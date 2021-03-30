@@ -1,1 +1,3 @@
-A place for Tendermint related design docs
+# Verim Tendermint
+
+A place for Tendermint related design documents.
