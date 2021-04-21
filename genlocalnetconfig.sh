@@ -97,13 +97,21 @@ id1=$(ls localnet/node1/config/gentx | sed 's/gentx-\(.*\).json/\1/')
 id2=$(ls localnet/node2/config/gentx | sed 's/gentx-\(.*\).json/\1/')
 id3=$(ls localnet/node3/config/gentx | sed 's/gentx-\(.*\).json/\1/')
 
+orig=''
+
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    orig=''
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    orig='.orig'
+fi
+
 # Update address book of the first node
 peers="$id0@node0:26656,$id1@node1:26656,$id2@node2:26656,$id3@node3:26656"
-sed -i .orig "s/persistent_peers = \"\"/persistent_peers = \"$peers\"/g" localnet/node0/config/config.toml
+sed -i $orig "s/persistent_peers = \"\"/persistent_peers = \"$peers\"/g" localnet/node0/config/config.toml
 
 # Make RPC enpoint available externally
 
-sed -i .orig 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/g' localnet/node0/config/config.toml
-sed -i .orig 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/g' localnet/node1/config/config.toml
-sed -i .orig 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/g' localnet/node2/config/config.toml
-sed -i .orig 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/g' localnet/node3/config/config.toml
+sed -i $orig 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/g' localnet/node0/config/config.toml
+sed -i $orig 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/g' localnet/node1/config/config.toml
+sed -i $orig 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/g' localnet/node2/config/config.toml
+sed -i $orig 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/g' localnet/node3/config/config.toml
