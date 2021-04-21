@@ -28,7 +28,6 @@ To launch your blockchain live on mutliple nodes use `starport network` commands
 ## Localnet
 
 ```
-docker build -t verim-cosmos 
 starport build
 ./genlocalnetconfig.sh
 docker-compose up
