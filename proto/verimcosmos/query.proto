@@ -4,12 +4,36 @@ package verimid.verimcosmos.verimcosmos;
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 // this line is used by starport scaffolding # 1
+import "verimcosmos/nym.proto";
 
 option go_package = "github.com/verim-id/verim-cosmos/x/verimcosmos/types";
 
 // Query defines the gRPC querier service.
 service Query {
     // this line is used by starport scaffolding # 2
+	rpc Nym(QueryGetNymRequest) returns (QueryGetNymResponse) {
+		option (google.api.http).get = "/verim-id/verimcosmos/verimcosmos/nym/{id}";
+	}
+	rpc NymAll(QueryAllNymRequest) returns (QueryAllNymResponse) {
+		option (google.api.http).get = "/verim-id/verimcosmos/verimcosmos/nym";
+	}
+
 }
 
 // this line is used by starport scaffolding # 3
+message QueryGetNymRequest {
+	uint64 id = 1;
+}
+
+message QueryGetNymResponse {
+	Nym Nym = 1;
+}
+
+message QueryAllNymRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllNymResponse {
+	repeated Nym Nym = 1;
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
