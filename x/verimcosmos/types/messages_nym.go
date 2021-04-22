@@ -7,10 +7,10 @@ import (
 
 var _ sdk.Msg = &MsgCreateNym{}
 
-func NewMsgCreateNym(creator string, alais string, verkey string, did string, role string) *MsgCreateNym {
+func NewMsgCreateNym(creator string, alias string, verkey string, did string, role string) *MsgCreateNym {
 	return &MsgCreateNym{
 		Creator: creator,
-		Alais:   alais,
+		Alias:   alias,
 		Verkey:  verkey,
 		Did:     did,
 		Role:    role,
@@ -48,11 +48,11 @@ func (msg *MsgCreateNym) ValidateBasic() error {
 
 var _ sdk.Msg = &MsgUpdateNym{}
 
-func NewMsgUpdateNym(creator string, id uint64, alais string, verkey string, did string, role string) *MsgUpdateNym {
+func NewMsgUpdateNym(creator string, id uint64, alias string, verkey string, did string, role string) *MsgUpdateNym {
 	return &MsgUpdateNym{
 		Id:      id,
 		Creator: creator,
-		Alais:   alais,
+		Alias:   alias,
 		Verkey:  verkey,
 		Did:     did,
 		Role:    role,

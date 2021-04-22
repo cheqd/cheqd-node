@@ -30,7 +30,7 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 // this line is used by starport scaffolding # proto/tx/message
 type MsgCreateNym struct {
 	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	Alais   string `protobuf:"bytes,2,opt,name=alais,proto3" json:"alais,omitempty"`
+	Alias   string `protobuf:"bytes,2,opt,name=alias,proto3" json:"alias,omitempty"`
 	Verkey  string `protobuf:"bytes,3,opt,name=verkey,proto3" json:"verkey,omitempty"`
 	Did     string `protobuf:"bytes,4,opt,name=did,proto3" json:"did,omitempty"`
 	Role    string `protobuf:"bytes,5,opt,name=role,proto3" json:"role,omitempty"`
@@ -76,9 +76,9 @@ func (m *MsgCreateNym) GetCreator() string {
 	return ""
 }
 
-func (m *MsgCreateNym) GetAlais() string {
+func (m *MsgCreateNym) GetAlias() string {
 	if m != nil {
-		return m.Alais
+		return m.Alias
 	}
 	return ""
 }
@@ -151,7 +151,7 @@ func (m *MsgCreateNymResponse) GetId() uint64 {
 type MsgUpdateNym struct {
 	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	Id      uint64 `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
-	Alais   string `protobuf:"bytes,3,opt,name=alais,proto3" json:"alais,omitempty"`
+	Alias   string `protobuf:"bytes,3,opt,name=alias,proto3" json:"alias,omitempty"`
 	Verkey  string `protobuf:"bytes,4,opt,name=verkey,proto3" json:"verkey,omitempty"`
 	Did     string `protobuf:"bytes,5,opt,name=did,proto3" json:"did,omitempty"`
 	Role    string `protobuf:"bytes,6,opt,name=role,proto3" json:"role,omitempty"`
@@ -204,9 +204,9 @@ func (m *MsgUpdateNym) GetId() uint64 {
 	return 0
 }
 
-func (m *MsgUpdateNym) GetAlais() string {
+func (m *MsgUpdateNym) GetAlias() string {
 	if m != nil {
-		return m.Alais
+		return m.Alias
 	}
 	return ""
 }
@@ -588,10 +588,10 @@ func (m *MsgCreateNym) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x1a
 	}
-	if len(m.Alais) > 0 {
-		i -= len(m.Alais)
-		copy(dAtA[i:], m.Alais)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Alais)))
+	if len(m.Alias) > 0 {
+		i -= len(m.Alias)
+		copy(dAtA[i:], m.Alias)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Alias)))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -674,10 +674,10 @@ func (m *MsgUpdateNym) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x22
 	}
-	if len(m.Alais) > 0 {
-		i -= len(m.Alais)
-		copy(dAtA[i:], m.Alais)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Alais)))
+	if len(m.Alias) > 0 {
+		i -= len(m.Alias)
+		copy(dAtA[i:], m.Alias)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Alias)))
 		i--
 		dAtA[i] = 0x1a
 	}
@@ -798,7 +798,7 @@ func (m *MsgCreateNym) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.Alais)
+	l = len(m.Alias)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -842,7 +842,7 @@ func (m *MsgUpdateNym) Size() (n int) {
 	if m.Id != 0 {
 		n += 1 + sovTx(uint64(m.Id))
 	}
-	l = len(m.Alais)
+	l = len(m.Alias)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -964,7 +964,7 @@ func (m *MsgCreateNym) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Alais", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Alias", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -992,7 +992,7 @@ func (m *MsgCreateNym) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Alais = string(dAtA[iNdEx:postIndex])
+			m.Alias = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
@@ -1262,7 +1262,7 @@ func (m *MsgUpdateNym) Unmarshal(dAtA []byte) error {
 			}
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Alais", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Alias", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1290,7 +1290,7 @@ func (m *MsgUpdateNym) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Alais = string(dAtA[iNdEx:postIndex])
+			m.Alias = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {

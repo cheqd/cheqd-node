@@ -7,7 +7,7 @@ export const protobufPackage = "verimid.verimcosmos.verimcosmos";
 export interface Nym {
   creator: string;
   id: number;
-  alais: string;
+  alias: string;
   verkey: string;
   did: string;
   role: string;
@@ -16,7 +16,7 @@ export interface Nym {
 const baseNym: object = {
   creator: "",
   id: 0,
-  alais: "",
+  alias: "",
   verkey: "",
   did: "",
   role: "",
@@ -30,8 +30,8 @@ export const Nym = {
     if (message.id !== 0) {
       writer.uint32(16).uint64(message.id);
     }
-    if (message.alais !== "") {
-      writer.uint32(26).string(message.alais);
+    if (message.alias !== "") {
+      writer.uint32(26).string(message.alias);
     }
     if (message.verkey !== "") {
       writer.uint32(34).string(message.verkey);
@@ -59,7 +59,7 @@ export const Nym = {
           message.id = longToNumber(reader.uint64() as Long);
           break;
         case 3:
-          message.alais = reader.string();
+          message.alias = reader.string();
           break;
         case 4:
           message.verkey = reader.string();
@@ -90,10 +90,10 @@ export const Nym = {
     } else {
       message.id = 0;
     }
-    if (object.alais !== undefined && object.alais !== null) {
-      message.alais = String(object.alais);
+    if (object.alias !== undefined && object.alias !== null) {
+      message.alias = String(object.alias);
     } else {
-      message.alais = "";
+      message.alias = "";
     }
     if (object.verkey !== undefined && object.verkey !== null) {
       message.verkey = String(object.verkey);
@@ -117,7 +117,7 @@ export const Nym = {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
     message.id !== undefined && (obj.id = message.id);
-    message.alais !== undefined && (obj.alais = message.alais);
+    message.alias !== undefined && (obj.alias = message.alias);
     message.verkey !== undefined && (obj.verkey = message.verkey);
     message.did !== undefined && (obj.did = message.did);
     message.role !== undefined && (obj.role = message.role);
@@ -136,10 +136,10 @@ export const Nym = {
     } else {
       message.id = 0;
     }
-    if (object.alais !== undefined && object.alais !== null) {
-      message.alais = object.alais;
+    if (object.alias !== undefined && object.alias !== null) {
+      message.alias = object.alias;
     } else {
-      message.alais = "";
+      message.alias = "";
     }
     if (object.verkey !== undefined && object.verkey !== null) {
       message.verkey = object.verkey;

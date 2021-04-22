@@ -16,7 +16,7 @@ service Msg {
 // this line is used by starport scaffolding # proto/tx/message
 message MsgCreateNym {
   string creator = 1;
-  string alais = 2;
+  string alias = 2;
   string verkey = 3;
   string did = 4;
   string role = 5;
@@ -29,7 +29,7 @@ message MsgCreateNymResponse {
 message MsgUpdateNym {
   string creator = 1;
   uint64 id = 2;
-  string alais = 3;
+  string alias = 3;
   string verkey = 4;
   string did = 5;
   string role = 6;

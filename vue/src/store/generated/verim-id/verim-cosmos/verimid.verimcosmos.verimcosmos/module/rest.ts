@@ -93,7 +93,7 @@ export interface VerimcosmosNym {
 
   /** @format uint64 */
   id?: string;
-  alais?: string;
+  alias?: string;
   verkey?: string;
   did?: string;
   role?: string;

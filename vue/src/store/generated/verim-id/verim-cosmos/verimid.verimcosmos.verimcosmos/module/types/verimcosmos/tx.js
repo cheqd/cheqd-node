@@ -4,7 +4,7 @@ import * as Long from "long";
 export const protobufPackage = "verimid.verimcosmos.verimcosmos";
 const baseMsgCreateNym = {
     creator: "",
-    alais: "",
+    alias: "",
     verkey: "",
     did: "",
     role: "",
@@ -14,8 +14,8 @@ export const MsgCreateNym = {
         if (message.creator !== "") {
             writer.uint32(10).string(message.creator);
         }
-        if (message.alais !== "") {
-            writer.uint32(18).string(message.alais);
+        if (message.alias !== "") {
+            writer.uint32(18).string(message.alias);
         }
         if (message.verkey !== "") {
             writer.uint32(26).string(message.verkey);
@@ -39,7 +39,7 @@ export const MsgCreateNym = {
                     message.creator = reader.string();
                     break;
                 case 2:
-                    message.alais = reader.string();
+                    message.alias = reader.string();
                     break;
                 case 3:
                     message.verkey = reader.string();
@@ -65,11 +65,11 @@ export const MsgCreateNym = {
         else {
             message.creator = "";
         }
-        if (object.alais !== undefined && object.alais !== null) {
-            message.alais = String(object.alais);
+        if (object.alias !== undefined && object.alias !== null) {
+            message.alias = String(object.alias);
         }
         else {
-            message.alais = "";
+            message.alias = "";
         }
         if (object.verkey !== undefined && object.verkey !== null) {
             message.verkey = String(object.verkey);
@@ -94,7 +94,7 @@ export const MsgCreateNym = {
     toJSON(message) {
         const obj = {};
         message.creator !== undefined && (obj.creator = message.creator);
-        message.alais !== undefined && (obj.alais = message.alais);
+        message.alias !== undefined && (obj.alias = message.alias);
         message.verkey !== undefined && (obj.verkey = message.verkey);
         message.did !== undefined && (obj.did = message.did);
         message.role !== undefined && (obj.role = message.role);
@@ -108,11 +108,11 @@ export const MsgCreateNym = {
         else {
             message.creator = "";
         }
-        if (object.alais !== undefined && object.alais !== null) {
-            message.alais = object.alais;
+        if (object.alias !== undefined && object.alias !== null) {
+            message.alias = object.alias;
         }
         else {
-            message.alais = "";
+            message.alias = "";
         }
         if (object.verkey !== undefined && object.verkey !== null) {
             message.verkey = object.verkey;
@@ -189,7 +189,7 @@ export const MsgCreateNymResponse = {
 const baseMsgUpdateNym = {
     creator: "",
     id: 0,
-    alais: "",
+    alias: "",
     verkey: "",
     did: "",
     role: "",
@@ -202,8 +202,8 @@ export const MsgUpdateNym = {
         if (message.id !== 0) {
             writer.uint32(16).uint64(message.id);
         }
-        if (message.alais !== "") {
-            writer.uint32(26).string(message.alais);
+        if (message.alias !== "") {
+            writer.uint32(26).string(message.alias);
         }
         if (message.verkey !== "") {
             writer.uint32(34).string(message.verkey);
@@ -230,7 +230,7 @@ export const MsgUpdateNym = {
                     message.id = longToNumber(reader.uint64());
                     break;
                 case 3:
-                    message.alais = reader.string();
+                    message.alias = reader.string();
                     break;
                 case 4:
                     message.verkey = reader.string();
@@ -262,11 +262,11 @@ export const MsgUpdateNym = {
         else {
             message.id = 0;
         }
-        if (object.alais !== undefined && object.alais !== null) {
-            message.alais = String(object.alais);
+        if (object.alias !== undefined && object.alias !== null) {
+            message.alias = String(object.alias);
         }
         else {
-            message.alais = "";
+            message.alias = "";
         }
         if (object.verkey !== undefined && object.verkey !== null) {
             message.verkey = String(object.verkey);
@@ -292,7 +292,7 @@ export const MsgUpdateNym = {
         const obj = {};
         message.creator !== undefined && (obj.creator = message.creator);
         message.id !== undefined && (obj.id = message.id);
-        message.alais !== undefined && (obj.alais = message.alais);
+        message.alias !== undefined && (obj.alias = message.alias);
         message.verkey !== undefined && (obj.verkey = message.verkey);
         message.did !== undefined && (obj.did = message.did);
         message.role !== undefined && (obj.role = message.role);
@@ -312,11 +312,11 @@ export const MsgUpdateNym = {
         else {
             message.id = 0;
         }
-        if (object.alais !== undefined && object.alais !== null) {
-            message.alais = object.alais;
+        if (object.alias !== undefined && object.alias !== null) {
+            message.alias = object.alias;
         }
         else {
-            message.alais = "";
+            message.alias = "";
         }
         if (object.verkey !== undefined && object.verkey !== null) {
             message.verkey = object.verkey;

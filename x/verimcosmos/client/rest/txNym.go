@@ -15,7 +15,7 @@ import (
 type createNymRequest struct {
 	BaseReq rest.BaseReq `json:"base_req"`
 	Creator string       `json:"creator"`
-	Alais   string       `json:"alais"`
+	Alias   string       `json:"alias"`
 	Verkey  string       `json:"verkey"`
 	Did     string       `json:"did"`
 	Role    string       `json:"role"`
@@ -40,7 +40,7 @@ func createNymHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		parsedAlais := req.Alais
+		parsedAlias := req.Alias
 
 		parsedVerkey := req.Verkey
 
@@ -50,7 +50,7 @@ func createNymHandler(clientCtx client.Context) http.HandlerFunc {
 
 		msg := types.NewMsgCreateNym(
 			req.Creator,
-			parsedAlais,
+			parsedAlias,
 			parsedVerkey,
 			parsedDid,
 			parsedRole,
@@ -63,7 +63,7 @@ func createNymHandler(clientCtx client.Context) http.HandlerFunc {
 type updateNymRequest struct {
 	BaseReq rest.BaseReq `json:"base_req"`
 	Creator string       `json:"creator"`
-	Alais   string       `json:"alais"`
+	Alias   string       `json:"alias"`
 	Verkey  string       `json:"verkey"`
 	Did     string       `json:"did"`
 	Role    string       `json:"role"`
@@ -93,7 +93,7 @@ func updateNymHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		parsedAlais := req.Alais
+		parsedAlias := req.Alias
 
 		parsedVerkey := req.Verkey
 
@@ -104,7 +104,7 @@ func updateNymHandler(clientCtx client.Context) http.HandlerFunc {
 		msg := types.NewMsgUpdateNym(
 			req.Creator,
 			id,
-			parsedAlais,
+			parsedAlias,
 			parsedVerkey,
 			parsedDid,
 			parsedRole,

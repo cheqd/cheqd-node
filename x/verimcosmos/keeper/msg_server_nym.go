@@ -15,7 +15,7 @@ func (k msgServer) CreateNym(goCtx context.Context, msg *types.MsgCreateNym) (*t
 	id := k.AppendNym(
 		ctx,
 		msg.Creator,
-		msg.Alais,
+		msg.Alias,
 		msg.Verkey,
 		msg.Did,
 		msg.Role,
@@ -32,7 +32,7 @@ func (k msgServer) UpdateNym(goCtx context.Context, msg *types.MsgUpdateNym) (*t
 	var nym = types.Nym{
 		Creator: msg.Creator,
 		Id:      msg.Id,
-		Alais:   msg.Alais,
+		Alias:   msg.Alias,
 		Verkey:  msg.Verkey,
 		Did:     msg.Did,
 		Role:    msg.Role,

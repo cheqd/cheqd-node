@@ -3,7 +3,7 @@ export declare const protobufPackage = "verimid.verimcosmos.verimcosmos";
 /** this line is used by starport scaffolding # proto/tx/message */
 export interface MsgCreateNym {
     creator: string;
-    alais: string;
+    alias: string;
     verkey: string;
     did: string;
     role: string;
@@ -14,7 +14,7 @@ export interface MsgCreateNymResponse {
 export interface MsgUpdateNym {
     creator: string;
     id: number;
-    alais: string;
+    alias: string;
     verkey: string;
     did: string;
     role: string;

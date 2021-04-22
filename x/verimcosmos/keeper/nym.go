@@ -2,10 +2,11 @@ package keeper
 
 import (
 	"encoding/binary"
+	"strconv"
+
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/verim-id/verim-cosmos/x/verimcosmos/types"
-	"strconv"
 )
 
 // GetNymCount get the total number of nym
@@ -41,7 +42,7 @@ func (k Keeper) SetNymCount(ctx sdk.Context, count uint64) {
 func (k Keeper) AppendNym(
 	ctx sdk.Context,
 	creator string,
-	alais string,
+	alias string,
 	verkey string,
 	did string,
 	role string,
@@ -51,7 +52,7 @@ func (k Keeper) AppendNym(
 	var nym = types.Nym{
 		Creator: creator,
 		Id:      count,
-		Alais:   alais,
+		Alias:   alias,
 		Verkey:  verkey,
 		Did:     did,
 		Role:    role,

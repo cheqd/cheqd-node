@@ -8,7 +8,7 @@ import "gogoproto/gogo.proto";
 message Nym {
   string creator = 1;
   uint64 id = 2;
-  string alais = 3; 
+  string alias = 3; 
   string verkey = 4; 
   string did = 5; 
   string role = 6; 

@@ -3,7 +3,7 @@ export declare const protobufPackage = "verimid.verimcosmos.verimcosmos";
 export interface Nym {
     creator: string;
     id: number;
-    alais: string;
+    alias: string;
     verkey: string;
     did: string;
     role: string;
