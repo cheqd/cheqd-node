@@ -27,8 +27,27 @@ To launch your blockchain live on mutliple nodes use `starport network` commands
 
 ## Localnet
 
+Commands to setup localnet:
+
 ```
 starport build
 ./genlocalnetconfig.sh
 docker-compose up
 ```
+
+This will setup 4 nodes listening on the following ports:
+
+- Node0:
+    - p2p: 26656
+    - rpc: 26657
+- Node1:
+    - p2p: 26666
+    - rpc: 26667
+- Node2:
+    - p2p: 26676
+    - rpc: 26677
+- Node3:
+    - p2p: 26686
+    - rpc: 26687
+
+You can tests connection to a node using browser: `http://localhost:<rpc_port>`. Example for the fitst node: `http://localhost:26657`.
