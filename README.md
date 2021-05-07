@@ -32,7 +32,7 @@ Commands to setup localnet:
 ```
 starport build
 ./genlocalnetconfig.sh
-docker-compose up
+docker-compose up --build
 ```
 
 This will setup 4 nodes listening on the following ports:
@@ -51,3 +51,18 @@ This will setup 4 nodes listening on the following ports:
     - rpc: 26687
 
 You can tests connection to a node using browser: `http://localhost:<rpc_port>`. Example for the fitst node: `http://localhost:26657`.
+
+When connecting using CLI, point path to home directory: `--home localnet/client`. This directory contains keys from genesis acounts.
+
+Demo commands:
+
+```
+# Show balances
+vc query bank balances (vc keys show anna -a --home localnet/client) --home localnet/client
+
+# Create NYM
+vc tx verimcosmos create-nym "alias" "verkey" "did" "role" --from anna --gas-prices 1token --chain-id verim-cosmos-chain --home localnet/client
+
+# List nym
+vc query verimcosmos list-nym --home localnet/client
+```
