@@ -79,7 +79,7 @@ echo "# Generate key"
 verim-cosmosd keys add bob --home $NODE_2_HOME
 
 echo "# Initialze node"
-verim-cosmosd init node1 --chain-id $CHAIN_ID --home $NODE_2_HOME
+verim-cosmosd init node2 --chain-id $CHAIN_ID --home $NODE_2_HOME
 
 echo "### Get genesis from Alice"
 cp $NODE_1_HOME/config/genesis.json $NODE_2_HOME/config
@@ -93,9 +93,6 @@ verim-cosmosd add-genesis-account bob 10000000token,100000000stake --home $NODE_
 
 echo "# Generate genesis node tx"
 verim-cosmosd gentx bob 1000000stake --chain-id $CHAIN_ID --home $NODE_2_HOME
-
-echo "# Add the tx into genesis"
-verim-cosmosd collect-gentxs --home $NODE_2_HOME
 
 echo "# Publish validator pubkey"
 NODE_2_ID=$(verim-cosmosd tendermint show-node-id --home $NODE_2_HOME)
