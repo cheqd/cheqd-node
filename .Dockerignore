@@ -1,0 +1,5 @@
+localnet
+.devcontainer
+.github
+.idea
+vue/node_modules
