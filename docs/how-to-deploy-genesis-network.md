@@ -1,8 +1,6 @@
 # Deploy genesis network
 
-This document describes in details how to configure a genesis (first) validator node.
-
-Here we assume (for simplicity) that the genesis block consists of a single node only. Please note that nothing prevents you from adding more nodes to the genesis file by adapting the instructions accordingly.
+This document describes in details how to configure a genesis network with any amount of particiatns.
 
 ### Hardware requirements
 Minimal:
@@ -20,36 +18,11 @@ Current delivery is compiled and tested under `Ubuntu 20.04 LTS` so we recommend
 
 ## Deployment steps
 
-- Add key for new client `verim-cosmosd keys add <name-client>`
-- Optionally, add other clients using the same command.
-2. Initialize node
-    - Initialize new configuration `verim-cosmosd init <name-node> --chain-id <chain-id> --home localnet/<name-node>`
-    - Copy genesis file `cp -r localnet/client/* localnet/<name-node>`
-    - Add genesis account with the generated key `verim-cosmosd add-genesis-account <name-client> 1000token,100000000stake --home localnet/<name-node>`
-    - Optionally, add other genesis accounts using the same command.
-    - Create genesis transaction: `verim-cosmosd gentx <name-client> 1000000stake --chain-id <chain-id> --home localnet/<name-node>`
-3. Collect all validator creation transactions:
-    - Create `gentx` directory `mkdir localnet/client/config/gentx`
-    - Copy `gentx` for every node `cp localnet/<name-node>/config/gentx/* $HOME/.verimcosmos/config/gentx`
-5. Embed them into genesis:
-    - `verim-cosmosd init dummy-node --chain-id <chain-id>`
-    - `verim-cosmosd add-genesis-account <name-client> 1000token,100000000stake`
-    - Repeat last substep for every client.
-    - `verim-cosmosd collect-gentxs`
-    - `verim-cosmosd validate-genesis`
-6. Update config for every node:
-    - `cp localnet/client/config/genesis.json localnet/<name-node>/config/`
-    - Find out ip address and id of all nodes, then open file `localnet/<name-node>/config/config.toml`, where `<name-node>` is name of first node, and set value for param `persistent_peers="<id-node1>@<ip-node1>,<id-node2>@<ip-node2>"`.
-    - Set `laddr="tcp:\/\/127.0.0.1:26657"` for RPC server to listen on, and set `laddr = "tcp:\/\/0.0.0.0:26657"` for incoming connections, for every node config `localnet/<name-node>/config/config.toml`.
-7. Run your nodes:
-    - `verim-cosmosd start --home localnet/<name-node>`.
-8. Congrats! You deployed own network!
+1 Jack
 
-## Deployment scenario
+  1. Generates local key: `verim-cosmosd keys add jack --home $NODE_0_HOME`, where `$NODE_0_HOME="localnet/node0"`
 
-1.1 Jack generates local key: `verim-cosmosd keys add jack --home $NODE_0_HOME`, where `$NODE_0_HOME="localnet/node0"`
-
-1.2 Jack initializes local node: `verim-cosmosd init node0 --chain-id $CHAIN_ID --home $NODE_0_HOME`, where `$CHAIN_ID="verim-cosmos-chain"`
+  2. Initializes local node: `verim-cosmosd init node0 --chain-id $CHAIN_ID --home $NODE_0_HOME`, where `$CHAIN_ID="verim-cosmos-chain"`
 
 1.3 Jack adds genesis account: `verim-cosmosd add-genesis-account jack 10000000token,100000000stake --home $NODE_0_HOME`
 
