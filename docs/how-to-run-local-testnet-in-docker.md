@@ -31,7 +31,7 @@ This will setup 4 nodes listening on the following ports:
 
 You can tests connection to a node using browser: `http://localhost:<rpc_port>`. Example for the fitst node: `http://localhost:26657`.
 
-When connecting using CLI, point path to home directory: `--home localnet/client`. This directory contains keys from genesis acounts.
+Keys of all accounts are located in `localnet/client`. When connecting using CLI, point path to home directory: `--home localnet/client`. This directory contains keys from genesis acounts.
 
 Demo commands:
 
