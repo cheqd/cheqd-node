@@ -57,13 +57,16 @@ After this steps the nodes of all participants have same genesis, and they can c
 ### Running the network
 
 - Each of them:
-    - Shares his node's ID@IP with each other
-        - How to get this information?
-    - 5.1 Updates address book of them node. It allows nodes to connect to each other. Every node owner needs to run follow command: `sed -i "s/persistent_peers = \"\"/persistent_peers = \"$NODE_0_ID@node0:26656,$NODE_1_ID@node1:26656,$NODE_2_ID@node2:26656,$NODE_3_ID@node3:26656\"/g" $NODE_#_HOME/config/config.toml`, where $NODE_#_HOME means variable with number of node owner.
+    - Shares his node's ID@IP with each other:
+        - Find out own id-node: `verim-cosmosd tendermint show-node-id`
+        - Node IP matches to `[rpc] laddr` field in `$HOME/.verimcosmos/config/config.toml`
+    -  Updates address book of them node:
+        - Command: `sed -i "s/persistent_peers = \"\"/persistent_peers = \"<node-0-id>@<node-0-ip>,<node-1-id>@<node-1-ip>,<node-2-id>@<node-2-id>,<node-3-id>@<node-3-id>\"/g" $HOME/.verimcosmos/config/config.toml`
+        - Example: `sed -i "s/persistent_peers = \"\"/persistent_peers = \"d45dcc54583d6223ba6d4b3876928767681e8ff6@node0:26656,9fb6636188ad9e40a9caf86b88ffddbb1b6b04ce@node1:26656,abbcb709fb556ce63e2f8d59a76c5023d7b28b86@node2:26656,cda0d4dbe3c29edcfcaf4668ff17ddcb96730aec@node3:26656\"/g" $HOME/.verimcosmos/config/config.toml`
     - // TODO: Research 5.2 Eventually need to set minimal gas prices (it needs for fees transaction). Every node owner needs to run follow command: `sed -i 's/minimum-gas-prices = ""/minimum-gas-prices = "1token"/g' $NODE_#_HOME/config/app.toml`, where instead `1token` node can set other price.
     - Start node:
         - `verim-cosmosd start`
-        - It's better to use process superviser like `systemd`.
+        - It's better to use process supervisor like `systemd`.
 
 
 Congrats!
