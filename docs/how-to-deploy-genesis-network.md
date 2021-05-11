@@ -64,18 +64,9 @@ After this steps the nodes of all participants have same genesis, and they can c
         - Find out own id-node: `verim-cosmosd tendermint show-node-id`
         - Node IP matches to `[rpc] laddr` field in `$HOME/.verimcosmos/config/config.toml`
     -  Updates address book of own node:
-        - Command:
-            ```
-            sed -i "s/persistent_peers = \"\"/persistent_peers = \"
-            <node-0-id>@<node-0-ip>,
-            <node-1-id>@<node-1-ip>,
-            <node-2-id>@<node-2-id>,
-            <node-3-id>@<node-3-id>\"/g" $HOME/.verimcosmos/config/config.toml
-            ```
-        - Example:
-            ```
-            sed -i "s/persistent_peers = \"\"/persistent_peers = \"d45dcc54583d6223ba6d4b3876928767681e8ff6@node0:26656,9fb6636188ad9e40a9caf86b88ffddbb1b6b04ce@node1:26656,abbcb709fb556ce63e2f8d59a76c5023d7b28b86@node2:26656,cda0d4dbe3c29edcfcaf4668ff17ddcb96730aec@node3:26656\"/g" $HOME/.verimcosmos/config/config.toml
-            ```
+        - Open file `$HOME/.verimcosmos/config/config.toml`
+        - Set value for persistent_peers param like `<node-0-id>@<node-0-ip>, <node-1-id>@<node-1-ip>,<node-2-id>@<node-2-id>, <node-3-id>@<node-3-id>`
+            - Example ```persistent_peers = "d45dcc54583d6223ba6d4b3876928767681e8ff6@node0:26656,9fb6636188ad9e40a9caf86b88ffddbb1b6b04ce@node1:26656,abbcb709fb556ce63e2f8d59a76c5023d7b28b86@node2:26656,cda0d4dbe3c29edcfcaf4668ff17ddcb96730aec@node3:26656"```
     - // TODO: Research 5.2 Eventually need to set minimal gas prices (it needs for fees transaction). Every node owner needs to run follow command: `sed -i 's/minimum-gas-prices = ""/minimum-gas-prices = "1token"/g' $NODE_#_HOME/config/app.toml`, where instead `1token` node can set other price.
     - Start node:
         - `verim-cosmosd start`
