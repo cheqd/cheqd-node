@@ -55,6 +55,7 @@ Current delivery is compiled and tested under `Ubuntu 20.04 LTS` so we recommend
 
 1.4 Jack generates genesis node transaction: `verim-cosmosd gentx jack 1000000stake --chain-id $CHAIN_ID --home $NODE_0_HOME`
 
+<br/>
 
 2.1 Alice generates local key: `verim-cosmosd keys add alice --home $NODE_1_HOME`, where `$NODE_1_HOME="localnet/node1"`
 
@@ -68,6 +69,7 @@ Current delivery is compiled and tested under `Ubuntu 20.04 LTS` so we recommend
 
 2.5 Alice adds genesis account: `verim-cosmosd add-genesis-account alice 10000000token,100000000stake --home $NODE_1_HOME`
 
+<br/>
 
 3.1 Bob generates local key: `verim-cosmosd keys add bob --home $NODE_2_HOME`, where `$NODE_2_HOME="localnet/node2"`
 
@@ -81,11 +83,11 @@ Current delivery is compiled and tested under `Ubuntu 20.04 LTS` so we recommend
 
 3.5 Bob adds genesis account: `verim-cosmosd add-genesis-account bob 10000000token,100000000stake --home $NODE_2_HOME`
 
+<br/>
 
 4.1 Anna generates local key: `verim-cosmosd keys add bob --home $NODE_3_HOME`, where `$NODE_3_HOME="localnet/node3"`
 
-4.2 Anna initializes local node:
-- `verim-cosmosd init node3 --chain-id $CHAIN_ID --home $NODE_2_HOME`
+4.2 Anna initializes local node: `verim-cosmosd init node3 --chain-id $CHAIN_ID --home $NODE_2_HOME`
 
 4.3 Anna gets genesis from Bob. If it is the only machine: `cp $NODE_2_HOME/config/genesis.json $NODE_3_HOME/config`
 
@@ -104,9 +106,12 @@ Current delivery is compiled and tested under `Ubuntu 20.04 LTS` so we recommend
 - `cp $NODE_3_HOME/config/genesis.json $NODE_1_HOME/config/`
 - `cp $NODE_3_HOME/config/genesis.json $NODE_2_HOME/config/`
 
+<br/>
 
 5.1 Updates address book of them node. It allows nodes to connect to each other. Every node owner needs to run follow command: `sed -i "s/persistent_peers = \"\"/persistent_peers = \"$NODE_0_ID@node0:26656,$NODE_1_ID@node1:26656,$NODE_2_ID@node2:26656,$NODE_3_ID@node3:26656\"/g" $NODE_#_HOME/config/config.toml`, where $NODE_#_HOME means variable with number of node owner.
 
 5.2 Eventually need to set minimal gas prices (it needs for fees transaction). Every node owner needs to run follow command: `sed -i 's/minimum-gas-prices = ""/minimum-gas-prices = "1token"/g' $NODE_#_HOME/config/app.toml`, where instead `1token` node can set other price.
+
+<br/>
 
 After this steps the nodes of Jack, Alice, Bob and Anna have same genesis, and they can connect to each other.
