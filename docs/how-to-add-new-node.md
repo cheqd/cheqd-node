@@ -105,3 +105,9 @@ New participant:
         `commission-max-change-rate`, `commission-max-rate` and `commission-rate` may take fraction number as `0.01`
 
         Use this command to find out `<validator-pubkey>`: `verim-cosmosd tendermint show-validator`. This command **MUST** be run on the node's machine.
+        
+        Example:
+        
+        ```
+        verim-cosmosd tx staking create-validator --amount 50000000stake --from steward1 --moniker steward1 --chain-id verimcosmos --min-self-delegation="1" --gas="auto" --gas-prices="1token" --pubkey cosmosvalconspub1zcjduepqpmyzmytdzjhf2fjwttjsrv49t62gdexm2yttpmgzh38p0rncqg8ssrxm2l --commission-max-change-rate="0.02" --commission-max-rate="0.02" --commission-rate="0.01"
+        ```
