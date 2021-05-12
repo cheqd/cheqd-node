@@ -8,18 +8,9 @@ You need to have Go and Node.js toolchains installed.
 
 ## Deploy steps
 
-1. Build node executable:
-    ```
-    starport build
-    ```
-2. Use `genlocalnetconfig.sh` script to generate node configurations:
-    ```
-    ./genlocalnetconfig.sh
-    ```
-3. Use docker-compose to run nodes:
-    ```
-    docker-compose up --build
-    ```
+1. Build node executable: `starport build`
+2. Use `genlocalnetconfig.sh` script to generate node configurations: `./genlocalnetconfig.sh`
+3. Use docker-compose to run nodes: `docker-compose up --build`
 
 This will setup 4 nodes listening on the following ports:
 
