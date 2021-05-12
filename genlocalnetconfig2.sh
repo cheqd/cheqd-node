@@ -144,7 +144,7 @@ cp $NODE_3_HOME/config/genesis.json $NODE_1_HOME/config/
 cp $NODE_3_HOME/config/genesis.json $NODE_2_HOME/config/
 
 
-echo "################################ Anna (at least one participant) Updates address book of her node. It will alow nodes to connect to each other."
+echo "################################ Anna (at least one participant) Updates address book of her node. It will allow nodes to connect to each other."
 peers="$NODE_0_ID@node0:26656,$NODE_1_ID@node1:26656,$NODE_2_ID@node2:26656,$NODE_3_ID@node3:26656"
 sed -i $extension "s/persistent_peers = \"\"/persistent_peers = \"$peers\"/g" $NODE_0_HOME/config/config.toml
 sed -i $extension "s/persistent_peers = \"\"/persistent_peers = \"$peers\"/g" $NODE_1_HOME/config/config.toml
@@ -153,7 +153,7 @@ sed -i $extension "s/persistent_peers = \"\"/persistent_peers = \"$peers\"/g" $N
 
 
 echo "################################ (any participant, optional) Sets minimal gas prices"
-sed -i $extension 's/minimum-gas-prices = ""/minimum-gas-prices = "1token"/g' localnet/node0/config/app.toml
-sed -i $extension 's/minimum-gas-prices = ""/minimum-gas-prices = "1token"/g' localnet/node1/config/app.toml
-sed -i $extension 's/minimum-gas-prices = ""/minimum-gas-prices = "1token"/g' localnet/node2/config/app.toml
-sed -i $extension 's/minimum-gas-prices = ""/minimum-gas-prices = "1token"/g' localnet/node3/config/app.toml
+sed -i $extension 's/minimum-gas-prices = ""/minimum-gas-prices = "1token"/g' $NODE_0_HOME/config/app.toml
+sed -i $extension 's/minimum-gas-prices = ""/minimum-gas-prices = "1token"/g' $NODE_1_HOME/config/app.toml
+sed -i $extension 's/minimum-gas-prices = ""/minimum-gas-prices = "1token"/g' $NODE_2_HOME/config/app.toml
+sed -i $extension 's/minimum-gas-prices = ""/minimum-gas-prices = "1token"/g' $NODE_3_HOME/config/app.toml
