@@ -35,11 +35,15 @@ message MsgUpdateNym {
   string role = 6;
 }
 
-message MsgUpdateNymResponse { }
+message MsgUpdateNymResponse {
+  uint64 id = 1;
+}
 
 message MsgDeleteNym {
   string creator = 1;
   uint64 id = 2;
 }
 
-message MsgDeleteNymResponse { }
+message MsgDeleteNymResponse {
+  uint64 id = 1;
+}
