@@ -1,0 +1,31 @@
+name: Main
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.15
+      env:
+        GOOS: ${{ matrix.targetos }}
+        GOARCH: ${{ matrix.arch }}
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Starport install
+      run: |
+          git clone https://github.com/tendermint/starport --depth=1
+          cd starport && make install && cd ..
+
+    - name: Starport start
+      run: starport serve
+
