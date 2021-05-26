@@ -12,20 +12,19 @@ jobs:
     - name: Set up Go 1.x
       uses: actions/setup-go@v2
       with:
-        go-version: 1.15
-      env:
-        GOOS: ${{ matrix.targetos }}
-        GOARCH: ${{ matrix.arch }}
+        go-version: ^1.13
       id: go
 
-    - name: Check out code into the Go module directory
+    - name: Check out starport repo
       uses: actions/checkout@v2
+      with:
+          repository: tendermint/starport
 
     - name: Starport install
-      run: |
-          git clone https://github.com/tendermint/starport --depth=1
-          cd starport && make install && cd ..
+      run: make install
+
+    - name: Check out back
+      uses: actions/checkout@v2
 
     - name: Starport start
       run: starport serve
-
