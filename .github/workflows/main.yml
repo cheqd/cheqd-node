@@ -30,14 +30,18 @@ jobs:
     - name: Starport build
       run: starport build
 
-    - shell: bash
+  archive:
+    name: Archive
+    runs-on: ubuntu-latest
+    steps:
+    - name: Make archive
       run: |
           touch node.tar.gz
           tar -czf node.tar.gz --exclude=node.tar.gz .
     - name: Upload archive
       uses: actions/upload-artifact@v2
       with:
-        name: node_tar
+        name: node.tar.gz
         path: node.tar.gz
 
 #  unit_tests:
