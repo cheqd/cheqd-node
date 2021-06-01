@@ -1,7 +1,6 @@
 package verimcosmos
 
 import (
-	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/require"
 	"github.com/verim-id/verim-cosmos/x/verimcosmos/types"
 	"testing"
@@ -10,38 +9,69 @@ import (
 func TestHandler_CreateNym(t *testing.T) {
 	setup := Setup()
 
-	// add new model
+	// add new NYM
 	nymMsg := TestMsgCreateNym()
-	result, er := setup.Handler(setup.Ctx, nymMsg)
-	//require.Equal(t, sdk.CodeOK, result.)
-	//var id = types.MsgCreateNymResponse.Unmarshal(*[]byte(result.Data))
-	id := proto.Unmarshal(result.Data, &types.MsgCreateNymResponse)
-	//var receivedModelInfo types.ModelInfo
-	//_ = setup.Cdc(result, &receivedModelInfo)
-	print(id)
-	print(er)
+	result, _ := setup.Handler(setup.Ctx, nymMsg)
+	nym := types.MsgCreateNymResponse{}
+	nym.Unmarshal(result.Data)
 
-	// query model
-	//receivedNym := queryGetNym(setup, result.)
-	//receivedNym := setup.NymKeeper.GetNym(setup.Ctx, id)
-	//
+	// query NYM
+	receivedNym := setup.NymKeeper.GetNym(setup.Ctx, nym.Id)
+
 	//// check
-	//require.Equal(t, receivedNym., nymMsg)
+	require.Equal(t, receivedNym.Id, nym.Id)
+	require.Equal(t, nymMsg.GetCreator(), receivedNym.GetCreator())
+	require.Equal(t, nymMsg.GetAlias(), receivedNym.GetAlias())
+	require.Equal(t, nymMsg.GetDid(), receivedNym.GetDid())
+	require.Equal(t, nymMsg.GetVerkey(), receivedNym.GetVerkey())
+	require.Equal(t, nymMsg.GetRole(), receivedNym.GetRole())
+}
+func TestHandler_UpdateNym(t *testing.T) {
+	setup := Setup()
+
+	// add new NYM
+	nymMsg := TestMsgCreateNym()
+	result, _ := setup.Handler(setup.Ctx, nymMsg)
+	nym := types.MsgCreateNymResponse{}
+	nym.Unmarshal(result.Data)
+
+	// update NYM
+	updateNymMsg := TestMsgUpdateNym(nym.GetId())
+	setup.Handler(setup.Ctx, updateNymMsg)
+
+	// query NYM
+	receivedNym := setup.NymKeeper.GetNym(setup.Ctx, nym.Id)
+
+	//// check
+	require.Equal(t, receivedNym.Id, nym.Id)
+	require.Equal(t, updateNymMsg.GetCreator(), receivedNym.GetCreator())
+	require.Equal(t, updateNymMsg.GetAlias(), receivedNym.GetAlias())
+	require.Equal(t, updateNymMsg.GetDid(), receivedNym.GetDid())
+	require.Equal(t, updateNymMsg.GetVerkey(), receivedNym.GetVerkey())
+	require.Equal(t, updateNymMsg.GetRole(), receivedNym.GetRole())
 }
 
-//func queryGetNym(setup TestSetup, id unit64) types.Nym {
-//
-//
-//
-//	result, _ := setup.Querier(
-//		setup.Ctx,
-//		[]string{keeper.QueryModel, fmt.Sprintf("%v", vid), TestQueryGetNym(id)},
-//		abci.RequestQuery{},
-//	)
-//
-//	var receivedNym types.Nym
-//	_ = setup.Cdc.UnmarshalJSON(result, &receivedNym)
-//
-//	return receivedNym
-//
-//}
+func TestHandler_DeleteNym(t *testing.T) {
+	setup := Setup()
+
+	// add new NYM
+	nymMsg := TestMsgCreateNym()
+	result, _ := setup.Handler(setup.Ctx, nymMsg)
+	nym := types.MsgCreateNymResponse{}
+	nym.Unmarshal(result.Data)
+
+	// delete NYM
+	updateNymMsg := TestMsgDeleteNym(nym.GetId())
+	setup.Handler(setup.Ctx, updateNymMsg)
+
+	// query NYM
+	receivedNym := setup.NymKeeper.GetNym(setup.Ctx, nym.Id)
+
+	//// check
+	require.Equal(t, receivedNym.Id, nym.Id)
+	require.Equal(t, "", receivedNym.GetCreator())
+	require.Equal(t, "", receivedNym.GetAlias())
+	require.Equal(t, "", receivedNym.GetDid())
+	require.Equal(t, "", receivedNym.GetVerkey())
+	require.Equal(t, "", receivedNym.GetRole())
+}
