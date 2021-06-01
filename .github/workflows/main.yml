@@ -27,8 +27,8 @@ jobs:
     - name: Check out back
       uses: actions/checkout@v2
 
-    - name: Starport start
-      run: starport serve
+    - name: Starport build
+      run: starport build
 
   unit_tests:
     name: Unit tests
