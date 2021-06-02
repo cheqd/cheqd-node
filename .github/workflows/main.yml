@@ -3,8 +3,8 @@ name: Main
 on:
   push:
     branches:
-      - "master"
-      - "amromashov/verim-poc"
+      - master
+      - amromashov/verim-poc
 jobs:
 
   build:
