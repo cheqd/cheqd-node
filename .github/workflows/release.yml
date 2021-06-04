@@ -1,0 +1,77 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - "v*"
+
+jobs:
+  tagged-release:
+    name: "Tagged Release"
+    runs-on: "ubuntu-latest"
+
+    steps:
+
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.13
+      id: go
+
+    - name: Check out starport repo
+      uses: actions/checkout@v2
+      with:
+          repository: tendermint/starport
+
+    - name: Starport install
+      run: make install
+
+    - name: Check out back
+      uses: actions/checkout@v2
+
+    - name: Starport build
+      run: starport build
+
+    - name: Make archive
+      run: |
+        touch node.tar.gz
+        tar -czf node.tar.gz --exclude=node.tar.gz .
+    - name: Upload archive
+      uses: actions/upload-artifact@v2
+      with:
+        name: node.tar.gz
+        path: node.tar.gz
+
+    - name: Creating deb package
+    - run: mkdir Node_${{ GITHUB_REF }}_arm64
+    - run: mkdir -p Node_${{ GITHUB_REF }}_arm64/usr/local/bin
+    - run: cp ~/go/go/bin/verim-cosmosd Node_${{ GITHUB_REF }}_arm64/usr/local/bin
+    - run: mkdir Node_${{ GITHUB_REF }}_arm64/DEBIAN
+    - run: touch Node_${{ GITHUB_REF }}_arm64/DEBIAN/control
+    - run: echo Package: Node >> Node_${{ GITHUB_REF }}_arm64/DEBIAN/control
+    - run: echo Version: ${{ GITHUB_REF }} >> Node_${{ GITHUB_REF }}_arm64/DEBIAN/control
+    - run: echo Architecture: arm64 >> Node_${{ GITHUB_REF }}_arm64/DEBIAN/control
+    - run: echo Maintainer: Somebody <> >> Node_${{ GITHUB_REF }}_arm64/DEBIAN/control
+    - run: echo Description: verim node >> Node_${{ GITHUB_REF }}_arm64/DEBIAN/control
+
+    - run:  dpkg-deb --build --root-owner-group <Node_${{ GITHUB_REF }}_arm64>
+
+
+    - name: Upload deb
+      uses: actions/upload-artifact@v2
+      with:
+        name: Node_${{ GITHUB_REF }}_arm64.deb
+        path: Node_${{ GITHUB_REF }}_arm64.deb
+
+    - uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        prerelease: false
+        files: |
+          node.tar.gz
+          Node_${{ GITHUB_REF }}_arm64.deb
+
+

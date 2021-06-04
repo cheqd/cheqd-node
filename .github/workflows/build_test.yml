@@ -1,0 +1,50 @@
+name: Build and Test
+
+on: [push, pull_request]
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.13
+      id: go
+
+    - name: Check out starport repo
+      uses: actions/checkout@v2
+      with:
+          repository: tendermint/starport
+
+    - name: Starport install
+      run: make install
+
+    - name: Check out back
+      uses: actions/checkout@v2
+
+    - name: Starport build
+      run: starport build
+
+#  unit_tests:
+#    name: Unit tests
+#    runs-on: ubuntu-latest
+#    steps:
+#
+#      - name: Set up Go 1.x
+#        uses: actions/setup-go@v2
+#        with:
+#          go-version: ^1.13
+#        id: go
+#
+#      - name: Check out code into the Go module directory
+#        uses: actions/checkout@v2
+#
+#      - name: Run units
+#        run: |
+#           PACKAGES = $(shell go list ./... | grep -v '/unit_tests')
+#           go test -v $(PACKAGES)
+#
