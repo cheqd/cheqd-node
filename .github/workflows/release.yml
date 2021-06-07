@@ -65,6 +65,17 @@ jobs:
         name: Node_${{ GITHUB_REF }}_arm64.deb
         path: Node_${{ GITHUB_REF }}_arm64.deb
 
+    - uses: actions/checkout@v2
+
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag Node:$(date +%s)
+      
+    - name: Upload deb
+      uses: actions/upload-artifact@v2
+      with:
+        name: Node:$(date +%s)
+        path: Node:$(date +%s)
+
     - uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
@@ -73,5 +84,6 @@ jobs:
         files: |
           node.tar.gz
           Node_${{ GITHUB_REF }}_arm64.deb
+          Node:$(date +%s)
 
 
