@@ -8,6 +8,57 @@ on:
       - "v*"
 
 jobs:
+
+  workflow-setup:
+    runs-on: ubuntu-latest
+    outputs:
+      CACHE_KEY_BUILD: ${{ steps.cache.outputs.CACHE_KEY_BUILD }}
+      CACHE_KEY_LINT: ${{ steps.cache.outputs.CACHE_KEY_LINT }}
+      # Expose the lowercase version of the GitHub repository name
+      # to all subsequent jobs that reference image repositories
+      # as the push and pull operations require the URL of the repository
+      # to be in lowercase.
+      GITHUB_REPOSITORY_NAME: ${{ steps.cache.outputs.GITHUB_REPOSITORY_NAME }}
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+
+      - name: Set outputs
+        id: cache
+        run: |
+          echo "::set-output name=CACHE_KEY_BUILD::${{ hashFiles('Dockerfile') }}"
+          # Convert the GitHub repository name to lowercase
+          echo "::set-output name=GITHUB_REPOSITORY_NAME::$(echo ${GITHUB_REPOSITORY,,})"
+
+  build-image:
+    # Reference to workflow-setup job is required to access its various outputs.
+    needs: workflow-setup
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_BUILDKIT: 1
+      CACHE_KEY_BUILD: ${{ needs.workflow-setup.outputs.CACHE_KEY_BUILD }}
+      GITHUB_REPOSITORY_NAME: ${{ needs.workflow-setup.outputs.GITHUB_REPOSITORY_NAME }}
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+
+      - name: Try load from cache.
+        id: cache-image
+        uses: actions/cache@v2
+        with:
+          path: ${GITHUB_WORKSPACE}/cache
+          key: ${{ env.CACHE_KEY_BUILD}}
+
+      - name: If NOT found in cache, build and push image.
+        if: steps.cache-image.outputs.cache-hit != 'true'
+        run: |
+          echo ${{ secrets.CR_PAT }} | docker login ghcr.io --username ${{ secrets.CR_USER }} --password-stdin
+          docker build -f .github/workflows/build/Dockerfile --no-cache -t ${{ env.GITHUB_REPOSITORY_NAME }}/node-build:${{ env.CACHE_KEY_BUILD }} .
+          docker tag ${{ env.GITHUB_REPOSITORY_NAME }}/node-build:${{ env.CACHE_KEY_BUILD }} ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}/node-build:latest
+          docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}/node-build:latest
+          mkdir -p ${GITHUB_WORKSPACE}/cache
+          touch ${GITHUB_WORKSPACE}/cache/${{ env.CACHE_KEY_BUILD }}
+
   tagged-release:
     name: "Tagged Release"
     runs-on: "ubuntu-latest"
@@ -65,16 +116,6 @@ jobs:
         name: Node_${{ GITHUB_REF }}_arm64.deb
         path: Node_${{ GITHUB_REF }}_arm64.deb
 
-    - uses: actions/checkout@v2
-
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag Node:$(date +%s)
-      
-    - name: Upload deb
-      uses: actions/upload-artifact@v2
-      with:
-        name: Node:$(date +%s)
-        path: Node:$(date +%s)
 
     - uses: "marvinpinto/action-automatic-releases@latest"
       with:
@@ -84,6 +125,5 @@ jobs:
         files: |
           node.tar.gz
           Node_${{ GITHUB_REF }}_arm64.deb
-          Node:$(date +%s)
 
 
