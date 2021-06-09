@@ -99,7 +99,7 @@ jobs:
     - run: sudo gem install --no-document fpm
 
     - name: Creating deb package
-    - run: fpm -s tar -t deb -C ./node.tar.gz --name node --version ${{ GITHUB_REF }} --iteration 1  --description "A verim node" .
+      run: fpm -s tar -t deb -C ./node.tar.gz --name node --version ${{ GITHUB_REF }} --iteration 1  --description "A verim node" .
 
     - name: Upload deb
       uses: actions/upload-artifact@v2
