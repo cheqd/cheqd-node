@@ -45,5 +45,5 @@ jobs:
 
    - name: Run tests
      run: |
-        go test ./handler_test.go ./handler_test_setup.go
+        go test ./x/verimcosmos/handler_test.go ./x/verimcosmos/handler_test_setup.go
 
