@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     branches:
-      - main
+      - master
     tags:
       - "v*"
 
@@ -20,61 +20,44 @@ jobs:
       # to be in lowercase.
       GITHUB_REPOSITORY_NAME: ${{ steps.cache.outputs.GITHUB_REPOSITORY_NAME }}
     steps:
-    - name: Git checkout
-      uses: actions/checkout@v2
+      - name: Git checkout
+        uses: actions/checkout@v2
 
-    - name: Set outputs
-      id: cache
-      run: |
-        echo "::set-output name=CACHE_KEY_BUILD::${{ hashFiles('Dockerfile') }}"
-        # Convert the GitHub repository name to lowercase
-        echo "::set-output name=GITHUB_REPOSITORY_NAME::$(echo ${GITHUB_REPOSITORY,,})"
+      - name: Set outputs
+        id: cache
+        run: |
+          echo "::set-output name=CACHE_KEY_BUILD::${{ hashFiles('Dockerfile') }}"
+          # Convert the GitHub repository name to lowercase
+          echo "::set-output name=GITHUB_REPOSITORY_NAME::$(echo ${GITHUB_REPOSITORY,,})"
 
-  push-to-registry:
-    name: Push Docker image to GitHub Packages
+  build-image:
+    # Reference to workflow-setup job is required to access its various outputs.
     needs: workflow-setup
     runs-on: ubuntu-latest
     env:
       DOCKER_BUILDKIT: 1
       CACHE_KEY_BUILD: ${{ needs.workflow-setup.outputs.CACHE_KEY_BUILD }}
       GITHUB_REPOSITORY_NAME: ${{ needs.workflow-setup.outputs.GITHUB_REPOSITORY_NAME }}
-    permissions:
-      packages: write
-      contents: read
     steps:
-    - name: Check out the repo
-      uses: actions/checkout@v2
+      - name: Git checkout
+        uses: actions/checkout@v2
 
-    - name: Try load from cache.
-      id: cache-image
-      uses: actions/cache@v2
-      with:
-        path: ${GITHUB_WORKSPACE}/cache
-        key: ${{ env.CACHE_KEY_BUILD}}
+      - name: Try load from cache.
+        id: cache-image
+        uses: actions/cache@v2
+        with:
+          path: ${GITHUB_WORKSPACE}/cache
+          key: ${{ env.CACHE_KEY_BUILD}}
 
-    - name: Log in to GitHub Docker Registry
-      if: steps.cache-image.outputs.cache-hit != 'true'
-      uses: docker/login-action@v1
-      with:
-        registry: docker.pkg.github.com
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: If NOT found in cache, build and cache image.
-      if: steps.cache-image.outputs.cache-hit != 'true'
-      run: |
-        docker build -f .github/workflows/build/Dockerfile --no-cache -t ${{ env.GITHUB_REPOSITORY_NAME }}/node-build:${{ env.CACHE_KEY_BUILD }} .
-        mkdir -p ${GITHUB_WORKSPACE}/cache
-        touch ${GITHUB_WORKSPACE}/cache/${{ env.CACHE_KEY_BUILD }}
-
-    - name: Build and push container image
-      if: steps.cache-image.outputs.cache-hit != 'true'
-      uses: docker/build-push-action@v2
-      with:
-        push: true
-        tags: |
-          docker.pkg.github.com/${{ github.repository }}/node-image:${{ github.sha }}
-          docker.pkg.github.com/${{ github.repository }}/node-image:${{ github.ref }}
+      - name: If NOT found in cache, build and push image.
+        if: steps.cache-image.outputs.cache-hit != 'true'
+        run: |
+          echo ${{ secrets.CR_PAT }} | docker login ghcr.io --username ${{ secrets.CR_USER }} --password-stdin
+          docker build -f .github/workflows/build/Dockerfile --no-cache -t ${{ env.GITHUB_REPOSITORY_NAME }}/node-build:${{ env.CACHE_KEY_BUILD }} .
+          docker tag ${{ env.GITHUB_REPOSITORY_NAME }}/node-build:${{ env.CACHE_KEY_BUILD }} ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}/node-build:latest
+          docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}/node-build:latest
+          mkdir -p ${GITHUB_WORKSPACE}/cache
+          touch ${GITHUB_WORKSPACE}/cache/${{ env.CACHE_KEY_BUILD }}
 
   tagged-release:
     name: "Tagged Release"
@@ -91,7 +74,7 @@ jobs:
     - name: Check out starport repo
       uses: actions/checkout@v2
       with:
-        repository: tendermint/starport
+          repository: tendermint/starport
 
     - name: Starport install
       run: make install
@@ -112,26 +95,17 @@ jobs:
         name: node.tar.gz
         path: node.tar.gz
 
+    - run: sudo apt-get install ruby ruby-dev rubygems build-essential
+    - run: sudo gem install --no-document fpm
+
     - name: Creating deb package
-    - run: mkdir Node_${{ GITHUB_REF }}_arm64
-    - run: mkdir -p Node_${{ GITHUB_REF }}_arm64/usr/local/bin
-    - run: cp ~/go/go/bin/verim-cosmosd Node_${{ GITHUB_REF }}_arm64/usr/local/bin
-    - run: mkdir Node_${{ GITHUB_REF }}_arm64/DEBIAN
-    - run: touch Node_${{ GITHUB_REF }}_arm64/DEBIAN/control
-    - run: echo Package: Node >> Node_${{ GITHUB_REF }}_arm64/DEBIAN/control
-    - run: echo Version: ${{ GITHUB_REF }} >> Node_${{ GITHUB_REF }}_arm64/DEBIAN/control
-    - run: echo Architecture: arm64 >> Node_${{ GITHUB_REF }}_arm64/DEBIAN/control
-    - run: echo Maintainer: Somebody <> >> Node_${{ GITHUB_REF }}_arm64/DEBIAN/control
-    - run: echo Description: verim node >> Node_${{ GITHUB_REF }}_arm64/DEBIAN/control
-
-    - run:  dpkg-deb --build --root-owner-group <Node_${{ GITHUB_REF }}_arm64>
-
+    - run: fpm -s tar -t deb -C ./node.tar.gz --name node --version ${{ GITHUB_REF }} --iteration 1  --description "A verim node" .
 
     - name: Upload deb
       uses: actions/upload-artifact@v2
       with:
-        name: Node_${{ GITHUB_REF }}_arm64.deb
-        path: Node_${{ GITHUB_REF }}_arm64.deb
+        name: node_${{ GITHUB_REF }}-1_amd64.deb
+        path: node_${{ GITHUB_REF }}-1_amd64.deb
 
 
     - uses: "marvinpinto/action-automatic-releases@latest"
@@ -141,6 +115,6 @@ jobs:
         prerelease: false
         files: |
           node.tar.gz
-          Node_${{ GITHUB_REF }}_arm64.deb
+          node_${{ GITHUB_REF }}-1_amd64.deb
 
 
