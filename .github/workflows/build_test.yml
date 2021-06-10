@@ -15,16 +15,10 @@ jobs:
         go-version: ^1.13
       id: go
 
-    - name: Check out starport repo
-      uses: actions/checkout@v2
-      with:
-          repository: tendermint/starport
+    - name: Download and build starport
+      run: curl https://get.starport.network/starport | bash
 
-    - name: Starport install
-      run: make install
-
-    - name: Check out back
-      uses: actions/checkout@v2
+    - run: sudo mv starport /usr/local/bin/
 
     - name: Starport build
       run: starport build
