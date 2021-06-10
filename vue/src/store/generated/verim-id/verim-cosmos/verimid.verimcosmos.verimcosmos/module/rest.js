@@ -130,7 +130,7 @@ export class HttpClient {
     }
 }
 /**
- * @title verimcosmos/query.proto
+ * @title verimcosmos/tx.proto
  * @version version not set
  */
 export class Api extends HttpClient {

@@ -4,15 +4,15 @@ import { StdFee } from "@cosmjs/launchpad";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { Registry, OfflineSigner, EncodeObject, DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { Api } from "./rest";
+import { MsgDeleteNym } from "./types/verimcosmos/tx";
 import { MsgCreateNym } from "./types/verimcosmos/tx";
 import { MsgUpdateNym } from "./types/verimcosmos/tx";
-import { MsgDeleteNym } from "./types/verimcosmos/tx";
 
 
 const types = [
+  ["/verimid.verimcosmos.verimcosmos.MsgDeleteNym", MsgDeleteNym],
   ["/verimid.verimcosmos.verimcosmos.MsgCreateNym", MsgCreateNym],
   ["/verimid.verimcosmos.verimcosmos.MsgUpdateNym", MsgUpdateNym],
-  ["/verimid.verimcosmos.verimcosmos.MsgDeleteNym", MsgDeleteNym],
   
 ];
 
@@ -40,9 +40,9 @@ const txClient = async (wallet: OfflineSigner, { addr: addr }: TxClientOptions =
 
   return {
     signAndBroadcast: (msgs: EncodeObject[], { fee=defaultFee, memo=null }: SignAndBroadcastOptions) => memo?client.signAndBroadcast(address, msgs, fee,memo):client.signAndBroadcast(address, msgs, fee),
+    msgDeleteNym: (data: MsgDeleteNym): EncodeObject => ({ typeUrl: "/verimid.verimcosmos.verimcosmos.MsgDeleteNym", value: data }),
     msgCreateNym: (data: MsgCreateNym): EncodeObject => ({ typeUrl: "/verimid.verimcosmos.verimcosmos.MsgCreateNym", value: data }),
     msgUpdateNym: (data: MsgUpdateNym): EncodeObject => ({ typeUrl: "/verimid.verimcosmos.verimcosmos.MsgUpdateNym", value: data }),
-    msgDeleteNym: (data: MsgDeleteNym): EncodeObject => ({ typeUrl: "/verimid.verimcosmos.verimcosmos.MsgDeleteNym", value: data }),
     
   };
 };

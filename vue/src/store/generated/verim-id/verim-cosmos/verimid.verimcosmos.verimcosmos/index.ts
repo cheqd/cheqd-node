@@ -137,6 +137,20 @@ export default {
 			}
 		},
 		
+		async sendMsgDeleteNym({ rootGetters }, { value, fee, memo }) {
+			try {
+				const msg = await (await initTxClient(rootGetters)).msgDeleteNym(value)
+				const result = await (await initTxClient(rootGetters)).signAndBroadcast([msg], {fee: { amount: fee, 
+  gas: "200000" }, memo})
+				return result
+			} catch (e) {
+				if (e.toString()=='wallet is required') {
+					throw new SpVuexError('TxClient:MsgDeleteNym:Init', 'Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new SpVuexError('TxClient:MsgDeleteNym:Send', 'Could not broadcast Tx.')
+				}
+			}
+		},
 		async sendMsgCreateNym({ rootGetters }, { value, fee, memo }) {
 			try {
 				const msg = await (await initTxClient(rootGetters)).msgCreateNym(value)
@@ -165,21 +179,19 @@ export default {
 				}
 			}
 		},
-		async sendMsgDeleteNym({ rootGetters }, { value, fee, memo }) {
+		
+		async MsgDeleteNym({ rootGetters }, { value }) {
 			try {
 				const msg = await (await initTxClient(rootGetters)).msgDeleteNym(value)
-				const result = await (await initTxClient(rootGetters)).signAndBroadcast([msg], {fee: { amount: fee, 
-  gas: "200000" }, memo})
-				return result
+				return msg
 			} catch (e) {
 				if (e.toString()=='wallet is required') {
 					throw new SpVuexError('TxClient:MsgDeleteNym:Init', 'Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new SpVuexError('TxClient:MsgDeleteNym:Send', 'Could not broadcast Tx.')
+					throw new SpVuexError('TxClient:MsgDeleteNym:Create', 'Could not create message.')
 				}
 			}
 		},
-		
 		async MsgCreateNym({ rootGetters }, { value }) {
 			try {
 				const msg = await (await initTxClient(rootGetters)).msgCreateNym(value)
@@ -201,18 +213,6 @@ export default {
 					throw new SpVuexError('TxClient:MsgUpdateNym:Init', 'Could not initialize signing client. Wallet is required.')
 				}else{
 					throw new SpVuexError('TxClient:MsgUpdateNym:Create', 'Could not create message.')
-				}
-			}
-		},
-		async MsgDeleteNym({ rootGetters }, { value }) {
-			try {
-				const msg = await (await initTxClient(rootGetters)).msgDeleteNym(value)
-				return msg
-			} catch (e) {
-				if (e.toString()=='wallet is required') {
-					throw new SpVuexError('TxClient:MsgDeleteNym:Init', 'Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new SpVuexError('TxClient:MsgDeleteNym:Create', 'Could not create message.')
 				}
 			}
 		},

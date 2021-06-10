@@ -310,7 +310,7 @@ export class HttpClient<SecurityDataType = unknown> {
 }
 
 /**
- * @title verimcosmos/query.proto
+ * @title verimcosmos/tx.proto
  * @version version not set
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {

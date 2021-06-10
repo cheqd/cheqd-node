@@ -2,13 +2,13 @@
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { Registry } from "@cosmjs/proto-signing";
 import { Api } from "./rest";
+import { MsgDeleteNym } from "./types/verimcosmos/tx";
 import { MsgCreateNym } from "./types/verimcosmos/tx";
 import { MsgUpdateNym } from "./types/verimcosmos/tx";
-import { MsgDeleteNym } from "./types/verimcosmos/tx";
 const types = [
+    ["/verimid.verimcosmos.verimcosmos.MsgDeleteNym", MsgDeleteNym],
     ["/verimid.verimcosmos.verimcosmos.MsgCreateNym", MsgCreateNym],
     ["/verimid.verimcosmos.verimcosmos.MsgUpdateNym", MsgUpdateNym],
-    ["/verimid.verimcosmos.verimcosmos.MsgDeleteNym", MsgDeleteNym],
 ];
 const registry = new Registry(types);
 const defaultFee = {
@@ -22,9 +22,9 @@ const txClient = async (wallet, { addr: addr } = { addr: "http://localhost:26657
     const { address } = (await wallet.getAccounts())[0];
     return {
         signAndBroadcast: (msgs, { fee = defaultFee, memo = null }) => memo ? client.signAndBroadcast(address, msgs, fee, memo) : client.signAndBroadcast(address, msgs, fee),
+        msgDeleteNym: (data) => ({ typeUrl: "/verimid.verimcosmos.verimcosmos.MsgDeleteNym", value: data }),
         msgCreateNym: (data) => ({ typeUrl: "/verimid.verimcosmos.verimcosmos.MsgCreateNym", value: data }),
         msgUpdateNym: (data) => ({ typeUrl: "/verimid.verimcosmos.verimcosmos.MsgUpdateNym", value: data }),
-        msgDeleteNym: (data) => ({ typeUrl: "/verimid.verimcosmos.verimcosmos.MsgDeleteNym", value: data }),
     };
 };
 const queryClient = async ({ addr: addr } = { addr: "http://localhost:1317" }) => {

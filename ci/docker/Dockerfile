@@ -20,3 +20,5 @@ VOLUME /root/.verim-cosmosd
 EXPOSE 26656 26657
 
 STOPSIGNAL SIGTERM
+
+# TODO: extract build step

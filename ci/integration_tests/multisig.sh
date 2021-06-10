@@ -20,7 +20,7 @@ echo "bob: $BOB_PUBKEY"
 echo "anna: $ANNA_PUBKEY"
 
 
-############ Jack creates multisig key: ffour (fantastic four)
+############ Jack imports other's public keys and creates multisig key: ffour
 
 verim-cosmosd keys add alice_pub --pubkey $ALICE_PUBKEY --home $JACK_HOME
 verim-cosmosd keys add bob_pub --pubkey $BOB_PUBKEY --home $JACK_HOME
@@ -36,7 +36,7 @@ FFOUR_ADDRESS=$(verim-cosmosd keys show ffour -a --home $JACK_HOME)
 verim-cosmosd tx bank send jack $FFOUR_ADDRESS 1token --home $JACK_HOME
 
 
-############ Alice creates multisig key: ffour (fantastic four)
+############ Alice imports other's public keys and creates multisig key: ffour (she doesn't trust shared ffour key)
 
 verim-cosmosd keys add jack_pub --pubkey $JACK_PUBKEY --home $ALICE_HOME
 verim-cosmosd keys add bob_pub --pubkey $BOB_PUBKEY --home $ALICE_HOME
@@ -47,19 +47,22 @@ verim-cosmosd keys add ffour --multisig=jack_pub,alice,bob_pub,anna_pub --multis
 
 verim-cosmosd keys show ffour --home $ALICE_HOME
 FFOUR_ADDRESS_2=$(verim-cosmosd keys show ffour -a --home $ALICE_HOME)
+FFOUR_PUBKEY=$(verim-cosmosd keys show ffour -p --home $ALICE_HOME)
 
 
-############ Bob creates multisig key: ffour (fantastic four)
+############ Bob imports ffour key directly (he trusts shared multisig key)
 
-verim-cosmosd keys add jack_pub --pubkey $JACK_PUBKEY --home $BOB_HOME
-verim-cosmosd keys add alice_pub --pubkey $ALICE_PUBKEY --home $BOB_HOME
-verim-cosmosd keys add anna_pub --pubkey $ANNA_PUBKEY --home $BOB_HOME
+# verim-cosmosd keys add jack_pub --pubkey $JACK_PUBKEY --home $BOB_HOME
+# verim-cosmosd keys add alice_pub --pubkey $ALICE_PUBKEY --home $BOB_HOME
+# verim-cosmosd keys add anna_pub --pubkey $ANNA_PUBKEY --home $BOB_HOME
 
-# is 3 imoprtant?
-verim-cosmosd keys add ffour --multisig=jack_pub,alice_pub,bob,anna_pub --multisig-threshold=3 --home $BOB_HOME
+# # is 3 imoprtant?
+# verim-cosmosd keys add ffour --multisig=jack_pub,alice_pub,bob,anna_pub --multisig-threshold=3 --home $BOB_HOME
 
-verim-cosmosd keys show ffour --home $BOB_HOME
-FFOUR_ADDRESS_3=$(verim-cosmosd keys show ffour -a --home $BOB_HOME)
+verim-cosmosd keys add ffour_pub --pubkey $FFOUR_PUBKEY --home $BOB_HOME
+
+verim-cosmosd keys show ffour_pub --home $BOB_HOME
+FFOUR_ADDRESS_3=$(verim-cosmosd keys show ffour_pub -a --home $BOB_HOME)
 
 
 ############ Ffour

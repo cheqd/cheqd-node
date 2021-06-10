@@ -2,7 +2,7 @@
 
 set -euox pipefail
 
-CHAIN_ID="verimcosmos"
+CHAIN_ID="verim-cosmos-chain"
 
 rm -rf localnet
 mkdir localnet
