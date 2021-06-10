@@ -2,4 +2,4 @@ vue/node_modules
 vue/src/store/generated
 vue/dist
 secret.yml
-localnet
+ci/local_net/node_configs

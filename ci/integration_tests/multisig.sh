@@ -2,7 +2,7 @@
 
 set -euox pipefail
 
-JACK_HOME="localnet/node0"
+JACK_HOME="../local_net/node_configs/node0"
 ALICE_HOME="localnet/node1"
 BOB_HOME="localnet/node2"
 ANNA_HOME="localnet/node3"

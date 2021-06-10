@@ -1,13 +1,15 @@
 #!/bin/bash
 
-# Creates network of 4 nodes. Mostly the same script as `genlocalnetconfig.sh` but discribes the production flow (keys don't leave the place where they where generated).
+# Generates configurations for 4 nodes. Mostly the same script as `gen_$NODE_CONFIGS_DIR.sh` but discribes
+# the real life flow (keys don't leave the place where they are generated).
 
 set -euox pipefail
 
 CHAIN_ID="verim"
+NODE_CONFIGS_DIR="node_configs"
 
-rm -rf localnet
-mkdir localnet
+rm -rf $NODE_CONFIGS_DIR
+mkdir $NODE_CONFIGS_DIR
 
 # sed in macos requires extra argument
 extension=''
@@ -20,7 +22,7 @@ fi
 
 echo "################################ Jack's node0"
 
-NODE_0_HOME="localnet/node0"
+NODE_0_HOME="node_configs/node0"
 
 echo "# Generate key"
 verim-noded keys add jack --home $NODE_0_HOME
@@ -43,7 +45,7 @@ sed -i $extension 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:
 
 echo "################################ Alice's node1"
 
-NODE_1_HOME="localnet/node1"
+NODE_1_HOME="$NODE_CONFIGS_DIR/node1"
 
 echo "# Generate key"
 verim-noded keys add alice --home $NODE_1_HOME
@@ -73,7 +75,7 @@ sed -i $extension 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:
 
 echo "################################ Bob's node2"
 
-NODE_2_HOME="localnet/node2"
+NODE_2_HOME="$NODE_CONFIGS_DIR/node2"
 
 echo "# Generate key"
 verim-noded keys add bob --home $NODE_2_HOME
@@ -103,7 +105,7 @@ sed -i $extension 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:
 
 echo "################################ Anna's node3"
 
-NODE_3_HOME="localnet/node3"
+NODE_3_HOME="$NODE_CONFIGS_DIR/node3"
 
 echo "# Generate key"
 verim-noded keys add anna --home $NODE_3_HOME

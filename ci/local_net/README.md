@@ -1,16 +1,28 @@
 # Localnet
 
-## Build docker image
+## How to run
 
-See [instruction](sdfsdf)
+1.  Build docker image:
 
-Commands to setup localnet:
+    See [the instruction](../docker/README.md)
 
-```
-starport build
-./genlocalnetconfig.sh
-docker-compose up --build
-```
+2. Build verim-noded:
+
+    ```
+    starport build
+    ```
+
+3. Generate node configurations:
+
+    Run: `gen_node_configs.sh` or `gen_node_configs.sh`.
+
+4. Run docker-compose:
+
+    ```
+    docker-compose up
+    ```
+
+## Result
 
 This will setup 4 nodes listening on the following ports:
 
@@ -31,15 +43,22 @@ You can tests connection to a node using browser: `http://localhost:<rpc_port>`.
 
 When connecting using CLI, point path to home directory: `--home localnet/client`. This directory contains keys from genesis acounts.
 
-Demo commands:
+## Demo commands:
+
+### Show balances
 
 ```
-# Show balances
 vc query bank balances (vc keys show anna -a --home localnet/client) --home localnet/client
+```
 
-# Create NYM
+### Create NYM
+
+```
 vc tx verim create-nym "alias" "verkey" "did" "role" --from anna --gas-prices 1token --chain-id verim-node-chain --home localnet/client
+```
 
-# List nym
+### List nym
+
+```
 vc query verim list-nym --home localnet/client
 ```
