@@ -1,3 +1,5 @@
+#####  Build container  #####
+
 FROM golang:buster as builder
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
@@ -14,16 +16,18 @@ RUN curl https://get.starport.network/starport! | bash
 # App
 WORKDIR /app
 
-COPY app .
-COPY cmd .
-COPY proto .
-COPY vue .
-COPY x .
+COPY app ./app
+COPY cmd ./cmd
+COPY proto ./proto
+COPY vue ./vue
+COPY x ./x
 COPY go.mod .
 COPY go.sum .
 
 RUN starport build
 
+
+#####  Run container  #####
 
 FROM debian:buster
 
