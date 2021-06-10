@@ -1,4 +1,4 @@
-FROM golang:buster
+FROM golang:buster as builder
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
@@ -16,9 +16,13 @@ WORKDIR /app
 COPY . .
 RUN starport build
 
-VOLUME /root/.verim-cosmosd
-EXPOSE 26656 26657
 
+FROM debian:buster
+
+COPY --from=builder /go/bin/verim-noded /root/bin
+
+VOLUME /root/.verim-noded
+EXPOSE 26656 26657
 STOPSIGNAL SIGTERM
 
-# TODO: extract build step
+ENTRYPOINT [ "verim-noded" ]

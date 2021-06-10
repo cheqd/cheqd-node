@@ -2,41 +2,41 @@ version: '3.2'
 
 services:
   node0:
-    image: verim-cosmos
+    image: verim-node
     build: .
     ports:
       - "26656:26656" # p2p
       - "26657:26657" # rpc
     volumes:
-      - ./localnet/node0:/root/.verimcosmos:Z
-    command: verim-cosmosd start
+      - ./localnet/node0:/root/.verim:Z
+    command: verim-noded start
 
   node1:
-    image: verim-cosmos
+    image: verim-node
     build: .
     ports:
       - "26666:26656" # p2p
       - "26667:26657" # rpc
     volumes:
-      - ./localnet/node1:/root/.verimcosmos:Z
-    command: verim-cosmosd start
+      - ./localnet/node1:/root/.verim:Z
+    command: verim-noded start
 
   node2:
-    image: verim-cosmos
+    image: verim-node
     build: .
     ports:
       - "26676:26656" # p2p
       - "26677:26657" # rpc
     volumes:
-      - ./localnet/node2:/root/.verimcosmos:Z
-    command: verim-cosmosd start
+      - ./localnet/node2:/root/.verim:Z
+    command: verim-noded start
 
   node3:
-    image: verim-cosmos
+    image: verim-node
     build: .
     ports:
       - "26686:26656" # p2p
       - "26687:26657" # rpc
     volumes:
-      - ./localnet/node3:/root/.verimcosmos:Z
-    command: verim-cosmosd start
+      - ./localnet/node3:/root/.verim:Z
+    command: verim-noded start

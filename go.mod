@@ -1,4 +1,4 @@
-module github.com/verim-id/verim-cosmos
+module github.com/verim-id/verim-node
 
 go 1.15
 

@@ -38,8 +38,8 @@ Demo commands:
 vc query bank balances (vc keys show anna -a --home localnet/client) --home localnet/client
 
 # Create NYM
-vc tx verimcosmos create-nym "alias" "verkey" "did" "role" --from anna --gas-prices 1token --chain-id verim-cosmos-chain --home localnet/client
+vc tx verim create-nym "alias" "verkey" "did" "role" --from anna --gas-prices 1token --chain-id verim-node-chain --home localnet/client
 
 # List nym
-vc query verimcosmos list-nym --home localnet/client
+vc query verim list-nym --home localnet/client
 ```

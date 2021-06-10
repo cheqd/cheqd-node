@@ -2,65 +2,65 @@
 
 set -euox pipefail
 
-CHAIN_ID="verim-cosmos-chain"
+CHAIN_ID="verim-node-chain"
 
 rm -rf localnet
 mkdir localnet
 
 # client
 
-verim-cosmosd keys add jack --home localnet/client
-verim-cosmosd keys add alice --home localnet/client
-verim-cosmosd keys add bob --home localnet/client
-verim-cosmosd keys add anna --home localnet/client
+verim-noded keys add jack --home localnet/client
+verim-noded keys add alice --home localnet/client
+verim-noded keys add bob --home localnet/client
+verim-noded keys add anna --home localnet/client
 
 # node 0
 
-verim-cosmosd init node0 --chain-id $CHAIN_ID --home localnet/node0
+verim-noded init node0 --chain-id $CHAIN_ID --home localnet/node0
 cp -r localnet/client/* localnet/node0
 
-verim-cosmosd add-genesis-account jack 10000000token,100000000stake --home localnet/node0
-verim-cosmosd add-genesis-account alice 10000000token,100000000stake --home localnet/node0
-verim-cosmosd add-genesis-account bob 10000000token,100000000stake --home localnet/node0
-verim-cosmosd add-genesis-account anna 10000000token,100000000stake --home localnet/node0
+verim-noded add-genesis-account jack 10000000token,100000000stake --home localnet/node0
+verim-noded add-genesis-account alice 10000000token,100000000stake --home localnet/node0
+verim-noded add-genesis-account bob 10000000token,100000000stake --home localnet/node0
+verim-noded add-genesis-account anna 10000000token,100000000stake --home localnet/node0
 
-verim-cosmosd gentx jack 1000000stake --chain-id $CHAIN_ID --home localnet/node0
+verim-noded gentx jack 1000000stake --chain-id $CHAIN_ID --home localnet/node0
 
 # node 1
 
-verim-cosmosd init node1 --chain-id $CHAIN_ID --home localnet/node1
+verim-noded init node1 --chain-id $CHAIN_ID --home localnet/node1
 cp -r localnet/client/* localnet/node1
 
-verim-cosmosd add-genesis-account jack 10000000token,100000000stake --home localnet/node1
-verim-cosmosd add-genesis-account alice 10000000token,100000000stake --home localnet/node1
-verim-cosmosd add-genesis-account bob 10000000token,100000000stake --home localnet/node1
-verim-cosmosd add-genesis-account anna 10000000token,100000000stake --home localnet/node1
+verim-noded add-genesis-account jack 10000000token,100000000stake --home localnet/node1
+verim-noded add-genesis-account alice 10000000token,100000000stake --home localnet/node1
+verim-noded add-genesis-account bob 10000000token,100000000stake --home localnet/node1
+verim-noded add-genesis-account anna 10000000token,100000000stake --home localnet/node1
 
-verim-cosmosd gentx alice 1000000stake --chain-id $CHAIN_ID --home localnet/node1
+verim-noded gentx alice 1000000stake --chain-id $CHAIN_ID --home localnet/node1
 
 # node 2
 
-verim-cosmosd init node2 --chain-id $CHAIN_ID --home localnet/node2
+verim-noded init node2 --chain-id $CHAIN_ID --home localnet/node2
 cp -r localnet/client/* localnet/node2
 
-verim-cosmosd add-genesis-account jack 10000000token,100000000stake --home localnet/node2
-verim-cosmosd add-genesis-account alice 10000000token,100000000stake --home localnet/node2
-verim-cosmosd add-genesis-account bob 10000000token,100000000stake --home localnet/node2
-verim-cosmosd add-genesis-account anna 10000000token,100000000stake --home localnet/node2
+verim-noded add-genesis-account jack 10000000token,100000000stake --home localnet/node2
+verim-noded add-genesis-account alice 10000000token,100000000stake --home localnet/node2
+verim-noded add-genesis-account bob 10000000token,100000000stake --home localnet/node2
+verim-noded add-genesis-account anna 10000000token,100000000stake --home localnet/node2
 
-verim-cosmosd gentx bob 1000000stake --chain-id $CHAIN_ID --home localnet/node2
+verim-noded gentx bob 1000000stake --chain-id $CHAIN_ID --home localnet/node2
 
 # node 3
 
-verim-cosmosd init node3 --chain-id $CHAIN_ID --home localnet/node3
+verim-noded init node3 --chain-id $CHAIN_ID --home localnet/node3
 cp -r localnet/client/* localnet/node3
 
-verim-cosmosd add-genesis-account jack 10000000token,100000000stake --home localnet/node3
-verim-cosmosd add-genesis-account alice 10000000token,100000000stake --home localnet/node3
-verim-cosmosd add-genesis-account bob 10000000token,100000000stake --home localnet/node3
-verim-cosmosd add-genesis-account anna 10000000token,100000000stake --home localnet/node3
+verim-noded add-genesis-account jack 10000000token,100000000stake --home localnet/node3
+verim-noded add-genesis-account alice 10000000token,100000000stake --home localnet/node3
+verim-noded add-genesis-account bob 10000000token,100000000stake --home localnet/node3
+verim-noded add-genesis-account anna 10000000token,100000000stake --home localnet/node3
 
-verim-cosmosd gentx anna 1000000stake --chain-id $CHAIN_ID --home localnet/node3
+verim-noded gentx anna 1000000stake --chain-id $CHAIN_ID --home localnet/node3
 
 # Collect all validator creation transactions
 
@@ -73,15 +73,15 @@ cp localnet/node3/config/gentx/* localnet/client/config/gentx
 
 # Embed them into genesis
 
-verim-cosmosd init dummy-node --chain-id $CHAIN_ID --home localnet/client
+verim-noded init dummy-node --chain-id $CHAIN_ID --home localnet/client
 
-verim-cosmosd add-genesis-account jack 10000000token,100000000stake --home localnet/client
-verim-cosmosd add-genesis-account alice 10000000token,100000000stake --home localnet/client
-verim-cosmosd add-genesis-account bob 10000000token,100000000stake --home localnet/client
-verim-cosmosd add-genesis-account anna 10000000token,100000000stake --home localnet/client
+verim-noded add-genesis-account jack 10000000token,100000000stake --home localnet/client
+verim-noded add-genesis-account alice 10000000token,100000000stake --home localnet/client
+verim-noded add-genesis-account bob 10000000token,100000000stake --home localnet/client
+verim-noded add-genesis-account anna 10000000token,100000000stake --home localnet/client
 
-verim-cosmosd collect-gentxs --home localnet/client
-verim-cosmosd validate-genesis --home localnet/client
+verim-noded collect-gentxs --home localnet/client
+verim-noded validate-genesis --home localnet/client
 
 # Update genesis for all nodes
 

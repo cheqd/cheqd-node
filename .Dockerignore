@@ -3,3 +3,6 @@ ci
 .github
 .idea
 vue/node_modules
+vue/src/store/generated
+vue/dist
+secret.yml
