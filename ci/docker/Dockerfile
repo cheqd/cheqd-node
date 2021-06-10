@@ -13,13 +13,21 @@ RUN curl https://get.starport.network/starport! | bash
 
 # App
 WORKDIR /app
-COPY . .
+
+COPY app .
+COPY cmd .
+COPY proto .
+COPY vue .
+COPY x .
+COPY go.mod .
+COPY go.sum .
+
 RUN starport build
 
 
 FROM debian:buster
 
-COPY --from=builder /go/bin/verim-noded /root/bin
+COPY --from=builder /go/bin/verim-noded /bin
 
 VOLUME /root/.verim-noded
 EXPOSE 26656 26657
