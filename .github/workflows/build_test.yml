@@ -4,22 +4,22 @@ on: [push, pull_request]
 
 jobs:
 
-  workflow-setup:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Set up Go 1.16
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.16
-      id: go
+#   workflow-setup:
+#     runs-on: ubuntu-latest
+#     steps:
+#     - name: Set up Go 1.16
+#       uses: actions/setup-go@v2
+#       with:
+#         go-version: 1.16
+#       id: go
 
-    - name: Set up Go env variables
-      run: export PATH=$PATH:$(go env GOPATH)/bin
-    - run: export GOPATH=$(go env GOPATH)
+#     - name: Set up Go env variables
+#       run: export PATH=$PATH:$(go env GOPATH)/bin
+#     - run: export GOPATH=$(go env GOPATH)
 
   build:
     name: Build
-    needs: workflow-setup
+#     needs: workflow-setup
     runs-on: ubuntu-latest
     steps:
 
@@ -36,7 +36,7 @@ jobs:
 
   tests:
    name: Unit tests
-   needs: [build, workflow-setup]
+#    needs: [build, workflow-setup]
    runs-on: ubuntu-latest
    steps:
 
