@@ -29,6 +29,7 @@ jobs:
     # Reference to workflow-setup job is required to access its various outputs.
     needs: workflow-setup
     runs-on: ubuntu-latest
+    env:
       GITHUB_REPOSITORY_NAME: ${{ needs.workflow-setup.outputs.GITHUB_REPOSITORY_NAME }}
       VERSION: ${{ needs.workflow-setup.outputs.VERSION }}
     steps:
