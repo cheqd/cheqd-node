@@ -12,7 +12,6 @@ jobs:
   workflow-setup:
     runs-on: ubuntu-latest
     outputs:
-      CACHE_KEY_BUILD: ${{ steps.cache.outputs.CACHE_KEY_BUILD }}
       GITHUB_REPOSITORY_NAME: ${{ steps.cache.outputs.GITHUB_REPOSITORY_NAME }}
       VERSION: ${{ steps.cache.outputs.VERSION }}
     steps:
@@ -22,8 +21,6 @@ jobs:
       - name: Set outputs
         id: cache
         run: |
-          echo "::set-output name=CACHE_KEY_BUILD::${{ hashFiles('Dockerfile') }}"
-          # Convert the GitHub repository name to lowercase
           echo "::set-output name=GITHUB_REPOSITORY_NAME::$(echo ${GITHUB_REPOSITORY,,})"
           echo "::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}"
 
@@ -32,31 +29,18 @@ jobs:
     # Reference to workflow-setup job is required to access its various outputs.
     needs: workflow-setup
     runs-on: ubuntu-latest
-    env:
-      DOCKER_BUILDKIT: 1
-      CACHE_KEY_BUILD: ${{ needs.workflow-setup.outputs.CACHE_KEY_BUILD }}
-
       GITHUB_REPOSITORY_NAME: ${{ needs.workflow-setup.outputs.GITHUB_REPOSITORY_NAME }}
+      VERSION: ${{ needs.workflow-setup.outputs.VERSION }}
     steps:
       - name: Git checkout
         uses: actions/checkout@v2
 
-      - name: Try load from cache.
-        id: cache-image
-        uses: actions/cache@v2
-        with:
-          path: ${GITHUB_WORKSPACE}/cache
-          key: ${{ env.CACHE_KEY_BUILD}}
-
-      - name: If NOT found in cache, build and push image.
-        if: steps.cache-image.outputs.cache-hit != 'true'
+      - name: build and push image
         run: |
-          echo ${{ secrets.CR_PAT }} | docker login ghcr.io --username ${{ secrets.CR_USER }} --password-stdin
-          docker build -f .github/workflows/build/Dockerfile --no-cache -t ${{ env.GITHUB_REPOSITORY_NAME }}/node-build:${{ env.CACHE_KEY_BUILD }} .
-          docker tag ${{ env.GITHUB_REPOSITORY_NAME }}/node-build:${{ env.CACHE_KEY_BUILD }} ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}/node-build:${{ needs.workflow-setup.outputs.VERSION }}
-          docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}/node-build:${{ needs.workflow-setup.outputs.VERSION }}
-          mkdir -p ${GITHUB_WORKSPACE}/cache
-          touch ${GITHUB_WORKSPACE}/cache/${{ env.CACHE_KEY_BUILD }}
+          echo ${{ secrets.GH_PAT }} | docker login ghcr.io --username ${{ secrets.GH_USER }} --password-stdin
+          docker build -f .github/workflows/build/Dockerfile --no-cache -t ${{ env.GITHUB_REPOSITORY_NAME }}/node-build:${{ env.VERSION }} .
+          docker tag ${{ env.GITHUB_REPOSITORY_NAME }}/node-build:${{ env.VERSION }} ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}/node-build:${{ env.VERSION }}
+          docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}/node-build:${{ env.VERSION }}
 
   tagged-release:
     name: "Tagged Release"
@@ -68,7 +52,7 @@ jobs:
     - name: Set up Go 1.x
       uses: actions/setup-go@v2
       with:
-        go-version: ^1.13
+        go-version: 1.16
       id: go
 
     - name: Download and build starport
