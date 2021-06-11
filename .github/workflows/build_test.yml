@@ -4,11 +4,9 @@ on: [push, pull_request]
 
 jobs:
 
-  build:
-    name: Build
+  workflow-setup:
     runs-on: ubuntu-latest
     steps:
-
     - name: Set up Go 1.16
       uses: actions/setup-go@v2
       with:
@@ -18,6 +16,12 @@ jobs:
     - name: Set up Go env variables
       run: export PATH=$PATH:$(go env GOPATH)/bin
     - run: export GOPATH=$(go env GOPATH)
+
+  build:
+    name: Build
+    needs: workflow-setup
+    runs-on: ubuntu-latest
+    steps:
 
     - name: Download and build starport
       run: curl https://get.starport.network/starport | bash
@@ -29,19 +33,9 @@ jobs:
 
   tests:
    name: Unit tests
-   needs: build
+   needs: [build, workflow-setup]
    runs-on: ubuntu-latest
    steps:
-
-   - name: Set up Go 1.x
-     uses: actions/setup-go@v2
-     with:
-       go-version: ^1.13
-     id: go
-
-   - name: Check out code into the Go module directory
-     uses: actions/checkout@v2
-
    - name: Run tests
      run: |
         go test -v ./x/verimcosmos/
