@@ -2,7 +2,7 @@ package app
 
 import (
 	"github.com/cosmos/cosmos-sdk/std"
-	"github.com/verim-id/verim-cosmos/app/params"
+	"github.com/verim-id/verim-node/app/params"
 )
 
 // MakeEncodingConfig creates an EncodingConfig for testing

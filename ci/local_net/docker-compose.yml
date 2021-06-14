@@ -1,0 +1,42 @@
+version: '3.2'
+
+services:
+  node0:
+    image: verim-node
+    build: .
+    ports:
+      - "26656:26656" # p2p
+      - "26657:26657" # rpc
+    volumes:
+      - ./node_configs/node0:/root/.verim:Z
+    command: start
+
+  node1:
+    image: verim-node
+    build: .
+    ports:
+      - "26666:26656" # p2p
+      - "26667:26657" # rpc
+    volumes:
+      - ./node_configs/node1:/root/.verim:Z
+    command: start
+
+  node2:
+    image: verim-node
+    build: .
+    ports:
+      - "26676:26656" # p2p
+      - "26677:26657" # rpc
+    volumes:
+      - ./node_configs/node2:/root/.verim:Z
+    command: start
+
+  node3:
+    image: verim-node
+    build: .
+    ports:
+      - "26686:26656" # p2p
+      - "26687:26657" # rpc
+    volumes:
+      - ./node_configs/node3:/root/.verim:Z
+    command: start
