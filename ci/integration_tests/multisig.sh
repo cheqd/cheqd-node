@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Documentation: https://github.com/cosmos/gaia/blob/0ecb6ed8a244d835807f1ced49217d54a9ca2070/docs/resources/gaiad.md#multisig-transactions
+
 set -euox pipefail
 
 NODE_CONFIGS="../local_net/node_configs"
