@@ -1,6 +1,6 @@
 # This is a basic workflow that is manually triggered
 
-name: verimcosmos
+name: verim
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
@@ -15,7 +15,7 @@ jobs:
       matrix:
         arch: [amd64, arm64]
         targetos: [windows, darwin, linux]
-    name: verimcosmos ${{ matrix.arch }} for ${{ matrix.targetos }}
+    name: verim ${{ matrix.arch }} for ${{ matrix.targetos }}
     steps:
       - uses: actions/checkout@v2
       - name: Setup go
@@ -29,11 +29,11 @@ jobs:
       - name: Compile
         run: |
           go mod download
-          cd cmd/verimcosmosd
+          cd cmd/verimd
           go build .
 
       - uses: actions/upload-artifact@v2
         with:
-          name: verimcosmosd ${{ matrix.targetos }} ${{ matrix.arch }}
-          path: cmd/verimcosmosd/verimcosmosd
+          name: verimd ${{ matrix.targetos }} ${{ matrix.arch }}
+          path: cmd/verimd/verimd
 

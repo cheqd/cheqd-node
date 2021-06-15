@@ -81,14 +81,14 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
-	appparams "github.com/verim-id/verim-cosmos/app/params"
-	"github.com/verim-id/verim-cosmos/x/verimcosmos"
-	verimcosmoskeeper "github.com/verim-id/verim-cosmos/x/verimcosmos/keeper"
-	verimcosmostypes "github.com/verim-id/verim-cosmos/x/verimcosmos/types"
+	appparams "github.com/verim-id/verim-node/app/params"
+	"github.com/verim-id/verim-node/x/verim"
+	verimkeeper "github.com/verim-id/verim-node/x/verim/keeper"
+	verimtypes "github.com/verim-id/verim-node/x/verim/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
-const Name = "verimcosmos"
+const Name = "verim"
 
 // this line is used by starport scaffolding # stargate/wasm/app/enabledProposals
 
@@ -131,7 +131,7 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
-		verimcosmos.AppModuleBasic{},
+		verim.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -198,7 +198,7 @@ type App struct {
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
-	verimcosmosKeeper verimcosmoskeeper.Keeper
+	verimKeeper verimkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// the module manager
@@ -228,7 +228,7 @@ func New(
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		verimcosmostypes.StoreKey,
+		verimtypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -319,8 +319,8 @@ func New(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
-	app.verimcosmosKeeper = *verimcosmoskeeper.NewKeeper(
-		appCodec, keys[verimcosmostypes.StoreKey], keys[verimcosmostypes.MemStoreKey],
+	app.verimKeeper = *verimkeeper.NewKeeper(
+		appCodec, keys[verimtypes.StoreKey], keys[verimtypes.MemStoreKey],
 	)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
@@ -365,7 +365,7 @@ func New(
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
-		verimcosmos.NewAppModule(appCodec, app.verimcosmosKeeper),
+		verim.NewAppModule(appCodec, app.verimKeeper),
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
@@ -399,7 +399,7 @@ func New(
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
-		verimcosmostypes.ModuleName,
+		verimtypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
