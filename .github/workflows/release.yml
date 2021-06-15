@@ -40,10 +40,8 @@ jobs:
 
       - name: build and push image
         run: |
-          pwd
-          ls
           echo ${{ secrets.GH_PAT }} | docker login ghcr.io --username ${{ secrets.GH_USER }} --password-stdin
-          docker build -f ci/Docker/Dockerfile --no-cache -t verim-node .
+          docker build -f ci/docker/Dockerfile --no-cache -t verim-node .
           docker tag verim-node ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
           docker tag verim-node ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:latest
           docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
