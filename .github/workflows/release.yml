@@ -78,7 +78,7 @@ jobs:
     - name: Make archive
       run: |
         touch ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
-        tar -czf ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz /go/bin/verim-noded
+        tar -czf ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz /home/runner/go/bin/verim-noded
 
     - name: Upload archive
       uses: actions/upload-artifact@v2
