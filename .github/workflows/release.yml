@@ -83,7 +83,7 @@ jobs:
     - name: Upload archive
       uses: actions/upload-artifact@v2
       with:
-        name: ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+        name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
         path: ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
 
     - name: Install fpm
@@ -105,14 +105,11 @@ jobs:
           --package ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb \
           ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
 
-    - name: TODO DELETE
-      run: ls ${{ env.OUTPUT_DIR }}; exit 1
-
     - name: Upload deb
       uses: actions/upload-artifact@v2
       with:
         name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
-        path: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}-1_amd64.deb
+        path: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
 
 
     - uses: "marvinpinto/action-automatic-releases@latest"
@@ -121,7 +118,7 @@ jobs:
         automatic_release_tag: "latest"
         prerelease: false
         files: |
-          node_${{ needs.workflow-setup.outputs.VERSION }}.tar.gz
-          node_${{ needs.workflow-setup.outputs.VERSION }}-1_amd64.deb
+          ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+          ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
 
 
