@@ -40,6 +40,8 @@ jobs:
 
       - name: build and push image
         run: |
+          pwd
+          ls
           echo ${{ secrets.GH_PAT }} | docker login ghcr.io --username ${{ secrets.GH_USER }} --password-stdin
           docker build -f ci/Docker/Dockerfile --no-cache -t verim-node .
           docker tag verim-node ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
@@ -65,6 +67,9 @@ jobs:
 
     - name: Install starport
       run: curl https://get.starport.network/starport! | sudo bash
+
+    - name: Git checkout
+      uses: actions/checkout@v2
 
     - name: Build
       run: starport build
