@@ -21,6 +21,7 @@ jobs:
       - name: Set outputs
         id: cache
         run: |
+          # Exposes org_name/repository_name in lower case. Required by docker.
           echo "::set-output name=GITHUB_REPOSITORY_NAME::$(echo ${GITHUB_REPOSITORY,,})"
           echo "::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}"
 
@@ -39,52 +40,75 @@ jobs:
       - name: build and push image
         run: |
           echo ${{ secrets.GH_PAT }} | docker login ghcr.io --username ${{ secrets.GH_USER }} --password-stdin
-          docker build -f .github/workflows/build/Dockerfile --no-cache -t ${{ env.GITHUB_REPOSITORY_NAME }}/node-build:${{ env.VERSION }} .
-          docker tag ${{ env.GITHUB_REPOSITORY_NAME }}/node-build:${{ env.VERSION }} ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}/node-build:${{ env.VERSION }}
-          docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}/node-build:${{ env.VERSION }}
+          docker build -f ci/Docker/Dockerfile --no-cache -t verim-node .
+          docker tag verim-node ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
+          docker tag verim-node ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:latest
+          docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
+          docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:latest
 
   tagged-release:
     name: "Tagged Release"
     needs: workflow-setup
     runs-on: "ubuntu-latest"
-
+    env:
+      GITHUB_REPOSITORY_NAME: ${{ needs.workflow-setup.outputs.GITHUB_REPOSITORY_NAME }}
+      VERSION: ${{ needs.workflow-setup.outputs.VERSION }}
+      ARTIFACTS_PATH: "output"
+      PACKAGE_NAME: "verim-node"
     steps:
 
     - name: Set up Go 1.x
       uses: actions/setup-go@v2
       with:
         go-version: 1.16
-      id: go
 
-    - name: Download and build starport
-      run: curl https://get.starport.network/starport | bash
+    - name: Install starport
+      run: curl https://get.starport.network/starport! | sudo bash
 
-    - run: sudo mv starport /usr/local/bin/
-
-    - name: Starport build
+    - name: Build
       run: starport build
 
+    - name: Create artifacts directory
+      run: mkdir ${{ env.ARTIFACTS_PATH }}
+      
     - name: Make archive
       run: |
-        touch node_${{ needs.workflow-setup.outputs.VERSION }}.tar.gz
-        tar -czf node_${{ needs.workflow-setup.outputs.VERSION }}.tar.gz --exclude=node_${{ needs.workflow-setup.outputs.VERSION }}.tar.gz .
+        touch ${{ env.ARTIFACTS_PATH }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+        tar -czf ${{ env.ARTIFACTS_PATH }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz /go/bin/verim-noded
+
     - name: Upload archive
       uses: actions/upload-artifact@v2
       with:
-        name: node_${{ needs.workflow-setup.outputs.VERSION }}.tar.gz
-        path: node_${{ needs.workflow-setup.outputs.VERSION }}.tar.gz
+        name: ${{ env.ARTIFACTS_PATH }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+        path: ${{ env.ARTIFACTS_PATH }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
 
-    - run: sudo apt-get install ruby ruby-dev rubygems build-essential
-    - run: sudo gem install --no-document fpm
+    - name: Install fpm
+      run: |
+        sudo apt-get install ruby ruby-dev rubygems build-essential
+        sudo gem install --no-document fpm
 
-    - name: Creating deb package
-      run: sh build_deb.sh -v ${{ needs.workflow-setup.outputs.VERSION }} -t node_${{ needs.workflow-setup.outputs.VERSION }}.tar.gz
+    - name: Create deb package
+      run: |
+        fpm \
+          --input-type "tar" \
+          --output-type "deb" \
+          --version ${{ env.VERSION }} \
+          --name verim-node \
+          --description "verim node" \
+          --architecture "amd64" \
+          --verbose \
+          --chdir ${{ env.ARTIFACTS_PATH }} \
+          --package ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb \
+          ${{ env.ARTIFACTS_PATH }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+
+    - name: TODO DELETE
+      run: ls ${{ env.ARTIFACTS_PATH }}; exit 1
 
     - name: Upload deb
       uses: actions/upload-artifact@v2
       with:
-        name: node_${{ needs.workflow-setup.outputs.VERSION }}-1_amd64.deb
-        path: node_${{ needs.workflow-setup.outputs.VERSION }}-1_amd64.deb
+        name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+        path: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}-1_amd64.deb
 
 
     - uses: "marvinpinto/action-automatic-releases@latest"
