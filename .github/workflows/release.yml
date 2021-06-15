@@ -101,7 +101,6 @@ jobs:
           --description "verim node" \
           --architecture "amd64" \
           --verbose \
-          --chdir ${{ env.OUTPUT_DIR }} \
           --package ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb \
           ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
 
