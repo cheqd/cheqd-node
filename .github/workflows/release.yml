@@ -54,7 +54,7 @@ jobs:
     env:
       GITHUB_REPOSITORY_NAME: ${{ needs.workflow-setup.outputs.GITHUB_REPOSITORY_NAME }}
       VERSION: ${{ needs.workflow-setup.outputs.VERSION }}
-      ARTIFACTS_PATH: "output"
+      OUTPUT_DIR: "output"
       PACKAGE_NAME: "verim-node"
     steps:
 
@@ -73,18 +73,18 @@ jobs:
       run: starport build
 
     - name: Create artifacts directory
-      run: mkdir ${{ env.ARTIFACTS_PATH }}
+      run: mkdir ${{ env.OUTPUT_DIR }}
       
     - name: Make archive
       run: |
-        touch ${{ env.ARTIFACTS_PATH }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
-        tar -czf ${{ env.ARTIFACTS_PATH }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz /go/bin/verim-noded
+        touch ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+        tar -czf ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz /go/bin/verim-noded
 
     - name: Upload archive
       uses: actions/upload-artifact@v2
       with:
-        name: ${{ env.ARTIFACTS_PATH }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
-        path: ${{ env.ARTIFACTS_PATH }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+        name: ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+        path: ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
 
     - name: Install fpm
       run: |
@@ -101,12 +101,12 @@ jobs:
           --description "verim node" \
           --architecture "amd64" \
           --verbose \
-          --chdir ${{ env.ARTIFACTS_PATH }} \
+          --chdir ${{ env.OUTPUT_DIR }} \
           --package ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb \
-          ${{ env.ARTIFACTS_PATH }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+          ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
 
     - name: TODO DELETE
-      run: ls ${{ env.ARTIFACTS_PATH }}; exit 1
+      run: ls ${{ env.OUTPUT_DIR }}; exit 1
 
     - name: Upload deb
       uses: actions/upload-artifact@v2
