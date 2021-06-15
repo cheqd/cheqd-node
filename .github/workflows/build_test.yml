@@ -38,5 +38,5 @@ jobs:
 
    - name: Run tests
      run: |
-        PACKAGES = $(go list ./...)
+        PACKAGES=$(go list ./...)
         go test -v $PACKAGES
