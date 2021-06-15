@@ -15,7 +15,7 @@ jobs:
         go-version: 1.16
 
     - name: Download and build starport
-      run: curl https://get.starport.network/starport! | bash
+      run: curl https://get.starport.network/starport! | sudo bash
       
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
@@ -38,5 +38,5 @@ jobs:
 
    - name: Run tests
      run: |
-        PACKAGES = $(shell go list ./...)
+        PACKAGES = $(go list ./...)
         go test -v $PACKAGES
