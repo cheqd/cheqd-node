@@ -1,0 +1,43 @@
+name: CI
+
+on: push
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Set up Go 1.16
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16
+
+    - name: Download and build starport
+      run: curl https://get.starport.network/starport! | sudo bash
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Starport build
+      run: starport build
+
+  test:
+   name: Unit tests
+   runs-on: ubuntu-latest
+   steps:
+
+   - name: Set up Go 1.16
+     uses: actions/setup-go@v2
+     with:
+        go-version: 1.16
+
+   - name: Check out code into the Go module directory
+     uses: actions/checkout@v2
+
+   - name: Run tests
+     run: |
+        PACKAGES=$(go list ./...)
+        go test -v $PACKAGES
+
