@@ -7,7 +7,8 @@ on:
 
 jobs:
 
-  workflow-setup:
+  setup-workflow:
+    name: "Setup workflow"
     runs-on: ubuntu-latest
     outputs:
       GITHUB_REPOSITORY_NAME: ${{ steps.cache.outputs.GITHUB_REPOSITORY_NAME }}
@@ -24,9 +25,10 @@ jobs:
           echo "::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}"
 
 
-  build-image:
+  publish-image:
+    name: "Publish docker image"
     # Reference to workflow-setup job is required to access its various outputs.
-    needs: workflow-setup
+    needs: setup-workflow
     runs-on: ubuntu-latest
     env:
       GITHUB_REPOSITORY_NAME: ${{ needs.workflow-setup.outputs.GITHUB_REPOSITORY_NAME }}
@@ -44,9 +46,9 @@ jobs:
           docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
           docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:latest
 
-  tagged-release:
-    name: "Tagged Release"
-    needs: workflow-setup
+  publish-release:
+    name: "Publish release"
+    needs: setup-workflow
     runs-on: "ubuntu-latest"
     env:
       GITHUB_REPOSITORY_NAME: ${{ needs.workflow-setup.outputs.GITHUB_REPOSITORY_NAME }}

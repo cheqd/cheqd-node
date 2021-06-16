@@ -1,4 +1,4 @@
-name: Build and Test
+name: CI
 
 on: push
 
@@ -8,7 +8,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-    
+
     - name: Set up Go 1.16
       uses: actions/setup-go@v2
       with:
@@ -16,14 +16,14 @@ jobs:
 
     - name: Download and build starport
       run: curl https://get.starport.network/starport! | sudo bash
-      
+
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
 
     - name: Starport build
       run: starport build
 
-  tests:
+  test:
    name: Unit tests
    runs-on: ubuntu-latest
    steps:
