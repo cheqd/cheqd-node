@@ -2,11 +2,8 @@ name: Release
 
 on:
   push:
-    branches:
-      - main
-      - amromashov/verim-poc
     tags:
-      - "v*"
+    - 'v*'
 
 jobs:
 
