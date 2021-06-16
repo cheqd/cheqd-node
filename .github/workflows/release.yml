@@ -98,8 +98,7 @@ jobs:
           --description "verim node" \
           --architecture "amd64" \
           --verbose \
-          --prefix ${{ env.OUTPUT_DIR }} \
-          --package ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb \
+          --package ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb \
           ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
 
     - name: Upload deb
@@ -115,7 +114,7 @@ jobs:
         automatic_release_tag: "latest"
         prerelease: false
         files: |
-          ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
-          ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+          ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+          ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
 
 
