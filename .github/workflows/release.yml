@@ -31,8 +31,8 @@ jobs:
     needs: setup-workflow
     runs-on: ubuntu-latest
     env:
-      GITHUB_REPOSITORY_NAME: ${{ needs.workflow-setup.outputs.GITHUB_REPOSITORY_NAME }}
-      VERSION: ${{ needs.workflow-setup.outputs.VERSION }}
+      GITHUB_REPOSITORY_NAME: ${{ needs.setup-workflow.outputs.GITHUB_REPOSITORY_NAME }}
+      VERSION: ${{ needs.setup-workflow.outputs.VERSION }}
     steps:
       - name: Git checkout
         uses: actions/checkout@v2
@@ -51,8 +51,8 @@ jobs:
     needs: setup-workflow
     runs-on: "ubuntu-latest"
     env:
-      GITHUB_REPOSITORY_NAME: ${{ needs.workflow-setup.outputs.GITHUB_REPOSITORY_NAME }}
-      VERSION: ${{ needs.workflow-setup.outputs.VERSION }}
+      GITHUB_REPOSITORY_NAME: ${{ needs.setup-workflow.outputs.GITHUB_REPOSITORY_NAME }}
+      VERSION: ${{ needs.setup-workflow.outputs.VERSION }}
       OUTPUT_DIR: "output"
       PACKAGE_NAME: "verim-node"
     steps:
