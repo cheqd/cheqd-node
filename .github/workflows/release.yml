@@ -101,6 +101,7 @@ jobs:
           --description "verim node" \
           --architecture "amd64" \
           --verbose \
+          --prefix ${{ env.OUTPUT_DIR }} \
           --package ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb \
           ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
 
@@ -108,7 +109,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
-        path: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+        path: ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
 
 
     - uses: "marvinpinto/action-automatic-releases@latest"
