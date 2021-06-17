@@ -45,10 +45,7 @@ func TestHandler_UpdateNym(t *testing.T) {
 
 	// update NYM
 	updateNymMsg := TestMsgUpdateNym(nym.GetId())
-	_, err := setup.Handler(setup.Ctx, updateNymMsg)
-	if err != nil {
-		log.Fatal(err)
-	}
+	result, _ = setup.Handler(setup.Ctx, updateNymMsg)
 
 	// query NYM
 	receivedNym := setup.NymKeeper.GetNym(setup.Ctx, nym.Id)
@@ -76,10 +73,7 @@ func TestHandler_DeleteNym(t *testing.T) {
 
 	// delete NYM
 	updateNymMsg := TestMsgDeleteNym(nym.GetId())
-	_, err := setup.Handler(setup.Ctx, updateNymMsg)
-	if err != nil {
-		log.Fatal(err)
-	}
+	result, _ = setup.Handler(setup.Ctx, updateNymMsg)
 
 	// query NYM
 	receivedNym := setup.NymKeeper.GetNym(setup.Ctx, nym.Id)
