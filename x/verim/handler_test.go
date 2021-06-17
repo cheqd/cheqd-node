@@ -2,6 +2,7 @@ package verim
 
 import (
 	"testing"
+	"log"
 
 	"github.com/stretchr/testify/require"
 	"github.com/verim-id/verim-node/x/verim/types"
@@ -14,7 +15,10 @@ func TestHandler_CreateNym(t *testing.T) {
 	nymMsg := TestMsgCreateNym()
 	result, _ := setup.Handler(setup.Ctx, nymMsg)
 	nym := types.MsgCreateNymResponse{}
-	nym.Unmarshal(result.Data)
+	err := nym.Unmarshal(result.Data)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// query NYM
 	receivedNym := setup.NymKeeper.GetNym(setup.Ctx, nym.Id)
@@ -34,11 +38,14 @@ func TestHandler_UpdateNym(t *testing.T) {
 	nymMsg := TestMsgCreateNym()
 	result, _ := setup.Handler(setup.Ctx, nymMsg)
 	nym := types.MsgCreateNymResponse{}
-	nym.Unmarshal(result.Data)
+	err := nym.Unmarshal(result.Data)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// update NYM
 	updateNymMsg := TestMsgUpdateNym(nym.GetId())
-	setup.Handler(setup.Ctx, updateNymMsg)
+	_,_ = setup.Handler(setup.Ctx, updateNymMsg)
 
 	// query NYM
 	receivedNym := setup.NymKeeper.GetNym(setup.Ctx, nym.Id)
@@ -59,11 +66,14 @@ func TestHandler_DeleteNym(t *testing.T) {
 	nymMsg := TestMsgCreateNym()
 	result, _ := setup.Handler(setup.Ctx, nymMsg)
 	nym := types.MsgCreateNymResponse{}
-	nym.Unmarshal(result.Data)
+	err := nym.Unmarshal(result.Data)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// delete NYM
 	updateNymMsg := TestMsgDeleteNym(nym.GetId())
-	setup.Handler(setup.Ctx, updateNymMsg)
+	_,_ = setup.Handler(setup.Ctx, updateNymMsg)
 
 	// query NYM
 	receivedNym := setup.NymKeeper.GetNym(setup.Ctx, nym.Id)
