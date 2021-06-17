@@ -2,6 +2,7 @@ package verim
 
 import (
 	"testing"
+	"log"
 
 	"github.com/stretchr/testify/require"
 	"github.com/verim-id/verim-node/x/verim/types"
@@ -44,7 +45,7 @@ func TestHandler_UpdateNym(t *testing.T) {
 
 	// update NYM
 	updateNymMsg := TestMsgUpdateNym(nym.GetId())
-	err := setup.Handler(setup.Ctx, updateNymMsg)
+	_, err := setup.Handler(setup.Ctx, updateNymMsg)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -75,7 +76,7 @@ func TestHandler_DeleteNym(t *testing.T) {
 
 	// delete NYM
 	updateNymMsg := TestMsgDeleteNym(nym.GetId())
-	err := setup.Handler(setup.Ctx, updateNymMsg)
+	_, err := setup.Handler(setup.Ctx, updateNymMsg)
 	if err != nil {
 		log.Fatal(err)
 	}

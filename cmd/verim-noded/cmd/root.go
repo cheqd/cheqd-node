@@ -267,7 +267,7 @@ func overwriteFlagDefaults(c *cobra.Command, defaults map[string]string) {
 			f.DefValue = val
 			err := f.Value.Set(val)
 			if err != nil {
-				log.Fatal(err)
+				panic(err)
 			}
 		}
 	}
