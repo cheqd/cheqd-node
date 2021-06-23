@@ -1,6 +1,6 @@
 #####  Build container  #####
 
-FROM golang:buster as builder
+FROM verim-node
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
