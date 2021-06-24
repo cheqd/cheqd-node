@@ -10,6 +10,8 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     protobuf-compiler \
     libprotobuf-dev
 
+
+
 # Starport
 RUN curl https://get.starport.network/starport! | bash
 
@@ -32,6 +34,8 @@ RUN starport build
 FROM debian:buster
 
 COPY --from=builder /go/bin/verim-noded /bin
+
+RUN useradd --create-home --shell /bin/bash --uid 1000 verim
 
 VOLUME /root/.verim-noded
 EXPOSE 26656 26657
