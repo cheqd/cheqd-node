@@ -1,11 +1,11 @@
 FROM verim-node
 
-COPY ci/local_net/gen_node_configs.sh ./ci/gen_node_configs.sh
+COPY ci/local_net/gen_node_configs.sh gen_node_configs.sh
 COPY ci/docker-testnet/supervisord.conf /etc/supervisord.conf
 
-EXPOSE 9701 9702 9703 9704 9705 9706 9707 9708
+EXPOSE 26657 26660 26663 26666
 
-RUN ./ci/gen_node_configs.sh
+RUN ./gen_node_configs.sh
 
-CMD ["/usr/bin/supervisord"]
+ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
 STOPSIGNAL SIGTERM

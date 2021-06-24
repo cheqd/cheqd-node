@@ -145,13 +145,21 @@ cp $NODE_3_HOME/config/genesis.json $NODE_0_HOME/config/
 cp $NODE_3_HOME/config/genesis.json $NODE_1_HOME/config/
 cp $NODE_3_HOME/config/genesis.json $NODE_2_HOME/config/
 
+# Make RPC enpoint available externally
+sed -i $extension 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/g' $NODE_CONFIGS_DIR/node0/config/config.toml
+sed -i $extension 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26660"/g' $NODE_CONFIGS_DIR/node1/config/config.toml
+sed -i $extension 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26663"/g' $NODE_CONFIGS_DIR/node2/config/config.toml
+sed -i $extension 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26666"/g' $NODE_CONFIGS_DIR/node3/config/config.toml
 
-echo "################################ Anna (at least one participant) Updates address book of her node. It will allow nodes to connect to each other."
-peers="$NODE_0_ID@node0:26656,$NODE_1_ID@node1:26656,$NODE_2_ID@node2:26656,$NODE_3_ID@node3:26656"
-sed -i $extension "s/persistent_peers = \"\"/persistent_peers = \"$peers\"/g" $NODE_0_HOME/config/config.toml
-sed -i $extension "s/persistent_peers = \"\"/persistent_peers = \"$peers\"/g" $NODE_1_HOME/config/config.toml
-sed -i $extension "s/persistent_peers = \"\"/persistent_peers = \"$peers\"/g" $NODE_2_HOME/config/config.toml
-sed -i $extension "s/persistent_peers = \"\"/persistent_peers = \"$peers\"/g" $NODE_3_HOME/config/config.toml
+# Make p2p enpoints different
+sed -i $extension 's/laddr = "tcp:\/\/0.0.0.0:26656"/laddr = "tcp:\/\/0.0.0.0:26656"/g' $NODE_CONFIGS_DIR/node0/config/config.toml
+sed -i $extension 's/laddr = "tcp:\/\/0.0.0.0:26656"/laddr = "tcp:\/\/0.0.0.0:26659"/g' $NODE_CONFIGS_DIR/node1/config/config.toml
+sed -i $extension 's/laddr = "tcp:\/\/0.0.0.0:26656"/laddr = "tcp:\/\/0.0.0.0:26662"/g' $NODE_CONFIGS_DIR/node2/config/config.toml
+sed -i $extension 's/laddr = "tcp:\/\/0.0.0.0:26656"/laddr = "tcp:\/\/0.0.0.0:26665"/g' $NODE_CONFIGS_DIR/node3/config/config.toml
+
+# Update address book of the first node
+peers="$id0@node0:26656,$id1@node1:26659,$id2@node2:26662,$id3@node3:26665"
+sed -i $extension "s/persistent_peers = \"\"/persistent_peers = \"$peers\"/g" $NODE_CONFIGS_DIR/node0/config/config.toml
 
 
 echo "################################ (any participant, optional) Sets minimal gas prices"

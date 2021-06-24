@@ -30,14 +30,14 @@ This will setup 4 nodes listening on the following ports:
     - p2p: 26656
     - rpc: 26657
 - Node1:
-    - p2p: 26666
-    - rpc: 26667
+    - p2p: 26659
+    - rpc: 26660
 - Node2:
-    - p2p: 26676
-    - rpc: 26677
+    - p2p: 26662
+    - rpc: 26663
 - Node3:
-    - p2p: 26686
-    - rpc: 26687
+    - p2p: 26665
+    - rpc: 26666
 
 You can tests connection to a node using browser: `http://localhost:<rpc_port>`. Example for the fitst node: `http://localhost:26657`.
 
