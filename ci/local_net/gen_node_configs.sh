@@ -109,16 +109,22 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     extension='.orig'
 fi
 
-# Update address book of the first node
-peers="$id0@node0:26656,$id1@node1:26656,$id2@node2:26656,$id3@node3:26656"
-sed -i $extension "s/persistent_peers = \"\"/persistent_peers = \"$peers\"/g" $NODE_CONFIGS_DIR/node0/config/config.toml
 
 # Make RPC enpoint available externally
 sed -i $extension 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/g' $NODE_CONFIGS_DIR/node0/config/config.toml
-sed -i $extension 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/g' $NODE_CONFIGS_DIR/node1/config/config.toml
-sed -i $extension 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/g' $NODE_CONFIGS_DIR/node2/config/config.toml
-sed -i $extension 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/g' $NODE_CONFIGS_DIR/node3/config/config.toml
+sed -i $extension 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26660"/g' $NODE_CONFIGS_DIR/node1/config/config.toml
+sed -i $extension 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26663"/g' $NODE_CONFIGS_DIR/node2/config/config.toml
+sed -i $extension 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26666"/g' $NODE_CONFIGS_DIR/node3/config/config.toml
 
+# Make p2p enpoints different
+sed -i $extension 's/laddr = "tcp:\/\/0.0.0.0:26656"/laddr = "tcp:\/\/0.0.0.0:26656"/g' $NODE_CONFIGS_DIR/node0/config/config.toml
+sed -i $extension 's/laddr = "tcp:\/\/0.0.0.0:26656"/laddr = "tcp:\/\/0.0.0.0:26659"/g' $NODE_CONFIGS_DIR/node1/config/config.toml
+sed -i $extension 's/laddr = "tcp:\/\/0.0.0.0:26656"/laddr = "tcp:\/\/0.0.0.0:26662"/g' $NODE_CONFIGS_DIR/node2/config/config.toml
+sed -i $extension 's/laddr = "tcp:\/\/0.0.0.0:26656"/laddr = "tcp:\/\/0.0.0.0:26665"/g' $NODE_CONFIGS_DIR/node3/config/config.toml
+
+# Update address book of the first node
+peers="$id0@node0:26656,$id1@node1:26659,$id2@node2:26662,$id3@node3:26665"
+sed -i $extension "s/persistent_peers = \"\"/persistent_peers = \"$peers\"/g" $NODE_CONFIGS_DIR/node0/config/config.toml
 
 # Set gas prices
 sed -i $extension 's/minimum-gas-prices = ""/minimum-gas-prices = "1token"/g' $NODE_CONFIGS_DIR/node0/config/app.toml
