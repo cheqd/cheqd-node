@@ -1,5 +1,14 @@
 # Localnet
 
+## Description
+
+The set of scripts to generate configuration for a testnet of four nodes and run it locally in docker-compose.
+
+## Prerequisites
+
+- [Starport](https://docs.starport.network/intro/install.html) 
+- docker-compose
+
 ## How to run
 
 1.  Build docker image:
