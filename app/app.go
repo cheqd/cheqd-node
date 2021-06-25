@@ -88,7 +88,9 @@ import (
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
-const Name = "verim"
+const Name = "verimnode"
+const Version = "1.0"
+const AppVersion = 1
 
 // this line is used by starport scaffolding # stargate/wasm/app/enabledProposals
 
@@ -465,6 +467,17 @@ func (app *App) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.Res
 		panic(err)
 	}
 	return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
+}
+
+// Info implements the ABCI interface.
+// We have to override it because the base method doesn't fill version fields which are expected by rust client.
+func (app *App) Info(req abci.RequestInfo) abci.ResponseInfo {
+	res := app.BaseApp.Info(req)
+
+	res.Version = Version
+	res.AppVersion = AppVersion
+
+	return res
 }
 
 // LoadHeight loads a particular height
