@@ -27,39 +27,39 @@ Current delivery is compiled and tested under `Ubuntu 20.04 LTS` so we recommend
     
     - **Generates local keys for his future account:**
     
-        Comman `verim-cosmosd keys add <key_name>`
+        Comman `verim-noded keys add <key_name>`
 
-        Examp `verim-cosmosd keys add alice`
+        Examp `verim-noded keys add alice`
     
     - **Initializes node config files:**
         
-        Command: `verim-cosmosd init <node_name> --chain-id <chain_id>`
+        Command: `verim-noded init <node_name> --chain-id <chain_id>`
         
-        Example: `verim-cosmosd init alice-node --chain-id verim-cosmos`
+        Example: `verim-noded init alice-node --chain-id verim-node`
         
     - **(Each participatn except the first one) Gets genesis from the previous participant:**
         
-        Location on the previous participant's machine: `$HOME/.verimcosmos/config/genesis.json`
+        Location on the previous participant's machine: `$HOME/.verimnode/config/genesis.json`
         
-        Destination folder on the current participant's machine: `$HOME/.verimcosmos/config/`
+        Destination folder on the current participant's machine: `$HOME/.verimnode/config/`
         
     - **(Each participatn except the first one) Gets genesis node transactions form the previous participant:**
         
-        Location on the previous participant's machine: `$HOME/.verimcosmos/config/gentx/`
+        Location on the previous participant's machine: `$HOME/.verimnode/config/gentx/`
         
-        Destination folder on the current participant's machine: `$HOME/.verimcosmos/config/gentx/`
+        Destination folder on the current participant's machine: `$HOME/.verimnode/config/gentx/`
                 
     - **Adds a genesis account with his public key:**
         
-        Command: `verim-cosmosd add-genesis-account <key_name> 10000000token,100000000stake`
+        Command: `verim-noded add-genesis-account <key_name> 10000000token,100000000stake`
         
-        Example: `verim-cosmosd add-genesis-account alice 10000000token,100000000stake`
+        Example: `verim-noded add-genesis-account alice 10000000token,100000000stake`
         
     - **Generates genesis node transaction:**
         
-        Command: `verim-cosmosd gentx <key_name> 1000000stake --chain-id <chain_id>`
+        Command: `verim-noded gentx <key_name> 1000000stake --chain-id <chain_id>`
         
-        Example: `verim-cosmosd gentx alice 1000000stake --chain-id verim-cosmos`
+        Example: `verim-noded gentx alice 1000000stake --chain-id verim-node`
         
         **TODO: Node owner should specify gas prices here. Need to research how it works.**
         
@@ -67,17 +67,17 @@ Current delivery is compiled and tested under `Ubuntu 20.04 LTS` so we recommend
 
     - **Adds genesis node transactions into genesis:**
         
-        Command: `verim-cosmosd collect-gentxs`
+        Command: `verim-noded collect-gentxs`
         
     - **Verifies genesis:**
         
-        Command: `verim-cosmosd validate-genesis`
+        Command: `verim-noded validate-genesis`
         
     - **Shares his genesis with other nodes:**
         
-        Location on the last participant's machine: `$HOME/.verimcosmos/config/genesis.json`
+        Location on the last participant's machine: `$HOME/.verimnode/config/genesis.json`
         
-        Destination folder on the other participant's machines: `$HOME/.verimcosmos/config/`
+        Destination folder on the other participant's machines: `$HOME/.verimnode/config/`
 
 After this steps:
 - Nodes of all participants have same genesis;
@@ -91,19 +91,19 @@ After this steps:
 
     - **Shares his node ID and IP with each other:**
         
-        Command to find out node's id: `verim-cosmosd tendermint show-node-id`. This command **MUST** be run on the machine where node's config files are located.
+        Command to find out node's id: `verim-noded tendermint show-node-id`. This command **MUST** be run on the machine where node's config files are located.
         
         Node IP is external IP of the node's machine.
         
         Node adress is the combination of IP and ID in the following format: `ID@IP`.
         
-        Port is the RPC adress of the node. It can be configured here: `$HOME/.verimcosmos/config/config.toml`. Default value is `26656`.
+        Port is the RPC adress of the node. It can be configured here: `$HOME/.verimnode/config/config.toml`. Default value is `26656`.
         
         Node address example: `d45dcc54583d6223ba6d4b3876928767681e8ff6@192.168.0.142:26656`
         
     - **Update address book of his node:**
         
-        Open node's config file: `$HOME/.verimcosmos/config/config.toml`
+        Open node's config file: `$HOME/.verimnode/config/config.toml`
         
         Search for `persistent_peers` parameter and set it's value to a comma separated list of other participant node addresses.
         
@@ -121,7 +121,7 @@ After this steps:
         
         This step is necessary if you want to allow incoming client applications connections to your node. Otherwise, the node will be accessible only locally. 
         
-        Open node configuration file using text editor you prefer: `$HOME/.verimcosmos/config/config.toml`
+        Open node configuration file using text editor you prefer: `$HOME/.verimnode/config/config.toml`
         
         Search for `ladr` parameter in `RPC Server Configuration Options` section and replace it's value to `0.0.0.0:26657`
                 
@@ -129,7 +129,7 @@ After this steps:
         
     - **Start node:**
         
-        Command: `verim-cosmosd start`
+        Command: `verim-noded start`
         
         It's better to use process supervisor like `systemd` to run persistent nodes.
 
