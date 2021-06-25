@@ -43,7 +43,7 @@ func Setup() TestSetup {
 	// Create context
 	blockTime, _ := time.Parse(time.RFC3339, "2021-01-01T00:00:00.000Z")
 	ctx := sdk.NewContext(dbStore,
-		tmproto.Header{ChainID: "verim-cosmos", Time: blockTime},
+		tmproto.Header{ChainID: "verim-node", Time: blockTime},
 		false, log.NewNopLogger())
 
 	handler := NewHandler(*nymKeeper)
