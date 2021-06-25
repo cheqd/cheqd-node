@@ -9,7 +9,7 @@ services:
       - "26657:26657" # rpc
     volumes:
       - ./node_configs/node0:/home/verim/.verimnode:Z
-    command: start
+    command: start --rpc.laddr tcp://0.0.0.0:26657 --p2p.persistent_peers "${NODE_0_ID}@node0:26656,${NODE_1_ID}@node1:26656,${NODE_2_ID}@node2:26656,${NODE_3_ID}@node3:26656"
 
   node1:
     image: verim-node
@@ -19,7 +19,7 @@ services:
       - "26660:26660" # rpc
     volumes:
       - ./node_configs/node1:/home/verim/.verimnode:Z
-    command: start
+    command: start --rpc.laddr tcp://0.0.0.0:26657
 
   node2:
     image: verim-node
@@ -29,7 +29,7 @@ services:
       - "26663:26663" # rpc
     volumes:
       - ./node_configs/node2:/home/verim/.verimnode:Z
-    command: start
+    command: start --rpc.laddr tcp://0.0.0.0:26657
 
   node3:
     image: verim-node
@@ -39,4 +39,4 @@ services:
       - "26666:26666" # rpc
     volumes:
       - ./node_configs/node3:/home/verim/.verimnode:Z
-    command: start
+    command: start --rpc.laddr tcp://0.0.0.0:26657

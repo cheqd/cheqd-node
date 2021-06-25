@@ -18,7 +18,7 @@ To build the image:
 ## Running
 
 - Run `docker run -it --rm -p "26657:26657" -p "26660:26660" -p "26663:26663" -p "26666:26666" verim-testnet`
-- RPC posta are exposed on the folowing ports:
+- RPC apis are exposed on the folowing ports:
   - node_0: `26657`
   - node_1: `26660`
   - node_2: `26663`
