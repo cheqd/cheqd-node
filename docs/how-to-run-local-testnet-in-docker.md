@@ -29,17 +29,17 @@ Keys of all accounts are located in `localnet/client`. When connecting using CLI
 Show balances:
 
 ```
-verim-cosmosd query bank balances $(verim-cosmosd keys show anna -a --home localnet/client) --home localnet/client
+verim-noded query bank balances $(verim-noded keys show anna -a --home localnet/client) --home localnet/client
 ```
 
 Create NYM:
 
 ```
-verim-cosmosd tx verimcosmos create-nym "alias" "verkey" "did" "role" --from anna --gas-prices 1token --chain-id verimcosmos --home localnet/client
+verim-noded tx verimnode create-nym "alias" "verkey" "did" "role" --from anna --gas-prices 1token --chain-id verimnode --home localnet/client
 ```
 
 List NYMs:
 
 ```
-verim-cosmosd query verimcosmos list-nym --home localnet/client
+verim-noded query verimnode list-nym --home localnet/client
 ```
