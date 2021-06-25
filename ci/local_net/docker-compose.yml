@@ -8,7 +8,7 @@ services:
       - "26656:26656" # p2p
       - "26657:26657" # rpc
     volumes:
-      - ./node_configs/node0:/root/.verim:Z
+      - ./node_configs/node0:/home/verim/.verimnode:Z
     command: start
 
   node1:
@@ -18,7 +18,7 @@ services:
       - "26659:26659" # p2p
       - "26660:26660" # rpc
     volumes:
-      - ./node_configs/node1:/root/.verim:Z
+      - ./node_configs/node1:/home/verim/.verimnode:Z
     command: start
 
   node2:
@@ -28,7 +28,7 @@ services:
       - "26662:26662" # p2p
       - "26663:26663" # rpc
     volumes:
-      - ./node_configs/node2:/root/.verim:Z
+      - ./node_configs/node2:/home/verim/.verimnode:Z
     command: start
 
   node3:
@@ -38,5 +38,5 @@ services:
       - "26665:26665" # p2p
       - "26666:26666" # rpc
     volumes:
-      - ./node_configs/node3:/root/.verim:Z
+      - ./node_configs/node3:/home/verim/.verimnode:Z
     command: start

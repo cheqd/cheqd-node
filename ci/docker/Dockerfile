@@ -8,8 +8,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     curl \
     # Protoc
     protobuf-compiler \
-    libprotobuf-dev \
-    supervisor
+    libprotobuf-dev
 
 # Starport
 RUN curl https://get.starport.network/starport! | bash
