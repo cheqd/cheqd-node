@@ -11,14 +11,6 @@ NODE_CONFIGS_DIR="node_configs"
 rm -rf $NODE_CONFIGS_DIR
 mkdir $NODE_CONFIGS_DIR
 
-# sed in macos requires extra argument
-extension=''
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    extension=''
-elif [[ "$OSTYPE" == "darwin"* ]]; then
-    extension='.orig'
-fi
-
 
 echo "################################ Jack's node0"
 
@@ -36,11 +28,8 @@ verim-noded add-genesis-account jack 10000000token,100000000stake --home $NODE_0
 echo "# Generate genesis node tx"
 verim-noded gentx jack 1000000stake --chain-id $CHAIN_ID --home $NODE_0_HOME
 
-echo "# Publish validator pubkey"
+echo "# Publish validator id"
 NODE_0_ID=$(verim-noded tendermint show-node-id --home $NODE_0_HOME)
-
-echo "# Make RPC enpoint available externally (optional, allows cliens to connect to the node)"
-sed -i $extension 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/g' $NODE_0_HOME/config/config.toml
 
 
 echo "################################ Alice's node1"
@@ -66,11 +55,8 @@ verim-noded add-genesis-account alice 10000000token,100000000stake --home $NODE_
 echo "# Generate genesis node tx"
 verim-noded gentx alice 1000000stake --chain-id $CHAIN_ID --home $NODE_1_HOME
 
-echo "# Publish validator pubkey"
+echo "# Publish validator id"
 NODE_1_ID=$(verim-noded tendermint show-node-id --home $NODE_1_HOME)
-
-echo "# Make RPC enpoint available externally (optional, allows cliens to connect to the node)"
-sed -i $extension 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/g' $NODE_1_HOME/config/config.toml
 
 
 echo "################################ Bob's node2"
@@ -96,11 +82,8 @@ verim-noded add-genesis-account bob 10000000token,100000000stake --home $NODE_2_
 echo "# Generate genesis node tx"
 verim-noded gentx bob 1000000stake --chain-id $CHAIN_ID --home $NODE_2_HOME
 
-echo "# Publish validator pubkey"
+echo "# Publish validator id"
 NODE_2_ID=$(verim-noded tendermint show-node-id --home $NODE_2_HOME)
-
-echo "# Make RPC enpoint available externally (optional, allows cliens to connect to the node)"
-sed -i $extension 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/g' $NODE_2_HOME/config/config.toml
 
 
 echo "################################ Anna's node3"
@@ -126,11 +109,8 @@ verim-noded add-genesis-account anna 10000000token,100000000stake --home $NODE_3
 echo "# Generate genesis node tx"
 verim-noded gentx anna 1000000stake --chain-id $CHAIN_ID --home $NODE_3_HOME
 
-echo "# Publish validator pubkey"
+echo "# Publish validator id"
 NODE_3_ID=$(verim-noded tendermint show-node-id --home $NODE_3_HOME)
-
-echo "# Make RPC enpoint available externally (optional, allows cliens to connect to the node)"
-sed -i $extension 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/g' $NODE_3_HOME/config/config.toml
 
 
 echo "################################ Anna (last participatn) shares genesis with everyone else"

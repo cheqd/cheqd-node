@@ -17,10 +17,10 @@ To build the image:
 
 ## Running
 
-- Run `docker run -it --rm -p "26657:26657" -p "26660:26660" -p "26663:26663" -p "26666:26666" verim-testnet`
+- Run `docker run -it --rm -p "26657:26657" -p "26659:26659" -p "26661:26661" -p "26663:26663" verim-testnet`
 - RPC apis are exposed on the folowing ports:
   - node_0: `26657`
-  - node_1: `26660`
-  - node_2: `26663`
-  - node_3: `26666`
-- Try to connect to any node in your browser, for instance: ``
+  - node_1: `26659`
+  - node_2: `26661`
+  - node_3: `26663`
+- Try to connect to any node in your browser, for instance: `http://localhost:26657/`
