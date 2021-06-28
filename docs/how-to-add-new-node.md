@@ -26,9 +26,9 @@ New participant:
 
     - **Generates local keys for his future account:**
 
-        Command `verim-noded keys add <key_name>`
+        Command: `verim-noded keys add <key_name>`
 
-        Example `verim-noded keys add alice`
+        Example: `verim-noded keys add alice`
 
     - **Asks another member to transfer some tokens:**
 
@@ -42,7 +42,7 @@ New participant:
 
     - **Find out `<chain-id>`:**
 
-        Command `verim-noded status --node <remove_node_ip>`
+        Command `verim-noded status --node <remote_node_ip>`
         
         Chain id will showed as `network` property.
         
