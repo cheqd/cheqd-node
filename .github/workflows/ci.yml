@@ -23,6 +23,19 @@ jobs:
     - name: Starport build
       run: starport build
 
+  build-node-and-testnet-images:
+    name: Build node and testnet images
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Build node image
+        run: |
+          docker build -f ci/docker/Dockerfile --no-cache -t verim-node .
+
+      - name: Build testnet image
+        run: |
+          docker build -f ci/docker-testnet/Dockerfile --no-cache -t verim-testnet .
+
   test:
    name: Unit tests
    runs-on: ubuntu-latest

@@ -37,7 +37,7 @@ jobs:
       - name: Git checkout
         uses: actions/checkout@v2
 
-      - name: build and push image
+      - name: Build and push image
         run: |
           echo ${{ secrets.GH_PAT }} | docker login ghcr.io --username ${{ secrets.GH_USER }} --password-stdin
           docker build -f ci/docker/Dockerfile --no-cache -t verim-node .
