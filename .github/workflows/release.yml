@@ -57,10 +57,10 @@ jobs:
 
       - name: Push testnet image
         run: |
-          docker tag verim-testnet ghcr.io/${{ github.repository_owner }}/{ env.TESTNET_IMAGE_NAME }:${{ env.VERSION }}
-          docker tag verim-testnet ghcr.io/${{ github.repository_owner }}/{ env.TESTNET_IMAGE_NAME }:latest
-          docker push ghcr.io/${{ github.repository_owner }}/{ env.TESTNET_IMAGE_NAME }:${{ env.VERSION }}
-          docker push ghcr.io/${{ github.repository_owner }}/{ env.TESTNET_IMAGE_NAME }:latest
+          docker tag verim-testnet ghcr.io/${{ github.repository_owner }}/{{ env.TESTNET_IMAGE_NAME }}:${{ env.VERSION }}
+          docker tag verim-testnet ghcr.io/${{ github.repository_owner }}/{{ env.TESTNET_IMAGE_NAME }}:latest
+          docker push ghcr.io/${{ github.repository_owner }}/{{ env.TESTNET_IMAGE_NAME }}:${{ env.VERSION }}
+          docker push ghcr.io/${{ github.repository_owner }}/{{ env.TESTNET_IMAGE_NAME }}:latest
 
   publish-release:
     name: "Publish release"
