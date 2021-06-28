@@ -3,10 +3,9 @@ name: Release
 on:
   push:
     tags:
-    - 'v*'
+      - "v*"
 
 jobs:
-
   setup-workflow:
     name: "Setup workflow"
     runs-on: ubuntu-latest
@@ -24,8 +23,7 @@ jobs:
           echo "::set-output name=GITHUB_REPOSITORY_NAME::$(echo ${GITHUB_REPOSITORY,,})"
           echo "::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}"
 
-
-  publish-image:
+  publish-images:
     name: "Publish docker image"
     # Reference to workflow-setup job is required to access its various outputs.
     needs: setup-workflow
@@ -33,18 +31,36 @@ jobs:
     env:
       GITHUB_REPOSITORY_NAME: ${{ needs.setup-workflow.outputs.GITHUB_REPOSITORY_NAME }}
       VERSION: ${{ needs.setup-workflow.outputs.VERSION }}
+      TESTNET_IMAGE_NAME: "verim-testnet"
     steps:
       - name: Git checkout
         uses: actions/checkout@v2
 
-      - name: Build and push image
+      - name: Login to docker
         run: |
           echo ${{ secrets.GH_PAT }} | docker login ghcr.io --username ${{ secrets.GH_USER }} --password-stdin
+
+      - name: Build node image
+        run: |
           docker build -f ci/docker/Dockerfile --no-cache -t verim-node .
+
+      - name: Build testnet image
+        run: |
+          docker build -f ci/docker-testnet/Dockerfile --no-cache -t verim-testnet .
+
+      - name: Push node image
+        run: |
           docker tag verim-node ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
           docker tag verim-node ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:latest
           docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
           docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:latest
+
+      - name: Push testnet image
+        run: |
+          docker tag verim-testnet ghcr.io/${{ github.repository_owner }}/{ env.TESTNET_IMAGE_NAME }:${{ env.VERSION }}
+          docker tag verim-testnet ghcr.io/${{ github.repository_owner }}/{ env.TESTNET_IMAGE_NAME }:latest
+          docker push ghcr.io/${{ github.repository_owner }}/{ env.TESTNET_IMAGE_NAME }:${{ env.VERSION }}
+          docker push ghcr.io/${{ github.repository_owner }}/{ env.TESTNET_IMAGE_NAME }:latest
 
   publish-release:
     name: "Publish release"
@@ -56,67 +72,63 @@ jobs:
       OUTPUT_DIR: "output"
       PACKAGE_NAME: "verim-node"
     steps:
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
 
-    - name: Set up Go 1.x
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.16
+      - name: Install starport
+        run: curl https://get.starport.network/starport! | sudo bash
 
-    - name: Install starport
-      run: curl https://get.starport.network/starport! | sudo bash
+      - name: Git checkout
+        uses: actions/checkout@v2
 
-    - name: Git checkout
-      uses: actions/checkout@v2
+      - name: Build
+        run: starport build
 
-    - name: Build
-      run: starport build
+      - name: Create artifacts directory
+        run: mkdir ${{ env.OUTPUT_DIR }}
 
-    - name: Create artifacts directory
-      run: mkdir ${{ env.OUTPUT_DIR }}
-      
-    - name: Make archive
-      run: |
-        touch ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
-        tar -czf ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz /home/runner/go/bin/verim-noded
+      - name: Make archive
+        run: |
+          touch ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+          tar -czf ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz /home/runner/go/bin/verim-noded
 
-    - name: Upload archive
-      uses: actions/upload-artifact@v2
-      with:
-        name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
-        path: ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+      - name: Upload archive
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+          path: ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
 
-    - name: Install fpm
-      run: |
-        sudo apt-get install ruby ruby-dev rubygems build-essential
-        sudo gem install --no-document fpm
+      - name: Install fpm
+        run: |
+          sudo apt-get install ruby ruby-dev rubygems build-essential
+          sudo gem install --no-document fpm
 
-    - name: Create deb package
-      run: |
-        fpm \
-          --input-type "tar" \
-          --output-type "deb" \
-          --version ${{ env.VERSION }} \
-          --name verim-node \
-          --description "verim node" \
-          --architecture "amd64" \
-          --verbose \
-          --package ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb \
-          ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+      - name: Create deb package
+        run: |
+          fpm \
+            --input-type "tar" \
+            --output-type "deb" \
+            --version ${{ env.VERSION }} \
+            --name verim-node \
+            --description "verim node" \
+            --architecture "amd64" \
+            --verbose \
+            --package ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb \
+            ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
 
-    - name: Upload deb
-      uses: actions/upload-artifact@v2
-      with:
-        name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
-        path: ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+      - name: Upload deb
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+          path: ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
 
-
-    - uses: "marvinpinto/action-automatic-releases@latest"
-      with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "latest"
-        prerelease: false
-        files: |
-          ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
-          ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
-
-
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: false
+          files: |
+            ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+            ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
