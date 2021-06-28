@@ -23,13 +23,11 @@ The set of scripts to generate configuration for a testnet of four nodes and run
 
 3. Generate node configurations:
 
-    Run: `gen_node_configs.sh` or `gen_node_configs.sh`.
+    Run: `gen_node_configs.sh` or `gen_node_configs_demo.sh`.
 
 4. Run docker-compose:
 
-    ```
-    docker-compose up
-    ```
+    Run: `run_docker.sh`.
 
 ## Result
 
