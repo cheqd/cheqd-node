@@ -3,3 +3,4 @@ vue/src/store/generated
 vue/dist
 secret.yml
 ci/local_net/node_configs
+.idea

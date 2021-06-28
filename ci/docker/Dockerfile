@@ -33,6 +33,10 @@ FROM debian:buster
 
 COPY --from=builder /go/bin/verim-noded /bin
 
+RUN useradd --create-home --shell /bin/bash --uid 1000 verim
+WORKDIR /home/verim
+USER verim
+
 VOLUME /root/.verim-noded
 EXPOSE 26656 26657
 STOPSIGNAL SIGTERM
