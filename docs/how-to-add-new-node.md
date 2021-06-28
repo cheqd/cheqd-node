@@ -26,9 +26,9 @@ New participant:
 
     - **Generates local keys for his future account:**
 
-        Comman `verim-noded keys add <key_name>`
+        Command `verim-noded keys add <key_name>`
 
-        Examp `verim-noded keys add alice`
+        Example `verim-noded keys add alice`
 
     - **Asks another member to transfer some tokens:**
 
