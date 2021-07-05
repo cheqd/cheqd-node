@@ -13,7 +13,7 @@ Debian based docker image with the latest version of `verim-nonded` executable a
 To build the image:
 
 - Go to the repository root
-- Run `docker build -f ci/docker-testnet/Dockerfile -t verim-testnet .`
+- Run `docker build -f ci/docker_testnet/Dockerfile -t verim-testnet .`
 
 ## Running
 

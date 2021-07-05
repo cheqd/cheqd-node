@@ -9,8 +9,8 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 
 USER verim
 
-COPY ci/docker-testnet/gen_node_configs.sh .
-COPY ci/docker-testnet/supervisord.conf /etc
+COPY ci/docker_testnet/gen_node_configs.sh .
+COPY ci/docker_testnet/supervisord.conf /etc
 
 EXPOSE 26657 26659
 
