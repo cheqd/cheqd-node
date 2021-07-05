@@ -2,5 +2,5 @@ vue/node_modules
 vue/src/store/generated
 vue/dist
 secret.yml
-ci/local_net/node_configs
+**/node_configs
 .idea
