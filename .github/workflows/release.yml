@@ -46,7 +46,7 @@ jobs:
 
       - name: Build testnet image
         run: |
-          docker build -f ci/docker-testnet/Dockerfile --no-cache -t verim-testnet .
+          docker build -f ci/docker_testnet/Dockerfile --no-cache -t verim-testnet .
 
       - name: Push node image
         run: |
