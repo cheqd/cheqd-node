@@ -24,7 +24,7 @@ jobs:
           echo "::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}"
 
   publish-images:
-    name: "Publish docker image"
+    name: "Publish docker images"
     # Reference to workflow-setup job is required to access its various outputs.
     needs: setup-workflow
     runs-on: ubuntu-latest

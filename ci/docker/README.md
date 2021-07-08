@@ -27,6 +27,7 @@ docker run -it --rm verim-node <command> <args>
 
 Used to run a node in one command. The following env variable should be defined:
 
+- `NODE_MONIKER` - node moniker;
 - `GENESIS` - base64 encoded content of `genesis.json`;
 - `NODE_KEY` - base64 encoded content of `node_key.json`;
 - `PRIV_VALIDATOR_KEY` - base64 encoded content of `priv_validator_key.json`;
