@@ -7,8 +7,15 @@ set -euox pipefail
 NODE_HOME="$HOME/.verimnode"
 
 
-# Init config directory
-verim-noded init $NODE_MONIKER
+# Init node config directory
+if [ ! -d "${NODE_HOME}" ]
+then
+    echo "Node home not found. Initializing."
+    verim-noded init $NODE_MONIKER
+else
+    echo "Node home exists. Skipping initialization."
+fi
+
 
 # Update configs
 echo "$GENESIS" | base64 --decode > $NODE_HOME/config/genesis.json
