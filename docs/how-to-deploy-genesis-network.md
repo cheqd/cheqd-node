@@ -1,6 +1,6 @@
-# Deploy genesis network
+# Creating a new network from genesis
 
-This document describes in details how to configure a genesis network with any amount of particiatns.
+This document describes in details how to configure a genesis network with any amount of participants.
 
 ### Hardware requirements
 
@@ -16,20 +16,20 @@ Recommended (for highload applications):
 
 ### Operating System
 
-Current delivery is compiled and tested under `Ubuntu 20.04 LTS` so we recommend using this distribution for now. In the future, it will be possible to compile the application for a wide range of operating systems thanks to Go language.
+Current delivery is compiled and tested for `Ubuntu 20.04 LTS` so we recommend using this distribution for now. In the future, it will be possible to compile the application for a wide range of operating systems thanks to the Go language.
 
 ## Deployment steps
 
 ### Generating genesis file
 
 1. Participants must choose <chain_id> for the network.
-2. Each participant (one by one):
+2. Each participant (one by one) should:
     
-    - **Generates local keys for his future account:**
+    - **Generates local keys for the future account:**
     
-        Comman `verim-noded keys add <key_name>`
+        Command `verim-noded keys add <key_name>`
 
-        Examp `verim-noded keys add alice`
+        Example `verim-noded keys add alice`
     
     - **Initializes node config files:**
         
@@ -37,19 +37,19 @@ Current delivery is compiled and tested under `Ubuntu 20.04 LTS` so we recommend
         
         Example: `verim-noded init alice-node --chain-id verim-node`
         
-    - **(Each participatn except the first one) Gets genesis from the previous participant:**
+    - **(Each participant except the first one) Gets genesis from the previous participant:**
         
         Location on the previous participant's machine: `$HOME/.verimnode/config/genesis.json`
         
         Destination folder on the current participant's machine: `$HOME/.verimnode/config/`
         
-    - **(Each participatn except the first one) Gets genesis node transactions form the previous participant:**
+    - **(Each participant except the first one) Gets genesis node transactions from the previous participant:**
         
         Location on the previous participant's machine: `$HOME/.verimnode/config/gentx/`
         
         Destination folder on the current participant's machine: `$HOME/.verimnode/config/gentx/`
                 
-    - **Adds a genesis account with his public key:**
+    - **Adds a genesis account with a public key:**
         
         Command: `verim-noded add-genesis-account <key_name> 10000000token,100000000stake`
         
@@ -73,14 +73,14 @@ Current delivery is compiled and tested under `Ubuntu 20.04 LTS` so we recommend
         
         Command: `verim-noded validate-genesis`
         
-    - **Shares his genesis with other nodes:**
+    - **Shares genesis with other nodes:**
         
         Location on the last participant's machine: `$HOME/.verimnode/config/genesis.json`
         
         Destination folder on the other participant's machines: `$HOME/.verimnode/config/`
 
 After this steps:
-- Nodes of all participants have same genesis;
+- Nodes of all participants have the same genesis;
 - The genesis contains:
     - Accounts of all participants (genesis accounts);
     - Node creation transactions from all participants (genesis nodes).
@@ -89,7 +89,7 @@ After this steps:
 
 - Each participant:
 
-    - **Shares his node ID and IP with each other:**
+    - **Shares his node ID and IP with the others:**
         
         Command to find out node's id: `verim-noded tendermint show-node-id`. This command **MUST** be run on the machine where node's config files are located.
         
@@ -101,7 +101,7 @@ After this steps:
         
         Node address example: `d45dcc54583d6223ba6d4b3876928767681e8ff6@192.168.0.142:26656`
         
-    - **Update address book of his node:**
+    - **Update address book of the node:**
         
         Open node's config file: `$HOME/.verimnode/config/config.toml`
         
@@ -109,7 +109,7 @@ After this steps:
         
         Format: `<node-0-id>@<node-0-ip>, <node-1-id>@<node-1-ip>, <node-2-id>@<node-2-id>, <node-3-id>@<node-3-id>`.
         
-        Domain namaes can be used instead IP adresses.
+        Domain names can be used instead of IP adresses.
         
         Example:
         
@@ -121,7 +121,7 @@ After this steps:
         
         This step is necessary if you want to allow incoming client applications connections to your node. Otherwise, the node will be accessible only locally. 
         
-        Open node configuration file using text editor you prefer: `$HOME/.verimnode/config/config.toml`
+        Open node configuration file using the text editor that you prefer: `$HOME/.verimnode/config/config.toml`
         
         Search for `ladr` parameter in `RPC Server Configuration Options` section and replace it's value to `0.0.0.0:26657`
                 
