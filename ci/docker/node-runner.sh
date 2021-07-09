@@ -8,7 +8,7 @@ NODE_HOME="$HOME/.verimnode"
 
 
 # Init node config directory
-if [ ! -d "${NODE_HOME}" ]
+if [ ! -d "${NODE_HOME}/config" ]
 then
     echo "Node home not found. Initializing."
     verim-noded init $NODE_MONIKER
