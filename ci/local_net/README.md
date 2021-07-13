@@ -13,7 +13,7 @@ The set of scripts to generate configuration for a testnet of four nodes and run
 
 1.  Build docker image:
 
-    See [the instruction](../docker/README.md)
+    See [the instruction](../docker/README.md).
 
 2. Build verim-noded:
 
