@@ -12,7 +12,7 @@ Prerequisites:
 To build the node executable run:
 
 ```
-starport build
+starport chain build
 ```
 
 To look up binary's location run:

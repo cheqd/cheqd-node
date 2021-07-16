@@ -18,7 +18,7 @@ The set of scripts to generate configuration for a testnet of four nodes and run
 2. Build verim-noded:
 
     ```
-    starport build
+    starport chain build
     ```
 
 3. Generate node configurations:

@@ -24,7 +24,7 @@ COPY x ./x
 COPY go.mod .
 COPY go.sum .
 
-RUN starport build
+RUN starport chain build
 
 
 #####  Run container  #####
