@@ -1,0 +1,39 @@
+syntax = "proto3";
+package cheqdid.cheqdnode.cheqd;
+
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+// this line is used by starport scaffolding # 1
+import "cheqd/nym.proto";
+
+option go_package = "github.com/cheqd-id/cheqd-node/x/cheqd/types";
+
+// Query defines the gRPC querier service.
+service Query {
+    // this line is used by starport scaffolding # 2
+	rpc Nym(QueryGetNymRequest) returns (QueryGetNymResponse) {
+		option (google.api.http).get = "/cheqd-id/cheqd/cheqd/nym/{id}";
+	}
+	rpc NymAll(QueryAllNymRequest) returns (QueryAllNymResponse) {
+		option (google.api.http).get = "/cheqd-id/cheqd/cheqd/nym";
+	}
+
+}
+
+// this line is used by starport scaffolding # 3
+message QueryGetNymRequest {
+	uint64 id = 1;
+}
+
+message QueryGetNymResponse {
+	Nym Nym = 1;
+}
+
+message QueryAllNymRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllNymResponse {
+	repeated Nym Nym = 1;
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}

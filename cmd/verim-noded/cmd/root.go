@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/cheqd-id/cheqd-node/app/params"
 	"github.com/cosmos/cosmos-sdk/snapshots"
-	"github.com/verim-id/verim-node/app/params"
 
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
@@ -16,6 +16,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
 
+	"github.com/cheqd-id/cheqd-node/app"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/debug"
@@ -33,7 +34,6 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
-	"github.com/verim-id/verim-node/app"
 	// this line is used by starport scaffolding # stargate/root/import
 )
 

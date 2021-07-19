@@ -14,6 +14,10 @@ import (
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
 
+	appparams "github.com/cheqd-id/cheqd-node/app/params"
+	"github.com/cheqd-id/cheqd-node/x/cheqd"
+	cheqdkeeper "github.com/cheqd-id/cheqd-node/x/cheqd/keeper"
+	cheqdtypes "github.com/cheqd-id/cheqd-node/x/cheqd/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
@@ -81,14 +85,10 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
-	appparams "github.com/verim-id/verim-node/app/params"
-	"github.com/verim-id/verim-node/x/verim"
-	verimkeeper "github.com/verim-id/verim-node/x/verim/keeper"
-	verimtypes "github.com/verim-id/verim-node/x/verim/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
-const Name = "verimnode"
+const Name = "cheqdnode"
 const Version = "1.0"
 const AppVersion = 1
 
@@ -133,7 +133,7 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
-		verim.AppModuleBasic{},
+		cheqd.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -200,7 +200,7 @@ type App struct {
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
-	verimKeeper verimkeeper.Keeper
+	cheqdKeeper cheqdkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// the module manager
@@ -230,7 +230,7 @@ func New(
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		verimtypes.StoreKey,
+		cheqdtypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -321,8 +321,8 @@ func New(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
-	app.verimKeeper = *verimkeeper.NewKeeper(
-		appCodec, keys[verimtypes.StoreKey], keys[verimtypes.MemStoreKey],
+	app.cheqdKeeper = *cheqdkeeper.NewKeeper(
+		appCodec, keys[cheqdtypes.StoreKey], keys[cheqdtypes.MemStoreKey],
 	)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
@@ -367,7 +367,7 @@ func New(
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
-		verim.NewAppModule(appCodec, app.verimKeeper),
+		cheqd.NewAppModule(appCodec, app.cheqdKeeper),
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
@@ -401,7 +401,7 @@ func New(
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
-		verimtypes.ModuleName,
+		cheqdtypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 

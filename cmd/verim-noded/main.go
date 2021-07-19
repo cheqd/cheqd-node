@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
+	"github.com/cheqd-id/cheqd-node/app"
+	"github.com/cheqd-id/cheqd-node/cmd/cheqd-noded/cmd"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
-	"github.com/verim-id/verim-node/app"
-	"github.com/verim-id/verim-node/cmd/verim-noded/cmd"
 )
 
 func main() {

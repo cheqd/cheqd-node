@@ -2,7 +2,7 @@
 	<div>
 		<div class="container">
       	<!-- this line is used by starport scaffolding # 4 -->
-		<SpType modulePath="verim-id.verim.verim" moduleType="Nym"  />
+		<SpType modulePath="cheqd-id.cheqd.cheqd" moduleType="Nym"  />
 		</div>
 	</div>
 </template>

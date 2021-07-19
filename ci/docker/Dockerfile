@@ -31,19 +31,19 @@ RUN starport chain build
 
 FROM debian:buster
 
-COPY --from=builder /go/bin/verim-noded /bin
+COPY --from=builder /go/bin/cheqd-noded /bin
 
 COPY ci/docker/node-runner.sh /bin/node-runner
 RUN chmod +x /bin/node-runner
 
-RUN groupadd --gid 1000 verim && \
-    useradd --create-home --shell /bin/bash --uid 1000 --gid verim verim
+RUN groupadd --gid 1000 cheqd && \
+    useradd --create-home --shell /bin/bash --uid 1000 --gid cheqd cheqd
 
-WORKDIR /home/verim
-USER verim
+WORKDIR /home/cheqd
+USER cheqd
 
-VOLUME /home/verim/.verimnode
+VOLUME /home/cheqd/.cheqdnode
 EXPOSE 26656 26657
 STOPSIGNAL SIGTERM
 
-ENTRYPOINT [ "verim-noded" ]
+ENTRYPOINT [ "cheqd-noded" ]

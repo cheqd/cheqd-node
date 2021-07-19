@@ -31,7 +31,7 @@ jobs:
     env:
       GITHUB_REPOSITORY_NAME: ${{ needs.setup-workflow.outputs.GITHUB_REPOSITORY_NAME }}
       VERSION: ${{ needs.setup-workflow.outputs.VERSION }}
-      TESTNET_IMAGE_NAME: "verim-testnet"
+      TESTNET_IMAGE_NAME: "cheqd-testnet"
     steps:
       - name: Git checkout
         uses: actions/checkout@v2
@@ -42,23 +42,23 @@ jobs:
 
       - name: Build node image
         run: |
-          docker build -f ci/docker/Dockerfile --no-cache -t verim-node .
+          docker build -f ci/docker/Dockerfile --no-cache -t cheqd-node .
 
       - name: Build testnet image
         run: |
-          docker build -f ci/docker_testnet/Dockerfile --no-cache -t verim-testnet .
+          docker build -f ci/docker_testnet/Dockerfile --no-cache -t cheqd-testnet .
 
       - name: Push node image
         run: |
-          docker tag verim-node ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
-          docker tag verim-node ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:latest
+          docker tag cheqd-node ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
+          docker tag cheqd-node ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:latest
           docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
           docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:latest
 
       - name: Push testnet image
         run: |
-          docker tag verim-testnet ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:${{ env.VERSION }}
-          docker tag verim-testnet ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:latest
+          docker tag cheqd-testnet ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:${{ env.VERSION }}
+          docker tag cheqd-testnet ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:latest
           docker push ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:${{ env.VERSION }}
           docker push ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:latest
 
@@ -70,7 +70,7 @@ jobs:
       GITHUB_REPOSITORY_NAME: ${{ needs.setup-workflow.outputs.GITHUB_REPOSITORY_NAME }}
       VERSION: ${{ needs.setup-workflow.outputs.VERSION }}
       OUTPUT_DIR: "output"
-      PACKAGE_NAME: "verim-node"
+      PACKAGE_NAME: "cheqd-node"
     steps:
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
@@ -92,7 +92,7 @@ jobs:
       - name: Make archive
         run: |
           touch ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
-          tar -czf ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz /home/runner/go/bin/verim-noded
+          tar -czf ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz /home/runner/go/bin/cheqd-noded
 
       - name: Upload archive
         uses: actions/upload-artifact@v2
@@ -111,8 +111,8 @@ jobs:
             --input-type "tar" \
             --output-type "deb" \
             --version ${{ env.VERSION }} \
-            --name verim-node \
-            --description "verim node" \
+            --name cheqd-node \
+            --description "cheqd node" \
             --architecture "amd64" \
             --verbose \
             --package ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb \
