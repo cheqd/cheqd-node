@@ -25,61 +25,61 @@ Current delivery is compiled and tested for `Ubuntu 20.04 LTS` so we recommend u
 1. Participants must choose <chain_id> for the network.
 2. Each participant (one by one) should:
     
-    - **Generates local keys for the future account:**
+    - **Generate local keys for the future account:**
     
         Command `verim-noded keys add <key_name>`
 
         Example `verim-noded keys add alice`
     
-    - **Initializes node config files:**
+    - **Initialize node config files:**
         
         Command: `verim-noded init <node_name> --chain-id <chain_id>`
         
         Example: `verim-noded init alice-node --chain-id verim-node`
         
-    - **(Each participant except the first one) Gets genesis from the previous participant:**
+    - **(Each participant except the first one) Get genesis config from the another participant:**
         
         Location on the previous participant's machine: `$HOME/.verimnode/config/genesis.json`
         
         Destination folder on the current participant's machine: `$HOME/.verimnode/config/`
         
-    - **(Each participant except the first one) Gets genesis node transactions from the previous participant:**
+    - **(Each participant except the first one) Get genesis node transactions from the previous participant:**
         
         Location on the previous participant's machine: `$HOME/.verimnode/config/gentx/`
         
         Destination folder on the current participant's machine: `$HOME/.verimnode/config/gentx/`
                 
-    - **Adds a genesis account with a public key:**
+    - **Add a genesis account with a public key:**
         
         Command: `verim-noded add-genesis-account <key_name> 10000000token,100000000stake`
         
         Example: `verim-noded add-genesis-account alice 10000000token,100000000stake`
         
-    - **Generates genesis node transaction:**
+    - **Generate genesis node transaction:**
         
         Command: `verim-noded gentx <key_name> 1000000stake --chain-id <chain_id>`
         
         Example: `verim-noded gentx alice 1000000stake --chain-id verim-node`
         
-        **TODO: Node owner should specify gas prices here. Need to research how it works.**
+        **TODO: Node owner should specify gas prices here. This work is in progress.**
         
 3. The last participant:
 
-    - **Adds genesis node transactions into genesis:**
+    - **Add genesis node transactions into genesis:**
         
         Command: `verim-noded collect-gentxs`
         
-    - **Verifies genesis:**
+    - **Verify genesis:**
         
         Command: `verim-noded validate-genesis`
         
-    - **Shares genesis with other nodes:**
+    - **Share genesis with other nodes:**
         
         Location on the last participant's machine: `$HOME/.verimnode/config/genesis.json`
         
         Destination folder on the other participant's machines: `$HOME/.verimnode/config/`
 
-After this steps:
+### After these steps
 - Nodes of all participants have the same genesis;
 - The genesis contains:
     - Accounts of all participants (genesis accounts);
@@ -89,7 +89,7 @@ After this steps:
 
 - Each participant:
 
-    - **Shares his node ID and IP with the others:**
+    - **Shares their node ID and IP with the others:**
         
         Command to find out node's id: `verim-noded tendermint show-node-id`. This command **MUST** be run on the machine where node's config files are located.
         
@@ -101,7 +101,7 @@ After this steps:
         
         Node address example: `d45dcc54583d6223ba6d4b3876928767681e8ff6@192.168.0.142:26656`
         
-    - **Update address book of the node:**
+    - **Update the address book of the node:**
         
         Open node's config file: `$HOME/.verimnode/config/config.toml`
         
@@ -131,7 +131,10 @@ After this steps:
         
         Command: `verim-noded start`
         
-        It's better to use process supervisor like `systemd` to run persistent nodes.
+        It is recommended to use a process supervisor like `systemd` to run persistent node services.
 
 
-Congratulations the network is running!
+Congratulations, you should have node(s) deployed and running on a network if the above steps succeed.
+
+# Support
+Please log issues and any questions via GitHub Issues
