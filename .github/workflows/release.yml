@@ -84,7 +84,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build
-        run: starport build
+        run: starport chain build
 
       - name: Create artifacts directory
         run: mkdir ${{ env.OUTPUT_DIR }}

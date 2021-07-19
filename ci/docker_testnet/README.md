@@ -2,7 +2,7 @@
 
 ## Description
 
-Debian based docker image with the latest version of `verim-nonded` executable and preconfigured network of 4 nodes. Intended for use in CI pipelines.
+Debian based docker image with the latest version of `verim-nonded` executable and preconfigured network of 2 nodes. Intended for use in CI pipelines.
 
 ## Prerequisites
 

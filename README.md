@@ -2,7 +2,37 @@
 
 verim is a blockchain built using Cosmos SDK and Tendermint and created with [Starport](https://github.com/tendermint/starport).
 
-## Get started
+## Building node from source
+
+Prerequisites:
+
+- Install [Go](https://golang.org/doc/install)
+- Install [Starport](https://docs.starport.network/intro/install.html)
+
+To build the node executable run:
+
+```
+starport chain build
+```
+
+To look up binary's location run:
+
+```
+which verim-noded
+```
+
+## Building node in docker
+
+Use this [instruction](ci/docker/README.md).
+
+## Running local network using starport
+
+Prerequisites:
+
+- Install [Go](https://golang.org/doc/install)
+- Install [Starport](https://docs.starport.network/intro/install.html)
+
+Only the network of one node is supported. To run the network of one node:
 
 ```
 starport serve
@@ -10,13 +40,11 @@ starport serve
 
 `serve` command installs dependencies, builds, initializes and starts your blockchain in development.
 
-## Configure
-
 Your blockchain in development can be configured with `config.yml`. To learn more see the [reference](https://github.com/tendermint/starport#documentation).
 
-## Launch
+## Running local network using docker
 
-To launch your blockchain live on mutliple nodes use `starport network` commands. Learn more about [Starport Network](https://github.com/tendermint/spn).
+Use this [instruction](ci/local_net/README.md).
 
 ## Learn more
 
