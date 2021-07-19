@@ -15,8 +15,8 @@ services:
     image: verim-node
     build: .
     ports:
-      - "26659:26659" # p2p
-      - "26660:26660" # rpc
+      - "26659:26656" # p2p
+      - "26660:26657" # rpc
     volumes:
       - ./node_configs/node1:/home/verim/.verimnode:Z
     command: start --rpc.laddr tcp://0.0.0.0:26657
@@ -25,8 +25,8 @@ services:
     image: verim-node
     build: .
     ports:
-      - "26662:26662" # p2p
-      - "26663:26663" # rpc
+      - "26662:26656" # p2p
+      - "26663:26657" # rpc
     volumes:
       - ./node_configs/node2:/home/verim/.verimnode:Z
     command: start --rpc.laddr tcp://0.0.0.0:26657
@@ -35,8 +35,8 @@ services:
     image: verim-node
     build: .
     ports:
-      - "26665:26665" # p2p
-      - "26666:26666" # rpc
+      - "26665:26656" # p2p
+      - "26666:26657" # rpc
     volumes:
       - ./node_configs/node3:/home/verim/.verimnode:Z
     command: start --rpc.laddr tcp://0.0.0.0:26657
