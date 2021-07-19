@@ -1,0 +1,45 @@
+syntax = "proto3";
+package cheqdid.cheqdnode.cheqd;
+
+// this line is used by starport scaffolding # proto/tx/import
+
+option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
+
+// Msg defines the Msg service.
+service Msg {
+    // this line is used by starport scaffolding # proto/tx/rpc
+  rpc CreateNym(MsgCreateNym) returns (MsgCreateNymResponse);
+  rpc UpdateNym(MsgUpdateNym) returns (MsgUpdateNymResponse);
+  rpc DeleteNym(MsgDeleteNym) returns (MsgDeleteNymResponse);
+}
+
+// this line is used by starport scaffolding # proto/tx/message
+message MsgCreateNym {
+  string creator = 1;
+  string alias = 2;
+  string verkey = 3;
+  string did = 4;
+  string role = 5;
+}
+
+message MsgCreateNymResponse {
+  uint64 id = 1;
+}
+
+message MsgUpdateNym {
+  string creator = 1;
+  uint64 id = 2;
+  string alias = 3;
+  string verkey = 4;
+  string did = 5;
+  string role = 6;
+}
+
+message MsgUpdateNymResponse { }
+
+message MsgDeleteNym {
+  string creator = 1;
+  uint64 id = 2;
+}
+
+message MsgDeleteNymResponse { }

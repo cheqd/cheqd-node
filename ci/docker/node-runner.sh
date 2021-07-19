@@ -4,14 +4,14 @@
 
 set -euox pipefail
 
-NODE_HOME="$HOME/.verimnode"
+NODE_HOME="$HOME/.cheqdnode"
 
 
 # Init node config directory
 if [ ! -d "${NODE_HOME}/config" ]
 then
     echo "Node home not found. Initializing."
-    verim-noded init $NODE_MONIKER
+    cheqd-noded init $NODE_MONIKER
 else
     echo "Node home exists. Skipping initialization."
 fi
@@ -24,4 +24,4 @@ echo "$PRIV_VALIDATOR_KEY" | base64 --decode > $NODE_HOME/config/priv_validator_
 
 # Run node
 NODE_ARGS=${NODE_ARGS:-}  # Allo node args to be empty
-verim-noded start $NODE_ARGS
+cheqd-noded start $NODE_ARGS

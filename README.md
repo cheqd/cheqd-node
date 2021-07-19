@@ -1,6 +1,6 @@
-# verim
+# cheqd
 
-verim is a blockchain built using Cosmos SDK and Tendermint and created with [Starport](https://github.com/tendermint/starport).
+cheqd is a blockchain built using Cosmos SDK and Tendermint and created with [Starport](https://github.com/tendermint/starport).
 
 ## Building node from source
 
@@ -18,7 +18,7 @@ starport chain build
 To look up binary's location run:
 
 ```
-which verim-noded
+which cheqd-noded
 ```
 
 ## Building node in docker

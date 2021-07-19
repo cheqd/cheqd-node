@@ -1,0 +1,14 @@
+syntax = "proto3";
+package cheqdid.cheqdnode.cheqd;
+
+// this line is used by starport scaffolding # genesis/proto/import
+import "cheqd/nym.proto";
+
+option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
+
+// GenesisState defines the capability module's genesis state.
+message GenesisState {
+    // this line is used by starport scaffolding # genesis/proto/state
+		repeated Nym nymList = 1; // this line is used by starport scaffolding # genesis/proto/stateField
+}
+

@@ -30,11 +30,11 @@ jobs:
 
       - name: Build node image
         run: |
-          docker build -f ci/docker/Dockerfile --no-cache -t verim-node .
+          docker build -f ci/docker/Dockerfile --no-cache -t cheqd-node .
 
       - name: Build testnet image
         run: |
-          docker build -f ci/docker_testnet/Dockerfile --no-cache -t verim-testnet .
+          docker build -f ci/docker_testnet/Dockerfile --no-cache -t cheqd-testnet .
 
   test:
     name: Unit tests

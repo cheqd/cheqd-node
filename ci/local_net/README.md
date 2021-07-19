@@ -15,7 +15,7 @@ The set of scripts to generate configuration for a testnet of four nodes and run
 
     See [the instruction](../docker/README.md).
 
-2. Build verim-noded:
+2. Build cheqd-noded:
 
     ```
     starport chain build
@@ -61,11 +61,11 @@ vc query bank balances (vc keys show anna -a --home localnet/client) --home loca
 ### Create NYM
 
 ```
-vc tx verim create-nym "alias" "verkey" "did" "role" --from anna --gas-prices 1token --chain-id verim-node-chain --home localnet/client
+vc tx cheqd create-nym "alias" "verkey" "did" "role" --from anna --gas-prices 1token --chain-id cheqd-node-chain --home localnet/client
 ```
 
 ### List nym
 
 ```
-vc query verim list-nym --home localnet/client
+vc query cheqd list-nym --home localnet/client
 ```
