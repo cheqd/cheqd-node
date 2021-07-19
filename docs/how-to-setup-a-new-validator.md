@@ -25,9 +25,9 @@ Current delivery is compiled and tested for `Ubuntu 20.04 LTS` so we recommend u
 There are several ways to get binary:
 
 - Compile from source code - [instruction](../README.md);
-- Get `tar` archive with the binary compiled for Ubuntu 20.04 in [releases](https://github.com/cheqd-id/cheqd-node/releases); <-- Recommended
-- Get `deb` for Ubuntu 20.04 in [releases](https://github.com/cheqd-id/cheqd-node/releases);
-- Get docker image form [packages](https://github.com/cheqd-id/cheqd-node/pkgs/container/cheqd-node).
+- Get `tar` archive with the binary compiled for Ubuntu 20.04 in [releases](https://github.com/cheqd/cheqd-node/releases); <-- Recommended
+- Get `deb` for Ubuntu 20.04 in [releases](https://github.com/cheqd/cheqd-node/releases);
+- Get docker image form [packages](https://github.com/cheqd/cheqd-node/pkgs/container/cheqd-node).
 
 ## Node deployment
 

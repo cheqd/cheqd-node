@@ -3,15 +3,15 @@ package cheqd
 import (
 	"time"
 
-	"github.com/cheqd-id/cheqd-node/app/params"
+	"github.com/cheqd/cheqd-node/app/params"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store"
 	"github.com/tendermint/tendermint/libs/log"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/cheqd-id/cheqd-node/x/cheqd/keeper"
-	"github.com/cheqd-id/cheqd-node/x/cheqd/types"
+	"github.com/cheqd/cheqd-node/x/cheqd/keeper"
+	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

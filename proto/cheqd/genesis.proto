@@ -4,7 +4,7 @@ package cheqdid.cheqdnode.cheqd;
 // this line is used by starport scaffolding # genesis/proto/import
 import "cheqd/nym.proto";
 
-option go_package = "github.com/cheqd-id/cheqd-node/x/cheqd/types";
+option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
 // GenesisState defines the capability module's genesis state.
 message GenesisState {

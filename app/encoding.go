@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/cheqd-id/cheqd-node/app/params"
+	"github.com/cheqd/cheqd-node/app/params"
 	"github.com/cosmos/cosmos-sdk/std"
 )
 

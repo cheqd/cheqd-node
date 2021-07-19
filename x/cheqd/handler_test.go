@@ -4,7 +4,7 @@ import (
 	"log"
 	"testing"
 
-	"github.com/cheqd-id/cheqd-node/x/cheqd/types"
+	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/stretchr/testify/require"
 )
 

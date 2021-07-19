@@ -12,10 +12,10 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/cheqd-id/cheqd-node/x/cheqd/client/cli"
-	"github.com/cheqd-id/cheqd-node/x/cheqd/client/rest"
-	"github.com/cheqd-id/cheqd-node/x/cheqd/keeper"
-	"github.com/cheqd-id/cheqd-node/x/cheqd/types"
+	"github.com/cheqd/cheqd-node/x/cheqd/client/cli"
+	"github.com/cheqd/cheqd-node/x/cheqd/client/rest"
+	"github.com/cheqd/cheqd-node/x/cheqd/keeper"
+	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
