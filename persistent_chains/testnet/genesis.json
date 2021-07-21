@@ -1,6 +1,6 @@
 {
   "genesis_time": "2021-07-21T09:58:52.766545881Z",
-  "chain_id": "cheqdnode",
+  "chain_id": "cheqd-testnet",
   "initial_height": "1",
   "consensus_params": {
     "block": {
