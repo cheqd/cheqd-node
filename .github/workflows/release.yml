@@ -18,7 +18,7 @@ jobs:
         run: |
           # Exposes org_name/repository_name in lower case. Required by docker.
           echo "::set-output name=GITHUB_REPOSITORY_NAME::$(echo ${GITHUB_REPOSITORY,,})"
-          echo "::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}"
+          echo "::set-output name=VERSION::1.2.3"
 
   publish-release:
     name: "Publish release"
