@@ -16,7 +16,7 @@ else
     exit 1
 fi
 
-source build_tools/common.sh
+source ./common.sh
 
 ARCH="amd64"
 FULL_PKG_NAME=${PKG_NAME}_${VERSION}_${ARCH}.deb
