@@ -47,12 +47,14 @@ jobs:
       - name: Make archive
         run: |
           build_tools/build_tar.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }} 
+        working-directory: ./build_tools
 
       - name: Upload archive
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
           path: ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+        working-directory: ./build_tools
 
       - name: Install fpm
         run: |
@@ -66,10 +68,12 @@ jobs:
       - name: Create deb package
         run: |
           build_tools/build_deb.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }}
+        working-directory: ./build_tools
 
       - name: Upload deb
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
           path: ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+        working-directory: ./build_tools
 
