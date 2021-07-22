@@ -26,7 +26,7 @@ jobs:
     runs-on: "ubuntu-latest"
     env:
       GITHUB_REPOSITORY_NAME: ${{ needs.setup-workflow.outputs.GITHUB_REPOSITORY_NAME }}
-      VERSION: ${{ echo needs.setup-workflow.outputs.VERSION | sed "s/v//" }}
+      VERSION: ${{ needs.setup-workflow.outputs.VERSION }}
       OUTPUT_DIR: "output"
       PACKAGE_NAME: "cheqd-node"
     steps:
