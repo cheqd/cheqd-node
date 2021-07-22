@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Get rid of systemd service
+rm /etc/systemd/system/cheqd-node.service
+
+# Reload systemd daemons
+systemctl daemon-reload

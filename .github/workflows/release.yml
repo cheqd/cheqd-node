@@ -68,7 +68,7 @@ jobs:
     runs-on: "ubuntu-latest"
     env:
       GITHUB_REPOSITORY_NAME: ${{ needs.setup-workflow.outputs.GITHUB_REPOSITORY_NAME }}
-      VERSION: ${{ needs.setup-workflow.outputs.VERSION }}
+      VERSION: ${{ echo needs.setup-workflow.outputs.VERSION | sed "s/v//" }}
       OUTPUT_DIR: "output"
       PACKAGE_NAME: "cheqd-node"
     steps:
@@ -86,13 +86,9 @@ jobs:
       - name: Build
         run: starport chain build
 
-      - name: Create artifacts directory
-        run: mkdir ${{ env.OUTPUT_DIR }}
-
       - name: Make archive
         run: |
-          touch ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
-          tar -czf ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz /home/runner/go/bin/cheqd-noded
+          build_tools/build_tar.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }} 
 
       - name: Upload archive
         uses: actions/upload-artifact@v2
@@ -105,18 +101,13 @@ jobs:
           sudo apt-get install ruby ruby-dev rubygems build-essential
           sudo gem install --no-document fpm
 
+      - name: Changing version for deb packaging
+        run: |
+          echo "VERSION=$(echo ${{ env.VERSION }} | sed 's/v//')" >> $GITHUB_ENV
+
       - name: Create deb package
         run: |
-          fpm \
-            --input-type "tar" \
-            --output-type "deb" \
-            --version ${{ env.VERSION }} \
-            --name cheqd-node \
-            --description "cheqd node" \
-            --architecture "amd64" \
-            --verbose \
-            --package ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb \
-            ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+          build_tools/build_deb.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }}
 
       - name: Upload deb
         uses: actions/upload-artifact@v2

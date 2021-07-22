@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Make home directory for cheqd-node
+mkdir -p /var/lib/cheqd-noded/
+
+# add systemd script
+cat <<EOF > /etc/systemd/system/cheqd-noded.service
+[Unit]
+Description=Service for running Cheqd node
+After=network.target
+
+[Service]
+Environment="HOME=/var/lib/cheqd-noded/"
+Type=simple
+ExecStart=/bin/bash -c '/usr/bin/cheqd-noded start --home /var/lib/cheqd-noded/'
+Restart=on-failure
+RestartSec=10
+StartLimitBurst=10
+StartLimitInterval=200
+TimeoutSec=300
+StandardOutput=file:/var/log/cheqd-noded.logs
+StandardError=file:/var/log/cheqd-noded.errors
+
+[Install]
+WantedBy=multi-user.target
+EOF
