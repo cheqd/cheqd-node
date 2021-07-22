@@ -17,7 +17,7 @@ else
 fi
 
 
-source ./common.sh
+source build_tools/common.sh
 
 mkdir -p output
 mkdir -p $TMP_DIR
