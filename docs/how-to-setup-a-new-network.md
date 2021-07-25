@@ -20,9 +20,13 @@ Current delivery is compiled and tested for `Ubuntu 20.04 LTS` so we recommend u
 
 ## Deployment steps
 
+### Setting up nodes
+
+All participants should [setup their nodes](how-to-setup-a-new-node.md) using default genesis and empty list of peers.
+
 ### Generating genesis file
 
-1. Participants must choose <chain_id> for the network.
+1. Participants must choose `<chain_id>` for the network.
 2. Each participant (one by one) should:
     
     - **Generate local keys for the future account:**
@@ -31,12 +35,6 @@ Current delivery is compiled and tested for `Ubuntu 20.04 LTS` so we recommend u
 
         Example `cheqd-noded keys add alice`
     
-    - **Initialize node config files:**
-        
-        Command: `cheqd-noded init <node_name> --chain-id <chain_id>`
-        
-        Example: `cheqd-noded init alice-node --chain-id cheqd-node`
-        
     - **(Each participant except the first one) Get genesis config from the another participant:**
         
         Location on the previous participant's machine: `$HOME/.cheqdnode/config/genesis.json`
@@ -76,36 +74,26 @@ Current delivery is compiled and tested for `Ubuntu 20.04 LTS` so we recommend u
     - **Share genesis with other nodes:**
         
         Location on the last participant's machine: `$HOME/.cheqdnode/config/genesis.json`
-        
-        Destination folder on the other participant's machines: `$HOME/.cheqdnode/config/`
 
-### After these steps
-- Nodes of all participants have the same genesis;
-- The genesis contains:
-    - Accounts of all participants (genesis accounts);
-    - Node creation transactions from all participants (genesis nodes).
+### Sharing peer list
 
-### Running the network
+All participants should share their peer info with each other. See [node setup instruction](how-to-setup-a-new-node.md) for more information.
 
-- Each participant:
+### Updating genesis and persistent peers
 
-    - **Shares their node ID and IP with the others:**
-        
-        Command to find out node's id: `cheqd-noded tendermint show-node-id`. This command **MUST** be run on the machine where node's config files are located.
-        
-        Node IP is external IP of the node's machine.
-        
-        Node adress is the combination of IP and ID in the following format: `ID@IP`.
-        
-        Port is the RPC adress of the node. It can be configured here: `$HOME/.cheqdnode/config/config.toml`. Default value is `26656`.
-        
-        Node address example: `d45dcc54583d6223ba6d4b3876928767681e8ff6@192.168.0.142:26656`
-        
-    - **Update the address book of the node:**
+- Each participant should:
+
+    - **Stop the node;**
+
+    - **Update the genesis file:**
+
+        File location: `$HOME/.cheqdnode/config/genesis.json`
+
+    - **Update peer list:**
         
         Open node's config file: `$HOME/.cheqdnode/config/config.toml`
         
-        Search for `persistent_peers` parameter and set it's value to a comma separated list of other participant node addresses.
+        Search for `persistent_peers` parameter and set it's value to a comma separated list of peers.
         
         Format: `<node-0-id>@<node-0-ip>, <node-1-id>@<node-1-ip>, <node-2-id>@<node-2-id>, <node-3-id>@<node-3-id>`.
         
@@ -117,22 +105,8 @@ Current delivery is compiled and tested for `Ubuntu 20.04 LTS` so we recommend u
         persistent_peers = "d45dcc54583d6223ba6d4b3876928767681e8ff6@node0:26656, 9fb6636188ad9e40a9caf86b88ffddbb1b6b04ce@node1:26656, abbcb709fb556ce63e2f8d59a76c5023d7b28b86@node2:26656, cda0d4dbe3c29edcfcaf4668ff17ddcb96730aec@node3:26656"
         ```
         
-    - **Makes RPC endpoint available externally (optional):**
+    - **Restart node.**
         
-        This step is necessary if you want to allow incoming client applications connections to your node. Otherwise, the node will be accessible only locally. 
-        
-        Open node configuration file using the text editor that you prefer: `$HOME/.cheqdnode/config/config.toml`
-        
-        Search for `ladr` parameter in `RPC Server Configuration Options` section and replace it's value to `0.0.0.0:26657`
-                
-        Example: `laddr = "tcp://0.0.0.0:26657"`
-        
-    - **Start node:**
-        
-        Command: `cheqd-noded start`
-        
-        It is recommended to use a process supervisor like `systemd` to run persistent node services.
-
 
 Congratulations, you should have node(s) deployed and running on a network if the above steps succeed.
 
