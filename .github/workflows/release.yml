@@ -28,7 +28,7 @@ jobs:
       GITHUB_REPOSITORY_NAME: ${{ needs.setup-workflow.outputs.GITHUB_REPOSITORY_NAME }}
       VERSION: ${{ needs.setup-workflow.outputs.VERSION }}
       OUTPUT_DIR: "output"
-      PACKAGE_NAME: "cheqd-noded"
+      PACKAGE_NAME: "cheqd-node"
     steps:
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
