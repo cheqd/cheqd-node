@@ -31,6 +31,7 @@ fpm \
     --architecture "${ARCH}" \
     --pre-install "postinst" \
     --after-remove "postremove" \
+    --depends "logrotate" \
     --verbose \
     --package "${PKG_PATH}" \
     $PATH_TAR

@@ -1,26 +1,76 @@
 #!/bin/bash
 
-# Make home directory for cheqd-node
-mkdir -p /var/lib/cheqd-noded/
+CHEQD_USER_NAME=cheqd
 
-# add systemd script
+# Create cheqd user
+useradd -d /home/$CHEQD_USER_NAME -m $CHEQD_USER_NAME
+
+# Make directory for logs
+mkdir -p /var/log/cheqd-node
+
+# Make directory for config
+mkdir -p /etc/cheqd-node
+
+# Make home directory for cheqd-node
+mkdir -p /var/lib/cheqd-node/
+
+# Change permissions for config and data directories
+chown -R $CHEQD_USER_NAME:$CHEQD_USER_NAME /etc/cheqd-node
+chown -R $CHEQD_USER_NAME:$CHEQD_USER_NAME /var/lib/cheqd-node
+
+# Add rsyslogd configuration
+cat <<EOF > /etc/rsyslog.d/cheqd-node.conf
+if \$programname == 'cheqd-noded' then /var/log/cheqd-node/stdout.log
+& stop
+EOF
+
+# Change permissions for logs:
+chown -R syslog:$CHEQD_USER_NAME /var/log/cheqd-node/
+
+# Add config for logrotation
+cat <<EOF > /etc/logrotate.d/cheqd-node
+/var/log/cheqd-node/stdout.log {
+  rotate 30
+  maxsize 1000
+  notifempty
+  copytruncate
+  compress
+  maxage 30
+}
+EOF
+
+# Add crontab job for daily rotation
+cat <<EOF > /etc/cron.hourly/cheqd-node
+#!/bin/bash
+logrotate /etc/logrotate.d/cheqd-node
+EOF
+
+# Restart syslog
+systemctl restart rsyslog
+
+# Add systemd script
 cat <<EOF > /etc/systemd/system/cheqd-noded.service
 [Unit]
 Description=Service for running Cheqd node
 After=network.target
 
 [Service]
-Environment="HOME=/var/lib/cheqd-noded/"
 Type=simple
-ExecStart=/bin/bash -c '/usr/bin/cheqd-noded start --home /var/lib/cheqd-noded/'
+User=cheqd
+ExecStart=/bin/bash -c '/usr/bin/cheqd-noded start'
 Restart=on-failure
 RestartSec=10
 StartLimitBurst=10
 StartLimitInterval=200
 TimeoutSec=300
-StandardOutput=file:/var/log/cheqd-noded.logs
-StandardError=file:/var/log/cheqd-noded.errors
+StandardOutput=syslog
+StandardError=syslog
+SyslogFacility=syslog
+SyslogIdentifier=cheqd-noded
 
 [Install]
 WantedBy=multi-user.target
 EOF
+
+# Reload daemons for systemctl
+systemctl daemon-reload
