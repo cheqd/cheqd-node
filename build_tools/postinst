@@ -31,7 +31,7 @@ chown -R syslog:$CHEQD_USER_NAME /var/log/cheqd-node/
 cat <<EOF > /etc/logrotate.d/cheqd-node
 /var/log/cheqd-node/stdout.log {
   rotate 30
-  maxsize 1000
+  maxsize 100M
   notifempty
   copytruncate
   compress
@@ -40,13 +40,13 @@ cat <<EOF > /etc/logrotate.d/cheqd-node
 EOF
 
 # Add crontab job for daily rotation
-cat <<EOF > /etc/cron.hourly/cheqd-node
+cat <<EOF > /etc/cron.daily/cheqd-node
 #!/bin/bash
 logrotate /etc/logrotate.d/cheqd-node
 EOF
 
 # Make this script executable
-chmod +x /etc/cron.hourly/cheqd-node
+chmod +x /etc/cron.daily/cheqd-node
 
 # Restart syslog
 systemctl restart rsyslog
