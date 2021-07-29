@@ -52,3 +52,4 @@ Use this [instruction](ci/local_net/README.md).
 - [Cosmos SDK documentation](https://docs.cosmos.network)
 - [Cosmos SDK Tutorials](https://tutorials.cosmos.network)
 - [Discord](https://discord.gg/W8trcGV)
+
