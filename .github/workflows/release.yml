@@ -1,6 +1,9 @@
 name: Release
 
-on: push
+on:
+  push:
+    tags:
+      - "v*"
 
 jobs:
   setup-workflow:
@@ -18,7 +21,42 @@ jobs:
         run: |
           # Exposes org_name/repository_name in lower case. Required by docker.
           echo "::set-output name=GITHUB_REPOSITORY_NAME::$(echo ${GITHUB_REPOSITORY,,})"
-          echo "::set-output name=VERSION::1.2.3"
+          echo "::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}"
+
+  publish-images:
+    name: "Publish docker images"
+    # Reference to workflow-setup job is required to access its various outputs.
+    needs: setup-workflow
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_REPOSITORY_NAME: ${{ needs.setup-workflow.outputs.GITHUB_REPOSITORY_NAME }}
+      VERSION: ${{ needs.setup-workflow.outputs.VERSION }}
+      TESTNET_IMAGE_NAME: "cheqd-testnet"
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+
+      - name: Login to docker
+        run: |
+          echo ${{ secrets.GH_PAT }} | docker login ghcr.io --username ${{ secrets.GH_USER }} --password-stdin
+      - name: Build node image
+        run: |
+          docker build -f ci/docker/Dockerfile --no-cache -t cheqd-node .
+      - name: Build testnet image
+        run: |
+          docker build -f ci/docker_testnet/Dockerfile --no-cache -t cheqd-testnet .
+      - name: Push node image
+        run: |
+          docker tag cheqd-node ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
+          docker tag cheqd-node ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:latest
+          docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
+          docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:latest
+      - name: Push testnet image
+        run: |
+          docker tag cheqd-testnet ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:${{ env.VERSION }}
+          docker tag cheqd-testnet ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:latest
+          docker push ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:${{ env.VERSION }}
+          docker push ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:latest
 
   publish-release:
     name: "Publish release"
@@ -75,3 +113,11 @@ jobs:
           name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
           path: build_tools/${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
 
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "${{ env.VERSION }}"
+          prerelease: false
+          files: |
+            ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+            ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
