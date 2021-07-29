@@ -45,6 +45,9 @@ cat <<EOF > /etc/cron.hourly/cheqd-node
 logrotate /etc/logrotate.d/cheqd-node
 EOF
 
+# Make this script executable
+chmod +x /etc/cron.hourly/cheqd-node
+
 # Restart syslog
 systemctl restart rsyslog
 
