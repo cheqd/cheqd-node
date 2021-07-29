@@ -82,6 +82,10 @@ jobs:
       - name: Build
         run: starport chain build
 
+      - name: Changing version for deb packaging
+        run: |
+          echo "VERSION=$(echo ${{ env.VERSION }} | sed 's/v//')" >> $GITHUB_ENV
+
       - name: Make archive
         run: |
           ./build_tar.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }} 
@@ -97,10 +101,6 @@ jobs:
         run: |
           sudo apt-get install ruby ruby-dev rubygems build-essential
           sudo gem install --no-document fpm
-
-      - name: Changing version for deb packaging
-        run: |
-          echo "VERSION=$(echo ${{ env.VERSION }} | sed 's/v//')" >> $GITHUB_ENV
 
       - name: Create deb package
         run: |
