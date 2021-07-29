@@ -67,6 +67,7 @@ jobs:
       VERSION: ${{ needs.setup-workflow.outputs.VERSION }}
       OUTPUT_DIR: "output"
       PACKAGE_NAME: "cheqd-node"
+      RELEASE_TAG: ${{ needs.setup-workflow.outputs.VERSION }}
     steps:
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
@@ -116,8 +117,8 @@ jobs:
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "${{ env.VERSION }}"
+          automatic_release_tag: "${{ env.RELEASE_TAG }}"
           prerelease: false
           files: |
-            ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
-            ${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+            build_tools/${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+            build_tools/${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
