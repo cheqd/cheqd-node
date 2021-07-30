@@ -31,6 +31,7 @@ There are several ways to get binary:
 - Get `deb` for Ubuntu 20.04 in [releases](https://github.com/cheqd/cheqd-node/releases);
 - Get docker image form [packages](https://github.com/cheqd/cheqd-node/pkgs/container/cheqd-node).
 
+The most preferable way to get `cheqd-node` is to use `.deb` package. Detailed information about it can be found [here](#deb-package-installation.md)  
 ## Node deployment
 
 Follow these steps to deploy a new node:
@@ -39,9 +40,7 @@ Follow these steps to deploy a new node:
 
     More about hardware requirements can be found [here](https://docs.tendermint.com/master/nodes/running-in-production.html#hardware).
 
-2. Get the binary using one of the [described ways](#binary-distribution);
-
-    It's recommended to put the binary to the location which is in PATH.
+2. In the case of using tarball, put the binary to the location which is in PATH.
 
     Example:
 
@@ -98,10 +97,10 @@ Follow these steps to deploy a new node:
     Allow all outgoing tcp connections for P2P communication. You can restrict port to the default P2P port `26656` but your node will not be able to connect to nodes with non default P2P port in this case.
 
 8. Start node:
-
-    Command: `cheqd-noded start`
-
-    It's highly recommended to use a process supervisor like `systemd` to run persistent nodes.
+   
+    8.1 In case of using tarball: `cheqd-noded start`
+   
+     8.2 In case of using `.deb` package:`systemctl start cheqd-noded.service`
 
 9. (optional) Setup sentry nodes for DDOS protection:
 
