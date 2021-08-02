@@ -29,7 +29,7 @@ fpm \
     --name "cheqd-node" \
     --description "cheqd node" \
     --architecture "${ARCH}" \
-    --pre-install "postinst" \
+    --after-install "postinst" \
     --after-remove "postremove" \
     --depends "logrotate" \
     --verbose \
