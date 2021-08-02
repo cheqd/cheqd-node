@@ -1,24 +1,40 @@
 #!/bin/sh
 
 CHEQD_USER_NAME=cheqd
+USER_HOME_DIR=/var/lib/${CHEQD_USER_NAME}
+CHEQD_HOME_DIR=${USER_HOME_DIR}/.cheqdnode
+CHEQD_CONFIG_DIR=/etc/cheqd-node
+
+# If there is an argument then assume using as binary + script instead of apt
+if [ -n "$1" ] && [ -f "$1" ] ; then
+  cp "$1" /usr/bin/
+fi
 
 # Create cheqd user
 if ! /usr/bin/getent passwd $CHEQD_USER_NAME > /dev/null 2>&1 ; then
-    adduser --system ${CHEQD_USER_NAME} --home /var/lib/${CHEQD_USER_NAME}
+
+  useradd ${CHEQD_USER_NAME} --home ${USER_HOME_DIR}
+
+  # Make directory for logs
+  mkdir -p /var/log/cheqd-node
+
+  # Make directory for config
+  mkdir -p ${CHEQD_CONFIG_DIR}
+
+  # Make directory for data
+  mkdir -p ${USER_HOME_DIR}/data
+
+ # Make home directory for cheqd user
+  mkdir -p ${CHEQD_HOME_DIR}
+
+  # Symlinks for data and configs
+  ln -s /etc/cheqd-node ${CHEQD_HOME_DIR}/config
+  ln -s ${USER_HOME_DIR}/data ${CHEQD_HOME_DIR}/data
+
+  # Change permissions for config and data directories
+  chown -R $CHEQD_USER_NAME:$CHEQD_USER_NAME ${CHEQD_CONFIG_DIR}
+  chown -R $CHEQD_USER_NAME:$CHEQD_USER_NAME ${USER_HOME_DIR}
 fi
-
-# Make directory for logs
-mkdir -p /var/log/cheqd-node
-
-# Make directory for config
-mkdir -p /etc/cheqd-node
-
-# Make home directory for cheqd-node
-mkdir -p /var/lib/cheqd/
-
-# Change permissions for config and data directories
-chown -R $CHEQD_USER_NAME:$CHEQD_USER_NAME /etc/cheqd-node
-chown -R $CHEQD_USER_NAME:$CHEQD_USER_NAME /var/lib/cheqd-node
 
 # Add rsyslogd configuration
 if [ -d /etc/rsyslog.d/ ] ; then
@@ -27,13 +43,14 @@ if [ -d /etc/rsyslog.d/ ] ; then
 if \$programname == 'cheqd-noded' then /var/log/cheqd-node/stdout.log
 & stop
 EOF
+
+    # Change permissions for logs:
+    chown -R syslog:$CHEQD_USER_NAME /var/log/cheqd-node/
+
     # Restart syslog
     systemctl restart rsyslog
     fi
 fi
-
-# Change permissions for logs:
-chown -R syslog:$CHEQD_USER_NAME /var/log/cheqd-node/
 
 # Add config for logrotation
 if [ ! -f /etc/logrotate.d/cheqd-node ] ; then
@@ -87,4 +104,7 @@ WantedBy=multi-user.target
 EOF
   # Reload daemons for systemctl
   systemctl daemon-reload
+
+  # Enable cheqd-noded
+  systemctl enable cheqd-noded
 fi

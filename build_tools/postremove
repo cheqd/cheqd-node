@@ -1,30 +1,11 @@
 #!/bin/bash
 
-# Stop systemd service firstly
-systemctl stop cheqd-noded
-
-# Get rid of config for rsyslog
-if test -f "/etc/rsyslog.d/cheqd-node.conf"; then
-    rm /etc/rsyslog.d/cheqd-node.conf
-    # Restart rsyslog daemon
-    systemctl restart rsyslog
-fi
-
-# Get rid of logrotate config
-if test -f "/etc/logrotate.d/cheqd-node"; then
-    rm /etc/logrotate.d/cheqd-node
-fi
-
-# Get rid of daily script for logrotate
-if test -f "/etc/cron.daily/cheqd-node"; then
-    rm /etc/cron.daily/cheqd-node
-fi
-
-
 # Get rid of systemd service
-if test -f "/etc/systemd/system/cheqd-noded.service"; then
-    rm /etc/systemd/system/cheqd-noded.service
+if test -f "/lib/systemd/system/cheqd-noded.service"; then
+    # Stop systemd service firstly
+    systemctl stop cheqd-noded
+
+    rm /lib/systemd/system/cheqd-noded.service
     # Reload systemd daemons
     systemctl daemon-reload
 fi
-
