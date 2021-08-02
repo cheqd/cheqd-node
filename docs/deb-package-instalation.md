@@ -7,16 +7,26 @@ By the way, debian package consists of binary, named `cheqd-noded` and script wi
 ## Post-install actions
 ### Create a special user "cheqd"
 By default, cosmos-sdk create all needed directories in the `HOME` directory. 
-That's why package creates a special user with home directory `/home/cheqd`. Also, this user will use for setting permissions to data and configs.
+That's why package creates a special user with home directory `/var/lib/cheqd`. Also, this user will use for setting permissions to data and configs.
 
 ### Dividing configs, data and logs
 #### Directories
 According to general filesystem hierarchy standard (FHS), the next directories will be created:
 ```
 /etc/cheqd-node                - configs, permissions cheqd:cheqd
-/var/lib/cheqd-node/           - data   , permissions cheqd:cheqd
+/var/lib/cheqd/data            - data   , permissions cheqd:cheqd
 /var/log/cheqd-node            - logs   , permissions syslog:adm (set by rsyslog)
 ```
+
+After setting up the node, it's expected, then configs and data will be symlinked to the corresponded system directories.
+For this purposes will be created the next symlinks to configs and data:
+```
+sudo ln -s /etc/cheqd-node/ /var/lib/cheqd/.cheqdnode/config   - for configs
+sudo ln -s /var/lib/cheqd/data /var/lib/cheqd/.cheqdnode/      - for data
+```
+
+After this preparation, it would be possible to set up cheqd node in general but under `cheqd` user.
+
 #### Rsyslog config
 The next config for rsyslog will be created:
 ```
@@ -64,18 +74,6 @@ SyslogIdentifier=cheqd-noded
 WantedBy=multi-user.target
 ```
 The main thing here is that it will restart on binary failures and put all output to the `rsyslog`.
-
-## Actions that can be deployed manually
-After setting up the node, it's expected, then configs and data will be symlinked to the corresponded system directories. 
-Please, make sure that service was stopped, by checking output:
-```
-systemctl status cheqd-noded.service
-```
-Commands can be: 
-```
-sudo ln -s /etc/cheqd-node/config /home/cheqd/.cheqdnode/config   - for configs
-sudo ln -s /var/lib/cheqd-node/data/ /home/cheqd/.cheqdnode/      - for data
-```
 
 ## Exposing port
 
