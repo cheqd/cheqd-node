@@ -13,7 +13,7 @@ fi
 # Create cheqd user
 if ! /usr/bin/getent passwd $CHEQD_USER_NAME > /dev/null 2>&1 ; then
 
-  useradd ${CHEQD_USER_NAME} --home ${USER_HOME_DIR}
+  adduser --system ${CHEQD_USER_NAME} --home ${USER_HOME_DIR} --shell /bin/bash
 
   # Make directory for logs
   mkdir -p /var/log/cheqd-node
