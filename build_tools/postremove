@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Get rid of systemd service
+if test -f "/lib/systemd/system/cheqd-noded.service"; then
+    # Stop systemd service firstly
+    systemctl stop cheqd-noded
+
+    rm /lib/systemd/system/cheqd-noded.service
+    # Reload systemd daemons
+    systemctl daemon-reload
+fi
