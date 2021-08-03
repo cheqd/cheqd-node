@@ -1,8 +1,10 @@
-# Running a new Validator Node
+# Running a new node
 
-This document describes in detail how to configure a validator node, and add it to the existing network.
+This document describes in detail how to configure infrastructure and deploy a new node (observer or validator).
 
-If a new network needs to be initialized, please first follow the instructions for [creating a new network from genesis](how-to-deploy-genesis-network.md). After this, more validator nodes can be added by following the instructions from this document.
+If a new network needs to be initialized, please first follow the instructions for [creating a new network from genesis](how-to-setup-a-new-network.md).
+
+If a new validator needs to be added to the existing network, please refer to [joining existing network](how-to-join-existing-network.md) instruction.
 
 ### Hardware requirements
 
@@ -25,10 +27,11 @@ Current delivery is compiled and tested for `Ubuntu 20.04 LTS` so we recommend u
 There are several ways to get binary:
 
 - Compile from source code - [instruction](../README.md);
-- Get `tar` archive with the binary compiled for Ubuntu 20.04 in [releases](https://github.com/cheqd/cheqd-node/releases); <-- Recommended
+- Get `tar` archive with the binary compiled for Ubuntu 20.04 in [releases](https://github.com/cheqd/cheqd-node/releases);
 - Get `deb` for Ubuntu 20.04 in [releases](https://github.com/cheqd/cheqd-node/releases);
 - Get docker image form [packages](https://github.com/cheqd/cheqd-node/pkgs/container/cheqd-node).
 
+The most preferable way to get `cheqd-node` is to use `.deb` package. Detailed information about it can be found [here](#deb-package-installation.md)  
 ## Node deployment
 
 Follow these steps to deploy a new node:
@@ -37,9 +40,7 @@ Follow these steps to deploy a new node:
 
     More about hardware requirements can be found [here](https://docs.tendermint.com/master/nodes/running-in-production.html#hardware).
 
-2. Get the binary using one of the [described ways](#binary-distribution);
-
-    It's recommended to put the binary to the location which is in PATH.
+2. In the case of using tarball, put the binary to the location which is in PATH.
 
     Example:
 
@@ -104,11 +105,11 @@ Follow these steps to deploy a new node:
 
 8. Start node:
 
-    Command: `cheqd-noded start`
+    8.1 In case of using tarball: `cheqd-noded start`
 
     It's highly recommended to use a process supervisor like `systemd` to run persistent nodes.
-   
-    **FYI**, in case of installing cheqd-node as a `.deb` package, please log in as a `cheqd` user, by calling `sudo su cheqd`.
+
+    8.2 In case of using `.deb` package:`systemctl start cheqd-noded.service`
 
 9. (optional) Setup sentry nodes for DDOS protection:
 
@@ -122,40 +123,34 @@ Follow these steps to deploy a new node:
 
     You can read advices [here](https://docs.tendermint.com/master/nodes/running-in-production.html).
 
-## Network configuration
+## Getting node info
 
-Follow these steps to promote the deployed node to a validator:
+### Node id
 
-1. Create an account:
+Node id is a part of peer info. To get `node id` run the following command on the node's machine:
 
-    - **Generate local keys for the future account:**
+```
+cheqd-noded tendermint show-node-id
+```
 
-        Command: `cheqd-noded keys add <key_name>`
+### Validator public key
 
-        Example: `cheqd-noded keys add alice`
+Validator public key is used to promote node to the validator. To get it run the following command on the node's machine:
 
-    - **Ask another member to transfer some tokens:**
+```
+cheqd-noded tendermint show-validator
+```
 
-        Tokens are used to post transactions. It also used to create a stake for new nodes.
+### Peer information
 
-        Another mmber will ask for the address of the new participant. Cosmos account address is a function of the public key.
+Peer info is used to connect to peers when setting up a new node. It has the following format:
 
-        Use this command to find out your adress and other key information: `cheqd-noded keys show <key_name>`
+```
+<node-id>@<node-url>
+```
 
-3. Promote the node to the validator:
+Example:
 
-    - **Post a transaction to the network:**
-    
-        ```
-        cheqd-noded tx staking create-validator --amount <amount-staking> --from <key-name> --chain-id <chain-id> --min-self-delegation <min-self-delegation> --gas <amount-gas> --gas-prices <price-gas> --pubkey <validator-pubkey> --commission-max-change-rate <commission-max-change-rate> --commission-max-rate <commission-max-rate> --commission-rate <commission-rate>
-        ```
-
-        `commission-max-change-rate`, `commission-max-rate` and `commission-rate` may take fraction number as `0.01`
-
-        Use this command to find out the `<validator-pubkey>`: `cheqd-noded tendermint show-validator`. This command **MUST** be run on the node's machine.
-        
-        Example:
-        
-        ```
-        cheqd-noded tx staking create-validator --amount 50000000stake --from steward1 --moniker steward1 --chain-id cheqdnode --min-self-delegation="1" --gas="auto" --gas-prices="1token" --pubkey cosmosvalconspub1zcjduepqpmyzmytdzjhf2fjwttjsrv49t62gdexm2yttpmgzh38p0rncqg8ssrxm2l --commission-max-change-rate="0.02" --commission-max-rate="0.02" --commission-rate="0.01"
-        ```
+```
+ba1689516f45be7f79c7450394144711e02e7341@3.13.19.41:26656
+```
