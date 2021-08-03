@@ -105,6 +105,4 @@ EOF
   # Reload daemons for systemctl
   systemctl daemon-reload
 
-  # Enable cheqd-noded
-  systemctl enable cheqd-noded
 fi

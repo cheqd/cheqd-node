@@ -1,6 +1,6 @@
 ## Overview
 One of the possible distribution way is to use debian package. 
-It's the most common way for Ubuntu OS and also it can provide post-install steps which can help to make our application as a service.
+It's the most common way for Ubuntu OS and also it can provide post-install steps which can help to make our application to run as a service.
 Because we have to run init procedure for creating tree of directories, `configs` and `data`, not all the steps can be automated.
 By the way, debian package consists of binary, named `cheqd-noded` and script with post-install and post-remove actions. 
 

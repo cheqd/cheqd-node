@@ -2,9 +2,13 @@
 
 This document describes in detail how to configure infrastructure and deploy a new node (observer or validator).
 
-If a new network needs to be initialized, please first follow the instructions for [creating a new network from genesis](how-to-setup-a-new-network.md).
+If a new network needs to be initialized, please first follow the instructions for [creating a new network from genesis](setting-up-a-new-network.md).
 
-If a new validator needs to be added to the existing network, please refer to [joining existing network](how-to-join-existing-network.md) instruction.
+If a new validator needs to be added to the existing network, please refer to [joining existing network](joining-existing-network.md) instruction.
+
+---
+
+## Setting up infrastructure
 
 ### Hardware requirements
 
@@ -18,27 +22,72 @@ Recommended (for highload applications):
 - 100GB SSD
 - x64 2.0 GHz 2v CPU
 
+More about hardware requirements can be found [here](https://docs.tendermint.com/master/nodes/running-in-production.html#hardware).
+
 ### Operating System
 
 Current delivery is compiled and tested for `Ubuntu 20.04 LTS` so we recommend using this distribution for now. In the future, it will be possible to compile the application for a wide range of operating systems thanks to the Go language.
 
-### Binary distribution
+### Ports
 
-There are several ways to get binary:
+To function properly node requires the following ports to be configured:
+
+- P2P port:
+  - This port is used for peer to peer node communication
+  - Incoming and outcoming tcp connections must be allowed
+  - `26656` by default
+  - Can be configured in `config.toml`
+- RPC port:
+  - This port is used by client applications. Open it only if you want clients to be able to connect to your node.
+  - Incoming tcp connections should be allowed.
+  - SSL can also be configured separately
+  - `26657` by default
+  - Can be configured in `config.toml`
+
+### Volumes
+
+We recommend to use separate volume for `data` directory where blockchain is stored.
+
+The directory location depends on the installation method:
+- For binary distribution it's `$HOME/.cheqdnode/data` by default;
+- If you install node using `deb` package, default location is: `/var/lib/cheqd/.cheqdnode/data`.
+
+---
+
+## Installing and configuring software
+
+### Installing using .deb package
+
+- Get `deb` for Ubuntu 20.04 in [releases](https://github.com/cheqd/cheqd-node/releases);
+    - Recommended
+
+1. install
+
+2. init
+
+3.
+
+```
+  # Enable cheqd-noded
+  systemctl enable cheqd-noded
+```
+
+The most preferable way to get `cheqd-node` is to use `.deb` package. Detailed information about it can be found [here](#deb-package-installation.md)
+
+### Installing using binary
 
 - Compile from source code - [instruction](../README.md);
 - Get `tar` archive with the binary compiled for Ubuntu 20.04 in [releases](https://github.com/cheqd/cheqd-node/releases);
-- Get `deb` for Ubuntu 20.04 in [releases](https://github.com/cheqd/cheqd-node/releases);
+
+### Other ways
+
+There are several node:
+
 - Get docker image form [packages](https://github.com/cheqd/cheqd-node/pkgs/container/cheqd-node).
 
-The most preferable way to get `cheqd-node` is to use `.deb` package. Detailed information about it can be found [here](#deb-package-installation.md)  
-## Node deployment
+
 
 Follow these steps to deploy a new node:
-
-1. Setup a server that satisfies [hardware requirements](#hardware-requirements) and [operating system requirements](#operating-system);
-
-    More about hardware requirements can be found [here](https://docs.tendermint.com/master/nodes/running-in-production.html#hardware).
 
 2. In the case of using tarball, put the binary to the location which is in PATH.
 
@@ -122,6 +171,8 @@ Follow these steps to deploy a new node:
 11. (optional) Read other advices about running node in production:
 
     You can read advices [here](https://docs.tendermint.com/master/nodes/running-in-production.html).
+
+---
 
 ## Getting node info
 
