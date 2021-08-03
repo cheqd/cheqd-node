@@ -53,12 +53,16 @@ Follow these steps to deploy a new node:
     Command: `cheqd-noded init <node_name>`
     
     Example: `cheqd-noded init alice-node`
+
+    **FYI**, in case of installing cheqd-node as a `.deb` package, please log in as a `cheqd` user, by calling `sudo su cheqd`.
         
 4. Set genesis:
         
     Genesis should be published for public networks. If not, you can ask any existing network participant for it.
     
     Location (destination) of the genesis file: `$HOME/.cheqdnode/config/genesis.json`
+    
+    **FYI**, in case of installing cheqd-node as a `.deb` package, please log in as a `cheqd` user, by calling `sudo su cheqd`.
         
 5. Set persistent peers:
         
@@ -77,6 +81,7 @@ Follow these steps to deploy a new node:
     ```
     persistent_peers = "d45dcc54583d6223ba6d4b3876928767681e8ff6@node0:26656, 9fb6636188ad9e40a9caf86b88ffddbb1b6b04ce@node1:26656, abbcb709fb556ce63e2f8d59a76c5023d7b28b86@node2:26656, cda0d4dbe3c29edcfcaf4668ff17ddcb96730aec@node3:26656"
     ```
+    **FYI**, in case of installing cheqd-node as a `.deb` package, please log in as a `cheqd` user, by calling `sudo su cheqd`.
 
 6. (optional) Make RPC endpoint available externally:
      
@@ -88,6 +93,8 @@ Follow these steps to deploy a new node:
         
     Example: `laddr = "tcp://0.0.0.0:26657"`
 
+    **FYI**, in case of installing cheqd-node as a `.deb` package, please log in as a `cheqd` user, by calling `sudo su cheqd`.
+
 7. Configure firewall rules:
 
     Allow incoming tcp connections on the P2P port - `26656` by default.
@@ -97,10 +104,12 @@ Follow these steps to deploy a new node:
     Allow all outgoing tcp connections for P2P communication. You can restrict port to the default P2P port `26656` but your node will not be able to connect to nodes with non default P2P port in this case.
 
 8. Start node:
-   
+
     8.1 In case of using tarball: `cheqd-noded start`
-   
-     8.2 In case of using `.deb` package:`systemctl start cheqd-noded.service`
+
+    It's highly recommended to use a process supervisor like `systemd` to run persistent nodes.
+
+    8.2 In case of using `.deb` package:`systemctl start cheqd-noded.service`
 
 9. (optional) Setup sentry nodes for DDOS protection:
 
