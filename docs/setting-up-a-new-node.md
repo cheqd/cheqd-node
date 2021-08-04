@@ -52,49 +52,34 @@ The directory location depends on the installation method:
 - For binary distribution it's `$HOME/.cheqdnode/data` by default;
 - If you install node using `deb` package, default location is: `/var/lib/cheqd/.cheqdnode/data`.
 
+### Sentry nodes (optional)
+
+You can read about sentry nodes [here](https://docs.tendermint.com/master/nodes/validators.html).
+
+
+
 ---
 
 ## Installing and configuring software
 
 ### Installing using .deb package
 
-- Get `deb` for Ubuntu 20.04 in [releases](https://github.com/cheqd/cheqd-node/releases);
-    - Recommended
+This is the most preferable way to get `cheqd-node`. Detailed information about changes made by the package can be found [here](#deb-package-installation.md)
 
-1. install
+1. Get `deb` for Ubuntu 20.04 in [releases](https://github.com/cheqd/cheqd-node/releases);
 
-2. init
+2. Install the package;
 
-3.
+    Command: `sudo dpkg -i <package_file>.deb`
+    
+    Example: `sudo dpkg -i cheqd-node_0.1.13_amd64.deb`
 
-```
-  # Enable cheqd-noded
-  systemctl enable cheqd-noded
-```
+3. Switch to `cheqd` system user:
 
-The most preferable way to get `cheqd-node` is to use `.deb` package. Detailed information about it can be found [here](#deb-package-installation.md)
-
-### Installing using binary
-
-- Compile from source code - [instruction](../README.md);
-- Get `tar` archive with the binary compiled for Ubuntu 20.04 in [releases](https://github.com/cheqd/cheqd-node/releases);
-
-### Other ways
-
-There are several node:
-
-- Get docker image form [packages](https://github.com/cheqd/cheqd-node/pkgs/container/cheqd-node).
-
-
-
-Follow these steps to deploy a new node:
-
-2. In the case of using tarball, put the binary to the location which is in PATH.
-
-    Example:
+    You should always switch to `cheqd` system user before managing node. That's because node binary stores configuration files in home directory.
 
     ```
-    cp cheqd-noded /usr/bin
+    sudo su cheqd
     ```
 
 3. Initialize node config files:
@@ -103,74 +88,56 @@ Follow these steps to deploy a new node:
     
     Example: `cheqd-noded init alice-node`
 
-    **FYI**, in case of installing cheqd-node as a `.deb` package, please log in as a `cheqd` user, by calling `sudo su cheqd`.
-        
 4. Set genesis:
         
-    Genesis should be published for public networks. If not, you can ask any existing network participant for it.
+    Genesis files for public networks are published in [this directory](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains).
     
-    Location (destination) of the genesis file: `$HOME/.cheqdnode/config/genesis.json`
+    Put corresponding `genesis.json` to: `/etc/cheqd-node/`
     
-    **FYI**, in case of installing cheqd-node as a `.deb` package, please log in as a `cheqd` user, by calling `sudo su cheqd`.
-        
 5. Set persistent peers:
         
-    Persistent nodes addresses should also be published publically. If not, you can ask any existing network participant for it.
+    Persistent nodes addresses for public networks are also published in [this directory](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains).
     
-    Open node's config file: `$HOME/.cheqdnode/config/config.toml`
+    Open node's config file: `/etc/cheqd-node/config.toml`
     
     Search for `persistent_peers` parameter and set it's value to a comma separated list of other participant node addresses.
     
-    Format: `<node-0-id>@<node-0-ip>, <node-1-id>@<node-1-ip>, <node-2-id>@<node-2-id>, <node-3-id>@<node-3-id>`.
+    Format: `<node-0-id>@<node-0-ip>, <node-1-id>@<node-1-ip>, <node-n-id>@<node-n-ip>, ...`.
     
-    Domain names can be used instead of IP adresses.
+    Domain names can be used instead of IP addresses.
     
     Example:
     
     ```
     persistent_peers = "d45dcc54583d6223ba6d4b3876928767681e8ff6@node0:26656, 9fb6636188ad9e40a9caf86b88ffddbb1b6b04ce@node1:26656, abbcb709fb556ce63e2f8d59a76c5023d7b28b86@node2:26656, cda0d4dbe3c29edcfcaf4668ff17ddcb96730aec@node3:26656"
     ```
-    **FYI**, in case of installing cheqd-node as a `.deb` package, please log in as a `cheqd` user, by calling `sudo su cheqd`.
 
 6. (optional) Make RPC endpoint available externally:
      
     This step is necessary if you want to allow incoming client application connections to your node. Otherwise, the node will be accessible only locally. 
 
-    Open the node configuration file using the text editor that you prefer: `$HOME/.cheqdnode/config/config.toml`
+    Open the node configuration file using the text editor that you prefer: `/etc/cheqd-node/config.toml`
 
     Search for `ladr` parameter in `RPC Server Configuration Options` section and replace it's value to `0.0.0.0:26657`
         
     Example: `laddr = "tcp://0.0.0.0:26657"`
 
-    **FYI**, in case of installing cheqd-node as a `.deb` package, please log in as a `cheqd` user, by calling `sudo su cheqd`.
+7. Enable `cheqd-noded` service:
 
-7. Configure firewall rules:
+    ```
+    systemctl enable cheqd-noded
+    ```
 
-    Allow incoming tcp connections on the P2P port - `26656` by default.
+### Installing using binary
 
-    If you made RPC endpoint available externally, allow incoming tcp connections on the RPC port - `26657` by default.
+You can get the binary in several ways:
 
-    Allow all outgoing tcp connections for P2P communication. You can restrict port to the default P2P port `26656` but your node will not be able to connect to nodes with non default P2P port in this case.
+- Compile from source code - [instruction](../README.md);
+- Get `tar` archive with the binary compiled for Ubuntu 20.04 in [releases](https://github.com/cheqd/cheqd-node/releases);
 
-8. Start node:
+### Other ways
 
-    8.1 In case of using tarball: `cheqd-noded start`
-
-    It's highly recommended to use a process supervisor like `systemd` to run persistent nodes.
-
-    8.2 In case of using `.deb` package:`systemctl start cheqd-noded.service`
-
-9. (optional) Setup sentry nodes for DDOS protection:
-
-    You can read about sentry nodes [here](https://docs.tendermint.com/master/nodes/validators.html).
-
-10. (optional) Setup cosmovisor for automatic updates:
-
-    You can read about sentry nodes [here](https://docs.cosmos.network/master/run-node/cosmovisor.html).
-
-11. (optional) Read other advices about running node in production:
-
-    You can read advices [here](https://docs.tendermint.com/master/nodes/running-in-production.html).
+- Get docker image form [packages](https://github.com/cheqd/cheqd-node/pkgs/container/cheqd-node).
 
 ---
 
@@ -205,3 +172,11 @@ Example:
 ```
 ba1689516f45be7f79c7450394144711e02e7341@3.13.19.41:26656
 ```
+
+---
+
+## Additional information
+
+You can read other advices about running node in production [here](https://docs.tendermint.com/master/nodes/running-in-production.html).
+
+[Сosmovisor](https://docs.cosmos.network/master/run-node/cosmovisor.html) can be used for automatic updates.
