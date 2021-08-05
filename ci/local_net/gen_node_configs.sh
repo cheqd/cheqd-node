@@ -45,7 +45,7 @@ echo "##### [Validator operators] Add them to the genesis"
 
 for ((i=0 ; i<$NODES_COUNT ; i++))
 do
-    cheqd-noded add-genesis-account "operator$i" 10000000token,100000000stake --home $OPERATORS_HOME
+    cheqd-noded add-genesis-account "operator$i" 10000000cheq,100000000stake --home $OPERATORS_HOME
 done
 
 
