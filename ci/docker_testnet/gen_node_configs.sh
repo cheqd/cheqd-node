@@ -41,14 +41,14 @@ cheqd-noded init dummy_node --chain-id $CHAIN_ID --home $CLIENT_HOME
 
 echo "##### [Validator operators] Add them to the genesis" 
 
-cheqd-noded add-genesis-account alice 10000000token,100000000stake --home $CLIENT_HOME
-cheqd-noded add-genesis-account bob 10000000token,100000000stake --home $CLIENT_HOME
+cheqd-noded add-genesis-account alice 10000000cheq,100000000stake --home $CLIENT_HOME
+cheqd-noded add-genesis-account bob 10000000cheq,100000000stake --home $CLIENT_HOME
 
 
 echo "##### [Test pool] Add test account to the genesis" 
 
 ACCOUNT_ID="cosmos1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd"
-echo $(cat ${CLIENT_HOME}/config/genesis.json | jq '.app_state.bank.balances += [{"address": "'${ACCOUNT_ID}'", "coins": [{"denom": "stake", "amount": "100000000"},{"denom": "token", "amount": "1000"}] }]') > ${CLIENT_HOME}/config/genesis.json
+echo $(cat ${CLIENT_HOME}/config/genesis.json | jq '.app_state.bank.balances += [{"address": "'${ACCOUNT_ID}'", "coins": [{"denom": "stake", "amount": "100000000"},{"denom": "cheq", "amount": "1000"}] }]') > ${CLIENT_HOME}/config/genesis.json
 echo $(cat ${CLIENT_HOME}/config/genesis.json | jq '.app_state.auth.accounts += [{"@type": "/cosmos.auth.v1beta1.BaseAccount","address": "'${ACCOUNT_ID}'", "pub_key": null,"account_number": "0","sequence": "0"}]') > ${CLIENT_HOME}/config/genesis.json
 
 
