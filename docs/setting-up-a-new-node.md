@@ -64,7 +64,7 @@ You can read about sentry nodes [here](https://docs.tendermint.com/master/nodes/
 
 ### Installing using .deb package
 
-This is the most preferable way to get `cheqd-node`. Detailed information about changes made by the package can be found [here](#deb-package-installation.md)
+This is the most preferable way to get `cheqd-node`. Detailed information about changes made by the package can be found [here](deb-package-overview.md)
 
 1. Get `deb` for Ubuntu 20.04 in [releases](https://github.com/cheqd/cheqd-node/releases);
 

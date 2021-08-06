@@ -1,41 +1,41 @@
 # Overview of changes that `deb` package does
 
 
-One of the possible distribution way is to use debian package.
-It's the most common way for Ubuntu OS and also it can provide post-install steps which can help to make our application to run as a service.
+Debian package is the most common way for Ubuntu OS and also it can provide post-install steps which can help to make our application to run as a service.
 
-The package consists of binary, named `cheqd-noded` and script with post-install and post-remove actions. 
+The package consists of:
+- Binary, named `cheqd-noded`;
+- Script with post-install and post-remove actions. 
 
 ## Post-install actions
 
-### Create a special user "cheqd"
+### System user creation
 
 By default, cosmos-sdk create all needed directories in the `HOME` directory. 
-That's why package creates a special user with home directory `/var/lib/cheqd`. Also, this user will use for setting permissions to data and configs.
+That's why package creates a special `cheqd` user with home directory set to `/var/lib/cheqd`.
 
-### Dividing configs, data and logs
-
-#### Directories
+### Directories and symlinks
 
 According to general filesystem hierarchy standard (FHS), the next directories will be created:
 
-```
-/etc/cheqd-node                - configs, permissions cheqd:cheqd
-/var/lib/cheqd/data            - data   , permissions cheqd:cheqd
-/var/log/cheqd-node            - logs   , permissions syslog:adm (set by rsyslog)
-```
+- `/etc/cheqd-node`
+  - Configuration files location
+  - Permissions: `cheqd:cheqd`
+- `/var/lib/cheqd/data`
+  - Place for blockchain data
+  - Permissions: cheqd:cheqd
+- `/var/log/cheqd-node`
+  - Place for logs
+  - Permissions: syslog:adm (set by rsyslog)
 
-After setting up the node, it's expected, then configs and data will be symlinked to the corresponded system directories.
-For this purposes will be created the next symlinks to configs and data:
+The following symlinks will be created:
 
-```
-sudo ln -s /etc/cheqd-node/ /var/lib/cheqd/.cheqdnode/config       - for configs
-sudo ln -s /var/lib/cheqd/data /var/lib/cheqd/.cheqdnode/data      - for data
-```
+- `/etc/cheqd-node/` -> `/var/lib/cheqd/.cheqdnode/config`
+  - For configs
+- `/var/lib/cheqd/data` -> `/var/lib/cheqd/.cheqdnode/data`
+  - For data
 
-After this preparation, it would be possible to set up cheqd node in general but under `cheqd` user.
-
-#### Rsyslog config
+### Rsyslog configuration
 
 The next config for rsyslog will be created:
 
@@ -46,9 +46,9 @@ if \$programname == 'cheqd-noded' then /var/log/cheqd-node/stdout.log
 
 It redirects all the logs into the file.
 
-#### Logrotate config
+### Logrotate config
 
-For rotating log file will be used `logrotate` - the general approach for Linux/systemd with the next config:
+For rotating log file will be used `logrotate` - the general approach for Linux/systemd with the following config:
 
 ```
 /var/log/cheqd-node/stdout.log {
@@ -66,9 +66,9 @@ All the archives will be stored for a month (30 days). Also, the main file will 
 
 Once a day by crontab will be called a small script for running logrotate logic.
 
-### Systemd
+## Systemd
 
-The main part of post-installation process is making our binary as a service. Systemd service file can help with it:
+The main part of post-installation process is making our binary as a service. The following systemd service file will be created:
 
 ```
 [Unit]
