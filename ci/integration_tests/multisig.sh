@@ -39,8 +39,8 @@ echo "############ Someone (Jack) transfers money to the ffour account"
 FFOUR_ADDRESS=$(cheqd-noded keys show ffour -a --home $JACK_HOME)
 FFOUR_PUBKEY=$(cheqd-noded keys show ffour -p --home $JACK_HOME)
 
-cheqd-noded tx bank send jack $FFOUR_ADDRESS 1000000token \
-  --fees 200000token \
+cheqd-noded tx bank send jack $FFOUR_ADDRESS 1000000cheq \
+  --fees 200000cheq \
   --chain-id=$CHAIN_ID \
   --home $JACK_HOME \
   --yes
@@ -67,8 +67,8 @@ cheqd-noded keys show ffour --home $BOB_HOME
 
 echo "############ Jack generates a transaction"
 
-cheqd-noded tx bank send $FFOUR_ADDRESS $JACK_ADDRESS 1000token \
-  --fees 200000token \
+cheqd-noded tx bank send $FFOUR_ADDRESS $JACK_ADDRESS 1000cheq \
+  --fees 200000cheq \
   --generate-only \
   --home $JACK_HOME \
   > $NODE_CONFIGS/unsignedTx.json

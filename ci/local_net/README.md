@@ -61,7 +61,7 @@ vc query bank balances (vc keys show anna -a --home localnet/client) --home loca
 ### Create NYM
 
 ```
-vc tx cheqd create-nym "alias" "verkey" "did" "role" --from anna --gas-prices 1token --chain-id cheqd-node-chain --home localnet/client
+vc tx cheqd create-nym "alias" "verkey" "did" "role" --from anna --gas-prices 1cheq --chain-id cheqd-node-chain --home localnet/client
 ```
 
 ### List nym

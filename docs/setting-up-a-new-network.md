@@ -49,9 +49,9 @@ All participants should [setup their nodes](how-to-setup-a-new-node.md) using de
                 
     - **Add a genesis account with a public key:**
         
-        Command: `cheqd-noded add-genesis-account <key_name> 10000000token,100000000stake`
+        Command: `cheqd-noded add-genesis-account <key_name> 10000000cheq,100000000stake`
         
-        Example: `cheqd-noded add-genesis-account alice 10000000token,100000000stake`
+        Example: `cheqd-noded add-genesis-account alice 10000000cheq,100000000stake`
         
     - **Generate genesis node transaction:**
         

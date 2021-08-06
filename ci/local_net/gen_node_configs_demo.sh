@@ -23,7 +23,7 @@ echo "# Initialze node"
 cheqd-noded init node0 --chain-id $CHAIN_ID --home $NODE_0_HOME
 
 echo "# Add genesis account"
-cheqd-noded add-genesis-account jack 10000000token,100000000stake --home $NODE_0_HOME
+cheqd-noded add-genesis-account jack 10000000cheq,100000000stake --home $NODE_0_HOME
 
 echo "# Generate genesis node tx"
 cheqd-noded gentx jack 1000000stake --chain-id $CHAIN_ID --home $NODE_0_HOME
@@ -50,7 +50,7 @@ mkdir $NODE_1_HOME/config/gentx
 cp $NODE_0_HOME/config/gentx/* $NODE_1_HOME/config/gentx
 
 echo "# Add genesis account"
-cheqd-noded add-genesis-account alice 10000000token,100000000stake --home $NODE_1_HOME
+cheqd-noded add-genesis-account alice 10000000cheq,100000000stake --home $NODE_1_HOME
 
 echo "# Generate genesis node tx"
 cheqd-noded gentx alice 1000000stake --chain-id $CHAIN_ID --home $NODE_1_HOME
@@ -77,7 +77,7 @@ mkdir $NODE_2_HOME/config/gentx
 cp $NODE_1_HOME/config/gentx/* $NODE_2_HOME/config/gentx
 
 echo "# Add genesis account"
-cheqd-noded add-genesis-account bob 10000000token,100000000stake --home $NODE_2_HOME
+cheqd-noded add-genesis-account bob 10000000cheq,100000000stake --home $NODE_2_HOME
 
 echo "# Generate genesis node tx"
 cheqd-noded gentx bob 1000000stake --chain-id $CHAIN_ID --home $NODE_2_HOME
@@ -104,7 +104,7 @@ mkdir $NODE_3_HOME/config/gentx
 cp $NODE_2_HOME/config/gentx/* $NODE_3_HOME/config/gentx
 
 echo "# Add genesis account"
-cheqd-noded add-genesis-account anna 10000000token,100000000stake --home $NODE_3_HOME
+cheqd-noded add-genesis-account anna 10000000cheq,100000000stake --home $NODE_3_HOME
 
 echo "# Generate genesis node tx"
 cheqd-noded gentx anna 1000000stake --chain-id $CHAIN_ID --home $NODE_3_HOME
