@@ -23,7 +23,7 @@ The set of scripts to generate configuration for a testnet of four nodes and run
 
 3. Generate node configurations:
 
-    Run: `gen_node_configs.sh` or `gen_node_configs_demo.sh`.
+    Run: `gen_node_configs.sh`.
 
 4. Run docker-compose:
 
@@ -45,27 +45,35 @@ This will setup 4 nodes listening on the following ports:
 - Node3:
     - p2p: 26665
     - rpc: 26666
+    
+- Client's with configs in `node_configs/client` directory. 
+
+Also, there are 4 accounts for operators:
+- operator0;
+- operator1;
+- operator2;
+- operator3;
 
 You can tests connection to a node using browser: `http://localhost:<rpc_port>`. Example for the fitst node: `http://localhost:26657`.
 
-When connecting using CLI, point path to home directory: `--home localnet/client`. This directory contains keys from genesis acounts.
+When connecting using CLI, point path to home directory: `--home node_configs/client`. This directory contains keys from genesis acounts.
 
 ## Demo commands:
 
 ### Show balances
 
 ```
-vc query bank balances (vc keys show anna -a --home localnet/client) --home localnet/client
+cheqd-noded query bank balances $(cheqd-noded keys show operator0 -a --home node_configs/client) --home node_configs/client
 ```
 
 ### Create NYM
 
 ```
-vc tx cheqd create-nym "alias" "verkey" "did" "role" --from anna --gas-prices 1cheq --chain-id cheqd-node-chain --home localnet/client
+cheqd-noded tx cheqd create-nym "alias" "verkey" "did" "role" --from operator0 --gas-prices 1cheq --chain-id cheqd --home node_configs/client
 ```
 
 ### List nym
 
 ```
-vc query cheqd list-nym --home localnet/client
+cheqd-noded query cheqd list-nym --home node_configs/client
 ```
