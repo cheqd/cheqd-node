@@ -6,7 +6,7 @@ This document describes in detail how to join existing network as validator.
 
 1. Setup a node:
 
-    Follow [this instruction](setting-up-a-new-node.md).
+    Follow [this instruction](setting-up-a-new-node-broken.md).
 
     Use corresponding `genesis.json` and `persistent peers list` form `persistent_chains` folder in the root of the repository.
 
