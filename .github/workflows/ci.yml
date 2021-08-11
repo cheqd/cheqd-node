@@ -64,3 +64,9 @@ jobs:
         with:
           version: v1.40
           args: --timeout 5m0s
+
+  link-markdown:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: gaurav-nelson/github-action-markdown-link-check@v1
