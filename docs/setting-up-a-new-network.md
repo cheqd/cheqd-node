@@ -77,7 +77,7 @@ All participants should [setup their nodes](how-to-setup-a-new-node.md) using de
 
 ### Sharing peer list
 
-All participants should share their peer info with each other. See [node setup instruction](how-to-setup-a-new-node.md) for more information.
+All participants should share their peer info with each other. See [node setup instruction](setting-up-a-new-node.md) for more information.
 
 ### Updating genesis and persistent peers
 
