@@ -22,7 +22,7 @@ Current delivery is compiled and tested for `Ubuntu 20.04 LTS` so we recommend u
 
 ### Setting up nodes
 
-All participants should [setup their nodes](how-to-setup-a-new-node.md) using default genesis and empty list of peers.
+All participants should [setup their nodes](setting-up-a-new-node.md) using default genesis and empty list of peers.
 
 ### Generating genesis file
 
