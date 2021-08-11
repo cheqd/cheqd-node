@@ -11,6 +11,9 @@ To build the image:
 - Go to the repository root;
 - Run `docker build -f ci/docker/Dockerfile -t cheqd-node .`.
 
+Note: If you are using M1 Macbook you should modify the FROM statement in the Dockerfile, should be like this 
+"FROM --platform=linux/amd64 golang:buster as builder "
+
 ## Usage
 
 ### cheqd-noded
