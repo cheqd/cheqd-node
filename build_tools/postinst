@@ -13,7 +13,10 @@ fi
 # Create cheqd user
 if ! /usr/bin/getent passwd $CHEQD_USER_NAME > /dev/null 2>&1 ; then
 
-  adduser --system ${CHEQD_USER_NAME} --home ${USER_HOME_DIR} --shell /bin/bash
+  # Create group and user named "cheqd"
+  addgroup ${CHEQD_USER_NAME} --quiet
+
+  adduser --system ${CHEQD_USER_NAME} --home ${USER_HOME_DIR} --shell /bin/bash --ingroup ${CHEQD_USER_NAME} --quiet
 
   # Make directory for logs
   mkdir -p /var/log/cheqd-node
@@ -28,8 +31,12 @@ if ! /usr/bin/getent passwd $CHEQD_USER_NAME > /dev/null 2>&1 ; then
   mkdir -p ${CHEQD_HOME_DIR}
 
   # Symlinks for data and configs
-  ln -s /etc/cheqd-node ${CHEQD_HOME_DIR}/config
-  ln -s ${USER_HOME_DIR}/data ${CHEQD_HOME_DIR}/data
+  if [ ! -L ${CHEQD_HOME_DIR}/config ] ; then
+     ln -s /etc/cheqd-node ${CHEQD_HOME_DIR}/config
+  fi
+  if [ ! -L ${CHEQD_HOME_DIR}/data ] ; then 
+     ln -s ${USER_HOME_DIR}/data ${CHEQD_HOME_DIR}/data
+  fi
 
   # Change permissions for config and data directories
   chown -R $CHEQD_USER_NAME:$CHEQD_USER_NAME ${CHEQD_CONFIG_DIR}
