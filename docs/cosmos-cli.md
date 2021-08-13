@@ -88,7 +88,7 @@ Pay attention at return status code. It should be 0 if a transaction is submitte
 
 ## Managing NYMs
 
-__Creating a NUM:__
+__Creating a NYM:__
 
 Command:
 
