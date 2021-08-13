@@ -87,11 +87,15 @@ All participants should share their peer info with each other. See [node setup i
 
     - **Update the genesis file:**
 
-        File location: `$HOME/.cheqdnode/config/genesis.json`
+        File location:
+        - Deb destribution: `/etc/cheqd-node/genesis.json`
+        - Binary destribution: `$HOME/.cheqdnode/config/genesis.json`
 
     - **Update peer list:**
         
-        Open node's config file: `$HOME/.cheqdnode/config/config.toml`
+        Open node's config file:
+        - Deb destribution: `/etc/cheqd-node/config.toml`
+        - Binary destribution: `$HOME/.cheqdnode/config/config.toml`
         
         Search for `persistent_peers` parameter and set it's value to a comma separated list of peers.
         
