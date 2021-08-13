@@ -1,46 +1,46 @@
-# cheqd cosmos cli
+# cheqd Command Line Interface (CLI)
 
-There are two cli tools for cheqd:
+There are two CLI tools for cheqd:
 
-- Cosmos SDK based: for infrastructure management;
-- VDR tools based: for identity management.
+- Cosmos CLI: This is intended for node operators. Typically for node configuration, setup, and Cosmos keys.
+- [Verifiable Data Registry (VDR) Tools](https://gitlab.com/evernym/verity/vdr-tools) CLI: This is intended for carrying out interactions related to decentralised identity / self-sovereign identity (SSI) functionality.
 
-This document describes common workflows for cheqd cosmos cli.
+This document describes common workflows for cheqd Cosmos CLI.
 
 
 ## Managing keys
 
-Keys are closely related to accounts and on ledger authentication.
+Keys are closely related to accounts and on-ledger authentication.
 
-Account address is a properly encoded hash of public key. It means that each account is connected with one key (multisig accounts are exceptions).
+Account address is a properly encoded hash of public key. It means that each account is connected with at least one key. (MultiSig accounts are exceptions.)
 
-To submit a transaction on behalf of an account it must be signed with account's private key.
+To submit a transaction on behalf of an account, it must be signed with account's private key.
 
-It's highly recommended to add `--keyring-backend os` to each command that is related to key management or usage.
+It's highly recommended to add `--keyring-backend os` to each command that is related to key management or usage. Cosmos supports [multiple keyring backends](https://docs.cosmos.network/v0.43/run-node/keyring.html), so each node operator is free to use the method they choose. `os` is a safe default to use.
 
-__Key creation:__
+__Creating a key__
 
 ```
 cheqd-noded keys add <alias>
 ```
 
-`Mnemonic phrase` and `account address` will be printed. Kee mnemonic safe. This is the only wa to restore access to the account.
+`Mnemonic phrase` and `account address` will be printed. Keep mnemonic safe. This is the only way to restore access to the account if they keyring cannot be recovered.
 
-__Key restoring:__
+__Restoring a key from backup mnemonic key__
 
 ```
 cheqd-noded keys add <alias> --recover <mnemonic>
 ```
 
-__Keys listing:__
+__Listing available keys on a node__
 
 ```
 cheqd-noded keys list
 ```
 
-__Using a key for transaction signing:__
+__Using a key for transaction signing__
 
-Most transactions will require you to use `--from <key-alias>` param which is a name or address of private key with which to sign tx.
+Most transactions will require you to use `--from <key-alias>` param which is a name or address of private key with which to sign a transaction.
 
 ```
 cheqd-noded tx <module> <tx-name> --from <key-alias>
@@ -60,8 +60,8 @@ Example:
 cheqd-noded query bank balances cosmos1lxej42urme32ffqc3fjvz4ay8q5q9449f06t4v --node http://nodes.testnet.cheqd.network:26657
 ```
 
-Extra arguments:
-- `--node` - ip address or url of node to connect.
+Arguments:
+- `--node` - IP address or URL of node to send the request to
 
 ## Submitting transactions
 
@@ -78,15 +78,23 @@ cheqd-noded tx bank send alice cosmos10dl985c76zanc8n9z6c88qnl9t2hmhl5rcg0jq 100
 ```
 
 Extra arguments:
-- `--node` - ip address or url of node to connect;
-- `--chain-id` - i.e. `cheqd-testnet` or `cheqd-mainnet`;
-- `--fees` - max fee to pay along with transaction.
+- `--node` - IP address or URL of node to send request to
+- `--chain-id` - i.e. `cheqd-testnet`
+- `--fees` - Max fee limit that is allowed for the transaction. 
 
 Status code:
 
-Pay attention at return status code. It should be 0 if a transaction is submitted successfully. Otherwise error message is returned.
+Pay attention at return status code. It should be 0 if a transaction is submitted successfully. Otherwise, an error message may be returned.
 
 ## Managing NYMs
+
+[**NYM** is the term used by Hyperledger Indy](https://hyperledger-indy.readthedocs.io/projects/node/en/latest/transactions.html#nym) for Decentralized Identifiers (DIDs) that are created on ledger. A DID is typically the identifier that is associated with a specific organisation issuing/managing SSI credentials.
+
+For the sake of explaining with similar concepts to current Hyperledger Indy implementations, on the `cheqd-testnet` these are still called NYMs.
+
+Transactions to add a DID to the ledger are called NYM transactions.
+
+Future releases of `cheqd-node` are likely to replace the NYM terminology with DID for better understanding.
 
 __Creating a NYM:__
 
@@ -102,9 +110,9 @@ Example:
 cheqd-noded tx cheqd create-nym "alias" "verkey" "did" "role"  --chain-id cheqd --from alice --node http://localhost:26657 --chain-id cheqd ---fee 100000cheq
 ```
 
-Id of the created NYM will be returned.
+ID of the created NYM will be returned.
 
-__Querying a NYM by id:__
+__Querying a NYM by ID:__
 
 Command:
 
