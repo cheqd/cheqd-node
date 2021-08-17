@@ -15,7 +15,7 @@ systemctl status cheqd-noded
 for checking that service was stopped.
 2. After that new package can be installed by calling:
 ```
-apt install <path/to/package>
+dpkg -i <path/to/package>
 ```
 ## Needed checks after installation
 * Start `cheqd-noded` service by calling:
