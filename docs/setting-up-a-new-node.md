@@ -36,13 +36,13 @@ To function properly node requires the following ports to be configured:
   - This port is used for peer to peer node communication
   - Incoming and outcoming tcp connections must be allowed
   - `26656` by default
-  - Can be configured in `config.toml`
+  - Can be configured in `/etc/cheqd-node/config.toml`
 - RPC port:
   - This port is used by client applications. Open it only if you want clients to be able to connect to your node.
   - Incoming tcp connections should be allowed.
   - SSL can also be configured separately
   - `26657` by default
-  - Can be configured in `config.toml`
+  - Can be configured in `/etc/cheqd-node/config.toml`
 
 ### Volumes
 
