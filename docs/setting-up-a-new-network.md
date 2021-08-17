@@ -84,7 +84,11 @@ All participants should share their peer info with each other. See [node setup i
 - Each participant should:
 
     - **Stop the node;**
+      `systemctl stop cheqd-noded`
 
+    - **Make sure the node is stopped**
+      `systemctl status cheqd-noded`
+      
     - **Update the genesis file:**
 
         File location:
@@ -110,7 +114,10 @@ All participants should share their peer info with each other. See [node setup i
         ```
         
     - **Restart node.**
-        
+      `systemctl start cheqd-noded`  
+      
+    - **Make sure the node process is running**
+    `systemctl status cheqd-noded`
 
 Congratulations, you should have node(s) deployed and running on a network if the above steps succeed.
 
