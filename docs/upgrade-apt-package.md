@@ -30,4 +30,4 @@ apt install <path/to/package>
 Package installation process is idempotent and it should not change service files, configs or any other user data.
 
 P.S. In case of using just binary installation before, we recommend to copy all `config` into `/etc/cheqd-node` and `data` into the `/var/lib/cheqd/data`.
-Also, additional information about debian package can be find [here](debian-package-overview.md).
+Also, additional information about debian package can be find [here](deb-package-overview.md).
