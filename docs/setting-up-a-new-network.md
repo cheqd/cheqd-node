@@ -114,7 +114,7 @@ All participants should share their peer info with each other. See [node setup i
         
     - **Start node:**  `systemctl start cheqd-noded`  
       
-    - **Make sure the node process is running: **   `systemctl status cheqd-noded`
+    - **Make sure the node process is running:**   `systemctl status cheqd-noded`
 
 Congratulations, you should have node(s) deployed and running on a network if the above steps succeed.
 
