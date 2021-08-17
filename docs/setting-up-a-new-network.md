@@ -83,8 +83,11 @@ All participants should share their peer info with each other. See [node setup i
 
 - Each participant should:
 
-    - **Stop the node;**
+    - **Stop the node:**  `systemctl stop cheqd-noded`
 
+    - **Make sure the node is stopped**
+      `systemctl status cheqd-noded`
+      
     - **Update the genesis file:**
 
         File location:
@@ -109,8 +112,9 @@ All participants should share their peer info with each other. See [node setup i
         persistent_peers = "d45dcc54583d6223ba6d4b3876928767681e8ff6@node0:26656, 9fb6636188ad9e40a9caf86b88ffddbb1b6b04ce@node1:26656, abbcb709fb556ce63e2f8d59a76c5023d7b28b86@node2:26656, cda0d4dbe3c29edcfcaf4668ff17ddcb96730aec@node3:26656"
         ```
         
-    - **Restart node.**
-        
+    - **Start node:**  `systemctl start cheqd-noded`  
+      
+    - **Make sure the node process is running:**   `systemctl status cheqd-noded`
 
 Congratulations, you should have node(s) deployed and running on a network if the above steps succeed.
 

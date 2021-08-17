@@ -2,7 +2,7 @@
 
 This document describes in detail how to configure infrastructure and deploy a new node (observer or validator).
 
-If a new network needs to be initialized, please first follow the instructions for [creating a new network from genesis](setting-up-a-new-network.md).
+After creating the nodes, if a new network needs to be initialized, please follow the instructions for [creating a new network from genesis](setting-up-a-new-network.md).
 
 If a new validator needs to be added to the existing network, please refer to [joining existing network](joining-existing-network.md) instruction.
 
@@ -36,13 +36,13 @@ To function properly node requires the following ports to be configured:
   - This port is used for peer to peer node communication
   - Incoming and outcoming tcp connections must be allowed
   - `26656` by default
-  - Can be configured in `config.toml`
+  - Can be configured in `/etc/cheqd-node/config.toml`
 - RPC port:
   - This port is used by client applications. Open it only if you want clients to be able to connect to your node.
   - Incoming tcp connections should be allowed.
   - SSL can also be configured separately
   - `26657` by default
-  - Can be configured in `config.toml`
+  - Can be configured in `/etc/cheqd-node/config.toml`
 
 ### Volumes
 
@@ -118,7 +118,7 @@ This is the most preferable way to get `cheqd-node`. Detailed information about 
 
     Open the node configuration file using the text editor that you prefer: `/etc/cheqd-node/config.toml`
 
-    Search for `ladr` parameter in `RPC Server Configuration Options` section and replace it's value to `0.0.0.0:26657`
+    Search for `laddr` parameter in `RPC Server Configuration Options` section and replace it's value to `0.0.0.0:26657`
         
     Example: `laddr = "tcp://0.0.0.0:26657"`
 
