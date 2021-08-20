@@ -4,7 +4,7 @@ This document describes in detail how to configure infrastructure and deploy a n
 
 After creating the nodes, if a new network needs to be initialized, please follow the instructions for [creating a new network from genesis](setting-up-a-new-network.md).
 
-If a new validator needs to be added to the existing network, please refer to [joining existing network](joining-existing-network.md) instruction.
+If a new validator needs to be added to the existing network, please refer to [joining existing network](setting-up-a-new-validator.md) instruction.
 
 ---
 

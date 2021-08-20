@@ -8,7 +8,7 @@ cheqd is a blockchain built using Cosmos SDK and Tendermint and created with [St
   * [Setting up a new node](docs/setting-up-a-new-node.md)
     * [Deb package overview](docs/deb-package-overview.md)
     * [Deb package upgrade](docs/deb-package-upgrade.md)
-  * [Setting up a new validator](docs/setting-up-a-new-validator.md.md)
+  * [Setting up a new validator](docs/setting-up-a-new-validator.md)
   * [Setting up a new network](docs/setting-up-a-new-network.md)
 * **CLI**
   * [CLI reference](docs/cosmos-cli.md)
