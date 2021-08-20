@@ -13,7 +13,7 @@ The set of scripts to generate configurations for a network of four nodes and ru
 
 1.  Build docker image:
 
-    See [the instruction](../docker/README.md).
+    See [the instruction](../cheqd_node/README.md).
 
 2. Build cheqd-noded:
 

@@ -23,7 +23,7 @@ which cheqd-noded
 
 ## Building node in docker
 
-Use this [instruction](ci/docker/README.md).
+Use this [instruction](docker/cheqd_node/README.md).
 
 ## Running local network using starport
 
@@ -42,9 +42,9 @@ starport serve
 
 Your blockchain in development can be configured with `config.yml`. To learn more see the [reference](https://github.com/tendermint/starport#documentation).
 
-## Running local network using docker
+## Running local network using docker compose
 
-Use this [instruction](ci/local_net/README.md).
+Use this [instruction](docker/docker_compose_localnet/README.md).
 
 ## Discuss this project, get help and support
 The [cheqd Community Slack is open for anyone to join](http://cheqd.link/join-cheqd-slack) and is our discussion forum for the open-source community, software developers, and node operators. Please reach out to us for real-time discussions and help.

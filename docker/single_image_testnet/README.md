@@ -6,7 +6,7 @@ Debian based docker image with the `cheqd-nonded` executable inside preconfigure
 
 ## Prerequisites
 
-- Build `cheqd-node` image first. See the [instruction](../docker/README.md).
+- Build `cheqd-node` image first. See the [instruction](../cheqd_node/README.md).
 
 ## Building
 
