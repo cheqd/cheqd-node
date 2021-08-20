@@ -2,49 +2,19 @@
 
 cheqd is a blockchain built using Cosmos SDK and Tendermint and created with [Starport](https://github.com/tendermint/starport).
 
-## Building node from source
+## Read docs
 
-Prerequisites:
+* **Network**
+  * [Setting up a new node](docs/setting-up-a-new-node.md)
+    * [Deb package overview](docs/deb-package-overview.md)
+    * [Deb package upgrade](docs/deb-package-upgrade.md)
+  * [Setting up a new validator](docs/setting-up-a-new-validator.md)
+  * [Setting up a new network](docs/setting-up-a-new-network.md)
+* **CLI**
+  * [CLI reference](docs/cosmos-cli.md)
+* **Development**
+  * [Building and testing](docs/building-and-testing.md)
 
-- Install [Go](https://golang.org/doc/install)
-- Install [Starport](https://docs.starport.network/intro/install.html)
-
-To build the node executable run:
-
-```
-starport chain build
-```
-
-To look up binary's location run:
-
-```
-which cheqd-noded
-```
-
-## Building node in docker
-
-Use this [instruction](docker/cheqd_node/README.md).
-
-## Running local network using starport
-
-Prerequisites:
-
-- Install [Go](https://golang.org/doc/install)
-- Install [Starport](https://docs.starport.network/intro/install.html)
-
-Only the network of one node is supported. To run the network of one node:
-
-```
-starport serve
-```
-
-`serve` command installs dependencies, builds, initializes and starts your blockchain in development.
-
-Your blockchain in development can be configured with `config.yml`. To learn more see the [reference](https://github.com/tendermint/starport#documentation).
-
-## Running local network using docker compose
-
-Use this [instruction](docker/docker_compose_localnet/README.md).
 
 ## Discuss this project, get help and support
 The [cheqd Community Slack is open for anyone to join](http://cheqd.link/join-cheqd-slack) and is our discussion forum for the open-source community, software developers, and node operators. Please reach out to us for real-time discussions and help.
