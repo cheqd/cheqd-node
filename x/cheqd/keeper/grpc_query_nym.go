@@ -25,7 +25,7 @@ func (k Keeper) NymAll(c context.Context, req *types.QueryAllNymRequest) (*types
 
 	pageRes, err := query.Paginate(nymStore, req.Pagination, func(key []byte, value []byte) error {
 		var nym types.Nym
-		if err := k.cdc.UnmarshalBinaryBare(value, &nym); err != nil {
+		if err := k.cdc.Unmarshal(value, &nym); err != nil {
 			return err
 		}
 
@@ -53,7 +53,7 @@ func (k Keeper) Nym(c context.Context, req *types.QueryGetNymRequest) (*types.Qu
 	}
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.NymKey))
-	k.cdc.MustUnmarshalBinaryBare(store.Get(GetNymIDBytes(req.Id)), &nym)
+	k.cdc.MustUnmarshal(store.Get(GetNymIDBytes(req.Id)), &nym)
 
 	return &types.QueryGetNymResponse{Nym: &nym}, nil
 }
