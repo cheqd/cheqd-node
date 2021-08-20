@@ -18,7 +18,7 @@ Note: If you are using M1 Macbook you should modify the FROM statement in the Do
 
 ### cheqd-noded
 
-`cheqd-noded` executable is entry point.
+`cheqd-noded` executable is entry point by default.
 
 Usage:
 
@@ -28,7 +28,9 @@ docker run -it --rm cheqd-node <command> <args>
 
 ### node-runner
 
-Used to run a node in one command. The following env variable should be defined:
+Used to initialize configuration files and run a node in one command.
+
+Parameters:
 
 - `NODE_MONIKER` - node moniker;
 - `GENESIS` - base64 encoded content of `genesis.json`;
