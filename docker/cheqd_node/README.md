@@ -9,7 +9,7 @@ Debian based docker image that contains the latest version of `cheqd-nonded` exe
 To build the image:
 
 - Go to the repository root;
-- Run `docker build -f ci/docker/Dockerfile -t cheqd-node .`.
+- Run `docker build -f docker/cheqd_node/Dockerfile -t cheqd-node .`.
 
 Note: If you are using M1 Macbook you should modify the FROM statement in the Dockerfile, should be like this 
 "FROM --platform=linux/amd64 golang:buster as builder "
@@ -18,7 +18,7 @@ Note: If you are using M1 Macbook you should modify the FROM statement in the Do
 
 ### cheqd-noded
 
-`cheqd-noded` executable is entry point.
+`cheqd-noded` executable is entry point by default.
 
 Usage:
 
@@ -28,7 +28,9 @@ docker run -it --rm cheqd-node <command> <args>
 
 ### node-runner
 
-Used to run a node in one command. The following env variable should be defined:
+Used to initialize configuration files and run a node in one command.
+
+Parameters:
 
 - `NODE_MONIKER` - node moniker;
 - `GENESIS` - base64 encoded content of `genesis.json`;

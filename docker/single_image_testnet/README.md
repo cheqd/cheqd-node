@@ -2,18 +2,18 @@
 
 ## Description
 
-Debian based docker image with the latest version of `cheqd-nonded` executable and preconfigured network of 2 nodes. Intended for use in CI pipelines.
+Debian based docker image with the `cheqd-nonded` executable inside preconfigured to run a network of 2 nodes. Intended for use in CI pipelines.
 
 ## Prerequisites
 
-- Build `cheqd-node` image first. See the [instruction](../docker/README.md).
+- Build `cheqd-node` image first. See the [instruction](../cheqd_node/README.md).
 
 ## Building
 
 To build the image:
 
 - Go to the repository root
-- Run `docker build -f ci/docker_testnet/Dockerfile -t cheqd-testnet .`
+- Run `docker build -f docker/single_image_testnet/Dockerfile -t cheqd-testnet .`
 
 ## Running
 

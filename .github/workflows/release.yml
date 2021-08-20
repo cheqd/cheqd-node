@@ -41,10 +41,10 @@ jobs:
           echo ${{ secrets.GH_PAT }} | docker login ghcr.io --username ${{ secrets.GH_USER }} --password-stdin
       - name: Build node image
         run: |
-          docker build -f ci/docker/Dockerfile --no-cache -t cheqd-node .
+          docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node .
       - name: Build testnet image
         run: |
-          docker build -f ci/docker_testnet/Dockerfile --no-cache -t cheqd-testnet .
+          docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
       - name: Push node image
         run: |
           docker tag cheqd-node ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}

@@ -11,29 +11,30 @@ The latest Debian package can be found in [releases](https://github.com/cheqd/ch
 ## Steps to upgrade via Debian package
 1. Ensure that current `cheqd-noded` service is stopped. Make [backups of app data](https://github.com/cheqd/cheqd-node/blob/main/docs/deb-package-overview.md#directories-and-symlinks) and keys before package upgrading.
 To stop the node service:
-```
-systemctl stop cheqd-noded
-```
-and 
-```
-systemctl status cheqd-noded
-```
-to confirming that service was stopped.
+
+    ```
+    systemctl stop cheqd-noded
+    ```
+    and 
+    ```
+    systemctl status cheqd-noded
+    ```
+    to confirming that service was stopped.
 
 2. The new package version can be installed by calling:
-```
-dpkg -i <path/to/package>
-```
-Depending on how your system is configured, you may need `sudo` or administrator permissions to carry out the step above.
+    ```
+    dpkg -i <path/to/package>
+    ```
+    Depending on how your system is configured, you may need `sudo` or administrator permissions to carry out the step above.
 
 3. Start `cheqd-noded` service by calling:
-  ```
-  systemctl start cheqd-noded
-  ```
-  and confirm that the service is running:
-  ```
-  systemctl status cheqd-noded
-  ```
+    ```
+    systemctl start cheqd-noded
+    ```
+    and confirm that the service is running:
+    ```
+    systemctl status cheqd-noded
+    ```
 
 4. If the `cheqd-noded` service is running, the package upgrade has been successful. 
 
