@@ -26,6 +26,9 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+# VS Code
+.devcontainer
+
 # Application specific
 vue/node_modules
 vue/src/store/generated
