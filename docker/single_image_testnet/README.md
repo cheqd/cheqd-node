@@ -13,7 +13,7 @@ Debian based docker image with the `cheqd-nonded` executable inside preconfigure
 To build the image:
 
 - Go to the repository root
-- Run `docker build -f ci/docker_testnet/Dockerfile -t cheqd-testnet .`
+- Run `docker build -f docker/single_image_testnet/Dockerfile -t cheqd-testnet .`
 
 ## Running
 

@@ -33,7 +33,7 @@ FROM debian:buster
 
 COPY --from=builder /go/bin/cheqd-noded /bin
 
-COPY ci/docker/node-runner.sh /bin/node-runner
+COPY docker/cheqd_node/node-runner.sh /bin/node-runner
 RUN chmod +x /bin/node-runner
 
 RUN groupadd --gid 1000 cheqd && \
