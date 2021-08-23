@@ -45,6 +45,7 @@ The package upgrade/installation process is idempotent and it should not change 
 
 To check that your node is functioning correctly, it is recommended to attempt [querying the ledger](https://github.com/cheqd/cheqd-node/blob/main/docs/cosmos-cli.md) or [any of the other commands described in the cheqd Cosmos CLI guide](https://github.com/cheqd/cheqd-node/blob/main/docs/cosmos-cli.md).
 
+If you are running a validator node, check that it's [connected to the network](setting-up-a-new-node.md) (see check section) and [signs blocks](setting-up-a-new-validator.md) (see check section).
 
 ## Further information
 
