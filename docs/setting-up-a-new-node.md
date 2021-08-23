@@ -143,9 +143,9 @@ You can get the binary in several ways:
 
 ## Getting node info
 
-### Node id
+### Node ID
 
-Node id is a part of peer info. To get `node id` run the following command on the node's machine:
+Node ID is a part of peer info. To get `node id` run the following command on the node's machine:
 
 ```
 cheqd-noded tendermint show-node-id
