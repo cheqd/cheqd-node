@@ -5,12 +5,12 @@ cheqd is a purpose-built network for decentralised identity built using [Cosmos 
 ## Quick start for joining cheqd Testnet
 Getting started as a node operator on the cheqd network testnet requires the following steps:
 
-1. [Install the `cheqd-node` software](docs/setting-up-a-new-node.md) on hosting platform of your choice.
+1. [Install the `cheqd-node` software](docs/setting-up-a-new-node.md) connected to the existing [persistent peers](persistent_chains/testnet) on the testnet. Use hosting platform of your choice.
 2. When you have a node successfully installed, join the [cheqd Slack community](http://cheqd.link/join-cheqd-slack) so that you can acquire testnet tokens required for staking on the network. Please post the following details on the [**#testnet-node-operators**](https://cheqd-community.slack.com/archives/C029NSCSA75) channel:
    1. Node ID for your node
    2. IP address / DNS record that points to the node (if you're using an IP address, a static IP is recommended)
    3. Peer-to-peer (P2P) connection port (defaults to `26656`)
-3. [Configure your node as a new validator](docs/setting-up-a-new-validator.md) on the testnet connected to the existing [persistent peers](persistent_chains/testnet).
+3. [Configure your node as a new validator](docs/setting-up-a-new-validator.md).
 4. If successfully configured, your node would become the latest on the cheqd Testnet! 
 
 ## Usage
@@ -47,8 +47,8 @@ We provide packaged releases available for node installation, depending on the m
 
 ### Docker
 * We provide [pre-built Docker containers for `cheqd-node`](https://github.com/orgs/cheqd/packages?repo_name=cheqd-node) for those who wish to install local / testnet nodes using Docker.
-* You can [use a Docker node to connect to cheqd Testnet](docker/single_image_testnet/README.md) with a modified set of instructions.
-* You can also [build your own Docker container images for `cheqd-node`](docker/cheqd_node/README.md) and use Docker Compose to [set up a local network consisting of multiple Docker nodes](docker/docker_compose_localnet/README.md) for testing purposes.
+* You can [build your own Docker container images for `cheqd-node`](docker/cheqd_node/README.md) and use Docker Compose to [set up a local network consisting of multiple Docker nodes](docker/docker_compose_localnet/README.md) for testing purposes.
+* You can also [use this image to set up a local network consisting of multiple node processes in a single container](docker/single_image_testnet/README.md).
 
 ## Building from source
 `cheqd-node` is created with [Starport](https://github.com/tendermint/starport). If you want to build a node from source or contribute to the code, please read our guide to [building and testing](docs/building-and-testing.md).
