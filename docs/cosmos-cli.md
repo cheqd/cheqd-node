@@ -172,3 +172,76 @@ Example:
 ```
 cheqd-noded tx bank send alice cosmos10dl985c76zanc8n9z6c88qnl9t2hmhl5rcg0jq 10000stake --node http://localhost:26657 --chain-id cheqd ---fee 100000cheq
 ```
+
+## Managing node
+
+cheqd node has two keys:
+- Node key:
+  - Default location is `$NODE_HOME/config/node_key.json`
+  - Used for p2p communication
+- Validator key:
+  - Default location is `$NODE_HOME/config/priv_validator_key.json`
+  - Used to sign consensus messages
+
+__Running node__
+
+
+```
+cheqd-noded start
+```
+
+__Getting node address (node ID)__
+
+Node ID or node address is a part of peer info. It's calculated from node's `pubKey` as `hex(address(nodePubKey))`. To get `node id` run the following command on the node's machine:
+
+```
+cheqd-noded tendermint show-node-id
+```
+
+__Getting validator address__
+
+Validator address is a function of validator's public key. To get `bech32` encoded validator address run this command on node's machine:
+
+```
+cosmosvalcons1l43yqtdjcvyj65vnp29ly8u8yyau92q0ptzdp0
+```
+
+There are several ways to get hex encoded validator address:
+
+1. Convert from bech32
+
+    ```
+    cheqd-noded keys parse <bech-32-encoded-address>
+    ```
+
+2. Query node using CLI:
+
+    ```
+    cheqd-noded tendermint show-address --node <node-prc-url>
+    ```
+
+    Look for `"ValidatorInfo":{"Address":"..."}`.
+
+__Getting validator public key__
+
+Validator public key is used in `create-validator` transactions. To get `bech32` encoded validator public key, run the following command on the node's machine:
+
+```
+cheqd-noded tendermint show-validator
+```
+
+__Sharing peer information__
+
+Peer info is used to connect to peers when setting up a new node. It has the following format:
+
+```
+<node-id>@<node-url>
+```
+
+Example:
+
+```
+ba1689516f45be7f79c7450394144711e02e7341@3.13.19.41:26656
+```
+
+Using this information other participants will be able to join your node.

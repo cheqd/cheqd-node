@@ -128,6 +128,14 @@ This is the most preferable way to get `cheqd-node`. Detailed information about 
     systemctl enable cheqd-noded
     ```
 
+8. Check that the node is connected and catching up:
+
+    Use status command `cheqd-noded status --node <rpc-address>` or open status page in your browser `<rpc-address>/status`.
+
+    Make sure that `latest_block_height` is increasing over time.
+
+    Wait for `catching_up` to become `false`.
+
 ### Installing using binary
 
 You can get the binary in several ways:

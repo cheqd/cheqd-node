@@ -10,36 +10,55 @@ This document describes in detail how to join existing network as validator.
 
     Use corresponding `genesis.json` and `persistent peers list` form `persistent_chains` folder in the root of the repository.
 
-2. Create an account:
+2. Generate a user key:
 
-    - **Generate local keys for the future account:**
+    See [the instruction](cosmos-cli.md#managing-keys).
 
-        Command: `cheqd-noded keys add <key_name>`
+3. Get some tokens:
 
-        Example: `cheqd-noded keys add alice`
+    If you would like to participate `testnet`, join [cheqd Slack community](http://cheqd.link/join-cheqd-slack) and ask for tokens here.
 
-    - **Ask another member to transfer some tokens:**
+    Make sure that your balance is positive using [this reference](cosmos-cli.md#managing-account-balances).
 
-        Tokens are used to post transactions. It also used to create a stake for new nodes.
+4. Promote the node to the validator:
 
-        Another mmber will ask for the address of the new participant. Cosmos account address is a function of the public key.
-
-        Use this command to find out your adress and other key information: `cheqd-noded keys show <key_name>`
-
-3. Promote the node to the validator:
-
-    - **Post `create-validator` transaction to the network:**
+    Post `create-validator` transaction to the network:
     
-        ```
-        cheqd-noded tx staking create-validator --amount <amount-staking> --from <key-name> --chain-id <chain-id> --min-self-delegation <min-self-delegation> --gas <amount-gas> --gas-prices <price-gas> --pubkey <validator-pubkey> --commission-max-change-rate <commission-max-change-rate> --commission-max-rate <commission-max-rate> --commission-rate <commission-rate>
-        ```
+    ```
+    cheqd-noded tx staking create-validator --amount <amount-staking> --from <key-name> --chain-id <chain-id> --min-self-delegation <min-self-delegation> --gas <amount-gas> --gas-prices <price-gas> --pubkey <validator-pubkey> --commission-max-change-rate <commission-max-change-rate> --commission-max-rate <commission-max-rate> --commission-rate <commission-rate>
+    ```
 
-        `commission-max-change-rate`, `commission-max-rate` and `commission-rate` may take fraction number as `0.01`
+    Parameters:
+    - `amount` - amount of tokens to stake;
+    - `from` - key alias of account that will become node operator and will make initial stake;
+    - `min-self-delegation` - minimal amount of tokens that the node operator promises to keep bonded;
+    - `pubkey` - validator's public key. See [this reference](cosmos-cli.md#managing-node) on how to get it;
+    - `commission-rate` - validator's commission;
+    - `commission-max-rate` - maximum validator's commission. Can't be changed;
+    - `commission-max-change-rate` - maximum validator's commission change per day. Can't be changed;
+    - `chain-id` - chain id;
+    - `gas` - max gas;
+    - `gas-prices` - gas price;
 
-        Use this command to find out the `<validator-pubkey>`: `cheqd-noded tendermint show-validator`. This command **MUST** be run on the node's machine.
-        
-        Example:
-        
-        ```
-        cheqd-noded tx staking create-validator --amount 50000000stake --from steward1 --moniker steward1 --chain-id cheqdnode --min-self-delegation="1" --gas="auto" --gas-prices="1cheq" --pubkey cosmosvalconspub1zcjduepqpmyzmytdzjhf2fjwttjsrv49t62gdexm2yttpmgzh38p0rncqg8ssrxm2l --commission-max-change-rate="0.02" --commission-max-rate="0.02" --commission-rate="0.01"
-        ```
+    `commission-max-change-rate`, `commission-max-rate` and `commission-rate` may take fraction number as `0.01`
+
+    Example:
+    
+    ```
+    cheqd-noded tx staking create-validator --amount 50000000cheq --from steward1 --moniker steward1 --chain-id cheqdnode --min-self-delegation="1" --gas="auto" --gas-prices="1cheq" --pubkey cosmosvalconspub1zcjduepqpmyzmytdzjhf2fjwttjsrv49t62gdexm2yttpmgzh38p0rncqg8ssrxm2l --commission-max-change-rate="0.02" --commission-max-rate="0.02" --commission-rate="0.01"
+    ```
+
+5. Check that the validator is bonded and taking part in consensus:
+
+    Perform the following query:
+
+    ```
+    cheqd-noded query staking validators --node <any-rpc-url>
+    ```
+
+    Find your node by `moniker` and make sure that `status` is `BOND_STATUS_BONDED`.
+
+    Make sure that your node is signing blocks:
+    - Find out [hex encoded validator address](cosmos-cli.md#managing-node) of your node;
+    - Query the latest block. Open `<rpc-url>/block` in browser;
+    - Make sure that there is a signature with your validator address in the signature list.
