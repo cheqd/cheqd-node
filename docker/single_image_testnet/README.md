@@ -4,6 +4,18 @@
 
 Debian based docker image with the `cheqd-nonded` executable inside preconfigured to run a network of 2 nodes. Intended for use in CI pipelines.
 
+## Prebuilt package
+
+You can find prebuilt package here:
+
+https://github.com/cheqd/cheqd-node/pkgs/container/cheqd-testnet
+
+To pull it use:
+
+```
+docker pull ghcr.io/cheqd/cheqd-testnet:latest
+```
+
 ## Prerequisites
 
 - Build `cheqd-node` image first. See the [instruction](../cheqd_node/README.md).

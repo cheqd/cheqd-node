@@ -4,6 +4,18 @@
 
 Debian based docker image that contains the latest version of `cheqd-nonded` executable.
 
+## Prebuilt package
+
+You can find prebuilt package here:
+
+https://github.com/cheqd/cheqd-node/pkgs/container/cheqd-node
+
+To pull it use:
+
+```
+docker pull ghcr.io/cheqd/cheqd-node:latest
+```
+
 ## Building
 
 To build the image:
