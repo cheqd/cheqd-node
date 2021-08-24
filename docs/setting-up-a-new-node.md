@@ -143,6 +143,17 @@ You can get the binary in several ways:
 - Compile from source code - [instruction](../README.md);
 - Get `tar` archive with the binary compiled for Ubuntu 20.04 in [releases](https://github.com/cheqd/cheqd-node/releases);
 
+### Setting up `cheqd-noded` binary as a service
+
+It's highly recommended running node under the service, for example `systemd` system can be used for it. 
+Our debian package uses [postinst](https://github.com/cheqd/cheqd-node/blob/main/build_tools/postinst) script for setting up our binary as a service and it was designed for using outside deb package too. 
+For setting up your binary as a service on ubuntu just run (it requires root privileges):
+```
+# bash postinst <path/to/cheqd-noded/binary> 
+```
+and this script will add service file and prepare all needed directories for `configs/keys` and `data`.
+Please make sure, it assumes to create and use `cheqd` user for service and all the manipulations with `cheqd-noded` should be run under the `cheqd` user in the future.
+
 ### Other ways
 
 - Get docker image form [packages](https://github.com/cheqd/cheqd-node/pkgs/container/cheqd-node).
