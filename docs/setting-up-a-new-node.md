@@ -155,9 +155,7 @@ To set up the binary using `postint`, execute the following with sudo privileges
 ```
 # bash postinst <path/to/cheqd-noded/binary> 
 ```
-This will add a service file and prepare all needed directories for `configs/keys` and `data`.
-
-Also it creates and uses `cheqd` user for service and all the manipulations with `cheqd-noded` should be run under the `cheqd` user in the future.
+This will add a service file and prepare all needed directories for `configs/keys` and `data`. The script also creates a new service user called `cheqd`, to ensure that all processes and directorioes related to `cheqd-noded` are isolated under that service user.
 
 ### Other ways
 
