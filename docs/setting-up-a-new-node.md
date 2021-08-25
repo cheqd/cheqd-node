@@ -146,13 +146,15 @@ You can get the binary in several ways:
 ### Setting up `cheqd-noded` binary as a service
 
 It's highly recommended running node under the service, for example `systemd` system can be used for it. 
-Our debian package uses [postinst](https://github.com/cheqd/cheqd-node/blob/main/build_tools/postinst) script for setting up our binary as a service and it was designed for using outside deb package too. 
-For setting up your binary as a service on ubuntu just run (it requires root privileges):
+Our debian package uses [postinst](https://github.com/cheqd/cheqd-node/blob/main/build_tools/postinst) script for setting up our binary as a service and it was designed for using outside deb package too.
+There is only one input parameter for `postinst` script, it's a path to where binary is.
+As result, for setting up your binary as a service on ubuntu just run (it requires root privileges):
 ```
 # bash postinst <path/to/cheqd-noded/binary> 
 ```
-and this script will add service file and prepare all needed directories for `configs/keys` and `data`.
-Please make sure, it assumes to create and use `cheqd` user for service and all the manipulations with `cheqd-noded` should be run under the `cheqd` user in the future.
+and this script will add service file and prepare all needed directories for `configs/keys` and `data`. 
+Also it creates and uses `cheqd` user for service and all the manipulations with `cheqd-noded` should be run under the `cheqd` user in the future.
+
 
 ### Other ways
 
