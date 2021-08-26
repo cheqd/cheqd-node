@@ -35,7 +35,7 @@ We plan on adding new functionality rapidly and on a regular basis. We are also 
 
 ## Release artefacts
 Our instructions on [how to set up a new node](docs/setting-up-a-new-node.md) covers:
-1. Minimum system requirements and pre-requisities
+1. Minimum system requirements and pre-requisites
 2. Installation process using Debian (.deb) package, binary, and Docker
 3. Fetching basic node information after installation
 
