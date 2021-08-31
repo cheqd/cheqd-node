@@ -22,7 +22,3 @@
 * [persistent\_chains](persistent_chains/README.md)
   * [Testnet](persistent_chains/testnet.md)
 
-## Governance
-
-* [Untitled](governance/untitled.md)
-
