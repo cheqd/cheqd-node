@@ -14,10 +14,13 @@
   * [setting-up-a-new-network](docs/setting-up-a-new-network.md)
   * [cheqd Command Line Interface \(CLI\)](docs/cosmos-cli.md)
 * [cheqd Security Policy](security.md)
-* [NOTICE](notice.md)
 * [cheqd UI](vue.md)
 * [persistent\_chains](persistent_chains/README.md)
   * [Testnet](persistent_chains/testnet.md)
 
 ## Architecture
+
+## About the cheq-node project <a id="about"></a>
+
+* [Notice](about/notice.md)
 
