@@ -5,7 +5,7 @@
 Prerequisites:
 
 * Install [Go](https://golang.org/doc/install)
-* Install [Starport](https://docs.starport.network/intro/install.html)
+* Install [Starport](https://docs.starport.network/guide/install.html)
 
 To build the node executable run:
 
@@ -28,7 +28,7 @@ Use this [instruction](../docker/cheqd_node.md).
 Prerequisites:
 
 * Install [Go](https://golang.org/doc/install)
-* Install [Starport](https://docs.starport.network/intro/install.html)
+* Install [Starport](https://docs.starport.network/guide/install.html)
 
 Only the network of one node is supported. To run the network of one node:
 
