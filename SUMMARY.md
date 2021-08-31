@@ -1,6 +1,6 @@
 # Table of contents
 
-* [cheqd](README.md)
+* [cheqd: Node Documentation Home](README.md)
 * [docker](docker/README.md)
   * [cheqd-node docker image](docker/cheqd_node.md)
   * [cheqd-testsnet docker image](docker/single_image_testnet.md)
@@ -20,8 +20,4 @@
   * [Testnet](persistent_chains/testnet.md)
 
 ## Architecture
-
-* [Architecture Decision Records \(ADR\)](architecture/architecture/README.md)
-  * [ADR {ADR-NUMBER}: {TITLE}](architecture/architecture/adr-template.md)
-  * [ADR 001: payment mechanism for issuing credentials](architecture/architecture/adr_001_credential_issuing.md)
 

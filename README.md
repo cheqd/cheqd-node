@@ -1,4 +1,4 @@
-# cheqd
+# cheqd: Node Documentation Home
 
 cheqd is a purpose-built network for decentralised identity built using [Cosmos SDK](https://github.com/cosmos/cosmos-sdk) and [Tendermint](https://github.com/tendermint/tendermint).
 
