@@ -6,7 +6,7 @@ The set of scripts to generate configurations for a network of four nodes and ru
 
 ## Prerequisites
 
-* [Starport](https://docs.starport.network/intro/install.html) 
+* [Starport](https://docs.starport.network/guide/install.html) 
 * docker-compose
 
 ## How to run
