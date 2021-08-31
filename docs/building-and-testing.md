@@ -5,7 +5,7 @@
 Prerequisites:
 
 * Install [Go](https://golang.org/doc/install)
-* Install [Starport](https://docs.starport.network/intro/install.html)
+* Install [Starport](https://docs.starport.network/guide/install.html)
 
 To build the node executable run:
 
