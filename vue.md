@@ -6,22 +6,23 @@ The vue.js framework for building your user interface helps with rapid app devel
 
 ## Project setup
 
-```
+```text
 npm install
 ```
 
 ### Compiles and hot-reloads for development
 
-```
+```text
 npm run serve
 ```
 
 ### Compiles and minifies for production
 
-```
+```text
 npm run build
 ```
 
 ### Customize configuration
 
 See [Configuration Reference](https://cli.vuejs.org/config/).
+

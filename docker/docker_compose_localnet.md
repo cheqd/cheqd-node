@@ -6,28 +6,28 @@ The set of scripts to generate configurations for a network of four nodes and ru
 
 ## Prerequisites
 
-- [Starport](https://docs.starport.network/intro/install.html) 
-- docker-compose
+* [Starport](https://docs.starport.network/intro/install.html) 
+* docker-compose
 
 ## How to run
 
-1.  Build docker image:
+1. Build docker image:
 
-    See [the instruction](../cheqd_node/README.md).
+   See [the instruction](cheqd_node.md).
 
 2. Build cheqd-noded:
 
-    ```
+   ```text
     starport chain build
-    ```
+   ```
 
 3. Generate node configurations:
 
-    Run: `gen_node_configs.sh`.
+   Run: `gen_node_configs.sh`.
 
 4. Run docker-compose:
 
-    Run: `run_docker.sh`.
+   Run: `run_docker.sh`.
 
 ## Result
 
@@ -35,18 +35,18 @@ The set of scripts to generate configurations for a network of four nodes and ru
 
 This will setup 4 nodes listening on the following ports:
 
-- Node0:
-    - p2p: 26656
-    - rpc: 26657
-- Node1:
-    - p2p: 26659
-    - rpc: 26660
-- Node2:
-    - p2p: 26662
-    - rpc: 26663
-- Node3:
-    - p2p: 26665
-    - rpc: 26666
+* Node0:
+  * p2p: 26656
+  * rpc: 26657
+* Node1:
+  * p2p: 26659
+  * rpc: 26660
+* Node2:
+  * p2p: 26662
+  * rpc: 26663
+* Node3:
+  * p2p: 26665
+  * rpc: 26666
 
 You can tests connection to a node using browser: `http://localhost:<rpc_port>`. Example for the first node: `http://localhost:26657`.
 
@@ -54,13 +54,14 @@ You can tests connection to a node using browser: `http://localhost:<rpc_port>`.
 
 Also, there will be 4 keys generated and corresponding genesis accounts created for node operators:
 
-- operator0;
-- operator1;
-- operator2;
-- operator3;
+* operator0;
+* operator1;
+* operator2;
+* operator3;
 
-When connecting using CLI, point path to home directory: `--home node_configs/client`. 
+When connecting using CLI, point path to home directory: `--home node_configs/client`.
 
 ## CLI commands:
 
-See [the reference](../../docs/cosmos-cli.md) to learn about the most common CLI flows.
+See [the reference](../docs/cosmos-cli.md) to learn about the most common CLI flows.
+

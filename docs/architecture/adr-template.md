@@ -1,14 +1,14 @@
 # ADR {ADR-NUMBER}: {TITLE}
 
 ## Status
-{DRAFT | PROPOSED | ACCEPTED | REJECTED | SUPERSEEDED by ADR-xxx | ABANDONED} {Implemented | Not Implemented)
+
+{DRAFT \| PROPOSED \| ACCEPTED \| REJECTED \| SUPERSEEDED by ADR-xxx \| ABANDONED} {Implemented \| Not Implemented\)
 
 What is the status, such as proposed, accepted, rejected, deprecated, superseded, etc.?
 
 ## Summary
 
-> A short (~100 word) description of the issue being addressed.
-> "If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the ADR.
+> A short \(~100 word\) description of the issue being addressed. "If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the ADR.
 
 ## Context
 
@@ -40,4 +40,5 @@ What is the change that we're proposing and/or doing?
 
 ## References
 
-- {reference link}
+* {reference link}
+
