@@ -22,10 +22,12 @@
 
 * [Testnet](persistent_chains/testnet.md)
 
-## Architecture Decision Records \(ADRs\) <a id="architecture"></a>
+## Architecture
 
-* [ADR Process](architecture/README.md)
-* [ADR Template](architecture/adr-template.md)
+* [Architecture Decision Record \(ADR\) Process](architecture/architecture/README.md)
+  * [ADR {ADR-NUMBER}: {TITLE}](architecture/architecture/adr-template.md)
+* [ADR Table of Contents](architecture/adr-table-of-contents/README.md)
+  * [ADR 001: Payment mechanism for issuing credentials](architecture/adr-table-of-contents/adr-001-payment-mechanism-for-issuing-credentials.md)
 
 ## Contributor Guidelines <a id="contributing"></a>
 
