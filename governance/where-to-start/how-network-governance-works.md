@@ -1,2 +1,0 @@
-# How Network Governance works
-

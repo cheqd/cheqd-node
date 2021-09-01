@@ -1,2 +1,0 @@
-# Trust Assurance and Certification
-
