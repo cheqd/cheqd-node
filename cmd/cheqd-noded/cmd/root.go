@@ -37,7 +37,7 @@ import (
 	// this line is used by starport scaffolding # stargate/root/import
 )
 
-var ChainID string
+var ChainID = "cheqd"
 
 // NewRootCmd creates a new root command for simd. It is called once in the
 // main function.
