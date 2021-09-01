@@ -8,6 +8,14 @@ NODES_COUNT="4"
 CHAIN_ID="cheqd"
 NODE_CONFIGS_DIR="node_configs"
 
+# sed in macos requires extra argument
+sed_extension=''
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    sed_extension=''
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    sed_extension='.orig'
+fi
+
 rm -rf $NODE_CONFIGS_DIR
 mkdir $NODE_CONFIGS_DIR
 
@@ -36,16 +44,16 @@ do
 done
 
 
-echo "##### [Validator operators] Init genesis" 
+echo "##### [Validator operators] Init genesis and make cheq a default denom" 
 
 cheqd-noded init dummy_node --chain-id $CHAIN_ID --home $OPERATORS_HOME
-
+sed -i $sed_extension 's/"stake"/"cheq"/' $OPERATORS_HOME/config/genesis.json
 
 echo "##### [Validator operators] Add them to the genesis" 
 
 for ((i=0 ; i<$NODES_COUNT ; i++))
 do
-    cheqd-noded add-genesis-account "operator$i" 10000000cheq,100000000stake --home $OPERATORS_HOME
+    cheqd-noded add-genesis-account "operator$i" 20000000cheq --home $OPERATORS_HOME
 done
 
 
@@ -57,7 +65,7 @@ do
     NODE_ID=$(cheqd-noded tendermint show-node-id --home $NODE_HOME)
     NODE_VAL_PUBKEY=$(cheqd-noded tendermint show-validator --home $NODE_HOME)
 
-    cheqd-noded gentx "operator$i" 1000000stake --chain-id $CHAIN_ID --node-id $NODE_ID --pubkey $NODE_VAL_PUBKEY --home $OPERATORS_HOME
+    cheqd-noded gentx "operator$i" 1000000cheq --chain-id $CHAIN_ID --node-id $NODE_ID --pubkey $NODE_VAL_PUBKEY --home $OPERATORS_HOME
 done
 
 
@@ -74,4 +82,14 @@ do
     NODE_HOME="$NODE_CONFIGS_DIR/node$i"
 
     cp $OPERATORS_HOME/config/genesis.json $NODE_HOME/config/
+done
+
+
+echo "##### [Validator operators] Set minimum fee price"
+
+for ((i=0 ; i<$NODES_COUNT ; i++))
+do
+    NODE_HOME="$NODE_CONFIGS_DIR/node$i"
+
+    sed -i $sed_extension 's/minimum-gas-prices = ""/minimum-gas-prices = "0.00'$i'cheq"/g' $NODE_HOME/config/app.toml
 done
