@@ -24,7 +24,8 @@
 
 ## Architecture Decision Records \(ADRs\) <a id="architecture"></a>
 
-* [Untitled](architecture/untitled.md)
+* [adr_001_credential_issuing](architecture/adr_001_credential_issuing.md)
+* [adr_002_identity_transactions](architecture/adr_002_identity_transactions.md)
 
 ## Contributor Guidelines <a id="contributing"></a>
 
