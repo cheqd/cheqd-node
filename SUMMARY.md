@@ -18,9 +18,3 @@
 * [persistent\_chains](persistent_chains/README.md)
   * [Testnet](persistent_chains/testnet.md)
 
-## Architecture
-
-## About the cheq-node project <a id="about"></a>
-
-* [Notice](about/notice.md)
-
