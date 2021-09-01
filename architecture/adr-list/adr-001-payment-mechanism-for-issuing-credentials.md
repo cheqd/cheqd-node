@@ -1,4 +1,4 @@
-# ADR 001: payment mechanism for issuing credentials
+# ADR 001: Payment mechanism for issuing credentials
 
 ## Status
 

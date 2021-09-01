@@ -1,4 +1,4 @@
-# Architecture Decision Records \(ADR\)
+# Architecture Decision Record \(ADR\) Process
 
 This is a location to record all high-level architecture decisions in the **cheqd-node**, The server/node portion of purpose-built network for decentralised identity.
 
@@ -21,13 +21,5 @@ If recorded decisions turned out to be lacking, convene a discussion, record the
 
 ## Creating new ADR
 
-Use the [ADR template](adr-template.md) when creating a new ADR.
-
-## ADR Table of Contents
-
-### Accepted
-
-### Proposed
-
-### Draft
+Use the [ADR template](adr-list/adr-template.md) when creating a new ADR.
 
