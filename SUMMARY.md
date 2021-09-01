@@ -28,8 +28,6 @@
 
 ## Contributor Guidelines <a id="contributing"></a>
 
-* [Code of Conduct](contributing/code-of-conduct.md)
+* [Code of Conduct](contributing/code_of_conduct.md)
 * [Security Policy](contributing/security.md)
-* [Policies, Principles & Conduct](contributing/policies-principles-and-conduct/README.md)
-  * [cheqd Constitution](contributing/policies-principles-and-conduct/cheqd-constitution.md)
 
