@@ -12,15 +12,5 @@ description: >-
 
 {% page-ref page="adr-001-payment-mechanism-for-issuing-credentials.md" %}
 
-{% tabs %}
-{% tab title="Accepted" %}
-
-{% endtab %}
-
-{% tab title="Proposed" %}
-
-{% endtab %}
-{% endtabs %}
-
 ### Draft
 
