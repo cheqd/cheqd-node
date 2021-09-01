@@ -60,7 +60,7 @@ jobs:
 
   publish-release:
     name: "Publish release"
-    needs: setup-workflow
+    needs: [setup-workflow, publish-images]
     runs-on: "ubuntu-latest"
     env:
       GITHUB_REPOSITORY_NAME: ${{ needs.setup-workflow.outputs.GITHUB_REPOSITORY_NAME }}

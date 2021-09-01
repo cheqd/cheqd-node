@@ -4,35 +4,35 @@
 
 Prerequisites:
 
-- Install [Go](https://golang.org/doc/install)
-- Install [Starport](https://docs.starport.network/intro/install.html)
+* Install [Go](https://golang.org/doc/install)
+* Install [Starport](https://docs.starport.network/guide/install.html)
 
 To build the node executable run:
 
-```
+```text
 starport chain build
 ```
 
 To look up binary's location run:
 
-```
+```text
 which cheqd-noded
 ```
 
 ## Building node in docker
 
-Use this [instruction](../docker/cheqd_node/README.md).
+Use this [instruction](../docker/cheqd_node.md).
 
 ## Running local network using starport
 
 Prerequisites:
 
-- Install [Go](https://golang.org/doc/install)
-- Install [Starport](https://docs.starport.network/intro/install.html)
+* Install [Go](https://golang.org/doc/install)
+* Install [Starport](https://docs.starport.network/guide/install.html)
 
 Only the network of one node is supported. To run the network of one node:
 
-```
+```text
 starport serve
 ```
 
@@ -42,4 +42,5 @@ Your blockchain in development can be configured with `config.yml`. To learn mor
 
 ## Running local network using docker compose
 
-Use this [instruction](../docker/docker_compose_localnet/README.md).
+Use this [instruction](../docker/docker_compose_localnet.md).
+
