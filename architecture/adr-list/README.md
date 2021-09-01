@@ -4,7 +4,7 @@ description: >-
   in Draft stage.
 ---
 
-# ADR Table of Contents
+# List of ADRs
 
 ### Accepted
 

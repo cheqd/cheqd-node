@@ -25,9 +25,9 @@
 ## Architecture
 
 * [Architecture Decision Record \(ADR\) Process](architecture/readme.md)
-* [ADR Table of Contents](architecture/adr-table-of-contents/README.md)
-  * [ADR {ADR-NUMBER}: {TITLE}](architecture/adr-table-of-contents/adr-template.md)
-  * [ADR 001: Payment mechanism for issuing credentials](architecture/adr-table-of-contents/adr-001-payment-mechanism-for-issuing-credentials.md)
+* [List of ADRs](architecture/adr-list/README.md)
+  * [ADR {ADR-NUMBER}: {TITLE}](architecture/adr-list/adr-template.md)
+  * [ADR 001: Payment mechanism for issuing credentials](architecture/adr-list/adr-001-payment-mechanism-for-issuing-credentials.md)
 
 ## Contributor Guidelines <a id="contributing"></a>
 
