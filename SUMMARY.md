@@ -25,7 +25,7 @@
 ## Governance
 
 * [Primer on Governance](governance/primer-on-governance.md)
-* [Summary](governance/readme.md.md)
+* [Summary](governance/readme.md)
 * [Where to start](governance/where-to-start/README.md)
   * [Introduction to Governance](governance/where-to-start/introduction-to-governance.md)
   * [Community engagement](governance/where-to-start/community-engagement.md)
