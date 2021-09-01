@@ -24,7 +24,8 @@
 
 ## Architecture Decision Records \(ADRs\) <a id="architecture"></a>
 
-* [Untitled](architecture/untitled.md)
+* [ADR Process](architecture/README.md)
+* [ADR Template](architecture/adr-template.md)
 
 ## Contributor Guidelines <a id="contributing"></a>
 
