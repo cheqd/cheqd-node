@@ -1,4 +1,4 @@
-# cheqd Security Policy
+# Security Policy
 
 ## Reporting a Vulnerability
 

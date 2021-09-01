@@ -1,2 +1,2 @@
-# persistent\_chains
+# Network Details
 
