@@ -34,3 +34,14 @@
 * [Code of Conduct](contributing/code_of_conduct.md)
 * [Security Policy](contributing/security.md)
 
+## Governance
+
+* [Getting started with Governance](governance/readme/README.md)
+  * [Introduction to Governance](governance/readme/introduction-to-governance.md)
+  * [Introduction to cheqd](governance/readme/introduction-to-cheqd.md)
+* [Contributing](governance/contributing/README.md)
+  * [Community](governance/contributing/community.md)
+  * [Proposal Template](governance/contributing/proposal-template.md)
+* [Advanced concepts](governance/advanced-concepts.md)
+* [Terminology & Glossary](governance/terminology-and-glossary.md)
+
