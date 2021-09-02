@@ -113,5 +113,5 @@ After the discussion on Jul 1 we agreed on:
 
 ## References
 
-* {reference link}
+* None
 
