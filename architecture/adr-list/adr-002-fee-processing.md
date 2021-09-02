@@ -59,11 +59,7 @@ Gas and fees in Cosmos SDK and Tendermint:
   * Is extra fee that is unused returned?
     * No, all fee suggested by user is charged.
 
-How other notworks handle fees? Here are some links:
-
-* [https://github.com/cosmos/cosmos-sdk/issues/6555](https://github.com/cosmos/cosmos-sdk/issues/6555)
-* [https://github.com/cosmos/cosmos-sdk/issues/2150](https://github.com/cosmos/cosmos-sdk/issues/2150)
-* [https://github.com/cosmos/cosmos-sdk/issues/4938](https://github.com/cosmos/cosmos-sdk/issues/4938)
+## Decision
 
 Proposals:
 
@@ -75,33 +71,46 @@ Proposals:
   * Option 1: Set recommended gas price for the network, embed it into the applications
   * Option 2: Dynamically determine gas price based on recent transactions
     * Can be either implemented on client size or provided as a service
-  * Then use exponential growth if fee isn't enought
+  * Then use exponential growth if fee isn't enough
 
-## Decision
+Transaction sending algorithm for VDR tools library consumer:
 
-What is the change that we're proposing and/or doing?
+1. Build and sing a transaction
+2. Send gas estimation request
+3. Set initial gas price to a value:
+   1. Either proposed by community;
+   2. Or retrieved from recent transactions, median for example:
+      1. Can be retrieved on a clien side;
+      2. Or received from a public service.
+
+* Try to send the transaction
+  * Exponentially increase gas limit in case of gas limit failure
+  * Exponentially increase gas price in case of time out
 
 ## Consequences
 
-> This section describes the resulting context, after applying the decision. All consequences should be listed here, not just the "positive" ones. A particular decision may have positive, negative, and neutral consequences, but all of them affect the team and project in the future.
+* We use standard Cosmos mechanisms for fee estimation
+* Client side becomes pretty comlex
 
 ### Backwards Compatibility
 
-> All ADRs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The ADR must explain how the author proposes to deal with these incompatibilities. ADR submissions without a sufficient backwards compatibility treatise may be rejected outright.
+* This proposal is compatible with all recent versions of Cosmos
 
 ### Positive
 
-{positive consequences}
+* No
 
 ### Negative
 
-{negative consequences}
+* Client side logic cocmplicatin
 
 ### Neutral
 
-{neutral consequences}
+* No
 
 ## References
 
-* {reference link}
+* [https://github.com/cosmos/cosmos-sdk/issues/6555](https://github.com/cosmos/cosmos-sdk/issues/6555)
+* [https://github.com/cosmos/cosmos-sdk/issues/2150](https://github.com/cosmos/cosmos-sdk/issues/2150)
+* [https://github.com/cosmos/cosmos-sdk/issues/4938](https://github.com/cosmos/cosmos-sdk/issues/4938)
 
