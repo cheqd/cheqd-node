@@ -2,7 +2,7 @@
 
 ## Status
 
-DRAFT \| Not Implemented
+PROPOSED
 
 ## Summary
 
@@ -20,10 +20,13 @@ Gas and fees in Cosmos SDK and Tendermint:
     * Spam prevention.
 * Gas wanted:
   * What is it?
-    * The amount of gas that tx is allowed to use.
+    * The amount of gas that transaction is allowed to use.
     * Set by transaction sender
-  * How it can be predicted?
-    * **TODO:** simulations
+  * How can it be predicted?
+    * There is an estimation functionality in cosmos cli.
+    * It doesn't take into account reads and writes to state so it's inaccurate and can underestimate `gas_wanted`.
+  * Is it accessible via \`RPC\` call?
+    * Yes, we can query `app/simulate` endpoint
 * Gas used:
   * What is it?
     * The amount of gas used by a transaction.
@@ -47,7 +50,7 @@ Gas and fees in Cosmos SDK and Tendermint:
     * The transaction has chances to be committed within timeout.
     * It it depends on sum of voting powers of validators that are ready to commit it.
   * Can `gas_prices` be requested?
-    * **TODO:** most likely no
+    * There is no way to request gas prices.
 * Fee:
   * What is it?
     * The amount of tokens validator takes for a transaction processing.
@@ -56,13 +59,23 @@ Gas and fees in Cosmos SDK and Tendermint:
   * Is extra fee that is unused returned?
     * No, all fee suggested by user is charged.
 
-How other notworks handle fees? Here are some thoughts:
+How other notworks handle fees? Here are some links:
 
 * [https://github.com/cosmos/cosmos-sdk/issues/6555](https://github.com/cosmos/cosmos-sdk/issues/6555)
 * [https://github.com/cosmos/cosmos-sdk/issues/2150](https://github.com/cosmos/cosmos-sdk/issues/2150)
 * [https://github.com/cosmos/cosmos-sdk/issues/4938](https://github.com/cosmos/cosmos-sdk/issues/4938)
 
-> This section describes the forces at play, such as business, technological, social, and project local. These forces are probably in tension, and should be called out as such. The language in this section is value-neutral. It is simply describing facts. It should clearly explain the problem and motivation that the proposal aims to resolve.
+Proposals:
+
+* Gas estimation:
+  * Option 1: Implement gas estimation request in VDR tools and find out adjustment coefficient
+  * Option 2: Estimate gas for most common transactions in advance
+    * Can be used as a workaround while estimation request isn't implemented
+* Fee prices estimations:
+  * Option 1: Set recommended gas price for the network, embed it into the applications
+  * Option 2: Dynamically determine gas price based on recent transactions
+    * Can be either implemented on client size or provided as a service
+  * Then use exponential growth if fee isn't enought
 
 ## Decision
 
