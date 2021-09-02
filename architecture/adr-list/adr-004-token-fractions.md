@@ -2,17 +2,15 @@
 description: This is the suggested template to be used for ADRs on the cheqd-node project.
 ---
 
-# ADR {ADR-NUMBER}: {TITLE}
+# ADR 004: Token fractions
 
 ## Status
 
-{DRAFT \| PROPOSED \| ACCEPTED \| REJECTED \| SUPERSEEDED by ADR-xxx \| ABANDONED} {Implemented \| Not Implemented\)
-
-What is the status, such as proposed, accepted, rejected, deprecated, superseded, etc.?
+ACCEPTED \| Not Implemented
 
 ## Summary
 
-> A short \(~100 word\) description of the issue being addressed. "If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the ADR.
+The aim of this ADR is to define the smallest token fraction on cheqd network.
 
 ## Context
 
