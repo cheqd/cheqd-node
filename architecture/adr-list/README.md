@@ -6,12 +6,13 @@ description: >-
 
 # List of ADRs
 
-### Accepted
+## Accepted
 
-### Proposed
+## Proposed
 
 {% page-ref page="adr-001-payment-mechanism-for-issuing-credentials.md" %}
+
 {% page-ref page="adr-002-fee-processing.md" %}
 
-### Draft
+## Draft
 
