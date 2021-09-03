@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for considering contributing to cheqd!
+**Thank you for considering contributing to cheqd!**
 
 You can contribute to the documentation in the following ways:
 
