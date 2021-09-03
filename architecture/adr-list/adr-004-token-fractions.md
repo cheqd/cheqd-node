@@ -14,33 +14,38 @@ The aim of this ADR is to define the smallest token fraction on cheqd network.
 
 ## Context
 
-> This section describes the forces at play, such as business, technological, social, and project local. These forces are probably in tension, and should be called out as such. The language in this section is value-neutral. It is simply describing facts. It should clearly explain the problem and motivation that the proposal aims to resolve.
+Cosmos SDK doesn't provide native support for token fractions. The minimal amount you can operate in transactions is 1token. To address this issue networks assume that they use **N** digits after the decimal point and multiply all values by **10^\(-N\)** in UI.
+
+### Examples
+
+How many digits after the decimal point popular networks use:
+
+* Cosmos - **6**
+* IRIS - **6**
+* Fetch.ai - **18**
+* Binance - **8**
 
 ## Decision
 
-What is the change that we're proposing and/or doing?
+It was decided to go with 10^-9 as the smallest fraction and call it **ncheq** \(nano cheq\).
 
 ## Consequences
 
-> This section describes the resulting context, after applying the decision. All consequences should be listed here, not just the "positive" ones. A particular decision may have positive, negative, and neutral consequences, but all of them affect the team and project in the future.
+### Backward Compatibility
 
-### Backwards Compatibility
-
-> All ADRs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The ADR must explain how the author proposes to deal with these incompatibilities. ADR submissions without a sufficient backwards compatibility treatise may be rejected outright.
+There is no backward compatibility. To adjust the number of digits after the decimal point network should be restarted.
 
 ### Positive
 
-{positive consequences}
+* The value chosen is more precise than in the Cosmos chain so we have a reserve.
 
 ### Negative
 
-{negative consequences}
+* This decision is hard to change in the future.
 
 ### Neutral
 
-{neutral consequences}
-
 ## References
 
-* {reference link}
+* [Cosmos ADR proposal to add coin metadata](https://docs.cosmos.network/master/architecture/adr-024-coin-metadata.html)
 
