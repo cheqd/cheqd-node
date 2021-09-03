@@ -2,7 +2,7 @@
 
 ## Status
 
-PROPOSED
+PROPOSED \| Not Implemented
 
 ## Summary
 
