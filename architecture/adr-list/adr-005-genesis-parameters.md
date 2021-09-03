@@ -2,7 +2,7 @@
 description: This is the suggested template to be used for ADRs on the cheqd-node project.
 ---
 
-# ADR {ADR-NUMBER}: {TITLE}
+# ADR 005: Genesis parameters
 
 ## Status
 
