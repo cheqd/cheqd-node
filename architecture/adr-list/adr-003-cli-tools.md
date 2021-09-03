@@ -12,10 +12,10 @@ ACCEPTED \| Implemented
 
 Due to the nature of the verim product, there are two CLI tools for operating the network:
 
-* Cosmos CLI \(which comes with Cosmos, but doesn’t yet have any identity related modules\)
-* VDR CLI \(previously known as Indy CLI\): traditionally, this is the tool that node operators / stewards would have used 
+* Cosmos CLI \(which comes with Cosmos, but doesn’t yet have any identity-related modules\)
+* VDR CLI \(previously known as Indy CLI\): traditionally, this is the tool that node operators/stewards would have used 
 
-Now there are two different CLI tools with different feature sets available to operate with verim networks. Need to decide how CLI tools should look like for the end user.
+Now there are two different CLI tools with different feature sets available to operate with verim networks. Need to decide how CLI tools should look like for the end-user.
 
 ## Context
 
@@ -41,7 +41,7 @@ Now there are two different CLI tools with different feature sets available to o
 | :--- | :--- | :--- |
 | Cosmos Txs + Queries | Signing service + Key storage | verim Txs + Queries |
 | Multisig | \(Tx + Queries\) sending + Proof validation | DIDs + VCs \(+ DID storage\) |
-| Network bootstrapping commangs |  |  |
+| Network bootstrapping commands |  |  |
 
 ### Options
 
@@ -65,9 +65,9 @@ Pros:
 Options:
 
 * Option a: map Cosmos CLI commands as aliases to VDR CLI
-  * Better ux for those who is familiar with Indy
+  * Better UX for those who are familiar with Indy
 * Option b: map VDR CLI commands as aliases to Cosmos CLI
-  * Better ux for those who is familiar with Cosmos
+  * Better UX for those who are familiar with Cosmos
 
 #### 3.3. Actually move modules around between the two libraries
 
@@ -94,9 +94,7 @@ After the discussion on Jul 1 we agreed on:
 
 ## Consequences
 
-### Backwards Compatibility
-
-* None
+### Backward Compatibility
 
 ### Positive
 
@@ -109,9 +107,5 @@ After the discussion on Jul 1 we agreed on:
 
 ### Neutral
 
-* None
-
 ## References
-
-* None
 
