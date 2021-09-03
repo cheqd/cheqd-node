@@ -11,36 +11,6 @@
   </thead>
   <tbody>
     <tr>
-      <td style="text-align:left"><b>Accreditation</b>
-      </td>
-      <td style="text-align:left">The service an Auditor performs of verifying that a Trust Community Member
-        conforms to the requirements of a Governance Framework. Accreditation involves
-        performing an assessment against relied upon criteria for the benefit of
-        adding reasonable assurance that the assessed party is meeting those criteria.</td>
-    </tr>
-    <tr>
-      <td style="text-align:left"><b>Accreditation Credential</b>
-      </td>
-      <td style="text-align:left">A Credential issued by an Auditor Accreditor or Governance Authority asserting
-        that a Trust Community Member conforms to the Accreditation requirements
-        of a Governance Framework.</td>
-    </tr>
-    <tr>
-      <td style="text-align:left"><b>Accredited</b>
-      </td>
-      <td style="text-align:left">The status of an Entity having a valid Accreditation Credential from an
-        Auditor for a specific Governance Framework.</td>
-    </tr>
-    <tr>
-      <td style="text-align:left"><b>Active Thing</b>
-      </td>
-      <td style="text-align:left">A Man-Made Thing that has the capacity to operate its own Agent(s) that
-        can interact using the Agent-to-Agent Protocol. Examples include computing
-        devices, drones, robots, vehicles, satellites, active cat collars, etc.
-        Active Things still require Thing Controllers. Mutually exclusive with
-        Passive Thing.</td>
-    </tr>
-    <tr>
       <td style="text-align:left"><b>Agency</b>
       </td>
       <td style="text-align:left">A service provider that hosts Cloud Agents and may provision Edge Agents
