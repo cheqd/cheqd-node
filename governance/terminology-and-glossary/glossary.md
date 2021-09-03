@@ -327,7 +327,7 @@
       </td>
       <td style="text-align:left">As defined by the <a href="https://en.wikipedia.org/wiki/General_Data_Protection_Regulation">EU General Data Protection Regulation</a> (GDPR),
         any person whose Personal Data is being collected, held, or processed.
-        In the Sovrin Governance Framework, a Data Subject is referred to as an
+        In the cheqd Governance Framework, a Data Subject is referred to as an
         Individual.</td>
     </tr>
     <tr>
