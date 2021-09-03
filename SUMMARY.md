@@ -28,6 +28,7 @@
 * [List of ADRs](architecture/adr-list/README.md)
   * [ADR {ADR-NUMBER}: {TITLE}](architecture/adr-list/adr-template.md)
   * [ADR 001: Payment mechanism for issuing credentials](architecture/adr-list/adr-001-payment-mechanism-for-issuing-credentials.md)
+  * [ADR 005: Genesis parameters](architecture/adr-list/adr-005-genesis-parameters.md)
 
 ## Contributor Guidelines <a id="contributing"></a>
 
