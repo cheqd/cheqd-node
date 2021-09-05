@@ -6,13 +6,11 @@ description: This is the suggested template to be used for ADRs on the cheqd-nod
 
 ## Status
 
-{DRAFT \| PROPOSED \| ACCEPTED \| REJECTED \| SUPERSEEDED by ADR-xxx \| ABANDONED} {Implemented \| Not Implemented\)
-
-What is the status, such as proposed, accepted, rejected, deprecated, superseded, etc.?
+PROPOSED \| Not Implemented
 
 ## Summary
 
-> A short \(~100 word\) description of the issue being addressed. "If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the ADR.
+The aim of this docment is to define genesis parameters that will be used in testnets and the mainnet.
 
 ## Context
 
