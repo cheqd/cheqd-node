@@ -16,8 +16,6 @@ The aim of this ADR is to define how community tax will work on cheqd network.
 
 ### Community tax collection
 
-In Cosmos **v0.42**:
-
 * `communityTax` tax value is set in genesis and can be changed via proposals + voting
 * The tax is applied to fees collected in each block
 * Tokens charged accumulate in community pool
@@ -44,6 +42,8 @@ Use the same community tax as in Cosmos mainnet: `2%`.
 ## Consequences
 
 ### Backward Compatibility
+
+The behavior of community tax is the same for In Cosmos **v0.42** and **v0.43**.
 
 ### Positive
 
