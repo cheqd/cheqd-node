@@ -2,47 +2,56 @@
 description: This is the suggested template to be used for ADRs on the cheqd-node project.
 ---
 
-# ADR {ADR-NUMBER}: {TITLE}
+# ADR 006: Community tax
 
 ## Status
 
-{DRAFT \| PROPOSED \| ACCEPTED \| REJECTED \| SUPERSEEDED by ADR-xxx \| ABANDONED} {Implemented \| Not Implemented\)
-
-What is the status, such as proposed, accepted, rejected, deprecated, superseded, etc.?
+PROPOSAL \| Not Implemented
 
 ## Summary
 
-> A short \(~100 word\) description of the issue being addressed. "If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the ADR.
+The aim of this ADR is to define how community tax will work on cheqd network.
 
 ## Context
 
-> This section describes the forces at play, such as business, technological, social, and project local. These forces are probably in tension, and should be called out as such. The language in this section is value-neutral. It is simply describing facts. It should clearly explain the problem and motivation that the proposal aims to resolve.
+### Community tax collection
+
+In Cosmos **v0.42**:
+
+* `communityTax` tax value is set in genesis and can be changed via proposals + voting
+* The tax is applied to fees collected in each block
+* Tokens charged accumulate in community pool
+
+```text
+communityFunding = feesCollectedDec * communityTax
+feePool.CommunityFund += communityFunding
+```
+
+Here is more information about fees distribution [\[ref\]](https://docs.cosmos.network/v0.42/modules/distribution/03_end_block.html).
+
+### Community tax distribution
+
+To spend tokens from community pool:
+
+* `community-pool-spend` proposal should be submitted
+  * Recipient address and amount of tokens should be specified
+* If proposal is approved recipient will recieve tokens and will be able to spend them
 
 ## Decision
 
-What is the change that we're proposing and/or doing?
+Use the same community tax as in Cosmos mainnet: `2%`.
 
 ## Consequences
 
-> This section describes the resulting context, after applying the decision. All consequences should be listed here, not just the "positive" ones. A particular decision may have positive, negative, and neutral consequences, but all of them affect the team and project in the future.
-
-### Backwards Compatibility
-
-> All ADRs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The ADR must explain how the author proposes to deal with these incompatibilities. ADR submissions without a sufficient backwards compatibility treatise may be rejected outright.
+### Backward Compatibility
 
 ### Positive
 
-{positive consequences}
+* Community will receive tokens that can be spent on network support.
 
 ### Negative
 
-{negative consequences}
-
 ### Neutral
 
-{neutral consequences}
-
 ## References
-
-* {reference link}
 
