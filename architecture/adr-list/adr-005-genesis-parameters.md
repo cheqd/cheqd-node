@@ -62,58 +62,35 @@ Cosmos application is divided into modules. Each module has parameters that help
     * Enables send for specific denominations
   * default\_send\_enabled = `true`
     * The default send enabled value allows send transfers for all coin denominations
-* \[ibc\] capability
-  * ...
-* cheqd
-  * None
 * \(?\) crisis
   * ?
 * distribution
   * community\_tax = `0.02`
-    * The percent of rewards that goes to community fund pool
-  * "base\_proposer\_reward": "0.010000000000000000",
-  * "bonus\_proposer\_reward": "0.040000000000000000",
-  * \(?\) withdraw\_addr\_enabled = true
+    * The percent of rewards that goes to the community fund pool
+  * base\_proposer\_reward = `0.01`
+    * Base reward that proposer gets
+  * bonus\_proposer\_reward = `0.04`
+    * Bonus reward that proposer gets which depends on the number of precommits included to the block
+  * \(?\) withdraw\_addr\_enabled = `true`
 * \(?\) evidence
   * ?
 * genutil
   * Used to manage initalal transactions such as genesis validators creation
-* \(?\) gov
-  * "deposit\_params": {
-
-      "min\_deposit": \[
-
-        {
-
-          "denom": "stake",
-
-          "amount": "10000000"
-
-        }
-
-      \],
-
-      "max\_deposit\_period": "172800s"
-
-    },
-
-    "voting\_params": {
-
-      "voting\_period": "172800s"
-
-    },
-
-    "tally\_params": {
-
-      "quorum": "0.334000000000000000",
-
-      "threshold": "0.500000000000000000",
-
-      "veto\_threshold": "0.334000000000000000"
-
-    }
-* \[ibc\] ibc
-  * ...
+* gov
+  * deposit\_params
+    * min\_deposit = `[{ "denom": "stake", "amount": "10000000" }]`
+      * The minimum deposit for a proposal to enter the voting period.
+    * max\_deposit\_period = `172800s`
+      * Maximum period for Atom holders to deposit on a proposal. Initial value: 2 months.
+  * voting\_params
+    * voting\_period = `172800s`
+  * tally\_params
+    * quorum = `0.334`
+      * Minimum percentage of total stake needed to vote for a result to be considered valid. 
+    * threshold = `0.5`
+      * Minimum percentage of total stake needed to vote for a result to be considered valid.
+    * veto\_threshold = `0.334`
+      * Minimum value of Veto votes to Total votes ratio for proposal to be vetoed. Default value: 1/3.
 * mint
   * mint\_denom = `cheq`
   * inflation\_rate\_change = `0.13`
@@ -152,6 +129,10 @@ Cosmos application is divided into modules. Each module has parameters that help
     * Amount of unbound/redelegate entries to store
   * bond\_denom = `stake`
     * Denomination used in staking
+* \[ibc\] ibc
+  * ...
+* \[ibc\] capability
+  * ...
 * \[ibc\] transfer
   * send\_enabled = `false`
     * Enables or disables all cross-chain token transfers from this chain
@@ -161,10 +142,6 @@ Cosmos application is divided into modules. Each module has parameters that help
 ### Parameter adjustment
 
 All parameters can be changed via change proposals + voting.
-
-### Questions
-
-* Do we want IBC?
 
 ## Decision
 
