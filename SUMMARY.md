@@ -24,7 +24,7 @@
 
 ## Architecture
 
-* [Architecture Decision Record \(ADR\) Process](architecture/architecture-decision-record-adr-process.md)
+* [Architecture Decision Record \(ADR\) Process](architecture/readme.md)
 * [List of ADRs](architecture/adr-list/README.md)
   * [ADR {ADR-NUMBER}: {TITLE}](architecture/adr-list/adr-template.md)
   * [ADR 001: Payment mechanism for issuing credentials](architecture/adr-list/adr-001-payment-mechanism-for-issuing-credentials.md)

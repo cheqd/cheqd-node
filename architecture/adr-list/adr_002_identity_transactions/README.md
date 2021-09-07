@@ -2,7 +2,10 @@
 
 ## Status
 
-PROPOSED \| Not Implemented
+| Category | Status |
+| :--- | :--- |
+| **ADR Stage** | PROPOSED |
+| **Implementation Status** | Not Implemented |
 
 ## Summary
 
