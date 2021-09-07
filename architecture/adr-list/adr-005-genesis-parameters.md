@@ -64,7 +64,7 @@ Cosmos application is divided into modules. Each module has parameters that help
     * The default send enabled value allows send transfers for all coin denominations
 * crisis
   * constant\_fee = `{ "denom": "cheq", "amount": "1000" }`
-    * The fee used to verify the invariant in the crisis module. Rean more about invariants [here](https://docs.cosmos.network/v0.43/building-modules/invariants.html).
+    * The fee is used to verify the invariant in the crisis module. Rean more about invariants [here](https://docs.cosmos.network/v0.43/building-modules/invariants.html).
 * distribution
   * community\_tax = `0.02`
     * The percent of rewards that goes to the community fund pool
@@ -72,17 +72,18 @@ Cosmos application is divided into modules. Each module has parameters that help
     * Base reward that proposer gets
   * bonus\_proposer\_reward = `0.04`
     * Bonus reward that proposer gets which depends on the number of precommits included to the block
-  * \(?\) withdraw\_addr\_enabled = `true`
-* \(?\) evidence
-  * ?
+  * withdraw\_addr\_enabled = `true`
+    * Whether withdrawal address can be changed or not. By default, it's the delegator's address.
+* evidence
+  * No parameters
 * genutil
-  * Used to manage initalal transactions such as genesis validators creation
+  * Used to manage initial transactions such as genesis validators creation
 * gov
   * deposit\_params
     * min\_deposit = `[{ "denom": "stake", "amount": "10000000" }]`
       * The minimum deposit for a proposal to enter the voting period.
     * max\_deposit\_period = `172800s`
-      * Maximum period for Atom holders to deposit on a proposal. Initial value: 2 months.
+      * The maximum period for Atom holders to deposit on a proposal. Initial value: 2 months.
   * voting\_params
     * voting\_period = `172800s`
   * tally\_params
@@ -91,7 +92,7 @@ Cosmos application is divided into modules. Each module has parameters that help
     * threshold = `0.5`
       * Minimum percentage of total stake needed to vote for a result to be considered valid.
     * veto\_threshold = `0.334`
-      * Minimum value of Veto votes to Total votes ratio for proposal to be vetoed. Default value: 1/3.
+      * The minimum value of Veto votes to Total votes ratio for proposal to be vetoed. Default value: 1/3.
 * mint
   * mint\_denom = `cheq`
   * inflation\_rate\_change = `0.13`
@@ -146,29 +147,19 @@ All parameters can be changed via change proposals + voting.
 
 ## Decision
 
-What is the change that we're proposing and/or doing?
+Use parameters proposed in context.
 
 ## Consequences
 
-> This section describes the resulting context, after applying the decision. All consequences should be listed here, not just the "positive" ones. A particular decision may have positive, negative, and neutral consequences, but all of them affect the team and project in the future.
-
 ### Backward Compatibility
-
-> All ADRs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The ADR must explain how the author proposes to deal with these incompatibilities. ADR submissions without a sufficient backwards compatibility treatise may be rejected outright.
 
 ### Positive
 
-{positive consequences}
-
 ### Negative
 
-{negative consequences}
+* Voting needed to change parameters. It can potentially take a lot of time.
 
 ### Neutral
 
-{neutral consequences}
-
 ## References
-
-* {reference link}
 
