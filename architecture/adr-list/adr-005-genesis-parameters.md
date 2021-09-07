@@ -12,7 +12,7 @@ PROPOSED \| Not Implemented
 
 The aim of this document is to define genesis parameters that will be used in testnets and the mainnet.
 
-**NB: v0.42.5**
+> Cosmos v0.42.5 parameters are described.
 
 ## Context
 
@@ -27,14 +27,20 @@ Proposed values:
     * Cosmos hub: `200000` \(~200KB\)
   * max\_gas = `-1` \(no gas limit\)
     * Cosmos hub: `2000000`
-  * \(?\) time\_iota\_ms = `1000`
+  * time\_iota\_ms = `1000`
     * Cosmos hub: `1000`
-* \(?\) evidence
+    * **Deprecated, unused**
+* evidence
   * max\_age\_num\_blocks = `100000`
+    * Max age of evidence, in blocks. The basic formula for calculating this is: `MaxAgeDuration / {average block time}`.
   * max\_age\_duration = `172800000000000`
+    * Max age of evidence, in time. It should correspond with an app's "unbonding period".
   * max\_bytes = `1048576`
+    * This sets the maximum size of total evidence in bytes that can be committed in a single block and should fall comfortably under the max block bytes.
 * validator
   * pub\_key\_types = `[ "ed25519" ]`
+
+[Here](https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#genesis) you can find more about Tendermint genesis parameters.
 
 ### Application parameters
 
@@ -51,13 +57,14 @@ Cosmos application is divided into modules. Each module has parameters that help
     * Cost of `ed25519` signature verification
   * sig\_verify\_cost\_secp256k1 = `1000`
     * Cost of `secp256k1` signature verification
-* \(?\) bank
-  * "send\_enabled": \[\],
-
-    "default\_send\_enabled": true
-* \(?\) capability
-  * ?
-* \(?\) cheqd
+* bank
+  * send\_enabled = `[]`
+    * Enables send for specific denominations
+  * default\_send\_enabled = `true`
+    * The default send enabled value allows send transfers for all coin denominations
+* \[ibc\] capability
+  * ...
+* cheqd
   * None
 * \(?\) crisis
   * ?
@@ -69,8 +76,8 @@ Cosmos application is divided into modules. Each module has parameters that help
   * \(?\) withdraw\_addr\_enabled = true
 * \(?\) evidence
   * ?
-* \(?\) genutil
-  * None
+* genutil
+  * Used to manage initalal transactions such as genesis validators creation
 * \(?\) gov
   * "deposit\_params": {
 
@@ -105,8 +112,8 @@ Cosmos application is divided into modules. Each module has parameters that help
       "veto\_threshold": "0.334000000000000000"
 
     }
-* \(?\) ibc
-  * ?
+* \[ibc\] ibc
+  * ...
 * mint
   * mint\_denom = `cheq`
   * inflation\_rate\_change = `0.13`
@@ -145,14 +152,19 @@ Cosmos application is divided into modules. Each module has parameters that help
     * Amount of unbound/redelegate entries to store
   * bond\_denom = `stake`
     * Denomination used in staking
-* \(?\) transfer
-  * "send\_enabled": true,
-
-    "receive\_enabled": true
+* \[ibc\] transfer
+  * send\_enabled = `false`
+    * Enables or disables all cross-chain token transfers from this chain
+  * receive\_enabled = `false`
+    * Enables or disables all cross-chain token transfers to this chain
 
 ### Parameter adjustment
 
 All parameters can be changed via change proposals + voting.
+
+### Questions
+
+* Do we want IBC?
 
 ## Decision
 
