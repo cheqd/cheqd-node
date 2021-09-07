@@ -2,7 +2,7 @@
 description: This is the suggested template to be used for ADRs on the cheqd-node project.
 ---
 
-# ADR 003: CLI tools
+# ADR 003: Command Line Interface \(CLI\) tools
 
 ## Status
 
@@ -10,7 +10,7 @@ ACCEPTED \| Implemented
 
 ## Summary
 
-Due to the nature of the verim product, there are two CLI tools for operating the network:
+Due to the nature of the cheqd network and product, there are two potential avenues for created Command Line Interface \(CLI\) tools for developers to use:
 
 * Cosmos CLI \(which comes with Cosmos, but doesn’t yet have any identity-related modules\)
 * VDR CLI \(previously known as Indy CLI\): traditionally, this is the tool that node operators/stewards would have used 

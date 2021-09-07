@@ -28,7 +28,7 @@
 * [List of ADRs](architecture/adr-list/README.md)
   * [ADR {ADR-NUMBER}: {TITLE}](architecture/adr-list/adr-template.md)
   * [ADR 001: Payment mechanism for issuing credentials](architecture/adr-list/adr-001-payment-mechanism-for-issuing-credentials.md)
-  * [ADR 003: CLI tools](architecture/adr-list/adr-003-cli-tools.md)
+  * [ADR 003: Command Line Interface \(CLI\) tools](architecture/adr-list/adr-003-cli-tools.md)
 
 ## Contributor Guidelines <a id="contributing"></a>
 
