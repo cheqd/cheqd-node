@@ -90,13 +90,11 @@ This is the most preferable way to get `cheqd-node`. Detailed information about 
 
 5. Set genesis:
 
-   Genesis files for public networks are published in [this directory](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains).
-   Download `genesis.json` using wget https://github.com/cheqd/cheqd-node/blob/main/persistent_chains/testnet/genesis.json to: `/etc/cheqd-node/`
+   Genesis files for public networks are published in [this directory](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains). Download `genesis.json` using wget [https://github.com/cheqd/cheqd-node/blob/main/persistent\_chains/testnet/genesis.json](https://github.com/cheqd/cheqd-node/blob/main/persistent_chains/testnet/genesis.json) to: `/etc/cheqd-node/`
 
 6. Set persistent peers:
 
-   Persistent nodes addresses for public networks are also published in [this directory](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains).
-   Copy the persistent_peers from the `persistent_peers.txt` and use it in the steps below.
+   Persistent nodes addresses for public networks are also published in [this directory](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains). Copy the persistent\_peers from the `persistent_peers.txt` and use it in the steps below.
 
    Open node's config file: `/etc/cheqd-node/config.toml`
 
@@ -127,6 +125,7 @@ This is the most preferable way to get `cheqd-node`. Detailed information about 
    ```text
     systemctl enable cheqd-noded
    ```
+
    ```text
     systemctl start cheqd-noded
    ```
