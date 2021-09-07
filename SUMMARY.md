@@ -11,6 +11,7 @@
 * [Building and testing](docs/building-and-testing.md)
 * [setting-up-a-new-network](docs/setting-up-a-new-network.md)
 * [cheqd Command Line Interface \(CLI\)](docs/cosmos-cli.md)
+* [Identity API](docs/identity-api.md)
 
 ## Docker packages <a id="docker"></a>
 
@@ -24,11 +25,11 @@
 
 ## Architecture
 
-* [Architecture Decision Record \(ADR\) Process](architecture/architecture.md)
+* [Architecture Decision Record \(ADR\) Process](architecture/architecture-decision-record-adr-process.md)
 * [List of ADRs](architecture/adr-list/README.md)
   * [ADR {ADR-NUMBER}: {TITLE}](architecture/adr-list/adr-template.md)
   * [ADR 001: Payment mechanism for issuing credentials](architecture/adr-list/adr-001-payment-mechanism-for-issuing-credentials.md)
-  * [ADR 003: CLI tools](architecture/adr-list/adr-003-cli-tools.md)
+  * [ADR 002: Identity entities and transactions](architecture/adr-list/adr_002_identity_transactions.md)
 
 ## Contributor Guidelines <a id="contributing"></a>
 
