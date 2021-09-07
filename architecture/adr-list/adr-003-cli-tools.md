@@ -6,106 +6,120 @@ description: This is the suggested template to be used for ADRs on the cheqd-nod
 
 ## Status
 
-ACCEPTED \| Implemented
+| Category | Status |
+| :--- | :--- |
+| **ADR Stage** | ACCEPTED |
+| **Implementation Status** | Implemented |
 
 ## Summary
 
-Due to the nature of the cheqd network and product, there are two potential avenues for created Command Line Interface \(CLI\) tools for developers to use:
+Due to the nature of the cheqd project merging concepts from the [Cosmos blockchain framework](https://github.com/cosmos/cosmos-sdk) and self-sovereign identity \(SSI\), there are two potential options for creating Command Line Interface \(CLI\) tools for developers to use:
 
-* Cosmos CLI \(which comes with Cosmos, but doesn’t yet have any identity-related modules\)
-* VDR CLI \(previously known as Indy CLI\): traditionally, this is the tool that node operators/stewards would have used 
+1. **Cosmos-based CLI:** Most likely route for Cosmos projects for their node application. Most existing Cosmos node validators will be familiar with this method of managing their node. 
+2. **VDR CLI**: Traditionally, a lot of SSI networks have used [Hyperledger Indy](https://github.com/hyperledger/indy-node) and therefore the Indy CLI tool for managing and interacting with the ledger. This has now been renamed to [Verifiable Data Registry \(VDR\) Tools CLI](https://gitlab.com/evernym/verity/vdr-tools) and is the tool that most existing SSI node operators \("stewards"\) would be familiar with.
 
-Now there are two different CLI tools with different feature sets available to operate with verim networks. Need to decide how CLI tools should look like for the end-user.
+Ideally, the `cheqd-node` project would provide a consistent set of CLI tools rather than two separate tools with varying feature sets between them.
+
+This ADR will focus on the CLI tool architecture choice for `cheqd-node`.
 
 ## Context
 
 ### Assumptions / Considerations
 
-1. Anything that is done by verim or Evernym should NOT increase the likelihood of introducing potential bugs or security vulnerabilities in Cosmos CLI. This is a must-have requirement.
-   1. Cosmos CLI is battle-tested and reviewed by the wider Cosmos open source community.
-   2. Cosmos features/functions are also what directly relate to the most financially-sensitive part of the verim product stack. E.g., losing control of a DID is bad, but recoverable. Losing control of tokens or stake can have massive financial impact or loss.
-2. Would node operators want a single CLI to manage everything?
-   1. This might be the case with node operators from an SSI / digital identity background, or node operators coming from Hyperledger Indy
-   2. A “single CLI” could be a single tool as far as the user sees, but actually consist of multiple modules beneath it in how it’s implemented
-3. Or, would node operators be okay with having two separate CLIs: one for Cosmos-related functions, and one for verim/identity specific functions.
-   1. Unlike Sovrin/Hyperledger Indy, many of the node operators on the verim network will be existing native Cosmos validators. For this group, having to learn a new “single” CLI tool is a worse user experience than what they have now.
-   2. It might be acceptable for node operators to have two separate CLIs for security reasons too, i.e., for a separation of concerns in terms of functionality.
+#### **Likelihood of introducing bugs or security vulnerabilities**
 
-### Current architecture overview
+1. Any CLI tool architecture chosen should not increase the likelihood of introducing bugs, security vulnerabilities, or design pattern deviations from upstream Cosmos SDK.
+2. Actions that are carried out on ledger through a CLI tool in `cheqd-node` now include token functionality as well as identity functionality. E.g., if a DID gets compromised, there could be mechanisms to recover or signal that fact to issuers/verifiers. If tokens or the staking balance of node operators get compromised, this may potentially have more severe consequences for them.
+
+#### User / Node Operator preferences
+
+1. Would node operators want a single CLI to manage everything?
+   1. This might be the case with node operators from an SSI / digital identity background, or node operators familiar with Hyperledger Indy CLI / VDR Tools CLI.
+   2. A “single CLI” could be a single tool as far as the user sees, but actually consist of multiple modules beneath it in how it’s implemented.
+2. Would node operators be okay with having two separate CLIs?
+   1. One for Cosmos-ledger functions, and one for identity-specific functions.
+   2. Unlike existing Hyperledger Indy networks, it is anticipated that some of the node operators on the cheqd network will have experience running Cosmos validator nodes. For this group, having to learn a new “single” CLI tool could cause a steeper learning curve and a worse user experience than what they have now.
+   3. Node operators may want one/separate CLIs for security and operational reasons, i.e., for a separation of concerns in terms of functionality.
+
+### Existing CLI architecture overview
+
+Currently, there are two separate CLI tools being used by the development team to interact with the ledger: Cosmos-based CLI and VDR CLI.
 
 ![Current Cosmos CLI and VDR tools CLI architecture](https://lh3.googleusercontent.com/cMdfEe19vqDVaRJ0kP97KGCUHauEpnh2TV1OhmvGqOFqqIkhWXGkdKxONDLjW2rnU83k9yelFWK_jhsqQoF57tNf8ChrPeIZsiLys3LKVT_QKG9Gk7Mir4ChbCeiUKs2V7l7jE8d=s0)
 
-### Features overview
+### Existing CLI tools feature matrix
 
-| Cosmos only | Need to decide whether on Cosmos CLI or VDR CLI | VDR CLI only |
+| Only available in Cosmos CLI | Decision needed whether these are in Cosmos CLI or VDR CLI | Only available in VDR CLI |
 | :--- | :--- | :--- |
-| Cosmos Txs + Queries | Signing service + Key storage | verim Txs + Queries |
-| Multisig | \(Tx + Queries\) sending + Proof validation | DIDs + VCs \(+ DID storage\) |
+| Cosmos transactions + Queries | Signing service + Key storage | Identity transactions + Queries |
+| MultiSig | \(Transaction + Query\) sending + Proof validation | DIDs + VCs \(+ DID storage\) |
 | Network bootstrapping commands |  |  |
 
-### Options
+### Options considered
 
-#### 1. Keep two separate CLIs for different purposes
+#### 1. Keep both Cosmos CLI and VDR Tools CLI, but use them for different purposes.
 
-Pros:
+**Pros:**
 
-* Simple to do, no changes needed - explain the difference between them in documentation
-* Might be acceptable enough to dev audience
+* Simple to do, no changes needed in code developed.
+* Differences in functionality between the two CLIs can be explained in documentation.
+* Node operators with good technical skills will understand the difference.
+* Cosmos CLI design patterns would be consistent the wider Cosmos open source ecosystem.
+* No steep learning curve for potential node operators who only want to run a node, without implementing SSI functionality in apps.
 
-Cons:
+**Cons:**
 
-* Two key storages for cosmos accounts
+* Key storage for Cosmos accounts may need to be done in two different keystores.
+* Potentially confusing for node operators who use both CLIs to know which one to use for what purpose.
+* Potentially a steeper learning curve for existing SSI node operators.
 
-#### 3.2. Just create aliases in one direction
+#### 2. Implement overlapping functionality in both CLI tools
 
-Pros:
+**Pros:**
 
-* Single tool
+* Both Cosmos CLI and VDR Tools CLI would have native support for identity as well as token transactions.
+* Node operators/developers could pick their preferred CLI tool.
 
-Options:
+**Cons:**
 
-* Option a: map Cosmos CLI commands as aliases to VDR CLI
-  * Better UX for those who are familiar with Indy
-* Option b: map VDR CLI commands as aliases to Cosmos CLI
-  * Better UX for those who are familiar with Cosmos
+* Significant development effort required to implement very similar functionality two separate times, with little difference to the end user in actions that can be executed.
+* VDR Tools CLI has DID / VC modules that would take significant effort to recreate in Cosmos CLI
+* Cosmos CLI has token related functionality that would take significant development effort to replicate in VDR Tools CLI, and opens up the possibility that errors in implementation could introduce security vulnerabilities.
 
-#### 3.3. Actually move modules around between the two libraries
+#### 3. Create aliases for commands in one of the CLI tools in the other CLI tool
 
-Cons:
+_Commands in the Cosmos CLI could be made available as aliases in the VDR Tools CLI, or vice versa._
 
-* Potentially big effort
+**Pros:**
 
-Considerations:
+* Single CLI tool to learn and understand for node operators.
+* Development effort is simplified, as overlapping functionality is not implemented in two separate tools.
 
-* VDR has DID / VC modules that are highly unlikely to be moved to Cosmos CLI
-* If we try to move verim/VDR modules to Cosmos CLI, it is very likely that this will be our own standalone fork and won’t actually be integrated into the main Cosmos CLI release as this is functionality/project specific code. This effectively means we end up with a fork of Cosmos CLI, deviating from mainline branch, that we have to patch and maintain.
-* If we try to make Cosmos functions easier to use in VDR, we have the possibility that a bug or vulnerability in VDR CLI somehow results in an action that makes tokens/stake vulnerable.
-* Similarly, if we try to put in VDR functions in Cosmos CLI, we’re introducing an element of deviation from the mainline Cosmos CLI release. We may therefore accidentally end up introducing a security vulnerability in our modified version of Cosmos CLI \(with verim/VDR functionality\) that results in tokens/stake being lost.
+**Cons:**
+
+* Less development effort required than Option 2, but greater than Option 1.
+* Opens up the possibility that there's deviation in feature coverage between the two CLIs if aliases are not created to make 1:1 feature parity in both tools.
 
 ## Decision
 
-After the discussion on Jul 1 we agreed on:
+Based on the options considerations above and an analysis of development required, the decision was taken to maintain two separate CLI tools:
 
-* Keep 2 separate CLI tools for different purposes:
-  * VC/DID stuff management
-  * Cosmos network management
-* Get feedback after net launch and decide how to improve UX
-  * Possible direction - use single keyring back-end for CLIs
+1. **`cheqd-node` Cosmos CLI**: Any Cosmos-specific features, such as network & node management, token functionality required by node operators, etc.
+2. **VDR Tools CLI**: Any identity-specific features required by issuers, verifiers, holders on SSI networks.
 
 ## Consequences
 
-### Backward Compatibility
-
 ### Positive
 
-* Simple to do, no changes needed - explain the difference between them in documentation
-* Might be acceptable enough to dev audience
+* Faster time-to-market on the CLI tools, while freeing up time to build out user-facing functionality.
 
 ### Negative
 
-* Two key storages for cosmos accounts
+* Cosmos account keys may need to be replicated in two separate key storages. A potential resolution for this in the future is to integrate the ability to use a single keyring for both CLI tools.
 
 ### Neutral
+
+* Seek feedback from cheqd's open source community and node operators during testnet phase on whether the documentation and user experience is easy to understand and appropriate tools are available.
 
 ## References
 
