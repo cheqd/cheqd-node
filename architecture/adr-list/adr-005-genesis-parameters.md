@@ -62,8 +62,9 @@ Cosmos application is divided into modules. Each module has parameters that help
     * Enables send for specific denominations
   * default\_send\_enabled = `true`
     * The default send enabled value allows send transfers for all coin denominations
-* \(?\) crisis
-  * ?
+* crisis
+  * constant\_fee = `{ "denom": "cheq", "amount": "1000" }`
+    * The fee used to verify the invariant in the crisis module. Rean more about invariants [here](https://docs.cosmos.network/v0.43/building-modules/invariants.html).
 * distribution
   * community\_tax = `0.02`
     * The percent of rewards that goes to the community fund pool
