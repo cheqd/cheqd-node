@@ -8,9 +8,10 @@ description: >-
 
 ## Accepted
 
-## Proposed
+1. [ADR 001: **Payment mechanism for issuing credentials**](adr-001-payment-mechanism-for-issuing-credentials.md)\*\*\*\*
+2. [ADR 003: **Command Line Interface \(CLI\) tools**](adr-003-cli-tools.md)\*\*\*\*
 
-{% page-ref page="adr-001-payment-mechanism-for-issuing-credentials.md" %}
+## Proposed
 
 ## Draft
 
