@@ -13,8 +13,8 @@ description: >-
 
 ## Proposed
 
-1. [ADR 007: **Fees on cheqd network**](adr-007-fees-on-cheqd-network.md)\*\*\*\*
-2. [ADR 006: **Community tax**](adr-006-community-tax.md)
+1. [ADR 006: **Community tax**](adr-006-community-tax.md)
+2. [ADR 007: **Fees on cheqd network**](adr-007-estimating-transaction-fees.md)\*\*\*\*
 
 ## Draft
 
