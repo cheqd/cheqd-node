@@ -96,7 +96,7 @@ This is the most preferable way to get `cheqd-node`. Detailed information about 
    
    ```
    cd /etc/cheqd-node/
-   wget -O genesis.json https://github.com/cheqd/cheqd-node/blob/main/persistent_chains/testnet/genesis.json
+   wget -O genesis.json https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/testnet/genesis.json
    ```
 
 6. Set persistent peers:
