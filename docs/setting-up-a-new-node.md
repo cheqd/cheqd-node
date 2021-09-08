@@ -72,7 +72,7 @@ This is the most preferable way to get `cheqd-node`. Detailed information about 
 
    Command: `sudo dpkg -i <package_file>.deb`
 
-   Example: `sudo dpkg -i cheqd-node_0.1.13_amd64.deb`
+   Example: `sudo dpkg -i cheqd-node_0.1.20_amd64.deb`
 
 3. Switch to `cheqd` system user:
 
