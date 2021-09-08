@@ -10,7 +10,7 @@ description: >-
 
 ## Proposed
 
-{% page-ref page="adr-001-payment-mechanism-for-issuing-credentials.md" %}
+1. [ADR 002: **Identity entities and transactions**](adr_002_identity_transactions.md)\*\*\*\*
 
 ## Draft
 
