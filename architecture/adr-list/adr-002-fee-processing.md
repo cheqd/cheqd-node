@@ -64,9 +64,8 @@ Gas and fees in Cosmos SDK and Tendermint:
 Proposals:
 
 * Gas estimation:
-  * Option 1: Implement gas estimation request in VDR tools and find out adjustment coefficient
-  * Option 2: Estimate gas for most common transactions in advance
-    * Can be used as a workaround while estimation request isn't implemented
+  * Request gas esctimation from node
+  * Multiply response by `safety coefficient`
 * Fee prices estimations:
   * Option 1: Set recommended gas price for the network, embed it into the applications
   * Option 2: Dynamically determine the gas price based on recent transactions
@@ -77,15 +76,10 @@ Transaction sending algorithm for VDR tools library consumer:
 
 1. Build and sign a transaction
 2. Send gas estimation request
-3. Set initial gas price to a value:
-   1. Either proposed by the community;
-   2. Or retrieved from recent transactions, median for example:
-      1. Can be retrieved on a client-side;
-      2. Or received from public service.
-
-* Try to send the transaction
-  * Exponentially increase the gas limit in case of gas limit failure
-  * Exponentially increase gas price in case of time out
+3. Set initial gas price to a value: 1. Either proposed by the community; 2. Or retrieved from recent transactions, median for example: 1. Can be retrieved on a client-side; 2. Or received from public service.
+4. Try to send the transaction
+   * Exponentially increase the gas limit in case of gas limit failure
+   * Exponentially increase gas price in case of time out
 
 ## Consequences
 
