@@ -1,20 +1,25 @@
-# ADR 001: Payment mechanism for issuing credentials
+# ADR 001: Payment mechanism for credential issuance
 
 ## Status
 
-PROPOSED
+| Category | Status |
+| :--- | :--- |
+| **ADR Stage** | ACCEPTED |
+| **Implementation Status** | Not Implemented |
 
 ## Summary
 
-The Aries protocol describes the payment mechanism for issuing credentials. It is necessary to establish which public API cheqd-node can provide for implementation of payments for issuing through cheqd coins transfer for Connect.me.
+The [Hyperledger Aries](https://github.com/hyperledger/aries) protocol describes a payment mechanism that can used to pay for the issuance of credentials.
+
+It is necessary to establish which public APIs from Hyperledger Aries can be implemented in `cheqd-node` to provide an implementation of payments using CHEQ tokens using a well-understood SSI protocol.
 
 ## Decision
 
-According to Aries protocol we can use payment decorators `~payment_request` and `~payment_receipt` credential issuing.
+Hyperledger Aries protocol has the concept of payment "decorators" `~payment_request` and `~payment_receipt` in requests, that can be used to pay using tokens for credential issuance.
 
 ### Step 1: Credential Offer
 
-A message sent by the Issuer to the potential Holder, describing the credential they intend to offer and possibly the price they expect to be paid. [Aries Credential Offer](https://github.com/hyperledger/aries-rfcs/blob/main/features/0036-issue-credential/README.md#offer-credential)
+A message is sent by the Issuer to the potential Holder, describing the credential they intend to offer and optionally, the price the issuer would be expected to be paid for said credential. This is based on the [Hyperledger Aries credential offer RFC](https://github.com/hyperledger/aries-rfcs/blob/main/features/0036-issue-credential/README.md#offer-credential).
 
 ```text
     "@type": "https://didcomm.org/issue-credential/1.0/offer-credential",
@@ -34,7 +39,7 @@ A message sent by the Issuer to the potential Holder, describing the credential 
 }
 ```
 
-And use a payment decorator to add information about an issuing price and address for sending payment transaction. [Aries payment\_request decorator](https://github.com/hyperledger/aries-rfcs/blob/main/features/0075-payment-decorators/README.md#payment_request)
+A payment request can then be defined using the [Hyperledger Aries Payment Decorator](https://github.com/hyperledger/aries-rfcs/blob/main/features/0075-payment-decorators/README.md#payment_request) to add information about an issuing price and address where payment should be sent.
 
 ```text
    "~payment_request": {
@@ -62,62 +67,61 @@ And use a payment decorator to add information about an issuing price and addres
       }
 ```
 
-* `details.id` field contains an invoice number that unambiguously identifies a credential for which payment is requested. When paying, this value should be placed in `memo` field for Cheqd payment transaction.
-* `payeeId` field contains a Cheqd account address in the cosmos format.
+* **`details.id`** field contains an invoice number that unambiguously identifies a credential for which payment is requested. When paying, this value should be placed in `memo` field for the cheqd payment transaction.
+* **`payeeId`** field contains a cheqd account address in the correct format for cheqd network.
 
-### Step 2: Payment transaction
+### Step 2: Payment transaction flow
 
-This operation has 5 steps:
+The payment flow can be broken down into five steps:
 
-* _Step 2.1._ Build a request for transferring coins. Example: `cheqd_ledger::bank::build_msg_send(from_account, to_account, amount_for_transfer, denom)`.
-  * `from_account` the potential Holder Cheqd account address
-  * `to_account` the same with `payeeId` from a payment request
-  * `amount_for_transfer` the same with `details.total.amount.value` from a payment request
-  * `denom` the same with `details.total.amount.currency` from a payment request
-* _Step 2.2._ Built a transaction with the request from the previous step. Example: `cheqd_ledger::auth::build_tx(pool_alias, pub_key, builded_request, account_number, account_sequence, max_gas, max_coin_amount, denom, timeout_height, memo)`. 
-  * `memo` tha same with `details.id` from a payment request
-* _Step 2.3._ Sign a transaction from the previous step. `cheqd_keys::sign(wallet_handle, key_alias, tx)`. 
-* _Step 2.4._ Broadcast a signed transaction from the previous step. `cheqd_pool::broadcast_tx_commit(pool_alias, signed)`.
+1. **Build a request for transferring tokens**. Example: `cheqd_ledger::bank::build_msg_send(from_account, to_account, amount_for_transfer, denom)`
+   * **`from_account`**: The prospective credential holder's cheqd account address
+   * **`to_account`**: Same as `payeeId` from the Payment Request
+   * **`amount_for_transfer`**: Price of credential issuance defined as `details.total.amount.value` from the Payment Request
+   * **`denom`**: Defined in `details.total.amount.currency` from the Payment Request
+2. **Build a transaction with the request from the previous step** Example: `cheqd_ledger::auth::build_tx(pool_alias, pub_key, builded_request, account_number, account_sequence, max_gas, max_coin_amount, denom, timeout_height, memo)`
+   * `memo`: This should be the same as `details.id` from the Payment Request
+3. **Sign the transaction** Example:`cheqd_keys::sign(wallet_handle, key_alias, tx)`. 
+4. **Broadcast the signed transaction** Example: `cheqd_pool::broadcast_tx_commit(pool_alias, signed)`.
 
-  Response format:
+#### Response format
 
-  ```text
-    Response {
-     check_tx: TxResult {
-        code: 0,
-        data: None,
-        log: "",
-        info: "",
-        gas_wanted: 0,
-        gas_used: 0,
-        events: [
-        ],
-        codespace: ""
-     },
-     deliver_tx: TxResult {
-        code: 0,
-        data: Some(Data([...])),
-        log: "[{\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"send\"},{\"key\":\"sender\",\"value\":\"cosmos1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"cosmos1pvnjjy3vz0ga6hexv32gdxydzxth7f86mekcpg\"},{\"key\":\"sender\",\"value\":\"cosmos1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd\"},{\"key\":\"amount\",\"value\":\"100cheq\"}]}]}]",
-        info: "",
-        gas_wanted: 0,
-        gas_used: 0,
-        events: [...], 
-        codespace: ""
-     },
-     hash: "1B3B00849B4D50E8FCCF50193E35FD6CA5FD4686ED6AD8F847AC8C5E466CFD3E",
-     height: 353
-  }
-  ```
+```text
+  Response {
+   check_tx: TxResult {
+      code: 0,
+      data: None,
+      log: "",
+      info: "",
+      gas_wanted: 0,
+      gas_used: 0,
+      events: [
+      ],
+      codespace: ""
+   },
+   deliver_tx: TxResult {
+      code: 0,
+      data: Some(Data([...])),
+      log: "[{\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"send\"},{\"key\":\"sender\",\"value\":\"cosmos1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"cosmos1pvnjjy3vz0ga6hexv32gdxydzxth7f86mekcpg\"},{\"key\":\"sender\",\"value\":\"cosmos1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd\"},{\"key\":\"amount\",\"value\":\"100cheq\"}]}]}]",
+      info: "",
+      gas_wanted: 0,
+      gas_used: 0,
+      events: [...], 
+      codespace: ""
+   },
+   hash: "1B3B00849B4D50E8FCCF50193E35FD6CA5FD4686ED6AD8F847AC8C5E466CFD3E",
+   height: 353
+}
+```
 
-  `hash` - transaction hash
+Key fields in the response above are:
 
-  `height` - ledger height
-
-[Read more about Cheqd payment transaction](https://gitlab.com/evernym/verity/vdr-tools/-/tree/cheqd/docs/design/014-bank-transactions)
+* `hash`: Transaction hash
+* `height`: Ledger height
 
 ### Step 3: Credential Request
 
-This is a message sent by the potential Holder to the Issuer, to request the issuance of a credential. After sending a payment transaction.
+This is a message sent by the potential Holder to the Issuer, to request the issuance of a credential after tokens are transferred to the nominated account using a Payment Transaction.
 
 ```text
 {
@@ -135,22 +139,43 @@ This is a message sent by the potential Holder to the Issuer, to request the iss
 }
 ```
 
-`request_id` the same with `details.id` from payment\_request and with `memo` from a payment transaction
+**`request_id`** should be the same as `details.id` from Payment Request and `memo` from Payment Transaction.
 
 ### Step 4: Check payment\_receipt
 
-Issuer receives Credential Request + `payment_receipt` with payment `transaction_id`. It allows Issuer
+Issuer receives Credential Request + `payment_receipt` with payment `transaction_id`. It allows the Issuer to:
 
-* get the payment transaction by hash from Cheqd Ledger using `get_tx_by_hash(hash)` method. `hash` parameter is `transaction_id` from previous steps.
-* check that `memo` field from received transaction contains `request_id`.
+* Get the payment transaction by hash from cheqd network ledger using `get_tx_by_hash(hash)` method, where `hash` is `transaction_id` from previous steps.
+* Check that `memo` field from received transaction contains the correct `request_id`.
 
 ### Step 5: Credential issuing
 
-Credential issuing according Aries protocol.
+If steps 1-4 are successful, the Issuer is able to confirm that the requested payment has been made using CHEQ tokens. The credential issuing process can then proceed using standard Hyperledger Aries protocol procedures.
+
+## Consequences
+
+### Backward Compatibility
+
+* Credential issuance outside of the payment flow is compatible with and carried out using existing Hyperledger Aries protocol procedures. This should provide a level of compatibility with existing apps/SDKs that implement Aries protocol.
+* Defining the transaction in CHEQ tokens is specific to the cheqd network.
+
+### Positive
+
+* By defining the payment mechanism using Hyperledger Aries protocols, this allows the possibility in the future to support payments on multiple networks.
+* Existing SSI app developers should already be familiar with Hyperledger Aries \(if building on Hyperledger Indy\) and provides a transition path to add new functionality.
+
+### Negative
+
+* Hyperledger Aries may not be a familiar protocol for other Cosmos projects.
+* Using the Payment Decorator in practice means there could be interoperability challenges at in implementations that impact credential issuance and exchange.
+
+### Neutral
+
+* N/A
 
 ## References
 
-* [Cheqd payment transaction](https://gitlab.com/evernym/verity/vdr-tools/-/tree/cheqd/docs/design/014-bank-transactions)
-* [Aries Credential Offer](https://github.com/hyperledger/aries-rfcs/blob/main/features/0036-issue-credential/README.md#offer-credential)
-* [Aries payment\_request decorator](https://github.com/hyperledger/aries-rfcs/blob/main/features/0075-payment-decorators/README.md#payment_request)
+* [Hyperledger Aries RFC 0036: Issue Credential Protocol 1.0 ](https://github.com/hyperledger/aries-rfcs/blob/main/features/0036-issue-credential/README.md)
+* [Hyperledger Aries RFC 0075: Payment Decorators](https://github.com/hyperledger/aries-rfcs/blob/main/features/0075-payment-decorators/README.md)
+* [Evernym VDR Tools cheqd network payments ADR](https://gitlab.com/evernym/verity/vdr-tools/-/tree/cheqd/docs/design/014-bank-transactions)
 
