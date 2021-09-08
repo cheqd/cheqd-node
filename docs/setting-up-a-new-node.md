@@ -90,7 +90,14 @@ This is the most preferable way to get `cheqd-node`. Detailed information about 
 
 5. Set genesis:
 
-   Genesis files for public networks are published in [this directory](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains). Download `genesis.json` using wget [https://github.com/cheqd/cheqd-node/blob/main/persistent\_chains/testnet/genesis.json](https://github.com/cheqd/cheqd-node/blob/main/persistent_chains/testnet/genesis.json) to: `/etc/cheqd-node/`
+   Genesis files for public networks are published in [this directory](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains). Download `genesis.json` and put it to the `/etc/cheqd-node/`.
+   
+   For testnet:
+   
+   ```
+   cd /etc/cheqd-node/
+   wget -O genesis.json https://github.com/cheqd/cheqd-node/blob/main/persistent_chains/testnet/genesis.json
+   ```
 
 6. Set persistent peers:
 
