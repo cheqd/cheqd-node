@@ -91,10 +91,10 @@ This is the most preferable way to get `cheqd-node`. Detailed information about 
 5. Set genesis:
 
    Genesis files for public networks are published in [this directory](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains). Download `genesis.json` and put it to the `/etc/cheqd-node/`.
-   
+
    For testnet:
-   
-   ```
+
+   ```text
    cd /etc/cheqd-node/
    wget -O genesis.json https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/testnet/genesis.json
    ```
@@ -137,11 +137,11 @@ This is the most preferable way to get `cheqd-node`. Detailed information about 
     systemctl start cheqd-noded
    ```
 
-  Check that the service is running:
-  
-  ```text
-  systemctl status cheqd-noded
-  ```
+   Check that the service is running:
+
+   ```text
+   systemctl status cheqd-noded
+   ```
 
 9. Check that the node is connected and catching up:
 
