@@ -152,6 +152,26 @@ Issuer receives Credential Request + `payment_receipt` with payment `transaction
 
 If steps 1-4 are successful, the Issuer is able to confirm that the requested payment has been made using CHEQ tokens. The credential issuing process can then proceed using standard Hyperledger Aries protocol procedures.
 
+### Overview of steps 1-5
+
+![Payment flow for credential issuances based on Hyperledger Aries protocol](../../.gitbook/assets/adr001-payment-flow.png)
+
+#### UML version
+
+Editable version available on [swimlanes.io](https://swimlanes.io/u/6_9Qx9GOe?rev=2) or as text for compatible UML diagram generators below:
+
+```text
+Issuer -> Holder: Credential Offer (+ payment_request)
+Holder -> Ledger: payment transaction (with payment_request id in memo)
+Ledger -> Holder: payment transaction response (with transaction_hash)
+Holder -> Issuer: Credential Request (+ payment_receipt)
+Issuer -> Ledger: Get payment transaction by hash
+Ledger -> Issuer: Payment transaction
+Issuer -> Issuer: Check `memo` field from received transaction
+Issuer -> Holder: Credential
+Holder -> Issuer: Accept
+```
+
 ## Consequences
 
 ### Backward Compatibility
