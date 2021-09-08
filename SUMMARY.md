@@ -24,13 +24,13 @@
 
 ## Architecture
 
-* [Architecture Decision Record \(ADR\) Process](architecture/readme.md)
+* [Architecture Decision Record \(ADR\) Process](architecture/architecture.md)
 * [List of ADRs](architecture/adr-list/README.md)
   * [ADR {ADR-NUMBER}: {TITLE}](architecture/adr-list/adr-template.md)
   * [ADR 001: Payment mechanism for credential issuance](architecture/adr-list/adr-001-payment-mechanism-for-issuing-credentials.md)
   * [ADR 004: Token fractions](architecture/adr-list/adr-004-token-fractions.md)
   * [ADR 006: Community tax](architecture/adr-list/adr-006-community-tax.md)
-  * [ADR 007: Community tax](architecture/adr-list/adr-007-revocation-registry.md)
+  * [ADR 007: Revocation registry](architecture/adr-list/adr-007-revocation-registry.md)
 
 ## Contributor Guidelines <a id="contributing"></a>
 
