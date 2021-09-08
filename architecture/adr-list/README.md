@@ -8,9 +8,9 @@ description: >-
 
 ## Accepted
 
-## Proposed
+1. [ADR 004: **Token fractions**](adr-004-token-fractions.md)\*\*\*\*
 
-{% page-ref page="adr-001-payment-mechanism-for-issuing-credentials.md" %}
+## Proposed
 
 ## Draft
 
