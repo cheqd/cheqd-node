@@ -6,10 +6,7 @@ description: This is the suggested template to be used for ADRs on the cheqd-nod
 
 ## Status
 
-| Category | Status |
-| :--- | :--- |
-| **ADR Stage** | {DRAFT \| PROPOSED \| ACCEPTED \| REJECTED \| SUPERSEDED by ADR-xxx \| ABANDONED} |
-| **Implementation Status** | {Implemented \| Not Implemented} |
+{DRAFT \| PROPOSED \| ACCEPTED \| REJECTED \| SUPERSEEDED by ADR-xxx \| ABANDONED} {Implemented \| Not Implemented\)
 
 What is the status, such as proposed, accepted, rejected, deprecated, superseded, etc.?
 
