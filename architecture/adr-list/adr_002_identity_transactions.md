@@ -70,7 +70,7 @@ All identity requests will have the following format:
 
 The request can be used for creation of new DIDs, setting, and rotation of verification key.
 
-1. **`dest` \(base58-encoded string\):**
+1. **`id` \(base58-encoded string\):**
 
    Target DID as base58-encoded string for 16 or 32 byte DID value. It may differ from `identifier` metadata field, where `identifier` is the DID of the submitter. If they are equal \(in permissionless case\), then the transaction must be signed by the newly created `verkey`.
 
@@ -87,7 +87,7 @@ The request can be used for creation of new DIDs, setting, and rotation of verif
    ```text
        {
          "alias": "Alice DID",
-         "dest": "GEzcdDLhCpGCYRHW82kjHd",
+         "id": "GEzcdDLhCpGCYRHW82kjHd",
          "verkey": "~HmUWn928bnFT6Ephf65YXv"
        }
    ```
@@ -102,30 +102,7 @@ If there is a DID transaction with the specified DID \(`dest`\), then this is up
 
 #### State format
 
-`dest -> {(alias, dest, verkey), last_tx_hash, last_update_timestamp }`
-
-_Request Example_:
-
-```text
-CreateDidRequest
-{
-    "data": {
-              "alias": "Alice DID",
-              "dest": "GEzcdDLhCpGCYRHW82kjHd",
-              "verkey": "~HmUWn928bnFT6Ephf65YXv"
-             }
-    "owner": "GEzcdDLhCpGCYRHW82kjHd",
-    "signature": "49W5WP5jr7x1fZhtpAhHFbuUDqUYZ3AKht88gUjrz8TEJZr5MZUPjskpfBFdboLPZXKjbGjutoVascfKiMD5W7Ba",
-    "metadata": {}
-}
-```
-
-_Reply Example_:
-
-```text
-CreateDidResponse
-{}
-```
+`id -> {(alias, id, verkey), last_tx_hash, last_update_timestamp }`
 
 _DID transaction format:_
 
@@ -140,9 +117,9 @@ Did
 
 ### ATTRIB
 
-Adds a new Attribute or updates an existing Attribute to a DID record.
+Attributes to an existing DID record.
 
-* **`dest` \(base58-encoded string\):**
+* **`did` \(base58-encoded string\):**
 
   Target DID as base58-encoded string for 16 or 32 byte DID value.
 
@@ -150,33 +127,20 @@ Adds a new Attribute or updates an existing Attribute to a DID record.
 
   Raw data is represented as JSON, where the key is attribute name and value is attribute value.
 
+ATTRIB _transaction format:_:
+
+```text
+{
+              "did": "N22KY2Dyvmuu2PyyqSFKue",
+              "raw": "{"name": "Alice"}",
+}
+```
+
 **Note:** ATTRIB **can** be updated
 
 #### State format
 
- `dest -> {(dest, raw), last_tx_hash, last_update_timestamp }`
-
-_Request Example_:
-
-```text
-CreateAttribRequest
-{
-    "data": {
-              "dest": "N22KY2Dyvmuu2PyyqSFKue",
-              "raw": "{"name": "Alice"}",
-             }
-    "owner": "GEzcdDLhCpGCYRHW82kjHd",
-    "signature": "49W5WP5jr7x1fZhtpAhHFbuUDqUYZ3AKht88gUjrz8TEJZr5MZUPjskpfBFdboLPZXKjbGjutoVascfKiMD5W7Ba",
-    "metadata": {}
-}
-```
-
-_Reply Example_:
-
-```text
-CreateAttribResponse
-{}
-```
+ `did -> {(did, raw), last_tx_hash, last_update_timestamp }`
 
 ### SCHEMA
 
@@ -194,32 +158,21 @@ If a Schema evolves, a new schema with a new version or name needs to be created
   * **`name`**: Schema's name string
   * **`version`**: Schema's version string
 
+SCHEMA transaction format:
+
+```text
+{
+            "version": "1.0",
+            "name": "Degree",
+            "attr_names": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
+}
+```
+
 **Note:** SCHEMA **cannot** be updated
 
 #### State format
 
 `(version, name, owner) -> {(version, name, attr_names), tx_hash, tx_timestamp }`
-
-_Request Example_:
-
-```text
-{
-    "data": {
-            "version": "1.0",
-            "name": "Degree",
-            "attr_names": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
-             },
-    "owner": "L5AD5g65TDQr1PPHHRoiGf",
-    "signature": "5ZTp9g4SP6t73rH2s8zgmtqdXyTuSMWwkLvfV1FD6ddHCpwTY5SAsp8YmLWnTgDnPXfJue3vJBWjy89bSHvyMSdS",
-    "metadata": {}
-}
-```
-
-_Reply Example_:
-
-```text
-{}
-```
 
 ### CRED\_DEF 
 
@@ -246,37 +199,25 @@ It is not possible to update `data` in existing Credential Definitions. If a Cre
 
   A unique tag to have multiple public keys for the same Schema and type issued by the same DID. A default tag `tag` will be used if not specified.
 
-**Note**: CRED\_DEF **cannot** be updated.
-
-#### State format
-
-`(owner, signature_type, ref, tag) -> {(primary, revocation), tx_hash, tx_timestamp }`
-
-_Request Example_:
+CRED\_DEF transaction format:
 
 ```text
 {
-    "data": {
         "signature_type": "CL",
-        "ref": 5ZTp9g4SP6t73rH2s8zgmtqdXyT,
+        "schema_id": 5ZTp9g4SP6t73rH2s8zgmtqdXyT,
         "tag": "some_tag",    
         "cred_def": {
             "primary": ....,
             "revocation": ....
         }
-    },
-
-    "owner": "L5AD5g65TDQr1PPHHRoiGf",
-    "signature": "5ZTp9g4SP6t73rH2s8zgmtqdXyTuSMWwkLvfV1FD6ddHCpwTY5SAsp8YmLWnTgDnPXfJue3vJBWjy89bSHvyMSdS",
-    "metadata": {}
-}
+    }
 ```
 
-_Reply Example_:
+**Note**: CRED\_DEF **cannot** be updated.
 
-```text
-{}
-```
+#### State format
+
+`(owner, signature_type, ref, tag) -> {(signature_type, schema_id, tag, cred_def), tx_hash, tx_timestamp }`
 
 ## References
 
