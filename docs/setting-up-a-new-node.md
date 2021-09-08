@@ -137,6 +137,12 @@ This is the most preferable way to get `cheqd-node`. Detailed information about 
     systemctl start cheqd-noded
    ```
 
+  Check that service is running:
+  
+  ```text
+  systemctl status cheqd-noded
+  ```
+
 9. Check that the node is connected and catching up:
 
    Use status command `cheqd-noded status --node <rpc-address>` or open status page in your browser `<rpc-address>/status`.
