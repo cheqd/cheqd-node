@@ -9,11 +9,15 @@
 
 ## Summary
 
-> A short \(~100 word\) description of the issue being addressed. "If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the ADR.
+Issued credentials need to be revocable by their issuers. Revocation needs to be straightforward and fast. Testing of revocation needs to preserve privacy \(be non-correlating\), and it should be possible to do without contacting the issuer.
 
 ## Context
 
-> This section describes the forces at play, such as business, technological, social, and project local. These forces are probably in tension, and should be called out as such. The language in this section is value-neutral. It is simply describing facts. It should clearly explain the problem and motivation that the proposal aims to resolve.
+This has obvious use cases for professional credentials being revoked for fraud or misconduct, and for driver’s licenses being revoked for criminal activity. However, it’s also important if a credential gets issued in error \(e.g., has a typo in it that misidentifies the subject\). The latter case is important even for immutable and permanent credentials such as a birth certificate.
+
+In addition, it seems likely that the data inside credentials will change over time \(e.g., a person’s mailing address or phone number updates\). This is likely to be quite common, revocation can be used to guarantee currency of credential data when it happens. In other words, revocation may be used to force updated data, not just to revoke authorization.
+
+To better understanding a context, highly recommend reading [Hyperledger Indy Credential Revocation Hype](https://hyperledger-indy.readthedocs.io/projects/hipe/en/latest/text/0011-cred-revocation/README.html) from Daniel Hardman
 
 ## Decision
 
@@ -123,5 +127,9 @@ _Reply Example_:
 {}
 ```
 
-## 
+
+
+## References
+
+* [Hyperledger Indy Credential Revocation Hype](https://hyperledger-indy.readthedocs.io/projects/hipe/en/latest/text/0011-cred-revocation/README.html)
 
