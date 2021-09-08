@@ -137,7 +137,7 @@ This is the most preferable way to get `cheqd-node`. Detailed information about 
     systemctl start cheqd-noded
    ```
 
-  Check that service is running:
+  Check that the service is running:
   
   ```text
   systemctl status cheqd-noded
