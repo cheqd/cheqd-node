@@ -30,6 +30,7 @@
   * [ADR 001: Payment mechanism for credential issuance](architecture/adr-list/adr-001-payment-mechanism-for-issuing-credentials.md)
   * [ADR 004: Token fractions](architecture/adr-list/adr-004-token-fractions.md)
   * [ADR 006: Community tax](architecture/adr-list/adr-006-community-tax.md)
+  * [ADR 007: Community tax](architecture/adr-list/adr-007-revocation-registry.md)
 
 ## Contributor Guidelines <a id="contributing"></a>
 
