@@ -12,5 +12,7 @@ description: >-
 
 ## Proposed
 
+1. [ADR 006: **Community tax**](adr-006-community-tax.md)\*\*\*\*
+
 ## Draft
 
