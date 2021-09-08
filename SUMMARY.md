@@ -28,8 +28,7 @@
 * [List of ADRs](architecture/adr-list/README.md)
   * [ADR {ADR-NUMBER}: {TITLE}](architecture/adr-list/adr-template.md)
   * [ADR 001: Payment mechanism for issuing credentials](architecture/adr-list/adr-001-payment-mechanism-for-issuing-credentials.md)
-  * [ADR 002: Identity entities and transactions](architecture/adr-list/adr_002_identity_transactions/README.md)
-    * [Identity API](architecture/adr-list/adr_002_identity_transactions/identity-api.md)
+  * [ADR 002: Identity entities and transactions](architecture/adr-list/adr_002_identity_transactions.md)
 
 ## Contributor Guidelines <a id="contributing"></a>
 
