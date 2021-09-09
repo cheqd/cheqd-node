@@ -1,95 +1,77 @@
 # Contributing
 
-**Thank you for considering contributing to cheqd!**
+## How do I make changes on the Network?
 
-You can contribute to the documentation in the following ways:
+Every User is encouraged to contribute to the cheqd Network. To make this easy, it is important to explain HOW a User can contribute, and what the best practices are for making changes. 
 
-* Improving general documentation;
-* Improving the governance framework;
-* Contributing code to cheqd by fixing bugs or implementing features;
-* Finding and reporting bugs;
-* Translating the cheqd documentation into various languages;
-* Making on-chain Proposals as to how the Network Principles of Parameters should change;
-* Participating on Community discussion! 
+For this reason, it is important to distinguish when a change can be made entirely off-ledger, and when a change is needed to be voted on, and made on-ledger. To do this we must differentiate between **minor changes** which are able to take place **entirely off-ledger** and **major network changes** which need to be **formalised on-ledger.**
 
-## On-chain vs off-chain
+### **Minor Network changes**
 
-We want contributing to be as accessible as possible. 
+These are changes that are insignificant, and do not affect the way the Network runs overall. Minor Network changes include, but are not limited to:
 
-## Revisions and amendments
+* Textual edits to the Governance Framework or written general documentation;
+* Sensible additions to general documentation to improve clarity;
+* Minor code changes;
+* Finding, reporting and suggesting fixes to bugs;
+* Translating the cheqd documentation into various languages.
 
-You are able to make revisions and amendments to the wiki and source code without making a formal Proposal. 
+### Major Network changes 
 
-cheqd is an Open Source project which means that anyone is free to propose a revision, addition or amendment. 
+These are changes that have a materially significant effect on the Network. Such changes SHOULD be made via a Proposal, following the steps in the decision tree diagram below. 
 
-Changes can be made through two routes:
+Major Network changes include, but are not limited to:
 
-1. [GitBook](https://docs.cheqd.io/cheqd-node/)
-2. [Github](https://github.com/cheqd)
+* Materially significant Architecture Decisions \(**ADs**\), such as:
+  * An additional feature to cheqd;
+  * Removal of a feature of cheqd;
+* Parameter changes for the Network;
+* Community pool decisions;
+* Materially significant changes to a cheqd Principle;
+* Partnerships or connections to other infrastructure.
 
-### GitBook
+## Decision Tree
 
-GitBook is where cheqd's Wiki lives and where YOU can make suggested changes to the written documentation. 
+To help YOU understand how to make changes on the cheqd Network, the decision tree below visualises how changes should be carried out.
 
-To make a change, you need to use the link below to become an Open Source Contributor on cheqd's GitBook:
+\(Placeholder\)
 
-{% embed url="https://app.gitbook.com/invite/cheqd?invite=-MiVxCDUlLSB22RuQ6dl" %}
 
-You should follow these instructions to make a change to any cheqd  GitBook content.
 
-1. Make your own branch
 
-To create a new branch, select 'New' followed by 'New variant'.
 
-![](../../.gitbook/assets/image%20%281%29.png)
+## Learning the basics
 
-Next you need to name your new branch.
+For general holders of coins or tokens across the industry, governance is often seen as something inaccessible and complex. This is because education about governance is often lackluster. At cheqd, we want to make participating in governance easy.
 
-You should use the prefix:
+#### Frequently asked questions:
 
-* ADR/
-* gov/
+1. What is a **Validator** or **Node Operator**?  The terms Validator and Node Operator are synonymous. In blockchain ecosystems, the **Node Operator** runs what is called a **node**. A node can be thought of like a power pylon in the physical world, which helps to distribute electricity around a wide network of users. Without these pylons, electricity would be largely centralised in one location; the pylons help to distribute power to entire wide-scale populations. And if one pylon fails, the grid is set up to circumvent this pylon and re-route the electricity a different route. Similarly, in blockchain infrastructure, each node runs an instance of the consensus protocol and helps to create a broad, robust network, with no single points of failure. A node failing will have no impact on the Network as a whole.  
+2. What does **staking** mean?  **Stake** is the amount of tokens a **Node Operator** puts aside and dedicates to cheqd, in order to contribute to governance and earn rewards. cheqd is a Proof of Stake Network. This means that rewards can be earnt in direct correlation with the amount of stake a Node Operator holds.  
+3. What does it mean to have **bonded** tokens?  In order to participate in governance, Users need to **bond** their tokens to a Node Operator. Users with bonded tokens are known as **Participants**. This is a beneficial arrangement for both the Participant and the Node Operator. The Participant may not be interested in voting on the Network, or may be busy, and in this instance the Node Operator can cast a vote on behalf of the Participant. Bonded tokens from Users add to the **stake** of Node Operators. If the vote is accepted, the Node Operator may receive rewards in proportion to how many tokens it has staked. A percentage of these rewards can be distributed to the Users as a commission.  ****
+4. Can **Participants** earn money?  
 
-followed by a unique title indicating your draft number such as
 
-* ADR/{username}draft1
-* gov/{username}draft1
+   In short, yes. Participants may be eligible for a percentage of the rewards that Node Operators earn during the course of running a node. Node Operators may offer a certain commission for bonding to them. These rewards may come in two forms:  
 
-On this branch you should make and save all desired changes to the content.
 
-Once you have finished your changes, save the branch but **do not merge the branch to main**. 
+   1. **Transaction fees**  ****Read and writes to the cheqd Network incur what is known as a **transaction fee,** which is a calculated based on **gas.** Gas may be higher when there are high transaction volumes on the Network, and vice versa. Node Operators may also set their own gas prices, above which they are considered in the pool of who creates that transaction block. However, we will not get into the nuances of gas here.  
+   2. **Block rewards**
 
-Your edits will be reviewed by a cheqd admin or moderator and then merged, amended or rejected.
+  
+      Block rewards depend on **inflation**. Inflation is the gradual increase in the number of total tokens on the Network. A Node Operator may earn block rewards during a period of inflation, which can be disseminated to the Users with bonded tokens.   
+  
+      For this reason, it is suggested that token holders **bond** and **delegate** their tokens, to create a healthy Network and earn passive income.   
 
-### Github
+5. What if I want to **vote unilaterally**, without a Node Operator/Validator?  
 
-You may also use Github to make changes and amendments to both the source code and the written content in this documentation.
 
-You should similarly make a branch of the cheqd Github main. 
+   If you are particularly interested or passionate about a specific governance proposal, or do not agree with your bonded Node Operator, it is absolutely possible to vote unilaterally. To do this, follow the instructions below in the section How do I Vote?  
 
-You should then make a pull request with your proposed changes, edits, revisions and additions. 
+6. Is my **choice of Node Operator** important?  Yes, your choice of bonded Node Operator is very important. You should be mindful about what reputation the Node Operator has. This is because the Node Operator may use your votes against the best interest of yourself and the community. Furthermore, the Node Operator might exhibit bad behaviour on the Network and have some of its stake slashed. Slashing means taking stake away from the Node Operator and adding it to the Community Pool. This may involve those who have bonded and delegated tokens to have their tokens slashed as well.  
+7. Is it possible to **unbond** from a Node Operator?  Yes, is possible to instantly redelegate to a new Node Operator or **unbond** your tokens. You cannot 'hop' between Node Operators quickly however. You must complete your redelegation to a Node Operator before moving again. If you want to completely withdraw and **unbond** your tokens, you need to be mindful that this process takes **2 weeks** for the tokens to become available for use again.  
 
-**Please use clean, concise titles for your pull requests.** Assume that the person reading the pull request title is not a programmer, but instead a cheqd Network user or lay-person, and **try to describe your change or fix from in plain English**. We use commit squashing, so the final commit in the main branch will carry the title of the pull request, and commits from the main branch are fed into the changelog. The changelog is separated into [keepachangelog.com categories](https://keepachangelog.com/en/1.0.0/), and while that spec does not prescribe how the entries ought to be named, for easier sorting, start your pull request titles using one of the verbs "Add", "Change", "Deprecate", "Remove", or "Fix" \(present tense\).
-
-Example:
-
-| Not ideal | Better |
-| :--- | :--- |
-| Fixed NoMethodError in RemovalWorker | Fix nil error when removing statuses caused by race condition |
-
-It is not always possible to phrase every change in such a manner, but it is desired.
-
-**The smaller the set of changes in the pull request is, the quicker it can be reviewed and merged.** Splitting tasks into multiple smaller pull requests is often preferable.
-
-**Pull requests that do not pass automated checks may not be reviewed**. 
-
-## Bug reports
-
-Bug reports and feature suggestions must use descriptive and concise titles and be submitted to [GitHub Issues](https://github.com/cheqd/cheqd-node/issues). Please use the search function to make sure that you are not submitting duplicates, and that a similar report or request has not already been resolved or rejected.
-
-## Translations
-
-You can submit translations via Github or GitBook branches \(as above\). We would greatly appreciate this work!
+## 
 
 ## Community
 
