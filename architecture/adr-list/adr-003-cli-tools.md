@@ -1,7 +1,3 @@
----
-description: This is the suggested template to be used for ADRs on the cheqd-node project.
----
-
 # ADR 003: Command Line Interface \(CLI\) tools
 
 ## Status
@@ -26,7 +22,7 @@ This ADR will focus on the CLI tool architecture choice for `cheqd-node`.
 
 ### Assumptions / Considerations
 
-#### **Likelihood of introducing bugs or security vulnerabilities**
+#### Likelihood of introducing bugs or security vulnerabilities
 
 1. Any CLI tool architecture chosen should not increase the likelihood of introducing bugs, security vulnerabilities, or design pattern deviations from upstream Cosmos SDK.
 2. Actions that are carried out on ledger through a CLI tool in `cheqd-node` now include token functionality as well as identity functionality. E.g., if a DID gets compromised, there could be mechanisms to recover or signal that fact to issuers/verifiers. If tokens or the staking balance of node operators get compromised, this may potentially have more severe consequences for them.
