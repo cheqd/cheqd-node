@@ -50,6 +50,7 @@
 * [Advanced concepts](governance/advanced-concepts/README.md)
   * [Building on Cosmos](governance/advanced-concepts/building-on-cosmos.md)
   * [Trust over IP alignment](governance/advanced-concepts/trust-over-ip-alignment.md)
+  * [Genesis Parameters](governance/advanced-concepts/genesis-parameters.md)
   * [Legal Disclaimer](governance/advanced-concepts/node-operator-legal-position.md)
 * [Terminology & Glossary](governance/terminology-and-glossary/README.md)
   * [Glossary of terms](governance/terminology-and-glossary/glossary.md)
