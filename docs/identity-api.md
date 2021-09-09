@@ -1,54 +1,62 @@
-# Identity API
+# Client-app Identity APIs
 
-## Base write flow
+## Overview
 
-* _Step 1._ Build a request. Example: `build_create_did_request(id, verkey, alias)`
-* _Step_ 2_._ Sign request using DID key. Example:  `indy_crypto_sign(did, verkey)`
-* _Step 3._ Built a transaction with the request from the previous step. Example: `build_tx(pool_alias, pub_key, builded_request, account_number, account_sequence, max_gas, max_coin_amount, denom, timeout_height, memo)`
-* _Step 4._ Sign a transaction from the previous step. `cheqd_keys_sign(wallet_handle, key_alias, tx)`. 
-* _Step 5._ Broadcast a signed transaction from the previous step. `broadcast_tx_commit(pool_alias, signed)`.
+This page describes how identity domain transactions need to be implemented by client-side applications/libraries such as [`cheqd-sdk`](https://github.com/cheqd/cheqd-sdk) \(forked from [Evernym VDR Tools](https://gitlab.com/evernym/verity/vdr-tools)\).
 
-  Response format:
+Details on how identity transactions are defined is available in [ADR 002: Identity entities and transactions](../architecture/adr-list/adr_002_identity_transactions.md).
 
-  ```text
-    Response {
-     check_tx: TxResult {
-        code: 0,
-        data: None,
-        log: "",
-        info: "",
-        gas_wanted: 0,
-        gas_used: 0,
-        events: [
-        ],
-        codespace: ""
-     },
-     deliver_tx: TxResult {
-        code: 0,
-        data: Some(Data([...])),
-        log: "[{\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"send\"},{\"key\":\"sender\",\"value\":\"cosmos1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"cosmos1pvnjjy3vz0ga6hexv32gdxydzxth7f86mekcpg\"},{\"key\":\"sender\",\"value\":\"cosmos1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd\"},{\"key\":\"amount\",\"value\":\"100cheq\"}]}]}]",
-        info: "",
-        gas_wanted: 0,
-        gas_used: 0,
-        events: [...], 
-        codespace: ""
-     },
-     hash: "1B3B00849B4D50E8FCCF50193E35FD6CA5FD4686ED6AD8F847AC8C5E466CFD3E",
-     height: 353
-  }
-  ```
+### Base write flow
 
-  `hash` - transaction hash
+1. **Build a request** _Example_: `build_create_did_request(id, verkey, alias)`
+2. **Sign the request using DID key** _Example_:  `indy_crypto_sign(did, verkey)`
+3. **Build a transaction with the request from previous step** _Example_: `build_tx(pool_alias, pub_key, builded_request, account_number, account_sequence, max_gas, max_coin_amount, denom, timeout_height, memo)`
+4. **Sign the transaction** _Example_: `cheqd_keys_sign(wallet_handle, key_alias, tx)`. 
+5. **Broadcast a signed transaction** _Example_: `broadcast_tx_commit(pool_alias, signed)`.
 
-  `height` - ledger height
+#### Response format
 
-##   DID
+```text
+  Response {
+   check_tx: TxResult {
+      code: 0,
+      data: None,
+      log: "",
+      info: "",
+      gas_wanted: 0,
+      gas_used: 0,
+      events: [
+      ],
+      codespace: ""
+   },
+   deliver_tx: TxResult {
+      code: 0,
+      data: Some(Data([...])),
+      log: "[{\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"send\"},{\"key\":\"sender\",\"value\":\"cosmos1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"cosmos1pvnjjy3vz0ga6hexv32gdxydzxth7f86mekcpg\"},{\"key\":\"sender\",\"value\":\"cosmos1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd\"},{\"key\":\"amount\",\"value\":\"100cheq\"}]}]}]",
+      info: "",
+      gas_wanted: 0,
+      gas_used: 0,
+      events: [...], 
+      codespace: ""
+   },
+   hash: "1B3B00849B4D50E8FCCF50193E35FD6CA5FD4686ED6AD8F847AC8C5E466CFD3E",
+   height: 353
+}
+```
+
+**`hash`** : Transaction hash
+
+**`height`**: Ledger height
+
+## DID transactions
 
 ### Create DID
 
-_VDR tools: ****_build\_create\_did\_request\(id, verkey, alias\)
+#### cheqd-sdk function
 
-_Builds request in the follow format:_
+`build_create_did_request(id, verkey, alias)`
+
+#### Request format
 
 ```text
 CreateDidRequest 
@@ -56,7 +64,7 @@ CreateDidRequest
     "data": {
                "id": "GEzcdDLhCpGCYRHW82kjHd",
                "verkey": "~HmUWn928bnFT6Ephf65YXv",
-               "alias": "Alice did"
+               "alias": "DID for Alice"
              },
     "owner": "GEzcdDLhCpGCYRHW82kjHd",
     "signature": "49W5WP5jr7x1fZhtpAhHFbuUDqUYZ3AKht88gUjrz8TEJZr5MZUPjskpfBFdboLPZXKjbGjutoVascfKiMD5W7Ba",
@@ -64,11 +72,11 @@ CreateDidRequest
 }
 ```
 
-* `id` \(base58-encoded string\) Target DID as base58-encoded string for 16 or 32 byte DID value.
-* `verkey` \(base58-encoded string, possibly starting with "~"; optional\) Target verification key. It can start with "~", which means that it's abbreviated verkey and should be 16 bytes long when decoded, otherwise it's a full verkey which should be 32 bytes long when decoded.
-* `alias` \(string; optional\).
+* `id` \(base58-encoded string\): Target DID as base58-encoded string for 16 or 32 byte DID value
+* `verkey` \(base58-encoded string, possibly starting with "~"; optional\): Target verification key. It can start with "~", which means that it is an abbreviated `verkey` and should be 16 bytes long when decoded. Otherwise, it's a full `verkey` which should be 32 bytes long when decoded.
+* `alias` \(string; optional\)
 
-_Returns:_
+#### Response format
 
 ```text
 CreateDidResponse {
@@ -76,17 +84,19 @@ CreateDidResponse {
 }  
 ```
 
-* `key`\(string\): a key is used to store this DID in a state
+* `key`\(string\): A unique key is used to store this DID in a state
 
-#### Validation
+#### Response validation
 
-* `CreateDidRequest` must be signed by  DID from `id` field. It means that this DID must be an owner of this DID transaction.
+* `CreateDidRequest` must be signed by the DID from `id` field. It means that this DID must be an owner of this DID transaction.
 
 ### Update DID
 
-_VDR tools: ****_build\_update\_did\_request\(id, verkey, alias\)
+#### **cheqd-sdk function**
 
-_Builds request in the follow format:_
+`build_update_did_request(id, verkey, alias)`
+
+#### Request format
 
 ```text
 UpdateDidRequest 
@@ -94,7 +104,7 @@ UpdateDidRequest
     "data": {
                "id": "GEzcdDLhCpGCYRHW82kjHd",
                "verkey": "~HmUWn928bnFT6Ephf65YXv",
-               "alias": "Alice did"
+               "alias": "DID for Alice"
              },
     "owner": "GEzcdDLhCpGCYRHW82kjHd",
     "signature": "49W5WP5jr7x1fZhtpAhHFbuUDqUYZ3AKht88gUjrz8TEJZr5MZUPjskpfBFdboLPZXKjbGjutoVascfKiMD5W7Ba",
@@ -102,11 +112,11 @@ UpdateDidRequest
 }
 ```
 
-* `id` \(base58-encoded string\) Target DID as base58-encoded string for 16 or 32 byte DID value.
-* `verkey` \(base58-encoded string, possibly starting with "~"; optional\) Target verification key. It can start with "~", which means that it's abbreviated verkey and should be 16 bytes long when decoded, otherwise it's a full verkey which should be 32 bytes long when decoded.
+* `id` \(base58-encoded string\): Target DID as base58-encoded string for 16 or 32 byte DID value.
+* `verkey` \(base58-encoded string, possibly starting with "~"; optional\): Target verification key. It can start with "~", which means that it is an abbreviated `verkey` and should be 16 bytes long when decoded. Otherwise, it's a full `verkey` which should be 32 bytes long when decoded.
 * `alias` \(string; optional\).
 
-_Returns:_
+#### Response format
 
 ```text
 UpdateDidResponse {
@@ -114,20 +124,22 @@ UpdateDidResponse {
 }  
 ```
 
-* `key`\(string\): a key is used to store this DID in a state
+* `key`\(string\): A unique key is used to store this DID in a state
 
-#### Validation
+#### **Response** validation
 
 * A transaction with `id` from `UpdateDidRequest`must already be in a ledger created by `CreateDidRequest`
-* `UpdateDidRequest` must be signed by  DID from `id` field. It means that this DID must be an owner of this DID transaction.
+* `UpdateDidRequest` must be signed by the DID from `id` field. It means that this DID must be an owner of this DID transaction.
 
 ### Get DID
 
-_VDR tools: ****_build\_query\_get\_did\(id\)
+#### cheqd-sdk function
 
-* `id` \(base58-encoded string\) Target DID as base58-encoded string for 16 or 32 byte DID value.
+`build_query_get_did(id)`
 
-_Builds request in the follow format:_
+* `id` \(base58-encoded string\): Target DID as base58-encoded string for 16 or 32 byte DID value.
+
+#### Request format
 
 ```text
 Request 
@@ -139,30 +151,32 @@ Request
 }
 ```
 
-* `path`_-_ path for RPC Endpoint for Cheqd pool; 
-* `data` - query with an entity key from a state. String `did:<id>` encoded to bytes;
-* `height` - a height of ledger \(size\). `None` for auto calculation;
-* `prove` - boolean value. `True` - for getting state proof in a pool response. 
+* `path`: __Path for RPC endpoint for cheqd pool
+* `data`: Query with an entity key from a state. String `did:<id>` encoded to bytes
+* `height`: Ledger height \(size\). `None` for auto calculation
+* `prove`:  Boolean value. `True` for getting state proof in a pool response
 
-_Returns:_
+#### Response format
 
 ```text
 QueryGetDidResponse{
         "did": {
                "id": "GEzcdDLhCpGCYRHW82kjHd",
                "verkey": "~HmUWn928bnFT6Ephf65YXv",
-               "alias": "Alice did"
+               "alias": "DID for Alice"
              },
 }  
 ```
 
-## ATTRIB
+## ATTRIB transactions
 
 ### Create ATTRIB
 
-_VDR tools: ****_build\_create\_attrib\_request\(did, raw\)
+#### cheqd-sdk function
 
-_Builds request in the follow format:_
+`build_create_attrib_request(did, raw)`
+
+#### Request format
 
 ```text
 CreateAttribRequest 
@@ -177,13 +191,10 @@ CreateAttribRequest
 }
 ```
 
-* `did` \(base58-encoded string\):
+* `did` \(base58-encoded string\): Target DID as base58-encoded string for 16 or 32 byte DID value.
+* `raw` \(JSON; mutually exclusive with `hash` and `enc`\): Raw data represented as JSON, where the key is attribute name and value is attribute value.
 
-  Target DID as base58-encoded string for 16 or 32 byte DID value.
-
-* `raw` \(json; mutually exclusive with `hash` and `enc`\): Raw data is represented as json, where the key is attribute name and value is attribute value.
-
-_Returns:_
+#### Response format
 
 ```text
 CreateAttribResponse {
@@ -191,18 +202,20 @@ CreateAttribResponse {
 } 
 ```
 
-* `key`\(string\): a key is used to store these attributes in a state
+* `key`\(string\): A unique key is used to store these attributes in a state
 
-#### Validation
+#### Response validation
 
 * A DID transaction with `id` from `UpdateAttribRequest`must already be in a ledger created by `CreateDidRequest`
-* `CreateAttribRequest` must be signed by  DID from `did` field. It means that this DID must be an owner of this ATTRIB transaction.
+* `CreateAttribRequest` must be signed by the DID from `did` field. It means that this DID must be an owner of this ATTRIB transaction.
 
 ### Update ATTRIB
 
-_VDR tools: ****_build\_update\_attrib\_request\(id, raw\)
+#### cheqd-sdk function
 
-_Builds request in the follow format:_
+`build_update_attrib_request(id, raw)`
+
+#### Request format
 
 ```text
 UpdateAttribRequest 
@@ -217,13 +230,10 @@ UpdateAttribRequest
 }
 ```
 
-* `did` \(base58-encoded string\):
+* `did` \(base58-encoded string\): Target DID as base58-encoded string for 16 or 32 byte DID value.
+* `raw` \(JSON; mutually exclusive with `hash` and `enc`\): Raw data represented as JSON, where the key is attribute name and value is attribute value.
 
-  Target DID as base58-encoded string for 16 or 32 byte DID value.
-
-* `raw` \(json; mutually exclusive with `hash` and `enc`\): Raw data is represented as json, where the key is attribute name and value is attribute value.
-
-_Returns:_
+#### Response format
 
 ```text
 UpdateAttribResponse {
@@ -231,20 +241,22 @@ UpdateAttribResponse {
 } 
 ```
 
-* `key`\(string\): a key is used to store these attributes in a state
+* `key`\(string\): A unique key is used to store these attributes in a state
 
-#### Validation
+#### Response validation
 
 * A DID transaction with `id` from `UpdateAttribRequest`must already be in a ledger created by `CreateDidRequest`
 * `UpdateAttribRequest` must be signed by  DID from `did` field. It means that this DID must be an owner of this ATTRIB transaction.
 
 ### Get ATTRIB
 
-_VDR tools: ****_build\_query\_get\_attrib\(did\)
+#### cheqd-sdk function
+
+`build_query_get_attrib(did)`
 
 * `did` \(base58-encoded string\) Target DID as base58-encoded string for 16 or 32 byte DID value.
 
-_Builds request in the follow format:_
+#### Request format
 
 ```text
 Request 
@@ -256,12 +268,12 @@ Request
 }
 ```
 
-* `path`_-_ path for RPC Endpoint for Cheqd pool; 
-* `data` - query with an entity key from a state. String `attrib:<did>` encoded to bytes;
-* `height` - a height of ledger \(size\). `None` for auto calculation;
-* `prove` - boolean value. `True` - for getting state proof in a pool response. 
+* `path`: __Path for RPC endpoint for cheqd pool
+* `data`: Query with an entity key from a state. String `did:<id>` encoded to bytes
+* `height`: Ledger height \(size\). `None` for auto calculation
+* `prove`:  Boolean value. `True` for getting state proof in a pool response
 
-_Returns:_
+#### Response format
 
 ```text
 QueryGetAttribResponse{
@@ -272,9 +284,9 @@ QueryGetAttribResponse{
 }  
 ```
 
-## SCHEMA
+## SCHEMA transactions
 
-### Create Schema
+### Create SCHEMA
 
 _VDR tools: ****_build\_create\_schema\_request\(version, name, attr\_names\)
 
