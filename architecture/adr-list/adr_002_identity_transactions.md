@@ -140,7 +140,7 @@ ATTRIB _transaction format:_:
 
 #### State format
 
- `did -> {(did, raw), last_tx_hash, last_update_timestamp }`
+`did -> {(did, raw), last_tx_hash, last_update_timestamp }`
 
 ### SCHEMA
 
@@ -174,7 +174,7 @@ SCHEMA transaction format:
 
 `(version, name, owner) -> {(version, name, attr_names), tx_hash, tx_timestamp }`
 
-### CRED\_DEF 
+### CRED\_DEF
 
 Adds a Credential Definition \(in particular, public key\), which is created by an Issuer and published for a particular Credential Schema.
 

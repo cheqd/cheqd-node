@@ -8,12 +8,13 @@ description: >-
 
 ## Accepted
 
-1. [ADR 001: **Payment mechanism for credential issuance**](adr-001-payment-mechanism-for-issuing-credentials.md)\*\*\*\*
+1. [ADR 001: **Payment mechanism for issuing credentials**](adr-001-payment-mechanism-for-issuing-credentials.md)\*\*\*\*
 2. [ADR 004: **Token fractions**](adr-004-token-fractions.md)
 
 ## Proposed
 
-1. [ADR 006: **Community tax**](adr-006-community-tax.md)
+1. [ADR 004: **Token fractions**](adr-004-token-fractions.md)\*\*\*\*
+2. [ADR 006: **Community tax**](adr-006-community-tax.md)
 
 ## Draft
 

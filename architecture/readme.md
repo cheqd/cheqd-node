@@ -22,3 +22,4 @@ If recorded decisions turned out to be lacking, convene a discussion, record the
 ## Creating new ADR
 
 Use the [ADR template](adr-list/adr-template.md) when creating a new ADR.
+
