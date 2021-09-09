@@ -47,6 +47,8 @@ Entropy is broadly defined as the degree of disorder or uncertainty in a system 
 
 Let’s think of a sandcastle sitting in a desert.
 
+
+
 ![Sandcastle stock image: https://jooinn.com/sand-castle.html](https://miro.medium.com/max/1120/0*6Y9_oufXGvqPs4x-)
 
 The sandcastle in the desert has both order and structure, and there are very few ways to arrange the sand grains to achieve the same structure.

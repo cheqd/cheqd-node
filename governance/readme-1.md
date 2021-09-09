@@ -45,7 +45,7 @@ Throughout this Governance Framework, it will be made clear where the veto shoul
 
 With respect to the Principle Principle, it is also crucial to balance the right to freedom of expression with the other Principles set forth in this document.
 
-We do not want Users to feel hesitant to make genuine, well-intentioned Proposals, for fear of having their Proposal vetoed. We want Users to feel that their voice can be heard without being shut down and penalised. And we want to instil a culture of inclusivity and open-discussion. 
+We do not want Users to feel hesitant to make genuine, well-intentioned Proposals, for fear of having their Proposal vetoed. We want Users to feel that their voice can be heard without being shut down and penalised. And we want to instill a culture of inclusivity and open-discussion. 
 
 This Principle introduces an exception to the Principle Principle. If there is a Proposal to amend, add or remove a Principle which is well-reasoned and well-intentioned, such Proposal SHOULD NOT be vetoed. 
 
@@ -87,7 +87,7 @@ The cheqd Governance Framework embodies the following General Governance princip
 
 ### 1. Interoperability
 
-cheqd SHOULD enable digital identity data for an entity to be represented, exchanged, secured, protected, and verified interoperably, across multiple decentralised identity Networks, using open, public, and royalty-free Standards, such as the Standards for Decentralised Identifiers \(DIDs\) and Verifiable Credentials \(VCs\) defined by the World Wide Web Consortium \(W3C\).  
+cheqd SHOULD enable digital identity data for an entity to be represented, exchanged, secured, protected, and verified in an interoperable way, across multiple decentralised identity Networks, using open, public, and royalty-free Standards, such as the Standards for Decentralised Identifiers \(DIDs\) and Verifiable Credentials \(VCs\) defined by the World Wide Web Consortium \(W3C\).  
 
 
 ### 2. Accessibility
@@ -99,7 +99,7 @@ cheqd can be defined as a Layer 1 component of the Trust over IP stack, and SHOU
 
 ### 3. Transparency
 
-Cheqd Network and Community SHALL enable Network Users to easily access and verify information necessary to understand the incentives, rules, policies, and algorithms under which node operators and other participants of the Network operate.  
+Cheqd Network and Community SHALL enable Network Users to easily access and verify information necessary to understand the incentives, rules, policies, and algorithms under which Node Operators and other participants of the Network operate.  
 
 
 ### 4. Integrity
@@ -121,15 +121,14 @@ cheqd Network code and updates SHALL provide appropriate, measurable security of
 
 cheqd Network Users SHALL NOT enable personal data, as defined in the GDPR, to be written to the Network, in either a plain text proposal, or a software update.  
   
-cheqd Network SHALL ensure any data uploaded to the Network is anonymous and uncorrelateable.   
-
+cheqd Network SHALL ensure any data uploaded to the Network is anonymous and uncorrelateable. 
 
 A User’s right to be forgotten \(i.e. the right for their personally identifiable information to be erased or put beyond use\) SHALL be promptly honored wherever applicable.   
 
 
 ### 8. Notification
 
-Network Users SHOULD notify the other Users of the Network as soon as practically possible if there is a security breach, data breach, breach of contract, or else if a Regulator has made an inquiry into the Network’s operations.   
+Network Users SHOULD notify the other Users of the Network as soon as practically possible if there is a security breach, data breach or else if a Regulator has made an inquiry into the Network’s operations.   
 
 
 ### 9. Decentralization
@@ -141,7 +140,7 @@ cheqd SHALL not require reliance on a centralized system to represent, control, 
 
 cheqd SHOULD always strive to be environmentally sustainable, given the imminent threat of climate change and the important role that the private sector can play in mitigating this threat. 
 
-For example, this COULD be achieved through a Carbon Tax on the Network.A Carbon Tax is a nominally small fee that is charged for the use of the Network, which can be put aside into an escrow wallet, and donated for the betterment of the environment. 
+For example, this COULD be achieved through a Carbon Tax on the Network. A Carbon Tax is a nominally small fee that is charged for the use of the Network, which can be put aside into a Community Pool, and donated for the betterment of the environment. 
 
 ### 11. Inclusion
 

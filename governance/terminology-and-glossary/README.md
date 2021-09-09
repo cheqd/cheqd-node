@@ -22,3 +22,8 @@ The Governance Framework SHALL also make use of the terms, conventions and patte
 
 cheqd-specific Terms SHALL be defined in the [Glossary of terms](https://docs.google.com/document/d/1G-gNBDyQxsCsx27KbkXd84H4WNQNB3OnmsjfhN0jeIM/edit), a Controlled Document of the Governance Framework.  
 
+Reference MAY also be made to:
+
+* [Sovrin Glossary](https://docs.google.com/document/d/1gfIz5TT0cNp2kxGMLFXr19x1uoZsruUe_0glHst2fZ8/edit)
+* [eSSIF Lab Glossary](https://essif-lab.pages.grnet.gr/framework/docs/essifLab-glossary) 
+

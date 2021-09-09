@@ -1,4 +1,4 @@
-# Glossary
+# Glossary of terms
 
 <table>
   <thead>
@@ -425,6 +425,12 @@
       </td>
       <td style="text-align:left">A proportion of Network transaction costs that is taken used to remunerate
         Network participants or the Community Pool.</td>
+    </tr>
+    <tr>
+      <td style="text-align:left"><b>Gas</b>
+      </td>
+      <td style="text-align:left">Gas refers to the fee, or pricing value, required to successfully conduct
+        a transaction or execute a contract on a blockchain.</td>
     </tr>
     <tr>
       <td style="text-align:left"><b>Genesis Parameters</b>

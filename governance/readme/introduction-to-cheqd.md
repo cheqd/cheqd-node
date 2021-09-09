@@ -32,27 +32,25 @@ In other words, every time we want to get access to our own data and digital ide
 
 We _****_play out this sequence multiple times a day:
 
-
-
-Person: _**"Hello there, can I please get into my account to view my own data please".**_
-
-Company: "_**Ahhh maybe, if you have the key you can get in, otherwise nah, you can't have your data today".**_
-
-Person: _**\*Digs out key\*     "Password1!   -   an old classic"**_
-
-Company: _**"Come on in then, have a rummage around, and then close the door behind you on the way out, yeah?"**_
-
-Person: _**"Can I maybe have a verified copy of this data, so I can prove who I am to the next company to make this whole process easier??"**_
-
-Company: _**"You what?"**_
-
-Person: _**"Yeah come on mate, I just want to have a portable copy of my data so that I don't need to go through this process all the time."**_
-
-Company: _**"Yeah it doesn't work like that around here. Have a view of your data, enjoy some videos of cute cats, OH... AND HAVE YOU SEEN THIS VIDEO OF A BABY MONKEY RIDING A PIG?"**_
-
-Person: _**"That is some GREAT content, you know what, forget about what I said before yeah, you keep that data and do your thing"**_
-
-Company: _**\*sweats advertisement money\***_
+> Person: _**"Hello there, can I please get into my account to view my own data please".**_
+>
+> Company: "_**Ahhh maybe, if you have the key you can get in, otherwise nah, you can't have your data today".**_
+>
+> Person: _**\*Digs out key\*     "Password1!   -   an old classic"**_
+>
+> Company: _**"Come on in then, have a rummage around, and then close the door behind you on the way out, yeah?"**_
+>
+> Person: _**"Can I maybe have a verified copy of this data, so I can prove who I am to the next company to make this whole process easier??"**_
+>
+> Company: _**"You what?"**_
+>
+> Person: _**"Yeah come on mate, I just want to have a portable copy of my data so that I don't need to go through this process all the time."**_
+>
+> Company: _**"Yeah it doesn't work like that around here. Have a view of your data, enjoy some videos of cute cats, OH... AND HAVE YOU SEEN THIS VIDEO OF A BABY MONKEY RIDING A PIG?"**_
+>
+> Person: _**"That is some GREAT content, you know what, forget about what I said before yeah, you keep that data and do your thing"**_
+>
+> Company: _**\*sweats advertisement money\***_
 
 This is the digital sphere we have all become accustomed to, without really being aware of, or presented an alternative. For this reason, we feel a level of content sacrificing a little bit of privacy for a whole lot of convenience. 
 
