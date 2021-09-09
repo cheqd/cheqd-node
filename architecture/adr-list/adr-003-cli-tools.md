@@ -41,20 +41,6 @@ This ADR will focus on the CLI tool architecture choice for `cheqd-node`.
    2. Unlike existing Hyperledger Indy networks, it is anticipated that some of the node operators on the cheqd network will have experience running Cosmos validator nodes. For this group, having to learn a new “single” CLI tool could cause a steeper learning curve and a worse user experience than what they have now.
    3. Node operators may want one/separate CLIs for security and operational reasons, i.e., for a separation of concerns in terms of functionality.
 
-### Existing CLI architecture overview
-
-Currently, there are two separate CLI tools being used by the development team to interact with the ledger: Cosmos-based CLI and VDR CLI.
-
-![Current Cosmos CLI and VDR tools CLI architecture](https://lh3.googleusercontent.com/cMdfEe19vqDVaRJ0kP97KGCUHauEpnh2TV1OhmvGqOFqqIkhWXGkdKxONDLjW2rnU83k9yelFWK_jhsqQoF57tNf8ChrPeIZsiLys3LKVT_QKG9Gk7Mir4ChbCeiUKs2V7l7jE8d=s0)
-
-### Existing CLI tools feature matrix
-
-| Only available in Cosmos CLI | Decision needed whether these are in Cosmos CLI or VDR CLI | Only available in VDR CLI |
-| :--- | :--- | :--- |
-| Cosmos transactions + Queries | Signing service + Key storage | Identity transactions + Queries |
-| MultiSig | \(Transaction + Query\) sending + Proof validation | DIDs + VCs \(+ DID storage\) |
-| Network bootstrapping commands |  |  |
-
 ### Options considered
 
 #### 1. Keep both Cosmos CLI and VDR Tools CLI, but use them for different purposes.
@@ -106,6 +92,20 @@ Based on the options considerations above and an analysis of development require
 
 1. **`cheqd-node` Cosmos CLI**: Any Cosmos-specific features, such as network & node management, token functionality required by node operators, etc.
 2. **VDR Tools CLI**: Any identity-specific features required by issuers, verifiers, holders on SSI networks.
+
+### CLI components overview
+
+Currently, there are two separate CLI tools being used by the development team to interact with the ledger: Cosmos-based CLI and VDR CLI.
+
+![Current Cosmos CLI and VDR tools CLI architecture](https://lh3.googleusercontent.com/cMdfEe19vqDVaRJ0kP97KGCUHauEpnh2TV1OhmvGqOFqqIkhWXGkdKxONDLjW2rnU83k9yelFWK_jhsqQoF57tNf8ChrPeIZsiLys3LKVT_QKG9Gk7Mir4ChbCeiUKs2V7l7jE8d=s0)
+
+### CLI tools feature matrix
+
+| Only available in Cosmos CLI | Decision needed whether these are in Cosmos CLI or VDR CLI | Only available in VDR CLI |
+| :--- | :--- | :--- |
+| Cosmos transactions + Queries | Signing service + Key storage | Identity transactions + Queries |
+| MultiSig | \(Transaction + Query\) sending + Proof validation | DIDs + VCs \(+ DID storage\) |
+| Network bootstrapping commands |  |  |
 
 ## Consequences
 
