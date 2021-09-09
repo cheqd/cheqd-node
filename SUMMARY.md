@@ -44,7 +44,6 @@
   * [Minor Network changes](governance/contributing/how-network-governance-works-user.md)
   * [Major Network changes](governance/contributing/major-network-changes.md)
   * [Voting on cheqd](governance/contributing/voting-on-cheqd.md)
-  * [How Network Governance works \(Node Operator\)](governance/contributing/how-network-governance-works-node-operator.md)
   * [Proposal Template](governance/contributing/proposal-template.md)
 * [Principles](governance/readme-1.md)
 * [Advanced concepts](governance/advanced-concepts/README.md)

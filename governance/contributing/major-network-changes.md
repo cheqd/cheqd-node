@@ -1,6 +1,6 @@
 # Major Network changes
 
-### Major Network changes 
+## Major Network changes 
 
 These are changes that have a materially significant effect on the Network. Such changes SHOULD be made via a Proposal, following the steps in the decision tree diagram below. 
 

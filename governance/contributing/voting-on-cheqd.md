@@ -6,30 +6,32 @@ Before you dive into this section, we suggest that you familiarise yourself with
 
 ## How do I Vote?
 
+Voting on cheqd is a core part of the Network and how each individual User can influence the direction of change. cheqd voting is based on a liquid democracy model, whereby Users can vote unilaterally or delegate their votes to a Node Operator of their choice.
+
 ### Participants
 
-Participants are users that have the right to vote on proposals. In the cheqd Network, participants are bonded CHEQ holders. Bonding means something different for Validators and for everyday Users:
+Participants are users that have the right to vote on proposals. In the cheqd Network, participants are **bonded** CHEQ holders. Bonding means something different for Node Operators and for everyday Users:
 
-1. Validators can ‘self-bond’ their staking tokens in order to vote on governance matters;
-2. Everyday Users can ‘bond’ their tokens to a Validator, this is known as delegation. 
+1. Node Operators can ‘self-bond’ their staking tokens in order to vote on governance matters;
+2. Everyday Users can ‘bond’ their tokens to a Node Operator, this is known as delegation. 
 
 Unbonded CHEQ holders and other users do not get the right to participate in voting on proposals. However, they can submit and deposit on proposals.
 
-Note that some participants can be forbidden to vote on a proposal under a certain Validator if:
+Note that some participants can be forbidden to vote on a proposal under a certain Node Operator if:
 
-* participant has bonded or unbonded CHEQ to a particular Validator after the proposal has entered its voting period.
-* participant set up a node and became a Validator after the proposal entered its voting period.
+* participant has bonded or unbonded CHEQ to a particular Node Operator after the proposal has entered its voting period.
+* participant set up a node and became a Node Operator after the proposal entered its voting period.
 
-This does not prevent the participant voting with CHEQ bonded to other Validators. For example, if a participant bonded some CHEQ to Validator A before a proposal entered voting period and other CHEQ to Validator B after proposal entered voting period, only the vote under Validator B will be forbidden.  
+This does not prevent the participant voting with CHEQ bonded to other Node Operator. For example, if a participant bonded some CHEQ to Node Operator A before a proposal entered voting period and other CHEQ to Node Operator B after proposal entered voting period, only the vote under Node Operator B will be forbidden.  
 
 
 ### Inheritance
 
-If a User does not vote, it will inherit the Validator’s vote which it is bonded to.
+If a User does not vote, it will inherit the Node Operator's vote which it is bonded to.
 
-If the User votes before its Validator, it’s vote will take precedence; the Validator will not inherit the User’s vote. 
+If the User votes before its bonded Node Operator, it’s vote will take precedence; the Node Operator will not inherit the User’s vote. 
 
-If the User votes after its Validator, it will override its Validator vote with its own. If the proposal is urgent, it is possible that the vote will close before User has a chance to react and override their Validator's vote.  
+If the User votes after its Node Operator, it will override its Node Operator vote with its own. If the proposal is urgent, it is possible that the vote will close before User has a chance to react and override their Node Operator's vote.  
 
 
 ### Voting period
@@ -80,14 +82,14 @@ Threshold is defined as the minimum proportion of Yes votes \(excluding Abstain 
 Initially, the threshold is set at **50%** with a possibility to veto if more than **33.34% of votes** \(excluding Abstain votes\) are _**NoWithVeto**_ votes. This means that proposals are accepted if the proportion of Yes votes \(excluding Abstain votes\) at the end of the voting period is superior to **50%** and if the proportion of _**NoWithVeto**_ votes is inferior to **33.34%** \(excluding Abstain votes\).  
 
 
-### Validator’s punishment for non-voting
+### Node Operator's punishment for non-voting
 
-At present, Validators are not punished for failing to vote.  
+At present, Node Operators are not punished for failing to vote.  
 
 
 ### Governance address
 
-For the MVP, the Governance address will be the main Validator address generated at account creation. This address corresponds to a different PrivKey than the Tendermint PrivKey which is responsible for signing consensus messages. Validators thus do not have to sign governance transactions with the sensitive Tendermint PrivKey.  
+At launch, the Governance address will be the main Node Operator address generated at account creation. This address corresponds to a different PrivKey than the Tendermint PrivKey which is responsible for signing consensus messages. Node Operators thus do not have to sign governance transactions with the sensitive Tendermint PrivKey.  
 
 
 ### Software Upgrade
@@ -101,12 +103,12 @@ Switch
 
 #### Signal
 
-After a _**SoftwareUpgradeProposal**_ is accepted, Validators are expected to download and install the new version of the software while continuing to run the previous version. Once a Validator has downloaded and installed the upgrade, it will start signaling to the network that it is ready to switch by including the proposal's proposalID in its precommits.\(Note: Confirmation that we want it in the precommit?\)
+After a _**SoftwareUpgradeProposal**_ is accepted, Node Operators are expected to download and install the new version of the software while continuing to run the previous version. Once a Node Operator has downloaded and installed the upgrade, it will start signaling to the network that it is ready to switch by including the proposal's proposalID in its precommits.\(Note: Confirmation that we want it in the precommit?\)
 
 Note: There is only one signal slot per precommit. If several _**SoftwareUpgradeProposals**_ are accepted in a short timeframe, a pipeline will form and they will be implemented one after the other in the order that they were accepted.  
 
 
 #### Switch
 
-Once a block contains more than 2/3rd precommits where a common _**SoftwareUpgradeProposal**_ is signaled, all the nodes \(including Validator nodes, non-validating full nodes and light-nodes\) are expected to switch to the new version of the software.
+Once a block contains more than 2/3rd precommits where a common _**SoftwareUpgradeProposal**_ is signaled, all the nodes \(including Node Operator nodes, non-validating full nodes and light-nodes\) are expected to switch to the new version of the software.
 
