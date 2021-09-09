@@ -4,7 +4,7 @@
 
 | Category | Status |
 | :--- | :--- |
-| **ADR Stage** | PROPOSED |
+| **ADR Stage** | DRAFT |
 | **Implementation Status** | Not Implemented |
 
 ## Summary
