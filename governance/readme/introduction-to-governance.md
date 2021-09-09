@@ -45,7 +45,7 @@ The point is here, that people impose principles that are unwritten, because the
 
 Most things humans touch or have created in the world have a fiscal element. Or at least, you could probably make a strong argument that is the case. For this reason, when it comes to governance, there is generally a financial angle. 
 
-FInancial incentives and payment generally align tightly with motivation and willingness to follow a Governance Framework. For example, fines can deter actions from being taken, whereas, gifts and earnings can bring additional momentum in accordance with the rules. Sunstein and Thaler’s Nudge Theory is entirely built around this idea.
+Financial incentives and payment generally align tightly with motivation and willingness to follow a Governance Framework. For example, fines can deter actions from being taken, whereas, gifts and earnings can bring additional momentum in accordance with the rules. Sunstein and Thaler’s Nudge Theory is entirely built around this idea.
 
 In this way, regulating markets and the price of something has a large amount of sway on whether something will be willingly followed. Tokenomics largely implement this for decentralised networks.
 
