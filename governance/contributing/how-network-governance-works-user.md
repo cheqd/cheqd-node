@@ -1,6 +1,20 @@
 # Minor Network changes
 
-## Revisions and amendments
+## **Minor Network changes**
+
+These are changes that are insignificant, and do not affect the way the Network runs overall. Minor Network changes include, but are not limited to:
+
+* Textual edits to the Governance Framework or written general documentation;
+* Sensible additions to general documentation to improve clarity;
+* Minor code changes;
+* Finding, reporting and suggesting fixes to bugs;
+* Translating the cheqd documentation into various languages.
+
+## Decision tree
+
+\(Placeholder\)
+
+## How do I make edits to general text or code in cheqd documentation?
 
 You are able to make revisions and amendments to the wiki and source code without making a formal Proposal. 
 
@@ -19,15 +33,15 @@ To make a change, you need to use the link below to become an Open Source Contri
 
 {% embed url="https://app.gitbook.com/invite/cheqd?invite=-MiVxCDUlLSB22RuQ6dl" %}
 
-You should follow these instructions to make a change to any cheqd  GitBook content.
+You should follow these instructions to make a change to any cheqd GitBook content.
 
-1. Make your own branch
+1. **Make your own branch**
 
 To create a new branch, select 'New' followed by 'New variant'.
 
 ![](../../.gitbook/assets/image%20%281%29.png)
 
-Next you need to name your new branch.
+2. Next you need to **name your new branch**.
 
 You should use the prefix:
 
