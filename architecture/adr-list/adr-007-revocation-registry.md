@@ -13,11 +13,9 @@ Issued credentials need to be revocable by their issuers. Revocation needs to be
 
 ## Context
 
-This has obvious use cases for professional credentials being revoked for fraud or misconduct, and for driver’s licenses being revoked for criminal activity. However, it’s also important if a credential gets issued in error \(e.g., has a typo in it that misidentifies the subject\). The latter case is important even for immutable and permanent credentials such as a birth certificate.
+This has obvious use cases for professional credentials being revoked for fraud or misconduct, e.g., a driver’s license could be revoked for criminal activity. However, it’s also important if a credential gets issued in error \(e.g., has a typo in it that misidentifies the subject\). The latter case is important even for immutable and permanent credentials such as a birth certificate.
 
 In addition, it seems likely that the data inside credentials will change over time \(e.g., a person’s mailing address or phone number updates\). This is likely to be quite common, revocation can be used to guarantee currency of credential data when it happens. In other words, revocation may be used to force updated data, not just to revoke authorization.
-
-To better understanding a context, highly recommend reading [Hyperledger Indy Credential Revocation Hype](https://hyperledger-indy.readthedocs.io/projects/hipe/en/latest/text/0011-cred-revocation/README.html) from Daniel Hardman
 
 ## Decision
 
