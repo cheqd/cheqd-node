@@ -12,6 +12,8 @@ These are changes that are insignificant, and do not affect the way the Network 
 
 ## Decision tree
 
+To help YOU understand how to make changes on the cheqd Network, the decision tree below visualises how changes should be carried out.
+
 \(Placeholder\)
 
 ## How do I make edits to general text or code in cheqd documentation?

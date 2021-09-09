@@ -1,2 +1,2 @@
-# Node Operator Legal Position
+# Legal Disclaimer
 
