@@ -23,13 +23,45 @@ For general holders of coins or tokens across the industry, governance is often 
   
       For this reason, it is suggested that token holders **bond** and **delegate** their tokens, to create a healthy Network and earn passive income.   
 
-5. What if I want to vote myself, without a Node Operator/Validator?  
+5. What if I want to **vote unilaterally**, without a Node Operator/Validator?  
 
 
    If you are particularly interested or passionate about a specific governance proposal, or do not agree with your bonded Node Operator, it is absolutely possible to vote unilaterally. To do this, follow the instructions below in the section How do I Vote?  
 
-6. Is my choice of Node Operator important?  Yes, your choice of bonded Node Operator is very important. You should be mindful about what reputation the Node Operator has. This is because the Node Operator may use your votes against the best interest of yourself and the community. Furthermore, the Node Operator might exhibit bad behaviour on the Network and have some of its stake slashed. Slashing means taking stake away from the Node Operator and adding it to the Community Pool. This may involve those who have bonded and delegated tokens to have their tokens slashed as well.  
-7. Is it possible to **unbond** from a Node Operator?  Yes, there is an unbonding process and it is possible to instantly redelegate to a new Node Operator. You cannot 'hop' between Node Operators quickly however. You must complete your redelegation to a Node Operator before moving again.    
+6. Is my **choice of Node Operator** important?  Yes, your choice of bonded Node Operator is very important. You should be mindful about what reputation the Node Operator has. This is because the Node Operator may use your votes against the best interest of yourself and the community. Furthermore, the Node Operator might exhibit bad behaviour on the Network and have some of its stake slashed. Slashing means taking stake away from the Node Operator and adding it to the Community Pool. This may involve those who have bonded and delegated tokens to have their tokens slashed as well.  
+7. Is it possible to **unbond** from a Node Operator?  Yes, is possible to instantly redelegate to a new Node Operator or **unbond** your tokens. You cannot 'hop' between Node Operators quickly however. You must complete your redelegation to a Node Operator before moving again. If you want to completely withdraw and **unbond** your tokens, you need to be mindful that this process takes **2 weeks** for the tokens to become available for use again.    
+
+## How do I make changes on the Network?
+
+Every User is encouraged to contribute to the cheqd Network. You can contribute to the documentation in the following ways:
+
+* Improving general documentation;
+* Improving the governance framework;
+* Contributing code to cheqd by fixing bugs or implementing features;
+* Finding and reporting bugs;
+* Translating the cheqd documentation into various languages;
+* Making on-chain Proposals as to how the Network Principles of Parameters should change;
+* Participating in Community discussion!
+
+To make this easy, it is important to explain HOW a User can contribute, and what the best practices are for making changes. 
+
+For this reason, it is important to distinguish when a change can be made entirely off-ledger, and when a change is needed to be voted on, and made on-ledger. To do this we must differentiate between **minor changes** which are able to take place **entirely off-ledger** and **major network changes** which need to be **formalised on-ledger.**
+
+### **Minor Network changes**
+
+### Major Network changes 
+
+For major network changes, changes should be accompanied by a Proposal.
+
+Major network changes include, but are not limited to:
+
+* Materially significant Architecture Decisions \(**ADs**\), such as:
+  * An additional feature to cheqd;
+  * Removal of a feature of cheqd;
+* Parameter changes for the Network;
+* Community pool decisions;
+* Material changes to a cheqd Principle;
+* Partnerships or connections to other infrastructure.
 
 ## Proposals
 
