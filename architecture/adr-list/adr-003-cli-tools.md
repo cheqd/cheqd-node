@@ -99,9 +99,9 @@ Based on the options considerations above and an analysis of development require
 
 ### CLI components overview
 
-![Cosmos CLI components](adr_003_cli_tools/cli_components_cosmos.png)
+![Cosmos CLI components](../../.gitbook/assets/cli_components_cosmos.png)
 
-![VDR CLI components](adr_003_cli_tools/cli_components_vdr.png)
+![VDR CLI components](../../.gitbook/assets/cli_components_vdr.png)
 
 ## Consequences
 
