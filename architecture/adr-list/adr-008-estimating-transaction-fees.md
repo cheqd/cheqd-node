@@ -109,19 +109,34 @@ There is currently no way to request `min-gas-prices`.
 
 ### Proposed API in VDR Tools
 
-#### Methods for `gas` estimation:
+#### Build simulate query
+
+Used to build gas estimation request. 
 
 ```
 indy_cheqd_ledger_tx_build_query_simulate(tx: byte[]) -> String
 ```
 
-Tx bytes from `build_tx` method should be used.
+Parameters:
+* `tx` - transaction bytes from `build_tx` method
+
+Result:
+* request body
+
+`indy_cheqd_pool_abci_query` should be used to send the request and receive a response.
+
+#### Parse simulate query response
+
+Used to parse gas estimation response.
 
 ```
-indy_cheqd_ledger_tx_parse_query_simulate_resp(tx: byte[]) -> String
+indy_cheqd_ledger_tx_parse_query_simulate_resp(resp: String) -> String
 ```
 
-Return string is json encoded  structure:
+Parameters:
+* `resp` - response string from `indy_cheqd_pool_abci_query` call
+
+Result is json encoded  structure:
 
 ```
 SimulateResponse {
@@ -137,27 +152,47 @@ SimulateResponse {
 
 Full type description can be found [here](https://github.com/cosmos/cosmos-sdk/blob/master/proto/cosmos/tx/v1beta1/service.proto#L112).
 
-#### Method for getting recommended `gas` estimation multiplier:
+`GasUsed` is the estimated gas value.
+
+#### Get gas multiplier
+
+It's recommended to use this precomputed multiplier to increase chances of a transaction being committed.
 
 ```
 indy_cheqd_ledger_tx_get_gas_multiplier() -> double
 ```
 
-Recommended to use this multiplier to increase chances of a transaction being committed.
+Params:
+* None
 
-#### Method for `gas price` estimation:
+Result:
+* Multiplier value
 
-```
-indy_cheqd_ledger_tx_build_query_prices(tx: byte[]) -> String
-```
-
-Tx bytes from `build_tx` method should be used.
+#### Build average gas price query
 
 ```
-indy_cheqd_ledger_tx_parse_query_prices_resp(tx: byte[]) -> String
+indy_cheqd_ledger_tx_build_query_prices() -> String
 ```
 
-Return string is json encoded  structure:
+Parameters:
+* None
+
+Result:
+* Request body
+
+`indy_cheqd_pool_abci_query` should be used to send the request and receive a response.
+
+#### Parse average gas price response
+
+Used to parse gas estimation response.
+
+```
+indy_cheqd_ledger_tx_parse_query_prices_resp(resp: String) -> String
+```
+Params:
+* None
+
+Return string is json encoded structure:
 
 ```
 PricesResponse {
@@ -168,7 +203,7 @@ PricesResponse {
 
 `LastAverage` - average gas price for the recent `N` committed transactions where `N` is `SubsetSize`.
 
-#### Method for getting recommended `gas price` estimation multiplier:
+#### Get gas average price multiplier
 
 To minimize `gas price` it's recommended to apply a multiplier for `last average`.
 
@@ -176,7 +211,11 @@ To minimize `gas price` it's recommended to apply a multiplier for `last average
 indy_cheqd_ledger_tx_get_gas_price_multiplier() -> double
 ```
 
-In case of timeout exponential growth should be applied.
+Parameters:
+* None
+
+Result:
+* Multiplier value
 
 ## Decision
 
