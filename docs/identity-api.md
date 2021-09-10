@@ -92,7 +92,7 @@ CreateDidResponse {
 
 ### Update DID
 
-#### **cheqd-sdk function**
+#### cheqd-sdk function
 
 `build_update_did_request(id, verkey, alias)`
 
@@ -126,7 +126,7 @@ UpdateDidResponse {
 
 * `key`\(string\): A unique key is used to store this DID in a state
 
-#### **Response** validation
+#### Response validation
 
 * A transaction with `id` from `UpdateDidRequest`must already be in a ledger created by `CreateDidRequest`
 * `UpdateDidRequest` must be signed by the DID from `id` field. It means that this DID must be an owner of this DID transaction.
@@ -151,7 +151,7 @@ Request
 }
 ```
 
-* `path`: __Path for RPC endpoint for cheqd pool
+* `path`: Path for RPC endpoint for cheqd pool
 * `data`: Query with an entity key from a state. String `did:<id>` encoded to bytes
 * `height`: Ledger height \(size\). `None` for auto calculation
 * `prove`:  Boolean value. `True` for getting state proof in a pool response
@@ -268,7 +268,7 @@ Request
 }
 ```
 
-* `path`: __Path for RPC endpoint for cheqd pool
+* `path`: Path for RPC endpoint for cheqd pool
 * `data`: Query with an entity key from a state. String `did:<id>` encoded to bytes
 * `height`: Ledger height \(size\). `None` for auto calculation
 * `prove`:  Boolean value. `True` for getting state proof in a pool response
@@ -288,9 +288,11 @@ QueryGetAttribResponse{
 
 ### Create SCHEMA
 
-_VDR tools: ****_build\_create\_schema\_request\(version, name, attr\_names\)
+#### cheqd-sdk function
 
-_Builds request in the follow format:_
+`build\_create\_schema\_request\(version, name, attr\_names\)`
+
+#### Request format
 
 ```text
 CreateSchemaRequest 
@@ -306,11 +308,11 @@ CreateSchemaRequest
 }
 ```
 
-* `attr_names`\(array\): array of attribute name strings \(125 attributes maximum\)
+* `attr_names`\(array\): Array of attribute name strings \(125 attributes maximum\)
 * `name`\(string\): Schema's name string
 * `version`\(string\): Schema's version string
 
-_Returns:_
+#### Response format
 
 ```text
 CreateSchemaResponse {
@@ -318,22 +320,23 @@ CreateSchemaResponse {
 } 
 ```
 
-* `key`\(string\): a key is used to store this schema in a state
+* `key`\(string\): A key is used to store this schema in a state
 
-#### Validation
+#### Response validation
 
-* A SCHEMA transaction with did from `owner` field must already be in a ledger created by `CreateDidRequest`
+* A SCHEMA transaction with DID from `owner` field must already be in a ledger created by `CreateDidRequest`
 * `CreateSchemaRequest` must be signed by  DID from `owner` field. 
 
 ### Get Schema
+#### cheqd-sdk function
 
-_VDR tools: ****_build\_query\_get\_schema\(name, version, owner\)
+`build\_query\_get\_schema\(name, version, owner\)`
 
 * `name`\(string\): Schema's name string
 * `version`\(string\): Schema's version string
 * `owner` \(string\): Schema's owner did
 
-_Builds request in the follow format:_
+#### Request format
 
 ```text
 Request 
@@ -345,13 +348,12 @@ Request
 }
 ```
 
-* `path`_-_ path for RPC Endpoint for Cheqd pool; 
-* `data` - query with an entity key from a state. String `schema:<owner>:<name>:<version>` encoded to bytes;
-* `height` - a height of ledger \(size\). `None` for auto calculation;
-* `prove` - boolean value. `True` - for getting state proof in a pool response. 
+* `path`: Path for RPC Endpoint for cheqd pool
+* `data`: Query with an entity key from a state. String `schema:<owner>:<name>:<version>` encoded to bytes
+* `height`: Ledger height \(size\). `None` for auto calculation;
+* `prove`: Boolean value. `True` for getting state proof in a pool response. 
 
-_Returns:_
-
+#### Response format
 ```text
 QueryGetSchemaResponse{
         "attrib": {
@@ -366,9 +368,11 @@ QueryGetSchemaResponse{
 
 ### Create Credential Definition
 
-_VDR tools: ****_build\_create\_cred\_def\_request\(cred\_def, schema\_id, signature\_type, tag\)
+#### cheqd-sdk function
 
-_Builds request in the follow format:_
+`build\_create\_cred\_def\_request\(cred\_def, schema\_id, signature\_type, tag\)`
+
+#### Request format
 
 ```text
 CreateCredDefRequest 
@@ -387,14 +391,14 @@ CreateCredDefRequest
 }
 ```
 
-* `cred_def` \(dict\): Dictionary with Cred Definition's data:
-  * `primary` \(dict\): primary credential public key
-  * `revocation` \(dict\): revocation credential public key
-* `schema_id` \(string\): Schema_'_s key from a state
-* `signature_type` \(string\): Type of the credential definition \(that is credential signature\). `CL` \(Camenisch-Lysyanskaya\) is the only supported type now.
+* `cred_def` \(dict\): Dictionary with Credential Definition's data:
+  * `primary` \(dict\): Primary credential public key
+  * `revocation` \(dict\): Revocation credential public key
+* `schema_id` \(string\): Schema's key from a state
+* `signature_type` \(string\): Type of the Credential Definition \(that is credential signature\). `CL` \(Camenisch-Lysyanskaya\) is the only supported type now.
 * `tag` \(string, optional\): A unique tag to have multiple public keys for the same Schema and type issued by the same DID. A default tag `tag` will be used if not specified.
 
-_Returns:_
+#### Response format
 
 ```text
 CreateCredDefResponse {
@@ -402,23 +406,25 @@ CreateCredDefResponse {
 } 
 ```
 
-* `key`\(string\): a key is used to store this Credential Definition in a state
+* `key`\(string\): A unique key that is used to store this Credential Definition in a state
 
-#### Validation
+#### Response validation
 
-* A CRED\_DEF transaction with did from `owner` field must already be in a ledger created by `CreateDidRequest`
+* A CRED\_DEF transaction with DID from `owner` field must already be in a ledger created by `CreateDidRequest`
 * `CreateCredDefRequest` must be signed by  DID from `owner` field. 
 
 ### Get Credential Definition
 
-_VDR tools: ****_build\_query\_get\_cred\_def\(name, version, owner\)
+#### cheqd-sdk function
+
+`build\_query\_get\_cred\_def\(name, version, owner\)`
 
 * `schema_id`\(string\): Schema's key from a state
-* `signature_type`\(string\): Type of the credential definition \(that is credential signature\). CL \(Camenisch-Lysyanskaya\) is the only supported type now.
-* `owner` \(string\): Credential Definition's owner did
+* `signature_type`\(string\): Type of the Credential Definition \(that is credential signature\). CL \(Camenisch-Lysyanskaya\) is the only supported type now.
+* `owner` \(string\): Credential Definition's owner DID
 * `tag` \(string, optional\): A unique tag to have multiple public keys for the same Schema and type issued by the same DID. A default tag `tag` will be used if not specified.
 
-_Builds request in the follow format:_
+#### Request format
 
 ```text
 Request 
@@ -430,12 +436,12 @@ Request
 }
 ```
 
-* `path`_-_ path for RPC Endpoint for Cheqd pool; 
-* `data` - query with an entity key from a state. String `cred_def:<owner>:<schema_id>:<tag>:<signature_type>` encoded to bytes;
-* `height` - a height of ledger \(size\). `None` for auto calculation;
-* `prove` - boolean value. `True` - for getting state proof in a pool response. 
+* `path`: Path for RPC endpoint for cheqd pool
+* `data`: Query with an entity key from a state. String `cred_def:<owner>:<schema_id>:<tag>:<signature_type>` encoded to bytes
+* `height`: Ledger height \(size\). `None` for auto calculation
+* `prove`: Boolean value. `True` for getting state proof in a pool response. 
 
-_Returns:_
+#### Response format
 
 ```text
 QueryGetCredDefResponse{
@@ -449,6 +455,3 @@ QueryGetCredDefResponse{
          },
 }  
 ```
-
-## 
-
