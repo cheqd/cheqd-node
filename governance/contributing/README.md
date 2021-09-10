@@ -40,7 +40,7 @@ To help YOU understand how to make changes on the cheqd Network, the decision tr
 
 Whenever a **major network change** takes place on the Network, reference MUST be made to cheqd's Foundational Principles. The Principles should act as a checks and balance against **major network changes.**
 
-This means, that **major network changes** should never oppose a Principle. For more information on how the Principles should be interpreted, see the Section on Principles. 
+This means, that **major network changes** should never oppose a Principle, unless it is acting to update or change a Principle. For more information on how the Principles should be interpreted, see the Section on Principles. 
 
 ## Community
 

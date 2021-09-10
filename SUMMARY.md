@@ -24,7 +24,7 @@
 
 ## Architecture
 
-* [Architecture Decision Record \(ADR\) Process](architecture/architecture.md)
+* [Architecture Decision Record \(ADR\) Process](architecture/architecture-decision-record-adr-process.md)
 * [List of ADRs](architecture/adr-list/README.md)
   * [ADR {ADR-NUMBER}: {TITLE}](architecture/adr-list/adr-template.md)
   * [ADR 001: Payment mechanism for issuing credentials](architecture/adr-list/adr-001-payment-mechanism-for-issuing-credentials.md)
@@ -47,10 +47,11 @@
   * [Voting on cheqd](governance/contributing/voting-on-cheqd.md)
   * [Proposal Template](governance/contributing/proposal-template.md)
 * [Principles](governance/readme-1.md)
+* [Untitled](governance/untitled.md)
 * [Advanced concepts](governance/advanced-concepts/README.md)
   * [Building on Cosmos](governance/advanced-concepts/building-on-cosmos.md)
   * [Trust over IP alignment](governance/advanced-concepts/trust-over-ip-alignment.md)
-  * [Genesis Parameters](governance/advanced-concepts/genesis-parameters.md)
+  * [Network Parameters](governance/advanced-concepts/genesis-parameters.md)
   * [Legal Disclaimer](governance/advanced-concepts/node-operator-legal-position.md)
 * [Terminology & Glossary](governance/terminology-and-glossary/README.md)
   * [Glossary of terms](governance/terminology-and-glossary/glossary.md)

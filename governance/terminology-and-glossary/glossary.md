@@ -104,7 +104,7 @@
         Network Governance and delegate unused votes to that specific Node Operator.</td>
     </tr>
     <tr>
-      <td style="text-align:left"><b>CHEQ</b>
+      <td style="text-align:left"><b>Cheq</b>
       </td>
       <td style="text-align:left">The native medium of exchange, governance and transaction fee on the cheqd
         Network.</td>
