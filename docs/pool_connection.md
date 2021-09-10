@@ -3,7 +3,7 @@
 ## Overview
 
 This page describes API about how to work with keys and how to connect to the pool. 
-All the libraries methods/calls are defined on the [`cheqd-sdk`](https://github.com/cheqd/cheqd-sdk) \(forked from [Evernym VDR Tools](https://gitlab.com/evernym/verity/vdr-tools)\).
+All the libraries methods/calls are defined on the [`cheqd-sdk`](https://github.com/cheqd/cheqd-sdk)    (forked from [Evernym VDR Tools](https://gitlab.com/evernym/verity/vdr-tools) ).
 
 ## Keys
 ### List of methods
@@ -15,6 +15,12 @@ All the libraries methods/calls are defined on the [`cheqd-sdk`](https://github.
 
 #### **indy_cheqd_keys_add_random**
 This method implements the logic of creation a key just using `alias`, without specifying any other additional information, like mnemonic.
+
+Input parameters:
+
+* `wallet_handle` - integer, which is connected to previously created and opened wallet.
+* `alias` - human-readable representation of alias to user,
+
 As result, the next structure is expected:
 ```
 {
@@ -26,6 +32,13 @@ As result, the next structure is expected:
 
 #### **indy_cheqd_keys_add_from_mnemonic**
 This method realised logic for recovering keys from `mnemonic` string. Mnemonic string - it's a human-readable combination of words, in general can include 12 or 24 words.
+
+Input parameters:
+
+* `wallet_handle` - integer, which is connected to previously created and opened wallet.
+* `alias` - human-readable representation of alias to user,
+* `mnemonic` - string of 12 or 24 words.
+
 As result, the next structure is expected:
 ```
 {
@@ -37,6 +50,12 @@ As result, the next structure is expected:
 
 #### **indy_cheqd_keys_get_info**
 This method is needed for getting information about already generated and stored keys by using only an `alias`.
+
+Input parameters:
+
+* `wallet_handle` - integer, which is connected to previously created and opened wallet.
+* `alias` - human-readable representation of alias to user,
+
 As result, the list of next structures is expected:
 ```
 {
@@ -48,6 +67,11 @@ As result, the list of next structures is expected:
 
 #### **indy_cheqd_keys_get_list_keys**
 The method returns a list of all keys which are placed locally.
+
+Input parameters:
+
+* `wallet_handle` - integer, which is connected to previously created and opened wallet.
+
 As result, the next structure is expected:
 ```
  [
@@ -59,6 +83,14 @@ As result, the next structure is expected:
 
 #### **indy_cheqd_keys_sign**
 This method can sign a transaction by using a key which can be found by `alias`
+
+Input parameters:
+
+* `wallet_handle` - integer, which is connected to previously created and opened wallet.
+* `alias` - human-readable representation of alias to user, 
+* `tx_raw` - byte representation of transaction,
+* `tx_len` - length of string with bytes of transaction,
+
 As result, raw byte's string is expected.
 ```
 [10, 146, 1, 10, 134, 1, 10, 37, 47, 99, 104, 101, 113, 100, 105, 100, 46, 99, 104, 101, 113, 100, 110, 111, 100, 101, 46, 99, 104, 101, 113, 100, 46, 77, 115, 103, 67, 114, 101, 97, 116, 101, 78, 121, 109, 18, 93, 10, 45, 99, 111, 115, 109, 111, 115, 49, 120, 51, 51, 120, 107, 106, 100, 51, 103, 113, 108, 102, 104, 122, 53, 108, 57, 104, 54, 48, 109, 53, 51, 112, 114, 50, 109, 100, 100, 52, 121, 51, 110, 99, 56, 54, 104, 48, 18, 10, 116, 101, 115, 116, 45, 97, 108, 105, 97, 115, 26, 11, 116, 101, 115, 116, 45, 118, 101, 114, 107, 101, 121, 34, 8, 116, 101, 115, 116, 45, 100, 105, 100, 42, 9, 116, 101, 115, 116, 45, 114, 111, 108, 101, 18, 4, 109, 101, 109, 111, 24, 192, 2, 18, 97, 10, 78, 10, 70, 10, 31, 47, 99, 111, 115, 109, 111, 115, 46, 99, 114, 121, 112, 116, 111, 46, 115, 101, 99, 112, 50, 53, 54, 107, 49, 46, 80, 117, 98, 75, 101, 121, 18, 35, 10, 33, 2, 59, 126, 95, 52, 102, 213, 99, 251, 102, 62, 148, 101, 72, 226, 188, 243, 222, 31, 35, 148, 19, 127, 79, 75, 79, 37, 160, 132, 193, 33, 148, 7, 18, 4, 10, 2, 8, 1, 18, 15, 10, 9, 10, 4, 99, 104, 101, 113, 18, 1, 48, 16, 224, 167, 18, 26, 64, 130, 229, 164, 76, 214, 244, 157, 39, 135, 11, 118, 223, 29, 196, 41, 92, 247, 126, 129, 194, 18, 154, 136, 165, 153, 76, 202, 85, 187, 195, 40, 69, 10, 206, 165, 238, 223, 245, 35, 140, 92, 123, 246, 110, 23, 39, 32, 215, 239, 230, 196, 146, 168, 5, 147, 9, 67, 113, 242, 163, 0, 223, 233, 73]
@@ -76,6 +108,7 @@ As result, raw byte's string is expected.
 
 #### **indy_cheqd_pool_add**
 This method is needed for adding information about pool which will be used to connect to.
+
 Input parameters:
 * `alias` - is a human-readable string,
 * `rpc_address` - address for connecting to the node, like `http://1.2.3.4:26657`, port `26657` is default value.
@@ -90,6 +123,10 @@ As result structure like PoolConfig is expected in response:
 ```
 #### **indy_cheqd_pool_get_config**
 This method is needed for getting config information about connecting to the pool by alias.
+
+Input parameters:
+* `alias` - human-readable string, represents pool alias, like `test_pool`.
+
 Expected result is structure PoolConfig, like:
 ```
 {
@@ -115,6 +152,12 @@ Object({
 ```
 #### **indy_cheqd_pool_broadcast_tx_commit**
 This method allows to send a txn to all the nodes.
+
+Input parameters:
+* `pool_alias` - human-readable string, like `test_pool`,
+* `signed_tx_raw` - string of bytes which includes raw signed transaction,
+* `signed_tx_len` - length of signed txn string,
+
 Request signed txn as input in raw format.
 Expected response should be in json format like:
 ```
@@ -160,6 +203,11 @@ Expected response should be in json format like:
 #### **indy_cheqd_pool_abci_query**
 Needs to send abci_query to the pool.
 With pool `alias` it requires request in json format as input parameter.
+
+Input parameters:
+* `pool_alias` - human-readable string, like `test_pool`,
+* `req_json`- String of ABCI query in json format,
+
 Expected response should be in json format like:
 ```
 {
@@ -176,7 +224,7 @@ Expected response should be in json format like:
 ```
 #### **indy_cheqd_pool_abci_info**
 Get general pool information. 
-Requires only `pool alias`
+Requires only `pool alias` as input parameter.
 Returns the response in json format, like:
 ```
 "{
@@ -194,4 +242,5 @@ Returns the response in json format, like:
 ## Base connection workflow:
 * Generate keys or restore them from mnemonic string. Useful methods here [`indy_cheqd_keys_add_random`](#indy_cheqd_keys_add_random) or [`indy_cheqd_keys_add_from_mnemonic`](#indy_cheqd_keys_add_from_mnemonic). 
 * Add configuration about pool, by calling [`indy_cheqd_pool_add`](#indy_cheqd_pool_add)
-THe real connection will be created only when request or txn will be sent.
+
+The real connection will be created only when request or txn will be sent.
