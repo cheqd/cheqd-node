@@ -11,6 +11,7 @@
 * [Building and testing](docs/building-and-testing.md)
 * [setting-up-a-new-network](docs/setting-up-a-new-network.md)
 * [cheqd Command Line Interface \(CLI\)](docs/cosmos-cli.md)
+* [Client-app Identity APIs](docs/identity-api.md)
 
 ## Docker packages <a id="docker"></a>
 
