@@ -58,7 +58,24 @@ echo $(cat ${CLIENT_HOME}/config/genesis.json | jq '.app_state.bank.balances += 
 echo $(cat ${CLIENT_HOME}/config/genesis.json | jq '.app_state.auth.accounts += [{"@type": "/cosmos.auth.v1beta1.BaseAccount","address": "'${ALICE_NEW_ACCOUNT_ID}'", "pub_key": null,"account_number": "0","sequence": "0"}]') > ${CLIENT_HOME}/config/genesis.json
 
 
-echo "##### [Validator operators] Generate stake transactions" 
+BASE_VESTING_ACCOUNT="cosmos1h0ul2knsd6pa4spfxtvznxfy6qma34uhxtu8zd"
+BASE_VESTING_COIN='{"denom":"cheq","amount":"10001000"}'
+echo $(cat ${CLIENT_HOME}/config/genesis.json | jq '.app_state.bank.balances += [{"address": "'${BASE_VESTING_ACCOUNT}'", "coins": [{"denom": "cheq", "amount": "5000000"}] }]') > ${CLIENT_HOME}/config/genesis.json
+echo $(cat ${CLIENT_HOME}/config/genesis.json | jq '.app_state.auth.accounts += [{"@type": "/cosmos.vesting.v1beta1.BaseVestingAccount", "base_account": {"address": "'${BASE_VESTING_ACCOUNT}'","pub_key": null,"account_number": "0","sequence": "0"}, "original_vesting": ['${BASE_VESTING_COIN}'], "delegated_free": [], "delegated_vesting": [], "end_time": "1630362459"}]') > ${CLIENT_HOME}/config/genesis.json
+
+CONTINOUS_VESTING_ACCOUNT="cosmos16gn9jhq4cztt9rkg8pt6r8zeruy6swzlwurcay"
+echo $(cat ${CLIENT_HOME}/config/genesis.json | jq '.app_state.bank.balances += [{"address": "'${CONTINOUS_VESTING_ACCOUNT}'", "coins": [{"denom": "cheq", "amount": "5000000"}] }]') > ${CLIENT_HOME}/config/genesis.json
+echo $(cat ${CLIENT_HOME}/config/genesis.json | jq '.app_state.auth.accounts += [{"@type": "/cosmos.vesting.v1beta1.ContinuousVestingAccount", "base_vesting_account": { "base_account": {"address": "'${CONTINOUS_VESTING_ACCOUNT}'","pub_key": null,"account_number": "0","sequence": "0"}, "original_vesting": ['${BASE_VESTING_COIN}'], "delegated_free": [], "delegated_vesting": [], "end_time": "1630362459"}, "start_time": "1630352459"}]') > ${CLIENT_HOME}/config/genesis.json
+
+DELAYED_VESTING_ACCOUNT="cosmos1830c9zt72lwaqgk7yxjcxpgawwqhq9mlla8yhx"
+echo $(cat ${CLIENT_HOME}/config/genesis.json | jq '.app_state.bank.balances += [{"address": "'${DELAYED_VESTING_ACCOUNT}'", "coins": [{"denom": "cheq", "amount": "5000000"}] }]') > ${CLIENT_HOME}/config/genesis.json
+echo $(cat ${CLIENT_HOME}/config/genesis.json | jq '.app_state.auth.accounts += [{"@type": "/cosmos.vesting.v1beta1.DelayedVestingAccount", "base_vesting_account": { "base_account": {"address": "'${DELAYED_VESTING_ACCOUNT}'","pub_key": null,"account_number": "0","sequence": "0"}, "original_vesting": ['${BASE_VESTING_COIN}'], "delegated_free": [], "delegated_vesting": [], "end_time": "1630362459"}}]') > ${CLIENT_HOME}/config/genesis.json
+
+PERIODIC_VESTING_ACCOUNT="cosmos1ecnhll5kery5td3ensfefeszfd208rv5tsa4u6"
+echo $(cat ${CLIENT_HOME}/config/genesis.json | jq '.app_state.bank.balances += [{"address": "'${PERIODIC_VESTING_ACCOUNT}'", "coins": [{"denom": "cheq", "amount": "5000000"}] }]') > ${CLIENT_HOME}/config/genesis.json
+echo $(cat ${CLIENT_HOME}/config/genesis.json | jq '.app_state.auth.accounts += [{"@type": "/cosmos.vesting.v1beta1.PeriodicVestingAccount", "base_vesting_account": { "base_account": {"address": "'${PERIODIC_VESTING_ACCOUNT}'","pub_key": null,"account_number": "0","sequence": "0"}, "original_vesting": ['${BASE_VESTING_COIN}'], "delegated_free": [], "delegated_vesting": [], "end_time": "1630362459"}, "start_time": "1630362439", "vesting_periods": [{"length": "20", "amount": ['${BASE_VESTING_COIN}']}]}]') > ${CLIENT_HOME}/config/genesis.json
+
+echo "##### [Validator operators] Generate stake transactions"
 
 cheqd-noded gentx alice 1000000cheq --chain-id $CHAIN_ID --node-id $NODE_0_ID --pubkey $NODE_0_VAL_PUBKEY --home $CLIENT_HOME
 cheqd-noded gentx bob 1000000cheq --chain-id $CHAIN_ID --node-id $NODE_1_ID --pubkey $NODE_1_VAL_PUBKEY --home $CLIENT_HOME
