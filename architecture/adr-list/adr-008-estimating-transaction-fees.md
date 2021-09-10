@@ -1,4 +1,4 @@
-# ADR 007: Estimating transaction fees
+# ADR 008: Estimating transaction fees
 
 ## Status
 
