@@ -19,3 +19,5 @@ description: >-
 
 ## Draft
 
+1. [ADR 007: **Revocation registry**](adr-007-revocation-registry.md)
+
