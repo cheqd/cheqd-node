@@ -47,7 +47,6 @@
   * [Voting on cheqd](governance/contributing/voting-on-cheqd.md)
   * [Proposal Template](governance/contributing/proposal-template.md)
 * [Principles](governance/readme-1.md)
-* [Untitled](governance/untitled.md)
 * [Advanced concepts](governance/advanced-concepts/README.md)
   * [Building on Cosmos](governance/advanced-concepts/building-on-cosmos.md)
   * [Trust over IP alignment](governance/advanced-concepts/trust-over-ip-alignment.md)
