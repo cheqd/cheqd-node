@@ -7,11 +7,11 @@ All the libraries methods/calls are defined on the [`cheqd-sdk`](https://github.
 
 ## Keys
 ### List of methods
-* [`**indy_cheqd_keys_add_random**`](#indy_cheqd_keys_add_random)
-* [`**indy_cheqd_keys_add_from_mnemonic**`](#indy_cheqd_keys_add_from_mnemonic)
-* [`**indy_cheqd_keys_get_info**`](#indy_cheqd_keys_get_info)
-* [`**indy_cheqd_keys_get_list_keys**`](#indy_cheqd_keys_get_list_keys)
-* [`**indy_cheqd_keys_sign**`](#indy_cheqd_keys_sign)
+* [`indy_cheqd_keys_add_random`](#indy_cheqd_keys_add_random)
+* [`indy_cheqd_keys_add_from_mnemonic`](#indy_cheqd_keys_add_from_mnemonic)
+* [`indy_cheqd_keys_get_info`](#indy_cheqd_keys_get_info)
+* [`indy_cheqd_keys_get_list_keys`](#indy_cheqd_keys_get_list_keys)
+* [`indy_cheqd_keys_sign`](#indy_cheqd_keys_sign)
 
 #### **indy_cheqd_keys_add_random**
 This method implements the logic of creation a key just using `alias`, without specifying any other additional information, like mnemonic.
@@ -64,12 +64,12 @@ As result, raw byte's string is expected.
 ## Pool
 
 ### list of methods
-* [`**indy_cheqd_pool_add**`](#indy_cheqd_pool_add)
-* [`**indy_cheqd_pool_get_config**`](#indy_cheqd_pool_get_config)
-* [`**indy_cheqd_pool_get_all_config**`](#indy_cheqd_pool_get_all_config)
-* [`**indy_cheqd_pool_broadcast_tx_commit**`](#indy_cheqd_pool_broadcast_tx_commit)
-* [`**indy_cheqd_pool_abci_query**`](#indy_cheqd_pool_abci_query)
-* [`**indy_cheqd_pool_abci_info**`](#indy_cheqd_pool_abci_info)
+* [`indy_cheqd_pool_add`](#indy_cheqd_pool_add)
+* [`indy_cheqd_pool_get_config`](#indy_cheqd_pool_get_config)
+* [`indy_cheqd_pool_get_all_config`](#indy_cheqd_pool_get_all_config)
+* [`indy_cheqd_pool_broadcast_tx_commit`](#indy_cheqd_pool_broadcast_tx_commit)
+* [`indy_cheqd_pool_abci_query`](#indy_cheqd_pool_abci_query)
+* [`indy_cheqd_pool_abci_info`](#indy_cheqd_pool_abci_info)
 
 #### **indy_cheqd_pool_add**
 This method is needed for adding information about pool which will be used to connect to.
@@ -114,3 +114,8 @@ Returns the response in json format, like:
       "last_block_app_hash": "dNurd7DVM06TCDJtZ4rd6RfWraKhxjptbARRbKPAF30="
     }
 ```
+
+## Base connection workflow:
+* Generate keys or restore them from mnemonic string. Useful methods here [`indy_cheqd_keys_add_random`](#indy_cheqd_keys_add_random) or [`indy_cheqd_keys_add_from_mnemonic`](#indy_cheqd_keys_add_from_mnemonic). 
+* Add configuration about pool, by calling [`indy_cheqd_pool_add`](#indy_cheqd_pool_add)
+THe real connection will be created only when request or txn will be sent.
