@@ -65,13 +65,13 @@ There is currently no way to request `min-gas-prices`.
 **Option 1: Client-side calculation**
 
 1. A gas estimation request could be built into the client libraries \(such as [VDR Tools](https://gitlab.com/evernym/verity/vdr-tools)\) used in applications using cheqd network
-2. The client library would calculate an adjustment coefficient client-side.
+2. The client library would use a precalculated adjustment coefficient to increase the chances of the transaction being committed.
 
 **Option 2: Use estimated values**
 
 1. Estimated gas for most common transactions could be pre-calculated based on best-guess.
 2. This method can be used as a workaround in the absence of a formal gas estimation request in Cosmos.
-3. This scenario is more likely to fail over time as gas prices can be dynamic on a live network with lots of transactions.
+3. This approach can be used because gas needed to process simple transactions will remain constant over time.
 
 #### Fee price estimations
 
@@ -79,20 +79,30 @@ There is currently no way to request `min-gas-prices`.
 
 1. Set a fixed recommended gas price on the cheqd network
 2. Embed the fixed value into applications
+3. This scenario is more likely to fail over time because validator operators can change gas prices.
 
 **Option 2: Dynamically calculate values**
 
-1. Gas prices can be dynamically determined client side based on recent transactions.
-2. This could be implemented as a client-side calculation, provided as a service \(e.g., via an oracle\), or a blend of both approaches.
-3. If the dynamically calculated fees are insufficient to put a transaction though, use exponential growth to calculate higher values and retry.
+1. Gas prices can be dynamically determined based on recent transactions.
+2. Possible ways of estimation:
+   1. Moving average
+   2. Weighed moving average
+   3. Exponential moving average
+3. Possible ways of implementation:
+   1. Client side
+   2. Provided as a service
+   3. On chain (the most trusted and robust way)
+3. To prevent constant growth of the mean value it's proposed to use multiplier `Y < 1` to get star fee price.
+4. If the dynamically calculated fees are insufficient to put a transaction though, use exponential growth to calculate higher values and retry.
 
 ### Proposed transaction sending flow in VDR Tools
 
 1. Build and sign a transaction
 2. Send gas estimation request
-3. Set initial gas price to
-   1. a fixed, pre-determined value
-   2. or, dynamically calculated value
+   1. Multiply response to the precalculated coefficient `X > 1` to increase probability of the transaction being committed
+3. Set initial gas price
+   1. Request moving average from the network
+   2. Multiply response by `Y < 1` to prevent constant growth of the mean value
 4. Try sending the transaction to the network
    1. Exponentially increase the `gas` limit, in case of failure due to gas being lower than gas-wanted.
    2. Exponentially increase the `gas-prices`, in case transaction time-out \(as this indicates `min-gas-prices` was not met\)
