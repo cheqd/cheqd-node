@@ -107,6 +107,77 @@ There is currently no way to request `min-gas-prices`.
    1. Exponentially increase the `gas` limit, in case of failure due to gas being lower than gas-wanted.
    2. Exponentially increase the `gas-prices`, in case transaction time-out \(as this indicates `min-gas-prices` was not met\)
 
+### Proposed API in VDR Tools
+
+#### Methods for `gas` estimation:
+
+```
+indy_cheqd_ledger_tx_build_query_simulate(tx: byte[]) -> String
+```
+
+Tx bytes from `build_tx` method should be used.
+
+```
+indy_cheqd_ledger_tx_parse_query_simulate_resp(tx: byte[]) -> String
+```
+
+Return string is json encoded  structure:
+
+```
+SimulateResponse {
+   GasInfo {
+      GasWanted uint64,
+      GasUsed uint64
+   },
+   Result {
+      ...
+   }
+}
+```
+
+Full type description can be found [here](https://github.com/cosmos/cosmos-sdk/blob/master/proto/cosmos/tx/v1beta1/service.proto#L112).
+
+#### Method for getting recommended `gas` estimation multiplier:
+
+```
+indy_cheqd_ledger_tx_get_gas_multiplier() -> double
+```
+
+Recommended to use this multiplier to increase chances of a transaction being committed.
+
+#### Method for `gas price` estimation:
+
+```
+indy_cheqd_ledger_tx_build_query_prices(tx: byte[]) -> String
+```
+
+Tx bytes from `build_tx` method should be used.
+
+```
+indy_cheqd_ledger_tx_parse_query_prices_resp(tx: byte[]) -> String
+```
+
+Return string is json encoded  structure:
+
+```
+PricesResponse {
+   LastAverage uint64
+   SubsetSize uint64
+}
+```
+
+`LastAverage` - average gas price for the recent `N` committed transactions where `N` is `SubsetSize`.
+
+#### Method for getting recommended `gas price` estimation multiplier:
+
+To minimize `gas price` it's recommended to apply a multiplier for `last average`.
+
+```
+indy_cheqd_ledger_tx_get_gas_price_multiplier() -> double
+```
+
+In case of timeout exponential growth should be applied.
+
 ## Decision
 
 
