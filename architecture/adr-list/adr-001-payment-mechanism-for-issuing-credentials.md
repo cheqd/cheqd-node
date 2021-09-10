@@ -1,4 +1,4 @@
-# ADR 001: Payment mechanism for credential issuance
+# ADR 001: Payment mechanism for issuing credentials
 
 ## Status
 
@@ -154,7 +154,7 @@ If steps 1-4 are successful, the Issuer is able to confirm that the requested pa
 
 ### Overview of steps 1-5
 
-![Payment flow for credential issuances based on Hyperledger Aries protocol](../../.gitbook/assets/adr001-payment-flow%20%282%29%20%282%29%20%284%29.png)
+![](../../.gitbook/assets/adr001-payment-flow%20%281%29.png)
 
 #### UML version
 
