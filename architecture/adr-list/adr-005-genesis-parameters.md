@@ -1,165 +1,167 @@
----
-description: This is the suggested template to be used for ADRs on the cheqd-node project.
----
-
 # ADR 005: Genesis parameters
 
 ## Status
 
-PROPOSED \| Not Implemented
+| Category | Status |
+| :--- | :--- |
+| **ADR Stage** | PROPOSED |
+| **Implementation Status** | Not Implemented |
 
 ## Summary
 
-The aim of this document is to define genesis parameters that will be used in testnets and the mainnet.
+The aim of this document is to define the genesis parameters that will be used in the cheqd network testnet.
 
 > Cosmos v0.42.5 parameters are described.
 
 ## Context
 
-Genesis consists of Tendermint consensus engine parameters and Cosmos app-specific parameters.
+Genesis consists of Tendermint consensus engine parameters and Cosmos app-specific parameters. 
 
 ### Consensus parameters
+Tendermint requires [genesis parameters](https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#genesis) to be defined for basic consensus conditions on any Cosmos network.
 
-Proposed values:
+#### Proposed values
 
-* block
-  * max\_bytes = `22020096` \(~22MB\)
+* **`block`**
+  * `max_bytes` = `22020096` \(~22MB\)
     * Cosmos hub: `200000` \(~200KB\)
-  * max\_gas = `-1` \(no gas limit\)
+  * `max_gas` = `-1` \(no gas limit\)
     * Cosmos hub: `2000000`
-  * time\_iota\_ms = `1000`
+  * `time_iota_ms` = `1000`
     * Cosmos hub: `1000`
     * **Deprecated, unused**
-* evidence
-  * max\_age\_num\_blocks = `100000`
-    * Max age of evidence, in blocks. The basic formula for calculating this is: `MaxAgeDuration / {average block time}`.
-  * max\_age\_duration = `172800000000000`
-    * Max age of evidence, in time. It should correspond with an app's "unbonding period".
-  * max\_bytes = `1048576`
-    * This sets the maximum size of total evidence in bytes that can be committed in a single block and should fall comfortably under the max block bytes.
-* validator
-  * pub\_key\_types = `[ "ed25519" ]`
-
-[Here](https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#genesis) you can find more about Tendermint genesis parameters.
+* **`evidence`**
+  * `max_age_num_blocks` = `100000`
+    * Maximum age of evidence, in blocks. The basic formula for calculating this is: `MaxAgeDuration / {average block time}`.
+  * `max_age_duration` = `172800000000000`
+    * Maximum age of evidence, in time. It should correspond with an app's "unbonding period".
+  * `max_bytes` = `1048576`
+    * This sets the maximum size of total evidence in bytes that can be committed in a single block and should fall comfortably under `max_bytes` for a block.
+* **`validator`**
+  * `pub_key_types` = `[ "ed25519" ]`
 
 ### Application parameters
 
-Cosmos application is divided into modules. Each module has parameters that help to adjust the module's behavior. Here are proposed values for default modules:
+Cosmos application is divided [into a list of modules](https://docs.cosmos.network/v0.44/modules/). Each module has parameters that help to adjust the module's behaviour. Here are proposed values for default modules:
 
-* auth
-  * max\_memo\_characters = `512`
-    * Max number of characters in the memo field
-  * tx\_sig\_limit = `7`
+* **`auth`**
+  * `max_memo_characters` = `512`
+    * Maximum number of characters in the memo field
+  * `tx_sig_limit` = `7`
     * Max number of signatures
-  * tx\_size\_cost\_per\_byte = `10`
+  * `tx_size_cost_per_byte` = `10`
     * Gas cost of transaction byte
-  * sig\_verify\_cost\_ed25519 = `590`
+  * `sig_verify_cost_ed25519` = `590`
     * Cost of `ed25519` signature verification
-  * sig\_verify\_cost\_secp256k1 = `1000`
+  * `sig_verify_cost_secp256k1` = `1000`
     * Cost of `secp256k1` signature verification
-* bank
-  * send\_enabled = `[]`
+* **`bank`**
+  * s`end_enabled` = `[]`
     * Enables send for specific denominations
-  * default\_send\_enabled = `true`
+  * `default_send_enabled` = `true`
     * The default send enabled value allows send transfers for all coin denominations
-* crisis
-  * constant\_fee = `{ "denom": "cheq", "amount": "1000" }`
-    * The fee is used to verify the invariant in the crisis module. Rean more about invariants [here](https://docs.cosmos.network/v0.43/building-modules/invariants.html).
-* distribution
-  * community\_tax = `0.02`
+* **`crisis`**
+  * `constant_fee` = `{ "denom": "cheq", "amount": "1000" }`
+    * The fee is used to verify the [invariant(s)](https://docs.cosmos.network/v0.44/building-modules/invariants.html) in the `crisis` module.
+* **`distribution`**
+  * `community_tax` = `0.02`
     * The percent of rewards that goes to the community fund pool
-  * base\_proposer\_reward = `0.01`
+  * `base_proposer_reward` = `0.01`
     * Base reward that proposer gets
-  * bonus\_proposer\_reward = `0.04`
-    * Bonus reward that proposer gets which depends on the number of precommits included to the block
-  * withdraw\_addr\_enabled = `true`
+  * `bonus_proposer_reward` = `0.04`
+    * Bonus reward that proposer gets. This depends on the number of pre-commits included to the block
+  * `withdraw_addr_enabled` = `true`
     * Whether withdrawal address can be changed or not. By default, it's the delegator's address.
-* evidence
+* **`evidence`**
   * No parameters
-* genutil
+* **`genutil`**
   * Used to manage initial transactions such as genesis validators creation
-* gov
-  * deposit\_params
-    * min\_deposit = `[{ "denom": "stake", "amount": "10000000" }]`
+* **`gov`**
+  * `deposit_params`
+    * min_deposit = `[{ "denom": "stake", "amount": "10000000" }]`
       * The minimum deposit for a proposal to enter the voting period.
-    * max\_deposit\_period = `172800s`
+    * `max_deposit_period` = `172800s`
       * The maximum period for Atom holders to deposit on a proposal. Initial value: 2 months.
-  * voting\_params
-    * voting\_period = `172800s`
-  * tally\_params
-    * quorum = `0.334`
+  * `voting_params`
+    * voting_period = `172800s`
+  * `tally_params`
+    * `quorum` = `0.334`
       * Minimum percentage of total stake needed to vote for a result to be considered valid. 
-    * threshold = `0.5`
+    * `threshold` = `0.5`
       * Minimum percentage of total stake needed to vote for a result to be considered valid.
-    * veto\_threshold = `0.334`
-      * The minimum value of Veto votes to Total votes ratio for proposal to be vetoed. Default value: 1/3.
-* mint
-  * mint\_denom = `cheq`
-  * inflation\_rate\_change = `0.13`
-    * Max inflation rate change per year
+    * `veto_threshold` = `0.334`
+      * The minimum value of veto votes to total votes ratio for proposal to be vetoed. Default value: 1/3.
+* **`mint`**
+  * `mint_denom` = `cheq`
+  * `inflation_rate_change` = `0.13`
+    * Maximum inflation rate change per year
     * In Cosmos hub they use `1.0`
     * Formula: `inflationRateChangePerYear = (1 - BondedRatio/ GoalBonded) * MaxInflationRateChange`
-  * inflation\_max = `0.20`
+  * `inflation_max` = `0.20`
     * Inflation aims to this value if `bonded_ratio` &lt; `bonded_goal`
     * Cosmos hub: `0.20`
-  * inflation\_min = `0.07`
+  * `inflation_min` = `0.07`
     * Inflation aims to this value if `bonded_ratio` &lt; `bonded_goal`
     * Cosmos hub: `0.07`
-  * goal\_bonded = `0.67`
+  * `goal_bonded` = `0.67`
     * Cosmos hub: `0.67`
-  * blocks\_per\_year = `6311520`
+  * `blocks_per_year` = `6311520`
     * Cosmos hub: `4360000`
-* slashing
-  * signed\_blocks\_window = `120960` \(1 week\)
+* **`slashing`**
+  * `signed_blocks_window` = `120960` \(1 week\)
     * Cosmos hub: `10000` \(~20h\)
-  * min\_signed\_per\_window = `0.50`
+  * `min_signed_per_window`= `0.50`
     * This percentage of blocks must be signed within the window
-  * downtime\_jail\_duration = `600s`
+  * `downtime_jail_duration` = `600s`
     * The minimal time validator have to stay in jail
-  * slash\_fraction\_double\_sign = `0.05`
+  * `slash_fraction_double_sign` = `0.05`
     * Slash for double sign
-  * slash\_fraction\_downtime = `0.01`
+  * `slash_fraction_downtime` = `0.01`
     * Slash for downtime
-* staking
-  * unbonding\_time = `1814400s`
+* **`staking`**
+  * `unbonding_time` = `1814400s`
     * A delegator must wait this time before tokens become unbonded
-  * max\_validators = `125`
+  * `max_validators` = `125`
     * The maximum number of validators in the network
-  * max\_entries = `7`
+  * `max_entries` = `7`
     * Max amount of unbound/redelegation operations in progress per account
-  * historical\_entries = `10000`
+  * `historical_entries` = `10000`
     * Amount of unbound/redelegate entries to store
-  * bond\_denom = `stake`
+  * `bond_denom` = `stake`
     * Denomination used in staking
-* \[ibc\] ibc
+* *\[ibc\]* **`ibc`**
   * ...
-* \[ibc\] capability
+* *\[ibc\]* **`capability`**
   * ...
-* \[ibc\] transfer
-  * send\_enabled = `false`
+* *\[ibc\]* **`transfer`**
+  * `send_enabled` = `false`
     * Enables or disables all cross-chain token transfers from this chain
-  * receive\_enabled = `false`
+  * `receive_enabled` = `false`
     * Enables or disables all cross-chain token transfers to this chain
-
-### Parameter adjustment
-
-All parameters can be changed via change proposals + voting.
 
 ## Decision
 
-Use parameters proposed in context.
+The parameters above were agreed to be used for the cheqd network testnet, with a view towards testing them for cheqd mainnet.
 
 ## Consequences
 
 ### Backward Compatibility
 
+* The token denomination has been changed to make the smallest denomination 10^-9 `cheq` instead of 1 `cheq`. This is a breaking change from the previous version of the cheqd testnet that will potentially require new tokens to be transferred and issued to testnet node operators.
+  
 ### Positive
+
+* Inflation allows fees to be collected from block rewards in addition to transaction fees.
+* In production/mainnet, parameters can only be changed via a majority vote without veto defeat according to the cheqd network governance principles. This allows for more democratic governance frameworks to be created for a self-sovereign identity network.
 
 ### Negative
 
-* Voting needed to change parameters. It can potentially take a lot of time.
 
 ### Neutral
 
+* Voting time, unbonding period, and deposit period have all been reduced to 2 weeks to balance the speed at which decisions can be reached vs giving enough time to validators to participate.
+
 ## References
 
+* [List of Cosmos modules](https://docs.cosmos.network/v0.44/modules/)
+* [Tendermint genesis parameters](https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#genesis)

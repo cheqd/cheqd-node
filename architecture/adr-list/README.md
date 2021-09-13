@@ -10,7 +10,7 @@ description: >-
 
 ## Proposed
 
-{% page-ref page="adr-001-payment-mechanism-for-issuing-credentials.md" %}
+1. [ADR 005: **Genesis parameters**](adr-005-genesis-parameters.md)
 
 ## Draft
 
