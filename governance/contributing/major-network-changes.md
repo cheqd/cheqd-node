@@ -35,67 +35,56 @@ These will be discussed in turn.
 
 Rather than making a proposal directly to the Network, proposals SHOULD first be made off-chain. Off-chain governance is vital for building a healthy and active governance community.
 
-Once consensus is reached in an off-chain forum, the parties to the discussion can have more confidence that a Proposal will reach minimum deposit and be approved on-chain. 
+Once feedback has been given in an off-chain forum, the User proposing the Proposal can have more confidence that a Proposal will reach minimum deposit and be approved on-chain. 
 
-At present, Proposals SHOULD be made and discussed on:
+### Your Idea
 
-1. [Github Discussions](https://github.com/cheqd/cheqd-node/discussions)
-
-They can also be discussed by the community on:
-
-1. [Telegram](https://t.me/cheqd), or
-2. Discord \(placeholder\)
-
-Engagement is likely to be critical to the success of a proposal.
-
-The degree to which you engage with the cheqd community should be relative to the potential impact that your proposal may have on the stakeholders.
-
-There are many different ways to engage. One strategy involves a few stages of engagement before and after submitting a proposal on chain. Why do it in stages? It's a more conservative approach to save resources. The idea is to check in with key stakeholders at each stage before investing more resources into developing your proposal.
-
-#### Stage 1: Your Idea
-
-In the first stage of this strategy, you should engage people \(ideally experts\) informally about your idea.
+Before you make a Network Proposal, you should engage people \(ideally experts\) informally about your idea. You should consider:
 
 * Does it make sense?
 * Are there critical flaws?
 * Does it need to be reconsidered?
 
-#### Not yet confident about your idea?
+Governance proposals potentially impact many stakeholders. Introduce your idea with known members of the community before investing resources into drafting a formal proposal. Don't let negative feedback dissuade you from exploring your idea if you think that it's still important.
 
-Don’t worry! Governance proposals potentially impact many stakeholders. Introduce your idea with known members of the community before investing resources into drafting a formal proposal. Don't let negative feedback dissuade you from exploring your idea if you think that it's still important.
+If you know people who are very involved with cheqd, send them a private message with a concise overview of what you think will result from your idea or proposed changes. 
 
-If you know people who are very involved with cheqd, send them a private message with a concise overview of what you think will result from your idea or proposed changes. Wait for them to ask questions before providing details. Do the same in semi-private channels where people tend to be respectful \(and hopefully supportive\).  We recommend the [cheqd Telegram Community](https://t.me/cheqd).
+You could ask a simple question or present an idea in our [Github Discussions](https://github.com/cheqd/cheqd-node/discussions), specifically in:
 
-#### Confident with your idea?
+1. [cheqd Q&A forum](https://github.com/cheqd/cheqd-node/discussions/categories/q-a)
+2. [cheqd ideas forum](https://github.com/cheqd/cheqd-node/discussions/categories/ideas)
+
+You may also want to rationalise your idea, or ask your question to the wider community, in:
+
+1. cheqd [Telegram](https://t.me/cheqd), or
+2. cheqd Discord
+
+Engagement is likely to be critical to the success of a proposal. The degree to which you engage with the cheqd community should be relative to the potential impact that your proposal may have on the Network.
+
+### Confident with your idea?
 
 Great! However, we still recommend that you introduce your idea with members of the community before investing resources into drafting a proposal. At this point you should seek out and carefully consider critical feedback in order to protect yourself from [confirmation bias](https://en.wikipedia.org/wiki/Confirmation_bias). This is the ideal time to see a critical flaw, because submitting a flawed proposal will waste resources.
 
-#### **Are you ready to draft a governance proposal?**
+### **Drafting a Proposal**
 
-There will likely be differences of opinion about the value of what you're proposing to do and the strategy by which you're planning to do it. If you've considered feedback from broad perspectives and think that what you're doing is valuable and that your strategy should work, and you believe that others feel this way as well, it's likely worth drafting a proposal. 
+If you've considered feedback from broad perspectives and think that what you're doing is valuable and that your strategy should work, and you believe that others feel this way as well, it's likely worth drafting a proposal. 
 
-A conservative approach is to have some confidence that you roughly have initial support from a good proportion of the voting power before proceeding to drafting your proposal. However, there are likely other approaches, and if your idea is important enough, you may want to pursue it regardless of whether or not you are confident that the voting power will support it.
+To make reading and reviewing your Proposal easier for the community, please select a Proposal template from the list below.
 
-#### Stage 2: Your Draft Proposal
-
-Begin with a well-considered draft proposal. Please use our proposal template here.
-
-Ensure that you have considered your proposal and anticipated questions that the community will likely ask.
+1. **Architecture Decision Record \(ADR\) Proposal**
+   1. **ADR 001**
+   2. **ADR 002**
+2. **General Governance Proposal**
+3. **\(Need to update with relevant templates\)**
 
 The ideal format for a proposal is as a Markdown file \(ie. .md\) in a Github repo. Markdown is a simple and accessible format for writing plain text files that is easy to learn. See the [Github Markdown Guide](https://guides.github.com/features/mastering-markdown/) for details on writing markdown files.
 
-If you don't have a [Github](http://github.com/) account already, register one. 
-
-Then fork this repository, draft your proposal in the proposals directory, and make a pull-request back to this repository. For more details on using Github, see the [Github Forking Guide](https://guides.github.com/activities/forking/). If you need help using Github, don't be afraid to ask someone!
-
-If you really don't want to deal with Github, you can always draft a proposal in Word or Google Docs, or directly in the forums, or otherwise. However, Markdown on Github is the ultimate standard for distributed collaboration on text files.
-
 Engage the community with your draft proposal
 
-1. Post a draft of your proposal as a topic in the 'governance' category of the cheqd Github forum. Ideally this should contain a link to this repository, either directly to your proposal if it has been merged, or else to a pull-request containing your proposal if it has not been merged yet.
+1. Post a draft of your proposal as a topic in the relevant category of the cheqd Github forum. 
 2. Directly engage key members of the community for feedback. These could be large contributors, those likely to be most impacted by the proposal, and entities with high stake-backing \(eg. high-ranked Validators; large stakers\).
 3. Target members of the community in a semi-public way before bringing the draft to a full public audience. 
-4. Alert the entire community to the draft proposal via
+4. Alert the community to the draft proposal via:
    * Twitter, tagging accounts such as the [cheqd account](https://twitter.com/cheqd_io)
    * [Telegram](https://t.me/cheqd)
 
