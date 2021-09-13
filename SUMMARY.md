@@ -36,17 +36,17 @@
 
 ## Governance
 
-* [Getting started with Governance](governance/readme/README.md)
-  * [Introduction to Governance](governance/readme/introduction-to-governance.md)
-  * [Introduction to cheqd](governance/readme/introduction-to-cheqd.md)
-  * [Introduction to Entropy](governance/readme/introduction-to-entropy.md)
+* [Getting started with Governance](governance/getting-started/README.md)
+  * [Introduction to Governance](governance/getting-started/introduction-to-governance.md)
+  * [Introduction to cheqd](governance/getting-started/introduction-to-cheqd.md)
+  * [Introduction to Entropy](governance/getting-started/introduction-to-entropy.md)
 * [Contributing](governance/contributing/README.md)
   * [Learning the basics](governance/contributing/learning-the-basics.md)
   * [Minor Network changes](governance/contributing/how-network-governance-works-user.md)
   * [Major Network changes](governance/contributing/major-network-changes.md)
   * [Voting on cheqd](governance/contributing/voting-on-cheqd.md)
   * [Proposal Template](governance/contributing/proposal-template.md)
-* [Principles](governance/readme-1.md)
+* [Principles](governance/principles.md)
 * [Advanced concepts](governance/advanced-concepts/README.md)
   * [Building on Cosmos](governance/advanced-concepts/building-on-cosmos.md)
   * [Trust over IP alignment](governance/advanced-concepts/trust-over-ip-alignment.md)
