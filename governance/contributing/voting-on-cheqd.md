@@ -111,7 +111,7 @@ Switch
 
 ### Signal
 
-After a _**SoftwareUpgradeProposal**_ is accepted, Node Operators are expected to download and install the new version of the software while continuing to run the previous version. Once a Node Operator has downloaded and installed the upgrade, it will start signaling to the network that it is ready to switch by including the proposal's proposalID in its precommits.\(Note: Confirmation that we want it in the precommit?\)
+After a _**SoftwareUpgradeProposal**_ is accepted, Node Operators are expected to download and install the new version of the software while continuing to run the previous version. Once a Node Operator has downloaded and installed the upgrade, it will start signaling to the network that it is ready to switch by including the proposal's proposalID in its precommits.
 
 Note: There is only one signal slot per precommit. If several _**SoftwareUpgradeProposals**_ are accepted in a short timeframe, a pipeline will form and they will be implemented one after the other in the order that they were accepted.  
 
