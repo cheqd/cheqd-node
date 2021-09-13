@@ -17,10 +17,34 @@ func RegisterRoutes(clientCtx client.Context, r *mux.Router) {
 	registerQueryRoutes(clientCtx, r)
 	registerTxHandlers(clientCtx, r)
 
+	registerQueryRoutes(clientCtx, r)
+	registerTxHandlers(clientCtx, r)
+
+	registerQueryRoutes(clientCtx, r)
+	registerTxHandlers(clientCtx, r)
+
+	registerQueryRoutes(clientCtx, r)
+	registerTxHandlers(clientCtx, r)
+
+	registerQueryRoutes(clientCtx, r)
+	registerTxHandlers(clientCtx, r)
+
 }
 
 func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {
 	// this line is used by starport scaffolding # 3
+	r.HandleFunc("/cheqd/cred_defs/{id}", getCred_defHandler(clientCtx)).Methods("GET")
+	r.HandleFunc("/cheqd/cred_defs", listCred_defHandler(clientCtx)).Methods("GET")
+
+	r.HandleFunc("/cheqd/schemata/{id}", getSchemaHandler(clientCtx)).Methods("GET")
+	r.HandleFunc("/cheqd/schemata", listSchemaHandler(clientCtx)).Methods("GET")
+
+	r.HandleFunc("/cheqd/attribs/{id}", getAttribHandler(clientCtx)).Methods("GET")
+	r.HandleFunc("/cheqd/attribs", listAttribHandler(clientCtx)).Methods("GET")
+
+	r.HandleFunc("/cheqd/dids/{id}", getDidHandler(clientCtx)).Methods("GET")
+	r.HandleFunc("/cheqd/dids", listDidHandler(clientCtx)).Methods("GET")
+
 	r.HandleFunc("/cheqd/nyms/{id}", getNymHandler(clientCtx)).Methods("GET")
 	r.HandleFunc("/cheqd/nyms", listNymHandler(clientCtx)).Methods("GET")
 
@@ -28,6 +52,22 @@ func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {
 
 func registerTxHandlers(clientCtx client.Context, r *mux.Router) {
 	// this line is used by starport scaffolding # 4
+	r.HandleFunc("/cheqd/cred_defs", createCred_defHandler(clientCtx)).Methods("POST")
+	r.HandleFunc("/cheqd/cred_defs/{id}", updateCred_defHandler(clientCtx)).Methods("POST")
+	r.HandleFunc("/cheqd/cred_defs/{id}", deleteCred_defHandler(clientCtx)).Methods("POST")
+
+	r.HandleFunc("/cheqd/schemata", createSchemaHandler(clientCtx)).Methods("POST")
+	r.HandleFunc("/cheqd/schemata/{id}", updateSchemaHandler(clientCtx)).Methods("POST")
+	r.HandleFunc("/cheqd/schemata/{id}", deleteSchemaHandler(clientCtx)).Methods("POST")
+
+	r.HandleFunc("/cheqd/attribs", createAttribHandler(clientCtx)).Methods("POST")
+	r.HandleFunc("/cheqd/attribs/{id}", updateAttribHandler(clientCtx)).Methods("POST")
+	r.HandleFunc("/cheqd/attribs/{id}", deleteAttribHandler(clientCtx)).Methods("POST")
+
+	r.HandleFunc("/cheqd/dids", createDidHandler(clientCtx)).Methods("POST")
+	r.HandleFunc("/cheqd/dids/{id}", updateDidHandler(clientCtx)).Methods("POST")
+	r.HandleFunc("/cheqd/dids/{id}", deleteDidHandler(clientCtx)).Methods("POST")
+
 	r.HandleFunc("/cheqd/nyms", createNymHandler(clientCtx)).Methods("POST")
 	r.HandleFunc("/cheqd/nyms/{id}", updateNymHandler(clientCtx)).Methods("POST")
 	r.HandleFunc("/cheqd/nyms/{id}", deleteNymHandler(clientCtx)).Methods("POST")

@@ -8,12 +8,130 @@ option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 // Msg defines the Msg service.
 service Msg {
     // this line is used by starport scaffolding # proto/tx/rpc
-  rpc CreateNym(MsgCreateNym) returns (MsgCreateNymResponse);
-  rpc UpdateNym(MsgUpdateNym) returns (MsgUpdateNymResponse);
-  rpc DeleteNym(MsgDeleteNym) returns (MsgDeleteNymResponse);
+  rpc CreateCred_def(MsgCreateCred_def) returns (MsgCreateCred_defResponse);
+  rpc UpdateCred_def(MsgUpdateCred_def) returns (MsgUpdateCred_defResponse);
+  rpc DeleteCred_def(MsgDeleteCred_def) returns (MsgDeleteCred_defResponse);
+  rpc CreateSchema(MsgCreateSchema) returns (MsgCreateSchemaResponse);
+  rpc UpdateSchema(MsgUpdateSchema) returns (MsgUpdateSchemaResponse);
+  rpc DeleteSchema(MsgDeleteSchema) returns (MsgDeleteSchemaResponse);
+  rpc CreateAttrib(MsgCreateAttrib) returns (MsgCreateAttribResponse);
+  rpc UpdateAttrib(MsgUpdateAttrib) returns (MsgUpdateAttribResponse);
+  rpc DeleteAttrib(MsgDeleteAttrib) returns (MsgDeleteAttribResponse);
+  rpc CreateDid(MsgCreateDid) returns (MsgCreateDidResponse);
+  rpc UpdateDid(MsgUpdateDid) returns (MsgUpdateDidResponse);
+  rpc DeleteDid(MsgDeleteDid) returns (MsgDeleteDidResponse);
 }
 
 // this line is used by starport scaffolding # proto/tx/message
+message MsgCreateCred_def {
+  string creator = 1;
+  string schema_id = 2;
+  string tag = 3;
+  string signature_type = 4;
+  string value = 5;
+}
+
+message MsgCreateCred_defResponse {
+  uint64 id = 1;
+}
+
+message MsgUpdateCred_def {
+  string creator = 1;
+  uint64 id = 2;
+  string schema_id = 3;
+  string tag = 4;
+  string signature_type = 5;
+  string value = 6;
+}
+
+message MsgUpdateCred_defResponse { }
+
+message MsgDeleteCred_def {
+  string creator = 1;
+  uint64 id = 2;
+}
+
+message MsgDeleteCred_defResponse { }
+
+message MsgCreateSchema {
+  string creator = 1;
+  string name = 2;
+  string version = 3;
+  string attr_names = 4;
+}
+
+message MsgCreateSchemaResponse {
+  uint64 id = 1;
+}
+
+message MsgUpdateSchema {
+  string creator = 1;
+  uint64 id = 2;
+  string name = 3;
+  string version = 4;
+  string attr_names = 5;
+}
+
+message MsgUpdateSchemaResponse { }
+
+message MsgDeleteSchema {
+  string creator = 1;
+  uint64 id = 2;
+}
+
+message MsgDeleteSchemaResponse { }
+
+message MsgCreateAttrib {
+  string creator = 1;
+  string did = 2;
+  string raw = 3;
+}
+
+message MsgCreateAttribResponse {
+  uint64 id = 1;
+}
+
+message MsgUpdateAttrib {
+  string creator = 1;
+  uint64 id = 2;
+  string did = 3;
+  string raw = 4;
+}
+
+message MsgUpdateAttribResponse { }
+
+message MsgDeleteAttrib {
+  string creator = 1;
+  uint64 id = 2;
+}
+
+message MsgDeleteAttribResponse { }
+
+message MsgCreateDid {
+  string id = 1;
+  string verkey = 2;
+  string alias = 3;
+}
+
+message MsgCreateDidResponse {
+  string id = 1;
+}
+
+message MsgUpdateDid {
+  string id = 2;
+  string verkey = 3;
+  string alias = 4;
+}
+
+message MsgUpdateDidResponse { }
+
+message MsgDeleteDid {
+  string creator = 1;
+  uint64 id = 2;
+}
+
+message MsgDeleteDidResponse { }
+
 message MsgCreateNym {
   string creator = 1;
   string alias = 2;

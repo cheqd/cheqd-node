@@ -1,0 +1,15 @@
+syntax = "proto3";
+package cheqd.cheqdnode.cheqd;
+
+option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
+
+import "gogoproto/gogo.proto";
+
+message Cred_def {
+  string creator = 1;
+  uint64 id = 2;
+  string schema_id = 3; 
+  string tag = 4; 
+  string signature_type = 5; 
+  string value = 6; 
+}

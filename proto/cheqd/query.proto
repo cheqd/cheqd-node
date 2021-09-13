@@ -4,6 +4,10 @@ package cheqdid.cheqdnode.cheqd;
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 // this line is used by starport scaffolding # 1
+import "cheqd/cred_def.proto";
+import "cheqd/schema.proto";
+import "cheqd/attrib.proto";
+import "cheqd/did.proto";
 import "cheqd/nym.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
@@ -11,6 +15,34 @@ option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 // Query defines the gRPC querier service.
 service Query {
     // this line is used by starport scaffolding # 2
+	rpc Cred_def(QueryGetCred_defRequest) returns (QueryGetCred_defResponse) {
+		option (google.api.http).get = "/cheqd/cheqdnode/cheqd/cred_def/{id}";
+	}
+	rpc Cred_defAll(QueryAllCred_defRequest) returns (QueryAllCred_defResponse) {
+		option (google.api.http).get = "/cheqd/cheqdnode/cheqd/cred_def";
+	}
+
+	rpc Schema(QueryGetSchemaRequest) returns (QueryGetSchemaResponse) {
+		option (google.api.http).get = "/cheqd/cheqdnode/cheqd/schema/{id}";
+	}
+	rpc SchemaAll(QueryAllSchemaRequest) returns (QueryAllSchemaResponse) {
+		option (google.api.http).get = "/cheqd/cheqdnode/cheqd/schema";
+	}
+
+	rpc Attrib(QueryGetAttribRequest) returns (QueryGetAttribResponse) {
+		option (google.api.http).get = "/cheqd/cheqdnode/cheqd/attrib/{id}";
+	}
+	rpc AttribAll(QueryAllAttribRequest) returns (QueryAllAttribResponse) {
+		option (google.api.http).get = "/cheqd/cheqdnode/cheqd/attrib";
+	}
+
+	rpc Did(QueryGetDidRequest) returns (QueryGetDidResponse) {
+		option (google.api.http).get = "/cheqd/cheqdnode/cheqd/did/{id}";
+	}
+	rpc DidAll(QueryAllDidRequest) returns (QueryAllDidResponse) {
+		option (google.api.http).get = "/cheqd/cheqdnode/cheqd/did";
+	}
+
 	rpc Nym(QueryGetNymRequest) returns (QueryGetNymResponse) {
 		option (google.api.http).get = "/cheqd/cheqd/cheqd/nym/{id}";
 	}
@@ -21,6 +53,70 @@ service Query {
 }
 
 // this line is used by starport scaffolding # 3
+message QueryGetCred_defRequest {
+	uint64 id = 1;
+}
+
+message QueryGetCred_defResponse {
+	Cred_def Cred_def = 1;
+}
+
+message QueryAllCred_defRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllCred_defResponse {
+	repeated Cred_def Cred_def = 1;
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+message QueryGetSchemaRequest {
+	uint64 id = 1;
+}
+
+message QueryGetSchemaResponse {
+	Schema Schema = 1;
+}
+
+message QueryAllSchemaRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllSchemaResponse {
+	repeated Schema Schema = 1;
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+message QueryGetAttribRequest {
+	uint64 id = 1;
+}
+
+message QueryGetAttribResponse {
+	Attrib Attrib = 1;
+}
+
+message QueryAllAttribRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllAttribResponse {
+	repeated Attrib Attrib = 1;
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+message QueryGetDidRequest {
+	uint64 id = 1;
+}
+
+message QueryGetDidResponse {
+	Did Did = 1;
+}
+
+message QueryAllDidRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllDidResponse {
+	repeated Did Did = 1;
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
 message QueryGetNymRequest {
 	uint64 id = 1;
 }

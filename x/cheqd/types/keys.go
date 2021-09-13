@@ -25,3 +25,23 @@ const (
 	NymKey      = "Nym-value-"
 	NymCountKey = "Nym-count-"
 )
+
+const (
+	DidKey      = "Did-value-"
+	DidCountKey = "Did-count-"
+)
+
+const (
+	AttribKey      = "Attrib-value-"
+	AttribCountKey = "Attrib-count-"
+)
+
+const (
+	SchemaKey      = "Schema-value-"
+	SchemaCountKey = "Schema-count-"
+)
+
+const (
+	Cred_defKey      = "Cred_def-value-"
+	Cred_defCountKey = "Cred_def-count-"
+)
