@@ -16,6 +16,8 @@ These are changes that are insignificant, and do not affect the way the Network 
 * Finding, reporting and suggesting fixes to bugs;
 * Translating the cheqd documentation into various languages.
 
+See more, here
+
 ### Major Network changes 
 
 These are changes that have a materially significant effect on the Network. Such changes SHOULD be made via a Proposal, following the steps in the decision tree diagram below. 
@@ -29,6 +31,8 @@ Major Network changes include, but are not limited to:
 * Community pool decisions;
 * Materially significant changes to a cheqd Principle;
 * Partnerships or connections to other infrastructure.
+
+See more, here
 
 ## Decision Tree
 
@@ -60,10 +64,10 @@ If you are non-technical and want to make edits in a more visual way, you can do
    1. Our open sourced code;
    2. Documentation to help YOU onboard to the Network as a Node Operator;
    3. Our Wiki page, with all formal documentation YOU need to know about cheqd, including this Governance Framework;
-   4. A forum for discussion relevant to specific topics, issues and proposals. This is a space for you to make suggestions and proposals on how you want to improve cheqd, as well as participate in discussion with the community.   You can edit our Github through branches and pull requests, explained further in our [Contributing ](https://docs.cheqd.io/cheqd-node/v/gov%2Fdraft1/governance/contributing)document.  
+   4. A forum for discussion relevant to specific topics, issues and proposals. This is a space for you to make suggestions and proposals on how you want to improve cheqd, as well as participate in discussion with the community.   You can edit our Github through branches and pull requests, explained further in our Minor Network Changes document.  
 2. [GitBook](https://docs.cheqd.io/cheqd-node/): Here we will host:
    1. Documentation to help YOU onboard to the Network as a Node Operator;
-   2. Our Wiki page, with all formal documentation YOU need to know about cheqd, including this Governance Framework;  GitBook will be a more accessible and easy-to-read layout.  You can edit our GitBook through branching our main repository and making edit requests, explained further in our [Contributing](https://docs.cheqd.io/cheqd-node/v/gov%2Fdraft1/governance/contributing) document.
+   2. Our Wiki page, with all formal documentation YOU need to know about cheqd, including this Governance Framework;  GitBook will be a more accessible and easy-to-read layout.  You can edit our GitBook through branching our main repository and making edit requests, explained further in our Minor Network Changes document.
 
 If you want to stay updated with cheqd news, we recommend that you join us on:
 

@@ -39,12 +39,12 @@ Once consensus is reached in an off-chain forum, the parties to the discussion c
 
 At present, Proposals SHOULD be made and discussed on:
 
-1. Github Discussions
+1. [Github Discussions](https://github.com/cheqd/cheqd-node/discussions)
 
 They can also be discussed by the community on:
 
 1. [Telegram](https://t.me/cheqd), or
-2. Discord
+2. Discord \(placeholder\)
 
 Engagement is likely to be critical to the success of a proposal.
 
