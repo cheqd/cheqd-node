@@ -20,7 +20,7 @@ Governance is a challenging concept. It relates to setting rules and standards t
 
 At cheqd, we like to think about Governance as constituting 4 parts:
 
-1. Law and guidelines
+1. Law and rules
 2. Principles and social norms
 3. Markets and economy
 4. Architecture
