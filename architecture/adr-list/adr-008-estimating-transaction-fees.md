@@ -11,7 +11,7 @@
 
 The goal of this ADR is to define how fees will be defined and processed on the cheqd network.
 
-A linked ADR associated with this is [ADR 006: **Community tax**](adr-006-community-tax.md), ****which describes additional steps that take place based on the fees for a particular transaction on the network.
+A linked ADR associated with this is [ADR 006: **Community tax**](adr-006-community-tax.md), which describes additional steps that take place based on the fees for a particular transaction on the network.
 
 ## Context
 
