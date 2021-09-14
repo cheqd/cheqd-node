@@ -8,8 +8,7 @@ The idea is that any ToIP Layer 1 innovation should be able to interoperate with
 
 We love this idea, and want our Network to be agnostic to the technology built on top of it, championing Open Standards and the latest SSI innovations such as BBS+ Credentials and a movement towards a unified Credential Exchange Protocol. 
 
-This is a snapshot of the ToIP stack, which many of the SSI community will be familiar with.  
-
+This is a snapshot of the ToIP stack, which many of the SSI community will be familiar with.
 
 If this is new to you and you want to learn more about it, you can take a look at their [new, cool interactive model here](https://trustoverip.org/wp-content/toip-model/).
 
