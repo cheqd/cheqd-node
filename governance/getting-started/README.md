@@ -16,11 +16,9 @@ Governance Frameworks are generally perceived as largely inaccessible documents,
 3. They are too formal and written in abrasive, legal language;
 4. They do not educate the reader about the concepts they are governing.
 
-At cheqd, we want our Governance Framework to be something that is easy to read, understand and use in practice. We want this document to be clearly understood by a diverse and multidisciplinary audience and collective, spanning across the world.   
+At cheqd, we want our Governance Framework to be something that is easy to read, understand and use in practice. We want this document to be clearly understood by a diverse and multidisciplinary audience and collective, spanning across the world. 
 
-
-We are committed to writing our documentation in simple language, using easy examples to explain difficult concepts, and designing a Governance Framework which is open and easy to change.  
-
+We are committed to writing our documentation in simple language, using easy examples to explain difficult concepts, and designing a Governance Framework which is open and easy to change.
 
 This is the most important part of any governance framework...  
 ****

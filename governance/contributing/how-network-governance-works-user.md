@@ -14,7 +14,7 @@ These are changes that are insignificant, and do not affect the way the Network 
 
 To help YOU understand how to make changes on the cheqd Network, the decision tree below visualises how changes should be carried out.
 
-\(Placeholder\)
+![Decision tree for cheqd Governance](../../.gitbook/assets/on-chain-vs-off-chain-decision-tree-1-.jpg)
 
 ## How do I make edits to general text or code in cheqd documentation?
 
@@ -85,11 +85,17 @@ It is not always possible to phrase every change in such a manner, but it is des
 
 ## Bug reports
 
-Bug reports and feature suggestions must use descriptive and concise titles and be submitted to [GitHub Issues](https://github.com/cheqd/cheqd-node/issues). Please use the search function to make sure that you are not submitting duplicates, and that a similar report or request has not already been resolved or rejected.
+During the course of cheqd's lifecycle, it is likely that bugs will arise. Reporting these bugs effectively and resolving them promptly will be very important for the smooth running of the Network.
+
+Bugs SHOULD be discussed or raised in the [Technical Help section of our Forum](https://github.com/cheqd/cheqd-node/discussions/categories/technical-help). 
+
+From a bug raised here, bugs SHOULD be forwarded to [GitHub Issues](https://github.com/cheqd/cheqd-node/issues). This can be done by clicking the button "create issue from discussion".
+
+Please use the search function to make sure that you are not submitting duplicates, and that a similar report or request has not already been resolved or rejected.
 
 ## Translations
 
-You can submit translations via Github or GitBook branches \(as above\). We would greatly appreciate this work!  
+You can submit translations via Github or GitBook branches \(as above\). We would greatly appreciate this work from our community to ensure that cheqd reaches a diverse, multijurisdictional and multilingual spread of society!  
  
 
 ## 

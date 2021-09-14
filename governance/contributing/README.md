@@ -38,7 +38,7 @@ See more, [here](https://docs.cheqd.io/cheqd-node/v/gov%2Fdraft1/governance/cont
 
 To help YOU understand how to make changes on the cheqd Network, the decision tree below visualises how changes should be carried out.
 
-\(Placeholder\)
+![Decision tree for cheqd Governance](../../.gitbook/assets/on-chain-vs-off-chain-decision-tree-1-.jpg)
 
 ## cheqd's Principles
 
