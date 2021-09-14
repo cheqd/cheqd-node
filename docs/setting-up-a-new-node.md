@@ -64,11 +64,15 @@ You can read about sentry nodes [here](https://docs.tendermint.com/master/nodes/
 This is the most preferable way to get `cheqd-node`. Detailed information about changes made by the package can be found [here](deb-package-overview.md)
 
 1. Get `deb` for Ubuntu 20.04 in [releases](https://github.com/cheqd/cheqd-node/releases);
-2. Install the package;
+2. Download & Install the package;
+
+   Command: `sudo wget <github_package_file>`
+
+   Example: `sudo wget https://github.com/cheqd/cheqd-node/releases/download/v0.1.20/cheqd-node_0.1.20_amd64.deb`
 
    Command: `sudo dpkg -i <package_file>.deb`
 
-   Example: `sudo dpkg -i cheqd-node_0.1.13_amd64.deb`
+   Example: `sudo dpkg -i cheqd-node_0.1.20_amd64.deb`
 
 3. Switch to `cheqd` system user:
 
@@ -86,13 +90,18 @@ This is the most preferable way to get `cheqd-node`. Detailed information about 
 
 5. Set genesis:
 
-   Genesis files for public networks are published in [this directory](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains).
+   Genesis files for public networks are published in [this directory](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains). Download `genesis.json` and put it to the `/etc/cheqd-node/`.
 
-   Put corresponding `genesis.json` to: `/etc/cheqd-node/`
+   For testnet:
+
+   ```text
+   cd /etc/cheqd-node/
+   wget -O genesis.json https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/testnet/genesis.json
+   ```
 
 6. Set persistent peers:
 
-   Persistent nodes addresses for public networks are also published in [this directory](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains).
+   Persistent nodes addresses for public networks are also published in [this directory](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains). Copy the persistent\_peers from the `persistent_peers.txt` and use it in the steps below.
 
    Open node's config file: `/etc/cheqd-node/config.toml`
 
@@ -118,10 +127,20 @@ This is the most preferable way to get `cheqd-node`. Detailed information about 
 
    Example: `laddr = "tcp://0.0.0.0:26657"`
 
-8. Enable `cheqd-noded` service:
+8. Enable `cheqd-noded` service and start it:
 
    ```text
     systemctl enable cheqd-noded
+   ```
+
+   ```text
+    systemctl start cheqd-noded
+   ```
+
+   Check that the service is running:
+
+   ```text
+   systemctl status cheqd-noded
    ```
 
 9. Check that the node is connected and catching up:
