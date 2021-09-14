@@ -16,7 +16,7 @@ These are changes that are insignificant, and do not affect the way the Network 
 * Finding, reporting and suggesting fixes to bugs;
 * Translating the cheqd documentation into various languages.
 
-See more, here
+See more, [here](https://docs.cheqd.io/cheqd-node/v/gov%2Fdraft1/governance/contributing/how-network-governance-works-user)
 
 ### Major Network changes 
 
@@ -32,7 +32,7 @@ Major Network changes include, but are not limited to:
 * Materially significant changes to a cheqd Principle;
 * Partnerships or connections to other infrastructure.
 
-See more, here
+See more, [here](https://docs.cheqd.io/cheqd-node/v/gov%2Fdraft1/governance/contributing/major-network-changes)
 
 ## Decision Tree
 
@@ -48,7 +48,7 @@ This means, that **major network changes** should never oppose a Principle, unle
 
 ## Community
 
-You do not have to own any CHEQ to participate in our community discussion. You are free to learn about cheqd and participate in our community discussions across multiple platforms and forums.
+You do not have to own any cheq to participate in our community discussion. You are free to learn about cheqd and participate in our community discussions across multiple platforms and forums.
 
 We want learning about cheqd and participating in the community to be easy and accessible. For this reason, we have decided to make sure our [wiki](https://docs.cheqd.io/cheqd-node/) and our [source code](https://github.com/cheqd/cheqd-node) are natively interconnected. 
 
@@ -58,22 +58,22 @@ If you are a technical person and want to make changes directly to our source co
 
 If you are non-technical and want to make edits in a more visual way, you can do this on our [GitBook](https://docs.cheqd.io/cheqd-node/).
 
-**Let's summarise this easily:**
+**Let's summarise this simply:**
 
 1. [Github](https://github.com/cheqd): Here we will host:
    1. Our open sourced code;
    2. Documentation to help YOU onboard to the Network as a Node Operator;
    3. Our Wiki page, with all formal documentation YOU need to know about cheqd, including this Governance Framework;
-   4. A forum for discussion relevant to specific topics, issues and proposals. This is a space for you to make suggestions and proposals on how you want to improve cheqd, as well as participate in discussion with the community.   You can edit our Github through branches and pull requests, explained further in our Minor Network Changes document.  
+   4. [A forum for discussion relevant to specific topics, issues and proposals.](https://github.com/cheqd/cheqd-node/discussions) This is a space for you to make suggestions and proposals on how you want to improve cheqd, as well as participate in discussion with the community.   You can edit our Github through branches and pull requests, explained further in our [Minor Network Changes document](https://docs.cheqd.io/cheqd-node/v/gov%2Fdraft1/governance/contributing/how-network-governance-works-user).  
 2. [GitBook](https://docs.cheqd.io/cheqd-node/): Here we will host:
    1. Documentation to help YOU onboard to the Network as a Node Operator;
-   2. Our Wiki page, with all formal documentation YOU need to know about cheqd, including this Governance Framework;  GitBook will be a more accessible and easy-to-read layout.  You can edit our GitBook through branching our main repository and making edit requests, explained further in our Minor Network Changes document.
+   2. Our Wiki page, with all formal documentation YOU need to know about cheqd, including this Governance Framework;  GitBook will be a more accessible and easy-to-read layout.  You can edit our GitBook through branching our main repository and making edit requests, explained further in our [Minor Network Changes document](https://docs.cheqd.io/cheqd-node/v/gov%2Fdraft1/governance/contributing/how-network-governance-works-user).
 
 If you want to stay updated with cheqd news, we recommend that you join us on:
 
 1. [Twitter](https://twitter.com/cheqd_io): Follow us here to keep up to date with the latest cheqd news and to be the first to hear about special announcements;
 2. [Telegram](https://t.me/cheqd): Join our community here to participate in general conversation about cheqd with our core community following and be the first to hear about special announcements.
-3. [Discord:](https://discord.gg/SQA8NpVe2v) Discord is a fantastic way to discuss topics in a more structured way, across specific channels related to your interests. 
+3. [Community Slack:](https://join.slack.com/t/cheqd-community/shared_invite/zt-toqyo7b7-2g9qDRjx3otd6529dTqeIA) Our community slack is where our Node Operators will be onboarded. This a great place to interact with technical members of the community.  
 
 We also kindly ask you to familiarise yourself with our Code of Conduct which sets our clearly defined expectations and behaviour that we want to uphold in the community.  
 
