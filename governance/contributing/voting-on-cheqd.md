@@ -65,6 +65,10 @@ _**NoWithVeto**_ counts as _**No**_ but also adds a Veto vote. This s significan
 Abstain option allows voters to signal that they do not intend to vote in favor or against the proposal but accept the result of the vote.  
 
 
+{% hint style="info" %}
+Note: Weighted voting may not be available in the first iteration of the cheqd Network
+{% endhint %}
+
 ### Weighted Votes
 
 Users casting a vote on a proposal have the option to split their votes into several voting options. For example, a User could use 70% of its voting power to vote Yes and 30% of its voting power to vote No.
