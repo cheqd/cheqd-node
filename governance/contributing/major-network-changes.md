@@ -56,8 +56,8 @@ You could ask a simple question or present an idea in our [Github Discussions](h
 
 You may also want to rationalise your idea, or ask your question to the wider community, in:
 
-1. cheqd [Telegram](https://t.me/cheqd), or
-2. cheqd Discord
+1. [cheqd Telegram](https://t.me/cheqd), or
+2. [cheqd Community Slack](https://join.slack.com/t/cheqd-community/shared_invite/zt-toqyo7b7-2g9qDRjx3otd6529dTqeIA)
 
 Engagement is likely to be critical to the success of a proposal. The degree to which you engage with the cheqd community should be relative to the potential impact that your proposal may have on the Network.
 
@@ -71,26 +71,26 @@ If you've considered feedback from broad perspectives and think that what you're
 
 To make reading and reviewing your Proposal easier for the community, please select a Proposal template from the list below.
 
+\(Need to update with relevant templates\)
+
 1. **Architecture Decision Record \(ADR\) Proposal**
    1. **ADR 001**
    2. **ADR 002**
 2. **General Governance Proposal**
-3. **\(Need to update with relevant templates\)**
 
 The ideal format for a proposal is as a Markdown file \(ie. .md\) in a Github repo. Markdown is a simple and accessible format for writing plain text files that is easy to learn. See the [Github Markdown Guide](https://guides.github.com/features/mastering-markdown/) for details on writing markdown files.
 
 Engage the community with your draft proposal
 
-1. Post a draft of your proposal as a topic in the relevant category of the cheqd Github forum. 
-2. Directly engage key members of the community for feedback. These could be large contributors, those likely to be most impacted by the proposal, and entities with high stake-backing \(eg. high-ranked Validators; large stakers\).
+1. Post a draft of your proposal as a topic in the relevant category of the [cheqd Github forum](https://github.com/cheqd/cheqd-node/discussions). 
+2. Directly engage key members of the community for feedback. These could be large contributors, those likely to be most impacted by the proposal, and entities with high stake-backing \(eg. high-ranked Node Operators; large stakers\).
 3. Target members of the community in a semi-public way before bringing the draft to a full public audience. 
 4. Alert the community to the draft proposal via:
    * Twitter, tagging accounts such as the [cheqd account](https://twitter.com/cheqd_io)
-   * [Telegram](https://t.me/cheqd)
+   * [cheqd Telegram](https://t.me/cheqd)
+   * [cheqd Community Slack](https://join.slack.com/t/cheqd-community/shared_invite/zt-toqyo7b7-2g9qDRjx3otd6529dTqeIA)
 
 #### Submit your proposal to the testnet
-
-We intend to expand this [guide to include testnet instructions](https://github.com/cosmos/governance/blob/master/submitting.md#submitting-your-proposal-to-the-testnet).
 
 You may want to submit your proposal to the testnet chain before the mainnet for a number of reasons, such as wanting to see what the proposal description will look like, to share what the proposal will look like in advance with stakeholders, and to signal that your proposal is about to go live on the mainnet.
 
@@ -98,27 +98,35 @@ Perhaps most importantly, for parameter change proposals, you can test the param
 
 Submitting your proposal to the testnet increases the likelihood of engagement and the possibility that you will be alerted to a flaw before deploying your proposal to mainnet.
 
+{% hint style="info" %}
+Note: It is currently not possible to submit to mainnet, as cheqd Network is not yet live
+{% endhint %}
+
 ## Formal on-chain proposal
 
-Once you have sensibly tested your proposal and bounced your ideas around the community, you are ready to submit a proposal on-chain.
+Once you have sensibly tested your proposal and bounced your ideas around the community, you are ready to submit a Proposal on-chain.
+
+{% hint style="info" %}
+Note: This section is in an early Draft form and will need to be iterated, as the cheqd mainnet has not yet launched
+{% endhint %}
 
 ### Formatting the JSON file for the governance proposal
 
-Prior to sending the transaction that submits your proposal on-chain, you must create a JSON file. This file will contain the information that will be stored on-chain as the governance proposal. Begin by creating a new text \(.txt\) file to enter this information. Use these best practices as a guide for the contents of your proposal. When you're done, save the file as a .json file. See the examples that follow to help format your proposal.
+Prior to sending the transaction that submits your Proposal on-chain, you must create a JSON file. This file will contain the information that will be stored on-chain as the governance Proposal. Begin by creating a new text \(.txt\) file to enter this information. Use these best practices as a guide for the contents of your proposal. When you're done, save the file as a .json file. See the examples that follow to help format your proposal.
 
-Each proposal type is unique in how the JSON should be formatted. See the relevant section for the type of proposal you are drafting:
+Each Proposal type is unique in how the .json should be formatted:
 
 1. **TextProposal**: All the proposals that do not involve a modification of the source code go under this type. For example, an opinion poll would use a proposal of type _**TextProposal**_.
-2. **SoftwareUpgradeProposal**: If accepted, Validators are expected to update their software in accordance with the proposal. They must do so by following a 2-steps process described in the [Software Upgrade](https://docs.cosmos.network/v0.43/modules/gov/01_concepts.html#software-upgrade) section below. Software upgrade roadmap may be discussed and agreed on via _**TextProposals**_, but actual software upgrades must be performed via _**SoftwareUpgradeProposals**_.
+2. **SoftwareUpgradeProposal**: If accepted, Node Operators are expected to update their software in accordance with the proposal. They must do so by following a 2-steps process described in the [Software Upgrade](https://docs.cosmos.network/v0.43/modules/gov/01_concepts.html#software-upgrade) section below. Software upgrade roadmap may be discussed and agreed on via _**TextProposals**_, but actual software upgrades must be performed via _**SoftwareUpgradeProposals**_.
 3. **CommunityPoolSpendProposal**: details a proposal for use of community funds, together with how many coins are proposed to be spent, and to which recipient account.
 4. **ParameterChangeProposal**: defines a proposal to change one or more parameters. If accepted, the requested parameter change is updated automatically by the proposal handler upon conclusion of the voting period.
 5. **CancelSoftwareUpgradeProposal**: is a gov Content type for cancelling a software upgrade.
 
 To create a new Proposal type, you can propose a _**ParameterChangeProposal**_ with a custom handler, to perform another type of state change. 
 
-Once on-chain, most people will rely upon network explorers to interpret this information with a graphical user interface \(GUI\).
+Once on-chain, most people will rely upon network explorers to interpret this information with a Graphical User Interface \(GUI\).
 
-This is the command format for using cheqd’s CLI \(the command-line interface\) to submit your proposal on-chain:  
+This is the command format for using cheqd’s CLI \(Command-Line Interface\) to submit your proposal on-chain:  
 
 
 ```text
@@ -126,35 +134,11 @@ VDR CLI tx gov submit-proposal \
   --title=<title> \
   --description=<description> \
   --type="Text" \
-  --deposit="2170nanocheq" \
+  --deposit="8000cheq" \
   --from=<name> \
   --chain-id=<chain_id>
 
 ```
-
-### Deposit
-
-To prevent spam, proposals must be submitted with a deposit in the coins defined in the _**MinDeposit**_ param. The voting period will not start until the proposal's deposit equals _**MinDeposit**_.
-
-When a proposal is submitted, it has to be accompanied by a deposit that must be strictly positive, but can be inferior to _**MinDeposit**_. The submitter doesn't need to pay for the entire deposit on their own. If a proposal's deposit is inferior to _**MinDeposit**_, other token holders can increase the proposal's deposit by sending a Deposit transaction. 
-
-The deposit is kept in an escrow in the governance _**ModuleAccount**_ until the proposal is finalized \(passed or rejected\).
-
-Once the proposal's deposit reaches _**MinDeposit**_, it enters the voting period. If a proposal's deposit does not reach _**MinDeposit**_ before _**MaxDepositPeriod**_, the proposal closes and nobody can deposit on it anymore.
-
-In this scenario, the tokens spent on the Deposit which did not reach the _**MinDeposit**_ will be burnt, meaning that they will be removed from the active pool of tokens and put beyond use. 
-
-The minimum deposit for cheqd will initially be 8,000 CHEQ tokens.   
-
-
-### Deposit refund and burn
-
-When a proposal is finalized, the coins from the deposit are either refunded or burned, according to the final tally of the proposal:
-
-* If a proposal does not reach _**MinDeposit,**_ the cheq in the governance _**ModuleAccount**_ will be burnt. 
-* If the proposal reaches _**MinDeposit**_ and is approved or rejected but not vetoed, deposits will automatically be refunded to their respective depositor \(transferred from the governance _**ModuleAccount**_\).
-* If the proposal is approved, but the minimum quorum \(33.34%\) is not reached for the vote, deposits will be burned from the governance _**ModuleAccount.**_
-* When the proposal is vetoed by 33.34%, deposits will be burned from the governance _**ModuleAccount**_.
 
 ### Proposal type
 
@@ -167,39 +151,53 @@ VDR CLI tx gov submit-proposal \
 --title=<Parameter change proposal> \
 --description=<parameter change of min deposit> \
 --type="param-change" \
---deposit="80000cheq" \
+--deposit="8000cheq" \
 --from=<alex> \
---chain-id=<node 45.77.218.219:26657>
+--chain-id=<testnetnode 45.77.218.219:26657>
 ```
 
-This is the complete command that I could use to submit a mainnet parameter-change proposal right now: 
+1. VDR CLI is the command-line interface client that is used to send transactions and query the cheqd testnet; 
+2. tx gov submit-proposal param-change indicates that the transaction is submitting a parameter-change proposal; 
+3. --from "alex" is the account key that pays the transaction fee and deposit amount; 
+4. --gas 500 is the maximum amount of gas you accept may be used to process the transaction:
+   * The more content there is in the description of your proposal, the more gas your transaction will consume;
+   * If this number isn't high enough and there isn't enough gas to process your transaction, the transaction will fail;
+   * The transaction will only use the amount of gas needed to process the transaction. 
+5. --fees is a flat-rate incentive for a Node Operator to process your transaction:
+   * The cheqd Network accepts zero fees, but many nodes will not transmit your transaction to the network without a minimum fee;
+   * Many nodes use a minimum fee to disincentivize transaction spamming; 
+6. --the testnet chain ID is \[insert chain ID\] 
+7. --node cheqd-node-1.evernym.network:26657 is using Evernym Networks' node to send the transaction to the cheqd testnet.
 
-```text
-VDR CLI tx gov submit-proposal \
---title=<Parameter change proposal> \
---description=<parameter change of min deposit> \
---type="param-change" \
---deposit="80000cheq" \
---from=<alex> \
---chain-id=<cheqdnetwork--node cheqd-node-1.evernym.network:26657>
-```
+Note: be careful what you use for **--fees**. A mistake here could result in spending hundreds or thousands of cheqs accidentally, which cannot be recovered.
 
-1. VDR CLI is the command-line interface client that is used to send transactions and query the Cosmos Hub
-2. tx gov submit-proposal param-change indicates that the transaction is submitting a parameter-change proposal
-3. --from alex is the account key that pays the transaction fee and deposit amount
-4. --gas 500000 is the maximum amount of gas permitted to be used to process the transaction
-   * the more content there is in the description of your proposal, the more gas your transaction will consume
-   * if this number isn't high enough and there isn't enough gas to process your transaction, the transaction will fail
-   * the transaction will only use the amount of gas needed to process the transaction
-5. --fees is a flat-rate incentive for a Validator to process your transaction
-   * the network still accepts zero fees, but many nodes will not transmit your transaction to the network without a minimum fee
-   * many nodes \(including the Figment node\) use a minimum fee to disincentivize transaction spamming
-   * 7500uCHEQ is equal to 0.0075 CHEQ
-6. --chain-id cheqdnetwork is cheqd’s mainnet. For current and past chain-id's, please look at the cheqd/mainnetresource
-   * the testnet chain ID is \[insert chain ID\]
-7. --node cheqd-node-1.evernym.network:26657 is using Evernym Networks' node to send the transaction to the cheqd mainnet.
 
-Note: be careful what you use for **--fees**. A mistake here could result in spending hundreds or thousands of CHEQs accidentally, which cannot be recovered.
+
+### Deposit
+
+To prevent spam, Proposals must be submitted with a deposit in the coins defined in the _**MinDeposit**_ param. The voting period will not start until the Proposal's deposit equals _**MinDeposit**_.
+
+When a Proposal is submitted, it has to be accompanied by a deposit that must be strictly positive, but can be inferior to _**MinDeposit**_. The submitter doesn't need to pay for the entire deposit on their own. If a Proposal's deposit is inferior to _**MinDeposit**_, other token holders can increase the Proposal's deposit by sending a Deposit transaction. 
+
+The deposit is kept in an escrow in the governance _**ModuleAccount**_ until the proposal is finalized \(passed or rejected\).
+
+Once the proposal's deposit reaches _**MinDeposit**_, it enters the voting period. If a proposal's deposit does not reach _**MinDeposit**_ before _**MaxDepositPeriod**_, the proposal closes and nobody can deposit on it anymore.
+
+In this scenario, the tokens spent on the Deposit which did not reach the _**MinDeposit**_ will be burnt, meaning that they will be removed from the active pool of tokens and put beyond use. 
+
+The **minimum deposit** for cheqd will initially be **8,000 cheqs**. 
+
+The _**MaxDepositPeriod**_ will be **2 weeks**.  
+
+
+### Deposit refund and burn
+
+When a proposal is finalized, the coins from the deposit are either refunded or burned, according to the final tally of the proposal:
+
+* If a proposal does not reach _**MinDeposit,**_ the cheq in the governance _**ModuleAccount**_ will be burnt, which means that they will be put beyond use and removed from the ecosystem. 
+* If the proposal reaches _**MinDeposit**_ and is approved or rejected but not vetoed, deposits will automatically be refunded to their respective depositor \(transferred from the governance _**ModuleAccount**_\).
+* If the proposal is approved, but the minimum quorum \(33.34%\) is not reached for the vote, deposits will be burned from the governance _**ModuleAccount.**_
+* When the proposal is vetoed by 33.34%, deposits will be burned from the governance _**ModuleAccount**_.
 
 ####  
 
@@ -214,9 +212,9 @@ After posting your transaction, your command line interface will provide you wit
 There are a number of reasons why a transaction may fail. Here are two examples:
 
 1. Running out of gas - The more data there is in a transaction, the more gas it will need to be processed. If you don't specify enough gas, the transaction will fail.
-2. Incorrect denomination - You may have specified an amount in 'microCHEQ' or 'CHEQ' instead of 'nanoCHEQ', causing the transaction to fail.
+2. Incorrect denomination - You may have specified an amount in 'nanocheq' or 'microcheq' instead of 'cheq', causing the transaction to fail.
 
 If you encounter a problem, try to troubleshoot it first, and then ask for help on the cheqd Governance forum. We can learn from failed attempts and use them to improve upon this document.
 
-## 
+
 
