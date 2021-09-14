@@ -154,7 +154,7 @@ If steps 1-4 are successful, the Issuer is able to confirm that the requested pa
 
 ### Overview of steps 1-5
 
-![Flow diagram of payment flow steps](assets/adr001-payment-flow.png)
+![Flow diagram of payment flow steps](../../.gitbook/assets/adr001-payment-flow.png)
 
 #### UML version
 
