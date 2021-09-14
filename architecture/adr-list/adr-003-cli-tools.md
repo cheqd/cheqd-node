@@ -99,9 +99,11 @@ Based on the options considerations above and an analysis of development require
 
 ### CLI components overview
 
-![Cosmos CLI components](../../.gitbook/assets/cli_components_cosmos.png)
+![Cosmos CLI components](assets/adr003-cli-components-cosmos.png)
 
-![VDR CLI components](../../.gitbook/assets/cli_components_vdr.png)
+![VDR CLI components](assets/adr003-cli-compononents-vdr.png)
+
+> [Editable versions of the diagrams](assets/adr003-cli-components-editable.excalidraw) (in Excalidraw format)
 
 ## Consequences
 
