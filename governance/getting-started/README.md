@@ -50,7 +50,7 @@ In return, we kindly ask that YOU, while using the cheqd Network:
 
 We also ask that YOU follow the provisions of our [Code of Conduct](https://github.com/cheqd/cheqd-node/blob/main/contributing/code_of_conduct.md) to ensure the best experience for others in the community. 
 
-If you have any questions regarding the way cheqd's Governance is structured, please reach out to one of our Community leaders and/or email [governace@cheqd.io](mailto:governace@cheqd.io)
+If you have any questions regarding the way cheqd's Governance is structured, please reach out to one of our Community leaders in the [cheqd Community Slack](https://join.slack.com/t/cheqd-community/shared_invite/zt-toqyo7b7-2g9qDRjx3otd6529dTqeIA), ask a question in our [Q&A forum](https://github.com/cheqd/cheqd-node/discussions/categories/q-a), or email [governace@cheqd.io](mailto:governace@cheqd.io)
 
 Let’s make cheqd a success together, and payment rails for authentic data a global standard: improving trust and efficiency in every industry.   
 ****
@@ -63,8 +63,7 @@ Let’s make cheqd a success together, and payment rails for authentic data a gl
 
 ## **Where to start**
 
-If you are not familiar with Governance, and especially decentralised governance, we suggest that you should begin with our introductory documents:  
-
+If you are not familiar with Governance, and especially decentralised governance, we suggest that you should begin with our introductory documents:
 
 1. [Introduction to Governance](https://docs.google.com/document/d/1swd1WtdPkhkVcxF0-efl185506kBld2zIUKvpKp3M_E/edit#heading=h.g1hnv482cbkn)  ****This document explains how we define governance, and why it is crucial in the management of a decentralised Network. ****
 2. [Introduction to cheqd](https://docs.google.com/document/d/19_FV8bfeM3ITZIZyTObmvIt2dszqrvtVLP-2AWz8TGo/edit#)  This document explains what cheqd is trying to achieve, and what the intended goal of the Network is. 
@@ -82,8 +81,6 @@ We’ve got some super simple videos on our Youtube channel explaining SSI and t
 And we also have a glossary to help you understand all this technical mumbo jumbo!
 
 [Glossary of terms](https://docs.google.com/document/d/1G-gNBDyQxsCsx27KbkXd84H4WNQNB3OnmsjfhN0jeIM/edit)
-
-
 
 ## Starting your journey with cheqd
 
