@@ -4,7 +4,13 @@ description: >-
   proposals
 ---
 
-# Proposal Template
+# Governance Proposal Template
+
+{% hint style="info" %}
+Tip: Click 'Edit on Github' and you will be able to copy this template in Markdown \(.md\) 
+{% endhint %}
+
+#### \*\*\*\*
 
 #### **Governance Proposal {1} {Example Proposal}**
 

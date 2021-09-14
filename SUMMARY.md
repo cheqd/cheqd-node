@@ -45,7 +45,7 @@
   * [Minor Network changes](governance/contributing/how-network-governance-works-user.md)
   * [Major Network changes](governance/contributing/major-network-changes.md)
   * [Voting on cheqd](governance/contributing/voting-on-cheqd.md)
-  * [Proposal Template](governance/contributing/proposal-template.md)
+  * [Governance Proposal Template](governance/contributing/proposal-template.md)
 * [Principles](governance/principles.md)
 * [Advanced concepts](governance/advanced-concepts/README.md)
   * [Building on Cosmos](governance/advanced-concepts/building-on-cosmos.md)
