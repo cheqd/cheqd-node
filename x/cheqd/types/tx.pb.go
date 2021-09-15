@@ -29,24 +29,24 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // this line is used by starport scaffolding # proto/tx/message
-type WriteRequest struct {
+type MsgWriteRequest struct {
 	Data      *types.Any `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
 	Author    string     `protobuf:"bytes,2,opt,name=author,proto3" json:"author,omitempty"`
 	Signature string     `protobuf:"bytes,3,opt,name=signature,proto3" json:"signature,omitempty"`
 }
 
-func (m *WriteRequest) Reset()         { *m = WriteRequest{} }
-func (m *WriteRequest) String() string { return proto.CompactTextString(m) }
-func (*WriteRequest) ProtoMessage()    {}
-func (*WriteRequest) Descriptor() ([]byte, []int) {
+func (m *MsgWriteRequest) Reset()         { *m = MsgWriteRequest{} }
+func (m *MsgWriteRequest) String() string { return proto.CompactTextString(m) }
+func (*MsgWriteRequest) ProtoMessage()    {}
+func (*MsgWriteRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_d0277a2196c64ae2, []int{0}
 }
-func (m *WriteRequest) XXX_Unmarshal(b []byte) error {
+func (m *MsgWriteRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *WriteRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgWriteRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_WriteRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgWriteRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -56,33 +56,33 @@ func (m *WriteRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return b[:n], nil
 	}
 }
-func (m *WriteRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_WriteRequest.Merge(m, src)
+func (m *MsgWriteRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgWriteRequest.Merge(m, src)
 }
-func (m *WriteRequest) XXX_Size() int {
+func (m *MsgWriteRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *WriteRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_WriteRequest.DiscardUnknown(m)
+func (m *MsgWriteRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgWriteRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_WriteRequest proto.InternalMessageInfo
+var xxx_messageInfo_MsgWriteRequest proto.InternalMessageInfo
 
-func (m *WriteRequest) GetData() *types.Any {
+func (m *MsgWriteRequest) GetData() *types.Any {
 	if m != nil {
 		return m.Data
 	}
 	return nil
 }
 
-func (m *WriteRequest) GetAuthor() string {
+func (m *MsgWriteRequest) GetAuthor() string {
 	if m != nil {
 		return m.Author
 	}
 	return ""
 }
 
-func (m *WriteRequest) GetSignature() string {
+func (m *MsgWriteRequest) GetSignature() string {
 	if m != nil {
 		return m.Signature
 	}
@@ -706,7 +706,7 @@ func (m *MsgUpdateDidResponse) GetId() string {
 }
 
 func init() {
-	proto.RegisterType((*WriteRequest)(nil), "cheqdid.cheqdnode.cheqd.WriteRequest")
+	proto.RegisterType((*MsgWriteRequest)(nil), "cheqdid.cheqdnode.cheqd.MsgWriteRequest")
 	proto.RegisterType((*MsgCreateCredDef)(nil), "cheqdid.cheqdnode.cheqd.MsgCreateCredDef")
 	proto.RegisterType((*MsgCreateCredDefResponse)(nil), "cheqdid.cheqdnode.cheqd.MsgCreateCredDefResponse")
 	proto.RegisterType((*MsgCreateSchema)(nil), "cheqdid.cheqdnode.cheqd.MsgCreateSchema")
@@ -775,12 +775,12 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
 	// this line is used by starport scaffolding # proto/tx/rpc
-	CreateCredDef(ctx context.Context, in *WriteRequest, opts ...grpc.CallOption) (*MsgCreateCredDefResponse, error)
-	CreateSchema(ctx context.Context, in *WriteRequest, opts ...grpc.CallOption) (*MsgCreateSchemaResponse, error)
-	CreateAttrib(ctx context.Context, in *WriteRequest, opts ...grpc.CallOption) (*MsgCreateAttribResponse, error)
-	UpdateAttrib(ctx context.Context, in *WriteRequest, opts ...grpc.CallOption) (*MsgUpdateAttribResponse, error)
-	CreateDid(ctx context.Context, in *WriteRequest, opts ...grpc.CallOption) (*MsgCreateDidResponse, error)
-	UpdateDid(ctx context.Context, in *WriteRequest, opts ...grpc.CallOption) (*MsgUpdateDidResponse, error)
+	CreateCredDef(ctx context.Context, in *MsgWriteRequest, opts ...grpc.CallOption) (*MsgCreateCredDefResponse, error)
+	CreateSchema(ctx context.Context, in *MsgWriteRequest, opts ...grpc.CallOption) (*MsgCreateSchemaResponse, error)
+	CreateAttrib(ctx context.Context, in *MsgWriteRequest, opts ...grpc.CallOption) (*MsgCreateAttribResponse, error)
+	UpdateAttrib(ctx context.Context, in *MsgWriteRequest, opts ...grpc.CallOption) (*MsgUpdateAttribResponse, error)
+	CreateDid(ctx context.Context, in *MsgWriteRequest, opts ...grpc.CallOption) (*MsgCreateDidResponse, error)
+	UpdateDid(ctx context.Context, in *MsgWriteRequest, opts ...grpc.CallOption) (*MsgUpdateDidResponse, error)
 }
 
 type msgClient struct {
@@ -791,7 +791,7 @@ func NewMsgClient(cc grpc1.ClientConn) MsgClient {
 	return &msgClient{cc}
 }
 
-func (c *msgClient) CreateCredDef(ctx context.Context, in *WriteRequest, opts ...grpc.CallOption) (*MsgCreateCredDefResponse, error) {
+func (c *msgClient) CreateCredDef(ctx context.Context, in *MsgWriteRequest, opts ...grpc.CallOption) (*MsgCreateCredDefResponse, error) {
 	out := new(MsgCreateCredDefResponse)
 	err := c.cc.Invoke(ctx, "/cheqdid.cheqdnode.cheqd.Msg/CreateCredDef", in, out, opts...)
 	if err != nil {
@@ -800,7 +800,7 @@ func (c *msgClient) CreateCredDef(ctx context.Context, in *WriteRequest, opts ..
 	return out, nil
 }
 
-func (c *msgClient) CreateSchema(ctx context.Context, in *WriteRequest, opts ...grpc.CallOption) (*MsgCreateSchemaResponse, error) {
+func (c *msgClient) CreateSchema(ctx context.Context, in *MsgWriteRequest, opts ...grpc.CallOption) (*MsgCreateSchemaResponse, error) {
 	out := new(MsgCreateSchemaResponse)
 	err := c.cc.Invoke(ctx, "/cheqdid.cheqdnode.cheqd.Msg/CreateSchema", in, out, opts...)
 	if err != nil {
@@ -809,7 +809,7 @@ func (c *msgClient) CreateSchema(ctx context.Context, in *WriteRequest, opts ...
 	return out, nil
 }
 
-func (c *msgClient) CreateAttrib(ctx context.Context, in *WriteRequest, opts ...grpc.CallOption) (*MsgCreateAttribResponse, error) {
+func (c *msgClient) CreateAttrib(ctx context.Context, in *MsgWriteRequest, opts ...grpc.CallOption) (*MsgCreateAttribResponse, error) {
 	out := new(MsgCreateAttribResponse)
 	err := c.cc.Invoke(ctx, "/cheqdid.cheqdnode.cheqd.Msg/CreateAttrib", in, out, opts...)
 	if err != nil {
@@ -818,7 +818,7 @@ func (c *msgClient) CreateAttrib(ctx context.Context, in *WriteRequest, opts ...
 	return out, nil
 }
 
-func (c *msgClient) UpdateAttrib(ctx context.Context, in *WriteRequest, opts ...grpc.CallOption) (*MsgUpdateAttribResponse, error) {
+func (c *msgClient) UpdateAttrib(ctx context.Context, in *MsgWriteRequest, opts ...grpc.CallOption) (*MsgUpdateAttribResponse, error) {
 	out := new(MsgUpdateAttribResponse)
 	err := c.cc.Invoke(ctx, "/cheqdid.cheqdnode.cheqd.Msg/UpdateAttrib", in, out, opts...)
 	if err != nil {
@@ -827,7 +827,7 @@ func (c *msgClient) UpdateAttrib(ctx context.Context, in *WriteRequest, opts ...
 	return out, nil
 }
 
-func (c *msgClient) CreateDid(ctx context.Context, in *WriteRequest, opts ...grpc.CallOption) (*MsgCreateDidResponse, error) {
+func (c *msgClient) CreateDid(ctx context.Context, in *MsgWriteRequest, opts ...grpc.CallOption) (*MsgCreateDidResponse, error) {
 	out := new(MsgCreateDidResponse)
 	err := c.cc.Invoke(ctx, "/cheqdid.cheqdnode.cheqd.Msg/CreateDid", in, out, opts...)
 	if err != nil {
@@ -836,7 +836,7 @@ func (c *msgClient) CreateDid(ctx context.Context, in *WriteRequest, opts ...grp
 	return out, nil
 }
 
-func (c *msgClient) UpdateDid(ctx context.Context, in *WriteRequest, opts ...grpc.CallOption) (*MsgUpdateDidResponse, error) {
+func (c *msgClient) UpdateDid(ctx context.Context, in *MsgWriteRequest, opts ...grpc.CallOption) (*MsgUpdateDidResponse, error) {
 	out := new(MsgUpdateDidResponse)
 	err := c.cc.Invoke(ctx, "/cheqdid.cheqdnode.cheqd.Msg/UpdateDid", in, out, opts...)
 	if err != nil {
@@ -848,34 +848,34 @@ func (c *msgClient) UpdateDid(ctx context.Context, in *WriteRequest, opts ...grp
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	// this line is used by starport scaffolding # proto/tx/rpc
-	CreateCredDef(context.Context, *WriteRequest) (*MsgCreateCredDefResponse, error)
-	CreateSchema(context.Context, *WriteRequest) (*MsgCreateSchemaResponse, error)
-	CreateAttrib(context.Context, *WriteRequest) (*MsgCreateAttribResponse, error)
-	UpdateAttrib(context.Context, *WriteRequest) (*MsgUpdateAttribResponse, error)
-	CreateDid(context.Context, *WriteRequest) (*MsgCreateDidResponse, error)
-	UpdateDid(context.Context, *WriteRequest) (*MsgUpdateDidResponse, error)
+	CreateCredDef(context.Context, *MsgWriteRequest) (*MsgCreateCredDefResponse, error)
+	CreateSchema(context.Context, *MsgWriteRequest) (*MsgCreateSchemaResponse, error)
+	CreateAttrib(context.Context, *MsgWriteRequest) (*MsgCreateAttribResponse, error)
+	UpdateAttrib(context.Context, *MsgWriteRequest) (*MsgUpdateAttribResponse, error)
+	CreateDid(context.Context, *MsgWriteRequest) (*MsgCreateDidResponse, error)
+	UpdateDid(context.Context, *MsgWriteRequest) (*MsgUpdateDidResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
 type UnimplementedMsgServer struct {
 }
 
-func (*UnimplementedMsgServer) CreateCredDef(ctx context.Context, req *WriteRequest) (*MsgCreateCredDefResponse, error) {
+func (*UnimplementedMsgServer) CreateCredDef(ctx context.Context, req *MsgWriteRequest) (*MsgCreateCredDefResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateCredDef not implemented")
 }
-func (*UnimplementedMsgServer) CreateSchema(ctx context.Context, req *WriteRequest) (*MsgCreateSchemaResponse, error) {
+func (*UnimplementedMsgServer) CreateSchema(ctx context.Context, req *MsgWriteRequest) (*MsgCreateSchemaResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateSchema not implemented")
 }
-func (*UnimplementedMsgServer) CreateAttrib(ctx context.Context, req *WriteRequest) (*MsgCreateAttribResponse, error) {
+func (*UnimplementedMsgServer) CreateAttrib(ctx context.Context, req *MsgWriteRequest) (*MsgCreateAttribResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateAttrib not implemented")
 }
-func (*UnimplementedMsgServer) UpdateAttrib(ctx context.Context, req *WriteRequest) (*MsgUpdateAttribResponse, error) {
+func (*UnimplementedMsgServer) UpdateAttrib(ctx context.Context, req *MsgWriteRequest) (*MsgUpdateAttribResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateAttrib not implemented")
 }
-func (*UnimplementedMsgServer) CreateDid(ctx context.Context, req *WriteRequest) (*MsgCreateDidResponse, error) {
+func (*UnimplementedMsgServer) CreateDid(ctx context.Context, req *MsgWriteRequest) (*MsgCreateDidResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateDid not implemented")
 }
-func (*UnimplementedMsgServer) UpdateDid(ctx context.Context, req *WriteRequest) (*MsgUpdateDidResponse, error) {
+func (*UnimplementedMsgServer) UpdateDid(ctx context.Context, req *MsgWriteRequest) (*MsgUpdateDidResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateDid not implemented")
 }
 
@@ -884,7 +884,7 @@ func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
 }
 
 func _Msg_CreateCredDef_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(WriteRequest)
+	in := new(MsgWriteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -896,13 +896,13 @@ func _Msg_CreateCredDef_Handler(srv interface{}, ctx context.Context, dec func(i
 		FullMethod: "/cheqdid.cheqdnode.cheqd.Msg/CreateCredDef",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).CreateCredDef(ctx, req.(*WriteRequest))
+		return srv.(MsgServer).CreateCredDef(ctx, req.(*MsgWriteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Msg_CreateSchema_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(WriteRequest)
+	in := new(MsgWriteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -914,13 +914,13 @@ func _Msg_CreateSchema_Handler(srv interface{}, ctx context.Context, dec func(in
 		FullMethod: "/cheqdid.cheqdnode.cheqd.Msg/CreateSchema",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).CreateSchema(ctx, req.(*WriteRequest))
+		return srv.(MsgServer).CreateSchema(ctx, req.(*MsgWriteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Msg_CreateAttrib_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(WriteRequest)
+	in := new(MsgWriteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -932,13 +932,13 @@ func _Msg_CreateAttrib_Handler(srv interface{}, ctx context.Context, dec func(in
 		FullMethod: "/cheqdid.cheqdnode.cheqd.Msg/CreateAttrib",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).CreateAttrib(ctx, req.(*WriteRequest))
+		return srv.(MsgServer).CreateAttrib(ctx, req.(*MsgWriteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Msg_UpdateAttrib_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(WriteRequest)
+	in := new(MsgWriteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -950,13 +950,13 @@ func _Msg_UpdateAttrib_Handler(srv interface{}, ctx context.Context, dec func(in
 		FullMethod: "/cheqdid.cheqdnode.cheqd.Msg/UpdateAttrib",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).UpdateAttrib(ctx, req.(*WriteRequest))
+		return srv.(MsgServer).UpdateAttrib(ctx, req.(*MsgWriteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Msg_CreateDid_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(WriteRequest)
+	in := new(MsgWriteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -968,13 +968,13 @@ func _Msg_CreateDid_Handler(srv interface{}, ctx context.Context, dec func(inter
 		FullMethod: "/cheqdid.cheqdnode.cheqd.Msg/CreateDid",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).CreateDid(ctx, req.(*WriteRequest))
+		return srv.(MsgServer).CreateDid(ctx, req.(*MsgWriteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Msg_UpdateDid_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(WriteRequest)
+	in := new(MsgWriteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -986,7 +986,7 @@ func _Msg_UpdateDid_Handler(srv interface{}, ctx context.Context, dec func(inter
 		FullMethod: "/cheqdid.cheqdnode.cheqd.Msg/UpdateDid",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).UpdateDid(ctx, req.(*WriteRequest))
+		return srv.(MsgServer).UpdateDid(ctx, req.(*MsgWriteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1024,7 +1024,7 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 	Metadata: "cheqd/tx.proto",
 }
 
-func (m *WriteRequest) Marshal() (dAtA []byte, err error) {
+func (m *MsgWriteRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1034,12 +1034,12 @@ func (m *WriteRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *WriteRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgWriteRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *WriteRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgWriteRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1521,7 +1521,7 @@ func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *WriteRequest) Size() (n int) {
+func (m *MsgWriteRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1748,7 +1748,7 @@ func sovTx(x uint64) (n int) {
 func sozTx(x uint64) (n int) {
 	return sovTx(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *WriteRequest) Unmarshal(dAtA []byte) error {
+func (m *MsgWriteRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1771,10 +1771,10 @@ func (m *WriteRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: WriteRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgWriteRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: WriteRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgWriteRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
