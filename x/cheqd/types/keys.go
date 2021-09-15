@@ -22,11 +22,6 @@ func KeyPrefix(p string) []byte {
 }
 
 const (
-	NymKey      = "Nym-value-"
-	NymCountKey = "Nym-count-"
-)
-
-const (
 	DidKey      = "Did-value-"
 	DidCountKey = "Did-count-"
 )

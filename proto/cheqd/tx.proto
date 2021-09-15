@@ -9,20 +9,19 @@ option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 // Msg defines the Msg service.
 service Msg {
     // this line is used by starport scaffolding # proto/tx/rpc
-  rpc CreateCredDef(WriteRequest) returns (MsgCreateCredDefResponse);
-  rpc CreateSchema(WriteRequest) returns (MsgCreateSchemaResponse);
-  rpc CreateAttrib(WriteRequest) returns (MsgCreateAttribResponse);
-  rpc UpdateAttrib(WriteRequest) returns (MsgUpdateAttribResponse);
-  rpc CreateDid(WriteRequest) returns (MsgCreateDidResponse);
-  rpc UpdateDid(WriteRequest) returns (MsgUpdateDidResponse);
+  rpc CreateCredDef(MsgWriteRequest) returns (MsgCreateCredDefResponse);
+  rpc CreateSchema(MsgWriteRequest) returns (MsgCreateSchemaResponse);
+  rpc CreateAttrib(MsgWriteRequest) returns (MsgCreateAttribResponse);
+  rpc UpdateAttrib(MsgWriteRequest) returns (MsgUpdateAttribResponse);
+  rpc CreateDid(MsgWriteRequest) returns (MsgCreateDidResponse);
+  rpc UpdateDid(MsgWriteRequest) returns (MsgUpdateDidResponse);
 }
 
 // this line is used by starport scaffolding # proto/tx/message
-message WriteRequest {
+message MsgWriteRequest {
   google.protobuf.Any data = 1;
   string author = 2;
-  string signature = 3;
-
+  map<string, string> signatures = 3;
 }
 
 message MsgCreateCredDef {

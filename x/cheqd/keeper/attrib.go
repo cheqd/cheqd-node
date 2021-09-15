@@ -40,22 +40,19 @@ func (k Keeper) SetAttribCount(ctx sdk.Context, count uint64) {
 // AppendAttrib appends a attrib in the store with a new id and update the count
 func (k Keeper) AppendAttrib(
 	ctx sdk.Context,
-	creator string,
 	did string,
 	raw string,
 ) uint64 {
 	// Create the attrib
 	count := k.GetAttribCount(ctx)
 	var attrib = types.Attrib{
-		Creator: creator,
-		Id:      count,
-		Did:     did,
-		Raw:     raw,
+		Did: did,
+		Raw: raw,
 	}
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.AttribKey))
 	value := k.cdc.MustMarshalBinaryBare(&attrib)
-	store.Set(GetAttribIDBytes(attrib.Id), value)
+	store.Set(GetAttribIDBytes(attrib.Did), value)
 
 	// Update attrib count
 	k.SetAttribCount(ctx, count+1)
@@ -67,11 +64,11 @@ func (k Keeper) AppendAttrib(
 func (k Keeper) SetAttrib(ctx sdk.Context, attrib types.Attrib) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.AttribKey))
 	b := k.cdc.MustMarshalBinaryBare(&attrib)
-	store.Set(GetAttribIDBytes(attrib.Id), b)
+	store.Set(GetAttribIDBytes(attrib.Did), b)
 }
 
 // GetAttrib returns a attrib from its id
-func (k Keeper) GetAttrib(ctx sdk.Context, id uint64) types.Attrib {
+func (k Keeper) GetAttrib(ctx sdk.Context, id string) types.Attrib {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.AttribKey))
 	var attrib types.Attrib
 	k.cdc.MustUnmarshalBinaryBare(store.Get(GetAttribIDBytes(id)), &attrib)
@@ -79,40 +76,41 @@ func (k Keeper) GetAttrib(ctx sdk.Context, id uint64) types.Attrib {
 }
 
 // HasAttrib checks if the attrib exists in the store
-func (k Keeper) HasAttrib(ctx sdk.Context, id uint64) bool {
+func (k Keeper) HasAttrib(ctx sdk.Context, id string) bool {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.AttribKey))
 	return store.Has(GetAttribIDBytes(id))
 }
 
 // GetAttribOwner returns the creator of the attrib
-func (k Keeper) GetAttribOwner(ctx sdk.Context, id uint64) string {
-	return k.GetAttrib(ctx, id).Creator
+func (k Keeper) GetAttribOwner(ctx sdk.Context, did string) string {
+	return did
 }
 
-// RemoveAttrib removes a attrib from the store
-func (k Keeper) RemoveAttrib(ctx sdk.Context, id uint64) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.AttribKey))
-	store.Delete(GetAttribIDBytes(id))
-}
-
-// GetAllAttrib returns all attrib
-func (k Keeper) GetAllAttrib(ctx sdk.Context) (list []types.Attrib) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.AttribKey))
-	iterator := sdk.KVStorePrefixIterator(store, []byte{})
-
-	defer iterator.Close()
-
-	for ; iterator.Valid(); iterator.Next() {
-		var val types.Attrib
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &val)
-		list = append(list, val)
-	}
-
-	return
-}
+//
+//// RemoveAttrib removes a attrib from the store
+//func (k Keeper) RemoveAttrib(ctx sdk.Context, id string) {
+//	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.AttribKey))
+//	store.Delete(GetAttribIDBytes(id))
+//}
+//
+//// GetAllAttrib returns all attrib
+//func (k Keeper) GetAllAttrib(ctx sdk.Context) (list []types.Attrib) {
+//	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.AttribKey))
+//	iterator := sdk.KVStorePrefixIterator(store, []byte{})
+//
+//	defer iterator.Close()
+//
+//	for ; iterator.Valid(); iterator.Next() {
+//		var val types.Attrib
+//		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &val)
+//		list = append(list, val)
+//	}
+//
+//	return
+//}
 
 // GetAttribIDBytes returns the byte representation of the ID
-func GetAttribIDBytes(id uint64) []byte {
+func GetAttribIDBytes(id string) []byte {
 	bz := make([]byte, 8)
 	binary.BigEndian.PutUint64(bz, id)
 	return bz

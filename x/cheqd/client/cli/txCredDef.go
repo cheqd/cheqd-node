@@ -1,13 +1,11 @@
 package cli
 
 import (
-	"github.com/spf13/cobra"
-	"strconv"
-
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	"github.com/spf13/cobra"
 )
 
 func CmdCreateCredDef() *cobra.Command {
@@ -26,70 +24,7 @@ func CmdCreateCredDef() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgCreateCredDef(clientCtx.GetFromAddress().String(), string(argsSchema_id), string(argsTag), string(argsSignature_type), string(argsValue))
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
-		},
-	}
-
-	flags.AddTxFlagsToCmd(cmd)
-
-	return cmd
-}
-
-func CmdUpdateCredDef() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "update-credDef [id] [schema_id] [tag] [signature_type] [value]",
-		Short: "Update a credDef",
-		Args:  cobra.ExactArgs(5),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			id, err := strconv.ParseUint(args[0], 10, 64)
-			if err != nil {
-				return err
-			}
-
-			argsSchema_id := string(args[1])
-			argsTag := string(args[2])
-			argsSignature_type := string(args[3])
-			argsValue := string(args[4])
-
-			clientCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-
-			msg := types.NewMsgUpdateCredDef(clientCtx.GetFromAddress().String(), id, string(argsSchema_id), string(argsTag), string(argsSignature_type), string(argsValue))
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
-		},
-	}
-
-	flags.AddTxFlagsToCmd(cmd)
-
-	return cmd
-}
-
-func CmdDeleteCredDef() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "delete-credDef [id] [schema_id] [tag] [signature_type] [value]",
-		Short: "Delete a credDef by id",
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			id, err := strconv.ParseUint(args[0], 10, 64)
-			if err != nil {
-				return err
-			}
-
-			clientCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-
-			msg := types.NewMsgDeleteCredDef(clientCtx.GetFromAddress().String(), id)
+			msg := types.NewMsgCreateCredDef(string(argsSchema_id), string(argsTag), string(argsSignature_type), string(argsValue))
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

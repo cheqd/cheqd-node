@@ -1,26 +1,17 @@
 package types
 
 const (
-	QueryGetNym  = "get-nym"
-	QueryListNym = "list-nym"
+	QueryGetDid = "get-did"
 )
 
 const (
-	QueryGetDid  = "get-did"
-	QueryListDid = "list-did"
+	QueryGetAttrib = "get-attrib"
 )
 
 const (
-	QueryGetAttrib  = "get-attrib"
-	QueryListAttrib = "list-attrib"
+	QueryGetSchema = "get-schema"
 )
 
 const (
-	QueryGetSchema  = "get-schema"
-	QueryListSchema = "list-schema"
-)
-
-const (
-	QueryGetCredDef  = "get-credDef"
-	QueryListCredDef = "list-credDef"
+	QueryGetCredDef = "get-credDef"
 )
