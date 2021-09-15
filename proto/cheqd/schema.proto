@@ -1,5 +1,5 @@
 syntax = "proto3";
-package cheqd.cheqdnode.cheqd;
+package cheqdid.cheqdnode.cheqd;
 
 option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 

@@ -8,7 +8,6 @@ import "cheqd/credDef.proto";
 import "cheqd/schema.proto";
 import "cheqd/attrib.proto";
 import "cheqd/did.proto";
-import "cheqd/nym.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 

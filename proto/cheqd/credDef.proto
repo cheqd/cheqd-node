@@ -1,5 +1,5 @@
 syntax = "proto3";
-package cheqd.cheqdnode.cheqd;
+package cheqdid.cheqdnode.cheqd;
 
 option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
@@ -10,5 +10,5 @@ message CredDef {
   string schema_id = 2; 
   string tag = 3; 
   string signature_type = 4; 
-  string value = 4; 
+  string value = 5;
 }
