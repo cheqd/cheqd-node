@@ -4,7 +4,7 @@
 
 | Category | Status |
 | :--- | :--- |
-| **ADR Stage** | PROPOSED |
+| **ADR Stage** | ACCEPTED |
 | **Implementation Status** | Not Implemented |
 
 ## Summary
@@ -24,9 +24,9 @@ Tendermint requires [genesis parameters](https://docs.tendermint.com/master/tend
 
 * **`block`**
   * `max_bytes` = `200000` \(~200KB\)
-    * Cosmos hub: `200000` \(~200KB\)
+    * Cosmos Hub: `200000` \(~200KB\)
   * `max_gas` = `2000000` (~20 txs)
-    * Cosmos hub: `2000000` (~20 txs)
+    * Cosmos Hub: `2000000` (~20 txs)
 * **`evidence`**
   * `max_age_num_blocks` = `1576800`
     * Maximum age of evidence, in blocks. The basic formula for calculating this is: `MaxAgeDuration / {average block time}`.
@@ -58,7 +58,7 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
   * `default_send_enabled` = `true`
     * The default send enabled value allows send transfers for all coin denominations
 * **`crisis`**
-  * `constant_fee` = `{ "denom": "ncheq", "amount": "10000000000000" }` (10,000cheq)
+  * `constant_fee` = `{ "denom": "ncheq", "amount": "10000000000000" }` (10,000 `cheq`)
     * The fee is used to verify the [invariant(s)](https://docs.cosmos.network/v0.44/building-modules/invariants.html) in the `crisis` module.
 * **`distribution`**
   * `community_tax` = `0.02`
@@ -75,7 +75,7 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
   * Used to manage initial transactions such as genesis validators creation
 * **`gov`**
   * `deposit_params`
-    * min_deposit = `[{ "denom": "ncheq", "amount": "8000000000000" }]` (8,000cheq)
+    * min_deposit = `[{ "denom": "ncheq", "amount": "8000000000000" }]` (8,000 `cheq`)
       * The minimum deposit for a proposal to enter the voting period.
     * `max_deposit_period` = `1210000s` (2 weeks)
       * The maximum period for Atom holders to deposit on a proposal. Initial value: 2 months.
@@ -92,21 +92,21 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
   * `mint_denom` = `ncheq`
   * `inflation_rate_change` = `0.02`
     * Maximum inflation rate change per year
-    * In Cosmos hub they use `1.0`
+    * In Cosmos Hub they use `1.0`
     * Formula: `inflationRateChangePerYear = (1 - BondedRatio/ GoalBonded) * MaxInflationRateChange`
   * `inflation_max` = `0.04`
     * Inflation aims to this value if `bonded_ratio` &lt; `bonded_goal`
-    * Cosmos hub: `0.20`
+    * Cosmos Hub: `0.20`
   * `inflation_min` = `0.01`
     * Inflation aims to this value if `bonded_ratio` &lt; `bonded_goal`
-    * Cosmos hub: `0.07`
+    * Cosmos Hub: `0.07`
   * `goal_bonded` = `0.60`
-    * Cosmos hub: `0.67`
+    * Cosmos Hub: `0.67`
   * `blocks_per_year` = `6311520` (~5s)
-    * Cosmos hub: `4360000`
+    * Cosmos Hub: `4360000`
 * **`slashing`**
   * `signed_blocks_window` = `120960` \(1 week\)
-    * Cosmos hub: `10000` \(~20h\)
+    * Cosmos Hub: `10000` \(~20h\)
   * `min_signed_per_window`= `0.50`
     * This percentage of blocks must be signed within the window
   * `downtime_jail_duration` = `600s`
@@ -152,7 +152,7 @@ The parameters above were agreed to be used for the cheqd network testnet, with 
 * In production/mainnet, parameters can only be changed via a majority vote without veto defeat according to the cheqd network governance principles. This allows for more democratic governance frameworks to be created for a self-sovereign identity network.
 
 ### Negative
-
+* Existing node operators will need to re-establish staking with new staking denomination and staking parameters.
 
 ### Neutral
 
