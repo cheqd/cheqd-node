@@ -8,7 +8,7 @@ description: This is the suggested template to be used for ADRs on the cheqd-nod
 
 | Category | Status |
 | :--- | :--- |
-| **ADR Stage** | PROPOSED |
+| **ADR Stage** | ACCEPTED |
 | **Implementation Status** | Not Implemented |
 
 ## Summary
