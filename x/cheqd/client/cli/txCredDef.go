@@ -10,10 +10,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 )
 
-func CmdCreateCred_def() *cobra.Command {
+func CmdCreateCredDef() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-cred_def [schema_id] [tag] [signature_type] [value]",
-		Short: "Creates a new cred_def",
+		Use:   "create-credDef [schema_id] [tag] [signature_type] [value]",
+		Short: "Creates a new credDef",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			argsSchema_id := string(args[0])
@@ -26,7 +26,7 @@ func CmdCreateCred_def() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgCreateCred_def(clientCtx.GetFromAddress().String(), string(argsSchema_id), string(argsTag), string(argsSignature_type), string(argsValue))
+			msg := types.NewMsgCreateCredDef(clientCtx.GetFromAddress().String(), string(argsSchema_id), string(argsTag), string(argsSignature_type), string(argsValue))
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -39,10 +39,10 @@ func CmdCreateCred_def() *cobra.Command {
 	return cmd
 }
 
-func CmdUpdateCred_def() *cobra.Command {
+func CmdUpdateCredDef() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-cred_def [id] [schema_id] [tag] [signature_type] [value]",
-		Short: "Update a cred_def",
+		Use:   "update-credDef [id] [schema_id] [tag] [signature_type] [value]",
+		Short: "Update a credDef",
 		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			id, err := strconv.ParseUint(args[0], 10, 64)
@@ -60,7 +60,7 @@ func CmdUpdateCred_def() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgUpdateCred_def(clientCtx.GetFromAddress().String(), id, string(argsSchema_id), string(argsTag), string(argsSignature_type), string(argsValue))
+			msg := types.NewMsgUpdateCredDef(clientCtx.GetFromAddress().String(), id, string(argsSchema_id), string(argsTag), string(argsSignature_type), string(argsValue))
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -73,10 +73,10 @@ func CmdUpdateCred_def() *cobra.Command {
 	return cmd
 }
 
-func CmdDeleteCred_def() *cobra.Command {
+func CmdDeleteCredDef() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "delete-cred_def [id] [schema_id] [tag] [signature_type] [value]",
-		Short: "Delete a cred_def by id",
+		Use:   "delete-credDef [id] [schema_id] [tag] [signature_type] [value]",
+		Short: "Delete a credDef by id",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			id, err := strconv.ParseUint(args[0], 10, 64)
@@ -89,7 +89,7 @@ func CmdDeleteCred_def() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgDeleteCred_def(clientCtx.GetFromAddress().String(), id)
+			msg := types.NewMsgDeleteCredDef(clientCtx.GetFromAddress().String(), id)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

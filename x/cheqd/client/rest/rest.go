@@ -33,8 +33,8 @@ func RegisterRoutes(clientCtx client.Context, r *mux.Router) {
 
 func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {
 	// this line is used by starport scaffolding # 3
-	r.HandleFunc("/cheqd/cred_defs/{id}", getCred_defHandler(clientCtx)).Methods("GET")
-	r.HandleFunc("/cheqd/cred_defs", listCred_defHandler(clientCtx)).Methods("GET")
+	r.HandleFunc("/cheqd/credDefs/{id}", getCredDefHandler(clientCtx)).Methods("GET")
+	r.HandleFunc("/cheqd/credDefs", listCredDefHandler(clientCtx)).Methods("GET")
 
 	r.HandleFunc("/cheqd/schemata/{id}", getSchemaHandler(clientCtx)).Methods("GET")
 	r.HandleFunc("/cheqd/schemata", listSchemaHandler(clientCtx)).Methods("GET")
@@ -52,9 +52,9 @@ func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {
 
 func registerTxHandlers(clientCtx client.Context, r *mux.Router) {
 	// this line is used by starport scaffolding # 4
-	r.HandleFunc("/cheqd/cred_defs", createCred_defHandler(clientCtx)).Methods("POST")
-	r.HandleFunc("/cheqd/cred_defs/{id}", updateCred_defHandler(clientCtx)).Methods("POST")
-	r.HandleFunc("/cheqd/cred_defs/{id}", deleteCred_defHandler(clientCtx)).Methods("POST")
+	r.HandleFunc("/cheqd/credDefs", createCredDefHandler(clientCtx)).Methods("POST")
+	r.HandleFunc("/cheqd/credDefs/{id}", updateCredDefHandler(clientCtx)).Methods("POST")
+	r.HandleFunc("/cheqd/credDefs/{id}", deleteCredDefHandler(clientCtx)).Methods("POST")
 
 	r.HandleFunc("/cheqd/schemata", createSchemaHandler(clientCtx)).Methods("POST")
 	r.HandleFunc("/cheqd/schemata/{id}", updateSchemaHandler(clientCtx)).Methods("POST")

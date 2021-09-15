@@ -6,9 +6,8 @@ option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 import "gogoproto/gogo.proto";
 
 message Schema {
-  string creator = 1;
-  uint64 id = 2;
-  string name = 3; 
-  string version = 4; 
-  string attr_names = 5; 
+  string author = 1;
+  string name = 2;
+  string version = 3;
+  string attr_names = 4;
 }

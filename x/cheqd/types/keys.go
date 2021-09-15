@@ -42,6 +42,6 @@ const (
 )
 
 const (
-	Cred_defKey      = "Cred_def-value-"
-	Cred_defCountKey = "Cred_def-count-"
+	CredDefKey      = "CredDef-value-"
+	CredDefCountKey = "CredDef-count-"
 )

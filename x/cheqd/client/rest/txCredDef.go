@@ -12,7 +12,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type createCred_defRequest struct {
+type createCredDefRequest struct {
 	BaseReq        rest.BaseReq `json:"base_req"`
 	Creator        string       `json:"creator"`
 	Schema_id      string       `json:"schema_id"`
@@ -21,9 +21,9 @@ type createCred_defRequest struct {
 	Value          string       `json:"value"`
 }
 
-func createCred_defHandler(clientCtx client.Context) http.HandlerFunc {
+func createCredDefHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req createCred_defRequest
+		var req createCredDefRequest
 		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
 			return
@@ -48,7 +48,7 @@ func createCred_defHandler(clientCtx client.Context) http.HandlerFunc {
 
 		parsedValue := req.Value
 
-		msg := types.NewMsgCreateCred_def(
+		msg := types.NewMsgCreateCredDef(
 			req.Creator,
 			parsedSchema_id,
 			parsedTag,
@@ -60,7 +60,7 @@ func createCred_defHandler(clientCtx client.Context) http.HandlerFunc {
 	}
 }
 
-type updateCred_defRequest struct {
+type updateCredDefRequest struct {
 	BaseReq        rest.BaseReq `json:"base_req"`
 	Creator        string       `json:"creator"`
 	Schema_id      string       `json:"schema_id"`
@@ -69,14 +69,14 @@ type updateCred_defRequest struct {
 	Value          string       `json:"value"`
 }
 
-func updateCred_defHandler(clientCtx client.Context) http.HandlerFunc {
+func updateCredDefHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
 		if err != nil {
 			return
 		}
 
-		var req updateCred_defRequest
+		var req updateCredDefRequest
 		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
 			return
@@ -101,7 +101,7 @@ func updateCred_defHandler(clientCtx client.Context) http.HandlerFunc {
 
 		parsedValue := req.Value
 
-		msg := types.NewMsgUpdateCred_def(
+		msg := types.NewMsgUpdateCredDef(
 			req.Creator,
 			id,
 			parsedSchema_id,
@@ -114,19 +114,19 @@ func updateCred_defHandler(clientCtx client.Context) http.HandlerFunc {
 	}
 }
 
-type deleteCred_defRequest struct {
+type deleteCredDefRequest struct {
 	BaseReq rest.BaseReq `json:"base_req"`
 	Creator string       `json:"creator"`
 }
 
-func deleteCred_defHandler(clientCtx client.Context) http.HandlerFunc {
+func deleteCredDefHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
 		if err != nil {
 			return
 		}
 
-		var req deleteCred_defRequest
+		var req deleteCredDefRequest
 		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
 			return
@@ -143,7 +143,7 @@ func deleteCred_defHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgDeleteCred_def(
+		msg := types.NewMsgDeleteCredDef(
 			req.Creator,
 			id,
 		)

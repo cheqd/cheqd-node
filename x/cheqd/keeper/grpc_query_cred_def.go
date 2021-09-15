@@ -12,24 +12,24 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) Cred_defAll(c context.Context, req *types.QueryAllCred_defRequest) (*types.QueryAllCred_defResponse, error) {
+func (k Keeper) CredDefAll(c context.Context, req *types.QueryAllCredDefRequest) (*types.QueryAllCredDefResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
-	var cred_defs []*types.Cred_def
+	var credDefs []*types.CredDef
 	ctx := sdk.UnwrapSDKContext(c)
 
 	store := ctx.KVStore(k.storeKey)
-	cred_defStore := prefix.NewStore(store, types.KeyPrefix(types.Cred_defKey))
+	credDefStore := prefix.NewStore(store, types.KeyPrefix(types.CredDefKey))
 
-	pageRes, err := query.Paginate(cred_defStore, req.Pagination, func(key []byte, value []byte) error {
-		var cred_def types.Cred_def
-		if err := k.cdc.UnmarshalBinaryBare(value, &cred_def); err != nil {
+	pageRes, err := query.Paginate(credDefStore, req.Pagination, func(key []byte, value []byte) error {
+		var credDef types.CredDef
+		if err := k.cdc.UnmarshalBinaryBare(value, &credDef); err != nil {
 			return err
 		}
 
-		cred_defs = append(cred_defs, &cred_def)
+		credDefs = append(credDefs, &credDef)
 		return nil
 	})
 
@@ -37,23 +37,23 @@ func (k Keeper) Cred_defAll(c context.Context, req *types.QueryAllCred_defReques
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &types.QueryAllCred_defResponse{Cred_def: cred_defs, Pagination: pageRes}, nil
+	return &types.QueryAllCredDefResponse{CredDef: credDefs, Pagination: pageRes}, nil
 }
 
-func (k Keeper) Cred_def(c context.Context, req *types.QueryGetCred_defRequest) (*types.QueryGetCred_defResponse, error) {
+func (k Keeper) CredDef(c context.Context, req *types.QueryGetCredDefRequest) (*types.QueryGetCredDefResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
-	var cred_def types.Cred_def
+	var credDef types.CredDef
 	ctx := sdk.UnwrapSDKContext(c)
 
-	if !k.HasCred_def(ctx, req.Id) {
+	if !k.HasCredDef(ctx, req.Id) {
 		return nil, sdkerrors.ErrKeyNotFound
 	}
 
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.Cred_defKey))
-	k.cdc.MustUnmarshalBinaryBare(store.Get(GetCred_defIDBytes(req.Id)), &cred_def)
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CredDefKey))
+	k.cdc.MustUnmarshalBinaryBare(store.Get(GetCredDefIDBytes(req.Id)), &credDef)
 
-	return &types.QueryGetCred_defResponse{Cred_def: &cred_def}, nil
+	return &types.QueryGetCredDefResponse{CredDef: &credDef}, nil
 }

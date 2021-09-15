@@ -11,11 +11,11 @@ const DefaultIndex uint64 = 1
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		// this line is used by starport scaffolding # genesis/types/default
-		Cred_defList: []*Cred_def{},
-		SchemaList:   []*Schema{},
-		AttribList:   []*Attrib{},
-		DidList:      []*Did{},
-		NymList:      []*Nym{},
+		CredDefList: []*CredDef{},
+		SchemaList:  []*Schema{},
+		AttribList:  []*Attrib{},
+		DidList:     []*Did{},
+		NymList:     []*Nym{},
 	}
 }
 
@@ -23,14 +23,14 @@ func DefaultGenesis() *GenesisState {
 // failure.
 func (gs GenesisState) Validate() error {
 	// this line is used by starport scaffolding # genesis/types/validate
-	// Check for duplicated ID in cred_def
-	cred_defIdMap := make(map[uint64]bool)
+	// Check for duplicated ID in credDef
+	credDefIdMap := make(map[uint64]bool)
 
-	for _, elem := range gs.Cred_defList {
-		if _, ok := cred_defIdMap[elem.Id]; ok {
-			return fmt.Errorf("duplicated id for cred_def")
+	for _, elem := range gs.CredDefList {
+		if _, ok := credDefIdMap[elem.Id]; ok {
+			return fmt.Errorf("duplicated id for credDef")
 		}
-		cred_defIdMap[elem.Id] = true
+		credDefIdMap[elem.Id] = true
 	}
 	// Check for duplicated ID in schema
 	schemaIdMap := make(map[uint64]bool)

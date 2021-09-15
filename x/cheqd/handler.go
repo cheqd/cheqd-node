@@ -18,16 +18,16 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 		switch msg := msg.(type) {
 		// this line is used by starport scaffolding # 1
-		case *types.MsgCreateCred_def:
-			res, err := msgServer.CreateCred_def(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgCreateCredDef:
+			res, err := msgServer.CreateCredDef(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
-		case *types.MsgUpdateCred_def:
-			res, err := msgServer.UpdateCred_def(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgUpdateCredDef:
+			res, err := msgServer.UpdateCredDef(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
-		case *types.MsgDeleteCred_def:
-			res, err := msgServer.DeleteCred_def(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgDeleteCredDef:
+			res, err := msgServer.DeleteCredDef(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case *types.MsgCreateSchema:

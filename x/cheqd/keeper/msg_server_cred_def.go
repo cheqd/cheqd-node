@@ -9,10 +9,10 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func (k msgServer) CreateCred_def(goCtx context.Context, msg *types.MsgCreateCred_def) (*types.MsgCreateCred_defResponse, error) {
+func (k msgServer) CreateCredDef(goCtx context.Context, msg *types.MsgCreateCredDef) (*types.MsgCreateCredDefResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	id := k.AppendCred_def(
+	id := k.AppendCredDef(
 		ctx,
 		msg.Creator,
 		msg.Schema_id,
@@ -21,15 +21,15 @@ func (k msgServer) CreateCred_def(goCtx context.Context, msg *types.MsgCreateCre
 		msg.Value,
 	)
 
-	return &types.MsgCreateCred_defResponse{
+	return &types.MsgCreateCredDefResponse{
 		Id: id,
 	}, nil
 }
 
-func (k msgServer) UpdateCred_def(goCtx context.Context, msg *types.MsgUpdateCred_def) (*types.MsgUpdateCred_defResponse, error) {
+func (k msgServer) UpdateCredDef(goCtx context.Context, msg *types.MsgUpdateCredDef) (*types.MsgUpdateCredDefResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	var cred_def = types.Cred_def{
+	var credDef = types.CredDef{
 		Creator:        msg.Creator,
 		Id:             msg.Id,
 		Schema_id:      msg.Schema_id,
@@ -39,31 +39,31 @@ func (k msgServer) UpdateCred_def(goCtx context.Context, msg *types.MsgUpdateCre
 	}
 
 	// Checks that the element exists
-	if !k.HasCred_def(ctx, msg.Id) {
+	if !k.HasCredDef(ctx, msg.Id) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %d doesn't exist", msg.Id))
 	}
 
 	// Checks if the the msg sender is the same as the current owner
-	if msg.Creator != k.GetCred_defOwner(ctx, msg.Id) {
+	if msg.Creator != k.GetCredDefOwner(ctx, msg.Id) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
 	}
 
-	k.SetCred_def(ctx, cred_def)
+	k.SetCredDef(ctx, credDef)
 
-	return &types.MsgUpdateCred_defResponse{}, nil
+	return &types.MsgUpdateCredDefResponse{}, nil
 }
 
-func (k msgServer) DeleteCred_def(goCtx context.Context, msg *types.MsgDeleteCred_def) (*types.MsgDeleteCred_defResponse, error) {
+func (k msgServer) DeleteCredDef(goCtx context.Context, msg *types.MsgDeleteCredDef) (*types.MsgDeleteCredDefResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	if !k.HasCred_def(ctx, msg.Id) {
+	if !k.HasCredDef(ctx, msg.Id) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %d doesn't exist", msg.Id))
 	}
-	if msg.Creator != k.GetCred_defOwner(ctx, msg.Id) {
+	if msg.Creator != k.GetCredDefOwner(ctx, msg.Id) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
 	}
 
-	k.RemoveCred_def(ctx, msg.Id)
+	k.RemoveCredDef(ctx, msg.Id)
 
-	return &types.MsgDeleteCred_defResponse{}, nil
+	return &types.MsgDeleteCredDefResponse{}, nil
 }

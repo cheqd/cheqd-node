@@ -9,9 +9,9 @@ import (
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	// this line is used by starport scaffolding # 2
-	cdc.RegisterConcrete(&MsgCreateCred_def{}, "cheqd/CreateCred_def", nil)
-	cdc.RegisterConcrete(&MsgUpdateCred_def{}, "cheqd/UpdateCred_def", nil)
-	cdc.RegisterConcrete(&MsgDeleteCred_def{}, "cheqd/DeleteCred_def", nil)
+	cdc.RegisterConcrete(&MsgCreateCredDef{}, "cheqd/CreateCredDef", nil)
+	cdc.RegisterConcrete(&MsgUpdateCredDef{}, "cheqd/UpdateCredDef", nil)
+	cdc.RegisterConcrete(&MsgDeleteCredDef{}, "cheqd/DeleteCredDef", nil)
 
 	cdc.RegisterConcrete(&MsgCreateSchema{}, "cheqd/CreateSchema", nil)
 	cdc.RegisterConcrete(&MsgUpdateSchema{}, "cheqd/UpdateSchema", nil)
@@ -34,9 +34,9 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	// this line is used by starport scaffolding # 3
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgCreateCred_def{},
-		&MsgUpdateCred_def{},
-		&MsgDeleteCred_def{},
+		&MsgCreateCredDef{},
+		&MsgUpdateCredDef{},
+		&MsgDeleteCredDef{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreateSchema{},

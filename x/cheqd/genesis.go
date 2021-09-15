@@ -10,13 +10,13 @@ import (
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 	// this line is used by starport scaffolding # genesis/module/init
-	// Set all the cred_def
-	for _, elem := range genState.Cred_defList {
-		k.SetCred_def(ctx, *elem)
+	// Set all the credDef
+	for _, elem := range genState.CredDefList {
+		k.SetCredDef(ctx, *elem)
 	}
 
-	// Set cred_def count
-	k.SetCred_defCount(ctx, uint64(len(genState.Cred_defList)))
+	// Set credDef count
+	k.SetCredDefCount(ctx, uint64(len(genState.CredDefList)))
 
 	// Set all the schema
 	for _, elem := range genState.SchemaList {
@@ -57,11 +57,11 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis := types.DefaultGenesis()
 
 	// this line is used by starport scaffolding # genesis/module/export
-	// Get all cred_def
-	cred_defList := k.GetAllCred_def(ctx)
-	for _, elem := range cred_defList {
+	// Get all credDef
+	credDefList := k.GetAllCredDef(ctx)
+	for _, elem := range credDefList {
 		elem := elem
-		genesis.Cred_defList = append(genesis.Cred_defList, &elem)
+		genesis.CredDefList = append(genesis.CredDefList, &elem)
 	}
 
 	// Get all schema

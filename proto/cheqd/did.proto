@@ -6,7 +6,7 @@ option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 import "gogoproto/gogo.proto";
 
 message Did {
-  uint64 id = 1;
+  string id = 1;
   string verkey = 2;
   string alias = 3;
 }

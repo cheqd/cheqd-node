@@ -10,10 +10,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdListCred_def() *cobra.Command {
+func CmdListCredDef() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list-cred_def",
-		Short: "list all cred_def",
+		Use:   "list-credDef",
+		Short: "list all credDef",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -24,11 +24,11 @@ func CmdListCred_def() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryAllCred_defRequest{
+			params := &types.QueryAllCredDefRequest{
 				Pagination: pageReq,
 			}
 
-			res, err := queryClient.Cred_defAll(context.Background(), params)
+			res, err := queryClient.CredDefAll(context.Background(), params)
 			if err != nil {
 				return err
 			}
@@ -42,10 +42,10 @@ func CmdListCred_def() *cobra.Command {
 	return cmd
 }
 
-func CmdShowCred_def() *cobra.Command {
+func CmdShowCredDef() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-cred_def [id]",
-		Short: "shows a cred_def",
+		Use:   "show-credDef [id]",
+		Short: "shows a credDef",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -57,11 +57,11 @@ func CmdShowCred_def() *cobra.Command {
 				return err
 			}
 
-			params := &types.QueryGetCred_defRequest{
+			params := &types.QueryGetCredDefRequest{
 				Id: id,
 			}
 
-			res, err := queryClient.Cred_def(context.Background(), params)
+			res, err := queryClient.CredDef(context.Background(), params)
 			if err != nil {
 				return err
 			}

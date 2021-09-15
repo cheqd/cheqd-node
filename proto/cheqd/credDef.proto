@@ -5,7 +5,10 @@ option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
 import "gogoproto/gogo.proto";
 
-message Attrib {
-  string did = 1;
-  string raw = 2;
+message CredDef {
+  string author = 1;
+  string schema_id = 2; 
+  string tag = 3; 
+  string signature_type = 4; 
+  string value = 4; 
 }

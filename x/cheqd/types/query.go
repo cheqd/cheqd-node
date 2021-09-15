@@ -21,6 +21,6 @@ const (
 )
 
 const (
-	QueryGetCred_def  = "get-cred_def"
-	QueryListCred_def = "list-cred_def"
+	QueryGetCredDef  = "get-credDef"
+	QueryListCredDef = "list-credDef"
 )

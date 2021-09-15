@@ -8,10 +8,10 @@ import (
 	"strconv"
 )
 
-// GetCred_defCount get the total number of cred_def
-func (k Keeper) GetCred_defCount(ctx sdk.Context) uint64 {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.Cred_defCountKey))
-	byteKey := types.KeyPrefix(types.Cred_defCountKey)
+// GetCredDefCount get the total number of credDef
+func (k Keeper) GetCredDefCount(ctx sdk.Context) uint64 {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CredDefCountKey))
+	byteKey := types.KeyPrefix(types.CredDefCountKey)
 	bz := store.Get(byteKey)
 
 	// Count doesn't exist: no element
@@ -29,16 +29,16 @@ func (k Keeper) GetCred_defCount(ctx sdk.Context) uint64 {
 	return count
 }
 
-// SetCred_defCount set the total number of cred_def
-func (k Keeper) SetCred_defCount(ctx sdk.Context, count uint64) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.Cred_defCountKey))
-	byteKey := types.KeyPrefix(types.Cred_defCountKey)
+// SetCredDefCount set the total number of credDef
+func (k Keeper) SetCredDefCount(ctx sdk.Context, count uint64) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CredDefCountKey))
+	byteKey := types.KeyPrefix(types.CredDefCountKey)
 	bz := []byte(strconv.FormatUint(count, 10))
 	store.Set(byteKey, bz)
 }
 
-// AppendCred_def appends a cred_def in the store with a new id and update the count
-func (k Keeper) AppendCred_def(
+// AppendCredDef appends a credDef in the store with a new id and update the count
+func (k Keeper) AppendCredDef(
 	ctx sdk.Context,
 	creator string,
 	schema_id string,
@@ -46,9 +46,9 @@ func (k Keeper) AppendCred_def(
 	signature_type string,
 	value string,
 ) uint64 {
-	// Create the cred_def
-	count := k.GetCred_defCount(ctx)
-	var cred_def = types.Cred_def{
+	// Create the credDef
+	count := k.GetCredDefCount(ctx)
+	var credDef = types.CredDef{
 		Creator:        creator,
 		Id:             count,
 		Schema_id:      schema_id,
@@ -57,57 +57,57 @@ func (k Keeper) AppendCred_def(
 		Value:          value,
 	}
 
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.Cred_defKey))
-	value := k.cdc.MustMarshalBinaryBare(&cred_def)
-	store.Set(GetCred_defIDBytes(cred_def.Id), value)
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CredDefKey))
+	value := k.cdc.MustMarshalBinaryBare(&credDef)
+	store.Set(GetCredDefIDBytes(credDef.Id), value)
 
-	// Update cred_def count
-	k.SetCred_defCount(ctx, count+1)
+	// Update credDef count
+	k.SetCredDefCount(ctx, count+1)
 
 	return count
 }
 
-// SetCred_def set a specific cred_def in the store
-func (k Keeper) SetCred_def(ctx sdk.Context, cred_def types.Cred_def) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.Cred_defKey))
-	b := k.cdc.MustMarshalBinaryBare(&cred_def)
-	store.Set(GetCred_defIDBytes(cred_def.Id), b)
+// SetCredDef set a specific credDef in the store
+func (k Keeper) SetCredDef(ctx sdk.Context, credDef types.CredDef) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CredDefKey))
+	b := k.cdc.MustMarshalBinaryBare(&credDef)
+	store.Set(GetCredDefIDBytes(credDef.Id), b)
 }
 
-// GetCred_def returns a cred_def from its id
-func (k Keeper) GetCred_def(ctx sdk.Context, id uint64) types.Cred_def {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.Cred_defKey))
-	var cred_def types.Cred_def
-	k.cdc.MustUnmarshalBinaryBare(store.Get(GetCred_defIDBytes(id)), &cred_def)
-	return cred_def
+// GetCredDef returns a credDef from its id
+func (k Keeper) GetCredDef(ctx sdk.Context, id uint64) types.CredDef {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CredDefKey))
+	var credDef types.CredDef
+	k.cdc.MustUnmarshalBinaryBare(store.Get(GetCredDefIDBytes(id)), &credDef)
+	return credDef
 }
 
-// HasCred_def checks if the cred_def exists in the store
-func (k Keeper) HasCred_def(ctx sdk.Context, id uint64) bool {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.Cred_defKey))
-	return store.Has(GetCred_defIDBytes(id))
+// HasCredDef checks if the credDef exists in the store
+func (k Keeper) HasCredDef(ctx sdk.Context, id uint64) bool {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CredDefKey))
+	return store.Has(GetCredDefIDBytes(id))
 }
 
-// GetCred_defOwner returns the creator of the cred_def
-func (k Keeper) GetCred_defOwner(ctx sdk.Context, id uint64) string {
-	return k.GetCred_def(ctx, id).Creator
+// GetCredDefOwner returns the creator of the credDef
+func (k Keeper) GetCredDefOwner(ctx sdk.Context, id uint64) string {
+	return k.GetCredDef(ctx, id).Creator
 }
 
-// RemoveCred_def removes a cred_def from the store
-func (k Keeper) RemoveCred_def(ctx sdk.Context, id uint64) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.Cred_defKey))
-	store.Delete(GetCred_defIDBytes(id))
+// RemoveCredDef removes a credDef from the store
+func (k Keeper) RemoveCredDef(ctx sdk.Context, id uint64) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CredDefKey))
+	store.Delete(GetCredDefIDBytes(id))
 }
 
-// GetAllCred_def returns all cred_def
-func (k Keeper) GetAllCred_def(ctx sdk.Context) (list []types.Cred_def) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.Cred_defKey))
+// GetAllCredDef returns all credDef
+func (k Keeper) GetAllCredDef(ctx sdk.Context) (list []types.CredDef) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CredDefKey))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var val types.Cred_def
+		var val types.CredDef
 		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &val)
 		list = append(list, val)
 	}
@@ -115,14 +115,14 @@ func (k Keeper) GetAllCred_def(ctx sdk.Context) (list []types.Cred_def) {
 	return
 }
 
-// GetCred_defIDBytes returns the byte representation of the ID
-func GetCred_defIDBytes(id uint64) []byte {
+// GetCredDefIDBytes returns the byte representation of the ID
+func GetCredDefIDBytes(id uint64) []byte {
 	bz := make([]byte, 8)
 	binary.BigEndian.PutUint64(bz, id)
 	return bz
 }
 
-// GetCred_defIDFromBytes returns ID in uint64 format from a byte array
-func GetCred_defIDFromBytes(bz []byte) uint64 {
+// GetCredDefIDFromBytes returns ID in uint64 format from a byte array
+func GetCredDefIDFromBytes(bz []byte) uint64 {
 	return binary.BigEndian.Uint64(bz)
 }

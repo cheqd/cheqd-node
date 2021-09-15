@@ -7,8 +7,8 @@ import (
 	"strconv"
 )
 
-func listCred_def(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
-	msgs := keeper.GetAllCred_def(ctx)
+func listCredDef(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
+	msgs := keeper.GetAllCredDef(ctx)
 
 	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, msgs)
 	if err != nil {
@@ -18,17 +18,17 @@ func listCred_def(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.Legacy
 	return bz, nil
 }
 
-func getCred_def(ctx sdk.Context, key string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
+func getCredDef(ctx sdk.Context, key string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	id, err := strconv.ParseUint(key, 10, 64)
 	if err != nil {
 		return nil, err
 	}
 
-	if !keeper.HasCred_def(ctx, id) {
+	if !keeper.HasCredDef(ctx, id) {
 		return nil, sdkerrors.ErrKeyNotFound
 	}
 
-	msg := keeper.GetCred_def(ctx, id)
+	msg := keeper.GetCredDef(ctx, id)
 
 	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, msg)
 	if err != nil {
