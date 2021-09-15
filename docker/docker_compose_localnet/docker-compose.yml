@@ -9,7 +9,7 @@ services:
       - "26657:26657" # rpc
     volumes:
       - ./node_configs/node0:/home/cheqd/.cheqdnode:Z
-    command: start --rpc.laddr tcp://0.0.0.0:26657 --p2p.persistent_peers "${NODE_0_ID}@node0:26656,${NODE_1_ID}@node1:26656,${NODE_2_ID}@node2:26656,${NODE_3_ID}@node3:26656"
+    command: start --rpc.laddr tcp://0.0.0.0:26657 --minimum-gas-prices "0.001cheq"
 
   node1:
     image: cheqd-node
@@ -19,7 +19,7 @@ services:
       - "26660:26657" # rpc
     volumes:
       - ./node_configs/node1:/home/cheqd/.cheqdnode:Z
-    command: start --rpc.laddr tcp://0.0.0.0:26657
+    command: start --rpc.laddr tcp://0.0.0.0:26657 --minimum-gas-prices "0.001cheq" --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
 
   node2:
     image: cheqd-node
@@ -29,7 +29,7 @@ services:
       - "26663:26657" # rpc
     volumes:
       - ./node_configs/node2:/home/cheqd/.cheqdnode:Z
-    command: start --rpc.laddr tcp://0.0.0.0:26657
+    command: start --rpc.laddr tcp://0.0.0.0:26657 --minimum-gas-prices "0.001cheq" --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
 
   node3:
     image: cheqd-node
@@ -39,4 +39,24 @@ services:
       - "26666:26657" # rpc
     volumes:
       - ./node_configs/node3:/home/cheqd/.cheqdnode:Z
-    command: start --rpc.laddr tcp://0.0.0.0:26657
+    command: start --rpc.laddr tcp://0.0.0.0:26657 --minimum-gas-prices "0.001cheq" --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
+
+  observer0:
+    image: cheqd-node
+    build: .
+    ports:
+      - "26668:26656" # p2p
+      - "26669:26657" # rpc
+    volumes:
+      - ./node_configs/observer0:/home/cheqd/.cheqdnode:Z
+    command: start --rpc.laddr tcp://0.0.0.0:26657 --minimum-gas-prices "1cheq" --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
+
+  observer1:
+    image: cheqd-node
+    build: .
+    ports:
+      - "26671:26656" # p2p
+      - "26672:26657" # rpc
+    volumes:
+      - ./node_configs/observer1:/home/cheqd/.cheqdnode:Z
+    command: start --rpc.laddr tcp://0.0.0.0:26657 --minimum-gas-prices "1cheq" --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
