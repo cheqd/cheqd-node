@@ -27,9 +27,6 @@ Tendermint requires [genesis parameters](https://docs.tendermint.com/master/tend
     * Cosmos hub: `200000` \(~200KB\)
   * `max_gas` = `2000000` (~20 txs)
     * Cosmos hub: `2000000` (~20 txs)
-  * `time_iota_ms` = `1000` (1s)
-    * Cosmos hub: `1000` (1s)
-    * **Deprecated, unused**
 * **`evidence`**
   * `max_age_num_blocks` = `1576800`
     * Maximum age of evidence, in blocks. The basic formula for calculating this is: `MaxAgeDuration / {average block time}`.
@@ -61,7 +58,7 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
   * `default_send_enabled` = `true`
     * The default send enabled value allows send transfers for all coin denominations
 * **`crisis`**
-  * `constant_fee` = `{ "denom": "ncheq", "amount": "10.000.000.000.000" }`
+  * `constant_fee` = `{ "denom": "ncheq", "amount": "10000000000000" }` (10,000cheq)
     * The fee is used to verify the [invariant(s)](https://docs.cosmos.network/v0.44/building-modules/invariants.html) in the `crisis` module.
 * **`distribution`**
   * `community_tax` = `0.02`
@@ -78,7 +75,7 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
   * Used to manage initial transactions such as genesis validators creation
 * **`gov`**
   * `deposit_params`
-    * min_deposit = `[{ "denom": "ncheq", "amount": "8.000.000.000.000" }]`
+    * min_deposit = `[{ "denom": "ncheq", "amount": "8000000000000" }]` (8,000cheq)
       * The minimum deposit for a proposal to enter the voting period.
     * `max_deposit_period` = `1210000s` (2 weeks)
       * The maximum period for Atom holders to deposit on a proposal. Initial value: 2 months.
