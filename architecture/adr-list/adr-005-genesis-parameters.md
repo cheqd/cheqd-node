@@ -23,17 +23,17 @@ Tendermint requires [genesis parameters](https://docs.tendermint.com/master/tend
 #### Proposed values
 
 * **`block`**
-  * `max_bytes` = `22020096` \(~22MB\)
+  * `max_bytes` = `200000` \(~200KB\)
     * Cosmos hub: `200000` \(~200KB\)
-  * `max_gas` = `-1` \(no gas limit\)
-    * Cosmos hub: `2000000`
-  * `time_iota_ms` = `1000`
-    * Cosmos hub: `1000`
+  * `max_gas` = `2000000` (~20 txs)
+    * Cosmos hub: `2000000` (~20 txs)
+  * `time_iota_ms` = `1000` (1s)
+    * Cosmos hub: `1000` (1s)
     * **Deprecated, unused**
 * **`evidence`**
-  * `max_age_num_blocks` = `100000`
+  * `max_age_num_blocks` = `1576800`
     * Maximum age of evidence, in blocks. The basic formula for calculating this is: `MaxAgeDuration / {average block time}`.
-  * `max_age_duration` = `172800000000000`
+  * `max_age_duration` = `7884000`
     * Maximum age of evidence, in time. It should correspond with an app's "unbonding period".
   * `max_bytes` = `1048576`
     * This sets the maximum size of total evidence in bytes that can be committed in a single block and should fall comfortably under `max_bytes` for a block.
@@ -61,7 +61,7 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
   * `default_send_enabled` = `true`
     * The default send enabled value allows send transfers for all coin denominations
 * **`crisis`**
-  * `constant_fee` = `{ "denom": "cheq", "amount": "1000" }`
+  * `constant_fee` = `{ "denom": "ncheq", "amount": "10.000.000.000.000" }`
     * The fee is used to verify the [invariant(s)](https://docs.cosmos.network/v0.44/building-modules/invariants.html) in the `crisis` module.
 * **`distribution`**
   * `community_tax` = `0.02`
@@ -78,12 +78,12 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
   * Used to manage initial transactions such as genesis validators creation
 * **`gov`**
   * `deposit_params`
-    * min_deposit = `[{ "denom": "stake", "amount": "10000000" }]`
+    * min_deposit = `[{ "denom": "ncheq", "amount": "8.000.000.000.000" }]`
       * The minimum deposit for a proposal to enter the voting period.
-    * `max_deposit_period` = `172800s`
+    * `max_deposit_period` = `1210000s` (2 weeks)
       * The maximum period for Atom holders to deposit on a proposal. Initial value: 2 months.
   * `voting_params`
-    * voting_period = `172800s`
+    * voting_period = `1210000s` (2 weeks)
   * `tally_params`
     * `quorum` = `0.334`
       * Minimum percentage of total stake needed to vote for a result to be considered valid. 
@@ -92,20 +92,20 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
     * `veto_threshold` = `0.334`
       * The minimum value of veto votes to total votes ratio for proposal to be vetoed. Default value: 1/3.
 * **`mint`**
-  * `mint_denom` = `cheq`
-  * `inflation_rate_change` = `0.13`
+  * `mint_denom` = `ncheq`
+  * `inflation_rate_change` = `0.02`
     * Maximum inflation rate change per year
     * In Cosmos hub they use `1.0`
     * Formula: `inflationRateChangePerYear = (1 - BondedRatio/ GoalBonded) * MaxInflationRateChange`
-  * `inflation_max` = `0.20`
+  * `inflation_max` = `0.04`
     * Inflation aims to this value if `bonded_ratio` &lt; `bonded_goal`
     * Cosmos hub: `0.20`
-  * `inflation_min` = `0.07`
+  * `inflation_min` = `0.01`
     * Inflation aims to this value if `bonded_ratio` &lt; `bonded_goal`
     * Cosmos hub: `0.07`
-  * `goal_bonded` = `0.67`
+  * `goal_bonded` = `0.60`
     * Cosmos hub: `0.67`
-  * `blocks_per_year` = `6311520`
+  * `blocks_per_year` = `6311520` (~5s)
     * Cosmos hub: `4360000`
 * **`slashing`**
   * `signed_blocks_window` = `120960` \(1 week\)
@@ -119,7 +119,7 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
   * `slash_fraction_downtime` = `0.01`
     * Slash for downtime
 * **`staking`**
-  * `unbonding_time` = `1814400s`
+  * `unbonding_time` = `1814400s` (3 weeks)
     * A delegator must wait this time before tokens become unbonded
   * `max_validators` = `125`
     * The maximum number of validators in the network
@@ -127,7 +127,7 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
     * Max amount of unbound/redelegation operations in progress per account
   * `historical_entries` = `10000`
     * Amount of unbound/redelegate entries to store
-  * `bond_denom` = `stake`
+  * `bond_denom` = `ncheq`
     * Denomination used in staking
 * *\[ibc\]* **`ibc`**
   * ...
