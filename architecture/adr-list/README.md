@@ -14,11 +14,11 @@ description: >-
 
 ## Proposed
 
-1. [ADR 002: **Identity entities and transactions**](adr_002_identity_transactions.md)\*\*\*\*
+1. [ADR 002: **Identity entities and transactions**](adr_002_identity_transactions.md)
 2. [ADR 006: **Community tax**](adr-006-community-tax.md)
 
 ## Draft
 
 1. [ADR 007: **Revocation registry**](adr-007-revocation-registry.md)
-2. [ADR 008: **Estimating transaction fees**](adr-008-estimating-transaction-fees.md)\*\*\*\*
+2. [ADR 008: **Estimating transaction fees**](adr-008-estimating-transaction-fees.md)
 
