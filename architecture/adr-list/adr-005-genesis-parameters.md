@@ -56,7 +56,7 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
   * `sig_verify_cost_secp256k1` = `1000`
     * Cost of `secp256k1` signature verification
 * **`bank`**
-  * s`end_enabled` = `[]`
+  * `send_enabled` = `[]`
     * Enables send for specific denominations
   * `default_send_enabled` = `true`
     * The default send enabled value allows send transfers for all coin denominations
