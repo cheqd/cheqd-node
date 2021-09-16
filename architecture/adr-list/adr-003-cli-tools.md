@@ -99,9 +99,11 @@ Based on the options considerations above and an analysis of development require
 
 ### CLI components overview
 
-![Cosmos CLI components](../../.gitbook/assets/cli_components_cosmos.png)
+![Cosmos CLI components](../../.gitbook/assets/adr003-cli-components-cosmos.png)
 
-![VDR CLI components](../../.gitbook/assets/cli_components_vdr.png)
+![VDR CLI components](../../.gitbook/assets/adr003-cli-compononents-vdr.png)
+
+> [Editable versions of the diagrams](https://github.com/cheqd/cheqd-node/tree/e5f850355609f35a9a62c557ebf4adc73e766a44/architecture/adr-list/assets/adr003-cli-components-editable.excalidraw) \(in Excalidraw format\)
 
 ## Consequences
 

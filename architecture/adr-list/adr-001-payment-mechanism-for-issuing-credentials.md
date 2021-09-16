@@ -154,7 +154,7 @@ If steps 1-4 are successful, the Issuer is able to confirm that the requested pa
 
 ### Overview of steps 1-5
 
-![](../../.gitbook/assets/adr001-payment-flow%20%281%29.png)
+![Credential issuance payment flow](../../.gitbook/assets/adr001-payment-flow.png)
 
 #### UML version
 

@@ -81,7 +81,7 @@ CreateDidRequest
 ```text
 CreateDidResponse {
     "key": "did:GEzcdDLhCpGCYRHW82kjHd" 
-}  
+}
 ```
 
 * `key`\(string\): A unique key is used to store this DID in a state
@@ -121,7 +121,7 @@ UpdateDidRequest
 ```text
 UpdateDidResponse {
     "key": "did:GEzcdDLhCpGCYRHW82kjHd" 
-}  
+}
 ```
 
 * `key`\(string\): A unique key is used to store this DID in a state
@@ -165,7 +165,7 @@ QueryGetDidResponse{
                "verkey": "~HmUWn928bnFT6Ephf65YXv",
                "alias": "DID for Alice"
              },
-}  
+}
 ```
 
 ## ATTRIB transactions
@@ -199,7 +199,7 @@ CreateAttribRequest
 ```text
 CreateAttribResponse {
     "key": "attrib:GEzcdDLhCpGCYRHW82kjHd" 
-} 
+}
 ```
 
 * `key`\(string\): A unique key is used to store these attributes in a state
@@ -238,7 +238,7 @@ UpdateAttribRequest
 ```text
 UpdateAttribResponse {
         "key": "attrib:GEzcdDLhCpGCYRHW82kjHd" 
-} 
+}
 ```
 
 * `key`\(string\): A unique key is used to store these attributes in a state
@@ -281,7 +281,7 @@ QueryGetAttribResponse{
                "did": "GEzcdDLhCpGCYRHW82kjHd",
                "raw": "{'name': 'Alice'}"
              },
-}  
+}
 ```
 
 ## SCHEMA transactions
@@ -317,7 +317,7 @@ CreateSchemaRequest
 ```text
 CreateSchemaResponse {
         "key": "schema:GEzcdDLhCpGCYRHW82kjHd:Degree:1.0" 
-} 
+}
 ```
 
 * `key`\(string\): A key is used to store this schema in a state
@@ -328,6 +328,7 @@ CreateSchemaResponse {
 * `CreateSchemaRequest` must be signed by  DID from `owner` field. 
 
 ### Get Schema
+
 #### cheqd-sdk function
 
 `build\_query\_get\_schema\(name, version, owner\)`
@@ -354,6 +355,7 @@ Request
 * `prove`: Boolean value. `True` for getting state proof in a pool response. 
 
 #### Response format
+
 ```text
 QueryGetSchemaResponse{
         "attrib": {
@@ -361,7 +363,7 @@ QueryGetSchemaResponse{
                 "name": "Degree",
                 "attr_names": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
              },
-}  
+}
 ```
 
 ## CRED\_DEF
@@ -403,7 +405,7 @@ CreateCredDefRequest
 ```text
 CreateCredDefResponse {
         "key": "cred_def:GEzcdDLhCpGCYRHW82kjHd:schema:GEzcdDLhCpGCYRHW82kjHd:Degree:1.0:some_tag:CL" 
-} 
+}
 ```
 
 * `key`\(string\): A unique key that is used to store this Credential Definition in a state
@@ -453,5 +455,6 @@ QueryGetCredDefResponse{
                     "primary": ....,
                     "revocation": ....
          },
-}  
+}
 ```
+
