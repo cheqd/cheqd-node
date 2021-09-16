@@ -47,7 +47,7 @@ message MsgCreateSchemaResponse {
 
 message MsgCreateAttrib {
   string did = 1;
-  string raw = 2;
+  repeated string raw = 2;
 }
 
 message MsgCreateAttribResponse {
@@ -56,7 +56,7 @@ message MsgCreateAttribResponse {
 
 message MsgUpdateAttrib {
   string did = 1;
-  string raw = 2;
+  repeated string raw = 2;
 }
 
 message MsgUpdateAttribResponse {

@@ -7,5 +7,5 @@ import "gogoproto/gogo.proto";
 
 message Attrib {
   string did = 1;
-  string raw = 2;
+  repeated string raw = 2;
 }

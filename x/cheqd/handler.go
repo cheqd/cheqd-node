@@ -2,6 +2,7 @@ package cheqd
 
 import (
 	"fmt"
+	"google.golang.org/protobuf/types/known/anypb"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/keeper"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
@@ -20,6 +21,7 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 			errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName, msg)
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 		}
+		m, err := anypb.New(parsed_msg.Data)
 		switch parsed_msg.Data.TypeUrl {
 		// this line is used by starport scaffolding # 1
 		case types.MsgCreateCredDef.Type():
