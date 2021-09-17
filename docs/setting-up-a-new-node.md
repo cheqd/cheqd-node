@@ -72,7 +72,7 @@ This is the most preferable way to get `cheqd-node`. Detailed information about 
 
    Command: `sudo dpkg -i <package_file>.deb`
 
-   Example: `sudo dpkg -i cheqd-node_0.1.13_amd64.deb`
+   Example: `sudo dpkg -i cheqd-node_0.1.20_amd64.deb`
 
 3. Switch to `cheqd` system user:
 
@@ -90,7 +90,14 @@ This is the most preferable way to get `cheqd-node`. Detailed information about 
 
 5. Set genesis:
 
-   Genesis files for public networks are published in [this directory](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains). Download `genesis.json` using wget [https://github.com/cheqd/cheqd-node/blob/main/persistent\_chains/testnet/genesis.json](https://github.com/cheqd/cheqd-node/blob/main/persistent_chains/testnet/genesis.json) to: `/etc/cheqd-node/`
+   Genesis files for public networks are published in [this directory](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains). Download `genesis.json` and put it to the `/etc/cheqd-node/`.
+
+   For testnet:
+
+   ```text
+   cd /etc/cheqd-node/
+   wget -O genesis.json https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/testnet/genesis.json
+   ```
 
 6. Set persistent peers:
 
@@ -128,6 +135,12 @@ This is the most preferable way to get `cheqd-node`. Detailed information about 
 
    ```text
     systemctl start cheqd-noded
+   ```
+
+   Check that the service is running:
+
+   ```text
+   systemctl status cheqd-noded
    ```
 
 9. Check that the node is connected and catching up:
