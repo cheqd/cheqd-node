@@ -1,0 +1,8 @@
+{
+    "name": "cheqd-node CI",
+    "description": "CI for cheqd-node",
+    "iconName": "cheqd",
+    "categories": [
+        "Go"
+    ]
+}
