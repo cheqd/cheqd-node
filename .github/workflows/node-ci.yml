@@ -1,10 +1,15 @@
-name: CI
+name: cheqd-node CI
 
-on: push
+on: 
+  push:
+    paths-ignore:
+    - '**.md'
+    - 'docs/**'
+    - 'architecture/**'
 
 jobs:
   build:
-    name: Build
+    name: Build cheqd-node
     runs-on: ubuntu-latest
     steps:
       - name: Set up Go 1.16
@@ -22,7 +27,7 @@ jobs:
         run: starport chain build
 
   build-node-and-testnet-images:
-    name: Build node and testnet images
+    name: Build cheqd-node and testnet Docker images
     runs-on: ubuntu-latest
     steps:
       - name: Check out
@@ -37,7 +42,7 @@ jobs:
           docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
 
   test:
-    name: Unit tests
+    name: cheqd-node unit tests
     runs-on: ubuntu-latest
     steps:
       - name: Set up Go 1.16
@@ -54,7 +59,7 @@ jobs:
           go test -v $PACKAGES
 
   lint:
-    name: Lint
+    name: cheqd-node Linting
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
