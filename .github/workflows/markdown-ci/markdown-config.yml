@@ -106,7 +106,7 @@ MD038: true
 MD039: true
 
 # Fenced code blocks should have a language specified <https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md040>
-MD040: true
+MD040: false
 
 # First line in file should be a top level heading <https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md041>
 MD041: true
@@ -125,14 +125,14 @@ MD045: false
 
 # Code block style <https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md046>
 MD046:
-  style: 'fenced'
+  style: 'consistent'
 
 # Files should end with a single newline character <https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md047>
 MD047: true
 
 # Code fence style <https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md048>
 MD048:
-  style: 'backtick'
+  style: 'consistent'
 
 # Custom rules:
 # CHANGELOG-RULE-001: false
