@@ -32,6 +32,7 @@
   * [ADR 002: Identity entities and transactions](architecture/adr-list/adr_002_identity_transactions.md)
   * [ADR 003: Command Line Interface \(CLI\) tools](architecture/adr-list/adr-003-cli-tools.md)
   * [ADR 004: Token fractions](architecture/adr-list/adr-004-token-fractions.md)
+  * [ADR 005: Genesis parameters](architecture/adr-list/adr-005-genesis-parameters.md)
   * [ADR 006: Community tax](architecture/adr-list/adr-006-community-tax.md)
   * [ADR 007: Revocation registry](architecture/adr-list/adr-007-revocation-registry.md)
 
