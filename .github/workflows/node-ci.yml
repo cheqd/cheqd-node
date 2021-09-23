@@ -55,6 +55,7 @@ jobs:
       - name: Set up 4 node docker pool
         run: |
           export PATH=$PATH:/home/runner/go/bin/
+          chmod +x /home/runner/go/bin/cheqd-noded
           docker/docker_compose_localnet/gen_node_configs.sh
 
   test:
