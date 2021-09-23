@@ -41,6 +41,11 @@ jobs:
         run: |
           docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
 
+      - name: Run testnet bootstrapping script
+        run: |
+          cd test/networks/docker_compose
+          bash gen_node_configs.sh
+
   test:
     name: Run cheqd-node unit tests
     runs-on: ubuntu-latest
