@@ -57,6 +57,8 @@ jobs:
           export PATH=$PATH:/home/runner/go/bin/
           chmod +x /home/runner/go/bin/cheqd-noded
           docker/docker_compose_localnet/gen_node_configs.sh
+          docker/docker_compose_localnet/run_docker.sh
+          docker ps
 
   test:
     name: cheqd-node unit tests
