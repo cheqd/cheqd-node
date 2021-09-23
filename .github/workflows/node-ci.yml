@@ -54,7 +54,7 @@ jobs:
 
       - name: Set up 4 node docker pool
         run: |
-          mv /home/runner/go/bin/cheqd-noded /usr/bin/cheqd-noded
+          sudo mv /home/runner/go/bin/cheqd-noded /usr/bin/cheqd-noded
           docker/docker_compose_localnet/gen_node_configs.sh
 
   test:
