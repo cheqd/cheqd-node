@@ -58,6 +58,8 @@ jobs:
           chmod +x /home/runner/go/bin/cheqd-noded
           cd docker/docker_compose_localnet/
           ./gen_node_configs.sh
+          ls -l ./node_configs
+          ls -l ./node_configs/node0
           ./run_docker.sh
           docker ps
 
