@@ -38,8 +38,8 @@ COPY --from=builder /go/bin/cheqd-noded /bin
 COPY docker/cheqd_node/node-runner.sh /bin/node-runner
 RUN chmod +x /bin/node-runner
 
-RUN groupadd --system cheqd && \
-    useradd --system --create-home --home-dir /cheqd --shell /bin/bash --gid cheqd cheqd
+RUN groupadd --system --gid 1000 cheqd && \
+    useradd --system --create-home --home-dir /cheqd --shell /bin/bash --gid cheqd --uid 1000 cheqd
 RUN chown -R cheqd /cheqd
 
 WORKDIR /cheqd

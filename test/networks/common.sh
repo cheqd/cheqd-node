@@ -15,6 +15,6 @@ fi
 
 cheqd_noded_docker() {
   docker run --rm -it \
-    -v "$(pwd)/.cheqdnode":/home/cheqd/.cheqdnode \
+    -v "$(pwd)":"/cheqd" \
     cheqd-node "$@"
 }
