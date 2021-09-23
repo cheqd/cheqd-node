@@ -15,6 +15,6 @@ fi
 
 cheqd_noded_docker() {
   docker run --rm \
-    -v "$(pwd):/cheqd:Z" \
+    -v "$(pwd)":"/cheqd" \
     cheqd-node "$@"
 }
