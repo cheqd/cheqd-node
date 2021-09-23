@@ -26,12 +26,22 @@ jobs:
       - name: Starport build
         run: starport chain build
 
+      - uses: actions/upload-artifact@master
+        with:
+          name: cheqd-noded
+          path: $HOME/go/bin/
+
   build-node-and-testnet-images:
     name: Build cheqd-node and testnet Docker images
     runs-on: ubuntu-latest
     steps:
       - name: Check out
         uses: actions/checkout@v2
+
+      - uses: actions/download-artifact@master
+        with:
+          name: cheqd-noded
+          path: $HOME/go/bin/
 
       - name: Build node image
         run: |
