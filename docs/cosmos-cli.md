@@ -15,7 +15,7 @@ Account address is a properly encoded hash of public key. It means that each acc
 
 To submit a transaction on behalf of an account, it must be signed with account's private key.
 
-It's highly recommended to add `--keyring-backend os` to each command that is related to key management or usage. Cosmos supports [multiple keyring backends](https://docs.cosmos.network/v0.43/run-node/keyring.html), so each node operator is free to use the method they choose. `os` is a safe default to use.
+It's highly recommended to add `--keyring-backend os` to each command that is related to key management or usage. Cosmos supports [multiple keyring backends](https://docs.cosmos.network/v0.44/run-node/keyring.html), so each node operator is free to use the method they choose. `os` is a safe default to use.
 
 **Creating a key**
 

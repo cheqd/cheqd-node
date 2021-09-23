@@ -29,9 +29,8 @@ To build the image:
 
 ## Running
 
-* Run `docker run -it --rm -p "26657:26657" -p "26659:26659" cheqd-testnet`
+* Run `docker run -it --rm -p "26657:26657" cheqd-testnet`
 * RPC apis are exposed on the folowing ports:
   * node\_0: `26657`
-  * node\_1: `26659`
 * Try to connect to any node in your browser, for instance: `http://localhost:26657/`
 
