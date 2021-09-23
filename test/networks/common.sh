@@ -14,7 +14,7 @@ fi
 # cheqd_noded docker wrapper
 
 cheqd_noded_docker() {
-  docker run --rm -it \
+  docker run --rm \
     -v "$(pwd)":"/cheqd" \
     cheqd-node "$@"
 }
