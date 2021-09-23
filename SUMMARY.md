@@ -17,7 +17,7 @@
 
 * [cheqd-node docker image](docker/cheqd_node.md)
 * [cheqd-testsnet docker image](docker/single_image_testnet.md)
-* [Docker Compose Based Localnet](docker/docker_compose_localnet.md)
+* [Docker Compose Based Localnet](test/networks/docker_compose.md)
 
 ## Network Details <a id="persistent_chains"></a>
 
