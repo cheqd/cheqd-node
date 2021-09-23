@@ -44,6 +44,27 @@ _**Note**: Hyperledger Indy also contains other transaction types beyond the one
 
 ## Decision
 
+###Cheqd DID Method Identifiers
+
+The did:cheqd Method DID identifier has four components that are concatonated to make a DID specification conformant identifier. The components are:
+
+- DID: the hardcoded string `did:` to indicate the identifier is a DID
+- DID Cheqd Method: the hardcoded string `cheqd:` indicating that the identifier uses this DID Method specification.
+- DID Cheqd Namespace: a string that identifies the name of the primary Cheqd ledger, followed by a `:`. The namespace string may optionally have a secondary ledger name prefixed by a `:` following the primary name. If there is no secondary ledger element, the DID resides on the primary ledger, else it resides on the secondary ledger. By convention, the primary is a production ledger while the secondary ledgers are non-production ledgers (e.g. main, test) associated with the primary ledger.
+- Namespace Identifier: a self-certifying identifier unique to the given DID Cheqd namespace. To be self-certifying the identifier must be derived from the initial verkey associated with the identifier.
+
+The components are assembled as follows:
+
+`did:cheqd:<namespace>:<namespace identifier>`
+
+Some examples of did:cheqd DID Method identifiers are:
+
+- A DID written to the Cheqd MainNet ledger:
+  `did:cheqd:main_net:7Tqg6BwSSWapxgUDm9KKgg`
+- A DID written to the Cheqd TestNet ledger:
+  `did:cheqd:test_net:6cgbu8ZPoWTnR5Rv5JcSMB`
+
+
 ### General structure of transaction requests
 
 All identity requests will have the following format:
@@ -51,15 +72,17 @@ All identity requests will have the following format:
 ```text
 {
     "data": { <request data for writing a transaction to the ledger> },
-    "owner": "GEzcdDLhCpGCYRHW82kjHd",
-    "signature": "49W5WP5jr7x1fZhtpAhHFbuUDqUYZ3AKht88gUjrz8TEJZr5MZUPjskpfBFdboLPZXKjbGjutoVascfKiMD5W7Ba",
+    "creators": [<identifier>, ...]
+    "signatures": [
+                    <public_key>: <signature>,
+                  ],
     "metadata": {}
 }
 ```
 
 * **`data`**: Data requested to be written to the ledger, specific for each request type.
-* **`owner`**: Owner identifier \(DID\) for this entity. This could be a new DID or an existing DID, for existing entities.
-* **`signature`**: `data` should be signed by `owner` private key.
+* **`creators`**: Creators identifiers (DID) list for this entity. There should be a new DIDs or an existing DIDs, for existing entities.
+* **`signatures`**: `data` should be signed by all `creators` private key. This field contains a dict there creator's public key is a key, and the signature is a value.
 * **`metadata`**: Dictionary with additional metadata fields. Empty for now. This fields provides extensibility in the future, e.g., it can contain `protocolVersion` or other relevant metadata associated with a request.
 
 ## List of transactions and details
@@ -67,30 +90,133 @@ All identity requests will have the following format:
 ### `DID` transactions
 
 [Decentralized Identifiers \(DIDs\) are a W3C specification](https://www.w3.org/TR/did-core/) for identifiers that enable verifiable, decentralized digital identity.
+DIDDoc format conforms to [DIDDoc spec]().
+The request can be used for creation of new DIDDoc, setting, and rotation of verification key.
 
-The request can be used for creation of new DIDs, setting, and rotation of verification key.
+#### DIDDoc
+1. **`id` (base58-encoded string):**
 
-1. **`id` \(base58-encoded string\):**
+   Target DID as base58-encoded string for 16 or 32 byte DID value. In the ledger we store only an identifier without Method and Namespace.
 
-   Target DID as base58-encoded string for 16 or 32 byte DID value. It may differ from `identifier` metadata field, where `identifier` is the DID of the submitter. If they are equal \(in permissionless case\), then the transaction must be signed by the newly created `verkey`.
+2. **`controller` (list of base58-encoded string, optional):**
 
-   _Example_: `identifier` is a DID of an Endorser creating a new DID, and `dest` is a newly created DID.
+   A set of identifier strings.
 
-2. **`verkey` \(base58-encoded string, possibly starting with "~"; optional\):**
+3. **`verificationMethod` (list of Verification Methods, optional):**
 
-   Target verification key as base58-encoded string. It can start with "~", which means that it's abbreviated `verkey` and should be 16 bytes long when decoded, otherwise it's a full `verkey` which should be 32 bytes long when decoded. If not set, then either the target identifier \(`dest`\) is 32-bit cryptonym CID \(this is deprecated\), or this is a user under guardianship \(doesn't own the identifier yet\).
+4. **`authentication` (list of Verification Methods or strings with key aliases, optional):**
 
-3. **`alias` \(string; optional\):**
+5. **`assertionMethod` (list of Verification Methods or strings with key aliases, optional):**
 
-   Alias for the DID
+6. **`capabilityInvocation` (list of Verification Methods or strings with key aliases, optional):**
 
-   ```text
-       {
-         "alias": "Alice DID",
-         "id": "GEzcdDLhCpGCYRHW82kjHd",
-         "verkey": "~HmUWn928bnFT6Ephf65YXv"
-       }
-   ```
+7. **`capabilityDelegation` (list of Verification Methods or strings with key aliases, optional):**
+
+8. **`service` (set of Service Endpoint maps, optional):**
+
+9. **`@context` (list of strings, optional):**
+
+**Example:**
+```
+  {
+    "@context": [
+      "https://www.w3.org/ns/did/v1",
+      "https://w3id.org/security/suites/ed25519-2020/v1"
+    ],
+    "id": "N22KY2Dyvmuu2PyyqSFKue",
+    "authentication": [
+      {
+        "id": "N22KY2Dyvmuu2PyyqSFKue#z6MkecaLyHuYWkayBDLw5ihndj3T1m6zKTGqau3A51G7RBf3",
+        "type": "Ed25519VerificationKey2020", // external (property value)
+        "controller": "N22KY2Dyvmuu2PyyqSFKue",
+        "publicKeyMultibase": "zAKJP3f7BD6W4iWEQ9jwndVTCBq8ua2Utt8EEjJ6Vxsf"
+      }
+    ],
+    "capabilityInvocation": [
+      {
+        "id": "N22KY2Dyvmuu2PyyqSFKue#z6MkhdmzFu659ZJ4XKj31vtEDmjvsi5yDZG5L7Caz63oP39k",
+        "type": "Ed25519VerificationKey2020", // external (property value)
+        "controller": "N22KY2Dyvmuu2PyyqSFKue",
+        "publicKeyMultibase": "z4BWwfeqdp1obQptLLMvPNgBw48p7og1ie6Hf9p5nTpNN"
+      }
+    ],
+    "capabilityDelegation": [
+      {
+        "id": "N22KY2Dyvmuu2PyyqSFKue#z6Mkw94ByR26zMSkNdCUi6FNRsWnc2DFEeDXyBGJ5KTzSWyi",
+        "type": "Ed25519VerificationKey2020", // external (property value)
+        "controller": "N22KY2Dyvmuu2PyyqSFKue",
+        "publicKeyMultibase": "zHgo9PAmfeoxHG8Mn2XHXamxnnSwPpkyBHAMNF3VyXJCL"
+      }
+    ],
+    "assertionMethod": [
+      {
+        "id": "N22KY2Dyvmuu2PyyqSFKue#z6MkiukuAuQAE8ozxvmahnQGzApvtW7KT5XXKfojjwbdEomY",
+        "type": "Ed25519VerificationKey2020", // external (property value)
+        "controller": "N22KY2Dyvmuu2PyyqSFKue",
+        "publicKeyMultibase": "z5TVraf9itbKXrRvt2DSS95Gw4vqU3CHAdetoufdcKazA"
+      }
+    ]
+ }
+```
+
+
+#### Verification Method
+
+1. **`id` (string):**
+
+   A string with format `<DIDDoc-id>#<key-alias`
+
+2. **`controller` (list of base58-encoded string):**
+
+   A set of identifier strings.
+
+3. **`type` (string).**
+4. **`publicKeyJwk` (map[string,string], optional):**
+
+   A map representing a JSON Web Key that conforms to [RFC7517](https://tools.ietf.org/html/rfc7517). See definition of publicKeyJwk for additional constraints.
+
+5. **`publicKeyMultibase` (base58-encoded string, optional):**
+
+   A string that conforms to a [MULTIBASE](https://datatracker.ietf.org/doc/html/draft-multiformats-multibase-03) encoded public key.
+
+**Example:**
+```
+    {
+      "id": "N22KY2Dyvmuu2PyyqSFKue#key-0",
+      "type": "JsonWebKey2020",
+      "controller": "N22KY2Dyvmuu2PyyqSFKue",
+      "publicKeyJwk": {
+        "kty": "OKP", // external (property name)
+        "crv": "Ed25519", // external (property name)
+        "x": "VCpo2LMLhn6iWku8MKvSLg2ZAoC-nlOyPVQaO3FxVeQ" // external (property name)
+      }
+```
+
+
+#### Service
+
+1. **`id` (string):**
+
+   The value of the id property MUST be a URI conforming to [RFC3986](https://www.rfc-editor.org/rfc/rfc3986). A conforming producer MUST NOT produce multiple service entries with the same id. A conforming consumer MUST produce an error if it detects multiple service entries with the same id.
+   It has a follow format: `<DIDDoc-id>#<srvice-alias>`
+
+2. **`type` (strings):**
+
+   the service type and its associated properties SHOULD be registered in the DID Specification Registries [DID-SPEC-REGISTRIES](https://www.w3.org/TR/did-spec-registries/).
+
+2. **`serviceEndpoint` (strings).**
+
+   A string that conforms to the rules of [RFC3986](https://www.rfc-editor.org/rfc/rfc3986) for URIs, a map, or a set composed of a one or more strings that conform to the rules of [RFC3986](https://www.rfc-editor.org/rfc/rfc3986) for URIs and/or maps.
+
+**Example:**
+
+    ```
+        "service": [{
+        "id":"N22KY2Dyvmuu2PyyqSFKue#linked-domain",
+        "type": "LinkedDomains",
+        "serviceEndpoint": "https://bar.example.com"
+        }]
+    ````
 
 #### **Update DID**
 
@@ -102,45 +228,7 @@ If there is a DID transaction with the specified DID \(`dest`\), then this is up
 
 #### State format
 
-`id -> {(alias, id, verkey), last_tx_hash, last_update_timestamp }`
-
-_DID transaction format:_
-
-```text
-Did
-{
-    "alias": "Alice DID",
-    "dest": "GEzcdDLhCpGCYRHW82kjHd",
-    "verkey": "~HmUWn928bnFT6Ephf65YXv"
-}
-```
-
-### ATTRIB
-
-Attributes to an existing DID record.
-
-* **`did` \(base58-encoded string\):**
-
-  Target DID as base58-encoded string for 16 or 32 byte DID value.
-
-* **`raw` \(json; mutually exclusive with `hash` and `enc`\):**
-
-  Raw data is represented as JSON, where the key is attribute name and value is attribute value.
-
-ATTRIB _transaction format:_:
-
-```text
-{
-              "did": "N22KY2Dyvmuu2PyyqSFKue",
-              "raw": "{"name": "Alice"}",
-}
-```
-
-**Note:** ATTRIB **can** be updated
-
-#### State format
-
-`did -> {(did, raw), last_tx_hash, last_update_timestamp }`
+`id -> {encode(data, creators), tx_hash, tx_timestamp }`
 
 ### SCHEMA
 
@@ -154,14 +242,16 @@ If a Schema evolves, a new schema with a new version or name needs to be created
 
   Dictionary with Schema's data:
 
-  * **`attr_names`**: Array of attribute name strings \(125 attributes maximum\)
-  * **`name`**: Schema's name string
-  * **`version`**: Schema's version string
+    * **`id`**: DID as base58-encoded string for 16 or 32 byte DID value.
+    * **`attr_names`**: Array of attribute name strings \(125 attributes maximum\)
+    * **`name`**: Schema's name string
+    * **`version`**: Schema's version string
 
 SCHEMA transaction format:
 
 ```text
 {
+            "id": "N22KY2Dyvmuu2PyyqSFKue",
             "version": "1.0",
             "name": "Degree",
             "attr_names": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
@@ -172,7 +262,7 @@ SCHEMA transaction format:
 
 #### State format
 
-`(version, name, owner) -> {(version, name, attr_names), tx_hash, tx_timestamp }`
+`id -> {encode(data, creators), tx_hash, tx_timestamp }`
 
 ### CRED\_DEF
 
@@ -180,12 +270,14 @@ Adds a Credential Definition \(in particular, public key\), which is created by 
 
 It is not possible to update `data` in existing Credential Definitions. If a Credential Definition needs to be evolved \(for example, a key needs to be rotated\), then a new Credential Definition needs to be created by a new Issuer DID \(`owner`\).
 
-* **`cred_def` \(dict\):**
+* **`id`**: DID as base58-encoded string for 16 or 32 byte DID value.
 
-  Dictionary with Credential Definition's data:
+* **`value` \(dict\):**
 
-  * **`primary`** \(dict\): Primary credential public key
-  * **`revocation`** \(dict\): Revocation credential public key
+  Dictionary with Credential Definition's data if `signature_type` is `CL`:
+
+    * **`primary`** (dict): Primary credential public key
+    * **`revocation`** (dict, optional): Revocation credential public key
 
 * **`ref` \(string\):**
 
@@ -203,21 +295,22 @@ CRED\_DEF transaction format:
 
 ```text
 {
+        "id": "N22KY2Dyvmuu2PyyqSFKue",
         "signature_type": "CL",
-        "schema_id": 5ZTp9g4SP6t73rH2s8zgmtqdXyT,
+        "schema_id": "5ZTp9g4SP6t73rH2s8zgmtqdXyT",
         "tag": "some_tag",    
-        "cred_def": {
+        "value": {
             "primary": ....,
             "revocation": ....
         }
     }
 ```
 
-**Note**: CRED\_DEF **cannot** be updated.
+**Note**: CRED_DEF **cannot** be updated.
 
 #### State format
 
-`(owner, signature_type, ref, tag) -> {(signature_type, schema_id, tag, cred_def), tx_hash, tx_timestamp }`
+`id -> {encode(data, creators), tx_hash, tx_timestamp }`
 
 ## References
 
