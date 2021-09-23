@@ -48,13 +48,14 @@ jobs:
         run: |
           docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node .
 
-      - name: Build testnet image
-        run: |
-          docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
+      # - name: Build testnet image
+      #   run: |
+      #     docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
 
       - name: Set up 4 node docker pool
         run: |
           sudo mv /home/runner/go/bin/cheqd-noded /usr/bin/cheqd-noded
+          ls -l /usr/bin/
           docker/docker_compose_localnet/gen_node_configs.sh
 
   test:
