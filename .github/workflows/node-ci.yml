@@ -54,6 +54,7 @@ jobs:
 
       - name: Set up 4 node docker pool
         run: |
+          ls -l /home/runner/go/bin/
           docker/docker_compose_localnet/gen_node_configs.sh
 
   test:
