@@ -60,6 +60,7 @@ jobs:
           ./gen_node_configs.sh
           ls -l ./node_configs
           ls -l ./node_configs/node0
+          ls -l ./node_configs/node0/config
           ./run_docker.sh
           docker ps
 
