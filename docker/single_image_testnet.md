@@ -33,4 +33,3 @@ To build the image:
 * RPC apis are exposed on the folowing ports:
   * node\_0: `26657`
 * Try to connect to any node in your browser, for instance: `http://localhost:26657/`
-
