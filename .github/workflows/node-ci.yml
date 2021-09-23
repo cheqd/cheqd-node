@@ -41,6 +41,10 @@ jobs:
         run: |
           docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
 
+      - name: Set up 4 node docker pool
+        run: |
+          docker/docker_compose_localnet/gen_node_configs.sh
+
   test:
     name: cheqd-node unit tests
     runs-on: ubuntu-latest
@@ -69,4 +73,3 @@ jobs:
         with:
           version: v1.40
           args: --timeout 5m0s
-
