@@ -28,8 +28,10 @@ cheqd-noded keys add <alias>
 **Restoring a key from backup mnemonic key**
 
 ```text
-cheqd-noded keys add <alias> --recover <mnemonic>
+cheqd-noded keys add --recover <alias>
 ```
+Then enter your bip39 `mnemonic phrase`.
+
 
 **Listing available keys on a node**
 
@@ -68,13 +70,13 @@ Arguments:
 Typical transaction submit command looks like this:
 
 ```text
-cheqd-noded tx <module> <tx> <params> --node <url> --chain-id <chain> ---fee <fee>
+cheqd-noded tx <module> <tx> <params> --node <url> --chain-id <chain> --fees <fee>
 ```
 
 Example:
 
 ```text
-cheqd-noded tx bank send alice cosmos10dl985c76zanc8n9z6c88qnl9t2hmhl5rcg0jq 10000cheq --node http://localhost:26657 --chain-id cheqd ---fee 100000cheq
+cheqd-noded tx bank send alice cosmos10dl985c76zanc8n9z6c88qnl9t2hmhl5rcg0jq 10000cheq --node http://localhost:26657 --chain-id cheqd --fees 100000cheq
 ```
 
 Extra arguments:
@@ -102,13 +104,13 @@ Future releases of `cheqd-node` are likely to replace the NYM terminology with D
 Command:
 
 ```text
-cheqd-noded tx cheqd create-nym <alias> <verkey> <did> <role>  --from <key-alias> --node <url> --chain-id <chain> ---fee <fee>
+cheqd-noded tx cheqd create-nym <alias> <verkey> <did> <role>  --from <key-alias> --node <url> --chain-id <chain> --fees <fee>
 ```
 
 Example:
 
 ```text
-cheqd-noded tx cheqd create-nym "alias" "verkey" "did" "role"  --chain-id cheqd --from alice --node http://localhost:26657 --chain-id cheqd ---fee 100000cheq
+cheqd-noded tx cheqd create-nym "alias" "verkey" "did" "role"  --chain-id cheqd --from alice --node http://localhost:26657 --chain-id cheqd --fees 100000cheq
 ```
 
 ID of the created NYM will be returned.
@@ -162,7 +164,7 @@ cheqd-noded query bank balances cosmos1lxej42urme32ffqc3fjvz4ay8q5q9449f06t4v --
 Command:
 
 ```text
-cheqd-noded tx bank send <from> <to-address> <amount> --node <url> --chain-id <chain> ---fee <fee>
+cheqd-noded tx bank send <from> <to-address> <amount> --node <url> --chain-id <chain> --fees <fee>
 ```
 
 Params:
@@ -172,7 +174,7 @@ Params:
 Example:
 
 ```text
-cheqd-noded tx bank send alice cosmos10dl985c76zanc8n9z6c88qnl9t2hmhl5rcg0jq 10000stake --node http://localhost:26657 --chain-id cheqd ---fee 100000cheq
+cheqd-noded tx bank send alice cosmos10dl985c76zanc8n9z6c88qnl9t2hmhl5rcg0jq 10000stake --node http://localhost:26657 --chain-id cheqd --fees 100000cheq
 ```
 
 ## Managing node
