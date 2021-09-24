@@ -24,7 +24,7 @@
   "app_state": {
     "auth": {
       "params": {
-        "max_memo_characters": "256",
+        "max_memo_characters": "512",
         "tx_sig_limit": "7",
         "tx_size_cost_per_byte": "10",
         "sig_verify_cost_ed25519": "590",
@@ -53,8 +53,8 @@
     },
     "crisis": {
       "constant_fee": {
-        "denom": "stake",
-        "amount": "1000"
+        "denom": "ncheq",
+        "amount": "10000000000000"
       }
     },
     "distribution": {
@@ -93,14 +93,14 @@
       "deposit_params": {
         "min_deposit": [
           {
-            "denom": "stake",
-            "amount": "10000000"
+            "denom": "ncheq",
+            "amount": "8000000000000"
           }
         ],
-        "max_deposit_period": "172800s"
+        "max_deposit_period": "1210000s"
       },
       "voting_params": {
-        "voting_period": "172800s"
+        "voting_period": "1210000s"
       },
       "tally_params": {
         "quorum": "0.334000000000000000",
@@ -143,22 +143,22 @@
     },
     "mint": {
       "minter": {
-        "inflation": "0.130000000000000000",
+        "inflation": "0.010000000000000000",
         "annual_provisions": "0.000000000000000000"
       },
       "params": {
-        "mint_denom": "stake",
-        "inflation_rate_change": "0.130000000000000000",
-        "inflation_max": "0.200000000000000000",
-        "inflation_min": "0.070000000000000000",
-        "goal_bonded": "0.670000000000000000",
+        "mint_denom": "ncheq",
+        "inflation_rate_change": "0.020000000000000000",
+        "inflation_max": "0.040000000000000000",
+        "inflation_min": "0.010000000000000000",
+        "goal_bonded": "0.600000000000000000",
         "blocks_per_year": "6311520"
       }
     },
     "params": null,
     "slashing": {
       "params": {
-        "signed_blocks_window": "100",
+        "signed_blocks_window": "120960",
         "min_signed_per_window": "0.500000000000000000",
         "downtime_jail_duration": "600s",
         "slash_fraction_double_sign": "0.050000000000000000",
@@ -170,10 +170,10 @@
     "staking": {
       "params": {
         "unbonding_time": "1814400s",
-        "max_validators": 100,
+        "max_validators": 125,
         "max_entries": 7,
         "historical_entries": 10000,
-        "bond_denom": "stake"
+        "bond_denom": "ncheq"
       },
       "last_total_power": "0",
       "last_validator_powers": [],
