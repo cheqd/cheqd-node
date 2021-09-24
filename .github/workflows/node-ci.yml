@@ -80,7 +80,7 @@ jobs:
     steps:
       - name: Download and install deb package
         run: |
-          wget https://github.com/cheqd/cheqd-node/releases/download/v0.1.21/cheqd-node_0.1.21_amd64.deb
+          wget https://github.com/cheqd/cheqd-node/releases/download/v0.1.21/cheqd-node_0.1.21_amd64.deb > /dev/null
           sudo dpkg -i cheqd-node_0.1.21_amd64.deb
           cheqd-noded help
 
@@ -99,3 +99,8 @@ jobs:
           ./run_docker.sh > /dev/null &
           sleep 10
           docker ps
+
+      - name: Add deb node as observer
+        run: |
+          cd && mkdir node5 && cd node5
+          cheqd-noded init node5 --home .
