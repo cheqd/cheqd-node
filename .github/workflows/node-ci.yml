@@ -74,7 +74,7 @@ jobs:
           docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
 
   install-deb-package-and-set-up-pool:
-    name: Install deb package and set up pool
+    name: Install deb package and set up Docker pool
     runs-on: ubuntu-20.04 # exact version, not latest
     needs: build-node-and-testnet-images
     steps:
@@ -96,6 +96,6 @@ jobs:
           cd docker/docker_compose_localnet/
           ./gen_node_configs.sh
           sudo chmod -R 777 ./node_configs
-          ./run_docker.sh > /dev/null/ &
+          ./run_docker.sh > /dev/null &
           sleep 10
           docker ps
