@@ -42,7 +42,7 @@ jobs:
           docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
 
   test:
-    name: cheqd-node unit tests
+    name: Run cheqd-node unit tests
     runs-on: ubuntu-latest
     steps:
       - name: Set up Go 1.16
@@ -59,7 +59,7 @@ jobs:
           go test -v $PACKAGES
 
   lint:
-    name: cheqd-node Linting
+    name: Lint cheqd-node
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
