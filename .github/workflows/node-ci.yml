@@ -103,3 +103,4 @@ jobs:
         run: |
           wget https://github.com/cheqd/cheqd-node/releases/download/v0.1.21/cheqd-node_0.1.21_amd64.deb
           sudo dpkg -i cheqd-node_0.1.21_amd64.deb
+          cheqd-noded help
