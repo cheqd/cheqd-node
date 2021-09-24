@@ -57,10 +57,10 @@ jobs:
       - name: Starport build
         run: starport chain build
 
-      - uses: actions/upload-artifact@master
-        with:
-          name: cheqd-noded
-          path: /home/runner/go/bin/
+      # - uses: actions/upload-artifact@master
+      #   with:
+      #     name: cheqd-noded
+      #     path: /home/runner/go/bin/
 
   build-node-and-testnet-images:
     name: Build cheqd-node and testnet Docker images
@@ -70,10 +70,10 @@ jobs:
       - name: Check out
         uses: actions/checkout@v2
 
-      - uses: actions/download-artifact@master
-        with:
-          name: cheqd-noded
-          path: /home/runner/go/bin/
+      # - uses: actions/download-artifact@master
+      #   with:
+      #     name: cheqd-noded
+      #     path: /home/runner/go/bin/
 
       - name: Build node image
         run: |
@@ -113,6 +113,6 @@ jobs:
           cd docker/docker_compose_localnet/
           ./gen_node_configs.sh
           sudo chmod -R 777 ./node_configs
-          ./run_docker.sh > /dev/null &
+          ./run_docker.sh
           sleep 10
           docker ps
