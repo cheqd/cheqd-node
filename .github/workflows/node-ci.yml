@@ -58,7 +58,7 @@ jobs:
           chmod +x /home/runner/go/bin/cheqd-noded
           cd docker/docker_compose_localnet/
           ./gen_node_configs.sh
-          sudo chmod -R 777 ./node_configs
+          chown -R $USER:$USER ./node_configs
           ./run_docker.sh > /dev/null &
           sleep 10
           docker ps
