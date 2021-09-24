@@ -65,13 +65,13 @@ jobs:
       - name: Check out
         uses: actions/checkout@v2
 
-      - name: Build node image
-        run: |
-          docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node .
+      # - name: Build node image
+      #   run: |
+      #     docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node .
 
-      - name: Build testnet image
-        run: |
-          docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
+      # - name: Build testnet image
+      #   run: |
+      #     docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
 
   install-deb-package-and-set-up-pool:
     name: Install deb package and set up Docker pool
@@ -95,7 +95,6 @@ jobs:
         run: |
           cd test/networks/docker_compose
           ./gen_node_configs.sh
-          sudo chmod -R 777 ./node_configs
           ./run_docker.sh > /dev/null &
           sleep 10
           docker ps
