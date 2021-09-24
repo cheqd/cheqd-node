@@ -4,13 +4,13 @@
   "initial_height": "1",
   "consensus_params": {
     "block": {
-      "max_bytes": "22020096",
-      "max_gas": "-1",
+      "max_bytes": "200000",
+      "max_gas": "2000000",
       "time_iota_ms": "1000"
     },
     "evidence": {
-      "max_age_num_blocks": "100000",
-      "max_age_duration": "172800000000000",
+      "max_age_num_blocks": "1576800",
+      "max_age_duration": "7884000",
       "max_bytes": "1048576"
     },
     "validator": {
