@@ -30,6 +30,7 @@ do
     echo "[Validator $i] Generating key..."
 
     cheqd_noded_docker init "node$i" --chain-id $CHAIN_ID
+    chmod -R 777 .cheqdnode
     echo "$(cheqd_noded_docker tendermint show-node-id)" > node_id.txt
     echo "$(cheqd_noded_docker tendermint show-validator)" > node_val_pubkey.txt
 
