@@ -35,7 +35,7 @@ do
 
     echo "Setting minimum fee price..."
 
-    chmod -R 777 .cheqdnode/config/ # FIXME
+    chmod -R 777 /home/runner/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs # FIXME
     sed -i $sed_extension 's/minimum-gas-prices = ""/minimum-gas-prices = "0.00'$i'cheq"/g' .cheqdnode/config/app.toml
 
     popd
