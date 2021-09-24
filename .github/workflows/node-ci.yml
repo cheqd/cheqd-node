@@ -57,11 +57,6 @@ jobs:
       - name: Starport build
         run: starport chain build
 
-      # - uses: actions/upload-artifact@master
-      #   with:
-      #     name: cheqd-noded
-      #     path: /home/runner/go/bin/
-
   build-node-and-testnet-images:
     name: Build cheqd-node and testnet Docker images
     runs-on: ubuntu-latest
@@ -70,11 +65,6 @@ jobs:
       - name: Check out
         uses: actions/checkout@v2
 
-      # - uses: actions/download-artifact@master
-      #   with:
-      #     name: cheqd-noded
-      #     path: /home/runner/go/bin/
-
       - name: Build node image
         run: |
           docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node .
@@ -82,17 +72,6 @@ jobs:
       - name: Build testnet image
         run: |
           docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
-
-      # - name: Set up 4 node docker pool
-      #   run: |
-      #     export PATH=$PATH:/home/runner/go/bin/
-      #     chmod +x /home/runner/go/bin/cheqd-noded
-      #     cd docker/docker_compose_localnet/
-      #     ./gen_node_configs.sh
-      #     sudo chmod -R 777 ./node_configs
-      #     ./run_docker.sh > /dev/null &
-      #     sleep 10
-      #     docker ps
 
   install-deb-package-and-set-up-pool:
     name: Install deb package and set up pool
