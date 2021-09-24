@@ -93,3 +93,13 @@ jobs:
           ./run_docker.sh > /dev/null &
           sleep 10
           docker ps
+
+  install-deb-package:
+    name: Install deb package
+    runs-on: ubuntu-20.04
+    needs: build-node-and-testnet-images
+    steps:
+      - name: Download and install deb package
+        run: |
+          wget https://github.com/cheqd/cheqd-node/releases/download/v0.1.21/cheqd-node_0.1.21_amd64.deb
+          sudo dpkg -i cheqd-node_0.1.21_amd64.deb
