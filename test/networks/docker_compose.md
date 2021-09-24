@@ -13,7 +13,7 @@ The set of scripts to generate configurations for a network of four nodes and ru
 
 1. Build docker image:
 
-   See [the instruction](cheqd_node.md).
+   See [the instruction](../../docker/cheqd_node.md).
 
 2. Build cheqd-noded:
 
@@ -63,5 +63,5 @@ When connecting using CLI, point path to home directory: `--home node_configs/cl
 
 ## CLI commands:
 
-See [the reference](../docs/cosmos-cli.md) to learn about the most common CLI flows.
+See [the reference](../../docs/cosmos-cli.md) to learn about the most common CLI flows.
 

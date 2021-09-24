@@ -31,18 +31,21 @@ RUN starport chain build
 
 FROM debian:buster
 
+# Node binary
 COPY --from=builder /go/bin/cheqd-noded /bin
 
+# Runner script
 COPY docker/cheqd_node/node-runner.sh /bin/node-runner
 RUN chmod +x /bin/node-runner
 
-RUN groupadd --gid 1000 cheqd && \
-    useradd --create-home --shell /bin/bash --uid 1000 --gid cheqd cheqd
+RUN groupadd --system --gid 1000 cheqd && \
+    useradd --system --create-home --home-dir /cheqd --shell /bin/bash --gid cheqd --uid 1000 cheqd
+RUN chown -R cheqd /cheqd
 
-WORKDIR /home/cheqd
+WORKDIR /cheqd
 USER cheqd
 
-VOLUME /home/cheqd/.cheqdnode
+VOLUME /cheqd
 EXPOSE 26656 26657
 STOPSIGNAL SIGTERM
 
