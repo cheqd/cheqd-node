@@ -63,7 +63,7 @@ jobs:
           path: /home/runner/go/bin/
 
   build-node-and-testnet-images:
-    name: Build cheqd-node and testnet Docker images, run Docker pool
+    name: Build cheqd-node and testnet Docker images
     runs-on: ubuntu-latest
     needs: build
     steps:
@@ -83,20 +83,20 @@ jobs:
         run: |
           docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
 
-      - name: Set up 4 node docker pool
-        run: |
-          export PATH=$PATH:/home/runner/go/bin/
-          chmod +x /home/runner/go/bin/cheqd-noded
-          cd docker/docker_compose_localnet/
-          ./gen_node_configs.sh
-          sudo chmod -R 777 ./node_configs
-          ./run_docker.sh > /dev/null &
-          sleep 10
-          docker ps
+      # - name: Set up 4 node docker pool
+      #   run: |
+      #     export PATH=$PATH:/home/runner/go/bin/
+      #     chmod +x /home/runner/go/bin/cheqd-noded
+      #     cd docker/docker_compose_localnet/
+      #     ./gen_node_configs.sh
+      #     sudo chmod -R 777 ./node_configs
+      #     ./run_docker.sh > /dev/null &
+      #     sleep 10
+      #     docker ps
 
-  install-deb-package:
-    name: Install deb package
-    runs-on: ubuntu-20.04
+  install-deb-package-and-set-up-pool:
+    name: Install deb package and set up pool
+    runs-on: ubuntu-20.04 # exact version, not latest
     needs: build-node-and-testnet-images
     steps:
       - name: Download and install deb package
@@ -104,3 +104,15 @@ jobs:
           wget https://github.com/cheqd/cheqd-node/releases/download/v0.1.21/cheqd-node_0.1.21_amd64.deb
           sudo dpkg -i cheqd-node_0.1.21_amd64.deb
           cheqd-noded help
+
+      - name: Check out
+        uses: actions/checkout@v2
+
+      - name: Set up 4 node docker pool
+        run: |
+          cd docker/docker_compose_localnet/
+          ./gen_node_configs.sh
+          sudo chmod -R 777 ./node_configs
+          ./run_docker.sh > /dev/null &
+          sleep 10
+          docker ps
