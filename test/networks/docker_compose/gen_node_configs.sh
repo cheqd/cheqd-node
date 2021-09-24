@@ -49,6 +49,7 @@ pushd $OPERATORS_HOME
 
 echo "Initializing genesis..."
 cheqd_noded_docker init dummy_node --chain-id $CHAIN_ID
+sudo chmod -R 777 /home/runner/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs # FIXME
 sed -i $sed_extension 's/"stake"/"cheq"/' .cheqdnode/config/genesis.json
 
 echo "Generating operator keys..."
@@ -105,6 +106,7 @@ do
     NODE_HOME="observer$i"
 
     mkdir $NODE_HOME
+    chmod -R 777 $NODE_HOME # FIXME
     pushd $NODE_HOME
 
     echo "##### [Observer $i] Generating keys..."
@@ -119,6 +121,7 @@ do
     cp "$OPERATORS_HOME/.cheqdnode/config/genesis.json" ".cheqdnode/config/"
 
     echo "##### [Observer $i] Setting min gas prices..."
+    sudo chmod -R 777 /home/runner/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs # FIXME
     sed -i $sed_extension 's/minimum-gas-prices = ""/minimum-gas-prices = "'$i'cheq"/g' .cheqdnode/config/app.toml
 
     popd
