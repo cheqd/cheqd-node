@@ -96,6 +96,6 @@ jobs:
           cd docker/docker_compose_localnet/
           ./gen_node_configs.sh
           sudo chmod -R 777 ./node_configs
-          ./run_docker.sh
+          ./run_docker.sh > /dev/null/ &
           sleep 10
           docker ps
