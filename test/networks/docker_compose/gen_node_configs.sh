@@ -30,12 +30,12 @@ do
     echo "[Validator $i] Generating key..."
 
     cheqd_noded_docker init "node$i" --chain-id $CHAIN_ID
-    ls -l
     echo "$(cheqd_noded_docker tendermint show-node-id)" > node_id.txt
     echo "$(cheqd_noded_docker tendermint show-validator)" > node_val_pubkey.txt
 
     echo "Setting minimum fee price..."
 
+    chmod -R 777 .cheqdnode/config/ # FIXME
     sed -i $sed_extension 's/minimum-gas-prices = ""/minimum-gas-prices = "0.00'$i'cheq"/g' .cheqdnode/config/app.toml
 
     popd
