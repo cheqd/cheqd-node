@@ -44,6 +44,7 @@ done
 
 OPERATORS_HOME="client"
 mkdir $OPERATORS_HOME
+chmod -R 777 $OPERATORS_HOME # FIXME
 pushd $OPERATORS_HOME
 
 echo "Initializing genesis..."
