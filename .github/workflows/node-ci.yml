@@ -8,9 +8,40 @@ on:
     - 'architecture/**'
 
 jobs:
+  lint:
+    name: cheqd-node linting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.40
+          args: --timeout 5m0s
+
+  test:
+    name: cheqd-node unit tests
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Set up Go 1.16
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Run tests
+        run: |
+          PACKAGES=$(go list ./...)
+          go test -v $PACKAGES
+
   build:
     name: Build cheqd-node
     runs-on: ubuntu-latest
+    needs: test
     steps:
       - name: Set up Go 1.16
         uses: actions/setup-go@v2
@@ -32,7 +63,7 @@ jobs:
           path: /home/runner/go/bin/
 
   build-node-and-testnet-images:
-    name: Build cheqd-node and testnet Docker images
+    name: Build cheqd-node and testnet Docker images, run Docker pool
     runs-on: ubuntu-latest
     needs: build
     steps:
@@ -48,9 +79,9 @@ jobs:
         run: |
           docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node .
 
-      # - name: Build testnet image
-      #   run: |
-      #     docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
+      - name: Build testnet image
+        run: |
+          docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
 
       - name: Set up 4 node docker pool
         run: |
@@ -58,36 +89,7 @@ jobs:
           chmod +x /home/runner/go/bin/cheqd-noded
           cd docker/docker_compose_localnet/
           ./gen_node_configs.sh
-          chown -R $USER:$USER ./node_configs
+          sudo chmod -R 777 ./node_configs
           ./run_docker.sh > /dev/null &
           sleep 10
           docker ps
-
-  test:
-    name: cheqd-node unit tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set up Go 1.16
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.16
-
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
-
-      - name: Run tests
-        run: |
-          PACKAGES=$(go list ./...)
-          go test -v $PACKAGES
-
-  lint:
-    name: cheqd-node Linting
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v2
-        with:
-          version: v1.40
-          args: --timeout 5m0s
