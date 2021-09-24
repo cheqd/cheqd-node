@@ -15,7 +15,7 @@ source "../common.sh"
 NODE_CONFIGS_DIR="node_configs"
 rm -rf $NODE_CONFIGS_DIR
 mkdir $NODE_CONFIGS_DIR
-chmod -R 777 $NODE_CONFIGS_DIR
+chmod -R 777 $NODE_CONFIGS_DIR # FIXME
 pushd $NODE_CONFIGS_DIR
 
 echo "Generating validator keys..."
@@ -24,13 +24,13 @@ for ((i=0 ; i<$VALIDATORS_COUNT ; i++))
 do
     NODE_HOME="node$i"
     mkdir $NODE_HOME
-    chmod -R 777 $NODE_HOME
+    chmod -R 777 $NODE_HOME # FIXME
     pushd $NODE_HOME
 
     echo "[Validator $i] Generating key..."
 
     cheqd_noded_docker init "node$i" --chain-id $CHAIN_ID
-    chmod -R 777 .cheqdnode
+    ls -l
     echo "$(cheqd_noded_docker tendermint show-node-id)" > node_id.txt
     echo "$(cheqd_noded_docker tendermint show-validator)" > node_val_pubkey.txt
 
