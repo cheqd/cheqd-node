@@ -93,7 +93,7 @@ jobs:
 
       - name: Set up 4 node docker pool
         run: |
-          cd docker/docker_compose_localnet/
+          cd test/networks/docker_compose
           ./gen_node_configs.sh
           sudo chmod -R 777 ./node_configs
           ./run_docker.sh > /dev/null &
