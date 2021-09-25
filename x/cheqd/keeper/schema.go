@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"encoding/binary"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -40,19 +39,18 @@ func (k Keeper) SetSchemaCount(ctx sdk.Context, count uint64) {
 // AppendSchema appends a schema in the store with a new id and update the count
 func (k Keeper) AppendSchema(
 	ctx sdk.Context,
-	creator string,
+	id string,
 	name string,
 	version string,
-	attr_names string,
+	attrNames []string,
 ) uint64 {
 	// Create the schema
 	count := k.GetSchemaCount(ctx)
 	var schema = types.Schema{
-		Creator:    creator,
-		Id:         count,
-		Name:       name,
-		Version:    version,
-		Attr_names: attr_names,
+		Id:        id,
+		Name:      name,
+		Version:   version,
+		AttrNames: attrNames,
 	}
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.SchemaKey))
@@ -73,7 +71,7 @@ func (k Keeper) SetSchema(ctx sdk.Context, schema types.Schema) {
 }
 
 // GetSchema returns a schema from its id
-func (k Keeper) GetSchema(ctx sdk.Context, id uint64) types.Schema {
+func (k Keeper) GetSchema(ctx sdk.Context, id string) types.Schema {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.SchemaKey))
 	var schema types.Schema
 	k.cdc.MustUnmarshalBinaryBare(store.Get(GetSchemaIDBytes(id)), &schema)
@@ -81,18 +79,13 @@ func (k Keeper) GetSchema(ctx sdk.Context, id uint64) types.Schema {
 }
 
 // HasSchema checks if the schema exists in the store
-func (k Keeper) HasSchema(ctx sdk.Context, id uint64) bool {
+func (k Keeper) HasSchema(ctx sdk.Context, id string) bool {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.SchemaKey))
 	return store.Has(GetSchemaIDBytes(id))
 }
 
-// GetSchemaOwner returns the creator of the schema
-func (k Keeper) GetSchemaOwner(ctx sdk.Context, id uint64) string {
-	return k.GetSchema(ctx, id).Creator
-}
-
 // RemoveSchema removes a schema from the store
-func (k Keeper) RemoveSchema(ctx sdk.Context, id uint64) {
+func (k Keeper) RemoveSchema(ctx sdk.Context, id string) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.SchemaKey))
 	store.Delete(GetSchemaIDBytes(id))
 }
@@ -114,13 +107,11 @@ func (k Keeper) GetAllSchema(ctx sdk.Context) (list []types.Schema) {
 }
 
 // GetSchemaIDBytes returns the byte representation of the ID
-func GetSchemaIDBytes(id uint64) []byte {
-	bz := make([]byte, 8)
-	binary.BigEndian.PutUint64(bz, id)
-	return bz
+func GetSchemaIDBytes(id string) []byte {
+	return []byte(id)
 }
 
 // GetSchemaIDFromBytes returns ID in uint64 format from a byte array
-func GetSchemaIDFromBytes(bz []byte) uint64 {
-	return binary.BigEndian.Uint64(bz)
+func GetSchemaIDFromBytes(bz []byte) string {
+	return string(bz)
 }

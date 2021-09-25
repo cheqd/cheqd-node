@@ -154,7 +154,7 @@ If a Schema evolves, a new schema with a new version or name needs to be created
 
   Dictionary with Schema's data:
 
-  * **`attr_names`**: Array of attribute name strings \(125 attributes maximum\)
+  * **`attrNames`**: Array of attribute name strings \(125 attributes maximum\)
   * **`name`**: Schema's name string
   * **`version`**: Schema's version string
 
@@ -164,7 +164,7 @@ SCHEMA transaction format:
 {
             "version": "1.0",
             "name": "Degree",
-            "attr_names": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
+            "attrNames": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
 }
 ```
 
@@ -172,7 +172,7 @@ SCHEMA transaction format:
 
 #### State format
 
-`(version, name, owner) -> {(version, name, attr_names), tx_hash, tx_timestamp }`
+`(version, name, owner) -> {(version, name, attrNames), tx_hash, tx_timestamp }`
 
 ### CRED\_DEF
 
@@ -191,7 +191,7 @@ It is not possible to update `data` in existing Credential Definitions. If a Cre
 
   Hash of a Schema transaction the credential definition is created for.
 
-* **`signature_type` \(string\):**
+* **`signatureType` \(string\):**
 
   Type of the credential definition \(that is credential signature\). `CL` \(Camenisch-Lysyanskaya\) is the only supported type now. Other signature types are being explored for future releases.
 
@@ -203,7 +203,7 @@ CRED\_DEF transaction format:
 
 ```text
 {
-        "signature_type": "CL",
+        "signatureType": "CL",
         "schema_id": 5ZTp9g4SP6t73rH2s8zgmtqdXyT,
         "tag": "some_tag",    
         "cred_def": {
@@ -217,7 +217,7 @@ CRED\_DEF transaction format:
 
 #### State format
 
-`(owner, signature_type, ref, tag) -> {(signature_type, schema_id, tag, cred_def), tx_hash, tx_timestamp }`
+`(owner, signatureType, ref, tag) -> {(signatureType, schema_id, tag, cred_def), tx_hash, tx_timestamp }`
 
 ## References
 

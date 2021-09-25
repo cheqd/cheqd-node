@@ -6,11 +6,12 @@ import (
 
 var _ sdk.Msg = &MsgCreateSchema{}
 
-func NewMsgCreateSchema(name string, version string, attr_names string) *MsgCreateSchema {
+func NewMsgCreateSchema(id string, name string, version string, attrNames []string) *MsgCreateSchema {
 	return &MsgCreateSchema{
+		Id:        id,
 		Name:      name,
 		Version:   version,
-		AttrNames: attr_names,
+		AttrNames: attrNames,
 	}
 }
 

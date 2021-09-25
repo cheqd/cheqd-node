@@ -10,7 +10,7 @@ import (
 
 func CmdCreateCredDef() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-credDef [schema_id] [tag] [signature_type] [value]",
+		Use:   "create-credDef [schema_id] [tag] [signatureType] [value]",
 		Short: "Creates a new credDef",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {

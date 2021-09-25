@@ -27,7 +27,7 @@ message MsgCreateCredDef {
   string id = 1;
   string schema_id = 2;
   string tag = 3;
-  string signature_type = 4;
+  string signatureType = 4;
   google.protobuf.Any value = 5;
 }
 
@@ -39,7 +39,7 @@ message MsgCreateSchema {
   string id = 1;
   string name = 2;
   string version = 3;
-  repeated string attr_names = 4;
+  repeated string attrNames = 4;
 }
 
 message MsgCreateSchemaResponse {
@@ -48,15 +48,15 @@ message MsgCreateSchemaResponse {
 
 message MsgCreateDid {
   string id = 1;
-  optional repeated string controller = 2;
-  optional repeated VerificationMethod verificationMethod = 3;
-  optional repeated google.protobuf.Any authentication = 4;
-  optional repeated google.protobuf.Any assertionMethod = 5;
-  optional repeated google.protobuf.Any capabilityInvocation = 6;
-  optional repeated google.protobuf.Any capabilityDelegation = 7;
-  optional repeated google.protobuf.Any keyAgreement = 8;
-  optional repeated string alsoKnownAs = 9;
-  optional repeated DidService service = 10;
+  repeated string controller = 2;
+  repeated VerificationMethod verificationMethod = 3;
+  repeated google.protobuf.Any authentication = 4;
+  repeated google.protobuf.Any assertionMethod = 5;
+  repeated google.protobuf.Any capabilityInvocation = 6;
+  repeated google.protobuf.Any capabilityDelegation = 7;
+  repeated google.protobuf.Any keyAgreement = 8;
+  repeated string alsoKnownAs = 9;
+  repeated DidService service = 10;
 }
 
 message MsgCreateDidResponse {
@@ -65,15 +65,15 @@ message MsgCreateDidResponse {
 
 message MsgUpdateDid {
   string id = 1;
-  optional repeated string controller = 2;
-  optional repeated VerificationMethod verificationMethod = 3;
-  optional repeated google.protobuf.Any authentication = 4;
-  optional repeated google.protobuf.Any assertionMethod = 5;
-  optional repeated google.protobuf.Any capabilityInvocation = 6;
-  optional repeated google.protobuf.Any capabilityDelegation = 7;
-  optional repeated google.protobuf.Any keyAgreement = 8;
-  optional repeated string alsoKnownAs = 9;
-  optional repeated DidService service = 10;
+  repeated string controller = 2;
+  repeated VerificationMethod verificationMethod = 3;
+  repeated google.protobuf.Any authentication = 4;
+  repeated google.protobuf.Any assertionMethod = 5;
+  repeated google.protobuf.Any capabilityInvocation = 6;
+  repeated google.protobuf.Any capabilityDelegation = 7;
+  repeated google.protobuf.Any keyAgreement = 8;
+  repeated string alsoKnownAs = 9;
+  repeated DidService service = 10;
 }
 
 

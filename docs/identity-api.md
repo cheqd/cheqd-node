@@ -300,7 +300,7 @@ CreateSchemaRequest
     "data": {
             "version": "1.0",
             "name": "Degree",
-            "attr_names": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
+            "attrNames": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
              },
     "owner": "GEzcdDLhCpGCYRHW82kjHd",
     "signature": "49W5WP5jr7x1fZhtpAhHFbuUDqUYZ3AKht88gUjrz8TEJZr5MZUPjskpfBFdboLPZXKjbGjutoVascfKiMD5W7Ba",
@@ -308,7 +308,7 @@ CreateSchemaRequest
 }
 ```
 
-* `attr_names`\(array\): Array of attribute name strings \(125 attributes maximum\)
+* `attrNames`\(array\): Array of attribute name strings \(125 attributes maximum\)
 * `name`\(string\): Schema's name string
 * `version`\(string\): Schema's version string
 
@@ -361,7 +361,7 @@ QueryGetSchemaResponse{
         "attrib": {
                 "version": "1.0",
                 "name": "Degree",
-                "attr_names": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
+                "attrNames": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
              },
 }
 ```
@@ -380,7 +380,7 @@ QueryGetSchemaResponse{
 CreateCredDefRequest 
 {
     "data": {
-                "signature_type": "CL",
+                "signatureType": "CL",
                 "schema_id": "schema:GEzcdDLhCpGCYRHW82kjHd:Degree:1.0",
                 "tag": "some_tag",    
                 "cred_def": {
@@ -397,7 +397,7 @@ CreateCredDefRequest
   * `primary` \(dict\): Primary credential public key
   * `revocation` \(dict\): Revocation credential public key
 * `schema_id` \(string\): Schema's key from a state
-* `signature_type` \(string\): Type of the Credential Definition \(that is credential signature\). `CL` \(Camenisch-Lysyanskaya\) is the only supported type now.
+* `signatureType` \(string\): Type of the Credential Definition \(that is credential signature\). `CL` \(Camenisch-Lysyanskaya\) is the only supported type now.
 * `tag` \(string, optional\): A unique tag to have multiple public keys for the same Schema and type issued by the same DID. A default tag `tag` will be used if not specified.
 
 #### Response format
@@ -422,7 +422,7 @@ CreateCredDefResponse {
 `build\_query\_get\_cred\_def\(name, version, owner\)`
 
 * `schema_id`\(string\): Schema's key from a state
-* `signature_type`\(string\): Type of the Credential Definition \(that is credential signature\). CL \(Camenisch-Lysyanskaya\) is the only supported type now.
+* `signatureType`\(string\): Type of the Credential Definition \(that is credential signature\). CL \(Camenisch-Lysyanskaya\) is the only supported type now.
 * `owner` \(string\): Credential Definition's owner DID
 * `tag` \(string, optional\): A unique tag to have multiple public keys for the same Schema and type issued by the same DID. A default tag `tag` will be used if not specified.
 
@@ -439,7 +439,7 @@ Request
 ```
 
 * `path`: Path for RPC endpoint for cheqd pool
-* `data`: Query with an entity key from a state. String `cred_def:<owner>:<schema_id>:<tag>:<signature_type>` encoded to bytes
+* `data`: Query with an entity key from a state. String `cred_def:<owner>:<schema_id>:<tag>:<signatureType>` encoded to bytes
 * `height`: Ledger height \(size\). `None` for auto calculation
 * `prove`: Boolean value. `True` for getting state proof in a pool response. 
 
@@ -448,7 +448,7 @@ Request
 ```text
 QueryGetCredDefResponse{
         "cred_def": {
-                "signature_type": "CL",
+                "signatureType": "CL",
                 "schema_id": "schema:GEzcdDLhCpGCYRHW82kjHd:Degree:1.0",
                 "tag": "some_tag",    
                 "cred_def": {

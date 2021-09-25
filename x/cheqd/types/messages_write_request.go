@@ -7,11 +7,11 @@ import (
 
 var _ sdk.Msg = &MsgWriteRequest{}
 
-func NewMsgWriteRequest(data *types.Any, author string, signature string) *MsgWriteRequest {
+func NewMsgWriteRequest(data *types.Any, authors []string, signatures map[string]string) *MsgWriteRequest {
 	return &MsgWriteRequest{
-		Data:      data,
-		Author:    author,
-		Signature: signature,
+		Data:       data,
+		Authors:    authors,
+		Signatures: signatures,
 	}
 }
 
@@ -20,7 +20,7 @@ func (msg *MsgWriteRequest) Route() string {
 }
 
 func (msg *MsgWriteRequest) Type() string {
-	return "WriteRequestDef"
+	return "WriteRequest"
 }
 
 func (msg *MsgWriteRequest) GetSigners() []sdk.AccAddress {

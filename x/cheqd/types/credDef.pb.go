@@ -5,6 +5,7 @@ package types
 
 import (
 	fmt "fmt"
+	types "github.com/cosmos/cosmos-sdk/codec/types"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	io "io"
@@ -24,12 +25,12 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type CredDef struct {
-	Id            string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Author        string `protobuf:"bytes,2,opt,name=author,proto3" json:"author,omitempty"`
-	SchemaId      string `protobuf:"bytes,3,opt,name=schema_id,json=schemaId,proto3" json:"schema_id,omitempty"`
-	Tag           string `protobuf:"bytes,4,opt,name=tag,proto3" json:"tag,omitempty"`
-	SignatureType string `protobuf:"bytes,5,opt,name=signature_type,json=signatureType,proto3" json:"signature_type,omitempty"`
-	Value         string `protobuf:"bytes,6,opt,name=value,proto3" json:"value,omitempty"`
+	Id            string     `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Authors       []string   `protobuf:"bytes,2,rep,name=authors,proto3" json:"authors,omitempty"`
+	SchemaId      string     `protobuf:"bytes,3,opt,name=schema_id,json=schemaId,proto3" json:"schema_id,omitempty"`
+	Tag           string     `protobuf:"bytes,4,opt,name=tag,proto3" json:"tag,omitempty"`
+	SignatureType string     `protobuf:"bytes,5,opt,name=signatureType,json=signatureType,proto3" json:"signatureType,omitempty"`
+	Value         *types.Any `protobuf:"bytes,6,opt,name=value,proto3" json:"value,omitempty"`
 }
 
 func (m *CredDef) Reset()         { *m = CredDef{} }
@@ -72,11 +73,11 @@ func (m *CredDef) GetId() string {
 	return ""
 }
 
-func (m *CredDef) GetAuthor() string {
+func (m *CredDef) GetAuthors() []string {
 	if m != nil {
-		return m.Author
+		return m.Authors
 	}
-	return ""
+	return nil
 }
 
 func (m *CredDef) GetSchemaId() string {
@@ -100,37 +101,101 @@ func (m *CredDef) GetSignatureType() string {
 	return ""
 }
 
-func (m *CredDef) GetValue() string {
+func (m *CredDef) GetValue() *types.Any {
 	if m != nil {
 		return m.Value
 	}
-	return ""
+	return nil
+}
+
+type CredDefValue struct {
+	Primary    map[string]*types.Any `protobuf:"bytes,1,rep,name=primary,proto3" json:"primary,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Revocation map[string]*types.Any `protobuf:"bytes,2,rep,name=revocation,proto3" json:"revocation,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+}
+
+func (m *CredDefValue) Reset()         { *m = CredDefValue{} }
+func (m *CredDefValue) String() string { return proto.CompactTextString(m) }
+func (*CredDefValue) ProtoMessage()    {}
+func (*CredDefValue) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bc069326307a6009, []int{1}
+}
+func (m *CredDefValue) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *CredDefValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_CredDefValue.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *CredDefValue) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CredDefValue.Merge(m, src)
+}
+func (m *CredDefValue) XXX_Size() int {
+	return m.Size()
+}
+func (m *CredDefValue) XXX_DiscardUnknown() {
+	xxx_messageInfo_CredDefValue.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CredDefValue proto.InternalMessageInfo
+
+func (m *CredDefValue) GetPrimary() map[string]*types.Any {
+	if m != nil {
+		return m.Primary
+	}
+	return nil
+}
+
+func (m *CredDefValue) GetRevocation() map[string]*types.Any {
+	if m != nil {
+		return m.Revocation
+	}
+	return nil
 }
 
 func init() {
 	proto.RegisterType((*CredDef)(nil), "cheqdid.cheqdnode.cheqd.CredDef")
+	proto.RegisterType((*CredDefValue)(nil), "cheqdid.cheqdnode.cheqd.CredDefValue")
+	proto.RegisterMapType((map[string]*types.Any)(nil), "cheqdid.cheqdnode.cheqd.CredDefValue.PrimaryEntry")
+	proto.RegisterMapType((map[string]*types.Any)(nil), "cheqdid.cheqdnode.cheqd.CredDefValue.RevocationEntry")
 }
 
 func init() { proto.RegisterFile("cheqd/credDef.proto", fileDescriptor_bc069326307a6009) }
 
 var fileDescriptor_bc069326307a6009 = []byte{
-	// 250 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x4e, 0xce, 0x48, 0x2d,
-	0x4c, 0xd1, 0x4f, 0x2e, 0x4a, 0x4d, 0x71, 0x49, 0x4d, 0xd3, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17,
-	0x12, 0x07, 0x0b, 0x66, 0xa6, 0xe8, 0x81, 0xe9, 0xbc, 0xfc, 0x94, 0x54, 0x08, 0x4b, 0x4a, 0x24,
-	0x3d, 0x3f, 0x3d, 0x1f, 0xac, 0x46, 0x1f, 0xc4, 0x82, 0x28, 0x57, 0x9a, 0xcb, 0xc8, 0xc5, 0xee,
-	0x0c, 0x31, 0x40, 0x88, 0x8f, 0x8b, 0x29, 0x33, 0x45, 0x82, 0x51, 0x81, 0x51, 0x83, 0x33, 0x88,
-	0x29, 0x33, 0x45, 0x48, 0x8c, 0x8b, 0x2d, 0xb1, 0xb4, 0x24, 0x23, 0xbf, 0x48, 0x82, 0x09, 0x2c,
-	0x06, 0xe5, 0x09, 0x49, 0x73, 0x71, 0x16, 0x27, 0x67, 0xa4, 0xe6, 0x26, 0xc6, 0x67, 0xa6, 0x48,
-	0x30, 0x83, 0xa5, 0x38, 0x20, 0x02, 0x9e, 0x29, 0x42, 0x02, 0x5c, 0xcc, 0x25, 0x89, 0xe9, 0x12,
-	0x2c, 0x60, 0x61, 0x10, 0x53, 0x48, 0x95, 0x8b, 0xaf, 0x38, 0x33, 0x3d, 0x2f, 0xb1, 0xa4, 0xb4,
-	0x28, 0x35, 0xbe, 0xa4, 0xb2, 0x20, 0x55, 0x82, 0x15, 0x2c, 0xc9, 0x0b, 0x17, 0x0d, 0xa9, 0x2c,
-	0x48, 0x15, 0x12, 0xe1, 0x62, 0x2d, 0x4b, 0xcc, 0x29, 0x4d, 0x95, 0x60, 0x03, 0xcb, 0x42, 0x38,
-	0x4e, 0xce, 0x27, 0x1e, 0xc9, 0x31, 0x5e, 0x78, 0x24, 0xc7, 0xf8, 0xe0, 0x91, 0x1c, 0xe3, 0x84,
-	0xc7, 0x72, 0x0c, 0x17, 0x1e, 0xcb, 0x31, 0xdc, 0x78, 0x2c, 0xc7, 0x10, 0xa5, 0x99, 0x9e, 0x59,
-	0x92, 0x51, 0x9a, 0xa4, 0x97, 0x9c, 0x9f, 0xab, 0x0f, 0x0d, 0x08, 0x10, 0xa9, 0x0b, 0xf2, 0xb2,
-	0x7e, 0x05, 0x54, 0x08, 0x64, 0x5d, 0x71, 0x12, 0x1b, 0xd8, 0xaf, 0xc6, 0x80, 0x00, 0x00, 0x00,
-	0xff, 0xff, 0x4f, 0x63, 0xff, 0x3e, 0x31, 0x01, 0x00, 0x00,
+	// 397 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x52, 0x5f, 0xab, 0xd3, 0x30,
+	0x1c, 0x5d, 0x5a, 0xef, 0x9d, 0xcb, 0xae, 0x57, 0x89, 0x17, 0x8c, 0x15, 0x4a, 0xb9, 0x20, 0x54,
+	0xc1, 0x14, 0x2a, 0x82, 0xf8, 0xa6, 0xd3, 0x07, 0xc1, 0x87, 0x51, 0xff, 0x3c, 0xf8, 0x32, 0xb2,
+	0x26, 0x6b, 0x83, 0x5b, 0x53, 0xd3, 0x74, 0xd8, 0x6f, 0xe1, 0x97, 0xf1, 0x3b, 0xf8, 0xb8, 0x47,
+	0xf1, 0x49, 0xb6, 0x2f, 0x22, 0x49, 0xba, 0x39, 0x04, 0x51, 0xf0, 0xa5, 0x3d, 0x39, 0xf9, 0x9d,
+	0xf3, 0xcb, 0xef, 0x24, 0xf0, 0x66, 0x5e, 0xf2, 0x8f, 0x2c, 0xc9, 0x15, 0x67, 0xcf, 0xf9, 0x82,
+	0xd4, 0x4a, 0x6a, 0x89, 0x6e, 0x59, 0x52, 0x30, 0x62, 0xff, 0x95, 0x64, 0xdc, 0xa1, 0xe0, 0x76,
+	0x21, 0x65, 0xb1, 0xe4, 0x89, 0x2d, 0x9b, 0xb7, 0x8b, 0x84, 0x56, 0x9d, 0xd3, 0x04, 0x17, 0x85,
+	0x2c, 0xa4, 0x85, 0x89, 0x41, 0x8e, 0xbd, 0xfc, 0x02, 0xe0, 0x70, 0xe2, 0xbc, 0xd1, 0x39, 0xf4,
+	0x04, 0xc3, 0x20, 0x02, 0xf1, 0x28, 0xf3, 0x04, 0x43, 0x18, 0x0e, 0x69, 0xab, 0x4b, 0xa9, 0x1a,
+	0xec, 0x45, 0x7e, 0x3c, 0xca, 0xf6, 0x4b, 0x74, 0x07, 0x8e, 0x9a, 0xbc, 0xe4, 0x2b, 0x3a, 0x13,
+	0x0c, 0xfb, 0x56, 0x70, 0xd5, 0x11, 0x2f, 0x19, 0xba, 0x01, 0x7d, 0x4d, 0x0b, 0x7c, 0xc5, 0xd2,
+	0x06, 0xa2, 0xbb, 0xf0, 0xbc, 0x11, 0x45, 0x45, 0x75, 0xab, 0xf8, 0x4c, 0x77, 0x35, 0xc7, 0x27,
+	0x76, 0xf3, 0xda, 0x81, 0x7d, 0xd3, 0xd5, 0x1c, 0xdd, 0x87, 0x27, 0x6b, 0xba, 0x6c, 0x39, 0x3e,
+	0x8d, 0x40, 0x3c, 0x4e, 0x2f, 0x88, 0x1b, 0x86, 0xec, 0x87, 0x21, 0x4f, 0xab, 0x2e, 0x73, 0x25,
+	0x97, 0xdf, 0x3d, 0x78, 0xd6, 0x9f, 0xfb, 0x9d, 0x21, 0xd0, 0x2b, 0x38, 0xac, 0x95, 0x58, 0x51,
+	0xd5, 0x61, 0x10, 0xf9, 0xf1, 0x38, 0x4d, 0xc9, 0x1f, 0x42, 0x22, 0xc7, 0x3a, 0x32, 0x75, 0xa2,
+	0x17, 0x95, 0x56, 0x5d, 0xb6, 0xb7, 0x40, 0x6f, 0x21, 0x54, 0x7c, 0x2d, 0x73, 0xaa, 0x85, 0xac,
+	0xec, 0xf4, 0xe3, 0xf4, 0xd1, 0xbf, 0x19, 0x66, 0x07, 0x9d, 0xf3, 0x3c, 0x32, 0x0a, 0xa6, 0xf0,
+	0xec, 0xb8, 0x9f, 0x89, 0xea, 0x03, 0xef, 0xfa, 0xc8, 0x0d, 0xfc, 0x95, 0x81, 0xf7, 0xd7, 0x0c,
+	0x9e, 0x78, 0x8f, 0x41, 0xf0, 0x1a, 0x5e, 0xff, 0xad, 0xe1, 0xff, 0x9b, 0x3e, 0x9b, 0x7c, 0xdd,
+	0x86, 0x60, 0xb3, 0x0d, 0xc1, 0x8f, 0x6d, 0x08, 0x3e, 0xef, 0xc2, 0xc1, 0x66, 0x17, 0x0e, 0xbe,
+	0xed, 0xc2, 0xc1, 0xfb, 0x7b, 0x85, 0xd0, 0x65, 0x3b, 0x27, 0xb9, 0x5c, 0x25, 0xfd, 0xc3, 0x34,
+	0xdf, 0x07, 0x26, 0x8c, 0xe4, 0x53, 0x4f, 0x99, 0x1b, 0x6e, 0xe6, 0xa7, 0xd6, 0xfd, 0xe1, 0xcf,
+	0x00, 0x00, 0x00, 0xff, 0xff, 0x8b, 0x02, 0xc5, 0x0a, 0xc1, 0x02, 0x00, 0x00,
 }
 
 func (m *CredDef) Marshal() (dAtA []byte, err error) {
@@ -153,10 +218,15 @@ func (m *CredDef) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Value) > 0 {
-		i -= len(m.Value)
-		copy(dAtA[i:], m.Value)
-		i = encodeVarintCredDef(dAtA, i, uint64(len(m.Value)))
+	if m.Value != nil {
+		{
+			size, err := m.Value.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintCredDef(dAtA, i, uint64(size))
+		}
 		i--
 		dAtA[i] = 0x32
 	}
@@ -181,12 +251,14 @@ func (m *CredDef) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x1a
 	}
-	if len(m.Author) > 0 {
-		i -= len(m.Author)
-		copy(dAtA[i:], m.Author)
-		i = encodeVarintCredDef(dAtA, i, uint64(len(m.Author)))
-		i--
-		dAtA[i] = 0x12
+	if len(m.Authors) > 0 {
+		for iNdEx := len(m.Authors) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Authors[iNdEx])
+			copy(dAtA[i:], m.Authors[iNdEx])
+			i = encodeVarintCredDef(dAtA, i, uint64(len(m.Authors[iNdEx])))
+			i--
+			dAtA[i] = 0x12
+		}
 	}
 	if len(m.Id) > 0 {
 		i -= len(m.Id)
@@ -194,6 +266,81 @@ func (m *CredDef) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i = encodeVarintCredDef(dAtA, i, uint64(len(m.Id)))
 		i--
 		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *CredDefValue) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CredDefValue) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CredDefValue) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Revocation) > 0 {
+		for k := range m.Revocation {
+			v := m.Revocation[k]
+			baseI := i
+			if v != nil {
+				{
+					size, err := v.MarshalToSizedBuffer(dAtA[:i])
+					if err != nil {
+						return 0, err
+					}
+					i -= size
+					i = encodeVarintCredDef(dAtA, i, uint64(size))
+				}
+				i--
+				dAtA[i] = 0x12
+			}
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintCredDef(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintCredDef(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if len(m.Primary) > 0 {
+		for k := range m.Primary {
+			v := m.Primary[k]
+			baseI := i
+			if v != nil {
+				{
+					size, err := v.MarshalToSizedBuffer(dAtA[:i])
+					if err != nil {
+						return 0, err
+					}
+					i -= size
+					i = encodeVarintCredDef(dAtA, i, uint64(size))
+				}
+				i--
+				dAtA[i] = 0x12
+			}
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintCredDef(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintCredDef(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0xa
+		}
 	}
 	return len(dAtA) - i, nil
 }
@@ -219,9 +366,11 @@ func (m *CredDef) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovCredDef(uint64(l))
 	}
-	l = len(m.Author)
-	if l > 0 {
-		n += 1 + l + sovCredDef(uint64(l))
+	if len(m.Authors) > 0 {
+		for _, s := range m.Authors {
+			l = len(s)
+			n += 1 + l + sovCredDef(uint64(l))
+		}
 	}
 	l = len(m.SchemaId)
 	if l > 0 {
@@ -235,9 +384,44 @@ func (m *CredDef) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovCredDef(uint64(l))
 	}
-	l = len(m.Value)
-	if l > 0 {
+	if m.Value != nil {
+		l = m.Value.Size()
 		n += 1 + l + sovCredDef(uint64(l))
+	}
+	return n
+}
+
+func (m *CredDefValue) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.Primary) > 0 {
+		for k, v := range m.Primary {
+			_ = k
+			_ = v
+			l = 0
+			if v != nil {
+				l = v.Size()
+				l += 1 + sovCredDef(uint64(l))
+			}
+			mapEntrySize := 1 + len(k) + sovCredDef(uint64(len(k))) + l
+			n += mapEntrySize + 1 + sovCredDef(uint64(mapEntrySize))
+		}
+	}
+	if len(m.Revocation) > 0 {
+		for k, v := range m.Revocation {
+			_ = k
+			_ = v
+			l = 0
+			if v != nil {
+				l = v.Size()
+				l += 1 + sovCredDef(uint64(l))
+			}
+			mapEntrySize := 1 + len(k) + sovCredDef(uint64(len(k))) + l
+			n += mapEntrySize + 1 + sovCredDef(uint64(mapEntrySize))
+		}
 	}
 	return n
 }
@@ -311,7 +495,7 @@ func (m *CredDef) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Author", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Authors", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -339,7 +523,7 @@ func (m *CredDef) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Author = string(dAtA[iNdEx:postIndex])
+			m.Authors = append(m.Authors, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
@@ -441,7 +625,7 @@ func (m *CredDef) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowCredDef
@@ -451,23 +635,335 @@ func (m *CredDef) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthCredDef
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthCredDef
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Value = string(dAtA[iNdEx:postIndex])
+			if m.Value == nil {
+				m.Value = &types.Any{}
+			}
+			if err := m.Value.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipCredDef(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthCredDef
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *CredDefValue) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowCredDef
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CredDefValue: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CredDefValue: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Primary", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCredDef
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthCredDef
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthCredDef
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Primary == nil {
+				m.Primary = make(map[string]*types.Any)
+			}
+			var mapkey string
+			var mapvalue *types.Any
+			for iNdEx < postIndex {
+				entryPreIndex := iNdEx
+				var wire uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowCredDef
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					wire |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
+					var stringLenmapkey uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowCredDef
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapkey |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapkey := int(stringLenmapkey)
+					if intStringLenmapkey < 0 {
+						return ErrInvalidLengthCredDef
+					}
+					postStringIndexmapkey := iNdEx + intStringLenmapkey
+					if postStringIndexmapkey < 0 {
+						return ErrInvalidLengthCredDef
+					}
+					if postStringIndexmapkey > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
+					iNdEx = postStringIndexmapkey
+				} else if fieldNum == 2 {
+					var mapmsglen int
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowCredDef
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						mapmsglen |= int(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					if mapmsglen < 0 {
+						return ErrInvalidLengthCredDef
+					}
+					postmsgIndex := iNdEx + mapmsglen
+					if postmsgIndex < 0 {
+						return ErrInvalidLengthCredDef
+					}
+					if postmsgIndex > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapvalue = &types.Any{}
+					if err := mapvalue.Unmarshal(dAtA[iNdEx:postmsgIndex]); err != nil {
+						return err
+					}
+					iNdEx = postmsgIndex
+				} else {
+					iNdEx = entryPreIndex
+					skippy, err := skipCredDef(dAtA[iNdEx:])
+					if err != nil {
+						return err
+					}
+					if (skippy < 0) || (iNdEx+skippy) < 0 {
+						return ErrInvalidLengthCredDef
+					}
+					if (iNdEx + skippy) > postIndex {
+						return io.ErrUnexpectedEOF
+					}
+					iNdEx += skippy
+				}
+			}
+			m.Primary[mapkey] = mapvalue
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Revocation", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCredDef
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthCredDef
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthCredDef
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Revocation == nil {
+				m.Revocation = make(map[string]*types.Any)
+			}
+			var mapkey string
+			var mapvalue *types.Any
+			for iNdEx < postIndex {
+				entryPreIndex := iNdEx
+				var wire uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowCredDef
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					wire |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
+					var stringLenmapkey uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowCredDef
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapkey |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapkey := int(stringLenmapkey)
+					if intStringLenmapkey < 0 {
+						return ErrInvalidLengthCredDef
+					}
+					postStringIndexmapkey := iNdEx + intStringLenmapkey
+					if postStringIndexmapkey < 0 {
+						return ErrInvalidLengthCredDef
+					}
+					if postStringIndexmapkey > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
+					iNdEx = postStringIndexmapkey
+				} else if fieldNum == 2 {
+					var mapmsglen int
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowCredDef
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						mapmsglen |= int(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					if mapmsglen < 0 {
+						return ErrInvalidLengthCredDef
+					}
+					postmsgIndex := iNdEx + mapmsglen
+					if postmsgIndex < 0 {
+						return ErrInvalidLengthCredDef
+					}
+					if postmsgIndex > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapvalue = &types.Any{}
+					if err := mapvalue.Unmarshal(dAtA[iNdEx:postmsgIndex]); err != nil {
+						return err
+					}
+					iNdEx = postmsgIndex
+				} else {
+					iNdEx = entryPreIndex
+					skippy, err := skipCredDef(dAtA[iNdEx:])
+					if err != nil {
+						return err
+					}
+					if (skippy < 0) || (iNdEx+skippy) < 0 {
+						return ErrInvalidLengthCredDef
+					}
+					if (iNdEx + skippy) > postIndex {
+						return io.ErrUnexpectedEOF
+					}
+					iNdEx += skippy
+				}
+			}
+			m.Revocation[mapkey] = mapvalue
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

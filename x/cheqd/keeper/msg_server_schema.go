@@ -17,7 +17,7 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgCreateSchem
 		msg.Creator,
 		msg.Name,
 		msg.Version,
-		msg.Attr_names,
+		msg.AttrNames,
 	)
 
 	return &types.MsgCreateSchemaResponse{
@@ -29,11 +29,11 @@ func (k msgServer) UpdateSchema(goCtx context.Context, msg *types.MsgUpdateSchem
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	var schema = types.Schema{
-		Creator:    msg.Creator,
-		Id:         msg.Id,
-		Name:       msg.Name,
-		Version:    msg.Version,
-		Attr_names: msg.Attr_names,
+		Creator:   msg.Creator,
+		Id:        msg.Id,
+		Name:      msg.Name,
+		Version:   msg.Version,
+		AttrNames: msg.AttrNames,
 	}
 
 	// Checks that the element exists

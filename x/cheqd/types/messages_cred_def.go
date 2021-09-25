@@ -1,16 +1,18 @@
 package types
 
 import (
+	"github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var _ sdk.Msg = &MsgCreateCredDef{}
 
-func NewMsgCreateCredDef(schema_id string, tag string, signature_type string, value string) *MsgCreateCredDef {
+func NewMsgCreateCredDef(id string, schemaId string, tag string, signatureType string, value *types.Any) *MsgCreateCredDef {
 	return &MsgCreateCredDef{
-		SchemaId:      schema_id,
+		Id:            id,
+		SchemaId:      schemaId,
 		Tag:           tag,
-		SignatureType: signature_type,
+		SignatureType: signatureType,
 		Value:         value,
 	}
 }

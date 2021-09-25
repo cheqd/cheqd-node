@@ -22,16 +22,16 @@ func KeyPrefix(p string) []byte {
 }
 
 const (
-	DidKey      = "Did-value-"
-	DidCountKey = "Did-count-"
+	DidKey      = "did:"
+	DidCountKey = "Did-count:"
 )
 
 const (
-	SchemaKey      = "Schema-value-"
-	SchemaCountKey = "Schema-count-"
+	SchemaKey      = "schema:"
+	SchemaCountKey = "Schema-count:"
 )
 
 const (
-	CredDefKey      = "CredDef-value-"
-	CredDefCountKey = "CredDef-count-"
+	CredDefKey      = "CredDef:"
+	CredDefCountKey = "CredDef-count:"
 )

@@ -11,13 +11,12 @@ import (
 
 func (k msgServer) CreateCredDef(goCtx context.Context, msg *types.MsgCreateCredDef) (*types.MsgCreateCredDefResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-
 	id := k.AppendCredDef(
 		ctx,
-		msg.Creator,
-		msg.Schema_id,
+		msg.Id,
+		msg.SchemaId,
 		msg.Tag,
-		msg.Signature_type,
+		msg.SignatureType,
 		msg.Value,
 	)
 
@@ -30,12 +29,12 @@ func (k msgServer) UpdateCredDef(goCtx context.Context, msg *types.MsgUpdateCred
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	var credDef = types.CredDef{
-		Creator:        msg.Creator,
-		Id:             msg.Id,
-		Schema_id:      msg.Schema_id,
-		Tag:            msg.Tag,
-		Signature_type: msg.Signature_type,
-		Value:          msg.Value,
+		Creator:       msg.Creator,
+		Id:            msg.Id,
+		Schema_id:     msg.Schema_id,
+		Tag:           msg.Tag,
+		SignatureType: msg.SignatureType,
+		Value:         msg.Value,
 	}
 
 	// Checks that the element exists

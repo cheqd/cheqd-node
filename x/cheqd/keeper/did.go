@@ -40,17 +40,30 @@ func (k Keeper) SetDidCount(ctx sdk.Context, count uint64) {
 // AppendDid appends a did in the store with a new id and update the count
 func (k Keeper) AppendDid(
 	ctx sdk.Context,
-	creator string,
-	verkey string,
-	alias string,
+	id string,
+	controller []string,
+	verificationMethod []*VerificationMethod,
+	authentication []*types.Any,
+	assertionMethod []*types.Any,
+	capabilityInvocation []*types.Any,
+	capabilityDelegation []*types.Any,
+	keyAgreement []*types.Any,
+	alsoKnownAs []string,
+	service []*DidService,
 ) uint64 {
 	// Create the did
 	count := k.GetDidCount(ctx)
 	var did = types.Did{
-		Creator: creator,
-		Id:      count,
-		Verkey:  verkey,
-		Alias:   alias,
+		Id:                   id,
+		Controller:           controller,
+		VerificationMethod:   verificationMethod,
+		Authentication:       authentication,
+		AssertionMethod:      assertionMethod,
+		CapabilityInvocation: capabilityInvocation,
+		CapabilityDelegation: capabilityDelegation,
+		KeyAgreement:         keyAgreement,
+		AlsoKnownAs:          alsoKnownAs,
+		Service:              service,
 	}
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
@@ -71,7 +84,7 @@ func (k Keeper) SetDid(ctx sdk.Context, did types.Did) {
 }
 
 // GetDid returns a did from its id
-func (k Keeper) GetDid(ctx sdk.Context, id uint64) types.Did {
+func (k Keeper) GetDid(ctx sdk.Context, id string) types.Did {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
 	var did types.Did
 	k.cdc.MustUnmarshalBinaryBare(store.Get(GetDidIDBytes(id)), &did)
@@ -79,18 +92,13 @@ func (k Keeper) GetDid(ctx sdk.Context, id uint64) types.Did {
 }
 
 // HasDid checks if the did exists in the store
-func (k Keeper) HasDid(ctx sdk.Context, id uint64) bool {
+func (k Keeper) HasDid(ctx sdk.Context, id string) bool {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
 	return store.Has(GetDidIDBytes(id))
 }
 
-// GetDidOwner returns the creator of the did
-func (k Keeper) GetDidOwner(ctx sdk.Context, id uint64) string {
-	return k.GetDid(ctx, id).Creator
-}
-
 // RemoveDid removes a did from the store
-func (k Keeper) RemoveDid(ctx sdk.Context, id uint64) {
+func (k Keeper) RemoveDid(ctx sdk.Context, id string) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
 	store.Delete(GetDidIDBytes(id))
 }
@@ -112,13 +120,11 @@ func (k Keeper) GetAllDid(ctx sdk.Context) (list []types.Did) {
 }
 
 // GetDidIDBytes returns the byte representation of the ID
-func GetDidIDBytes(id uint64) []byte {
-	bz := make([]byte, 8)
-	binary.BigEndian.PutUint64(bz, id)
-	return bz
+func GetDidIDBytes(id string) []byte {
+	return []byte(id)
 }
 
 // GetDidIDFromBytes returns ID in uint64 format from a byte array
-func GetDidIDFromBytes(bz []byte) uint64 {
-	return binary.BigEndian.Uint64(bz)
+func GetDidIDFromBytes(bz []byte) string {
+	return string(bz)
 }

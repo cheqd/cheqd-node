@@ -10,5 +10,5 @@ message Schema {
   repeated string authors = 2;
   string name = 3;
   string version = 4;
-  repeated string attr_names = 5;
+  repeated string attrNames = 5;
 }

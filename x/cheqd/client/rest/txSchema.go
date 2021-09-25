@@ -13,11 +13,11 @@ import (
 )
 
 type createSchemaRequest struct {
-	BaseReq    rest.BaseReq `json:"base_req"`
-	Creator    string       `json:"creator"`
-	Name       string       `json:"name"`
-	Version    string       `json:"version"`
-	Attr_names string       `json:"attr_names"`
+	BaseReq   rest.BaseReq `json:"base_req"`
+	Creator   string       `json:"creator"`
+	Name      string       `json:"name"`
+	Version   string       `json:"version"`
+	AttrNames string       `json:"attrNames"`
 }
 
 func createSchemaHandler(clientCtx client.Context) http.HandlerFunc {
@@ -43,13 +43,13 @@ func createSchemaHandler(clientCtx client.Context) http.HandlerFunc {
 
 		parsedVersion := req.Version
 
-		parsedAttr_names := req.Attr_names
+		parsedAttrNames := req.AttrNames
 
 		msg := types.NewMsgCreateSchema(
 			req.Creator,
 			parsedName,
 			parsedVersion,
-			parsedAttr_names,
+			parsedAttrNames,
 		)
 
 		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
@@ -57,11 +57,11 @@ func createSchemaHandler(clientCtx client.Context) http.HandlerFunc {
 }
 
 type updateSchemaRequest struct {
-	BaseReq    rest.BaseReq `json:"base_req"`
-	Creator    string       `json:"creator"`
-	Name       string       `json:"name"`
-	Version    string       `json:"version"`
-	Attr_names string       `json:"attr_names"`
+	BaseReq   rest.BaseReq `json:"base_req"`
+	Creator   string       `json:"creator"`
+	Name      string       `json:"name"`
+	Version   string       `json:"version"`
+	AttrNames string       `json:"attrNames"`
 }
 
 func updateSchemaHandler(clientCtx client.Context) http.HandlerFunc {
@@ -92,14 +92,14 @@ func updateSchemaHandler(clientCtx client.Context) http.HandlerFunc {
 
 		parsedVersion := req.Version
 
-		parsedAttr_names := req.Attr_names
+		parsedAttrNames := req.AttrNames
 
 		msg := types.NewMsgUpdateSchema(
 			req.Creator,
 			id,
 			parsedName,
 			parsedVersion,
-			parsedAttr_names,
+			parsedAttrNames,
 		)
 
 		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)

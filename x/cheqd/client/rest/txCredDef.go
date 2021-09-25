@@ -13,12 +13,12 @@ import (
 )
 
 type createCredDefRequest struct {
-	BaseReq        rest.BaseReq `json:"base_req"`
-	Creator        string       `json:"creator"`
-	Schema_id      string       `json:"schema_id"`
-	Tag            string       `json:"tag"`
-	Signature_type string       `json:"signature_type"`
-	Value          string       `json:"value"`
+	BaseReq       rest.BaseReq `json:"base_req"`
+	Creator       string       `json:"creator"`
+	Schema_id     string       `json:"schema_id"`
+	Tag           string       `json:"tag"`
+	SignatureType string       `json:"signatureType"`
+	Value         string       `json:"value"`
 }
 
 func createCredDefHandler(clientCtx client.Context) http.HandlerFunc {
@@ -44,7 +44,7 @@ func createCredDefHandler(clientCtx client.Context) http.HandlerFunc {
 
 		parsedTag := req.Tag
 
-		parsedSignature_type := req.Signature_type
+		parsedSignature_type := req.SignatureType
 
 		parsedValue := req.Value
 
@@ -61,12 +61,12 @@ func createCredDefHandler(clientCtx client.Context) http.HandlerFunc {
 }
 
 type updateCredDefRequest struct {
-	BaseReq        rest.BaseReq `json:"base_req"`
-	Creator        string       `json:"creator"`
-	Schema_id      string       `json:"schema_id"`
-	Tag            string       `json:"tag"`
-	Signature_type string       `json:"signature_type"`
-	Value          string       `json:"value"`
+	BaseReq       rest.BaseReq `json:"base_req"`
+	Creator       string       `json:"creator"`
+	Schema_id     string       `json:"schema_id"`
+	Tag           string       `json:"tag"`
+	SignatureType string       `json:"signatureType"`
+	Value         string       `json:"value"`
 }
 
 func updateCredDefHandler(clientCtx client.Context) http.HandlerFunc {
@@ -97,7 +97,7 @@ func updateCredDefHandler(clientCtx client.Context) http.HandlerFunc {
 
 		parsedTag := req.Tag
 
-		parsedSignature_type := req.Signature_type
+		parsedSignature_type := req.SignatureType
 
 		parsedValue := req.Value
 

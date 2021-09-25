@@ -1,16 +1,35 @@
 package types
 
 import (
+	"github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var _ sdk.Msg = &MsgCreateDid{}
 
-func NewMsgCreateDid(id string, verkey string, alias string) *MsgCreateDid {
+func NewMsgCreateDid(
+	id string,
+	controller []string,
+	verificationMethod []*VerificationMethod,
+	authentication []*types.Any,
+	assertionMethod []*types.Any,
+	capabilityInvocation []*types.Any,
+	capabilityDelegation []*types.Any,
+	keyAgreement []*types.Any,
+	alsoKnownAs []string,
+	service []*DidService,
+) *MsgCreateDid {
 	return &MsgCreateDid{
-		Id:     id,
-		Verkey: verkey,
-		Alias:  alias,
+		Id:                   id,
+		Controller:           controller,
+		VerificationMethod:   verificationMethod,
+		Authentication:       authentication,
+		AssertionMethod:      assertionMethod,
+		CapabilityInvocation: capabilityInvocation,
+		CapabilityDelegation: capabilityDelegation,
+		KeyAgreement:         keyAgreement,
+		AlsoKnownAs:          alsoKnownAs,
+		Service:              service,
 	}
 }
 
@@ -36,11 +55,29 @@ func (msg *MsgCreateDid) ValidateBasic() error {
 
 var _ sdk.Msg = &MsgUpdateDid{}
 
-func NewMsgUpdateDid(id string, verkey string, alias string) *MsgUpdateDid {
+func NewMsgUpdateDid(
+	id string,
+	controller []string,
+	verificationMethod []*VerificationMethod,
+	authentication []*types.Any,
+	assertionMethod []*types.Any,
+	capabilityInvocation []*types.Any,
+	capabilityDelegation []*types.Any,
+	keyAgreement []*types.Any,
+	alsoKnownAs []string,
+	service []*DidService,
+) *MsgUpdateDid {
 	return &MsgUpdateDid{
-		Id:     id,
-		Verkey: verkey,
-		Alias:  alias,
+		Id:                   id,
+		Controller:           controller,
+		VerificationMethod:   verificationMethod,
+		Authentication:       authentication,
+		AssertionMethod:      assertionMethod,
+		CapabilityInvocation: capabilityInvocation,
+		CapabilityDelegation: capabilityDelegation,
+		KeyAgreement:         keyAgreement,
+		AlsoKnownAs:          alsoKnownAs,
+		Service:              service,
 	}
 }
 

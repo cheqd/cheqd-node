@@ -12,20 +12,20 @@ import (
 
 func CmdCreateSchema() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-schema [name] [version] [attr_names]",
+		Use:   "create-schema [name] [version] [attrNames]",
 		Short: "Creates a new schema",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			argsName := string(args[0])
 			argsVersion := string(args[1])
-			argsAttr_names := string(args[2])
+			argsAttrNames := string(args[2])
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgCreateSchema(clientCtx.GetFromAddress().String(), string(argsName), string(argsVersion), string(argsAttr_names))
+			msg := types.NewMsgCreateSchema(clientCtx.GetFromAddress().String(), string(argsName), string(argsVersion), string(argsAttrNames))
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -40,7 +40,7 @@ func CmdCreateSchema() *cobra.Command {
 
 func CmdUpdateSchema() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-schema [id] [name] [version] [attr_names]",
+		Use:   "update-schema [id] [name] [version] [attrNames]",
 		Short: "Update a schema",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -51,14 +51,14 @@ func CmdUpdateSchema() *cobra.Command {
 
 			argsName := string(args[1])
 			argsVersion := string(args[2])
-			argsAttr_names := string(args[3])
+			argsAttrNames := string(args[3])
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgUpdateSchema(clientCtx.GetFromAddress().String(), id, string(argsName), string(argsVersion), string(argsAttr_names))
+			msg := types.NewMsgUpdateSchema(clientCtx.GetFromAddress().String(), id, string(argsName), string(argsVersion), string(argsAttrNames))
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -73,7 +73,7 @@ func CmdUpdateSchema() *cobra.Command {
 
 func CmdDeleteSchema() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "delete-schema [id] [name] [version] [attr_names]",
+		Use:   "delete-schema [id] [name] [version] [attrNames]",
 		Short: "Delete a schema by id",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
