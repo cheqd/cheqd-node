@@ -6,7 +6,6 @@ import "cosmos/base/query/v1beta1/pagination.proto";
 // this line is used by starport scaffolding # 1
 import "cheqd/credDef.proto";
 import "cheqd/schema.proto";
-import "cheqd/attrib.proto";
 import "cheqd/did.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
@@ -20,10 +19,6 @@ service Query {
 
 	rpc Schema(QueryGetSchemaRequest) returns (QueryGetSchemaResponse) {
 		option (google.api.http).get = "/cheqd/cheqdnode/cheqd/schema/{id}";
-	}
-
-	rpc Attrib(QueryGetAttribRequest) returns (QueryGetAttribResponse) {
-		option (google.api.http).get = "/cheqd/cheqdnode/cheqd/attrib/{id}";
 	}
 
 	rpc Did(QueryGetDidRequest) returns (QueryGetDidResponse) {
@@ -46,14 +41,6 @@ message QueryGetSchemaRequest {
 
 message QueryGetSchemaResponse {
 	Schema Schema = 1;
-}
-
-message QueryGetAttribRequest {
-	string id = 1;
-}
-
-message QueryGetAttribResponse {
-	Attrib Attrib = 1;
 }
 
 message QueryGetDidRequest {

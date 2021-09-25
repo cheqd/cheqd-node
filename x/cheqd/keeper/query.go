@@ -23,32 +23,11 @@ func NewQuerier(k Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 		case types.QueryGetCredDef:
 			return getCredDef(ctx, path[1], k, legacyQuerierCdc)
 
-		case types.QueryListCredDef:
-			return listCredDef(ctx, k, legacyQuerierCdc)
-
 		case types.QueryGetSchema:
 			return getSchema(ctx, path[1], k, legacyQuerierCdc)
 
-		case types.QueryListSchema:
-			return listSchema(ctx, k, legacyQuerierCdc)
-
-		case types.QueryGetAttrib:
-			return getAttrib(ctx, path[1], k, legacyQuerierCdc)
-
-		case types.QueryListAttrib:
-			return listAttrib(ctx, k, legacyQuerierCdc)
-
 		case types.QueryGetDid:
 			return getDid(ctx, path[1], k, legacyQuerierCdc)
-
-		case types.QueryListDid:
-			return listDid(ctx, k, legacyQuerierCdc)
-
-		case types.QueryGetNym:
-			return getNym(ctx, path[1], k, legacyQuerierCdc)
-
-		case types.QueryListNym:
-			return listNym(ctx, k, legacyQuerierCdc)
 
 		default:
 			err = sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown %s query endpoint: %s", types.ModuleName, path[0])

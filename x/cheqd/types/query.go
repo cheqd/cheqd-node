@@ -5,10 +5,6 @@ const (
 )
 
 const (
-	QueryGetAttrib = "get-attrib"
-)
-
-const (
 	QueryGetSchema = "get-schema"
 )
 

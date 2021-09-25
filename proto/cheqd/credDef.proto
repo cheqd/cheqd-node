@@ -1,14 +1,21 @@
 syntax = "proto3";
 package cheqdid.cheqdnode.cheqd;
+import "google/protobuf/any.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
 import "gogoproto/gogo.proto";
 
 message CredDef {
-  string author = 1;
-  string schema_id = 2; 
-  string tag = 3; 
-  string signature_type = 4; 
-  string value = 5;
+  string id = 1;
+  repasted string authors = 2;
+  string schema_id = 3;
+  string tag = 4;
+  string signature_type = 5;
+  google.protobuf.Any value = 6;
+}
+
+message CredDefValue {
+  map[string, google.protobuf.Any] primary = 1;
+  optional map[string, google.protobuf.Any] revocation = 2;
 }

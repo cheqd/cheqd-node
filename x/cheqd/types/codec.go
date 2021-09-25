@@ -13,9 +13,6 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 
 	cdc.RegisterConcrete(&MsgCreateSchema{}, "cheqd/CreateSchema", nil)
 
-	cdc.RegisterConcrete(&MsgCreateAttrib{}, "cheqd/CreateAttrib", nil)
-	cdc.RegisterConcrete(&MsgUpdateAttrib{}, "cheqd/UpdateAttrib", nil)
-
 	cdc.RegisterConcrete(&MsgCreateDid{}, "cheqd/CreateDid", nil)
 	cdc.RegisterConcrete(&MsgUpdateDid{}, "cheqd/UpdateDid", nil)
 
@@ -28,10 +25,6 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreateSchema{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgCreateAttrib{},
-		&MsgUpdateAttrib{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreateDid{},

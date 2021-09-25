@@ -27,11 +27,6 @@ const (
 )
 
 const (
-	AttribKey      = "Attrib-value-"
-	AttribCountKey = "Attrib-count-"
-)
-
-const (
 	SchemaKey      = "Schema-value-"
 	SchemaCountKey = "Schema-count-"
 )

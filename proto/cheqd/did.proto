@@ -7,6 +7,29 @@ import "gogoproto/gogo.proto";
 
 message Did {
   string id = 1;
-  string verkey = 2;
-  string alias = 3;
+  optional repeated string controller = 2;
+  optional repeated VerificationMethod verificationMethod = 3;
+  optional repeated google.protobuf.Any authentication = 4;
+  optional repeated google.protobuf.Any assertionMethod = 5;
+  optional repeated google.protobuf.Any capabilityInvocation = 6;
+  optional repeated google.protobuf.Any capabilityDelegation = 7;
+  optional repeated google.protobuf.Any keyAgreement = 8;
+  optional repeated string alsoKnownAs = 9;
+  optional repeated DidService service = 10;
 }
+
+message VerificationMethod {
+  string id = 1;
+  string type = 2;
+  string controller = 3;
+  optional map[string,string] publicKeyJwk = 3;
+  optional string publicKeyMultibase = 3;
+}
+
+message DidService {
+  string id = 1;
+  string type = 2;
+  string serviceEndpoint = 3;
+}
+
+
