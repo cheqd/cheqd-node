@@ -118,7 +118,7 @@ jobs:
 
       - name: Promote deb node to validator
         run: |
-          chown -R runner ${{ env.NODE_CONFIGS_BASE }}/client/.cheqdnode
+          sudo chown -R runner ${{ env.NODE_CONFIGS_BASE }}/client/.cheqdnode
           ls -la ${{ env.NODE_CONFIGS_BASE }}/client/.cheqdnode
           ls -la ${{ env.NODE_CONFIGS_BASE }}/client/.cheqdnode/config
           cheqd-noded keys list --home ${{ env.NODE_CONFIGS_BASE }}/client/.cheqdnode/
