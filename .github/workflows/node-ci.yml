@@ -122,5 +122,6 @@ jobs:
           sudo chown -R runner:docker ${{ env.NODE_CONFIGS_BASE }}
           ls -la ${{ env.NODE_CONFIGS_BASE }}/client/.cheqdnode
           ls -la ${{ env.NODE_CONFIGS_BASE }}/client/.cheqdnode/config
+          cp -a ${{ env.NODE_CONFIGS_BASE }}/client/.cheqdnode/. /home/runner/
+          ls -la /home/runner
           cheqd-noded keys list --home ${{ env.NODE_CONFIGS_BASE }}/client/.cheqdnode
-          cheqd-noded tendermint show-node-id --home ${{ env.NODE_CONFIGS_BASE }}/client/.cheqdnode
