@@ -15,7 +15,7 @@ description: >-
 
 ## Proposed
 
-1. [ADR 002: **Identity entities and transactions**](adr_002_identity_transactions.md)
+1. [ADR 002: **Identity entities and transactions**](adr-002-identity-transactions.md)
 
 ## Draft
 
