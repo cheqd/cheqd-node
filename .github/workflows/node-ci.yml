@@ -121,7 +121,7 @@ jobs:
         run: |
           sudo chown -R runner:docker ${{ env.NODE_CONFIGS_BASE }}
           rm -rf /home/runner/.cheqdnode
-          cp -a ${{ env.NODE_CONFIGS_BASE }}/client/.cheqdnode/. /home/runner/
+          cp -a ${{ env.NODE_CONFIGS_BASE }}/client/.cheqdnode/. /home/runner/.cheqdnode/
           ls -la /home/runner
           ls -la /home/runner/.cheqdnode
           cheqd-noded keys list --home ${{ env.NODE_CONFIGS_BASE }}/client/.cheqdnode
