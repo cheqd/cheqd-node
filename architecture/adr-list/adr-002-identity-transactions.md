@@ -62,7 +62,6 @@ Some examples of `did:cheqd` method identifiers are:
 - A DID written to the cheqd testnet ledger:
   `did:cheqd:testnet:6cgbu8ZPoWTnR5Rv5JcSMB`
 
-
 ### General structure of transaction requests
 
 All identity requests will have the following format:
@@ -78,10 +77,10 @@ All identity requests will have the following format:
 }
 ```
 
-* **`data`**: Data requested to be written to the ledger, specific for each request type.
-* **`creators`**: Creators identifiers (DID) list for this entity. There should be a new DIDs or an existing DIDs, for existing entities.
-* **`signatures`**: `data` should be signed by all `creators` private key. This field contains a dict there creator's public key is a key, and the signature is a value.
-* **`metadata`**: Dictionary with additional metadata fields. Empty for now. This fields provides extensibility in the future, e.g., it can contain `protocolVersion` or other relevant metadata associated with a request.
+- **`data`**: Data requested to be written to the ledger, specific for each request type.
+- **`creators`**: Creators identifiers (DID) list for this entity. There should be a new DIDs or an existing DIDs, for existing entities.
+- **`signatures`**: `data` should be signed by all `creators` private key. This field contains a dict there creator's public key is a key, and the signature is a value.
+- **`metadata`**: Dictionary with additional metadata fields. Empty for now. This fields provides extensibility in the future, e.g., it can contain `protocolVersion` or other relevant metadata associated with a request.
 
 ## List of transactions and details
 
@@ -89,7 +88,7 @@ All identity requests will have the following format:
 
 [Decentralized Identifiers \(DIDs\) are a W3C specification](https://www.w3.org/TR/did-core/) for identifiers that enable verifiable, decentralized digital identity.
 
-DIDDoc format conforms to [DIDDoc spec]().
+DIDDoc format conforms to [DIDDoc spec](https://www.w3.org/TR/did-core/#representations).
 The request can be used for creation of new DIDDoc, setting, and rotation of verification key.
 
 #### DIDDoc
@@ -102,9 +101,10 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 6. **`capabilityInvocation`** (optional): A list of Verification Methods or strings with key aliases
 7. **`capabilityDelegation`** (optional): A list of Verification Methods or strings with key aliases
 8. **`service`** (optional): A set of Service Endpoint maps
-9.  **`@context`** (optional): A list of strings
+9. **`@context`** (optional): A list of strings
 
 **Example:**
+
 ```json
 {
   "@context": [
@@ -147,7 +147,6 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
  }
 ```
 
-
 #### Verification Method
 
 1. **`id`** (string): A string with format `<DIDDoc-id>#<key-alias`
@@ -157,6 +156,7 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 5. **`publicKeyMultibase`** (optional): A base58-encoded string that conforms to a [MULTIBASE](https://datatracker.ietf.org/doc/html/draft-multiformats-multibase-03) encoded public key.
 
 **Example:**
+
 ```json
 {
   "id": "N22KY2Dyvmuu2PyyqSFKue#key-0",
@@ -168,7 +168,6 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
     "x": "VCpo2LMLhn6iWku8MKvSLg2ZAoC-nlOyPVQaO3FxVeQ" // external (property name)
 }
 ```
-
 
 #### Service
 
@@ -188,19 +187,19 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 }]
 ```
 
-#### **Update DID**
+#### **Update `DID`**
 
 If there is no DID transaction with the specified DID \(`dest`\), it is considered as a creation request for a new DID.
 
 If there is a DID transaction with the specified DID \(`dest`\), then this is update of existing DID. In this case, we can specify only the values we would like to override. All unspecified values remain the same. E.g., if a key rotation needs to be performed, the owner of the DID needs to send a DID transaction request with `dest`, `verkey` only. `alias` will stay the same.
 
-**Note:** Fields `dest` and `owner` should have the same value.
+**Note**: Fields `dest` and `owner` should have the same value.
 
 #### State format
 
 `id -> {encode(data, creators), tx_hash, tx_timestamp }`
 
-### SCHEMA
+### `SCHEMA`
 
 This transaction is used to create a Schema associated with credentials.
 
@@ -208,13 +207,13 @@ It is not possible to update an existing Schema, to ensure the original schema u
 
 If a Schema evolves, a new schema with a new version or name needs to be created.
 
-* **`data`**: Dictionary with Schema's data:
-    * **`id`**: DID as base58-encoded string for 16 or 32 byte DID value.
-    * **`attr_names`**: Array of attribute name strings (125 attributes maximum)
-    * **`name`**: Schema's name string
-    * **`version`**: Schema's version string
+- **`data`**: Dictionary with Schema's data:
+  - **`id`**: DID as base58-encoded string for 16 or 32 byte DID value.
+  - **`attr_names`**: Array of attribute name strings (125 attributes maximum)
+  - **`name`**: Schema's name string
+  - **`version`**: Schema's version string
 
-#### SCHEMA transaction format
+#### `SCHEMA` transaction format
 
 ```json
 {
@@ -225,27 +224,27 @@ If a Schema evolves, a new schema with a new version or name needs to be created
 }
 ```
 
-**Note:** SCHEMA **cannot** be updated
+**Note**: `SCHEMA` **cannot** be updated
 
-#### State format
+#### `SCHEMA` State format
 
 `id -> {encode(data, creators), tx_hash, tx_timestamp }`
 
-### CRED_DEF
+### `CRED_DEF`
 
 Adds a Credential Definition (in particular, public key), which is created by an Issuer and published for a particular Credential Schema.
 
 It is not possible to update `data` in existing Credential Definitions. If a Credential Definition needs to be evolved \(for example, a key needs to be rotated\), then a new Credential Definition needs to be created by a new Issuer DID \(`owner`\).
 
-* **`id`**: DID as base58-encoded string for 16 or 32 byte DID value.
-* **`value`** \(dict\): Dictionary with Credential Definition's data if `signature_type` is `CL`:
-  * **`primary`** (dict): Primary credential public key
-  * **`revocation`** (dict, optional): Revocation credential public key
-* **`ref`** (string): Hash of a Schema transaction the credential definition is created for.
-* **`signature_type`** (string): Type of the credential definition \(that is credential signature\). `CL` \(Camenisch-Lysyanskaya\) is the only supported type now. Other signature types are being explored for future releases.
-* **`tag`** (string, optional): A unique tag to have multiple public keys for the same Schema and type issued by the same DID. A default tag `tag` will be used if not specified.
+- **`id`**: DID as base58-encoded string for 16 or 32 byte DID value.
+- **`value`** \(dict\): Dictionary with Credential Definition's data if `signature_type` is `CL`:
+  - **`primary`** (dict): Primary credential public key
+  - **`revocation`** (dict, optional): Revocation credential public key
+- **`ref`** (string): Hash of a Schema transaction the credential definition is created for.
+- **`signature_type`** (string): Type of the credential definition \(that is credential signature\). `CL` \(Camenisch-Lysyanskaya\) is the only supported type now. Other signature types are being explored for future releases.
+- **`tag`** (string, optional): A unique tag to have multiple public keys for the same Schema and type issued by the same DID. A default tag `tag` will be used if not specified.
 
-#### CRED_DEF transaction format:
+#### `CRED_DEF` transaction format
 
 ```json
 {
@@ -260,14 +259,13 @@ It is not possible to update `data` in existing Credential Definitions. If a Cre
 }
 ```
 
-**Note**: CRED_DEF **cannot** be updated.
+**Note**: `CRED_DEF` **cannot** be updated.
 
-#### State format
+#### `CRED_DEF` state format
 
 `id -> {encode(data, creators), tx_hash, tx_timestamp }`
 
 ## References
 
-* [Hyperledger Indy Identity transactions](https://github.com/hyperledger/indy-node/blob/master/docs/source/transactions.md)
-* [W3 DID Spec](https://www.w3.org/TR/did-core/)
-
+- [Hyperledger Indy Identity transactions](https://github.com/hyperledger/indy-node/blob/master/docs/source/transactions.md)
+- [W3 DID Spec](https://www.w3.org/TR/did-core/)
