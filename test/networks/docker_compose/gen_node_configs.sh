@@ -50,7 +50,7 @@ pushd $OPERATORS_HOME
 echo "Initializing genesis..."
 cheqd_noded_docker init dummy_node --chain-id $CHAIN_ID
 sudo chmod -R 777 /home/runner/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs || echo "I'm not in pipeline" # FIXME
-sed -i $sed_extension 's/"stake"/"cheq"/' .cheqdnode/config/genesis.json
+sed -i $sed_extension 's/"stake"/"ncheq"/' .cheqdnode/config/genesis.json
 
 echo "Generating operator keys..."
 
