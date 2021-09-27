@@ -120,8 +120,8 @@ jobs:
       - name: Promote deb node to validator
         run: |
           sudo chown -R runner:docker ${{ env.NODE_CONFIGS_BASE }}
-          ls -la ${{ env.NODE_CONFIGS_BASE }}/client/.cheqdnode
-          ls -la ${{ env.NODE_CONFIGS_BASE }}/client/.cheqdnode/config
+          rm -rf /home/runner/.cheqdnode
           cp -a ${{ env.NODE_CONFIGS_BASE }}/client/.cheqdnode/. /home/runner/
           ls -la /home/runner
+          ls -la /home/runner/.cheqdnode
           cheqd-noded keys list --home ${{ env.NODE_CONFIGS_BASE }}/client/.cheqdnode
