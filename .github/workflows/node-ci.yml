@@ -107,5 +107,7 @@ jobs:
           PEER0=$(cat ~/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs/node0/node_id.txt)@node0:26656
           echo $PEER0
           sed -ri "s|persistent_peers = \".*\"|persistent_peers = \"${PEER0}\"|" config/config.toml
+          sed -ri "s|laddr = \"tcp://127.0.0.1:26657\"|laddr = \"tcp://127.0.0.1:26677\"|" config/config.toml
+          sed -ri "s|laddr = \"tcp://0.0.0.0:26656\"|laddr = \"tcp://0.0.0.0:26676\"|" config/config.toml
           cat config/config.toml
           cheqd-noded start --home .
