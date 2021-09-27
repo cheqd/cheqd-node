@@ -104,7 +104,8 @@ jobs:
           cd && mkdir node5 && cd node5
           cheqd-noded init node5 --home .
           cp ~/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs/node0/.cheqdnode/config/genesis.json config/
-          PEER0=$(cat ~/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs/node0/node_id.txt)@node0:26656
+          docker inspect docker_compose_node0_1
+          PEER0=$(cat ~/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs/node0/node_id.txt)@$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}'' docker_compose_node0_1):26656
           echo $PEER0
           sed -ri "s|persistent_peers = \".*\"|persistent_peers = \"${PEER0}\"|" config/config.toml
           sed -ri "s|laddr = \"tcp://127.0.0.1:26657\"|laddr = \"tcp://127.0.0.1:26677\"|" config/config.toml
