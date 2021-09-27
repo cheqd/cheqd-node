@@ -103,7 +103,7 @@ jobs:
         run: |
           cd && mkdir node5 && cd node5
           cheqd-noded init node5 --home .
-          echo $NODE_ID
-          ls -l ~/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs
-          ls -l ~/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs/node3
-          docker inspect docker_compose_node3_1
+          ls -la cp ~/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs/node0
+          cp ~/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs/node0/.cheqdnoded/config/genesis.json config/
+          cat ~/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs/node0/node_id.txt
+          docker inspect docker_compose_node0_1
