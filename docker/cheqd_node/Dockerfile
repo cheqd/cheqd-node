@@ -45,7 +45,6 @@ RUN chown -R cheqd /cheqd
 WORKDIR /cheqd
 USER cheqd
 
-VOLUME /cheqd
 EXPOSE 26656 26657
 STOPSIGNAL SIGTERM
 
