@@ -106,6 +106,6 @@ jobs:
           cp ~/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs/node0/.cheqdnode/config/genesis.json config/
           PEER0=$(cat ~/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs/node0/node_id.txt)@node0:26656
           echo $PEER0
-          sed -i 's/persistent\_peers\=\"\"/persistent\_peers\=\"${PEER0}\"/' config/config.toml
+          sed -ri 's/persistent\_peers\=\"\"/persistent\_peers\=\"${PEER0}\"/' config/config.toml
           cat config/config.toml
           cheqd-noded start --home .
