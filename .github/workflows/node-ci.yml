@@ -105,6 +105,7 @@ jobs:
       - name: Add deb node as observer
         run: |
           cd && mkdir node5 && cd node5
+          pwd
           cheqd-noded init node5 --home .
           cp ${{ env.NODE_CONFIGS_BASE }}/node0/.cheqdnode/config/genesis.json config/
           PEER0=$(cat ${{ env.NODE_CONFIGS_BASE }}/node0/node_id.txt)@$(docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} docker_compose_node0_1):26656
@@ -121,6 +122,6 @@ jobs:
           sudo chown -R runner:docker ${{ env.NODE_CONFIGS_BASE }}
           ls -la ${{ env.NODE_CONFIGS_BASE }}/client/.cheqdnode
           ls -la ${{ env.NODE_CONFIGS_BASE }}/client/.cheqdnode/config
-          cheqd-noded keys list --home ${{ env.NODE_CONFIGS_BASE }}/client/.cheqdnode/
+          cheqd-noded keys list --home ${{ env.NODE_CONFIGS_BASE }}/client/.cheqdnode
           cheqd-noded tendermint show-node-id --home ${{ env.NODE_CONFIGS_BASE }}/node0/.cheqdnode
           cheqd-noded tendermint show-node-id --home ${{ env.NODE_CONFIGS_BASE }}/node1/.cheqdnode
