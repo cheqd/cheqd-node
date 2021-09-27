@@ -25,7 +25,7 @@ NODE_0_VAL_PUBKEY=$(cheqd-noded tendermint show-validator)
 
 echo "##### [Node 0] Setting fee"
 
-sed -i $sed_extension 's/minimum-gas-prices = ""/minimum-gas-prices = "2500000ncheq"/g' "$HOME/.cheqdnode/config/app.toml"
+sed -i $sed_extension 's/minimum-gas-prices = ""/minimum-gas-prices = "25ncheq"/g' "$HOME/.cheqdnode/config/app.toml"
 
 echo "##### [Validator operator] Generating key"
 
