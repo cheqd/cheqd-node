@@ -206,6 +206,12 @@ cheqd-noded tendermint show-node-id
 
 Validator address is a function of validator's public key. To get `bech32` encoded validator address run this command on node's machine:
 
+```
+cheqd-noded tendermint show-validator
+```
+
+Result should look like:
+
 ```text
 cosmosvalcons1l43yqtdjcvyj65vnp29ly8u8yyau92q0ptzdp0
 ```
