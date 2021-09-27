@@ -36,7 +36,7 @@ do
     echo "Setting minimum fee price..."
 
     sudo chmod -R 777 /home/runner/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs || echo "I'm not in pipeline" # FIXME
-    sed -i $sed_extension 's/minimum-gas-prices = ""/minimum-gas-prices = "0.00'$i'cheq"/g' .cheqdnode/config/app.toml
+    sed -i $sed_extension 's/minimum-gas-prices = ""/minimum-gas-prices = "25ncheq"/g' .cheqdnode/config/app.toml
 
     popd
 done
