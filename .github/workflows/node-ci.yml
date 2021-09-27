@@ -103,3 +103,4 @@ jobs:
         run: |
           cd && mkdir node5 && cd node5
           cheqd-noded init node5 --home .
+          ls -l
