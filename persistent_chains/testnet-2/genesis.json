@@ -66,9 +66,7 @@
       "index": "1",
       "owners": []
     },
-    "cheqd": {
-      "nymList": []
-    },
+    "cheqd": {},
     "crisis": {
       "constant_fee": {
         "denom": "ncheq",
