@@ -122,3 +122,5 @@ jobs:
           ls -la ${{ env.NODE_CONFIGS_BASE }}/client/.cheqdnode
           ls -la ${{ env.NODE_CONFIGS_BASE }}/client/.cheqdnode/config
           cheqd-noded keys list --home ${{ env.NODE_CONFIGS_BASE }}/client/.cheqdnode/
+          cheqd-noded tendermint show-node-id --home ${{ env.NODE_CONFIGS_BASE }}/node0/.cheqdnode
+          cheqd-noded tendermint show-node-id --home ${{ env.NODE_CONFIGS_BASE }}/node1/.cheqdnode
