@@ -33,7 +33,7 @@ do
 
     echo "Setting minimum fee price..."
 
-    sed -i $sed_extension 's/minimum-gas-prices = ""/minimum-gas-prices = "0.00'$i'cheq"/g' .cheqdnode/config/app.toml
+    sed -i $sed_extension 's/minimum-gas-prices = ""/minimum-gas-prices = "25ncheq"/g' .cheqdnode/config/app.toml
 
     popd
 done
@@ -45,7 +45,7 @@ pushd $OPERATORS_HOME
 
 echo "Initializing genesis..."
 cheqd_noded_docker init dummy_node --chain-id $CHAIN_ID
-sed -i $sed_extension 's/"stake"/"cheq"/' .cheqdnode/config/genesis.json
+sed -i $sed_extension 's/"stake"/"ncheq"/' .cheqdnode/config/genesis.json
 
 echo "Generating operator keys..."
 
@@ -58,7 +58,7 @@ echo "Creating genesis accounts..."
 
 for ((i=0 ; i<$VALIDATORS_COUNT ; i++))
 do
-    cheqd_noded_docker add-genesis-account "operator$i" 20000000cheq
+    cheqd_noded_docker add-genesis-account "operator$i" 20000000000000000ncheq
 done
 
 echo "Creating genesis validators..."
@@ -73,7 +73,7 @@ do
 
     popd
 
-    cheqd_noded_docker gentx "operator$i" 1000000cheq --chain-id $CHAIN_ID --node-id $NODE_ID --pubkey $NODE_VAL_PUBKEY
+    cheqd_noded_docker gentx "operator$i" 1000000000000000ncheq --chain-id $CHAIN_ID --node-id $NODE_ID --pubkey $NODE_VAL_PUBKEY
 done
 
 echo "Collecting them..."
@@ -115,7 +115,7 @@ do
     cp "$OPERATORS_HOME/.cheqdnode/config/genesis.json" ".cheqdnode/config/"
 
     echo "##### [Observer $i] Setting min gas prices..."
-    sed -i $sed_extension 's/minimum-gas-prices = ""/minimum-gas-prices = "'$i'cheq"/g' .cheqdnode/config/app.toml
+    sed -i $sed_extension 's/minimum-gas-prices = ""/minimum-gas-prices = "25ncheq"/g' .cheqdnode/config/app.toml
 
     popd
 done
