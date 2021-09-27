@@ -43,7 +43,7 @@ func (k Keeper) AppendSchema(
 	name string,
 	version string,
 	attrNames []string,
-) uint64 {
+) string {
 	// Create the schema
 	count := k.GetSchemaCount(ctx)
 	var schema = types.Schema{
@@ -60,7 +60,7 @@ func (k Keeper) AppendSchema(
 	// Update schema count
 	k.SetSchemaCount(ctx, count+1)
 
-	return count
+	return id
 }
 
 // SetSchema set a specific schema in the store

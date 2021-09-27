@@ -3,6 +3,7 @@ package keeper
 import (
 	"encoding/binary"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"strconv"
@@ -42,15 +43,15 @@ func (k Keeper) AppendDid(
 	ctx sdk.Context,
 	id string,
 	controller []string,
-	verificationMethod []*VerificationMethod,
+	verificationMethod []*types.VerificationMethod,
 	authentication []*types.Any,
 	assertionMethod []*types.Any,
 	capabilityInvocation []*types.Any,
 	capabilityDelegation []*types.Any,
 	keyAgreement []*types.Any,
 	alsoKnownAs []string,
-	service []*DidService,
-) uint64 {
+	service []*types.DidService,
+) string {
 	// Create the did
 	count := k.GetDidCount(ctx)
 	var did = types.Did{
@@ -73,7 +74,7 @@ func (k Keeper) AppendDid(
 	// Update did count
 	k.SetDidCount(ctx, count+1)
 
-	return count
+	return id
 }
 
 // SetDid set a specific did in the store
@@ -89,6 +90,11 @@ func (k Keeper) GetDid(ctx sdk.Context, id string) types.Did {
 	var did types.Did
 	k.cdc.MustUnmarshalBinaryBare(store.Get(GetDidIDBytes(id)), &did)
 	return did
+}
+
+// areOwners returns a bool are received authors can control this DID
+func (k Keeper) areDidOwners(ctx sdk.Context, id string, authors []string) bool {
+	return utils.CompareOwners(authors, k.GetDid(ctx, id).Controller)
 }
 
 // HasDid checks if the did exists in the store

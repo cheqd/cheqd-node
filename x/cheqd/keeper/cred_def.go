@@ -3,6 +3,7 @@ package keeper
 import (
 	"encoding/binary"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"strconv"
@@ -44,7 +45,7 @@ func (k Keeper) AppendCredDef(
 	schemaId string,
 	tag string,
 	signatureType string,
-	value *types.Any,
+	credDefValue *types.Any,
 ) string {
 	// Create the credDef
 	count := k.GetCredDefCount(ctx)
@@ -53,7 +54,7 @@ func (k Keeper) AppendCredDef(
 		SchemaId:      schemaId,
 		Tag:           tag,
 		SignatureType: signatureType,
-		Value:         value,
+		Value:         credDefValue,
 	}
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CredDefKey))

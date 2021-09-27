@@ -9,57 +9,64 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*types.MsgCreateDidResponse, error) {
+func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgWriteRequest) (*types.MsgCreateDidResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	id := k.AppendDid(
+	didMsg, isMsgIdentity := msg.Data.GetCachedValue().(*types.MsgCreateDid)
+	if !isMsgIdentity {
+		errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName, msg)
+		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
+	}
+	k.AppendDid(
 		ctx,
-		msg.Creator,
-		msg.Verkey,
-		msg.Alias,
+		didMsg.Id,
+		didMsg.Controller,
+		didMsg.VerificationMethod,
+		didMsg.Authentication,
+		didMsg.AssertionMethod,
+		didMsg.CapabilityInvocation,
+		didMsg.CapabilityDelegation,
+		didMsg.KeyAgreement,
+		didMsg.AlsoKnownAs,
+		didMsg.Service,
 	)
 
 	return &types.MsgCreateDidResponse{
-		Id: id,
+		Id: didMsg.Id,
 	}, nil
 }
 
-func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*types.MsgUpdateDidResponse, error) {
+func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) (*types.MsgUpdateDidResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-
+	didMsg, isMsgIdentity := msg.Data.GetCachedValue().(*types.MsgUpdateDid)
+	if !isMsgIdentity {
+		errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName, msg)
+		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
+	}
 	var did = types.Did{
-		Creator: msg.Creator,
-		Id:      msg.Id,
-		Verkey:  msg.Verkey,
-		Alias:   msg.Alias,
+		Id:                   didMsg.Id,
+		Controller:           didMsg.Controller,
+		VerificationMethod:   didMsg.VerificationMethod,
+		Authentication:       didMsg.Authentication,
+		AssertionMethod:      didMsg.AssertionMethod,
+		CapabilityInvocation: didMsg.CapabilityInvocation,
+		CapabilityDelegation: didMsg.CapabilityDelegation,
+		KeyAgreement:         didMsg.KeyAgreement,
+		AlsoKnownAs:          didMsg.AlsoKnownAs,
+		Service:              didMsg.Service,
 	}
 
 	// Checks that the element exists
-	if !k.HasDid(ctx, msg.Id) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %d doesn't exist", msg.Id))
+	if !k.HasDid(ctx, didMsg.Id) {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %s doesn't exist", didMsg.Id))
 	}
 
 	// Checks if the the msg sender is the same as the current owner
-	if msg.Creator != k.GetDidOwner(ctx, msg.Id) {
+
+	if !k.areDidOwners(ctx, didMsg.Id, msg.Authors) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
 	}
 
 	k.SetDid(ctx, did)
 
 	return &types.MsgUpdateDidResponse{}, nil
-}
-
-func (k msgServer) DeleteDid(goCtx context.Context, msg *types.MsgDeleteDid) (*types.MsgDeleteDidResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	if !k.HasDid(ctx, msg.Id) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %d doesn't exist", msg.Id))
-	}
-	if msg.Creator != k.GetDidOwner(ctx, msg.Id) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
-	}
-
-	k.RemoveDid(ctx, msg.Id)
-
-	return &types.MsgDeleteDidResponse{}, nil
 }
