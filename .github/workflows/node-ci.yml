@@ -80,8 +80,8 @@ jobs:
     steps:
       - name: Download and install deb package
         run: |
-          wget https://github.com/cheqd/cheqd-node/releases/download/v0.1.21/cheqd-node_0.1.21_amd64.deb > /dev/null
-          sudo dpkg -i cheqd-node_0.1.21_amd64.deb
+          wget https://github.com/cheqd/cheqd-node/releases/download/v0.2.1/cheqd-node_0.2.1_amd64.deb > /dev/null
+          sudo dpkg -i cheqd-node_0.2.1_amd64.deb
           cheqd-noded help
 
       - name: Check out
