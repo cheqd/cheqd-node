@@ -80,6 +80,8 @@ jobs:
     name: Install deb package and set up Docker pool
     runs-on: ubuntu-20.04 # exact version, not latest
     # needs: build-node-and-testnet-images
+    env:
+      HOME: "~/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs"
     steps:
       - name: Download and install deb package
         run: |
@@ -120,4 +122,6 @@ jobs:
       - name: Promote deb node to validator
         run: |
           sudo chown -R runner:docker ${{ env.NODE_CONFIGS_BASE }}
-          HOME="${{ env.NODE_CONFIGS_BASE }}/client/.cheqdnode" cheqd-noded keys list
+          rm -rf /home/runner/.cheqdnode
+          cp -a ~/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs/client/.cheqdnode/. /home/runner/.cheqdnode/
+          cheqd-noded keys list --home ~/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs/client/.cheqdnode
