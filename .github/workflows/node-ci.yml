@@ -128,3 +128,6 @@ jobs:
           echo $OP5_ADDRESS
           OP0_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p)
           echo $OP0_ADDRESS
+          OP5_PUBKEY=$(cheqd-noded keys list | sed -nr 's/.*"key":"(.*?).*/\1/p' | sed -n 1p)
+          echo $OP5_PUBKEY
+
