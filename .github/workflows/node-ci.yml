@@ -123,4 +123,8 @@ jobs:
           rm -rf /home/runner/.cheqdnode
           cp -a ~/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs/client/.cheqdnode/. /home/runner/.cheqdnode/
           cheqd-noded keys add node5-operator
-          cheqd-noded keys list | sed -nr 's/.*address: (.*)\n.*/\1/p'
+          cheqd-noded keys list
+          OP5_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p)
+          echo $OP5_ADDRESS
+          OP0_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p)
+          echo $OP0_ADDRESS
