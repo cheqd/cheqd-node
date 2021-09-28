@@ -68,7 +68,7 @@ Some examples of `did:cheqd` method identifiers are:
 
 All identity requests will have the following format:
 
-```json
+```javascript
 {
     "data": { "<request data for writing a transaction to the ledger>" },
     "creators": ["<identifier>", "..."],
@@ -107,7 +107,7 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 
 **Example:**
 
-```json
+```javascript
 {
   "@context": [
     "https://www.w3.org/ns/did/v1",
@@ -159,7 +159,7 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 
 **Example:**
 
-```json
+```javascript
 {
   "id": "N22KY2Dyvmuu2PyyqSFKue#key-0",
   "type": "JsonWebKey2020",
@@ -179,7 +179,7 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 
 **Example:**
 
- ```json
+ ```javascript
 "service": [{
   "id":"N22KY2Dyvmuu2PyyqSFKue#linked-domain",
   "type": "LinkedDomains",
@@ -215,7 +215,7 @@ If a Schema evolves, a new schema with a new version or name needs to be created
 
 #### `SCHEMA` transaction format
 
-```json
+```javascript
 {
   "id": "N22KY2Dyvmuu2PyyqSFKue",
   "version": "1.0",
@@ -247,7 +247,7 @@ It is not possible to update `data` in existing Credential Definitions. If a Cre
 
 #### `CRED_DEF` transaction format
 
-```json
+```javascript
 {
   "id": "N22KY2Dyvmuu2PyyqSFKue",
   "signature_type": "CL",
