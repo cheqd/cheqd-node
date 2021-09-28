@@ -130,4 +130,5 @@ jobs:
           echo $OP0_ADDRESS
           OP5_PUBKEY=$(cheqd-noded keys list | sed -nr 's/.*"key":"(.*?)".*/\1/p' | sed -n 1p)
           echo $OP5_PUBKEY
-
+          cheqd-noded tx bank send $OP0_ADDRESS $OP5_ADDRESS 1000000000000000ncheq --chain-id cheqd
+          cheqd-noded tx staking create-validator --amount 1000000stake --from node5-operator --chain-id cheqd --min-self-delegation="1" --gas="auto" --gas-prices="25ncheq" --pubkey $OP5_PUBKEY --commission-max-change-rate="0.02" --commission-max-rate="0.02" --commission-rate="0.01" --gas 239933
