@@ -23,6 +23,7 @@ COPY vue ./vue
 COPY x ./x
 COPY go.mod .
 COPY go.sum .
+COPY .git .
 
 RUN starport chain build
 
