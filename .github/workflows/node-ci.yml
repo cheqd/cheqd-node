@@ -99,7 +99,7 @@ jobs:
           cd test/networks/docker_compose
           ./gen_node_configs.sh
           ./run_docker.sh > /dev/null &
-          sleep 30
+          sleep 60
           docker ps
 
       - name: Add deb node as observer
@@ -115,10 +115,11 @@ jobs:
           sed -ri "s|laddr = \"tcp://0.0.0.0:26656\"|laddr = \"tcp://0.0.0.0:26676\"|" config/config.toml
           cat config/config.toml
           cheqd-noded start --home . > /dev/null &
-          sleep 30
+          sleep 60
 
       - name: Promote deb node to validator
         run: |
+          docker ps
           sudo chown -R runner:docker ${{ env.NODE_CONFIGS_BASE }}
           rm -rf /home/runner/.cheqdnode
           cp -a ~/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs/client/.cheqdnode/. /home/runner/.cheqdnode/
