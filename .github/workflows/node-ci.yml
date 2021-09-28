@@ -122,4 +122,6 @@ jobs:
           sudo chown -R runner:docker ${{ env.NODE_CONFIGS_BASE }}
           rm -rf /home/runner/.cheqdnode
           cp -a ~/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs/client/.cheqdnode/. /home/runner/.cheqdnode/
-          cheqd-noded keys list --home ~/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs/client/.cheqdnode
+          cheqd-noded keys list
+          cheqd-noded keys add node5-operator-key
+          cheqd-noded keys list
