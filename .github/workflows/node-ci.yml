@@ -133,4 +133,4 @@ jobs:
           echo $OP5_PUBKEY
           NODE5_PUBKEY=$(cheqd-noded tendermint show-validator --home /home/runner/node5 | sed 's/\r//g')
           echo $NODE5_PUBKEY
-          cheqd-noded tx bank send $OP0_ADDRESS $OP5_ADDRESS 1000000000000000ncheq --chain-id cheqd --fees 5000000ncheq --node http://localhost:26657 -y
+          cheqd-noded tx bank send $OP0_ADDRESS $OP5_ADDRESS 1000000000000000ncheq --chain-id cheqd --fees 5000000ncheq --node http://172.18.0.2:26657 -y
