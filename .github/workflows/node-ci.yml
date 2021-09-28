@@ -100,7 +100,7 @@ jobs:
           cd test/networks/docker_compose
           ./gen_node_configs.sh
           ./run_docker.sh > /dev/null &
-          sleep 300
+          sleep 600
           docker ps
 
       - name: Add deb node as observer
