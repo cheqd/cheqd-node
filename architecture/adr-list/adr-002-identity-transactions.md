@@ -53,7 +53,7 @@ The `did:cheqd` method DID has four components that are concatenated to make a W
 - **DID**: the hardcoded string `did:` to indicate the identifier is a DID
 - **`cheqd` DID method**: the hardcoded string `cheqd:` indicating that the identifier uses the `cheqd` DID method specification.
 - **Namespace**: A string that identifies the name of the primary cheqd ledger ("mainnet"), followed by a `:`. The namespace string may optionally have a secondary ledger name prefixed by a `:` following the primary name. If there is no secondary ledger element, the DID resides on the primary ledger ("mainnet"), else it resides on the secondary ledger. By convention, the primary is a production ledger while the secondary ledgers are non-production ledgers (e.g. testnet) associated with the primary ledger.
-- **Namespace Identifier**: A self-certified identifier unique to the given cheqd DID ledger namespace. To be self-certifying, the identifier must be derived from the initial `verkey` associated with the identifier.
+- **Namespace Identifier**: A self-certified identifier unique to the given cheqd DID ledger namespace.
 
 The components are assembled as follows:
 
@@ -68,20 +68,20 @@ Some examples of `did:cheqd` method identifiers are:
 
 All identity requests will have the following format:
 
-```javascript
+```json
 {
     "data": { "<request data for writing a transaction to the ledger>" },
-    "creators": ["<identifier>", "..."],
+    "authors": ["<identifier>", "..."],
     "signatures": [
-        "<public_key>": "<signature>",
+        "<verification method id>": "<signature>",
       ],
     "metadata": {}
 }
 ```
 
 - **`data`**: Data requested to be written to the ledger, specific for each request type.
-- **`creators`**: Creators identifiers (DID) list for this entity. There should be a new DIDs or an existing DIDs, for existing entities.
-- **`signatures`**: `data` should be signed by all `creators` private key. This field contains a dict there creator's public key is a key, and the signature is a value.
+- **`authors`**: Authors identifiers (DID) list for this entity. There should be a new DIDs or an existing DIDs, for existing entities.
+- **`signatures`**: `data` should be signed by all `authors` private key. This field contains a dict there authors key's id from `DIDDoc.authentication` is a key, and the signature is a value.
 - **`metadata`**: Dictionary with additional metadata fields. Empty for now. This fields provides extensibility in the future, e.g., it can contain `protocolVersion` or other relevant metadata associated with a request.
 
 ## List of transactions and details
@@ -102,12 +102,14 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 5. **`assertionMethod`** (optional): A list of Verification Methods or strings with key aliases
 6. **`capabilityInvocation`** (optional): A list of Verification Methods or strings with key aliases
 7. **`capabilityDelegation`** (optional): A list of Verification Methods or strings with key aliases
-8. **`service`** (optional): A set of Service Endpoint maps
-9. **`@context`** (optional): A list of strings
+8. **`keyAgreement`** (optional): A list of Verification Methods or strings with key aliases
+9. **`service`** (optional): A set of Service Endpoint maps
+10. **`alsoKnownAs`** (optional): A list of strings. A DID subject can have multiple identifiers for different purposes, or at different times. The assertion that two or more DIDs refer to the same DID subject can be made using the `alsoKnownAs` property.
+11. **`@context`** (optional): A list of strings with links or JSONs for describing specifications that this DID Document is following to.
 
 **Example:**
 
-```javascript
+```json
 {
   "@context": [
     "https://www.w3.org/ns/did/v1",
@@ -151,7 +153,7 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 
 #### Verification Method
 
-1. **`id`** (string): A string with format `<DIDDoc-id>#<key-alias`
+1. **`id`** (string): A string with format `<DIDDoc-id>#<key-alias>`
 2. **`controller`**: A list of base58-encoded identifier strings.
 3. **`type`** (string)
 4. **`publicKeyJwk`** (`map[string,string]`, optional): A map representing a JSON Web Key that conforms to [RFC7517](https://tools.ietf.org/html/rfc7517). See definition of `publicKeyJwk` for additional constraints.
@@ -159,7 +161,7 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 
 **Example:**
 
-```javascript
+```json
 {
   "id": "N22KY2Dyvmuu2PyyqSFKue#key-0",
   "type": "JsonWebKey2020",
@@ -179,7 +181,7 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 
 **Example:**
 
- ```javascript
+ ```json
 "service": [{
   "id":"N22KY2Dyvmuu2PyyqSFKue#linked-domain",
   "type": "LinkedDomains",
@@ -189,15 +191,15 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 
 #### Update `DID`
 
-If there is no DID transaction with the specified DID \(`dest`\), it is considered as a creation request for a new DID.
+If there is no DID transaction with the specified DID (`DID.id`), it is considered as a creation request for a new DID.
 
-If there is a DID transaction with the specified DID \(`dest`\), then this is update of existing DID. In this case, we can specify only the values we would like to override. All unspecified values remain the same. E.g., if a key rotation needs to be performed, the owner of the DID needs to send a DID transaction request with `dest`, `verkey` only. `alias` will stay the same.
+If there is a DID transaction with the specified DID (`DID.id`), then this is update of existing DID.
 
-**Note**: Fields `dest` and `owner` should have the same value.
+**Note**: Fields `controller`(before updating) and `authors`(from `WriteRequest`) should have the same value.
 
 #### State format
 
-`id -> {encode(data, creators), tx_hash, tx_timestamp }`
+`id -> {encode(data, authors), tx_hash, tx_timestamp }`
 
 ### `SCHEMA`
 
@@ -215,7 +217,7 @@ If a Schema evolves, a new schema with a new version or name needs to be created
 
 #### `SCHEMA` transaction format
 
-```javascript
+```json
 {
   "id": "N22KY2Dyvmuu2PyyqSFKue",
   "version": "1.0",
@@ -228,7 +230,7 @@ If a Schema evolves, a new schema with a new version or name needs to be created
 
 #### `SCHEMA` State format
 
-`id -> {encode(data, creators), tx_hash, tx_timestamp }`
+`id -> {encode(data, authors), tx_hash, tx_timestamp }`
 
 
 ### `CRED_DEF`
@@ -241,13 +243,13 @@ It is not possible to update `data` in existing Credential Definitions. If a Cre
 - **`value`** \(dict\): Dictionary with Credential Definition's data if `signature_type` is `CL`:
   - **`primary`** (dict): Primary credential public key
   - **`revocation`** (dict, optional): Revocation credential public key
-- **`ref`** (string): Hash of a Schema transaction the credential definition is created for.
+- **`ref`** (string): `id` of a Schema transaction the credential definition is created for.
 - **`signature_type`** (string): Type of the credential definition \(that is credential signature\). `CL` \(Camenisch-Lysyanskaya\) is the only supported type now. Other signature types are being explored for future releases.
 - **`tag`** (string, optional): A unique tag to have multiple public keys for the same Schema and type issued by the same DID. A default tag `tag` will be used if not specified.
 
 #### `CRED_DEF` transaction format
 
-```javascript
+```json
 {
   "id": "N22KY2Dyvmuu2PyyqSFKue",
   "signature_type": "CL",
@@ -264,7 +266,7 @@ It is not possible to update `data` in existing Credential Definitions. If a Cre
 
 #### `CRED_DEF` state format
 
-`id -> {encode(data, creators), tx_hash, tx_timestamp }`
+`id -> {encode(data, authors), tx_hash, tx_timestamp }`
 
 ## References
 
