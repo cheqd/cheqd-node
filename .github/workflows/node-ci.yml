@@ -99,7 +99,7 @@ jobs:
           cd test/networks/docker_compose
           ./gen_node_configs.sh
           ./run_docker.sh > /dev/null &
-          sleep 10
+          sleep 15
           docker ps
 
       - name: Add deb node as observer
@@ -115,7 +115,7 @@ jobs:
           sed -ri "s|laddr = \"tcp://0.0.0.0:26656\"|laddr = \"tcp://0.0.0.0:26676\"|" config/config.toml
           cat config/config.toml
           cheqd-noded start --home . > /dev/null &
-          sleep 10
+          sleep 15
 
       - name: Promote deb node to validator
         run: |
