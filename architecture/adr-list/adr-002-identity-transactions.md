@@ -40,6 +40,10 @@ Hyperledger Indy is a public-permissioned distributed ledger. As `cheqd-node` is
 
 _**Note**: Hyperledger Indy also contains other transaction types beyond the ones listed above, but these are currently not in scope for implementation in `cheqd-node`. They will be considered for inclusion later in the product roadmap._
 
+#### Dropping `ATTRIB` transactions
+
+`ATTRIB` was originally used in Hyperledger Indy to add document content similar to DID Documents (DIDDocs). The cheqd DID method replaces this by implementing DIDDocs for most transaction types.
+
 ## Decision
 
 ### cheqd DID Method
@@ -57,10 +61,8 @@ The components are assembled as follows:
 
 Some examples of `did:cheqd` method identifiers are:
 
-- A DID written to the cheqd mainnet ledger:
-  `did:cheqd:mainnet:7Tqg6BwSSWapxgUDm9KKgg`
-- A DID written to the cheqd testnet ledger:
-  `did:cheqd:testnet:6cgbu8ZPoWTnR5Rv5JcSMB`
+- A DID written to the cheqd mainnet ledger: `did:cheqd:mainnet:7Tqg6BwSSWapxgUDm9KKgg`
+- A DID written to the cheqd testnet ledger: `did:cheqd:testnet:6cgbu8ZPoWTnR5Rv5JcSMB`
 
 ### General structure of transaction requests
 
@@ -68,10 +70,10 @@ All identity requests will have the following format:
 
 ```json
 {
-    "data": { <request data for writing a transaction to the ledger> },
-    "creators": [<identifier>, ...],
+    "data": { "<request data for writing a transaction to the ledger>" },
+    "creators": ["<identifier>", "..."],
     "signatures": [
-        <public_key>: <signature>,
+        "<public_key>": "<signature>",
       ],
     "metadata": {}
 }
@@ -172,9 +174,7 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 #### Service
 
 1. **`id`** (string): The value of the id property MUST be a URI conforming to [RFC3986](https://www.rfc-editor.org/rfc/rfc3986). A conforming producer MUST NOT produce multiple service entries with the same ID. A conforming consumer MUST produce an error if it detects multiple service entries with the same ID. It has a follow format: `<DIDDoc-id>#<service-alias>`
-
-2. **`type`** (string): The service type and its associated properties SHOULD be registered in the DID Specification Registries [DID-SPEC-REGISTRIES](https://www.w3.org/TR/did-spec-registries/).
-
+2. **`type`** (string): The service type and its associated properties SHOULD be registered in the DID Specification Registries [DID-SPEC-REGISTRIES](https://www.w3.org/TR/did-spec-registries/)
 3. **`serviceEndpoint`** (strings): A string that conforms to the rules of [RFC3986](https://www.rfc-editor.org/rfc/rfc3986) for URIs, a map, or a set composed of a one or more strings that conform to the rules of [RFC3986](https://www.rfc-editor.org/rfc/rfc3986) for URIs and/or maps.
 
 **Example:**
@@ -187,7 +187,7 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 }]
 ```
 
-#### **Update `DID`**
+#### Update `DID`
 
 If there is no DID transaction with the specified DID \(`dest`\), it is considered as a creation request for a new DID.
 
@@ -230,6 +230,7 @@ If a Schema evolves, a new schema with a new version or name needs to be created
 
 `id -> {encode(data, creators), tx_hash, tx_timestamp }`
 
+
 ### `CRED_DEF`
 
 Adds a Credential Definition (in particular, public key), which is created by an Issuer and published for a particular Credential Schema.
@@ -253,8 +254,8 @@ It is not possible to update `data` in existing Credential Definitions. If a Cre
   "schema_id": "5ZTp9g4SP6t73rH2s8zgmtqdXyT",
   "tag": "some_tag",    
   "value": {
-      "primary": ....,
-      "revocation": ....
+      "primary": "...",
+      "revocation": "..."
   }
 }
 ```
