@@ -80,8 +80,6 @@ jobs:
     name: Install deb package and set up Docker pool
     runs-on: ubuntu-20.04 # exact version, not latest
     # needs: build-node-and-testnet-images
-    env:
-      HOME: "~/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs"
     steps:
       - name: Download and install deb package
         run: |
