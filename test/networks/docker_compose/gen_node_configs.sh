@@ -7,7 +7,7 @@ set -euox pipefail
 CHAIN_ID="cheqd"
 
 VALIDATORS_COUNT="4"
-OBSERVERS_COUNT="2"
+OBSERVERS_COUNT="0"
 
 source "../common.sh"
 
