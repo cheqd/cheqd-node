@@ -17,8 +17,9 @@ jobs:
         with:
           go-version: 1.16
 
+      # There is an issue with the latest starport, especially 0.18 version
       - name: Download and build starport
-        run: curl https://get.starport.network/starport! | sudo bash
+        run: wget -qO- https://github.com/tendermint/starport/releases/download/v0.17.3/starport_0.17.3_linux_amd64.tar.gz | tar xvz -C /tmp/ && sudo cp /tmp/starport /usr/bin
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
