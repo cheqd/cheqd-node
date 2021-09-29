@@ -12,7 +12,10 @@ message CredDef {
   string schema_id = 3;
   string tag = 4;
   string signatureType = 5;
-  google.protobuf.Any value = 6;
+  oneof value {
+    CredDefValue cl_type = 7;
+    google.protobuf.Any any_type = 6;
+  }
 }
 
 message CredDefValue {

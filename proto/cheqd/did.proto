@@ -10,11 +10,11 @@ message Did {
   string id = 1;
   repeated string controller = 2; //optional
   repeated VerificationMethod verificationMethod = 3; // optional
-  repeated google.protobuf.Any authentication = 4; // optional
-  repeated google.protobuf.Any assertionMethod = 5; // optional
-  repeated google.protobuf.Any capabilityInvocation = 6; // optional
-  repeated google.protobuf.Any capabilityDelegation = 7; // optional
-  repeated google.protobuf.Any keyAgreement = 8; // optional
+  repeated string authentication = 4; // optional
+  repeated string assertionMethod = 5; // optional
+  repeated string capabilityInvocation = 6; // optional
+  repeated string capabilityDelegation = 7; // optional
+  repeated string keyAgreement = 8; // optional
   repeated string alsoKnownAs = 9; // optional
   repeated DidService service = 10; // optional
 }
