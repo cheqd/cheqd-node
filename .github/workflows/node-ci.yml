@@ -95,21 +95,19 @@ jobs:
         run: |
           docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node .
 
-      - name: Set up 4 node docker pool
+      - name: Set up 4 node docker pool, add observer and validator
         run: |
           cd test/networks/docker_compose
           ./gen_node_configs.sh
           ./run_docker.sh > /dev/null &
           sleep 300
-          docker ps
-
-      - name: Add deb node as observer
-        run: |
           cd && mkdir node5 && cd node5
           pwd
           cheqd-noded init node5 --home .
           cp ${{ env.NODE_CONFIGS_BASE }}/node0/.cheqdnode/config/genesis.json config/
-          PEER0=$(cat ${{ env.NODE_CONFIGS_BASE }}/node0/node_id.txt)@$(docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} docker_compose_node0_1):26656
+          NODE0_IP=$(docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} docker_compose_node0_1)
+          echo $NODE0_IP
+          PEER0=$(cat ${{ env.NODE_CONFIGS_BASE }}/node0/node_id.txt)@$NODE0_IP:26656
           echo $PEER0
           sed -ri "s|persistent_peers = \".*\"|persistent_peers = \"${PEER0}\"|" config/config.toml
           sed -ri "s|laddr = \"tcp://127.0.0.1:26657\"|laddr = \"tcp://127.0.0.1:26677\"|" config/config.toml
@@ -117,9 +115,6 @@ jobs:
           cat config/config.toml
           cheqd-noded start --home . > /dev/null &
           sleep 300
-
-      - name: Promote deb node to validator
-        run: |
           docker ps
           sudo chown -R runner:docker ${{ env.NODE_CONFIGS_BASE }}
           rm -rf /home/runner/.cheqdnode
@@ -134,11 +129,7 @@ jobs:
           echo $OP5_PUBKEY
           NODE5_PUBKEY=$(cheqd-noded tendermint show-validator --home /home/runner/node5 | sed 's/\r//g')
           echo $NODE5_PUBKEY
-          NODE0_IP=$(docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} docker_compose_node0_1)
-          echo $NODE0_IP
-          NODE1_IP=$(docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} docker_compose_node1_1)
-          echo $NODE1_IP
           cheqd-noded tx bank send $OP0_ADDRESS $OP5_ADDRESS 1000000000000000ncheq --chain-id cheqd --fees 5000000ncheq --node "http://$NODE0_IP:26657" -y || echo "Something went wrong!"
           sleep 5
-          cheqd-noded tx staking create-validator --amount 1000000stake --from node5-operator --chain-id cheqd --min-self-delegation="1" --gas="auto" --gas-prices="25ncheq" --pubkey $NODE5_PUBKEY --commission-max-change-rate="0.02" --commission-max-rate="0.02" --commission-rate="0.01" --gas 239933 --node "http://$NODE1_IP:26660"
+          cheqd-noded tx staking create-validator --amount 1000000stake --from node5-operator --chain-id cheqd --min-self-delegation="1" --gas="auto" --gas-prices="25ncheq" --pubkey $NODE5_PUBKEY --commission-max-change-rate="0.02" --commission-max-rate="0.02" --commission-rate="0.01" --gas 239933 --node "http://$NODE0_IP:26657"
           sleep 5
