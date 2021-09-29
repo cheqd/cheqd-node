@@ -275,6 +275,19 @@ It is not possible to update `data` in existing Credential Definitions. If a Cre
 
 `id -> {encode(data, requestId), txHash, txTimestamp }`
 
+## Consequences
+
+### Backward Compatibility
+
+* `cheqd-node` [release v0.1.17](https://github.com/cheqd/cheqd-node/releases/tag/v0.1.17) and earlier had a transaction type called `NYM` which would allow writing/reading a unique identifier on ledger. However, this `NYM` state was not fully defined as a DID method and did not contain DID Documents that resolved when the DID identifier was read. This `NYM` transaction type is deprecated and the data written to cheqd testnet with legacy states will not be retained. 
+
+### Positive
+
+### Negative
+
+### Neutral
+
+
 ## References
 
 - [Hyperledger Indy Identity transactions](https://github.com/hyperledger/indy-node/blob/master/docs/source/transactions.md)
