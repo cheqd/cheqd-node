@@ -71,17 +71,18 @@ All identity requests will have the following format:
 ```json
 {
     "data": { "<request data for writing a transaction to the ledger>" },
-    "authors": ["<identifier>", "..."],
     "signatures": [
-        "<verification method id>": "<signature>",
+        "<verification method id>" : "<signature>",
+        ...
       ],
+    "requestId": "<uniq request identifier>",
     "metadata": {}
 }
 ```
 
 - **`data`**: Data requested to be written to the ledger, specific for each request type.
-- **`authors`**: Authors identifiers (DID) list for this entity. There should be a new DIDs or an existing DIDs, for existing entities.
-- **`signatures`**: `data` should be signed by all `authors` private key. This field contains a dict there authors key's id from `DIDDoc.authentication` is a key, and the signature is a value.
+- **`signatures`**: `data` should be signed by all `controller` private keys. This field contains a dict there key's id from `DIDDoc.authentication` is a key, and the signature is a value. The `signatures` must contains signatures from all controllers. And every controller should sign all fields excluding `signatures` using at least one key from `DIDDoc.authentication`.
+- **`requestId`**: String with uniq identifier. Unix timestamp is recommended. Needs for a reply protection.
 - **`metadata`**: Dictionary with additional metadata fields. Empty for now. This fields provides extensibility in the future, e.g., it can contain `protocolVersion` or other relevant metadata associated with a request.
 
 ## List of transactions and details
@@ -158,6 +159,7 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 3. **`type`** (string)
 4. **`publicKeyJwk`** (`map[string,string]`, optional): A map representing a JSON Web Key that conforms to [RFC7517](https://tools.ietf.org/html/rfc7517). See definition of `publicKeyJwk` for additional constraints.
 5. **`publicKeyMultibase`** (optional): A base58-encoded string that conforms to a [MULTIBASE](https://datatracker.ietf.org/doc/html/draft-multiformats-multibase-03) encoded public key.
+**Note**:Verification Method can't contain both `publicKeyJwk` and` publicKeyMultibase` but must contain at least one of them.
 
 **Example:**
 
@@ -195,11 +197,11 @@ If there is no DID transaction with the specified DID (`DID.id`), it is consider
 
 If there is a DID transaction with the specified DID (`DID.id`), then this is update of existing DID.
 
-**Note**: Fields `controller`(before updating) and `authors`(from `WriteRequest`) should have the same value.
+**Note**: Fields `signatures`(from `WriteRequest`) must contain signatures from all old controllers and all new controllers.
 
 #### State format
 
-`id -> {encode(data, authors), tx_hash, tx_timestamp }`
+`id -> {encode(data, requestId), txHash, txTimestamp }`
 
 ### `SCHEMA`
 
@@ -211,7 +213,8 @@ If a Schema evolves, a new schema with a new version or name needs to be created
 
 - **`data`**: Dictionary with Schema's data:
   - **`id`**: DID as base58-encoded string for 16 or 32 byte DID value.
-  - **`attr_names`**: Array of attribute name strings (125 attributes maximum)
+  - **`controller`**: DIDDoc.id list of strings of schema controllers. All DIDs must exist.
+  - **`attrNames`**: Array of attribute name strings (125 attributes maximum)
   - **`name`**: Schema's name string
   - **`version`**: Schema's version string
 
@@ -220,9 +223,10 @@ If a Schema evolves, a new schema with a new version or name needs to be created
 ```json
 {
   "id": "N22KY2Dyvmuu2PyyqSFKue",
+  "controller": ["5ZTp9g4SP6t73rH2s8zgmtqdXyT"],
   "version": "1.0",
   "name": "Degree",
-  "attr_names": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
+  "attrNames": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
 }
 ```
 
@@ -230,7 +234,7 @@ If a Schema evolves, a new schema with a new version or name needs to be created
 
 #### `SCHEMA` State format
 
-`id -> {encode(data, authors), tx_hash, tx_timestamp }`
+`id -> {encode(data, requestId), txHash, txTimestamp }`
 
 
 ### `CRED_DEF`
@@ -243,17 +247,19 @@ It is not possible to update `data` in existing Credential Definitions. If a Cre
 - **`value`** \(dict\): Dictionary with Credential Definition's data if `signature_type` is `CL`:
   - **`primary`** (dict): Primary credential public key
   - **`revocation`** (dict, optional): Revocation credential public key
-- **`ref`** (string): `id` of a Schema transaction the credential definition is created for.
-- **`signature_type`** (string): Type of the credential definition \(that is credential signature\). `CL` \(Camenisch-Lysyanskaya\) is the only supported type now. Other signature types are being explored for future releases.
+- **`schemaId`** (string): `id` of a Schema transaction the credential definition is created for.
+- **`signatureType`** (string): Type of the credential definition \(that is credential signature\). `CL` \(Camenisch-Lysyanskaya\) is the only supported type now. Other signature types are being explored for future releases.
 - **`tag`** (string, optional): A unique tag to have multiple public keys for the same Schema and type issued by the same DID. A default tag `tag` will be used if not specified.
+- **`controller`**: DIDDoc.id list of strings of schema controllers. All DIDs must exist.
 
 #### `CRED_DEF` transaction format
 
 ```json
 {
   "id": "N22KY2Dyvmuu2PyyqSFKue",
-  "signature_type": "CL",
-  "schema_id": "5ZTp9g4SP6t73rH2s8zgmtqdXyT",
+  "controller": ["6RTp9g4SP6t73rH2s8zgmtqdXyT"],
+  "signatureType": "CL",
+  "schemaId": "5ZTp9g4SP6t73rH2s8zgmtqdXyT",
   "tag": "some_tag",    
   "value": {
       "primary": "...",
@@ -266,7 +272,7 @@ It is not possible to update `data` in existing Credential Definitions. If a Cre
 
 #### `CRED_DEF` state format
 
-`id -> {encode(data, authors), tx_hash, tx_timestamp }`
+`id -> {encode(data, requestId), txHash, txTimestamp }`
 
 ## References
 
