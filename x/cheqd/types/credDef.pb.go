@@ -76,10 +76,10 @@ type isCredDef_Value interface {
 }
 
 type CredDef_ClType struct {
-	ClType *CredDefValue `protobuf:"bytes,7,opt,name=cl_type,json=clType,proto3,oneof" json:"cl_type,omitempty"`
+	ClType *CredDefValue `protobuf:"bytes,6,opt,name=cl_type,json=clType,proto3,oneof" json:"cl_type,omitempty"`
 }
 type CredDef_AnyType struct {
-	AnyType *types.Any `protobuf:"bytes,6,opt,name=any_type,json=anyType,proto3,oneof" json:"any_type,omitempty"`
+	AnyType *types.Any `protobuf:"bytes,7,opt,name=any_type,json=anyType,proto3,oneof" json:"any_type,omitempty"`
 }
 
 func (*CredDef_ClType) isCredDef_Value()  {}
@@ -225,9 +225,9 @@ var fileDescriptor_bc069326307a6009 = []byte{
 	0x4a, 0xd7, 0x38, 0x19, 0x76, 0x46, 0xbd, 0x62, 0xfd, 0x89, 0xee, 0x40, 0xaf, 0x2e, 0xa7, 0x7c,
 	0x4e, 0x4f, 0x05, 0xc3, 0x1d, 0x1f, 0xd8, 0x0d, 0xc6, 0x6b, 0x86, 0x6e, 0x40, 0xc7, 0xd0, 0x0a,
 	0x5f, 0xf1, 0xb6, 0x93, 0xe8, 0x2e, 0x5c, 0xad, 0x45, 0x25, 0xa9, 0x69, 0x34, 0x7f, 0x67, 0x17,
-	0x1c, 0xef, 0xf8, 0xb1, 0xbf, 0x4d, 0xf4, 0x1c, 0xd2, 0x72, 0x76, 0x6a, 0xdc, 0x78, 0x3a, 0x8c,
-	0x47, 0xfd, 0xf1, 0x3d, 0x72, 0xc9, 0x31, 0x49, 0xbb, 0xe3, 0x0f, 0x74, 0xd6, 0xf0, 0xe3, 0xa8,
-	0xe8, 0x96, 0x33, 0x4f, 0x78, 0x04, 0xbb, 0x54, 0xda, 0x80, 0xe8, 0x7a, 0xc4, 0x3e, 0x09, 0x85,
+	0x1c, 0xef, 0xf8, 0xb1, 0xbf, 0x4d, 0xf4, 0x1c, 0xd2, 0x72, 0x76, 0x6a, 0xdc, 0x78, 0x77, 0x18,
+	0x8f, 0xfa, 0xe3, 0x7b, 0xe4, 0x92, 0x63, 0x92, 0x76, 0xc7, 0x1f, 0xe8, 0xac, 0xe1, 0xc7, 0x51,
+	0xd1, 0x2d, 0x67, 0x9e, 0xf0, 0x08, 0x76, 0xa9, 0xb4, 0x01, 0x91, 0x7a, 0xc4, 0x3e, 0x09, 0x85,
 	0x90, 0x75, 0x21, 0xe4, 0x85, 0xb4, 0xc7, 0x51, 0x91, 0x52, 0x69, 0x5d, 0xe4, 0x30, 0x85, 0x9d,
 	0x73, 0x47, 0x39, 0xf8, 0x99, 0xc0, 0xde, 0x26, 0x16, 0xbd, 0x81, 0x74, 0xa1, 0xc5, 0x9c, 0x6a,
 	0x8b, 0xe3, 0x61, 0x67, 0xd4, 0x1f, 0x8f, 0xb7, 0xda, 0x0e, 0x39, 0x09, 0xa1, 0x57, 0xd2, 0x68,
@@ -238,7 +238,7 @@ var fileDescriptor_bc069326307a6009 = []byte{
 	0xbe, 0xcc, 0xe2, 0x8b, 0x65, 0x16, 0xff, 0x5a, 0x66, 0xf1, 0xb7, 0x55, 0x16, 0x5d, 0xac, 0xb2,
 	0xe8, 0xc7, 0x2a, 0x8b, 0x3e, 0xde, 0xaf, 0x84, 0x99, 0x36, 0x13, 0x52, 0xaa, 0x79, 0xde, 0xfe,
 	0xe9, 0xee, 0xf9, 0xd0, 0x95, 0x91, 0x7f, 0x69, 0x2d, 0x77, 0xa1, 0xf5, 0xa4, 0xeb, 0xe9, 0x8f,
-	0x7f, 0x07, 0x00, 0x00, 0xff, 0xff, 0xad, 0x74, 0x6c, 0x17, 0x12, 0x03, 0x00, 0x00,
+	0x7f, 0x07, 0x00, 0x00, 0xff, 0xff, 0x71, 0x6b, 0x15, 0x9c, 0x12, 0x03, 0x00, 0x00,
 }
 
 func (m *CredDef) Marshal() (dAtA []byte, err error) {
@@ -310,16 +310,16 @@ func (m *CredDef) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *CredDef_AnyType) MarshalTo(dAtA []byte) (int, error) {
+func (m *CredDef_ClType) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *CredDef_AnyType) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *CredDef_ClType) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.AnyType != nil {
+	if m.ClType != nil {
 		{
-			size, err := m.AnyType.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.ClType.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -331,16 +331,16 @@ func (m *CredDef_AnyType) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	return len(dAtA) - i, nil
 }
-func (m *CredDef_ClType) MarshalTo(dAtA []byte) (int, error) {
+func (m *CredDef_AnyType) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *CredDef_ClType) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *CredDef_AnyType) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.ClType != nil {
+	if m.AnyType != nil {
 		{
-			size, err := m.ClType.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.AnyType.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -472,18 +472,6 @@ func (m *CredDef) Size() (n int) {
 	return n
 }
 
-func (m *CredDef_AnyType) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.AnyType != nil {
-		l = m.AnyType.Size()
-		n += 1 + l + sovCredDef(uint64(l))
-	}
-	return n
-}
 func (m *CredDef_ClType) Size() (n int) {
 	if m == nil {
 		return 0
@@ -492,6 +480,18 @@ func (m *CredDef_ClType) Size() (n int) {
 	_ = l
 	if m.ClType != nil {
 		l = m.ClType.Size()
+		n += 1 + l + sovCredDef(uint64(l))
+	}
+	return n
+}
+func (m *CredDef_AnyType) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.AnyType != nil {
+		l = m.AnyType.Size()
 		n += 1 + l + sovCredDef(uint64(l))
 	}
 	return n
@@ -728,41 +728,6 @@ func (m *CredDef) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AnyType", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowCredDef
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthCredDef
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthCredDef
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &types.Any{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.Value = &CredDef_AnyType{v}
-			iNdEx = postIndex
-		case 7:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ClType", wireType)
 			}
 			var msglen int
@@ -795,6 +760,41 @@ func (m *CredDef) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			m.Value = &CredDef_ClType{v}
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AnyType", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCredDef
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthCredDef
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthCredDef
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &types.Any{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Value = &CredDef_AnyType{v}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

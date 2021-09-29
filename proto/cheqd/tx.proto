@@ -50,11 +50,11 @@ message MsgCreateDid {
   string id = 1;
   repeated string controller = 2;
   repeated VerificationMethod verificationMethod = 3;
-  repeated google.protobuf.Any authentication = 4;
-  repeated google.protobuf.Any assertionMethod = 5;
-  repeated google.protobuf.Any capabilityInvocation = 6;
-  repeated google.protobuf.Any capabilityDelegation = 7;
-  repeated google.protobuf.Any keyAgreement = 8;
+  repeated string authentication = 4;
+  repeated string assertionMethod = 5;
+  repeated string capabilityInvocation = 6;
+  repeated string capabilityDelegation = 7;
+  repeated string keyAgreement = 8;
   repeated string alsoKnownAs = 9;
   repeated DidService service = 10;
 }
@@ -67,11 +67,11 @@ message MsgUpdateDid {
   string id = 1;
   repeated string controller = 2;
   repeated VerificationMethod verificationMethod = 3;
-  repeated google.protobuf.Any authentication = 4;
-  repeated google.protobuf.Any assertionMethod = 5;
-  repeated google.protobuf.Any capabilityInvocation = 6;
-  repeated google.protobuf.Any capabilityDelegation = 7;
-  repeated google.protobuf.Any keyAgreement = 8;
+  repeated string authentication = 4;
+  repeated string assertionMethod = 5;
+  repeated string capabilityInvocation = 6;
+  repeated string capabilityDelegation = 7;
+  repeated string keyAgreement = 8;
   repeated string alsoKnownAs = 9;
   repeated DidService service = 10;
 }

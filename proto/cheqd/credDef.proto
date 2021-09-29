@@ -13,8 +13,8 @@ message CredDef {
   string tag = 4;
   string signatureType = 5;
   oneof value {
-    CredDefValue cl_type = 7;
-    google.protobuf.Any any_type = 6;
+    CredDefValue cl_type = 6;
+    google.protobuf.Any any_type = 7;
   }
 }
 
