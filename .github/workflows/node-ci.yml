@@ -101,7 +101,7 @@ jobs:
           cd test/networks/docker_compose
           ./gen_node_configs.sh
           ./run_docker.sh > /dev/null &
-          sleep 360
+          sleep 400
           docker ps
 
       - name: Add observer node
@@ -119,7 +119,7 @@ jobs:
           sed -ri "s|laddr = \"tcp://0.0.0.0:26656\"|laddr = \"tcp://0.0.0.0:26676\"|" /home/runner/.cheqdnode/config/config.toml
           cat /home/runner/.cheqdnode/config/config.toml
           cheqd-noded start > /dev/null &
-          sleep 120
+          sleep 60
           docker ps
 
       - name: Promote observer to validator
@@ -143,6 +143,5 @@ jobs:
           curl "http://${NODE1_IP}:26657"
           for i in $(seq 1 2 5)
           do
-            HOME=${{ env.NODE_CONFIGS_BASE }}/client cheqd-noded tx bank send $OP0_ADDRESS $OP5_ADDRESS 1000000000000000ncheq --chain-id cheqd --fees 5000000ncheq --node "http://$NODE1_IP:26657" -y || echo "Something went wrong!"
+            HOME=${{ env.NODE_CONFIGS_BASE }}/client cheqd-noded tx bank send ${OP0_ADDRESS} ${OP5_ADDRESS} 1000000000000000ncheq --chain-id cheqd --fees 5000000ncheq --node "http://${NODE1_IP}:26657" -y || echo "Something went wrong!"
           done
-          HOME=${{ env.NODE_CONFIGS_BASE }}/client cheqd-noded tx staking create-validator --amount 1000000000000000ncheq --from node5-operator --chain-id cheqd --min-self-delegation="1" --gas="auto" --gas-prices="25ncheq" --pubkey $NODE5_PUBKEY --commission-max-change-rate="0.02" --commission-max-rate="0.02" --commission-rate="0.01" --gas 239933 --node "http://$NODE1_IP:26657" -y
