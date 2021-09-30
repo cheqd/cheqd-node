@@ -12,17 +12,18 @@ import (
 func (k msgServer) CreateCredDef(goCtx context.Context, msg *types.MsgWriteRequest) (*types.MsgCreateCredDefResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	credDefMsg, isMsgIdentity := msg.Data.GetCachedValue().(*types.MsgCreateCredDef)
+
 	if !isMsgIdentity {
 		errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName, msg)
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 	}
+
 	k.AppendCredDef(
 		ctx,
 		credDefMsg.Id,
 		credDefMsg.SchemaId,
 		credDefMsg.Tag,
 		credDefMsg.SignatureType,
-		credDefMsg.Value,
 	)
 
 	return &types.MsgCreateCredDefResponse{

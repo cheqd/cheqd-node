@@ -7,16 +7,36 @@ import (
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
 )
 
+type DidService struct {
+	Id              string `json:"id""`
+	Type            string `json:"type"`
+	ServiceEndpoint string `json:"serviceEndpoint"`
+}
+
+type VerificationMethod struct {
+	Id                 string            `json:"id"`
+	Type               string            `json:"type"`
+	Controller         string            `json:"controller"`
+	PublicKeyJwk       map[string]string `json:"publicKeyJwk"`
+	PublicKeyMultibase string            `json:"publicKeyMultibase"`
+}
+
 type createDidRequest struct {
-	BaseReq rest.BaseReq `json:"base_req"`
-	Creator string       `json:"creator"`
-	Verkey  string       `json:"verkey"`
-	Alias   string       `json:"alias"`
+	BaseReq              rest.BaseReq          `json:"base_req"`
+	Id                   string                `json:"id"`
+	Controller           []string              `json:"controller"`
+	VerificationMethod   []*VerificationMethod `json:"alias"`
+	Authentication       []string              `json:"authentication"`
+	AssertionMethod      []string              `json:"assertionMethod"`
+	CapabilityInvocation []string              `json:"capabilityInvocation"`
+	CapabilityDelegation []string              `json:"capabilityDelegation"`
+	KeyAgreement         []string              `json:"keyAgreement"`
+	AlsoKnownAs          []string              `json:"alsoKnownAs"`
+	Service              []*DidService         `json:"service"`
 }
 
 func createDidHandler(clientCtx client.Context) http.HandlerFunc {
@@ -32,20 +52,18 @@ func createDidHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		_, err := sdk.AccAddressFromBech32(req.Creator)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		parsedVerkey := req.Verkey
-
-		parsedAlias := req.Alias
-
+		// TODO add verifificationMethod and Service
 		msg := types.NewMsgCreateDid(
-			req.Creator,
-			parsedVerkey,
-			parsedAlias,
+			req.Id,
+			req.Controller,
+			nil,
+			req.Authentication,
+			req.AssertionMethod,
+			req.CapabilityInvocation,
+			req.CapabilityDelegation,
+			req.KeyAgreement,
+			req.AlsoKnownAs,
+			nil,
 		)
 
 		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
@@ -53,15 +71,22 @@ func createDidHandler(clientCtx client.Context) http.HandlerFunc {
 }
 
 type updateDidRequest struct {
-	BaseReq rest.BaseReq `json:"base_req"`
-	Creator string       `json:"creator"`
-	Verkey  string       `json:"verkey"`
-	Alias   string       `json:"alias"`
+	BaseReq              rest.BaseReq          `json:"base_req"`
+	Id                   string                `json:"id"`
+	Controller           []string              `json:"controller"`
+	VerificationMethod   []*VerificationMethod `json:"alias"`
+	Authentication       []string              `json:"authentication"`
+	AssertionMethod      []string              `json:"assertionMethod"`
+	CapabilityInvocation []string              `json:"capabilityInvocation"`
+	CapabilityDelegation []string              `json:"capabilityDelegation"`
+	KeyAgreement         []string              `json:"keyAgreement"`
+	AlsoKnownAs          []string              `json:"alsoKnownAs"`
+	Service              []*DidService         `json:"service"`
 }
 
 func updateDidHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
+		_, err := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
 		if err != nil {
 			return
 		}
@@ -77,59 +102,18 @@ func updateDidHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		_, err = sdk.AccAddressFromBech32(req.Creator)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		parsedVerkey := req.Verkey
-
-		parsedAlias := req.Alias
-
+		// TODO add verifificationMethod and Service
 		msg := types.NewMsgUpdateDid(
-			req.Creator,
-			id,
-			parsedVerkey,
-			parsedAlias,
-		)
-
-		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
-	}
-}
-
-type deleteDidRequest struct {
-	BaseReq rest.BaseReq `json:"base_req"`
-	Creator string       `json:"creator"`
-}
-
-func deleteDidHandler(clientCtx client.Context) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
-		if err != nil {
-			return
-		}
-
-		var req deleteDidRequest
-		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
-			return
-		}
-
-		baseReq := req.BaseReq.Sanitize()
-		if !baseReq.ValidateBasic(w) {
-			return
-		}
-
-		_, err = sdk.AccAddressFromBech32(req.Creator)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		msg := types.NewMsgDeleteDid(
-			req.Creator,
-			id,
+			req.Id,
+			req.Controller,
+			nil,
+			req.Authentication,
+			req.AssertionMethod,
+			req.CapabilityInvocation,
+			req.CapabilityDelegation,
+			req.KeyAgreement,
+			req.AlsoKnownAs,
+			nil,
 		)
 
 		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)

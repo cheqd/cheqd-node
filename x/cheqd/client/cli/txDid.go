@@ -14,16 +14,13 @@ func CmdCreateDid() *cobra.Command {
 		Short: "Creates a new did",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			id := string(args[0])
-			argsVerkey := string(args[1])
-			argsAlias := string(args[2])
-
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgCreateDid(string(id), string(argsVerkey), string(argsAlias))
+			// TODO pass arguments
+			msg := types.NewMsgCreateDid("nil", nil, nil, nil, nil, nil, nil, nil, nil, nil)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -42,16 +39,13 @@ func CmdUpdateDid() *cobra.Command {
 		Short: "Update a did",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			id := string(args[0])
-			argsVerkey := string(args[1])
-			argsAlias := string(args[2])
-
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgUpdateDid(string(id), string(argsVerkey), string(argsAlias))
+			// TODO pass arguments
+			msg := types.NewMsgUpdateDid("nil", nil, nil, nil, nil, nil, nil, nil, nil, nil)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

@@ -1,7 +1,6 @@
 package types
 
 import (
-	"github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -11,11 +10,11 @@ func NewMsgCreateDid(
 	id string,
 	controller []string,
 	verificationMethod []*VerificationMethod,
-	authentication []*types.Any,
-	assertionMethod []*types.Any,
-	capabilityInvocation []*types.Any,
-	capabilityDelegation []*types.Any,
-	keyAgreement []*types.Any,
+	authentication []string,
+	assertionMethod []string,
+	capabilityInvocation []string,
+	capabilityDelegation []string,
+	keyAgreement []string,
 	alsoKnownAs []string,
 	service []*DidService,
 ) *MsgCreateDid {
@@ -59,11 +58,11 @@ func NewMsgUpdateDid(
 	id string,
 	controller []string,
 	verificationMethod []*VerificationMethod,
-	authentication []*types.Any,
-	assertionMethod []*types.Any,
-	capabilityInvocation []*types.Any,
-	capabilityDelegation []*types.Any,
-	keyAgreement []*types.Any,
+	authentication []string,
+	assertionMethod []string,
+	capabilityInvocation []string,
+	capabilityDelegation []string,
+	keyAgreement []string,
 	alsoKnownAs []string,
 	service []*DidService,
 ) *MsgUpdateDid {

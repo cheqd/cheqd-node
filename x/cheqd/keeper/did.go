@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"encoding/binary"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
@@ -44,11 +43,11 @@ func (k Keeper) AppendDid(
 	id string,
 	controller []string,
 	verificationMethod []*types.VerificationMethod,
-	authentication []*types.Any,
-	assertionMethod []*types.Any,
-	capabilityInvocation []*types.Any,
-	capabilityDelegation []*types.Any,
-	keyAgreement []*types.Any,
+	authentication []string,
+	assertionMethod []string,
+	capabilityInvocation []string,
+	capabilityDelegation []string,
+	keyAgreement []string,
 	alsoKnownAs []string,
 	service []*types.DidService,
 ) string {
