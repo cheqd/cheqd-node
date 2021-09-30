@@ -126,7 +126,7 @@ jobs:
         run: |
           export NODE0_IP=$(docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} docker_compose_node0_1 | sed 's/\r//g')
           echo $NODE0_IP
-          export NODE0_IP=$(docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} docker_compose_node1_1 | sed 's/\r//g')
+          export NODE1_IP=$(docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} docker_compose_node1_1 | sed 's/\r//g')
           echo $NODE1_IP
           curl "http://$NODE1_IP:26657"
           sudo chown -R runner:docker ${{ env.NODE_CONFIGS_BASE }}
