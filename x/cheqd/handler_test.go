@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	ptypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/stretchr/testify/require"
 )
 
@@ -13,7 +14,8 @@ func TestHandler_CreateDid(t *testing.T) {
 
 	// add new Did
 	didMsg := setup.CreateDid()
-	result, _ := setup.Handler(setup.Ctx, didMsg)
+	data, _ := ptypes.NewAnyWithValue(didMsg)
+	result, _ := setup.Handler(setup.Ctx, setup.WrapRequest(data))
 	did := types.MsgCreateDidResponse{}
 	err := did.Unmarshal(result.Data)
 

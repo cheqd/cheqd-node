@@ -12,8 +12,8 @@ import (
 
 	"github.com/cheqd/cheqd-node/x/cheqd/keeper"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	ptypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	// ptypes "github.com/cosmos/cosmos-sdk/codec/types"
 )
 
 type TestSetup struct {
@@ -84,5 +84,11 @@ func (s *TestSetup) CreateDid() *types.MsgCreateDid {
 		KeyAgreement:         []string{"KeyAgreement"},
 		AlsoKnownAs:          []string{"AlsoKnownAs"},
 		Service:              []*types.DidService{&Service},
+	}
+}
+
+func (s *TestSetup) WrapRequest(Data *ptypes.Any) *types.MsgWriteRequest {
+	return &types.MsgWriteRequest{
+		Data: Data,
 	}
 }
