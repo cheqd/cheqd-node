@@ -38,7 +38,6 @@ do
     sudo chmod -R 777 /home/runner/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs || echo "I'm not in pipeline" # FIXME
     sudo chmod -R 777 ~/cheqd-node/test/networks/docker_compose/node_configs || echo "I'm not in local machine" # FIXME
     sed -i $sed_extension 's/minimum-gas-prices = ""/minimum-gas-prices = "25ncheq"/g' .cheqdnode/config/app.toml
-    sed -ri "s|laddr = \"tcp://127.0.0.1:26657\"|laddr = \"tcp://0.0.0.0:26657\"|" .cheqdnode/config/config.toml
 
     popd
 done
