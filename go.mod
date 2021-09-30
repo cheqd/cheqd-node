@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/armon/go-metrics v0.3.8 // indirect
+	github.com/btcsuite/btcutil v1.0.2 // indirect
 	github.com/confio/ics23/go v0.6.6 // indirect
 	github.com/cosmos/cosmos-sdk v0.42.4
 	github.com/gogo/protobuf v1.3.3

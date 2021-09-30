@@ -1,6 +1,10 @@
 package cheqd
 
 import (
+	"crypto/ed25519"
+	"encoding/base64"
+	"encoding/json"
+	"github.com/btcsuite/btcutil/base58"
 	"time"
 
 	"github.com/cheqd/cheqd-node/app/params"
@@ -39,7 +43,7 @@ func Setup() TestSetup {
 	_ = dbStore.LoadLatestVersion()
 
 	// Init Keepers
-	keeper := keeper.NewKeeper(cdc, storeKey, memStoreKey)
+	newKeeper := keeper.NewKeeper(cdc, storeKey, memStoreKey)
 
 	// Create context
 	blockTime, _ := time.Parse(time.RFC3339, "2021-01-01T00:00:00.000Z")
@@ -47,24 +51,26 @@ func Setup() TestSetup {
 		tmproto.Header{ChainID: "cheqd-node", Time: blockTime},
 		false, log.NewNopLogger())
 
-	handler := NewHandler(*keeper)
+	handler := NewHandler(*newKeeper)
 
 	setup := TestSetup{
 		Cdc:     cdc,
 		Ctx:     ctx,
-		Keeper:  *keeper,
+		Keeper:  *newKeeper,
 		Handler: handler,
 	}
 
 	return setup
 }
 
-func (s *TestSetup) CreateDid() *types.MsgCreateDid {
+func (s *TestSetup) CreateDid(pubKey ed25519.PublicKey) *types.MsgCreateDid {
+	PublicKeyMultibase := "z" + base58.Encode(pubKey)
+
 	VerificationMethod := types.VerificationMethod{
-		Id:                 "12",
+		Id:                 "did:cheqd:test:alice#key-1",
 		Type:               "Ed25519VerificationKey2020",
 		Controller:         "Controller",
-		PublicKeyMultibase: "21312",
+		PublicKeyMultibase: PublicKeyMultibase,
 	}
 
 	Service := types.DidService{
@@ -74,10 +80,10 @@ func (s *TestSetup) CreateDid() *types.MsgCreateDid {
 	}
 
 	return &types.MsgCreateDid{
-		Id:                   "1",
+		Id:                   "did:cheqd:test:alice",
 		Controller:           []string{"controller"},
 		VerificationMethod:   []*types.VerificationMethod{&VerificationMethod},
-		Authentication:       []string{"Authentication"},
+		Authentication:       []string{"did:cheqd:test:alice#key-1"},
 		AssertionMethod:      []string{"AssertionMethod"},
 		CapabilityInvocation: []string{"CapabilityInvocation"},
 		CapabilityDelegation: []string{"CapabilityDelegation"},
@@ -87,8 +93,17 @@ func (s *TestSetup) CreateDid() *types.MsgCreateDid {
 	}
 }
 
-func (s *TestSetup) WrapRequest(Data *ptypes.Any) *types.MsgWriteRequest {
+func (s *TestSetup) WrapRequest(privKey ed25519.PrivateKey, data *ptypes.Any, metadata map[string]string) *types.MsgWriteRequest {
+	metadataBytes, _ := json.Marshal(&metadata)
+	dataBytes := data.Value
+
+	signingInput := base64.StdEncoding.EncodeToString(metadataBytes) + "." + base64.StdEncoding.EncodeToString(dataBytes)
+	signingInputBytes := []byte(base64.StdEncoding.EncodeToString([]byte(signingInput)))
+	signature := base64.StdEncoding.EncodeToString(ed25519.Sign(privKey, signingInputBytes))
+
 	return &types.MsgWriteRequest{
-		Data: Data,
+		Data:       data,
+		Metadata:   metadata,
+		Signatures: map[string]string{"did:cheqd:test:alice#key-1": signature},
 	}
 }
