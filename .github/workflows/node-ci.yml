@@ -101,7 +101,7 @@ jobs:
           cd test/networks/docker_compose
           ./gen_node_configs.sh
           ./run_docker.sh > /dev/null &
-          sleep 360
+          sleep 600
           docker ps
 
       - name: Add observer node
@@ -119,7 +119,7 @@ jobs:
           sed -ri "s|laddr = \"tcp://0.0.0.0:26656\"|laddr = \"tcp://0.0.0.0:26676\"|" /home/runner/.cheqdnode/config/config.toml
           cat /home/runner/.cheqdnode/config/config.toml
           cheqd-noded start > /dev/null &
-          sleep 120
+          sleep 60
           docker ps
 
       - name: Promote observer to validator
@@ -136,8 +136,6 @@ jobs:
           cheqd-noded keys list
           OP5_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
           echo $OP5_ADDRESS
-          OP5_PUBKEY=$(cheqd-noded keys list | sed -nr 's/.*"key":"(.*?)".*/\1/p' | sed -n 1p | sed 's/\r//g')
-          echo $OP5_PUBKEY
           export HOME=/home/runner
           NODE5_PUBKEY=$(cheqd-noded tendermint show-validator | sed 's/\r//g')
           echo $NODE5_PUBKEY
