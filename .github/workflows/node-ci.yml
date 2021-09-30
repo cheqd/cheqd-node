@@ -119,7 +119,7 @@ jobs:
           sed -ri "s|laddr = \"tcp://0.0.0.0:26656\"|laddr = \"tcp://0.0.0.0:26676\"|" /home/runner/.cheqdnode/config/config.toml
           cat /home/runner/.cheqdnode/config/config.toml
           cheqd-noded start > /dev/null &
-          sleep 120
+          sleep 60
           docker ps
 
       - name: Promote observer to validator
