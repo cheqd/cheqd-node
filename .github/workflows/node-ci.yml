@@ -96,12 +96,16 @@ jobs:
         run: |
           docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node .
 
-      - name: Set up 4 node docker pool, add observer and validator
+      - name: Set up 4 node docker pool
         run: |
           cd test/networks/docker_compose
           ./gen_node_configs.sh
           ./run_docker.sh > /dev/null &
           sleep 300
+          docker ps
+
+      - name: Add observer node
+        run: |
           cd && mkdir node5 && cd node5
           pwd
           cheqd-noded init node5 --home .
@@ -117,6 +121,9 @@ jobs:
           cheqd-noded start --home . > /dev/null &
           sleep 300
           docker ps
+
+      - name: Promote observer to validator
+        run: |
           sudo chown -R runner:docker ${{ env.NODE_CONFIGS_BASE }}
           rm -rf /home/runner/.cheqdnode
           cp -a ~/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs/client/.cheqdnode/. /home/runner/.cheqdnode/
