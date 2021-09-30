@@ -141,7 +141,5 @@ jobs:
           NODE5_PUBKEY=$(cheqd-noded tendermint show-validator | sed 's/\r//g')
           echo $NODE5_PUBKEY
           curl "http://${NODE1_IP}:26657"
-          sleep 15
           HOME=${{ env.NODE_CONFIGS_BASE }}/client cheqd-noded tx bank send $OP0_ADDRESS $OP5_ADDRESS 1000000000000000ncheq --chain-id cheqd --fees 5000000ncheq --node "http://$NODE1_IP:26657" -y || echo "Something went wrong!"
-          sleep 60
           HOME=${{ env.NODE_CONFIGS_BASE }}/client cheqd-noded tx staking create-validator --amount 1000000000000000ncheq --from node5-operator --chain-id cheqd --min-self-delegation="1" --gas="auto" --gas-prices="25ncheq" --pubkey $NODE5_PUBKEY --commission-max-change-rate="0.02" --commission-max-rate="0.02" --commission-rate="0.01" --gas 239933 --node "http://$NODE1_IP:26657" -y
