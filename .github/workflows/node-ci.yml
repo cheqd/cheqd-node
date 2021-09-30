@@ -106,33 +106,33 @@ jobs:
 
       - name: Add observer node
         run: |
-          cd && mkdir node5 && cd node5
+          cd
           pwd
-          cheqd-noded init node5 --home .
-          cp ${{ env.NODE_CONFIGS_BASE }}/node0/.cheqdnode/config/genesis.json config/
+          cheqd-noded init node5
+          cp ${{ env.NODE_CONFIGS_BASE }}/node0/.cheqdnode/config/genesis.json /home/runner/.cheqdnode/config/
           NODE0_IP=$(docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} docker_compose_node0_1)
           echo $NODE0_IP
           PEER0=$(cat ${{ env.NODE_CONFIGS_BASE }}/node0/node_id.txt)@$NODE0_IP:26656
           echo $PEER0
-          sed -ri "s|persistent_peers = \".*\"|persistent_peers = \"${PEER0}\"|" config/config.toml
-          sed -ri "s|laddr = \"tcp://127.0.0.1:26657\"|laddr = \"tcp://127.0.0.1:26677\"|" config/config.toml
-          sed -ri "s|laddr = \"tcp://0.0.0.0:26656\"|laddr = \"tcp://0.0.0.0:26676\"|" config/config.toml
-          cat config/config.toml
-          cheqd-noded start --home . > /dev/null &
+          sed -ri "s|persistent_peers = \".*\"|persistent_peers = \"${PEER0}\"|" /home/runner/.cheqdnode/config/config.toml
+          sed -ri "s|laddr = \"tcp://127.0.0.1:26657\"|laddr = \"tcp://127.0.0.1:26677\"|" /home/runner/.cheqdnode/config/config.toml
+          sed -ri "s|laddr = \"tcp://0.0.0.0:26656\"|laddr = \"tcp://0.0.0.0:26676\"|" /home/runner/.cheqdnode/config/config.toml
+          cat /home/runner/.cheqdnode/config/config.toml
+          cheqd-noded start > /dev/null &
           sleep 300
           docker ps
 
       - name: Promote observer to validator
         run: |
           sudo chown -R runner:docker ${{ env.NODE_CONFIGS_BASE }}
-          rm -rf /home/runner/.cheqdnode
-          cp -a ~/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs/client/.cheqdnode/. /home/runner/.cheqdnode/
+          export HOME=${{ env.NODE_CONFIGS_BASE }}/client
+          cheqd-noded keys list
+          OP0_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p)
+          echo $OP0_ADDRESS
           cheqd-noded keys add node5-operator
           cheqd-noded keys list
           OP5_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p)
           echo $OP5_ADDRESS
-          OP0_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p)
-          echo $OP0_ADDRESS
           OP5_PUBKEY=$(cheqd-noded keys list | sed -nr 's/.*"key":"(.*?)".*/\1/p' | sed -n 1p)
           echo $OP5_PUBKEY
           NODE5_PUBKEY=$(cheqd-noded tendermint show-validator --home /home/runner/node5 | sed 's/\r//g')
