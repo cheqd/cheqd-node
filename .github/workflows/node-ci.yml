@@ -130,13 +130,13 @@ jobs:
           sudo chown -R runner:docker ${{ env.NODE_CONFIGS_BASE }}
           export HOME=${{ env.NODE_CONFIGS_BASE }}/client
           cheqd-noded keys list
-          OP0_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p)
+          OP0_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
           echo $OP0_ADDRESS
           cheqd-noded keys add node5-operator
           cheqd-noded keys list
-          OP5_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p)
+          OP5_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
           echo $OP5_ADDRESS
-          OP5_PUBKEY=$(cheqd-noded keys list | sed -nr 's/.*"key":"(.*?)".*/\1/p' | sed -n 1p)
+          OP5_PUBKEY=$(cheqd-noded keys list | sed -nr 's/.*"key":"(.*?)".*/\1/p' | sed -n 1p | sed 's/\r//g')
           echo $OP5_PUBKEY
           export HOME=/home/runner
           NODE5_PUBKEY=$(cheqd-noded tendermint show-validator | sed 's/\r//g')
