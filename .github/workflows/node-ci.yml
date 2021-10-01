@@ -131,6 +131,8 @@ jobs:
           export NODE2_IP=$(docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} docker_compose_node2_1 | sed 's/\r//g')
           echo $NODE2_IP
           sudo chown -R runner:docker ${{ env.NODE_CONFIGS_BASE }}
+          docker ps
+          docker network inspect docker_compose_default
           export HOME=${{ env.NODE_CONFIGS_BASE }}/client
           cheqd-noded keys list
           OP0_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
