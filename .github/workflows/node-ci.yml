@@ -128,6 +128,8 @@ jobs:
           echo $NODE0_IP
           export NODE1_IP=$(docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} docker_compose_node1_1 | sed 's/\r//g')
           echo $NODE1_IP
+          export NODE2_IP=$(docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} docker_compose_node2_1 | sed 's/\r//g')
+          echo $NODE2_IP
           sudo chown -R runner:docker ${{ env.NODE_CONFIGS_BASE }}
           export HOME=${{ env.NODE_CONFIGS_BASE }}/client
           cheqd-noded keys list
@@ -140,7 +142,7 @@ jobs:
           export HOME=/home/runner
           NODE5_PUBKEY=$(cheqd-noded tendermint show-validator | sed 's/\r//g')
           echo $NODE5_PUBKEY
-          curl "http://${NODE0_IP}:26657" || echo "Curl failed!"
-          HOME=${{ env.NODE_CONFIGS_BASE }}/client sudo cheqd-noded tx bank send ${OP0_ADDRESS} ${OP5_ADDRESS} 1000000000000000ncheq --chain-id cheqd --fees 5000000ncheq --node "http://${NODE0_IP}:26657" -y
+          curl "http://${NODE2_IP}:26657" || echo "Curl failed!"
+          HOME=${{ env.NODE_CONFIGS_BASE }}/client sudo cheqd-noded tx bank send ${OP0_ADDRESS} ${OP5_ADDRESS} 1000000000000000ncheq --chain-id cheqd --fees 5000000ncheq --node "http://${NODE2_IP}:26657" -y || echo "Send failed!"
           docker ps
           docker network ls
