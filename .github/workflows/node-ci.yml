@@ -146,7 +146,7 @@ jobs:
           echo $NODE5_PUBKEY
           docker ps
           docker network inspect docker_compose_default
-          HOME=${{ env.NODE_CONFIGS_BASE }}/client cheqd-noded tx bank send ${OP0_ADDRESS} ${OP5_ADDRESS} 1000000000000000ncheq --chain-id cheqd --fees 5000000ncheq --node "http://${NODE2_IP}:26657" -y
+          HOME=${{ env.NODE_CONFIGS_BASE }}/client cheqd-noded tx bank send ${OP0_ADDRESS} ${OP5_ADDRESS} 1100000000000000ncheq --chain-id cheqd --fees 5000000ncheq --node "http://${NODE2_IP}:26657" -y
           sleep 15
           HOME=${{ env.NODE_CONFIGS_BASE }}/client cheqd-noded tx staking create-validator --amount 1000000000000000ncheq --from node5-operator --chain-id cheqd --min-self-delegation="1" --gas="auto" --gas-prices="25ncheq" --pubkey $NODE5_PUBKEY --commission-max-change-rate="0.02" --commission-max-rate="0.02" --commission-rate="0.01" --gas 239933 --node "http://${NODE2_IP}:26657" -y
           docker ps
