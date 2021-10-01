@@ -101,7 +101,7 @@ jobs:
           cd test/networks/docker_compose
           ./gen_node_configs.sh
           ./run_docker.sh > /dev/null &
-          sleep 400
+          sleep 300
           docker ps
 
       - name: Add observer node
@@ -132,6 +132,7 @@ jobs:
           echo $NODE2_IP
           docker ps
           docker network inspect docker_compose_default
+          sudo chown -R runner:docker ${{ env.NODE_CONFIGS_BASE }}/client
           export HOME=${{ env.NODE_CONFIGS_BASE }}/client
           cheqd-noded keys list
           OP0_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
@@ -143,6 +144,8 @@ jobs:
           export HOME=/home/runner
           NODE5_PUBKEY=$(cheqd-noded tendermint show-validator | sed 's/\r//g')
           echo $NODE5_PUBKEY
+          docker ps
+          docker network inspect docker_compose_default
           HOME=${{ env.NODE_CONFIGS_BASE }}/client cheqd-noded tx bank send ${OP0_ADDRESS} ${OP5_ADDRESS} 1000000000000000ncheq --chain-id cheqd --fees 5000000ncheq --node "http://${NODE2_IP}:26657" -y || echo "Send failed!"
           curl "http://${NODE2_IP}:26657" || echo "Curl failed!"
           docker ps
