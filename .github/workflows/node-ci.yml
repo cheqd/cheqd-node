@@ -143,6 +143,6 @@ jobs:
           NODE5_PUBKEY=$(cheqd-noded tendermint show-validator | sed 's/\r//g')
           echo $NODE5_PUBKEY
           curl "http://${NODE2_IP}:26657" || echo "Curl failed!"
-          HOME=${{ env.NODE_CONFIGS_BASE }}/client sudo cheqd-noded tx bank send ${OP0_ADDRESS} ${OP5_ADDRESS} 1000000000000000ncheq --chain-id cheqd --fees 5000000ncheq --node "http://${NODE2_IP}:26657" -y || echo "Send failed!"
+          HOME=${{ env.NODE_CONFIGS_BASE }}/client cheqd-noded tx bank send ${OP0_ADDRESS} ${OP5_ADDRESS} 1000000000000000ncheq --chain-id cheqd --fees 5000000ncheq --node "http://${NODE2_IP}:26657" -y || echo "Send failed!"
           docker ps
           docker network ls
