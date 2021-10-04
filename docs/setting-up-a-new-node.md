@@ -28,44 +28,49 @@ Extended information on [recommended hardware requirements is available in Tende
 
 Our [packaged releases](https://github.com/cheqd/cheqd-node/releases) are currently compiled and tested for `Ubuntu 20.04 LTS`, which is the recommended operating system in case the installation is carried out using Debian package or binaries.
 
-For other operating systems, we 
+For other operating systems, we recommend using [pre-built Docker image releases for `cheqd-node`](https://github.com/orgs/cheqd/packages?repo_name=cheqd-node).
 
-We pkan
+We plan on supporting other operating systems in the future based on demand for specific platforms by the community.
 
 ### Ports
 
-To function properly node requires the following ports to be configured:
+To function properly, `cheqd-node` requires two types of ports to be configured.
 
-* P2P port:
-  * This port is used for peer to peer node communication
-  * Incoming and outcoming tcp connections must be allowed
-  * `26656` by default
-  * Can be configured in `/etc/cheqd-node/config.toml`
-* RPC port:
-  * This port is used by client applications. Open it only if you want clients to be able to connect to your node.
-  * Incoming tcp connections should be allowed.
-  * SSL can also be configured separately
-  * `26657` by default
-  * Can be configured in `/etc/cheqd-node/config.toml`
+#### P2P port
+
+* This port is used for peer-to-peer node communication
+* Incoming and outcoming TCP connections must be allowed from any IPv4 address
+* `26656` by default
+* Can be configured in `/etc/cheqd-node/config.toml`
+
+#### RPC port
+
+* This port is used by client applications. Open it only if you want clients to be able to connect to your node.
+* Incoming tcp connections should be allowed.
+* SSL can also be configured separately
+* `26657` by default
+* Can be configured in `/etc/cheqd-node/config.toml`
 
 ### Volumes
 
-We recommend to use separate volume for `data` directory where blockchain is stored.
+We recommend using a separate storage volume for the `data` directory where the node's copy of the ledger is stored.
 
-The directory location depends on the installation method:
+The default directory location depends on the installation method used:
 
-* For binary distribution it's `$HOME/.cheqdnode/data` by default;
-* If you install node using `deb` package, default location is: `/var/lib/cheqd/.cheqdnode/data`.
+* For binary distribution, it is `$HOME/.cheqdnode/data`
+* For installations done using our Debian packages, it is `/var/lib/cheqd/.cheqdnode/data`.
 
 ### Sentry nodes \(optional\)
 
-You can read about sentry nodes [here](https://docs.tendermint.com/master/nodes/validators.html).
+Tendermint allows more complex setups in production, where the ingress/egress to a validator node is [proxied behind a "sentry" node](https://docs.tendermint.com/master/nodes/validators.html#setting-up-a-validator).
+
+While this setup is not compulsory, node operators with higher stakes or a need to have more robust network security may consider setting up a sentry-validator node architecture.
 
 ## Installing and configuring software
 
 ### Installing using .deb package
 
-This is the most preferable way to get `cheqd-node`. Detailed information about changes made by the package can be found [here](deb-package-overview.md)
+The recommended way to install `cheqd-node` on a standalone (virtual) machine is to use our Debian package installer on Ubuntu 20.04 LTS. Detailed information about changes made by the package can be found [here](deb-package-overview.md)
 
 1. Get `deb` for Ubuntu 20.04 in [releases](https://github.com/cheqd/cheqd-node/releases);
 2. Download & Install the package;
