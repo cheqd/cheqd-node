@@ -56,7 +56,7 @@ func (k Keeper) AppendCredDef(
 	}
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CredDefKey))
-	value := k.cdc.MustMarshalBinaryBare(&credDef)
+	value := k.cdc.MustMarshal(&credDef)
 	store.Set(GetCredDefIDBytes(credDef.Id), value)
 
 	// Update credDef count
@@ -68,7 +68,7 @@ func (k Keeper) AppendCredDef(
 // SetCredDef set a specific credDef in the store
 func (k Keeper) SetCredDef(ctx sdk.Context, credDef types.CredDef) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CredDefKey))
-	b := k.cdc.MustMarshalBinaryBare(&credDef)
+	b := k.cdc.MustMarshal(&credDef)
 	store.Set(GetCredDefIDBytes(credDef.Id), b)
 }
 
@@ -76,7 +76,7 @@ func (k Keeper) SetCredDef(ctx sdk.Context, credDef types.CredDef) {
 func (k Keeper) GetCredDef(ctx sdk.Context, id string) types.CredDef {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CredDefKey))
 	var credDef types.CredDef
-	k.cdc.MustUnmarshalBinaryBare(store.Get(GetCredDefIDBytes(id)), &credDef)
+	k.cdc.MustUnmarshal(store.Get(GetCredDefIDBytes(id)), &credDef)
 	return credDef
 }
 
@@ -101,7 +101,7 @@ func (k Keeper) GetAllCredDef(ctx sdk.Context) (list []types.CredDef) {
 
 	for ; iterator.Valid(); iterator.Next() {
 		var val types.CredDef
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &val)
+		k.cdc.MustUnmarshal(iterator.Value(), &val)
 		list = append(list, val)
 	}
 

@@ -54,7 +54,7 @@ func (k Keeper) AppendSchema(
 	}
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.SchemaKey))
-	value := k.cdc.MustMarshalBinaryBare(&schema)
+	value := k.cdc.MustMarshal(&schema)
 	store.Set(GetSchemaIDBytes(schema.Id), value)
 
 	// Update schema count
@@ -66,7 +66,7 @@ func (k Keeper) AppendSchema(
 // SetSchema set a specific schema in the store
 func (k Keeper) SetSchema(ctx sdk.Context, schema types.Schema) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.SchemaKey))
-	b := k.cdc.MustMarshalBinaryBare(&schema)
+	b := k.cdc.MustMarshal(&schema)
 	store.Set(GetSchemaIDBytes(schema.Id), b)
 }
 
@@ -74,7 +74,7 @@ func (k Keeper) SetSchema(ctx sdk.Context, schema types.Schema) {
 func (k Keeper) GetSchema(ctx sdk.Context, id string) types.Schema {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.SchemaKey))
 	var schema types.Schema
-	k.cdc.MustUnmarshalBinaryBare(store.Get(GetSchemaIDBytes(id)), &schema)
+	k.cdc.MustUnmarshal(store.Get(GetSchemaIDBytes(id)), &schema)
 	return schema
 }
 
@@ -99,7 +99,7 @@ func (k Keeper) GetAllSchema(ctx sdk.Context) (list []types.Schema) {
 
 	for ; iterator.Valid(); iterator.Next() {
 		var val types.Schema
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &val)
+		k.cdc.MustUnmarshal(iterator.Value(), &val)
 		list = append(list, val)
 	}
 
@@ -109,9 +109,4 @@ func (k Keeper) GetAllSchema(ctx sdk.Context) (list []types.Schema) {
 // GetSchemaIDBytes returns the byte representation of the ID
 func GetSchemaIDBytes(id string) []byte {
 	return []byte(id)
-}
-
-// GetSchemaIDFromBytes returns ID in uint64 format from a byte array
-func GetSchemaIDFromBytes(bz []byte) string {
-	return string(bz)
 }

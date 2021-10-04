@@ -1,9 +1,11 @@
 package cheqd
 
 import (
+	"crypto/ed25519"
 	"log"
 	"testing"
 
+	"crypto/rand"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	ptypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/stretchr/testify/require"
@@ -12,10 +14,13 @@ import (
 func TestHandler_CreateDid(t *testing.T) {
 	setup := Setup()
 
+	//Init priv key
+	pubKey, privKey, _ := ed25519.GenerateKey(rand.Reader)
+
 	// add new Did
-	didMsg := setup.CreateDid()
+	didMsg := setup.CreateDid(pubKey)
 	data, _ := ptypes.NewAnyWithValue(didMsg)
-	result, _ := setup.Handler(setup.Ctx, setup.WrapRequest(data))
+	result, _ := setup.Handler(setup.Ctx, setup.WrapRequest(privKey, data, make(map[string]string, 0)))
 	did := types.MsgCreateDidResponse{}
 	err := did.Unmarshal(result.Data)
 

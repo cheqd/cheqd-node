@@ -24,7 +24,7 @@ func (k Keeper) Did(c context.Context, req *types.QueryGetDidRequest) (*types.Qu
 	}
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
-	k.cdc.MustUnmarshalBinaryBare(store.Get(GetDidIDBytes(req.Id)), &did)
+	k.cdc.MustUnmarshal(store.Get(GetDidIDBytes(req.Id)), &did)
 
 	return &types.QueryGetDidResponse{Did: &did}, nil
 }

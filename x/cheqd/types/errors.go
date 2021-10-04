@@ -8,5 +8,5 @@ import (
 
 // x/cheqd module sentinel errors
 var (
-	ErrSample = sdkerrors.Register(ModuleName, 1100, "sample error")
+	ErrInvalidSignature = sdkerrors.Register(ModuleName, 1100, "invalid signature detected")
 )

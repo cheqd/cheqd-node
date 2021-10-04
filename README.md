@@ -52,7 +52,7 @@ We provide packaged releases available for node installation, depending on the m
 ### Docker
 
 * We provide [pre-built Docker containers for `cheqd-node`](https://github.com/orgs/cheqd/packages?repo_name=cheqd-node) for those who wish to install local / testnet nodes using Docker.
-* You can [build your own Docker container images for `cheqd-node`](docker/cheqd_node.md) and use Docker Compose to [set up a local network consisting of multiple Docker nodes](docker/docker_compose_localnet.md) for testing purposes.
+* You can [build your own Docker container images for `cheqd-node`](docker/cheqd_node.md) and use Docker Compose to [set up a local network consisting of multiple Docker nodes](test/networks/docker_compose.md) for testing purposes.
 * You can also [use this image to set up a local network consisting of multiple node processes in a single container](docker/single_image_testnet.md).
 
 ## Building from source

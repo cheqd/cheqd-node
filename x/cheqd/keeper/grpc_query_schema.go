@@ -24,7 +24,7 @@ func (k Keeper) Schema(c context.Context, req *types.QueryGetSchemaRequest) (*ty
 	}
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.SchemaKey))
-	k.cdc.MustUnmarshalBinaryBare(store.Get(GetSchemaIDBytes(req.Id)), &schema)
+	k.cdc.MustUnmarshal(store.Get(GetSchemaIDBytes(req.Id)), &schema)
 
 	return &types.QueryGetSchemaResponse{Schema: &schema}, nil
 }

@@ -21,6 +21,7 @@ message MsgWriteRequest {
   google.protobuf.Any data = 1;
   repeated string authors = 2;
   map<string, string> signatures = 3;
+  map<string, string> metadata = 4;
 }
 
 message MsgCreateCredDef {

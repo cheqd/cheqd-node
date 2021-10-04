@@ -46,7 +46,7 @@ This document describes in detail how to join existing network as validator.
      Example:
 
      ```text
-     cheqd-noded tx staking create-validator --amount 50000000cheq --from steward1 --moniker steward1 --chain-id cheqd-testet --min-self-delegation="1" --gas="auto" --gas-prices="1cheq" --pubkey cosmosvalconspub1zcjduepqpmyzmytdzjhf2fjwttjsrv49t62gdexm2yttpmgzh38p0rncqg8ssrxm2l --commission-max-change-rate="0.02" --commission-max-rate="0.02" --commission-rate="0.01"
+     cheqd-noded tx staking create-validator --amount 40000000000000000ncheq --from eu-node-operator --moniker node1-eu-testnet-cheqd --chain-id cheqd-testnet-2 --min-self-delegation="1" --gas="300000" --gas-prices="25ncheq" --pubkey '{"@type":"/cosmos.crypto.ed25519.PubKey","key":"4anVUO8WhmRMqG1t4z6VxqmqZL3V7q6HqucjwZePiUw="}' --commission-max-change-rate="0.02" --commission-max-rate="0.02" --commission-rate="0.01" --node http://node1.eu.testnet.cheqd.network:26657
      ```
 
 5. Check that the validator is bonded and taking part in consensus:

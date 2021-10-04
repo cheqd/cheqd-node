@@ -1,5 +1,7 @@
 package utils
 
+import "strings"
+
 func CompareOwners(authors []string, controllers []string) bool {
 	type void struct{}
 	var member void
@@ -15,4 +17,9 @@ func CompareOwners(authors []string, controllers []string) bool {
 	}
 
 	return result
+}
+
+func SplitDidUrlIntoDidAndFragment(didUrl string) (string, string) {
+	fragments := strings.Split(didUrl, "#")
+	return fragments[0], fragments[1]
 }

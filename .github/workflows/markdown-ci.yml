@@ -1,0 +1,42 @@
+name: Markdown quality control
+
+on: 
+  push:
+    paths:
+    - '**.md'
+    - '**.markdown'
+    - '**.mdown'
+    - '**.mdwn'
+    - '**.mdx'
+    - '**.mkd'
+    - '**.mkdn'
+    - '**.mkdown'
+    - '**.ronn'
+    - '**.scd'
+    - '**.workbook'
+
+jobs:
+  check_links:
+    name: Markdown - Link Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Check if Markdown links are valid
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with: 
+          config-file: '.github/workflows/markdown-ci/mlc_config.json'
+          folder-path: "."
+
+  lint-check:
+    name: Markdown - Linting Check
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Check if Markdown is formatted correctly
+      uses: avto-dev/markdown-lint@v1
+      with:
+        config: '.github/workflows/markdown-ci/markdown-config.yml'
+        args: '.'
+        fix: true

@@ -24,7 +24,7 @@ func (k Keeper) CredDef(c context.Context, req *types.QueryGetCredDefRequest) (*
 	}
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CredDefKey))
-	k.cdc.MustUnmarshalBinaryBare(store.Get(GetCredDefIDBytes(req.Id)), &credDef)
+	k.cdc.MustUnmarshal(store.Get(GetCredDefIDBytes(req.Id)), &credDef)
 
 	return &types.QueryGetCredDefResponse{CredDef: &credDef}, nil
 }
