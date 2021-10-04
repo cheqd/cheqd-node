@@ -117,7 +117,19 @@ This is the most preferable way to get `cheqd-node`. Detailed information about 
     persistent_peers = "d45dcc54583d6223ba6d4b3876928767681e8ff6@node0:26656, 9fb6636188ad9e40a9caf86b88ffddbb1b6b04ce@node1:26656, abbcb709fb556ce63e2f8d59a76c5023d7b28b86@node2:26656, cda0d4dbe3c29edcfcaf4668ff17ddcb96730aec@node3:26656"
    ```
 
-7. \(optional\) Make RPC endpoint available externally:
+7. Set gas prices:
+
+   Open app's config file: `/etc/cheqd-node/app.toml`
+
+   Search for `minimum-gas-prices` parameter and set it to a non-empty value. Recommended one is `25ncheq`.
+
+   Example:
+
+   ```text
+   minimum-gas-prices = "25ncheq"
+   ```
+
+8. \(optional\) Make RPC endpoint available externally:
 
    This step is necessary if you want to allow incoming client application connections to your node. Otherwise, the node will be accessible only locally.
 
@@ -127,7 +139,7 @@ This is the most preferable way to get `cheqd-node`. Detailed information about 
 
    Example: `laddr = "tcp://0.0.0.0:26657"`
 
-8. Enable `cheqd-noded` service and start it:
+9. Enable `cheqd-noded` service and start it:
 
    ```text
     systemctl enable cheqd-noded
@@ -143,7 +155,7 @@ This is the most preferable way to get `cheqd-node`. Detailed information about 
    systemctl status cheqd-noded
    ```
 
-9. Check that the node is connected and catching up:
+10. Check that the node is connected and catching up:
 
    Use status command `cheqd-noded status --node <rpc-address>` or open status page in your browser `<rpc-address>/status`.
 
@@ -215,4 +227,3 @@ ba1689516f45be7f79c7450394144711e02e7341@3.13.19.41:26656
 You can read other advices about running node in production [here](https://docs.tendermint.com/master/nodes/running-in-production.html).
 
 [Сosmovisor](https://docs.cosmos.network/master/run-node/cosmovisor.html) can be used for automatic updates.
-

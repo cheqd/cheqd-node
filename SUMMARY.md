@@ -17,7 +17,7 @@
 
 * [cheqd-node docker image](docker/cheqd_node.md)
 * [cheqd-testsnet docker image](docker/single_image_testnet.md)
-* [Docker Compose Based Localnet](docker/docker_compose_localnet.md)
+* [Docker Compose Based Localnet](test/networks/docker_compose.md)
 
 ## Network Details <a id="persistent_chains"></a>
 
@@ -25,7 +25,7 @@
 
 ## Architecture
 
-* [Architecture Decision Record \(ADR\) Process](architecture/architecture-decision-record-adr-process.md)
+* [Architecture Decision Record \(ADR\) Process](architecture/readme.md)
 * [List of ADRs](architecture/adr-list/README.md)
   * [ADR {ADR-NUMBER}: {TITLE}](architecture/adr-list/adr-template.md)
   * [ADR 001: Payment mechanism for issuing credentials](architecture/adr-list/adr-001-payment-mechanism-for-issuing-credentials.md)
