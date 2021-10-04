@@ -67,7 +67,7 @@ func (k Keeper) AppendDid(
 	}
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
-	value := k.cdc.MustMarshalBinaryBare(&did)
+	value := k.cdc.MustMarshal(&did)
 	store.Set(GetDidIDBytes(did.Id), value)
 
 	// Update did count
@@ -79,7 +79,7 @@ func (k Keeper) AppendDid(
 // SetDid set a specific did in the store
 func (k Keeper) SetDid(ctx sdk.Context, did types.Did) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
-	b := k.cdc.MustMarshalBinaryBare(&did)
+	b := k.cdc.MustMarshal(&did)
 	store.Set(GetDidIDBytes(did.Id), b)
 }
 
@@ -87,7 +87,7 @@ func (k Keeper) SetDid(ctx sdk.Context, did types.Did) {
 func (k Keeper) GetDid(ctx sdk.Context, id string) types.Did {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
 	var did types.Did
-	k.cdc.MustUnmarshalBinaryBare(store.Get(GetDidIDBytes(id)), &did)
+	k.cdc.MustUnmarshal(store.Get(GetDidIDBytes(id)), &did)
 	return did
 }
 
@@ -117,7 +117,7 @@ func (k Keeper) GetAllDid(ctx sdk.Context) (list []types.Did) {
 
 	for ; iterator.Valid(); iterator.Next() {
 		var val types.Did
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &val)
+		k.cdc.MustUnmarshal(iterator.Value(), &val)
 		list = append(list, val)
 	}
 

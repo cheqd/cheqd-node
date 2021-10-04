@@ -21,7 +21,7 @@ import (
 )
 
 type TestSetup struct {
-	Cdc     codec.Marshaler
+	Cdc     codec.Codec
 	Ctx     sdk.Context
 	Keeper  keeper.Keeper
 	Handler sdk.Handler
@@ -30,7 +30,7 @@ type TestSetup struct {
 func Setup() TestSetup {
 	// Init Codec
 	encodingConfig := params.MakeEncodingConfig()
-	cdc := encodingConfig.Marshaler
+	cdc := encodingConfig.Codec
 
 	// Init KVSore
 	db := dbm.NewMemDB()
