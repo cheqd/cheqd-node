@@ -132,7 +132,7 @@ jobs:
           sleep 15
           cheqd-noded query staking validators --node "http://${NODE2_IP}:26657" | sed -nr 's/.*status: (.*?).*/\1/p'
           [[ $(cheqd-noded query staking validators --node "http://${NODE2_IP}:26657" | sed -nr 's/.*status: (.*?).*/\1/p' | wc -l) == 5 ]] && echo "5 validators are running!" || exit 1
-          $(cheqd-noded query staking validators --node "http://${NODE2_IP}:26657" | sed -nr 's/.*status: (.*?).*/\1/p') $1 | while read x; do [[ $x == 'BOND_STATUS_BONDED' ]] && echo "Status OK" || exit 1; done
+          $(cheqd-noded query staking validators --node "http://${NODE2_IP}:26657" | sed -nr 's/.*status: (.*?).*/\1/p') $1 | while read x; do $([[ "BOND_STATUS_BONDED" == $x ]] && echo "Status OK" || exit 1) ; done
 
   # run-cosmos-specific-tests:
   #   name: Run cosmos-specific tests using cheqd-node CLI
