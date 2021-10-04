@@ -70,9 +70,9 @@ jobs:
       - name: Check out
         uses: actions/checkout@v2
 
-      # - name: Build node image
-      #   run: |
-      #     docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node .
+      - name: Build node image
+        run: |
+          docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node .
 
       - name: Build testnet image
         run: |
