@@ -12,55 +12,55 @@ env:
   NODE_CONFIGS_BASE: "~/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs"
 
 jobs:
-  # lint:
-  #   name: cheqd-node linting
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
+  lint:
+    name: cheqd-node linting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
 
-  #     - name: golangci-lint
-  #       uses: golangci/golangci-lint-action@v2
-  #       with:
-  #         version: v1.40
-  #         args: --timeout 5m0s
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.40
+          args: --timeout 5m0s
 
-  # test:
-  #   name: cheqd-node unit tests
-  #   runs-on: ubuntu-latest
-  #   needs: lint
-  #   steps:
-  #     - name: Set up Go 1.16
-  #       uses: actions/setup-go@v2
-  #       with:
-  #         go-version: 1.16
+  test:
+    name: cheqd-node unit tests
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Set up Go 1.16
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
 
-  #     - name: Check out code into the Go module directory
-  #       uses: actions/checkout@v2
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
 
-  #     - name: Run tests
-  #       run: |
-  #         PACKAGES=$(go list ./...)
-  #         go test -v $PACKAGES
+      - name: Run tests
+        run: |
+          PACKAGES=$(go list ./...)
+          go test -v $PACKAGES
 
-  # build:
-  #   name: Build cheqd-node
-  #   runs-on: ubuntu-latest
-  #   needs: test
-  #   steps:
-  #     - name: Set up Go 1.16
-  #       uses: actions/setup-go@v2
-  #       with:
-  #         go-version: 1.16
+  build:
+    name: Build cheqd-node
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Set up Go 1.16
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
 
-  #     # There is an issue with the latest starport, especially 0.18 version
-  #     - name: Download and build starport
-  #       run: wget -qO- https://github.com/tendermint/starport/releases/download/v0.17.3/starport_0.17.3_linux_amd64.tar.gz | tar xvz -C /tmp/ && sudo cp /tmp/starport /usr/bin
+      # There is an issue with the latest starport, especially 0.18 version
+      - name: Download and build starport
+        run: wget -qO- https://github.com/tendermint/starport/releases/download/v0.17.3/starport_0.17.3_linux_amd64.tar.gz | tar xvz -C /tmp/ && sudo cp /tmp/starport /usr/bin
 
-  #     - name: Check out code into the Go module directory
-  #       uses: actions/checkout@v2
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
 
-  #     - name: Starport build
-  #       run: starport chain build
+      - name: Starport build
+        run: starport chain build
 
   build-images-and-set-up-pool:
     name: Build cheqd-node and testnet Docker images, install deb package and run Docker pool
@@ -90,7 +90,6 @@ jobs:
           ./gen_node_configs.sh
           ./run_docker.sh > /dev/null &
           sleep 30
-          docker ps
           [[ $(docker ps | wc -l) == 5 ]] && echo "4 pool containers are running!" || exit 1
 
       - name: Add observer node
@@ -108,7 +107,6 @@ jobs:
           sed -ri "s|laddr = \"tcp://0.0.0.0:26656\"|laddr = \"tcp://0.0.0.0:26676\"|" ~/.cheqdnode/config/config.toml
           cheqd-noded start > /dev/null &
           sleep 15
-          cheqd-noded status -n "tcp://localhost:26677" 2>&1 | wc -l
           [[ $(cheqd-noded status -n "tcp://localhost:26677" 2>&1 | wc -l) == 1 ]] && echo "New node returns status!" || exit 1
 
       - name: Promote observer to validator
@@ -130,7 +128,6 @@ jobs:
           HOME=${{ env.NODE_CONFIGS_BASE }}/client cheqd-noded tx bank send ${OP0_ADDRESS} ${OP5_ADDRESS} 1100000000000000ncheq --chain-id cheqd --fees 5000000ncheq --node "http://${NODE2_IP}:26657" -y
           HOME=${{ env.NODE_CONFIGS_BASE }}/client cheqd-noded tx staking create-validator --amount 1000000000000000ncheq --from node5-operator --chain-id cheqd --min-self-delegation="1" --gas="auto" --gas-prices="25ncheq" --pubkey $NODE5_PUBKEY --commission-max-change-rate="0.02" --commission-max-rate="0.02" --commission-rate="0.01" --gas 239933 --node "http://${NODE2_IP}:26657" -y
           sleep 15
-          cheqd-noded query staking validators --node "http://${NODE2_IP}:26657" | sed -nr 's/.*status: (.*?).*/\1/p'
           [[ $(cheqd-noded query staking validators --node "http://${NODE2_IP}:26657" | sed -nr 's/.*status: (.*?).*/\1/p' | wc -l) == 5 ]] && echo "5 validators are running!" || exit 1
           cheqd-noded query staking validators --node "http://${NODE2_IP}:26657" | sed -nr 's/.*status: (.*?).*/\1/p' $1 | while read x; do [[ "BOND_STATUS_BONDED" == $x ]] && echo "Validator's status is bonded!" || exit 1 ; done
 
