@@ -13,11 +13,6 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	didMsg, isMsgIdentity := msg.Data.GetCachedValue().(*types.MsgCreateDid)
 
-	if !k.VerifyMsgCreateDid(msg, didMsg) {
-		errMsg := "Invalid signature detected"
-		return nil, sdkerrors.Wrap(types.ErrInvalidSignature, errMsg)
-	}
-
 	if !isMsgIdentity {
 		errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName, msg)
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
@@ -77,5 +72,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 
 	k.SetDid(ctx, did)
 
-	return &types.MsgUpdateDidResponse{}, nil
+	return &types.MsgUpdateDidResponse{
+		Id: didMsg.Id,
+	}, nil
 }

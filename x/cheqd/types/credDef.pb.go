@@ -154,6 +154,10 @@ type CredDefValue struct {
 	Revocation map[string]*types.Any `protobuf:"bytes,2,rep,name=revocation,proto3" json:"revocation,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
+func (m *CredDefValue) isMsgCreateCredDef_Value() {
+	panic("implement me")
+}
+
 func (m *CredDefValue) Reset()         { *m = CredDefValue{} }
 func (m *CredDefValue) String() string { return proto.CompactTextString(m) }
 func (*CredDefValue) ProtoMessage()    {}

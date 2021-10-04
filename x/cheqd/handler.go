@@ -14,27 +14,33 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
-		parsed_msg, isMsgIdentity := msg.(*types.MsgWriteRequest)
+		parsedMsg, isMsgIdentity := msg.(*types.MsgWriteRequest)
 		if !isMsgIdentity {
 			errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName, msg)
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 		}
-		switch parsed_msg.Data.TypeUrl {
+
+		if !k.Verify(ctx, parsedMsg) {
+			errMsg := "Invalid signature"
+			return nil, sdkerrors.Wrap(types.ErrInvalidSignature, errMsg)
+		}
+
+		switch parsedMsg.Data.TypeUrl {
 		// this line is used by starport scaffolding # 1
 		case "/cheqdid.cheqdnode.cheqd.MsgCreateCredDef":
-			res, err := msgServer.CreateCredDef(sdk.WrapSDKContext(ctx), parsed_msg)
+			res, err := msgServer.CreateCredDef(sdk.WrapSDKContext(ctx), parsedMsg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case "/cheqdid.cheqdnode.cheqd.MsgCreateSchema":
-			res, err := msgServer.CreateSchema(sdk.WrapSDKContext(ctx), parsed_msg)
+			res, err := msgServer.CreateSchema(sdk.WrapSDKContext(ctx), parsedMsg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case "/cheqdid.cheqdnode.cheqd.MsgCreateDid":
-			res, err := msgServer.CreateDid(sdk.WrapSDKContext(ctx), parsed_msg)
+			res, err := msgServer.CreateDid(sdk.WrapSDKContext(ctx), parsedMsg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case "/cheqdid.cheqdnode.cheqd.MsgUpdateDid":
-			res, err := msgServer.UpdateDid(sdk.WrapSDKContext(ctx), parsed_msg)
+			res, err := msgServer.UpdateDid(sdk.WrapSDKContext(ctx), parsedMsg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		default:

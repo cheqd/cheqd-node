@@ -2,6 +2,7 @@ syntax = "proto3";
 package cheqdid.cheqdnode.cheqd;
 import "google/protobuf/any.proto";
 import "cheqd/did.proto";
+import "cheqd/credDef.proto";
 
 // this line is used by starport scaffolding # proto/tx/import
 
@@ -29,7 +30,10 @@ message MsgCreateCredDef {
   string schema_id = 2;
   string tag = 3;
   string signatureType = 4;
-  google.protobuf.Any value = 5;
+  oneof value {
+    CredDefValue cl_type = 5;
+    google.protobuf.Any any_type = 6;
+  }
 }
 
 message MsgCreateCredDefResponse {

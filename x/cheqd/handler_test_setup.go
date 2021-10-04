@@ -93,17 +93,67 @@ func (s *TestSetup) CreateDid(pubKey ed25519.PublicKey) *types.MsgCreateDid {
 	}
 }
 
+func (s *TestSetup) UpdateDid(did *types.Did, pubKey ed25519.PublicKey) *types.MsgUpdateDid {
+	PublicKeyMultibase := "z" + base58.Encode(pubKey)
+
+	VerificationMethod := types.VerificationMethod{
+		Id:                 "did:cheqd:test:alice#key-2",
+		Type:               "Ed25519VerificationKey2020",
+		Controller:         "Controller",
+		PublicKeyMultibase: PublicKeyMultibase,
+	}
+
+	return &types.MsgUpdateDid{
+		Id:                   did.Id,
+		Controller:           did.Controller,
+		VerificationMethod:   []*types.VerificationMethod{&VerificationMethod},
+		Authentication:       did.Authentication,
+		AssertionMethod:      did.AssertionMethod,
+		CapabilityInvocation: did.CapabilityInvocation,
+		CapabilityDelegation: did.CapabilityDelegation,
+		KeyAgreement:         did.KeyAgreement,
+		AlsoKnownAs:          did.AlsoKnownAs,
+		Service:              did.Service,
+	}
+}
+
+func (s *TestSetup) CreateSchema() *types.MsgCreateSchema {
+	return &types.MsgCreateSchema{
+		Id:        "schema-1",
+		Name:      "name",
+		Version:   "version",
+		AttrNames: []string{"attr1", "attr2"},
+	}
+}
+
+func (s *TestSetup) CreateCredDef() *types.MsgCreateCredDef {
+	Value := types.MsgCreateCredDef_ClType{
+		ClType: &types.CredDefValue{
+			Primary:    map[string]*ptypes.Any{"first": nil},
+			Revocation: map[string]*ptypes.Any{"second": nil},
+		},
+	}
+
+	return &types.MsgCreateCredDef{
+		Id:            "cred-def-1",
+		SchemaId:      "schema-1",
+		Tag:           "tag",
+		SignatureType: "signature-type",
+		Value:         &Value,
+	}
+}
+
 func (s *TestSetup) WrapRequest(privKey ed25519.PrivateKey, data *ptypes.Any, metadata map[string]string) *types.MsgWriteRequest {
 	metadataBytes, _ := json.Marshal(&metadata)
 	dataBytes := data.Value
 
-	signingInput := base64.StdEncoding.EncodeToString(metadataBytes) + "." + base64.StdEncoding.EncodeToString(dataBytes)
-	signingInputBytes := []byte(base64.StdEncoding.EncodeToString([]byte(signingInput)))
-	signature := base64.StdEncoding.EncodeToString(ed25519.Sign(privKey, signingInputBytes))
+	signingInput := []byte(base64.StdEncoding.EncodeToString(metadataBytes) + base64.StdEncoding.EncodeToString(dataBytes))
+	signature := base64.StdEncoding.EncodeToString(ed25519.Sign(privKey, signingInput))
 
 	return &types.MsgWriteRequest{
 		Data:       data,
 		Metadata:   metadata,
 		Signatures: map[string]string{"did:cheqd:test:alice#key-1": signature},
+		Authors:    []string{"controller"},
 	}
 }

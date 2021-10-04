@@ -44,6 +44,7 @@ func (k Keeper) AppendCredDef(
 	schemaId string,
 	tag string,
 	signatureType string,
+	clValue *types.CredDef_ClType,
 ) string {
 	// Create the credDef
 	count := k.GetCredDefCount(ctx)
@@ -53,6 +54,7 @@ func (k Keeper) AppendCredDef(
 		SchemaId:      schemaId,
 		Tag:           tag,
 		SignatureType: signatureType,
+		Value:         clValue,
 	}
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CredDefKey))

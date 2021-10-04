@@ -18,15 +18,21 @@ func (k msgServer) CreateCredDef(goCtx context.Context, msg *types.MsgWriteReque
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 	}
 
-	k.AppendCredDef(
-		ctx,
-		credDefMsg.Id,
-		credDefMsg.SchemaId,
-		credDefMsg.Tag,
-		credDefMsg.SignatureType,
-	)
+	switch value := credDefMsg.Value.(type) {
+	case *types.MsgCreateCredDef_ClType:
+		k.AppendCredDef(
+			ctx,
+			credDefMsg.Id,
+			credDefMsg.SchemaId,
+			credDefMsg.Tag,
+			credDefMsg.SignatureType,
+			(*types.CredDef_ClType)(value),
+		)
 
-	return &types.MsgCreateCredDefResponse{
-		Id: credDefMsg.Id,
-	}, nil
+		return &types.MsgCreateCredDefResponse{
+			Id: credDefMsg.Id,
+		}, nil
+	default:
+		return nil, sdkerrors.Wrap(types.ErrInvalidCredDefValue, "unsupported cred def value")
+	}
 }
