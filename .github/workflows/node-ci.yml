@@ -12,76 +12,76 @@ env:
   NODE_CONFIGS_BASE: "~/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs"
 
 jobs:
-  # lint:
-  #   name: cheqd-node linting
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
+  lint:
+    name: cheqd-node linting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
 
-  #     - name: golangci-lint
-  #       uses: golangci/golangci-lint-action@v2
-  #       with:
-  #         version: v1.40
-  #         args: --timeout 5m0s
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.40
+          args: --timeout 5m0s
 
-  # test:
-  #   name: cheqd-node unit tests
-  #   runs-on: ubuntu-latest
-  #   needs: lint
-  #   steps:
-  #     - name: Set up Go 1.16
-  #       uses: actions/setup-go@v2
-  #       with:
-  #         go-version: 1.16
+  test:
+    name: cheqd-node unit tests
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Set up Go 1.16
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
 
-  #     - name: Check out code into the Go module directory
-  #       uses: actions/checkout@v2
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
 
-  #     - name: Run tests
-  #       run: |
-  #         PACKAGES=$(go list ./...)
-  #         go test -v $PACKAGES
+      - name: Run tests
+        run: |
+          PACKAGES=$(go list ./...)
+          go test -v $PACKAGES
 
-  # build:
-  #   name: Build cheqd-node
-  #   runs-on: ubuntu-latest
-  #   needs: test
-  #   steps:
-  #     - name: Set up Go 1.16
-  #       uses: actions/setup-go@v2
-  #       with:
-  #         go-version: 1.16
+  build:
+    name: Build cheqd-node
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Set up Go 1.16
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
 
-  #     # There is an issue with the latest starport, especially 0.18 version
-  #     - name: Download and build starport
-  #       run: wget -qO- https://github.com/tendermint/starport/releases/download/v0.17.3/starport_0.17.3_linux_amd64.tar.gz | tar xvz -C /tmp/ && sudo cp /tmp/starport /usr/bin
+      # There is an issue with the latest starport, especially 0.18 version
+      - name: Download and build starport
+        run: wget -qO- https://github.com/tendermint/starport/releases/download/v0.17.3/starport_0.17.3_linux_amd64.tar.gz | tar xvz -C /tmp/ && sudo cp /tmp/starport /usr/bin
 
-  #     - name: Check out code into the Go module directory
-  #       uses: actions/checkout@v2
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
 
-  #     - name: Starport build
-  #       run: starport chain build
+      - name: Starport build
+        run: starport chain build
 
-  # build-node-and-testnet-images:
-  #   name: Build cheqd-node and testnet Docker images
-  #   runs-on: ubuntu-latest
-  #   needs: build
-  #   steps:
-  #     - name: Check out
-  #       uses: actions/checkout@v2
+  build-node-and-testnet-images:
+    name: Build cheqd-node and testnet Docker images
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Check out
+        uses: actions/checkout@v2
 
-  #     - name: Build node image
-  #       run: |
-  #         docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node .
+      # - name: Build node image
+      #   run: |
+      #     docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node .
 
-  #     - name: Build testnet image
-  #       run: |
-  #         docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
+      - name: Build testnet image
+        run: |
+          docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
 
   install-deb-package-and-set-up-pool:
     name: Install deb package and set up Docker pool
     runs-on: ubuntu-20.04 # exact version, not latest
-    # needs: build-node-and-testnet-images
+    needs: build-node-and-testnet-images
     steps:
       - name: Download and install deb package
         run: |
