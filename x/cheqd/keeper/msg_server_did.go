@@ -12,10 +12,12 @@ import (
 func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgWriteRequest) (*types.MsgCreateDidResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	didMsg, isMsgIdentity := msg.Data.GetCachedValue().(*types.MsgCreateDid)
+
 	if !isMsgIdentity {
 		errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName, msg)
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 	}
+
 	k.AppendDid(
 		ctx,
 		didMsg.Id,
@@ -38,10 +40,12 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) (*types.MsgUpdateDidResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	didMsg, isMsgIdentity := msg.Data.GetCachedValue().(*types.MsgUpdateDid)
+
 	if !isMsgIdentity {
 		errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName, msg)
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 	}
+
 	var did = types.Did{
 		Id:                   didMsg.Id,
 		Controller:           didMsg.Controller,

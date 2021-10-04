@@ -2,8 +2,6 @@ package cheqd
 
 import (
 	"fmt"
-	"reflect"
-
 	"github.com/cheqd/cheqd-node/x/cheqd/keeper"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -23,19 +21,19 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		}
 		switch parsed_msg.Data.TypeUrl {
 		// this line is used by starport scaffolding # 1
-		case reflect.TypeOf(types.MsgCreateCredDef{}).Name():
+		case "/cheqdid.cheqdnode.cheqd.MsgCreateCredDef":
 			res, err := msgServer.CreateCredDef(sdk.WrapSDKContext(ctx), parsed_msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
-		case reflect.TypeOf(types.MsgCreateSchema{}).Name():
+		case "/cheqdid.cheqdnode.cheqd.MsgCreateSchema":
 			res, err := msgServer.CreateSchema(sdk.WrapSDKContext(ctx), parsed_msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
-		case reflect.TypeOf(types.MsgCreateDid{}).Name():
+		case "/cheqdid.cheqdnode.cheqd.MsgCreateDid":
 			res, err := msgServer.CreateDid(sdk.WrapSDKContext(ctx), parsed_msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
-		case reflect.TypeOf(types.MsgUpdateDid{}).Name():
+		case "/cheqdid.cheqdnode.cheqd.MsgUpdateDid":
 			res, err := msgServer.UpdateDid(sdk.WrapSDKContext(ctx), parsed_msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 

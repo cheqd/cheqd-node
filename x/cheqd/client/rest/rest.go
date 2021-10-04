@@ -40,10 +40,6 @@ func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {
 
 	r.HandleFunc("/cheqd/dids/{id}", getDidHandler(clientCtx)).Methods("GET")
 	r.HandleFunc("/cheqd/dids", listDidHandler(clientCtx)).Methods("GET")
-
-	r.HandleFunc("/cheqd/nyms/{id}", getNymHandler(clientCtx)).Methods("GET")
-	r.HandleFunc("/cheqd/nyms", listNymHandler(clientCtx)).Methods("GET")
-
 }
 
 func registerTxHandlers(clientCtx client.Context, r *mux.Router) {

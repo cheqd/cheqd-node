@@ -12,14 +12,15 @@ import (
 
 	"github.com/cheqd/cheqd-node/x/cheqd/keeper"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	ptypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type TestSetup struct {
-	Cdc       codec.Marshaler
-	Ctx       sdk.Context
-	NymKeeper keeper.Keeper
-	Handler   sdk.Handler
+	Cdc     codec.Marshaler
+	Ctx     sdk.Context
+	Keeper  keeper.Keeper
+	Handler sdk.Handler
 }
 
 func Setup() TestSetup {
@@ -31,14 +32,14 @@ func Setup() TestSetup {
 	db := dbm.NewMemDB()
 
 	dbStore := store.NewCommitMultiStore(db)
-	nymKey := sdk.NewKVStoreKey(types.StoreKey)
+	storeKey := sdk.NewKVStoreKey(types.StoreKey)
 	memStoreKey := sdk.NewKVStoreKey(types.MemStoreKey)
-	dbStore.MountStoreWithDB(nymKey, sdk.StoreTypeIAVL, nil)
+	dbStore.MountStoreWithDB(storeKey, sdk.StoreTypeIAVL, nil)
 
 	_ = dbStore.LoadLatestVersion()
 
 	// Init Keepers
-	nymKeeper := keeper.NewKeeper(cdc, nymKey, memStoreKey)
+	keeper := keeper.NewKeeper(cdc, storeKey, memStoreKey)
 
 	// Create context
 	blockTime, _ := time.Parse(time.RFC3339, "2021-01-01T00:00:00.000Z")
@@ -46,48 +47,48 @@ func Setup() TestSetup {
 		tmproto.Header{ChainID: "cheqd-node", Time: blockTime},
 		false, log.NewNopLogger())
 
-	handler := NewHandler(*nymKeeper)
+	handler := NewHandler(*keeper)
 
 	setup := TestSetup{
-		Cdc:       cdc,
-		Ctx:       ctx,
-		NymKeeper: *nymKeeper,
-		Handler:   handler,
+		Cdc:     cdc,
+		Ctx:     ctx,
+		Keeper:  *keeper,
+		Handler: handler,
 	}
 
 	return setup
 }
 
-func TestMsgCreateNym() *types.MsgCreateNym {
-	return types.NewMsgCreateNym(
-		"creator_address",
-		"test_alias",
-		"test_verkey",
-		"test_did",
-		"test_role",
-	)
+func (s *TestSetup) CreateDid() *types.MsgCreateDid {
+	VerificationMethod := types.VerificationMethod{
+		Id:                 "12",
+		Type:               "Ed25519VerificationKey2020",
+		Controller:         "Controller",
+		PublicKeyMultibase: "21312",
+	}
+
+	Service := types.DidService{
+		Id:              "1",
+		Type:            "type",
+		ServiceEndpoint: "endpoint",
+	}
+
+	return &types.MsgCreateDid{
+		Id:                   "1",
+		Controller:           []string{"controller"},
+		VerificationMethod:   []*types.VerificationMethod{&VerificationMethod},
+		Authentication:       []string{"Authentication"},
+		AssertionMethod:      []string{"AssertionMethod"},
+		CapabilityInvocation: []string{"CapabilityInvocation"},
+		CapabilityDelegation: []string{"CapabilityDelegation"},
+		KeyAgreement:         []string{"KeyAgreement"},
+		AlsoKnownAs:          []string{"AlsoKnownAs"},
+		Service:              []*types.DidService{&Service},
+	}
 }
 
-func TestMsgUpdateNym(id uint64) *types.MsgUpdateNym {
-	return types.NewMsgUpdateNym(
-		"creator_address",
-		id,
-		"test_alias_new",
-		"test_verkey_new",
-		"test_did_new",
-		"test_role_new",
-	)
-}
-
-func TestMsgDeleteNym(id uint64) *types.MsgDeleteNym {
-	return types.NewMsgDeleteNym(
-		"creator_address",
-		id,
-	)
-}
-
-func TestQueryGetNym(id uint64) types.QueryGetNymRequest {
-	return types.QueryGetNymRequest{
-		Id: id,
+func (s *TestSetup) WrapRequest(Data *ptypes.Any) *types.MsgWriteRequest {
+	return &types.MsgWriteRequest{
+		Data: Data,
 	}
 }

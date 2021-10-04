@@ -7,7 +7,6 @@ import (
 )
 
 func getDid(ctx sdk.Context, id string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
-
 	if !keeper.HasDid(ctx, id) {
 		return nil, sdkerrors.ErrKeyNotFound
 	}
