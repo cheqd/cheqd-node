@@ -20,7 +20,7 @@ func TestHandler_CreateDid(t *testing.T) {
 	// add new Did
 	didMsg := setup.CreateDid(pubKey)
 	data, _ := ptypes.NewAnyWithValue(didMsg)
-	result, _ := setup.Handler(setup.Ctx, setup.WrapRequest(privKey, data, make(map[string]string, 0)))
+	result, _ := setup.Handler(setup.Ctx, setup.WrapRequest(privKey, data, make(map[string]string)))
 	did := types.MsgCreateDidResponse{}
 	err := did.Unmarshal(result.Data)
 

@@ -12,7 +12,7 @@ import (
 )
 
 type DidService struct {
-	Id              string `json:"id""`
+	Id              string `json:"id"`
 	Type            string `json:"type"`
 	ServiceEndpoint string `json:"serviceEndpoint"`
 }
