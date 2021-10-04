@@ -22,11 +22,15 @@ Recommended \(for highload applications\):
 * 100GB SSD
 * x64 2.0 GHz 2v CPU
 
-More about hardware requirements can be found [here](https://docs.tendermint.com/master/nodes/running-in-production.html#hardware).
+Extended information on [recommended hardware requirements is available in Tendermint documentation](https://docs.tendermint.com/master/nodes/running-in-production.html#hardware).
 
 ### Operating System
 
-Current delivery is compiled and tested for `Ubuntu 20.04 LTS` so we recommend using this distribution for now. In the future, it will be possible to compile the application for a wide range of operating systems thanks to the Go language.
+Our [packaged releases](https://github.com/cheqd/cheqd-node/releases) are currently compiled and tested for `Ubuntu 20.04 LTS`, which is the recommended operating system in case the installation is carried out using Debian package or binaries.
+
+For other operating systems, we 
+
+We pkan
 
 ### Ports
 
