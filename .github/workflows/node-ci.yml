@@ -84,7 +84,7 @@ jobs:
         run: |
           docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
 
-      - name: Set up 4 node docker pool
+      - name: Set up 4 validators + 2 observers node docker pool
         run: |
           cd test/networks/docker_compose
           ./gen_node_configs.sh
