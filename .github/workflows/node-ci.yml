@@ -65,7 +65,7 @@ jobs:
   build-images-and-set-up-pool:
     name: Build cheqd-node and testnet Docker images, install deb package and run Docker pool
     runs-on: ubuntu-20.04 # exact version, not latest
-    # needs: build
+    needs: build
     steps:
       - name: Download and install deb package
         run: |
