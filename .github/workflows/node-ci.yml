@@ -106,10 +106,9 @@ jobs:
           sed -ri "s|persistent_peers = \".*\"|persistent_peers = \"${PEER0}\"|" ~/.cheqdnode/config/config.toml
           sed -ri "s|laddr = \"tcp://127.0.0.1:26657\"|laddr = \"tcp://127.0.0.1:26677\"|" ~/.cheqdnode/config/config.toml
           sed -ri "s|laddr = \"tcp://0.0.0.0:26656\"|laddr = \"tcp://0.0.0.0:26676\"|" ~/.cheqdnode/config/config.toml
-          cat ~/.cheqdnode/config/config.toml
           cheqd-noded start > /dev/null &
           sleep 15
-          cheqd-noded status
+          cheqd-noded status -n "tcp://localhost:26677"
           echo "Add some assertion here"
 
       - name: Promote observer to validator
