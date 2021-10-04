@@ -62,24 +62,8 @@ jobs:
       - name: Starport build
         run: starport chain build
 
-  # build-node-and-testnet-images:
-  #   name: Build cheqd-node and testnet Docker images
-  #   runs-on: ubuntu-latest
-  #   needs: build
-  #   steps:
-  #     - name: Check out
-  #       uses: actions/checkout@v2
-
-  #     - name: Build node image
-  #       run: |
-  #         docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node .
-
-  #     - name: Build testnet image
-  #       run: |
-  #         docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
-
-  build-images-install-deb-package-and-set-up-pool:
-    name: Install deb package and set up Docker pool
+  build-images-and-set-up-pool:
+    name: Build cheqd-node and testnet Docker images, install deb package and run Docker pool
     runs-on: ubuntu-20.04 # exact version, not latest
     needs: build
     steps:
@@ -146,3 +130,19 @@ jobs:
           HOME=${{ env.NODE_CONFIGS_BASE }}/client cheqd-noded tx staking create-validator --amount 1000000000000000ncheq --from node5-operator --chain-id cheqd --min-self-delegation="1" --gas="auto" --gas-prices="25ncheq" --pubkey $NODE5_PUBKEY --commission-max-change-rate="0.02" --commission-max-rate="0.02" --commission-rate="0.01" --gas 239933 --node "http://${NODE2_IP}:26657" -y
           sleep 15
           cheqd-noded query staking validators --node "http://${NODE2_IP}:26657" | sed -nr 's/.*\$\{NODE5_PUBKEY\}(.*?).*/\1/p'
+
+  run-cosmos-specific-tests:
+    name: Run 
+    runs-on: ubuntu-latest
+    needs: build-images-and-set-up-pool
+    steps:
+      - name: Check out
+        uses: actions/checkout@v2
+
+  run-identity-specific-tests:
+    name: Run 
+    runs-on: ubuntu-latest
+    needs: build-images-and-set-up-pool
+    steps:
+      - name: Check out
+        uses: actions/checkout@v2
