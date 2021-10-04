@@ -131,7 +131,7 @@ jobs:
           HOME=${{ env.NODE_CONFIGS_BASE }}/client cheqd-noded tx staking create-validator --amount 1000000000000000ncheq --from node5-operator --chain-id cheqd --min-self-delegation="1" --gas="auto" --gas-prices="25ncheq" --pubkey $NODE5_PUBKEY --commission-max-change-rate="0.02" --commission-max-rate="0.02" --commission-rate="0.01" --gas 239933 --node "http://${NODE2_IP}:26657" -y
           sleep 15
           cheqd-noded query staking validators --node "http://${NODE2_IP}:26657" | sed -nr 's/.*status: (.*?).*/\1/p'
-          [[ $(cheqd-noded query staking validators --node "http://${NODE2_IP}:26657" | sed -nr 's/.*status: (.*?).*/\1/p') == 5 ]] && echo "5 validators are bonded!" || exit 1
+          [[ $(cheqd-noded query staking validators --node "http://${NODE2_IP}:26657" | sed -nr 's/.*status: (.*?).*/\1/p' | wc -l) == 5 ]] && echo "5 validators are bonded!" || exit 1
 
   run-cosmos-specific-tests:
     name: Run cosmos-specific tests using cheqd-node CLI
