@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -10,21 +11,26 @@ import (
 
 func CmdCreateDid() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-did [id] [verkey] [alias]",
+		Use:   "create-did [did]",
 		Short: "Creates a new did",
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			argsDidJson := args[0]
+
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			// TODO pass arguments
-			msg := types.NewMsgCreateDid("nil", nil, nil, nil, nil, nil, nil, nil, nil, nil)
+			var msg types.MsgCreateDid
+			if err := json.Unmarshal([]byte(argsDidJson), &msg); err != nil {
+				return err
+			}
+
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
 		},
 	}
 
@@ -35,21 +41,26 @@ func CmdCreateDid() *cobra.Command {
 
 func CmdUpdateDid() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-did [id] [verkey] [alias]",
+		Use:   "update-did [did]",
 		Short: "Update a did",
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			argsDidJson := args[0]
+
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			// TODO pass arguments
-			msg := types.NewMsgUpdateDid("nil", nil, nil, nil, nil, nil, nil, nil, nil, nil)
+			var msg types.MsgUpdateDid
+			if err := json.Unmarshal([]byte(argsDidJson), &msg); err != nil {
+				return err
+			}
+
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
 		},
 	}
 

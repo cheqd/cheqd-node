@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -10,21 +11,27 @@ import (
 
 func CmdCreateCredDef() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-credDef [schema_id] [tag] [signatureType] [value]",
+		Use:   "create-cred-def [id] [schema_id] [tag] [signature_type] [value]",
 		Short: "Creates a new credDef",
-		Args:  cobra.ExactArgs(4),
+		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			argsSchema_id := string(args[0])
-			argsTag := string(args[1])
-			argsSignature_type := string(args[2])
-			argsValue := string(args[3])
+			argsId := args[0]
+			argsSchemaId := args[1]
+			argsTag := args[2]
+			argsSignatureType := args[3]
+			argsValue := args[4]
+
+			var value types.MsgCreateCredDef_ClType
+			if err := json.Unmarshal([]byte(argsValue), &value); err != nil {
+				return err
+			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgCreateCredDef(string(argsSchema_id), string(argsTag), string(argsSignature_type), string(argsValue))
+			msg := types.NewMsgCreateCredDef(argsId, argsSchemaId, argsTag, argsSignatureType, &value)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

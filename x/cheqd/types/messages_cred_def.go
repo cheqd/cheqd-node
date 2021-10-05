@@ -7,12 +7,13 @@ import (
 var _ sdk.Msg = &MsgCreateCredDef{}
 
 // NewMsgCreateCredDef todo add value
-func NewMsgCreateCredDef(id string, schemaId string, tag string, signatureType string) *MsgCreateCredDef {
+func NewMsgCreateCredDef(id string, schemaId string, tag string, signatureType string, value *MsgCreateCredDef_ClType) *MsgCreateCredDef {
 	return &MsgCreateCredDef{
 		Id:            id,
 		SchemaId:      schemaId,
 		Tag:           tag,
 		SignatureType: signatureType,
+		Value:         value,
 	}
 }
 

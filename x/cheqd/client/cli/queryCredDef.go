@@ -10,7 +10,7 @@ import (
 
 func CmdShowCredDef() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-credDef [id]",
+		Use:   "show-cred-def [id]",
 		Short: "shows a credDef",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {

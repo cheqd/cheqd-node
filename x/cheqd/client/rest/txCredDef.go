@@ -48,6 +48,7 @@ func createCredDefHandler(clientCtx client.Context) http.HandlerFunc {
 			parsedSchema_id,
 			parsedTag,
 			parsedSignature_type,
+			nil,
 		)
 
 		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
