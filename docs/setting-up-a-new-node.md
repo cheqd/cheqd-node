@@ -75,13 +75,13 @@ The recommended way to install `cheqd-node` on a standalone (virtual) machine is
 1. Get `deb` package for Ubuntu 20.04 in [releases](https://github.com/cheqd/cheqd-node/releases):
 
    ```
-   wget https://github.com/cheqd/cheqd-node/releases/download/v0.2.2/cheqd-node_0.2.2_amd64.deb
+   wget https://github.com/cheqd/cheqd-node/releases/download/v0.2.3/cheqd-node_0.2.3_amd64.deb
    ```
 
 2. Install the package:
 
    ```
-   sudo dpkg -i cheqd-node_0.2.2_amd64.deb
+   sudo dpkg -i cheqd-node_0.2.3_amd64.deb
    ```
 
 3. Switch to `cheqd` system user:
