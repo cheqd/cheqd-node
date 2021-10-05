@@ -35,8 +35,8 @@ do
 
     echo "Setting minimum fee price..."
 
-    sudo chmod -R 777 /home/runner/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs || echo "I'm not in pipeline" # FIXME
-    sudo chmod -R 777 ~/cheqd-node/test/networks/docker_compose/node_configs || echo "I'm not in local machine" # FIXME
+    sudo chmod -R 777 /home/runner/work/cheqd-node/cheqd-node/tests/networks/docker_compose/node_configs || echo "I'm not in pipeline" # FIXME
+    sudo chmod -R 777 ~/cheqd-node/tests/networks/docker_compose/node_configs || echo "I'm not in local machine" # FIXME
     sed -i $sed_extension 's/minimum-gas-prices = ""/minimum-gas-prices = "25ncheq"/g' .cheqdnode/config/app.toml
 
     popd
@@ -50,8 +50,8 @@ pushd $OPERATORS_HOME
 
 echo "Initializing genesis..."
 cheqd_noded_docker init dummy_node --chain-id $CHAIN_ID
-sudo chmod -R 777 /home/runner/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs || echo "I'm not in pipeline" # FIXME
-sudo chmod -R 777 ~/cheqd-node/test/networks/docker_compose/node_configs || echo "I'm not in local machine" # FIXME
+sudo chmod -R 777 /home/runner/work/cheqd-node/cheqd-node/tests/networks/docker_compose/node_configs || echo "I'm not in pipeline" # FIXME
+sudo chmod -R 777 ~/cheqd-node/tests/networks/docker_compose/node_configs || echo "I'm not in local machine" # FIXME
 sed -i $sed_extension 's/"stake"/"ncheq"/' .cheqdnode/config/genesis.json
 
 echo "Generating operator keys..."
@@ -120,8 +120,8 @@ do
 
     echo "##### [Observer $i] Loading genesis..."
     OPERATORS_HOME="../client"
-    sudo chmod -R 777 /home/runner/work/cheqd-node/cheqd-node/test/networks/docker_compose/node_configs || echo "I'm not in pipeline" # FIXME
-    sudo chmod -R 777 ~/cheqd-node/test/networks/docker_compose/node_configs || echo "I'm not in local machine" # FIXME
+    sudo chmod -R 777 /home/runner/work/cheqd-node/cheqd-node/tests/networks/docker_compose/node_configs || echo "I'm not in pipeline" # FIXME
+    sudo chmod -R 777 ~/cheqd-node/tests/networks/docker_compose/node_configs || echo "I'm not in local machine" # FIXME
     cp "$OPERATORS_HOME/.cheqdnode/config/genesis.json" ".cheqdnode/config/"
 
     echo "##### [Observer $i] Setting min gas prices..."
