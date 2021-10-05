@@ -36,3 +36,7 @@ vue/dist
 secret.yml
 **/node_configs
 .idea
+
+# Python
+.pytest_cache
+**/__pycache__
