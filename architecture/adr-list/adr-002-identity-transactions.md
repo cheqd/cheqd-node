@@ -76,15 +76,19 @@ All identity requests will have the following format:
         ...
       ],
     "requestId": "<uniq request identifier>",
-    "metadata": {}
+    "metadata": [
+      "versionId": "<transaction_hash>",
+      ...
+    ]
 }
 ```
 
 - **`data`**: Data requested to be written to the ledger, specific for each request type.
 - **`signatures`**: `data` should be signed by all `controller` private keys. This field contains a dict there key's id from `DIDDoc.authentication` is a key, and the signature is a value. The `signatures` must contains signatures from all controllers. And every controller should sign all fields excluding `signatures` using at least one key from `DIDDoc.authentication`.
 - **`requestId`**: String with uniq identifier. Unix timestamp is recommended. Needs for a reply protection.
-- **`metadata`**: Dictionary with additional metadata fields. Empty for now. This fields provides extensibility in the future, e.g., it can contain `protocolVersion` or other relevant metadata associated with a request.
-
+- **`metadata`**: Dictionary with additional metadata fields. Empty for now. This fields provides extensibility in the future, e.g., it can contain `protocolVersion` or other relevant metadata associated with a request. 
+  - **`versionId`**: acceptable only for DIDDoc updating.
+  
 ## List of transactions and details
 
 ### `DID` transactions
@@ -201,7 +205,25 @@ If there is a DID transaction with the specified DID (`DID.id`), then this is up
 
 #### State format
 
-`id -> {encode(data, requestId), txHash, txTimestamp }`
+`id -> {encode(data, didDocumentMetadata), txHash, txTimestamp }`
+
+`didDocumentMetadata` is created by the node after transaction ordering and before adding it to a State.
+
+DID Document Metadata:
+1. **`created`** (string): Formatted as an XML Datetime normalized to UTC 00:00:00 and without sub-second decimal precision. For example: 2020-12-20T19:17:47Z.
+2. **`updated`** (string): The value of the property MUST follow the same formatting rules as the created property. The `updated` field is null if an Update operation has never been performed on the DID document. If an updated property exists, it can be the same value as the created property when the difference between the two timestamps is less than one second.
+3. **`deactivated`** (strings): If DID has been deactivated, DID document metadata MUST include this property with the boolean value true. By default `false`.
+4. **`versionId`** (strings): Contains transaction hash of the previous DIDDoc version. If it's just created this fields contains its transaction hash.
+
+```json
+DidDocumentMetadata {
+  "created": "2020-12-20T19:17:47Z",
+  "updated": "2020-12-20T19:19:47Z",
+  "deactivated": false,
+  "versionId": "N22KY2Dyvmuu2PyyqSFKueN22KY2Dyvmuu2PyyqSFKue",
+}
+```
+
 
 ### `SCHEMA`
 
