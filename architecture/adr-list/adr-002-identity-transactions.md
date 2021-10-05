@@ -24,6 +24,8 @@ Hyperledger Indy contains the following [identity domain transactions](https://g
 
 Our aim is to replicate similar transactions on `cheqd-node` to allow existing SSI software designed to work with Hyperledger Indy to be compatible with the cheqd network.
 
+_**Note**: Hyperledger Indy also contains other transaction types beyond the ones listed above, but these are currently not in scope for implementation in `cheqd-node`. They will be considered for inclusion later in the product roadmap._
+
 ### Changes proposed from existing Hyperledger Indy transactions
 
 We have assessed the existing Hyperledger Indy transactions and recommend the following changes to be made.
@@ -38,11 +40,10 @@ Our proposal is to change the term `NYM` in transactions to `DID`, which would m
 
 Hyperledger Indy is a public-permissioned distributed ledger. As `cheqd-node` is based on a public-permissionless network based on the [Cosmos blockchain framework](https://github.com/cosmos/cosmos-sdk), the need for having a `role` type is not necessary.
 
-_**Note**: Hyperledger Indy also contains other transaction types beyond the ones listed above, but these are currently not in scope for implementation in `cheqd-node`. They will be considered for inclusion later in the product roadmap._
-
 #### Dropping `ATTRIB` transactions
 
 `ATTRIB` was originally used in Hyperledger Indy to add document content similar to DID Documents (DIDDocs). The cheqd DID method replaces this by implementing DIDDocs for most transaction types.
+
 
 ## Decision
 
@@ -72,7 +73,7 @@ All identity requests will have the following format:
 {
     "data": { "<request data for writing a transaction to the ledger>" },
     "signatures": [
-        "<verification method id>" : "<signature>",
+        "<verification method id>": "<signature>",
         ...
       ],
     "requestId": "<uniq request identifier>",
@@ -163,7 +164,7 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 3. **`type`** (string)
 4. **`publicKeyJwk`** (`map[string,string]`, optional): A map representing a JSON Web Key that conforms to [RFC7517](https://tools.ietf.org/html/rfc7517). See definition of `publicKeyJwk` for additional constraints.
 5. **`publicKeyMultibase`** (optional): A base58-encoded string that conforms to a [MULTIBASE](https://datatracker.ietf.org/doc/html/draft-multiformats-multibase-03) encoded public key.
-**Note**:Verification Method can't contain both `publicKeyJwk` and` publicKeyMultibase` but must contain at least one of them.
+**Note**: Verification Method can't contain both `publicKeyJwk` and` publicKeyMultibase` but must contain at least one of them.
 
 **Example:**
 
@@ -187,7 +188,7 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 
 **Example:**
 
- ```json
+```json
 "service": [{
   "id":"N22KY2Dyvmuu2PyyqSFKue#linked-domain",
   "type": "LinkedDomains",
@@ -295,6 +296,19 @@ It is not possible to update `data` in existing Credential Definitions. If a Cre
 #### `CRED_DEF` state format
 
 `id -> {encode(data, requestId), txHash, txTimestamp }`
+
+## Consequences
+
+### Backward Compatibility
+
+* `cheqd-node` [release v0.1.17](https://github.com/cheqd/cheqd-node/releases/tag/v0.1.17) and earlier had a transaction type called `NYM` which would allow writing/reading a unique identifier on ledger. However, this `NYM` state was not fully defined as a DID method and did not contain DID Documents that resolved when the DID identifier was read. This `NYM` transaction type is deprecated and the data written to cheqd testnet with legacy states will not be retained. 
+
+### Positive
+
+### Negative
+
+### Neutral
+
 
 ## References
 
