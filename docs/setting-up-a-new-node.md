@@ -89,7 +89,7 @@ The recommended way to install `cheqd-node` on a standalone (virtual) machine is
    You should always switch to `cheqd` user before managing node. That's because node stores configuration files in home directory which is different for each user.
 
    ```
-    sudo su cheqd
+   sudo su cheqd
    ```
 
 4. Initialize node config files:
@@ -110,67 +110,69 @@ The recommended way to install `cheqd-node` on a standalone (virtual) machine is
 
 6. Set seeds:
 
-   Seed node addresses for persistent chains are also published in [this directory](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains). Copy the persistent\_peers from the `persistent_peers.txt` and use it in the steps below.
-
-   Open node's config file: `/etc/cheqd-node/config.toml`
-
-   Search for `persistent_peers` parameter and set it's value to a comma separated list of other participant node addresses.
-
-   Format: `<node-0-id>@<node-0-ip>, <node-1-id>@<node-1-ip>, <node-n-id>@<node-n-ip>, ...`.
-
-   Domain names can be used instead of IP addresses.
+   Open node's config file: `/etc/cheqd-node/config.toml`. Search for `seeds` parameter and set it's value to a comma separated list of seed node addresses from `seeds.txt` from [this directory](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains).
 
    For `testnet`:
 
    ```text
-    persistent_peers = "d45dcc54583d6223ba6d4b3876928767681e8ff6@node0:26656, 9fb6636188ad9e40a9caf86b88ffddbb1b6b04ce@node1:26656, abbcb709fb556ce63e2f8d59a76c5023d7b28b86@node2:26656, cda0d4dbe3c29edcfcaf4668ff17ddcb96730aec@node3:26656"
+   SEEDS=$(wget -qO- https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/testnet/seeds.txt)
+
+   echo $SEEDS
+   # Comma separated list should be printed
+
+   sed -i.bak 's/seeds = ""/seeds = "'$SEEDS'"/g' /etc/cheqd-node/config.toml
    ```
 
 7. Set gas prices:
 
-   Open app's config file: `/etc/cheqd-node/app.toml`
+   Open app's config file: `/etc/cheqd-node/app.toml`. Search for `minimum-gas-prices` parameter and set it to a non-empty value. Recommended one is `25ncheq`.
 
-   Search for `minimum-gas-prices` parameter and set it to a non-empty value. Recommended one is `25ncheq`.
-
-   Example:
+   For `testnet`:
 
    ```text
-   minimum-gas-prices = "25ncheq"
+   sed -i.bak 's/minimum-gas-prices = ""/minimum-gas-prices = "25ncheq"/g' /etc/cheqd-node/app.toml
    ```
 
 8. \(optional\) Make RPC endpoint available externally:
 
    This step is necessary if you want to allow incoming client application connections to your node. Otherwise, the node will be accessible only locally.
 
-   Open the node configuration file using the text editor that you prefer: `/etc/cheqd-node/config.toml`
+   Open the node configuration file `/etc/cheqd-node/config.toml` in any text editor. Search for `laddr` parameter in `RPC Server Configuration Options` section and replace it's value to `0.0.0.0:26657`
 
-   Search for `laddr` parameter in `RPC Server Configuration Options` section and replace it's value to `0.0.0.0:26657`
+   For `testnet`:
 
-   Example: `laddr = "tcp://0.0.0.0:26657"`
+   ```
+   sed -i.bak 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/g' /etc/cheqd-node/config.toml
+   ```
 
 9. Enable `cheqd-noded` service and start it:
 
-   ```text
-    systemctl enable cheqd-noded
    ```
+   systemctl enable cheqd-noded
 
-   ```text
-    systemctl start cheqd-noded
+   systemctl start cheqd-noded
    ```
 
    Check that the service is running:
 
-   ```text
+   ```
    systemctl status cheqd-noded
    ```
 
-10. Check that the node is connected and catching up:
+   Status should be: `Active: active (running)`
 
-   Use status command `cheqd-noded status --node <rpc-address>` or open status page in your browser `<rpc-address>/status`.
+9. Check that the node is connected and catching up:
+
+   ```
+   cheqd-noded status
+   ```
 
    Make sure that `latest_block_height` is increasing over time.
 
    Wait for `catching_up` to become `false`.
+
+   - You can query status remotely: `cheqd-noded status --node <rpc-address>`;
+   - Another way is to open status page in browser: `<rpc-address>/status`.
 
 ### Installing using binary
 
