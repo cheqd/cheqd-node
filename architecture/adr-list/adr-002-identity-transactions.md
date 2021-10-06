@@ -121,39 +121,23 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
     "https://www.w3.org/ns/did/v1",
     "https://w3id.org/security/suites/ed25519-2020/v1"
   ],
-  "id": "N22KY2Dyvmuu2PyyqSFKue",
-  "authentication": [
+  "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
+  "verificationMethod": [
     {
-      "id": "N22KY2Dyvmuu2PyyqSFKue#z6MkecaLyHuYWkayBDLw5ihndj3T1m6zKTGqau3A51G7RBf3",
+      "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue#authKey1",
       "type": "Ed25519VerificationKey2020", // external (property value)
-      "controller": "N22KY2Dyvmuu2PyyqSFKue",
+      "controller": "did:cheqd:N22N22KY2Dyvmuu2PyyqSFKue",
       "publicKeyMultibase": "zAKJP3f7BD6W4iWEQ9jwndVTCBq8ua2Utt8EEjJ6Vxsf"
-    }
-  ],
-  "capabilityInvocation": [
+    },
     {
-      "id": "N22KY2Dyvmuu2PyyqSFKue#z6MkhdmzFu659ZJ4XKj31vtEDmjvsi5yDZG5L7Caz63oP39k",
+      "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue#capabilityInvocationKey",
       "type": "Ed25519VerificationKey2020", // external (property value)
-      "controller": "N22KY2Dyvmuu2PyyqSFKue",
+      "controller": "did:cheqd:N22N22KY2Dyvmuu2PyyqSFKue",
       "publicKeyMultibase": "z4BWwfeqdp1obQptLLMvPNgBw48p7og1ie6Hf9p5nTpNN"
     }
   ],
-  "capabilityDelegation": [
-    {
-      "id": "N22KY2Dyvmuu2PyyqSFKue#z6Mkw94ByR26zMSkNdCUi6FNRsWnc2DFEeDXyBGJ5KTzSWyi",
-      "type": "Ed25519VerificationKey2020", // external (property value)
-      "controller": "N22KY2Dyvmuu2PyyqSFKue",
-      "publicKeyMultibase": "zHgo9PAmfeoxHG8Mn2XHXamxnnSwPpkyBHAMNF3VyXJCL"
-    }
-  ],
-  "assertionMethod": [
-    {
-      "id": "N22KY2Dyvmuu2PyyqSFKue#z6MkiukuAuQAE8ozxvmahnQGzApvtW7KT5XXKfojjwbdEomY",
-      "type": "Ed25519VerificationKey2020", // external (property value)
-      "controller": "N22KY2Dyvmuu2PyyqSFKue",
-      "publicKeyMultibase": "z5TVraf9itbKXrRvt2DSS95Gw4vqU3CHAdetoufdcKazA"
-    }
-  ]
+  "authentication": ["did:cheqd:N22KY2Dyvmuu2PyyqSFKue#authKey1"],
+  "capabilityInvocation": ["did:cheqd:N22KY2Dyvmuu2PyyqSFKue#capabilityInvocationKey"],
  }
 ```
 
@@ -170,9 +154,9 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 
 ```json
 {
-  "id": "N22KY2Dyvmuu2PyyqSFKue#key-0",
+  "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue#key-0",
   "type": "JsonWebKey2020",
-  "controller": "N22KY2Dyvmuu2PyyqSFKue",
+  "controller": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
   "publicKeyJwk": {
     "kty": "OKP", // external (property name)
     "crv": "Ed25519", // external (property name)
@@ -190,7 +174,7 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 
 ```json
 "service": [{
-  "id":"N22KY2Dyvmuu2PyyqSFKue#linked-domain",
+  "id":"did:cheqd:N22KY2Dyvmuu2PyyqSFKue#linked-domain",
   "type": "LinkedDomains",
   "serviceEndpoint": "https://bar.example.com"
 }]
@@ -204,13 +188,13 @@ If there is a DID transaction with the specified DID (`DID.id`), then this is up
 
 **Note**: Fields `signatures`(from `WriteRequest`) must contain signatures from all old controllers and all new controllers.
 
-#### State format
+#### DIDDoc State format
 
-`id -> {encode(data, didDocumentMetadata), txHash, txTimestamp }`
+`"diddoc:<id>" -> {DIDDoc, DidDocumentMetadata, txHash, txTimestamp }`
 
 `didDocumentMetadata` is created by the node after transaction ordering and before adding it to a State.
 
-DID Document Metadata:
+####DID Document Metadata:
 1. **`created`** (string): Formatted as an XML Datetime normalized to UTC 00:00:00 and without sub-second decimal precision. For example: 2020-12-20T19:17:47Z.
 2. **`updated`** (string): The value of the property MUST follow the same formatting rules as the created property. The `updated` field is null if an Update operation has never been performed on the DID document. If an updated property exists, it can be the same value as the created property when the difference between the two timestamps is less than one second.
 3. **`deactivated`** (strings): If DID has been deactivated, DID document metadata MUST include this property with the boolean value true. By default `false`.
@@ -228,28 +212,47 @@ DidDocumentMetadata {
 
 ### `SCHEMA`
 
-This transaction is used to create a Schema associated with credentials.
+This transaction is used to create a Schema associated with credentials. 
 
 It is not possible to update an existing Schema, to ensure the original schema used to issue any credentials in the past are always available.
 
 If a Schema evolves, a new schema with a new version or name needs to be created.
 
-- **`data`**: Dictionary with Schema's data:
   - **`id`**: DID as base58-encoded string for 16 or 32 byte DID value.
-  - **`controller`**: DIDDoc.id list of strings of schema controllers. All DIDs must exist.
+  - **`type`**: String with a schema type. Now only `CL-Schema` is supported.
   - **`attrNames`**: Array of attribute name strings (125 attributes maximum)
   - **`name`**: Schema's name string
   - **`version`**: Schema's version string
 
-#### `SCHEMA` transaction format
+#### `SCHEMA` entity transaction format
 
 ```json
 {
-  "id": "N22KY2Dyvmuu2PyyqSFKue",
-  "controller": ["5ZTp9g4SP6t73rH2s8zgmtqdXyT"],
+  "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
+  "type": "CL-Schema",
   "version": "1.0",
   "name": "Degree",
   "attrNames": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
+}
+```
+
+#### `SCHEMA` DID Document transaction format
+
+```json
+{
+  "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
+  "service":[
+    {
+      "id": "cheqd-schema",
+      "type": "CL-Schema",
+      "serviceEndpoint": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue?resource=true"
+    },
+    {
+      "id": "indy-schema",
+      "type": "CL-Schema",
+      "serviceEndpoint": "did:sov:N22KY2Dyvmuu2PyyqSFKue:CL:" //external links are allowed
+    }
+  ]
 }
 ```
 
@@ -257,37 +260,53 @@ If a Schema evolves, a new schema with a new version or name needs to be created
 
 #### `SCHEMA` State format
 
-`id -> {encode(data, requestId), txHash, txTimestamp }`
+- `"diddoc:<id>" -> {SchemaDIDDoc, DidDocumentMetadata, txHash, txTimestamp}`
+- `"schema:<id>" -> {SchemaEntity, txHash, txTimestamp}`
+
+`id` example: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
+
+[Link to DidDocumentMetadata description](#did-document-metadata)
 
 
 ### `CRED_DEF`
 
 Adds a Credential Definition (in particular, public key), which is created by an Issuer and published for a particular Credential Schema.
 
-It is not possible to update `data` in existing Credential Definitions. If a Credential Definition needs to be evolved \(for example, a key needs to be rotated\), then a new Credential Definition needs to be created by a new Issuer DID \(`owner`\).
+It is not possible to update Credential Definitions. If a Credential Definition needs to be evolved (for example, a key needs to be rotated), then a new Credential Definition needs to be created for a new Issuer DIDdoc.
+Credential Definitions is added to the ledger in as verification method for Issuer DIDDoc
 
 - **`id`**: DID as base58-encoded string for 16 or 32 byte DID value.
-- **`value`** \(dict\): Dictionary with Credential Definition's data if `signature_type` is `CL`:
+- **`value`** (dict): Dictionary with Credential Definition's data if `signature_type` is `CL`:
   - **`primary`** (dict): Primary credential public key
   - **`revocation`** (dict, optional): Revocation credential public key
 - **`schemaId`** (string): `id` of a Schema transaction the credential definition is created for.
-- **`signatureType`** (string): Type of the credential definition \(that is credential signature\). `CL` \(Camenisch-Lysyanskaya\) is the only supported type now. Other signature types are being explored for future releases.
+- **`signatureType`** (string): Type of the credential definition (that is credential signature). `CL-Sig-Cred_def` (Camenisch-Lysyanskaya) is the only supported type now. Other signature types are being explored for future releases.
 - **`tag`** (string, optional): A unique tag to have multiple public keys for the same Schema and type issued by the same DID. A default tag `tag` will be used if not specified.
 - **`controller`**: DIDDoc.id list of strings of schema controllers. All DIDs must exist.
 
-#### `CRED_DEF` transaction format
+#### `CRED_DEF` example
 
 ```json
 {
-  "id": "N22KY2Dyvmuu2PyyqSFKue",
-  "controller": ["6RTp9g4SP6t73rH2s8zgmtqdXyT"],
-  "signatureType": "CL",
-  "schemaId": "5ZTp9g4SP6t73rH2s8zgmtqdXyT",
-  "tag": "some_tag",    
-  "value": {
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+    "https://w3id.org/security/suites/jws-2020/v1",
+    "https://w3id.org/security/suites/ed25519-2020/v1"
+  ]
+  "id": "did:cheqd:123456789abcdefghi",
+  ...
+  "verificationMethod": [{
+    "id": "passport-keys",
+    "type": "CL-Sig-Cred_def",
+    "controller": "did:cheqd:123456789abcdefghi",
+    "schemaId": "5ZTp9g4SP6t73rH2s8zgmtqdXyT",
+    "tag": "some_tag",
+    "value": {
       "primary": "...",
       "revocation": "..."
-  }
+    }
+  }]
+
 }
 ```
 
@@ -295,7 +314,7 @@ It is not possible to update `data` in existing Credential Definitions. If a Cre
 
 #### `CRED_DEF` state format
 
-`id -> {encode(data, requestId), txHash, txTimestamp }`
+Stored inside [DIDDoc](#diddoc-state-format)
 
 ## Consequences
 
