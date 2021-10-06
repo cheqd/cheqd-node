@@ -279,10 +279,10 @@ Credential Definitions is added to the ledger in as verification method for Issu
 - **`value`** (dict): Dictionary with Credential Definition's data if `signature_type` is `CL`:
   - **`primary`** (dict): Primary credential public key
   - **`revocation`** (dict, optional): Revocation credential public key
-- **`schemaId`** (string): `id` of a Schema transaction the credential definition is created for.
+- **`schemaId`** (string): `id` of a Schema the credential definition is created for.
 - **`signatureType`** (string): Type of the credential definition (that is credential signature). `CL-Sig-Cred_def` (Camenisch-Lysyanskaya) is the only supported type now. Other signature types are being explored for future releases.
 - **`tag`** (string, optional): A unique tag to have multiple public keys for the same Schema and type issued by the same DID. A default tag `tag` will be used if not specified.
-- **`controller`**: DIDDoc.id list of strings of schema controllers. All DIDs must exist.
+- **`controller`**: DIDDoc.id list of strings of a credential definition controllers. All DIDs must exist.
 
 #### `CRED_DEF` example
 
@@ -299,7 +299,7 @@ Credential Definitions is added to the ledger in as verification method for Issu
     "id": "passport-keys",
     "type": "CL-Sig-Cred_def",
     "controller": "did:cheqd:123456789abcdefghi",
-    "schemaId": "5ZTp9g4SP6t73rH2s8zgmtqdXyT",
+    "schemaId": "did:cheqd:5ZTp9g4SP6t73rH2s8zgmtqdXyT",
     "tag": "some_tag",
     "value": {
       "primary": "...",
