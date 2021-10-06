@@ -229,22 +229,29 @@ If a Schema evolves, a new schema with a new version or name needs to be created
 {
   "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
   "type": "CL-Schema",
-  "controller": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
+  "controller": "did:cheqd:IK22KY2Dyvmuu2PyyqSFKu",  // Schema Issuer DID
   "version": "1.0",
   "name": "Degree",
   "attrNames": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
 }
 ```
 ### Option 1
-Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
-Schema Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>` (?)
+Schema DIDDoc URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
+Schema Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
+Schema Entity(by default) URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue?resource=true`
 #### `SCHEMA` DID Document transaction format
 ```json
 {
   "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
+  "controller": "did:cheqd:IK22KY2Dyvmuu2PyyqSFKu", // Schema Issuer DID
   "service":[
     {
-      "id": "cheqd-schema",
+      "id": "cheqd-schema1",
+      "type": "CL-Schema",
+      "serviceEndpoint": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue?resource=true"
+    },
+    {
+      "id": "cheqd-schema2",
       "type": "CL-Schema",
       "serviceEndpoint": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue?resource=true"
     },
@@ -264,7 +271,7 @@ Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
   "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
   "schema":[
     {
-      "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
+      "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue#schema1",
       "type": "CL-Schema",
       "controller": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
       "value": {
