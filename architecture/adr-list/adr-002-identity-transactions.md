@@ -44,7 +44,6 @@ Hyperledger Indy is a public-permissioned distributed ledger. As `cheqd-node` is
 
 `ATTRIB` was originally used in Hyperledger Indy to add document content similar to DID Documents (DIDDocs). The cheqd DID method replaces this by implementing DIDDocs for most transaction types.
 
-
 ## Decision
 
 ### cheqd DID Method
@@ -87,7 +86,7 @@ All identity requests will have the following format:
 - **`data`**: Data requested to be written to the ledger, specific for each request type.
 - **`signatures`**: `data` should be signed by all `controller` private keys. This field contains a dict there key's id from `DIDDoc.authentication` is a key, and the signature is a value. The `signatures` must contains signatures from all controllers. And every controller should sign all fields excluding `signatures` using at least one key from `DIDDoc.authentication`.
 - **`requestId`**: String with uniq identifier. Unix timestamp is recommended. Needs for a reply protection.
-- **`metadata`**: Dictionary with additional metadata fields. Empty for now. This fields provides extensibility in the future, e.g., it can contain `protocolVersion` or other relevant metadata associated with a request. 
+- **`metadata`**: Dictionary with additional metadata fields. Empty for now. This fields provides extensibility in the future, e.g., it can contain `protocolVersion` or other relevant metadata associated with a request.
   - **`versionId`**: acceptable only for DIDDoc updating.
   
 ## List of transactions and details
@@ -148,7 +147,7 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 3. **`type`** (string)
 4. **`publicKeyJwk`** (`map[string,string]`, optional): A map representing a JSON Web Key that conforms to [RFC7517](https://tools.ietf.org/html/rfc7517). See definition of `publicKeyJwk` for additional constraints.
 5. **`publicKeyMultibase`** (optional): A base58-encoded string that conforms to a [MULTIBASE](https://datatracker.ietf.org/doc/html/draft-multiformats-multibase-03) encoded public key.
-**Note**: Verification Method can't contain both `publicKeyJwk` and` publicKeyMultibase` but must contain at least one of them.
+**Note**: Verification Method can't contain both `publicKeyJwk` and`publicKeyMultibase` but must contain at least one of them.
 
 **Example:**
 
@@ -194,7 +193,8 @@ If there is a DID transaction with the specified DID (`DID.id`), then this is up
 
 `didDocumentMetadata` is created by the node after transaction ordering and before adding it to a State.
 
-####DID Document Metadata:
+#### DID Document Metadata:
+
 1. **`created`** (string): Formatted as an XML Datetime normalized to UTC 00:00:00 and without sub-second decimal precision. For example: 2020-12-20T19:17:47Z.
 2. **`updated`** (string): The value of the property MUST follow the same formatting rules as the created property. The `updated` field is null if an Update operation has never been performed on the DID document. If an updated property exists, it can be the same value as the created property when the difference between the two timestamps is less than one second.
 3. **`deactivated`** (strings): If DID has been deactivated, DID document metadata MUST include this property with the boolean value true. By default `false`.
@@ -209,20 +209,19 @@ DidDocumentMetadata {
 }
 ```
 
-
 ### `SCHEMA`
 
-This transaction is used to create a Schema associated with credentials. 
+This transaction is used to create a Schema associated with credentials.
 
 It is not possible to update an existing Schema, to ensure the original schema used to issue any credentials in the past are always available.
 
 If a Schema evolves, a new schema with a new version or name needs to be created.
 
-  - **`id`**: DID as base58-encoded string for 16 or 32 byte DID value.
-  - **`type`**: String with a schema type. Now only `CL-Schema` is supported.
-  - **`attrNames`**: Array of attribute name strings (125 attributes maximum)
-  - **`name`**: Schema's name string
-  - **`version`**: Schema's version string
+- **`id`**: DID as base58-encoded string for 16 or 32 byte DID value.
+- **`type`**: String with a schema type. Now only `CL-Schema` is supported.
+- **`attrNames`**: Array of attribute name strings (125 attributes maximum)
+- **`name`**: Schema's name string
+- **`version`**: Schema's version string
 
 #### `SCHEMA` entity transaction format
 
@@ -322,7 +321,6 @@ Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
 
 [Link to DidDocumentMetadata description](#did-document-metadata)
 
-
 ### `CRED_DEF`
 
 Adds a Credential Definition (in particular, public key), which is created by an Issuer and published for a particular Credential Schema.
@@ -375,14 +373,13 @@ Stored inside [DIDDoc](#diddoc-state-format)
 
 ### Backward Compatibility
 
-* `cheqd-node` [release v0.1.17](https://github.com/cheqd/cheqd-node/releases/tag/v0.1.17) and earlier had a transaction type called `NYM` which would allow writing/reading a unique identifier on ledger. However, this `NYM` state was not fully defined as a DID method and did not contain DID Documents that resolved when the DID identifier was read. This `NYM` transaction type is deprecated and the data written to cheqd testnet with legacy states will not be retained. 
+- `cheqd-node` [release v0.1.17](https://github.com/cheqd/cheqd-node/releases/tag/v0.1.17) and earlier had a transaction type called `NYM` which would allow writing/reading a unique identifier on ledger. However, this `NYM` state was not fully defined as a DID method and did not contain DID Documents that resolved when the DID identifier was read. This `NYM` transaction type is deprecated and the data written to cheqd testnet with legacy states will not be retained.
 
 ### Positive
 
 ### Negative
 
 ### Neutral
-
 
 ## References
 
