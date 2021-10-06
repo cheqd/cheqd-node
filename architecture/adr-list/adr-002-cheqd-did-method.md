@@ -71,15 +71,14 @@ All identity requests will have the following format:
 ```jsonc
 {
   "data": { "<request data for writing a transaction to the ledger>" },
-  "signatures": [
-      "verification method id": "signature",
+  "signatures": {
+      "verification method id": "signature"
       // Multiple verification methods and corresponding signatures can be added here
-    ],
+    },
   "requestId": "<unique request identifier>",
-  "metadata": [
-    "versionId": "<transaction_hash>",
-    // 
-  ]
+  "metadata": {
+    "versionId": "<transaction_hash>"
+  }
 }
 ```
 
@@ -157,9 +156,13 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
   "type": "JsonWebKey2020",
   "controller": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
   "publicKeyJwk": {
-    "kty": "OKP", // external (property name)
-    "crv": "Ed25519", // external (property name)
-    "x": "VCpo2LMLhn6iWku8MKvSLg2ZAoC-nlOyPVQaO3FxVeQ" // external (property name)
+    "kty": "OKP",
+    // external (property name)
+    "crv": "Ed25519",
+    // external (property name)
+    "x": "VCpo2LMLhn6iWku8MKvSLg2ZAoC-nlOyPVQaO3FxVeQ"
+    // external (property name)
+  }
 }
 ```
 
@@ -172,11 +175,11 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 **Example:**
 
 ```json
-"service": [{
+{
   "id":"did:cheqd:N22KY2Dyvmuu2PyyqSFKue#linked-domain",
   "type": "LinkedDomains",
   "serviceEndpoint": "https://bar.example.com"
-}]
+}
 ```
 
 #### Update `DID`
@@ -201,7 +204,7 @@ If there is a DID transaction with the specified DID (`DID.id`), then this is up
 4. **`versionId`** (strings): Contains transaction hash of the previous DIDDoc version. If it's just created this fields contains its transaction hash.
 
 ```json
-DidDocumentMetadata {
+{
   "created": "2020-12-20T19:17:47Z",
   "updated": "2020-12-20T19:19:47Z",
   "deactivated": false,
@@ -308,12 +311,12 @@ Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
 {
   "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
   "schema":[
-    {
-      "id": "cheqd-schema",
-      "type": "CL-Schema",
-      "schemaRef": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue?resource=true"
-    }
-  ]
+              {
+                "id": "cheqd-schema",
+                "type": "CL-Schema",
+                "schemaRef": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue?resource=true"
+              }
+          ]
 }
 ```
 
@@ -345,16 +348,14 @@ Credential Definitions is added to the ledger in as verification method for Issu
 - **`controller`**: DIDDoc.id list of strings of a credential definition controllers. All DIDs must exist.
 
 #### `CRED_DEF` example
-
 ```json
 {
   "@context": [
     "https://www.w3.org/ns/did/v1",
     "https://w3id.org/security/suites/jws-2020/v1",
     "https://w3id.org/security/suites/ed25519-2020/v1"
-  ]
+  ],
   "id": "did:cheqd:123456789abcdefghi",
-  ...
   "verificationMethod": [{
     "id": "passport-keys",
     "type": "CL-Sig-Cred_def",
@@ -375,6 +376,7 @@ Credential Definitions is added to the ledger in as verification method for Issu
 #### `CRED_DEF` state format
 
 Stored inside [DIDDoc](#diddoc-state-format)
+Credential Definition URL: `<issuerDID>#<credDefId>`. Ex: `did:cheqd:123456789abcdefghi#passport-keys`
 
 ## Consequences
 
