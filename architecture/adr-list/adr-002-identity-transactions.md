@@ -230,14 +230,16 @@ If a Schema evolves, a new schema with a new version or name needs to be created
 {
   "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
   "type": "CL-Schema",
+  "controller": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
   "version": "1.0",
   "name": "Degree",
   "attrNames": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
 }
 ```
-
+### Option 1
+Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
+Schema Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>` (?)
 #### `SCHEMA` DID Document transaction format
-
 ```json
 {
   "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
@@ -251,6 +253,59 @@ If a Schema evolves, a new schema with a new version or name needs to be created
       "id": "indy-schema",
       "type": "CL-Schema",
       "serviceEndpoint": "did:sov:N22KY2Dyvmuu2PyyqSFKue:CL:" //external links are allowed
+    }
+  ]
+}
+```
+### Option 2
+#### `SCHEMA` DID Document transaction format
+Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
+```json
+{
+  "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
+  "schema":[
+    {
+      "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
+      "type": "CL-Schema",
+      "controller": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
+      "value": {
+                "version": "1.0",
+                "name": "Degree",
+                "attrNames": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
+              },
+    },
+  ]
+}
+```
+### Option 3
+#### `SCHEMA` DID Document transaction format
+Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
+```json
+{
+  "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
+  "schema": {
+              "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
+              "type": "CL-Schema",
+              "controller": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
+              "value": {
+                "version": "1.0",
+                "name": "Degree",
+                "attrNames": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
+              },
+            },
+}
+```
+### Option 4
+Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
+#### `SCHEMA` DID Document transaction format
+```json
+{
+  "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
+  "schema":[
+    {
+      "id": "cheqd-schema",
+      "type": "CL-Schema",
+      "schemaRef": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue?resource=true"
     }
   ]
 }
