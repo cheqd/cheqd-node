@@ -104,8 +104,8 @@ The recommended way to install `cheqd-node` on a standalone (virtual) machine is
 
    For `testnet`:
 
-   ```
-   wget -O /etc/cheqd-node/genesis.json https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/testnet/genesis.json
+   ```bash
+   $ wget -O /etc/cheqd-node/genesis.json https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/testnet/genesis.json
    ```
 
 6. Set seeds:
@@ -114,13 +114,13 @@ The recommended way to install `cheqd-node` on a standalone (virtual) machine is
 
    For `testnet`:
 
-   ```text
-   SEEDS=$(wget -qO- https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/testnet/seeds.txt)
+   ```bash
+   $ SEEDS=$(wget -qO- https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/testnet/seeds.txt)
 
-   echo $SEEDS
+   $ echo $SEEDS
    # Comma separated list should be printed
 
-   sed -i.bak 's/seeds = ""/seeds = "'$SEEDS'"/g' /etc/cheqd-node/config.toml
+   $ sed -i.bak 's/seeds = ""/seeds = "'$SEEDS'"/g' /etc/cheqd-node/config.toml
    ```
 
 7. Set gas prices:
@@ -129,7 +129,7 @@ The recommended way to install `cheqd-node` on a standalone (virtual) machine is
 
    For `testnet`:
 
-   ```text
+   ```bash
    sed -i.bak 's/minimum-gas-prices = ""/minimum-gas-prices = "25ncheq"/g' /etc/cheqd-node/app.toml
    ```
 
@@ -141,7 +141,7 @@ The recommended way to install `cheqd-node` on a standalone (virtual) machine is
 
    For `testnet`:
 
-   ```
+   ```bash
    sed -i.bak 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/g' /etc/cheqd-node/config.toml
    ```
 
