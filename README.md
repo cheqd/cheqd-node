@@ -1,4 +1,4 @@
-# cheqd: Node Documentation Home
+# cheqd: Node Documentation
 
 cheqd is a purpose-built network for decentralised identity built using [Cosmos SDK](https://github.com/cosmos/cosmos-sdk) and [Tendermint](https://github.com/tendermint/tendermint).
 
@@ -7,7 +7,7 @@ cheqd is a purpose-built network for decentralised identity built using [Cosmos 
 Getting started as a node operator on the cheqd network testnet requires the following steps:
 
 1. [Install the `cheqd-node` software](docs/setup-and-configure/readme.md) connected to the [existing seed nodes](https://github.com/cheqd/cheqd-node/blob/main/persistent_chains/testnet/seeds.txt) on the testnet. Use hosting platform of your choice.
-2. When you have a node successfully installed, please fill out our node operator onboarding form so that you can acquire testnet tokens required for staking on the network. You will need to have the following details on hand to fill out the form:
+2. When you have a node successfully installed, please fill out our [**node operator onboarding form**](http://cheqd.link/join-testnet-form) so that you can acquire testnet tokens required for staking on the network. You will need to have the following details on hand to fill out the form:
    1. Node ID for your node
    2. IP address / DNS record that points to the node \(if you're using an IP address, a static IP is recommended\)
    3. Peer-to-peer \(P2P\) connection port \(defaults to `26656`\)

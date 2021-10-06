@@ -1,6 +1,6 @@
 # Table of contents
 
-* [cheqd: Node Documentation Home](README.md)
+* [cheqd: Node Documentation](README.md)
 
 ## Documentation & Guides <a id="docs"></a>
 
