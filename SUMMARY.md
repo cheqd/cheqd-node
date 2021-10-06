@@ -19,10 +19,6 @@
 * [cheqd-testsnet docker image](docker/cheqd-testsnet-docker-image.md)
 * [Docker Compose Based Localnet](docker/docker_compose.md)
 
-## Network Details <a id="persistent_chains"></a>
-
-* [Testnet](persistent_chains/testnet.md)
-
 ## Architecture
 
 * [Architecture Decision Record \(ADR\) Process](architecture/architecture.md)
