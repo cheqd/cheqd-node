@@ -30,8 +30,8 @@ cheqd-noded keys add <alias>
 ```text
 cheqd-noded keys add --recover <alias>
 ```
-Then enter your bip39 `mnemonic phrase`.
 
+Then enter your bip39 `mnemonic phrase`.
 
 **Listing available keys on a node**
 
@@ -206,7 +206,7 @@ cheqd-noded tendermint show-node-id
 
 Validator address is a function of validator's public key. To get `bech32` encoded validator address run this command on node's machine:
 
-```
+```text
 cheqd-noded tendermint show-address
 ```
 
@@ -242,7 +242,7 @@ cheqd-noded tendermint show-validator
 
 Output example:
 
-```
+```text
 {"@type":"/cosmos.crypto.ed25519.PubKey","key":"y8v/nsf+VFCnJ7c9ZM/C4tUMnWKHhU+K+B82B+5vUZg="}
 ```
 

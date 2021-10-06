@@ -6,23 +6,23 @@ cheqd is a purpose-built network for decentralised identity built using [Cosmos 
 
 Getting started as a node operator on the cheqd network testnet requires the following steps:
 
-1. [Install the `cheqd-node` software](docs/setting-up-a-new-node.md) connected to the existing [persistent peers](persistent_chains/testnet.md) on the testnet. Use hosting platform of your choice.
-2. When you have a node successfully installed, join the [cheqd Slack community](http://cheqd.link/join-cheqd-slack) so that you can acquire testnet tokens required for staking on the network. Please post the following details on the [**\#testnet-node-operators**](https://cheqd-community.slack.com/archives/C029NSCSA75) channel:
+1. [Install the `cheqd-node` software](docs/setup-and-configure/readme.md) connected to the [existing seed nodes](https://github.com/cheqd/cheqd-node/blob/main/persistent_chains/testnet/seeds.txt) on the testnet. Use hosting platform of your choice.
+2. When you have a node successfully installed, please fill out our node operator onboarding form so that you can acquire testnet tokens required for staking on the network. You will need to have the following details on hand to fill out the form:
    1. Node ID for your node
    2. IP address / DNS record that points to the node \(if you're using an IP address, a static IP is recommended\)
    3. Peer-to-peer \(P2P\) connection port \(defaults to `26656`\)
-3. [Configure your node as a new validator](docs/setting-up-a-new-validator.md).
-4. If successfully configured, your node would become the latest on the cheqd Testnet! 
+3. Once you have received your tokens, [promote your node to a validator](docs/setup-and-configure/configure-new-validator.md).
+4. If successfully configured, your node would become the latest validator on the cheqd Testnet! Say hi to the other node operators on the [\#testnet-node-operators](https://cheqd-community.slack.com/archives/C029NSCSA75) channel.
+
+Any time you have questions or need support, join our [**cheqd Community Slack** ](http://cheqd.link/join-cheqd-slack) and [ask for help](https://cheqd-community.slack.com/archives/C02AQ9UK4HY).
 
 ## Usage
 
-Once installed, `cheqd-node` can be controlled using the [cheqd Cosmo CLI reference guide](docs/cosmos-cli.md).
+Once installed, `cheqd-node` can be controlled using the [cheqd Cosmos CLI reference guide](docs/cosmos-cli.md).
 
 ### Currently supported functionality
 
 * Basic token functionality for holding and transferring tokens to other accounts on the same network
-* Writing and querying Decentralized Identifiers \(DIDs\) entries on ledger
-* Paying for DID writes to ledger using testnet tokens
 * Creating, managing, and configuring accounts and keys on a cheqd Cosmos ledger
 * Staking and participating in public-permissionless governance
 
@@ -40,20 +40,24 @@ We plan on adding new functionality rapidly and on a regular basis. We are also 
 
 ## Release artefacts
 
-Our instructions on [how to set up a new node](docs/setting-up-a-new-node.md) covers: 1. Minimum system requirements and pre-requisites 2. Installation process using Debian \(.deb\) package, binary, and Docker 3. Fetching basic node information after installation
+Our instructions on [how to set up a new node](docs/setup-and-configure/readme.md) covers: 
+
+1. Minimum system requirements and prerequisites
+2. Installation process using Debian \(.deb\) package, binary, and Docker
+3. Fetching basic node information after installation
 
 We provide packaged releases available for node installation, depending on the method you prefer.
 
 ### Debian \(.deb\) package releases
 
-* Understand an [overview of what the `cheqd-node` Debian \(.deb\) package](docs/deb-package-overview.md) configures.
-* If you already have an existing `cheqd-node` installation that was done using the .deb package, finf out how to [upgrade your node using the .deb package](docs/deb-package-upgrade.md).
+* Understand an [overview of what the `cheqd-node` Debian \(.deb\) package]() configures.
+* If you already have an existing `cheqd-node` installation that was done using the .deb package, find out how to [upgrade your node using the .deb package]().
 
 ### Docker
 
 * We provide [pre-built Docker containers for `cheqd-node`](https://github.com/orgs/cheqd/packages?repo_name=cheqd-node) for those who wish to install local / testnet nodes using Docker.
-* You can [build your own Docker container images for `cheqd-node`](docker/cheqd_node.md) and use Docker Compose to [set up a local network consisting of multiple Docker nodes](test/networks/docker_compose.md) for testing purposes.
-* You can also [use this image to set up a local network consisting of multiple node processes in a single container](docker/single_image_testnet.md).
+* You can [build your own Docker container images for `cheqd-node`]() and use Docker Compose to [set up a local network consisting of multiple Docker nodes](docker/docker_compose.md) for testing purposes.
+* You can also [use this image to set up a local network consisting of multiple node processes in a single container]().
 
 ## Building from source
 
@@ -65,7 +69,7 @@ If you are building from source, or otherwise interested in running a local netw
 
 ## Community
 
-The [cheqd Community Slack](http://cheqd.link/join-cheqd-slack) is our chat channel for the open-source community, software developers, and node operators.
+The [**cheqd Community Slack**](http://cheqd.link/join-cheqd-slack) ****is our chat channel for the open-source community, software developers, and node operators.
 
 Please reach out to us there for discussions, help, and feedback on the project.
 
