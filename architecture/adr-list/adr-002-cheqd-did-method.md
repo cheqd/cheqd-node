@@ -1,4 +1,4 @@
-# ADR 002: Identity entities and transactions
+# ADR 002: cheqd DID method, identity entities, and transactions
 
 ## Status
 
@@ -38,7 +38,7 @@ Our proposal is to change the term `NYM` in transactions to `DID`, which would m
 
 #### Remove `role` field from DID transaction
 
-Hyperledger Indy is a public-permissioned distributed ledger. As `cheqd-node` is based on a public-permissionless network based on the [Cosmos blockchain framework](https://github.com/cosmos/cosmos-sdk), the need for having a `role` type is not necessary.
+Hyperledger Indy is a public-permissioned distributed ledger. As `cheqd-node` is based on a public-permissionless network based on the [Cosmos blockchain framework](https://github.com/cosmos/cosmos-sdk), the `role` type is no longer necessary.
 
 #### Dropping `ATTRIB` transactions
 
@@ -68,24 +68,24 @@ Some examples of `did:cheqd` method identifiers are:
 
 All identity requests will have the following format:
 
-```json
+```jsonc
 {
-    "data": { "<request data for writing a transaction to the ledger>" },
-    "signatures": [
-        "<verification method id>": "<signature>",
-        ...
-      ],
-    "requestId": "<uniq request identifier>",
-    "metadata": [
-      "versionId": "<transaction_hash>",
-      ...
-    ]
+  "data": { "<request data for writing a transaction to the ledger>" },
+  "signatures": [
+      "verification method id": "signature",
+      // Multiple verification methods and corresponding signatures can be added here
+    ],
+  "requestId": "<unique request identifier>",
+  "metadata": [
+    "versionId": "<transaction_hash>",
+    // 
+  ]
 }
 ```
 
 - **`data`**: Data requested to be written to the ledger, specific for each request type.
 - **`signatures`**: `data` should be signed by all `controller` private keys. This field contains a dict there key's id from `DIDDoc.authentication` is a key, and the signature is a value. The `signatures` must contains signatures from all controllers. And every controller should sign all fields excluding `signatures` using at least one key from `DIDDoc.authentication`.
-- **`requestId`**: String with uniq identifier. Unix timestamp is recommended. Needs for a reply protection.
+- **`requestId`**: String with unique identifier. Unix timestamp is recommended. Needed for a reply protection.
 - **`metadata`**: Dictionary with additional metadata fields. Empty for now. This fields provides extensibility in the future, e.g., it can contain `protocolVersion` or other relevant metadata associated with a request.
   - **`versionId`**: acceptable only for DIDDoc updating.
   
@@ -193,7 +193,7 @@ If there is a DID transaction with the specified DID (`DID.id`), then this is up
 
 `didDocumentMetadata` is created by the node after transaction ordering and before adding it to a State.
 
-#### DID Document Metadata:
+#### DID Document Metadata
 
 1. **`created`** (string): Formatted as an XML Datetime normalized to UTC 00:00:00 and without sub-second decimal precision. For example: 2020-12-20T19:17:47Z.
 2. **`updated`** (string): The value of the property MUST follow the same formatting rules as the created property. The `updated` field is null if an Update operation has never been performed on the DID document. If an updated property exists, it can be the same value as the created property when the difference between the two timestamps is less than one second.
