@@ -78,7 +78,6 @@ All identity requests will have the following format:
   "requestId": "<unique request identifier>",
   "metadata": [
     "versionId": "<transaction_hash>",
-    // 
   ]
 }
 ```
@@ -89,7 +88,7 @@ All identity requests will have the following format:
 - **`metadata`**: Dictionary with additional metadata fields. Empty for now. This fields provides extensibility in the future, e.g., it can contain `protocolVersion` or other relevant metadata associated with a request.
   - **`versionId`**: acceptable only for DIDDoc updating.
   
-## List of transactions and details
+## Identity transactions for cheqd DID method
 
 ### `DID` transactions
 
@@ -112,9 +111,9 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 10. **`alsoKnownAs`** (optional): A list of strings. A DID subject can have multiple identifiers for different purposes, or at different times. The assertion that two or more DIDs refer to the same DID subject can be made using the `alsoKnownAs` property.
 11. **`@context`** (optional): A list of strings with links or JSONs for describing specifications that this DID Document is following to.
 
-**Example:**
+##### Example of DID Document
 
-```json
+```jsonc
 {
   "@context": [
     "https://www.w3.org/ns/did/v1",
@@ -137,7 +136,7 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
   ],
   "authentication": ["did:cheqd:N22KY2Dyvmuu2PyyqSFKue#authKey1"],
   "capabilityInvocation": ["did:cheqd:N22KY2Dyvmuu2PyyqSFKue#capabilityInvocationKey"],
- }
+}
 ```
 
 #### Verification Method
@@ -147,11 +146,11 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 3. **`type`** (string)
 4. **`publicKeyJwk`** (`map[string,string]`, optional): A map representing a JSON Web Key that conforms to [RFC7517](https://tools.ietf.org/html/rfc7517). See definition of `publicKeyJwk` for additional constraints.
 5. **`publicKeyMultibase`** (optional): A base58-encoded string that conforms to a [MULTIBASE](https://datatracker.ietf.org/doc/html/draft-multiformats-multibase-03) encoded public key.
-**Note**: Verification Method can't contain both `publicKeyJwk` and`publicKeyMultibase` but must contain at least one of them.
+**Note**: Verification Method cannot contain both `publicKeyJwk` and`publicKeyMultibase` but must contain at least one of them.
 
-**Example:**
+##### Example of Verification Method
 
-```json
+```jsonc
 {
   "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue#key-0",
   "type": "JsonWebKey2020",
@@ -169,9 +168,9 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 2. **`type`** (string): The service type and its associated properties SHOULD be registered in the DID Specification Registries [DID-SPEC-REGISTRIES](https://www.w3.org/TR/did-spec-registries/)
 3. **`serviceEndpoint`** (strings): A string that conforms to the rules of [RFC3986](https://www.rfc-editor.org/rfc/rfc3986) for URIs, a map, or a set composed of a one or more strings that conform to the rules of [RFC3986](https://www.rfc-editor.org/rfc/rfc3986) for URIs and/or maps.
 
-**Example:**
+##### Example of Service
 
-```json
+```jsonc
 "service": [{
   "id":"did:cheqd:N22KY2Dyvmuu2PyyqSFKue#linked-domain",
   "type": "LinkedDomains",
@@ -181,11 +180,11 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 
 #### Update `DID`
 
-If there is no DID transaction with the specified DID (`DID.id`), it is considered as a creation request for a new DID.
+If there is no DID entry on the ledger with the specified DID (`DID.id`), it is considered as a creation request for a new DID.
 
-If there is a DID transaction with the specified DID (`DID.id`), then this is update of existing DID.
+If there is a DID entry on the ledger with the specified DID (`DID.id`), then this considered a request for updating an existing DID.
 
-**Note**: Fields `signatures`(from `WriteRequest`) must contain signatures from all old controllers and all new controllers.
+**Note**: The field `signatures`(from `WriteRequest`) must contain signatures from all old controllers and all new controllers.
 
 #### DIDDoc State format
 
@@ -198,9 +197,11 @@ If there is a DID transaction with the specified DID (`DID.id`), then this is up
 1. **`created`** (string): Formatted as an XML Datetime normalized to UTC 00:00:00 and without sub-second decimal precision. For example: 2020-12-20T19:17:47Z.
 2. **`updated`** (string): The value of the property MUST follow the same formatting rules as the created property. The `updated` field is null if an Update operation has never been performed on the DID document. If an updated property exists, it can be the same value as the created property when the difference between the two timestamps is less than one second.
 3. **`deactivated`** (strings): If DID has been deactivated, DID document metadata MUST include this property with the boolean value true. By default `false`.
-4. **`versionId`** (strings): Contains transaction hash of the previous DIDDoc version. If it's just created this fields contains its transaction hash.
+4. **`versionId`** (strings): Contains transaction hash of the previous DIDDoc version. If the DID Document has just been created, this field contains its own transaction hash.
 
-```json
+##### Example of DID Document Metadata
+
+```jsonc
 DidDocumentMetadata {
   "created": "2020-12-20T19:17:47Z",
   "updated": "2020-12-20T19:19:47Z",
@@ -225,7 +226,7 @@ If a Schema evolves, a new schema with a new version or name needs to be created
 
 #### `SCHEMA` entity transaction format
 
-```json
+```jsonc
 {
   "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
   "type": "CL-Schema",
@@ -235,12 +236,15 @@ If a Schema evolves, a new schema with a new version or name needs to be created
   "attrNames": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
 }
 ```
+
 ### Option 1
-Schema DIDDoc URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
-Schema Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
-Schema Entity(by default) URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue?resource=true`
+
+Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
+Schema Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>` (?)
+
 #### `SCHEMA` DID Document transaction format
-```json
+
+```jsonc
 {
   "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
   "controller": "did:cheqd:IK22KY2Dyvmuu2PyyqSFKu", // Schema Issuer DID
@@ -263,10 +267,14 @@ Schema Entity(by default) URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue?resource=true`
   ]
 }
 ```
+
 ### Option 2
+
 #### `SCHEMA` DID Document transaction format
+
 Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
-```json
+
+```jsonc
 {
   "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
   "schema":[
@@ -283,10 +291,14 @@ Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
   ]
 }
 ```
+
 ### Option 3
+
 #### `SCHEMA` DID Document transaction format
+
 Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
-```json
+
+```jsonc
 {
   "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
   "schema": {
@@ -301,10 +313,14 @@ Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
             },
 }
 ```
+
 ### Option 4
+
 Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
+
 #### `SCHEMA` DID Document transaction format
-```json
+
+```jsonc
 {
   "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
   "schema":[
@@ -344,17 +360,17 @@ Credential Definitions is added to the ledger in as verification method for Issu
 - **`tag`** (string, optional): A unique tag to have multiple public keys for the same Schema and type issued by the same DID. A default tag `tag` will be used if not specified.
 - **`controller`**: DIDDoc.id list of strings of a credential definition controllers. All DIDs must exist.
 
-#### `CRED_DEF` example
+#### Example of Credential Definition
 
-```json
+```jsonc
 {
   "@context": [
     "https://www.w3.org/ns/did/v1",
     "https://w3id.org/security/suites/jws-2020/v1",
     "https://w3id.org/security/suites/ed25519-2020/v1"
-  ]
+  ],
   "id": "did:cheqd:123456789abcdefghi",
-  ...
+  // Body of credential definition
   "verificationMethod": [{
     "id": "passport-keys",
     "type": "CL-Sig-Cred_def",
