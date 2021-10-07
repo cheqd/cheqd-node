@@ -72,12 +72,10 @@ jobs:
       - name: Check out
         uses: actions/checkout@v2
 
-      - name: Get tag
-        id: previoustag
-        uses: "WyriHaximus/github-action-get-previous-tag@v1"
-
       - name: Download and install latest deb package
         run: |
+          echo $GITHUB_ENV
+          echo "-----"
           echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
           echo "-----"
           echo $RELEASE_VERSION
@@ -85,8 +83,6 @@ jobs:
           echo ${{ env.RELEASE_VERSION }}
           echo "-----"
           echo ${{ github.event.release.tag_name }}
-          echo "-----"
-          echo ${{ steps.previoustag.outputs.tag }}
 
       # - name: Build node image
       #   run: |
