@@ -69,8 +69,11 @@ jobs:
     runs-on: ubuntu-20.04 # exact version, not latest
     needs: build
     steps:
-      - name: Download and install deb package
+      - name: Download and install latest deb package
         run: |
+          echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+          echo $RELEASE_VERSION
+          echo ${{ env.RELEASE_VERSION }}
           wget https://github.com/cheqd/cheqd-node/releases/download/v0.2.3/cheqd-node_0.2.3_amd64.deb > /dev/null
           sudo dpkg -i cheqd-node_0.2.3_amd64.deb
           cheqd-noded help
