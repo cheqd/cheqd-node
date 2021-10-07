@@ -71,8 +71,8 @@ jobs:
     steps:
       - name: Download and install deb package
         run: |
-          wget https://github.com/cheqd/cheqd-node/releases/download/v0.2.2/cheqd-node_0.2.2_amd64.deb > /dev/null
-          sudo dpkg -i cheqd-node_0.2.2_amd64.deb
+          wget https://github.com/cheqd/cheqd-node/releases/download/v0.2.3/cheqd-node_0.2.3_amd64.deb > /dev/null
+          sudo dpkg -i cheqd-node_0.2.3_amd64.deb
           cheqd-noded help
 
       - name: Check out
