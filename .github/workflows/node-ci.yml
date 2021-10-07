@@ -65,7 +65,7 @@ jobs:
         run: starport chain build
 
       - name: Check launch
-        run: cheqd-noded version
+        run: cheqd-noded help
 
   build-images-and-set-up-pool:
     name: Build cheqd-node and testnet Docker images, install deb package and run Docker pool
