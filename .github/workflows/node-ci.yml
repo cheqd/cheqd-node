@@ -79,6 +79,8 @@ jobs:
           echo $RELEASE_VERSION
           echo "-----"
           echo ${{ env.RELEASE_VERSION }}
+          echo "-----"
+          ${{ github.event.release.tag_name }}
 
       # - name: Build node image
       #   run: |
