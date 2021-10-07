@@ -202,7 +202,7 @@ For updating `versionId` from `WriteRequest.metadata` should be filled by a tran
 1. **`created`** (string): Formatted as an XML Datetime normalized to UTC 00:00:00 and without sub-second decimal precision. For example: 2020-12-20T19:17:47Z.
 2. **`updated`** (string): The value of the property MUST follow the same formatting rules as the created property. The `updated` field is null if an Update operation has never been performed on the DID document. If an updated property exists, it can be the same value as the created property when the difference between the two timestamps is less than one second.
 3. **`deactivated`** (strings): If DID has been deactivated, DID document metadata MUST include this property with the boolean value true. By default `false`.
-4. **`versionId`** (strings): Contains transaction hash of the previous DIDDoc version. If the DID Document has just been created, this field contains its own transaction hash.
+4. **`versionId`** (strings): Contains transaction hash of the current DIDDoc version.
 
 ##### Example of DID Document Metadata
 
