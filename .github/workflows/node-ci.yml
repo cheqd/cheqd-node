@@ -72,9 +72,11 @@ jobs:
       - name: Check out
         uses: actions/checkout@v2
 
-      - name: Download and install latest deb package
+      - name: Get tag
         id: previoustag
         uses: "WyriHaximus/github-action-get-previous-tag@v1"
+
+      - name: Download and install latest deb package
         run: |
           echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
           echo "-----"
