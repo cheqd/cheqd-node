@@ -1,4 +1,4 @@
-# Running a new Validator Node
+# Configure a node as validator
 
 This document describes in detail how to join existing network as validator.
 
@@ -6,19 +6,19 @@ This document describes in detail how to join existing network as validator.
 
 1. Setup a node:
 
-   Follow [this instruction](setting-up-a-new-node.md).
+   Follow [this instruction](readme.md).
 
    Use corresponding `genesis.json` and `persistent peers list` form `persistent_chains` folder in the root of the repository.
 
 2. Generate a user key:
 
-   See [the instruction](cosmos-cli.md#managing-keys).
+   See [the instruction](../cosmos-cli.md#managing-keys).
 
 3. Get some tokens:
 
    If you would like to participate `testnet`, join [cheqd Slack community](http://cheqd.link/join-cheqd-slack) and ask for tokens here.
 
-   Make sure that your balance is positive using [this reference](cosmos-cli.md#managing-account-balances).
+   Make sure that your balance is positive using [this reference](../cosmos-cli.md#managing-account-balances).
 
 4. Promote the node to the validator:
 
@@ -33,7 +33,7 @@ This document describes in detail how to join existing network as validator.
    * `amount` - amount of tokens to stake;
    * `from` - key alias of account that will become node operator and will make initial stake;
    * `min-self-delegation` - minimal amount of tokens that the node operator promises to keep bonded;
-   * `pubkey` - validator's public key. See [this reference](cosmos-cli.md#managing-node) on how to get it;
+   * `pubkey` - validator's public key. See [this reference](../cosmos-cli.md#managing-node) on how to get it;
    * `commission-rate` - validator's commission;
    * `commission-max-rate` - maximum validator's commission. Can't be changed;
    * `commission-max-change-rate` - maximum validator's commission change per day. Can't be changed;
@@ -61,7 +61,7 @@ This document describes in detail how to join existing network as validator.
 
    Make sure that your node is signing blocks:
 
-   * Find out [hex encoded validator address](cosmos-cli.md#managing-node) of your node;
+   * Find out [hex encoded validator address](../cosmos-cli.md#managing-node) of your node;
    * Query the latest block. Open `<rpc-url>/block` in browser;
    * Make sure that there is a signature with your validator address in the signature list.
 

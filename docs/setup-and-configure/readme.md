@@ -1,10 +1,10 @@
-# Running a new node
+# Setup a new cheqd node
 
-This document describes in detail how to configure infrastructure and deploy a new node \(observer or validator\).
+This document describes in detail how to configure infrastructure and deploy a new node as an observer or validator.
 
-After creating the nodes, if a new network needs to be initialized, please follow the instructions for [creating a new network from genesis](setting-up-a-new-network.md).
+After creating the nodes, if a new network needs to be initialized, please follow the instructions for [creating a new network from genesis](../setting-up-a-new-network.md).
 
-If a new validator needs to be added to the existing network, please refer to [joining existing network](setting-up-a-new-validator.md) instruction.
+If a new validator needs to be added to the existing network, please refer to [joining existing network](configure-new-validator.md) instruction.
 
 ## Setting up infrastructure
 
@@ -70,17 +70,17 @@ While this setup is not compulsory, node operators with higher stakes or a need 
 
 ### Installing using .deb package
 
-The recommended way to install `cheqd-node` on a standalone (virtual) machine is to use our Debian package installer on Ubuntu 20.04 LTS. Detailed information about changes made by the package can be found [here](deb-package-overview.md)
+The recommended way to install `cheqd-node` on a standalone \(virtual\) machine is to use our Debian package installer on Ubuntu 20.04 LTS. Detailed information about changes made by the package can be found [here](https://github.com/cheqd/cheqd-node/tree/8ea79cda7c3fb5f41ab90faba7ed9e42d2096dce/docs/deb-package-overview.md)
 
 1. Get `deb` package for Ubuntu 20.04 in [releases](https://github.com/cheqd/cheqd-node/releases):
 
-   ```
+   ```text
    wget https://github.com/cheqd/cheqd-node/releases/download/v0.2.3/cheqd-node_0.2.3_amd64.deb
    ```
 
 2. Install the package:
 
-   ```
+   ```text
    sudo dpkg -i cheqd-node_0.2.3_amd64.deb
    ```
 
@@ -88,13 +88,13 @@ The recommended way to install `cheqd-node` on a standalone (virtual) machine is
 
    You should always switch to `cheqd` user before managing node. That's because node stores configuration files in home directory which is different for each user.
 
-   ```
+   ```text
    sudo su cheqd
    ```
 
 4. Initialize node config files:
 
-   ```
+   ```text
    cheqd-noded init <your-node-name>
    ```
 
@@ -147,7 +147,7 @@ The recommended way to install `cheqd-node` on a standalone (virtual) machine is
 
 9. Enable `cheqd-noded` service and start it:
 
-   ```
+   ```text
    systemctl enable cheqd-noded
 
    systemctl start cheqd-noded
@@ -155,24 +155,24 @@ The recommended way to install `cheqd-node` on a standalone (virtual) machine is
 
    Check that the service is running:
 
-   ```
+   ```text
    systemctl status cheqd-noded
    ```
 
    Status should be: `Active: active (running)`
 
-9. Check that the node is connected and catching up:
+10. Check that the node is connected and catching up:
 
-   ```
-   cheqd-noded status
-   ```
+    ```text
+    cheqd-noded status
+    ```
 
-   Make sure that `latest_block_height` is increasing over time.
+    Make sure that `latest_block_height` is increasing over time.
 
-   Wait for `catching_up` to become `false`.
+    Wait for `catching_up` to become `false`.
 
-   - You can query status remotely: `cheqd-noded status --node <rpc-address>`;
-   - Another way is to open status page in browser: `<rpc-address>/status`.
+    * You can query status remotely: `cheqd-noded status --node <rpc-address>`;
+    * Another way is to open status page in browser: `<rpc-address>/status`.
 
 ### Installing using binary
 
@@ -180,7 +180,7 @@ The recommended way to install `cheqd-node` on a standalone (virtual) machine is
 
    You can get the binary in several ways:
 
-   * Compile from source code - [instruction](../);
+   * Compile from source code - [instruction](../../);
    * Get `tar` archive with the binary compiled for Ubuntu 20.04 in [releases](https://github.com/cheqd/cheqd-node/releases);
 
 2. Set up `cheqd-noded` binary as a service
@@ -212,3 +212,4 @@ The recommended way to install `cheqd-node` on a standalone (virtual) machine is
 You can read other advices about running node in production [here](https://docs.tendermint.com/master/nodes/running-in-production.html).
 
 [Сosmovisor](https://docs.cosmos.network/master/run-node/cosmovisor.html) can be used for automatic updates.
+

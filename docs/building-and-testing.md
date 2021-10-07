@@ -1,15 +1,15 @@
 # Building and testing
 
-## Building node from source
+## Building `cheqd-node` from source
 
-Prerequisites:
+### Prerequisites
 
 * Install [Go](https://golang.org/doc/install)
 * Install [Starport](https://docs.starport.network/guide/install.html)
 
-To build the node executable run:
+To build the `cheqd-node` executable run:
 
-```text
+```bash
 starport chain build
 ```
 
@@ -21,7 +21,7 @@ which cheqd-noded
 
 ## Building node in docker
 
-Use this [instruction](../docker/cheqd_node.md).
+Use this [instruction](https://github.com/cheqd/cheqd-node/tree/8ea79cda7c3fb5f41ab90faba7ed9e42d2096dce/docker/cheqd_node.md).
 
 ## Running local network using starport
 
@@ -42,5 +42,5 @@ Your blockchain in development can be configured with `config.yml`. To learn mor
 
 ## Running local network using docker compose
 
-Use this [instruction](../test/networks/docker_compose.md).
+Use this [instruction](../docker/docker_compose.md).
 
