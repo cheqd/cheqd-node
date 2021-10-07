@@ -72,19 +72,17 @@ jobs:
       - name: Check out
         uses: actions/checkout@v2
 
+    - name: Get latest release
+      uses: rez0n/actions-github-release@main
+      id: release_tag
+      env:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        repository: "cheqd/cheqd-node"
+        type: "latest"
+
       - name: Download and install latest deb package
         run: |
-          echo $GITHUB_ENV
-          echo "-----"
-          echo $GITHUB_REF
-          echo "-----"
-          echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-          echo "-----"
-          echo $RELEASE_VERSION
-          echo "-----"
-          echo ${{ env.RELEASE_VERSION }}
-          echo "-----"
-          echo ${{ github.event.release.tag_name }}
+          echo ${{ steps.release_tag.outputs.release }}
 
       # - name: Build node image
       #   run: |
