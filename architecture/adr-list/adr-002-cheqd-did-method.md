@@ -83,10 +83,10 @@ All identity requests will have the following format:
 ```
 
 - **`data`**: Data requested to be written to the ledger, specific for each request type.
-- **`signatures`**: `data` should be signed by all `controller` private keys. This field contains a dict there key's id from `DIDDoc.authentication` is a key, and the signature is a value. The `signatures` must contains signatures from all controllers. And every controller should sign all fields excluding `signatures` using at least one key from `DIDDoc.authentication`.
+- **`signatures`**: `data`and `metadata` should be signed by all `controller` private keys. This field contains a dict there key's id from `DIDDoc.authentication` is a key, and the signature is a value. The `signatures` must contains signatures from all controllers. And every controller should sign all fields excluding `signatures` using at least one key from `DIDDoc.authentication`.
 - **`requestId`**: String with unique identifier. Unix timestamp is recommended. Needed for a reply protection.
 - **`metadata`**: Dictionary with additional metadata fields. Empty for now. This fields provides extensibility in the future, e.g., it can contain `protocolVersion` or other relevant metadata associated with a request.
-  - **`versionId`**: acceptable only for DIDDoc updating.
+  - **`versionId`**: String with a previous entity version transaction hash. Acceptable only for DIDDoc updating. This field is needed for a replay protection.
   
 ## Identity transactions for cheqd DID method
 
@@ -99,8 +99,8 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 
 #### DIDDoc
 
-1. **`id`**: Target DID as base58-encoded string for 16 or 32 byte DID value. In the ledger, we store only an identifier without specifying the method and namespace.
-2. **`controller`** (optional): A list of base58-encoded identifier strings.
+1. **`id`**: Target DID as base58-encoded string for 16 or 32 byte DID value with Cheqd DID Method prefix `did:cheqd:<namespace>:<namespace identifier>:`.
+2. **`controller`** (optional): A list of fully qualified DID strings or one string. Contains one or more DIDs who can update this DIDdoc. All DIDs must exist.
 3. **`verificationMethod`** (optional): A list of Verification Methods
 4. **`authentication`** (optional): A list of Verification Methods or strings with key aliases
 5. **`assertionMethod`** (optional): A list of Verification Methods or strings with key aliases
@@ -119,30 +119,30 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
     "https://www.w3.org/ns/did/v1",
     "https://w3id.org/security/suites/ed25519-2020/v1"
   ],
-  "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
+  "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
   "verificationMethod": [
     {
-      "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue#authKey1",
+      "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#authKey1",
       "type": "Ed25519VerificationKey2020", // external (property value)
-      "controller": "did:cheqd:N22N22KY2Dyvmuu2PyyqSFKue",
+      "controller": "did:cheqd:mainnet:N22N22KY2Dyvmuu2PyyqSFKue",
       "publicKeyMultibase": "zAKJP3f7BD6W4iWEQ9jwndVTCBq8ua2Utt8EEjJ6Vxsf"
     },
     {
-      "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue#capabilityInvocationKey",
+      "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#capabilityInvocationKey",
       "type": "Ed25519VerificationKey2020", // external (property value)
-      "controller": "did:cheqd:N22N22KY2Dyvmuu2PyyqSFKue",
+      "controller": "did:cheqd:mainnet:N22N22KY2Dyvmuu2PyyqSFKue",
       "publicKeyMultibase": "z4BWwfeqdp1obQptLLMvPNgBw48p7og1ie6Hf9p5nTpNN"
     }
   ],
-  "authentication": ["did:cheqd:N22KY2Dyvmuu2PyyqSFKue#authKey1"],
-  "capabilityInvocation": ["did:cheqd:N22KY2Dyvmuu2PyyqSFKue#capabilityInvocationKey"],
+  "authentication": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#authKey1"],
+  "capabilityInvocation": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#capabilityInvocationKey"],
 }
 ```
 
 #### Verification Method
 
 1. **`id`** (string): A string with format `<DIDDoc-id>#<key-alias>`
-2. **`controller`**: A list of base58-encoded identifier strings.
+2. **`controller`**: A list of fully qualified DID strings or one string. All DIDs must exist.
 3. **`type`** (string)
 4. **`publicKeyJwk`** (`map[string,string]`, optional): A map representing a JSON Web Key that conforms to [RFC7517](https://tools.ietf.org/html/rfc7517). See definition of `publicKeyJwk` for additional constraints.
 5. **`publicKeyMultibase`** (optional): A base58-encoded string that conforms to a [MULTIBASE](https://datatracker.ietf.org/doc/html/draft-multiformats-multibase-03) encoded public key.
@@ -152,9 +152,9 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 
 ```jsonc
 {
-  "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue#key-0",
+  "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#key-0",
   "type": "JsonWebKey2020",
-  "controller": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
+  "controller": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
   "publicKeyJwk": {
     "kty": "OKP",
     // external (property name)
@@ -176,7 +176,7 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 
 ```jsonc
 {
-  "id":"did:cheqd:N22KY2Dyvmuu2PyyqSFKue#linked-domain",
+  "id":"did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#linked-domain",
   "type": "LinkedDomains",
   "serviceEndpoint": "https://bar.example.com"
 }
@@ -187,6 +187,7 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 If there is no DID entry on the ledger with the specified DID (`DID.id`), it is considered as a creation request for a new DID.
 
 If there is a DID entry on the ledger with the specified DID (`DID.id`), then this considered a request for updating an existing DID.
+For updating `versionId` from `WriteRequest.metadata` should be filled by a transaction hash of the previous DIDDoc version.
 
 **Note**: The field `signatures`(from `WriteRequest`) must contain signatures from all old controllers and all new controllers.
 
@@ -222,19 +223,20 @@ It is not possible to update an existing Schema, to ensure the original schema u
 
 If a Schema evolves, a new schema with a new version or name needs to be created.
 
-- **`id`**: DID as base58-encoded string for 16 or 32 byte DID value.
+- **`id`**: DID as base58-encoded string for 16 or 32 byte DID value with Cheqd DID Method prefix `did:cheqd:<namespace>:<namespace identifier>:` and a resource type at the end.
 - **`type`**: String with a schema type. Now only `CL-Schema` is supported.
 - **`attrNames`**: Array of attribute name strings (125 attributes maximum)
 - **`name`**: Schema's name string
 - **`version`**: Schema's version string
+- **`controller`**: DIDs list of strings or only one string of a schema controller(s). All DIDs must exist.
 
 #### `SCHEMA` entity transaction format
 
 ```jsonc
 {
-  "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue/schema",
+  "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue/schema",
   "type": "CL-Schema",
-  "controller": "did:cheqd:IK22KY2Dyvmuu2PyyqSFKu",  // Schema Issuer DID
+  "controller": "did:cheqd:mainnet:IK22KY2Dyvmuu2PyyqSFKu",  // Schema Issuer DID
   "version": "1.0",
   "name": "Degree",
   "attrNames": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
@@ -252,13 +254,13 @@ Schema Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue/schema`
 #### `SCHEMA` DID Document transaction format 
 ```jsonc
 {
-  "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
-  "controller": "did:cheqd:IK22KY2Dyvmuu2PyyqSFKu", // Schema Issuer DID
+  "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
+  "controller": "did:cheqd:mainnet:IK22KY2Dyvmuu2PyyqSFKu", // Schema Issuer DID
   "service":[
     {
       "id": "cheqd-schema1",
       "type": "CL-Schema",
-      "serviceEndpoint": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue?resource=true"
+      "serviceEndpoint": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue?resource=true"
     }
   ]
 }
@@ -272,12 +274,12 @@ Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
 
 ```jsonc
 {
-  "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
+  "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
   "schema":[
     {
-      "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue#schema1",
+      "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#schema1",
       "type": "CL-Schema",
-      "controller": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
+      "controller": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
       "value": {
                 "version": "1.0",
                 "name": "Degree",
@@ -296,11 +298,11 @@ Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
 
 ```jsonc
 {
-  "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
+  "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
   "schema": {
-              "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
+              "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
               "type": "CL-Schema",
-              "controller": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
+              "controller": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
               "value": {
                 "version": "1.0",
                 "name": "Degree",
@@ -318,12 +320,12 @@ Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
 
 ```jsonc
 {
-  "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
+  "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
   "schema":[
               {
                 "id": "cheqd-schema",
                 "type": "CL-Schema",
-                "schemaRef": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue?resource=true"
+                "schemaRef": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue?resource=true"
               }
           ]
 }
@@ -346,14 +348,14 @@ Adds a Credential Definition (in particular, public key), which is created by an
 It is not possible to update Credential Definitions. If a Credential Definition needs to be evolved (for example, a key needs to be rotated), then a new Credential Definition needs to be created for a new Issuer DIDdoc.
 Credential Definitions is added to the ledger in as verification method for Issuer DIDDoc
 
-- **`id`**: DID as base58-encoded string for 16 or 32 byte DID value.
+- **`id`**: DID as base58-encoded string for 16 or 32 byte DID value with Cheqd DID Method prefix `did:cheqd:<namespace>:<namespace identifier>:` and a resource type at the end.
 - **`value`** (dict): Dictionary with Credential Definition's data if `signature_type` is `CL`:
   - **`primary`** (dict): Primary credential public key
   - **`revocation`** (dict, optional): Revocation credential public key
 - **`schemaId`** (string): `id` of a Schema the credential definition is created for.
 - **`signatureType`** (string): Type of the credential definition (that is credential signature). `CL-Sig-Cred_def` (Camenisch-Lysyanskaya) is the only supported type now. Other signature types are being explored for future releases.
 - **`tag`** (string, optional): A unique tag to have multiple public keys for the same Schema and type issued by the same DID. A default tag `tag` will be used if not specified.
-- **`controller`**: DIDDoc.id list of strings of a credential definition controllers. All DIDs must exist.
+- **`controller`**: DIDs list of strings or only one string of a credential definition controller(s). All DIDs must exist.
 
 #### `CRED_DEF` entity transaction format
 
@@ -361,8 +363,8 @@ Credential Definitions is added to the ledger in as verification method for Issu
 {
     "id": "<cred_def_url>",
     "type": "CL-CredDef",
-    "controller": "did:cheqd:123456789abcdefghi",
-    "schemaId": "did:cheqd:5ZTp9g4SP6t73rH2s8zgmtqdXyT/schema",
+    "controller": "did:cheqd:mainnet:123456789abcdefghi",
+    "schemaId": "did:cheqd:mainnet:5ZTp9g4SP6t73rH2s8zgmtqdXyT/schema",
     "tag": "some_tag",
     "value": {
       "primary": "...",
@@ -382,13 +384,13 @@ Schema Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue/credDef`
 #### `CRED_DEF` DID Document transaction format
 ```jsonc
 {
-  "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
-  "controller": "did:cheqd:IK22KY2Dyvmuu2PyyqSFKu", // CredDef Issuer DID
+  "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
+  "controller": "did:cheqd:mainnet:IK22KY2Dyvmuu2PyyqSFKu", // CredDef Issuer DID
   "service":[
     {
       "id": "cheqd-cred-def",
       "type": "CL-CredDef",
-      "serviceEndpoint": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue/credDef"
+      "serviceEndpoint": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue/credDef"
     }
   ]
 }
@@ -413,12 +415,12 @@ CredDef URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<cred_def_entity_id>`
     "https://w3id.org/security/suites/jws-2020/v1",
     "https://w3id.org/security/suites/ed25519-2020/v1"
   ],
-  "id": "did:cheqd:123456789abcdefghi",
+  "id": "did:cheqd:mainnet:123456789abcdefghi",
   "verificationMethod": [{
     "id": "passport-keys",
     "type": "CL-Sig-Cred_def",
-    "controller": "did:cheqd:123456789abcdefghi",
-    "schemaId": "did:cheqd:5ZTp9g4SP6t73rH2s8zgmtqdXyT",
+    "controller": "did:cheqd:mainnet:123456789abcdefghi",
+    "schemaId": "did:cheqd:mainnet:5ZTp9g4SP6t73rH2s8zgmtqdXyT",
     "tag": "some_tag",
     "value": {
       "primary": "...",
