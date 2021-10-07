@@ -72,13 +72,13 @@ jobs:
       - name: Check out
         uses: actions/checkout@v2
 
-    - name: Get latest release
-      uses: rez0n/actions-github-release@main
-      id: release_tag
-      env:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        repository: "cheqd/cheqd-node"
-        type: "latest"
+      - name: Get latest release
+        uses: rez0n/actions-github-release@main
+        id: release_tag
+        env:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: "cheqd/cheqd-node"
+          type: "latest"
 
       - name: Download and install latest deb package
         run: |
