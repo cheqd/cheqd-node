@@ -232,7 +232,7 @@ If a Schema evolves, a new schema with a new version or name needs to be created
 
 ```jsonc
 {
-  "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
+  "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue/schema",
   "type": "CL-Schema",
   "controller": "did:cheqd:IK22KY2Dyvmuu2PyyqSFKu",  // Schema Issuer DID
   "version": "1.0",
@@ -241,13 +241,15 @@ If a Schema evolves, a new schema with a new version or name needs to be created
 }
 ```
 
-### Option 1
+### Option 1 [Chosen]
+
+Don't store Schema DIDDoc in the State.
 
 Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
-Schema Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>` (?)
 
-#### `SCHEMA` DID Document transaction format
+Schema Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue/schema` 
 
+#### `SCHEMA` DID Document transaction format 
 ```jsonc
 {
   "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
@@ -257,16 +259,6 @@ Schema Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>` (?)
       "id": "cheqd-schema1",
       "type": "CL-Schema",
       "serviceEndpoint": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue?resource=true"
-    },
-    {
-      "id": "cheqd-schema2",
-      "type": "CL-Schema",
-      "serviceEndpoint": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue?resource=true"
-    },
-    {
-      "id": "indy-schema",
-      "type": "CL-Schema",
-      "serviceEndpoint": "did:sov:N22KY2Dyvmuu2PyyqSFKue:CL:" //external links are allowed
     }
   ]
 }
@@ -341,7 +333,6 @@ Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
 
 #### `SCHEMA` State format
 
-- `"diddoc:<id>" -> {SchemaDIDDoc, DidDocumentMetadata, txHash, txTimestamp}`
 - `"schema:<id>" -> {SchemaEntity, txHash, txTimestamp}`
 
 `id` example: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
@@ -364,7 +355,56 @@ Credential Definitions is added to the ledger in as verification method for Issu
 - **`tag`** (string, optional): A unique tag to have multiple public keys for the same Schema and type issued by the same DID. A default tag `tag` will be used if not specified.
 - **`controller`**: DIDDoc.id list of strings of a credential definition controllers. All DIDs must exist.
 
-#### Example of Issuer DIDDoc with Credential Definition
+#### `CRED_DEF` entity transaction format
+
+```jsonc
+{
+    "id": "<cred_def_url>",
+    "type": "CL-CredDef",
+    "controller": "did:cheqd:123456789abcdefghi",
+    "schemaId": "did:cheqd:5ZTp9g4SP6t73rH2s8zgmtqdXyT/schema",
+    "tag": "some_tag",
+    "value": {
+      "primary": "...",
+      "revocation": "..."
+    }
+}
+```
+
+### Option 1 [Chosen]
+
+Don't store Schema DIDDoc in the State.
+
+Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
+
+Schema Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue/credDef`
+
+#### `CRED_DEF` DID Document transaction format
+```jsonc
+{
+  "id": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue",
+  "controller": "did:cheqd:IK22KY2Dyvmuu2PyyqSFKu", // CredDef Issuer DID
+  "service":[
+    {
+      "id": "cheqd-cred-def",
+      "type": "CL-CredDef",
+      "serviceEndpoint": "did:cheqd:N22KY2Dyvmuu2PyyqSFKue/credDef"
+    }
+  ]
+}
+```
+
+#### `CRED_DEF` state format
+
+`"credDef:<id>" -> {CredDefEntity, txHash, txTimestamp}`
+
+### Option 2
+
+#### `CRED_DEF` DID Document transaction format
+
+Store inside Issuer DID Document
+
+CredDef URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<cred_def_entity_id>`
 
 ```jsonc
 {
@@ -389,12 +429,13 @@ Credential Definitions is added to the ledger in as verification method for Issu
 }
 ```
 
-**Note**: `CRED_DEF` **cannot** be updated.
-
 #### `CRED_DEF` state format
 
 Stored inside [DIDDoc](#diddoc-state-format)
-Credential Definition URL: `<issuerDID>#<credDefId>`. Ex: `did:cheqd:123456789abcdefghi#passport-keys`
+
+
+**Note**: `CRED_DEF` **cannot** be updated.
+
 
 ## Consequences
 
