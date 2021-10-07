@@ -64,6 +64,9 @@ jobs:
       - name: Starport build
         run: starport chain build
 
+      - name: Check launch
+        run: cheqd-noded version
+
   build-images-and-set-up-pool:
     name: Build cheqd-node and testnet Docker images, install deb package and run Docker pool
     runs-on: ubuntu-20.04 # exact version, not latest
@@ -82,7 +85,7 @@ jobs:
           export RELEASE_NUMBER=$(echo ${{ steps.release_tag.outputs.release }} | cut -c2-)
           wget https://github.com/cheqd/cheqd-node/releases/download/${{ steps.release_tag.outputs.release }}/cheqd-node_${RELEASE_NUMBER}_amd64.deb > /dev/null
           sudo dpkg -i cheqd-node_${RELEASE_NUMBER}_amd64.deb
-          cheqd-noded help
+          cheqd-noded version
 
       - name: Check out
         uses: actions/checkout@v2

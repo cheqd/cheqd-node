@@ -1,7 +1,15 @@
 import sys
+import os
 import pexpect
-from pytest import *
+import pytest
 
 
-def test_version():
-    pexpect.spawn("cheqd-noded version", encoding="utf-8").expect("0.2.2")
+@pytest.mark.parametrize(
+        "command, expected_output",
+        [
+            ("help", "cheqd App"),
+            ("version", os.environ["RELEASE_NUMBER"]),
+        ]
+    )
+def test_basic(command, expected_output):
+    pexpect.spawn(f"cheqd-noded {command}", encoding="utf-8").expect(expected_output)
