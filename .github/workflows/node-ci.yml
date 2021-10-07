@@ -80,8 +80,10 @@ jobs:
       - name: Download and install latest deb package
         run: |
           echo ${{ steps.release_tag.outputs.release }}
-          wget https://github.com/cheqd/cheqd-node/releases/download/${{ steps.release_tag.outputs.release }}/cheqd-node_${{ steps.release_tag.outputs.release:1 }}_amd64.deb > /dev/null
-          sudo dpkg -i cheqd-node_${{ steps.release_tag.outputs.release:1 }}_amd64.deb
+          export RELEASE_NUMBER=$(echo ${{ steps.release_tag.outputs.release }} | cut -c2-)
+          echo $RELEASE_NUMBER
+          wget https://github.com/cheqd/cheqd-node/releases/download/${{ steps.release_tag.outputs.release }}/cheqd-node_${RELEASE_NUMBER}_amd64.deb > /dev/null
+          sudo dpkg -i cheqd-node_${RELEASE_NUMBER}_amd64.deb
           cheqd-noded help
 
       - name: Check out
