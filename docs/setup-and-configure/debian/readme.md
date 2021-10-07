@@ -1,21 +1,39 @@
-# Overview of changes that deb package does
+# Guide to Debian packages for `cheqd-node`
 
-Debian package is the most common way for Ubuntu OS and also it can provide post-install steps which can help to make our application to run as a service.
+## Context
 
-The package consists of:
+We provide [pre-compiled Debian packages](https://github.com/cheqd/cheqd-node/releases) for ease-of-installation and configuration of cheqd-node on standalone virtual machines / hosts.
 
-* Binary, named `cheqd-noded`;
-* Script with post-install and post-remove actions. 
+These are tested to work with Ubuntu 20.04 LTS, which is the current long-term support release for Ubuntu Linux.
 
-## Post-install actions
+It may be possible to use the same package on other Ubuntu / Debian distributions based on the same LTS version; however, this method is not officially supported.
+
+
+## How-to instructions for `cheqd-node` Debian packages
+
+* [Install (or uninstall) a new node](deb-package-install.md) using Debian package
+* If you already have an existing `cheqd-node` installation that was done using the .deb, find out how to [upgrade your node using the Debian package](deb-package-upgrade.md).
+
+
+## Pre/post-install action details
+
+This section describes the system changes that our Debian packages attempt to carry out, including:
+
+* Pre-install system configuration actions.
+* Installing pre-compiled `cheqd-node` binary.
+* Post-install actions, such as setting up the `cheqd-node` daemon as a `systemctl` service.
 
 ### System user creation
 
-By default, cosmos-sdk create all needed directories in the `HOME` directory. That's why package creates a special `cheqd` user with home directory set to `/var/lib/cheqd`.
+By default, Cosmos SDK creates all requisite directories in the `HOME` directory of the user that initiates installation.
 
-### Directories and symlinks
+Our package creates a new system user called `cheqd` with home directory set to `/var/lib/cheqd`. This allows node operators to keep sysadmin / standard users separate from the service user.
 
-According to general filesystem hierarchy standard \(FHS\), the next directories will be created:
+### Application directory and symbolic link creation
+
+To keep `cheqd-node` configuration data in 
+
+#### App data directories
 
 * `/etc/cheqd-node`
   * Configuration files location
@@ -101,4 +119,3 @@ For now, all files created during installation process will be removed from the 
 /etc/cron.daily/cheqd-node
 /etc/systemd/system/cheqd-noded.service
 ```
-

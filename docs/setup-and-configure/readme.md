@@ -1,22 +1,22 @@
-# Setup a new cheqd node
+# Setting up a new cheqd node
 
-This document describes in detail how to configure infrastructure and deploy a new node as an observer or validator.
+## Context
 
-After creating the nodes, if a new network needs to be initialized, please follow the instructions for [creating a new network from genesis](../setting-up-a-new-network.md).
+This document describes how to use install and configure a new instance of `cheqd-node` from pre-built packages and adding it to an existing network (such as the the cheqd testnet) as an observer or validator.
 
-If a new validator needs to be added to the existing network, please refer to [joining existing network](configure-new-validator.md) instruction.
+For other scenarios, please see [setting up a new network from scratch](../build-and-networks/readme.md) and [building `cheqd-node` from source](../build-and-networks/build-from-source.md).
 
-## Setting up infrastructure
+## Pre-requisites
 
 ### Hardware requirements
 
-Minimal:
+#### Minimum specifications
 
 * 1GB RAM
 * 25GB of disk space
 * 1.4 GHz CPU
 
-Recommended \(for highload applications\):
+#### Recommended specifications
 
 * 2GB RAM
 * 100GB SSD
@@ -24,34 +24,15 @@ Recommended \(for highload applications\):
 
 Extended information on [recommended hardware requirements is available in Tendermint documentation](https://docs.tendermint.com/master/nodes/running-in-production.html#hardware).
 
-### Operating System
+### Operating system
 
-Our [packaged releases](https://github.com/cheqd/cheqd-node/releases) are currently compiled and tested for `Ubuntu 20.04 LTS`, which is the recommended operating system in case the installation is carried out using Debian package or binaries.
+Our [packaged releases](https://github.com/cheqd/cheqd-node/releases) are currently compiled and tested for `Ubuntu 20.04 LTS`, which is the recommended operating system for installation using Debian package or binaries.
 
 For other operating systems, we recommend using [pre-built Docker image releases for `cheqd-node`](https://github.com/orgs/cheqd/packages?repo_name=cheqd-node).
 
-We plan on supporting other operating systems in the future based on demand for specific platforms by the community.
+We plan on supporting other operating systems in the future, based on demand for specific platforms by the community.
 
-### Ports
-
-To function properly, `cheqd-node` requires two types of ports to be configured.
-
-#### P2P port
-
-* This port is used for peer-to-peer node communication
-* Incoming and outcoming TCP connections must be allowed from any IPv4 address
-* `26656` by default
-* Can be configured in `/etc/cheqd-node/config.toml`
-
-#### RPC port
-
-* This port is used by client applications. Open it only if you want clients to be able to connect to your node.
-* Incoming tcp connections should be allowed.
-* SSL can also be configured separately
-* `26657` by default
-* Can be configured in `/etc/cheqd-node/config.toml`
-
-### Volumes
+### Storage volumes
 
 We recommend using a separate storage volume for the `data` directory where the node's copy of the ledger is stored.
 
@@ -60,11 +41,43 @@ The default directory location depends on the installation method used:
 * For binary distribution, it is `$HOME/.cheqdnode/data`
 * For installations done using our Debian packages, it is `/var/lib/cheqd/.cheqdnode/data`.
 
+### Ports
+
+To function properly, `cheqd-node` requires two types of ports to be configured. Depending on the setup, you may also need to configure firewall rules to allow the correct ingress/egress traffic.
+
+Node operators should ensure there are no existing services running on these ports before proceeding with installation.
+
+#### P2P port
+
+The P2P port is used for peer-to-peer communication between nodes.
+
+Further details on [how P2P settings work is defined in Tendermint documentation](https://docs.tendermint.com/master/nodes/configuration.html#p2p-settings).
+
+* By default, the P2P port is set to `26656`.
+* Inbound and outbound TCP connections must be allowed from any IPv4 address range.
+* The default P2P port can be changed in `/etc/cheqd-node/config.toml`.
+
+#### RPC port
+
+The RPC port is intended to be used by client applications to interact with the node.
+
+During node configuration for cheqd testnet, the RPC port is needed to transfer the initial balance of `cheq` tokens required for staking.
+
+Beyond this stage, it is up to a node operator whether they want this port to be exposed to the public internet.
+
+The [RPC endpoints for a node](https://docs.tendermint.com/master/rpc/) provide REST, JSONRPC over HTTP, and JSONRPC over WebSockets. These API endpoints can provide useful information for node operators, such as healthchecks, network information, validator information etc.
+
+* By default, the RPC port is set to `26657`
+* Inbound and outbound TCP connections should be allowed from destinations desired by the node operator. The default is to allow this from any IPv4 address range.
+* TLS for the RPC port can also be setup separately. Currently, TLS setup is not automatically carried out in the install process described below.
+* The default RPC port can be changed in `/etc/cheqd-node/config.toml`.
+
 ### Sentry nodes \(optional\)
 
 Tendermint allows more complex setups in production, where the ingress/egress to a validator node is [proxied behind a "sentry" node](https://docs.tendermint.com/master/nodes/validators.html#setting-up-a-validator).
 
 While this setup is not compulsory, node operators with higher stakes or a need to have more robust network security may consider setting up a sentry-validator node architecture.
+
 
 ## Installing and configuring software
 

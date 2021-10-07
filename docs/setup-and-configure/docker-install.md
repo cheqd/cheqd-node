@@ -1,4 +1,4 @@
-# Guide to using `cheqd-node` with Docker 
+# Installing `cheqd-node` with Docker
 
 ## Description
 
