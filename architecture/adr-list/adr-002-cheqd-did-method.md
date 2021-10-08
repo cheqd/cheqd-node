@@ -9,11 +9,15 @@
 
 ## Summary
 
-This ADR summarises the identity entities, queries, and transaction types for the cheqd network. These recommendations are based on the design patterns currently used by [Hyperledger Indy](https://github.com/hyperledger/indy-node), a blockchain built for self-sovereign identity \(SSI\).
+This ADR summarises the identity entities, queries, and transaction types for
+the cheqd network. These recommendations are based on the design patterns
+currently used by [Hyperledger Indy](https://github.com/hyperledger/indy-node),
+a blockchain built for self-sovereign identity \(SSI\).
 
 ## Context
 
-Hyperledger Indy contains the following [identity domain transactions](https://github.com/hyperledger/indy-node/blob/master/docs/source/transactions.md):
+Hyperledger Indy contains the following
+[identity domain transactions](https://github.com/hyperledger/indy-node/blob/master/docs/source/transactions.md):
 
 1. `NYM`
 2. `ATTRIB`
@@ -22,38 +26,64 @@ Hyperledger Indy contains the following [identity domain transactions](https://g
 5. `REVOC_REG_DEF`
 6. `REVOC_REG_ENTRY`
 
-Our aim is to replicate similar transactions on `cheqd-node` to allow existing SSI software designed to work with Hyperledger Indy to be compatible with the cheqd network.
+Our aim is to replicate similar transactions on `cheqd-node` to allow existing
+SSI software designed to work with Hyperledger Indy to be compatible with the
+cheqd network.
 
-_**Note**: Hyperledger Indy also contains other transaction types beyond the ones listed above, but these are currently not in scope for implementation in `cheqd-node`. They will be considered for inclusion later in the product roadmap._
+_**Note**: Hyperledger Indy also contains other transaction types beyond the
+ones listed above, but these are currently not in scope for implementation in
+`cheqd-node`. They will be considered for inclusion later in the product
+roadmap._
 
 ### Changes proposed from existing Hyperledger Indy transactions
 
-We have assessed the existing Hyperledger Indy transactions and recommend the following changes to be made.
+We have assessed the existing Hyperledger Indy transactions and recommend the
+following changes to be made.
 
 #### Rename `NYM` transactions to `DID` transactions
 
-[**NYM** is the term used by Hyperledger Indy](https://hyperledger-indy.readthedocs.io/projects/node/en/latest/transactions.html#nym) for [Decentralized Identifiers \(DIDs\)](https://www.w3.org/TR/did-core/) that are created on ledger. A DID is typically the identifier that is associated with a specific organisation issuing/managing SSI credentials.
+[**NYM** is the term used by Hyperledger Indy](https://hyperledger-indy.readthedocs.io/projects/node/en/latest/transactions.html#nym)
+for [Decentralized Identifiers \(DIDs\)](https://www.w3.org/TR/did-core/) that
+are created on ledger. A DID is typically the identifier that is associated with
+a specific organisation issuing/managing SSI credentials.
 
-Our proposal is to change the term `NYM` in transactions to `DID`, which would make understanding the context of a transaction easier to understand. This change will bring transactions better in-line with World Wide Web Consortium \(W3C\) terminology.
+Our proposal is to change the term `NYM` in transactions to `DID`, which would
+make understanding the context of a transaction easier to understand. This
+change will bring transactions better in-line with World Wide Web Consortium
+\(W3C\) terminology.
 
 #### Remove `role` field from DID transaction
 
-Hyperledger Indy is a public-permissioned distributed ledger. As `cheqd-node` is based on a public-permissionless network based on the [Cosmos blockchain framework](https://github.com/cosmos/cosmos-sdk), the `role` type is no longer necessary.
+Hyperledger Indy is a public-permissioned distributed ledger. As `cheqd-node` is
+based on a public-permissionless network based on the
+[Cosmos blockchain framework](https://github.com/cosmos/cosmos-sdk), the `role`
+type is no longer necessary.
 
 #### Dropping `ATTRIB` transactions
 
-`ATTRIB` was originally used in Hyperledger Indy to add document content similar to DID Documents (DIDDocs). The cheqd DID method replaces this by implementing DIDDocs for most transaction types.
+`ATTRIB` was originally used in Hyperledger Indy to add document content similar
+to DID Documents (DIDDocs). The cheqd DID method replaces this by implementing
+DIDDocs for most transaction types.
 
 ## Decision
 
 ### cheqd DID Method
 
-The `did:cheqd` method DID has four components that are concatenated to make a W3C DID specification conformant identifier. The components are:
+The `did:cheqd` method DID has four components that are concatenated to make a
+W3C DID specification conformant identifier. The components are:
 
 - **DID**: the hardcoded string `did:` to indicate the identifier is a DID
-- **`cheqd` DID method**: the hardcoded string `cheqd:` indicating that the identifier uses the `cheqd` DID method specification.
-- **Namespace**: A string that identifies the name of the primary cheqd ledger ("mainnet"), followed by a `:`. The namespace string may optionally have a secondary ledger name prefixed by a `:` following the primary name. If there is no secondary ledger element, the DID resides on the primary ledger ("mainnet"), else it resides on the secondary ledger. By convention, the primary is a production ledger while the secondary ledgers are non-production ledgers (e.g. testnet) associated with the primary ledger.
-- **Namespace Identifier**: A self-certified identifier unique to the given cheqd DID ledger namespace.
+- **`cheqd` DID method**: the hardcoded string `cheqd:` indicating that the
+identifier uses the `cheqd` DID method specification.
+- **Namespace**: A string that identifies the name of the primary cheqd ledger
+("mainnet"), followed by a `:`. The namespace string may optionally have a
+secondary ledger name prefixed by a `:` following the primary name. If there is
+no secondary ledger element, the DID resides on the primary ledger ("mainnet"),
+else it resides on the secondary ledger. By convention, the primary is a
+production ledger while the secondary ledgers are non-production ledgers (e.g.
+testnet) associated with the primary ledger.
+- **Namespace Identifier**: A self-certified identifier unique to the given
+cheqd DID ledger namespace.
 
 The components are assembled as follows:
 
@@ -82,34 +112,60 @@ All identity requests will have the following format:
 }
 ```
 
-- **`data`**: Data requested to be written to the ledger, specific for each request type.
-- **`signatures`**: `data`and `metadata` should be signed by all `controller` private keys. This field contains a dict there key's id from `DIDDoc.authentication` is a key, and the signature is a value. The `signatures` must contains signatures from all controllers. And every controller should sign all fields excluding `signatures` using at least one key from `DIDDoc.authentication`.
-- **`requestId`**: String with unique identifier. Unix timestamp is recommended. Needed for a reply protection.
-- **`metadata`**: Dictionary with additional metadata fields. Empty for now. This fields provides extensibility in the future, e.g., it can contain `protocolVersion` or other relevant metadata associated with a request.
-  - **`versionId`**: String with a previous entity version transaction hash. Acceptable only for DIDDoc updating. This field is needed for a replay protection.
+- **`data`**: Data requested to be written to the ledger, specific for each
+request type.
+- **`signatures`**: `data`and `metadata` should be signed by all `controller`
+private keys. This field contains a dict there key's id from
+`DIDDoc.authentication` is a key, and the signature is a value. The `signatures`
+must contains signatures from all controllers. And every controller should sign
+all fields excluding `signatures` using at least one key from
+`DIDDoc.authentication`.
+- **`requestId`**: String with unique identifier. Unix timestamp is recommended.
+Needed for a reply protection.
+- **`metadata`**: Dictionary with additional metadata fields. Empty for now.
+This fields provides extensibility in the future, e.g., it can contain
+`protocolVersion` or other relevant metadata associated with a request.
+  - **`versionId`**: String with a previous entity version transaction hash.
+  Acceptable only for DIDDoc updating. This field is needed for a replay
+  protection.
   
 ## Identity transactions for cheqd DID method
 
 ### `DID` transactions
 
-[Decentralized Identifiers \(DIDs\) are a W3C specification](https://www.w3.org/TR/did-core/) for identifiers that enable verifiable, decentralized digital identity.
+[Decentralized Identifiers \(DIDs\) are a W3C specification](https://www.w3.org/TR/did-core/)
+for identifiers that enable verifiable, decentralized digital identity.
 
-DIDDoc format conforms to [DIDDoc spec](https://www.w3.org/TR/did-core/#representations).
-The request can be used for creation of new DIDDoc, setting, and rotation of verification key.
+DIDDoc format conforms to
+[DIDDoc spec](https://www.w3.org/TR/did-core/#representations).
+The request can be used for creation of new DIDDoc, setting, and rotation of
+verification key.
 
 #### DIDDoc
 
-1. **`id`**: Target DID as base58-encoded string for 16 or 32 byte DID value with Cheqd DID Method prefix `did:cheqd:<namespace>:<namespace identifier>:`.
-2. **`controller`** (optional): A list of fully qualified DID strings or one string. Contains one or more DIDs who can update this DIDdoc. All DIDs must exist.
+1. **`id`**: Target DID as base58-encoded string for 16 or 32 byte DID value
+with Cheqd DID Method prefix `did:cheqd:<namespace>:<namespace identifier>:`.
+2. **`controller`** (optional): A list of fully qualified DID strings or one
+string. Contains one or more DIDs who can update this DIDdoc. All DIDs must
+exist.
 3. **`verificationMethod`** (optional): A list of Verification Methods
-4. **`authentication`** (optional): A list of Verification Methods or strings with key aliases
-5. **`assertionMethod`** (optional): A list of Verification Methods or strings with key aliases
-6. **`capabilityInvocation`** (optional): A list of Verification Methods or strings with key aliases
-7. **`capabilityDelegation`** (optional): A list of Verification Methods or strings with key aliases
-8. **`keyAgreement`** (optional): A list of Verification Methods or strings with key aliases
+4. **`authentication`** (optional): A list of Verification Methods or strings
+with key aliases
+5. **`assertionMethod`** (optional): A list of Verification Methods or strings
+with key aliases
+6. **`capabilityInvocation`** (optional): A list of Verification Methods or
+strings with key aliases
+7. **`capabilityDelegation`** (optional): A list of Verification Methods or
+strings with key aliases
+8. **`keyAgreement`** (optional): A list of Verification Methods or strings
+with key aliases
 9. **`service`** (optional): A set of Service Endpoint maps
-10. **`alsoKnownAs`** (optional): A list of strings. A DID subject can have multiple identifiers for different purposes, or at different times. The assertion that two or more DIDs refer to the same DID subject can be made using the `alsoKnownAs` property.
-11. **`@context`** (optional): A list of strings with links or JSONs for describing specifications that this DID Document is following to.
+10. **`alsoKnownAs`** (optional): A list of strings. A DID subject can have
+multiple identifiers for different purposes, or at different times. The
+assertion that two or more DIDs refer to the same DID subject can be made using
+the `alsoKnownAs` property.
+11. **`@context`** (optional): A list of strings with links or JSONs for
+describing specifications that this DID Document is following to.
 
 ##### Example of DID Document
 
@@ -142,11 +198,17 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 #### Verification Method
 
 1. **`id`** (string): A string with format `<DIDDoc-id>#<key-alias>`
-2. **`controller`**: A list of fully qualified DID strings or one string. All DIDs must exist.
+2. **`controller`**: A list of fully qualified DID strings or one string. All
+DIDs must exist.
 3. **`type`** (string)
-4. **`publicKeyJwk`** (`map[string,string]`, optional): A map representing a JSON Web Key that conforms to [RFC7517](https://tools.ietf.org/html/rfc7517). See definition of `publicKeyJwk` for additional constraints.
-5. **`publicKeyMultibase`** (optional): A base58-encoded string that conforms to a [MULTIBASE](https://datatracker.ietf.org/doc/html/draft-multiformats-multibase-03) encoded public key.
-**Note**: Verification Method cannot contain both `publicKeyJwk` and`publicKeyMultibase` but must contain at least one of them.
+4. **`publicKeyJwk`** (`map[string,string]`, optional): A map representing a
+JSON Web Key that conforms to [RFC7517](https://tools.ietf.org/html/rfc7517).
+See definition of `publicKeyJwk` for additional constraints.
+5. **`publicKeyMultibase`** (optional): A base58-encoded string that conforms to
+a [MULTIBASE](https://datatracker.ietf.org/doc/html/draft-multiformats-multibase-03)
+encoded public key.
+**Note**: Verification Method cannot contain both `publicKeyJwk` and
+`publicKeyMultibase` but must contain at least one of them.
 
 ##### Example of Verification Method
 
@@ -168,9 +230,18 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 
 #### Service
 
-1. **`id`** (string): The value of the id property MUST be a URI conforming to [RFC3986](https://www.rfc-editor.org/rfc/rfc3986). A conforming producer MUST NOT produce multiple service entries with the same ID. A conforming consumer MUST produce an error if it detects multiple service entries with the same ID. It has a follow formats: `<DIDDoc-id>#<service-alias>` or `#<service-alias>`.
-2. **`type`** (string): The service type and its associated properties SHOULD be registered in the DID Specification Registries [DID-SPEC-REGISTRIES](https://www.w3.org/TR/did-spec-registries/)
-3. **`serviceEndpoint`** (strings): A string that conforms to the rules of [RFC3986](https://www.rfc-editor.org/rfc/rfc3986) for URIs, a map, or a set composed of a one or more strings that conform to the rules of [RFC3986](https://www.rfc-editor.org/rfc/rfc3986) for URIs and/or maps.
+1. **`id`** (string): The value of the id property MUST be a URI conforming to
+[RFC3986](https://www.rfc-editor.org/rfc/rfc3986). A conforming producer MUST
+NOT produce multiple service entries with the same ID. A conforming consumer
+MUST produce an error if it detects multiple service entries with the same ID.
+It has a follow formats: `<DIDDoc-id>#<service-alias>` or `#<service-alias>`.
+2. **`type`** (string): The service type and its associated properties SHOULD be
+registered in the DID Specification Registries
+[DID-SPEC-REGISTRIES](https://www.w3.org/TR/did-spec-registries/)
+3. **`serviceEndpoint`** (strings): A string that conforms to the rules of
+[RFC3986](https://www.rfc-editor.org/rfc/rfc3986) for URIs, a map, or a set
+composed of a one or more strings that conform to the rules of
+[RFC3986](https://www.rfc-editor.org/rfc/rfc3986) for URIs and/or maps.
 
 ##### Example of Service
 
@@ -184,25 +255,39 @@ The request can be used for creation of new DIDDoc, setting, and rotation of ver
 
 #### Update `DID`
 
-If there is no DID entry on the ledger with the specified DID (`DID.id`), it is considered as a creation request for a new DID.
+If there is no DID entry on the ledger with the specified DID (`DID.id`), it is
+considered as a creation request for a new DID.
 
-If there is a DID entry on the ledger with the specified DID (`DID.id`), then this considered a request for updating an existing DID.
-For updating `versionId` from `WriteRequest.metadata` should be filled by a transaction hash of the previous DIDDoc version.
+If there is a DID entry on the ledger with the specified DID (`DID.id`), then
+this considered a request for updating an existing DID.
+For updating `versionId` from `WriteRequest.metadata` should be filled by a
+transaction hash of the previous DIDDoc version.
 
-**Note**: The field `signatures`(from `WriteRequest`) must contain signatures from all old controllers and all new controllers.
+**Note**: The field `signatures`(from `WriteRequest`) must contain signatures
+from all old controllers and all new controllers.
 
 #### DIDDoc State format
 
 `"diddoc:<id>" -> {DIDDoc, DidDocumentMetadata, txHash, txTimestamp }`
 
-`didDocumentMetadata` is created by the node after transaction ordering and before adding it to a State.
+`didDocumentMetadata` is created by the node after transaction ordering and
+before adding it to a State.
 
 #### DID Document Metadata
 
-1. **`created`** (string): Formatted as an XML Datetime normalized to UTC 00:00:00 and without sub-second decimal precision. For example: 2020-12-20T19:17:47Z.
-2. **`updated`** (string): The value of the property MUST follow the same formatting rules as the created property. The `updated` field is null if an Update operation has never been performed on the DID document. If an updated property exists, it can be the same value as the created property when the difference between the two timestamps is less than one second.
-3. **`deactivated`** (strings): If DID has been deactivated, DID document metadata MUST include this property with the boolean value true. By default `false`.
-4. **`versionId`** (strings): Contains transaction hash of the current DIDDoc version.
+1. **`created`** (string): Formatted as an XML Datetime normalized to UTC
+00:00:00 and without sub-second decimal precision. For example:
+2020-12-20T19:17:47Z.
+2. **`updated`** (string): The value of the property MUST follow the same
+formatting rules as the created property. The `updated` field is null if an
+Update operation has never been performed on the DID document. If an updated
+property exists, it can be the same value as the created property when the
+difference between the two timestamps is less than one second.
+3. **`deactivated`** (strings): If DID has been deactivated, DID document
+metadata MUST include this property with the boolean value true. By default
+`false`.
+4. **`versionId`** (strings): Contains transaction hash of the current DIDDoc
+version.
 
 ##### Example of DID Document Metadata
 
@@ -219,16 +304,20 @@ For updating `versionId` from `WriteRequest.metadata` should be filled by a tran
 
 This transaction is used to create a Schema associated with credentials.
 
-It is not possible to update an existing Schema, to ensure the original schema used to issue any credentials in the past are always available.
+It is not possible to update an existing Schema, to ensure the original schema
+used to issue any credentials in the past are always available.
 
 If a Schema evolves, a new schema with a new version or name needs to be created.
 
-- **`id`**: DID as base58-encoded string for 16 or 32 byte DID value with Cheqd DID Method prefix `did:cheqd:<namespace>:<namespace identifier>:` and a resource type at the end.
+- **`id`**: DID as base58-encoded string for 16 or 32 byte DID value with Cheqd
+DID Method prefix `did:cheqd:<namespace>:<namespace identifier>:` and a resource
+type at the end.
 - **`type`**: String with a schema type. Now only `CL-Schema` is supported.
 - **`attrNames`**: Array of attribute name strings (125 attributes maximum)
 - **`name`**: Schema's name string
 - **`version`**: Schema's version string
-- **`controller`**: DIDs list of strings or only one string of a schema controller(s). All DIDs must exist.
+- **`controller`**: DIDs list of strings or only one string of a schema
+controller(s). All DIDs must exist.
 
 #### `SCHEMA` entity transaction format
 
@@ -343,19 +432,32 @@ Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
 
 ### `CRED_DEF`
 
-Adds a Credential Definition (in particular, public key), which is created by an Issuer and published for a particular Credential Schema.
+Adds a Credential Definition (in particular, public key), which is created by an
+Issuer and published for a particular Credential Schema.
 
-It is not possible to update Credential Definitions. If a Credential Definition needs to be evolved (for example, a key needs to be rotated), then a new Credential Definition needs to be created for a new Issuer DIDdoc.
-Credential Definitions is added to the ledger in as verification method for Issuer DIDDoc
+It is not possible to update Credential Definitions. If a Credential Definition
+needs to be evolved (for example, a key needs to be rotated), then a new
+Credential Definition needs to be created for a new Issuer DIDdoc.
+Credential Definitions is added to the ledger in as verification method for
+Issuer DIDDoc
 
-- **`id`**: DID as base58-encoded string for 16 or 32 byte DID value with Cheqd DID Method prefix `did:cheqd:<namespace>:<namespace identifier>:` and a resource type at the end.
-- **`value`** (dict): Dictionary with Credential Definition's data if `signature_type` is `CL`:
+- **`id`**: DID as base58-encoded string for 16 or 32 byte DID value with Cheqd
+DID Method prefix `did:cheqd:<namespace>:<namespace identifier>:` and a resource
+type at the end.
+- **`value`** (dict): Dictionary with Credential Definition's data if
+`signature_type` is `CL`:
   - **`primary`** (dict): Primary credential public key
   - **`revocation`** (dict, optional): Revocation credential public key
-- **`schemaId`** (string): `id` of a Schema the credential definition is created for.
-- **`signatureType`** (string): Type of the credential definition (that is credential signature). `CL-Sig-Cred_def` (Camenisch-Lysyanskaya) is the only supported type now. Other signature types are being explored for future releases.
-- **`tag`** (string, optional): A unique tag to have multiple public keys for the same Schema and type issued by the same DID. A default tag `tag` will be used if not specified.
-- **`controller`**: DIDs list of strings or only one string of a credential definition controller(s). All DIDs must exist.
+- **`schemaId`** (string): `id` of a Schema the credential definition is created
+for.
+- **`signatureType`** (string): Type of the credential definition (that is
+credential signature). `CL-Sig-Cred_def` (Camenisch-Lysyanskaya) is the only
+supported type now. Other signature types are being explored for future releases.
+- **`tag`** (string, optional): A unique tag to have multiple public keys for
+the same Schema and type issued by the same DID. A default tag `tag` will be
+used if not specified.
+- **`controller`**: DIDs list of strings or only one string of a credential
+definition controller(s). All DIDs must exist.
 
 #### `CRED_DEF` entity transaction format
 
@@ -443,7 +545,12 @@ Stored inside [DIDDoc](#diddoc-state-format)
 
 ### Backward Compatibility
 
-- `cheqd-node` [release v0.1.17](https://github.com/cheqd/cheqd-node/releases/tag/v0.1.17) and earlier had a transaction type called `NYM` which would allow writing/reading a unique identifier on ledger. However, this `NYM` state was not fully defined as a DID method and did not contain DID Documents that resolved when the DID identifier was read. This `NYM` transaction type is deprecated and the data written to cheqd testnet with legacy states will not be retained.
+- `cheqd-node` [release v0.1.17](https://github.com/cheqd/cheqd-node/releases/tag/v0.1.17)
+and earlier had a transaction type called `NYM` which would allow
+writing/reading a unique identifier on ledger. However, this `NYM` state was not
+fully defined as a DID method and did not contain DID Documents that resolved
+when the DID identifier was read. This `NYM` transaction type is deprecated and
+the data written to cheqd testnet with legacy states will not be retained.
 
 ### Positive
 
