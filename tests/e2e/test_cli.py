@@ -31,3 +31,12 @@ def test_keys(command, params, expected_output):
     cli = pexpect.spawn(f"cheqd-noded keys {command} {params}", encoding="utf-8")
     cli.logfile = sys.stdout
     cli.expect(expected_output)
+
+def test_query():
+    pass
+
+def test_tendermint():
+    pass
+
+def test_tx():
+    pass
