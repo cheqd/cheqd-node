@@ -176,6 +176,7 @@ jobs:
           ./run_docker.sh > /dev/null &
           sleep 15
           [[ $(docker ps | wc -l) == 7 ]] && echo "6 pool containers are running!" || exit 1
+          cheqd-noded status
 
       - name: Set up tests
         run: |
