@@ -31,40 +31,12 @@ Our aim is to bring the functionality enabled by these transactions into
 `cheqd-node` to allow the use cases of existing SSI projects that work with
 Hyperledger Indy to be supported by the cheqd network.
 
-_**Note**: We define transaction that differ from the ones listed above, but
+We define transaction that differ from the ones listed above, but
 which enable equivalent support for privacy-respecting SSI use cases. The
-differences stem primarily from our desire to conform to
-[Decentralized Identifiers v1.0](https://www.w3.org/TR/did-core/)_
-
-### Changes proposed from existing Hyperledger Indy transactions
-
-We have assessed the existing Hyperledger Indy transactions and recommend the
-following changes to be made.
-
-#### Rename `NYM` transactions to `DID` transactions
-
-[**NYM** is the term used by Hyperledger Indy](https://hyperledger-indy.readthedocs.io/projects/node/en/latest/transactions.html#nym)
-for [Decentralized Identifiers \(DIDs\)](https://www.w3.org/TR/did-core/) that
-are created on ledger. A DID is typically the identifier that is associated with
-a specific organisation issuing/managing SSI credentials.
-
-Our proposal is to change the term `NYM` in transactions to `DID`, which would
-make understanding the context of a transaction easier to understand. This
-change will bring transactions better in-line with World Wide Web Consortium
-\(W3C\) terminology.
-
-#### Remove `role` field from DID transaction
-
-Hyperledger Indy is a public-permissioned distributed ledger. As `cheqd-node` is
-based on a public-permissionless network based on the
-[Cosmos blockchain framework](https://github.com/cosmos/cosmos-sdk), the `role`
-type is no longer necessary.
-
-#### Dropping `ATTRIB` transactions
-
-`ATTRIB` was originally used in Hyperledger Indy to add document content similar
-to DID Documents (DIDDocs). The cheqd DID method replaces this by implementing
-DIDDocs for most transaction types.
+differences stem primarily from our conformance to
+[Decentralized Identifiers v1.0](https://www.w3.org/TR/did-core/) and the
+capabilities of the underlying
+[Cosmos blockchain framework](https://github.com/cosmos/cosmos-sdk) that we use.
 
 ## Decision - cheqd DID Method
 
