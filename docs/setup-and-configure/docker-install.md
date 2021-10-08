@@ -54,4 +54,3 @@ Usage:
 ```text
 docker run -it --rm --entrypoint node-runner -e NODE_MONIKER=<moniker> -e GENESIS="<content>" -e NODE_KEY="<content>" -e PRIV_VALIDATOR_KEY="<content>" cheqd-node
 ```
-

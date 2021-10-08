@@ -85,4 +85,4 @@ An alternative method to check a node's status is via the RPC interface, if it h
 
 ## Next steps
 
-For further confirmation on whether your node is working correctly, we recommend attempting to [run commands from the cheqd CLI guide](../../cheqd-cli.md); e.g., query the ledger for transactions, account balances etc.
+For further confirmation on whether your node is working correctly, we recommend attempting to [run commands from the cheqd CLI guide](../../cheqd-cli/readme.md); e.g., query the ledger for transactions, account balances etc.
