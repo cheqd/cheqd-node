@@ -39,16 +39,23 @@ capabilities of the underlying
 [Cosmos blockchain framework](https://github.com/cosmos/cosmos-sdk) that we use.
 
 ## Decision - cheqd DID Method
+The cheqd DID Method will conform to 
+[Decentralized Identifiers v1.0](https://github.com/w3c/did-core) with the goal
+of maximizing interoperability with other compatible tools and projects.
 
 ### Syntax
-The `did:cheqd` method DID has four components that are concatenated to make a
-W3C DID specification conformant identifier. The components are:
+As with all DIDs, cheqd identifiers begin with the string `did:`.
 
-- **DID**: the hardcoded string `did:` to indicate the identifier is a DID
-- **`cheqd` DID method**: the hardcoded string `cheqd:` indicating that the
-identifier uses the `cheqd` DID method specification.
-- **Namespace**: A string that identifies the name of the primary cheqd ledger
-("mainnet"), followed by a `:`. The namespace string may optionally have a
+#### DID Method Name
+The `method-name` is the string `cheqd:`.
+
+#### cheqd DID Method Specific Identifier
+
+The cheqd DID `method-specific-id` is made up of two components, a `namespace`
+and a `namespace-id`:
+
+- **namespace**: A string that identifies the name of the primary cheqd ledger
+(e.g., "mainnet"), followed by a `:`. The namespace string may optionally have a
 secondary ledger name prefixed by a `:` following the primary name. If there is
 no secondary ledger element, the DID resides on the primary ledger ("mainnet"),
 else it resides on the secondary ledger. By convention, the primary is a
