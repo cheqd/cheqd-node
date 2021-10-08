@@ -170,6 +170,9 @@ jobs:
           cd tests/e2e
           python3 --version
           pip3 install -r requirements.txt >> /dev/null
+
+      - name: Set up tests
+        run: |
           pytest -v -rP
 
   # run-identity-specific-tests:
