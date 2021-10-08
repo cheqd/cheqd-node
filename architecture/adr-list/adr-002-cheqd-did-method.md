@@ -65,10 +65,9 @@ type is no longer necessary.
 to DID Documents (DIDDocs). The cheqd DID method replaces this by implementing
 DIDDocs for most transaction types.
 
-## Decision
+## Decision - cheqd DID Method
 
-### cheqd DID Method
-
+### Syntax
 The `did:cheqd` method DID has four components that are concatenated to make a
 W3C DID specification conformant identifier. The components are:
 
@@ -94,7 +93,9 @@ Some examples of `did:cheqd` method identifiers are:
 - A DID written to the cheqd mainnet ledger: `did:cheqd:mainnet:7Tqg6BwSSWapxgUDm9KKgg`
 - A DID written to the cheqd testnet ledger: `did:cheqd:testnet:6cgbu8ZPoWTnR5Rv5JcSMB`
 
-### General structure of transaction requests
+### Operations
+
+#### General structure of transaction requests
 
 All identity requests will have the following format:
 
@@ -129,9 +130,7 @@ This fields provides extensibility in the future, e.g., it can contain
   Acceptable only for DIDDoc updating. This field is needed for a replay
   protection.
   
-## Identity transactions for cheqd DID method
-
-### `DID` transactions
+#### `DID` transactions
 
 [Decentralized Identifiers \(DIDs\) are a W3C specification](https://www.w3.org/TR/did-core/)
 for identifiers that enable verifiable, decentralized digital identity.
@@ -141,7 +140,33 @@ DIDDoc format conforms to
 The request can be used for creation of new DIDDoc, setting, and rotation of
 verification key.
 
-#### DIDDoc
+##### Create `DID`
+
+If there is no DID entry on the ledger with the specified DID (`DID.id`), it is
+considered as a creation request for a new DID.
+
+If there is a DID entry on the ledger with the specified DID (`DID.id`), then
+this considered a request for updating an existing DID.
+For updating `versionId` from `WriteRequest.metadata` should be filled by a
+transaction hash of the previous DIDDoc version.
+
+**Note**: The field `signatures`(from `WriteRequest`) must contain signatures
+from all old controllers and all new controllers.
+
+##### Update `DID`
+
+If there is no DID entry on the ledger with the specified DID (`DID.id`), it is
+considered as a creation request for a new DID.
+
+If there is a DID entry on the ledger with the specified DID (`DID.id`), then
+this considered a request for updating an existing DID.
+For updating `versionId` from `WriteRequest.metadata` should be filled by a
+transaction hash of the previous DIDDoc version.
+
+**Note**: The field `signatures`(from `WriteRequest`) must contain signatures
+from all old controllers and all new controllers.
+
+##### DIDDoc
 
 1. **`id`**: Target DID as base58-encoded string for 16 or 32 byte DID value
 with Cheqd DID Method prefix `did:cheqd:<namespace>:<namespace identifier>:`.
@@ -167,7 +192,7 @@ the `alsoKnownAs` property.
 11. **`@context`** (optional): A list of strings with links or JSONs for
 describing specifications that this DID Document is following to.
 
-##### Example of DID Document
+For Example:
 
 ```jsonc
 {
@@ -195,7 +220,7 @@ describing specifications that this DID Document is following to.
 }
 ```
 
-#### Verification Method
+##### Verification Method
 
 1. **`id`** (string): A string with format `<DIDDoc-id>#<key-alias>`
 2. **`controller`**: A list of fully qualified DID strings or one string. All
@@ -210,7 +235,7 @@ encoded public key.
 **Note**: Verification Method cannot contain both `publicKeyJwk` and
 `publicKeyMultibase` but must contain at least one of them.
 
-##### Example of Verification Method
+For Example:
 
 ```jsonc
 {
@@ -228,7 +253,7 @@ encoded public key.
 }
 ```
 
-#### Service
+##### Service
 
 1. **`id`** (string): The value of the id property MUST be a URI conforming to
 [RFC3986](https://www.rfc-editor.org/rfc/rfc3986). A conforming producer MUST
@@ -243,7 +268,7 @@ registered in the DID Specification Registries
 composed of a one or more strings that conform to the rules of
 [RFC3986](https://www.rfc-editor.org/rfc/rfc3986) for URIs and/or maps.
 
-##### Example of Service
+For Example:
 
 ```jsonc
 {
@@ -253,27 +278,14 @@ composed of a one or more strings that conform to the rules of
 }
 ```
 
-#### Update `DID`
-
-If there is no DID entry on the ledger with the specified DID (`DID.id`), it is
-considered as a creation request for a new DID.
-
-If there is a DID entry on the ledger with the specified DID (`DID.id`), then
-this considered a request for updating an existing DID.
-For updating `versionId` from `WriteRequest.metadata` should be filled by a
-transaction hash of the previous DIDDoc version.
-
-**Note**: The field `signatures`(from `WriteRequest`) must contain signatures
-from all old controllers and all new controllers.
-
-#### DIDDoc State format
+##### DIDDoc State format
 
 `"diddoc:<id>" -> {DIDDoc, DidDocumentMetadata, txHash, txTimestamp }`
 
 `didDocumentMetadata` is created by the node after transaction ordering and
 before adding it to a State.
 
-#### DID Document Metadata
+##### DID Document Metadata
 
 1. **`created`** (string): Formatted as an XML Datetime normalized to UTC
 00:00:00 and without sub-second decimal precision. For example:
@@ -289,8 +301,7 @@ metadata MUST include this property with the boolean value true. By default
 4. **`versionId`** (strings): Contains transaction hash of the current DIDDoc
 version.
 
-##### Example of DID Document Metadata
-
+For Example:
 ```jsonc
 {
   "created": "2020-12-20T19:17:47Z",
@@ -300,7 +311,7 @@ version.
 }
 ```
 
-### `SCHEMA`
+#### `SCHEMA`
 
 This transaction is used to create a Schema associated with credentials.
 
@@ -319,7 +330,7 @@ type at the end.
 - **`controller`**: DIDs list of strings or only one string of a schema
 controller(s). All DIDs must exist.
 
-#### `SCHEMA` entity transaction format
+`SCHEMA` entity transaction format:
 
 ```jsonc
 {
@@ -332,15 +343,13 @@ controller(s). All DIDs must exist.
 }
 ```
 
-### Option 1 [Chosen]
-
 Don't store Schema DIDDoc in the State.
 
 Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
 
 Schema Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue/schema` 
 
-#### `SCHEMA` DID Document transaction format 
+`SCHEMA` DID Document transaction format: 
 ```jsonc
 {
   "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
@@ -355,74 +364,9 @@ Schema Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue/schema`
 }
 ```
 
-### Option 2
-
-#### `SCHEMA` DID Document transaction format
-
-Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
-
-```jsonc
-{
-  "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
-  "schema":[
-    {
-      "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#schema1",
-      "type": "CL-Schema",
-      "controller": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
-      "value": {
-                "version": "1.0",
-                "name": "Degree",
-                "attrNames": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
-              },
-    },
-  ]
-}
-```
-
-### Option 3
-
-#### `SCHEMA` DID Document transaction format
-
-Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
-
-```jsonc
-{
-  "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
-  "schema": {
-              "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
-              "type": "CL-Schema",
-              "controller": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
-              "value": {
-                "version": "1.0",
-                "name": "Degree",
-                "attrNames": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
-              },
-            },
-}
-```
-
-### Option 4
-
-Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
-
-#### `SCHEMA` DID Document transaction format
-
-```jsonc
-{
-  "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
-  "schema":[
-              {
-                "id": "cheqd-schema",
-                "type": "CL-Schema",
-                "schemaRef": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue?resource=true"
-              }
-          ]
-}
-```
-
 **Note**: `SCHEMA` **cannot** be updated
 
-#### `SCHEMA` State format
+**`SCHEMA` State format:**
 
 - `"schema:<id>" -> {SchemaEntity, txHash, txTimestamp}`
 
@@ -430,7 +374,7 @@ Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
 
 [Link to DidDocumentMetadata description](#did-document-metadata)
 
-### `CRED_DEF`
+#### `CRED_DEF`
 
 Adds a Credential Definition (in particular, public key), which is created by an
 Issuer and published for a particular Credential Schema.
@@ -459,7 +403,7 @@ used if not specified.
 - **`controller`**: DIDs list of strings or only one string of a credential
 definition controller(s). All DIDs must exist.
 
-#### `CRED_DEF` entity transaction format
+`CRED_DEF` entity transaction format:
 
 ```jsonc
 {
@@ -475,15 +419,13 @@ definition controller(s). All DIDs must exist.
 }
 ```
 
-### Option 1 [Chosen]
-
 Don't store Schema DIDDoc in the State.
 
 Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
 
 Schema Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue/credDef`
 
-#### `CRED_DEF` DID Document transaction format
+`CRED_DEF` DID Document transaction format:
 ```jsonc
 {
   "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
@@ -498,48 +440,15 @@ Schema Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue/credDef`
 }
 ```
 
-#### `CRED_DEF` state format
+`CRED_DEF` state format:
 
 `"credDef:<id>" -> {CredDefEntity, txHash, txTimestamp}`
 
-### Option 2
-
-#### `CRED_DEF` DID Document transaction format
-
-Store inside Issuer DID Document
-
-CredDef URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<cred_def_entity_id>`
-
-```jsonc
-{
-  "@context": [
-    "https://www.w3.org/ns/did/v1",
-    "https://w3id.org/security/suites/jws-2020/v1",
-    "https://w3id.org/security/suites/ed25519-2020/v1"
-  ],
-  "id": "did:cheqd:mainnet:123456789abcdefghi",
-  "verificationMethod": [{
-    "id": "passport-keys",
-    "type": "CL-Sig-Cred_def",
-    "controller": "did:cheqd:mainnet:123456789abcdefghi",
-    "schemaId": "did:cheqd:mainnet:5ZTp9g4SP6t73rH2s8zgmtqdXyT",
-    "tag": "some_tag",
-    "value": {
-      "primary": "...",
-      "revocation": "..."
-    }
-  }]
-
-}
-```
-
-#### `CRED_DEF` state format
-
-Stored inside [DIDDoc](#diddoc-state-format)
-
-
 **Note**: `CRED_DEF` **cannot** be updated.
 
+### Security Considerations
+
+### Privacy Considerations
 
 ## Consequences
 
