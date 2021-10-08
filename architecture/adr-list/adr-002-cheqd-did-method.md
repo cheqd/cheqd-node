@@ -27,14 +27,14 @@ Hyperledger Indy contains the following
 5. `REVOC_REG_DEF`
 6. `REVOC_REG_ENTRY`
 
-Our aim is to replicate similar transactions on `cheqd-node` to allow existing
-SSI software designed to work with Hyperledger Indy to be compatible with the
-cheqd network.
+Our aim is to bring the functionality enabled by these transactions into
+`cheqd-node` to allow the use cases of existing SSI projects that work with
+Hyperledger Indy to be supported by the cheqd network.
 
-_**Note**: Hyperledger Indy also contains other transaction types beyond the
-ones listed above, but these are currently not in scope for implementation in
-`cheqd-node`. They will be considered for inclusion later in the product
-roadmap._
+_**Note**: We define transaction that differ from the ones listed above, but
+which enable equivalent support for privacy-respecting SSI use cases. The
+differences stem primarily from our desire to conform to
+[Decentralized Identifiers v1.0](https://www.w3.org/TR/did-core/)_
 
 ### Changes proposed from existing Hyperledger Indy transactions
 
