@@ -78,8 +78,15 @@ Tendermint allows more complex setups in production, where the ingress/egress to
 
 While this setup is not compulsory, node operators with higher stakes or a need to have more robust network security may consider setting up a sentry-validator node architecture.
 
-## Installing and configuring software
+## Installing and configuring a cheqd node
 
+Follow the guide for your preferred installation method:
+
+* [Debian package install](debian/deb-package-install.md)
+* [Docker install](docker-install.md)
+* [Binary install](binary-install.md)
+
+[Configure your node as a validator](configure-new-validator.md) after successful installation.
 
 ## Further information
 
