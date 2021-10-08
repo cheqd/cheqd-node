@@ -10,9 +10,10 @@
 ## Summary
 
 This ADR summarises the identity entities, queries, and transaction types for
-the cheqd network. These recommendations are based on the design patterns
-currently used by [Hyperledger Indy](https://github.com/hyperledger/indy-node),
-a blockchain built for self-sovereign identity \(SSI\).
+the cheqd network and defines the cheqd DID Method. These transactions enable
+similar use cases as those currently supported by
+[Hyperledger Indy](https://github.com/hyperledger/indy-node), a verifiable data
+registry built for self-sovereign identity (SSI) with a strong privacy focus.
 
 ## Context
 
