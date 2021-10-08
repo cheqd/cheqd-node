@@ -169,6 +169,8 @@ jobs:
         run: |
           cd tests/e2e
           python3 --version
+          pip3 install -r requirements.txt >> /dev/null
+          pytest -v -rP
 
   # run-identity-specific-tests:
   #   name: Run identity-specific tests using cheqd-node CLI or VDR tools

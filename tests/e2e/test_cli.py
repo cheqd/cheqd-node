@@ -4,12 +4,11 @@ import pexpect
 import pytest
 
 
-@pytest.mark.skip
 @pytest.mark.parametrize(
         "command, expected_output",
         [
             ("help", "cheqd App"),
-            ("version", os.environ["RELEASE_NUMBER"]), # this works against deb package but not against starport build
+            # ("version", os.environ["RELEASE_NUMBER"]), # this works against deb package but not against starport build
         ]
     )
 def test_basic(command, expected_output):
@@ -20,12 +19,12 @@ def test_basic(command, expected_output):
 @pytest.mark.parametrize(
         "command, params, expected_output",
         [
-            ("list", None, "- name: node5-operator"),
-            ("add", "test4", "- name: test4"),
-            ("list", None, "- name: test4"),
-            ("delete", "test4 -y", "Key deleted forever"),
-            ("show", "test", "- name: test"),
-            ("show", "test4", "Error: test4 is not a valid name or address"),
+            ("add", "test1", "- name: test1"),
+            ("list", None, "- name: test1"),
+            ("delete", "test1 -y", "Key deleted forever"),
+            ("add", "test2", "- name: test2"),
+            ("show", "test2", "- name: test2"),
+            ("show", "test9", "Error: test9 is not a valid name or address"),
         ]
     )
 def test_keys(command, params, expected_output):
