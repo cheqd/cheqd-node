@@ -1,60 +1,88 @@
-# Overview
+# Upgrading a cheqd node using Debian package releases
 
-This document describes how to upgrade to a new release of `cheqd-node` using the Debian package \(.deb\) releases.
+## Context
 
-This document assumes that `cheqd-node` has already been installed previously using a .deb package. See [installation instructions](https://github.com/cheqd/cheqd-node/blob/main/docs/setting-up-a-new-node.md) if this your first time setting up a node.
+This document provides guidance on how to upgrade to an [existing installation of `cheqd-node` that was done using the Debian package](deb-package-install.md) release to a new release version.
 
-## Get the latest package
+It is assumed that the [pre-requisites mentioned in the node setup guide](../readme.md) are satisfied, as a node has already been installed.
 
-The latest Debian package can be found in [releases](https://github.com/cheqd/cheqd-node/releases)
+Before carrying out an upgrade, please read our [guide to Debian packages for `cheqd-node`](readme.md) to understand an overview of what configuration actions are carried out by the installer.
 
-## Steps to upgrade via Debian package
+## Upgrade steps for `cheqd-node` .deb
 
-1. Ensure that current `cheqd-noded` service is stopped. Make [backups of app data](https://github.com/cheqd/cheqd-node/blob/main/docs/deb-package-overview.md#directories-and-symlinks) and keys before package upgrading. To stop the node service:
+| :warning: WARNING          |
+|:---------------------------|
+| Please make sure any accounts keys are backed up or exported before attempting uninstallation |
 
-   ```text
+The package upgrade process is idempotent and it should not affect service files, configurations or any other user data.
+
+However, as best practice we recommend backing up the [app data directories for `cheqd-node`](readme.md)  and Cosmos account keys before attempting the upgrade process.
+
+1. **Download [the latest release of `cheqd-node` .deb](https://github.com/cheqd/cheqd-node/releases/latest) package**
+
+    ```bash
+    wget https://github.com/cheqd/cheqd-node/releases/download/v0.2.3/cheqd-node_0.2.3_amd64.deb
+    ```
+
+2. **Stop the existing `cheqd-noded` service**
+
+   To stop the `cheqd-noded` service (with `sudo` privileges or as `root` user, if necessary):
+
+   ```bash
     systemctl stop cheqd-noded
    ```
 
-   and
+   Confirm the `cheqd-noded` service has been successfully stopped:
 
-   ```text
+   ```bash
     systemctl status cheqd-noded
    ```
 
-   to confirming that service was stopped.
+3. **Install the new .deb package version**
 
-2. The new package version can be installed by calling:
+   Install the `cheqd-node` package downloaded in step 1 (with `sudo` privileges or as `root` user, if necessary):
 
-   ```text
-    dpkg -i <path/to/package>
+   ```bash
+   dpkg -i <path/to/package>
    ```
 
-   Depending on how your system is configured, you may need `sudo` or administrator permissions to carry out the step above.
+4. **Re-start the `cheqd-noded` service and confirm it is running**
 
-3. Start `cheqd-noded` service by calling:
+   To start the `cheqd-noded` service (with `sudo` privileges or as `root` user, if necessary):
 
-   ```text
-    systemctl start cheqd-noded
+   ```bash
+   systemctl start cheqd-noded
    ```
 
-   and confirm that the service is running:
+   Check that the `cheqd-noded` service is running. If successfully started, the status output should return `Active: active (running)`
 
-   ```text
-    systemctl status cheqd-noded
+   ```bash
+   systemctl status cheqd-noded
    ```
 
-4. If the `cheqd-noded` service is running, the package upgrade has been successful.
+## Post-upgrade steps
 
-## Steps to carry out after package upgrade
+The package upgrade process is successful once the service re-started.
 
-The package upgrade/installation process is idempotent and it should not change service files, configs or any other user data.
+Once the `cheqd-noded` daemon is active and running, check that the node is connected to the cheqd testnet and catching up with the latest updates on the ledger.
 
-To check that your node is functioning correctly, it is recommended to attempt [querying the ledger](https://github.com/cheqd/cheqd-node/blob/main/docs/cosmos-cli.md) or [any of the other commands described in the cheqd Cosmos CLI guide](https://github.com/cheqd/cheqd-node/blob/main/docs/cosmos-cli.md).
+### Checking node status via terminal
 
-If you are running a validator node, check that it's [connected to the network](setting-up-a-new-node.md) \(see check section\) and [signs blocks](setting-up-a-new-validator.md) \(see check section\).
+```bash
+cheqd-noded status
+```
 
-## Further information
+In the output, look for the text `latest_block_height` and note the value. Execute the status command above a few times and make sure the value of `latest_block_height` has increased each time.
 
-Additional information about [cheqd Debian package release can be found here in the overview](deb-package-overview.md).
+The node is fully caught up when the parameter `catching_up` returns the output `false`.
 
+### Checking node status via the RPC endpoint
+
+An alternative method to check a node's status is via the RPC interface, if it has been configured.
+
+* Remotely via the RPC interface: `cheqd-noded status --node <rpc-address>`
+* By opening the JSONRPC over HTTP status page through a web browser: `<node-address:rpc-port>/status`
+
+## Next steps
+
+For further confirmation on whether your node is working correctly, we recommend attempting to [run commands from the cheqd CLI guide](../../cheqd-cli.md); e.g., query the ledger for transactions, account balances etc.

@@ -85,7 +85,7 @@ This document provides guidance on how to install and configure a node for the c
 
 9. **Enable and start the `cheqd-noded` system service**
 
-   If you are prompted for a password for the `cheqd` user, type `exit` to logout and then attempt to execute this as a privileged user (with `sudo` or as root user).
+   If you are prompted for a password for the `cheqd` user, type `exit` to logout and then attempt to execute this as a privileged user (with `sudo` privileges or as root user, if necessary).
 
    ```bash
    systemctl enable cheqd-noded
