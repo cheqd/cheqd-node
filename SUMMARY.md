@@ -43,4 +43,5 @@
 
 * [Code of Conduct](code_of_conduct.md)
 * [Security Policy](security.md)
+* [Notice](notice.md)
 
