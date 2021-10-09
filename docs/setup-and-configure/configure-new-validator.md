@@ -38,7 +38,7 @@ While the instructions listed here are specific to the cheqd testnet, a similar 
 
 ### Requesting CHEQ tokens for cheqd testnet
 
-Once you have successfully completed the steps above, please fill out our **[node operator onboarding form](http://cheqd.link/join-testnet-form)** so that you can acquire CHEQ testnet tokens required for staking on the network.
+Once you have successfully completed the steps above, please fill out our [**node operator onboarding form**](http://cheqd.link/join-testnet-form) so that you can acquire CHEQ testnet tokens required for staking on the network.
 
 You will need to have the following details on hand to fill out the form:
 
@@ -52,7 +52,7 @@ If you need help or support, join our [**cheqd Community Slack** ](http://cheqd.
 
 1. **Ensure your account has a positive balance**
 
-   Follow the guidance on [using cheqd CLI to manage accounts](../cheqd-cli/cheqd-cli-accounts.md) to check that your account is correctly showing the  CHEQ testnet tokens provided to you.
+   Follow the guidance on [using cheqd CLI to manage accounts](../cheqd-cli/cheqd-cli-accounts.md) to check that your account is correctly showing the CHEQ testnet tokens provided to you.
 
    ```bash
    cheqd-noded query bank balances <address> --node <url>
@@ -68,9 +68,9 @@ If you need help or support, join our [**cheqd Community Slack** ](http://cheqd.
 
 3. **Promote your node to validator status by staking your token balance**
 
-   You can decide how many tokens you would like to stake from your account balance. For instance, you may want to leave a portion of the balance for paying transaction fees (now and in the future).
+   You can decide how many tokens you would like to stake from your account balance. For instance, you may want to leave a portion of the balance for paying transaction fees \(now and in the future\).
 
-   To promote to validation, submit a  `create-validator` transaction to the network:
+   To promote to validation, submit a `create-validator` transaction to the network:
 
    ```bash
    cheqd-noded tx staking create-validator --amount <amount-staking> --from <key-name> --chain-id <chain-id> --min-self-delegation <min-self-delegation> --gas <amount-gas> --gas-prices <price-gas> --pubkey <validator-pubkey> --commission-max-change-rate <commission-max-change-rate> --commission-max-rate <commission-max-rate> --commission-rate <commission-rate>
@@ -89,7 +89,7 @@ If you need help or support, join our [**cheqd Community Slack** ](http://cheqd.
    * **`gas`**: Maximum gas
    * **`gas-prices`**: Maximum gas price set by the validator
 
-   *Example transaction:*
+   _Example transaction:_
 
    ```bash
    cheqd-noded tx staking create-validator --amount 40000000000000000ncheq --from eu-node-operator --moniker node1-eu-testnet-cheqd --chain-id cheqd-testnet-2 --min-self-delegation="1" --gas="300000" --gas-prices="25ncheq" --pubkey '{"@type":"/cosmos.crypto.ed25519.PubKey","key":"4anVUO8WhmRMqG1t4z6VxqmqZL3V7q6HqucjwZePiUw="}' --commission-max-change-rate="0.02" --commission-max-rate="0.02" --commission-rate="0.01" --node http://node1.eu.testnet.cheqd.network:26657
@@ -120,3 +120,4 @@ If you need help or support, join our [**cheqd Community Slack** ](http://cheqd.
 On completion of the steps above, you would have successfully bonded a node as validator to the cheqd testnet and participating in staking/consensus.
 
 Learn more about what you can do with your new validator node in the [cheqd CLI guide](../cheqd-cli/readme.md).
+

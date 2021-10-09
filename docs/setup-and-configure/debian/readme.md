@@ -1,4 +1,4 @@
-# Guide to Debian packages for `cheqd-node`
+# Guide to Debian packages for cheqd-node
 
 ## Context
 
@@ -8,12 +8,10 @@ These are tested to work with Ubuntu 20.04 LTS, which is the current long-term s
 
 It may be possible to use the same package on other Ubuntu / Debian distributions based on the same LTS version; however, this method is not officially supported.
 
-
 ## How-to instructions for `cheqd-node` Debian packages
 
-* [Install (or uninstall) a new node](deb-package-install.md) using Debian package
+* [Install \(or uninstall\) a new node](deb-package-install.md) using Debian package
 * If you already have an existing `cheqd-node` installation that was done using the .deb, find out how to [upgrade your node using the Debian package](deb-package-upgrade.md).
-
 
 ## Pre-install actions executed by Debian package
 
@@ -82,7 +80,7 @@ Our installer makes the following changes:
 
 ## Post-install actions executed by Debian package
 
-The main part of post-installation process is to make the `cheqd-node` binary run as a `systemctl` daemon. 
+The main part of post-installation process is to make the `cheqd-node` binary run as a `systemctl` daemon.
 
 This ensures the service is restarted after any failures and output sent to `rsyslog`.
 
@@ -107,14 +105,13 @@ SyslogIdentifier=cheqd-noded
 WantedBy=multi-user.target
 ```
 
-
 ## Uninstalling the Debian package
 
-| :warning: WARNING          |
-|:---------------------------|
+| :warning: WARNING |
+| :--- |
 | Please make sure any accounts keys are backed up or exported before attempting uninstallation |
 
-To uninstall `cheqd-node` when it has been installed using the Debian package release, execute the following (with `sudo` or as the `root` user):
+To uninstall `cheqd-node` when it has been installed using the Debian package release, execute the following \(with `sudo` or as the `root` user\):
 
 ```bash
 apt remove cheqd-node
@@ -128,3 +125,4 @@ This will remove all configuration files created during installation process fro
 /etc/cron.daily/cheqd-node
 /etc/systemd/system/cheqd-noded.service
 ```
+

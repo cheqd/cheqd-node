@@ -10,23 +10,23 @@ Before carrying out an upgrade, please read our [guide to Debian packages for `c
 
 ## Upgrade steps for `cheqd-node` .deb
 
-| :warning: WARNING          |
-|:---------------------------|
+| :warning: WARNING |
+| :--- |
 | Please make sure any accounts keys are backed up or exported before attempting uninstallation |
 
 The package upgrade process is idempotent and it should not affect service files, configurations or any other user data.
 
-However, as best practice we recommend backing up the [app data directories for `cheqd-node`](readme.md)  and Cosmos account keys before attempting the upgrade process.
+However, as best practice we recommend backing up the [app data directories for `cheqd-node`](readme.md) and Cosmos account keys before attempting the upgrade process.
 
-1. **Download [the latest release of `cheqd-node` .deb](https://github.com/cheqd/cheqd-node/releases/latest) package**
+1. **Download** [**the latest release of `cheqd-node` .deb**](https://github.com/cheqd/cheqd-node/releases/latest) **package**
 
-    ```bash
+   ```bash
     wget https://github.com/cheqd/cheqd-node/releases/download/v0.2.3/cheqd-node_0.2.3_amd64.deb
-    ```
+   ```
 
 2. **Stop the existing `cheqd-noded` service**
 
-   To stop the `cheqd-noded` service (with `sudo` privileges or as `root` user, if necessary):
+   To stop the `cheqd-noded` service \(with `sudo` privileges or as `root` user, if necessary\):
 
    ```bash
     systemctl stop cheqd-noded
@@ -40,7 +40,7 @@ However, as best practice we recommend backing up the [app data directories for 
 
 3. **Install the new .deb package version**
 
-   Install the `cheqd-node` package downloaded in step 1 (with `sudo` privileges or as `root` user, if necessary):
+   Install the `cheqd-node` package downloaded in step 1 \(with `sudo` privileges or as `root` user, if necessary\):
 
    ```bash
    dpkg -i <path/to/package>
@@ -48,7 +48,7 @@ However, as best practice we recommend backing up the [app data directories for 
 
 4. **Re-start the `cheqd-noded` service and confirm it is running**
 
-   To start the `cheqd-noded` service (with `sudo` privileges or as `root` user, if necessary):
+   To start the `cheqd-noded` service \(with `sudo` privileges or as `root` user, if necessary\):
 
    ```bash
    systemctl start cheqd-noded
@@ -86,3 +86,4 @@ An alternative method to check a node's status is via the RPC interface, if it h
 ## Next steps
 
 For further confirmation on whether your node is working correctly, we recommend attempting to [run commands from the cheqd CLI guide](../../cheqd-cli/readme.md); e.g., query the ledger for transactions, account balances etc.
+

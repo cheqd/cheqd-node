@@ -1,4 +1,4 @@
-# Installing `cheqd-node` with Docker
+# Installing cheqd-node with Docker
 
 ## Description
 
@@ -54,3 +54,4 @@ Usage:
 ```text
 docker run -it --rm --entrypoint node-runner -e NODE_MONIKER=<moniker> -e GENESIS="<content>" -e NODE_KEY="<content>" -e PRIV_VALIDATOR_KEY="<content>" cheqd-node
 ```
+

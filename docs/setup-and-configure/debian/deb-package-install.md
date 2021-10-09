@@ -10,11 +10,11 @@ This document provides guidance on how to install and configure a node for the c
 
 ## Installation steps for `cheqd-node` .deb
 
-1. **Download [the latest release of `cheqd-node` .deb](https://github.com/cheqd/cheqd-node/releases/latest) package**
+1. **Download** [**the latest release of `cheqd-node` .deb**](https://github.com/cheqd/cheqd-node/releases/latest) **package**
 
-    ```bash
+   ```bash
     wget https://github.com/cheqd/cheqd-node/releases/download/v0.2.3/cheqd-node_0.2.3_amd64.deb
-    ```
+   ```
 
 2. **Install the package**
 
@@ -71,7 +71,7 @@ This document provides guidance on how to install and configure a node for the c
    sed -i.bak 's/minimum-gas-prices = ""/minimum-gas-prices = "25ncheq"/g' /etc/cheqd-node/app.toml
    ```
 
-8. **Make the RPC endpoint available externally** (optional)
+8. **Make the RPC endpoint available externally** \(optional\)
 
    This step is necessary only if you want to allow incoming client application connections to your node. Otherwise, the node will be accessible only locally. Further details about the RPC endpoints is available in the [cheqd node setup guide](../readme.md).
 
@@ -85,7 +85,7 @@ This document provides guidance on how to install and configure a node for the c
 
 9. **Enable and start the `cheqd-noded` system service**
 
-   If you are prompted for a password for the `cheqd` user, type `exit` to logout and then attempt to execute this as a privileged user (with `sudo` privileges or as root user, if necessary).
+   If you are prompted for a password for the `cheqd` user, type `exit` to logout and then attempt to execute this as a privileged user \(with `sudo` privileges or as root user, if necessary\).
 
    ```bash
    systemctl enable cheqd-noded
@@ -122,7 +122,7 @@ An alternative method to check a node's status is via the RPC interface, if it h
 * Remotely via the RPC interface: `cheqd-noded status --node <rpc-address>`
 * By opening the JSONRPC over HTTP status page through a web browser: `<node-address:rpc-port>/status`
 
-
 ## Next steps
 
 At this stage, your node would be connected to the cheqd testnet as an observer node. Learn [how to configure your node as a validator node](../configure-new-validator.md) to participate in staking rewards, block creation, and governance.
+

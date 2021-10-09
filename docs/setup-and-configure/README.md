@@ -2,9 +2,9 @@
 
 ## Context
 
-This document describes how to use install and configure a new instance of `cheqd-node` from pre-built packages and adding it to an existing network (such as the the cheqd testnet) as an observer or validator.
+This document describes how to use install and configure a new instance of `cheqd-node` from pre-built packages and adding it to an existing network \(such as the the cheqd testnet\) as an observer or validator.
 
-For other scenarios, please see [setting up a new network from scratch](../build-and-networks/readme.md) and [building `cheqd-node` from source](../build-and-networks/build-from-source.md).
+For other scenarios, please see [setting up a new network from scratch](../build-and-networks/build-and-networks.md) and [building `cheqd-node` from source](../build-and-networks/readme.md).
 
 ## Pre-requisites
 
@@ -92,3 +92,4 @@ Follow the guide for your preferred installation method:
 
 * Tendermint documentation has [best practices for running a Cosmos node in production](https://docs.tendermint.com/master/nodes/running-in-production.html).
 * [Сosmovisor could be used for automatic upgrades](https://docs.cosmos.network/master/run-node/cosmovisor.html); however in our testing so far this method has not been reliable and is therefore currently not recommended.
+

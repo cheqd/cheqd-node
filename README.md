@@ -16,7 +16,7 @@ Getting started as a node operator on the cheqd network testnet requires the fol
 3. Once you have received your tokens, [promote your node to a validator](docs/setup-and-configure/configure-new-validator.md).
 4. If successfully configured, your node would become the latest validator on the cheqd Testnet! Say hi to the other node operators on the [\#testnet-node-operators](https://cheqd-community.slack.com/archives/C029NSCSA75) channel.
 
-Any time you have questions or need support, join our **[cheqd Community Slack](http://cheqd.link/join-cheqd-slack)** and [ask for help](https://cheqd-community.slack.com/archives/C02AQ9UK4HY).
+Any time you have questions or need support, join our [**cheqd Community Slack**](http://cheqd.link/join-cheqd-slack) and [ask for help](https://cheqd-community.slack.com/archives/C02AQ9UK4HY).
 
 ## Usage
 
@@ -41,15 +41,15 @@ We plan on adding new functionality rapidly and on a regular basis. We are also 
 
 ## Building from source
 
-`cheqd-node` is created with [Starport](https://github.com/tendermint/starport). If you want to build a node from source or contribute to the code, please read our guide to [building and testing](docs/building-and-testing.md).
+`cheqd-node` is created with [Starport](https://github.com/tendermint/starport). If you want to build a node from source or contribute to the code, please read our guide to [building and testing](https://github.com/cheqd/cheqd-node/tree/f74ec3e0ad08adcf2e4173de80dbd9442edc337e/docs/building-and-testing.md).
 
 ### Creating a local network
 
-If you are building from source, or otherwise interested in running a local network, we have [instructions on how to set up a new network](docs/setting-up-a-new-network.md) for development purposes.
+If you are building from source, or otherwise interested in running a local network, we have [instructions on how to set up a new network](https://github.com/cheqd/cheqd-node/tree/f74ec3e0ad08adcf2e4173de80dbd9442edc337e/docs/setting-up-a-new-network.md) for development purposes.
 
 ## Community
 
-The **[cheqd Community Slack](http://cheqd.link/join-cheqd-slack)** is our chat channel for the open-source community, software developers, and node operators.
+The [**cheqd Community Slack**](http://cheqd.link/join-cheqd-slack) is our chat channel for the open-source community, software developers, and node operators.
 
 Please reach out to us there for discussions, help, and feedback on the project.
 
@@ -61,3 +61,4 @@ Follow the cheqd team on our social channels for news, announcements, and discus
 * [@cheqd](https://t.me/cheqd) on Telegram \(with a separate [announcements-only channel](https://t.me/cheqd_announcements)\)
 * [Medium](https://blog.cheqd.io/) blog
 * [LinkedIn](http://cheqd.link/linkedin)
+

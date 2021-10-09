@@ -50,7 +50,7 @@ Allows restoring a key from a previously-created bip39 `mnemonic phrase`.
 cheqd-noded keys add --recover <alias>
 ```
 
-### Listing available keys on a node**
+### Listing available keys on a node\*\*
 
 #### Command
 
@@ -67,3 +67,4 @@ Most transactions will require you to use `--from <key-alias>` param which is a 
 ```bash
 cheqd-noded tx <module> <tx-name> --from <key-alias>
 ```
+

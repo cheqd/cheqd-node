@@ -53,3 +53,4 @@ $ cheqd-noded tx bank send alice
 
 cheqd10dl985c76zanc8n9z6c88qnl9t2hmhl5rcg0jq 10000cheq --node http://localhost:26657 --chain-id cheqd --fees 100000cheq
 ```
+
