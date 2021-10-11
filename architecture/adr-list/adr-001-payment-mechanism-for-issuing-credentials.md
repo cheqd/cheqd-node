@@ -155,7 +155,6 @@ If steps 1-4 are successful, the Issuer is able to confirm that the requested pa
 ### Overview of steps 1-5
 
 
-
 #### UML version
 
 Editable version available on [swimlanes.io](https://swimlanes.io/u/6_9Qx9GOe?rev=2) or as text for compatible UML diagram generators below:
