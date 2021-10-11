@@ -120,6 +120,60 @@ DIDDoc format conforms to
 The request can be used for creation of new DIDDoc, setting, and rotation of
 verification key.
 
+##### DIDDoc
+
+1. **`id`**: Target DID as base58-encoded string for 16 or 32 byte DID value
+with Cheqd DID Method prefix `did:cheqd:<namespace>:<namespace identifier>:`.
+2. **`controller`** (optional): A list of fully qualified DID strings or one
+string. Contains one or more DIDs who can update this DIDdoc. All DIDs must
+exist.
+3. **`verificationMethod`** (optional): A list of Verification Methods
+4. **`authentication`** (optional): A list of Verification Methods or strings
+with key aliases
+5. **`assertionMethod`** (optional): A list of Verification Methods or strings
+with key aliases
+6. **`capabilityInvocation`** (optional): A list of Verification Methods or
+strings with key aliases
+7. **`capabilityDelegation`** (optional): A list of Verification Methods or
+strings with key aliases
+8. **`keyAgreement`** (optional): A list of Verification Methods or strings
+with key aliases
+9. **`service`** (optional): A set of Service Endpoint maps
+10. **`alsoKnownAs`** (optional): A list of strings. A DID subject can have
+multiple identifiers for different purposes, or at different times. The
+assertion that two or more DIDs refer to the same DID subject can be made using
+the `alsoKnownAs` property.
+11. **`@context`** (optional): A list of strings with links or JSONs for
+describing specifications that this DID Document is following to.
+
+For Example:
+
+```jsonc
+{
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+    "https://w3id.org/security/suites/ed25519-2020/v1"
+  ],
+  "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
+  "verificationMethod": [
+    {
+      "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#authKey1",
+      "type": "Ed25519VerificationKey2020", // external (property value)
+      "controller": "did:cheqd:mainnet:N22N22KY2Dyvmuu2PyyqSFKue",
+      "publicKeyMultibase": "zAKJP3f7BD6W4iWEQ9jwndVTCBq8ua2Utt8EEjJ6Vxsf"
+    },
+    {
+      "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#capabilityInvocationKey",
+      "type": "Ed25519VerificationKey2020", // external (property value)
+      "controller": "did:cheqd:mainnet:N22N22KY2Dyvmuu2PyyqSFKue",
+      "publicKeyMultibase": "z4BWwfeqdp1obQptLLMvPNgBw48p7og1ie6Hf9p5nTpNN"
+    }
+  ],
+  "authentication": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#authKey1"],
+  "capabilityInvocation": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#capabilityInvocationKey"],
+}
+```
+
 ##### Create `DID`
 
 If there is no DID entry on the ledger with the specified DID (`DID.id`), it is
@@ -182,60 +236,6 @@ For Example:
 ```
 
 ##### Deactivate DID
-
-##### DIDDoc
-
-1. **`id`**: Target DID as base58-encoded string for 16 or 32 byte DID value
-with Cheqd DID Method prefix `did:cheqd:<namespace>:<namespace identifier>:`.
-2. **`controller`** (optional): A list of fully qualified DID strings or one
-string. Contains one or more DIDs who can update this DIDdoc. All DIDs must
-exist.
-3. **`verificationMethod`** (optional): A list of Verification Methods
-4. **`authentication`** (optional): A list of Verification Methods or strings
-with key aliases
-5. **`assertionMethod`** (optional): A list of Verification Methods or strings
-with key aliases
-6. **`capabilityInvocation`** (optional): A list of Verification Methods or
-strings with key aliases
-7. **`capabilityDelegation`** (optional): A list of Verification Methods or
-strings with key aliases
-8. **`keyAgreement`** (optional): A list of Verification Methods or strings
-with key aliases
-9. **`service`** (optional): A set of Service Endpoint maps
-10. **`alsoKnownAs`** (optional): A list of strings. A DID subject can have
-multiple identifiers for different purposes, or at different times. The
-assertion that two or more DIDs refer to the same DID subject can be made using
-the `alsoKnownAs` property.
-11. **`@context`** (optional): A list of strings with links or JSONs for
-describing specifications that this DID Document is following to.
-
-For Example:
-
-```jsonc
-{
-  "@context": [
-    "https://www.w3.org/ns/did/v1",
-    "https://w3id.org/security/suites/ed25519-2020/v1"
-  ],
-  "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
-  "verificationMethod": [
-    {
-      "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#authKey1",
-      "type": "Ed25519VerificationKey2020", // external (property value)
-      "controller": "did:cheqd:mainnet:N22N22KY2Dyvmuu2PyyqSFKue",
-      "publicKeyMultibase": "zAKJP3f7BD6W4iWEQ9jwndVTCBq8ua2Utt8EEjJ6Vxsf"
-    },
-    {
-      "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#capabilityInvocationKey",
-      "type": "Ed25519VerificationKey2020", // external (property value)
-      "controller": "did:cheqd:mainnet:N22N22KY2Dyvmuu2PyyqSFKue",
-      "publicKeyMultibase": "z4BWwfeqdp1obQptLLMvPNgBw48p7og1ie6Hf9p5nTpNN"
-    }
-  ],
-  "authentication": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#authKey1"],
-  "capabilityInvocation": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#capabilityInvocationKey"],
-}
-```
 
 ##### Verification Method
 
