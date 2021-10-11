@@ -109,7 +109,7 @@ jobs:
 
       - name: Build node image
         run: |
-          docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node .
+          docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
 
       - name: Build testnet image
         run: |
