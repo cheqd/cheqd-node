@@ -18,8 +18,8 @@ env:
 
 jobs:
   lint:
-    name: cheqd-node linting
-    runs-on: ubuntu-latest
+    name: Lint
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
 
@@ -30,8 +30,8 @@ jobs:
           args: --timeout 5m0s
 
   test:
-    name: cheqd-node unit tests
-    runs-on: ubuntu-latest
+    name: Run unit tests
+    runs-on: ubuntu-20.04
     needs: lint
     steps:
       - name: Set up Go 1.16
@@ -48,8 +48,8 @@ jobs:
           go test -v $PACKAGES
 
   build:
-    name: Build cheqd-node and create deb package
-    runs-on: ubuntu-latest
+    name: Build binary and create deb package
+    runs-on: ubuntu-20.04
     needs: test
     steps:
       - name: Set up Go 1.16
@@ -92,7 +92,7 @@ jobs:
 
   build-images-and-set-up-pool:
     name: Build cheqd-node and testnet Docker images, install deb package and run Docker pool
-    runs-on: ubuntu-20.04 # exact version, not latest
+    runs-on: ubuntu-20.04
     needs: build
     steps:
       - name: Download deb
@@ -146,7 +146,7 @@ jobs:
 
   # run-cosmos-specific-tests:
   #   name: Run cosmos-specific tests using cheqd-node CLI
-  #   runs-on: ubuntu-latest
+  #   runs-on: ubuntu-20.04
   #   needs: build-images-and-set-up-pool
   #   steps:
   #     - name: Check out
@@ -154,7 +154,7 @@ jobs:
 
   # run-identity-specific-tests:
   #   name: Run identity-specific tests using cheqd-node CLI or VDR tools
-  #   runs-on: ubuntu-latest
+  #   runs-on: ubuntu-20.04
   #   needs: build-images-and-set-up-pool
   #   steps:
   #     - name: Check out
