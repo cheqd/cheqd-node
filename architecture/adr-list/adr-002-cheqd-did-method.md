@@ -432,6 +432,116 @@ Schema Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue/credDef`
 
 ### Rationale and Alternatives
 
+#### Schema options not used
+##### Option 2
+
+Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
+
+`SCHEMA` DID Document transaction format:
+
+```jsonc
+{
+  "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
+  "schema":[
+    {
+      "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#schema1",
+      "type": "CL-Schema",
+      "controller": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
+      "value": {
+                "version": "1.0",
+                "name": "Degree",
+                "attrNames": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
+              },
+    },
+  ]
+}
+```
+
+##### Option 3
+
+Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
+
+`SCHEMA` DID Document transaction format:
+
+```jsonc
+{
+  "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
+  "schema": {
+              "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
+              "type": "CL-Schema",
+              "controller": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
+              "value": {
+                "version": "1.0",
+                "name": "Degree",
+                "attrNames": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
+              },
+            },
+}
+```
+
+##### Option 4
+
+Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
+
+`SCHEMA` DID Document transaction format:
+
+```jsonc
+{
+  "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
+  "schema":[
+              {
+                "id": "cheqd-schema",
+                "type": "CL-Schema",
+                "schemaRef": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue?resource=true"
+              }
+          ]
+}
+```
+
+`SCHEMA` State format:
+
+- `"schema:<id>" -> {SchemaEntity, txHash, txTimestamp}`
+
+`id` example: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
+
+[Link to DidDocumentMetadata description](#did-document-metadata)
+
+#### Cred Def options not used
+
+##### Option 2
+
+Store inside Issuer DID Document
+
+CredDef URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<cred_def_entity_id>`
+
+`CRED_DEF` DID Document transaction format:
+```jsonc
+{
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+    "https://w3id.org/security/suites/jws-2020/v1",
+    "https://w3id.org/security/suites/ed25519-2020/v1"
+  ],
+  "id": "did:cheqd:mainnet:123456789abcdefghi",
+  "verificationMethod": [{
+    "id": "passport-keys",
+    "type": "CL-Sig-Cred_def",
+    "controller": "did:cheqd:mainnet:123456789abcdefghi",
+    "schemaId": "did:cheqd:mainnet:5ZTp9g4SP6t73rH2s8zgmtqdXyT",
+    "tag": "some_tag",
+    "value": {
+      "primary": "...",
+      "revocation": "..."
+    }
+  }]
+
+}
+```
+
+`CRED_DEF` state format:
+
+Stored inside [DIDDoc](#diddoc-state-format)
+
 ## Consequences
 
 ### Backward Compatibility
