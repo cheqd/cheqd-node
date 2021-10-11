@@ -24,7 +24,7 @@ for ((i=0 ; i<$VALIDATORS_COUNT ; i++))
 do
     NODE_HOME="node$i"
     mkdir $NODE_HOME
-    # chmod -R 777 $NODE_HOME # FIXME
+    chmod -R 777 $NODE_HOME # FIXME
     pushd $NODE_HOME
 
     echo "[Validator $i] Generating key..."
@@ -108,7 +108,7 @@ do
     NODE_HOME="observer$i"
 
     mkdir $NODE_HOME
-    # chmod -R 777 $NODE_HOME # FIXME
+    chmod -R 777 $NODE_HOME # FIXME
     pushd $NODE_HOME
 
     echo "##### [Observer $i] Generating keys..."
@@ -120,8 +120,8 @@ do
 
     echo "##### [Observer $i] Loading genesis..."
     OPERATORS_HOME="../client"
-    # sudo chmod -R 777 /home/runner/work/cheqd-node/cheqd-node/tests/networks/docker_compose/node_configs || echo "I'm not in pipeline" # FIXME
-    # sudo chmod -R 777 ~/cheqd-node/tests/networks/docker_compose/node_configs || echo "I'm not in local machine" # FIXME
+    sudo chmod -R 777 /home/runner/work/cheqd-node/cheqd-node/tests/networks/docker_compose/node_configs || echo "I'm not in pipeline" # FIXME
+    sudo chmod -R 777 ~/cheqd-node/tests/networks/docker_compose/node_configs || echo "I'm not in local machine" # FIXME
     cp "$OPERATORS_HOME/.cheqdnode/config/genesis.json" ".cheqdnode/config/"
 
     echo "##### [Observer $i] Setting min gas prices..."
