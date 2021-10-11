@@ -1,0 +1,27 @@
+syntax = "proto3";
+package cheqdid.cheqdnode.cheqd;
+import "cheqd/did.proto";
+import "cheqd/credDef.proto";
+import "cheqd/schema.proto";
+
+// this line is used by starport scaffolding # proto/tx/import
+option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
+
+message State {
+  oneof data {
+    Did did = 1;
+    Schema schema = 2;
+    CredDef credDef = 3;
+  }
+  string txHash = 4;
+  int64 txTimestamp = 5;
+  Metadata metadata = 6; // optional
+}
+
+// metadata
+message Metadata {
+  string created = 1;
+  string updated = 2;
+  bool deactivated = 3;
+  string versionId = 4;
+}
