@@ -1,6 +1,7 @@
 #!/bin/bash
 
 cd
+pwd
 cheqd-noded init node5
 cp ${NODE_CONFIGS_BASE}/node0/.cheqdnode/config/genesis.json ~/.cheqdnode/config/
 NODE0_IP=$(docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} docker_compose_node0_1)
