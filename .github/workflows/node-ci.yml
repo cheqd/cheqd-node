@@ -50,6 +50,7 @@ jobs:
     needs: test
     env:
       PACKAGE_NAME: "cheqd-node"
+      VERSION: "test"
       OUTPUT_DIR: "output"
     steps:
       - name: Set up Go 1.16
@@ -66,10 +67,6 @@ jobs:
 
       - name: Starport build
         run: starport chain build
-
-      - name: Changing version for deb packaging
-        run: |
-          echo "VERSION=$(echo ${{ env.VERSION }} | sed 's/v//')" >> $GITHUB_ENV
 
       - name: Make archive
         run: |
