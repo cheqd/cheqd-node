@@ -119,7 +119,7 @@ jobs:
         run: |
           cd tests/networks/docker_compose
           ./gen_node_configs.sh
-          ./run_docker.sh
+          ./run_docker.sh > /dev/null &
           sleep 15
           [[ $(docker ps | wc -l) == 7 ]] && echo "6 pool containers are running!" || exit 1
           ls -l ${NODE_CONFIGS_BASE}/node0/.cheqdnode/config/

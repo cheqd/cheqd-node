@@ -12,4 +12,4 @@ export NODE_0_ID=$(cheqd_noded_docker tendermint show-node-id | sed 's/\r//g')
 
 popd
 
-docker-compose up -d
+docker-compose up
