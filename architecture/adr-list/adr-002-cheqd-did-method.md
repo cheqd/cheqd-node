@@ -285,7 +285,11 @@ For Example:
 }
 ```
 
+TODO: describe the resolution process
+
 ##### Deactivate DID
+
+TODO: describe the deactivation process
 
 #### `SCHEMA`
 
@@ -424,7 +428,11 @@ Schema Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue/credDef`
 
 ### Security Considerations
 
+TODO: add security considerations
+
 ### Privacy Considerations
+
+TODO: add privacy considerations
 
 ### Rationale and Alternatives
 
