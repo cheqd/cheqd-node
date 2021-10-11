@@ -13,7 +13,7 @@ on:
 env:
   NODE_CONFIGS_BASE: "~/work/cheqd-node/cheqd-node/tests/networks/docker_compose/node_configs"
   PACKAGE_NAME: "cheqd-node"
-  VERSION: "test"
+  VERSION: "9.9.9"
   OUTPUT_DIR: "output"
 
 jobs:
