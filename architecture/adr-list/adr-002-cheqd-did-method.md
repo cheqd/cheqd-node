@@ -432,6 +432,33 @@ Schema Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue/credDef`
 
 ### Rationale and Alternatives
 
+#### Changes from Indy 
+
+##### Rename `NYM` transactions to `DID` transactions
+
+[**NYM** is the term used by Hyperledger Indy](https://hyperledger-indy.readthedocs.io/projects/node/en/latest/transactions.html#nym) for [Decentralized Identifiers \(DIDs\)](https://www.w3.org/TR/did-core/)
+that are created on ledger. A DID is typically the identifier that is associated
+with a specific organisation issuing/managing SSI credentials.
+
+Our proposal is to change the term `NYM` in transactions to `DID`, which would
+make understanding the context of a transaction easier to understand. This
+change will bring transactions better in-line with World Wide Web Consortium
+\(W3C\) terminology.
+
+#### Remove `role` field from DID transaction
+
+Hyperledger Indy is a public-permissioned distributed ledger. As `cheqd-node`
+is based on a public-permissionless network based on the
+[Cosmos blockchain framework](https://github.com/cosmos/cosmos-sdk), the `role`
+type is no longer necessary.
+
+#### Dropping `ATTRIB` transactions
+
+`ATTRIB` was originally used in Hyperledger Indy to add document content similar
+to DID Documents (DIDDocs). The cheqd DID method replaces this by implementing
+DIDDocs for most transaction types.
+
+
 #### Schema options not used
 ##### Option 2
 
