@@ -79,10 +79,15 @@ jobs:
           sudo apt-get install ruby ruby-dev rubygems build-essential
           sudo gem install --no-document fpm
 
-      - name: Create deb package
+      - name: Create deb
         run: |
           ./build_deb.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }}
         working-directory: ./build_tools
+
+      - name: Install deb
+        run: |
+          sudo dpkg -i build_tools/${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+          cheqd-noded version
 
       - name: Upload deb
         uses: actions/upload-artifact@v2
