@@ -10,4 +10,4 @@ echo $PEER0
 sed -ri "s|persistent_peers = \".*\"|persistent_peers = \"${PEER0}\"|" ~/.cheqdnode/config/config.toml
 sed -ri "s|laddr = \"tcp://127.0.0.1:26657\"|laddr = \"tcp://127.0.0.1:26677\"|" ~/.cheqdnode/config/config.toml
 sed -ri "s|laddr = \"tcp://0.0.0.0:26656\"|laddr = \"tcp://0.0.0.0:26676\"|" ~/.cheqdnode/config/config.toml
-cheqd-noded start > /dev/null &
+cheqd-noded start
