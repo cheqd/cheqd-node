@@ -430,6 +430,8 @@ Schema Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue/credDef`
 
 ### Privacy Considerations
 
+### Rationale and Alternatives
+
 ## Consequences
 
 ### Backward Compatibility
