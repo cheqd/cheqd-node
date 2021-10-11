@@ -12,6 +12,9 @@ on:
 
 env:
   NODE_CONFIGS_BASE: "~/work/cheqd-node/cheqd-node/tests/networks/docker_compose/node_configs"
+  PACKAGE_NAME: "cheqd-node"
+  VERSION: "test"
+  OUTPUT_DIR: "output"
 
 jobs:
   lint:
@@ -48,10 +51,6 @@ jobs:
     name: Build cheqd-node and create deb package
     runs-on: ubuntu-latest
     needs: test
-    env:
-      PACKAGE_NAME: "cheqd-node"
-      VERSION: "test"
-      OUTPUT_DIR: "output"
     steps:
       - name: Set up Go 1.16
         uses: actions/setup-go@v2
