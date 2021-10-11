@@ -45,7 +45,7 @@ jobs:
           go test -v $PACKAGES
 
   build:
-    name: Build cheqd-node
+    name: Build cheqd-node and create deb package
     runs-on: ubuntu-latest
     needs: test
     env:
@@ -110,6 +110,17 @@ jobs:
       #     wget https://github.com/cheqd/cheqd-node/releases/download/${{ steps.release_tag.outputs.release }}/cheqd-node_${RELEASE_NUMBER}_amd64.deb > /dev/null
       #     sudo dpkg -i cheqd-node_${RELEASE_NUMBER}_amd64.deb
       #     cheqd-noded version
+
+      - name: Download deb
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+          path: build_tools/${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+
+      - name: Install deb
+        run: |
+          sudo dpkg -i build_tools/${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+          cheqd-noded version
 
       - name: Check out
         uses: actions/checkout@v2
