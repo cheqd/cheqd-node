@@ -111,39 +111,34 @@ jobs:
         run: |
           docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
 
-      - name: Build testnet image
-        run: |
-          docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
+      # - name: Build testnet image
+      #   run: |
+      #     docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
 
-      - name: Set up 4 validators + 2 observers node docker pool # FIXME: implement waiting script instead of sleep
+      - name: Set up 4 validators + 2 observers node docker pool
         run: |
           cd tests/networks/docker_compose
           ./gen_node_configs.sh
           ./run_docker.sh
-          ./wait.sh "[[ $(docker ps | wc -l) == 7 ]] && echo '6 pool containers are running!'"
+          ./wait.sh "[[ $(docker ps | wc -l) == 7 ]] && echo '6 pool containers are running!'" || exit 1
 
-      - name: Add observer node # FIXME: implement waiting script instead of sleep
+      - name: Add observer node
         run: |
           cd tests/networks/docker_compose
           ./add_observer.sh > /dev/null &
-          ./wait.sh "[[ $(cheqd-noded status -n "tcp://localhost:26677" 2>&1 | wc -l) == 1 ]] && echo 'New node returns status!'"
+          ./wait.sh "[[ $(cheqd-noded status -n "tcp://localhost:26677" 2>&1 | wc -l) == 1 ]] && echo 'New node returns status!'" || exit 1
 
       - name: Promote observer to validator # FIXME count signatures
         run: |
           export NODE2_IP=$(docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} docker_compose_node2_1 | sed 's/\r//g')
-          echo $NODE2_IP
           sudo chown -R runner:docker ${{ env.NODE_CONFIGS_BASE }}/client
           export HOME=${{ env.NODE_CONFIGS_BASE }}/client
           cheqd-noded keys list
           OP0_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
-          echo $OP0_ADDRESS
           cheqd-noded keys add node5-operator
-          cheqd-noded keys list
           OP5_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
-          echo $OP5_ADDRESS
           export HOME=/home/runner
           NODE5_PUBKEY=$(cheqd-noded tendermint show-validator | sed 's/\r//g')
-          echo $NODE5_PUBKEY
           HOME=${{ env.NODE_CONFIGS_BASE }}/client cheqd-noded tx bank send ${OP0_ADDRESS} ${OP5_ADDRESS} 1100000000000000ncheq --chain-id cheqd --fees 5000000ncheq --node "http://${NODE2_IP}:26657" -y
           HOME=${{ env.NODE_CONFIGS_BASE }}/client cheqd-noded tx staking create-validator --amount 1000000000000000ncheq --from node5-operator --chain-id cheqd --min-self-delegation="1" --gas="auto" --gas-prices="25ncheq" --pubkey $NODE5_PUBKEY --commission-max-change-rate="0.02" --commission-max-rate="0.02" --commission-rate="0.01" --gas 239933 --node "http://${NODE2_IP}:26657" -y
           [[ $(cheqd-noded query staking validators --node "http://${NODE2_IP}:26657" | sed -nr 's/.*status: (.*?).*/\1/p' | wc -l) == 5 ]] && echo "5 validators are running!" || exit 1
