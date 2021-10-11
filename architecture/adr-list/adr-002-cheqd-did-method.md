@@ -146,6 +146,43 @@ transaction hash of the previous DIDDoc version.
 **Note**: The field `signatures`(from `WriteRequest`) must contain signatures
 from all old controllers and all new controllers.
 
+##### Resolve DID
+
+DIDDoc State format:
+
+`"diddoc:<id>" -> {DIDDoc, DidDocumentMetadata, txHash, txTimestamp }`
+
+`didDocumentMetadata` is created by the node after transaction ordering and
+before adding it to a State.
+
+DID Document Metadata:
+
+1. **`created`** (string): Formatted as an XML Datetime normalized to UTC
+00:00:00 and without sub-second decimal precision. For example:
+2020-12-20T19:17:47Z.
+2. **`updated`** (string): The value of the property MUST follow the same
+formatting rules as the created property. The `updated` field is null if an
+Update operation has never been performed on the DID document. If an updated
+property exists, it can be the same value as the created property when the
+difference between the two timestamps is less than one second.
+3. **`deactivated`** (strings): If DID has been deactivated, DID document
+metadata MUST include this property with the boolean value true. By default
+`false`.
+4. **`versionId`** (strings): Contains transaction hash of the current DIDDoc
+version.
+
+For Example:
+```jsonc
+{
+  "created": "2020-12-20T19:17:47Z",
+  "updated": "2020-12-20T19:19:47Z",
+  "deactivated": false,
+  "versionId": "N22KY2Dyvmuu2PyyqSFKueN22KY2Dyvmuu2PyyqSFKue",
+}
+```
+
+##### Deactivate DID
+
 ##### DIDDoc
 
 1. **`id`**: Target DID as base58-encoded string for 16 or 32 byte DID value
@@ -255,39 +292,6 @@ For Example:
   "id":"did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#linked-domain",
   "type": "LinkedDomains",
   "serviceEndpoint": "https://bar.example.com"
-}
-```
-
-##### DIDDoc State format
-
-`"diddoc:<id>" -> {DIDDoc, DidDocumentMetadata, txHash, txTimestamp }`
-
-`didDocumentMetadata` is created by the node after transaction ordering and
-before adding it to a State.
-
-##### DID Document Metadata
-
-1. **`created`** (string): Formatted as an XML Datetime normalized to UTC
-00:00:00 and without sub-second decimal precision. For example:
-2020-12-20T19:17:47Z.
-2. **`updated`** (string): The value of the property MUST follow the same
-formatting rules as the created property. The `updated` field is null if an
-Update operation has never been performed on the DID document. If an updated
-property exists, it can be the same value as the created property when the
-difference between the two timestamps is less than one second.
-3. **`deactivated`** (strings): If DID has been deactivated, DID document
-metadata MUST include this property with the boolean value true. By default
-`false`.
-4. **`versionId`** (strings): Contains transaction hash of the current DIDDoc
-version.
-
-For Example:
-```jsonc
-{
-  "created": "2020-12-20T19:17:47Z",
-  "updated": "2020-12-20T19:19:47Z",
-  "deactivated": false,
-  "versionId": "N22KY2Dyvmuu2PyyqSFKueN22KY2Dyvmuu2PyyqSFKue",
 }
 ```
 
