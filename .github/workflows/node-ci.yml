@@ -123,6 +123,7 @@ jobs:
 
       - name: Install deb
         run: |
+          ls -l build_tools/${{ env.OUTPUT_DIR }}/
           sudo dpkg -i build_tools/${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
           cheqd-noded version
 
