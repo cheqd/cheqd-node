@@ -119,7 +119,7 @@ jobs:
         run: |
           cd tests/networks/docker_compose
           ./gen_node_configs.sh
-          ./run_docker.sh > /dev/null &
+          ./run_docker.sh && sleep 10 > /dev/null &
           ./wait.sh "[[ $(docker ps | wc -l) == 7 ]] && echo '6 pool containers are running!'""
 
       - name: Add observer node # FIXME: implement waiting script instead of sleep
