@@ -15,7 +15,7 @@ source "../common.sh"
 NODE_CONFIGS_DIR="node_configs"
 rm -rf $NODE_CONFIGS_DIR
 mkdir $NODE_CONFIGS_DIR
-# chmod -R 777 $NODE_CONFIGS_DIR # FIXME
+chmod -R 777 $NODE_CONFIGS_DIR # FIXME
 pushd $NODE_CONFIGS_DIR
 
 echo "Generating validator keys..."
@@ -35,8 +35,8 @@ do
 
     echo "Setting minimum fee price..."
 
-    # sudo chmod -R 777 /home/runner/work/cheqd-node/cheqd-node/tests/networks/docker_compose/node_configs || echo "I'm not in pipeline" # FIXME
-    # sudo chmod -R 777 ~/cheqd-node/tests/networks/docker_compose/node_configs || echo "I'm not in local machine" # FIXME
+    sudo chmod -R 777 /home/runner/work/cheqd-node/cheqd-node/tests/networks/docker_compose/node_configs || echo "I'm not in pipeline" # FIXME
+    sudo chmod -R 777 ~/cheqd-node/tests/networks/docker_compose/node_configs || echo "I'm not in local machine" # FIXME
     sed -i $sed_extension 's/minimum-gas-prices = ""/minimum-gas-prices = "25ncheq"/g' .cheqdnode/config/app.toml
 
     popd
