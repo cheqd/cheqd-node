@@ -69,7 +69,7 @@ jobs:
 
       - name: Make archive
         run: |
-          ./build_tar.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }} 
+          ./build_tar.sh cheqd-node 9.9.9
         working-directory: ./build_tools
 
       - name: Install fpm
