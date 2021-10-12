@@ -12,9 +12,8 @@ on:
 
 env:
   NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/tests/networks/docker_compose/node_configs"
-  # PACKAGE_NAME: "cheqd-node"
-  # VERSION: "9.9.9"
-  # OUTPUT_DIR: "output"
+  PACKAGE_NAME: "cheqd-node"
+  VERSION: "9.9.9"
 
 jobs:
   # lint:
@@ -69,7 +68,7 @@ jobs:
 
       - name: Make archive
         run: |
-          ./build_tar.sh cheqd-node 9.9.9
+          ./build_tar.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }} 
         working-directory: ./build_tools
 
       - name: Install fpm
@@ -79,14 +78,14 @@ jobs:
 
       - name: Create deb
         run: |
-          ./build_deb.sh cheqd-node 9.9.9
+          ./build_deb.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }} 
         working-directory: ./build_tools
 
       - name: Upload deb
         uses: actions/upload-artifact@v2
         with:
-          name: cheqd-node_9.9.9_amd64.deb
-          path: build_tools/output/cheqd-node_9.9.9_amd64.deb
+          name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+          path: build_tools/output/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
 
   build-images-and-set-up-pool:
     name: Build cheqd-node and testnet Docker images, install deb package and run Docker pool
@@ -96,11 +95,11 @@ jobs:
       - name: Download deb
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-node_9.9.9_amd64.deb
+          name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
 
       - name: Install deb
         run: |
-          sudo dpkg -i cheqd-node_9.9.9_amd64.deb
+          sudo dpkg -i ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
 
       - name: Check out
         uses: actions/checkout@v2
@@ -117,8 +116,8 @@ jobs:
         run: |
           cd tests/networks/docker_compose
           ./gen_node_configs.sh
-          ./run_docker.sh > /dev/null &
-          sleep 30
+          ./run_docker.sh
+          sleep 15
           [[ $(docker ps | wc -l) == 7 ]] && echo "6 pool containers are running!" || exit 1
 
       - name: Add observer node
