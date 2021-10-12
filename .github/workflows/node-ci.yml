@@ -15,36 +15,36 @@ env:
   PACKAGE_NAME: "cheqd-node"
   VERSION: "9.9.9"
 
-jobs:
-  lint:
-    name: Lint
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
+# jobs:
+#   lint:
+#     name: Lint
+#     runs-on: ubuntu-20.04
+#     steps:
+#       - uses: actions/checkout@v2
 
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v2
-        with:
-          version: v1.40
-          args: --timeout 5m0s
+#       - name: golangci-lint
+#         uses: golangci/golangci-lint-action@v2
+#         with:
+#           version: v1.40
+#           args: --timeout 5m0s
 
-  test:
-    name: Run unit tests
-    runs-on: ubuntu-20.04
-    needs: lint
-    steps:
-      - name: Set up Go 1.16
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.16
+#   test:
+#     name: Run unit tests
+#     runs-on: ubuntu-20.04
+#     needs: lint
+#     steps:
+#       - name: Set up Go 1.16
+#         uses: actions/setup-go@v2
+#         with:
+#           go-version: 1.16
 
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
+#       - name: Check out code into the Go module directory
+#         uses: actions/checkout@v2
 
-      - name: Run tests
-        run: |
-          PACKAGES=$(go list ./...)
-          go test -v $PACKAGES
+#       - name: Run tests
+#         run: |
+#           PACKAGES=$(go list ./...)
+#           go test -v $PACKAGES
 
   build:
     name: Build binary and create deb package
@@ -108,9 +108,9 @@ jobs:
         run: |
           docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
 
-      - name: Build testnet image
-        run: |
-          docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
+      # - name: Build testnet image
+      #   run: |
+      #     docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
 
       - name: Set up 4 validators + 2 observers node docker pool # TODO count txns height to assert
         run: |
@@ -123,7 +123,7 @@ jobs:
         run: |
           cd tests/networks/docker_compose
           ./add_observer.sh > /dev/null &
-          .wait.sh "[[ $(cheqd-noded status -n 'tcp://localhost:26677' 2>&1 | wc -l) == 1 ]] && echo 'New node returns status!' || exit 1"
+          ./wait.sh "[[ $(cheqd-noded status -n 'tcp://localhost:26677' 2>&1 | wc -l) == 1 ]] && echo 'New node returns status!' || exit 1"
 
       - name: Promote observer to validator # TODO count signatures to assert
         run: |
@@ -131,6 +131,7 @@ jobs:
           ./promote_validator.sh
           [[ $(cheqd-noded query staking validators --node "http://localhost:26657" | sed -nr 's/.*status: (.*?).*/\1/p' | wc -l) == 5 ]] && echo "5 validators are running!" || exit 1
           cheqd-noded query staking validators --node "http://localhost:26657" | sed -nr 's/.*status: (.*?).*/\1/p' $1 | while read x; do [[ "BOND_STATUS_BONDED" == $x ]] && echo "Validator's status is bonded!" || exit 1 ; done
+          curl -s localhost:26657/block
 
   # run-cosmos-specific-tests:
   #   name: Run cosmos-specific tests using cheqd-node CLI
