@@ -126,6 +126,7 @@ jobs:
           cd
           pwd
           cheqd-noded init node5
+          ls -la /home/runner/work/cheqd-node/cheqd-node/tests/networks/docker_compose
           ls -l ${NODE_CONFIGS_BASE}
           ls -l ${NODE_CONFIGS_BASE}/node0
           ls -l ${NODE_CONFIGS_BASE}/node0/.cheqdnode
