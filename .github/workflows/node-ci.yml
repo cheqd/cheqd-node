@@ -15,7 +15,7 @@ env:
   PACKAGE_NAME: "cheqd-node"
   VERSION: "9.9.9"
 
-# jobs:
+jobs:
 #   lint:
 #     name: Lint
 #     runs-on: ubuntu-20.04
