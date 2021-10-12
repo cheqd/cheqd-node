@@ -1,5 +1,5 @@
 #!/bin/bash
-
+sudo chown -R runner:docker /etc/cheqd-node
 cd
 cheqd-noded init node5
 ls -la /etc/cheqd-node
