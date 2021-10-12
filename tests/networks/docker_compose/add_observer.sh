@@ -13,5 +13,3 @@ sed -ri "s|persistent_peers = \".*\"|persistent_peers = \"${PEER0}\"|" /var/lib/
 sed -ri "s|laddr = \"tcp://127.0.0.1:26657\"|laddr = \"tcp://127.0.0.1:26677\"|" /var/lib/cheqd/.cheqdnode/config/config.toml
 sed -ri "s|laddr = \"tcp://0.0.0.0:26656\"|laddr = \"tcp://0.0.0.0:26676\"|" /var/lib/cheqd/.cheqdnode/config/config.toml
 # cheqd-noded start
-systemctl start cheqd-noded
-systemctl status cheqd-noded

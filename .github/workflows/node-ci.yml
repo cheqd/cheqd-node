@@ -122,7 +122,9 @@ jobs:
       - name: Add observer node # FIXME remove sleep with wat script / TODO assert `catching_up` to become `false`
         run: |
           cd tests/networks/docker_compose
-          sudo ./add_observer.sh
+          ./add_observer.sh
+          sudo systemctl start cheqd-noded
+          systemctl status cheqd-noded
           [[ $(cheqd-noded status -n "tcp://localhost:26677" 2>&1 | wc -l) == 1 ]] && echo "New node returns status!" || exit 1
 
       - name: Promote observer to validator # TODO count signatures to assert
