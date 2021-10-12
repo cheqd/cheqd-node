@@ -47,7 +47,7 @@ A payment request can then be defined using the [Hyperledger Aries Payment Decor
           {
             "supportedMethods": "cheqd",
             "data": {
-              "payeeId": "cosmos1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd"
+              "payeeId": "cheqd1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd"
             },
           }
         ],
