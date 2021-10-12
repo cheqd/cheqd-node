@@ -16,35 +16,35 @@ env:
   VERSION: "9.9.9"
 
 jobs:
-  # lint:
-  #   name: Lint
-  #   runs-on: ubuntu-20.04
-  #   steps:
-  #     - uses: actions/checkout@v2
+  lint:
+    name: Lint
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
 
-  #     - name: golangci-lint
-  #       uses: golangci/golangci-lint-action@v2
-  #       with:
-  #         version: v1.40
-  #         args: --timeout 5m0s
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.40
+          args: --timeout 5m0s
 
-  # test:
-  #   name: Run unit tests
-  #   runs-on: ubuntu-20.04
-  #   needs: lint
-  #   steps:
-  #     - name: Set up Go 1.16
-  #       uses: actions/setup-go@v2
-  #       with:
-  #         go-version: 1.16
+  test:
+    name: Run unit tests
+    runs-on: ubuntu-20.04
+    needs: lint
+    steps:
+      - name: Set up Go 1.16
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
 
-  #     - name: Check out code into the Go module directory
-  #       uses: actions/checkout@v2
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
 
-  #     - name: Run tests
-  #       run: |
-  #         PACKAGES=$(go list ./...)
-  #         go test -v $PACKAGES
+      - name: Run tests
+        run: |
+          PACKAGES=$(go list ./...)
+          go test -v $PACKAGES
 
   build:
     name: Build binary and create deb package
@@ -108,18 +108,18 @@ jobs:
         run: |
           docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
 
-      # - name: Build testnet image
-      #   run: |
-      #     docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
+      - name: Build testnet image
+        run: |
+          docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
 
-      - name: Set up 4 validators + 2 observers node docker pool
+      - name: Set up 4 validators + 2 observers node docker pool # TODO count txns height to assert
         run: |
           cd tests/networks/docker_compose
           ./gen_node_configs.sh
           ./run_docker.sh
           [[ $(docker ps | wc -l) == 7 ]] && echo "6 pool containers are running!" || exit 1
 
-      - name: Add observer node # FIXME run as service?
+      - name: Add observer node # FIXME remove sleep or hide it inside script
         run: |
           cd tests/networks/docker_compose
           ./add_observer.sh > /dev/null &
@@ -127,7 +127,7 @@ jobs:
           cheqd-noded status -n "tcp://localhost:26677"
           [[ $(cheqd-noded status -n "tcp://localhost:26677" 2>&1 | wc -l) == 1 ]] && echo "New node returns status!" || exit 1
 
-      - name: Promote observer to validator # FIXME count signatures
+      - name: Promote observer to validator # TODO count signatures to assert
         run: |
           cd tests/networks/docker_compose
           ./promote_validator.sh
