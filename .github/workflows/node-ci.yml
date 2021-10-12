@@ -128,7 +128,9 @@ jobs:
           cd
           pwd
           cheqd-noded init node5
-          ls -l ${NODE_CONFIGS_BASE}/node0/.cheqdnode/config/
+          ls -l ${NODE_CONFIGS_BASE}
+          ls -l ${NODE_CONFIGS_BASE}/node0
+          ls -l ${NODE_CONFIGS_BASE}/node0/.cheqdnode
           cp ${NODE_CONFIGS_BASE}/node0/.cheqdnode/config/genesis.json ~/.cheqdnode/config/
           NODE0_IP=$(docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} docker_compose_node0_1)
           echo $NODE0_IP
