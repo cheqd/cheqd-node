@@ -1,5 +1,5 @@
 #!/bin/bash
-sudo chmod -R 777
+sudo chmod -R 777 /etc/cheqd-node
 cd
 cheqd-noded init node5
 # cp ${NODE_CONFIGS_BASE}/node0/.cheqdnode/config/genesis.json ~/.cheqdnode/config/
