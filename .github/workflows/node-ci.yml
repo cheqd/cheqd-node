@@ -125,7 +125,7 @@ jobs:
           ./add_observer.sh
           sleep 30
           cheqd-noded status -n "tcp://localhost:26677"
-          [[ $(cheqd-noded status -n "tcp://localhost:26677" 2>&1 | wc -l) == 1 ]] && echo "New node returns status!" || exit 1
+          systemctl status cheqd-noded
 
       - name: Promote observer to validator # TODO count signatures to assert
         run: |
