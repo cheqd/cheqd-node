@@ -140,6 +140,7 @@ jobs:
         if: ${{ failure() }}
         run: |
           sudo chmod -R 777 /var/log/cheqd-node
+          sudo chown -R runner:docker /var/log/cheqd-node
           ls -la /var/log/cheqd-node
           ls /var/log/cheqd-node | xargs cat
           curl --request POST \
