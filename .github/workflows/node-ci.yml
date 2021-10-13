@@ -139,6 +139,7 @@ jobs:
       - name: Gather logs on failure
         if: ${{ failure() }}
         run: |
+          sudo chmod -R 777 /var/log/cheqd-node
           ls /var/log/cheqd-node | xargs cat
           curl --request POST \
           --url https://api.github.com/repos/${{ github.repository }}/issues \
