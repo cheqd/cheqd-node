@@ -117,6 +117,7 @@ jobs:
           cd tests/networks/docker_compose
           ./gen_node_configs.sh
           ./run_docker.sh
+          sleep 60
           [[ $(docker ps | wc -l) == 7 ]] && echo "6 pool containers are running!" || exit 1
 
       - name: Add observer node # TODO assert `catching_up` to become `false`
