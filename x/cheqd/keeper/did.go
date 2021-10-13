@@ -99,24 +99,46 @@ func (k Keeper) AppendDid(
 }
 
 // SetDid set a specific did in the store
-func (k Keeper) SetDid(ctx sdk.Context, did types.Did) {
+func (k Keeper) SetDid(ctx sdk.Context, did types.Did, metadata *types.Metadata) {
+	updated := ctx.BlockTime().String()
+	txHash := base64.StdEncoding.EncodeToString(tmhash.Sum(ctx.TxBytes()))
+
+	metadata = &types.Metadata{
+		Created:     metadata.Created,
+		Updated:     updated,
+		Deactivated: metadata.Deactivated,
+		VersionId:   txHash,
+	}
+
+	stateValue := types.StateValue{
+		Metadata: metadata,
+		Data: &types.StateValue_Did{
+			Did: &did,
+		},
+		Timestamp: updated,
+		Txhash:    txHash,
+	}
+
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
-	b := k.cdc.MustMarshal(&did)
+	b := k.cdc.MustMarshal(&stateValue)
 	store.Set(GetDidIDBytes(did.Id), b)
 }
 
 // GetDid returns a did from its id
-func (k Keeper) GetDid(ctx sdk.Context, id string) (*types.Did, error) {
+func (k Keeper) GetDid(ctx sdk.Context, id string) (*types.Did, *types.Metadata, error) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
 
 	var value types.StateValue
-	k.cdc.MustUnmarshal(store.Get(GetDidIDBytes(id)), &value)
+	err := k.cdc.Unmarshal(store.Get(GetDidIDBytes(id)), &value)
+	if err != nil {
+		return nil, nil, sdkerrors.Wrap(sdkerrors.ErrInvalidType, err.Error())
+	}
 
 	switch data := value.Data.(type) {
 	case *types.StateValue_Did:
-		return data.Did, nil
+		return data.Did, value.Metadata, nil
 	default:
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidType, fmt.Sprintf("State has unexpected type %T", data))
+		return nil, nil, sdkerrors.Wrap(sdkerrors.ErrInvalidType, fmt.Sprintf("State has unexpected type %T", data))
 	}
 }
 

@@ -11,7 +11,7 @@ func getDid(ctx sdk.Context, id string, keeper Keeper, legacyQuerierCdc *codec.L
 		return nil, sdkerrors.ErrKeyNotFound
 	}
 
-	msg, err := keeper.GetDid(ctx, id)
+	msg, _, err := keeper.GetDid(ctx, id)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}

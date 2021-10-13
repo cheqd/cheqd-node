@@ -51,6 +51,26 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 	}
 
+	// Checks that the element exists
+	if !k.HasDid(ctx, didMsg.Id) {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %s doesn't exist", didMsg.Id))
+	}
+
+	_, metadata, err := k.GetDid(ctx, didMsg.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	versionId, exists := msg.Metadata["versionId"]
+	if !exists {
+		return nil, sdkerrors.Wrap(types.ErrUnexpectedDidVersion, "Metadata doesn't contain `versionId`")
+	}
+
+	if metadata.VersionId != versionId {
+		errMsg := fmt.Sprintf("Ecpected %s with version %s. Got version %s", didMsg.Id, metadata.VersionId, versionId)
+		return nil, sdkerrors.Wrap(types.ErrUnexpectedDidVersion, errMsg)
+	}
+
 	var did = types.Did{
 		Id:                   didMsg.Id,
 		Controller:           didMsg.Controller,
@@ -64,12 +84,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 		Service:              didMsg.Service,
 	}
 
-	// Checks that the element exists
-	if !k.HasDid(ctx, didMsg.Id) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %s doesn't exist", didMsg.Id))
-	}
-
-	k.SetDid(ctx, did)
+	k.SetDid(ctx, did, metadata)
 
 	return &types.MsgUpdateDidResponse{
 		Id: didMsg.Id,

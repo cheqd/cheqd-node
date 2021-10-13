@@ -17,7 +17,7 @@ func TestHandler_CreateDid(t *testing.T) {
 	_, did, _ := setup.InitDid()
 
 	// query Did
-	receivedDid, _ := setup.Keeper.GetDid(setup.Ctx, did.Id)
+	receivedDid, _, _ := setup.Keeper.GetDid(setup.Ctx, did.Id)
 
 	// check
 	require.Equal(t, did.Id, receivedDid.Id)
@@ -39,15 +39,19 @@ func TestHandler_UpdateDid(t *testing.T) {
 	privKey, did, _ := setup.InitDid()
 
 	// query Did
-	receivedDid, _ := setup.Keeper.GetDid(setup.Ctx, did.Id)
+	receivedDid, didMetadata, _ := setup.Keeper.GetDid(setup.Ctx, did.Id)
 
 	//Init priv key
 	newPubKey, _, _ := ed25519.GenerateKey(rand.Reader)
 
 	// add new Did
+	metadata := map[string]string{
+		"versionId": didMetadata.VersionId,
+	}
+
 	didMsgUpdate := setup.UpdateDid(receivedDid, newPubKey)
 	dataUpdate, _ := ptypes.NewAnyWithValue(didMsgUpdate)
-	resultUpdate, _ := setup.Handler(setup.Ctx, setup.WrapRequest(privKey, dataUpdate, make(map[string]string)))
+	resultUpdate, _ := setup.Handler(setup.Ctx, setup.WrapRequest(privKey, dataUpdate, metadata))
 	didUpdated := types.MsgUpdateDidResponse{}
 	errUpdate := didUpdated.Unmarshal(resultUpdate.Data)
 
@@ -56,7 +60,7 @@ func TestHandler_UpdateDid(t *testing.T) {
 	}
 
 	// query Did
-	receivedUpdatedDid, _ := setup.Keeper.GetDid(setup.Ctx, did.Id)
+	receivedUpdatedDid, _, _ := setup.Keeper.GetDid(setup.Ctx, did.Id)
 
 	// check
 	require.Equal(t, didUpdated.Id, receivedUpdatedDid.Id)
@@ -78,7 +82,7 @@ func TestHandler_UpdateDidInvalidSignature(t *testing.T) {
 	_, did, _ := setup.InitDid()
 
 	// query Did
-	receivedDid, _ := setup.Keeper.GetDid(setup.Ctx, did.Id)
+	receivedDid, _, _ := setup.Keeper.GetDid(setup.Ctx, did.Id)
 
 	//Init priv key
 	newPubKey, newPrivKey, _ := ed25519.GenerateKey(rand.Reader)

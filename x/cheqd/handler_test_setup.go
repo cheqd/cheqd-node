@@ -46,11 +46,15 @@ func Setup() TestSetup {
 	// Init Keepers
 	newKeeper := keeper.NewKeeper(cdc, storeKey, memStoreKey)
 
+	// Create Tx
+	txBytes := make([]byte, 28)
+	_, _ = rand.Read(txBytes)
+
 	// Create context
 	blockTime, _ := time.Parse(time.RFC3339, "2021-01-01T00:00:00.000Z")
 	ctx := sdk.NewContext(dbStore,
 		tmproto.Header{ChainID: "cheqd-node", Time: blockTime},
-		false, log.NewNopLogger())
+		false, log.NewNopLogger()).WithTxBytes(txBytes)
 
 	handler := NewHandler(*newKeeper)
 
