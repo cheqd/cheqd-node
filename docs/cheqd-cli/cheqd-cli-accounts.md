@@ -40,5 +40,5 @@ cheqd-noded tx bank send <from> <to-address> <amount> --node <url> --chain-id <c
 
 ```bash
 $ cheqd-noded tx bank send alice 
-cheqd10dl985c76zanc8n9z6c88qnl9t2hmhl5rcg0jq 10000stake --node http://localhost:26657 --chain-id cheqd --fees 50ncheq
+cheqd10dl985c76zanc8n9z6c88qnl9t2hmhl5rcg0jq 10000ncheq --node http://localhost:26657 --chain-id cheqd --fees 50ncheq
 ```
