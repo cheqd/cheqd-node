@@ -7,14 +7,14 @@ import "cheqd/schema.proto";
 // this line is used by starport scaffolding # proto/tx/import
 option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
-message State {
+message StateValue {
   oneof data {
     Did did = 1;
     Schema schema = 2;
     CredDef credDef = 3;
   }
-  string txHash = 4;
-  int64 txTimestamp = 5;
+  string txhash = 4;
+  string timestamp = 5;
   Metadata metadata = 6; // optional
 }
 

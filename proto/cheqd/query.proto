@@ -7,6 +7,7 @@ import "cosmos/base/query/v1beta1/pagination.proto";
 import "cheqd/credDef.proto";
 import "cheqd/schema.proto";
 import "cheqd/did.proto";
+import "cheqd/state.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
@@ -49,4 +50,5 @@ message QueryGetDidRequest {
 
 message QueryGetDidResponse {
 	Did Did = 1;
+	Metadata Metadata = 2;
 }

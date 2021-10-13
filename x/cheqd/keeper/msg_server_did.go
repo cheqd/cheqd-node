@@ -64,12 +64,6 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %s doesn't exist", didMsg.Id))
 	}
 
-	// Checks if the the msg sender is the same as the current owner
-
-	if !k.areDidOwners(ctx, didMsg.Id, msg.Authors) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
-	}
-
 	k.SetDid(ctx, did)
 
 	return &types.MsgUpdateDidResponse{

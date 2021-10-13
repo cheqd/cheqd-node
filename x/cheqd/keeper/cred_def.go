@@ -1,9 +1,13 @@
 package keeper
 
 import (
+	"encoding/base64"
+	"fmt"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/tendermint/tendermint/crypto/tmhash"
 	"strconv"
 )
 
@@ -57,8 +61,19 @@ func (k Keeper) AppendCredDef(
 		Value:         clValue,
 	}
 
+	created := ctx.BlockTime().String()
+	txHash := base64.StdEncoding.EncodeToString(tmhash.Sum(ctx.TxBytes()))
+
+	stateValue := types.StateValue{
+		Data: &types.StateValue_CredDef{
+			CredDef: &credDef,
+		},
+		Timestamp: created,
+		Txhash:    txHash,
+	}
+
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CredDefKey))
-	value := k.cdc.MustMarshal(&credDef)
+	value := k.cdc.MustMarshal(&stateValue)
 	store.Set(GetCredDefIDBytes(credDef.Id), value)
 
 	// Update credDef count
@@ -75,11 +90,18 @@ func (k Keeper) SetCredDef(ctx sdk.Context, credDef types.CredDef) {
 }
 
 // GetCredDef returns a credDef from its id
-func (k Keeper) GetCredDef(ctx sdk.Context, id string) types.CredDef {
+func (k Keeper) GetCredDef(ctx sdk.Context, id string) (*types.CredDef, error) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CredDefKey))
-	var credDef types.CredDef
-	k.cdc.MustUnmarshal(store.Get(GetCredDefIDBytes(id)), &credDef)
-	return credDef
+
+	var value types.StateValue
+	k.cdc.MustUnmarshal(store.Get(GetCredDefIDBytes(id)), &value)
+
+	switch data := value.Data.(type) {
+	case *types.StateValue_CredDef:
+		return data.CredDef, nil
+	default:
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidType, fmt.Sprintf("State has unexpected type %T", data))
+	}
 }
 
 // HasCredDef checks if the credDef exists in the store
@@ -88,34 +110,7 @@ func (k Keeper) HasCredDef(ctx sdk.Context, id string) bool {
 	return store.Has(GetCredDefIDBytes(id))
 }
 
-// RemoveCredDef removes a credDef from the store
-func (k Keeper) RemoveCredDef(ctx sdk.Context, id string) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CredDefKey))
-	store.Delete(GetCredDefIDBytes(id))
-}
-
-// GetAllCredDef returns all credDef
-func (k Keeper) GetAllCredDef(ctx sdk.Context) (list []types.CredDef) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CredDefKey))
-	iterator := sdk.KVStorePrefixIterator(store, []byte{})
-
-	defer iterator.Close()
-
-	for ; iterator.Valid(); iterator.Next() {
-		var val types.CredDef
-		k.cdc.MustUnmarshal(iterator.Value(), &val)
-		list = append(list, val)
-	}
-
-	return
-}
-
 // GetCredDefIDBytes returns the byte representation of the ID
 func GetCredDefIDBytes(id string) []byte {
 	return []byte(id)
-}
-
-// GetCredDefIDFromBytes returns ID in string format from a byte array
-func GetCredDefIDFromBytes(bz []byte) string {
-	return string(bz)
 }

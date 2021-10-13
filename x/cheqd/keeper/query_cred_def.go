@@ -11,7 +11,10 @@ func getCredDef(ctx sdk.Context, id string, keeper Keeper, legacyQuerierCdc *cod
 		return nil, sdkerrors.ErrKeyNotFound
 	}
 
-	msg := keeper.GetCredDef(ctx, id)
+	msg, err := keeper.GetCredDef(ctx, id)
+	if err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
+	}
 
 	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, msg)
 	if err != nil {

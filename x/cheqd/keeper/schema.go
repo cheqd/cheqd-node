@@ -1,9 +1,13 @@
 package keeper
 
 import (
+	"encoding/base64"
+	"fmt"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/tendermint/tendermint/crypto/tmhash"
 	"strconv"
 )
 
@@ -53,8 +57,19 @@ func (k Keeper) AppendSchema(
 		AttrNames: attrNames,
 	}
 
+	created := ctx.BlockTime().String()
+	txHash := base64.StdEncoding.EncodeToString(tmhash.Sum(ctx.TxBytes()))
+
+	stateValue := types.StateValue{
+		Data: &types.StateValue_Schema{
+			Schema: &schema,
+		},
+		Timestamp: created,
+		Txhash:    txHash,
+	}
+
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.SchemaKey))
-	value := k.cdc.MustMarshal(&schema)
+	value := k.cdc.MustMarshal(&stateValue)
 	store.Set(GetSchemaIDBytes(schema.Id), value)
 
 	// Update schema count
@@ -71,39 +86,24 @@ func (k Keeper) SetSchema(ctx sdk.Context, schema types.Schema) {
 }
 
 // GetSchema returns a schema from its id
-func (k Keeper) GetSchema(ctx sdk.Context, id string) types.Schema {
+func (k Keeper) GetSchema(ctx sdk.Context, id string) (*types.Schema, error) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.SchemaKey))
-	var schema types.Schema
-	k.cdc.MustUnmarshal(store.Get(GetSchemaIDBytes(id)), &schema)
-	return schema
+
+	var value types.StateValue
+	k.cdc.MustUnmarshal(store.Get(GetSchemaIDBytes(id)), &value)
+
+	switch data := value.Data.(type) {
+	case *types.StateValue_Schema:
+		return data.Schema, nil
+	default:
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidType, fmt.Sprintf("State has unexpected type %T", data))
+	}
 }
 
 // HasSchema checks if the schema exists in the store
 func (k Keeper) HasSchema(ctx sdk.Context, id string) bool {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.SchemaKey))
 	return store.Has(GetSchemaIDBytes(id))
-}
-
-// RemoveSchema removes a schema from the store
-func (k Keeper) RemoveSchema(ctx sdk.Context, id string) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.SchemaKey))
-	store.Delete(GetSchemaIDBytes(id))
-}
-
-// GetAllSchema returns all schema
-func (k Keeper) GetAllSchema(ctx sdk.Context) (list []types.Schema) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.SchemaKey))
-	iterator := sdk.KVStorePrefixIterator(store, []byte{})
-
-	defer iterator.Close()
-
-	for ; iterator.Valid(); iterator.Next() {
-		var val types.Schema
-		k.cdc.MustUnmarshal(iterator.Value(), &val)
-		list = append(list, val)
-	}
-
-	return
 }
 
 // GetSchemaIDBytes returns the byte representation of the ID

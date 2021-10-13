@@ -51,7 +51,7 @@ func (k Keeper) FindPublicKey(context sdk.Context, request *types.MsgWriteReques
 		authentication = didDoc.Authentication
 		verificationMethod = didDoc.VerificationMethod
 	} else {
-		didDoc := k.GetDid(context, did)
+		didDoc, _ := k.GetDid(context, did)
 		authentication = didDoc.Authentication
 		verificationMethod = didDoc.VerificationMethod
 	}

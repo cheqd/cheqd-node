@@ -11,7 +11,10 @@ func getSchema(ctx sdk.Context, id string, keeper Keeper, legacyQuerierCdc *code
 		return nil, sdkerrors.ErrKeyNotFound
 	}
 
-	msg := keeper.GetSchema(ctx, id)
+	msg, err := keeper.GetSchema(ctx, id)
+	if err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
+	}
 
 	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, msg)
 	if err != nil {

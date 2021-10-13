@@ -17,7 +17,7 @@ func TestHandler_CreateDid(t *testing.T) {
 	_, did := InitDid(setup)
 
 	// query Did
-	receivedDid := setup.Keeper.GetDid(setup.Ctx, did.Id)
+	receivedDid, _ := setup.Keeper.GetDid(setup.Ctx, did.Id)
 
 	// check
 	require.Equal(t, did.Id, receivedDid.Id)
@@ -39,13 +39,13 @@ func TestHandler_UpdateDid(t *testing.T) {
 	privKey, did := InitDid(setup)
 
 	// query Did
-	receivedDid := setup.Keeper.GetDid(setup.Ctx, did.Id)
+	receivedDid, _ := setup.Keeper.GetDid(setup.Ctx, did.Id)
 
 	//Init priv key
 	newPubKey, _, _ := ed25519.GenerateKey(rand.Reader)
 
 	// add new Did
-	didMsgUpdate := setup.UpdateDid(&receivedDid, newPubKey)
+	didMsgUpdate := setup.UpdateDid(receivedDid, newPubKey)
 	dataUpdate, _ := ptypes.NewAnyWithValue(didMsgUpdate)
 	resultUpdate, _ := setup.Handler(setup.Ctx, setup.WrapRequest(privKey, dataUpdate, make(map[string]string)))
 	didUpdated := types.MsgUpdateDidResponse{}
@@ -56,7 +56,7 @@ func TestHandler_UpdateDid(t *testing.T) {
 	}
 
 	// query Did
-	receivedUpdatedDid := setup.Keeper.GetDid(setup.Ctx, did.Id)
+	receivedUpdatedDid, _ := setup.Keeper.GetDid(setup.Ctx, did.Id)
 
 	// check
 	require.Equal(t, didUpdated.Id, receivedUpdatedDid.Id)
@@ -78,13 +78,13 @@ func TestHandler_UpdateDidInvalidSignature(t *testing.T) {
 	_, did := InitDid(setup)
 
 	// query Did
-	receivedDid := setup.Keeper.GetDid(setup.Ctx, did.Id)
+	receivedDid, _ := setup.Keeper.GetDid(setup.Ctx, did.Id)
 
 	//Init priv key
 	newPubKey, newPrivKey, _ := ed25519.GenerateKey(rand.Reader)
 
 	// add new Did
-	didMsgUpdate := setup.UpdateDid(&receivedDid, newPubKey)
+	didMsgUpdate := setup.UpdateDid(receivedDid, newPubKey)
 	dataUpdate, _ := ptypes.NewAnyWithValue(didMsgUpdate)
 	_, err := setup.Handler(setup.Ctx, setup.WrapRequest(newPrivKey, dataUpdate, make(map[string]string)))
 	require.Error(t, err)
@@ -108,7 +108,7 @@ func TestHandler_CreateSchema(t *testing.T) {
 	}
 
 	// query Did
-	receivedSchema := setup.Keeper.GetSchema(setup.Ctx, schema.Id)
+	receivedSchema, _ := setup.Keeper.GetSchema(setup.Ctx, schema.Id)
 
 	require.Equal(t, schema.Id, receivedSchema.Id)
 	require.Equal(t, msg.Name, receivedSchema.Name)
@@ -133,7 +133,7 @@ func TestHandler_CreateCredDef(t *testing.T) {
 	}
 
 	// query Cred Def
-	receivedCredDef := setup.Keeper.GetCredDef(setup.Ctx, credDef.Id)
+	receivedCredDef, _ := setup.Keeper.GetCredDef(setup.Ctx, credDef.Id)
 
 	expectedValue := msg.Value.(*types.MsgCreateCredDef_ClType)
 	actualValue := receivedCredDef.Value.(*types.CredDef_ClType)
