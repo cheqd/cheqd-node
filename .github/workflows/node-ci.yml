@@ -119,11 +119,13 @@ jobs:
           ./run_docker.sh
           [[ $(docker ps | wc -l) == 7 ]] && echo "6 pool containers are running!" || exit 1
 
-      - name: Add observer node # FIXME remove sleep with wat script / TODO assert `catching_up` to become `false`
+      - name: Add observer node # TODO assert `catching_up` to become `false`
         run: |
           cd tests/networks/docker_compose
           ./add_observer.sh
-          [[ $(cheqd-noded status -n 'tcp://localhost:26677' 2>&1 | wc -l) == 1 ]] && echo 'New node returns status!'
+          cheqd-noded status -n 'tcp://localhost:26677'
+          cheqd-noded status -n 'tcp://localhost:26677' 2>&1 | wc -l
+          ./wait.sh "[[ $(cheqd-noded status -n 'tcp://localhost:26677' 2>&1 | wc -l) == 1 ]] && echo 'New node returns status!'"
 
       - name: Promote observer to validator # TODO count signatures to assert
         run: |
