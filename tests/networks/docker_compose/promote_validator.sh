@@ -1,3 +1,4 @@
+#!/bin/bash
 sudo chown -R runner:docker ${NODE_CONFIGS_BASE}/client
 export HOME=${NODE_CONFIGS_BASE}/client
 cheqd-noded keys list
