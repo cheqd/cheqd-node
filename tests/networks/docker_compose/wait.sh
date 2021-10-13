@@ -4,10 +4,10 @@ cmd="$1"
 
 for i in 1 2 3; do
     if eval $cmd; then
-        echo "success"
+        echo "Waiter returned success!"
         exit 0
     else
-        echo "fail"
+        echo "Waiter returned fail. Retrying..."
         sleep 15
     fi
 done
