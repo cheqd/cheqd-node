@@ -4,8 +4,8 @@ set -euox pipefail
 
 cmd="$1"
 
-for i in 1 2 3 4 5 6; do
-    sleep 30
+for i in 1 2 3 4 5; do
+    sleep 60
     if eval $cmd; then
         echo "Waiter returned success!"
         exit 0
