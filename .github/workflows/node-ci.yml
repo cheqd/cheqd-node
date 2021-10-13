@@ -125,7 +125,7 @@ jobs:
           ./add_observer.sh
           sleep 30
           cheqd-noded status -n "tcp://localhost:26677" || echo "Error"
-          systemctl status cheqd-noded
+          journalctl -ex | grep cheqd
 
       - name: Promote observer to validator # TODO count signatures to assert
         run: |
