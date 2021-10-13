@@ -118,13 +118,13 @@ jobs:
           cd tests/networks/docker_compose
           ./gen_node_configs.sh
           ./run_docker.sh
-          ./wait_for_blocks.sh
+          ./wait.sh '[[ $(curl -s -N localhost:26657/block | jq -cr '"'"'.result.block.last_commit.height'"'"') -gt 1 ]] && echo "Height is more than 1"'
 
       - name: Add observer node
         run: |
           cd tests/networks/docker_compose
           ./add_observer.sh
-          ./wait_for_status.sh
+          ./wait.sh '[[ $(cheqd-noded status -n '"'"'tcp://localhost:26677'"'"' 2>&1 | wc -l) == 1 ]] && echo "New node returns status!"'
 
       - name: Promote observer to validator
         run: |
@@ -132,9 +132,22 @@ jobs:
           ./promote_validator.sh
           cheqd-noded query staking validators --node "http://localhost:26657" | sed -nr 's/.*status: (.*?).*/\1/p' $1 | while read x; do [[ "BOND_STATUS_BONDED" == $x ]] && echo "Validator's status is bonded!" || exit 1 ; done
           curl -s localhost:26657/block | sed -nr 's/.*signature": (.*?).*/\1/p'
-          ./wait_for_sigs.sh
+          ./wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*signature": (.*?).*/\1/p'"'"' | wc -l) == 5 ]] && echo "There are 5 validators signatures in block!"'
           curl -s localhost:26657/block | sed -nr 's/.*(signature": null).*/\1/p'
-          ./wait_for_no_null.sh
+          ./wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*(signature": null).*/\1/p'"'"' | wc -l) == 0 ]] && echo "There are no null signatures in block!"'
+
+      - name: Gather logs on failure
+        if: ${{ failure() }}
+        run: |
+          ls /var/log/cheqd-node | xargs cat
+          curl --request POST \
+          --url https://api.github.com/repos/${{ github.repository }}/issues \
+          --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+          --header 'content-type: application/json' \
+          --data '{
+            "title": "Issue created due to workflow fialure: ${{ github.run_id }}",
+            "body": "This issue was automatically created by the GitHub Action workflow **${{ github.workflow }}**. \n\n due to failure in run: _${{ github.run_id }}_."
+            }'
 
   # run-cosmos-specific-tests:
   #   name: Run cosmos-specific tests using cheqd-node CLI
