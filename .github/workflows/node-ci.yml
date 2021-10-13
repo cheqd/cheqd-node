@@ -120,7 +120,7 @@ jobs:
           ./run_docker.sh
           ./wait_for_blocks.sh
 
-      - name: Add observer node # TODO assert `catching_up` to become `false`
+      - name: Add observer node
         run: |
           cd tests/networks/docker_compose
           ./add_observer.sh
@@ -130,12 +130,11 @@ jobs:
         run: |
           cd tests/networks/docker_compose
           ./promote_validator.sh
-          ./wait.sh "[[ $(cheqd-noded query staking validators --node 'http://localhost:26657' | sed -nr 's/.*status: (.*?).*/\1/p' | wc -l) == 5 ]] && echo '5 validators are running!'"
           cheqd-noded query staking validators --node "http://localhost:26657" | sed -nr 's/.*status: (.*?).*/\1/p' $1 | while read x; do [[ "BOND_STATUS_BONDED" == $x ]] && echo "Validator's status is bonded!" || exit 1 ; done
           curl -s localhost:26657/block | sed -nr 's/.*signature": (.*?).*/\1/p'
-          ./wait.sh "[[ $(curl -s localhost:26657/block | sed -nr 's/.*signature": (.*?).*/\1/p' | wc -l) == 5 ]] && echo 'There are 5 validators signatures in block!'"
+          ./wait_for_sigs.sh
           curl -s localhost:26657/block | sed -nr 's/.*(signature": null).*/\1/p'
-          ./wait.sh "[[ $(curl -s localhost:26657/block | sed -nr 's/.*(signature": null).*/\1/p' | wc -l) == 0 ]] && echo 'There are no null signatures in block!'"
+          ./wait_for_no_null.sh
 
   # run-cosmos-specific-tests:
   #   name: Run cosmos-specific tests using cheqd-node CLI
