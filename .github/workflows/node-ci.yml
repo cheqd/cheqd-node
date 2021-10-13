@@ -112,13 +112,14 @@ jobs:
       #   run: |
       #     docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
 
-      - name: Set up 4 validators + 2 observers node docker pool # TODO count txns height to assert
+      - name: Set up 4 validators + 2 observers node docker pool
         run: |
           cd tests/networks/docker_compose
           ./gen_node_configs.sh
           ./run_docker.sh
           sleep 60
           ./wait.sh "[[ $(docker ps | wc -l) == 7 ]] && echo '6 pool containers are running!'"
+          ./wait.sh "[[ $(curl -s localhost:26657/block | sed -nr 's/.*height": "(.*?)",/\1/p' | head -n 1) -gt 1 ]] && echo 'Height is more than 1'"
 
       - name: Add observer node # TODO assert `catching_up` to become `false`
         run: |
