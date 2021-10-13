@@ -28,7 +28,7 @@ Validator address is a function of validator's public key. To get `bech32` encod
 
 ```bash
 $ cheqd-noded tendermint show-address
-cosmosvalcons1l43yqtdjcvyj65vnp29ly8u8yyau92q0ptzdp0
+cheqdvalcons1l43yqtdjcvyj65vnp29ly8u8yyau92q0ptzdp0
 ```
 
 There are several ways to get hex-encoded validator address:
@@ -42,7 +42,7 @@ There are several ways to get hex-encoded validator address:
 2. Query node using CLI:
 
    ```bash
-   cheqd-noded tendermint show-address --node <node-rpc-url>
+   cheqd-noded tendermint show-address
    ```
 
    Look for `"ValidatorInfo":{"Address":"..."}`
@@ -72,4 +72,3 @@ ba1689516f45be7f79c7450394144711e02e7341@3.13.19.41:26656
 ```
 
 Using this information other participants will be able to join your node.
-

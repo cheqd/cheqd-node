@@ -15,4 +15,3 @@ This document is focussed on providing guidance on ow to use the **cheqd Cosmos 
 * [Key management](cheqd-cli-key-management.md)
 * [Account management](cheqd-cli-accounts.md)
 * [Token transactions](cheqd-cli-token-transactions.md)
-

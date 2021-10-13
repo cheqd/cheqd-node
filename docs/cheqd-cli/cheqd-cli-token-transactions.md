@@ -51,5 +51,5 @@ Pay attention at return status code. It should be 0 if a transaction is submitte
 ```bash
 $ cheqd-noded tx bank send alice 
 
-cheqd10dl985c76zanc8n9z6c88qnl9t2hmhl5rcg0jq 10000cheq --node http://localhost:26657 --chain-id cheqd --fees 50ncheq
+cheqd10dl985c76zanc8n9z6c88qnl9t2hmhl5rcg0jq 10000ncheq --node http://localhost:26657 --chain-id cheqd --fees 50ncheq
 ```
