@@ -2,4 +2,14 @@
 
 cmd="$1"
 
-for i in 1 2 3; do $($cmd) && break || sleep 15; done
+for i in 1 2 3; do
+    if eval $cmd; then
+        echo "success"
+        exit 0
+    else
+        echo "fail"
+        sleep 15
+    fi
+done
+
+exit 1

@@ -1,5 +1,5 @@
 #!/bin/bash
-sudo chown -R runner:docker /etc/cheqd-node
+sudo chmod -R 777
 cd
 cheqd-noded init node5
 # cp ${NODE_CONFIGS_BASE}/node0/.cheqdnode/config/genesis.json ~/.cheqdnode/config/
