@@ -97,8 +97,9 @@ jobs:
         with:
           name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
 
-      - name: Install deb
+      - name: Install deb and jq
         run: |
+          sudo apt install jq
           sudo dpkg -i ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
 
       - name: Check out
@@ -118,7 +119,7 @@ jobs:
           ./gen_node_configs.sh
           ./run_docker.sh
           ./wait.sh "[[ $(docker ps | wc -l) == 7 ]] && echo '6 pool containers are running!'"
-          ./wait.sh "[[ $(curl -s localhost:26657/block | sed -nr 's/.*height": "(.*?)",/\1/p' | head -n 1) -gt 1 ]] && echo 'Height is more than 1'"
+          ./wait.sh "[[ $(curl -s -N localhost:26657/block | jq -cr '.result.block.last_commit.height') -gt 1 ]] && echo 'Height is more than 1'"
 
       - name: Add observer node # TODO assert `catching_up` to become `false`
         run: |

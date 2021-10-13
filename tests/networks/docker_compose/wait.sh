@@ -7,7 +7,7 @@ for i in 1 2 3 4 5 6; do
         echo "Waiter returned success!"
         exit 0
     else
-        echo "Waiter returned fail. Retrying..."
+        echo "Waiter returned failure. Retrying..."
         sleep 60
     fi
 done
