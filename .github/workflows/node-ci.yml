@@ -124,7 +124,7 @@ jobs:
           cd tests/networks/docker_compose
           ./add_observer.sh
           sleep 30
-          cheqd-noded status -n "tcp://localhost:26677"
+          cheqd-noded status -n "tcp://localhost:26677" || echo "Error"
           systemctl status cheqd-noded
 
       - name: Promote observer to validator # TODO count signatures to assert
