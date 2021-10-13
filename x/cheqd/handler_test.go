@@ -14,7 +14,7 @@ import (
 func TestHandler_CreateDid(t *testing.T) {
 	setup := Setup()
 
-	_, did := InitDid(setup)
+	_, did, _ := setup.InitDid()
 
 	// query Did
 	receivedDid, _ := setup.Keeper.GetDid(setup.Ctx, did.Id)
@@ -36,7 +36,7 @@ func TestHandler_UpdateDid(t *testing.T) {
 	setup := Setup()
 
 	//Init did
-	privKey, did := InitDid(setup)
+	privKey, did, _ := setup.InitDid()
 
 	// query Did
 	receivedDid, _ := setup.Keeper.GetDid(setup.Ctx, did.Id)
@@ -75,7 +75,7 @@ func TestHandler_UpdateDid(t *testing.T) {
 func TestHandler_UpdateDidInvalidSignature(t *testing.T) {
 	setup := Setup()
 
-	_, did := InitDid(setup)
+	_, did, _ := setup.InitDid()
 
 	// query Did
 	receivedDid, _ := setup.Keeper.GetDid(setup.Ctx, did.Id)
@@ -94,7 +94,7 @@ func TestHandler_UpdateDidInvalidSignature(t *testing.T) {
 func TestHandler_CreateSchema(t *testing.T) {
 	setup := Setup()
 
-	privKey, _ := InitDid(setup)
+	privKey, _, _ := setup.InitDid()
 	msg := setup.CreateSchema()
 
 	data, _ := ptypes.NewAnyWithValue(msg)
@@ -119,7 +119,7 @@ func TestHandler_CreateSchema(t *testing.T) {
 func TestHandler_CreateCredDef(t *testing.T) {
 	setup := Setup()
 
-	privKey, _ := InitDid(setup)
+	privKey, _, _ := setup.InitDid()
 	msg := setup.CreateCredDef()
 
 	data, _ := ptypes.NewAnyWithValue(msg)
@@ -158,19 +158,28 @@ func TestHandler_CreateSchemaInvalidSignature(t *testing.T) {
 	require.Equal(t, "Invalid signature: invalid signature detected", err.Error())
 }
 
-func InitDid(setup TestSetup) (ed25519.PrivateKey, *types.MsgCreateDid) {
-	pubKey, privKey, _ := ed25519.GenerateKey(rand.Reader)
+func TestHandler_DidDocAlreadyExists(t *testing.T) {
+	setup := Setup()
 
-	// add new Did
-	didMsg := setup.CreateDid(pubKey)
-	data, _ := ptypes.NewAnyWithValue(didMsg)
-	result, _ := setup.Handler(setup.Ctx, setup.WrapRequest(privKey, data, make(map[string]string)))
-	did := types.MsgCreateDidResponse{}
-	err := did.Unmarshal(result.Data)
+	privKey, _, _ := setup.InitDid()
+	_, _, err := setup.InitDid()
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	require.Error(t, err)
+	require.Equal(t, "DID DOC already exists for DID did:cheqd:test:alice: did doc exists", err.Error())
 
-	return privKey, didMsg
+	credDefMsg := setup.CreateCredDef()
+	data, _ := ptypes.NewAnyWithValue(credDefMsg)
+	_, _ = setup.Handler(setup.Ctx, setup.WrapRequest(privKey, data, make(map[string]string)))
+	_, err = setup.Handler(setup.Ctx, setup.WrapRequest(privKey, data, make(map[string]string)))
+
+	require.Error(t, err)
+	require.Equal(t, "DID DOC already exists for CredDef did:cheqd:test:cred-def-1: did doc exists", err.Error())
+
+	schemaMsg := setup.CreateSchema()
+	data, _ = ptypes.NewAnyWithValue(schemaMsg)
+	_, _ = setup.Handler(setup.Ctx, setup.WrapRequest(privKey, data, make(map[string]string)))
+	_, err = setup.Handler(setup.Ctx, setup.WrapRequest(privKey, data, make(map[string]string)))
+
+	require.Error(t, err)
+	require.Equal(t, "DID DOC already exists for Schema did:cheqd:test:schema-1: did doc exists", err.Error())
 }

@@ -2,6 +2,7 @@ package cheqd
 
 import (
 	"crypto/ed25519"
+	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
 	"github.com/btcsuite/btcutil/base58"
@@ -119,7 +120,7 @@ func (s *TestSetup) UpdateDid(did *types.Did, pubKey ed25519.PublicKey) *types.M
 
 func (s *TestSetup) CreateSchema() *types.MsgCreateSchema {
 	return &types.MsgCreateSchema{
-		Id:        "schema-1",
+		Id:        "did:cheqd:test:schema-1",
 		Name:      "name",
 		Version:   "version",
 		AttrNames: []string{"attr1", "attr2"},
@@ -135,7 +136,7 @@ func (s *TestSetup) CreateCredDef() *types.MsgCreateCredDef {
 	}
 
 	return &types.MsgCreateCredDef{
-		Id:            "cred-def-1",
+		Id:            "did:cheqd:test:cred-def-1",
 		SchemaId:      "schema-1",
 		Tag:           "tag",
 		SignatureType: "signature-type",
@@ -156,4 +157,27 @@ func (s *TestSetup) WrapRequest(privKey ed25519.PrivateKey, data *ptypes.Any, me
 		Signatures: map[string]string{"did:cheqd:test:alice#key-1": signature},
 		Authors:    []string{"controller"},
 	}
+}
+
+func (s *TestSetup) InitDid() (ed25519.PrivateKey, *types.MsgCreateDid, error) {
+	pubKey, privKey, _ := ed25519.GenerateKey(rand.Reader)
+
+	// add new Did
+	didMsg := s.CreateDid(pubKey)
+	data, err := ptypes.NewAnyWithValue(didMsg)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	result, err := s.Handler(s.Ctx, s.WrapRequest(privKey, data, make(map[string]string)))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	did := types.MsgCreateDidResponse{}
+	if err := did.Unmarshal(result.Data); err != nil {
+		return nil, nil, err
+	}
+
+	return privKey, didMsg, nil
 }

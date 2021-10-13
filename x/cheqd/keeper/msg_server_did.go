@@ -18,6 +18,11 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 	}
 
+	// Checks that the element exists
+	if err := k.HasDidDoc(ctx, didMsg.Id); err != nil {
+		return nil, err
+	}
+
 	k.AppendDid(
 		ctx,
 		didMsg.Id,

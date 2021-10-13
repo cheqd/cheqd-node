@@ -18,6 +18,11 @@ func (k msgServer) CreateCredDef(goCtx context.Context, msg *types.MsgWriteReque
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 	}
 
+	// Checks that the element exists
+	if err := k.HasDidDoc(ctx, credDefMsg.Id); err != nil {
+		return nil, err
+	}
+
 	switch value := credDefMsg.Value.(type) {
 	case *types.MsgCreateCredDef_ClType:
 		k.AppendCredDef(

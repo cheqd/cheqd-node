@@ -18,6 +18,11 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgWriteReques
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 	}
 
+	// Checks that the element exists
+	if err := k.HasDidDoc(ctx, schemaMsg.Id); err != nil {
+		return nil, err
+	}
+
 	k.AppendSchema(
 		ctx,
 		schemaMsg.Id,
