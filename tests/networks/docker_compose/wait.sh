@@ -2,7 +2,7 @@
 
 cmd="$1"
 
-for i in 1 2 3; do
+for i in 1 2 3 4 5; do
     if eval $cmd; then
         echo "Waiter returned success!"
         exit 0
