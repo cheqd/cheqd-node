@@ -117,7 +117,6 @@ jobs:
           cd tests/networks/docker_compose
           ./gen_node_configs.sh
           ./run_docker.sh
-          sleep 60
           ./wait.sh "[[ $(docker ps | wc -l) == 7 ]] && echo '6 pool containers are running!'"
           ./wait.sh "[[ $(curl -s localhost:26657/block | sed -nr 's/.*height": "(.*?)",/\1/p' | head -n 1) -gt 1 ]] && echo 'Height is more than 1'"
 
@@ -133,7 +132,9 @@ jobs:
           ./promote_validator.sh
           ./wait.sh "[[ $(cheqd-noded query staking validators --node 'http://localhost:26657' | sed -nr 's/.*status: (.*?).*/\1/p' | wc -l) == 5 ]] && echo '5 validators are running!'"
           cheqd-noded query staking validators --node "http://localhost:26657" | sed -nr 's/.*status: (.*?).*/\1/p' $1 | while read x; do [[ "BOND_STATUS_BONDED" == $x ]] && echo "Validator's status is bonded!" || exit 1 ; done
+          curl -s localhost:26657/block | sed -nr 's/.*signature": (.*?).*/\1/p'
           ./wait.sh "[[ $(curl -s localhost:26657/block | sed -nr 's/.*signature": (.*?).*/\1/p' | wc -l) == 5 ]] && echo 'There are 5 validators signatures in block!'"
+          curl -s localhost:26657/block | sed -nr 's/.*(signature": null).*/\1/p'
           ./wait.sh "[[ $(curl -s localhost:26657/block | sed -nr 's/.*(signature": null).*/\1/p' | wc -l) == 0 ]] && echo 'There are no null signatures in block!'"
 
   # run-cosmos-specific-tests:
