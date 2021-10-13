@@ -111,7 +111,7 @@ If you need help or support, join our [**cheqd Community Slack** ](http://cheqd.
    Find out your [validator node's hex-encoded address](../cheqd-cli/cheqd-cli-node-management.md) and look for `"ValidatorInfo":{"Address":"..."}`:
 
    ```bash
-   cheqd-noded tendermint show-address --node <node-rpc-url>
+   cheqd-noded tendermint show-address
    ```
 
    Query the latest block. Open `<node-address:rpc-port/block` in a web browser. Make sure that there is a signature with your validator address in the signature list.
