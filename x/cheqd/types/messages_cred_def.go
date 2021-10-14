@@ -1,36 +1,28 @@
 package types
 
-import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-)
+var _ IdentityMsg = &MsgCreateCredDef{}
 
-var _ sdk.Msg = &MsgCreateCredDef{}
-
-// NewMsgCreateCredDef todo add value
-func NewMsgCreateCredDef(id string, schemaId string, tag string, signatureType string, value *MsgCreateCredDef_ClType) *MsgCreateCredDef {
+func NewMsgCreateCredDef(id string, schemaId string, tag string, signatureType string, controller []string, value *MsgCreateCredDef_ClType) *MsgCreateCredDef {
 	return &MsgCreateCredDef{
 		Id:            id,
 		SchemaId:      schemaId,
 		Tag:           tag,
 		SignatureType: signatureType,
 		Value:         value,
+		Controller:    controller,
 	}
 }
 
-func (msg *MsgCreateCredDef) Route() string {
-	return RouterKey
-}
+func (msg *MsgCreateCredDef) GetSigners() []Signer {
+	result := make([]Signer, len(msg.Controller))
 
-func (msg *MsgCreateCredDef) Type() string {
-	return "CreateCredDef"
-}
+	for i, signer := range msg.Controller {
+		result[i] = Signer{
+			Signer: signer,
+		}
+	}
 
-func (msg *MsgCreateCredDef) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{}
-}
-
-func (msg *MsgCreateCredDef) GetSignBytes() []byte {
-	return []byte{}
+	return result
 }
 
 func (msg *MsgCreateCredDef) ValidateBasic() error {

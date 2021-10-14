@@ -53,6 +53,7 @@ func (k Keeper) AppendDid(
 	keyAgreement []string,
 	alsoKnownAs []string,
 	service []*types.DidService,
+	context []string,
 ) string {
 	// Create the did
 	count := k.GetDidCount(ctx)
@@ -67,6 +68,7 @@ func (k Keeper) AppendDid(
 		KeyAgreement:         keyAgreement,
 		AlsoKnownAs:          alsoKnownAs,
 		Service:              service,
+		Context:              context,
 	}
 
 	created := ctx.BlockTime().String()

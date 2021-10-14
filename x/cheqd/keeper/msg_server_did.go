@@ -14,11 +14,17 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 	didMsg, isMsgIdentity := msg.Data.GetCachedValue().(*types.MsgCreateDid)
 
 	if !isMsgIdentity {
-		errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName, msg)
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", types.ModuleName, msg)
 	}
 
-	didMsg.Verify(&k, &ctx, msg)
+	if err := didMsg.ValidateBasic(); err != nil {
+		return nil, err
+	}
+
+	if err := k.VerifySignature(&ctx, msg, didMsg.GetSigners()); err != nil {
+		return nil, err
+	}
+
 	// Checks that the element exists
 	if err := k.HasDidDoc(ctx, didMsg.Id); err != nil {
 		return nil, err
@@ -36,6 +42,7 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 		didMsg.KeyAgreement,
 		didMsg.AlsoKnownAs,
 		didMsg.Service,
+		didMsg.Context,
 	)
 
 	return &types.MsgCreateDidResponse{
@@ -48,8 +55,15 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 	didMsg, isMsgIdentity := msg.Data.GetCachedValue().(*types.MsgUpdateDid)
 
 	if !isMsgIdentity {
-		errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName, msg)
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", types.ModuleName, msg)
+	}
+
+	if err := didMsg.ValidateBasic(); err != nil {
+		return nil, err
+	}
+
+	if err := k.VerifySignature(&ctx, msg, didMsg.GetSigners()); err != nil {
+		return nil, err
 	}
 
 	// Checks that the element exists
@@ -83,6 +97,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 		KeyAgreement:         didMsg.KeyAgreement,
 		AlsoKnownAs:          didMsg.AlsoKnownAs,
 		Service:              didMsg.Service,
+		Context:              didMsg.Context,
 	}
 
 	k.SetDid(ctx, did, metadata)

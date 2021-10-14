@@ -2,8 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
-
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -14,8 +12,15 @@ func (k msgServer) CreateCredDef(goCtx context.Context, msg *types.MsgWriteReque
 	credDefMsg, isMsgIdentity := msg.Data.GetCachedValue().(*types.MsgCreateCredDef)
 
 	if !isMsgIdentity {
-		errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName, msg)
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", types.ModuleName, msg)
+	}
+
+	if err := credDefMsg.ValidateBasic(); err != nil {
+		return nil, err
+	}
+
+	if err := k.VerifySignature(&ctx, msg, credDefMsg.GetSigners()); err != nil {
+		return nil, err
 	}
 
 	// Checks that the element exists

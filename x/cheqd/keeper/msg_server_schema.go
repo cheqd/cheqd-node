@@ -2,8 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
-
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -14,8 +12,15 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgWriteReques
 	schemaMsg, isMsgIdentity := msg.Data.GetCachedValue().(*types.MsgCreateSchema)
 
 	if !isMsgIdentity {
-		errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName, msg)
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", types.ModuleName, msg)
+	}
+
+	if err := schemaMsg.ValidateBasic(); err != nil {
+		return nil, err
+	}
+
+	if err := k.VerifySignature(&ctx, msg, schemaMsg.GetSigners()); err != nil {
+		return nil, err
 	}
 
 	// Checks that the element exists

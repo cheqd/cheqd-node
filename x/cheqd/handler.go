@@ -14,6 +14,7 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
+
 		parsedMsg, isMsgIdentity := msg.(*types.MsgWriteRequest)
 		if !isMsgIdentity {
 			errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName, msg)
@@ -22,19 +23,19 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 		switch parsedMsg.Data.TypeUrl {
 		// this line is used by starport scaffolding # 1
-		case "/cheqdid.cheqdnode.cheqd.MsgCreateCredDef":
+		case types.MessageCreateCredDef:
 			res, err := msgServer.CreateCredDef(sdk.WrapSDKContext(ctx), parsedMsg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
-		case "/cheqdid.cheqdnode.cheqd.MsgCreateSchema":
+		case types.MessageCreateSchema:
 			res, err := msgServer.CreateSchema(sdk.WrapSDKContext(ctx), parsedMsg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
-		case "/cheqdid.cheqdnode.cheqd.MsgCreateDid":
+		case types.MessageCreateDid:
 			res, err := msgServer.CreateDid(sdk.WrapSDKContext(ctx), parsedMsg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
-		case "/cheqdid.cheqdnode.cheqd.MsgUpdateDid":
+		case types.MessageUpdateDid:
 			res, err := msgServer.UpdateDid(sdk.WrapSDKContext(ctx), parsedMsg)
 			return sdk.WrapServiceResult(ctx, res, err)
 

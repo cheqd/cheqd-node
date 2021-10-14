@@ -1,31 +1,28 @@
 package types
 
-import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-)
+var _ IdentityMsg = &MsgCreateSchema{}
 
-var _ sdk.Msg = &MsgCreateSchema{}
-
-func NewMsgCreateSchema(id string, name string, version string, attrNames []string) *MsgCreateSchema {
+func NewMsgCreateSchema(id string, typeSchema string, name string, version string, attrNames []string, controller []string) *MsgCreateSchema {
 	return &MsgCreateSchema{
-		Id:        id,
-		Name:      name,
-		Version:   version,
-		AttrNames: attrNames,
+		Id:         id,
+		Type:       typeSchema,
+		Name:       name,
+		Version:    version,
+		AttrNames:  attrNames,
+		Controller: controller,
 	}
 }
 
-func (msg *MsgCreateSchema) Route() string {
-	return RouterKey
-}
+func (msg *MsgCreateSchema) GetSigners() []Signer {
+	result := make([]Signer, len(msg.Controller))
 
-func (msg *MsgCreateSchema) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{}
-}
+	for i, signer := range msg.Controller {
+		result[i] = Signer{
+			Signer: signer,
+		}
+	}
 
-func (msg *MsgCreateSchema) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
+	return result
 }
 
 func (msg *MsgCreateSchema) ValidateBasic() error {

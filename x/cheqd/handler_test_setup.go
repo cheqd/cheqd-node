@@ -86,7 +86,7 @@ func (s *TestSetup) CreateDid(pubKey ed25519.PublicKey) *types.MsgCreateDid {
 
 	return &types.MsgCreateDid{
 		Id:                   "did:cheqd:test:alice",
-		Controller:           []string{"controller"},
+		Controller:           nil,
 		VerificationMethod:   []*types.VerificationMethod{&VerificationMethod},
 		Authentication:       []string{"did:cheqd:test:alice#key-1"},
 		AssertionMethod:      []string{"AssertionMethod"},
@@ -94,6 +94,7 @@ func (s *TestSetup) CreateDid(pubKey ed25519.PublicKey) *types.MsgCreateDid {
 		CapabilityDelegation: []string{"CapabilityDelegation"},
 		KeyAgreement:         []string{"KeyAgreement"},
 		AlsoKnownAs:          []string{"AlsoKnownAs"},
+		Context:              []string{"Context"},
 		Service:              []*types.DidService{&Service},
 	}
 }
@@ -111,7 +112,7 @@ func (s *TestSetup) UpdateDid(did *types.Did, pubKey ed25519.PublicKey) *types.M
 	return &types.MsgUpdateDid{
 		Id:                   did.Id,
 		Controller:           did.Controller,
-		VerificationMethod:   []*types.VerificationMethod{&VerificationMethod},
+		VerificationMethod:   []*types.VerificationMethod{did.VerificationMethod[0], &VerificationMethod},
 		Authentication:       did.Authentication,
 		AssertionMethod:      did.AssertionMethod,
 		CapabilityInvocation: did.CapabilityInvocation,
@@ -159,7 +160,6 @@ func (s *TestSetup) WrapRequest(privKey ed25519.PrivateKey, data *ptypes.Any, me
 		Data:       data,
 		Metadata:   metadata,
 		Signatures: map[string]string{"did:cheqd:test:alice#key-1": signature},
-		Authors:    []string{"controller"},
 	}
 }
 

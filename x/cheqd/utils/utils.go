@@ -27,13 +27,13 @@ func SplitDidUrlIntoDidAndFragment(didUrl string) (string, string) {
 	return fragments[0], fragments[1]
 }
 
-func VerifyIdentitySignature(controller string, authentication []string, verificationMethods []*types.VerificationMethod, signatures map[string]string, signingInput []byte) (bool, error) {
+func VerifyIdentitySignature(signer types.Signer, signatures map[string]string, signingInput []byte) (bool, error) {
 	result := true
 
-	for signer, signature := range signatures {
-		did, _ := SplitDidUrlIntoDidAndFragment(signer)
-		if did == controller {
-			pubKey, err := FindPublicKey(authentication, verificationMethods, signer)
+	for id, signature := range signatures {
+		did, _ := SplitDidUrlIntoDidAndFragment(id)
+		if did == signer.Signer {
+			pubKey, err := FindPublicKey(signer, id)
 			if err != nil {
 				return false, err
 			}
@@ -50,10 +50,10 @@ func VerifyIdentitySignature(controller string, authentication []string, verific
 	return result, nil
 }
 
-func FindPublicKey(authentication []string, verificationMethods []*types.VerificationMethod, id string) (ed25519.PublicKey, error) {
-	for _, authentication := range authentication {
+func FindPublicKey(signer types.Signer, id string) (ed25519.PublicKey, error) {
+	for _, authentication := range signer.Authentication {
 		if authentication == id {
-			for _, vm := range verificationMethods {
+			for _, vm := range signer.VerificationMethod {
 				if vm.Id == id {
 					return base58.Decode(vm.PublicKeyMultibase[1:]), nil
 				}
