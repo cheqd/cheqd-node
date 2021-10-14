@@ -24,14 +24,14 @@ message VerificationMethod {
   string id = 1;
   string type = 2;
   string controller = 3;
-  map<string,string> publicKeyJwk = 4; // optional
-  string publicKeyMultibase = 5; // optional
+  map<string,string> public_key_jwk = 4; // optional
+  string public_key_multibase = 5; // optional
 }
 
 message DidService {
   string id = 1;
   string type = 2;
-  string serviceEndpoint = 3;
+  string service_endpoint = 3;
 }
 
 

@@ -2,6 +2,8 @@ package utils
 
 import (
 	"crypto/ed25519"
+	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/btcsuite/btcutil/base58"
@@ -9,26 +11,43 @@ import (
 	"strings"
 )
 
-func CompareOwners(authors []string, controllers []string) bool {
-	type void struct{}
-	var member void
-
-	controllerSet := make(map[string]void)
-	for _, author := range authors {
-		controllerSet[author] = member
-	}
-	result := true
-	for _, controller := range controllers {
-		_, exists := controllerSet[controller]
-		result = result && exists
+func BuildSigningInput(msg *types.MsgWriteRequest) ([]byte, error) {
+	metadataBytes, err := json.Marshal(&msg.Metadata)
+	if err != nil {
+		return nil, types.ErrInvalidSignature.Wrap("An error has occurred during metadata marshalling")
 	}
 
-	return result
+	dataBytes := msg.Data.Value
+	signingInput := ([]byte)(base64.StdEncoding.EncodeToString(metadataBytes) + base64.StdEncoding.EncodeToString(dataBytes))
+	return signingInput, nil
 }
 
 func SplitDidUrlIntoDidAndFragment(didUrl string) (string, string) {
 	fragments := strings.Split(didUrl, "#")
 	return fragments[0], fragments[1]
+}
+
+func VerifyIdentitySignature(controller string, authentication []string, verificationMethods []*types.VerificationMethod, signatures map[string]string, signingInput []byte) (bool, error) {
+	result := true
+
+	for signer, signature := range signatures {
+		did, _ := SplitDidUrlIntoDidAndFragment(signer)
+		if did == controller {
+			pubKey, err := FindPublicKey(authentication, verificationMethods, signer)
+			if err != nil {
+				return false, err
+			}
+
+			signature, err := base64.StdEncoding.DecodeString(signature)
+			if err != nil {
+				return false, err
+			}
+
+			result = result && ed25519.Verify(pubKey, signingInput, signature)
+		}
+	}
+
+	return result, nil
 }
 
 func FindPublicKey(authentication []string, verificationMethods []*types.VerificationMethod, id string) (ed25519.PublicKey, error) {

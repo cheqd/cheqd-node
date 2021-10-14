@@ -7,7 +7,6 @@ import "cosmos/base/query/v1beta1/pagination.proto";
 import "cheqd/credDef.proto";
 import "cheqd/schema.proto";
 import "cheqd/did.proto";
-import "cheqd/state.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
@@ -33,7 +32,7 @@ message QueryGetCredDefRequest {
 }
 
 message QueryGetCredDefResponse {
-	CredDef CredDef = 1;
+	CredDef cred_def = 1;
 }
 
 message QueryGetSchemaRequest {
@@ -41,7 +40,7 @@ message QueryGetSchemaRequest {
 }
 
 message QueryGetSchemaResponse {
-	Schema Schema = 1;
+	Schema schema = 1;
 }
 
 message QueryGetDidRequest {
@@ -49,6 +48,5 @@ message QueryGetDidRequest {
 }
 
 message QueryGetDidResponse {
-	Did Did = 1;
-	Metadata Metadata = 2;
+	Did did = 1;
 }

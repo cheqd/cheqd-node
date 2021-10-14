@@ -85,7 +85,7 @@ func (k Keeper) AppendDid(
 			Did: &did,
 		},
 		Timestamp: created,
-		Txhash:    txHash,
+		TxHash:    txHash,
 	}
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
@@ -116,7 +116,7 @@ func (k Keeper) SetDid(ctx sdk.Context, did types.Did, metadata *types.Metadata)
 			Did: &did,
 		},
 		Timestamp: updated,
-		Txhash:    txHash,
+		TxHash:    txHash,
 	}
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
@@ -125,7 +125,7 @@ func (k Keeper) SetDid(ctx sdk.Context, did types.Did, metadata *types.Metadata)
 }
 
 // GetDid returns a did from its id
-func (k Keeper) GetDid(ctx sdk.Context, id string) (*types.Did, *types.Metadata, error) {
+func (k Keeper) GetDid(ctx *sdk.Context, id string) (*types.Did, *types.Metadata, error) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
 
 	var value types.StateValue

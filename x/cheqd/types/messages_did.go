@@ -32,6 +32,46 @@ func NewMsgCreateDid(
 	}
 }
 
+/*
+func (msg *MsgCreateDid) Verify(keeper *keeper.Keeper, ctx *sdk.Context, request *MsgWriteRequest) (bool, error) {
+	signingInput, err:=utils.BuildSigningInput(request)
+	if err!=nil {
+		return false, err
+	}
+
+	// if controller is present
+	if len(msg.Controller) > 0 {
+		for _, controller := range msg.Controller {
+			var authentication []string
+			var verificationMethod []*VerificationMethod
+
+			// if self-signed
+			if controller == msg.Id {
+				authentication=msg.Authentication
+				verificationMethod=msg.VerificationMethod
+			} else {
+				didDoc, _, err := keeper.GetDid(ctx, controller)
+				if err != nil {
+					return false, ErrDidDocNotFound.Wrap(controller)
+				}
+
+				authentication=didDoc.Authentication
+				verificationMethod=didDoc.VerificationMethod
+			}
+
+			// check all controller signatures
+			return utils.VerifyIdentitySignature(controller, authentication, verificationMethod, request.Signatures, signingInput)
+		}
+	}
+
+	// controller is not present but there are authentications
+	if len(msg.Authentication) > 0 {
+		return utils.VerifyIdentitySignature(msg.Id, msg.Authentication, msg.VerificationMethod, request.Signatures, signingInput)
+	}
+
+	return false, ErrInvalidSignature.Wrap("At least DID Doc should contain `controller` or `authentication`")
+}*/
+
 func (msg *MsgCreateDid) Route() string {
 	return RouterKey
 }

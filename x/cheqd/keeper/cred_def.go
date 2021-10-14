@@ -69,7 +69,7 @@ func (k Keeper) AppendCredDef(
 			CredDef: &credDef,
 		},
 		Timestamp: created,
-		Txhash:    txHash,
+		TxHash:    txHash,
 	}
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CredDefKey))

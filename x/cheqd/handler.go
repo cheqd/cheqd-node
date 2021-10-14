@@ -20,11 +20,6 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 		}
 
-		if !k.Verify(ctx, parsedMsg) {
-			errMsg := "Invalid signature"
-			return nil, sdkerrors.Wrap(types.ErrInvalidSignature, errMsg)
-		}
-
 		switch parsedMsg.Data.TypeUrl {
 		// this line is used by starport scaffolding # 1
 		case "/cheqdid.cheqdnode.cheqd.MsgCreateCredDef":

@@ -11,9 +11,9 @@ message StateValue {
   oneof data {
     Did did = 1;
     Schema schema = 2;
-    CredDef credDef = 3;
+    CredDef cred_def = 3;
   }
-  string txhash = 4;
+  string tx_hash = 4;
   string timestamp = 5;
   Metadata metadata = 6; // optional
 }
@@ -23,5 +23,5 @@ message Metadata {
   string created = 1;
   string updated = 2;
   bool deactivated = 3;
-  string versionId = 4;
+  string version_id = 4;
 }

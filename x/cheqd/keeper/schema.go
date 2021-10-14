@@ -65,7 +65,7 @@ func (k Keeper) AppendSchema(
 			Schema: &schema,
 		},
 		Timestamp: created,
-		Txhash:    txHash,
+		TxHash:    txHash,
 	}
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.SchemaKey))

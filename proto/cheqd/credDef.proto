@@ -8,14 +8,14 @@ import "gogoproto/gogo.proto";
 
 message CredDef {
   string id = 1;
-  repeated string authors = 2;
-  string schema_id = 3;
-  string tag = 4;
-  string signatureType = 5;
   oneof value {
     CredDefValue cl_type = 6;
     google.protobuf.Any any_type = 7;
   }
+  repeated string authors = 2;
+  string schema_id = 3;
+  string tag = 4;
+  string signatureType = 5;
 }
 
 message CredDefValue {

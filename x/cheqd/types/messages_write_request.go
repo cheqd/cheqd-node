@@ -7,10 +7,10 @@ import (
 
 var _ sdk.Msg = &MsgWriteRequest{}
 
-func NewMsgWriteRequest(data *types.Any, authors []string, signatures map[string]string) *MsgWriteRequest {
+func NewMsgWriteRequest(data *types.Any, metadata map[string]string, signatures map[string]string) *MsgWriteRequest {
 	return &MsgWriteRequest{
 		Data:       data,
-		Authors:    authors,
+		Metadata:   metadata,
 		Signatures: signatures,
 	}
 }
@@ -28,9 +28,22 @@ func (msg *MsgWriteRequest) GetSigners() []sdk.AccAddress {
 }
 
 func (msg *MsgWriteRequest) GetSignBytes() []byte {
-	return []byte{}
+	bz := ModuleCdc.MustMarshal(msg)
+	return sdk.MustSortJSON(bz)
 }
 
 func (msg *MsgWriteRequest) ValidateBasic() error {
+	if msg.Data == nil {
+		return ErrBadRequest.Wrap("Invalid Data: it is required")
+	}
+
+	if len(msg.Data.TypeUrl) == 0 || len(msg.Data.Value) == 0 {
+		return ErrBadRequest.Wrap("Invalid Data: it cannot be empty")
+	}
+
+	if len(msg.Signatures) == 0 {
+		return ErrBadRequest.Wrap("Invalid Signatures: it is required")
+	}
+
 	return nil
 }

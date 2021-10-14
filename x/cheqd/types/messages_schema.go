@@ -19,16 +19,13 @@ func (msg *MsgCreateSchema) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgCreateSchema) Type() string {
-	return "CreateSchema"
-}
-
 func (msg *MsgCreateSchema) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{}
 }
 
 func (msg *MsgCreateSchema) GetSignBytes() []byte {
-	return []byte{}
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
 }
 
 func (msg *MsgCreateSchema) ValidateBasic() error {

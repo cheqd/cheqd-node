@@ -20,20 +20,20 @@ service Msg {
 // this line is used by starport scaffolding # proto/tx/message
 message MsgWriteRequest {
   google.protobuf.Any data = 1;
-  repeated string authors = 2;
-  map<string, string> signatures = 3;
-  map<string, string> metadata = 4;
+  map<string, string> signatures = 2;
+  map<string, string> metadata = 3;
 }
 
 message MsgCreateCredDef {
   string id = 1;
   string schema_id = 2;
   string tag = 3;
-  string signatureType = 4;
+  string signature_type = 4;
   oneof value {
     CredDefValue cl_type = 5;
     google.protobuf.Any any_type = 6;
   }
+  repeated string controller = 7;
 }
 
 message MsgCreateCredDefResponse {
@@ -42,9 +42,11 @@ message MsgCreateCredDefResponse {
 
 message MsgCreateSchema {
   string id = 1;
-  string name = 2;
-  string version = 3;
-  repeated string attrNames = 4;
+  string type = 2;
+  string name = 3;
+  string version = 4;
+  repeated string attr_names = 5;
+  repeated string controller = 6;
 }
 
 message MsgCreateSchemaResponse {
@@ -54,14 +56,15 @@ message MsgCreateSchemaResponse {
 message MsgCreateDid {
   string id = 1;
   repeated string controller = 2;
-  repeated VerificationMethod verificationMethod = 3;
+  repeated VerificationMethod verification_method = 3;
   repeated string authentication = 4;
-  repeated string assertionMethod = 5;
-  repeated string capabilityInvocation = 6;
-  repeated string capabilityDelegation = 7;
-  repeated string keyAgreement = 8;
-  repeated string alsoKnownAs = 9;
+  repeated string assertion_method = 5;
+  repeated string capability_invocation = 6;
+  repeated string capability_delegation = 7;
+  repeated string key_agreement = 8;
+  repeated string also_known_as = 9;
   repeated DidService service = 10;
+  repeated string context = 11;
 }
 
 message MsgCreateDidResponse {
@@ -71,14 +74,15 @@ message MsgCreateDidResponse {
 message MsgUpdateDid {
   string id = 1;
   repeated string controller = 2;
-  repeated VerificationMethod verificationMethod = 3;
+  repeated VerificationMethod verification_method = 3;
   repeated string authentication = 4;
-  repeated string assertionMethod = 5;
-  repeated string capabilityInvocation = 6;
-  repeated string capabilityDelegation = 7;
-  repeated string keyAgreement = 8;
-  repeated string alsoKnownAs = 9;
+  repeated string assertion_method = 5;
+  repeated string capability_invocation = 6;
+  repeated string capability_delegation = 7;
+  repeated string key_agreement = 8;
+  repeated string also_known_as = 9;
   repeated DidService service = 10;
+  repeated string context = 11;
 }
 
 

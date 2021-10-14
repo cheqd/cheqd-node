@@ -18,6 +18,7 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 	}
 
+	didMsg.Verify(&k, &ctx, msg)
 	// Checks that the element exists
 	if err := k.HasDidDoc(ctx, didMsg.Id); err != nil {
 		return nil, err
@@ -56,7 +57,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %s doesn't exist", didMsg.Id))
 	}
 
-	_, metadata, err := k.GetDid(ctx, didMsg.Id)
+	_, metadata, err := k.GetDid(&ctx, didMsg.Id)
 	if err != nil {
 		return nil, err
 	}
