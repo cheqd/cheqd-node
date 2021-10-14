@@ -63,7 +63,7 @@ def test_query(command, params, expected_output):
 @pytest.mark.parametrize(
         "command, params, expected_output",
         [
-            ("bank send", f"{TEST_NET_DESTINATION}", r"Error\: accepts 3 arg\(s\), received 0"),
+            ("bank send", f"{TEST_NET_DESTINATION}", r"Error: accepts 3 arg\(s\), received 0"),
         ]
     )
 def test_tx(command, params, expected_output):
