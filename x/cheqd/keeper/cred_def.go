@@ -40,7 +40,6 @@ func (k Keeper) SetCredDefCount(ctx sdk.Context, count uint64) {
 	store.Set(byteKey, bz)
 }
 
-// AppendCredDef TODO add Value
 // AppendCredDef appends a credDef in the store with a new id and update the count
 func (k Keeper) AppendCredDef(
 	ctx sdk.Context,
@@ -52,6 +51,11 @@ func (k Keeper) AppendCredDef(
 ) string {
 	// Create the credDef
 	count := k.GetCredDefCount(ctx)
+
+	// A default tag `tag` will be used if not specified.
+	if len(tag) == 0 {
+		tag = "tag"
+	}
 
 	var credDef = types.CredDef{
 		Id:            id,

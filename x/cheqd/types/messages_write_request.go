@@ -34,15 +34,15 @@ func (msg *MsgWriteRequest) GetSignBytes() []byte {
 
 func (msg *MsgWriteRequest) ValidateBasic() error {
 	if msg.Data == nil {
-		return ErrBadRequest.Wrap("Invalid Data: it is required")
+		return ErrBadRequestIsRequired.Wrap("Data")
+	}
+
+	if len(msg.Signatures) == 0 {
+		return ErrBadRequestIsRequired.Wrap("Signatures")
 	}
 
 	if len(msg.Data.TypeUrl) == 0 || len(msg.Data.Value) == 0 {
 		return ErrBadRequest.Wrap("Invalid Data: it cannot be empty")
-	}
-
-	if len(msg.Signatures) == 0 {
-		return ErrBadRequest.Wrap("Invalid Signatures: it is required")
 	}
 
 	return nil

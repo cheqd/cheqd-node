@@ -1,6 +1,12 @@
 package keeper
 
 import (
+	"crypto/ed25519"
+	"encoding/base64"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"github.com/btcsuite/btcutil/base58"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -8,7 +14,7 @@ import (
 )
 
 func (k *Keeper) VerifySignature(ctx *sdk.Context, msg *types.MsgWriteRequest, signers []types.Signer) error {
-	signingInput, err := utils.BuildSigningInput(msg)
+	signingInput, err := BuildSigningInput(msg)
 	if err != nil {
 		return sdkerrors.Wrap(types.ErrInvalidSignature, err.Error())
 	}
@@ -24,7 +30,7 @@ func (k *Keeper) VerifySignature(ctx *sdk.Context, msg *types.MsgWriteRequest, s
 			signer.VerificationMethod = didDoc.VerificationMethod
 		}
 
-		valid, err := utils.VerifyIdentitySignature(signer, msg.Signatures, signingInput)
+		valid, err := VerifyIdentitySignature(signer, msg.Signatures, signingInput)
 		if err != nil {
 			return sdkerrors.Wrap(types.ErrInvalidSignature, err.Error())
 		}
@@ -35,4 +41,56 @@ func (k *Keeper) VerifySignature(ctx *sdk.Context, msg *types.MsgWriteRequest, s
 	}
 
 	return nil
+}
+
+func BuildSigningInput(msg *types.MsgWriteRequest) ([]byte, error) {
+	metadataBytes, err := json.Marshal(&msg.Metadata)
+	if err != nil {
+		return nil, types.ErrInvalidSignature.Wrap("An error has occurred during metadata marshalling")
+	}
+
+	dataBytes := msg.Data.Value
+	signingInput := ([]byte)(base64.StdEncoding.EncodeToString(metadataBytes) + base64.StdEncoding.EncodeToString(dataBytes))
+	return signingInput, nil
+}
+
+func VerifyIdentitySignature(signer types.Signer, signatures map[string]string, signingInput []byte) (bool, error) {
+	result := true
+
+	for id, signature := range signatures {
+		did, _ := utils.SplitDidUrlIntoDidAndFragment(id)
+		if did == signer.Signer {
+			pubKey, err := FindPublicKey(signer, id)
+			if err != nil {
+				return false, err
+			}
+
+			signature, err := base64.StdEncoding.DecodeString(signature)
+			if err != nil {
+				return false, err
+			}
+
+			result = result && ed25519.Verify(pubKey, signingInput, signature)
+		}
+	}
+
+	return result, nil
+}
+
+func FindPublicKey(signer types.Signer, id string) (ed25519.PublicKey, error) {
+	for _, authentication := range signer.Authentication {
+		if authentication == id {
+			for _, vm := range signer.VerificationMethod {
+				if vm.Id == id {
+					return base58.Decode(vm.PublicKeyMultibase[1:]), nil
+				}
+			}
+
+			msg := fmt.Sprintf("Verification Method %s not found", id)
+			return nil, errors.New(msg)
+		}
+	}
+
+	msg := fmt.Sprintf("Authentication %s not found", id)
+	return nil, errors.New(msg)
 }

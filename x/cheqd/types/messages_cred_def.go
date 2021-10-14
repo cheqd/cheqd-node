@@ -1,5 +1,7 @@
 package types
 
+import "github.com/cheqd/cheqd-node/x/cheqd/utils"
+
 var _ IdentityMsg = &MsgCreateCredDef{}
 
 func NewMsgCreateCredDef(id string, schemaId string, tag string, signatureType string, controller []string, value *MsgCreateCredDef_ClType) *MsgCreateCredDef {
@@ -26,5 +28,33 @@ func (msg *MsgCreateCredDef) GetSigners() []Signer {
 }
 
 func (msg *MsgCreateCredDef) ValidateBasic() error {
+	if utils.IsNotDid(msg.Id) {
+		return ErrBadRequestIsNotDid.Wrap("Id")
+	}
+
+	if msg.Value == nil || msg.Value.Size() == 0 {
+		return ErrBadRequestIsRequired.Wrap("Value")
+	}
+
+	if len(msg.SchemaId) == 0 {
+		return ErrBadRequestIsRequired.Wrap("SchemaId")
+	}
+
+	if len(msg.SignatureType) == 0 {
+		return ErrBadRequestIsRequired.Wrap("SignatureType")
+	}
+
+	if utils.IsNotCredDefSignatureType(msg.SignatureType) {
+		return ErrBadRequest.Wrapf("%s is not allowed signature type", msg.SignatureType)
+	}
+
+	if len(msg.Controller) == 0 {
+		return ErrBadRequestIsRequired.Wrap("Controller")
+	}
+
+	if notValid, i := utils.ArrayContainsNotDid(msg.Controller); notValid {
+		return ErrBadRequestIsNotDid.Wrapf("Controller item %s", msg.Controller[i])
+	}
+
 	return nil
 }
