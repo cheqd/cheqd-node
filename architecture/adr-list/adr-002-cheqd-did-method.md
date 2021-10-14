@@ -4,8 +4,10 @@
 
 | Category | Status |
 | :--- | :--- |
+| **Authors** | Renata Toktar, Brent Zundel, Ankur Banerjee |
 | **ADR Stage** | PROPOSED |
-| **Implementation Status** | Not Implemented |
+| **Implementation Status** | Implementation in progress |
+| **Start Date** | 2021-09-23 |
 
 ## Summary
 
@@ -86,10 +88,7 @@ All identity requests will have the following format:
       "verification method id": "signature"
       // Multiple verification methods and corresponding signatures can be added here
     },
-  "requestId": "<unique request identifier>",
-  "metadata": {
-    "versionId": "<transaction_hash>"
-  }
+  "metadata": {}
 }
 ```
 
@@ -106,9 +105,7 @@ Needed for a reply protection.
 - **`metadata`**: Dictionary with additional metadata fields. Empty for now.
 This fields provides extensibility in the future, e.g., it can contain
 `protocolVersion` or other relevant metadata associated with a request.
-  - **`versionId`**: String with a previous entity version transaction hash.
-  Acceptable only for DIDDoc updating. This field is needed for a replay
-  protection.
+
   
 #### `DID` transactions
 
@@ -244,8 +241,10 @@ from all new controllers.
 
 If there is a DID entry on the ledger with the specified DID (`DID.id`), then
 this considered a request for updating an existing DID.
-For updating `versionId` from `WriteRequest.metadata` should be filled by a
-transaction hash of the previous DIDDoc version.
+
+For updating `versionId` from `UpdateDIDRequest` should be filled by a
+transaction hash of the previous DIDDoc version. It is needed for a replay
+  protection.
 
 **Note**: The field `signatures`(from `WriteRequest`) must contain signatures
 from all old controllers and all new controllers.
@@ -352,7 +351,7 @@ Schema Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue/schema`
 
 `id` example: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
 
-[Link to DidDocumentMetadata description](#did-document-metadata)
+[Link to DidDocumentMetadata description](#resolve-did)
 
 #### `CRED_DEF`
 
@@ -401,9 +400,9 @@ definition controller(s). All DIDs must exist.
 
 Don't store Schema DIDDoc in the State.
 
-Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
+CredDef URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
 
-Schema Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue/credDef`
+CredDef Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue/credDef`
 
 `CRED_DEF` DID Document transaction format:
 ```jsonc
@@ -535,7 +534,7 @@ Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
 
 `id` example: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
 
-[Link to DidDocumentMetadata description](#did-document-metadata)
+[Link to DidDocumentMetadata description](#resolve-did)
 
 #### Cred Def options not used
 
@@ -571,7 +570,7 @@ CredDef URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<cred_def_entity_id>`
 
 `CRED_DEF` state format:
 
-Stored inside [DIDDoc](#diddoc-state-format)
+Stored inside [DIDDoc](#resolve-did)
 
 ## Consequences
 
@@ -594,3 +593,10 @@ the data written to cheqd testnet with legacy states will not be retained.
 
 - [Hyperledger Indy Identity transactions](https://github.com/hyperledger/indy-node/blob/master/docs/source/transactions.md)
 - [W3 DID Spec](https://www.w3.org/TR/did-core/)
+
+## Unresolved questions
+
+- Describe the resolution process for DID
+- Describe the deactivation process
+- Add security considerations 
+- Add privacy considerations
