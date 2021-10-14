@@ -1,4 +1,5 @@
 #!/bin/bash
+sudo chmod -R 777 /etc/cheqd-node
 cd
 cheqd-noded init node5
 NODE0_IP=$(docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} docker_compose_node0_1)
