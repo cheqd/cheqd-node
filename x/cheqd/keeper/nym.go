@@ -59,7 +59,7 @@ func (k Keeper) AppendNym(
 	}
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.NymKey))
-	value := k.cdc.MustMarshalBinaryBare(&nym)
+	value := k.cdc.MustMarshal(&nym)
 	store.Set(GetNymIDBytes(nym.Id), value)
 
 	// Update nym count
@@ -71,7 +71,7 @@ func (k Keeper) AppendNym(
 // SetNym set a specific nym in the store
 func (k Keeper) SetNym(ctx sdk.Context, nym types.Nym) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.NymKey))
-	b := k.cdc.MustMarshalBinaryBare(&nym)
+	b := k.cdc.MustMarshal(&nym)
 	store.Set(GetNymIDBytes(nym.Id), b)
 }
 
@@ -79,7 +79,7 @@ func (k Keeper) SetNym(ctx sdk.Context, nym types.Nym) {
 func (k Keeper) GetNym(ctx sdk.Context, id uint64) types.Nym {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.NymKey))
 	var nym types.Nym
-	k.cdc.MustUnmarshalBinaryBare(store.Get(GetNymIDBytes(id)), &nym)
+	k.cdc.MustUnmarshal(store.Get(GetNymIDBytes(id)), &nym)
 	return nym
 }
 
@@ -109,7 +109,7 @@ func (k Keeper) GetAllNym(ctx sdk.Context) (list []types.Nym) {
 
 	for ; iterator.Valid(); iterator.Next() {
 		var val types.Nym
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &val)
+		k.cdc.MustUnmarshal(iterator.Value(), &val)
 		list = append(list, val)
 	}
 

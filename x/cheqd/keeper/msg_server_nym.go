@@ -10,20 +10,7 @@ import (
 )
 
 func (k msgServer) CreateNym(goCtx context.Context, msg *types.MsgCreateNym) (*types.MsgCreateNymResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	id := k.AppendNym(
-		ctx,
-		msg.Creator,
-		msg.Alias,
-		msg.Verkey,
-		msg.Did,
-		msg.Role,
-	)
-
-	return &types.MsgCreateNymResponse{
-		Id: id,
-	}, nil
+	return nil, sdkerrors.Wrap(sdkerrors.ErrNotSupported, "NYM creation isn't supported")
 }
 
 func (k msgServer) UpdateNym(goCtx context.Context, msg *types.MsgUpdateNym) (*types.MsgUpdateNymResponse, error) {

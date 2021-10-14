@@ -32,7 +32,7 @@ Details on how identity transactions are defined is available in [ADR 002: Ident
    deliver_tx: TxResult {
       code: 0,
       data: Some(Data([...])),
-      log: "[{\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"send\"},{\"key\":\"sender\",\"value\":\"cosmos1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"cosmos1pvnjjy3vz0ga6hexv32gdxydzxth7f86mekcpg\"},{\"key\":\"sender\",\"value\":\"cosmos1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd\"},{\"key\":\"amount\",\"value\":\"100cheq\"}]}]}]",
+      log: "[{\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"send\"},{\"key\":\"sender\",\"value\":\"cheqd1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"cheqds1pvnjjy3vz0ga6hexv32gdxydzxth7f86mekcpg\"},{\"key\":\"sender\",\"value\":\"cheqd1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd\"},{\"key\":\"amount\",\"value\":\"1000ncheq\"}]}]}]",
       info: "",
       gas_wanted: 0,
       gas_used: 0,
@@ -58,7 +58,7 @@ Details on how identity transactions are defined is available in [ADR 002: Ident
 
 #### Request format
 
-```text
+```json
 CreateDidRequest 
 {
     "data": {
@@ -441,20 +441,19 @@ Request
 * `path`: Path for RPC endpoint for cheqd pool
 * `data`: Query with an entity key from a state. String `cred_def:<owner>:<schema_id>:<tag>:<signature_type>` encoded to bytes
 * `height`: Ledger height \(size\). `None` for auto calculation
-* `prove`: Boolean value. `True` for getting state proof in a pool response. 
+* `prove`: Boolean value. `True` for getting state proof in a pool response.
 
 #### Response format
 
-```text
+```jsonc
 QueryGetCredDefResponse{
-        "cred_def": {
-                "signature_type": "CL",
-                "schema_id": "schema:GEzcdDLhCpGCYRHW82kjHd:Degree:1.0",
-                "tag": "some_tag",    
-                "cred_def": {
-                    "primary": ....,
-                    "revocation": ....
-         },
+    "cred_def": {
+            "signature_type": "CL",
+            "schema_id": "schema:GEzcdDLhCpGCYRHW82kjHd:Degree:1.0",
+            "tag": "some_tag",    
+            "cred_def": {
+                "primary": "...",// Primary
+                "revocation": "..." // Revocation registry
+        },
 }
 ```
-
