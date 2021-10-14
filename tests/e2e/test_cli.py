@@ -7,9 +7,10 @@ import pytest
 IMPLICIT_TIMEOUT = 30
 ENCODING = "utf-8"
 READ_BUFFER = 6000
+TEST_NET_DESTINATION = "--node 'http://18.222.221.192:26657' --chain-id 'cheqd-testnet-2'"
 
 
-# @pytest.mark.skip
+@pytest.mark.skip
 @pytest.mark.parametrize(
         "command, expected_output",
         [
@@ -25,7 +26,7 @@ def test_basic(command, expected_output):
     cli.expect(expected_output)
 
 
-# @pytest.mark.skip
+@pytest.mark.skip
 @pytest.mark.parametrize(
         "command, params, expected_output",
         [
@@ -47,7 +48,7 @@ def test_keys(command, params, expected_output):
 @pytest.mark.parametrize(
         "command, params, expected_output",
         [
-            ("staking", "validators", r"pagination:(.*?)validators:"),
+            ("staking validators", f"{TEST_NET_DESTINATION}", r"pagination:(.*?)validators:"),
         ]
     )
 def test_query(command, params, expected_output):
@@ -57,15 +58,21 @@ def test_query(command, params, expected_output):
     cli.expect(expected_output)
 
 
+@pytest.mark.parametrize(
+        "command, params, expected_output",
+        [
+            ("bank send", f"{TEST_NET_DESTINATION}", r""),
+        ]
+    )
+def test_tx(command, params, expected_output):
+    command_base = "cheqd-noded tx"
+    cli = pexpect.spawn(f"{command_base} {command} {params}", encoding=ENCODING, timeout=IMPLICIT_TIMEOUT)
+    cli.logfile = sys.stdout
+    cli.expect(expected_output)
+
+
 # def test_tendermint():
 #     command_base = "cheqd-noded tendermint"
-#     cli = pexpect.spawn(f"{command_base} {command} {params}", encoding=ENCODING, timeout=IMPLICIT_TIMEOUT)
-#     cli.logfile = sys.stdout
-#     cli.expect(expected_output)
-
-
-# def test_tx():
-#     command_base = "cheqd-noded tx"
 #     cli = pexpect.spawn(f"{command_base} {command} {params}", encoding=ENCODING, timeout=IMPLICIT_TIMEOUT)
 #     cli.logfile = sys.stdout
 #     cli.expect(expected_output)
