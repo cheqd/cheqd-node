@@ -8,6 +8,11 @@ IMPLICIT_TIMEOUT = 30
 ENCODING = "utf-8"
 READ_BUFFER = 6000
 TEST_NET_DESTINATION = "--node 'http://18.222.221.192:26657' --chain-id 'cheqd-testnet-2'"
+TEST_NET_FEES = "--gas 70000 --gas-prices 25ncheq"
+YES_FLAG = "-y"
+
+sender = "cheqd1ece09txhq6nm9fkft9jh3mce6e48ftescs5jsw"
+receiver = "cheqd16d72a6kusmzml5mjhzjv63c9j5xnpsyqs8f3sk"
 
 
 def run(command_base, command, params, expected_output):
@@ -47,11 +52,12 @@ def test_keys(command, params, expected_output):
     run(command_base, command, params, expected_output)
 
 
-@pytest.mark.skip
+# @pytest.mark.skip
 @pytest.mark.parametrize(
         "command, params, expected_output",
         [
             ("staking validators", f"{TEST_NET_DESTINATION}", r"pagination:(.*?)validators:"),
+            ("bank balances", f"{sender} {TEST_NET_DESTINATION}", r"balances:(.*?)amount:(.*?)denom: ncheq(.*?)pagination:"),
         ]
     )
 def test_query(command, params, expected_output):
@@ -63,7 +69,10 @@ def test_query(command, params, expected_output):
 @pytest.mark.parametrize(
         "command, params, expected_output",
         [
-            ("bank send", f"{TEST_NET_DESTINATION}", r"Error: accepts 3 arg\(s\), received 0"),
+            ("bank send", "", r"Error: accepts 3 arg\(s\), received 0"),
+            ("bank send", f"{sender} {receiver} 0ncheq {TEST_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", r"Error: : invalid coins"),
+            ("bank send", f"{sender} {receiver} 1ncheq {TEST_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", r"\"code\":0(.*?)\"value\":\"1ncheq\""),
+            ("bank send", f"{sender} {receiver} 99ncheq {TEST_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", r"\"code\":0(.*?)\"value\":\"99ncheq\""),
         ]
     )
 def test_tx(command, params, expected_output):

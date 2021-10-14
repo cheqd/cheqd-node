@@ -165,18 +165,18 @@ jobs:
       - name: Build CLI to run commands
         run: starport chain build
 
-      - name: Build node image
-        run: |
-          docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node .
+      # - name: Build node image
+      #   run: |
+      #     docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node .
 
-      - name: Set up 4 validators + 2 observers node docker pool
-        run: |
-          cd tests/networks/docker_compose
-          ./gen_node_configs.sh
-          ./run_docker.sh > /dev/null &
-          sleep 15
-          [[ $(docker ps | wc -l) == 7 ]] && echo "6 pool containers are running!" || exit 1
-          cheqd-noded status
+      # - name: Set up 4 validators + 2 observers node docker pool
+      #   run: |
+      #     cd tests/networks/docker_compose
+      #     ./gen_node_configs.sh
+      #     ./run_docker.sh > /dev/null &
+      #     sleep 15
+      #     [[ $(docker ps | wc -l) == 7 ]] && echo "6 pool containers are running!" || exit 1
+      #     cheqd-noded status
 
       - name: Set up tests
         run: |
