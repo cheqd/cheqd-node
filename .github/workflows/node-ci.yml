@@ -126,7 +126,7 @@ jobs:
           ./add_observer.sh
           ./wait.sh '[[ $(cheqd-noded status -n '"'"'tcp://localhost:26677'"'"' 2>&1 | wc -l) == 1 ]] && echo "New node returns status!"'
 
-      - name: Promote observer to validator
+      - name: Promote observer to validator # remove last assertion before merging!
         run: |
           cd tests/networks/docker_compose
           ./promote_validator.sh
@@ -137,14 +137,10 @@ jobs:
       - name: Gather logs on failure
         if: ${{ failure() }}
         run: |
-          curl --request POST \
-          --url https://api.github.com/repos/${{ github.repository }}/issues \
-          --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
-          --header 'content-type: application/json' \
-          --data '{
-            "title": "Issue created due to workflow fialure: ${{ github.run_id }}",
-            "body": "This issue was automatically created by the GitHub Action workflow **${{ github.workflow }}**. \n\n due to failure in run: _${{ github.run_id }}_."
-            }'
+          sudo chmod -R 777 /var/log/cheqd-node
+          sudo chown -R runner:docker /var/log/cheqd-node
+          ls -la /var/log/cheqd-node
+          ls /var/log/cheqd-node | xargs cat
 
   # run-cosmos-specific-tests:
   #   name: Run cosmos-specific tests using cheqd-node CLI
