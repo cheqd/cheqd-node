@@ -9,14 +9,15 @@ import "gogoproto/gogo.proto";
 message Did {
   string id = 1;
   repeated string controller = 2; //optional
-  repeated VerificationMethod verificationMethod = 3; // optional
+  repeated VerificationMethod verification_method = 3; // optional
   repeated string authentication = 4; // optional
   repeated string assertionMethod = 5; // optional
-  repeated string capabilityInvocation = 6; // optional
-  repeated string capabilityDelegation = 7; // optional
-  repeated string keyAgreement = 8; // optional
-  repeated string alsoKnownAs = 9; // optional
-  repeated DidService service = 10; // optional
+  repeated string capability_invocation = 6; // optional
+  repeated string capability_delegation = 7; // optional
+  repeated string key_agreement = 8; // optional
+  repeated DidService service = 9; // optional
+  repeated string also_known_as = 10; // optional
+  repeated string context = 11;
 }
 
 message VerificationMethod {
