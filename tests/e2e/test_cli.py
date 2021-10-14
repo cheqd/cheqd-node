@@ -52,7 +52,7 @@ def test_keys(command, params, expected_output):
     run(command_base, command, params, expected_output)
 
 
-# @pytest.mark.skip
+@pytest.mark.skip
 @pytest.mark.parametrize(
         "command, params, expected_output",
         [
@@ -65,7 +65,7 @@ def test_query(command, params, expected_output):
     run(command_base, command, params, expected_output)
 
 
-# @pytest.mark.skip
+@pytest.mark.skip
 @pytest.mark.parametrize(
         "command, params, expected_output",
         [
@@ -80,6 +80,13 @@ def test_tx(command, params, expected_output):
     run(command_base, command, params, expected_output)
 
 
-# def test_tendermint():
-#     command_base = "cheqd-noded tendermint"
-#     run(command_base, command, params, expected_output)
+@pytest.mark.skip
+@pytest.mark.parametrize(
+        "command, params, expected_output",
+        [
+            ("show-validator", "", r"\"\@type\":(.*?)\"key\":"),
+        ]
+    )
+def test_tendermint(command, params, expected_output):
+    command_base = "cheqd-noded tendermint"
+    run(command_base, command, params, expected_output)
