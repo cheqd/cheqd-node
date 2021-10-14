@@ -27,7 +27,7 @@ Tokens collected through this process accumulate in the **community pool**. The 
 
 ### Community tax collection
 
-From [Cosmos SDK documentation, `distribution` module](https://docs.cosmos.network/v0.43/modules/distribution/03_begin_block.html#reward-to-the-community-pool):
+From [Cosmos SDK documentation, `distribution` module](https://docs.cosmos.network/master/modules/distribution/03_begin_block.html#reward-to-the-community-pool):
 
 > The community pool gets `community_tax * fees`, plus any remaining dust after validators get their rewards that are always rounded down to the nearest integer value.
 

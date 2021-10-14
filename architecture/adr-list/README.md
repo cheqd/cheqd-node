@@ -16,7 +16,7 @@ description: >-
 
 ## Proposed
 
-1. [ADR 002: **Identity entities and transactions**](adr-002-identity-transactions.md)
+1. [ADR 002: **Cheqd DID method, identity entities, and transactions**](adr-002-cheqd-did-method.md)
 
 ## Draft
 
