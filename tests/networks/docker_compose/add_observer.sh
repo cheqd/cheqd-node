@@ -12,6 +12,8 @@ cp ~/.cheqdnode/config/* /etc/cheqd-node/               # /var/lib/cheqd/.cheqdn
 cp ~/.cheqdnode/data/* /var/lib/cheqd/data/             # /var/lib/cheqd/.cheqdnode/data    ->    /var/lib/cheqd/data
 cp ${NODE_CONFIGS_BASE}/node0/.cheqdnode/config/genesis.json /etc/cheqd-node/
 sudo chmod -R 777 /etc/cheqd-node
+sudo chmod -R 777 /var/lib/cheqd/data
+ls -la /etc/cheqd-node
 ls -la /etc/cheqd-node
 sudo systemctl start cheqd-noded
 systemctl status cheqd-noded
