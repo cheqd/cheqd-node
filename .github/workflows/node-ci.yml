@@ -126,21 +126,20 @@ jobs:
           ./add_observer.sh
           ./wait.sh '[[ $(cheqd-noded status -n '"'"'tcp://localhost:26677'"'"' 2>&1 | wc -l) == 1 ]] && echo "New node returns status!"'
 
-      - name: Promote observer to validator # remove last assertion before merging!
+      - name: Promote observer to validator
         run: |
           cd tests/networks/docker_compose
           ./promote_validator.sh
           cheqd-noded query staking validators --node "http://localhost:26657" | sed -nr 's/.*status: (.*?).*/\1/p' $1 | while read x; do [[ "BOND_STATUS_BONDED" == $x ]] && echo "Validator's status is bonded!" || exit 1 ; done
           ./wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*signature": (.*?).*/\1/p'"'"' | wc -l) == 5 ]] && echo "There are 5 validators signatures in block!"'
-          ./wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*(signature": null).*/\1/p'"'"' | wc -l) == 0 ]] && echo "There are no null signatures in block!"'
 
-      - name: Gather logs on failure
-        if: ${{ failure() }}
-        run: |
-          sudo chmod -R 777 /var/log/cheqd-node
-          sudo chown -R runner:docker /var/log/cheqd-node
-          ls -la /var/log/cheqd-node
-          ls /var/log/cheqd-node | xargs cat
+      # - name: Gather logs on failure
+      #   if: ${{ failure() }}
+      #   run: |
+      #     sudo chmod -R 777 /var/log/cheqd-node
+      #     sudo chown -R runner:docker /var/log/cheqd-node
+      #     ls -la /var/log/cheqd-node
+      #     ls /var/log/cheqd-node | xargs cat
 
   # run-cosmos-specific-tests:
   #   name: Run cosmos-specific tests using cheqd-node CLI
