@@ -11,7 +11,7 @@ sed -ri "s|laddr = \"tcp://0.0.0.0:26656\"|laddr = \"tcp://0.0.0.0:26676\"|" ~/.
 cp ~/.cheqdnode/config/* /etc/cheqd-node/               # /var/lib/cheqd/.cheqdnode/config    ->    /etc/cheqd-node/
 cp ~/.cheqdnode/data/* /var/lib/cheqd/data/             # /var/lib/cheqd/.cheqdnode/data    ->    /var/lib/cheqd/data
 cp ${NODE_CONFIGS_BASE}/node0/.cheqdnode/config/genesis.json /etc/cheqd-node/
-sudo chmod -R 777 /etc/cheqd-node
-sudo chmod -R 777 /var/lib/cheqd/data
+sudo chmod -R 755 /etc/cheqd-node
+sudo chmod -R 755 /var/lib/cheqd/data
 sudo systemctl start cheqd-noded
 systemctl status cheqd-noded
