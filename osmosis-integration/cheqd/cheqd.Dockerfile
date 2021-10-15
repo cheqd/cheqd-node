@@ -8,7 +8,8 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     protobuf-compiler \
     libprotobuf-dev \
     wget \
-    git
+    git \
+    nano
 
 # Starport
 # RUN curl https://get.starport.network/starport! | bash

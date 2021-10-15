@@ -18,3 +18,10 @@ services:
     ports:
       - "26666:26656" # p2p
       - "26667:26657" # rpc
+
+  hermes:
+    image: hermes
+    build:
+      context: ./hermes
+      dockerfile: hermes.Dockerfile
+    entrypoint: tail -f /dev/null
