@@ -11,13 +11,21 @@
 
 ## Summary
 
-This ADR summarises the identity entities, queries, and transaction types for
-the cheqd network and defines the cheqd DID Method. These transactions enable
-similar use cases as those currently supported by
-[Hyperledger Indy](https://github.com/hyperledger/indy-node), a verifiable data
-registry built for self-sovereign identity (SSI) with a strong privacy focus.
+This ADR defines the cheqd DID method and describes the identity entities, queries, and transaction types for the cheqd network.
+
+[Decentralized identifiers](https://www.w3.org/TR/did-core) (DIDs) are a type of identifier that enables verifiable, decentralized digital identity. A DID refers to any subject (for example, a person, organization, thing, data model, abstract entity, and so on) as determined by the controller of the DID.
+
+The identity entities and transactions for the cheqd network are designed to support usage scenarios and functionality currently supported by [Hyperledger Indy](https://github.com/hyperledger/indy-node).
 
 ## Context
+
+### Rationale for baselining against Hyperledger Indy
+
+Hyperledger Indy is a verifiable data registry (VDR) built for DIDs with a strong focus on privacy-preserving techniques. It is one of the most widely-adopted self-sovereign identity (SSI) blockchain ledgers; most notably by the [Sovrin network](https://sovrin.org/overview/).
+
+
+
+However, as the core of Hyperledger Indy's architecture was designed before the [W3C DID specification](https://www.w3.org/TR/did-core/) started to be defined, the [Indy DID Method](https://hyperledger.github.io/indy-did-method/) (`did:indy`) has aspects that are not fully-compliant with latest specifications.
 
 Hyperledger Indy contains the following
 [identity domain transactions](https://github.com/hyperledger/indy-node/blob/master/docs/source/transactions.md):
@@ -40,12 +48,12 @@ differences stem primarily from our conformance to
 capabilities of the underlying
 [Cosmos blockchain framework](https://github.com/cosmos/cosmos-sdk) that we use.
 
-## Decision - cheqd DID Method
-The cheqd DID Method will conform to 
-[Decentralized Identifiers v1.0](https://github.com/w3c/did-core) with the goal
-of maximizing interoperability with other compatible tools and projects.
+## Decision
+
+The cheqd DID Method will conform to [Decentralized Identifiers v1.0](https://github.com/w3c/did-core) with the goal of maximizing interoperability with other compatible tools and projects.
 
 ### Syntax
+
 As with all DIDs, cheqd identifiers begin with the string `did:`.
 
 #### DID Method Name
@@ -576,12 +584,7 @@ Stored inside [DIDDoc](#resolve-did)
 
 ### Backward Compatibility
 
-- `cheqd-node` [release v0.1.17](https://github.com/cheqd/cheqd-node/releases/tag/v0.1.17)
-and earlier had a transaction type called `NYM` which would allow
-writing/reading a unique identifier on ledger. However, this `NYM` state was not
-fully defined as a DID method and did not contain DID Documents that resolved
-when the DID identifier was read. This `NYM` transaction type is deprecated and
-the data written to cheqd testnet with legacy states will not be retained.
+- `cheqd-node` [release v0.1.17](https://github.com/cheqd/cheqd-node/releases/tag/v0.1.17) and earlier had a transaction type called `NYM` which would allow writing/reading a unique identifier on ledger. However, this `NYM` state was not fully defined as a DID method and did not contain DID Documents that resolved when the DID identifier was read. This `NYM` transaction type is deprecated and the data written to cheqd testnet with legacy states will not be retained.
 
 ### Positive
 
