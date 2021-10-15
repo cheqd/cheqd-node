@@ -8,17 +8,17 @@ import (
 )
 
 // HasDidDoc checks if the did exist in the store
-func (k Keeper) HasDidDoc(ctx sdk.Context, id string) error {
-	if k.HasDid(ctx, id) {
-		return sdkerrors.Wrap(types.ErrDidDocExists, fmt.Sprintf("DID DOC already exists for DID %s", id))
+func (k Keeper) HasDidDoc(ctx sdk.Context, did string) error {
+	if k.HasDid(ctx, did) {
+		return sdkerrors.Wrap(types.ErrDidDocExists, fmt.Sprintf("DID DOC already exists for DID %s", did))
 	}
 
-	if k.HasSchema(ctx, id) {
-		return sdkerrors.Wrap(types.ErrDidDocExists, fmt.Sprintf("DID DOC already exists for Schema %s", id))
+	if k.HasSchema(ctx, did+"/schema") {
+		return sdkerrors.Wrap(types.ErrDidDocExists, fmt.Sprintf("DID DOC already exists for Schema %s", did))
 	}
 
-	if k.HasCredDef(ctx, id) {
-		return sdkerrors.Wrap(types.ErrDidDocExists, fmt.Sprintf("DID DOC already exists for CredDef %s", id))
+	if k.HasCredDef(ctx, did+"/credDef") {
+		return sdkerrors.Wrap(types.ErrDidDocExists, fmt.Sprintf("DID DOC already exists for CredDef %s", did))
 	}
 
 	return nil
