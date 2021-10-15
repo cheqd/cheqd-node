@@ -7,8 +7,9 @@ import pytest
 IMPLICIT_TIMEOUT = 30
 ENCODING = "utf-8"
 READ_BUFFER = 6000
-TEST_NET_DESTINATION = "--node 'http://18.222.221.192:26657' --chain-id 'cheqd-testnet-2'"
-TEST_NET_FEES = "--gas 70000 --gas-prices 25ncheq"
+TEST_NET_DESTINATION = "--node 'tcp://seed1.us.testnet.cheqd.network:26657' --chain-id 'cheqd-testnet-2'"
+TEST_NET_FEES = "--fees 5000000ncheq"
+TEST_NET_GAS_X_GAS_PRICES = "--gas 70000 --gas-prices 25ncheq"
 YES_FLAG = "-y"
 
 sender = "cheqd1ece09txhq6nm9fkft9jh3mce6e48ftescs5jsw"
@@ -58,22 +59,26 @@ def test_keys(command, params, expected_output):
         [
             ("staking validators", f"{TEST_NET_DESTINATION}", r"pagination:(.*?)validators:"),
             ("bank balances", f"{sender} {TEST_NET_DESTINATION}", r"balances:(.*?)amount:(.*?)denom: ncheq(.*?)pagination:"),
+            # ("tx"),
         ]
     )
 def test_query(command, params, expected_output):
     command_base = "cheqd-noded query"
     run(command_base, command, params, expected_output)
 
-
+# + --note
 # @pytest.mark.skip
 @pytest.mark.parametrize(
         "command, params, expected_output",
         [
-            ("bank send", "", r"Error: accepts 3 arg\(s\), received 0"),
-            ("bank send", f"{sender} {receiver} 0ncheq {TEST_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", r"Error: : invalid coins"),
-            ("bank send", f"{sender} {receiver} 1ncheq {TEST_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", r"\"code\":0(.*?)\"value\":\"1ncheq\""),
+            ("bank send", "", r"Error: accepts 3 arg\(s\), received 0"), # no args
+            ("bank send", f"{sender} {receiver} 0ncheq {TEST_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", r"Error: : invalid coins"), # 0
+            ("bank send", f"{sender} {receiver} 1ncheq {TEST_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", r"\"code\":0(.*?)\"value\":\"1ncheq\""), # 1 + fees
+            ("bank send", f"{sender} {receiver} 2ncheq {TEST_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG}", r"\"code\":0(.*?)\"value\":\"2ncheq\""), # 2 + gas x price
             ("bank send", f"{sender} {receiver} 99ncheq {TEST_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", r"\"code\":0(.*?)\"value\":\"99ncheq\""),
-            ("bank send", f"{receiver} {sender} 1ncheq {TEST_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", r"\"code\":0(.*?)\"value\":\"1ncheq\""),
+            ("bank send", f"{sender} {receiver} 99ncheq {TEST_NET_DESTINATION} {YES_FLAG}", r"\"code\":13(.*?)insufficient fees"),
+            ("bank send", f"{receiver} {sender} 2ncheq {TEST_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", r"\"code\":0(.*?)\"value\":\"2ncheq\""), # transfer back 2 + fees
+            ("bank send", f"{receiver} {sender} 1ncheq {TEST_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG}", r"\"code\":0(.*?)\"value\":\"1ncheq\""), # transfer back 1 + gas x price
             ("bank send", f"{receiver} {sender} 999999999ncheq {TEST_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", r"\"code\":5(.*?)insufficient funds"),
         ]
     )
@@ -86,6 +91,8 @@ def test_tx(command, params, expected_output):
 @pytest.mark.parametrize(
         "command, params, expected_output",
         [
+            ("show-address", "", r"cheqd(.*?)"),
+            ("show-node-id", "", r"^.{40}$"),
             ("show-validator", "", r"\"\@type\":(.*?)\"key\":"),
         ]
     )
