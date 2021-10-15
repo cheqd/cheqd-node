@@ -100,7 +100,7 @@ jobs:
 
       # It looks ugly cause starport chain build --release creates archive without version.
       - name: Untar release
-        run: tar xzvf release/cheqd-node_linux_amd64.tar.gz && cp release/cheqd-noded /home/runner/go/bin/
+        run: tar xzvf release/cheqd-node_linux_amd64.tar.gz && cp cheqd-noded /home/runner/go/bin/
 
       - name: Changing version for deb packaging
         run: |
