@@ -44,7 +44,7 @@ jobs:
 
       - name: Login to docker
         run: |
-          echo ${{ secrets.GH_PAT }} | docker login ghcr.io --username ${{ secrets.GH_USER }} --password-stdin
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io --username ${{ secrets.GH_USER }} --password-stdin
       - name: Build node image
         run: |
           docker build -f docker/cheqd_node/Dockerfile.release \
