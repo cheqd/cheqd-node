@@ -17,8 +17,6 @@ jobs:
   setup-workflow:
     name: "Setup workflow"
     runs-on: ubuntu-latest
-    env:
-      STARPORT_RELEASE_PARAMS: "--release"
     outputs:
       GITHUB_REPOSITORY_NAME: ${{ steps.cache.outputs.GITHUB_REPOSITORY_NAME }}
       VERSION: ${{ steps.cache.outputs.VERSION }}
@@ -42,6 +40,7 @@ jobs:
       GITHUB_REPOSITORY_NAME: ${{ needs.setup-workflow.outputs.GITHUB_REPOSITORY_NAME }}
       VERSION: ${{ needs.setup-workflow.outputs.VERSION }}
       TESTNET_IMAGE_NAME: "cheqd-testnet"
+      STARPORT_RELEASE_PARAMS: "--release"
     steps:
       - name: Git checkout
         uses: actions/checkout@v2
@@ -53,7 +52,7 @@ jobs:
         run: |
           docker build -f docker/cheqd_node/Dockerfile.release \
               --no-cache \
-              --build-arg STARPORT_RELEASE_PARAMS=${{ needs.setup-workflow.env.STARPORT_RELEASE_PARAMS }} \
+              --build-arg STARPORT_RELEASE_PARAMS=${{ env.STARPORT_RELEASE_PARAMS }} \
               -t cheqd-node .
       - name: Build testnet image
         run: |
@@ -81,6 +80,7 @@ jobs:
       OUTPUT_DIR: "output"
       PACKAGE_NAME: "cheqd-node"
       RELEASE_TAG: ${{ needs.setup-workflow.outputs.VERSION }}
+      STARPORT_RELEASE_PARAMS: "--release"
     steps:
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
@@ -96,7 +96,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build
-        run: starport chain build ${{ needs.setup-workflow.env.STARPORT_BUILD_PARAMS }}
+        run: starport chain build ${{ env.STARPORT_RELEASE_PARAMS }}
 
       # It looks ugly cause starport chain build --release creates archive without version.
       - name: Untar release
