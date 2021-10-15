@@ -65,7 +65,7 @@ def test_query(command, params, expected_output):
     run(command_base, command, params, expected_output)
 
 
-@pytest.mark.skip
+# @pytest.mark.skip
 @pytest.mark.parametrize(
         "command, params, expected_output",
         [
@@ -73,6 +73,8 @@ def test_query(command, params, expected_output):
             ("bank send", f"{sender} {receiver} 0ncheq {TEST_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", r"Error: : invalid coins"),
             ("bank send", f"{sender} {receiver} 1ncheq {TEST_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", r"\"code\":0(.*?)\"value\":\"1ncheq\""),
             ("bank send", f"{sender} {receiver} 99ncheq {TEST_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", r"\"code\":0(.*?)\"value\":\"99ncheq\""),
+            ("bank send", f"{receiver} {sender} 1ncheq {TEST_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", r"\"code\":0(.*?)\"value\":\"1ncheq\""),
+            ("bank send", f"{receiver} {sender} 999999999ncheq {TEST_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", r"\"code\":5(.*?)insufficient funds"),
         ]
     )
 def test_tx(command, params, expected_output):
