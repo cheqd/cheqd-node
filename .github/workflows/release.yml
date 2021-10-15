@@ -98,7 +98,7 @@ jobs:
       - name: Build
         run: starport chain build ${{ env.STARPORT_RELEASE_PARAMS }}
 
-      # It looks ugly cause starport chain build --release creates archive without version.
+      # It looks ugly cause starport chain build --release creates archive without version. 
       - name: Untar release
         run: tar xzvf release/cheqd-node_linux_amd64.tar.gz && cp release/cheqd-noded /home/runner/go/bin/
 
