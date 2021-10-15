@@ -1,10 +1,7 @@
 name: Release
 
 on:
-  workflow_dispatch:
   push:
-    branches:
-    - DEV-545
     paths-ignore:
     - '**.md'
     - 'docs/**'
@@ -57,18 +54,18 @@ jobs:
       - name: Build testnet image
         run: |
           docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
-#      - name: Push node image
-#        run: |
-#          docker tag cheqd-node ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
-#          docker tag cheqd-node ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:latest
-#          docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
-#          docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:latest
-#      - name: Push testnet image
-#        run: |
-#          docker tag cheqd-testnet ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:${{ env.VERSION }}
-#          docker tag cheqd-testnet ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:latest
-#          docker push ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:${{ env.VERSION }}
-#          docker push ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:latest
+      - name: Push node image
+        run: |
+          docker tag cheqd-node ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
+          docker tag cheqd-node ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:latest
+          docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
+          docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:latest
+      - name: Push testnet image
+        run: |
+          docker tag cheqd-testnet ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:${{ env.VERSION }}
+          docker tag cheqd-testnet ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:latest
+          docker push ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:${{ env.VERSION }}
+          docker push ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:latest
 
   publish-release:
     name: "Publish release"
@@ -133,11 +130,11 @@ jobs:
           name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
           path: build_tools/${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
 
-#      - uses: "marvinpinto/action-automatic-releases@latest"
-#        with:
-#          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-#          automatic_release_tag: "${{ env.RELEASE_TAG }}"
-#          prerelease: false
-#          files: |
-#            build_tools/${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
-#            build_tools/${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "${{ env.RELEASE_TAG }}"
+          prerelease: false
+          files: |
+            build_tools/${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+            build_tools/${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
