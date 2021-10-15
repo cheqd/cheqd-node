@@ -2,8 +2,6 @@ name: Release
 
 on:
   push:
-    branches:
-    - DEV-545
     paths-ignore:
     - '**.md'
     - 'docs/**'
@@ -136,11 +134,11 @@ jobs:
           name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
           path: build_tools/${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
 
-#      - uses: "marvinpinto/action-automatic-releases@latest"
-#        with:
-#          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-#          automatic_release_tag: "${{ env.RELEASE_TAG }}"
-#          prerelease: false
-#          files: |
-#            build_tools/${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
-#            build_tools/${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "${{ env.RELEASE_TAG }}"
+          prerelease: false
+          files: |
+            build_tools/${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+            build_tools/${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
