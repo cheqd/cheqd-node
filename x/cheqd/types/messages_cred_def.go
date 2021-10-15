@@ -1,6 +1,9 @@
 package types
 
-import "github.com/cheqd/cheqd-node/x/cheqd/utils"
+import (
+	"github.com/cheqd/cheqd-node/x/cheqd/utils"
+	"strings"
+)
 
 var _ IdentityMsg = &MsgCreateCredDef{}
 
@@ -28,7 +31,11 @@ func (msg *MsgCreateCredDef) GetSigners() []Signer {
 }
 
 func (msg *MsgCreateCredDef) ValidateBasic() error {
-	if utils.IsNotDid(msg.Id) {
+	if !strings.HasSuffix(msg.Id, "/credDef") {
+		return ErrBadRequest.Wrap("Id must end with resource type '/credDef'")
+	}
+
+	if utils.IsNotDid(msg.Id[:len(msg.Id)-8]) {
 		return ErrBadRequestIsNotDid.Wrap("Id")
 	}
 

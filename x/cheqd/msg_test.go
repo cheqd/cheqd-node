@@ -16,7 +16,7 @@ func TestNewMsgCreateCredDef(t *testing.T) {
 		{
 			true,
 			types.NewMsgCreateCredDef(
-				"did:cheqd:test:aaaaa",
+				"did:cheqd:test:aaaaa/credDef",
 				"schema",
 				"",
 				"CL-Sig-Cred_def",
@@ -27,7 +27,7 @@ func TestNewMsgCreateCredDef(t *testing.T) {
 		{
 			true,
 			types.NewMsgCreateCredDef(
-				"did:cheqd:test:aaaaa",
+				"did:cheqd:test:aaaaa/credDef",
 				"schema",
 				"tag",
 				"CL-Sig-Cred_def",
@@ -38,7 +38,7 @@ func TestNewMsgCreateCredDef(t *testing.T) {
 		{
 			false,
 			types.NewMsgCreateCredDef(
-				"",
+				"/credDef",
 				"",
 				"",
 				"",
@@ -49,7 +49,7 @@ func TestNewMsgCreateCredDef(t *testing.T) {
 		{
 			false,
 			types.NewMsgCreateCredDef(
-				"did:cheqd:test:alice#key-1",
+				"did:cheqd:test:alice#key-1/credDef",
 				"",
 				"",
 				"",
@@ -61,6 +61,17 @@ func TestNewMsgCreateCredDef(t *testing.T) {
 			false,
 			types.NewMsgCreateCredDef(
 				"did:cheqd:test:alice",
+				"",
+				"",
+				"",
+				nil,
+				&types.MsgCreateCredDef_ClType{ClType: &types.CredDefValue{Primary: nil, Revocation: nil}}),
+			"Id must end with resource type '/credDef': bad request",
+		},
+		{
+			false,
+			types.NewMsgCreateCredDef(
+				"did:cheqd:test:alice/credDef",
 				"",
 				"",
 				"",
@@ -71,7 +82,7 @@ func TestNewMsgCreateCredDef(t *testing.T) {
 		{
 			false,
 			types.NewMsgCreateCredDef(
-				"did:cheqd:test:alice",
+				"did:cheqd:test:alice/credDef",
 				"schema-1",
 				"",
 				"",
@@ -82,7 +93,7 @@ func TestNewMsgCreateCredDef(t *testing.T) {
 		{
 			false,
 			types.NewMsgCreateCredDef(
-				"did:cheqd:test:alice",
+				"did:cheqd:test:alice/credDef",
 				"schema-1",
 				"",
 				"ss",
@@ -93,7 +104,7 @@ func TestNewMsgCreateCredDef(t *testing.T) {
 		{
 			false,
 			types.NewMsgCreateCredDef(
-				"did:cheqd:test:alice",
+				"did:cheqd:test:alice/credDef",
 				"schema-1",
 				"",
 				"CL-Sig-Cred_def",
@@ -104,7 +115,7 @@ func TestNewMsgCreateCredDef(t *testing.T) {
 		{
 			false,
 			types.NewMsgCreateCredDef(
-				"did:cheqd:test:alice",
+				"did:cheqd:test:alice/credDef",
 				"schema-1",
 				"",
 				"CL-Sig-Cred_def",
@@ -115,7 +126,7 @@ func TestNewMsgCreateCredDef(t *testing.T) {
 		{
 			false,
 			types.NewMsgCreateCredDef(
-				"did:cheqd:test:alice",
+				"did:cheqd:test:alice/credDef",
 				"schema-1",
 				"",
 				"CL-Sig-Cred_def",
