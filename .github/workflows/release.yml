@@ -51,7 +51,7 @@ jobs:
           echo ${{ secrets.GH_PAT }} | docker login ghcr.io --username ${{ secrets.GH_USER }} --password-stdin
       - name: Build node image
         run: |
-          docker build -f docker/cheqd_node/Dockerfile \
+          docker build -f docker/cheqd_node/Dockerfile.release \
               --no-cache \
               --build-arg STARPORT_RELEASE_PARAMS=${{ needs.setup-workflow.env.STARPORT_RELEASE_PARAMS }} \
               -t cheqd-node .
@@ -98,6 +98,7 @@ jobs:
       - name: Build
         run: starport chain build ${{ needs.setup-workflow.env.STARPORT_BUILD_PARAMS }}
 
+      # It looks ugly cause starport chain build --release creates archive without version.
       - name: Untar release
         run: tar xzvf release/cheqd-node_linux_amd64.tar.gz && cp release/cheqd-noded /home/runner/go/bin/
 
