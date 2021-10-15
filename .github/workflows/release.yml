@@ -2,6 +2,8 @@ name: Release
 
 on:
   push:
+    branches:
+    - DEV-545
     paths-ignore:
     - '**.md'
     - 'docs/**'
@@ -15,6 +17,8 @@ jobs:
   setup-workflow:
     name: "Setup workflow"
     runs-on: ubuntu-latest
+    env:
+      STARPORT_RELEASE_PARAMS: "--release"
     outputs:
       GITHUB_REPOSITORY_NAME: ${{ steps.cache.outputs.GITHUB_REPOSITORY_NAME }}
       VERSION: ${{ steps.cache.outputs.VERSION }}
@@ -47,7 +51,10 @@ jobs:
           echo ${{ secrets.GH_PAT }} | docker login ghcr.io --username ${{ secrets.GH_USER }} --password-stdin
       - name: Build node image
         run: |
-          docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node .
+          docker build -f docker/cheqd_node/Dockerfile \
+              --no-cache \
+              --build-arg STARPORT_RELEASE_PARAMS=${{ needs.setup-workflow.env.STARPORT_RELEASE_PARAMS }} \
+              -t cheqd-node .
       - name: Build testnet image
         run: |
           docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
@@ -82,13 +89,17 @@ jobs:
 
       # There is an issue with the latest starport, especially 0.18 version
       - name: Install starport
-        run: wget -qO- https://github.com/tendermint/starport/releases/download/v0.17.3/starport_0.17.3_linux_amd64.tar.gz | tar xvz -C /tmp/ && sudo cp /tmp/starport /usr/bin
+        run: wget -qO- https://github.com/tendermint/starport/releases/download/v0.17.3/starport_0.17.3_linux_amd64.tar.gz \
+             | tar xvz -C /tmp/ && sudo cp /tmp/starport /usr/bin
 
       - name: Git checkout
         uses: actions/checkout@v2
 
       - name: Build
-        run: starport chain build
+        run: starport chain build ${{ needs.setup-workflow.env.STARPORT_BUILD_PARAMS }}
+
+      - name: Untar release
+        run: tar xzvf release/cheqd-node_linux_amd64.tar.gz && cp release/cheqd-noded /home/runner/go/bin/
 
       - name: Changing version for deb packaging
         run: |
@@ -121,11 +132,11 @@ jobs:
           name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
           path: build_tools/${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
 
-      - uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "${{ env.RELEASE_TAG }}"
-          prerelease: false
-          files: |
-            build_tools/${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
-            build_tools/${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+#      - uses: "marvinpinto/action-automatic-releases@latest"
+#        with:
+#          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+#          automatic_release_tag: "${{ env.RELEASE_TAG }}"
+#          prerelease: false
+#          files: |
+#            build_tools/${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+#            build_tools/${{ env.OUTPUT_DIR }}/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
