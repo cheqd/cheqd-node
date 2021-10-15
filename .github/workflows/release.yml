@@ -10,7 +10,7 @@ on:
     - 'docs/**'
     - 'architecture/**'
     - '.gitbook/**'
-    - '.github/**'
+#    - '.github/**'
     tags:
       - "v*"
 
