@@ -97,9 +97,8 @@ jobs:
         with:
           name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
 
-      - name: Install deb and jq
+      - name: Install deb
         run: |
-          sudo apt install jq
           sudo dpkg -i ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
 
       - name: Check out
@@ -138,19 +137,3 @@ jobs:
         if: ${{ failure() }}
         run: |
           journalctl -ex | grep cheqd
-
-  # run-cosmos-specific-tests:
-  #   name: Run cosmos-specific tests using cheqd-node CLI
-  #   runs-on: ubuntu-20.04
-  #   needs: build-images-and-set-up-pool
-  #   steps:
-  #     - name: Check out
-  #       uses: actions/checkout@v2
-
-  # run-identity-specific-tests:
-  #   name: Run identity-specific tests using cheqd-node CLI or VDR tools
-  #   runs-on: ubuntu-20.04
-  #   needs: build-images-and-set-up-pool
-  #   steps:
-  #     - name: Check out
-  #       uses: actions/checkout@v2
