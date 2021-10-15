@@ -3,7 +3,6 @@ sudo chmod -R 777 /etc/cheqd-node
 sudo chmod -R 777 /var/lib/cheqd/data
 cd
 cheqd-noded init node5
-# NODE0_IP=$(docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} docker_compose_node0_1)
 NODE0_IP="127.0.0.1"
 PEER0=$(cat ${NODE_CONFIGS_BASE}/node0/node_id.txt)@$NODE0_IP:26656
 sed -ri "s|peers = \".*\"|peers = \"${PEER0}\"|" ~/.cheqdnode/config/config.toml
