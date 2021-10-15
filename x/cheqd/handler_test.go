@@ -117,9 +117,11 @@ func TestHandler_CreateSchema(t *testing.T) {
 	receivedSchema, _ := setup.Keeper.GetSchema(setup.Ctx, schema.Id)
 
 	require.Equal(t, schema.Id, receivedSchema.Id)
+	require.Equal(t, msg.Type, receivedSchema.Type)
 	require.Equal(t, msg.Name, receivedSchema.Name)
 	require.Equal(t, msg.Version, receivedSchema.Version)
 	require.Equal(t, msg.AttrNames, receivedSchema.AttrNames)
+	require.Equal(t, msg.Controller, receivedSchema.Controller)
 }
 
 func TestHandler_CreateCredDef(t *testing.T) {
@@ -149,6 +151,7 @@ func TestHandler_CreateCredDef(t *testing.T) {
 	require.Equal(t, msg.SchemaId, receivedCredDef.SchemaId)
 	require.Equal(t, msg.Tag, receivedCredDef.Tag)
 	require.Equal(t, msg.SignatureType, receivedCredDef.SignatureType)
+	require.Equal(t, msg.Controller, receivedCredDef.Controller)
 }
 
 func TestHandler_DidDocAlreadyExists(t *testing.T) {
@@ -166,7 +169,7 @@ func TestHandler_DidDocAlreadyExists(t *testing.T) {
 	_, err = setup.Handler(setup.Ctx, setup.WrapRequest(privKey, data, make(map[string]string)))
 
 	require.Error(t, err)
-	require.Equal(t, "DID DOC already exists for CredDef did:cheqd:test:cred-def-1: DID Doc exists", err.Error())
+	require.Equal(t, "DID DOC already exists for CredDef did:cheqd:test:cred-def-1/credDef: DID Doc exists", err.Error())
 
 	schemaMsg := setup.CreateSchema()
 	data, _ = ptypes.NewAnyWithValue(schemaMsg)
@@ -174,5 +177,5 @@ func TestHandler_DidDocAlreadyExists(t *testing.T) {
 	_, err = setup.Handler(setup.Ctx, setup.WrapRequest(privKey, data, make(map[string]string)))
 
 	require.Error(t, err)
-	require.Equal(t, "DID DOC already exists for Schema did:cheqd:test:schema-1: DID Doc exists", err.Error())
+	require.Equal(t, "DID DOC already exists for Schema did:cheqd:test:schema-1/schema: DID Doc exists", err.Error())
 }

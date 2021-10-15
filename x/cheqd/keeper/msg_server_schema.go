@@ -31,9 +31,11 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgWriteReques
 	k.AppendSchema(
 		ctx,
 		schemaMsg.Id,
+		schemaMsg.Type,
 		schemaMsg.Name,
 		schemaMsg.Version,
 		schemaMsg.AttrNames,
+		schemaMsg.Controller,
 	)
 
 	return &types.MsgCreateSchemaResponse{

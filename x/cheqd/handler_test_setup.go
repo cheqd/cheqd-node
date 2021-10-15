@@ -125,10 +125,12 @@ func (s *TestSetup) UpdateDid(did *types.Did, pubKey ed25519.PublicKey) *types.M
 
 func (s *TestSetup) CreateSchema() *types.MsgCreateSchema {
 	return &types.MsgCreateSchema{
-		Id:        "did:cheqd:test:schema-1",
-		Name:      "name",
-		Version:   "version",
-		AttrNames: []string{"attr1", "attr2"},
+		Id:         "did:cheqd:test:schema-1/schema",
+		Type:       "CL-Schema",
+		Name:       "name",
+		Version:    "version",
+		AttrNames:  []string{"attr1", "attr2"},
+		Controller: []string{"did:cheqd:test:alice"},
 	}
 }
 
@@ -141,11 +143,12 @@ func (s *TestSetup) CreateCredDef() *types.MsgCreateCredDef {
 	}
 
 	return &types.MsgCreateCredDef{
-		Id:            "did:cheqd:test:cred-def-1",
+		Id:            "did:cheqd:test:cred-def-1/credDef",
 		SchemaId:      "schema-1",
 		Tag:           "tag",
-		SignatureType: "signature-type",
+		SignatureType: "CL-Sig-Cred_def",
 		Value:         &Value,
+		Controller:    []string{"did:cheqd:test:alice"},
 	}
 }
 

@@ -37,6 +37,7 @@ func (k msgServer) CreateCredDef(goCtx context.Context, msg *types.MsgWriteReque
 			credDefMsg.Tag,
 			credDefMsg.SignatureType,
 			(*types.CredDef_ClType)(value),
+			credDefMsg.Controller,
 		)
 
 		return &types.MsgCreateCredDefResponse{

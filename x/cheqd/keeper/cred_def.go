@@ -48,6 +48,7 @@ func (k Keeper) AppendCredDef(
 	tag string,
 	signatureType string,
 	clValue *types.CredDef_ClType,
+	controller []string,
 ) string {
 	// Create the credDef
 	count := k.GetCredDefCount(ctx)
@@ -63,6 +64,7 @@ func (k Keeper) AppendCredDef(
 		Tag:           tag,
 		SignatureType: signatureType,
 		Value:         clValue,
+		Controller:    controller,
 	}
 
 	created := ctx.BlockTime().String()

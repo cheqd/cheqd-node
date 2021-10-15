@@ -44,17 +44,21 @@ func (k Keeper) SetSchemaCount(ctx sdk.Context, count uint64) {
 func (k Keeper) AppendSchema(
 	ctx sdk.Context,
 	id string,
+	schemaType string,
 	name string,
 	version string,
 	attrNames []string,
+	controller []string,
 ) string {
 	// Create the schema
 	count := k.GetSchemaCount(ctx)
 	var schema = types.Schema{
-		Id:        id,
-		Name:      name,
-		Version:   version,
-		AttrNames: attrNames,
+		Id:         id,
+		Name:       name,
+		Type:       schemaType,
+		Version:    version,
+		AttrNames:  attrNames,
+		Controller: controller,
 	}
 
 	created := ctx.BlockTime().String()
