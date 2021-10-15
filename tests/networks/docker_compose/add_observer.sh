@@ -1,6 +1,6 @@
 #!/bin/bash
-sudo chmod -R 777 /etc/cheqd-node
-sudo chmod -R 777 /var/lib/cheqd/data
+sudo chmod -R 755 /etc/cheqd-node
+sudo chmod -R 755 /var/lib/cheqd/data
 cd
 cheqd-noded init node5
 NODE0_IP=$(docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} docker_compose_node0_1)
