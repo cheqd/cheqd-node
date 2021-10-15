@@ -13,7 +13,7 @@ on:
 env:
   NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/tests/networks/docker_compose/node_configs"
   PACKAGE_NAME: "cheqd-node"
-  VERSION: "9.9.9"
+  VERSION: "9.9.9" # test deb package version to avoid issues with dpkg
 
 jobs:
   lint:
