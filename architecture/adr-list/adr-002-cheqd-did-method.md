@@ -33,7 +33,7 @@ Our aim is to bring the functionality enabled by these transactions into
 `cheqd-node` to allow the use cases of existing SSI projects that work with
 Hyperledger Indy to be supported by the cheqd network.
 
-We define transaction that differ from the ones listed above, but
+We define transactions that differ from the ones listed above, but
 which enable equivalent support for privacy-respecting SSI use cases. The
 differences stem primarily from our conformance to
 [Decentralized Identifiers v1.0](https://www.w3.org/TR/did-core/) and the
@@ -174,8 +174,7 @@ For Example:
 ##### Verification Method
 
 1. **`id`** (string): A string with format `<DIDDoc-id>#<key-alias>`
-2. **`controller`**: A list of fully qualified DID strings or one string. All
-DIDs must exist.
+2. **`controller`**: A string with fully qualified DID. DID must exist.
 3. **`type`** (string)
 4. **`publicKeyJwk`** (`map[string,string]`, optional): A map representing a
 JSON Web Key that conforms to [RFC7517](https://tools.ietf.org/html/rfc7517).
@@ -326,18 +325,19 @@ Don't store Schema DIDDoc in the State.
 
 Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
 
-Schema Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue/schema` 
+Schema Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue/schema`
+
+[TODO: add language about resolving the DID (and getting the DID Doc) vs 
+dereferencing the DID (and getting the schema)]
 
 `SCHEMA` DID Document transaction format: 
 ```jsonc
 {
   "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
   "controller": "did:cheqd:mainnet:IK22KY2Dyvmuu2PyyqSFKu", // Schema Issuer DID
-  "service":[
+  "alsoKnownAs":[
     {
-      "id": "cheqd-schema1",
-      "type": "CL-Schema",
-      "serviceEndpoint": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue?resource=true"
+      "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue/schema"
     }
   ]
 }
@@ -354,6 +354,9 @@ Schema Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue/schema`
 [Link to DidDocumentMetadata description](#resolve-did)
 
 #### `CRED_DEF`
+
+[TODO: explain that a Cred Def is simply an additional property inside of 
+the Issuer's DID Doc]
 
 Adds a Credential Definition (in particular, public key), which is created by an
 Issuer and published for a particular Credential Schema.
