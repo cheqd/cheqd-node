@@ -9,9 +9,16 @@
 | **Implementation Status** | Implementation in progress |
 | **Start Date** | 2021-09-23 |
 
+## TODO
+
+- Describe the resolution process for DID
+- Describe the deactivation process
+- Add security considerations
+- Add privacy considerations
+
 ## Summary
 
-This ADR defines the cheqd DID method and describes the identity entities, queries, and transaction types for the cheqd network.
+This ADR defines the cheqd DID method and describes the identity entities, queries, and transaction types for the cheqd network: a purpose-built self-sovereign identity (SSI) network based on the [Cosmos blockchain framework](https://github.com/cosmos/cosmos-sdk).
 
 [Decentralized identifiers](https://www.w3.org/TR/did-core) (DIDs) are a type of identifier that enables verifiable, decentralized digital identity. A DID refers to any subject (for example, a person, organization, thing, data model, abstract entity, and so on) as determined by the controller of the DID.
 
@@ -21,11 +28,27 @@ The identity entities and transactions for the cheqd network are designed to sup
 
 ### Rationale for baselining against Hyperledger Indy
 
-Hyperledger Indy is a verifiable data registry (VDR) built for DIDs with a strong focus on privacy-preserving techniques. It is one of the most widely-adopted self-sovereign identity (SSI) blockchain ledgers; most notably by the [Sovrin network](https://sovrin.org/overview/).
+Hyperledger Indy is a verifiable data registry (VDR) built for DIDs with a strong focus on privacy-preserving techniques. It is one of the most widely-adopted SSI blockchain ledgers. Most notably, Indy is used by the [Sovrin Network](https://sovrin.org/overview/).
 
+The Sovrin Foundation initiated a project called [`libsovtoken`](https://github.com/sovrin-foundation/libsovtoken) in 2018 to create a native token for Hyperledger Indy. `libsovtoken` was intended to be a payment handler library that could work with `libindy` and be merged upstream. This native token would allow interactions on Hyperledger Indy networks (such as Sovrin) to be paid for using tokens.
 
+Due to challenges the project ran into, the `libsovtoken` codebase saw its [last official release in August 2019](https://github.com/sovrin-foundation/libsovtoken/releases/tag/v1.0.1).
 
-However, as the core of Hyperledger Indy's architecture was designed before the [W3C DID specification](https://www.w3.org/TR/did-core/) started to be defined, the [Indy DID Method](https://hyperledger.github.io/indy-did-method/) (`did:indy`) has aspects that are not fully-compliant with latest specifications.
+### Rationale for using the Cosmos blockchain framework for cheqd
+
+The cheqd network aims to support similar use cases for SSI as seen on Hyperledger Indy networks, with a similar focus on privacy-resspecting techniques.
+
+Since the core of Hyperledger Indy's architecture was designed before the [W3C DID specification](https://www.w3.org/TR/did-core/) started to be defined, the [Indy DID Method](https://hyperledger.github.io/indy-did-method/) (`did:indy`) has aspects that are not fully-compliant with latest specifications.
+
+However, the [rationale for why the cheqd team chose the Cosmos blockchain framework instead of Hyperledger Indy](https://blog.cheqd.io/why-cheqd-has-joined-the-cosmos-4db8845722c5) were primarily down to the following reasons:
+
+1. **Hyperledger Indy is a permissioned ledger**: Indy networks are permissioned networks where the ability to have write capability is restricted to a limited number of nodes. Governance of such a permissioned network is therefore also not decentralised.
+2. **Limitations of Hyperledger Indy's consensus mechanism**: Linked to the permissioned nature of Indy are the drawbacks of its [Plenum Byzantine Fault Tolerant (BFT) consensus](https://github.com/hyperledger/indy-plenum) mechanism, which effectively limits the number of nodes with write capability to approximately 25 nodes. This limit is due to limited transactions per second (TPS) for an Indy network with a large number of nodes, rather than a hard cap implemented in the consensus protocol.
+3. **Wider ecosystem for token functionality outside of Hyperledger Indy**: Due to its origins as an identity-specific ledger, Indy does not have a fully-featured token implementation with sophisticated capabilities. Moreover, this also impacts end-user options for ecosystem services such as token wallets, cryptocurrency exchanges, custodianship services etc that would be necessary to make a viable, enterprise-ready SSI ledger with token functionality.
+
+By selecting the Cosmos blockchain framework, the maintainers of the cheqd project aim to address the limitations of Hyperledger Indy outlined above. However, with an eye towards interoperability, the cheqd project aims to use [Hyperledger Aries](https://wiki.hyperledger.org/display/ARIES/Hyperledger+Aries) for ledger-related peer-to-peer interactions.
+
+### Identity-domain transaction types in Hyperledger Indy
 
 Hyperledger Indy contains the following
 [identity domain transactions](https://github.com/hyperledger/indy-node/blob/master/docs/source/transactions.md):
@@ -597,12 +620,19 @@ Stored inside [DIDDoc](#resolve-did)
 
 ## References
 
-- [Hyperledger Indy Identity transactions](https://github.com/hyperledger/indy-node/blob/master/docs/source/transactions.md)
-- [W3 DID Spec](https://www.w3.org/TR/did-core/)
-
-## Unresolved questions
-
-- Describe the resolution process for DID
-- Describe the deactivation process
-- Add security considerations 
-- Add privacy considerations
+- [Hyperledger Indy](https://wiki.hyperledger.org/display/indy) official project background on Hyperledger Foundation wiki
+  - [`indy-node`](https://github.com/hyperledger/indy-node) GitHub repository: Server-side blockchain node for Indy ([documentation](https://hyperledger-indy.readthedocs.io/projects/node/en/latest/index.html))
+  - [`indy-plenum`](https://github.com/hyperledger/indy-plenum) GitHub repository: Plenum Byzantine Fault Tolerant consensus protocol; used by `indy-node` ([documentation](https://hyperledger-indy.readthedocs.io/projects/plenum/en/latest/index.html))
+  - [Indy DID method](https://hyperledger.github.io/indy-did-method/) (`did:indy`)
+  - [Indy identity-domain transactions](https://github.com/hyperledger/indy-node/blob/master/docs/source/transactions.md)
+- [Hyperledger Aries](https://wiki.hyperledger.org/display/ARIES/Hyperledger+Aries) official project background on Hyperledger Foundation wiki
+  - [`aries`](https://github.com/hyperledger/aries) GitHub repository: Provides links to implementations in various programming languages
+  - [`aries-rfcs`](https://github.com/hyperledger/aries-rfcs) GitHub repository: Contains Requests for Comment (RFCs) that define the Aries protocol behaviour
+- [W3C Decentralized Identifiers (DIDs)](https://www.w3.org/TR/did-core/) specification
+  - [DID Core Specification Test Suite](https://w3c.github.io/did-test-suite/)
+- [Cosmos blockchain framework](https://cosmos.network/) official project website
+  - [`cosmos-sdk`](https://github.com/cosmos/cosmos-sdk) GitHub repository ([documentation](https://docs.cosmos.network/))
+- [Sovrin Foundation](https://sovrin.org/)
+  - [Sovrin Networks](https://sovrin.org/overview/)
+  - [`libsovtoken`](https://github.com/sovrin-foundation/libsovtoken): Sovrin Network token library
+  - [Sovrin Ledger token plugin](https://github.com/sovrin-foundation/token-plugin)
