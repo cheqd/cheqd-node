@@ -109,34 +109,26 @@ A DID written to the cheqd "testnet" ledger `namespace`:
 did:cheqd:testnet:6cgbu8ZPoWTnR5Rv5JcSMB
 ```
 
+### DID Documents (DIDDocs)
 
-##### DIDDoc
+A DID Document ("DIDDoc") associated with a cheqd DID is a set of data describing a DID subject. The [representation of a DIDDoc when requested for production](https://www.w3.org/TR/did-core/#representations) from a DID on cheqd networks MUST meet the DID Core specifications.
 
-1. **`id`**: Target DID as base58-encoded string for 16 or 32 byte DID value
-with Cheqd DID Method prefix `did:cheqd:<namespace>:<namespace identifier>:`.
-2. **`controller`** (optional): A list of fully qualified DID strings or one
-string. Contains one or more DIDs who can update this DIDdoc. All DIDs must
-exist.
+#### Elements needed for DIDDoc representation
+
+1. **`id`**: Target DID as base58-encoded string for 16 or 32 byte DID value with cheqd DID Method prefix `did:cheqd:<namespace>:<namespace identifier>:`.
+2. **`controller`** (optional): A list of fully qualified DID strings or one string. Contains one or more DIDs who can update this DIDdoc. All DIDs must exist.
 3. **`verificationMethod`** (optional): A list of Verification Methods
-4. **`authentication`** (optional): A list of Verification Methods or strings
-with key aliases
-5. **`assertionMethod`** (optional): A list of Verification Methods or strings
-with key aliases
-6. **`capabilityInvocation`** (optional): A list of Verification Methods or
-strings with key aliases
-7. **`capabilityDelegation`** (optional): A list of Verification Methods or
-strings with key aliases
-8. **`keyAgreement`** (optional): A list of Verification Methods or strings
-with key aliases
+4. **`authentication`** (optional): A list of Verification Methods or strings with key aliases
+5. **`assertionMethod`** (optional): A list of Verification Methods or strings with key aliases
+6. **`capabilityInvocation`** (optional): A list of Verification Methods or strings with key aliases
+7. **`capabilityDelegation`** (optional): A list of Verification Methods or strings with key aliases
+8. **`keyAgreement`** (optional): A list of Verification Methods or strings with key aliases
 9. **`service`** (optional): A set of Service Endpoint maps
-10. **`alsoKnownAs`** (optional): A list of strings. A DID subject can have
-multiple identifiers for different purposes, or at different times. The
-assertion that two or more DIDs refer to the same DID subject can be made using
-the `alsoKnownAs` property.
+10. **`alsoKnownAs`** (optional): A list of strings. A DID subject can have multiple identifiers for different purposes, or at different times. The assertion that two or more DIDs refer to the same DID subject can be made using the `alsoKnownAs` property.
 11. **`@context`** (optional): A list of strings with links or JSONs for
 describing specifications that this DID Document is following to.
 
-For Example:
+##### Example of DIDDoc representation
 
 ```jsonc
 {
@@ -164,21 +156,49 @@ For Example:
 }
 ```
 
-##### Verification Method
+#### State format for DIDDocs on ledger
+
+`"diddoc:<id>" -> {DIDDoc, DidDocumentMetadata, txHash, txTimestamp }`
+
+`didDocumentMetadata` is created by the node after transaction ordering and before adding it to a State.
+
+#### DIDDoc metadata
+
+1. **`created`** (string): Formatted as an XML Datetime normalized to UTC
+00:00:00 and without sub-second decimal precision. For example:
+2020-12-20T19:17:47Z.
+2. **`updated`** (string): The value of the property MUST follow the same
+formatting rules as the created property. The `updated` field is null if an Update operation has never been performed on the DID document. If an updated property exists, it can be the same value as the created property when the difference between the two timestamps is less than one second.
+3. **`deactivated`** (strings): If DID has been deactivated, DID document
+metadata MUST include this property with the boolean value true. By default this is set to `false`.
+4. **`versionId`** (strings): Contains transaction hash of the current DIDDoc version.
+
+##### Example of DIDDoc metadata
+
+```jsonc
+{
+  "created": "2020-12-20T19:17:47Z",
+  "updated": "2020-12-20T19:19:47Z",
+  "deactivated": false,
+  "versionId": "N22KY2Dyvmuu2PyyqSFKueN22KY2Dyvmuu2PyyqSFKue",
+}
+```
+
+#### Verification method
+
+Verification methods are used to define how to authenticate / authorise interactions with a DID subject or delegates. Verification method is an OPTIONAL property.
 
 1. **`id`** (string): A string with format `<DIDDoc-id>#<key-alias>`
 2. **`controller`**: A string with fully qualified DID. DID must exist.
 3. **`type`** (string)
-4. **`publicKeyJwk`** (`map[string,string]`, optional): A map representing a
-JSON Web Key that conforms to [RFC7517](https://tools.ietf.org/html/rfc7517).
-See definition of `publicKeyJwk` for additional constraints.
-5. **`publicKeyMultibase`** (optional): A base58-encoded string that conforms to
-a [MULTIBASE](https://datatracker.ietf.org/doc/html/draft-multiformats-multibase-03)
+4. **`publicKeyJwk`** (`map[string,string]`, optional): A map representing a JSON Web Key that conforms to [RFC7517](https://tools.ietf.org/html/rfc7517). See definition of `publicKeyJwk` for additional constraints.
+5. **`publicKeyMultibase`** (optional): A base58-encoded string that conforms to a [MULTIBASE](https://datatracker.ietf.org/doc/html/draft-multiformats-multibase-03)
 encoded public key.
-**Note**: Verification Method cannot contain both `publicKeyJwk` and
+
+**Note**: Verification method cannot contain both `publicKeyJwk` and
 `publicKeyMultibase` but must contain at least one of them.
 
-For Example:
+##### Example of Verification method in a DIDDoc
 
 ```jsonc
 {
@@ -196,22 +216,16 @@ For Example:
 }
 ```
 
-##### Service
+#### Service
 
-1. **`id`** (string): The value of the id property MUST be a URI conforming to
-[RFC3986](https://www.rfc-editor.org/rfc/rfc3986). A conforming producer MUST
-NOT produce multiple service entries with the same ID. A conforming consumer
-MUST produce an error if it detects multiple service entries with the same ID.
-It has a follow formats: `<DIDDoc-id>#<service-alias>` or `#<service-alias>`.
-2. **`type`** (string): The service type and its associated properties SHOULD be
-registered in the DID Specification Registries
-[DID-SPEC-REGISTRIES](https://www.w3.org/TR/did-spec-registries/)
-3. **`serviceEndpoint`** (strings): A string that conforms to the rules of
-[RFC3986](https://www.rfc-editor.org/rfc/rfc3986) for URIs, a map, or a set
-composed of a one or more strings that conform to the rules of
+Services can be defined in a DIDDoc to express means of communicating with the DID subject or associated entities.
+
+1. **`id`** (string): The value of the `id` property for a Service MUST be a URI conforming to [RFC3986](https://www.rfc-editor.org/rfc/rfc3986). A conforming producer MUST NOT produce multiple service entries with the same ID. A conforming consumer MUST produce an error if it detects multiple service entries with the same ID. It has a follow formats: `<DIDDoc-id>#<service-alias>` or `#<service-alias>`.
+2. **`type`** (string): The service type and its associated properties SHOULD be registered in the [DID Specification Registries](https://www.w3.org/TR/did-spec-registries/)
+3. **`serviceEndpoint`** (strings): A string that conforms to the rules of [RFC3986](https://www.rfc-editor.org/rfc/rfc3986) for URIs, a map, or a set composed of a one or more strings that conform to the rules of
 [RFC3986](https://www.rfc-editor.org/rfc/rfc3986) for URIs and/or maps.
 
-For Example:
+##### Example of Service in a DIDDoc
 
 ```jsonc
 {
@@ -221,89 +235,40 @@ For Example:
 }
 ```
 
-#### `DID` transactions
+### `DID` transactions
 
-[Decentralized Identifiers \(DIDs\) are a W3C specification](https://www.w3.org/TR/did-core/)
-for identifiers that enable verifiable, decentralized digital identity.
+#### Create `DID`
 
-DIDDoc format conforms to
-[DIDDoc spec](https://www.w3.org/TR/did-core/#representations).
-The request can be used for creation of new DIDDoc, setting, and rotation of
-verification key.
+If there is no DID entry on the ledger with the specified DID (`DID.id`), it is considered as a creation request for a new DID.
 
-##### Create `DID`
+**Note**: The field `signatures`(from `WriteRequest`) must contain signatures from all new controllers.
 
-If there is no DID entry on the ledger with the specified DID (`DID.id`), it is
-considered as a creation request for a new DID.
+#### Update `DID`
 
-**Note**: The field `signatures`(from `WriteRequest`) must contain signatures
-from all new controllers.
-
-##### Update `DID`
-
-If there is a DID entry on the ledger with the specified DID (`DID.id`), then
-this considered a request for updating an existing DID.
+If there is a DID entry on the ledger with the specified DID (`DID.id`), then this considered a request for updating an existing DID.
 
 For updating `versionId` from `UpdateDIDRequest` should be filled by a
-transaction hash of the previous DIDDoc version. It is needed for a replay
-  protection.
+transaction hash of the previous DIDDoc version. It is needed for a replay protection.
 
-**Note**: The field `signatures`(from `WriteRequest`) must contain signatures
-from all old controllers and all new controllers.
+**Note**: The field `signatures`(from `WriteRequest`) must contain signatures from all old controllers and all new controllers.
 
-##### Resolve DID
-
-DIDDoc State format:
-
-`"diddoc:<id>" -> {DIDDoc, DidDocumentMetadata, txHash, txTimestamp }`
-
-`didDocumentMetadata` is created by the node after transaction ordering and
-before adding it to a State.
-
-DID Document Metadata:
-
-1. **`created`** (string): Formatted as an XML Datetime normalized to UTC
-00:00:00 and without sub-second decimal precision. For example:
-2020-12-20T19:17:47Z.
-2. **`updated`** (string): The value of the property MUST follow the same
-formatting rules as the created property. The `updated` field is null if an
-Update operation has never been performed on the DID document. If an updated
-property exists, it can be the same value as the created property when the
-difference between the two timestamps is less than one second.
-3. **`deactivated`** (strings): If DID has been deactivated, DID document
-metadata MUST include this property with the boolean value true. By default
-`false`.
-4. **`versionId`** (strings): Contains transaction hash of the current DIDDoc
-version.
-
-For Example:
-
-```jsonc
-{
-  "created": "2020-12-20T19:17:47Z",
-  "updated": "2020-12-20T19:19:47Z",
-  "deactivated": false,
-  "versionId": "N22KY2Dyvmuu2PyyqSFKueN22KY2Dyvmuu2PyyqSFKue",
-}
-```
+#### Resolve DID
 
 TODO: describe the resolution process
 
-##### Deactivate DID
+#### Deactivate DID
 
 TODO: describe the deactivation process
 
-#### `SCHEMA`
+### `SCHEMA`
 
 This transaction is used to create a Schema associated with credentials.
 
-It is not possible to update an existing Schema, to ensure the original schema
-used to issue any credentials in the past are always available.
+It is not possible to update an existing Schema, to ensure the original schema used to issue any credentials in the past are always available.
 
 If a Schema evolves, a new schema with a new version or name needs to be created.
 
-- **`id`**: DID as base58-encoded string for 16 or 32 byte DID value with Cheqd
-DID Method prefix `did:cheqd:<namespace>:<namespace identifier>:` and a resource
+- **`id`**: DID as base58-encoded string for 16 or 32 byte DID value with cheqd DID Method prefix `did:cheqd:<namespace>:<namespace identifier>:` and a resource
 type at the end.
 - **`type`**: String with a schema type. Now only `CL-Schema` is supported.
 - **`attrNames`**: Array of attribute name strings (125 attributes maximum)
@@ -445,18 +410,11 @@ TODO: add privacy considerations
 
 All identity transaction requests for cheqd networks should contain the following details:
 
-- **`data`**: Data requested to be written to the ledger, specific for each
-request type.
+- **`data`**: Data requested to be written to the ledger, specific for each request type.
 - **`signatures`**: `data`and `metadata` should be signed by all `controller` private keys. This field contains a dict there key's id from
-`DIDDoc.authentication` is a key, and the signature is a value. The `signatures`
-must contains signatures from all controllers. And every controller should sign
-all fields excluding `signatures` using at least one key from
-`DIDDoc.authentication`.
-- **`requestId`**: String with unique identifier. Unix timestamp is recommended.
-Needed for a reply protection.
-- **`metadata`**: Dictionary with additional metadata fields. Empty for now.
-This fields provides extensibility in the future, e.g., it can contain
-`protocolVersion` or other relevant metadata associated with a request.
+`DIDDoc.authentication` is a key, and the signature is a value. The `signatures` must contains signatures from all controllers. And every controller should sign all fields excluding `signatures` using at least one key from `DIDDoc.authentication`.
+- **`requestId`**: String with unique identifier. Unix timestamp is recommended. Needed for a replay protection.
+- **`metadata`**: Dictionary with additional metadata fields. Empty for now. This fields provides extensibility in the future, e.g., it can contain `protocolVersion` or other relevant metadata associated with a request.
 
 #### Example of generic transaction request
 
