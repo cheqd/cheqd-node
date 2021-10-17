@@ -3,6 +3,8 @@ package keeper
 import (
 	"context"
 	"fmt"
+	"github.com/cheqd/cheqd-node/x/cheqd/utils/strings"
+	"reflect"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -62,17 +64,17 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 		return nil, err
 	}
 
-	if err := k.VerifySignature(&ctx, msg, didMsg.GetSigners()); err != nil {
-		return nil, err
-	}
-
 	// Checks that the element exists
 	if !k.HasDid(ctx, didMsg.Id) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %s doesn't exist", didMsg.Id))
 	}
 
-	_, metadata, err := k.GetDid(&ctx, didMsg.Id)
+	oldDIDDoc, metadata, err := k.GetDid(&ctx, didMsg.Id)
 	if err != nil {
+		return nil, err
+	}
+
+	if err := k.UpdateDidVerifySignature(&ctx, msg, oldDIDDoc, didMsg); err != nil {
 		return nil, err
 	}
 
@@ -105,4 +107,72 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 	return &types.MsgUpdateDidResponse{
 		Id: didMsg.Id,
 	}, nil
+}
+
+func (k msgServer) UpdateDidVerifySignature(ctx *sdk.Context, msg *types.MsgWriteRequest, oldDIDDoc *types.Did, newDIDDoc *types.MsgUpdateDid) error {
+	var signers = newDIDDoc.GetSigners()
+
+	// Get Old DID Doc controller if it's nil then assign self
+	oldController := oldDIDDoc.Controller
+	if len(oldController) == 0 {
+		oldController = []string{oldDIDDoc.Id}
+	}
+
+	// Get New DID Doc controller if it's nil then assign self
+	newController := newDIDDoc.Controller
+	if len(newController) == 0 {
+		newController = []string{newDIDDoc.Id}
+	}
+
+	// DID Doc controller has been changed
+	if removedControllers := strings.Complement(oldController, newController); len(removedControllers) > 0 {
+		for _, controller := range removedControllers {
+			signers = append(signers, types.Signer{Signer: controller})
+		}
+	}
+
+	for _, oldVM := range oldDIDDoc.VerificationMethod {
+		newVM := FindVerificationMethod(newDIDDoc.VerificationMethod, oldVM.Id)
+
+		// Verification Method has been deleted
+		if newVM == nil {
+			signers = AppendSignerIfNeed(signers, oldVM.Controller, newDIDDoc)
+			continue
+		}
+
+		// Verification Method has been changed
+		if !reflect.DeepEqual(oldVM, newVM) {
+			signers = AppendSignerIfNeed(signers, newVM.Controller, newDIDDoc)
+		}
+
+		// Verification Method Controller has been changed, need to add old controller
+		if newVM.Controller != oldVM.Controller {
+			signers = AppendSignerIfNeed(signers, oldVM.Controller, newDIDDoc)
+		}
+	}
+
+	if err := k.VerifySignature(ctx, msg, signers); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func AppendSignerIfNeed(signers []types.Signer, controller string, msg *types.MsgUpdateDid) []types.Signer {
+	for _, signer := range signers {
+		if signer.Signer == controller {
+			return signers
+		}
+	}
+
+	signer := types.Signer{
+		Signer: controller,
+	}
+
+	if controller == msg.Id {
+		signer.VerificationMethod = msg.VerificationMethod
+		signer.Authentication = msg.Authentication
+	}
+
+	return append(signers, signer)
 }

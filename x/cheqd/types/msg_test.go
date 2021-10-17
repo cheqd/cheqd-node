@@ -1,7 +1,6 @@
-package cheqd
+package types
 
 import (
-	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	ctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -10,128 +9,128 @@ import (
 func TestNewMsgCreateCredDef(t *testing.T) {
 	cases := []struct {
 		valid  bool
-		msg    *types.MsgCreateCredDef
+		msg    *MsgCreateCredDef
 		errMsg string
 	}{
 		{
 			true,
-			types.NewMsgCreateCredDef(
+			NewMsgCreateCredDef(
 				"did:cheqd:test:aaaaa/credDef",
 				"schema",
 				"",
 				"CL-Sig-Cred_def",
 				[]string{"did:cheqd:test:alice"},
-				&types.MsgCreateCredDef_ClType{ClType: &types.CredDefValue{Primary: nil, Revocation: nil}}),
+				&MsgCreateCredDef_ClType{ClType: &CredDefValue{Primary: nil, Revocation: nil}}),
 			"",
 		},
 		{
 			true,
-			types.NewMsgCreateCredDef(
+			NewMsgCreateCredDef(
 				"did:cheqd:test:aaaaa/credDef",
 				"schema",
 				"tag",
 				"CL-Sig-Cred_def",
 				[]string{"did:cheqd:test:alice"},
-				&types.MsgCreateCredDef_ClType{ClType: &types.CredDefValue{Primary: nil, Revocation: nil}}),
+				&MsgCreateCredDef_ClType{ClType: &CredDefValue{Primary: nil, Revocation: nil}}),
 			"",
 		},
 		{
 			false,
-			types.NewMsgCreateCredDef(
+			NewMsgCreateCredDef(
 				"/credDef",
 				"",
 				"",
 				"",
 				nil,
-				&types.MsgCreateCredDef_ClType{ClType: nil}),
+				&MsgCreateCredDef_ClType{ClType: nil}),
 			"Id: is not DID",
 		},
 		{
 			false,
-			types.NewMsgCreateCredDef(
+			NewMsgCreateCredDef(
 				"did:cheqd:test:alice#key-1/credDef",
 				"",
 				"",
 				"",
 				nil,
-				&types.MsgCreateCredDef_ClType{ClType: nil}),
+				&MsgCreateCredDef_ClType{ClType: nil}),
 			"Id: is not DID",
 		},
 		{
 			false,
-			types.NewMsgCreateCredDef(
+			NewMsgCreateCredDef(
 				"did:cheqd:test:alice",
 				"",
 				"",
 				"",
 				nil,
-				&types.MsgCreateCredDef_ClType{ClType: &types.CredDefValue{Primary: nil, Revocation: nil}}),
+				&MsgCreateCredDef_ClType{ClType: &CredDefValue{Primary: nil, Revocation: nil}}),
 			"Id must end with resource type '/credDef': bad request",
 		},
 		{
 			false,
-			types.NewMsgCreateCredDef(
+			NewMsgCreateCredDef(
 				"did:cheqd:test:alice/credDef",
 				"",
 				"",
 				"",
 				nil,
-				&types.MsgCreateCredDef_ClType{ClType: &types.CredDefValue{Primary: nil, Revocation: nil}}),
+				&MsgCreateCredDef_ClType{ClType: &CredDefValue{Primary: nil, Revocation: nil}}),
 			"SchemaId: is required",
 		},
 		{
 			false,
-			types.NewMsgCreateCredDef(
+			NewMsgCreateCredDef(
 				"did:cheqd:test:alice/credDef",
 				"schema-1",
 				"",
 				"",
 				nil,
-				&types.MsgCreateCredDef_ClType{ClType: &types.CredDefValue{Primary: nil, Revocation: nil}}),
+				&MsgCreateCredDef_ClType{ClType: &CredDefValue{Primary: nil, Revocation: nil}}),
 			"SignatureType: is required",
 		},
 		{
 			false,
-			types.NewMsgCreateCredDef(
+			NewMsgCreateCredDef(
 				"did:cheqd:test:alice/credDef",
 				"schema-1",
 				"",
 				"ss",
 				[]string{"did:cheqd:test:alice"},
-				&types.MsgCreateCredDef_ClType{ClType: &types.CredDefValue{Primary: nil, Revocation: nil}}),
+				&MsgCreateCredDef_ClType{ClType: &CredDefValue{Primary: nil, Revocation: nil}}),
 			"ss is not allowed signature type: bad request",
 		},
 		{
 			false,
-			types.NewMsgCreateCredDef(
+			NewMsgCreateCredDef(
 				"did:cheqd:test:alice/credDef",
 				"schema-1",
 				"",
 				"CL-Sig-Cred_def",
 				nil,
-				&types.MsgCreateCredDef_ClType{ClType: &types.CredDefValue{Primary: nil, Revocation: nil}}),
+				&MsgCreateCredDef_ClType{ClType: &CredDefValue{Primary: nil, Revocation: nil}}),
 			"Controller: is required",
 		},
 		{
 			false,
-			types.NewMsgCreateCredDef(
+			NewMsgCreateCredDef(
 				"did:cheqd:test:alice/credDef",
 				"schema-1",
 				"",
 				"CL-Sig-Cred_def",
 				[]string{"1"},
-				&types.MsgCreateCredDef_ClType{ClType: &types.CredDefValue{Primary: nil, Revocation: nil}}),
+				&MsgCreateCredDef_ClType{ClType: &CredDefValue{Primary: nil, Revocation: nil}}),
 			"Controller item 1: is not DID",
 		},
 		{
 			false,
-			types.NewMsgCreateCredDef(
+			NewMsgCreateCredDef(
 				"did:cheqd:test:alice/credDef",
 				"schema-1",
 				"",
 				"CL-Sig-Cred_def",
 				[]string{"did:cheqd:test:alice"},
-				&types.MsgCreateCredDef_ClType{ClType: nil}),
+				&MsgCreateCredDef_ClType{ClType: nil}),
 			"Value: is required",
 		},
 	}
@@ -151,14 +150,14 @@ func TestNewMsgCreateCredDef(t *testing.T) {
 func TestNewMsgWriteRequestValidation(t *testing.T) {
 	cases := []struct {
 		valid  bool
-		msg    *types.MsgWriteRequest
+		msg    *MsgWriteRequest
 		errMsg string
 	}{
-		{true, types.NewMsgWriteRequest(&ctypes.Any{TypeUrl: "1", Value: []byte{1}}, nil, map[string]string{"foo": "bar"}), ""},
-		{false, types.NewMsgWriteRequest(&ctypes.Any{TypeUrl: "1"}, nil, map[string]string{"foo": "bar"}), "Invalid Data: it cannot be empty: bad request"},
-		{false, types.NewMsgWriteRequest(&ctypes.Any{Value: []byte{1}}, nil, map[string]string{"foo": "bar"}), "Invalid Data: it cannot be empty: bad request"},
-		{false, types.NewMsgWriteRequest(nil, nil, nil), "Data: is required"},
-		{false, types.NewMsgWriteRequest(&ctypes.Any{TypeUrl: "1", Value: []byte{1}}, nil, nil), "Signatures: is required"},
+		{true, NewMsgWriteRequest(&ctypes.Any{TypeUrl: "1", Value: []byte{1}}, nil, map[string]string{"foo": "bar"}), ""},
+		{false, NewMsgWriteRequest(&ctypes.Any{TypeUrl: "1"}, nil, map[string]string{"foo": "bar"}), "Invalid Data: it cannot be empty: bad request"},
+		{false, NewMsgWriteRequest(&ctypes.Any{Value: []byte{1}}, nil, map[string]string{"foo": "bar"}), "Invalid Data: it cannot be empty: bad request"},
+		{false, NewMsgWriteRequest(nil, nil, nil), "Data: is required"},
+		{false, NewMsgWriteRequest(&ctypes.Any{TypeUrl: "1", Value: []byte{1}}, nil, nil), "Signatures: is required"},
 	}
 
 	for _, tc := range cases {
@@ -176,12 +175,12 @@ func TestNewMsgWriteRequestValidation(t *testing.T) {
 func TestNewMsgCreateSchema(t *testing.T) {
 	cases := []struct {
 		valid  bool
-		msg    *types.MsgCreateSchema
+		msg    *MsgCreateSchema
 		errMsg string
 	}{
 		{
 			true,
-			types.NewMsgCreateSchema(
+			NewMsgCreateSchema(
 				"did:cheqd:test:aaaaa/schema",
 				"CL-Schema",
 				"schema",
@@ -192,7 +191,7 @@ func TestNewMsgCreateSchema(t *testing.T) {
 		},
 		{
 			false,
-			types.NewMsgCreateSchema(
+			NewMsgCreateSchema(
 				"/schema",
 				"",
 				"",
@@ -203,7 +202,7 @@ func TestNewMsgCreateSchema(t *testing.T) {
 		},
 		{
 			false,
-			types.NewMsgCreateSchema(
+			NewMsgCreateSchema(
 				"did:cheqd:test:alice#key-1/schema",
 				"",
 				"",
@@ -214,7 +213,7 @@ func TestNewMsgCreateSchema(t *testing.T) {
 		},
 		{
 			false,
-			types.NewMsgCreateSchema(
+			NewMsgCreateSchema(
 				"did:cheqd:test:alice",
 				"",
 				"",
@@ -225,7 +224,7 @@ func TestNewMsgCreateSchema(t *testing.T) {
 		},
 		{
 			false,
-			types.NewMsgCreateSchema(
+			NewMsgCreateSchema(
 				"did:cheqd:test:alice/schema",
 				"",
 				"",
@@ -236,7 +235,7 @@ func TestNewMsgCreateSchema(t *testing.T) {
 		},
 		{
 			false,
-			types.NewMsgCreateSchema(
+			NewMsgCreateSchema(
 				"did:cheqd:test:alice/schema",
 				"schema-1",
 				"",
@@ -247,7 +246,7 @@ func TestNewMsgCreateSchema(t *testing.T) {
 		},
 		{
 			false,
-			types.NewMsgCreateSchema(
+			NewMsgCreateSchema(
 				"did:cheqd:test:alice/schema",
 				"schema-1",
 				"",
@@ -258,7 +257,7 @@ func TestNewMsgCreateSchema(t *testing.T) {
 		},
 		{
 			false,
-			types.NewMsgCreateSchema(
+			NewMsgCreateSchema(
 				"did:cheqd:test:alice/schema",
 				"CL-Schema",
 				"",
@@ -269,7 +268,7 @@ func TestNewMsgCreateSchema(t *testing.T) {
 		},
 		{
 			false,
-			types.NewMsgCreateSchema(
+			NewMsgCreateSchema(
 				"did:cheqd:test:alice/schema",
 				"CL-Schema",
 				"",
@@ -280,7 +279,7 @@ func TestNewMsgCreateSchema(t *testing.T) {
 		},
 		{
 			false,
-			types.NewMsgCreateSchema(
+			NewMsgCreateSchema(
 				"did:cheqd:test:alice/schema",
 				"CL-Schema",
 				"",
@@ -291,7 +290,7 @@ func TestNewMsgCreateSchema(t *testing.T) {
 		},
 		{
 			false,
-			types.NewMsgCreateSchema(
+			NewMsgCreateSchema(
 				"did:cheqd:test:alice/schema",
 				"CL-Schema",
 				"",
@@ -302,7 +301,7 @@ func TestNewMsgCreateSchema(t *testing.T) {
 		},
 		{
 			false,
-			types.NewMsgCreateSchema(
+			NewMsgCreateSchema(
 				"did:cheqd:test:alice/schema",
 				"CL-Schema",
 				"schema",
@@ -313,7 +312,7 @@ func TestNewMsgCreateSchema(t *testing.T) {
 		},
 		{
 			false,
-			types.NewMsgCreateSchema(
+			NewMsgCreateSchema(
 				"did:cheqd:test:alice/schema",
 				"CL-Schema",
 				"schema",
@@ -324,7 +323,7 @@ func TestNewMsgCreateSchema(t *testing.T) {
 		},
 		{
 			false,
-			types.NewMsgCreateSchema(
+			NewMsgCreateSchema(
 				"did:cheqd:test:alice/schema",
 				"CL-Schema",
 				"schema",

@@ -12,6 +12,17 @@ func SplitDidUrlIntoDidAndFragment(didUrl string) (string, string) {
 	return fragments[0], fragments[1]
 }
 
+func ResolveVerificationMethodId(did string, methodId string) string {
+	result := methodId
+
+	methodDid, methodFragment := SplitDidUrlIntoDidAndFragment(methodId)
+	if len(methodDid) == 0 {
+		methodDid = did + "#" + methodFragment
+	}
+
+	return result
+}
+
 func ArrayContainsNotDid(array []string) (bool, int) {
 	for i, did := range array {
 		if IsNotDid(did) {

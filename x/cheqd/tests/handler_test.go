@@ -1,4 +1,4 @@
-package cheqd
+package tests
 
 import (
 	"crypto/ed25519"
@@ -14,7 +14,7 @@ import (
 func TestHandler_CreateDid(t *testing.T) {
 	setup := Setup()
 
-	_, did, _ := setup.InitDid()
+	_, did, _ := setup.InitDid("did:cheqd:test:alice")
 
 	// query Did
 	receivedDid, _, _ := setup.Keeper.GetDid(&setup.Ctx, did.Id)
@@ -37,7 +37,7 @@ func TestHandler_UpdateDid(t *testing.T) {
 	setup := Setup()
 
 	//Init did
-	privKey, did, _ := setup.InitDid()
+	keys, did, _ := setup.InitDid("did:cheqd:test:alice")
 
 	// query Did
 	receivedDid, didMetadata, _ := setup.Keeper.GetDid(&setup.Ctx, did.Id)
@@ -52,7 +52,7 @@ func TestHandler_UpdateDid(t *testing.T) {
 
 	didMsgUpdate := setup.UpdateDid(receivedDid, newPubKey)
 	dataUpdate, _ := ptypes.NewAnyWithValue(didMsgUpdate)
-	resultUpdate, _ := setup.Handler(setup.Ctx, setup.WrapRequest(privKey, dataUpdate, metadata))
+	resultUpdate, _ := setup.Handler(setup.Ctx, setup.WrapRequest(dataUpdate, keys, metadata))
 
 	didUpdated := types.MsgUpdateDidResponse{}
 	errUpdate := didUpdated.Unmarshal(resultUpdate.Data)
@@ -78,33 +78,14 @@ func TestHandler_UpdateDid(t *testing.T) {
 	require.NotEqual(t, receivedDid.VerificationMethod, receivedUpdatedDid.VerificationMethod)
 }
 
-func TestHandler_UpdateDidInvalidSignature(t *testing.T) {
-	setup := Setup()
-
-	_, did, _ := setup.InitDid()
-
-	// query Did
-	receivedDid, _, _ := setup.Keeper.GetDid(&setup.Ctx, did.Id)
-
-	//Init priv key
-	newPubKey, newPrivKey, _ := ed25519.GenerateKey(rand.Reader)
-
-	// add new Did
-	didMsgUpdate := setup.UpdateDid(receivedDid, newPubKey)
-	dataUpdate, _ := ptypes.NewAnyWithValue(didMsgUpdate)
-	_, err := setup.Handler(setup.Ctx, setup.WrapRequest(newPrivKey, dataUpdate, make(map[string]string)))
-	require.Error(t, err)
-	require.Equal(t, "did:cheqd:test:alice: invalid signature detected", err.Error())
-}
-
 func TestHandler_CreateSchema(t *testing.T) {
 	setup := Setup()
 
-	privKey, _, _ := setup.InitDid()
+	keys, _, _ := setup.InitDid("did:cheqd:test:alice")
 	msg := setup.CreateSchema()
 
 	data, _ := ptypes.NewAnyWithValue(msg)
-	result, _ := setup.Handler(setup.Ctx, setup.WrapRequest(privKey, data, make(map[string]string)))
+	result, _ := setup.Handler(setup.Ctx, setup.WrapRequest(data, keys, make(map[string]string)))
 
 	schema := types.MsgCreateSchemaResponse{}
 	err := schema.Unmarshal(result.Data)
@@ -127,11 +108,11 @@ func TestHandler_CreateSchema(t *testing.T) {
 func TestHandler_CreateCredDef(t *testing.T) {
 	setup := Setup()
 
-	privKey, _, _ := setup.InitDid()
+	keys, _, _ := setup.InitDid("did:cheqd:test:alice")
 	msg := setup.CreateCredDef()
 
 	data, _ := ptypes.NewAnyWithValue(msg)
-	result, _ := setup.Handler(setup.Ctx, setup.WrapRequest(privKey, data, make(map[string]string)))
+	result, _ := setup.Handler(setup.Ctx, setup.WrapRequest(data, keys, make(map[string]string)))
 
 	credDef := types.MsgCreateCredDefResponse{}
 	err := credDef.Unmarshal(result.Data)
@@ -157,24 +138,24 @@ func TestHandler_CreateCredDef(t *testing.T) {
 func TestHandler_DidDocAlreadyExists(t *testing.T) {
 	setup := Setup()
 
-	privKey, _, _ := setup.InitDid()
-	_, _, err := setup.InitDid()
+	keys, _, _ := setup.InitDid("did:cheqd:test:alice")
+	_, _, err := setup.InitDid("did:cheqd:test:alice")
 
 	require.Error(t, err)
 	require.Equal(t, "DID DOC already exists for DID did:cheqd:test:alice: DID Doc exists", err.Error())
 
 	credDefMsg := setup.CreateCredDef()
 	data, _ := ptypes.NewAnyWithValue(credDefMsg)
-	_, _ = setup.Handler(setup.Ctx, setup.WrapRequest(privKey, data, make(map[string]string)))
-	_, err = setup.Handler(setup.Ctx, setup.WrapRequest(privKey, data, make(map[string]string)))
+	_, _ = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys, make(map[string]string)))
+	_, err = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys, make(map[string]string)))
 
 	require.Error(t, err)
 	require.Equal(t, "DID DOC already exists for CredDef did:cheqd:test:cred-def-1/credDef: DID Doc exists", err.Error())
 
 	schemaMsg := setup.CreateSchema()
 	data, _ = ptypes.NewAnyWithValue(schemaMsg)
-	_, _ = setup.Handler(setup.Ctx, setup.WrapRequest(privKey, data, make(map[string]string)))
-	_, err = setup.Handler(setup.Ctx, setup.WrapRequest(privKey, data, make(map[string]string)))
+	_, _ = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys, make(map[string]string)))
+	_, err = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys, make(map[string]string)))
 
 	require.Error(t, err)
 	require.Equal(t, "DID DOC already exists for Schema did:cheqd:test:schema-1/schema: DID Doc exists", err.Error())
