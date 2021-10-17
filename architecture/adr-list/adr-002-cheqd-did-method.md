@@ -50,103 +50,65 @@ By selecting the Cosmos blockchain framework, the maintainers of the cheqd proje
 
 ### Identity-domain transaction types in Hyperledger Indy
 
-Hyperledger Indy contains the following
-[identity domain transactions](https://github.com/hyperledger/indy-node/blob/master/docs/source/transactions.md):
+Our aim is to support the functionality enabled by [identity-domain transactions in by Hyperledger Indy](https://github.com/hyperledger/indy-node/blob/master/docs/source/transactions.md) into `cheqd-node`. This will partly enable the goal of allowing use cases of existing SSI networks on Hyperledger Indy to be supported by the cheqd network.
 
-1. `NYM`
-2. `ATTRIB`
-3. `SCHEMA`
-4. `CRED_DEF`
-5. `REVOC_REG_DEF`
-6. `REVOC_REG_ENTRY`
+The following identity-domain transactions from Indy were considered:
 
-Our aim is to bring the functionality enabled by these transactions into
-`cheqd-node` to allow the use cases of existing SSI projects that work with
-Hyperledger Indy to be supported by the cheqd network.
+1. `NYM`: Equivalent to "DIDs" on other networks
+2. `ATTRIB`: Payload for DID Document generation
+3. `SCHEMA`: Schema used by a credential
+4. `CRED_DEF`: Credential definition by an issuer for a particular schema
+5. `REVOC_REG_DEF`: Credential revocation registry definition
+6. `REVOC_REG_ENTRY`: Credential revocation registry entry
 
-We define transactions that differ from the ones listed above, but
-which enable equivalent support for privacy-respecting SSI use cases. The
-differences stem primarily from our conformance to
-[Decentralized Identifiers v1.0](https://www.w3.org/TR/did-core/) and the
-capabilities of the underlying
-[Cosmos blockchain framework](https://github.com/cosmos/cosmos-sdk) that we use.
+Revocation registries for credentials are not covered under the scope of this ADR. This topic is discussed separately in [ADR 007: **Revocation registry**](adr-007-revocation-registry.md) as there is ongoing research by the cheqd project on how to improve the privacy and scalability of credential revocations.
 
 ## Decision
 
-The cheqd DID Method will conform to [Decentralized Identifiers v1.0](https://github.com/w3c/did-core) with the goal of maximizing interoperability with other compatible tools and projects.
+Identity entities and transactions for the cheqd network may differ in name from those in Hyperledger Indy, but aim enable equivalent support for privacy-respecting SSI use cases.
 
-### Syntax
+The differences stem primarily from aiming to achieve better compliance with the W3C [DID Core](https://www.w3.org/TR/did-core/) specification and architectural differences between Hyperledger Indy and [Cosmos SDK](https://github.com/cosmos/cosmos-sdk) (used to build `cheqd-node`).
 
-As with all DIDs, cheqd identifiers begin with the string `did:`.
+With better compliance against the DID Core specification, the goal of the **cheqd DID method** is to maximise interoperability with compatible third-party software librarires, tools and projects in the SSI ecosystem.
 
-#### DID Method Name
-The `method-name` is the string `cheqd:`.
+### DID Method Name
 
-#### cheqd DID Method Specific Identifier
+The `method-name` for the **cheqd DID Method** will be identified by the string `cheqd`.
 
-The cheqd DID `method-specific-id` is made up of two components, a `namespace`
-and a `namespace-id`:
+A DID that uses the cheqd DID method MUST begin with the prefix `did:cheqd`. This prefix string MUST be in lowercase. The remainder of the DID, after the prefix, is as follows:
 
-- **namespace**: A string that identifies the name of the primary cheqd ledger
-(e.g., "mainnet"), followed by a `:`. The namespace string may optionally have a
-secondary ledger name prefixed by a `:` following the primary name. If there is
-no secondary ledger element, the DID resides on the primary ledger ("mainnet"),
-else it resides on the secondary ledger. By convention, the primary is a
-production ledger while the secondary ledgers are non-production ledgers (e.g.
-testnet) associated with the primary ledger.
-- **Namespace Identifier**: A self-certified identifier unique to the given
-cheqd DID ledger namespace.
+#### Method Specific Identifier
 
-The components are assembled as follows:
+The cheqd DID `method-specific-id` is made up of two components:
 
-`did:cheqd:<namespace>:<namespace identifier>`
+1. **`namespace`**: A string that identifies the cheqd network `chain_id` (e.g., "mainnet", "testnet") where the DID reference is stored. Different cheqd networks may be differentiated based on whether they are production vs non-production, governance frameworks in use, participants involved in running nodes, etc.
+2. **`namespace-id`**: A self-certified identifier unique to the given namespace, i.e., cheqd network `chain_id`.
 
-Some examples of `did:cheqd` method identifiers are:
+#### cheqd DID method syntax
 
-- A DID written to the cheqd mainnet ledger: `did:cheqd:mainnet:7Tqg6BwSSWapxgUDm9KKgg`
-- A DID written to the cheqd testnet ledger: `did:cheqd:testnet:6cgbu8ZPoWTnR5Rv5JcSMB`
+The cheqd DID method ABNF to conform with [DID syntax guidelines](https://www.w3.org/TR/did-core/#did-syntax) is as follows:
 
-### Operations
-
-#### General structure of transaction requests
-
-All identity requests will have the following format:
-
-```jsonc
-{
-  "data": { "<request data for writing a transaction to the ledger>" },
-  "signatures": {
-      "verification method id": "signature"
-      // Multiple verification methods and corresponding signatures can be added here
-    },
-  "metadata": {}
-}
+```abnf
+cheqd-did         = "did:cheqd:" namespace ":" namespace-id
+namespace         = chain_id ":" 1*255id-char ":" namespace-id
+namespace-id      = 38*255id-char
+id-char           = ALPHA / DIGIT
 ```
 
-- **`data`**: Data requested to be written to the ledger, specific for each
-request type.
-- **`signatures`**: `data`and `metadata` should be signed by all `controller`
-private keys. This field contains a dict there key's id from
-`DIDDoc.authentication` is a key, and the signature is a value. The `signatures`
-must contains signatures from all controllers. And every controller should sign
-all fields excluding `signatures` using at least one key from
-`DIDDoc.authentication`.
-- **`requestId`**: String with unique identifier. Unix timestamp is recommended.
-Needed for a reply protection.
-- **`metadata`**: Dictionary with additional metadata fields. Empty for now.
-This fields provides extensibility in the future, e.g., it can contain
-`protocolVersion` or other relevant metadata associated with a request.
+#### Examples of `did:cheqd` identifiers
 
-  
-#### `DID` transactions
+A DID written to the cheqd "mainnet" ledger `namespace`:
 
-[Decentralized Identifiers \(DIDs\) are a W3C specification](https://www.w3.org/TR/did-core/)
-for identifiers that enable verifiable, decentralized digital identity.
+```abnf
+did:cheqd:mainnet:7Tqg6BwSSWapxgUDm9KKgg
+```
 
-DIDDoc format conforms to
-[DIDDoc spec](https://www.w3.org/TR/did-core/#representations).
-The request can be used for creation of new DIDDoc, setting, and rotation of
-verification key.
+A DID written to the cheqd "testnet" ledger `namespace`:
+
+```abnf
+did:cheqd:testnet:6cgbu8ZPoWTnR5Rv5JcSMB
+```
+
 
 ##### DIDDoc
 
@@ -259,6 +221,16 @@ For Example:
 }
 ```
 
+#### `DID` transactions
+
+[Decentralized Identifiers \(DIDs\) are a W3C specification](https://www.w3.org/TR/did-core/)
+for identifiers that enable verifiable, decentralized digital identity.
+
+DIDDoc format conforms to
+[DIDDoc spec](https://www.w3.org/TR/did-core/#representations).
+The request can be used for creation of new DIDDoc, setting, and rotation of
+verification key.
+
 ##### Create `DID`
 
 If there is no DID entry on the ledger with the specified DID (`DID.id`), it is
@@ -305,6 +277,7 @@ metadata MUST include this property with the boolean value true. By default
 version.
 
 For Example:
+
 ```jsonc
 {
   "created": "2020-12-20T19:17:47Z",
@@ -361,7 +334,8 @@ Schema Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue/schema`
 [TODO: add language about resolving the DID (and getting the DID Doc) vs 
 dereferencing the DID (and getting the schema)]
 
-`SCHEMA` DID Document transaction format: 
+`SCHEMA` DID Document transaction format:
+
 ```jsonc
 {
   "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
@@ -467,36 +441,57 @@ TODO: add security considerations
 
 TODO: add privacy considerations
 
-### Rationale and Alternatives
+### Generic transaction request envelope
 
-#### Changes from Indy 
+All identity transaction requests for cheqd networks should contain the following details:
 
-##### Rename `NYM` transactions to `DID` transactions
+- **`data`**: Data requested to be written to the ledger, specific for each
+request type.
+- **`signatures`**: `data`and `metadata` should be signed by all `controller` private keys. This field contains a dict there key's id from
+`DIDDoc.authentication` is a key, and the signature is a value. The `signatures`
+must contains signatures from all controllers. And every controller should sign
+all fields excluding `signatures` using at least one key from
+`DIDDoc.authentication`.
+- **`requestId`**: String with unique identifier. Unix timestamp is recommended.
+Needed for a reply protection.
+- **`metadata`**: Dictionary with additional metadata fields. Empty for now.
+This fields provides extensibility in the future, e.g., it can contain
+`protocolVersion` or other relevant metadata associated with a request.
 
-[**NYM** is the term used by Hyperledger Indy](https://hyperledger-indy.readthedocs.io/projects/node/en/latest/transactions.html#nym) for [Decentralized Identifiers \(DIDs\)](https://www.w3.org/TR/did-core/)
-that are created on ledger. A DID is typically the identifier that is associated
-with a specific organisation issuing/managing SSI credentials.
+#### Example of generic transaction request
 
-Our proposal is to change the term `NYM` in transactions to `DID`, which would
-make understanding the context of a transaction easier to understand. This
-change will bring transactions better in-line with World Wide Web Consortium
-\(W3C\) terminology.
+```jsonc
+{
+  "data": { "<request data for writing a transaction to the ledger>" },
+  "signatures": {
+      "verification method id": "<signature>"
+      // Multiple verification methods and corresponding signatures can be added here
+    },
+  "metadata": {}
+}
+```
 
-#### Remove `role` field from DID transaction
+### Changes from Indy entities and transactions
 
-Hyperledger Indy is a public-permissioned distributed ledger. As `cheqd-node`
-is based on a public-permissionless network based on the
-[Cosmos blockchain framework](https://github.com/cosmos/cosmos-sdk), the `role`
-type is no longer necessary.
+#### Rename `NYM` transactions to `DID` transactions
+
+[**NYM** is the term used by Hyperledger Indy](https://hyperledger-indy.readthedocs.io/projects/node/en/latest/transactions.html#nym) for DIDs. 
+
+cheqd uses the term `DID` instead of `NYM` in transactions, which should
+make it easier to understand the context of a transaction easier by bringing it closer to W3C DID terminology used by the rest of the SSI ecosystem.
+
+#### Remove `role` field from `DID` transactions
+
+Hyperledger Indy is a public-permissioned distributed ledger and therefore use the `role` field to distinguish transactions from different types of nodes. As cheqd networks are public-permissionless, the `role` scope has been removed.
 
 #### Dropping `ATTRIB` transactions
 
-`ATTRIB` was originally used in Hyperledger Indy to add document content similar
-to DID Documents (DIDDocs). The cheqd DID method replaces this by implementing
-DIDDocs for most transaction types.
+`ATTRIB` was originally used in Hyperledger Indy to add document content similar to DID Documents (DIDDocs). The cheqd DID method replaces this by implementing DIDDocs for most transaction types.
 
+### Rationale and Alternatives
 
 #### Schema options not used
+
 ##### Option 2
 
 Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
@@ -579,6 +574,7 @@ Store inside Issuer DID Document
 CredDef URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<cred_def_entity_id>`
 
 `CRED_DEF` DID Document transaction format:
+
 ```jsonc
 {
   "@context": [
