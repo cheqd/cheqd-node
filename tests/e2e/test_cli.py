@@ -51,7 +51,7 @@ def test_basic(command, params, expected_output):
             ("add", "test2", "- name: test2"),
             ("show", "test2", "- name: test2"),
             ("show", "test9", "Error: test9 is not a valid name or address"),
-            ("mnemonic", None, '\w+ \w+ \w+ \w+ \w+ \w+ \w+ \w+ \w+ \w+ \w+ \w+ \w+ \w+ \w+ \w+ \w+ \w+ \w+ \w+ \w+ \w+ \w+ \w+\r\n')
+            ("mnemonic", None, '(\w+\s){23}(\w+){1}\r\n')
         ]
     )
 def test_keys(command, params, expected_output):
