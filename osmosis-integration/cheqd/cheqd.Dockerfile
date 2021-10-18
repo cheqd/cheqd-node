@@ -30,6 +30,13 @@ RUN starport chain build
 
 FROM debian:buster
 
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends \
+    nano \
+    curl \
+    wget \
+    netcat
+
 # Node binary
 COPY --from=builder /go/bin/cheqd-noded /bin
 

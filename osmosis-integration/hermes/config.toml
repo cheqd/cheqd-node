@@ -1,0 +1,56 @@
+# https://github.com/informalsystems/ibc-rs/blob/master/config.toml
+
+[global]
+strategy = 'packets'
+filter = false
+log_level = 'info'
+clear_packets_interval = 100
+tx_confirmation = true
+
+[rest]
+enabled = true
+host = '127.0.0.1'
+port = 3000
+
+[telemetry]
+enabled = true
+host = '127.0.0.1'
+port = 3001
+
+[[chains]]
+id = 'cheqd'
+rpc_addr = 'http://cheqd:26657'
+grpc_addr = 'http://cheqd:9090'
+websocket_addr = 'ws://cheqd:26657/websocket'
+rpc_timeout = '10s'
+account_prefix = 'cheqd'
+key_name = 'cheqd-key'
+address_type = { derivation = 'cosmos' }
+store_prefix = 'ibc'
+max_gas = 3000000
+gas_price = { price = 25, denom = 'ncheq' }
+gas_adjustment = 0.1
+max_msg_num = 30
+max_tx_size = 2097152
+clock_drift = '5s'
+trusting_period = '14days'
+trust_threshold = { numerator = '1', denominator = '3' }
+
+[[chains]]
+id = 'osmosis'
+rpc_addr = 'http://osmosis:26657'
+grpc_addr = 'http://osmosis:9090'
+websocket_addr = 'ws://osmosis:26657/websocket'
+rpc_timeout = '10s'
+account_prefix = 'osmo'
+key_name = 'osmosis-key'
+store_prefix = 'ibc'
+max_gas = 3000000
+gas_price = { price = 0.001, denom = 'stake' }
+gas_adjustment = 0.1
+max_msg_num = 30
+max_tx_size = 2097152
+clock_drift = '5s'
+trusting_period = '14days'
+trust_threshold = { numerator = '1', denominator = '3' }
+address_type = { derivation = 'cosmos' }
