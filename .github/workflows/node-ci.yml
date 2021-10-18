@@ -158,7 +158,7 @@ jobs:
       - name: Build CLI and init node
         run: |
           starport chain build
-          cheqd-node init test_node
+          cheqd-noded init test_node
 
       - name: Set up tests
         run: |

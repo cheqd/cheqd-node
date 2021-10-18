@@ -111,6 +111,7 @@ def test_tendermint(command, params, expected_output):
 
 @pytest.mark.skip
 def test_production():
-    cli = run("cheqd-noded tx", "bank send", f"{sender} {receiver} 1000ncheq {TEST_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} --note 'test_memo'", r"\"code\":0(.*?)\"value\":\"1000ncheq\"")
+    note = "test_memo"
+    cli = run("cheqd-noded tx", "bank send", f"{sender} {receiver} 1000ncheq {TEST_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} --note {note}", r"\"code\":0(.*?)\"value\":\"1000ncheq\"")
     tx_hash = re.search(r"\"txhash\":\"(.+?)\"", cli.before).group(1).strip()
     print(tx_hash)
