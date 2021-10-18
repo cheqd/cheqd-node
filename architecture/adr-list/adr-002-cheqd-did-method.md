@@ -118,11 +118,11 @@ A DID Document ("DIDDoc") associated with a cheqd DID is a set of data describin
 1. **`id`**: Target DID as base58-encoded string for 16 or 32 byte DID value with cheqd DID Method prefix `did:cheqd:<namespace>:<namespace identifier>:`.
 2. **`controller`** (optional): A list of fully qualified DID strings or one string. Contains one or more DIDs who can update this DIDdoc. All DIDs must exist.
 3. **`verificationMethod`** (optional): A list of Verification Methods
-4. **`authentication`** (optional): A list of Verification Methods or strings with key aliases
-5. **`assertionMethod`** (optional): A list of Verification Methods or strings with key aliases
-6. **`capabilityInvocation`** (optional): A list of Verification Methods or strings with key aliases
-7. **`capabilityDelegation`** (optional): A list of Verification Methods or strings with key aliases
-8. **`keyAgreement`** (optional): A list of Verification Methods or strings with key aliases
+4. **`authentication`** (optional): A list of strings with key aliases or IDs
+5. **`assertionMethod`** (optional): A list of strings with key aliases or IDs
+6. **`capabilityInvocation`** (optional): A list of strings with key aliases or IDs
+7. **`capabilityDelegation`** (optional): A list of strings with key aliases or IDs
+8. **`keyAgreement`** (optional): A list of strings with key aliases or IDs
 9. **`service`** (optional): A set of Service Endpoint maps
 10. **`alsoKnownAs`** (optional): A list of strings. A DID subject can have multiple identifiers for different purposes, or at different times. The assertion that two or more DIDs refer to the same DID subject can be made using the `alsoKnownAs` property.
 11. **`@context`** (optional): A list of strings with links or JSONs for
@@ -540,18 +540,20 @@ CredDef URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<cred_def_entity_id>`
     "https://w3id.org/security/suites/jws-2020/v1",
     "https://w3id.org/security/suites/ed25519-2020/v1"
   ],
-  "id": "did:cheqd:mainnet:123456789abcdefghi",
-  "verificationMethod": [{
-    "id": "passport-keys",
-    "type": "CL-Sig-Cred_def",
-    "controller": "did:cheqd:mainnet:123456789abcdefghi",
-    "schemaId": "did:cheqd:mainnet:5ZTp9g4SP6t73rH2s8zgmtqdXyT",
-    "tag": "some_tag",
-    "value": {
-      "primary": "...",
-      "revocation": "..."
+  "verificationMethod": [
+    {
+      "id": "did:cheqd:mainnet:IK22KY2Dyvmuu2PyyqSFKu#creddef-1", // Cred Def ID
+      "type": "CamLysCredDefJwk2021", // TODO: define and register this key type
+      "controller": "did:cheqd:mainnet:IK22KY2Dyvmuu2PyyqSFKu"
+      "publicKeyJwk":
+      {
+        [TODO: Define structure for CL JWK]
+      }
     }
-  }]
+  ],
+  "assertionMethod": [
+    "#creddef-1"
+  ]
 
 }
 ```
@@ -560,11 +562,28 @@ CredDef URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<cred_def_entity_id>`
 
 Stored inside [DIDDoc](#resolve-did)
 
+###### Positive
+
+- Credential Definition is a set of Issuer keys. So storing them in Issuer's DIDDoc reasonable.
+
+###### Negative
+
+- Credential Definition name means that it contains more than just a key and `value` field 
+  provides this flexibility.
+- Adding all Cred Defs to Issuer's DIDDoc makes it too large. For every DIDDoc or Cred Def request 
+  a client will receive the whole list of Issuer's Cred Defs.
+- Impossible to put a few controllers for Cred Def.
+- In theory, we need to make Credential Definitions mutable.
+
 ## Consequences
 
 ### Backward Compatibility
 
-- `cheqd-node` [release v0.1.17](https://github.com/cheqd/cheqd-node/releases/tag/v0.1.17) and earlier had a transaction type called `NYM` which would allow writing/reading a unique identifier on ledger. However, this `NYM` state was not fully defined as a DID method and did not contain DID Documents that resolved when the DID identifier was read. This `NYM` transaction type is deprecated and the data written to cheqd testnet with legacy states will not be retained.
+- `cheqd-node` [release v0.1.17](https://github.com/cheqd/cheqd-node/releases/tag/v0.1.17) and 
+  earlier had a transaction type called `NYM` which would allow writing/reading a unique identifier 
+  on ledger. However, this `NYM` state was not fully defined as a DID method and did not contain DID Documents 
+  that resolved when the DID identifier was read. This `NYM` transaction type is deprecated and the data written 
+  to cheqd testnet with legacy states will not be retained.
 
 ### Positive
 
