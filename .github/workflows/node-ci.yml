@@ -155,7 +155,7 @@ jobs:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
 
-      - name: Build CLI and init node
+      - name: Build CLI and init node (for tendermint test)
         run: |
           starport chain build
           cheqd-noded init test_node
