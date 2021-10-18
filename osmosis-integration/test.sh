@@ -33,13 +33,59 @@ RES=$(docker-compose exec osmosis osmosisd tx bank send osmosis-user ${BOB_ADDRE
 [[ $(echo $RES | jq --raw-output '.code') == 0 ]] && echo "tx successfull" || (echo "non zero tx return code"; exit 1)
 
 
-# Configure hermes
+# Configure and start hermes
 docker-compose exec hermes hermes keys restore cheqd --mnemonic "$ALICE_MNEMONIC" --name cheqd-key
 docker-compose exec hermes hermes keys restore osmosis --mnemonic "$BOB_MNEMONIC" --name osmosis-key
 
+docker-compose exec hermes hermes create channel cheqd osmosis --port-a transfer --port-b transfer
 
-# docker-compose exec hermes rm -f config.toml && touch config.toml
-# docker-compose exec hermes rm -rf cheqd && mkdir cheqd
-# docker-compose exec hermes rm -rf osmosis && mkdir osmosis
+docker-compose exec -d hermes hermes start
 
-# docker-compose exec hermes hermes -c ./config.toml light add tcp://cheqd:26657 -c chain-a -s ./cheqd -p -y -f
+
+# balances
+CHEQD_USER_ADDRESS=$(docker-compose exec cheqd cheqd-noded keys show --address cheqd-user | sed 's/\r//g')
+CHEQD_BALANCE_1=$(docker-compose exec cheqd cheqd-noded query bank balances $CHEQD_USER_ADDRESS --output json)
+
+OSMOSIS_USER_ADDRESS=$(docker-compose exec osmosis osmosisd keys show --address osmosis-user --keyring-backend test | sed 's/\r//g')
+docker-compose exec osmosis osmosisd query bank balances $OSMOSIS_USER_ADDRESS
+
+# forward transfer
+PORT="transfer"
+CHANNEL="channel-0"
+docker-compose exec cheqd cheqd-noded tx ibc-transfer transfer $PORT $CHANNEL $OSMOSIS_USER_ADDRESS 10000000000ncheq --from cheqd-user --chain-id cheqd --gas-prices 25ncheq -y
+sleep 60
+
+# balances
+CHEQD_USER_ADDRESS=$(docker-compose exec cheqd cheqd-noded keys show --address cheqd-user | sed 's/\r//g')
+CHEQD_BALANCE_2=$(docker-compose exec cheqd cheqd-noded query bank balances $CHEQD_USER_ADDRESS --output json)
+
+OSMOSIS_USER_ADDRESS=$(docker-compose exec osmosis osmosisd keys show --address osmosis-user --keyring-backend test | sed 's/\r//g')
+BALANCES=$(docker-compose exec osmosis osmosisd query bank balances $OSMOSIS_USER_ADDRESS --output json)
+
+# denom trace
+DENOM=$(echo "$BALANCES" | jq --raw-output '.balances[0].denom')
+DENOM_CUT=$(echo "$DENOM" | cut -c 5-)
+docker-compose exec osmosis osmosisd query ibc-transfer denom-trace $DENOM_CUT
+
+# back transfer
+PORT="transfer"
+CHANNEL="channel-0"
+docker-compose exec osmosis osmosisd tx ibc-transfer transfer $PORT $CHANNEL $CHEQD_USER_ADDRESS 10000000000${DENOM} --from osmosis-user --chain-id osmosis --keyring-backend test -y
+sleep 60
+
+# balances
+CHEQD_USER_ADDRESS=$(docker-compose exec cheqd cheqd-noded keys show --address cheqd-user | sed 's/\r//g')
+CHEQD_BALANCE_3=$(docker-compose exec cheqd cheqd-noded query bank balances $CHEQD_USER_ADDRESS --output json)
+
+OSMOSIS_USER_ADDRESS=$(docker-compose exec osmosis osmosisd keys show --address osmosis-user --keyring-backend test | sed 's/\r//g')
+docker-compose exec osmosis osmosisd query bank balances $OSMOSIS_USER_ADDRESS
+
+echo $CHEQD_BALANCE_1 | jq '.balances[0].amount'
+echo $CHEQD_BALANCE_2 | jq '.balances[0].amount'
+echo $CHEQD_BALANCE_3 | jq '.balances[0].amount'
+
+# TODO:
+# - Test with gravity
+# - Look at osmosis, atom, gravity genesis params
+# - Test back transfers
+# - Read white paper

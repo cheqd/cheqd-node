@@ -20,8 +20,8 @@ NODE_0_VAL_PUBKEY=$(cheqd-noded tendermint show-validator)
 cheqd-noded keys add cheqd-user
 
 # Config
-sed -i $sed_extension 's/minimum-gas-prices = ""/minimum-gas-prices = "25ncheq"/g' "$HOME/.cheqdnode/config/app.toml"
-sed -i $sed_extension 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/g' "$HOME/.cheqdnode/config/app.toml"
+sed -i $sed_extension 's|minimum-gas-prices = ""|minimum-gas-prices = "25ncheq"|g' "$HOME/.cheqdnode/config/app.toml"
+sed -i $sed_extension 's|laddr = "tcp://127.0.0.1:26657"|laddr = "tcp://0.0.0.0:26657"|g' "$HOME/.cheqdnode/config/config.toml"
 
 # Genesis
 GENESIS="$HOME/.cheqdnode/config/genesis.json"
