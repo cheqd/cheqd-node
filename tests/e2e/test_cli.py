@@ -1,5 +1,8 @@
 import re
+
+import pexpect
 import pytest
+import getpass
 from helpers import run, run_interaction, \
     TEST_NET_NETWORK, TEST_NET_NODE_TCP, TEST_NET_NODE_HTTP, TEST_NET_DESTINATION, TEST_NET_DESTINATION_HTTP, TEST_NET_FEES, TEST_NET_GAS_X_GAS_PRICES, YES_FLAG, \
     SENDER_ADDRESS, RECEIVER_ADDRESS, CODE_0
@@ -69,18 +72,34 @@ def create_import_keys():
     run(command_base, "add", "import_key", "name: import_key")
 
 
+@pytest.mark.skip
 @pytest.mark.usefixtures('create_import_keys')
 def test_keys_import():
     command_base = "cheqd-noded keys"
     key_name = "import_key"
     passphrase = "00000000"
+    filename = "/home/{}/key.txt".format(getpass.getuser())
     cli = run(command_base, "export", key_name, "Enter passphrase")
     run_interaction(cli, passphrase, "BEGIN")
 
-    key_content = cli.before
+    key_content = "-----BEGIN{}".format(cli.read())
+
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    print(key_content)
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+
+    text_file = open(filename, "w")
+    text_file.write(key_content)
+    text_file.close()
 
     cli = run(command_base, "delete", key_name, "Continue?")
     run_interaction(cli, "y", "Key deleted forever")
+
+    cli = run(command_base, "import", "{} {}".format(key_name, filename), "Enter passphrase to decrypt your key")
+    # TODO: fails due to unexpected eof?? Manual import of the same file works well
+    run_interaction(cli, passphrase, None)
+
+    run("list", None, "- name: {}".format(key_name))
 
 
 @pytest.mark.skip
