@@ -177,7 +177,6 @@ jobs:
           pip3 install -r requirements.txt >> /dev/null
           cp -R ${NODE_CONFIGS_BASE}/client/.cheqdnode /home/runner/
           sudo chmod -R 777 /home/runner
-          ls -la /home/runner/.cheqdnode
 
       - name: Run tests
         run: |
