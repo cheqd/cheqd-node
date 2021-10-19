@@ -71,9 +71,13 @@ def test_query(command, params, expected_output):
             ("bank send", f"{RECEIVER_ADDRESS} {SENDER_ADDRESS} 9999ncheq {TEST_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"9999ncheq\""), # transfer back: tcp + fees
         ]
     )
-def test_tx(command, params, expected_output):
+def test_tx_bank_send(command, params, expected_output):
     command_base = "cheqd-noded tx"
     run(command_base, command, params, expected_output)
+
+
+def test_tx_staking():
+    pass
 
 
 @pytest.mark.parametrize(

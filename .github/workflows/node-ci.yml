@@ -16,132 +16,132 @@ env:
   VERSION: "9.9.9" # test deb package version to avoid issues with dpkg
 
 jobs:
-  lint:
-    name: Lint
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
+  # lint:
+  #   name: Lint
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v2
 
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v2
-        with:
-          version: v1.40
-          args: --timeout 5m0s
+  #     - name: golangci-lint
+  #       uses: golangci/golangci-lint-action@v2
+  #       with:
+  #         version: v1.40
+  #         args: --timeout 5m0s
 
-  test:
-    name: Run unit tests
-    runs-on: ubuntu-20.04
-    needs: lint
-    steps:
-      - name: Set up Go 1.16
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.16
+  # test:
+  #   name: Run unit tests
+  #   runs-on: ubuntu-20.04
+  #   needs: lint
+  #   steps:
+  #     - name: Set up Go 1.16
+  #       uses: actions/setup-go@v2
+  #       with:
+  #         go-version: 1.16
 
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
+  #     - name: Check out code into the Go module directory
+  #       uses: actions/checkout@v2
 
-      - name: Run tests
-        run: |
-          PACKAGES=$(go list ./...)
-          go test -v $PACKAGES
+  #     - name: Run tests
+  #       run: |
+  #         PACKAGES=$(go list ./...)
+  #         go test -v $PACKAGES
 
-  build:
-    name: Build binary and create deb package
-    runs-on: ubuntu-20.04
-    needs: test
-    steps:
-      - name: Set up Go 1.16
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.16
+  # build:
+  #   name: Build binary and create deb package
+  #   runs-on: ubuntu-20.04
+  #   needs: test
+  #   steps:
+  #     - name: Set up Go 1.16
+  #       uses: actions/setup-go@v2
+  #       with:
+  #         go-version: 1.16
 
-      # There is an issue with the latest starport, especially 0.18 version
-      - name: Download and build starport
-        run: wget -qO- https://github.com/tendermint/starport/releases/download/v0.17.3/starport_0.17.3_linux_amd64.tar.gz | tar xvz -C /tmp/ && sudo cp /tmp/starport /usr/bin
+  #     # There is an issue with the latest starport, especially 0.18 version
+  #     - name: Download and build starport
+  #       run: wget -qO- https://github.com/tendermint/starport/releases/download/v0.17.3/starport_0.17.3_linux_amd64.tar.gz | tar xvz -C /tmp/ && sudo cp /tmp/starport /usr/bin
 
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
+  #     - name: Check out code into the Go module directory
+  #       uses: actions/checkout@v2
 
-      - name: Build CLI to run commands
-        run: starport chain build
+  #     - name: Build CLI to run commands
+  #       run: starport chain build
 
-      - name: Make archive
-        run: |
-          ./build_tar.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }} 
-        working-directory: ./build_tools
+  #     - name: Make archive
+  #       run: |
+  #         ./build_tar.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }} 
+  #       working-directory: ./build_tools
 
-      - name: Install fpm
-        run: |
-          sudo apt-get install ruby ruby-dev rubygems build-essential
-          sudo gem install --no-document fpm
+  #     - name: Install fpm
+  #       run: |
+  #         sudo apt-get install ruby ruby-dev rubygems build-essential
+  #         sudo gem install --no-document fpm
 
-      - name: Create deb
-        run: |
-          ./build_deb.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }} 
-        working-directory: ./build_tools
+  #     - name: Create deb
+  #       run: |
+  #         ./build_deb.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }} 
+  #       working-directory: ./build_tools
 
-      - name: Upload deb
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
-          path: build_tools/output/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+  #     - name: Upload deb
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+  #         path: build_tools/output/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
 
-  build-images-and-set-up-pool:
-    name: Build cheqd-node and testnet Docker images, install deb package and run Docker pool
-    runs-on: ubuntu-20.04
-    needs: build
-    steps:
-      - name: Download deb
-        uses: actions/download-artifact@v2
-        with:
-          name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+  # build-images-and-set-up-pool:
+  #   name: Build cheqd-node and testnet Docker images, install deb package and run Docker pool
+  #   runs-on: ubuntu-20.04
+  #   needs: build
+  #   steps:
+  #     - name: Download deb
+  #       uses: actions/download-artifact@v2
+  #       with:
+  #         name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
 
-      - name: Install deb
-        run: |
-          sudo dpkg -i ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+  #     - name: Install deb
+  #       run: |
+  #         sudo dpkg -i ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
 
-      - name: Check out
-        uses: actions/checkout@v2
+  #     - name: Check out
+  #       uses: actions/checkout@v2
 
-      - name: Build node image
-        run: |
-          docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
+  #     - name: Build node image
+  #       run: |
+  #         docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
 
-      - name: Set up tests
-        run: |
-          docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
+  #     - name: Build test net image
+  #       run: |
+  #         docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
 
-      - name: Set up 4 validators + 2 observers node docker pool
-        working-directory: ./tests/networks/docker_compose
-        run: |
-          ./gen_node_configs.sh
-          ./run_docker.sh
-          ./wait.sh '[[ $(curl -s -N localhost:26657/block | jq -cr '"'"'.result.block.last_commit.height'"'"') -gt 1 ]] && echo "Height is more than 1"'
+  #     - name: Set up 4 validators + 2 observers node docker pool
+  #       working-directory: ./tests/networks/docker_compose
+  #       run: |
+  #         ./gen_node_configs.sh
+  #         ./run_docker.sh
+  #         ./wait.sh '[[ $(curl -s -N localhost:26657/block | jq -cr '"'"'.result.block.last_commit.height'"'"') -gt 1 ]] && echo "Height is more than 1"'
 
-      - name: Add observer node
-        working-directory: ./tests/networks/docker_compose
-        run: |
-          ./add_observer.sh
-          ./wait.sh '[[ $(cheqd-noded status -n '"'"'tcp://localhost:26677'"'"' 2>&1 | wc -l) == 1 ]] && echo "New node returns status!"'
+  #     - name: Add observer node
+  #       working-directory: ./tests/networks/docker_compose
+  #       run: |
+  #         ./add_observer.sh
+  #         ./wait.sh '[[ $(cheqd-noded status -n '"'"'tcp://localhost:26677'"'"' 2>&1 | wc -l) == 1 ]] && echo "New node returns status!"'
 
-      - name: Promote observer to validator
-        working-directory: ./tests/networks/docker_compose
-        run: |
-          ./promote_validator.sh
-          cheqd-noded query staking validators --node "http://localhost:26657" | sed -nr 's/.*status: (.*?).*/\1/p' $1 | while read x; do [[ "BOND_STATUS_BONDED" == $x ]] && echo "Validator's status is bonded!" || exit 1 ; done
-          ./wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*signature": (.*?).*/\1/p'"'"' | wc -l) == 5 ]] && echo "There are 5 validators signatures in block!"'
-          ./wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*(signature": null).*/\1/p'"'"' | wc -l) == 0 ]] && echo "There are no null signatures in block!"'
+  #     - name: Promote observer to validator
+  #       working-directory: ./tests/networks/docker_compose
+  #       run: |
+  #         ./promote_validator.sh
+  #         cheqd-noded query staking validators --node "http://localhost:26657" | sed -nr 's/.*status: (.*?).*/\1/p' $1 | while read x; do [[ "BOND_STATUS_BONDED" == $x ]] && echo "Validator's status is bonded!" || exit 1 ; done
+  #         ./wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*signature": (.*?).*/\1/p'"'"' | wc -l) == 5 ]] && echo "There are 5 validators signatures in block!"'
+  #         ./wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*(signature": null).*/\1/p'"'"' | wc -l) == 0 ]] && echo "There are no null signatures in block!"'
 
-      - name: Gather logs on failure
-        if: ${{ failure() }}
-        run: |
-          journalctl -ex | grep cheqd
+  #     - name: Gather logs on failure
+  #       if: ${{ failure() }}
+  #       run: |
+  #         journalctl -ex | grep cheqd
 
   run-cosmos-specific-tests:
     name: Run cosmos-specific tests using cheqd-node CLI
     runs-on: ubuntu-20.04
-    needs: build-images-and-set-up-pool
+    # needs: build-images-and-set-up-pool
     steps:
       - name: Set up Go 1.16
         uses: actions/setup-go@v2
@@ -159,6 +159,17 @@ jobs:
         run: |
           starport chain build
           cheqd-noded init test_node
+
+      - name: Build node image
+        run: |
+          docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
+
+      - name: Set up 4 validators + 2 observers node docker pool for local test run
+        working-directory: ./tests/networks/docker_compose
+        run: |
+          ./gen_node_configs.sh
+          ./run_docker.sh
+          ./wait.sh '[[ $(curl -s -N localhost:26657/block | jq -cr '"'"'.result.block.last_commit.height'"'"') -gt 1 ]] && echo "Height is more than 1"'
 
       - name: Set up tests
         working-directory: ./tests/e2e
