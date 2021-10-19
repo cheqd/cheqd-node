@@ -188,4 +188,5 @@ jobs:
           export OP1_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p | sed 's/\r//g')
           echo $OP0_ADDRESS
           echo $OP1_ADDRESS
+          export PYTHONPATH=.
           pytest -v -rP
