@@ -174,10 +174,11 @@ jobs:
       - name: Set up tests and env variables
         working-directory: ./tests/e2e
         run: |
+          PATH=$PATH:${NODE_CONFIGS_BASE}/client/.local/bin
+          sudo chown -R runner:docker ${NODE_CONFIGS_BASE}/client
           export HOME=${NODE_CONFIGS_BASE}/client
           python3 --version
           pip3 install -r requirements.txt >> /dev/null
-          PATH=$PATH:${NODE_CONFIGS_BASE}/client/.local/bin
 
       - name: Run tests
         run: |
