@@ -1,2 +1,0 @@
-# cheqd-testsnet docker image
-

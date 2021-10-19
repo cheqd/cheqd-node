@@ -28,6 +28,7 @@ Temporary Items
 
 # VS Code
 .devcontainer
+.vscode
 
 # Application specific
 vue/node_modules
