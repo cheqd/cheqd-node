@@ -8,6 +8,7 @@ ENCODING = "utf-8"
 READ_BUFFER = 6000
 
 TEST_NET_NETWORK = "cheqd-testnet-2"
+LOCAL_NET_NETWORK = "cheqd"
 TEST_NET_NODE_TCP = "--node 'tcp://seed1.us.testnet.cheqd.network:26657'"
 TEST_NET_NODE_HTTP = "--node http://node1.eu.testnet.cheqd.network:26657/"
 LOCAL_NET_NODE_TCP = "--node 'tcp://localhost:26657'"
