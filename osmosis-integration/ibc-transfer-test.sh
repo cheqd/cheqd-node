@@ -79,7 +79,7 @@ info "Check balances the second time" # ---
 CHEQD_BALANCE_2=$(docker-compose exec cheqd cheqd-noded query bank balances $CHEQD_USER_ADDRESS --output json)
 BALANCES=$(docker-compose exec osmosis osmosisd query bank balances $OSMOSIS_USER_ADDRESS --output json)
 
-log "Denom trace" # ---
+info "Denom trace" # ---
 DENOM=$(echo "$BALANCES" | jq --raw-output '.balances[0].denom')
 DENOM_CUT=$(echo "$DENOM" | cut -c 5-)
 docker-compose exec osmosis osmosisd query ibc-transfer denom-trace $DENOM_CUT
@@ -104,7 +104,7 @@ info "Assert balances" # ---
 [[ $CHEQD_BALANCE_3 < $CHEQD_BALANCE_1 ]] && info "fee processed successfully" || (err "fee error"; exit 1)
 
 
-log "Tear down" # ---
+info "Tear down" # ---
 docker-compose down --timeout 20
 
 
