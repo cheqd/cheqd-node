@@ -56,10 +56,31 @@ def create_export_keys():
          "BEGIN TENDERMINT PRIVATE KEY"),
     ]
 )
-def test_keys_interactive(command, params, expected_output, input_string, expected_output_2):
+def test_keys_export(command, params, expected_output, input_string, expected_output_2):
     command_base = "cheqd-noded keys"
     cli = run(command_base, command, params, expected_output)
     run_interaction(cli, input_string, expected_output_2)
+
+
+
+@pytest.fixture(scope='session')
+def create_import_keys():
+    command_base = "cheqd-noded keys"
+    run(command_base, "add", "import_key", "name: import_key")
+
+
+@pytest.mark.usefixtures('create_import_keys')
+def test_keys_import():
+    command_base = "cheqd-noded keys"
+    key_name = "import_key"
+    passphrase = "00000000"
+    cli = run(command_base, "export", key_name, "Enter passphrase")
+    run_interaction(cli, passphrase, "BEGIN")
+
+    key_content = cli.before
+
+    cli = run(command_base, "delete", key_name, "Continue?")
+    run_interaction(cli, "y", "Key deleted forever")
 
 
 @pytest.mark.skip
