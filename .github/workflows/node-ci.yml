@@ -155,10 +155,9 @@ jobs:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
 
-      - name: Build CLI and init node (for tendermint test)
+      - name: Build CLI and init node (for tendermint test) ?
         run: |
           starport chain build
-          cheqd-noded init test_node
 
       - name: Build node image
         run: |
@@ -179,9 +178,11 @@ jobs:
 
       - name: Run tests
         run: |
+          ls -la ${NODE_CONFIGS_BASE}/client
           export HOME=${NODE_CONFIGS_BASE}/client
           export OP0_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
           export OP1_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p | sed 's/\r//g')
-          echo $OP0_ADDRESS
-          echo $OP1_ADDRESS
+          cp -R ${NODE_CONFIGS_BASE}/client /home/runner/
+          sudo chmod -R 777 /home/runner
+          ls -la /home/runner/.cheqdnode
           HOME=/home/runner pytest -v -rP
