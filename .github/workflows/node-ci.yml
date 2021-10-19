@@ -11,144 +11,45 @@ on:
   workflow_dispatch:
 
 env:
-  NODE_CONFIGS_BASE: "~/work/cheqd-node/cheqd-node/tests/networks/docker_compose/node_configs"
+  NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/tests/networks/docker_compose/node_configs"
+  PACKAGE_NAME: "cheqd-node"
+  VERSION: "9.9.9" # test deb package version to avoid issues with dpkg
 
 jobs:
-  # lint:
-  #   name: cheqd-node linting
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
+  lint:
+    name: Lint
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
 
-  #     - name: golangci-lint
-  #       uses: golangci/golangci-lint-action@v2
-  #       with:
-  #         version: v1.40
-  #         args: --timeout 5m0s
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.40
+          args: --timeout 5m0s
 
-  # test:
-  #   name: cheqd-node unit tests
-  #   runs-on: ubuntu-latest
-  #   needs: lint
-  #   steps:
-  #     - name: Set up Go 1.16
-  #       uses: actions/setup-go@v2
-  #       with:
-  #         go-version: 1.16
+  test:
+    name: Run unit tests
+    runs-on: ubuntu-20.04
+    needs: lint
+    steps:
+      - name: Set up Go 1.16
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
 
-  #     - name: Check out code into the Go module directory
-  #       uses: actions/checkout@v2
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
 
-  #     - name: Run tests
-  #       run: |
-  #         PACKAGES=$(go list ./...)
-  #         go test -v $PACKAGES
+      - name: Run tests
+        run: |
+          PACKAGES=$(go list ./...)
+          go test -v $PACKAGES
 
-  # build:
-  #   name: Build cheqd-node
-  #   runs-on: ubuntu-latest
-  #   needs: test
-  #   steps:
-  #     - name: Set up Go 1.16
-  #       uses: actions/setup-go@v2
-  #       with:
-  #         go-version: 1.16
-
-  #     # There is an issue with the latest starport, especially 0.18 version
-  #     - name: Download and build starport
-  #       run: wget -qO- https://github.com/tendermint/starport/releases/download/v0.17.3/starport_0.17.3_linux_amd64.tar.gz | tar xvz -C /tmp/ && sudo cp /tmp/starport /usr/bin
-
-  #     - name: Check out code into the Go module directory
-  #       uses: actions/checkout@v2
-
-  #     - name: Starport build
-  #       run: starport chain build
-
-  #     - name: Check launch
-  #       run: cheqd-noded help
-
-  # build-images-and-set-up-pool:
-  #   name: Build cheqd-node and testnet Docker images, install deb package and run Docker pool
-  #   runs-on: ubuntu-20.04 # exact version, not latest
-  #   needs: build
-  #   steps:
-  #     - name: Get latest release tag
-  #       uses: rez0n/actions-github-release@main
-  #       id: release_tag
-  #       env:
-  #         token: ${{ secrets.GITHUB_TOKEN }}
-  #         repository: "cheqd/cheqd-node"
-  #         type: "latest"
-
-  #     - name: Download and install latest deb package
-  #       run: |
-  #         export RELEASE_NUMBER=$(echo ${{ steps.release_tag.outputs.release }} | cut -c2-)
-  #         wget https://github.com/cheqd/cheqd-node/releases/download/${{ steps.release_tag.outputs.release }}/cheqd-node_${RELEASE_NUMBER}_amd64.deb > /dev/null
-  #         sudo dpkg -i cheqd-node_${RELEASE_NUMBER}_amd64.deb
-  #         cheqd-noded version
-
-  #     - name: Check out
-  #       uses: actions/checkout@v2
-
-  #     - name: Build node image
-  #       run: |
-  #         docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node .
-
-  #     - name: Build testnet image
-  #       run: |
-  #         docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
-
-  #     - name: Set up 4 validators + 2 observers node docker pool
-  #       run: |
-  #         cd tests/networks/docker_compose
-  #         ./gen_node_configs.sh
-  #         ./run_docker.sh > /dev/null &
-  #         sleep 30
-  #         [[ $(docker ps | wc -l) == 7 ]] && echo "6 pool containers are running!" || exit 1
-
-  #     - name: Add observer node
-  #       run: |
-  #         cd
-  #         pwd
-  #         cheqd-noded init node5
-  #         cp ${{ env.NODE_CONFIGS_BASE }}/node0/.cheqdnode/config/genesis.json ~/.cheqdnode/config/
-  #         NODE0_IP=$(docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} docker_compose_node0_1)
-  #         echo $NODE0_IP
-  #         PEER0=$(cat ${{ env.NODE_CONFIGS_BASE }}/node0/node_id.txt)@$NODE0_IP:26656
-  #         echo $PEER0
-  #         sed -ri "s|persistent_peers = \".*\"|persistent_peers = \"${PEER0}\"|" ~/.cheqdnode/config/config.toml
-  #         sed -ri "s|laddr = \"tcp://127.0.0.1:26657\"|laddr = \"tcp://127.0.0.1:26677\"|" ~/.cheqdnode/config/config.toml
-  #         sed -ri "s|laddr = \"tcp://0.0.0.0:26656\"|laddr = \"tcp://0.0.0.0:26676\"|" ~/.cheqdnode/config/config.toml
-  #         cheqd-noded start > /dev/null &
-  #         sleep 15
-  #         [[ $(cheqd-noded status -n "tcp://localhost:26677" 2>&1 | wc -l) == 1 ]] && echo "New node returns status!" || exit 1
-
-  #     - name: Promote observer to validator
-  #       run: |
-  #         export NODE2_IP=$(docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} docker_compose_node2_1 | sed 's/\r//g')
-  #         echo $NODE2_IP
-  #         sudo chown -R runner:docker ${{ env.NODE_CONFIGS_BASE }}/client
-  #         export HOME=${{ env.NODE_CONFIGS_BASE }}/client
-  #         cheqd-noded keys list
-  #         OP0_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
-  #         echo $OP0_ADDRESS
-  #         cheqd-noded keys add node5-operator
-  #         cheqd-noded keys list
-  #         OP5_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
-  #         echo $OP5_ADDRESS
-  #         export HOME=/home/runner
-  #         NODE5_PUBKEY=$(cheqd-noded tendermint show-validator | sed 's/\r//g')
-  #         echo $NODE5_PUBKEY
-  #         HOME=${{ env.NODE_CONFIGS_BASE }}/client cheqd-noded tx bank send ${OP0_ADDRESS} ${OP5_ADDRESS} 1100000000000000ncheq --chain-id cheqd --fees 5000000ncheq --node "http://${NODE2_IP}:26657" -y
-  #         HOME=${{ env.NODE_CONFIGS_BASE }}/client cheqd-noded tx staking create-validator --amount 1000000000000000ncheq --from node5-operator --chain-id cheqd --min-self-delegation="1" --gas="auto" --gas-prices="25ncheq" --pubkey $NODE5_PUBKEY --commission-max-change-rate="0.02" --commission-max-rate="0.02" --commission-rate="0.01" --gas 239933 --node "http://${NODE2_IP}:26657" -y
-  #         sleep 15
-  #         [[ $(cheqd-noded query staking validators --node "http://${NODE2_IP}:26657" | sed -nr 's/.*status: (.*?).*/\1/p' | wc -l) == 5 ]] && echo "5 validators are running!" || exit 1
-  #         cheqd-noded query staking validators --node "http://${NODE2_IP}:26657" | sed -nr 's/.*status: (.*?).*/\1/p' $1 | while read x; do [[ "BOND_STATUS_BONDED" == $x ]] && echo "Validator's status is bonded!" || exit 1 ; done
-
-  run-cosmos-specific-tests:
-    name: Run cosmos-specific tests using cheqd-node CLI
-    runs-on: ubuntu-latest
-    # needs: build-images-and-set-up-pool
+  build:
+    name: Build binary and create deb package
+    runs-on: ubuntu-20.04
+    needs: test
     steps:
       - name: Set up Go 1.16
         uses: actions/setup-go@v2
@@ -165,33 +66,105 @@ jobs:
       - name: Build CLI to run commands
         run: starport chain build
 
-      # - name: Build node image
-      #   run: |
-      #     docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node .
+      - name: Make archive
+        run: |
+          ./build_tar.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }} 
+        working-directory: ./build_tools
 
-      # - name: Set up 4 validators + 2 observers node docker pool
-      #   run: |
-      #     cd tests/networks/docker_compose
-      #     ./gen_node_configs.sh
-      #     ./run_docker.sh > /dev/null &
-      #     sleep 15
-      #     [[ $(docker ps | wc -l) == 7 ]] && echo "6 pool containers are running!" || exit 1
-      #     cheqd-noded status
+      - name: Install fpm
+        run: |
+          sudo apt-get install ruby ruby-dev rubygems build-essential
+          sudo gem install --no-document fpm
+
+      - name: Create deb
+        run: |
+          ./build_deb.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }} 
+        working-directory: ./build_tools
+
+      - name: Upload deb
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+          path: build_tools/output/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+
+  build-images-and-set-up-pool:
+    name: Build cheqd-node and testnet Docker images, install deb package and run Docker pool
+    runs-on: ubuntu-20.04
+    needs: build
+    steps:
+      - name: Download deb
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+
+      - name: Install deb
+        run: |
+          sudo dpkg -i ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+
+      - name: Check out
+        uses: actions/checkout@v2
+
+      - name: Build node image
+        run: |
+          docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
+
+      - name: Set up tests
+        run: |
+          docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
+
+      - name: Set up 4 validators + 2 observers node docker pool
+        working-directory: ./tests/networks/docker_compose
+        run: |
+          ./gen_node_configs.sh
+          ./run_docker.sh
+          ./wait.sh '[[ $(curl -s -N localhost:26657/block | jq -cr '"'"'.result.block.last_commit.height'"'"') -gt 1 ]] && echo "Height is more than 1"'
+
+      - name: Add observer node
+        working-directory: ./tests/networks/docker_compose
+        run: |
+          ./add_observer.sh
+          ./wait.sh '[[ $(cheqd-noded status -n '"'"'tcp://localhost:26677'"'"' 2>&1 | wc -l) == 1 ]] && echo "New node returns status!"'
+
+      - name: Promote observer to validator
+        working-directory: ./tests/networks/docker_compose
+        run: |
+          ./promote_validator.sh
+          cheqd-noded query staking validators --node "http://localhost:26657" | sed -nr 's/.*status: (.*?).*/\1/p' $1 | while read x; do [[ "BOND_STATUS_BONDED" == $x ]] && echo "Validator's status is bonded!" || exit 1 ; done
+          ./wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*signature": (.*?).*/\1/p'"'"' | wc -l) == 5 ]] && echo "There are 5 validators signatures in block!"'
+          ./wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*(signature": null).*/\1/p'"'"' | wc -l) == 0 ]] && echo "There are no null signatures in block!"'
+
+      - name: Gather logs on failure
+        if: ${{ failure() }}
+        run: |
+          journalctl -ex | grep cheqd
+
+  run-cosmos-specific-tests:
+    name: Run cosmos-specific tests using cheqd-node CLI
+    runs-on: ubuntu-20.04
+    needs: build-images-and-set-up-pool
+    steps:
+      - name: Set up Go 1.16
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+
+      # There is an issue with the latest starport, especially 0.18 version
+      - name: Download and build starport
+        run: wget -qO- https://github.com/tendermint/starport/releases/download/v0.17.3/starport_0.17.3_linux_amd64.tar.gz | tar xvz -C /tmp/ && sudo cp /tmp/starport /usr/bin
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Build CLI and init node (for tendermint test)
+        run: |
+          starport chain build
+          cheqd-noded init test_node
 
       - name: Set up tests
         run: |
           cd tests/e2e
           python3 --version
           pip3 install -r requirements.txt >> /dev/null
-
       - name: Run tests
         run: |
           pytest -v -rP
-
-  # run-identity-specific-tests:
-  #   name: Run identity-specific tests using cheqd-node CLI or VDR tools
-  #   runs-on: ubuntu-latest
-  #   needs: build-images-and-set-up-pool
-  #   steps:
-  #     - name: Check out
-  #       uses: actions/checkout@v2

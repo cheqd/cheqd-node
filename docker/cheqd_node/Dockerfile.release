@@ -19,6 +19,8 @@ RUN wget -qO- https://github.com/tendermint/starport/releases/download/v0.17.3/s
 # App
 WORKDIR /app
 
+ARG STARPORT_RELEASE_PARAMS
+
 COPY app ./app
 COPY cmd ./cmd
 COPY proto ./proto
@@ -28,25 +30,23 @@ COPY go.mod .
 COPY go.sum .
 COPY .git .
 
-RUN starport chain build
+RUN starport chain build $STARPORT_RELEASE_PARAMS
 
-
+# It looks ugly cause starport chain build --release creates archive without version.
+RUN tar xzvf release/cheqd-node_linux_amd64.tar.gz
 #####  Run container  #####
 
 FROM debian:buster
 
 # Node binary
-COPY --from=builder /go/bin/cheqd-noded /bin
+COPY --from=builder /app/cheqd-noded /bin
 
 # Runner script
 COPY docker/cheqd_node/node-runner.sh /bin/node-runner
 RUN chmod +x /bin/node-runner
 
-ARG UID=1000
-ARG GID=1000
-
-RUN groupadd --system --gid $GID cheqd && \
-    useradd --system --create-home --home-dir /cheqd --shell /bin/bash --gid cheqd --uid $UID cheqd
+RUN groupadd --system --gid 1000 cheqd && \
+    useradd --system --create-home --home-dir /cheqd --shell /bin/bash --gid cheqd --uid 1000 cheqd
 RUN chown -R cheqd /cheqd
 
 WORKDIR /cheqd
