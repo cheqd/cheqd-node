@@ -9,7 +9,7 @@
 
 ## Summary
 
-The aim of this document is to define the genesis parameters that will be used in the cheqd network testnet.
+The aim of this document is to define the genesis parameters that will be used in cheqd network testnet and mainnet.
 
 > Cosmos v0.42.5 parameters are described.
 
@@ -128,13 +128,16 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
   * `bond_denom` = `ncheq`
     * Denomination used in staking
 * _\[ibc\]_ **`ibc`**
-  * ...
+  * `max_expected_time_per_block` = `20000000000`
+    * Maximum expected time per block (in nanoseconds), used to enforce block delay. This parameter should reflect the largest amount of time that the chain might reasonably take to produce the next block under normal operating conditions. A safe choice is 3-5x the expected time per block.
+  * `allowed_clients` = `[ "07-tendermint" ]` (allow connections only from other chains)
+    * Defines the list of allowed client state types. We allow connections only from other chains.
 * _\[ibc\]_ **`capability`**
-  * ...
+  * No params
 * _\[ibc\]_ **`transfer`**
-  * `send_enabled` = `false`
+  * `send_enabled` = `true`
     * Enables or disables all cross-chain token transfers from this chain
-  * `receive_enabled` = `false`
+  * `receive_enabled` = `true`
     * Enables or disables all cross-chain token transfers to this chain
 
 ## Decision
