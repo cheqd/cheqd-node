@@ -12,7 +12,7 @@ from helpers import run, run_interaction, get_balance, send_with_note, \
         [
             ("help", "",r"cheqd App(.*?)Usage:(.*?)Available Commands:(.*?)Flags:"),
             ("status", TEST_NET_NODE_TCP, fr"\"NodeInfo\"(.*?)\"network\":\"{TEST_NET_NETWORK}\"(.*?)\"moniker\":\"seed1-us-testnet-cheqd\""), # tcp + us node
-            ("status", TEST_NET_NODE_HTTP, fr"\"NodeInfo\"(.*?)\"network\":\"{TEST_NET_NETWORK}\"(.*?)\"moniker\":\"node1-eu-testnet-cheqd\""), # http + eu node
+            # ("status", TEST_NET_NODE_HTTP, fr"\"NodeInfo\"(.*?)\"network\":\"{TEST_NET_NETWORK}\"(.*?)\"moniker\":\"node1-eu-testnet-cheqd\""), # http + eu node
         ]
     )
 def test_basic(command, params, expected_output):
@@ -70,7 +70,7 @@ def test_query(command, params, expected_output):
             ("bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 4ncheq {LOCAL_NET_DESTINATION} --gas 1 --gas-prices 25ncheq {YES_FLAG}", r"\"code\":11(.*?)out of gas"), # bad gas amount
             ("bank send", f"{LOCAL_RECEIVER_ADDRESS} {LOCAL_SENDER_ADDRESS} 2ncheq {LOCAL_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"2ncheq\""), # transfer back: 2 + fees
             ("bank send", f"{LOCAL_RECEIVER_ADDRESS} {LOCAL_SENDER_ADDRESS} 1ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"1ncheq\""), # transfer back: 1 + gas x price
-            ("bank send", f"{LOCAL_RECEIVER_ADDRESS} {LOCAL_SENDER_ADDRESS} 999999999ncheq {LOCAL_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", r"\"code\":5(.*?)insufficient funds"),
+            ("bank send", f"{LOCAL_RECEIVER_ADDRESS} {LOCAL_SENDER_ADDRESS} 99999999999999999ncheq {LOCAL_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", r"\"code\":5(.*?)insufficient funds"),
             ("bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 1000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} --note 'test123!=$'", fr"{CODE_0}(.*?)\"value\":\"1000ncheq\""), # note
             ("bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 9999ncheq {LOCAL_NET_DESTINATION_HTTP} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"9999ncheq\""), # http + gas x price
             ("bank send", f"{LOCAL_RECEIVER_ADDRESS} {LOCAL_SENDER_ADDRESS} 9999ncheq {LOCAL_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"9999ncheq\""), # transfer back: tcp + fees
