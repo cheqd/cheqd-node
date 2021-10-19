@@ -48,10 +48,7 @@ func TestHandler_UpdateDid(t *testing.T) {
 
 	didMsgUpdate := setup.UpdateDid(state.GetDid(), newPubKey, state.Metadata.VersionId)
 	dataUpdate, _ := ptypes.NewAnyWithValue(didMsgUpdate)
-	resultUpdate, err := setup.Handler(setup.Ctx, setup.WrapRequest(dataUpdate, keys, map[string]string{}))
-	if err != nil {
-
-	}
+	resultUpdate, _ := setup.Handler(setup.Ctx, setup.WrapRequest(dataUpdate, keys, map[string]string{}))
 
 	didUpdated := types.MsgUpdateDidResponse{}
 	errUpdate := didUpdated.Unmarshal(resultUpdate.Data)
