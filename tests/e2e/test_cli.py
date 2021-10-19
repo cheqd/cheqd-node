@@ -1,6 +1,8 @@
 import re
 
 import pexpect
+import os
+import shutil
 import pytest
 import getpass
 from helpers import run, run_interaction, \
@@ -93,6 +95,22 @@ def test_keys_import():
     run_interaction(cli, passphrase, "")
 
     run(command_base, "list", None, "- name: {}".format(key_name))
+
+
+def test_keys_recovery():
+    command_base = "cheqd-noded keys"
+    key_name = "recovery_key"
+    cli = run(command_base, "add", key_name, "name: {}".format(key_name))
+
+    command_result = cli.read()
+    mnemonic = re.search('(\w+\s){24}', command_result).group(0)
+    print(mnemonic)
+
+    keys_path = "/home/{}/.cheqdnode/".format(getpass.getuser())
+    shutil.rmtree(keys_path)
+
+    cli = run(command_base, "add", "{} --recover".format(key_name), "Enter your bip39 mnemonic")
+    run_interaction(cli, mnemonic, r"- name: {}(.*?)type: local(.*?)address: (.*?)pubkey: (.*?)mnemonic: ".format(key_name))
 
 
 @pytest.mark.skip
