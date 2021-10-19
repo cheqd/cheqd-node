@@ -24,7 +24,7 @@ func (k msgServer) CreateCredDef(goCtx context.Context, msg *types.MsgWriteReque
 	}
 
 	// Checks that the element exists
-	if err := k.HasDidDoc(ctx, credDefMsg.Id[:len(credDefMsg.Id)-8]); err != nil {
+	if err := k.HasDidDoc(ctx, credDefMsg.GetDid()); err != nil {
 		return nil, err
 	}
 

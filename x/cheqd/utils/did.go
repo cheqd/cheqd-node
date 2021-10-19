@@ -27,6 +27,12 @@ var ServiceType = []string{
 	"DIDCommMessaging",
 }
 
+var CredDefSuffix = "/credDef"
+var CredDefSuffixLen = len(CredDefSuffix)
+
+var SchemaSuffix = "/schema"
+var SchemaSuffixLen = len(SchemaSuffix)
+
 func SplitDidUrlIntoDidAndFragment(didUrl string) (string, string) {
 	fragments := strings.Split(didUrl, "#")
 	return fragments[0], fragments[1]
@@ -125,4 +131,20 @@ func IsDid(did string) bool {
 	}
 
 	return true
+}
+
+func IsSchema(did string) bool {
+	return !strings.HasSuffix(did, SchemaSuffix)
+}
+
+func GetDidFromSchema(schema string) string {
+	return schema[:len(schema)-SchemaSuffixLen]
+}
+
+func IsCredDef(did string) bool {
+	return !strings.HasSuffix(did, CredDefSuffix)
+}
+
+func GetDidFromCredDef(credDef string) string {
+	return credDef[:len(credDef)-CredDefSuffixLen]
 }

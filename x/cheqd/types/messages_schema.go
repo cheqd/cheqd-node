@@ -2,7 +2,6 @@ package types
 
 import (
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
-	"strings"
 )
 
 var _ IdentityMsg = &MsgCreateSchema{}
@@ -30,12 +29,16 @@ func (msg *MsgCreateSchema) GetSigners() []Signer {
 	return result
 }
 
+func (msg *MsgCreateSchema) GetDid() string {
+	return utils.GetDidFromSchema(msg.Id)
+}
+
 func (msg *MsgCreateSchema) ValidateBasic() error {
-	if !strings.HasSuffix(msg.Id, "/schema") {
+	if !utils.IsSchema(msg.Id) {
 		return ErrBadRequest.Wrap("Id must end with resource type '/schema'")
 	}
 
-	if utils.IsNotDid(msg.Id[:len(msg.Id)-7]) {
+	if utils.IsNotDid(msg.GetDid()) {
 		return ErrBadRequestIsNotDid.Wrap("Id")
 	}
 

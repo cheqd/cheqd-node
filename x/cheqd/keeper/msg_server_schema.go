@@ -24,7 +24,7 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgWriteReques
 	}
 
 	// Checks that the element exists
-	if err := k.HasDidDoc(ctx, schemaMsg.Id[:len(schemaMsg.Id)-7]); err != nil {
+	if err := k.HasDidDoc(ctx, schemaMsg.GetDid()); err != nil {
 		return nil, err
 	}
 
