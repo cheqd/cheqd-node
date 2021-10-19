@@ -28,7 +28,7 @@ message MsgCreateCredDef {
   string id = 1;
   string schema_id = 2;
   string tag = 3;
-  string signature_type = 4;
+  string type = 4;
   oneof value {
     CredDefValue cl_type = 5;
     google.protobuf.Any any_type = 6;

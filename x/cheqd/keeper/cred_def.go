@@ -88,13 +88,6 @@ func (k Keeper) AppendCredDef(
 	return id
 }
 
-// SetCredDef set a specific credDef in the store
-func (k Keeper) SetCredDef(ctx sdk.Context, credDef types.CredDef) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CredDefKey))
-	b := k.cdc.MustMarshal(&credDef)
-	store.Set(GetCredDefIDBytes(credDef.Id), b)
-}
-
 // GetCredDef returns a credDef from its id
 func (k Keeper) GetCredDef(ctx sdk.Context, id string) (*types.CredDef, error) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CredDefKey))

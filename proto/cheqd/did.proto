@@ -11,7 +11,7 @@ message Did {
   repeated string controller = 2; //optional
   repeated VerificationMethod verification_method = 3; // optional
   repeated string authentication = 4; // optional
-  repeated string assertionMethod = 5; // optional
+  repeated string assertion_method = 5; // optional
   repeated string capability_invocation = 6; // optional
   repeated string capability_delegation = 7; // optional
   repeated string key_agreement = 8; // optional
