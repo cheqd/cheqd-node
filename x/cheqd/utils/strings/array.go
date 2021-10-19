@@ -29,7 +29,3 @@ func Complement(vs []string, ts []string) []string {
 		return !Include(ts, s)
 	})
 }
-
-func E() {
-
-}
