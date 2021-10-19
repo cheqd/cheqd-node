@@ -53,7 +53,7 @@ def test_query(command, params, expected_output):
         [
             ("bank send", "", r"Error: accepts 3 arg\(s\), received 0"), # no args
             ("bank send", f"{SENDER_ADDRESS} {RECEIVER_ADDRESS} 0ncheq {TEST_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", r"Error: : invalid coins"), # 0
-            ("bank send", f"{SENDER_ADDRESS} {RECEIVER_ADDRESS} 100ncheq {TEST_NET_FEES} {YES_FLAG}", r"Error: post failed: Post \"http://localhost:26657\": dial tcp 127.0.0.1:26657: connect: connection refused"), # no destination, localhost error
+            ("bank send", f"{SENDER_ADDRESS} {RECEIVER_ADDRESS} 100ncheq {TEST_NET_FEES} {YES_FLAG}", r"Error: post failed: Post \"http://localhost:26657\"(.*?)connect: connection refused"), # no destination, localhost error
             ("bank send", f"{SENDER_ADDRESS} {RECEIVER_ADDRESS} 1ncheq {TEST_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"1ncheq\""), # 1 + fees
             ("bank send", f"{SENDER_ADDRESS} {RECEIVER_ADDRESS} 2ncheq {TEST_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"2ncheq\""), # 2 + gas x price
             ("bank send", f"{SENDER_ADDRESS} {RECEIVER_ADDRESS} 99ncheq {TEST_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"99ncheq\""),
