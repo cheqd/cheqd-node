@@ -3,7 +3,6 @@ package keeper
 import (
 	"crypto/ed25519"
 	"encoding/base64"
-	"errors"
 	"fmt"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
@@ -68,7 +67,7 @@ func VerifyIdentitySignature(signer types.Signer, signatures map[string]string, 
 	}
 
 	if !foundOne {
-		return false, errors.New(fmt.Sprintf("signature %s not found", signer.Signer))
+		return false, fmt.Errorf("signature %s not found", signer.Signer)
 	}
 
 	return result, nil

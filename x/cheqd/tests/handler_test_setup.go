@@ -160,12 +160,12 @@ func (s *TestSetup) CreateCredDef() *types.MsgCreateCredDef {
 	}
 
 	return &types.MsgCreateCredDef{
-		Id:            "did:cheqd:test:cred-def-1/credDef",
-		SchemaId:      "schema-1",
-		Tag:           "tag",
-		SignatureType: "CL-Sig-Cred_def",
-		Value:         &Value,
-		Controller:    []string{"did:cheqd:test:alice"},
+		Id:         "did:cheqd:test:cred-def-1/credDef",
+		SchemaId:   "schema-1",
+		Tag:        "tag",
+		Type:       "CL-Sig-Cred_def",
+		Value:      &Value,
+		Controller: []string{"did:cheqd:test:alice"},
 	}
 }
 
@@ -221,20 +221,16 @@ func (s *TestSetup) SendUpdateDid(msg *types.MsgUpdateDid, keys map[string]ed255
 	}
 
 	// query Did
-	_, didMetadata, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
+	state, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
+	msg.VersionId = state.Metadata.VersionId
 
-	// add new Did
-	metadata := map[string]string{
-		"versionId": didMetadata.VersionId,
-	}
-
-	_, err = s.Handler(s.Ctx, s.WrapRequest(data, keys, metadata))
+	_, err = s.Handler(s.Ctx, s.WrapRequest(data, keys, map[string]string{}))
 	if err != nil {
 		return nil, err
 	}
 
-	did, _, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
-	return did, nil
+	did, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
+	return did.GetDid(), nil
 }
 
 func (s *TestSetup) SendCreateDid(msg *types.MsgCreateDid, keys map[string]ed25519.PrivateKey) (*types.Did, error) {
@@ -248,8 +244,8 @@ func (s *TestSetup) SendCreateDid(msg *types.MsgCreateDid, keys map[string]ed255
 		return nil, err
 	}
 
-	did, _, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
-	return did, nil
+	state, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
+	return state.GetDid(), nil
 }
 
 func ConcatKeys(dst map[string]ed25519.PrivateKey, src map[string]ed25519.PrivateKey) map[string]ed25519.PrivateKey {

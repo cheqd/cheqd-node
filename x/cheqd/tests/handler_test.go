@@ -17,7 +17,8 @@ func TestHandler_CreateDid(t *testing.T) {
 	_, did, _ := setup.InitDid("did:cheqd:test:alice")
 
 	// query Did
-	receivedDid, _, _ := setup.Keeper.GetDid(&setup.Ctx, did.Id)
+	state, _ := setup.Keeper.GetDid(&setup.Ctx, did.Id)
+	receivedDid := state.GetDid()
 
 	// check
 	require.Equal(t, did.Id, receivedDid.Id)
@@ -40,19 +41,14 @@ func TestHandler_UpdateDid(t *testing.T) {
 	keys, did, _ := setup.InitDid("did:cheqd:test:alice")
 
 	// query Did
-	receivedDid, didMetadata, _ := setup.Keeper.GetDid(&setup.Ctx, did.Id)
+	state, _ := setup.Keeper.GetDid(&setup.Ctx, did.Id)
 
 	//Init priv key
 	newPubKey, _, _ := ed25519.GenerateKey(rand.Reader)
 
-	// add new Did
-	metadata := map[string]string{
-		"versionId": didMetadata.VersionId,
-	}
-
-	didMsgUpdate := setup.UpdateDid(receivedDid, newPubKey)
+	didMsgUpdate := setup.UpdateDid(state.GetDid(), newPubKey)
 	dataUpdate, _ := ptypes.NewAnyWithValue(didMsgUpdate)
-	resultUpdate, _ := setup.Handler(setup.Ctx, setup.WrapRequest(dataUpdate, keys, metadata))
+	resultUpdate, _ := setup.Handler(setup.Ctx, setup.WrapRequest(dataUpdate, keys, map[string]string{}))
 
 	didUpdated := types.MsgUpdateDidResponse{}
 	errUpdate := didUpdated.Unmarshal(resultUpdate.Data)
@@ -62,7 +58,8 @@ func TestHandler_UpdateDid(t *testing.T) {
 	}
 
 	// query Did
-	receivedUpdatedDid, _, _ := setup.Keeper.GetDid(&setup.Ctx, did.Id)
+	updatedState, _ := setup.Keeper.GetDid(&setup.Ctx, did.Id)
+	receivedUpdatedDid := updatedState.GetDid()
 
 	// check
 	require.Equal(t, didUpdated.Id, receivedUpdatedDid.Id)
@@ -75,7 +72,7 @@ func TestHandler_UpdateDid(t *testing.T) {
 	require.Equal(t, didMsgUpdate.KeyAgreement, receivedUpdatedDid.KeyAgreement)
 	require.Equal(t, didMsgUpdate.AlsoKnownAs, receivedUpdatedDid.AlsoKnownAs)
 	require.Equal(t, didMsgUpdate.Service, receivedUpdatedDid.Service)
-	require.NotEqual(t, receivedDid.VerificationMethod, receivedUpdatedDid.VerificationMethod)
+	require.NotEqual(t, state.GetDid().VerificationMethod, receivedUpdatedDid.VerificationMethod)
 }
 
 func TestHandler_CreateSchema(t *testing.T) {
@@ -95,7 +92,8 @@ func TestHandler_CreateSchema(t *testing.T) {
 	}
 
 	// query Did
-	receivedSchema, _ := setup.Keeper.GetSchema(setup.Ctx, schema.Id)
+	state, _ := setup.Keeper.GetSchema(setup.Ctx, schema.Id)
+	receivedSchema := state.GetSchema()
 
 	require.Equal(t, schema.Id, receivedSchema.Id)
 	require.Equal(t, msg.Type, receivedSchema.Type)
@@ -121,8 +119,9 @@ func TestHandler_CreateCredDef(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	// query Cred Def
-	receivedCredDef, _ := setup.Keeper.GetCredDef(setup.Ctx, credDef.Id)
+	// query Did
+	state, _ := setup.Keeper.GetCredDef(setup.Ctx, credDef.Id)
+	receivedCredDef := state.GetCredDef()
 
 	expectedValue := msg.Value.(*types.MsgCreateCredDef_ClType)
 	actualValue := receivedCredDef.Value.(*types.CredDef_ClType)
@@ -131,7 +130,7 @@ func TestHandler_CreateCredDef(t *testing.T) {
 	require.Equal(t, expectedValue.ClType, actualValue.ClType)
 	require.Equal(t, msg.SchemaId, receivedCredDef.SchemaId)
 	require.Equal(t, msg.Tag, receivedCredDef.Tag)
-	require.Equal(t, msg.SignatureType, receivedCredDef.SignatureType)
+	require.Equal(t, msg.Type, receivedCredDef.Type)
 	require.Equal(t, msg.Controller, receivedCredDef.Controller)
 }
 

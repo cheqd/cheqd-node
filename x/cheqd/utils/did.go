@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-var DidForbiddenSymbolsRegexp, _ = regexp.Compile("^[^#?&/\\\\]+$")
+var DidForbiddenSymbolsRegexp, _ = regexp.Compile(`^[^#?&/\\]+$`)
 
 var VerificationMethodType = []string{
 	"JsonWebKey2020",
@@ -100,7 +100,7 @@ func ArrayContainsNotDidFragment(array []string) (bool, int) {
 }
 
 func IsNotDid(did string) bool {
-	return IsDid(did) == false
+	return !IsDid(did)
 }
 
 func IsDid(did string) bool {

@@ -127,22 +127,3 @@ func TestDIDDocVerificationMethodDeleted(t *testing.T) {
 	require.NotEqual(t, len(aliceDid.VerificationMethod), len(receivedDid.VerificationMethod))
 	require.True(t, reflect.DeepEqual(aliceDid.VerificationMethod[0], receivedDid.VerificationMethod[0]))
 }
-
-/*func TestHandler_UpdateDidInvalidSignature(t *testing.T) {
-	setup := Setup()
-
-	_, did, _ := setup.InitDid("did:cheqd:test:alice")
-
-	// query Did
-	receivedDid, _, _ := setup.Keeper.GetDid(&setup.Ctx, did.Id)
-
-	//Init priv key
-	newPubKey, newPrivKey, _ := ed25519.GenerateKey(rand.Reader)
-
-	// add new Did
-	didMsgUpdate := setup.UpdateDid(receivedDid, newPubKey)
-	dataUpdate, _ := ptypes.NewAnyWithValue(didMsgUpdate)
-	_, err := setup.Handler(setup.Ctx, setup.WrapRequest(newPrivKey, dataUpdate, make(map[string]string)))
-	require.Error(t, err)
-	require.Equal(t, "did:cheqd:test:alice: invalid signature detected", err.Error())
-}*/

@@ -137,12 +137,6 @@ func (k Keeper) GetDid(ctx *sdk.Context, id string) (*types.StateValue, error) {
 	return &value, nil
 }
 
-// areOwners returns a bool are received authors can control this DID
-func (k Keeper) areDidOwners(ctx sdk.Context, id string, authors []string) bool {
-	//return utils.CompareOwners(authors, k.GetDid(ctx, id).Controller)
-	return true
-}
-
 // HasDid checks if the did exists in the store
 func (k Keeper) HasDid(ctx sdk.Context, id string) bool {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
