@@ -36,14 +36,24 @@ def test_keys(command, params, expected_output):
     run(command_base, command, params, expected_output)
 
 
+@pytest.fixture(scope='session')
+def create_export_keys():
+    command_base = "cheqd-noded keys"
+    run(command_base, "add", "export_key", "name: export_key")
+
+
 # tbd - import, migrate, parse
-@pytest.mark.skip
+@pytest.mark.usefixtures('create_export_keys')
 @pytest.mark.parametrize(
     "command, params, expected_output, input_string, expected_output_2",
     [
-        ("export", "test2", "Enter passphrase to encrypt the exported key", "123456", "password must be at least 8 characters"),
-        ("export", "test2", "Enter passphrase to encrypt the exported key", "12345678",
+        ("export", "export_key", "Enter passphrase to encrypt the exported key", "123456", "password must be at least 8 characters"),
+        ("export", "export_key", "Enter passphrase to encrypt the exported key", "12345678",
         "BEGIN TENDERMINT PRIVATE KEY"),
+        ("export", "export_key", "Enter passphrase to encrypt the exported key", "qwe!@#$%^123",
+         "BEGIN TENDERMINT PRIVATE KEY"),
+        ("export", "export_key", "Enter passphrase to encrypt the exported key", "ttttttttttttttttttttttttttttttttttttttt",
+         "BEGIN TENDERMINT PRIVATE KEY"),
     ]
 )
 def test_keys_interactive(command, params, expected_output, input_string, expected_output_2):
