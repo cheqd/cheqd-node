@@ -1,16 +1,16 @@
 import re
 import pytest
-from helpers import run, run_interaction, \
+from helpers import run, run_interaction, get_balance, send_with_note, \
     TEST_NET_NETWORK, TEST_NET_NODE_TCP, TEST_NET_NODE_HTTP, TEST_NET_DESTINATION, TEST_NET_DESTINATION_HTTP, TEST_NET_FEES, TEST_NET_GAS_X_GAS_PRICES, YES_FLAG, \
-    SENDER_ADDRESS, RECEIVER_ADDRESS, CODE_0
+    SENDER_ADDRESS, RECEIVER_ADDRESS, CODE_0, TEST_NET_GAS_X_GAS_PRICES_INT
 
 
 @pytest.mark.parametrize(
         "command, params, expected_output",
         [
             ("help", "",r"cheqd App(.*?)Usage:(.*?)Available Commands:(.*?)Flags:"),
-            ("status", TEST_NET_NODE_TCP, fr"\"NodeInfo\"(.*?)\"network\":\"{TEST_NET_NETWORK}\"(.*?)\"moniker\":\"seed1-us-testnet-cheqd\""),
-            ("status", TEST_NET_NODE_HTTP, fr"\"NodeInfo\"(.*?)\"network\":\"{TEST_NET_NETWORK}\"(.*?)\"moniker\":\"node1-eu-testnet-cheqd\""),
+            ("status", TEST_NET_NODE_TCP, fr"\"NodeInfo\"(.*?)\"network\":\"{TEST_NET_NETWORK}\"(.*?)\"moniker\":\"seed1-us-testnet-cheqd\""), # tcp + us node
+            ("status", TEST_NET_NODE_HTTP, fr"\"NodeInfo\"(.*?)\"network\":\"{TEST_NET_NETWORK}\"(.*?)\"moniker\":\"node1-eu-testnet-cheqd\""), # http + eu node
         ]
     )
 def test_basic(command, params, expected_output):
@@ -40,6 +40,7 @@ def test_keys(command, params, expected_output):
         [
             ("staking validators", f"{TEST_NET_DESTINATION}", r"pagination:(.*?)validators:"),
             ("bank balances", f"{SENDER_ADDRESS} {TEST_NET_DESTINATION}", r"balances:(.*?)amount:(.*?)denom: ncheq(.*?)pagination:"),
+            ("bank balances", f"{RECEIVER_ADDRESS} {TEST_NET_DESTINATION}", r"balances:(.*?)amount:(.*?)denom: ncheq(.*?)pagination:"),
         ]
     )
 def test_query(command, params, expected_output):
@@ -52,6 +53,7 @@ def test_query(command, params, expected_output):
         "command, params, expected_output",
         [
             ("bank send", "", r"Error: accepts 3 arg\(s\), received 0"), # no args
+            ("bank send", f"{SENDER_ADDRESS} {RECEIVER_ADDRESS} -1ncheq {TEST_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", r"Error: unknown shorthand flag: '1' in -1ncheq"), # -1
             ("bank send", f"{SENDER_ADDRESS} {RECEIVER_ADDRESS} 0ncheq {TEST_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", r"Error: : invalid coins"), # 0
             ("bank send", f"{SENDER_ADDRESS} {RECEIVER_ADDRESS} 100ncheq {TEST_NET_FEES} {YES_FLAG}", r"Error: post failed: Post \"http://localhost:26657\"(.*?)connect: connection refused"), # no destination, localhost error
             ("bank send", f"{SENDER_ADDRESS} {RECEIVER_ADDRESS} 1ncheq {TEST_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"1ncheq\""), # 1 + fees
@@ -64,7 +66,7 @@ def test_query(command, params, expected_output):
             ("bank send", f"{RECEIVER_ADDRESS} {SENDER_ADDRESS} 2ncheq {TEST_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"2ncheq\""), # transfer back: 2 + fees
             ("bank send", f"{RECEIVER_ADDRESS} {SENDER_ADDRESS} 1ncheq {TEST_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"1ncheq\""), # transfer back: 1 + gas x price
             ("bank send", f"{RECEIVER_ADDRESS} {SENDER_ADDRESS} 999999999ncheq {TEST_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", r"\"code\":5(.*?)insufficient funds"),
-            ("bank send", f"{SENDER_ADDRESS} {RECEIVER_ADDRESS} 1000ncheq {TEST_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} --note 'test123!=$'", fr"{CODE_0}(.*?)\"value\":\"1000ncheq\""),
+            ("bank send", f"{SENDER_ADDRESS} {RECEIVER_ADDRESS} 1000ncheq {TEST_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} --note 'test123!=$'", fr"{CODE_0}(.*?)\"value\":\"1000ncheq\""), # note
             ("bank send", f"{SENDER_ADDRESS} {RECEIVER_ADDRESS} 9999ncheq {TEST_NET_DESTINATION_HTTP} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"9999ncheq\""), # http + gas x price
             ("bank send", f"{RECEIVER_ADDRESS} {SENDER_ADDRESS} 9999ncheq {TEST_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"9999ncheq\""), # transfer back: tcp + fees
         ]
@@ -87,6 +89,23 @@ def test_tendermint(command, params, expected_output):
     run(command_base, command, params, expected_output)
 
 
-def test_production(send_with_note):
-    tx_hash, tx_memo = send_with_note
+# TODO: hypothesis
+@pytest.mark.parametrize('note', ["a", "123qwe!@#", "asd_qwe_zxc", "kdkfdkgkSGDAFHFHGFHGFHGFHHGFH000009999991111111111111~&*"])
+def test_memo(note):
+    tx_hash, tx_memo = send_with_note(note)
     run("cheqd-noded query", "tx", f"{tx_hash} {TEST_NET_DESTINATION}", fr"code: 0(.*?)memo: {tx_memo}(.*?)txhash: {tx_hash}") # check that txn has correct memo value
+
+
+# TODO: hypothesis
+@pytest.mark.parametrize('value', ["1", "888", "55555", "1000000", "9876540"])
+def test_balance(value):
+    sender_balance = get_balance(SENDER_ADDRESS, TEST_NET_DESTINATION)
+    receiver_balance = get_balance(RECEIVER_ADDRESS, TEST_NET_DESTINATION)
+
+    run("cheqd-noded tx", "bank send", f"{SENDER_ADDRESS} {RECEIVER_ADDRESS} {value}ncheq {TEST_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"{value}ncheq\"")
+
+    new_sender_balance = get_balance(SENDER_ADDRESS, TEST_NET_DESTINATION)
+    new_receiver_balance = get_balance(RECEIVER_ADDRESS, TEST_NET_DESTINATION)
+
+    assert int(new_sender_balance) == (int(sender_balance) - int(value) - TEST_NET_GAS_X_GAS_PRICES_INT)
+    assert int(new_receiver_balance) == (int(receiver_balance) + int(value))

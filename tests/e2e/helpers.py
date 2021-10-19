@@ -1,5 +1,6 @@
 import sys
 import pexpect
+import re
 
 
 IMPLICIT_TIMEOUT = 30
@@ -13,6 +14,7 @@ TEST_NET_DESTINATION = f"{TEST_NET_NODE_TCP} --chain-id 'cheqd-testnet-2'"
 TEST_NET_DESTINATION_HTTP = f"{TEST_NET_NODE_HTTP} --chain-id 'cheqd-testnet-2'"
 TEST_NET_FEES = "--fees 5000000ncheq"
 TEST_NET_GAS_X_GAS_PRICES = "--gas 70000 --gas-prices 25ncheq"
+TEST_NET_GAS_X_GAS_PRICES_INT = 1750000
 YES_FLAG = "-y"
 
 SENDER_ADDRESS = "cheqd1ece09txhq6nm9fkft9jh3mce6e48ftescs5jsw"
@@ -35,3 +37,15 @@ def run(command_base, command, params, expected_output):
 def run_interaction(cli, input_string, expected_output):
     cli.sendline(input_string)
     cli.expect(expected_output)
+
+
+def get_balance(address, network_destination):
+    cli = run("cheqd-noded query", "bank balances", f"{address} {network_destination}", r"balances:(.*?)amount:(.*?)denom: ncheq(.*?)pagination:")
+    balance = re.search(r"amount: \"(.+?)\"", cli.after).group(1).strip()
+    return balance
+
+
+def send_with_note(note):
+    cli = run("cheqd-noded tx", "bank send", f"{SENDER_ADDRESS} {RECEIVER_ADDRESS} 1000ncheq {TEST_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} --note {note}", fr"{CODE_0}(.*?)\"value\":\"1000ncheq\"")
+    tx_hash = re.search(r"\"txhash\":\"(.+?)\"", cli.before).group(1).strip()
+    return tx_hash, note
