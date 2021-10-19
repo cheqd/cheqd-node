@@ -4,7 +4,7 @@ from helpers import run, run_interaction, get_balance, send_with_note, \
     TEST_NET_NETWORK, TEST_NET_NODE_TCP, TEST_NET_NODE_HTTP, TEST_NET_DESTINATION, TEST_NET_DESTINATION_HTTP, \
     LOCAL_NET_NETWORK, LOCAL_NET_NODE_TCP, LOCAL_NET_NODE_HTTP, LOCAL_NET_DESTINATION, LOCAL_NET_DESTINATION_HTTP, \
     TEST_NET_FEES, TEST_NET_GAS_X_GAS_PRICES, YES_FLAG, \
-    SENDER_ADDRESS, RECEIVER_ADDRESS, CODE_0, TEST_NET_GAS_X_GAS_PRICES_INT
+    SENDER_ADDRESS, RECEIVER_ADDRESS, LOCAL_SENDER_ADDRESS, LOCAL_RECEIVER_ADDRESS,CODE_0, TEST_NET_GAS_X_GAS_PRICES_INT
 
 
 @pytest.mark.parametrize(
@@ -41,9 +41,12 @@ def test_keys(command, params, expected_output):
         "command, params, expected_output",
         [
             ("staking validators", f"{TEST_NET_DESTINATION}", r"pagination:(.*?)validators:"), # test net
+            ("bank balances", f"{SENDER_ADDRESS} {TEST_NET_DESTINATION}", r"balances:(.*?)amount:(.*?)denom: ncheq(.*?)pagination:"),
+            ("bank balances", f"{RECEIVER_ADDRESS} {TEST_NET_DESTINATION}", r"balances:(.*?)amount:(.*?)denom: ncheq(.*?)pagination:"),
+
             ("staking validators", f"{LOCAL_NET_DESTINATION}", r"pagination:(.*?)validators:"), # local net
-            ("bank balances", f"{SENDER_ADDRESS} {TEST_NET_DESTINATION}", r"balances:(.*?)amount:(.*?)denom: ncheq(.*?)pagination:"), # FIXME for local
-            ("bank balances", f"{RECEIVER_ADDRESS} {TEST_NET_DESTINATION}", r"balances:(.*?)amount:(.*?)denom: ncheq(.*?)pagination:"), # FIXME for local
+            ("bank balances", f"{LOCAL_SENDER_ADDRESS} {LOCAL_NET_DESTINATION}", r"balances:(.*?)amount:(.*?)denom: ncheq(.*?)pagination:"),
+            ("bank balances", f"{LOCAL_RECEIVER_ADDRESS} {LOCAL_NET_DESTINATION}", r"balances:(.*?)amount:(.*?)denom: ncheq(.*?)pagination:"),
         ]
     )
 def test_query(command, params, expected_output):
