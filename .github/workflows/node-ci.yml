@@ -155,7 +155,7 @@ jobs:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
 
-      - name: Build CLI and init node (for tendermint test) ?
+      - name: Build CLI
         run: |
           starport chain build
 
@@ -170,19 +170,17 @@ jobs:
           ./run_docker.sh
           ./wait.sh '[[ $(curl -s -N localhost:26657/block | jq -cr '"'"'.result.block.last_commit.height'"'"') -gt 1 ]] && echo "Height is more than 1"'
 
-      - name: Set up tests and env variables
+      - name: Set up test environment
         working-directory: ./tests/e2e
         run: |
           python3 --version
           pip3 install -r requirements.txt >> /dev/null
-
-      - name: Run tests
-        run: |
-          ls -la ${NODE_CONFIGS_BASE}/client
-          export HOME=${NODE_CONFIGS_BASE}/client
-          export OP0_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
-          export OP1_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p | sed 's/\r//g')
           cp -R ${NODE_CONFIGS_BASE}/client/.cheqdnode /home/runner/
           sudo chmod -R 777 /home/runner
           ls -la /home/runner/.cheqdnode
-          HOME=/home/runner pytest -v -rP
+
+      - name: Run tests
+        run: |
+          export OP0_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
+          export OP1_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p | sed 's/\r//g')
+          pytest -v -rP
