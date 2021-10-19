@@ -176,6 +176,12 @@ jobs:
         run: |
           python3 --version
           pip3 install -r requirements.txt >> /dev/null
+          export HOME=${NODE_CONFIGS_BASE}/client
+          cheqd-noded keys list
+          export OP0_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
+          echo $OP0_ADDRESS
+          export OP1_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p | sed 's/\r//g')
+          echo $OP1_ADDRESS
 
       - name: Run tests
         run: |
