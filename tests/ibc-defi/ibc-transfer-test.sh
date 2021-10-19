@@ -106,16 +106,3 @@ info "Assert balances" # ---
 
 info "Tear down" # ---
 docker-compose down --timeout 20
-
-
-# Ready:
-# - Positive case test
-# ToDo:
-# - Test with gravity
-# - Look at osmosis, atom, gravity genesis params
-# - Test back transfers
-# - Read white paper
-# Questions:
-# - Back transfer via other channel?
-# - relayers scalability?
-# - What to backup on relyer?
