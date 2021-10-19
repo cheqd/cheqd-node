@@ -13,6 +13,7 @@ Getting started as a node operator on the cheqd network testnet requires the fol
    1. Node ID for your node
    2. IP address / DNS record that points to the node \(if you're using an IP address, a static IP is recommended\)
    3. Peer-to-peer \(P2P\) connection port \(defaults to `26656`\)
+   4. Validator account address (begins with `cheqd`)
 3. Once you have received your tokens, [promote your node to a validator](docs/setup-and-configure/configure-new-validator.md).
 4. If successfully configured, your node would become the latest validator on the cheqd Testnet! Say hi to the other node operators on the [\#testnet-node-operators](https://cheqd-community.slack.com/archives/C029NSCSA75) channel.
 

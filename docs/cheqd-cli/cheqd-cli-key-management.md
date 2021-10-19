@@ -67,4 +67,3 @@ Most transactions will require you to use `--from <key-alias>` param which is a 
 ```bash
 cheqd-noded tx <module> <tx-name> --from <key-alias>
 ```
-

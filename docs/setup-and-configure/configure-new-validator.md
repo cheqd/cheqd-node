@@ -22,31 +22,42 @@ While the instructions listed here are specific to the cheqd testnet, a similar 
 
    Follow the guidance on [using cheqd CLI to manage keys](../cheqd-cli/cheqd-cli-key-management.md) to create a new account key.
 
-   When you create a new key, a `mnemonic phrase` and `account address` will be printed. K**eep the mnemonic phrase safe** as this is the only way to restore access to the account if they keyring cannot be recovered.
-
    ```bash
    cheqd-noded keys add <alias>
    ```
 
-3. **Get your node ID / node address**
+   When you create a new key, a `mnemonic phrase` and `account address` will be printed. K**eep the mnemonic phrase safe** as this is the only way to restore access to the account if they keyring cannot be recovered.
 
-   Follow the guidance on [using cheqd CLI to manage nodes](../cheqd-cli/cheqd-cli-node-management.md) to fetch your node ID / node address.
+3. **Get your node ID**
+
+   Follow the guidance on [using cheqd CLI to manage nodes](../cheqd-cli/cheqd-cli-node-management.md) to fetch your node ID.
 
    ```bash
    cheqd-noded tendermint show-node-id
    ```
 
+4. **Get your validator account address**
+
+   The validator account address is generated in Step 1 above when a new key is added. To show the validator account address, follow the [cheqd CLI guide on managing accounts](../cheqd-cli/cheqd-cli-accounts.md).
+
+   ```bash
+   cheqd-noded keys list
+   ```
+
+   (The assumption above is that there is only one account / key that has been added on the node. In case you have multiple addresses, please jot down the preferred account address.)
+
 ### Requesting CHEQ tokens for cheqd testnet
 
-Once you have successfully completed the steps above, please fill out our [**node operator onboarding form**](http://cheqd.link/join-testnet-form) so that you can acquire CHEQ testnet tokens required for staking on the network.
+Once you have successfully completed the steps above, please fill out our [**node operator onboarding form**](http://cheqd.link/join-testnet-form) so that you can acquire CHEQ testnet tokens required for staking on the network. The tokens will be send to your (validator) account address generated above.
 
 You will need to have the following details on hand to fill out the form:
 
 1. Node ID for your node
 2. IP address / DNS record that points to the node \(if you're using an IP address, a static IP is recommended\)
 3. Peer-to-peer \(P2P\) connection port \(default is `26656`\)
+4. Validator account address (begins with `cheqd`)
 
-If you need help or support, join our [**cheqd Community Slack** ](http://cheqd.link/join-cheqd-slack) and [ask for help](https://cheqd-community.slack.com/archives/C02AQ9UK4HY).
+If you need help or support, join our [**cheqd Community Slack**](http://cheqd.link/join-cheqd-slack) and [ask for help](https://cheqd-community.slack.com/archives/C02AQ9UK4HY).
 
 ## Promote a node to validator after acquiring CHEQ tokens for staking
 
@@ -110,7 +121,7 @@ If you need help or support, join our [**cheqd Community Slack** ](http://cheqd.
    Find out your [validator node's hex-encoded address](../cheqd-cli/cheqd-cli-node-management.md) and look for `"ValidatorInfo":{"Address":"..."}`:
 
    ```bash
-   cheqd-noded tendermint show-address --node <node-rpc-url>
+   cheqd-noded tendermint show-address
    ```
 
    Query the latest block. Open `<node-address:rpc-port/block` in a web browser. Make sure that there is a signature with your validator address in the signature list.
