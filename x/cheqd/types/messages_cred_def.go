@@ -9,12 +9,12 @@ var _ IdentityMsg = &MsgCreateCredDef{}
 
 func NewMsgCreateCredDef(id string, schemaId string, tag string, signatureType string, controller []string, value *MsgCreateCredDef_ClType) *MsgCreateCredDef {
 	return &MsgCreateCredDef{
-		Id:            id,
-		SchemaId:      schemaId,
-		Tag:           tag,
-		SignatureType: signatureType,
-		Value:         value,
-		Controller:    controller,
+		Id:         id,
+		SchemaId:   schemaId,
+		Tag:        tag,
+		Type:       signatureType,
+		Value:      value,
+		Controller: controller,
 	}
 }
 
@@ -47,12 +47,12 @@ func (msg *MsgCreateCredDef) ValidateBasic() error {
 		return ErrBadRequestIsRequired.Wrap("SchemaId")
 	}
 
-	if len(msg.SignatureType) == 0 {
+	if len(msg.Type) == 0 {
 		return ErrBadRequestIsRequired.Wrap("SignatureType")
 	}
 
-	if utils.IsNotCredDefSignatureType(msg.SignatureType) {
-		return ErrBadRequest.Wrapf("%s is not allowed signature type", msg.SignatureType)
+	if utils.IsNotCredDefSignatureType(msg.Type) {
+		return ErrBadRequest.Wrapf("%s is not allowed type", msg.Type)
 	}
 
 	if len(msg.Controller) == 0 {

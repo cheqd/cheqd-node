@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"encoding/base64"
-	"fmt"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -82,26 +81,16 @@ func (k Keeper) AppendSchema(
 	return id
 }
 
-// SetSchema set a specific schema in the store
-func (k Keeper) SetSchema(ctx sdk.Context, schema types.Schema) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.SchemaKey))
-	b := k.cdc.MustMarshal(&schema)
-	store.Set(GetSchemaIDBytes(schema.Id), b)
-}
-
 // GetSchema returns a schema from its id
-func (k Keeper) GetSchema(ctx sdk.Context, id string) (*types.Schema, error) {
+func (k Keeper) GetSchema(ctx sdk.Context, id string) (*types.StateValue, error) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.SchemaKey))
 
 	var value types.StateValue
-	k.cdc.MustUnmarshal(store.Get(GetSchemaIDBytes(id)), &value)
-
-	switch data := value.Data.(type) {
-	case *types.StateValue_Schema:
-		return data.Schema, nil
-	default:
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidType, fmt.Sprintf("State has unexpected type %T", data))
+	if err := k.cdc.Unmarshal(store.Get(GetSchemaIDBytes(id)), &value); err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidType, err.Error())
 	}
+
+	return &value, nil
 }
 
 // HasSchema checks if the schema exists in the store

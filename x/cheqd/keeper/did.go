@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"encoding/base64"
-	"fmt"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -127,21 +126,15 @@ func (k Keeper) SetDid(ctx sdk.Context, did types.Did, metadata *types.Metadata)
 }
 
 // GetDid returns a did from its id
-func (k Keeper) GetDid(ctx *sdk.Context, id string) (*types.Did, *types.Metadata, error) {
+func (k Keeper) GetDid(ctx *sdk.Context, id string) (*types.StateValue, error) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
 
 	var value types.StateValue
-	err := k.cdc.Unmarshal(store.Get(GetDidIDBytes(id)), &value)
-	if err != nil {
-		return nil, nil, sdkerrors.Wrap(sdkerrors.ErrInvalidType, err.Error())
+	if err := k.cdc.Unmarshal(store.Get(GetDidIDBytes(id)), &value); err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidType, err.Error())
 	}
 
-	switch data := value.Data.(type) {
-	case *types.StateValue_Did:
-		return data.Did, value.Metadata, nil
-	default:
-		return nil, nil, sdkerrors.Wrap(sdkerrors.ErrInvalidType, fmt.Sprintf("State has unexpected type %T", data))
-	}
+	return &value, nil
 }
 
 // areOwners returns a bool are received authors can control this DID

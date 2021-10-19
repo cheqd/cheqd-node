@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"encoding/base64"
-	"fmt"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -59,12 +58,12 @@ func (k Keeper) AppendCredDef(
 	}
 
 	var credDef = types.CredDef{
-		Id:            id,
-		SchemaId:      schemaId,
-		Tag:           tag,
-		SignatureType: signatureType,
-		Value:         clValue,
-		Controller:    controller,
+		Id:         id,
+		SchemaId:   schemaId,
+		Tag:        tag,
+		Type:       signatureType,
+		Value:      clValue,
+		Controller: controller,
 	}
 
 	created := ctx.BlockTime().String()
@@ -89,18 +88,15 @@ func (k Keeper) AppendCredDef(
 }
 
 // GetCredDef returns a credDef from its id
-func (k Keeper) GetCredDef(ctx sdk.Context, id string) (*types.CredDef, error) {
+func (k Keeper) GetCredDef(ctx sdk.Context, id string) (*types.StateValue, error) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CredDefKey))
 
 	var value types.StateValue
-	k.cdc.MustUnmarshal(store.Get(GetCredDefIDBytes(id)), &value)
-
-	switch data := value.Data.(type) {
-	case *types.StateValue_CredDef:
-		return data.CredDef, nil
-	default:
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidType, fmt.Sprintf("State has unexpected type %T", data))
+	if err := k.cdc.Unmarshal(store.Get(GetCredDefIDBytes(id)), &value); err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidType, err.Error())
 	}
+
+	return &value, nil
 }
 
 // HasCredDef checks if the credDef exists in the store

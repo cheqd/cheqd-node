@@ -23,13 +23,13 @@ func (k *Keeper) VerifySignature(ctx *sdk.Context, msg *types.MsgWriteRequest, s
 
 	for _, signer := range signers {
 		if signer.VerificationMethod == nil {
-			didDoc, _, err := k.GetDid(ctx, signer.Signer)
+			state, err := k.GetDid(ctx, signer.Signer)
 			if err != nil {
 				return types.ErrDidDocNotFound.Wrap(signer.Signer)
 			}
 
-			signer.Authentication = didDoc.Authentication
-			signer.VerificationMethod = didDoc.VerificationMethod
+			signer.Authentication = state.GetDid().Authentication
+			signer.VerificationMethod = state.GetDid().VerificationMethod
 		}
 
 		valid, err := VerifyIdentitySignature(signer, msg.Signatures, signingInput)

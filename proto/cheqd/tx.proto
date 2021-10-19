@@ -83,6 +83,7 @@ message MsgUpdateDid {
   repeated string also_known_as = 9;
   repeated DidService service = 10;
   repeated string context = 11;
+  string version_id = 12;
 }
 
 

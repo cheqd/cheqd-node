@@ -69,22 +69,17 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %s doesn't exist", didMsg.Id))
 	}
 
-	oldDIDDoc, metadata, err := k.GetDid(&ctx, didMsg.Id)
+	oldDIDDoc, err := k.GetDid(&ctx, didMsg.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := k.UpdateDidVerifySignature(&ctx, msg, oldDIDDoc, didMsg); err != nil {
+	if err := k.UpdateDidVerifySignature(&ctx, msg, oldDIDDoc.GetDid(), didMsg); err != nil {
 		return nil, err
 	}
 
-	versionId, exists := msg.Metadata["versionId"]
-	if !exists {
-		return nil, sdkerrors.Wrap(types.ErrUnexpectedDidVersion, "Metadata doesn't contain `versionId`")
-	}
-
-	if metadata.VersionId != versionId {
-		errMsg := fmt.Sprintf("Ecpected %s with version %s. Got version %s", didMsg.Id, metadata.VersionId, versionId)
+	if oldDIDDoc.Metadata.VersionId != didMsg.VersionId {
+		errMsg := fmt.Sprintf("Ecpected %s with version %s. Got version %s", didMsg.Id, oldDIDDoc.Metadata.VersionId, didMsg.VersionId)
 		return nil, sdkerrors.Wrap(types.ErrUnexpectedDidVersion, errMsg)
 	}
 
@@ -102,7 +97,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 		Context:              didMsg.Context,
 	}
 
-	k.SetDid(ctx, did, metadata)
+	k.SetDid(ctx, did, oldDIDDoc.Metadata)
 
 	return &types.MsgUpdateDidResponse{
 		Id: didMsg.Id,

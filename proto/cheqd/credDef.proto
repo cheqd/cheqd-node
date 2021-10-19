@@ -10,7 +10,7 @@ message CredDef {
   string id = 1;
   string schema_id = 2;
   string tag = 3;
-  string signature_type = 4;
+  string type = 4;
   repeated string controller = 5;
   oneof value {
     CredDefValue cl_type = 6;
