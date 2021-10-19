@@ -182,7 +182,7 @@ jobs:
           export HOME=${NODE_CONFIGS_BASE}/client
           export OP0_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
           export OP1_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p | sed 's/\r//g')
-          cp -R ${NODE_CONFIGS_BASE}/client /home/runner/
+          cp -R ${NODE_CONFIGS_BASE}/client/.cheqdnode /home/runner/
           sudo chmod -R 777 /home/runner
           ls -la /home/runner/.cheqdnode
           HOME=/home/runner pytest -v -rP
