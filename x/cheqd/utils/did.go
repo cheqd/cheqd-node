@@ -134,7 +134,7 @@ func IsDid(did string) bool {
 }
 
 func IsSchema(did string) bool {
-	return !strings.HasSuffix(did, SchemaSuffix)
+	return strings.HasSuffix(did, SchemaSuffix)
 }
 
 func GetDidFromSchema(schema string) string {
@@ -142,7 +142,7 @@ func GetDidFromSchema(schema string) string {
 }
 
 func IsCredDef(did string) bool {
-	return !strings.HasSuffix(did, CredDefSuffix)
+	return strings.HasSuffix(did, CredDefSuffix)
 }
 
 func GetDidFromCredDef(credDef string) string {

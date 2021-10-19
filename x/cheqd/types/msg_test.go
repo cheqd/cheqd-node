@@ -98,7 +98,7 @@ func TestNewMsgCreateCredDef(t *testing.T) {
 				"ss",
 				[]string{"did:cheqd:test:alice"},
 				&MsgCreateCredDef_ClType{ClType: &CredDefValue{Primary: nil, Revocation: nil}}),
-			"ss is not allowed signature type: bad request",
+			"ss is not allowed type: bad request",
 		},
 		{
 			false,
