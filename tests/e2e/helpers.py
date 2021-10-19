@@ -1,4 +1,5 @@
 import sys
+import os
 import pexpect
 import re
 
@@ -26,6 +27,9 @@ SENDER_ADDRESS = "cheqd1ece09txhq6nm9fkft9jh3mce6e48ftescs5jsw"
 SENDER_MNEMONIC = "oil long siege student rent jar awkward park entry ripple enable company sort people little damp arrange wise slender push brief solve tattoo cycle"
 RECEIVER_ADDRESS= "cheqd16d72a6kusmzml5mjhzjv63c9j5xnpsyqs8f3sk"
 RECEIVER_MNEMONIC = "strike impact earth indoor man illness virus genuine rib control antenna loop neck rotate bargain original nasty size either try snap quiz stairs huge"
+
+LOCAL_SENDER_ADDRESS = os.environ["OP0_ADDRESS"]
+LOCAL_RECEIVER_ADDRESS = os.environ["OP1_ADDRESS"]
 
 CODE_0 = "\"code\":0"
 

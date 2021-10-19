@@ -176,12 +176,12 @@ jobs:
         run: |
           python3 --version
           pip3 install -r requirements.txt >> /dev/null
-          export HOME=${NODE_CONFIGS_BASE}/client
-          export OP0_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
-          export OP1_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p | sed 's/\r//g')
 
       - name: Run tests
         run: |
+          export HOME=${NODE_CONFIGS_BASE}/client
+          export OP0_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
+          export OP1_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p | sed 's/\r//g')
           echo $OP0_ADDRESS
           echo $OP1_ADDRESS
           pytest -v -rP
