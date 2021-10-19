@@ -46,9 +46,12 @@ func TestHandler_UpdateDid(t *testing.T) {
 	//Init priv key
 	newPubKey, _, _ := ed25519.GenerateKey(rand.Reader)
 
-	didMsgUpdate := setup.UpdateDid(state.GetDid(), newPubKey)
+	didMsgUpdate := setup.UpdateDid(state.GetDid(), newPubKey, state.Metadata.VersionId)
 	dataUpdate, _ := ptypes.NewAnyWithValue(didMsgUpdate)
-	resultUpdate, _ := setup.Handler(setup.Ctx, setup.WrapRequest(dataUpdate, keys, map[string]string{}))
+	resultUpdate, err := setup.Handler(setup.Ctx, setup.WrapRequest(dataUpdate, keys, map[string]string{}))
+	if err != nil {
+
+	}
 
 	didUpdated := types.MsgUpdateDidResponse{}
 	errUpdate := didUpdated.Unmarshal(resultUpdate.Data)
@@ -149,7 +152,7 @@ func TestHandler_DidDocAlreadyExists(t *testing.T) {
 	_, err = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys, make(map[string]string)))
 
 	require.Error(t, err)
-	require.Equal(t, "DID DOC already exists for CredDef did:cheqd:test:cred-def-1/credDef: DID Doc exists", err.Error())
+	require.Equal(t, "DID DOC already exists for CredDef did:cheqd:test:cred-def-1: DID Doc exists", err.Error())
 
 	schemaMsg := setup.CreateSchema()
 	data, _ = ptypes.NewAnyWithValue(schemaMsg)
@@ -157,5 +160,5 @@ func TestHandler_DidDocAlreadyExists(t *testing.T) {
 	_, err = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys, make(map[string]string)))
 
 	require.Error(t, err)
-	require.Equal(t, "DID DOC already exists for Schema did:cheqd:test:schema-1/schema: DID Doc exists", err.Error())
+	require.Equal(t, "DID DOC already exists for Schema did:cheqd:test:schema-1: DID Doc exists", err.Error())
 }

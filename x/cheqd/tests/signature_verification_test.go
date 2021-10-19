@@ -34,7 +34,7 @@ func TestDIDDocVerificationMethodChangedWithoutOldSignature(t *testing.T) {
 	bobKeys, _, _ := setup.InitDid("did:cheqd:test:bob")
 
 	updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
-	updatedDidDoc.VerificationMethod[0].Type = "new"
+	updatedDidDoc.VerificationMethod[0].Type = "SchnorrSecp256k1VerificationKey2019"
 	_, err := setup.SendUpdateDid(updatedDidDoc, bobKeys)
 
 	// check
@@ -86,14 +86,18 @@ func TestDIDDocVerificationMethodDeletedWithoutOldSignature(t *testing.T) {
 	aliceDid.VerificationMethod = append(aliceDid.VerificationMethod, &types.VerificationMethod{
 		Id:                 "did:cheqd:test:alice#key-2",
 		Controller:         "did:cheqd:test:bob",
+		Type:               "Ed25519VerificationKey2020",
 		PublicKeyMultibase: bodDidDoc.VerificationMethod[0].PublicKeyMultibase,
 	})
+
+	aliceDid.Authentication = append(aliceDid.Authentication, "did:cheqd:test:alice#key-2")
 
 	aliceKeys := map[string]ed25519.PrivateKey{"did:cheqd:test:alice#key-1": privKey}
 	_, _ = setup.SendCreateDid(aliceDid, aliceKeys)
 
 	updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
 	updatedDidDoc.VerificationMethod = []*types.VerificationMethod{aliceDid.VerificationMethod[0]}
+	updatedDidDoc.Authentication = []string{aliceDid.Authentication[0]}
 	_, err := setup.SendUpdateDid(updatedDidDoc, aliceKeys)
 
 	// check
@@ -110,9 +114,11 @@ func TestDIDDocVerificationMethodDeleted(t *testing.T) {
 	pubKey, privKey, _ := ed25519.GenerateKey(rand.Reader)
 	aliceDid := setup.CreateDid(pubKey, "did:cheqd:test:alice")
 
+	aliceDid.Authentication = append(aliceDid.Authentication, "did:cheqd:test:alice#key-2")
 	aliceDid.VerificationMethod = append(aliceDid.VerificationMethod, &types.VerificationMethod{
 		Id:                 "did:cheqd:test:alice#key-2",
 		Controller:         "did:cheqd:test:bob",
+		Type:               "Ed25519VerificationKey2020",
 		PublicKeyMultibase: bodDidDoc.VerificationMethod[0].PublicKeyMultibase,
 	})
 
@@ -120,6 +126,7 @@ func TestDIDDocVerificationMethodDeleted(t *testing.T) {
 	_, _ = setup.SendCreateDid(aliceDid, aliceKeys)
 
 	updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
+	updatedDidDoc.Authentication = []string{aliceDid.Authentication[0]}
 	updatedDidDoc.VerificationMethod = []*types.VerificationMethod{aliceDid.VerificationMethod[0]}
 	receivedDid, _ := setup.SendUpdateDid(updatedDidDoc, ConcatKeys(aliceKeys, bobKeys))
 

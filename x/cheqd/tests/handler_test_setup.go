@@ -80,8 +80,8 @@ func (s *TestSetup) CreateDid(pubKey ed25519.PublicKey, did string) *types.MsgCr
 	}
 
 	Service := types.DidService{
-		Id:              "1",
-		Type:            "type",
+		Id:              "#service-2",
+		Type:            "DIDCommMessaging",
 		ServiceEndpoint: "endpoint",
 	}
 
@@ -90,17 +90,17 @@ func (s *TestSetup) CreateDid(pubKey ed25519.PublicKey, did string) *types.MsgCr
 		Controller:           nil,
 		VerificationMethod:   []*types.VerificationMethod{&VerificationMethod},
 		Authentication:       []string{did + "#key-1"},
-		AssertionMethod:      []string{"AssertionMethod"},
-		CapabilityInvocation: []string{"CapabilityInvocation"},
-		CapabilityDelegation: []string{"CapabilityDelegation"},
-		KeyAgreement:         []string{"KeyAgreement"},
-		AlsoKnownAs:          []string{"AlsoKnownAs"},
+		AssertionMethod:      []string{did + "#key-1"},
+		CapabilityInvocation: []string{did + "#key-1"},
+		CapabilityDelegation: []string{did + "#key-1"},
+		KeyAgreement:         []string{did + "#key-1"},
+		AlsoKnownAs:          []string{did + "#key-1"},
 		Context:              []string{"Context"},
 		Service:              []*types.DidService{&Service},
 	}
 }
 
-func (s *TestSetup) UpdateDid(did *types.Did, pubKey ed25519.PublicKey) *types.MsgUpdateDid {
+func (s *TestSetup) UpdateDid(did *types.Did, pubKey ed25519.PublicKey, versionId string) *types.MsgUpdateDid {
 	PublicKeyMultibase := "z" + base58.Encode(pubKey)
 
 	VerificationMethod := types.VerificationMethod{
@@ -114,13 +114,15 @@ func (s *TestSetup) UpdateDid(did *types.Did, pubKey ed25519.PublicKey) *types.M
 		Id:                   did.Id,
 		Controller:           did.Controller,
 		VerificationMethod:   []*types.VerificationMethod{did.VerificationMethod[0], &VerificationMethod},
-		Authentication:       did.Authentication,
+		Authentication:       append(did.Authentication, "#key-2"),
 		AssertionMethod:      did.AssertionMethod,
 		CapabilityInvocation: did.CapabilityInvocation,
 		CapabilityDelegation: did.CapabilityDelegation,
 		KeyAgreement:         did.KeyAgreement,
 		AlsoKnownAs:          did.AlsoKnownAs,
 		Service:              did.Service,
+		VersionId:            versionId,
+		Context:              did.Context,
 	}
 }
 
