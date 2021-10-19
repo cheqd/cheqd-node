@@ -5,6 +5,7 @@ import (
 )
 
 var _ IdentityMsg = &MsgCreateSchema{}
+var MaxAttrNamesCount = 125
 
 func NewMsgCreateSchema(id string, typeSchema string, name string, version string, attrNames []string, controller []string) *MsgCreateSchema {
 	return &MsgCreateSchema{
@@ -54,7 +55,7 @@ func (msg *MsgCreateSchema) ValidateBasic() error {
 		return ErrBadRequestIsRequired.Wrap("AttrNames")
 	}
 
-	if len(msg.AttrNames) > 125 {
+	if len(msg.AttrNames) > MaxAttrNamesCount {
 		return ErrBadRequest.Wrapf("AttrNames: Expected max length 125, got: %d", len(msg.AttrNames))
 	}
 
