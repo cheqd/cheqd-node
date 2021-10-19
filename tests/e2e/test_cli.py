@@ -65,14 +65,12 @@ def test_keys_export(command, params, expected_output, input_string, expected_ou
     run_interaction(cli, input_string, expected_output_2)
 
 
-
 @pytest.fixture(scope='session')
 def create_import_keys():
     command_base = "cheqd-noded keys"
     run(command_base, "add", "import_key", "name: import_key")
 
 
-@pytest.mark.skip
 @pytest.mark.usefixtures('create_import_keys')
 def test_keys_import():
     command_base = "cheqd-noded keys"
@@ -84,10 +82,6 @@ def test_keys_import():
 
     key_content = "-----BEGIN{}".format(cli.read())
 
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-    print(key_content)
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-
     text_file = open(filename, "w")
     text_file.write(key_content)
     text_file.close()
@@ -96,10 +90,9 @@ def test_keys_import():
     run_interaction(cli, "y", "Key deleted forever")
 
     cli = run(command_base, "import", "{} {}".format(key_name, filename), "Enter passphrase to decrypt your key")
-    # TODO: fails due to unexpected eof?? Manual import of the same file works well
-    run_interaction(cli, passphrase, None)
+    run_interaction(cli, passphrase, "")
 
-    run("list", None, "- name: {}".format(key_name))
+    run(command_base, "list", None, "- name: {}".format(key_name))
 
 
 @pytest.mark.skip
