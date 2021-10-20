@@ -1,5 +1,7 @@
 import json
 import pytest
+from hypothesis import settings, given, strategies, Phase, Verbosity
+from string import digits, ascii_letters
 from helpers import run, run_interaction, get_balance, send_with_note, set_up_operator, \
     TEST_NET_NETWORK, TEST_NET_NODE_TCP, TEST_NET_NODE_HTTP, TEST_NET_DESTINATION, TEST_NET_DESTINATION_HTTP, \
     LOCAL_NET_NETWORK, LOCAL_NET_NODE_TCP, LOCAL_NET_NODE_HTTP, LOCAL_NET_DESTINATION, LOCAL_NET_DESTINATION_HTTP, \
@@ -83,6 +85,7 @@ def test_tx_bank_send(command, params, expected_output):
     run(command_base, command, params, expected_output)
 
 
+# TODO get observers' pubkeys to promote them
 NODE_PUBKEY = json.dumps({"@type":"/cosmos.crypto.ed25519.PubKey","key":"+Gt8W3guq0TE0HuVuJBI3maNhj2uCW02CZE9pAbkiA8="})
 @pytest.mark.parametrize(
         "command, params, expected_output",
@@ -111,16 +114,16 @@ def test_tendermint(command, params, expected_output):
     run(command_base, command, params, expected_output)
 
 
-# TODO: hypothesis
-@pytest.mark.parametrize('note', ["a", "123qwe!@#", "asd_qwe_zxc", "kdkfdkgkSGDAFHFHGFHGFHGFHHGFH000009999991111111111111~&*"])
+@settings(deadline=None, max_examples=25)
+@given(note=strategies.text(ascii_letters, min_size=1, max_size=1024))
 def test_memo(note):
     tx_hash, tx_memo = send_with_note(note)
     run("cheqd-noded query", "tx", f"{tx_hash} {LOCAL_NET_DESTINATION}", fr"code: 0(.*?)memo: {tx_memo}(.*?)txhash: {tx_hash}") # check that txn has correct memo value
 
 
-# TODO: hypothesis
-@pytest.mark.parametrize('value', ["1", "888", "55555", "1000000", "987654321"])
-def test_balance(value):
+@settings(deadline=None, max_examples=25)
+@given(value=strategies.integers(min_value=1, max_value=999999999))
+def test_token_transfer(value):
     sender_balance = get_balance(LOCAL_SENDER_ADDRESS, LOCAL_NET_DESTINATION)
     receiver_balance = get_balance(LOCAL_RECEIVER_ADDRESS, LOCAL_NET_DESTINATION)
 
@@ -129,5 +132,5 @@ def test_balance(value):
     new_sender_balance = get_balance(LOCAL_SENDER_ADDRESS, LOCAL_NET_DESTINATION)
     new_receiver_balance = get_balance(LOCAL_RECEIVER_ADDRESS, LOCAL_NET_DESTINATION)
 
-    assert int(new_sender_balance) == (int(sender_balance) - int(value) - TEST_NET_GAS_X_GAS_PRICES_INT)
-    assert int(new_receiver_balance) == (int(receiver_balance) + int(value))
+    assert int(new_sender_balance) == (int(sender_balance) - value - TEST_NET_GAS_X_GAS_PRICES_INT)
+    assert int(new_receiver_balance) == (int(receiver_balance) + value)
