@@ -1,6 +1,6 @@
-import re
+import json
 import pytest
-from helpers import run, run_interaction, get_balance, send_with_note, \
+from helpers import run, run_interaction, get_balance, send_with_note, set_up_operator, \
     TEST_NET_NETWORK, TEST_NET_NODE_TCP, TEST_NET_NODE_HTTP, TEST_NET_DESTINATION, TEST_NET_DESTINATION_HTTP, \
     LOCAL_NET_NETWORK, LOCAL_NET_NODE_TCP, LOCAL_NET_NODE_HTTP, LOCAL_NET_DESTINATION, LOCAL_NET_DESTINATION_HTTP, \
     TEST_NET_FEES, TEST_NET_GAS_X_GAS_PRICES, YES_FLAG, \
@@ -56,7 +56,7 @@ def test_query(command, params, expected_output):
     run(command_base, command, params, expected_output)
 
 
-@pytest.mark.usefixtures('restore_test_keys') # for pipeline
+@pytest.mark.usefixtures('restore_test_keys') # for test net
 @pytest.mark.parametrize(
         "command, params, expected_output",
         [
@@ -83,8 +83,19 @@ def test_tx_bank_send(command, params, expected_output):
     run(command_base, command, params, expected_output)
 
 
-def test_tx_staking():
-    pass
+NODE_PUBKEY = json.dumps({"@type":"/cosmos.crypto.ed25519.PubKey","key":"+Gt8W3guq0TE0HuVuJBI3maNhj2uCW02CZE9pAbkiA8="})
+@pytest.mark.parametrize(
+        "command, params, expected_output",
+        [
+            ("staking create-validator", "", r"Error: required flag\(s\) \"amount\", \"from\", \"pubkey\" not set"), # no args
+            ("staking create-validator", fr"--amount 1000000000000000ncheq --from {set_up_operator()[0]} --pubkey {set_up_operator()[2]} --min-self-delegation='1' --commission-max-change-rate='0.02' --commission-max-rate='0.02' --commission-rate='0.01' {TEST_NET_FEES} {LOCAL_NET_DESTINATION} {YES_FLAG}", r"\"code\":6(.*?)validator pubkey type is not supported"), # wrong pubkey type
+            ("staking create-validator", fr"--amount 1000000000000000ncheq --from {set_up_operator()[0]} --pubkey '{NODE_PUBKEY}' --min-self-delegation='1' --commission-max-change-rate='0.02' --commission-max-rate='0.02' --commission-rate='0.01' {TEST_NET_FEES} {LOCAL_NET_DESTINATION} {YES_FLAG}", fr"{CODE_0}"),
+            ("staking create-validator", fr"--amount 1000000000000000ncheq --from {set_up_operator()[0]} --pubkey '{NODE_PUBKEY}' --min-self-delegation='1' --commission-max-change-rate='0.02' --commission-max-rate='0.02' --commission-rate='0.01' {TEST_NET_FEES} {LOCAL_NET_DESTINATION} {YES_FLAG}", fr"\"code\":5(.*?)validator already exist for this pubkey"), # promote twice the same pubkey
+        ]
+)
+def test_tx_staking_create(command, params, expected_output):
+    command_base = "cheqd-noded tx"
+    run(command_base, command, params, expected_output)
 
 
 @pytest.mark.parametrize(

@@ -2,6 +2,8 @@ import sys
 import os
 import pexpect
 import re
+import random
+import string
 
 
 IMPLICIT_TIMEOUT = 30
@@ -34,6 +36,10 @@ LOCAL_RECEIVER_ADDRESS = os.environ["OP1_ADDRESS"]
 CODE_0 = "\"code\":0"
 
 
+def random_string(length):
+    return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(length))
+
+
 def run(command_base, command, params, expected_output):
     cli = pexpect.spawn(f"{command_base} {command} {params}", encoding=ENCODING, timeout=IMPLICIT_TIMEOUT, maxread=READ_BUFFER)
     cli.logfile = sys.stdout
@@ -58,3 +64,14 @@ def send_with_note(note):
     cli = run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 1000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} --note {note}", fr"{CODE_0}(.*?)\"value\":\"1000ncheq\"")
     tx_hash = re.search(r"\"txhash\":\"(.+?)\"", cli.before).group(1).strip()
     return tx_hash, note
+
+
+def set_up_operator():
+    name = random_string(10)
+    cli = run("cheqd-noded keys", "add", name, r"mnemonic: \"\"")
+    address = re.search(r"address: (.+?)\n", cli.before).group(1).strip()
+    print(address)
+    pubkey = re.search(r"pubkey: (.+?)\n", cli.before).group(1).strip()
+    print(pubkey)
+    run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {address} 1100000000000000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"1100000000000000ncheq\"")
+    return name, address, pubkey
