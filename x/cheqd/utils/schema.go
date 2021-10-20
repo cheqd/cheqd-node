@@ -18,3 +18,7 @@ func IsSchema(did string) bool {
 func GetDidFromSchema(schema string) string {
 	return schema[:len(schema)-SchemaSuffixLen]
 }
+
+func GetSchemaFromDid(did string) string {
+	return did + SchemaSuffix
+}

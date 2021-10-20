@@ -18,3 +18,7 @@ func IsCredDef(did string) bool {
 func GetDidFromCredDef(credDef string) string {
 	return credDef[:len(credDef)-CredDefSuffixLen]
 }
+
+func GetCredDefFromDid(did string) string {
+	return did + CredDefSuffix
+}
