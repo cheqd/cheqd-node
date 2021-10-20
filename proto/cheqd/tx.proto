@@ -17,6 +17,11 @@ service Msg {
   rpc UpdateDid(MsgWriteRequest) returns (MsgUpdateDidResponse);
 }
 
+message MsgWriteRequestSignObject {
+  google.protobuf.Any data = 1;
+  map<string, string> metadata = 2;
+}
+
 // this line is used by starport scaffolding # proto/tx/message
 message MsgWriteRequest {
   google.protobuf.Any data = 1;

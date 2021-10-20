@@ -2,23 +2,25 @@ package keeper
 
 import (
 	"crypto/ed25519"
-	"encoding/base64"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	"github.com/cosmos/cosmos-sdk/codec"
 )
 
-func BuildSigningInput(msg *types.MsgWriteRequest) ([]byte, error) {
-	metadataBytes, err := json.Marshal(&msg.Metadata)
-	if err != nil {
-		return nil, types.ErrInvalidSignature.Wrap("An error has occurred during metadata marshalling")
+func BuildSigningInput(codec codec.Codec, msg *types.MsgWriteRequest) ([]byte, error) {
+	signObject := types.MsgWriteRequestSignObject{
+		Data:     msg.Data,
+		Metadata: msg.Metadata,
 	}
 
-	dataBytes := msg.Data.Value
-	signingInput := ([]byte)(base64.StdEncoding.EncodeToString(metadataBytes) + base64.StdEncoding.EncodeToString(dataBytes))
-	return signingInput, nil
+	bz, err := codec.Marshal(&signObject)
+	if err != nil {
+		return nil, err
+	}
+
+	return bz, nil
 }
 
 func FindPublicKey(signer types.Signer, id string) (ed25519.PublicKey, error) {

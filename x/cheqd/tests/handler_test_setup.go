@@ -4,7 +4,6 @@ import (
 	"crypto/ed25519"
 	"crypto/rand"
 	"encoding/base64"
-	"encoding/json"
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cheqd/cheqd-node/x/cheqd"
 	"time"
@@ -21,6 +20,11 @@ import (
 	ptypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+type KeyPair struct {
+	PrivateKey ed25519.PrivateKey
+	PublicKey  ed25519.PublicKey
+}
 
 type TestSetup struct {
 	Cdc     codec.Codec
@@ -172,11 +176,13 @@ func (s *TestSetup) CreateCredDef() *types.MsgCreateCredDef {
 }
 
 func (s *TestSetup) WrapRequest(data *ptypes.Any, keys map[string]ed25519.PrivateKey, metadata map[string]string) *types.MsgWriteRequest {
-	metadataBytes, _ := json.Marshal(&metadata)
-	dataBytes := data.Value
+	result := types.MsgWriteRequest{
+		Data:     data,
+		Metadata: metadata,
+	}
 
-	signingInput := []byte(base64.StdEncoding.EncodeToString(metadataBytes) + base64.StdEncoding.EncodeToString(dataBytes))
 	signatures := make(map[string]string)
+	signingInput, _ := keeper.BuildSigningInput(s.Cdc, &result)
 
 	for privKeyId, privKey := range keys {
 		signature := base64.StdEncoding.EncodeToString(ed25519.Sign(privKey, signingInput))
@@ -188,6 +194,11 @@ func (s *TestSetup) WrapRequest(data *ptypes.Any, keys map[string]ed25519.Privat
 		Metadata:   metadata,
 		Signatures: signatures,
 	}
+}
+
+func GenerateKeyPair() KeyPair {
+	PublicKey, PrivateKey, _ := ed25519.GenerateKey(rand.Reader)
+	return KeyPair{PrivateKey, PublicKey}
 }
 
 func (s *TestSetup) InitDid(did string) (map[string]ed25519.PrivateKey, *types.MsgCreateDid, error) {

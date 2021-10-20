@@ -15,7 +15,7 @@ func (k *Keeper) VerifySignature(ctx *sdk.Context, msg *types.MsgWriteRequest, s
 		return types.ErrInvalidSignature.Wrap("At least one signer should be present")
 	}
 
-	signingInput, err := BuildSigningInput(msg)
+	signingInput, err := BuildSigningInput(k.cdc, msg)
 	if err != nil {
 		return sdkerrors.Wrap(types.ErrInvalidSignature, err.Error())
 	}
