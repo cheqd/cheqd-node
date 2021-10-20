@@ -13,3 +13,9 @@ def restore_test_keys():
 
     cli2 = run("cheqd-noded keys", "add", "qaatests2 --recover", r"Enter your bip39 mnemonic")
     run_interaction(cli2, RECEIVER_MNEMONIC, r"- name: qaatests2")
+
+
+@pytest.fixture(scope='session')
+def create_export_keys():
+    command_base = "cheqd-noded keys"
+    run(command_base, "add", "export_key", "name: export_key")

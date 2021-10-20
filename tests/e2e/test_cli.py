@@ -1,8 +1,13 @@
 import json
 import pytest
+import re
+import pexpect
+import os
+import shutil
+import getpass
 from hypothesis import settings, given, strategies, Phase, Verbosity
 from string import digits, ascii_letters
-from helpers import run, run_interaction, get_balance, send_with_note, set_up_operator, \
+from helpers import run, run_interaction, get_balance, send_with_note, set_up_operator, random_string, \
     TEST_NET_NETWORK, TEST_NET_NODE_TCP, TEST_NET_NODE_HTTP, TEST_NET_DESTINATION, TEST_NET_DESTINATION_HTTP, \
     LOCAL_NET_NETWORK, LOCAL_NET_NODE_TCP, LOCAL_NET_NODE_HTTP, LOCAL_NET_DESTINATION, LOCAL_NET_DESTINATION_HTTP, \
     TEST_NET_FEES, TEST_NET_GAS_X_GAS_PRICES, YES_FLAG, \
@@ -34,11 +39,155 @@ def test_basic(command, params, expected_output):
             ("show", "test2", "- name: test2"),
             ("delete", f"test2 {YES_FLAG}", r"Key deleted forever \(uh oh!\)"),
             ("show", "test9", "Error: test9 is not a valid name or address"),
+            ("mnemonic", None, '(\w+\s){23}(\w+){1}\r\n')
         ]
     )
 def test_keys(command, params, expected_output):
     command_base = "cheqd-noded keys"
     run(command_base, command, params, expected_output)
+
+
+def test_keys_add_recover():
+    command_base = "cheqd-noded keys"
+    key_name = "recovery_key_{}".format(random_string(4))
+    cli = run(command_base, "add", key_name, "name: {}".format(key_name))
+
+    command_result = cli.read()
+    mnemonic = re.search('(\w+\s){24}', command_result).group(0)
+    print(mnemonic)
+
+    keys_path = "/home/{}/.cheqdnode/".format(getpass.getuser())
+    shutil.rmtree(keys_path)
+
+    cli = run(command_base, "add", "{} --recover".format(key_name), "Enter your bip39 mnemonic")
+    run_interaction(cli, mnemonic, r"- name: {}(.*?)type: local(.*?)address: (.*?)pubkey: (.*?)mnemonic: ".format(key_name))
+
+    cli = run(command_base, "delete", key_name, "Continue?")
+    run_interaction(cli, "y", "Key deleted forever")
+
+
+def test_keys_add_recover_existing():
+    command_base = "cheqd-noded keys"
+    key_name = "recovery_key_{}".format(random_string(4))
+    cli = run(command_base, "add", key_name, "name: {}".format(key_name))
+
+    command_result = cli.read()
+    mnemonic = re.search('(\w+\s){24}', command_result).group(0)
+    print(mnemonic)
+
+    cli = run(command_base, "add", "{} --recover".format(key_name), "override the existing name {}".format(key_name))
+    run_interaction(cli, "y", "Enter your bip39 mnemonic")
+    run_interaction(cli, mnemonic, r"- name: {}(.*?)type: local(.*?)address: (.*?)pubkey: (.*?)mnemonic: ".format(key_name))
+
+    cli = run(command_base, "delete", key_name, "Continue?")
+    run_interaction(cli, "y", "Key deleted forever")
+
+
+def test_keys_add_recover_wrong_phrase():
+    command_base = "cheqd-noded keys"
+    key_name = "recovery_key_{}".format(random_string(4))
+    run(command_base, "add", key_name, "name: {}".format(key_name))
+
+    keys_path = "/home/{}/.cheqdnode/".format(getpass.getuser())
+    shutil.rmtree(keys_path)
+
+    cli = run(command_base, "add", "{} --recover".format(key_name), "Enter your bip39 mnemonic")
+    run_interaction(cli, random_string(20), "Error: invalid mnemonic")
+
+
+@pytest.mark.usefixtures('create_export_keys')
+@pytest.mark.parametrize(
+    "command, params, expected_output, input_string, expected_output_2",
+    [
+        ("export", "export_key", "Enter passphrase to encrypt the exported key", random_string(6), "password must be at least 8 characters"),
+        ("export", "export_key", "Enter passphrase to encrypt the exported key", random_string(8), "BEGIN TENDERMINT PRIVATE KEY"),
+        ("export", "export_key", "Enter passphrase to encrypt the exported key", "qwe!@#$%^123", "BEGIN TENDERMINT PRIVATE KEY"),
+        ("export", "export_key", "Enter passphrase to encrypt the exported key", random_string(40), "BEGIN TENDERMINT PRIVATE KEY"),
+    ]
+)
+def test_keys_export(command, params, expected_output, input_string, expected_output_2):
+    command_base = "cheqd-noded keys"
+    cli = run(command_base, command, params, expected_output)
+    run_interaction(cli, input_string, expected_output_2)
+
+
+def test_keys_import():
+    command_base = "cheqd-noded keys"
+    key_name = "import_key_{}".format(random_string(4))
+    passphrase = random_string(8)
+    filename = "/home/{}/key.txt".format(getpass.getuser())
+
+    run(command_base, "add", key_name, "name: {}".format(key_name))
+
+    cli = run(command_base, "export", key_name, "Enter passphrase")
+    run_interaction(cli, passphrase, "BEGIN")
+
+    key_content = "-----BEGIN{}".format(cli.read())
+
+    text_file = open(filename, "w")
+    text_file.write(key_content)
+    text_file.close()
+
+    cli = run(command_base, "delete", key_name, "Continue?")
+    run_interaction(cli, "y", "Key deleted forever")
+
+    cli = run(command_base, "import", "{} {}".format(key_name, filename), "Enter passphrase to decrypt your key")
+    run_interaction(cli, passphrase, "")
+
+    run(command_base, "list", None, "- name: {}".format(key_name))
+
+    cli = run(command_base, "delete", key_name, "Continue?")
+    run_interaction(cli, "y", "Key deleted forever")
+
+
+@pytest.mark.parametrize(
+        "action, expected_result",
+        [
+            ("armor", "Error: failed to decrypt private key: unrecognized armor type:  TENDERMINT PRIVATE KEY"),
+            ("eof", "Error: failed to decrypt private key: EOF"),
+            ("key", "Error: failed to decrypt private key: illegal base64 data at input byte"),
+            ("passphrase", "Error: failed to decrypt private key: ciphertext decryption failed")
+        ]
+    )
+def test_keys_import_wrong_data(action, expected_result):
+    command_base = "cheqd-noded keys"
+    key_name = "import_key_{}".format(random_string(4))
+    passphrase = random_string(8)
+    filename = "/home/{}/key.txt".format(getpass.getuser())
+
+    run(command_base, "add", key_name, "name: {}".format(key_name))
+
+    cli = run(command_base, "export", key_name, "Enter passphrase")
+    run_interaction(cli, passphrase, "BEGIN")
+
+    cli_output = cli.read()
+
+    # correct default content
+    key_content = "-----BEGIN{}".format(cli_output)
+    if action is "armor":
+        # adding extra space between BEGIN and rest of the key
+        key_content = "-----BEGIN {}".format(cli_output)
+    if action is "eof":
+        # not appending -----BEGIN at all
+        key_content = "{}".format(cli_output)
+    if action is "key":
+        key_content = "-----BEGIN{}".format(cli_output)
+        key_content_as_list = list(key_content)
+        key_content_as_list[120] = "%"
+        key_content = "".join(key_content_as_list)
+
+    text_file = open(filename, "w")
+    text_file.write(key_content)
+    text_file.close()
+
+    cli = run(command_base, "delete", key_name, "Continue?")
+    run_interaction(cli, "y", "Key deleted forever")
+
+    cli = run(command_base, "import", "{} {}".format(key_name, filename), "Enter passphrase to decrypt your key")
+
+    if action is "passphrase":
+        passphrase = random_string(8)
+    run_interaction(cli, passphrase, expected_result)
 
 
 @pytest.mark.parametrize(
@@ -87,13 +236,14 @@ def test_tx_bank_send(command, params, expected_output):
 
 # TODO get observers' pubkeys to promote them
 NODE_PUBKEY = json.dumps({"@type":"/cosmos.crypto.ed25519.PubKey","key":"+Gt8W3guq0TE0HuVuJBI3maNhj2uCW02CZE9pAbkiA8="})
+@pytest.mark.skip
 @pytest.mark.parametrize(
         "command, params, expected_output",
         [
             ("staking create-validator", "", r"Error: required flag\(s\) \"amount\", \"from\", \"pubkey\" not set"), # no args
-            ("staking create-validator", fr"--amount 1000000000000000ncheq --from {set_up_operator()[0]} --pubkey {set_up_operator()[2]} --min-self-delegation='1' --commission-max-change-rate='0.02' --commission-max-rate='0.02' --commission-rate='0.01' {TEST_NET_FEES} {LOCAL_NET_DESTINATION} {YES_FLAG}", r"\"code\":6(.*?)validator pubkey type is not supported"), # wrong pubkey type
-            ("staking create-validator", fr"--amount 1000000000000000ncheq --from {set_up_operator()[0]} --pubkey '{NODE_PUBKEY}' --min-self-delegation='1' --commission-max-change-rate='0.02' --commission-max-rate='0.02' --commission-rate='0.01' {TEST_NET_FEES} {LOCAL_NET_DESTINATION} {YES_FLAG}", fr"{CODE_0}"),
-            ("staking create-validator", fr"--amount 1000000000000000ncheq --from {set_up_operator()[0]} --pubkey '{NODE_PUBKEY}' --min-self-delegation='1' --commission-max-change-rate='0.02' --commission-max-rate='0.02' --commission-rate='0.01' {TEST_NET_FEES} {LOCAL_NET_DESTINATION} {YES_FLAG}", fr"\"code\":5(.*?)validator already exist for this pubkey"), # promote twice the same pubkey
+            # ("staking create-validator", fr"--amount 1000000000000000ncheq --from {set_up_operator()[0]} --pubkey {set_up_operator()[2]} --min-self-delegation='1' --commission-max-change-rate='0.02' --commission-max-rate='0.02' --commission-rate='0.01' {TEST_NET_FEES} {LOCAL_NET_DESTINATION} {YES_FLAG}", r"\"code\":6(.*?)validator pubkey type is not supported"), # wrong pubkey type
+            # ("staking create-validator", fr"--amount 1000000000000000ncheq --from {set_up_operator()[0]} --pubkey '{NODE_PUBKEY}' --min-self-delegation='1' --commission-max-change-rate='0.02' --commission-max-rate='0.02' --commission-rate='0.01' {TEST_NET_FEES} {LOCAL_NET_DESTINATION} {YES_FLAG}", fr"{CODE_0}"),
+            # ("staking create-validator", fr"--amount 1000000000000000ncheq --from {set_up_operator()[0]} --pubkey '{NODE_PUBKEY}' --min-self-delegation='1' --commission-max-change-rate='0.02' --commission-max-rate='0.02' --commission-rate='0.01' {TEST_NET_FEES} {LOCAL_NET_DESTINATION} {YES_FLAG}", fr"\"code\":5(.*?)validator already exist for this pubkey"), # promote twice the same pubkey
         ]
 )
 def test_tx_staking_create(command, params, expected_output):
