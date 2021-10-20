@@ -15,7 +15,6 @@ source "../common.sh"
 NODE_CONFIGS_DIR="node_configs"
 rm -rf $NODE_CONFIGS_DIR
 mkdir $NODE_CONFIGS_DIR
-chmod -R 777 $NODE_CONFIGS_DIR # FIXME
 pushd $NODE_CONFIGS_DIR
 
 echo "Generating validator keys..."
@@ -24,7 +23,6 @@ for ((i=0 ; i<$VALIDATORS_COUNT ; i++))
 do
     NODE_HOME="node$i"
     mkdir $NODE_HOME
-    chmod -R 777 $NODE_HOME # FIXME
     pushd $NODE_HOME
 
     echo "[Validator $i] Generating key..."
@@ -35,8 +33,6 @@ do
 
     echo "Setting minimum fee price..."
 
-    sudo chmod -R 777 /home/runner/work/cheqd-node/cheqd-node/tests/networks/docker_compose/node_configs || echo "I'm not in pipeline" # FIXME
-    sudo chmod -R 777 ~/cheqd-node/tests/networks/docker_compose/node_configs || echo "I'm not in local machine" # FIXME
     sed -i $sed_extension 's/minimum-gas-prices = ""/minimum-gas-prices = "25ncheq"/g' .cheqdnode/config/app.toml
 
     popd
@@ -45,13 +41,10 @@ done
 
 OPERATORS_HOME="client"
 mkdir $OPERATORS_HOME
-chmod -R 777 $OPERATORS_HOME # FIXME
 pushd $OPERATORS_HOME
 
 echo "Initializing genesis..."
 cheqd_noded_docker init dummy_node --chain-id $CHAIN_ID
-sudo chmod -R 777 /home/runner/work/cheqd-node/cheqd-node/tests/networks/docker_compose/node_configs || echo "I'm not in pipeline" # FIXME
-sudo chmod -R 777 ~/cheqd-node/tests/networks/docker_compose/node_configs || echo "I'm not in local machine" # FIXME
 sed -i $sed_extension 's/"stake"/"ncheq"/' .cheqdnode/config/genesis.json
 
 echo "Generating operator keys..."
@@ -108,7 +101,6 @@ do
     NODE_HOME="observer$i"
 
     mkdir $NODE_HOME
-    chmod -R 777 $NODE_HOME # FIXME
     pushd $NODE_HOME
 
     echo "##### [Observer $i] Generating keys..."
@@ -120,8 +112,6 @@ do
 
     echo "##### [Observer $i] Loading genesis..."
     OPERATORS_HOME="../client"
-    sudo chmod -R 777 /home/runner/work/cheqd-node/cheqd-node/tests/networks/docker_compose/node_configs || echo "I'm not in pipeline" # FIXME
-    sudo chmod -R 777 ~/cheqd-node/tests/networks/docker_compose/node_configs || echo "I'm not in local machine" # FIXME
     cp "$OPERATORS_HOME/.cheqdnode/config/genesis.json" ".cheqdnode/config/"
 
     echo "##### [Observer $i] Setting min gas prices..."
