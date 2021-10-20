@@ -79,18 +79,23 @@ A DID that uses the cheqd DID method MUST begin with the prefix `did:cheqd`. Thi
 
 #### Method Specific Identifier
 
-The cheqd DID `method-specific-id` is made up of two components:
+The cheqd DID `method-specific-id` is made up of a component:
 
-**`namespace`**: A string that identifies the cheqd network `chain_id` (e.g., "mainnet-1", "testnet") where the DID reference is stored. Different cheqd networks may be differentiated based on whether they are production vs non-production, governance frameworks in use, participants involved in running nodes, etc.
+**`namespace`**: A string that identifies the cheqd network `chain_id` (e.g., "mainnet-1", "testnet-1") where the DID reference is stored. Different cheqd networks may be differentiated based on whether they are production vs non-production, governance frameworks in use, participants involved in running nodes, etc.
+
+A `did:cheqd` DID MUST be self-certifying by having the namespace component of the DID (last element)
+derived from the initial public key of the DID, as follows:
+For an Ed25519 key: Convert into Base58char the first 16 bytes of the 256 bit public key.
 
 #### cheqd DID method syntax
 
 The cheqd DID method ABNF to conform with [DID syntax guidelines](https://www.w3.org/TR/did-core/#did-syntax) is as follows:
 
 ```abnf
-cheqd-did         = "did:cheqd:" namespace "
-namespace         = chain_id ":" 1*255id-char "
-id-char           = ALPHA / DIGIT / "-"
+cheqd-did         = "did:cheqd:" namespace
+namespace         = 1*namespace-char "-" 1*namespace-ver 
+namespace-char    = ALPHA / DIGIT
+namespace-ver     = ALPHA / DIGIT
 ```
 
 #### Examples of `did:cheqd` identifiers
