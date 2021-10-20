@@ -1,12 +1,10 @@
 package keeper
 
 import (
-	"encoding/base64"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/tendermint/tendermint/crypto/tmhash"
 	"strconv"
 )
 
@@ -40,83 +38,24 @@ func (k Keeper) SetDidCount(ctx sdk.Context, count uint64) {
 }
 
 // AppendDid appends a did in the store with a new id and update the count
-func (k Keeper) AppendDid(
-	ctx sdk.Context,
-	id string,
-	controller []string,
-	verificationMethod []*types.VerificationMethod,
-	authentication []string,
-	assertionMethod []string,
-	capabilityInvocation []string,
-	capabilityDelegation []string,
-	keyAgreement []string,
-	alsoKnownAs []string,
-	service []*types.DidService,
-	context []string,
-) string {
+func (k Keeper) AppendDid(ctx sdk.Context, did types.Did, metadata *types.Metadata, timestamp string, txHash string) string {
 	// Create the did
 	count := k.GetDidCount(ctx)
-	did := types.Did{
-		Id:                   id,
-		Controller:           controller,
-		VerificationMethod:   verificationMethod,
-		Authentication:       authentication,
-		AssertionMethod:      assertionMethod,
-		CapabilityInvocation: capabilityInvocation,
-		CapabilityDelegation: capabilityDelegation,
-		KeyAgreement:         keyAgreement,
-		AlsoKnownAs:          alsoKnownAs,
-		Service:              service,
-		Context:              context,
-	}
-
-	created := ctx.BlockTime().String()
-	txHash := base64.StdEncoding.EncodeToString(tmhash.Sum(ctx.TxBytes()))
-
-	metadata := types.Metadata{
-		Created:     created,
-		Updated:     created,
-		Deactivated: false,
-		VersionId:   txHash,
-	}
-
-	stateValue := types.StateValue{
-		Metadata: &metadata,
-		Data: &types.StateValue_Did{
-			Did: &did,
-		},
-		Timestamp: created,
-		TxHash:    txHash,
-	}
-
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
-	value := k.cdc.MustMarshal(&stateValue)
-	store.Set(GetDidIDBytes(did.Id), value)
+	k.SetDid(ctx, did, metadata, timestamp, txHash)
 
 	// Update did count
 	k.SetDidCount(ctx, count+1)
-
-	return id
+	return did.Id
 }
 
 // SetDid set a specific did in the store
-func (k Keeper) SetDid(ctx sdk.Context, did types.Did, metadata *types.Metadata) {
-	updated := ctx.BlockTime().String()
-	txHash := base64.StdEncoding.EncodeToString(tmhash.Sum(ctx.TxBytes()))
-
-	metadata = &types.Metadata{
-		Created:     metadata.Created,
-		Updated:     updated,
-		Deactivated: metadata.Deactivated,
-		VersionId:   txHash,
-	}
-
+func (k Keeper) SetDid(ctx sdk.Context, did types.Did, metadata *types.Metadata, timestamp string, txHash string) {
 	stateValue := types.StateValue{
 		Metadata: metadata,
 		Data: &types.StateValue_Did{
 			Did: &did,
 		},
-		Timestamp: updated,
+		Timestamp: timestamp,
 		TxHash:    txHash,
 	}
 

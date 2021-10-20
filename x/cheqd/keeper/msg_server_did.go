@@ -2,8 +2,10 @@ package keeper
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"github.com/cheqd/cheqd-node/x/cheqd/utils/strings"
+	"github.com/tendermint/tendermint/crypto/tmhash"
 	"reflect"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
@@ -33,20 +35,31 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 		return nil, err
 	}
 
-	k.AppendDid(
-		ctx,
-		didMsg.Id,
-		didMsg.Controller,
-		didMsg.VerificationMethod,
-		didMsg.Authentication,
-		didMsg.AssertionMethod,
-		didMsg.CapabilityInvocation,
-		didMsg.CapabilityDelegation,
-		didMsg.KeyAgreement,
-		didMsg.AlsoKnownAs,
-		didMsg.Service,
-		didMsg.Context,
-	)
+	var did = types.Did{
+		Id:                   didMsg.Id,
+		Controller:           didMsg.Controller,
+		VerificationMethod:   didMsg.VerificationMethod,
+		Authentication:       didMsg.Authentication,
+		AssertionMethod:      didMsg.AssertionMethod,
+		CapabilityInvocation: didMsg.CapabilityInvocation,
+		CapabilityDelegation: didMsg.CapabilityDelegation,
+		KeyAgreement:         didMsg.KeyAgreement,
+		AlsoKnownAs:          didMsg.AlsoKnownAs,
+		Service:              didMsg.Service,
+		Context:              didMsg.Context,
+	}
+
+	timestamp := ctx.BlockTime().String()
+	txHash := base64.StdEncoding.EncodeToString(tmhash.Sum(ctx.TxBytes()))
+
+	metadata := types.Metadata{
+		Created:     timestamp,
+		Deactivated: false,
+		Updated:     timestamp,
+		VersionId:   txHash,
+	}
+
+	k.AppendDid(ctx, did, &metadata, timestamp, txHash)
 
 	return &types.MsgCreateDidResponse{
 		Id: didMsg.Id,
@@ -99,7 +112,17 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 		Context:              didMsg.Context,
 	}
 
-	k.SetDid(ctx, did, oldDIDDoc.Metadata)
+	timestamp := ctx.BlockTime().String()
+	txHash := base64.StdEncoding.EncodeToString(tmhash.Sum(ctx.TxBytes()))
+
+	metadata := types.Metadata{
+		Created:     oldDIDDoc.Metadata.Created,
+		Deactivated: oldDIDDoc.Metadata.Deactivated,
+		Updated:     timestamp,
+		VersionId:   txHash,
+	}
+
+	k.SetDid(ctx, did, &metadata, timestamp, txHash)
 
 	return &types.MsgUpdateDidResponse{
 		Id: didMsg.Id,
