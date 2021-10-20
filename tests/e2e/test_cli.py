@@ -12,7 +12,7 @@ from helpers import run, run_interaction, get_balance, send_with_note, \
         [
             ("help", "",r"cheqd App(.*?)Usage:(.*?)Available Commands:(.*?)Flags:"),
             ("status", TEST_NET_NODE_TCP, fr"\"NodeInfo\"(.*?)\"network\":\"{TEST_NET_NETWORK}\"(.*?)\"moniker\":\"seed1-us-testnet-cheqd\""), # tcp + us node
-            # ("status", TEST_NET_NODE_HTTP, fr"\"NodeInfo\"(.*?)\"network\":\"{TEST_NET_NETWORK}\"(.*?)\"moniker\":\"node1-eu-testnet-cheqd\""), # http + eu node
+            ("status", TEST_NET_NODE_HTTP, fr"\"NodeInfo\"(.*?)\"network\":\"{TEST_NET_NETWORK}\"(.*?)\"moniker\":\"node1-eu-testnet-cheqd\""), # http + eu node
         ]
     )
 def test_basic(command, params, expected_output):
@@ -106,15 +106,15 @@ def test_memo(note):
 
 
 # TODO: hypothesis
-@pytest.mark.parametrize('value', ["1", "888", "55555", "1000000", "9876540"])
+@pytest.mark.parametrize('value', ["1", "888", "55555", "1000000", "987654321"])
 def test_balance(value):
-    sender_balance = get_balance(SENDER_ADDRESS, TEST_NET_DESTINATION)
-    receiver_balance = get_balance(RECEIVER_ADDRESS, TEST_NET_DESTINATION)
+    sender_balance = get_balance(LOCAL_SENDER_ADDRESS, LOCAL_NET_DESTINATION)
+    receiver_balance = get_balance(LOCAL_RECEIVER_ADDRESS, LOCAL_NET_DESTINATION)
 
-    run("cheqd-noded tx", "bank send", f"{SENDER_ADDRESS} {RECEIVER_ADDRESS} {value}ncheq {TEST_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"{value}ncheq\"")
+    run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {RECEIVER_ADDRESS} {value}ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"{value}ncheq\"")
 
-    new_sender_balance = get_balance(SENDER_ADDRESS, TEST_NET_DESTINATION)
-    new_receiver_balance = get_balance(RECEIVER_ADDRESS, TEST_NET_DESTINATION)
+    new_sender_balance = get_balance(LOCAL_SENDER_ADDRESS, LOCAL_NET_DESTINATION)
+    new_receiver_balance = get_balance(LOCAL_RECEIVER_ADDRESS, LOCAL_NET_DESTINATION)
 
     assert int(new_sender_balance) == (int(sender_balance) - int(value) - TEST_NET_GAS_X_GAS_PRICES_INT)
     assert int(new_receiver_balance) == (int(receiver_balance) + int(value))
