@@ -27,6 +27,11 @@ func (k *Keeper) VerifySignature(ctx *sdk.Context, msg *types.MsgWriteRequest, s
 				return types.ErrDidDocNotFound.Wrap(signer.Signer)
 			}
 
+			didDoc := state.GetDid()
+			if didDoc == nil {
+				return types.ErrDidDocNotFound.Wrap(signer.Signer)
+			}
+
 			signer.Authentication = state.GetDid().Authentication
 			signer.VerificationMethod = state.GetDid().VerificationMethod
 		}

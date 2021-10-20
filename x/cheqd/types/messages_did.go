@@ -3,6 +3,7 @@ package types
 import (
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"strings"
 )
 
 func NewMsgCreateDid(
@@ -269,6 +270,10 @@ func ValidateVerificationMethods(namespace string, did string, vms []*Verificati
 	}
 
 	for i, vm := range vms {
+		if !strings.HasPrefix(vm.Id, did) {
+			return ErrBadRequestInvalidVerMethod.Wrapf("%s not belong %s DID Doc", vm.Id, did)
+		}
+
 		if IncludeVerificationMethod(did, vms[i+1:], vm.Id) {
 			return ErrBadRequestInvalidVerMethod.Wrapf("%s is duplicated", vm.Id)
 		}
@@ -305,6 +310,10 @@ func ValidateServices(namespace string, did string, services []*DidService) erro
 	}
 
 	for i, s := range services {
+		if !strings.HasPrefix(utils.ResolveId(did, s.Id), did) {
+			return ErrBadRequestInvalidService.Wrapf("%s not belong %s DID Doc", s.Id, did)
+		}
+
 		if IncludeService(did, services[i+1:], s.Id) {
 			return ErrBadRequestInvalidService.Wrapf("%s is duplicated", s.Id)
 		}
