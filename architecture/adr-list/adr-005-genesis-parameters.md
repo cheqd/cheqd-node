@@ -9,9 +9,9 @@
 
 ## Summary
 
-The aim of this document is to define the genesis parameters that will be used in the cheqd network testnet.
+The aim of this document is to define the genesis parameters that will be used in cheqd network testnet and mainnet.
 
-> Cosmos v0.42.5 parameters are described.
+> Cosmos v0.44.2 parameters are described.
 
 ## Context
 
@@ -70,10 +70,6 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
     * Bonus reward that proposer gets. This depends on the number of pre-commits included to the block
   * `withdraw_addr_enabled` = `true`
     * Whether withdrawal address can be changed or not. By default, it's the delegator's address.
-* **`evidence`**
-  * No parameters
-* **`genutil`**
-  * Used to manage initial transactions such as genesis validators creation
 * **`gov`**
   * `deposit_params`
     * min\_deposit = `[{ "denom": "ncheq", "amount": "8000000000000" }]` \(8,000 `cheq`\)
@@ -127,14 +123,15 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
     * Amount of unbound/redelegate entries to store
   * `bond_denom` = `ncheq`
     * Denomination used in staking
-* _\[ibc\]_ **`ibc`**
-  * ...
-* _\[ibc\]_ **`capability`**
-  * ...
-* _\[ibc\]_ **`transfer`**
-  * `send_enabled` = `false`
+*  **`ibc`**
+  * `max_expected_time_per_block` = `20000000000`
+    * Maximum expected time per block (in nanoseconds), used to enforce block delay. This parameter should reflect the largest amount of time that the chain might reasonably take to produce the next block under normal operating conditions. A safe choice is 3-5x the expected time per block.
+  * `allowed_clients` = `[ "07-tendermint" ]` (allow connections only from other chains)
+    * Defines the list of allowed client state types. We allow connections only from other chains.
+* **`ibc-transfer`**
+  * `send_enabled` = `true`
     * Enables or disables all cross-chain token transfers from this chain
-  * `receive_enabled` = `false`
+  * `receive_enabled` = `true`
     * Enables or disables all cross-chain token transfers to this chain
 
 ## Decision
