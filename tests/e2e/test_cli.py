@@ -111,7 +111,7 @@ def test_balance(value):
     sender_balance = get_balance(LOCAL_SENDER_ADDRESS, LOCAL_NET_DESTINATION)
     receiver_balance = get_balance(LOCAL_RECEIVER_ADDRESS, LOCAL_NET_DESTINATION)
 
-    run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {RECEIVER_ADDRESS} {value}ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"{value}ncheq\"")
+    run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} {value}ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"{value}ncheq\"")
 
     new_sender_balance = get_balance(LOCAL_SENDER_ADDRESS, LOCAL_NET_DESTINATION)
     new_receiver_balance = get_balance(LOCAL_RECEIVER_ADDRESS, LOCAL_NET_DESTINATION)
