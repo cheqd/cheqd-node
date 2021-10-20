@@ -5,6 +5,8 @@ import os
 import shutil
 import pytest
 import getpass
+
+import data_helpers
 from helpers import run, run_interaction, \
     TEST_NET_NETWORK, TEST_NET_NODE_TCP, TEST_NET_NODE_HTTP, TEST_NET_DESTINATION, TEST_NET_DESTINATION_HTTP, TEST_NET_FEES, TEST_NET_GAS_X_GAS_PRICES, YES_FLAG, \
     SENDER_ADDRESS, RECEIVER_ADDRESS, CODE_0
@@ -41,23 +43,70 @@ def test_keys(command, params, expected_output):
     run(command_base, command, params, expected_output)
 
 
+def test_keys_add_recover():
+    command_base = "cheqd-noded keys"
+    key_name = "recovery_key_{}".format(data_helpers.get_alphanumeric_string(4))
+    cli = run(command_base, "add", key_name, "name: {}".format(key_name))
+
+    command_result = cli.read()
+    mnemonic = re.search('(\w+\s){24}', command_result).group(0)
+    print(mnemonic)
+
+    keys_path = "/home/{}/.cheqdnode/".format(getpass.getuser())
+    shutil.rmtree(keys_path)
+
+    cli = run(command_base, "add", "{} --recover".format(key_name), "Enter your bip39 mnemonic")
+    run_interaction(cli, mnemonic, r"- name: {}(.*?)type: local(.*?)address: (.*?)pubkey: (.*?)mnemonic: ".format(key_name))
+
+    cli = run(command_base, "delete", key_name, "Continue?")
+    run_interaction(cli, "y", "Key deleted forever")
+
+
+def test_keys_add_recover_existing():
+    command_base = "cheqd-noded keys"
+    key_name = "recovery_key_{}".format(data_helpers.get_alphanumeric_string(4))
+    cli = run(command_base, "add", key_name, "name: {}".format(key_name))
+
+    command_result = cli.read()
+    mnemonic = re.search('(\w+\s){24}', command_result).group(0)
+    print(mnemonic)
+
+    cli = run(command_base, "add", "{} --recover".format(key_name), "override the existing name {}".format(key_name))
+    run_interaction(cli, "y", "Enter your bip39 mnemonic")
+    run_interaction(cli, mnemonic, r"- name: {}(.*?)type: local(.*?)address: (.*?)pubkey: (.*?)mnemonic: ".format(key_name))
+
+    cli = run(command_base, "delete", key_name, "Continue?")
+    run_interaction(cli, "y", "Key deleted forever")
+
+
+def test_keys_add_recover_wrong_phrase():
+    command_base = "cheqd-noded keys"
+    key_name = "recovery_key_{}".format(data_helpers.get_alphanumeric_string(4))
+    run(command_base, "add", key_name, "name: {}".format(key_name))
+
+    keys_path = "/home/{}/.cheqdnode/".format(getpass.getuser())
+    shutil.rmtree(keys_path)
+
+    cli = run(command_base, "add", "{} --recover".format(key_name), "Enter your bip39 mnemonic")
+    run_interaction(cli, data_helpers.get_alphanumeric_string(20), "Error: invalid mnemonic")
+
+
 @pytest.fixture(scope='session')
 def create_export_keys():
     command_base = "cheqd-noded keys"
     run(command_base, "add", "export_key", "name: export_key")
 
 
-# tbd - import, migrate, parse
 @pytest.mark.usefixtures('create_export_keys')
 @pytest.mark.parametrize(
     "command, params, expected_output, input_string, expected_output_2",
     [
-        ("export", "export_key", "Enter passphrase to encrypt the exported key", "123456", "password must be at least 8 characters"),
-        ("export", "export_key", "Enter passphrase to encrypt the exported key", "12345678",
+        ("export", "export_key", "Enter passphrase to encrypt the exported key", data_helpers.get_alphanumeric_string(6), "password must be at least 8 characters"),
+        ("export", "export_key", "Enter passphrase to encrypt the exported key", data_helpers.get_alphanumeric_string(8),
         "BEGIN TENDERMINT PRIVATE KEY"),
         ("export", "export_key", "Enter passphrase to encrypt the exported key", "qwe!@#$%^123",
          "BEGIN TENDERMINT PRIVATE KEY"),
-        ("export", "export_key", "Enter passphrase to encrypt the exported key", "ttttttttttttttttttttttttttttttttttttttt",
+        ("export", "export_key", "Enter passphrase to encrypt the exported key", data_helpers.get_alphanumeric_string(40),
          "BEGIN TENDERMINT PRIVATE KEY"),
     ]
 )
@@ -67,18 +116,14 @@ def test_keys_export(command, params, expected_output, input_string, expected_ou
     run_interaction(cli, input_string, expected_output_2)
 
 
-@pytest.fixture(scope='session')
-def create_import_keys():
-    command_base = "cheqd-noded keys"
-    run(command_base, "add", "import_key", "name: import_key")
-
-
-@pytest.mark.usefixtures('create_import_keys')
 def test_keys_import():
     command_base = "cheqd-noded keys"
-    key_name = "import_key"
-    passphrase = "00000000"
+    key_name = "import_key_{}".format(data_helpers.get_alphanumeric_string(4))
+    passphrase = data_helpers.get_alphanumeric_string(8)
     filename = "/home/{}/key.txt".format(getpass.getuser())
+
+    run(command_base, "add", key_name, "name: {}".format(key_name))
+
     cli = run(command_base, "export", key_name, "Enter passphrase")
     run_interaction(cli, passphrase, "BEGIN")
 
@@ -96,21 +141,58 @@ def test_keys_import():
 
     run(command_base, "list", None, "- name: {}".format(key_name))
 
+    cli = run(command_base, "delete", key_name, "Continue?")
+    run_interaction(cli, "y", "Key deleted forever")
 
-def test_keys_recovery():
+
+@pytest.mark.parametrize(
+        "action, expected_result",
+        [
+            ("armor", "Error: failed to decrypt private key: unrecognized armor type:  TENDERMINT PRIVATE KEY"),
+            ("eof", "Error: failed to decrypt private key: EOF"),
+            ("key", "Error: failed to decrypt private key: illegal base64 data at input byte"),
+            ("passphrase", "Error: failed to decrypt private key: ciphertext decryption failed")
+        ]
+    )
+def test_keys_import_wrong_data(action, expected_result):
     command_base = "cheqd-noded keys"
-    key_name = "recovery_key"
-    cli = run(command_base, "add", key_name, "name: {}".format(key_name))
+    key_name = "import_key_{}".format(data_helpers.get_alphanumeric_string(4))
+    passphrase = data_helpers.get_alphanumeric_string(8)
+    filename = "/home/{}/key.txt".format(getpass.getuser())
 
-    command_result = cli.read()
-    mnemonic = re.search('(\w+\s){24}', command_result).group(0)
-    print(mnemonic)
+    run(command_base, "add", key_name, "name: {}".format(key_name))
 
-    keys_path = "/home/{}/.cheqdnode/".format(getpass.getuser())
-    shutil.rmtree(keys_path)
+    cli = run(command_base, "export", key_name, "Enter passphrase")
+    run_interaction(cli, passphrase, "BEGIN")
 
-    cli = run(command_base, "add", "{} --recover".format(key_name), "Enter your bip39 mnemonic")
-    run_interaction(cli, mnemonic, r"- name: {}(.*?)type: local(.*?)address: (.*?)pubkey: (.*?)mnemonic: ".format(key_name))
+    cli_output = cli.read()
+
+    # correct default content
+    key_content = "-----BEGIN{}".format(cli_output)
+    if action is "armor":
+        # adding extra space between BEGIN and rest of the key
+        key_content = "-----BEGIN {}".format(cli_output)
+    if action is "eof":
+        # not appending -----BEGIN at all
+        key_content = "{}".format(cli_output)
+    if action is "key":
+        key_content = "-----BEGIN{}".format(cli_output)
+        key_content_as_list = list(key_content)
+        key_content_as_list[120] = "%"
+        key_content = "".join(key_content_as_list)
+
+    text_file = open(filename, "w")
+    text_file.write(key_content)
+    text_file.close()
+
+    cli = run(command_base, "delete", key_name, "Continue?")
+    run_interaction(cli, "y", "Key deleted forever")
+
+    cli = run(command_base, "import", "{} {}".format(key_name, filename), "Enter passphrase to decrypt your key")
+
+    if action is "passphrase":
+        passphrase = data_helpers.get_alphanumeric_string(8)
+    run_interaction(cli, passphrase, expected_result)
 
 
 @pytest.mark.skip
