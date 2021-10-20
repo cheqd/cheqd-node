@@ -68,8 +68,9 @@ def test_keys_add_recover():
     mnemonic = re.search('(\w+\s){24}', command_result).group(0)
     print(mnemonic)
 
-    keys_path = "/home/{}/.cheqdnode/".format(getpass.getuser())
-    shutil.rmtree(keys_path)
+    run(command_base, "delete", f"{key_name} {YES_FLAG}", r"Key deleted forever \(uh oh!\)")
+    # keys_path = "/home/{}/.cheqdnode/".format(getpass.getuser())
+    # shutil.rmtree(keys_path)
 
     cli = run(command_base, "add", "{} --recover".format(key_name), "Enter your bip39 mnemonic")
     run_interaction(cli, mnemonic, r"- name: {}(.*?)type: local(.*?)address: (.*?)pubkey: (.*?)mnemonic: ".format(key_name))
@@ -100,8 +101,9 @@ def test_keys_add_recover_wrong_phrase():
     key_name = "recovery_key_{}".format(helpers.random_string(4))
     run(command_base, "add", key_name, "name: {}".format(key_name))
 
-    keys_path = "/home/{}/.cheqdnode/".format(getpass.getuser())
-    shutil.rmtree(keys_path)
+    run(command_base, "delete", f"{key_name} {YES_FLAG}", r"Key deleted forever \(uh oh!\)")
+    # keys_path = "/home/{}/.cheqdnode/".format(getpass.getuser())
+    # shutil.rmtree(keys_path)
 
     cli = run(command_base, "add", "{} --recover".format(key_name), "Enter your bip39 mnemonic")
     run_interaction(cli, helpers.random_string(20), "Error: invalid mnemonic")
