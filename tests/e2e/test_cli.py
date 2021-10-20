@@ -13,6 +13,8 @@ from helpers import run, run_interaction, get_balance, send_with_note, \
             ("help", "",r"cheqd App(.*?)Usage:(.*?)Available Commands:(.*?)Flags:"),
             ("status", TEST_NET_NODE_TCP, fr"\"NodeInfo\"(.*?)\"network\":\"{TEST_NET_NETWORK}\"(.*?)\"moniker\":\"seed1-us-testnet-cheqd\""), # tcp + us node
             ("status", TEST_NET_NODE_HTTP, fr"\"NodeInfo\"(.*?)\"network\":\"{TEST_NET_NETWORK}\"(.*?)\"moniker\":\"node1-eu-testnet-cheqd\""), # http + eu node
+            ("status", LOCAL_NET_NODE_TCP, fr"\"NodeInfo\"(.*?)\"network\":\"{LOCAL_NET_NETWORK}\"(.*?)\"moniker\":\"node0\""), # tcp + local
+            ("status", LOCAL_NET_NODE_HTTP, fr"\"NodeInfo\"(.*?)\"network\":\"{LOCAL_NET_NETWORK}\"(.*?)\"moniker\":\"node0\""), # http + local
         ]
     )
 def test_basic(command, params, expected_output):
