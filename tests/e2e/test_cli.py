@@ -6,7 +6,6 @@ import shutil
 import pytest
 import getpass
 
-import helpers
 from helpers import run, run_interaction, \
     TEST_NET_NETWORK, TEST_NET_NODE_TCP, TEST_NET_NODE_HTTP, TEST_NET_DESTINATION, TEST_NET_DESTINATION_HTTP, TEST_NET_FEES, TEST_NET_GAS_X_GAS_PRICES, YES_FLAG, \
     SENDER_ADDRESS, RECEIVER_ADDRESS, CODE_0
@@ -61,7 +60,7 @@ def test_keys(command, params, expected_output):
 
 def test_keys_add_recover():
     command_base = "cheqd-noded keys"
-    key_name = "recovery_key_{}".format(helpers.random_string(4))
+    key_name = "recovery_key_{}".format(random_string(4))
     cli = run(command_base, "add", key_name, "name: {}".format(key_name))
 
     command_result = cli.read()
@@ -81,7 +80,7 @@ def test_keys_add_recover():
 
 def test_keys_add_recover_existing():
     command_base = "cheqd-noded keys"
-    key_name = "recovery_key_{}".format(helpers.random_string(4))
+    key_name = "recovery_key_{}".format(random_string(4))
     cli = run(command_base, "add", key_name, "name: {}".format(key_name))
 
     command_result = cli.read()
@@ -98,7 +97,7 @@ def test_keys_add_recover_existing():
 
 def test_keys_add_recover_wrong_phrase():
     command_base = "cheqd-noded keys"
-    key_name = "recovery_key_{}".format(helpers.random_string(4))
+    key_name = "recovery_key_{}".format(random_string(4))
     run(command_base, "add", key_name, "name: {}".format(key_name))
 
     run(command_base, "delete", f"{key_name} {YES_FLAG}", r"Key deleted forever \(uh oh!\)")
@@ -106,19 +105,19 @@ def test_keys_add_recover_wrong_phrase():
     # shutil.rmtree(keys_path)
 
     cli = run(command_base, "add", "{} --recover".format(key_name), "Enter your bip39 mnemonic")
-    run_interaction(cli, helpers.random_string(20), "Error: invalid mnemonic")
+    run_interaction(cli, random_string(20), "Error: invalid mnemonic")
 
 
 @pytest.mark.usefixtures('create_export_keys')
 @pytest.mark.parametrize(
     "command, params, expected_output, input_string, expected_output_2",
     [
-        ("export", "export_key", "Enter passphrase to encrypt the exported key", helpers.random_string(6), "password must be at least 8 characters"),
-        ("export", "export_key", "Enter passphrase to encrypt the exported key", helpers.random_string(8),
+        ("export", "export_key", "Enter passphrase to encrypt the exported key", random_string(6), "password must be at least 8 characters"),
+        ("export", "export_key", "Enter passphrase to encrypt the exported key", random_string(8),
         "BEGIN TENDERMINT PRIVATE KEY"),
         ("export", "export_key", "Enter passphrase to encrypt the exported key", "qwe!@#$%^123",
          "BEGIN TENDERMINT PRIVATE KEY"),
-        ("export", "export_key", "Enter passphrase to encrypt the exported key", helpers.random_string(40),
+        ("export", "export_key", "Enter passphrase to encrypt the exported key", random_string(40),
          "BEGIN TENDERMINT PRIVATE KEY"),
     ]
 )
@@ -203,13 +202,13 @@ def test_keys_import_wrong_data(action, expected_result):
     cli = run(command_base, "import", "{} {}".format(key_name, filename), "Enter passphrase to decrypt your key")
 
     if action is "passphrase":
-        passphrase = helpers.random_string(8)
+        passphrase = random_string(8)
     run_interaction(cli, passphrase, expected_result)
 
 
 def test_keys_parse():
     command_base = "cheqd-noded keys"
-    key_name = "parse_key_{}".format(helpers.random_string(4))
+    key_name = "parse_key_{}".format(random_string(4))
     cli = run(command_base, "add", key_name, "name: {}".format(key_name))
 
     bech32 = re.search('[a-zA-Z0-9]{44}', cli.read()).group(0)
