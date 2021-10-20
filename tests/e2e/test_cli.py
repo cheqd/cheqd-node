@@ -1,14 +1,3 @@
-import re
-
-import pexpect
-import os
-import shutil
-import pytest
-import getpass
-
-from helpers import run, run_interaction, \
-    TEST_NET_NETWORK, TEST_NET_NODE_TCP, TEST_NET_NODE_HTTP, TEST_NET_DESTINATION, TEST_NET_DESTINATION_HTTP, TEST_NET_FEES, TEST_NET_GAS_X_GAS_PRICES, YES_FLAG, \
-    SENDER_ADDRESS, RECEIVER_ADDRESS, CODE_0
 import json
 import pytest
 import re
@@ -113,12 +102,9 @@ def test_keys_add_recover_wrong_phrase():
     "command, params, expected_output, input_string, expected_output_2",
     [
         ("export", "export_key", "Enter passphrase to encrypt the exported key", random_string(6), "password must be at least 8 characters"),
-        ("export", "export_key", "Enter passphrase to encrypt the exported key", random_string(8),
-        "BEGIN TENDERMINT PRIVATE KEY"),
-        ("export", "export_key", "Enter passphrase to encrypt the exported key", "qwe!@#$%^123",
-         "BEGIN TENDERMINT PRIVATE KEY"),
-        ("export", "export_key", "Enter passphrase to encrypt the exported key", random_string(40),
-         "BEGIN TENDERMINT PRIVATE KEY"),
+        ("export", "export_key", "Enter passphrase to encrypt the exported key", random_string(8), "BEGIN TENDERMINT PRIVATE KEY"),
+        ("export", "export_key", "Enter passphrase to encrypt the exported key", "qwe!@#$%^123", "BEGIN TENDERMINT PRIVATE KEY"),
+        ("export", "export_key", "Enter passphrase to encrypt the exported key", random_string(40), "BEGIN TENDERMINT PRIVATE KEY"),
     ]
 )
 def test_keys_export(command, params, expected_output, input_string, expected_output_2):
