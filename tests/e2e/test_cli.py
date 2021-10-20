@@ -1,3 +1,14 @@
+import re
+
+import pexpect
+import os
+import shutil
+import pytest
+import getpass
+
+from helpers import run, run_interaction, \
+    TEST_NET_NETWORK, TEST_NET_NODE_TCP, TEST_NET_NODE_HTTP, TEST_NET_DESTINATION, TEST_NET_DESTINATION_HTTP, TEST_NET_FEES, TEST_NET_GAS_X_GAS_PRICES, YES_FLAG, \
+    SENDER_ADDRESS, RECEIVER_ADDRESS, CODE_0
 import json
 import pytest
 import re
@@ -102,9 +113,12 @@ def test_keys_add_recover_wrong_phrase():
     "command, params, expected_output, input_string, expected_output_2",
     [
         ("export", "export_key", "Enter passphrase to encrypt the exported key", random_string(6), "password must be at least 8 characters"),
-        ("export", "export_key", "Enter passphrase to encrypt the exported key", random_string(8), "BEGIN TENDERMINT PRIVATE KEY"),
-        ("export", "export_key", "Enter passphrase to encrypt the exported key", "qwe!@#$%^123", "BEGIN TENDERMINT PRIVATE KEY"),
-        ("export", "export_key", "Enter passphrase to encrypt the exported key", random_string(40), "BEGIN TENDERMINT PRIVATE KEY"),
+        ("export", "export_key", "Enter passphrase to encrypt the exported key", random_string(8),
+        "BEGIN TENDERMINT PRIVATE KEY"),
+        ("export", "export_key", "Enter passphrase to encrypt the exported key", "qwe!@#$%^123",
+         "BEGIN TENDERMINT PRIVATE KEY"),
+        ("export", "export_key", "Enter passphrase to encrypt the exported key", random_string(40),
+         "BEGIN TENDERMINT PRIVATE KEY"),
     ]
 )
 def test_keys_export(command, params, expected_output, input_string, expected_output_2):
@@ -191,6 +205,31 @@ def test_keys_import_wrong_data(action, expected_result):
     if action is "passphrase":
         passphrase = random_string(8)
     run_interaction(cli, passphrase, expected_result)
+
+
+def test_keys_parse():
+    command_base = "cheqd-noded keys"
+    key_name = "parse_key_{}".format(random_string(4))
+    cli = run(command_base, "add", key_name, "name: {}".format(key_name))
+
+    bech32 = re.search('[a-zA-Z0-9]{44}', cli.read()).group(0)
+    print(bech32)
+
+    cli = run(command_base, "parse", bech32, r"human: cheqd(.*?)bytes: [A-Z0-9]{40}")
+
+    hex_key = re.search('[A-Z0-9]{40}', cli.after).group(0)
+    print(hex_key)
+
+    run(command_base, "parse", hex_key, r"formats:(.*?)" +
+              "- cheqd[a-z0-9]{39}(.*?)"+
+              "- cheqdpub[a-z0-9]{39}(.*?)" +
+              "- cheqdvaloper[a-z0-9]{39}(.*?)" +
+              "- cheqdvaloperpub[a-z0-9]{39}(.*?)" +
+              "- cheqdvalcons[a-z0-9]{39}(.*?)" +
+              "- cheqdvalconspub[a-z0-9]{39}")
+
+    cli = run(command_base, "delete", key_name, "Continue?")
+    run_interaction(cli, "y", "Key deleted forever")
 
 
 @pytest.mark.parametrize(
