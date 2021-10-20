@@ -82,10 +82,10 @@ func TestHandler_CreateSchema(t *testing.T) {
 	msg := setup.CreateSchema()
 
 	data, _ := ptypes.NewAnyWithValue(msg)
-	result, _ := setup.Handler(setup.Ctx, setup.WrapRequest(data, keys, make(map[string]string)))
+	result, err := setup.Handler(setup.Ctx, setup.WrapRequest(data, keys, make(map[string]string)))
 
 	schema := types.MsgCreateSchemaResponse{}
-	err := schema.Unmarshal(result.Data)
+	err = schema.Unmarshal(result.Data)
 
 	if err != nil {
 		log.Fatal(err)

@@ -9,13 +9,14 @@ import (
 
 func (k msgServer) CreateCredDef(goCtx context.Context, msg *types.MsgWriteRequest) (*types.MsgCreateCredDefResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	credDefMsg, isMsgIdentity := msg.Data.GetCachedValue().(*types.MsgCreateCredDef)
+	prefix := types.DidPrefix + ctx.ChainID() + ":"
 
+	credDefMsg, isMsgIdentity := msg.Data.GetCachedValue().(*types.MsgCreateCredDef)
 	if !isMsgIdentity {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", types.ModuleName, msg)
 	}
 
-	if err := credDefMsg.ValidateBasic(); err != nil {
+	if err := credDefMsg.ValidateBasic(prefix); err != nil {
 		return nil, err
 	}
 

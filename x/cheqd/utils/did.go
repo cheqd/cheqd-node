@@ -1,45 +1,18 @@
 package utils
 
 import (
-	ustring "github.com/cheqd/cheqd-node/x/cheqd/utils/strings"
 	"regexp"
 	"strings"
 )
 
 var DidForbiddenSymbolsRegexp, _ = regexp.Compile(`^[^#?&/\\]+$`)
 
-var VerificationMethodType = []string{
-	"JsonWebKey2020",
-	"EcdsaSecp256k1VerificationKey2019",
-	"Ed25519VerificationKey2018",
-	"Ed25519VerificationKey2020",
-	"Bls12381G1Key2020",
-	"Bls12381G2Key2020",
-	"PgpVerificationKey2021",
-	"RsaVerificationKey2018",
-	"X25519KeyAgreementKey2019",
-	"SchnorrSecp256k1VerificationKey2019",
-	"EcdsaSecp256k1RecoveryMethod2020",
-	"VerifiableCondition2021",
-}
-
-var ServiceType = []string{
-	"LinkedDomains",
-	"DIDCommMessaging",
-}
-
-var CredDefSuffix = "/credDef"
-var CredDefSuffixLen = len(CredDefSuffix)
-
-var SchemaSuffix = "/schema"
-var SchemaSuffixLen = len(SchemaSuffix)
-
 func SplitDidUrlIntoDidAndFragment(didUrl string) (string, string) {
 	fragments := strings.Split(didUrl, "#")
 	return fragments[0], fragments[1]
 }
 
-func IsDidFragment(didUrl string) bool {
+func IsDidFragment(prefix string, didUrl string) bool {
 	if !strings.Contains(didUrl, "#") {
 		return false
 	}
@@ -49,24 +22,16 @@ func IsDidFragment(didUrl string) bool {
 	}
 
 	did, _ := SplitDidUrlIntoDidAndFragment(didUrl)
-	return IsDid(did)
+	return IsDid(prefix, did)
 }
 
-func IsFullDidFragment(didUrl string) bool {
+func IsFullDidFragment(prefix string, didUrl string) bool {
 	if !strings.Contains(didUrl, "#") {
 		return false
 	}
 
 	did, _ := SplitDidUrlIntoDidAndFragment(didUrl)
-	return IsDid(did)
-}
-
-func IsVerificationMethodType(vmType string) bool {
-	return ustring.Include(VerificationMethodType, vmType)
-}
-
-func IsDidServiceType(sType string) bool {
-	return ustring.Include(ServiceType, sType)
+	return IsDid(prefix, did)
 }
 
 func ResolveId(did string, methodId string) string {
@@ -80,9 +45,9 @@ func ResolveId(did string, methodId string) string {
 	return result
 }
 
-func ArrayContainsNotDid(array []string) (bool, int) {
+func ArrayContainsNotDid(prefix string, array []string) (bool, int) {
 	for i, did := range array {
-		if IsNotDid(did) {
+		if IsNotDid(prefix, did) {
 			return true, i
 		}
 	}
@@ -90,9 +55,9 @@ func ArrayContainsNotDid(array []string) (bool, int) {
 	return false, 0
 }
 
-func ArrayContainsNotDidFragment(array []string) (bool, int) {
+func ArrayContainsNotDidFragment(prefix string, array []string) (bool, int) {
 	for i, did := range array {
-		if !IsDidFragment(did) {
+		if !IsDidFragment(prefix, did) {
 			return true, i
 		}
 	}
@@ -100,11 +65,11 @@ func ArrayContainsNotDidFragment(array []string) (bool, int) {
 	return false, 0
 }
 
-func IsNotDid(did string) bool {
-	return !IsDid(did)
+func IsNotDid(prefix string, did string) bool {
+	return !IsDid(prefix, did)
 }
 
-func IsDid(did string) bool {
+func IsDid(prefix string, did string) bool {
 	if len(did) == 0 {
 		return false
 	}
@@ -113,39 +78,5 @@ func IsDid(did string) bool {
 		return false
 	}
 
-	fragments := strings.Split(did, ":")
-
-	if len(fragments) <= 3 {
-		return false
-	}
-
-	if fragments[0] != "did" {
-		return false
-	}
-
-	if fragments[1] != MethodName {
-		return false
-	}
-
-	if fragments[2] != MethodSpecificId {
-		return false
-	}
-
-	return true
-}
-
-func IsSchema(did string) bool {
-	return strings.HasSuffix(did, SchemaSuffix)
-}
-
-func GetDidFromSchema(schema string) string {
-	return schema[:len(schema)-SchemaSuffixLen]
-}
-
-func IsCredDef(did string) bool {
-	return strings.HasSuffix(did, CredDefSuffix)
-}
-
-func GetDidFromCredDef(credDef string) string {
-	return credDef[:len(credDef)-CredDefSuffixLen]
+	return strings.HasPrefix(did, prefix)
 }

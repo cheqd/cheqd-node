@@ -15,6 +15,9 @@ const (
 
 	// MemStoreKey defines the in-memory store key
 	MemStoreKey = "mem_capability"
+
+	// DidPrefix defines did prefix
+	DidPrefix = "did:" + ModuleName + ":"
 )
 
 func KeyPrefix(p string) []byte {

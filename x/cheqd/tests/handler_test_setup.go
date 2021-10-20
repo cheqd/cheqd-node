@@ -54,7 +54,7 @@ func Setup() TestSetup {
 	// Create context
 	blockTime, _ := time.Parse(time.RFC3339, "2021-01-01T00:00:00.000Z")
 	ctx := sdk.NewContext(dbStore,
-		tmproto.Header{ChainID: "cheqd-node", Time: blockTime},
+		tmproto.Header{ChainID: "test", Time: blockTime},
 		false, log.NewNopLogger()).WithTxBytes(txBytes)
 
 	handler := cheqd.NewHandler(*newKeeper)
@@ -144,7 +144,7 @@ func (s *TestSetup) CreateToUpdateDid(did *types.MsgCreateDid) *types.MsgUpdateD
 
 func (s *TestSetup) CreateSchema() *types.MsgCreateSchema {
 	return &types.MsgCreateSchema{
-		Id:         "did:cheqd:test:schema-1/schema",
+		Id:         "did:cheqd:test:schema-1?service=CL-Schema",
 		Type:       "CL-Schema",
 		Name:       "name",
 		Version:    "version",
@@ -162,10 +162,10 @@ func (s *TestSetup) CreateCredDef() *types.MsgCreateCredDef {
 	}
 
 	return &types.MsgCreateCredDef{
-		Id:         "did:cheqd:test:cred-def-1/credDef",
+		Id:         "did:cheqd:test:cred-def-1?service=CL-CredDef",
 		SchemaId:   "schema-1",
 		Tag:        "tag",
-		Type:       "CL-Sig-Cred_def",
+		Type:       "CL-CredDef",
 		Value:      &Value,
 		Controller: []string{"did:cheqd:test:alice"},
 	}

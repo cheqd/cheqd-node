@@ -69,36 +69,36 @@ func (msg *MsgCreateDid) GetSigners() []Signer {
 	return []Signer{}
 }
 
-func (msg *MsgCreateDid) ValidateBasic() error {
-	if utils.IsNotDid(msg.Id) {
+func (msg *MsgCreateDid) ValidateBasic(namespace string) error {
+	if utils.IsNotDid(namespace, msg.Id) {
 		return ErrBadRequestIsNotDid.Wrap("Id")
 	}
 
-	if notValid, i := utils.ArrayContainsNotDid(msg.Controller); notValid {
+	if notValid, i := utils.ArrayContainsNotDid(namespace, msg.Controller); notValid {
 		return ErrBadRequestIsNotDid.Wrapf("Controller item %s at position %d", msg.Controller[i], i)
 	}
 
-	if err := ValidateVerificationMethods(msg.Id, msg.VerificationMethod); err != nil {
+	if err := ValidateVerificationMethods(namespace, msg.Id, msg.VerificationMethod); err != nil {
 		return err
 	}
 
-	if err := ValidateServices(msg.Id, msg.Service); err != nil {
+	if err := ValidateServices(namespace, msg.Id, msg.Service); err != nil {
 		return err
 	}
 
-	if notValid, i := utils.ArrayContainsNotDidFragment(msg.Authentication); notValid {
+	if notValid, i := utils.ArrayContainsNotDidFragment(namespace, msg.Authentication); notValid {
 		return ErrBadRequestIsNotDidFragment.Wrapf("Authentication item %s", msg.Authentication[i])
 	}
 
-	if notValid, i := utils.ArrayContainsNotDidFragment(msg.CapabilityInvocation); notValid {
+	if notValid, i := utils.ArrayContainsNotDidFragment(namespace, msg.CapabilityInvocation); notValid {
 		return ErrBadRequestIsNotDidFragment.Wrapf("CapabilityInvocation item %s", msg.CapabilityInvocation[i])
 	}
 
-	if notValid, i := utils.ArrayContainsNotDidFragment(msg.CapabilityDelegation); notValid {
+	if notValid, i := utils.ArrayContainsNotDidFragment(namespace, msg.CapabilityDelegation); notValid {
 		return ErrBadRequestIsNotDidFragment.Wrapf("CapabilityDelegation item %s", msg.CapabilityDelegation[i])
 	}
 
-	if notValid, i := utils.ArrayContainsNotDidFragment(msg.KeyAgreement); notValid {
+	if notValid, i := utils.ArrayContainsNotDidFragment(namespace, msg.KeyAgreement); notValid {
 		return ErrBadRequestIsNotDidFragment.Wrapf("KeyAgreement item %s", msg.KeyAgreement[i])
 	}
 
@@ -197,36 +197,36 @@ func (msg *MsgUpdateDid) GetSigners() []Signer {
 	return []Signer{}
 }
 
-func (msg *MsgUpdateDid) ValidateBasic() error {
-	if utils.IsNotDid(msg.Id) {
+func (msg *MsgUpdateDid) ValidateBasic(namespace string) error {
+	if utils.IsNotDid(namespace, msg.Id) {
 		return ErrBadRequestIsNotDid.Wrap("Id")
 	}
 
-	if notValid, i := utils.ArrayContainsNotDid(msg.Controller); notValid {
+	if notValid, i := utils.ArrayContainsNotDid(namespace, msg.Controller); notValid {
 		return ErrBadRequestIsNotDid.Wrapf("Controller item %s at position %d", msg.Controller[i], i)
 	}
 
-	if err := ValidateVerificationMethods(msg.Id, msg.VerificationMethod); err != nil {
+	if err := ValidateVerificationMethods(namespace, msg.Id, msg.VerificationMethod); err != nil {
 		return err
 	}
 
-	if err := ValidateServices(msg.Id, msg.Service); err != nil {
+	if err := ValidateServices(namespace, msg.Id, msg.Service); err != nil {
 		return err
 	}
 
-	if notValid, i := utils.ArrayContainsNotDidFragment(msg.Authentication); notValid {
+	if notValid, i := utils.ArrayContainsNotDidFragment(namespace, msg.Authentication); notValid {
 		return ErrBadRequestIsNotDidFragment.Wrapf("Authentication item %s", msg.Authentication[i])
 	}
 
-	if notValid, i := utils.ArrayContainsNotDidFragment(msg.CapabilityInvocation); notValid {
+	if notValid, i := utils.ArrayContainsNotDidFragment(namespace, msg.CapabilityInvocation); notValid {
 		return ErrBadRequestIsNotDidFragment.Wrapf("CapabilityInvocation item %s", msg.CapabilityInvocation[i])
 	}
 
-	if notValid, i := utils.ArrayContainsNotDidFragment(msg.CapabilityDelegation); notValid {
+	if notValid, i := utils.ArrayContainsNotDidFragment(namespace, msg.CapabilityDelegation); notValid {
 		return ErrBadRequestIsNotDidFragment.Wrapf("CapabilityDelegation item %s", msg.CapabilityDelegation[i])
 	}
 
-	if notValid, i := utils.ArrayContainsNotDidFragment(msg.KeyAgreement); notValid {
+	if notValid, i := utils.ArrayContainsNotDidFragment(namespace, msg.KeyAgreement); notValid {
 		return ErrBadRequestIsNotDidFragment.Wrapf("KeyAgreement item %s", msg.KeyAgreement[i])
 	}
 
@@ -261,9 +261,9 @@ func (msg *MsgUpdateDid) ValidateBasic() error {
 	return nil
 }
 
-func ValidateVerificationMethods(did string, vms []*VerificationMethod) error {
+func ValidateVerificationMethods(namespace string, did string, vms []*VerificationMethod) error {
 	for i, vm := range vms {
-		if err := ValidateVerificationMethod(vm); err != nil {
+		if err := ValidateVerificationMethod(namespace, vm); err != nil {
 			return ErrBadRequestInvalidVerMethod.Wrap(sdkerrors.Wrapf(err, "index %d, value %s", i, vm.Id).Error())
 		}
 	}
@@ -277,8 +277,8 @@ func ValidateVerificationMethods(did string, vms []*VerificationMethod) error {
 	return nil
 }
 
-func ValidateVerificationMethod(vm *VerificationMethod) error {
-	if !utils.IsFullDidFragment(vm.Id) {
+func ValidateVerificationMethod(namespace string, vm *VerificationMethod) error {
+	if !utils.IsFullDidFragment(namespace, vm.Id) {
 		return ErrBadRequestIsNotDidFragment.Wrap(vm.Id)
 	}
 
@@ -297,9 +297,9 @@ func ValidateVerificationMethod(vm *VerificationMethod) error {
 	return nil
 }
 
-func ValidateServices(did string, services []*DidService) error {
+func ValidateServices(namespace string, did string, services []*DidService) error {
 	for i, s := range services {
-		if err := ValidateService(s); err != nil {
+		if err := ValidateService(namespace, s); err != nil {
 			return ErrBadRequestInvalidService.Wrap(sdkerrors.Wrapf(err, "index %d, value %s", i, s.Id).Error())
 		}
 	}
@@ -313,8 +313,8 @@ func ValidateServices(did string, services []*DidService) error {
 	return nil
 }
 
-func ValidateService(s *DidService) error {
-	if !utils.IsDidFragment(s.Id) {
+func ValidateService(namespace string, s *DidService) error {
+	if !utils.IsDidFragment(namespace, s.Id) {
 		return ErrBadRequestIsNotDidFragment.Wrap(s.Id)
 	}
 

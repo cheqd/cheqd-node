@@ -34,12 +34,12 @@ func (msg *MsgCreateSchema) GetDid() string {
 	return utils.GetDidFromSchema(msg.Id)
 }
 
-func (msg *MsgCreateSchema) ValidateBasic() error {
+func (msg *MsgCreateSchema) ValidateBasic(namespace string) error {
 	if !utils.IsSchema(msg.Id) {
-		return ErrBadRequest.Wrap("Id must end with resource type '/schema'")
+		return ErrBadRequest.Wrap("Id must end with resource type '?service=CL-Schema'")
 	}
 
-	if utils.IsNotDid(msg.GetDid()) {
+	if utils.IsNotDid(namespace, msg.GetDid()) {
 		return ErrBadRequestIsNotDid.Wrap("Id")
 	}
 
@@ -71,7 +71,7 @@ func (msg *MsgCreateSchema) ValidateBasic() error {
 		return ErrBadRequestIsRequired.Wrap("Controller")
 	}
 
-	if notValid, i := utils.ArrayContainsNotDid(msg.Controller); notValid {
+	if notValid, i := utils.ArrayContainsNotDid(namespace, msg.Controller); notValid {
 		return ErrBadRequestIsNotDid.Wrapf("Controller item %s", msg.Controller[i])
 	}
 

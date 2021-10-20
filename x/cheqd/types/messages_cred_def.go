@@ -33,12 +33,12 @@ func (msg *MsgCreateCredDef) GetDid() string {
 	return utils.GetDidFromCredDef(msg.Id)
 }
 
-func (msg *MsgCreateCredDef) ValidateBasic() error {
+func (msg *MsgCreateCredDef) ValidateBasic(namespace string) error {
 	if !utils.IsCredDef(msg.Id) {
-		return ErrBadRequest.Wrap("Id must end with resource type '/credDef'")
+		return ErrBadRequest.Wrap("Id must end with resource type '?service=CL-CredDef'")
 	}
 
-	if utils.IsNotDid(msg.GetDid()) {
+	if utils.IsNotDid(namespace, msg.GetDid()) {
 		return ErrBadRequestIsNotDid.Wrap("Id")
 	}
 
@@ -62,7 +62,7 @@ func (msg *MsgCreateCredDef) ValidateBasic() error {
 		return ErrBadRequestIsRequired.Wrap("Controller")
 	}
 
-	if notValid, i := utils.ArrayContainsNotDid(msg.Controller); notValid {
+	if notValid, i := utils.ArrayContainsNotDid(namespace, msg.Controller); notValid {
 		return ErrBadRequestIsNotDid.Wrapf("Controller item %s", msg.Controller[i])
 	}
 

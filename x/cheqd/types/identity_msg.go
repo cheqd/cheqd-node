@@ -2,7 +2,7 @@ package types
 
 type (
 	IdentityMsg interface {
-		ValidateBasic() error
+		ValidateBasic(namespace string) error
 		GetSigners() []Signer
 	}
 

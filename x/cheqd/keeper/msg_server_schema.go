@@ -9,13 +9,15 @@ import (
 
 func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgWriteRequest) (*types.MsgCreateSchemaResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+	prefix := types.DidPrefix + ctx.ChainID() + ":"
+
 	schemaMsg, isMsgIdentity := msg.Data.GetCachedValue().(*types.MsgCreateSchema)
 
 	if !isMsgIdentity {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", types.ModuleName, msg)
 	}
 
-	if err := schemaMsg.ValidateBasic(); err != nil {
+	if err := schemaMsg.ValidateBasic(prefix); err != nil {
 		return nil, err
 	}
 

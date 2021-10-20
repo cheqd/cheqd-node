@@ -26,5 +26,5 @@ func (k Keeper) Did(c context.Context, req *types.QueryGetDidRequest) (*types.Qu
 		return nil, err
 	}
 
-	return &types.QueryGetDidResponse{Did: state.GetDid()}, nil
+	return &types.QueryGetDidResponse{Did: state.GetDid(), Metadata: state.Metadata}, nil
 }

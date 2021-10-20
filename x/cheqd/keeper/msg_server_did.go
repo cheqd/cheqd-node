@@ -13,13 +13,14 @@ import (
 
 func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgWriteRequest) (*types.MsgCreateDidResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	didMsg, isMsgIdentity := msg.Data.GetCachedValue().(*types.MsgCreateDid)
+	prefix := types.DidPrefix + ctx.ChainID() + ":"
 
+	didMsg, isMsgIdentity := msg.Data.GetCachedValue().(*types.MsgCreateDid)
 	if !isMsgIdentity {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", types.ModuleName, msg)
 	}
 
-	if err := didMsg.ValidateBasic(); err != nil {
+	if err := didMsg.ValidateBasic(prefix); err != nil {
 		return nil, err
 	}
 
@@ -54,13 +55,14 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 
 func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) (*types.MsgUpdateDidResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	didMsg, isMsgIdentity := msg.Data.GetCachedValue().(*types.MsgUpdateDid)
+	prefix := types.DidPrefix + ctx.ChainID() + ":"
 
+	didMsg, isMsgIdentity := msg.Data.GetCachedValue().(*types.MsgUpdateDid)
 	if !isMsgIdentity {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", types.ModuleName, msg)
 	}
 
-	if err := didMsg.ValidateBasic(); err != nil {
+	if err := didMsg.ValidateBasic(prefix); err != nil {
 		return nil, err
 	}
 
