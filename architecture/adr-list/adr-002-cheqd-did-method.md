@@ -81,32 +81,30 @@ A DID that uses the cheqd DID method MUST begin with the prefix `did:cheqd`. Thi
 
 The cheqd DID `method-specific-id` is made up of two components:
 
-1. **`namespace`**: A string that identifies the cheqd network `chain_id` (e.g., "mainnet", "testnet") where the DID reference is stored. Different cheqd networks may be differentiated based on whether they are production vs non-production, governance frameworks in use, participants involved in running nodes, etc.
-2. **`namespace-id`**: A self-certified identifier unique to the given namespace, i.e., cheqd network `chain_id`.
+**`namespace`**: A string that identifies the cheqd network `chain_id` (e.g., "mainnet-1", "testnet") where the DID reference is stored. Different cheqd networks may be differentiated based on whether they are production vs non-production, governance frameworks in use, participants involved in running nodes, etc.
 
 #### cheqd DID method syntax
 
 The cheqd DID method ABNF to conform with [DID syntax guidelines](https://www.w3.org/TR/did-core/#did-syntax) is as follows:
 
 ```abnf
-cheqd-did         = "did:cheqd:" namespace ":" namespace-id
-namespace         = chain_id ":" 1*255id-char ":" namespace-id
-namespace-id      = 38*255id-char
-id-char           = ALPHA / DIGIT
+cheqd-did         = "did:cheqd:" namespace "
+namespace         = chain_id ":" 1*255id-char "
+id-char           = ALPHA / DIGIT / "-"
 ```
 
 #### Examples of `did:cheqd` identifiers
 
-A DID written to the cheqd "mainnet" ledger `namespace`:
+A DID written to the cheqd "mainnet-1" ledger `namespace`:
 
 ```abnf
-did:cheqd:mainnet:7Tqg6BwSSWapxgUDm9KKgg
+did:cheqd:mainnet-1:7Tqg6BwSSWapxgUDm9KKgg
 ```
 
 A DID written to the cheqd "testnet" ledger `namespace`:
 
 ```abnf
-did:cheqd:testnet:6cgbu8ZPoWTnR5Rv5JcSMB
+did:cheqd:testnet-1:6cgbu8ZPoWTnR5Rv5JcSMB
 ```
 
 ### DID Documents (DIDDocs)
@@ -115,7 +113,7 @@ A DID Document ("DIDDoc") associated with a cheqd DID is a set of data describin
 
 #### Elements needed for DIDDoc representation
 
-1. **`id`**: Target DID as base58-encoded string for 16 or 32 byte DID value with cheqd DID Method prefix `did:cheqd:<namespace>:<namespace identifier>:`.
+1. **`id`**: Target DID as base58-encoded string for 16 or 32 byte DID value with cheqd DID Method prefix `did:cheqd:<namespace>:`.
 2. **`controller`** (optional): A list of fully qualified DID strings or one string. Contains one or more DIDs who can update this DIDdoc. All DIDs must exist.
 3. **`verificationMethod`** (optional): A list of Verification Methods
 4. **`authentication`** (optional): A list of strings with key aliases or IDs
@@ -136,23 +134,23 @@ describing specifications that this DID Document is following to.
     "https://www.w3.org/ns/did/v1",
     "https://w3id.org/security/suites/ed25519-2020/v1"
   ],
-  "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
+  "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue",
   "verificationMethod": [
     {
-      "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#authKey1",
+      "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue#authKey1",
       "type": "Ed25519VerificationKey2020", // external (property value)
-      "controller": "did:cheqd:mainnet:N22N22KY2Dyvmuu2PyyqSFKue",
+      "controller": "did:cheqd:mainnet-1:N22N22KY2Dyvmuu2PyyqSFKue",
       "publicKeyMultibase": "zAKJP3f7BD6W4iWEQ9jwndVTCBq8ua2Utt8EEjJ6Vxsf"
     },
     {
-      "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#capabilityInvocationKey",
+      "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue#capabilityInvocationKey",
       "type": "Ed25519VerificationKey2020", // external (property value)
-      "controller": "did:cheqd:mainnet:N22N22KY2Dyvmuu2PyyqSFKue",
+      "controller": "did:cheqd:mainnet-1:N22N22KY2Dyvmuu2PyyqSFKue",
       "publicKeyMultibase": "z4BWwfeqdp1obQptLLMvPNgBw48p7og1ie6Hf9p5nTpNN"
     }
   ],
-  "authentication": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#authKey1"],
-  "capabilityInvocation": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#capabilityInvocationKey"],
+  "authentication": ["did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue#authKey1"],
+  "capabilityInvocation": ["did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue#capabilityInvocationKey"],
 }
 ```
 
@@ -202,9 +200,9 @@ encoded public key.
 
 ```jsonc
 {
-  "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#key-0",
+  "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue#key-0",
   "type": "JsonWebKey2020",
-  "controller": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
+  "controller": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue",
   "publicKeyJwk": {
     "kty": "OKP",
     // external (property name)
@@ -229,7 +227,7 @@ Services can be defined in a DIDDoc to express means of communicating with the D
 
 ```jsonc
 {
-  "id":"did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#linked-domain",
+  "id":"did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue#linked-domain",
   "type": "LinkedDomains",
   "serviceEndpoint": "https://bar.example.com"
 }
@@ -268,7 +266,7 @@ It is not possible to update an existing Schema, to ensure the original schema u
 
 If a Schema evolves, a new schema with a new version or name needs to be created.
 
-- **`id`**: DID as base58-encoded string for 16 or 32 byte DID value with cheqd DID Method prefix `did:cheqd:<namespace>:<namespace identifier>:` and a resource
+- **`id`**: DID as base58-encoded string for 16 or 32 byte DID value with cheqd DID Method prefix `did:cheqd:<namespace>:` and a resource
 type at the end.
 - **`type`**: String with a schema type. Now only `CL-Schema` is supported.
 - **`attrNames`**: Array of attribute name strings (125 attributes maximum)
@@ -281,9 +279,9 @@ controller(s). All DIDs must exist.
 
 ```jsonc
 {
-  "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue/schema",
+  "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?service=CL-Schema",
   "type": "CL-Schema",
-  "controller": "did:cheqd:mainnet:IK22KY2Dyvmuu2PyyqSFKu",  // Schema Issuer DID
+  "controller": "did:cheqd:mainnet-1:IK22KY2Dyvmuu2PyyqSFKu",  // Schema Issuer DID
   "version": "1.0",
   "name": "Degree",
   "attrNames": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
@@ -292,9 +290,9 @@ controller(s). All DIDs must exist.
 
 Don't store Schema DIDDoc in the State.
 
-Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
+Schema URL: `did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue`
 
-Schema Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue/schema`
+Schema Entity URL: `did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?service=CL-Schema`
 
 [TODO: add language about resolving the DID (and getting the DID Doc) vs 
 dereferencing the DID (and getting the schema)]
@@ -303,11 +301,13 @@ dereferencing the DID (and getting the schema)]
 
 ```jsonc
 {
-  "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
-  "controller": "did:cheqd:mainnet:IK22KY2Dyvmuu2PyyqSFKu", // Schema Issuer DID
-  "alsoKnownAs":[
+  "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue",
+  "controller": "did:cheqd:mainnet-1:IK22KY2Dyvmuu2PyyqSFKu", // Schema Issuer DID
+  "service":[
     {
-      "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue/schema"
+      "id": "cheqd-schema",
+      "type": "CL-Schema",
+      "serviceEndpoint": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?service=CL-Schema"
     }
   ]
 }
@@ -319,7 +319,7 @@ dereferencing the DID (and getting the schema)]
 
 - `"schema:<id>" -> {SchemaEntity, txHash, txTimestamp}`
 
-`id` example: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
+`id` example: `did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue`
 
 [Link to DidDocumentMetadata description](#resolve-did)
 
@@ -338,7 +338,7 @@ Credential Definitions is added to the ledger in as verification method for
 Issuer DIDDoc
 
 - **`id`**: DID as base58-encoded string for 16 or 32 byte DID value with Cheqd
-DID Method prefix `did:cheqd:<namespace>:<namespace identifier>:` and a resource
+DID Method prefix `did:cheqd:<namespace>:` and a resource
 type at the end.
 - **`value`** (dict): Dictionary with Credential Definition's data if
 `signature_type` is `CL`:
@@ -361,8 +361,8 @@ definition controller(s). All DIDs must exist.
 {
     "id": "<cred_def_url>",
     "type": "CL-CredDef",
-    "controller": "did:cheqd:mainnet:123456789abcdefghi",
-    "schemaId": "did:cheqd:mainnet:5ZTp9g4SP6t73rH2s8zgmtqdXyT/schema",
+    "controller": "did:cheqd:mainnet-1:123456789abcdefghi",
+    "schemaId": "did:cheqd:mainnet-1:5ZTp9g4SP6t73rH2s8zgmtqdXyT?service=CL-Schema",
     "tag": "some_tag",
     "value": {
       "primary": "...",
@@ -373,20 +373,20 @@ definition controller(s). All DIDs must exist.
 
 Don't store Schema DIDDoc in the State.
 
-CredDef URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
+CredDef URL: `did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue`
 
-CredDef Entity URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue/credDef`
+CredDef Entity URL: `did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?service=CL-CredDef`
 
 `CRED_DEF` DID Document transaction format:
 ```jsonc
 {
-  "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
-  "controller": "did:cheqd:mainnet:IK22KY2Dyvmuu2PyyqSFKu", // CredDef Issuer DID
+  "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue",
+  "controller": "did:cheqd:mainnet-1:IK22KY2Dyvmuu2PyyqSFKu", // CredDef Issuer DID
   "service":[
     {
       "id": "cheqd-cred-def",
       "type": "CL-CredDef",
-      "serviceEndpoint": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue/credDef"
+      "serviceEndpoint": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?service=CL-CredDef"
     }
   ]
 }
@@ -452,18 +452,18 @@ Hyperledger Indy is a public-permissioned distributed ledger and therefore use t
 
 ##### Option 2
 
-Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
+Schema URL: `did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
 
 `SCHEMA` DID Document transaction format:
 
 ```jsonc
 {
-  "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
+  "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue",
   "schema":[
     {
-      "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#schema1",
+      "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue#schema1",
       "type": "CL-Schema",
-      "controller": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
+      "controller": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue",
       "value": {
                 "version": "1.0",
                 "name": "Degree",
@@ -476,17 +476,17 @@ Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
 
 ##### Option 3
 
-Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
+Schema URL: `did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue`
 
 `SCHEMA` DID Document transaction format:
 
 ```jsonc
 {
-  "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
+  "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue",
   "schema": {
-              "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
+              "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue",
               "type": "CL-Schema",
-              "controller": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
+              "controller": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue",
               "value": {
                 "version": "1.0",
                 "name": "Degree",
@@ -498,18 +498,18 @@ Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
 
 ##### Option 4
 
-Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
+Schema URL: `did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
 
 `SCHEMA` DID Document transaction format:
 
 ```jsonc
 {
-  "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
+  "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue",
   "schema":[
               {
                 "id": "cheqd-schema",
                 "type": "CL-Schema",
-                "schemaRef": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue?resource=true"
+                "schemaRef": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?resource=true"
               }
           ]
 }
@@ -519,7 +519,7 @@ Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
 
 - `"schema:<id>" -> {SchemaEntity, txHash, txTimestamp}`
 
-`id` example: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue`
+`id` example: `did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue`
 
 [Link to DidDocumentMetadata description](#resolve-did)
 
@@ -529,7 +529,7 @@ Schema URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<schema_entity_id>`
 
 Store inside Issuer DID Document
 
-CredDef URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<cred_def_entity_id>`
+CredDef URL: `did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue#<cred_def_entity_id>`
 
 `CRED_DEF` DID Document transaction format:
 
@@ -542,9 +542,9 @@ CredDef URL: `did:cheqd:N22KY2Dyvmuu2PyyqSFKue#<cred_def_entity_id>`
   ],
   "verificationMethod": [
     {
-      "id": "did:cheqd:mainnet:IK22KY2Dyvmuu2PyyqSFKu#creddef-1", // Cred Def ID
+      "id": "did:cheqd:mainnet-1:IK22KY2Dyvmuu2PyyqSFKu#creddef-1", // Cred Def ID
       "type": "CamLysCredDefJwk2021", // TODO: define and register this key type
-      "controller": "did:cheqd:mainnet:IK22KY2Dyvmuu2PyyqSFKu"
+      "controller": "did:cheqd:mainnet-1:IK22KY2Dyvmuu2PyyqSFKu"
       "publicKeyJwk":
       {
         [TODO: Define structure for CL JWK]
