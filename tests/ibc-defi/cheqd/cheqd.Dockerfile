@@ -4,12 +4,12 @@ FROM golang:buster as builder
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
-    # Common
     curl \
-    # Protoc
     protobuf-compiler \
     libprotobuf-dev \
-    wget
+    wget \
+    git \
+    nano
 
 # Starport
 # RUN curl https://get.starport.network/starport! | bash
@@ -19,14 +19,9 @@ RUN wget -qO- https://github.com/tendermint/starport/releases/download/v0.17.3/s
 # App
 WORKDIR /app
 
-COPY app ./app
-COPY cmd ./cmd
-COPY proto ./proto
-COPY vue ./vue
-COPY x ./x
-COPY go.mod .
-COPY go.sum .
-COPY .git .
+RUN git clone --depth 1 --branch v0.2.3 https://github.com/cheqd/cheqd-node
+
+WORKDIR /app/cheqd-node
 
 RUN starport chain build
 
@@ -35,18 +30,18 @@ RUN starport chain build
 
 FROM debian:buster
 
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends \
+    nano \
+    curl \
+    wget \
+    netcat
+
 # Node binary
 COPY --from=builder /go/bin/cheqd-noded /bin
 
-# Runner script
-COPY docker/cheqd_node/node-runner.sh /bin/node-runner
-RUN chmod +x /bin/node-runner
-
-ARG UID=1000
-ARG GID=1000
-
-RUN groupadd --system --gid $GID cheqd && \
-    useradd --system --create-home --home-dir /cheqd --shell /bin/bash --gid cheqd --uid $UID cheqd
+RUN groupadd --system --gid 1000 cheqd && \
+    useradd --system --create-home --home-dir /cheqd --shell /bin/bash --gid cheqd --uid 1000 cheqd
 RUN chown -R cheqd /cheqd
 
 WORKDIR /cheqd
@@ -55,4 +50,8 @@ USER cheqd
 EXPOSE 26656 26657
 STOPSIGNAL SIGTERM
 
-ENTRYPOINT [ "cheqd-noded" ]
+# Init network
+COPY cheqd_init.sh .
+RUN bash cheqd_init.sh
+
+ENTRYPOINT [ "cheqd-noded", "start" ]

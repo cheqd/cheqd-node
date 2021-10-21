@@ -32,7 +32,7 @@ Details on how identity transactions are defined is available in [ADR 002: Ident
    deliver_tx: TxResult {
       code: 0,
       data: Some(Data([...])),
-      log: "[{\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"send\"},{\"key\":\"sender\",\"value\":\"cosmos1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"cosmos1pvnjjy3vz0ga6hexv32gdxydzxth7f86mekcpg\"},{\"key\":\"sender\",\"value\":\"cosmos1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd\"},{\"key\":\"amount\",\"value\":\"100cheq\"}]}]}]",
+      log: "[{\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"send\"},{\"key\":\"sender\",\"value\":\"cheqd1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"cheqds1pvnjjy3vz0ga6hexv32gdxydzxth7f86mekcpg\"},{\"key\":\"sender\",\"value\":\"cheqd1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd\"},{\"key\":\"amount\",\"value\":\"1000ncheq\"}]}]}]",
       info: "",
       gas_wanted: 0,
       gas_used: 0,
@@ -58,7 +58,7 @@ Details on how identity transactions are defined is available in [ADR 002: Ident
 
 #### Request format
 
-```text
+```json
 CreateDidRequest 
 {
     "data": {
@@ -300,7 +300,7 @@ CreateSchemaRequest
     "data": {
             "version": "1.0",
             "name": "Degree",
-            "attrNames": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
+            "attr_names": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
              },
     "owner": "GEzcdDLhCpGCYRHW82kjHd",
     "signature": "49W5WP5jr7x1fZhtpAhHFbuUDqUYZ3AKht88gUjrz8TEJZr5MZUPjskpfBFdboLPZXKjbGjutoVascfKiMD5W7Ba",
@@ -308,7 +308,7 @@ CreateSchemaRequest
 }
 ```
 
-* `attrNames`\(array\): Array of attribute name strings \(125 attributes maximum\)
+* `attr_names`\(array\): Array of attribute name strings \(125 attributes maximum\)
 * `name`\(string\): Schema's name string
 * `version`\(string\): Schema's version string
 
@@ -361,7 +361,7 @@ QueryGetSchemaResponse{
         "attrib": {
                 "version": "1.0",
                 "name": "Degree",
-                "attrNames": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
+                "attr_names": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
              },
 }
 ```
@@ -380,7 +380,7 @@ QueryGetSchemaResponse{
 CreateCredDefRequest 
 {
     "data": {
-                "signatureType": "CL",
+                "signature_type": "CL",
                 "schema_id": "schema:GEzcdDLhCpGCYRHW82kjHd:Degree:1.0",
                 "tag": "some_tag",    
                 "cred_def": {
@@ -397,7 +397,7 @@ CreateCredDefRequest
   * `primary` \(dict\): Primary credential public key
   * `revocation` \(dict\): Revocation credential public key
 * `schema_id` \(string\): Schema's key from a state
-* `signatureType` \(string\): Type of the Credential Definition \(that is credential signature\). `CL` \(Camenisch-Lysyanskaya\) is the only supported type now.
+* `signature_type` \(string\): Type of the Credential Definition \(that is credential signature\). `CL` \(Camenisch-Lysyanskaya\) is the only supported type now.
 * `tag` \(string, optional\): A unique tag to have multiple public keys for the same Schema and type issued by the same DID. A default tag `tag` will be used if not specified.
 
 #### Response format
@@ -422,7 +422,7 @@ CreateCredDefResponse {
 `build\_query\_get\_cred\_def\(name, version, owner\)`
 
 * `schema_id`\(string\): Schema's key from a state
-* `signatureType`\(string\): Type of the Credential Definition \(that is credential signature\). CL \(Camenisch-Lysyanskaya\) is the only supported type now.
+* `signature_type`\(string\): Type of the Credential Definition \(that is credential signature\). CL \(Camenisch-Lysyanskaya\) is the only supported type now.
 * `owner` \(string\): Credential Definition's owner DID
 * `tag` \(string, optional\): A unique tag to have multiple public keys for the same Schema and type issued by the same DID. A default tag `tag` will be used if not specified.
 
@@ -439,22 +439,21 @@ Request
 ```
 
 * `path`: Path for RPC endpoint for cheqd pool
-* `data`: Query with an entity key from a state. String `cred_def:<owner>:<schema_id>:<tag>:<signatureType>` encoded to bytes
+* `data`: Query with an entity key from a state. String `cred_def:<owner>:<schema_id>:<tag>:<signature_type>` encoded to bytes
 * `height`: Ledger height \(size\). `None` for auto calculation
-* `prove`: Boolean value. `True` for getting state proof in a pool response. 
+* `prove`: Boolean value. `True` for getting state proof in a pool response.
 
 #### Response format
 
-```text
+```jsonc
 QueryGetCredDefResponse{
-        "cred_def": {
-                "signatureType": "CL",
-                "schema_id": "schema:GEzcdDLhCpGCYRHW82kjHd:Degree:1.0",
-                "tag": "some_tag",    
-                "cred_def": {
-                    "primary": ....,
-                    "revocation": ....
-         },
+    "cred_def": {
+            "signature_type": "CL",
+            "schema_id": "schema:GEzcdDLhCpGCYRHW82kjHd:Degree:1.0",
+            "tag": "some_tag",    
+            "cred_def": {
+                "primary": "...",// Primary
+                "revocation": "..." // Revocation registry
+        },
 }
 ```
-

@@ -1,4 +1,4 @@
-# cheqd-node docker image
+# Installing cheqd-node with Docker
 
 ## Description
 

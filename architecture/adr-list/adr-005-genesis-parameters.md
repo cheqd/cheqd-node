@@ -9,15 +9,16 @@
 
 ## Summary
 
-The aim of this document is to define the genesis parameters that will be used in the cheqd network testnet.
+The aim of this document is to define the genesis parameters that will be used in cheqd network testnet and mainnet.
 
-> Cosmos v0.42.5 parameters are described.
+> Cosmos v0.44.2 parameters are described.
 
 ## Context
 
-Genesis consists of Tendermint consensus engine parameters and Cosmos app-specific parameters. 
+Genesis consists of Tendermint consensus engine parameters and Cosmos app-specific parameters.
 
 ### Consensus parameters
+
 Tendermint requires [genesis parameters](https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#genesis) to be defined for basic consensus conditions on any Cosmos network.
 
 #### Proposed values
@@ -25,8 +26,8 @@ Tendermint requires [genesis parameters](https://docs.tendermint.com/master/tend
 * **`block`**
   * `max_bytes` = `200000` \(~200KB\)
     * Cosmos Hub: `200000` \(~200KB\)
-  * `max_gas` = `2000000` (~20 txs)
-    * Cosmos Hub: `2000000` (~20 txs)
+  * `max_gas` = `2000000` \(~20 txs\)
+    * Cosmos Hub: `2000000` \(~20 txs\)
 * **`evidence`**
   * `max_age_num_blocks` = `1576800`
     * Maximum age of evidence, in blocks. The basic formula for calculating this is: `MaxAgeDuration / {average block time}`.
@@ -58,8 +59,8 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
   * `default_send_enabled` = `true`
     * The default send enabled value allows send transfers for all coin denominations
 * **`crisis`**
-  * `constant_fee` = `{ "denom": "ncheq", "amount": "10000000000000" }` (10,000 `cheq`)
-    * The fee is used to verify the [invariant(s)](https://docs.cosmos.network/v0.44/building-modules/invariants.html) in the `crisis` module.
+  * `constant_fee` = `{ "denom": "ncheq", "amount": "10000000000000" }` \(10,000 `cheq`\)
+    * The fee is used to verify the [invariant\(s\)](https://docs.cosmos.network/v0.44/building-modules/invariants.html) in the `crisis` module.
 * **`distribution`**
   * `community_tax` = `0.02`
     * The percent of rewards that goes to the community fund pool
@@ -69,18 +70,14 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
     * Bonus reward that proposer gets. This depends on the number of pre-commits included to the block
   * `withdraw_addr_enabled` = `true`
     * Whether withdrawal address can be changed or not. By default, it's the delegator's address.
-* **`evidence`**
-  * No parameters
-* **`genutil`**
-  * Used to manage initial transactions such as genesis validators creation
 * **`gov`**
   * `deposit_params`
-    * min_deposit = `[{ "denom": "ncheq", "amount": "8000000000000" }]` (8,000 `cheq`)
+    * min\_deposit = `[{ "denom": "ncheq", "amount": "8000000000000" }]` \(8,000 `cheq`\)
       * The minimum deposit for a proposal to enter the voting period.
-    * `max_deposit_period` = `1210000s` (2 weeks)
+    * `max_deposit_period` = `1210000s` \(2 weeks\)
       * The maximum period for Atom holders to deposit on a proposal. Initial value: 2 months.
   * `voting_params`
-    * voting_period = `1210000s` (2 weeks)
+    * voting\_period = `1210000s` \(2 weeks\)
   * `tally_params`
     * `quorum` = `0.334`
       * Minimum percentage of total stake needed to vote for a result to be considered valid. 
@@ -102,7 +99,7 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
     * Cosmos Hub: `0.07`
   * `goal_bonded` = `0.60`
     * Cosmos Hub: `0.67`
-  * `blocks_per_year` = `6311520` (~5s)
+  * `blocks_per_year` = `6311520` \(~5s\)
     * Cosmos Hub: `4360000`
 * **`slashing`**
   * `signed_blocks_window` = `120960` \(1 week\)
@@ -116,7 +113,7 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
   * `slash_fraction_downtime` = `0.01`
     * Slash for downtime
 * **`staking`**
-  * `unbonding_time` = `1814400s` (3 weeks)
+  * `unbonding_time` = `1814400s` \(3 weeks\)
     * A delegator must wait this time before tokens become unbonded
   * `max_validators` = `125`
     * The maximum number of validators in the network
@@ -126,14 +123,15 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
     * Amount of unbound/redelegate entries to store
   * `bond_denom` = `ncheq`
     * Denomination used in staking
-* *\[ibc\]* **`ibc`**
-  * ...
-* *\[ibc\]* **`capability`**
-  * ...
-* *\[ibc\]* **`transfer`**
-  * `send_enabled` = `false`
+*  **`ibc`**
+  * `max_expected_time_per_block` = `20000000000`
+    * Maximum expected time per block (in nanoseconds), used to enforce block delay. This parameter should reflect the largest amount of time that the chain might reasonably take to produce the next block under normal operating conditions. A safe choice is 3-5x the expected time per block.
+  * `allowed_clients` = `[ "07-tendermint" ]` (allow connections only from other chains)
+    * Defines the list of allowed client state types. We allow connections only from other chains.
+* **`ibc-transfer`**
+  * `send_enabled` = `true`
     * Enables or disables all cross-chain token transfers from this chain
-  * `receive_enabled` = `false`
+  * `receive_enabled` = `true`
     * Enables or disables all cross-chain token transfers to this chain
 
 ## Decision
@@ -145,13 +143,14 @@ The parameters above were agreed to be used for the cheqd network testnet, with 
 ### Backward Compatibility
 
 * The token denomination has been changed to make the smallest denomination 10^-9 `cheq` instead of 1 `cheq`. This is a breaking change from the previous version of the cheqd testnet that will potentially require new tokens to be transferred and issued to testnet node operators.
-  
+
 ### Positive
 
 * Inflation allows fees to be collected from block rewards in addition to transaction fees.
 * In production/mainnet, parameters can only be changed via a majority vote without veto defeat according to the cheqd network governance principles. This allows for more democratic governance frameworks to be created for a self-sovereign identity network.
 
 ### Negative
+
 * Existing node operators will need to re-establish staking with new staking denomination and staking parameters.
 
 ### Neutral
@@ -162,3 +161,4 @@ The parameters above were agreed to be used for the cheqd network testnet, with 
 
 * [List of Cosmos modules](https://docs.cosmos.network/v0.44/modules/)
 * [Tendermint genesis parameters](https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#genesis)
+

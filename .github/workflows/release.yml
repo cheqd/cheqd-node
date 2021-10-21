@@ -2,6 +2,11 @@ name: Release
 
 on:
   push:
+    paths-ignore:
+    - '**.md'
+    - 'docs/**'
+    - 'architecture/**'
+    - '.gitbook/**'
     tags:
       - "v*"
 
@@ -32,16 +37,24 @@ jobs:
       GITHUB_REPOSITORY_NAME: ${{ needs.setup-workflow.outputs.GITHUB_REPOSITORY_NAME }}
       VERSION: ${{ needs.setup-workflow.outputs.VERSION }}
       TESTNET_IMAGE_NAME: "cheqd-testnet"
+      STARPORT_RELEASE_PARAMS: "--release"
     steps:
       - name: Git checkout
         uses: actions/checkout@v2
 
-      - name: Login to docker
-        run: |
-          echo ${{ secrets.GH_PAT }} | docker login ghcr.io --username ${{ secrets.GH_USER }} --password-stdin
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          login-server: ghcr.io
+          username: ${{ secrets.GH_USER }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build node image
         run: |
-          docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node .
+          docker build -f docker/cheqd_node/Dockerfile.release \
+              --no-cache \
+              --build-arg STARPORT_RELEASE_PARAMS=${{ env.STARPORT_RELEASE_PARAMS }} \
+              -t cheqd-node .
       - name: Build testnet image
         run: |
           docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
@@ -68,6 +81,7 @@ jobs:
       OUTPUT_DIR: "output"
       PACKAGE_NAME: "cheqd-node"
       RELEASE_TAG: ${{ needs.setup-workflow.outputs.VERSION }}
+      STARPORT_RELEASE_PARAMS: "--release"
     steps:
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
@@ -76,13 +90,18 @@ jobs:
 
       # There is an issue with the latest starport, especially 0.18 version
       - name: Install starport
-        run: wget -qO- https://github.com/tendermint/starport/releases/download/v0.17.3/starport_0.17.3_linux_amd64.tar.gz | tar xvz -C /tmp/ && sudo cp /tmp/starport /usr/bin
+        run: wget -qO- https://github.com/tendermint/starport/releases/download/v0.17.3/starport_0.17.3_linux_amd64.tar.gz \
+             | tar xvz -C /tmp/ && sudo cp /tmp/starport /usr/bin
 
       - name: Git checkout
         uses: actions/checkout@v2
 
       - name: Build
-        run: starport chain build
+        run: starport chain build ${{ env.STARPORT_RELEASE_PARAMS }}
+
+      # It looks ugly cause starport chain build --release creates archive without version.
+      - name: Untar release
+        run: tar xzvf release/cheqd-node_linux_amd64.tar.gz && cp cheqd-noded /home/runner/go/bin/
 
       - name: Changing version for deb packaging
         run: |
