@@ -262,7 +262,6 @@ def test_tx_bank_send(command, params, expected_output):
     run(command_base, command, params, expected_output)
 
 
-# TODO get observers' pubkeys to promote them
 NODE_PUBKEY = json.dumps({"@type":"/cosmos.crypto.ed25519.PubKey","key":"+Gt8W3guq0TE0HuVuJBI3maNhj2uCW02CZE9pAbkiA8="})
 @pytest.mark.parametrize(
         "command, params, expected_output",
