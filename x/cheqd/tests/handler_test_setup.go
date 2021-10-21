@@ -235,7 +235,9 @@ func (s *TestSetup) SendUpdateDid(msg *types.MsgUpdateDid, keys map[string]ed255
 
 	// query Did
 	state, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
-	msg.VersionId = state.Metadata.VersionId
+	if len(msg.VersionId) == 0 {
+		msg.VersionId = state.Metadata.VersionId
+	}
 
 	_, err = s.Handler(s.Ctx, s.WrapRequest(data, keys, map[string]string{}))
 	if err != nil {
@@ -267,4 +269,129 @@ func ConcatKeys(dst map[string]ed25519.PrivateKey, src map[string]ed25519.Privat
 	}
 
 	return dst
+}
+
+func (s TestSetup) CreatePreparedDID() map[string]KeyPair {
+	prefilledDids := []struct {
+		keys    map[string]KeyPair
+		signers []string
+		msg     *types.MsgCreateDid
+	}{
+		{
+			keys: map[string]KeyPair{
+				AliceKey1: GenerateKeyPair(),
+				AliceKey2: GenerateKeyPair(),
+			},
+			signers: []string{AliceKey1},
+			msg: &types.MsgCreateDid{
+				Id:             AliceDID,
+				Authentication: []string{AliceKey1},
+				VerificationMethod: []*types.VerificationMethod{
+					{
+						Id:         AliceKey1,
+						Type:       "Ed25519VerificationKey2020",
+						Controller: AliceDID,
+					},
+				},
+			},
+		},
+		{
+			keys: map[string]KeyPair{
+				BobKey1: GenerateKeyPair(),
+				BobKey2: GenerateKeyPair(),
+				BobKey3: GenerateKeyPair(),
+				BobKey4: GenerateKeyPair(),
+			},
+			signers: []string{BobKey2},
+			msg: &types.MsgCreateDid{
+				Id: BobDID,
+				Authentication: []string{
+					BobKey1,
+					BobKey2,
+					BobKey3,
+				},
+				CapabilityDelegation: []string{
+					BobKey4,
+				},
+				VerificationMethod: []*types.VerificationMethod{
+					{
+						Id:         BobKey1,
+						Type:       "Ed25519VerificationKey2020",
+						Controller: BobDID,
+					},
+					{
+						Id:         BobKey2,
+						Type:       "Ed25519VerificationKey2020",
+						Controller: BobDID,
+					},
+					{
+						Id:         BobKey3,
+						Type:       "Ed25519VerificationKey2020",
+						Controller: BobDID,
+					},
+					{
+						Id:         BobKey4,
+						Type:       "Ed25519VerificationKey2020",
+						Controller: BobDID,
+					},
+				},
+			},
+		},
+		{
+			keys: map[string]KeyPair{
+				CharlieKey1: GenerateKeyPair(),
+				CharlieKey2: GenerateKeyPair(),
+				CharlieKey3: GenerateKeyPair(),
+			},
+			signers: []string{CharlieKey2},
+			msg: &types.MsgCreateDid{
+				Id: CharlieDID,
+				Authentication: []string{
+					CharlieKey1,
+					CharlieKey2,
+					CharlieKey3,
+				},
+				VerificationMethod: []*types.VerificationMethod{
+					{
+						Id:         CharlieKey1,
+						Type:       "Ed25519VerificationKey2020",
+						Controller: BobDID,
+					},
+					{
+						Id:         CharlieKey2,
+						Type:       "Ed25519VerificationKey2020",
+						Controller: BobDID,
+					},
+					{
+						Id:         CharlieKey3,
+						Type:       "Ed25519VerificationKey2020",
+						Controller: BobDID,
+					},
+				},
+			},
+		},
+	}
+
+	keys := map[string]KeyPair{}
+
+	for _, prefilled := range prefilledDids {
+		msg := prefilled.msg
+
+		for _, vm := range msg.VerificationMethod {
+			vm.PublicKeyMultibase = "z" + base58.Encode(prefilled.keys[vm.Id].PublicKey)
+		}
+
+		signerKeys := map[string]ed25519.PrivateKey{}
+		for _, signer := range prefilled.signers {
+			signerKeys[signer] = prefilled.keys[signer].PrivateKey
+		}
+
+		for keyId, key := range prefilled.keys {
+			keys[keyId] = key
+		}
+
+		_, _ = s.SendCreateDid(msg, signerKeys)
+	}
+
+	return keys
 }
