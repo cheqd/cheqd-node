@@ -167,13 +167,13 @@ def test_keys_import_wrong_data(action, expected_result):
 
     # correct default content
     key_content = "-----BEGIN{}".format(cli_output)
-    if action is "armor":
+    if action == "armor":
         # adding extra space between BEGIN and rest of the key
         key_content = "-----BEGIN {}".format(cli_output)
-    if action is "eof":
+    if action == "eof":
         # not appending -----BEGIN at all
         key_content = "{}".format(cli_output)
-    if action is "key":
+    if action == "key":
         key_content = "-----BEGIN{}".format(cli_output)
         key_content_as_list = list(key_content)
         key_content_as_list[120] = "%"
@@ -188,7 +188,7 @@ def test_keys_import_wrong_data(action, expected_result):
 
     cli = run(command_base, "import", "{} {}".format(key_name, filename), "Enter passphrase to decrypt your key")
 
-    if action is "passphrase":
+    if action == "passphrase":
         passphrase = random_string(8)
     run_interaction(cli, passphrase, expected_result)
 
