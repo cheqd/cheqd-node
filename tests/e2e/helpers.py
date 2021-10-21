@@ -44,8 +44,6 @@ def run(command_base, command, params, expected_output):
     cli = pexpect.spawn(f"{command_base} {command} {params}", encoding=ENCODING, timeout=IMPLICIT_TIMEOUT, maxread=READ_BUFFER)
     cli.logfile = sys.stdout
     cli.expect(expected_output)
-    print(f"BEFORE >>> {cli.before}") # FIXME DEBUG
-    print(f"AFTER >>> {cli.after}") # FIXME DEBUG
     return cli
 
 
