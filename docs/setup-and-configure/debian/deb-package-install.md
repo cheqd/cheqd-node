@@ -55,8 +55,7 @@ This document provides guidance on how to install and configure a node for the c
    ```bash
    SEEDS=$(wget -qO- https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/testnet/seeds.txt)
 
-   echo $SEEDS
-   # Comma separated list should be printed
+   echo $SEEDS # Comma separated list should be printed
 
    sed -i.bak 's/seeds = ""/seeds = "'$SEEDS'"/g' /etc/cheqd-node/config.toml
    ```
