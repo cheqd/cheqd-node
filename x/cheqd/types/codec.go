@@ -23,6 +23,12 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgWriteRequest{},
 	)
+
+	registry.RegisterInterface(MessageCreateDid, (*IdentityMsg)(nil), &MsgCreateDid{})
+	registry.RegisterInterface(MessageUpdateDid, (*IdentityMsg)(nil), &MsgUpdateDid{})
+	registry.RegisterInterface(MessageCreateSchema, (*IdentityMsg)(nil), &MsgCreateSchema{})
+	registry.RegisterInterface(MessageCreateCredDef, (*IdentityMsg)(nil), &MsgCreateCredDef{})
+
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }
 
