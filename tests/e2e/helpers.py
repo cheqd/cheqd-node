@@ -4,7 +4,10 @@ import pexpect
 import re
 import random
 import string
+import json
 
+from vdrtools import wallet
+from vdrtools import cheqd_keys, cheqd_pool, cheqd_ledger
 
 IMPLICIT_TIMEOUT = 30
 ENCODING = "utf-8"
@@ -73,3 +76,35 @@ def set_up_operator():
     print(pubkey)
     run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {address} 1100000000000000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"1100000000000000ncheq\"")
     return name, address, pubkey
+
+
+async def wallet_helper(wallet_id=None, wallet_key="", wallet_key_derivation_method="ARGON2I_INT"):
+    if not wallet_id:
+        wallet_id = random_string(25)
+    wallet_config = json.dumps({"id": wallet_id})
+    wallet_credentials = json.dumps({"key": wallet_key, "key_derivation_method": wallet_key_derivation_method})
+    await wallet.create_wallet(wallet_config, wallet_credentials)
+    wallet_handle = await wallet.open_wallet(wallet_config, wallet_credentials)
+
+    return wallet_handle, wallet_config, wallet_credentials
+
+
+async def get_base_account_number_and_sequence(pool_alias, account_id):
+    req = await cheqd_ledger.auth.build_query_account(account_id)
+    resp = await cheqd_pool.abci_query(pool_alias, req)
+    resp = await cheqd_ledger.auth.parse_query_account_resp(resp)
+    account = json.loads(resp)["account"]
+    base_account = account["value"]
+    account_number = base_account["account_number"]
+    account_sequence = base_account["sequence"]
+
+    return account_number, account_sequence
+
+
+async def get_timeout_height(pool_alias):
+    TIMEOUT = 20
+    info = await cheqd_pool.abci_info(pool_alias)
+    info = json.loads(info)
+    current_height = info["response"]["last_block_height"]
+
+    return int(current_height) + TIMEOUT

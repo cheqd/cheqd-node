@@ -4,70 +4,53 @@ import logging
 
 from vdrtools import wallet
 from vdrtools import cheqd_keys, cheqd_pool, cheqd_ledger
+from vdrtools.error import CommonInvalidStructure
 
-from helpers import random_string
+from helpers import random_string, wallet_helper, get_base_account_number_and_sequence, get_timeout_height, \
+    SENDER_ADDRESS, SENDER_MNEMONIC, RECEIVER_ADDRESS, TEST_NET_NETWORK
 
 # logger = logging.getLogger(__name__)
 # logging.basicConfig(level=logging.DEBUG)
 
-account_id = "cheqd1ece09txhq6nm9fkft9jh3mce6e48ftescs5jsw"
-pool_alias = random_string(5)
+key_alias = "qaatests"
+memo = "test_memo"
+MAX_GAS_MAGIC_NUMBER_NEGATIVE = 1.2
 MAX_GAS_MAGIC_NUMBER = 1.3
 GAS_PRICE = 25
+DENOM = "ncheq"
+TEST_NET_HTTP = "http://seed1.us.testnet.cheqd.network:26657/"
 
 
-async def wallet_helper(wallet_id=None, wallet_key="", wallet_key_derivation_method="ARGON2I_INT"):
-    if not wallet_id:
-        wallet_id = random_string(25)
-    wallet_config = json.dumps({"id": wallet_id})
-    wallet_credentials = json.dumps({"key": wallet_key, "key_derivation_method": wallet_key_derivation_method})
-    await wallet.create_wallet(wallet_config, wallet_credentials)
-    wallet_handle = await wallet.open_wallet(wallet_config, wallet_credentials)
-
-    return wallet_handle, wallet_config, wallet_credentials
-
-
-async def get_base_account_number_and_sequence(account_id):
-    req = await cheqd_ledger.auth.build_query_account(account_id)
-    resp = await cheqd_pool.abci_query(pool_alias, req)
-    resp = await cheqd_ledger.auth.parse_query_account_resp(resp)
-    account = json.loads(resp)["account"]
-    base_account = account["value"]
-    account_number = base_account["account_number"]
-    account_sequence = base_account["sequence"]
-
-    return account_number, account_sequence
-
-
-async def get_timeout_height():
-    TIMEOUT = 20
-    info = await cheqd_pool.abci_info(pool_alias)
-    info = json.loads(info)
-    current_height = info["response"]["last_block_height"]
-
-    return int(current_height) + TIMEOUT
-
-
+@pytest.mark.parametrize(
+    "magic_number_negative, magic_number_positive",
+    [
+        (1.2, 1.3), # base case
+        (1.0, 1.5),
+        (0.5, 2),
+    ]
+)
+@pytest.mark.parametrize("transfer_amount", ["1", "1000", "1000000"])
 @pytest.mark.asyncio
-async def test_basic():
-    await cheqd_pool.add(pool_alias, "http://seed1.us.testnet.cheqd.network:26657/", "cheqd-testnet-2")
+async def test_gas_estimation(magic_number_negative, magic_number_positive, transfer_amount):
+    pool_alias = random_string(5)
+    await cheqd_pool.add(pool_alias, TEST_NET_HTTP, TEST_NET_NETWORK)
 
     wallet_handle, _, _ = await wallet_helper()
 
     res3 = await cheqd_keys.add_from_mnemonic(
-        wallet_handle, "qaatests", "oil long siege student rent jar awkward park entry ripple enable company sort people little damp arrange wise slender push brief solve tattoo cycle", ""
+        wallet_handle, key_alias, SENDER_MNEMONIC, ""
     )
 
     msg = await cheqd_ledger.bank.build_msg_send(
-        account_id, "cheqd16d72a6kusmzml5mjhzjv63c9j5xnpsyqs8f3sk", "1000", "ncheq"
+        SENDER_ADDRESS, RECEIVER_ADDRESS, transfer_amount, DENOM
     )
 
-    account_number, sequence_number = await get_base_account_number_and_sequence(account_id)
+    account_number, sequence_number = await get_base_account_number_and_sequence(pool_alias, SENDER_ADDRESS)
 
-    timeout_height = await get_timeout_height()
+    timeout_height = await get_timeout_height(pool_alias)
 
     test_tx = await cheqd_ledger.auth.build_tx(
-        pool_alias, json.loads(res3)["pub_key"], msg, account_number, sequence_number, 1000000, 0, "ncheq", timeout_height, "test_memo"
+        pool_alias, json.loads(res3)["pub_key"], msg, account_number, sequence_number, 0, 0, DENOM, timeout_height, memo
     )
 
     request = await cheqd_ledger.tx.build_query_simulate(test_tx)
@@ -79,11 +62,35 @@ async def test_basic():
     gas_estimation = json.loads(response)["gas_info"]["gas_used"]
     print(gas_estimation)
 
-    prod_tx = await cheqd_ledger.auth.build_tx(
-        pool_alias, json.loads(res3)["pub_key"], msg, account_number, sequence_number, int(gas_estimation*MAX_GAS_MAGIC_NUMBER), int(gas_estimation*MAX_GAS_MAGIC_NUMBER*GAS_PRICE), "ncheq", timeout_height, "test_memo"
+    # negative case
+    prod_tx_negative = await cheqd_ledger.auth.build_tx(
+        pool_alias, json.loads(res3)["pub_key"], msg, account_number, sequence_number, int(gas_estimation*magic_number_negative), int(gas_estimation*magic_number_negative*GAS_PRICE), DENOM, timeout_height, memo
     )
 
-    prod_tx_signed = await cheqd_keys.sign(wallet_handle, "qaatests", prod_tx)
+    prod_tx_negative_signed = await cheqd_keys.sign(wallet_handle, key_alias, prod_tx_negative)
 
-    final_res = await cheqd_pool.broadcast_tx_commit(pool_alias, prod_tx_signed)
-    print(final_res)
+    with pytest.raises(CommonInvalidStructure):
+        await cheqd_pool.broadcast_tx_commit(pool_alias, prod_tx_negative_signed)
+
+    # positive case
+    account_number, sequence_number = await get_base_account_number_and_sequence(pool_alias, SENDER_ADDRESS) # get this one more time to avoid `incorrect account sequence` error
+
+    prod_tx = await cheqd_ledger.auth.build_tx(
+        pool_alias, json.loads(res3)["pub_key"], msg, account_number, sequence_number, int(gas_estimation*magic_number_positive), int(gas_estimation*magic_number_positive*GAS_PRICE), DENOM, timeout_height, memo
+    )
+
+    prod_tx_signed = await cheqd_keys.sign(wallet_handle, key_alias, prod_tx)
+
+    positive_res = await cheqd_pool.broadcast_tx_commit(pool_alias, prod_tx_signed)
+
+    assert json.loads(positive_res)["check_tx"]["code"] == 0
+
+
+# @pytest.mark.asyncio
+# async def test_token_transfer():
+#     pass
+
+
+# @pytest.mark.asyncio
+# async def test_memo():
+#     pass
