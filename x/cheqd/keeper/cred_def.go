@@ -91,8 +91,13 @@ func (k Keeper) AppendCredDef(
 func (k Keeper) GetCredDef(ctx sdk.Context, id string) (*types.StateValue, error) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CredDefKey))
 
+	if !k.HasCredDef(ctx, id) {
+		return nil, sdkerrors.ErrNotFound
+	}
+
 	var value types.StateValue
-	if err := k.cdc.Unmarshal(store.Get(GetCredDefIDBytes(id)), &value); err != nil {
+	var bytes = store.Get(GetCredDefIDBytes(id))
+	if err := k.cdc.Unmarshal(bytes, &value); err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidType, err.Error())
 	}
 

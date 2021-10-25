@@ -13,7 +13,7 @@ func getSchema(ctx sdk.Context, id string, keeper Keeper, legacyQuerierCdc *code
 
 	msg, err := keeper.GetSchema(ctx, id)
 	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
+		return nil, err
 	}
 
 	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, msg)

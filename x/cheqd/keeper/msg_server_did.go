@@ -31,7 +31,7 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 	}
 
 	// Checks that the element exists
-	if err := k.HasDidDoc(ctx, didMsg.Id); err != nil {
+	if err := k.EnsureDidIsNotUsed(ctx, didMsg.Id); err != nil {
 		return nil, err
 	}
 

@@ -26,7 +26,7 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgWriteReques
 	}
 
 	// Checks that the element exists
-	if err := k.HasDidDoc(ctx, schemaMsg.GetDid()); err != nil {
+	if err := k.EnsureDidIsNotUsed(ctx, schemaMsg.GetDid()); err != nil {
 		return nil, err
 	}
 

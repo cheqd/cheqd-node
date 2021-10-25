@@ -85,8 +85,13 @@ func (k Keeper) AppendSchema(
 func (k Keeper) GetSchema(ctx sdk.Context, id string) (*types.StateValue, error) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.SchemaKey))
 
+	if !k.HasSchema(ctx, id) {
+		return nil, sdkerrors.ErrNotFound
+	}
+
 	var value types.StateValue
-	if err := k.cdc.Unmarshal(store.Get(GetSchemaIDBytes(id)), &value); err != nil {
+	var bytes = store.Get(GetSchemaIDBytes(id))
+	if err := k.cdc.Unmarshal(bytes, &value); err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidType, err.Error())
 	}
 

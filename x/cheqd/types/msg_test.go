@@ -155,9 +155,9 @@ func TestNewMsgWriteRequestValidation(t *testing.T) {
 		msg    *MsgWriteRequest
 		errMsg string
 	}{
-		{true, NewMsgWriteRequest(&ctypes.Any{TypeUrl: "1", Value: []byte{1}}, nil, map[string]string{"foo": "bar"}), ""},
-		{false, NewMsgWriteRequest(&ctypes.Any{TypeUrl: "1"}, nil, map[string]string{"foo": "bar"}), "Invalid Data: it cannot be empty: bad request"},
-		{false, NewMsgWriteRequest(&ctypes.Any{Value: []byte{1}}, nil, map[string]string{"foo": "bar"}), "Invalid Data: it cannot be empty: bad request"},
+		{true, NewMsgWriteRequest(&ctypes.Any{TypeUrl: "1", Value: []byte{1}}, nil, []*SignInfo{ {VerificationMethodId: "foo", Signature: "bar"} }), ""},
+		{false, NewMsgWriteRequest(&ctypes.Any{TypeUrl: "1"}, nil, []*SignInfo{ {VerificationMethodId: "foo", Signature: "bar"} }), "Invalid Data: it cannot be empty: bad request"},
+		{false, NewMsgWriteRequest(&ctypes.Any{Value: []byte{1}}, nil, []*SignInfo{ {VerificationMethodId: "foo", Signature: "bar"} }), "Invalid Data: it cannot be empty: bad request"},
 		{false, NewMsgWriteRequest(nil, nil, nil), "Data: is required"},
 		{false, NewMsgWriteRequest(&ctypes.Any{TypeUrl: "1", Value: []byte{1}}, nil, nil), "Signatures: is required"},
 	}

@@ -68,8 +68,13 @@ func (k Keeper) SetDid(ctx sdk.Context, did types.Did, metadata *types.Metadata,
 func (k Keeper) GetDid(ctx *sdk.Context, id string) (*types.StateValue, error) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
 
+	if !k.HasDid(*ctx, id) {
+		return nil, sdkerrors.ErrNotFound
+	}
+
 	var value types.StateValue
-	if err := k.cdc.Unmarshal(store.Get(GetDidIDBytes(id)), &value); err != nil {
+	var bytes = store.Get(GetDidIDBytes(id))
+	if err := k.cdc.Unmarshal(bytes, &value); err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidType, err.Error())
 	}
 

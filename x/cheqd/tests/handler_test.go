@@ -393,7 +393,7 @@ func TestCreateDID(t *testing.T) {
 					},
 				},
 			},
-			errMsg: "DID DOC already exists for DID did:cheqd:test:123456qwertyui: DID Doc exists",
+			errMsg: "DID is already used by DIDDoc did:cheqd:test:123456qwertyui: DID Doc exists",
 		},
 		{
 			valid: false,
@@ -1150,7 +1150,7 @@ func TestHandler_DidDocAlreadyExists(t *testing.T) {
 	_, _, err := setup.InitDid("did:cheqd:test:alice")
 
 	require.Error(t, err)
-	require.Equal(t, "DID DOC already exists for DID did:cheqd:test:alice: DID Doc exists", err.Error())
+	require.Equal(t, "DID is already used by DIDDoc did:cheqd:test:alice: DID Doc exists", err.Error())
 
 	credDefMsg := setup.CreateCredDef()
 	data, _ := ptypes.NewAnyWithValue(credDefMsg)
@@ -1158,7 +1158,7 @@ func TestHandler_DidDocAlreadyExists(t *testing.T) {
 	_, err = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys))
 
 	require.Error(t, err)
-	require.Equal(t, "DID DOC already exists for CredDef did:cheqd:test:cred-def-1: DID Doc exists", err.Error())
+	require.Equal(t, "DID is already used by CredDef did:cheqd:test:cred-def-1: DID Doc exists", err.Error())
 
 	schemaMsg := setup.CreateSchema()
 	data, _ = ptypes.NewAnyWithValue(schemaMsg)
@@ -1166,5 +1166,5 @@ func TestHandler_DidDocAlreadyExists(t *testing.T) {
 	_, err = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys))
 
 	require.Error(t, err)
-	require.Equal(t, "DID DOC already exists for Schema did:cheqd:test:schema-1: DID Doc exists", err.Error())
+	require.Equal(t, "DID is already used by Schema did:cheqd:test:schema-1: DID Doc exists", err.Error())
 }
