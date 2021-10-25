@@ -11,9 +11,9 @@ func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgWriteReques
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	prefix := types.DidPrefix + ctx.ChainID() + ":"
 
-	schemaMsg, isMsgIdentity := msg.Data.GetCachedValue().(*types.MsgCreateSchema)
-
-	if !isMsgIdentity {
+	var schemaMsg types.MsgCreateSchema
+	err := k.cdc.Unmarshal(msg.Data.Value, &schemaMsg)
+	if err != nil {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", types.ModuleName, msg)
 	}
 

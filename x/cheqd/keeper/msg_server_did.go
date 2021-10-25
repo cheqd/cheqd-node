@@ -17,8 +17,9 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	prefix := types.DidPrefix + ctx.ChainID() + ":"
 
-	didMsg, isMsgIdentity := msg.Data.GetCachedValue().(*types.MsgCreateDid)
-	if !isMsgIdentity {
+	var didMsg types.MsgCreateDid
+	err := k.cdc.Unmarshal(msg.Data.Value, &didMsg)
+	if err != nil {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", types.ModuleName, msg)
 	}
 
@@ -70,8 +71,9 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	prefix := types.DidPrefix + ctx.ChainID() + ":"
 
-	didMsg, isMsgIdentity := msg.Data.GetCachedValue().(*types.MsgUpdateDid)
-	if !isMsgIdentity {
+	var didMsg types.MsgUpdateDid
+	err := k.cdc.Unmarshal(msg.Data.Value, &didMsg)
+	if err != nil {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", types.ModuleName, msg)
 	}
 
@@ -89,7 +91,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 		return nil, err
 	}
 
-	if err := k.UpdateDidVerifySignature(&ctx, msg, oldDIDDoc.GetDid(), didMsg); err != nil {
+	if err := k.UpdateDidVerifySignature(&ctx, msg, oldDIDDoc.GetDid(), &didMsg); err != nil {
 		return nil, err
 	}
 

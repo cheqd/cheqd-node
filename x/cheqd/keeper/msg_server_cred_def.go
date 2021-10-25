@@ -11,8 +11,9 @@ func (k msgServer) CreateCredDef(goCtx context.Context, msg *types.MsgWriteReque
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	prefix := types.DidPrefix + ctx.ChainID() + ":"
 
-	credDefMsg, isMsgIdentity := msg.Data.GetCachedValue().(*types.MsgCreateCredDef)
-	if !isMsgIdentity {
+	var credDefMsg types.MsgCreateCredDef
+	err := k.cdc.Unmarshal(msg.Data.Value, &credDefMsg)
+	if err != nil {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", types.ModuleName, msg)
 	}
 
