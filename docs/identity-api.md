@@ -16,7 +16,7 @@ Details on how identity transactions are defined is available in [ADR 002: Ident
 
 #### Response format
 
-```text
+```protobuf
   Response {
    check_tx: TxResult {
       code: 0,
@@ -58,7 +58,7 @@ Details on how identity transactions are defined is available in [ADR 002: Ident
 
 #### Request format
 
-```text
+```jsonc
 {
   "data": {
     "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue", // id from the method parameters
@@ -81,12 +81,12 @@ Details on how identity transactions are defined is available in [ADR 002: Ident
 }
 ```
 
-* `id` \(base58-encoded string\): Target DID as base58-encoded string for 16 or 32 byte of fully qualified DID value. 
-* `verkey` \(base58-encoded string): Target verification key. 
+* `id` \(base58-encoded string\): Target DID as base58-encoded string for 16 or 32 byte of fully qualified DID value.
+* `verkey` \(base58-encoded string): Target verification key.
 
 #### Response format
 
-```text
+```jsonc
 CreateDidResponse {
     "key": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue" 
 }
@@ -106,7 +106,7 @@ CreateDidResponse {
 
 #### Request format
 
-```json 
+```jsonc
 {
     "data": {
               "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue",
@@ -136,7 +136,7 @@ CreateDidResponse {
 
 #### Response format
 
-```text
+```jsonc
 UpdateDidResponse {
     "key": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue" 
 }
@@ -159,7 +159,7 @@ UpdateDidResponse {
 
 #### Request format
 
-```text
+```protobuf
 Request 
 {
     "path": "/store/cheqd/key",
@@ -176,7 +176,7 @@ Request
 
 #### Response format
 
-```text
+```jsonc
 QueryGetDidResponse{
         "did": {
                "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue",
@@ -208,7 +208,7 @@ QueryGetDidResponse{
 
 #### Request format
 
-```json 
+```jsonc
 {
     "data": {
             "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?service=CL-Schema",
@@ -237,7 +237,7 @@ type at the end.
 
 #### Response format
 
-```text
+```jsonc
 CreateSchemaResponse {
         "key": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?service=CL-Schema" 
 }
@@ -261,7 +261,7 @@ CreateSchemaResponse {
 
 #### Request format
 
-```text
+```protobuf
 Request 
 {
     "path": "/store/cheqd/key",
@@ -278,12 +278,12 @@ Request
 
 #### Response format
 
-```text
+```jsonc
 QueryGetSchemaResponse{
         "schema": {
             "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?service=CL-Schema",
             "type": "CL-Schema",
-            "controller": ["did:cheqd:mainnet-1:GEzcdDLhCpGCYRHW82kjHd"]
+            "controller": ["did:cheqd:mainnet-1:GEzcdDLhCpGCYRHW82kjHd"],
             "version": "1.0",
             "name": "Degree",
             "attr_names": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
@@ -301,7 +301,7 @@ QueryGetSchemaResponse{
 
 #### Request format
 
-```text
+```jsonc
 CreateCredDefRequest 
 {
     "data": {   
@@ -344,7 +344,7 @@ CreateCredDefRequest
 
 #### Response format
 
-```text
+```jsonc
 CreateCredDefResponse {
         "key": "did:cheqd:mainnet-1:5ZTp9g4SP6t73rH2s8zgmtqdXyT?service=CL-CredDef" 
 }
@@ -369,7 +369,7 @@ CreateCredDefResponse {
   
 #### Request format
 
-```text
+```protobuf
 Request 
 {
     "path": "/store/cheqd/key",
