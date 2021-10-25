@@ -1,6 +1,7 @@
 syntax = "proto3";
 package cheqdid.cheqdnode.cheqd;
 import "google/protobuf/any.proto";
+import "cheqd/common.proto";
 import "cheqd/did.proto";
 import "cheqd/credDef.proto";
 
@@ -19,14 +20,19 @@ service Msg {
 
 message MsgWriteRequestSignObject {
   google.protobuf.Any data = 1;
-  map<string, string> metadata = 2;
+  repeated KeyValuePair metadata = 2;
 }
 
 // this line is used by starport scaffolding # proto/tx/message
 message MsgWriteRequest {
   google.protobuf.Any data = 1;
-  map<string, string> signatures = 2;
-  map<string, string> metadata = 3;
+  repeated SignInfo signatures = 2;
+  repeated KeyValuePair metadata = 3;
+}
+
+message SignInfo {
+  string verification_method_id = 1;
+  string signature = 2;
 }
 
 message MsgCreateCredDef {

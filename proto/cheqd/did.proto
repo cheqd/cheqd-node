@@ -5,6 +5,7 @@ option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
 import "google/protobuf/any.proto";
 import "gogoproto/gogo.proto";
+import "cheqd/common.proto";
 
 message Did {
   string id = 1;
@@ -24,7 +25,7 @@ message VerificationMethod {
   string id = 1;
   string type = 2;
   string controller = 3;
-  map<string,string> public_key_jwk = 4; // optional
+  repeated KeyValuePair public_key_jwk = 4; // optional
   string public_key_multibase = 5; // optional
 }
 

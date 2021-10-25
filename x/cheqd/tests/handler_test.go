@@ -1061,7 +1061,7 @@ func TestHandler_UpdateDid(t *testing.T) {
 
 	didMsgUpdate := setup.UpdateDid(state.GetDid(), newPubKey, state.Metadata.VersionId)
 	dataUpdate, _ := ptypes.NewAnyWithValue(didMsgUpdate)
-	resultUpdate, _ := setup.Handler(setup.Ctx, setup.WrapRequest(dataUpdate, keys, map[string]string{}))
+	resultUpdate, _ := setup.Handler(setup.Ctx, setup.WrapRequest(dataUpdate, keys))
 
 	didUpdated := types.MsgUpdateDidResponse{}
 	errUpdate := didUpdated.Unmarshal(resultUpdate.Data)
@@ -1095,7 +1095,7 @@ func TestHandler_CreateSchema(t *testing.T) {
 	msg := setup.CreateSchema()
 
 	data, _ := ptypes.NewAnyWithValue(msg)
-	result, _ := setup.Handler(setup.Ctx, setup.WrapRequest(data, keys, make(map[string]string)))
+	result, _ := setup.Handler(setup.Ctx, setup.WrapRequest(data, keys))
 
 	schema := types.MsgCreateSchemaResponse{}
 	_ = schema.Unmarshal(result.Data)
@@ -1119,7 +1119,7 @@ func TestHandler_CreateCredDef(t *testing.T) {
 	msg := setup.CreateCredDef()
 
 	data, _ := ptypes.NewAnyWithValue(msg)
-	result, _ := setup.Handler(setup.Ctx, setup.WrapRequest(data, keys, make(map[string]string)))
+	result, _ := setup.Handler(setup.Ctx, setup.WrapRequest(data, keys))
 
 	credDef := types.MsgCreateCredDefResponse{}
 	err := credDef.Unmarshal(result.Data)
@@ -1154,16 +1154,16 @@ func TestHandler_DidDocAlreadyExists(t *testing.T) {
 
 	credDefMsg := setup.CreateCredDef()
 	data, _ := ptypes.NewAnyWithValue(credDefMsg)
-	_, _ = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys, make(map[string]string)))
-	_, err = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys, make(map[string]string)))
+	_, _ = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys))
+	_, err = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys))
 
 	require.Error(t, err)
 	require.Equal(t, "DID DOC already exists for CredDef did:cheqd:test:cred-def-1: DID Doc exists", err.Error())
 
 	schemaMsg := setup.CreateSchema()
 	data, _ = ptypes.NewAnyWithValue(schemaMsg)
-	_, _ = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys, make(map[string]string)))
-	_, err = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys, make(map[string]string)))
+	_, _ = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys))
+	_, err = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys))
 
 	require.Error(t, err)
 	require.Equal(t, "DID DOC already exists for Schema did:cheqd:test:schema-1: DID Doc exists", err.Error())

@@ -7,7 +7,7 @@ import (
 
 var _ sdk.Msg = &MsgWriteRequest{}
 
-func NewMsgWriteRequest(data *types.Any, metadata map[string]string, signatures map[string]string) *MsgWriteRequest {
+func NewMsgWriteRequest(data *types.Any, metadata []*KeyValuePair, signatures []*SignInfo) *MsgWriteRequest {
 	return &MsgWriteRequest{
 		Data:       data,
 		Metadata:   metadata,

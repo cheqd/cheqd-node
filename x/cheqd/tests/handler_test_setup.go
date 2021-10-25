@@ -175,23 +175,24 @@ func (s *TestSetup) CreateCredDef() *types.MsgCreateCredDef {
 	}
 }
 
-func (s *TestSetup) WrapRequest(data *ptypes.Any, keys map[string]ed25519.PrivateKey, metadata map[string]string) *types.MsgWriteRequest {
+func (s *TestSetup) WrapRequest(data *ptypes.Any, keys map[string]ed25519.PrivateKey) *types.MsgWriteRequest {
 	result := types.MsgWriteRequest{
-		Data:     data,
-		Metadata: metadata,
+		Data: data,
 	}
 
-	signatures := make(map[string]string)
+	var signatures []*types.SignInfo
 	signingInput, _ := keeper.BuildSigningInput(s.Cdc, &result)
 
 	for privKeyId, privKey := range keys {
 		signature := base64.StdEncoding.EncodeToString(ed25519.Sign(privKey, signingInput))
-		signatures[privKeyId] = signature
+		signatures = append(signatures, &types.SignInfo{
+			VerificationMethodId: privKeyId,
+			Signature:            signature,
+		})
 	}
 
 	return &types.MsgWriteRequest{
 		Data:       data,
-		Metadata:   metadata,
 		Signatures: signatures,
 	}
 }
@@ -214,7 +215,7 @@ func (s *TestSetup) InitDid(did string) (map[string]ed25519.PrivateKey, *types.M
 	keyId := did + "#key-1"
 	keys := map[string]ed25519.PrivateKey{keyId: privKey}
 
-	result, err := s.Handler(s.Ctx, s.WrapRequest(data, keys, make(map[string]string)))
+	result, err := s.Handler(s.Ctx, s.WrapRequest(data, keys))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -239,7 +240,7 @@ func (s *TestSetup) SendUpdateDid(msg *types.MsgUpdateDid, keys map[string]ed255
 		msg.VersionId = state.Metadata.VersionId
 	}
 
-	_, err = s.Handler(s.Ctx, s.WrapRequest(data, keys, map[string]string{}))
+	_, err = s.Handler(s.Ctx, s.WrapRequest(data, keys))
 	if err != nil {
 		return nil, err
 	}
@@ -254,7 +255,7 @@ func (s *TestSetup) SendCreateDid(msg *types.MsgCreateDid, keys map[string]ed255
 		return nil, err
 	}
 
-	_, err = s.Handler(s.Ctx, s.WrapRequest(data, keys, map[string]string{}))
+	_, err = s.Handler(s.Ctx, s.WrapRequest(data, keys))
 	if err != nil {
 		return nil, err
 	}

@@ -49,19 +49,19 @@ func (k *Keeper) VerifySignature(ctx *sdk.Context, msg *types.MsgWriteRequest, s
 	return nil
 }
 
-func VerifyIdentitySignature(signer types.Signer, signatures map[string]string, signingInput []byte) (bool, error) {
+func VerifyIdentitySignature(signer types.Signer, signatures []*types.SignInfo, signingInput []byte) (bool, error) {
 	result := true
 	foundOne := false
 
-	for id, signature := range signatures {
-		did, _ := utils.SplitDidUrlIntoDidAndFragment(id)
+	for _, info := range signatures {
+		did, _ := utils.SplitDidUrlIntoDidAndFragment(info.VerificationMethodId)
 		if did == signer.Signer {
-			pubKey, err := FindPublicKey(signer, id)
+			pubKey, err := FindPublicKey(signer, info.VerificationMethodId)
 			if err != nil {
 				return false, err
 			}
 
-			signature, err := base64.StdEncoding.DecodeString(signature)
+			signature, err := base64.StdEncoding.DecodeString(info.Signature)
 			if err != nil {
 				return false, err
 			}
