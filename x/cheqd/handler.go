@@ -21,10 +21,6 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 		}
 
-		if err := parsedMsg.ValidateBasic(); err != nil {
-			return nil, err
-		}
-
 		switch parsedMsg.Data.TypeUrl {
 		// this line is used by starport scaffolding # 1
 		case types.MessageCreateCredDef:

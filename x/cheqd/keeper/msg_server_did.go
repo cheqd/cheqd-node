@@ -15,7 +15,7 @@ import (
 
 func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgWriteRequest) (*types.MsgCreateDidResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	prefix := types.DidPrefix + ctx.ChainID() + ":"
+	prefix := types.DidPrefix + ":" + types.DidMethod + ":" + ctx.ChainID() + ":"
 
 	var didMsg types.MsgCreateDid
 	err := k.cdc.Unmarshal(msg.Data.Value, &didMsg)
@@ -69,7 +69,7 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 
 func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) (*types.MsgUpdateDidResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	prefix := types.DidPrefix + ctx.ChainID() + ":"
+	prefix := types.DidPrefix + ":" + types.DidMethod + ":" + ctx.ChainID() + ":"
 
 	var didMsg types.MsgUpdateDid
 	err := k.cdc.Unmarshal(msg.Data.Value, &didMsg)

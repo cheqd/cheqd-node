@@ -43,13 +43,12 @@ func Setup() TestSetup {
 
 	dbStore := store.NewCommitMultiStore(db)
 	storeKey := sdk.NewKVStoreKey(types.StoreKey)
-	memStoreKey := sdk.NewKVStoreKey(types.MemStoreKey)
 	dbStore.MountStoreWithDB(storeKey, sdk.StoreTypeIAVL, nil)
 
 	_ = dbStore.LoadLatestVersion()
 
 	// Init Keepers
-	newKeeper := keeper.NewKeeper(cdc, storeKey, memStoreKey)
+	newKeeper := keeper.NewKeeper(cdc, storeKey)
 
 	// Create Tx
 	txBytes := make([]byte, 28)

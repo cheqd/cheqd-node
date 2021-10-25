@@ -13,11 +13,9 @@ const (
 	// QuerierRoute defines the module's query routing key
 	QuerierRoute = ModuleName
 
-	// MemStoreKey defines the in-memory store key
-	MemStoreKey = "mem_capability"
+	DidMethod = ModuleName
 
-	// DidPrefix defines did prefix
-	DidPrefix = "did:" + ModuleName + ":"
+	DidPrefix = "did"
 )
 
 func KeyPrefix(p string) []byte {
@@ -26,15 +24,15 @@ func KeyPrefix(p string) []byte {
 
 const (
 	DidKey      = "did:"
-	DidCountKey = "Did-count:"
+	DidCountKey = "did-count:"
 )
 
 const (
 	SchemaKey      = "schema:"
-	SchemaCountKey = "Schema-count:"
+	SchemaCountKey = "schema-count:"
 )
 
 const (
-	CredDefKey      = "CredDef:"
-	CredDefCountKey = "CredDef-count:"
+	CredDefKey      = "credDef:"
+	CredDefCountKey = "credDef-count:"
 )

@@ -348,7 +348,7 @@ func New(
 	app.EvidenceKeeper = *evidenceKeeper
 
 	app.cheqdKeeper = *cheqdkeeper.NewKeeper(
-		appCodec, keys[cheqdtypes.StoreKey], keys[cheqdtypes.MemStoreKey],
+		appCodec, keys[cheqdtypes.StoreKey],
 	)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition

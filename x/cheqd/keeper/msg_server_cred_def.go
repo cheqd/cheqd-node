@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -9,7 +10,7 @@ import (
 
 func (k msgServer) CreateCredDef(goCtx context.Context, msg *types.MsgWriteRequest) (*types.MsgCreateCredDefResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	prefix := types.DidPrefix + ctx.ChainID() + ":"
+	prefix := types.DidPrefix + ":" + types.DidMethod + ":" + ctx.ChainID() + ":"
 
 	var credDefMsg types.MsgCreateCredDef
 	err := k.cdc.Unmarshal(msg.Data.Value, &credDefMsg)

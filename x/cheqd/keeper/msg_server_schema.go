@@ -9,7 +9,7 @@ import (
 
 func (k msgServer) CreateSchema(goCtx context.Context, msg *types.MsgWriteRequest) (*types.MsgCreateSchemaResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	prefix := types.DidPrefix + ctx.ChainID() + ":"
+	prefix := types.DidPrefix + ":" + types.DidMethod + ":" + ctx.ChainID() + ":"
 
 	var schemaMsg types.MsgCreateSchema
 	err := k.cdc.Unmarshal(msg.Data.Value, &schemaMsg)

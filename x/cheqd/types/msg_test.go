@@ -1,9 +1,10 @@
 package types
 
 import (
+	"testing"
+
 	ctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 const Prefix = "did:cheqd:test:"
@@ -155,9 +156,9 @@ func TestNewMsgWriteRequestValidation(t *testing.T) {
 		msg    *MsgWriteRequest
 		errMsg string
 	}{
-		{true, NewMsgWriteRequest(&ctypes.Any{TypeUrl: "1", Value: []byte{1}}, nil, []*SignInfo{ {VerificationMethodId: "foo", Signature: "bar"} }), ""},
-		{false, NewMsgWriteRequest(&ctypes.Any{TypeUrl: "1"}, nil, []*SignInfo{ {VerificationMethodId: "foo", Signature: "bar"} }), "Invalid Data: it cannot be empty: bad request"},
-		{false, NewMsgWriteRequest(&ctypes.Any{Value: []byte{1}}, nil, []*SignInfo{ {VerificationMethodId: "foo", Signature: "bar"} }), "Invalid Data: it cannot be empty: bad request"},
+		{true, NewMsgWriteRequest(&ctypes.Any{TypeUrl: "1", Value: []byte{1}}, nil, []*SignInfo{{VerificationMethodId: "foo", Signature: "bar"}}), ""},
+		{false, NewMsgWriteRequest(&ctypes.Any{TypeUrl: "1"}, nil, []*SignInfo{{VerificationMethodId: "foo", Signature: "bar"}}), "Invalid Data: it cannot be empty: bad request"},
+		{false, NewMsgWriteRequest(&ctypes.Any{Value: []byte{1}}, nil, []*SignInfo{{VerificationMethodId: "foo", Signature: "bar"}}), "Invalid Data: it cannot be empty: bad request"},
 		{false, NewMsgWriteRequest(nil, nil, nil), "Data: is required"},
 		{false, NewMsgWriteRequest(&ctypes.Any{TypeUrl: "1", Value: []byte{1}}, nil, nil), "Signatures: is required"},
 	}
