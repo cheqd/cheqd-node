@@ -27,6 +27,9 @@ TEST_NET_FEES = "--fees 5000000ncheq"
 TEST_NET_GAS_X_GAS_PRICES = "--gas 70000 --gas-prices 25ncheq"
 TEST_NET_GAS_X_GAS_PRICES_INT = 1750000
 YES_FLAG = "-y"
+DENOM = "ncheq"
+GAS_AMOUNT = 70000
+GAS_PRICE = 25
 
 SENDER_ADDRESS = "cheqd1ece09txhq6nm9fkft9jh3mce6e48ftescs5jsw"
 SENDER_MNEMONIC = "oil long siege student rent jar awkward park entry ripple enable company sort people little damp arrange wise slender push brief solve tattoo cycle"
@@ -47,6 +50,7 @@ def run(command_base, command, params, expected_output):
     cli = pexpect.spawn(f"{command_base} {command} {params}", encoding=ENCODING, timeout=IMPLICIT_TIMEOUT, maxread=READ_BUFFER)
     cli.logfile = sys.stdout
     cli.expect(expected_output)
+
     return cli
 
 
@@ -58,13 +62,41 @@ def run_interaction(cli, input_string, expected_output):
 def get_balance(address, network_destination):
     cli = run("cheqd-noded query", "bank balances", f"{address} {network_destination}", r"balances:(.*?)amount:(.*?)denom: ncheq(.*?)pagination:")
     balance = re.search(r"amount: \"(.+?)\"", cli.after).group(1).strip()
+
     return balance
+
+
+async def get_balance_vdr(pool_alias, address):
+    request = await cheqd_ledger.bank.build_query_balance(address, DENOM)
+    res = await cheqd_pool.abci_query(pool_alias, request)
+    res = await cheqd_ledger.bank.parse_query_balance_resp(res)
+    sender_balance = json.loads(res)["balance"]["amount"]
+
+    return sender_balance
 
 
 def send_with_note(note):
     cli = run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 1000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} --note {note}", fr"{CODE_0}(.*?)\"value\":\"1000ncheq\"")
     tx_hash = re.search(r"\"txhash\":\"(.+?)\"", cli.before).group(1).strip()
+
     return tx_hash, note
+
+
+async def transfer_tokens_vdr(pool_alias, wallet_handle, key_alias, public_key, sender_address, receiver_address, amount, memo):
+    msg = await cheqd_ledger.bank.build_msg_send(
+        sender_address, receiver_address, amount, DENOM
+    )
+    timeout_height = await get_timeout_height(pool_alias)
+    account_number, sequence_number = await get_base_account_number_and_sequence(pool_alias, sender_address)
+    tx = await cheqd_ledger.auth.build_tx(
+        pool_alias, public_key, msg, account_number, sequence_number, GAS_AMOUNT, GAS_AMOUNT*GAS_PRICE, DENOM, timeout_height, memo
+    )
+    tx_signed = await cheqd_keys.sign(wallet_handle, key_alias, tx)
+    res = json.loads(await cheqd_pool.broadcast_tx_commit(pool_alias, tx_signed))
+    assert res["check_tx"]["code"] == 0
+    tx_hash = res["hash"]
+
+    return tx_hash
 
 
 def set_up_operator():
@@ -75,6 +107,7 @@ def set_up_operator():
     pubkey = re.search(r"pubkey: (.+?)\n", cli.before).group(1).strip()
     print(pubkey)
     run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {address} 1100000000000000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"1100000000000000ncheq\"")
+
     return name, address, pubkey
 
 
