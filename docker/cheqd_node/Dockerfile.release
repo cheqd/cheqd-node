@@ -36,7 +36,7 @@ RUN starport chain build $STARPORT_RELEASE_PARAMS
 RUN tar xzvf release/cheqd-node_linux_amd64.tar.gz
 #####  Run container  #####
 
-FROM debian:buster
+FROM ubuntu:focal
 
 # Node binary
 COPY --from=builder /app/cheqd-noded /bin
