@@ -33,6 +33,6 @@ const (
 )
 
 const (
-	CredDefKey      = "credDef:"
-	CredDefCountKey = "credDef-count:"
+	CredDefKey      = "cred-def:"
+	CredDefCountKey = "cred-def-count:"
 )
