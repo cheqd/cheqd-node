@@ -33,7 +33,7 @@ RUN starport chain build
 
 #####  Run container  #####
 
-FROM debian:buster
+FROM debian:bullseye-20211011
 
 # Node binary
 COPY --from=builder /go/bin/cheqd-noded /bin
