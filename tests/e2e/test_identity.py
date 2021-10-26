@@ -108,5 +108,22 @@ async def test_memo(memo):
     request = await cheqd_ledger.tx.build_query_get_tx_by_hash(tx_hash)
     res = await cheqd_pool.abci_query(pool_alias, request)
     res = json.loads(await cheqd_ledger.tx.parse_query_get_tx_by_hash_resp(res))
-    print(res["tx"]["body"]["memo"])
+
     assert memo == res["tx"]["body"]["memo"]
+
+
+@pytest.mark.asyncio
+async def test_did():
+    pool_alias = random_string(5)
+    await cheqd_pool.add(pool_alias, TEST_NET_HTTP, TEST_NET_NETWORK)
+    wallet_handle, _, _ = await wallet_helper()
+
+    did = "abc"
+    vk = "def"
+
+    # create FQDID, build -> sign -> build tx -> sign -> broadcast
+
+    req = await cheqd_ledger.cheqd.build_msg_create_did(did, vk)
+    print(req)
+    signed_req = await cheqd_ledger.cheqd.sign_msg_write_request(wallet_handle, did, req)
+    print(signed_req)
