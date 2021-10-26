@@ -2,7 +2,7 @@ import pytest
 import json
 import logging
 
-from vdrtools import wallet
+from vdrtools import wallet, did
 from vdrtools import cheqd_keys, cheqd_pool, cheqd_ledger
 from vdrtools.error import CommonInvalidStructure
 
@@ -117,13 +117,13 @@ async def test_did():
     pool_alias = random_string(5)
     await cheqd_pool.add(pool_alias, TEST_NET_HTTP, TEST_NET_NETWORK)
     wallet_handle, _, _ = await wallet_helper()
-
-    did = "abc"
-    vk = "def"
+    _did, vk = await did.create_and_store_my_did(wallet_handle, '{}')
+    fqdid = "did:cheqd:cheqd:" + _did
+    print(fqdid, vk)
 
     # create FQDID, build -> sign -> build tx -> sign -> broadcast
 
-    req = await cheqd_ledger.cheqd.build_msg_create_did(did, vk)
+    req = await cheqd_ledger.cheqd.build_msg_create_did(fqdid, vk)
     print(req)
-    signed_req = await cheqd_ledger.cheqd.sign_msg_write_request(wallet_handle, did, req)
+    signed_req = await cheqd_ledger.cheqd.sign_msg_write_request(wallet_handle, fqdid, req)
     print(signed_req)
