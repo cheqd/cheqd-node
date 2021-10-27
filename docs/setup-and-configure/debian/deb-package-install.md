@@ -53,11 +53,12 @@ This document provides guidance on how to install and configure a node for the c
    For cheqd testnet, executing the following commands will set this up correctly:
 
    ```bash
-   SEEDS=$(wget -qO- https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/testnet/seeds.txt)
+   $ SEEDS=$(wget -qO- https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/testnet/seeds.txt)
 
-   echo $SEEDS # Comma separated list should be printed
-
-   sed -i.bak 's/seeds = ""/seeds = "'$SEEDS'"/g' /etc/cheqd-node/config.toml
+   $ echo $SEEDS
+   # Comma separated list should be printed
+   
+   $ sed -i.bak 's/seeds = ""/seeds = "'$SEEDS'"/g' /etc/cheqd-node/config.toml
    ```
 
 7. **Set gas prices accepted by the node**
