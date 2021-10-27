@@ -28,13 +28,18 @@ TEST_NET_GAS_X_GAS_PRICES = "--gas 70000 --gas-prices 25ncheq"
 TEST_NET_GAS_X_GAS_PRICES_INT = 1750000
 YES_FLAG = "-y"
 DENOM = "ncheq"
-GAS_AMOUNT = 70000
+GAS_AMOUNT = 80000 # 70000 throws `out of gas` sometimes
 GAS_PRICE = 25
 
-SENDER_ADDRESS = "cheqd1ece09txhq6nm9fkft9jh3mce6e48ftescs5jsw"
-SENDER_MNEMONIC = "oil long siege student rent jar awkward park entry ripple enable company sort people little damp arrange wise slender push brief solve tattoo cycle"
-RECEIVER_ADDRESS= "cheqd16d72a6kusmzml5mjhzjv63c9j5xnpsyqs8f3sk"
-RECEIVER_MNEMONIC = "strike impact earth indoor man illness virus genuine rib control antenna loop neck rotate bargain original nasty size either try snap quiz stairs huge"
+# SENDER_ADDRESS = "cheqd1ece09txhq6nm9fkft9jh3mce6e48ftescs5jsw"
+# SENDER_MNEMONIC = "oil long siege student rent jar awkward park entry ripple enable company sort people little damp arrange wise slender push brief solve tattoo cycle"
+# RECEIVER_ADDRESS= "cheqd16d72a6kusmzml5mjhzjv63c9j5xnpsyqs8f3sk"
+# RECEIVER_MNEMONIC = "strike impact earth indoor man illness virus genuine rib control antenna loop neck rotate bargain original nasty size either try snap quiz stairs huge"
+
+SENDER_ADDRESS = "cheqd1uj3wsv2vv8ccswmumcumz2mtyps0tec3ruvws2"
+SENDER_MNEMONIC = "rigid enjoy fold animal habit engage doll dish portion vehicle spatial annual original matter ankle ordinary follow blade edge end clip inside minute pigeon"
+RECEIVER_ADDRESS= "cheqd1ykrpjludkm9tfpadnr9th8x0nu5ml2jl8xkap0"
+RECEIVER_MNEMONIC = "kitchen globe dynamic vital record nasty cloud like profit disease cushion figure enough maze club donkey humble turn message soccer dice until term regret"
 
 LOCAL_SENDER_ADDRESS = os.environ["OP0_ADDRESS"]
 LOCAL_RECEIVER_ADDRESS = os.environ["OP1_ADDRESS"]
@@ -82,21 +87,18 @@ def send_with_note(note):
     return tx_hash, note
 
 
-async def transfer_tokens_vdr(pool_alias, wallet_handle, key_alias, public_key, sender_address, receiver_address, amount, memo):
-    msg = await cheqd_ledger.bank.build_msg_send(
-        sender_address, receiver_address, amount, DENOM
-    )
+async def send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, msg, memo):
     timeout_height = await get_timeout_height(pool_alias)
     account_number, sequence_number = await get_base_account_number_and_sequence(pool_alias, sender_address)
     tx = await cheqd_ledger.auth.build_tx(
-        pool_alias, public_key, msg, account_number, sequence_number, GAS_AMOUNT, GAS_AMOUNT*GAS_PRICE, DENOM, timeout_height, memo
+        pool_alias, public_key, msg, account_number, sequence_number, GAS_AMOUNT, GAS_AMOUNT*GAS_PRICE, DENOM, sender_address, timeout_height, memo
     )
-    tx_signed = await cheqd_keys.sign(wallet_handle, key_alias, tx)
+    tx_signed = await cheqd_ledger.auth.sign_tx(wallet_handle, key_alias, tx)
     res = json.loads(await cheqd_pool.broadcast_tx_commit(pool_alias, tx_signed))
     assert res["check_tx"]["code"] == 0
     tx_hash = res["hash"]
 
-    return tx_hash
+    return res, tx_hash
 
 
 def set_up_operator():
