@@ -63,7 +63,7 @@ This document provides guidance on how to install and configure a node for the c
 
 7. **Set gas prices accepted by the node**
 
-   Search for the `minimum-gas-prices` parameter in the node configuration file `/etc/cheqd-node/config.toml` and set it to a non-empty value. The recommended value is `25ncheq`.
+   Search for the `minimum-gas-prices` parameter in the node configuration file `/etc/cheqd-node/app.toml` and set it to a non-empty value. The recommended value is `25ncheq`.
 
    For cheqd testnet, executing the following command will set this up correctly:
 
