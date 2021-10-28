@@ -9,9 +9,7 @@ import (
 )
 
 const (
-	StateValueDid     = "/cheqdid.cheqdnode.cheqd.Did"
-	StateValueCredDef = "/cheqdid.cheqdnode.cheqd.CredDef"
-	StateValueSchema  = "/cheqdid.cheqdnode.cheqd.Schema"
+	StateValueDid = "/cheqdid.cheqdnode.cheqd.Did"
 )
 
 func NewStateValue(msg proto.Message, metadata *Metadata) (*StateValue, error) {

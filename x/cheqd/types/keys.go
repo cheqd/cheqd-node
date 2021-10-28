@@ -26,13 +26,3 @@ const (
 	DidKey      = "did:"
 	DidCountKey = "did-count:"
 )
-
-const (
-	SchemaKey      = "schema:"
-	SchemaCountKey = "schema-count:"
-)
-
-const (
-	CredDefKey      = "cred-def:"
-	CredDefCountKey = "cred-def-count:"
-)
