@@ -340,7 +340,7 @@ func TestNewMsgCreateSchema(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		err := tc.msg.ValidateBasic(Prefix)
+		err := tc.msg.Validate(Prefix)
 
 		if tc.valid {
 			require.Nil(t, err)
@@ -732,7 +732,7 @@ func TestNewMsgCreateDid(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		err := tc.msg.ValidateBasic(Prefix)
+		err := tc.msg.Validate(Prefix)
 
 		if tc.valid {
 			require.Nil(t, err)
@@ -1124,7 +1124,7 @@ func TestNewMsgUpdateDid(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		err := tc.msg.ValidateBasic(Prefix)
+		err := tc.msg.Validate(Prefix)
 
 		if tc.valid {
 			require.Nil(t, err)
