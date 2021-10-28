@@ -224,7 +224,7 @@ func TestNewMsgCreateDid(t *testing.T) {
 				},
 				Controller: []string{"did:cheqd:test:alice"},
 			},
-			"index 0, value did:cheqd:test:alice#key-1: The verification method must contain either a PublicKeyMultibase or a PublicKeyJwk: bad request: invalid verification method",
+			"index 0, value did:cheqd:test:alice#key-1: JsonWebKey2020: should contain `PublicKeyJwk` verification material property: bad request: invalid verification method",
 		},
 		{
 			false,
@@ -239,7 +239,7 @@ func TestNewMsgCreateDid(t *testing.T) {
 				},
 				Controller: []string{"did:cheqd:test:alice"},
 			},
-			"index 0, value did:cheqd:test:alice#key-1: Controller: is required: invalid verification method",
+			"index 0, value did:cheqd:test:alice#key-1: JsonWebKey2020: should contain `PublicKeyJwk` verification material property: bad request: invalid verification method",
 		},
 		{
 			false,
@@ -248,13 +248,13 @@ func TestNewMsgCreateDid(t *testing.T) {
 				VerificationMethod: []*VerificationMethod{
 					{
 						Id:                 "did:cheqd:test:alice#key-1",
-						Type:               "JsonWebKey2020",
+						Type:               "Ed25519VerificationKey2020",
 						PublicKeyMultibase: "tetetet",
 						Controller:         "did:cheqd:test:alice",
 					},
 					{
 						Id:                 "did:cheqd:test:alice#key-1",
-						Type:               "JsonWebKey2020",
+						Type:               "Ed25519VerificationKey2020",
 						PublicKeyMultibase: "tetetet",
 						Controller:         "did:cheqd:test:alice",
 					},
@@ -270,15 +270,20 @@ func TestNewMsgCreateDid(t *testing.T) {
 				VerificationMethod: []*VerificationMethod{
 					{
 						Id:                 "did:cheqd:test:alice#key-1",
-						Type:               "JsonWebKey2020",
+						Type:               "Ed25519VerificationKey2020",
 						PublicKeyMultibase: "tetetet",
 						Controller:         "did:cheqd:test:alice",
 					},
 					{
-						Id:                 "did:cheqd:test:alice#key-2",
-						Type:               "JsonWebKey2020",
-						PublicKeyMultibase: "tetetet",
-						Controller:         "did:cheqd:test:alice",
+						Id:   "did:cheqd:test:alice#key-2",
+						Type: "JsonWebKey2020",
+						PublicKeyJwk: []*KeyValuePair{
+							{
+								Key:   "x",
+								Value: "sadad",
+							},
+						},
+						Controller: "did:cheqd:test:alice",
 					},
 					{
 						Id:                 "did:cheqd:test:alice#key-3",
@@ -397,14 +402,19 @@ func TestNewMsgCreateDid(t *testing.T) {
 				Authentication: []string{"#key-1", "did:cheqd:test:alice#key-2"},
 				VerificationMethod: []*VerificationMethod{
 					{
-						Id:                 "did:cheqd:test:alice#key-1",
-						Type:               "JsonWebKey2020",
-						PublicKeyMultibase: "tetetet",
-						Controller:         "did:cheqd:test:alice",
+						Id:   "did:cheqd:test:alice#key-1",
+						Type: "JsonWebKey2020",
+						PublicKeyJwk: []*KeyValuePair{
+							{
+								Key:   "x",
+								Value: "sadad",
+							},
+						},
+						Controller: "did:cheqd:test:alice",
 					},
 					{
 						Id:                 "did:cheqd:test:alice#key-2",
-						Type:               "JsonWebKey2020",
+						Type:               "Ed25519VerificationKey2020",
 						PublicKeyMultibase: "tetetet",
 						Controller:         "did:cheqd:test:alice",
 					},
@@ -611,12 +621,12 @@ func TestNewMsgUpdateDid(t *testing.T) {
 				VerificationMethod: []*VerificationMethod{
 					{
 						Id:   "did:cheqd:test:alice#key-1",
-						Type: "JsonWebKey2020",
+						Type: "Ed25519VerificationKey2020",
 					},
 				},
 				Controller: []string{"did:cheqd:test:alice"},
 			},
-			"index 0, value did:cheqd:test:alice#key-1: The verification method must contain either a PublicKeyMultibase or a PublicKeyJwk: bad request: invalid verification method",
+			"index 0, value did:cheqd:test:alice#key-1: Ed25519VerificationKey2020: should contain `PublicKeyMultibase` verification material property: bad request: invalid verification method",
 		},
 		{
 			false,
@@ -624,9 +634,11 @@ func TestNewMsgUpdateDid(t *testing.T) {
 				Id: "did:cheqd:test:alice",
 				VerificationMethod: []*VerificationMethod{
 					{
-						Id:                 "did:cheqd:test:alice#key-1",
-						Type:               "JsonWebKey2020",
-						PublicKeyMultibase: "tetetet",
+						Id:   "did:cheqd:test:alice#key-1",
+						Type: "JsonWebKey2020",
+						PublicKeyJwk: []*KeyValuePair{
+							{Key: "x", Value: "y"},
+						},
 					},
 				},
 				Controller: []string{"did:cheqd:test:alice"},
@@ -640,13 +652,13 @@ func TestNewMsgUpdateDid(t *testing.T) {
 				VerificationMethod: []*VerificationMethod{
 					{
 						Id:                 "did:cheqd:test:alice#key-1",
-						Type:               "JsonWebKey2020",
+						Type:               "Ed25519VerificationKey2020",
 						PublicKeyMultibase: "tetetet",
 						Controller:         "did:cheqd:test:alice",
 					},
 					{
 						Id:                 "did:cheqd:test:alice#key-1",
-						Type:               "JsonWebKey2020",
+						Type:               "Ed25519VerificationKey2020",
 						PublicKeyMultibase: "tetetet",
 						Controller:         "did:cheqd:test:alice",
 					},
@@ -662,13 +674,13 @@ func TestNewMsgUpdateDid(t *testing.T) {
 				VerificationMethod: []*VerificationMethod{
 					{
 						Id:                 "did:cheqd:test:alice#key-1",
-						Type:               "JsonWebKey2020",
+						Type:               "Ed25519VerificationKey2020",
 						PublicKeyMultibase: "tetetet",
 						Controller:         "did:cheqd:test:alice",
 					},
 					{
 						Id:                 "did:cheqd:test:alice#key-2",
-						Type:               "JsonWebKey2020",
+						Type:               "Ed25519VerificationKey2020",
 						PublicKeyMultibase: "tetetet",
 						Controller:         "did:cheqd:test:alice",
 					},
@@ -790,13 +802,13 @@ func TestNewMsgUpdateDid(t *testing.T) {
 				VerificationMethod: []*VerificationMethod{
 					{
 						Id:                 "did:cheqd:test:alice#key-1",
-						Type:               "JsonWebKey2020",
+						Type:               "Ed25519VerificationKey2020",
 						PublicKeyMultibase: "tetetet",
 						Controller:         "did:cheqd:test:alice",
 					},
 					{
 						Id:                 "did:cheqd:test:alice#key-2",
-						Type:               "JsonWebKey2020",
+						Type:               "Ed25519VerificationKey2020",
 						PublicKeyMultibase: "tetetet",
 						Controller:         "did:cheqd:test:alice",
 					},

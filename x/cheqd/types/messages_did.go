@@ -295,7 +295,20 @@ func ValidateVerificationMethod(namespace string, vm *VerificationMethod) error 
 		return ErrBadRequestIsNotDidFragment.Wrap(vm.Id)
 	}
 
-	if !utils.IsVerificationMethodType(vm.Type) {
+	if len(vm.PublicKeyMultibase) != 0 && len(vm.PublicKeyJwk) != 0 {
+		return ErrBadRequest.Wrap("contains multiple verification material properties")
+	}
+
+	switch utils.IsVerificationMethodType(vm.Type) {
+	case utils.PublicKeyJwk:
+		if len(vm.PublicKeyJwk) == 0 {
+			return ErrBadRequest.Wrapf("%s: should contain `PublicKeyJwk` verification material property", vm.Type)
+		}
+	case utils.PublicKeyMultibase:
+		if len(vm.PublicKeyMultibase) == 0 {
+			return ErrBadRequest.Wrapf("%s: should contain `PublicKeyMultibase` verification material property", vm.Type)
+		}
+	default:
 		return ErrBadRequest.Wrapf("%s: unsupported verification method type", vm.Type)
 	}
 

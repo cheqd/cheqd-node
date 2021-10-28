@@ -2,9 +2,14 @@ package utils
 
 import "github.com/cheqd/cheqd-node/x/cheqd/utils/strings"
 
-var VerificationMethodType = []string{
-	"JsonWebKey2020",
-	"Ed25519VerificationKey2020",
+const (
+	PublicKeyJwk       = "PublicKeyJwk"
+	PublicKeyMultibase = "PublicKeyMultibase"
+)
+
+var VerificationMethodType = map[string]string{
+	"JsonWebKey2020":             PublicKeyJwk,
+	"Ed25519VerificationKey2020": PublicKeyMultibase,
 }
 
 var ServiceType = []string{
@@ -12,8 +17,8 @@ var ServiceType = []string{
 	"DIDCommMessaging",
 }
 
-func IsVerificationMethodType(vmType string) bool {
-	return strings.Include(VerificationMethodType, vmType)
+func IsVerificationMethodType(vmType string) string {
+	return VerificationMethodType[vmType]
 }
 
 func IsDidServiceType(sType string) bool {
