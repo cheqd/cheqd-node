@@ -2,9 +2,6 @@ package keeper
 
 import (
 	"crypto/ed25519"
-	"errors"
-	"fmt"
-	"github.com/btcsuite/btcutil/base58"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 )
 
@@ -13,17 +10,15 @@ func FindPublicKey(signer types.Signer, id string) (ed25519.PublicKey, error) {
 		if authentication == id {
 			for _, vm := range signer.VerificationMethod {
 				if vm.Id == id {
-					return base58.Decode(vm.PublicKeyMultibase[1:]), nil
+					return vm.GetPublicKey()
 				}
 			}
 
-			msg := fmt.Sprintf("Verification Method %s not found", id)
-			return nil, errors.New(msg)
+			return nil, types.ErrVerificationMethodNotFound.Wrap(id)
 		}
 	}
 
-	msg := fmt.Sprintf("Authentication %s not found", id)
-	return nil, errors.New(msg)
+	return nil, types.ErrVerificationMethodNotFound.Wrap(id)
 }
 
 func FindVerificationMethod(vms []*types.VerificationMethod, id string) *types.VerificationMethod {

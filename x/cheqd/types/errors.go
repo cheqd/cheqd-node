@@ -19,6 +19,8 @@ var (
 	ErrDidDocNotFound             = sdkerrors.Register(ModuleName, 1201, "DID Doc not found")
 	ErrVerificationMethodNotFound = sdkerrors.Register(ModuleName, 1202, "verification method not found")
 	ErrUnexpectedDidVersion       = sdkerrors.Register(ModuleName, 1203, "unexpected DID version")
+	ErrInvalidPublicKey           = sdkerrors.Register(ModuleName, 1204, "invalid public key")
 	ErrInvalidDidStateValue       = sdkerrors.Register(ModuleName, 1300, "invalid did state value")
 	ErrSetToState                 = sdkerrors.Register(ModuleName, 1304, "cannot set to state")
+	ErrNotImplemented             = sdkerrors.Register(ModuleName, 1501, "not implemented")
 )
