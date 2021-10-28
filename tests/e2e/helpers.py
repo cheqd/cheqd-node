@@ -36,10 +36,10 @@ TEST_NET_GAS_X_GAS_PRICES_INT = GAS_AMOUNT * GAS_PRICE
 # RECEIVER_ADDRESS= "cheqd16d72a6kusmzml5mjhzjv63c9j5xnpsyqs8f3sk"
 # RECEIVER_MNEMONIC = "strike impact earth indoor man illness virus genuine rib control antenna loop neck rotate bargain original nasty size either try snap quiz stairs huge"
 
-SENDER_ADDRESS = "cheqd1uj3wsv2vv8ccswmumcumz2mtyps0tec3ruvws2"
-SENDER_MNEMONIC = "rigid enjoy fold animal habit engage doll dish portion vehicle spatial annual original matter ankle ordinary follow blade edge end clip inside minute pigeon"
-RECEIVER_ADDRESS= "cheqd1ykrpjludkm9tfpadnr9th8x0nu5ml2jl8xkap0"
-RECEIVER_MNEMONIC = "kitchen globe dynamic vital record nasty cloud like profit disease cushion figure enough maze club donkey humble turn message soccer dice until term regret"
+SENDER_ADDRESS = "cheqd1t07jem7yv740rq29ctwecxyvm9qegq6rvdwkcp"
+SENDER_MNEMONIC = "exclude slam riot window wink peace lemon interest token accident pupil wall squirrel slight endless manage cereal celery local teach galaxy culture exact cliff"
+RECEIVER_ADDRESS= "cheqd1xrhxp68j8wuy62uhrsje6g90pld55e4ncls4uz"
+RECEIVER_MNEMONIC = "join coconut smooth number unfair future banner mad lawn deny virtual derive cradle brain business pyramid absorb crush couch cook cliff job poet differ"
 
 LOCAL_SENDER_ADDRESS = os.environ["OP0_ADDRESS"]
 LOCAL_RECEIVER_ADDRESS = os.environ["OP1_ADDRESS"]
