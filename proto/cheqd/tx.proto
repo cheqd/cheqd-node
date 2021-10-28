@@ -1,9 +1,7 @@
 syntax = "proto3";
 package cheqdid.cheqdnode.cheqd;
 import "google/protobuf/any.proto";
-import "cheqd/common.proto";
 import "cheqd/did.proto";
-import "cheqd/credDef.proto";
 
 // this line is used by starport scaffolding # proto/tx/import
 
@@ -11,9 +9,6 @@ option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
 // Msg defines the Msg service.
 service Msg {
-    // this line is used by starport scaffolding # proto/tx/rpc
-  rpc CreateCredDef(MsgWriteRequest) returns (MsgCreateCredDefResponse);
-  rpc CreateSchema(MsgWriteRequest) returns (MsgCreateSchemaResponse);
   rpc CreateDid(MsgWriteRequest) returns (MsgCreateDidResponse);
   rpc UpdateDid(MsgWriteRequest) returns (MsgUpdateDidResponse);
 }
@@ -27,32 +22,6 @@ message MsgWriteRequest {
 message SignInfo {
   string verification_method_id = 1;
   string signature = 2;
-}
-
-message MsgCreateCredDef {
-  string id = 1;
-  string schema_id = 2;
-  string tag = 3;
-  string type = 4;
-  repeated string controller = 5;
-  google.protobuf.Any value = 6;
-}
-
-message MsgCreateCredDefResponse {
-  string id = 1;
-}
-
-message MsgCreateSchema {
-  string id = 1;
-  string type = 2;
-  string name = 3;
-  string version = 4;
-  repeated string attr_names = 5;
-  repeated string controller = 6;
-}
-
-message MsgCreateSchemaResponse {
-  string id = 1;
 }
 
 message MsgCreateDid {
@@ -87,7 +56,6 @@ message MsgUpdateDid {
   repeated string context = 11;
   string version_id = 12;
 }
-
 
 message MsgUpdateDidResponse {
   string id = 1;

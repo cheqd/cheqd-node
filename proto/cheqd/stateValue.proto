@@ -1,8 +1,5 @@
 syntax = "proto3";
 package cheqdid.cheqdnode.cheqd;
-import "cheqd/did.proto";
-import "cheqd/credDef.proto";
-import "cheqd/schema.proto";
 import "google/protobuf/any.proto";
 
 // this line is used by starport scaffolding # proto/tx/import
