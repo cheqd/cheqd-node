@@ -170,7 +170,7 @@ async def test_did_positive():
 
 
 @pytest.mark.asyncio
-async def test_did_positive():
+async def test_did_negative():
     pool_alias = random_string(5)
     await cheqd_pool.add(pool_alias, LOCAL_POOL_HTTP, LOCAL_NET_NETWORK)
     wallet_handle, _, _ = await wallet_helper()
