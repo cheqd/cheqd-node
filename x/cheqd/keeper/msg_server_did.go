@@ -25,7 +25,7 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 		return nil, err
 	}
 
-	if err := k.VerifySignature(&ctx, msg, didMsg.GetSigners()); err != nil {
+	if err := k.VerifySignature(&ctx, &didMsg, didMsg.GetSigners(), msg.GetSignatures()); err != nil {
 		return nil, err
 	}
 
@@ -88,7 +88,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 		return nil, err
 	}
 
-	if err := k.VerifySignatureOnDidUpdate(&ctx, msg, oldDIDDoc, &didMsg); err != nil {
+	if err := k.VerifySignatureOnDidUpdate(&ctx, oldDIDDoc, &didMsg, msg.Signatures); err != nil {
 		return nil, err
 	}
 
@@ -124,7 +124,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 	}, nil
 }
 
-func (k msgServer) VerifySignatureOnDidUpdate(ctx *sdk.Context, msg *types.MsgWriteRequest, oldDIDDoc *types.Did, newDIDDoc *types.MsgUpdateDid) error {
+func (k msgServer) VerifySignatureOnDidUpdate(ctx *sdk.Context, oldDIDDoc *types.Did, newDIDDoc *types.MsgUpdateDid, signatures []*types.SignInfo) error {
 	var signers = newDIDDoc.GetSigners()
 
 	// Get Old DID Doc controller if it's nil then assign self
@@ -166,7 +166,7 @@ func (k msgServer) VerifySignatureOnDidUpdate(ctx *sdk.Context, msg *types.MsgWr
 		}
 	}
 
-	if err := k.VerifySignature(ctx, msg, signers); err != nil {
+	if err := k.VerifySignature(ctx, newDIDDoc, signers, signatures); err != nil {
 		return err
 	}
 

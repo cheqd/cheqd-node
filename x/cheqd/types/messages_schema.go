@@ -77,3 +77,7 @@ func (msg *MsgCreateSchema) Validate(namespace string) error {
 
 	return nil
 }
+
+func (msg *MsgCreateSchema) GetSignBytes() []byte {
+	return ModuleCdc.MustMarshal(msg)
+}

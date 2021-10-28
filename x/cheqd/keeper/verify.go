@@ -10,12 +10,16 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func (k *Keeper) VerifySignature(ctx *sdk.Context, msg *types.MsgWriteRequest, signers []types.Signer) error {
+func (k *Keeper) VerifySignature(ctx *sdk.Context, msg types.IdentityMsg, signers []types.Signer, signatures []*types.SignInfo) error {
 	if len(signers) == 0 {
 		return types.ErrInvalidSignature.Wrap("At least one signer should be present")
 	}
 
-	signingInput := msg.Data.Value
+	if len(signatures) == 0 {
+		return types.ErrInvalidSignature.Wrap("At least one signature should be present")
+	}
+
+	signingInput := msg.GetSignBytes()
 
 	for _, signer := range signers {
 		if signer.VerificationMethod == nil {
@@ -33,7 +37,7 @@ func (k *Keeper) VerifySignature(ctx *sdk.Context, msg *types.MsgWriteRequest, s
 			signer.VerificationMethod = didDoc.VerificationMethod
 		}
 
-		valid, err := VerifyIdentitySignature(signer, msg.Signatures, signingInput)
+		valid, err := VerifyIdentitySignature(signer, signatures, signingInput)
 		if err != nil {
 			return sdkerrors.Wrap(types.ErrInvalidSignature, err.Error())
 		}

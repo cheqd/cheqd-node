@@ -69,3 +69,7 @@ func (msg *MsgCreateCredDef) Validate(namespace string) error {
 
 	return nil
 }
+
+func (msg *MsgCreateCredDef) GetSignBytes() []byte {
+	return ModuleCdc.MustMarshal(msg)
+}

@@ -248,7 +248,7 @@ func TestCreateDID(t *testing.T) {
 				Id:         "did:cheqd:test:controller1",
 				Controller: []string{AliceDID, BobDID},
 			},
-			errMsg: "signature did:cheqd:test:alice not found: invalid signature detected",
+			errMsg: "At least one signature should be present: invalid signature detected",
 		},
 		{
 			valid: false,
@@ -257,7 +257,7 @@ func TestCreateDID(t *testing.T) {
 				Id:         "did:cheqd:test:controller1",
 				Controller: []string{AliceDID, BobDID},
 			},
-			errMsg: "signature did:cheqd:test:alice not found: invalid signature detected",
+			errMsg: "At least one signature should be present: invalid signature detected",
 		},
 		{
 			valid: false,

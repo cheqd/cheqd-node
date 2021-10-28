@@ -4,6 +4,7 @@ type (
 	IdentityMsg interface {
 		Validate(namespace string) error
 		GetSigners() []Signer
+		GetSignBytes() []byte
 	}
 
 	Signer struct {

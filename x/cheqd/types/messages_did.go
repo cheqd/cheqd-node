@@ -134,6 +134,10 @@ func (msg *MsgCreateDid) Validate(namespace string) error {
 	return nil
 }
 
+func (msg *MsgCreateDid) GetSignBytes() []byte {
+	return ModuleCdc.MustMarshal(msg)
+}
+
 var _ IdentityMsg = &MsgUpdateDid{}
 
 func NewMsgUpdateDid(
@@ -260,6 +264,10 @@ func (msg *MsgUpdateDid) Validate(namespace string) error {
 	}
 
 	return nil
+}
+
+func (msg *MsgUpdateDid) GetSignBytes() []byte {
+	return ModuleCdc.MustMarshal(msg)
 }
 
 func ValidateVerificationMethods(namespace string, did string, vms []*VerificationMethod) error {
