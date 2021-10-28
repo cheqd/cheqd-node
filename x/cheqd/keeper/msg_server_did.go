@@ -21,7 +21,7 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", types.ModuleName, msg)
 	}
 
-	if err := didMsg.ValidateBasic(prefix); err != nil {
+	if err := didMsg.Validate(prefix); err != nil {
 		return nil, err
 	}
 
@@ -29,7 +29,7 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 		return nil, err
 	}
 
-	// Checks that the element exists
+	// Checks that the did doesn't exist
 	if err := k.EnsureDidIsNotUsed(ctx, didMsg.Id); err != nil {
 		return nil, err
 	}
@@ -69,11 +69,11 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", types.ModuleName, msg)
 	}
 
-	if err := didMsg.ValidateBasic(prefix); err != nil {
+	if err := didMsg.Validate(prefix); err != nil {
 		return nil, err
 	}
 
-	// Checks that the element exists
+	// Checks that the did doesn't exist
 	if !k.HasDid(ctx, didMsg.Id) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %s doesn't exist", didMsg.Id))
 	}
@@ -88,7 +88,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 		return nil, err
 	}
 
-	if err := k.UpdateDidVerifySignature(&ctx, msg, oldDIDDoc, &didMsg); err != nil {
+	if err := k.VerifySignatureOnDidUpdate(&ctx, msg, oldDIDDoc, &didMsg); err != nil {
 		return nil, err
 	}
 
@@ -124,7 +124,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 	}, nil
 }
 
-func (k msgServer) UpdateDidVerifySignature(ctx *sdk.Context, msg *types.MsgWriteRequest, oldDIDDoc *types.Did, newDIDDoc *types.MsgUpdateDid) error {
+func (k msgServer) VerifySignatureOnDidUpdate(ctx *sdk.Context, msg *types.MsgWriteRequest, oldDIDDoc *types.Did, newDIDDoc *types.MsgUpdateDid) error {
 	var signers = newDIDDoc.GetSigners()
 
 	// Get Old DID Doc controller if it's nil then assign self

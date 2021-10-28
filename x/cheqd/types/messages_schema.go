@@ -34,7 +34,7 @@ func (msg *MsgCreateSchema) GetDid() string {
 	return utils.GetDidFromSchema(msg.Id)
 }
 
-func (msg *MsgCreateSchema) ValidateBasic(namespace string) error {
+func (msg *MsgCreateSchema) Validate(namespace string) error {
 	if !utils.IsSchema(msg.Id) {
 		return ErrBadRequest.Wrap("Id must end with resource type '?service=CL-Schema'")
 	}

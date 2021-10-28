@@ -34,7 +34,7 @@ func (msg *MsgCreateCredDef) GetDid() string {
 	return utils.GetDidFromCredDef(msg.Id)
 }
 
-func (msg *MsgCreateCredDef) ValidateBasic(namespace string) error {
+func (msg *MsgCreateCredDef) Validate(namespace string) error {
 	if !utils.IsCredDef(msg.Id) {
 		return ErrBadRequest.Wrap("Id must end with resource type '?service=CL-CredDef'")
 	}

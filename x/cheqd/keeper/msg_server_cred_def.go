@@ -27,7 +27,7 @@ func (k msgServer) CreateCredDef(goCtx context.Context, msg *types.MsgWriteReque
 			return nil, err
 		}
 
-		// Checks that the element exists
+		// Checks that the did doesn't exist
 		if err := k.EnsureDidIsNotUsed(ctx, credDefMsg.GetDid()); err != nil {
 			return nil, err
 		}

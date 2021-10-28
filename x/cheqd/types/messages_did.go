@@ -70,7 +70,7 @@ func (msg *MsgCreateDid) GetSigners() []Signer {
 	return []Signer{}
 }
 
-func (msg *MsgCreateDid) ValidateBasic(namespace string) error {
+func (msg *MsgCreateDid) Validate(namespace string) error {
 	if utils.IsNotDid(namespace, msg.Id) {
 		return ErrBadRequestIsNotDid.Wrap("Id")
 	}
@@ -198,7 +198,7 @@ func (msg *MsgUpdateDid) GetSigners() []Signer {
 	return []Signer{}
 }
 
-func (msg *MsgUpdateDid) ValidateBasic(namespace string) error {
+func (msg *MsgUpdateDid) Validate(namespace string) error {
 	if utils.IsNotDid(namespace, msg.Id) {
 		return ErrBadRequestIsNotDid.Wrap("Id")
 	}
