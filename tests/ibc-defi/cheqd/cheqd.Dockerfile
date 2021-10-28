@@ -4,12 +4,12 @@ FROM golang:buster as builder
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
-    # Common
     curl \
-    # Protoc
     protobuf-compiler \
     libprotobuf-dev \
-    wget
+    wget \
+    git \
+    nano
 
 # Starport
 # RUN curl https://get.starport.network/starport! | bash
@@ -19,31 +19,26 @@ RUN wget -qO- https://github.com/tendermint/starport/releases/download/v0.17.3/s
 # App
 WORKDIR /app
 
-ARG STARPORT_RELEASE_PARAMS
+RUN git clone --depth 1 --branch v0.2.3 https://github.com/cheqd/cheqd-node
 
-COPY app ./app
-COPY cmd ./cmd
-COPY proto ./proto
-COPY vue ./vue
-COPY x ./x
-COPY go.mod .
-COPY go.sum .
-COPY .git .
+WORKDIR /app/cheqd-node
 
-RUN starport chain build $STARPORT_RELEASE_PARAMS
+RUN starport chain build
 
-# It looks ugly cause starport chain build --release creates archive without version.
-RUN tar xzvf release/cheqd-node_linux_amd64.tar.gz
+
 #####  Run container  #####
 
-FROM ubuntu:focal
+FROM debian:buster
+
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends \
+    nano \
+    curl \
+    wget \
+    netcat
 
 # Node binary
-COPY --from=builder /app/cheqd-noded /bin
-
-# Runner script
-COPY docker/cheqd_node/node-runner.sh /bin/node-runner
-RUN chmod +x /bin/node-runner
+COPY --from=builder /go/bin/cheqd-noded /bin
 
 RUN groupadd --system --gid 1000 cheqd && \
     useradd --system --create-home --home-dir /cheqd --shell /bin/bash --gid cheqd --uid 1000 cheqd
@@ -55,4 +50,8 @@ USER cheqd
 EXPOSE 26656 26657
 STOPSIGNAL SIGTERM
 
-ENTRYPOINT [ "cheqd-noded" ]
+# Init network
+COPY cheqd_init.sh .
+RUN bash cheqd_init.sh
+
+ENTRYPOINT [ "cheqd-noded", "start" ]

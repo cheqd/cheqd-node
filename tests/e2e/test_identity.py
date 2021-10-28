@@ -167,3 +167,13 @@ async def test_did_positive():
     assert version_id != new_version_id
     assert parsed_res["did"]["id"] == fqdid
     assert parsed_res["did"]["verification_method"][0]["public_key_multibase"] == f"z{new_vk}"
+
+
+@pytest.mark.asyncio
+async def test_did_positive():
+    pool_alias = random_string(5)
+    await cheqd_pool.add(pool_alias, LOCAL_POOL_HTTP, LOCAL_NET_NETWORK)
+    wallet_handle, _, _ = await wallet_helper()
+    public_key = json.loads(
+        await cheqd_keys.add_from_mnemonic(wallet_handle, key_alias, SENDER_MNEMONIC, "")
+    )["pub_key"]
