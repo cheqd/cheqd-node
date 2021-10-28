@@ -81,7 +81,7 @@ A DID that uses the cheqd DID method MUST begin with the prefix `did:cheqd`. Thi
 
 The cheqd DID `method-specific-id` is made up of a component:
 
-**`namespace`**: A string that identifies the cheqd network `chain_id` (e.g., "mainnet-1", "testnet-1") where the DID reference is stored. Different cheqd networks may be differentiated based on whether they are production vs non-production, governance frameworks in use, participants involved in running nodes, etc.
+**`namespace`**: A string that identifies the cheqd network `chain_id` (e.g., "mainnet", "testnet") where the DID reference is stored. Different cheqd networks may be differentiated based on whether they are production vs non-production, governance frameworks in use, participants involved in running nodes, etc.
 
 A `did:cheqd` DID MUST be self-certifying by having the namespace component of the DID (last element)
 derived from the initial public key of the DID, as follows:
@@ -100,16 +100,16 @@ namespace-ver     = ALPHA / DIGIT
 
 #### Examples of `did:cheqd` identifiers
 
-A DID written to the cheqd "mainnet-1" ledger `namespace`:
+A DID written to the cheqd "mainnet" ledger `namespace`:
 
 ```abnf
-did:cheqd:mainnet-1:7Tqg6BwSSWapxgUDm9KKgg
+did:cheqd:mainnet:7Tqg6BwSSWapxgUDm9KKgg
 ```
 
 A DID written to the cheqd "testnet" ledger `namespace`:
 
 ```abnf
-did:cheqd:testnet-1:6cgbu8ZPoWTnR5Rv5JcSMB
+did:cheqd:testnet:6cgbu8ZPoWTnR5Rv5JcSMB
 ```
 
 ### DID Documents (DIDDocs)
@@ -139,23 +139,23 @@ describing specifications that this DID Document is following to.
     "https://www.w3.org/ns/did/v1",
     "https://w3id.org/security/suites/ed25519-2020/v1"
   ],
-  "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue",
+  "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
   "verificationMethod": [
     {
-      "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue#authKey1",
+      "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#authKey1",
       "type": "Ed25519VerificationKey2020", // external (property value)
-      "controller": "did:cheqd:mainnet-1:N22N22KY2Dyvmuu2PyyqSFKue",
+      "controller": "did:cheqd:mainnet:N22N22KY2Dyvmuu2PyyqSFKue",
       "publicKeyMultibase": "zAKJP3f7BD6W4iWEQ9jwndVTCBq8ua2Utt8EEjJ6Vxsf"
     },
     {
-      "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue#capabilityInvocationKey",
+      "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#capabilityInvocationKey",
       "type": "Ed25519VerificationKey2020", // external (property value)
-      "controller": "did:cheqd:mainnet-1:N22N22KY2Dyvmuu2PyyqSFKue",
+      "controller": "did:cheqd:mainnet:N22N22KY2Dyvmuu2PyyqSFKue",
       "publicKeyMultibase": "z4BWwfeqdp1obQptLLMvPNgBw48p7og1ie6Hf9p5nTpNN"
     }
   ],
-  "authentication": ["did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue#authKey1"],
-  "capabilityInvocation": ["did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue#capabilityInvocationKey"],
+  "authentication": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#authKey1"],
+  "capabilityInvocation": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#capabilityInvocationKey"],
 }
 ```
 
@@ -183,7 +183,7 @@ metadata MUST include this property with the boolean value true. By default this
   "created": "2020-12-20T19:17:47Z",
   "updated": "2020-12-20T19:19:47Z",
   "deactivated": false,
-  "versionId": "N22KY2Dyvmuu2PyyqSFKueN22KY2Dyvmuu2PyyqSFKue",
+  "versionId": "1B3B00849B4D50E8FCCF50193E35FD6CA5FD4686ED6AD8F847AC8C5E466CFD3E",
 }
 ```
 
@@ -205,9 +205,9 @@ encoded public key.
 
 ```jsonc
 {
-  "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue#key-0",
+  "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#key-0",
   "type": "JsonWebKey2020",
-  "controller": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue",
+  "controller": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
   "publicKeyJwk": {
     "kty": "OKP",
     // external (property name)
@@ -232,7 +232,7 @@ Services can be defined in a DIDDoc to express means of communicating with the D
 
 ```jsonc
 {
-  "id":"did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue#linked-domain",
+  "id":"did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#linked-domain",
   "type": "LinkedDomains",
   "serviceEndpoint": "https://bar.example.com"
 }
@@ -246,53 +246,115 @@ If there is no DID entry on the ledger with the specified DID (`DID.id`), it is 
 
 **Note**: The field `signatures`(from `WriteRequest`) must contain signatures from all new controllers.
 
+**Client request**: 
+`WriteRequest(CreateDidRequest(id, controller, verificationMethod, authentication, assertionMethod, capabilityInvocation, capabilityDelegation, keyAgreement, service, alsoKnownAs, context), signatures)`
+
+- **`signatures`**: `CreateDidRequest` should be signed by all `controller` private keys. This field contains a dict there key's URI from
+  `DIDDoc.authentication`, and the signature is a value. The `signatures` must contains signatures from all controllers.
+- **`id`**: fully qualified did
+- **`controller, verificationMethod, authentication, assertionMethod, capabilityInvocation, capabilityDelegation, keyAgreement, service, alsoKnownAs, context`**: optional parameters in accordance with DIDDoc properties
+
+Example of a client request:
+
+```jsonc
+WriteRequest{
+              "data": 
+                      CreateDidRequest{   
+                                        "context": [
+                                            "https://www.w3.org/ns/did/v1",
+                                            "https://w3id.org/security/suites/ed25519-2020/v1"
+                                        ],
+                                        "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
+                                        "controller": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue"],
+                                        "verificationMethod": [
+                                          {
+                                            "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#capabilityInvocationKey",
+                                            "type": "Ed25519VerificationKey2020", // external (property value)
+                                            "controller": "did:cheqd:mainnet:N22N22KY2Dyvmuu2PyyqSFKue",
+                                            "publicKeyMultibase": "z4BWwfeqdp1obQptLLMvPNgBw48p7og1ie6Hf9p5nTpNN"
+                                          }
+                                        ],
+                                        "authentication": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#authKey1"],
+              },
+              "signatures": {
+                  "verification method URI": "<signature>"
+                  // Multiple verification methods and corresponding signatures can be added here
+              },
+}
+```
+
 #### Update `DID`
 
 If there is a DID entry on the ledger with the specified DID (`DID.id`), then this considered a request for updating an existing DID.
 
 For updating `versionId` from `UpdateDIDRequest` should be filled by a
-transaction hash of the previous DIDDoc version. It is needed for a replay protection.
+transaction hash of the previous DIDDoc version. Can be received by GetDid query. It is needed for a replay protection.
 
 **Note**: The field `signatures`(from `WriteRequest`) must contain signatures from all old controllers and all new controllers.
 
+**Client request**:
+`WriteRequest(UpdateDidRequest(id, controller, verificationMethod, authentication, assertionMethod, capabilityInvocation, capabilityDelegation, keyAgreement, service, alsoKnownAs, context, versionId), signatures)`
+
+- **`signatures`**: `CreateDidRequest` should be signed by all `controller` private keys. This field contains a dict there key's URI from
+  `DIDDoc.authentication`, and the signature is a value. The `signatures` must contains signatures from all controllers.
+- **`id`**: fully qualified did
+- **`versionId`**: transaction hash of the previous DIDDoc version.
+- **`controller, verificationMethod, authentication, assertionMethod, capabilityInvocation, capabilityDelegation, keyAgreement, service, alsoKnownAs, context`**: optional parameters in accordance with DIDDoc properties
+
+Example of a client request:
+
+```jsonc
+WriteRequest{
+              "data": 
+                     UpdateDidRequest{   
+                                      "context": [
+                                          "https://www.w3.org/ns/did/v1",
+                                          "https://w3id.org/security/suites/ed25519-2020/v1"
+                                      ],
+                                      "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
+                                      "controller": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue"],
+                                      "verificationMethod": [
+                                        {
+                                          "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#capabilityInvocationKey",
+                                          "type": "Ed25519VerificationKey2020", // external (property value)
+                                          "controller": "did:cheqd:mainnet:N22N22KY2Dyvmuu2PyyqSFKue",
+                                          "publicKeyMultibase": "z4BWwfeqdp1obQptLLMvPNgBw48p7og1ie6Hf9p5nTpNN"
+                                        }
+                                      ],
+                                      "authentication": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#authKey1"],
+                                      "versionId": "1B3B00849B4D50E8FCCF50193E35FD6CA5FD4686ED6AD8F847AC8C5E466CFD3E"
+              },
+              "signatures": {
+                  "verification method URI": "<signature>"
+                  // Multiple verification methods and corresponding signatures can be added here
+              },
+}
+```
+
 #### Resolve DID
 
-TODO: describe the resolution process
+Using GetDid query DIDDoc can be received from the ledger.
+`QueryGetDidResponse(id)`
 
-#### Deactivate DID
+Response format from Tendermint RPC interface is `QueryGetDidResponse` protobuf:
+```cjson
 
-TODO: describe the deactivation process
+
+```
 
 ### Security Considerations
 
-TODO: add security considerations
+For adding a new DIDDoc or update an old one should be signed by controller signatures. 
+
+Changing of a DIDDoc fragment without a controller (any field except VerificationMethods) MUST be signed by DIDDoc's controller(s).
+
+Changing of a DIDDoc fragment with a controller MUST be signed by DIDDoc's controller(s) **and** fragment's controller.
+
+Changing the controller requires a list of signatures as before for changing any field.
 
 ### Privacy Considerations
 
 TODO: add privacy considerations
-
-### Generic transaction request envelope
-
-All identity transaction requests for cheqd networks should contain the following details:
-
-- **`data`**: Data requested to be written to the ledger, specific for each request type.
-- **`signatures`**: `data`and `metadata` should be signed by all `controller` private keys. This field contains a dict there key's id from
-`DIDDoc.authentication` is a key, and the signature is a value. The `signatures` must contains signatures from all controllers. And every controller should sign all fields excluding `signatures` using at least one key from `DIDDoc.authentication`.
-- **`requestId`**: String with unique identifier. Unix timestamp is recommended. Needed for a replay protection.
-- **`metadata`**: Dictionary with additional metadata fields. Empty for now. This fields provides extensibility in the future, e.g., it can contain `protocolVersion` or other relevant metadata associated with a request.
-
-#### Example of generic transaction request
-
-```jsonc
-{
-  "data": { "<request data for writing a transaction to the ledger>" },
-  "signatures": {
-      "verification method id": "<signature>"
-      // Multiple verification methods and corresponding signatures can be added here
-    },
-  "metadata": {}
-}
-```
 
 ### Changes from Indy entities and transactions
 
