@@ -19,13 +19,6 @@ func NewQuerier(k Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 		)
 
 		switch path[0] {
-		// this line is used by starport scaffolding # 2
-		case types.QueryGetCredDef:
-			return getCredDef(ctx, path[1], k, legacyQuerierCdc)
-
-		case types.QueryGetSchema:
-			return getSchema(ctx, path[1], k, legacyQuerierCdc)
-
 		case types.QueryGetDid:
 			return getDid(ctx, path[1], k, legacyQuerierCdc)
 

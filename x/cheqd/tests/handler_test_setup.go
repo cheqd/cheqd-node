@@ -103,32 +103,6 @@ func (s *TestSetup) CreateDid(pubKey ed25519.PublicKey, did string) *types.MsgCr
 	}
 }
 
-func (s *TestSetup) UpdateDid(did *types.Did, pubKey ed25519.PublicKey, versionId string) *types.MsgUpdateDid {
-	PublicKeyMultibase := "z" + base58.Encode(pubKey)
-
-	VerificationMethod := types.VerificationMethod{
-		Id:                 "did:cheqd:test:alice#key-2",
-		Type:               "Ed25519VerificationKey2020",
-		Controller:         "Controller",
-		PublicKeyMultibase: PublicKeyMultibase,
-	}
-
-	return &types.MsgUpdateDid{
-		Id:                   did.Id,
-		Controller:           did.Controller,
-		VerificationMethod:   []*types.VerificationMethod{did.VerificationMethod[0], &VerificationMethod},
-		Authentication:       append(did.Authentication, "#key-2"),
-		AssertionMethod:      did.AssertionMethod,
-		CapabilityInvocation: did.CapabilityInvocation,
-		CapabilityDelegation: did.CapabilityDelegation,
-		KeyAgreement:         did.KeyAgreement,
-		AlsoKnownAs:          did.AlsoKnownAs,
-		Service:              did.Service,
-		VersionId:            versionId,
-		Context:              did.Context,
-	}
-}
-
 func (s *TestSetup) CreateToUpdateDid(did *types.MsgCreateDid) *types.MsgUpdateDid {
 	return &types.MsgUpdateDid{
 		Id:                   did.Id,
@@ -143,36 +117,6 @@ func (s *TestSetup) CreateToUpdateDid(did *types.MsgCreateDid) *types.MsgUpdateD
 		Service:              did.Service,
 		Context:              did.Context,
 	}
-}
-
-func (s *TestSetup) CreateSchema() *types.MsgCreateSchema {
-	return &types.MsgCreateSchema{
-		Id:         "did:cheqd:test:schema-1?service=CL-Schema",
-		Type:       "CL-Schema",
-		Name:       "name",
-		Version:    "version",
-		AttrNames:  []string{"attr1", "attr2"},
-		Controller: []string{"did:cheqd:test:alice"},
-	}
-}
-
-func (s *TestSetup) CreateCredDef() *types.MsgCreateCredDef {
-	/*Value := types.MsgCreateCredDef_ClType{
-		ClType: &types.CredDefValue{
-			Primary:    map[string]*ptypes.Any{"first": nil},
-			Revocation: map[string]*ptypes.Any{"second": nil},
-		},
-	}
-
-	return &types.MsgCreateCredDef{
-		Id:         "did:cheqd:test:cred-def-1?service=CL-CredDef",
-		SchemaId:   "schema-1",
-		Tag:        "tag",
-		Type:       "CL-CredDef",
-		Value:      &Value,
-		Controller: []string{"did:cheqd:test:alice"},
-	}*/
-	return nil
 }
 
 func (s *TestSetup) WrapRequest(data *ptypes.Any, keys map[string]ed25519.PrivateKey) *types.MsgWriteRequest {
