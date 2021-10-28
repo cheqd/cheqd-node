@@ -49,9 +49,15 @@ sed -i $sed_extension 's/"stake"/"ncheq"/' .cheqdnode/config/genesis.json
 
 echo "Generating operator keys..."
 
+MNEMONIC0="exclude slam riot window wink peace lemon interest token accident pupil wall squirrel slight endless manage cereal celery local teach galaxy culture exact cliff"
+MNEMONIC1="join coconut smooth number unfair future banner mad lawn deny virtual derive cradle brain business pyramid absorb crush couch cook cliff job poet differ"
+MNEMONIC2="novel hurdle ancient shift crane volcano fine soldier upgrade correct zoo also enhance jacket wrap board shallow chest success roast patch miss behave tortoise"
+MNEMONIC3="hand rifle extra notable hawk aunt swallow burden margin aspect solid eyebrow ten tornado find cube subject bomb silver case trim chimney wagon hawk"
+
 for ((i=0 ; i<$VALIDATORS_COUNT ; i++))
 do
-    cheqd_noded_docker keys add "operator$i"
+    temp=MNEMONIC$i
+    echo "${!temp}" | cheqd_noded_docker keys add "operator$i" --recover
 done
 
 echo "Creating genesis accounts..."

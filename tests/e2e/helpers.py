@@ -25,11 +25,11 @@ LOCAL_NET_DESTINATION = f"{LOCAL_NET_NODE_TCP} --chain-id 'cheqd'"
 LOCAL_NET_DESTINATION_HTTP = f"{LOCAL_NET_NODE_HTTP} --chain-id 'cheqd'"
 TEST_NET_FEES = "--fees 5000000ncheq"
 TEST_NET_GAS_X_GAS_PRICES = "--gas 70000 --gas-prices 25ncheq"
-TEST_NET_GAS_X_GAS_PRICES_INT = 1750000
 YES_FLAG = "-y"
 DENOM = "ncheq"
 GAS_AMOUNT = 80000 # 70000 throws `out of gas` sometimes
 GAS_PRICE = 25
+TEST_NET_GAS_X_GAS_PRICES_INT = GAS_AMOUNT * GAS_PRICE
 
 # SENDER_ADDRESS = "cheqd1ece09txhq6nm9fkft9jh3mce6e48ftescs5jsw"
 # SENDER_MNEMONIC = "oil long siege student rent jar awkward park entry ripple enable company sort people little damp arrange wise slender push brief solve tattoo cycle"
@@ -95,10 +95,32 @@ async def send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sende
     )
     tx_signed = await cheqd_ledger.auth.sign_tx(wallet_handle, key_alias, tx)
     res = json.loads(await cheqd_pool.broadcast_tx_commit(pool_alias, tx_signed))
-    assert res["check_tx"]["code"] == 0
     tx_hash = res["hash"]
 
     return res, tx_hash
+
+
+async def create_did_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, fqdid, vk, memo):
+    req = await cheqd_ledger.cheqd.build_msg_create_did(fqdid, vk)
+    signed_req = await cheqd_ledger.cheqd.sign_msg_write_request(wallet_handle, fqdid, bytes(req))
+    res, _ = await send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, bytes(signed_req), memo)
+
+    return res
+
+
+async def query_did_helper(pool_alias, fqdid):
+    req = await cheqd_ledger.cheqd.build_query_get_did(fqdid)
+    res = await cheqd_pool.abci_query(pool_alias, req)
+
+    return res
+
+
+async def update_did_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, fqdid, new_vk, version_id, memo):
+    req = await cheqd_ledger.cheqd.build_msg_update_did(fqdid, new_vk, version_id)
+    signed_req = await cheqd_ledger.cheqd.sign_msg_write_request(wallet_handle, fqdid, bytes(req))
+    res, _ = await send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, bytes(signed_req), memo)
+
+    return res
 
 
 def set_up_operator():
