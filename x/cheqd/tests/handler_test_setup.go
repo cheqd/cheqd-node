@@ -82,7 +82,7 @@ func (s *TestSetup) CreateDid(pubKey ed25519.PublicKey, did string) *types.MsgCr
 		PublicKeyMultibase: PublicKeyMultibase,
 	}
 
-	Service := types.DidService{
+	Service := types.ServiceEndpoint{
 		Id:              "#service-2",
 		Type:            "DIDCommMessaging",
 		ServiceEndpoint: "endpoint",
@@ -99,7 +99,7 @@ func (s *TestSetup) CreateDid(pubKey ed25519.PublicKey, did string) *types.MsgCr
 		KeyAgreement:         []string{did + "#key-1"},
 		AlsoKnownAs:          []string{did + "#key-1"},
 		Context:              []string{"Context"},
-		Service:              []*types.DidService{&Service},
+		Service:              []*types.ServiceEndpoint{&Service},
 	}
 }
 
@@ -157,7 +157,7 @@ func (s *TestSetup) CreateSchema() *types.MsgCreateSchema {
 }
 
 func (s *TestSetup) CreateCredDef() *types.MsgCreateCredDef {
-	Value := types.MsgCreateCredDef_ClType{
+	/*Value := types.MsgCreateCredDef_ClType{
 		ClType: &types.CredDefValue{
 			Primary:    map[string]*ptypes.Any{"first": nil},
 			Revocation: map[string]*ptypes.Any{"second": nil},
@@ -171,7 +171,8 @@ func (s *TestSetup) CreateCredDef() *types.MsgCreateCredDef {
 		Type:       "CL-CredDef",
 		Value:      &Value,
 		Controller: []string{"did:cheqd:test:alice"},
-	}
+	}*/
+	return nil
 }
 
 func (s *TestSetup) WrapRequest(data *ptypes.Any, keys map[string]ed25519.PrivateKey) *types.MsgWriteRequest {
@@ -180,7 +181,7 @@ func (s *TestSetup) WrapRequest(data *ptypes.Any, keys map[string]ed25519.Privat
 	}
 
 	var signatures []*types.SignInfo
-	signingInput, _ := keeper.BuildSigningInput(s.Cdc, &result)
+	signingInput := result.Data.Value
 
 	for privKeyId, privKey := range keys {
 		signature := base64.StdEncoding.EncodeToString(ed25519.Sign(privKey, signingInput))
@@ -244,8 +245,8 @@ func (s *TestSetup) SendUpdateDid(msg *types.MsgUpdateDid, keys map[string]ed255
 		return nil, err
 	}
 
-	did, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
-	return did.GetDid(), nil
+	updated, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
+	return updated.GetDid()
 }
 
 func (s *TestSetup) SendCreateDid(msg *types.MsgCreateDid, keys map[string]ed25519.PrivateKey) (*types.Did, error) {
@@ -259,8 +260,8 @@ func (s *TestSetup) SendCreateDid(msg *types.MsgCreateDid, keys map[string]ed255
 		return nil, err
 	}
 
-	state, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
-	return state.GetDid(), nil
+	created, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
+	return created.GetDid()
 }
 
 func ConcatKeys(dst map[string]ed25519.PrivateKey, src map[string]ed25519.PrivateKey) map[string]ed25519.PrivateKey {

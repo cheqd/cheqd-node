@@ -2,10 +2,8 @@ package keeper
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 	"github.com/cheqd/cheqd-node/x/cheqd/utils/strings"
-	"github.com/tendermint/tendermint/crypto/tmhash"
 	"reflect"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
@@ -50,20 +48,14 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 		Context:              didMsg.Context,
 	}
 
-	timestamp := ctx.BlockTime().String()
-	txHash := base64.StdEncoding.EncodeToString(tmhash.Sum(ctx.TxBytes()))
-
-	metadata := types.Metadata{
-		Created:     timestamp,
-		Deactivated: false,
-		Updated:     timestamp,
-		VersionId:   txHash,
+	metadata := types.NewMetadata(ctx)
+	id, err := k.AppendDid(ctx, did, &metadata)
+	if err != nil {
+		return nil, err
 	}
 
-	k.AppendDid(ctx, did, &metadata, timestamp, txHash)
-
 	return &types.MsgCreateDidResponse{
-		Id: didMsg.Id,
+		Id: *id,
 	}, nil
 }
 
@@ -86,17 +78,22 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %s doesn't exist", didMsg.Id))
 	}
 
-	oldDIDDoc, err := k.GetDid(&ctx, didMsg.Id)
+	oldStateValue, err := k.GetDid(&ctx, didMsg.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := k.UpdateDidVerifySignature(&ctx, msg, oldDIDDoc.GetDid(), &didMsg); err != nil {
+	oldDIDDoc, err := oldStateValue.GetDid()
+	if err != nil {
 		return nil, err
 	}
 
-	if oldDIDDoc.Metadata.VersionId != didMsg.VersionId {
-		errMsg := fmt.Sprintf("Ecpected %s with version %s. Got version %s", didMsg.Id, oldDIDDoc.Metadata.VersionId, didMsg.VersionId)
+	if err := k.UpdateDidVerifySignature(&ctx, msg, oldDIDDoc, &didMsg); err != nil {
+		return nil, err
+	}
+
+	if oldStateValue.Metadata.VersionId != didMsg.VersionId {
+		errMsg := fmt.Sprintf("Ecpected %s with version %s. Got version %s", didMsg.Id, oldStateValue.Metadata.VersionId, didMsg.VersionId)
 		return nil, sdkerrors.Wrap(types.ErrUnexpectedDidVersion, errMsg)
 	}
 
@@ -114,17 +111,13 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 		Context:              didMsg.Context,
 	}
 
-	timestamp := ctx.BlockTime().String()
-	txHash := base64.StdEncoding.EncodeToString(tmhash.Sum(ctx.TxBytes()))
+	metadata := types.NewMetadata(ctx)
+	metadata.Created = oldStateValue.Metadata.Created
+	metadata.Deactivated = oldStateValue.Metadata.Deactivated
 
-	metadata := types.Metadata{
-		Created:     oldDIDDoc.Metadata.Created,
-		Deactivated: oldDIDDoc.Metadata.Deactivated,
-		Updated:     timestamp,
-		VersionId:   txHash,
+	if err = k.SetDid(ctx, did, &metadata); err != nil {
+		return nil, err
 	}
-
-	k.SetDid(ctx, did, &metadata, timestamp, txHash)
 
 	return &types.MsgUpdateDidResponse{
 		Id: didMsg.Id,

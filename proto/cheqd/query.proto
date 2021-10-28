@@ -34,6 +34,7 @@ message QueryGetCredDefRequest {
 
 message QueryGetCredDefResponse {
 	CredDef cred_def = 1;
+	Metadata metadata = 2;
 }
 
 message QueryGetSchemaRequest {
@@ -42,6 +43,7 @@ message QueryGetSchemaRequest {
 
 message QueryGetSchemaResponse {
 	Schema schema = 1;
+	Metadata metadata = 2;
 }
 
 message QueryGetDidRequest {

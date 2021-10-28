@@ -12,13 +12,10 @@ message CredDef {
   string tag = 3;
   string type = 4;
   repeated string controller = 5;
-  oneof value {
-    CredDefValue cl_type = 6;
-    google.protobuf.Any any_type = 7;
-  }
+  google.protobuf.Any value = 6;
 }
 
-message CredDefValue {
+message CredDefCLValue {
   map<string, google.protobuf.Any> primary = 1;
   map<string, google.protobuf.Any> revocation = 2; //optional
 }

@@ -38,30 +38,30 @@ func (k Keeper) SetDidCount(ctx sdk.Context, count uint64) {
 }
 
 // AppendDid appends a did in the store with a new id and update the count
-func (k Keeper) AppendDid(ctx sdk.Context, did types.Did, metadata *types.Metadata, timestamp string, txHash string) string {
+func (k Keeper) AppendDid(ctx sdk.Context, did types.Did, metadata *types.Metadata) (*string, error) {
 	// Create the did
 	count := k.GetDidCount(ctx)
-	k.SetDid(ctx, did, metadata, timestamp, txHash)
+	err := k.SetDid(ctx, did, metadata)
+	if err != nil {
+		return nil, err
+	}
 
 	// Update did count
 	k.SetDidCount(ctx, count+1)
-	return did.Id
+	return &did.Id, nil
 }
 
 // SetDid set a specific did in the store
-func (k Keeper) SetDid(ctx sdk.Context, did types.Did, metadata *types.Metadata, timestamp string, txHash string) {
-	stateValue := types.StateValue{
-		Metadata: metadata,
-		Data: &types.StateValue_Did{
-			Did: &did,
-		},
-		Timestamp: timestamp,
-		TxHash:    txHash,
+func (k Keeper) SetDid(ctx sdk.Context, did types.Did, metadata *types.Metadata) error {
+	stateValue, err := types.NewStateValue(&did, metadata)
+	if err != nil {
+		return types.ErrSetToState.Wrap(err.Error())
 	}
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
-	b := k.cdc.MustMarshal(&stateValue)
+	b := k.cdc.MustMarshal(stateValue)
 	store.Set(GetDidIDBytes(did.Id), b)
+	return nil
 }
 
 // GetDid returns a did from its id

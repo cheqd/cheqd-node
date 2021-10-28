@@ -18,16 +18,10 @@ service Msg {
   rpc UpdateDid(MsgWriteRequest) returns (MsgUpdateDidResponse);
 }
 
-message MsgWriteRequestSignObject {
-  google.protobuf.Any data = 1;
-  repeated KeyValuePair metadata = 2;
-}
-
 // this line is used by starport scaffolding # proto/tx/message
 message MsgWriteRequest {
   google.protobuf.Any data = 1;
   repeated SignInfo signatures = 2;
-  repeated KeyValuePair metadata = 3;
 }
 
 message SignInfo {
@@ -40,11 +34,8 @@ message MsgCreateCredDef {
   string schema_id = 2;
   string tag = 3;
   string type = 4;
-  oneof value {
-    CredDefValue cl_type = 5;
-    google.protobuf.Any any_type = 6;
-  }
-  repeated string controller = 7;
+  repeated string controller = 5;
+  google.protobuf.Any value = 6;
 }
 
 message MsgCreateCredDefResponse {
@@ -74,7 +65,7 @@ message MsgCreateDid {
   repeated string capability_delegation = 7;
   repeated string key_agreement = 8;
   repeated string also_known_as = 9;
-  repeated DidService service = 10;
+  repeated ServiceEndpoint service = 10;
   repeated string context = 11;
 }
 
@@ -92,7 +83,7 @@ message MsgUpdateDid {
   repeated string capability_delegation = 7;
   repeated string key_agreement = 8;
   repeated string also_known_as = 9;
-  repeated DidService service = 10;
+  repeated ServiceEndpoint service = 10;
   repeated string context = 11;
   string version_id = 12;
 }

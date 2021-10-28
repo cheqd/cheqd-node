@@ -1,12 +1,10 @@
 package keeper
 
 import (
-	"encoding/base64"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/tendermint/tendermint/crypto/tmhash"
 	"strconv"
 )
 
@@ -42,43 +40,34 @@ func (k Keeper) SetSchemaCount(ctx sdk.Context, count uint64) {
 // AppendSchema appends a schema in the store with a new id and update the count
 func (k Keeper) AppendSchema(
 	ctx sdk.Context,
-	id string,
-	schemaType string,
-	name string,
-	version string,
-	attrNames []string,
-	controller []string,
-) string {
+	schema types.Schema,
+	metadata *types.Metadata,
+) (*string, error) {
 	// Create the schema
 	count := k.GetSchemaCount(ctx)
-	var schema = types.Schema{
-		Id:         id,
-		Name:       name,
-		Type:       schemaType,
-		Version:    version,
-		AttrNames:  attrNames,
-		Controller: controller,
+
+	err := k.SetSchema(ctx, schema, metadata)
+	if err != nil {
+		return nil, err
 	}
-
-	created := ctx.BlockTime().String()
-	txHash := base64.StdEncoding.EncodeToString(tmhash.Sum(ctx.TxBytes()))
-
-	stateValue := types.StateValue{
-		Data: &types.StateValue_Schema{
-			Schema: &schema,
-		},
-		Timestamp: created,
-		TxHash:    txHash,
-	}
-
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.SchemaKey))
-	value := k.cdc.MustMarshal(&stateValue)
-	store.Set(GetSchemaIDBytes(schema.Id), value)
 
 	// Update schema count
 	k.SetSchemaCount(ctx, count+1)
 
-	return id
+	return &schema.Id, nil
+}
+
+// SetSchema set a specific cred def in the store
+func (k Keeper) SetSchema(ctx sdk.Context, schema types.Schema, metadata *types.Metadata) error {
+	stateValue, err := types.NewStateValue(&schema, metadata)
+	if err != nil {
+		return types.ErrSetToState.Wrap(err.Error())
+	}
+
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.SchemaKey))
+	b := k.cdc.MustMarshal(stateValue)
+	store.Set(GetSchemaIDBytes(schema.Id), b)
+	return nil
 }
 
 // GetSchema returns a schema from its id

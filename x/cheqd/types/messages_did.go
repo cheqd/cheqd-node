@@ -16,7 +16,7 @@ func NewMsgCreateDid(
 	capabilityDelegation []string,
 	keyAgreement []string,
 	alsoKnownAs []string,
-	service []*DidService,
+	service []*ServiceEndpoint,
 	context []string,
 ) *MsgCreateDid {
 	return &MsgCreateDid{
@@ -146,7 +146,7 @@ func NewMsgUpdateDid(
 	capabilityDelegation []string,
 	keyAgreement []string,
 	alsoKnownAs []string,
-	service []*DidService,
+	service []*ServiceEndpoint,
 	context []string,
 ) *MsgUpdateDid {
 	return &MsgUpdateDid{
@@ -302,7 +302,7 @@ func ValidateVerificationMethod(namespace string, vm *VerificationMethod) error 
 	return nil
 }
 
-func ValidateServices(namespace string, did string, services []*DidService) error {
+func ValidateServices(namespace string, did string, services []*ServiceEndpoint) error {
 	for i, s := range services {
 		if err := ValidateService(namespace, s); err != nil {
 			return ErrBadRequestInvalidService.Wrap(sdkerrors.Wrapf(err, "index %d, value %s", i, s.Id).Error())
@@ -322,7 +322,7 @@ func ValidateServices(namespace string, did string, services []*DidService) erro
 	return nil
 }
 
-func ValidateService(namespace string, s *DidService) error {
+func ValidateService(namespace string, s *ServiceEndpoint) error {
 	if !utils.IsDidFragment(namespace, s.Id) {
 		return ErrBadRequestIsNotDidFragment.Wrap(s.Id)
 	}
@@ -344,7 +344,7 @@ func IncludeVerificationMethod(did string, vms []*VerificationMethod, id string)
 	return false
 }
 
-func IncludeService(did string, services []*DidService, id string) bool {
+func IncludeService(did string, services []*ServiceEndpoint, id string) bool {
 	for _, s := range services {
 		if utils.ResolveId(did, s.Id) == utils.ResolveId(did, id) {
 			return true

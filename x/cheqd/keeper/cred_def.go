@@ -1,12 +1,10 @@
 package keeper
 
 import (
-	"encoding/base64"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/tendermint/tendermint/crypto/tmhash"
 	"strconv"
 )
 
@@ -39,52 +37,37 @@ func (k Keeper) SetCredDefCount(ctx sdk.Context, count uint64) {
 	store.Set(byteKey, bz)
 }
 
-// AppendCredDef appends a credDef in the store with a new id and update the count
+// AppendCredDef appends a CredDef in the store with a new id and update the count
 func (k Keeper) AppendCredDef(
 	ctx sdk.Context,
-	id string,
-	schemaId string,
-	tag string,
-	signatureType string,
-	clValue *types.CredDef_ClType,
-	controller []string,
-) string {
-	// Create the credDef
+	CredDef types.CredDef,
+	metadata *types.Metadata,
+) (*string, error) {
+	// Create the CredDef
 	count := k.GetCredDefCount(ctx)
 
-	// A default tag `tag` will be used if not specified.
-	if len(tag) == 0 {
-		tag = "tag"
+	err := k.SetCredDef(ctx, CredDef, metadata)
+	if err != nil {
+		return nil, err
 	}
 
-	var credDef = types.CredDef{
-		Id:         id,
-		SchemaId:   schemaId,
-		Tag:        tag,
-		Type:       signatureType,
-		Value:      clValue,
-		Controller: controller,
-	}
+	// Update CredDef count
+	k.SetCredDefCount(ctx, count+1)
 
-	created := ctx.BlockTime().String()
-	txHash := base64.StdEncoding.EncodeToString(tmhash.Sum(ctx.TxBytes()))
+	return &CredDef.Id, nil
+}
 
-	stateValue := types.StateValue{
-		Data: &types.StateValue_CredDef{
-			CredDef: &credDef,
-		},
-		Timestamp: created,
-		TxHash:    txHash,
+// SetCredDef set a specific cred def in the store
+func (k Keeper) SetCredDef(ctx sdk.Context, CredDef types.CredDef, metadata *types.Metadata) error {
+	stateValue, err := types.NewStateValue(&CredDef, metadata)
+	if err != nil {
+		return types.ErrSetToState.Wrap(err.Error())
 	}
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.CredDefKey))
-	value := k.cdc.MustMarshal(&stateValue)
-	store.Set(GetCredDefIDBytes(credDef.Id), value)
-
-	// Update credDef count
-	k.SetCredDefCount(ctx, count+1)
-
-	return id
+	b := k.cdc.MustMarshal(stateValue)
+	store.Set(GetCredDefIDBytes(CredDef.Id), b)
+	return nil
 }
 
 // GetCredDef returns a credDef from its id

@@ -2,17 +2,18 @@ package types
 
 import (
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
+	"github.com/cosmos/cosmos-sdk/codec/types"
 )
 
 var _ IdentityMsg = &MsgCreateCredDef{}
 
-func NewMsgCreateCredDef(id string, schemaId string, tag string, signatureType string, controller []string, value *MsgCreateCredDef_ClType) *MsgCreateCredDef {
+func NewMsgCreateCredDef(id string, schemaId string, tag string, signatureType string, controller []string, value types.Any) *MsgCreateCredDef {
 	return &MsgCreateCredDef{
 		Id:         id,
 		SchemaId:   schemaId,
 		Tag:        tag,
 		Type:       signatureType,
-		Value:      value,
+		Value:      &value,
 		Controller: controller,
 	}
 }

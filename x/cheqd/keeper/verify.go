@@ -15,10 +15,7 @@ func (k *Keeper) VerifySignature(ctx *sdk.Context, msg *types.MsgWriteRequest, s
 		return types.ErrInvalidSignature.Wrap("At least one signer should be present")
 	}
 
-	signingInput, err := BuildSigningInput(k.cdc, msg)
-	if err != nil {
-		return sdkerrors.Wrap(types.ErrInvalidSignature, err.Error())
-	}
+	signingInput := msg.Data.Value
 
 	for _, signer := range signers {
 		if signer.VerificationMethod == nil {
@@ -27,13 +24,13 @@ func (k *Keeper) VerifySignature(ctx *sdk.Context, msg *types.MsgWriteRequest, s
 				return types.ErrDidDocNotFound.Wrap(signer.Signer)
 			}
 
-			didDoc := state.GetDid()
-			if didDoc == nil {
+			didDoc, err := state.GetDid()
+			if err != nil {
 				return types.ErrDidDocNotFound.Wrap(signer.Signer)
 			}
 
-			signer.Authentication = state.GetDid().Authentication
-			signer.VerificationMethod = state.GetDid().VerificationMethod
+			signer.Authentication = didDoc.Authentication
+			signer.VerificationMethod = didDoc.VerificationMethod
 		}
 
 		valid, err := VerifyIdentitySignature(signer, msg.Signatures, signingInput)

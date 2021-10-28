@@ -20,5 +20,10 @@ func (k Keeper) Schema(c context.Context, req *types.QueryGetSchemaRequest) (*ty
 		return nil, err
 	}
 
-	return &types.QueryGetSchemaResponse{Schema: state.GetSchema()}, nil
+	schema, err := state.GetSchema()
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.QueryGetSchemaResponse{Schema: schema, Metadata: state.Metadata}, nil
 }

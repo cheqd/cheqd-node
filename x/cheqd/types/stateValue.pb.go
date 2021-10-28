@@ -5,6 +5,7 @@ package types
 
 import (
 	fmt "fmt"
+	types "github.com/cosmos/cosmos-sdk/codec/types"
 	proto "github.com/gogo/protobuf/proto"
 	io "io"
 	math "math"
@@ -23,14 +24,8 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type StateValue struct {
-	// Types that are valid to be assigned to Data:
-	//	*StateValue_Did
-	//	*StateValue_Schema
-	//	*StateValue_CredDef
-	Data      isStateValue_Data `protobuf_oneof:"data"`
-	TxHash    string            `protobuf:"bytes,4,opt,name=tx_hash,json=txHash,proto3" json:"tx_hash,omitempty"`
-	Timestamp string            `protobuf:"bytes,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	Metadata  *Metadata         `protobuf:"bytes,6,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	Data     *types.Any `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	Metadata *Metadata  `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
 }
 
 func (m *StateValue) Reset()         { *m = StateValue{} }
@@ -66,66 +61,11 @@ func (m *StateValue) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_StateValue proto.InternalMessageInfo
 
-type isStateValue_Data interface {
-	isStateValue_Data()
-	MarshalTo([]byte) (int, error)
-	Size() int
-}
-
-type StateValue_Did struct {
-	Did *Did `protobuf:"bytes,1,opt,name=did,proto3,oneof" json:"did,omitempty"`
-}
-type StateValue_Schema struct {
-	Schema *Schema `protobuf:"bytes,2,opt,name=schema,proto3,oneof" json:"schema,omitempty"`
-}
-type StateValue_CredDef struct {
-	CredDef *CredDef `protobuf:"bytes,3,opt,name=cred_def,json=credDef,proto3,oneof" json:"cred_def,omitempty"`
-}
-
-func (*StateValue_Did) isStateValue_Data()     {}
-func (*StateValue_Schema) isStateValue_Data()  {}
-func (*StateValue_CredDef) isStateValue_Data() {}
-
-func (m *StateValue) GetData() isStateValue_Data {
+func (m *StateValue) GetData() *types.Any {
 	if m != nil {
 		return m.Data
 	}
 	return nil
-}
-
-func (m *StateValue) GetDid() *Did {
-	if x, ok := m.GetData().(*StateValue_Did); ok {
-		return x.Did
-	}
-	return nil
-}
-
-func (m *StateValue) GetSchema() *Schema {
-	if x, ok := m.GetData().(*StateValue_Schema); ok {
-		return x.Schema
-	}
-	return nil
-}
-
-func (m *StateValue) GetCredDef() *CredDef {
-	if x, ok := m.GetData().(*StateValue_CredDef); ok {
-		return x.CredDef
-	}
-	return nil
-}
-
-func (m *StateValue) GetTxHash() string {
-	if m != nil {
-		return m.TxHash
-	}
-	return ""
-}
-
-func (m *StateValue) GetTimestamp() string {
-	if m != nil {
-		return m.Timestamp
-	}
-	return ""
 }
 
 func (m *StateValue) GetMetadata() *Metadata {
@@ -133,15 +73,6 @@ func (m *StateValue) GetMetadata() *Metadata {
 		return m.Metadata
 	}
 	return nil
-}
-
-// XXX_OneofWrappers is for the internal use of the proto package.
-func (*StateValue) XXX_OneofWrappers() []interface{} {
-	return []interface{}{
-		(*StateValue_Did)(nil),
-		(*StateValue_Schema)(nil),
-		(*StateValue_CredDef)(nil),
-	}
 }
 
 // metadata
@@ -221,31 +152,27 @@ func init() {
 func init() { proto.RegisterFile("cheqd/stateValue.proto", fileDescriptor_8f10490b1a4abc33) }
 
 var fileDescriptor_8f10490b1a4abc33 = []byte{
-	// 369 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x52, 0x3d, 0x4f, 0xfa, 0x40,
-	0x1c, 0x6e, 0x81, 0x7f, 0xa1, 0xc7, 0xf0, 0x4f, 0xce, 0x44, 0x1a, 0x82, 0xb5, 0x32, 0xe1, 0x60,
-	0x31, 0x3a, 0x39, 0xb8, 0x00, 0x43, 0x1d, 0x5c, 0x8e, 0xc4, 0xc1, 0x85, 0x1c, 0xbd, 0x1f, 0xf6,
-	0x12, 0x4b, 0x2b, 0x3d, 0x08, 0x4e, 0x7e, 0x05, 0x3f, 0x8d, 0x9f, 0xc1, 0x91, 0xd1, 0xd1, 0xc0,
-	0x17, 0x31, 0xf7, 0x02, 0xba, 0x74, 0xe9, 0xf5, 0x9e, 0x97, 0x7b, 0xee, 0xb9, 0xfc, 0xd0, 0x71,
-	0x9c, 0xc0, 0x0b, 0xeb, 0x17, 0x82, 0x0a, 0x78, 0xa0, 0xcf, 0x4b, 0x08, 0xf3, 0x45, 0x26, 0x32,
-	0xdc, 0x52, 0x38, 0x67, 0xa1, 0x5a, 0xe7, 0x19, 0x03, 0xfd, 0xd7, 0xfe, 0xaf, 0x0d, 0x92, 0x52,
-	0xca, 0xf6, 0x91, 0x06, 0xe2, 0x05, 0xb0, 0x11, 0xcc, 0x0c, 0x88, 0xcd, 0xb1, 0x71, 0x02, 0x29,
-	0xd5, 0x58, 0xf7, 0xa3, 0x82, 0xd0, 0xf8, 0x90, 0x83, 0x2f, 0x51, 0x95, 0x71, 0xe6, 0xd9, 0x81,
-	0xdd, 0x6b, 0x5e, 0x75, 0xc2, 0x92, 0xbc, 0x70, 0xc4, 0x59, 0x64, 0x11, 0x29, 0xc5, 0x37, 0xc8,
-	0xd1, 0x07, 0x7a, 0x15, 0x65, 0x3a, 0x2d, 0x35, 0x8d, 0x95, 0x2c, 0xb2, 0x88, 0x31, 0xe0, 0x5b,
-	0xd4, 0x90, 0x17, 0x9c, 0x30, 0x98, 0x79, 0x55, 0x65, 0x0e, 0x4a, 0xcd, 0x43, 0xdd, 0x24, 0xb2,
-	0x48, 0xdd, 0x94, 0xc2, 0x2d, 0x54, 0x17, 0xeb, 0x49, 0x42, 0x8b, 0xc4, 0xab, 0x05, 0x76, 0xcf,
-	0x25, 0x8e, 0x58, 0x47, 0xb4, 0x48, 0x70, 0x07, 0xb9, 0x82, 0xa7, 0x50, 0x08, 0x9a, 0xe6, 0xde,
-	0x3f, 0x45, 0xfd, 0x02, 0x32, 0x35, 0x05, 0x41, 0x19, 0x15, 0xd4, 0x73, 0x54, 0xea, 0x59, 0x69,
-	0xea, 0xbd, 0x11, 0x92, 0x83, 0x65, 0xe0, 0xa0, 0x9a, 0x5c, 0xbb, 0x6f, 0xa8, 0xb1, 0x67, 0xb1,
-	0x87, 0xe4, 0xa5, 0xa8, 0x00, 0xfd, 0x72, 0x2e, 0xd9, 0x6f, 0x25, 0xb3, 0xcc, 0x99, 0x62, 0x2a,
-	0x9a, 0x31, 0x5b, 0x1c, 0xa0, 0x26, 0x03, 0x1a, 0x0b, 0xbe, 0x52, 0xac, 0xec, 0xdf, 0x20, 0x7f,
-	0x21, 0x7c, 0x82, 0xd0, 0x0a, 0x16, 0x05, 0xcf, 0xe6, 0x13, 0xce, 0x4c, 0x45, 0xd7, 0x20, 0x77,
-	0x6c, 0x30, 0xfc, 0xdc, 0xfa, 0xf6, 0x66, 0xeb, 0xdb, 0xdf, 0x5b, 0xdf, 0x7e, 0xdf, 0xf9, 0xd6,
-	0x66, 0xe7, 0x5b, 0x5f, 0x3b, 0xdf, 0x7a, 0x3c, 0x7f, 0xe2, 0x22, 0x59, 0x4e, 0xc3, 0x38, 0x4b,
-	0xfb, 0x66, 0x0e, 0xe4, 0xf7, 0x42, 0x16, 0xeb, 0xaf, 0x0d, 0x24, 0x5e, 0x73, 0x28, 0xa6, 0x8e,
-	0x9a, 0x82, 0xeb, 0x9f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x46, 0x9a, 0x56, 0xd4, 0x72, 0x02, 0x00,
-	0x00,
+	// 307 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x90, 0xbf, 0x4e, 0xc3, 0x30,
+	0x10, 0xc6, 0xeb, 0x52, 0x41, 0xeb, 0x0e, 0x48, 0x06, 0x41, 0xa9, 0x84, 0x55, 0x3a, 0x95, 0x01,
+	0x47, 0x82, 0x99, 0x81, 0x3f, 0x0b, 0x03, 0x4b, 0x90, 0x18, 0x58, 0x90, 0x6b, 0x5f, 0xdb, 0x48,
+	0x6d, 0x1c, 0x12, 0xa7, 0x22, 0x13, 0xaf, 0xc0, 0x63, 0x31, 0x76, 0x64, 0x44, 0xc9, 0x8b, 0xa0,
+	0x9c, 0x9d, 0x8a, 0x85, 0xc5, 0xf6, 0xfd, 0xbe, 0xef, 0xb3, 0xcf, 0x47, 0x8f, 0xd4, 0x02, 0xde,
+	0x74, 0x90, 0x59, 0x69, 0xe1, 0x59, 0x2e, 0x73, 0x10, 0x49, 0x6a, 0xac, 0x61, 0xc7, 0xc8, 0x23,
+	0x2d, 0x70, 0x8f, 0x8d, 0x06, 0x77, 0x1a, 0xee, 0xbb, 0x40, 0x2d, 0xa1, 0x73, 0x78, 0xe0, 0x80,
+	0x4a, 0x41, 0xdf, 0xc3, 0xcc, 0x43, 0xe6, 0xaf, 0x55, 0x0b, 0x58, 0x49, 0xcf, 0x4e, 0xe6, 0xc6,
+	0xcc, 0x97, 0x10, 0x60, 0x35, 0xcd, 0x67, 0x81, 0x8c, 0x0b, 0x27, 0x8d, 0x73, 0x4a, 0x9f, 0xb6,
+	0x1d, 0xb0, 0x09, 0xed, 0x68, 0x69, 0xe5, 0x80, 0x8c, 0xc8, 0xa4, 0x7f, 0x79, 0x28, 0x5c, 0x4e,
+	0x34, 0x39, 0x71, 0x13, 0x17, 0x21, 0x3a, 0xd8, 0x35, 0xed, 0xae, 0xc0, 0x4a, 0x74, 0xb7, 0xd1,
+	0x7d, 0x26, 0xfe, 0x69, 0x5c, 0x3c, 0x7a, 0x63, 0xb8, 0x8d, 0x8c, 0x3f, 0x68, 0xb7, 0xa1, 0x6c,
+	0x40, 0xf7, 0x54, 0x0a, 0xd2, 0x82, 0xc6, 0x77, 0x7b, 0x61, 0x53, 0xd6, 0x4a, 0x9e, 0x68, 0x54,
+	0xda, 0x4e, 0xf1, 0x25, 0x1b, 0xd1, 0xbe, 0x06, 0xa9, 0x6c, 0xb4, 0x46, 0x75, 0x67, 0x44, 0x26,
+	0xdd, 0xf0, 0x2f, 0x62, 0xa7, 0x94, 0xae, 0x21, 0xcd, 0x22, 0x13, 0xbf, 0x46, 0x7a, 0xd0, 0xc1,
+	0x78, 0xcf, 0x93, 0x07, 0x7d, 0x7b, 0xf7, 0x55, 0x72, 0xb2, 0x29, 0x39, 0xf9, 0x29, 0x39, 0xf9,
+	0xac, 0x78, 0x6b, 0x53, 0xf1, 0xd6, 0x77, 0xc5, 0x5b, 0x2f, 0xe7, 0xf3, 0xc8, 0x2e, 0xf2, 0xa9,
+	0x50, 0x66, 0x15, 0xf8, 0x01, 0xd7, 0xeb, 0x45, 0xfd, 0xa1, 0xe0, 0xdd, 0x23, 0x5b, 0x24, 0x90,
+	0x4d, 0x77, 0x71, 0x30, 0x57, 0xbf, 0x01, 0x00, 0x00, 0xff, 0xff, 0xf6, 0xf9, 0x96, 0xfd, 0xcb,
+	0x01, 0x00, 0x00,
 }
 
 func (m *StateValue) Marshal() (dAtA []byte, err error) {
@@ -278,44 +205,11 @@ func (m *StateValue) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			i = encodeVarintStateValue(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0x32
-	}
-	if len(m.Timestamp) > 0 {
-		i -= len(m.Timestamp)
-		copy(dAtA[i:], m.Timestamp)
-		i = encodeVarintStateValue(dAtA, i, uint64(len(m.Timestamp)))
-		i--
-		dAtA[i] = 0x2a
-	}
-	if len(m.TxHash) > 0 {
-		i -= len(m.TxHash)
-		copy(dAtA[i:], m.TxHash)
-		i = encodeVarintStateValue(dAtA, i, uint64(len(m.TxHash)))
-		i--
-		dAtA[i] = 0x22
+		dAtA[i] = 0x12
 	}
 	if m.Data != nil {
 		{
-			size := m.Data.Size()
-			i -= size
-			if _, err := m.Data.MarshalTo(dAtA[i:]); err != nil {
-				return 0, err
-			}
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *StateValue_Did) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *StateValue_Did) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.Did != nil {
-		{
-			size, err := m.Did.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.Data.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -327,48 +221,7 @@ func (m *StateValue_Did) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	return len(dAtA) - i, nil
 }
-func (m *StateValue_Schema) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
 
-func (m *StateValue_Schema) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.Schema != nil {
-		{
-			size, err := m.Schema.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintStateValue(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x12
-	}
-	return len(dAtA) - i, nil
-}
-func (m *StateValue_CredDef) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *StateValue_CredDef) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.CredDef != nil {
-		{
-			size, err := m.CredDef.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintStateValue(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x1a
-	}
-	return len(dAtA) - i, nil
-}
 func (m *Metadata) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -441,14 +294,7 @@ func (m *StateValue) Size() (n int) {
 	var l int
 	_ = l
 	if m.Data != nil {
-		n += m.Data.Size()
-	}
-	l = len(m.TxHash)
-	if l > 0 {
-		n += 1 + l + sovStateValue(uint64(l))
-	}
-	l = len(m.Timestamp)
-	if l > 0 {
+		l = m.Data.Size()
 		n += 1 + l + sovStateValue(uint64(l))
 	}
 	if m.Metadata != nil {
@@ -458,42 +304,6 @@ func (m *StateValue) Size() (n int) {
 	return n
 }
 
-func (m *StateValue_Did) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Did != nil {
-		l = m.Did.Size()
-		n += 1 + l + sovStateValue(uint64(l))
-	}
-	return n
-}
-func (m *StateValue_Schema) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Schema != nil {
-		l = m.Schema.Size()
-		n += 1 + l + sovStateValue(uint64(l))
-	}
-	return n
-}
-func (m *StateValue_CredDef) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.CredDef != nil {
-		l = m.CredDef.Size()
-		n += 1 + l + sovStateValue(uint64(l))
-	}
-	return n
-}
 func (m *Metadata) Size() (n int) {
 	if m == nil {
 		return 0
@@ -555,7 +365,7 @@ func (m *StateValue) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Did", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Data", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -582,147 +392,14 @@ func (m *StateValue) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &Did{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if m.Data == nil {
+				m.Data = &types.Any{}
+			}
+			if err := m.Data.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Data = &StateValue_Did{v}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Schema", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowStateValue
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthStateValue
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthStateValue
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &Schema{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.Data = &StateValue_Schema{v}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CredDef", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowStateValue
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthStateValue
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthStateValue
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &CredDef{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.Data = &StateValue_CredDef{v}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TxHash", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowStateValue
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthStateValue
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthStateValue
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TxHash = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowStateValue
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthStateValue
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthStateValue
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Timestamp = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 6:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Metadata", wireType)
 			}

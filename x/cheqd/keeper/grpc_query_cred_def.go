@@ -20,5 +20,10 @@ func (k Keeper) CredDef(c context.Context, req *types.QueryGetCredDefRequest) (*
 		return nil, err
 	}
 
-	return &types.QueryGetCredDefResponse{CredDef: state.GetCredDef()}, nil
+	credDef, err := state.GetCredDef()
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.QueryGetCredDefResponse{CredDef: credDef, Metadata: state.Metadata}, nil
 }
