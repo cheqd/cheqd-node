@@ -1090,82 +1090,90 @@ func TestHandler_UpdateDid(t *testing.T) {
 }
 
 func TestHandler_CreateSchema(t *testing.T) {
-	setup := Setup()
+	// this test is not implemented
+	/*
+		setup := Setup()
 
-	keys, _, _ := setup.InitDid("did:cheqd:test:alice")
-	msg := setup.CreateSchema()
+		keys, _, _ := setup.InitDid("did:cheqd:test:alice")
+		msg := setup.CreateSchema()
 
-	data, _ := ptypes.NewAnyWithValue(msg)
-	result, _ := setup.Handler(setup.Ctx, setup.WrapRequest(data, keys))
+		data, _ := ptypes.NewAnyWithValue(msg)
+		result, _ := setup.Handler(setup.Ctx, setup.WrapRequest(data, keys))
 
-	schema := types.MsgCreateSchemaResponse{}
-	_ = schema.Unmarshal(result.Data)
+		schema := types.MsgCreateSchemaResponse{}
+		_ = schema.Unmarshal(result.Data)
 
-	// query Did
-	state, _ := setup.Keeper.GetSchema(setup.Ctx, schema.Id)
-	receivedSchema, _ := state.GetSchema()
+		// query Did
+		state, _ := setup.Keeper.GetSchema(setup.Ctx, schema.Id)
+		receivedSchema, _ := state.GetSchema()
 
-	require.Equal(t, schema.Id, receivedSchema.Id)
-	require.Equal(t, msg.Type, receivedSchema.Type)
-	require.Equal(t, msg.Name, receivedSchema.Name)
-	require.Equal(t, msg.Version, receivedSchema.Version)
-	require.Equal(t, msg.AttrNames, receivedSchema.AttrNames)
-	require.Equal(t, msg.Controller, receivedSchema.Controller)
+		require.Equal(t, schema.Id, receivedSchema.Id)
+		require.Equal(t, msg.Type, receivedSchema.Type)
+		require.Equal(t, msg.Name, receivedSchema.Name)
+		require.Equal(t, msg.Version, receivedSchema.Version)
+		require.Equal(t, msg.AttrNames, receivedSchema.AttrNames)
+		require.Equal(t, msg.Controller, receivedSchema.Controller)*/
 }
 
 func TestHandler_CreateCredDef(t *testing.T) {
-	setup := Setup()
+	// this test is not implemented
+	/*
+		setup := Setup()
 
-	keys, _, _ := setup.InitDid("did:cheqd:test:alice")
-	msg := setup.CreateCredDef()
+		keys, _, _ := setup.InitDid("did:cheqd:test:alice")
+		msg := setup.CreateCredDef()
 
-	data, _ := ptypes.NewAnyWithValue(msg)
-	result, _ := setup.Handler(setup.Ctx, setup.WrapRequest(data, keys))
+		data, _ := ptypes.NewAnyWithValue(msg)
+		result, _ := setup.Handler(setup.Ctx, setup.WrapRequest(data, keys))
 
-	credDef := types.MsgCreateCredDefResponse{}
-	err := credDef.Unmarshal(result.Data)
+		credDef := types.MsgCreateCredDefResponse{}
+		err := credDef.Unmarshal(result.Data)
 
-	if err != nil {
-		log.Fatal(err)
-	}
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	// query Did
-	//state, _ := setup.Keeper.GetCredDef(setup.Ctx, credDef.Id)
-	//receivedCredDef, _ := state.GetCredDef()
+		// query Did
+		//state, _ := setup.Keeper.GetCredDef(setup.Ctx, credDef.Id)
+		//receivedCredDef, _ := state.GetCredDef()
 
-	//expectedValue := msg.Value.(*types.MsgCreateCredDef_ClType)
-	//actualValue := receivedCredDef.Value.(*types.CredDef_ClType)
+		//expectedValue := msg.Value.(*types.MsgCreateCredDef_ClType)
+		//actualValue := receivedCredDef.Value.(*types.CredDef_ClType)
 
-	//require.Equal(t, credDef.Id, receivedCredDef.Id)
-	//require.Equal(t, expectedValue.ClType, actualValue.ClType)
-	//require.Equal(t, msg.SchemaId, receivedCredDef.SchemaId)
-	//require.Equal(t, msg.Tag, receivedCredDef.Tag)
-	//require.Equal(t, msg.Type, receivedCredDef.Type)
-	//require.Equal(t, msg.Controller, receivedCredDef.Controller)
+		//require.Equal(t, credDef.Id, receivedCredDef.Id)
+		//require.Equal(t, expectedValue.ClType, actualValue.ClType)
+		//require.Equal(t, msg.SchemaId, receivedCredDef.SchemaId)
+		//require.Equal(t, msg.Tag, receivedCredDef.Tag)
+		//require.Equal(t, msg.Type, receivedCredDef.Type)
+		//require.Equal(t, msg.Controller, receivedCredDef.Controller)
+	*/
 }
 
 func TestHandler_DidDocAlreadyExists(t *testing.T) {
 	setup := Setup()
 
-	keys, _, _ := setup.InitDid("did:cheqd:test:alice")
+	_, _, _ = setup.InitDid("did:cheqd:test:alice")
 	_, _, err := setup.InitDid("did:cheqd:test:alice")
 
 	require.Error(t, err)
 	require.Equal(t, "DID is already used by DIDDoc did:cheqd:test:alice: DID Doc exists", err.Error())
 
-	credDefMsg := setup.CreateCredDef()
-	data, _ := ptypes.NewAnyWithValue(credDefMsg)
-	_, _ = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys))
-	_, err = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys))
+	// cred_def and schmea is not implemented
+	/*
+		credDefMsg := setup.CreateCredDef()
+		data, _ := ptypes.NewAnyWithValue(credDefMsg)
+		_, _ = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys))
+		_, err = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys))
 
-	require.Error(t, err)
-	require.Equal(t, "DID is already used by CredDef did:cheqd:test:cred-def-1: DID Doc exists", err.Error())
+		require.Error(t, err)
+		require.Equal(t, "DID is already used by CredDef did:cheqd:test:cred-def-1: DID Doc exists", err.Error())
 
-	schemaMsg := setup.CreateSchema()
-	data, _ = ptypes.NewAnyWithValue(schemaMsg)
-	_, _ = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys))
-	_, err = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys))
+		schemaMsg := setup.CreateSchema()
+		data, _ = ptypes.NewAnyWithValue(schemaMsg)
+		_, _ = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys))
+		_, err = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys))
 
-	require.Error(t, err)
-	require.Equal(t, "DID is already used by Schema did:cheqd:test:schema-1: DID Doc exists", err.Error())
+		require.Error(t, err)
+		require.Equal(t, "DID is already used by Schema did:cheqd:test:schema-1: DID Doc exists", err.Error())
+	*/
 }

@@ -34,7 +34,7 @@ func TestDIDDocVerificationMethodChangedWithoutOldSignature(t *testing.T) {
 	bobKeys, _, _ := setup.InitDid("did:cheqd:test:bob")
 
 	updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
-	updatedDidDoc.VerificationMethod[0].Type = "SchnorrSecp256k1VerificationKey2019"
+	updatedDidDoc.VerificationMethod[0].Type = "Ed25519VerificationKey2020"
 	_, err := setup.SendUpdateDid(updatedDidDoc, bobKeys)
 
 	// check

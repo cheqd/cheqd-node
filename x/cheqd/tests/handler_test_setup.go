@@ -229,15 +229,15 @@ func (s *TestSetup) InitDid(did string) (map[string]ed25519.PrivateKey, *types.M
 }
 
 func (s *TestSetup) SendUpdateDid(msg *types.MsgUpdateDid, keys map[string]ed25519.PrivateKey) (*types.Did, error) {
-	data, err := ptypes.NewAnyWithValue(msg)
-	if err != nil {
-		return nil, err
-	}
-
 	// query Did
 	state, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
 	if len(msg.VersionId) == 0 {
 		msg.VersionId = state.Metadata.VersionId
+	}
+
+	data, err := ptypes.NewAnyWithValue(msg)
+	if err != nil {
+		return nil, err
 	}
 
 	_, err = s.Handler(s.Ctx, s.WrapRequest(data, keys))
