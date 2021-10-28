@@ -29,7 +29,7 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
-// IsDidUsed checks if the did is used by DIDDoc, Schema or CredDef
+// IsDidUsed checks if the did is used by DIDDoc
 func (k Keeper) IsDidUsed(ctx sdk.Context, did string) bool {
 	return k.HasDid(ctx, did)
 }
