@@ -293,7 +293,7 @@ func TestCreateDID(t *testing.T) {
 			keys: map[string]KeyPair{
 				BobKey4: keys[BobKey4],
 			},
-			errMsg: "Authentication did:cheqd:test:bob#key-4 not found: invalid signature detected",
+			errMsg: "did:cheqd:test:bob#key-4: verification method not found: invalid signature detected",
 		},
 		{
 			valid: false,
@@ -308,7 +308,7 @@ func TestCreateDID(t *testing.T) {
 				BobKey4:     keys[BobKey4],
 				CharlieKey3: keys[CharlieKey3],
 			},
-			errMsg: "Authentication did:cheqd:test:bob#key-4 not found: invalid signature detected",
+			errMsg: "did:cheqd:test:bob#key-4: verification method not found: invalid signature detected",
 		},
 		{
 			valid: false,
@@ -348,7 +348,7 @@ func TestCreateDID(t *testing.T) {
 			keys: map[string]KeyPair{
 				"did:cheqd:test:123456qwertyui#key-2": GenerateKeyPair(),
 			},
-			errMsg: "Authentication did:cheqd:test:123456qwertyui#key-2 not found: invalid signature detected",
+			errMsg: "did:cheqd:test:123456qwertyui#key-2: verification method not found: invalid signature detected",
 		},
 		{
 			valid: false,
@@ -370,7 +370,7 @@ func TestCreateDID(t *testing.T) {
 				AliceKey1:                             keys[AliceKey1],
 				"did:cheqd:test:123456qwertyui#key-2": GenerateKeyPair(),
 			},
-			errMsg: "Authentication did:cheqd:test:123456qwertyui#key-2 not found: invalid signature detected",
+			errMsg: "did:cheqd:test:123456qwertyui#key-2: verification method not found: invalid signature detected",
 		},
 		{
 			valid: false,
@@ -546,7 +546,7 @@ func TestUpdateDid(t *testing.T) {
 					},
 				},
 			},
-			errMsg: "Authentication did:cheqd:test:alice#key-1 not found: invalid signature detected",
+			errMsg: "did:cheqd:test:alice#key-1: verification method not found: invalid signature detected",
 		},
 		{
 			valid: true,
@@ -755,7 +755,7 @@ func TestUpdateDid(t *testing.T) {
 					},
 				},
 			},
-			errMsg: "Authentication did:cheqd:test:alice#key-1 not found: invalid signature detected",
+			errMsg: "did:cheqd:test:alice#key-1: verification method not found: invalid signature detected",
 		},
 		{
 			valid: true,
