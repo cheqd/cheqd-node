@@ -22,7 +22,7 @@ func IsDidFragment(prefix string, didUrl string) bool {
 	}
 
 	did, _ := SplitDidUrlIntoDidAndFragment(didUrl)
-	return IsDid(prefix, did)
+	return IsValidDid(prefix, did)
 }
 
 func IsFullDidFragment(prefix string, didUrl string) bool {
@@ -31,7 +31,7 @@ func IsFullDidFragment(prefix string, didUrl string) bool {
 	}
 
 	did, _ := SplitDidUrlIntoDidAndFragment(didUrl)
-	return IsDid(prefix, did)
+	return IsValidDid(prefix, did)
 }
 
 func ResolveId(did string, methodId string) string {
@@ -45,9 +45,9 @@ func ResolveId(did string, methodId string) string {
 	return result
 }
 
-func ArrayContainsNotDid(prefix string, array []string) (bool, int) {
+func IsNotValidDIDArray(prefix string, array []string) (bool, int) {
 	for i, did := range array {
-		if IsNotDid(prefix, did) {
+		if !IsValidDid(prefix, did) {
 			return true, i
 		}
 	}
@@ -55,7 +55,7 @@ func ArrayContainsNotDid(prefix string, array []string) (bool, int) {
 	return false, 0
 }
 
-func ArrayContainsNotDidFragment(prefix string, array []string) (bool, int) {
+func IsNotValidDIDArrayFragment(prefix string, array []string) (bool, int) {
 	for i, did := range array {
 		if !IsDidFragment(prefix, did) {
 			return true, i
@@ -65,11 +65,7 @@ func ArrayContainsNotDidFragment(prefix string, array []string) (bool, int) {
 	return false, 0
 }
 
-func IsNotDid(prefix string, did string) bool {
-	return !IsDid(prefix, did)
-}
-
-func IsDid(prefix string, did string) bool {
+func IsValidDid(prefix string, did string) bool {
 	if len(did) == 0 {
 		return false
 	}

@@ -1,6 +1,6 @@
 package strings
 
-func Index(vs []string, t string) int {
+func IndexOf(vs []string, t string) int {
 	for i, v := range vs {
 		if v == t {
 			return i
@@ -10,8 +10,8 @@ func Index(vs []string, t string) int {
 	return -1
 }
 
-func Include(vs []string, t string) bool {
-	return Index(vs, t) >= 0
+func Contains(vs []string, t string) bool {
+	return IndexOf(vs, t) >= 0
 }
 
 func Filter(vs []string, f func(string) bool) []string {
@@ -26,6 +26,6 @@ func Filter(vs []string, f func(string) bool) []string {
 
 func Complement(vs []string, ts []string) []string {
 	return Filter(vs, func(s string) bool {
-		return !Include(ts, s)
+		return !Contains(ts, s)
 	})
 }

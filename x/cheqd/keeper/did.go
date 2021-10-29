@@ -37,7 +37,7 @@ func (k Keeper) SetDidCount(ctx sdk.Context, count uint64) {
 	store.Set(byteKey, bz)
 }
 
-// AppendDid appends a did in the store with a new id and update the count
+// AppendDid appends a did in the store with a new id and updates the count
 func (k Keeper) AppendDid(ctx sdk.Context, did types.Did, metadata *types.Metadata) (*string, error) {
 	// Create the did
 	count := k.GetDidCount(ctx)

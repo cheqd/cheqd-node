@@ -8,13 +8,11 @@ import (
 func FindPublicKey(signer types.Signer, id string) (ed25519.PublicKey, error) {
 	for _, authentication := range signer.Authentication {
 		if authentication == id {
-			for _, vm := range signer.VerificationMethod {
-				if vm.Id == id {
-					return vm.GetPublicKey()
-				}
+			vm := FindVerificationMethod(signer.VerificationMethod, id)
+			if vm == nil {
+				return nil, types.ErrVerificationMethodNotFound.Wrap(id)
 			}
-
-			return nil, types.ErrVerificationMethodNotFound.Wrap(id)
+			return vm.GetPublicKey()
 		}
 	}
 

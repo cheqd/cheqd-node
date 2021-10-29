@@ -17,10 +17,10 @@ var ServiceType = []string{
 	"DIDCommMessaging",
 }
 
-func IsVerificationMethodType(vmType string) string {
+func GetVerificationMethodType(vmType string) string {
 	return VerificationMethodType[vmType]
 }
 
-func IsDidServiceType(sType string) bool {
-	return strings.Include(ServiceType, sType)
+func IsValidDidServiceType(sType string) bool {
+	return strings.Contains(ServiceType, sType)
 }
