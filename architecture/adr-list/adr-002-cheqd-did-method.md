@@ -335,12 +335,43 @@ WriteRequest{
 
 Using GetDid query DIDDoc can be received from the ledger.
 `QueryGetDidResponse(id)`
+```json
+{
+  "id":"did:cheqd:mainnet:2PRyVHmkXQnQzJQKxHxnXC"
+}
+```
 
 Response format from Tendermint RPC interface is `QueryGetDidResponse` protobuf:
-```cjson
-
+```json
+{
+   "did":{
+      "id":"did:cheqd:mainnet:2PRyVHmkXQnQzJQKxHxnXC",
+      "controller":[
+         "did:cheqd:mainnet:2PRyVHmkXQnQzJQKxHxnXC"
+      ],
+      "verification_method":[
+         {
+            "id":"did:cheqd:mainnet:2PRyVHmkXQnQzJQKxHxnXC#verkey",
+            "type":"Ed25519VerificationKey2020",
+            "controller":"did:cheqd:mainnet:2PRyVHmkXQnQzJQKxHxnXC",
+            "public_key_multibase":"zkqa2HyagzfMAq42H5f9u3UMwnSBPQx2QfrSyXbUPxMn"
+         }
+      ],
+      "authentication":[
+         "did:cheqd:mainnet:2PRyVHmkXQnQzJQKxHxnXC#verkey"
+      ]
+   },
+   "metadata":{
+      "created":"2021-10-26 13:35:17.8230284 +0000 UTC",
+      "updated":"2021-10-26 13:35:17.8230284 +0000 UTC",
+      "deactivated":false,
+      "version_id":"1B3B00849B4D50E8FCCF50193E35FD6CA5FD4686ED6AD8F847AC8C5E466CFD3E"
+   }
+}
 
 ```
+- **`did`**: contains DIDDoc properties. [DIDDoc structure](#did-documents-diddocs)
+- **`metadata`**: contains DIDDoc metadata. [DIDDoc metadata](#diddoc-metadata)
 
 ### Security Considerations
 
