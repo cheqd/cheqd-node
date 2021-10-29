@@ -2,6 +2,8 @@ syntax = "proto3";
 package cheqdid.cheqdnode.cheqd;
 
 // this line is used by starport scaffolding # genesis/proto/import
+import "cheqd/credDef.proto";
+import "cheqd/schema.proto";
 import "cheqd/did.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";

@@ -4,6 +4,7 @@ package cheqdid.cheqdnode.cheqd;
 option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
 import "google/protobuf/any.proto";
+import "gogoproto/gogo.proto";
 import "cheqd/common.proto";
 
 message Did {

@@ -4,6 +4,8 @@ package cheqdid.cheqdnode.cheqd;
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 // this line is used by starport scaffolding # 1
+import "cheqd/credDef.proto";
+import "cheqd/schema.proto";
 import "cheqd/did.proto";
 import "cheqd/stateValue.proto";
 
@@ -11,9 +13,37 @@ option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
 // Query defines the gRPC querier service.
 service Query {
+    // this line is used by starport scaffolding # 2
+	rpc CredDef(QueryGetCredDefRequest) returns (QueryGetCredDefResponse) {
+		option (google.api.http).get = "/cheqd/cheqdnode/cheqd/credDef/{id}";
+	}
+
+	rpc Schema(QueryGetSchemaRequest) returns (QueryGetSchemaResponse) {
+		option (google.api.http).get = "/cheqd/cheqdnode/cheqd/schema/{id}";
+	}
+
 	rpc Did(QueryGetDidRequest) returns (QueryGetDidResponse) {
 		option (google.api.http).get = "/cheqd/cheqdnode/cheqd/did/{id}";
 	}
+}
+
+// this line is used by starport scaffolding # 3
+message QueryGetCredDefRequest {
+	string id = 1;
+}
+
+message QueryGetCredDefResponse {
+	CredDef cred_def = 1;
+	Metadata metadata = 2;
+}
+
+message QueryGetSchemaRequest {
+	string id = 1;
+}
+
+message QueryGetSchemaResponse {
+	Schema schema = 1;
+	Metadata metadata = 2;
 }
 
 message QueryGetDidRequest {

@@ -1,0 +1,15 @@
+syntax = "proto3";
+package cheqdid.cheqdnode.cheqd;
+
+option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
+
+import "gogoproto/gogo.proto";
+
+message Schema {
+  string id = 1;
+  string type = 2;
+  string name = 3;
+  string version = 4;
+  repeated string attr_names = 5;
+  repeated string controller = 6;
+}

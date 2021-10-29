@@ -23,6 +23,14 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 		switch parsedMsg.Data.TypeUrl {
 		// this line is used by starport scaffolding # 1
+		case types.MessageCreateCredDef:
+			res, err := msgServer.CreateCredDef(sdk.WrapSDKContext(ctx), parsedMsg)
+			return sdk.WrapServiceResult(ctx, res, err)
+
+		case types.MessageCreateSchema:
+			res, err := msgServer.CreateSchema(sdk.WrapSDKContext(ctx), parsedMsg)
+			return sdk.WrapServiceResult(ctx, res, err)
+
 		case types.MessageCreateDid:
 			res, err := msgServer.CreateDid(sdk.WrapSDKContext(ctx), parsedMsg)
 			return sdk.WrapServiceResult(ctx, res, err)

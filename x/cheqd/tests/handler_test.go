@@ -3,9 +3,12 @@ package tests
 import (
 	"crypto/ed25519"
 	"github.com/btcsuite/btcutil/base58"
+	"log"
 	"testing"
 
+	"crypto/rand"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	ptypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/stretchr/testify/require"
 )
 
@@ -1044,6 +1047,108 @@ func TestUpdateDid(t *testing.T) {
 	}
 }
 
+func TestHandler_UpdateDid(t *testing.T) {
+	setup := Setup()
+
+	//Init did
+	keys, did, _ := setup.InitDid("did:cheqd:test:alice")
+
+	// query Did
+	state, _ := setup.Keeper.GetDid(&setup.Ctx, did.Id)
+
+	//Init priv key
+	newPubKey, _, _ := ed25519.GenerateKey(rand.Reader)
+
+	oldDid, _ := state.GetDid()
+	didMsgUpdate := setup.UpdateDid(oldDid, newPubKey, state.Metadata.VersionId)
+	dataUpdate, _ := ptypes.NewAnyWithValue(didMsgUpdate)
+	resultUpdate, _ := setup.Handler(setup.Ctx, setup.WrapRequest(dataUpdate, keys))
+
+	didUpdated := types.MsgUpdateDidResponse{}
+	errUpdate := didUpdated.Unmarshal(resultUpdate.Data)
+
+	if errUpdate != nil {
+		log.Fatal(errUpdate)
+	}
+
+	// query Did
+	updatedState, _ := setup.Keeper.GetDid(&setup.Ctx, did.Id)
+	receivedUpdatedDid, _ := updatedState.GetDid()
+
+	// check
+	require.Equal(t, didUpdated.Id, receivedUpdatedDid.Id)
+	require.Equal(t, didMsgUpdate.Controller, receivedUpdatedDid.Controller)
+	require.Equal(t, didMsgUpdate.VerificationMethod, receivedUpdatedDid.VerificationMethod)
+	require.Equal(t, didMsgUpdate.Authentication, receivedUpdatedDid.Authentication)
+	require.Equal(t, didMsgUpdate.AssertionMethod, receivedUpdatedDid.AssertionMethod)
+	require.Equal(t, didMsgUpdate.CapabilityInvocation, receivedUpdatedDid.CapabilityInvocation)
+	require.Equal(t, didMsgUpdate.CapabilityDelegation, receivedUpdatedDid.CapabilityDelegation)
+	require.Equal(t, didMsgUpdate.KeyAgreement, receivedUpdatedDid.KeyAgreement)
+	require.Equal(t, didMsgUpdate.AlsoKnownAs, receivedUpdatedDid.AlsoKnownAs)
+	require.Equal(t, didMsgUpdate.Service, receivedUpdatedDid.Service)
+	require.NotEqual(t, oldDid.VerificationMethod, receivedUpdatedDid.VerificationMethod)
+}
+
+func TestHandler_CreateSchema(t *testing.T) {
+	// this test is not implemented
+	/*
+		setup := Setup()
+
+		keys, _, _ := setup.InitDid("did:cheqd:test:alice")
+		msg := setup.CreateSchema()
+
+		data, _ := ptypes.NewAnyWithValue(msg)
+		result, _ := setup.Handler(setup.Ctx, setup.WrapRequest(data, keys))
+
+		schema := types.MsgCreateSchemaResponse{}
+		_ = schema.Unmarshal(result.Data)
+
+		// query Did
+		state, _ := setup.Keeper.GetSchema(setup.Ctx, schema.Id)
+		receivedSchema, _ := state.GetSchema()
+
+		require.Equal(t, schema.Id, receivedSchema.Id)
+		require.Equal(t, msg.Type, receivedSchema.Type)
+		require.Equal(t, msg.Name, receivedSchema.Name)
+		require.Equal(t, msg.Version, receivedSchema.Version)
+		require.Equal(t, msg.AttrNames, receivedSchema.AttrNames)
+		require.Equal(t, msg.Controller, receivedSchema.Controller)*/
+}
+
+func TestHandler_CreateCredDef(t *testing.T) {
+	// this test is not implemented
+	/*
+		setup := Setup()
+
+		keys, _, _ := setup.InitDid("did:cheqd:test:alice")
+		msg := setup.CreateCredDef()
+
+		data, _ := ptypes.NewAnyWithValue(msg)
+		result, _ := setup.Handler(setup.Ctx, setup.WrapRequest(data, keys))
+
+		credDef := types.MsgCreateCredDefResponse{}
+		err := credDef.Unmarshal(result.Data)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// query Did
+		//state, _ := setup.Keeper.GetCredDef(setup.Ctx, credDef.Id)
+		//receivedCredDef, _ := state.GetCredDef()
+
+		//expectedValue := msg.Value.(*types.MsgCreateCredDef_ClType)
+		//actualValue := receivedCredDef.Value.(*types.CredDef_ClType)
+
+		//require.Equal(t, credDef.Id, receivedCredDef.Id)
+		//require.Equal(t, expectedValue.ClType, actualValue.ClType)
+		//require.Equal(t, msg.SchemaId, receivedCredDef.SchemaId)
+		//require.Equal(t, msg.Tag, receivedCredDef.Tag)
+		//require.Equal(t, msg.Type, receivedCredDef.Type)
+		//require.Equal(t, msg.Controller, receivedCredDef.Controller)
+	*/
+}
+
 func TestHandler_DidDocAlreadyExists(t *testing.T) {
 	setup := Setup()
 
@@ -1052,4 +1157,23 @@ func TestHandler_DidDocAlreadyExists(t *testing.T) {
 
 	require.Error(t, err)
 	require.Equal(t, "DID is already used by DIDDoc did:cheqd:test:alice: DID Doc exists", err.Error())
+
+	// cred_def and schmea is not implemented
+	/*
+		credDefMsg := setup.CreateCredDef()
+		data, _ := ptypes.NewAnyWithValue(credDefMsg)
+		_, _ = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys))
+		_, err = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys))
+
+		require.Error(t, err)
+		require.Equal(t, "DID is already used by CredDef did:cheqd:test:cred-def-1: DID Doc exists", err.Error())
+
+		schemaMsg := setup.CreateSchema()
+		data, _ = ptypes.NewAnyWithValue(schemaMsg)
+		_, _ = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys))
+		_, err = setup.Handler(setup.Ctx, setup.WrapRequest(data, keys))
+
+		require.Error(t, err)
+		require.Equal(t, "DID is already used by Schema did:cheqd:test:schema-1: DID Doc exists", err.Error())
+	*/
 }
