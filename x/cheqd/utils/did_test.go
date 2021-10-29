@@ -25,7 +25,7 @@ func TestIsDid(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		isDid := IsDid("did:cheqd:test:", tc.did)
+		isDid := IsValidDid("did:cheqd:test:", tc.did)
 
 		if tc.valid {
 			require.True(t, isDid)
