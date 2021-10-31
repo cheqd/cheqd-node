@@ -1,21 +1,31 @@
 package types
 
-// DefaultIndex is the default capability global index
-const DefaultIndex uint64 = 1
+import "fmt"
 
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		// this line is used by starport scaffolding # genesis/types/default
-
+		DidList: []*StateValue{},
 	}
 }
 
 // Validate performs basic genesis state validation returning an error upon any
 // failure.
 func (gs GenesisState) Validate() error {
-	// this line is used by starport scaffolding # genesis/types/validate
-	// Check for duplicated ID in credDef
+	didIdMap := make(map[string]bool)
+
+	for _, elem := range gs.DidList {
+		did, err := elem.GetDid()
+		if err != nil {
+			return err
+		}
+
+		if _, ok := didIdMap[did.Id]; ok {
+			return fmt.Errorf("duplicated id for did")
+		}
+
+		didIdMap[did.Id] = true
+	}
 
 	return nil
 }
