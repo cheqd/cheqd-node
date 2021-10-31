@@ -1,0 +1,215 @@
+swagger: '2.0'
+info:
+  title: Cosmos SDK - Legacy REST and gRPC Gateway docs
+  description: 'A REST interface for state queries, legacy transactions'
+  version: 1.0.0
+
+paths:
+  /getDid:
+    get:
+      tags:
+        - Query
+      summary: return DID
+      operationId: returnDid
+      description: |
+        Return DID Document from the ledger by DID
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: id
+          description: id from DID Document. Fully qualified DID
+          required: true
+          type: string
+      responses:
+        200:
+          description: DID Document
+          schema:
+            $ref: '#/definitions/InventoryItem'
+        400:
+          description: bad input parameter
+  /createDid:
+    post:
+      tags:
+        - admins
+      summary: adds an inventory item
+      operationId: addInventory
+      description: Adds an item to the system
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: inventoryItem
+          description: Inventory item to add
+          schema:
+            $ref: '#/definitions/WriteRequest'
+      responses:
+        201:
+          description: item created
+        400:
+          description: invalid input, object invalid
+        409:
+          description: an existing item already exists
+definitions:
+  MsgWriteRequest:
+    type: object
+    required:
+      - data
+      - signatures
+    properties:
+      data:
+        type: object
+      signatures:
+        type: array
+        items:
+          $ref: '#/definitions/SignInfo'
+
+  SignInfo:
+    required:
+      - verification_method_id
+      - signature
+    properties:
+      verificationMethodId:
+        type: string
+        example: ACME Corporation
+      signature:
+        type: string
+        example:  https://www.acme-corp.com
+
+  MsgCreateDid:
+    required:
+      - context
+      - id
+      - controller
+      - verificationMethod
+      - authentication
+      - assertionMethod
+      - capabilityInvocation
+      - capabilityDelegation
+      - keyAgreement
+      - alsoKnownAs
+      - service
+    properties:
+      context:
+        type: array
+        items:
+          type: string
+      id:
+        type: string
+        example: did:cheqd:testnet:6cgbu8ZPoWTnR5Rv5JcSMB
+      verificationMethod:
+        type: array
+        items:
+          $ref: '#/definitions/VerificationMethod'
+      controller:
+        type: array
+        items:
+          type: string
+      authentication:
+        type: array
+        items:
+          type: string
+      assertionMethod:
+        type: array
+        items:
+          type: string
+      capabilityInvocation:
+        type: array
+        items:
+          type: string
+      capabilityDelegation:
+        type: array
+        items:
+          type: string
+      keyAgreement:
+        type: array
+        items:
+          type: string
+      alsoKnownAs:
+        type: array
+        items:
+          type: string
+      service:
+        type: array
+        items:
+          $ref: '#/definitions/ServiceEndpoint'
+
+  MsgCreateDidResponse:
+    required:
+      - id
+    properties:
+      id:
+        type: string
+        example: did:cheqd:testnet:6cgbu8ZPoWTnR5Rv5JcSMB
+
+  MsgUpdateDid:
+    required:
+      - context
+      - id
+      - controller
+      - verificationMethod
+      - authentication
+      - assertionMethod
+      - capabilityInvocation
+      - capabilityDelegation
+      - keyAgreement
+      - alsoKnownAs
+      - service
+      - versionId
+    properties:
+      context:
+        type: array
+        items:
+          type: string
+      id:
+        type: string
+        example: did:cheqd:testnet:6cgbu8ZPoWTnR5Rv5JcSMB
+      verificationMethod:
+        type: array
+        items:
+          $ref: '#/definitions/VerificationMethod'
+      controller:
+        type: array
+        items:
+          type: string
+      authentication:
+        type: array
+        items:
+          type: string
+      assertionMethod:
+        type: array
+        items:
+          type: string
+      capabilityInvocation:
+        type: array
+        items:
+          type: string
+      capabilityDelegation:
+        type: array
+        items:
+          type: string
+      keyAgreement:
+        type: array
+        items:
+          type: string
+      alsoKnownAs:
+        type: array
+        items:
+          type: string
+      service:
+        type: array
+        items:
+          $ref: '#/definitions/ServiceEndpoint'
+      versionId:
+        type: string
+        example: 1B3B00849B4D50E8FCCF50193E35FD6CA5FD4686ED6AD8F847AC8C5E466CFD3E
+
+  MsgUpdateDidResponse:
+    required:
+      - id
+    properties:
+      id:
+        type: string
+        example: did:cheqd:testnet:6cgbu8ZPoWTnR5Rv5JcSMB
