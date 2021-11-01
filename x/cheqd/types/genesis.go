@@ -2,10 +2,13 @@ package types
 
 import "fmt"
 
+const DidNamespace = "testnet"
+
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		DidList: []*StateValue{},
+		DidList:      []*StateValue{},
+		DidNamespace: DidNamespace,
 	}
 }
 
@@ -25,6 +28,10 @@ func (gs GenesisState) Validate() error {
 		}
 
 		didIdMap[did.Id] = true
+	}
+
+	if len(gs.GetDidNamespace()) == 0 {
+		return fmt.Errorf("DidNamespace is not set up")
 	}
 
 	return nil
