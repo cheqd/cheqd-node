@@ -204,6 +204,7 @@ jobs:
         run: |
           docker run -d --rm -p "26657:26657" cheqd-testnet
           sleep 60
+          docker ps
 
       - name: Set up test environment
         working-directory: ./tests/e2e
@@ -214,4 +215,4 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest -v -rP tests/e2e/test_identity.py
+          pytest -v -rP tests/e2e/test_identity.py::test_gas_estimation
