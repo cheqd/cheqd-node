@@ -203,6 +203,7 @@ jobs:
       - name: Run test net container
         run: |
           docker run -d --rm -p "26657:26657" cheqd-testnet
+          sleep 60
 
       - name: Set up test environment
         working-directory: ./tests/e2e
