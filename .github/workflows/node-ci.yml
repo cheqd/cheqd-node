@@ -51,7 +51,7 @@ jobs:
   build:
     name: Build binary and create deb package
     runs-on: ubuntu-20.04
-    needs: test
+    # needs: test
     steps:
       - name: Set up Go 1.16
         uses: actions/setup-go@v2
