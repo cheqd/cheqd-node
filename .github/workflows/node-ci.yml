@@ -194,15 +194,15 @@ jobs:
 
       - name: Build node image
         run: |
-          docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
+          docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node-debug --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
 
       - name: Build test net image
         run: |
-          docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
+          docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet-debug .
 
       - name: Run test net container
         run: |
-          docker run -d --rm -p "26657:26657" cheqd-testnet
+          docker run -d --rm -p "26657:26657" cheqd-testnet-debug
           sleep 60
           docker ps
 
@@ -215,4 +215,4 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest -v -rP tests/e2e/test_identity.py::test_did_positive
+          pytest -v -rP tests/e2e/test_identity.py
