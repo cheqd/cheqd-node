@@ -31,6 +31,7 @@ GAS_AMOUNT = 80000 # 70000 throws `out of gas` sometimes
 GAS_PRICE = 25
 TEST_NET_GAS_X_GAS_PRICES_INT = GAS_AMOUNT * GAS_PRICE
 
+# addresses and mnemonics for test net docker image
 SENDER_ADDRESS = "cheqd1rnr5jrt4exl0samwj0yegv99jeskl0hsxmcz96"
 SENDER_MNEMONIC = "sketch mountain erode window enact net enrich smoke claim kangaroo another visual write meat latin bacon pulp similar forum guilt father state erase bright"
 RECEIVER_ADDRESS= "cheqd1l9sq0se0jd3vklyrrtjchx4ua47awug5vsyeeh"
