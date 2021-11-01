@@ -1,4 +1,3 @@
-from ctypes import create_string_buffer
 import pytest
 import json
 import logging
@@ -12,7 +11,7 @@ from helpers import create_did_helper, query_did_helper, random_string, update_d
     SENDER_ADDRESS, SENDER_MNEMONIC, RECEIVER_ADDRESS, LOCAL_NET_NETWORK, TEST_NET_GAS_X_GAS_PRICES_INT, GAS_AMOUNT, GAS_PRICE, DENOM
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 key_alias = "operator0"
 default_amount = 1000
