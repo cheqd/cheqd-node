@@ -14,6 +14,8 @@ env:
   NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/tests/networks/docker_compose/node_configs"
   PACKAGE_NAME: "cheqd-node"
   VERSION: "9.9.9" # test deb package version to avoid issues with dpkg
+  OP0_ADDRESS: ""
+  OP1_ADDRESS: ""
 
 jobs:
   lint:
@@ -169,7 +171,6 @@ jobs:
       - name: Set up test environment
         working-directory: ./tests/e2e
         run: |
-          python3 --version
           pip3 install -r requirements.txt >> /dev/null
           pip3 install --force-reinstall 'git+https://gitlab.com/evernym/verity/vdr-tools.git@DEV-330#egg=vdr-tools&subdirectory=wrappers/python' -U
           cp -R ${NODE_CONFIGS_BASE}/client/.cheqdnode /home/runner/
@@ -204,7 +205,6 @@ jobs:
       - name: Set up test environment
         working-directory: ./tests/e2e
         run: |
-          python3 --version
           pip3 install -r requirements.txt >> /dev/null
           pip3 install --force-reinstall 'git+https://gitlab.com/evernym/verity/vdr-tools.git@DEV-330#egg=vdr-tools&subdirectory=wrappers/python' -U
 

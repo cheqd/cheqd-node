@@ -1,9 +1,7 @@
 import json
 import pytest
 import re
-import pexpect
-import os
-import shutil
+import time
 import getpass
 from hypothesis import settings, given, strategies, Phase, Verbosity
 from string import digits, ascii_letters
@@ -290,6 +288,7 @@ def test_tendermint(command, params, expected_output):
 @given(note=strategies.text(ascii_letters, min_size=1, max_size=512))
 def test_memo(note):
     tx_hash, tx_memo = send_with_note(note)
+    time.sleep(5) # FIXME
     run("cheqd-noded query", "tx", f"{tx_hash} {LOCAL_NET_DESTINATION}", fr"code: 0(.*?)memo: {tx_memo}(.*?)txhash: {tx_hash}") # check that txn has correct memo value
 
 

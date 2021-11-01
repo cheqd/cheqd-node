@@ -24,22 +24,17 @@ TEST_NET_DESTINATION_HTTP = f"{TEST_NET_NODE_HTTP} --chain-id 'cheqd-testnet-2'"
 LOCAL_NET_DESTINATION = f"{LOCAL_NET_NODE_TCP} --chain-id 'cheqd'"
 LOCAL_NET_DESTINATION_HTTP = f"{LOCAL_NET_NODE_HTTP} --chain-id 'cheqd'"
 TEST_NET_FEES = "--fees 5000000ncheq"
-TEST_NET_GAS_X_GAS_PRICES = "--gas 70000 --gas-prices 25ncheq"
+TEST_NET_GAS_X_GAS_PRICES = "--gas 80000 --gas-prices 25ncheq"
 YES_FLAG = "-y"
 DENOM = "ncheq"
 GAS_AMOUNT = 80000 # 70000 throws `out of gas` sometimes
 GAS_PRICE = 25
 TEST_NET_GAS_X_GAS_PRICES_INT = GAS_AMOUNT * GAS_PRICE
 
-# SENDER_ADDRESS = "cheqd1ece09txhq6nm9fkft9jh3mce6e48ftescs5jsw"
-# SENDER_MNEMONIC = "oil long siege student rent jar awkward park entry ripple enable company sort people little damp arrange wise slender push brief solve tattoo cycle"
-# RECEIVER_ADDRESS= "cheqd16d72a6kusmzml5mjhzjv63c9j5xnpsyqs8f3sk"
-# RECEIVER_MNEMONIC = "strike impact earth indoor man illness virus genuine rib control antenna loop neck rotate bargain original nasty size either try snap quiz stairs huge"
-
-SENDER_ADDRESS = "cheqd1t07jem7yv740rq29ctwecxyvm9qegq6rvdwkcp"
-SENDER_MNEMONIC = "exclude slam riot window wink peace lemon interest token accident pupil wall squirrel slight endless manage cereal celery local teach galaxy culture exact cliff"
-RECEIVER_ADDRESS= "cheqd1xrhxp68j8wuy62uhrsje6g90pld55e4ncls4uz"
-RECEIVER_MNEMONIC = "join coconut smooth number unfair future banner mad lawn deny virtual derive cradle brain business pyramid absorb crush couch cook cliff job poet differ"
+SENDER_ADDRESS = "cheqd1rnr5jrt4exl0samwj0yegv99jeskl0hsxmcz96"
+SENDER_MNEMONIC = "sketch mountain erode window enact net enrich smoke claim kangaroo another visual write meat latin bacon pulp similar forum guilt father state erase bright"
+RECEIVER_ADDRESS= "cheqd1l9sq0se0jd3vklyrrtjchx4ua47awug5vsyeeh"
+RECEIVER_MNEMONIC = "ugly dirt sorry girl prepare argue door man that manual glow scout bomb pigeon matter library transfer flower clown cat miss pluck drama dizzy"
 
 LOCAL_SENDER_ADDRESS = os.environ["OP0_ADDRESS"]
 LOCAL_RECEIVER_ADDRESS = os.environ["OP1_ADDRESS"]
