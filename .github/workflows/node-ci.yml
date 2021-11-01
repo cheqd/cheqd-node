@@ -215,4 +215,4 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest -v -rP tests/e2e/test_identity.py::test_gas_estimation
+          pytest -v -rP tests/e2e/test_identity.py::test_did_positive
