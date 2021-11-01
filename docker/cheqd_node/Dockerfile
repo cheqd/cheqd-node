@@ -33,7 +33,7 @@ RUN starport chain build
 
 #####  Run container  #####
 
-FROM debian:buster
+FROM ubuntu:focal
 
 # Node binary
 COPY --from=builder /go/bin/cheqd-noded /bin

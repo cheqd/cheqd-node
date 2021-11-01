@@ -57,13 +57,13 @@ This document provides guidance on how to install and configure a node for the c
 
    $ echo $SEEDS
    # Comma separated list should be printed
-
+   
    $ sed -i.bak 's/seeds = ""/seeds = "'$SEEDS'"/g' /etc/cheqd-node/config.toml
    ```
 
 7. **Set gas prices accepted by the node**
 
-   Search for the `minimum-gas-prices` parameter in the node configuration file `/etc/cheqd-node/config.toml` and set it to a non-empty value. The recommended value is `25ncheq`.
+   Search for the `minimum-gas-prices` parameter in the node configuration file `/etc/cheqd-node/app.toml` and set it to a non-empty value. The recommended value is `25ncheq`.
 
    For cheqd testnet, executing the following command will set this up correctly:
 

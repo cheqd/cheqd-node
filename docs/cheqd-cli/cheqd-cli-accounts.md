@@ -13,15 +13,13 @@ This document contains the commands for account management.
 #### Command
 
 ```bash
-cheqd-noded query bank balances <address> --node <url>
+cheqd-noded query bank balances <address>
 ```
 
 #### Example
 
 ```bash
-$ cheqd-noded query bank balances 
-
-cheqd1lxej42urme32ffqc3fjvz4ay8q5q9449f06t4v --node http://nodes.testnet.cheqd.network:26657
+cheqd-noded query bank balances cheqd1lxej42urme32ffqc3fjvz4ay8q5q9449f06t4v
 ```
 
 ### Transferring tokens
