@@ -1,5 +1,7 @@
 syntax = "proto3";
 package cheqdid.cheqdnode.cheqd;
+import "google/protobuf/any.proto";
+import "cheqd/did.proto";
 
 // this line is used by starport scaffolding # proto/tx/import
 
@@ -7,39 +9,54 @@ option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
 // Msg defines the Msg service.
 service Msg {
-    // this line is used by starport scaffolding # proto/tx/rpc
-  rpc CreateNym(MsgCreateNym) returns (MsgCreateNymResponse);
-  rpc UpdateNym(MsgUpdateNym) returns (MsgUpdateNymResponse);
-  rpc DeleteNym(MsgDeleteNym) returns (MsgDeleteNymResponse);
+  rpc CreateDid(MsgWriteRequest) returns (MsgCreateDidResponse);
+  rpc UpdateDid(MsgWriteRequest) returns (MsgUpdateDidResponse);
 }
 
 // this line is used by starport scaffolding # proto/tx/message
-message MsgCreateNym {
-  string creator = 1;
-  string alias = 2;
-  string verkey = 3;
-  string did = 4;
-  string role = 5;
+message MsgWriteRequest {
+  google.protobuf.Any data = 1;
+  repeated SignInfo signatures = 2;
 }
 
-message MsgCreateNymResponse {
-  uint64 id = 1;
+message SignInfo {
+  string verification_method_id = 1;
+  string signature = 2;
 }
 
-message MsgUpdateNym {
-  string creator = 1;
-  uint64 id = 2;
-  string alias = 3;
-  string verkey = 4;
-  string did = 5;
-  string role = 6;
+message MsgCreateDid {
+  string id = 1;
+  repeated string controller = 2;
+  repeated VerificationMethod verification_method = 3;
+  repeated string authentication = 4;
+  repeated string assertion_method = 5;
+  repeated string capability_invocation = 6;
+  repeated string capability_delegation = 7;
+  repeated string key_agreement = 8;
+  repeated string also_known_as = 9;
+  repeated ServiceEndpoint service = 10;
+  repeated string context = 11;
 }
 
-message MsgUpdateNymResponse { }
-
-message MsgDeleteNym {
-  string creator = 1;
-  uint64 id = 2;
+message MsgCreateDidResponse {
+  string id = 1;
 }
 
-message MsgDeleteNymResponse { }
+message MsgUpdateDid {
+  string id = 1;
+  repeated string controller = 2;
+  repeated VerificationMethod verification_method = 3;
+  repeated string authentication = 4;
+  repeated string assertion_method = 5;
+  repeated string capability_invocation = 6;
+  repeated string capability_delegation = 7;
+  repeated string key_agreement = 8;
+  repeated string also_known_as = 9;
+  repeated ServiceEndpoint service = 10;
+  repeated string context = 11;
+  string version_id = 12;
+}
+
+message MsgUpdateDidResponse {
+  string id = 1;
+}

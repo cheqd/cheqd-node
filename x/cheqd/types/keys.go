@@ -13,8 +13,9 @@ const (
 	// QuerierRoute defines the module's query routing key
 	QuerierRoute = ModuleName
 
-	// MemStoreKey defines the in-memory store key
-	MemStoreKey = "mem_capability"
+	DidMethod = ModuleName
+
+	DidPrefix = "did"
 )
 
 func KeyPrefix(p string) []byte {
@@ -22,6 +23,6 @@ func KeyPrefix(p string) []byte {
 }
 
 const (
-	NymKey      = "Nym-value-"
-	NymCountKey = "Nym-count-"
+	DidKey      = "did:"
+	DidCountKey = "did-count:"
 )
