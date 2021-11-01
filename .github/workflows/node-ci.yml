@@ -14,8 +14,6 @@ env:
   NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/tests/networks/docker_compose/node_configs"
   PACKAGE_NAME: "cheqd-node"
   VERSION: "9.9.9" # test deb package version to avoid issues with dpkg
-  OP0_ADDRESS: ""
-  OP1_ADDRESS: ""
 
 jobs:
   # lint:
@@ -215,4 +213,6 @@ jobs:
 
       - name: Run tests
         run: |
+          export OP0_ADDRESS=""
+          export OP1_ADDRESS=""
           pytest -v -rP tests/e2e/test_identity.py
