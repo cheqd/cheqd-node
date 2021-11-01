@@ -19,7 +19,7 @@ default_amount = 1000
 default_memo = "test_memo"
 MAX_GAS_MAGIC_NUMBER_NEGATIVE = 1.2
 MAX_GAS_MAGIC_NUMBER = 1.3
-LOCAL_POOL_HTTP = "http://localhost:26657/"
+LOCAL_POOL_HTTP = "http://127.0.0.1:26657/"
 FQ_PREFIX = "did:cheqd:cheqd:"
 
 
