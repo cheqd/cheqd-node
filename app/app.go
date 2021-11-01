@@ -100,7 +100,7 @@ import (
 )
 
 const Name = "cheqd-node"
-const ProtocolVersion = 1;
+const ProtocolVersion = 1
 
 // this line is used by starport scaffolding # stargate/wasm/app/enabledProposals
 
@@ -156,7 +156,7 @@ var (
 		minttypes.ModuleName:           {authtypes.Minter},
 		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
-		ibctransfertypes.ModuleName:	{authtypes.Minter, authtypes.Burner},
+		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		govtypes.ModuleName:            {authtypes.Burner},
 	}
 )
@@ -348,7 +348,7 @@ func New(
 	app.EvidenceKeeper = *evidenceKeeper
 
 	app.cheqdKeeper = *cheqdkeeper.NewKeeper(
-		appCodec, keys[cheqdtypes.StoreKey], keys[cheqdtypes.MemStoreKey],
+		appCodec, keys[cheqdtypes.StoreKey],
 	)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
