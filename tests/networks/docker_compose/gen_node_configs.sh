@@ -57,7 +57,7 @@ MNEMONIC3="hand rifle extra notable hawk aunt swallow burden margin aspect solid
 for ((i=0 ; i<$VALIDATORS_COUNT ; i++))
 do
     temp=MNEMONIC$i
-    echo "${!temp}" | cheqd_noded_docker keys add "operator$i" --recover
+    cheqd_noded_docker_alt "echo \"${!temp}\" | cheqd-node keys add \"operator$i\" --recover"
 done
 
 echo "Creating genesis accounts..."
