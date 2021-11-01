@@ -20,8 +20,8 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgUpdateDid{},
 	)
 
-	registry.RegisterInterface(MessageCreateDid, (*IdentityMsg)(nil), &MsgCreateDid{})
-	registry.RegisterInterface(MessageUpdateDid, (*IdentityMsg)(nil), &MsgUpdateDid{})
+	registry.RegisterInterface(MessageCreateDid, (*IdentityMsg)(nil), &MsgCreateDidPayload{})
+	registry.RegisterInterface(MessageUpdateDid, (*IdentityMsg)(nil), &MsgUpdateDidPayload{})
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }
