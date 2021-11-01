@@ -201,7 +201,7 @@ jobs:
       - name: Run test net container
         run: |
           docker run -d --rm -p "26657:26657" cheqd-testnet-debug
-          sleep 180
+          sleep 30
           docker ps
           curl http://127.0.0.1:26657
 
@@ -210,7 +210,11 @@ jobs:
         run: |
           sudo cp libindy.so /usr/lib/libindy.so
           pip3 install -r requirements.txt >> /dev/null
-          pip3 install --force-reinstall 'git+https://gitlab.com/evernym/verity/vdr-tools.git@DEV-330#egg=vdr-tools&subdirectory=wrappers/python' -U
+          git clone https://gitlab.com/evernym/verity/vdr-tools.git
+          pushd vdr-tools
+          git checkout 21de3b374ba7252cea627a8e8badfe6adfbe042d
+          pip3 install -e wrappers/python/
+          popd
 
       - name: Run tests
         run: |
