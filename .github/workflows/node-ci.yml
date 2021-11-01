@@ -217,8 +217,15 @@ jobs:
           popd
 
       - name: Run tests
+        id: maybe_fails
         run: |
           export OP0_ADDRESS=""
           export OP1_ADDRESS=""
-          pytest -v -rP tests/e2e/test_identity.py::test_did_positive || echo "Fail!"
-          ls -la $HOME/.indy_client
+          pytest -v -rP tests/e2e/test_identity.py::test_did_positive 2> errors.txt || echo "Fail!"
+          echo ::set-output name=errors::`cat errors.txt`
+          exit 1
+
+      - name: Show logs on failure
+        if: ${{ failure() }}
+        run: |
+          echo ${{ steps.maybe_fails.outputs.errors }}
