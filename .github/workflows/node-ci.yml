@@ -220,4 +220,4 @@ jobs:
         run: |
           export OP0_ADDRESS=""
           export OP1_ADDRESS=""
-          pytest -v -rP tests/e2e/test_identity.py
+          pytest -v -rP tests/e2e/test_identity.py::test_did_positive

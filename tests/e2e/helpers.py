@@ -27,7 +27,7 @@ TEST_NET_FEES = "--fees 5000000ncheq"
 TEST_NET_GAS_X_GAS_PRICES = "--gas 90000 --gas-prices 25ncheq"
 YES_FLAG = "-y"
 DENOM = "ncheq"
-GAS_AMOUNT = 100000 # 70000 throws `out of gas` sometimes
+GAS_AMOUNT = 90000 # 70000 throws `out of gas` sometimes
 GAS_PRICE = 25
 TEST_NET_GAS_X_GAS_PRICES_INT = GAS_AMOUNT * GAS_PRICE
 

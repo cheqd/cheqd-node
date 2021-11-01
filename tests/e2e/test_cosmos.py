@@ -284,11 +284,11 @@ def test_tendermint(command, params, expected_output):
     run(command_base, command, params, expected_output)
 
 
-@settings(deadline=None, max_examples=5)
+@settings(deadline=None, max_examples=2)
 @given(note=strategies.text(ascii_letters, min_size=1, max_size=512))
 def test_memo(note):
     tx_hash, tx_memo = send_with_note(note)
-    time.sleep(10) # FIXME
+    time.sleep(15) # FIXME
     run("cheqd-noded query", "tx", f"{tx_hash} {LOCAL_NET_DESTINATION}", fr"code: 0(.*?)memo: {tx_memo}(.*?)txhash: {tx_hash}") # check that txn has correct memo value
 
 
