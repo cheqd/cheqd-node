@@ -201,8 +201,9 @@ jobs:
       - name: Run test net container
         run: |
           docker run -d --rm -p "26657:26657" cheqd-testnet-debug
-          sleep 60
+          sleep 180
           docker ps
+          curl http://127.0.0.1:26657
 
       - name: Set up test environment
         working-directory: ./tests/e2e
@@ -215,4 +216,4 @@ jobs:
         run: |
           export OP0_ADDRESS=""
           export OP1_ADDRESS=""
-          pytest -v -rP tests/e2e/test_identity.py
+          pytest -v -rP tests/e2e/test_identity.py::test_did_positive
