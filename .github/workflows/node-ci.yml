@@ -221,7 +221,7 @@ jobs:
         run: |
           export OP0_ADDRESS=""
           export OP1_ADDRESS=""
-          pytest -v -rP tests/e2e/test_identity.py::test_did_positive 2> errors.txt || echo "Fail!"
+          pytest -v -rP tests/e2e/test_identity.py::test_did_positive 2>&1 > errors.txt || echo "Fail!"
           echo ::set-output name=errors::`cat errors.txt`
           exit 1
 
