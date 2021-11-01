@@ -152,7 +152,7 @@ jobs:
         run: |
           sudo dpkg -i ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
 
-      - name: Check out code into the Go module directory
+      - name: Check out code
         uses: actions/checkout@v2
 
       - name: Build node image
@@ -186,19 +186,20 @@ jobs:
     runs-on: ubuntu-20.04
     needs: build-images-and-set-up-pool
     steps:
-      - name: Check out code into the Go module directory
+      - name: Check out code
         uses: actions/checkout@v2
 
       - name: Build node image
         run: |
           docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
 
-      - name: Set up 4 validators + 2 observers node docker pool for local test run
-        working-directory: ./tests/networks/docker_compose
+      - name: Build test net image
         run: |
-          ./gen_node_configs.sh
-          ./run_docker.sh
-          ./wait.sh '[[ $(curl -s -N localhost:26657/block | jq -cr '"'"'.result.block.last_commit.height'"'"') -gt 1 ]] && echo "Height is more than 1"'
+          docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
+
+      - name: Run test net container
+        run: |
+          docker run -d --rm -p "26657:26657" cheqd-testnet
 
       - name: Set up test environment
         working-directory: ./tests/e2e
