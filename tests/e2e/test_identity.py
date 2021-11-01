@@ -121,7 +121,8 @@ async def test_memo(memo):
 
 @pytest.mark.asyncio
 async def test_did_positive():
-    pool_alias = random_string(5)
+    # pool_alias = random_string(5)
+    pool_alias = "defined"
     await cheqd_pool.add(pool_alias, LOCAL_POOL_HTTP, LOCAL_NET_NETWORK)
     wallet_handle, _, _ = await wallet_helper()
     public_key = json.loads(

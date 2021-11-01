@@ -27,7 +27,7 @@ TEST_NET_FEES = "--fees 5000000ncheq"
 TEST_NET_GAS_X_GAS_PRICES = "--gas 90000 --gas-prices 25ncheq"
 YES_FLAG = "-y"
 DENOM = "ncheq"
-GAS_AMOUNT = 90000 # 70000 throws `out of gas` sometimes
+GAS_AMOUNT = 100000 # 70000 throws `out of gas` sometimes
 GAS_PRICE = 25
 TEST_NET_GAS_X_GAS_PRICES_INT = GAS_AMOUNT * GAS_PRICE
 
@@ -84,6 +84,8 @@ def send_with_note(note):
 
 
 async def send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, msg, memo):
+    res = await cheqd_pool.get_all_config()
+    print(res)
     timeout_height = await get_timeout_height(pool_alias)
     account_number, sequence_number = await get_base_account_number_and_sequence(pool_alias, sender_address)
     tx = await cheqd_ledger.auth.build_tx(
