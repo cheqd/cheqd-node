@@ -39,7 +39,7 @@ message MsgCreateDidPayload {
   repeated string capability_delegation = 7;
   repeated string key_agreement = 8;
   repeated string also_known_as = 9;
-  repeated ServiceEndpoint service = 10;
+  repeated Service service = 10;
   repeated string context = 11;
 }
 
@@ -57,7 +57,7 @@ message MsgUpdateDidPayload {
   repeated string capability_delegation = 7;
   repeated string key_agreement = 8;
   repeated string also_known_as = 9;
-  repeated ServiceEndpoint service = 10;
+  repeated Service service = 10;
   repeated string context = 11;
   string version_id = 12;
 }
