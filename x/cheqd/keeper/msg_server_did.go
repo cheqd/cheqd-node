@@ -20,7 +20,7 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 		return nil, err
 	}
 
-	if err := k.ValidateDidControllers(&ctx, didMsg.Controller, didMsg.VerificationMethod); err != nil {
+	if err := k.ValidateDidControllers(&ctx, didMsg.Id, didMsg.Controller, didMsg.VerificationMethod); err != nil {
 		return nil, err
 	}
 
@@ -82,7 +82,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 		return nil, err
 	}
 
-	if err := k.ValidateDidControllers(&ctx, didMsg.Controller, didMsg.VerificationMethod); err != nil {
+	if err := k.ValidateDidControllers(&ctx, didMsg.Id, didMsg.Controller, didMsg.VerificationMethod); err != nil {
 		return nil, err
 	}
 
@@ -191,15 +191,18 @@ func AppendSignerIfNeed(signers []types.Signer, controller string, msg *types.Ms
 	return append(signers, signer)
 }
 
-func (k msgServer) ValidateDidControllers(ctx *sdk.Context, controllers []string, verMethods []*types.VerificationMethod) error {
+func (k msgServer) ValidateDidControllers(ctx *sdk.Context, id string, controllers []string, verMethods []*types.VerificationMethod) error {
 
 	for _, verificationMethod := range verMethods {
-		return k.ValidateController(ctx, verificationMethod.Controller)
+		if err := k.ValidateController(ctx, id, verificationMethod.Controller); err != nil {
+			return err
+		}
 	}
 
 	for _, didController := range controllers {
-		return k.ValidateController(ctx, didController)
+		if err := k.ValidateController(ctx, id, didController); err != nil {
+			return err
+		}
 	}
-
 	return nil
 }

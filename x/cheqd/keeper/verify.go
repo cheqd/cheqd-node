@@ -50,7 +50,10 @@ func (k *Keeper) VerifySignature(ctx *sdk.Context, msg types.IdentityMsg, signer
 	return nil
 }
 
-func (k *Keeper) ValidateController(ctx *sdk.Context, controller string) error {
+func (k *Keeper) ValidateController(ctx *sdk.Context, id string, controller string) error {
+	if id == controller {
+		return nil
+	}
 	state, err := k.GetDid(ctx, controller)
 	if err != nil {
 		return types.ErrDidDocNotFound.Wrap(controller)
