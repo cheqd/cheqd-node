@@ -20,6 +20,18 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 		return nil, err
 	}
 
+	for _, verificationMethod := range didMsg.VerificationMethod {
+		if err := k.VerifyController(&ctx, verificationMethod.Controller); err != nil {
+			return nil, err
+		}
+	}
+
+	for _, didController := range didMsg.Controller {
+		if err := k.VerifyController(&ctx, didController); err != nil {
+			return nil, err
+		}
+	}
+
 	if err := k.VerifySignature(&ctx, didMsg, didMsg.GetSigners(), msg.GetSignatures()); err != nil {
 		return nil, err
 	}
