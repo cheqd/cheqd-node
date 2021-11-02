@@ -284,7 +284,7 @@ def test_tendermint(command, params, expected_output):
     run(command_base, command, params, expected_output)
 
 
-@settings(deadline=None, max_examples=5)
+@settings(deadline=None, max_examples=5) # investigate n and N memo issue
 @given(note=strategies.text(ascii_letters, min_size=1, max_size=512))
 def test_memo(note):
     tx_hash, tx_memo = send_with_note(note)
