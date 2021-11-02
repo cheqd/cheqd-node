@@ -205,10 +205,12 @@ jobs:
           docker ps
           curl http://127.0.0.1:26657
 
-      - name: Set up test environment
+      - name: Setup python
         uses: actions/setup-python@v2
         with:
           python-version: '3.6'
+
+      - name: Set up test environment
         working-directory: ./tests/e2e
         run: |
           sudo cp libindy.so /usr/lib/libindy.so
