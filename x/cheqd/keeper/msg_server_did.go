@@ -13,7 +13,7 @@ import (
 
 func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*types.MsgCreateDidResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	prefix := types.DidPrefix + ":" + types.DidMethod + ":" + k.GetDidNamespace(ctx) + ":"
+	prefix := k.GetDidPrefix(ctx)
 
 	didMsg := msg.GetPayload()
 	if err := didMsg.Validate(prefix); err != nil {
@@ -56,7 +56,7 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 
 func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*types.MsgUpdateDidResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	prefix := types.DidPrefix + ":" + types.DidMethod + ":" + k.GetDidNamespace(ctx) + ":"
+	prefix := k.GetDidPrefix(ctx)
 
 	didMsg := msg.GetPayload()
 	if err := didMsg.Validate(prefix); err != nil {

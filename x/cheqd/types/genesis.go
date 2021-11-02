@@ -30,9 +30,5 @@ func (gs GenesisState) Validate() error {
 		didIdMap[did.Id] = true
 	}
 
-	if len(gs.GetDidNamespace()) == 0 {
-		return fmt.Errorf("DidNamespace is not set up")
-	}
-
 	return nil
 }
