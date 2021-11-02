@@ -226,3 +226,4 @@ jobs:
         if: ${{ failure() }}
         run: |
           echo "Do something on failure..."
+          cat /tmp/tests.log
