@@ -225,7 +225,7 @@ jobs:
         run: |
           export OP0_ADDRESS=""
           export OP1_ADDRESS=""
-          pytest -v -s tests/e2e/test_identity.py::test_did_positive
+          RUST_LOG=trace pytest -v -s tests/e2e/test_identity.py::test_did_positive
 
       - name: Show logs on failure
         if: ${{ failure() }}
