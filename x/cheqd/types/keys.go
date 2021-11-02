@@ -26,3 +26,5 @@ const (
 	DidKey      = "did:"
 	DidCountKey = "did-count:"
 )
+
+const DidNamespaceKey = "did-namespace:"

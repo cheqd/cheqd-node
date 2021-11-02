@@ -68,6 +68,7 @@ func Setup() TestSetup {
 		Handler: handler,
 	}
 
+	setup.Keeper.SetDidNamespace(ctx, "test")
 	return setup
 }
 

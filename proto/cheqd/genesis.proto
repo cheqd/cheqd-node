@@ -8,6 +8,7 @@ option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
 // GenesisState defines the capability module's genesis state.
 message GenesisState {
-  repeated StateValue didList = 1;
+  string did_namespace = 1;
+  repeated StateValue didList = 2;
 }
 
