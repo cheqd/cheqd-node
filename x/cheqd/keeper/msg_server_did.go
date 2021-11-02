@@ -191,7 +191,7 @@ func AppendSignerIfNeed(signers []v1.Signer, controller string, msg *v1.MsgUpdat
 	return append(signers, signer)
 }
 
-func (k msgServer) ValidateDidControllers(ctx *sdk.Context, id string, controllers []string, verMethods []*types.VerificationMethod) error {
+func (k msgServer) ValidateDidControllers(ctx *sdk.Context, id string, controllers []string, verMethods []*v1.VerificationMethod) error {
 
 	for _, verificationMethod := range verMethods {
 		if err := k.ValidateController(ctx, id, verificationMethod.Controller); err != nil {

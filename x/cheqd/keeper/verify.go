@@ -62,7 +62,7 @@ func (k *Keeper) ValidateController(ctx *sdk.Context, id string, controller stri
 	if err != nil {
 		return v1.ErrDidDocNotFound.Wrap(controller)
 	}
-	if len(didDoc.Authentication) < 0 {
+	if len(didDoc.Authentication) == 0 {
 		return v1.ErrBadRequestInvalidVerMethod.Wrap(
 			fmt.Sprintf("Verificatition method controller %s doesn't have an authentication keys", controller))
 	}
