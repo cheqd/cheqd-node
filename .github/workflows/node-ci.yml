@@ -221,7 +221,7 @@ jobs:
         run: |
           export OP0_ADDRESS=""
           export OP1_ADDRESS=""
-          pytest -v -s tests/e2e/test_identity.py::test_did_positive
+          pytest -v -s tests/e2e/test_identity.py::test_did_positive 2>&1
 
       - name: Show logs on failure
         if: ${{ failure() }}
