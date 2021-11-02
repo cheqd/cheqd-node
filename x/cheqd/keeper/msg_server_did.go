@@ -11,21 +11,16 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgWriteRequest) (*types.MsgCreateDidResponse, error) {
+func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*types.MsgCreateDidResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	prefix := types.DidPrefix + ":" + types.DidMethod + ":" + ctx.ChainID() + ":"
 
-	var didMsg types.MsgCreateDid
-	err := k.cdc.Unmarshal(msg.Data.Value, &didMsg)
-	if err != nil {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", types.ModuleName, msg)
-	}
-
+	didMsg := msg.GetPayload()
 	if err := didMsg.Validate(prefix); err != nil {
 		return nil, err
 	}
 
-	if err := k.VerifySignature(&ctx, &didMsg, didMsg.GetSigners(), msg.GetSignatures()); err != nil {
+	if err := k.VerifySignature(&ctx, didMsg, didMsg.GetSigners(), msg.GetSignatures()); err != nil {
 		return nil, err
 	}
 
@@ -59,16 +54,11 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 	}, nil
 }
 
-func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) (*types.MsgUpdateDidResponse, error) {
+func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*types.MsgUpdateDidResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	prefix := types.DidPrefix + ":" + types.DidMethod + ":" + ctx.ChainID() + ":"
 
-	var didMsg types.MsgUpdateDid
-	err := k.cdc.Unmarshal(msg.Data.Value, &didMsg)
-	if err != nil {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", types.ModuleName, msg)
-	}
-
+	didMsg := msg.GetPayload()
 	if err := didMsg.Validate(prefix); err != nil {
 		return nil, err
 	}
@@ -88,7 +78,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 		return nil, err
 	}
 
-	if err := k.VerifySignatureOnDidUpdate(&ctx, oldDIDDoc, &didMsg, msg.Signatures); err != nil {
+	if err := k.VerifySignatureOnDidUpdate(&ctx, oldDIDDoc, didMsg, msg.Signatures); err != nil {
 		return nil, err
 	}
 
@@ -125,7 +115,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgWriteRequest) 
 	}, nil
 }
 
-func (k msgServer) VerifySignatureOnDidUpdate(ctx *sdk.Context, oldDIDDoc *types.Did, newDIDDoc *types.MsgUpdateDid, signatures []*types.SignInfo) error {
+func (k msgServer) VerifySignatureOnDidUpdate(ctx *sdk.Context, oldDIDDoc *types.Did, newDIDDoc *types.MsgUpdateDidPayload, signatures []*types.SignInfo) error {
 	var signers = newDIDDoc.GetSigners()
 
 	// Get Old DID Doc controller if it's nil then assign self
@@ -174,7 +164,7 @@ func (k msgServer) VerifySignatureOnDidUpdate(ctx *sdk.Context, oldDIDDoc *types
 	return nil
 }
 
-func AppendSignerIfNeed(signers []types.Signer, controller string, msg *types.MsgUpdateDid) []types.Signer {
+func AppendSignerIfNeed(signers []types.Signer, controller string, msg *types.MsgUpdateDidPayload) []types.Signer {
 	for _, signer := range signers {
 		if signer.Signer == controller {
 			return signers

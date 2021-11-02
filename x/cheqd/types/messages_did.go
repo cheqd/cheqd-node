@@ -2,145 +2,88 @@ package types
 
 import (
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"strings"
 )
 
-func NewMsgCreateDid(
-	id string,
-	controller []string,
-	verificationMethod []*VerificationMethod,
-	authentication []string,
-	assertionMethod []string,
-	capabilityInvocation []string,
-	capabilityDelegation []string,
-	keyAgreement []string,
-	alsoKnownAs []string,
-	service []*ServiceEndpoint,
-	context []string,
-) *MsgCreateDid {
+var _ sdk.Msg = &MsgCreateDid{}
+
+func NewMsgCreateDid(payload *MsgCreateDidPayload, signatures []*SignInfo) *MsgCreateDid {
 	return &MsgCreateDid{
-		Id:                   id,
-		Controller:           controller,
-		VerificationMethod:   verificationMethod,
-		Authentication:       authentication,
-		AssertionMethod:      assertionMethod,
-		CapabilityInvocation: capabilityInvocation,
-		CapabilityDelegation: capabilityDelegation,
-		KeyAgreement:         keyAgreement,
-		AlsoKnownAs:          alsoKnownAs,
-		Service:              service,
-		Context:              context,
+		Payload:    payload,
+		Signatures: signatures,
 	}
 }
 
-var _ IdentityMsg = &MsgCreateDid{}
-
-func (msg *MsgCreateDid) GetSigners() []Signer {
-	if len(msg.Controller) > 0 {
-		result := make([]Signer, len(msg.Controller))
-
-		for i, controller := range msg.Controller {
-			if controller == msg.Id {
-				result[i] = Signer{
-					Signer:             controller,
-					Authentication:     msg.Authentication,
-					VerificationMethod: msg.VerificationMethod,
-				}
-			} else {
-				result[i] = Signer{
-					Signer: controller,
-				}
-			}
-		}
-
-		return result
-	}
-
-	if len(msg.Authentication) > 0 {
-		return []Signer{
-			{
-				Signer:             msg.Id,
-				Authentication:     msg.Authentication,
-				VerificationMethod: msg.VerificationMethod,
-			},
-		}
-	}
-
-	return []Signer{}
+func (msg *MsgCreateDid) Route() string {
+	return RouterKey
 }
 
-func (msg *MsgCreateDid) Validate(namespace string) error {
-	if !utils.IsValidDid(namespace, msg.Id) {
-		return ErrBadRequestIsNotDid.Wrap("Id")
-	}
+func (msg *MsgCreateDid) Type() string {
+	return "MsgCreateDid"
+}
 
-	if notValid, i := utils.IsNotValidDIDArray(namespace, msg.Controller); notValid {
-		return ErrBadRequestIsNotDid.Wrapf("Controller item %s at position %d", msg.Controller[i], i)
-	}
-
-	if err := ValidateVerificationMethods(namespace, msg.Id, msg.VerificationMethod); err != nil {
-		return err
-	}
-
-	if err := ValidateServices(namespace, msg.Id, msg.Service); err != nil {
-		return err
-	}
-
-	if notValid, i := utils.IsNotValidDIDArrayFragment(namespace, msg.Authentication); notValid {
-		return ErrBadRequestIsNotDidFragment.Wrapf("Authentication item %s", msg.Authentication[i])
-	}
-
-	if notValid, i := utils.IsNotValidDIDArrayFragment(namespace, msg.CapabilityInvocation); notValid {
-		return ErrBadRequestIsNotDidFragment.Wrapf("CapabilityInvocation item %s", msg.CapabilityInvocation[i])
-	}
-
-	if notValid, i := utils.IsNotValidDIDArrayFragment(namespace, msg.CapabilityDelegation); notValid {
-		return ErrBadRequestIsNotDidFragment.Wrapf("CapabilityDelegation item %s", msg.CapabilityDelegation[i])
-	}
-
-	if notValid, i := utils.IsNotValidDIDArrayFragment(namespace, msg.KeyAgreement); notValid {
-		return ErrBadRequestIsNotDidFragment.Wrapf("KeyAgreement item %s", msg.KeyAgreement[i])
-	}
-
-	if len(msg.Authentication) == 0 && len(msg.Controller) == 0 {
-		return ErrBadRequest.Wrap("The message must contain either a Controller or a Authentication")
-	}
-
-	for _, i := range msg.Authentication {
-		if !IncludeVerificationMethod(msg.Id, msg.VerificationMethod, i) {
-			return ErrVerificationMethodNotFound.Wrap(i)
-		}
-	}
-
-	for _, i := range msg.KeyAgreement {
-		if !IncludeVerificationMethod(msg.Id, msg.VerificationMethod, i) {
-			return ErrVerificationMethodNotFound.Wrap(i)
-		}
-	}
-
-	for _, i := range msg.CapabilityDelegation {
-		if !IncludeVerificationMethod(msg.Id, msg.VerificationMethod, i) {
-			return ErrVerificationMethodNotFound.Wrap(i)
-		}
-	}
-
-	for _, i := range msg.CapabilityInvocation {
-		if !IncludeVerificationMethod(msg.Id, msg.VerificationMethod, i) {
-			return ErrVerificationMethodNotFound.Wrap(i)
-		}
-	}
-
-	return nil
+func (msg *MsgCreateDid) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{}
 }
 
 func (msg *MsgCreateDid) GetSignBytes() []byte {
-	return ModuleCdc.MustMarshal(msg)
+	bz := ModuleCdc.MustMarshal(msg)
+	return sdk.MustSortJSON(bz)
 }
 
-var _ IdentityMsg = &MsgUpdateDid{}
+func (msg *MsgCreateDid) ValidateBasic() error {
+	if msg.Payload == nil {
+		return ErrBadRequestIsRequired.Wrap("Payload")
+	}
 
-func NewMsgUpdateDid(
+	if len(msg.Signatures) == 0 {
+		return ErrBadRequestIsRequired.Wrap("Signatures")
+	}
+
+	return nil
+}
+
+var _ sdk.Msg = &MsgUpdateDid{}
+
+func NewMsgUpdateDid(payload *MsgUpdateDidPayload, signatures []*SignInfo) *MsgUpdateDid {
+	return &MsgUpdateDid{
+		Payload:    payload,
+		Signatures: signatures,
+	}
+}
+
+func (msg *MsgUpdateDid) Route() string {
+	return RouterKey
+}
+
+func (msg *MsgUpdateDid) Type() string {
+	return "WriteRequest"
+}
+
+func (msg *MsgUpdateDid) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{}
+}
+
+func (msg *MsgUpdateDid) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshal(msg)
+	return sdk.MustSortJSON(bz)
+}
+
+func (msg *MsgUpdateDid) ValidateBasic() error {
+	if msg.Payload == nil {
+		return ErrBadRequestIsRequired.Wrap("Payload")
+	}
+
+	if len(msg.Signatures) == 0 {
+		return ErrBadRequestIsRequired.Wrap("Signatures")
+	}
+
+	return nil
+}
+
+func NewMsgCreateDidPayloadPayload(
 	id string,
 	controller []string,
 	verificationMethod []*VerificationMethod,
@@ -152,8 +95,8 @@ func NewMsgUpdateDid(
 	alsoKnownAs []string,
 	service []*ServiceEndpoint,
 	context []string,
-) *MsgUpdateDid {
-	return &MsgUpdateDid{
+) *MsgCreateDidPayload {
+	return &MsgCreateDidPayload{
 		Id:                   id,
 		Controller:           controller,
 		VerificationMethod:   verificationMethod,
@@ -168,7 +111,9 @@ func NewMsgUpdateDid(
 	}
 }
 
-func (msg *MsgUpdateDid) GetSigners() []Signer {
+var _ IdentityMsg = &MsgCreateDidPayload{}
+
+func (msg *MsgCreateDidPayload) GetSigners() []Signer {
 	if len(msg.Controller) > 0 {
 		result := make([]Signer, len(msg.Controller))
 
@@ -202,7 +147,7 @@ func (msg *MsgUpdateDid) GetSigners() []Signer {
 	return []Signer{}
 }
 
-func (msg *MsgUpdateDid) Validate(namespace string) error {
+func (msg *MsgCreateDidPayload) Validate(namespace string) error {
 	if !utils.IsValidDid(namespace, msg.Id) {
 		return ErrBadRequestIsNotDid.Wrap("Id")
 	}
@@ -266,7 +211,139 @@ func (msg *MsgUpdateDid) Validate(namespace string) error {
 	return nil
 }
 
-func (msg *MsgUpdateDid) GetSignBytes() []byte {
+func (msg *MsgCreateDidPayload) GetSignBytes() []byte {
+	return ModuleCdc.MustMarshal(msg)
+}
+
+var _ IdentityMsg = &MsgUpdateDidPayload{}
+
+func NewMsgUpdateDidPayloadPayload(
+	id string,
+	controller []string,
+	verificationMethod []*VerificationMethod,
+	authentication []string,
+	assertionMethod []string,
+	capabilityInvocation []string,
+	capabilityDelegation []string,
+	keyAgreement []string,
+	alsoKnownAs []string,
+	service []*ServiceEndpoint,
+	context []string,
+) *MsgUpdateDidPayload {
+	return &MsgUpdateDidPayload{
+		Id:                   id,
+		Controller:           controller,
+		VerificationMethod:   verificationMethod,
+		Authentication:       authentication,
+		AssertionMethod:      assertionMethod,
+		CapabilityInvocation: capabilityInvocation,
+		CapabilityDelegation: capabilityDelegation,
+		KeyAgreement:         keyAgreement,
+		AlsoKnownAs:          alsoKnownAs,
+		Service:              service,
+		Context:              context,
+	}
+}
+
+func (msg *MsgUpdateDidPayload) GetSigners() []Signer {
+	if len(msg.Controller) > 0 {
+		result := make([]Signer, len(msg.Controller))
+
+		for i, controller := range msg.Controller {
+			if controller == msg.Id {
+				result[i] = Signer{
+					Signer:             controller,
+					Authentication:     msg.Authentication,
+					VerificationMethod: msg.VerificationMethod,
+				}
+			} else {
+				result[i] = Signer{
+					Signer: controller,
+				}
+			}
+		}
+
+		return result
+	}
+
+	if len(msg.Authentication) > 0 {
+		return []Signer{
+			{
+				Signer:             msg.Id,
+				Authentication:     msg.Authentication,
+				VerificationMethod: msg.VerificationMethod,
+			},
+		}
+	}
+
+	return []Signer{}
+}
+
+func (msg *MsgUpdateDidPayload) Validate(namespace string) error {
+	if !utils.IsValidDid(namespace, msg.Id) {
+		return ErrBadRequestIsNotDid.Wrap("Id")
+	}
+
+	if notValid, i := utils.IsNotValidDIDArray(namespace, msg.Controller); notValid {
+		return ErrBadRequestIsNotDid.Wrapf("Controller item %s at position %d", msg.Controller[i], i)
+	}
+
+	if err := ValidateVerificationMethods(namespace, msg.Id, msg.VerificationMethod); err != nil {
+		return err
+	}
+
+	if err := ValidateServices(namespace, msg.Id, msg.Service); err != nil {
+		return err
+	}
+
+	if notValid, i := utils.IsNotValidDIDArrayFragment(namespace, msg.Authentication); notValid {
+		return ErrBadRequestIsNotDidFragment.Wrapf("Authentication item %s", msg.Authentication[i])
+	}
+
+	if notValid, i := utils.IsNotValidDIDArrayFragment(namespace, msg.CapabilityInvocation); notValid {
+		return ErrBadRequestIsNotDidFragment.Wrapf("CapabilityInvocation item %s", msg.CapabilityInvocation[i])
+	}
+
+	if notValid, i := utils.IsNotValidDIDArrayFragment(namespace, msg.CapabilityDelegation); notValid {
+		return ErrBadRequestIsNotDidFragment.Wrapf("CapabilityDelegation item %s", msg.CapabilityDelegation[i])
+	}
+
+	if notValid, i := utils.IsNotValidDIDArrayFragment(namespace, msg.KeyAgreement); notValid {
+		return ErrBadRequestIsNotDidFragment.Wrapf("KeyAgreement item %s", msg.KeyAgreement[i])
+	}
+
+	if len(msg.Authentication) == 0 && len(msg.Controller) == 0 {
+		return ErrBadRequest.Wrap("The message must contain either a Controller or a Authentication")
+	}
+
+	for _, i := range msg.Authentication {
+		if !IncludeVerificationMethod(msg.Id, msg.VerificationMethod, i) {
+			return ErrVerificationMethodNotFound.Wrap(i)
+		}
+	}
+
+	for _, i := range msg.KeyAgreement {
+		if !IncludeVerificationMethod(msg.Id, msg.VerificationMethod, i) {
+			return ErrVerificationMethodNotFound.Wrap(i)
+		}
+	}
+
+	for _, i := range msg.CapabilityDelegation {
+		if !IncludeVerificationMethod(msg.Id, msg.VerificationMethod, i) {
+			return ErrVerificationMethodNotFound.Wrap(i)
+		}
+	}
+
+	for _, i := range msg.CapabilityInvocation {
+		if !IncludeVerificationMethod(msg.Id, msg.VerificationMethod, i) {
+			return ErrVerificationMethodNotFound.Wrap(i)
+		}
+	}
+
+	return nil
+}
+
+func (msg *MsgUpdateDidPayload) GetSignBytes() []byte {
 	return ModuleCdc.MustMarshal(msg)
 }
 

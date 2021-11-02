@@ -1,97 +1,122 @@
 package types
 
 import (
-	"testing"
-
-	ctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/stretchr/testify/require"
+	"testing"
 )
 
 const Prefix = "did:cheqd:test:"
 
-func TestNewMsgWriteRequestValidation(t *testing.T) {
+func TestNewMsgCreateDidValidation(t *testing.T) {
 	cases := []struct {
 		valid  bool
-		msg    *MsgWriteRequest
-		errMsg string
-	}{
-		{true, NewMsgWriteRequest(&ctypes.Any{TypeUrl: "1", Value: []byte{1}}, []*SignInfo{{VerificationMethodId: "foo", Signature: "bar"}}), ""},
-		{false, NewMsgWriteRequest(&ctypes.Any{TypeUrl: "1"}, []*SignInfo{{VerificationMethodId: "foo", Signature: "bar"}}), "Invalid Data: it cannot be empty: bad request"},
-		{false, NewMsgWriteRequest(&ctypes.Any{Value: []byte{1}}, []*SignInfo{{VerificationMethodId: "foo", Signature: "bar"}}), "Invalid Data: it cannot be empty: bad request"},
-		{false, NewMsgWriteRequest(nil, nil), "Data: is required"},
-		{false, NewMsgWriteRequest(&ctypes.Any{TypeUrl: "1", Value: []byte{1}}, nil), "Signatures: is required"},
-	}
-
-	for _, tc := range cases {
-		err := tc.msg.ValidateBasic()
-
-		if tc.valid {
-			require.Nil(t, err)
-		} else {
-			require.Error(t, err)
-			require.Equal(t, tc.errMsg, err.Error())
-		}
-	}
-}
-
-func TestNewMsgCreateDid(t *testing.T) {
-	cases := []struct {
-		valid  bool
+		name   string
 		msg    *MsgCreateDid
 		errMsg string
 	}{
+		{true, "Valid Create Did Msg", NewMsgCreateDid(&MsgCreateDidPayload{Id: "1"}, []*SignInfo{{VerificationMethodId: "foo", Signature: "bar"}}), ""},
+		{false, "Payload is missed", NewMsgCreateDid(nil, nil), "Payload: is required"},
+		{false, "Signatures is missed", NewMsgCreateDid(&MsgCreateDidPayload{Id: "1"}, nil), "Signatures: is required"},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			err := tc.msg.ValidateBasic()
+
+			if tc.valid {
+				require.Nil(t, err)
+			} else {
+				require.Error(t, err)
+				require.Equal(t, tc.errMsg, err.Error())
+			}
+		})
+	}
+}
+
+func TestNewMsgUpdateDidValidation(t *testing.T) {
+	cases := []struct {
+		valid  bool
+		name   string
+		msg    *MsgUpdateDid
+		errMsg string
+	}{
+		{true, "Valid Update Did Msg", NewMsgUpdateDid(&MsgUpdateDidPayload{Id: "1"}, []*SignInfo{{VerificationMethodId: "foo", Signature: "bar"}}), ""},
+		{false, "Payload is missed", NewMsgUpdateDid(nil, nil), "Payload: is required"},
+		{false, "Signatures is missed", NewMsgUpdateDid(&MsgUpdateDidPayload{Id: "1"}, nil), "Signatures: is required"},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			err := tc.msg.ValidateBasic()
+
+			if tc.valid {
+				require.Nil(t, err)
+			} else {
+				require.Error(t, err)
+				require.Equal(t, tc.errMsg, err.Error())
+			}
+		})
+	}
+}
+
+func TestMsgCreateDidPayloadPayload(t *testing.T) {
+	cases := []struct {
+		valid  bool
+		msg    *MsgCreateDidPayload
+		errMsg string
+	}{
 		{
 			false,
-			&MsgCreateDid{},
+			&MsgCreateDidPayload{},
 			"Id: is not DID",
 		},
 		{
 			false,
-			&MsgCreateDid{Id: ""},
+			&MsgCreateDidPayload{Id: ""},
 			"Id: is not DID",
 		},
 		{
 			false,
-			&MsgCreateDid{Id: "did:ch:test:alice"},
+			&MsgCreateDidPayload{Id: "did:ch:test:alice"},
 			"Id: is not DID",
 		},
 		{
 			false,
-			&MsgCreateDid{Id: "did:cheqd:test:alice"},
+			&MsgCreateDidPayload{Id: "did:cheqd:test:alice"},
 			"The message must contain either a Controller or a Authentication: bad request",
 		},
 		{
 			false,
-			&MsgCreateDid{Id: "did:cheqd:test:alice",
+			&MsgCreateDidPayload{Id: "did:cheqd:test:alice",
 				VerificationMethod: []*VerificationMethod{},
 			},
 			"The message must contain either a Controller or a Authentication: bad request",
 		},
 		{
 			false,
-			&MsgCreateDid{Id: "did:cheqd:test:alice",
+			&MsgCreateDidPayload{Id: "did:cheqd:test:alice",
 				VerificationMethod: []*VerificationMethod{{}},
 			},
 			"index 0, value : : is not DID fragment: invalid verification method",
 		},
 		{
 			false,
-			&MsgCreateDid{Id: "did:cheqd:test:alice", Authentication: []string{"dd"}},
+			&MsgCreateDidPayload{Id: "did:cheqd:test:alice", Authentication: []string{"dd"}},
 			"Authentication item dd: is not DID fragment",
 		},
 		{
 			false,
-			&MsgCreateDid{Id: "did:cheqd:test:alice", Authentication: []string{""}},
+			&MsgCreateDidPayload{Id: "did:cheqd:test:alice", Authentication: []string{""}},
 			"Authentication item : is not DID fragment",
 		},
 		{
 			false,
-			&MsgCreateDid{Id: "did:cheqd:test:alice", Authentication: []string{"did:cheqd:test:alice"}},
+			&MsgCreateDidPayload{Id: "did:cheqd:test:alice", Authentication: []string{"did:cheqd:test:alice"}},
 			"Authentication item did:cheqd:test:alice: is not DID fragment",
 		},
 		{
 			false,
-			&MsgCreateDid{
+			&MsgCreateDidPayload{
 				Id:             "did:cheqd:test:alice",
 				Authentication: []string{"did:cheqd:test:alice#key-1"},
 				Controller:     []string{"did:cheqd:test:alice"},
@@ -100,22 +125,22 @@ func TestNewMsgCreateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgCreateDid{Id: "did:cheqd:test:alice", CapabilityInvocation: []string{"dd"}},
+			&MsgCreateDidPayload{Id: "did:cheqd:test:alice", CapabilityInvocation: []string{"dd"}},
 			"CapabilityInvocation item dd: is not DID fragment",
 		},
 		{
 			false,
-			&MsgCreateDid{Id: "did:cheqd:test:alice", CapabilityInvocation: []string{""}},
+			&MsgCreateDidPayload{Id: "did:cheqd:test:alice", CapabilityInvocation: []string{""}},
 			"CapabilityInvocation item : is not DID fragment",
 		},
 		{
 			false,
-			&MsgCreateDid{Id: "did:cheqd:test:alice", CapabilityInvocation: []string{"did:cheqd:test:alice"}},
+			&MsgCreateDidPayload{Id: "did:cheqd:test:alice", CapabilityInvocation: []string{"did:cheqd:test:alice"}},
 			"CapabilityInvocation item did:cheqd:test:alice: is not DID fragment",
 		},
 		{
 			false,
-			&MsgCreateDid{
+			&MsgCreateDidPayload{
 				Id:                   "did:cheqd:test:alice",
 				CapabilityInvocation: []string{"did:cheqd:test:alice#key-1"},
 				Controller:           []string{"did:cheqd:test:alice"},
@@ -124,22 +149,22 @@ func TestNewMsgCreateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgCreateDid{Id: "did:cheqd:test:alice", CapabilityDelegation: []string{"dd"}},
+			&MsgCreateDidPayload{Id: "did:cheqd:test:alice", CapabilityDelegation: []string{"dd"}},
 			"CapabilityDelegation item dd: is not DID fragment",
 		},
 		{
 			false,
-			&MsgCreateDid{Id: "did:cheqd:test:alice", CapabilityDelegation: []string{""}},
+			&MsgCreateDidPayload{Id: "did:cheqd:test:alice", CapabilityDelegation: []string{""}},
 			"CapabilityDelegation item : is not DID fragment",
 		},
 		{
 			false,
-			&MsgCreateDid{Id: "did:cheqd:test:alice", CapabilityDelegation: []string{"did:cheqd:test:alice"}},
+			&MsgCreateDidPayload{Id: "did:cheqd:test:alice", CapabilityDelegation: []string{"did:cheqd:test:alice"}},
 			"CapabilityDelegation item did:cheqd:test:alice: is not DID fragment",
 		},
 		{
 			false,
-			&MsgCreateDid{
+			&MsgCreateDidPayload{
 				Id:                   "did:cheqd:test:alice",
 				CapabilityDelegation: []string{"did:cheqd:test:alice#key-1"},
 				Controller:           []string{"did:cheqd:test:alice"},
@@ -148,22 +173,22 @@ func TestNewMsgCreateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgCreateDid{Id: "did:cheqd:test:alice", KeyAgreement: []string{"dd"}},
+			&MsgCreateDidPayload{Id: "did:cheqd:test:alice", KeyAgreement: []string{"dd"}},
 			"KeyAgreement item dd: is not DID fragment",
 		},
 		{
 			false,
-			&MsgCreateDid{Id: "did:cheqd:test:alice", KeyAgreement: []string{""}},
+			&MsgCreateDidPayload{Id: "did:cheqd:test:alice", KeyAgreement: []string{""}},
 			"KeyAgreement item : is not DID fragment",
 		},
 		{
 			false,
-			&MsgCreateDid{Id: "did:cheqd:test:alice", KeyAgreement: []string{"did:cheqd:test:alice"}},
+			&MsgCreateDidPayload{Id: "did:cheqd:test:alice", KeyAgreement: []string{"did:cheqd:test:alice"}},
 			"KeyAgreement item did:cheqd:test:alice: is not DID fragment",
 		},
 		{
 			false,
-			&MsgCreateDid{
+			&MsgCreateDidPayload{
 				Id:           "did:cheqd:test:alice",
 				KeyAgreement: []string{"did:cheqd:test:alice#key-1"},
 				Controller:   []string{"did:cheqd:test:alice"},
@@ -172,7 +197,7 @@ func TestNewMsgCreateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgCreateDid{
+			&MsgCreateDidPayload{
 				Id:           "did:cheqd:test:alice",
 				KeyAgreement: []string{"did:cheqd:test:alice#key-1"},
 				Controller:   []string{"did:cheqd::alice"},
@@ -181,7 +206,7 @@ func TestNewMsgCreateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgCreateDid{
+			&MsgCreateDidPayload{
 				Id: "did:cheqd:test:alice",
 				VerificationMethod: []*VerificationMethod{
 					{Id: "dasda"},
@@ -192,7 +217,7 @@ func TestNewMsgCreateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgCreateDid{
+			&MsgCreateDidPayload{
 				Id: "did:cheqd:test:alice",
 				VerificationMethod: []*VerificationMethod{
 					{Id: "did:cheqd:test:alice#key-1"},
@@ -203,7 +228,7 @@ func TestNewMsgCreateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgCreateDid{
+			&MsgCreateDidPayload{
 				Id: "did:cheqd:test:alice",
 				VerificationMethod: []*VerificationMethod{
 					{Id: "did:cheqd:test:alice#key-1", Type: "YES"},
@@ -214,7 +239,7 @@ func TestNewMsgCreateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgCreateDid{
+			&MsgCreateDidPayload{
 				Id: "did:cheqd:test:alice",
 				VerificationMethod: []*VerificationMethod{
 					{
@@ -228,7 +253,7 @@ func TestNewMsgCreateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgCreateDid{
+			&MsgCreateDidPayload{
 				Id: "did:cheqd:test:alice",
 				VerificationMethod: []*VerificationMethod{
 					{
@@ -243,7 +268,7 @@ func TestNewMsgCreateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgCreateDid{
+			&MsgCreateDidPayload{
 				Id: "did:cheqd:test:alice",
 				VerificationMethod: []*VerificationMethod{
 					{
@@ -265,7 +290,7 @@ func TestNewMsgCreateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgCreateDid{
+			&MsgCreateDidPayload{
 				Id: "did:cheqd:test:alice",
 				VerificationMethod: []*VerificationMethod{
 					{
@@ -298,7 +323,7 @@ func TestNewMsgCreateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgCreateDid{
+			&MsgCreateDidPayload{
 				Id:         "did:cheqd:test:alice",
 				Controller: []string{"did:cheqd:test:alice"},
 				Service: []*ServiceEndpoint{
@@ -309,7 +334,7 @@ func TestNewMsgCreateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgCreateDid{
+			&MsgCreateDidPayload{
 				Id:         "did:cheqd:test:alice",
 				Controller: []string{"did:cheqd:test:alice"},
 				Service: []*ServiceEndpoint{
@@ -322,7 +347,7 @@ func TestNewMsgCreateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgCreateDid{
+			&MsgCreateDidPayload{
 				Id:         "did:cheqd:test:alice",
 				Controller: []string{"did:cheqd:test:alice"},
 				Service: []*ServiceEndpoint{
@@ -335,7 +360,7 @@ func TestNewMsgCreateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgCreateDid{
+			&MsgCreateDidPayload{
 				Id:         "did:cheqd:test:alice",
 				Controller: []string{"did:cheqd:test:alice"},
 				Service: []*ServiceEndpoint{
@@ -353,7 +378,7 @@ func TestNewMsgCreateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgCreateDid{
+			&MsgCreateDidPayload{
 				Id:         "did:cheqd:test:alice",
 				Controller: []string{"did:cheqd:test:alice"},
 				Service: []*ServiceEndpoint{
@@ -371,7 +396,7 @@ func TestNewMsgCreateDid(t *testing.T) {
 		},
 		{
 			true,
-			&MsgCreateDid{
+			&MsgCreateDidPayload{
 				Id:                 "did:cheqd:test:alice",
 				Controller:         []string{"did:cheqd:test:alice"},
 				VerificationMethod: []*VerificationMethod{},
@@ -380,7 +405,7 @@ func TestNewMsgCreateDid(t *testing.T) {
 		},
 		{
 			true,
-			&MsgCreateDid{
+			&MsgCreateDidPayload{
 				Id:         "did:cheqd:test:alice",
 				Controller: []string{"did:cheqd:test:alice"},
 				Service:    []*ServiceEndpoint{},
@@ -389,14 +414,14 @@ func TestNewMsgCreateDid(t *testing.T) {
 		},
 		{
 			true,
-			&MsgCreateDid{
+			&MsgCreateDidPayload{
 				Id:         "did:cheqd:test:alice",
 				Controller: []string{"did:cheqd:test:alice"}},
 			"",
 		},
 		{
 			true,
-			&MsgCreateDid{
+			&MsgCreateDidPayload{
 				Id:             "did:cheqd:test:alice",
 				Controller:     []string{"did:cheqd:test:alice", "did:cheqd:test:bob"},
 				Authentication: []string{"#key-1", "did:cheqd:test:alice#key-2"},
@@ -436,64 +461,64 @@ func TestNewMsgCreateDid(t *testing.T) {
 	}
 }
 
-func TestNewMsgUpdateDid(t *testing.T) {
+func TestNewMsgUpdateDidPayload(t *testing.T) {
 	cases := []struct {
 		valid  bool
-		msg    *MsgUpdateDid
+		msg    *MsgUpdateDidPayload
 		errMsg string
 	}{
 		{
 			false,
-			&MsgUpdateDid{},
+			&MsgUpdateDidPayload{},
 			"Id: is not DID",
 		},
 		{
 			false,
-			&MsgUpdateDid{Id: ""},
+			&MsgUpdateDidPayload{Id: ""},
 			"Id: is not DID",
 		},
 		{
 			false,
-			&MsgUpdateDid{Id: "did:ch:test:alice"},
+			&MsgUpdateDidPayload{Id: "did:ch:test:alice"},
 			"Id: is not DID",
 		},
 		{
 			false,
-			&MsgUpdateDid{Id: "did:cheqd:test:alice"},
+			&MsgUpdateDidPayload{Id: "did:cheqd:test:alice"},
 			"The message must contain either a Controller or a Authentication: bad request",
 		},
 		{
 			false,
-			&MsgUpdateDid{Id: "did:cheqd:test:alice",
+			&MsgUpdateDidPayload{Id: "did:cheqd:test:alice",
 				VerificationMethod: []*VerificationMethod{},
 			},
 			"The message must contain either a Controller or a Authentication: bad request",
 		},
 		{
 			false,
-			&MsgUpdateDid{Id: "did:cheqd:test:alice",
+			&MsgUpdateDidPayload{Id: "did:cheqd:test:alice",
 				VerificationMethod: []*VerificationMethod{{}},
 			},
 			"index 0, value : : is not DID fragment: invalid verification method",
 		},
 		{
 			false,
-			&MsgUpdateDid{Id: "did:cheqd:test:alice", Authentication: []string{"dd"}},
+			&MsgUpdateDidPayload{Id: "did:cheqd:test:alice", Authentication: []string{"dd"}},
 			"Authentication item dd: is not DID fragment",
 		},
 		{
 			false,
-			&MsgUpdateDid{Id: "did:cheqd:test:alice", Authentication: []string{""}},
+			&MsgUpdateDidPayload{Id: "did:cheqd:test:alice", Authentication: []string{""}},
 			"Authentication item : is not DID fragment",
 		},
 		{
 			false,
-			&MsgUpdateDid{Id: "did:cheqd:test:alice", Authentication: []string{"did:cheqd:test:alice"}},
+			&MsgUpdateDidPayload{Id: "did:cheqd:test:alice", Authentication: []string{"did:cheqd:test:alice"}},
 			"Authentication item did:cheqd:test:alice: is not DID fragment",
 		},
 		{
 			false,
-			&MsgUpdateDid{
+			&MsgUpdateDidPayload{
 				Id:             "did:cheqd:test:alice",
 				Authentication: []string{"did:cheqd:test:alice#key-1"},
 				Controller:     []string{"did:cheqd:test:alice"},
@@ -502,22 +527,22 @@ func TestNewMsgUpdateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgUpdateDid{Id: "did:cheqd:test:alice", CapabilityInvocation: []string{"dd"}},
+			&MsgUpdateDidPayload{Id: "did:cheqd:test:alice", CapabilityInvocation: []string{"dd"}},
 			"CapabilityInvocation item dd: is not DID fragment",
 		},
 		{
 			false,
-			&MsgUpdateDid{Id: "did:cheqd:test:alice", CapabilityInvocation: []string{""}},
+			&MsgUpdateDidPayload{Id: "did:cheqd:test:alice", CapabilityInvocation: []string{""}},
 			"CapabilityInvocation item : is not DID fragment",
 		},
 		{
 			false,
-			&MsgUpdateDid{Id: "did:cheqd:test:alice", CapabilityInvocation: []string{"did:cheqd:test:alice"}},
+			&MsgUpdateDidPayload{Id: "did:cheqd:test:alice", CapabilityInvocation: []string{"did:cheqd:test:alice"}},
 			"CapabilityInvocation item did:cheqd:test:alice: is not DID fragment",
 		},
 		{
 			false,
-			&MsgUpdateDid{
+			&MsgUpdateDidPayload{
 				Id:                   "did:cheqd:test:alice",
 				CapabilityInvocation: []string{"did:cheqd:test:alice#key-1"},
 				Controller:           []string{"did:cheqd:test:alice"},
@@ -526,22 +551,22 @@ func TestNewMsgUpdateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgUpdateDid{Id: "did:cheqd:test:alice", CapabilityDelegation: []string{"dd"}},
+			&MsgUpdateDidPayload{Id: "did:cheqd:test:alice", CapabilityDelegation: []string{"dd"}},
 			"CapabilityDelegation item dd: is not DID fragment",
 		},
 		{
 			false,
-			&MsgUpdateDid{Id: "did:cheqd:test:alice", CapabilityDelegation: []string{""}},
+			&MsgUpdateDidPayload{Id: "did:cheqd:test:alice", CapabilityDelegation: []string{""}},
 			"CapabilityDelegation item : is not DID fragment",
 		},
 		{
 			false,
-			&MsgUpdateDid{Id: "did:cheqd:test:alice", CapabilityDelegation: []string{"did:cheqd:test:alice"}},
+			&MsgUpdateDidPayload{Id: "did:cheqd:test:alice", CapabilityDelegation: []string{"did:cheqd:test:alice"}},
 			"CapabilityDelegation item did:cheqd:test:alice: is not DID fragment",
 		},
 		{
 			false,
-			&MsgUpdateDid{
+			&MsgUpdateDidPayload{
 				Id:                   "did:cheqd:test:alice",
 				CapabilityDelegation: []string{"did:cheqd:test:alice#key-1"},
 				Controller:           []string{"did:cheqd:test:alice"},
@@ -550,22 +575,22 @@ func TestNewMsgUpdateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgUpdateDid{Id: "did:cheqd:test:alice", KeyAgreement: []string{"dd"}},
+			&MsgUpdateDidPayload{Id: "did:cheqd:test:alice", KeyAgreement: []string{"dd"}},
 			"KeyAgreement item dd: is not DID fragment",
 		},
 		{
 			false,
-			&MsgUpdateDid{Id: "did:cheqd:test:alice", KeyAgreement: []string{""}},
+			&MsgUpdateDidPayload{Id: "did:cheqd:test:alice", KeyAgreement: []string{""}},
 			"KeyAgreement item : is not DID fragment",
 		},
 		{
 			false,
-			&MsgUpdateDid{Id: "did:cheqd:test:alice", KeyAgreement: []string{"did:cheqd:test:alice"}},
+			&MsgUpdateDidPayload{Id: "did:cheqd:test:alice", KeyAgreement: []string{"did:cheqd:test:alice"}},
 			"KeyAgreement item did:cheqd:test:alice: is not DID fragment",
 		},
 		{
 			false,
-			&MsgUpdateDid{
+			&MsgUpdateDidPayload{
 				Id:           "did:cheqd:test:alice",
 				KeyAgreement: []string{"did:cheqd:test:alice#key-1"},
 				Controller:   []string{"did:cheqd:test:alice"},
@@ -574,7 +599,7 @@ func TestNewMsgUpdateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgUpdateDid{
+			&MsgUpdateDidPayload{
 				Id:           "did:cheqd:test:alice",
 				KeyAgreement: []string{"did:cheqd:test:alice#key-1"},
 				Controller:   []string{"did:cheqd::alice"},
@@ -583,7 +608,7 @@ func TestNewMsgUpdateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgUpdateDid{
+			&MsgUpdateDidPayload{
 				Id: "did:cheqd:test:alice",
 				VerificationMethod: []*VerificationMethod{
 					{Id: "dasda"},
@@ -594,7 +619,7 @@ func TestNewMsgUpdateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgUpdateDid{
+			&MsgUpdateDidPayload{
 				Id: "did:cheqd:test:alice",
 				VerificationMethod: []*VerificationMethod{
 					{Id: "did:cheqd:test:alice#key-1"},
@@ -605,7 +630,7 @@ func TestNewMsgUpdateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgUpdateDid{
+			&MsgUpdateDidPayload{
 				Id: "did:cheqd:test:alice",
 				VerificationMethod: []*VerificationMethod{
 					{Id: "did:cheqd:test:alice#key-1", Type: "YES"},
@@ -616,7 +641,7 @@ func TestNewMsgUpdateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgUpdateDid{
+			&MsgUpdateDidPayload{
 				Id: "did:cheqd:test:alice",
 				VerificationMethod: []*VerificationMethod{
 					{
@@ -630,7 +655,7 @@ func TestNewMsgUpdateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgUpdateDid{
+			&MsgUpdateDidPayload{
 				Id: "did:cheqd:test:alice",
 				VerificationMethod: []*VerificationMethod{
 					{
@@ -647,7 +672,7 @@ func TestNewMsgUpdateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgUpdateDid{
+			&MsgUpdateDidPayload{
 				Id: "did:cheqd:test:alice",
 				VerificationMethod: []*VerificationMethod{
 					{
@@ -669,7 +694,7 @@ func TestNewMsgUpdateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgUpdateDid{
+			&MsgUpdateDidPayload{
 				Id: "did:cheqd:test:alice",
 				VerificationMethod: []*VerificationMethod{
 					{
@@ -697,7 +722,7 @@ func TestNewMsgUpdateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgUpdateDid{
+			&MsgUpdateDidPayload{
 				Id:         "did:cheqd:test:alice",
 				Controller: []string{"did:cheqd:test:alice"},
 				Service: []*ServiceEndpoint{
@@ -708,7 +733,7 @@ func TestNewMsgUpdateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgUpdateDid{
+			&MsgUpdateDidPayload{
 				Id:         "did:cheqd:test:alice",
 				Controller: []string{"did:cheqd:test:alice"},
 				Service: []*ServiceEndpoint{
@@ -721,7 +746,7 @@ func TestNewMsgUpdateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgUpdateDid{
+			&MsgUpdateDidPayload{
 				Id:         "did:cheqd:test:alice",
 				Controller: []string{"did:cheqd:test:alice"},
 				Service: []*ServiceEndpoint{
@@ -734,7 +759,7 @@ func TestNewMsgUpdateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgUpdateDid{
+			&MsgUpdateDidPayload{
 				Id:         "did:cheqd:test:alice",
 				Controller: []string{"did:cheqd:test:alice"},
 				Service: []*ServiceEndpoint{
@@ -752,7 +777,7 @@ func TestNewMsgUpdateDid(t *testing.T) {
 		},
 		{
 			false,
-			&MsgUpdateDid{
+			&MsgUpdateDidPayload{
 				Id:         "did:cheqd:test:alice",
 				Controller: []string{"did:cheqd:test:alice"},
 				Service: []*ServiceEndpoint{
@@ -770,7 +795,7 @@ func TestNewMsgUpdateDid(t *testing.T) {
 		},
 		{
 			true,
-			&MsgUpdateDid{
+			&MsgUpdateDidPayload{
 				Id:                 "did:cheqd:test:alice",
 				Controller:         []string{"did:cheqd:test:alice"},
 				VerificationMethod: []*VerificationMethod{},
@@ -779,7 +804,7 @@ func TestNewMsgUpdateDid(t *testing.T) {
 		},
 		{
 			true,
-			&MsgUpdateDid{
+			&MsgUpdateDidPayload{
 				Id:         "did:cheqd:test:alice",
 				Controller: []string{"did:cheqd:test:alice"},
 				Service:    []*ServiceEndpoint{},
@@ -788,14 +813,14 @@ func TestNewMsgUpdateDid(t *testing.T) {
 		},
 		{
 			true,
-			&MsgUpdateDid{
+			&MsgUpdateDidPayload{
 				Id:         "did:cheqd:test:alice",
 				Controller: []string{"did:cheqd:test:alice"}},
 			"",
 		},
 		{
 			true,
-			&MsgUpdateDid{
+			&MsgUpdateDidPayload{
 				Id:             "did:cheqd:test:alice",
 				Controller:     []string{"did:cheqd:test:alice", "did:cheqd:test:bob"},
 				Authentication: []string{"#key-1", "did:cheqd:test:alice#key-2"},

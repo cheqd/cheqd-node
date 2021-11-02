@@ -17,7 +17,6 @@ import (
 
 	"github.com/cheqd/cheqd-node/x/cheqd/keeper"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
-	ptypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -72,7 +71,7 @@ func Setup() TestSetup {
 	return setup
 }
 
-func (s *TestSetup) CreateDid(pubKey ed25519.PublicKey, did string) *types.MsgCreateDid {
+func (s *TestSetup) CreateDid(pubKey ed25519.PublicKey, did string) *types.MsgCreateDidPayload {
 	PublicKeyMultibase := "z" + base58.Encode(pubKey)
 
 	VerificationMethod := types.VerificationMethod{
@@ -88,7 +87,7 @@ func (s *TestSetup) CreateDid(pubKey ed25519.PublicKey, did string) *types.MsgCr
 		ServiceEndpoint: "endpoint",
 	}
 
-	return &types.MsgCreateDid{
+	return &types.MsgCreateDidPayload{
 		Id:                   did,
 		Controller:           nil,
 		VerificationMethod:   []*types.VerificationMethod{&VerificationMethod},
@@ -103,8 +102,8 @@ func (s *TestSetup) CreateDid(pubKey ed25519.PublicKey, did string) *types.MsgCr
 	}
 }
 
-func (s *TestSetup) CreateToUpdateDid(did *types.MsgCreateDid) *types.MsgUpdateDid {
-	return &types.MsgUpdateDid{
+func (s *TestSetup) CreateToUpdateDid(did *types.MsgCreateDidPayload) *types.MsgUpdateDidPayload {
+	return &types.MsgUpdateDidPayload{
 		Id:                   did.Id,
 		Controller:           did.Controller,
 		VerificationMethod:   did.VerificationMethod,
@@ -119,13 +118,9 @@ func (s *TestSetup) CreateToUpdateDid(did *types.MsgCreateDid) *types.MsgUpdateD
 	}
 }
 
-func (s *TestSetup) WrapRequest(data *ptypes.Any, keys map[string]ed25519.PrivateKey) *types.MsgWriteRequest {
-	result := types.MsgWriteRequest{
-		Data: data,
-	}
-
+func (s *TestSetup) WrapCreateRequest(payload *types.MsgCreateDidPayload, keys map[string]ed25519.PrivateKey) *types.MsgCreateDid {
 	var signatures []*types.SignInfo
-	signingInput := result.Data.Value
+	signingInput := payload.GetSignBytes()
 
 	for privKeyId, privKey := range keys {
 		signature := base64.StdEncoding.EncodeToString(ed25519.Sign(privKey, signingInput))
@@ -135,8 +130,26 @@ func (s *TestSetup) WrapRequest(data *ptypes.Any, keys map[string]ed25519.Privat
 		})
 	}
 
-	return &types.MsgWriteRequest{
-		Data:       data,
+	return &types.MsgCreateDid{
+		Payload:    payload,
+		Signatures: signatures,
+	}
+}
+
+func (s *TestSetup) WrapUpdateRequest(payload *types.MsgUpdateDidPayload, keys map[string]ed25519.PrivateKey) *types.MsgUpdateDid {
+	var signatures []*types.SignInfo
+	signingInput := payload.GetSignBytes()
+
+	for privKeyId, privKey := range keys {
+		signature := base64.StdEncoding.EncodeToString(ed25519.Sign(privKey, signingInput))
+		signatures = append(signatures, &types.SignInfo{
+			VerificationMethodId: privKeyId,
+			Signature:            signature,
+		})
+	}
+
+	return &types.MsgUpdateDid{
+		Payload:    payload,
 		Signatures: signatures,
 	}
 }
@@ -146,20 +159,16 @@ func GenerateKeyPair() KeyPair {
 	return KeyPair{PrivateKey, PublicKey}
 }
 
-func (s *TestSetup) InitDid(did string) (map[string]ed25519.PrivateKey, *types.MsgCreateDid, error) {
+func (s *TestSetup) InitDid(did string) (map[string]ed25519.PrivateKey, *types.MsgCreateDidPayload, error) {
 	pubKey, privKey, _ := ed25519.GenerateKey(rand.Reader)
 
 	// add new Did
 	didMsg := s.CreateDid(pubKey, did)
-	data, err := ptypes.NewAnyWithValue(didMsg)
-	if err != nil {
-		return nil, nil, err
-	}
 
 	keyId := did + "#key-1"
 	keys := map[string]ed25519.PrivateKey{keyId: privKey}
 
-	result, err := s.Handler(s.Ctx, s.WrapRequest(data, keys))
+	result, err := s.Handler(s.Ctx, s.WrapCreateRequest(didMsg, keys))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -172,19 +181,14 @@ func (s *TestSetup) InitDid(did string) (map[string]ed25519.PrivateKey, *types.M
 	return keys, didMsg, nil
 }
 
-func (s *TestSetup) SendUpdateDid(msg *types.MsgUpdateDid, keys map[string]ed25519.PrivateKey) (*types.Did, error) {
+func (s *TestSetup) SendUpdateDid(msg *types.MsgUpdateDidPayload, keys map[string]ed25519.PrivateKey) (*types.Did, error) {
 	// query Did
 	state, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
 	if len(msg.VersionId) == 0 {
 		msg.VersionId = state.Metadata.VersionId
 	}
 
-	data, err := ptypes.NewAnyWithValue(msg)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = s.Handler(s.Ctx, s.WrapRequest(data, keys))
+	_, err := s.Handler(s.Ctx, s.WrapUpdateRequest(msg, keys))
 	if err != nil {
 		return nil, err
 	}
@@ -193,13 +197,8 @@ func (s *TestSetup) SendUpdateDid(msg *types.MsgUpdateDid, keys map[string]ed255
 	return updated.GetDid()
 }
 
-func (s *TestSetup) SendCreateDid(msg *types.MsgCreateDid, keys map[string]ed25519.PrivateKey) (*types.Did, error) {
-	data, err := ptypes.NewAnyWithValue(msg)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = s.Handler(s.Ctx, s.WrapRequest(data, keys))
+func (s *TestSetup) SendCreateDid(msg *types.MsgCreateDidPayload, keys map[string]ed25519.PrivateKey) (*types.Did, error) {
+	_, err := s.Handler(s.Ctx, s.WrapCreateRequest(msg, keys))
 	if err != nil {
 		return nil, err
 	}
@@ -220,7 +219,7 @@ func (s TestSetup) CreatePreparedDID() map[string]KeyPair {
 	prefilledDids := []struct {
 		keys    map[string]KeyPair
 		signers []string
-		msg     *types.MsgCreateDid
+		msg     *types.MsgCreateDidPayload
 	}{
 		{
 			keys: map[string]KeyPair{
@@ -228,7 +227,7 @@ func (s TestSetup) CreatePreparedDID() map[string]KeyPair {
 				AliceKey2: GenerateKeyPair(),
 			},
 			signers: []string{AliceKey1},
-			msg: &types.MsgCreateDid{
+			msg: &types.MsgCreateDidPayload{
 				Id:             AliceDID,
 				Authentication: []string{AliceKey1},
 				VerificationMethod: []*types.VerificationMethod{
@@ -248,7 +247,7 @@ func (s TestSetup) CreatePreparedDID() map[string]KeyPair {
 				BobKey4: GenerateKeyPair(),
 			},
 			signers: []string{BobKey2},
-			msg: &types.MsgCreateDid{
+			msg: &types.MsgCreateDidPayload{
 				Id: BobDID,
 				Authentication: []string{
 					BobKey1,
@@ -289,7 +288,7 @@ func (s TestSetup) CreatePreparedDID() map[string]KeyPair {
 				CharlieKey3: GenerateKeyPair(),
 			},
 			signers: []string{CharlieKey2},
-			msg: &types.MsgCreateDid{
+			msg: &types.MsgCreateDidPayload{
 				Id: CharlieDID,
 				Authentication: []string{
 					CharlieKey1,

@@ -1,9 +1,9 @@
 package types
 
 const (
-	MessageCreateDid = "/cheqdid.cheqdnode.cheqd.MsgCreateDid"
+	MessageCreateDid = "/cheqdid.cheqdnode.cheqd.v1.MsgCreateDidPayload"
 )
 
 const (
-	MessageUpdateDid = "/cheqdid.cheqdnode.cheqd.MsgUpdateDid"
+	MessageUpdateDid = "/cheqdid.cheqdnode.cheqd.v1.MsgUpdateDidPayload"
 )
