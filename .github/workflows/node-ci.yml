@@ -200,7 +200,7 @@ jobs:
 
       - name: Run test net container
         run: |
-          docker run -d --rm -p "26657:26657" cheqd-testnet-debug
+          docker run -d --rm -p "26657:26657" cheqd-testnet
           sleep 30
           docker ps
           curl http://127.0.0.1:26657
