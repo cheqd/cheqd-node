@@ -183,7 +183,7 @@ jobs:
 
   run-identity-specific-tests:
     name: Run identity-specific tests using VDR
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-18.04
     # needs: build-images-and-set-up-pool
     needs: build
     steps:
@@ -217,7 +217,6 @@ jobs:
           popd
 
       - name: Run tests
-        id: maybe_fails
         run: |
           export OP0_ADDRESS=""
           export OP1_ADDRESS=""
