@@ -1,4 +1,4 @@
-#Upgrade overview
+# Upgrade overview
 Upgrade process includes 2 main parts:
 - Sending ``SoftwareUpgradeProposal``
 - Moving to the new binary manually.
