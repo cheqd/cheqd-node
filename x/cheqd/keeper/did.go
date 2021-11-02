@@ -91,3 +91,19 @@ func (k Keeper) HasDid(ctx sdk.Context, id string) bool {
 func GetDidIDBytes(id string) []byte {
 	return []byte(id)
 }
+
+// GetAllDid returns all did
+func (k Keeper) GetAllDid(ctx sdk.Context) (list []types.StateValue) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
+	iterator := sdk.KVStorePrefixIterator(store, []byte{})
+
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var val types.StateValue
+		k.cdc.MustUnmarshal(iterator.Value(), &val)
+		list = append(list, val)
+	}
+
+	return
+}
