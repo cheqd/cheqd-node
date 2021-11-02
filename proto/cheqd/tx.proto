@@ -1,5 +1,5 @@
 syntax = "proto3";
-package cheqdid.cheqdnode.cheqd;
+package cheqdid.cheqdnode.cheqd.v1;
 import "google/protobuf/any.proto";
 import "cheqd/did.proto";
 
@@ -9,13 +9,18 @@ option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
 // Msg defines the Msg service.
 service Msg {
-  rpc CreateDid(MsgWriteRequest) returns (MsgCreateDidResponse);
-  rpc UpdateDid(MsgWriteRequest) returns (MsgUpdateDidResponse);
+  rpc CreateDid(MsgCreateDid) returns (MsgCreateDidResponse);
+  rpc UpdateDid(MsgUpdateDid) returns (MsgUpdateDidResponse);
 }
 
 // this line is used by starport scaffolding # proto/tx/message
-message MsgWriteRequest {
-  google.protobuf.Any data = 1;
+message MsgCreateDid {
+  MsgCreateDidPayload payload = 1;
+  repeated SignInfo signatures = 2;
+}
+
+message MsgUpdateDid {
+  MsgUpdateDidPayload payload = 1;
   repeated SignInfo signatures = 2;
 }
 
@@ -24,7 +29,7 @@ message SignInfo {
   string signature = 2;
 }
 
-message MsgCreateDid {
+message MsgCreateDidPayload {
   string id = 1;
   repeated string controller = 2;
   repeated VerificationMethod verification_method = 3;
@@ -42,7 +47,7 @@ message MsgCreateDidResponse {
   string id = 1;
 }
 
-message MsgUpdateDid {
+message MsgUpdateDidPayload {
   string id = 1;
   repeated string controller = 2;
   repeated VerificationMethod verification_method = 3;
