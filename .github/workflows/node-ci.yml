@@ -206,6 +206,9 @@ jobs:
           curl http://127.0.0.1:26657
 
       - name: Set up test environment
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.6'
         working-directory: ./tests/e2e
         run: |
           sudo cp libindy.so /usr/lib/libindy.so
@@ -220,10 +223,9 @@ jobs:
         run: |
           export OP0_ADDRESS=""
           export OP1_ADDRESS=""
-          RUST_BACKTRACE=1 RUST_LOG=indy::=debug,zmq=trace RUST_TEST_THREADS=1 pytest -v -s tests/e2e/test_identity.py::test_did_positive
+          pytest -v -s tests/e2e/test_identity.py::test_did_positive
 
       - name: Show logs on failure
         if: ${{ failure() }}
         run: |
           echo "Do something on failure..."
-          cat /tmp/tests.log
