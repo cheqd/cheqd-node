@@ -82,7 +82,7 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
     * `quorum` = `0.334`
       * Minimum percentage of total stake needed to vote for a result to be considered valid. 
     * `threshold` = `0.5`
-      * Minimum percentage of total stake needed to vote for a result to be considered valid.
+      * Minimum proportion of Yes votes for proposal to pass.
     * `veto_threshold` = `0.334`
       * The minimum value of veto votes to total votes ratio for proposal to be vetoed. Default value: 1/3.
 * **`mint`**

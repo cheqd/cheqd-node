@@ -130,5 +130,4 @@ If you need help or support, join our [**cheqd Community Slack**](http://cheqd.l
 
 On completion of the steps above, you would have successfully bonded a node as validator to the cheqd testnet and participating in staking/consensus.
 
-Learn more about what you can do with your new validator node in the [cheqd CLI guide](../cheqd-cli/readme.md).
-
+Learn more about what you can do with your new validator node in the [cheqd CLI guide](../cheqd-cli/README.md).
