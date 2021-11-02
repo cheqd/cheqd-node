@@ -87,6 +87,7 @@ async def send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sende
     res = await cheqd_pool.get_all_config()
     print(res)
     account_number, sequence_number = await get_base_account_number_and_sequence(pool_alias, sender_address)
+    print(account_number, sequence_number)
     timeout_height = await get_timeout_height(pool_alias)
     tx = await cheqd_ledger.auth.build_tx(
         pool_alias, public_key, msg, account_number, sequence_number, GAS_AMOUNT, GAS_AMOUNT*GAS_PRICE, DENOM, sender_address, timeout_height, memo
