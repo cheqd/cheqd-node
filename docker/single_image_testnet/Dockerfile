@@ -1,4 +1,4 @@
-FROM cheqd-node-debug
+FROM cheqd-node
 
 USER root
 
