@@ -176,7 +176,7 @@ func TestCreateDID(t *testing.T) {
 				CapabilityDelegation: []string{"did:cheqd:test:123456qwertyui#key-3"},
 				KeyAgreement:         []string{"did:cheqd:test:123456qwertyui#key-4"},
 				AlsoKnownAs:          []string{"did:cheqd:test:123456eqweqwe"},
-				Service: []*types.ServiceEndpoint{
+				Service: []*types.Service{
 					{
 						Id:              "did:cheqd:test:123456qwertyui#service-1",
 						Type:            "DIDCommMessaging",

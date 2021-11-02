@@ -81,7 +81,7 @@ func (s *TestSetup) CreateDid(pubKey ed25519.PublicKey, did string) *types.MsgCr
 		PublicKeyMultibase: PublicKeyMultibase,
 	}
 
-	Service := types.ServiceEndpoint{
+	Service := types.Service{
 		Id:              "#service-2",
 		Type:            "DIDCommMessaging",
 		ServiceEndpoint: "endpoint",
@@ -98,7 +98,7 @@ func (s *TestSetup) CreateDid(pubKey ed25519.PublicKey, did string) *types.MsgCr
 		KeyAgreement:         []string{did + "#key-1"},
 		AlsoKnownAs:          []string{did + "#key-1"},
 		Context:              []string{"Context"},
-		Service:              []*types.ServiceEndpoint{&Service},
+		Service:              []*types.Service{&Service},
 	}
 }
 

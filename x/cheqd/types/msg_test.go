@@ -326,7 +326,7 @@ func TestMsgCreateDidPayloadPayload(t *testing.T) {
 			&MsgCreateDidPayload{
 				Id:         "did:cheqd:test:alice",
 				Controller: []string{"did:cheqd:test:alice"},
-				Service: []*ServiceEndpoint{
+				Service: []*Service{
 					{},
 				},
 			},
@@ -337,7 +337,7 @@ func TestMsgCreateDidPayloadPayload(t *testing.T) {
 			&MsgCreateDidPayload{
 				Id:         "did:cheqd:test:alice",
 				Controller: []string{"did:cheqd:test:alice"},
-				Service: []*ServiceEndpoint{
+				Service: []*Service{
 					{
 						Id: "weqweqw",
 					},
@@ -350,7 +350,7 @@ func TestMsgCreateDidPayloadPayload(t *testing.T) {
 			&MsgCreateDidPayload{
 				Id:         "did:cheqd:test:alice",
 				Controller: []string{"did:cheqd:test:alice"},
-				Service: []*ServiceEndpoint{
+				Service: []*Service{
 					{
 						Id: "#service-1",
 					},
@@ -363,7 +363,7 @@ func TestMsgCreateDidPayloadPayload(t *testing.T) {
 			&MsgCreateDidPayload{
 				Id:         "did:cheqd:test:alice",
 				Controller: []string{"did:cheqd:test:alice"},
-				Service: []*ServiceEndpoint{
+				Service: []*Service{
 					{
 						Id:   "#service-1",
 						Type: "DIDCommMessaging",
@@ -381,7 +381,7 @@ func TestMsgCreateDidPayloadPayload(t *testing.T) {
 			&MsgCreateDidPayload{
 				Id:         "did:cheqd:test:alice",
 				Controller: []string{"did:cheqd:test:alice"},
-				Service: []*ServiceEndpoint{
+				Service: []*Service{
 					{
 						Id:   "did:cheqd:test:alice#service-1",
 						Type: "DIDCommMessaging",
@@ -408,7 +408,7 @@ func TestMsgCreateDidPayloadPayload(t *testing.T) {
 			&MsgCreateDidPayload{
 				Id:         "did:cheqd:test:alice",
 				Controller: []string{"did:cheqd:test:alice"},
-				Service:    []*ServiceEndpoint{},
+				Service:    []*Service{},
 			},
 			"",
 		},
@@ -725,7 +725,7 @@ func TestNewMsgUpdateDidPayload(t *testing.T) {
 			&MsgUpdateDidPayload{
 				Id:         "did:cheqd:test:alice",
 				Controller: []string{"did:cheqd:test:alice"},
-				Service: []*ServiceEndpoint{
+				Service: []*Service{
 					{},
 				},
 			},
@@ -736,7 +736,7 @@ func TestNewMsgUpdateDidPayload(t *testing.T) {
 			&MsgUpdateDidPayload{
 				Id:         "did:cheqd:test:alice",
 				Controller: []string{"did:cheqd:test:alice"},
-				Service: []*ServiceEndpoint{
+				Service: []*Service{
 					{
 						Id: "weqweqw",
 					},
@@ -749,7 +749,7 @@ func TestNewMsgUpdateDidPayload(t *testing.T) {
 			&MsgUpdateDidPayload{
 				Id:         "did:cheqd:test:alice",
 				Controller: []string{"did:cheqd:test:alice"},
-				Service: []*ServiceEndpoint{
+				Service: []*Service{
 					{
 						Id: "#service-1",
 					},
@@ -762,7 +762,7 @@ func TestNewMsgUpdateDidPayload(t *testing.T) {
 			&MsgUpdateDidPayload{
 				Id:         "did:cheqd:test:alice",
 				Controller: []string{"did:cheqd:test:alice"},
-				Service: []*ServiceEndpoint{
+				Service: []*Service{
 					{
 						Id:   "#service-1",
 						Type: "DIDCommMessaging",
@@ -780,7 +780,7 @@ func TestNewMsgUpdateDidPayload(t *testing.T) {
 			&MsgUpdateDidPayload{
 				Id:         "did:cheqd:test:alice",
 				Controller: []string{"did:cheqd:test:alice"},
-				Service: []*ServiceEndpoint{
+				Service: []*Service{
 					{
 						Id:   "did:cheqd:test:alice#service-1",
 						Type: "DIDCommMessaging",
@@ -807,7 +807,7 @@ func TestNewMsgUpdateDidPayload(t *testing.T) {
 			&MsgUpdateDidPayload{
 				Id:         "did:cheqd:test:alice",
 				Controller: []string{"did:cheqd:test:alice"},
-				Service:    []*ServiceEndpoint{},
+				Service:    []*Service{},
 			},
 			"",
 		},

@@ -15,7 +15,7 @@ message Did {
   repeated string capability_invocation = 6; // optional
   repeated string capability_delegation = 7; // optional
   repeated string key_agreement = 8; // optional
-  repeated ServiceEndpoint service = 9; // optional
+  repeated Service service = 9; // optional
   repeated string also_known_as = 10; // optional
   repeated string context = 11;
 }
@@ -28,7 +28,7 @@ message VerificationMethod {
   string public_key_multibase = 5; // optional
 }
 
-message ServiceEndpoint {
+message Service {
   string id = 1;
   string type = 2;
   string service_endpoint = 3;
