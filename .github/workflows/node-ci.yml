@@ -206,7 +206,7 @@ jobs:
           curl http://127.0.0.1:26657
 
       - name: Set up test environment
-      - uses: actions/setup-python@v2
+        uses: actions/setup-python@v2
         with:
           python-version: '3.6'
         working-directory: ./tests/e2e
