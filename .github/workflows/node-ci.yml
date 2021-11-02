@@ -192,11 +192,11 @@ jobs:
 
       - name: Build node image
         run: |
-          docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node-debug --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
+          docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
 
       - name: Build test net image
         run: |
-          docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet-debug .
+          docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
 
       - name: Run test net container
         run: |
@@ -221,11 +221,9 @@ jobs:
         run: |
           export OP0_ADDRESS=""
           export OP1_ADDRESS=""
-          pytest -v -rP tests/e2e/test_identity.py::test_did_positive 2>&1 > errors.txt || echo "Fail!"
-          echo ::set-output name=errors::`cat errors.txt`
-          exit 1
+          pytest -v -s tests/e2e/test_identity.py::test_did_positive
 
       - name: Show logs on failure
         if: ${{ failure() }}
         run: |
-          echo ${{ steps.maybe_fails.outputs.errors }}
+          echo "Do something on failure..."
