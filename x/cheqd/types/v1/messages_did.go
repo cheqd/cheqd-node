@@ -1,4 +1,4 @@
-package types
+package v1
 
 import (
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"

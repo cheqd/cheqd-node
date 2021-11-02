@@ -3,15 +3,15 @@ package keeper
 import (
 	"context"
 	"fmt"
+	"github.com/cheqd/cheqd-node/x/cheqd/types/v1"
 	"github.com/cheqd/cheqd-node/x/cheqd/utils/strings"
 	"reflect"
 
-	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*types.MsgCreateDidResponse, error) {
+func (k msgServer) CreateDid(goCtx context.Context, msg *v1.MsgCreateDid) (*v1.MsgCreateDidResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	prefix := k.GetDidPrefix(ctx)
 
@@ -29,7 +29,7 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 		return nil, err
 	}
 
-	var did = types.Did{
+	var did = v1.Did{
 		Id:                   didMsg.Id,
 		Controller:           didMsg.Controller,
 		VerificationMethod:   didMsg.VerificationMethod,
@@ -43,18 +43,18 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 		Context:              didMsg.Context,
 	}
 
-	metadata := types.NewMetadata(ctx)
+	metadata := v1.NewMetadata(ctx)
 	id, err := k.AppendDid(ctx, did, &metadata)
 	if err != nil {
 		return nil, err
 	}
 
-	return &types.MsgCreateDidResponse{
+	return &v1.MsgCreateDidResponse{
 		Id: *id,
 	}, nil
 }
 
-func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*types.MsgUpdateDidResponse, error) {
+func (k msgServer) UpdateDid(goCtx context.Context, msg *v1.MsgUpdateDid) (*v1.MsgUpdateDidResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	prefix := k.GetDidPrefix(ctx)
 
@@ -85,10 +85,10 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 	// replay protection
 	if oldStateValue.Metadata.VersionId != didMsg.VersionId {
 		errMsg := fmt.Sprintf("Ecpected %s with version %s. Got version %s", didMsg.Id, oldStateValue.Metadata.VersionId, didMsg.VersionId)
-		return nil, sdkerrors.Wrap(types.ErrUnexpectedDidVersion, errMsg)
+		return nil, sdkerrors.Wrap(v1.ErrUnexpectedDidVersion, errMsg)
 	}
 
-	var did = types.Did{
+	var did = v1.Did{
 		Id:                   didMsg.Id,
 		Controller:           didMsg.Controller,
 		VerificationMethod:   didMsg.VerificationMethod,
@@ -102,7 +102,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 		Context:              didMsg.Context,
 	}
 
-	metadata := types.NewMetadata(ctx)
+	metadata := v1.NewMetadata(ctx)
 	metadata.Created = oldStateValue.Metadata.Created
 	metadata.Deactivated = oldStateValue.Metadata.Deactivated
 
@@ -110,12 +110,12 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 		return nil, err
 	}
 
-	return &types.MsgUpdateDidResponse{
+	return &v1.MsgUpdateDidResponse{
 		Id: didMsg.Id,
 	}, nil
 }
 
-func (k msgServer) VerifySignatureOnDidUpdate(ctx *sdk.Context, oldDIDDoc *types.Did, newDIDDoc *types.MsgUpdateDidPayload, signatures []*types.SignInfo) error {
+func (k msgServer) VerifySignatureOnDidUpdate(ctx *sdk.Context, oldDIDDoc *v1.Did, newDIDDoc *v1.MsgUpdateDidPayload, signatures []*v1.SignInfo) error {
 	var signers = newDIDDoc.GetSigners()
 
 	// Get Old DID Doc controller if it's nil then assign self
@@ -133,7 +133,7 @@ func (k msgServer) VerifySignatureOnDidUpdate(ctx *sdk.Context, oldDIDDoc *types
 	// DID Doc controller has been changed
 	if removedControllers := strings.Complement(oldController, newController); len(removedControllers) > 0 {
 		for _, controller := range removedControllers {
-			signers = append(signers, types.Signer{Signer: controller})
+			signers = append(signers, v1.Signer{Signer: controller})
 		}
 	}
 
@@ -164,14 +164,14 @@ func (k msgServer) VerifySignatureOnDidUpdate(ctx *sdk.Context, oldDIDDoc *types
 	return nil
 }
 
-func AppendSignerIfNeed(signers []types.Signer, controller string, msg *types.MsgUpdateDidPayload) []types.Signer {
+func AppendSignerIfNeed(signers []v1.Signer, controller string, msg *v1.MsgUpdateDidPayload) []v1.Signer {
 	for _, signer := range signers {
 		if signer.Signer == controller {
 			return signers
 		}
 	}
 
-	signer := types.Signer{
+	signer := v1.Signer{
 		Signer: controller,
 	}
 

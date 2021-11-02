@@ -1,6 +1,7 @@
 package app
 
 import (
+	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types/v1"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	authzmodule "github.com/cosmos/cosmos-sdk/x/authz/module"
@@ -34,7 +35,6 @@ import (
 	appparams "github.com/cheqd/cheqd-node/app/params"
 	"github.com/cheqd/cheqd-node/x/cheqd"
 	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
