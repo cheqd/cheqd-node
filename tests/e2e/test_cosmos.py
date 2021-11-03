@@ -219,7 +219,7 @@ def test_keys_parse():
 @pytest.mark.parametrize(
         "command, params, expected_output",
         [
-            ("staking validators", f"{TEST_NET_DESTINATION}", r"pagination:(.*?)validators:"), # test net
+            # ("staking validators", f"{TEST_NET_DESTINATION}", r"pagination:(.*?)validators:"), # test net
             ("staking validators", f"{LOCAL_NET_DESTINATION}", r"pagination:(.*?)validators:"), # local net
             ("bank balances", f"{LOCAL_SENDER_ADDRESS} {LOCAL_NET_DESTINATION}", r"balances:(.*?)amount:(.*?)denom: ncheq(.*?)pagination:"),
             ("bank balances", f"{LOCAL_RECEIVER_ADDRESS} {LOCAL_NET_DESTINATION}", r"balances:(.*?)amount:(.*?)denom: ncheq(.*?)pagination:"),
