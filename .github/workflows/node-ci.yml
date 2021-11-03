@@ -205,10 +205,10 @@ jobs:
           docker ps
           curl http://127.0.0.1:26657
 
-      - name: Setup python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.6'
+      # - name: Setup python
+      #   uses: actions/setup-python@v2
+      #   with:
+      #     python-version: '3.6'
 
       - name: Set up test environment
         working-directory: ./tests/e2e
@@ -225,7 +225,7 @@ jobs:
         run: |
           export OP0_ADDRESS=""
           export OP1_ADDRESS=""
-          RUST_LOG=trace pytest -v -s tests/e2e/test_identity.py::test_did_positive
+          pytest -v -s tests/e2e/test_identity.py::test_did_positive
 
       - name: Show logs on failure
         if: ${{ failure() }}
