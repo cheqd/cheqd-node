@@ -37,6 +37,12 @@ SENDER_MNEMONIC = "sketch mountain erode window enact net enrich smoke claim kan
 RECEIVER_ADDRESS= "cheqd1l9sq0se0jd3vklyrrtjchx4ua47awug5vsyeeh"
 RECEIVER_MNEMONIC = "ugly dirt sorry girl prepare argue door man that manual glow scout bomb pigeon matter library transfer flower clown cat miss pluck drama dizzy"
 
+# # addresses and mnemonics for local docker image after upgrade
+# SENDER_ADDRESS = "cheqd1r2290vaq2tyya3urpzqzsgxlpy6dpynfjqkc98"
+# SENDER_MNEMONIC = "crazy dwarf rose garbage half melt maze voyage position surprise grid kingdom armed kiwi jealous toilet flag culture casino cube biology physical burger note"
+# RECEIVER_ADDRESS= "cheqd1qx9rlu5czc39tl3x2mwej435rftkumcd5zpww7"
+# RECEIVER_MNEMONIC = "lemon decade dune confirm tragic task maple ketchup merit grit dinosaur food flight urban differ aware either civil law vicious cream easy sibling just"
+
 LOCAL_SENDER_ADDRESS = os.environ["OP0_ADDRESS"]
 LOCAL_RECEIVER_ADDRESS = os.environ["OP1_ADDRESS"]
 
