@@ -1,4 +1,4 @@
-package types
+package v1
 
 import "github.com/multiformats/go-multibase"
 

@@ -1,4 +1,4 @@
-package types
+package v1
 
 import (
 	"encoding/base64"
@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	StateValueDid = "/cheqdid.cheqdnode.cheqd.Did"
+	StateValueDid = "/cheqdid.cheqdnode.cheqd.v1.Did"
 )
 
 func NewStateValue(msg proto.Message, metadata *Metadata) (*StateValue, error) {

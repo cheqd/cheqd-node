@@ -17,6 +17,7 @@ description: >-
 ## Proposed
 
 1. [ADR 002: **Identity entities and transactions**](adr_002_identity_transactions.md)
+2. [ADR 008: **Resources: schema, credential definition**](adr-008-identity-resources.md)
 
 ## Draft
 

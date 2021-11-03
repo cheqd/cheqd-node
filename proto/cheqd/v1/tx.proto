@@ -1,21 +1,26 @@
 syntax = "proto3";
-package cheqdid.cheqdnode.cheqd;
+package cheqdid.cheqdnode.cheqd.v1;
 import "google/protobuf/any.proto";
-import "cheqd/did.proto";
+import "cheqd/v1/did.proto";
 
 // this line is used by starport scaffolding # proto/tx/import
 
-option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
+option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types/v1";
 
 // Msg defines the Msg service.
 service Msg {
-  rpc CreateDid(MsgWriteRequest) returns (MsgCreateDidResponse);
-  rpc UpdateDid(MsgWriteRequest) returns (MsgUpdateDidResponse);
+  rpc CreateDid(MsgCreateDid) returns (MsgCreateDidResponse);
+  rpc UpdateDid(MsgUpdateDid) returns (MsgUpdateDidResponse);
 }
 
 // this line is used by starport scaffolding # proto/tx/message
-message MsgWriteRequest {
-  google.protobuf.Any data = 1;
+message MsgCreateDid {
+  MsgCreateDidPayload payload = 1;
+  repeated SignInfo signatures = 2;
+}
+
+message MsgUpdateDid {
+  MsgUpdateDidPayload payload = 1;
   repeated SignInfo signatures = 2;
 }
 
@@ -24,7 +29,7 @@ message SignInfo {
   string signature = 2;
 }
 
-message MsgCreateDid {
+message MsgCreateDidPayload {
   string id = 1;
   repeated string controller = 2;
   repeated VerificationMethod verification_method = 3;
@@ -34,7 +39,7 @@ message MsgCreateDid {
   repeated string capability_delegation = 7;
   repeated string key_agreement = 8;
   repeated string also_known_as = 9;
-  repeated ServiceEndpoint service = 10;
+  repeated Service service = 10;
   repeated string context = 11;
 }
 
@@ -42,7 +47,7 @@ message MsgCreateDidResponse {
   string id = 1;
 }
 
-message MsgUpdateDid {
+message MsgUpdateDidPayload {
   string id = 1;
   repeated string controller = 2;
   repeated VerificationMethod verification_method = 3;
@@ -52,7 +57,7 @@ message MsgUpdateDid {
   repeated string capability_delegation = 7;
   repeated string key_agreement = 8;
   repeated string also_known_as = 9;
-  repeated ServiceEndpoint service = 10;
+  repeated Service service = 10;
   repeated string context = 11;
   string version_id = 12;
 }

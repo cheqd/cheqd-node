@@ -1,9 +1,9 @@
 syntax = "proto3";
-package cheqdid.cheqdnode.cheqd;
+package cheqdid.cheqdnode.cheqd.v1;
 import "google/protobuf/any.proto";
 
 // this line is used by starport scaffolding # proto/tx/import
-option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
+option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types/v1";
 
 message StateValue {
   google.protobuf.Any data = 1;
