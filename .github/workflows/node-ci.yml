@@ -215,11 +215,7 @@ jobs:
         run: |
           sudo cp libindy.so /usr/lib/libindy.so
           pip3 install -r requirements.txt >> /dev/null
-          git clone https://gitlab.com/evernym/verity/vdr-tools.git
-          pushd vdr-tools
-          git checkout 21de3b374ba7252cea627a8e8badfe6adfbe042d
-          pip3 install -e wrappers/python/
-          popd
+          pip3 install --force-reinstall 'git+https://gitlab.com/evernym/verity/vdr-tools.git@DEV-330#egg=vdr-tools&subdirectory=wrappers/python' -U
 
       - name: Run tests
         run: |

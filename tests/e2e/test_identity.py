@@ -10,8 +10,8 @@ from vdrtools.error import CommonInvalidStructure
 from helpers import create_did_helper, query_did_helper, random_string, update_did_helper, wallet_helper, get_base_account_number_and_sequence, get_timeout_height, get_balance_vdr, send_tx_helper, \
     SENDER_ADDRESS, SENDER_MNEMONIC, RECEIVER_ADDRESS, LOCAL_NET_NETWORK, TEST_NET_GAS_X_GAS_PRICES_INT, GAS_AMOUNT, GAS_PRICE, DENOM
 
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG)
+# logger = logging.getLogger(__name__)
+# logging.basicConfig(level=logging.DEBUG)
 # logging.basicConfig(filename='/tmp/tests.log', encoding='utf-8', level=logging.DEBUG)
 
 key_alias = "operator0"
@@ -20,7 +20,7 @@ default_memo = "test_memo"
 MAX_GAS_MAGIC_NUMBER_NEGATIVE = 1.2
 MAX_GAS_MAGIC_NUMBER = 1.3
 LOCAL_POOL_HTTP = "http://localhost:26657"
-FQ_PREFIX = "did:cheqd:cheqd:"
+FQ_PREFIX = "did:cheqd:testnet:"
 
 
 @pytest.mark.parametrize(
@@ -123,7 +123,6 @@ async def test_memo(memo):
 @pytest.mark.asyncio
 async def test_did_positive():
     pool_alias = random_string(5)
-    # pool_alias = "defined"
     await cheqd_pool.add(pool_alias, LOCAL_POOL_HTTP, LOCAL_NET_NETWORK)
     wallet_handle, _, _ = await wallet_helper()
     public_key = json.loads(
