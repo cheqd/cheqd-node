@@ -164,9 +164,10 @@ async def get_base_account_number_and_sequence(pool_alias, account_id):
 
 
 async def get_timeout_height(pool_alias):
-    TIMEOUT = 20
-    info = await cheqd_pool.abci_info(pool_alias)
-    info = json.loads(info)
-    current_height = info["response"]["last_block_height"]
+    # TIMEOUT = 20
+    # info = await cheqd_pool.abci_info(pool_alias)
+    # info = json.loads(info)
+    # current_height = info["response"]["last_block_height"]
 
-    return int(current_height) + TIMEOUT
+    # return int(current_height) + TIMEOUT
+    return 100
