@@ -1,4 +1,4 @@
-package types
+package v1
 
 import (
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
@@ -93,7 +93,7 @@ func NewMsgCreateDidPayloadPayload(
 	capabilityDelegation []string,
 	keyAgreement []string,
 	alsoKnownAs []string,
-	service []*ServiceEndpoint,
+	service []*Service,
 	context []string,
 ) *MsgCreateDidPayload {
 	return &MsgCreateDidPayload{
@@ -227,7 +227,7 @@ func NewMsgUpdateDidPayloadPayload(
 	capabilityDelegation []string,
 	keyAgreement []string,
 	alsoKnownAs []string,
-	service []*ServiceEndpoint,
+	service []*Service,
 	context []string,
 ) *MsgUpdateDidPayload {
 	return &MsgUpdateDidPayload{
@@ -400,7 +400,7 @@ func ValidateVerificationMethod(namespace string, vm *VerificationMethod) error 
 	return nil
 }
 
-func ValidateServices(namespace string, did string, services []*ServiceEndpoint) error {
+func ValidateServices(namespace string, did string, services []*Service) error {
 	for i, s := range services {
 		if err := ValidateService(namespace, s); err != nil {
 			return ErrBadRequestInvalidService.Wrap(sdkerrors.Wrapf(err, "index %d, value %s", i, s.Id).Error())
@@ -420,7 +420,7 @@ func ValidateServices(namespace string, did string, services []*ServiceEndpoint)
 	return nil
 }
 
-func ValidateService(namespace string, s *ServiceEndpoint) error {
+func ValidateService(namespace string, s *Service) error {
 	if !utils.IsDidFragment(namespace, s.Id) {
 		return ErrBadRequestIsNotDidFragment.Wrap(s.Id)
 	}
@@ -442,7 +442,7 @@ func IncludeVerificationMethod(did string, vms []*VerificationMethod, id string)
 	return false
 }
 
-func IncludeService(did string, services []*ServiceEndpoint, id string) bool {
+func IncludeService(did string, services []*Service, id string) bool {
 	for _, s := range services {
 		if utils.ResolveId(did, s.Id) == utils.ResolveId(did, id) {
 			return true

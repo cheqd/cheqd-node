@@ -3,7 +3,7 @@ package cheqd
 import (
 	"fmt"
 	"github.com/cheqd/cheqd-node/x/cheqd/keeper"
-	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	"github.com/cheqd/cheqd-node/x/cheqd/types/v1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -17,16 +17,16 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 		switch msg := msg.(type) {
 		// this line is used by starport scaffolding # 1
-		case *types.MsgCreateDid:
+		case *v1.MsgCreateDid:
 			res, err := msgServer.CreateDid(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
-		case *types.MsgUpdateDid:
+		case *v1.MsgUpdateDid:
 			res, err := msgServer.UpdateDid(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		default:
-			errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName, msg)
+			errMsg := fmt.Sprintf("unrecognized %s message type: %T", v1.ModuleName, msg)
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 		}
 	}

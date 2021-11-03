@@ -1,4 +1,4 @@
-package types
+package v1
 
 const (
 	// ModuleName defines the module name
@@ -26,3 +26,5 @@ const (
 	DidKey      = "did:"
 	DidCountKey = "did-count:"
 )
+
+const DidNamespaceKey = "did-namespace:"
