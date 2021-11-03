@@ -2,7 +2,7 @@ package cli
 
 import (
 	"encoding/base64"
-	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	"github.com/cheqd/cheqd-node/x/cheqd/types/v1"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -22,7 +22,7 @@ func CmdCreateDid() *cobra.Command {
 				return err
 			}
 
-			var msg types.MsgWriteRequest
+			var msg v1.MsgCreateDid
 			data, err := base64.StdEncoding.DecodeString(argsDidBase64)
 			if err != nil {
 				return err
@@ -57,7 +57,7 @@ func CmdUpdateDid() *cobra.Command {
 				return err
 			}
 
-			var msg types.MsgWriteRequest
+			var msg v1.MsgUpdateDid
 			data, err := base64.StdEncoding.DecodeString(argsDidBase64)
 			if err != nil {
 				return err

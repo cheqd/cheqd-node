@@ -7,14 +7,14 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	// "github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	"github.com/cheqd/cheqd-node/x/cheqd/types/v1"
 )
 
 // GetTxCmd returns the transaction commands for this module
 func GetTxCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:                        types.ModuleName,
-		Short:                      fmt.Sprintf("%s transactions subcommands", types.ModuleName),
+		Use:                        v1.ModuleName,
+		Short:                      fmt.Sprintf("%s transactions subcommands", v1.ModuleName),
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
