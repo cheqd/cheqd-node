@@ -6,8 +6,11 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"github.com/btcsuite/btcutil/base58"
+	"github.com/cheqd/cheqd-node/app"
+	"github.com/cheqd/cheqd-node/cmd/cheqd-noded/cmd"
 	"github.com/cheqd/cheqd-node/x/cheqd/client/cli"
 	"github.com/cheqd/cheqd-node/x/cheqd/types/v1"
+	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 	"github.com/spf13/cobra"
 )
 
@@ -19,13 +22,16 @@ type KeyPair struct {
 type TestSetup struct {
 	txCmd    *cobra.Command
 	queryCmd *cobra.Command
+	root     *cobra.Command
 	keys     map[string]KeyPair
 }
 
 func Setup() (*TestSetup, error) {
+	root, _ := cmd.NewRootCmd()
 	setup := TestSetup{
 		txCmd:    cli.GetTxCmd(),
 		queryCmd: cli.GetQueryCmd(),
+		root:     root,
 	}
 
 	keys, err := setup.CreatePreparedDID()
@@ -36,6 +42,7 @@ func Setup() (*TestSetup, error) {
 	return &TestSetup{
 		txCmd:    cli.GetTxCmd(),
 		queryCmd: cli.GetQueryCmd(),
+		root:     root,
 		keys:     keys,
 	}, nil
 }
@@ -193,16 +200,19 @@ func (t TestSetup) CreatePreparedDID() (map[string]KeyPair, error) {
 func (t TestSetup) SendCreateDid(msg *v1.MsgCreateDidPayload, keys map[string]ed25519.PrivateKey) (string, error) {
 	msgWriteRequestBytes, _ := WrapRequestCreateDid(msg, keys).Marshal()
 	argWriteRequest := base64.StdEncoding.EncodeToString(msgWriteRequestBytes)
-	return t.ExecuteCommand(t.txCmd, "create-did", argWriteRequest, "--from=cheqd1rnr5jrt4exl0samwj0yegv99jeskl0hsxmcz96")
+	return t.ExecuteCommand("tx", "cheqd", "create-did", argWriteRequest)
 }
 
-func (t TestSetup) ExecuteCommand(cmd *cobra.Command, args ...string) (output string, err error) {
+func (t TestSetup) ExecuteCommand(args ...string) (output string, err error) {
 	buf := new(bytes.Buffer)
-	cmd.SetOut(buf)
-	cmd.SetErr(buf)
-	cmd.SetArgs(args)
+	t.root.SetOut(buf)
+	t.root.SetErr(buf)
+	t.root.SetArgs(args)
 
-	err = cmd.Execute()
+	if err := svrcmd.Execute(t.root, app.DefaultNodeHome); err != nil {
+		return buf.String(), err
+	}
+
 	return buf.String(), err
 }
 
