@@ -16,8 +16,8 @@ from helpers import run, run_interaction, get_balance, send_with_note, set_up_op
         "command, params, expected_output",
         [
             ("help", "",r"cheqd App(.*?)Usage:(.*?)Available Commands:(.*?)Flags:"),
-            ("status", TEST_NET_NODE_TCP, fr"\"NodeInfo\"(.*?)\"network\":\"{TEST_NET_NETWORK}\"(.*?)\"moniker\":\"seed1-us-testnet-cheqd\""), # tcp + us node
-            ("status", TEST_NET_NODE_HTTP, fr"\"NodeInfo\"(.*?)\"network\":\"{TEST_NET_NETWORK}\"(.*?)\"moniker\":\"node1-eu-testnet-cheqd\""), # http + eu node
+            # ("status", TEST_NET_NODE_TCP, fr"\"NodeInfo\"(.*?)\"network\":\"{TEST_NET_NETWORK}\"(.*?)\"moniker\":\"seed1-us-testnet-cheqd\""), # tcp + us node
+            # ("status", TEST_NET_NODE_HTTP, fr"\"NodeInfo\"(.*?)\"network\":\"{TEST_NET_NETWORK}\"(.*?)\"moniker\":\"node1-eu-testnet-cheqd\""), # http + eu node
             ("status", LOCAL_NET_NODE_TCP, fr"\"NodeInfo\"(.*?)\"network\":\"{LOCAL_NET_NETWORK}\"(.*?)\"moniker\":\"node0\""), # tcp + local
             ("status", LOCAL_NET_NODE_HTTP, fr"\"NodeInfo\"(.*?)\"network\":\"{LOCAL_NET_NETWORK}\"(.*?)\"moniker\":\"node0\""), # http + local
         ]
@@ -284,11 +284,11 @@ def test_tendermint(command, params, expected_output):
     run(command_base, command, params, expected_output)
 
 
-@settings(deadline=None, max_examples=10) # investigate n and N memo issue
-@given(note=strategies.text(ascii_letters, min_size=1, max_size=256))
+@settings(deadline=None, max_examples=5) # investigate n and N memo issue
+@given(note=strategies.text(ascii_letters, min_size=1, max_size=1024))
 def test_memo(note):
     tx_hash, tx_memo = send_with_note(note)
-    time.sleep(5) # FIXME
+    time.sleep(15) # FIXME
     run("cheqd-noded query", "tx", f"{tx_hash} {LOCAL_NET_DESTINATION}", fr"code: 0(.*?)memo: {tx_memo}(.*?)txhash: {tx_hash}") # check that txn has correct memo value
 
 
