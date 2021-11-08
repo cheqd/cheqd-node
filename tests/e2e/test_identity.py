@@ -73,7 +73,7 @@ async def test_gas_estimation(magic_number_negative, magic_number_positive, tran
     assert json.loads(positive_res)["check_tx"]["code"] == 0
 
 
-@pytest.mark.parametrize("transfer_amount", [1, 999, 1001, 987654321])
+@pytest.mark.parametrize("transfer_amount", [1, 999, 1001, 987654321]) # TODO: hypothesis
 @pytest.mark.asyncio
 async def test_token_transfer(transfer_amount):
     pool_alias = random_string(5)
@@ -98,9 +98,7 @@ async def test_token_transfer(transfer_amount):
     assert int(new_receiver_balance) == (int(receiver_balance) + transfer_amount)
 
 
-@pytest.mark.parametrize("note", ["a", "1", "test_memo_test", "123qwe$%^&", "______________________________"])
-# @settings(deadline=None, max_examples=20)
-# @given(note=strategies.text(ascii_letters, min_size=1, max_size=1024))
+@pytest.mark.parametrize("note", ["a", "1", "test_memo_test", "123qwe$%^&", "______________________________"]) # TODO: hypothesis
 @pytest.mark.asyncio
 async def test_memo(note): # intermittent failures here due to `Internal error: timed out waiting for tx to be included in a block`
     pool_alias = random_string(5)
