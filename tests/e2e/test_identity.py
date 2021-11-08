@@ -2,6 +2,8 @@ import pytest
 import json
 import logging
 import time
+from hypothesis import settings, given, strategies, Phase, Verbosity
+from string import digits, ascii_letters
 
 from vdrtools import wallet, did
 from vdrtools import cheqd_keys, cheqd_pool, cheqd_ledger
@@ -96,7 +98,9 @@ async def test_token_transfer(transfer_amount):
     assert int(new_receiver_balance) == (int(receiver_balance) + transfer_amount)
 
 
-@pytest.mark.parametrize("memo", ["a", "1", "test_memo_test", "123qwe$%^&", "______________________________"])
+# @pytest.mark.parametrize("memo", ["a", "1", "test_memo_test", "123qwe$%^&", "______________________________"])
+@settings(deadline=None, max_examples=20)
+@given(note=strategies.text(ascii_letters, min_size=1, max_size=1024))
 @pytest.mark.asyncio
 async def test_memo(memo): # intermittent failures here due to `Internal error: timed out waiting for tx to be included in a block`
     pool_alias = random_string(5)
