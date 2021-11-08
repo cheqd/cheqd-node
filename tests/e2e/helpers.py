@@ -8,6 +8,7 @@ import json
 
 from vdrtools import wallet
 from vdrtools import cheqd_keys, cheqd_pool, cheqd_ledger
+from vdrtools.error import CommonInvalidStructure
 
 IMPLICIT_TIMEOUT = 30
 ENCODING = "utf-8"
@@ -164,10 +165,11 @@ async def get_base_account_number_and_sequence(pool_alias, account_id):
 
 
 async def get_timeout_height(pool_alias):
-    # TIMEOUT = 20
-    # info = await cheqd_pool.abci_info(pool_alias)
-    # info = json.loads(info)
-    # current_height = info["response"]["last_block_height"]
-
-    # return int(current_height) + TIMEOUT
-    return 100
+    TIMEOUT = 30
+    try:
+        info = await cheqd_pool.abci_info(pool_alias)
+        info = json.loads(info)
+        current_height = info["response"]["last_block_height"]
+        return int(current_height) + TIMEOUT
+    except CommonInvalidStructure:
+        return 100
