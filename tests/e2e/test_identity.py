@@ -104,6 +104,7 @@ async def test_token_transfer(transfer_amount):
 @pytest.mark.asyncio
 async def test_memo(note): # intermittent failures here due to `Internal error: timed out waiting for tx to be included in a block`
     pool_alias = random_string(5)
+    await cheqd_pool.add(pool_alias, LOCAL_POOL_HTTP, LOCAL_NET_NETWORK)
     wallet_handle, _, _ = await wallet_helper()
     public_key = json.loads(
         await cheqd_keys.add_from_mnemonic(wallet_handle, key_alias, SENDER_MNEMONIC, "")
