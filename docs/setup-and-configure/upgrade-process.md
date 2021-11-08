@@ -19,7 +19,7 @@ The next steps are describing the general flow for making a proposal:
 #### Command for sending proposal
 
 ```
-cheqd-noded tx gov submit-proposal software-upgrade upgrade_to_0.3 --title "Upgrade to 0.3 version" --description "This proposal is about new version of our application." --upgrade-height 1000 --from <operator alias> --chain-id <chain_id>
+cheqd-noded tx gov submit-proposal software-upgrade upgrade_to_0.3 --title "Upgrade to 0.3 version" --description "This proposal is about new version of our application." --upgrade-height <upgrade height> --from <operator alias> --chain-id <chain_id>
 ```
 The main parameters here are:
 - `upgrade_to_0.3` - name of proposal which will be used in `UpgradeHandler` in the new application,
