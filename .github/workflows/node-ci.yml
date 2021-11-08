@@ -142,7 +142,6 @@ jobs:
     name: Run cosmos-specific tests using cheqd-node CLI
     runs-on: ubuntu-20.04
     needs: build-images-and-set-up-pool
-    needs: build
     steps:
       - name: Download deb
         uses: actions/download-artifact@v2
@@ -185,7 +184,6 @@ jobs:
     name: Run identity-specific tests using VDR
     runs-on: ubuntu-20.04
     needs: build-images-and-set-up-pool
-    needs: build
     steps:
       - name: Check out code
         uses: actions/checkout@v2
