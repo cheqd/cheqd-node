@@ -98,11 +98,11 @@ async def test_token_transfer(transfer_amount):
     assert int(new_receiver_balance) == (int(receiver_balance) + transfer_amount)
 
 
-# @pytest.mark.parametrize("memo", ["a", "1", "test_memo_test", "123qwe$%^&", "______________________________"])
+# @pytest.mark.parametrize("note", ["a", "1", "test_memo_test", "123qwe$%^&", "______________________________"])
 @settings(deadline=None, max_examples=20)
 @given(note=strategies.text(ascii_letters, min_size=1, max_size=1024))
 @pytest.mark.asyncio
-async def test_memo(memo): # intermittent failures here due to `Internal error: timed out waiting for tx to be included in a block`
+async def test_memo(note): # intermittent failures here due to `Internal error: timed out waiting for tx to be included in a block`
     pool_alias = random_string(5)
     await cheqd_pool.add(pool_alias, LOCAL_POOL_HTTP, LOCAL_NET_NETWORK)
     wallet_handle, _, _ = await wallet_helper()
@@ -114,7 +114,7 @@ async def test_memo(memo): # intermittent failures here due to `Internal error: 
         SENDER_ADDRESS, RECEIVER_ADDRESS, str(default_amount), DENOM
     )
     res, tx_hash = await send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, SENDER_ADDRESS, msg, memo)
-    assert json.loads(res)["check_tx"]["code"] == 0
+    assert res["check_tx"]["code"] == 0
 
     request = await cheqd_ledger.tx.build_query_get_tx_by_hash(tx_hash)
     res = await cheqd_pool.abci_query(pool_alias, request)

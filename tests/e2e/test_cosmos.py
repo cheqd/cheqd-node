@@ -8,7 +8,7 @@ from string import digits, ascii_letters
 from helpers import run, run_interaction, get_balance, send_with_note, set_up_operator, random_string, \
     TEST_NET_NETWORK, TEST_NET_NODE_TCP, TEST_NET_NODE_HTTP, TEST_NET_DESTINATION, TEST_NET_DESTINATION_HTTP, \
     LOCAL_NET_NETWORK, LOCAL_NET_NODE_TCP, LOCAL_NET_NODE_HTTP, LOCAL_NET_DESTINATION, LOCAL_NET_DESTINATION_HTTP, \
-    TEST_NET_FEES, TEST_NET_GAS_X_GAS_PRICES, YES_FLAG, \
+    TEST_NET_FEES, TEST_NET_GAS_X_GAS_PRICES, YES_FLAG, IMPLICIT_TIMEOUT, \
     LOCAL_SENDER_ADDRESS, LOCAL_RECEIVER_ADDRESS,CODE_0, TEST_NET_GAS_X_GAS_PRICES_INT
 
 
@@ -281,7 +281,11 @@ def test_tendermint(command, params, expected_output):
 @given(note=strategies.text(ascii_letters, min_size=1, max_size=1024))
 def test_memo(note): # intermittent failures here due to `Internal error: timed out waiting for tx to be included in a block`
     tx_hash, tx_memo = send_with_note(note)
-    run("cheqd-noded query", "tx", f"{tx_hash} {LOCAL_NET_DESTINATION}", fr"code: 0(.*?)memo: {tx_memo}(.*?)txhash: {tx_hash}") # check that txn has correct memo value
+    try:
+        run("cheqd-noded query", "tx", f"{tx_hash} {LOCAL_NET_DESTINATION}", fr"code: 0(.*?)memo: {tx_memo}(.*?)txhash: {tx_hash}") # check that txn has correct memo value
+    except Exception:
+        time.sleep(IMPLICIT_TIMEOUT)
+        run("cheqd-noded query", "tx", f"{tx_hash} {LOCAL_NET_DESTINATION}", fr"code: 0(.*?)memo: {tx_memo}(.*?)txhash: {tx_hash}") # check that txn has correct memo value
 
 
 @settings(deadline=None, max_examples=10)
