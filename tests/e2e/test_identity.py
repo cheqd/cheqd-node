@@ -109,8 +109,8 @@ async def test_memo(memo): # intermittent failures here due to `Internal error: 
     msg = await cheqd_ledger.bank.build_msg_send(
         SENDER_ADDRESS, RECEIVER_ADDRESS, str(default_amount), DENOM
     )
-    _, tx_hash = await send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, SENDER_ADDRESS, msg, memo) 
-    # time.sleep(15) # FIXME
+    res, tx_hash = await send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, SENDER_ADDRESS, msg, memo)
+    assert json.loads(res)["check_tx"]["code"] == 0
 
     request = await cheqd_ledger.tx.build_query_get_tx_by_hash(tx_hash)
     res = await cheqd_pool.abci_query(pool_alias, request)

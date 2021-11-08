@@ -211,4 +211,4 @@ jobs:
         run: |
           export OP0_ADDRESS=""
           export OP1_ADDRESS=""
-          pytest -v -s tests/e2e/test_identity.py
+          pytest -v -rP tests/e2e/test_identity.py
