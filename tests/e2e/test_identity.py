@@ -12,7 +12,6 @@ from helpers import create_did_helper, query_did_helper, random_string, update_d
 
 # logger = logging.getLogger(__name__)
 # logging.basicConfig(level=logging.DEBUG)
-# logging.basicConfig(filename='/tmp/tests.log', encoding='utf-8', level=logging.DEBUG)
 
 key_alias = "operator0"
 default_amount = 1000
