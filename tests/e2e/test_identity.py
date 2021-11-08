@@ -98,7 +98,7 @@ async def test_token_transfer(transfer_amount):
 
 @pytest.mark.parametrize("memo", ["a", "1", "test_memo_test", "123qwe$%^&", "______________________________"])
 @pytest.mark.asyncio
-async def test_memo(memo):
+async def test_memo(memo): # intermittent failures here due to `Internal error: timed out waiting for tx to be included in a block`
     pool_alias = random_string(5)
     await cheqd_pool.add(pool_alias, LOCAL_POOL_HTTP, LOCAL_NET_NETWORK)
     wallet_handle, _, _ = await wallet_helper()
@@ -110,7 +110,7 @@ async def test_memo(memo):
         SENDER_ADDRESS, RECEIVER_ADDRESS, str(default_amount), DENOM
     )
     _, tx_hash = await send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, SENDER_ADDRESS, msg, memo) 
-    time.sleep(5) # FIXME
+    # time.sleep(15) # FIXME
 
     request = await cheqd_ledger.tx.build_query_get_tx_by_hash(tx_hash)
     res = await cheqd_pool.abci_query(pool_alias, request)
