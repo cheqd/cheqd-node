@@ -7,7 +7,7 @@ from string import digits, ascii_letters
 
 from vdrtools import wallet, did
 from vdrtools import cheqd_keys, cheqd_pool, cheqd_ledger
-from vdrtools.error import CommonInvalidStructure
+from vdrtools.error import CommonInvalidStructure, PoolLedgerConfigAlreadyExistsError
 
 from helpers import create_did_helper, query_did_helper, random_string, update_did_helper, wallet_helper, get_base_account_number_and_sequence, get_timeout_height, get_balance_vdr, send_tx_helper, \
     SENDER_ADDRESS, SENDER_MNEMONIC, RECEIVER_ADDRESS, LOCAL_NET_NETWORK, TEST_NET_GAS_X_GAS_PRICES_INT, GAS_AMOUNT, GAS_PRICE, DENOM
@@ -104,7 +104,10 @@ async def test_token_transfer(transfer_amount):
 @pytest.mark.asyncio
 async def test_memo(note): # intermittent failures here due to `Internal error: timed out waiting for tx to be included in a block`
     pool_alias = random_string(5)
-    await cheqd_pool.add(pool_alias, LOCAL_POOL_HTTP, LOCAL_NET_NETWORK)
+    try:
+        await cheqd_pool.add(pool_alias, LOCAL_POOL_HTTP, LOCAL_NET_NETWORK)
+    except PoolLedgerConfigAlreadyExistsError:
+        pass
     wallet_handle, _, _ = await wallet_helper()
     public_key = json.loads(
         await cheqd_keys.add_from_mnemonic(wallet_handle, key_alias, SENDER_MNEMONIC, "")
