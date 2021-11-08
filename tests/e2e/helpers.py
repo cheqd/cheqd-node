@@ -97,6 +97,14 @@ async def send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sende
     return res, tx_hash
 
 
+async def get_tx_helper(pool_alias, tx_hash):
+    request = await cheqd_ledger.tx.build_query_get_tx_by_hash(tx_hash)
+    res = await cheqd_pool.abci_query(pool_alias, request)
+    res = json.loads(await cheqd_ledger.tx.parse_query_get_tx_by_hash_resp(res))
+
+    return res
+
+
 async def create_did_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, fqdid, vk, memo):
     req = await cheqd_ledger.cheqd.build_msg_create_did(fqdid, vk)
     signed_req = await cheqd_ledger.cheqd.sign_msg_write_request(wallet_handle, fqdid, bytes(req))

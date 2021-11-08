@@ -9,7 +9,7 @@ from vdrtools import wallet, did
 from vdrtools import cheqd_keys, cheqd_pool, cheqd_ledger
 from vdrtools.error import CommonInvalidStructure, PoolLedgerConfigAlreadyExistsError
 
-from helpers import create_did_helper, query_did_helper, random_string, update_did_helper, wallet_helper, get_base_account_number_and_sequence, get_timeout_height, get_balance_vdr, send_tx_helper, \
+from helpers import create_did_helper, query_did_helper, random_string, update_did_helper, wallet_helper, get_base_account_number_and_sequence, get_timeout_height, get_balance_vdr, send_tx_helper, get_tx_helper, \
     SENDER_ADDRESS, SENDER_MNEMONIC, RECEIVER_ADDRESS, LOCAL_NET_NETWORK, TEST_NET_GAS_X_GAS_PRICES_INT, GAS_AMOUNT, GAS_PRICE, DENOM, IMPLICIT_TIMEOUT
 
 # logger = logging.getLogger(__name__)
@@ -116,16 +116,12 @@ async def test_memo(note): # intermittent failures here due to `Internal error: 
     res, tx_hash = await send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, SENDER_ADDRESS, msg, note)
     assert res["check_tx"]["code"] == 0
 
-    request = await cheqd_ledger.tx.build_query_get_tx_by_hash(tx_hash)
-
     try:
-        res = await cheqd_pool.abci_query(pool_alias, request)
-        res = json.loads(await cheqd_ledger.tx.parse_query_get_tx_by_hash_resp(res))
+        res = await get_tx_helper(pool_alias, tx_hash)
         assert res["tx"]["body"]["memo"] == note
     except TypeError:
         time.sleep(IMPLICIT_TIMEOUT)
-        res = await cheqd_pool.abci_query(pool_alias, request)
-        res = json.loads(await cheqd_ledger.tx.parse_query_get_tx_by_hash_resp(res))
+        res = await get_tx_helper(pool_alias, tx_hash)
         assert res["tx"]["body"]["memo"] == note
 
 
