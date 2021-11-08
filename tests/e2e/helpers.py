@@ -5,6 +5,7 @@ import re
 import random
 import string
 import json
+import time
 
 from vdrtools import wallet
 from vdrtools import cheqd_keys, cheqd_pool, cheqd_ledger
@@ -78,7 +79,12 @@ async def get_balance_vdr(pool_alias, address):
 
 
 def send_with_note(note):
-    cli = run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 1000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} --note {note}", fr"{CODE_0}(.*?)\"value\":\"1000ncheq\"")
+    try:
+        cli = run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 1000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} --note {note}", fr"{CODE_0}(.*?)\"value\":\"1000ncheq\"")
+    except pexpect.exceptions.EOF:
+        time.sleep(IMPLICIT_TIMEOUT)
+        cli = run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 1000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} --note {note}", fr"{CODE_0}(.*?)\"value\":\"1000ncheq\"")
+
     tx_hash = re.search(r"\"txhash\":\"(.+?)\"", cli.before).group(1).strip()
 
     return tx_hash, note
