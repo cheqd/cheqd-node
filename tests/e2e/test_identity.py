@@ -88,7 +88,7 @@ async def test_gas_estimation_negative(magic_number_negative, transfer_amount):
         await cheqd_pool.broadcast_tx_commit(pool_alias, prod_tx_negative_signed)
 
 
-@pytest.mark.parametrize("transfer_amount", [1, 999, 1001, 987654321]) # TODO: hypothesis
+@pytest.mark.parametrize("transfer_amount", [1, 999, 1001, 987654321, 1000000000000]) # TODO: hypothesis
 @pytest.mark.asyncio
 async def test_token_transfer_positive(transfer_amount):
     pool_alias = random_string(5)
@@ -136,8 +136,8 @@ async def test_token_transfer_negative(transfer_amount):
     new_sender_balance = await get_balance_vdr(pool_alias, SENDER_ADDRESS)
     new_receiver_balance = await get_balance_vdr(pool_alias, RECEIVER_ADDRESS)
 
-    assert int(new_sender_balance) == (int(sender_balance) - TEST_NET_GAS_X_GAS_PRICES_INT)
-    assert int(new_receiver_balance) == (int(receiver_balance))
+    assert int(new_sender_balance) == (int(sender_balance) - TEST_NET_GAS_X_GAS_PRICES_INT) # fees spent
+    assert int(new_receiver_balance) == (int(receiver_balance)) # not changed
 
 
 @pytest.mark.parametrize("note", ["a", "1", "test_memo_test", "123qwe$%^&", "______________________________"]) # TODO: hypothesis
