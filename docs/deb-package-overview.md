@@ -11,28 +11,22 @@ The package consists of:
 
 ### System user creation
 
-By default, cosmos-sdk create all needed directories in the `HOME` directory. That's why package creates a special `cheqd` user with home directory set to `/var/lib/cheqd`.
+By default, cosmos-sdk create all needed directories in the `HOME` directory. That's why package creates a special `cheqd` user with home directory set to `/home/cheqd`.
 
 ### Directories and symlinks
 
 According to general filesystem hierarchy standard \(FHS\), the next directories will be created:
 
-* `/etc/cheqd-node`
+* `$HOME/.cheqdnode/config`
   * Configuration files location
   * Permissions: `cheqd:cheqd`
-* `/var/lib/cheqd/data`
+* `$HOME/.cheqdnode/data`
   * Place for blockchain data
   * Permissions: cheqd:cheqd
-* `/var/log/cheqd-node`
+* `$HOME/.cheqdnode/log`
   * Place for logs
   * Permissions: syslog:adm \(set by rsyslog\)
 
-The following symlinks will be created:
-
-* `/etc/cheqd-node/` -&gt; `/var/lib/cheqd/.cheqdnode/config`
-  * For configs
-* `/var/lib/cheqd/data` -&gt; `/var/lib/cheqd/.cheqdnode/data`
-  * For data
 
 ### Rsyslog configuration
 
