@@ -43,6 +43,7 @@ LOCAL_SENDER_ADDRESS = os.environ["OP0_ADDRESS"]
 LOCAL_RECEIVER_ADDRESS = os.environ["OP1_ADDRESS"]
 
 CODE_0 = "\"code\":0"
+CODE_0_DIGIT = 0
 
 
 def random_string(length):
