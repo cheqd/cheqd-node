@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
-  title: Cosmos SDK - Legacy REST and gRPC Gateway docs
-  description: 'A REST interface for state queries, legacy transactions'
+  title: Cheqd - Tendermint RPC
+  description: 'A Tendermint RPC for state queries, write transactions'
   version: 1.0.0
 
 paths:
@@ -25,9 +25,10 @@ paths:
         200:
           description: DID Document
           schema:
-            $ref: '#/definitions/InventoryItem'
+            $ref: '#/definitions/StateValue'
         400:
           description: bad input parameter
+
   /createDid:
     post:
       tags:
@@ -44,27 +45,45 @@ paths:
           name: inventoryItem
           description: Inventory item to add
           schema:
-            $ref: '#/definitions/WriteRequest'
+            $ref: '#/definitions/MsgCreateDid'
       responses:
         201:
           description: item created
+          schema:
+            $ref: '#/definitions/MsgCreateDidResponse'
+        400:
+          description: invalid input, object invalid
+        409:
+          description: an existing item already exists
+
+  /updateDid:
+    post:
+      tags:
+        - admins
+      summary: adds an inventory item
+      operationId: updateInventory
+      description: Adds an item to the system
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: inventoryItem
+          description: Inventory item to add
+          schema:
+            $ref: '#/definitions/MsgUpdateDid'
+      responses:
+        201:
+          description: item created
+          schema:
+            $ref: '#/definitions/MsgUpdateDidResponse'
         400:
           description: invalid input, object invalid
         409:
           description: an existing item already exists
 definitions:
-  MsgWriteRequest:
-    type: object
-    required:
-      - data
-      - signatures
-    properties:
-      data:
-        type: object
-      signatures:
-        type: array
-        items:
-          $ref: '#/definitions/SignInfo'
+
 
   SignInfo:
     required:
@@ -77,8 +96,20 @@ definitions:
       signature:
         type: string
         example:  https://www.acme-corp.com
-
   MsgCreateDid:
+    type: object
+    required:
+      - payload
+      - signatures
+    properties:
+      payload:
+        $ref: '#/definitions/MsgCreateDidPayload'
+      signatures:
+        type: array
+        items:
+          $ref: '#/definitions/SignInfo'
+
+  MsgCreateDidPayload:
     required:
       - context
       - id
@@ -134,7 +165,7 @@ definitions:
       service:
         type: array
         items:
-          $ref: '#/definitions/ServiceEndpoint'
+          $ref: '#/definitions/Service'
 
   MsgCreateDidResponse:
     required:
@@ -144,7 +175,22 @@ definitions:
         type: string
         example: did:cheqd:testnet:6cgbu8ZPoWTnR5Rv5JcSMB
 
+
   MsgUpdateDid:
+    type: object
+    required:
+      - payload
+      - signatures
+    properties:
+      payload:
+        $ref: '#/definitions/MsgUpdateDidPayload'
+      signatures:
+        type: array
+        items:
+          $ref: '#/definitions/SignInfo'
+
+
+  MsgUpdateDidPayload:
     required:
       - context
       - id
@@ -201,7 +247,7 @@ definitions:
       service:
         type: array
         items:
-          $ref: '#/definitions/ServiceEndpoint'
+          $ref: '#/definitions/Service'
       versionId:
         type: string
         example: 1B3B00849B4D50E8FCCF50193E35FD6CA5FD4686ED6AD8F847AC8C5E466CFD3E
@@ -213,3 +259,73 @@ definitions:
       id:
         type: string
         example: did:cheqd:testnet:6cgbu8ZPoWTnR5Rv5JcSMB
+
+
+  StateValue:
+    required:
+      - data
+      - metadata
+    properties:
+      data:
+        type: object
+      metadata:
+        $ref: '#/definitions/Metadata'
+
+  Metadata:
+    required:
+      - created
+      - updated
+      - deactivated
+      - versionId
+    properties:
+      created:
+        type: string
+        example: 2020-12-20T19:17:47Z
+      updated:
+        type: string
+        example: 2020-12-20T19:17:47Z
+      deactivated:
+        type: boolean
+        example: false
+      versionId:
+        type: string
+        example: 1B3B00849B4D50E8FCCF50193E35FD6CA5FD4686ED6AD8F847AC8C5E466CFD3E
+
+  Service:
+    required:
+      - id
+      - type
+      - serviceEndpoint
+    properties:
+      id:
+        type: string
+        example: did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#linked-domain
+      type:
+        type: string
+        example: LinkedDomains
+      serviceEndpoint:
+        type: string
+        example: https://bar.example.com
+
+  VerificationMethod :
+    required:
+      - id
+      - type
+      - controller
+      - publicKeyJwk
+      - publicKeyMultibase
+    properties:
+      id:
+        type: string
+        example: did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#key-0
+      type:
+        type: string
+        example: Ed25519VerificationKey2020
+      controller:
+        type: string
+        example: did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue
+      publicKeyJwk:
+        type: object
+      publicKeyMultibase:
+        type: string
+        example: zAKJP3f7BD6W4iWEQ9jwndVTCBq8ua2Utt8EEjJ6Vxsf
