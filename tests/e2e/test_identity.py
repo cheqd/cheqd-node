@@ -114,7 +114,7 @@ async def test_token_transfer_positive(transfer_amount):
     assert int(new_receiver_balance) == (int(receiver_balance) + transfer_amount)
 
 
-@pytest.mark.parametrize("transfer_amount", [999999999999999999999]) # TODO: hypothesis
+@pytest.mark.parametrize("transfer_amount", [1111111111111111111111, 55555555555555555555555, 9999999999999999999999999]) # TODO: hypothesis
 @pytest.mark.asyncio
 async def test_token_transfer_negative(transfer_amount):
     pool_alias = random_string(5)
