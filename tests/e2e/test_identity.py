@@ -104,7 +104,7 @@ async def test_token_transfer_positive(transfer_amount):
     msg = await cheqd_ledger.bank.build_msg_send(
         SENDER_ADDRESS, RECEIVER_ADDRESS, str(transfer_amount), DENOM
     )
-    res = await send_tx_helper(pool_alias, wallet_handle, KEY_ALIAS, public_key, SENDER_ADDRESS, msg, DEFAULT_MEMO)
+    res, _ = await send_tx_helper(pool_alias, wallet_handle, KEY_ALIAS, public_key, SENDER_ADDRESS, msg, DEFAULT_MEMO)
     assert res["check_tx"]["code"] == CODE_0_DIGIT
 
     new_sender_balance = await get_balance_vdr(pool_alias, SENDER_ADDRESS)
@@ -130,9 +130,9 @@ async def test_token_transfer_negative(transfer_amount):
     msg = await cheqd_ledger.bank.build_msg_send(
         SENDER_ADDRESS, RECEIVER_ADDRESS, str(transfer_amount), DENOM
     )
-    res = await send_tx_helper(pool_alias, wallet_handle, KEY_ALIAS, public_key, SENDER_ADDRESS, msg, DEFAULT_MEMO)
-    # assert res["check_tx"]["code"] == CODE_0_DIGIT
+    res, _ = await send_tx_helper(pool_alias, wallet_handle, KEY_ALIAS, public_key, SENDER_ADDRESS, msg, DEFAULT_MEMO)
     print(res)
+    assert res["check_tx"]["code"] == CODE_0_DIGIT
 
 @pytest.mark.parametrize("note", ["a", "1", "test_memo_test", "123qwe$%^&", "______________________________"]) # TODO: hypothesis
 @pytest.mark.asyncio
