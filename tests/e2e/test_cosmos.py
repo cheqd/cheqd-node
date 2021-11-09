@@ -1,16 +1,14 @@
 import json
 import pytest
 import re
-import pexpect
-import os
-import shutil
+import time
 import getpass
 from hypothesis import settings, given, strategies, Phase, Verbosity
 from string import digits, ascii_letters
 from helpers import run, run_interaction, get_balance, send_with_note, set_up_operator, random_string, \
     TEST_NET_NETWORK, TEST_NET_NODE_TCP, TEST_NET_NODE_HTTP, TEST_NET_DESTINATION, TEST_NET_DESTINATION_HTTP, \
     LOCAL_NET_NETWORK, LOCAL_NET_NODE_TCP, LOCAL_NET_NODE_HTTP, LOCAL_NET_DESTINATION, LOCAL_NET_DESTINATION_HTTP, \
-    TEST_NET_FEES, TEST_NET_GAS_X_GAS_PRICES, YES_FLAG, \
+    TEST_NET_FEES, TEST_NET_GAS_X_GAS_PRICES, YES_FLAG, IMPLICIT_TIMEOUT, \
     LOCAL_SENDER_ADDRESS, LOCAL_RECEIVER_ADDRESS,CODE_0, TEST_NET_GAS_X_GAS_PRICES_INT
 
 
@@ -18,8 +16,6 @@ from helpers import run, run_interaction, get_balance, send_with_note, set_up_op
         "command, params, expected_output",
         [
             ("help", "",r"cheqd App(.*?)Usage:(.*?)Available Commands:(.*?)Flags:"),
-            ("status", TEST_NET_NODE_TCP, fr"\"NodeInfo\"(.*?)\"network\":\"{TEST_NET_NETWORK}\"(.*?)\"moniker\":\"seed1-us-testnet-cheqd\""), # tcp + us node
-            ("status", TEST_NET_NODE_HTTP, fr"\"NodeInfo\"(.*?)\"network\":\"{TEST_NET_NETWORK}\"(.*?)\"moniker\":\"node1-eu-testnet-cheqd\""), # http + eu node
             ("status", LOCAL_NET_NODE_TCP, fr"\"NodeInfo\"(.*?)\"network\":\"{LOCAL_NET_NETWORK}\"(.*?)\"moniker\":\"node0\""), # tcp + local
             ("status", LOCAL_NET_NODE_HTTP, fr"\"NodeInfo\"(.*?)\"network\":\"{LOCAL_NET_NETWORK}\"(.*?)\"moniker\":\"node0\""), # http + local
         ]
@@ -57,8 +53,6 @@ def test_keys_add_recover():
     print(mnemonic)
 
     run(command_base, "delete", f"{key_name} {YES_FLAG}", r"Key deleted forever \(uh oh!\)")
-    # keys_path = "/home/{}/.cheqdnode/".format(getpass.getuser())
-    # shutil.rmtree(keys_path)
 
     cli = run(command_base, "add", "{} --recover".format(key_name), "Enter your bip39 mnemonic")
     run_interaction(cli, mnemonic, r"- name: {}(.*?)type: local(.*?)address: (.*?)pubkey: (.*?)mnemonic: ".format(key_name))
@@ -90,8 +84,6 @@ def test_keys_add_recover_wrong_phrase():
     run(command_base, "add", key_name, "name: {}".format(key_name))
 
     run(command_base, "delete", f"{key_name} {YES_FLAG}", r"Key deleted forever \(uh oh!\)")
-    # keys_path = "/home/{}/.cheqdnode/".format(getpass.getuser())
-    # shutil.rmtree(keys_path)
 
     cli = run(command_base, "add", "{} --recover".format(key_name), "Enter your bip39 mnemonic")
     run_interaction(cli, random_string(20), "Error: invalid mnemonic")
@@ -221,7 +213,6 @@ def test_keys_parse():
 @pytest.mark.parametrize(
         "command, params, expected_output",
         [
-            ("staking validators", f"{TEST_NET_DESTINATION}", r"pagination:(.*?)validators:"), # test net
             ("staking validators", f"{LOCAL_NET_DESTINATION}", r"pagination:(.*?)validators:"), # local net
             ("bank balances", f"{LOCAL_SENDER_ADDRESS} {LOCAL_NET_DESTINATION}", r"balances:(.*?)amount:(.*?)denom: ncheq(.*?)pagination:"),
             ("bank balances", f"{LOCAL_RECEIVER_ADDRESS} {LOCAL_NET_DESTINATION}", r"balances:(.*?)amount:(.*?)denom: ncheq(.*?)pagination:"),
@@ -286,14 +277,18 @@ def test_tendermint(command, params, expected_output):
     run(command_base, command, params, expected_output)
 
 
-@settings(deadline=None, max_examples=10)
-@given(note=strategies.text(ascii_letters, min_size=1, max_size=512))
-def test_memo(note):
+@settings(deadline=None, max_examples=20)
+@given(note=strategies.text(ascii_letters, min_size=2, max_size=1024)) # start from 2 - cosmos issue with single word memo
+def test_memo(note): # intermittent failures here due to `Internal error: timed out waiting for tx to be included in a block`
     tx_hash, tx_memo = send_with_note(note)
-    run("cheqd-noded query", "tx", f"{tx_hash} {LOCAL_NET_DESTINATION}", fr"code: 0(.*?)memo: {tx_memo}(.*?)txhash: {tx_hash}") # check that txn has correct memo value
+    try:
+        run("cheqd-noded query", "tx", f"{tx_hash} {LOCAL_NET_DESTINATION}", fr"code: 0(.*?)memo: {tx_memo}(.*?)txhash: {tx_hash}") # check that txn has correct memo value
+    except Exception:
+        time.sleep(IMPLICIT_TIMEOUT)
+        run("cheqd-noded query", "tx", f"{tx_hash} {LOCAL_NET_DESTINATION}", fr"code: 0(.*?)memo: {tx_memo}(.*?)txhash: {tx_hash}") # check that txn has correct memo value
 
 
-@settings(deadline=None, max_examples=10)
+@settings(deadline=None, max_examples=20)
 @given(value=strategies.integers(min_value=1, max_value=999999999))
 def test_token_transfer(value):
     sender_balance = get_balance(LOCAL_SENDER_ADDRESS, LOCAL_NET_DESTINATION)

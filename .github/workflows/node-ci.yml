@@ -152,7 +152,7 @@ jobs:
         run: |
           sudo dpkg -i ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
 
-      - name: Check out code into the Go module directory
+      - name: Check out code
         uses: actions/checkout@v2
 
       - name: Build node image
@@ -169,8 +169,8 @@ jobs:
       - name: Set up test environment
         working-directory: ./tests/e2e
         run: |
-          python3 --version
           pip3 install -r requirements.txt >> /dev/null
+          pip3 install --force-reinstall 'git+https://gitlab.com/evernym/verity/vdr-tools.git@DEV-330#egg=vdr-tools&subdirectory=wrappers/python' -U
           cp -R ${NODE_CONFIGS_BASE}/client/.cheqdnode /home/runner/
           sudo chmod -R 777 /home/runner
 
@@ -178,4 +178,37 @@ jobs:
         run: |
           export OP0_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
           export OP1_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p | sed 's/\r//g')
-          pytest -v -rP
+          pytest -v -rP tests/e2e/test_cosmos.py
+
+  run-identity-specific-tests:
+    name: Run identity-specific tests using VDR
+    runs-on: ubuntu-20.04
+    needs: build-images-and-set-up-pool
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Build node image
+        run: |
+          docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
+
+      - name: Build test net image
+        run: |
+          docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
+
+      - name: Run test net container
+        run: |
+          docker run -d --rm -p "26657:26657" cheqd-testnet
+
+      - name: Set up test environment
+        working-directory: ./tests/e2e
+        run: |
+          sudo cp libindy.so /usr/lib/libindy.so
+          pip3 install -r requirements.txt >> /dev/null
+          pip3 install --force-reinstall 'git+https://gitlab.com/evernym/verity/vdr-tools.git@DEV-330#egg=vdr-tools&subdirectory=wrappers/python' -U
+
+      - name: Run tests
+        run: |
+          export OP0_ADDRESS=""
+          export OP1_ADDRESS=""
+          pytest -v -rP tests/e2e/test_identity.py
