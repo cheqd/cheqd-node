@@ -26,17 +26,59 @@ MAX_GAS = 0
 MAX_COIN_AMOUNT = 0
 
 
-@pytest.mark.parametrize(
-    "magic_number_negative, magic_number_positive",
-    [
-        (1.2, 1.3), # base case, corner values
-        (1.0, 1.5),
-        (0.5, 2),
-    ]
-)
+# @pytest.mark.parametrize(
+#     "magic_number_negative, magic_number_positive",
+#     [
+#         (1.2, 1.3), # base case, corner values
+#         (1.0, 1.5),
+#         (0.5, 2),
+#     ]
+# )
+# @pytest.mark.parametrize("transfer_amount", ["1", "20002", "3000003", "9000000009"])
+# @pytest.mark.asyncio
+# async def test_gas_estimation(magic_number_negative, magic_number_positive, transfer_amount):
+#     pool_alias = random_string(5)
+#     await cheqd_pool.add(pool_alias, LOCAL_POOL_HTTP, LOCAL_NET_NETWORK)
+#     wallet_handle, _, _ = await wallet_helper()
+#     public_key = json.loads(
+#         await cheqd_keys.add_from_mnemonic(wallet_handle, KEY_ALIAS, SENDER_MNEMONIC, "")
+#     )["pub_key"]
+
+#     msg = await cheqd_ledger.bank.build_msg_send(
+#         SENDER_ADDRESS, RECEIVER_ADDRESS, transfer_amount, DENOM
+#     )
+#     account_number, sequence_number = await get_base_account_number_and_sequence(pool_alias, SENDER_ADDRESS)
+#     timeout_height = await get_timeout_height(pool_alias)
+#     test_tx = await cheqd_ledger.auth.build_tx(
+#         pool_alias, public_key, msg, account_number, sequence_number, MAX_GAS, MAX_COIN_AMOUNT, DENOM, SENDER_ADDRESS, timeout_height, DEFAULT_MEMO
+#     )
+#     request = await cheqd_ledger.tx.build_query_simulate(test_tx)
+#     response = await cheqd_pool.abci_query(pool_alias, request)
+#     response = await cheqd_ledger.tx.parse_query_simulate_resp(response)
+#     gas_estimation = json.loads(response)["gas_info"]["gas_used"]
+
+#     # negative case
+#     prod_tx_negative = await cheqd_ledger.auth.build_tx(
+#         pool_alias, public_key, msg, account_number, sequence_number, int(gas_estimation*magic_number_negative), int(gas_estimation*magic_number_negative*GAS_PRICE), DENOM, SENDER_ADDRESS, timeout_height, DEFAULT_MEMO
+#     )
+#     prod_tx_negative_signed = await cheqd_ledger.auth.sign_tx(wallet_handle, KEY_ALIAS, prod_tx_negative)
+#     with pytest.raises(CommonInvalidStructure):
+#         await cheqd_pool.broadcast_tx_commit(pool_alias, prod_tx_negative_signed)
+
+#     # positive case
+#     account_number, sequence_number = await get_base_account_number_and_sequence(pool_alias, SENDER_ADDRESS) # get this one more time to avoid `incorrect account sequence` error
+#     prod_tx = await cheqd_ledger.auth.build_tx(
+#         pool_alias, public_key, msg, account_number, sequence_number, int(gas_estimation*magic_number_positive), int(gas_estimation*magic_number_positive*GAS_PRICE), DENOM, SENDER_ADDRESS, timeout_height, DEFAULT_MEMO
+#     )
+#     prod_tx_signed = await cheqd_ledger.auth.sign_tx(wallet_handle, KEY_ALIAS, prod_tx)
+#     positive_res = await cheqd_pool.broadcast_tx_commit(pool_alias, prod_tx_signed)
+#     assert json.loads(positive_res)["check_tx"]["code"] == CODE_0_DIGIT
+
+
+@pytest.mark.parametrize("magic_number_positive", [1.3, 2, 3, 10])
 @pytest.mark.parametrize("transfer_amount", ["1", "20002", "3000003", "9000000009"])
 @pytest.mark.asyncio
-async def test_gas_estimation(magic_number_negative, magic_number_positive, transfer_amount):
+async def test_gas_estimation_positive(magic_number_positive, transfer_amount):
     pool_alias = random_string(5)
     await cheqd_pool.add(pool_alias, LOCAL_POOL_HTTP, LOCAL_NET_NETWORK)
     wallet_handle, _, _ = await wallet_helper()
@@ -56,17 +98,6 @@ async def test_gas_estimation(magic_number_negative, magic_number_positive, tran
     response = await cheqd_pool.abci_query(pool_alias, request)
     response = await cheqd_ledger.tx.parse_query_simulate_resp(response)
     gas_estimation = json.loads(response)["gas_info"]["gas_used"]
-
-    # negative case
-    prod_tx_negative = await cheqd_ledger.auth.build_tx(
-        pool_alias, public_key, msg, account_number, sequence_number, int(gas_estimation*magic_number_negative), int(gas_estimation*magic_number_negative*GAS_PRICE), DENOM, SENDER_ADDRESS, timeout_height, DEFAULT_MEMO
-    )
-    prod_tx_negative_signed = await cheqd_ledger.auth.sign_tx(wallet_handle, KEY_ALIAS, prod_tx_negative)
-    with pytest.raises(CommonInvalidStructure):
-        await cheqd_pool.broadcast_tx_commit(pool_alias, prod_tx_negative_signed)
-
-    # positive case
-    account_number, sequence_number = await get_base_account_number_and_sequence(pool_alias, SENDER_ADDRESS) # get this one more time to avoid `incorrect account sequence` error
     prod_tx = await cheqd_ledger.auth.build_tx(
         pool_alias, public_key, msg, account_number, sequence_number, int(gas_estimation*magic_number_positive), int(gas_estimation*magic_number_positive*GAS_PRICE), DENOM, SENDER_ADDRESS, timeout_height, DEFAULT_MEMO
     )
@@ -75,9 +106,40 @@ async def test_gas_estimation(magic_number_negative, magic_number_positive, tran
     assert json.loads(positive_res)["check_tx"]["code"] == CODE_0_DIGIT
 
 
+@pytest.mark.parametrize("magic_number_negative", [1.2, 1, 0.5, 0.1])
+@pytest.mark.parametrize("transfer_amount", ["1", "20002", "3000003", "9000000009"])
+@pytest.mark.asyncio
+async def test_gas_estimation_negative(magic_number_negative, transfer_amount):
+    pool_alias = random_string(5)
+    await cheqd_pool.add(pool_alias, LOCAL_POOL_HTTP, LOCAL_NET_NETWORK)
+    wallet_handle, _, _ = await wallet_helper()
+    public_key = json.loads(
+        await cheqd_keys.add_from_mnemonic(wallet_handle, KEY_ALIAS, SENDER_MNEMONIC, "")
+    )["pub_key"]
+
+    msg = await cheqd_ledger.bank.build_msg_send(
+        SENDER_ADDRESS, RECEIVER_ADDRESS, transfer_amount, DENOM
+    )
+    account_number, sequence_number = await get_base_account_number_and_sequence(pool_alias, SENDER_ADDRESS)
+    timeout_height = await get_timeout_height(pool_alias)
+    test_tx = await cheqd_ledger.auth.build_tx(
+        pool_alias, public_key, msg, account_number, sequence_number, MAX_GAS, MAX_COIN_AMOUNT, DENOM, SENDER_ADDRESS, timeout_height, DEFAULT_MEMO
+    )
+    request = await cheqd_ledger.tx.build_query_simulate(test_tx)
+    response = await cheqd_pool.abci_query(pool_alias, request)
+    response = await cheqd_ledger.tx.parse_query_simulate_resp(response)
+    gas_estimation = json.loads(response)["gas_info"]["gas_used"]
+    prod_tx_negative = await cheqd_ledger.auth.build_tx(
+        pool_alias, public_key, msg, account_number, sequence_number, int(gas_estimation*magic_number_negative), int(gas_estimation*magic_number_negative*GAS_PRICE), DENOM, SENDER_ADDRESS, timeout_height, DEFAULT_MEMO
+    )
+    prod_tx_negative_signed = await cheqd_ledger.auth.sign_tx(wallet_handle, KEY_ALIAS, prod_tx_negative)
+    with pytest.raises(CommonInvalidStructure):
+        await cheqd_pool.broadcast_tx_commit(pool_alias, prod_tx_negative_signed)
+
+
 @pytest.mark.parametrize("transfer_amount", [1, 999, 1001, 987654321]) # TODO: hypothesis
 @pytest.mark.asyncio
-async def test_token_transfer(transfer_amount):
+async def test_token_transfer_positive(transfer_amount):
     pool_alias = random_string(5)
     await cheqd_pool.add(pool_alias, LOCAL_POOL_HTTP, LOCAL_NET_NETWORK)
     wallet_handle, _, _ = await wallet_helper()
