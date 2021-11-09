@@ -104,7 +104,8 @@ async def test_token_transfer_positive(transfer_amount):
     msg = await cheqd_ledger.bank.build_msg_send(
         SENDER_ADDRESS, RECEIVER_ADDRESS, str(transfer_amount), DENOM
     )
-    await send_tx_helper(pool_alias, wallet_handle, KEY_ALIAS, public_key, SENDER_ADDRESS, msg, DEFAULT_MEMO)
+    res = await send_tx_helper(pool_alias, wallet_handle, KEY_ALIAS, public_key, SENDER_ADDRESS, msg, DEFAULT_MEMO)
+    assert res["check_tx"]["code"] == CODE_0_DIGIT
 
     new_sender_balance = await get_balance_vdr(pool_alias, SENDER_ADDRESS)
     new_receiver_balance = await get_balance_vdr(pool_alias, RECEIVER_ADDRESS)
@@ -112,6 +113,25 @@ async def test_token_transfer_positive(transfer_amount):
     assert int(new_sender_balance) == (int(sender_balance) - transfer_amount - TEST_NET_GAS_X_GAS_PRICES_INT)
     assert int(new_receiver_balance) == (int(receiver_balance) + transfer_amount)
 
+
+@pytest.mark.parametrize("transfer_amount", [99999999999999999999999]) # TODO: hypothesis
+@pytest.mark.asyncio
+async def test_token_transfer_negative(transfer_amount):
+    pool_alias = random_string(5)
+    await cheqd_pool.add(pool_alias, LOCAL_POOL_HTTP, LOCAL_NET_NETWORK)
+    wallet_handle, _, _ = await wallet_helper()
+    public_key = json.loads(
+        await cheqd_keys.add_from_mnemonic(wallet_handle, KEY_ALIAS, SENDER_MNEMONIC, "")
+    )["pub_key"]
+
+    sender_balance = await get_balance_vdr(pool_alias, SENDER_ADDRESS)
+    receiver_balance = await get_balance_vdr(pool_alias, RECEIVER_ADDRESS)
+
+    msg = await cheqd_ledger.bank.build_msg_send(
+        SENDER_ADDRESS, RECEIVER_ADDRESS, str(transfer_amount), DENOM
+    )
+    res = await send_tx_helper(pool_alias, wallet_handle, KEY_ALIAS, public_key, SENDER_ADDRESS, msg, DEFAULT_MEMO)
+    assert res["check_tx"]["code"] == CODE_0_DIGIT
 
 @pytest.mark.parametrize("note", ["a", "1", "test_memo_test", "123qwe$%^&", "______________________________"]) # TODO: hypothesis
 @pytest.mark.asyncio
