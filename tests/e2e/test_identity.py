@@ -114,7 +114,7 @@ async def test_token_transfer_positive(transfer_amount):
     assert int(new_receiver_balance) == (int(receiver_balance) + transfer_amount)
 
 
-@pytest.mark.parametrize("transfer_amount", [99999999999999999999999]) # TODO: hypothesis
+@pytest.mark.parametrize("transfer_amount", [999999999999999999999]) # TODO: hypothesis
 @pytest.mark.asyncio
 async def test_token_transfer_negative(transfer_amount):
     pool_alias = random_string(5)
@@ -130,9 +130,15 @@ async def test_token_transfer_negative(transfer_amount):
     msg = await cheqd_ledger.bank.build_msg_send(
         SENDER_ADDRESS, RECEIVER_ADDRESS, str(transfer_amount), DENOM
     )
-    res, _ = await send_tx_helper(pool_alias, wallet_handle, KEY_ALIAS, public_key, SENDER_ADDRESS, msg, DEFAULT_MEMO)
-    print(res)
-    assert res["check_tx"]["code"] == CODE_0_DIGIT
+    with pytest.raises(CommonInvalidStructure):
+        await send_tx_helper(pool_alias, wallet_handle, KEY_ALIAS, public_key, SENDER_ADDRESS, msg, DEFAULT_MEMO)
+
+    new_sender_balance = await get_balance_vdr(pool_alias, SENDER_ADDRESS)
+    new_receiver_balance = await get_balance_vdr(pool_alias, RECEIVER_ADDRESS)
+
+    assert int(new_sender_balance) == (int(sender_balance) - TEST_NET_GAS_X_GAS_PRICES_INT)
+    assert int(new_receiver_balance) == (int(receiver_balance))
+
 
 @pytest.mark.parametrize("note", ["a", "1", "test_memo_test", "123qwe$%^&", "______________________________"]) # TODO: hypothesis
 @pytest.mark.asyncio
