@@ -1,24 +1,24 @@
 swagger: '2.0'
 info:
-  title: Cheqd - Tendermint RPC
-  description: 'A Tendermint RPC for state queries, write transactions'
+  title: cheqd-node - Tendermint RPC APIs
+  description: 'Tendermint RPC for identity functionality in cheqd-node. This document describes the APIs for creating, updating, and querying Decentralized Identifiers (DIDs) using the `did:cheqd` method.'
   version: 1.0.0
+
 
 paths:
   /getDid:
     get:
       tags:
-        - Query
+        - Query requests
       summary: return DID
       operationId: returnDid
-      description: |
-        Return DID Document from the ledger by DID
+      description: Returns DID Document from the ledger by DID
       produces:
         - application/json
       parameters:
         - in: query
           name: id
-          description: Id from DID Document. Fully qualified DID which already exists in a ledger. Target DID as base58-encoded string for 16 or 32 byte DID value with cheqd DID Method prefix `did:cheqd:<namespace>:`.
+          description: Fully-qualified DID of type `did:cheqd:<namespace>` which already exists on a cheqd network ledger.
           required: true
           type: string
       responses:
@@ -27,15 +27,15 @@ paths:
           schema:
             $ref: '#/definitions/StateValue'
         x-1201:
-          description: The DID Doc not found in the ledger
-
+          description: No DID Document correlating to DID found on the ledger
+  
   /createDid:
     post:
       tags:
         - Write requests
-      summary: Write to a ledger a new DID Document
+      summary: Create a new DID and associated DID Document on ledger
       operationId: createDid
-      description: Write to a ledger a new DID Document. If there is no DID entry on the ledger with the specified DID (`DID.id`), it is considered as a creation request for a new DID.
+      description: Creates a new DID using the `did:cheqd` method along with associated DID Document representation.
       consumes:
         - application/json
       produces:
@@ -43,36 +43,36 @@ paths:
       parameters:
         - in: body
           name: request
-          description: signed request for creating DID Document
+          description: Signed request for creating DID Document
           schema:
             $ref: '#/definitions/MsgCreateDid'
       responses:
         201:
-          description: item created
+          description: DID created
           schema:
             $ref: '#/definitions/MsgCreateDidResponse'
         x-1000:
           description: The request the client made is incorrect or corrupt
         x-1001:
-          description: The request does not contain required property
+          description: The request does not contain required properties
         x-1002:
           description: The request contains invalid `id` property
         x-1003:
-          description: The request contains invalid verification method
+          description: The request contains invalid Verification Method
         x-1004:
-          description: The request contains invalid service
+          description: The request contains invalid Service
         x-1005:
-          description: The request contains invalid verification method id
+          description: The request contains invalid Verification Method ID
         x-1100:
           description: Invalid signature detected
         x-1200:
-          description: An attempt to create a DID Doc that exists in the ledger detected
+          description: Attempt to create a DID / DID Document that already exists on ledger
         x-1202:
-          description: The DID Doc does not contain the requested verification method
+          description: The DID Document does not contain required Verification Method
         x-1204:
           description: Unable to decode public key
         x-1304:
-          description: Unable to set value into the ledger
+          description: Unable to set value to the ledger
         x-1504:
           description: The method is not implemented
 
@@ -80,9 +80,9 @@ paths:
     post:
       tags:
         - Write requests
-      summary: Update existing DID Document
+      summary: Update DID Document associatd with an existing DID
       operationId: updateDid
-      description: Update existing DID Document. If there is a DID entry on the ledger with the specified DID (`DID.id`), then this considered a request for updating an existing DID.
+      description: Update DID Document associated with an existing DID of type `did:cheqd:<namespace>`.
       consumes:
         - application/json
       produces:
@@ -90,43 +90,43 @@ paths:
       parameters:
         - in: body
           name: request
-          description: signed request for updating DID Document
+          description: Signed request for updating DID Document
           schema:
             $ref: '#/definitions/MsgUpdateDid'
       responses:
         201:
-          description: item updated
+          description: DID Document updated
           schema:
             $ref: '#/definitions/MsgUpdateDidResponse'
         x-1000:
           description: The request the client made is incorrect or corrupt
         x-1001:
-          description: The request does not contain required property
+          description: The request does not contain required properties
         x-1002:
           description: The request contains invalid `id` property
         x-1003:
-          description: The request contains invalid verification method
+          description: The request contains invalid Verification Method
         x-1004:
-          description: The request contains invalid service
+          description: The request contains invalid Service
         x-1005:
-          description: The request contains invalid verification method id
+          description: The request contains invalid Verification Method ID
         x-1100:
           description: Invalid signature detected
         x-1201:
-          description: The DID Doc not found in the ledger
+          description: No DID Document founder on specified ledger
         x-1202:
-          description: The DID Doc does not contain the requested verification method
+          description: The DID Document does not contain required Verification Method
         x-1203:
-          description: Replay protected failed. An attempt to update DID Doc with wrong version detected
+          description: Potential replay attack detected. An attempt to was made to update the DID Document with incorrect version ID.
         x-1204:
           description: Unable to decode public key
         x-1304:
-          description: Unable to set value into the ledger
+          description: Unable to set value to the ledger
         x-1504:
           description: The method is not implemented
+
+
 definitions:
-
-
   SignInfo:
     required:
       - verificationMethodId
@@ -135,11 +135,11 @@ definitions:
       verificationMethodId:
         description: URI from `DIDDoc.authentication`
         type: string
-        example: did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue#verkey
+        example: did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#verkey
       signature:
-        description: Multiple verification methods and corresponding signatures can be added here
+        description: Multiple Verification Methods and corresponding signatures can be added here
         type: string
-        example:  49W5WP5jr7x1fZhtpAhHFbuUDqUYZ3AKht88gUjrz8TEJZr5MZUPjskpfBFdboLPZXKjbGjutoVascfKiMD5W7Ba
+        example: 49W5WP5jr7x1fZhtpAhHFbuUDqUYZ3AKht88gUjrz8TEJZr5MZUPjskpfBFdboLPZXKjbGjutoVascfKiMD5W7Ba
 
   MsgCreateDid:
     type: object
@@ -312,7 +312,7 @@ definitions:
           type: string
           example: "https://www.w3.org/ns/did/v1"
       versionId:
-        description: Should be filled by a transaction hash of the previous DIDDoc version. Can be received by GetDid query. It is needed for a replay protection.
+        description: Should be filled by a transaction hash of the previous DID Document version. Can be received by `/getDid` query. It is needed for a replay protection.
         type: string
         example: 1B3B00849B4D50E8FCCF50193E35FD6CA5FD4686ED6AD8F847AC8C5E466CFD3E
 
@@ -355,7 +355,7 @@ definitions:
         type: boolean
         example: false
       versionId:
-        description: Contains transaction hash of the current DIDDoc version.
+        description: Contains transaction hash of the current DID Document version.
         type: string
         example: 1B3B00849B4D50E8FCCF50193E35FD6CA5FD4686ED6AD8F847AC8C5E466CFD3E
 
@@ -386,7 +386,7 @@ definitions:
       - controller
     properties:
       id:
-        description: A string with format `<DIDDoc-id>#<key-alias>`
+        description: A string with format `did:cheqd:<namespace>:<unique-id>#<key-alias>`
         type: string
         example: did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#key-0
       type:
