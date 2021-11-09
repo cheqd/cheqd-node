@@ -36,13 +36,13 @@ To function properly node requires the following ports to be configured:
   * This port is used for peer to peer node communication
   * Incoming and outcoming tcp connections must be allowed
   * `26656` by default
-  * Can be configured in `/etc/cheqd-node/config.toml`
+  * Can be configured in `$HOME/.cheqdnode/config/config.toml`
 * RPC port:
   * This port is used by client applications. Open it only if you want clients to be able to connect to your node.
   * Incoming tcp connections should be allowed.
   * SSL can also be configured separately
   * `26657` by default
-  * Can be configured in `/etc/cheqd-node/config.toml`
+  * Can be configured in `$HOME/.cheqdnode/config/config.toml`
 
 ### Volumes
 
@@ -51,7 +51,7 @@ We recommend to use separate volume for `data` directory where blockchain is sto
 The directory location depends on the installation method:
 
 * For binary distribution it's `$HOME/.cheqdnode/data` by default;
-* If you install node using `deb` package, default location is: `/var/lib/cheqd/.cheqdnode/data`.
+* If you install node using `deb` package, default location is: `/home/cheqd/.cheqdnode/data`. But it can be changed, by setting `CHEQD_HOME_DIR` parameter due to install command calling. By default, `CHEQD_HOME_DIR=/home/cheqd`
 
 ### Sentry nodes \(optional\)
 
@@ -74,6 +74,11 @@ This is the most preferable way to get `cheqd-node`. Detailed information about 
 
    Example: `sudo dpkg -i cheqd-node_0.1.20_amd64.deb`
 
+   Due to installation process user `cheqd` will be created. By default, `Home` directory will be in `/home/cheqd`, but it can be changed by passing parameter `CHEQD_HOME_DIR` while running `dpkg` command for versions `0.2.4` and upper, like:
+   ```bash
+   sudo CHEQD_HOME_DIR=/path/to/home/directory dpkg -i cheqd-node_0.2.4_amd64.deb
+   ```
+
 3. Switch to `cheqd` system user:
 
    You should always switch to `cheqd` system user before managing node. That's because node binary stores configuration files in home directory.
@@ -90,12 +95,12 @@ This is the most preferable way to get `cheqd-node`. Detailed information about 
 
 5. Set genesis:
 
-   Genesis files for public networks are published in [this directory](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains). Download `genesis.json` and put it to the `/etc/cheqd-node/`.
+   Genesis files for public networks are published in [this directory](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains). Download `genesis.json` and put it to the `$HOME/.cheqdnode/config`.
 
    For testnet:
 
    ```text
-   cd /etc/cheqd-node/
+   cd $HOME/.cheqdnode/config
    wget -O genesis.json https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/testnet/genesis.json
    ```
 
@@ -103,7 +108,7 @@ This is the most preferable way to get `cheqd-node`. Detailed information about 
 
    Persistent nodes addresses for public networks are also published in [this directory](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains). Copy the persistent\_peers from the `persistent_peers.txt` and use it in the steps below.
 
-   Open node's config file: `/etc/cheqd-node/config.toml`
+   Open node's config file: `$HOME/.cheqdnode/config/config.toml`
 
    Search for `persistent_peers` parameter and set it's value to a comma separated list of other participant node addresses.
 
@@ -119,7 +124,7 @@ This is the most preferable way to get `cheqd-node`. Detailed information about 
 
 7. Set gas prices:
 
-   Open app's config file: `/etc/cheqd-node/app.toml`
+   Open app's config file: `$HOME/.cheqdnode/config/app.toml`
 
    Search for `minimum-gas-prices` parameter and set it to a non-empty value. Recommended one is `25ncheq`.
 
@@ -133,7 +138,7 @@ This is the most preferable way to get `cheqd-node`. Detailed information about 
 
    This step is necessary if you want to allow incoming client application connections to your node. Otherwise, the node will be accessible only locally.
 
-   Open the node configuration file using the text editor that you prefer: `/etc/cheqd-node/config.toml`
+   Open the node configuration file using the text editor that you prefer: `$HOME/.cheqdnode/config/config.toml`
 
    Search for `laddr` parameter in `RPC Server Configuration Options` section and replace it's value to `0.0.0.0:26657`
 
