@@ -21,6 +21,16 @@ This document provides guidance on how to install and configure a node for the c
    ```bash
    sudo dpkg -i cheqd-node_0.2.3_amd64.deb
    ```
+   Due to installation process user `cheqd` will be created. By default, `Home` directory will be in `/home/cheqd`, but it can be changed by passing parameter `CHEQD_HOME_DIR` while running `dpkg` command for versions `0.3.1` and upper, like:
+   ```bash
+   sudo CHEQD_HOME_DIR=/path/to/home/directory dpkg -i cheqd-node_0.2.3_amd64.deb
+   ```
+   P.S. It's up to user to setup directories according to `Filesystem Hierarchy Standard` and it can be implemented by using symlinks, like:
+   ```
+   ln -s $HOME/.cheqdnode/config /etc/cheqd-node
+   ln -s $HOME/.cheqdnode/data /var/lib/cheqd
+   ```
+   But please make sure, that `cheqd-noded` expects `config` and `data` are placed in the `$HOME/.cheqdnode` location.
 
 3. **Switch to the `cheqd` system user**
 
@@ -38,7 +48,7 @@ This document provides guidance on how to install and configure a node for the c
 
 5. **Download the genesis file for a persistent chain, such as the cheqd testnet**
 
-   Download the `genesis.json` file [corresponding a persistent chain](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains/testnet) and put it in the `/etc/cheqd-node/` directory.
+   Download the `genesis.json` file [corresponding a persistent chain](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains/testnet) and put it in the `$HOME/.cheqdnode/config` directory.
 
    For cheqd testnet:
 
@@ -48,7 +58,7 @@ This document provides guidance on how to install and configure a node for the c
 
 6. **Define the seed configuration for populating the list of peers known by a node**
 
-   Search for the `seeds` parameter in the node configuration file `/etc/cheqd-node/config.toml` and set its value to a comma separated list of seed node addresses specified in `seeds.txt` for [persistent chains](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains/testnet).
+   Search for the `seeds` parameter in the node configuration file `$HOME/.cheqdnode/config/config.toml` and set its value to a comma separated list of seed node addresses specified in `seeds.txt` for [persistent chains](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains/testnet).
 
    For cheqd testnet, executing the following commands will set this up correctly:
 
@@ -63,7 +73,7 @@ This document provides guidance on how to install and configure a node for the c
 
 7. **Set gas prices accepted by the node**
 
-   Search for the `minimum-gas-prices` parameter in the node configuration file `/etc/cheqd-node/app.toml` and set it to a non-empty value. The recommended value is `25ncheq`.
+   Search for the `minimum-gas-prices` parameter in the node configuration file `$HOME/.cheqdnode/config/app.toml` and set it to a non-empty value. The recommended value is `25ncheq`.
 
    For cheqd testnet, executing the following command will set this up correctly:
 

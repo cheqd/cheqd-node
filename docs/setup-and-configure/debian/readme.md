@@ -33,27 +33,22 @@ To keep `cheqd-node` configuration data in segregated from userspace home direct
 
 #### App data directories
 
-* `/etc/cheqd-node`
+* `$HOME/.cheqdnode/config`
   * Location for configuration files
   * Ownership permission set to: `cheqd:cheqd`
-* `/var/lib/cheqd/data`
+* `$HOME/.cheqdnode/data`
   * Location for ledger data
   * Ownership permission set to: `cheqd:cheqd`
-* `/var/log/cheqd-node`
+* `$HOME/.cheqdnode/log`
   * Location for app logs
   * Ownership persmissions set to: `syslog:adm` \(set by rsyslog\)
-
-#### Symlinks
-
-* For configuration data: `/var/lib/cheqd/.cheqdnode/config` -&gt; `/etc/cheqd-node/`
-* For ledger data: `/var/lib/cheqd/.cheqdnode/data` -&gt; `/var/lib/cheqd/data`
 
 ### Logging configuration
 
 `rsyslog` is configured to redirect logs from the `cheqd-node` daemon to the log directory defined above.
 
 ```bash
-if \$programname == 'cheqd-noded' then /var/log/cheqd-node/stdout.log
+if \$programname == 'cheqd-noded' then $HOME/.cheqdnode/log/stdout.log
 & stop
 ```
 
@@ -68,7 +63,7 @@ Our installer makes the following changes:
 * Once a day, a cron job is executed to run `logrotate` actions.
 
 ```text
-/var/log/cheqd-node/stdout.log {
+$HOME/.cheqdnode/log/stdout.log {
   rotate 30
   maxsize 100M
   notifempty
