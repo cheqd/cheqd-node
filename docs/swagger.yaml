@@ -18,7 +18,7 @@ paths:
       parameters:
         - in: query
           name: id
-          description: id from DID Document. Fully qualified DID
+          description: Id from DID Document. Fully qualified DID which already exists in a ledger. Target DID as base58-encoded string for 16 or 32 byte DID value with cheqd DID Method prefix `did:cheqd:<namespace>:`.
           required: true
           type: string
       responses:
@@ -26,24 +26,24 @@ paths:
           description: DID Document
           schema:
             $ref: '#/definitions/StateValue'
-        400:
-          description: bad input parameter
+        x-1201:
+          description: The DID Doc not found in the ledger
 
   /createDid:
     post:
       tags:
-        - admins
-      summary: adds an inventory item
-      operationId: addInventory
-      description: Adds an item to the system
+        - Write requests
+      summary: Write to a ledger a new DID Document
+      operationId: createDid
+      description: Write to a ledger a new DID Document. If there is no DID entry on the ledger with the specified DID (`DID.id`), it is considered as a creation request for a new DID.
       consumes:
         - application/json
       produces:
         - application/json
       parameters:
         - in: body
-          name: inventoryItem
-          description: Inventory item to add
+          name: request
+          description: signed request for creating DID Document
           schema:
             $ref: '#/definitions/MsgCreateDid'
       responses:
@@ -51,51 +51,96 @@ paths:
           description: item created
           schema:
             $ref: '#/definitions/MsgCreateDidResponse'
-        400:
-          description: invalid input, object invalid
-        409:
-          description: an existing item already exists
+        x-1000:
+          description: The request the client made is incorrect or corrupt
+        x-1001:
+          description: The request does not contain required property
+        x-1002:
+          description: The request contains invalid `id` property
+        x-1003:
+          description: The request contains invalid verification method
+        x-1004:
+          description: The request contains invalid service
+        x-1005:
+          description: The request contains invalid verification method id
+        x-1100:
+          description: Invalid signature detected
+        x-1200:
+          description: An attempt to create a DID Doc that exists in the ledger detected
+        x-1202:
+          description: The DID Doc does not contain the requested verification method
+        x-1204:
+          description: Unable to decode public key
+        x-1304:
+          description: Unable to set value into the ledger
+        x-1504:
+          description: The method is not implemented
 
   /updateDid:
     post:
       tags:
-        - admins
-      summary: adds an inventory item
-      operationId: updateInventory
-      description: Adds an item to the system
+        - Write requests
+      summary: Update existing DID Document
+      operationId: updateDid
+      description: Update existing DID Document. If there is a DID entry on the ledger with the specified DID (`DID.id`), then this considered a request for updating an existing DID.
       consumes:
         - application/json
       produces:
         - application/json
       parameters:
         - in: body
-          name: inventoryItem
-          description: Inventory item to add
+          name: request
+          description: signed request for updating DID Document
           schema:
             $ref: '#/definitions/MsgUpdateDid'
       responses:
         201:
-          description: item created
+          description: item updated
           schema:
             $ref: '#/definitions/MsgUpdateDidResponse'
-        400:
-          description: invalid input, object invalid
-        409:
-          description: an existing item already exists
+        x-1000:
+          description: The request the client made is incorrect or corrupt
+        x-1001:
+          description: The request does not contain required property
+        x-1002:
+          description: The request contains invalid `id` property
+        x-1003:
+          description: The request contains invalid verification method
+        x-1004:
+          description: The request contains invalid service
+        x-1005:
+          description: The request contains invalid verification method id
+        x-1100:
+          description: Invalid signature detected
+        x-1201:
+          description: The DID Doc not found in the ledger
+        x-1202:
+          description: The DID Doc does not contain the requested verification method
+        x-1203:
+          description: Replay protected failed. An attempt to update DID Doc with wrong version detected
+        x-1204:
+          description: Unable to decode public key
+        x-1304:
+          description: Unable to set value into the ledger
+        x-1504:
+          description: The method is not implemented
 definitions:
 
 
   SignInfo:
     required:
-      - verification_method_id
+      - verificationMethodId
       - signature
     properties:
       verificationMethodId:
+        description: URI from `DIDDoc.authentication`
         type: string
-        example: ACME Corporation
+        example: did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue#verkey
       signature:
+        description: Multiple verification methods and corresponding signatures can be added here
         type: string
-        example:  https://www.acme-corp.com
+        example:  49W5WP5jr7x1fZhtpAhHFbuUDqUYZ3AKht88gUjrz8TEJZr5MZUPjskpfBFdboLPZXKjbGjutoVascfKiMD5W7Ba
+
   MsgCreateDid:
     type: object
     required:
@@ -105,67 +150,76 @@ definitions:
       payload:
         $ref: '#/definitions/MsgCreateDidPayload'
       signatures:
+        description: Payload should be signed by all `controller` private keys. The `signatures` must contains signatures from all controllers.
         type: array
         items:
           $ref: '#/definitions/SignInfo'
 
   MsgCreateDidPayload:
     required:
-      - context
       - id
-      - controller
-      - verificationMethod
-      - authentication
-      - assertionMethod
-      - capabilityInvocation
-      - capabilityDelegation
-      - keyAgreement
-      - alsoKnownAs
-      - service
     properties:
-      context:
-        type: array
-        items:
-          type: string
       id:
+        description: Target DID as base58-encoded string for 16 or 32 byte DID value with cheqd DID Method prefix `did:cheqd:<namespace>:`.
         type: string
         example: did:cheqd:testnet:6cgbu8ZPoWTnR5Rv5JcSMB
       verificationMethod:
+        description: A list of Verification Methods
         type: array
         items:
           $ref: '#/definitions/VerificationMethod'
       controller:
+        description: A list of strings with key aliases or IDs
         type: array
         items:
           type: string
+          example: did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue
       authentication:
+        description: A list of strings with key aliases or IDs
         type: array
         items:
           type: string
+          example: "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#key1"
       assertionMethod:
+        description: A list of strings with key aliases or IDs
         type: array
         items:
           type: string
+          example: "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#key1"
       capabilityInvocation:
+        description: A list of strings with key aliases or IDs
         type: array
         items:
           type: string
+          example: "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#key1"
       capabilityDelegation:
+        description: A list of strings with key aliases or IDs
         type: array
         items:
           type: string
+          example: "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#key1"
       keyAgreement:
+        description: A list of strings with key aliases or IDs
         type: array
         items:
           type: string
+          example: "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#key1"
       alsoKnownAs:
+        description: A list of strings. A DID subject can have multiple identifiers for different purposes, or at different times. The assertion that two or more DIDs refer to the same DID subject can be made using the `alsoKnownAs` property.
         type: array
         items:
           type: string
       service:
+        description: A set of Service Endpoint maps
         type: array
         items:
           $ref: '#/definitions/Service'
+      context:
+        description: A list of strings with links or JSONs for describing specifications that this DID Document is following to.
+        type: array
+        items:
+          type: string
+          example: "https://www.w3.org/ns/did/v1"
 
   MsgCreateDidResponse:
     required:
@@ -185,6 +239,7 @@ definitions:
       payload:
         $ref: '#/definitions/MsgUpdateDidPayload'
       signatures:
+        description: Payload should be signed by all `controller` private keys. The `signatures` must contains signatures from all controllers.
         type: array
         items:
           $ref: '#/definitions/SignInfo'
@@ -192,63 +247,72 @@ definitions:
 
   MsgUpdateDidPayload:
     required:
-      - context
       - id
-      - controller
-      - verificationMethod
-      - authentication
-      - assertionMethod
-      - capabilityInvocation
-      - capabilityDelegation
-      - keyAgreement
-      - alsoKnownAs
-      - service
       - versionId
     properties:
-      context:
-        type: array
-        items:
-          type: string
       id:
+        description: Target DID as base58-encoded string for 16 or 32 byte DID value with cheqd DID Method prefix `did:cheqd:<namespace>:`.
         type: string
         example: did:cheqd:testnet:6cgbu8ZPoWTnR5Rv5JcSMB
       verificationMethod:
+        description: A list of Verification Methods
         type: array
         items:
           $ref: '#/definitions/VerificationMethod'
       controller:
+        description: A list of strings with key aliases or IDs
         type: array
         items:
           type: string
+          example: did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue
       authentication:
+        description: A list of strings with key aliases or IDs
         type: array
         items:
           type: string
+          example: "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#key1"
       assertionMethod:
+        description: A list of strings with key aliases or IDs
         type: array
         items:
           type: string
+          example: "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#key1"
       capabilityInvocation:
+        description: A list of strings with key aliases or IDs
         type: array
         items:
           type: string
+          example: "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#key1"
       capabilityDelegation:
+        description: A list of strings with key aliases or IDs
         type: array
         items:
           type: string
+          example: "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#key1"
       keyAgreement:
+        description: A list of strings with key aliases or IDs
         type: array
         items:
           type: string
+          example: "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#key1"
       alsoKnownAs:
+        description: A list of strings. A DID subject can have multiple identifiers for different purposes, or at different times. The assertion that two or more DIDs refer to the same DID subject can be made using the `alsoKnownAs` property.
         type: array
         items:
           type: string
       service:
+        description: A set of Service Endpoint maps
         type: array
         items:
           $ref: '#/definitions/Service'
+      context:
+        description: A list of strings with links or JSONs for describing specifications that this DID Document is following to.
+        type: array
+        items:
+          type: string
+          example: "https://www.w3.org/ns/did/v1"
       versionId:
+        description: Should be filled by a transaction hash of the previous DIDDoc version. Can be received by GetDid query. It is needed for a replay protection.
         type: string
         example: 1B3B00849B4D50E8FCCF50193E35FD6CA5FD4686ED6AD8F847AC8C5E466CFD3E
 
@@ -279,15 +343,19 @@ definitions:
       - versionId
     properties:
       created:
+        description: Formatted as an XML Datetime normalized to UTC 00:00:00 and without sub-second decimal precision.
         type: string
         example: 2020-12-20T19:17:47Z
       updated:
+        description: The value of the property MUST follow the same formatting rules as the created property. The `updated` field is null if an Update operation has never been performed on the DID document. If an updated property exists, it can be the same value as the created property when the difference between the two timestamps is less than one second.
         type: string
         example: 2020-12-20T19:17:47Z
       deactivated:
+        description: If DID has been deactivated, DID document metadata MUST include this property with the boolean value true. By default this is set to `false`.
         type: boolean
         example: false
       versionId:
+        description: Contains transaction hash of the current DIDDoc version.
         type: string
         example: 1B3B00849B4D50E8FCCF50193E35FD6CA5FD4686ED6AD8F847AC8C5E466CFD3E
 
@@ -298,34 +366,40 @@ definitions:
       - serviceEndpoint
     properties:
       id:
+        description: The value of the `id` property for a Service MUST be a URI conforming to [RFC3986](http://www.rfc-editor.org/rfc/rfc3986). A conforming producer MUST NOT produce multiple service entries with the same ID.
         type: string
         example: did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#linked-domain
       type:
+        description: The service type and its associated properties SHOULD be registered in the [DID Specification Registries](https://www.w3.org/TR/did-spec-registries/)
         type: string
         example: LinkedDomains
       serviceEndpoint:
+        description: A string that conforms to the rules of [RFC3986](https://www.rfc-editor.org/rfc/rfc3986) for URIs, a map, or a set composed of a one or more strings that conform to the rules of [RFC3986](https://www.rfc-editor.org/rfc/rfc3986) for URIs and/or maps.
         type: string
         example: https://bar.example.com
 
   VerificationMethod :
+    description: Only one of `publicKeyJwk` or `publicKeyMultibase` must exist
     required:
       - id
       - type
       - controller
-      - publicKeyJwk
-      - publicKeyMultibase
     properties:
       id:
+        description: A string with format `<DIDDoc-id>#<key-alias>`
         type: string
         example: did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#key-0
       type:
         type: string
         example: Ed25519VerificationKey2020
       controller:
+        description: A string with fully qualified DID. DID must exist.
         type: string
         example: did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue
       publicKeyJwk:
+        description: A map representing a JSON Web Key that conforms to [RFC7517](https://tools.ietf.org/html/rfc7517). See definition of `publicKeyJwk` for additional constraints.
         type: object
       publicKeyMultibase:
+        description: A base58-encoded string that conforms to a [MULTIBASE](https://datatracker.ietf.org/doc/html/draft-multiformats-multibase-03) encoded public key.
         type: string
         example: zAKJP3f7BD6W4iWEQ9jwndVTCBq8ua2Utt8EEjJ6Vxsf
