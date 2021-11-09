@@ -2,13 +2,20 @@
 
 CHEQD_USER_NAME=cheqd
 
-# This parameter can be overwritten while running dpkg
+# Home directory location can be passed when running dpkg -i
 if [ -z ${CHEQD_HOME_DIR+x} ]; then
   CHEQD_HOME_DIR=/home/${CHEQD_USER_NAME}
 fi
-CHEQD_ROOT_DIR=${CHEQD_HOME_DIR}/.cheqdnode
 
-CHEQD_LOG_DIR=${CHEQD_ROOT_DIR}/log
+# Node config and data directory locations based on home directory
+CHEQD_ROOT_DIR=${CHEQD_HOME_DIR}/.cheqdnode
+CHEQD_CONFIG_DIR=${CHEQD_ROOT_DIR}/config
+CHEQD_DATA_DIR=${CHEQD_ROOT_DIR}/data
+
+# Log directory can be overwritten while running dpkg
+if [ -z ${CHEQD_LOG_DIR+x} ]; then
+  CHEQD_LOG_DIR=${CHEQD_ROOT_DIR}/log
+fi
 
 # If there is an argument then assume using as binary + script instead of apt
 if [ -n "$1" ] && [ -f "$1" ] ; then
@@ -27,9 +34,43 @@ if ! /usr/bin/getent passwd ${CHEQD_USER_NAME} > /dev/null 2>&1 ; then
 
 fi
 
-# Make directory for logs if it's needed
-mkdir -p ${CHEQD_LOG_DIR}
-chown ${CHEQD_USER_NAME}:${CHEQD_USER_NAME} ${CHEQD_ROOT_DIR}
+# Set permissions and ownership for cheqd root directory
+chown -R ${CHEQD_USER_NAME}:${CHEQD_USER_NAME} ${CHEQD_ROOT_DIR}
+
+# Create node configuration directory
+if [ ! -d "${CHEQD_CONFIG_DIR}" ]
+then
+    echo "Node configuration directory not found. Initializing."
+    mkdir -p ${CHEQD_CONFIG_DIR}
+    chmod -R 0755 ${CHEQD_CONFIG_DIR}
+else
+    echo "Node configuration exists. Skipping."
+fi
+
+# Create node data directory
+if [ ! -d "${CHEQD_DATA_DIR}" ]
+then
+    echo "Node configuration data not found. Initializing."
+    mkdir -p ${CHEQD_DATA_DIR}
+    chmod -R 0755 ${CHEQD_DATA_DIR}
+else
+    echo "Node data exists. Skipping."
+fi
+
+# Create node log directory
+if [ ! -d "${CHEQD_LOG_DIR}" ]
+then
+    echo "Node log directory not found. Initializing."
+    mkdir -p ${CHEQD_LOG_DIR}
+    chown -R syslog:${CHEQD_USER_NAME} ${CHEQD_LOG_DIR}
+else
+    echo "Node log directory exists. Skipping."
+fi
+
+# Symbolic link to log directory
+if [ ! -L /var/log/cheqd-node ] ; then
+    ln -s ${CHEQD_LOG_DIR} /var/log/cheqd-node
+fi
 
 # Add rsyslogd configuration
 if [ -d /etc/rsyslog.d/ ] ; then
@@ -38,10 +79,6 @@ if [ -d /etc/rsyslog.d/ ] ; then
 if \$programname == 'cheqd-noded' then ${CHEQD_LOG_DIR}/stdout.log
 & stop
 EOF
-
-    # Change permissions for logs:
-    chown -R syslog:${CHEQD_USER_NAME} ${CHEQD_LOG_DIR}
-
     # Restart syslog
     systemctl restart rsyslog
     fi
@@ -77,7 +114,7 @@ fi
 if [ ! -f /lib/systemd/system/cheqd-noded.service ] ; then
   cat <<EOF > /lib/systemd/system/cheqd-noded.service
 [Unit]
-Description=Service for running Cheqd node
+Description=Service for running cheqd-node daemon
 After=network.target
 
 [Service]
