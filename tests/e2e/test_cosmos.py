@@ -278,7 +278,7 @@ def test_tendermint(command, params, expected_output):
 
 
 @settings(deadline=None, max_examples=10)
-@given(note=strategies.text(ascii_letters, min_size=1, max_size=1024).filter(lambda x: x not in ["n", "N"])) # cosmos issue
+@given(note=strategies.text(ascii_letters, min_size=2, max_size=1024)) # start from 2 - cosmos issue with single word memo
 def test_memo(note): # intermittent failures here due to `Internal error: timed out waiting for tx to be included in a block`
     tx_hash, tx_memo = send_with_note(note)
     try:
