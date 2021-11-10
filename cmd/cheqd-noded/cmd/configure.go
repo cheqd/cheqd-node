@@ -228,15 +228,15 @@ func maxPacketMsgPayloadSizeCmd(defaultNodeHome string) *cobra.Command {
 // createEmptyBlocksCmd returns configuration cobra Command.
 func createEmptyBlocksCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-empty-clocks [value]",
-		Short: "Update create-empty-clocks value in config.toml",
+		Use:   "create-empty-blocks [value]",
+		Short: "Update create-empty-blocks value in config.toml",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
 			value, err := strconv.ParseBool(args[0])
 			if err != nil {
-				return errors.Wrap(err, "can't parse create-empty-clocks")
+				return errors.Wrap(err, "can't parse create-empty-blocks")
 			}
 
 			return updateTmConfig(clientCtx.HomeDir, func(config *tmcfg.Config) {
