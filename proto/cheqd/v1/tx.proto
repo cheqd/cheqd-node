@@ -30,17 +30,17 @@ message SignInfo {
 }
 
 message MsgCreateDidPayload {
-  string id = 1;
-  repeated string controller = 2;
-  repeated VerificationMethod verification_method = 3;
-  repeated string authentication = 4;
-  repeated string assertion_method = 5;
-  repeated string capability_invocation = 6;
-  repeated string capability_delegation = 7;
-  repeated string key_agreement = 8;
-  repeated string also_known_as = 9;
-  repeated Service service = 10;
-  repeated string context = 11;
+  repeated string context = 1;
+  string id = 2;
+  repeated string controller = 3;
+  repeated VerificationMethod verification_method = 4;
+  repeated string authentication = 5;
+  repeated string assertion_method = 6;
+  repeated string capability_invocation = 7;
+  repeated string capability_delegation = 8;
+  repeated string key_agreement = 9;
+  repeated string also_known_as = 10;
+  repeated Service service = 11;
 }
 
 message MsgCreateDidResponse {
@@ -48,17 +48,17 @@ message MsgCreateDidResponse {
 }
 
 message MsgUpdateDidPayload {
-  string id = 1;
-  repeated string controller = 2;
-  repeated VerificationMethod verification_method = 3;
-  repeated string authentication = 4;
-  repeated string assertion_method = 5;
-  repeated string capability_invocation = 6;
-  repeated string capability_delegation = 7;
-  repeated string key_agreement = 8;
-  repeated string also_known_as = 9;
-  repeated Service service = 10;
-  repeated string context = 11;
+  repeated string context = 1;
+  string id = 2;
+  repeated string controller = 3;
+  repeated VerificationMethod verification_method = 4;
+  repeated string authentication = 5;
+  repeated string assertion_method = 6;
+  repeated string capability_invocation = 7;
+  repeated string capability_delegation = 8;
+  repeated string key_agreement = 9;
+  repeated string also_known_as = 10;
+  repeated Service service = 11;
   string version_id = 12;
 }
 
