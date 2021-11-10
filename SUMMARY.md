@@ -14,7 +14,7 @@
   * [Installing a cheqd node from binary package releases](docs/setup-and-configure/binary-install.md)
   * [Configure a cheqd node as validator](docs/setup-and-configure/configure-new-validator.md)
 * [cheqd Cosmos CLI](docs/cheqd-cli/README.md)
-  * [cheqd Command Line Interface \(CLI\) guide](docs/cheqd-cli/readme.md)
+  * [cheqd Command Line Interface \(CLI\) guide](docs/cheqd-cli.md)
   * [Using cheqd Cosmos CLI to manage keys](docs/cheqd-cli/cheqd-cli-key-management.md)
   * [Using cheqd Cosmos CLI to manage accounts](docs/cheqd-cli/cheqd-cli-accounts.md)
   * [Using cheqd Cosmos CLI to manage a node](docs/cheqd-cli/cheqd-cli-node-management.md)
