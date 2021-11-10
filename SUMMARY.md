@@ -20,7 +20,7 @@
   * [Using cheqd Cosmos CLI to manage a node](docs/cheqd-cli/cheqd-cli-node-management.md)
   * [Using cheqd Cosmos CLI for token transactions](docs/cheqd-cli/cheqd-cli-token-transactions.md)
 * [Building from source](docs/build-and-networks/README.md)
-  * [Building and testing](docs/build-and-networks/readme.md)
+  * [Building and testing](docs/build-and-networks/README.md)
   * [cheqd-testsnet docker image](docs/build-and-networks/local-docker-network.md)
   * [Docker Compose Based Localnet](docs/build-and-networks/docker_compose.md)
   * [setting-up-a-new-network](docs/build-and-networks/build-and-networks.md)
