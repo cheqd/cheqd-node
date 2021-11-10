@@ -45,8 +45,8 @@ To keep `cheqd-node` configuration data in segregated from userspace home direct
 
 #### Symlinks
 
-* For configuration data: `/etc/cheqd-node/` -&gt; `/var/lib/cheqd/.cheqdnode/config`
-* For ledger data: `/var/lib/cheqd/data` -&gt; `/var/lib/cheqd/.cheqdnode/data`
+* For configuration data: `/var/lib/cheqd/.cheqdnode/config` -&gt; `/etc/cheqd-node/`
+* For ledger data: `/var/lib/cheqd/.cheqdnode/data` -&gt; `/var/lib/cheqd/data`
 
 ### Logging configuration
 

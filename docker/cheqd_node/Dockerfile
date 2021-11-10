@@ -33,7 +33,7 @@ RUN starport chain build
 
 #####  Run container  #####
 
-FROM debian:buster
+FROM ubuntu:focal
 
 # Node binary
 COPY --from=builder /go/bin/cheqd-noded /bin
@@ -42,8 +42,11 @@ COPY --from=builder /go/bin/cheqd-noded /bin
 COPY docker/cheqd_node/node-runner.sh /bin/node-runner
 RUN chmod +x /bin/node-runner
 
-RUN groupadd --system --gid 1000 cheqd && \
-    useradd --system --create-home --home-dir /cheqd --shell /bin/bash --gid cheqd --uid 1000 cheqd
+ARG UID=1000
+ARG GID=1000
+
+RUN groupadd --system --gid $GID cheqd && \
+    useradd --system --create-home --home-dir /cheqd --shell /bin/bash --gid cheqd --uid $UID cheqd
 RUN chown -R cheqd /cheqd
 
 WORKDIR /cheqd

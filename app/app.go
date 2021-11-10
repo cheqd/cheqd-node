@@ -1,6 +1,7 @@
 package app
 
 import (
+	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types/v1"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	authzmodule "github.com/cosmos/cosmos-sdk/x/authz/module"
@@ -34,7 +35,6 @@ import (
 	appparams "github.com/cheqd/cheqd-node/app/params"
 	"github.com/cheqd/cheqd-node/x/cheqd"
 	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
@@ -100,7 +100,7 @@ import (
 )
 
 const Name = "cheqd-node"
-const ProtocolVersion = 1;
+const ProtocolVersion = 1
 
 // this line is used by starport scaffolding # stargate/wasm/app/enabledProposals
 
@@ -156,7 +156,7 @@ var (
 		minttypes.ModuleName:           {authtypes.Minter},
 		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
-		ibctransfertypes.ModuleName:	{authtypes.Minter, authtypes.Burner},
+		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		govtypes.ModuleName:            {authtypes.Burner},
 	}
 )
@@ -306,6 +306,12 @@ func New(
 	)
 	app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath, app.BaseApp)
 
+	// Upgrade handler
+	app.UpgradeKeeper.SetUpgradeHandler("v0.3", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx.Logger().Info("Handler for upgrade plan: v0.3")
+		return fromVM, nil
+	})
+
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.StakingKeeper = *stakingKeeper.SetHooks(
@@ -348,7 +354,7 @@ func New(
 	app.EvidenceKeeper = *evidenceKeeper
 
 	app.cheqdKeeper = *cheqdkeeper.NewKeeper(
-		appCodec, keys[cheqdtypes.StoreKey], keys[cheqdtypes.MemStoreKey],
+		appCodec, keys[cheqdtypes.StoreKey],
 	)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
