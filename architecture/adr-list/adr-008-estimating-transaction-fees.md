@@ -62,26 +62,26 @@ There is currently no way to request `min-gas-prices`.
 
 #### Gas estimation
 
-**Option 1: Client-side calculation**
-
-1. A gas estimation request could be built into the client libraries \(such as [VDR Tools](https://gitlab.com/evernym/verity/vdr-tools)\) used in applications using cheqd network
-2. The client library would use a precalculated adjustment coefficient to increase the chances of the transaction being committed.
-
-**Option 2: Use estimated values**
+**Option 1: Use estimated values** [Chosen]
 
 1. Estimated gas for most common transactions could be pre-calculated based on best-guess.
 2. This method can be used as a workaround in the absence of a formal gas estimation request in Cosmos.
 3. This approach can be used because gas needed to process simple transactions will remain constant over time.
 
+**Option 2: Client-side calculation** [Rejected]
+
+1. A gas estimation request could be built into the client libraries (such as [VDR Tools](https://gitlab.com/evernym/verity/vdr-tools)) used in applications using cheqd network
+2. The client library would use a precalculated adjustment coefficient to increase the chances of the transaction being committed.
+
 #### Fee price estimations
 
-**Option 1: Use fixed values**
+**Option 1: Use fixed values** [Chosen]
 
-1. Set a fixed recommended gas price on the cheqd network
-2. Embed the fixed value into applications
-3. This scenario is more likely to fail over time because validator operators can change gas prices.
+1. Set a fixed recommended gas price on the cheqd network: `1gas = 25ncheq`
+2. Embed the fixed value into applications and provide a client 3 options with gas price `25ncheq`, `50ncheq` or `100ncheq`.
+3. This scenario is more likely to fail over time because validator operators can change gas prices. But fee will not be spent in this case. 
 
-**Option 2: Dynamically calculate values**
+**Option 2: Dynamically calculate values** [Rejected]
 
 1. Gas prices can be dynamically determined based on recent transactions.
 2. Possible ways of estimation:
@@ -99,12 +99,10 @@ There is currently no way to request `min-gas-prices`.
 
 1. Build and sign a transaction
 2. Send gas estimation request
-   1. Multiply response to the precalculated coefficient `X > 1` to increase probability of the transaction being committed
-3. Set initial gas price
-   1. Request moving average from the network
-   2. Multiply response by `Y < 1` to prevent constant growth of the mean value
+   1. This gas evaluation can be multiplied by coefficient `X > 1` to increase probability of the transaction being committed. Recommended `X = 1.3`
+3. Set initial gas price `25ncheq`, `50ncheq` or `100ncheq`.
 4. Try sending the transaction to the network
-   1. Exponentially increase the `gas` limit, in case of failure due to gas being lower than gas-wanted.
+   1. Exponentially increase coefficient `X` for the `gas` limit, in case of failure due to gas being lower than gas-wanted.
    2. Exponentially increase the `gas-prices`, in case transaction time-out \(as this indicates `min-gas-prices` was not met\)
 
 ### Proposed API in VDR Tools
@@ -219,7 +217,8 @@ Result:
 
 ## Decision
 
-
+- Use estimated gas value from Cheqd Node
+- Use fixed 3 values for a gas price
 
 ## Consequences
 
@@ -227,18 +226,20 @@ There is no solution currently available that simplifies transaction fee estimat
 
 ### Backward Compatibility
 
-* This proposal is compatible with all recent versions of Cosmos.
+- This proposal is compatible with all recent versions of Cosmos.
 
 ### Positive
-
-* 
+- Gas estimation from Cheqd Node
+  - Client-side library implementation for gas/fee estimation can be complex to achieve. Use a simulation call is easier and faster.
+- Fixed gas price: 
+  - fast for implementation 
+  - the same approach with Kepler
+    
 ### Negative
 
-* Client-side library implementation for gas/fee estimation can be complex to achieve
+- Fixed gas price: 
+  - This scenario is more likely to fail over time because validator operators can change gas prices
 
-### Neutral
-
-* 
 ## References
 
 * [ADR 006: Community Tax](adr-006-community-tax.md)
