@@ -2,10 +2,11 @@ package cmd
 
 import (
 	"fmt"
+	"path/filepath"
+
 	cosmcfg "github.com/cosmos/cosmos-sdk/server/config"
 	"github.com/spf13/viper"
 	tmcfg "github.com/tendermint/tendermint/config"
-	"path/filepath"
 )
 
 func updateCosmConfig(homeDir string, updateFn func(config *cosmcfg.Config)) error {
