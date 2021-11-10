@@ -159,6 +159,12 @@ definitions:
     required:
       - id
     properties:
+      context:
+        description: A list of strings with links or JSONs for describing specifications that this DID Document is following to.
+        type: array
+        items:
+          type: string
+          example: "https://www.w3.org/ns/did/v1"
       id:
         description: Target DID as base58-encoded string for 16 or 32 byte DID value with cheqd DID Method prefix `did:cheqd:<namespace>:`.
         type: string
@@ -214,12 +220,6 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Service'
-      context:
-        description: A list of strings with links or JSONs for describing specifications that this DID Document is following to.
-        type: array
-        items:
-          type: string
-          example: "https://www.w3.org/ns/did/v1"
 
   MsgCreateDidResponse:
     required:
@@ -250,6 +250,12 @@ definitions:
       - id
       - versionId
     properties:
+      context:
+        description: A list of strings with links or JSONs for describing specifications that this DID Document is following to.
+        type: array
+        items:
+          type: string
+          example: "https://www.w3.org/ns/did/v1"
       id:
         description: Target DID as base58-encoded string for 16 or 32 byte DID value with cheqd DID Method prefix `did:cheqd:<namespace>:`.
         type: string
@@ -305,12 +311,6 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Service'
-      context:
-        description: A list of strings with links or JSONs for describing specifications that this DID Document is following to.
-        type: array
-        items:
-          type: string
-          example: "https://www.w3.org/ns/did/v1"
       versionId:
         description: Should be filled by a transaction hash of the previous DIDDoc version. Can be received by GetDid query. It is needed for a replay protection.
         type: string
@@ -331,7 +331,7 @@ definitions:
       - metadata
     properties:
       data:
-        type: object
+        $ref: '#/definitions/Did'
       metadata:
         $ref: '#/definitions/Metadata'
 
@@ -358,6 +358,72 @@ definitions:
         description: Contains transaction hash of the current DIDDoc version.
         type: string
         example: 1B3B00849B4D50E8FCCF50193E35FD6CA5FD4686ED6AD8F847AC8C5E466CFD3E
+
+  Did:
+    required:
+      - id
+    properties:
+      context:
+        description: A list of strings with links or JSONs for describing specifications that this DID Document is following to.
+        type: array
+        items:
+          type: string
+          example: "https://www.w3.org/ns/did/v1"
+      id:
+        description: Target DID as base58-encoded string for 16 or 32 byte DID value with cheqd DID Method prefix `did:cheqd:<namespace>:`.
+        type: string
+        example: did:cheqd:testnet:6cgbu8ZPoWTnR5Rv5JcSMB
+      verificationMethod:
+        description: A list of Verification Methods
+        type: array
+        items:
+          $ref: '#/definitions/VerificationMethod'
+      controller:
+        description: A list of strings with key aliases or IDs
+        type: array
+        items:
+          type: string
+          example: did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue
+      authentication:
+        description: A list of strings with key aliases or IDs
+        type: array
+        items:
+          type: string
+          example: "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#key1"
+      assertionMethod:
+        description: A list of strings with key aliases or IDs
+        type: array
+        items:
+          type: string
+          example: "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#key1"
+      capabilityInvocation:
+        description: A list of strings with key aliases or IDs
+        type: array
+        items:
+          type: string
+          example: "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#key1"
+      capabilityDelegation:
+        description: A list of strings with key aliases or IDs
+        type: array
+        items:
+          type: string
+          example: "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#key1"
+      keyAgreement:
+        description: A list of strings with key aliases or IDs
+        type: array
+        items:
+          type: string
+          example: "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#key1"
+      alsoKnownAs:
+        description: A list of strings. A DID subject can have multiple identifiers for different purposes, or at different times. The assertion that two or more DIDs refer to the same DID subject can be made using the `alsoKnownAs` property.
+        type: array
+        items:
+          type: string
+      service:
+        description: A set of Service Endpoint maps
+        type: array
+        items:
+          $ref: '#/definitions/Service'
 
   Service:
     required:
