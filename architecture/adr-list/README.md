@@ -13,6 +13,7 @@ description: >-
 3. [ADR 004: **Token fractions**](adr-004-token-fractions.md)
 4. [ADR 005: **Genesis parameters**](adr-005-genesis-parameters.md)
 5. [ADR 006: **Community tax**](adr-006-community-tax.md)
+6. [ADR 009: **Estimating transaction fees**](adr-009-estimating-transaction-fees.md)
 
 ## Proposed
 

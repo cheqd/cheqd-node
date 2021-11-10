@@ -1,11 +1,13 @@
-# ADR 008: Estimating transaction fees
+# ADR 009: Estimating transaction fees
 
 ## Status
 
 | Category | Status |
 | :--- | :--- |
-| **ADR Stage** | DRAFT |
-| **Implementation Status** | Not Implemented |
+| **Authors** | Alexandr Kolesov |
+| **ADR Stage** | ACCEPTED |
+| **Implementation Status** | Implemented |
+| **Start Date** | 2021-09-09 |
 
 ## Summary
 
