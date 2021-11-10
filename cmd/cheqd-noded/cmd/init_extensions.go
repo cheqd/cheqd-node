@@ -48,6 +48,7 @@ func applyTmDefaults(homeDir string) error {
 	}
 
 	tmConfig.Consensus.CreateEmptyBlocks = false
+	tmConfig.FastSync.Version = "v2"
 
 	err = tmConfig.ValidateBasic()
 	if err != nil {
