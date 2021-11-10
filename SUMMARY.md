@@ -8,8 +8,8 @@
   * [Setting up a new cheqd node](docs/setup-and-configure/readme.md)
   * [Debian package installation](docs/setup-and-configure/debian/readme.md)
     * [Guide to Debian packages for cheqd-node](docs/setup-and-configure/debian/readme.md)
-    * [Upgrading a cheqd node using Debian package releases](docs/setup-and-configure/debian/deb-package-upgrade.md)
     * [Installing a cheqd node using Debian package releases](docs/setup-and-configure/debian/deb-package-install.md)
+    * [Upgrading a cheqd node using Debian package releases](docs/setup-and-configure/debian/deb-package-upgrade.md)
   * [Installing cheqd-node with Docker](docs/setup-and-configure/docker-install.md)
   * [Installing a cheqd node from binary package releases](docs/setup-and-configure/binary-install.md)
   * [Configure a cheqd node as validator](docs/setup-and-configure/configure-new-validator.md)
@@ -28,20 +28,20 @@
 
 ## Architecture
 
-* [Architecture Decision Record \(ADR\) Process](architecture/readme.md)
+* [Architecture Decision Record \(ADR\) Process](architecture/README.md)
 * [List of ADRs](architecture/adr-list/README.md)
   * [ADR 001: Payment mechanism for issuing credentials](architecture/adr-list/adr-001-payment-mechanism-for-issuing-credentials.md)
-  * [ADR 002: Identity entities and transactions](architecture/adr-list/adr-002-cheqd-did-method.md)
+  * [ADR 002: cheqd DID method, identity entities, and transactions](architecture/adr-list/adr-002-cheqd-did-method.md)
   * [ADR 003: Command Line Interface \(CLI\) tools](architecture/adr-list/adr-003-cli-tools.md)
   * [ADR 004: Token fractions](architecture/adr-list/adr-004-token-fractions.md)
   * [ADR 005: Genesis parameters](architecture/adr-list/adr-005-genesis-parameters.md)
   * [ADR 006: Community tax](architecture/adr-list/adr-006-community-tax.md)
   * [ADR 007: Revocation registry](architecture/adr-list/adr-007-revocation-registry.md)
+  * [ADR 008: cheqd DIDDOc resources: Schemas and Credential Definitions](architecture/adr-list/adr-008-identity-resources.md)
   * [ADR {ADR-NUMBER}: {TITLE}](architecture/adr-list/adr-template.md)
 
 ---
 
-* [Code of Conduct](code_of_conduct.md)
-* [Security Policy](security.md)
-* [Notice](notice.md)
-
+* [Code of Conduct](CODE_OF_CONDUCT.md)
+* [Security Policy](SECURITY.md)
+* [Notice](NOTICE.md)
