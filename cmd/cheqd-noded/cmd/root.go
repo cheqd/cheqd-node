@@ -65,12 +65,9 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 				return err
 			}
 
-			// Allow us to overwrite the SDK's default server config.
-			srvCfg := serverconfig.DefaultConfig()
-			// TODO: We can overwrite default min_gas_price here
-
+			// Allows us to overwrite the SDK's default server config.
 			customAppTemplate := serverconfig.DefaultConfigTemplate
-			customAppConfig := *srvCfg
+			customAppConfig := serverconfig.DefaultConfig()
 
 			return server.InterceptConfigsPreRunHandler(cmd, customAppTemplate, customAppConfig)
 		},

@@ -8,7 +8,25 @@ import (
 	"path/filepath"
 )
 
-func readCosmosConfig(homeDir string) (cosmcfg.Config, error) {
+func updateCosmConfig(homeDir string, updateFn func(config *cosmcfg.Config)) error {
+	cosmConfig, err := readCosmConfig(homeDir)
+	if err != nil {
+		return err
+	}
+
+	updateFn(&cosmConfig)
+
+	err = cosmConfig.ValidateBasic()
+	if err != nil {
+		return err
+	}
+
+	writeCosmConfig(homeDir, &cosmConfig)
+
+	return nil
+}
+
+func readCosmConfig(homeDir string) (cosmcfg.Config, error) {
 	v := viper.New()
 
 	v.SetConfigType("toml")
@@ -24,9 +42,27 @@ func readCosmosConfig(homeDir string) (cosmcfg.Config, error) {
 	return config, nil
 }
 
-func writeCosmosConfig(homeDir string, config *cosmcfg.Config) {
+func writeCosmConfig(homeDir string, config *cosmcfg.Config) {
 	tmConfigPath := filepath.Join(homeDir, "config", "app.toml")
 	cosmcfg.WriteConfigFile(tmConfigPath, config)
+}
+
+func updateTmConfig(homeDir string, updateFn func(config *tmcfg.Config)) error {
+	tmConfig, err := readTmConfig(homeDir)
+	if err != nil {
+		return err
+	}
+
+	updateFn(&tmConfig)
+
+	err = tmConfig.ValidateBasic()
+	if err != nil {
+		return err
+	}
+
+	writeTmConfig(homeDir, &tmConfig)
+
+	return nil
 }
 
 func readTmConfig(homeDir string) (tmcfg.Config, error) {

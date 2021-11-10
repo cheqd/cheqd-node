@@ -2,7 +2,9 @@ package cmd
 
 import (
 	"github.com/cosmos/cosmos-sdk/client"
+	cosmcfg "github.com/cosmos/cosmos-sdk/server/config"
 	"github.com/spf13/cobra"
+	tmcfg "github.com/tendermint/tendermint/config"
 )
 
 func extendInit(initCmd *cobra.Command) *cobra.Command {
@@ -28,52 +30,22 @@ func extendInit(initCmd *cobra.Command) *cobra.Command {
 func applyConfigDefaults(cmd *cobra.Command) error {
 	clientCtx := client.GetClientContextFromCmd(cmd)
 
-	err := applyTmDefaults(clientCtx.HomeDir)
+	err := updateTmConfig(clientCtx.HomeDir, func(config *tmcfg.Config) {
+		config.FastSync.Version = "v2"
+		config.P2P.SendRate = 20000000
+		config.P2P.RecvRate = 20000000
+		config.P2P.MaxPacketMsgPayloadSize = 10240
+	})
 	if err != nil {
 		return err
 	}
 
-	err = applyCosmosDefaults(clientCtx.HomeDir)
+	err = updateCosmConfig(clientCtx.HomeDir, func(config *cosmcfg.Config) {
+		config.BaseConfig.MinGasPrices = "25ncheq"
+	})
 	if err != nil {
 		return err
 	}
-
-	return nil
-}
-
-func applyTmDefaults(homeDir string) error {
-	tmConfig, err := readTmConfig(homeDir)
-	if err != nil {
-		return err
-	}
-
-	tmConfig.Consensus.CreateEmptyBlocks = false
-	tmConfig.FastSync.Version = "v2"
-
-	err = tmConfig.ValidateBasic()
-	if err != nil {
-		return err
-	}
-
-	writeTmConfig(homeDir, &tmConfig)
-
-	return nil
-}
-
-func applyCosmosDefaults(homeDir string) error {
-	cosmConfig, err := readCosmosConfig(homeDir)
-	if err != nil {
-		return err
-	}
-
-	cosmConfig.BaseConfig.MinGasPrices = "25ncheq"
-
-	err = cosmConfig.ValidateBasic()
-	if err != nil {
-		return err
-	}
-
-	writeCosmosConfig(homeDir, &cosmConfig)
 
 	return nil
 }
