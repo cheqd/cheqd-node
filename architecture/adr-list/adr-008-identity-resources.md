@@ -1,4 +1,4 @@
-# ADR 008: Cheqd DIDdoc resources: schema, credential definition
+# ADR 008: cheqd DIDDOc resources: Schemas and Credential Definitions
 
 ## Status
 
