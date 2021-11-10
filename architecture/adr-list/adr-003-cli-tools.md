@@ -4,8 +4,10 @@
 
 | Category | Status |
 | :--- | :--- |
+| **Authors** | Alexandr Kolesov |
 | **ADR Stage** | ACCEPTED |
 | **Implementation Status** | Implemented |
+| **Start Date** | 2021-09-10 |
 
 ## Summary
 

@@ -4,8 +4,10 @@
 
 | Category | Status |
 | :--- | :--- |
+| **Authors** | Renata Toktar |
 | **ADR Stage** | DRAFT |
 | **Implementation Status** | Not Implemented |
+| **Start Date** | 2021-09-10 |
 
 ## Summary
 

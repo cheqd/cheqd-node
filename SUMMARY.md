@@ -31,7 +31,7 @@
 * [Architecture Decision Record \(ADR\) Process](architecture/readme.md)
 * [List of ADRs](architecture/adr-list/README.md)
   * [ADR 001: Payment mechanism for issuing credentials](architecture/adr-list/adr-001-payment-mechanism-for-issuing-credentials.md)
-  * [ADR 002: Identity entities and transactions](architecture/adr-list/adr_002_identity_transactions.md)
+  * [ADR 002: Identity entities and transactions](architecture/adr-list/adr-002-identity-transactions.md)
   * [ADR 003: Command Line Interface \(CLI\) tools](architecture/adr-list/adr-003-cli-tools.md)
   * [ADR 004: Token fractions](architecture/adr-list/adr-004-token-fractions.md)
   * [ADR 005: Genesis parameters](architecture/adr-list/adr-005-genesis-parameters.md)
