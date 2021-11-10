@@ -32,6 +32,7 @@ DENOM = "ncheq"
 GAS_AMOUNT = 90000 # 70000 throws `out of gas` sometimes
 GAS_PRICE = 25
 TEST_NET_GAS_X_GAS_PRICES_INT = GAS_AMOUNT * GAS_PRICE
+MAX_GAS_MAGIC_NUMBER = 1.3
 
 # addresses and mnemonics for test net docker image
 SENDER_ADDRESS = "cheqd1rnr5jrt4exl0samwj0yegv99jeskl0hsxmcz96"
@@ -94,10 +95,17 @@ def send_with_note(note):
 async def send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, msg, memo):
     account_number, sequence_number = await get_base_account_number_and_sequence(pool_alias, sender_address)
     timeout_height = await get_timeout_height(pool_alias)
-    tx = await cheqd_ledger.auth.build_tx(
+    test_tx = await cheqd_ledger.auth.build_tx(
         pool_alias, public_key, msg, account_number, sequence_number, GAS_AMOUNT, GAS_AMOUNT*GAS_PRICE, DENOM, sender_address, timeout_height, memo
     )
-    tx_signed = await cheqd_ledger.auth.sign_tx(wallet_handle, key_alias, tx)
+    request = await cheqd_ledger.tx.build_query_simulate(test_tx)
+    response = await cheqd_pool.abci_query(pool_alias, request)
+    response = await cheqd_ledger.tx.parse_query_simulate_resp(response)
+    gas_estimation = json.loads(response)["gas_info"]["gas_used"]
+    prod_tx = await cheqd_ledger.auth.build_tx(
+        pool_alias, public_key, msg, account_number, sequence_number, int(gas_estimation*MAX_GAS_MAGIC_NUMBER), int(gas_estimation*MAX_GAS_MAGIC_NUMBER*GAS_PRICE), DENOM, SENDER_ADDRESS, timeout_height, memo
+    )
+    tx_signed = await cheqd_ledger.auth.sign_tx(wallet_handle, key_alias, prod_tx)
     res = json.loads(await cheqd_pool.broadcast_tx_commit(pool_alias, tx_signed))
     tx_hash = res["hash"]
 

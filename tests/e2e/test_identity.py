@@ -10,7 +10,7 @@ from vdrtools import cheqd_keys, cheqd_pool, cheqd_ledger
 from vdrtools.error import CommonInvalidStructure, PoolLedgerConfigAlreadyExistsError
 
 from helpers import create_did_helper, query_did_helper, random_string, update_did_helper, wallet_helper, get_base_account_number_and_sequence, get_timeout_height, get_balance_vdr, send_tx_helper, get_tx_helper, \
-    SENDER_ADDRESS, SENDER_MNEMONIC, RECEIVER_ADDRESS, LOCAL_NET_NETWORK, TEST_NET_GAS_X_GAS_PRICES_INT, GAS_AMOUNT, GAS_PRICE, DENOM, IMPLICIT_TIMEOUT, CODE_0_DIGIT
+    SENDER_ADDRESS, SENDER_MNEMONIC, RECEIVER_ADDRESS, LOCAL_NET_NETWORK, TEST_NET_GAS_X_GAS_PRICES_INT, GAS_AMOUNT, GAS_PRICE, DENOM, IMPLICIT_TIMEOUT, CODE_0_DIGIT, MAX_GAS_MAGIC_NUMBER
 
 # logger = logging.getLogger(__name__)
 # logging.basicConfig(level=logging.DEBUG)
@@ -19,7 +19,6 @@ KEY_ALIAS = "operator0"
 DEFAULT_AMOUNT = 1000
 DEFAULT_MEMO = "test_memo"
 MAX_GAS_MAGIC_NUMBER_NEGATIVE = 1.2
-MAX_GAS_MAGIC_NUMBER = 1.3
 LOCAL_POOL_HTTP = "http://localhost:26657"
 FQ_PREFIX = "did:cheqd:testnet:"
 MAX_GAS = 0
