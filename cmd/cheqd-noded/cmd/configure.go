@@ -20,7 +20,8 @@ func configureCmd(defaultNodeHome string) *cobra.Command {
 	cmd.AddCommand(
 		minGasPricesCmd(defaultNodeHome),
 		p2pCmd(defaultNodeHome),
-		rpcLaddrCmd(defaultNodeHome))
+		rpcLaddrCmd(defaultNodeHome),
+		createEmptyBlocksCmd(defaultNodeHome))
 
 	return cmd
 }
