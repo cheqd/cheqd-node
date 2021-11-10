@@ -7,6 +7,7 @@ description: >-
 # List of ADRs
 
 ## Accepted
+
 1. [ADR 001: **Payment mechanism for issuing credentials**](adr-001-payment-mechanism-for-issuing-credentials.md)
 2. [ADR 003: **Command Line Interface \(CLI\) tools**](adr-003-cli-tools.md)
 3. [ADR 004: **Token fractions**](adr-004-token-fractions.md)
@@ -14,8 +15,11 @@ description: >-
 5. [ADR 006: **Community tax**](adr-006-community-tax.md)
 
 ## Proposed
-1. [ADR 002: **Identity entities and transactions**](adr_002_identity_transactions.md)
+
+1. [ADR 002: **cheqd DID method, identity entities, and transactions**](adr-002-cheqd-did-method.md)
+2. [ADR 008: **cheqd DIDDoc resources: Schemas and Credential Definition**](adr-008-identity-resources.md)
 
 ## Draft
+
 1. [ADR 007: **Revocation registry**](adr-007-revocation-registry.md)
-2. [ADR 008: **Estimating transaction fees**](adr-008-estimating-transaction-fees.md)
+

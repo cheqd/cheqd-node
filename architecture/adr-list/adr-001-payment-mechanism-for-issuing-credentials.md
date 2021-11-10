@@ -4,8 +4,10 @@
 
 | Category | Status |
 | :--- | :--- |
+| **Authors** | Ankur Banerjee |
 | **ADR Stage** | ACCEPTED |
 | **Implementation Status** | Not Implemented |
+| **Start Date** | 2021-09-01 |
 
 ## Summary
 
@@ -41,13 +43,13 @@ A message is sent by the Issuer to the potential Holder, describing the credenti
 
 A payment request can then be defined using the [Hyperledger Aries Payment Decorator](https://github.com/hyperledger/aries-rfcs/blob/main/features/0075-payment-decorators/README.md#payment_request) to add information about an issuing price and address where payment should be sent.
 
-```text
+```json
    "~payment_request": {
         "methodData": [
           {
             "supportedMethods": "cheqd",
             "data": {
-              "payeeId": "cosmos1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd"
+              "payeeId": "cheqd1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd"
             },
           }
         ],
@@ -56,12 +58,12 @@ A payment request can then be defined using the [Hyperledger Aries Payment Decor
           "displayItems": [
             {
               "label": "commercial driver's license",
-              "amount": { "currency": "cheq", "value": "10" },
+              "amount": { "currency": "ncheq", "value": "1000" },
             }
           ],
           "total": {
             "label": "Total due",
-            "amount": { "currency": "cheq", "value": "10" }
+            "amount": { "currency": "ncheq", "value": "1000" }
           }
         }
       }
@@ -102,7 +104,7 @@ The payment flow can be broken down into five steps:
    deliver_tx: TxResult {
       code: 0,
       data: Some(Data([...])),
-      log: "[{\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"send\"},{\"key\":\"sender\",\"value\":\"cosmos1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"cosmos1pvnjjy3vz0ga6hexv32gdxydzxth7f86mekcpg\"},{\"key\":\"sender\",\"value\":\"cosmos1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd\"},{\"key\":\"amount\",\"value\":\"100cheq\"}]}]}]",
+      log: "[{\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"send\"},{\"key\":\"sender\",\"value\":\"cheqd1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"cheqd1pvnjjy3vz0ga6hexv32gdxydzxth7f86mekcpg\"},{\"key\":\"sender\",\"value\":\"cheqd1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd\"},{\"key\":\"amount\",\"value\":\"1000ncheq\"}]}]}]",
       info: "",
       gas_wanted: 0,
       gas_used: 0,
@@ -123,18 +125,18 @@ Key fields in the response above are:
 
 This is a message sent by the potential Holder to the Issuer, to request the issuance of a credential after tokens are transferred to the nominated account using a Payment Transaction.
 
-```text
+```json
 {
     "@type": "https://didcomm.org/issue_credential/1.0/request_credential",
     "@id": "94af9be9-5248-4a65-ad14-3e7a6c3489b6",
-    "~thread": { "thid": "5bc1989d-f5c1-4eb1-89dd-21fd47093d96" },
+    "~thread": { "this": "5bc1989d-f5c1-4eb1-89dd-21fd47093d96" },
     "cred_def_id": "KTwaKJkvyjKKf55uc6U8ZB:3:CL:59:tag1",
     "~payment_receipt": {
       "request_id": "0a2bc4a6-1f45-4ff0-a046-703c71ab845d",
       "selected_method": "cheqd",
       "transaction_id": "1B3B00849B4D50E8FCCF50193E35FD6CA5FD4686ED6AD8F847AC8C5E466CFD3E",
       "payeeId": "0xD15239C7e7dDd46575DaD9134a1bae81068AB2A4",
-      "amount": { "currency": "cheq", "value": "10.0" }
+      "amount": { "currency": "ncheq", "value": "1000.0" }
     }
 }
 ```
@@ -154,7 +156,7 @@ If steps 1-4 are successful, the Issuer is able to confirm that the requested pa
 
 ### Overview of steps 1-5
 
-REPLACE PNG IMAGES
+REPLACE WITH PNG
 
 #### UML version
 

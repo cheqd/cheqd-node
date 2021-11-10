@@ -1,8 +1,7 @@
 package keeper
 
 import (
-	// this line is used by starport scaffolding # 1
-	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	"github.com/cheqd/cheqd-node/x/cheqd/types/v1"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -19,15 +18,11 @@ func NewQuerier(k Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 		)
 
 		switch path[0] {
-		// this line is used by starport scaffolding # 2
-		case types.QueryGetNym:
-			return getNym(ctx, path[1], k, legacyQuerierCdc)
-
-		case types.QueryListNym:
-			return listNym(ctx, k, legacyQuerierCdc)
+		case v1.QueryGetDid:
+			return getDid(ctx, path[1], k, legacyQuerierCdc)
 
 		default:
-			err = sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown %s query endpoint: %s", types.ModuleName, path[0])
+			err = sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown %s query endpoint: %s", v1.ModuleName, path[0])
 		}
 
 		return res, err

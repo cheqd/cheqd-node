@@ -4,8 +4,10 @@
 
 | Category | Status |
 | :--- | :--- |
+| **Authors** | Alexandr Kolesov |
 | **ADR Stage** | ACCEPTED |
 | **Implementation Status** | Implemented |
+| **Start Date** | 2021-09-10 |
 
 ## Summary
 
@@ -99,7 +101,6 @@ Based on the options considerations above and an analysis of development require
 
 ### CLI components overview
 
-REPLACE PNG IMAGES
 
 > [Editable versions of the diagrams](https://github.com/cheqd/cheqd-node/tree/e5f850355609f35a9a62c557ebf4adc73e766a44/architecture/adr-list/assets/adr003-cli-components-editable.excalidraw) \(in Excalidraw format\)
 

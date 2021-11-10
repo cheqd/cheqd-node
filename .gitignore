@@ -28,6 +28,7 @@ Temporary Items
 
 # VS Code
 .devcontainer
+.vscode
 
 # Application specific
 vue/node_modules
@@ -36,3 +37,7 @@ vue/dist
 secret.yml
 **/node_configs
 .idea
+
+# Python
+.pytest_cache
+**/__pycache__
