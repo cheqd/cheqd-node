@@ -9,13 +9,6 @@
 | **Implementation Status** | Implementation in progress |
 | **Start Date** | 2021-09-23 |
 
-## TODO
-
-- Describe the resolution process for DID
-- Describe the deactivation process
-- Add security considerations
-- Add privacy considerations
-
 ## Summary
 
 This ADR defines the cheqd DID method and describes the identity entities, queries, and transaction types for the cheqd network: a purpose-built self-sovereign identity (SSI) network based on the [Cosmos blockchain framework](https://github.com/cosmos/cosmos-sdk).
@@ -61,7 +54,7 @@ The following identity-domain transactions from Indy were considered:
 
 Revocation registries for credentials are not covered under the scope of this ADR. This topic is discussed separately in [ADR 007: **Revocation registry**](adr-007-revocation-registry.md) as there is ongoing research by the cheqd project on how to improve the privacy and scalability of credential revocations.
 
-Schema and Credential definition have been moved to another ADR.
+Schemas and Credential Definitions are also not covered under the scope of this ADR as there are ongoing discussions on how to implement this in a W3C-com
 
 ## Decision
 
@@ -79,23 +72,24 @@ A DID that uses the cheqd DID method MUST begin with the prefix `did:cheqd`. Thi
 
 #### Method Specific Identifier
 
-The cheqd DID `method-specific-id` is made up of a component:
+The cheqd DID method's method-specific identifier (`method-specific-id`) is made up of the **`namespace`** component. The **`namespace`** is defined as a string that identifies the cheqd network (e.g., "mainnet", "testnet") where the DID reference is stored. Different cheqd networks may be differentiated based on whether they are production vs non-production, governance frameworks in use, participants involved in running nodes, etc.
 
-**`namespace`**: A string that identifies the cheqd network (e.g., "mainnet", "testnet") where the DID reference is stored. Different cheqd networks may be differentiated based on whether they are production vs non-production, governance frameworks in use, participants involved in running nodes, etc.
-A namespace value is stored in the genesis file on the node side and can't be changed by validators vote. A namespace is optional and can be omitted. 
+The `namespace` associated with a certain network/ledger is stored in the genesis file on the node and cannot be changed by validators vote. A namespace is optional and can be omitted.
 
-A `did:cheqd` DID MUST be self-certifying by having the namespace component of the DID (last element)
-derived from the initial public key of the DID, as follows:
-For an Ed25519 key: Convert into Base58char the first 16 bytes of the 256 bit public key.
+A `did:cheqd` DID **must** be unique by having the `unique-id` component be derived from the initial public key of the DID. For an `Ed25519` public key, the first 16 bytes of the base-58 representation of the 256-bit public key is used to generate the `unique-id`.
+
+If no `namespace` is specified, it assumed to be default `namespace` for the network/ledger the request is targetted at. This will generally be `mainnet` for the primary production cheqd network.
 
 #### cheqd DID method syntax
 
 The cheqd DID method ABNF to conform with [DID syntax guidelines](https://www.w3.org/TR/did-core/#did-syntax) is as follows:
 
 ```abnf
-cheqd-did         = "did:cheqd:" [namespace ":"]
-namespace         = 1*namespace-char
-namespace-char    = ALPHA / DIGIT
+cheqd-did       = "did:cheqd:" [namespace]
+namespace       = 1*255namespace-char ":" unique-id
+namespace-char  = ALPHA / DIGIT
+unique-id       = 32*255id-char
+id-char         = ALPHA / DIGIT
 ```
 
 #### Examples of `did:cheqd` identifiers
@@ -112,7 +106,7 @@ A DID written to the cheqd "testnet" ledger `namespace`:
 did:cheqd:testnet:6cgbu8ZPoWTnR5Rv5JcSMB
 ```
 
-Another possible cheqd DID:
+Another possible cheqd DID (where no namespace is defined):
 
 ```abnf
 did:cheqd:6cgbu8ZPoWTnR5Rv5JcSMB
@@ -122,7 +116,7 @@ did:cheqd:6cgbu8ZPoWTnR5Rv5JcSMB
 
 A DID Document ("DIDDoc") associated with a cheqd DID is a set of data describing a DID subject. The [representation of a DIDDoc when requested for production](https://www.w3.org/TR/did-core/#representations) from a DID on cheqd networks MUST meet the DID Core specifications.
 
-#### Elements needed for DIDDoc representation
+#### Elements needed for a W3C specification compliant DIDDoc representation
 
 1. **`id`**: Target DID as base58-encoded string for 16 or 32 byte DID value with cheqd DID Method prefix `did:cheqd:<namespace>:`.
 2. **`controller`** (optional): A list of fully qualified DID strings or one string. Contains one or more DIDs who can update this DIDdoc. All DIDs must exist.
@@ -173,13 +167,12 @@ describing specifications that this DID Document is following to.
 
 #### DIDDoc metadata
 
-1. **`created`** (string): Formatted as an XML Datetime normalized to UTC
-00:00:00 and without sub-second decimal precision. For example:
-2020-12-20T19:17:47Z.
+Each DID Document MUST have a metadata section when a representation is produced. It can have the following properties:
+
+1. **`created`** (string): Formatted as an XML Datetime normalized to UTC 00:00:00 and without sub-second decimal precision, e.g., `2020-12-20T19:17:47Z`.
 2. **`updated`** (string): The value of the property MUST follow the same
-formatting rules as the created property. The `updated` field is null if an Update operation has never been performed on the DID document. If an updated property exists, it can be the same value as the created property when the difference between the two timestamps is less than one second.
-3. **`deactivated`** (strings): If DID has been deactivated, DID document
-metadata MUST include this property with the boolean value true. By default this is set to `false`.
+formatting rules as the created property. The `updated` field is `null` if an Update operation has never been performed on the DID document. If an updated property exists, it can be the same value as the created property when the difference between the two timestamps is less than one second.
+3. **`deactivated`** (strings): If DID has been deactivated, DID document metadata MUST include this property with the boolean value `true`. By default this is set to `false`.
 4. **`versionId`** (strings): Contains transaction hash of the current DIDDoc version.
 
 ##### Example of DIDDoc metadata
@@ -197,15 +190,14 @@ metadata MUST include this property with the boolean value true. By default this
 
 Verification methods are used to define how to authenticate / authorise interactions with a DID subject or delegates. Verification method is an OPTIONAL property.
 
-1. **`id`** (string): A string with format `<DIDDoc-id>#<key-alias>`
+1. **`id`** (string): A string with format `did:cheqd:<namespace>#<key-alias>`
 2. **`controller`**: A string with fully qualified DID. DID must exist.
 3. **`type`** (string)
 4. **`publicKeyJwk`** (`map[string,string]`, optional): A map representing a JSON Web Key that conforms to [RFC7517](https://tools.ietf.org/html/rfc7517). See definition of `publicKeyJwk` for additional constraints.
 5. **`publicKeyMultibase`** (optional): A base58-encoded string that conforms to a [MULTIBASE](https://datatracker.ietf.org/doc/html/draft-multiformats-multibase-03)
 encoded public key.
 
-**Note**: Verification method cannot contain both `publicKeyJwk` and
-`publicKeyMultibase` but must contain at least one of them.
+**Note**: Verification method cannot contain both `publicKeyJwk` and `publicKeyMultibase` but must contain at least one of them.
 
 ##### Example of Verification method in a DIDDoc
 
@@ -244,169 +236,173 @@ Services can be defined in a DIDDoc to express means of communicating with the D
 }
 ```
 
-### `DID` transactions
+### DID transactions
 
-#### Create `DID`
+#### Create DID
 
-If there is no DID entry on the ledger with the specified DID (`DID.id`), it is considered as a creation request for a new DID.
+This operation creates a new DID using the `did:cheqd` method along with associated DID Document representation.
 
-**Note**: The field `signatures`(from `WriteRequest`) must contain signatures from all new controllers.
+- **`signatures`**: `CreateDidRequest` should be signed by all `controller` private keys. This field contains a `dict` structure with the key URI from `DIDDoc.authentication`, as well as signature values.
+- **`id`**: Fully qualified DID of type `did:cheqd:<namespace>`.
+- **`controller, verificationMethod, authentication, assertionMethod, capabilityInvocation, capabilityDelegation, keyAgreement, service, alsoKnownAs, context`**: Optional parameters in accordance with DID Core specification properties.
 
-**Client request**: 
-`WriteRequest(CreateDidRequest(id, controller, verificationMethod, authentication, assertionMethod, capabilityInvocation, capabilityDelegation, keyAgreement, service, alsoKnownAs, context), signatures)`
+#### Client request format for create DID
 
-- **`signatures`**: `CreateDidRequest` should be signed by all `controller` private keys. This field contains a dict there key's URI from
-  `DIDDoc.authentication`, and the signature is a value. The `signatures` must contains signatures from all controllers.
-- **`id`**: fully qualified did
-- **`controller, verificationMethod, authentication, assertionMethod, capabilityInvocation, capabilityDelegation, keyAgreement, service, alsoKnownAs, context`**: optional parameters in accordance with DIDDoc properties
+```jsonc
+WriteRequest (CreateDidRequest(id, controller, verificationMethod, authentication, assertionMethod, capabilityInvocation, capabilityDelegation, keyAgreement, service, alsoKnownAs, context), signatures)
+```
 
-Example of a client request:
+#### Example of a create DID client request
 
 ```jsonc
 WriteRequest{
-              "data": 
-                      CreateDidRequest{   
-                                        "context": [
-                                            "https://www.w3.org/ns/did/v1",
-                                            "https://w3id.org/security/suites/ed25519-2020/v1"
-                                        ],
-                                        "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
-                                        "controller": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue"],
-                                        "verificationMethod": [
-                                          {
-                                            "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#capabilityInvocationKey",
-                                            "type": "Ed25519VerificationKey2020", // external (property value)
-                                            "controller": "did:cheqd:mainnet:N22N22KY2Dyvmuu2PyyqSFKue",
-                                            "publicKeyMultibase": "z4BWwfeqdp1obQptLLMvPNgBw48p7og1ie6Hf9p5nTpNN"
-                                          }
-                                        ],
-                                        "authentication": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#authKey1"],
-              },
-              "signatures": {
-                  "verification method URI": "<signature>"
-                  // Multiple verification methods and corresponding signatures can be added here
-              },
+  "data": 
+    CreateDidRequest {   
+      "context": [
+          "https://www.w3.org/ns/did/v1",
+          "https://w3id.org/security/suites/ed25519-2020/v1"
+      ],
+      "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
+      "controller": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue"],
+      "verificationMethod": [
+        {
+          "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#capabilityInvocationKey",
+          "type": "Ed25519VerificationKey2020", // external (property value)
+          "controller": "did:cheqd:mainnet:N22N22KY2Dyvmuu2PyyqSFKue",
+          "publicKeyMultibase": "z4BWwfeqdp1obQptLLMvPNgBw48p7og1ie6Hf9p5nTpNN"
+        }
+      ],
+      "authentication": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#authKey1"],
+  },
+  "signatures": {
+      "Verification Method URI": "<signature>"
+      // Multiple verification methods and corresponding signatures can be added here
+  }
 }
 ```
 
-#### Update `DID`
+#### Update DID
 
-If there is a DID entry on the ledger with the specified DID (`DID.id`), then this considered a request for updating an existing DID.
+This operation updates the DID Document associated with an existing DID of type `did:cheqd:<namespace>`.
 
-For updating `versionId` from `UpdateDIDRequest` should be filled by a
-transaction hash of the previous DIDDoc version. Can be received by GetDid query. It is needed for a replay protection.
+- **`signatures`**: `UpdateDidRequest` should be signed by all `controller` private keys. This field contains a `dict` structure with the key URI from `DIDDoc.authentication`, as well as signature values.
+- **`id`**: Fully qualified DID of type `did:cheqd:<namespace>`.
+- **`versionId`**: Transaction hash of the previous DIDDoc version. This is necessary to provide replay protection. The previous DIDDoc `versionId` can fetched using a get DID query.
+- **`controller, verificationMethod, authentication, assertionMethod, capabilityInvocation, capabilityDelegation, keyAgreement, service, alsoKnownAs, context`**: Optional parameters in accordance with DID Core specification properties.
 
-**Note**: The field `signatures`(from `WriteRequest`) must contain signatures from all old controllers and all new controllers.
+#### Client request format for update DID
 
-**Client request**:
-`WriteRequest(UpdateDidRequest(id, controller, verificationMethod, authentication, assertionMethod, capabilityInvocation, capabilityDelegation, keyAgreement, service, alsoKnownAs, context, versionId), signatures)`
+```jsonc
+WriteRequest(UpdateDidRequest(id, controller, verificationMethod, authentication, assertionMethod, capabilityInvocation, capabilityDelegation, keyAgreement, service, alsoKnownAs, context, versionId), signatures)
+```
 
-- **`signatures`**: `CreateDidRequest` should be signed by all `controller` private keys. This field contains a dict there key's URI from
-  `DIDDoc.authentication`, and the signature is a value. The `signatures` must contains signatures from all controllers.
-- **`id`**: fully qualified did
-- **`versionId`**: transaction hash of the previous DIDDoc version.
-- **`controller, verificationMethod, authentication, assertionMethod, capabilityInvocation, capabilityDelegation, keyAgreement, service, alsoKnownAs, context`**: optional parameters in accordance with DIDDoc properties
-
-Example of a client request:
+#### Example of an update DID client request
 
 ```jsonc
 WriteRequest{
-              "data": 
-                     UpdateDidRequest{   
-                                      "context": [
-                                          "https://www.w3.org/ns/did/v1",
-                                          "https://w3id.org/security/suites/ed25519-2020/v1"
-                                      ],
-                                      "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
-                                      "controller": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue"],
-                                      "verificationMethod": [
-                                        {
-                                          "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#capabilityInvocationKey",
-                                          "type": "Ed25519VerificationKey2020", // external (property value)
-                                          "controller": "did:cheqd:mainnet:N22N22KY2Dyvmuu2PyyqSFKue",
-                                          "publicKeyMultibase": "z4BWwfeqdp1obQptLLMvPNgBw48p7og1ie6Hf9p5nTpNN"
-                                        }
-                                      ],
-                                      "authentication": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#authKey1"],
-                                      "versionId": "1B3B00849B4D50E8FCCF50193E35FD6CA5FD4686ED6AD8F847AC8C5E466CFD3E"
-              },
-              "signatures": {
-                  "verification method URI": "<signature>"
-                  // Multiple verification methods and corresponding signatures can be added here
-              },
-}
-```
-
-#### Resolve DID
-
-Using GetDid query DIDDoc can be received from the ledger.
-`QueryGetDidResponse(id)`
-```json
-{
-  "id":"did:cheqd:mainnet:2PRyVHmkXQnQzJQKxHxnXC"
-}
-```
-
-Response format from Tendermint RPC interface is `QueryGetDidResponse` protobuf:
-```json
-{
-   "did":{
-      "id":"did:cheqd:mainnet:2PRyVHmkXQnQzJQKxHxnXC",
-      "controller":[
-         "did:cheqd:mainnet:2PRyVHmkXQnQzJQKxHxnXC"
+  "data": 
+    UpdateDidRequest {   
+      "context": [
+          "https://www.w3.org/ns/did/v1",
+          "https://w3id.org/security/suites/ed25519-2020/v1"
       ],
-      "verification_method":[
-         {
-            "id":"did:cheqd:mainnet:2PRyVHmkXQnQzJQKxHxnXC#verkey",
-            "type":"Ed25519VerificationKey2020",
-            "controller":"did:cheqd:mainnet:2PRyVHmkXQnQzJQKxHxnXC",
-            "public_key_multibase":"zkqa2HyagzfMAq42H5f9u3UMwnSBPQx2QfrSyXbUPxMn"
-         }
+      "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
+      "controller": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue"],
+      "verificationMethod": [
+        {
+          "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#capabilityInvocationKey",
+          "type": "Ed25519VerificationKey2020", // external (property value)
+          "controller": "did:cheqd:mainnet:N22N22KY2Dyvmuu2PyyqSFKue",
+          "publicKeyMultibase": "z4BWwfeqdp1obQptLLMvPNgBw48p7og1ie6Hf9p5nTpNN"
+        }
       ],
-      "authentication":[
-         "did:cheqd:mainnet:2PRyVHmkXQnQzJQKxHxnXC#verkey"
-      ]
-   },
-   "metadata":{
-      "created":"2021-10-26 13:35:17.8230284 +0000 UTC",
-      "updated":"2021-10-26 13:35:17.8230284 +0000 UTC",
-      "deactivated":false,
-      "version_id":"1B3B00849B4D50E8FCCF50193E35FD6CA5FD4686ED6AD8F847AC8C5E466CFD3E"
-   }
+      "authentication": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#authKey1"],
+      "versionId": "1B3B00849B4D50E8FCCF50193E35FD6CA5FD4686ED6AD8F847AC8C5E466CFD3E"
+  },
+  "signatures": {
+      "Verification Method URI": "<signature>"
+      // Multiple verification methods and corresponding signatures can be added here
+  }
 }
-
 ```
-- **`did`**: contains DIDDoc properties. [DIDDoc structure](#did-documents-diddocs)
-- **`metadata`**: contains DIDDoc metadata. [DIDDoc metadata](#diddoc-metadata)
 
-### Security Considerations
+#### Get/Resolve DID
 
-For adding a new DIDDoc or update an old one should be signed by controller signatures. 
+DIDDocs associated with a DID of type `did:cheqd:<namespace>` can be resolved using the `GetDid` query to fetch a response from the ledger. The response contains:
 
-Changing of a DIDDoc fragment without a controller (any field except VerificationMethods) MUST be signed by DIDDoc's controller(s).
+- **`did`**: DIDDoc associated with the specified DID in a W3C specification compliant [DIDDoc structure](#did-documents-diddocs).
+- **`metadata`**: Contains the MUST have [DIDDoc metadata](#diddoc-metadata) associated with a DIDDOc.
 
-Changing of a DIDDoc fragment with a controller MUST be signed by DIDDoc's controller(s) **and** fragment's controller.
+#### Client request format for get/resolve DID
 
-Changing the controller requires a list of signatures as before for changing any field.
+DID resolution requests can be sent to the Tendermint RPC interface for a node by passing the fully-qualified DID.
+
+```jsonc
+QueryGetDidResponse(did)
+```
+
+#### Example of an get/resolve DID client request
+
+The response is returned as a protobuf, which can be converted to JSON client-side.
+
+```jsonc
+{
+  "did":{
+    "id":"did:cheqd:mainnet:2PRyVHmkXQnQzJQKxHxnXC",
+    "controller":[
+        "did:cheqd:mainnet:2PRyVHmkXQnQzJQKxHxnXC"
+    ],
+    "verification_method":[
+        {
+          "id":"did:cheqd:mainnet:2PRyVHmkXQnQzJQKxHxnXC#verkey",
+          "type":"Ed25519VerificationKey2020",
+          "controller":"did:cheqd:mainnet:2PRyVHmkXQnQzJQKxHxnXC",
+          "public_key_multibase":"zkqa2HyagzfMAq42H5f9u3UMwnSBPQx2QfrSyXbUPxMn"
+        }
+    ],
+    "authentication":[
+        "did:cheqd:mainnet:2PRyVHmkXQnQzJQKxHxnXC#verkey"
+    ]
+  },
+  "metadata":{
+    "created":"2021-10-26 13:35:17.8230284 +0000 UTC",
+    "updated":"2021-10-26 13:35:17.8230284 +0000 UTC",
+    "deactivated":false,
+    "version_id":"1B3B00849B4D50E8FCCF50193E35FD6CA5FD4686ED6AD8F847AC8C5E466CFD3E"
+  }
+}
+```
+
+### Security considerations
+
+1. For creating a new DID or update the DIDDoc associated with an existing DID, the requested should be signed by all `controller` signatures.
+   1. To update a DIDDoc fragment without a `controller` (any field except `VerificationMethods`), the request MUST be signed by the DID's `controller`(s).
+   2. To update a DIDDoc fragment that has its own `controller`(s), the request MUST be signed by the DID's `controller`(s) **and** the DIDDoc fragment's `controller`(s).
+2. Changing the `controller`(s) associated with  a DID requires a list of signatures as before for changing any field.
 
 ### Privacy Considerations
 
-TODO: add privacy considerations
+One of the key design decisions in the cheqd DID method is to use separate sets of key pairs for Cosmos / node layer transactions and identity payloads.
+
+Keypairs and accounts on the Cosmos node layer are public, and can be crawled/explored by inspecting transactions on a node or through a block explorer. This therefore poses a privacy risk through correlation, if the identity payloads were signed using the same keys.
+
+By splitting the keys/accounts for the two layers, we account for identity payloads being signed using keys that can be kept off-ledger.
+
+This also allows for uses cases where the key owners/controllers at the identity layer are different than the key/account owners at the Cosmos node layer. In essence, that this allows is it removes the need for a DID's controllers to also have an account on the cheqd network ledger.
+
+Further discussion on how these boundaries are separated in implementation, with one specific implementation library, is described in [ADR 003: **Command Line Interface (CLI) tools**](adr-003-cli-tools.md)
 
 ### Changes from Indy entities and transactions
 
 #### Rename `NYM` transactions to `DID` transactions
 
-[**NYM** is the term used by Hyperledger Indy](https://hyperledger-indy.readthedocs.io/projects/node/en/latest/transactions.html#nym) for DIDs. 
+[**NYM** is the term used by Hyperledger Indy](https://hyperledger-indy.readthedocs.io/projects/node/en/latest/transactions.html#nym) for DIDs. cheqd uses the term `DID` instead of `NYM` in transactions, which should make it easier to understand the context of a transaction easier by bringing it closer to W3C DID terminology used by the rest of the SSI ecosystem.
 
-cheqd uses the term `DID` instead of `NYM` in transactions, which should
-make it easier to understand the context of a transaction easier by bringing it closer to W3C DID terminology used by the rest of the SSI ecosystem.
-
-#### Remove `role` field from `DID` transactions
+#### Removing `role` field from DID transactions
 
 Hyperledger Indy is a public-permissioned distributed ledger and therefore use the `role` field to distinguish transactions from different types of nodes. As cheqd networks are public-permissionless, the `role` scope has been removed.
 
-#### Dropping `ATTRIB` transactions
+#### `ATTRIB` transactions dropped
 
 `ATTRIB` was originally used in Hyperledger Indy to add document content similar to DID Documents (DIDDocs). The cheqd DID method replaces this by implementing DIDDocs for most transaction types.
 
@@ -414,17 +410,21 @@ Hyperledger Indy is a public-permissioned distributed ledger and therefore use t
 
 ### Backward Compatibility
 
-- `cheqd-node` [release v0.1.17](https://github.com/cheqd/cheqd-node/releases/tag/v0.1.17) and 
-  earlier had a transaction type called `NYM` which would allow writing/reading a unique identifier 
-  on ledger. However, this `NYM` state was not fully defined as a DID method and did not contain DID Documents 
-  that resolved when the DID identifier was read. This `NYM` transaction type is deprecated and the data written 
-  to cheqd testnet with legacy states will not be retained.
+- `cheqd-node` [release v0.1.19](https://github.com/cheqd/cheqd-node/releases/tag/v0.1.19) and  earlier had a transaction type called `NYM` which would allow writing/reading a unique identifier on ledger. However, this `NYM` state was not fully defined as a DID method and did not store DID Documents associated with a DID. This `NYM` transaction type is deprecated and the data written to cheqd testnet with legacy states will not be retained.
+- The cheqd DID method does not aim to be 1:1 compatible in API methods with `did:indy`. It makes opinionated choices to not implement certain transaction types, which in our analysis have been superseded by new developments in the W3C DID Core specification.
 
 ### Positive
 
+- Design decisions defined in this ADR aim to make the cheqd DID method close to compliance with the W3C DID Core specification.
+- As the client/peer-to-peer exchange layer (at least in the implementation provided by [VDR Tools SDK](https://gitlab.com/evernym/verity/vdr-tools)) is built on a library that supports Hyperledger Aries, extending Aries implementations to other W3C compliant DID methods should become simpler for the SSI ecosystem.
+
 ### Negative
 
+- The cheqd DID method does not currently have full coverage with the [W3C DID Core Test Suite](https://w3c.github.io/did-test-suite/). It is our intention to aim for further coverage for edge cases in future updates to the DID method implementation on `cheqd-node`.
+
 ### Neutral
+
+- DID transaction operations at the moment must be assembled using a client-side library with DID specification identity standards support, and then wrapped up inside a Cosmos transaction that is sent to the Tendermint RPC interface. Future implementations of `cheqd-node` aim to provide simpler interfaces, such as gRPC or REST, at least for a read actions on a limited set of commonly-used APIs.
 
 ## References
 
