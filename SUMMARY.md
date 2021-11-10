@@ -6,8 +6,8 @@
 
 * [Setting up a new cheqd node](docs/setup-and-configure/readme.md)
   * [Setting up a new cheqd node](docs/setup-and-configure/readme.md)
-  * [Debian package installation](docs/setup-and-configure/debian/readme.md)
-    * [Guide to Debian packages for cheqd-node](docs/setup-and-configure/debian/readme.md)
+  * [Debian package installation](docs/setup-and-configure/debian/README.md)
+    * [Guide to Debian packages for cheqd-node](docs/setup-and-configure/debian/README.md)
     * [Installing a cheqd node using Debian package releases](docs/setup-and-configure/debian/deb-package-install.md)
     * [Upgrading a cheqd node using Debian package releases](docs/setup-and-configure/debian/deb-package-upgrade.md)
   * [Installing cheqd-node with Docker](docs/setup-and-configure/docker-install.md)
