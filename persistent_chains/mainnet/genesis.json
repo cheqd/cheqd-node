@@ -50,7 +50,10 @@
       "index": "1",
       "owners": []
     },
-    "cheqd": {},
+    "cheqd": {
+      "didList":[],
+      "did_namespace":"mainnet"
+    },
     "crisis": {
       "constant_fee": {
         "denom": "ncheq",
@@ -144,12 +147,12 @@
     },
     "mint": {
       "minter": {
-        "inflation": "0.010000000000000000",
+        "inflation": "0.015000000000000000",
         "annual_provisions": "0.000000000000000000"
       },
       "params": {
         "mint_denom": "ncheq",
-        "inflation_rate_change": "0.020000000000000000",
+        "inflation_rate_change": "0.025000000000000000",
         "inflation_max": "0.040000000000000000",
         "inflation_min": "0.010000000000000000",
         "goal_bonded": "0.600000000000000000",
