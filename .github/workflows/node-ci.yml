@@ -7,7 +7,6 @@ on:
     - 'docs/**'
     - 'architecture/**'
     - '.gitbook/**'
-    - '.github/**'
   workflow_dispatch:
 
 env:
