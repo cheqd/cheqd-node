@@ -4,13 +4,28 @@
 
 set -euox pipefail
 
+# sed in macos requires extra argument
+
+sed_extension=''
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    sed_extension=''
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    sed_extension='.orig'
+fi
+
+# cheqd_noded docker wrapper
+
+cheqd_noded_docker() {
+  docker run --rm \
+    -v "$(pwd)":"/cheqd" \
+    cheqd-node "$@"
+}
+
+
 CHAIN_ID="cheqd"
 
 VALIDATORS_COUNT="4"
 OBSERVERS_COUNT="2"
-
-source "../common.sh"
-
 
 NODE_CONFIGS_DIR="node_configs"
 rm -rf $NODE_CONFIGS_DIR
@@ -51,7 +66,7 @@ echo "Generating operator keys..."
 
 for ((i=0 ; i<$VALIDATORS_COUNT ; i++))
 do
-    cheqd_noded_docker keys add "operator$i"
+    cheqd_noded_docker keys add "operator$i" --keyring-backend "test"
 done
 
 echo "Creating genesis accounts..."
@@ -73,7 +88,7 @@ do
 
     popd
 
-    cheqd_noded_docker gentx "operator$i" 1000000000000000ncheq --chain-id $CHAIN_ID --node-id $NODE_ID --pubkey $NODE_VAL_PUBKEY
+    cheqd_noded_docker gentx "operator$i" 1000000000000000ncheq --chain-id $CHAIN_ID --node-id $NODE_ID --pubkey $NODE_VAL_PUBKEY --keyring-backend "test"
 done
 
 echo "Collecting them..."
