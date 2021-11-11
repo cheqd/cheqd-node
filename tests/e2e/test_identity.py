@@ -9,7 +9,7 @@ from vdrtools import wallet, did
 from vdrtools import cheqd_keys, cheqd_pool, cheqd_ledger
 from vdrtools.error import CommonInvalidStructure, PoolLedgerConfigAlreadyExistsError
 
-from helpers import create_did_helper, query_did_helper, random_string, update_did_helper, wallet_helper, get_base_account_number_and_sequence, get_timeout_height, get_balance_vdr, send_tx_helper, get_tx_helper, \
+from helpers import create_did_helper, query_did_helper, random_string, update_did_helper, wallet_helper, get_base_account_number_and_sequence, get_timeout_height, get_balance_vdr, send_tx_helper, send_tx_helper_alt, get_tx_helper, \
     SENDER_ADDRESS, SENDER_MNEMONIC, RECEIVER_ADDRESS, LOCAL_NET_NETWORK, TEST_NET_GAS_X_GAS_PRICES_INT, GAS_AMOUNT, GAS_PRICE, DENOM, IMPLICIT_TIMEOUT, CODE_0_DIGIT, MAX_GAS_MAGIC_NUMBER
 
 # logger = logging.getLogger(__name__)
@@ -87,7 +87,7 @@ async def test_gas_estimation_negative(magic_number_negative, transfer_amount):
         await cheqd_pool.broadcast_tx_commit(pool_alias, prod_tx_negative_signed)
 
 
-@pytest.mark.parametrize("transfer_amount", [1, 999, 1001, 987654321, 1000000000000]) # TODO: hypothesis
+@pytest.mark.parametrize("transfer_amount", [1, 2, 999, 1001, 9876543210, 1000000000000]) # TODO: hypothesis
 @pytest.mark.asyncio
 async def test_token_transfer_positive(transfer_amount):
     pool_alias = random_string(5)
@@ -103,17 +103,17 @@ async def test_token_transfer_positive(transfer_amount):
     msg = await cheqd_ledger.bank.build_msg_send(
         SENDER_ADDRESS, RECEIVER_ADDRESS, str(transfer_amount), DENOM
     )
-    res, _ = await send_tx_helper(pool_alias, wallet_handle, KEY_ALIAS, public_key, SENDER_ADDRESS, msg, DEFAULT_MEMO)
+    res, _, fees = await send_tx_helper(pool_alias, wallet_handle, KEY_ALIAS, public_key, SENDER_ADDRESS, msg, DEFAULT_MEMO)
     assert res["check_tx"]["code"] == CODE_0_DIGIT
 
     new_sender_balance = await get_balance_vdr(pool_alias, SENDER_ADDRESS)
     new_receiver_balance = await get_balance_vdr(pool_alias, RECEIVER_ADDRESS)
 
-    assert int(new_sender_balance) == (int(sender_balance) - transfer_amount - TEST_NET_GAS_X_GAS_PRICES_INT)
+    assert int(new_sender_balance) == (int(sender_balance) - transfer_amount - fees)
     assert int(new_receiver_balance) == (int(receiver_balance) + transfer_amount)
 
 
-@pytest.mark.parametrize("transfer_amount", [1111111111111111111111, 55555555555555555555555, 9999999999999999999999999]) # TODO: hypothesis
+@pytest.mark.parametrize("transfer_amount", [1111111111111111111111, 55555555555555555555555, 999999999999999999999999, 10000000000000000000000000000]) # TODO: hypothesis
 @pytest.mark.asyncio
 async def test_token_transfer_negative(transfer_amount):
     pool_alias = random_string(5)
@@ -130,7 +130,7 @@ async def test_token_transfer_negative(transfer_amount):
         SENDER_ADDRESS, RECEIVER_ADDRESS, str(transfer_amount), DENOM
     )
     with pytest.raises(CommonInvalidStructure):
-        await send_tx_helper(pool_alias, wallet_handle, KEY_ALIAS, public_key, SENDER_ADDRESS, msg, DEFAULT_MEMO)
+        await send_tx_helper_alt(pool_alias, wallet_handle, KEY_ALIAS, public_key, SENDER_ADDRESS, msg, DEFAULT_MEMO)
 
     new_sender_balance = await get_balance_vdr(pool_alias, SENDER_ADDRESS)
     new_receiver_balance = await get_balance_vdr(pool_alias, RECEIVER_ADDRESS)
@@ -152,7 +152,7 @@ async def test_memo(note): # intermittent failures here due to `Internal error: 
     msg = await cheqd_ledger.bank.build_msg_send(
         SENDER_ADDRESS, RECEIVER_ADDRESS, str(DEFAULT_AMOUNT), DENOM
     )
-    res, tx_hash = await send_tx_helper(pool_alias, wallet_handle, KEY_ALIAS, public_key, SENDER_ADDRESS, msg, note)
+    res, tx_hash, _ = await send_tx_helper(pool_alias, wallet_handle, KEY_ALIAS, public_key, SENDER_ADDRESS, msg, note)
     assert res["check_tx"]["code"] == CODE_0_DIGIT
 
     try:
@@ -233,7 +233,7 @@ async def test_did_update_wrong_version(version_id):
     req = await cheqd_ledger.cheqd.build_msg_update_did(fqdid, new_vk, version_id)
     signed_req = await cheqd_ledger.cheqd.sign_msg_write_request(wallet_handle, fqdid, bytes(req))
     with pytest.raises(CommonInvalidStructure):
-        await send_tx_helper(pool_alias, wallet_handle, KEY_ALIAS, public_key, SENDER_ADDRESS, bytes(signed_req), DEFAULT_MEMO)
+        await send_tx_helper_alt(pool_alias, wallet_handle, KEY_ALIAS, public_key, SENDER_ADDRESS, bytes(signed_req), DEFAULT_MEMO)
 
 
 @pytest.mark.asyncio
@@ -262,7 +262,7 @@ async def test_did_update_wrong_vk():
     req = await cheqd_ledger.cheqd.build_msg_update_did(fqdid, new_vk, version_id) # new vk
     signed_req = await cheqd_ledger.cheqd.sign_msg_write_request(wallet_handle, fqdid, bytes(req))
     with pytest.raises(CommonInvalidStructure):
-        await send_tx_helper(pool_alias, wallet_handle, KEY_ALIAS, public_key, SENDER_ADDRESS, bytes(signed_req), DEFAULT_MEMO)
+        await send_tx_helper_alt(pool_alias, wallet_handle, KEY_ALIAS, public_key, SENDER_ADDRESS, bytes(signed_req), DEFAULT_MEMO)
 
 
 @pytest.mark.asyncio

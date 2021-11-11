@@ -102,10 +102,24 @@ async def send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sende
     response = await cheqd_pool.abci_query(pool_alias, request)
     response = await cheqd_ledger.tx.parse_query_simulate_resp(response)
     gas_estimation = json.loads(response)["gas_info"]["gas_used"]
+    fees = int(gas_estimation*MAX_GAS_MAGIC_NUMBER*GAS_PRICE)
     prod_tx = await cheqd_ledger.auth.build_tx(
-        pool_alias, public_key, msg, account_number, sequence_number, int(gas_estimation*MAX_GAS_MAGIC_NUMBER), int(gas_estimation*MAX_GAS_MAGIC_NUMBER*GAS_PRICE), DENOM, SENDER_ADDRESS, timeout_height, memo
+        pool_alias, public_key, msg, account_number, sequence_number, int(gas_estimation*MAX_GAS_MAGIC_NUMBER), fees, DENOM, SENDER_ADDRESS, timeout_height, memo
     )
     tx_signed = await cheqd_ledger.auth.sign_tx(wallet_handle, key_alias, prod_tx)
+    res = json.loads(await cheqd_pool.broadcast_tx_commit(pool_alias, tx_signed))
+    tx_hash = res["hash"]
+
+    return res, tx_hash, fees
+
+
+async def send_tx_helper_alt(pool_alias, wallet_handle, key_alias, public_key, sender_address, msg, memo):
+    account_number, sequence_number = await get_base_account_number_and_sequence(pool_alias, sender_address)
+    timeout_height = await get_timeout_height(pool_alias)
+    tx = await cheqd_ledger.auth.build_tx(
+        pool_alias, public_key, msg, account_number, sequence_number, GAS_AMOUNT, GAS_AMOUNT*GAS_PRICE, DENOM, sender_address, timeout_height, memo
+    )
+    tx_signed = await cheqd_ledger.auth.sign_tx(wallet_handle, key_alias, tx)
     res = json.loads(await cheqd_pool.broadcast_tx_commit(pool_alias, tx_signed))
     tx_hash = res["hash"]
 
@@ -123,7 +137,7 @@ async def get_tx_helper(pool_alias, tx_hash):
 async def create_did_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, fqdid, vk, memo):
     req = await cheqd_ledger.cheqd.build_msg_create_did(fqdid, vk)
     signed_req = await cheqd_ledger.cheqd.sign_msg_write_request(wallet_handle, fqdid, bytes(req))
-    res, _ = await send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, bytes(signed_req), memo)
+    res, _, _ = await send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, bytes(signed_req), memo)
 
     return res
 
@@ -138,7 +152,7 @@ async def query_did_helper(pool_alias, fqdid):
 async def update_did_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, fqdid, new_vk, version_id, memo):
     req = await cheqd_ledger.cheqd.build_msg_update_did(fqdid, new_vk, version_id)
     signed_req = await cheqd_ledger.cheqd.sign_msg_write_request(wallet_handle, fqdid, bytes(req))
-    res, _ = await send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, bytes(signed_req), memo)
+    res, _, _ = await send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, bytes(signed_req), memo)
 
     return res
 
