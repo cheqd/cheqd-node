@@ -12,7 +12,7 @@ cheqd-noded configure p2p persistent-peers "${PERSISTENT_PEERS}"
 cp "${NODE_CONFIGS_BASE}/node0/.cheqdnode/config/genesis.json" "$HOME/.cheqdnode/config"
 
 cheqd-noded configure p2p laddr "tcp://0.0.0.0:26676"
-cheqd-noded configure rpc-laddr "tcp://127.0.0.1:26677"
+cheqd-noded configure rpc-laddr "tcp://0.0.0.0:26677"
 
 sudo chmod -R 777 "$HOME/.cheqdnode"
 
