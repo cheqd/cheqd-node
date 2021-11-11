@@ -73,7 +73,7 @@ echo "Creating genesis accounts..."
 
 for ((i=0 ; i<$VALIDATORS_COUNT ; i++))
 do
-    cheqd_noded_docker add-genesis-account "operator$i" 20000000000000000ncheq
+    cheqd_noded_docker add-genesis-account "operator$i" 20000000000000000ncheq --keyring-backend "test"
 done
 
 echo "Creating genesis validators..."

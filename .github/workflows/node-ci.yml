@@ -30,7 +30,7 @@ jobs:
   test:
     name: Run unit tests
     runs-on: ubuntu-20.04
-    needs: lint
+    # needs: lint
     steps:
       - name: Set up Go 1.16
         uses: actions/setup-go@v2
@@ -48,7 +48,7 @@ jobs:
   build:
     name: Build binary and create deb package
     runs-on: ubuntu-20.04
-    needs: test
+    # needs: test
     steps:
       - name: Set up Go 1.16
         uses: actions/setup-go@v2
@@ -89,7 +89,7 @@ jobs:
   build-images-and-set-up-pool:
     name: Build cheqd-node and testnet Docker images, install deb package and run Docker pool
     runs-on: ubuntu-20.04
-    needs: build
+    # needs: build
     steps:
       - name: Download deb
         uses: actions/download-artifact@v2
@@ -140,7 +140,7 @@ jobs:
   run-cosmos-specific-tests:
     name: Run cosmos-specific tests using cheqd-node CLI
     runs-on: ubuntu-20.04
-    needs: build-images-and-set-up-pool
+    # needs: build-images-and-set-up-pool
     steps:
       - name: Download deb
         uses: actions/download-artifact@v2
@@ -182,7 +182,7 @@ jobs:
   run-identity-specific-tests:
     name: Run identity-specific tests using VDR
     runs-on: ubuntu-20.04
-    needs: build-images-and-set-up-pool
+    # needs: build-images-and-set-up-pool
     steps:
       - name: Check out code
         uses: actions/checkout@v2
