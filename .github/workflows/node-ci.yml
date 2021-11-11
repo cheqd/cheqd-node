@@ -121,12 +121,7 @@ jobs:
       - name: Add observer node
         working-directory: ./tests/networks/docker_compose
         run: |
-          sudo chown -R cheqd:cheqd "/home/runner/cheqd/"
-          sudo -u cheqd ./add_observer.sh
-          sudo chmod -R 777 "/home/runner/cheqd/.cheqdnode"
-          sudo systemctl start cheqd-noded
-          sleep 10
-          systemctl status cheqd-noded
+          ./add_observer.sh
           cheqd-noded status -n tcp://localhost:26677 2>&1
           ./wait.sh '[[ $(cheqd-noded status -n '"'"'tcp://localhost:26677'"'"' 2>&1 | wc -l) == 1 ]] && echo "New node returns status!"'
 
