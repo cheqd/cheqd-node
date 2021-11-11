@@ -24,8 +24,9 @@ This document provides guidance on how to install and configure a node for the c
 
    As a part of installation `cheqd` user will be created. By default, `HOME` directory for the user is `/home/cheqd`, but it can be changed by setting `CHEQD_HOME_DIR` environment variable before running `dpkg` command, like:
    ```bash
-   sudo CHEQD_HOME_DIR=/path/to/home/directory dpkg -i cheqd-node_0.2.3_amd64.deb
+   sudo CHEQD_HOME_DIR=/path/to/home/directory dpkg -i cheqd-node_0.2.4_amd64.deb
    ```
+   P.S. ability to change default `$HOME` directory is supported only in version `0.2.4` and upper.
 
 3. **Switch to the `cheqd` system user**
 
