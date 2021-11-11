@@ -42,7 +42,8 @@ func p2pCmd(defaultNodeHome string) *cobra.Command {
 		persistentPeersCmd(defaultNodeHome),
 		sendRateCmd(defaultNodeHome),
 		recvRateCmd(defaultNodeHome),
-		maxPacketMsgPayloadSizeCmd(defaultNodeHome))
+		maxPacketMsgPayloadSizeCmd(defaultNodeHome),
+		p2pLaddrCmd(defaultNodeHome))
 
 	return cmd
 }
@@ -218,6 +219,26 @@ func maxPacketMsgPayloadSizeCmd(defaultNodeHome string) *cobra.Command {
 
 			return updateTmConfig(clientCtx.HomeDir, func(config *tmcfg.Config) {
 				config.P2P.MaxPacketMsgPayloadSize = int(value)
+			})
+		},
+	}
+
+	cmd.Flags().String(flags.FlagHome, defaultNodeHome, "The application home directory")
+
+	return cmd
+}
+
+// p2pLaddrCmd returns configuration cobra Command.
+func p2pLaddrCmd(defaultNodeHome string) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "laddr [value]",
+		Short: "Update p2p.laddr value in config.toml",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+
+			return updateTmConfig(clientCtx.HomeDir, func(config *tmcfg.Config) {
+				config.P2P.ListenAddress = args[0]
 			})
 		},
 	}
