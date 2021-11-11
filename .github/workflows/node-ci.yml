@@ -89,7 +89,7 @@ jobs:
   build-images-and-set-up-pool:
     name: Build cheqd-node and testnet Docker images, install deb package and run Docker pool
     runs-on: ubuntu-20.04
-    # needs: build
+    needs: build
     steps:
       - name: Download deb
         uses: actions/download-artifact@v2
@@ -140,7 +140,7 @@ jobs:
   run-cosmos-specific-tests:
     name: Run cosmos-specific tests using cheqd-node CLI
     runs-on: ubuntu-20.04
-    # needs: build-images-and-set-up-pool
+    needs: build
     steps:
       - name: Download deb
         uses: actions/download-artifact@v2
