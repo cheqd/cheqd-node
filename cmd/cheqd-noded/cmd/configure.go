@@ -1,13 +1,14 @@
 package cmd
 
 import (
+	"strconv"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	cosmcfg "github.com/cosmos/cosmos-sdk/server/config"
 	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/spf13/cobra"
 	tmcfg "github.com/tendermint/tendermint/config"
-	"strconv"
 )
 
 // configureCmd returns configure cobra Command.
@@ -21,7 +22,8 @@ func configureCmd(defaultNodeHome string) *cobra.Command {
 		minGasPricesCmd(defaultNodeHome),
 		p2pCmd(defaultNodeHome),
 		rpcLaddrCmd(defaultNodeHome),
-		createEmptyBlocksCmd(defaultNodeHome))
+		createEmptyBlocksCmd(defaultNodeHome),
+		fastsyncVersionCmd(defaultNodeHome))
 
 	return cmd
 }
@@ -50,7 +52,7 @@ func minGasPricesCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "min-gas-prices [value]",
 		Short: "Update min-gas-prices value in app.toml",
-		Args: cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -70,7 +72,7 @@ func seedModeCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "seed-mode [value]",
 		Short: "Update seed-mode value in config.toml",
-		Args: cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -95,7 +97,7 @@ func seedsCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "seeds [value]",
 		Short: "Update seeds value in config.toml",
-		Args: cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -115,7 +117,7 @@ func externalAddressCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "external-address [value]",
 		Short: "Update external-address value in config.toml",
-		Args: cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -135,7 +137,7 @@ func persistentPeersCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "persistent-peers [value]",
 		Short: "Update persistent-peers value in config.toml",
-		Args: cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -155,7 +157,7 @@ func sendRateCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "send-rate [value]",
 		Short: "Update send-rate value in config.toml",
-		Args: cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -180,7 +182,7 @@ func recvRateCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "recv-rate [value]",
 		Short: "Update recv-rate value in config.toml",
-		Args: cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -205,7 +207,7 @@ func maxPacketMsgPayloadSizeCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "max-packet-msg-payload-size [value]",
 		Short: "Update max-packet-msg-payload-size value in config.toml",
-		Args: cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -230,7 +232,7 @@ func createEmptyBlocksCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-empty-blocks [value]",
 		Short: "Update create-empty-blocks value in config.toml",
-		Args: cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -255,12 +257,32 @@ func rpcLaddrCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "rpc-laddr [value]",
 		Short: "Update rpc.laddr value in config.toml",
-		Args: cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
 			return updateTmConfig(clientCtx.HomeDir, func(config *tmcfg.Config) {
 				config.RPC.ListenAddress = args[0]
+			})
+		},
+	}
+
+	cmd.Flags().String(flags.FlagHome, defaultNodeHome, "The application home directory")
+
+	return cmd
+}
+
+// fastsyncVersionCmd returns configuration cobra Command.
+func fastsyncVersionCmd(defaultNodeHome string) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "fastsync-version [value]",
+		Short: "Update fastsync.version value in config.toml",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+
+			return updateTmConfig(clientCtx.HomeDir, func(config *tmcfg.Config) {
+				config.FastSync.Version = args[0]
 			})
 		},
 	}
