@@ -98,7 +98,7 @@ jobs:
 
       - name: Install deb
         run: |
-          sudo dpkg CHEQD_HOME_DIR=$HOME -i ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+          sudo CHEQD_HOME_DIR=$HOME dpkg -i ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
 
       - name: Check out
         uses: actions/checkout@v2
