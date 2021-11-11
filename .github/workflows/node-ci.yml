@@ -122,7 +122,8 @@ jobs:
         working-directory: ./tests/networks/docker_compose
         run: |
           ./add_observer.sh
-          ./wait.sh '[[ $(cheqd-noded status -n '"'"'tcp://localhost:26677'"'"' 2>&1 | wc -l) == 1 ]] && echo "New node returns status!"'
+          cheqd-noded status -n tcp://localhost:26677 2>&1
+#          ./wait.sh '[[ $(cheqd-noded status -n '"'"'tcp://localhost:26677'"'"' 2>&1 | wc -l) == 1 ]] && echo "New node returns status!"'
 
       - name: Promote observer to validator
         working-directory: ./tests/networks/docker_compose
