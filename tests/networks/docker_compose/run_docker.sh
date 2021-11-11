@@ -4,7 +4,13 @@
 
 set -euox pipefail
 
-set -euox pipefail
+# cheqd_noded docker wrapper
+
+cheqd_noded_docker() {
+  docker run --rm \
+    -v "$(pwd)":"/cheqd" \
+    cheqd-node "$@"
+}
 
 # sed in macos requires extra argument
 
