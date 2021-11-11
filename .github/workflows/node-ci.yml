@@ -137,6 +137,11 @@ jobs:
         run: |
           journalctl -ex | grep cheqd
 
+      - name: Gather logs on failure 2
+        if: ${{ failure() }}
+        run: |
+          journalctl -u service-name.service --no-pager
+
   run-cosmos-specific-tests:
     name: Run cosmos-specific tests using cheqd-node CLI
     runs-on: ubuntu-20.04
