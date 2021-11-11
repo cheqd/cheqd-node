@@ -2,7 +2,6 @@
 
 set -euox pipefail
 
-
 cheqd-noded init node5
 
 NODE0_ID=$(cat "${NODE_CONFIGS_BASE}/node0/node_id.txt")
@@ -14,11 +13,7 @@ cp "${NODE_CONFIGS_BASE}/node0/.cheqdnode/config/genesis.json" "$HOME/.cheqdnode
 cheqd-noded configure p2p laddr "tcp://0.0.0.0:26676"
 cheqd-noded configure rpc-laddr "tcp://0.0.0.0:26677"
 
-cat "$HOME/.cheqdnode/config/config.toml"
-
 sudo chmod -R 777 "$HOME/.cheqdnode"
 
-sudo systemctl start cheqd-noded
-systemctl status cheqd-noded
-sleep 10
-systemctl status cheqd-noded
+#sudo systemctl start cheqd-noded
+cheqd-noded start
