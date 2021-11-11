@@ -2,6 +2,7 @@
 
 set -euox pipefail
 
+NODE_CONFIGS_BASE="/home/runner/work/cheqd-node/cheqd-node/tests/networks/docker_compose/node_configs"
 cheqd-noded init node5
 
 NODE0_ID=$(cat "${NODE_CONFIGS_BASE}/node0/node_id.txt")
