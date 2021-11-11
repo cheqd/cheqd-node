@@ -9,7 +9,7 @@ from helpers import run, run_interaction, get_balance, send_with_note, set_up_op
     TEST_NET_NETWORK, TEST_NET_NODE_TCP, TEST_NET_NODE_HTTP, TEST_NET_DESTINATION, TEST_NET_DESTINATION_HTTP, \
     LOCAL_NET_NETWORK, LOCAL_NET_NODE_TCP, LOCAL_NET_NODE_HTTP, LOCAL_NET_DESTINATION, LOCAL_NET_DESTINATION_HTTP, \
     TEST_NET_FEES, TEST_NET_GAS_X_GAS_PRICES, YES_FLAG, IMPLICIT_TIMEOUT, \
-    LOCAL_SENDER_ADDRESS, LOCAL_RECEIVER_ADDRESS,CODE_0, TEST_NET_GAS_X_GAS_PRICES_INT
+    LOCAL_SENDER_ADDRESS, LOCAL_RECEIVER_ADDRESS,CODE_0, TEST_NET_GAS_X_GAS_PRICES_INT, KEYRING_BACKEND_TEST
 
 
 @pytest.mark.parametrize(
@@ -28,13 +28,13 @@ def test_basic(command, params, expected_output):
 @pytest.mark.parametrize(
         "command, params, expected_output",
         [
-            ("add", "test1", r"- name: test1(.*?)type: local(.*?)address: (.*?)pubkey: (.*?)mnemonic: "),
-            ("list", None, "- name: test1"),
-            ("delete", f"test1 {YES_FLAG}", r"Key deleted forever \(uh oh!\)"),
-            ("add", "test2", "- name: test2"),
-            ("show", "test2", "- name: test2"),
-            ("delete", f"test2 {YES_FLAG}", r"Key deleted forever \(uh oh!\)"),
-            ("show", "test9", "Error: test9 is not a valid name or address"),
+            ("add", f"test1 {KEYRING_BACKEND_TEST}", r"- name: test1(.*?)type: local(.*?)address: (.*?)pubkey: (.*?)mnemonic: "),
+            ("list", KEYRING_BACKEND_TEST, "- name: test1"),
+            ("delete", f"test1 {YES_FLAG} {KEYRING_BACKEND_TEST}", r"Key deleted forever \(uh oh!\)"),
+            ("add", f"test2 {KEYRING_BACKEND_TEST}", "- name: test2"),
+            ("show", f"test2 {KEYRING_BACKEND_TEST}", "- name: test2"),
+            ("delete", f"test2 {YES_FLAG} {KEYRING_BACKEND_TEST}", r"Key deleted forever \(uh oh!\)"),
+            ("show", f"test9 {KEYRING_BACKEND_TEST}", "Error: test9 is not a valid name or address"),
             ("mnemonic", None, '(\w+\s){23}(\w+){1}\r\n')
         ]
     )
@@ -46,46 +46,46 @@ def test_keys(command, params, expected_output):
 def test_keys_add_recover():
     command_base = "cheqd-noded keys"
     key_name = "recovery_key_{}".format(random_string(4))
-    cli = run(command_base, "add", key_name, "name: {}".format(key_name))
+    cli = run(command_base, "add", f"{key_name} {KEYRING_BACKEND_TEST}", "name: {}".format(key_name))
 
     command_result = cli.read()
     mnemonic = re.search('(\w+\s){24}', command_result).group(0)
     print(mnemonic)
 
-    run(command_base, "delete", f"{key_name} {YES_FLAG}", r"Key deleted forever \(uh oh!\)")
+    run(command_base, "delete", f"{key_name} {YES_FLAG} {KEYRING_BACKEND_TEST}", r"Key deleted forever \(uh oh!\)")
 
-    cli = run(command_base, "add", "{} --recover".format(key_name), "Enter your bip39 mnemonic")
+    cli = run(command_base, "add", f"{key_name} --recover {KEYRING_BACKEND_TEST}", "Enter your bip39 mnemonic")
     run_interaction(cli, mnemonic, r"- name: {}(.*?)type: local(.*?)address: (.*?)pubkey: (.*?)mnemonic: ".format(key_name))
 
-    cli = run(command_base, "delete", key_name, "Continue?")
+    cli = run(command_base, "delete", f"{key_name} {KEYRING_BACKEND_TEST}", "Continue?")
     run_interaction(cli, "y", "Key deleted forever")
 
 
 def test_keys_add_recover_existing():
     command_base = "cheqd-noded keys"
     key_name = "recovery_key_{}".format(random_string(4))
-    cli = run(command_base, "add", key_name, "name: {}".format(key_name))
+    cli = run(command_base, "add", f"{key_name} {KEYRING_BACKEND_TEST}", "name: {}".format(key_name))
 
     command_result = cli.read()
     mnemonic = re.search('(\w+\s){24}', command_result).group(0)
     print(mnemonic)
 
-    cli = run(command_base, "add", "{} --recover".format(key_name), "override the existing name {}".format(key_name))
+    cli = run(command_base, "add", f"{key_name} --recover {KEYRING_BACKEND_TEST}", "override the existing name {}".format(key_name))
     run_interaction(cli, "y", "Enter your bip39 mnemonic")
     run_interaction(cli, mnemonic, r"- name: {}(.*?)type: local(.*?)address: (.*?)pubkey: (.*?)mnemonic: ".format(key_name))
 
-    cli = run(command_base, "delete", key_name, "Continue?")
+    cli = run(command_base, "delete", f"{key_name} {KEYRING_BACKEND_TEST}", "Continue?")
     run_interaction(cli, "y", "Key deleted forever")
 
 
 def test_keys_add_recover_wrong_phrase():
     command_base = "cheqd-noded keys"
     key_name = "recovery_key_{}".format(random_string(4))
-    run(command_base, "add", key_name, "name: {}".format(key_name))
+    run(command_base, "add", f"{key_name} {KEYRING_BACKEND_TEST}", f"name: {key_name}")
 
-    run(command_base, "delete", f"{key_name} {YES_FLAG}", r"Key deleted forever \(uh oh!\)")
+    run(command_base, "delete", f"{key_name} {YES_FLAG} {KEYRING_BACKEND_TEST}", r"Key deleted forever \(uh oh!\)")
 
-    cli = run(command_base, "add", "{} --recover".format(key_name), "Enter your bip39 mnemonic")
+    cli = run(command_base, "add", f"{key_name} --recover {KEYRING_BACKEND_TEST}", "Enter your bip39 mnemonic")
     run_interaction(cli, random_string(20), "Error: invalid mnemonic")
 
 
@@ -93,10 +93,10 @@ def test_keys_add_recover_wrong_phrase():
 @pytest.mark.parametrize(
     "command, params, expected_output, input_string, expected_output_2",
     [
-        ("export", "export_key", "Enter passphrase to encrypt the exported key", random_string(6), "password must be at least 8 characters"),
-        ("export", "export_key", "Enter passphrase to encrypt the exported key", random_string(8), "BEGIN TENDERMINT PRIVATE KEY"),
-        ("export", "export_key", "Enter passphrase to encrypt the exported key", "qwe!@#$%^123", "BEGIN TENDERMINT PRIVATE KEY"),
-        ("export", "export_key", "Enter passphrase to encrypt the exported key", random_string(40), "BEGIN TENDERMINT PRIVATE KEY"),
+        ("export", f"export_key {KEYRING_BACKEND_TEST}", "Enter passphrase to encrypt the exported key", random_string(6), "password must be at least 8 characters"),
+        ("export", f"export_key {KEYRING_BACKEND_TEST}", "Enter passphrase to encrypt the exported key", random_string(8), "BEGIN TENDERMINT PRIVATE KEY"),
+        ("export", f"export_key {KEYRING_BACKEND_TEST}", "Enter passphrase to encrypt the exported key", "qwe!@#$%^123", "BEGIN TENDERMINT PRIVATE KEY"),
+        ("export", f"export_key {KEYRING_BACKEND_TEST}", "Enter passphrase to encrypt the exported key", random_string(40), "BEGIN TENDERMINT PRIVATE KEY"),
     ]
 )
 def test_keys_export(command, params, expected_output, input_string, expected_output_2):
