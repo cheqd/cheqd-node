@@ -7,16 +7,6 @@ if [ -z ${CHEQD_HOME_DIR+x} ]; then
   CHEQD_HOME_DIR=/home/${CHEQD_USER_NAME}
 fi
 
-# Node config and data directory locations based on home directory
-CHEQD_ROOT_DIR=${CHEQD_HOME_DIR}/.cheqdnode
-CHEQD_CONFIG_DIR=${CHEQD_ROOT_DIR}/config
-CHEQD_DATA_DIR=${CHEQD_ROOT_DIR}/data
-
-# Log directory can be overwritten while running dpkg
-if [ -z ${CHEQD_LOG_DIR+x} ]; then
-  CHEQD_LOG_DIR=${CHEQD_ROOT_DIR}/log
-fi
-
 # If there is an argument then assume using as binary + script instead of apt
 if [ -n "$1" ] && [ -f "$1" ] ; then
   cp "$1" /usr/bin/
@@ -24,42 +14,17 @@ fi
 
 # Create cheqd user
 if ! /usr/bin/getent passwd ${CHEQD_USER_NAME} > /dev/null 2>&1 ; then
-
   # Create group and user named "cheqd"
   addgroup ${CHEQD_USER_NAME} --quiet
-
   echo "Home directory for user ${CHEQD_USER_NAME} will be set up as ${CHEQD_HOME_DIR}"
-
   adduser --system ${CHEQD_USER_NAME} --home ${CHEQD_HOME_DIR} --shell /bin/bash --ingroup ${CHEQD_USER_NAME} --quiet
-
+else 
+  echo "User home directory already exists. Skipping user initialisation."
 fi
 
-# Create root directory if needed
-mkdir -p ${CHEQD_ROOT_DIR}
-
-# Set permissions and ownership for cheqd root directory
-chown -R ${CHEQD_USER_NAME}:${CHEQD_USER_NAME} ${CHEQD_ROOT_DIR}
-
-# Create node configuration directory
-if [ ! -d "${CHEQD_CONFIG_DIR}" ]
-then
-    echo "Node configuration directory not found. Initializing."
-    mkdir -p ${CHEQD_CONFIG_DIR}
-    chmod -R 0755 ${CHEQD_CONFIG_DIR}
-    chown -R ${CHEQD_USER_NAME}:${CHEQD_USER_NAME} ${CHEQD_CONFIG_DIR}
-else
-    echo "Node configuration exists. Skipping."
-fi
-
-# Create node data directory
-if [ ! -d "${CHEQD_DATA_DIR}" ]
-then
-    echo "Node configuration data not found. Initializing."
-    mkdir -p ${CHEQD_DATA_DIR}
-    chmod -R 0755 ${CHEQD_DATA_DIR}
-    chown -R ${CHEQD_USER_NAME}:${CHEQD_USER_NAME} ${CHEQD_DATA_DIR}
-else
-    echo "Node data exists. Skipping."
+# Log directory can be overwritten while running dpkg
+if [ -z ${CHEQD_LOG_DIR+x} ]; then
+  CHEQD_LOG_DIR=${CHEQD_HOME_DIR}/.cheqdnode/log
 fi
 
 # Create node log directory
@@ -94,6 +59,7 @@ if [ ! -f /etc/logrotate.d/cheqd-node ] ; then
   cat <<EOF > /etc/logrotate.d/cheqd-node
 ${CHEQD_LOG_DIR}/stdout.log {
   rotate 30
+  daily
   maxsize 100M
   notifempty
   copytruncate
@@ -101,18 +67,9 @@ ${CHEQD_LOG_DIR}/stdout.log {
   maxage 30
 }
 EOF
-fi
-
-# Add crontab job for daily rotation
-if [ ! -f /etc/cron.daily/cheqd-node ] ; then
-  cat <<EOF > /etc/cron.daily/cheqd-node
-#!/bin/bash
-logrotate /etc/logrotate.d/cheqd-node
-EOF
-
-  # Make this script executable
-  chmod +x /etc/cron.daily/cheqd-node
-
+# Restart logrotate
+systemctl restart logrotate.service
+systemctl restart logrotate.timer
 fi
 
 # Add systemd script
@@ -142,5 +99,4 @@ WantedBy=multi-user.target
 EOF
   # Reload daemons for systemctl
   systemctl daemon-reload
-
 fi
