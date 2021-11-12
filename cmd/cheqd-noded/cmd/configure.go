@@ -32,7 +32,7 @@ func configureCmd(defaultNodeHome string) *cobra.Command {
 func p2pCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "p2p",
-		Short: "Adjust p2p parameters",
+		Short: "Adjust peer-to-peer (p2p) parameters",
 	}
 
 	cmd.AddCommand(
@@ -52,9 +52,9 @@ func p2pCmd(defaultNodeHome string) *cobra.Command {
 func minGasPricesCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "min-gas-prices [value]",
-		Short: "The minimum gas prices a validator is willing to accept",
+		Short: "The minimum gas prices a validator is willing to accept (default  \"25ncheq\")",
 		Long: "The minimum gas prices a validator is willing to accept for processing a transaction. A transaction's " +
-			"fees must meet the minimum of any denomination specified in this config (e.g. 0.25token1;0.0001token2).",
+			"fees must meet the minimum tokens in ncheq denomination (e.g. \"25ncheq\", \"50ncheq\").",
 		Example: "min-gas-prices 25cheq",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -103,7 +103,7 @@ func seedModeCmd(defaultNodeHome string) *cobra.Command {
 func seedsCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "seeds [value]",
-		Short: "Comma separated list of seed nodes to connect to",
+		Short: "Comma separated list of seed nodes to connect to in <node-id@ip-address-or-dns-name:port> format",
 		Example: "seeds \"658453f9578d82f0897f13205ca2e7ad37279f95@seed1.eu.testnet.cheqd.network:26656," +
 			"eec97b12f7271116deb888a8d62e0739b4350fbd@seed1.us.testnet.cheqd.network:26656\"",
 		Args:  cobra.ExactArgs(1),
@@ -125,9 +125,10 @@ func seedsCmd(defaultNodeHome string) *cobra.Command {
 func externalAddressCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "external-address [value]",
-		Short: "Address to advertise to peers for them to dial",
-		Long: "Address to advertise to peers for them to dial. If empty, will use the same port as the laddr, and " +
-			"will introspect on the listener or use UPnP to figure out the address. ip and port are required.",
+		Short: "Address to advertise to peers for them to connect to the node",
+		Long: "Address to advertise to peers for them to connect to the node. If empty, the node will use the same port " + 
+		"as the laddr, and will attach it to the listener or use UPnP to figure out the address. IP address/DNS name " + 
+		" P2P port are required.",
 		Example: "external-address 159.89.10.97:26656",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -148,7 +149,8 @@ func externalAddressCmd(defaultNodeHome string) *cobra.Command {
 func persistentPeersCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "persistent-peers [value]",
-		Short: "Comma separated list of nodes to keep persistent connections to",
+		Short: "Comma separated list of nodes to keep persistent connections to in " +
+		"<node-id@ip-address-or-dns-name:p2p-port> format",
 		Example: "persistent-peers \"658453f9578d82f0897f13205ca2e7ad37279f95@seed1.eu.testnet.cheqd.network:26656," +
 			"eec97b12f7271116deb888a8d62e0739b4350fbd@seed1.us.testnet.cheqd.network:26656\"",
 		Args:  cobra.ExactArgs(1),
