@@ -22,6 +22,12 @@ This document provides guidance on how to install and configure a node for the c
    sudo dpkg -i cheqd-node_0.2.3_amd64.deb
    ```
 
+   As a part of installation `cheqd` user will be created. By default, `HOME` directory for the user is `/home/cheqd`, but it can be changed by setting `CHEQD_HOME_DIR` environment variable before running `dpkg` command, like:
+   ```bash
+   sudo CHEQD_HOME_DIR=/path/to/home/directory dpkg -i cheqd-node_0.2.4_amd64.deb
+   ```
+   P.S. ability to change default `$HOME` directory is supported only in version `0.2.4` and upper.
+
 3. **Switch to the `cheqd` system user**
 
    Always switch to `cheqd` user before managing node. By default, the node stores configuration files in the home directory for the user that initialises the node. By switching to the special `cheqd` system user, you can ensure that the configuration files are stored in the [system app data directories](readme.md) configured by the Debian package.
@@ -38,17 +44,17 @@ This document provides guidance on how to install and configure a node for the c
 
 5. **Download the genesis file for a persistent chain, such as the cheqd testnet**
 
-   Download the `genesis.json` file [corresponding a persistent chain](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains/testnet) and put it in the `/etc/cheqd-node/` directory.
+   Download the `genesis.json` file [corresponding a persistent chain](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains/testnet) and put it in the `$HOME/.cheqdnode/config` directory.
 
    For cheqd testnet:
 
    ```bash
-   wget -O /etc/cheqd-node/genesis.json https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/testnet/genesis.json
+   wget -O $HOME/.cheqdnode/config/genesis.json https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/testnet/genesis.json
    ```
 
 6. **Define the seed configuration for populating the list of peers known by a node**
 
-   Search for the `seeds` parameter in the node configuration file `/etc/cheqd-node/config.toml` and set its value to a comma separated list of seed node addresses specified in `seeds.txt` for [persistent chains](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains/testnet).
+   Update `seeds` with a comma separated list of seed node addresses specified in `seeds.txt` for [persistent chains](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains/testnet).
 
    For cheqd testnet, executing the following commands will set this up correctly:
 
@@ -58,29 +64,23 @@ This document provides guidance on how to install and configure a node for the c
    $ echo $SEEDS
    # Comma separated list should be printed
    
-   $ sed -i.bak 's/seeds = ""/seeds = "'$SEEDS'"/g' /etc/cheqd-node/config.toml
+   $ cheqd-noded configure p2p seeds "$SEEDS"
    ```
 
 7. **Set gas prices accepted by the node**
 
-   Search for the `minimum-gas-prices` parameter in the node configuration file `/etc/cheqd-node/app.toml` and set it to a non-empty value. The recommended value is `25ncheq`.
-
-   For cheqd testnet, executing the following command will set this up correctly:
+   Update `minimum-gas-prices` parameter if you want to use custom value. The default is `25ncheq`.
 
    ```bash
-   sed -i.bak 's/minimum-gas-prices = ""/minimum-gas-prices = "25ncheq"/g' /etc/cheqd-node/app.toml
+   cheqd-noded configure min-gas-prices "25ncheq"
    ```
 
 8. **Make the RPC endpoint available externally** \(optional\)
 
    This step is necessary only if you want to allow incoming client application connections to your node. Otherwise, the node will be accessible only locally. Further details about the RPC endpoints is available in the [cheqd node setup guide](../readme.md).
 
-   Search for the `laddr` parameter under the `RPC Server Configuration Options` section in the node configuration file `/etc/cheqd-node/config.toml` and replace its value to `0.0.0.0:26657`
-
-   For cheqd testnet, executing the following commands will set this up correctly:
-
    ```bash
-   sed -i.bak 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/g' /etc/cheqd-node/config.toml
+   cheqd-noded configure rpc-laddr "tcp:\/\/0.0.0.0:26657"
    ```
 
 9. **Enable and start the `cheqd-noded` system service**

@@ -28,6 +28,7 @@ LOCAL_NET_DESTINATION_HTTP = f"{LOCAL_NET_NODE_HTTP} --chain-id 'cheqd'"
 TEST_NET_FEES = "--fees 5000000ncheq"
 TEST_NET_GAS_X_GAS_PRICES = "--gas 90000 --gas-prices 25ncheq"
 YES_FLAG = "-y"
+KEYRING_BACKEND_TEST = "--keyring-backend test"
 DENOM = "ncheq"
 GAS_AMOUNT = 90000 # 70000 throws `out of gas` sometimes
 GAS_PRICE = 25
@@ -82,10 +83,10 @@ async def get_balance_vdr(pool_alias, address):
 
 def send_with_note(note):
     try:
-        cli = run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 1000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} --note {note}", fr"{CODE_0}(.*?)\"value\":\"1000ncheq\"")
+        cli = run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 1000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} {KEYRING_BACKEND_TEST} --note {note}", fr"{CODE_0}(.*?)\"value\":\"1000ncheq\"")
     except pexpect.exceptions.EOF:
         time.sleep(IMPLICIT_TIMEOUT)
-        cli = run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 1000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} --note {note}", fr"{CODE_0}(.*?)\"value\":\"1000ncheq\"")
+        cli = run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 1000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} {KEYRING_BACKEND_TEST} --note {note}", fr"{CODE_0}(.*?)\"value\":\"1000ncheq\"")
 
     tx_hash = re.search(r"\"txhash\":\"(.+?)\"", cli.before).group(1).strip()
 
@@ -159,12 +160,12 @@ async def update_did_helper(pool_alias, wallet_handle, key_alias, public_key, se
 
 def set_up_operator():
     name = random_string(10)
-    cli = run("cheqd-noded keys", "add", name, r"mnemonic: \"\"")
+    cli = run("cheqd-noded keys", "add", f"{name} {KEYRING_BACKEND_TEST}", r"mnemonic: \"\"")
     address = re.search(r"address: (.+?)\n", cli.before).group(1).strip()
     print(address)
     pubkey = re.search(r"pubkey: (.+?)\n", cli.before).group(1).strip()
     print(pubkey)
-    run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {address} 1100000000000000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"1100000000000000ncheq\"")
+    run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {address} 1100000000000000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} {KEYRING_BACKEND_TEST}", fr"{CODE_0}(.*?)\"value\":\"1100000000000000ncheq\"")
 
     return name, address, pubkey
 

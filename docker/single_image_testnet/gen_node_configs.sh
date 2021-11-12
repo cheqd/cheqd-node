@@ -29,7 +29,7 @@ sed -i $sed_extension 's/minimum-gas-prices = ""/minimum-gas-prices = "25ncheq"/
 
 echo "##### [Validator operator] Generating key"
 
-cheqd-noded keys add alice
+cheqd-noded keys add alice --keyring-backend test
 
 echo "##### [Validator operator] Initializing genesis"
 
@@ -38,7 +38,7 @@ sed -i $sed_extension 's/"stake"/"ncheq"/' $GENESIS
 
 echo "##### [Validator operator] Creating genesis account"
 
-cheqd-noded add-genesis-account alice 20000000000000000ncheq
+cheqd-noded add-genesis-account alice 20000000000000000ncheq --keyring-backend test
 
 echo "##### Adding test accounts to the genesis"
 
@@ -75,7 +75,7 @@ cat <<< "$(jq '.app_state.auth.accounts += [{"@type": "/cosmos.vesting.v1beta1.P
 
 echo "##### [Validator operator] Creating genesis validator"
 
-cheqd-noded gentx alice 1000000000000000ncheq --chain-id $CHAIN_ID --node-id "$NODE_0_ID" --pubkey "$NODE_0_VAL_PUBKEY"
+cheqd-noded gentx alice 1000000000000000ncheq --chain-id $CHAIN_ID --node-id "$NODE_0_ID" --pubkey "$NODE_0_VAL_PUBKEY"  --keyring-backend test
 
 echo "##### [Validator operator] Collect gentxs"
 
