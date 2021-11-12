@@ -52,7 +52,10 @@ func p2pCmd(defaultNodeHome string) *cobra.Command {
 func minGasPricesCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "min-gas-prices [value]",
-		Short: "Update min-gas-prices value in app.toml",
+		Short: "The minimum gas prices a validator is willing to accept",
+		Long: "The minimum gas prices a validator is willing to accept for processing a transaction. A transaction's " +
+			"fees must meet the minimum of any denomination specified in this config (e.g. 0.25token1;0.0001token2).",
+		Example: "min-gas-prices 25cheq",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -71,8 +74,11 @@ func minGasPricesCmd(defaultNodeHome string) *cobra.Command {
 // seedModeCmd returns configuration cobra Command.
 func seedModeCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "seed-mode [value]",
-		Short: "Update seed-mode value in config.toml",
+		Use:   "seed-mode (true|false)",
+		Short: "Seed mode, in which node constantly crawls the network and looks for peers.",
+		Long: "Seed mode, in which node constantly crawls the network and looks for peers. If another node asks " +
+			"it for addresses, it responds and disconnects.",
+		Example: "seed-mode true",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -97,7 +103,9 @@ func seedModeCmd(defaultNodeHome string) *cobra.Command {
 func seedsCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "seeds [value]",
-		Short: "Update seeds value in config.toml",
+		Short: "Comma separated list of seed nodes to connect to",
+		Example: "seeds \"658453f9578d82f0897f13205ca2e7ad37279f95@seed1.eu.testnet.cheqd.network:26656," +
+			"eec97b12f7271116deb888a8d62e0739b4350fbd@seed1.us.testnet.cheqd.network:26656\"",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -117,7 +125,10 @@ func seedsCmd(defaultNodeHome string) *cobra.Command {
 func externalAddressCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "external-address [value]",
-		Short: "Update external-address value in config.toml",
+		Short: "Address to advertise to peers for them to dial",
+		Long: "Address to advertise to peers for them to dial. If empty, will use the same port as the laddr, and " +
+			"will introspect on the listener or use UPnP to figure out the address. ip and port are required.",
+		Example: "external-address 159.89.10.97:26656",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -137,7 +148,9 @@ func externalAddressCmd(defaultNodeHome string) *cobra.Command {
 func persistentPeersCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "persistent-peers [value]",
-		Short: "Update persistent-peers value in config.toml",
+		Short: "Comma separated list of nodes to keep persistent connections to",
+		Example: "persistent-peers \"658453f9578d82f0897f13205ca2e7ad37279f95@seed1.eu.testnet.cheqd.network:26656," +
+			"eec97b12f7271116deb888a8d62e0739b4350fbd@seed1.us.testnet.cheqd.network:26656\"",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -157,7 +170,8 @@ func persistentPeersCmd(defaultNodeHome string) *cobra.Command {
 func sendRateCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "send-rate [value]",
-		Short: "Update send-rate value in config.toml",
+		Short: "Rate at which packets can be sent, in bytes/second",
+		Example: "send-rate 20000000",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -182,7 +196,8 @@ func sendRateCmd(defaultNodeHome string) *cobra.Command {
 func recvRateCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "recv-rate [value]",
-		Short: "Update recv-rate value in config.toml",
+		Short: "Rate at which packets can be received, in bytes/second",
+		Example: "recv-rate 20000000",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -207,7 +222,8 @@ func recvRateCmd(defaultNodeHome string) *cobra.Command {
 func maxPacketMsgPayloadSizeCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "max-packet-msg-payload-size [value]",
-		Short: "Update max-packet-msg-payload-size value in config.toml",
+		Short: "Maximum size of a message packet payload, in bytes",
+		Example: "max-packet-msg-payload-size 10240",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -232,7 +248,8 @@ func maxPacketMsgPayloadSizeCmd(defaultNodeHome string) *cobra.Command {
 func p2pLaddrCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "laddr [value]",
-		Short: "Update p2p.laddr value in config.toml",
+		Short: "Address to listen for incoming connections",
+		Example: "laddr \"tcp://0.0.0.0:26656\"",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -252,7 +269,8 @@ func p2pLaddrCmd(defaultNodeHome string) *cobra.Command {
 func createEmptyBlocksCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-empty-blocks [value]",
-		Short: "Update create-empty-blocks value in config.toml",
+		Short: "EmptyBlocks mode (true|false)",
+		Example:   "create-empty-blocks false",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -277,7 +295,8 @@ func createEmptyBlocksCmd(defaultNodeHome string) *cobra.Command {
 func rpcLaddrCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "rpc-laddr [value]",
-		Short: "Update rpc.laddr value in config.toml",
+		Short: "TCP or UNIX socket address for the RPC server to listen on",
+		Example: "rpc-laddr \"tcp://127.0.0.1:26657\"",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -297,7 +316,8 @@ func rpcLaddrCmd(defaultNodeHome string) *cobra.Command {
 func fastsyncVersionCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "fastsync-version [value]",
-		Short: "Update fastsync.version value in config.toml",
+		Short: "Fast Sync version to use (v0|v1|v2)",
+		Example: "fastsync-version v2",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
