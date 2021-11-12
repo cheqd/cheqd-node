@@ -18,7 +18,7 @@ if ! /usr/bin/getent passwd ${CHEQD_USER_NAME} > /dev/null 2>&1 ; then
   addgroup ${CHEQD_USER_NAME} --quiet
   echo "Home directory for user ${CHEQD_USER_NAME} will be set up as ${CHEQD_HOME_DIR}"
   adduser --system ${CHEQD_USER_NAME} --home ${CHEQD_HOME_DIR} --shell /bin/bash --ingroup ${CHEQD_USER_NAME} --quiet
-else 
+else
   echo "User home directory already exists. Skipping user initialisation."
 fi
 

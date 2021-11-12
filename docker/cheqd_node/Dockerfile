@@ -44,8 +44,11 @@ RUN chmod +x /bin/node-runner
 
 ARG CHEQD_HOME_DIR="/cheqd"
 
-RUN groupadd --system --gid 1000 cheqd && \
-    useradd --system --create-home --home-dir ${CHEQD_HOME_DIR} --shell /bin/bash --gid cheqd --uid 1000 cheqd
+ARG UID=1000
+ARG GID=1000
+
+RUN groupadd --system --gid $GID cheqd && \
+    useradd --system --create-home --home-dir ${CHEQD_HOME_DIR} --shell /bin/bash --gid cheqd --uid $UID cheqd
 
 WORKDIR ${CHEQD_HOME_DIR}
 USER cheqd
@@ -53,4 +56,4 @@ USER cheqd
 EXPOSE 26656 26657
 STOPSIGNAL SIGTERM
 
-ENTRYPOINT [ "node-runner" ]
+ENTRYPOINT [ "cheqd-noded" ]
