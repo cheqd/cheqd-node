@@ -2,7 +2,7 @@
 sudo chown -R runner:docker ${NODE_CONFIGS_BASE}/client
 export HOME=${NODE_CONFIGS_BASE}/client
 sudo -u cheqd cheqd-noded keys list --keyring-backend "test"
-OP0_ADDRESS=$(sudo -u cheqd cheqd-noded keys list --keyring-backend "test" --home ${NODE_CONFIGS_BASE}/node0/.cheqdnode/ | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
+OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home ${NODE_CONFIGS_BASE}/node0/.cheqdnode/ | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
 sudo -u cheqd cheqd-noded keys add node5-operator --keyring-backend "test"
 OP5_ADDRESS=$(sudo -u cheqd cheqd-noded keys list --keyring-backend "test"| sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
 export HOME=/home/runner
