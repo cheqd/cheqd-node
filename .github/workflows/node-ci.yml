@@ -175,7 +175,7 @@ jobs:
         working-directory: ./tests/e2e
         run: |
           pip3 install -r requirements.txt >> /dev/null
-          pip3 install --force-reinstall 'git+https://gitlab.com/evernym/verity/vdr-tools.git@DEV-330#egg=vdr-tools&subdirectory=wrappers/python' -U
+          pip3 install --force-reinstall 'git+https://gitlab.com/evernym/verity/vdr-tools.git@cheqd-node-0.3.1#egg=vdr-tools&subdirectory=wrappers/python' -U
           cp -R ${NODE_CONFIGS_BASE}/client/.cheqdnode /home/runner/
           sudo chmod -R 777 /home/runner
 
@@ -210,10 +210,10 @@ jobs:
         run: |
           sudo cp libindy.so /usr/lib/libindy.so
           pip3 install -r requirements.txt >> /dev/null
-          pip3 install --force-reinstall 'git+https://gitlab.com/evernym/verity/vdr-tools.git@DEV-330#egg=vdr-tools&subdirectory=wrappers/python' -U
+          pip3 install --force-reinstall 'git+https://gitlab.com/evernym/verity/vdr-tools.git@cheqd-node-0.3.1#egg=vdr-tools&subdirectory=wrappers/python' -U
 
-#      - name: Run tests
-#        run: |
-#          export OP0_ADDRESS=""
-#          export OP1_ADDRESS=""
-#          pytest -v -rP tests/e2e/test_identity.py
+     - name: Run tests
+       run: |
+         export OP0_ADDRESS=""
+         export OP1_ADDRESS=""
+         pytest -v -rP tests/e2e/test_identity.py
