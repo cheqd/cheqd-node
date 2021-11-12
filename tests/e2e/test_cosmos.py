@@ -150,7 +150,7 @@ def test_keys_import_wrong_data(action, expected_result):
     passphrase = random_string(8)
     filename = "/home/{}/key.txt".format(getpass.getuser())
 
-    run(command_base, "add", key_name, "name: {}".format(key_name))
+    run(command_base, "add", f"{key_name} --keyring-backend 'test'", "name: {}".format(key_name))
 
     cli = run(command_base, "export", key_name, "Enter passphrase")
     run_interaction(cli, passphrase, "BEGIN")
@@ -227,21 +227,21 @@ def test_query(command, params, expected_output):
         "command, params, expected_output",
         [
             ("bank send", "", r"Error: accepts 3 arg\(s\), received 0"), # no args
-            ("bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} -1ncheq {LOCAL_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", r"Error: unknown shorthand flag: '1' in -1ncheq"), # -1
-            ("bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 0ncheq {LOCAL_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", r"Error: : invalid coins"), # 0
-            ("bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 1ncheq {LOCAL_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"1ncheq\""), # 1 + fees
-            ("bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 2ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"2ncheq\""), # 2 + gas x price
-            ("bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 99ncheq {LOCAL_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"99ncheq\""),
-            ("bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 1ncheq {LOCAL_NET_DESTINATION} {YES_FLAG}", r"\"code\":13(.*?)insufficient fees"), # no fees
-            ("bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 2ncheq {LOCAL_NET_DESTINATION} --fees 4000000ncheq {YES_FLAG}", r"\"code\":13(.*?)insufficient fees"), # bad fees
-            ("bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 3ncheq {LOCAL_NET_DESTINATION} --gas 70000 --gas-prices 1ncheq {YES_FLAG}", r"\"code\":13(.*?)insufficient fees"), # bad gas price
-            ("bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 4ncheq {LOCAL_NET_DESTINATION} --gas 1 --gas-prices 25ncheq {YES_FLAG}", r"\"code\":11(.*?)out of gas"), # bad gas amount
-            ("bank send", f"{LOCAL_RECEIVER_ADDRESS} {LOCAL_SENDER_ADDRESS} 2ncheq {LOCAL_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"2ncheq\""), # transfer back: 2 + fees
-            ("bank send", f"{LOCAL_RECEIVER_ADDRESS} {LOCAL_SENDER_ADDRESS} 1ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"1ncheq\""), # transfer back: 1 + gas x price
-            ("bank send", f"{LOCAL_RECEIVER_ADDRESS} {LOCAL_SENDER_ADDRESS} 99999999999999999ncheq {LOCAL_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", r"\"code\":5(.*?)insufficient funds"),
-            ("bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 1000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} --note 'test123!=$'", fr"{CODE_0}(.*?)\"value\":\"1000ncheq\""), # note
-            ("bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 9999ncheq {LOCAL_NET_DESTINATION_HTTP} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"9999ncheq\""), # http + gas x price
-            ("bank send", f"{LOCAL_RECEIVER_ADDRESS} {LOCAL_SENDER_ADDRESS} 9999ncheq {LOCAL_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"9999ncheq\""), # transfer back: tcp + fees
+            ("bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} -1ncheq {LOCAL_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG} --keyring-backend 'test'", r"Error: unknown shorthand flag: '1' in -1ncheq"), # -1
+            ("bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 0ncheq {LOCAL_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG} --keyring-backend 'test'", r"Error: : invalid coins"), # 0
+            ("bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 1ncheq {LOCAL_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG} --keyring-backend 'test'", fr"{CODE_0}(.*?)\"value\":\"1ncheq\""), # 1 + fees
+            ("bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 2ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} --keyring-backend 'test'", fr"{CODE_0}(.*?)\"value\":\"2ncheq\""), # 2 + gas x price
+            ("bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 99ncheq {LOCAL_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG} --keyring-backend 'test'", fr"{CODE_0}(.*?)\"value\":\"99ncheq\""),
+            ("bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 1ncheq {LOCAL_NET_DESTINATION} {YES_FLAG} --keyring-backend 'test'", r"\"code\":13(.*?)insufficient fees"), # no fees
+            ("bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 2ncheq {LOCAL_NET_DESTINATION} --fees 4000000ncheq {YES_FLAG} --keyring-backend 'test'", r"\"code\":13(.*?)insufficient fees"), # bad fees
+            ("bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 3ncheq {LOCAL_NET_DESTINATION} --gas 70000 --gas-prices 1ncheq {YES_FLAG} --keyring-backend 'test'", r"\"code\":13(.*?)insufficient fees"), # bad gas price
+            ("bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 4ncheq {LOCAL_NET_DESTINATION} --gas 1 --gas-prices 25ncheq {YES_FLAG} --keyring-backend 'test'", r"\"code\":11(.*?)out of gas"), # bad gas amount
+            ("bank send", f"{LOCAL_RECEIVER_ADDRESS} {LOCAL_SENDER_ADDRESS} 2ncheq {LOCAL_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG} --keyring-backend 'test'", fr"{CODE_0}(.*?)\"value\":\"2ncheq\""), # transfer back: 2 + fees
+            ("bank send", f"{LOCAL_RECEIVER_ADDRESS} {LOCAL_SENDER_ADDRESS} 1ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} --keyring-backend 'test'", fr"{CODE_0}(.*?)\"value\":\"1ncheq\""), # transfer back: 1 + gas x price
+            ("bank send", f"{LOCAL_RECEIVER_ADDRESS} {LOCAL_SENDER_ADDRESS} 99999999999999999ncheq {LOCAL_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG} --keyring-backend 'test'", r"\"code\":5(.*?)insufficient funds"),
+            ("bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 1000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} --note 'test123!=$' --keyring-backend 'test'", fr"{CODE_0}(.*?)\"value\":\"1000ncheq\""), # note
+            ("bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 9999ncheq {LOCAL_NET_DESTINATION_HTTP} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} --keyring-backend 'test'", fr"{CODE_0}(.*?)\"value\":\"9999ncheq\""), # http + gas x price
+            ("bank send", f"{LOCAL_RECEIVER_ADDRESS} {LOCAL_SENDER_ADDRESS} 9999ncheq {LOCAL_NET_DESTINATION} {TEST_NET_FEES} {YES_FLAG} --keyring-backend 'test'", fr"{CODE_0}(.*?)\"value\":\"9999ncheq\""), # transfer back: tcp + fees
         ]
     )
 def test_tx_bank_send(command, params, expected_output):
