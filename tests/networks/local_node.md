@@ -9,7 +9,6 @@ The script to generate configuration for a network of one node and run it locall
 ## Prerequisites
 
 * [Starport](https://docs.starport.network/guide/install.html) 
-* docker-compose
 
 ## How to run
 

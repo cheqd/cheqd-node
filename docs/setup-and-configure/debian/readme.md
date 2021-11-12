@@ -25,7 +25,7 @@ This section describes the system changes that our Debian packages attempt to ca
 
 By default, Cosmos SDK creates all requisite directories in the `HOME` directory of the user that initiates installation.
 
-Our package creates a new system user called `cheqd` with home directory set to `/var/lib/cheqd`. This allows node operators to keep sysadmin / standard users separate from the service user.
+Our package creates a new system user called `cheqd` with home directory set to `/home/cheqd`. This allows node operators to keep sysadmin / standard users separate from the service user. Home directory can be changed by setting `CHEQD_HOME_DIR` environment variable before installation.
 
 ### Directory location configuration
 
@@ -33,20 +33,15 @@ To keep `cheqd-node` configuration data in segregated from userspace home direct
 
 #### App data directories
 
-* `/etc/cheqd-node`
+* `$HOME/.cheqdnode/config`
   * Location for configuration files
   * Ownership permission set to: `cheqd:cheqd`
-* `/var/lib/cheqd/data`
+* `$HOME/.cheqdnode/data`
   * Location for ledger data
   * Ownership permission set to: `cheqd:cheqd`
-* `/var/log/cheqd-node`
+* `$HOME/.cheqdnode/log`
   * Location for app logs
   * Ownership persmissions set to: `syslog:adm` \(set by rsyslog\)
-
-#### Symlinks
-
-* For configuration data: `/var/lib/cheqd/.cheqdnode/config` -&gt; `/etc/cheqd-node/`
-* For ledger data: `/var/lib/cheqd/.cheqdnode/data` -&gt; `/var/lib/cheqd/data`
 
 ### Logging configuration
 

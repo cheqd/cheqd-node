@@ -84,6 +84,7 @@ func (msg *MsgUpdateDid) ValidateBasic() error {
 }
 
 func NewMsgCreateDidPayloadPayload(
+	context []string,
 	id string,
 	controller []string,
 	verificationMethod []*VerificationMethod,
@@ -94,9 +95,9 @@ func NewMsgCreateDidPayloadPayload(
 	keyAgreement []string,
 	alsoKnownAs []string,
 	service []*Service,
-	context []string,
 ) *MsgCreateDidPayload {
 	return &MsgCreateDidPayload{
+		Context:              context,
 		Id:                   id,
 		Controller:           controller,
 		VerificationMethod:   verificationMethod,
@@ -107,7 +108,6 @@ func NewMsgCreateDidPayloadPayload(
 		KeyAgreement:         keyAgreement,
 		AlsoKnownAs:          alsoKnownAs,
 		Service:              service,
-		Context:              context,
 	}
 }
 
@@ -218,6 +218,7 @@ func (msg *MsgCreateDidPayload) GetSignBytes() []byte {
 var _ IdentityMsg = &MsgUpdateDidPayload{}
 
 func NewMsgUpdateDidPayloadPayload(
+	context []string,
 	id string,
 	controller []string,
 	verificationMethod []*VerificationMethod,
@@ -228,9 +229,9 @@ func NewMsgUpdateDidPayloadPayload(
 	keyAgreement []string,
 	alsoKnownAs []string,
 	service []*Service,
-	context []string,
 ) *MsgUpdateDidPayload {
 	return &MsgUpdateDidPayload{
+		Context:              context,
 		Id:                   id,
 		Controller:           controller,
 		VerificationMethod:   verificationMethod,
@@ -241,7 +242,6 @@ func NewMsgUpdateDidPayloadPayload(
 		KeyAgreement:         keyAgreement,
 		AlsoKnownAs:          alsoKnownAs,
 		Service:              service,
-		Context:              context,
 	}
 }
 

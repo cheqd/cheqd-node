@@ -7,17 +7,17 @@ import "google/protobuf/any.proto";
 import "cheqd/v1/common.proto";
 
 message Did {
-  string id = 1;
-  repeated string controller = 2; //optional
-  repeated VerificationMethod verification_method = 3; // optional
-  repeated string authentication = 4; // optional
-  repeated string assertion_method = 5; // optional
-  repeated string capability_invocation = 6; // optional
-  repeated string capability_delegation = 7; // optional
-  repeated string key_agreement = 8; // optional
-  repeated Service service = 9; // optional
-  repeated string also_known_as = 10; // optional
-  repeated string context = 11;
+  repeated string context = 1; // optional
+  string id = 2;
+  repeated string controller = 3; //optional
+  repeated VerificationMethod verification_method = 4; // optional
+  repeated string authentication = 5; // optional
+  repeated string assertion_method = 6; // optional
+  repeated string capability_invocation = 7; // optional
+  repeated string capability_delegation = 8; // optional
+  repeated string key_agreement = 9; // optional
+  repeated Service service = 10; // optional
+  repeated string also_known_as = 11; // optional
 }
 
 message VerificationMethod {

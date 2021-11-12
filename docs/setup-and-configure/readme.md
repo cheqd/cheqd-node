@@ -39,7 +39,7 @@ We recommend using a separate storage volume for the `data` directory where the 
 The default directory location depends on the installation method used:
 
 * For binary distribution, it is `$HOME/.cheqdnode/data`
-* For installations done using our Debian packages, it is `/var/lib/cheqd/.cheqdnode/data`.
+* For installations done using our Debian packages, it is `/home/cheqd/.cheqdnode/data`.
 
 ### Ports
 
@@ -55,7 +55,7 @@ Further details on [how P2P settings work is defined in Tendermint documentation
 
 * By default, the P2P port is set to `26656`.
 * Inbound and outbound TCP connections must be allowed from any IPv4 address range.
-* The default P2P port can be changed in `/etc/cheqd-node/config.toml`.
+* The default P2P port can be changed in `$HOME/.cheqdnode/config/config.toml`.
 
 #### RPC port
 
@@ -70,7 +70,7 @@ The [RPC endpoints for a node](https://docs.tendermint.com/master/rpc/) provide 
 * By default, the RPC port is set to `26657`
 * Inbound and outbound TCP connections should be allowed from destinations desired by the node operator. The default is to allow this from any IPv4 address range.
 * TLS for the RPC port can also be setup separately. Currently, TLS setup is not automatically carried out in the install process described below.
-* The default RPC port can be changed in `/etc/cheqd-node/config.toml`.
+* The default RPC port can be changed in `$HOME/.cheqdnode/config/config.toml`.
 
 ### Sentry nodes \(optional\)
 

@@ -5,8 +5,8 @@
 | Category | Status |
 | :--- | :--- |
 | **Authors** | Renata Toktar, Brent Zundel, Ankur Banerjee |
-| **ADR Stage** | PROPOSED |
-| **Implementation Status** | Implementation in progress |
+| **ADR Stage** | DRAFT |
+| **Implementation Status** | Draft |
 | **Start Date** | 2021-09-23 |
 
 ## Summary

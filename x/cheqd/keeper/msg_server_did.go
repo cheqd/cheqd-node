@@ -34,6 +34,7 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *v1.MsgCreateDid) (*v1.M
 	}
 
 	var did = v1.Did{
+		Context:              didMsg.Context,
 		Id:                   didMsg.Id,
 		Controller:           didMsg.Controller,
 		VerificationMethod:   didMsg.VerificationMethod,
@@ -44,7 +45,6 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *v1.MsgCreateDid) (*v1.M
 		KeyAgreement:         didMsg.KeyAgreement,
 		AlsoKnownAs:          didMsg.AlsoKnownAs,
 		Service:              didMsg.Service,
-		Context:              didMsg.Context,
 	}
 
 	metadata := v1.NewMetadata(ctx)
@@ -97,6 +97,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *v1.MsgUpdateDid) (*v1.M
 	}
 
 	var did = v1.Did{
+		Context:              didMsg.Context,
 		Id:                   didMsg.Id,
 		Controller:           didMsg.Controller,
 		VerificationMethod:   didMsg.VerificationMethod,
@@ -107,7 +108,6 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *v1.MsgUpdateDid) (*v1.M
 		KeyAgreement:         didMsg.KeyAgreement,
 		AlsoKnownAs:          didMsg.AlsoKnownAs,
 		Service:              didMsg.Service,
-		Context:              didMsg.Context,
 	}
 
 	metadata := v1.NewMetadata(ctx)

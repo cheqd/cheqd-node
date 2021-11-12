@@ -4,7 +4,22 @@
 
 set -euox pipefail
 
-source "../common.sh"
+# cheqd_noded docker wrapper
+
+cheqd_noded_docker() {
+  docker run --rm \
+    -v "$(pwd)":"/cheqd" \
+    cheqd-node "$@"
+}
+
+# sed in macos requires extra argument
+
+sed_extension=''
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    sed_extension=''
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    sed_extension='.orig'
+fi
 
 pushd "node_configs/node0"
 

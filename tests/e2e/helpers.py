@@ -28,10 +28,12 @@ LOCAL_NET_DESTINATION_HTTP = f"{LOCAL_NET_NODE_HTTP} --chain-id 'cheqd'"
 TEST_NET_FEES = "--fees 5000000ncheq"
 TEST_NET_GAS_X_GAS_PRICES = "--gas 90000 --gas-prices 25ncheq"
 YES_FLAG = "-y"
+KEYRING_BACKEND_TEST = "--keyring-backend test"
 DENOM = "ncheq"
 GAS_AMOUNT = 90000 # 70000 throws `out of gas` sometimes
 GAS_PRICE = 25
 TEST_NET_GAS_X_GAS_PRICES_INT = GAS_AMOUNT * GAS_PRICE
+MAX_GAS_MAGIC_NUMBER = 1.3
 
 # addresses and mnemonics for test net docker image
 SENDER_ADDRESS = "cheqd1rnr5jrt4exl0samwj0yegv99jeskl0hsxmcz96"
@@ -81,10 +83,10 @@ async def get_balance_vdr(pool_alias, address):
 
 def send_with_note(note):
     try:
-        cli = run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 1000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} --note {note}", fr"{CODE_0}(.*?)\"value\":\"1000ncheq\"")
+        cli = run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 1000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} {KEYRING_BACKEND_TEST} --note {note}", fr"{CODE_0}(.*?)\"value\":\"1000ncheq\"")
     except pexpect.exceptions.EOF:
         time.sleep(IMPLICIT_TIMEOUT)
-        cli = run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 1000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} --note {note}", fr"{CODE_0}(.*?)\"value\":\"1000ncheq\"")
+        cli = run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {LOCAL_RECEIVER_ADDRESS} 1000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} {KEYRING_BACKEND_TEST} --note {note}", fr"{CODE_0}(.*?)\"value\":\"1000ncheq\"")
 
     tx_hash = re.search(r"\"txhash\":\"(.+?)\"", cli.before).group(1).strip()
 
@@ -92,6 +94,27 @@ def send_with_note(note):
 
 
 async def send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, msg, memo):
+    account_number, sequence_number = await get_base_account_number_and_sequence(pool_alias, sender_address)
+    timeout_height = await get_timeout_height(pool_alias)
+    test_tx = await cheqd_ledger.auth.build_tx(
+        pool_alias, public_key, msg, account_number, sequence_number, GAS_AMOUNT, GAS_AMOUNT*GAS_PRICE, DENOM, sender_address, timeout_height, memo
+    )
+    request = await cheqd_ledger.tx.build_query_simulate(test_tx)
+    response = await cheqd_pool.abci_query(pool_alias, request)
+    response = await cheqd_ledger.tx.parse_query_simulate_resp(response)
+    gas_estimation = json.loads(response)["gas_info"]["gas_used"]
+    fees = int(gas_estimation*MAX_GAS_MAGIC_NUMBER*GAS_PRICE)
+    prod_tx = await cheqd_ledger.auth.build_tx(
+        pool_alias, public_key, msg, account_number, sequence_number, int(gas_estimation*MAX_GAS_MAGIC_NUMBER), fees, DENOM, SENDER_ADDRESS, timeout_height, memo
+    )
+    tx_signed = await cheqd_ledger.auth.sign_tx(wallet_handle, key_alias, prod_tx)
+    res = json.loads(await cheqd_pool.broadcast_tx_commit(pool_alias, tx_signed))
+    tx_hash = res["hash"]
+
+    return res, tx_hash, fees
+
+
+async def send_tx_helper_alt(pool_alias, wallet_handle, key_alias, public_key, sender_address, msg, memo):
     account_number, sequence_number = await get_base_account_number_and_sequence(pool_alias, sender_address)
     timeout_height = await get_timeout_height(pool_alias)
     tx = await cheqd_ledger.auth.build_tx(
@@ -115,7 +138,7 @@ async def get_tx_helper(pool_alias, tx_hash):
 async def create_did_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, fqdid, vk, memo):
     req = await cheqd_ledger.cheqd.build_msg_create_did(fqdid, vk)
     signed_req = await cheqd_ledger.cheqd.sign_msg_write_request(wallet_handle, fqdid, bytes(req))
-    res, _ = await send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, bytes(signed_req), memo)
+    res, _, _ = await send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, bytes(signed_req), memo)
 
     return res
 
@@ -130,19 +153,19 @@ async def query_did_helper(pool_alias, fqdid):
 async def update_did_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, fqdid, new_vk, version_id, memo):
     req = await cheqd_ledger.cheqd.build_msg_update_did(fqdid, new_vk, version_id)
     signed_req = await cheqd_ledger.cheqd.sign_msg_write_request(wallet_handle, fqdid, bytes(req))
-    res, _ = await send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, bytes(signed_req), memo)
+    res, _, _ = await send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, bytes(signed_req), memo)
 
     return res
 
 
 def set_up_operator():
     name = random_string(10)
-    cli = run("cheqd-noded keys", "add", name, r"mnemonic: \"\"")
+    cli = run("cheqd-noded keys", "add", f"{name} {KEYRING_BACKEND_TEST}", r"mnemonic: \"\"")
     address = re.search(r"address: (.+?)\n", cli.before).group(1).strip()
     print(address)
     pubkey = re.search(r"pubkey: (.+?)\n", cli.before).group(1).strip()
     print(pubkey)
-    run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {address} 1100000000000000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG}", fr"{CODE_0}(.*?)\"value\":\"1100000000000000ncheq\"")
+    run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {address} 1100000000000000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} {KEYRING_BACKEND_TEST}", fr"{CODE_0}(.*?)\"value\":\"1100000000000000ncheq\"")
 
     return name, address, pubkey
 
