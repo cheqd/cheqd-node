@@ -150,9 +150,9 @@ def test_keys_import_wrong_data(action, expected_result):
     passphrase = random_string(8)
     filename = "/home/{}/key.txt".format(getpass.getuser())
 
-    run(command_base, "add", f"{key_name} --keyring-backend 'test'", "name: {}".format(key_name))
+    run(command_base, "add", f"{key_name} {KEYRING_BACKEND_TEST}", "name: {}".format(key_name))
 
-    cli = run(command_base, "export", key_name, "Enter passphrase")
+    cli = run(command_base, "export", f"{key_name} {KEYRING_BACKEND_TEST}", "Enter passphrase")
     run_interaction(cli, passphrase, "BEGIN")
 
     cli_output = cli.read()
@@ -175,7 +175,7 @@ def test_keys_import_wrong_data(action, expected_result):
     text_file.write(key_content)
     text_file.close()
 
-    cli = run(command_base, "delete", key_name, "Continue?")
+    cli = run(command_base, "delete", f"{key_name} {KEYRING_BACKEND_TEST}", "Continue?")
     run_interaction(cli, "y", "Key deleted forever")
 
     cli = run(command_base, "import", "{} {}".format(key_name, filename), "Enter passphrase to decrypt your key")
@@ -188,7 +188,7 @@ def test_keys_import_wrong_data(action, expected_result):
 def test_keys_parse():
     command_base = "cheqd-noded keys"
     key_name = "parse_key_{}".format(random_string(4))
-    cli = run(command_base, "add", key_name, "name: {}".format(key_name))
+    cli = run(command_base, "add", f"{key_name} {KEYRING_BACKEND_TEST}", "name: {}".format(key_name))
 
     bech32 = re.search('[a-zA-Z0-9]{44}', cli.read()).group(0)
     print(bech32)
@@ -206,7 +206,7 @@ def test_keys_parse():
               "- cheqdvalcons[a-z0-9]{39}(.*?)" +
               "- cheqdvalconspub[a-z0-9]{39}")
 
-    cli = run(command_base, "delete", key_name, "Continue?")
+    cli = run(command_base, "delete", f"{key_name} {KEYRING_BACKEND_TEST}", "Continue?")
     run_interaction(cli, "y", "Key deleted forever")
 
 
@@ -277,7 +277,7 @@ def test_tendermint(command, params, expected_output):
     run(command_base, command, params, expected_output)
 
 
-@settings(deadline=None, max_examples=20)
+@settings(deadline=None, max_examples=1) # 20
 @given(note=strategies.text(ascii_letters, min_size=2, max_size=1024)) # start from 2 - cosmos issue with single word memo
 def test_memo(note): # intermittent failures here due to `Internal error: timed out waiting for tx to be included in a block`
     tx_hash, tx_memo = send_with_note(note)
@@ -288,7 +288,7 @@ def test_memo(note): # intermittent failures here due to `Internal error: timed 
         run("cheqd-noded query", "tx", f"{tx_hash} {LOCAL_NET_DESTINATION}", fr"code: 0(.*?)memo: {tx_memo}(.*?)txhash: {tx_hash}") # check that txn has correct memo value
 
 
-@settings(deadline=None, max_examples=20)
+@settings(deadline=None, max_examples=1) # 20
 @given(value=strategies.integers(min_value=1, max_value=999999999))
 def test_token_transfer(value):
     sender_balance = get_balance(LOCAL_SENDER_ADDRESS, LOCAL_NET_DESTINATION)
