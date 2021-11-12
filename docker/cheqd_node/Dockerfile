@@ -33,7 +33,7 @@ RUN starport chain build
 
 #####  Run container  #####
 
-FROM debian:buster
+FROM ubuntu:focal
 
 # Node binary
 COPY --from=builder /go/bin/cheqd-noded /bin
@@ -46,7 +46,6 @@ ARG CHEQD_HOME_DIR="/cheqd"
 
 RUN groupadd --system --gid 1000 cheqd && \
     useradd --system --create-home --home-dir ${CHEQD_HOME_DIR} --shell /bin/bash --gid cheqd --uid 1000 cheqd
-RUN chown -R cheqd ${CHEQD_HOME_DIR}
 
 WORKDIR ${CHEQD_HOME_DIR}
 USER cheqd
@@ -54,4 +53,4 @@ USER cheqd
 EXPOSE 26656 26657
 STOPSIGNAL SIGTERM
 
-ENTRYPOINT [ "cheqd-noded" ]
+ENTRYPOINT [ "node-runner" ]

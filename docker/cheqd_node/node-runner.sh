@@ -4,18 +4,16 @@
 
 set -euox pipefail
 
-NODE_HOME="$HOME/.cheqdnode"
-
+CHEQD_ROOT_DIR="$HOME/.cheqdnode"
 
 # Init node config directory
-if [ ! -d "${NODE_HOME}/config" ]
+if [ ! -d "${CHEQD_ROOT_DIR}/config" ]
 then
-    echo "Node home not found. Initializing."
-    cheqd-noded init $NODE_MONIKER
+    echo "Node config not found. Initializing."
+    cheqd-noded init $NODE_MONIKER --home 
 else
-    echo "Node home exists. Skipping initialization."
+    echo "Node config exists. Skipping initialization."
 fi
-
 
 # Run configure
 # `! -z` is used instead of `-n` to distinguilsh null and empty values
@@ -38,16 +36,9 @@ if [[ ! -z ${P2P_SEND_RATE+x} ]]; then cheqd-noded configure p2p send-rate ${P2P
 set - # Disable ditailed command logging
 
 echo "Updating genesis"
-echo "$GENESIS" | base64 --decode > $NODE_HOME/config/genesis.json
-
-echo "Updating node key"
-echo "$NODE_KEY" | base64 --decode > $NODE_HOME/config/node_key.json
-
-echo "Updating validator key"
-echo "$PRIV_VALIDATOR_KEY" | base64 --decode > $NODE_HOME/config/priv_validator_key.json
+echo "$GENESIS" | base64 --decode > $CHEQD_ROOT_DIR/config/genesis.json
 
 set -x # Re-enable ditailed command logging
-
 
 # Run node
 NODE_ARGS=${NODE_ARGS:-}  # Allo node args to be empty

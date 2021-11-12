@@ -12,7 +12,7 @@ You can find prebuilt package here:
 
 To pull it use:
 
-```text
+```bash
 docker pull ghcr.io/cheqd/cheqd-node:latest
 ```
 
@@ -35,7 +35,7 @@ Note: If you are using M1 Macbook you should modify the FROM statement in the Do
 
 Usage:
 
-```text
+```bash
 docker run -it --rm cheqd-node <command> <args>
 ```
 
@@ -47,8 +47,6 @@ Parameters that can be passed via environment variables:
 
 * `NODE_MONIKER` - node moniker;
 * `GENESIS` - base64 encoded content of `genesis.json`;
-* `NODE_KEY` - base64 encoded content of `node_key.json`;
-* `PRIV_VALIDATOR_KEY` - base64 encoded content of `priv_validator_key.json`;
 * `NODE_ARGS` \(optional\) - argument string passed to the `cheqd-noded start` command.
 
 Additional parameters that will be applied via `cheqd-noded configure`:
@@ -68,6 +66,6 @@ Additional parameters that will be applied via `cheqd-noded configure`:
 
 Usage:
 
-```text
-docker run -it --rm --entrypoint node-runner -e NODE_MONIKER=<moniker> -e GENESIS="<content>" -e NODE_KEY="<content>" -e PRIV_VALIDATOR_KEY="<content>" cheqd-node
+```bash
+docker run -it -v data:/cheqd --rm --entrypoint node-runner -e NODE_MONIKER=<moniker> -e GENESIS="<content>" cheqd-node
 ```
