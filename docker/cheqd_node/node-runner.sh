@@ -18,9 +18,18 @@ fi
 
 
 # Update configs
+set - # Disable ditailed command logging
+
+echo "Updating genesis"
 echo "$GENESIS" | base64 --decode > $NODE_HOME/config/genesis.json
+
+echo "Updating node key"
 echo "$NODE_KEY" | base64 --decode > $NODE_HOME/config/node_key.json
+
+echo "Updating validator key"
 echo "$PRIV_VALIDATOR_KEY" | base64 --decode > $NODE_HOME/config/priv_validator_key.json
+
+set -x # Re-enable ditailed command logging
 
 # Run node
 NODE_ARGS=${NODE_ARGS:-}  # Allo node args to be empty
