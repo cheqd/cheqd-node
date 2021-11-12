@@ -43,7 +43,7 @@ docker run -it --rm cheqd-node <command> <args>
 
 Used to initialize configuration files and run a node in one command.
 
-Parameters:
+Parameters that can be passed via environment variables:
 
 * `NODE_MONIKER` - node moniker;
 * `GENESIS` - base64 encoded content of `genesis.json`;
@@ -51,9 +51,23 @@ Parameters:
 * `PRIV_VALIDATOR_KEY` - base64 encoded content of `priv_validator_key.json`;
 * `NODE_ARGS` \(optional\) - argument string passed to the `cheqd-noded start` command.
 
+Additional parameters that will be applied via `cheqd-noded configure`:
+
+* `CREATE_EMPTY_BLOCKS`
+* `FASTSYNC_VERSION`
+* `MIN_GAS_PRICES`
+* `RPC_LADDR`
+* `P2P_EXTERNAL_ADDRESS`
+* `P2P_LADDR`
+* `P2P_MAX_PACKET_MSG_PAYLOAD_SIZE`
+* `P2P_PERSISTENT_PEERS`
+* `P2P_RECV_RATE`
+* `P2P_SEED_MODE`
+* `P2P_SEEDS`
+* `P2P_SEND_RATE`
+
 Usage:
 
 ```text
 docker run -it --rm --entrypoint node-runner -e NODE_MONIKER=<moniker> -e GENESIS="<content>" -e NODE_KEY="<content>" -e PRIV_VALIDATOR_KEY="<content>" cheqd-node
 ```
-
