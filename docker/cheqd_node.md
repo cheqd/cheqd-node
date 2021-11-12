@@ -23,6 +23,8 @@ To build the image:
 * Go to the repository root;
 * Run `docker build -f docker/cheqd_node/Dockerfile -t cheqd-node .`.
 
+Default home directory for `cheqd` user is `/cheqd`. It can be overridden via `CHEQD_HOME_DIR` build argument. Example: `--build-arg CHEQD_HOME_DIR=/home/cheqd`.
+
 Note: If you are using M1 Macbook you should modify the FROM statement in the Dockerfile, should be like this "FROM --platform=linux/amd64 golang:buster as builder "
 
 ## Usage
