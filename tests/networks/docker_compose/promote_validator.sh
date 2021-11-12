@@ -2,9 +2,9 @@
 sudo chown -R runner:docker ${NODE_CONFIGS_BASE}/client
 export HOME=${NODE_CONFIGS_BASE}/client
 cheqd-noded keys list --keyring-backend "test"
-OP0_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
+OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test"| sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
 cheqd-noded keys add node5-operator --keyring-backend "test"
-OP5_ADDRESS=$(cheqd-noded keys list | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
+OP5_ADDRESS=$(cheqd-noded keys list --keyring-backend "test"| sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
 export HOME=/home/runner
 NODE5_PUBKEY=$(cheqd-noded tendermint show-validator | sed 's/\r//g')
 HOME=${NODE_CONFIGS_BASE}/client cheqd-noded tx bank send ${OP0_ADDRESS} ${OP5_ADDRESS} 1100000000000000ncheq --chain-id cheqd --fees 5000000ncheq --node "http://localhost:26657" -y --keyring-backend "test"
