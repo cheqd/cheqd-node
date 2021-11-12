@@ -34,6 +34,9 @@ if ! /usr/bin/getent passwd ${CHEQD_USER_NAME} > /dev/null 2>&1 ; then
 
 fi
 
+# Create root directory if needed
+mkdir -p ${CHEQD_ROOT_DIR}
+
 # Set permissions and ownership for cheqd root directory
 chown -R ${CHEQD_USER_NAME}:${CHEQD_USER_NAME} ${CHEQD_ROOT_DIR}
 
@@ -43,6 +46,7 @@ then
     echo "Node configuration directory not found. Initializing."
     mkdir -p ${CHEQD_CONFIG_DIR}
     chmod -R 0755 ${CHEQD_CONFIG_DIR}
+    chown -R ${CHEQD_USER_NAME}:${CHEQD_USER_NAME} ${CHEQD_CONFIG_DIR}
 else
     echo "Node configuration exists. Skipping."
 fi
@@ -53,6 +57,7 @@ then
     echo "Node configuration data not found. Initializing."
     mkdir -p ${CHEQD_DATA_DIR}
     chmod -R 0755 ${CHEQD_DATA_DIR}
+    chown -R ${CHEQD_USER_NAME}:${CHEQD_USER_NAME} ${CHEQD_DATA_DIR}
 else
     echo "Node data exists. Skipping."
 fi
