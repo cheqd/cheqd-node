@@ -42,6 +42,6 @@
 
 ---
 
-* [Code of Conduct](CODE_OF_CONDUCT.md)
-* [Security Policy](SECURITY.md)
-* [Notice](NOTICE.md)
+* [Code of Conduct](code_of_conduct.md)
+* [Security Policy](security.md)
+* [Notice](notice.md)
