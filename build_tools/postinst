@@ -5,8 +5,9 @@ CHEQD_USER_NAME=cheqd
 # Home directory location can be passed when running dpkg -i
 if [ -z ${CHEQD_HOME_DIR+x} ]; then
   CHEQD_HOME_DIR=/home/${CHEQD_USER_NAME}
-  CHEQD_ROOT_DIR=${CHEQD_HOME_DIR}/.cheqdnode
 fi
+
+CHEQD_ROOT_DIR=${CHEQD_HOME_DIR}/.cheqdnode
 
 # If there is an argument then assume using as binary + script instead of apt
 if [ -n "$1" ] && [ -f "$1" ] ; then
