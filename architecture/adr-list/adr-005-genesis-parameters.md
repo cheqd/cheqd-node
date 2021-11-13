@@ -6,14 +6,14 @@
 | :--- | :--- |
 | **Authors** | Alexandr Kolesov |
 | **ADR Stage** | ACCEPTED |
-| **Implementation Status** | Not Implemented |
+| **Implementation Status** | Implemented |
 | **Start Date** | 2021-09-15 |
 
 ## Summary
 
 The aim of this document is to define the genesis parameters that will be used in cheqd network testnet and mainnet.
 
-> Cosmos v0.44.2 parameters are described.
+> Cosmos v0.44.3 parameters are described.
 
 ## Context
 
@@ -23,19 +23,18 @@ Genesis consists of Tendermint consensus engine parameters and Cosmos app-specif
 
 Tendermint requires [genesis parameters](https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#genesis) to be defined for basic consensus conditions on any Cosmos network.
 
-#### Proposed values
-
 * **`block`**
-  * `max_bytes` = `200000` \(~200KB\)
-    * Cosmos Hub: `200000` \(~200KB\)
+  * `max_bytes` = `200000` \(~200 KB\)
+    * Cosmos Hub: `200000` \(~200 KB\)
   * `max_gas` = `2000000` \(~20 txs\)
     * Cosmos Hub: `2000000` \(~20 txs\)
+  * `time_iota_ms` = `1000` (1 second)
 * **`evidence`**
-  * `max_age_num_blocks` = `1576800`
+  * `max_age_num_blocks` = `121000`
     * Maximum age of evidence, in blocks. The basic formula for calculating this is: `MaxAgeDuration / {average block time}`.
-  * `max_age_duration` = `7884000`
+  * `max_age_duration` = `1209600000000000` (expressed in nanoseconds, ~2 weeks)
     * Maximum age of evidence, in time. It should correspond with an app's "unbonding period".
-  * `max_bytes` = `1048576`
+  * `max_bytes` = `50000` (~ 50 KB)
     * This sets the maximum size of total evidence in bytes that can be committed in a single block and should fall comfortably under `max_bytes` for a block.
 * **`validator`**
   * `pub_key_types` = `[ "ed25519" ]`
@@ -82,40 +81,41 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
     * voting\_period = `1210000s` \(2 weeks\)
   * `tally_params`
     * `quorum` = `0.334`
-      * Minimum percentage of total stake needed to vote for a result to be considered valid. 
+      * Minimum percentage of total stake needed to vote for a result to be considered valid.
     * `threshold` = `0.5`
       * Minimum proportion of Yes votes for proposal to pass.
     * `veto_threshold` = `0.334`
       * The minimum value of veto votes to total votes ratio for proposal to be vetoed. Default value: 1/3.
 * **`mint`**
   * `mint_denom` = `ncheq`
-  * `inflation_rate_change` = `0.02`
+  * `inflation_rate_change` = `0.045`
     * Maximum inflation rate change per year
     * In Cosmos Hub they use `1.0`
-    * Formula: `inflationRateChangePerYear = (1 - BondedRatio/ GoalBonded) * MaxInflationRateChange`
+    * Formula: `inflationRateChangePerYear = (1 - BondedRatio / GoalBonded) * MaxInflationRateChange`
   * `inflation_max` = `0.04`
-    * Inflation aims to this value if `bonded_ratio` &lt; `bonded_goal`
+    * Inflation aims to this value if `bonded_ratio` < `bonded_goal`
     * Cosmos Hub: `0.20`
   * `inflation_min` = `0.01`
-    * Inflation aims to this value if `bonded_ratio` &lt; `bonded_goal`
+    * Inflation aims to this value if `bonded_ratio` > `bonded_goal`
     * Cosmos Hub: `0.07`
   * `goal_bonded` = `0.60`
     * Cosmos Hub: `0.67`
-  * `blocks_per_year` = `6311520` \(~5s\)
+  * `blocks_per_year` = `3155760` (1 block every ~10 seconds)
     * Cosmos Hub: `4360000`
 * **`slashing`**
-  * `signed_blocks_window` = `120960` \(1 week\)
+  * `signed_blocks_window` = `25920` (expressed in blocks, equates to 259200 seconds or ~3 days)
     * Cosmos Hub: `10000` \(~20h\)
+    * Number of blocks a validator can miss signing before it is slashed
   * `min_signed_per_window`= `0.50`
     * This percentage of blocks must be signed within the window
-  * `downtime_jail_duration` = `600s`
+  * `downtime_jail_duration` = `600s` (~10 minutes)
     * The minimal time validator have to stay in jail
   * `slash_fraction_double_sign` = `0.05`
     * Slash for double sign
   * `slash_fraction_downtime` = `0.01`
     * Slash for downtime
 * **`staking`**
-  * `unbonding_time` = `1814400s` \(3 weeks\)
+  * `unbonding_time` = `1210000s` (~2 weeks)
     * A delegator must wait this time before tokens become unbonded
   * `max_validators` = `125`
     * The maximum number of validators in the network
@@ -126,15 +126,15 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
   * `bond_denom` = `ncheq`
     * Denomination used in staking
 *  **`ibc`**
-  * `max_expected_time_per_block` = `20000000000`
-    * Maximum expected time per block (in nanoseconds), used to enforce block delay. This parameter should reflect the largest amount of time that the chain might reasonably take to produce the next block under normal operating conditions. A safe choice is 3-5x the expected time per block.
-  * `allowed_clients` = `[ "07-tendermint" ]` (allow connections only from other chains)
-    * Defines the list of allowed client state types. We allow connections only from other chains.
-* **`ibc-transfer`**
-  * `send_enabled` = `true`
-    * Enables or disables all cross-chain token transfers from this chain
-  * `receive_enabled` = `true`
-    * Enables or disables all cross-chain token transfers to this chain
+     * `max_expected_time_per_block` = `30000000000` (expressed in nanoseconds, ~ 30 seconds)
+       * Maximum expected time per block, used to enforce block delay. This parameter should reflect the largest amount of time that the chain might reasonably take to produce the next block under normal operating conditions. A safe choice is 3-5x the expected time per block.
+     * `allowed_clients` = `[ "06-solomachine", "07-tendermint" ]`
+       * Defines the list of allowed client state types. We allow connections from other chains using the [Tendermint client](https://github.com/cosmos/ibc-go/blob/main/modules/light-clients/07-tendermint), and with light clients using the [Solo Machine client](https://github.com/cosmos/ibc-go/blob/main/modules/light-clients/06-solomachine).
+   * **`ibc-transfer`**
+     * `send_enabled` = `true`
+       * Enables or disables all cross-chain token transfers from this chain
+     * `receive_enabled` = `true`
+       * Enables or disables all cross-chain token transfers to this chain
 
 ## Decision
 
