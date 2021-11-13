@@ -42,11 +42,11 @@ We plan on adding new functionality rapidly and on a regular basis. We are also 
 
 ## Building from source
 
-`cheqd-node` is created with [Starport](https://github.com/tendermint/starport). If you want to build a node from source or contribute to the code, please read our guide to [building and testing](https://github.com/cheqd/cheqd-node/tree/f74ec3e0ad08adcf2e4173de80dbd9442edc337e/docs/building-and-testing.md).
+`cheqd-node` is created with [Starport](https://github.com/tendermint/starport). If you want to build a node from source or contribute to the code, please read our guide to [building and testing](https://github.com/cheqd/cheqd-node/blob/main/docs/build-and-networks/README.md).
 
 ### Creating a local network
 
-If you are building from source, or otherwise interested in running a local network, we have [instructions on how to set up a new network](https://github.com/cheqd/cheqd-node/tree/f74ec3e0ad08adcf2e4173de80dbd9442edc337e/docs/setting-up-a-new-network.md) for development purposes.
+If you are building from source, or otherwise interested in running a local network, we have [instructions on how to set up a new network](https://github.com/cheqd/cheqd-node/blob/main/docs/build-and-networks/build-and-networks.md) for development purposes.
 
 ## Community
 
