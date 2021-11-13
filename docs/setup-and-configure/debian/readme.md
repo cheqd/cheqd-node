@@ -25,7 +25,7 @@ This section describes the system changes that our Debian packages attempt to ca
 
 By default, Cosmos SDK creates all requisite directories in the `HOME` directory of the user that initiates installation.
 
-Our package creates a new system user called `cheqd` with home directory set to `/home/cheqd`. This allows node operators to keep sysadmin / standard users separate from the service user. Home directory can be changed by setting `CHEQD_HOME_DIR` environment variable before installation.
+Our package creates a new system user called `cheqd` with home directory set to `/home/cheqd`. This allows node operators to keep sysadmin / standard users separate from the service user. Home directory can be changed by passing a variable called `CHEQD_HOME_DIR` before executing installation.
 
 ### Directory location configuration
 
@@ -39,16 +39,22 @@ To keep `cheqd-node` configuration data in segregated from userspace home direct
 * `$HOME/.cheqdnode/data`
   * Location for ledger data
   * Ownership permission set to: `cheqd:cheqd`
-* `$HOME/.cheqdnode/log`
-  * Location for app logs
-  * Ownership persmissions set to: `syslog:adm` \(set by rsyslog\)
 
 ### Logging configuration
 
+The default logging location and permissions are as follows:
+
+* `$HOME/.cheqdnode/log`
+  * Location for app logs
+  * Ownership permissions set to: `syslog:cheqd` \(set by rsyslog\)
+
+The log location can be overridden by passing the variable `CHEQD_LOG_DIR` before executing the installation proceess.
+
 `rsyslog` is configured to redirect logs from the `cheqd-node` daemon to the log directory defined above.
 
+
 ```bash
-if \$programname == 'cheqd-noded' then /var/log/cheqd-node/stdout.log
+if \$programname == 'cheqd-noded' then ${CHEQD_LOG_DIR}/stdout.log
 & stop
 ```
 
@@ -60,11 +66,12 @@ Our installer makes the following changes:
 
 * Sets the maximum filesize of the `stdout.log` file is set to 100 MB, after which the log file is compressed and stored separately. The `stdout.log` file then continues with storing newer log entries.
 * Archives logs are deleted after 30 days.
-* Once a day, a cron job is executed to run `logrotate` actions.
+* Once a day, uses the `logrotate.timer` service to rotate logs.
 
-```text
-/var/log/cheqd-node/stdout.log {
+```bash
+${CHEQD_LOG_DIR}/stdout.log {
   rotate 30
+  daily
   maxsize 100M
   notifempty
   copytruncate
@@ -117,7 +124,5 @@ This will remove all configuration files created during installation process fro
 ```text
 /etc/rsyslog.d/cheqd-node.conf
 /etc/logrotate.d/cheqd-node
-/etc/cron.daily/cheqd-node
-/etc/systemd/system/cheqd-noded.service
+/lib/systemd/system/cheqd-noded.service
 ```
-
