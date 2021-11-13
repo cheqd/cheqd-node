@@ -24,5 +24,3 @@ mkdir -p $TMP_DIR
 cp $PATH_TO_BIN $TMP_DIR
 
 tar -czf $PATH_TAR $TMP_DIR
-
-

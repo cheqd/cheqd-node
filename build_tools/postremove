@@ -1,11 +1,38 @@
 #!/bin/bash
 
-# Get rid of systemd service
+# Remove cheqd-noded systemd service
 if test -f "/lib/systemd/system/cheqd-noded.service"; then
-    # Stop systemd service firstly
-    systemctl stop cheqd-noded
+    # Stop cheqd-noded service
+    systemctl stop cheqd-noded.service
 
+    # Disable cheqd-noded service
+    systemctl disable cheqd-noded.service
+
+    # Remove link in systemd service libraries folder
     rm /lib/systemd/system/cheqd-noded.service
-    # Reload systemd daemons
-    systemctl daemon-reload
 fi
+
+# Remove rsyslog config for cheqd-noded
+if test -f "/etc/rsyslog.d/cheqd-node.conf"; then
+    # Remove syslog conf
+    rm /etc/rsyslog.d/cheqd-node.conf
+
+    # Remove symlink to log location
+    rm /var/log/cheqd-node
+
+    # Restart syslog
+    systemctl restart rsyslog
+fi
+
+# Remove logrotate config for cheqd-noded
+if test -f "etc/logrotate.d/cheqd-node"; then
+    # Remove syslog conf
+    rm /etc/rsyslog.d/cheqd-node.conf
+
+    # Restart logrotate
+    systemctl restart logrotate.service
+    systemctl restart logrotate.timer
+fi
+
+# Reload systemd daemons
+systemctl daemon-reload

@@ -7,6 +7,8 @@ if [ -z ${CHEQD_HOME_DIR+x} ]; then
   CHEQD_HOME_DIR=/home/${CHEQD_USER_NAME}
 fi
 
+CHEQD_ROOT_DIR=${CHEQD_HOME_DIR}/.cheqdnode
+
 # If there is an argument then assume using as binary + script instead of apt
 if [ -n "$1" ] && [ -f "$1" ] ; then
   cp "$1" /usr/bin/
@@ -18,13 +20,15 @@ if ! /usr/bin/getent passwd ${CHEQD_USER_NAME} > /dev/null 2>&1 ; then
   addgroup ${CHEQD_USER_NAME} --quiet
   echo "Home directory for user ${CHEQD_USER_NAME} will be set up as ${CHEQD_HOME_DIR}"
   adduser --system ${CHEQD_USER_NAME} --home ${CHEQD_HOME_DIR} --shell /bin/bash --ingroup ${CHEQD_USER_NAME} --quiet
+  mkdir -p ${CHEQD_ROOT_DIR}
+  chown -R ${CHEQD_USER_NAME}:${CHEQD_USER_NAME} ${CHEQD_ROOT_DIR}
 else
   echo "User home directory already exists. Skipping user initialisation."
 fi
 
 # Log directory can be overwritten while running dpkg
 if [ -z ${CHEQD_LOG_DIR+x} ]; then
-  CHEQD_LOG_DIR=${CHEQD_HOME_DIR}/.cheqdnode/log
+  CHEQD_LOG_DIR=${CHEQD_ROOT_DIR}/log
 fi
 
 # Create node log directory
@@ -32,6 +36,7 @@ if [ ! -d "${CHEQD_LOG_DIR}" ]
 then
     echo "Node log directory not found. Initializing."
     mkdir -p ${CHEQD_LOG_DIR}
+    touch ${CHEQD_LOG_DIR}/stdout.log
     chown -R syslog:${CHEQD_USER_NAME} ${CHEQD_LOG_DIR}
 else
     echo "Node log directory exists. Skipping."
