@@ -36,7 +36,7 @@ We plan on supporting other operating systems in the future, based on demand for
 
 We recommend using a storage path that can be kept persistent and restored/remounted (if necessary) for the configuration, data, and log directories associated with a node. This allows a node to be restored along with configuration files such as node keys and for the node's copy of the ledger to be restored without triggering a full chain sync.
 
-The default directory location for `cheqd-node` installations is `$HOME/.cheqdnode`, which computes to `/home/cheqd/.cheqdnode` when [using the Debian package installer](debian/readme.md). Custom paths can be defined if desired.
+The default directory location for `cheqd-node` installations is `$HOME/.cheqdnode`, which computes to `/home/cheqd/.cheqdnode` when [using the Debian package installer](debian/README.md). Custom paths can be defined if desired.
 
 ### Ports
 
