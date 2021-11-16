@@ -78,7 +78,7 @@ All participants should [setup their nodes](../setup-and-configure/README.md) us
 
 #### Sharing peer list
 
-All participants should share their peer info with each other. See [node setup instruction](https://github.com/cheqd/cheqd-node/tree/f74ec3e0ad08adcf2e4173de80dbd9442edc337e/docs/build-and-networks/setup-and-configure/readme.md) for more information.
+All participants should share their peer info with each other. See [node setup instruction](../setup-and-configure/README.md) for more information.
 
 #### Updating genesis and persistent peers
 
