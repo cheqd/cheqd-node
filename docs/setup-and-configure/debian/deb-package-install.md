@@ -48,7 +48,7 @@ This document provides guidance on how to install and configure a node for the c
 
 3. **Switch to the `cheqd` system user**
 
-   Always switch to `cheqd` user before managing node. By default, the node stores configuration files in the home directory for the user that initialises the node. By switching to the special `cheqd` system user, you can ensure that the configuration files are stored in the [system app data directories](readme.md) configured by the Debian package.
+   Always switch to `cheqd` user before managing node. By default, the node stores configuration files in the home directory for the user that initialises the node. By switching to the special `cheqd` system user, you can ensure that the configuration files are stored in the [system app data directories](README.md) configured by the Debian package.
 
    ```bash
    sudo su cheqd
@@ -125,7 +125,7 @@ This document provides guidance on how to install and configure a node for the c
 
 9. **Make the RPC endpoint available externally** \(optional\)
 
-   This step is necessary only if you want to allow incoming client application connections to your node. Otherwise, the node will be accessible only locally. Further details about the RPC endpoints is available in the [cheqd node setup guide](../readme.md).
+   This step is necessary only if you want to allow incoming client application connections to your node. Otherwise, the node will be accessible only locally. Further details about the RPC endpoints is available in the [cheqd node setup guide](../README.md).
 
    ```bash
    cheqd-noded configure rpc-laddr "tcp:\/\/0.0.0.0:26657"
