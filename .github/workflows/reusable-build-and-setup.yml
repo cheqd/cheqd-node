@@ -12,7 +12,6 @@ jobs:
   build-deb-package:
     name: Build binary and create deb package
     runs-on: ubuntu-20.04
-    needs: test
     steps:
       - name: Set up Go 1.16
         uses: actions/setup-go@v2
@@ -53,7 +52,7 @@ jobs:
   build-images-and-set-up-pool:
     name: Build cheqd-node and testnet Docker images, install deb package and run Docker pool
     runs-on: ubuntu-20.04
-    needs: build
+    needs: build-deb-package
     steps:
       - name: Download deb
         uses: actions/download-artifact@v2
