@@ -45,7 +45,7 @@ jobs:
           PACKAGES=$(go list ./...)
           go test -v $PACKAGES
 
-  build:
+  build-deb-package:
     name: Build binary and create deb package
     runs-on: ubuntu-20.04
     needs: test
