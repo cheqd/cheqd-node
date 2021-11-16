@@ -13,18 +13,18 @@ This document provides guidance on how to install and configure a node for the c
 1. **Download** [**the latest release of `cheqd-node` .deb**](https://github.com/cheqd/cheqd-node/releases/latest) **package**
 
    ```bash
-    wget https://github.com/cheqd/cheqd-node/releases/download/v0.2.3/cheqd-node_0.2.3_amd64.deb
+    wget https://github.com/cheqd/cheqd-node/releases/download/v0.3.1/cheqd-node_0.3.1_amd64.deb
    ```
 
 2. **Install the package**
 
    ```bash
-   sudo dpkg -i cheqd-node_0.2.3_amd64.deb
+   sudo dpkg -i cheqd-node_0.3.1_amd64.deb
    ```
 
    As a part of installation `cheqd` user will be created. By default, `HOME` directory for the user is `/home/cheqd`, but it can be changed by setting `CHEQD_HOME_DIR` environment variable before running `dpkg` command, like:
    ```bash
-   sudo CHEQD_HOME_DIR=/path/to/home/directory dpkg -i cheqd-node_0.2.4_amd64.deb
+   sudo CHEQD_HOME_DIR=/path/to/home/directory dpkg -i cheqd-node_0.3.1_amd64.deb
    ```
    P.S. ability to change default `$HOME` directory is supported only in version `0.2.4` and upper.
 
