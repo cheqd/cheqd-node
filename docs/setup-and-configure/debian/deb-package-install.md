@@ -11,7 +11,7 @@ This document provides guidance on how to install and configure a node for the c
 ## Installation steps for `cheqd-node` .deb
 
 1. **Download** [**the latest release of `cheqd-node` .deb**](https://github.com/cheqd/cheqd-node/releases/latest) **package**
-   
+
    For mainnet nodes, use v0.3.1+
 
    ```bash
@@ -39,7 +39,7 @@ This document provides guidance on how to install and configure a node for the c
    ```
 
    As a part of installation `cheqd` user will be created. By default, `HOME` directory for the user is `/home/cheqd`, but it can be changed by setting `CHEQD_HOME_DIR` environment variable before running `dpkg` command. Additionnally, a custom logging directory can also be defined by passing the environment variable `CHEQD_LOG_DIR` (defaults to `/home/cheqd/.cheqdnode/log`):
-   
+
    Example custom directories:
 
    ```bash
@@ -97,10 +97,10 @@ This document provides guidance on how to install and configure a node for the c
    After the `SEEDS` variable is defined, pass the values to the `cheqd-noded configure` tool to set it in the configuration file.
 
    ```bash
-   echo $SEEDS
+   $ echo $SEEDS
    # Comma separated list should be printed
    
-   cheqd-noded configure p2p seeds "$SEEDS"
+   $ cheqd-noded configure p2p seeds "$SEEDS"
    ```
 
 7. **Set gas prices accepted by the node**
@@ -112,15 +112,15 @@ This document provides guidance on how to install and configure a node for the c
    ```
 
 8. **Define the external peer-to-peer address**
-   
+
    Unless you are running a node in a sentry/validator two-tier architecture, your node should be reachable on its peer-to-peer (P2P) port by other other nodes. This can be defined by setting the `external-address` property which defines the externally reachable address. This can be defined using either IP address or DNS name followed by the P2P port (Default: 26656).
-   
+
    ```bash
    cheqd-noded configure p2p external-address <ip-address-or-dns-name:p2p-port>
    # Example
    # cheqd-noded configure p2p external-address 8.8.8.8:26656
    ```
-   
+
    This is especially important if the node has no public IP address, e.g., if it's in a private subnet with traffic routed via a load balancer or proxy. Without the `external-address` property, the node will report a private IP address from its own host network interface as its `remote_ip`, which will be unreachable from the outside world. The node still works in this configuration, but only with limited unidirectional connectivity.
 
 9. **Make the RPC endpoint available externally** \(optional\)
@@ -136,10 +136,10 @@ This document provides guidance on how to install and configure a node for the c
    If you are prompted for a password for the `cheqd` user, type `exit` to logout and then attempt to execute this as a privileged user \(with `sudo` privileges or as root user, if necessary\).
 
    ```bash
-   systemctl enable cheqd-noded
+   $ systemctl enable cheqd-noded
    Created symlink /etc/systemd/system/multi-user.target.wants/cheqd-noded.service → /lib/systemd/system/cheqd-noded.service.
 
-   systemctl start cheqd-noded
+   $ systemctl start cheqd-noded
    ```
 
    Check that the `cheqd-noded` service is running. If successfully started, the status output should return `Active: active (running)`
