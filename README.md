@@ -4,21 +4,30 @@
 
 `cheqd-node` is the server/node portion of the cheqd network stack, built using [Cosmos SDK](https://github.com/cosmos/cosmos-sdk) and [Tendermint](https://github.com/tendermint/tendermint).
 
-## Quick start for joining cheqd mainnet
+## Quick start for joining cheqd networks
+
+Join our [**cheqd Community Slack**](http://cheqd.link/join-cheqd-slack) for help, question, and support if you are looking at joining either the cheqd mainnet or the testnet/ Either the cheqd team, or one of your fellow node operators will be happy to offer some guidance.
+
+### Mainnet
 
 Getting started as a node operator on the cheqd network mainnet requires the following steps:
 
-1. [Install the `cheqd-node` software](docs/setup-and-configure/readme.md) on a hosting platform of your choice.
-2. When you have a node successfully installed, please fill out our [**node operator onboarding form**](http://cheqd.link/mainnet-onboarding). You will need to have the following details on hand to fill out the form:
+1. [Install the `cheqd-node` software](docs/setup-and-configure/README.md) (**version 0.3.1+**) on a hosting platform of your choice.
+2. When you have a node successfully installed, please fill out our [**mainnet node operator onboarding form**](http://cheqd.link/mainnet-onboarding). You will need to have the following details on hand to fill out the form:
    1. Node ID for your node
    2. IP address / DNS record that points to the node \(if you're using an IP address, a static IP is recommended\)
    3. Peer-to-peer \(P2P\) connection port \(defaults to `26656`\)
    4. Validator account address (begins with `cheqd`)
    5. Moniker (Nickname/moniker that is set for your mainnet node)
 3. Once you have received or purchased your tokens, [promote your node to a validator](docs/setup-and-configure/configure-new-validator.md).
-4. If successfully configured, your node would become the latest validator on the cheqd Mainnet! Say hi to the other node operators on our [**cheqd Community Slack**](http://cheqd.link/join-cheqd-slack)
+4. If successfully configured, your node would become the latest validator on the cheqd mainnet!
 
-Any time you have questions or need support, feel free to reach out through the [ask for help](https://cheqd-community.slack.com/archives/C02AQ9UK4HY) channel and either the cheqd team or one of your fellow node operators will be happy to offer some guidance. 
+### Testnet
+
+Joining the cheqd tetsnet is very similar to the instructions above for mainnet, with a few key differences:
+
+1. Install [v0.2.7 of cheqd-node](https://github.com/cheqd/cheqd-node/releases/tag/v0.2.7) (instead of v0.3.1+)
+2. Fill our [testnet node operator onboarding form](http://cheqd.link/join-testnet-form) with the same details as above.
 
 ## Usage
 
@@ -30,14 +39,15 @@ Once installed, `cheqd-node` can be controlled using the [cheqd Cosmos CLI guide
 * Creating, managing, and configuring accounts and keys on a cheqd node
 * Staking and participating in public-permissionless governance
 * Governance framework for public-permissionless self-sovereign identity networks
-* DID method specification
+* Creating [`did:cheqd` method DIDs](architecture/adr-list/adr-002-cheqd-did-method.md), DID Documents ("DIDDocs), and querying full DIDDocs
 
 ### Upcoming functionality
 
 A non-exhaustive list of future planned functionality \(not necessarily in order of priority\) is highlighted below:
 
-* Creating and querying DIDDocs
 * Creating and managing Verifiable Credentials anchored to DIDs on cheqd mainnet
+* Querying DIDDoc fragments and specific resources
+* Defining Schemas and Credential Definitions
 
 We plan on adding new functionality rapidly and on a regular basis. We will be sharing regular updates through our **Live Product Updates** page which includes our product roadmap, release notes, node operator FAQs and more. We welcome feedback on our [cheqd Community Slack](http://cheqd.link/join-cheqd-slack) workspace.
 
