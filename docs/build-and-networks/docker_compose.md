@@ -15,7 +15,7 @@ The set of scripts to generate configurations for a network of four nodes and ru
 
    See [the instruction](docker_compose.md).
 
-2. Build cheqd-noded:
+2. Build cheqd-node:
 
    ```text
     starport chain build
