@@ -63,5 +63,5 @@ When connecting using CLI, point path to home directory: `--home node_configs/cl
 
 ## CLI commands:
 
-See [the reference](https://github.com/cheqd/cheqd-node/tree/f74ec3e0ad08adcf2e4173de80dbd9442edc337e/docs/docs/cosmos-cli.md) to learn about the most common CLI flows.
+See [the reference](docs/../../cheqd-cli/README.md) to learn about the most common CLI flows.
 
