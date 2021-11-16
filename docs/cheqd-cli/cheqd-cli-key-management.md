@@ -2,7 +2,7 @@
 
 ## Overview
 
-[cheqd Cosmos CLI](readme.md) can be used manage keys on a node.Keys are closely related to accounts and on-ledger authentication.
+[cheqd Cosmos CLI](README.md) can be used manage keys on a node.Keys are closely related to accounts and on-ledger authentication.
 
 Account addresses are on a cheqd node are an encoded version of a public key. Each account is linked with at least one public-private key pair. Multi-sig accounts can have more than one key pair associated with them.
 
