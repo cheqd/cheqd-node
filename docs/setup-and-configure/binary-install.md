@@ -6,7 +6,7 @@ This document provides guidance on how to install and configure a node for the c
 
 If you are planning to install a node on a host machine running Ubuntu 20.04 LTS, our recommended method is to use the [Debian package installation guide](debian/deb-package-install.md) instead.
 
-The [node setup guide provides pre-requisites](readme.md) needed before the steps below should be attempted.
+The [node setup guide provides pre-requisites](README.md) needed before the steps below should be attempted.
 
 ## Installation steps for `cheqd-node` .tar.gz binary
 
