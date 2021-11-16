@@ -46,6 +46,16 @@ While the instructions listed here are specific to the cheqd testnet, a similar 
 
    (The assumption above is that there is only one account / key that has been added on the node. In case you have multiple addresses, please jot down the preferred account address.)
 
+### Requesting CHEQ tokens for cheqd mainnet
+When you have a node successfully installed, please fill out our [**mainnet node operator onboarding form**](http://cheqd.link/mainnet-onboarding). You will need to have the following details on hand to fill out the form:
+   1. Node ID for your node
+   2. IP address / DNS record that points to the node \(if you're using an IP address, a static IP is recommended\)
+   3. Peer-to-peer \(P2P\) connection port \(defaults to `26656`\)
+   4. Validator account address (begins with `cheqd`)
+   5. Moniker (Nickname/moniker that is set for your mainnet node)
+3. Once you have received or purchased your tokens, [promote your node to a validator](docs/setup-and-configure/configure-new-validator.md).
+4. If successfully configured, your node would become the latest validator on the cheqd mainnet!
+
 ### Requesting CHEQ tokens for cheqd testnet
 
 Once you have successfully completed the steps above, please fill out our [**node operator onboarding form**](http://cheqd.link/join-testnet-form) so that you can acquire CHEQ testnet tokens required for staking on the network. The tokens will be send to your (validator) account address generated above.
