@@ -8,6 +8,5 @@ We take all security bugs seriously. If confirmed upon investigation, we will pa
 
 There are two ways to report a security bug:
 
-* Email us at [security-github@cheqd.io](mailto:security-github@cheqd.io)
+* Email us at [securitycheqd.io](mailto:security@cheqd.io)
 * Join [our cheqd Community Slack](http://cheqd.link/join-cheqd-slack) and post a message on the \#security channel
-
