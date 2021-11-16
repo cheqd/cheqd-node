@@ -4,8 +4,8 @@
 
 This document provides guidance on how to install and configure a node for the cheqd testnet.
 
-* Our [guide to Debian packages for `cheqd-node`](readme.md) provides an overview of what configuration actions are carried out by the installer.
-* The [node setup guide provides pre-requisites](../readme.md) needed before the steps below should be attempted.
+* Our [guide to Debian packages for `cheqd-node`](README.md) provides an overview of what configuration actions are carried out by the installer.
+* The [node setup guide provides pre-requisites](../README.md) needed before the steps below should be attempted.
 * Separate instructions apply if you're looking to [upgrade an existing cheqd node](deb-package-upgrade.md).
 
 ## Installation steps for `cheqd-node` .deb
