@@ -8,7 +8,8 @@ env:
   PACKAGE_NAME: "cheqd-node"
   VERSION: "1.0.0" # Package build scripts require version to be provided
 
-run-cosmos-specific-tests:
+jobs:
+  run-cosmos-specific-tests:
     name: Run cosmos-specific tests using cheqd-node CLI
     runs-on: ubuntu-20.04
     steps:
@@ -44,6 +45,7 @@ run-cosmos-specific-tests:
           export OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
           export OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p | sed 's/\r//g')
           pytest -v -rP tests/e2e/test_cosmos.py
+
   run-identity-specific-tests:
     name: Run identity-specific tests using VDR
     runs-on: ubuntu-20.04
