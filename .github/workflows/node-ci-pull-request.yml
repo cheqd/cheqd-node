@@ -12,9 +12,9 @@ on:
 jobs:
   lint-and-test:
     name: Lint code and run unit tests
-    uses: cheqd/cheqd-node/.github/workflows/reusable-lint-and-test.yml
+    uses: cheqd/cheqd-node/.github/workflows/reusable-lint-and-test.yml@main
   
   build-and-setup:
     needs: lint-and-test
     name: Build deb, images and set up docker pool
-    uses: cheqd/cheqd-node/.github/workflows/reusable-build-and-setup.yml
+    uses: cheqd/cheqd-node/.github/workflows/reusable-build-and-setup.yml@main
