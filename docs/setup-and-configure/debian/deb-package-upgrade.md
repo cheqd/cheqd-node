@@ -99,7 +99,7 @@ $ sudo systemctl stop cheqd-noded
 ```
 * Install `.deb` package for `0.3.1` version:
 ```bash
-sudo CHEQD_HOME_DIR=/cheqd ddpkg -i cheqd-node_0.3.1_amd64.deb
+sudo CHEQD_HOME_DIR=/cheqd dpkg -i cheqd-node_0.3.1_amd64.deb
 ```
 * After that the next directory tree is expected:
 ```bash
