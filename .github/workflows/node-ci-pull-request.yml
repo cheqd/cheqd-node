@@ -1,0 +1,19 @@
+name: cheqd-node CI (pull request)
+
+on: 
+  pull_request:
+    branches: [ main ]
+    paths-ignore:
+    - '**.md'
+    - 'docs/**'
+    - 'architecture/**'
+    - '.gitbook/**'
+
+jobs:
+  lint-and-test:
+    name: Lint code and run unit tests
+    uses: cheqd/cheqd-node/.github/workflows/reusable-lint-and-test.yml@v1
+  
+  build-and-setup:
+    name: Build deb, images and set up docker pool
+    uses: cheqd/cheqd-node/.github/workflows/reusable-lint-and-test.yml@v1
