@@ -53,8 +53,8 @@ When you have a node successfully installed, please fill out our [**mainnet node
    3. Peer-to-peer \(P2P\) connection port \(defaults to `26656`\)
    4. Validator account address (begins with `cheqd`)
    5. Moniker (Nickname/moniker that is set for your mainnet node)
-3. Once you have received or purchased your tokens, [promote your node to a validator](docs/setup-and-configure/configure-new-validator.md).
-4. If successfully configured, your node would become the latest validator on the cheqd mainnet!
+1. Once you have received or purchased your tokens, [promote your node to a validator](configure-new-validator.md).
+2. If successfully configured, your node would become the latest validator on the cheqd mainnet!
 
 ### Requesting CHEQ tokens for cheqd testnet
 
