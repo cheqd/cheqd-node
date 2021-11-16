@@ -10,5 +10,5 @@ on:
 
 jobs:
   lint-and-test:
-    name: Lint code and run unit tests
+    # name: Lint code and run unit tests
     uses: cheqd/cheqd-node/.github/workflows/reusable-lint-and-test.yml@split-workflows
