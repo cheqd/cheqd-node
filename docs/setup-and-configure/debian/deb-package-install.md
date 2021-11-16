@@ -11,7 +11,7 @@ This document provides guidance on how to install and configure a node for the c
 ## Installation steps for `cheqd-node` .deb
 
 1. **Download** [**the latest release of `cheqd-node` .deb**](https://github.com/cheqd/cheqd-node/releases/latest) **package**
-   
+
    For mainnet nodes, use v0.3.1+
 
    ```bash
@@ -39,7 +39,7 @@ This document provides guidance on how to install and configure a node for the c
    ```
 
    As a part of installation `cheqd` user will be created. By default, `HOME` directory for the user is `/home/cheqd`, but it can be changed by setting `CHEQD_HOME_DIR` environment variable before running `dpkg` command. Additionnally, a custom logging directory can also be defined by passing the environment variable `CHEQD_LOG_DIR` (defaults to `/home/cheqd/.cheqdnode/log`):
-   
+
    Example custom directories:
 
    ```bash
@@ -85,13 +85,13 @@ This document provides guidance on how to install and configure a node for the c
    For cheqd mainnet, set the `SEEDS` environment variable:
 
    ```bash
-   $ SEEDS=$(wget -qO- https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/mainnet/seeds.txt)
+   SEEDS=$(wget -qO- https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/mainnet/seeds.txt)
    ```
 
    For cheqd testnet, set the `SEEDS` environment variable:
 
    ```bash
-   $ SEEDS=$(wget -qO- https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/testnet/seeds.txt)
+   SEEDS=$(wget -qO- https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/testnet/seeds.txt)
    ```
 
    After the `SEEDS` variable is defined, pass the values to the `cheqd-noded configure` tool to set it in the configuration file.
@@ -112,13 +112,15 @@ This document provides guidance on how to install and configure a node for the c
    ```
 
 8. **Define the external peer-to-peer address**
-   
-   Unless you are running a node in a sentry/validator two-tier architecture, your node should be reachable on its peer-to-peer (P2P) port by other other nodes. This can be defined by setting the `external-address` property which defines the externally reachable address. This can be defined using either IP address or DNS name followed by the P2P port.
-   
+
+   Unless you are running a node in a sentry/validator two-tier architecture, your node should be reachable on its peer-to-peer (P2P) port by other other nodes. This can be defined by setting the `external-address` property which defines the externally reachable address. This can be defined using either IP address or DNS name followed by the P2P port (Default: 26656).
+
    ```bash
    cheqd-noded configure p2p external-address <ip-address-or-dns-name:p2p-port>
+   # Example
+   # cheqd-noded configure p2p external-address 8.8.8.8:26656
    ```
-   
+
    This is especially important if the node has no public IP address, e.g., if it's in a private subnet with traffic routed via a load balancer or proxy. Without the `external-address` property, the node will report a private IP address from its own host network interface as its `remote_ip`, which will be unreachable from the outside world. The node still works in this configuration, but only with limited unidirectional connectivity.
 
 9. **Make the RPC endpoint available externally** \(optional\)
