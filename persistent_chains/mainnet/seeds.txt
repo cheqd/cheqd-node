@@ -1,1 +1,1 @@
-258a9bfb822637bfca87daaab6181c10e7fd0910@seed1.eu.cheqd.network:26656
+258a9bfb822637bfca87daaab6181c10e7fd0910@seed1.eu.cheqd.net:26656,f565ff792b20977face9817df6acb268d41d4092@seed2.eu.cheqd.net:26656
