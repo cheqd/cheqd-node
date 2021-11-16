@@ -34,12 +34,9 @@ We plan on supporting other operating systems in the future, based on demand for
 
 ### Storage volumes
 
-We recommend using a separate storage volume for the `data` directory where the node's copy of the ledger is stored.
+We recommend using a storage path that can be kept persistent and restored/remounted (if necessary) for the configuration, data, and log directories associated with a node. This allows a node to be restored along with configuration files such as node keys and for the node's copy of the ledger to be restored without triggering a full chain sync.
 
-The default directory location depends on the installation method used:
-
-* For binary distribution, it is `$HOME/.cheqdnode/data`
-* For installations done using our Debian packages, it is `/home/cheqd/.cheqdnode/data`.
+The default directory location for `cheqd-node` installations is `$HOME/.cheqdnode`, which computes to `/home/cheqd/.cheqdnode` when [using the Debian package installer](debian/readme.md). Custom paths can be defined if desired.
 
 ### Ports
 
@@ -91,5 +88,4 @@ Follow the guide for your preferred installation method:
 ## Further information
 
 * Tendermint documentation has [best practices for running a Cosmos node in production](https://docs.tendermint.com/master/nodes/running-in-production.html).
-* [Сosmovisor could be used for automatic upgrades](https://docs.cosmos.network/master/run-node/cosmovisor.html); however in our testing so far this method has not been reliable and is therefore currently not recommended.
-
+* [Сosmosvisor could be used for automatic upgrades](https://docs.cosmos.network/master/run-node/cosmovisor.html); however in our testing so far this method has not been reliable and is therefore currently not recommended.

@@ -19,7 +19,7 @@ This section describes the system changes that our Debian packages attempt to ca
 
 * Pre-install system configuration actions.
 * Installing pre-compiled `cheqd-node` binary.
-* Post-install actions, such as setting up the `cheqd-node` daemon as a `systemctl` service.
+* Post-install actions, such as setting up the `cheqd-noded` daemon as a `systemctl` service.
 
 ### System user creation
 
