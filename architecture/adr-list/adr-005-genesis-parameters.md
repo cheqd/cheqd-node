@@ -103,7 +103,7 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
   * `blocks_per_year` = `3155760` (1 block every ~10 seconds)
     * Cosmos Hub: `4360000`
 * **`slashing`**
-  * `signed_blocks_window` = `120960` (expressed in blocks, equates to 1209600 seconds or ~14 days)
+  * `signed_blocks_window` = `25920` (expressed in blocks, equates to 259200 seconds or ~3 days)
     * Cosmos Hub: `10000` \(~20h\)
     * Number of blocks a validator can miss signing before it is slashed
   * `min_signed_per_window`= `0.50`
