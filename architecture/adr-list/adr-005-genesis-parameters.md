@@ -75,10 +75,10 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
   * `deposit_params`
     * min\_deposit = `[{ "denom": "ncheq", "amount": "8000000000000" }]` \(8,000 `cheq`\)
       * The minimum deposit for a proposal to enter the voting period.
-    * `max_deposit_period` = `1210000s` \(2 weeks\)
+    * `max_deposit_period` = `604800s` \(1 week\)
       * The maximum period for Atom holders to deposit on a proposal. Initial value: 2 months.
   * `voting_params`
-    * voting\_period = `1210000s` \(2 weeks\)
+    * voting\_period = `604800s` \(1 week\)
   * `tally_params`
     * `quorum` = `0.334`
       * Minimum percentage of total stake needed to vote for a result to be considered valid.
@@ -103,7 +103,7 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
   * `blocks_per_year` = `3155760` (1 block every ~10 seconds)
     * Cosmos Hub: `4360000`
 * **`slashing`**
-  * `signed_blocks_window` = `25920` (expressed in blocks, equates to 259200 seconds or ~3 days)
+  * `signed_blocks_window` = `120960` (expressed in blocks, equates to 1209600 seconds or ~14 days)
     * Cosmos Hub: `10000` \(~20h\)
     * Number of blocks a validator can miss signing before it is slashed
   * `min_signed_per_window`= `0.50`
