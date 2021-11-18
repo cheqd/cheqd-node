@@ -6,20 +6,20 @@ The set of scripts to generate configurations for a network of four nodes and ru
 
 ## Prerequisites
 
-* [Starport](https://docs.starport.network/guide/install.html) 
+* [Starport](https://docs.starport.network/guide/install.html)
 * docker-compose
 
 ## How to run
 
 1. Build docker image:
 
-   See [the instruction](docker_compose.md).
+   See [the instruction](local-docker-network.md).
 
 2. Build cheqd-node:
 
-   ```text
-    starport chain build
-   ```
+```bash
+starport chain build
+```
 
 3. Generate node configurations:
 
@@ -61,7 +61,6 @@ Also, there will be 4 keys generated and corresponding genesis accounts created 
 
 When connecting using CLI, point path to home directory: `--home node_configs/client`.
 
-## CLI commands:
+## CLI commands
 
-See [the reference](docs/../../cheqd-cli/README.md) to learn about the most common CLI flows.
-
+See [the cheqd CLI guide](../cheqd-cli/README.md) to learn about the most common CLI flows.

@@ -22,7 +22,7 @@
 * [Building from source](docs/build-and-networks/README.md)
   * [Building and testing](docs/build-and-networks/README.md)
   * [cheqd-testsnet docker image](docs/build-and-networks/local-docker-network.md)
-  * [Docker Compose Based Localnet](docs/build-and-networks/docker_compose.md)
+  * [Docker Compose Based Localnet](docs/build-and-networks/docker-compose.md)
   * [Setting up a new network](docs/build-and-networks/build-and-networks.md)
 * [Client-app Identity APIs](docs/identity-api/README.md)
   * [Error messages](docs/identity-api/identity-api-error-messages.md)
