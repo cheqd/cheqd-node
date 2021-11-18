@@ -4,7 +4,7 @@
 
 This document describes how to use install and configure a new instance of `cheqd-node` from pre-built packages and adding it to an existing network \(such as the cheqd testnet\) as an observer or validator.
 
-For other scenarios, please see [setting up a new network from scratch](../build-and-networks/build-and-networks.md) and [building `cheqd-node` from source](../build-and-networks/readme.md).
+For other scenarios, please see [setting up a new network from scratch](../build-and-networks/build-and-networks.md) and [building `cheqd-node` from source](../build-and-networks/README.md).
 
 ## Pre-requisites
 
@@ -36,7 +36,7 @@ We plan on supporting other operating systems in the future, based on demand for
 
 We recommend using a storage path that can be kept persistent and restored/remounted (if necessary) for the configuration, data, and log directories associated with a node. This allows a node to be restored along with configuration files such as node keys and for the node's copy of the ledger to be restored without triggering a full chain sync.
 
-The default directory location for `cheqd-node` installations is `$HOME/.cheqdnode`, which computes to `/home/cheqd/.cheqdnode` when [using the Debian package installer](debian/readme.md). Custom paths can be defined if desired.
+The default directory location for `cheqd-node` installations is `$HOME/.cheqdnode`, which computes to `/home/cheqd/.cheqdnode` when [using the Debian package installer](debian/README.md). Custom paths can be defined if desired.
 
 ### Ports
 

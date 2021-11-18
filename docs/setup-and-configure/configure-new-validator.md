@@ -26,7 +26,7 @@ While the instructions listed here are specific to the cheqd testnet, a similar 
    cheqd-noded keys add <alias>
    ```
 
-   When you create a new key, a `mnemonic phrase` and `account address` will be printed. K**eep the mnemonic phrase safe** as this is the only way to restore access to the account if they keyring cannot be recovered.
+   When you create a new key, a `mnemonic phrase` and `account address` will be printed. **Keep the mnemonic phrase safe** as this is the only way to restore access to the account if they keyring cannot be recovered.
 
 3. **Get your node ID**
 
@@ -47,14 +47,14 @@ While the instructions listed here are specific to the cheqd testnet, a similar 
    (The assumption above is that there is only one account / key that has been added on the node. In case you have multiple addresses, please jot down the preferred account address.)
 
 ### Requesting CHEQ tokens for cheqd mainnet
+
 When you have a node successfully installed, please fill out our [**mainnet node operator onboarding form**](http://cheqd.link/mainnet-onboarding). You will need to have the following details on hand to fill out the form:
-   1. Node ID for your node
-   2. IP address / DNS record that points to the node \(if you're using an IP address, a static IP is recommended\)
-   3. Peer-to-peer \(P2P\) connection port \(defaults to `26656`\)
-   4. Validator account address (begins with `cheqd`)
-   5. Moniker (Nickname/moniker that is set for your mainnet node)
-3. Once you have received or purchased your tokens, [promote your node to a validator](docs/setup-and-configure/configure-new-validator.md).
-4. If successfully configured, your node would become the latest validator on the cheqd mainnet!
+
+1. Node ID for your node
+2. IP address / DNS record that points to the node \(if you're using an IP address, a static IP is recommended\)
+3. Peer-to-peer \(P2P\) connection port \(defaults to `26656`\)
+4. Validator account address (begins with `cheqd1`)
+5. Moniker (nickname/moniker that is set for your mainnet node)
 
 ### Requesting CHEQ tokens for cheqd testnet
 
@@ -76,7 +76,7 @@ If you need help or support, join our [**cheqd Community Slack**](http://cheqd.l
    Follow the guidance on [using cheqd CLI to manage accounts](../cheqd-cli/cheqd-cli-accounts.md) to check that your account is correctly showing the CHEQ testnet tokens provided to you.
 
    ```bash
-   cheqd-noded query bank balances <address> --node <url>
+   cheqd-noded query bank balances <address>
    ```
 
 2. **Get your node's validator public key**
@@ -94,7 +94,7 @@ If you need help or support, join our [**cheqd Community Slack**](http://cheqd.l
    To promote to validation, submit a `create-validator` transaction to the network:
 
    ```bash
-   cheqd-noded tx staking create-validator --amount <amount-staking> --from <key-name> --chain-id <chain-id> --min-self-delegation <min-self-delegation> --gas <amount-gas> --gas-prices <price-gas> --pubkey <validator-pubkey> --commission-max-change-rate <commission-max-change-rate> --commission-max-rate <commission-max-rate> --commission-rate <commission-rate>
+   cheqd-noded tx staking create-validator --amount <amount-staking> --from <key-name> --chain-id <chain-id> --min-self-delegation <min-self-delegation> --gas auto --gas-adjustment <multiplication-factor> --gas-prices <price-gas> --pubkey <validator-pubkey> --commission-max-change-rate <commission-max-change-rate> --commission-max-rate <commission-max-rate> --commission-rate <commission-rate>
    ```
 
    Parameters required in the transaction above are:
@@ -106,14 +106,17 @@ If you need help or support, join our [**cheqd Community Slack**](http://cheqd.l
    * **`commission-rate`**: Validator's commission rate
    * **`commission-max-rate`**: Validator's maximum commission rate, expressed as a number with up to two decimal points. The value for this cannot be changed later.
    * **`commission-max-change-rate`**: Maximum rate of change of a validator's commission rate per day, expressed as a number with up to two decimal points. The value for this cannot be changed later.
-   * **`chain-id`**: Unique identifier for the chain. For cheqd's current testnet, this is `cheqd-testnet-2`.
-   * **`gas`**: Maximum gas
+   * **`chain-id`**: Unique identifier for the chain. 
+     * For cheqd's current mainnet, this is `cheqd-mainnet-1`
+     * For cheqd's current testnet, this is `cheqd-testnet-2`
+   * **`gas`**: Maximum gas to use for *this specific* transaction. Using `auto` uses Cosmos's auto-calculation mechanism, but can also be specified manually as an integer value.
+   * **gas-adjustment** (optional): If you're using `auto` gas calculation, this parameter multiplies the auto-calculated amount by the specified factor, e.g., `1.2`. This is recommended so that it leaves enough margin of error to add a bit more gas to the transaction and ensure it successfully goes through.
    * **`gas-prices`**: Maximum gas price set by the validator
 
    _Example transaction:_
 
    ```bash
-   cheqd-noded tx staking create-validator --amount 40000000000000000ncheq --from eu-node-operator --moniker node1-eu-testnet-cheqd --chain-id cheqd-testnet-2 --min-self-delegation="1" --gas="300000" --gas-prices="25ncheq" --pubkey '{"@type":"/cosmos.crypto.ed25519.PubKey","key":"4anVUO8WhmRMqG1t4z6VxqmqZL3V7q6HqucjwZePiUw="}' --commission-max-change-rate="0.02" --commission-max-rate="0.02" --commission-rate="0.01" --node http://node1.eu.testnet.cheqd.network:26657
+   cheqd-noded tx staking create-validator --amount 1000ncheq --from eu-node-operator --moniker node1-eu-testnet-cheqd --chain-id cheqd-mainnet-1 --min-self-delegation="1" --gas="300000" --gas-prices="25ncheq" --pubkey '{"@type":"/cosmos.crypto.ed25519.PubKey","key":"4anVUO8WhmRMqG1t4z6VxqmqZL3V7q6HqucjwZePiUw="}' --commission-max-change-rate="0.02" --commission-max-rate="0.02" --commission-rate="0.01" --node http://sentry1.eu.cheqd.net:26657
    ```
 
 4. **Check that your validator node is bonded**

@@ -45,4 +45,4 @@ Also, there will be 1 key generated and corresponding genesis accounts created f
 
 ## CLI commands:
 
-See [the reference](../../docs/cosmos-cli.md) to learn about the most common CLI flows.
+See [the reference](https://github.com/cheqd/cheqd-node/blob/main/docs/cheqd-cli/README.md) to learn about the most common CLI flows.

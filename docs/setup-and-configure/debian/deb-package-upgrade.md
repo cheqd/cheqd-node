@@ -4,9 +4,9 @@
 
 This document provides guidance on how to upgrade to an [existing installation of `cheqd-node` that was done using the Debian package](deb-package-install.md) release to a new release version.
 
-It is assumed that the [pre-requisites mentioned in the node setup guide](../readme.md) are satisfied, as a node has already been installed.
+It is assumed that the [pre-requisites mentioned in the node setup guide](../README.md) are satisfied, as a node has already been installed.
 
-Before carrying out an upgrade, please read our [guide to Debian packages for `cheqd-node`](readme.md) to understand an overview of what configuration actions are carried out by the installer.
+Before carrying out an upgrade, please read our [guide to Debian packages for `cheqd-node`](README.md) to understand an overview of what configuration actions are carried out by the installer.
 
 ## Upgrade steps for `cheqd-node` .deb
 
@@ -16,7 +16,7 @@ Before carrying out an upgrade, please read our [guide to Debian packages for `c
 
 The package upgrade process is idempotent and it should not affect service files, configurations or any other user data.
 
-However, as best practice we recommend backing up the [app data directories for `cheqd-node`](readme.md) and Cosmos account keys before attempting the upgrade process.
+However, as best practice we recommend backing up the [app data directories for `cheqd-node`](README.md) and Cosmos account keys before attempting the upgrade process.
 
 1. **Download** [**the latest release of `cheqd-node` .deb**](https://github.com/cheqd/cheqd-node/releases/latest) **package**
 
@@ -120,4 +120,4 @@ and check the service status or just check RPC endpoint.
 
 ## Next steps
 
-For further confirmation on whether your node is working correctly, we recommend attempting to [run commands from the cheqd CLI guide](../../cheqd-cli/readme.md); e.g., query the ledger for transactions, account balances etc.
+For further confirmation on whether your node is working correctly, we recommend attempting to [run commands from the cheqd CLI guide](../../cheqd-cli/README.md); e.g., query the ledger for transactions, account balances etc.

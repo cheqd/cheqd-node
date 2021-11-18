@@ -4,8 +4,8 @@
 
 This document provides guidance on how to install and configure a node for the cheqd testnet.
 
-* Our [guide to Debian packages for `cheqd-node`](readme.md) provides an overview of what configuration actions are carried out by the installer.
-* The [node setup guide provides pre-requisites](../readme.md) needed before the steps below should be attempted.
+* Our [guide to Debian packages for `cheqd-node`](README.md) provides an overview of what configuration actions are carried out by the installer.
+* The [node setup guide provides pre-requisites](../README.md) needed before the steps below should be attempted.
 * Separate instructions apply if you're looking to [upgrade an existing cheqd node](deb-package-upgrade.md).
 
 ## Installation steps for `cheqd-node` .deb
@@ -48,7 +48,7 @@ This document provides guidance on how to install and configure a node for the c
 
 3. **Switch to the `cheqd` system user**
 
-   Always switch to `cheqd` user before managing node. By default, the node stores configuration files in the home directory for the user that initialises the node. By switching to the special `cheqd` system user, you can ensure that the configuration files are stored in the [system app data directories](readme.md) configured by the Debian package.
+   Always switch to `cheqd` user before managing node. By default, the node stores configuration files in the home directory for the user that initialises the node. By switching to the special `cheqd` system user, you can ensure that the configuration files are stored in the [system app data directories](README.md) configured by the Debian package.
 
    ```bash
    sudo su cheqd
@@ -135,7 +135,7 @@ This document provides guidance on how to install and configure a node for the c
 
 11. **Make the RPC endpoint available externally** \(optional\)
 
-   This step is necessary only if you want to allow incoming client application connections to your node. Otherwise, the node will be accessible only locally. Further details about the RPC endpoints is available in the [cheqd node setup guide](../readme.md).
+   This step is necessary only if you want to allow incoming client application connections to your node. Otherwise, the node will be accessible only locally. Further details about the RPC endpoints is available in the [cheqd node setup guide](../README.md).
 
    ```bash
    cheqd-noded configure rpc-laddr "tcp:\/\/0.0.0.0:26657"

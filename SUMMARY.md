@@ -4,8 +4,8 @@
 
 ## Guides <a id="docs"></a>
 
-* [Setting up a new cheqd node](docs/setup-and-configure/readme.md)
-  * [Setting up a new cheqd node](docs/setup-and-configure/readme.md)
+* [Setting up a new cheqd node](docs/setup-and-configure/README.md)
+  * [Setting up a new cheqd node](docs/setup-and-configure/README.md)
   * [Debian package installation](docs/setup-and-configure/debian/README.md)
     * [Guide to Debian packages for cheqd-node](docs/setup-and-configure/debian/README.md)
     * [Installing a cheqd node using Debian package releases](docs/setup-and-configure/debian/deb-package-install.md)
@@ -22,7 +22,7 @@
 * [Building from source](docs/build-and-networks/README.md)
   * [Building and testing](docs/build-and-networks/README.md)
   * [cheqd-testsnet docker image](docs/build-and-networks/local-docker-network.md)
-  * [Docker Compose Based Localnet](docs/build-and-networks/docker_compose.md)
+  * [Docker Compose Based Localnet](docs/build-and-networks/docker-compose.md)
   * [Setting up a new network](docs/build-and-networks/build-and-networks.md)
 * [Client-app Identity APIs](docs/identity-api/README.md)
   * [Error messages](docs/identity-api/identity-api-error-messages.md)
