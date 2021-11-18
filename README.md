@@ -12,7 +12,7 @@ Join our [**cheqd Community Slack**](http://cheqd.link/join-cheqd-slack) for hel
 
 Getting started as a node operator on the cheqd network mainnet requires the following steps:
 
-1. [Install the `cheqd-node` software](docs/setup-and-configure/readme.md) (**version 0.3.1+**) on a hosting platform of your choice.
+1. [Install the `cheqd-node` software](docs/setup-and-configure/README.md) (**version 0.3.1+**) on a hosting platform of your choice.
 2. When you have a node successfully installed, please fill out our [**mainnet node operator onboarding form**](http://cheqd.link/mainnet-onboarding). You will need to have the following details on hand to fill out the form:
    1. Node ID for your node
    2. IP address / DNS record that points to the node \(if you're using an IP address, a static IP is recommended\)
