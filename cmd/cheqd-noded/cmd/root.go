@@ -65,12 +65,9 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 				return err
 			}
 
-			// Allow us to overwrite the SDK's default server config.
-			srvCfg := serverconfig.DefaultConfig()
-			// TODO: We can overwrite default min_gas_price here
-
+			// Allows us to overwrite the SDK's default server config.
 			customAppTemplate := serverconfig.DefaultConfigTemplate
-			customAppConfig := *srvCfg
+			customAppConfig := serverconfig.DefaultConfig()
 
 			return server.InterceptConfigsPreRunHandler(cmd, customAppTemplate, customAppConfig)
 		},
@@ -79,7 +76,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	initRootCmd(rootCmd, encodingConfig)
 	overwriteFlagDefaults(rootCmd, map[string]string{
 		flags.FlagChainID:        ChainID,
-		flags.FlagKeyringBackend: "test",
+		flags.FlagKeyringBackend: "os",
 	})
 
 	return rootCmd, encodingConfig
@@ -90,7 +87,8 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 	cfg.Seal()
 
 	rootCmd.AddCommand(
-		genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome),
+		extendInit(genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome)),
+		configureCmd(app.DefaultNodeHome),
 		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
 		genutilcli.MigrateGenesisCmd(),
 		genutilcli.GenTxCmd(app.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),

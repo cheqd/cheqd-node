@@ -4,27 +4,51 @@
 
 This document provides guidance on how to install and configure a node for the cheqd testnet.
 
-* Our [guide to Debian packages for `cheqd-node`](readme.md) provides an overview of what configuration actions are carried out by the installer.
-* The [node setup guide provides pre-requisites](../readme.md) needed before the steps below should be attempted.
+* Our [guide to Debian packages for `cheqd-node`](README.md) provides an overview of what configuration actions are carried out by the installer.
+* The [node setup guide provides pre-requisites](../README.md) needed before the steps below should be attempted.
 * Separate instructions apply if you're looking to [upgrade an existing cheqd node](deb-package-upgrade.md).
 
 ## Installation steps for `cheqd-node` .deb
 
 1. **Download** [**the latest release of `cheqd-node` .deb**](https://github.com/cheqd/cheqd-node/releases/latest) **package**
 
+   For mainnet nodes, use v0.3.1+
+
    ```bash
-    wget https://github.com/cheqd/cheqd-node/releases/download/v0.2.3/cheqd-node_0.2.3_amd64.deb
+   wget https://github.com/cheqd/cheqd-node/releases/download/v0.3.1/cheqd-node_0.3.1_amd64.deb
+   ```
+
+   For testnet nodes, use v0.2.7:
+
+   ```bash
+   wget https://github.com/cheqd/cheqd-node/releases/download/v0.2.7/cheqd-node_0.2.7_amd64.deb
    ```
 
 2. **Install the package**
 
+   For mainnet nodes on v0.3.1+
+
    ```bash
-   sudo dpkg -i cheqd-node_0.2.3_amd64.deb
+   sudo dpkg -i cheqd-node_0.3.1_amd64.deb
+   ```
+
+   For testnet nodes on v0.2.7 (or below):
+
+   ```bash
+   sudo dpkg -i cheqd-node_0.2.7_amd64.deb
+   ```
+
+   As a part of installation `cheqd` user will be created. By default, `HOME` directory for the user is `/home/cheqd`, but it can be changed by setting `CHEQD_HOME_DIR` environment variable before running `dpkg` command. Additionnally, a custom logging directory can also be defined by passing the environment variable `CHEQD_LOG_DIR` (defaults to `/home/cheqd/.cheqdnode/log`):
+
+   Example custom directories:
+
+   ```bash
+   sudo CHEQD_HOME_DIR=/path/to/desired/home/directory dpkg -i cheqd-node_0.3.1_amd64.deb
    ```
 
 3. **Switch to the `cheqd` system user**
 
-   Always switch to `cheqd` user before managing node. By default, the node stores configuration files in the home directory for the user that initialises the node. By switching to the special `cheqd` system user, you can ensure that the configuration files are stored in the [system app data directories](readme.md) configured by the Debian package.
+   Always switch to `cheqd` user before managing node. By default, the node stores configuration files in the home directory for the user that initialises the node. By switching to the special `cheqd` system user, you can ensure that the configuration files are stored in the [system app data directories](README.md) configured by the Debian package.
 
    ```bash
    sudo su cheqd
@@ -32,67 +56,100 @@ This document provides guidance on how to install and configure a node for the c
 
 4. **Initialise the node configuration files**
 
+   The "moniker" for your node is a "friendly" name that will be available to peers on the network in their address book, and allows easily searching a peer's address book.
+
    ```bash
-   cheqd-noded init <your-node-name>
+   cheqd-noded init <node-moniker>
    ```
 
 5. **Download the genesis file for a persistent chain, such as the cheqd testnet**
 
-   Download the `genesis.json` file [corresponding a persistent chain](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains/testnet) and put it in the `/etc/cheqd-node/` directory.
+   Download the `genesis.json` file for the relevant [persistent chain](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains/) and put it in the `$HOME/.cheqdnode/config` directory.
+
+   For cheqd mainnet:
+
+   ```bash
+   wget -O $HOME/.cheqdnode/config/genesis.json https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/mainnet/genesis.json
+   ```
 
    For cheqd testnet:
 
    ```bash
-   wget -O /etc/cheqd-node/genesis.json https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/testnet/genesis.json
+   wget -O $HOME/.cheqdnode/config/genesis.json https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/testnet/genesis.json
    ```
 
 6. **Define the seed configuration for populating the list of peers known by a node**
 
-   Search for the `seeds` parameter in the node configuration file `/etc/cheqd-node/config.toml` and set its value to a comma separated list of seed node addresses specified in `seeds.txt` for [persistent chains](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains/testnet).
+   Update `seeds` with a comma separated list of seed node addresses specified in `seeds.txt` for the relevant [persistent chain](https://github.com/cheqd/cheqd-node/tree/main/persistent_chains/).
 
-   For cheqd testnet, executing the following commands will set this up correctly:
+   For cheqd mainnet, set the `SEEDS` environment variable:
 
    ```bash
-   $ SEEDS=$(wget -qO- https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/testnet/seeds.txt)
+   SEEDS=$(wget -qO- https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/mainnet/seeds.txt)
+   ```
 
+   For cheqd testnet, set the `SEEDS` environment variable:
+
+   ```bash
+   SEEDS=$(wget -qO- https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/testnet/seeds.txt)
+   ```
+
+   After the `SEEDS` variable is defined, pass the values to the `cheqd-noded configure` tool to set it in the configuration file.
+
+   ```bash
    $ echo $SEEDS
    # Comma separated list should be printed
    
-   $ sed -i.bak 's/seeds = ""/seeds = "'$SEEDS'"/g' /etc/cheqd-node/config.toml
+   $ cheqd-noded configure p2p seeds "$SEEDS"
    ```
 
 7. **Set gas prices accepted by the node**
 
-   Search for the `minimum-gas-prices` parameter in the node configuration file `/etc/cheqd-node/app.toml` and set it to a non-empty value. The recommended value is `25ncheq`.
-
-   For cheqd testnet, executing the following command will set this up correctly:
+   Update `minimum-gas-prices` parameter if you want to use custom value. The default is `25ncheq`.
 
    ```bash
-   sed -i.bak 's/minimum-gas-prices = ""/minimum-gas-prices = "25ncheq"/g' /etc/cheqd-node/app.toml
+   cheqd-noded configure min-gas-prices "25ncheq"
    ```
 
-8. **Make the RPC endpoint available externally** \(optional\)
+8. **Turn off empty block creation**
 
-   This step is necessary only if you want to allow incoming client application connections to your node. Otherwise, the node will be accessible only locally. Further details about the RPC endpoints is available in the [cheqd node setup guide](../readme.md).
+   By default, the underlying Tendermint consensus creates blocks even when there are no transactions ("empty blocks").
 
-   Search for the `laddr` parameter under the `RPC Server Configuration Options` section in the node configuration file `/etc/cheqd-node/config.toml` and replace its value to `0.0.0.0:26657`
-
-   For cheqd testnet, executing the following commands will set this up correctly:
+   Turning off empty block creation is an optimisation strategy to limit growth in chain size, although this only works if a majority of the nodes opt-in to this setting.
 
    ```bash
-   sed -i.bak 's/laddr = "tcp:\/\/127.0.0.1:26657"/laddr = "tcp:\/\/0.0.0.0:26657"/g' /etc/cheqd-node/config.toml
+   cheqd-noded configure create-empty-blocks false
    ```
 
-9. **Enable and start the `cheqd-noded` system service**
+9.  **Define the external peer-to-peer address**
+
+   Unless you are running a node in a sentry/validator two-tier architecture, your node should be reachable on its peer-to-peer (P2P) port by other other nodes. This can be defined by setting the `external-address` property which defines the externally reachable address. This can be defined using either IP address or DNS name followed by the P2P port (Default: 26656).
+
+   ```bash
+   cheqd-noded configure p2p external-address <ip-address-or-dns-name:p2p-port>
+   # Example
+   # cheqd-noded configure p2p external-address 8.8.8.8:26656
+   ```
+
+   This is especially important if the node has no public IP address, e.g., if it's in a private subnet with traffic routed via a load balancer or proxy. Without the `external-address` property, the node will report a private IP address from its own host network interface as its `remote_ip`, which will be unreachable from the outside world. The node still works in this configuration, but only with limited unidirectional connectivity.
+
+11. **Make the RPC endpoint available externally** \(optional\)
+
+   This step is necessary only if you want to allow incoming client application connections to your node. Otherwise, the node will be accessible only locally. Further details about the RPC endpoints is available in the [cheqd node setup guide](../README.md).
+
+   ```bash
+   cheqd-noded configure rpc-laddr "tcp:\/\/0.0.0.0:26657"
+   ```
+
+12. **Enable and start the `cheqd-noded` system service**
 
    If you are prompted for a password for the `cheqd` user, type `exit` to logout and then attempt to execute this as a privileged user \(with `sudo` privileges or as root user, if necessary\).
 
    ```bash
-   systemctl enable cheqd-noded
-   ```
+   $ systemctl enable cheqd-noded
+   Created symlink /etc/systemd/system/multi-user.target.wants/cheqd-noded.service → /lib/systemd/system/cheqd-noded.service.
 
-   ```bash
-   systemctl start cheqd-noded
+   $ systemctl start cheqd-noded
    ```
 
    Check that the `cheqd-noded` service is running. If successfully started, the status output should return `Active: active (running)`

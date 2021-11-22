@@ -1,8 +1,16 @@
 #!/bin/bash
 
-set -euox pipefail
+set -euo pipefail
 
-source "../common.sh"
+# sed in macos requires extra argument
+
+sed_extension=''
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    sed_extension=''
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    sed_extension='.orig'
+fi
+
 
 CHAIN_ID="cheqd"
 

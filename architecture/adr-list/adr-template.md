@@ -8,8 +8,10 @@ description: This is the suggested template to be used for ADRs on the cheqd-nod
 
 | Category | Status |
 | :--- | :--- |
+| **Authors** | {Author or list of authors} |
 | **ADR Stage** | {DRAFT \| PROPOSED \| ACCEPTED \| REJECTED \| SUPERSEDED by ADR-xxx \| ABANDONED} |
 | **Implementation Status** | {Implemented \| Not Implemented} |
+| **Start Date** | {yyyy-mm-dd} |
 
 What is the status, such as proposed, accepted, rejected, deprecated, superseded, etc.?
 
@@ -49,3 +51,6 @@ What is the change that we're proposing and/or doing?
 
 * {reference link}
 
+## Unresolved questions
+
+{list of questions or action items}

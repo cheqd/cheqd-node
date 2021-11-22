@@ -1,12 +1,12 @@
-# ADR 008: Cheqd DIDdoc resources: schema, credential definition
+# ADR 008: cheqd DIDDOc resources: Schemas and Credential Definitions
 
 ## Status
 
 | Category | Status |
 | :--- | :--- |
 | **Authors** | Renata Toktar, Brent Zundel, Ankur Banerjee |
-| **ADR Stage** | PROPOSED |
-| **Implementation Status** | Implementation in progress |
+| **ADR Stage** | DRAFT |
+| **Implementation Status** | Draft |
 | **Start Date** | 2021-09-23 |
 
 ## Summary

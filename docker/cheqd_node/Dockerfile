@@ -42,14 +42,15 @@ COPY --from=builder /go/bin/cheqd-noded /bin
 COPY docker/cheqd_node/node-runner.sh /bin/node-runner
 RUN chmod +x /bin/node-runner
 
+ARG CHEQD_HOME_DIR="/cheqd"
+
 ARG UID=1000
 ARG GID=1000
 
 RUN groupadd --system --gid $GID cheqd && \
-    useradd --system --create-home --home-dir /cheqd --shell /bin/bash --gid cheqd --uid $UID cheqd
-RUN chown -R cheqd /cheqd
+    useradd --system --create-home --home-dir ${CHEQD_HOME_DIR} --shell /bin/bash --gid cheqd --uid $UID cheqd
 
-WORKDIR /cheqd
+WORKDIR ${CHEQD_HOME_DIR}
 USER cheqd
 
 EXPOSE 26656 26657

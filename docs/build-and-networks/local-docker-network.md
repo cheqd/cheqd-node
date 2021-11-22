@@ -18,7 +18,7 @@ docker pull ghcr.io/cheqd/cheqd-testnet:latest
 
 ## Prerequisites
 
-* Build `cheqd-node` image first. See the [instruction](https://github.com/cheqd/cheqd-node/tree/f74ec3e0ad08adcf2e4173de80dbd9442edc337e/docs/build-and-networks/cheqd_node.md).
+* Build `cheqd-node` image first. See the [instruction](build-and-networks.md).
 
 ## Building
 

@@ -4,24 +4,34 @@
 
 `cheqd-node` is the server/node portion of the cheqd network stack, built using [Cosmos SDK](https://github.com/cosmos/cosmos-sdk) and [Tendermint](https://github.com/tendermint/tendermint).
 
-## Quick start for joining cheqd testnet
+## Quick start for joining cheqd networks
 
-Getting started as a node operator on the cheqd network testnet requires the following steps:
+Join our [**cheqd Community Slack**](http://cheqd.link/join-cheqd-slack) for help, question, and support if you are looking at joining either the cheqd mainnet or the testnet/ Either the cheqd team, or one of your fellow node operators will be happy to offer some guidance.
 
-1. [Install the `cheqd-node` software](docs/setup-and-configure/readme.md) on a hosting platform of your choice.
-2. When you have a node successfully installed, please fill out our [**node operator onboarding form**](http://cheqd.link/join-testnet-form) so that you can acquire CHEQ testnet tokens required for staking on the network. You will need to have the following details on hand to fill out the form:
+### Mainnet
+
+Getting started as a node operator on the cheqd network mainnet requires the following steps:
+
+1. [Install the `cheqd-node` software](docs/setup-and-configure/README.md) (**version 0.3.1+**) on a hosting platform of your choice.
+2. When you have a node successfully installed, please fill out our [**mainnet node operator onboarding form**](http://cheqd.link/mainnet-onboarding). You will need to have the following details on hand to fill out the form:
    1. Node ID for your node
    2. IP address / DNS record that points to the node \(if you're using an IP address, a static IP is recommended\)
    3. Peer-to-peer \(P2P\) connection port \(defaults to `26656`\)
    4. Validator account address (begins with `cheqd`)
-3. Once you have received your tokens, [promote your node to a validator](docs/setup-and-configure/configure-new-validator.md).
-4. If successfully configured, your node would become the latest validator on the cheqd Testnet! Say hi to the other node operators on the [\#testnet-node-operators](https://cheqd-community.slack.com/archives/C029NSCSA75) channel.
+   5. Moniker (Nickname/moniker that is set for your mainnet node)
+3. Once you have received or purchased your tokens, [promote your node to a validator](docs/setup-and-configure/configure-new-validator.md).
+4. If successfully configured, your node would become the latest validator on the cheqd mainnet!
 
-Any time you have questions or need support, join our [**cheqd Community Slack**](http://cheqd.link/join-cheqd-slack) and [ask for help](https://cheqd-community.slack.com/archives/C02AQ9UK4HY).
+### Testnet
+
+Joining the cheqd tetsnet is very similar to the instructions above for mainnet, with a few key differences:
+
+1. Install [v0.2.7 of cheqd-node](https://github.com/cheqd/cheqd-node/releases/tag/v0.2.7) (instead of v0.3.1+)
+2. Fill our [testnet node operator onboarding form](http://cheqd.link/join-testnet-form) with the same details as above.
 
 ## Usage
 
-Once installed, `cheqd-node` can be controlled using the [cheqd Cosmos CLI guide](docs/cheqd-cli/readme.md).
+Once installed, `cheqd-node` can be controlled using the [cheqd Cosmos CLI guide](docs/cheqd-cli/README.md).
 
 ### Currently supported functionality
 
@@ -29,30 +39,36 @@ Once installed, `cheqd-node` can be controlled using the [cheqd Cosmos CLI guide
 * Creating, managing, and configuring accounts and keys on a cheqd node
 * Staking and participating in public-permissionless governance
 * Governance framework for public-permissionless self-sovereign identity networks
+* Creating [`did:cheqd` method DIDs](architecture/adr-list/adr-002-cheqd-did-method.md), DID Documents ("DIDDocs), and querying full DIDDocs
 
 ### Upcoming functionality
 
 A non-exhaustive list of future planned functionality \(not necessarily in order of priority\) is highlighted below:
 
-* DID method specification
-* Creating and querying DIDDocs
-* Creating and managing Verifiable Credentials anchored to DIDs on cheqd testnet
+* Creating and managing Verifiable Credentials anchored to DIDs on cheqd mainnet
+* Querying DIDDoc fragments and specific resources
+* Defining Schemas and Credential Definitions
 
-We plan on adding new functionality rapidly and on a regular basis. We are also exploring mechanisms to showcase our product roadmap and gather feedback from our community members. We welcome feedback on our [cheqd Community Slack](http://cheqd.link/join-cheqd-slack) workspace.
+We plan on adding new functionality rapidly and on a regular basis. We will be sharing regular updates through our **Live Product Updates** page which includes our product roadmap, release notes, node operator FAQs and more. We welcome feedback on our [cheqd Community Slack](http://cheqd.link/join-cheqd-slack) workspace.
 
 ## Building from source
 
-`cheqd-node` is created with [Starport](https://github.com/tendermint/starport). If you want to build a node from source or contribute to the code, please read our guide to [building and testing](https://github.com/cheqd/cheqd-node/tree/f74ec3e0ad08adcf2e4173de80dbd9442edc337e/docs/building-and-testing.md).
+`cheqd-node` is created with [Starport](https://github.com/tendermint/starport). If you want to build a node from source or contribute to the code, please read our guide to [building and testing](docs/build-and-networks/README.md).
 
 ### Creating a local network
 
-If you are building from source, or otherwise interested in running a local network, we have [instructions on how to set up a new network](https://github.com/cheqd/cheqd-node/tree/f74ec3e0ad08adcf2e4173de80dbd9442edc337e/docs/setting-up-a-new-network.md) for development purposes.
+If you are building from source, or otherwise interested in running a local network, we have [instructions on how to set up a new network](docs/setup-and-configure/README.md) for development purposes.
 
 ## Community
 
 The [**cheqd Community Slack**](http://cheqd.link/join-cheqd-slack) is our chat channel for the open-source community, software developers, and node operators.
 
 Please reach out to us there for discussions, help, and feedback on the project.
+
+## Bug Reporting & New Feature Requests 
+
+If you notice anything not behaving how you expected, or would like to make a suggestion / request for a new feature, please submit a **bug_report** or **feature_request**  by creating a [**New Issue**](https://github.com/cheqd/cheqd-node/issues/new/choose) and selecting the relevant template. 
+
 
 ### Social media
 

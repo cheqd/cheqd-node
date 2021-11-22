@@ -4,9 +4,9 @@
 
 This document provides guidance on how to upgrade to an [existing installation of `cheqd-node` that was done using the Debian package](deb-package-install.md) release to a new release version.
 
-It is assumed that the [pre-requisites mentioned in the node setup guide](../readme.md) are satisfied, as a node has already been installed.
+It is assumed that the [pre-requisites mentioned in the node setup guide](../README.md) are satisfied, as a node has already been installed.
 
-Before carrying out an upgrade, please read our [guide to Debian packages for `cheqd-node`](readme.md) to understand an overview of what configuration actions are carried out by the installer.
+Before carrying out an upgrade, please read our [guide to Debian packages for `cheqd-node`](README.md) to understand an overview of what configuration actions are carried out by the installer.
 
 ## Upgrade steps for `cheqd-node` .deb
 
@@ -16,12 +16,12 @@ Before carrying out an upgrade, please read our [guide to Debian packages for `c
 
 The package upgrade process is idempotent and it should not affect service files, configurations or any other user data.
 
-However, as best practice we recommend backing up the [app data directories for `cheqd-node`](readme.md) and Cosmos account keys before attempting the upgrade process.
+However, as best practice we recommend backing up the [app data directories for `cheqd-node`](README.md) and Cosmos account keys before attempting the upgrade process.
 
 1. **Download** [**the latest release of `cheqd-node` .deb**](https://github.com/cheqd/cheqd-node/releases/latest) **package**
 
    ```bash
-    wget https://github.com/cheqd/cheqd-node/releases/download/v0.2.3/cheqd-node_0.2.3_amd64.deb
+    wget https://github.com/cheqd/cheqd-node/releases/download/v0.3.1/cheqd-node_0.3.1_amd64.deb
    ```
 
 2. **Stop the existing `cheqd-noded` service**
@@ -83,7 +83,41 @@ An alternative method to check a node's status is via the RPC interface, if it h
 * Remotely via the RPC interface: `cheqd-noded status --node <rpc-address>`
 * By opening the JSONRPC over HTTP status page through a web browser: `<node-address:rpc-port>/status`
 
+## Upgrade from `0.2.3` to `0.3.1`.
+According to debian package usage on AWS instances and recovering after crashes we introduced new storage and mount points approach.
+For now, `$HOME` directory excepts to be `/home/cheqd` by default or it can be changed while `.deb` package install, like:
+```bash
+sudo CHEQD_HOME_DIR=/path/to/home/directory dpkg -i cheqd-node_0.3.1_amd64.deb
+```
+In general, it's not required and up to system administrators how to ensure safe revocring after crashes.
+
+If you have `0.2.3` version installed and you want to follow the new `$HOME` directory approach the next steps can help with it:
+* Please define the mount point for `cheqd` root directory where all the configs and data will be placed. For example, let it be `/cheqd`.
+* Stop `cheqd-noded` service by running:
+```bash
+$ sudo systemctl stop cheqd-noded
+```
+* Install `.deb` package for `0.3.1` version:
+```bash
+sudo CHEQD_HOME_DIR=/cheqd dpkg -i cheqd-node_0.3.1_amd64.deb
+```
+* After that the next directory tree is expected:
+```bash
+/cheqd/.cheqdnode/data
+/cheqd/.cheqdnode/config
+/cheqd/.cheqdnode/log
+```
+* After that you should move all the configs from previous location into the new one `/cheqd/.cheqdnode/config`, data into `/cheqd/.cheqdnode/data`. It's assumed that root directory `/cheqd` will be stored and mounted as external resource and will not be removed after potential instance crashing.
+* For logs symlink can be created by using command:
+```bash
+ln -s /cheqd/.cheqdnode/log /var/log/cheqd-node
+```
+* Start `cheqd-noded` service by running:
+```bash
+$ sudo systemctl start cheqd-noded
+```
+and check the service status or just check RPC endpoint.
+
 ## Next steps
 
-For further confirmation on whether your node is working correctly, we recommend attempting to [run commands from the cheqd CLI guide](../../cheqd-cli/readme.md); e.g., query the ledger for transactions, account balances etc.
-
+For further confirmation on whether your node is working correctly, we recommend attempting to [run commands from the cheqd CLI guide](../../cheqd-cli/README.md); e.g., query the ledger for transactions, account balances etc.
