@@ -6,7 +6,7 @@ import (
 	"encoding/base64"
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cheqd/cheqd-node/x/cheqd"
-	"github.com/cheqd/cheqd-node/x/cheqd/types/v1"
+	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"time"
 
 	"github.com/cheqd/cheqd-node/app/params"
@@ -41,7 +41,7 @@ func Setup() TestSetup {
 	db := dbm.NewMemDB()
 
 	dbStore := store.NewCommitMultiStore(db)
-	storeKey := sdk.NewKVStoreKey(v1.StoreKey)
+	storeKey := sdk.NewKVStoreKey(types.StoreKey)
 	dbStore.MountStoreWithDB(storeKey, sdk.StoreTypeIAVL, nil)
 
 	_ = dbStore.LoadLatestVersion()
@@ -72,26 +72,26 @@ func Setup() TestSetup {
 	return setup
 }
 
-func (s *TestSetup) CreateDid(pubKey ed25519.PublicKey, did string) *v1.MsgCreateDidPayload {
+func (s *TestSetup) CreateDid(pubKey ed25519.PublicKey, did string) *types.MsgCreateDidPayload {
 	PublicKeyMultibase := "z" + base58.Encode(pubKey)
 
-	VerificationMethod := v1.VerificationMethod{
+	VerificationMethod := types.VerificationMethod{
 		Id:                 did + "#key-1",
 		Type:               "Ed25519VerificationKey2020",
 		Controller:         did,
 		PublicKeyMultibase: PublicKeyMultibase,
 	}
 
-	Service := v1.Service{
+	Service := types.Service{
 		Id:              "#service-2",
 		Type:            "DIDCommMessaging",
 		ServiceEndpoint: "endpoint",
 	}
 
-	return &v1.MsgCreateDidPayload{
+	return &types.MsgCreateDidPayload{
 		Id:                   did,
 		Controller:           nil,
-		VerificationMethod:   []*v1.VerificationMethod{&VerificationMethod},
+		VerificationMethod:   []*types.VerificationMethod{&VerificationMethod},
 		Authentication:       []string{did + "#key-1"},
 		AssertionMethod:      []string{did + "#key-1"},
 		CapabilityInvocation: []string{did + "#key-1"},
@@ -99,12 +99,12 @@ func (s *TestSetup) CreateDid(pubKey ed25519.PublicKey, did string) *v1.MsgCreat
 		KeyAgreement:         []string{did + "#key-1"},
 		AlsoKnownAs:          []string{did + "#key-1"},
 		Context:              []string{"Context"},
-		Service:              []*v1.Service{&Service},
+		Service:              []*types.Service{&Service},
 	}
 }
 
-func (s *TestSetup) CreateToUpdateDid(did *v1.MsgCreateDidPayload) *v1.MsgUpdateDidPayload {
-	return &v1.MsgUpdateDidPayload{
+func (s *TestSetup) CreateToUpdateDid(did *types.MsgCreateDidPayload) *types.MsgUpdateDidPayload {
+	return &types.MsgUpdateDidPayload{
 		Id:                   did.Id,
 		Controller:           did.Controller,
 		VerificationMethod:   did.VerificationMethod,
@@ -119,37 +119,37 @@ func (s *TestSetup) CreateToUpdateDid(did *v1.MsgCreateDidPayload) *v1.MsgUpdate
 	}
 }
 
-func (s *TestSetup) WrapCreateRequest(payload *v1.MsgCreateDidPayload, keys map[string]ed25519.PrivateKey) *v1.MsgCreateDid {
-	var signatures []*v1.SignInfo
+func (s *TestSetup) WrapCreateRequest(payload *types.MsgCreateDidPayload, keys map[string]ed25519.PrivateKey) *types.MsgCreateDid {
+	var signatures []*types.SignInfo
 	signingInput := payload.GetSignBytes()
 
 	for privKeyId, privKey := range keys {
 		signature := base64.StdEncoding.EncodeToString(ed25519.Sign(privKey, signingInput))
-		signatures = append(signatures, &v1.SignInfo{
+		signatures = append(signatures, &types.SignInfo{
 			VerificationMethodId: privKeyId,
 			Signature:            signature,
 		})
 	}
 
-	return &v1.MsgCreateDid{
+	return &types.MsgCreateDid{
 		Payload:    payload,
 		Signatures: signatures,
 	}
 }
 
-func (s *TestSetup) WrapUpdateRequest(payload *v1.MsgUpdateDidPayload, keys map[string]ed25519.PrivateKey) *v1.MsgUpdateDid {
-	var signatures []*v1.SignInfo
+func (s *TestSetup) WrapUpdateRequest(payload *types.MsgUpdateDidPayload, keys map[string]ed25519.PrivateKey) *types.MsgUpdateDid {
+	var signatures []*types.SignInfo
 	signingInput := payload.GetSignBytes()
 
 	for privKeyId, privKey := range keys {
 		signature := base64.StdEncoding.EncodeToString(ed25519.Sign(privKey, signingInput))
-		signatures = append(signatures, &v1.SignInfo{
+		signatures = append(signatures, &types.SignInfo{
 			VerificationMethodId: privKeyId,
 			Signature:            signature,
 		})
 	}
 
-	return &v1.MsgUpdateDid{
+	return &types.MsgUpdateDid{
 		Payload:    payload,
 		Signatures: signatures,
 	}
@@ -160,7 +160,7 @@ func GenerateKeyPair() KeyPair {
 	return KeyPair{PrivateKey, PublicKey}
 }
 
-func (s *TestSetup) InitDid(did string) (map[string]ed25519.PrivateKey, *v1.MsgCreateDidPayload, error) {
+func (s *TestSetup) InitDid(did string) (map[string]ed25519.PrivateKey, *types.MsgCreateDidPayload, error) {
 	pubKey, privKey, _ := ed25519.GenerateKey(rand.Reader)
 
 	// add new Did
@@ -174,7 +174,7 @@ func (s *TestSetup) InitDid(did string) (map[string]ed25519.PrivateKey, *v1.MsgC
 		return nil, nil, err
 	}
 
-	didResponse := v1.MsgCreateDidResponse{}
+	didResponse := types.MsgCreateDidResponse{}
 	if err := didResponse.Unmarshal(result.Data); err != nil {
 		return nil, nil, err
 	}
@@ -182,7 +182,7 @@ func (s *TestSetup) InitDid(did string) (map[string]ed25519.PrivateKey, *v1.MsgC
 	return keys, didMsg, nil
 }
 
-func (s *TestSetup) SendUpdateDid(msg *v1.MsgUpdateDidPayload, keys map[string]ed25519.PrivateKey) (*v1.Did, error) {
+func (s *TestSetup) SendUpdateDid(msg *types.MsgUpdateDidPayload, keys map[string]ed25519.PrivateKey) (*types.Did, error) {
 	// query Did
 	state, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
 	if len(msg.VersionId) == 0 {
@@ -198,7 +198,7 @@ func (s *TestSetup) SendUpdateDid(msg *v1.MsgUpdateDidPayload, keys map[string]e
 	return updated.GetDid()
 }
 
-func (s *TestSetup) SendCreateDid(msg *v1.MsgCreateDidPayload, keys map[string]ed25519.PrivateKey) (*v1.Did, error) {
+func (s *TestSetup) SendCreateDid(msg *types.MsgCreateDidPayload, keys map[string]ed25519.PrivateKey) (*types.Did, error) {
 	_, err := s.Handler(s.Ctx, s.WrapCreateRequest(msg, keys))
 	if err != nil {
 		return nil, err
@@ -220,7 +220,7 @@ func (s TestSetup) CreatePreparedDID() map[string]KeyPair {
 	prefilledDids := []struct {
 		keys    map[string]KeyPair
 		signers []string
-		msg     *v1.MsgCreateDidPayload
+		msg     *types.MsgCreateDidPayload
 	}{
 		{
 			keys: map[string]KeyPair{
@@ -228,10 +228,10 @@ func (s TestSetup) CreatePreparedDID() map[string]KeyPair {
 				AliceKey2: GenerateKeyPair(),
 			},
 			signers: []string{AliceKey1},
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id:             AliceDID,
 				Authentication: []string{AliceKey1},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey1,
 						Type:       "Ed25519VerificationKey2020",
@@ -248,7 +248,7 @@ func (s TestSetup) CreatePreparedDID() map[string]KeyPair {
 				BobKey4: GenerateKeyPair(),
 			},
 			signers: []string{BobKey2},
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id: BobDID,
 				Authentication: []string{
 					BobKey1,
@@ -258,7 +258,7 @@ func (s TestSetup) CreatePreparedDID() map[string]KeyPair {
 				CapabilityDelegation: []string{
 					BobKey4,
 				},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         BobKey1,
 						Type:       "Ed25519VerificationKey2020",
@@ -289,14 +289,14 @@ func (s TestSetup) CreatePreparedDID() map[string]KeyPair {
 				CharlieKey3: GenerateKeyPair(),
 			},
 			signers: []string{CharlieKey2},
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id: CharlieDID,
 				Authentication: []string{
 					CharlieKey1,
 					CharlieKey2,
 					CharlieKey3,
 				},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         CharlieKey1,
 						Type:       "Ed25519VerificationKey2020",

@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/cheqd/cheqd-node/x/cheqd/types/v1"
+	"github.com/cheqd/cheqd-node/x/cheqd/types"
 )
 
-var _ v1.QueryServer = Keeper{}
+var _ types.QueryServer = Keeper{}

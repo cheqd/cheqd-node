@@ -9,7 +9,7 @@ import (
 	"github.com/cheqd/cheqd-node/app"
 	"github.com/cheqd/cheqd-node/cmd/cheqd-noded/cmd"
 	"github.com/cheqd/cheqd-node/x/cheqd/client/cli"
-	"github.com/cheqd/cheqd-node/x/cheqd/types/v1"
+	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 	"github.com/spf13/cobra"
 )
@@ -47,23 +47,23 @@ func Setup() (*TestSetup, error) {
 	}, nil
 }
 
-func WrapRequestCreateDid(payload *v1.MsgCreateDidPayload, keys map[string]ed25519.PrivateKey) *v1.MsgCreateDid {
-	result := v1.MsgCreateDid{
+func WrapRequestCreateDid(payload *types.MsgCreateDidPayload, keys map[string]ed25519.PrivateKey) *types.MsgCreateDid {
+	result := types.MsgCreateDid{
 		Payload: payload,
 	}
 
-	var signatures []*v1.SignInfo
+	var signatures []*types.SignInfo
 	signingInput := result.Payload.GetSignBytes()
 
 	for privKeyId, privKey := range keys {
 		signature := base64.StdEncoding.EncodeToString(ed25519.Sign(privKey, signingInput))
-		signatures = append(signatures, &v1.SignInfo{
+		signatures = append(signatures, &types.SignInfo{
 			VerificationMethodId: privKeyId,
 			Signature:            signature,
 		})
 	}
 
-	return &v1.MsgCreateDid{
+	return &types.MsgCreateDid{
 		Payload:    payload,
 		Signatures: signatures,
 	}
@@ -73,7 +73,7 @@ func (t TestSetup) CreatePreparedDID() (map[string]KeyPair, error) {
 	prefilledDids := []struct {
 		keys    map[string]KeyPair
 		signers []string
-		msg     *v1.MsgCreateDidPayload
+		msg     *types.MsgCreateDidPayload
 	}{
 		{
 			keys: map[string]KeyPair{
@@ -81,10 +81,10 @@ func (t TestSetup) CreatePreparedDID() (map[string]KeyPair, error) {
 				AliceKey2: GenerateKeyPair(),
 			},
 			signers: []string{AliceKey1},
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id:             AliceDID,
 				Authentication: []string{AliceKey1},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey1,
 						Type:       "Ed25519VerificationKey2020",
@@ -101,7 +101,7 @@ func (t TestSetup) CreatePreparedDID() (map[string]KeyPair, error) {
 				BobKey4: GenerateKeyPair(),
 			},
 			signers: []string{BobKey2},
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id: BobDID,
 				Authentication: []string{
 					BobKey1,
@@ -111,7 +111,7 @@ func (t TestSetup) CreatePreparedDID() (map[string]KeyPair, error) {
 				CapabilityDelegation: []string{
 					BobKey4,
 				},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         BobKey1,
 						Type:       "Ed25519VerificationKey2020",
@@ -142,14 +142,14 @@ func (t TestSetup) CreatePreparedDID() (map[string]KeyPair, error) {
 				CharlieKey3: GenerateKeyPair(),
 			},
 			signers: []string{CharlieKey2},
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id: CharlieDID,
 				Authentication: []string{
 					CharlieKey1,
 					CharlieKey2,
 					CharlieKey3,
 				},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         CharlieKey1,
 						Type:       "Ed25519VerificationKey2020",
@@ -197,7 +197,7 @@ func (t TestSetup) CreatePreparedDID() (map[string]KeyPair, error) {
 	return keys, nil
 }
 
-func (t TestSetup) SendCreateDid(msg *v1.MsgCreateDidPayload, keys map[string]ed25519.PrivateKey) (string, error) {
+func (t TestSetup) SendCreateDid(msg *types.MsgCreateDidPayload, keys map[string]ed25519.PrivateKey) (string, error) {
 	msgWriteRequestBytes, _ := WrapRequestCreateDid(msg, keys).Marshal()
 	argWriteRequest := base64.StdEncoding.EncodeToString(msgWriteRequestBytes)
 	return t.ExecuteCommand("tx", "cheqd", "create-did", argWriteRequest)

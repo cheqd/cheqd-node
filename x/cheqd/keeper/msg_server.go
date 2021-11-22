@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/cheqd/cheqd-node/x/cheqd/types/v1"
+	"github.com/cheqd/cheqd-node/x/cheqd/types"
 )
 
 type msgServer struct {
@@ -10,8 +10,8 @@ type msgServer struct {
 
 // NewMsgSercheqdpl returns an implementation of the MsgServer interface
 // for the provided Keeper.
-func NewMsgSercheqdpl(keeper Keeper) v1.MsgServer {
+func NewMsgSercheqdpl(keeper Keeper) types.MsgServer {
 	return &msgServer{Keeper: keeper}
 }
 
-var _ v1.MsgServer = msgServer{}
+var _ types.MsgServer = msgServer{}

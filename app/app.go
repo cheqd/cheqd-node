@@ -1,7 +1,7 @@
 package app
 
 import (
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types/v1"
+	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	authzmodule "github.com/cosmos/cosmos-sdk/x/authz/module"

@@ -1,4 +1,4 @@
-package v1
+package types
 
 import (
 	"github.com/stretchr/testify/require"
