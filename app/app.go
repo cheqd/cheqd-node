@@ -2,6 +2,7 @@ package app
 
 import (
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	authzmodule "github.com/cosmos/cosmos-sdk/x/authz/module"
@@ -95,24 +96,19 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
-	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
 const Name = "cheqd-node"
 const ProtocolVersion = 1
 
-// this line is used by starport scaffolding # stargate/wasm/app/enabledProposals
-
 func getGovProposalHandlers() []govclient.ProposalHandler {
 	var govProposalHandlers []govclient.ProposalHandler
-	// this line is used by starport scaffolding # stargate/app/govProposalHandlers
 
 	govProposalHandlers = append(govProposalHandlers,
 		paramsclient.ProposalHandler,
 		distrclient.ProposalHandler,
 		upgradeclient.ProposalHandler,
 		upgradeclient.CancelProposalHandler,
-		// this line is used by starport scaffolding # stargate/app/govProposalHandler
 	)
 
 	return govProposalHandlers
@@ -235,7 +231,7 @@ func New(
 
 	bApp := baseapp.NewBaseApp(Name, logger, db, encodingConfig.TxConfig.TxDecoder(), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
-	bApp.SetVersion("1.2")
+	bApp.SetVersion(version.Version)
 	bApp.SetProtocolVersion(ProtocolVersion)
 	bApp.SetInterfaceRegistry(interfaceRegistry)
 
