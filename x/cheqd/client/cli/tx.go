@@ -3,10 +3,8 @@ package cli
 import (
 	"fmt"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
-
-	"github.com/spf13/cobra"
-
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/spf13/cobra"
 )
 
 // GetTxCmd returns the transaction commands for this module
