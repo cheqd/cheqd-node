@@ -89,6 +89,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 	rootCmd.AddCommand(
 		extendInit(genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome)),
 		configureCmd(app.DefaultNodeHome),
+		toolsCmd(),
 		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
 		genutilcli.MigrateGenesisCmd(),
 		genutilcli.GenTxCmd(app.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
@@ -96,7 +97,6 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		AddGenesisAccountCmd(app.DefaultNodeHome),
 		tmcli.NewCompletionCmd(rootCmd, true),
 		debug.Cmd(),
-		// this line is used by starport scaffolding # stargate/root/commands
 	)
 
 	a := appCreator{encodingConfig}

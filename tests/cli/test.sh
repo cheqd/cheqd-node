@@ -12,3 +12,5 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     sed_extension='.orig'
 fi
+
+cheqd-noded keys list --keyring-backend "test"

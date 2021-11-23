@@ -8,9 +8,8 @@ type msgServer struct {
 	Keeper
 }
 
-// NewMsgSercheqdpl returns an implementation of the MsgServer interface
-// for the provided Keeper.
-func NewMsgSercheqdpl(keeper Keeper) types.MsgServer {
+// NewMsgServer returns an implementation of the MsgServer interface for the provided Keeper.
+func NewMsgServer(keeper Keeper) types.MsgServer {
 	return &msgServer{Keeper: keeper}
 }
 

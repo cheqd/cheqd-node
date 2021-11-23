@@ -29,8 +29,8 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 	}
 
 	// Checks that the did doesn't exist
-	if err := k.EnsureDidIsNotUsed(ctx, didMsg.Id); err != nil {
-		return nil, err
+	if k.HasDid(ctx, didMsg.Id) {
+		return nil, sdkerrors.Wrap(types.ErrDidDocExists, fmt.Sprintf("DID is already used by DIDDoc %s", didMsg.Id))
 	}
 
 	var did = types.Did{

@@ -1,22 +1,21 @@
 package keeper
 
 import (
+	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 func getDid(ctx sdk.Context, id string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
-	if !keeper.HasDid(ctx, id) {
-		return nil, sdkerrors.ErrKeyNotFound
-	}
+	queryServer := NewQueryServer(keeper)
 
-	msg, err := keeper.GetDid(&ctx, id)
+	resp, err := queryServer.Did(sdk.WrapSDKContext(ctx) , &types.QueryGetDidRequest{Id: id})
 	if err != nil {
 		return nil, err
 	}
 
-	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, msg)
+	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, resp)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
