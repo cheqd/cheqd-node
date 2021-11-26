@@ -101,7 +101,7 @@ If you need help or support, join our [**cheqd Community Slack**](http://cheqd.l
 
    Parameters required in the transaction above are:
 
-   * **`amount`**: Amount of tokens to stake
+   * **`amount`**: Amount of tokens to stake. You should stake at least 1 CHEQ (= 1,000,000,000ncheq) to successfully complete a staking transaction.
    * **`from`**: Key alias of the node operator account that makes the initial stake
    * **`min-self-delegation`**: Minimum amount of tokens that the node operator promises to keep bonded
    * **`pubkey`**: Node's `bech32`-encoded validator public key from the previous step
@@ -118,7 +118,7 @@ If you need help or support, join our [**cheqd Community Slack**](http://cheqd.l
    _Example transaction:_
 
    ```bash
-   cheqd-noded tx staking create-validator --amount 1000ncheq --from eu-node-operator --moniker node1-eu-testnet-cheqd --chain-id cheqd-mainnet-1 --min-self-delegation="1" --gas="300000" --gas-prices="25ncheq" --pubkey '{"@type":"/cosmos.crypto.ed25519.PubKey","key":"4anVUO8WhmRMqG1t4z6VxqmqZL3V7q6HqucjwZePiUw="}' --commission-max-change-rate="0.02" --commission-max-rate="0.02" --commission-rate="0.01" --node http://sentry1.eu.cheqd.net:26657
+   cheqd-noded tx staking create-validator --amount 1000000000ncheq --from key-alias-name --moniker mainnet-validator-name --chain-id cheqd-mainnet-1 --min-self-delegation="1" --gas auto --gas-adjustment 1.2 --gas-prices="25ncheq" --pubkey '{"@type":"/cosmos.crypto.ed25519.PubKey","key":"4anVUO8WhmRMqG1t4z6VxqmqZL3V7q6HqucjwZePiUw="}' --commission-max-change-rate="0.05" --commission-max-rate="0.1" --commission-rate="0.05" --node https://rpc.cheqd.net:443
    ```
 
 4. **Check that your validator node is bonded**
