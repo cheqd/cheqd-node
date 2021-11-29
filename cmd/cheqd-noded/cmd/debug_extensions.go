@@ -10,17 +10,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// configureCmd returns tools cobra Command.
-func toolsCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "tools",
-		Short: "Tools intended to be used for debugging",
-	}
-
-	cmd.AddCommand(ed25519Cmd(),
+func extendDebug(debugCmd *cobra.Command) *cobra.Command {
+	debugCmd.AddCommand(ed25519Cmd(),
 		encodingCmd())
 
-	return cmd
+	return debugCmd
 }
 
 // ed25519Cmd returns cobra Command.

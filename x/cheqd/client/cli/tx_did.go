@@ -75,6 +75,12 @@ func CmdCreateDid() *cobra.Command {
 				Signatures: []*types.SignInfo{ &signInfo },
 			}
 
+			//Set fee-payer if not set
+			err = setFeePayerFromSigner(&clientCtx)
+			if err != nil {
+				return err
+			}
+
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
 		},
 	}
