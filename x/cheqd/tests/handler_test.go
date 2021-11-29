@@ -1013,6 +1013,7 @@ func TestUpdateDid(t *testing.T) {
 			msg := tc.msg
 
 			for _, vm := range msg.VerificationMethod {
+				// TODO: Replace with multibase encoding
 				vm.PublicKeyMultibase = "z" + base58.Encode(tc.keys[vm.Id].PublicKey)
 			}
 
