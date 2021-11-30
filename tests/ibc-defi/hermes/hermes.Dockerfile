@@ -12,7 +12,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 
 WORKDIR /app
 
-RUN git clone --depth 1 --branch v0.7.3 https://github.com/informalsystems/ibc-rs
+RUN git clone --depth 1 --branch v0.9.0 https://github.com/informalsystems/ibc-rs
 
 WORKDIR /app/ibc-rs
 

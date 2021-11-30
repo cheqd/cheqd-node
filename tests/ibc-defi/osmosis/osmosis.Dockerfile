@@ -17,7 +17,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 # App
 WORKDIR /app
 
-RUN git clone --depth 1 --branch v4.0.0 https://github.com/osmosis-labs/osmosis
+RUN git clone --depth 1 --branch v4.2.0 https://github.com/osmosis-labs/osmosis
 
 WORKDIR /app/osmosis
 
