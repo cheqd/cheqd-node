@@ -13,10 +13,10 @@ jobs:
     name: Build binary and create deb package
     runs-on: ubuntu-20.04
     steps:
-      - name: Set up Go 1.16
+      - name: Set up Go 1.17
         uses: actions/setup-go@v2
         with:
-          go-version: 1.16
+          go-version: 1.17
 
       # There is an issue with the latest starport, especially 0.18 version
       - name: Download and build starport
