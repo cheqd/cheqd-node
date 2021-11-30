@@ -19,7 +19,7 @@ RUN wget -qO- https://github.com/tendermint/starport/releases/download/v0.17.3/s
 # App
 WORKDIR /app
 
-RUN git clone --depth 1 --branch v0.2.3 https://github.com/cheqd/cheqd-node
+RUN git clone --depth 1 --branch v0.3.1 https://github.com/cheqd/cheqd-node
 
 WORKDIR /app/cheqd-node
 
