@@ -2,33 +2,34 @@ package cli
 
 import (
 	"context"
+
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/spf13/cobra"
 )
 
-func CmdShowDid() *cobra.Command {
+func CmdGetDid() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-did [id]",
-		Short: "shows a did",
+		Use:   "did [id]",
+		Short: "Query a did",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			id := args[0]
+			did := args[0]
 			params := &types.QueryGetDidRequest{
-				Id: id,
+				Id: did,
 			}
 
-			res, err := queryClient.Did(context.Background(), params)
+			resp, err := queryClient.Did(context.Background(), params)
 			if err != nil {
 				return err
 			}
 
-			return clientCtx.PrintProto(res)
+			return clientCtx.PrintProto(resp)
 		},
 	}
 
