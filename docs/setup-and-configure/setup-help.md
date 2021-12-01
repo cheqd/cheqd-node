@@ -93,23 +93,25 @@ We suggest the set:
 --gas-price
 ```
 
-should fall within this range:
+should fall within this recommended range:
 
-Low: 25ncheq(recommended) 
+Low: 25ncheq
 Medium: 50ncheq 
 High: 100ncheq 
-
-### Should I set my firewall port 26656 open to the world?
-
-Yes, this is how you should do it. Since it's a public permissionless network, there's no way of pre-determining what the set of IP addresses will be, as entities may leave and join the network. We suggest using a TCP/network load balancer and keeping your VM/node in a private subnet though for security reasons. The LB then becomes your network edge which if you're hosting on a cloud provider they manage/patch/run.
 
 
 ### How do I change my public name and description
 
-Your public name, is also known as your moniker. 
+Your public name, is also known as your **moniker**. 
 
 You are able to change this, as well as the description of your node using the function:
 
 ```
 cheqd-noded tx staking edit-validator --from validator1-eu --moniker "cheqd" --details "cheqd is building a private and secure decentralised digital identity network on the Cosmos ecosystem" --website "https://www.cheqd.io" --identity "F0669B9ACEE06ADC" --security-contact security@cheqd.io --gas auto --gas-adjustment 1.2 --gas-prices 25ncheq -chain-id cheqd-mainnet-1
 ```
+
+### Should I set my firewall port 26656 open to the world?
+
+Yes, this is how you should do it. Since it's a public permissionless network, there's no way of pre-determining what the set of IP addresses will be, as entities may leave and join the network. We suggest using a TCP/network load balancer and keeping your VM/node in a private subnet though for security reasons. The LB then becomes your network edge which if you're hosting on a cloud provider they manage/patch/run.
+
+
