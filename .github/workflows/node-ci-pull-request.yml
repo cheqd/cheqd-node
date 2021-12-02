@@ -12,9 +12,9 @@ on:
 jobs:
   build-and-setup:
     # name: Build deb, images and set up docker pool
-    uses: cheqd/cheqd-node/.github/workflows/reusable-build-and-setup.yml@main
+    uses: cheqd/cheqd-node/.github/workflows/reusable-build-and-setup.yml
 
   cosmos-and-identity-tests:
     needs: build-and-setup
     # name: Run cosmos and identity tests
-    uses: cheqd/cheqd-node/.github/workflows/reusable-cosmos-and-identity-tests.yml@main
+    uses: cheqd/cheqd-node/.github/workflows/reusable-cosmos-and-identity-tests.yml
