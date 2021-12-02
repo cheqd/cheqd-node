@@ -1,7 +1,12 @@
-name: Lint code and run unit tests
+name: "cheqd-node CI: Lint code and run unit tests"
 
 on:
-  workflow_call:
+  push:
+    paths-ignore:
+    - '**.md'
+    - 'docs/**'
+    - 'architecture/**'
+    - '.gitbook/**'
 
 jobs:
   lint:
