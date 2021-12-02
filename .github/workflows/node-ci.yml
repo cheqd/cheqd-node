@@ -1,8 +1,7 @@
-name: cheqd-node CI (pull request)
+name: cheqd-node CI
 
-on: 
-  pull_request:
-    branches: [ main ]
+on:
+  push:
     paths-ignore:
     - '**.md'
     - 'docs/**'
@@ -10,6 +9,10 @@ on:
     - '.gitbook/**'
 
 jobs:
+  lint-and-test:
+    # name: Lint code and run unit tests
+    uses: ./.github/workflows/reusable-lint-and-test.yml
+
   build-and-setup:
     # name: Build deb, images and set up docker pool
     uses: ./.github/workflows/reusable-build-and-setup.yml
