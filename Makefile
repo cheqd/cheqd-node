@@ -108,7 +108,6 @@ $(BUILD_TARGETS): go.sum $(BUILDDIR)/
 $(BUILDDIR)/:
 	mkdir -p $(BUILDDIR)/
 
-distclean: clean tools-clean
 clean:
 	rm -rf \
     $(BUILDDIR)/ \
