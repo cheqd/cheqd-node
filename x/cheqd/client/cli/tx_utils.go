@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"crypto/ed25519"
 	"encoding/base64"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/input"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
@@ -11,7 +12,6 @@ import (
 	sdkerr "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/spf13/cobra"
 )
-
 
 func setFeePayerFromSigner(ctx *client.Context) error {
 	if ctx.FromAddress != nil {
@@ -44,7 +44,7 @@ func accAddrByKeyRef(keyring keyring.Keyring, keyRef string) (sdk.AccAddress, er
 	return sdk.AccAddressFromBech32(keyRef)
 }
 
-func getVerKey(cmd *cobra.Command, err error, clientCtx client.Context) (ed25519.PrivateKey, error) {
+func getVerKey(cmd *cobra.Command, clientCtx client.Context) (ed25519.PrivateKey, error) {
 	// Try getting from arg
 	verKeyPrivBase64, err := cmd.Flags().GetString(FlagVerKey)
 	if err != nil {

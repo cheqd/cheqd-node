@@ -38,7 +38,7 @@ func CmdCreateDid() *cobra.Command {
 			}
 
 			// Get verKey
-			verKeyPriv, err := getVerKey(cmd, err, clientCtx)
+			verKeyPriv, err := getVerKey(cmd, clientCtx)
 			if err != nil {
 				return err
 			}
@@ -99,7 +99,7 @@ func CmdUpdateDid() *cobra.Command {
 			}
 
 			// Get verKey
-			verKeyPriv, err := getVerKey(cmd, err, clientCtx)
+			verKeyPriv, err := getVerKey(cmd, clientCtx)
 			if err != nil {
 				return err
 			}
