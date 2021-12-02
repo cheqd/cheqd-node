@@ -55,6 +55,8 @@ jobs:
         run: wget -qO- https://github.com/tendermint/starport/releases/download/v0.18.6/starport_0.18.6_linux_amd64.tar.gz | tar xvz -C /tmp/ && sudo cp /tmp/starport /usr/bin
 
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # Starport requires full repository
 
       - name: Build CLI to run commands
         run: |
