@@ -42,7 +42,7 @@ jobs:
         run: go test -v ./...
 
   build-deb-package:
-    name: Build binary and create deb package
+    name: Build binary and deb package
     runs-on: ubuntu-20.04
     steps:
       - name: Set up Go 1.17
@@ -51,11 +51,10 @@ jobs:
           go-version: 1.17
 
       # There is an issue with the latest starport, especially 0.18 version
-      - name: Download and build starport
+      - name: Download and install starport
         run: wget -qO- https://github.com/tendermint/starport/releases/download/v0.18.6/starport_0.18.6_linux_amd64.tar.gz | tar xvz -C /tmp/ && sudo cp /tmp/starport /usr/bin
 
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
       - name: Build CLI to run commands
         run: starport chain build
