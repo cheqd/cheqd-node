@@ -11,7 +11,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     sed_extension='.orig'
 fi
 
-source "../common.sh"
+SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+source "$SCRIPT_DIR/common.sh"
 
 
 # Creating DID
@@ -44,6 +45,29 @@ assert_tx_successful "$RESULT"
 
 # Query DID
 RESULT=$(cheqd-noded query cheqd did "${DID}" ${QUERY_PARAMS})
-echo "$RESULT" | jq -r ".metadata.version_id"
 
-echo "$RESULT" | jq -r ".metadata.version_id"
+EXPECTED='{
+   "context":[],
+   "id":"'${DID}'",
+   "controller":[],
+   "verification_method":[
+      {
+         "id":"'${KEY_ID}'",
+         "type":"Ed25519VerificationKey2020",
+         "controller":"'${DID}'",
+         "public_key_jwk":[],
+         "public_key_multibase":"'${ALICE_VER_PUB_MULTIBASE_58}'"
+      }
+   ],
+   "authentication":[
+      "'${KEY_ID}'"
+   ],
+   "assertion_method":[],
+   "capability_invocation":[],
+   "capability_delegation":[],
+   "key_agreement":[],
+   "service":[],
+   "also_known_as":[]
+}'
+
+assert_json_eq "${EXPECTED}" "$(echo "$RESULT" | jq -r ".did")"

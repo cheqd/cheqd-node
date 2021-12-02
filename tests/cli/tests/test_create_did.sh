@@ -11,7 +11,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     sed_extension='.orig'
 fi
 
-source "../common.sh"
+SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+source "$SCRIPT_DIR/common.sh"
 
 
 # Generate Alice identity key

@@ -11,7 +11,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     sed_extension='.orig'
 fi
 
-source "../common.sh"
+SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+source "$SCRIPT_DIR/common.sh"
 
 
 # Creating DID
@@ -41,10 +42,16 @@ RESULT=$(cheqd-noded tx cheqd create-did "${MSG_CREATE_DID}" "${KEY_ID}" --ver-k
 
 assert_tx_successful "$RESULT"
 
+# Query DID to find out version id
+# TODO: VersionId must be returned in MsgCreateDidResp
+RESULT=$(cheqd-noded query cheqd did "${DID}" ${QUERY_PARAMS})
+VERSION_ID=$(echo "${RESULT}" | jq -r ".metadata.version_id")
+
 
 # Updating DID
 MSG_UPDATE_DID='{
   "id": "'${DID}'",
+  "version_id": "'$VERSION_ID'",
   "verification_method": [{
     "id": "'${KEY_ID}'",
     "type": "Ed25519VerificationKey2020",
@@ -64,3 +71,35 @@ RESULT=$(cheqd-noded tx cheqd update-did "${MSG_UPDATE_DID}" "${KEY_ID}" --ver-k
   --from "${BASE_ACCOUNT_1}" ${TX_PARAMS})
 
 assert_tx_successful "$RESULT"
+
+
+# Query DID and assert resp
+RESULT=$(cheqd-noded query cheqd did "${DID}" ${QUERY_PARAMS})
+
+EXPECTED='{
+   "context":[],
+   "id":"'${DID}'",
+   "controller":[],
+   "verification_method":[
+      {
+         "id":"'${KEY_ID}'",
+         "type":"Ed25519VerificationKey2020",
+         "controller":"'${DID}'",
+         "public_key_jwk":[],
+         "public_key_multibase":"'${ALICE_VER_PUB_MULTIBASE_58}'"
+      }
+   ],
+   "authentication":[
+      "'${KEY_ID}'"
+   ],
+   "assertion_method":[],
+   "capability_invocation":[],
+   "capability_delegation":[
+      "'${KEY_ID}'"
+   ],
+   "key_agreement":[],
+   "service":[],
+   "also_known_as":[]
+}'
+
+assert_json_eq "${EXPECTED}" "$(echo "$RESULT" | jq -r ".did")"

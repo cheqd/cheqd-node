@@ -22,7 +22,7 @@ export DELAYED_VESTING_ACCOUNT="delayed_vesting_account"
 export PERIODIC_VESTING_ACCOUNT="periodic_vesting_account"
 
 function random_string() {
-  cat /dev/urandom | tr -dc '[:alpha:]' | fold -w ${1:-20} | head -n 1
+  echo $RANDOM | base64 | head -c 20
   return 0
 }
 
@@ -39,6 +39,12 @@ function assert_eq() {
     return 0
 }
 
+function assert_json_eq() {
+    ACTUAL=$1
+    EXPECTED=$2
+
+    assert_eq "$(echo "${ACTUAL}" | jq --sort-keys ".")" "$(echo "${EXPECTED}" | jq --sort-keys ".")"
+}
 
 function assert_tx_successful() {
     OUTPUT=$1
