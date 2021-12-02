@@ -6,7 +6,7 @@
 
 ## Quick start for joining cheqd networks
 
-Join our [**cheqd Community Slack**](http://cheqd.link/join-cheqd-slack) for help, question, and support if you are looking at joining either the cheqd mainnet or the testnet/ Either the cheqd team, or one of your fellow node operators will be happy to offer some guidance.
+Join our [**cheqd Community Slack**](http://cheqd.link/join-cheqd-slack) for help, question, and support if you are looking at joining either the cheqd mainnet or the testnet. Either the cheqd team, or one of your fellow node operators will be happy to offer some guidance.
 
 ### Mainnet
 
