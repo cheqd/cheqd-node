@@ -73,3 +73,33 @@ jobs:
           export OP0_ADDRESS=""
           export OP1_ADDRESS=""
           pytest -v -rP tests/e2e/test_identity.py
+
+  run-cosmos-cli-identity-tests:
+    name: Run identity tests using Cosmos CLI
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Load binary artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: cheqd-noded
+
+      - name: Build node image
+        run: |
+          docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
+
+      - name: Build test net image
+        run: |
+          docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
+
+      - name: Run test net container
+        run: |
+          docker run -d --rm -p "26657:26657" cheqd-testnet
+
+      - name: Set up and run tests
+        working-directory: tests/cli
+        run: |
+          bash import_keys.sh
+          bash run_all.sh

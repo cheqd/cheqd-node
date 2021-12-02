@@ -28,6 +28,12 @@ jobs:
       - name: Build CLI to run commands
         run: starport chain build
 
+      - name: Store binary artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: cheqd-noded
+          path: /home/runner/go/bin/cheqd-noded
+
       - name: Make archive
         run: |
           ./build_tar.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }} 
