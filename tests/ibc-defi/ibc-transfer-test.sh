@@ -31,12 +31,12 @@ sleep 15 # Wait for chains
 
 info "Create relayer user on cheqd"  # ---
 CHEQD_RELAYER_KEY_NAME="cheqd-relayer"
-CHEQD_RELAYER_ACCOUNT=$(docker-compose exec cheqd cheqd-noded keys add ${CHEQD_RELAYER_KEY_NAME} --output json)
+CHEQD_RELAYER_ACCOUNT=$(docker-compose exec cheqd cheqd-noded keys add ${CHEQD_RELAYER_KEY_NAME} --keyring-backend test --output json)
 CHEQD_RELAYER_ADDRESS=$(echo ${CHEQD_RELAYER_ACCOUNT} | jq --raw-output '.address')
 CHEQD_RELAYER_MNEMONIC=$(echo ${CHEQD_RELAYER_ACCOUNT} | jq --raw-output '.mnemonic')
 
 info "Send some tokens to it" # ---
-RES=$(docker-compose exec cheqd cheqd-noded tx bank send cheqd-user ${CHEQD_RELAYER_ADDRESS} 1000000000000ncheq --gas-prices 25ncheq --chain-id cheqd -y)
+RES=$(docker-compose exec cheqd cheqd-noded tx bank send cheqd-user ${CHEQD_RELAYER_ADDRESS} 1000000000000ncheq --gas-prices 25ncheq --chain-id cheqd -y --keyring-backend test)
 [[ $(echo $RES | jq --raw-output '.code') == 0 ]] && info "tx successfull" || (err "non zero tx return code"; exit 1)
 
 
@@ -63,7 +63,7 @@ docker-compose exec -d hermes hermes start
 
 
 info "Check balances" # ---
-CHEQD_USER_ADDRESS=$(docker-compose exec cheqd cheqd-noded keys show --address cheqd-user | sed 's/\r//g')
+CHEQD_USER_ADDRESS=$(docker-compose exec cheqd cheqd-noded keys show --address cheqd-user --keyring-backend test | sed 's/\r//g')
 OSMOSIS_USER_ADDRESS=$(docker-compose exec osmosis osmosisd keys show --address osmosis-user --keyring-backend test | sed 's/\r//g')
 
 CHEQD_BALANCE_1=$(docker-compose exec cheqd cheqd-noded query bank balances $CHEQD_USER_ADDRESS --output json)
@@ -72,7 +72,7 @@ docker-compose exec osmosis osmosisd query bank balances $OSMOSIS_USER_ADDRESS
 info "Forward transfer" # ---
 PORT="transfer"
 CHANNEL="channel-0"
-docker-compose exec cheqd cheqd-noded tx ibc-transfer transfer $PORT $CHANNEL $OSMOSIS_USER_ADDRESS 10000000000ncheq --from cheqd-user --chain-id cheqd --gas-prices 25ncheq -y
+docker-compose exec cheqd cheqd-noded tx ibc-transfer transfer $PORT $CHANNEL $OSMOSIS_USER_ADDRESS 10000000000ncheq --from cheqd-user --chain-id cheqd --gas-prices 25ncheq --keyring-backend test -y
 sleep 30 # Wait for relayer
 
 info "Check balances the second time" # ---

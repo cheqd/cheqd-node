@@ -1,0 +1,75 @@
+name: Run cosmos and identity tests
+
+on:
+  workflow_call:
+
+env:
+  NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/tests/networks/docker_compose/node_configs"
+  PACKAGE_NAME: "cheqd-node"
+  VERSION: "1.0.0" # Package build scripts require version to be provided
+
+jobs:
+  run-cosmos-specific-tests:
+    name: Run cosmos-specific tests using cheqd-node CLI
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Download deb
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+
+      - name: Install deb
+        run: |
+          sudo dpkg -i ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Build node image
+        run: |
+          docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
+      - name: Set up 4 validators + 2 observers node docker pool for local test run
+        working-directory: ./tests/networks/docker_compose
+        run: |
+          ./gen_node_configs.sh
+          ./run_docker.sh
+          ./wait.sh '[[ $(curl -s -N localhost:26657/block | jq -cr '"'"'.result.block.last_commit.height'"'"') -gt 1 ]] && echo "Height is more than 1"'
+      - name: Set up test environment
+        working-directory: ./tests/e2e
+        run: |
+          pip3 install -r requirements.txt >> /dev/null
+          pip3 install --force-reinstall 'git+https://gitlab.com/evernym/verity/vdr-tools.git@cheqd-node-0.3.1#egg=vdr-tools&subdirectory=wrappers/python' -U
+          cp -R ${NODE_CONFIGS_BASE}/client/.cheqdnode /home/runner/
+          sudo chmod -R 777 /home/runner
+      - name: Run tests
+        run: |
+          export OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
+          export OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p | sed 's/\r//g')
+          pytest -v -rP tests/e2e/test_cosmos.py
+
+  run-identity-specific-tests:
+    name: Run identity-specific tests using VDR
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Build node image
+        run: |
+          docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
+      - name: Build test net image
+        run: |
+          docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
+      - name: Run test net container
+        run: |
+          docker run -d --rm -p "26657:26657" cheqd-testnet
+      - name: Set up test environment
+        working-directory: ./tests/e2e
+        run: |
+          sudo cp libindy.so /usr/lib/libindy.so
+          pip3 install -r requirements.txt >> /dev/null
+          pip3 install --force-reinstall 'git+https://gitlab.com/evernym/verity/vdr-tools.git@cheqd-node-0.3.1#egg=vdr-tools&subdirectory=wrappers/python' -U
+      - name: Run tests
+        run: |
+          export OP0_ADDRESS=""
+          export OP1_ADDRESS=""
+          pytest -v -rP tests/e2e/test_identity.py
