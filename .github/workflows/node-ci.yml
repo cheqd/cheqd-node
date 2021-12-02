@@ -41,8 +41,8 @@ jobs:
       - name: Run tests
         run: go test -v ./...
 
-  build-deb-package:
-    name: Build binary and deb package
+  build-binary:
+    name: Build binary
     runs-on: ubuntu-20.04
     steps:
       - name: Set up Go 1.17
@@ -59,13 +59,21 @@ jobs:
           fetch-depth: 0 # FIXME: Starport requires full repository
 
       - name: Build CLI to run commands
-        run: |
-          which starport
-          starport
-          starport chain build
+        run: starport chain build
 
       - name: Store binary artifact
         uses: actions/upload-artifact@v2
+        with:
+          name: cheqd-noded
+          path: /home/runner/go/bin/cheqd-noded
+
+  build-deb-package:
+    name: Build deb package
+    runs-on: ubuntu-20.04
+    needs: build-binary
+    steps:
+      - name: Load binary artifact
+        uses: actions/download-artifact@v2
         with:
           name: cheqd-noded
           path: /home/runner/go/bin/cheqd-noded
@@ -200,18 +208,22 @@ jobs:
       - name: Build node image
         run: |
           docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
+
       - name: Build test net image
         run: |
           docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
+
       - name: Run test net container
         run: |
           docker run -d --rm -p "26657:26657" cheqd-testnet
+      
       - name: Set up test environment
         working-directory: ./tests/e2e
         run: |
           sudo cp libindy.so /usr/lib/libindy.so
           pip3 install -r requirements.txt >> /dev/null
           pip3 install --force-reinstall 'git+https://gitlab.com/evernym/verity/vdr-tools.git@cheqd-node-0.3.1#egg=vdr-tools&subdirectory=wrappers/python' -U
+      
       - name: Run tests
         run: |
           export OP0_ADDRESS=""
@@ -231,6 +243,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: cheqd-noded
+          path: /home/runner/go/bin/cheqd-noded
 
       - name: Build node image
         run: |
