@@ -80,14 +80,14 @@ jobs:
       RELEASE_TAG: ${{ needs.setup-workflow.outputs.VERSION }}
       STARPORT_RELEASE_PARAMS: "--release"
     steps:
-      - name: Set up Go 1.x
+      - name: Set up Go 1.17
         uses: actions/setup-go@v2
         with:
           go-version: 1.17
 
       # There is an issue with the latest starport, especially 0.18 version
       - name: Install starport
-        run: wget -qO- https://github.com/tendermint/starport/releases/download/v0.17.3/starport_0.17.3_linux_amd64.tar.gz \
+        run: wget -qO- https://github.com/tendermint/starport/releases/download/v0.18.6/starport_0.18.6_linux_amd64.tar.gz \
              | tar xvz -C /tmp/ && sudo cp /tmp/starport /usr/bin
 
       - name: Git checkout

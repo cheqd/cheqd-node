@@ -1,11 +1,10 @@
 syntax = "proto3";
 package cheqdid.cheqdnode.cheqd.v1;
+
+option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
+
 import "google/protobuf/any.proto";
 import "cheqd/v1/did.proto";
-
-// this line is used by starport scaffolding # proto/tx/import
-
-option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types/v1";
 
 // Msg defines the Msg service.
 service Msg {
@@ -44,7 +43,7 @@ message MsgCreateDidPayload {
 }
 
 message MsgCreateDidResponse {
-  string id = 1;
+  string id = 1; // Not necessary
 }
 
 message MsgUpdateDidPayload {
@@ -63,5 +62,5 @@ message MsgUpdateDidPayload {
 }
 
 message MsgUpdateDidResponse {
-  string id = 1;
+  string id = 1; // Not necessary
 }

@@ -2,12 +2,12 @@ package keeper
 
 import (
 	"crypto/ed25519"
-	"github.com/cheqd/cheqd-node/x/cheqd/types/v1"
+	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func (k *Keeper) GetDidPrefix(ctx sdk.Context) string {
-	prefix := v1.DidPrefix + ":" + v1.DidMethod + ":"
+	prefix := types.DidPrefix + ":" + types.DidMethod + ":"
 	namespace := k.GetDidNamespace(ctx)
 	if len(namespace) > 0 {
 		prefix = prefix + namespace + ":"
@@ -15,21 +15,21 @@ func (k *Keeper) GetDidPrefix(ctx sdk.Context) string {
 	return prefix
 }
 
-func FindPublicKey(signer v1.Signer, id string) (ed25519.PublicKey, error) {
+func FindPublicKey(signer types.Signer, id string) (ed25519.PublicKey, error) {
 	for _, authentication := range signer.Authentication {
 		if authentication == id {
 			vm := FindVerificationMethod(signer.VerificationMethod, id)
 			if vm == nil {
-				return nil, v1.ErrVerificationMethodNotFound.Wrap(id)
+				return nil, types.ErrVerificationMethodNotFound.Wrap(id)
 			}
 			return vm.GetPublicKey()
 		}
 	}
 
-	return nil, v1.ErrVerificationMethodNotFound.Wrap(id)
+	return nil, types.ErrVerificationMethodNotFound.Wrap(id)
 }
 
-func FindVerificationMethod(vms []*v1.VerificationMethod, id string) *v1.VerificationMethod {
+func FindVerificationMethod(vms []*types.VerificationMethod, id string) *types.VerificationMethod {
 	for _, vm := range vms {
 		if vm.Id == id {
 			return vm

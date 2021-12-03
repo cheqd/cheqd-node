@@ -1,12 +1,12 @@
 syntax = "proto3";
 package cheqdid.cheqdnode.cheqd.v1;
 
+option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
+
 import "google/api/annotations.proto";
-// this line is used by starport scaffolding # 1
 import "cheqd/v1/did.proto";
 import "cheqd/v1/stateValue.proto";
 
-option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types/v1";
 
 // Query defines the gRPC querier service.
 service Query {
