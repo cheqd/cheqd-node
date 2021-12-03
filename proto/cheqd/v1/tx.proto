@@ -44,7 +44,6 @@ message MsgCreateDidPayload {
 
 message MsgCreateDidResponse {
   string id = 1; // Not necessary
-  // TODO: Version must be there
 }
 
 message MsgUpdateDidPayload {
@@ -64,5 +63,4 @@ message MsgUpdateDidPayload {
 
 message MsgUpdateDidResponse {
   string id = 1; // Not necessary
-  // TODO: Version must be there
 }

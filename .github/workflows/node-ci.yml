@@ -73,8 +73,6 @@ jobs:
     needs: build-binary
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0 # FIXME: Starport requires full repository
 
       - name: Load binary artifact
         uses: actions/download-artifact@v2
