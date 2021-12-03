@@ -313,10 +313,10 @@ jobs:
       - name: Run test net container
         run: |
           docker run -d --rm -p "26657:26657" cheqd-testnet
-          bash tests/networks/wait_for_chain.sh
+          ./tests/networks/wait_for_chain.sh
 
       - name: Set up and run tests
         working-directory: tests/cli
         run: |
-          bash import_keys.sh
-          bash run_all.sh
+          ./import_keys.sh
+          ./run_all.sh
