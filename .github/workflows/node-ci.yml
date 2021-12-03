@@ -82,9 +82,6 @@ jobs:
           name: cheqd-noded
           path: /home/runner/go/bin
 
-      - name: Restore binary permissions  # FIXME: Is it needed here?
-        run: sudo chmod 777 /home/runner/.local/bin/cheqd-noded
-
       - name: Make archive
         working-directory: ./build_tools
         run: |
