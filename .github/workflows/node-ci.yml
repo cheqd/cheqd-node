@@ -82,6 +82,9 @@ jobs:
           name: cheqd-noded
           path: /home/runner/go/bin
 
+      - name: Restore binary permissions  # FIXME: Is it needed here?
+        run: sudo chmod 777 /home/runner/.local/bin/cheqd-noded
+
       - name: Make archive
         working-directory: ./build_tools
         run: |
@@ -219,6 +222,9 @@ jobs:
           name: cheqd-noded
           path: /home/runner/.local/bin
 
+      - name: Restore binary permissions
+        run: sudo chmod 777 /home/runner/.local/bin/cheqd-noded
+
       - name: Download node image
         uses: actions/download-artifact@v2
         with:
@@ -294,6 +300,9 @@ jobs:
         with:
           name: cheqd-noded
           path: /home/runner/.local/bin
+
+      - name: Restore binary permissions
+        run: sudo chmod 777 /home/runner/.local/bin/cheqd-noded
 
       - name: Download testnet image
         uses: actions/download-artifact@v2
