@@ -121,7 +121,7 @@ Please note the parameters below are just an “**example**”.
    
 When setting, for example, the commission, please look at this example for commissions: https://www.mintscan.io/cosmos/validators
 
-You will see the commission they set, the max rate they set, and the rate of change. Please use this as a guide when thinking of your own commission configurations. This is important to get right, because the max_commission and max_commission_rate_change cannot be changed after they are initially set. 
+You will see the commission they set, the max rate they set, and the rate of change. Please use this as a guide when thinking of your own commission configurations. This is important to get right, because the _commission-max-rate_ and _commission-max-change-rate_ cannot be changed after they are initially set. 
 
    ```bash
    cheqd-noded tx staking create-validator --amount 1000000000ncheq --from key-alias-name --moniker mainnet-validator-name --chain-id cheqd-mainnet-1 --min-self-delegation="1" --gas auto --gas-adjustment 1.2 --gas-prices="25ncheq" --pubkey '{"@type":"/cosmos.crypto.ed25519.PubKey","key":"4anVUO8WhmRMqG1t4z6VxqmqZL3V7q6HqucjwZePiUw="}' --commission-max-change-rate 0.01 --commission-max-rate 0.2 --commission-rate 0.01 --node https://rpc.cheqd.net:443
