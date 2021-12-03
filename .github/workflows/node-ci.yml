@@ -151,10 +151,10 @@ jobs:
           name: cheqd-testnet.tar
           path: cheqd-testnet.tar
 
-  build-images-and-set-up-pool:
-    name: Build cheqd-node and testnet Docker images, install deb package and run Docker pool
+  test-new-node-setup-from-deb:
+    name: Test new node setup from deb
     runs-on: ubuntu-20.04
-    needs: build-deb-package
+    needs: [build-deb-package, build-node-image]
     steps:
       - name: Download deb
         uses: actions/download-artifact@v2
@@ -165,18 +165,18 @@ jobs:
         run: |
           sudo CHEQD_HOME_DIR=/home/runner/cheqd dpkg -i ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
 
+      - name: Download node image
+        uses: actions/download-artifact@v2
+        with:
+          name: cheqd-node.tar
+
+      - name: Load node image
+        run: docker load -i cheqd-node.tar
+
       - name: Check out
         uses: actions/checkout@v2
 
-      - name: Build node image
-        run: |
-          docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
-
-      - name: Build test net image
-        run: |
-          docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
-
-      - name: Set up 4 validators + 2 observers node docker pool
+      - name: Set up 4 validators + 2 observers node docker pool  # TODO: Replace with testnet image
         working-directory: ./tests/networks/docker_compose
         run: |
           ./gen_node_configs.sh
@@ -211,30 +211,34 @@ jobs:
   run-cosmos-specific-tests:
     name: Run cosmos-specific tests using cheqd-node CLI
     runs-on: ubuntu-20.04
-    needs: build-deb-package
+    needs: [build-node-image, build-deb-package]
     steps:
       - name: Download deb
         uses: actions/download-artifact@v2
         with:
           name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
 
-      - name: Install deb
+      - name: Install deb # TODO: Use just binary
         run: |
           sudo dpkg -i ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
 
-      - uses: actions/checkout@v2
+      - name: Download node image
+        uses: actions/download-artifact@v2
         with:
-          fetch-depth: 0 # FIXME: Starport requires full repository
+          name: cheqd-node.tar
 
-      - name: Build node image
-        run: |
-          docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
-      - name: Set up 4 validators + 2 observers node docker pool for local test run
+      - name: Load node image
+        run: docker load -i cheqd-node.tar
+
+      - uses: actions/checkout@v2
+
+      - name: Set up 4 validators + 2 observers node docker pool for local test run # Replace with testnet image
         working-directory: ./tests/networks/docker_compose
         run: |
           ./gen_node_configs.sh
           ./run_docker.sh
           ./wait.sh '[[ $(curl -s -N localhost:26657/block | jq -cr '"'"'.result.block.last_commit.height'"'"') -gt 1 ]] && echo "Height is more than 1"'
+
       - name: Set up test environment
         working-directory: ./tests/e2e
         run: |
@@ -242,6 +246,7 @@ jobs:
           pip3 install --force-reinstall 'git+https://gitlab.com/evernym/verity/vdr-tools.git@cheqd-node-0.3.1#egg=vdr-tools&subdirectory=wrappers/python' -U
           cp -R ${NODE_CONFIGS_BASE}/client/.cheqdnode /home/runner/
           sudo chmod -R 777 /home/runner
+
       - name: Run tests
         run: |
           export OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
@@ -251,19 +256,17 @@ jobs:
   run-identity-specific-tests:
     name: Run identity-specific tests using VDR
     runs-on: ubuntu-20.04
-    needs: build-deb-package
+    needs: build-testnet-image
     steps:
       - uses: actions/checkout@v2
+
+      - name: Download testnet image
+        uses: actions/download-artifact@v2
         with:
-          fetch-depth: 0 # FIXME: Starport requires full repository
+          name: cheqd-testnet.tar
 
-      - name: Build node image
-        run: |
-          docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
-
-      - name: Build test net image
-        run: |
-          docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
+      - name: Load testnet image
+        run: docker load -i cheqd-testnet.tar
 
       - name: Run test net container
         run: |
@@ -285,11 +288,9 @@ jobs:
   run-cosmos-cli-identity-tests:
     name: Run identity tests using Cosmos CLI
     runs-on: ubuntu-20.04
-    needs: build-deb-package
+    needs: [build-binary, build-testnet-image]
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0 # FIXME: Starport requires full repository
 
       - name: Load binary artifact
         uses: actions/download-artifact@v2
@@ -297,13 +298,13 @@ jobs:
           name: cheqd-noded
           path: /home/runner/go/bin
 
-      - name: Build node image
-        run: |
-          docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
+      - name: Download testnet image
+        uses: actions/download-artifact@v2
+        with:
+          name: cheqd-testnet.tar
 
-      - name: Build test net image
-        run: |
-          docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
+      - name: Load testnet image
+        run: docker load -i cheqd-testnet.tar
 
       - name: Run test net container
         run: |
