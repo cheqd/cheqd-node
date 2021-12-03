@@ -20,8 +20,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - run: echo $PATH
-
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2
         with:
@@ -219,7 +217,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: cheqd-noded
-          path: /usr/bin
+          path: /home/runner/.local/bin
 
       - name: Download node image
         uses: actions/download-artifact@v2
@@ -295,7 +293,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: cheqd-noded
-          path: /usr/bin
+          path: /home/runner/.local/bin
 
       - name: Download testnet image
         uses: actions/download-artifact@v2
