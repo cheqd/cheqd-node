@@ -83,25 +83,43 @@ jobs:
           path: /home/runner/go/bin/cheqd-noded
 
       - name: Make archive
+        working-directory: ./build_tools
         run: |
           ./build_tar.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }} 
-        working-directory: ./build_tools
 
       - name: Install fpm
         run: |
           sudo apt-get install ruby ruby-dev rubygems build-essential
           sudo gem install --no-document fpm
 
-      - name: Create deb
+      - name: Build deb
         run: |
           ./build_deb.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }} 
         working-directory: ./build_tools
 
-      - name: Upload deb
+      - name: Store deb package artifact
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
           path: build_tools/output/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+
+  build-node-image:
+    name: Build cheqd-node and testnet Docker images, install deb package and run Docker pool
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out
+        uses: actions/checkout@v2
+
+      - name: Build
+        run: docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
+
+      - name: Save
+        run: docker save -o cheqd-node.tar cheqd-node
+
+      - name: Store artifact
+        uses: actions/upload-artifact@v2
+        with:
+          path: cheqd-node.tar
 
   build-images-and-set-up-pool:
     name: Build cheqd-node and testnet Docker images, install deb package and run Docker pool
