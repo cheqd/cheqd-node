@@ -55,13 +55,15 @@ max_commission_rate_change
 
 commission_rate
 ```
-The first is the maximum rate of commission that you will be able to move upwards to. Please note that this value cannot be changed once your Validator Node is set up, so be careful and do your research. 
+The first is the maximum rate of commission that you will be able to move upwards to.
+
+**Please note that this value cannot be changed once your Validator Node is set up**, so be careful and do your research. 
 
 The second parameter is the maximum amount of commission you will be able to increase by within a 24 hour period. For example if you set this as 0.01, you will be able to increase your commission by 1% a day.
 
 The third value is your current commission rate. 
 
-Points to note: **lower commission rate** = **higher likelihood** of **more token holders delegating** tokens to you because they will **earn more rewards**.
+Points to note: **lower commission rate** = **higher likelihood** of **more token holders delegating** tokens to you because they will **earn more rewards**. However, with a very low commission rate, in the future, you might find that the gas fees on the Network outweight the rewards made through commission.
 
 **higher commission rate** = **you earn more tokens** from the existing stake + delegated tokens. But the tradeoff being that it **may appear less desirable for new delegators** when compared to other Validators.
 
