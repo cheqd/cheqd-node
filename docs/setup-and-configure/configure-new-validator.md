@@ -116,9 +116,15 @@ If you need help or support, join our [**cheqd Community Slack**](http://cheqd.l
    * **`gas-prices`**: Maximum gas price set by the validator
 
    _Example transaction:_
+   
+   Please note the parameters below are just an “example”.
+   
+When setting, for example, the commission, please look at this example for commissions: https://www.mintscan.io/cosmos/validators
+
+You will see the commission they set, the max rate they set, and the rate of change. Please use this as a guide when thinking of your own commission configurations.
 
    ```bash
-   cheqd-noded tx staking create-validator --amount 1000000000ncheq --from key-alias-name --moniker mainnet-validator-name --chain-id cheqd-mainnet-1 --min-self-delegation="1" --gas auto --gas-adjustment 1.2 --gas-prices="25ncheq" --pubkey '{"@type":"/cosmos.crypto.ed25519.PubKey","key":"4anVUO8WhmRMqG1t4z6VxqmqZL3V7q6HqucjwZePiUw="}' --commission-max-change-rate <commission-max-change-rate> --commission-max-rate <commission-max-rate> --commission-rate <commission-rate> --node https://rpc.cheqd.net:443
+   cheqd-noded tx staking create-validator --amount 1000000000ncheq --from key-alias-name --moniker mainnet-validator-name --chain-id cheqd-mainnet-1 --min-self-delegation="1" --gas auto --gas-adjustment 1.2 --gas-prices="25ncheq" --pubkey '{"@type":"/cosmos.crypto.ed25519.PubKey","key":"4anVUO8WhmRMqG1t4z6VxqmqZL3V7q6HqucjwZePiUw="}' --commission-max-change-rate 0.01 --commission-max-rate 0.2 --commission-rate 0.01 --node https://rpc.cheqd.net:443
    ```
 
 4. **Check that your validator node is bonded**
