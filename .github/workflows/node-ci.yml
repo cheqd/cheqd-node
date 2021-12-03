@@ -107,11 +107,12 @@ jobs:
     name: Build cheqd-node image
     runs-on: ubuntu-20.04
     steps:
-      - name: Check out
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # FIXME: Starport requires full repository
 
       - name: Build
-        run: docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node . # --build-arg UID=$(id -u) --build-arg GID=$(id -g) . # TODO: Get rid of UID and GID
+        run: docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node  --build-arg UID=$(id -u) --build-arg GID=$(id -g) . # TODO: Get rid of UID and GID
 
       - name: Save
         run: docker save -o cheqd-node.tar cheqd-node
