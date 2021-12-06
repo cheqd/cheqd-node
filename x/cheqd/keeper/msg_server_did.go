@@ -124,7 +124,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 }
 
 func (k msgServer) VerifySignatureOnDidUpdate(ctx *sdk.Context, oldDIDDoc *types.Did, newDIDDoc *types.MsgUpdateDidPayload, signatures []*types.SignInfo) error {
-	var signers = newDIDDoc.GetSigners()
+	var signers []types.Signer
 
 	// Get Old DID Doc controller if it's nil then assign self
 	oldController := oldDIDDoc.Controller
