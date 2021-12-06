@@ -2,7 +2,7 @@ export VERSION := $(shell echo $(shell git describe --always --match "v*") | sed
 export TMVERSION := $(shell go list -m github.com/tendermint/tendermint | sed 's:.* ::')
 export COMMIT := $(shell git log -1 --format='%H')
 NAME ?= cheqd-node
-APPNAME ?= cheqd-noded
+APPNAME ?= $(NAME)d
 LEDGER_ENABLED ?= true
 BINDIR ?= $(GOPATH)/bin
 BUILDDIR ?= $(CURDIR)/build
