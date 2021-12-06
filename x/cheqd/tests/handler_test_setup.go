@@ -7,6 +7,7 @@ import (
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cheqd/cheqd-node/x/cheqd"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	"github.com/multiformats/go-multibase"
 	"time"
 
 	"github.com/cheqd/cheqd-node/app/params"
@@ -19,6 +20,8 @@ import (
 	"github.com/cheqd/cheqd-node/x/cheqd/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+const Ed25519VerificationKey2020 = "Ed25519VerificationKey2020"
 
 type KeyPair struct {
 	PrivateKey ed25519.PrivateKey
@@ -77,7 +80,7 @@ func (s *TestSetup) CreateDid(pubKey ed25519.PublicKey, did string) *types.MsgCr
 
 	VerificationMethod := types.VerificationMethod{
 		Id:                 did + "#key-1",
-		Type:               "Ed25519VerificationKey2020",
+		Type:               Ed25519VerificationKey2020,
 		Controller:         did,
 		PublicKeyMultibase: PublicKeyMultibase,
 	}
@@ -216,17 +219,24 @@ func ConcatKeys(dst map[string]ed25519.PrivateKey, src map[string]ed25519.Privat
 	return dst
 }
 
-func (s TestSetup) CreatePreparedDID() map[string]KeyPair {
-	prefilledDids := []struct {
-		keys    map[string]KeyPair
+func (s TestSetup) CreateTestDIDs() (map[string]KeyPair, error) {
+	keys := map[string]KeyPair{
+		AliceKey1: GenerateKeyPair(),
+		AliceKey2: GenerateKeyPair(),
+		BobKey1: GenerateKeyPair(),
+		BobKey2: GenerateKeyPair(),
+		BobKey3: GenerateKeyPair(),
+		BobKey4: GenerateKeyPair(),
+		CharlieKey1: GenerateKeyPair(),
+		CharlieKey2: GenerateKeyPair(),
+		CharlieKey3: GenerateKeyPair(),
+	}
+
+	testDIDs := []struct {
 		signers []string
 		msg     *types.MsgCreateDidPayload
 	}{
 		{
-			keys: map[string]KeyPair{
-				AliceKey1: GenerateKeyPair(),
-				AliceKey2: GenerateKeyPair(),
-			},
 			signers: []string{AliceKey1},
 			msg: &types.MsgCreateDidPayload{
 				Id:             AliceDID,
@@ -234,19 +244,13 @@ func (s TestSetup) CreatePreparedDID() map[string]KeyPair {
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey1,
-						Type:       "Ed25519VerificationKey2020",
+						Type:       Ed25519VerificationKey2020,
 						Controller: AliceDID,
 					},
 				},
 			},
 		},
 		{
-			keys: map[string]KeyPair{
-				BobKey1: GenerateKeyPair(),
-				BobKey2: GenerateKeyPair(),
-				BobKey3: GenerateKeyPair(),
-				BobKey4: GenerateKeyPair(),
-			},
 			signers: []string{BobKey2},
 			msg: &types.MsgCreateDidPayload{
 				Id: BobDID,
@@ -261,33 +265,28 @@ func (s TestSetup) CreatePreparedDID() map[string]KeyPair {
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         BobKey1,
-						Type:       "Ed25519VerificationKey2020",
+						Type:       Ed25519VerificationKey2020,
 						Controller: BobDID,
 					},
 					{
 						Id:         BobKey2,
-						Type:       "Ed25519VerificationKey2020",
+						Type:       Ed25519VerificationKey2020,
 						Controller: BobDID,
 					},
 					{
 						Id:         BobKey3,
-						Type:       "Ed25519VerificationKey2020",
+						Type:       Ed25519VerificationKey2020,
 						Controller: BobDID,
 					},
 					{
 						Id:         BobKey4,
-						Type:       "Ed25519VerificationKey2020",
+						Type:       Ed25519VerificationKey2020,
 						Controller: BobDID,
 					},
 				},
 			},
 		},
 		{
-			keys: map[string]KeyPair{
-				CharlieKey1: GenerateKeyPair(),
-				CharlieKey2: GenerateKeyPair(),
-				CharlieKey3: GenerateKeyPair(),
-			},
 			signers: []string{CharlieKey2},
 			msg: &types.MsgCreateDidPayload{
 				Id: CharlieDID,
@@ -299,17 +298,17 @@ func (s TestSetup) CreatePreparedDID() map[string]KeyPair {
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         CharlieKey1,
-						Type:       "Ed25519VerificationKey2020",
+						Type:       Ed25519VerificationKey2020,
 						Controller: BobDID,
 					},
 					{
 						Id:         CharlieKey2,
-						Type:       "Ed25519VerificationKey2020",
+						Type:       Ed25519VerificationKey2020,
 						Controller: BobDID,
 					},
 					{
 						Id:         CharlieKey3,
-						Type:       "Ed25519VerificationKey2020",
+						Type:       Ed25519VerificationKey2020,
 						Controller: BobDID,
 					},
 				},
@@ -317,26 +316,28 @@ func (s TestSetup) CreatePreparedDID() map[string]KeyPair {
 		},
 	}
 
-	keys := map[string]KeyPair{}
-
-	for _, prefilled := range prefilledDids {
+	for _, prefilled := range testDIDs {
 		msg := prefilled.msg
 
 		for _, vm := range msg.VerificationMethod {
-			vm.PublicKeyMultibase = "z" + base58.Encode(prefilled.keys[vm.Id].PublicKey)
+			encoded, err :=  multibase.Encode(multibase.Base58BTC, keys[vm.Id].PublicKey)
+			if err != nil {
+				return nil, err
+			}
+			vm.PublicKeyMultibase = encoded
 		}
 
 		signerKeys := map[string]ed25519.PrivateKey{}
 		for _, signer := range prefilled.signers {
-			signerKeys[signer] = prefilled.keys[signer].PrivateKey
+			signerKeys[signer] = keys[signer].PrivateKey
 		}
 
-		for keyId, key := range prefilled.keys {
+		for keyId, key := range keys {
 			keys[keyId] = key
 		}
 
 		_, _ = s.SendCreateDid(msg, signerKeys)
 	}
 
-	return keys
+	return keys, nil
 }
