@@ -217,5 +217,5 @@ jobs:
           automatic_release_tag: "${{ env.TAG }}"
           prerelease: true
           files: |
-            build_tools/output/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
-            build_tools/output/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+            ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+            ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
