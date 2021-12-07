@@ -29,7 +29,8 @@ COPY go.sum .
 # Required by starport
 COPY .git .
 
-RUN starport chain build
+RUN starport chain build --release
+RUN tar xzvf release/cheqd-node_linux_amd64.tar.gz
 
 
 #####  Run container  #####
@@ -37,7 +38,7 @@ RUN starport chain build
 FROM ubuntu:focal
 
 # Node binary
-COPY --from=builder /go/bin/cheqd-noded /bin
+COPY --from=builder /app/cheqd-noded /bin
 
 # Runner script
 COPY docker/cheqd_node/node-runner.sh /bin/node-runner
