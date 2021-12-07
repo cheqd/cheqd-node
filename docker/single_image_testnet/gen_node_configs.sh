@@ -27,6 +27,10 @@ echo "##### [Node 0] Setting fee"
 
 sed -i $sed_extension 's/minimum-gas-prices = ""/minimum-gas-prices = "25ncheq"/g' "$HOME/.cheqdnode/config/app.toml"
 
+echo "##### [Node 0] Switching on REST API"
+
+sed -i $sed_extension 's/enable = false/enable = true/g' "$HOME/.cheqdnode/config/app.toml"
+
 echo "##### [Validator operator] Generating key"
 
 cheqd-noded keys add alice --keyring-backend test
