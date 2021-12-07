@@ -70,7 +70,7 @@ jobs:
           path: cheqd-noded
 
   build-tar-archive:
-    name: Build deb package
+    name: Build tar archive
     runs-on: ubuntu-20.04
     needs: build-binary
     steps:
