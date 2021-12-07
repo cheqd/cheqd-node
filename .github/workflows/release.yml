@@ -21,7 +21,11 @@ jobs:
         run: |
           # Exposes org_name/repository_name in lower case. Required by docker.
           echo "::set-output name=GITHUB_REPOSITORY_NAME::$(echo ${GITHUB_REPOSITORY,,})"
-          echo "::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}"
+
+          # Version is tag without `v` prefix. Reuired by deb package.
+          TAG=${GITHUB_REF/refs\/tags\//}
+          VERSION=$($echo TAG  | sed 's/v//')
+          echo "::set-output name=VERSION::$VERSION"
 
   build-binary:
     name: Build binary
@@ -52,10 +56,13 @@ jobs:
           name: cheqd-noded
           path: cheqd-noded
 
-  build-deb-package:
-    name: Build deb package
+  build-tar-archive:
+    name: Build tar archive
     runs-on: ubuntu-20.04
     needs: build-binary
+    env:
+      PACKAGE_NAME: "cheqd-node"
+      VERSION: ${{ needs.setup-workflow.outputs.VERSION }}
     steps:
       - uses: actions/checkout@v2
 
@@ -72,6 +79,31 @@ jobs:
         working-directory: ./build_tools
         run: |
           ./build_tar.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }}
+
+      - name: Store tar artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+          path: build_tools/output/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+
+  build-deb-package:
+    name: Build deb package
+    runs-on: ubuntu-20.04
+    needs: build-binary
+    env:
+      PACKAGE_NAME: "cheqd-node"
+      VERSION: ${{ needs.setup-workflow.outputs.VERSION }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Load binary artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: cheqd-noded
+          path: /home/runner/go/bin
+
+      - name: Restore binary permissions
+        run: sudo chmod +x /home/runner/go/bin/cheqd-noded
 
       - name: Install fpm
         run: |
@@ -176,7 +208,7 @@ jobs:
 #          docker tag cheqd-testnet ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:latest
 #          docker push ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:${{ env.VERSION }}
 #          docker push ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:latest
-#
+
 #  publish-release:
 #    name: "Publish release"
 #    needs: [setup-workflow, publish-images]
@@ -187,27 +219,7 @@ jobs:
 #      OUTPUT_DIR: "output"
 #      PACKAGE_NAME: "cheqd-node"
 #      RELEASE_TAG: ${{ needs.setup-workflow.outputs.VERSION }}
-#      STARPORT_RELEASE_PARAMS: "--release"
 #    steps:
-#      - name: Set up Go 1.17
-#        uses: actions/setup-go@v2
-#        with:
-#          go-version: 1.17
-#
-#      # There is an issue with the latest starport, especially 0.18 version
-#      - name: Install starport
-#        run: wget -qO- https://github.com/tendermint/starport/releases/download/v0.18.6/starport_0.18.6_linux_amd64.tar.gz \
-#             | tar xvz -C /tmp/ && sudo cp /tmp/starport /usr/bin
-#
-#      - name: Git checkout
-#        uses: actions/checkout@v2
-#
-#      - name: Build
-#        run: starport chain build ${{ env.STARPORT_RELEASE_PARAMS }}
-#
-#      # It looks ugly cause starport chain build --release creates archive without version.
-#      - name: Untar release
-#        run: tar xzvf release/cheqd-node_linux_amd64.tar.gz && cp cheqd-noded /home/runner/go/bin/
 #
 #      - name: Changing version for deb packaging
 #        run: |
