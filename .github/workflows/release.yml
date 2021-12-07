@@ -216,6 +216,6 @@ jobs:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "${{ env.TAG }}"
           prerelease: true
-        files: |
-          build_tools/output/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
-          build_tools/output/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+          files: |
+            build_tools/output/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+            build_tools/output/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
