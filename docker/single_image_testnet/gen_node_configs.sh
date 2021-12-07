@@ -23,9 +23,16 @@ cheqd-noded init node0 --chain-id $CHAIN_ID
 NODE_0_ID=$(cheqd-noded tendermint show-node-id)
 NODE_0_VAL_PUBKEY=$(cheqd-noded tendermint show-validator)
 
-echo "##### [Node 0] Setting fee"
+echo "##### [Node 0] Set fee"
 
 sed -i $sed_extension 's/minimum-gas-prices = ""/minimum-gas-prices = "25ncheq"/g' "$HOME/.cheqdnode/config/app.toml"
+
+echo "##### [Node 0] Adjust consensus timeouts"
+
+sed -i $sed_extension 's/timeout_propose = "3s"/timeout_propose = "500ms"/g' "$HOME/.cheqdnode/config/config.toml"
+sed -i $sed_extension 's/timeout_prevote = "1s"/timeout_prevote = "500ms"/g' "$HOME/.cheqdnode/config/config.toml"
+sed -i $sed_extension 's/timeout_precommit = "1s"/timeout_precommit = "500ms"/g' "$HOME/.cheqdnode/config/config.toml"
+sed -i $sed_extension 's/timeout_commit = "5s"/timeout_commit = "500ms"/g' "$HOME/.cheqdnode/config/config.toml"
 
 echo "##### [Validator operator] Generating key"
 

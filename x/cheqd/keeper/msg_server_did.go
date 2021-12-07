@@ -3,9 +3,9 @@ package keeper
 import (
 	"context"
 	"fmt"
-	"github.com/cheqd/cheqd-node/x/cheqd/types"
-	"github.com/cheqd/cheqd-node/x/cheqd/utils/strings"
 	"reflect"
+
+	"github.com/cheqd/cheqd-node/x/cheqd/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -124,7 +124,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 }
 
 func (k msgServer) VerifySignatureOnDidUpdate(ctx *sdk.Context, oldDIDDoc *types.Did, newDIDDoc *types.MsgUpdateDidPayload, signatures []*types.SignInfo) error {
-	var signers = newDIDDoc.GetSigners()
+	var signers []types.Signer
 
 	// Get Old DID Doc controller if it's nil then assign self
 	oldController := oldDIDDoc.Controller
@@ -132,17 +132,8 @@ func (k msgServer) VerifySignatureOnDidUpdate(ctx *sdk.Context, oldDIDDoc *types
 		oldController = []string{oldDIDDoc.Id}
 	}
 
-	// Get New DID Doc controller if it's nil then assign self
-	newController := newDIDDoc.Controller
-	if len(newController) == 0 {
-		newController = []string{newDIDDoc.Id}
-	}
-
-	// DID Doc controller has been changed
-	if removedControllers := strings.Complement(oldController, newController); len(removedControllers) > 0 {
-		for _, controller := range removedControllers {
-			signers = append(signers, types.Signer{Signer: controller})
-		}
+	for _, controller := range oldController {
+		signers = append(signers, types.Signer{Signer: controller})
 	}
 
 	for _, oldVM := range oldDIDDoc.VerificationMethod {

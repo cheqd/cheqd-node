@@ -8,8 +8,9 @@ import (
 
 // GetDidNamespace get the total number of did
 func (k Keeper) GetDidNamespace(ctx sdk.Context) string {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidNamespace))
-	byteKey := types.KeyPrefix(types.DidNamespace)
+	// FIXME: This leads to double prefix. Should be just KVStore. Migration is needed to fix.
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidNamespaceKey))
+	byteKey := types.KeyPrefix(types.DidNamespaceKey)
 	bz := store.Get(byteKey)
 
 	// Parse bytes
@@ -19,8 +20,10 @@ func (k Keeper) GetDidNamespace(ctx sdk.Context) string {
 
 // SetDidNamespace set did namespace
 func (k Keeper) SetDidNamespace(ctx sdk.Context, namespace string) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidNamespace))
-	byteKey := types.KeyPrefix(types.DidNamespace)
+	// FIXME: This leads to double prefix. Should be just KVStore. Migration is needed to fix.
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidNamespaceKey))
+	byteKey := types.KeyPrefix(types.DidNamespaceKey)
+
 	bz := []byte(namespace)
 	store.Set(byteKey, bz)
 }

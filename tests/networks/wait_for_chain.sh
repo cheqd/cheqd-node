@@ -4,7 +4,7 @@ set -euox pipefail
 
 
 TARGET_HEIGHT=${1:-1} # Default is 1
-WAIT_TIME=${2:-100}    # In seconds, default - 10
+WAIT_TIME=${2:-60}    # In seconds, default - 60
 RPC_ENDPOINT=${3:-"http://localhost:26657/status"}
 
 WAITED=0

@@ -25,6 +25,7 @@ func KeyPrefix(p string) []byte {
 const (
 	DidKey      = "did:"
 	DidCountKey = "did-count:"
+	// DidNamespaceKey FIXME: Should be `did-namespace:`.
+	// Networks was started with `testnet` value so we need a migration now.
+	DidNamespaceKey = "testnet"
 )
-
-const DidNamespaceKey = "did-namespace:"
