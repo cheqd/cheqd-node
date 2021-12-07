@@ -30,7 +30,6 @@ jobs:
   build-binary:
     name: Build binary
     runs-on: ubuntu-20.04
-    needs: setup-workflow
     steps:
       - name: Set up Go 1.17
         uses: actions/setup-go@v2
@@ -59,7 +58,7 @@ jobs:
   build-deb-package:
     name: Build deb package
     runs-on: ubuntu-20.04
-    needs: build-binary
+    needs: [build-binary, setup-workflow]
     env:
       PACKAGE_NAME: "cheqd-node"
       VERSION: ${{ needs.setup-workflow.outputs.VERSION }}
