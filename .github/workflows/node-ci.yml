@@ -69,8 +69,8 @@ jobs:
           name: cheqd-noded
           path: cheqd-noded
 
-  build-tar-archive:
-    name: Build tar archive
+  build-deb-package:
+    name: Build deb package
     runs-on: ubuntu-20.04
     needs: build-binary
     steps:
@@ -96,28 +96,12 @@ jobs:
           name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
           path: build_tools/output/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
 
-  build-deb-package:
-    name: Build deb package
-    runs-on: ubuntu-20.04
-    needs: build-binary
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Load binary artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: cheqd-noded
-          path: /home/runner/go/bin
-
-      - name: Restore binary permissions
-        run: sudo chmod +x /home/runner/go/bin/cheqd-noded
-
       - name: Install fpm
         run: |
           sudo apt-get install ruby ruby-dev rubygems build-essential
           sudo gem install --no-document fpm
 
-      - name: Build deb
+      - name: Build deb # Depends on tar archive
         run: |
           ./build_deb.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }}
         working-directory: ./build_tools
