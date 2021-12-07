@@ -85,16 +85,10 @@ jobs:
       - name: Restore binary permissions
         run: sudo chmod +x /home/runner/go/bin/cheqd-noded
 
-      - name: Make archive
+      - name: Make intermediate archive
         working-directory: ./build_tools
         run: |
           ./build_tar.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }} 
-
-      - name: Store tar artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
-          path: build_tools/output/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
 
       - name: Install fpm
         run: |
@@ -124,13 +118,13 @@ jobs:
         run: docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node  --build-arg UID=$(id -u) --build-arg GID=$(id -g) . # TODO: Get rid of UID and GID
 
       - name: Save
-        run: docker save -o cheqd-node.tar cheqd-node
+        run: docker save -o cheqd-node-image.tar cheqd-node
 
       - name: Store artifact
         uses: actions/upload-artifact@v2
         with:
-          name: cheqd-node.tar
-          path: cheqd-node.tar
+          name: cheqd-node-image.tar
+          path: cheqd-node-image.tar
 
   build-testnet-image:
     name: Build cheqd-testnet image
@@ -143,22 +137,22 @@ jobs:
       - name: Download node image
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-node.tar
+          name: cheqd-node-image.tar
 
       - name: Load node image
-        run: docker load -i cheqd-node.tar
+        run: docker load -i cheqd-node-image.tar
 
       - name: Build
         run: docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
 
       - name: Save
-        run: docker save -o cheqd-testnet.tar cheqd-testnet
+        run: docker save -o cheqd-testnet-image.tar cheqd-testnet
 
       - name: Store artifact
         uses: actions/upload-artifact@v2
         with:
-          name: cheqd-testnet.tar
-          path: cheqd-testnet.tar
+          name: cheqd-testnet-image.tar
+          path: cheqd-testnet-image.tar
 
   test-new-node-setup-from-deb:
     name: Test new node setup from deb
@@ -176,10 +170,10 @@ jobs:
       - name: Download node image
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-node.tar
+          name: cheqd-node-image.tar
 
       - name: Load node image
-        run: docker load -i cheqd-node.tar
+        run: docker load -i cheqd-node-image.tar
 
       - name: Check out
         uses: actions/checkout@v2
@@ -233,10 +227,10 @@ jobs:
       - name: Download node image
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-node.tar
+          name: cheqd-node-image.tar
 
       - name: Load node image
-        run: docker load -i cheqd-node.tar
+        run: docker load -i cheqd-node-image.tar
 
       - uses: actions/checkout@v2
 
@@ -271,10 +265,10 @@ jobs:
       - name: Download testnet image
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-testnet.tar
+          name: cheqd-testnet-image.tar
 
       - name: Load testnet image
-        run: docker load -i cheqd-testnet.tar
+        run: docker load -i cheqd-testnet-image.tar
 
       - name: Run test net container
         run: |
@@ -313,10 +307,10 @@ jobs:
       - name: Download testnet image
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-testnet.tar
+          name: cheqd-testnet-image.tar
 
       - name: Load testnet image
-        run: docker load -i cheqd-testnet.tar
+        run: docker load -i cheqd-testnet-image.tar
 
       - name: Run test net container
         run: |
