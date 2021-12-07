@@ -59,13 +59,15 @@ jobs:
           fetch-depth: 0 # FIXME: Starport requires full repository
 
       - name: Build
-        run: starport chain build
+        run: |
+          starport chain build --release
+          tar xzvf release/cheqd-node_linux_amd64.tar.gz
 
       - name: Store artifact
         uses: actions/upload-artifact@v2
         with:
           name: cheqd-noded
-          path: /home/runner/go/bin/cheqd-noded
+          path: cheqd-noded
 
   build-deb-package:
     name: Build deb package
