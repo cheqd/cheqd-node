@@ -193,13 +193,14 @@ async def test_did_positive():
 
     # update
     new_vk = await did.replace_keys_start(wallet_handle, _did, '{}')
-    await did.replace_keys_apply(wallet_handle, _did)
 
     res = await update_did_helper(pool_alias, wallet_handle, KEY_ALIAS, public_key, SENDER_ADDRESS, fqdid, new_vk, version_id, DEFAULT_MEMO)
     assert res["check_tx"]["code"] == CODE_0_DIGIT
     assert res["deliver_tx"]["code"] == CODE_0_DIGIT
     parsed_res = json.loads(await cheqd_ledger.cheqd.parse_msg_update_did(json.dumps(res)))
     assert parsed_res["id"] == fqdid
+
+    await did.replace_keys_apply(wallet_handle, _did)
 
     # query
     res = await query_did_helper(pool_alias, fqdid)
@@ -257,10 +258,11 @@ async def test_did_update_wrong_vk():
     version_id = parsed_res["metadata"]["version_id"]
 
     # update
-    _, new_vk = await did.create_and_store_my_did(wallet_handle, '{}')
+    _new_did, new_vk = await did.create_and_store_my_did(wallet_handle, '{}')
+    fq_new_did = FQ_PREFIX + _new_did
 
     req = await cheqd_ledger.cheqd.build_msg_update_did(fqdid, new_vk, version_id) # new vk
-    signed_req = await cheqd_ledger.cheqd.sign_msg_write_request(wallet_handle, fqdid, bytes(req))
+    signed_req = await cheqd_ledger.cheqd.sign_msg_write_request(wallet_handle, fq_new_did, bytes(req)) # new signature
     with pytest.raises(CommonInvalidStructure):
         await send_tx_helper_alt(pool_alias, wallet_handle, KEY_ALIAS, public_key, SENDER_ADDRESS, bytes(signed_req), DEFAULT_MEMO)
 

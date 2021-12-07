@@ -307,6 +307,13 @@ func New(
 		return fromVM, nil
 	})
 
+	app.UpgradeKeeper.SetUpgradeHandler("v0.4", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx.Logger().Info("Handler for upgrade plan: v0.4")
+
+		initialVM := app.mm.GetVersionMap()
+		return initialVM, nil
+	})
+
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.StakingKeeper = *stakingKeeper.SetHooks(
@@ -491,6 +498,11 @@ func (app *App) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.Respo
 
 // InitChainer application update at chain initialization
 func (app *App) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
+	// FIXME: This should have been done from the beginning.
+	// Now this would break consensus with existing networks.
+	// so ModuleVersionMap is initialized as part of upgrade xxx.
+	//app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
+
 	var genesisState GenesisState
 	if err := tmjson.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
 		panic(err)

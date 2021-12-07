@@ -74,5 +74,7 @@ func IsValidDid(prefix string, did string) bool {
 		return false
 	}
 
+	// FIXME: Empty namespace must be allowed even if namespace is set in state
+	// https://github.com/cheqd/cheqd-node/blob/main/architecture/adr-list/adr-002-cheqd-did-method.md#method-specific-identifier
 	return strings.HasPrefix(did, prefix)
 }
