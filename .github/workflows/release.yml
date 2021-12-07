@@ -147,7 +147,7 @@ jobs:
           path: cheqd-testnet-image.tar
 
   publish:
-    name: "Publish docker images"
+    name: "Publish images and release"
     # Reference to workflow-setup job is required to access its various outputs.
     needs: [ setup-workflow, build-node-image, build-testnet-image, build-deb-package ]
     runs-on: ubuntu-latest
