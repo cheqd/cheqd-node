@@ -24,7 +24,7 @@ jobs:
 
           # Version is tag without `v` prefix. Reuired by deb package.
           TAG=${GITHUB_REF/refs\/tags\//}
-          VERSION=$($echo TAG  | sed 's/v//')
+          VERSION="${TAG:1}" # Remove first character
           echo "::set-output name=VERSION::$VERSION"
 
   build-binary:
