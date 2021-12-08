@@ -34,8 +34,8 @@
             "gov": true,
             "distribution": true
         },
-        "coingeckoId": "cheqd-network",
-        "networks": "https://raw.githubusercontent.com/cheqd/cheqd-node/persistent_chains/explorer/bigdipperv1-testnet-config.json",
+        "coingeckoId": "",
+        "networks": "https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/explorer/bigdipperv1-global-config.json",
         "banners": false
     },
     "remote":{
