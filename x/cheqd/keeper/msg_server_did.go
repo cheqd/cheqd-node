@@ -3,15 +3,15 @@ package keeper
 import (
 	"context"
 	"fmt"
-	"github.com/cheqd/cheqd-node/x/cheqd/types/v1"
-	"github.com/cheqd/cheqd-node/x/cheqd/utils/strings"
 	"reflect"
+
+	"github.com/cheqd/cheqd-node/x/cheqd/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func (k msgServer) CreateDid(goCtx context.Context, msg *v1.MsgCreateDid) (*v1.MsgCreateDidResponse, error) {
+func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*types.MsgCreateDidResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	prefix := k.GetDidPrefix(ctx)
 
@@ -29,11 +29,11 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *v1.MsgCreateDid) (*v1.M
 	}
 
 	// Checks that the did doesn't exist
-	if err := k.EnsureDidIsNotUsed(ctx, didMsg.Id); err != nil {
-		return nil, err
+	if k.HasDid(ctx, didMsg.Id) {
+		return nil, sdkerrors.Wrap(types.ErrDidDocExists, fmt.Sprintf("DID is already used by DIDDoc %s", didMsg.Id))
 	}
 
-	var did = v1.Did{
+	var did = types.Did{
 		Context:              didMsg.Context,
 		Id:                   didMsg.Id,
 		Controller:           didMsg.Controller,
@@ -47,18 +47,18 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *v1.MsgCreateDid) (*v1.M
 		Service:              didMsg.Service,
 	}
 
-	metadata := v1.NewMetadata(ctx)
+	metadata := types.NewMetadata(ctx)
 	id, err := k.AppendDid(ctx, did, &metadata)
 	if err != nil {
 		return nil, err
 	}
 
-	return &v1.MsgCreateDidResponse{
+	return &types.MsgCreateDidResponse{
 		Id: *id,
 	}, nil
 }
 
-func (k msgServer) UpdateDid(goCtx context.Context, msg *v1.MsgUpdateDid) (*v1.MsgUpdateDidResponse, error) {
+func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*types.MsgUpdateDidResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	prefix := k.GetDidPrefix(ctx)
 
@@ -93,10 +93,10 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *v1.MsgUpdateDid) (*v1.M
 	// replay protection
 	if oldStateValue.Metadata.VersionId != didMsg.VersionId {
 		errMsg := fmt.Sprintf("Ecpected %s with version %s. Got version %s", didMsg.Id, oldStateValue.Metadata.VersionId, didMsg.VersionId)
-		return nil, sdkerrors.Wrap(v1.ErrUnexpectedDidVersion, errMsg)
+		return nil, sdkerrors.Wrap(types.ErrUnexpectedDidVersion, errMsg)
 	}
 
-	var did = v1.Did{
+	var did = types.Did{
 		Context:              didMsg.Context,
 		Id:                   didMsg.Id,
 		Controller:           didMsg.Controller,
@@ -110,7 +110,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *v1.MsgUpdateDid) (*v1.M
 		Service:              didMsg.Service,
 	}
 
-	metadata := v1.NewMetadata(ctx)
+	metadata := types.NewMetadata(ctx)
 	metadata.Created = oldStateValue.Metadata.Created
 	metadata.Deactivated = oldStateValue.Metadata.Deactivated
 
@@ -118,13 +118,13 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *v1.MsgUpdateDid) (*v1.M
 		return nil, err
 	}
 
-	return &v1.MsgUpdateDidResponse{
+	return &types.MsgUpdateDidResponse{
 		Id: didMsg.Id,
 	}, nil
 }
 
-func (k msgServer) VerifySignatureOnDidUpdate(ctx *sdk.Context, oldDIDDoc *v1.Did, newDIDDoc *v1.MsgUpdateDidPayload, signatures []*v1.SignInfo) error {
-	var signers = newDIDDoc.GetSigners()
+func (k msgServer) VerifySignatureOnDidUpdate(ctx *sdk.Context, oldDIDDoc *types.Did, newDIDDoc *types.MsgUpdateDidPayload, signatures []*types.SignInfo) error {
+	var signers []types.Signer
 
 	// Get Old DID Doc controller if it's nil then assign self
 	oldController := oldDIDDoc.Controller
@@ -132,17 +132,8 @@ func (k msgServer) VerifySignatureOnDidUpdate(ctx *sdk.Context, oldDIDDoc *v1.Di
 		oldController = []string{oldDIDDoc.Id}
 	}
 
-	// Get New DID Doc controller if it's nil then assign self
-	newController := newDIDDoc.Controller
-	if len(newController) == 0 {
-		newController = []string{newDIDDoc.Id}
-	}
-
-	// DID Doc controller has been changed
-	if removedControllers := strings.Complement(oldController, newController); len(removedControllers) > 0 {
-		for _, controller := range removedControllers {
-			signers = append(signers, v1.Signer{Signer: controller})
-		}
+	for _, controller := range oldController {
+		signers = append(signers, types.Signer{Signer: controller})
 	}
 
 	for _, oldVM := range oldDIDDoc.VerificationMethod {
@@ -172,14 +163,14 @@ func (k msgServer) VerifySignatureOnDidUpdate(ctx *sdk.Context, oldDIDDoc *v1.Di
 	return nil
 }
 
-func AppendSignerIfNeed(signers []v1.Signer, controller string, msg *v1.MsgUpdateDidPayload) []v1.Signer {
+func AppendSignerIfNeed(signers []types.Signer, controller string, msg *types.MsgUpdateDidPayload) []types.Signer {
 	for _, signer := range signers {
 		if signer.Signer == controller {
 			return signers
 		}
 	}
 
-	signer := v1.Signer{
+	signer := types.Signer{
 		Signer: controller,
 	}
 
@@ -191,7 +182,7 @@ func AppendSignerIfNeed(signers []v1.Signer, controller string, msg *v1.MsgUpdat
 	return append(signers, signer)
 }
 
-func (k msgServer) ValidateDidControllers(ctx *sdk.Context, id string, controllers []string, verMethods []*v1.VerificationMethod) error {
+func (k msgServer) ValidateDidControllers(ctx *sdk.Context, id string, controllers []string, verMethods []*types.VerificationMethod) error {
 
 	for _, verificationMethod := range verMethods {
 		if err := k.ValidateController(ctx, id, verificationMethod.Controller); err != nil {

@@ -2,23 +2,26 @@ package tests
 
 import (
 	"crypto/ed25519"
-	"github.com/btcsuite/btcutil/base58"
-	"github.com/cheqd/cheqd-node/x/cheqd/types/v1"
 	"testing"
+
+	"github.com/btcsuite/btcutil/base58"
+	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	"github.com/multiformats/go-multibase"
 
 	"github.com/stretchr/testify/require"
 )
 
 func TestCreateDID(t *testing.T) {
 	setup := Setup()
-	keys := setup.CreatePreparedDID()
+	keys, err := setup.CreateTestDIDs()
+	require.NoError(t, err)
 
 	cases := []struct {
 		valid   bool
 		name    string
 		keys    map[string]KeyPair
 		signers []string
-		msg     *v1.MsgCreateDidPayload
+		msg     *types.MsgCreateDidPayload
 		errMsg  string
 	}{
 		{
@@ -28,10 +31,10 @@ func TestCreateDID(t *testing.T) {
 				"did:cheqd:test:123456qwertyui2#key-1": GenerateKeyPair(),
 			},
 			signers: []string{"did:cheqd:test:123456qwertyui2#key-1"},
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id:             "did:cheqd:test:123456qwertyui2",
 				Authentication: []string{"did:cheqd:test:123456qwertyui2#key-1"},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         "did:cheqd:test:123456qwertyui2#key-1",
 						Type:       "Ed25519VerificationKey2020",
@@ -48,11 +51,11 @@ func TestCreateDID(t *testing.T) {
 				AliceKey1:                           keys[AliceKey1],
 			},
 			signers: []string{AliceKey1},
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id:           "did:cheqd:test:KeyAgreement",
 				KeyAgreement: []string{"did:cheqd:test:KeyAgreement#key-1"},
 				Controller:   []string{AliceDID},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         "did:cheqd:test:KeyAgreement#key-1",
 						Type:       "Ed25519VerificationKey2020",
@@ -69,11 +72,11 @@ func TestCreateDID(t *testing.T) {
 				AliceKey1:                              keys[AliceKey1],
 			},
 			signers: []string{AliceKey1},
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id:              "did:cheqd:test:AssertionMethod",
 				AssertionMethod: []string{"did:cheqd:test:AssertionMethod#key-1"},
 				Controller:      []string{AliceDID},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         "did:cheqd:test:AssertionMethod#key-1",
 						Type:       "Ed25519VerificationKey2020",
@@ -90,11 +93,11 @@ func TestCreateDID(t *testing.T) {
 				AliceKey1: keys[AliceKey1],
 			},
 			signers: []string{AliceKey1},
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id:                   "did:cheqd:test:CapabilityDelegation",
 				CapabilityDelegation: []string{"did:cheqd:test:CapabilityDelegation#key-1"},
 				Controller:           []string{AliceDID},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         "did:cheqd:test:CapabilityDelegation#key-1",
 						Type:       "Ed25519VerificationKey2020",
@@ -111,11 +114,11 @@ func TestCreateDID(t *testing.T) {
 				AliceKey1: keys[AliceKey1],
 			},
 			signers: []string{AliceKey1},
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id:                   "did:cheqd:test:CapabilityInvocation",
 				CapabilityInvocation: []string{"did:cheqd:test:CapabilityInvocation#key-1"},
 				Controller:           []string{AliceDID},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         "did:cheqd:test:CapabilityInvocation#key-1",
 						Type:       "Ed25519VerificationKey2020",
@@ -127,7 +130,7 @@ func TestCreateDID(t *testing.T) {
 		{
 			valid: true,
 			name:  "With controller works",
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id:         "did:cheqd:test:controller1",
 				Controller: []string{AliceDID, BobDID},
 			},
@@ -165,7 +168,7 @@ func TestCreateDID(t *testing.T) {
 				CharlieKey2,
 				CharlieKey3,
 			},
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id: "did:cheqd:test:123456qwertyui",
 				Authentication: []string{
 					"did:cheqd:test:123456qwertyui#key-1",
@@ -176,7 +179,7 @@ func TestCreateDID(t *testing.T) {
 				CapabilityDelegation: []string{"did:cheqd:test:123456qwertyui#key-3"},
 				KeyAgreement:         []string{"did:cheqd:test:123456qwertyui#key-4"},
 				AlsoKnownAs:          []string{"did:cheqd:test:123456eqweqwe"},
-				Service: []*v1.Service{
+				Service: []*types.Service{
 					{
 						Id:              "did:cheqd:test:123456qwertyui#service-1",
 						Type:            "DIDCommMessaging",
@@ -184,7 +187,7 @@ func TestCreateDID(t *testing.T) {
 					},
 				},
 				Controller: []string{"did:cheqd:test:123456qwertyui", AliceDID, BobDID, CharlieDID},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         "did:cheqd:test:123456qwertyui#key-1",
 						Type:       "Ed25519VerificationKey2020",
@@ -216,7 +219,7 @@ func TestCreateDID(t *testing.T) {
 		{
 			valid: false,
 			name:  "Second controller did not sign request",
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id:         "did:cheqd:test:controller1",
 				Controller: []string{AliceDID, BobDID},
 			},
@@ -229,7 +232,7 @@ func TestCreateDID(t *testing.T) {
 		{
 			valid: false,
 			name:  "Bad request",
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id: "did:cheqd:test:controller1",
 			},
 			signers: []string{AliceKey1},
@@ -241,7 +244,7 @@ func TestCreateDID(t *testing.T) {
 		{
 			valid: false,
 			name:  "No signature",
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id:         "did:cheqd:test:controller1",
 				Controller: []string{AliceDID, BobDID},
 			},
@@ -250,7 +253,7 @@ func TestCreateDID(t *testing.T) {
 		{
 			valid: false,
 			name:  "Empty request",
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id:         "did:cheqd:test:controller1",
 				Controller: []string{AliceDID, BobDID},
 			},
@@ -259,7 +262,7 @@ func TestCreateDID(t *testing.T) {
 		{
 			valid: false,
 			name:  "Controller not found",
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id:         "did:cheqd:test:controller1",
 				Controller: []string{AliceDID, "did:cheqd:test:notfound"},
 			},
@@ -272,7 +275,7 @@ func TestCreateDID(t *testing.T) {
 		{
 			valid: false,
 			name:  "Wrong signature",
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id:         "did:cheqd:test:controller1",
 				Controller: []string{AliceDID},
 			},
@@ -285,7 +288,7 @@ func TestCreateDID(t *testing.T) {
 		{
 			valid: false,
 			name:  "Controller verification method not found",
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id:         "did:cheqd:test:controller1",
 				Controller: []string{BobDID},
 			},
@@ -298,7 +301,7 @@ func TestCreateDID(t *testing.T) {
 		{
 			valid: false,
 			name:  "Second controller verification method not found",
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id:         "did:cheqd:test:controller1",
 				Controller: []string{AliceDID, BobDID, CharlieDID},
 			},
@@ -313,10 +316,10 @@ func TestCreateDID(t *testing.T) {
 		{
 			valid: false,
 			name:  "DID signed by wrong controller",
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id:             "did:cheqd:test:123456qwertyui",
 				Authentication: []string{"did:cheqd:test:123456qwertyui#key-1"},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         "did:cheqd:test:123456qwertyui#key-1",
 						Type:       "Ed25519VerificationKey2020",
@@ -333,10 +336,10 @@ func TestCreateDID(t *testing.T) {
 		{
 			valid: false,
 			name:  "DID self-signed by not existing verification method",
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id:             "did:cheqd:test:123456qwertyui",
 				Authentication: []string{"did:cheqd:test:123456qwertyui#key-1"},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         "did:cheqd:test:123456qwertyui#key-1",
 						Type:       "Ed25519VerificationKey2020",
@@ -353,11 +356,11 @@ func TestCreateDID(t *testing.T) {
 		{
 			valid: false,
 			name:  "Self-signature not found",
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id:             "did:cheqd:test:123456qwertyui",
 				Controller:     []string{AliceDID, "did:cheqd:test:123456qwertyui"},
 				Authentication: []string{"did:cheqd:test:123456qwertyui#key-1"},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         "did:cheqd:test:123456qwertyui#key-1",
 						Type:       "Ed25519VerificationKey2020",
@@ -379,10 +382,10 @@ func TestCreateDID(t *testing.T) {
 				"did:cheqd:test:123456qwertyui#key-1": GenerateKeyPair(),
 			},
 			signers: []string{"did:cheqd:test:123456qwertyui#key-1"},
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id:             "did:cheqd:test:123456qwertyui",
 				Authentication: []string{"did:cheqd:test:123456qwertyui#key-1"},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         "did:cheqd:test:123456qwertyui#key-1",
 						Type:       "Ed25519VerificationKey2020",
@@ -395,11 +398,11 @@ func TestCreateDID(t *testing.T) {
 		{
 			valid: false,
 			name:  "Verification Method ID doesnt match",
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id:             "did:cheqd:test:controller1",
 				Controller:     []string{AliceDID, CharlieDID},
 				Authentication: []string{"#key-1"},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         "did:cheqd:test:123456qwertyui#key-1",
 						Type:       "Ed25519VerificationKey2020",
@@ -417,11 +420,11 @@ func TestCreateDID(t *testing.T) {
 		{
 			valid: false,
 			name:  "Full Verification Method ID doesnt match",
-			msg: &v1.MsgCreateDidPayload{
+			msg: &types.MsgCreateDidPayload{
 				Id:             "did:cheqd:test:controller1",
 				Controller:     []string{AliceDID, CharlieDID},
 				Authentication: []string{"did:cheqd:test:123456qwertyui#key-1"},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         "did:cheqd:test:123456qwertyui#key-1",
 						Type:       "Ed25519VerificationKey2020",
@@ -476,27 +479,24 @@ func TestCreateDID(t *testing.T) {
 
 func TestUpdateDid(t *testing.T) {
 	setup := Setup()
-	keys := setup.CreatePreparedDID()
+	keys, err := setup.CreateTestDIDs()
+	require.NoError(t, err)
 
 	cases := []struct {
 		valid   bool
 		name    string
-		keys    map[string]KeyPair
 		signers []string
-		msg     *v1.MsgUpdateDidPayload
+		msg     *types.MsgUpdateDidPayload
 		errMsg  string
 	}{
 		{
-			valid: true,
-			name:  "Works",
-			keys: map[string]KeyPair{
-				AliceKey2: keys[AliceKey2],
-			},
-			signers: []string{AliceKey2},
-			msg: &v1.MsgUpdateDidPayload{
+			valid:   true,
+			name:    "Key rotation works",
+			signers: []string{AliceKey1},
+			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
 				Authentication: []string{AliceKey2},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
 						Type:       "Ed25519VerificationKey2020",
@@ -506,17 +506,14 @@ func TestUpdateDid(t *testing.T) {
 			},
 		},
 		{
-			valid: false,
-			name:  "Try to add controller without self-signature",
-			keys: map[string]KeyPair{
-				BobKey1: keys[BobKey1],
-			},
+			valid:   false,
+			name:    "Try to add controller without self-signature",
 			signers: []string{BobKey1},
-			msg: &v1.MsgUpdateDidPayload{
+			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
 				Controller:     []string{BobDID},
 				Authentication: []string{AliceKey1},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey1,
 						Type:       "Ed25519VerificationKey2020",
@@ -527,18 +524,14 @@ func TestUpdateDid(t *testing.T) {
 			errMsg: "signature did:cheqd:test:alice not found: invalid signature detected",
 		},
 		{
-			valid: false,
-			name:  "Add controller and replace authentication without old signature do not work",
-			keys: map[string]KeyPair{
-				BobKey1:   keys[BobKey1],
-				AliceKey1: keys[AliceKey1],
-			},
+			valid:   false,
+			name:    "Add controller and replace authentication without old signature do not work",
 			signers: []string{BobKey1, AliceKey1},
-			msg: &v1.MsgUpdateDidPayload{
+			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
 				Controller:     []string{BobDID},
 				Authentication: []string{AliceKey1},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey1,
 						Type:       "Ed25519VerificationKey2020",
@@ -549,18 +542,14 @@ func TestUpdateDid(t *testing.T) {
 			errMsg: "did:cheqd:test:alice#key-1: verification method not found: invalid signature detected",
 		},
 		{
-			valid: true,
-			name:  "Add controller work",
-			keys: map[string]KeyPair{
-				BobKey1:   keys[BobKey1],
-				AliceKey2: keys[AliceKey2],
-			},
+			valid:   true,
+			name:    "Add controller work",
 			signers: []string{BobKey1, AliceKey2},
-			msg: &v1.MsgUpdateDidPayload{
+			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
 				Controller:     []string{BobDID},
 				Authentication: []string{AliceKey2},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
 						Type:       "Ed25519VerificationKey2020",
@@ -570,18 +559,14 @@ func TestUpdateDid(t *testing.T) {
 			},
 		},
 		{
-			valid: false,
-			name:  "Add controller work without signature do not work",
-			keys: map[string]KeyPair{
-				BobKey1:   keys[BobKey1],
-				AliceKey2: keys[AliceKey2],
-			},
+			valid:   true,
+			name:    "Add controller without signature work (signatures of old controllers are present)",
 			signers: []string{BobKey1, AliceKey2},
-			msg: &v1.MsgUpdateDidPayload{
+			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
 				Controller:     []string{BobDID, CharlieDID},
 				Authentication: []string{AliceKey2},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
 						Type:       "Ed25519VerificationKey2020",
@@ -592,18 +577,14 @@ func TestUpdateDid(t *testing.T) {
 			errMsg: "signature did:cheqd:test:charlie not found: invalid signature detected",
 		},
 		{
-			valid: false,
-			name:  "Replace controller work without new signature do not work",
-			keys: map[string]KeyPair{
-				BobKey1:   keys[BobKey1],
-				AliceKey2: keys[AliceKey2],
-			},
+			valid:   false,
+			name:    "Replace controller work without new signature do not work",
 			signers: []string{BobKey1, AliceKey2},
-			msg: &v1.MsgUpdateDidPayload{
+			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
 				Controller:     []string{CharlieDID},
 				Authentication: []string{AliceKey2},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
 						Type:       "Ed25519VerificationKey2020",
@@ -614,19 +595,14 @@ func TestUpdateDid(t *testing.T) {
 			errMsg: "signature did:cheqd:test:charlie not found: invalid signature detected",
 		},
 		{
-			valid: false,
-			name:  "Replace controller without old signature do not work",
-			keys: map[string]KeyPair{
-				BobKey1:     keys[BobKey1],
-				AliceKey2:   keys[AliceKey2],
-				CharlieKey3: keys[CharlieKey3],
-			},
+			valid:   false,
+			name:    "Replace controller without old signature do not work",
 			signers: []string{AliceKey2, CharlieKey3},
-			msg: &v1.MsgUpdateDidPayload{
+			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
 				Controller:     []string{CharlieDID},
 				Authentication: []string{AliceKey2},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
 						Type:       "Ed25519VerificationKey2020",
@@ -637,19 +613,14 @@ func TestUpdateDid(t *testing.T) {
 			errMsg: "signature did:cheqd:test:bob not found: invalid signature detected",
 		},
 		{
-			valid: true,
-			name:  "Replace controller work",
-			keys: map[string]KeyPair{
-				BobKey1:     keys[BobKey1],
-				AliceKey2:   keys[AliceKey2],
-				CharlieKey3: keys[CharlieKey3],
-			},
+			valid:   true,
+			name:    "Replace controller work",
 			signers: []string{AliceKey2, CharlieKey3, BobKey1},
-			msg: &v1.MsgUpdateDidPayload{
+			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
 				Controller:     []string{CharlieDID},
 				Authentication: []string{AliceKey2},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
 						Type:       "Ed25519VerificationKey2020",
@@ -659,19 +630,14 @@ func TestUpdateDid(t *testing.T) {
 			},
 		},
 		{
-			valid: true,
-			name:  "Add second controller works",
-			keys: map[string]KeyPair{
-				BobKey1:     keys[BobKey1],
-				AliceKey2:   keys[AliceKey2],
-				CharlieKey3: keys[CharlieKey3],
-			},
+			valid:   true,
+			name:    "Add second controller works",
 			signers: []string{AliceKey2, CharlieKey3, BobKey1},
-			msg: &v1.MsgUpdateDidPayload{
+			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
 				Controller:     []string{BobDID, CharlieDID},
 				Authentication: []string{AliceKey2},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
 						Type:       "Ed25519VerificationKey2020",
@@ -681,21 +647,15 @@ func TestUpdateDid(t *testing.T) {
 			},
 		},
 		{
-			valid: true,
-			name:  "Add verification method without signature controller work",
-			keys: map[string]KeyPair{
-				BobKey1:     keys[BobKey1],
-				AliceKey1:   keys[AliceKey1],
-				AliceKey2:   keys[AliceKey2],
-				CharlieKey3: keys[CharlieKey3],
-			},
+			valid:   true,
+			name:    "Add verification method without signature controller work",
 			signers: []string{CharlieKey3, BobKey1},
-			msg: &v1.MsgUpdateDidPayload{
+			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
 				Controller:     []string{BobDID, CharlieDID},
 				Authentication: []string{AliceKey2},
 				KeyAgreement:   []string{AliceKey1},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
 						Type:       "Ed25519VerificationKey2020",
@@ -710,20 +670,14 @@ func TestUpdateDid(t *testing.T) {
 			},
 		},
 		{
-			valid: false,
-			name:  "Remove verification method without signature controller do not work",
-			keys: map[string]KeyPair{
-				BobKey1:     keys[BobKey1],
-				AliceKey1:   keys[AliceKey1],
-				AliceKey2:   keys[AliceKey2],
-				CharlieKey3: keys[CharlieKey3],
-			},
+			valid:   false,
+			name:    "Remove verification method without signature controller do not work",
 			signers: []string{CharlieKey3, BobKey1},
-			msg: &v1.MsgUpdateDidPayload{
+			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
 				Controller:     []string{BobDID, CharlieDID},
 				Authentication: []string{AliceKey2},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
 						Type:       "Ed25519VerificationKey2020",
@@ -734,20 +688,14 @@ func TestUpdateDid(t *testing.T) {
 			errMsg: "signature did:cheqd:test:alice not found: invalid signature detected",
 		},
 		{
-			valid: false,
-			name:  "Remove verification method wrong authentication detected",
-			keys: map[string]KeyPair{
-				BobKey1:     keys[BobKey1],
-				AliceKey1:   keys[AliceKey1],
-				AliceKey2:   keys[AliceKey2],
-				CharlieKey3: keys[CharlieKey3],
-			},
+			valid:   false,
+			name:    "Remove verification method wrong authentication detected",
 			signers: []string{AliceKey1, CharlieKey3, BobKey1},
-			msg: &v1.MsgUpdateDidPayload{
+			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
 				Controller:     []string{BobDID, CharlieDID},
 				Authentication: []string{AliceKey2},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
 						Type:       "Ed25519VerificationKey2020",
@@ -758,20 +706,14 @@ func TestUpdateDid(t *testing.T) {
 			errMsg: "did:cheqd:test:alice#key-1: verification method not found: invalid signature detected",
 		},
 		{
-			valid: true,
-			name:  "Add second authentication works",
-			keys: map[string]KeyPair{
-				BobKey1:     keys[BobKey1],
-				AliceKey1:   keys[AliceKey1],
-				AliceKey2:   keys[AliceKey2],
-				CharlieKey3: keys[CharlieKey3],
-			},
+			valid:   true,
+			name:    "Add second authentication works",
 			signers: []string{AliceKey2, CharlieKey3, BobKey1},
-			msg: &v1.MsgUpdateDidPayload{
+			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
 				Controller:     []string{BobDID, CharlieDID},
 				Authentication: []string{AliceKey1, AliceKey2},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey1,
 						Type:       "Ed25519VerificationKey2020",
@@ -786,19 +728,14 @@ func TestUpdateDid(t *testing.T) {
 			},
 		},
 		{
-			valid: false,
-			name:  "Remove self authentication without signature do not work",
-			keys: map[string]KeyPair{
-				BobKey1:     keys[BobKey1],
-				AliceKey2:   keys[AliceKey2],
-				CharlieKey3: keys[CharlieKey3],
-			},
+			valid:   false,
+			name:    "Remove self authentication without signature do not work",
 			signers: []string{CharlieKey3, BobKey1},
-			msg: &v1.MsgUpdateDidPayload{
+			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
 				Controller:     []string{BobDID, CharlieDID},
 				Authentication: []string{AliceKey2},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
 						Type:       "Ed25519VerificationKey2020",
@@ -809,19 +746,14 @@ func TestUpdateDid(t *testing.T) {
 			errMsg: "signature did:cheqd:test:alice not found: invalid signature detected",
 		},
 		{
-			valid: false,
-			name:  "Change self controller verification without signature do not work",
-			keys: map[string]KeyPair{
-				BobKey1:     keys[BobKey1],
-				AliceKey2:   keys[AliceKey2],
-				CharlieKey3: keys[CharlieKey3],
-			},
+			valid:   false,
+			name:    "Change self controller verification without signature do not work",
 			signers: []string{CharlieKey3, BobKey1},
-			msg: &v1.MsgUpdateDidPayload{
+			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
 				Controller:     []string{BobDID, CharlieDID},
 				Authentication: []string{AliceKey1, AliceKey2},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey1,
 						Type:       "Ed25519VerificationKey2020",
@@ -837,19 +769,13 @@ func TestUpdateDid(t *testing.T) {
 			errMsg: "signature did:cheqd:test:alice not found: invalid signature detected",
 		},
 		{
-			valid: true,
-			name:  "Remove self authentication works",
-			keys: map[string]KeyPair{
-				BobKey1:     keys[BobKey1],
-				AliceKey2:   keys[AliceKey2],
-				CharlieKey3: keys[CharlieKey3],
-			},
+			valid:   true,
 			signers: []string{AliceKey2, CharlieKey3, BobKey1},
-			msg: &v1.MsgUpdateDidPayload{
+			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
 				Controller:     []string{BobDID, CharlieDID},
 				Authentication: []string{AliceKey2},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
 						Type:       "Ed25519VerificationKey2020",
@@ -859,18 +785,13 @@ func TestUpdateDid(t *testing.T) {
 			},
 		},
 		{
-			valid: false,
-			name:  "Change controller to self without old controllers signatures does not work",
-			keys: map[string]KeyPair{
-				BobKey1:     keys[BobKey1],
-				AliceKey2:   keys[AliceKey2],
-				CharlieKey3: keys[CharlieKey3],
-			},
+			valid:   false,
+			name:    "Change controller to self without old controllers signatures does not work",
 			signers: []string{AliceKey2},
-			msg: &v1.MsgUpdateDidPayload{
+			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
 				Authentication: []string{AliceKey2},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
 						Type:       "Ed25519VerificationKey2020",
@@ -881,18 +802,13 @@ func TestUpdateDid(t *testing.T) {
 			errMsg: "signature did:cheqd:test:bob not found: invalid signature detected",
 		},
 		{
-			valid: true,
-			name:  "Change controller to self works",
-			keys: map[string]KeyPair{
-				BobKey1:     keys[BobKey1],
-				AliceKey2:   keys[AliceKey2],
-				CharlieKey3: keys[CharlieKey3],
-			},
+			valid:   true,
+			name:    "Change controller to self works",
 			signers: []string{AliceKey2, CharlieKey3, BobKey1},
-			msg: &v1.MsgUpdateDidPayload{
+			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
 				Authentication: []string{AliceKey2},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
 						Type:       "Ed25519VerificationKey2020",
@@ -902,18 +818,13 @@ func TestUpdateDid(t *testing.T) {
 			},
 		},
 		{
-			valid: false,
-			name:  "Change verification method controller without old signature",
-			keys: map[string]KeyPair{
-				BobKey1:     keys[BobKey1],
-				AliceKey2:   keys[AliceKey2],
-				CharlieKey3: keys[CharlieKey3],
-			},
+			valid:   false,
+			name:    "Change verification method controller without old signature",
 			signers: []string{AliceKey2, CharlieKey3},
-			msg: &v1.MsgUpdateDidPayload{
+			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
 				Authentication: []string{AliceKey2},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
 						Type:       "Ed25519VerificationKey2020",
@@ -924,18 +835,13 @@ func TestUpdateDid(t *testing.T) {
 			errMsg: "signature did:cheqd:test:bob not found: invalid signature detected",
 		},
 		{
-			valid: false,
-			name:  "Change verification method controller without new signature",
-			keys: map[string]KeyPair{
-				BobKey1:     keys[BobKey1],
-				AliceKey2:   keys[AliceKey2],
-				CharlieKey3: keys[CharlieKey3],
-			},
+			valid:   false,
+			name:    "Change verification method controller without new signature",
 			signers: []string{AliceKey2, BobKey1},
-			msg: &v1.MsgUpdateDidPayload{
+			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
 				Authentication: []string{AliceKey2},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
 						Type:       "Ed25519VerificationKey2020",
@@ -946,18 +852,13 @@ func TestUpdateDid(t *testing.T) {
 			errMsg: "signature did:cheqd:test:charlie not found: invalid signature detected",
 		},
 		{
-			valid: true,
-			name:  "Change verification method controller",
-			keys: map[string]KeyPair{
-				BobKey1:     keys[BobKey1],
-				AliceKey2:   keys[AliceKey2],
-				CharlieKey3: keys[CharlieKey3],
-			},
+			valid:   true,
+			name:    "Change verification method controller",
 			signers: []string{AliceKey2, BobKey1, CharlieKey3},
-			msg: &v1.MsgUpdateDidPayload{
+			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
 				Authentication: []string{AliceKey2},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
 						Type:       "Ed25519VerificationKey2020",
@@ -967,16 +868,13 @@ func TestUpdateDid(t *testing.T) {
 			},
 		},
 		{
-			valid: false,
-			name:  "Change to self verification method without controller signature",
-			keys: map[string]KeyPair{
-				AliceKey2: keys[AliceKey2],
-			},
+			valid:   false,
+			name:    "Change to self verification method without controller signature",
 			signers: []string{AliceKey2},
-			msg: &v1.MsgUpdateDidPayload{
+			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
 				Authentication: []string{AliceKey2},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
 						Type:       "Ed25519VerificationKey2020",
@@ -987,17 +885,13 @@ func TestUpdateDid(t *testing.T) {
 			errMsg: "signature did:cheqd:test:charlie not found: invalid signature detected",
 		},
 		{
-			valid: true,
-			name:  "Change to self verification method without controller signature",
-			keys: map[string]KeyPair{
-				AliceKey2:   keys[AliceKey2],
-				CharlieKey3: keys[CharlieKey3],
-			},
+			valid:   true,
+			name:    "Change to self verification method without controller signature",
 			signers: []string{AliceKey2, CharlieKey3},
-			msg: &v1.MsgUpdateDidPayload{
+			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
 				Authentication: []string{AliceKey2},
-				VerificationMethod: []*v1.VerificationMethod{
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
 						Type:       "Ed25519VerificationKey2020",
@@ -1013,12 +907,14 @@ func TestUpdateDid(t *testing.T) {
 			msg := tc.msg
 
 			for _, vm := range msg.VerificationMethod {
-				vm.PublicKeyMultibase = "z" + base58.Encode(tc.keys[vm.Id].PublicKey)
+				encoded, err := multibase.Encode(multibase.Base58BTC, keys[vm.Id].PublicKey)
+				require.NoError(t, err)
+				vm.PublicKeyMultibase = encoded
 			}
 
 			signerKeys := map[string]ed25519.PrivateKey{}
 			for _, signer := range tc.signers {
-				signerKeys[signer] = tc.keys[signer].PrivateKey
+				signerKeys[signer] = keys[signer].PrivateKey
 			}
 
 			did, err := setup.SendUpdateDid(msg, signerKeys)
