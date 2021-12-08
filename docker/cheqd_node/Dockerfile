@@ -9,7 +9,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     wget
 
 
-# Get go protoc compiler and plugins. Taken from: tendermintdev/sdk-proto-gen:v0.2
+# Get go protoc compiler plugins. Taken from: tendermintdev/sdk-proto-gen:v0.2
 ENV GOLANG_PROTOBUF_VERSION=1.3.5 \
     GOGO_PROTOBUF_VERSION=1.3.2 \
     GRPC_GATEWAY_VERSION=1.14.7
@@ -22,6 +22,13 @@ RUN go get \
     github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@v${GRPC_GATEWAY_VERSION} \
     github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@v${GRPC_GATEWAY_VERSION} \
     github.com/regen-network/cosmos-proto/protoc-gen-gocosmos@latest
+
+
+# Install buf
+RUN PREFIX="/usr/local" && \
+    VERSION="1.0.0-rc8" && \
+    curl -sSL "https://github.com/bufbuild/buf/releases/download/v${VERSION}/buf-$(uname -s)-$(uname -m).tar.gz" | \
+    tar -xvzf - -C "${PREFIX}" --strip-components 1
 
 
 # App
