@@ -103,4 +103,4 @@ go.sum: go.mod
 	go mod tidy
 
 proto-gen:
-	sh ./scripts/protocgen.sh
+	bash ./scripts/protocgen.sh
