@@ -1,0 +1,62 @@
+{
+    "public":{
+        "chainName": "cheqd",
+        "chainId": "cheqd-testnet-2",
+        "slashingWindow": 120960,
+        "uptimeWindow": 600,
+        "initialPageSize": 30,
+        "secp256k1": true,
+        "bech32PrefixAccAddr": "cheqd",
+        "bech32PrefixAccPub": "cheqdpub",
+        "bech32PrefixValAddr": "cheqdvaloper",
+        "bech32PrefixValPub": "cheqdvaloperpub",
+        "bech32PrefixConsAddr": "cheqdvalcons",
+        "bech32PrefixConsPub": "cheqdvalconspub",
+        "bondDenom": "ncheq",
+        "powerReduction": 1000000000,
+        "coins": [
+            {
+                "denom": "ncheq",
+                "displayName": "CHEQ",
+                "fraction": 1000000000
+            } 
+        ],
+        "ledger":{
+            "coinType": 118,
+            "appName": "Cosmos",
+            "appVersion": "2.16.0",
+            "gasPrice": 0.000000025
+        },
+        "modules": {
+            "bank": true,
+            "supply": true,
+            "minting": true,
+            "gov": true,
+            "distribution": true
+        },
+        "coingeckoId": "cheqd-network",
+        "networks": "https://raw.githubusercontent.com/cheqd/cheqd-node/persistent_chains/explorer/bigdipperv1-testnet-config.json",
+        "banners": false
+    },
+    "remote":{
+        "rpc":"https://rpc.testnet.cheqd.network",
+        "api":"https://api.testnet.cheqd.network" 
+    },
+    "debug": {
+        "startTimer": false
+    },
+    "params":{
+        "startHeight": 1,
+        "defaultBlockTime": 5000,
+        "validatorUpdateWindow": 300,
+        "blockInterval": 15000,
+        "transactionsInterval": 18000,
+        "keybaseFetchingInterval": 1800000,
+        "consensusInterval": 1000,
+        "statusInterval":7500,
+        "signingInfoInterval": 1800000,
+        "proposalInterval": 5000,
+        "missedBlocksInterval": 60000,
+        "delegationInterval": 900000
+    }
+}
