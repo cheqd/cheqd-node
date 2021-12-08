@@ -9,7 +9,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     wget
 
 
-# Go protoc programs. Taken from: tendermintdev/sdk-proto-gen:v0.2
+# Get go protoc compiler and plugins. Taken from: tendermintdev/sdk-proto-gen:v0.2
 ENV GOLANG_PROTOBUF_VERSION=1.3.5 \
     GOGO_PROTOBUF_VERSION=1.3.2 \
     GRPC_GATEWAY_VERSION=1.14.7
