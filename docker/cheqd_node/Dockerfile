@@ -22,7 +22,6 @@ WORKDIR /app
 COPY app ./app
 COPY cmd ./cmd
 COPY proto ./proto
-COPY vue ./vue
 COPY x ./x
 COPY go.mod .
 COPY go.sum .
