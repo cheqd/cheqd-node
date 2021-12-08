@@ -1,19 +1,18 @@
 export VERSION := $(shell echo $(shell git describe --always --match "v*") | sed 's/^v//')
 export TMVERSION := $(shell go list -m github.com/tendermint/tendermint | sed 's:.* ::')
 export COMMIT := $(shell git log -1 --format='%H')
+
 NAME ?= cheqd-node
 APPNAME ?= $(NAME)d
 LEDGER_ENABLED ?= true
+
 BINDIR ?= $(GOPATH)/bin
 BUILDDIR ?= $(CURDIR)/build
-DOCKER := $(shell which docker)
-DOCKER_BUF := $(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace bufbuild/buf:1.0.0-rc8
-PROJECT_NAME = $(shell git remote get-url origin | xargs basename -s .git)
 
 export GO111MODULE = on
 
-# process build tags
 
+### Process build tags
 build_tags = netgo
 ifeq ($(LEDGER_ENABLED),true)
   ifeq ($(OS),Windows_NT)
@@ -42,14 +41,15 @@ whitespace += $(whitespace)
 comma := ,
 build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
 
-# process linker flags
 
+### Process linker flags
 ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=$(NAME)\
 		  -X github.com/cosmos/cosmos-sdk/version.AppName=$(APPNAME) \
 		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
 		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)" \
 			-X github.com/tendermint/tendermint/version.TMCoreSemVer=$(TMVERSION)
+
 
 # DB backend selection
 ifeq (cleveldb,$(findstring cleveldb,$(COSMOS_BUILD_OPTIONS)))
@@ -59,12 +59,15 @@ endif
 ifeq (,$(findstring nostrip,$(COSMOS_BUILD_OPTIONS)))
   ldflags += -w -s
 endif
+
 ldflags += $(LDFLAGS)
 ldflags := $(strip $(ldflags))
 
 build_tags += $(BUILD_TAGS)
 build_tags := $(strip $(build_tags))
 
+
+### Resulting build flags
 BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
 
 # check for nostrip option
@@ -77,17 +80,22 @@ ifeq (debug,$(findstring debug,$(COSMOS_BUILD_OPTIONS)))
   BUILD_FLAGS += -gcflags "all=-N -l"
 endif
 
-all: build
 
-BUILD_TARGETS := build install
+###############################################################################
+###                                  Build                                  ###
+###############################################################################
 
-build: BUILD_ARGS=-o $(BUILDDIR)/
 
-$(BUILD_TARGETS): go.sum $(BUILDDIR)/
-	go build -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS)/cheqd-noded ./cmd/cheqd-noded
+all: install
 
-$(BUILDDIR)/:
-	mkdir -p $(BUILDDIR)/
+build: go.sum $(BUILDDIR)
+	go build -mod=readonly $(BUILD_FLAGS) -o $(BUILDDIR)/cheqd-noded ./cmd/cheqd-noded
+
+install: go.sum
+	go install -mod=readonly $(BUILD_FLAGS) ./cmd/cheqd-noded
+
+$(BUILDDIR):
+	mkdir -p $(BUILDDIR)
 
 clean:
 	rm -rf \
@@ -95,12 +103,17 @@ clean:
     artifacts/ \
     tmp-swagger-gen/
 
-.PHONY: clean
+.PHONY: all clean build install
 
 go.sum: go.mod
 	echo "Ensure dependencies have not been modified ..." >&2
 	go mod verify
 	go mod tidy
 
+
+###############################################################################
+###                                  Protobuf                               ###
+###############################################################################
+
 proto-gen:
-	bash ./scripts/protocgen.sh
+	bash scripts/protocgen.sh
