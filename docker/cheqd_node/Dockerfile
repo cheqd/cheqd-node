@@ -4,33 +4,48 @@ FROM golang:buster as builder
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
-    # Common
     curl \
-    # Protoc
-    protobuf-compiler \
     libprotobuf-dev \
     wget
 
-# Starport
-# RUN curl https://get.starport.network/starport! | bash
-# There is an issue with the latest starport, especially 0.18 version
-RUN wget -qO- https://github.com/tendermint/starport/releases/download/v0.18.6/starport_0.18.6_linux_amd64.tar.gz | tar xvz -C /tmp/ && cp /tmp/starport /usr/bin
+
+# Get go protoc compiler plugins. Taken from: tendermintdev/sdk-proto-gen:v0.2
+ENV GOLANG_PROTOBUF_VERSION=1.3.5 \
+    GOGO_PROTOBUF_VERSION=1.3.2 \
+    GRPC_GATEWAY_VERSION=1.14.7
+
+RUN go get \
+    github.com/golang/protobuf/protoc-gen-go@v${GOLANG_PROTOBUF_VERSION} \
+    github.com/gogo/protobuf/protoc-gen-gogo@v${GOGO_PROTOBUF_VERSION} \
+    github.com/gogo/protobuf/protoc-gen-gogofast@v${GOGO_PROTOBUF_VERSION} \
+    github.com/gogo/protobuf/protoc-gen-gogofaster@v${GOGO_PROTOBUF_VERSION} \
+    github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@v${GRPC_GATEWAY_VERSION} \
+    github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@v${GRPC_GATEWAY_VERSION} \
+    github.com/regen-network/cosmos-proto/protoc-gen-gocosmos@latest
+
+
+# Install buf
+RUN PREFIX="/usr/local" && \
+    VERSION="1.0.0-rc8" && \
+    curl -sSL "https://github.com/bufbuild/buf/releases/download/v${VERSION}/buf-$(uname -s)-$(uname -m).tar.gz" | \
+    tar -xvzf - -C "${PREFIX}" --strip-components 1
+
 
 # App
 WORKDIR /app
 
 COPY app ./app
 COPY cmd ./cmd
+COPY scripts ./scripts
 COPY proto ./proto
-COPY vue ./vue
 COPY x ./x
 COPY go.mod .
 COPY go.sum .
-# Required by starport
+COPY Makefile .
+# Required to fetch version
 COPY .git .
 
-RUN starport chain build --release
-RUN tar xzvf release/cheqd-node_linux_amd64.tar.gz
+RUN make proto-gen build
 
 
 #####  Run container  #####
@@ -38,7 +53,7 @@ RUN tar xzvf release/cheqd-node_linux_amd64.tar.gz
 FROM ubuntu:focal
 
 # Node binary
-COPY --from=builder /app/cheqd-noded /bin
+COPY --from=builder /app/build/cheqd-noded /bin
 
 # Runner script
 COPY docker/cheqd_node/node-runner.sh /bin/node-runner

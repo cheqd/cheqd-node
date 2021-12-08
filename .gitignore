@@ -41,3 +41,4 @@ secret.yml
 # Python
 .pytest_cache
 **/__pycache__
+.vscode-upload.json
