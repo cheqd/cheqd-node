@@ -13,7 +13,7 @@
         "bech32PrefixConsAddr": "cheqdvalcons",
         "bech32PrefixConsPub": "cheqdvalconspub",
         "bondDenom": "ncheq",
-        "powerReduction": 1000000000,
+        "powerReduction": 1000000,
         "coins": [
             {
                 "denom": "ncheq",
