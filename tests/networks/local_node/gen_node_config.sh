@@ -24,6 +24,16 @@ sed -i $sed_extension 's/minimum-gas-prices = ""/minimum-gas-prices = "25ncheq"/
 cheqd-noded keys add "node_operator" --keyring-backend "test"
 cheqd-noded add-genesis-account "node_operator" 20000000000000000ncheq --keyring-backend "test"
 
+echo "##### [Node 0] Switch on REST API"
+
+sed -i $sed_extension 's/enable = false/enable = true/g' "$HOME/.cheqdnode/config/app.toml"
+
+echo "##### [Node 0] Adjust consensus timeouts"
+
+sed -i $sed_extension 's/timeout_propose = "3s"/timeout_propose = "500ms"/g' "$HOME/.cheqdnode/config/config.toml"
+sed -i $sed_extension 's/timeout_prevote = "1s"/timeout_prevote = "500ms"/g' "$HOME/.cheqdnode/config/config.toml"
+sed -i $sed_extension 's/timeout_precommit = "1s"/timeout_precommit = "500ms"/g' "$HOME/.cheqdnode/config/config.toml"
+sed -i $sed_extension 's/timeout_commit = "5s"/timeout_commit = "500ms"/g' "$HOME/.cheqdnode/config/config.toml"
 
 echo "##### Adding test accounts to the genesis"
 

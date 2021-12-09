@@ -27,6 +27,10 @@ echo "##### [Node 0] Set fee"
 
 sed -i $sed_extension 's/minimum-gas-prices = ""/minimum-gas-prices = "25ncheq"/g' "$HOME/.cheqdnode/config/app.toml"
 
+echo "##### [Node 0] Switch on REST API"
+
+sed -i $sed_extension 's/enable = false/enable = true/g' "$HOME/.cheqdnode/config/app.toml"
+
 echo "##### [Node 0] Adjust consensus timeouts"
 
 sed -i $sed_extension 's/timeout_propose = "3s"/timeout_propose = "500ms"/g' "$HOME/.cheqdnode/config/config.toml"
