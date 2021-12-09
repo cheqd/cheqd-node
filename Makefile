@@ -1,4 +1,4 @@
-export VERSION := $(shell echo $(shell git describe --always --match "v*") | sed 's/^v//')
+export VERSION := $(shell echo $(shell git describe --always --tag --match "v*") | sed 's/^v//')
 export TMVERSION := $(shell go list -m github.com/tendermint/tendermint | sed 's:.* ::')
 export COMMIT := $(shell git log -1 --format='%H')
 
