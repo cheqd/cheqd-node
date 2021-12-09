@@ -50,24 +50,43 @@ jobs:
         with:
           go-version: 1.17
 
-      # There is an issue with the latest starport, especially 0.18 version
-      - name: Download and install starport
-        run: wget -qO- https://github.com/tendermint/starport/releases/download/v0.18.6/starport_0.18.6_linux_amd64.tar.gz | tar xvz -C /tmp/ && sudo cp /tmp/starport /usr/bin
+      - name: Get go protoc compiler plugins
+        env:
+          GOLANG_PROTOBUF_VERSION: 1.3.5
+          GOGO_PROTOBUF_VERSION: 1.3.2
+          GRPC_GATEWAY_VERSION: 1.14.7
+        run: |
+          # Taken from: tendermintdev/sdk-proto-gen:v0.2
+          go get \
+            github.com/golang/protobuf/protoc-gen-go@v${GOLANG_PROTOBUF_VERSION} \
+            github.com/gogo/protobuf/protoc-gen-gogo@v${GOGO_PROTOBUF_VERSION} \
+            github.com/gogo/protobuf/protoc-gen-gogofast@v${GOGO_PROTOBUF_VERSION} \
+            github.com/gogo/protobuf/protoc-gen-gogofaster@v${GOGO_PROTOBUF_VERSION} \
+            github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@v${GRPC_GATEWAY_VERSION} \
+            github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@v${GRPC_GATEWAY_VERSION} \
+            github.com/regen-network/cosmos-proto/protoc-gen-gocosmos@latest
+
+      - name: Install buf
+        env:
+          PREFIX: "/usr/local"
+          VERSION: "1.0.0-rc8"
+        run: |
+          curl -sSL "https://github.com/bufbuild/buf/releases/download/v${VERSION}/buf-$(uname -s)-$(uname -m).tar.gz" | \
+          sudo tar -xvzf - -C "${PREFIX}" --strip-components 1
 
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 0 # FIXME: Starport requires full repository
+          fetch-depth: 0 # Required to fetch version
 
       - name: Build
         run: |
-          starport chain build --release
-          tar xzvf release/cheqd-node_linux_amd64.tar.gz
+          make proto-gen build
 
       - name: Store artifact
         uses: actions/upload-artifact@v2
         with:
           name: cheqd-noded
-          path: cheqd-noded
+          path: build/cheqd-noded
 
   build-deb-package:
     name: Build deb package
