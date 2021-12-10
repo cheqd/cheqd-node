@@ -47,30 +47,32 @@ COPY .git .
 
 RUN make proto-gen build
 
-
 #####  Run container  #####
 
 FROM ubuntu:focal
 
 # Node binary
 COPY --from=builder /app/build/cheqd-noded /bin
-
 # Runner script
-COPY docker/cheqd_node/node-runner.sh /bin/node-runner
-RUN chmod +x /bin/node-runner
+COPY docker/node-runner.sh /bin/node-runner
 
-ARG CHEQD_HOME_DIR="/cheqd"
-
+ARG CHEQD_HOME_DIR="/home/cheqd"
 ARG UID=1000
 ARG GID=1000
 
 RUN groupadd --system --gid $GID cheqd && \
-    useradd --system --create-home --home-dir ${CHEQD_HOME_DIR} --shell /bin/bash --gid cheqd --uid $UID cheqd
+    useradd --system --create-home --home-dir ${CHEQD_HOME_DIR} --shell /bin/bash --gid cheqd --uid $UID cheqd \
+	&& chmod +x /bin/node-runner \
+	&& mkdir -p /home/cheqd/.cheqdnode && chown cheqd /home/cheqd/.cheqdnode \
+	&& apt-get update && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends curl ca-certificates
 
+# cheqd user can own the mounted volume
+VOLUME /home/cheqd/.cheqdnode
 WORKDIR ${CHEQD_HOME_DIR}
 USER cheqd
 
-EXPOSE 26656 26657
+EXPOSE 26656 26657 1317 9090 9091
 STOPSIGNAL SIGTERM
 
 ENTRYPOINT [ "cheqd-noded" ]

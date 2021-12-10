@@ -1,0 +1,23 @@
+version: '3.7'
+
+services:
+  run_node:
+    image: ghcr.io/cheqd/cheqd-node:${CHEQD_MAINNET_VERSION}
+    user: cheqd
+    restart: always
+    ports:
+      - ${TM_P2P_PORT}:26656 # requird - p2p
+      - ${TM_JSON_RPC_PORT}:26657 # required - rpc
+      - ${TM_REST_API_PORT}:1317 # optional
+      - ${TM_GRPC_SERVER_PORT}:9090 # optional
+      - ${TM_GRPC_API_GATEWAY_PORT}:9091 # optional
+    env_file:
+      - mainnet-container.env
+    volumes:
+      - type: volume
+        source: cheqd_volume
+        target: /home/cheqd/.cheqdnode
+    entrypoint: sh -c "node-runner"
+
+volumes:
+  cheqd_volume:
