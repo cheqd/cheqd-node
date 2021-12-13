@@ -7,10 +7,10 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     supervisor \
     jq
 
-USER cheqd
-
 COPY --chown=cheqd:cheqd docker/testnet/gen_node_configs.sh .
 COPY docker/testnet/supervisord.conf /etc
+
+USER cheqd
 
 EXPOSE 26657 26659
 
