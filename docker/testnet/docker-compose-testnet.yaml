@@ -4,19 +4,34 @@ services:
   run_node:
     image: ghcr.io/cheqd/cheqd-testnet:${CHEQD_TESTNET_VERSION}
     user: cheqd
-    ports:
-      - ${TM_P2P_PORT}:26656 # requird - p2p
-      - ${TM_JSON_RPC_PORT}:26657 # required - rpc
-      - ${TM_REST_API_PORT}:1317 # optional
-      - ${TM_GRPC_SERVER_PORT}:9090 # optional
-      - ${TM_GRPC_API_GATEWAY_PORT}:9091 # required
+    ports: # target -> port inside container, published -> port on the host
+      - target: 26656 # P2P Service Port inside container (please don't change this unless you know what you're doing)
+        published: ${TM_P2P_PORT}
+        protocol: tcp
+        mode: host
+      - target: 26657
+        published: ${TM_JSON_RPC_PORT}
+        protocol: tcp
+        mode: host
+      - target: 1317
+        published: ${TM_REST_API_PORT}
+        protocol: tcp
+        mode: host
+      - target: 9090
+        published: ${TM_GRPC_SERVER_PORT}
+        protocol: tcp
+        mode: host
+      - target: 9091
+        published: ${TM_GRPC_API_GATEWAY_PORT}
+        protocol: tcp
+        mode: host
     env_file:
       - testnet-container.env
     volumes:
       - type: volume
         source: cheqd_volume
         target: /home/cheqd/.cheqdnode
-    entrypoint: sh -c "node-runner"
+    entrypoint: "node-runner"
 
 volumes:
   cheqd_volume:

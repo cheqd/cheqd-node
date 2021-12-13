@@ -60,11 +60,13 @@ ARG CHEQD_HOME_DIR="/home/cheqd"
 ARG UID=1000
 ARG GID=1000
 
-RUN groupadd --system --gid $GID cheqd && \
-    useradd --system --create-home --home-dir ${CHEQD_HOME_DIR} --shell /bin/bash --gid cheqd --uid $UID cheqd \
+RUN groupadd --system --gid $GID cheqd \
+    && useradd --system --create-home --home-dir ${CHEQD_HOME_DIR} --shell /bin/bash --gid cheqd --uid $UID cheqd \
 	&& chmod +x /bin/node-runner \
-	&& mkdir -p /home/cheqd/.cheqdnode && chown cheqd /home/cheqd/.cheqdnode \
-	&& apt-get update && export DEBIAN_FRONTEND=noninteractive \
+	&& mkdir -p /home/cheqd/.cheqdnode \
+	&& chown cheqd /home/cheqd/.cheqdnode \
+	&& apt-get update \
+	&& export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends curl ca-certificates
 
 # cheqd user can own the mounted volume
