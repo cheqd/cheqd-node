@@ -304,7 +304,9 @@ func New(
 	// Upgrade handler
 	app.UpgradeKeeper.SetUpgradeHandler("v0.3", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		ctx.Logger().Info("Handler for upgrade plan: v0.3")
-		return fromVM, nil
+
+		initialVM := app.mm.GetVersionMap()
+		return initialVM, nil
 	})
 
 	app.UpgradeKeeper.SetUpgradeHandler("v0.4", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
