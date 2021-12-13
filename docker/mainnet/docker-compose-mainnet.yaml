@@ -10,7 +10,7 @@ services:
       - ${TM_JSON_RPC_PORT}:26657 # required - rpc
       - ${TM_REST_API_PORT}:1317 # optional
       - ${TM_GRPC_SERVER_PORT}:9090 # optional
-      - ${TM_GRPC_API_GATEWAY_PORT}:9091 # optional
+      - ${TM_GRPC_API_GATEWAY_PORT}:9091 # required
     env_file:
       - mainnet-container.env
     volumes:

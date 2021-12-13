@@ -20,7 +20,7 @@ else
 fi
 
 # Run configure
-# `! -z` is used instead of `-n` to distinguilsh null and empty values
+# `! -z` is used instead of `-n` to distinguish null and empty values
 if [[ ! -z ${CREATE_EMPTY_BLOCKS+x} ]]; then cheqd-noded configure create-empty-blocks ${CREATE_EMPTY_BLOCKS}; fi
 if [[ ! -z ${FASTSYNC_VERSION+x} ]]; then cheqd-noded configure fastsync-version ${FASTSYNC_VERSION}; fi
 if [[ ! -z ${MIN_GAS_PRICES+x} ]]; then cheqd-noded configure min-gas-prices ${MIN_GAS_PRICES}; fi

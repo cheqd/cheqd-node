@@ -9,8 +9,8 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 
 USER cheqd
 
-COPY docker/single_image_testnet/gen_node_configs.sh .
-COPY docker/single_image_testnet/supervisord.conf /etc
+COPY docker/testnet/gen_node_configs.sh .
+COPY docker/testnet/supervisord.conf /etc
 
 EXPOSE 26657 26659
 
