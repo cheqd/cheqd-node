@@ -292,7 +292,7 @@ jobs:
       - name: Run test net container
         run: |
           docker run -d --rm -p "26657:26657" cheqd-testnet start --rpc.laddr tcp://0.0.0.0:26657
-          bash tests/networks/wait_for_chain.sh
+          bash tests/networks/wait_for_chain.sh 1 60 http://localhost:26659/status
       
       - name: Set up test environment
         working-directory: ./tests/e2e
@@ -334,7 +334,7 @@ jobs:
       - name: Run test net container
         run: |
           docker run -d --rm -p "26659:26657" -p "1317:1317" cheqd-testnet start --rpc.laddr tcp://0.0.0.0:26657
-          bash tests/networks/wait_for_chain.sh
+          bash tests/networks/wait_for_chain.sh 1 60 http://localhost:26659/status
 
       - name: Set up and run tests
         working-directory: tests/cli
