@@ -2,10 +2,11 @@
     "public":{
         "chainName": "cheqd",
         "chainId": "cheqd-mainnet-1",
+        "gtm": "",
         "slashingWindow": 25920,
         "uptimeWindow": 600,
         "initialPageSize": 30,
-        "secp256k1": true,
+        "secp256k1": false,
         "bech32PrefixAccAddr": "cheqd",
         "bech32PrefixAccPub": "cheqdpub",
         "bech32PrefixValAddr": "cheqdvaloper",
@@ -25,7 +26,7 @@
             "coinType": 118,
             "appName": "Cosmos",
             "appVersion": "2.16.0",
-            "gasPrice": 0.000000025
+            "gasPrice": 0.025
         },
         "modules": {
             "bank": true,
@@ -43,10 +44,10 @@
         "api":"https://api.cheqd.net" 
     },
     "debug": {
-        "startTimer": false
+        "startTimer": true
     },
     "params":{
-        "startHeight": 1,
+        "startHeight": 0,
         "defaultBlockTime": 5000,
         "validatorUpdateWindow": 300,
         "blockInterval": 15000,
