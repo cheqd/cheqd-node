@@ -181,4 +181,4 @@ An alternative method to check a node's status is via the RPC interface, if it h
 
 ## Next steps
 
-At this stage, your node would be connected to the cheqd testnet as an observer node. Learn [how to configure your node as a validator node](../configure-new-validator.md) to participate in staking rewards, block creation, and governance.
+At this stage, your node would be connected to the cheqd testnet as an observer node. Learn [how to configure your node as a validator node](../../validator-guide/README.md) to participate in staking rewards, block creation, and governance.

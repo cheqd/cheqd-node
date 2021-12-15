@@ -83,7 +83,7 @@ Follow the guide for your preferred installation method:
 * [Docker install](docker-install.md)
 * [Binary install](binary-install.md)
 
-[Configure your node as a validator](configure-new-validator.md) after successful installation.
+[Configure your node as a validator](../validator-guide/README.md) after successful installation.
 
 ## Further information
 
