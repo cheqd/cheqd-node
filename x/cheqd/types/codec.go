@@ -7,6 +7,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
 )
 
+// FIXME: Double check that registration is correct
+
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	// this line is used by starport scaffolding # 2
 	cdc.RegisterConcrete(&MsgCreateDid{}, "cheqd/CreateDid", nil)
