@@ -2,13 +2,13 @@ package types
 
 import "fmt"
 
-const DidNamespace = "testnet"
+const DefaultDidNamespace = "testnet"
 
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		DidList:      []*StateValue{},
-		DidNamespace: DidNamespace,
+		DidNamespace: DefaultDidNamespace,
 	}
 }
 

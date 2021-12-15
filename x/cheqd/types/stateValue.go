@@ -8,10 +8,6 @@ import (
 	"github.com/tendermint/tendermint/crypto/tmhash"
 )
 
-const (
-	StateValueDid = "/cheqdid.cheqdnode.cheqd.v1.Did"
-)
-
 func NewStateValue(msg proto.Message, metadata *Metadata) (*StateValue, error) {
 	data, err := types.NewAnyWithValue(msg)
 	if err != nil {
@@ -34,7 +30,7 @@ func (m StateValue) GetDid() (*Did, error) {
 		return &value, nil
 	}
 
-	if m.Data.TypeUrl != StateValueDid {
+	if m.Data.TypeUrl != MsgTypeURL(&Did{}) {
 		return nil, ErrInvalidDidStateValue.Wrap(m.Data.TypeUrl)
 	}
 
