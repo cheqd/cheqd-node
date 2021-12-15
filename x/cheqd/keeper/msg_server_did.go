@@ -77,7 +77,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 		return nil, err
 	}
 
-	oldDIDDoc, err := oldStateValue.GetDid()
+	oldDIDDoc, err := oldStateValue.UnpackDataAsDid()
 	if err != nil {
 		return nil, err
 	}

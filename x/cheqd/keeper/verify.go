@@ -28,7 +28,7 @@ func (k *Keeper) VerifySignature(ctx *sdk.Context, msg types.IdentityMsg, signer
 				return types.ErrDidDocNotFound.Wrap(signer.Signer)
 			}
 
-			didDoc, err := state.GetDid()
+			didDoc, err := state.UnpackDataAsDid()
 			if err != nil {
 				return types.ErrDidDocNotFound.Wrap(signer.Signer)
 			}
@@ -58,7 +58,7 @@ func (k *Keeper) ValidateController(ctx *sdk.Context, id string, controller stri
 	if err != nil {
 		return types.ErrDidDocNotFound.Wrap(controller)
 	}
-	didDoc, err := state.GetDid()
+	didDoc, err := state.UnpackDataAsDid()
 	if err != nil {
 		return types.ErrDidDocNotFound.Wrap(controller)
 	}

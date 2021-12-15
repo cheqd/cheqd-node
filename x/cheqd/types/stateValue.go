@@ -4,17 +4,24 @@ import (
 	"encoding/base64"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/gogo/protobuf/proto"
 	"github.com/tendermint/tendermint/crypto/tmhash"
+	"reflect"
 )
 
-func NewStateValue(msg proto.Message, metadata *Metadata) (*StateValue, error) {
-	data, err := types.NewAnyWithValue(msg)
+var _ types.UnpackInterfacesMessage = &StateValue{}
+
+func (m *StateValue) UnpackInterfaces(unpacker types.AnyUnpacker) error {
+	var data StateValueData
+	return unpacker.UnpackAny(m.Data, &data)
+}
+
+func NewStateValue(data StateValueData, metadata *Metadata) (*StateValue, error) {
+	any, err := types.NewAnyWithValue(data)
 	if err != nil {
 		return nil, ErrInvalidDidStateValue.Wrap(err.Error())
 	}
 
-	return &StateValue{Data: data, Metadata: metadata}, nil
+	return &StateValue{Data: any, Metadata: metadata}, nil
 }
 
 func NewMetadata(ctx sdk.Context) Metadata {
@@ -24,21 +31,25 @@ func NewMetadata(ctx sdk.Context) Metadata {
 	return Metadata{Created: created, Updated: created, Deactivated: false, VersionId: txHash}
 }
 
-func (m StateValue) GetDid() (*Did, error) {
-	value, isValue := m.Data.GetCachedValue().(Did)
-	if isValue {
-		return &value, nil
-	}
-
-	if m.Data.TypeUrl != MsgTypeURL(&Did{}) {
+func (m StateValue) UnpackData() (StateValueData, error) {
+	value, isOk := m.Data.GetCachedValue().(StateValueData)
+	if !isOk {
 		return nil, ErrInvalidDidStateValue.Wrap(m.Data.TypeUrl)
 	}
 
-	state := Did{}
-	err := state.Unmarshal(m.Data.Value)
+	return value, nil
+}
+
+func (m StateValue) UnpackDataAsDid() (*Did, error) {
+	data, err := m.UnpackData()
 	if err != nil {
-		return nil, ErrInvalidDidStateValue.Wrap(err.Error())
+		return nil, err
 	}
 
-	return &state, nil
+	value, isValue := data.(*Did)
+	if !isValue {
+		return nil, ErrInvalidDidStateValue.Wrap(reflect.TypeOf(data).String())
+	}
+
+	return value, nil
 }

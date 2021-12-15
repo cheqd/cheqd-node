@@ -1,6 +1,8 @@
 package types
 
-import "fmt"
+import (
+	"fmt"
+)
 
 const DefaultDidNamespace = "testnet"
 
@@ -18,7 +20,7 @@ func (gs GenesisState) Validate() error {
 	didIdMap := make(map[string]bool)
 
 	for _, elem := range gs.DidList {
-		did, err := elem.GetDid()
+		did, err := elem.UnpackDataAsDid()
 		if err != nil {
 			return err
 		}

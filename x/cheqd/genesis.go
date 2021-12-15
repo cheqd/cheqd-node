@@ -11,7 +11,7 @@ import (
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 	for _, elem := range genState.DidList {
-		did, err := elem.GetDid()
+		did, err := elem.UnpackDataAsDid()
 		if err != nil {
 			panic(fmt.Sprintf("Cannot import geneses case: %s", err.Error()))
 		}

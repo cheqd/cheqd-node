@@ -7,10 +7,10 @@ import (
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cheqd/cheqd-node/x/cheqd"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/multiformats/go-multibase"
 	"time"
 
-	"github.com/cheqd/cheqd-node/app/params"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store"
 	"github.com/tendermint/tendermint/libs/log"
@@ -37,8 +37,9 @@ type TestSetup struct {
 
 func Setup() TestSetup {
 	// Init Codec
-	encodingConfig := params.MakeEncodingConfig()
-	cdc := encodingConfig.Codec
+	ir := codectypes.NewInterfaceRegistry()
+	types.RegisterInterfaces(ir)
+	cdc := codec.NewProtoCodec(ir)
 
 	// Init KVSore
 	db := dbm.NewMemDB()
@@ -198,7 +199,7 @@ func (s *TestSetup) SendUpdateDid(msg *types.MsgUpdateDidPayload, keys map[strin
 	}
 
 	updated, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
-	return updated.GetDid()
+	return updated.UnpackDataAsDid()
 }
 
 func (s *TestSetup) SendCreateDid(msg *types.MsgCreateDidPayload, keys map[string]ed25519.PrivateKey) (*types.Did, error) {
@@ -208,7 +209,7 @@ func (s *TestSetup) SendCreateDid(msg *types.MsgCreateDidPayload, keys map[strin
 	}
 
 	created, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
-	return created.GetDid()
+	return created.UnpackDataAsDid()
 }
 
 func ConcatKeys(dst map[string]ed25519.PrivateKey, src map[string]ed25519.PrivateKey) map[string]ed25519.PrivateKey {
