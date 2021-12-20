@@ -31,7 +31,7 @@ func applyConfigDefaults(cmd *cobra.Command) error {
 	clientCtx := client.GetClientContextFromCmd(cmd)
 
 	err := updateTmConfig(clientCtx.HomeDir, func(config *tmcfg.Config) {
-		config.FastSync.Version = "v2"
+		config.FastSync.Version = "v0"
 		config.P2P.SendRate = 20000000
 		config.P2P.RecvRate = 20000000
 		config.P2P.MaxPacketMsgPayloadSize = 10240
