@@ -304,7 +304,10 @@ func New(
 	// Upgrade handler
 	app.UpgradeKeeper.SetUpgradeHandler("v0.3", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		ctx.Logger().Info("Handler for upgrade plan: v0.3")
-		return fromVM, nil
+
+		app.TestNetMigration(ctx)
+		initialVM := app.mm.GetVersionMap()
+		return initialVM, nil
 	})
 
 	app.UpgradeKeeper.SetUpgradeHandler("v0.4", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
@@ -494,6 +497,12 @@ func (app *App) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.R
 // EndBlocker application updates every end block
 func (app *App) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	return app.mm.EndBlock(ctx, req)
+}
+
+func (app *App) TestNetMigration(ctx sdk.Context) {
+	if ctx.ChainID() == "cheqd-testnet-2" {
+		app.cheqdKeeper.SetDidNamespace(ctx, "testnet")
+	}
 }
 
 // InitChainer application update at chain initialization
