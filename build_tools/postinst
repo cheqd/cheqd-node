@@ -63,13 +63,13 @@ fi
 if [ ! -f /etc/logrotate.d/cheqd-node ] ; then
   cat <<EOF > /etc/logrotate.d/cheqd-node
 ${CHEQD_LOG_DIR}/stdout.log {
-  rotate 30
+  rotate 7
   daily
   maxsize 100M
   notifempty
   copytruncate
   compress
-  maxage 30
+  maxage 7
 }
 EOF
 # Restart logrotate
