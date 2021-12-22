@@ -1,10 +1,10 @@
 {
     "public":{
         "chainName": "cheqd",
-        "chainId": "cheqd-testnet-2",
+        "chainId": "cheqd-testnet-3",
         "gtm": "",
         "slashingWindow": 120960,
-        "uptimeWindow": 600,
+        "uptimeWindow": 100,
         "initialPageSize": 30,
         "secp256k1": false,
         "bech32PrefixAccAddr": "cheqd",
@@ -44,7 +44,7 @@
         "api":"https://api.testnet.cheqd.network" 
     },
     "debug": {
-        "startTimer": true
+        "startTimer": false
     },
     "params":{
         "startHeight": 0,
@@ -54,7 +54,7 @@
         "transactionsInterval": 18000,
         "keybaseFetchingInterval": 1800000,
         "consensusInterval": 1000,
-        "statusInterval":7500,
+        "statusInterval": 7500,
         "signingInfoInterval": 1800000,
         "proposalInterval": 5000,
         "missedBlocksInterval": 60000,
