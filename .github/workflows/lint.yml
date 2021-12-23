@@ -30,7 +30,7 @@ jobs:
           folder-path: "."
 
   md-lint:
-    name: Linting markdown
+    name: Lint markdown
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
