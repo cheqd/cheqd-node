@@ -27,21 +27,23 @@ jobs:
     - name: Super-Linter
       uses: github/super-linter/slim@v4
       env:
-        VALIDATE_BASH: true
-        VALIDATE_BASH_EXEC: true
-        VALIDATE_DOCKERFILE_HADOLINT: true
-        VALIDATE_ENV: true
-        VALIDATE_GITHUB_ACTIONS: true
         VALIDATE_GITLEAKS: true
-        VALIDATE_GO: true
         VALIDATE_MARKDOWN: true
-        MARKDOWN_CONFIG_FILE: 'markdown-config.yml'
-        VALIDATE_OPENAPI: true
-        VALIDATE_PROTOBUF: true
-        VALIDATE_SHELL_SHFMT: true
-        VALIDATE_XML: true
-        VALIDATE_YAML: true
+        MARKDOWN_CONFIG_FILE: 'markdown-config.yaml'
+        # VALIDATE_BASH: true
+        # VALIDATE_BASH_EXEC: true
+        # VALIDATE_DOCKERFILE_HADOLINT: true
+        # VALIDATE_ENV: true
+        # VALIDATE_GITHUB_ACTIONS: true
+        # VALIDATE_GO: true
+        # VALIDATE_OPENAPI: true
+        # VALIDATE_PROTOBUF: true
+        # VALIDATE_SHELL_SHFMT: true
+        # VALIDATE_XML: true
+        # VALIDATE_YAML: true
 
         VALIDATE_ALL_CODEBASE: true
+        LOG_LEVEL: WARN
+
         DEFAULT_BRANCH: main
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
