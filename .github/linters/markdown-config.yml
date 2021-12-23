@@ -137,9 +137,3 @@ MD047: true
 # Code fence style <https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md048>
 MD048:
   style: 'consistent'
-
-# Custom rules:
-# CHANGELOG-RULE-001: false
-# CHANGELOG-RULE-002: false
-# CHANGELOG-RULE-003: false
-# CHANGELOG-RULE-004: false

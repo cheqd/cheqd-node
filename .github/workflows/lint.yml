@@ -14,7 +14,7 @@ jobs:
       - name: Check if Markdown links are valid
         uses: gaurav-nelson/github-action-markdown-link-check@v1
         with: 
-          config-file: '.github/workflows/configs/mlc_config.json'
+          config-file: '.github/linters/mlc_config.json'
           folder-path: "."
 
   super-lint:
@@ -35,7 +35,7 @@ jobs:
         VALIDATE_GITLEAKS: true
         VALIDATE_GO: true
         VALIDATE_MARKDOWN: true
-        MARKDOWN_CONFIG_FILE: '.github/workflows/configs/markdown-config.yml'
+        MARKDOWN_CONFIG_FILE: 'markdown-config.yml'
         VALIDATE_OPENAPI: true
         VALIDATE_PROTOBUF: true
         VALIDATE_SHELL_SHFMT: true
