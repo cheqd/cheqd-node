@@ -4,18 +4,6 @@ on: [push]
 
 jobs:
 
-  go-lint:
-    name: Lint go
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v2
-        with:
-          version: v1.43.0
-          args: --timeout 5m0s
-
   md-link-check:
     name: Check markdown links
     runs-on: ubuntu-latest
@@ -29,20 +17,6 @@ jobs:
           config-file: '.github/workflows/configs/mlc_config.json'
           folder-path: "."
 
-  md-lint:
-    name: Lint markdown
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Check if Markdown is formatted correctly
-      uses: avto-dev/markdown-lint@v1
-      with:
-        config: '.github/workflows/configs/markdown-config.yml'
-        args: '.'
-        fix: true
-
   super-lint:
     name: Run super linter
     runs-on: ubuntu-latest
@@ -53,6 +27,21 @@ jobs:
     - name: Super-Linter
       uses: github/super-linter@v4.8.5
       env:
+        VALIDATE_BASH: true
+        VALIDATE_BASH_EXEC: true
+        VALIDATE_DOCKERFILE_HADOLINT: true
+        VALIDATE_ENV: true
+        VALIDATE_GITHUB_ACTIONS: true
+        VALIDATE_GITLEAKS: true
+        VALIDATE_GO: true
+        VALIDATE_MARKDOWN: true
+        MARKDOWN_CONFIG_FILE: '.github/workflows/configs/markdown-config.yml'
+        VALIDATE_OPENAPI: true
+        VALIDATE_PROTOBUF: true
+        VALIDATE_SHELL_SHFMT: true
+        VALIDATE_XML: true
+        VALIDATE_YAML: true
+
         VALIDATE_ALL_CODEBASE: true
         DEFAULT_BRANCH: main
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
