@@ -18,7 +18,6 @@ jobs:
   run-unit-test:
     name: Run unit tests
     runs-on: ubuntu-20.04
-    needs: lint
     steps:
       - name: Set up Go 1.17
         uses: actions/setup-go@v2
