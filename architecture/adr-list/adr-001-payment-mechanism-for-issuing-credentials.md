@@ -83,7 +83,7 @@ The payment flow can be broken down into five steps:
    * **`denom`**: Defined in `details.total.amount.currency` from the Payment Request
 2. **Build a transaction with the request from the previous step** Example: `cheqd_ledger::auth::build_tx(pool_alias, pub_key, builded_request, account_number, account_sequence, max_gas, max_coin_amount, denom, timeout_height, memo)`
    * `memo`: This should be the same as `details.id` from the Payment Request
-3. **Sign the transaction** Example:`cheqd_keys::sign(wallet_handle, key_alias, tx)`. 
+3. **Sign the transaction** Example:`cheqd_keys::sign(wallet_handle, key_alias, tx)`.
 4. **Broadcast the signed transaction** Example: `cheqd_pool::broadcast_tx_commit(pool_alias, signed)`.
 
 #### Response format
@@ -197,7 +197,7 @@ Holder -> Issuer: Accept
 
 ## References
 
-* [Hyperledger Aries RFC 0036: Issue Credential Protocol 1.0 ](https://github.com/hyperledger/aries-rfcs/blob/main/features/0036-issue-credential/README.md)
+* [Hyperledger Aries RFC 0036: Issue Credential Protocol 1.0](https://github.com/hyperledger/aries-rfcs/blob/main/features/0036-issue-credential/README.md)
 * [Hyperledger Aries RFC 0075: Payment Decorators](https://github.com/hyperledger/aries-rfcs/blob/main/features/0075-payment-decorators/README.md)
 * [Evernym VDR Tools cheqd network payments ADR](https://gitlab.com/evernym/verity/vdr-tools/-/tree/cheqd/docs/design/014-bank-transactions)
 

@@ -13,7 +13,7 @@
 
 Due to the nature of the cheqd project merging concepts from the [Cosmos blockchain framework](https://github.com/cosmos/cosmos-sdk) and self-sovereign identity \(SSI\), there are two potential options for creating Command Line Interface \(CLI\) tools for developers to use:
 
-1. **Cosmos-based CLI:** Most likely route for Cosmos projects for their node application. Most existing Cosmos node validators will be familiar with this method of managing their node. 
+1. **Cosmos-based CLI:** Most likely route for Cosmos projects for their node application. Most existing Cosmos node validators will be familiar with this method of managing their node.
 2. **VDR CLI**: Traditionally, a lot of SSI networks have used [Hyperledger Indy](https://github.com/hyperledger/indy-node) and therefore the Indy CLI tool for managing and interacting with the ledger. This has now been renamed to [Verifiable Data Registry \(VDR\) Tools CLI](https://gitlab.com/evernym/verity/vdr-tools) and is the tool that most existing SSI node operators \("stewards"\) would be familiar with.
 
 Ideally, the `cheqd-node` project would provide a consistent set of CLI tools rather than two separate tools with varying feature sets between them.
@@ -41,7 +41,7 @@ This ADR will focus on the CLI tool architecture choice for `cheqd-node`.
 
 ### Options considered
 
-#### 1. Keep both Cosmos CLI and VDR Tools CLI, but use them for different purposes.
+#### 1. Keep both Cosmos CLI and VDR Tools CLI, but use them for different purposes
 
 **Pros:**
 

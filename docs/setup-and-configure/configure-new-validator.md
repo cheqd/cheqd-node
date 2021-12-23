@@ -108,7 +108,7 @@ If you need help or support, join our [**cheqd Community Slack**](http://cheqd.l
    * **`commission-rate`**: Validator's commission rate
    * **`commission-max-rate`**: Validator's maximum commission rate, expressed as a number with up to two decimal points. The value for this cannot be changed later.
    * **`commission-max-change-rate`**: Maximum rate of change of a validator's commission rate per day, expressed as a number with up to two decimal points. The value for this cannot be changed later.
-   * **`chain-id`**: Unique identifier for the chain. 
+   * **`chain-id`**: Unique identifier for the chain.
      * For cheqd's current mainnet, this is `cheqd-mainnet-1`
      * For cheqd's current testnet, this is `cheqd-testnet-2`
    * **`gas`**: Maximum gas to use for *this specific* transaction. Using `auto` uses Cosmos's auto-calculation mechanism, but can also be specified manually as an integer value.
@@ -155,15 +155,17 @@ To import the key first plug in the device and enter the device pin. Once you ha
 
 To add the key use the following command:
 
-```
+```bash
 cheqd-noded keys add <name for the key> --ledger
 ```
+
 Note
 
 The `--ledger` flag tells the command line tool to talk to the ledger device and the `--index` flag selects which HD index should be used.
 
 When running this command, the Ledger device will prompt you to verify the genereated address. Once you have done this you will get an output in the following form:
-```
+
+```bash
 $ cheqd-noded keys add test --ledger
 - name: test
  type: ledger
