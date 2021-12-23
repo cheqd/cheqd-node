@@ -8,20 +8,25 @@ import (
 )
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
-	// this line is used by starport scaffolding # 2
+	// Sdk messages
 	cdc.RegisterConcrete(&MsgCreateDid{}, "cheqd/CreateDid", nil)
 	cdc.RegisterConcrete(&MsgUpdateDid{}, "cheqd/UpdateDid", nil)
+
+	// State value data
+	cdc.RegisterInterface((*StateValueData)(nil), nil)
+	cdc.RegisterConcrete(&Did{}, "cheqd/Did", nil)
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
-	// this line is used by starport scaffolding # 3
+	// Sdk messages
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreateDid{},
 		&MsgUpdateDid{},
 	)
 
-	registry.RegisterInterface(MessageCreateDid, (*IdentityMsg)(nil), &MsgCreateDidPayload{})
-	registry.RegisterInterface(MessageUpdateDid, (*IdentityMsg)(nil), &MsgUpdateDidPayload{})
+	// State value data
+	registry.RegisterInterface("StateValueData", (*StateValueData)(nil))
+	registry.RegisterImplementations((*StateValueData)(nil), &Did{})
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }

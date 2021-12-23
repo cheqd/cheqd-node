@@ -15,15 +15,15 @@ func (k Keeper) Did(c context.Context, req *types.QueryGetDidRequest) (*types.Qu
 
 	ctx := sdk.UnwrapSDKContext(c)
 
-	state, err := k.GetDid(&ctx, req.Id)
+	stateValue, err := k.GetDid(&ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	did, err := state.GetDid()
+	did, err := stateValue.UnpackDataAsDid()
 	if err != nil {
 		return nil, err
 	}
 
-	return &types.QueryGetDidResponse{Did: did, Metadata: state.Metadata}, nil
+	return &types.QueryGetDidResponse{Did: did, Metadata: stateValue.Metadata}, nil
 }
