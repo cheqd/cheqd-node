@@ -1,4 +1,4 @@
-name: Markdown quality control
+name: Lint
 
 on: [push]
 

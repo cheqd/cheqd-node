@@ -1,4 +1,4 @@
-name: cheqd-node CI
+name: Test
 
 on:
   push:
