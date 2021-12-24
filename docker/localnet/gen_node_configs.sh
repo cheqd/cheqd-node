@@ -17,7 +17,7 @@ fi
 
 cheqd_noded_docker() {
   docker run --rm \
-    -v "$(pwd)":"/home/cheqd" \
+    -v "$(pwd)":"/cheqd" \
     cheqd-node "$@"
 }
 
@@ -128,6 +128,9 @@ do
     echo "##### [Observer $i] Loading genesis..."
     OPERATORS_HOME="../client"
     cp "$OPERATORS_HOME/.cheqdnode/config/genesis.json" ".cheqdnode/config/"
+
+    echo "##### [Observer $i] Setting min gas prices..."
+    sed -i $sed_extension 's/minimum-gas-prices = ""/minimum-gas-prices = "25ncheq"/g' .cheqdnode/config/app.toml
 
     popd
 done
