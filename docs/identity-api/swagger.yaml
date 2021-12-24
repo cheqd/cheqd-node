@@ -22,7 +22,7 @@ paths:
           required: true
           type: string
       responses:
-        200:
+        "200":
           description: DID Document
           schema:
             $ref: '#/definitions/StateValue'
@@ -47,7 +47,7 @@ paths:
           schema:
             $ref: '#/definitions/MsgCreateDid'
       responses:
-        201:
+        "201":
           description: DID created
           schema:
             $ref: '#/definitions/MsgCreateDidResponse'
@@ -94,7 +94,7 @@ paths:
           schema:
             $ref: '#/definitions/MsgUpdateDid'
       responses:
-        201:
+        "201":
           description: DID Document updated
           schema:
             $ref: '#/definitions/MsgUpdateDidResponse'

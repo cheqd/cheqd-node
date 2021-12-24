@@ -29,6 +29,7 @@ cheqd-noded tx gov submit-proposal software-upgrade upgrade_to_0.3 --title "Upgr
 ```
 
 The main parameters here are:
+
 - `upgrade_to_0.3` - name of proposal which will be used in `UpgradeHandler` in the new application,
 - `--upgrade-height` - height when upgrade process will be occurred,
 - `--from` - alias of a key which will be used for signing proposal,
@@ -55,10 +56,13 @@ Expected result for this state is `PROPOSAL_STATUS_DEPOSIT_PERIOD`, It means, th
 
 Since getting proposal, the `DEPOSIT` should be set to the pool.It will be return after finishing voting_preiod.
 For setting deposit the next command is used:
-```
+
+```bash
 cheqd-noded tx gov deposit <proposal_id> 10000000ncheq --from <operator_alias> --chain-id <chain_id>
 ```
+
 Parameters:
+
 - `<proposal_id>` - proposal identifier from [step](#Command for sending proposal)
   In this example, amount of deposit is equal to current `min-deposit` value.
 

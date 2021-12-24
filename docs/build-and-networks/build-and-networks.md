@@ -4,6 +4,8 @@
 
 This document describes in details how to configure a genesis network with any amount of participants.
 
+### Requirements
+
 #### Hardware requirements
 
 Minimal:

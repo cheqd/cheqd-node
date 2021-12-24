@@ -8,7 +8,7 @@ The script to generate configuration for a network of one node and run it locall
 
 ## Prerequisites
 
-* [Starport](https://docs.starport.network/guide/install.html) 
+* [Starport](https://docs.starport.network/guide/install.html)
 
 ## How to run
 
@@ -22,7 +22,7 @@ The script to generate configuration for a network of one node and run it locall
 
    Run: `gen_node_config.sh`.
 
-4. Run single node network:
+3. Run single node network:
 
    Run: `cheqd-noded start`.
 
@@ -43,6 +43,6 @@ Also, there will be 1 key generated and corresponding genesis accounts created f
 
 * node_operator;
 
-## CLI commands:
+## CLI commands
 
 See [the reference](https://github.com/cheqd/cheqd-node/blob/main/docs/cheqd-cli/README.md) to learn about the most common CLI flows.

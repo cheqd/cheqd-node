@@ -65,9 +65,9 @@ The [**cheqd Community Slack**](http://cheqd.link/join-cheqd-slack) is our chat 
 
 Please reach out to us there for discussions, help, and feedback on the project.
 
-## Bug Reporting & New Feature Requests 
+## Bug Reporting & New Feature Requests
 
-If you notice anything not behaving how you expected, or would like to make a suggestion / request for a new feature, please submit a **bug_report** or **feature_request**  by creating a [**New Issue**](https://github.com/cheqd/cheqd-node/issues/new/choose) and selecting the relevant template. 
+If you notice anything not behaving how you expected, or would like to make a suggestion / request for a new feature, please submit a **bug_report** or **feature_request**  by creating a [**New Issue**](https://github.com/cheqd/cheqd-node/issues/new/choose) and selecting the relevant template.
 
 
 ### Social media
