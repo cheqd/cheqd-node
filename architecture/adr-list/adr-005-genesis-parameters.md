@@ -125,16 +125,16 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
     * Amount of unbound/redelegate entries to store
   * `bond_denom` = `ncheq`
     * Denomination used in staking
-*  **`ibc`**
-     * `max_expected_time_per_block` = `30000000000` (expressed in nanoseconds, ~ 30 seconds)
-       * Maximum expected time per block, used to enforce block delay. This parameter should reflect the largest amount of time that the chain might reasonably take to produce the next block under normal operating conditions. A safe choice is 3-5x the expected time per block.
-     * `allowed_clients` = `[ "06-solomachine", "07-tendermint" ]`
-       * Defines the list of allowed client state types. We allow connections from other chains using the [Tendermint client](https://github.com/cosmos/ibc-go/blob/main/modules/light-clients/07-tendermint), and with light clients using the [Solo Machine client](https://github.com/cosmos/ibc-go/blob/main/modules/light-clients/06-solomachine).
-   * **`ibc-transfer`**
-     * `send_enabled` = `true`
-       * Enables or disables all cross-chain token transfers from this chain
-     * `receive_enabled` = `true`
-       * Enables or disables all cross-chain token transfers to this chain
+* **`ibc`**
+  * `max_expected_time_per_block` = `30000000000` (expressed in nanoseconds, ~ 30 seconds)
+    * Maximum expected time per block, used to enforce block delay. This parameter should reflect the largest amount of time that the chain might reasonably take to produce the next block under normal operating conditions. A safe choice is 3-5x the expected time per block.
+  * `allowed_clients` = `[ "06-solomachine", "07-tendermint" ]`
+    * Defines the list of allowed client state types. We allow connections from other chains using the [Tendermint client](https://github.com/cosmos/ibc-go/blob/main/modules/light-clients/07-tendermint), and with light clients using the [Solo Machine client](https://github.com/cosmos/ibc-go/blob/main/modules/light-clients/06-solomachine).
+* **`ibc-transfer`**
+  * `send_enabled` = `true`
+    * Enables or disables all cross-chain token transfers from this chain
+  * `receive_enabled` = `true`
+    * Enables or disables all cross-chain token transfers to this chain
 
 ## Decision
 

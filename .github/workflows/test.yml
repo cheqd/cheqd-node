@@ -1,4 +1,4 @@
-name: cheqd-node CI
+name: Test
 
 on:
   push:
@@ -14,22 +14,10 @@ env:
   VERSION: "1.0.0" # Package build scripts require version to be provided
 
 jobs:
-  lint:
-    name: Lint
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v2
-        with:
-          version: v1.43.0
-          args: --timeout 5m0s
 
   run-unit-test:
     name: Run unit tests
     runs-on: ubuntu-20.04
-    needs: lint
     steps:
       - name: Set up Go 1.17
         uses: actions/setup-go@v2
