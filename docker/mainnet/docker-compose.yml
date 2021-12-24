@@ -30,7 +30,7 @@ services:
     volumes:
       - type: volume
         source: cheqd_volume
-        target: /home/cheqd/.cheqdnode
+        target: /home/cheqd
     entrypoint: "node-runner"
 
 volumes:
