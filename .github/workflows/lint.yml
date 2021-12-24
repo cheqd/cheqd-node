@@ -4,6 +4,20 @@ on: [push]
 
 jobs:
 
+  # We can't use VALIDATE_GO from super linter because of this issue:
+  # https://github.com/github/super-linter/issues/143
+  go-lint:
+    name: Lint go
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.43.0
+          args: --timeout 5m0s
+
   md-link-check:
     name: Check markdown links
     runs-on: ubuntu-latest
@@ -29,7 +43,6 @@ jobs:
       env:
         VALIDATE_GITLEAKS: true
         VALIDATE_MARKDOWN: true
-        VALIDATE_GO: true
         # VALIDATE_BASH: true
         # VALIDATE_BASH_EXEC: true
         # VALIDATE_DOCKERFILE_HADOLINT: true
