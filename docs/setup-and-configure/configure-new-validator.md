@@ -28,6 +28,8 @@ While the instructions listed here are specific to the cheqd testnet, a similar 
 
    When you create a new key, a `mnemonic phrase` and `account address` will be printed. **Keep the mnemonic phrase safe** as this is the only way to restore access to the account if they keyring cannot be recovered.
 
+   P.S. in case of using Ledger Nano device it would be helpful to use [this instructions](#using-ledger-nano-device)
+
 3. **Get your node ID**
 
    Follow the guidance on [using cheqd CLI to manage nodes](../cheqd-cli/cheqd-cli-node-management.md) to fetch your node ID.
@@ -138,6 +140,37 @@ If you need help or support, join our [**cheqd Community Slack**](http://cheqd.l
    ```
 
    Query the latest block. Open `<node-address:rpc-port/block` in a web browser. Make sure that there is a signature with your validator address in the signature list.
+
+## Using Ledger Nano device
+
+To use your Ledger Nano you will need to complete the following steps:
+
+* Set-up your wallet by creating a PIN and passphrase, which must be stored securely to enable recovery if the device is lost or damaged.
+* Connect your device to your PC and update the firmware to the latest version using the Ledger Live application.
+* Install the Cosmos application using the software manager (Manager > Cosmos > Install).
+* Adding a new key
+In order to use the hardware wallet address with the cli, the user must first add it via `cheqd-noded`. This process only records the public information about the key.
+
+To import the key first plug in the device and enter the device pin. Once you have unlocked the device navigate to the Cosmos app on the device and open it.
+
+To add the key use the following command:
+
+```
+cheqd-noded keys add <name for the key> --ledger
+```
+Note
+
+The `--ledger` flag tells the command line tool to talk to the ledger device and the `--index` flag selects which HD index should be used.
+
+When running this command, the Ledger device will prompt you to verify the genereated address. Once you have done this you will get an output in the following form:
+```
+$ cheqd-noded keys add test --ledger
+- name: test
+ type: ledger
+ address: cheqd1zx9a7rsrmy5a2hakas0vnfwpadqwp3m327f2yt
+ pubkey: ‘{“@type”:“/cosmos.crypto.secp256k1.PubKey”,“key”:“Akm0MdDZpTVltoCpRmmWd/wxiosA9edjPlbNcirs4YO1"}’
+ mnemonic: “”
+```
 
 ## Next steps
 
