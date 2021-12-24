@@ -41,7 +41,6 @@ jobs:
     - name: Super-Linter
       uses: github/super-linter/slim@v4
       env:
-        VALIDATE_GITLEAKS: true
         VALIDATE_MARKDOWN: true
         VALIDATE_XML: true
         VALIDATE_YAML: true
