@@ -44,7 +44,7 @@
         "api":"https://api.cheqd.net" 
     },
     "debug": {
-        "startTimer": true
+        "startTimer": false
     },
     "params":{
         "startHeight": 0,
