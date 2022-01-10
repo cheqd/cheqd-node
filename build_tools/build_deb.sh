@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euox pipefail
+
 if [ -n "$1" ]; then
     PKG_NAME=$1
 else
