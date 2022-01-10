@@ -19,4 +19,5 @@ if [[ INVALID_FILES_FOUND ]]
 then
     echo ""
     echo "The bash scripts above must include either 'set -euo pipefail' or 'set -euox pipefail."
+    exit 1
 fi
