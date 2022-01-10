@@ -15,7 +15,7 @@ do
     fi
 done
 
-if [[ INVALID_FILES_FOUND ]]
+if [[ INVALID_FILES_FOUND -eq 1 ]]
 then
     echo ""
     echo "The bash scripts above must include either 'set -euo pipefail' or 'set -euox pipefail."
