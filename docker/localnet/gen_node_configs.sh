@@ -1,138 +1,94 @@
 #!/bin/bash
 
-# Generates configurations for 4 nodes.
+# Generates configurations for 1 node.
+
+# We can't pack several nodes without having `--home` flag working
+# so reducing nodes count to 1 for now and creating follow up ticket.
 
 set -euox pipefail
 
 # sed in macos requires extra argument
 
-sed_extension=''
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     sed_extension=''
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     sed_extension='.orig'
 fi
 
-# cheqd_noded docker wrapper
-
-cheqd_noded_docker() {
-  docker run --rm \
-    -v "$(pwd)":"/cheqd" \
-    cheqd-node "$@"
-}
-
-
 CHAIN_ID="cheqd"
 
-VALIDATORS_COUNT="4"
-OBSERVERS_COUNT="2"
+echo "##### [Node 0] Generating key"
 
-NODE_CONFIGS_DIR="node_configs"
-rm -rf $NODE_CONFIGS_DIR
-mkdir $NODE_CONFIGS_DIR
-pushd $NODE_CONFIGS_DIR
+cheqd-noded init node0 --chain-id $CHAIN_ID
+NODE_0_ID=$(cheqd-noded tendermint show-node-id)
+NODE_0_VAL_PUBKEY=$(cheqd-noded tendermint show-validator)
 
-echo "Generating validator keys..."
+echo "##### [Node 0] Set fee"
 
-for ((i=0 ; i<$VALIDATORS_COUNT ; i++))
-do
-    NODE_HOME="node$i"
-    mkdir $NODE_HOME
-    pushd $NODE_HOME
+sed -i $sed_extension 's/minimum-gas-prices = ""/minimum-gas-prices = "25ncheq"/g' "$HOME/.cheqdnode/config/app.toml"
 
-    echo "[Validator $i] Generating key..."
+echo "##### [Node 0] Switch on REST API"
 
-    cheqd_noded_docker init "node$i" --chain-id $CHAIN_ID
-    echo "$(cheqd_noded_docker tendermint show-node-id)" > node_id.txt
-    echo "$(cheqd_noded_docker tendermint show-validator)" > node_val_pubkey.txt
+sed -i $sed_extension 's/enable = false/enable = true/g' "$HOME/.cheqdnode/config/app.toml"
 
-    echo "Setting minimum fee price..."
+echo "##### [Node 0] Adjust consensus timeouts"
 
-    sed -i $sed_extension 's/minimum-gas-prices = ""/minimum-gas-prices = "25ncheq"/g' .cheqdnode/config/app.toml
+sed -i $sed_extension 's/timeout_propose = "3s"/timeout_propose = "500ms"/g' "$HOME/.cheqdnode/config/config.toml"
+sed -i $sed_extension 's/timeout_prevote = "1s"/timeout_prevote = "500ms"/g' "$HOME/.cheqdnode/config/config.toml"
+sed -i $sed_extension 's/timeout_precommit = "1s"/timeout_precommit = "500ms"/g' "$HOME/.cheqdnode/config/config.toml"
+sed -i $sed_extension 's/timeout_commit = "5s"/timeout_commit = "500ms"/g' "$HOME/.cheqdnode/config/config.toml"
 
-    popd
-done
+echo "##### [Validator operator] Generating key"
 
+cheqd-noded keys add alice --keyring-backend test
 
-OPERATORS_HOME="client"
-mkdir $OPERATORS_HOME
-pushd $OPERATORS_HOME
+echo "##### [Validator operator] Initializing genesis"
 
-echo "Initializing genesis..."
-cheqd_noded_docker init dummy_node --chain-id $CHAIN_ID
-sed -i $sed_extension 's/"stake"/"ncheq"/' .cheqdnode/config/genesis.json
+GENESIS="$HOME/.cheqdnode/config/genesis.json"
+sed -i $sed_extension 's/"stake"/"ncheq"/' $GENESIS
 
-echo "Generating operator keys..."
+echo "##### [Validator operator] Creating genesis account"
 
-for ((i=0 ; i<$VALIDATORS_COUNT ; i++))
-do
-    cheqd_noded_docker keys add "operator$i" --keyring-backend "test"
-done
+cheqd-noded add-genesis-account alice 20000000000000000ncheq --keyring-backend test
 
-echo "Creating genesis accounts..."
+echo "##### Adding test accounts to the genesis"
 
-for ((i=0 ; i<$VALIDATORS_COUNT ; i++))
-do
-    cheqd_noded_docker add-genesis-account "operator$i" 20000000000000000ncheq --keyring-backend "test"
-done
+BASE_ACCOUNT_1="cheqd1rnr5jrt4exl0samwj0yegv99jeskl0hsxmcz96"
+# Mnemonic: sketch mountain erode window enact net enrich smoke claim kangaroo another visual write meat latin bacon pulp similar forum guilt father state erase bright
+cat <<< "$(jq '.app_state.bank.balances += [{"address": "'${BASE_ACCOUNT_1}'", "coins": [{"denom": "ncheq", "amount": "100001000000000000"}] }]' "$GENESIS")" > "$GENESIS"
+cat <<< "$(jq '.app_state.auth.accounts += [{"@type": "/cosmos.auth.v1beta1.BaseAccount","address": "'${BASE_ACCOUNT_1}'", "pub_key": null,"account_number": "0","sequence": "0"}]' "$GENESIS")" > "$GENESIS"
 
-echo "Creating genesis validators..."
+BASE_ACCOUNT_2="cheqd1l9sq0se0jd3vklyrrtjchx4ua47awug5vsyeeh"
+# Mnemonic: ugly dirt sorry girl prepare argue door man that manual glow scout bomb pigeon matter library transfer flower clown cat miss pluck drama dizzy
+cat <<< "$(jq '.app_state.bank.balances += [{"address": "'${BASE_ACCOUNT_2}'", "coins": [{"denom": "ncheq", "amount": "100001000000000000"}] }]' "$GENESIS")" > $GENESIS
+cat <<< "$(jq '.app_state.auth.accounts += [{"@type": "/cosmos.auth.v1beta1.BaseAccount","address": "'${BASE_ACCOUNT_2}'", "pub_key": null,"account_number": "0","sequence": "0"}]' "$GENESIS")" > "$GENESIS"
 
-for ((i=0 ; i<$VALIDATORS_COUNT ; i++))
-do
-    NODE_HOME="../node$i"
-    pushd $NODE_HOME
+BASE_VESTING_ACCOUNT="cheqd1lkqddnapqvz2hujx2trpj7xj6c9hmuq7uhl0md"
+# Mnemonic: coach index fence broken very cricket someone casino dial truth fitness stay habit such three jump exotic spawn planet fragile walk enact angry great
+BASE_VESTING_COIN="{\"denom\":\"ncheq\",\"amount\":\"10001000000000000\"}"
+cat <<< "$(jq '.app_state.bank.balances += [{"address": "'${BASE_VESTING_ACCOUNT}'", "coins": [{"denom": "ncheq", "amount": "5000000000000000"}] }]' "$GENESIS")" > "$GENESIS"
+cat <<< "$(jq '.app_state.auth.accounts += [{"@type": "/cosmos.vesting.v1beta1.BaseVestingAccount", "base_account": {"address": "'${BASE_VESTING_ACCOUNT}'","pub_key": null,"account_number": "0","sequence": "0"}, "original_vesting": ['${BASE_VESTING_COIN}'], "delegated_free": [], "delegated_vesting": [], "end_time": "1630362459"}]' "$GENESIS")" > "$GENESIS"
 
-    NODE_ID=$(cheqd_noded_docker tendermint show-node-id)
-    NODE_VAL_PUBKEY=$(cheqd_noded_docker tendermint show-validator)
+CONTINOUS_VESTING_ACCOUNT="cheqd1353p46macvn444rupg2jstmx3tmz657yt9gl4l"
+# Mnemonic: phone worry flame safe panther dirt picture pepper purchase tiny search theme issue genre orange merit stove spoil surface color garment mind chuckle image
+cat <<< "$(jq '.app_state.bank.balances += [{"address": "'${CONTINOUS_VESTING_ACCOUNT}'", "coins": [{"denom": "ncheq", "amount": "5000000000000000"}] }]' "$GENESIS")" > "$GENESIS"
+cat <<< "$(jq '.app_state.auth.accounts += [{"@type": "/cosmos.vesting.v1beta1.ContinuousVestingAccount", "base_vesting_account": { "base_account": {"address": "'${CONTINOUS_VESTING_ACCOUNT}'","pub_key": null,"account_number": "0","sequence": "0"}, "original_vesting": ['${BASE_VESTING_COIN}'], "delegated_free": [], "delegated_vesting": [], "end_time": "1630362459"}, "start_time": "1630352459"}]' "$GENESIS")" > "$GENESIS"
 
-    popd
+DELAYED_VESTING_ACCOUNT="cheqd1njwu33lek5jt4kzlmljkp366ny4qpqusahpyrj"
+# Mnemonic: pilot text keen deal economy donkey use artist divide foster walk pink breeze proud dish brown icon shaft infant level labor lift will tomorrow
+cat <<< "$(jq '.app_state.bank.balances += [{"address": "'${DELAYED_VESTING_ACCOUNT}'", "coins": [{"denom": "ncheq", "amount": "5000000000000000"}] }]' "$GENESIS")" > "$GENESIS"
+cat <<< "$(jq '.app_state.auth.accounts += [{"@type": "/cosmos.vesting.v1beta1.DelayedVestingAccount", "base_vesting_account": { "base_account": {"address": "'${DELAYED_VESTING_ACCOUNT}'","pub_key": null,"account_number": "0","sequence": "0"}, "original_vesting": ['${BASE_VESTING_COIN}'], "delegated_free": [], "delegated_vesting": [], "end_time": "1630362459"}}]' "$GENESIS")" > "$GENESIS"
 
-    cheqd_noded_docker gentx "operator$i" 1000000000000000ncheq --chain-id $CHAIN_ID --node-id $NODE_ID --pubkey $NODE_VAL_PUBKEY --keyring-backend "test"
-done
+PERIODIC_VESTING_ACCOUNT="cheqd1uyngr0l3xtyj07js9sdew9mk50tqeq8lghhcfr"
+# Mnemonic: want merge flame plate trouble moral submit wing whale sick meat lonely yellow lens enable oyster slight health vast weird radar mesh grab olive
+cat <<< "$(jq '.app_state.bank.balances += [{"address": "'${PERIODIC_VESTING_ACCOUNT}'", "coins": [{"denom": "ncheq", "amount": "5000000000000000"}] }]' "$GENESIS")" > "$GENESIS"
+cat <<< "$(jq '.app_state.auth.accounts += [{"@type": "/cosmos.vesting.v1beta1.PeriodicVestingAccount", "base_vesting_account": { "base_account": {"address": "'${PERIODIC_VESTING_ACCOUNT}'","pub_key": null,"account_number": "0","sequence": "0"}, "original_vesting": ['${BASE_VESTING_COIN}'], "delegated_free": [], "delegated_vesting": [], "end_time": "1630362459"}, "start_time": "1630362439", "vesting_periods": [{"length": "20", "amount": ['${BASE_VESTING_COIN}']}]}]' "$GENESIS")" > "$GENESIS"
 
-echo "Collecting them..."
+echo "##### [Validator operator] Creating genesis validator"
 
-cheqd_noded_docker collect-gentxs
-cheqd_noded_docker validate-genesis
+cheqd-noded gentx alice 1000000000000000ncheq --chain-id $CHAIN_ID --node-id "$NODE_0_ID" --pubkey "$NODE_0_VAL_PUBKEY"  --keyring-backend test
 
-echo "Propagating genesis to nodes..."
+echo "##### [Validator operator] Collect gentxs"
 
-for ((i=0 ; i<$VALIDATORS_COUNT ; i++))
-do
-    NODE_HOME="../node$i"
-
-    cp ".cheqdnode/config/genesis.json" "$NODE_HOME/.cheqdnode/config/"
-done
-
-
-popd # operators' home
-
-
-echo "##### Setting up observers..."
-
-for ((i=0 ; i<$OBSERVERS_COUNT ; i++))
-do
-    NODE_HOME="observer$i"
-
-    mkdir $NODE_HOME
-    pushd $NODE_HOME
-
-    echo "##### [Observer $i] Generating keys..."
-    cheqd_noded_docker init "node$i" --chain-id $CHAIN_ID
-
-    echo "##### [Observer $i] Exporting public keys..."
-    echo "$(cheqd_noded_docker tendermint show-node-id)" > node_id.txt
-    echo "$(cheqd_noded_docker tendermint show-validator)" > node_val_pubkey.txt
-
-    echo "##### [Observer $i] Loading genesis..."
-    OPERATORS_HOME="../client"
-    cp "$OPERATORS_HOME/.cheqdnode/config/genesis.json" ".cheqdnode/config/"
-
-    echo "##### [Observer $i] Setting min gas prices..."
-    sed -i $sed_extension 's/minimum-gas-prices = ""/minimum-gas-prices = "25ncheq"/g' .cheqdnode/config/app.toml
-
-    popd
-done
-
-popd # node_configs
+cheqd-noded collect-gentxs
+cheqd-noded validate-genesis

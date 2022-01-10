@@ -133,8 +133,8 @@ jobs:
           name: cheqd-node-image.tar
           path: cheqd-node-image.tar
 
-  build-testnet-image:
-    name: Build cheqd-testnet image
+  build-localnet-image:
+    name: Build cheqd-localnet image
     runs-on: ubuntu-20.04
     needs: build-node-image
     steps:
@@ -150,16 +150,16 @@ jobs:
         run: docker load -i cheqd-node-image.tar
 
       - name: Build
-        run: docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
+        run: docker build -f docker/localnet/Dockerfile --no-cache -t cheqd-localnet .
 
       - name: Save
-        run: docker save -o cheqd-testnet-image.tar cheqd-testnet
+        run: docker save -o cheqd-localnet-image.tar cheqd-localnet
 
       - name: Store artifact
         uses: actions/upload-artifact@v2
         with:
-          name: cheqd-testnet-image.tar
-          path: cheqd-testnet-image.tar
+          name: cheqd-localnet-image.tar
+          path: cheqd-localnet-image.tar
 
   test-new-node-setup-from-deb:
     name: Test new node setup from deb
@@ -265,21 +265,21 @@ jobs:
   run-identity-tests-using-vdr:
     name: Run identity tests using VDR
     runs-on: ubuntu-20.04
-    needs: build-testnet-image
+    needs: build-localnet-image
     steps:
       - uses: actions/checkout@v2
 
-      - name: Download testnet image
+      - name: Download localnet image
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-testnet-image.tar
+          name: cheqd-localnet-image.tar
 
-      - name: Load testnet image
-        run: docker load -i cheqd-testnet-image.tar
+      - name: Load localnet image
+        run: docker load -i cheqd-localnet-image.tar
 
       - name: Run test net container
         run: |
-          docker run -d --rm -p "26659:26657" cheqd-testnet start --rpc.laddr tcp://0.0.0.0:26657
+          docker run -d --rm -p "26659:26657" cheqd-localnet start --rpc.laddr tcp://0.0.0.0:26657
           bash tests/networks/wait_for_chain.sh 1 60 http://localhost:26659/status
       
       - name: Set up test environment
@@ -298,7 +298,7 @@ jobs:
   run-identity-tests-using-cli:
     name: Run identity tests using CLI
     runs-on: ubuntu-20.04
-    needs: [build-binary, build-testnet-image]
+    needs: [build-binary, build-localnet-image]
     steps:
       - uses: actions/checkout@v2
 
@@ -311,17 +311,17 @@ jobs:
       - name: Restore binary permissions
         run: sudo chmod +x /home/runner/.local/bin/cheqd-noded
 
-      - name: Download testnet image
+      - name: Download localnet image
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-testnet-image.tar
+          name: cheqd-localnet-image.tar
 
-      - name: Load testnet image
-        run: docker load -i cheqd-testnet-image.tar
+      - name: Load localnet image
+        run: docker load -i cheqd-localnet-image.tar
 
-      - name: Run test net container
+      - name: Run localnet container
         run: |
-          docker run -d --rm -p "26659:26657" -p "1317:1317" cheqd-testnet start --rpc.laddr tcp://0.0.0.0:26657
+          docker run -d --rm -p "26659:26657" -p "1317:1317" cheqd-localnet start --rpc.laddr tcp://0.0.0.0:26657
           bash tests/networks/wait_for_chain.sh 1 60 http://localhost:26659/status
 
       - name: Set up and run tests

@@ -44,7 +44,7 @@ services:
       - "26669:26657" # rpc
     volumes:
       - ./node_configs/observer0:/home/cheqd
-    command: start --rpc.laddr tcp://0.0.0.0:26657 --minimum-gas-prices "1cheq" --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
+    command: start --rpc.laddr tcp://0.0.0.0:26657 --minimum-gas-prices "1ncheq" --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
 
   observer1:
     image: cheqd-node
@@ -53,4 +53,4 @@ services:
       - "26672:26657" # rpc
     volumes:
       - ./node_configs/observer1:/home/cheqd
-    command: start --rpc.laddr tcp://0.0.0.0:26657 --minimum-gas-prices "1cheq" --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
+    command: start --rpc.laddr tcp://0.0.0.0:26657 --minimum-gas-prices "1ncheq" --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
