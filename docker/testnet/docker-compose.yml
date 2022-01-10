@@ -30,7 +30,7 @@ services:
         protocol: tcp
         mode: host
     env_file:
-      - mainnet-container.env
+      - testnet-container.env
     volumes:
       - type: volume
         source: ${CHEQD_DOCKER_VOLUME_NAME}
