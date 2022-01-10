@@ -39,5 +39,5 @@ services:
 
 volumes:
   ${CHEQD_DOCKER_VOLUME_NAME}:
-    driver: ${CHEQD_DOCKER_VOLUME_DRIVER_TYPE}
-    external: ${CHEQD_DOCKER_IS_EXTERNAL_VOLUME}
+    driver: ${CHEQD_DOCKER_VOLUME_DRIVER}
+    external: ${CHEQD_DOCKER_VOLUME_IS_EXTERNAL}
