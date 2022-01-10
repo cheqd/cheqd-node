@@ -25,13 +25,19 @@ services:
         published: ${TM_GRPC_API_GATEWAY_PORT}
         protocol: tcp
         mode: host
+      - target: 26660
+        published: ${TM_PROMETHEUS_PORT}
+        protocol: tcp
+        mode: host
     env_file:
       - mainnet-container.env
     volumes:
       - type: volume
-        source: cheqd_volume
-        target: /home/cheqd
+        source: ${CHEQD_DOCKER_VOLUME_NAME}
+        target: ${CHEQD_DOCKER_VOLUME_SOURCE}
     entrypoint: "node-runner"
 
 volumes:
-  cheqd_volume:
+  ${CHEQD_DOCKER_VOLUME_NAME}:
+    driver: ${CHEQD_DOCKER_VOLUME_DRIVER_TYPE}
+    external: ${CHEQD_DOCKER_IS_EXTERNAL_VOLUME}

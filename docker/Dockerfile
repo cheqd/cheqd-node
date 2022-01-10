@@ -63,8 +63,8 @@ ARG GID=1000
 RUN groupadd --system --gid $GID cheqd \
     && useradd --system --create-home --home-dir ${CHEQD_HOME_DIR} --shell /bin/bash --gid cheqd --uid $UID cheqd \
 	&& chmod +x /bin/node-runner \
-	&& mkdir -p /home/cheqd/.cheqdnode \
-	&& chown -R cheqd /home/cheqd/.cheqdnode \
+	&& mkdir -p ${CHEQD_HOME_DIR} \
+	&& chown -R cheqd ${CHEQD_HOME_DIR} \
 	&& apt-get update \
 	&& export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends curl ca-certificates
@@ -72,7 +72,7 @@ RUN groupadd --system --gid $GID cheqd \
 WORKDIR ${CHEQD_HOME_DIR}
 USER cheqd
 
-EXPOSE 26656 26657 1317 9090 9091
+EXPOSE 26656 26657 1317 9090 9091 26660
 STOPSIGNAL SIGTERM
 
 ENTRYPOINT [ "cheqd-noded" ]
