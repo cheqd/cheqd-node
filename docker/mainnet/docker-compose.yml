@@ -33,11 +33,11 @@ services:
       - mainnet-container.env
     volumes:
       - type: volume
-        source: ${CHEQD_DOCKER_VOLUME_NAME}
+        source: cheqd_volume_mainnet
         target: ${CHEQD_DOCKER_VOLUME_SOURCE}
     entrypoint: "node-runner"
 
 volumes:
-  ${CHEQD_DOCKER_VOLUME_NAME}:
+  cheqd_volume_mainnet:
     driver: ${CHEQD_DOCKER_VOLUME_DRIVER}
     external: ${CHEQD_DOCKER_VOLUME_IS_EXTERNAL}
