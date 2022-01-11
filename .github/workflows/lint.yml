@@ -31,6 +31,16 @@ jobs:
           config-file: '.github/linters/mlc_config.json'
           folder-path: "."
 
+  sh-euox-pipefail-check:
+    name: Check for 'set -euox pipelail' in shell scripts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Check that all shell scripts use 'set -euox pipelail'
+        run: bash .github/scripts/enshure_set_euox_pipefail.sh
+
   super-lint:
     name: Run super linter
     runs-on: ubuntu-latest
@@ -45,13 +55,6 @@ jobs:
         VALIDATE_XML: true
         VALIDATE_YAML: true
         VALIDATE_OPENAPI: true
-        # VALIDATE_BASH: true
-        # VALIDATE_BASH_EXEC: true
-        # VALIDATE_DOCKERFILE_HADOLINT: true
-        # VALIDATE_ENV: true
-        # VALIDATE_GITHUB_ACTIONS: true
-        # VALIDATE_PROTOBUF: true
-        # VALIDATE_SHELL_SHFMT: true
 
         VALIDATE_ALL_CODEBASE: true
         LOG_LEVEL: WARN

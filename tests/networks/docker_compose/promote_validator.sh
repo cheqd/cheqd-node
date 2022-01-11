@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -euox pipefail
+
 sudo chown -R runner:docker ${NODE_CONFIGS_BASE}/client
 cheqd-noded keys list --keyring-backend "test" --home ${NODE_CONFIGS_BASE}/client/.cheqdnode/
 

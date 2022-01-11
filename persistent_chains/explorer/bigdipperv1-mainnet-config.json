@@ -4,7 +4,7 @@
         "chainId": "cheqd-mainnet-1",
         "gtm": "",
         "slashingWindow": 25920,
-        "uptimeWindow": 600,
+        "uptimeWindow": 100,
         "initialPageSize": 30,
         "secp256k1": false,
         "bech32PrefixAccAddr": "cheqd",
@@ -44,7 +44,7 @@
         "api":"https://api.cheqd.net" 
     },
     "debug": {
-        "startTimer": true
+        "startTimer": false
     },
     "params":{
         "startHeight": 0,
