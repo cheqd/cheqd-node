@@ -150,7 +150,7 @@ jobs:
         run: docker load -i cheqd-node-image.tar
 
       - name: Build
-        run: docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
+        run: docker build -f tests/networks/docker-localnet/Dockerfile --no-cache -t cheqd-testnet .
 
       - name: Save
         run: docker save -o cheqd-testnet-image.tar cheqd-testnet

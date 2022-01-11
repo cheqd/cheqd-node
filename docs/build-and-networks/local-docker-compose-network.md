@@ -13,7 +13,7 @@ The set of scripts to generate configurations for a network of four nodes and ru
 
 1. Build docker image:
 
-    See [the instruction](local-docker-network.md).
+    See [the instruction](../setup-and-configure/docker-install.md).
 
 2. Build cheqd-node:
 
