@@ -51,23 +51,22 @@ RUN make proto-gen build
 
 FROM ubuntu:focal
 
+RUN apt-get update \
+	&& export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends curl ca-certificates
+
 # Node binary
 COPY --from=builder /app/build/cheqd-noded /bin
 # Runner script
 COPY docker/node-runner.sh /bin/node-runner
+RUN chmod +x /bin/node-runner
 
 ARG CHEQD_HOME_DIR="/home/cheqd"
 ARG UID=1000
 ARG GID=1000
 
 RUN groupadd --system --gid $GID cheqd \
-    && useradd --system --create-home --home-dir ${CHEQD_HOME_DIR} --shell /bin/bash --gid cheqd --uid $UID cheqd \
-	&& chmod +x /bin/node-runner \
-	&& mkdir -p ${CHEQD_HOME_DIR} \
-	&& chown -R cheqd ${CHEQD_HOME_DIR} \
-	&& apt-get update \
-	&& export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends curl ca-certificates
+    && useradd --system --create-home --home-dir ${CHEQD_HOME_DIR} --shell /bin/bash --gid cheqd --uid $UID cheqd
 
 WORKDIR ${CHEQD_HOME_DIR}
 USER cheqd
