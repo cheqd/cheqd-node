@@ -33,11 +33,11 @@ services:
       - testnet-container.env
     volumes:
       - type: volume
-        source: cheqd_volume_testnet
+        source: cheqd_volume
         target: ${CHEQD_DOCKER_VOLUME_SOURCE}
     entrypoint: "node-runner"
 
 volumes:
-  cheqd_volume_testnet:
+  cheqd_volume:
     driver: ${CHEQD_DOCKER_VOLUME_DRIVER}
     external: ${CHEQD_DOCKER_VOLUME_IS_EXTERNAL}
