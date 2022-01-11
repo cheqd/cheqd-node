@@ -97,9 +97,9 @@ jobs:
         run: sudo chmod +x /home/runner/go/bin/cheqd-noded
 
       - name: Make intermediate archive
-        working-directory: ./build_tools
+        working-directory: ./build-tools
         run: |
-          ./build_tar.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }}
+          ./build-tar.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }}
 
       - name: Install fpm
         run: |
@@ -107,15 +107,15 @@ jobs:
           sudo gem install --no-document fpm
 
       - name: Build deb # Depends on tar archive
+        working-directory: ./build-tools
         run: |
-          ./build_deb.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }}
-        working-directory: ./build_tools
+          ./build-deb.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }}
 
       - name: Store deb package artifact
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
-          path: build_tools/output/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+          path: build-tools/output/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
 
   build-node-image:
     name: Build cheqd-node image
