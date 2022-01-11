@@ -9,7 +9,7 @@ on:
     - '.gitbook/**'
 
 env:
-  NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/tests/networks/docker_compose/node_configs"
+  NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/tests/networks/docker-compose-localnet/node_configs"
   PACKAGE_NAME: "cheqd-node"
   VERSION: "1.0.0" # Package build scripts require version to be provided
 
@@ -279,8 +279,8 @@ jobs:
 
       - name: Run test net container
         run: |
-          docker run -d --rm -p "26659:26657" cheqd-testnet start --rpc.laddr tcp://0.0.0.0:26657
-          bash tests/networks/tools/wait-for-chain.sh 1 60 http://localhost:26659/status
+          docker run -d --rm -p "26657:26657" cheqd-testnet
+          bash tests/networks/tools/wait-for-chain.sh
       
       - name: Set up test environment
         working-directory: ./tests/e2e
@@ -321,8 +321,8 @@ jobs:
 
       - name: Run test net container
         run: |
-          docker run -d --rm -p "26659:26657" -p "1317:1317" cheqd-testnet start --rpc.laddr tcp://0.0.0.0:26657
-          bash tests/networks/tools/wait-for-chain.sh 1 60 http://localhost:26659/status
+          docker run -d --rm -p "26657:26657" -p "1317:1317" cheqd-testnet
+          bash tests/networks/tools/wait-for-chain.sh
 
       - name: Set up and run tests
         working-directory: tests/cli
