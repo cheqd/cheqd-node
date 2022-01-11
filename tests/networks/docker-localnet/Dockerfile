@@ -9,10 +9,10 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 
 USER cheqd
 
-COPY --chown=cheqd:cheqd docker/single_image_testnet/gen_node_configs.sh ./
-COPY docker/single_image_testnet/supervisord.conf /etc
+COPY --chown=cheqd:cheqd tests/networks/docker-localnet/gen-node-configs.sh ./
+COPY tests/networks/docker-localnet/supervisord.conf /etc
 
-RUN chmod +x ./gen_node_configs.sh
+RUN chmod +x ./gen-node-configs.sh
 
 EXPOSE 26657 26659
 
