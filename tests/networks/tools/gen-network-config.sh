@@ -15,8 +15,8 @@ fi
 CHAIN_ID=${1:-"cheqd"} # First parameter, default is "cheqd"
 
 VALIDATORS_COUNT=${2:-4} # Second parameter, default is 4
-SEEDS_COUNT=${2:-1} # Third parameter, default is 1
-OBSERVERS_COUNT=${2:-1} # Fourth parameter, default is 1
+SEEDS_COUNT=${3:-1} # Third parameter, default is 1
+OBSERVERS_COUNT=${4:-1} # Fourth parameter, default is 1
 
 function init_node() {
   NODE_HOME=$1
@@ -40,6 +40,9 @@ function configure_node() {
 
   sed -i $SED_EXT 's/minimum-gas-prices = ""/minimum-gas-prices = "25ncheq"/g' "${APP_TOML}"
   sed -i $SED_EXT 's/enable = false/enable = true/g' "${APP_TOML}"
+
+  sed -i $SED_EXT 's|laddr = "tcp://127.0.0.1:26657"|laddr = "tcp://0.0.0.0:26657"|g' "${CONFIG_TOML}"
+  sed -i $SED_EXT 's|addr_book_strict = true|addr_book_strict = false|g' "${CONFIG_TOML}"
 
   sed -i $SED_EXT 's/timeout_propose = "3s"/timeout_propose = "500ms"/g' "${CONFIG_TOML}"
   sed -i $SED_EXT 's/timeout_prevote = "1s"/timeout_prevote = "500ms"/g' "${CONFIG_TOML}"
@@ -152,7 +155,7 @@ do
     --pubkey "${NODE_VAL_PUBKEY}" --keyring-backend "test"  --home "${NODE_HOME}"
 
   cp "${NODE_HOME}/config/genesis.json" "${TMP_NODE_HOME}/config/genesis.json"
-  cp -r "${NODE_HOME}/config/gentx/" "${TMP_NODE_HOME}/config/gentx"
+  cp -R "${NODE_HOME}/config/gentx/." "${TMP_NODE_HOME}/config/gentx"
 done
 
 
