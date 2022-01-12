@@ -190,7 +190,9 @@ jobs:
         run: |
           bash gen-network-config.sh
           docker-compose up -d
-          bash wait.sh '[[ $(curl -s -N localhost:26657/block | jq -cr '"'"'.result.block.last_commit.height'"'"') -gt 1 ]] && echo "Height is more than 1"'
+
+      - name: Wait for chain
+        run: bash tests/networks/tools/wait-for-chain.sh
 
       - name: Add observer node
         working-directory: ./tests/networks/docker-compose-localnet
@@ -246,7 +248,9 @@ jobs:
         run: |
           bash gen-network-config.sh
           docker-compose up -d
-          bash wait.sh '[[ $(curl -s -N localhost:26657/block | jq -cr '"'"'.result.block.last_commit.height'"'"') -gt 1 ]] && echo "Height is more than 1"'
+
+      - name: Wait for chain
+        run: bash tests/networks/tools/wait-for-chain.sh
 
       - name: Set up test environment
         working-directory: ./tests/e2e
