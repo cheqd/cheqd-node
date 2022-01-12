@@ -33,7 +33,7 @@ OBSERVERS_COUNT="2"
 
 NODE_CONFIGS_DIR="node_configs"
 rm -rf $NODE_CONFIGS_DIR
-mkdir $NODE_CONFIGS_DIR
+mkdir $NODE_CONFIGS_DIR 
 pushd $NODE_CONFIGS_DIR
 
 echo "Generating validator keys..."
@@ -42,6 +42,7 @@ for ((i=0 ; i<$VALIDATORS_COUNT ; i++))
 do
     NODE_HOME="node$i"
     mkdir $NODE_HOME
+    sudo chmod -R 777 $NODE_HOME
     pushd $NODE_HOME
 
     echo "[Validator $i] Generating key..."
@@ -124,6 +125,7 @@ do
     NODE_HOME="observer$i"
 
     mkdir $NODE_HOME
+    sudo chmod -R 777 $NODE_HOME
     pushd $NODE_HOME
 
     echo "##### [Observer $i] Generating keys..."
