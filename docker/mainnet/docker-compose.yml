@@ -11,27 +11,38 @@ services:
         published: ${TM_P2P_PORT}
         protocol: tcp
         mode: host
-      # RECOMMENDED: Tendermint RPC port (required if you want to use chqed-noded CLI directly from the host)
+      # RECOMMENDED: Tendermint RPC port
+      # Required if you want to use chqed-noded CLI directly from the host
       - target: 26657
         published: ${TM_JSON_RPC_PORT}
         protocol: tcp
         mode: host
+      # OPTIONAL: Cosmos REST API port
+      # Only required if you plan on targetting REST API requests at your own node
       - target: 1317 
         published: ${TM_REST_API_PORT}
         protocol: tcp
         mode: host
+      # RECOMMENDED: gRPC port
+      # Tendermint RPC requests (define above) are relayed to the gRPC port inside the container
+      # The Cosmos gRPC API has endpoints not otherwise available in Tendermint RPC and Cosmos REST API
       - target: 9090
         published: ${TM_GRPC_SERVER_PORT}
         protocol: tcp
         mode: host
+      # OPTIONAL: gRPC-Gateway port
+      # gRPC-Gateway provides a RESTful interface to relay requests to gRPC API
       - target: 9091
         published: ${TM_GRPC_API_GATEWAY_PORT}
         protocol: tcp
         mode: host
+      # OPTIONAL: Prometheus metrics port
+      # Allows collection of Tendermint and Cosmos metrics using Prometheus
       - target: 26660
         published: ${TM_PROMETHEUS_PORT}
         protocol: tcp
         mode: host
+    # Defines environment variables that are passed inside the container for cheqd-noded configuration
     env_file:
       - mainnet-container.env
     volumes:
