@@ -39,7 +39,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Check that all shell scripts use 'set -euox pipefail'
-        run: bash .github/scripts/enshure_set_euox_pipefail.sh
+        run: bash .github/scripts/ensure_set_euox_pipefail.sh
 
   super-lint:
     name: Run super linter
