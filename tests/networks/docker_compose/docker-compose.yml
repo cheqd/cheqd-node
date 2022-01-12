@@ -2,55 +2,60 @@ version: '3.2'
 
 services:
   node0:
-    image: cheqd-node
+    image: "ghcr.io/cheqd/cheqd-node:${CHEQD_VERSION}"
     ports:
       - "26656:26656" # p2p
       - "26657:26657" # rpc
     volumes:
-      - ./node_configs/node0:/cheqd
+      - "${MOUNT_POINT}/node_configs/node0:/cheqd"
     command: start --rpc.laddr tcp://0.0.0.0:26657
 
   node1:
-    image: cheqd-node
+    image: "ghcr.io/cheqd/cheqd-node:${CHEQD_VERSION}"
     ports:
       - "26659:26656" # p2p
       - "26660:26657" # rpc
     volumes:
-      - ./node_configs/node1:/cheqd
-    command: start --rpc.laddr tcp://0.0.0.0:26657 --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
+      - "${MOUNT_POINT}/node_configs/node1:/cheqd"
+    command: start --rpc.laddr tcp://0.0.0.0:26657 --p2p.persistent_peers
+      "${NODE_0_ID}@node0:26656"
 
   node2:
-    image: cheqd-node
+    image: "ghcr.io/cheqd/cheqd-node:${CHEQD_VERSION}"
     ports:
       - "26662:26656" # p2p
       - "26663:26657" # rpc
     volumes:
-      - ./node_configs/node2:/cheqd
-    command: start --rpc.laddr tcp://0.0.0.0:26657 --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
+      - "${MOUNT_POINT}/node_configs/node2:/cheqd"
+    command: start --rpc.laddr tcp://0.0.0.0:26657 --p2p.persistent_peers
+      "${NODE_0_ID}@node0:26656"
 
   node3:
-    image: cheqd-node
+    image: "ghcr.io/cheqd/cheqd-node:${CHEQD_VERSION}"
     ports:
       - "26665:26656" # p2p
       - "26666:26657" # rpc
     volumes:
-      - ./node_configs/node3:/cheqd
-    command: start --rpc.laddr tcp://0.0.0.0:26657 --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
+      - "${MOUNT_POINT}/node_configs/node3:/cheqd"
+    command: start --rpc.laddr tcp://0.0.0.0:26657 --p2p.persistent_peers
+      "${NODE_0_ID}@node0:26656"
 
   observer0:
-    image: cheqd-node
+    image: "ghcr.io/cheqd/cheqd-node:${CHEQD_VERSION}"
     ports:
       - "26668:26656" # p2p
       - "26669:26657" # rpc
     volumes:
-      - ./node_configs/observer0:/cheqd
-    command: start --rpc.laddr tcp://0.0.0.0:26657 --minimum-gas-prices "1cheq" --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
+      - "${MOUNT_POINT}/node_configs/observer0:/cheqd"
+    command: start --rpc.laddr tcp://0.0.0.0:26657 --minimum-gas-prices "1cheq"
+      --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
 
   observer1:
-    image: cheqd-node
+    image: "ghcr.io/cheqd/cheqd-node:${CHEQD_VERSION}"
     ports:
       - "26671:26656" # p2p
       - "26672:26657" # rpc
     volumes:
-      - ./node_configs/observer1:/cheqd
-    command: start --rpc.laddr tcp://0.0.0.0:26657 --minimum-gas-prices "1cheq" --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
+      - "${MOUNT_POINT}/node_configs/observer1:/cheqd"
+    command: start --rpc.laddr tcp://0.0.0.0:26657 --minimum-gas-prices "1cheq"
+      --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
