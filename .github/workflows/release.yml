@@ -20,10 +20,10 @@ jobs:
       - name: Set outputs
         id: cache
         run: |
-          # Exposes org_name/repository_name in lower case. Required by docker.
+          # Exposes org_name/repository_name in lower case. Required by Docker.
           echo "::set-output name=GITHUB_REPOSITORY_NAME::$(echo ${GITHUB_REPOSITORY,,})"
 
-          # Version is tag without `v` prefix. Reuired by deb package.
+          # Version is tag without `v` prefix. Required by Debian package.
           TAG=${GITHUB_REF/refs\/tags\//}
           echo "::set-output name=TAG::$TAG"
 
@@ -39,7 +39,7 @@ jobs:
         with:
           go-version: 1.17
 
-      - name: Get go protoc compiler plugins
+      - name: Get Go protoc compiler plugins
         env:
           GOLANG_PROTOBUF_VERSION: 1.3.5
           GOGO_PROTOBUF_VERSION: 1.3.2
@@ -78,7 +78,7 @@ jobs:
           path: build/cheqd-noded
 
   build-deb-package:
-    name: Build deb package
+    name: Build Debian package
     runs-on: ubuntu-20.04
     needs: [ build-binary, setup-workflow ]
     env:
@@ -106,19 +106,19 @@ jobs:
           sudo apt-get install ruby ruby-dev rubygems build-essential
           sudo gem install --no-document fpm
 
-      - name: Build deb # Depends on tar archive
+      - name: Build Debian package # Depends on tar archive
         working-directory: ./build-tools
         run: |
           ./build-deb.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }}
 
-      - name: Store deb package artifact
+      - name: Store Debian package artifact
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
           path: build-tools/output/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
 
   build-node-image:
-    name: Build cheqd-node image
+    name: Build cheqd-node Docker image
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
