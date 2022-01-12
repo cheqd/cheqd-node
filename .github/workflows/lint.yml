@@ -32,13 +32,13 @@ jobs:
           folder-path: "."
 
   sh-euox-pipefail-check:
-    name: Check for 'set -euox pipelail' in shell scripts
+    name: Check for 'set -euox pipefail' in shell scripts
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Check that all shell scripts use 'set -euox pipelail'
+      - name: Check that all shell scripts use 'set -euox pipefail'
         run: bash .github/scripts/enshure_set_euox_pipefail.sh
 
   super-lint:
