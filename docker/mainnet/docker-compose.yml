@@ -5,15 +5,18 @@ services:
     image: ghcr.io/cheqd/cheqd-node:${CHEQD_MAINNET_VERSION}
     user: cheqd
     ports: # target -> port inside container, published -> port on the host
-      - target: 26656 # P2P Service Port inside container (please don't change this unless you know what you're doing)
+      # REQUIRED: Tendermint peer-to-peer (P2P) port
+      # Please do not change this unless you've also changed this in the external-address parameter in Tendermint config
+      - target: 26656 
         published: ${TM_P2P_PORT}
         protocol: tcp
         mode: host
+      # RECOMMENDED: Tendermint RPC port (required if you want to use chqed-noded CLI directly from the host)
       - target: 26657
         published: ${TM_JSON_RPC_PORT}
         protocol: tcp
         mode: host
-      - target: 1317
+      - target: 1317 
         published: ${TM_REST_API_PORT}
         protocol: tcp
         mode: host
