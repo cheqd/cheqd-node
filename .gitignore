@@ -36,6 +36,7 @@ vue/src/store/generated
 vue/dist
 secret.yml
 **/node_configs
+**/network-config
 .idea
 
 # Python
