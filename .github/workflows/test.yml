@@ -188,9 +188,9 @@ jobs:
       - name: Set up 4 validators + 2 observers node docker pool  # TODO: Replace with testnet image
         working-directory: ./tests/networks/docker-compose-localnet
         run: |
-          ./gen-network-config.sh
+          bash gen-network-config.sh
           docker-compose up -d
-          ./wait.sh '[[ $(curl -s -N localhost:26657/block | jq -cr '"'"'.result.block.last_commit.height'"'"') -gt 1 ]] && echo "Height is more than 1"'
+          bash wait.sh '[[ $(curl -s -N localhost:26657/block | jq -cr '"'"'.result.block.last_commit.height'"'"') -gt 1 ]] && echo "Height is more than 1"'
 
       - name: Add observer node
         working-directory: ./tests/networks/docker-compose-localnet
@@ -244,9 +244,9 @@ jobs:
       - name: Set up 4 validators + 2 observers node docker pool for local test run # Replace with testnet image
         working-directory: ./tests/networks/docker-compose-localnet
         run: |
-          ./gen-node-configs.sh
-          ./run-docker.sh
-          ./wait.sh '[[ $(curl -s -N localhost:26657/block | jq -cr '"'"'.result.block.last_commit.height'"'"') -gt 1 ]] && echo "Height is more than 1"'
+          bash gen-network-config.sh
+          docker-compose up -d
+          bash wait.sh '[[ $(curl -s -N localhost:26657/block | jq -cr '"'"'.result.block.last_commit.height'"'"') -gt 1 ]] && echo "Height is more than 1"'
 
       - name: Set up test environment
         working-directory: ./tests/e2e
