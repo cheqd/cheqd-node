@@ -9,7 +9,7 @@ on:
     - '.gitbook/**'
 
 env:
-  NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/tests/networks/docker-compose-localnet/node_configs"
+  NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/tests/networks/docker-compose-localnet/network_config"
   PACKAGE_NAME: "cheqd-node"
   VERSION: "1.0.0" # Package build scripts require version to be provided
 

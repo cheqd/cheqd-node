@@ -3,10 +3,10 @@
 set -euox pipefail
 
 sudo chown -R runner:docker ${NODE_CONFIGS_BASE}/client
-cheqd-noded keys list --keyring-backend "test" --home ${NODE_CONFIGS_BASE}/validator-0/
+cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/validator-0"
 
 # Get operator0 address by setting --home flag
-OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home ${NODE_CONFIGS_BASE}/validator-0/ | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
+OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/validator-0" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
 
 # Create operator5 by running it under the `cheqd` user.
 sudo -u cheqd cheqd-noded keys add node5-operator --keyring-backend "test"
