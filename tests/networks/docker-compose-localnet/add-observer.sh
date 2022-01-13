@@ -10,7 +10,7 @@ VALIDATOR_0_ID=$(cat "${NODE_CONFIGS_BASE}/validator-0/node_id.txt")
 PERSISTENT_PEERS="${VALIDATOR_0_ID}@127.0.0.1:26656"
 sudo -u cheqd cheqd-noded configure p2p persistent-peers "${PERSISTENT_PEERS}"
 
-sudo cp "${NODE_CONFIGS_BASE}/validato-0/config/genesis.json" "/home/runner/cheqd/.cheqdnode/config"
+sudo cp "${NODE_CONFIGS_BASE}/validator-0/config/genesis.json" "/home/runner/cheqd/.cheqdnode/config"
 
 sudo chmod -R 777 "/home/runner/cheqd/.cheqdnode"
 

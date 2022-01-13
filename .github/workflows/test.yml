@@ -263,8 +263,9 @@ jobs:
 
       - name: Run tests
         run: |
-          export OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/operator-0" | sed -nr 's/.*address: (.*?).*/\1/p' | sed 's/\r//g')
-          export OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/operator-1" | sed -nr 's/.*address: (.*?).*/\1/p' | sed 's/\r//g')
+          set -euxo pipefail
+          export OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/validator-0" | sed -nr 's/.*address: (.*?).*/\1/p' | sed 's/\r//g')
+          export OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/validator-1" | sed -nr 's/.*address: (.*?).*/\1/p' | sed 's/\r//g')
           pytest -v -rP tests/e2e/test_cosmos.py
 
   run-identity-tests-using-vdr:
