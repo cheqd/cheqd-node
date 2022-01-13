@@ -1,3 +1,5 @@
+set -euox pipefail
+
 DOCKER_COMPOSE_DIR="../networks/docker_compose"
 CHEQD_VERSION_FROM="v0.3.1"
 CHEQD_VERSION_TO="0.4.0"

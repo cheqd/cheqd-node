@@ -4,7 +4,7 @@
 
 set -euox pipefail
 
-if [ -n "$1" ]; then
+if [ "$#" -eq 1]; then
     MOUNT_POINT="$1"
 else
     MOUNT_POINT="."
