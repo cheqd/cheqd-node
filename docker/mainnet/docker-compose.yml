@@ -1,7 +1,7 @@
 version: '3.7'
 
 services:
-  run_node:
+  cheqd_node:
     image: ghcr.io/cheqd/cheqd-node:${CHEQD_MAINNET_VERSION}
     user: cheqd
     ports: # target -> port inside container, published -> port on the host
@@ -14,7 +14,7 @@ services:
       # RECOMMENDED: Tendermint RPC port
       # Required if you want to use chqed-noded CLI directly from the host
       - target: 26657
-        published: ${TM_JSON_RPC_PORT}
+        published: ${TM_RPC_PORT}
         protocol: tcp
         mode: host
       # OPTIONAL: Cosmos REST API port
@@ -42,13 +42,13 @@ services:
         published: ${TM_PROMETHEUS_PORT}
         protocol: tcp
         mode: host
-    # Defines environment variables that are passed inside the container for cheqd-noded configuration
+    # Defines cheqd-noded configuration variables INSIDE the container 
     env_file:
       - mainnet-container.env
     volumes:
       - type: volume
-        source: cheqd_volume
-        target: ${CHEQD_DOCKER_VOLUME_SOURCE}
+        source: $(CHEQD_DOCKER_VOLUME_SOURCE) # Defaults to cheqd_volume, defined below
+        target: /home/cheqd # Do NOT change mount point inside the container unless rebuilding the image
     entrypoint: "node-runner"
 
 volumes:
