@@ -2,7 +2,7 @@
 
 set -euox pipefail
 
-sudo chown -R runner:docker ${NODE_CONFIGS_BASE}/client
+sudo chown -R runner:docker ${NODE_CONFIGS_BASE}
 cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/validator-0"
 
 # Get operator0 address by setting --home flag
