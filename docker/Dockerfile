@@ -57,6 +57,7 @@ RUN apt-get update \
 
 # Node binary
 COPY --from=builder /app/build/cheqd-noded /bin
+
 # Runner script
 COPY docker/node-runner.sh /bin/node-runner
 RUN chmod +x /bin/node-runner
