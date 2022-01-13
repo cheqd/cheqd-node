@@ -257,13 +257,14 @@ jobs:
         run: |
           pip3 install -r requirements.txt >> /dev/null
           pip3 install --force-reinstall 'git+https://gitlab.com/evernym/verity/vdr-tools.git@cheqd-node-0.3.1#egg=vdr-tools&subdirectory=wrappers/python' -U
-          cp -R ${NODE_CONFIGS_BASE}/client/.cheqdnode /home/runner/
+          cp -Rf ${NODE_CONFIGS_BASE}/operator-0/. /home/runner/.cheqdnode
+          cp -Rf ${NODE_CONFIGS_BASE}/operator-1/. /home/runner/.cheqdnode
           sudo chmod -R 777 /home/runner
 
       - name: Run tests
         run: |
-          export OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
-          export OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p | sed 's/\r//g')
+          export OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/operator-0" | sed -nr 's/.*address: (.*?).*/\1/p' | sed 's/\r//g')
+          export OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/operator-1" | sed -nr 's/.*address: (.*?).*/\1/p' | sed 's/\r//g')
           pytest -v -rP tests/e2e/test_cosmos.py
 
   run-identity-tests-using-vdr:
