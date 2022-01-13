@@ -1,40 +1,54 @@
 version: '3.7'
 
 services:
-  run_node:
+  cheqd_node:
     image: ghcr.io/cheqd/cheqd-node:${CHEQD_MAINNET_VERSION}
     user: cheqd
     ports: # target -> port inside container, published -> port on the host
-      - target: 26656 # P2P Service Port inside container (please don't change this unless you know what you're doing)
+      # REQUIRED: Tendermint peer-to-peer (P2P) port
+      # Please do not change this unless you've also changed this in the external-address parameter in Tendermint config
+      - target: 26656 
         published: ${TM_P2P_PORT}
         protocol: tcp
         mode: host
+      # RECOMMENDED: Tendermint RPC port
+      # Required if you want to use chqed-noded CLI directly from the host
       - target: 26657
-        published: ${TM_JSON_RPC_PORT}
+        published: ${TM_RPC_PORT}
         protocol: tcp
         mode: host
-      - target: 1317
+      # OPTIONAL: Cosmos REST API port
+      # Only required if you plan on targetting REST API requests at your own node
+      - target: 1317 
         published: ${TM_REST_API_PORT}
         protocol: tcp
         mode: host
+      # RECOMMENDED: gRPC port
+      # Tendermint RPC requests (define above) are relayed to the gRPC port inside the container
+      # The Cosmos gRPC API has endpoints not otherwise available in Tendermint RPC and Cosmos REST API
       - target: 9090
         published: ${TM_GRPC_SERVER_PORT}
         protocol: tcp
         mode: host
+      # OPTIONAL: gRPC-Gateway port
+      # gRPC-Gateway provides a RESTful interface to relay requests to gRPC API
       - target: 9091
         published: ${TM_GRPC_API_GATEWAY_PORT}
         protocol: tcp
         mode: host
+      # OPTIONAL: Prometheus metrics port
+      # Allows collection of Tendermint and Cosmos metrics using Prometheus
       - target: 26660
         published: ${TM_PROMETHEUS_PORT}
         protocol: tcp
         mode: host
+    # Defines cheqd-noded configuration variables INSIDE the container 
     env_file:
       - mainnet-container.env
     volumes:
       - type: volume
-        source: cheqd_volume
-        target: ${CHEQD_DOCKER_VOLUME_SOURCE}
+        source: $(CHEQD_DOCKER_VOLUME_SOURCE) # Defaults to cheqd_volume, defined below
+        target: /home/cheqd # Do NOT change mount point inside the container unless rebuilding the image
     entrypoint: "node-runner"
 
 volumes:

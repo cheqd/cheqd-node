@@ -57,6 +57,7 @@ RUN apt-get update \
 
 # Node binary
 COPY --from=builder /app/build/cheqd-noded /bin
+
 # Runner script
 COPY docker/node-runner.sh /bin/node-runner
 RUN chmod +x /bin/node-runner
@@ -71,7 +72,7 @@ RUN groupadd --system --gid $GID cheqd \
 WORKDIR ${CHEQD_HOME_DIR}
 USER cheqd
 
-EXPOSE 26656 26657 1317 9090 9091 26660
+EXPOSE 26656 26657 26660 1317 9090 9091
 STOPSIGNAL SIGTERM
 
 ENTRYPOINT [ "cheqd-noded" ]
