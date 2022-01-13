@@ -59,7 +59,7 @@ Also, there will be 4 keys generated and corresponding genesis accounts created 
 * operator2;
 * operator3;
 
-When connecting using CLI, point path to home directory of the node corresponding to the operator: `--home network_config/validator-x`.
+When connecting using CLI, point path to home directory of the node corresponding to the operator: `--home network-config/validator-x`.
 
 ## CLI commands
 

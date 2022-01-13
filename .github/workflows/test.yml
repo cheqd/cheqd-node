@@ -9,7 +9,7 @@ on:
     - '.gitbook/**'
 
 env:
-  NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/tests/networks/docker-compose-localnet/network_config"
+  NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/tests/networks/docker-compose-localnet/network-config"
   PACKAGE_NAME: "cheqd-node"
   VERSION: "1.0.0" # Package build scripts require version to be provided
 
@@ -257,8 +257,8 @@ jobs:
         run: |
           pip3 install -r requirements.txt >> /dev/null
           pip3 install --force-reinstall 'git+https://gitlab.com/evernym/verity/vdr-tools.git@cheqd-node-0.3.1#egg=vdr-tools&subdirectory=wrappers/python' -U
-          cp -Rf ${NODE_CONFIGS_BASE}/operator-0/. /home/runner/.cheqdnode
-          cp -Rf ${NODE_CONFIGS_BASE}/operator-1/. /home/runner/.cheqdnode
+          cp -Rf ${NODE_CONFIGS_BASE}/validator-0/. /home/runner/.cheqdnode
+          cp -Rf ${NODE_CONFIGS_BASE}/validator-1/. /home/runner/.cheqdnode
           sudo chmod -R 777 /home/runner
 
       - name: Run tests
