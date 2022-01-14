@@ -46,8 +46,8 @@ do
 
     echo "[Validator $i] Generating key..."
 
-    cheqd_noded_docker init "node$i" --chain-id $CHAIN_ID
-    sudo chown -R $USER:$USER .
+    cheqd_noded_docker_init "node$i" --chain-id $CHAIN_ID
+    # sudo chown -R $USER:$USER .
     echo "$(cheqd_noded_docker tendermint show-node-id)" > node_id.txt
     echo "$(cheqd_noded_docker tendermint show-validator)" > node_val_pubkey.txt
 
@@ -64,8 +64,8 @@ mkdir $OPERATORS_HOME
 pushd $OPERATORS_HOME
 
 echo "Initializing genesis..."
-cheqd_noded_docker init dummy_node --chain-id $CHAIN_ID
-sudo chown -R $USER:$USER .
+cheqd_noded_docker_init dummy_node --chain-id $CHAIN_ID
+# sudo chown -R $USER:$USER .
 sed -i $sed_extension 's/"stake"/"ncheq"/' .cheqdnode/config/genesis.json
 
 echo "Generating operator keys..."
@@ -73,7 +73,7 @@ echo "Generating operator keys..."
 for ((i=0 ; i<$VALIDATORS_COUNT ; i++))
 do
     cheqd_noded_docker keys add "operator$i" --keyring-backend "test"
-    sudo chown -R $USER:$USER .
+    # sudo chown -R $USER:$USER .
 done
 
 echo "Creating genesis accounts..."
@@ -130,8 +130,8 @@ do
     pushd $NODE_HOME
 
     echo "##### [Observer $i] Generating keys..."
-    cheqd_noded_docker init "node$i" --chain-id $CHAIN_ID
-    sudo chown -R $USER:$USER .
+    cheqd_noded_docker_init "node$i" --chain-id $CHAIN_ID
+    # sudo chown -R $USER:$USER .
 
     echo "##### [Observer $i] Exporting public keys..."
     echo "$(cheqd_noded_docker tendermint show-node-id)" > node_id.txt

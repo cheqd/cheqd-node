@@ -4,12 +4,6 @@
 
 set -euox pipefail
 
-if [ "$#" -eq 1 ] ; then
-    MOUNT_POINT="$1"
-else
-    MOUNT_POINT="."
-fi
-
 # cheqd_noded docker wrapper
 
 cheqd_noded_docker() {

@@ -18,8 +18,17 @@ cheqd_noded_docker() {
   docker run --rm \
     -v "$(pwd)":"/cheqd" \
     --network host \
+    ghcr.io/cheqd/cheqd-node:${CHEQD_VERSION_FROM} "$@"
+}
+
+# cheqd-noded docker wrapper for init purposes. It's needed because of "permission denied" issue on github runners
+
+cheqd_noded_docker_init() {
+  docker run --rm \
+    -v "$(pwd)":"/cheqd" \
+    --network host \
     -u root \
-    ghcr.io/cheqd/cheqd-node:${CHEQD_VERSION_FROM} "$@" --home /cheqd/.cheqdnode
+    ghcr.io/cheqd/cheqd-node:${CHEQD_VERSION_FROM} init "$@" --home /cheqd/.cheqdnode
 }
 
 # Parameters
@@ -37,8 +46,11 @@ function docker_exec () {
 function docker_compose_up () {
     CURR_DIR=$(pwd)
     MOUNT_POINT="$2"
-    pushd $DOCKER_COMPOSE_DIR
-    CHEQD_VERSION="$1" MOUNT_POINT=$MOUNT_POINT bash run_docker.sh $MOUNT_POINT
+    pushd "node_configs/node0"
+    export NODE_0_ID=$(cheqd_noded_docker tendermint show-node-id | sed 's/\r//g')
+    export CHEQD_VERSION="$1"
+    export MOUNT_POINT=$MOUNT_POINT
+    docker-compose -f ../../$DOCKER_COMPOSE_DIR/docker-compose.yml --env-file ../../$DOCKER_COMPOSE_DIR/.env up -d
     pushd $CURR_DIR
 }
 
