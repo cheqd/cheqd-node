@@ -33,7 +33,7 @@ cheqd_noded_docker() {
     -v "$(pwd)":"/cheqd" \
     --network host \
     -u root \
-    ghcr.io/cheqd/cheqd-node:${CHEQD_VERSION_FROM} init "$@" --home /cheqd/.cheqdnode
+    ghcr.io/cheqd/cheqd-node:${CHEQD_VERSION_FROM} "$@" --home /cheqd/.cheqdnode
 }
 
 VALIDATORS_COUNT="4"
