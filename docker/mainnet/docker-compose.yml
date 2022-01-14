@@ -2,9 +2,12 @@ version: '3.7'
 
 services:
   cheqd_node:
-    image: ghcr.io/cheqd/cheqd-node:${CHEQD_MAINNET_VERSION}
+    image: ghcr.io/cheqd/cheqd-node:${CHEQD_NODE_VERSION}
     user: cheqd
-    ports: # target -> port inside container, published -> port on the host
+    configs:
+      - source: genesis
+        target: /genesis
+    ports:
       # REQUIRED: Tendermint peer-to-peer (P2P) port
       # Please do not change this unless you've also changed this in the external-address parameter in Tendermint config
       - target: 26656 
@@ -14,26 +17,26 @@ services:
       # RECOMMENDED: Tendermint RPC port
       # Required if you want to use chqed-noded CLI directly from the host
       - target: 26657
-        published: ${TM_RPC_PORT}
+        published: ${TM_RPC_API_PORT}
         protocol: tcp
         mode: host
       # OPTIONAL: Cosmos REST API port
       # Only required if you plan on targetting REST API requests at your own node
       - target: 1317 
-        published: ${TM_REST_API_PORT}
+        published: ${COSMOS_REST_API_PORT}
         protocol: tcp
         mode: host
       # RECOMMENDED: gRPC port
       # Tendermint RPC requests (define above) are relayed to the gRPC port inside the container
       # The Cosmos gRPC API has endpoints not otherwise available in Tendermint RPC and Cosmos REST API
       - target: 9090
-        published: ${TM_GRPC_SERVER_PORT}
+        published: ${COSMOS_GRPC_API_PORT}
         protocol: tcp
         mode: host
       # OPTIONAL: gRPC-Gateway port
       # gRPC-Gateway provides a RESTful interface to relay requests to gRPC API
       - target: 9091
-        published: ${TM_GRPC_API_GATEWAY_PORT}
+        published: ${COSMOS_GRPC_GATEWAY_API_PORT}
         protocol: tcp
         mode: host
       # OPTIONAL: Prometheus metrics port
@@ -47,11 +50,16 @@ services:
       - mainnet-container.env
     volumes:
       - type: volume
-        source: $(CHEQD_DOCKER_VOLUME_SOURCE) # Defaults to cheqd_volume, defined below
+        source: ${CHEQD_DOCKER_VOLUME_SOURCE} # Defaults to cheqd_volume, defined below
         target: /home/cheqd # Do NOT change mount point inside the container unless rebuilding the image
     entrypoint: "node-runner"
 
+configs:
+  genesis:
+    file: ../../persistent_chains/${CHEQD_NETWORK}/genesis.json
+
 volumes:
   cheqd_volume:
+    name: cheqd_volume_${CHEQD_NETWORK}
     driver: ${CHEQD_DOCKER_VOLUME_DRIVER}
     external: ${CHEQD_DOCKER_VOLUME_IS_EXTERNAL}
