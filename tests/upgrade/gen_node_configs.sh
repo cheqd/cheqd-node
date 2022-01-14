@@ -124,7 +124,6 @@ do
     NODE_HOME="observer$i"
 
     mkdir $NODE_HOME
-    sudo chmod -R 777 $NODE_HOME
     pushd $NODE_HOME
 
     echo "##### [Observer $i] Generating keys..."
