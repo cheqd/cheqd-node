@@ -62,5 +62,5 @@ function local_client_exec () {
 }
 
 function make_777 () {
-    chmod -R 777 node_configs
+    sudo chmod -R 777 node_configs
 }
