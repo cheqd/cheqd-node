@@ -42,7 +42,7 @@ function docker_compose_up () {
     export NODE_0_ID=$(cheqd_noded_docker tendermint show-node-id | sed 's/\r//g')
     export CHEQD_VERSION="$1"
     export MOUNT_POINT=$MOUNT_POINT
-    docker-compose -f ../../$DOCKER_COMPOSE_DIR/docker-compose.yml --env-file ../../$DOCKER_COMPOSE_DIR/.env up
+    docker-compose -f ../../$DOCKER_COMPOSE_DIR/docker-compose.yml --env-file ../../$DOCKER_COMPOSE_DIR/.env up -d
     pushd $CURR_DIR
 }
 
