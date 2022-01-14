@@ -10,6 +10,9 @@ bash ../networks/wait_for_chain.sh $UPGRADE_HEIGHT $(echo "2*$VOTING_PERIOD" | b
 # Stop docker-compose service
 docker_compose_down
 
+# wait for graceful downing
+sleep 10
+
 # Start docker-compose with new base image on new version
 docker_compose_up $CHEQD_VERSION_TO $(pwd) debug
 
