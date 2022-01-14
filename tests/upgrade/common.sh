@@ -18,6 +18,7 @@ cheqd_noded_docker() {
   docker run --rm \
     -v "$(pwd)":"/cheqd" \
     --network host \
+    --privileged \
     ghcr.io/cheqd/cheqd-node:${CHEQD_VERSION_FROM} "$@"
 }
 
@@ -43,7 +44,7 @@ function docker_compose_up () {
 
 # Stop docker-compose
 function docker_compose_down () {
-    docker-compose -f $DOCKER_COMPOSE_DIR/docker-compose.yml down
+    docker-compose -f $DOCKER_COMPOSE_DIR/docker-compose.yml --env-file $DOCKER_COMPOSE_DIR/.env down 
 }
 
 # Clean environment
