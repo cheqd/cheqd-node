@@ -341,13 +341,13 @@ jobs:
 
       - name: Prepare nodes for checking upgrade
         working-directory: ./tests/upgrade
-        run: bash prepare.sh
+        run: bash prepare.sh && bash initiate_upgrade.sh && bash upgrade_and_check.sh
 
-      - name: Initiate the upgrade process
-        working-directory: ./tests/upgrade
-        run: bash initiate_upgrade.sh
+      # - name: Initiate the upgrade process
+      #   working-directory: ./tests/upgrade
+      #   run: bash initiate_upgrade.sh
 
-      - name: Make the upgrade and check results
-        working-directory: ./tests/upgrade
-        run: bash upgrade_and_check.sh
+      # - name: Make the upgrade and check results
+      #   working-directory: ./tests/upgrade
+      #   run: bash upgrade_and_check.sh
 
