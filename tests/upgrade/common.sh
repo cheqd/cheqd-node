@@ -19,7 +19,7 @@ cheqd_noded_docker() {
     -v "$(pwd)":"/cheqd" \
     --network host \
     -u root \
-    -w /cheqd \
+    -e HOME=/cheqd \
     ghcr.io/cheqd/cheqd-node:${CHEQD_VERSION_FROM} "$@"
 }
 
