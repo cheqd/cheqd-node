@@ -60,3 +60,7 @@ function clean_env () {
 function local_client_exec () {
     cheqd_noded_docker "$@" --home node_configs/client/.cheqdnode/ --keyring-backend test
 }
+
+function make_777 () {
+    chmod -R 777 node_configs
+}

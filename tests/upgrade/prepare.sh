@@ -13,5 +13,8 @@ clean_env
 # Generate config files
 bash gen_node_configs.sh
 
+# Make all the data accessable
+make_777
+
 # Start the network on version which will be upgraded from
 docker_compose_up $CHEQD_VERSION_FROM $(pwd)
