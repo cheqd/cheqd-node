@@ -11,7 +11,7 @@ bash ../networks/wait_for_chain.sh $UPGRADE_HEIGHT $(echo "2*$VOTING_PERIOD" | b
 docker_compose_down
 
 # Start docker-compose with new base image on new version
-docker_compose_up $CHEQD_VERSION_TO $(pwd)
+docker_compose_up $CHEQD_VERSION_TO $(pwd) debug
 
 # Check that upgrade was successful
 
