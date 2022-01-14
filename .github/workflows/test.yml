@@ -336,6 +336,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Chown for current user
+        run: sudo chown $USER:$USER .
+
       - name: Prepare nodes for checking upgrade
         working-directory: ./tests/upgrade
         run: bash prepare.sh
