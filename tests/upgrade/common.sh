@@ -21,16 +21,6 @@ cheqd_noded_docker() {
     ghcr.io/cheqd/cheqd-node:${CHEQD_VERSION_FROM} "$@"
 }
 
-# cheqd-noded docker wrapper for init purposes. It's needed because of "permission denied" issue on github runners
-
-cheqd_noded_docker_init() {
-  docker run --rm \
-    -v "$(pwd)":"/cheqd" \
-    --network host \
-    -u root \
-    ghcr.io/cheqd/cheqd-node:${CHEQD_VERSION_FROM} init "$@" --home /cheqd/.cheqdnode
-}
-
 # Parameters
 # $1 - Name of container to run command inside
 # $2 - The full command to run

@@ -27,6 +27,14 @@ edit_genesis () {
     jq "${PARAMETER_NAME} = \"${VALUE}\"" $GENESIS_PATH > /tmp/1 && mv /tmp/1 $GENESIS_PATH
 }
 
+# We use local copy of this function because of using -u root for allowing files creation inside the docker container
+cheqd_noded_docker() {
+  docker run --rm \
+    -v "$(pwd)":"/cheqd" \
+    --network host \
+    -u root \
+    ghcr.io/cheqd/cheqd-node:${CHEQD_VERSION_FROM} init "$@" --home /cheqd/.cheqdnode
+}
 
 VALIDATORS_COUNT="4"
 OBSERVERS_COUNT="2"
@@ -46,7 +54,7 @@ do
 
     echo "[Validator $i] Generating key..."
 
-    cheqd_noded_docker_init "node$i" --chain-id $CHAIN_ID
+    cheqd_noded_docker "node$i" --chain-id $CHAIN_ID
     sudo chown -R $USER:$USER .
     echo "$(cheqd_noded_docker tendermint show-node-id)" > node_id.txt
     echo "$(cheqd_noded_docker tendermint show-validator)" > node_val_pubkey.txt
@@ -64,7 +72,7 @@ mkdir $OPERATORS_HOME
 pushd $OPERATORS_HOME
 
 echo "Initializing genesis..."
-cheqd_noded_docker_init dummy_node --chain-id $CHAIN_ID
+cheqd_noded_docker dummy_node --chain-id $CHAIN_ID
 sudo chown -R $USER:$USER .
 sed -i $sed_extension 's/"stake"/"ncheq"/' .cheqdnode/config/genesis.json
 
@@ -130,7 +138,7 @@ do
     pushd $NODE_HOME
 
     echo "##### [Observer $i] Generating keys..."
-    cheqd_noded_docker_init "node$i" --chain-id $CHAIN_ID
+    cheqd_noded_docker "node$i" --chain-id $CHAIN_ID
     sudo chown -R $USER:$USER .
 
     echo "##### [Observer $i] Exporting public keys..."
