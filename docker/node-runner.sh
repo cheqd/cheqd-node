@@ -12,8 +12,8 @@ if [ ! -d "${CHEQD_ROOT_DIR}/config" ]
 then
     echo "Node config not found. Initializing."
     cheqd-noded init $NODE_MONIKER
-	curl -sSL "https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/${NETWORK}/genesis.json" > ${CHEQD_ROOT_DIR}/config/genesis.json
-	curl -sSL "https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/${NETWORK}/seeds.txt" > ${CHEQD_ROOT_DIR}/config/seeds.txt
+	cp /genesis ${CHEQD_ROOT_DIR}/config/genesis.json
+    cp /seeds ${CHEQD_ROOT_DIR}/config/seeds.txt
     cheqd-noded configure p2p seeds $(cat ${CHEQD_ROOT_DIR}/config/seeds.txt)
 else
     echo "Node config exists. Skipping initialization."
