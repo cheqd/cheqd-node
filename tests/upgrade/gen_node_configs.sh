@@ -42,7 +42,6 @@ for ((i=0 ; i<$VALIDATORS_COUNT ; i++))
 do
     NODE_HOME="node$i"
     mkdir $NODE_HOME
-    sudo chmod -R 777 $NODE_HOME
     pushd $NODE_HOME
 
     echo "[Validator $i] Generating key..."
