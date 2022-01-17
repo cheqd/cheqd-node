@@ -333,8 +333,17 @@ jobs:
   run-upgrade-test-positive-case:
     name: Run positive case for upgrade
     runs-on: ubuntu-20.04
+    needs: build-node-image
     steps:
       - uses: actions/checkout@v2
+
+      - name: Download testnet image
+        uses: actions/download-artifact@v2
+        with:
+          name: cheqd-testnet-image.tar
+
+      - name: Load testnet image
+        run: docker load -i cheqd-testnet-image.tar
 
       - name: Chown for current user
         run: sudo chown $USER:$USER .
