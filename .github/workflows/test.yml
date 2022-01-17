@@ -231,6 +231,13 @@ jobs:
       - name: Restore binary permissions
         run: sudo chmod +x /home/runner/.local/bin/cheqd-noded
 
+      - name: Download node image
+        uses: actions/download-artifact@v2
+        with:
+          name: cheqd-node-image.tar
+
+      - name: Load node image
+        run: docker load -i cheqd-node-image.tar
 
       - uses: actions/checkout@v2
 
@@ -329,7 +336,7 @@ jobs:
     needs: build-node-image
     steps:
       - uses: actions/checkout@v2
-      
+
       - name: Download node image
         uses: actions/download-artifact@v2
         with:
