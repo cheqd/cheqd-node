@@ -17,4 +17,4 @@ bash gen_node_configs.sh
 make_777
 
 # Start the network on version which will be upgraded from
-docker_compose_up $CHEQD_VERSION_FROM $(pwd)
+docker_compose_up "${CHEQD_IMAGE_FROM}" $(pwd)

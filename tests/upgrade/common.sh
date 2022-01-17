@@ -1,7 +1,8 @@
 set -euox pipefail
 
 DOCKER_COMPOSE_DIR="../networks/docker_compose"
-CHEQD_VERSION_FROM="v0.3.1"
+CHEQD_IMAGE_FROM="ghcr.io/cheqd/cheqd-node:v0.3.1"
+CHEQD_IMAGE_TO="cheqd-node"
 CHEQD_VERSION_TO="0.4.0"
 UPGRADE_NAME="v0.4"
 VOTING_PERIOD=30
@@ -20,7 +21,7 @@ cheqd_noded_docker() {
     --network host \
     -u root \
     -e HOME=/cheqd \
-    ghcr.io/cheqd/cheqd-node:${CHEQD_VERSION_FROM} "$@"
+    ${CHEQD_IMAGE_FROM} "$@"
 }
 
 # Parameters
@@ -40,8 +41,7 @@ function docker_compose_up () {
     MOUNT_POINT="$2"
     pushd "node_configs/node0"
     export NODE_0_ID=$(cheqd_noded_docker tendermint show-node-id | sed 's/\r//g')
-    export CHEQD_VERSION="$1"
-    export CHEQD_IMAGE_NAME="ghcr.io/cheqd/cheqd-node:${CHEQD_VERSION}"
+    export CHEQD_IMAGE_NAME="$1"
     export MOUNT_POINT=$MOUNT_POINT
     docker-compose -f ../../$DOCKER_COMPOSE_DIR/docker-compose.yml --env-file ../../$DOCKER_COMPOSE_DIR/.env up -d
     pushd $CURR_DIR

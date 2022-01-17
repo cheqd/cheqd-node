@@ -14,7 +14,7 @@ docker_compose_down
 make_777
 
 # Start docker-compose with new base image on new version
-docker_compose_up $CHEQD_VERSION_TO $(pwd)
+docker_compose_up "$CHEQD_IMAGE_TO" $(pwd)
 
 # Check that upgrade was successful
 
