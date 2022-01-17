@@ -21,7 +21,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     sed_extension='.orig'
 fi
 
-pushd "./node_configs/node0"
+pushd "node_configs/node0"
 
 export NODE_0_ID=$(cheqd_noded_docker tendermint show-node-id | sed 's/\r//g')
 

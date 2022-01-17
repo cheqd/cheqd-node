@@ -27,3 +27,9 @@ if [ $CURRENT_VERSION != $CHEQD_VERSION_TO ] ; then
      echo "Upgrade to version $CHEQD_VERSION_TO was not successful"
      exit 1
 fi
+
+# Stop docker compose
+docker_compose_down
+
+# Clean environment after test
+clean_env
