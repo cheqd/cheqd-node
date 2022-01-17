@@ -231,13 +231,6 @@ jobs:
       - name: Restore binary permissions
         run: sudo chmod +x /home/runner/.local/bin/cheqd-noded
 
-      - name: Download node image
-        uses: actions/download-artifact@v2
-        with:
-          name: cheqd-node-image.tar
-
-      - name: Load node image
-        run: docker load -i cheqd-node-image.tar
 
       - uses: actions/checkout@v2
 
@@ -276,7 +269,7 @@ jobs:
         run: docker load -i cheqd-testnet-image.tar
 
       - uses: actions/checkout@v2
-      
+
       - name: Run test net container
         run: |
           docker run -d --rm -p "26657:26657" cheqd-testnet
@@ -336,14 +329,14 @@ jobs:
     needs: build-node-image
     steps:
       - uses: actions/checkout@v2
-
-      - name: Download testnet image
+      
+      - name: Download node image
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-testnet-image.tar
+          name: cheqd-node-image.tar
 
-      - name: Load testnet image
-        run: docker load -i cheqd-testnet-image.tar
+      - name: Load node image
+        run: docker load -i cheqd-node-image.tar
 
       - name: Chown for current user
         run: sudo chown $USER:$USER .
