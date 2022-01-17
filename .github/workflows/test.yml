@@ -267,8 +267,6 @@ jobs:
     runs-on: ubuntu-20.04
     needs: build-testnet-image
     steps:
-      - uses: actions/checkout@v2
-
       - name: Download testnet image
         uses: actions/download-artifact@v2
         with:
@@ -277,6 +275,8 @@ jobs:
       - name: Load testnet image
         run: docker load -i cheqd-testnet-image.tar
 
+      - uses: actions/checkout@v2
+      
       - name: Run test net container
         run: |
           docker run -d --rm -p "26657:26657" cheqd-testnet
