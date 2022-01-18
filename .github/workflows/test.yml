@@ -252,7 +252,6 @@ jobs:
         working-directory: ./tests/e2e
         run: |
           pip3 install -r requirements.txt >> /dev/null
-          pip3 install --force-reinstall 'git+https://gitlab.com/evernym/verity/vdr-tools.git@cheqd-node-0.3.1#egg=vdr-tools&subdirectory=wrappers/python' -U
           cp -R ${NODE_CONFIGS_BASE}/client/.cheqdnode /home/runner/
           sudo chmod -R 777 /home/runner
 
