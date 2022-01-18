@@ -7,10 +7,6 @@ import string
 import json
 import time
 
-from vdrtools import wallet
-from vdrtools import cheqd_keys, cheqd_pool, cheqd_ledger
-from vdrtools.error import CommonInvalidStructure
-
 IMPLICIT_TIMEOUT = 30
 ENCODING = "utf-8"
 READ_BUFFER = 6000
@@ -72,13 +68,13 @@ def get_balance(address, network_destination):
     return balance
 
 
-async def get_balance_vdr(pool_alias, address):
-    request = await cheqd_ledger.bank.build_query_balance(address, DENOM)
-    res = await cheqd_pool.abci_query(pool_alias, request)
-    res = await cheqd_ledger.bank.parse_query_balance_resp(res)
-    sender_balance = json.loads(res)["balance"]["amount"]
+# async def get_balance_vdr(pool_alias, address):
+#     request = await cheqd_ledger.bank.build_query_balance(address, DENOM)
+#     res = await cheqd_pool.abci_query(pool_alias, request)
+#     res = await cheqd_ledger.bank.parse_query_balance_resp(res)
+#     sender_balance = json.loads(res)["balance"]["amount"]
 
-    return sender_balance
+#     return sender_balance
 
 
 def send_with_note(note):
@@ -93,69 +89,69 @@ def send_with_note(note):
     return tx_hash, note
 
 
-async def send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, msg, memo):
-    account_number, sequence_number = await get_base_account_number_and_sequence(pool_alias, sender_address)
-    timeout_height = await get_timeout_height(pool_alias)
-    test_tx = await cheqd_ledger.auth.build_tx(
-        pool_alias, public_key, msg, account_number, sequence_number, GAS_AMOUNT, GAS_AMOUNT*GAS_PRICE, DENOM, sender_address, timeout_height, memo
-    )
-    request = await cheqd_ledger.tx.build_query_simulate(test_tx)
-    response = await cheqd_pool.abci_query(pool_alias, request)
-    response = await cheqd_ledger.tx.parse_query_simulate_resp(response)
-    gas_estimation = json.loads(response)["gas_info"]["gas_used"]
-    fees = int(gas_estimation*MAX_GAS_MAGIC_NUMBER*GAS_PRICE)
-    prod_tx = await cheqd_ledger.auth.build_tx(
-        pool_alias, public_key, msg, account_number, sequence_number, int(gas_estimation*MAX_GAS_MAGIC_NUMBER), fees, DENOM, SENDER_ADDRESS, timeout_height, memo
-    )
-    tx_signed = await cheqd_ledger.auth.sign_tx(wallet_handle, key_alias, prod_tx)
-    res = json.loads(await cheqd_pool.broadcast_tx_commit(pool_alias, tx_signed))
-    tx_hash = res["hash"]
+# async def send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, msg, memo):
+#     account_number, sequence_number = await get_base_account_number_and_sequence(pool_alias, sender_address)
+#     timeout_height = await get_timeout_height(pool_alias)
+#     test_tx = await cheqd_ledger.auth.build_tx(
+#         pool_alias, public_key, msg, account_number, sequence_number, GAS_AMOUNT, GAS_AMOUNT*GAS_PRICE, DENOM, sender_address, timeout_height, memo
+#     )
+#     request = await cheqd_ledger.tx.build_query_simulate(test_tx)
+#     response = await cheqd_pool.abci_query(pool_alias, request)
+#     response = await cheqd_ledger.tx.parse_query_simulate_resp(response)
+#     gas_estimation = json.loads(response)["gas_info"]["gas_used"]
+#     fees = int(gas_estimation*MAX_GAS_MAGIC_NUMBER*GAS_PRICE)
+#     prod_tx = await cheqd_ledger.auth.build_tx(
+#         pool_alias, public_key, msg, account_number, sequence_number, int(gas_estimation*MAX_GAS_MAGIC_NUMBER), fees, DENOM, SENDER_ADDRESS, timeout_height, memo
+#     )
+#     tx_signed = await cheqd_ledger.auth.sign_tx(wallet_handle, key_alias, prod_tx)
+#     res = json.loads(await cheqd_pool.broadcast_tx_commit(pool_alias, tx_signed))
+#     tx_hash = res["hash"]
 
-    return res, tx_hash, fees
-
-
-async def send_tx_helper_alt(pool_alias, wallet_handle, key_alias, public_key, sender_address, msg, memo):
-    account_number, sequence_number = await get_base_account_number_and_sequence(pool_alias, sender_address)
-    timeout_height = await get_timeout_height(pool_alias)
-    tx = await cheqd_ledger.auth.build_tx(
-        pool_alias, public_key, msg, account_number, sequence_number, GAS_AMOUNT, GAS_AMOUNT*GAS_PRICE, DENOM, sender_address, timeout_height, memo
-    )
-    tx_signed = await cheqd_ledger.auth.sign_tx(wallet_handle, key_alias, tx)
-    res = json.loads(await cheqd_pool.broadcast_tx_commit(pool_alias, tx_signed))
-    tx_hash = res["hash"]
-
-    return res, tx_hash
+#     return res, tx_hash, fees
 
 
-async def get_tx_helper(pool_alias, tx_hash):
-    request = await cheqd_ledger.tx.build_query_get_tx_by_hash(tx_hash)
-    res = await cheqd_pool.abci_query(pool_alias, request)
-    res = json.loads(await cheqd_ledger.tx.parse_query_get_tx_by_hash_resp(res))
+# async def send_tx_helper_alt(pool_alias, wallet_handle, key_alias, public_key, sender_address, msg, memo):
+#     account_number, sequence_number = await get_base_account_number_and_sequence(pool_alias, sender_address)
+#     timeout_height = await get_timeout_height(pool_alias)
+#     tx = await cheqd_ledger.auth.build_tx(
+#         pool_alias, public_key, msg, account_number, sequence_number, GAS_AMOUNT, GAS_AMOUNT*GAS_PRICE, DENOM, sender_address, timeout_height, memo
+#     )
+#     tx_signed = await cheqd_ledger.auth.sign_tx(wallet_handle, key_alias, tx)
+#     res = json.loads(await cheqd_pool.broadcast_tx_commit(pool_alias, tx_signed))
+#     tx_hash = res["hash"]
 
-    return res
-
-
-async def create_did_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, fqdid, vk, memo):
-    req = await cheqd_ledger.cheqd.build_msg_create_did(fqdid, vk)
-    signed_req = await cheqd_ledger.cheqd.sign_msg_write_request(wallet_handle, fqdid, bytes(req))
-    res, _, _ = await send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, bytes(signed_req), memo)
-
-    return res
+#     return res, tx_hash
 
 
-async def query_did_helper(pool_alias, fqdid):
-    req = await cheqd_ledger.cheqd.build_query_get_did(fqdid)
-    res = await cheqd_pool.abci_query(pool_alias, req)
+# async def get_tx_helper(pool_alias, tx_hash):
+#     request = await cheqd_ledger.tx.build_query_get_tx_by_hash(tx_hash)
+#     res = await cheqd_pool.abci_query(pool_alias, request)
+#     res = json.loads(await cheqd_ledger.tx.parse_query_get_tx_by_hash_resp(res))
 
-    return res
+#     return res
 
 
-async def update_did_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, fqdid, new_vk, version_id, memo):
-    req = await cheqd_ledger.cheqd.build_msg_update_did(fqdid, new_vk, version_id)
-    signed_req = await cheqd_ledger.cheqd.sign_msg_write_request(wallet_handle, fqdid, bytes(req))
-    res, _, _ = await send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, bytes(signed_req), memo)
+# async def create_did_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, fqdid, vk, memo):
+#     req = await cheqd_ledger.cheqd.build_msg_create_did(fqdid, vk)
+#     signed_req = await cheqd_ledger.cheqd.sign_msg_write_request(wallet_handle, fqdid, bytes(req))
+#     res, _, _ = await send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, bytes(signed_req), memo)
 
-    return res
+#     return res
+
+
+# async def query_did_helper(pool_alias, fqdid):
+#     req = await cheqd_ledger.cheqd.build_query_get_did(fqdid)
+#     res = await cheqd_pool.abci_query(pool_alias, req)
+
+#     return res
+
+
+# async def update_did_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, fqdid, new_vk, version_id, memo):
+#     req = await cheqd_ledger.cheqd.build_msg_update_did(fqdid, new_vk, version_id)
+#     signed_req = await cheqd_ledger.cheqd.sign_msg_write_request(wallet_handle, fqdid, bytes(req))
+#     res, _, _ = await send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, bytes(signed_req), memo)
+
+#     return res
 
 
 def set_up_operator():
@@ -170,35 +166,35 @@ def set_up_operator():
     return name, address, pubkey
 
 
-async def wallet_helper(wallet_id=None, wallet_key="", wallet_key_derivation_method="ARGON2I_INT"):
-    if not wallet_id:
-        wallet_id = random_string(25)
-    wallet_config = json.dumps({"id": wallet_id})
-    wallet_credentials = json.dumps({"key": wallet_key, "key_derivation_method": wallet_key_derivation_method})
-    await wallet.create_wallet(wallet_config, wallet_credentials)
-    wallet_handle = await wallet.open_wallet(wallet_config, wallet_credentials)
+# async def wallet_helper(wallet_id=None, wallet_key="", wallet_key_derivation_method="ARGON2I_INT"):
+#     if not wallet_id:
+#         wallet_id = random_string(25)
+#     wallet_config = json.dumps({"id": wallet_id})
+#     wallet_credentials = json.dumps({"key": wallet_key, "key_derivation_method": wallet_key_derivation_method})
+#     await wallet.create_wallet(wallet_config, wallet_credentials)
+#     wallet_handle = await wallet.open_wallet(wallet_config, wallet_credentials)
 
-    return wallet_handle, wallet_config, wallet_credentials
-
-
-async def get_base_account_number_and_sequence(pool_alias, account_id):
-    req = await cheqd_ledger.auth.build_query_account(account_id)
-    resp = await cheqd_pool.abci_query(pool_alias, req)
-    resp = await cheqd_ledger.auth.parse_query_account_resp(resp)
-    account = json.loads(resp)["account"]
-    base_account = account["value"]
-    account_number = base_account["account_number"]
-    account_sequence = base_account["sequence"]
-
-    return account_number, account_sequence
+#     return wallet_handle, wallet_config, wallet_credentials
 
 
-async def get_timeout_height(pool_alias):
-    TIMEOUT = 50
-    try:
-        info = await cheqd_pool.abci_info(pool_alias)
-        info = json.loads(info)
-        current_height = info["response"]["last_block_height"]
-        return int(current_height) + TIMEOUT
-    except CommonInvalidStructure:
-        return 150
+# async def get_base_account_number_and_sequence(pool_alias, account_id):
+#     req = await cheqd_ledger.auth.build_query_account(account_id)
+#     resp = await cheqd_pool.abci_query(pool_alias, req)
+#     resp = await cheqd_ledger.auth.parse_query_account_resp(resp)
+#     account = json.loads(resp)["account"]
+#     base_account = account["value"]
+#     account_number = base_account["account_number"]
+#     account_sequence = base_account["sequence"]
+
+#     return account_number, account_sequence
+
+
+# async def get_timeout_height(pool_alias):
+#     TIMEOUT = 50
+#     try:
+#         info = await cheqd_pool.abci_info(pool_alias)
+#         info = json.loads(info)
+#         current_height = info["response"]["last_block_height"]
+#         return int(current_height) + TIMEOUT
+#     except CommonInvalidStructure:
+#         return 150

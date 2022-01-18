@@ -261,38 +261,38 @@ jobs:
           export OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p | sed 's/\r//g')
           pytest -v -rP tests/e2e/test_cosmos.py
 
-  run-identity-tests-using-vdr:
-    name: Run identity tests using VDR
-    runs-on: ubuntu-20.04
-    needs: build-testnet-image
-    steps:
-      - uses: actions/checkout@v2
+  # run-identity-tests-using-vdr:
+  #   name: Run identity tests using VDR
+  #   runs-on: ubuntu-20.04
+  #   needs: build-testnet-image
+  #   steps:
+  #     - uses: actions/checkout@v2
 
-      - name: Download testnet image
-        uses: actions/download-artifact@v2
-        with:
-          name: cheqd-testnet-image.tar
+  #     - name: Download testnet image
+  #       uses: actions/download-artifact@v2
+  #       with:
+  #         name: cheqd-testnet-image.tar
 
-      - name: Load testnet image
-        run: docker load -i cheqd-testnet-image.tar
+  #     - name: Load testnet image
+  #       run: docker load -i cheqd-testnet-image.tar
 
-      - name: Run test net container
-        run: |
-          docker run -d --rm -p "26657:26657" cheqd-testnet
-          bash tests/networks/wait_for_chain.sh
+  #     - name: Run test net container
+  #       run: |
+  #         docker run -d --rm -p "26657:26657" cheqd-testnet
+  #         bash tests/networks/wait_for_chain.sh
       
-      - name: Set up test environment
-        working-directory: ./tests/e2e
-        run: |
-          sudo cp libindy.so /usr/lib/libindy.so
-          pip3 install -r requirements.txt >> /dev/null
-          pip3 install --force-reinstall 'git+https://gitlab.com/evernym/verity/vdr-tools.git@cheqd-node-0.3.1#egg=vdr-tools&subdirectory=wrappers/python' -U
+  #     - name: Set up test environment
+  #       working-directory: ./tests/e2e
+  #       run: |
+  #         sudo cp libindy.so /usr/lib/libindy.so
+  #         pip3 install -r requirements.txt >> /dev/null
+  #         pip3 install --force-reinstall 'git+https://gitlab.com/evernym/verity/vdr-tools.git@cheqd-node-0.3.1#egg=vdr-tools&subdirectory=wrappers/python' -U
       
-      - name: Run tests
-        run: |
-          export OP0_ADDRESS=""
-          export OP1_ADDRESS=""
-          pytest -v -rP tests/e2e/test_identity.py
+  #     - name: Run tests
+  #       run: |
+  #         export OP0_ADDRESS=""
+  #         export OP1_ADDRESS=""
+  #         pytest -v -rP tests/e2e/test_identity.py
 
   run-identity-tests-using-cli:
     name: Run identity tests using CLI
