@@ -894,7 +894,7 @@
                     "address": "cheqd1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3me90jx",
                     "coins": [
                         {
-                            "amount": "684554366409479548",
+                            "amount": "1424554366409479548",
                             "denom": "ncheq"
                         }
                     ]
@@ -1236,7 +1236,7 @@
                     "address": "cheqd1ed04uq0x3lfc8mhyau209pfgua2r4vhw5yygcn",
                     "coins": [
                         {
-                            "amount": "500152426897786937",
+                            "amount": "5001524268977869370",
                             "denom": "ncheq"
                         }
                     ]
@@ -1348,7 +1348,7 @@
             },
             "supply": [
                 {
-                    "amount": "1361088915612735886",
+                    "amount": "6602460757692818319",
                     "denom": "ncheq"
                 }
             ]
@@ -2950,7 +2950,7 @@
                 }
             ],
             "exported": true,
-            "last_total_power": "684554366408",
+            "last_total_power": "1424554366408",
             "last_validator_powers": [
                 {
                     "address": "cheqdvaloper1qkn9hxmm68q9nndq20mu405e3pcd2s502y8k3e",
@@ -3050,7 +3050,7 @@
                 },
                 {
                     "address": "cheqdvaloper1ed04uq0x3lfc8mhyau209pfgua2r4vhwtw6w73",
-                    "power": "40000000000"
+                    "power": "400000000000"
                 },
                 {
                     "address": "cheqdvaloper1ell8hlc659lnrg2mauzk5zfqmjfdzdpl95sfnh",
@@ -3062,7 +3062,7 @@
                 },
                 {
                     "address": "cheqdvaloper17rphjx2fevym05qknvd2fl9jskf8peche0ct9n",
-                    "power": "20000000000"
+                    "power": "400000000000"
                 },
                 {
                     "address": "cheqdvaloper17vhpdsw5l5p6xzfmwnel3d98amektf7vssnjjs",
@@ -4003,7 +4003,7 @@
                     "min_self_delegation": "1",
                     "operator_address": "cheqdvaloper1ed04uq0x3lfc8mhyau209pfgua2r4vhwtw6w73",
                     "status": "BOND_STATUS_BONDED",
-                    "tokens": "40000000000000000",
+                    "tokens": "400000000000000000",
                     "unbonding_height": "0",
                     "unbonding_time": "1970-01-01T00:00:00Z"
                 },
@@ -4119,7 +4119,7 @@
                     "min_self_delegation": "1",
                     "operator_address": "cheqdvaloper17rphjx2fevym05qknvd2fl9jskf8peche0ct9n",
                     "status": "BOND_STATUS_BONDED",
-                    "tokens": "20000000000000000",
+                    "tokens": "400000000000000000",
                     "unbonding_height": "0",
                     "unbonding_time": "1970-01-01T00:00:00Z"
                 },
@@ -4406,7 +4406,7 @@
         {
             "address": "0B91E3CE1F6720192AFC4261B0EE8BC3186EF4E8",
             "name": "cheqd",
-            "power": "40000000000",
+            "power": "400000000000",
             "pub_key": {
                 "type": "tendermint/PubKeyEd25519",
                 "value": "29j2cmO9QnsW49AHwGpfYc/f12mTrG95iHCSe4WkUf8="
@@ -4433,7 +4433,7 @@
         {
             "address": "1E159A1C5099828A147A217DE46F1E12BE762A4F",
             "name": "node1-ap-testnet-cheqd",
-            "power": "20000000000",
+            "power": "400000000000",
             "pub_key": {
                 "type": "tendermint/PubKeyEd25519",
                 "value": "2d9sY6WX4XRBYMZJQKd0zuwDu/6WT+v3QBg/pwuJlAM="
