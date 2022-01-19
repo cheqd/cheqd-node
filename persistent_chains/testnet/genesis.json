@@ -2751,7 +2751,152 @@
         },
         "params": null,
         "slashing": {
-            "missed_blocks": [],
+            "missed_blocks": [
+                {
+                    "address": "cheqdvalcons1qvqu7r84f7yr4s6prc2xaqnuf96sw298428lpq",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1q7c3t5gtdugq0hyf637a8xtrrzt7wxfxm9unku",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1pguvxey8wl7lpg576tvyscnky8f0ap3wsvmjad",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1pwg78nslvuspj2hugfsmpm5tcvvxaa8ga44qaa",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1pceq98p0dn00v85hh9rdct88h9xn4nursrjtat",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1plqeqvtvlhefyxce25lfegh9jja95auml0360n",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1rc2e58zsnxpg59r6y977gmc7z2l8v2j0z4nera",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1y93y5k52hte6zvq2dvtfnx2nz7aa07nym0rgn0",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons19np27wt46y5qsmwxw0xzqnzlqd7zlumrrgnt48",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons19cnekpdxduxkqekwrw2vdamkh33vqhlxpz4v9d",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1xas70642ez3eeq0semxppuc4qx832qfc3v4x5d",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1gqn0pn9ge35w7ful9cwhf9gv6mqpwh9qag4lvt",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1g6hr44q0fmwflhcyts8rm4ee9hgle28zc7aw3p",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1fg0v76r46t9hhm67vstezdn9a336d7dtfuud0n",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons12qwps6u776y6k8y6c0a7df2zg72mv3yfet64ss",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons12veuz3jkfucf0q6glvcr6zewqstnxc2n7n4nrv",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1t829cnry8c63gstu9xn64r38h425zerc8wcmwx",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1wadtml2mncg5ju7qnnlfzzthkm3eceszy3hf02",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons10gx3d7jdttgg6tlqqnvqy5pq03tqrrrexvunla",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons10elfywzdrzcpr09ahszcmyksph0g4ufp9ytf4w",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1svk3nyf9f3r79rla50n5hr5qntk6vqw7rysfdk",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1sjn2fkxlx92t6jhmxp6pdqmc6tkuwf3kf2c8gm",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons13vxmgqqvfdg3d6f8vwhg30en4wcswr4mz5kmnz",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1n9cj3y6ax2tw3rzv5cs46avze03jlav2v4q5wp",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons14jnhf8hrc20a0c0y78a4kkwkqh9ug2c3d86qwu",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1cg4pkd0u4vzfatle8cqt2f9rc5ppwe96jf0mft",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1cvwtkhsan0tn8dgusekrt7pvln5pqww5sppxe6",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1e2xsfegr5v9s886ypfr5nft9lcyf8c5g6v5eer",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1mh3phsks3lmw34p0vqwy2lfna6ptqtxwwsfuhd",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1uz8pnlu7azfu2e6wn4nt464xwqcvmr4mgev07r",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1uvegnxcg6dn0ek2xfxyd7aarrfq5uvu0t3hjda",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1u7pgt4um67wqmt30djlkh3glqmjsrtreyzrwpt",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1afd8tq32ful5udcr0qv36fyd8xwx70hfatgr22",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1anysqwl0sa0pjlumhwwaynpugcpp8fanvrxsgn",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1a6ffsq84qlffyvfm9vmrynnvuutnupdgv0tlzw",
+                    "missed_blocks": []
+                },
+                {
+                    "address": "cheqdvalcons1l3n7xeha7jacdfz43ncs2wk2wmnjlxj02x44ft",
+                    "missed_blocks": []
+                }
+            ],
             "params": {
                 "downtime_jail_duration": "600s",
                 "min_signed_per_window": "0.500000000000000000",
@@ -2759,7 +2904,404 @@
                 "slash_fraction_double_sign": "0.050000000000000000",
                 "slash_fraction_downtime": "0.010000000000000000"
             },
-            "signing_infos": []
+            "signing_infos": [
+                {
+                    "address": "cheqdvalcons1qvqu7r84f7yr4s6prc2xaqnuf96sw298428lpq",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1qvqu7r84f7yr4s6prc2xaqnuf96sw298428lpq",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1q7c3t5gtdugq0hyf637a8xtrrzt7wxfxm9unku",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1q7c3t5gtdugq0hyf637a8xtrrzt7wxfxm9unku",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1pguvxey8wl7lpg576tvyscnky8f0ap3wsvmjad",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1pguvxey8wl7lpg576tvyscnky8f0ap3wsvmjad",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1pwg78nslvuspj2hugfsmpm5tcvvxaa8ga44qaa",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1pwg78nslvuspj2hugfsmpm5tcvvxaa8ga44qaa",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1pceq98p0dn00v85hh9rdct88h9xn4nursrjtat",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1pceq98p0dn00v85hh9rdct88h9xn4nursrjtat",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1plqeqvtvlhefyxce25lfegh9jja95auml0360n",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1plqeqvtvlhefyxce25lfegh9jja95auml0360n",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1rc2e58zsnxpg59r6y977gmc7z2l8v2j0z4nera",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1rc2e58zsnxpg59r6y977gmc7z2l8v2j0z4nera",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1y93y5k52hte6zvq2dvtfnx2nz7aa07nym0rgn0",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1y93y5k52hte6zvq2dvtfnx2nz7aa07nym0rgn0",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons19np27wt46y5qsmwxw0xzqnzlqd7zlumrrgnt48",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons19np27wt46y5qsmwxw0xzqnzlqd7zlumrrgnt48",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons19cnekpdxduxkqekwrw2vdamkh33vqhlxpz4v9d",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons19cnekpdxduxkqekwrw2vdamkh33vqhlxpz4v9d",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1xas70642ez3eeq0semxppuc4qx832qfc3v4x5d",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1xas70642ez3eeq0semxppuc4qx832qfc3v4x5d",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1gqn0pn9ge35w7ful9cwhf9gv6mqpwh9qag4lvt",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1gqn0pn9ge35w7ful9cwhf9gv6mqpwh9qag4lvt",
+                        "index_offset": "0",
+                        "jailed_until": "2021-12-15T00:55:01.387786080Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1g6hr44q0fmwflhcyts8rm4ee9hgle28zc7aw3p",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1g6hr44q0fmwflhcyts8rm4ee9hgle28zc7aw3p",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1fg0v76r46t9hhm67vstezdn9a336d7dtfuud0n",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1fg0v76r46t9hhm67vstezdn9a336d7dtfuud0n",
+                        "index_offset": "0",
+                        "jailed_until": "2021-10-27T01:18:31.629621636Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons12qwps6u776y6k8y6c0a7df2zg72mv3yfet64ss",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons12qwps6u776y6k8y6c0a7df2zg72mv3yfet64ss",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons12veuz3jkfucf0q6glvcr6zewqstnxc2n7n4nrv",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons12veuz3jkfucf0q6glvcr6zewqstnxc2n7n4nrv",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1t829cnry8c63gstu9xn64r38h425zerc8wcmwx",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1t829cnry8c63gstu9xn64r38h425zerc8wcmwx",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1wadtml2mncg5ju7qnnlfzzthkm3eceszy3hf02",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1wadtml2mncg5ju7qnnlfzzthkm3eceszy3hf02",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons10gx3d7jdttgg6tlqqnvqy5pq03tqrrrexvunla",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons10gx3d7jdttgg6tlqqnvqy5pq03tqrrrexvunla",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons10elfywzdrzcpr09ahszcmyksph0g4ufp9ytf4w",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons10elfywzdrzcpr09ahszcmyksph0g4ufp9ytf4w",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1svk3nyf9f3r79rla50n5hr5qntk6vqw7rysfdk",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1svk3nyf9f3r79rla50n5hr5qntk6vqw7rysfdk",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1sjn2fkxlx92t6jhmxp6pdqmc6tkuwf3kf2c8gm",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1sjn2fkxlx92t6jhmxp6pdqmc6tkuwf3kf2c8gm",
+                        "index_offset": "0",
+                        "jailed_until": "2021-11-20T18:12:18.716305499Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons13vxmgqqvfdg3d6f8vwhg30en4wcswr4mz5kmnz",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons13vxmgqqvfdg3d6f8vwhg30en4wcswr4mz5kmnz",
+                        "index_offset": "0",
+                        "jailed_until": "2021-11-13T22:53:27.284357533Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1n9cj3y6ax2tw3rzv5cs46avze03jlav2v4q5wp",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1n9cj3y6ax2tw3rzv5cs46avze03jlav2v4q5wp",
+                        "index_offset": "0",
+                        "jailed_until": "2021-12-14T23:57:17.418920312Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons14jnhf8hrc20a0c0y78a4kkwkqh9ug2c3d86qwu",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons14jnhf8hrc20a0c0y78a4kkwkqh9ug2c3d86qwu",
+                        "index_offset": "0",
+                        "jailed_until": "2021-11-07T04:37:09.641652339Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1cg4pkd0u4vzfatle8cqt2f9rc5ppwe96jf0mft",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1cg4pkd0u4vzfatle8cqt2f9rc5ppwe96jf0mft",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1cvwtkhsan0tn8dgusekrt7pvln5pqww5sppxe6",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1cvwtkhsan0tn8dgusekrt7pvln5pqww5sppxe6",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1e2xsfegr5v9s886ypfr5nft9lcyf8c5g6v5eer",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1e2xsfegr5v9s886ypfr5nft9lcyf8c5g6v5eer",
+                        "index_offset": "0",
+                        "jailed_until": "2021-11-15T21:32:06.397614706Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1mh3phsks3lmw34p0vqwy2lfna6ptqtxwwsfuhd",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1mh3phsks3lmw34p0vqwy2lfna6ptqtxwwsfuhd",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1uz8pnlu7azfu2e6wn4nt464xwqcvmr4mgev07r",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1uz8pnlu7azfu2e6wn4nt464xwqcvmr4mgev07r",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1uvegnxcg6dn0ek2xfxyd7aarrfq5uvu0t3hjda",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1uvegnxcg6dn0ek2xfxyd7aarrfq5uvu0t3hjda",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1u7pgt4um67wqmt30djlkh3glqmjsrtreyzrwpt",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1u7pgt4um67wqmt30djlkh3glqmjsrtreyzrwpt",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1afd8tq32ful5udcr0qv36fyd8xwx70hfatgr22",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1afd8tq32ful5udcr0qv36fyd8xwx70hfatgr22",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1anysqwl0sa0pjlumhwwaynpugcpp8fanvrxsgn",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1anysqwl0sa0pjlumhwwaynpugcpp8fanvrxsgn",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1a6ffsq84qlffyvfm9vmrynnvuutnupdgv0tlzw",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1a6ffsq84qlffyvfm9vmrynnvuutnupdgv0tlzw",
+                        "index_offset": "0",
+                        "jailed_until": "2021-10-29T19:17:46.032515404Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                },
+                {
+                    "address": "cheqdvalcons1l3n7xeha7jacdfz43ncs2wk2wmnjlxj02x44ft",
+                    "validator_signing_info": {
+                        "address": "cheqdvalcons1l3n7xeha7jacdfz43ncs2wk2wmnjlxj02x44ft",
+                        "index_offset": "0",
+                        "jailed_until": "1970-01-01T00:00:00Z",
+                        "missed_blocks_counter": "0",
+                        "start_height": "0",
+                        "tombstoned": false
+                    }
+                }
+            ]
         },
         "staking": {
             "delegations": [
