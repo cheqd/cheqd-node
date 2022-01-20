@@ -79,7 +79,7 @@ jobs:
       - name: Set version
         id: set-version
         run: |
-          VERSION=$(build/cheqd-noded version)
+          VERSION=$(build/cheqd-noded version 2>&1)
           echo "::set-output name=VERSION::$VERSION"
 
   build-tar-package:

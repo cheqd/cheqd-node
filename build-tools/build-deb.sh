@@ -7,7 +7,7 @@ if [ -z ${1+x} ]; then
 fi
 
 BINARY_PATH="$1"
-VERSION=$("${BINARY_PATH}" version)
+VERSION=$("${BINARY_PATH}" version 2>&1)
 PKG_NAME="cheqd-node"
 
 BUILD_DIR="build"
