@@ -137,7 +137,7 @@ jobs:
           fetch-depth: 0 # Required to fetch version
 
       - name: Build
-        run: docker build -f docker/Dockerfile --no-cache -t cheqd-node
+        run: docker build -f docker/Dockerfile --no-cache -t cheqd-node .
 
       - name: Save
         run: docker save -o cheqd-node-image.tar cheqd-node
