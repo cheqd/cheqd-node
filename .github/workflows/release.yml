@@ -107,20 +107,15 @@ jobs:
       - name: Restore binary permissions
         run: sudo chmod +x cheqd-noded
 
-      - name: Make intermediate archive
-        working-directory: ./build-tools
-        run: |
-          ./build-deb.sh "../cheqd-noded"
-
       - name: Install fpm
         run: |
           sudo apt-get install ruby ruby-dev rubygems build-essential
           sudo gem install --no-document fpm
 
-      - name: Build Debian package # Depends on tar archive
+      - name: Make intermediate archive
         working-directory: ./build-tools
         run: |
-          ./build-deb.sh "cheqd-node"
+          ./build-deb.sh "../cheqd-noded"
 
       - name: Store Debian package artifact
         uses: actions/upload-artifact@v2
