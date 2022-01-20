@@ -102,8 +102,7 @@ jobs:
       - name: Build tar
         working-directory: ./build-tools
         run: |
-          ls -la #TODO: Remove me
-          ./build-tar.sh "./cheqd-noded"
+          ./build-tar.sh "../cheqd-noded"
 
       - name: Store tar package artifact
         uses: actions/upload-artifact@v2
@@ -136,7 +135,7 @@ jobs:
       - name: Build deb
         working-directory: ./build-tools
         run: |
-          ./build-deb.sh "cheqd-noded"
+          ./build-deb.sh "../cheqd-noded"
 
       - name: Store deb package artifact
         uses: actions/upload-artifact@v2

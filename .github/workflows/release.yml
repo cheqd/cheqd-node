@@ -82,7 +82,7 @@ jobs:
       - name: Build tar
         working-directory: ./build-tools
         run: |
-          ./build-tar.sh "cheqd-noded"
+          ./build-tar.sh "../cheqd-noded"
 
       - name: Store tar package artifact
         uses: actions/upload-artifact@v2
@@ -110,7 +110,7 @@ jobs:
       - name: Make intermediate archive
         working-directory: ./build-tools
         run: |
-          ./build-deb.sh "cheqd-noded"
+          ./build-deb.sh "../cheqd-noded"
 
       - name: Install fpm
         run: |
@@ -183,7 +183,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       VERSION: ${{ needs.build-binary.outputs.VERSION }}
-      TESTNET_IMAGE_NAME: "cheqd-testnet"
     steps:
       - name: Git checkout
         uses: actions/checkout@v2
@@ -217,10 +216,10 @@ jobs:
 
       - name: Push testnet image
         run: |
-          docker tag cheqd-testnet ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:${{ env.VERSION }}
-          docker tag cheqd-testnet ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:latest
-          docker push ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:${{ env.VERSION }}
-          docker push ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:latest
+          docker tag cheqd-testnet ghcr.io/${{ github.repository_owner }}/cheqd-testnet:${{ env.VERSION }}
+          docker tag cheqd-testnet ghcr.io/${{ github.repository_owner }}/cheqd-testnet:latest
+          docker push ghcr.io/${{ github.repository_owner }}/cheqd-testnet:${{ env.VERSION }}
+          docker push ghcr.io/${{ github.repository_owner }}/cheqd-testnet:latest
 
       - name: Download deb
         uses: actions/download-artifact@v2
