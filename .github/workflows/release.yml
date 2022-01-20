@@ -204,10 +204,10 @@ jobs:
 
       - name: Push node image
         run: |
-          docker tag cheqd-node ghcr.io/${{ env.GITHUB_REPOSITORY }}:${{ env.VERSION }}
-          docker tag cheqd-node ghcr.io/${{ env.GITHUB_REPOSITORY }}:latest
-          docker push ghcr.io/${{ env.GITHUB_REPOSITORY }}:${{ env.VERSION }}
-          docker push ghcr.io/${{ env.GITHUB_REPOSITORY }}:latest
+          docker tag cheqd-node ghcr.io/${{ github.repository }}:${{ env.VERSION }}
+          docker tag cheqd-node ghcr.io/${{ github.repository }}:latest
+          docker push ghcr.io/${{ github.repository }}:${{ env.VERSION }}
+          docker push ghcr.io/${{ github.repository }}:latest
 
       - name: Push testnet image
         run: |
