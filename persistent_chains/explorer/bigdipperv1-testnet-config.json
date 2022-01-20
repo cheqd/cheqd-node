@@ -48,6 +48,7 @@
     },
     "params":{
         "startHeight": 0,
+        "defaultBlockTime": 5000,
         "validatorUpdateWindow": 300,
         "blockInterval": 15000,
         "transactionsInterval": 18000,
