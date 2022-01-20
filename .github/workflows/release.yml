@@ -6,24 +6,12 @@ on:
       - "v*"
 
 jobs:
-  setup-workflow:
-    name: "Setup workflow"
-    runs-on: ubuntu-latest
-    outputs:
-      VERSION: ${{ steps.cache.outputs.VERSION }}
-    steps:
-      - name: Git checkout
-        uses: actions/checkout@v2
-
-      - name: Set outputs
-        id: cache
-        run: |
-          VERSION="${TAG:1}" # Remove first character
-          echo "::set-output name=VERSION::$VERSION"
 
   build-binary:
     name: Build binary
     runs-on: ubuntu-20.04
+    outputs:
+      VERSION: ${{ steps.set-version.outputs.VERSION }}
     steps:
       - name: Set up Go 1.17
         uses: actions/setup-go@v2
@@ -68,10 +56,18 @@ jobs:
           name: cheqd-noded
           path: build/cheqd-noded
 
+      - name: Set version
+        id: set-version
+        run: |
+          VERSION=$(build/cheqd-noded version)
+          echo "::set-output name=VERSION::$VERSION"
+
   build-tar-package:
     name: Build tar package
     runs-on: ubuntu-20.04
     needs: build-binary
+    env:
+      VERSION: ${{ needs.build-binary.outputs.VERSION }}
     steps:
       - uses: actions/checkout@v2
 
@@ -86,7 +82,7 @@ jobs:
       - name: Build tar
         working-directory: ./build-tools
         run: |
-          ./build-tar.sh "cheqd-noded" ${{ env.VERSION }}
+          ./build-tar.sh "cheqd-noded"
 
       - name: Store tar package artifact
         uses: actions/upload-artifact@v2
@@ -97,10 +93,9 @@ jobs:
   build-deb-package:
     name: Build Debian package
     runs-on: ubuntu-20.04
-    needs: [ build-binary, setup-workflow ]
+    needs: [ build-binary ]
     env:
-      PACKAGE_NAME: "cheqd-node"
-      VERSION: ${{ needs.setup-workflow.outputs.VERSION }}
+      VERSION: ${{ needs.build-binary.outputs.VERSION }}
     steps:
       - uses: actions/checkout@v2
 
@@ -115,7 +110,7 @@ jobs:
       - name: Make intermediate archive
         working-directory: ./build-tools
         run: |
-          ./build-tar.sh "cheqd-noded" ${{ env.VERSION }}
+          ./build-deb.sh "cheqd-noded"
 
       - name: Install fpm
         run: |
@@ -125,13 +120,13 @@ jobs:
       - name: Build Debian package # Depends on tar archive
         working-directory: ./build-tools
         run: |
-          ./build-deb.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }}
+          ./build-deb.sh "cheqd-node"
 
       - name: Store Debian package artifact
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
-          path: build-tools/output/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+          name: cheqd-node_${{ env.VERSION }}_amd64.deb
+          path: build-tools/output/cheqd-node_${{ env.VERSION }}_amd64.deb
 
   build-node-image:
     name: Build cheqd-node Docker image
@@ -139,7 +134,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 0 # FIXME: Starport requires full repository
+          fetch-depth: 0 # Required to fetch version
 
       - name: Build
         run: docker build -f docker/Dockerfile --no-cache -t cheqd-node
@@ -184,12 +179,10 @@ jobs:
   publish:
     name: "Publish images and release"
     # Reference to workflow-setup job is required to access its various outputs.
-    needs: [ setup-workflow, build-node-image, build-testnet-image, build-deb-package ]
+    needs: [ build-binary, build-node-image, build-testnet-image, build-deb-package, build-tar-package ]
     runs-on: ubuntu-latest
     env:
-      TAG: ${{ needs.setup-workflow.outputs.TAG }}
-      VERSION: ${{ needs.setup-workflow.outputs.VERSION }}
-      PACKAGE_NAME: "cheqd-node"
+      VERSION: ${{ needs.build-binary.outputs.VERSION }}
       TESTNET_IMAGE_NAME: "cheqd-testnet"
     steps:
       - name: Git checkout
@@ -232,18 +225,12 @@ jobs:
       - name: Download deb
         uses: actions/download-artifact@v2
         with:
-          name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+          name: cheqd-node_${{ env.VERSION }}_amd64.deb
 
-      - name: Load binary artifact
+      - name: Download tar
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-noded
-
-      - name: Restore binary permissions
-        run: sudo chmod +x cheqd-noded
-
-      - name: Make tar archive
-        run: tar -zcvf ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz cheqd-noded
+          name: cheqd-node_${{ env.VERSION }}.tar.gz
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -251,5 +238,5 @@ jobs:
           automatic_release_tag: "${{ env.GITHUB_REF_NAME }}"
           prerelease: true
           files: |
-            ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
-            ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+            cheqd-node_${{ env.VERSION }}_amd64.deb
+            cheqd-node_${{ env.VERSION }}.tar.gz

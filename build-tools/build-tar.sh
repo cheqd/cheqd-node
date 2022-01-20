@@ -6,12 +6,8 @@ if [ -z ${1+x} ]; then
   echo "Binary path must be passed as the first parameter"
 fi
 
-if [ -z ${2+x} ]; then
-  echo "Binary version must be passed as the second parameter"
-fi
-
 BINARY_PATH="$1"
-VERSION="$2"
+VERSION=$("${BINARY_PATH}" version)
 PKG_NAME="cheqd-node"
 
 BUILD_DIR="build"
