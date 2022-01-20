@@ -48,16 +48,15 @@
     },
     "params":{
         "startHeight": 0,
-        "defaultBlockTime": 5000,
-        "validatorUpdateWindow": 1000,
+        "validatorUpdateWindow": 300,
         "blockInterval": 15000,
-        "transactionsInterval": 15000,
+        "transactionsInterval": 18000,
         "keybaseFetchingInterval": 1800000,
         "consensusInterval": 1000,
-        "statusInterval": 5000,
+        "statusInterval":7500,
         "signingInfoInterval": 1800000,
         "proposalInterval": 5000,
         "missedBlocksInterval": 60000,
-        "delegationInterval": 60000
+        "delegationInterval": 900000
     }
 }
