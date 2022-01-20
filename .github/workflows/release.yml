@@ -87,7 +87,7 @@ jobs:
       - name: Store tar package artifact
         uses: actions/upload-artifact@v2
         with:
-          name: cheqd-node_${{ env.VERSION }}.deb
+          name: cheqd-node_${{ env.VERSION }}.tar.gz
           path: build-tools/output/cheqd-node_${{ env.VERSION }}.tar.gz
 
   build-deb-package:
