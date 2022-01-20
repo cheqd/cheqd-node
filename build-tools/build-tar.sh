@@ -2,27 +2,29 @@
 
 set -euox pipefail
 
-if [ -n "$1" ]; then
-    PKG_NAME=$1
-else
-    echo "It seems that parameter 'PKG_NAME' was missed. Try: "
-    echo "$0 <package name> <version of deb>"
-    exit 1
+if [ -z ${1+x} ]; then
+  echo "Binary path must be passed as the first parameter"
 fi
 
-if [ -n "$2" ]; then
-    VERSION=$2
-else
-    echo "It seems that parameter 'VERSION' was missed. Try: "
-    echo "$0 <package name> <version of deb>"
-    exit 1
+if [ -z ${2+x} ]; then
+  echo "Binary version must be passed as the second parameter"
 fi
 
+BINARY_PATH="$1"
+VERSION="$2"
+PKG_NAME="cheqd-node"
 
-source ./common.sh
+BUILD_DIR="build"
+OUTPUT_DIR="output"
 
-mkdir -p output
-mkdir -p $TMP_DIR
-cp $PATH_TO_BIN $TMP_DIR
+mkdir -p "${BUILD_DIR}"
+mkdir -p "${OUTPUT_DIR}"
 
-tar -czf $PATH_TAR $TMP_DIR
+# Prepare content
+PACKAGE_CONTENT="${BUILD_DIR}/tar-package-content"
+mkdir -p "${PACKAGE_CONTENT}"
+cp "${BINARY_PATH}" "${PACKAGE_CONTENT}"
+
+# Make an archive
+TAR_PACKAGE="${OUTPUT_DIR}/${PKG_NAME}_${VERSION}.tar.gz"
+tar -cvzf "${TAR_PACKAGE}" -C "${PACKAGE_CONTENT}" "."

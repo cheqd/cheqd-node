@@ -10,8 +10,6 @@ on:
 
 env:
   NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/tests/networks/docker-compose-localnet/network-config"
-  PACKAGE_NAME: "cheqd-node"
-  VERSION: "1.0.0" # Package build scripts require version to be provided
 
 jobs:
 
@@ -32,6 +30,8 @@ jobs:
   build-binary:
     name: Build binary
     runs-on: ubuntu-20.04
+    outputs:
+      VERSION: ${{ steps.set-version.outputs.VERSION }}
     steps:
       - name: Set up Go 1.17
         uses: actions/setup-go@v2
@@ -76,6 +76,38 @@ jobs:
           name: cheqd-noded
           path: build/cheqd-noded
 
+      - name: Set version
+        id: set-version
+        run: |
+          VERSION=$(build/cheqd-noded version)
+          echo "::set-output name=VERSION::$VERSION"
+
+  build-tar-package:
+    name: Build tar package
+    runs-on: ubuntu-20.04
+    needs: build-binary
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Load binary artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: cheqd-noded
+
+      - name: Restore binary permissions
+        run: sudo chmod +x cheqd-noded
+
+      - name: Build tar
+        working-directory: ./build-tools
+        run: |
+          ./build-tar.sh "cheqd-noded" ${{ env.VERSION }}
+
+      - name: Store tar package artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: cheqd-node_${{ env.VERSION }}.tar.gz
+          path: build-tools/output/cheqd-node_${{ env.VERSION }}.tar.gz
+
   build-deb-package:
     name: Build deb package
     runs-on: ubuntu-20.04
@@ -87,31 +119,25 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: cheqd-noded
-          path: /home/runner/go/bin
 
       - name: Restore binary permissions
-        run: sudo chmod +x /home/runner/go/bin/cheqd-noded
-
-      - name: Make intermediate archive
-        working-directory: ./build-tools
-        run: |
-          ./build-tar.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }} 
+        run: sudo chmod +x cheqd-noded
 
       - name: Install fpm
         run: |
           sudo apt-get install ruby ruby-dev rubygems build-essential
           sudo gem install --no-document fpm
 
-      - name: Build deb # Depends on tar archive
+      - name: Build deb
         working-directory: ./build-tools
         run: |
-          ./build-deb.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }}
+          ./build-deb.sh "cheqd-noded" ${{ env.VERSION }}
 
       - name: Store deb package artifact
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
-          path: build-tools/output/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+          name: cheqd-node_${{ env.VERSION }}_amd64.deb
+          path: build-tools/output/cheqd-node_${{ env.VERSION }}_amd64.deb
 
   build-node-image:
     name: Build cheqd-node image
@@ -169,10 +195,10 @@ jobs:
       - name: Download deb
         uses: actions/download-artifact@v2
         with:
-          name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+          name: cheqd-node_${{ env.VERSION }}_amd64.deb
 
       - name: Install deb
-        run: sudo CHEQD_HOME_DIR=/home/runner/cheqd dpkg -i ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+        run: sudo CHEQD_HOME_DIR=/home/runner/cheqd dpkg -i cheqd-node_${{ env.VERSION }}_amd64.deb
 
       - name: Download node image
         uses: actions/download-artifact@v2

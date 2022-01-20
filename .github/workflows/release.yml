@@ -10,8 +10,6 @@ jobs:
     name: "Setup workflow"
     runs-on: ubuntu-latest
     outputs:
-      GITHUB_REPOSITORY_NAME: ${{ steps.cache.outputs.GITHUB_REPOSITORY_NAME }}
-      TAG: ${{ steps.cache.outputs.TAG }}
       VERSION: ${{ steps.cache.outputs.VERSION }}
     steps:
       - name: Git checkout
@@ -20,13 +18,6 @@ jobs:
       - name: Set outputs
         id: cache
         run: |
-          # Exposes org_name/repository_name in lower case. Required by Docker.
-          echo "::set-output name=GITHUB_REPOSITORY_NAME::$(echo ${GITHUB_REPOSITORY,,})"
-
-          # Version is tag without `v` prefix. Required by Debian package.
-          TAG=${GITHUB_REF/refs\/tags\//}
-          echo "::set-output name=TAG::$TAG"
-
           VERSION="${TAG:1}" # Remove first character
           echo "::set-output name=VERSION::$VERSION"
 
@@ -77,6 +68,32 @@ jobs:
           name: cheqd-noded
           path: build/cheqd-noded
 
+  build-tar-package:
+    name: Build tar package
+    runs-on: ubuntu-20.04
+    needs: build-binary
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Load binary artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: cheqd-noded
+
+      - name: Restore binary permissions
+        run: sudo chmod +x cheqd-noded
+
+      - name: Build tar
+        working-directory: ./build-tools
+        run: |
+          ./build-tar.sh "cheqd-noded" ${{ env.VERSION }}
+
+      - name: Store tar package artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: cheqd-node_${{ env.VERSION }}.deb
+          path: build-tools/output/cheqd-node_${{ env.VERSION }}.tar.gz
+
   build-deb-package:
     name: Build Debian package
     runs-on: ubuntu-20.04
@@ -91,15 +108,14 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: cheqd-noded
-          path: /home/runner/go/bin
 
       - name: Restore binary permissions
-        run: sudo chmod +x /home/runner/go/bin/cheqd-noded
+        run: sudo chmod +x cheqd-noded
 
       - name: Make intermediate archive
         working-directory: ./build-tools
         run: |
-          ./build-tar.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }}
+          ./build-tar.sh "cheqd-noded" ${{ env.VERSION }}
 
       - name: Install fpm
         run: |
@@ -171,7 +187,6 @@ jobs:
     needs: [ setup-workflow, build-node-image, build-testnet-image, build-deb-package ]
     runs-on: ubuntu-latest
     env:
-      GITHUB_REPOSITORY_NAME: ${{ needs.setup-workflow.outputs.GITHUB_REPOSITORY_NAME }}
       TAG: ${{ needs.setup-workflow.outputs.TAG }}
       VERSION: ${{ needs.setup-workflow.outputs.VERSION }}
       PACKAGE_NAME: "cheqd-node"
@@ -202,10 +217,10 @@ jobs:
 
       - name: Push node image
         run: |
-          docker tag cheqd-node ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
-          docker tag cheqd-node ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:latest
-          docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
-          docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:latest
+          docker tag cheqd-node ghcr.io/${{ env.GITHUB_REPOSITORY }}:${{ env.VERSION }}
+          docker tag cheqd-node ghcr.io/${{ env.GITHUB_REPOSITORY }}:latest
+          docker push ghcr.io/${{ env.GITHUB_REPOSITORY }}:${{ env.VERSION }}
+          docker push ghcr.io/${{ env.GITHUB_REPOSITORY }}:latest
 
       - name: Push testnet image
         run: |
@@ -233,7 +248,7 @@ jobs:
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "${{ env.TAG }}"
+          automatic_release_tag: "${{ env.GITHUB_REF_NAME }}"
           prerelease: true
           files: |
             ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
