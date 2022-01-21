@@ -56,7 +56,7 @@ def random_string(length):
 
 def run(command_base, command, params, expected_output):
     cli = pexpect.spawn(f"{command_base} {command} {params}", encoding=ENCODING, timeout=IMPLICIT_TIMEOUT, maxread=READ_BUFFER)
-    cli.logfile = sys.stderr
+    cli.logfile = sys.stdout
     cli.expect(expected_output)
 
     return cli
@@ -105,7 +105,7 @@ def set_up_operator():
     print(address)
     pubkey = re.search(r"pubkey: (.+?)\n", cli.before).group(1).strip()
     print(pubkey)
-    run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {address} 1100000000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} {KEYRING_BACKEND_TEST}", fr"{CODE_0}(.*?)\"value\":\"1100000000ncheq\"")
+    run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {address} 1100000000000000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} {KEYRING_BACKEND_TEST}", fr"{CODE_0}(.*?)\"value\":\"1100000000000000ncheq\"")
 
     return name, address, pubkey
 
