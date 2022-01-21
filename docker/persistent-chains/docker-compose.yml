@@ -7,6 +7,8 @@ services:
     configs:
       - source: genesis
         target: /genesis
+      - source: seeds
+        target: /seeds
     ports:
       # REQUIRED: Tendermint peer-to-peer (P2P) port
       # Please do not change this unless you've also changed this in the external-address parameter in Tendermint config
@@ -57,6 +59,8 @@ services:
 configs:
   genesis:
     file: ../../persistent_chains/${CHEQD_NETWORK}/genesis.json
+  seeds:
+    file: ../../persistent_chains/${CHEQD_NETWORK}/seeds.txt
 
 volumes:
   cheqd_volume:
