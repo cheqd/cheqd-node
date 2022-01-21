@@ -53,7 +53,7 @@ services:
     volumes:
       - type: volume
         source: ${CHEQD_DOCKER_VOLUME_SOURCE} # Defaults to cheqd_volume, defined below
-        target: /cheqd # Do NOT change mount point inside the container unless rebuilding the image
+        target: /home/cheqd # Do NOT change mount point inside the container unless rebuilding the image
     entrypoint: "node-runner"
 
 configs:
