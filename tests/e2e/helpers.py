@@ -1,3 +1,4 @@
+import copy
 import sys
 import os
 import pexpect
@@ -9,7 +10,7 @@ import time
 
 IMPLICIT_TIMEOUT = 30
 ENCODING = "utf-8"
-READ_BUFFER = 6000
+READ_BUFFER = 60000
 
 TEST_NET_NETWORK = "cheqd-testnet-2"
 LOCAL_NET_NETWORK = "cheqd"
@@ -21,13 +22,14 @@ TEST_NET_DESTINATION = f"{TEST_NET_NODE_TCP} --chain-id 'cheqd-testnet-2'"
 TEST_NET_DESTINATION_HTTP = f"{TEST_NET_NODE_HTTP} --chain-id 'cheqd-testnet-2'"
 LOCAL_NET_DESTINATION = f"{LOCAL_NET_NODE_TCP} --chain-id 'cheqd'"
 LOCAL_NET_DESTINATION_HTTP = f"{LOCAL_NET_NODE_HTTP} --chain-id 'cheqd'"
+GAS_AMOUNT = 90000 # 70000 throws `out of gas` sometimes
+GAS_PRICE = 25
 TEST_NET_FEES = "--fees 5000000ncheq"
 TEST_NET_GAS_X_GAS_PRICES = "--gas 90000 --gas-prices 25ncheq"
 YES_FLAG = "-y"
 KEYRING_BACKEND_TEST = "--keyring-backend test"
 DENOM = "ncheq"
-GAS_AMOUNT = 90000 # 70000 throws `out of gas` sometimes
-GAS_PRICE = 25
+
 TEST_NET_GAS_X_GAS_PRICES_INT = GAS_AMOUNT * GAS_PRICE
 MAX_GAS_MAGIC_NUMBER = 1.3
 
@@ -41,6 +43,10 @@ LOCAL_SENDER_ADDRESS = os.environ["OP0_ADDRESS"]
 LOCAL_RECEIVER_ADDRESS = os.environ["OP1_ADDRESS"]
 
 CODE_0 = "\"code\":0"
+CODE_5 = "\"code\":5"
+CODE_11 = "\"code\":11"
+CODE_1203 = "\"code\":1203"
+CODE_1100 = "\"code\":1100"
 CODE_0_DIGIT = 0
 
 
@@ -50,7 +56,7 @@ def random_string(length):
 
 def run(command_base, command, params, expected_output):
     cli = pexpect.spawn(f"{command_base} {command} {params}", encoding=ENCODING, timeout=IMPLICIT_TIMEOUT, maxread=READ_BUFFER)
-    cli.logfile = sys.stdout
+    cli.logfile = sys.stderr
     cli.expect(expected_output)
 
     return cli
@@ -68,13 +74,16 @@ def get_balance(address, network_destination):
     return balance
 
 
-# async def get_balance_vdr(pool_alias, address):
-#     request = await cheqd_ledger.bank.build_query_balance(address, DENOM)
-#     res = await cheqd_pool.abci_query(pool_alias, request)
-#     res = await cheqd_ledger.bank.parse_query_balance_resp(res)
-#     sender_balance = json.loads(res)["balance"]["amount"]
+def json_loads(s_to_load: str) -> dict:
+    s = copy.copy(s_to_load)
+    s = s.replace("\\", "")
+    s = s.replace("\"[", "[")
+    s = s.replace("]\"", "]")
+    return json.loads(s)
 
-#     return sender_balance
+
+def get_gas_extimation(s_to_search: str) -> int:
+    return int(re.findall(r"\d+", s_to_search)[0])
 
 
 def send_with_note(note):
@@ -89,71 +98,6 @@ def send_with_note(note):
     return tx_hash, note
 
 
-# async def send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, msg, memo):
-#     account_number, sequence_number = await get_base_account_number_and_sequence(pool_alias, sender_address)
-#     timeout_height = await get_timeout_height(pool_alias)
-#     test_tx = await cheqd_ledger.auth.build_tx(
-#         pool_alias, public_key, msg, account_number, sequence_number, GAS_AMOUNT, GAS_AMOUNT*GAS_PRICE, DENOM, sender_address, timeout_height, memo
-#     )
-#     request = await cheqd_ledger.tx.build_query_simulate(test_tx)
-#     response = await cheqd_pool.abci_query(pool_alias, request)
-#     response = await cheqd_ledger.tx.parse_query_simulate_resp(response)
-#     gas_estimation = json.loads(response)["gas_info"]["gas_used"]
-#     fees = int(gas_estimation*MAX_GAS_MAGIC_NUMBER*GAS_PRICE)
-#     prod_tx = await cheqd_ledger.auth.build_tx(
-#         pool_alias, public_key, msg, account_number, sequence_number, int(gas_estimation*MAX_GAS_MAGIC_NUMBER), fees, DENOM, SENDER_ADDRESS, timeout_height, memo
-#     )
-#     tx_signed = await cheqd_ledger.auth.sign_tx(wallet_handle, key_alias, prod_tx)
-#     res = json.loads(await cheqd_pool.broadcast_tx_commit(pool_alias, tx_signed))
-#     tx_hash = res["hash"]
-
-#     return res, tx_hash, fees
-
-
-# async def send_tx_helper_alt(pool_alias, wallet_handle, key_alias, public_key, sender_address, msg, memo):
-#     account_number, sequence_number = await get_base_account_number_and_sequence(pool_alias, sender_address)
-#     timeout_height = await get_timeout_height(pool_alias)
-#     tx = await cheqd_ledger.auth.build_tx(
-#         pool_alias, public_key, msg, account_number, sequence_number, GAS_AMOUNT, GAS_AMOUNT*GAS_PRICE, DENOM, sender_address, timeout_height, memo
-#     )
-#     tx_signed = await cheqd_ledger.auth.sign_tx(wallet_handle, key_alias, tx)
-#     res = json.loads(await cheqd_pool.broadcast_tx_commit(pool_alias, tx_signed))
-#     tx_hash = res["hash"]
-
-#     return res, tx_hash
-
-
-# async def get_tx_helper(pool_alias, tx_hash):
-#     request = await cheqd_ledger.tx.build_query_get_tx_by_hash(tx_hash)
-#     res = await cheqd_pool.abci_query(pool_alias, request)
-#     res = json.loads(await cheqd_ledger.tx.parse_query_get_tx_by_hash_resp(res))
-
-#     return res
-
-
-# async def create_did_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, fqdid, vk, memo):
-#     req = await cheqd_ledger.cheqd.build_msg_create_did(fqdid, vk)
-#     signed_req = await cheqd_ledger.cheqd.sign_msg_write_request(wallet_handle, fqdid, bytes(req))
-#     res, _, _ = await send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, bytes(signed_req), memo)
-
-#     return res
-
-
-# async def query_did_helper(pool_alias, fqdid):
-#     req = await cheqd_ledger.cheqd.build_query_get_did(fqdid)
-#     res = await cheqd_pool.abci_query(pool_alias, req)
-
-#     return res
-
-
-# async def update_did_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, fqdid, new_vk, version_id, memo):
-#     req = await cheqd_ledger.cheqd.build_msg_update_did(fqdid, new_vk, version_id)
-#     signed_req = await cheqd_ledger.cheqd.sign_msg_write_request(wallet_handle, fqdid, bytes(req))
-#     res, _, _ = await send_tx_helper(pool_alias, wallet_handle, key_alias, public_key, sender_address, bytes(signed_req), memo)
-
-#     return res
-
-
 def set_up_operator():
     name = random_string(10)
     cli = run("cheqd-noded keys", "add", f"{name} {KEYRING_BACKEND_TEST}", r"mnemonic: \"\"")
@@ -161,40 +105,49 @@ def set_up_operator():
     print(address)
     pubkey = re.search(r"pubkey: (.+?)\n", cli.before).group(1).strip()
     print(pubkey)
-    run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {address} 1100000000000000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} {KEYRING_BACKEND_TEST}", fr"{CODE_0}(.*?)\"value\":\"1100000000000000ncheq\"")
+    run("cheqd-noded tx", "bank send", f"{LOCAL_SENDER_ADDRESS} {address} 1100000000ncheq {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} {KEYRING_BACKEND_TEST}", fr"{CODE_0}(.*?)\"value\":\"1100000000ncheq\"")
 
     return name, address, pubkey
 
 
-# async def wallet_helper(wallet_id=None, wallet_key="", wallet_key_derivation_method="ARGON2I_INT"):
-#     if not wallet_id:
-#         wallet_id = random_string(25)
-#     wallet_config = json.dumps({"id": wallet_id})
-#     wallet_credentials = json.dumps({"key": wallet_key, "key_derivation_method": wallet_key_derivation_method})
-#     await wallet.create_wallet(wallet_config, wallet_credentials)
-#     wallet_handle = await wallet.open_wallet(wallet_config, wallet_credentials)
-
-#     return wallet_handle, wallet_config, wallet_credentials
-
-
-# async def get_base_account_number_and_sequence(pool_alias, account_id):
-#     req = await cheqd_ledger.auth.build_query_account(account_id)
-#     resp = await cheqd_pool.abci_query(pool_alias, req)
-#     resp = await cheqd_ledger.auth.parse_query_account_resp(resp)
-#     account = json.loads(resp)["account"]
-#     base_account = account["value"]
-#     account_number = base_account["account_number"]
-#     account_sequence = base_account["sequence"]
-
-#     return account_number, account_sequence
+def build_create_did_msg(did: str,
+                         key_id: str,
+                         ver_pub_multibase_58: str) -> str:
+    return f'{{ "id": "{did}", \
+    "verification_method": [{{ \
+       "id": "{key_id}", \
+       "type": "Ed25519VerificationKey2020", \
+       "controller": "{did}", \
+       "public_key_multibase": "{ver_pub_multibase_58}" \
+     }}], \
+     "authentication": [ \
+       "{key_id}" \
+     ] \
+    }} \ '
 
 
-# async def get_timeout_height(pool_alias):
-#     TIMEOUT = 50
-#     try:
-#         info = await cheqd_pool.abci_info(pool_alias)
-#         info = json.loads(info)
-#         current_height = info["response"]["last_block_height"]
-#         return int(current_height) + TIMEOUT
-#     except CommonInvalidStructure:
-#         return 150
+def build_update_did_msg(did: str,
+                         key_id: str,
+                         ver_pub_multibase_58: str,
+                         version_id: str) -> dict:
+    return json.loads(f'{{ "id": "{did}", \
+     "version_id": "{version_id}", \
+     "verification_method": [{{ \
+       "id": "{key_id}", \
+       "type": "Ed25519VerificationKey2020", \
+       "controller": "{did}", \
+       "public_key_multibase": "{ver_pub_multibase_58}" \
+     }}], \
+     "authentication": [ \
+       "{key_id}" \
+     ] \
+    }}')
+
+
+def generate_ed25519_key() -> dict:
+    cli = run(
+        "cheqd-noded debug",
+        "ed25519 random",
+        "",
+        "")
+    return json_loads(cli.read())
