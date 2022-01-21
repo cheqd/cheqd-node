@@ -2,6 +2,8 @@ version: '3.7'
 
 services:
   cheqd_node:
+    #
+    # build:
     image: ghcr.io/cheqd/cheqd-node:${CHEQD_NODE_VERSION}
     user: cheqd
     configs:
@@ -54,7 +56,7 @@ services:
       - type: volume
         source: ${CHEQD_DOCKER_VOLUME_SOURCE} # Defaults to cheqd_volume, defined below
         target: /home/cheqd # Do NOT change mount point inside the container unless rebuilding the image
-    entrypoint: "node-runner"
+    entrypoint: ./node-runner.sh
 
 configs:
   genesis:

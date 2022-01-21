@@ -19,6 +19,15 @@ else
     echo "Node config exists. Skipping initialization."
 fi
 
+# Check if a genesis file has been passed in config
+if [ -f "/genesis" ]
+then
+    echo "Genesis file passed. Adding/replacing current genesis file."
+    cp /genesis ${CHEQD_ROOT_DIR}/config/genesis.json
+else
+    echo "No genesis file config passed. Skipping and retaining existing config."
+fi
+
 # Run configure
 # `! -z` is used instead of `-n` to distinguish null and empty values
 if [[ ! -z ${CREATE_EMPTY_BLOCKS+x} ]]; then cheqd-noded configure create-empty-blocks ${CREATE_EMPTY_BLOCKS}; fi

@@ -56,6 +56,10 @@ FROM ubuntu:focal
 # Copy compiled node binary from Stage 1
 COPY --from=builder /app/build/cheqd-noded /bin
 
+# Set runner script
+# COPY docker/node-runner.sh /bin/node-runner
+# RUN chmod +x /bin/node-runner
+
 # Set user directory and details
 ARG CHEQD_HOME_DIR="/home/cheqd"
 ARG UID=1000
