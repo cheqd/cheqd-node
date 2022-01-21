@@ -21,7 +21,7 @@ for dir in $proto_dirs; do
   -I "$cosmos_sdk_dir/proto" \
   --gocosmos_out=plugins=interfacetype+grpc,\
 Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types:. \
-  $(find "${dir}" -name '*.proto')
+  "$(find "${dir}" -name '*.proto')"
 
   # Generate grpc gateway
   buf protoc \
@@ -29,7 +29,7 @@ Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types:. \
   -I "$cosmos_sdk_dir/third_party/proto" \
   -I "$cosmos_sdk_dir/proto" \
   --grpc-gateway_out=logtostderr=true,allow_colon_final_segments=true:. \
-  $(find "${dir}" -maxdepth 1 -name '*.proto')
+  "$(find "${dir}" -maxdepth 1 -name '*.proto')"
 done
 
 cp -r ./github.com/cheqd/cheqd-node/* ./
