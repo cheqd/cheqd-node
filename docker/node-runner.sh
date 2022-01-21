@@ -11,7 +11,7 @@ CHEQD_ROOT_DIR="$HOME/.cheqdnode"
 if [ ! -d "${CHEQD_ROOT_DIR}/config" ]
 then
     echo "Node config not found. Initializing."
-    cheqd-noded init $NODE_MONIKER
+    cheqd-noded init $NODE_MONIKER --home ${CHEQD_ROOT_DIR}
 	cp /genesis ${CHEQD_ROOT_DIR}/config/genesis.json
     cp /seeds ${CHEQD_ROOT_DIR}/config/seeds.txt
     cheqd-noded configure p2p seeds $(cat ${CHEQD_ROOT_DIR}/config/seeds.txt)
