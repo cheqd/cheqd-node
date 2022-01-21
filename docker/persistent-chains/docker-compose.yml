@@ -49,11 +49,11 @@ services:
         mode: host
     # Defines cheqd-noded configuration variables INSIDE the container 
     env_file:
-      - mainnet-container.env
+      - container.env
     volumes:
       - type: volume
         source: ${CHEQD_DOCKER_VOLUME_SOURCE} # Defaults to cheqd_volume, defined below
-        target: /home/cheqd # Do NOT change mount point inside the container unless rebuilding the image
+        target: /cheqd # Do NOT change mount point inside the container unless rebuilding the image
     entrypoint: "node-runner"
 
 configs:
