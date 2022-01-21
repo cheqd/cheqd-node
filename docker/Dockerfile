@@ -1,5 +1,5 @@
 ###############################################################
-###         STAGE 1: Build container for node binary        ###
+###             STAGE 1: Build image for node binary        ###
 ###############################################################
 
 FROM golang:buster as builder
@@ -48,27 +48,15 @@ COPY .git .
 RUN make proto-gen build
 
 ###############################################################
-###             STAGE 2: Build cheqd-node container         ###
+###             STAGE 2: Build cheqd-base container         ###
 ###############################################################
 
-FROM ubuntu:focal
+FROM ubuntu:focal AS base
 
 # Copy compiled node binary from Stage 1
 COPY --from=builder /app/build/cheqd-noded /bin
 
-# Set user directory and details
-ARG CHEQD_HOME_DIR="/home/cheqd"
-ARG UID=1000
-ARG GID=1000
-
-# Add cheqd user to use in the container
-RUN groupadd --system --gid $GID cheqd \
-    && useradd --system --create-home --home-dir ${CHEQD_HOME_DIR} --shell /bin/bash --gid cheqd --uid $UID cheqd
-
-WORKDIR ${CHEQD_HOME_DIR}
-USER cheqd
-
-# Expose default cheqd-node ports to host
+# Document default ports to expose to host
 EXPOSE 26656 26657 26660 1317 9090 9091
 
 # Define stop scenarios
