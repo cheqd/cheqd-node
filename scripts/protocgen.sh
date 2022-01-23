@@ -21,7 +21,7 @@ for dir in $proto_dirs; do
   -I "proto" \
   -I "$cosmos_sdk_dir/third_party/proto" \
   -I "$cosmos_sdk_dir/proto" \
-  --gocosmos_out=plugins=interfacetype+grpc,
+  --gocosmos_out=plugins=interfacetype+grpc,\
 Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types:. \
   "${proto_files[@]}"
 
