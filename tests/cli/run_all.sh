@@ -11,7 +11,7 @@ function log() {
 }
 
 # Run all shell tests
-TESTS=$(find tests -type f -not -name "common.sh")
+TESTS=$(find tests -type f -name "test_*")
 
 for TEST in ${TESTS}
 do

@@ -31,7 +31,8 @@ MSG_CREATE_DID='{
 }';
 
 # Post the message
+# shellcheck disable=SC2086
 RESULT=$(cheqd-noded tx cheqd create-did "${MSG_CREATE_DID}" "${KEY_ID}" --ver-key "${ALICE_VER_PRIV_BASE_64}" \
-  --from "${BASE_ACCOUNT_1}" "${TX_PARAMS}")
+  --from "${BASE_ACCOUNT_1}" ${TX_PARAMS})
 
 assert_tx_successful "$RESULT"
