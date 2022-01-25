@@ -48,13 +48,25 @@ COPY .git .
 RUN make proto-gen build
 
 ###############################################################
-###             STAGE 2: Build cheqd-base container         ###
+###      STAGE 2: Build cheqd binary base container         ###
 ###############################################################
 
 FROM ubuntu:focal AS base
 
 # Copy compiled node binary from Stage 1
 COPY --from=builder /app/build/cheqd-noded /bin
+
+# Set user directory and details
+ARG CHEQD_HOME_DIR="/home/cheqd"
+ARG UID=1000
+ARG GID=1000
+
+# Add cheqd user to use in the container
+RUN groupadd --system --gid $GID cheqd \
+    && useradd --system --create-home --home-dir ${CHEQD_HOME_DIR} --shell /bin/bash --gid cheqd --uid $UID cheqd
+
+WORKDIR ${CHEQD_HOME_DIR}
+USER cheqd
 
 # Document default ports to expose to host
 EXPOSE 26656 26657 26660 1317 9090 9091
@@ -64,3 +76,17 @@ STOPSIGNAL SIGTERM
 
 # Default entrypoint for cheqd-noded CLI usage
 ENTRYPOINT [ "cheqd-noded" ]
+
+
+###############################################################
+###             STAGE 3: Build cheqd-node image             ###
+###############################################################
+
+FROM base AS node
+
+# Set runner script
+COPY --chown=cheqd:cheqd entrypoint.sh /bin/node-start
+RUN chmod +x /bin/node-start
+
+# Default entrypoint for cheqd-noded CLI usage
+ENTRYPOINT [ "node-start" ]
