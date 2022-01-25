@@ -2,21 +2,19 @@ version: '3.7'
 
 services:
   cheqd_node:
-    # OPTIONAL: Rebuild cheq-node Docker image, if you want build your own
-    # Default is to pull in the pre-published image on GitHub Packages
-    # SYNTAX (from the root of the repo):
-    # docker compose --env-file docker/persistent-chains/docker-compose.env -f docker/persistent-chains/docker-compose.yml build --no-cache
-    # build:
-    #   context: ../..
-    #   dockerfile: docker/Dockerfile
-    #   target: node
-    #   args:
-    #     CHEQD_HOME_DIR: ${CHEQD_HOME_DIR}
-    #     UID: ${UID}
-    #     GID: ${GID}
-    # image: cheqd-node:${BUILD_TAG}
-    # CAUTION: Comment out the line below if building your own image in section above
+    # CAUTION: Change CHEQD_NODE_VERSION to local in docker-compose.env if building your own image in section below
     image: ghcr.io/cheqd/cheqd-node:${CHEQD_NODE_VERSION}
+    # OPTIONAL: Rebuild cheq-node Docker image, if you want build your own
+    # Default is to pull in the pre-published image on GitHub Container Registry
+    # SYNTAX: docker compose --env-file docker/persistent-chains/docker-compose.env -f docker/persistent-chains/docker-compose.yml build --no-cache
+    build:
+      context: ../..
+      dockerfile: docker/Dockerfile
+      target: node
+      args:
+        CHEQD_HOME_DIR: ${CHEQD_HOME_DIR}
+        UID: ${UID}
+        GID: ${GID}
     user: cheqd
     configs:
       - source: genesis

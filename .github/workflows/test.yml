@@ -121,11 +121,11 @@ jobs:
         with:
           fetch-depth: 0 # FIXME: Starport requires full repository
 
-      - name: Build base image
-        run: . docker/persistent-chains/docker-compose.env && docker build -f docker/persistent-chains/Dockerfile.release --no-cache -t $BASE_IMAGE
-
-      - name: Build main image
-        run: docker-compose -f docker/persistent-chains/docker-compose.yml --env-file docker/persistent-chains/docker-compose.env build
+      - name: Build
+        run: |
+          export CHEQD_NODE_VERSION=local
+          docker compose --env-file docker/persistent-chains/docker-compose.env -f docker/persistent-chains/docker-compose.yml build
+          docker tag ghcr.io/cheqd/cheqd-node:local cheqd-node
 
       - name: Save
         run: docker save -o cheqd-node-image.tar cheqd-node
