@@ -4,17 +4,16 @@ services:
   cheqd_node:
     # OPTIONAL: Rebuild cheq-node Docker image, if you want build your own
     # Default is to pull in the pre-published image on GitHub Packages
-    # SYNTAX: docker-compose --env-file build.env --env-file host.env up
-    # build:
-    #  context: .
-    #  dockerfile: ../Dockerfile
-    #  target: node
-    #  args:
-    #    CHEQD_HOME_DIR: ${CHEQD_HOME_DIR}
-    #    UID: ${UID}
-    #    GID: ${UID}
-    #  # cache_from:
-    # image: cheqd-node:${BUILD_TAG}
+    # SYNTAX: docker-compose build --env-file build.env --env-file host.env up
+    build:
+      context: ../..
+      dockerfile: docker/Dockerfile
+      target: node
+      args:
+        - CHEQD_HOME_DIR="zhopa"
+        - UID=${UID}
+        - GID=${GID}
+    image: cheqd-node:${BUILD_TAG}
     # CAUTION: Comment out the line below if building your own image in section above
     # image: ghcr.io/cheqd/cheqd-node:${CHEQD_NODE_VERSION}
     user: cheqd
@@ -26,7 +25,7 @@ services:
     ports:
       # REQUIRED: Tendermint peer-to-peer (P2P) port
       # Please do not change this unless you've also changed this in the external-address parameter in Tendermint config
-      - target: 26656 
+      - target: 26656
         published: ${TM_P2P_PORT}
         protocol: tcp
         mode: host
@@ -38,7 +37,7 @@ services:
         mode: host
       # OPTIONAL: Cosmos REST API port
       # Only required if you plan on targetting REST API requests at your own node
-      - target: 1317 
+      - target: 1317
         published: ${COSMOS_REST_API_PORT}
         protocol: tcp
         mode: host
@@ -68,7 +67,7 @@ services:
       - type: volume
         source: ${CHEQD_DOCKER_VOLUME_SOURCE} # Defaults to cheqd_volume, defined below
         target: /home/cheqd # Do NOT change mount point inside the container unless rebuilding the image
-    entrypoint: ["node-start"]
+    entrypoint: [ "node-start" ]
 
 configs:
   genesis:
