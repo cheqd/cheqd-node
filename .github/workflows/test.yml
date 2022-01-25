@@ -122,8 +122,7 @@ jobs:
           fetch-depth: 0 # FIXME: Starport requires full repository
 
       - name: Build base image
-        run: . docker/persistent-chains/docker-compose.env && docker build -f docker/persistent-chains/Dockerfile.release
- --no-cache -t $BASE_IMAGE
+        run: . docker/persistent-chains/docker-compose.env && docker build -f docker/persistent-chains/Dockerfile.release --no-cache -t $BASE_IMAGE
 
       - name: Build main image
         run: docker-compose -f docker/persistent-chains/docker-compose.yml --env-file docker/persistent-chains/docker-compose.env build
