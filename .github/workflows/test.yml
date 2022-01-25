@@ -125,7 +125,7 @@ jobs:
         run: . docker/persistent-chains/docker-compose.env && docker build -f docker/persistent-chains/Dockerfile.release
  --no-cache -t $BASE_IMAGE
 
-      - name: Build cheqd-node image
+      - name: Build main image
         run: docker-compose -f docker/persistent-chains/docker-compose.yml --env-file docker/persistent-chains/docker-compose.env build
 
       - name: Save
