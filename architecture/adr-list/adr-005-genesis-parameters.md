@@ -11,7 +11,9 @@
 
 ## Summary
 
-The aim of this document is to define the genesis parameters that will be used in cheqd network testnet and mainnet.
+The aim of this document is to define the genesis parameters that will be used in cheqd network mainnet. 
+
+The mainnet and testnet parameters differ slightly. This will be illustrated in a table at the bottom of this ADR.
 
 > Cosmos v0.44.3 parameters are described.
 
@@ -163,4 +165,21 @@ The parameters above were agreed to be used for the cheqd network testnet, with 
 
 * [List of Cosmos modules](https://docs.cosmos.network/v0.44/modules/)
 * [Tendermint genesis parameters](https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#genesis)
+
+### Testnet vs. Mainnet Parameter Differences
+
+|Parameter Name| Testnet Parameter    | Mainnet Parameter     |
+| ----------- | ----------- | ----------- |
+| chain_ID | cheqd-testnet-4      | cheqd-mainnet-1       |
+| Consensus "Evidence" max_age_duration | 259200000000000   | 1209600000000000        |
+| Consensus "Evidence" max_age_num_blocks | 25920   | 121000        |
+| Consensus "Evidence" max_bytes | 5000   | 50000        |
+| max_deposit_period | 172800s   | 604800s        |
+| voting_period | 172800s   | 604800s        |
+| signed_blocks_window | 17280   | 25920        |
+| unbonding_time | 259200s   | 1210000s        |
+
+
+
+
 
