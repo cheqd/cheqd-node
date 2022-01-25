@@ -5,18 +5,16 @@ services:
     # OPTIONAL: Rebuild cheq-node Docker image, if you want build your own
     # Default is to pull in the pre-published image on GitHub Packages
     # SYNTAX: docker-compose --env-file build.env --env-file host.env up
-    build:
-      context: .
-      dockerfile: Dockerfile.release
-      target: cheqd-node
-      args:
-        BASE_IMAGE: ${BASE_IMAGE}
-        BASE_VERSION: ${BASE_VERSION}
-        CHEQD_HOME_DIR: ${CHEQD_HOME_DIR}
-        UID: ${UID}
-        GID: ${UID}
-      # cache_from:
-    image: cheqd-node:${CHEQD_NODE_VERSION}
+    # build:
+    #  context: .
+    #  dockerfile: ../Dockerfile
+    #  target: node
+    #  args:
+    #    CHEQD_HOME_DIR: ${CHEQD_HOME_DIR}
+    #    UID: ${UID}
+    #    GID: ${UID}
+    #  # cache_from:
+    # image: cheqd-node:${BUILD_TAG}
     # CAUTION: Comment out the line below if building your own image in section above
     # image: ghcr.io/cheqd/cheqd-node:${CHEQD_NODE_VERSION}
     user: cheqd
