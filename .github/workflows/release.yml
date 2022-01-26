@@ -20,10 +20,10 @@ jobs:
       - name: Set outputs
         id: cache
         run: |
-          # Exposes org_name/repository_name in lower case. Required by docker.
+          # Exposes org_name/repository_name in lower case. Required by Docker.
           echo "::set-output name=GITHUB_REPOSITORY_NAME::$(echo ${GITHUB_REPOSITORY,,})"
 
-          # Version is tag without `v` prefix. Reuired by deb package.
+          # Version is tag without `v` prefix. Required by Debian package.
           TAG=${GITHUB_REF/refs\/tags\//}
           echo "::set-output name=TAG::$TAG"
 
@@ -39,7 +39,7 @@ jobs:
         with:
           go-version: 1.17
 
-      - name: Get go protoc compiler plugins
+      - name: Get Go protoc compiler plugins
         env:
           GOLANG_PROTOBUF_VERSION: 1.3.5
           GOGO_PROTOBUF_VERSION: 1.3.2
@@ -78,7 +78,7 @@ jobs:
           path: build/cheqd-noded
 
   build-deb-package:
-    name: Build deb package
+    name: Build Debian package
     runs-on: ubuntu-20.04
     needs: [ build-binary, setup-workflow ]
     env:
@@ -97,28 +97,28 @@ jobs:
         run: sudo chmod +x /home/runner/go/bin/cheqd-noded
 
       - name: Make intermediate archive
-        working-directory: ./build_tools
+        working-directory: ./build-tools
         run: |
-          ./build_tar.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }}
+          ./build-tar.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }}
 
       - name: Install fpm
         run: |
           sudo apt-get install ruby ruby-dev rubygems build-essential
           sudo gem install --no-document fpm
 
-      - name: Build deb # Depends on tar archive
+      - name: Build Debian package # Depends on tar archive
+        working-directory: ./build-tools
         run: |
-          ./build_deb.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }}
-        working-directory: ./build_tools
+          ./build-deb.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }}
 
-      - name: Store deb package artifact
+      - name: Store Debian package artifact
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
-          path: build_tools/output/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+          path: build-tools/output/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
 
   build-node-image:
-    name: Build cheqd-node image
+    name: Build cheqd-node Docker image
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -126,7 +126,10 @@ jobs:
           fetch-depth: 0 # FIXME: Starport requires full repository
 
       - name: Build
-        run: docker build -f docker/cheqd_node/Dockerfile --no-cache -t cheqd-node  --build-arg UID=$(id -u) --build-arg GID=$(id -g) . # TODO: Get rid of UID and GID
+        run: |
+          export CHEQD_NODE_VERSION=local
+          docker compose --env-file docker/persistent-chains/docker-compose.env -f docker/persistent-chains/docker-compose.yml build
+          docker tag ghcr.io/cheqd/cheqd-node:local cheqd-node
 
       - name: Save
         run: docker save -o cheqd-node-image.tar cheqd-node
@@ -154,7 +157,7 @@ jobs:
         run: docker load -i cheqd-node-image.tar
 
       - name: Build
-        run: docker build -f docker/single_image_testnet/Dockerfile --no-cache -t cheqd-testnet .
+        run: docker build -f tests/networks/docker-localnet/Dockerfile --no-cache -t cheqd-testnet .
 
       - name: Save
         run: docker save -o cheqd-testnet-image.tar cheqd-testnet

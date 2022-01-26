@@ -1,0 +1,81 @@
+version: '3.7'
+
+services:
+  cheqd_node:
+    # CAUTION: Change CHEQD_NODE_VERSION to local in docker-compose.env if building your own image in section below
+    image: ghcr.io/cheqd/cheqd-node:${CHEQD_NODE_VERSION}
+    # OPTIONAL: Rebuild cheq-node Docker image, if you want build your own
+    # Default is to pull in the pre-published image on GitHub Container Registry
+    # SYNTAX: docker compose --env-file docker/persistent-chains/docker-compose.env -f docker/persistent-chains/docker-compose.yml build --no-cache
+    build:
+      context: ../..
+      dockerfile: docker/Dockerfile
+      target: node
+      args:
+        CHEQD_HOME_DIR: ${CHEQD_HOME_DIR}
+        UID: ${UID}
+        GID: ${GID}
+    user: cheqd
+    configs:
+      - source: genesis
+        target: /genesis
+      - source: seeds
+        target: /seeds
+    ports:
+      # REQUIRED: Tendermint peer-to-peer (P2P) port
+      # Please do not change this unless you've also changed this in the external-address parameter in Tendermint config
+      - target: 26656
+        published: ${TM_P2P_PORT}
+        protocol: tcp
+        mode: host
+      # RECOMMENDED: Tendermint RPC port
+      # Required if you want to use chqed-noded CLI directly from the host
+      - target: 26657
+        published: ${TM_RPC_API_PORT}
+        protocol: tcp
+        mode: host
+      # OPTIONAL: Cosmos REST API port
+      # Only required if you plan on targetting REST API requests at your own node
+      - target: 1317
+        published: ${COSMOS_REST_API_PORT}
+        protocol: tcp
+        mode: host
+      # RECOMMENDED: gRPC port
+      # Tendermint RPC requests (define above) are relayed to the gRPC port inside the container
+      # The Cosmos gRPC API has endpoints not otherwise available in Tendermint RPC and Cosmos REST API
+      - target: 9090
+        published: ${COSMOS_GRPC_API_PORT}
+        protocol: tcp
+        mode: host
+      # OPTIONAL: gRPC-Gateway port
+      # gRPC-Gateway provides a RESTful interface to relay requests to gRPC API
+      - target: 9091
+        published: ${COSMOS_GRPC_GATEWAY_API_PORT}
+        protocol: tcp
+        mode: host
+      # OPTIONAL: Prometheus metrics port
+      # Allows collection of Tendermint and Cosmos metrics using Prometheus
+      - target: 26660
+        published: ${TM_PROMETHEUS_PORT}
+        protocol: tcp
+        mode: host
+    # Defines cheqd-noded configuration variables INSIDE the container 
+    env_file:
+      - container.env
+    volumes:
+      - type: volume
+        source: ${CHEQD_DOCKER_VOLUME_SOURCE} # Defaults to cheqd_volume, defined below
+        target: /home/cheqd # Do NOT change mount point inside the container unless rebuilding the image
+    entrypoint: [ "node-start" ]
+
+configs:
+  genesis:
+    file: ../../persistent_chains/${CHEQD_NETWORK}/genesis.json
+  seeds:
+    file: ../../persistent_chains/${CHEQD_NETWORK}/seeds.txt
+
+volumes:
+  cheqd_volume:
+    name: cheqd_volume_${CHEQD_NETWORK}
+    driver: ${CHEQD_DOCKER_VOLUME_DRIVER}
+    external: ${CHEQD_DOCKER_VOLUME_IS_EXTERNAL}

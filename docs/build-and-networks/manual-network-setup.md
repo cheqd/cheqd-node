@@ -1,4 +1,4 @@
-# setting-up-a-new-network
+# Setting up a new network manually
 
 ## Creating a new network from genesis
 
