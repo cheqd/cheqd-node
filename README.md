@@ -13,18 +13,13 @@ Join our [**cheqd Community Slack**](http://cheqd.link/join-cheqd-slack) for hel
 Getting started as a node operator on the cheqd network mainnet requires the following steps:
 
 1. [Install the `cheqd-node` software](docs/setup-and-configure/README.md) (**version 0.3.1+**) on a hosting platform of your choice.
-2. When you have a node successfully installed, please fill out our [**mainnet node operator onboarding form**](http://cheqd.link/mainnet-onboarding). You will need to have the following details on hand to fill out the form:
-   1. Node ID for your node
-   2. IP address / DNS record that points to the node \(if you're using an IP address, a static IP is recommended\)
-   3. Peer-to-peer \(P2P\) connection port \(defaults to `26656`\)
-   4. Validator account address (begins with `cheqd`)
-   5. Moniker (Nickname/moniker that is set for your mainnet node)
-3. Once you have received or purchased your tokens, [promote your node to a validator](docs/setup-and-configure/configure-new-validator.md).
-4. If successfully configured, your node would become the latest validator on the cheqd mainnet!
+name/moniker that is set for your mainnet node)
+2. Once you have received or purchased your tokens, [promote your node to a validator](docs/setup-and-configure/configure-new-validator.md).
+3. If successfully configured, your node would become the latest validator on the cheqd mainnet!
 
 ### Testnet
 
-Joining the cheqd tetsnet is very similar to the instructions above for mainnet, with a few key differences:
+Joining the cheqd testnet is very similar to the instructions above for mainnet, with a few key differences:
 
 1. Install [v0.2.7 of cheqd-node](https://github.com/cheqd/cheqd-node/releases/tag/v0.2.7) (instead of v0.3.1+)
 2. Fill our [testnet node operator onboarding form](http://cheqd.link/join-testnet-form) with the same details as above.
