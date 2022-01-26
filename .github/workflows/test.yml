@@ -191,6 +191,7 @@ jobs:
       - name: Set up 4 validators + 2 observers node docker pool  # TODO: Replace with testnet image
         working-directory: ./tests/networks/docker-compose-localnet
         run: |
+          sudo chmod -R 777 /home/runner
           ./gen-node-configs.sh
           ./run-docker.sh
           ./wait.sh '[[ $(curl -s -N localhost:26657/block | jq -cr '"'"'.result.block.last_commit.height'"'"') -gt 1 ]] && echo "Height is more than 1"'
@@ -247,6 +248,7 @@ jobs:
       - name: Set up 4 validators + 2 observers node docker pool for local test run # Replace with testnet image
         working-directory: ./tests/networks/docker-compose-localnet
         run: |
+          sudo chmod -R 777 /home/runner
           ./gen-node-configs.sh
           ./run-docker.sh
           ./wait.sh '[[ $(curl -s -N localhost:26657/block | jq -cr '"'"'.result.block.last_commit.height'"'"') -gt 1 ]] && echo "Height is more than 1"'
