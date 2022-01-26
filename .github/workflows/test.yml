@@ -124,9 +124,7 @@ jobs:
       - name: Build
         run: |
           export CHEQD_NODE_VERSION=local
-          export UID=$(id -u)
-          export GID=$(id -g)
-          docker compose --env-file docker/persistent-chains/docker-compose.env -f docker/persistent-chains/docker-compose.yml build
+          docker compose --env-file docker/persistent-chains/docker-compose.env -f docker/persistent-chains/docker-compose.yml build --build-arg UID=$(id -u) --build-arg GID=$(id -g)
           docker tag ghcr.io/cheqd/cheqd-node:local cheqd-node
 
       - name: Save
