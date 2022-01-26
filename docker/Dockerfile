@@ -4,14 +4,6 @@
 
 FROM golang:buster as builder
 
-# Set user directory and details
-ARG CHEQD_HOME_DIR
-ARG UID=1000
-ARG GID=1000
-
-RUN echo "uid: ${UID}, gid: ${GID}, cheqd_home_dir: ${CHEQD_HOME_DIR}"
-RUN exit 1
-
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
     curl \
@@ -68,9 +60,6 @@ COPY --from=builder /app/build/cheqd-noded /bin
 ARG CHEQD_HOME_DIR="/home/cheqd"
 ARG UID=1000
 ARG GID=1000
-
-RUN echo "uid: ${UID}, gid: ${GID}, cheqd_home_dir: ${CHEQD_HOME_DIR}"
-RUN exit 1
 
 # Add cheqd user to use in the container
 RUN groupadd --system --gid $GID cheqd \
