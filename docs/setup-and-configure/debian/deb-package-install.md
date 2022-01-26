@@ -18,10 +18,10 @@ This document provides guidance on how to install and configure a node for the c
    wget https://github.com/cheqd/cheqd-node/releases/download/v0.3.1/cheqd-node_0.3.1_amd64.deb
    ```
 
-   For testnet nodes, use v0.2.7:
+   For testnet nodes, use v0.4.0:
 
    ```bash
-   wget https://github.com/cheqd/cheqd-node/releases/download/v0.2.7/cheqd-node_0.2.7_amd64.deb
+   wget https://github.com/cheqd/cheqd-node/releases/download/v0.4.0/cheqd-node_0.4.0_amd64.deb
    ```
 
 2. **Install the package**
@@ -32,10 +32,10 @@ This document provides guidance on how to install and configure a node for the c
    sudo dpkg -i cheqd-node_0.3.1_amd64.deb
    ```
 
-   For testnet nodes on v0.2.7 (or below):
+   For testnet nodes on v0.4.0 (or below):
 
    ```bash
-   sudo dpkg -i cheqd-node_0.2.7_amd64.deb
+   sudo dpkg -i cheqd-node_0.4.0_amd64.deb
    ```
 
    As a part of installation `cheqd` user will be created. By default, `HOME` directory for the user is `/home/cheqd`, but it can be changed by setting `CHEQD_HOME_DIR` environment variable before running `dpkg` command. Additionnally, a custom logging directory can also be defined by passing the environment variable `CHEQD_LOG_DIR` (defaults to `/home/cheqd/.cheqdnode/log`):
