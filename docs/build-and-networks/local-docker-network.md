@@ -18,14 +18,14 @@ docker pull ghcr.io/cheqd/cheqd-testnet:latest
 
 ## Prerequisites
 
-* Build `cheqd-node` image first. See the [instruction](build-and-networks.md).
+* Build `cheqd-node` image first. See the [instruction](../setup-and-configure/docker-install.md).
 
 ## Building
 
 To build the image:
 
 * Go to the repository root
-* Run `docker build -f docker/single_image_testnet/Dockerfile -t cheqd-testnet .`
+* Run `docker build -f tests/networks/docker-localnet/Dockerfile -t cheqd-testnet .`
 
 ## Running
 

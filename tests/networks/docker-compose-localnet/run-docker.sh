@@ -8,7 +8,8 @@ set -euox pipefail
 
 cheqd_noded_docker() {
   docker run --rm \
-    -v "$(pwd)":"/cheqd" \
+    -v "$(pwd)":"/home/cheqd" \
+    --entrypoint "cheqd-noded" \
     cheqd-node "$@"
 }
 
