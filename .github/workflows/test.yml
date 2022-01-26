@@ -249,7 +249,6 @@ jobs:
         run: |
           ./gen-node-configs.sh
           ./run-docker.sh
-          docker logs docker-compose-localnet_node0_1
           ./wait.sh '[[ $(curl -s -N localhost:26657/block | jq -cr '"'"'.result.block.last_commit.height'"'"') -gt 1 ]] && echo "Height is more than 1"'
 
       - name: Set up test environment
