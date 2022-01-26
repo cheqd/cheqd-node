@@ -13,21 +13,21 @@ The set of scripts to generate configurations for a network of four nodes and ru
 
 1. Build docker image:
 
-   See [the instruction](../../docs/build-and-networks/build-and-networks.md).
+    See [the instruction](../setup-and-configure/docker-install.md).
 
-2. Build cheqd-noded:
+2. Build cheqd-node:
 
-   ```text
+    ```bash
     starport chain build
-   ```
+    ```
 
 3. Generate node configurations:
 
-   Run: `gen_node_configs.sh`.
+    Run: `gen_node_configs.sh`.
 
 4. Run docker-compose:
 
-   Run: `run_docker.sh`.
+    Run: `run_docker.sh`.
 
 ## Result
 
@@ -63,4 +63,4 @@ When connecting using CLI, point path to home directory: `--home node_configs/cl
 
 ## CLI commands
 
-See [the reference](../../docs/cheqd-cli/README.md) to learn about the most common CLI flows.
+See [the cheqd CLI guide](../cheqd-cli/README.md) to learn about the most common CLI flows.
