@@ -21,7 +21,7 @@ However, as best practice we recommend backing up the [app data directories for 
 1. **Download** [**the latest release of `cheqd-node` .deb**](https://github.com/cheqd/cheqd-node/releases/latest) **package**
 
    ```bash
-    wget https://github.com/cheqd/cheqd-node/releases/download/v0.3.1/cheqd-node_0.3.1_amd64.deb
+    wget https://github.com/cheqd/cheqd-node/releases/download/v0.4.0/cheqd-node_0.4.0_amd64.deb
    ```
 
 2. **Stop the existing `cheqd-noded` service**

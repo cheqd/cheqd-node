@@ -7,7 +7,8 @@ services:
       - "26656:26656" # p2p
       - "26657:26657" # rpc
     volumes:
-      - ./node_configs/node0:/cheqd
+      - ./node_configs/node0:/home/cheqd
+    entrypoint: cheqd-noded
     command: start --rpc.laddr tcp://0.0.0.0:26657
 
   node1:
@@ -16,7 +17,8 @@ services:
       - "26659:26656" # p2p
       - "26660:26657" # rpc
     volumes:
-      - ./node_configs/node1:/cheqd
+      - ./node_configs/node1:/home/cheqd
+    entrypoint: cheqd-noded
     command: start --rpc.laddr tcp://0.0.0.0:26657 --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
 
   node2:
@@ -25,7 +27,8 @@ services:
       - "26662:26656" # p2p
       - "26663:26657" # rpc
     volumes:
-      - ./node_configs/node2:/cheqd
+      - ./node_configs/node2:/home/cheqd
+    entrypoint: cheqd-noded
     command: start --rpc.laddr tcp://0.0.0.0:26657 --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
 
   node3:
@@ -34,7 +37,8 @@ services:
       - "26665:26656" # p2p
       - "26666:26657" # rpc
     volumes:
-      - ./node_configs/node3:/cheqd
+      - ./node_configs/node3:/home/cheqd
+    entrypoint: cheqd-noded
     command: start --rpc.laddr tcp://0.0.0.0:26657 --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
 
   observer0:
@@ -43,7 +47,8 @@ services:
       - "26668:26656" # p2p
       - "26669:26657" # rpc
     volumes:
-      - ./node_configs/observer0:/cheqd
+      - ./node_configs/observer0:/home/cheqd
+    entrypoint: cheqd-noded
     command: start --rpc.laddr tcp://0.0.0.0:26657 --minimum-gas-prices "1cheq" --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
 
   observer1:
@@ -52,5 +57,6 @@ services:
       - "26671:26656" # p2p
       - "26672:26657" # rpc
     volumes:
-      - ./node_configs/observer1:/cheqd
+      - ./node_configs/observer1:/home/cheqd
+    entrypoint: cheqd-noded
     command: start --rpc.laddr tcp://0.0.0.0:26657 --minimum-gas-prices "1cheq" --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
