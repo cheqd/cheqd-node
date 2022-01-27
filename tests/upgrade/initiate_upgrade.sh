@@ -5,7 +5,7 @@ set -euox pipefail
 . common.sh
 
 # Wait for start ordering, till height 2
-bash ../networks/wait_for_chain.sh 2
+bash ../networks/tools/wait-for-chain.sh 2
 
 # Send proposal to pool
 local_client_exec tx gov submit-proposal software-upgrade \
