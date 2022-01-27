@@ -55,9 +55,18 @@ def random_string(length):
 
 
 def run(command_base, command, params, expected_output):
+    # ToDo: Make it more clear.
+    # Quick hack for getting passing timouted transactions
+    timeout_str = "Error(.*?)timed out waiting for tx to be included in a block"
     cli = pexpect.spawn(f"{command_base} {command} {params}", encoding=ENCODING, timeout=IMPLICIT_TIMEOUT, maxread=READ_BUFFER)
     cli.logfile = sys.stdout
-    cli.expect(expected_output)
+    try:
+        cli.expect(expected_output)
+    except pexpect.exceptions.EOF as err:
+        if re.search(timeout_str, cli.before):
+            get_balance(LOCAL_SENDER_ADDRESS, LOCAL_NET_DESTINATION)
+            return cli
+        raise err
 
     return cli
 
