@@ -1,8 +1,9 @@
 set -euox pipefail
 
 DOCKER_COMPOSE_DIR="../networks/docker-compose-localnet"
-CHEQD_IMAGE_FROM="ghcr.io/cheqd/cheqd-node:v0.3.1"
+CHEQD_IMAGE_FROM="ghcr.io/cheqd/cheqd-node:0.4.0"
 CHEQD_IMAGE_TO="cheqd-node"
+CHEQD_VERSION_TO=$(echo $(git describe --always --tag --match "v*") | sed 's/^v//')
 UPGRADE_NAME="v0.4"
 VOTING_PERIOD=30
 EXPECTED_BLOCK_SECOND=5

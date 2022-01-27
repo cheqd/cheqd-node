@@ -340,9 +340,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Export version upgrade to
-        run: export CHEQD_VERSION_TO=${{ env.VERSION }}
-
       - name: Download node image
         uses: actions/download-artifact@v2
         with:
@@ -365,4 +362,3 @@ jobs:
       - name: Make the upgrade and check results
         working-directory: ./tests/upgrade
         run: bash upgrade_and_check.sh
-
