@@ -337,10 +337,11 @@ jobs:
     name: Run positive case for upgrade
     runs-on: ubuntu-20.04
     needs: build-node-image
-    env: 
-      CHEQD_VERSION_TO: ${{ env.VERSION }}
     steps:
       - uses: actions/checkout@v2
+
+      - name: Export version upgrade to
+        run: export CHEQD_VERSION_TO=${{ env.VERSION }}
 
       - name: Download node image
         uses: actions/download-artifact@v2
