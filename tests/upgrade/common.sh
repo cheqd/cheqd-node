@@ -1,3 +1,5 @@
+#!/bin/bash
+
 set -euox pipefail
 
 DOCKER_COMPOSE_DIR="../networks/docker-compose-localnet"
