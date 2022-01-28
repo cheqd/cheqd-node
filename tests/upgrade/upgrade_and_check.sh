@@ -21,7 +21,7 @@ docker_compose_up "$CHEQD_IMAGE_TO" $(pwd)
 # Wait for upgrade height
 bash ../networks/tools/wait-for-chain.sh $(echo $UPGRADE_HEIGHT+2 | bc)
 
-CURRENT_VERSION=$(docker run --entrypoint cheqd-noded cheqd-node version)
+CURRENT_VERSION=$(docker run --entrypoint cheqd-noded cheqd-node version 2>&1)
 # CURRENT_VERSION=$(curl -s http://localhost:26657/abci_info | jq '.result.response.version' | grep -Eo '[0-9]*\.[0-9]*\.[0-9]*')
 
 if [ $CURRENT_VERSION != $CHEQD_VERSION_TO ] ; then
