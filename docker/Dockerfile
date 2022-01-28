@@ -1,5 +1,5 @@
 ###############################################################
-###             STAGE 1: Build image for node binary        ###
+###        STAGE 1: Build node binary pre-requisites        ###
 ###############################################################
 
 FROM golang:buster as builder

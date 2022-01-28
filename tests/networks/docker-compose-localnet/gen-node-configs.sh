@@ -4,6 +4,11 @@
 
 set -euox pipefail
 
+<<<<<<< HEAD
+=======
+. common.sh
+
+>>>>>>> origin/main
 # sed in macos requires extra argument
 
 sed_extension=''
@@ -13,6 +18,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     sed_extension='.orig'
 fi
 
+<<<<<<< HEAD
 # cheqd_noded docker wrapper
 
 cheqd_noded_docker() {
@@ -25,12 +31,45 @@ cheqd_noded_docker() {
 
 CHAIN_ID="cheqd"
 
+=======
+
+# Parameters
+# $1 - The full parameter name
+# $2 - Value
+# $3 - Path to genesis file
+edit_genesis () {
+    PARAMETER_NAME=$1
+    VALUE=$2
+    GENESIS_PATH=$3
+    jq "${PARAMETER_NAME} = \"${VALUE}\"" $GENESIS_PATH > /tmp/1 && mv /tmp/1 $GENESIS_PATH
+}
+
+# We use local copy of this function because of using -u root for allowing files creation inside the
+cheqd_noded_docker() {
+  docker run --rm \
+<<<<<<< HEAD:tests/upgrade/gen_node_configs.sh
+    -v "$(pwd)":"/cheqd" \
+    --network host \
+    -u root \
+    ${CHEQD_IMAGE_FROM} "$@" --home /cheqd/.cheqdnode
+=======
+    -v "$(pwd)":"/home/cheqd" \
+    --entrypoint "cheqd-noded" \
+    cheqd-node "$@"
+>>>>>>> origin/main:tests/networks/docker-compose-localnet/gen-node-configs.sh
+}
+
+>>>>>>> origin/main
 VALIDATORS_COUNT="4"
 OBSERVERS_COUNT="2"
 
 NODE_CONFIGS_DIR="node_configs"
 rm -rf $NODE_CONFIGS_DIR
+<<<<<<< HEAD
 mkdir $NODE_CONFIGS_DIR
+=======
+mkdir $NODE_CONFIGS_DIR 
+>>>>>>> origin/main
 pushd $NODE_CONFIGS_DIR
 
 echo "Generating validator keys..."
@@ -44,6 +83,10 @@ do
     echo "[Validator $i] Generating key..."
 
     cheqd_noded_docker init "node$i" --chain-id $CHAIN_ID
+<<<<<<< HEAD
+=======
+    sudo chown -R $USER:$USER .
+>>>>>>> origin/main
     echo "$(cheqd_noded_docker tendermint show-node-id)" > node_id.txt
     echo "$(cheqd_noded_docker tendermint show-validator)" > node_val_pubkey.txt
 
@@ -61,6 +104,10 @@ pushd $OPERATORS_HOME
 
 echo "Initializing genesis..."
 cheqd_noded_docker init dummy_node --chain-id $CHAIN_ID
+<<<<<<< HEAD
+=======
+sudo chown -R $USER:$USER .
+>>>>>>> origin/main
 sed -i $sed_extension 's/"stake"/"ncheq"/' .cheqdnode/config/genesis.json
 
 echo "Generating operator keys..."
@@ -68,6 +115,10 @@ echo "Generating operator keys..."
 for ((i=0 ; i<$VALIDATORS_COUNT ; i++))
 do
     cheqd_noded_docker keys add "operator$i" --keyring-backend "test"
+<<<<<<< HEAD
+=======
+    sudo chown -R $USER:$USER .
+>>>>>>> origin/main
 done
 
 echo "Creating genesis accounts..."
@@ -99,6 +150,13 @@ cheqd_noded_docker validate-genesis
 
 echo "Propagating genesis to nodes..."
 
+<<<<<<< HEAD
+=======
+# Edit voting parameters
+edit_genesis ".app_state.gov.deposit_params.max_deposit_period" "${VOTING_PERIOD}s" .cheqdnode/config/genesis.json
+edit_genesis ".app_state.gov.voting_params.voting_period" "${VOTING_PERIOD}s" .cheqdnode/config/genesis.json
+
+>>>>>>> origin/main
 for ((i=0 ; i<$VALIDATORS_COUNT ; i++))
 do
     NODE_HOME="../node$i"
@@ -121,6 +179,10 @@ do
 
     echo "##### [Observer $i] Generating keys..."
     cheqd_noded_docker init "node$i" --chain-id $CHAIN_ID
+<<<<<<< HEAD
+=======
+    sudo chown -R $USER:$USER .
+>>>>>>> origin/main
 
     echo "##### [Observer $i] Exporting public keys..."
     echo "$(cheqd_noded_docker tendermint show-node-id)" > node_id.txt

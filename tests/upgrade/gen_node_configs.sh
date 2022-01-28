@@ -30,10 +30,16 @@ edit_genesis () {
 # We use local copy of this function because of using -u root for allowing files creation inside the
 cheqd_noded_docker() {
   docker run --rm \
+<<<<<<< HEAD:tests/upgrade/gen_node_configs.sh
     -v "$(pwd)":"/cheqd" \
     --network host \
     -u root \
     ${CHEQD_IMAGE_FROM} "$@" --home /cheqd/.cheqdnode
+=======
+    -v "$(pwd)":"/home/cheqd" \
+    --entrypoint "cheqd-noded" \
+    cheqd-node "$@"
+>>>>>>> origin/main:tests/networks/docker-compose-localnet/gen-node-configs.sh
 }
 
 VALIDATORS_COUNT="4"

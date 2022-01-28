@@ -41,7 +41,7 @@
     },
     "remote":{
         "rpc":"https://rpc.cheqd.net",
-        "api":"https://api.cheqd.net" 
+        "api":"https://api.cheqd.net"
     },
     "debug": {
         "startTimer": false

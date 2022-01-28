@@ -10,7 +10,7 @@
       },
       {
         "name": "cheqd Testnet",
-        "chain_id": "cheqd-testnet-2",
+        "chain_id": "cheqd-testnet-4",
         "url": "https://testnet-explorer.cheqd.io"
       }
     ]
