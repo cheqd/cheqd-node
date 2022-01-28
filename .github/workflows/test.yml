@@ -262,34 +262,9 @@ jobs:
         run: |
           export OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
           export OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p | sed 's/\r//g')
-          pytest -v -rP tests/e2e/test_cosmos.py
+          pytest -v -rP tests/e2e/test_cosmos.pytest
 
-<<<<<<< HEAD
-  run-identity-tests-using-vdr:
-    name: Run identity tests using VDR
-    runs-on: ubuntu-20.04
-    needs: build-testnet-image
-    steps:
-      - name: Download testnet image
-        uses: actions/download-artifact@v2
-        with:
-          name: cheqd-testnet-image.tar
-
-      - name: Load testnet image
-        run: docker load -i cheqd-testnet-image.tar
-
-      - uses: actions/checkout@v2
-
-      - name: Run test net container
-        run: |
-          docker run -d --rm -p "26657:26657" cheqd-testnet
-          bash tests/networks/tools/wait-for-chain.sh
-      
-      - name: Set up test environment
-        working-directory: ./tests/e2e
-=======
       - name: Run identity-related tests
->>>>>>> origin/main
         run: |
           export OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
           export OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p | sed 's/\r//g')
