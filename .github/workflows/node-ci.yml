@@ -344,3 +344,33 @@ jobs:
         run: |
           bash import_keys.sh
           bash run_all.sh
+
+  run-upgrade-test-positive-case:
+    name: Run positive case for upgrade
+    runs-on: ubuntu-20.04
+    needs: build-node-image
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Download node image
+        uses: actions/download-artifact@v2
+        with:
+          name: cheqd-node-image.tar
+
+      - name: Load node image
+        run: docker load -i cheqd-node-image.tar
+
+      - name: Chown for current user
+        run: sudo chown $USER:$USER .
+
+      - name: Prepare nodes for checking upgrade
+        working-directory: ./tests/upgrade
+        run: bash prepare.sh
+
+      - name: Initiate the upgrade process
+        working-directory: ./tests/upgrade
+        run: bash initiate_upgrade.sh
+
+      - name: Make the upgrade and check results
+        working-directory: ./tests/upgrade
+        run: bash upgrade_and_check.sh
