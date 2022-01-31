@@ -55,9 +55,9 @@ jobs:
         VALIDATE_XML: true
         VALIDATE_YAML: true
         VALIDATE_OPENAPI: true
-
         VALIDATE_ALL_CODEBASE: true
+        DOCKERFILE_HADOLINT_FILE_NAME: .hadolint.yaml
+        VALIDATE_DOCKERFILE_HADOLINT: true
         LOG_LEVEL: WARN
-
         DEFAULT_BRANCH: main
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
