@@ -4,13 +4,6 @@
 
 set -euo pipefail
 
-# sed in macos requires extra argument
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    SED_EXT=''
-elif [[ "$OSTYPE" == "darwin"* ]]; then
-    SED_EXT='.orig'
-fi
-
 # Generate base network configuration
 bash gen-network-config-base.sh cheqd 2 0 0 # 2 validators, 0 observers and 0 seeds
 

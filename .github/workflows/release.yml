@@ -6,33 +6,12 @@ on:
       - "v*"
 
 jobs:
-  setup-workflow:
-    name: "Setup workflow"
-    runs-on: ubuntu-latest
-    outputs:
-      GITHUB_REPOSITORY_NAME: ${{ steps.cache.outputs.GITHUB_REPOSITORY_NAME }}
-      TAG: ${{ steps.cache.outputs.TAG }}
-      VERSION: ${{ steps.cache.outputs.VERSION }}
-    steps:
-      - name: Git checkout
-        uses: actions/checkout@v2
-
-      - name: Set outputs
-        id: cache
-        run: |
-          # Exposes org_name/repository_name in lower case. Required by Docker.
-          echo "::set-output name=GITHUB_REPOSITORY_NAME::$(echo ${GITHUB_REPOSITORY,,})"
-
-          # Version is tag without `v` prefix. Required by Debian package.
-          TAG=${GITHUB_REF/refs\/tags\//}
-          echo "::set-output name=TAG::$TAG"
-
-          VERSION="${TAG:1}" # Remove first character
-          echo "::set-output name=VERSION::$VERSION"
 
   build-binary:
     name: Build binary
     runs-on: ubuntu-20.04
+    outputs:
+      VERSION: ${{ steps.set-version.outputs.VERSION }}
     steps:
       - name: Set up Go 1.17
         uses: actions/setup-go@v2
@@ -77,13 +56,18 @@ jobs:
           name: cheqd-noded
           path: build/cheqd-noded
 
-  build-deb-package:
-    name: Build Debian package
+      - name: Set version
+        id: set-version
+        run: |
+          VERSION=$(build/cheqd-noded version 2>&1)
+          echo "::set-output name=VERSION::$VERSION"
+
+  build-tar-package:
+    name: Build tar package
     runs-on: ubuntu-20.04
-    needs: [ build-binary, setup-workflow ]
+    needs: build-binary
     env:
-      PACKAGE_NAME: "cheqd-node"
-      VERSION: ${{ needs.setup-workflow.outputs.VERSION }}
+      VERSION: ${{ needs.build-binary.outputs.VERSION }}
     steps:
       - uses: actions/checkout@v2
 
@@ -91,31 +75,53 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: cheqd-noded
-          path: /home/runner/go/bin
 
       - name: Restore binary permissions
-        run: sudo chmod +x /home/runner/go/bin/cheqd-noded
+        run: sudo chmod +x cheqd-noded
 
-      - name: Make intermediate archive
+      - name: Build tar
         working-directory: ./build-tools
         run: |
-          ./build-tar.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }}
+          ./build-tar.sh "../cheqd-noded"
+
+      - name: Store tar package artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: cheqd-node_${{ env.VERSION }}.tar.gz
+          path: build-tools/output/cheqd-node_${{ env.VERSION }}.tar.gz
+
+  build-deb-package:
+    name: Build Debian package
+    runs-on: ubuntu-20.04
+    needs: [ build-binary ]
+    env:
+      VERSION: ${{ needs.build-binary.outputs.VERSION }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Load binary artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: cheqd-noded
+
+      - name: Restore binary permissions
+        run: sudo chmod +x cheqd-noded
 
       - name: Install fpm
         run: |
           sudo apt-get install ruby ruby-dev rubygems build-essential
           sudo gem install --no-document fpm
 
-      - name: Build Debian package # Depends on tar archive
+      - name: Make intermediate archive
         working-directory: ./build-tools
         run: |
-          ./build-deb.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }}
+          ./build-deb.sh "../cheqd-noded"
 
       - name: Store Debian package artifact
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
-          path: build-tools/output/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+          name: cheqd-node_${{ env.VERSION }}_amd64.deb
+          path: build-tools/output/cheqd-node_${{ env.VERSION }}_amd64.deb
 
   build-node-image:
     name: Build cheqd-node Docker image
@@ -123,10 +129,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 0 # FIXME: Starport requires full repository
+          fetch-depth: 0 # Required to fetch version
 
       - name: Build
-        run: docker build -f docker/Dockerfile --no-cache -t cheqd-node
+        run: docker build -f docker/Dockerfile --no-cache -t cheqd-node .
 
       - name: Save
         run: docker save -o cheqd-node-image.tar cheqd-node
@@ -168,14 +174,10 @@ jobs:
   publish:
     name: "Publish images and release"
     # Reference to workflow-setup job is required to access its various outputs.
-    needs: [ setup-workflow, build-node-image, build-testnet-image, build-deb-package ]
+    needs: [ build-binary, build-node-image, build-testnet-image, build-deb-package, build-tar-package ]
     runs-on: ubuntu-latest
     env:
-      GITHUB_REPOSITORY_NAME: ${{ needs.setup-workflow.outputs.GITHUB_REPOSITORY_NAME }}
-      TAG: ${{ needs.setup-workflow.outputs.TAG }}
-      VERSION: ${{ needs.setup-workflow.outputs.VERSION }}
-      PACKAGE_NAME: "cheqd-node"
-      TESTNET_IMAGE_NAME: "cheqd-testnet"
+      VERSION: ${{ needs.build-binary.outputs.VERSION }}
     steps:
       - name: Git checkout
         uses: actions/checkout@v2
@@ -202,39 +204,33 @@ jobs:
 
       - name: Push node image
         run: |
-          docker tag cheqd-node ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
-          docker tag cheqd-node ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:latest
-          docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
-          docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:latest
+          docker tag cheqd-node ghcr.io/${{ github.repository }}:${{ env.VERSION }}
+          docker tag cheqd-node ghcr.io/${{ github.repository }}:latest
+          docker push ghcr.io/${{ github.repository }}:${{ env.VERSION }}
+          docker push ghcr.io/${{ github.repository }}:latest
 
       - name: Push testnet image
         run: |
-          docker tag cheqd-testnet ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:${{ env.VERSION }}
-          docker tag cheqd-testnet ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:latest
-          docker push ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:${{ env.VERSION }}
-          docker push ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:latest
+          docker tag cheqd-testnet ghcr.io/${{ github.repository_owner }}/cheqd-testnet:${{ env.VERSION }}
+          docker tag cheqd-testnet ghcr.io/${{ github.repository_owner }}/cheqd-testnet:latest
+          docker push ghcr.io/${{ github.repository_owner }}/cheqd-testnet:${{ env.VERSION }}
+          docker push ghcr.io/${{ github.repository_owner }}/cheqd-testnet:latest
 
       - name: Download deb
         uses: actions/download-artifact@v2
         with:
-          name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+          name: cheqd-node_${{ env.VERSION }}_amd64.deb
 
-      - name: Load binary artifact
+      - name: Download tar
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-noded
-
-      - name: Restore binary permissions
-        run: sudo chmod +x cheqd-noded
-
-      - name: Make tar archive
-        run: tar -zcvf ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz cheqd-noded
+          name: cheqd-node_${{ env.VERSION }}.tar.gz
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "${{ env.TAG }}"
+          automatic_release_tag: "${{ env.GITHUB_REF_NAME }}"
           prerelease: true
           files: |
-            ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
-            ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+            cheqd-node_${{ env.VERSION }}_amd64.deb
+            cheqd-node_${{ env.VERSION }}.tar.gz

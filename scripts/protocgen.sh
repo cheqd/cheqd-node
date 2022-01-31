@@ -15,6 +15,7 @@ proto_dirs=$(find . -path ./third_party -prune -o -name '*.proto' -print0 | xarg
 
 for dir in $proto_dirs; do
   # Generate protobuf bind
+  # shellcheck disable=SC2046
   buf protoc \
   -I "proto" \
   -I "$cosmos_sdk_dir/third_party/proto" \
@@ -24,6 +25,7 @@ Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types:. \
   $(find "${dir}" -name '*.proto')
 
   # Generate grpc gateway
+  # shellcheck disable=SC2046
   buf protoc \
   -I "proto" \
   -I "$cosmos_sdk_dir/third_party/proto" \

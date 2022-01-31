@@ -55,6 +55,7 @@ jobs:
         VALIDATE_XML: true
         VALIDATE_YAML: true
         VALIDATE_OPENAPI: true
+        VALIDATE_BASH: true
 
         VALIDATE_ALL_CODEBASE: true
         LOG_LEVEL: WARN

@@ -1,12 +1,14 @@
 #!/bin/bash
 
+# TODO: Improve or get rid
+
 set -euox pipefail
 
 cmd="$1"
 
-for i in 1 2 3; do
+for _ in 1 2 3; do
     sleep 60
-    if eval $cmd; then
+    if eval "$cmd"; then
         echo "Waiter returned success!"
         exit 0
     else
