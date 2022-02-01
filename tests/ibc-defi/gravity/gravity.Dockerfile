@@ -4,12 +4,8 @@ FROM golang:buster as builder
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
-    curl \
-    protobuf-compiler \
-    libprotobuf-dev \
-    wget \
-    git \
-    nano
+    protobuf-compiler=3.6.1.3-2 \
+    libprotobuf-dev=3.6.1.3-2
 
 # App
 WORKDIR /app
@@ -27,10 +23,9 @@ FROM debian:buster
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
-    nano \
-    curl \
-    wget \
-    netcat
+    nano=3.2-3 curl=7.64.0-4+deb10u2 wget=1.20.1-1.1 netcat=1.10-41.1 && \
+	apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Node binary
 COPY --from=builder /go/bin/liquidityd /bin

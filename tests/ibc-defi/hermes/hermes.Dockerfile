@@ -4,11 +4,8 @@ FROM rust:buster as builder
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
-    curl \
-    protobuf-compiler \
-    libprotobuf-dev \
-    wget \
-    git
+    protobuf-compiler=3.6.1.3-2 \
+    libprotobuf-dev=3.6.1.3-2
 
 WORKDIR /app
 
@@ -25,11 +22,9 @@ FROM debian:buster
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
-    libssl-dev \
-    nano \
-    curl \
-    wget \
-    netcat
+    libssl-dev=1.1.1d-0+deb10u7 nano=3.2-3 curl=7.64.0-4+deb10u2 wget=1.20.1-1.1 netcat=1.10-41.1 && \
+	apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Node binary
 COPY --from=builder /app/ibc-rs/target/release/hermes /bin
@@ -42,13 +37,12 @@ WORKDIR /hermes
 
 # Init
 COPY hermes_init.sh .
-RUN bash hermes_init.sh
-
 # Config
-RUN mkdir .hermes
 COPY config.toml .hermes
 
-RUN chown -R hermes /hermes
+RUN bash hermes_init.sh && \
+	mkdir .hermes && \
+	chown -R hermes /hermes
 USER hermes
 
 ENTRYPOINT [ "hermes" ]

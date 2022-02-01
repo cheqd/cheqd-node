@@ -6,9 +6,8 @@ FROM golang:buster as builder
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
-    curl \
-    libprotobuf-dev \
-    && rm -rf /var/lib/apt/lists/*
+	libprotobuf-dev=3.6.1.3-2 && \
+    rm -rf /var/lib/apt/lists/*
 
 # Get go protoc compiler plugins. Taken from: tendermintdev/sdk-proto-gen:v0.2
 ENV GOLANG_PROTOBUF_VERSION=1.3.5 \
@@ -24,6 +23,7 @@ RUN go get \
     github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@v${GRPC_GATEWAY_VERSION} \
     github.com/regen-network/cosmos-proto/protoc-gen-gocosmos@latest
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # Install buf
 RUN PREFIX="/usr/local" && \
     VERSION="1.0.0-rc8" && \
