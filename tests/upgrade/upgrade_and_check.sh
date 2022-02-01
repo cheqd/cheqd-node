@@ -22,12 +22,14 @@ docker_compose_up "$CHEQD_IMAGE_TO" $(pwd)
 bash ../networks/tools/wait-for-chain.sh $(echo $UPGRADE_HEIGHT+2 | bc)
 
 CURRENT_VERSION=$(docker run --entrypoint cheqd-noded cheqd-node version 2>&1)
-# CURRENT_VERSION=$(curl -s http://localhost:26657/abci_info | jq '.result.response.version' | grep -Eo '[0-9]*\.[0-9]*\.[0-9]*')
 
 if [ $CURRENT_VERSION != $CHEQD_VERSION_TO ] ; then
      echo "Upgrade to version $CHEQD_VERSION_TO was not successful"
      exit 1
 fi
+
+# Check that token transaction exists after upgrade too
+check_tx_hashes
 
 # Stop docker compose
 docker_compose_down
