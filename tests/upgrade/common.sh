@@ -15,6 +15,10 @@ DEPOSIT_AMOUNT=10000000
 CHAIN_ID="cheqd"
 CHEQD_USER="cheqd"
 FNAME_TXHASHES="txs.hashes"
+OP3_AMOUNT_BEFORE="19000000000000000"
+CHEQ_AMOUNT="1ncheq"
+CHEQ_AMOUNT_NUMBER="1"
+DID="did:cheqd:testnet:abcdef"
 
 # cheqd_noded docker wrapper
 
@@ -86,20 +90,16 @@ function get_addresses () {
     echo "${addresses[@]}"
 }
 
-CHEQ_AMOUNT="1ncheq"
-
 # Send tokens from the first address in the list to another one
 function send_tokens() {
     get_addresses 
 
     OP0_ADDRESS=${addresses[0]}
-    OP1_ADDRESS=${addresses[1]}
-    OP2_ADDRESS=${addresses[2]}
     OP3_ADDRESS=${addresses[3]}
 
     send_res=$(local_client_tx tx \
                     bank \
-                    send $OP0_ADDRESS $OP1_ADDRESS $CHEQ_AMOUNT \
+                    send $OP0_ADDRESS $OP3_ADDRESS $CHEQ_AMOUNT \
                     --gas auto \
                     --gas-adjustment 1.2 \
                     --gas-prices "25ncheq" \
@@ -119,7 +119,6 @@ function send_did () {
     ALICE_VER_PUB_MULTIBASE_58=$(cheqd_noded_docker debug encoding base64-multibase58 "${ALICE_VER_PUB_BASE_64}")
 
     # Build CreateDid message
-    DID="did:cheqd:testnet:$(random_string)"
     KEY_ID="${DID}#key1"
 
     MSG_CREATE_DID='{"id":"'${DID}'","verification_method":[{"id":"'${KEY_ID}'","type":"Ed25519VerificationKey2020","controller":"'${DID}'","public_key_multibase":"'${ALICE_VER_PUB_MULTIBASE_58}'"}],"authentication":["'${KEY_ID}'"]}'
@@ -150,4 +149,36 @@ function check_tx_hashes () {
             exit 1
         fi
     done    
+}
+
+function get_balance () {
+    address=$1
+    echo $(cheqd_noded_docker query bank balances $address | grep amount | sed 's/[^0-9]//g')
+}
+
+function get_did () {
+    requested_did=$1
+    cheqd_noded_docker query cheqd did $requested_did --output json
+}
+
+# Check that balance of operator3 increased to CHEQ_AMOUNT
+function check_balance () {
+    get_addresses
+    OP3_ADDRESS=${addresses[3]}
+    new_balance=$(get_balance $OP3_ADDRESS)
+    if [ $(echo $new_balance-$OP3_AMOUNT_BEFORE | bc) != $CHEQ_AMOUNT_NUMBER ];
+    then
+        echo "Balance after token send is not expected"
+        exit 1
+    fi
+}
+
+# Check that $DID exists
+function check_did () {
+    did_from=$(get_did $DID | jq ".did.id" | tr -d '"')
+    if [ $did_from != "$DID" ];
+    then
+        echo "There is no any $DID on server"
+        exit 1
+    fi
 }

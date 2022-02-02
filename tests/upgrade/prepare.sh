@@ -13,9 +13,6 @@ clean_env
 # Generate config files
 bash gen_node_configs.sh
 
-# Make all the data accessable
-make_777
-
 # Start the network on version which will be upgraded from
 docker_compose_up "${CHEQD_IMAGE_FROM}" $(pwd)
 
@@ -30,3 +27,9 @@ send_did
 
 # Check that token transaction exists
 check_tx_hashes
+
+# Check that $DID was written
+check_did
+
+# Check balances after token sending
+check_balance

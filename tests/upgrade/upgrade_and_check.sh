@@ -31,6 +31,12 @@ fi
 # Check that token transaction exists after upgrade too
 check_tx_hashes
 
+# Check balances after token sending
+check_balance
+
+# Check that did written before upgrade stil exist
+check_did
+
 # Stop docker compose
 docker_compose_down
 
