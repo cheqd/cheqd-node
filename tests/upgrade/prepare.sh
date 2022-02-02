@@ -19,17 +19,21 @@ docker_compose_up "${CHEQD_IMAGE_FROM}" $(pwd)
 # Wait for start ordering, till height 1
 bash ../networks/tools/wait-for-chain.sh 1
 
-# Send tokens before upgrade
-send_tokens
+# Get address of operator which will be used for sending tokens before upgrade
+get_addresses
+OP2_ADDRESS=${addresses[2]}
 
-# Send DID transactions
-send_did
+# Send tokens before upgrade
+send_tokens $OP2_ADDRESS
+
+# Send DID transaction
+send_did $DID_1
 
 # Check that token transaction exists
 check_tx_hashes
 
 # Check that $DID was written
-check_did
+check_did $DID_1
 
-# Check balances after token sending
-check_balance
+# Check balance after token sending
+check_balance $OP2_ADDRESS
