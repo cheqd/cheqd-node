@@ -311,6 +311,8 @@ jobs:
     needs: build-node-image
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # It's needed for getting the full version of package by `git describe`
 
       - name: Download node image
         uses: actions/download-artifact@v2
