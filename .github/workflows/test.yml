@@ -122,10 +122,10 @@ jobs:
           fetch-depth: 0 # FIXME: Starport requires full repository
 
       - name: Build cheqd-cli with 'cheqd-noded' as entrypoint
-        run: docker build --target base -t cheqd-cli -f docker/Dockerfile .
+        run: docker build --target base -t cheqd-cli -f docker/Dockerfile --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
 
       - name: Build cheqd-node with 'node-start' as entrypoint
-        run: docker build --target node -t cheqd-node -f docker/Dockerfile .
+        run: docker build --target node -t cheqd-node -f docker/Dockerfile --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
           
 
       - name: Save cheqd-cli
