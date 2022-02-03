@@ -8,7 +8,6 @@ services:
       - "26657:26657" # rpc
     volumes:
       - "${MOUNT_POINT}/node_configs/node0:/cheqd"
-    entrypoint: cheqd-noded
     user: cheqd
     environment:
       - HOME=/cheqd
@@ -21,7 +20,6 @@ services:
       - "26660:26657" # rpc
     volumes:
       - "${MOUNT_POINT}/node_configs/node1:/cheqd"
-    entrypoint: cheqd-noded
     user: cheqd
     environment:
       - HOME=/cheqd
@@ -34,7 +32,6 @@ services:
       - "26663:26657" # rpc
     volumes:
       - "${MOUNT_POINT}/node_configs/node2:/cheqd"
-    entrypoint: cheqd-noded
     user: cheqd
     environment:
       - HOME=/cheqd
@@ -47,7 +44,6 @@ services:
       - "26666:26657" # rpc
     volumes:
       - "${MOUNT_POINT}/node_configs/node3:/cheqd"
-    entrypoint: cheqd-noded
     user: cheqd
     environment:
       - HOME=/cheqd
@@ -60,7 +56,6 @@ services:
       - "26669:26657" # rpc
     volumes:
       - "${MOUNT_POINT}/node_configs/observer0:/cheqd"
-    entrypoint: cheqd-noded
     user: cheqd
     environment:
       - HOME=/cheqd
@@ -73,7 +68,6 @@ services:
       - "26672:26657" # rpc
     volumes:
       - "${MOUNT_POINT}/node_configs/observer1:/cheqd"
-    entrypoint: cheqd-noded
     user: cheqd
     environment:
       - HOME=/cheqd

@@ -121,16 +121,26 @@ jobs:
         with:
           fetch-depth: 0 # FIXME: Starport requires full repository
 
-      - name: Build
-        run: |
-          export CHEQD_NODE_VERSION=local
-          docker compose --env-file docker/persistent-chains/docker-compose.env -f docker/persistent-chains/docker-compose.yml build --build-arg UID=$(id -u) --build-arg GID=$(id -g)
-          docker tag ghcr.io/cheqd/cheqd-node:local cheqd-node
+      - name: Build cheqd-cli with 'cheqd-noded' as entrypoint
+        run: docker build --target base -t cheqd-cli .
 
-      - name: Save
-        run: docker save -o cheqd-node-image.tar cheqd-node
+      - name: Build cheqd-node with 'node-start' as entrypoint
+        run: docker build --target node -t cheqd-node .
+          
 
-      - name: Store artifact
+      - name: Save cheqd-cli
+        run: docker save -o cheqd-cli-image.tar cheqd-cli
+
+      - name: Save cheqd-node
+        run: docker save -o cheqd-cli-image.tar cheqd-node
+
+      - name: Store cheqd-cli artifact 
+        uses: actions/upload-artifact@v2
+        with:
+          name: cheqd-cli-image.tar
+          path: cheqd-cli-image.tar
+      
+      - name: Store cheqd-node artifact 
         uses: actions/upload-artifact@v2
         with:
           name: cheqd-node-image.tar
@@ -147,10 +157,10 @@ jobs:
       - name: Download node image
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-node-image.tar
+          name: cheqd-cli-image.tar
 
       - name: Load node image
-        run: docker load -i cheqd-node-image.tar
+        run: docker load -i cheqd-cli-image.tar
 
       - name: Build
         run: docker build -f tests/networks/docker-localnet/Dockerfile --no-cache -t cheqd-testnet .
@@ -180,10 +190,10 @@ jobs:
       - name: Download node image
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-node-image.tar
+          name: cheqd-cli-image.tar
 
       - name: Load node image
-        run: docker load -i cheqd-node-image.tar
+        run: docker load -i cheqd-cli-image.tar
 
       - name: Check out
         uses: actions/checkout@v2
@@ -237,10 +247,10 @@ jobs:
       - name: Download node image
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-node-image.tar
+          name: cheqd-cli-image.tar
 
       - name: Load node image
-        run: docker load -i cheqd-node-image.tar
+        run: docker load -i cheqd-cli-image.tar
 
       - uses: actions/checkout@v2
 
@@ -317,10 +327,10 @@ jobs:
       - name: Download node image
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-node-image.tar
+          name: cheqd-cli-image.tar
 
       - name: Load node image
-        run: docker load -i cheqd-node-image.tar
+        run: docker load -i cheqd-cli-image.tar
 
       - name: Chown for current user
         run: sudo chown $USER:$USER .

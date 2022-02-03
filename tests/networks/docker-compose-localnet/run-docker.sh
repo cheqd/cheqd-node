@@ -6,11 +6,12 @@ set -euox pipefail
 
 # cheqd_noded docker wrapper
 
+CHEQD_NODE_IMAGE=cheqd-cli
+
 cheqd_noded_docker() {
   docker run --rm \
     -v "$(pwd)":"/home/cheqd" \
-    --entrypoint "cheqd-noded" \
-    cheqd-node "$@"
+    $CHEQD_NODE_IMAGE "$@"
 }
 
 # sed in macos requires extra argument

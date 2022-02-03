@@ -6,6 +6,8 @@ set -euox pipefail
 
 # sed in macos requires extra argument
 
+CHEQD_NODE_IMAGE=cheqd-cli
+
 sed_extension=''
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     sed_extension=''
@@ -18,8 +20,7 @@ fi
 cheqd_noded_docker() {
   docker run --rm \
     -v "$(pwd)":"/home/cheqd" \
-    --entrypoint "cheqd-noded" \
-    cheqd-node "$@"
+    $CHEQD_NODE_IMAGE "$@"
 }
 
 
