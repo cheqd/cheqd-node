@@ -132,7 +132,7 @@ jobs:
         run: docker save -o cheqd-cli-image.tar cheqd-cli
 
       - name: Save cheqd-node
-        run: docker save -o cheqd-cli-image.tar cheqd-node
+        run: docker save -o cheqd-node-image.tar cheqd-node
 
       - name: Store cheqd-cli artifact 
         uses: actions/upload-artifact@v2
