@@ -2,8 +2,8 @@ name: Release
 
 on:
   push:
-    tags:
-      - "v*"
+#    tags:
+#      - "v*"
 
 jobs:
   setup-workflow:
@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       GITHUB_REPOSITORY_NAME: ${{ steps.cache.outputs.GITHUB_REPOSITORY_NAME }}
+      GITHUB_ORG_NAME: ${{ steps.cache.outputs.GITHUB_ORG_NAME }}
       TAG: ${{ steps.cache.outputs.TAG }}
       VERSION: ${{ steps.cache.outputs.VERSION }}
     steps:
@@ -20,6 +21,9 @@ jobs:
       - name: Set outputs
         id: cache
         run: |
+          # Exposes org_name in lower case. Required by Docker.
+          echo "::set-output name=GITHUB_ORG_NAME::$(echo ${GITHUB_REPOSITORY_OWNER,,})"
+
           # Exposes org_name/repository_name in lower case. Required by Docker.
           echo "::set-output name=GITHUB_REPOSITORY_NAME::$(echo ${GITHUB_REPOSITORY,,})"
 
@@ -125,16 +129,25 @@ jobs:
         with:
           fetch-depth: 0 # FIXME: Starport requires full repository
 
-      - name: Build
-        run: |
-          export CHEQD_NODE_VERSION=local
-          docker compose --env-file docker/persistent-chains/docker-compose.env -f docker/persistent-chains/docker-compose.yml build
-          docker tag ghcr.io/cheqd/cheqd-node:local cheqd-node
+      - name: Build cheqd-cli with 'cheqd-noded' as entrypoint
+        run: docker build --target base -t cheqd-cli -f docker/Dockerfile --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
 
-      - name: Save
+      - name: Build cheqd-node with 'node-start' as entrypoint
+        run: docker build --target node -t cheqd-node -f docker/Dockerfile --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
+
+      - name: Save cheqd-cli
+        run: docker save -o cheqd-cli-image.tar cheqd-cli
+
+      - name: Save cheqd-node
         run: docker save -o cheqd-node-image.tar cheqd-node
 
-      - name: Store artifact
+      - name: Store cheqd-cli artifact 
+        uses: actions/upload-artifact@v2
+        with:
+          name: cheqd-cli-image.tar
+          path: cheqd-cli-image.tar
+      
+      - name: Store cheqd-node artifact 
         uses: actions/upload-artifact@v2
         with:
           name: cheqd-node-image.tar
@@ -151,10 +164,10 @@ jobs:
       - name: Download node image
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-node-image.tar
+          name: cheqd-cli-image.tar
 
       - name: Load node image
-        run: docker load -i cheqd-node-image.tar
+        run: docker load -i cheqd-cli-image.tar
 
       - name: Build
         run: docker build -f tests/networks/docker-localnet/Dockerfile --no-cache -t cheqd-testnet .
@@ -175,6 +188,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_REPOSITORY_NAME: ${{ needs.setup-workflow.outputs.GITHUB_REPOSITORY_NAME }}
+      GITHUB_ORG_NAME: ${{ needs.setup-workflow.outputs.GITHUB_ORG_NAME }}
       TAG: ${{ needs.setup-workflow.outputs.TAG }}
       VERSION: ${{ needs.setup-workflow.outputs.VERSION }}
       PACKAGE_NAME: "cheqd-node"
@@ -183,12 +197,20 @@ jobs:
       - name: Git checkout
         uses: actions/checkout@v2
 
-      - name: Download node image
+      - name: Download cheqd-cli image
+        uses: actions/download-artifact@v2
+        with:
+          name: cheqd-cli-image.tar
+
+      - name: Download cheqd-node image
         uses: actions/download-artifact@v2
         with:
           name: cheqd-node-image.tar
 
-      - name: Load node image
+      - name: Load cheqd-cli image
+        run: docker load -i cheqd-cli-image.tar
+
+      - name: Load cheqd-node image
         run: docker load -i cheqd-node-image.tar
 
       - name: Download testnet image
@@ -203,19 +225,27 @@ jobs:
         run: |
           echo ${{ secrets.GH_PAT }} | docker login ghcr.io --username ${{ secrets.GH_USER }} --password-stdin
 
-      - name: Push node image
+      - name: Push cheqd-node image
         run: |
           docker tag cheqd-node ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
           docker tag cheqd-node ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:latest
-          docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
-          docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:latest
+#          docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
+#          docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:latest
+
+      
+      - name: Push cheqd-cli image
+        run: |
+          docker tag cheqd-cli ghcr.io/${{ env.GITHUB_ORG_NAME }}/cheqd-cli:${{ env.VERSION }}
+          docker tag cheqd-cli ghcr.io/${{ env.GITHUB_ORG_NAME }}/cheqd-cli:latest
+#          docker push ghcr.io/${{ env.GITHUB_ORG_NAME }}:${{ env.VERSION }}
+#          docker push ghcr.io/${{ env.GITHUB_ORG_NAME }}:latest
 
       - name: Push testnet image
         run: |
           docker tag cheqd-testnet ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:${{ env.VERSION }}
           docker tag cheqd-testnet ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:latest
-          docker push ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:${{ env.VERSION }}
-          docker push ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:latest
+#          docker push ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:${{ env.VERSION }}
+#          docker push ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:latest
 
       - name: Download deb
         uses: actions/download-artifact@v2
@@ -233,11 +263,11 @@ jobs:
       - name: Make tar archive
         run: tar -zcvf ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz cheqd-noded
 
-      - uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "${{ env.TAG }}"
-          prerelease: true
-          files: |
-            ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
-            ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+#      - uses: "marvinpinto/action-automatic-releases@latest"
+#        with:
+#          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+#          automatic_release_tag: "${{ env.TAG }}"
+#          prerelease: true
+#          files: |
+#            ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+#            ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz

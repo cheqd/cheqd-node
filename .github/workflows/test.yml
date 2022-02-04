@@ -127,7 +127,6 @@ jobs:
       - name: Build cheqd-node with 'node-start' as entrypoint
         run: docker build --target node -t cheqd-node -f docker/Dockerfile --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
           
-
       - name: Save cheqd-cli
         run: docker save -o cheqd-cli-image.tar cheqd-cli
 
