@@ -2,8 +2,8 @@ name: Release
 
 on:
   push:
-#    tags:
-#      - "v*"
+    tags:
+      - "v*"
 
 jobs:
   setup-workflow:
@@ -13,8 +13,7 @@ jobs:
       GITHUB_REPOSITORY_NAME: ${{ steps.cache.outputs.GITHUB_REPOSITORY_NAME }}
       GITHUB_ORG_NAME: ${{ steps.cache.outputs.GITHUB_ORG_NAME }}
       TAG: ${{ steps.cache.outputs.TAG }}
-      VERSION: 0.0.1
-      #VERSION: ${{ steps.cache.outputs.VERSION }}
+      VERSION: ${{ steps.cache.outputs.VERSION }}
     steps:
       - name: Git checkout
         uses: actions/checkout@v2
@@ -230,23 +229,23 @@ jobs:
         run: |
           docker tag cheqd-node ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
           docker tag cheqd-node ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:latest
-#          docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
-#          docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:latest
+          docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:${{ env.VERSION }}
+          docker push ghcr.io/${{ env.GITHUB_REPOSITORY_NAME }}:latest
 
       
       - name: Push cheqd-cli image
         run: |
           docker tag cheqd-cli ghcr.io/${{ env.GITHUB_ORG_NAME }}/cheqd-cli:${{ env.VERSION }}
           docker tag cheqd-cli ghcr.io/${{ env.GITHUB_ORG_NAME }}/cheqd-cli:latest
-#          docker push ghcr.io/${{ env.GITHUB_ORG_NAME }}:${{ env.VERSION }}
-#          docker push ghcr.io/${{ env.GITHUB_ORG_NAME }}:latest
+          docker push ghcr.io/${{ env.GITHUB_ORG_NAME }}:${{ env.VERSION }}
+          docker push ghcr.io/${{ env.GITHUB_ORG_NAME }}:latest
 
       - name: Push testnet image
         run: |
           docker tag cheqd-testnet ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:${{ env.VERSION }}
           docker tag cheqd-testnet ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:latest
-#          docker push ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:${{ env.VERSION }}
-#          docker push ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:latest
+          docker push ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:${{ env.VERSION }}
+          docker push ghcr.io/${{ github.repository_owner }}/${{ env.TESTNET_IMAGE_NAME }}:latest
 
       - name: Download deb
         uses: actions/download-artifact@v2
@@ -264,11 +263,11 @@ jobs:
       - name: Make tar archive
         run: tar -zcvf ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz cheqd-noded
 
-#      - uses: "marvinpinto/action-automatic-releases@latest"
-#        with:
-#          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-#          automatic_release_tag: "${{ env.TAG }}"
-#          prerelease: true
-#          files: |
-#            ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
-#            ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "${{ env.TAG }}"
+          prerelease: true
+          files: |
+            ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+            ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}.tar.gz
