@@ -1,6 +1,12 @@
 ### APP-SPECIFIC EXCLUSIONS ###
+
+# Cosmos SDK
 **/node_configs
-.idea
+
+# Python
+.pytest_cache
+**/__pycache__
+
 
 ### GENERAL EXCLUSIONS ###
 
@@ -35,8 +41,7 @@ Temporary Items
 # VS Code
 .devcontainer
 .vscode
-
-# Python
-.pytest_cache
-**/__pycache__
 .vscode-upload.json
+
+# IDEs
+.idea
