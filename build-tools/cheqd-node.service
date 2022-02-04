@@ -1,0 +1,21 @@
+[Unit]
+Description=Service for running cheqd-node daemon
+After=network.target
+
+[Service]
+Type=simple
+User=cheqd
+ExecStart=/usr/bin/cheqd-noded start
+Restart=on-failure
+RestartSec=10
+StartLimitBurst=10
+StartLimitInterval=200
+TimeoutSec=300
+StandardOutput=syslog
+StandardError=syslog
+SyslogFacility=syslog
+SyslogIdentifier=cheqd-noded
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target
