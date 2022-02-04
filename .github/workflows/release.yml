@@ -13,7 +13,8 @@ jobs:
       GITHUB_REPOSITORY_NAME: ${{ steps.cache.outputs.GITHUB_REPOSITORY_NAME }}
       GITHUB_ORG_NAME: ${{ steps.cache.outputs.GITHUB_ORG_NAME }}
       TAG: ${{ steps.cache.outputs.TAG }}
-      VERSION: ${{ steps.cache.outputs.VERSION }}
+      VERSION: 0.0.1
+      #VERSION: ${{ steps.cache.outputs.VERSION }}
     steps:
       - name: Git checkout
         uses: actions/checkout@v2
