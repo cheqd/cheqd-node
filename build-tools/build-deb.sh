@@ -32,7 +32,9 @@ fpm \
     --description "cheqd node" \
     --architecture "${ARCH}" \
     --after-install "postinst" \
-    --after-remove "postremove" \
+    --after-purge "postpurge" \
+    --deb-systemd-enable \
+    --deb-systemd cheqd-node.service \
     --depends "logrotate" \
     --verbose \
     --package "${PKG_PATH}" \

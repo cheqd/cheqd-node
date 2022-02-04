@@ -17,8 +17,8 @@ if test -f "/etc/rsyslog.d/cheqd-node.conf"; then
     # Remove syslog conf
     rm /etc/rsyslog.d/cheqd-node.conf
 
-    # Remove symlink to log location
-    rm /var/log/cheqd-node
+    # Remove logs
+    rm -rf /var/log/cheqd-node/
 
     # Restart syslog
     systemctl restart rsyslog
