@@ -34,7 +34,7 @@ fpm \
     --after-install "postinst" \
     --deb-after-purge "postpurge" \
     --deb-systemd-enable \
-    --deb-systemd cheqd-node.service \
+    --deb-systemd cheqd-noded.service \
     --depends "logrotate" \
     --verbose \
     --package "${PKG_PATH}" \
