@@ -21,7 +21,7 @@ docker_compose_up "$CHEQD_IMAGE_TO" $(pwd)
 # Wait for upgrade height
 bash ../networks/tools/wait-for-chain.sh $(echo $UPGRADE_HEIGHT+2 | bc)
 
-CURRENT_VERSION=$(docker run --entrypoint cheqd-noded cheqd-node version 2>&1)
+CURRENT_VERSION=$(docker run --entrypoint cheqd-noded $CHEQD_IMAGE_TO version 2>&1)
 
 if [ $CURRENT_VERSION != $CHEQD_VERSION_TO ] ; then
      echo "Upgrade to version $CHEQD_VERSION_TO was not successful"

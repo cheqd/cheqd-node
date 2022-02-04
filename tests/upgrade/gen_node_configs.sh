@@ -27,15 +27,6 @@ edit_genesis () {
     jq "${PARAMETER_NAME} = \"${VALUE}\"" $GENESIS_PATH > /tmp/1 && mv /tmp/1 $GENESIS_PATH
 }
 
-# We use local copy of this function because of using -u root for allowing files creation inside the
-cheqd_noded_docker() {
-  docker run --rm \
-    -v "$(pwd)":"/cheqd" \
-    --network host \
-    --entrypoint "cheqd-noded" \
-    -u root \
-    ${CHEQD_IMAGE_FROM} "$@" --home /cheqd/.cheqdnode
-}
 
 VALIDATORS_COUNT="4"
 OBSERVERS_COUNT="2"
