@@ -1,16 +1,17 @@
 [Unit]
 Description=Service for running cheqd-node daemon
 After=network.target
+Documentation=https://docs.cheqd.io/node
 
 [Service]
 Type=simple
 User=cheqd
 ExecStart=/usr/bin/cheqd-noded start
 Restart=on-failure
-RestartSec=10
-StartLimitBurst=10
-StartLimitInterval=200
-TimeoutSec=300
+RestartSec=30
+StartLimitBurst=5
+StartLimitInterval=60
+TimeoutSec=120
 StandardOutput=syslog
 StandardError=syslog
 SyslogFacility=syslog
