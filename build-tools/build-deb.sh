@@ -30,9 +30,14 @@ fpm \
     --version "${VERSION}" \
     --name "cheqd-node" \
     --description "cheqd node" \
+    --url "https://github.com/cheqd/cheqd-node"
     --architecture "${ARCH}" \
+    --deb-generate-changes \
+    --deb-compression gz \
     --after-install "postinst" \
-    --after-remove "postremove" \
+    --deb-after-purge "postpurge" \
+    --deb-systemd-enable \
+    --deb-systemd cheqd-noded.service \
     --depends "logrotate" \
     --verbose \
     --package "${PKG_PATH}" \
