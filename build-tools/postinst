@@ -77,31 +77,3 @@ systemctl restart logrotate.service
 systemctl restart logrotate.timer
 fi
 
-# Add systemd script
-if [ ! -f /lib/systemd/system/cheqd-noded.service ] ; then
-  cat <<EOF > /lib/systemd/system/cheqd-noded.service
-[Unit]
-Description=Service for running cheqd-node daemon
-After=network.target
-
-[Service]
-Type=simple
-User=cheqd
-ExecStart=/usr/bin/cheqd-noded start
-Restart=on-failure
-RestartSec=10
-StartLimitBurst=10
-StartLimitInterval=200
-TimeoutSec=300
-StandardOutput=syslog
-StandardError=syslog
-SyslogFacility=syslog
-SyslogIdentifier=cheqd-noded
-LimitNOFILE=65535
-
-[Install]
-WantedBy=multi-user.target
-EOF
-  # Reload daemons for systemctl
-  systemctl daemon-reload
-fi
