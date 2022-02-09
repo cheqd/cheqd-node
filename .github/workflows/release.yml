@@ -131,13 +131,25 @@ jobs:
         with:
           fetch-depth: 0 # Required to fetch version
 
-      - name: Build
-        run: docker build -f docker/Dockerfile --no-cache -t cheqd-node .
+      - name: Build cheqd-cli with 'cheqd-noded' as entrypoint
+        run: docker build --target base -t cheqd-cli -f docker/Dockerfile .
 
-      - name: Save
+      - name: Build cheqd-node with 'node-start' as entrypoint
+        run: docker build --target node -t cheqd-node -f docker/Dockerfile .
+
+      - name: Save cheqd-cli
+        run: docker save -o cheqd-cli-image.tar cheqd-cli
+
+      - name: Save cheqd-node
         run: docker save -o cheqd-node-image.tar cheqd-node
 
-      - name: Store artifact
+      - name: Store cheqd-cli artifact 
+        uses: actions/upload-artifact@v2
+        with:
+          name: cheqd-cli-image.tar
+          path: cheqd-cli-image.tar
+      
+      - name: Store cheqd-node artifact 
         uses: actions/upload-artifact@v2
         with:
           name: cheqd-node-image.tar
@@ -154,10 +166,10 @@ jobs:
       - name: Download node image
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-node-image.tar
+          name: cheqd-cli-image.tar
 
       - name: Load node image
-        run: docker load -i cheqd-node-image.tar
+        run: docker load -i cheqd-cli-image.tar
 
       - name: Build
         run: docker build -f tests/networks/docker-localnet/Dockerfile --no-cache -t cheqd-testnet .
@@ -182,12 +194,20 @@ jobs:
       - name: Git checkout
         uses: actions/checkout@v2
 
-      - name: Download node image
+      - name: Download cheqd-cli image
+        uses: actions/download-artifact@v2
+        with:
+          name: cheqd-cli-image.tar
+
+      - name: Download cheqd-node image
         uses: actions/download-artifact@v2
         with:
           name: cheqd-node-image.tar
 
-      - name: Load node image
+      - name: Load cheqd-cli image
+        run: docker load -i cheqd-cli-image.tar
+
+      - name: Load cheqd-node image
         run: docker load -i cheqd-node-image.tar
 
       - name: Download testnet image
@@ -202,12 +222,20 @@ jobs:
         run: |
           echo ${{ secrets.GH_PAT }} | docker login ghcr.io --username ${{ secrets.GH_USER }} --password-stdin
 
-      - name: Push node image
+      - name: Push cheqd-node image
         run: |
           docker tag cheqd-node ghcr.io/${{ github.repository }}:${{ env.VERSION }}
           docker tag cheqd-node ghcr.io/${{ github.repository }}:latest
           docker push ghcr.io/${{ github.repository }}:${{ env.VERSION }}
           docker push ghcr.io/${{ github.repository }}:latest
+
+      
+      - name: Push cheqd-cli image
+        run: |
+          docker tag cheqd-cli ghcr.io/${{ env.GITHUB_ORG_NAME }}/cheqd-cli:${{ env.VERSION }}
+          docker tag cheqd-cli ghcr.io/${{ env.GITHUB_ORG_NAME }}/cheqd-cli:latest
+          docker push ghcr.io/${{ env.GITHUB_ORG_NAME }}:${{ env.VERSION }}
+          docker push ghcr.io/${{ env.GITHUB_ORG_NAME }}:latest
 
       - name: Push testnet image
         run: |

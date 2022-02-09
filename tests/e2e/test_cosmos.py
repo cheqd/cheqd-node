@@ -3,13 +3,12 @@ import pytest
 import re
 import time
 import getpass
-from hypothesis import settings, given, strategies, Phase, Verbosity
-from string import digits, ascii_letters
+from hypothesis import settings, given, strategies
+from string import ascii_letters
 from helpers import run, run_interaction, get_balance, send_with_note, set_up_operator, random_string, \
-    TEST_NET_NETWORK, TEST_NET_NODE_TCP, TEST_NET_NODE_HTTP, TEST_NET_DESTINATION, TEST_NET_DESTINATION_HTTP, \
     LOCAL_NET_NETWORK, LOCAL_NET_NODE_TCP, LOCAL_NET_NODE_HTTP, LOCAL_NET_DESTINATION, LOCAL_NET_DESTINATION_HTTP, \
     TEST_NET_FEES, TEST_NET_GAS_X_GAS_PRICES, YES_FLAG, IMPLICIT_TIMEOUT, \
-    LOCAL_SENDER_ADDRESS, LOCAL_RECEIVER_ADDRESS,CODE_0, TEST_NET_GAS_X_GAS_PRICES_INT, KEYRING_BACKEND_TEST
+    LOCAL_SENDER_ADDRESS, LOCAL_RECEIVER_ADDRESS, CODE_0, TEST_NET_GAS_X_GAS_PRICES_INT, KEYRING_BACKEND_TEST
 
 
 @pytest.mark.parametrize(

@@ -1,5 +1,5 @@
 ###############################################################
-###         STAGE 1: Build container for node binary        ###
+###        STAGE 1: Build node binary pre-requisites        ###
 ###############################################################
 
 FROM golang:buster as builder
@@ -48,18 +48,13 @@ COPY .git .
 RUN make proto-gen build
 
 ###############################################################
-###             STAGE 2: Build cheqd-node container         ###
+###      STAGE 2: Build cheqd binary base container         ###
 ###############################################################
-#####    #####
 
-FROM ubuntu:focal
+FROM ubuntu:focal AS base
 
 # Copy compiled node binary from Stage 1
 COPY --from=builder /app/build/cheqd-noded /bin
-
-# Set runner script
-COPY docker/node-runner.sh /bin/node-runner
-RUN chmod +x /bin/node-runner
 
 # Set user directory and details
 ARG CHEQD_HOME_DIR="/home/cheqd"
@@ -73,7 +68,7 @@ RUN groupadd --system --gid $GID cheqd \
 WORKDIR ${CHEQD_HOME_DIR}
 USER cheqd
 
-# Expose default cheqd-node ports to host
+# Document default ports to expose to host
 EXPOSE 26656 26657 26660 1317 9090 9091
 
 # Define stop scenarios
@@ -81,3 +76,17 @@ STOPSIGNAL SIGTERM
 
 # Default entrypoint for cheqd-noded CLI usage
 ENTRYPOINT [ "cheqd-noded" ]
+
+
+###############################################################
+###             STAGE 3: Build cheqd-node image             ###
+###############################################################
+
+FROM base AS node
+
+# Set runner script
+COPY --chown=cheqd:cheqd docker/persistent-chains/entrypoint.sh /bin/node-start
+RUN chmod +x /bin/node-start
+
+# Default entrypoint for cheqd-noded CLI usage
+ENTRYPOINT [ "node-start" ]
