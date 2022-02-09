@@ -123,8 +123,8 @@ jobs:
           name: cheqd-node_${{ env.VERSION }}_amd64.deb
           path: build-tools/output/cheqd-node_${{ env.VERSION }}_amd64.deb
 
-  build-node-image:
-    name: Build cheqd-node Docker image
+  build-node-images:
+    name: Build cheqd-node and cheqd-cli images
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -158,7 +158,7 @@ jobs:
   build-testnet-image:
     name: Build cheqd-testnet image
     runs-on: ubuntu-20.04
-    needs: build-node-image
+    needs: build-node-images
     steps:
       - name: Check out
         uses: actions/checkout@v2
@@ -186,7 +186,7 @@ jobs:
   publish:
     name: "Publish images and release"
     # Reference to workflow-setup job is required to access its various outputs.
-    needs: [ build-binary, build-node-image, build-testnet-image, build-deb-package, build-tar-package ]
+    needs: [ build-binary, build-node-images, build-testnet-image, build-deb-package, build-tar-package ]
     runs-on: ubuntu-latest
     env:
       VERSION: ${{ needs.build-binary.outputs.VERSION }}

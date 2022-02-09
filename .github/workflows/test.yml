@@ -143,8 +143,8 @@ jobs:
           name: cheqd-node_${{ env.VERSION }}_amd64.deb
           path: build-tools/output/cheqd-node_${{ env.VERSION }}_amd64.deb
 
-  build-node-image:
-    name: Build cheqd-node image
+  build-node-images:
+    name: Build cheqd-node and cheqd-cli images
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -178,7 +178,7 @@ jobs:
   build-testnet-image:
     name: Build cheqd-testnet image
     runs-on: ubuntu-20.04
-    needs: build-node-image
+    needs: build-node-images
     steps:
       - name: Check out
         uses: actions/checkout@v2
@@ -206,7 +206,7 @@ jobs:
   test-new-node-setup-from-deb:
     name: Test new node setup from deb
     runs-on: ubuntu-20.04
-    needs: [build-binary, build-deb-package, build-node-image]
+    needs: [build-binary, build-deb-package, build-node-images]
     env:
       VERSION: ${{ needs.build-binary.outputs.VERSION }}
     steps:
@@ -266,7 +266,7 @@ jobs:
   run-cosmos-tests-using-cli:
     name: Run cosmos and identity tests using CLI
     runs-on: ubuntu-20.04
-    needs: [build-node-image, build-binary]
+    needs: [build-node-images, build-binary]
     steps:
       - name: Load binary artifact
         uses: actions/download-artifact@v2
@@ -356,7 +356,7 @@ jobs:
   run-upgrade-test-positive-case:
     name: Run positive case for upgrade
     runs-on: ubuntu-20.04
-    needs: build-node-image
+    needs: build-node-images
     steps:
       - uses: actions/checkout@v2
         with:
