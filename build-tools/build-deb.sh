@@ -35,7 +35,7 @@ fpm \
   --version "${VERSION}" \
   --name "cheqd-node" \
   --description "cheqd node" \
-  --url "https://github.com/cheqd/cheqd-node"
+  --url "https://github.com/cheqd/cheqd-node" \
   --architecture "${ARCH}" \
   --deb-generate-changes \
   --deb-compression gz \
