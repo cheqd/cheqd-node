@@ -2,10 +2,9 @@
 
 set -euox pipefail
 
-DOCKER_COMPOSE_DIR="../networks/docker-compose-localnet"
 CHEQD_IMAGE_FROM="ghcr.io/cheqd/cheqd-node:0.4.0"
 CHEQD_IMAGE_TO="cheqd-cli"
-CHEQD_VERSION_TO=`echo $(git describe --always --tag --match "v*") | sed 's/^v//'`
+CHEQD_VERSION_TO=$(git describe --always --tag --match "v*" | sed 's/^v//')
 UPGRADE_NAME="v0.4"
 VOTING_PERIOD=30
 EXPECTED_BLOCK_SECOND=5
@@ -52,13 +51,13 @@ function docker_compose_up () {
     export NODE_0_ID=$(cheqd_noded_docker tendermint show-node-id | sed 's/\r//g')
     export CHEQD_IMAGE_NAME="$1"
     export MOUNT_POINT=$MOUNT_POINT
-    docker-compose -f ../../$DOCKER_COMPOSE_DIR/docker-compose.yml --env-file ../../$DOCKER_COMPOSE_DIR/.env up -d
+    docker-compose -f docker-compose.yml --env-file .env up -d
     pushd $CURR_DIR
 }
 
 # Stop docker-compose
 function docker_compose_down () {
-    docker-compose -f $DOCKER_COMPOSE_DIR/docker-compose.yml --env-file $DOCKER_COMPOSE_DIR/.env down 
+    docker-compose -f docker-compose.yml --env-file .env down 
 }
 
 # Clean environment
