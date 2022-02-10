@@ -45,19 +45,19 @@ function docker_exec () {
 # $1 - Version of base image
 # $2 - Root path for making directories for volumes
 function docker_compose_up () {
-    CURR_DIR=$(pwd)
-    MOUNT_POINT="$2"
     pushd "node_configs/node0"
     export NODE_0_ID=$(cheqd_noded_docker tendermint show-node-id | sed 's/\r//g')
+    popd
+    
     export CHEQD_IMAGE_NAME="$1"
-    export MOUNT_POINT=$MOUNT_POINT
-    docker-compose -f docker-compose.yml --env-file .env up -d
-    pushd $CURR_DIR
+    export MOUNT_POINT="$2"
+
+    docker-compose --env-file .env up -d
 }
 
 # Stop docker-compose
 function docker_compose_down () {
-    docker-compose -f docker-compose.yml --env-file .env down 
+    docker-compose --env-file .env down 
 }
 
 # Clean environment
