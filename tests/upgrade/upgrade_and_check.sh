@@ -11,7 +11,7 @@ bash ../networks/tools/wait-for-chain.sh "$UPGRADE_HEIGHT" $((2 * VOTING_PERIOD)
 # Stop docker-compose service
 docker_compose_down
 
-# Make all the data accessable
+# Make all the data accessible
 make_777
 
 # Start docker-compose with new base image on new version
