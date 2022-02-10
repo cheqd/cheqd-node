@@ -263,8 +263,8 @@ jobs:
         run: |
           journalctl -u service-name.service --no-pager
 
-  run-cosmos-tests-using-cli:
-    name: Run cosmos and identity tests using CLI
+  run-python-based-integration-tests:
+    name: Run python based cosmos and identity tests
     runs-on: ubuntu-20.04
     needs: [build-node-images, build-binary]
     steps:
@@ -318,8 +318,8 @@ jobs:
           export OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p | sed 's/\r//g')
           pytest -v -rP tests/e2e/test_identity.py
 
-  run-identity-tests-using-cli:
-    name: Run identity tests using CLI
+  run-bash-based-integration-tests:
+    name: Run bash based identity tests
     runs-on: ubuntu-20.04
     needs: [build-binary, build-testnet-image]
     steps:
