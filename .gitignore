@@ -1,7 +1,7 @@
 ### APP-SPECIFIC EXCLUSIONS ###
 
-# Cosmos SDK
-**/node_configs
+# Tests
+**/network-config
 
 # Python
 .pytest_cache

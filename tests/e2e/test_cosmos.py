@@ -15,8 +15,8 @@ from helpers import run, run_interaction, get_balance, send_with_note, set_up_op
         "command, params, expected_output",
         [
             ("help", "",r"cheqd App(.*?)Usage:(.*?)Available Commands:(.*?)Flags:"),
-            ("status", LOCAL_NET_NODE_TCP, fr"\"NodeInfo\"(.*?)\"network\":\"{LOCAL_NET_NETWORK}\"(.*?)\"moniker\":\"node0\""), # tcp + local
-            ("status", LOCAL_NET_NODE_HTTP, fr"\"NodeInfo\"(.*?)\"network\":\"{LOCAL_NET_NETWORK}\"(.*?)\"moniker\":\"node0\""), # http + local
+            ("status", LOCAL_NET_NODE_TCP, fr"\"NodeInfo\"(.*?)\"network\":\"{LOCAL_NET_NETWORK}\"(.*?)\"moniker\":\"validator-0\""), # tcp + local
+            ("status", LOCAL_NET_NODE_HTTP, fr"\"NodeInfo\"(.*?)\"network\":\"{LOCAL_NET_NETWORK}\"(.*?)\"moniker\":\"validator-0\""), # http + local
         ]
     )
 def test_basic(command, params, expected_output):

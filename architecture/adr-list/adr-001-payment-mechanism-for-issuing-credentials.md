@@ -199,5 +199,5 @@ Holder -> Issuer: Accept
 
 * [Hyperledger Aries RFC 0036: Issue Credential Protocol 1.0](https://github.com/hyperledger/aries-rfcs/blob/main/features/0036-issue-credential/README.md)
 * [Hyperledger Aries RFC 0075: Payment Decorators](https://github.com/hyperledger/aries-rfcs/blob/main/features/0075-payment-decorators/README.md)
-* [Evernym VDR Tools cheqd network payments ADR](https://gitlab.com/evernym/verity/vdr-tools/-/tree/cheqd/docs/design/014-bank-transactions)
+* [Evernym VDR Tools cheqd network payments ADR](https://gitlab.com/evernym/verity/vdr-tools/-/tree/main/docs/design/014-bank-transactions)
 
