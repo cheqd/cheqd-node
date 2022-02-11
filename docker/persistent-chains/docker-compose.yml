@@ -2,19 +2,20 @@ version: '3.7'
 
 services:
   cheqd_node:
-    # CAUTION: Change CHEQD_NODE_VERSION to local in docker-compose.env if building your own image in section below
-    image: ghcr.io/cheqd/cheqd-node:${CHEQD_NODE_VERSION}
     # OPTIONAL: Rebuild cheq-node Docker image, if you want build your own
     # Default is to pull in the pre-published image on GitHub Container Registry
     # SYNTAX: docker compose --env-file docker/persistent-chains/docker-compose.env -f docker/persistent-chains/docker-compose.yml build --no-cache
-    build:
-      context: ../..
-      dockerfile: docker/Dockerfile
-      target: node
-      args:
-        CHEQD_HOME_DIR: ${CHEQD_HOME_DIR}
-        UID: ${UID}
-        GID: ${GID}
+    # build:
+    #  context: ../..
+    #  dockerfile: docker/Dockerfile
+    #  target: node
+    #  args:
+    #    CHEQD_HOME_DIR: ${CHEQD_HOME_DIR}
+    #    UID: ${UID}
+    #    GID: ${GID}
+    # CAUTION: Change CHEQD_NODE_VERSION to local in docker-compose.env if building your own image in section below
+    # image: cheqd-node-custom-build:${CHEQD_NODE_VERSION}
+    image: ghcr.io/cheqd/cheqd-node:${CHEQD_NODE_VERSION}
     user: cheqd
     configs:
       - source: genesis
@@ -79,3 +80,9 @@ volumes:
     name: cheqd_volume_${CHEQD_NETWORK}
     driver: ${CHEQD_DOCKER_VOLUME_DRIVER}
     external: ${CHEQD_DOCKER_VOLUME_IS_EXTERNAL}
+
+# secrets:
+#  node-key:
+#    file:
+#  validator-key:
+#    file:
