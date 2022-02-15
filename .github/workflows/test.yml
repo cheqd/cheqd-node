@@ -12,17 +12,6 @@ env:
   NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/docker/localnet/network-config"
 
 jobs:
-
-  check-docker-version:
-    name: Check docker version
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Check Docker Version
-        run: |
-          docker --version
-          docker-compose --version
-          docker compose version
-
   run-unit-test:
     name: Run unit tests
     runs-on: ubuntu-20.04
@@ -243,7 +232,7 @@ jobs:
         working-directory: ./docker/localnet
         run: |
           bash gen-network-config.sh
-          CHEQD_NODE_IMAGE=cheqd-node CHEQD_NODE_VERSION=latest docker-compose up -d
+          CHEQD_NODE_IMAGE=cheqd-node CHEQD_NODE_VERSION=latest docker compose up -d
 
       - name: Wait for chain
         run: bash tests/tools/wait-for-chain.sh
