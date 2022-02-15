@@ -54,7 +54,7 @@ else
 fi
 
 # Run configure
-# TODO: Use native configuration solution
+# TODO: Use native configuration solution i.e. environment variables
 # `! -z` is used instead of `-n` to distinguish null and empty values
 if [[ -n ${CREATE_EMPTY_BLOCKS+x} ]]; then cheqd-noded configure create-empty-blocks "${CREATE_EMPTY_BLOCKS}"; fi
 if [[ -n ${FASTSYNC_VERSION+x} ]]; then cheqd-noded configure fastsync-version "${FASTSYNC_VERSION}"; fi

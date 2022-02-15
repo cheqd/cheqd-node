@@ -13,9 +13,16 @@ sudo cp "${NODE_CONFIGS_BASE}/validator-0/config/genesis.json" "/home/runner/che
 
 sudo chmod -R 777 "/home/runner/cheqd/.cheqdnode"
 
+# Configure ports because they conflict with localnet
 sudo -u cheqd cheqd-noded configure p2p laddr "tcp://0.0.0.0:26676"
 sudo -u cheqd cheqd-noded configure rpc-laddr "tcp://0.0.0.0:26677"
 
+# TODO: Use environment variables
+sudo -u cheqd sed -i.bak 's|pprof_laddr = "localhost:6060"|pprof_laddr = "localhost:6070"|g' /home/runner/cheqd/.cheqdnode/config/config.toml
+sudo -u cheqd sed -i.bak 's|address = "0.0.0.0:9090"|address = "0.0.0.0:9100"|g' /home/runner/cheqd/.cheqdnode/config/app.toml
+sudo -u cheqd sed -i.bak 's|address = "0.0.0.0:9091"|address = "0.0.0.0:9101"|g' /home/runner/cheqd/.cheqdnode/config/app.toml
+sudo -u cheqd sed -i.bak 's|address = "tcp://0.0.0.0:1317"|address = "tcp://0.0.0.0:1327"|g' /home/runner/cheqd/.cheqdnode/config/app.toml
+sudo -u cheqd sed -i.bak 's|address = ":8080"|address = ":8090"|g' /home/runner/cheqd/.cheqdnode/config/app.toml
 
 sudo systemctl start cheqd-noded
 sleep 10
