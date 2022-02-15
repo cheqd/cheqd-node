@@ -155,38 +155,10 @@ jobs:
           name: cheqd-node-image.tar
           path: cheqd-node-image.tar
 
-  build-testnet-image:
-    name: Build cheqd-testnet image
-    runs-on: ubuntu-20.04
-    needs: build-node-images
-    steps:
-      - name: Check out
-        uses: actions/checkout@v2
-
-      - name: Download node image
-        uses: actions/download-artifact@v2
-        with:
-          name: cheqd-cli-image.tar
-
-      - name: Load node image
-        run: docker load -i cheqd-cli-image.tar
-
-      - name: Build
-        run: docker build -f tests/networks/docker-localnet/Dockerfile --no-cache -t cheqd-testnet .
-
-      - name: Save
-        run: docker save -o cheqd-testnet-image.tar cheqd-testnet
-
-      - name: Store artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: cheqd-testnet-image.tar
-          path: cheqd-testnet-image.tar
-
   publish:
     name: "Publish images and release"
     # Reference to workflow-setup job is required to access its various outputs.
-    needs: [ build-binary, build-node-images, build-testnet-image, build-deb-package, build-tar-package ]
+    needs: [ build-binary, build-node-images, build-deb-package, build-tar-package ]
     runs-on: ubuntu-latest
     env:
       VERSION: ${{ needs.build-binary.outputs.VERSION }}
@@ -229,20 +201,12 @@ jobs:
           docker push ghcr.io/${{ github.repository }}:${{ env.VERSION }}
           docker push ghcr.io/${{ github.repository }}:latest
 
-      
       - name: Push cheqd-cli image
         run: |
           docker tag cheqd-cli ghcr.io/${{ env.GITHUB_ORG_NAME }}/cheqd-cli:${{ env.VERSION }}
           docker tag cheqd-cli ghcr.io/${{ env.GITHUB_ORG_NAME }}/cheqd-cli:latest
           docker push ghcr.io/${{ env.GITHUB_ORG_NAME }}:${{ env.VERSION }}
           docker push ghcr.io/${{ env.GITHUB_ORG_NAME }}:latest
-
-      - name: Push testnet image
-        run: |
-          docker tag cheqd-testnet ghcr.io/${{ github.repository_owner }}/cheqd-testnet:${{ env.VERSION }}
-          docker tag cheqd-testnet ghcr.io/${{ github.repository_owner }}/cheqd-testnet:latest
-          docker push ghcr.io/${{ github.repository_owner }}/cheqd-testnet:${{ env.VERSION }}
-          docker push ghcr.io/${{ github.repository_owner }}/cheqd-testnet:latest
 
       - name: Download deb
         uses: actions/download-artifact@v2

@@ -174,34 +174,6 @@ jobs:
           name: cheqd-node-image.tar
           path: cheqd-node-image.tar
 
-  build-testnet-image:
-    name: Build cheqd-testnet image
-    runs-on: ubuntu-20.04
-    needs: build-node-images
-    steps:
-      - name: Check out
-        uses: actions/checkout@v2
-
-      - name: Download node image
-        uses: actions/download-artifact@v2
-        with:
-          name: cheqd-cli-image.tar
-
-      - name: Load node image
-        run: docker load -i cheqd-cli-image.tar
-
-      - name: Build
-        run: docker build -f tests/networks/docker-localnet/Dockerfile --no-cache -t cheqd-testnet .
-
-      - name: Save
-        run: docker save -o cheqd-testnet-image.tar cheqd-testnet
-
-      - name: Store artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: cheqd-testnet-image.tar
-          path: cheqd-testnet-image.tar
-
   test-new-node-setup-from-deb:
     name: Test new node setup from deb
     runs-on: ubuntu-20.04
@@ -315,7 +287,7 @@ jobs:
   run-bash-based-integration-tests:
     name: Run bash based identity tests
     runs-on: ubuntu-20.04
-    needs: [build-binary, build-testnet-image]
+    needs: [build-binary, build-node-images]
     steps:
       - uses: actions/checkout@v2
 
