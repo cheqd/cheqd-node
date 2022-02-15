@@ -3,7 +3,6 @@
 set -euox pipefail
 sudo chown -R cheqd:cheqd "/home/runner/cheqd/"
 
-NODE_CONFIGS_BASE="/home/runner/work/cheqd-node/cheqd-node/tests/networks/docker-compose-localnet/network-config"
 sudo -u cheqd cheqd-noded init node5
 
 VALIDATOR_0_ID=$(cat "${NODE_CONFIGS_BASE}/validator-0/node_id.txt")
