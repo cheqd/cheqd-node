@@ -264,7 +264,7 @@ jobs:
         run: bash tests/tools/wait-for-chain.sh
 
       - name: Set up test environment
-        working-directory: ./tests/e2e
+        working-directory: ./tests/e2e-pytest
         run: |
           pip3 install -r requirements.txt >> /dev/null
           cp -Rf ${NODE_CONFIGS_BASE}/validator-0/. /home/runner/.cheqdnode
@@ -272,17 +272,19 @@ jobs:
           sudo chmod -R 777 /home/runner
 
       - name: Run cosmos-related tests
+        working-directory: ./tests/e2e-pytest
         run: |
           set -euxo pipefail
           export OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/validator-0" | sed -nr 's/.*address: (.*?).*/\1/p' | sed 's/\r//g')
           export OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/validator-1" | sed -nr 's/.*address: (.*?).*/\1/p' | sed 's/\r//g')
-          pytest -v -rP tests/e2e/test_cosmos.py
+          pytest -v -rP test_cosmos.py
 
       - name: Run identity-related tests # TODO: Move into separate stage?
+        working-directory: ./tests/e2e-pytest
         run: |
           export OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
           export OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p | sed 's/\r//g')
-          pytest -v -rP tests/e2e/test_identity.py
+          pytest -v -rP test_identity.py
 
   run-bash-based-integration-tests:
     name: Run bash based identity tests
@@ -321,7 +323,7 @@ jobs:
         run: bash tests/tools/wait-for-chain.sh
 
       - name: Set up and run tests
-        working-directory: tests/cli
+        working-directory: tests/e2e-bash
         run: |
           bash import_keys.sh
           bash run_all.sh
@@ -347,13 +349,13 @@ jobs:
         run: sudo chown $USER:$USER .
 
       - name: Prepare nodes for checking upgrade
-        working-directory: ./tests/upgrade
+        working-directory: ./tests/e2e-complex/upgrade
         run: bash prepare.sh
 
       - name: Initiate the upgrade process
-        working-directory: ./tests/upgrade
+        working-directory: ./tests/e2e-complex/upgrade
         run: bash initiate_upgrade.sh
 
       - name: Make the upgrade and check results
-        working-directory: ./tests/upgrade
+        working-directory: ./tests/e2e-complex/upgrade
         run: bash upgrade_and_check.sh
