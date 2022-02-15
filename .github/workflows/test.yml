@@ -274,18 +274,19 @@ jobs:
       - name: Download node image
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-cli-image.tar
+          name: cheqd-node-image.tar
 
       - name: Load node image
-        run: docker load -i cheqd-cli-image.tar
+        run: docker load -i cheqd-node-image.tar
 
-      - uses: actions/checkout@v2
+      - name: Check out
+        uses: actions/checkout@v2
 
-      - name: Set up 4 validators + 2 observers node docker pool for local test run # Replace with testnet image
-        working-directory: ./tests/networks/docker-compose-localnet
+      - name: Set up 4 validators + 2 observers node docker pool
+        working-directory: ./docker/localnet
         run: |
           bash gen-network-config.sh
-          docker-compose up -d
+          CHEQD_NODE_IMAGE=cheqd-node CHEQD_NODE_VERSION=latest docker compose up -d
 
       - name: Wait for chain
         run: bash tests/tools/wait-for-chain.sh
@@ -327,18 +328,25 @@ jobs:
       - name: Restore binary permissions
         run: sudo chmod +x /home/runner/.local/bin/cheqd-noded
 
-      - name: Download testnet image
+      - name: Download node image
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-testnet-image.tar
+          name: cheqd-node-image.tar
 
-      - name: Load testnet image
-        run: docker load -i cheqd-testnet-image.tar
+      - name: Load node image
+        run: docker load -i cheqd-node-image.tar
 
-      - name: Run test net container
+      - name: Check out
+        uses: actions/checkout@v2
+
+      - name: Set up 4 validators + 2 observers node docker pool
+        working-directory: ./docker/localnet
         run: |
-          docker run -d --rm -p "26657:26657" -p "1317:1317" cheqd-testnet
-          bash tests/networks/tools/wait-for-chain.sh
+          bash gen-network-config.sh
+          CHEQD_NODE_IMAGE=cheqd-node CHEQD_NODE_VERSION=latest docker compose up -d
+
+      - name: Wait for chain
+        run: bash tests/tools/wait-for-chain.sh
 
       - name: Set up and run tests
         working-directory: tests/cli
@@ -355,12 +363,12 @@ jobs:
         with:
           fetch-depth: 0 # It's needed for getting the full version of package by `git describe`
 
-      - name: Download node image
+      - name: Download cli image
         uses: actions/download-artifact@v2
         with:
           name: cheqd-cli-image.tar
 
-      - name: Load node image
+      - name: Load cli image
         run: docker load -i cheqd-cli-image.tar
 
       - name: Chown for current user
