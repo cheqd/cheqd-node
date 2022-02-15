@@ -1,123 +1,246 @@
 version: '3.7'
+# TODO: Speed up the pool
 
 services:
   validator-0:
-    image: ghcr.io/cheqd/cheqd-node:${CHEQD_NODE_VERSION}
+    image: ${CHEQD_NODE_IMAGE}:${CHEQD_NODE_VERSION}
     ports:
-      - "26656:26656" # p2p
-      - "26657:26657" # rpc
+      - target: 26656
+        published: 26656    # Tendermint peer-to-peer (P2P) port
+      - target: 26657
+        published: 26657    # Tendermint RPC port
+      - target: 1317
+        published: 1317     # Cosmos REST API port
+      - target: 9090
+        published: 9090     # gRPC port
+      - target: 9091
+        published: 9091     # gRPC-Gateway port
+      - target: 26660
+        published: 26660    # Prometheus metrics port
     volumes:
-      - "${MOUNT_POINT}/network-config/validator-0:/home/cheqd/.cheqdnode"
-    command: start
+      - type: volume
+        source: validator-0-data
+        target: /home/cheqd
+    environment:
+      NODE_MONIKER: validator-0
+      P2P_EXTERNAL_ADDRESS: validator-0:2665
+    configs:
+      - source: genesis
+        target: /genesis
+      - source: seeds
+        target: /seeds
+      - source: validator-0-node-key
+        target: /node_key
+      - source: validator-0-priv-val-key
+        target: /priv_validator_key
 
   validator-1:
-    image: ghcr.io/cheqd/cheqd-node:${CHEQD_NODE_VERSION}
+    image: ${CHEQD_NODE_IMAGE}:${CHEQD_NODE_VERSION}
     ports:
-      - "26659:26656" # p2p
-      - "26660:26657" # rpc
+      - target: 26656
+        published: 26756    # Tendermint peer-to-peer (P2P) port
+      - target: 26657
+        published: 26757    # Tendermint RPC port
+      - target: 1317
+        published: 1417     # Cosmos REST API port
+      - target: 9090
+        published: 9190     # gRPC port
+      - target: 9091
+        published: 9191     # gRPC-Gateway port
+      - target: 26660
+        published: 26760    # Prometheus metrics port
     volumes:
-      - "${MOUNT_POINT}/network-config/validator-1:/home/cheqd/.cheqdnode"
-    command: start
+      - type: volume
+        source: validator-1-data
+        target: /home/cheqd
+    environment:
+      NODE_MONIKER: validator-1
+      P2P_EXTERNAL_ADDRESS: validator-1:26656
+    configs:
+      - source: genesis
+        target: /genesis
+      - source: seeds
+        target: /seeds
+      - source: validator-1-node-key
+        target: /node_key
+      - source: validator-1-priv-val-key
+        target: /priv_validator_key
 
   validator-2:
-    image: ghcr.io/cheqd/cheqd-node:${CHEQD_NODE_VERSION}
+    image: ${CHEQD_NODE_IMAGE}:${CHEQD_NODE_VERSION}
     ports:
-      - "26662:26656" # p2p
-      - "26663:26657" # rpc
+      - target: 26656
+        published: 26856    # Tendermint peer-to-peer (P2P) port
+      - target: 26657
+        published: 26857    # Tendermint RPC port
+      - target: 1317
+        published: 1517     # Cosmos REST API port
+      - target: 9090
+        published: 9290     # gRPC port
+      - target: 9091
+        published: 9291     # gRPC-Gateway port
+      - target: 26660
+        published: 26860    # Prometheus metrics port
     volumes:
-      - "${MOUNT_POINT}/network-config/validator-2:/home/cheqd/.cheqdnode"
-    command: start
+      - type: volume
+        source: validator-2-data
+        target: /home/cheqd
+    environment:
+      NODE_MONIKER: validator-2
+      P2P_EXTERNAL_ADDRESS: validator-2:26656
+    configs:
+      - source: genesis
+        target: /genesis
+      - source: seeds
+        target: /seeds
+      - source: validator-2-node-key
+        target: /node_key
+      - source: validator-2-priv-val-key
+        target: /priv_validator_key
 
   validator-3:
-    image: ghcr.io/cheqd/cheqd-node:${CHEQD_NODE_VERSION}
+    image: ${CHEQD_NODE_IMAGE}:${CHEQD_NODE_VERSION}
     ports:
-      - "26665:26656" # p2p
-      - "26666:26657" # rpc
+      - target: 26656
+        published: 26956    # Tendermint peer-to-peer (P2P) port
+      - target: 26657
+        published: 26957    # Tendermint RPC port
+      - target: 1317
+        published: 1617     # Cosmos REST API port
+      - target: 9090
+        published: 9390     # gRPC port
+      - target: 9091
+        published: 9391     # gRPC-Gateway port
+      - target: 26660
+        published: 26960    # Prometheus metrics port
     volumes:
-      - "${MOUNT_POINT}/network-config/validator-3:/home/cheqd/.cheqdnode"
-    command: start
+      - type: volume
+        source: validator-3-data
+        target: /home/cheqd
+    environment:
+      NODE_MONIKER: validator-3
+      P2P_EXTERNAL_ADDRESS: validator-3:26656
+    configs:
+      - source: genesis
+        target: /genesis
+      - source: seeds
+        target: /seeds
+      - source: validator-3-node-key
+        target: /node_key
+      - source: validator-3-priv-val-key
+        target: /priv_validator_key
 
   seed-0:
-    image: ghcr.io/cheqd/cheqd-node:${CHEQD_NODE_VERSION}
+    image: ${CHEQD_NODE_IMAGE}:${CHEQD_NODE_VERSION}
     ports:
-      - "26668:26656" # p2p
-      - "26669:26657" # rpc
+      - target: 26656
+        published: 27056    # Tendermint peer-to-peer (P2P) port
+      - target: 26657
+        published: 27057    # Tendermint RPC port
+      - target: 1317
+        published: 1717     # Cosmos REST API port
+      - target: 9090
+        published: 9490     # gRPC port
+      - target: 9091
+        published: 9491     # gRPC-Gateway port
+      - target: 26660
+        published: 27060    # Prometheus metrics port
     volumes:
-      - "${MOUNT_POINT}/network-config/seed-0:/home/cheqd/.cheqdnode"
-    command: start
+      - type: volume
+        source: seed-0-data
+        target: /home/cheqd
+    environment:
+      NODE_MONIKER: seed-0
+      P2P_EXTERNAL_ADDRESS: seed-0:26656
+    configs:
+      - source: genesis
+        target: /genesis
+      - source: seeds
+        target: /seeds
+      - source: seed-0-node-key
+        target: /node_key
+      - source: seed-0-priv-val-key
+        target: /priv_validator_key
 
   observer-0:
-    image: ghcr.io/cheqd/cheqd-node:${CHEQD_NODE_VERSION}
+    image: ${CHEQD_NODE_IMAGE}:${CHEQD_NODE_VERSION}
     ports:
-      - "26671:26656" # p2p
-      - "26672:26657" # rpc
+      - target: 26656
+        published: 27156    # Tendermint peer-to-peer (P2P) port
+      - target: 26657
+        published: 27157    # Tendermint RPC port
+      - target: 1317
+        published: 1817     # Cosmos REST API port
+      - target: 9090
+        published: 9590     # gRPC port
+      - target: 9091
+        published: 9591     # gRPC-Gateway port
+      - target: 26660
+        published: 27160    # Prometheus metrics port
     volumes:
-      - "${MOUNT_POINT}/network-config/observer-0:/home/cheqd/.cheqdnode"
-    command: start
-
-
-  # cheqd_node:
-  #   image: ghcr.io/cheqd/cheqd-node:${CHEQD_NODE_VERSION}
-  #   configs:
-  #     - source: genesis
-  #       target: /genesis
-  #     - source: seeds
-  #       target: /seeds
-  #   ports:
-  #     # REQUIRED: Tendermint peer-to-peer (P2P) port
-  #     # Please do not change this unless you've also changed this in the external-address parameter in Tendermint config
-  #     - target: 26656
-  #       published: ${TM_P2P_PORT}
-  #       protocol: tcp
-  #       mode: host
-  #     # RECOMMENDED: Tendermint RPC port
-  #     # Required if you want to use chqed-noded CLI directly from the host
-  #     - target: 26657
-  #       published: ${TM_RPC_API_PORT}
-  #       protocol: tcp
-  #       mode: host
-  #     # OPTIONAL: Cosmos REST API port
-  #     # Only required if you plan on targetting REST API requests at your own node
-  #     - target: 1317
-  #       published: ${COSMOS_REST_API_PORT}
-  #       protocol: tcp
-  #       mode: host
-  #     # RECOMMENDED: gRPC port
-  #     # Tendermint RPC requests (define above) are relayed to the gRPC port inside the container
-  #     # The Cosmos gRPC API has endpoints not otherwise available in Tendermint RPC and Cosmos REST API
-  #     - target: 9090
-  #       published: ${COSMOS_GRPC_API_PORT}
-  #       protocol: tcp
-  #       mode: host
-  #     # OPTIONAL: gRPC-Gateway port
-  #     # gRPC-Gateway provides a RESTful interface to relay requests to gRPC API
-  #     - target: 9091
-  #       published: ${COSMOS_GRPC_GATEWAY_API_PORT}
-  #       protocol: tcp
-  #       mode: host
-  #     # OPTIONAL: Prometheus metrics port
-  #     # Allows collection of Tendermint and Cosmos metrics using Prometheus
-  #     - target: 26660
-  #       published: ${TM_PROMETHEUS_PORT}
-  #       protocol: tcp
-  #       mode: host
-  #   # Defines cheqd-noded configuration variables INSIDE the container 
-  #   env_file:
-  #     - container.env
-  #   volumes:
-  #     - type: volume
-  #       source: ${CHEQD_DOCKER_VOLUME_SOURCE} # Defaults to cheqd_volume, defined below
-  #       target: /home/cheqd # Do NOT change mount point inside the container unless rebuilding the image
-  #   entrypoint: [ "node-start" ]
+      - type: volume
+        source: observer-0-data
+        target: /home/cheqd
+    environment:
+      NODE_MONIKER: observer-0
+      P2P_EXTERNAL_ADDRESS: observer-0:26656
+    configs:
+      - source: genesis
+        target: /genesis
+      - source: seeds
+        target: /seeds
+      - source: observer-0-node-key
+        target: /node_key
+      - source: observer-0-priv-val-key
+        target: /priv_validator_key
 
 configs:
+  # Genesis and seeds
   genesis:
-    file: ../../persistent_chains/${CHEQD_NETWORK}/genesis.json
+    file: network-config/genesis.json
   seeds:
-    file: ../../persistent_chains/${CHEQD_NETWORK}/seeds.txt
+    file: network-config/seeds.txt
 
-# volumes:
-#   cheqd_volume:
-#     name: cheqd_volume_${CHEQD_NETWORK}
-#     driver: ${CHEQD_DOCKER_VOLUME_DRIVER}
-#     external: ${CHEQD_DOCKER_VOLUME_IS_EXTERNAL}
+  # Validator 0
+  validator-0-node-key:
+    file: network-config/validator-0/config/node_key.json
+  validator-0-priv-val-key:
+    file: network-config/validator-0/config/priv_validator_key.json
+
+  # Validator 1
+  validator-1-node-key:
+    file: network-config/validator-1/config/node_key.json
+  validator-1-priv-val-key:
+    file: network-config/validator-1/config/priv_validator_key.json
+
+  # Validator 2
+  validator-2-node-key:
+    file: network-config/validator-2/config/node_key.json
+  validator-2-priv-val-key:
+    file: network-config/validator-2/config/priv_validator_key.json
+
+  # Validator 3
+  validator-3-node-key:
+    file: network-config/validator-3/config/node_key.json
+  validator-3-priv-val-key:
+    file: network-config/validator-3/config/priv_validator_key.json
+
+  # Seed 0
+  seed-0-node-key:
+    file: network-config/seed-0/config/node_key.json
+  seed-0-priv-val-key:
+    file: network-config/seed-0/config/priv_validator_key.json
+
+  # Observer 0
+  observer-0-node-key:
+    file: network-config/observer-0/config/node_key.json
+  observer-0-priv-val-key:
+    file: network-config/observer-0/config/priv_validator_key.json
+
+volumes:
+  validator-0-data:
+  validator-1-data:
+  validator-2-data:
+  validator-3-data:
+  seed-0-data:
+  observer-0-data:

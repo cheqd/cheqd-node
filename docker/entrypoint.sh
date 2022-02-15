@@ -25,7 +25,7 @@ else
     echo "No genesis file passed. Skipping and retaining existing genesis."
 fi
 
-# Check if a genesis file has been passed in config
+# Check if a seeds file has been passed in config
 if [ -f "/seeds" ]
 then
     echo "Seeds file passed. Replacing current seeds."
@@ -33,6 +33,24 @@ then
     cheqd-noded configure p2p seeds "$(cat "${CHEQD_ROOT_DIR}/config/seeds.txt")"
 else
     echo "No seeds file passed. Skipping and retaining existing seeds."
+fi
+
+# Check if a node_key file has been passed in config
+if [ -f "/node_key" ]
+then
+    echo "Node key file passed. Replacing current key."
+    cp /node_key "${CHEQD_ROOT_DIR}/config/node_key.json"
+else
+    echo "No node key file passed. Skipping and retaining existing node key."
+fi
+
+# Check if a priv_validator_key file has been passed in config
+if [ -f "/priv_validator_key" ]
+then
+    echo "Private validator key file passed. Replacing current key."
+    cp /priv_validator_key "${CHEQD_ROOT_DIR}/config/priv_validator_key.json"
+else
+    echo "No private validator key file passed. Skipping and retaining existing key."
 fi
 
 # Run configure

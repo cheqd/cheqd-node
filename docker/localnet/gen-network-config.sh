@@ -202,5 +202,27 @@ do
   cp "${TMP_NODE_HOME}/config/genesis.json" "${NODE_HOME}/config/genesis.json"
 done
 
-# We don't need tmp node anymore
+# Leave one copy of genesis in the root of network-config
+cp "${TMP_NODE_HOME}/config/genesis.json" "${NETWORK_CONFIG_DIR}/genesis.json"
+
+# Generate seeds.txt
+SEEDS_STR=""
+
+for ((i=0 ; i<SEEDS_COUNT ; i++))
+do
+  NODE_MONIKER="seed-$i"
+  NODE_P2P_PORT="26656"
+  NODE_HOME="${NETWORK_CONFIG_DIR}/${NODE_MONIKER}"
+
+  if ((i != 0))
+  then
+  SEEDS_STR="${SEEDS_STR},"
+  fi
+
+  SEEDS_STR="${SEEDS_STR}$(cat "${NODE_HOME}/node_id.txt")@${NODE_MONIKER}:${NODE_P2P_PORT}"
+done
+
+echo "${SEEDS_STR}" > "${NETWORK_CONFIG_DIR}/seeds.txt"
+
+# We don't need the tmp node anymore
 rm -rf "${TMP_NODE_HOME}"
