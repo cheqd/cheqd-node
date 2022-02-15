@@ -221,10 +221,10 @@ jobs:
       - name: Download node image
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-cli-image.tar
+          name: cheqd-node-image.tar
 
       - name: Load node image
-        run: docker load -i cheqd-cli-image.tar
+        run: docker load -i cheqd-node-image.tar
 
       - name: Check out
         uses: actions/checkout@v2
