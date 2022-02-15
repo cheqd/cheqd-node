@@ -21,4 +21,3 @@ sudo -u cheqd cheqd-noded configure rpc-laddr "tcp://0.0.0.0:26677"
 sudo systemctl start cheqd-noded
 sleep 10
 systemctl status cheqd-noded
-
