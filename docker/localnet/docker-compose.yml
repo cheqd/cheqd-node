@@ -23,7 +23,6 @@ services:
         target: /home/cheqd
     environment:
       NODE_MONIKER: validator-0
-      # P2P_EXTERNAL_ADDRESS: validator-0:2665
       RPC_LADDR: tcp://0.0.0.0:26657
     configs:
       - source: genesis
@@ -56,7 +55,6 @@ services:
         target: /home/cheqd
     environment:
       NODE_MONIKER: validator-1
-      # P2P_EXTERNAL_ADDRESS: validator-1:26656
       RPC_LADDR: tcp://0.0.0.0:26657
     configs:
       - source: genesis
@@ -89,7 +87,6 @@ services:
         target: /home/cheqd
     environment:
       NODE_MONIKER: validator-2
-      # P2P_EXTERNAL_ADDRESS: validator-2:26656
       RPC_LADDR: tcp://0.0.0.0:26657
     configs:
       - source: genesis
@@ -122,7 +119,6 @@ services:
         target: /home/cheqd
     environment:
       NODE_MONIKER: validator-3
-      # P2P_EXTERNAL_ADDRESS: validator-3:26656
       RPC_LADDR: tcp://0.0.0.0:26657
     configs:
       - source: genesis
@@ -155,7 +151,6 @@ services:
         target: /home/cheqd
     environment:
       NODE_MONIKER: seed-0
-      # P2P_EXTERNAL_ADDRESS: seed-0:26656
       RPC_LADDR: tcp://0.0.0.0:26657
     configs:
       - source: genesis
@@ -188,7 +183,6 @@ services:
         target: /home/cheqd
     environment:
       NODE_MONIKER: observer-0
-      # P2P_EXTERNAL_ADDRESS: observer-0:26656
       RPC_LADDR: tcp://0.0.0.0:26657
     configs:
       - source: genesis
