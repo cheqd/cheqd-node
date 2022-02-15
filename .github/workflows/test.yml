@@ -13,6 +13,13 @@ env:
 
 jobs:
 
+  check-docker-version:
+    name: Check docker version
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check Docker Version
+        run: docker --version
+
   run-unit-test:
     name: Run unit tests
     runs-on: ubuntu-20.04
