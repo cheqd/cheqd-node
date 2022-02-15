@@ -18,7 +18,10 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Check Docker Version
-        run: docker --version
+        run: |
+          docker --version
+          docker-compose --version
+          docker compose --version
 
   run-unit-test:
     name: Run unit tests
