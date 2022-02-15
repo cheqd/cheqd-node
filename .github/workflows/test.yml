@@ -21,7 +21,7 @@ jobs:
         run: |
           docker --version
           docker-compose --version
-          docker compose --version
+          docker compose version
 
   run-unit-test:
     name: Run unit tests
