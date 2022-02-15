@@ -236,7 +236,7 @@ jobs:
           CHEQD_NODE_IMAGE=cheqd-node CHEQD_NODE_VERSION=latest docker-compose up -d
 
       - name: Wait for chain
-        run: bash tests/networks/tools/wait-for-chain.sh
+        run: bash tests/tools/wait-for-chain.sh
 
       - name: Add observer node
         working-directory: ./tests/networks/docker-compose-localnet
