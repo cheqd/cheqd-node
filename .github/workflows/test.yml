@@ -9,7 +9,7 @@ on:
     - '.gitbook/**'
 
 env:
-  NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/tests/networks/docker-compose-localnet/network-config"
+  NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/docker/localnet/network-config"
 
 jobs:
 
@@ -229,11 +229,11 @@ jobs:
       - name: Check out
         uses: actions/checkout@v2
 
-      - name: Set up 4 validators + 2 observers node docker pool  # TODO: Replace with testnet image
-        working-directory: ./tests/networks/docker-compose-localnet
+      - name: Set up 4 validators + 2 observers node docker pool
+        working-directory: ./docker/localnet
         run: |
           bash gen-network-config.sh
-          docker-compose up -d
+          CHEQD_NODE_IMAGE=cheqd-node CHEQD_NODE_VERSION=latest docker-compose up -d
 
       - name: Wait for chain
         run: bash tests/networks/tools/wait-for-chain.sh
