@@ -1,6 +1,13 @@
 # Overview
 This document includes just steps for writing a DID to the pool, without additional info.
-First of all, `vdrtools-cli` should be installed and run. For installation process [this instruction](install.md) can help
+
+## Pre-requirements for environment
+All the commands are prepared for using inside Ubuntu 20.04. It can be a Virtual machine, for example VirtualBox or docker.
+Maybe, the fastest way - to choose docker, like:
+`docker run -it --rm ubuntu:20.04 bash`
+and after that follow the installation flow. 
+
+For installation process of `vdrtools-cli` [this instruction](install.md) can help
 
 ## Steps for writing a DID to the testnet
 1. Create a wallet:
