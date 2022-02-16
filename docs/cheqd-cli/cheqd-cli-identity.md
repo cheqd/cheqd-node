@@ -127,7 +127,7 @@ cheqd-noded tx cheqd create-did '{"id": "did:cheqd:testnet:zJ5EDiiiKWDyo79n",\
   --from my_account --node http://nodes.testnet.cheqd.network:26657 --chain-id cheqd-testnet-4 --fees 50ncheq
 ```
 
-## Crypto commands in cheqd CLI - ![#f03c15](EXPERIMENTAL FUNCTIONALITY) - Do not use in production!
+## Crypto commands in cheqd CLI - EXPERIMENTAL FUNCTIONALITY - Do not use in production!
 
 
 #### Command
