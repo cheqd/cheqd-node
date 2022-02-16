@@ -30,7 +30,8 @@ if [ -f "/seeds" ]
 then
     echo "Seeds file passed. Overriding current seeds."
     cp /seeds "${CHEQD_ROOT_DIR}/config/seeds.txt"
-    export CHEQD_NODED_P2P_SEEDS="$(cat "${CHEQD_ROOT_DIR}/config/seeds.txt")"
+    CHEQD_NODED_P2P_SEEDS="$(cat "${CHEQD_ROOT_DIR}/config/seeds.txt")"
+    export CHEQD_NODED_P2P_SEEDS
 else
     echo "No seeds file passed. Skipping and retaining existing seeds."
 fi
