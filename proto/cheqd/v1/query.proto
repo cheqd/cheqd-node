@@ -13,6 +13,9 @@ service Query {
 	rpc Did(QueryGetDidRequest) returns (QueryGetDidResponse) {
 		option (google.api.http).get = "/cheqd/cheqdnode/cheqd/did/{id}";
 	}
+	rpc DidJson(QueryGetDidJsonRequest) returns (QueryGetDidJsonResponse) {
+		option (google.api.http).get = "/cheqd/cheqdnode/cheqd/did+json/{id}";
+	}
 }
 
 message QueryGetDidRequest {
@@ -22,4 +25,12 @@ message QueryGetDidRequest {
 message QueryGetDidResponse {
 	Did did = 1;
 	Metadata metadata = 2;
+}
+
+message QueryGetDidJsonRequest {
+	string id = 1;
+}
+
+message QueryGetDidJsonResponse {
+	string value = 1;
 }
