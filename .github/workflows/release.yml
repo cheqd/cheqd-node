@@ -182,14 +182,6 @@ jobs:
       - name: Load cheqd-node image
         run: docker load -i cheqd-node-image.tar
 
-      - name: Download testnet image
-        uses: actions/download-artifact@v2
-        with:
-          name: cheqd-testnet-image.tar
-
-      - name: Load testnet image
-        run: docker load -i cheqd-testnet-image.tar
-
       - name: Login to docker
         run: |
           echo ${{ secrets.GH_PAT }} | docker login ghcr.io --username ${{ secrets.GH_USER }} --password-stdin
