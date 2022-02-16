@@ -291,8 +291,6 @@ jobs:
     runs-on: ubuntu-20.04
     needs: [build-binary, build-node-images]
     steps:
-      - uses: actions/checkout@v2
-
       - name: Load binary artifact
         uses: actions/download-artifact@v2
         with:
