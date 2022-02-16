@@ -1,10 +1,13 @@
 # How to create DID using VDR tools
+
 In general, we need to create to main things, wallet and did inside it.
 Also, all the next commands shoud be typed inside the CLI. For make it possible, just run in terminal:
 ```
 vdrtools-cli
 ```
+
 ## Create wallet
+
 For wallet creation we just need:
 ```
 indy> wallet create <name-of-wallet> key
@@ -20,6 +23,7 @@ indy>
 where `key` - it's a password for your wallet
 
 ## Open wallet
+
 For all operations with items in the wallet we need to open it before. For make it possible, please call:
 ```
 indy> wallet open <name-of wallet> key
@@ -33,6 +37,7 @@ Wallet "cheqd-wallet" has been opened
 ```
 
 ## Create key for cosmos signature
+
 One of signatures that required for validation on the cheqd-node side is cosmos's signature.
 For adding a signing key we need to create/restore from mnemonic by using:
 ```
@@ -54,6 +59,7 @@ electric marine palace chaos open review friend left convince pupil spoon cigar 
 ```
 
 ## Generate DID
+
 For generating simple DID, like just an identificator can be used the next commmand:
 ```
 indy> did new
@@ -79,9 +85,11 @@ cheqd_pool(cheqd-pool):cheqd-wallet:indy>
 where the first created DID was `C9mR4KH6Mb7FWsCjsAfnVo`.
 
 ## Create and connect to the pool
+
 The next step which is needed for establishing connection to the server it's a command, name `cheqd-pool`.
 
 ### Create connection to the network
+
 In general it's some kind of configuration, which can be reusable in the future. The main command here:
 ```
 cheqd-pool add alias=<alias-value> rpc_address=<rpc_address-value> chain_id=<chain_id-value>
@@ -93,6 +101,7 @@ Pool "cheqd-pool" has been created "{"alias":"cheqd-pool","rpc_address":"http://
 ```
 
 ### Connect to the pool
+
 ```
 cheqd-pool open alias=<alias-value>
 ```
