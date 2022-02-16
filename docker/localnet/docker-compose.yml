@@ -20,15 +20,8 @@ services:
       - type: volume
         source: validator-0-data
         target: /home/cheqd
-    environment:
-      CHEQD_NODED_MONIKER: validator-0
-      CHEQD_NODED_RPC_LADDR: tcp://0.0.0.0:26657
-      CHEQD_NODED_API_ENABLE: true
-      # Consensus
-      CHEQD_NODED_CONSENSUS_TIMEOUT_PROPOSE: 500ms
-      CHEQD_NODED_CONSENSUS_TIMEOUT_PREVOTE: 500ms
-      CHEQD_NODED_CONSENSUS_TIMEOUT_PRECOMMIT: 500ms
-      CHEQD_NODED_CONSENSUS_TIMEOUT_COMMIT: 500ms
+    env_file:
+      - container-env/validator-0.env
     configs:
       - source: genesis
         target: /genesis
@@ -58,15 +51,8 @@ services:
       - type: volume
         source: validator-1-data
         target: /home/cheqd
-    environment:
-      CHEQD_NODED_MONIKER: validator-1
-      CHEQD_NODED_RPC_LADDR: tcp://0.0.0.0:26657
-      CHEQD_NODED_API_ENABLE: true
-      # Consensus
-      CHEQD_NODED_CONSENSUS_TIMEOUT_PROPOSE: 500ms
-      CHEQD_NODED_CONSENSUS_TIMEOUT_PREVOTE: 500ms
-      CHEQD_NODED_CONSENSUS_TIMEOUT_PRECOMMIT: 500ms
-      CHEQD_NODED_CONSENSUS_TIMEOUT_COMMIT: 500ms
+    env_file:
+      - container-env/validator-1.env
     configs:
       - source: genesis
         target: /genesis
@@ -96,15 +82,8 @@ services:
       - type: volume
         source: validator-2-data
         target: /home/cheqd
-    environment:
-      CHEQD_NODED_MONIKER: validator-2
-      CHEQD_NODED_RPC_LADDR: tcp://0.0.0.0:26657
-      CHEQD_NODED_API_ENABLE: true
-      # Consensus
-      CHEQD_NODED_CONSENSUS_TIMEOUT_PROPOSE: 500ms
-      CHEQD_NODED_CONSENSUS_TIMEOUT_PREVOTE: 500ms
-      CHEQD_NODED_CONSENSUS_TIMEOUT_PRECOMMIT: 500ms
-      CHEQD_NODED_CONSENSUS_TIMEOUT_COMMIT: 500ms
+    env_file:
+      - container-env/validator-2.env
     configs:
       - source: genesis
         target: /genesis
@@ -134,15 +113,8 @@ services:
       - type: volume
         source: validator-3-data
         target: /home/cheqd
-    environment:
-      CHEQD_NODED_MONIKER: validator-3
-      CHEQD_NODED_RPC_LADDR: tcp://0.0.0.0:26657
-      CHEQD_NODED_API_ENABLE: true
-      # Consensus
-      CHEQD_NODED_CONSENSUS_TIMEOUT_PROPOSE: 500ms
-      CHEQD_NODED_CONSENSUS_TIMEOUT_PREVOTE: 500ms
-      CHEQD_NODED_CONSENSUS_TIMEOUT_PRECOMMIT: 500ms
-      CHEQD_NODED_CONSENSUS_TIMEOUT_COMMIT: 500ms
+    env_file:
+      - container-env/validator-3.env
     configs:
       - source: genesis
         target: /genesis
@@ -172,15 +144,8 @@ services:
       - type: volume
         source: seed-0-data
         target: /home/cheqd
-    environment:
-      CHEQD_NODED_MONIKER: seed-0
-      CHEQD_NODED_RPC_LADDR: tcp://0.0.0.0:26657
-      CHEQD_NODED_API_ENABLE: true
-      # Consensus
-      CHEQD_NODED_CONSENSUS_TIMEOUT_PROPOSE: 500ms
-      CHEQD_NODED_CONSENSUS_TIMEOUT_PREVOTE: 500ms
-      CHEQD_NODED_CONSENSUS_TIMEOUT_PRECOMMIT: 500ms
-      CHEQD_NODED_CONSENSUS_TIMEOUT_COMMIT: 500ms
+    env_file:
+      - container-env/seed-0.env
     configs:
       - source: genesis
         target: /genesis
@@ -210,15 +175,8 @@ services:
       - type: volume
         source: observer-0-data
         target: /home/cheqd
-    environment:
-      CHEQD_NODED_MONIKER: observer-0
-      CHEQD_NODED_RPC_LADDR: tcp://0.0.0.0:26657
-      CHEQD_NODED_API_ENABLE: true
-      # Consensus
-      CHEQD_NODED_CONSENSUS_TIMEOUT_PROPOSE: 500ms
-      CHEQD_NODED_CONSENSUS_TIMEOUT_PREVOTE: 500ms
-      CHEQD_NODED_CONSENSUS_TIMEOUT_PRECOMMIT: 500ms
-      CHEQD_NODED_CONSENSUS_TIMEOUT_COMMIT: 500ms
+    env_file:
+      - container-env/observer-0.env
     configs:
       - source: genesis
         target: /genesis
