@@ -53,6 +53,31 @@ Mnemonic phrase is:
 electric marine palace chaos open review friend left convince pupil spoon cigar brain mass cake bronze potato suspect answer pig common alert ice choose
 ```
 
+## Generate DID
+For generating simple DID, like just an identificator can be used the next commmand:
+```
+indy> did new
+``` 
+As example, the result can be:
+```
+cheqd_pool(cheqd-pool):cheqd-wallet:indy> did new
+Did "C9mR4KH6Mb7FWsCjsAfnVo" has been created with "~T3TuBAkJPgFyre8bVWuRjF" verkey
+```
+
+If full DID with `testnet` or `mainnet` service is needed the next steps are useful:
+1. `did new`
+2. `did new did=<prefix>:<previously_created_DID>`
+In this case after the step 2 we can use this DID for sending to the cheqd network.
+For example:
+```
+cheqd_pool(cheqd-pool):cheqd-wallet:indy> did new
+Did "C9mR4KH6Mb7FWsCjsAfnVo" has been created with "~T3TuBAkJPgFyre8bVWuRjF" verkey
+cheqd_pool(cheqd-pool):cheqd-wallet:indy> did new did=did:cheqd:testnet:C9mR4KH6Mb7FWsCjsAfnVo
+Did "did:cheqd:testnet:C9mR4KH6Mb7FWsCjsAfnVo" has been created with "FrVpdaHkumCBYW91a1j5gLQwDSr65S72KErTqhoXcL65" verkey
+cheqd_pool(cheqd-pool):cheqd-wallet:indy>
+```
+where the first created DID was `C9mR4KH6Mb7FWsCjsAfnVo`.
+
 ## Create and connect to the pool
 The next step which is needed for establishing connection to the server it's a command, name `cheqd-pool`.
 
@@ -77,3 +102,35 @@ indy> cheqd-pool open alias=cheqd-pool
 Pool "cheqd-pool" has been opened
 ```
 
+## Send a DID to the pool
+
+After the whole previos steps we are able to send a DID to the pool, which we connected previously.
+For sending DID the next command can be used:
+```
+cheqd-ledger create-did did=<did-value> key_alias=<key_alias-value> max_coin=<max_coin-value> max_gas=<max_gas-value> denom=<denom-value> [memo=<memo-value>] [simulate=<simulate-value>]
+```
+where:
+- `did-value` - previously created DID. In our examples it was `did:cheqd:testnet:C9mR4KH6Mb7FWsCjsAfnVo`
+- `key-alias` - previously created/restored key. In our example it was `cheqd-key`
+- `denom`     - for cheqd pool the default value is `ncheq`
+- `max_coin` and `max_gas` - financial parameters for the pool
+For example:
+```
+cheqd_pool(cheqd-pool):cheqd-wallet:indy> cheqd-ledger create-did did=did:cheqd:testnet:C9mR4KH6Mb7FWsCjsAfnVo max_coin=250000000 max_gas=10000000 denom=ncheq memo=memo key_alias=cheqd-key
+Abci-info request result "{"response":{"app_version":"1","data":"cheqd-node","last_block_app_hash":[121,54,48,74,111,116,97,74,68,57,72,102,55,102,65,112,49,78,105,50,98,88,89,48,122,109,48,57,74,111,99,66,77,65,50,65,108,107,99,101,116,100,65,61],"last_block_height":"2100","version":"0.4.0"}}"
+Response from ledger: "{\"id\":\"did:cheqd:testnet:C9mR4KH6Mb7FWsCjsAfnVo\"}"
+```
+
+## Get DID from the pool
+
+For checking that DID was written successfully `get-did` subcommand can be used:
+```
+cheqd-ledger get-did did=<did-value>
+```
+
+As example for previously created DID:
+```
+cheqd_pool(cheqd-pool):cheqd-wallet:indy> cheqd-ledger get-did did=did:cheqd:testnet:C9mR4KH6Mb7FWsCjsAfnVo
+
+DID info: {"did":{"id":"did:cheqd:testnet:C9mR4KH6Mb7FWsCjsAfnVo","controller":["did:cheqd:testnet:C9mR4KH6Mb7FWsCjsAfnVo"],"verification_method":[{"id":"did:cheqd:testnet:C9mR4KH6Mb7FWsCjsAfnVo#verkey","type":"Ed25519VerificationKey2020","controller":"did:cheqd:testnet:C9mR4KH6Mb7FWsCjsAfnVo","public_key_multibase":"zFrVpdaHkumCBYW91a1j5gLQwDSr65S72KErTqhoXcL65"}],"authentication":["did:cheqd:testnet:C9mR4KH6Mb7FWsCjsAfnVo#verkey"]},"metadata":{"created":"2022-02-16 09:28:53.0549393 +0000 UTC","updated":"2022-02-16 09:28:53.0549393 +0000 UTC","deactivated":false,"version_id":"mRg6zKRgu+EXksfulQsay4icEpCNaMmgUQfxIyuXoCc="}}
+```
