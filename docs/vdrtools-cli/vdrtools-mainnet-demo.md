@@ -1,5 +1,6 @@
 # Overview
-This document includes just steps for writing a DID to the pool, without additional info
+This document includes just steps for writing a DID to the pool, without additional info.
+First of all, `vdrtools-cli` should be installed and run. For installation process [this instruction](install.md) can help
 
 ## Steps for writing a DID to the mainnet
 1. Create a wallet:
