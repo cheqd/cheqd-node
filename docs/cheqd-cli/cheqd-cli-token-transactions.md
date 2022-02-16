@@ -39,7 +39,7 @@ cheqd-noded tx <module> <tx> <params> --node <url> --chain-id <chain> --fees <fe
 #### Arguments
 
 * `--node`: IP address or URL of node to send request to
-* `--chain-id`: i.e. `cheqd-testnet-2`
+* `--chain-id`: i.e. `cheqd-testnet-4`
 * `--fees`: Maximum fee limit that is allowed for the transaction.
 
 #### Status codes
