@@ -2,8 +2,7 @@
 
 ## Overview
 
-[cheqd Cosmos CLI](README.md) can be used for creating, updating DIDDocs on the ledger side
-
+[cheqd Cosmos CLI](README.md) can be used for creating Decentralised Identifiers (DIDs) and DID Documents, as well as updating existing DIDs based on the [`did:cheqd` DID method](../../architecture/adr-list/adr-002-cheqd-did-method.md).
 
 ## Identity-related commands in cheqd CLI
 
@@ -18,7 +17,7 @@ cheqd-noded query cheqd did <id> --node http://localhost:26657
 #### Example
 
 ```bash
-cheqd-noded query cheqd did did:cheqd:testnet:zJ5EDiiiKWDyo79n --node http://nodes.testnet.cheqd.network:26657
+cheqd-noded query cheqd did did:cheqd:testnet:zJ5EDiiiKWDyo79n --node http://rpc.testnet.cheqd.network:26657
 ```
 
 ### Create DID Document
