@@ -6,7 +6,7 @@ set -euox pipefail
 . common.sh
 
 # Wait for upgrade height
-bash ../networks/tools/wait-for-chain.sh "$UPGRADE_HEIGHT" $((2 * VOTING_PERIOD))
+bash ../../tools/wait-for-chain.sh "$UPGRADE_HEIGHT" $((2 * VOTING_PERIOD))
 
 # Stop docker-compose service
 docker_compose_down
@@ -20,7 +20,7 @@ docker_compose_up "$CHEQD_IMAGE_TO" "$(pwd)"
 # Check that upgrade was successful
 
 # Wait for upgrade height
-bash ../networks/tools/wait-for-chain.sh $((UPGRADE_HEIGHT + 2))
+bash ../../tools/wait-for-chain.sh $((UPGRADE_HEIGHT + 2))
 
 CURRENT_VERSION=$(docker run --entrypoint cheqd-noded "$CHEQD_IMAGE_TO" version 2>&1)
 
