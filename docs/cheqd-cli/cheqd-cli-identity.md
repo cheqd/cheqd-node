@@ -244,6 +244,8 @@ cheqd-noded keys add <cheqd-operator-name> --recover --keyring-backend test
 
 where, `cheqd-operator-name` it's name of alias for storing your keys locally, whatever you want.
 
+### Exampe of working with test account.
+
 For example, for test purposes let's create a key with alias `operator`:
 
 ```text
@@ -264,11 +266,11 @@ crawl field same drill indoor olympic tank lamp range olive announce during pact
 
 The main bullets here:
 
-- operator address: `address: cheqd1vjuh4fjkcq0c02qullrt27z822gpn06sah2elh`
+- operator address: `cheqd1vjuh4fjkcq0c02qullrt27z822gpn06sah2elh`
 - mnemonic phrase ( 24 words ):
 `crawl field same drill indoor olympic tank lamp range olive announce during pact idea fall canal sauce film attend response mammal bounce stable suffer`
 
-Having this mnemonic phrase the usr is able to restore their keys whenever they want. For continue playing a user needs to run:
+Having this mnemonic phrase the user is able to restore their keys whenever they want. For continue playing a user needs to run:
 
 ```text
 ~ docker run -it --rm -u cheqd --entrypoint bash ghcr.io/cheqd/cheqd-node:0.4.0
@@ -294,7 +296,7 @@ cheqd@8c3f88f653ab:~$
 
 As you can see, the recovered address is the same as was created before.
 
-And after that all the commands from the flow can be called.
+And after that all the commands from the [flow](#demo-flow-for-sending-did-to-the-testnet) can be called.
 
 P.S. the case with `docker` can be used only for demonstration purposes, cause after closing the container all the data will be lost.
 For production purposes, maybe it would be great to have an image with Ubuntu 20.04 and operator's keys inside.
