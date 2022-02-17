@@ -6,40 +6,39 @@
 
 ## Identity-related commands in cheqd CLI
 
-### Querying DID Document
+**Note**: The `--chain-id` and `--node` flags are optional and only required if using the CLI from a machine that is not running an active cheqd node on mainnet/testnet.
+
+### Create a new DID
 
 #### Command
 
 ```bash
-cheqd-noded query cheqd did <id> --node http://localhost:26657
+cheqd-noded tx cheqd create-did <did-document-json> <did-verification-method-id> --ver-key <did-private-key> --from <wallet-name> --gas auto --gas-adjustment 1.2 --gas-prices 25ncheq --chain-id <chain-id> --node <node-rpc-endpoint>
 ```
 
-#### Example
+#### Sample DID Document JSON
 
-```bash
-cheqd-noded query cheqd did did:cheqd:testnet:zJ5EDiiiKWDyo79n --node http://rpc.testnet.cheqd.network:26657
+```json
+{
+  "id": "<did:cheqd:namespace:unique-id>",
+  "verification_method": [
+    {
+      "id": "<did:cheqd:namespace:unique-id#verification-key-id>",
+      "type": "Ed25519VerificationKey2020",
+      "controller": "<did:cheqd:namespace:unique-id>",
+      "public_key_multibase": "<verification-public-key-multibase>"
+    }
+  ],
+  "authentication": [
+    "<did:cheqd:namespace:unique-id#authentication-key-id>"
+  ]
+}
 ```
-
-### Create DID Document
 
 #### Arguments
 
-* `DIDDoc_in_JSON`: A string with a new DID Document in Json format.
-    Base example:
-    ```
-    {
-      "id": "<DID>",
-      "verification_method": [{
-        "id": "<KEY_ID>'",
-        "type": "Ed25519VerificationKey2020",
-        "controller": "<DID>",
-        "public_key_multibase": "<ALICE_VER_PUB_MULTIBASE_58>"
-      }],
-      "authentication": [
-        "<KEY_ID>"
-      ]
-    }
-    ```
+* `id`: A unique identifier for format `did:cheqd`, conforming to the [cheqd DID method specification](../../architecture/adr-list/adr-002-cheqd-did-method.md).
+
 * `did_verification_method_id`: key identifier(`<KEY_ID>`) in the following format: `<DID>#<key-alias>`. Exapmle: `did:cheqd:testnet:zJ5EDiiiKWDyo79n#key1`.
 * `--ver-key`: Base64 encoded ed25519 private key to sign identity message with. A pair for the key from DID Document. \
     Use for testing purposes only because the key will be stored in shell history!
@@ -48,12 +47,6 @@ cheqd-noded query cheqd did did:cheqd:testnet:zJ5EDiiiKWDyo79n --node http://rpc
 * `--chain-id`: i.e. `cheqd-testnet-4`
 * `--fees`: Maximum fee limit that is allowed for the transaction.
 
-#### Command
-
-```bash
-cheqd-noded tx cheqd create-did <DIDDoc_in_JSON> <did_verification_method_id> --ver-key <identity_private_key_BASE_64> \
-  --from <cosmos_account> --node <url> --chain-id <chain> --fees <fee>
-```
 
 #### Example
 
@@ -72,6 +65,24 @@ cheqd-noded tx cheqd create-did '{"id": "did:cheqd:testnet:zJ5EDiiiKWDyo79n",\
   --ver-key "FxaJOy4HFoC2Enu1SizKtU0L+hmBRBAEpC+B4TopfQoyetOF5T68Ks3db5Yy9ykFdgEboPUes3m6wvXNLpbv+Q==" \
   --from my_account --node http://nodes.testnet.cheqd.network:26657 --chain-id cheqd-testnet-4 --fees 50ncheq
 ```
+
+
+### Querying a DID
+
+Allows fetching the DID Document associated with an existing DID on cheqd networks.
+
+#### Command
+
+```bash
+cheqd-noded query cheqd did <id> --chain-id <chain-id> --node <node-rpc-endpoint>
+```
+
+#### Example
+
+```bash
+cheqd-noded query cheqd did did:cheqd:testnet:zJ5EDiiiKWDyo79n --chain-id cheqd-testnet-4 --node http://rpc.testnet.cheqd.network:26657
+```
+
 
 ### Update DID Document
 
