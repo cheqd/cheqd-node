@@ -45,30 +45,10 @@ assert_tx_successful "$RESULT"
 
 
 # Query DID
-RESULT=$(curl http://localhost:1317/cheqd/cheqdnode/cheqd/did/"${DID}")
+RESULT=$(curl http://localhost:1317/cheqd/cheqdnode/cheqd/did+json/"${DID}")
 
 EXPECTED='{
-   "context": ["https://www.w3.org/ns/did/v1"],
-   "id":"'${DID}'",
-   "controller":[],
-   "verification_method":[
-      {
-         "id":"'${KEY_ID}'",
-         "type":"Ed25519VerificationKey2020",
-         "controller":"'${DID}'",
-         "public_key_jwk":[],
-         "public_key_multibase":"'${ALICE_VER_PUB_MULTIBASE_58}'"
-      }
-   ],
-   "authentication":[
-      "'${KEY_ID}'"
-   ],
-   "assertion_method":[],
-   "capability_invocation":[],
-   "capability_delegation":[],
-   "key_agreement":[],
-   "service":[],
-   "also_known_as":[]
+  "value": "{\"@context\":[\"https://www.w3.org/ns/did/v1\"],\"id\":\"'${DID}'\",\"verificationMethod\":[{\"id\":\"'${KEY_ID}'\",\"type\":\"Ed25519VerificationKey2020\",\"controller\":\"'${DID}'\",\"publicKeyMultibase\":\"'${ALICE_VER_PUB_MULTIBASE_58}'\"}],\"authentication\":[\"'${KEY_ID}'\"]}"
 }'
 
-assert_json_eq "${EXPECTED}" "$(echo "$RESULT" | jq -r ".did")"
+assert_json_eq "${EXPECTED}" "$RESULT"

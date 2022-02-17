@@ -26,6 +26,7 @@ DID="did:cheqd:testnet:$(random_string)"
 KEY_ID="${DID}#key1"
 
 MSG_CREATE_DID='{
+  "context": ["https://www.w3.org/ns/did/v1"],
   "id": "'${DID}'",
   "verification_method": [{
     "id": "'${KEY_ID}'",

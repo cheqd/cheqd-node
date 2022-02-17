@@ -25,6 +25,7 @@ DID="did:cheqd:testnet:$(random_string)"
 KEY_ID="${DID}#key1"
 
 MSG_CREATE_DID='{
+  "context": ["https://www.w3.org/ns/did/v1"],
   "id": "'${DID}'",
   "verification_method": [{
     "id": "'${KEY_ID}'",
@@ -47,7 +48,7 @@ assert_tx_successful "$RESULT"
 RESULT=$(cheqd-noded query cheqd did "${DID}" ${QUERY_PARAMS})
 
 EXPECTED='{
-   "context":[],
+   "context": ["https://www.w3.org/ns/did/v1"],
    "id":"'${DID}'",
    "controller":[],
    "verification_method":[
