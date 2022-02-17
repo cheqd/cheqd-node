@@ -195,10 +195,10 @@ jobs:
 
       - name: Push cheqd-cli image
         run: |
-          docker tag cheqd-cli ghcr.io/${{ env.GITHUB_ORG_NAME }}/cheqd-cli:${{ env.VERSION }}
-          docker tag cheqd-cli ghcr.io/${{ env.GITHUB_ORG_NAME }}/cheqd-cli:latest
-          docker push ghcr.io/${{ env.GITHUB_ORG_NAME }}:${{ env.VERSION }}
-          docker push ghcr.io/${{ env.GITHUB_ORG_NAME }}:latest
+          docker tag cheqd-cli ghcr.io/${{ github.repository_owner }}/cheqd-cli:${{ env.VERSION }}
+          docker tag cheqd-cli ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
+          docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:${{ env.VERSION }}
+          docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
 
       - name: Download deb
         uses: actions/download-artifact@v2
