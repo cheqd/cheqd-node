@@ -224,3 +224,27 @@ cheqd-noded tx cheqd create-did '{"id": "did:cheqd:testnet:zJ5EDiiiKWDyo79n",\
 ```bash
 cheqd-noded query cheqd did "did:cheqd:testnet:zJ5EDiiiKWDyo79n" --output json
 ```
+
+## Requirements from OS side
+
+Our target OS system is Ubuntu 20.04.
+In this case, for running demo flow we can use variants: Virtualbox or docker. 
+For example, let it be a docker image, cause it's the most fastest way to start playing.
+The next command can help:
+
+```bash
+docker run -it --rm -u cheqd --entrypoint bash ghcr.io/cheqd/cheqd-node:0.4.0
+```
+
+The next step is to restore operator's keys:
+
+```bash
+cheqd-noded keys add <cheqd-operator-name> --recover
+```
+
+where, `cheqd-operator-name` it's name of alias for storing your keys locally, whatever you want.
+
+And after that all the commands from the flow can be called.
+
+P.S. the case with `docker` can be used only for demonstration purposes, cause after closing the container all the data will be lost.
+For production purposes, maybe it would be great to have an image with Ubuntu 20.04 and operator's keys inside.

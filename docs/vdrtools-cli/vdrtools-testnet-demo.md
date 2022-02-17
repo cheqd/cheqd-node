@@ -31,3 +31,4 @@ For installation process of `vdrtools-cli` [this instruction](install.md) can he
 7. Send previously created DID:
    `cheqd-ledger create-did did=<DID_from_step_5> max_coin=<value> max_gas=<value> denom=ncheq memo=memo key_alias=cheqd-testnet-key`
    You need only setup `max_coin` and `max_gas` parameters, according to your financial politic.
+   
