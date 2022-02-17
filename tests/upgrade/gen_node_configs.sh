@@ -4,6 +4,7 @@
 
 set -euox pipefail
 
+# shellcheck disable=SC1091
 . common.sh
 
 # sed in macos requires extra argument
@@ -24,18 +25,9 @@ edit_genesis () {
     PARAMETER_NAME=$1
     VALUE=$2
     GENESIS_PATH=$3
-    jq "${PARAMETER_NAME} = \"${VALUE}\"" $GENESIS_PATH > /tmp/1 && mv /tmp/1 $GENESIS_PATH
+    jq "${PARAMETER_NAME} = \"${VALUE}\"" "$GENESIS_PATH" > /tmp/1 && mv /tmp/1 "$GENESIS_PATH"
 }
 
-# We use local copy of this function because of using -u root for allowing files creation inside the
-cheqd_noded_docker() {
-  docker run --rm \
-    -v "$(pwd)":"/cheqd" \
-    --network host \
-    --entrypoint "cheqd-noded" \
-    -u root \
-    ${CHEQD_IMAGE_FROM} "$@" --home /cheqd/.cheqdnode
-}
 
 VALIDATORS_COUNT="4"
 OBSERVERS_COUNT="2"
@@ -47,7 +39,7 @@ pushd $NODE_CONFIGS_DIR
 
 echo "Generating validator keys..."
 
-for ((i=0 ; i<$VALIDATORS_COUNT ; i++))
+for ((i=0 ; i<VALIDATORS_COUNT ; i++))
 do
     NODE_HOME="node$i"
     mkdir $NODE_HOME
@@ -55,10 +47,10 @@ do
 
     echo "[Validator $i] Generating key..."
 
-    cheqd_noded_docker init "node$i" --chain-id $CHAIN_ID
-    sudo chown -R $USER:$USER .
-    echo "$(cheqd_noded_docker tendermint show-node-id)" > node_id.txt
-    echo "$(cheqd_noded_docker tendermint show-validator)" > node_val_pubkey.txt
+    cheqd_noded_docker init "node$i" --chain-id "$CHAIN_ID"
+    sudo chown -R "$USER:$USER" .
+    cheqd_noded_docker tendermint show-node-id > node_id.txt
+    cheqd_noded_docker tendermint show-validator > node_val_pubkey.txt
 
     echo "Setting minimum fee price..."
 
@@ -73,28 +65,28 @@ mkdir $OPERATORS_HOME
 pushd $OPERATORS_HOME
 
 echo "Initializing genesis..."
-cheqd_noded_docker init dummy_node --chain-id $CHAIN_ID
-sudo chown -R $USER:$USER .
+cheqd_noded_docker init dummy_node --chain-id "$CHAIN_ID"
+sudo chown -R "$USER:$USER" .
 sed -i $sed_extension 's/"stake"/"ncheq"/' .cheqdnode/config/genesis.json
 
 echo "Generating operator keys..."
 
-for ((i=0 ; i<$VALIDATORS_COUNT ; i++))
+for ((i=0 ; i<VALIDATORS_COUNT ; i++))
 do
     cheqd_noded_docker keys add "operator$i" --keyring-backend "test"
-    sudo chown -R $USER:$USER .
+    sudo chown -R "$USER:$USER" .
 done
 
 echo "Creating genesis accounts..."
 
-for ((i=0 ; i<$VALIDATORS_COUNT ; i++))
+for ((i=0 ; i<VALIDATORS_COUNT ; i++))
 do
     cheqd_noded_docker add-genesis-account "operator$i" 20000000000000000ncheq --keyring-backend "test"
 done
 
 echo "Creating genesis validators..."
 
-for ((i=0 ; i<$VALIDATORS_COUNT ; i++))
+for ((i=0 ; i<VALIDATORS_COUNT ; i++))
 do
     NODE_HOME="../node$i"
     pushd $NODE_HOME
@@ -104,7 +96,8 @@ do
 
     popd
 
-    cheqd_noded_docker gentx "operator$i" 1000000000000000ncheq --chain-id $CHAIN_ID --node-id $NODE_ID --pubkey $NODE_VAL_PUBKEY --keyring-backend "test"
+    cheqd_noded_docker gentx "operator$i" 1000000000000000ncheq --chain-id "$CHAIN_ID" --node-id "$NODE_ID" \
+      --pubkey "$NODE_VAL_PUBKEY" --keyring-backend "test"
 done
 
 echo "Collecting them..."
@@ -118,7 +111,7 @@ echo "Propagating genesis to nodes..."
 edit_genesis ".app_state.gov.deposit_params.max_deposit_period" "${VOTING_PERIOD}s" .cheqdnode/config/genesis.json
 edit_genesis ".app_state.gov.voting_params.voting_period" "${VOTING_PERIOD}s" .cheqdnode/config/genesis.json
 
-for ((i=0 ; i<$VALIDATORS_COUNT ; i++))
+for ((i=0 ; i<VALIDATORS_COUNT ; i++))
 do
     NODE_HOME="../node$i"
 
@@ -131,7 +124,7 @@ popd # operators' home
 
 echo "##### Setting up observers..."
 
-for ((i=0 ; i<$OBSERVERS_COUNT ; i++))
+for ((i=0 ; i<OBSERVERS_COUNT ; i++))
 do
     NODE_HOME="observer$i"
 
@@ -139,12 +132,12 @@ do
     pushd $NODE_HOME
 
     echo "##### [Observer $i] Generating keys..."
-    cheqd_noded_docker init "node$i" --chain-id $CHAIN_ID
-    sudo chown -R $USER:$USER .
+    cheqd_noded_docker init "node$i" --chain-id "$CHAIN_ID"
+    sudo chown -R "$USER:$USER" .
 
     echo "##### [Observer $i] Exporting public keys..."
-    echo "$(cheqd_noded_docker tendermint show-node-id)" > node_id.txt
-    echo "$(cheqd_noded_docker tendermint show-validator)" > node_val_pubkey.txt
+    cheqd_noded_docker tendermint show-node-id > node_id.txt
+    cheqd_noded_docker tendermint show-validator > node_val_pubkey.txt
 
     echo "##### [Observer $i] Loading genesis..."
     OPERATORS_HOME="../client"

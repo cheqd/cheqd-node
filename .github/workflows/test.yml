@@ -9,9 +9,7 @@ on:
     - '.gitbook/**'
 
 env:
-  NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/tests/networks/docker-compose-localnet/node_configs"
-  PACKAGE_NAME: "cheqd-node"
-  VERSION: "1.0.0" # Package build scripts require version to be provided
+  NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/tests/networks/docker-compose-localnet/network-config"
 
 jobs:
 
@@ -32,6 +30,8 @@ jobs:
   build-binary:
     name: Build binary
     runs-on: ubuntu-20.04
+    outputs:
+      VERSION: ${{ steps.set-version.outputs.VERSION }}
     steps:
       - name: Set up Go 1.17
         uses: actions/setup-go@v2
@@ -76,10 +76,18 @@ jobs:
           name: cheqd-noded
           path: build/cheqd-noded
 
-  build-deb-package:
-    name: Build deb package
+      - name: Set version
+        id: set-version
+        run: |
+          VERSION=$(build/cheqd-noded version 2>&1)
+          echo "::set-output name=VERSION::$VERSION"
+
+  build-tar-package:
+    name: Build tar package
     runs-on: ubuntu-20.04
     needs: build-binary
+    env:
+      VERSION: ${{ needs.build-binary.outputs.VERSION }}
     steps:
       - uses: actions/checkout@v2
 
@@ -87,50 +95,81 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: cheqd-noded
-          path: /home/runner/go/bin
 
       - name: Restore binary permissions
-        run: sudo chmod +x /home/runner/go/bin/cheqd-noded
+        run: sudo chmod +x cheqd-noded
 
-      - name: Make intermediate archive
+      - name: Build tar
         working-directory: ./build-tools
         run: |
-          ./build-tar.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }} 
+          ./build-tar.sh "../cheqd-noded"
+
+      - name: Store tar package artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: cheqd-node_${{ env.VERSION }}.tar.gz
+          path: build-tools/output/cheqd-node_${{ env.VERSION }}.tar.gz
+
+  build-deb-package:
+    name: Build deb package
+    runs-on: ubuntu-20.04
+    needs: build-binary
+    env:
+      VERSION: ${{ needs.build-binary.outputs.VERSION }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Load binary artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: cheqd-noded
+
+      - name: Restore binary permissions
+        run: sudo chmod +x cheqd-noded
 
       - name: Install fpm
         run: |
           sudo apt-get install ruby ruby-dev rubygems build-essential
           sudo gem install --no-document fpm
 
-      - name: Build deb # Depends on tar archive
+      - name: Build deb
         working-directory: ./build-tools
         run: |
-          ./build-deb.sh ${{ env.PACKAGE_NAME }} ${{ env.VERSION }}
+          ./build-deb.sh "../cheqd-noded"
 
       - name: Store deb package artifact
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
-          path: build-tools/output/${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+          name: cheqd-node_${{ env.VERSION }}_amd64.deb
+          path: build-tools/output/cheqd-node_${{ env.VERSION }}_amd64.deb
 
-  build-node-image:
-    name: Build cheqd-node image
+  build-node-images:
+    name: Build cheqd-node and cheqd-cli images
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 0 # FIXME: Starport requires full repository
+          fetch-depth: 0 # Required to fetch version
 
-      - name: Build
-        run: |
-          export CHEQD_NODE_VERSION=local
-          docker compose --env-file docker/persistent-chains/docker-compose.env -f docker/persistent-chains/docker-compose.yml build --build-arg UID=$(id -u) --build-arg GID=$(id -g)
-          docker tag ghcr.io/cheqd/cheqd-node:local cheqd-node
+      - name: Build cheqd-cli with 'cheqd-noded' as entrypoint
+        run: docker build --target base -t cheqd-cli -f docker/Dockerfile --build-arg UID=$(id -u) --build-arg GID=$(id -g) . # TODO: Get rid of UID and GID
 
-      - name: Save
+      - name: Build cheqd-node with 'node-start' as entrypoint
+        run: docker build --target node -t cheqd-node -f docker/Dockerfile --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
+
+      - name: Save cheqd-cli
+        run: docker save -o cheqd-cli-image.tar cheqd-cli
+
+      - name: Save cheqd-node
         run: docker save -o cheqd-node-image.tar cheqd-node
 
-      - name: Store artifact
+      - name: Store cheqd-cli artifact 
+        uses: actions/upload-artifact@v2
+        with:
+          name: cheqd-cli-image.tar
+          path: cheqd-cli-image.tar
+      
+      - name: Store cheqd-node artifact 
         uses: actions/upload-artifact@v2
         with:
           name: cheqd-node-image.tar
@@ -139,7 +178,7 @@ jobs:
   build-testnet-image:
     name: Build cheqd-testnet image
     runs-on: ubuntu-20.04
-    needs: build-node-image
+    needs: build-node-images
     steps:
       - name: Check out
         uses: actions/checkout@v2
@@ -147,10 +186,10 @@ jobs:
       - name: Download node image
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-node-image.tar
+          name: cheqd-cli-image.tar
 
       - name: Load node image
-        run: docker load -i cheqd-node-image.tar
+        run: docker load -i cheqd-cli-image.tar
 
       - name: Build
         run: docker build -f tests/networks/docker-localnet/Dockerfile --no-cache -t cheqd-testnet .
@@ -167,23 +206,25 @@ jobs:
   test-new-node-setup-from-deb:
     name: Test new node setup from deb
     runs-on: ubuntu-20.04
-    needs: [build-deb-package, build-node-image]
+    needs: [build-binary, build-deb-package, build-node-images]
+    env:
+      VERSION: ${{ needs.build-binary.outputs.VERSION }}
     steps:
       - name: Download deb
         uses: actions/download-artifact@v2
         with:
-          name: ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+          name: cheqd-node_${{ env.VERSION }}_amd64.deb
 
       - name: Install deb
-        run: sudo CHEQD_HOME_DIR=/home/runner/cheqd dpkg -i ${{ env.PACKAGE_NAME }}_${{ env.VERSION }}_amd64.deb
+        run: sudo CHEQD_HOME_DIR=/home/runner/cheqd dpkg -i cheqd-node_${{ env.VERSION }}_amd64.deb
 
       - name: Download node image
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-node-image.tar
+          name: cheqd-cli-image.tar
 
       - name: Load node image
-        run: docker load -i cheqd-node-image.tar
+        run: docker load -i cheqd-cli-image.tar
 
       - name: Check out
         uses: actions/checkout@v2
@@ -191,9 +232,11 @@ jobs:
       - name: Set up 4 validators + 2 observers node docker pool  # TODO: Replace with testnet image
         working-directory: ./tests/networks/docker-compose-localnet
         run: |
-          ./gen-node-configs.sh
-          ./run-docker.sh
-          ./wait.sh '[[ $(curl -s -N localhost:26657/block | jq -cr '"'"'.result.block.last_commit.height'"'"') -gt 1 ]] && echo "Height is more than 1"'
+          bash gen-network-config.sh
+          docker-compose up -d
+
+      - name: Wait for chain
+        run: bash tests/networks/tools/wait-for-chain.sh
 
       - name: Add observer node
         working-directory: ./tests/networks/docker-compose-localnet
@@ -220,10 +263,10 @@ jobs:
         run: |
           journalctl -u service-name.service --no-pager
 
-  run-cosmos-tests-using-cli:
-    name: Run cosmos and identity tests using CLI
+  run-python-based-integration-tests:
+    name: Run python based cosmos and identity tests
     runs-on: ubuntu-20.04
-    needs: [build-node-image, build-binary]
+    needs: [build-node-images, build-binary]
     steps:
       - name: Load binary artifact
         uses: actions/download-artifact@v2
@@ -237,41 +280,45 @@ jobs:
       - name: Download node image
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-node-image.tar
+          name: cheqd-cli-image.tar
 
       - name: Load node image
-        run: docker load -i cheqd-node-image.tar
+        run: docker load -i cheqd-cli-image.tar
 
       - uses: actions/checkout@v2
 
       - name: Set up 4 validators + 2 observers node docker pool for local test run # Replace with testnet image
         working-directory: ./tests/networks/docker-compose-localnet
         run: |
-          ./gen-node-configs.sh
-          ./run-docker.sh
-          ./wait.sh '[[ $(curl -s -N localhost:26657/block | jq -cr '"'"'.result.block.last_commit.height'"'"') -gt 1 ]] && echo "Height is more than 1"'
+          bash gen-network-config.sh
+          docker-compose up -d
+
+      - name: Wait for chain
+        run: bash tests/networks/tools/wait-for-chain.sh
 
       - name: Set up test environment
         working-directory: ./tests/e2e
         run: |
           pip3 install -r requirements.txt >> /dev/null
-          cp -R ${NODE_CONFIGS_BASE}/client/.cheqdnode /home/runner/
+          cp -Rf ${NODE_CONFIGS_BASE}/validator-0/. /home/runner/.cheqdnode
+          cp -Rf ${NODE_CONFIGS_BASE}/validator-1/. /home/runner/.cheqdnode
           sudo chmod -R 777 /home/runner
 
       - name: Run cosmos-related tests
         run: |
-          export OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
-          export OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p | sed 's/\r//g')
+          set -euxo pipefail
+          export OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/validator-0" | sed -nr 's/.*address: (.*?).*/\1/p' | sed 's/\r//g')
+          export OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/validator-1" | sed -nr 's/.*address: (.*?).*/\1/p' | sed 's/\r//g')
           pytest -v -rP tests/e2e/test_cosmos.py
 
-      - name: Run identity-related tests
+      - name: Run identity-related tests # TODO: Move into separate stage?
         run: |
           export OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
           export OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p | sed 's/\r//g')
           pytest -v -rP tests/e2e/test_identity.py
 
-  run-identity-tests-using-cli:
-    name: Run identity tests using CLI
+  run-bash-based-integration-tests:
+    name: Run bash based identity tests
     runs-on: ubuntu-20.04
     needs: [build-binary, build-testnet-image]
     steps:
@@ -308,17 +355,19 @@ jobs:
   run-upgrade-test-positive-case:
     name: Run positive case for upgrade
     runs-on: ubuntu-20.04
-    needs: build-node-image
+    needs: build-node-images
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # It's needed for getting the full version of package by `git describe`
 
       - name: Download node image
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-node-image.tar
+          name: cheqd-cli-image.tar
 
       - name: Load node image
-        run: docker load -i cheqd-node-image.tar
+        run: docker load -i cheqd-cli-image.tar
 
       - name: Chown for current user
         run: sudo chown $USER:$USER .

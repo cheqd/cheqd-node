@@ -1,17 +1,9 @@
 #!/bin/bash
 
-set -euox pipefail
-
-# sed in macos requires extra argument
-
-sed_extension=''
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    sed_extension=''
-elif [[ "$OSTYPE" == "darwin"* ]]; then
-    sed_extension='.orig'
-fi
+# set -euox pipefail
 
 SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+# shellcheck source=/dev/null
 source "$SCRIPT_DIR/common.sh"
 
 
@@ -38,6 +30,7 @@ MSG_CREATE_DID='{
   ]
 }';
 
+# shellcheck disable=SC2086
 RESULT=$(cheqd-noded tx cheqd create-did "${MSG_CREATE_DID}" "${KEY_ID}" --ver-key "${ALICE_VER_PRIV_BASE_64}" \
   --from "${BASE_ACCOUNT_1}" ${TX_PARAMS})
 
@@ -45,7 +38,7 @@ assert_tx_successful "$RESULT"
 
 
 # Query DID
-RESULT=$(cheqd-noded query cheqd did "${DID}" ${QUERY_PARAMS})
+RESULT=$(curl "http://localhost:1317/cheqd/cheqdnode/cheqd/did/${DID}")
 
 EXPECTED='{
    "context": ["https://www.w3.org/ns/did/v1"],

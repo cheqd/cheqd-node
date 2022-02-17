@@ -1,81 +1,56 @@
 version: '3.2'
 
 services:
-  node0:
+  validator-0:
     image: "${CHEQD_IMAGE_NAME}"
     ports:
       - "26656:26656" # p2p
       - "26657:26657" # rpc
     volumes:
-      - "${MOUNT_POINT}/node_configs/node0:/cheqd"
-    entrypoint: cheqd-noded
-    user: cheqd
-    environment:
-      - HOME=/cheqd
-    command: start --rpc.laddr tcp://0.0.0.0:26657
+      - "${MOUNT_POINT}/network-config/validator-0:/home/cheqd/.cheqdnode"
+    command: start
 
-  node1:
+  validator-1:
     image: "${CHEQD_IMAGE_NAME}"
     ports:
       - "26659:26656" # p2p
       - "26660:26657" # rpc
     volumes:
-      - "${MOUNT_POINT}/node_configs/node1:/cheqd"
-    entrypoint: cheqd-noded
-    user: cheqd
-    environment:
-      - HOME=/cheqd
-    command: start --rpc.laddr tcp://0.0.0.0:26657 --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
+      - "${MOUNT_POINT}/network-config/validator-1:/home/cheqd/.cheqdnode"
+    command: start
 
-  node2:
+  validator-2:
     image: "${CHEQD_IMAGE_NAME}"
     ports:
       - "26662:26656" # p2p
       - "26663:26657" # rpc
     volumes:
-      - "${MOUNT_POINT}/node_configs/node2:/cheqd"
-    entrypoint: cheqd-noded
-    user: cheqd
-    environment:
-      - HOME=/cheqd
-    command: start --rpc.laddr tcp://0.0.0.0:26657 --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
+      - "${MOUNT_POINT}/network-config/validator-2:/home/cheqd/.cheqdnode"
+    command: start
 
-  node3:
+  validator-3:
     image: "${CHEQD_IMAGE_NAME}"
     ports:
       - "26665:26656" # p2p
       - "26666:26657" # rpc
     volumes:
-      - "${MOUNT_POINT}/node_configs/node3:/cheqd"
-    entrypoint: cheqd-noded
-    user: cheqd
-    environment:
-      - HOME=/cheqd
-    command: start --rpc.laddr tcp://0.0.0.0:26657 --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
+      - "${MOUNT_POINT}/network-config/validator-3:/home/cheqd/.cheqdnode"
+    command: start
 
-  observer0:
+  seed-0:
     image: "${CHEQD_IMAGE_NAME}"
     ports:
       - "26668:26656" # p2p
       - "26669:26657" # rpc
     volumes:
-      - "${MOUNT_POINT}/node_configs/observer0:/cheqd"
-    entrypoint: cheqd-noded
-    user: cheqd
-    environment:
-      - HOME=/cheqd
-    command: start --rpc.laddr tcp://0.0.0.0:26657 --minimum-gas-prices "1cheq" --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
+      - "${MOUNT_POINT}/network-config/seed-0:/home/cheqd/.cheqdnode"
+    command: start
 
-  observer1:
+  observer-0:
     image: "${CHEQD_IMAGE_NAME}"
     ports:
       - "26671:26656" # p2p
       - "26672:26657" # rpc
     volumes:
-      - "${MOUNT_POINT}/node_configs/observer1:/cheqd"
-    entrypoint: cheqd-noded
-    user: cheqd
-    environment:
-      - HOME=/cheqd
-    command: start --rpc.laddr tcp://0.0.0.0:26657 --minimum-gas-prices "1cheq" --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
-    
+      - "${MOUNT_POINT}/network-config/observer-0:/home/cheqd/.cheqdnode"
+    command: start
