@@ -24,7 +24,7 @@ func NewStateValue(data StateValueData, metadata *Metadata) (*StateValue, error)
 	return &StateValue{Data: any, Metadata: metadata}, nil
 }
 
-func NewMetadata(ctx sdk.Context) Metadata {
+func NewMetadataFromContext(ctx sdk.Context) Metadata {
 	created := ctx.BlockTime().String()
 	txHash := base64.StdEncoding.EncodeToString(tmhash.Sum(ctx.TxBytes()))
 

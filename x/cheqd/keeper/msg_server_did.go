@@ -15,39 +15,39 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	prefix := k.GetDidPrefix(ctx)
 
-	didMsg := msg.GetPayload()
-	if err := didMsg.Validate(prefix); err != nil {
+	payload := msg.GetPayload()
+	if err := payload.Validate(prefix); err != nil {
 		return nil, err
 	}
 
-	if err := k.ValidateDidControllers(&ctx, didMsg.Id, didMsg.Controller, didMsg.VerificationMethod); err != nil {
+	if err := k.ValidateDidControllers(&ctx, payload.Id, payload.Controller, payload.VerificationMethod); err != nil {
 		return nil, err
 	}
 
-	if err := k.VerifySignature(&ctx, didMsg, didMsg.GetSigners(), msg.GetSignatures()); err != nil {
+	if err := k.VerifySignature(&ctx, payload, payload.GetSigners(), msg.GetSignatures()); err != nil {
 		return nil, err
 	}
 
 	// Checks that the did doesn't exist
-	if k.HasDid(ctx, didMsg.Id) {
-		return nil, sdkerrors.Wrap(types.ErrDidDocExists, fmt.Sprintf("DID is already used by DIDDoc %s", didMsg.Id))
+	if k.HasDid(ctx, payload.Id) {
+		return nil, sdkerrors.Wrap(types.ErrDidDocExists, fmt.Sprintf("DID is already used by DIDDoc %s", payload.Id))
 	}
 
 	var did = types.Did{
-		Context:              didMsg.Context,
-		Id:                   didMsg.Id,
-		Controller:           didMsg.Controller,
-		VerificationMethod:   didMsg.VerificationMethod,
-		Authentication:       didMsg.Authentication,
-		AssertionMethod:      didMsg.AssertionMethod,
-		CapabilityInvocation: didMsg.CapabilityInvocation,
-		CapabilityDelegation: didMsg.CapabilityDelegation,
-		KeyAgreement:         didMsg.KeyAgreement,
-		AlsoKnownAs:          didMsg.AlsoKnownAs,
-		Service:              didMsg.Service,
+		Context:              payload.Context,
+		Id:                   payload.Id,
+		Controller:           payload.Controller,
+		VerificationMethod:   payload.VerificationMethod,
+		Authentication:       payload.Authentication,
+		AssertionMethod:      payload.AssertionMethod,
+		CapabilityInvocation: payload.CapabilityInvocation,
+		CapabilityDelegation: payload.CapabilityDelegation,
+		KeyAgreement:         payload.KeyAgreement,
+		AlsoKnownAs:          payload.AlsoKnownAs,
+		Service:              payload.Service,
 	}
 
-	metadata := types.NewMetadata(ctx)
+	metadata := types.NewMetadataFromContext(ctx)
 	id, err := k.AppendDid(ctx, did, &metadata)
 	if err != nil {
 		return nil, err
@@ -110,7 +110,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 		Service:              didMsg.Service,
 	}
 
-	metadata := types.NewMetadata(ctx)
+	metadata := types.NewMetadataFromContext(ctx)
 	metadata.Created = oldStateValue.Metadata.Created
 	metadata.Deactivated = oldStateValue.Metadata.Deactivated
 
