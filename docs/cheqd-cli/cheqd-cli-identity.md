@@ -10,7 +10,7 @@
 #### Command for generating public and private part of verification key
 
 ```bash
-cheqd-noded debug ed25519 random >> keys.txt
+$ cheqd-noded debug ed25519 random >> keys.txt
 ```
 
 P.S. it's very important to keep your private verification key in a safe place. 
@@ -25,12 +25,12 @@ The simpliest suggestion here is to redirect output to file as shown in bash com
 
 #### Convert base64 to multibase58
 ```bash
-cheqd-noded debug encoding base64-multibase58 <public_key_in_base64_representaion>
+$ cheqd-noded debug encoding base64-multibase58 <public_key_in_base64_representaion>
 ```
 
 #### Response example
 ```text
-~ cheqd-noded debug encoding base64-multibase58 MnrTheU+vCrN3W+WMvcpBXYBG6D1HrN5usL1zS6W7/k=
+$ cheqd-noded debug encoding base64-multibase58 MnrTheU+vCrN3W+WMvcpBXYBG6D1HrN5usL1zS6W7/k=
 z4Q41kvWsd1JAuPFBff8Dti7P6fLbPZe3Nmod35uua9TE
 ```
 
@@ -44,7 +44,7 @@ z4Q41kvWsd1JAuPFBff8Dti7P6fLbPZe3Nmod35uua9TE
 #### Command
 
 ```bash
-cheqd-noded tx cheqd create-did <did-document-json> <did-verification-method-id> --ver-key <did-private-key> --from <wallet-name> --gas auto --gas-adjustment 1.2 --gas-prices 25ncheq --chain-id <chain-id> --node <node-rpc-endpoint>
+$ cheqd-noded tx cheqd create-did <did-document-json> <did-verification-method-id> --ver-key <did-private-key> --from <wallet-name> --gas auto --gas-adjustment 1.2 --gas-prices 25ncheq --chain-id <chain-id> --node <node-rpc-endpoint>
 ```
 
 #### Sample DID Document JSON
@@ -82,7 +82,7 @@ cheqd-noded tx cheqd create-did <did-document-json> <did-verification-method-id>
 #### Example
 
 ```bash
-cheqd-noded tx cheqd create-did '{"id": "did:cheqd:testnet:zJ5EDiiiKWDyo79n",\
+$ cheqd-noded tx cheqd create-did '{"id": "did:cheqd:testnet:zJ5EDiiiKWDyo79n",\
                                    "verification_method": [{\
                                      "id": "did:cheqd:testnet:zJ5EDiiiKWDyo79n#key1",\
                                      "type": "Ed25519VerificationKey2020",\
@@ -100,7 +100,7 @@ cheqd-noded tx cheqd create-did '{"id": "did:cheqd:testnet:zJ5EDiiiKWDyo79n",\
 BTW, it can be more useful to prepare json file using your favorite editor and after that run the command as:
 
 ```bash
-cheqd-noded tx cheqd create-did "$(cat json.txt)" --ver-key "FxaJOy4HFoC2Enu1SizKtU0L+hmBRBAEpC+B4TopfQoyetOF5T68Ks3db5Yy9ykFdgEboPUes3m6wvXNLpbv+Q==" \
+$ cheqd-noded tx cheqd create-did "$(cat json.txt)" --ver-key "FxaJOy4HFoC2Enu1SizKtU0L+hmBRBAEpC+B4TopfQoyetOF5T68Ks3db5Yy9ykFdgEboPUes3m6wvXNLpbv+Q==" \
   --from my_account --node http://nodes.testnet.cheqd.network:26657 --chain-id cheqd-testnet-4 --fees 5000000ncheq
 ```
 
@@ -113,13 +113,13 @@ Allows fetching the DID Document associated with an existing DID on cheqd networ
 #### Command
 
 ```bash
-cheqd-noded query cheqd did <id> --chain-id <chain-id> --node <node-rpc-endpoint>
+$ cheqd-noded query cheqd did <id> --chain-id <chain-id> --node <node-rpc-endpoint>
 ```
 
 #### Example
 
 ```bash
-cheqd-noded query cheqd did did:cheqd:testnet:zJ5EDiiiKWDyo79n --chain-id cheqd-testnet-4 --node http://rpc.testnet.cheqd.network:26657
+$ cheqd-noded query cheqd did did:cheqd:testnet:zJ5EDiiiKWDyo79n --chain-id cheqd-testnet-4 --node http://rpc.testnet.cheqd.network:26657
 ```
 
 
@@ -157,14 +157,14 @@ cheqd-noded query cheqd did did:cheqd:testnet:zJ5EDiiiKWDyo79n --chain-id cheqd-
 #### Command
 
 ```bash
-cheqd-noded tx cheqd create-did <DIDDoc_in_JSON> <did_verification_method_id> --ver-key <identity_private_key_BASE_64> \
+$ cheqd-noded tx cheqd create-did <DIDDoc_in_JSON> <did_verification_method_id> --ver-key <identity_private_key_BASE_64> \
   --from <cosmos_account> --node <url> --chain-id <chain> --fees <fee>
 ```
 
 #### Example
 
 ```bash
-cheqd-noded tx cheqd create-did '{"id": "did:cheqd:testnet:zJ5EDiiiKWDyo79n",\
+$ cheqd-noded tx cheqd create-did '{"id": "did:cheqd:testnet:zJ5EDiiiKWDyo79n",\
                                    "verification_method": [{\
                                      "id": "did:cheqd:testnet:zJ5EDiiiKWDyo79n#key1",\
                                      "type": "Ed25519VerificationKey2020",\
@@ -182,7 +182,7 @@ cheqd-noded tx cheqd create-did '{"id": "did:cheqd:testnet:zJ5EDiiiKWDyo79n",\
 BTW, it can be more useful to prepare json file using your favorite editor and after that run the command as:
 
 ```bash
-cheqd-noded tx cheqd create-did "$(cat json.txt)" --ver-key "FxaJOy4HFoC2Enu1SizKtU0L+hmBRBAEpC+B4TopfQoyetOF5T68Ks3db5Yy9ykFdgEboPUes3m6wvXNLpbv+Q==" \
+$ cheqd-noded tx cheqd create-did "$(cat json.txt)" --ver-key "FxaJOy4HFoC2Enu1SizKtU0L+hmBRBAEpC+B4TopfQoyetOF5T68Ks3db5Yy9ykFdgEboPUes3m6wvXNLpbv+Q==" \
   --from my_account --node http://nodes.testnet.cheqd.network:26657 --chain-id cheqd-testnet-4 --fees 5000000ncheq
 ```
 Let's the result will be like:
