@@ -190,7 +190,7 @@ formatting rules as the created property. The `updated` field is `null` if an Up
 
 Verification methods are used to define how to authenticate / authorise interactions with a DID subject or delegates. Verification method is an OPTIONAL property.
 
-1. **`id`** (string): A string with format `did:cheqd:<namespace>#<key-alias>`
+1. **`id`** (string): A string with format `did:cheqd:<namespace>:<unique-id>#<key-alias>`
 2. **`controller`**: A string with fully qualified DID. DID must exist.
 3. **`type`** (string)
 4. **`publicKeyJwk`** (`map[string,string]`, optional): A map representing a JSON Web Key that conforms to [RFC7517](https://tools.ietf.org/html/rfc7517). See definition of `publicKeyJwk` for additional constraints.

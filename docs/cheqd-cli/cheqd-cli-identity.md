@@ -4,6 +4,37 @@
 
 [cheqd Cosmos CLI](README.md) can be used for creating Decentralised Identifiers (DIDs) and DID Documents, as well as updating existing DIDs based on the [`did:cheqd` DID method](../../architecture/adr-list/adr-002-cheqd-did-method.md).
 
+## Crypto commands in cheqd CLI - EXPERIMENTAL FUNCTIONALITY - Do not use in production!
+
+
+#### Command for generating public and private part of verification key
+
+```bash
+cheqd-noded debug ed25519 random >> keys.txt
+```
+
+P.S. it's very important to keep your private verification key in a safe place. 
+The simpliest suggestion here is to redirect output to file as shown in bash command above.
+
+#### Response example
+
+```text
+{"pub_key_base_64":"MnrTheU+vCrN3W+WMvcpBXYBG6D1HrN5usL1zS6W7/k=","pub_key_multibase_58":"",\
+"priv_key_base_64":"FxaJOy4HFoC2Enu1SizKtU0L+hmBRBAEpC+B4TopfQoyetOF5T68Ks3db5Yy9ykFdgEboPUes3m6wvXNLpbv+Q=="}
+```
+
+#### Convert base64 to multibase58
+```bash
+cheqd-noded debug encoding base64-multibase58 <public_key_in_base64_representaion>
+```
+
+#### Response example
+```text
+~ cheqd-noded debug encoding base64-multibase58 MnrTheU+vCrN3W+WMvcpBXYBG6D1HrN5usL1zS6W7/k=
+z4Q41kvWsd1JAuPFBff8Dti7P6fLbPZe3Nmod35uua9TE
+```
+
+
 ## Identity-related commands in cheqd CLI
 
 **Note**: The `--chain-id` and `--node` flags are optional and only required if using the CLI from a machine that is not running an active cheqd node on mainnet/testnet.
@@ -20,17 +51,17 @@ cheqd-noded tx cheqd create-did <did-document-json> <did-verification-method-id>
 
 ```json
 {
-  "id": "<did:cheqd:namespace:unique-id>",
+  "id": "did:cheqd:<namespace>:<unique-id>",
   "verification_method": [
     {
-      "id": "<did:cheqd:namespace:unique-id#verification-key-id>",
+      "id": "did:cheqd:<namespace>:<unique-id>#<key-alias>",
       "type": "Ed25519VerificationKey2020",
-      "controller": "<did:cheqd:namespace:unique-id>",
+      "controller": "did:cheqd:<namespace>:<unique-id>",
       "public_key_multibase": "<verification-public-key-multibase>"
     }
   ],
   "authentication": [
-    "<did:cheqd:namespace:unique-id#authentication-key-id>"
+    "did:cheqd:<namespace>:<unique-id>#<auth-key-alias>"
   ]
 }
 ```
@@ -39,7 +70,7 @@ cheqd-noded tx cheqd create-did <did-document-json> <did-verification-method-id>
 
 * `id`: A unique identifier for format `did:cheqd`, conforming to the [cheqd DID method specification](../../architecture/adr-list/adr-002-cheqd-did-method.md).
 
-* `did_verification_method_id`: key identifier(`<KEY_ID>`) in the following format: `<DID>#<key-alias>`. Exapmle: `did:cheqd:testnet:zJ5EDiiiKWDyo79n#key1`.
+* `id` feild for `verification_method` section: key identifier in the following format: `did:cheqd:<namespace>:<unique-id>#<key-alias>`. Exapmle: `did:cheqd:testnet:zJ5EDiiiKWDyo79n#key1`.
 * `--ver-key`: Base64 encoded ed25519 private key to sign identity message with. A pair for the key from DID Document. \
     Use for testing purposes only because the key will be stored in shell history!
 * `--from`: Cosmos account key which will pay fees for the transaction ordering.
@@ -63,9 +94,17 @@ cheqd-noded tx cheqd create-did '{"id": "did:cheqd:testnet:zJ5EDiiiKWDyo79n",\
                                    ]\
                                  }' "id:cheqd:testnet:zJ5EDiiiKWDyo79n#key1" \
   --ver-key "FxaJOy4HFoC2Enu1SizKtU0L+hmBRBAEpC+B4TopfQoyetOF5T68Ks3db5Yy9ykFdgEboPUes3m6wvXNLpbv+Q==" \
-  --from my_account --node http://nodes.testnet.cheqd.network:26657 --chain-id cheqd-testnet-4 --fees 50ncheq
+  --from my_account --node http://nodes.testnet.cheqd.network:26657 --chain-id cheqd-testnet-4 --fees 5000000ncheq
 ```
 
+BTW, it can be more useful to prepare json file using your favorite editor and after that run the command as:
+
+```bash
+cheqd-noded tx cheqd create-did "$(cat json.txt)" --ver-key "FxaJOy4HFoC2Enu1SizKtU0L+hmBRBAEpC+B4TopfQoyetOF5T68Ks3db5Yy9ykFdgEboPUes3m6wvXNLpbv+Q==" \
+  --from my_account --node http://nodes.testnet.cheqd.network:26657 --chain-id cheqd-testnet-4 --fees 5000000ncheq
+```
+
+where `json.txt` - file with DID-Doc in json fromat.
 
 ### Querying a DID
 
@@ -90,21 +129,24 @@ cheqd-noded query cheqd did did:cheqd:testnet:zJ5EDiiiKWDyo79n --chain-id cheqd-
 
 * `DIDDoc_in_JSON`: A string with DID Document in Json format.  `id` is not changeable field and mast be used from creation transaction.
     Base example:
-    ```
+```text
+{
+  "id": "did:cheqd:<namespace>:<unique-id>",
+  "verification_method": [
     {
-      "id": "<DID>",
-      "verification_method": [{
-        "id": "<KEY_ID>'",
-        "type": "Ed25519VerificationKey2020",
-        "controller": "<DID>",
-        "public_key_multibase": "<ALICE_VER_PUB_MULTIBASE_58>"
-      }],
-      "authentication": [
-        "<KEY_ID>"
-      ]
+      "id": "did:cheqd:<namespace>:<unique-id>#<key-alias>",
+      "type": "Ed25519VerificationKey2020",
+      "controller": "did:cheqd:<namespace>:<unique-id>",
+      "public_key_multibase": "<verification-public-key-multibase>"
     }
-    ```
-* `did_verification_method_id`: key identifier in the following format: `<DID>#<key-alias>`. Exapmle: `did:cheqd:testnet:zJ5EDiiiKWDyo79n#key1`.
+  ],
+  "authentication": [
+    "did:cheqd:<namespace>:<unique-id>#<auth-key-alias>"
+  ]
+}
+```
+
+* `id` feild for `verification_method` section: key identifier in the following format: `did:cheqd:<namespace>:<unique-id>#<key-alias>`. Exapmle: `did:cheqd:testnet:zJ5EDiiiKWDyo79n#key1`.
 * `--ver-key`: Base64 encoded ed25519 private key to sign identity message with. A pair for the key which was used for the DID creation. \
     Use for testing purposes only because the key will be stored in shell history!
 * `--from`: Cosmos account key which will pay fees for the transaction ordering.
@@ -134,44 +176,14 @@ cheqd-noded tx cheqd create-did '{"id": "did:cheqd:testnet:zJ5EDiiiKWDyo79n",\
                                    ]\
                                  }' "id:cheqd:testnet:zJ5EDiiiKWDyo79n#key1" \
   --ver-key "FxaJOy4HFoC2Enu1SizKtU0L+hmBRBAEpC+B4TopfQoyetOF5T68Ks3db5Yy9ykFdgEboPUes3m6wvXNLpbv+Q==" \
-  --from my_account --node http://nodes.testnet.cheqd.network:26657 --chain-id cheqd-testnet-4 --fees 50ncheq
+  --from my_account --node http://nodes.testnet.cheqd.network:26657 --chain-id cheqd-testnet-4 --fees 5000000ncheq
 ```
 
-## Crypto commands in cheqd CLI - EXPERIMENTAL FUNCTIONALITY - Do not use in production!
-
-
-#### Command for generating public and private part of verification key
+BTW, it can be more useful to prepare json file using your favorite editor and after that run the command as:
 
 ```bash
-cheqd-noded debug ed25519 random
-```
-
-#### Response example
-
-```text
-{"pub_key_base_64":"MnrTheU+vCrN3W+WMvcpBXYBG6D1HrN5usL1zS6W7/k=","pub_key_multibase_58":"",\
-"priv_key_base_64":"FxaJOy4HFoC2Enu1SizKtU0L+hmBRBAEpC+B4TopfQoyetOF5T68Ks3db5Yy9ykFdgEboPUes3m6wvXNLpbv+Q=="}
-```
-
-#### Convert base64 to multibase58
-```bash
-cheqd-noded debug encoding base64-multibase58 <public_key_in_base64_representaion>
-```
-
-#### Response example
-```text
-~ cheqd-noded debug encoding base64-multibase58 MnrTheU+vCrN3W+WMvcpBXYBG6D1HrN5usL1zS6W7/k=
-z4Q41kvWsd1JAuPFBff8Dti7P6fLbPZe3Nmod35uua9TE
-```
-
-
-## Demo flow for sending DID to the testnet
-
-As an example, let it be DID `did:cheqd:testnet:zJ5EDiiiKWDyo79n`
-
-1. Generate verification key:
-```bash
-cheqd-noded debug ed25519 random
+cheqd-noded tx cheqd create-did "$(cat json.txt)" --ver-key "FxaJOy4HFoC2Enu1SizKtU0L+hmBRBAEpC+B4TopfQoyetOF5T68Ks3db5Yy9ykFdgEboPUes3m6wvXNLpbv+Q==" \
+  --from my_account --node http://nodes.testnet.cheqd.network:26657 --chain-id cheqd-testnet-4 --fees 5000000ncheq
 ```
 Let's the result will be like:
 ```text
