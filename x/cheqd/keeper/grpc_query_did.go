@@ -5,7 +5,11 @@ import (
 
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/golang/protobuf/jsonpb"
+
+	// jsonpb Marshaller is deprecated, but is needed because there's only one way to proto
+	// marshal in combination with our proto generator version
+	"github.com/golang/protobuf/jsonpb" //nolint
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

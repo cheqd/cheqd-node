@@ -2,16 +2,8 @@
 
 # set -euox pipefail
 
-# sed in macos requires extra argument
-
-sed_extension=''
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    sed_extension=''
-elif [[ "$OSTYPE" == "darwin"* ]]; then
-    sed_extension='.orig'
-fi
-
 SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+# shellcheck source=/dev/null
 source "$SCRIPT_DIR/common.sh"
 
 
