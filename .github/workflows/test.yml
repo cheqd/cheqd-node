@@ -320,10 +320,14 @@ jobs:
       - name: Wait for chain
         run: bash tests/tools/wait-for-chain.sh
 
+      - name: Import keys
+        working-directory: docker/localnet
+        run: |
+          bash import_keys.sh
+
       - name: Set up and run tests
         working-directory: tests/e2e-bash
         run: |
-          bash import_keys.sh
           bash run_all.sh
 
   run-upgrade-test-positive-case:
