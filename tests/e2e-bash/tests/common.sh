@@ -50,3 +50,9 @@ function assert_tx_successful() {
     OUTPUT=$1
     assert_eq "$(echo "${OUTPUT}" | jq -r ".code")" "0"
 }
+
+function assert_tx_code() {
+    OUTPUT=$1
+    CODE=$2
+    assert_eq "$(echo "${OUTPUT}" | jq -r ".code")" "$CODE"
+}
