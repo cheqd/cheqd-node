@@ -107,7 +107,7 @@ def test_transfer_memo(note):
 
 
 def test_did_query_non_existent():
-    did = fr"did:cheqd:testnet:AbCdEfGh"
+    did = fr"did:cheqd:testnet:00000000AbCdEfGh"
 
     # Try to get did
     run(
@@ -118,7 +118,7 @@ def test_did_query_non_existent():
 
 
 def test_did_wrong_version_update():
-    did = fr"did:cheqd:testnet:{random_string(5)}"
+    did = fr"did:cheqd:testnet:{random_string(16)}"
     key_id = fr"{did}#key1"
 
     # Generate ed25519 key
@@ -175,7 +175,7 @@ def test_did_wrong_version_update():
 
 
 def test_did_wrong_verkey_update():
-    did = fr"did:cheqd:testnet:{random_string(5)}"
+    did = fr"did:cheqd:testnet:{random_string(16)}"
     key_id = fr"{did}#key1"
 
     # Generate ed25519 key

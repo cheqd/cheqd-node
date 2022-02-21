@@ -6,6 +6,7 @@ import (
 )
 
 var DidForbiddenSymbolsRegexp, _ = regexp.Compile(`^[^#?&/\\]+$`)
+var DidAllowedSymbolsRegexp, _ = regexp.Compile(`^[a-zA-Z0-9_]*$`)
 
 func SplitDidUrlIntoDidAndFragment(didUrl string) (string, string) {
 	fragments := strings.Split(didUrl, "#")
@@ -66,11 +67,24 @@ func IsNotValidDIDArrayFragment(prefix string, array []string) (bool, int) {
 }
 
 func IsValidDid(prefix string, did string) bool {
+
 	if len(did) == 0 {
 		return false
 	}
 
 	if !DidForbiddenSymbolsRegexp.MatchString(did) {
+		return false
+	}
+
+	// Checks for unique identifier
+
+	unique_id := strings.TrimPrefix(did, prefix)
+
+	if len(unique_id) != 16 && len(unique_id) != 32 {
+		return false
+	}
+
+	if !DidAllowedSymbolsRegexp.MatchString(unique_id) {
 		return false
 	}
 

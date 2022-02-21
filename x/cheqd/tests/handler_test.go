@@ -2,6 +2,7 @@ package tests
 
 import (
 	"crypto/ed25519"
+	"fmt"
 	"testing"
 
 	"github.com/btcsuite/btcutil/base58"
@@ -28,17 +29,17 @@ func TestCreateDID(t *testing.T) {
 			valid: true,
 			name:  "Works",
 			keys: map[string]KeyPair{
-				"did:cheqd:test:123456qwertyui2#key-1": GenerateKeyPair(),
+				"did:cheqd:test:0123456qwertyui2#key-1": GenerateKeyPair(),
 			},
-			signers: []string{"did:cheqd:test:123456qwertyui2#key-1"},
+			signers: []string{"did:cheqd:test:0123456qwertyui2#key-1"},
 			msg: &types.MsgCreateDidPayload{
-				Id:             "did:cheqd:test:123456qwertyui2",
-				Authentication: []string{"did:cheqd:test:123456qwertyui2#key-1"},
+				Id:             "did:cheqd:test:0123456qwertyui2",
+				Authentication: []string{"did:cheqd:test:0123456qwertyui2#key-1"},
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:         "did:cheqd:test:123456qwertyui2#key-1",
+						Id:         "did:cheqd:test:0123456qwertyui2#key-1",
 						Type:       "Ed25519VerificationKey2020",
-						Controller: "did:cheqd:test:123456qwertyui2",
+						Controller: "did:cheqd:test:0123456qwertyui2",
 					},
 				},
 			},
@@ -47,19 +48,19 @@ func TestCreateDID(t *testing.T) {
 			valid: true,
 			name:  "Works with Key Agreement",
 			keys: map[string]KeyPair{
-				"did:cheqd:test:KeyAgreement#key-1": GenerateKeyPair(),
+				"did:cheqd:test:0000KeyAgreement#key-1": GenerateKeyPair(),
 				AliceKey1:                           keys[AliceKey1],
 			},
 			signers: []string{AliceKey1},
 			msg: &types.MsgCreateDidPayload{
-				Id:           "did:cheqd:test:KeyAgreement",
-				KeyAgreement: []string{"did:cheqd:test:KeyAgreement#key-1"},
+				Id:           "did:cheqd:test:0000KeyAgreement",
+				KeyAgreement: []string{"did:cheqd:test:0000KeyAgreement#key-1"},
 				Controller:   []string{AliceDID},
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:         "did:cheqd:test:KeyAgreement#key-1",
+						Id:         "did:cheqd:test:0000KeyAgreement#key-1",
 						Type:       "Ed25519VerificationKey2020",
-						Controller: "did:cheqd:test:KeyAgreement",
+						Controller: "did:cheqd:test:0000KeyAgreement",
 					},
 				},
 			},
@@ -68,19 +69,19 @@ func TestCreateDID(t *testing.T) {
 			valid: true,
 			name:  "Works with Assertion Method",
 			keys: map[string]KeyPair{
-				"did:cheqd:test:AssertionMethod#key-1": GenerateKeyPair(),
+				"did:cheqd:test:0AssertionMethod#key-1": GenerateKeyPair(),
 				AliceKey1:                              keys[AliceKey1],
 			},
 			signers: []string{AliceKey1},
 			msg: &types.MsgCreateDidPayload{
-				Id:              "did:cheqd:test:AssertionMethod",
-				AssertionMethod: []string{"did:cheqd:test:AssertionMethod#key-1"},
+				Id:              "did:cheqd:test:0AssertionMethod",
+				AssertionMethod: []string{"did:cheqd:test:0AssertionMethod#key-1"},
 				Controller:      []string{AliceDID},
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:         "did:cheqd:test:AssertionMethod#key-1",
+						Id:         "did:cheqd:test:0AssertionMethod#key-1",
 						Type:       "Ed25519VerificationKey2020",
-						Controller: "did:cheqd:test:AssertionMethod",
+						Controller: "did:cheqd:test:0AssertionMethod",
 					},
 				},
 			},
@@ -89,19 +90,19 @@ func TestCreateDID(t *testing.T) {
 			valid: true,
 			name:  "Works with Capability Delegation",
 			keys: map[string]KeyPair{
-				"did:cheqd:test:CapabilityDelegation#key-1": GenerateKeyPair(),
+				"did:cheqd:test:000000000000CapabilityDelegation#key-1": GenerateKeyPair(),
 				AliceKey1: keys[AliceKey1],
 			},
 			signers: []string{AliceKey1},
 			msg: &types.MsgCreateDidPayload{
-				Id:                   "did:cheqd:test:CapabilityDelegation",
-				CapabilityDelegation: []string{"did:cheqd:test:CapabilityDelegation#key-1"},
+				Id:                   "did:cheqd:test:000000000000CapabilityDelegation",
+				CapabilityDelegation: []string{"did:cheqd:test:000000000000CapabilityDelegation#key-1"},
 				Controller:           []string{AliceDID},
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:         "did:cheqd:test:CapabilityDelegation#key-1",
+						Id:         "did:cheqd:test:000000000000CapabilityDelegation#key-1",
 						Type:       "Ed25519VerificationKey2020",
-						Controller: "did:cheqd:test:CapabilityDelegation",
+						Controller: "did:cheqd:test:000000000000CapabilityDelegation",
 					},
 				},
 			},
@@ -110,19 +111,19 @@ func TestCreateDID(t *testing.T) {
 			valid: true,
 			name:  "Works with Capability Invocation",
 			keys: map[string]KeyPair{
-				"did:cheqd:test:CapabilityInvocation#key-1": GenerateKeyPair(),
+				"did:cheqd:test:000000000000CapabilityInvocation#key-1": GenerateKeyPair(),
 				AliceKey1: keys[AliceKey1],
 			},
 			signers: []string{AliceKey1},
 			msg: &types.MsgCreateDidPayload{
-				Id:                   "did:cheqd:test:CapabilityInvocation",
-				CapabilityInvocation: []string{"did:cheqd:test:CapabilityInvocation#key-1"},
+				Id:                   "did:cheqd:test:000000000000CapabilityInvocation",
+				CapabilityInvocation: []string{"did:cheqd:test:000000000000CapabilityInvocation#key-1"},
 				Controller:           []string{AliceDID},
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:         "did:cheqd:test:CapabilityInvocation#key-1",
+						Id:         "did:cheqd:test:000000000000CapabilityInvocation#key-1",
 						Type:       "Ed25519VerificationKey2020",
-						Controller: "did:cheqd:test:CapabilityInvocation",
+						Controller: "did:cheqd:test:000000000000CapabilityInvocation",
 					},
 				},
 			},
@@ -131,7 +132,7 @@ func TestCreateDID(t *testing.T) {
 			valid: true,
 			name:  "With controller works",
 			msg: &types.MsgCreateDidPayload{
-				Id:         "did:cheqd:test:controller1",
+				Id:         "did:cheqd:test:00000controller1",
 				Controller: []string{AliceDID, BobDID},
 			},
 			signers: []string{AliceKey1, BobKey3},
@@ -144,11 +145,11 @@ func TestCreateDID(t *testing.T) {
 			valid: true,
 			name:  "Full message works",
 			keys: map[string]KeyPair{
-				"did:cheqd:test:123456qwertyui#key-1": GenerateKeyPair(),
-				"did:cheqd:test:123456qwertyui#key-2": GenerateKeyPair(),
-				"did:cheqd:test:123456qwertyui#key-3": GenerateKeyPair(),
-				"did:cheqd:test:123456qwertyui#key-4": GenerateKeyPair(),
-				"did:cheqd:test:123456qwertyui#key-5": GenerateKeyPair(),
+				"did:cheqd:test:00123456qwertyui#key-1": GenerateKeyPair(),
+				"did:cheqd:test:00123456qwertyui#key-2": GenerateKeyPair(),
+				"did:cheqd:test:00123456qwertyui#key-3": GenerateKeyPair(),
+				"did:cheqd:test:00123456qwertyui#key-4": GenerateKeyPair(),
+				"did:cheqd:test:00123456qwertyui#key-5": GenerateKeyPair(),
 				AliceKey1:                             keys[AliceKey1],
 				BobKey1:                               keys[BobKey1],
 				BobKey2:                               keys[BobKey2],
@@ -158,8 +159,8 @@ func TestCreateDID(t *testing.T) {
 				CharlieKey3:                           keys[CharlieKey3],
 			},
 			signers: []string{
-				"did:cheqd:test:123456qwertyui#key-1",
-				"did:cheqd:test:123456qwertyui#key-5",
+				"did:cheqd:test:00123456qwertyui#key-1",
+				"did:cheqd:test:00123456qwertyui#key-5",
 				AliceKey1,
 				BobKey1,
 				BobKey2,
@@ -169,49 +170,49 @@ func TestCreateDID(t *testing.T) {
 				CharlieKey3,
 			},
 			msg: &types.MsgCreateDidPayload{
-				Id: "did:cheqd:test:123456qwertyui",
+				Id: "did:cheqd:test:00123456qwertyui",
 				Authentication: []string{
-					"did:cheqd:test:123456qwertyui#key-1",
-					"did:cheqd:test:123456qwertyui#key-5",
+					"did:cheqd:test:00123456qwertyui#key-1",
+					"did:cheqd:test:00123456qwertyui#key-5",
 				},
 				Context:              []string{"abc", "de"},
-				CapabilityInvocation: []string{"did:cheqd:test:123456qwertyui#key-2"},
-				CapabilityDelegation: []string{"did:cheqd:test:123456qwertyui#key-3"},
-				KeyAgreement:         []string{"did:cheqd:test:123456qwertyui#key-4"},
-				AlsoKnownAs:          []string{"did:cheqd:test:123456eqweqwe"},
+				CapabilityInvocation: []string{"did:cheqd:test:00123456qwertyui#key-2"},
+				CapabilityDelegation: []string{"did:cheqd:test:00123456qwertyui#key-3"},
+				KeyAgreement:         []string{"did:cheqd:test:00123456qwertyui#key-4"},
+				AlsoKnownAs:          []string{"did:cheqd:test:000123456eqweqwe"},
 				Service: []*types.Service{
 					{
-						Id:              "did:cheqd:test:123456qwertyui#service-1",
+						Id:              "did:cheqd:test:00123456qwertyui#service-1",
 						Type:            "DIDCommMessaging",
 						ServiceEndpoint: "ServiceEndpoint",
 					},
 				},
-				Controller: []string{"did:cheqd:test:123456qwertyui", AliceDID, BobDID, CharlieDID},
+				Controller: []string{"did:cheqd:test:00123456qwertyui", AliceDID, BobDID, CharlieDID},
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:         "did:cheqd:test:123456qwertyui#key-1",
+						Id:         "did:cheqd:test:00123456qwertyui#key-1",
 						Type:       "Ed25519VerificationKey2020",
-						Controller: "did:cheqd:test:123456qwertyui",
+						Controller: "did:cheqd:test:00123456qwertyui",
 					},
 					{
-						Id:         "did:cheqd:test:123456qwertyui#key-2",
+						Id:         "did:cheqd:test:00123456qwertyui#key-2",
 						Type:       "Ed25519VerificationKey2020",
-						Controller: "did:cheqd:test:123456qwertyui",
+						Controller: "did:cheqd:test:00123456qwertyui",
 					},
 					{
-						Id:         "did:cheqd:test:123456qwertyui#key-3",
+						Id:         "did:cheqd:test:00123456qwertyui#key-3",
 						Type:       "Ed25519VerificationKey2020",
-						Controller: "did:cheqd:test:123456qwertyui",
+						Controller: "did:cheqd:test:00123456qwertyui",
 					},
 					{
-						Id:         "did:cheqd:test:123456qwertyui#key-4",
+						Id:         "did:cheqd:test:00123456qwertyui#key-4",
 						Type:       "Ed25519VerificationKey2020",
-						Controller: "did:cheqd:test:123456qwertyui",
+						Controller: "did:cheqd:test:00123456qwertyui",
 					},
 					{
-						Id:         "did:cheqd:test:123456qwertyui#key-5",
+						Id:         "did:cheqd:test:00123456qwertyui#key-5",
 						Type:       "Ed25519VerificationKey2020",
-						Controller: "did:cheqd:test:123456qwertyui",
+						Controller: "did:cheqd:test:00123456qwertyui",
 					},
 				},
 			},
@@ -220,20 +221,20 @@ func TestCreateDID(t *testing.T) {
 			valid: false,
 			name:  "Second controller did not sign request",
 			msg: &types.MsgCreateDidPayload{
-				Id:         "did:cheqd:test:controller1",
+				Id:         "did:cheqd:test:00000controller1",
 				Controller: []string{AliceDID, BobDID},
 			},
 			signers: []string{AliceKey1},
 			keys: map[string]KeyPair{
 				AliceKey1: keys[AliceKey1],
 			},
-			errMsg: "signature did:cheqd:test:bob not found: invalid signature detected",
+			errMsg: fmt.Sprintf("signature %v not found: invalid signature detected", BobDID),
 		},
 		{
 			valid: false,
 			name:  "Bad request",
 			msg: &types.MsgCreateDidPayload{
-				Id: "did:cheqd:test:controller1",
+				Id: "did:cheqd:test:00000controller1",
 			},
 			signers: []string{AliceKey1},
 			keys: map[string]KeyPair{
@@ -245,7 +246,7 @@ func TestCreateDID(t *testing.T) {
 			valid: false,
 			name:  "No signature",
 			msg: &types.MsgCreateDidPayload{
-				Id:         "did:cheqd:test:controller1",
+				Id:         "did:cheqd:test:00000controller1",
 				Controller: []string{AliceDID, BobDID},
 			},
 			errMsg: "At least one signature should be present: invalid signature detected",
@@ -254,7 +255,7 @@ func TestCreateDID(t *testing.T) {
 			valid: false,
 			name:  "Empty request",
 			msg: &types.MsgCreateDidPayload{
-				Id:         "did:cheqd:test:controller1",
+				Id:         "did:cheqd:test:00000controller1",
 				Controller: []string{AliceDID, BobDID},
 			},
 			errMsg: "At least one signature should be present: invalid signature detected",
@@ -263,46 +264,46 @@ func TestCreateDID(t *testing.T) {
 			valid: false,
 			name:  "Controller not found",
 			msg: &types.MsgCreateDidPayload{
-				Id:         "did:cheqd:test:controller1",
-				Controller: []string{AliceDID, "did:cheqd:test:notfound"},
+				Id:         "did:cheqd:test:00000controller1",
+				Controller: []string{AliceDID, "did:cheqd:test:00000000notfound"},
 			},
 			signers: []string{AliceKey1},
 			keys: map[string]KeyPair{
 				AliceKey1: keys[AliceKey1],
 			},
-			errMsg: "did:cheqd:test:notfound: DID Doc not found",
+			errMsg: "did:cheqd:test:00000000notfound: DID Doc not found",
 		},
 		{
 			valid: false,
 			name:  "Wrong signature",
 			msg: &types.MsgCreateDidPayload{
-				Id:         "did:cheqd:test:controller1",
+				Id:         "did:cheqd:test:00000controller1",
 				Controller: []string{AliceDID},
 			},
 			signers: []string{AliceKey1},
 			keys: map[string]KeyPair{
 				AliceKey1: keys[BobKey1],
 			},
-			errMsg: "did:cheqd:test:alice: invalid signature detected",
+			errMsg: fmt.Sprintf("%v: invalid signature detected", AliceDID),
 		},
 		{
 			valid: false,
 			name:  "Controller verification method not found",
 			msg: &types.MsgCreateDidPayload{
-				Id:         "did:cheqd:test:controller1",
+				Id:         "did:cheqd:test:00000controller1",
 				Controller: []string{BobDID},
 			},
 			signers: []string{BobKey4},
 			keys: map[string]KeyPair{
 				BobKey4: keys[BobKey4],
 			},
-			errMsg: "did:cheqd:test:bob#key-4: verification method not found: invalid signature detected",
+			errMsg: "did:cheqd:test:0000000000000bob#key-4: verification method not found: invalid signature detected",
 		},
 		{
 			valid: false,
 			name:  "Second controller verification method not found",
 			msg: &types.MsgCreateDidPayload{
-				Id:         "did:cheqd:test:controller1",
+				Id:         "did:cheqd:test:00000controller1",
 				Controller: []string{AliceDID, BobDID, CharlieDID},
 			},
 			signers: []string{AliceKey1, BobKey4, CharlieKey3},
@@ -311,19 +312,19 @@ func TestCreateDID(t *testing.T) {
 				BobKey4:     keys[BobKey4],
 				CharlieKey3: keys[CharlieKey3],
 			},
-			errMsg: "did:cheqd:test:bob#key-4: verification method not found: invalid signature detected",
+			errMsg: "did:cheqd:test:0000000000000bob#key-4: verification method not found: invalid signature detected",
 		},
 		{
 			valid: false,
 			name:  "DID signed by wrong controller",
 			msg: &types.MsgCreateDidPayload{
-				Id:             "did:cheqd:test:123456qwertyui",
-				Authentication: []string{"did:cheqd:test:123456qwertyui#key-1"},
+				Id:             "did:cheqd:test:00123456qwertyui",
+				Authentication: []string{"did:cheqd:test:00123456qwertyui#key-1"},
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:         "did:cheqd:test:123456qwertyui#key-1",
+						Id:         "did:cheqd:test:00123456qwertyui#key-1",
 						Type:       "Ed25519VerificationKey2020",
-						Controller: "did:cheqd:test:123456qwertyui",
+						Controller: "did:cheqd:test:00123456qwertyui",
 					},
 				},
 			},
@@ -331,82 +332,82 @@ func TestCreateDID(t *testing.T) {
 			keys: map[string]KeyPair{
 				AliceKey1: keys[AliceKey1],
 			},
-			errMsg: "signature did:cheqd:test:123456qwertyui not found: invalid signature detected",
+			errMsg: "signature did:cheqd:test:00123456qwertyui not found: invalid signature detected",
 		},
 		{
 			valid: false,
 			name:  "DID self-signed by not existing verification method",
 			msg: &types.MsgCreateDidPayload{
-				Id:             "did:cheqd:test:123456qwertyui",
-				Authentication: []string{"did:cheqd:test:123456qwertyui#key-1"},
+				Id:             "did:cheqd:test:00123456qwertyui",
+				Authentication: []string{"did:cheqd:test:00123456qwertyui#key-1"},
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:         "did:cheqd:test:123456qwertyui#key-1",
+						Id:         "did:cheqd:test:00123456qwertyui#key-1",
 						Type:       "Ed25519VerificationKey2020",
-						Controller: "did:cheqd:test:123456qwertyui",
+						Controller: "did:cheqd:test:00123456qwertyui",
 					},
 				},
 			},
-			signers: []string{"did:cheqd:test:123456qwertyui#key-2"},
+			signers: []string{"did:cheqd:test:00123456qwertyui#key-2"},
 			keys: map[string]KeyPair{
-				"did:cheqd:test:123456qwertyui#key-2": GenerateKeyPair(),
+				"did:cheqd:test:00123456qwertyui#key-2": GenerateKeyPair(),
 			},
-			errMsg: "did:cheqd:test:123456qwertyui#key-2: verification method not found: invalid signature detected",
+			errMsg: "did:cheqd:test:00123456qwertyui#key-2: verification method not found: invalid signature detected",
 		},
 		{
 			valid: false,
 			name:  "Self-signature not found",
 			msg: &types.MsgCreateDidPayload{
-				Id:             "did:cheqd:test:123456qwertyui",
-				Controller:     []string{AliceDID, "did:cheqd:test:123456qwertyui"},
-				Authentication: []string{"did:cheqd:test:123456qwertyui#key-1"},
+				Id:             "did:cheqd:test:00123456qwertyui",
+				Controller:     []string{AliceDID, "did:cheqd:test:00123456qwertyui"},
+				Authentication: []string{"did:cheqd:test:00123456qwertyui#key-1"},
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:         "did:cheqd:test:123456qwertyui#key-1",
+						Id:         "did:cheqd:test:00123456qwertyui#key-1",
 						Type:       "Ed25519VerificationKey2020",
-						Controller: "did:cheqd:test:123456qwertyui",
+						Controller: "did:cheqd:test:00123456qwertyui",
 					},
 				},
 			},
-			signers: []string{AliceKey1, "did:cheqd:test:123456qwertyui#key-2"},
+			signers: []string{AliceKey1, "did:cheqd:test:00123456qwertyui#key-2"},
 			keys: map[string]KeyPair{
 				AliceKey1:                             keys[AliceKey1],
-				"did:cheqd:test:123456qwertyui#key-2": GenerateKeyPair(),
+				"did:cheqd:test:00123456qwertyui#key-2": GenerateKeyPair(),
 			},
-			errMsg: "did:cheqd:test:123456qwertyui#key-2: verification method not found: invalid signature detected",
+			errMsg: "did:cheqd:test:00123456qwertyui#key-2: verification method not found: invalid signature detected",
 		},
 		{
 			valid: false,
 			name:  "DID Doc already exists",
 			keys: map[string]KeyPair{
-				"did:cheqd:test:123456qwertyui#key-1": GenerateKeyPair(),
+				"did:cheqd:test:00123456qwertyui#key-1": GenerateKeyPair(),
 			},
-			signers: []string{"did:cheqd:test:123456qwertyui#key-1"},
+			signers: []string{"did:cheqd:test:00123456qwertyui#key-1"},
 			msg: &types.MsgCreateDidPayload{
-				Id:             "did:cheqd:test:123456qwertyui",
-				Authentication: []string{"did:cheqd:test:123456qwertyui#key-1"},
+				Id:             "did:cheqd:test:00123456qwertyui",
+				Authentication: []string{"did:cheqd:test:00123456qwertyui#key-1"},
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:         "did:cheqd:test:123456qwertyui#key-1",
+						Id:         "did:cheqd:test:00123456qwertyui#key-1",
 						Type:       "Ed25519VerificationKey2020",
-						Controller: "did:cheqd:test:123456qwertyui",
+						Controller: "did:cheqd:test:00123456qwertyui",
 					},
 				},
 			},
-			errMsg: "DID is already used by DIDDoc did:cheqd:test:123456qwertyui: DID Doc exists",
+			errMsg: "DID is already used by DIDDoc did:cheqd:test:00123456qwertyui: DID Doc exists",
 		},
 		{
 			valid: false,
 			name:  "Verification Method ID doesnt match",
 			msg: &types.MsgCreateDidPayload{
-				Id:             "did:cheqd:test:controller1",
+				Id:             "did:cheqd:test:00000controller1",
 				Controller:     []string{AliceDID, CharlieDID},
 				Authentication: []string{"#key-1"},
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:         "did:cheqd:test:123456qwertyui#key-1",
+						Id:         "did:cheqd:test:00123456qwertyui#key-1",
 						Type:       "Ed25519VerificationKey2020",
-						Controller: "did:cheqd:test:123456qwertyui",
+						Controller: "did:cheqd:test:00123456qwertyui",
 					},
 				},
 			},
@@ -415,20 +416,20 @@ func TestCreateDID(t *testing.T) {
 				AliceKey1:   keys[AliceKey1],
 				CharlieKey3: keys[CharlieKey3],
 			},
-			errMsg: "did:cheqd:test:123456qwertyui#key-1 not belong did:cheqd:test:controller1 DID Doc: invalid verification method",
+			errMsg: "did:cheqd:test:00123456qwertyui#key-1 not belong did:cheqd:test:00000controller1 DID Doc: invalid verification method",
 		},
 		{
 			valid: false,
 			name:  "Full Verification Method ID doesnt match",
 			msg: &types.MsgCreateDidPayload{
-				Id:             "did:cheqd:test:controller1",
+				Id:             "did:cheqd:test:00000controller1",
 				Controller:     []string{AliceDID, CharlieDID},
-				Authentication: []string{"did:cheqd:test:123456qwertyui#key-1"},
+				Authentication: []string{"did:cheqd:test:00123456qwertyui#key-1"},
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:         "did:cheqd:test:123456qwertyui#key-1",
+						Id:         "did:cheqd:test:00123456qwertyui#key-1",
 						Type:       "Ed25519VerificationKey2020",
-						Controller: "did:cheqd:test:123456qwertyui",
+						Controller: "did:cheqd:test:00123456qwertyui",
 					},
 				},
 			},
@@ -437,7 +438,7 @@ func TestCreateDID(t *testing.T) {
 				AliceKey1:   keys[AliceKey1],
 				CharlieKey3: keys[CharlieKey3],
 			},
-			errMsg: "did:cheqd:test:123456qwertyui#key-1 not belong did:cheqd:test:controller1 DID Doc: invalid verification method",
+			errMsg: "did:cheqd:test:00123456qwertyui#key-1 not belong did:cheqd:test:00000controller1 DID Doc: invalid verification method",
 		},
 	}
 
@@ -521,7 +522,7 @@ func TestUpdateDid(t *testing.T) {
 					},
 				},
 			},
-			errMsg: "signature did:cheqd:test:alice not found: invalid signature detected",
+			errMsg: fmt.Sprintf("signature %v not found: invalid signature detected", AliceDID),
 		},
 		{
 			valid:   false,
@@ -539,7 +540,7 @@ func TestUpdateDid(t *testing.T) {
 					},
 				},
 			},
-			errMsg: "did:cheqd:test:alice#key-1: verification method not found: invalid signature detected",
+			errMsg: fmt.Sprintf("%v: verification method not found: invalid signature detected", AliceKey1),
 		},
 		{
 			valid:   true,
@@ -574,7 +575,7 @@ func TestUpdateDid(t *testing.T) {
 					},
 				},
 			},
-			errMsg: "signature did:cheqd:test:charlie not found: invalid signature detected",
+			errMsg: fmt.Sprintf("signature %v not found: invalid signature detected", CharlieDID),
 		},
 		{
 			valid:   false,
@@ -592,7 +593,7 @@ func TestUpdateDid(t *testing.T) {
 					},
 				},
 			},
-			errMsg: "signature did:cheqd:test:charlie not found: invalid signature detected",
+			errMsg: fmt.Sprintf("signature %v not found: invalid signature detected", CharlieDID),
 		},
 		{
 			valid:   false,
@@ -610,7 +611,7 @@ func TestUpdateDid(t *testing.T) {
 					},
 				},
 			},
-			errMsg: "signature did:cheqd:test:bob not found: invalid signature detected",
+			errMsg: fmt.Sprintf("signature %v not found: invalid signature detected", BobDID),
 		},
 		{
 			valid:   true,
@@ -685,7 +686,7 @@ func TestUpdateDid(t *testing.T) {
 					},
 				},
 			},
-			errMsg: "signature did:cheqd:test:alice not found: invalid signature detected",
+			errMsg: fmt.Sprintf("signature %v not found: invalid signature detected", AliceDID),
 		},
 		{
 			valid:   false,
@@ -703,7 +704,7 @@ func TestUpdateDid(t *testing.T) {
 					},
 				},
 			},
-			errMsg: "did:cheqd:test:alice#key-1: verification method not found: invalid signature detected",
+			errMsg: fmt.Sprintf("%v: verification method not found: invalid signature detected", AliceKey1),
 		},
 		{
 			valid:   true,
@@ -743,7 +744,7 @@ func TestUpdateDid(t *testing.T) {
 					},
 				},
 			},
-			errMsg: "signature did:cheqd:test:alice not found: invalid signature detected",
+			errMsg: fmt.Sprintf("signature %v not found: invalid signature detected", AliceDID),
 		},
 		{
 			valid:   false,
@@ -766,7 +767,7 @@ func TestUpdateDid(t *testing.T) {
 					},
 				},
 			},
-			errMsg: "signature did:cheqd:test:alice not found: invalid signature detected",
+			errMsg: fmt.Sprintf("signature %v not found: invalid signature detected", AliceDID),
 		},
 		{
 			valid:   true,
@@ -799,7 +800,7 @@ func TestUpdateDid(t *testing.T) {
 					},
 				},
 			},
-			errMsg: "signature did:cheqd:test:bob not found: invalid signature detected",
+			errMsg: fmt.Sprintf("signature %v not found: invalid signature detected", BobDID),
 		},
 		{
 			valid:   true,
@@ -832,7 +833,7 @@ func TestUpdateDid(t *testing.T) {
 					},
 				},
 			},
-			errMsg: "signature did:cheqd:test:bob not found: invalid signature detected",
+			errMsg: fmt.Sprintf("signature %v not found: invalid signature detected", BobDID),
 		},
 		{
 			valid:   false,
@@ -849,7 +850,7 @@ func TestUpdateDid(t *testing.T) {
 					},
 				},
 			},
-			errMsg: "signature did:cheqd:test:charlie not found: invalid signature detected",
+			errMsg: fmt.Sprintf("signature %v not found: invalid signature detected", CharlieDID),
 		},
 		{
 			valid:   true,
@@ -882,7 +883,7 @@ func TestUpdateDid(t *testing.T) {
 					},
 				},
 			},
-			errMsg: "signature did:cheqd:test:charlie not found: invalid signature detected",
+			errMsg: fmt.Sprintf("signature %v not found: invalid signature detected", CharlieDID),
 		},
 		{
 			valid:   true,
@@ -943,9 +944,9 @@ func TestUpdateDid(t *testing.T) {
 func TestHandler_DidDocAlreadyExists(t *testing.T) {
 	setup := Setup()
 
-	_, _, _ = setup.InitDid("did:cheqd:test:alice")
-	_, _, err := setup.InitDid("did:cheqd:test:alice")
+	_, _, _ = setup.InitDid(AliceDID)
+	_, _, err := setup.InitDid(AliceDID)
 
 	require.Error(t, err)
-	require.Equal(t, "DID is already used by DIDDoc did:cheqd:test:alice: DID Doc exists", err.Error())
+	require.Equal(t, fmt.Sprintf("DID is already used by DIDDoc %v: DID Doc exists", AliceDID), err.Error())
 }

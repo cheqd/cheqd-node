@@ -12,7 +12,7 @@ IMPLICIT_TIMEOUT = 30
 ENCODING = "utf-8"
 READ_BUFFER = 60000
 
-TEST_NET_NETWORK = "cheqd-testnet-2"
+TEST_NET_NETWORK = "cheqd-testnet-4"
 LOCAL_NET_NETWORK = "cheqd"
 TEST_NET_NODE_TCP = "--node 'tcp://seed1.us.testnet.cheqd.network:26657'"
 TEST_NET_NODE_HTTP = "--node http://node1.eu.testnet.cheqd.network:26657/"

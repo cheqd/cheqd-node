@@ -23,9 +23,9 @@ AMOUNT_BEFORE="19000000000000000"
 CHEQ_AMOUNT="1ncheq"
 CHEQ_AMOUNT_NUMBER="1"
 # shellcheck disable=SC2034
-DID_1="did:cheqd:testnet:abcdef"
+DID_1="did:cheqd:testnet:0000000000abcdef"
 # shellcheck disable=SC2034
-DID_2="did:cheqd:testnet:higklm"
+DID_2="did:cheqd:testnet:0000000000higklm"
 
 # cheqd_noded docker wrapper
 
