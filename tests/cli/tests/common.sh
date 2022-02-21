@@ -22,7 +22,7 @@ export DELAYED_VESTING_ACCOUNT="delayed_vesting_account"
 export PERIODIC_VESTING_ACCOUNT="periodic_vesting_account"
 
 function random_string() {
-  echo $RANDOM | base64 | head -c 16
+  uuidgen | sed 's/[-]//g' | head -c 16
   return 0
 }
 
