@@ -182,9 +182,12 @@ jobs:
       - name: Load cheqd-node image
         run: docker load -i cheqd-node-image.tar
 
-      - name: Login to docker
-        run: |
-          echo ${{ secrets.GH_PAT }} | docker login ghcr.io --username ${{ secrets.GH_USER }} --password-stdin
+      - name: Log in to the Container registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push cheqd-node image
         run: |
