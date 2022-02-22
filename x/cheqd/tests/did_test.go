@@ -1,6 +1,7 @@
-package utils
+package tests
 
 import (
+	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -25,7 +26,7 @@ func TestIsDid(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		isDid := IsValidDid("did:cheqd:test:", tc.did)
+		isDid := utils.IsValidDid("did:cheqd:test:", tc.did)
 
 		if tc.valid {
 			require.True(t, isDid)

@@ -1,6 +1,7 @@
-package strings
+package tests
 
 import (
+	"github.com/cheqd/cheqd-node/x/cheqd/utils/strings"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -23,7 +24,7 @@ func TestComplement(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		actual := Complement(tc.first, tc.second)
+		actual := strings.Complement(tc.first, tc.second)
 		require.Equal(t, tc.expected, actual)
 	}
 }

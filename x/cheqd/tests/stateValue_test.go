@@ -1,6 +1,7 @@
-package types
+package tests
 
 import (
+	types2 "github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/stretchr/testify/assert"
@@ -9,13 +10,13 @@ import (
 )
 
 func Test_PackUnpackAny(t *testing.T) {
-	original := &Did{
+	original := &types2.Did{
 		Id:                   "test",
 	}
 
 	// Construct codec
 	registry := types.NewInterfaceRegistry()
-	RegisterInterfaces(registry)
+	types2.RegisterInterfaces(registry)
 	cdc := codec.NewProtoCodec(registry)
 
 	// Marshal
@@ -26,12 +27,12 @@ func Test_PackUnpackAny(t *testing.T) {
 	var any types.Any
 	err = any.Unmarshal(bz)
 	assert.NoError(t, err)
-	assert.Equal(t, any.TypeUrl, MsgTypeURL(&Did{}))
+	assert.Equal(t, any.TypeUrl, types2.MsgTypeURL(&types2.Did{}))
 
 	// Unmarshal
-	var decoded StateValueData
+	var decoded types2.StateValueData
 	err = cdc.UnmarshalInterface(bz, &decoded)
 	require.NoError(t, err)
-	require.IsType(t, &Did{}, decoded)
+	require.IsType(t, &types2.Did{}, decoded)
 	require.Equal(t, original, decoded)
 }
