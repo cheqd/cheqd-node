@@ -130,7 +130,12 @@ Copy and paste the template below into your terminal. We will add additional req
   ],
   "authentication": [
     "did:cheqd:<namespace>:<unique-id>#<auth-key-alias>"
-  ]
+  ],
+  "service": [{
+    "id":"did:cheqd:<namespace>:<unique-id>#<service-key>",
+    "type": "LinkedDomains",
+    "serviceEndpoint": "<URI-to-object>"
+  }]
 }
 ```
 
@@ -145,6 +150,8 @@ Where:
 *   `<key-alias>` - a key alias for the verification method identifier
 *   `<verification-public-key-multibase>` - result of this [step](#2-get-multibase58-string)
 *   `<auth-key-alias>` - alias of authentication key.
+*   `<service-key>` - alias for service. More information [here](../../architecture/adr-list/adr-002-cheqd-did-method.md#service)
+*   `<URI-to-object>` - URI according to the spec [rfc3986](https://www.rfc-editor.org/rfc/rfc3986) 
 
 In our example:
 
@@ -174,7 +181,12 @@ In our example:
   ],
   "authentication": [
     "did:cheqd:testnet:z4Q41kvWsd1JAuPFBff8Dti7P6fLbPZe#key1"
-  ]
+  ],
+  "service": [{
+    "id":"did:cheqd:testnet:z4Q41kvWsd1JAuPFBff8Dti7P6fLbPZe#linked-domain",
+    "type": "LinkedDomains",
+    "serviceEndpoint": "https://bar.example.com"
+  }]
 }
 ```
 
@@ -197,7 +209,7 @@ We can use the following command to send the DIDDoc:
   
 
 ```bash
-$ cheqd-noded tx cheqd create-did "$(cat diddoc.json)" "did:cheqd:testnet:zJ5EDiiiKWDyo79n#key1" --ver-key "FxaJOy4HFoC2Enu1SizKtU0L+hmBRBAEp+B4TopfQoyetOF5T68Ks3db5Yy9ykFdgEboPUes3m6wvXNLpbv+Q==" --from  --node https://rpc.testnet.cheqd.network:443 --chain-id cheqd-testnet-4 --fees 5000000ncheq
+$ cheqd-noded tx cheqd create-did "$(cat diddoc.json)" "did:cheqd:testnet:zJ5EDiiiKWDyo79n#key1" --ver-key "FxaJOy4HFoC2Enu1SizKtU0L+hmBRBAEp+B4TopfQoyetOF5T68Ks3db5Yy9ykFdgEboPUes3m6wvXNLpbv+Q==" --from <alias-to-cosmos-key>  --node https://rpc.testnet.cheqd.network:443 --chain-id cheqd-testnet-4 --fees 5000000ncheq
 ```
 
   
