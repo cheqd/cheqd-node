@@ -67,3 +67,85 @@ Most transactions will require you to use `--from <key-alias>` param which is a 
 ```bash
 cheqd-noded tx <module> <tx-name> --from <key-alias>
 ```
+
+
+### Example of working with test account
+
+
+For example, for test purposes let's create a key with alias `operator`:
+
+
+```bash
+$ docker run -it --rm -u cheqd ghcr.io/cheqd/cheqd-node:0.4.0 keys add operator
+Enter keyring passphrase:
+Re-enter keyring passphrase:
+
+- name: operator
+  type: local
+  address: cheqd1vjuh4fjkcq0c02qullrt27z822gpn06sah2elh
+  pubkey: '{"@type":"/cosmos.crypto.secp256k1.PubKey","key":"A0N73o8ke8bp/7c7PgsRjHGddjHvk0USHwq+RDzwwE0t"}'
+  mnemonic: ""
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+crawl field same drill indoor olympic tank lamp range olive announce during pact idea fall canal sauce film attend response mammal bounce stable suffer
+```
+
+  
+
+The main bullets here:
+
+  
+
+*   operator address: `cheqd1vjuh4fjkcq0c02qullrt27z822gpn06sah2elh`
+
+mnemonic phrase ( 24 words ):
+
+*   `crawl field same drill indoor olympic tank lamp range olive announce during pact idea fall canal sauce film attend response mammal bounce stable suffer`
+
+  
+
+Having this mnemonic phrase the user is able to restore their keys whenever they want. For continue playing a user needs to run:
+
+  
+
+```bash
+$ docker run -it --rm -u root --entrypoint bash ghcr.io/cheqd/cheqd-node:0.4.0
+... apt install ca-certificates
+... su cheqd
+
+cheqd@8c3f88f653ab:~$ cheqd-noded keys add operator --recover --keyring-backend test
+> Enter your bip39 mnemonic
+crawl field same drill indoor olympic tank lamp range olive announce during pact idea fall canal sauce film attend response mammal bounce stable suffer
+
+- name: operator
+  type: local
+  address: cheqd1vjuh4fjkcq0c02qullrt27z822gpn06sah2elh
+  pubkey: '{"@type":"/cosmos.crypto.secp256k1.PubKey","key":"A0N73o8ke8bp/7c7PgsRjHGddjHvk0USHwq+RDzwwE0t"}'
+  mnemonic: ""
+
+cheqd@8c3f88f653ab:~$ cheqd-noded keys list --keyring-backend test
+- name: operator
+  type: local
+  address: cheqd1vjuh4fjkcq0c02qullrt27z822gpn06sah2elh
+  pubkey: '{"@type":"/cosmos.crypto.secp256k1.PubKey","key":"A0N73o8ke8bp/7c7PgsRjHGddjHvk0USHwq+RDzwwE0t"}'
+  mnemonic: ""
+
+cheqd@8c3f88f653ab:~$
+```
+
+  
+
+As you can see, the recovered address is the same as was created before.
+
+  
+
+And after that all the commands from the tutorial above can be called.
+
+  
+
+P.S. the case with `docker` can be used only for demonstration purposes, cause after closing the container all the data will be lost.
+
+For production purposes, maybe it would be great to have an image with Ubuntu 20.04 and operator's keys inside.

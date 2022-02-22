@@ -1,7 +1,6 @@
 # Tutorial for creating a DID with VDR tools
 
-Overview
-========
+## Overview
 
 The purpose of this document is to outline how someone can create a DID on the cheqd network using [VDR tools.](https://gitlab.com/evernym/verity/vdr-tools)
 
@@ -11,12 +10,9 @@ This tutorial uses VDR Tools CLI to send a DID. The official page:
 
 [https://gitlab.com/evernym/verity/vdr-tools](https://gitlab.com/evernym/verity/vdr-tools)
 
-  
 
-Pre-requisites
---------------
+## Pre-requisites
 
-  
 
 In order to create a DID using the instructions outlined in this tutorial, you must be using Ubuntu 20.04 terminal. You'll find all the information required to setup your Ubuntu 20.04 terminal at the end of this tutorial.
 
@@ -50,7 +46,7 @@ In general this process is described on the main page of VDR tools [repository]
 
   
 
-```
+```bash
 $ apt install curl libsodium23 libzmq5 libncursesw5-dev -y
 ```
 
@@ -58,7 +54,7 @@ $ apt install curl libsodium23 libzmq5 libncursesw5-dev -y
 
   
 
-```
+```bash
 $ curl https://gitlab.com/evernym/verity/vdr-tools/-/package_files/27311917/download --output libvdrtools_0.8.4-focal_amd64.deb && dpkg -i libvdrtools_0.8.4-focal_amd64.deb
 ```
 
@@ -66,7 +62,7 @@ $ curl https://gitlab.com/evernym/verity/vdr-tools/-/package_files/27311917/down
 
   
 
-```
+```bash
 $ curl https://gitlab.com/evernym/verity/vdr-tools/-/package_files/27311922/download --output vdrtools-cli_0.8.4-focal_amd64.deb && dpkg -i vdrtools-cli_0.8.4-focal_amd64.deb
 ```
 
@@ -76,8 +72,7 @@ Once this is installed we're now ready to write a DID to the cheqd network.
 
   
 
-Writing a DID to the cheqd network
-----------------------------------
+## Writing a DID to the cheqd network
 
   
 
@@ -87,7 +82,7 @@ For running VDR Tools terminal just type:
 
   
 
-```
+```bash
 $ vdrtools-cli
 ```
 
@@ -105,7 +100,7 @@ The command:
 
   
 
-```
+```bash
 wallet create cheqd-wallet key 
 ```
 
@@ -115,7 +110,7 @@ Example:
 
   
 
-```
+```text
 indy> wallet create cheqd-wallet key
 Enter value for key:
 
@@ -136,7 +131,7 @@ Next use the following command to open the wallet created in the previous step
 
   
 
-```
+```bash
 wallet open cheqd-wallet key
 ```
 
@@ -150,7 +145,7 @@ Example:
 
   
 
-```
+```bash
 indy> wallet open cheqd-wallet key
 Enter value for key:
 
@@ -171,7 +166,7 @@ Use this command:
 
   
 
-```
+```bash
 cheqd-pool add alias=cheqd-pool-testnet rpc_address=https://rpc.testnet.cheqd.network/ chain_id=cheqd-testnet-4
 ```
 
@@ -181,7 +176,7 @@ Example:
 
   
 
-```
+```bash
 cheqd-wallet:indy> cheqd-pool add alias=cheqd-pool-testnet rpc_address=https://rpc.testnet.cheqd.network/ chain_id=cheqd-testnet-4
 Pool "cheqd-pool-testnet" has been created "{"alias":"cheqd-pool-testnet","rpc_address":"https://rpc.testnet.cheqd.network/","chain_id":"cheqd-testnet-4"}"
 ```
@@ -200,7 +195,7 @@ Use this command:
 
   
 
-```
+```bash
 cheqd-pool open alias=cheqd-pool-testnet
 ```
 
@@ -210,7 +205,7 @@ Example:
 
   
 
-```
+```bash
 cheqd-wallet:indy> cheqd-pool open alias=cheqd-pool-testnet
 Pool "cheqd-pool-testnet" has been opened
 ```
@@ -239,7 +234,7 @@ Example:
 
   
 
-```
+```bash
 cheqd_pool(cheqd-pool-testnet):cheqd-wallet:indy> did new
 Did "X9cNs1g3nMvQ77j7E8rPRr" has been created with "~4zHub2htDfEuV7wCsNcEgg" verkey
 
@@ -270,7 +265,7 @@ Example:
 
   
 
-```
+```bash
 cheqd_pool(cheqd-pool-testnet):cheqd-wallet:indy> cheqd-keys add alias=cheqd-testnet-key mnemonic
 Enter value for mnemonic:
 
@@ -288,7 +283,7 @@ We can now use the VDR tools to send our newly created DID using the following c
 
   
 
-```
+```bash
 cheqd-ledger create-did did=<DID_from_step_5> max_coin=<value> max_gas=<value> denom=ncheq memo=memo key_alias=cheqd-testnet-key
 ```
 
@@ -300,7 +295,7 @@ Note: You only need to setup `max_gas` and `max_coin` parameters, according 
 
 Example:
 
-```
+```bash
 cheqd_pool(cheqd-pool-testnet):cheqd-wallet:indy> cheqd-ledger create-did did=did:cheqd:testnet:X9cNs1g3nMvQ77j7E8rPRr denom=ncheq memo=memo key_alias=cheqd-testnet-key max_gas=200000 max_coin=5000000
 Abci-info request result "{"response":{"app_version":"1","data":"cheqd-node","last_block_app_hash":[74,43,67,81,106,98,53,116,108,84,99,43,107,97,52,119,43,49,103,83,82,73,89,69,114,85,55,105,77,48,70,53,109,79,120,69,66,69,104,119,109,109,107,61],"last_block_height":"495420","version":"0.4.0"}}"
 Response from ledger: "{\"id\":\"did:cheqd:testnet:X9cNs1g3nMvQ77j7E8rPRr\"}"
@@ -320,7 +315,7 @@ The command:
 
   
 
-```
+```bash
 cheqd-ledger get-did did=<DID_from_step_5>
 ```
 
@@ -330,23 +325,14 @@ Example:
 
   
 
-```
+```bash
 cheqd_pool(cheqd-pool-testnet):cheqd-wallet:indy> cheqd-ledger get-did did=did:cheqd:testnet:X9cNs1g3nMvQ77j7E8rPRr
 DID info: {"did":{"id":"did:cheqd:testnet:X9cNs1g3nMvQ77j7E8rPRr","controller":["did:cheqd:testnet:X9cNs1g3nMvQ77j7E8rPRr"],"verification_method":[{"id":"did:cheqd:testnet:X9cNs1g3nMvQ77j7E8rPRr#verkey","type":"Ed25519VerificationKey2020","controller":"did:cheqd:testnet:X9cNs1g3nMvQ77j7E8rPRr","public_key_multibase":"z7db7n4CNBbYFRcYEjoacMzSbVEqF2ToSovtvzBoovH5B"}],"authentication":["did:cheqd:testnet:X9cNs1g3nMvQ77j7E8rPRr#verkey"]},"metadata":{"created":"2022-02-21 14:06:50.162709363 +0000 UTC","updated":"2022-02-21 14:06:50.162709363 +0000 UTC","deactivated":false,"version_id":"Gf0tfbMUpHHR+z8j7KdXLInlAi4T51F6qgzxUyi9h+M="}}
 ```
 
   
 
-You can also check this using an API. The API path for requesting a DIDDoc on testnet is:
-
-```
-https://api.testnet.cheqd.network/cheqd/cheqdnode/cheqd/did/<DID_from_step_5>
-```
-
-  
-
-Docker setup
-------------
+## Docker setup
 
   
 
@@ -356,7 +342,7 @@ Docker setup
 
 ### 1\. Start a container
 
-```
+```bash
 $ docker run -it --rm -u root ubuntu:20.04 bash
 ```
 
@@ -364,6 +350,6 @@ $ docker run -it --rm -u root ubuntu:20.04 bash
 
 ### 2\. Update the package storage
 
-```
+```bash
 # apt update
 ```
