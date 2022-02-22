@@ -6,7 +6,10 @@ import (
 )
 
 var DidForbiddenSymbolsRegexp, _ = regexp.Compile(`^[^#?&/\\]+$`)
-var DidAllowedSymbolsRegexp, _ = regexp.Compile(`^[a-zA-Z0-9_]*$`)
+// Base58 allowed symbols:
+//                                                          "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+// Regexp from https://regex101.com/library/iT8tI7
+var DidAllowedSymbolsRegexp, _ = regexp.Compile(`^[1]([123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]*)$`)
 
 func SplitDidUrlIntoDidAndFragment(didUrl string) (string, string) {
 	fragments := strings.Split(didUrl, "#")

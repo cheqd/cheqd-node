@@ -22,7 +22,7 @@ export DELAYED_VESTING_ACCOUNT="delayed_vesting_account"
 export PERIODIC_VESTING_ACCOUNT="periodic_vesting_account"
 
 function random_string() {
-  uuidgen | sed 's/[-]//g' | head -c 16
+  cat /dev/urandom | tr -dc '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz' | fold -w ${1:-16} | head -n 1
   return 0
 }
 

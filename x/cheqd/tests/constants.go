@@ -1,9 +1,9 @@
 package tests
 
 const (
-	AliceDID      = "did:cheqd:test:00000000000alice"
-	BobDID        = "did:cheqd:test:0000000000000bob"
-	CharlieDID    = "did:cheqd:test:000000000charlie"
+	AliceDID      = "did:cheqd:test:11111base58a11ce"
+	BobDID        = "did:cheqd:test:1111111111111bob"
+	CharlieDID    = "did:cheqd:test:11111111111chare"
 	AliceKey1     = AliceDID + "#key-1"
 	AliceKey2     = AliceDID + "#key-2"
 	AliceKey3     = AliceDID + "#key-3"

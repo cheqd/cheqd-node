@@ -52,28 +52,28 @@ func TestDIDDocNotBase58UniqueId(t *testing.T) {
 }
 
 
-func TestDIDDocPositiveCaseUniqueId(t *testing.T) {
+func TestDIDDocPositiveCaseUniqueId16Symbols(t *testing.T) {
 	setup := Setup()
 
 	pubKey, privKey, _ := ed25519.GenerateKey(rand.Reader)
-	aliceDid := setup.CreateDid(pubKey, "did:cheqd:test:abcdefghijkl1234")
+	aliceDid := setup.CreateDid(pubKey, "did:cheqd:test:1A1zP1eP5QGefi2D")
 
-	aliceKeys := map[string]ed25519.PrivateKey{"did:cheqd:test:abcdefghijkl1234#key-1": privKey}
+	aliceKeys := map[string]ed25519.PrivateKey{"did:cheqd:test:1A1zP1eP5QGefi2D#key-1": privKey}
 	did, _ := setup.SendCreateDid(aliceDid, aliceKeys)
 
 	// Checks
-	require.Equal(t, did.Id, "did:cheqd:test:abcdefghijkl1234")
+	require.Equal(t, did.Id, "did:cheqd:test:1A1zP1eP5QGefi2D")
 }
 
 func TestDIDDocPositiveCaseUniqueId32Symbols(t *testing.T) {
 	setup := Setup()
 
 	pubKey, privKey, _ := ed25519.GenerateKey(rand.Reader)
-	aliceDid := setup.CreateDid(pubKey, "did:cheqd:test:abcdefghijkl1234abcdefghijkl1234")
+	aliceDid := setup.CreateDid(pubKey, "did:cheqd:test:1A1zP1eP5QGefi2DMPTfTL5SLmv7Divf")
 
-	aliceKeys := map[string]ed25519.PrivateKey{"did:cheqd:test:abcdefghijkl1234abcdefghijkl1234#key-1": privKey}
+	aliceKeys := map[string]ed25519.PrivateKey{"did:cheqd:test:1A1zP1eP5QGefi2DMPTfTL5SLmv7Divf#key-1": privKey}
 	did, _ := setup.SendCreateDid(aliceDid, aliceKeys)
 
 	// Checks
-	require.Equal(t, did.Id, "did:cheqd:test:abcdefghijkl1234abcdefghijkl1234")
+	require.Equal(t, did.Id, "did:cheqd:test:1A1zP1eP5QGefi2DMPTfTL5SLmv7Divf")
 }
