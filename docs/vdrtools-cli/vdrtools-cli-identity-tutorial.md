@@ -8,7 +8,6 @@ This tutorial uses VDR Tools CLI to send a DID. The official page:
 
 [https://gitlab.com/evernym/verity/vdr-tools](https://gitlab.com/evernym/verity/vdr-tools)
 
-
 ## Pre-requisites
 
 In order to create a DID using the instructions outlined in this tutorial, you must be using Ubuntu 20.04 terminal. You'll find all the information required to setup your Ubuntu 20.04 terminal at the end of this tutorial.
@@ -25,22 +24,22 @@ After the preparation of the Ubuntu 20.04 terminal please make sure you have ins
 
 In general this process is described on the main page of VDR tools [repository](https://gitlab.com/evernym/verity/vdr-tools#installing) but to be short let's make the next steps inside Ubuntu 20.04:
 
-#### 1\. Install additional packages:
+#### 1\. Install additional packages
 
 ```bash
-$ apt install curl libsodium23 libzmq5 libncursesw5-dev -y
+apt install curl libsodium23 libzmq5 libncursesw5-dev -y
 ```
 
-#### 2\. Download and install `libvdrtools`:
+#### 2\. Download and install `libvdrtools`
 
 ```bash
-$ curl https://gitlab.com/evernym/verity/vdr-tools/-/package_files/27311917/download --output libvdrtools_0.8.4-focal_amd64.deb && dpkg -i libvdrtools_0.8.4-focal_amd64.deb
+curl https://gitlab.com/evernym/verity/vdr-tools/-/package_files/27311917/download --output libvdrtools_0.8.4-focal_amd64.deb && dpkg -i libvdrtools_0.8.4-focal_amd64.deb
 ```
 
-#### 3\. Download and install `vdrtools-cli`:
+#### 3\. Download and install `vdrtools-cli`
 
 ```bash
-$ curl https://gitlab.com/evernym/verity/vdr-tools/-/package_files/27311922/download --output vdrtools-cli_0.8.4-focal_amd64.deb && dpkg -i vdrtools-cli_0.8.4-focal_amd64.deb
+curl https://gitlab.com/evernym/verity/vdr-tools/-/package_files/27311922/download --output vdrtools-cli_0.8.4-focal_amd64.deb && dpkg -i vdrtools-cli_0.8.4-focal_amd64.deb
 ```
 
 Once this is installed we're now ready to write a DID to the cheqd network.
@@ -52,17 +51,17 @@ All the command described below are supposed to be used from VDR Tools CLI.
 For running VDR Tools terminal just type:
 
 ```bash
-$ vdrtools-cli
+vdrtools-cli
 ```
 
 The next steps are about how to send a DID.
 
-#### 1\. Create a wallet
+### 1\. Create a wallet
 
 The command:
 
 ```bash
-wallet create cheqd-wallet key 
+wallet create cheqd-wallet key
 ```
 
 Example:
@@ -76,7 +75,7 @@ Wallet "cheqd-wallet" has been created
 
 where `Enter value for key` is a suggestion to create a secure password.
 
-#### 2\. Open your wallet: 
+### 2\. Open your wallet
 
 Next use the following command to open the wallet created in the previous step
 
@@ -95,7 +94,7 @@ Enter value for key:
 Wallet "cheqd-wallet" has been opened
 ```
 
-#### 3\. Create a pool connection: 
+### 3\. Create a pool connection
 
 Now we're ready to create a pool connection. This is a configuration to allow to connection to the of your wallet to the pool.
 
@@ -112,7 +111,7 @@ cheqd-wallet:indy> cheqd-pool add alias=cheqd-pool-testnet rpc_address=https://r
 Pool "cheqd-pool-testnet" has been created "{"alias":"cheqd-pool-testnet","rpc_address":"https://rpc.testnet.cheqd.network/","chain_id":"cheqd-testnet-4"}"
 ```
 
-#### 4\. Open a connection to the testnet: 
+### 4\. Open a connection to the testnet
 
 Next we need to setup a direct connection between the users machine and the pool on testnet.
 
@@ -129,15 +128,15 @@ cheqd-wallet:indy> cheqd-pool open alias=cheqd-pool-testnet
 Pool "cheqd-pool-testnet" has been opened
 ```
 
-#### 5\. Generate a DID:
+### 5\. Generate a DID
 
 Now the connection has been made, we're ready to create a DID. In this case we'll generate a DID first locally. This is because the current functionality of VDR tools only allows for the creation of a unique identifier as opposed to a DID.
 
-To do this we'll use need to use a 3 step process using 2 different commands
+To do this we'll use need to use a 3 step process using 2 different commands.
 
-1.  First use `did new`
-2.  Then copy the newly generated DID
-3.  Finally, paste your new DID into the allocated space in the templated command `did new did=did:cheqd:testnet:<copied-DID>`
+1. First use `did new`.
+2. Then copy the newly generated DID.
+3. Finally, paste your new DID into the allocated space in the templated command `did new did=did:cheqd:testnet:<copied-DID>`.
 
 Example:
 
@@ -149,14 +148,14 @@ cheqd_pool(cheqd-pool-testnet):cheqd-wallet:indy> did new did=did:cheqd:testnet:
 Did "did:cheqd:testnet:X9cNs1g3nMvQ77j7E8rPRr" has been created with "7db7n4CNBbYFRcYEjoacMzSbVEqF2ToSovtvzBoovH5B" verkey
 ```
 
-#### 6\. Generate/restore cosmos signature:
+### 6\. Generate/restore cosmos signature
 
 Now we'll need to restore the Cosmos keys from the mnemonic. The mnemonic required here was provided during node operator account creation.
 
 2-steps command:
 
-*   `cheqd-keys add alias=cheqd-testnet-key mnemonic`
-*   paste your mnemonic after suggestion `Enter value for mnemonic:`
+* `cheqd-keys add alias=cheqd-testnet-key mnemonic`
+* paste your mnemonic after suggestion `Enter value for mnemonic:`
 
 Example:
 
@@ -168,7 +167,7 @@ Key for account: cheqd1waszljnwadcuynjg6wc9rhhw8ega20nc97muc6
 has been restored from mnemonic
 ```
 
-#### 7\. Send previously created DID: 
+### 7\. Send previously created DID
 
 We can now use the VDR tools to send our newly created DID using the following command:
 
@@ -186,7 +185,7 @@ Abci-info request result "{"response":{"app_version":"1","data":"cheqd-node","la
 Response from ledger: "{\"id\":\"did:cheqd:testnet:X9cNs1g3nMvQ77j7E8rPRr\"}"
 ```
 
-#### 8\. Check the previously sent DID
+### 8\. Check the previously sent DID
 
 Finally we can now check that the DID was successfully written to the ledger.
 
@@ -210,11 +209,11 @@ DID info: {"did":{"id":"did:cheqd:testnet:X9cNs1g3nMvQ77j7E8rPRr","controller":[
 ### 1\. Start a container
 
 ```bash
-$ docker run -it --rm -u root ubuntu:20.04 bash
+docker run -it --rm -u root ubuntu:20.04 bash
 ```
 
 ### 2\. Update the package storage
 
 ```bash
-# apt update
+apt update
 ```
