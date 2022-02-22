@@ -10,7 +10,7 @@ func TestIsDid(t *testing.T) {
 		valid bool
 		did   string
 	}{
-		{true,  "did:cheqd:test:000000wyywywywyw"},
+		{true,  "did:cheqd:test:111111wyywywywyw"},
 		{false,  "did:cheqd:test:wyywywywyw:sdadasda"},
 		{false, "did1:cheqd:test:wyywywywyw:sdadasda"},
 		{false, "did:cheqd2:test:wyywywywyw:sdadasda"},
