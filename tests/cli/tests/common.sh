@@ -22,7 +22,8 @@ export DELAYED_VESTING_ACCOUNT="delayed_vesting_account"
 export PERIODIC_VESTING_ACCOUNT="periodic_vesting_account"
 
 function random_string() {
-  cat /dev/urandom | tr -dc '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz' | fold -w ${1:-16} | head -n 1
+  pub_key=$(cheqd-noded debug ed25519 random | jq -r ".pub_key_base_64")
+  printf '%.32s\n' `cheqd-noded debug encoding base64-multibase58 $pub_key`
   return 0
 }
 
