@@ -110,7 +110,7 @@ Example:
 
   
 
-```text
+```bash
 indy> wallet create cheqd-wallet key
 Enter value for key:
 

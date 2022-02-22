@@ -117,7 +117,7 @@ Copy and paste the template below into your terminal. We will add additional req
 
   
 
-```text
+```json
 {
   "id": "did:cheqd:<namespace>:<unique-id>",
   "verification_method": [
@@ -161,7 +161,7 @@ In our example:
 
   
 
-```text
+```json
 {
   "id": "did:cheqd:testnet:z4Q41kvWsd1JAuPFBff8Dti7P6fLbPZe",
   "verification_method": [

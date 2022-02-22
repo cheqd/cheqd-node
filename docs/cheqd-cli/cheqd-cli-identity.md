@@ -18,7 +18,7 @@ The simpliest suggestion here is to redirect output to file as shown in bash com
 
 #### Response example
 
-```text
+```bash
 {"pub_key_base_64":"MnrTheU+vCrN3W+WMvcpBXYBG6D1HrN5usL1zS6W7/k=","pub_key_multibase_58":"",\
 "priv_key_base_64":"FxaJOy4HFoC2Enu1SizKtU0L+hmBRBAEpC+B4TopfQoyetOF5T68Ks3db5Yy9ykFdgEboPUes3m6wvXNLpbv+Q=="}
 ```
@@ -29,7 +29,7 @@ $ cheqd-noded debug encoding base64-multibase58 <public_key_in_base64_representa
 ```
 
 #### Response example
-```text
+```bash
 $ cheqd-noded debug encoding base64-multibase58 MnrTheU+vCrN3W+WMvcpBXYBG6D1HrN5usL1zS6W7/k=
 z4Q41kvWsd1JAuPFBff8Dti7P6fLbPZe3Nmod35uua9TE
 ```
@@ -81,30 +81,27 @@ $ cheqd-noded tx cheqd create-did <did-document-json> <did-verification-method-i
 
 #### Example
 
-```bash
-$ cheqd-noded tx cheqd create-did '{"id": "did:cheqd:testnet:zJ5EDiiiKWDyo79n",\
-                                   "verification_method": [{\
-                                     "id": "did:cheqd:testnet:zJ5EDiiiKWDyo79n#key1",\
-                                     "type": "Ed25519VerificationKey2020",\
-                                     "controller": "id:cheqd:testnet:zJ5EDiiiKWDyo79n",\
-                                     "public_key_multibase": "z4Q41kvWsd1JAuPFBff8Dti7P6fLbPZe3Nmod35uua9TE"\
-                                   }],\
-                                   "authentication": [\
-                                     "id:cheqd:testnet:zJ5EDiiiKWDyo79n#key1"\
-                                   ]\
-                                 }' "id:cheqd:testnet:zJ5EDiiiKWDyo79n#key1" \
-  --ver-key "FxaJOy4HFoC2Enu1SizKtU0L+hmBRBAEpC+B4TopfQoyetOF5T68Ks3db5Yy9ykFdgEboPUes3m6wvXNLpbv+Q==" \
-  --from my_account --node http://nodes.testnet.cheqd.network:26657 --chain-id cheqd-testnet-4 --fees 5000000ncheq
+Create and edit did in the separate file, like `diddoc.json`:
+
+```json
+{"id": "did:cheqd:testnet:zJ5EDiiiKWDyo79n",
+    "verification_method": [{
+      "id": "did:cheqd:testnet:zJ5EDiiiKWDyo79n#key1",
+      "type": "Ed25519VerificationKey2020",
+      "controller": "id:cheqd:testnet:zJ5EDiiiKWDyo79n",
+      "public_key_multibase": "z4Q41kvWsd1JAuPFBff8Dti7P6fLbPZe3Nmod35uua9TE"
+    }],
+    "authentication": [
+      "id:cheqd:testnet:zJ5EDiiiKWDyo79n#key1"
+    ]
+  }
 ```
 
-BTW, it can be more useful to prepare json file using your favorite editor and after that run the command as:
+And inject this file into the command:
 
 ```bash
-$ cheqd-noded tx cheqd create-did "$(cat json.txt)" --ver-key "FxaJOy4HFoC2Enu1SizKtU0L+hmBRBAEpC+B4TopfQoyetOF5T68Ks3db5Yy9ykFdgEboPUes3m6wvXNLpbv+Q==" \
-  --from my_account --node http://nodes.testnet.cheqd.network:26657 --chain-id cheqd-testnet-4 --fees 5000000ncheq
+$ cheqd-noded tx cheqd create-did "$(cat diddoc.json)" --ver-key "FxaJOy4HFoC2Enu1SizKtU0L+hmBRBAEpC+B4TopfQoyetOF5T68Ks3db5Yy9ykFdgEboPUes3m6wvXNLpbv+Q==" --from my_account --node http://nodes.testnet.cheqd.network:26657 --chain-id cheqd-testnet-4 --fees 5000000ncheq
 ```
-
-where `json.txt` - file with DID-Doc in json fromat.
 
 ### Querying a DID
 
@@ -129,7 +126,7 @@ $ cheqd-noded query cheqd did did:cheqd:testnet:zJ5EDiiiKWDyo79n --chain-id cheq
 
 * `DIDDoc_in_JSON`: A string with DID Document in Json format.  `id` is not changeable field and mast be used from creation transaction.
     Base example:
-```text
+```json
 {
   "id": "did:cheqd:<namespace>:<unique-id>",
   "verification_method": [
@@ -182,7 +179,7 @@ $ cheqd-noded tx cheqd create-did '{"id": "did:cheqd:testnet:zJ5EDiiiKWDyo79n",\
 BTW, it can be more useful to prepare json file using your favorite editor and after that run the command as:
 
 ```bash
-$ cheqd-noded tx cheqd create-did "$(cat json.txt)" --ver-key "FxaJOy4HFoC2Enu1SizKtU0L+hmBRBAEpC+B4TopfQoyetOF5T68Ks3db5Yy9ykFdgEboPUes3m6wvXNLpbv+Q==" \
+$ cheqd-noded tx cheqd create-did "$(cat diddoc.json)" --ver-key "FxaJOy4HFoC2Enu1SizKtU0L+hmBRBAEpC+B4TopfQoyetOF5T68Ks3db5Yy9ykFdgEboPUes3m6wvXNLpbv+Q==" \
   --from my_account --node http://nodes.testnet.cheqd.network:26657 --chain-id cheqd-testnet-4 --fees 5000000ncheq
 ```
 Let's the result will be like:
@@ -322,3 +319,4 @@ And after that all the commands from the [flow](#demo-flow-for-sending-did-to-th
 
 P.S. the case with `docker` can be used only for demonstration purposes, cause after closing the container all the data will be lost.
 For production purposes, maybe it would be great to have an image with Ubuntu 20.04 and operator's keys inside.
+where `diddoc.json` - file with DID-Doc in json fromat.
