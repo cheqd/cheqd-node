@@ -2,9 +2,10 @@ package tests
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 const Prefix = "did:cheqd:test:"
@@ -18,7 +19,7 @@ func TestNewMsgCreateDidValidation(t *testing.T) {
 	}{
 		{true, "Valid Create Did Msg", types.NewMsgCreateDid(&types.MsgCreateDidPayload{Id: "1"}, []*types.SignInfo{{VerificationMethodId: "foo", Signature: "bar"}}), ""},
 		{false, "Payload is missed", types.NewMsgCreateDid(nil, nil), "Payload: is required"},
-		{false, "Signatures is missed", types.NewMsgCreateDid(&types.MsgCreateDidPayload{Id: "1"}, nil), "Signatures: is required"},
+		{false, "Signature is missed", types.NewMsgCreateDid(&types.MsgCreateDidPayload{Id: "1"}, nil), "Signature: is required"},
 	}
 
 	for _, tc := range cases {
@@ -44,7 +45,7 @@ func TestNewMsgUpdateDidValidation(t *testing.T) {
 	}{
 		{true, "Valid Update Did Msg", types.NewMsgUpdateDid(&types.MsgUpdateDidPayload{Id: "1"}, []*types.SignInfo{{VerificationMethodId: "foo", Signature: "bar"}}), ""},
 		{false, "Payload is missed", types.NewMsgUpdateDid(nil, nil), "Payload: is required"},
-		{false, "Signatures is missed", types.NewMsgUpdateDid(&types.MsgUpdateDidPayload{Id: "1"}, nil), "Signatures: is required"},
+		{false, "Signature is missed", types.NewMsgUpdateDid(&types.MsgUpdateDidPayload{Id: "1"}, nil), "Signature: is required"},
 	}
 
 	for _, tc := range cases {
@@ -70,17 +71,17 @@ func TestMsgCreateDidPayloadPayload(t *testing.T) {
 		{
 			false,
 			&types.MsgCreateDidPayload{},
-			"Id: is not DID",
+			"Unique ID does not match DID method specification",
 		},
 		{
 			false,
 			&types.MsgCreateDidPayload{Id: ""},
-			"Id: is not DID",
+			"Unique ID does not match DID method specification",
 		},
 		{
 			false,
 			&types.MsgCreateDidPayload{Id: "did:ch:test:alice"},
-			"Id: is not DID",
+			"Unique ID does not match DID method specification",
 		},
 		{
 			false,
@@ -226,7 +227,7 @@ func TestMsgCreateDidPayloadPayload(t *testing.T) {
 				},
 				Controller: []string{AliceDID},
 			},
-			fmt.Sprintf("index 0, value %v: : unsupported verification method type: bad request: invalid verification method", AliceKey1) ,
+			fmt.Sprintf("index 0, value %v: : unsupported verification method type: bad request: invalid verification method", AliceKey1),
 		},
 		{
 			false,
@@ -394,7 +395,7 @@ func TestMsgCreateDidPayloadPayload(t *testing.T) {
 					},
 				},
 			},
-			fmt.Sprintf("%v is duplicated: invalid service", AliceService1 ),
+			fmt.Sprintf("%v is duplicated: invalid service", AliceService1),
 		},
 		{
 			true,
@@ -472,17 +473,17 @@ func TestNewMsgUpdateDidPayload(t *testing.T) {
 		{
 			false,
 			&types.MsgUpdateDidPayload{},
-			"Id: is not DID",
+			"Unique ID does not match DID method specification",
 		},
 		{
 			false,
 			&types.MsgUpdateDidPayload{Id: ""},
-			"Id: is not DID",
+			"Unique ID does not match DID method specification",
 		},
 		{
 			false,
 			&types.MsgUpdateDidPayload{Id: "did:ch:test:alice"},
-			"Id: is not DID",
+			"Unique ID does not match DID method specification",
 		},
 		{
 			false,
