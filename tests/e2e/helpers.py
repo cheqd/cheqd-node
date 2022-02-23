@@ -14,12 +14,12 @@ READ_BUFFER = 60000
 
 TEST_NET_NETWORK = "cheqd-testnet-4"
 LOCAL_NET_NETWORK = "cheqd"
-TEST_NET_NODE_TCP = "--node 'tcp://seed1.us.testnet.cheqd.network:26657'"
-TEST_NET_NODE_HTTP = "--node http://node1.eu.testnet.cheqd.network:26657/"
+TEST_NET_NODE_TCP = "--node 'tcp://rpc.testnet.cheqd.network:443'"
+TEST_NET_NODE_HTTP = "--node https://rpc.testnet.cheqd.network:443/"
 LOCAL_NET_NODE_TCP = "--node 'tcp://localhost:26657'"
 LOCAL_NET_NODE_HTTP = "--node http://localhost:26657/"
-TEST_NET_DESTINATION = f"{TEST_NET_NODE_TCP} --chain-id 'cheqd-testnet-2'"
-TEST_NET_DESTINATION_HTTP = f"{TEST_NET_NODE_HTTP} --chain-id 'cheqd-testnet-2'"
+TEST_NET_DESTINATION = f"{TEST_NET_NODE_TCP} --chain-id 'cheqd-testnet-4'"
+TEST_NET_DESTINATION_HTTP = f"{TEST_NET_NODE_HTTP} --chain-id 'cheqd-testnet-4'"
 LOCAL_NET_DESTINATION = f"{LOCAL_NET_NODE_TCP} --chain-id 'cheqd'"
 LOCAL_NET_DESTINATION_HTTP = f"{LOCAL_NET_NODE_HTTP} --chain-id 'cheqd'"
 GAS_AMOUNT = 90000 # 70000 throws `out of gas` sometimes
