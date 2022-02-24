@@ -23,7 +23,7 @@ go install -tags rocksdb ./...
 # MAKE HOME FOLDER AND GET GENESIS
 cheqd-noded init "$NODE_MONIKER" --home /others/cheqd
 wget -O /others/cheqd/config/genesis.json https://github.com/cheqd/cheqd-node/raw/main/persistent_chains/mainnet/genesis.json
-wget -O /others/cheqd/config/seeds.txt https://github.com/cheqd/cheqd-node/raw/main/persistent_chains/mainnet/seeds.txt
+wget -O seeds.txt https://github.com/cheqd/cheqd-node/raw/main/persistent_chains/mainnet/seeds.txt
 
 INTERVAL=1000
 
@@ -45,7 +45,7 @@ export ${APPNAME}_P2P_MAX_NUM_OUTBOUND_PEERS=500
 export ${APPNAME}_STATESYNC_RPC_SERVERS="$RPC,$RPCN"
 export ${APPNAME}_STATESYNC_TRUST_HEIGHT="$BLOCK_HEIGHT"
 export ${APPNAME}_STATESYNC_TRUST_HASH="$TRUST_HASH"
-export ${APPNAME}_P2P_SEEDS="$(cat /others/cheqd/config/seeds.txt)"
+export ${APPNAME}_P2P_SEEDS="$(cat seeds.txt)"
 
 
 cheqd-noded start --x-crisis-skip-assert-invariants --home /others/cheqd --grpc-web.address 127.0.0.1:5050
