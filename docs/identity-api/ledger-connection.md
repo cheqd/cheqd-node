@@ -17,44 +17,46 @@ This method implements the logic of identity wallet key creation just using `ali
 #### Input parameters
 
 * `wallet_handle` (integer): Linked to previously created and opened wallet.
-* `alias` (string): Human-readable representation of alias to user,
+* `alias` (string): Memorable key name/alias that makes it easier to reference for a user.
 
 #### Example output
 
 ```jsonc
 {
     "alias": "some_alias",
-    "account_id":"cheqd1gudhsalrhsurucr5gkvga5973359etv6q0xvwz",
-    "pub_key":"xSMzGopEnnTPCwjQwryDcrG9MGw3sVyb4ecYVaJrfkoA"
+    "account_id": "cheqd1gudhsalrhsurucr5gkvga5973359etv6q0xvwz",
+    "pub_key": "xSMzGopEnnTPCwjQwryDcrG9MGw3sVyb4ecYVaJrfkoA"
 }
 ```
 
 ### indy_cheqd_keys_add_from_mnemonic
 
-This method realised logic for recovering keys from `mnemonic` string. Mnemonic string - it's a human-readable combination of words, in general can include 12 or 24 words.
+This method implements logic similar to that used in [cheqd CLI to recover a key](../cheqd-cli/cheqd-cli-key-management.md) in the identity wallet from a mnemonic.
 
-Input parameters:
+#### Input parameters
 
-* `wallet_handle` - integer, which is connected to previously created and opened wallet.
-* `alias` - human-readable representation of alias to user,
-* `mnemonic` - string of 12 or 24 words.
+* `wallet_handle` (integer): Linked to previously created and opened wallet.
+* `alias` (string): Memorable key name/alias that makes it easier to reference for a user.
+* `mnemonic` (string): 12 or 24 word seed phrase to recover the keys associated with a wallet.
 
-As result, the next structure is expected:
-```
+#### Example result
+
+```jsonc
 {
-    "alias":"some_alias_2",
-    "account_id":"cosmos10hcwm576uprz53wj2p8vv2dg0u8zu3n6l0wsxr",
-    "pub_key":"fPn3LGakGrbHJTEk5fs7hAfa65DfpefgWawmwfCwjTHF"
+	"alias": "some_alias_2",
+    "account_id": "cheqd10hcwm576uprz53wj2p8vv2dg0u8zu3n6l0wsxr",
+    "pub_key": "fPn3LGakGrbHJTEk5fs7hAfa65DfpefgWawmwfCwjTHF"
 }
 ```
 
-#### **indy_cheqd_keys_get_info**
+#### indy_cheqd_keys_get_info
+
 This method is needed for getting information about already generated and stored keys by using only an `alias`.
 
 Input parameters:
 
 * `wallet_handle` - integer, which is connected to previously created and opened wallet.
-* `alias` - human-readable representation of alias to user,
+* `alias` (string): Memorable key name/alias that makes it easier to reference for a user.
 
 As result, the list of next structures is expected:
 ```
@@ -87,7 +89,7 @@ This method can sign a transaction by using a key which can be found by `alias`
 Input parameters:
 
 * `wallet_handle` - integer, which is connected to previously created and opened wallet.
-* `alias` - human-readable representation of alias to user, 
+* `alias` (string): Memorable key name/alias that makes it easier to reference for a user. 
 * `tx_raw` - byte representation of transaction,
 * `tx_len` - length of string with bytes of transaction,
 
@@ -106,7 +108,9 @@ As result, raw byte's string is expected.
 			- [Input parameters](#input-parameters)
 			- [Example output](#example-output)
 		- [indy_cheqd_keys_add_from_mnemonic](#indy_cheqd_keys_add_from_mnemonic)
-			- [**indy_cheqd_keys_get_info**](#indy_cheqd_keys_get_info)
+			- [Input parameters](#input-parameters-1)
+			- [Example result](#example-result)
+			- [indy_cheqd_keys_get_info](#indy_cheqd_keys_get_info)
 			- [**indy_cheqd_keys_get_list_keys**](#indy_cheqd_keys_get_list_keys)
 			- [**indy_cheqd_keys_sign**](#indy_cheqd_keys_sign)
 	- [Pool](#pool)
