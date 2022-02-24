@@ -1,4 +1,4 @@
-# Key management in VDR Tools SDK
+# Account and key management in VDR Tools SDK
 
 ## Overview
 

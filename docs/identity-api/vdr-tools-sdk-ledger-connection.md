@@ -10,7 +10,7 @@ It is worth noting here that the terminology of "pool" connection is specificall
 
 Establishing a ledger "pool" connection in VDR Tools SDK broadly has the following steps:
 
-1. Generate keys or restore them from mnemonic as described in [key management using VDR Tools SDK](vdr-tools-sdk-key-management.md).
+1. Generate keys or restore them from mnemonic as described in [key management using VDR Tools SDK](vdr-tools-sdk-accounts-keys.md).
 2. Add ledger "pool" configuration as described using the methods below, i.e., `indy_cheqd_pool_add`. This only adds the configuration, without actually establishing the connection. The connection is established once the first transaction is sent.
 
 For compatibility purposes, VDR Tools SDK method names use the `indy_` prefix. This may be updated in the future as work is done on the upstream project to refactor method names to be ledger-agnostic.
