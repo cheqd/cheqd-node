@@ -1,8 +1,25 @@
-ci
-.devcontainer
+### APP-SPECIFIC
 .github
+*.md
+build-tools/*
+docs/*
+architecture/*
+persistent_chains/*
+
+
+### GENERAL EXCLUSIONS ###
+
+### macOS ###
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE Exclusions
+.devcontainer
+.vscode
+.vscode-upload.json
 .idea
-vue/node_modules
-vue/src/store/generated
-vue/dist
-secret.yml
+
+# Python
+.pytest_cache

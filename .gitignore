@@ -1,3 +1,15 @@
+### APP-SPECIFIC EXCLUSIONS ###
+
+# Tests
+**/network-config
+
+# Python
+.pytest_cache
+**/__pycache__
+
+
+### GENERAL EXCLUSIONS ###
+
 ### macOS ###
 # General
 .DS_Store
@@ -29,16 +41,7 @@ Temporary Items
 # VS Code
 .devcontainer
 .vscode
-
-# Application specific
-vue/node_modules
-vue/src/store/generated
-vue/dist
-secret.yml
-**/node_configs
-.idea
-
-# Python
-.pytest_cache
-**/__pycache__
 .vscode-upload.json
+
+# IDEs
+.idea

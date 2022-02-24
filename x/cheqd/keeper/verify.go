@@ -28,7 +28,7 @@ func (k *Keeper) VerifySignature(ctx *sdk.Context, msg types.IdentityMsg, signer
 				return types.ErrDidDocNotFound.Wrap(signer.Signer)
 			}
 
-			didDoc, err := state.GetDid()
+			didDoc, err := state.UnpackDataAsDid()
 			if err != nil {
 				return types.ErrDidDocNotFound.Wrap(signer.Signer)
 			}
@@ -58,7 +58,7 @@ func (k *Keeper) ValidateController(ctx *sdk.Context, id string, controller stri
 	if err != nil {
 		return types.ErrDidDocNotFound.Wrap(controller)
 	}
-	didDoc, err := state.GetDid()
+	didDoc, err := state.UnpackDataAsDid()
 	if err != nil {
 		return types.ErrDidDocNotFound.Wrap(controller)
 	}
@@ -86,7 +86,12 @@ func VerifyIdentitySignature(signer types.Signer, signatures []*types.SignInfo, 
 				return false, err
 			}
 
-			result = result && ed25519.Verify(pubKey, signingInput, signature)
+			verRes, err := verifyNoPanic(pubKey, signingInput, signature)
+			if err != nil {
+				return false, fmt.Errorf("signature verification error. verification method: %s. error: %s", info.VerificationMethodId, err)
+			}
+
+			result = result && verRes
 			foundOne = true
 		}
 	}
@@ -96,4 +101,15 @@ func VerifyIdentitySignature(signer types.Signer, signatures []*types.SignInfo, 
 	}
 
 	return result, nil
+}
+
+func verifyNoPanic(publicKey ed25519.PublicKey, message, sig []byte) (res bool, err error) {
+	defer func() {
+		if rec := recover(); rec != nil {
+			err = fmt.Errorf("%s", rec)
+		}
+	}()
+
+	internalRes := ed25519.Verify(publicKey, message, sig)
+	return internalRes, nil
 }

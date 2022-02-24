@@ -11,7 +11,7 @@ Details on how identity transactions are defined is available in [ADR 002: Ident
 1. **Build a request** _Example_: `build_create_did_request(id, verkey, alias)`
 2. **Sign the request using DID key** _Example_:  `indy_crypto_sign(did, verkey)`
 3. **Build a transaction with the request from previous step** _Example_: `build_tx(pool_alias, pub_key, builded_request, account_number, account_sequence, max_gas, max_coin_amount, denom, timeout_height, memo)`
-4. **Sign the transaction** _Example_: `cheqd_keys_sign(wallet_handle, key_alias, tx)`. 
+4. **Sign the transaction** _Example_: `cheqd_keys_sign(wallet_handle, key_alias, tx)`.
 5. **Broadcast a signed transaction** _Example_: `broadcast_tx_commit(pool_alias, signed)`.
 
 #### Response format
@@ -325,7 +325,7 @@ CreateSchemaResponse {
 #### Response validation
 
 * A SCHEMA transaction with DID from `owner` field must already be in a ledger created by `CreateDidRequest`
-* `CreateSchemaRequest` must be signed by  DID from `owner` field. 
+* `CreateSchemaRequest` must be signed by  DID from `owner` field.
 
 ### Get Schema
 
@@ -352,7 +352,7 @@ Request
 * `path`: Path for RPC Endpoint for cheqd pool
 * `data`: Query with an entity key from a state. String `schema:<owner>:<name>:<version>` encoded to bytes
 * `height`: Ledger height \(size\). `None` for auto calculation;
-* `prove`: Boolean value. `True` for getting state proof in a pool response. 
+* `prove`: Boolean value. `True` for getting state proof in a pool response.
 
 #### Response format
 
@@ -413,7 +413,7 @@ CreateCredDefResponse {
 #### Response validation
 
 * A CRED\_DEF transaction with DID from `owner` field must already be in a ledger created by `CreateDidRequest`
-* `CreateCredDefRequest` must be signed by  DID from `owner` field. 
+* `CreateCredDefRequest` must be signed by  DID from `owner` field.
 
 ### Get Credential Definition
 

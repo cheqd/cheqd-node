@@ -1,0 +1,64 @@
+name: Lint
+
+on: [push]
+
+jobs:
+
+  # We can't use VALIDATE_GO from super linter because of this issue:
+  # https://github.com/github/super-linter/issues/143
+  go-lint:
+    name: Lint go
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.43.0
+          args: --timeout 5m0s
+
+  md-link-check:
+    name: Check markdown links
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Check if Markdown links are valid
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with: 
+          config-file: '.github/linters/mlc_config.json'
+          folder-path: "."
+
+  sh-euox-pipefail-check:
+    name: Check for 'set -euox pipefail' in shell scripts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Check that all shell scripts use 'set -euox pipefail'
+        run: bash .github/scripts/ensure_set_euox_pipefail.sh
+
+  super-lint:
+    name: Run super linter
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Super-Linter
+      uses: github/super-linter/slim@v4
+      env:
+        VALIDATE_MARKDOWN: true
+        VALIDATE_XML: true
+        VALIDATE_YAML: true
+        VALIDATE_OPENAPI: true
+        VALIDATE_BASH: true
+
+        VALIDATE_ALL_CODEBASE: true
+        LOG_LEVEL: WARN
+
+        DEFAULT_BRANCH: main
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

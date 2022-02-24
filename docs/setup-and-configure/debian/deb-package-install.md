@@ -18,10 +18,10 @@ This document provides guidance on how to install and configure a node for the c
    wget https://github.com/cheqd/cheqd-node/releases/download/v0.3.1/cheqd-node_0.3.1_amd64.deb
    ```
 
-   For testnet nodes, use v0.2.7:
+   For testnet nodes, use v0.4.0:
 
    ```bash
-   wget https://github.com/cheqd/cheqd-node/releases/download/v0.2.7/cheqd-node_0.2.7_amd64.deb
+   wget https://github.com/cheqd/cheqd-node/releases/download/v0.4.0/cheqd-node_0.4.0_amd64.deb
    ```
 
 2. **Install the package**
@@ -32,10 +32,10 @@ This document provides guidance on how to install and configure a node for the c
    sudo dpkg -i cheqd-node_0.3.1_amd64.deb
    ```
 
-   For testnet nodes on v0.2.7 (or below):
+   For testnet nodes on v0.4.0 (or below):
 
    ```bash
-   sudo dpkg -i cheqd-node_0.2.7_amd64.deb
+   sudo dpkg -i cheqd-node_0.4.0_amd64.deb
    ```
 
    As a part of installation `cheqd` user will be created. By default, `HOME` directory for the user is `/home/cheqd`, but it can be changed by setting `CHEQD_HOME_DIR` environment variable before running `dpkg` command. Additionnally, a custom logging directory can also be defined by passing the environment variable `CHEQD_LOG_DIR` (defaults to `/home/cheqd/.cheqdnode/log`):
@@ -121,7 +121,7 @@ This document provides guidance on how to install and configure a node for the c
    cheqd-noded configure create-empty-blocks false
    ```
 
-9.  **Define the external peer-to-peer address**
+9. **Define the external peer-to-peer address**
 
    Unless you are running a node in a sentry/validator two-tier architecture, your node should be reachable on its peer-to-peer (P2P) port by other other nodes. This can be defined by setting the `external-address` property which defines the externally reachable address. This can be defined using either IP address or DNS name followed by the P2P port (Default: 26656).
 
@@ -133,30 +133,30 @@ This document provides guidance on how to install and configure a node for the c
 
    This is especially important if the node has no public IP address, e.g., if it's in a private subnet with traffic routed via a load balancer or proxy. Without the `external-address` property, the node will report a private IP address from its own host network interface as its `remote_ip`, which will be unreachable from the outside world. The node still works in this configuration, but only with limited unidirectional connectivity.
 
-11. **Make the RPC endpoint available externally** \(optional\)
+10. **Make the RPC endpoint available externally** \(optional\)
 
-   This step is necessary only if you want to allow incoming client application connections to your node. Otherwise, the node will be accessible only locally. Further details about the RPC endpoints is available in the [cheqd node setup guide](../README.md).
+      This step is necessary only if you want to allow incoming client application connections to your node. Otherwise, the node will be accessible only locally. Further details about the RPC endpoints is available in the [cheqd node setup guide](../README.md).
 
-   ```bash
-   cheqd-noded configure rpc-laddr "tcp:\/\/0.0.0.0:26657"
-   ```
+      ```bash
+      cheqd-noded configure rpc-laddr "tcp:\/\/0.0.0.0:26657"
+      ```
 
-12. **Enable and start the `cheqd-noded` system service**
+11. **Enable and start the `cheqd-noded` system service**
 
-   If you are prompted for a password for the `cheqd` user, type `exit` to logout and then attempt to execute this as a privileged user \(with `sudo` privileges or as root user, if necessary\).
+      If you are prompted for a password for the `cheqd` user, type `exit` to logout and then attempt to execute this as a privileged user \(with `sudo` privileges or as root user, if necessary\).
 
-   ```bash
-   $ systemctl enable cheqd-noded
-   Created symlink /etc/systemd/system/multi-user.target.wants/cheqd-noded.service → /lib/systemd/system/cheqd-noded.service.
+      ```bash
+      $ systemctl enable cheqd-noded
+      Created symlink /etc/systemd/system/multi-user.target.wants/cheqd-noded.service → /lib/systemd/system/cheqd-noded.service.
 
-   $ systemctl start cheqd-noded
-   ```
+      $ systemctl start cheqd-noded
+      ```
 
-   Check that the `cheqd-noded` service is running. If successfully started, the status output should return `Active: active (running)`
+      Check that the `cheqd-noded` service is running. If successfully started, the status output should return `Active: active (running)`
 
-   ```bash
-   systemctl status cheqd-noded
-   ```
+      ```bash
+      systemctl status cheqd-noded
+      ```
 
 ## Post-installation checks
 

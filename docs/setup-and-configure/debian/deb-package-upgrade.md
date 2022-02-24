@@ -21,7 +21,7 @@ However, as best practice we recommend backing up the [app data directories for 
 1. **Download** [**the latest release of `cheqd-node` .deb**](https://github.com/cheqd/cheqd-node/releases/latest) **package**
 
    ```bash
-    wget https://github.com/cheqd/cheqd-node/releases/download/v0.3.1/cheqd-node_0.3.1_amd64.deb
+    wget https://github.com/cheqd/cheqd-node/releases/download/v0.4.0/cheqd-node_0.4.0_amd64.deb
    ```
 
 2. **Stop the existing `cheqd-noded` service**
@@ -83,39 +83,53 @@ An alternative method to check a node's status is via the RPC interface, if it h
 * Remotely via the RPC interface: `cheqd-noded status --node <rpc-address>`
 * By opening the JSONRPC over HTTP status page through a web browser: `<node-address:rpc-port>/status`
 
-## Upgrade from `0.2.3` to `0.3.1`.
+## Upgrade from `0.2.3` to `0.3.1`
+
 According to debian package usage on AWS instances and recovering after crashes we introduced new storage and mount points approach.
 For now, `$HOME` directory excepts to be `/home/cheqd` by default or it can be changed while `.deb` package install, like:
+
 ```bash
 sudo CHEQD_HOME_DIR=/path/to/home/directory dpkg -i cheqd-node_0.3.1_amd64.deb
 ```
+
 In general, it's not required and up to system administrators how to ensure safe revocring after crashes.
 
 If you have `0.2.3` version installed and you want to follow the new `$HOME` directory approach the next steps can help with it:
+
 * Please define the mount point for `cheqd` root directory where all the configs and data will be placed. For example, let it be `/cheqd`.
 * Stop `cheqd-noded` service by running:
-```bash
-$ sudo systemctl stop cheqd-noded
-```
+
+   ```bash
+   sudo systemctl stop cheqd-noded
+   ```
+
 * Install `.deb` package for `0.3.1` version:
-```bash
-sudo CHEQD_HOME_DIR=/cheqd dpkg -i cheqd-node_0.3.1_amd64.deb
-```
+
+   ```bash
+   sudo CHEQD_HOME_DIR=/cheqd dpkg -i cheqd-node_0.3.1_amd64.deb
+   ```
+
 * After that the next directory tree is expected:
-```bash
-/cheqd/.cheqdnode/data
-/cheqd/.cheqdnode/config
-/cheqd/.cheqdnode/log
-```
+
+   ```bash
+   /cheqd/.cheqdnode/data
+   /cheqd/.cheqdnode/config
+   /cheqd/.cheqdnode/log
+   ```
+
 * After that you should move all the configs from previous location into the new one `/cheqd/.cheqdnode/config`, data into `/cheqd/.cheqdnode/data`. It's assumed that root directory `/cheqd` will be stored and mounted as external resource and will not be removed after potential instance crashing.
 * For logs symlink can be created by using command:
-```bash
-ln -s /cheqd/.cheqdnode/log /var/log/cheqd-node
-```
+
+   ```bash
+   ln -s /cheqd/.cheqdnode/log /var/log/cheqd-node
+   ```
+
 * Start `cheqd-noded` service by running:
-```bash
-$ sudo systemctl start cheqd-noded
-```
+
+   ```bash
+   sudo systemctl start cheqd-noded
+   ```
+
 and check the service status or just check RPC endpoint.
 
 ## Next steps

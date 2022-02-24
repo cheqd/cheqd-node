@@ -2,6 +2,8 @@ package types
 
 import "github.com/multiformats/go-multibase"
 
+var _ StateValueData = &Did{}
+
 func (v VerificationMethod) GetPublicKey() ([]byte, error) {
 	if len(v.PublicKeyMultibase) > 0 {
 		_, key, err := multibase.Decode(v.PublicKeyMultibase)

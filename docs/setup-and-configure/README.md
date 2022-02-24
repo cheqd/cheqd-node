@@ -4,7 +4,7 @@
 
 This document describes how to use install and configure a new instance of `cheqd-node` from pre-built packages and adding it to an existing network \(such as the cheqd testnet\) as an observer or validator.
 
-For other scenarios, please see [setting up a new network from scratch](../build-and-networks/build-and-networks.md) and [building `cheqd-node` from source](../build-and-networks/README.md).
+For other scenarios, please see [setting up a new network from scratch](../build-and-networks/manual-network-setup.md) and [building `cheqd-node` from source](../build-and-networks/README.md).
 
 ## Pre-requisites
 

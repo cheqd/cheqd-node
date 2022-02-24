@@ -77,7 +77,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 		return nil, err
 	}
 
-	oldDIDDoc, err := oldStateValue.GetDid()
+	oldDIDDoc, err := oldStateValue.UnpackDataAsDid()
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 
 	// replay protection
 	if oldStateValue.Metadata.VersionId != didMsg.VersionId {
-		errMsg := fmt.Sprintf("Ecpected %s with version %s. Got version %s", didMsg.Id, oldStateValue.Metadata.VersionId, didMsg.VersionId)
+		errMsg := fmt.Sprintf("Expected %s with version %s. Got version %s", didMsg.Id, oldStateValue.Metadata.VersionId, didMsg.VersionId)
 		return nil, sdkerrors.Wrap(types.ErrUnexpectedDidVersion, errMsg)
 	}
 

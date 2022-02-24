@@ -18,18 +18,18 @@ docker pull ghcr.io/cheqd/cheqd-testnet:latest
 
 ## Prerequisites
 
-* Build `cheqd-node` image first. See the [instruction](build-and-networks.md).
+* Build `cheqd-node` image first. See the [instruction](../setup-and-configure/docker-install.md).
 
 ## Building
 
 To build the image:
 
 * Go to the repository root
-* Run `docker build -f docker/single_image_testnet/Dockerfile -t cheqd-testnet .`
+* Run `docker build -f tests/networks/docker-localnet/Dockerfile -t cheqd-testnet .`
 
 ## Running
 
-* Run `docker run -it --rm -p "26657:26657" cheqd-testnet`
+* Run `docker run -it --rm -p "26657:26657" -p "1317:1317" cheqd-testnet`
 * RPC apis are exposed on the folowing ports:
   * node\_0: `26657`
 * Try to connect to any node in your browser, for instance: `http://localhost:26657/`

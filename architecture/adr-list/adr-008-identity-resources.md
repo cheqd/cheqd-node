@@ -74,7 +74,7 @@ Schema URL: `did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue`
 
 Schema Entity URL: `did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?service=CL-Schema`
 
-[TODO: add language about resolving the DID (and getting the DID Doc) vs 
+[TODO: add language about resolving the DID (and getting the DID Doc) vs
 dereferencing the DID (and getting the schema)]
 
 `SCHEMA` DID Document transaction format:
@@ -103,7 +103,7 @@ dereferencing the DID (and getting the schema)]
 
 #### Credential Definition
 
-[TODO: explain that a Cred Def is simply an additional property inside of 
+[TODO: explain that a Cred Def is simply an additional property inside of
 the Issuer's DID Doc]
 
 Adds a Credential Definition (in particular, public key), which is created by an
@@ -156,6 +156,7 @@ CredDef URL: `did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue`
 CredDef Entity URL: `did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?service=CL-CredDef`
 
 `CRED_DEF` DID Document transaction format:
+
 ```jsonc
 {
   "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue",
@@ -294,9 +295,9 @@ CredDef URL: `did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue#<cred_def_entity_id>`
 
 ###### Negative
 
-- Credential Definition name means that it contains more than just a key and `value` field 
+- Credential Definition name means that it contains more than just a key and `value` field
   provides this flexibility.
-- Adding all Cred Defs to Issuer's DIDDoc makes it too large. For every DIDDoc or Cred Def request 
+- Adding all Cred Defs to Issuer's DIDDoc makes it too large. For every DIDDoc or Cred Def request
   a client will receive the whole list of Issuer's Cred Defs.
 - Impossible to put a few controllers for Cred Def.
 - In theory, we need to make Credential Definitions mutable.
