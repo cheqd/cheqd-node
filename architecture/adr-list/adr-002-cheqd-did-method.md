@@ -5,8 +5,8 @@
 | Category | Status |
 | :--- | :--- |
 | **Authors** | Renata Toktar, Brent Zundel, Ankur Banerjee |
-| **ADR Stage** | PROPOSED |
-| **Implementation Status** | Implementation in progress |
+| **ADR Stage** | ACCEPTED |
+| **Implementation Status** | Implemented |
 | **Start Date** | 2021-09-23 |
 
 ## Summary
@@ -118,7 +118,7 @@ A DID Document ("DIDDoc") associated with a cheqd DID is a set of data describin
 
 #### Elements needed for a W3C specification compliant DIDDoc representation
 
-1. **`id`**: Target DID as base58-encoded string for 16 or 32 byte DID value with cheqd DID Method prefix `did:cheqd:<namespace>:`.
+1. **`id`**: Target DID as base58-encoded string for 16 or 32 byte DID value with cheqd DID Method prefix `did:cheqd:<namespace>:<unique-id>`. The namespace property is optional, and if not mentioned is intended to default to the cheqd network `mainnet` namespace.
 2. **`controller`** (optional): A list of fully qualified DID strings or one string. Contains one or more DIDs who can update this DIDdoc. All DIDs must exist.
 3. **`verificationMethod`** (optional): A list of Verification Methods
 4. **`authentication`** (optional): A list of strings with key aliases or IDs
@@ -170,9 +170,8 @@ describing specifications that this DID Document is following to.
 Each DID Document MUST have a metadata section when a representation is produced. It can have the following properties:
 
 1. **`created`** (string): Formatted as an XML Datetime normalized to UTC 00:00:00 and without sub-second decimal precision, e.g., `2020-12-20T19:17:47Z`.
-2. **`updated`** (string): The value of the property MUST follow the same
-formatting rules as the created property. The `updated` field is `null` if an Update operation has never been performed on the DID document. If an updated property exists, it can be the same value as the created property when the difference between the two timestamps is less than one second.
-3. **`deactivated`** (strings): If DID has been deactivated, DID document metadata MUST include this property with the boolean value `true`. By default this is set to `false`.
+2. **`updated`** (string): The value of the property MUST follow the same formatting rules as the `created` property. The `updated` field is `null` if an Update operation has never been performed on the DID Document. If an updated property exists, it can be the same value as the created property when the difference between the two timestamps is less than one second.
+3. **`deactivated`** (boolean): If DID has been deactivated, DID document metadata MUST include this property with the boolean value `true`. By default this is set to `false`.
 4. **`versionId`** (strings): Contains transaction hash of the current DIDDoc version.
 
 ##### Example of DIDDoc metadata
@@ -221,7 +220,7 @@ encoded public key.
 
 Services can be defined in a DIDDoc to express means of communicating with the DID subject or associated entities.
 
-1. **`id`** (string): The value of the `id` property for a Service MUST be a URI conforming to [RFC3986](https://www.rfc-editor.org/rfc/rfc3986). A conforming producer MUST NOT produce multiple service entries with the same ID. A conforming consumer MUST produce an error if it detects multiple service entries with the same ID. It has a follow formats: `<DIDDoc-id>#<service-alias>` or `#<service-alias>`.
+1. **`id`** (string): The value of the `id` property for a Service MUST be a URI conforming to [RFC3986](https://www.rfc-editor.org/rfc/rfc3986). A conforming producer MUST NOT produce multiple service entries with the same ID. A conforming consumer MUST produce an error if it detects multiple service entries with the same ID. It should have the format `did:cheqd:<namespace>:<unique-id>#<service-alias>` or `#<service-alias>`.
 2. **`type`** (string): The service type and its associated properties SHOULD be registered in the [DID Specification Registries](https://www.w3.org/TR/did-spec-registries/)
 3. **`serviceEndpoint`** (strings): A string that conforms to the rules of [RFC3986](https://www.rfc-editor.org/rfc/rfc3986) for URIs, a map, or a set composed of a one or more strings that conform to the rules of
 [RFC3986](https://www.rfc-editor.org/rfc/rfc3986) for URIs and/or maps.
@@ -283,7 +282,7 @@ WriteRequest{
 
 #### Update DID
 
-This operation updates the DID Document associated with an existing DID of type `did:cheqd:<namespace>`.
+This operation updates the DID Document associated with an existing DID of type `did:cheqd:<namespace>:<unique-id>`.
 
 - **`signatures`**: `UpdateDidRequest` should be signed by all `controller` private keys. This field contains a `dict` structure with the key URI from `DIDDoc.authentication`, as well as signature values.
 - **`id`**: Fully qualified DID of type `did:cheqd:<namespace>`.
