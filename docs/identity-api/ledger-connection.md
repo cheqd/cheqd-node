@@ -1,36 +1,36 @@
-# Keys and pool API
+# VDR Tools SDK ledger connection API
 
 ## Overview
 
-This page describes API about how to work with keys and how to connect to the pool. 
-All the libraries methods/calls are defined on the [`cheqd-sdk`](https://github.com/cheqd/cheqd-sdk)    (forked from [Evernym VDR Tools](https://gitlab.com/evernym/verity/vdr-tools) ).
+This page describes the API for how [Evernym VDR Tools](https://gitlab.com/evernym/verity/vdr-tools) works with identity wallet keys and how it connects to the ledger "pool".
 
-## Keys
-### List of methods
-* [`indy_cheqd_keys_add_random`](#indy_cheqd_keys_add_random)
-* [`indy_cheqd_keys_add_from_mnemonic`](#indy_cheqd_keys_add_from_mnemonic)
-* [`indy_cheqd_keys_get_info`](#indy_cheqd_keys_get_info)
-* [`indy_cheqd_keys_get_list_keys`](#indy_cheqd_keys_get_list_keys)
-* [`indy_cheqd_keys_sign`](#indy_cheqd_keys_sign)
+It is worth noting here that the terminology of "pool" connection is specifically a legacy term originally used in [Hyperledger Indy](https://github.com/hyperledger/indy-node), which as a permissioned blockchain assumes there is a finite pools of servers. While this paradigm is no longer true in the public, permissionless world of the cheqd network, the identity APIs in VDR Tools SDK and similar Hyperledger Aries-based frameworks is retained for explanations.
 
-#### **indy_cheqd_keys_add_random**
-This method implements the logic of creation a key just using `alias`, without specifying any other additional information, like mnemonic.
+## Identity wallet key methods
 
-Input parameters:
+For compatibility purposes, VDR Tools SDK method names use the `indy_` prefix. This may be updated in the future as work is done on the upstream project to refactor method names to be ledger-agnostic.
 
-* `wallet_handle` - integer, which is connected to previously created and opened wallet.
-* `alias` - human-readable representation of alias to user,
+### indy_cheqd_keys_add_random
 
-As result, the next structure is expected:
-```
+This method implements the logic of identity wallet key creation just using `alias`, without specifying any other additional information, like mnemonic.
+
+#### Input parameters
+
+* `wallet_handle` (integer): Linked to previously created and opened wallet.
+* `alias` (string): Human-readable representation of alias to user,
+
+#### Example output
+
+```jsonc
 {
-    "alias":"some_alias",
-    "account_id":"cosmos1gudhsalrhsurucr5gkvga5973359etv6q0xvwz",
+    "alias": "some_alias",
+    "account_id":"cheqd1gudhsalrhsurucr5gkvga5973359etv6q0xvwz",
     "pub_key":"xSMzGopEnnTPCwjQwryDcrG9MGw3sVyb4ecYVaJrfkoA"
 }
 ```
 
-#### **indy_cheqd_keys_add_from_mnemonic**
+### indy_cheqd_keys_add_from_mnemonic
+
 This method realised logic for recovering keys from `mnemonic` string. Mnemonic string - it's a human-readable combination of words, in general can include 12 or 24 words.
 
 Input parameters:
@@ -99,12 +99,25 @@ As result, raw byte's string is expected.
 ## Pool
 
 ### List of methods
-* [`indy_cheqd_pool_add`](#indy_cheqd_pool_add)
-* [`indy_cheqd_pool_get_config`](#indy_cheqd_pool_get_config)
-* [`indy_cheqd_pool_get_all_config`](#indy_cheqd_pool_get_all_config)
-* [`indy_cheqd_pool_broadcast_tx_commit`](#indy_cheqd_pool_broadcast_tx_commit)
-* [`indy_cheqd_pool_abci_query`](#indy_cheqd_pool_abci_query)
-* [`indy_cheqd_pool_abci_info`](#indy_cheqd_pool_abci_info)
+- [VDR Tools SDK ledger connection API](#vdr-tools-sdk-ledger-connection-api)
+	- [Overview](#overview)
+	- [Identity wallet key methods](#identity-wallet-key-methods)
+		- [indy_cheqd_keys_add_random](#indy_cheqd_keys_add_random)
+			- [Input parameters](#input-parameters)
+			- [Example output](#example-output)
+		- [indy_cheqd_keys_add_from_mnemonic](#indy_cheqd_keys_add_from_mnemonic)
+			- [**indy_cheqd_keys_get_info**](#indy_cheqd_keys_get_info)
+			- [**indy_cheqd_keys_get_list_keys**](#indy_cheqd_keys_get_list_keys)
+			- [**indy_cheqd_keys_sign**](#indy_cheqd_keys_sign)
+	- [Pool](#pool)
+		- [List of methods](#list-of-methods)
+			- [**indy_cheqd_pool_add**](#indy_cheqd_pool_add)
+			- [**indy_cheqd_pool_get_config**](#indy_cheqd_pool_get_config)
+			- [**indy_cheqd_pool_get_all_config**](#indy_cheqd_pool_get_all_config)
+			- [**indy_cheqd_pool_broadcast_tx_commit**](#indy_cheqd_pool_broadcast_tx_commit)
+			- [**indy_cheqd_pool_abci_query**](#indy_cheqd_pool_abci_query)
+			- [**indy_cheqd_pool_abci_info**](#indy_cheqd_pool_abci_info)
+	- [Base connection workflow:](#base-connection-workflow)
 
 #### **indy_cheqd_pool_add**
 This method is needed for adding information about pool which will be used to connect to.
