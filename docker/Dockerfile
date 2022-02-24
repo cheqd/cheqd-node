@@ -85,7 +85,7 @@ ENTRYPOINT [ "cheqd-noded" ]
 FROM base AS node
 
 # Set runner script
-COPY --chown=cheqd:cheqd docker/persistent-chains/entrypoint.sh /bin/node-start
+COPY --chown=cheqd:cheqd docker/entrypoint.sh /bin/node-start
 RUN chmod +x /bin/node-start
 
 # Default entrypoint for cheqd-noded CLI usage
