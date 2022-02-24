@@ -78,7 +78,7 @@ Return a list of all keys stored in the local identity wallet.
 
 #### Example output
 
-```text
+```js
  [
  Object({"account_id": String("cheqd1x33xkjd3gqlfhz5l9h60m53pr2mdd4y3nc86h0"), "alias": String("alice"), "pub_key": String("fTsZShn9KkgYKyDmbP5bLhVucNuPRdo4N6zGjAfzSSgv")}), 
  Object({"account_id": String("cheqd1c4n6j030trrljqsphmw9tcrcpgdf33hd3jd0jn"), "alias": String("some_alias_2"), "pub_key": String("g2vxGLkuYg84s3UcsKSxSttNgCKoQgRBQXizzSqbHdRJ")}), 
