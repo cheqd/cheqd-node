@@ -1,15 +1,14 @@
 package types
 
-type (
-	IdentityMsg interface {
-		Validate(namespace string) error
-		GetSigners() []Signer
-		GetSignBytes() []byte
-	}
+type IdentityMsg interface {
+	ValidateDynamic(namespace string) error
+	GetSigners() []Signer
+	GetSignBytes() []byte
+}
 
-	Signer struct {
-		Signer             string
-		Authentication     []string
-		VerificationMethod []*VerificationMethod
-	}
-)
+//TODO: Get rid of this
+type Signer struct {
+	Signer             string
+	Authentication     []string
+	VerificationMethod []*VerificationMethod
+}

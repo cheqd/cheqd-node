@@ -4,9 +4,15 @@ import (
 	"encoding/base64"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/gogo/protobuf/proto"
 	"github.com/tendermint/tendermint/crypto/tmhash"
 	"reflect"
 )
+
+// StateValueData is interface uniting possible types to be used for stateValue.data field
+type StateValueData interface {
+	proto.Message
+}
 
 var _ types.UnpackInterfacesMessage = &StateValue{}
 

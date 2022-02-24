@@ -63,7 +63,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 	prefix := k.GetDidPrefix(ctx)
 
 	didMsg := msg.GetPayload()
-	if err := didMsg.Validate(prefix); err != nil {
+	if err := didMsg.ValidateDynamic(prefix); err != nil {
 		return nil, err
 	}
 

@@ -1,4 +1,4 @@
-package utils
+package validate_primitives
 
 import (
 	"github.com/stretchr/testify/require"

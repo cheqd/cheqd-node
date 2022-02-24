@@ -1,4 +1,4 @@
-package utils
+package validate_primitives
 
 import (
 	"regexp"
@@ -78,3 +78,12 @@ func IsValidDid(prefix string, did string) bool {
 	// https://github.com/cheqd/cheqd-node/blob/main/architecture/adr-list/adr-002-cheqd-did-method.md#method-specific-identifier
 	return strings.HasPrefix(did, prefix)
 }
+
+
+// For future
+did = "did:method-name:method-specific-id
+
+// Did url
+
+
+did fragment = "did#sdf"
