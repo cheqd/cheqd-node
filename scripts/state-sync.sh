@@ -2,6 +2,14 @@
 # microtick and bitcanna contributed significantly here.
 set -ux
 
+if [ -z ${1+x} ];
+then
+  echo "Node moniker must be passed as the first parameter"
+  exit 1
+else
+  export NODE_MONIKER=${1}
+fi
+
 # set environment variables
 export GOPATH=~/go
 export PATH=$PATH:~/go/bin
@@ -13,7 +21,7 @@ export APPNAME=CHEQD_NODED
 go install -tags rocksdb ./...
 
 # MAKE HOME FOLDER AND GET GENESIS
-cheqd-noded init notional-sif-relays --home /others/cheqd
+cheqd-noded init $NODE_MONIKER --home /others/cheqd
 wget -O /others/cheqd/config/genesis.json https://github.com/cheqd/cheqd-node/raw/main/persistent_chains/mainnet/genesis.json
 
 INTERVAL=1000
