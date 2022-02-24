@@ -19,7 +19,7 @@ func TestNewMsgCreateDidValidation(t *testing.T) {
 	}{
 		{true, "Valid Create Did Msg", types.NewMsgCreateDid(&types.MsgCreateDidPayload{Id: "1"}, []*types.SignInfo{{VerificationMethodId: "foo", Signature: "bar"}}), ""},
 		{false, "Payload is missed", types.NewMsgCreateDid(nil, nil), "Payload: is required"},
-		{false, "Signature is missed", types.NewMsgCreateDid(&types.MsgCreateDidPayload{Id: "1"}, nil), "Signature: is required"},
+		{false, "Signature are missed", types.NewMsgCreateDid(&types.MsgCreateDidPayload{Id: "1"}, nil), "Signatures: are required"},
 	}
 
 	for _, tc := range cases {
@@ -45,7 +45,7 @@ func TestNewMsgUpdateDidValidation(t *testing.T) {
 	}{
 		{true, "Valid Update Did Msg", types.NewMsgUpdateDid(&types.MsgUpdateDidPayload{Id: "1"}, []*types.SignInfo{{VerificationMethodId: "foo", Signature: "bar"}}), ""},
 		{false, "Payload is missed", types.NewMsgUpdateDid(nil, nil), "Payload: is required"},
-		{false, "Signature is missed", types.NewMsgUpdateDid(&types.MsgUpdateDidPayload{Id: "1"}, nil), "Signature: is required"},
+		{false, "Signatures are missed", types.NewMsgUpdateDid(&types.MsgUpdateDidPayload{Id: "1"}, nil), "Signatures: are required"},
 	}
 
 	for _, tc := range cases {
@@ -71,17 +71,17 @@ func TestMsgCreateDidPayloadPayload(t *testing.T) {
 		{
 			false,
 			&types.MsgCreateDidPayload{},
-			"Unique ID does not match DID method specification",
+			"Id: is not DID",
 		},
 		{
 			false,
 			&types.MsgCreateDidPayload{Id: ""},
-			"Unique ID does not match DID method specification",
+			"Id: is not DID",
 		},
 		{
 			false,
 			&types.MsgCreateDidPayload{Id: "did:ch:test:alice"},
-			"Unique ID does not match DID method specification",
+			"Id: is not DID",
 		},
 		{
 			false,
@@ -473,17 +473,17 @@ func TestNewMsgUpdateDidPayload(t *testing.T) {
 		{
 			false,
 			&types.MsgUpdateDidPayload{},
-			"Unique ID does not match DID method specification",
+			"Id: is not DID",
 		},
 		{
 			false,
 			&types.MsgUpdateDidPayload{Id: ""},
-			"Unique ID does not match DID method specification",
+			"Id: is not DID",
 		},
 		{
 			false,
 			&types.MsgUpdateDidPayload{Id: "did:ch:test:alice"},
-			"Unique ID does not match DID method specification",
+			"Id: is not DID",
 		},
 		{
 			false,

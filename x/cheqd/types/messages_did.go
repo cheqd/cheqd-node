@@ -39,7 +39,7 @@ func (msg *MsgCreateDid) ValidateBasic() error {
 	}
 
 	if len(msg.Signatures) == 0 {
-		return ErrBadRequestIsRequired.Wrap("Signatures")
+		return ErrBadRequestAreRequired.Wrap("Signatures")
 	}
 
 	return nil
@@ -77,7 +77,7 @@ func (msg *MsgUpdateDid) ValidateBasic() error {
 	}
 
 	if len(msg.Signatures) == 0 {
-		return ErrBadRequestIsRequired.Wrap("Signatures")
+		return ErrBadRequestAreRequired.Wrap("Signatures")
 	}
 
 	return nil

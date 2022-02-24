@@ -14,6 +14,7 @@ var (
 	ErrBadRequestInvalidVerMethod = sdkerrors.Register(ModuleName, 1003, "invalid verification method")
 	ErrBadRequestInvalidService   = sdkerrors.Register(ModuleName, 1004, "invalid service")
 	ErrBadRequestIsNotDidFragment = sdkerrors.Register(ModuleName, 1005, "is not DID fragment")
+	ErrBadRequestAreRequired      = sdkerrors.Register(ModuleName, 1006, "are required")
 	ErrInvalidSignature           = sdkerrors.Register(ModuleName, 1100, "invalid signature detected")
 	ErrDidDocExists               = sdkerrors.Register(ModuleName, 1200, "DID Doc exists")
 	ErrDidDocNotFound             = sdkerrors.Register(ModuleName, 1201, "DID Doc not found")
