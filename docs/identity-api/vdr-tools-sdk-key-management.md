@@ -4,9 +4,9 @@
 
 This page describes how [Evernym VDR Tools](https://gitlab.com/evernym/verity/vdr-tools) works with cheqd accounts in identity wallets built using the VDR Tools SDK.
 
-## Identity wallet key methods
+## Identity wallet key methods for cheqd accounts
 
-These methods below are used to manage cheqd wallets/keys within identity wallets built using VDR Tools SDK. (For example, to pay for or receive payment for transactions that need to be written to ledger.)
+These methods below are used to manage [cheqd accounts/wallets](../cheqd-cli/cheqd-cli-accounts.md) within identity wallets built using VDR Tools SDK. (For example, to pay for or receive payment for transactions that need to be written to ledger.)
 
 For compatibility purposes, VDR Tools SDK method names use the `indy_` prefix. This may be updated in the future as work is done on the upstream project to refactor method names to be ledger-agnostic.
 
