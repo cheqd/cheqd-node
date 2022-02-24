@@ -23,6 +23,7 @@ go install -tags rocksdb ./...
 # MAKE HOME FOLDER AND GET GENESIS
 cheqd-noded init "$NODE_MONIKER" --home /others/cheqd
 wget -O /others/cheqd/config/genesis.json https://github.com/cheqd/cheqd-node/raw/main/persistent_chains/mainnet/genesis.json
+wget -O /others/cheqd/config/seeds.txt https://github.com/cheqd/cheqd-node/raw/main/persistent_chains/mainnet/seeds.txt
 
 INTERVAL=1000
 
@@ -44,7 +45,7 @@ export ${APPNAME}_P2P_MAX_NUM_OUTBOUND_PEERS=500
 export ${APPNAME}_STATESYNC_RPC_SERVERS="$RPC,$RPCN"
 export ${APPNAME}_STATESYNC_TRUST_HEIGHT="$BLOCK_HEIGHT"
 export ${APPNAME}_STATESYNC_TRUST_HASH="$TRUST_HASH"
-export ${APPNAME}_P2P_SEEDS="258a9bfb822637bfca87daaab6181c10e7fd0910@seed1.eu.cheqd.net:26656,f565ff792b20977face9817df6acb268d41d4092@seed2.eu.cheqd.net:26656,388947cc7d901c5c06fedc4c26751634564d68e6@seed3.eu.cheqd.net:26656,9b30307a2a2819790d68c04bb62f5cf4028f447e@seed1.ap.cheqd.net:26656,debcb3fa7d40e681d98bcc7d22278fd58a34b73a@144.76.183.180:1234,abd4be300be882ae9a69ab0959260afe8871f7a6@165.232.167.156:26656,fd17fe46e8b69bfa006b3fba53cfc9df2b8f9512@161.35.177.151:26656"
+export ${APPNAME}_P2P_SEEDS="$(cat /others/cheqd/config/seeds.txt)"
 
 
 cheqd-noded start --x-crisis-skip-assert-invariants --home /others/cheqd --grpc-web.address 127.0.0.1:5050
