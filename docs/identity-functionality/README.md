@@ -1,8 +1,8 @@
-# Client-app Identity APIs
+# Decentralised identity functionality
 
 ## Overview
 
-This page describes how identity domain transactions need to be implemented by client-side applications/libraries such as [`cheqd-sdk`](https://github.com/cheqd/cheqd-sdk) (forked from [Evernym VDR Tools](https://gitlab.com/evernym/verity/vdr-tools)).
+This page describes how identity domain transactions need to be implemented by client-side applications/libraries such as [Evernym VDR Tools](https://gitlab.com/evernym/verity/vdr-tools).
 
 Details on how identity transactions are defined is available in [ADR 002: Identity entities and transactions](../../architecture/adr-list/adr-002-cheqd-did-method.md).
 
