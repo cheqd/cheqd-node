@@ -1,6 +1,6 @@
 #!/bin/bash
 # microtick and bitcanna contributed significantly here.
-set -ux
+set -euox pipefail
 
 if [ -z ${1+x} ];
 then
