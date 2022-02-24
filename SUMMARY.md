@@ -25,6 +25,8 @@
   * [Docker Compose Based Localnet](docs/build-and-networks/local-docker-compose-network.md)
   * [Setting up a new network](docs/build-and-networks/manual-network-setup.md)
 * [Client-app Identity APIs](docs/identity-api/README.md)
+  * [Account and key management in VDR Tools SDK](docs/identity-api/vdr-tools-sdk-accounts-keys.md)
+  * [Ledger connections in VDR Tools SDK](docs/identity-api/vdr-tools-sdk-ledger-connection.md)
   * [Error messages](docs/identity-api/identity-api-error-messages.md)
 
 ## Architecture
