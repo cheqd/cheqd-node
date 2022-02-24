@@ -23,12 +23,12 @@ For example, an identity wallet application or backend application would need to
 
 Cosmos SDK uses [known algorithms for deriving private keys from mnemonics](https://docs.cosmos.network/master/basics/accounts.html#keyring). This can be replicated using standard crypto libraries to carry out the same steps as in Cosmos SDK:
 
-    ```text
-    rounds of iteration :    2048
-    length              :    64
-    algorithm           :    sha512
-    salt                :    "mnemonic" + passphrase
-    ```
+```text
+rounds of iteration :    2048
+length              :    64
+algorithm           :    sha512
+salt                :    "mnemonic" + passphrase
+```
 
 The mnemonic above is assumed to be a pre-existing one [cheqd/Cosmos CLI](../../docs/cheqd-cli/cheqd-cli-accounts.md). The "passphrase" above is user-defined, and defaults to blank if not defined.
 
