@@ -2,7 +2,6 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/go-playground/validator/v10"
 )
 
 var _ sdk.Msg = &MsgUpdateDid{}
@@ -32,7 +31,10 @@ func (msg *MsgUpdateDid) GetSignBytes() []byte {
 }
 
 func (msg *MsgUpdateDid) ValidateBasic() error {
-	validate := validator.New()
+	validate, err := BuildValidator(nil)
+	if err != nil {
+		return ErrInternal.Wrapf("can't init validator: %s", err.Error())
+	}
 
 	if err := validate.Struct(msg); err != nil {
 		return ErrBadRequest.Wrapf("basic validation failed: %s", err.Error())

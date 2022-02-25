@@ -22,5 +22,6 @@ var (
 	ErrInvalidPublicKey           = sdkerrors.Register(ModuleName, 1204, "invalid public key")
 	ErrInvalidDidStateValue       = sdkerrors.Register(ModuleName, 1300, "invalid did state value")
 	ErrSetToState                 = sdkerrors.Register(ModuleName, 1304, "cannot set to state")
+	ErrInternal                   = sdkerrors.Register(ModuleName, 1500, "internal error")
 	ErrNotImplemented             = sdkerrors.Register(ModuleName, 1501, "not implemented")
 )
