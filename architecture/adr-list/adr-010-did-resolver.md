@@ -34,8 +34,9 @@ Inconsistencies to be corrected:
 ## Consequences
 
 ### Cheqd resolver
-### Option 1. (chosen)
-Host the resolver separately from the ledger as an additional web service. Interaction with other applications and resolvers will implement the following schema:
+### Option 1 (chosen)
+Host the resolver separately from the ledger as an additional web service. Interaction with other applications and resolvers will implement [the following schema] (https://drive.google.com/file/d/1pKL9I5fMhZ3TnAdkCiRTs53Y7zs9cGiv/view?usp=sharinghttps://drive.google.com/file/d/1pKL9I5fMhZ3TnAdkCiRTs53Y7zs9cGiv/view?usp=sharing):
+![cheqd did resolver](assets/adr010-DID-resolver-Diagram.png)
 
 #### Positive
 * Updating the resolver software does not need updating the application on the node side
@@ -43,34 +44,33 @@ Host the resolver separately from the ledger as an additional web service. Inter
 
 #### Negative
 * Longer chain of trust. As a result, more resources required by the client to maintain the security of the system (`node + resolver` instead of `node`)
-The web application at this stage will implement simple functionality that meets the requirements and can be a lightweight architecture of threads without synchronization. Just several classes without the use of complex design patterns.
 
-### Option 2.
+The web application at this stage will implement simple functionality that can be a lightweight architecture of threads without synchronization. Just several classes without the use of complex design patterns.
+
+### Option 2
 Put the resolver inside Cheqd-node as a new module or as a new handler (keeper) inside the node application.
 
 #### Positive
-  The presentation of the data takes place next to the base where the data is stored. This
+The presentation of the data takes place next to the base where the data is stored. This
     * speeds up the process due to because of unnecessary data transferring between services
     * does not allow compromising the resolver, only the entire node, which is a more difficult task
 * fault tolerance and availability of the blockchain network is higher than a single web server
+
 #### Negative
 * Unable to update resolver without updating node. However, expanding the functionality without breaking changes is also possible with minor releases, which allows update the node without upgrade transaction.
 
-# Web service requirements
+### Web service requirements
  helping to define its architecture in detail:
-- Parallel executing of requests
-- Synchronous execution of client requests
-- Marshal/unmarshal JSON - object - protobuff
-- Programming language: Go(?)
+* Parallel executing of requests
+* Synchronous execution of client requests
+* Marshal/unmarshal JSON - object - protobuff
+* Programming language: Go(?)
 
-
-### Neutral
-
-{neutral consequences}
 
 ## References
 
-* {reference link}
+- [W3C Decentralized Identifiers (DIDs)](https://www.w3.org/TR/did-core/) specification
+    - [DID Core Specification Test Suite](https://w3c.github.io/did-test-suite/)
 
 ## Unresolved questions
 
