@@ -11,24 +11,25 @@
 | **Start Date** | 2022-02-22 |
 
 
-
 ## Summary
 
 This document defines the architecture of two DID resolvers: Cheqd DID resolver and a universal DID resolver driver for integration with Universal resolver.
 
 ## Context
- 
-{}
+
+First, let's look at the discrepancies between the DID Doc model stored in the ledger and the format from the specification. Data is written to the ledger based on protobuffs, which is due to the use of the Cosmos framework. However, according to the specification, DID Doc must be provided in JSON format, which provides more features that are not achievable in protobuffs.
+Therefore, a new DID resolver is needed.
 
 ## Decision
 
 Add a new web application for did-resolver
 
-First, let's look at the discrepancies between the DID Doc model stored in the ledger and the format from the specification. Data is written to the ledger based on protobuffs, which is due to the use of the Cosmos framework. However, according to the specification, DID Doc must be provided in JSON format, which provides more features that are not achievable in protobuffs.
-Inconsistencies to be corrected:
+Inconsistencies between DIDDoc from the ledger and specification that should be corrected:
 * Rename "context" to "@context" - will be done on the ledger side
 * Change snake_case to camelCase for field names - will be done on Cheqd resolver side using the marshaller setting
 * Remove empty lists  - will be done on Cheqd resolver side using the marshaller setting
+* Convert a list of pairs to a map for jwk_pubkey and other cases
+* In metadata make `did` property to be of `DID` type instead of `Any`
 * DID URL Dereferencing: handle links to provide DID fragments and convert them to the desired format - Cheqd DID resolver functionality.
 
 ## Consequences
@@ -62,9 +63,9 @@ The presentation of the data takes place next to the base where the data is stor
 ### Web service requirements
  helping to define its architecture in detail:
 * Parallel executing of requests
-* Synchronous execution of client requests
+* Synchronous replying for client requests (?)
 * Marshal/unmarshal JSON - object - protobuff
-* Programming language: Go(?)
+* Programming language: Go (?)
 
 
 ## References
@@ -74,5 +75,5 @@ The presentation of the data takes place next to the base where the data is stor
 
 ## Unresolved questions
 
-Should the web service find another node for the request if it is not possible to connect to the node? So will the web service have a pool of trusted nodes for requesting?
-
+* Should the web service find another node for the request if it is not possible to connect to the node? So will the web service have a pool of trusted nodes for requesting?
+* Synchronous replying for client requests?
