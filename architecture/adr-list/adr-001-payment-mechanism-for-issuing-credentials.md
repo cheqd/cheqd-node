@@ -184,7 +184,7 @@ Holder -> Issuer: Accept
 ### Positive
 
 * By defining the payment mechanism using Hyperledger Aries protocols, this allows the possibility in the future to support payments on multiple networks.
-* Existing SSI app developers should already be familiar with Hyperledger Aries \(if building on Hyperledger Indy\) and provides a transition path to add new functionality.
+* Existing SSI app developers should already be familiar with Hyperledger Aries (if building on Hyperledger Indy) and provides a transition path to add new functionality.
 
 ### Negative
 

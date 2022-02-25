@@ -53,8 +53,8 @@ While the instructions listed here are specific to the cheqd testnet, a similar 
 When you have a node successfully installed, please fill out our [**mainnet node operator onboarding form**](http://cheqd.link/mainnet-onboarding). You will need to have the following details on hand to fill out the form:
 
 1. Node ID for your node
-2. IP address / DNS record that points to the node \(if you're using an IP address, a static IP is recommended\)
-3. Peer-to-peer \(P2P\) connection port \(defaults to `26656`\)
+2. IP address / DNS record that points to the node (if you're using an IP address, a static IP is recommended)
+3. Peer-to-peer (P2P) connection port (defaults to `26656`)
 4. Validator account address (begins with `cheqd1`)
 5. Moniker (nickname/moniker that is set for your mainnet node)
 
@@ -65,8 +65,8 @@ Once you have successfully completed the steps above, please fill out our [**nod
 You will need to have the following details on hand to fill out the form:
 
 1. Node ID for your node
-2. IP address / DNS record that points to the node \(if you're using an IP address, a static IP is recommended\)
-3. Peer-to-peer \(P2P\) connection port \(default is `26656`\)
+2. IP address / DNS record that points to the node (if you're using an IP address, a static IP is recommended)
+3. Peer-to-peer (P2P) connection port (default is `26656`)
 4. Validator account address (begins with `cheqd`)
 
 If you need help or support, join our [**cheqd Community Slack**](http://cheqd.link/join-cheqd-slack) and [ask for help](https://cheqd-community.slack.com/archives/C02AQ9UK4HY).
@@ -91,7 +91,7 @@ If you need help or support, join our [**cheqd Community Slack**](http://cheqd.l
 
 3. **Promote your node to validator status by staking your token balance**
 
-   You can decide how many tokens you would like to stake from your account balance. For instance, you may want to leave a portion of the balance for paying transaction fees \(now and in the future\).
+   You can decide how many tokens you would like to stake from your account balance. For instance, you may want to leave a portion of the balance for paying transaction fees (now and in the future).
 
    To promote to validation, submit a `create-validator` transaction to the network:
 

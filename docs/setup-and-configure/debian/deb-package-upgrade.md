@@ -26,7 +26,7 @@ However, as best practice we recommend backing up the [app data directories for 
 
 2. **Stop the existing `cheqd-noded` service**
 
-   To stop the `cheqd-noded` service \(with `sudo` privileges or as `root` user, if necessary\):
+   To stop the `cheqd-noded` service (with `sudo` privileges or as `root` user, if necessary):
 
    ```bash
     systemctl stop cheqd-noded
@@ -40,7 +40,7 @@ However, as best practice we recommend backing up the [app data directories for 
 
 3. **Install the new .deb package version**
 
-   Install the `cheqd-node` package downloaded in step 1 \(with `sudo` privileges or as `root` user, if necessary\):
+   Install the `cheqd-node` package downloaded in step 1 (with `sudo` privileges or as `root` user, if necessary):
 
    ```bash
    dpkg -i <path/to/package>
@@ -48,7 +48,7 @@ However, as best practice we recommend backing up the [app data directories for 
 
 4. **Re-start the `cheqd-noded` service and confirm it is running**
 
-   To start the `cheqd-noded` service \(with `sudo` privileges or as `root` user, if necessary\):
+   To start the `cheqd-noded` service (with `sudo` privileges or as `root` user, if necessary):
 
    ```bash
    systemctl start cheqd-noded

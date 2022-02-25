@@ -1,10 +1,10 @@
-# Architecture Decision Record \(ADR\) Process
+# Architecture Decision Record (ADR) Process
 
 This is a location to record all high-level architecture decisions for **`cheqd-node`**, the server/node portion of purpose-built network for decentralised identity.
 
-An Architectural Decision \(**AD**\) is a software design choice that addresses a functional or non-functional requirement that is architecturally significant.
+An Architectural Decision (**AD**) is a software design choice that addresses a functional or non-functional requirement that is architecturally significant.
 
-An Architectural Decision Record \(**ADR**\) captures a single AD, such as often done when writing personal notes or meeting minutes; the collection of ADRs created and maintained in a project constitute its decision log.
+An Architectural Decision Record (**ADR**) captures a single AD, such as often done when writing personal notes or meeting minutes; the collection of ADRs created and maintained in a project constitute its decision log.
 
 ## Rationale
 

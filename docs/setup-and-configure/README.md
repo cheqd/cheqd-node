@@ -2,7 +2,7 @@
 
 ## Context
 
-This document describes how to use install and configure a new instance of `cheqd-node` from pre-built packages and adding it to an existing network \(such as the cheqd testnet\) as an observer or validator.
+This document describes how to use install and configure a new instance of `cheqd-node` from pre-built packages and adding it to an existing network (such as the cheqd testnet) as an observer or validator.
 
 For other scenarios, please see [setting up a new network from scratch](../build-and-networks/manual-network-setup.md) and [building `cheqd-node` from source](../build-and-networks/README.md).
 
@@ -69,7 +69,7 @@ The [RPC endpoints for a node](https://docs.tendermint.com/master/rpc/) provide 
 * TLS for the RPC port can also be setup separately. Currently, TLS setup is not automatically carried out in the install process described below.
 * The default RPC port can be changed in `$HOME/.cheqdnode/config/config.toml`.
 
-### Sentry nodes \(optional\)
+### Sentry nodes (optional)
 
 Tendermint allows more complex setups in production, where the ingress/egress to a validator node is [proxied behind a "sentry" node](https://docs.tendermint.com/master/nodes/validators.html#setting-up-a-validator).
 

@@ -133,7 +133,7 @@ This document provides guidance on how to install and configure a node for the c
 
    This is especially important if the node has no public IP address, e.g., if it's in a private subnet with traffic routed via a load balancer or proxy. Without the `external-address` property, the node will report a private IP address from its own host network interface as its `remote_ip`, which will be unreachable from the outside world. The node still works in this configuration, but only with limited unidirectional connectivity.
 
-10. **Make the RPC endpoint available externally** \(optional\)
+10. **Make the RPC endpoint available externally** (optional)
 
       This step is necessary only if you want to allow incoming client application connections to your node. Otherwise, the node will be accessible only locally. Further details about the RPC endpoints is available in the [cheqd node setup guide](../README.md).
 
@@ -143,7 +143,7 @@ This document provides guidance on how to install and configure a node for the c
 
 11. **Enable and start the `cheqd-noded` system service**
 
-      If you are prompted for a password for the `cheqd` user, type `exit` to logout and then attempt to execute this as a privileged user \(with `sudo` privileges or as root user, if necessary\).
+      If you are prompted for a password for the `cheqd` user, type `exit` to logout and then attempt to execute this as a privileged user (with `sudo` privileges or as root user, if necessary).
 
       ```bash
       $ systemctl enable cheqd-noded
