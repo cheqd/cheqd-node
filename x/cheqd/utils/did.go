@@ -1,4 +1,4 @@
-package validate
+package utils
 
 //Old implementation
 //var DidForbiddenSymbolsRegexp, _ = regexp.Compile(`^[^#?&/\\]+$`)
@@ -88,9 +88,10 @@ func IsValidDID(did string, allowedNamespaces []string) bool {
 	return err == nil
 }
 
-func SlitDID(did string) (method string, namespace string, id string, err error) {
+// SplitDID panics if did is not valid
+func SplitDID(did string) (method string, namespace string, id string) {
 	// TODO: Implement
-	return "", "", "", nil
+	return "", "", ""
 }
 
 // DIDUrl: did:namespace:id[/path][?query][#fragment]
@@ -108,7 +109,8 @@ func IsValidDIDUrl(didUrl string, allowedNamespaces []string) bool {
 	return err == nil
 }
 
-func SlitDIDUrl(didUrl string) (method string, namespace string, id string, path string, query string, fragment string, err error) {
+// SplitDIDUrl panics if did is not valid
+func SplitDIDUrl(didUrl string) (method string, namespace string, id string, path string, query string, fragment string) {
 	// TODO: Implement
-	return "", "", "", "", "", "", nil
+	return "", "", "", "", "", ""
 }

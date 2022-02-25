@@ -3,6 +3,7 @@ package cheqdid.cheqdnode.cheqd.v1;
 
 option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
+import "gogoproto/gogo.proto";
 import "google/protobuf/any.proto";
 import "cheqd/v1/common.proto";
 
@@ -21,11 +22,11 @@ message Did {
 }
 
 message VerificationMethod {
-  string id = 1;
+  string id = 1  [(gogoproto.moretags) = "validate:\"required,did-url,did-url-no-path,did-url-no-query,did-url-fragment\""];
   string type = 2;
   string controller = 3;
-  repeated KeyValuePair public_key_jwk = 4; // optional
-  string public_key_multibase = 5; // optional
+  repeated KeyValuePair public_key_jwk = 4 [(gogoproto.moretags) = "validate:\"required_without_all=PublicKeyMultibase\""];
+  string public_key_multibase = 5 [(gogoproto.moretags) = "validate:\"required_without_all=PublicKeyJwk\""];
 }
 
 message Service {
@@ -33,5 +34,3 @@ message Service {
   string type = 2;
   string service_endpoint = 3;
 }
-
-

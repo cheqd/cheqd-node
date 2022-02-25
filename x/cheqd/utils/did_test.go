@@ -1,4 +1,4 @@
-package validate
+package utils
 
 //func TestIsDid(t *testing.T) {
 //	cases := []struct {

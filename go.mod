@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce
-	github.com/cosmos/cosmos-sdk v0.44.5
+	github.com/cosmos/cosmos-sdk v0.45.1
 	github.com/cosmos/ibc-go v1.2.3
 	github.com/go-playground/validator/v10 v10.10.0
 	github.com/gogo/protobuf v1.3.3
