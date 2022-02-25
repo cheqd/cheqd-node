@@ -844,7 +844,7 @@ func TestNewMsgUpdateDidPayload(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		err := tc.msg.ValidateDynamic(Prefix)
+		err := tc.msg.Validate(Prefix)
 
 		if tc.valid {
 			require.Nil(t, err)
