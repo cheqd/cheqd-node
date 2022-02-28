@@ -10,19 +10,23 @@ For other scenarios, please see [setting up a new network from scratch](../build
 
 ### Hardware requirements
 
+For most nodes, the RAM/vCPU requirements are relatively static and do not change over time. However, the disk storage space needs to grow as the chain grows and will evolve over time.
+
+It is recommended to provide the disk storage as an expandable volume/partition that is mounted on your node configuration data path (the default is under `/home/cheqd`) so that it can be expanded independent of the root volume.
+
+Extended information on [recommended hardware requirements is available in Tendermint documentation](https://docs.tendermint.com/v0.35/nodes/running-in-production.html#hardware). The figures below have been updated from the default Tendermint recommendations to account for current cheqd network chain size, real-world usage accounting for requests nodes need to handle, etc.
+
 #### Minimum specifications
 
-* 1GB RAM
-* 25GB of disk space
-* 1.4 GHz CPU
+* 2 GB RAM
+* x64 1.4 GHz 1 vCPU (or equivalent)
+* 120 GB of disk space
 
 #### Recommended specifications
 
-* 2GB RAM
-* 100GB SSD
-* x64 2.0 GHz 2v CPU
-
-Extended information on [recommended hardware requirements is available in Tendermint documentation](https://docs.tendermint.com/v0.3.4/nodes/running-in-production.html#hardware).
+* 4 GB RAM
+* x64 2.0 GHz 2 vCPU (or equivalent)
+* 150 GB SSD
 
 ### Operating system
 
