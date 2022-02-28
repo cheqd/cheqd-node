@@ -52,7 +52,7 @@ Node operators should ensure there are no existing services running on these por
 
 The P2P port is used for peer-to-peer communication between nodes.
 
-Further details on [how P2P settings work is defined in Tendermint documentation](https://docs.tendermint.com/v0.3.4/nodes/configuration.html#p2p-settings).
+Further details on [how P2P settings work is defined in Tendermint documentation](https://docs.tendermint.com/v0.35/nodes/configuration.html#p2p-settings).
 
 * By default, the P2P port is set to `26656`.
 * Inbound and outbound TCP connections must be allowed from any IPv4 address range.
@@ -66,7 +66,7 @@ During node configuration for cheqd testnet, the RPC port is needed to transfer 
 
 Beyond this stage, it is up to a node operator whether they want this port to be exposed to the public internet.
 
-The [RPC endpoints for a node](https://docs.tendermint.com/v0.3.4/rpc/) provide REST, JSONRPC over HTTP, and JSONRPC over WebSockets. These API endpoints can provide useful information for node operators, such as healthchecks, network information, validator information etc.
+The [RPC endpoints for a node](https://docs.tendermint.com/master/rpc/) provide REST, JSONRPC over HTTP, and JSONRPC over WebSockets. These API endpoints can provide useful information for node operators, such as healthchecks, network information, validator information etc.
 
 * By default, the RPC port is set to `26657`
 * Inbound and outbound TCP connections should be allowed from destinations desired by the node operator. The default is to allow this from any IPv4 address range.
@@ -75,7 +75,7 @@ The [RPC endpoints for a node](https://docs.tendermint.com/v0.3.4/rpc/) provide 
 
 ### Sentry nodes (optional)
 
-Tendermint allows more complex setups in production, where the ingress/egress to a validator node is [proxied behind a "sentry" node](https://docs.tendermint.com/v0.3.4/nodes/validators.html#setting-up-a-validator).
+Tendermint allows more complex setups in production, where the ingress/egress to a validator node is [proxied behind a "sentry" node](https://docs.tendermint.com/v0.35/nodes/validators.html#setting-up-a-validator).
 
 While this setup is not compulsory, node operators with higher stakes or a need to have more robust network security may consider setting up a sentry-validator node architecture.
 
@@ -91,5 +91,5 @@ Follow the guide for your preferred installation method:
 
 ## Further information
 
-* Tendermint documentation has [best practices for running a Cosmos node in production](https://docs.tendermint.com/v0.3.4/nodes/running-in-production.html).
-* [Сosmosvisor could be used for automatic upgrades](https://docs.cosmos.network/master/run-node/cosmovisor.html); however in our testing so far this method has not been reliable and is therefore currently not recommended.
+* Tendermint documentation has [best practices for running a Cosmos node in production](https://docs.tendermint.com/v0.35/nodes/running-in-production.html).
+* [Сosmovisor could be used for automatic upgrades](https://docs.cosmos.network/master/run-node/cosmovisor.html); however in our testing so far this method has not been reliable and is therefore currently not recommended.
