@@ -50,7 +50,7 @@ func TestVerificationMethodValidation(t *testing.T) {
 		//},
 	}
 
-	validate, err := BuildValidator("", nil)
+	validate, err := BuildValidator(DidMethod, nil)
 	if err != nil {
 		t.Errorf("%s", err.Error())
 	}

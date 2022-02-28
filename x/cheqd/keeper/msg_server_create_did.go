@@ -15,45 +15,55 @@ import (
 func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*types.MsgCreateDidResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// Validate did method and namespace
+	// Basic validation + DID namespaces
 	namespace := k.GetDidNamespace(ctx)
-	validator, err := types.BuildValidator(types.DidMethod, []string{namespace, ""})	// TODO: Check requirements
+	validator, err := types.BuildValidator(types.DidMethod, []string{namespace, ""})
 	if err != nil {
 		return nil, types.ErrValidatorInitialisation.Wrap(err.Error())
 	}
 
 	err = validator.Struct(msg)
 	if err != nil {
-		return nil, types.ErrBasicValidation.Wrap(err.Error())
+		return nil, types.ErrNamespaceValidation.Wrap(err.Error())
 	}
 
+	// Static
+	// Verification methods -> no duplicates
+	// Verification methods -> valid types, corresponding properties are set
+	// Verification relationships -> no duplicates
+	// Verification relationships -> valid references
+	// Services -> valid types
 
-	payload := msg.GetPayload()
-	if err := payload.Validate(didPrefix); err != nil {
-		return nil, err
+	// Dynamic
+
+	// Validate DID doesn't exist
+	if k.HasDid(ctx, msg.Payload.Id) {
+		return nil, types.ErrDidDocExists.Wrap(msg.Payload.Id)
 	}
 
-	if err := k.ValidateDidControllers(&ctx, payload.Id, payload.Controller, payload.VerificationMethod); err != nil {
-		return nil, err
-	}
+	// Verify that all controllers have at least one authentication key of supported type
+	controllers :=
+	//if err := k.ValidateDidControllers(&ctx, payload.Id, payload.Controller, payload.VerificationMethod); err != nil {
+	//	return nil, err
+	//}
 
+
+	// Verify signatures
 	if err := k.VerifySignature(&ctx, payload, payload.GetSigners(), msg.GetSignatures()); err != nil {
 		return nil, err
 	}
 
-	// Checks that the did doesn't exist
-	if k.HasDid(ctx, payload.Id) {
-		return nil, sdkerrors.Wrapf(types.ErrDidDocExists, "DID is already used by DIDDoc %s", payload.Id)
-	}
-
-	did := payload.ToDID()
+	// Build DID and metadata
+	did := msg.Payload.ToDID()
 	metadata := types.NewMetadataFromContext(ctx)
 
+	// Write to state
 	id, err := k.AppendDid(ctx, did, &metadata)
 	if err != nil {
 		return nil, err
 	}
 
+	// Build response
 	return &types.MsgCreateDidResponse{
 		Id: *id,
 	}, nil
@@ -106,29 +116,9 @@ func ValidateVerificationMethods(namespace string, did string, vms []*Verificati
 			return ErrBadRequestInvalidVerMethod.Wrap(sdkerrors.Wrapf(err, "index %d, value %s", i, vm.Id).Error())
 		}
 	}
-
-	for i, vm := range vms {
-		if !strings.HasPrefix(vm.Id, did) {
-			return ErrBadRequestInvalidVerMethod.Wrapf("%s not belong %s DID Doc", vm.Id, did)
-		}
-
-		if IncludeVerificationMethod(did, vms[i+1:], vm.Id) {
-			return ErrBadRequestInvalidVerMethod.Wrapf("%s is duplicated", vm.Id)
-		}
-	}
-
-	return nil
 }
 
 func ValidateVerificationMethod(namespace string, vm *VerificationMethod) error {
-	if !utils.IsFullDidFragment(namespace, vm.Id) {
-		return ErrBadRequestIsNotDidFragment.Wrap(vm.Id)
-	}
-
-	if len(vm.PublicKeyMultibase) != 0 && len(vm.PublicKeyJwk) != 0 {
-		return ErrBadRequest.Wrap("contains multiple verification material properties")
-	}
-
 	switch utils.GetVerificationMethodType(vm.Type) {
 	case utils.PublicKeyJwk:
 		if len(vm.PublicKeyJwk) == 0 {

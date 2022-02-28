@@ -21,6 +21,7 @@ var (
 	ErrUnexpectedDidVersion       = sdkerrors.Register(ModuleName, 1203, "unexpected DID version")
 	ErrInvalidPublicKey           = sdkerrors.Register(ModuleName, 1204, "invalid public key")
 	ErrBasicValidation            = sdkerrors.Register(ModuleName, 1205, "basic validation failed")
+	ErrNamespaceValidation        = sdkerrors.Register(ModuleName, 1205, "DID namespace validation failed")
 	ErrInvalidDidStateValue       = sdkerrors.Register(ModuleName, 1300, "invalid did state value")
 	ErrSetToState                 = sdkerrors.Register(ModuleName, 1304, "cannot set to state")
 	ErrInternal                   = sdkerrors.Register(ModuleName, 1500, "internal error")

@@ -14,6 +14,7 @@ func NewVerificationMethod(id string, type_ string, controller string, publicKey
 	}
 }
 
+// TODO: Think about different key types
 func (v VerificationMethod) GetPublicKey() ([]byte, error) {
 	if len(v.PublicKeyMultibase) > 0 {
 		_, key, err := multibase.Decode(v.PublicKeyMultibase)

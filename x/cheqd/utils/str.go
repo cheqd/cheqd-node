@@ -24,8 +24,39 @@ func Filter(vs []string, f func(string) bool) []string {
 	return vsf
 }
 
-func Subtract(from []string, value []string) []string {
-	return Filter(from, func(s string) bool {
-		return !Contains(value, s)
-	})
+func Subtract(minuend []string, subtrahend []string) []string {
+	m := map[string]bool{}
+
+	for _, v := range minuend {
+		m[v] = true
+	}
+
+	for _, v := range subtrahend {
+		delete(m, v)
+	}
+
+	result := make([]string, 0, len(m))
+
+	for k, _ := range m {
+		result = append(result, k)
+	}
+
+	return result
+}
+
+// Unique returns a copy of the passed array with duplicates removed
+func Unique(array []string) []string {
+	m := map[string]bool{}
+
+	for _, v := range array {
+		m[v] = true
+	}
+
+	result := make([]string, 0, len(m))
+
+	for k, _ := range m {
+		result = append(result, k)
+	}
+
+	return result
 }
