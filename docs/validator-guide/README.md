@@ -2,11 +2,7 @@
 
 This document provides guidance on how configure and promote a cheqd node to validator status. Having a validator node is necessary to participate in staking rewards, block creation, and governance.
 
-## Pre-requisites to promoting a node to validator on cheqd testnet
-
-While the instructions listed here are specific to the cheqd testnet, a similar process is applicable to any network.
-
-### Preparation steps
+## Preparation steps
 
 1. **Ensure you have a cheqd node installed as a service**
 
@@ -14,13 +10,13 @@ While the instructions listed here are specific to the cheqd testnet, a similar 
 
    Please also ensure the node is fully caught up with the latest ledger updates.
 
-   1. [Debian package install](debian/deb-package-install.md)
-   2. [Docker install](docker-install.md)
-   3. [Binary install](binary-install.md)
+   1. [Debian package install](../setup-and-configure/debian/deb-package-install.md)
+   2. [Docker install](../setup-and-configure/docker-install.md)
+   3. [Binary install](../setup-and-configure/binary-install.md)
 
 2. **Generate a new account key**
 
-   Follow the guidance on [using cheqd CLI to manage keys](../cheqd-cli/cheqd-cli-key-management.md) to create a new account key.
+   Follow the guidance on [using cheqd CLI to manage keys](../cheqd-cli/cheqd-cli-accounts.md) to create a new account key.
 
    ```bash
    cheqd-noded keys add <alias>
