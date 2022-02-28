@@ -5,18 +5,18 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-func BuildValidator(allowedDIDNamespaces []string) (*validator.Validate, error) {
+func BuildValidator(DIDMethod string, allowedDIDNamespaces []string) (*validator.Validate, error) {
 	validate := validator.New()
 
 	err := validate.RegisterValidation("did", func(fl validator.FieldLevel) bool {
-		return utils.IsValidDID(fl.Field().String(), allowedDIDNamespaces)
+		return utils.IsValidDID(fl.Field().String(), DIDMethod, allowedDIDNamespaces)
 	})
 	if err != nil {
 		return nil, err
 	}
 
 	err = validate.RegisterValidation("did-url", func(fl validator.FieldLevel) bool {
-		return utils.IsValidDIDUrl(fl.Field().String(), allowedDIDNamespaces)
+		return utils.IsValidDIDUrl(fl.Field().String(), DIDMethod, allowedDIDNamespaces)
 	})
 	if err != nil {
 		return nil, err
@@ -38,7 +38,7 @@ func BuildValidator(allowedDIDNamespaces []string) (*validator.Validate, error) 
 		return nil, err
 	}
 
-	err = validate.RegisterValidation("did-url-fragment", func(fl validator.FieldLevel) bool {
+	err = validate.RegisterValidation("did-url-with-fragment", func(fl validator.FieldLevel) bool {
 		_, _, _, _, _, fragment := utils.SplitDIDUrl(fl.Field().String())
 		return fragment != ""
 	})

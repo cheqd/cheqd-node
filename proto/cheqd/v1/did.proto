@@ -22,7 +22,7 @@ message Did {
 }
 
 message VerificationMethod {
-  string id = 1  [(gogoproto.moretags) = "validate:\"required,did-url,did-url-no-path,did-url-no-query,did-url-fragment\""];
+  string id = 1 [(gogoproto.moretags) = "validate:\"required,did-url,did-url-no-path,did-url-no-query,did-url-with-fragment\""];
   string type = 2;
   string controller = 3;
   repeated KeyValuePair public_key_jwk = 4 [(gogoproto.moretags) = "validate:\"required_without_all=PublicKeyMultibase\""];

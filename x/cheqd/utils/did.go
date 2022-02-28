@@ -78,13 +78,13 @@ package utils
 
 // DID
 
-func ValidateDID(did string, allowedNamespaces []string) error {
+func ValidateDID(did string, method string, allowedNamespaces []string) error {
 	// TODO: Implement
 	return nil
 }
 
-func IsValidDID(did string, allowedNamespaces []string) bool {
-	err := ValidateDID(did, allowedNamespaces)
+func IsValidDID(did string, method string, allowedNamespaces []string) bool {
+	err := ValidateDID(did, method, allowedNamespaces)
 	return err == nil
 }
 
@@ -99,13 +99,13 @@ func SplitDID(did string) (method string, namespace string, id string) {
 // TODO: Is service -> id URI or DIDUrl? What should we support?
 // https://www.w3.org/TR/did-core/#did-url-syntax
 
-func ValidateDIDUrl(didUrl string, allowedNamespaces []string) error {
+func ValidateDIDUrl(didUrl string, method string, allowedNamespaces []string) error {
 	// TODO: Implement
 	return nil
 }
 
-func IsValidDIDUrl(didUrl string, allowedNamespaces []string) bool {
-	err := ValidateDIDUrl(didUrl, allowedNamespaces)
+func IsValidDIDUrl(didUrl string, method string, allowedNamespaces []string) bool {
+	err := ValidateDIDUrl(didUrl, method, allowedNamespaces)
 	return err == nil
 }
 

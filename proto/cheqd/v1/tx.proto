@@ -31,8 +31,8 @@ message SignInfo {
 
 message MsgCreateDidPayload {
   repeated string context = 1;
-  string id = 2 [(gogoproto.moretags) = "validate:\"required\""];
-  repeated string controller = 3;
+  string id = 2 [(gogoproto.moretags) = "validate:\"required\""]; //did
+  repeated string controller = 3; // did-array
   repeated VerificationMethod verification_method = 4;
   repeated string authentication = 5;
   repeated string assertion_method = 6;

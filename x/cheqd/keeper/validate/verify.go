@@ -1,4 +1,4 @@
-package keeper
+package validate
 
 import (
 	"crypto/ed25519"

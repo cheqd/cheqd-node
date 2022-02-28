@@ -1,19 +1,10 @@
-package keeper
+package validate
 
 import (
 	"crypto/ed25519"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
-
-func (k *Keeper) GetDidPrefix(ctx sdk.Context) string {
-	prefix := types.DidPrefix + ":" + types.DidMethod + ":"
-	namespace := k.GetDidNamespace(ctx)
-	if len(namespace) > 0 {
-		prefix = prefix + namespace + ":"
-	}
-	return prefix
-}
 
 func FindPublicKey(signer types.Signer, id string) (ed25519.PublicKey, error) {
 	for _, authentication := range signer.Authentication {

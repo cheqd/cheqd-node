@@ -14,8 +14,6 @@ const (
 	QuerierRoute = ModuleName
 
 	DidMethod = ModuleName
-
-	DidPrefix = "did"
 )
 
 func KeyPrefix(p string) []byte {

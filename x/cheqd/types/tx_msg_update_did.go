@@ -31,13 +31,13 @@ func (msg *MsgUpdateDid) GetSignBytes() []byte {
 }
 
 func (msg *MsgUpdateDid) ValidateBasic() error {
-	validate, err := BuildValidator(nil)
+	validate, err := BuildValidator("", nil)
 	if err != nil {
-		return ErrInternal.Wrapf("can't init validator: %s", err.Error())
+		return ErrValidatorInitialisation.Wrap(err.Error())
 	}
 
 	if err := validate.Struct(msg); err != nil {
-		return ErrBadRequest.Wrapf("basic validation failed: %s", err.Error())
+		return ErrBasicValidation.Wrapf(err.Error())
 	}
 
 	return nil
