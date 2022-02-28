@@ -25,7 +25,7 @@ Either the cheqd team, or one of your fellow node operators will be happy to off
 Getting started as a node operator on the cheqd network [mainnet](https://explorer.cheqd.io) is as simple as...
 
 1. [Install the `cheqd-node` software](docs/setup-and-configure/README.md) (**version 0.4.0+**) on a hosting platform of your choice
-2. Once you have acquired CHEQ tokens, [promote your node to a validator](docs/setup-and-configure/configure-new-validator.md)
+2. Once you have acquired CHEQ tokens, [promote your node to a validator](docs/validator-guide/README.md)
 
 If successfully configured, your node would become the latest validator on the cheqd mainnet. Welcome to the new digital ID revolution!
 
