@@ -21,7 +21,7 @@ Genesis consists of Tendermint consensus engine parameters and Cosmos app-specif
 
 ### Consensus parameters
 
-Tendermint requires [genesis parameters](https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#genesis) to be defined for basic consensus conditions on any Cosmos network.
+Tendermint requires [genesis parameters](https://docs.tendermint.com/v0.3.4/tendermint-core/using-tendermint.html#genesis) to be defined for basic consensus conditions on any Cosmos network.
 
 * **`block`**
   * `max_bytes` = `200000` (~200 KB)
@@ -162,5 +162,4 @@ The parameters above were agreed to be used for the cheqd network testnet, with 
 ## References
 
 * [List of Cosmos modules](https://docs.cosmos.network/v0.44/modules/)
-* [Tendermint genesis parameters](https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#genesis)
-
+* [Tendermint genesis parameters](https://docs.tendermint.com/v0.3.4/tendermint-core/using-tendermint.html#genesis)

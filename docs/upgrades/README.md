@@ -115,4 +115,4 @@ panic: UPGRADE "<proposed upgrade name>" NEEDED at height: 1000:
 
 After setting up new version of application node will continue ordering process.
 
-Instructions on setting up a new node/version can be found in [our installation guide](../debian/deb-package-install.md).
+Instructions on setting up a new node/version can be found in [our installation guide](../setup-and-configure/README.md).
