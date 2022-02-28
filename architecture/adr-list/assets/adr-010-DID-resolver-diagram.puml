@@ -23,14 +23,32 @@ end note
 
 
 
-Client -> Universal_Resolver: GET https://dev.uniresolver.io/1.0/identifiers/{DID}
-Universal_Resolver -> Cheqd_Universal_Resolver_Driver: GET localhost/1.0/identifiers/{DID}
+Client ->>  Universal_Resolver: GET /1.0/identifiers/{DID}
+Activate Universal_Resolver
+Universal_Resolver ->> Cheqd_Universal_Resolver_Driver: GET /1.0/identifiers/{DID}
+
+Activate Cheqd_Universal_Resolver_Driver
+Cheqd_Universal_Resolver_Driver ->> Cheqd_DID_Driver: GET /1.0/identifiers/{DID}
+
+Activate Cheqd_DID_Driver
+Cheqd_DID_Driver ->> Ledger
+
+Activate Ledger
+Cheqd_DID_Driver <<- Ledger: proto:DIDDoc
+
+Deactivate Ledger
+Cheqd_DID_Driver <<- Cheqd_DID_Driver: Marshall proto to JSON \naccording DID spec
+
+Cheqd_Universal_Resolver_Driver <<- Cheqd_DID_Driver: JSON:DIDDoc
+Deactivate Cheqd_DID_Driver
 
 
+Deactivate Ledger
+Universal_Resolver <<- Cheqd_Universal_Resolver_Driver: JSON:DIDDoc
+Deactivate Cheqd_Universal_Resolver_Driver
 
-note right Cheqd_Universal_Resolver_Driver
-    Request DID
-end note
+Client <<- Universal_Resolver: JSON:DIDDoc
+Deactivate Universal_Resolver
 
 
 @enduml
