@@ -21,7 +21,7 @@ The aim of this ADR is to define the smallest fraction for CHEQ tokens.
 
 Cosmos SDK doesn't provide native support for token fractions. The lowest denomination out-of-the-box that can be used in transactions is `1token`.
 
-To address this issue, similar Cosmos networks assume that they use **N** digits after the decimal point and multiply all values by **10^\(-N\)** in UI.
+To address this issue, similar Cosmos networks assume that they use **N** digits after the decimal point and multiply all values by **10^(-N)** in UI.
 
 ### Examples of lowest token denominations in Cosmos
 
@@ -42,7 +42,7 @@ It was decided to go with **10^-9** as the smallest fraction, with the whole num
 
 ### Backward Compatibility
 
-* There is no backward compatibility. To adjust the number of digits after the decimal point \(lowest token denomination\), the network should be restarted.
+* There is no backward compatibility. To adjust the number of digits after the decimal point (lowest token denomination), the network should be restarted.
 
 ### Positive
 

@@ -39,4 +39,4 @@ The [node setup guide provides pre-requisites](README.md) needed before the step
 
 ## Further information
 
-After successful installation, learn [how to configure your node as a validator node](configure-new-validator.md) to participate in staking rewards, block creation, and governance.
+After successful installation, learn [how to configure your node as a validator node](../validator-guide/README.md) to participate in staking rewards, block creation, and governance.
