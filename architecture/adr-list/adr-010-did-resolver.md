@@ -32,8 +32,6 @@ Inconsistencies between DIDDoc from the ledger and specification that should be 
 - In metadata make `did` property to be of `DID` type instead of `Any`
 - DID URL Dereferencing: handle links to provide DID fragments and convert them to the desired format - Cheqd DID resolver functionality.
 
-## Consequences
-
 ### Cheqd resolver
 
 ### Option 1 (chosen)
@@ -77,6 +75,26 @@ The presentation of the data takes place next to the base where the data is stor
 - Synchronous replying for client requests (?)
 - Marshal/unmarshal JSON - object - protobuff
 - Programming language: Go (?)
+
+## Consequences
+
+> This section describes the resulting context, after applying the decision. All consequences should be listed here, not just the "positive" ones. A particular decision may have positive, negative, and neutral consequences, but all of them affect the team and project in the future.
+
+### Backwards Compatibility
+
+> All ADRs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The ADR must explain how the author proposes to deal with these incompatibilities. ADR submissions without a sufficient backwards compatibility treatise may be rejected outright.
+
+### Positive
+
+{positive consequences}
+
+### Negative
+
+{negative consequences}
+
+### Neutral
+
+{neutral consequences}
 
 ## References
 

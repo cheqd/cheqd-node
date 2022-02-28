@@ -23,4 +23,4 @@ description: >-
 
 1. [ADR 007: **Revocation registry**](adr-007-revocation-registry.md)
 2. [ADR 008: **cheqd DIDDoc resources: Schemas and Credential Definition**](adr-008-identity-resources.md)
-2. [ADR 010: **cheqd DIDDoc resolver**](adr-010-did-resolver.md)
+3. [ADR 010: **cheqd DIDDoc resolver**](adr-010-did-resolver.md)

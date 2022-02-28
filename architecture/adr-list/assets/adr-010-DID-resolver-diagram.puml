@@ -1,0 +1,36 @@
+@startuml
+!pragma teoz true
+hide footbox
+
+actor Client
+participant Universal_Resolver
+participant Cheqd_Universal_Resolver_Driver
+participant Cheqd_DID_Driver
+database Ledger
+
+
+note over Universal_Resolver, Cheqd_Universal_Resolver_Driver
+    https://dev.uniresolver.io
+end note
+
+/ note over Cheqd_DID_Driver
+    Cheqd web service
+end note
+
+/ note over Ledger
+    Cheqd seed node
+end note
+
+
+
+Client -> Universal_Resolver: GET https://dev.uniresolver.io/1.0/identifiers/{DID}
+Universal_Resolver -> Cheqd_Universal_Resolver_Driver: GET localhost/1.0/identifiers/{DID}
+
+
+
+note right Cheqd_Universal_Resolver_Driver
+    Request DID
+end note
+
+
+@enduml
