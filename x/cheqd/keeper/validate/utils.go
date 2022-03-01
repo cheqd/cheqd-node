@@ -19,13 +19,3 @@ func FindPublicKey(signer types.Signer, id string) (ed25519.PublicKey, error) {
 
 	return nil, types.ErrVerificationMethodNotFound.Wrap(id)
 }
-
-func FindVerificationMethod(vms []*types.VerificationMethod, id string) *types.VerificationMethod {
-	for _, vm := range vms {
-		if vm.Id == id {
-			return vm
-		}
-	}
-
-	return nil
-}

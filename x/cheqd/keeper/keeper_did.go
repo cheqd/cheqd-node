@@ -38,26 +38,29 @@ func (k Keeper) SetDidCount(ctx sdk.Context, count uint64) {
 }
 
 // AppendDid appends a did in the store with a new id and updates the count
-func (k Keeper) AppendDid(ctx sdk.Context, did types.Did, metadata *types.Metadata) (*string, error) {
-	// TODO check that the did doesn't exist
+func (k Keeper) AppendDid(ctx sdk.Context, did *types.Did, metadata *types.Metadata) (string, error) {
+	// Check that did doesn't exist
+	if k.HasDid(ctx, did.Id) {
+		return "", types.ErrDidDocNotFound.Wrapf(did.Id)
+	}
 
 	// Create the did
 	count := k.GetDidCount(ctx)
 	err := k.SetDid(ctx, did, metadata)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	// Update did count
 	k.SetDidCount(ctx, count+1)
-	return &did.Id, nil
+	return did.Id, nil
 }
 
 // SetDid set a specific did in the store
-func (k Keeper) SetDid(ctx sdk.Context, did types.Did, metadata *types.Metadata) error {
-	stateValue, err := types.NewStateValue(&did, metadata)
+func (k Keeper) SetDid(ctx sdk.Context, did *types.Did, metadata *types.Metadata) error {
+	stateValue, err := types.NewStateValue(did, metadata)
 	if err != nil {
-		return types.ErrSetToState.Wrap(err.Error())
+		return err
 	}
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
@@ -67,20 +70,20 @@ func (k Keeper) SetDid(ctx sdk.Context, did types.Did, metadata *types.Metadata)
 }
 
 // GetDid returns a did from its id
-func (k Keeper) GetDid(ctx *sdk.Context, id string) (*types.StateValue, error) {
+func (k Keeper) GetDid(ctx *sdk.Context, id string) (types.StateValue, error) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
 
 	if !k.HasDid(*ctx, id) {
-		return nil, sdkerrors.ErrNotFound
+		return types.StateValue{}, sdkerrors.ErrNotFound.Wrap(id)
 	}
 
 	var value types.StateValue
 	var bytes = store.Get(GetDidIDBytes(id))
 	if err := k.cdc.Unmarshal(bytes, &value); err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidType, err.Error())
+		return types.StateValue{}, sdkerrors.Wrap(sdkerrors.ErrInvalidType, err.Error())
 	}
 
-	return &value, nil
+	return value, nil
 }
 
 // HasDid checks if the did exists in the store

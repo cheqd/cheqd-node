@@ -24,7 +24,7 @@ func (m *StateValue) UnpackInterfaces(unpacker types.AnyUnpacker) error {
 func NewStateValue(data StateValueData, metadata *Metadata) (*StateValue, error) {
 	any, err := types.NewAnyWithValue(data)
 	if err != nil {
-		return nil, ErrInvalidDidStateValue.Wrap(err.Error())
+		return nil, err
 	}
 
 	return &StateValue{Data: any, Metadata: metadata}, nil
@@ -40,7 +40,7 @@ func NewMetadataFromContext(ctx sdk.Context) Metadata {
 func (m StateValue) UnpackData() (StateValueData, error) {
 	value, isOk := m.Data.GetCachedValue().(StateValueData)
 	if !isOk {
-		return nil, ErrInvalidDidStateValue.Wrap(m.Data.TypeUrl)
+		return nil, ErrUnpackStateValue.Wrapf("invalid type url: ", m.Data.TypeUrl)
 	}
 
 	return value, nil
@@ -54,7 +54,7 @@ func (m StateValue) UnpackDataAsDid() (*Did, error) {
 
 	value, isValue := data.(*Did)
 	if !isValue {
-		return nil, ErrInvalidDidStateValue.Wrap(reflect.TypeOf(data).String())
+		return nil, ErrUnpackStateValue.Wrap(reflect.TypeOf(data).String())
 	}
 
 	return value, nil

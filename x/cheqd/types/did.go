@@ -1,6 +1,9 @@
 package types
 
-import "github.com/multiformats/go-multibase"
+import (
+	"github.com/cheqd/cheqd-node/x/cheqd/utils"
+	"github.com/multiformats/go-multibase"
+)
 
 var _ StateValueData = &Did{}
 
@@ -14,19 +17,35 @@ func NewVerificationMethod(id string, type_ string, controller string, publicKey
 	}
 }
 
-// TODO: Think about different key types
-func (v VerificationMethod) GetPublicKey() ([]byte, error) {
-	if len(v.PublicKeyMultibase) > 0 {
-		_, key, err := multibase.Decode(v.PublicKeyMultibase)
-		if err != nil {
-			return nil, ErrInvalidPublicKey.Wrapf("Cannot decode verification method '%s' public key", v.Id)
-		}
-		return key, nil
+// AggregateControllerDids returns controller DIDs used in both did.controllers and did.verification_method.controller
+func (did *Did) AggregateControllerDids() []string {
+	result := did.Controller
+
+	for _, vm := range did.VerificationMethod {
+		result = append(result, vm.Controller)
 	}
 
-	if len(v.PublicKeyJwk) > 0 {
-		return nil, ErrInvalidPublicKey.Wrap("JWK format not supported")
-	}
-
-	return nil, ErrInvalidPublicKey.Wrapf("verification method '%s' public key not found", v.Id)
+	return utils.Unique(result)
 }
+
+func (did *Did) FindVerificationMethod(id string) (VerificationMethod, bool) {
+	for _, vm := range vms {
+		if vm.Id == id {
+			return vm
+		}
+	}
+
+	return nil
+}
+
+func FindVerificationMethod(vms []VerificationMethod, id string) (VerificationMethod, bool) {
+	for _, vm := range vms {
+		if vm.Id ==id {
+			return vm, true
+		}
+	}
+
+	return VerificationMethod{}, false
+}
+
+func FilterVerificationMethods(vms []VerificationMethod, func())
