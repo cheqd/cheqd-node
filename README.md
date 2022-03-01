@@ -1,12 +1,12 @@
 # cheqd: Node Documentation
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/cheqd/cheqd-node/Test/main?style=flat-square)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/cheqd/cheqd-node/Test/main?style=flat-square)](https://github.com/cheqd/cheqd-node/actions/workflows/test.yml) [![GitHub Super-Linter](https://github.com/cheqd/cheqd-node/workflows/Lint/badge.svg?style=flat-square)](https://github.com/cheqd/cheqd-node/actions/workflows/lint.yml)
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/cheqd/cheqd-node?color=green&label=stable+version&style=flat-square) ![GitHub Release Date](https://img.shields.io/github/release-date/cheqd/cheqd-node?style=flat-square)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/cheqd/cheqd-node?color=green&label=stable+version&style=flat-square)](https://github.com/cheqd/cheqd-node/releases/latest) ![GitHub Release Date](https://img.shields.io/github/release-date/cheqd/cheqd-node?style=flat-square)
 
-![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/cheqd/cheqd-node?include_prereleases&label=pre-release&style=flat-square) ![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/cheqd/cheqd-node/latest?style=flat-square)
+[![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/cheqd/cheqd-node?include_prereleases&label=pre-release&style=flat-square)](https://github.com/cheqd/cheqd-node/releases/) ![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/cheqd/cheqd-node/latest?style=flat-square)
 
-![GitHub contributors](https://img.shields.io/github/contributors/cheqd/cheqd-node?style=flat-square) ![GitHub repo size](https://img.shields.io/github/repo-size/cheqd/cheqd-node?style=flat-square)
+[![GitHub contributors](https://img.shields.io/github/contributors/cheqd/cheqd-node?style=flat-square)](https://github.com/cheqd/cheqd-node/graphs/contributors) ![GitHub repo size](https://img.shields.io/github/repo-size/cheqd/cheqd-node?style=flat-square)
 
 ## ℹ️ Overview
 
