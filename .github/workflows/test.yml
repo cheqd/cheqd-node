@@ -152,10 +152,10 @@ jobs:
 
       - name: Build cheqd-cli with 'cheqd-noded' as entrypoint
         # TODO: Get rid of UID and GID
-        run: "docker build --target base -t cheqd-cli -f docker/Dockerfile --build-arg UID=$(id -u) --build-arg GID=$(id -g) ." 
+        run: docker build --target base -t cheqd-cli -f docker/Dockerfile --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" . 
 
       - name: Build cheqd-node with 'node-start' as entrypoint
-        run: "docker build --target node -t cheqd-node -f docker/Dockerfile --build-arg UID=$(id -u) --build-arg GID=$(id -g) ."
+        run: docker build --target node -t cheqd-node -f docker/Dockerfile --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" .
 
       - name: Save cheqd-cli
         run: docker save -o cheqd-cli-image.tar cheqd-cli
@@ -215,13 +215,13 @@ jobs:
         run: |
           ./add-observer.sh
           cheqd-noded status -n tcp://localhost:26677 2>&1
-          ./wait.sh '[[ $(cheqd-noded status -n '"'"'tcp://localhost:26677'"'"' 2>&1 | wc -l) == 1 ]] && echo "New node returns status!"'
+          ./wait.sh "[[ $(cheqd-noded status -n '"'"'tcp://localhost:26677'"'"' 2>&1 | wc -l) == 1 ]] && echo "New node returns status!""
 
       - name: Promote observer to validator
         working-directory: ./tests/e2e-complex/deb-install
         run: |
-          bash promote-validator.sh
-          cheqd-noded query staking validators --node "http://localhost:26657" | sed -nr 's/.*status: (.*?).*/\1/p' $1 | while read x; do [[ "BOND_STATUS_BONDED" == $x ]] && echo "Validator's status is bonded!" || exit 1 ; done
+          ./promote-validator.sh
+          cheqd-noded query staking validators --node "http://localhost:26657" | sed -nr 's/.*status: (.*?).*/\1/p' "$1" | while read -r x; do [[ "BOND_STATUS_BONDED" == "$x" ]] && echo "Validator's status is bonded!" || exit 1 ; done
           ./wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*signature": (.*?).*/\1/p'"'"' | wc -l) == 5 ]] && echo "There are 5 validators signatures in block!"'
           ./wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*(signature": null).*/\1/p'"'"' | wc -l) == 0 ]] && echo "There are no null signatures in block!"'
 
@@ -268,23 +268,27 @@ jobs:
         working-directory: ./tests/e2e-pytest
         run: |
           pip3 install -r requirements.txt >> /dev/null
-          cp -Rf ${NODE_CONFIGS_BASE}/validator-0/. /home/runner/.cheqdnode
-          cp -Rf ${NODE_CONFIGS_BASE}/validator-1/. /home/runner/.cheqdnode
+          cp -Rf "${NODE_CONFIGS_BASE}"/validator-0/. /home/runner/.cheqdnode
+          cp -Rf "${NODE_CONFIGS_BASE}"/validator-1/. /home/runner/.cheqdnode
           sudo chmod -R 777 /home/runner
 
       - name: Run cosmos-related tests
         working-directory: ./tests/e2e-pytest
         run: |
           set -euxo pipefail
-          export OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/validator-0" | sed -nr 's/.*address: (.*?).*/\1/p' | sed 's/\r//g')
-          export OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/validator-1" | sed -nr 's/.*address: (.*?).*/\1/p' | sed 's/\r//g')
+          OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/validator-0" | sed -nr 's/.*address: (.*?).*/\1/p' | sed 's/\r//g')
+          export OP0_ADDRESS
+          OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/validator-1" | sed -nr 's/.*address: (.*?).*/\1/p' | sed 's/\r//g')
+          export OP1_ADDRESS
           pytest -v -rP test_cosmos.py
 
       - name: Run identity-related tests # TODO: Move into separate stage?
         working-directory: ./tests/e2e-pytest
         run: |
-          export OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
-          export OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p | sed 's/\r//g')
+          OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
+          export OP0_ADDRESS
+          OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p | sed 's/\r//g')
+          export OP1_ADDRESS
           pytest -v -rP test_identity.py
 
   run-bash-based-integration-tests:
@@ -349,7 +353,7 @@ jobs:
         run: docker load -i cheqd-cli-image.tar
 
       - name: Chown for current user
-        run: sudo chown $USER:$USER .
+        run: sudo chown "$USER":"$USER" .
 
       - name: Prepare nodes for checking upgrade
         working-directory: ./tests/e2e-complex/upgrade
