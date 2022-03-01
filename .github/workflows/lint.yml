@@ -1,6 +1,6 @@
 name: Lint
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
 
@@ -60,7 +60,6 @@ jobs:
         MULTI_STATUS: true
 
         VALIDATE_BASH: true
-        VALIDATE_BASH_EXEC: true
         VALIDATE_GITHUB_ACTIONS: true
         VALIDATE_JSON: true
         VALIDATE_MARKDOWN: true
