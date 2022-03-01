@@ -64,7 +64,7 @@ jobs:
         VALIDATE_JSON: true
         VALIDATE_MARKDOWN: true
         VALIDATE_OPENAPI: true
-        VALIDATE_PROTOBUF: true
+        # VALIDATE_PROTOBUF: true
         VALIDATE_PYTHON_PYLINT: true
         VALIDATE_XML: true
         VALIDATE_YAML: true

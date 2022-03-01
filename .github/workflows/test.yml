@@ -42,16 +42,16 @@ jobs:
           GOLANG_PROTOBUF_VERSION: 1.3.5
           GOGO_PROTOBUF_VERSION: 1.3.2
           GRPC_GATEWAY_VERSION: 1.14.7
+        # Taken from: tendermintdev/sdk-proto-gen:v0.2
         run: |
-          # Taken from: tendermintdev/sdk-proto-gen:v0.2
-          go get \
+          "go get \
             github.com/golang/protobuf/protoc-gen-go@v${GOLANG_PROTOBUF_VERSION} \
             github.com/gogo/protobuf/protoc-gen-gogo@v${GOGO_PROTOBUF_VERSION} \
             github.com/gogo/protobuf/protoc-gen-gogofast@v${GOGO_PROTOBUF_VERSION} \
             github.com/gogo/protobuf/protoc-gen-gogofaster@v${GOGO_PROTOBUF_VERSION} \
             github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@v${GRPC_GATEWAY_VERSION} \
             github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@v${GRPC_GATEWAY_VERSION} \
-            github.com/regen-network/cosmos-proto/protoc-gen-gocosmos@latest
+            github.com/regen-network/cosmos-proto/protoc-gen-gocosmos@latest"
 
       - name: Install buf
         env:
@@ -151,10 +151,11 @@ jobs:
           fetch-depth: 0 # Required to fetch version
 
       - name: Build cheqd-cli with 'cheqd-noded' as entrypoint
-        run: docker build --target base -t cheqd-cli -f docker/Dockerfile --build-arg UID=$(id -u) --build-arg GID=$(id -g) . # TODO: Get rid of UID and GID
+        # TODO: Get rid of UID and GID
+        run: "docker build --target base -t cheqd-cli -f docker/Dockerfile --build-arg UID=$(id -u) --build-arg GID=$(id -g) ." 
 
       - name: Build cheqd-node with 'node-start' as entrypoint
-        run: docker build --target node -t cheqd-node -f docker/Dockerfile --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
+        run: "docker build --target node -t cheqd-node -f docker/Dockerfile --build-arg UID=$(id -u) --build-arg GID=$(id -g) ."
 
       - name: Save cheqd-cli
         run: docker save -o cheqd-cli-image.tar cheqd-cli
