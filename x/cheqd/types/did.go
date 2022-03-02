@@ -2,7 +2,6 @@ package types
 
 import (
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
-	"github.com/multiformats/go-multibase"
 )
 
 var _ StateValueData = &Did{}
@@ -28,15 +27,15 @@ func (did *Did) AggregateControllerDids() []string {
 	return utils.Unique(result)
 }
 
-func (did *Did) FindVerificationMethod(id string) (VerificationMethod, bool) {
-	for _, vm := range vms {
-		if vm.Id == id {
-			return vm
-		}
-	}
-
-	return nil
-}
+//func (did *Did) FindVerificationMethod(id string) (VerificationMethod, bool) {
+//	for _, vm := range vms {
+//		if vm.Id == id {
+//			return vm
+//		}
+//	}
+//
+//	return nil, true
+//}
 
 func FindVerificationMethod(vms []VerificationMethod, id string) (VerificationMethod, bool) {
 	for _, vm := range vms {
@@ -48,4 +47,6 @@ func FindVerificationMethod(vms []VerificationMethod, id string) (VerificationMe
 	return VerificationMethod{}, false
 }
 
-func FilterVerificationMethods(vms []VerificationMethod, func())
+//func FilterVerificationMethods(vms []VerificationMethod, func()) {
+//
+//}

@@ -40,7 +40,7 @@ func NewMetadataFromContext(ctx sdk.Context) Metadata {
 func (m StateValue) UnpackData() (StateValueData, error) {
 	value, isOk := m.Data.GetCachedValue().(StateValueData)
 	if !isOk {
-		return nil, ErrUnpackStateValue.Wrapf("invalid type url: ", m.Data.TypeUrl)
+		return nil, ErrUnpackStateValue.Wrapf("invalid type url: %s", m.Data.TypeUrl)
 	}
 
 	return value, nil
