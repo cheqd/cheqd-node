@@ -36,9 +36,10 @@ Inconsistencies between DIDDoc from the ledger and specification that should be 
 
 ### Option 1 (chosen)
 
-Host the resolver separately from the ledger as an additional web service. Interaction with other applications and resolvers will implement [the following schema](https://drive.google.com/file/d/1pKL9I5fMhZ3TnAdkCiRTs53Y7zs9cGiv/view?usp=sharinghttps://drive.google.com/file/d/1pKL9I5fMhZ3TnAdkCiRTs53Y7zs9cGiv/view?usp=sharing):
+Host the resolver separately from the ledger as an additional web service. Interaction with other applications and resolvers will implement the following schema:
 
-![cheqd did resolver](assets/adr010-DID-resolver-Diagram.png)
+![Cheqd did resolver](assets/adr-010-DID-resolver-diagram.png)
+[Cheqd did sequence diagram](assets/adr-010-DID-resolver-diagram.puml)
 
 #### Positive
 
@@ -50,6 +51,29 @@ Host the resolver separately from the ledger as an additional web service. Inter
 - Longer chain of trust. As a result, more resources required by the client to maintain the security of the system (`node + resolver` instead of `node`)
 
 The web application at this stage will implement simple functionality that can be a lightweight architecture of threads without synchronization. Just several classes without the use of complex design patterns.
+
+![cheqd did resolver class diagram](assets/adr-010-DID-resolver-driver.png)
+[Cheqd did resolver class diagram](assets/adr-010-DID-resolver-driver.puml)
+
+There are two ways to use Cheqd DIDDoc resolving module. As a library (go module) and as a standalone web service.
+
+- In the first case, the module can be imported simply by adding the necessary import:
+
+```golang
+import (
+     "github.com/cheqd/cheqd-did-resolver/src"
+)
+```
+
+- In the second one, by launching the application with the command.
+
+```bash
+go run cheqd_resolver_web_service.go
+```
+
+### Cheqd Universal resolver driver
+
+A universal resolver driver is not required, since the resolver web application will be able to implement all the needs of Universal resolver. In case of unexpected issues with its integration, the cheqd-did-resolver module can always be used to import as a library.
 
 ### Option 2
 

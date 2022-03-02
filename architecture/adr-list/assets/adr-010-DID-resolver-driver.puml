@@ -1,0 +1,17 @@
+@startuml
+RequestService: JSON resolveUrl(string url)
+
+DIDDocService: Json marshall(ProtoMsg)
+DIDDocService: Map prepareJWKPubkey(List<Pair>) - list of pair to map
+DIDDocService: Json getDIDMetadata(protoStateValue)
+DIDDocService: Json getDIDFragment(protoStateValue, string fragmentId)
+
+LedgerService: StateValue getDIDDoc(string id)
+LedgerService: setNode(string nodeUrl)
+
+CheqdResolverWebService: main(string nodeUrl)
+
+RequestService <-- DIDDocService
+RequestService <-- LedgerService
+CheqdResolverWebService <-- RequestService
+@enduml
