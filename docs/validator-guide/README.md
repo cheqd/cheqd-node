@@ -4,29 +4,29 @@ This document provides guidance on how configure and promote a cheqd node to val
 
 ## Preparation steps
 
-1. **Ensure you have a cheqd node installed as a service**
+### Step 1: Ensure you have a cheqd node installed as a service
 
-   You must already have a running `cheqd-node` instance installed using one of the supported methods.
+You must already have a running `cheqd-node` instance installed using one of the supported methods.
 
-   Please also ensure the node is fully caught up with the latest ledger updates.
+Please also ensure the node is fully caught up with the latest ledger updates.
 
-   1. [Debian package install](../setup-and-configure/debian/deb-package-install.md)
-   2. [Docker install](../setup-and-configure/docker-install.md)
-   3. [Binary install](../setup-and-configure/binary-install.md)
+1. [Debian package install](../setup-and-configure/debian/deb-package-install.md)
+2. [Docker install](../setup-and-configure/docker-install.md)
+3. [Binary install](../setup-and-configure/binary-install.md)
 
-2. **Generate a new account key**
+### Step 2: Generate a new account key
 
-   Follow the guidance on [using cheqd CLI to manage keys](../cheqd-cli/cheqd-cli-accounts.md) to create a new account key.
+Follow the guidance on [using cheqd CLI to manage keys](../cheqd-cli/cheqd-cli-accounts.md) to create a new account key.
 
-   ```bash
-   cheqd-noded keys add <alias>
-   ```
+```bash
+cheqd-noded keys add <alias>
+```
 
-   When you create a new key, a `mnemonic phrase` and `account address` will be printed. **Keep the mnemonic phrase safe** as this is the only way to restore access to the account if they keyring cannot be recovered.
+When you create a new key, a new **account address** and **mnemonic backup phrase** will be printed. Keep the mnemonic phrase safe as this is the only way to restore access to the account if they keyring cannot be recovered.
 
-   P.S. in case of using Ledger Nano device it would be helpful to use [this instructions](#using-ledger-nano-device)
+P.S. in case of using Ledger Nano device it would be helpful to use [this instructions](#using-ledger-nano-device)
 
-3. **Get your node ID**
+1. **Get your node ID**
 
    Follow the guidance on [using cheqd CLI to manage nodes](../cheqd-cli/cheqd-cli-node-management.md) to fetch your node ID.
 
@@ -34,7 +34,7 @@ This document provides guidance on how configure and promote a cheqd node to val
    cheqd-noded tendermint show-node-id
    ```
 
-4. **Get your validator account address**
+2. **Get your validator account address**
 
    The validator account address is generated in Step 1 above when a new key is added. To show the validator account address, follow the [cheqd CLI guide on managing accounts](../cheqd-cli/cheqd-cli-accounts.md).
 
@@ -83,7 +83,7 @@ This document provides guidance on how configure and promote a cheqd node to val
    * **`commission-max-change-rate`**: Maximum rate of change of a validator's commission rate per day, expressed as a number with up to two decimal points. The value for this cannot be changed later.
    * **`chain-id`**: Unique identifier for the chain.
      * For cheqd's current mainnet, this is `cheqd-mainnet-1`
-     * For cheqd's current testnet, this is `cheqd-testnet-2`
+     * For cheqd's current testnet, this is `cheqd-testnet-4`
    * **`gas`**: Maximum gas to use for *this specific* transaction. Using `auto` uses Cosmos's auto-calculation mechanism, but can also be specified manually as an integer value.
    * **gas-adjustment** (optional): If you're using `auto` gas calculation, this parameter multiplies the auto-calculated amount by the specified factor, e.g., `1.2`. This is recommended so that it leaves enough margin of error to add a bit more gas to the transaction and ensure it successfully goes through.
    * **`gas-prices`**: Maximum gas price set by the validator
