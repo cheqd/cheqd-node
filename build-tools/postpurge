@@ -25,9 +25,9 @@ if test -f "/etc/rsyslog.d/cheqd-node.conf"; then
 fi
 
 # Remove logrotate config for cheqd-noded
-if test -f "etc/logrotate.d/cheqd-node"; then
+if test -f "/etc/logrotate.d/cheqd-node"; then
     # Remove syslog conf
-    rm /etc/rsyslog.d/cheqd-node.conf
+    rm /etc/logrotate.d/cheqd-node
 
     # Restart logrotate
     systemctl restart logrotate.service
