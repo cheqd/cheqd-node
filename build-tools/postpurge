@@ -1,7 +1,9 @@
 #!/bin/bash
 
 # Remove cheqd-noded systemd service
-if test -f "/lib/systemd/system/cheqd-noded.service"; then
+# shellcheck disable=SC1136
+if [ -f "/lib/systemd/system/cheqd-noded.service" ]
+then
     # Stop cheqd-noded service
     systemctl stop cheqd-noded.service
 
@@ -13,7 +15,8 @@ if test -f "/lib/systemd/system/cheqd-noded.service"; then
 fi
 
 # Remove rsyslog config for cheqd-noded
-if test -f "/etc/rsyslog.d/cheqd-node.conf"; then
+if [ -f "/etc/rsyslog.d/cheqd-node.conf" ]
+then
     # Remove syslog conf
     rm /etc/rsyslog.d/cheqd-node.conf
 
@@ -25,7 +28,8 @@ if test -f "/etc/rsyslog.d/cheqd-node.conf"; then
 fi
 
 # Remove logrotate config for cheqd-noded
-if test -f "/etc/logrotate.d/cheqd-node"; then
+if [ -f "/etc/logrotate.d/cheqd-node" ]
+then
     # Remove syslog conf
     rm /etc/logrotate.d/cheqd-node
 
