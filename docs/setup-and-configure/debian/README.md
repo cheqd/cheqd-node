@@ -10,7 +10,7 @@ It may be possible to use the same package on other Ubuntu / Debian distribution
 
 ## How-to instructions for `cheqd-node` Debian packages
 
-* [Install \(or uninstall\) a new node](deb-package-install.md) using Debian package
+* [Install (or uninstall) a new node](deb-package-install.md) using Debian package
 * If you already have an existing `cheqd-node` installation that was done using the .deb, find out how to [upgrade your node using the Debian package](deb-package-upgrade.md).
 
 ## Pre-install actions executed by Debian package
@@ -46,7 +46,7 @@ The default logging location and permissions are as follows:
 
 * `$HOME/.cheqdnode/log`
   * Location for app logs
-  * Ownership permissions set to: `syslog:cheqd` \(set by rsyslog\)
+  * Ownership permissions set to: `syslog:cheqd` (set by rsyslog)
 
 The log location can be overridden by passing the variable `CHEQD_LOG_DIR` before executing the installation proceess.
 
@@ -113,7 +113,7 @@ WantedBy=multi-user.target
 | :--- |
 | Please make sure any accounts keys are backed up or exported before attempting uninstallation |
 
-To uninstall `cheqd-node` when it has been installed using the Debian package release, execute the following \(with `sudo` or as the `root` user\):
+To uninstall `cheqd-node` when it has been installed using the Debian package release, execute the following (with `sudo` or as the `root` user):
 
 ```bash
 apt remove cheqd-node

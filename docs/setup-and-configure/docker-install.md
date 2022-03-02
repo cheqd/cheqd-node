@@ -47,7 +47,7 @@ Parameters that can be passed via environment variables:
 
 * `NODE_MONIKER` - node moniker;
 * `GENESIS` - base64 encoded content of `genesis.json`;
-* `NODE_ARGS` \(optional\) - argument string passed to the `cheqd-noded start` command.
+* `NODE_ARGS` (optional) - argument string passed to the `cheqd-noded start` command.
 
 Additional parameters that will be applied via `cheqd-noded configure`:
 
