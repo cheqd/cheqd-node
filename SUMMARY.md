@@ -43,7 +43,7 @@
   * [ADR 007: Revocation registry](architecture/adr-list/adr-007-revocation-registry.md)
   * [ADR 008: cheqd DIDDOc resources: Schemas and Credential Definitions](architecture/adr-list/adr-008-identity-resources.md)
   * [ADR 009: Importing/exporting mnemonic keys from Cosmos](architecture/adr-list/adr-009-mnemonic-keys-cosmos.md)
-  * [ADR 010: DID Doc Resolver](architecture/adr-list/adr-010-did-resolver.md)
+  * [ADR 010: DID Doc Resolver](architecture/adr-list/adr-010-did-resolution.md)
   * [ADR {ADR-NUMBER}: {TITLE}](architecture/adr-list/adr-template.md)
 
 ---

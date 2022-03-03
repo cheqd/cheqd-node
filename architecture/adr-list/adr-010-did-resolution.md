@@ -1,5 +1,5 @@
 
-# ADR 009: DID-resolver
+# ADR 009: DID-resolution
 
 ## Status
 
@@ -19,10 +19,6 @@ This document defines the architecture of two DID resolvers: Cheqd DID resolver 
 First, let's look at the discrepancies between the DID Doc model stored in the ledger and the format from the specification. Data is written to the ledger based on protobuffs, which is due to the use of the Cosmos framework. However, according to the specification, DID Doc must be provided in JSON format, which provides more features that are not achievable in protobuffs.
 Therefore, a new DID resolver is needed.
 
-## Decision
-
-Add a new web application for did-resolver
-
 Inconsistencies between DIDDoc from the ledger and specification that should be corrected:
 
 - Rename "context" to "@context" - will be done on the ledger side
@@ -32,11 +28,16 @@ Inconsistencies between DIDDoc from the ledger and specification that should be 
 - In metadata make `did` property to be of `DID` type instead of `Any`
 - DID URL Dereferencing: handle links to provide DID fragments and convert them to the desired format - Cheqd DID resolver functionality.
 
+
+## Decision
+
+Add a new application/library for did-resolution
+
 ### Cheqd resolver
 
 ### Option 1 (chosen)
 
-Host the resolver separately from the ledger as an additional web service. Interaction with other applications and resolvers will implement the following schema:
+Host the resolver separately from the ledger as an additional resolution service. Interaction with other applications and resolvers will implement the following schema:
 
 ![Cheqd did resolver](assets/adr-010-DID-resolver-diagram.png)
 [Cheqd did sequence diagram](assets/adr-010-DID-resolver-diagram.puml)
@@ -50,7 +51,7 @@ Host the resolver separately from the ledger as an additional web service. Inter
 
 - Longer chain of trust. As a result, more resources required by the client to maintain the security of the system (`node + resolver` instead of `node`)
 
-The web application at this stage will implement simple functionality that can be a lightweight architecture of threads without synchronization. Just several classes without the use of complex design patterns.
+Cheqd DIDDoc resolving module at this stage will implement simple functionality that can be a lightweight architecture of threads without synchronization. Just several classes without the use of complex design patterns.
 
 ![cheqd did resolver class diagram](assets/adr-010-DID-resolver-driver.png)
 [Cheqd did resolver class diagram](assets/adr-010-DID-resolver-driver.puml)
