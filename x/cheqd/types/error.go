@@ -27,4 +27,12 @@ var (
 	ErrInternal                   = sdkerrors.Register(ModuleName, 1500, "internal error")
 	ErrNotImplemented             = sdkerrors.Register(ModuleName, 1501, "not implemented")
 	ErrValidatorInitialisation    = sdkerrors.Register(ModuleName, 1502, "can't init validator")
+	// Static validation errors
+	ErrStaticDIDBadMethod              = sdkerrors.Register(ModuleName, 1600, "DID method is not cheqd")
+	ErrStaticDIDNamespaceNotAllowed    = sdkerrors.Register(ModuleName, 1601, "Namespace is not allow for this network")
+	ErrStaticDIDBadUniqueIDLen         = sdkerrors.Register(ModuleName, 1602, "Length of unique ID should be 16 or 32 symbols")
+	ErrStaticDIDNotBase58ID            = sdkerrors.Register(ModuleName, 1603, "Not base58 symbols for unique ID string")
+	ErrStaticDIDURLPathAbemptyNotValid = sdkerrors.Register(ModuleName, 1604, "There are not allowed symbols in Path.")
+	ErrStaticDIDURLQueryNotValid       = sdkerrors.Register(ModuleName, 1605, "Query part in DIDUrl is not valid.")
+	ErrStaticDIDURLFragmentNotValid    = sdkerrors.Register(ModuleName, 1606, "Fragment part in DIDUrl is not valid.")
 )

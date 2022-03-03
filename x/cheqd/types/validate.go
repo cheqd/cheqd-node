@@ -1,7 +1,6 @@
 package types
 
 import (
-	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -9,21 +8,21 @@ func BuildValidator(DIDMethod string, allowedDIDNamespaces []string) (*validator
 	validate := validator.New()
 
 	err := validate.RegisterValidation("did", func(fl validator.FieldLevel) bool {
-		return utils.IsValidDID(fl.Field().String(), DIDMethod, allowedDIDNamespaces)
+		return IsValidDID(fl.Field().String(), DIDMethod, allowedDIDNamespaces)
 	})
 	if err != nil {
 		return nil, err
 	}
 
 	err = validate.RegisterValidation("did-url", func(fl validator.FieldLevel) bool {
-		return utils.IsValidDIDUrl(fl.Field().String(), DIDMethod, allowedDIDNamespaces)
+		return IsValidDIDUrl(fl.Field().String(), DIDMethod, allowedDIDNamespaces)
 	})
 	if err != nil {
 		return nil, err
 	}
 
 	err = validate.RegisterValidation("did-url-no-path", func(fl validator.FieldLevel) bool {
-		_, _, _, path, _, _ := utils.SplitDIDUrl(fl.Field().String())
+		_, path, _, _ := SplitDIDUrl(fl.Field().String())
 		return path == ""
 	})
 	if err != nil {
@@ -31,7 +30,7 @@ func BuildValidator(DIDMethod string, allowedDIDNamespaces []string) (*validator
 	}
 
 	err = validate.RegisterValidation("did-url-no-query", func(fl validator.FieldLevel) bool {
-		_, _, _, _, query, _ := utils.SplitDIDUrl(fl.Field().String())
+		_, _, query, _ := SplitDIDUrl(fl.Field().String())
 		return query == ""
 	})
 	if err != nil {
@@ -39,7 +38,7 @@ func BuildValidator(DIDMethod string, allowedDIDNamespaces []string) (*validator
 	}
 
 	err = validate.RegisterValidation("did-url-with-fragment", func(fl validator.FieldLevel) bool {
-		_, _, _, _, _, fragment := utils.SplitDIDUrl(fl.Field().String())
+		_, _, _, fragment := SplitDIDUrl(fl.Field().String())
 		return fragment != ""
 	})
 	if err != nil {
