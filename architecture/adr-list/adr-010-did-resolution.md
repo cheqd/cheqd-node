@@ -1,5 +1,5 @@
 
-# ADR 009: DID-resolution
+# ADR 010: DID Resolver
 
 ## Status
 
@@ -8,46 +8,50 @@
 | **Authors** | Renata Toktar|
 | **ADR Stage** | DRAFT |
 | **Implementation Status** | Not Implemented |
-| **Start Date** | 2022-02-22 |
+| **Start Date** | 22 February 2022 |
 
 ## Summary
 
-This document defines the architecture of two DID resolvers: Cheqd DID resolver and a universal DID resolver driver for integration with Universal resolver.
+This document defines the architecture of two DID resolvers: a DID resolver for the [cheqd DID method](adr-002-cheqd-did-method.md), and a DID driver for the [Universal Resolver](https://github.com/decentralized-identity/universal-resolver) project.
 
 ## Context
 
-First, let's look at the discrepancies between the DID Doc model stored in the ledger and the format from the specification. Data is written to the ledger based on protobuffs, which is due to the use of the Cosmos framework. However, according to the specification, DID Doc must be provided in JSON format, which provides more features that are not achievable in protobuffs.
+First, let's look at the discrepancies between the DID Doc model stored in the ledger and the format from the specification. Data is written to the ledger based on protobufs, which is due to the use of the Cosmos framework. However, according to the specification, DID Doc must be provided in JSON format, which provides more features that are not achievable in protobuffs.
 Therefore, a new DID resolver is needed.
 
 Inconsistencies between DIDDoc from the ledger and specification that should be corrected:
 
-- Rename "context" to "@context" - will be done on the ledger side
-- Change snake_case to camelCase for field names - will be done on Cheqd resolver side using the marshaller setting
-- Remove empty lists  - will be done on Cheqd resolver side using the marshaller setting
-- Convert a list of pairs to a map for jwk_pubkey and other cases
-- In metadata make `did` property to be of `DID` type instead of `Any`
-- DID URL Dereferencing: handle links to provide DID fragments and convert them to the desired format - Cheqd DID resolver functionality.
+1. Rename "context" to "@context" - will be done on the ledger side
+2. Change snake_case to camelCase for field names - will be done on Cheqd resolver side using the marshaller setting
+3. Remove empty lists  - will be done on Cheqd resolver side using the marshaller setting
+4. Convert a list of pairs to a map for jwk_pubkey and other cases
+5. In metadata make `did` property to be of `DID` type instead of `Any`
+6. DID URL Dereferencing: handle links to provide DID fragments and convert them to the desired format - Cheqd DID resolver functionality.
 
+### Design principles
 
-## Decision
+ helping to define its architecture in detail:
 
-Add a new application/library for did-resolution
+- Parallel executing of requests
+- Synchronous replying for client requests (?)
+- Marshal/unmarshal JSON - object - protobuff
+- Programming language: Go (?)
 
-### Cheqd resolver
+## Architecture of DID Resolver(s)
 
-### Option 1 (chosen)
+### DID Resolution from the cheqd network ledger
 
 Host the resolver separately from the ledger as an additional resolution service. Interaction with other applications and resolvers will implement the following schema:
 
 ![Cheqd did resolver](assets/adr-010-DID-resolver-diagram.png)
 [Cheqd did sequence diagram](assets/adr-010-DID-resolver-diagram.puml)
 
-#### Positive
+#### Pros
 
 - Updating the resolver software does not need updating the application on the node side
 - Separation of the system into microservices, moving away from a monolithic structure
 
-#### Negative
+#### Cons
 
 - Longer chain of trust. As a result, more resources required by the client to maintain the security of the system (`node + resolver` instead of `node`)
 
@@ -72,15 +76,13 @@ import (
 go run cheqd_resolver_web_service.go
 ```
 
-### Cheqd Universal resolver driver
+### Universal resolver driver
 
 A universal resolver driver is not required, since the resolver web application will be able to implement all the needs of Universal resolver. In case of unexpected issues with its integration, the cheqd-did-resolver module can always be used to import as a library.
 
-### Option 2
-
 Put the resolver inside Cheqd-node as a new module or as a new handler (keeper) inside the node application.
 
-#### Positive
+#### Pros
 
 The presentation of the data takes place next to the base where the data is stored. This
 
@@ -88,22 +90,15 @@ The presentation of the data takes place next to the base where the data is stor
 - does not allow compromising the resolver, only the entire node, which is a more difficult task
 - fault tolerance and availability of the blockchain network is higher than a single web server
 
-#### Negative
+#### Cons
 
 - Unable to update resolver without updating node. However, expanding the functionality without breaking changes is also possible with minor releases, which allows update the node without upgrade transaction.
 
-### Web service requirements
+## Decision
 
- helping to define its architecture in detail:
-
-- Parallel executing of requests
-- Synchronous replying for client requests (?)
-- Marshal/unmarshal JSON - object - protobuff
-- Programming language: Go (?)
+Add a new application/library for did-resolution
 
 ## Consequences
-
-> This section describes the resulting context, after applying the decision. All consequences should be listed here, not just the "positive" ones. A particular decision may have positive, negative, and neutral consequences, but all of them affect the team and project in the future.
 
 ### Backwards Compatibility
 
