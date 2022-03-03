@@ -42,7 +42,8 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 	}
 
 	// Verify that all controllers have at least one authentication key of supported type
-	controllers := msg.Payload.AggregateControllerDids()
+	did := msg.Payload.ToDid()
+	controllers := did.AggregateControllerDids()
 	for _, v := range controllers {
 		// ValidateDIDHasAtLeaseOneSupportedAuthKey
 	}
@@ -58,7 +59,6 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 	}
 
 	// Build DID and metadata
-	did := msg.Payload.ToDid()
 	metadata := types.NewMetadataFromContext(ctx)
 
 	// Write to state

@@ -31,7 +31,7 @@ func (msg *MsgUpdateDid) GetSignBytes() []byte {
 }
 
 func (msg *MsgUpdateDid) ValidateBasic() error {
-	validate, err := BuildValidator("", nil)
+	validate, err := BuildValidator(DidMethod, nil)
 	if err != nil {
 		return ErrValidatorInitialisation.Wrap(err.Error())
 	}

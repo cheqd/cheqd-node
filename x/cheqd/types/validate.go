@@ -22,7 +22,7 @@ func BuildValidator(DIDMethod string, allowedDIDNamespaces []string) (*validator
 	}
 
 	err = validate.RegisterValidation("did-url-no-path", func(fl validator.FieldLevel) bool {
-		_, path, _, _ := SplitDIDUrl(fl.Field().String())
+		_, path, _, _ := TrySplitDIDUrl(fl.Field().String())
 		return path == ""
 	})
 	if err != nil {
@@ -30,7 +30,7 @@ func BuildValidator(DIDMethod string, allowedDIDNamespaces []string) (*validator
 	}
 
 	err = validate.RegisterValidation("did-url-no-query", func(fl validator.FieldLevel) bool {
-		_, _, query, _ := SplitDIDUrl(fl.Field().String())
+		_, _, query, _ := TrySplitDIDUrl(fl.Field().String())
 		return query == ""
 	})
 	if err != nil {
@@ -38,7 +38,7 @@ func BuildValidator(DIDMethod string, allowedDIDNamespaces []string) (*validator
 	}
 
 	err = validate.RegisterValidation("did-url-with-fragment", func(fl validator.FieldLevel) bool {
-		_, _, _, fragment := SplitDIDUrl(fl.Field().String())
+		_, _, _, fragment := TrySplitDIDUrl(fl.Field().String())
 		return fragment != ""
 	})
 	if err != nil {
