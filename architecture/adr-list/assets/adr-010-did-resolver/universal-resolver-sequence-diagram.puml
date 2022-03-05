@@ -1,0 +1,131 @@
+@startuml
+!pragma teoz true
+hide footbox
+
+actor Client
+participant Universal_Resolver
+participant Cheqd_Universal_Resolver_Driver
+participant Cheqd_DID_Driver
+database Ledger
+
+
+
+note over Cheqd_Universal_Resolver_Driver
+    Node.js microservice
+    Proxies any requests to a cheqd-specific
+    web microservice
+    NPM module
+end note
+
+note over Universal_Resolver, Cheqd_Universal_Resolver_Driver
+    https://dev.uniresolver.io
+end note
+
+/ note over Cheqd_DID_Driver
+    Cheqd web service
+    (written in Go)
+end note
+
+/ note over Ledger
+    Cheqd seed node
+end note
+
+group Universal Resolver flow
+
+Client ->>  Universal_Resolver: GET /1.0/identifiers/{DID}
+Activate Universal_Resolver
+note right
+Common REST API
+for multiple DID method
+end note
+
+
+Universal_Resolver ->> Cheqd_Universal_Resolver_Driver: GET /1.0/identifiers/{DID}
+Activate Cheqd_Universal_Resolver_Driver
+note right
+Common REST API for
+a specific DID method
+end note
+
+Cheqd_Universal_Resolver_Driver ->> Cheqd_DID_Driver: GET /1.0/identifiers/{DID}
+Activate Cheqd_DID_Driver
+note right
+REST API for
+Cheqd DID method
+end note
+
+Cheqd_DID_Driver ->> Ledger
+note right
+Cosmos SDK
+gRPC API
+end note
+
+Activate Ledger
+Cheqd_DID_Driver <<- Ledger: proto:DIDDoc\n(like it's stored)
+
+Deactivate Ledger
+Cheqd_DID_Driver <<- Cheqd_DID_Driver: Marshall proto to JSON \naccording DID spec
+
+Cheqd_Universal_Resolver_Driver <<- Cheqd_DID_Driver: JSON:DIDDoc
+Deactivate Cheqd_DID_Driver
+
+Universal_Resolver <<- Cheqd_Universal_Resolver_Driver: JSON:DIDDoc
+Deactivate Cheqd_Universal_Resolver_Driver
+
+Client <<- Universal_Resolver: JSON:DIDDoc
+Deactivate Universal_Resolver
+
+end
+
+group Client <-> Web Service Resolver
+
+Client ->> Cheqd_DID_Driver: GET /1.0/identifiers/{DID}
+Activate Cheqd_DID_Driver
+note right
+REST API for
+Cheqd DID method
+end note
+
+Activate Ledger
+Cheqd_DID_Driver ->> Ledger
+note right
+Cosmos SDK
+gRPC API
+end note
+
+Cheqd_DID_Driver <<- Ledger: proto:DIDDoc\n(like it's stored)
+Deactivate Ledger
+
+Cheqd_DID_Driver <<- Cheqd_DID_Driver: Marshall proto to JSON \naccording DID spec
+
+Client <<- Cheqd_DID_Driver: JSON:DIDDoc
+Deactivate Cheqd_DID_Driver
+
+end
+
+
+group Client <-> Ledger
+
+
+Activate Client
+note over Client
+Cheqd_DID_Driver as
+Go module dependency
+(library)
+end note
+Activate Ledger
+Client ->> Ledger
+note right
+Cosmos SDK
+gRPC API
+end note
+
+Client <<- Ledger: proto:DIDDoc\n(like it's stored)
+Deactivate Ledger
+Client <<- Client: Marshall proto\nto JSON\naccording\nDID spec
+
+
+Deactivate Client
+end
+
+@enduml

@@ -43,8 +43,8 @@ Inconsistencies between DIDDoc from the ledger and specification that should be 
 
 Host the resolver separately from the ledger as an additional resolution service. Interaction with other applications and resolvers will implement the following schema:
 
-![Cheqd did resolver](assets/adr-010-DID-resolver-diagram.png)
-[Cheqd did sequence diagram](assets/adr-010-DID-resolver-diagram.puml)
+![Cheqd did resolver](assets/adr-010-did-resolver/universal-resolver-sequence-diagram.png)
+[Cheqd did sequence diagram. Schema 1.](assets/adr-010-did-resolver/universal-resolver-sequence-diagram.puml)
 
 #### Pros
 
@@ -53,12 +53,22 @@ Host the resolver separately from the ledger as an additional resolution service
 
 #### Cons
 
+For using the resolver separately from the ledger as an additional resolution service. 
+All options for application interaction will be described in more detail below in [Possible flows for DID resolution](#possible-flows-for-did-resolution).
+
 - Longer chain of trust. As a result, more resources required by the client to maintain the security of the system (`node + resolver` instead of `node`)
+
+### Possible flows for DID resolution
+
+To level out downsides of this approach a client can choose one of suitable flows.
+
+#### 1.  
+
 
 Cheqd DIDDoc resolving module at this stage will implement simple functionality that can be a lightweight architecture of threads without synchronization. Just several classes without the use of complex design patterns.
 
-![cheqd did resolver class diagram](assets/adr-010-DID-resolver-driver.png)
-[Cheqd did resolver class diagram](assets/adr-010-DID-resolver-driver.puml)
+![cheqd did resolver class diagram](assets/adr-010-did-resolver/resolver-class-diagram.png)
+[Cheqd did resolver class diagram](assets/adr-010-did-resolver/resolver-class-diagram.puml)
 
 There are two ways to use Cheqd DIDDoc resolving module. As a library (go module) and as a standalone web service.
 
