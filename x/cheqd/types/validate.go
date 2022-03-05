@@ -1,8 +1,10 @@
 package types
 
-import "github.com/cheqd/cheqd-node/x/cheqd/utils"
+import (
+	"github.com/cheqd/cheqd-node/x/cheqd/utils"
+)
 
-
+// DID rule
 type DIDRule struct {
 	method string
 	allowedNamespaces []string
@@ -21,7 +23,7 @@ func (D DIDRule) Validate(value interface{}) error {
 	return utils.ValidateDID(casted, D.method, D.allowedNamespaces)
 }
 
-
+// DIDURL rule
 type DIDUrlRule struct {
 	method string
 	allowedNamespaces []string
@@ -40,6 +42,40 @@ func (D DIDUrlRule) Validate(value interface{}) error {
 	return utils.ValidateDIDUrl(casted, D.method, D.allowedNamespaces)
 }
 
+// List of DID rule
+type DIDListRule struct {
+	method string
+	allowedNamespaces []string
+}
+
+func NewDIDListRule(method string, allowedNamespaces []string) *DIDListRule {
+	return &DIDListRule{method: method, allowedNamespaces: allowedNamespaces}
+}
+
+func (D DIDListRule) Validate(value interface{}) error {
+	casted, ok := value.([]string)
+	if !ok {
+		panic("DIDListRule must be only applied on list of strings")
+	}
+	return utils.ValidateDIDList(casted, D.method, D.allowedNamespaces)
+}
+
+// PublicKeyMultibase
+type PublicKeyMultibaseRule struct {
+}
+
+func NewPublicKeyMultibaseRule() *PublicKeyMultibaseRule {
+	return &PublicKeyMultibaseRule{}
+}
+
+func (D PublicKeyMultibaseRule) Validate(value interface{}) error {
+	casted, ok := value.(string)
+	if !ok {
+		panic("PublicKeyMultibaseRule must be only applied on string properties")
+	}
+
+	return utils.ValidatePublicKeyMultibase(casted)
+}
 
 ////const (
 ////	PublicKeyJwk       = "PublicKeyJwk"

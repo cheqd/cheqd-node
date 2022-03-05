@@ -17,10 +17,13 @@ func NewVerificationMethod(id string, type_ string, controller string, publicKey
 	}
 }
 
+// Validate verification method
 func (vm VerificationMethod) Validate() error {
 	return validation.ValidateStruct(&vm,
-		validation.Field(&vm.Id, validation.Required, NewDIDRule("", nil)),
+		validation.Field(&vm.Id, validation.Required, NewDIDUrlRule("", nil)),
+		validation.Field(&vm.Controller, validation.Required, NewDIDRule("", nil)),
 		validation.Field(&vm.PublicKeyJwk, validation.When(vm.Type == "jwk", validation.Required.Error("must be set when type is jwk"))),
+		validation.Field(&vm.PublicKeyMultibase,  validation.When(vm.Type != "jwk", NewPublicKeyMultibaseRule())),
 	)
 }
 

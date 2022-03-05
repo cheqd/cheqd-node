@@ -28,5 +28,6 @@ func (msg MsgCreateDidPayload) Validate() error {
 	return validation.ValidateStruct(&msg,
 		validation.Field(&msg.Id, validation.Required, NewDIDRule("", nil)),
 		validation.Field(&msg.VerificationMethod),
+		validation.Field(&msg.Controller, validation.When(len(msg.Controller) > 0),NewDIDListRule("", nil)),
 	)
 }

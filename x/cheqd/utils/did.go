@@ -64,11 +64,11 @@ func ValidateDID(did string, method string, allowedNamespaces []string) error {
 func ValidateUniqueId(uniqueId string) error {
 	// Length should be 16 or 32 symbols
 	if len(uniqueId) != 16 && len(uniqueId) != 32 {
-		return fmt.Errorf("id length should be 16 or 32 symbols")
+		return fmt.Errorf("unique id length should be 16 or 32 symbols")
 	}
 	// Base58 check
 	if !ValidBase58Regexp.MatchString(uniqueId) {
-		return fmt.Errorf("did id must be valid base58 string")
+		return fmt.Errorf("unique id must be valid base58 string")
 	}
 
 	return nil
