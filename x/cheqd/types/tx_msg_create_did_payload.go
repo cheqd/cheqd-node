@@ -1,5 +1,7 @@
 package types
 
+import validation "github.com/go-ozzo/ozzo-validation/v4"
+
 var _ IdentityMsg = &MsgCreateDidPayload{}
 
 func (msg *MsgCreateDidPayload) GetSignBytes() []byte {
@@ -20,4 +22,11 @@ func (msg *MsgCreateDidPayload) ToDid() Did {
 		AlsoKnownAs:          msg.AlsoKnownAs,
 		Service:              msg.Service,
 	}
+}
+
+func (msg MsgCreateDidPayload) Validate() error {
+	return validation.ValidateStruct(&msg,
+		validation.Field(&msg.Id, validation.Required, NewDIDRule("", nil)),
+		validation.Field(&msg.VerificationMethod),
+	)
 }

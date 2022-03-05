@@ -31,14 +31,14 @@ func (msg *MsgUpdateDid) GetSignBytes() []byte {
 }
 
 func (msg *MsgUpdateDid) ValidateBasic() error {
-	validate, err := BuildValidator(DidMethod, nil)
-	if err != nil {
-		return ErrValidatorInitialisation.Wrap(err.Error())
-	}
-
-	if err := validate.Struct(msg); err != nil {
-		return ErrBasicValidation.Wrapf(err.Error())
-	}
+	//validate, err := BuildValidator(DidMethod, nil)
+	//if err != nil {
+	//	return ErrValidatorInitialisation.Wrap(err.Error())
+	//}
+	//
+	//if err := validate.Struct(msg); err != nil {
+	//	return ErrBasicValidation.Wrapf(err.Error())
+	//}
 
 	return nil
 }

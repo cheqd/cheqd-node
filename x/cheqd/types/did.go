@@ -2,6 +2,7 @@ package types
 
 import (
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
 var _ StateValueData = &Did{}
@@ -14,6 +15,13 @@ func NewVerificationMethod(id string, type_ string, controller string, publicKey
 		PublicKeyJwk:       publicKeyJwk,
 		PublicKeyMultibase: publicKeyMultibase,
 	}
+}
+
+func (vm VerificationMethod) Validate() error {
+	return validation.ValidateStruct(&vm,
+		validation.Field(&vm.Id, validation.Required, NewDIDRule("", nil)),
+		validation.Field(&vm.PublicKeyJwk, validation.When(vm.Type == "jwk", validation.Required.Error("must be set when type is jwk"))),
+	)
 }
 
 // AggregateControllerDids returns controller DIDs used in both did.controllers and did.verification_method.controller

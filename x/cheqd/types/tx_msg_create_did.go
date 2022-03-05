@@ -2,6 +2,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
 var _ sdk.Msg = &MsgCreateDid{}
@@ -31,14 +32,20 @@ func (msg *MsgCreateDid) GetSignBytes() []byte {
 }
 
 func (msg *MsgCreateDid) ValidateBasic() error {
-	validate, err := BuildValidator(DidMethod, nil)
-	if err != nil {
-		return ErrValidatorInitialisation.Wrap(err.Error())
-	}
-
-	if err := validate.Struct(msg); err != nil {
-		return ErrBasicValidation.Wrapf(err.Error())
-	}
+	//validate, err := BuildValidator(DidMethod, nil)
+	//if err != nil {
+	//	return ErrValidatorInitialisation.Wrap(err.Error())
+	//}
+	//
+	//if err := validate.Struct(msg); err != nil {
+	//	return ErrBasicValidation.Wrapf(err.Error())
+	//}
 
 	return nil
+}
+
+func (msg MsgCreateDid) Validate() error {
+	return validation.ValidateStruct(&msg,
+		validation.Field(&msg.Payload),
+	)
 }

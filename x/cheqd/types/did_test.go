@@ -5,66 +5,36 @@ import (
 	"testing"
 )
 
-func TestVerificationMethodValidation(t *testing.T) {
+func TestVerificationMethod(t *testing.T) {
 	cases := []struct {
-		name    string
-		struct_ *VerificationMethod
-		valid   bool
-		errMsg  string
+		name   string
+		struct_ VerificationMethod
+		isValid bool
+		errorMsg string
 	}{
 		{
-			"Id is required",
-			&VerificationMethod{
-				Id:                 "",
-				Type:               "",
+			name: "test case 1",
+			struct_: VerificationMethod{
+				Id:                 "did1:cheqd:testnet:123456789abcdefg#sdfsdf",
+				Type:               "jwk",
 				Controller:         "",
 				PublicKeyJwk:       nil,
-				PublicKeyMultibase: "key_content",
+				PublicKeyMultibase: "multibase",
 			},
-			false,
-			"Key: 'VerificationMethod.Id' Error:Field validation for 'Id' failed on the 'required' tag",
+			isValid: true,
+			errorMsg: "",
 		},
-		//{
-		//	"Id must be a DID",
-		//	&VerificationMethod{
-		//		Id:                 "abba",
-		//		Type:               "",
-		//		Controller:         "",
-		//		PublicKeyJwk:       nil,
-		//		PublicKeyMultibase: "key_content",
-		//	},
-		//	false,
-		//	"",
-		//},
-		//{
-		//	"Valid verification method",
-		//	&VerificationMethod{
-		//		Id:                 "did:cheqd:alternet:TG9yZW0gaXBzdW0g",
-		//		Type:               "",
-		//		Controller:         "",
-		//		PublicKeyJwk:       nil,
-		//		PublicKeyMultibase: "key_content",
-		//	},
-		//	true,
-		//	"",
-		//},
 	}
 
-	validate, err := BuildValidator(DidMethod, nil)
-	if err != nil {
-		t.Errorf("%s", err.Error())
-	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			err := tc.struct_.Validate()
 
-	for _, testCase := range cases {
-		t.Run(testCase.name, func(t *testing.T) {
-
-			err := validate.Struct(testCase.struct_)
-
-			if testCase.valid {
-				require.Nil(t, err)
+			if tc.isValid {
+				require.NoError(t, err)
 			} else {
 				require.Error(t, err)
-				require.Equal(t, testCase.errMsg, err.Error())
+				require.Equal(t, err.Error(), tc.errorMsg)
 			}
 		})
 	}
