@@ -3,11 +3,12 @@ package types
 import (
 	"errors"
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
+	"github.com/go-playground/validator/v10"
 	"regexp"
 )
 
 var SplitDIDRegexp, _        = regexp.Compile(`^did:([^:]+?)(:([^:]+?))?:([^:]+)$`)
-var DidNamespaceRegexp, _    = regexp.Compile(`^[a-zA-Z0-9]$`)
+var DidNamespaceRegexp, _    = regexp.Compile(`^[a-zA-Z0-9]*$`)
 // Base58 only allowed (without OolI and 0)
 var UniqueIDRegexp, _        = regexp.Compile(`^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]*$`)
 // That for groups:
@@ -20,9 +21,9 @@ var UniqueIDRegexp, _        = regexp.Compile(`^[123456789ABCDEFGHJKLMNPQRSTUVWX
 // 6 - [^#]+[\$]?    - fragment only															  (key1???)
 // Number of queries is not limited.
 var SplitDIDURL, _           = regexp.Compile(`([^/?#]*)?([^?#]*)(\?([^#]*))?(#([^#]+$))?$`)
-var DIDPathAbemptyRegexp, _  = regexp.Compile(`^[/a-zA-Z0-9\-\.\_\~\%\!\$\&\'\(\)\*\+\,\;\=\:\@]+$`)
-var DIDQueryRegexp, _        = regexp.Compile(`^[/a-zA-Z0-9\-\.\_\~\%\!\$\&\'\(\)\*\+\,\;\=\:\@\/\?]*$`)
-var DIDFragmentRegexp, _     = regexp.Compile(`^[/a-zA-Z0-9\-\.\_\~\%\!\$\&\'\(\)\*\+\,\;\=\:\@\/\?]*$`)
+var DIDPathAbemptyRegexp, _  = regexp.Compile(`^([/a-zA-Z0-9\-\.\_\~\!\$\&\'\(\)\*\+\,\;\=\:\@]*|(%[0-9A-Fa-f]{2})*)*$`)
+var DIDQueryRegexp, _        = regexp.Compile(`^([/a-zA-Z0-9\-\.\_\~\!\$\&\'\(\)\*\+\,\;\=\:\@\/\?]*|(%[0-9A-Fa-f]{2})*)*$`)
+var DIDFragmentRegexp, _     = regexp.Compile(`^([/a-zA-Z0-9\-\.\_\~\!\$\&\'\(\)\*\+\,\;\=\:\@\/\?]*|(%[0-9A-Fa-f]{2})*)*$`)
 
 
 //// DID-related
@@ -48,21 +49,28 @@ func TrySplitDID(did string) (method string, namespace string, id string, err er
 // ValidateDID checks method and allowed namespaces only when the corresponding parameters are specified.
 // TODO: Handle empty parameters
 func ValidateDID(did string, method string, allowedNamespaces []string) error {
-	method, namespace, unique_id, err := TrySplitDID(did)
+	s_method, s_namespace, s_unique_id, err := TrySplitDID(did)
 	if err != nil {
 		return err
 	}
 
 	// check method
-	if method != method {
+	if method != "" && method != s_method {
 		return ErrStaticDIDBadMethod.Wrap(method)
 	}
 	// check namespaces
-	if !DidNamespaceRegexp.MatchString(namespace) || !utils.Contains(allowedNamespaces, namespace) {
-		return ErrStaticDIDNamespaceNotAllowed.Wrap(namespace)
+	if len(allowedNamespaces) > 0 && !utils.Contains(allowedNamespaces, s_namespace) {
+		return ErrStaticDIDNamespaceNotAllowed.Wrap(s_namespace)
 	}
+
+	if !DidNamespaceRegexp.MatchString(s_namespace) {
+		return ErrStaticDIDNamespaceNotValid.Wrap(s_namespace)
+}
 	// check unique-id
-	err := ValidateUniqueId(unique_id)
+	err = ValidateUniqueId(s_unique_id)
+	if (err != nil) {
+		return err
+	}
 
 	return err
 }
@@ -147,4 +155,15 @@ func IsValidDIDUrl(didUrl string, method string, allowedNamespaces []string) boo
 	err := ValidateDIDUrl(didUrl, method, allowedNamespaces)
 
 	return nil == err
+}
+
+
+//// VerificationMethod-related
+
+func VerificationMethodStructLevelValidation(sl validator.StructLevel) {
+	vm := sl.Current().Interface().(VerificationMethod)
+
+	if vm.Type == "jwk" && vm.PublicKeyJwk == nil {
+		sl.ReportError(vm.PublicKeyJwk, "pubKeyJwk", "PublicKeyJwk", "pubKeyJwk_required_when_type_is_jwk", "")
+	}
 }

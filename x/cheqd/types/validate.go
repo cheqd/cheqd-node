@@ -7,6 +7,7 @@ import (
 func BuildValidator(DIDMethod string, allowedDIDNamespaces []string) (*validator.Validate, error) {
 	validate := validator.New()
 
+	// Custom tags
 	err := validate.RegisterValidation("did", func(fl validator.FieldLevel) bool {
 		return IsValidDID(fl.Field().String(), DIDMethod, allowedDIDNamespaces)
 	})
@@ -44,6 +45,10 @@ func BuildValidator(DIDMethod string, allowedDIDNamespaces []string) (*validator
 	if err != nil {
 		return nil, err
 	}
+
+	// Custom struct level rules
+
+	validate.RegisterStructValidation(VerificationMethodStructLevelValidation, VerificationMethod{})
 
 	return validate, nil
 }
