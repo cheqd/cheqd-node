@@ -58,12 +58,6 @@ All options for application interaction will be described in more detail below i
 
 - Longer chain of trust. As a result, more resources required by the client to maintain the security of the system (`node + resolver` instead of `node`)
 
-### Possible flows for DID resolution
-
-To level out downsides of this approach a client can choose one of suitable flows.
-
-#### 1.  
-
 
 Cheqd DIDDoc resolving module at this stage will implement simple functionality that can be a lightweight architecture of threads without synchronization. Just several classes without the use of complex design patterns.
 
@@ -103,6 +97,45 @@ The presentation of the data takes place next to the base where the data is stor
 #### Cons
 
 - Unable to update resolver without updating node. However, expanding the functionality without breaking changes is also possible with minor releases, which allows update the node without upgrade transaction.
+
+### Possible flows for DID resolution
+
+To level out downsides of this approach a client can choose one of suitable flows.
+
+#### 1. Universal resolver on DIF side
+
+DIF company has an experimental setup of Universal Resolver on the https://dev.uniresolver.io
+The first "Universal Resolver" section from the [schema 1](#did-resolution-from-the-cheqd-network-ledger) shows this flow.
+- A client just send a request to https://dev.uniresolver.io. 
+- Universal Resolver on DIF servers uses Cheqd Universal Resolver Driver to redirect client request to Cheqd DID Resolver.
+- Cheqd DID Resolver get DID Doc in protobuf format from the ledger throw Cosmos SDK gRPC API
+- Cheqd DID Resolver generate an answer for the client request based on received DID Doc.
+- And sends a response to the client throw Cheqd Universal Resolver Driver and Universal Resolver
+
+##### Pros
+
+- Development can be started without additional library dependencies and setting up additional services.
+
+##### Cons
+
+- https://dev.uniresolver.io can be used only for development, can't be use in production goals.
+- The longest trust chain where the client must trust all sides
+
+#### 2.  Universal resolver on a client side
+
+Absolutely the same with [Universal resolver on DIF side flow](#1-universal-resolver-on-dif-side). 
+But the client sets up Universal Resolver with Drivers by themselves.
+
+##### Pros
+
+- Can be used in production
+- Trust DIF servers is not needed
+
+##### Cons
+
+- Setting up Universal Resolver and Drivers are needed
+- The trust chain where the client must trust all sides, but smaller ten in previous case.
+
 
 ## Decision
 
