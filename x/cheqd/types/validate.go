@@ -42,22 +42,22 @@ func (D DIDUrlRule) Validate(value interface{}) error {
 	return utils.ValidateDIDUrl(casted, D.method, D.allowedNamespaces)
 }
 
-// List of DID rule
-type DIDListRule struct {
+// Set of DID rule
+type DIDSetRule struct {
 	method string
 	allowedNamespaces []string
 }
 
-func NewDIDListRule(method string, allowedNamespaces []string) *DIDListRule {
-	return &DIDListRule{method: method, allowedNamespaces: allowedNamespaces}
+func NewDIDSetRule(method string, allowedNamespaces []string) *DIDSetRule {
+	return &DIDSetRule{method: method, allowedNamespaces: allowedNamespaces}
 }
 
-func (D DIDListRule) Validate(value interface{}) error {
+func (D DIDSetRule) Validate(value interface{}) error {
 	casted, ok := value.([]string)
 	if !ok {
-		panic("DIDListRule must be only applied on list of strings")
+		panic("DIDSetRule must be only applied on list of strings")
 	}
-	return utils.ValidateDIDList(casted, D.method, D.allowedNamespaces)
+	return utils.ValidateDIDSet(casted, D.method, D.allowedNamespaces)
 }
 
 // PublicKeyMultibase

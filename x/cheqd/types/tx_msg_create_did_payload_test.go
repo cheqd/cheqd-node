@@ -19,6 +19,58 @@ func TestMsgCreateDidPayloadValidation(t *testing.T) {
 		errorMsg string
 	}{
 		{
+			name: "Valid: Id: allowed DID",
+			struct_: &MsgCreateDidPayload{
+				Context:    nil,
+				Id:         CorrectTestDID,
+				Controller: nil,
+				VerificationMethod: []*VerificationMethod{
+					{
+						Id:                 fmt.Sprintf("%s#fragment", CorrectTestDID),
+						Type:               "Ed25519VerificationKey2020",
+						Controller:         CorrectTestDID,
+						PublicKeyJwk:       nil,
+						PublicKeyMultibase: "zABCDEFG12345678",
+					},
+				},
+				Authentication:       nil,
+				AssertionMethod:      nil,
+				CapabilityInvocation: nil,
+				CapabilityDelegation: nil,
+				KeyAgreement:         nil,
+				AlsoKnownAs:          nil,
+				Service:              nil,
+			},
+			isValid:  true,
+			errorMsg: "",
+		},
+		{
+			name: "Not valid: Id: not allowed DID",
+			struct_: &MsgCreateDidPayload{
+				Context:    nil,
+				Id:         BadTestDID,
+				Controller: nil,
+				VerificationMethod: []*VerificationMethod{
+					{
+						Id:                 fmt.Sprintf("%s#fragment", CorrectTestDID),
+						Type:               "Ed25519VerificationKey2020",
+						Controller:         CorrectTestDID,
+						PublicKeyJwk:       nil,
+						PublicKeyMultibase: "zABCDEFG12345678",
+					},
+				},
+				Authentication:       nil,
+				AssertionMethod:      nil,
+				CapabilityInvocation: nil,
+				CapabilityDelegation: nil,
+				KeyAgreement:         nil,
+				AlsoKnownAs:          nil,
+				Service:              nil,
+			},
+			isValid:  false,
+			errorMsg: "did must match the following regex exactly one time",
+		},
+		{
 			name: "Valid: Verification Method: all is fine with type Ed25519VerificationKey2020",
 			struct_: &MsgCreateDidPayload{
 				Context:    nil,
