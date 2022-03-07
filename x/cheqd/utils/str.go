@@ -60,3 +60,23 @@ func Unique(array []string) []string {
 
 	return result
 }
+
+func IsUnique(list []string) bool {
+	set :=map[string]bool{}
+
+	for _, did := range list {
+		set[did] = true
+	}
+
+	return len(list) == len(set)
+}
+
+func ToInterfaces(list []string) []interface{} {
+	res := make([]interface{}, len(list))
+
+	for i := range list {
+		res[i] = list[i]
+	}
+
+	return res
+}

@@ -7,9 +7,9 @@ import (
 	"testing"
 )
 
-var CorrectTestDID = "did:cheqd:testnet:123456789abcdefg"
-var CorrectTestDID2 = "did:cheqd:testnet:gfedcba987654321"
-var BadTestDID = "badDid"
+var ValidTestDID = "did:cheqd:testnet:123456789abcdefg"
+var ValidTestDID2 = "did:cheqd:testnet:gfedcba987654321"
+var UnvalidTestDID = "badDid"
 
 func TestMsgCreateDidPayloadValidation(t *testing.T) {
 	cases := []struct {
@@ -22,13 +22,13 @@ func TestMsgCreateDidPayloadValidation(t *testing.T) {
 			name: "Valid: Id: allowed DID",
 			struct_: &MsgCreateDidPayload{
 				Context:    nil,
-				Id:         CorrectTestDID,
+				Id:         ValidTestDID,
 				Controller: nil,
 				VerificationMethod: []*VerificationMethod{
 					{
-						Id:                 fmt.Sprintf("%s#fragment", CorrectTestDID),
+						Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
 						Type:               "Ed25519VerificationKey2020",
-						Controller:         CorrectTestDID,
+						Controller:         ValidTestDID,
 						PublicKeyJwk:       nil,
 						PublicKeyMultibase: "zABCDEFG12345678",
 					},
@@ -48,13 +48,13 @@ func TestMsgCreateDidPayloadValidation(t *testing.T) {
 			name: "Not valid: Id: not allowed DID",
 			struct_: &MsgCreateDidPayload{
 				Context:    nil,
-				Id:         BadTestDID,
+				Id:         UnvalidTestDID,
 				Controller: nil,
 				VerificationMethod: []*VerificationMethod{
 					{
-						Id:                 fmt.Sprintf("%s#fragment", CorrectTestDID),
+						Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
 						Type:               "Ed25519VerificationKey2020",
-						Controller:         CorrectTestDID,
+						Controller:         ValidTestDID,
 						PublicKeyJwk:       nil,
 						PublicKeyMultibase: "zABCDEFG12345678",
 					},
@@ -74,13 +74,13 @@ func TestMsgCreateDidPayloadValidation(t *testing.T) {
 			name: "Valid: Verification Method: all is fine with type Ed25519VerificationKey2020",
 			struct_: &MsgCreateDidPayload{
 				Context:    nil,
-				Id:         CorrectTestDID,
+				Id:         ValidTestDID,
 				Controller: nil,
 				VerificationMethod: []*VerificationMethod{
 					{
-						Id:                 fmt.Sprintf("%s#fragment", CorrectTestDID),
+						Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
 						Type:               "Ed25519VerificationKey2020",
-						Controller:         CorrectTestDID,
+						Controller:         ValidTestDID,
 						PublicKeyJwk:       nil,
 						PublicKeyMultibase: "zABCDEFG12345678",
 					},
@@ -100,13 +100,13 @@ func TestMsgCreateDidPayloadValidation(t *testing.T) {
 			name: "Valid: Verification Method: all is fine with type jwk",
 			struct_: &MsgCreateDidPayload{
 				Context:    nil,
-				Id:         CorrectTestDID,
+				Id:         ValidTestDID,
 				Controller: nil,
 				VerificationMethod: []*VerificationMethod{
 					{
-						Id:                  fmt.Sprintf("%s#fragment", CorrectTestDID),
+						Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
 						Type:               "jwk",
-						Controller:         CorrectTestDID,
+						Controller:         ValidTestDID,
 						PublicKeyJwk:       []*KeyValuePair{&KeyValuePair{"key", "value"}},
 						PublicKeyMultibase: "",
 					},
@@ -126,13 +126,13 @@ func TestMsgCreateDidPayloadValidation(t *testing.T) {
 			name: "Not valid: Verification Method: Wrong id",
 			struct_: &MsgCreateDidPayload{
 				Context:    nil,
-				Id:         CorrectTestDID,
+				Id:         ValidTestDID,
 				Controller: nil,
 				VerificationMethod: []*VerificationMethod{
 					{
-						Id:                 BadTestDID,
+						Id:                 UnvalidTestDID,
 						Type:               "jwk",
-						Controller:         CorrectTestDID,
+						Controller:         ValidTestDID,
 						PublicKeyJwk:       []*KeyValuePair{&KeyValuePair{"key", "value"}},
 						PublicKeyMultibase: "",
 					},
@@ -152,13 +152,13 @@ func TestMsgCreateDidPayloadValidation(t *testing.T) {
 			name: "Not valid: Verification Method: Wrong controller",
 			struct_: &MsgCreateDidPayload{
 				Context:    nil,
-				Id:         CorrectTestDID,
+				Id:         ValidTestDID,
 				Controller: nil,
 				VerificationMethod: []*VerificationMethod{
 					{
-						Id:                  fmt.Sprintf("%s#fragment", CorrectTestDID),
+						Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
 						Type:               "jwk",
-						Controller:         BadTestDID,
+						Controller:         UnvalidTestDID,
 						PublicKeyJwk:       []*KeyValuePair{&KeyValuePair{"key", "value"}},
 						PublicKeyMultibase: "",
 					},
@@ -178,13 +178,13 @@ func TestMsgCreateDidPayloadValidation(t *testing.T) {
 			name: "Not valid: Verification Method: Wrong id and controller",
 			struct_: &MsgCreateDidPayload{
 				Context:    nil,
-				Id:         CorrectTestDID,
+				Id:         ValidTestDID,
 				Controller: nil,
 				VerificationMethod: []*VerificationMethod{
 					{
-						Id:                  fmt.Sprintf("%s#fragment", CorrectTestDID),
+						Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
 						Type:               "jwk",
-						Controller:         BadTestDID,
+						Controller:         UnvalidTestDID,
 						PublicKeyJwk:       []*KeyValuePair{&KeyValuePair{"key", "value"}},
 						PublicKeyMultibase: "",
 					},
@@ -204,13 +204,13 @@ func TestMsgCreateDidPayloadValidation(t *testing.T) {
 			name: "Not valid: Verification Method: type - jwk but PublicKeyJwk is nil",
 			struct_: &MsgCreateDidPayload{
 				Context:    nil,
-				Id:         CorrectTestDID,
+				Id:         ValidTestDID,
 				Controller: nil,
 				VerificationMethod: []*VerificationMethod{
 					{
-						Id:                  fmt.Sprintf("%s#fragment", CorrectTestDID),
+						Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
 						Type:               "jwk",
-						Controller:         CorrectTestDID,
+						Controller:         ValidTestDID,
 						PublicKeyMultibase: "",
 					},
 				},
@@ -229,13 +229,13 @@ func TestMsgCreateDidPayloadValidation(t *testing.T) {
 			name: "Not valid: Verification Method: type - Ed25519VerificationKey2020 but PublicKeyMultibase is empty",
 			struct_: &MsgCreateDidPayload{
 				Context:    nil,
-				Id:         CorrectTestDID,
+				Id:         ValidTestDID,
 				Controller: nil,
 				VerificationMethod: []*VerificationMethod{
 					{
-						Id:                  fmt.Sprintf("%s#fragment", CorrectTestDID),
+						Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
 						Type:               "Ed25519VerificationKey2020",
-						Controller:         CorrectTestDID,
+						Controller:         ValidTestDID,
 						PublicKeyMultibase: "",
 					},
 				},
@@ -254,13 +254,13 @@ func TestMsgCreateDidPayloadValidation(t *testing.T) {
 			name: "Valid: Controller: List of DIDs allowed",
 			struct_: &MsgCreateDidPayload{
 				Context:    nil,
-				Id:         CorrectTestDID,
-				Controller: []string{CorrectTestDID, CorrectTestDID2},
+				Id:         ValidTestDID,
+				Controller: []string{ValidTestDID, ValidTestDID2},
 				VerificationMethod: []*VerificationMethod{
 					{
-						Id:                  fmt.Sprintf("%s#fragment", CorrectTestDID),
+						Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
 						Type:               "Ed25519VerificationKey2020",
-						Controller:         CorrectTestDID,
+						Controller:         ValidTestDID,
 						PublicKeyMultibase: "zABCDEFG12345678",
 					},
 				},
@@ -279,13 +279,13 @@ func TestMsgCreateDidPayloadValidation(t *testing.T) {
 			name: "Not valid: Controller: List of DIDs is not allowed",
 			struct_: &MsgCreateDidPayload{
 				Context:    nil,
-				Id:         CorrectTestDID,
-				Controller: []string{CorrectTestDID, BadTestDID},
+				Id:         ValidTestDID,
+				Controller: []string{ValidTestDID, UnvalidTestDID},
 				VerificationMethod: []*VerificationMethod{
 					{
-						Id:                  fmt.Sprintf("%s#fragment", CorrectTestDID),
+						Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
 						Type:               "Ed25519VerificationKey2020",
-						Controller:         CorrectTestDID,
+						Controller:         ValidTestDID,
 						PublicKeyMultibase: "zABCDEFG12345678",
 					},
 				},

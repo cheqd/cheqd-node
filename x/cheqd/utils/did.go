@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -9,8 +10,6 @@ import (
 var SplitDIDRegexp, _ = regexp.Compile(`^did:([^:]+?)(:([^:]+?))?:([^:]+)$`)
 var DidNamespaceRegexp, _ = regexp.Compile(`^[a-zA-Z0-9]*$`)
 
-// Base58 only allowed (without OolI and 0)
-var ValidBase58Regexp, _ = regexp.Compile(`^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]*$`)
 
 // TrySplitDID Validates generic format of DID. It doesn't validate method, name and id content.
 // Call ValidateDID for further validation.
@@ -23,7 +22,7 @@ func TrySplitDID(did string) (method string, namespace string, id string, err er
 	// match [4] - base58str1ng1111     - id
 	matches := SplitDIDRegexp.FindAllStringSubmatch(did, -1)
 	if len(matches) != 1 {
-		return "", "", "", fmt.Errorf("did must match the following regex exactly one time: %s", SplitDIDRegexp)
+		return "", "", "", errors.New("unable to split did into method, namespace and id")
 	}
 
 	match := matches[0]
@@ -38,14 +37,13 @@ func ValidateDID(did string, method string, allowedNamespaces []string) error {
 	}
 
 	// check method
-	// TODO: Is there any regexp fo method?
 	if method != "" && method != sMethod {
 		return fmt.Errorf("did method must be: %s", method)
 	}
 
 	// check namespaces
 	if !DidNamespaceRegexp.MatchString(sNamespace) {
-		return fmt.Errorf("did namespace must match the following regexp: %s", DidNamespaceRegexp)
+		return errors.New("invalid did namespace")
 	}
 
 	if len(allowedNamespaces) > 0 && !Contains(allowedNamespaces, sNamespace) {
@@ -66,9 +64,10 @@ func ValidateUniqueId(uniqueId string) error {
 	if len(uniqueId) != 16 && len(uniqueId) != 32 {
 		return fmt.Errorf("unique id length should be 16 or 32 symbols")
 	}
+
 	// Base58 check
-	if !ValidBase58Regexp.MatchString(uniqueId) {
-		return fmt.Errorf("unique id must be valid base58 string")
+	if err := ValidateBase58(uniqueId); err != nil {
+		return fmt.Errorf("unique id must be valid base58 string: %s", err)
 	}
 
 	return nil

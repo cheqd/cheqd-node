@@ -1,6 +1,8 @@
 package types
 
-import validation "github.com/go-ozzo/ozzo-validation/v4"
+import (
+	validation "github.com/go-ozzo/ozzo-validation/v4"
+)
 
 var _ IdentityMsg = &MsgCreateDidPayload{}
 
@@ -26,9 +28,9 @@ func (msg *MsgCreateDidPayload) ToDid() Did {
 
 func (msg MsgCreateDidPayload) Validate() error {
 	return validation.ValidateStruct(&msg,
-		validation.Field(&msg.Id, validation.Required, NewDIDRule("", nil)),
+		validation.Field(&msg.Id, validation.Required, IsDID()),
 		validation.Field(&msg.VerificationMethod),
-		validation.Field(&msg.Controller, validation.When(len(msg.Controller) > 0), NewDIDSetRule("", nil)),
+		validation.Field(&msg.Controller, IsUnique(), validation.Each(IsDID())),
 		validation.Field(&msg.Authentication),
 	)
 }
