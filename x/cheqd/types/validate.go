@@ -2,7 +2,19 @@ package types
 
 import (
 	"errors"
+	"fmt"
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
+	"strings"
+)
+
+// Helper enums
+
+type ValidationType int
+
+const (
+	Optional ValidationType = iota
+	Required ValidationType = iota
+	Empty    ValidationType = iota
 )
 
 // Custom error rule
@@ -19,28 +31,60 @@ func (c CustomErrorRule) Validate(value interface{}) error {
 	return c.fn(value)
 }
 
-
 // Validation helpers
 
-func IsDID() *CustomErrorRule {
+func IsDID(allowedNamespaces []string) *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.(string)
 		if !ok {
 			panic("IsDID must be only applied on string properties")
 		}
 
-		return utils.ValidateDID(casted, "", nil)
+		return utils.ValidateDID(casted, DidMethod, allowedNamespaces)
 	})
 }
 
-func IsDIDUrl() *CustomErrorRule {
+func IsDIDUrl(allowedNamespaces []string, pathRule, queryRule, fragmentRule ValidationType) *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.(string)
 		if !ok {
 			panic("IsDIDUrl must be only applied on string properties")
 		}
 
-		return utils.ValidateDIDUrl(casted, "", nil)
+		if err := utils.ValidateDIDUrl(casted, DidMethod, allowedNamespaces); err != nil {
+			return err
+		}
+
+		_, path, query, fragment, err := utils.TrySplitDIDUrl(casted)
+		if err != nil {
+			return err
+		}
+
+		if pathRule == Required && path == "" {
+			return errors.New("path is required")
+		}
+
+		if pathRule == Empty && path != "" {
+			return errors.New("path must be empty")
+		}
+
+		if queryRule == Required && query == "" {
+			return errors.New("query is required")
+		}
+
+		if queryRule == Empty && query != "" {
+			return errors.New("query must be empty")
+		}
+
+		if fragmentRule == Required && fragment == "" {
+			return errors.New("fragment is required")
+		}
+
+		if fragmentRule == Empty && fragment != "" {
+			return errors.New("fragment must be empty")
+		}
+
+		return nil
 	})
 }
 
@@ -55,7 +99,23 @@ func IsMultibase() *CustomErrorRule {
 	})
 }
 
-func IsUnique() *CustomErrorRule {
+func HasPrefix(prefix string) *CustomErrorRule {
+	return NewCustomErrorRule(func(value interface{}) error {
+		casted, ok := value.(string)
+		if !ok {
+			panic("HasPrefix must be only applied on string properties")
+		}
+
+		if !strings.HasPrefix(casted, prefix) {
+			return fmt.Errorf("must have prefix: %s", prefix)
+		}
+
+		return nil
+	})
+}
+
+
+func IsUniqueStrList() *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.([]string)
 		if !ok {

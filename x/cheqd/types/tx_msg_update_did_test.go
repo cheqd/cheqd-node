@@ -5,17 +5,58 @@ import (
 	"testing"
 )
 
-func TestMsgCreateDidValidation(t *testing.T) {
+func TestMsgUpdateDidValidation(t *testing.T) {
 	cases := []struct {
 		name     string
-		struct_  *MsgCreateDid
+		struct_  *MsgUpdateDid
 		isValid  bool
 		errorMsg string
 	}{
 		{
 			name: "positive",
-			struct_: &MsgCreateDid{
-				Payload: &MsgCreateDidPayload{
+			struct_: &MsgUpdateDid{
+				Payload: &MsgUpdateDidPayload{
+					Id:         "did:cheqd:testnet:123456789abcdefg",
+					VerificationMethod: []*VerificationMethod{
+						{
+							Id:                 "did:cheqd:testnet:123456789abcdefg#key1",
+							Type:               "Ed25519VerificationKey2020",
+							Controller:         "did:cheqd:testnet:123456789abcdefg",
+							PublicKeyMultibase: "multibase",
+						},
+					},
+					Authentication:       []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#aaa"},
+					VersionId: "version1",
+				},
+				Signatures: nil,
+			},
+			isValid:  true,
+		},
+		{
+			name: "negative: relationship duplicates",
+			struct_: &MsgUpdateDid{
+				Payload: &MsgUpdateDidPayload{
+					Id:         "did:cheqd:testnet:123456789abcdefg",
+					VerificationMethod: []*VerificationMethod{
+						{
+							Id:                 "did:cheqd:testnet:123456789abcdefg#key1",
+							Type:               "Ed25519VerificationKey2020",
+							Controller:         "did:cheqd:testnet:123456789abcdefg",
+							PublicKeyMultibase: "multibase",
+						},
+					},
+					Authentication:       []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#key1"},
+					VersionId: "version1",
+				},
+				Signatures: nil,
+			},
+			isValid:  false,
+			errorMsg: "authentication: there should be no duplicates.: basic validation failed",
+		},
+		{
+			name: "negative: version id is required",
+			struct_: &MsgUpdateDid{
+				Payload: &MsgUpdateDidPayload{
 					Id:         "did:cheqd:testnet:123456789abcdefg",
 					VerificationMethod: []*VerificationMethod{
 						{
@@ -29,27 +70,8 @@ func TestMsgCreateDidValidation(t *testing.T) {
 				},
 				Signatures: nil,
 			},
-			isValid:  true,
-		},
-		{
-			name: "negative: relationship duplicates",
-			struct_: &MsgCreateDid{
-				Payload: &MsgCreateDidPayload{
-					Id:         "did:cheqd:testnet:123456789abcdefg",
-					VerificationMethod: []*VerificationMethod{
-						{
-							Id:                 "did:cheqd:testnet:123456789abcdefg#key1",
-							Type:               "Ed25519VerificationKey2020",
-							Controller:         "did:cheqd:testnet:123456789abcdefg",
-							PublicKeyMultibase: "multibase",
-						},
-					},
-					Authentication:       []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#key1"},
-				},
-				Signatures: nil,
-			},
 			isValid:  false,
-			errorMsg: "authentication: there should be no duplicates.: basic validation failed",
+			errorMsg: "payload: (version_id: cannot be blank.).: basic validation failed",
 		},
 	}
 

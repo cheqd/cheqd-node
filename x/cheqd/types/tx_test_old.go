@@ -1,5 +1,6 @@
 package types
 
+// TODO: Think what to do with old tests
 //const Prefix = "did:cheqd:test:"
 //
 //func TestNewMsgCreateDidValidation(t *testing.T) {

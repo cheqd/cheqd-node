@@ -32,20 +32,24 @@ func (msg *MsgCreateDid) GetSignBytes() []byte {
 }
 
 func (msg *MsgCreateDid) ValidateBasic() error {
-	//validate, err := BuildValidator(DidMethod, nil)
-	//if err != nil {
-	//	return ErrValidatorInitialisation.Wrap(err.Error())
-	//}
-	//
-	//if err := validate.Struct(msg); err != nil {
-	//	return ErrBasicValidation.Wrapf(err.Error())
-	//}
+	err := msg.Validate(nil)
+	if err != nil {
+		return ErrBasicValidation.Wrap(err.Error())
+	}
+
+	err = msg.Payload.ToDid().Validate(nil)
+	if err != nil {
+		return ErrBasicValidation.Wrap(err.Error())
+	}
 
 	return nil
 }
 
-func (msg MsgCreateDid) Validate() error {
+// Validate
+
+func (msg MsgCreateDid) Validate(allowedNamespaces []string) error {
 	return validation.ValidateStruct(&msg,
-		validation.Field(&msg.Payload),
+		validation.Field(&msg.Payload, validation.Required),
+		validation.Field(&msg.Signatures, IsUniqueSignInfoList(), validation.Each(ValidSignInfo(allowedNamespaces))),
 	)
 }

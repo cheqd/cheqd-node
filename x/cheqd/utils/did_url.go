@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 )
@@ -14,24 +15,34 @@ import (
 // 5 - #([^#]+[\$]?) - group for fragment, starts with #, includes #                              (#key1???)
 // 6 - [^#]+[\$]?    - fragment only															  (key1???)
 // Number of queries is not limited.
-var SplitDIDURL, _           = regexp.Compile(`([^/?#]*)?([^?#]*)(\?([^#]*))?(#([^#]+$))?$`)
-var DIDPathAbemptyRegexp, _  = regexp.Compile(`^([/a-zA-Z0-9\-\.\_\~\!\$\&\'\(\)\*\+\,\;\=\:\@]*|(%[0-9A-Fa-f]{2})*)*$`)
-var DIDQueryRegexp, _        = regexp.Compile(`^([/a-zA-Z0-9\-\.\_\~\!\$\&\'\(\)\*\+\,\;\=\:\@\/\?]*|(%[0-9A-Fa-f]{2})*)*$`)
-var DIDFragmentRegexp, _     = regexp.Compile(`^([/a-zA-Z0-9\-\.\_\~\!\$\&\'\(\)\*\+\,\;\=\:\@\/\?]*|(%[0-9A-Fa-f]{2})*)*$`)
-
+var SplitDIDURLRegexp, _ = regexp.Compile(`([^/?#]*)?([^?#]*)(\?([^#]*))?(#([^#]+$))?$`)
+var DIDPathAbemptyRegexp, _ = regexp.Compile(`^([/a-zA-Z0-9\-\.\_\~\!\$\&\'\(\)\*\+\,\;\=\:\@]*|(%[0-9A-Fa-f]{2})*)*$`)
+var DIDQueryRegexp, _ = regexp.Compile(`^([/a-zA-Z0-9\-\.\_\~\!\$\&\'\(\)\*\+\,\;\=\:\@\/\?]*|(%[0-9A-Fa-f]{2})*)*$`)
+var DIDFragmentRegexp, _ = regexp.Compile(`^([/a-zA-Z0-9\-\.\_\~\!\$\&\'\(\)\*\+\,\;\=\:\@\/\?]*|(%[0-9A-Fa-f]{2})*)*$`)
 
 // TrySplitDIDUrl Validates generic format of DIDUrl. It doesn't validate path, query and fragment content.
 // Call ValidateDIDUrl for further validation.
-func TrySplitDIDUrl(didUrl string) (did string, path string , query string, fragment string) {
-	match := SplitDIDURL.FindStringSubmatch(didUrl)
-	return match[1], match[2], match[4], match[6]
+func TrySplitDIDUrl(didUrl string) (did string, path string, query string, fragment string, err error) {
+	matches := SplitDIDURLRegexp.FindAllStringSubmatch(didUrl, -1)
+
+	if len(matches) != 1 {
+		return "", "", "", "", errors.New("unable to split did url into did, path, query and fragment")
+	}
+
+	match := matches[0]
+
+	return match[1], match[2], match[4], match[6], nil
 }
 
 // ValidateDIDUrl checks method and allowed namespaces only when the corresponding parameters are specified.
 func ValidateDIDUrl(didUrl string, method string, allowedNamespaces []string) error {
-	did, path, query, fragment := TrySplitDIDUrl(didUrl)
+	did, path, query, fragment, err := TrySplitDIDUrl(didUrl)
+	if err != nil {
+		return err
+	}
+
 	// Validate DID
-	err := ValidateDID(did, method, allowedNamespaces)
+	err = ValidateDID(did, method, allowedNamespaces)
 	if err != nil {
 		return err
 	}

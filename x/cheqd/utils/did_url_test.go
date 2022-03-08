@@ -51,6 +51,7 @@ func TestIsDidURL(t *testing.T) {
 		{"Not valid: UniqueID less then 16 symbols", false, "did:cheqd:testnet:123/path?query#fragment"},
 		{"Not valid: UniqueID more then 16 symbols but less then 32", false, "did:cheqd:testnet:123456789abcdefgABCDEF/path?query#fragment"},
 		{"Not valid: UniqueID more then 32 symbols", false, "did:cheqd:testnet:123456789abcdefg123456789abcdefgABCDEF/path?query#fragment"},
+		{"Not valid: Split should return error", false, "qwerty"},
 	}
 
 	for _, tc := range cases {
