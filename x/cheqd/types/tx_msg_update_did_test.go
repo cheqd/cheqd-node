@@ -51,7 +51,7 @@ func TestMsgUpdateDidValidation(t *testing.T) {
 				Signatures: nil,
 			},
 			isValid:  false,
-			errorMsg: "authentication: there should be no duplicates.: basic validation failed",
+			errorMsg: "payload: (authentication: there should be no duplicates.).: basic validation failed",
 		},
 		{
 			name: "negative: version id is required",

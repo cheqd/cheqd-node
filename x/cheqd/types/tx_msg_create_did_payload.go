@@ -21,3 +21,20 @@ func (msg *MsgCreateDidPayload) ToDid() Did {
 		Service:              msg.Service,
 	}
 }
+
+// Validation
+
+func (msg MsgCreateDidPayload) Validate(allowedNamespaces []string) error {
+	return msg.ToDid().Validate(allowedNamespaces)
+}
+
+func ValidMsgCreateDidPayload(allowedNamespaces []string) *CustomErrorRule {
+	return NewCustomErrorRule(func(value interface{}) error {
+		casted, ok := value.(*MsgCreateDidPayload)
+		if !ok {
+			panic("ValidMsgCreateDidPayload must be only applied on MsgCreateDidPayload properties")
+		}
+
+		return casted.Validate(allowedNamespaces)
+	})
+}

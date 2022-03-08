@@ -12,64 +12,73 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
+// TODO: High priority
+// Define dynamic validation logic in ADR
+// TODO: Medium priority
+// Having multiple namespaces is impossible now. Do we need fix?
+// Do we need check references existence? It's not necessary according to spec but was implemented.
+// Validate keys in verification methods - Andrew N.
+// TODO: Low priority
+// Migrate old tests for static validation
+
 func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*types.MsgCreateDidResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// Basic validation + DID namespaces
+	// Validate namespaces
 	namespace := k.GetDidNamespace(ctx)
-	validator, err := types.BuildValidator(types.DidMethod, []string{namespace, ""})
-	if err != nil {
-		return nil, types.ErrValidatorInitialisation.Wrap(err.Error())
-	}
-
-	err = validator.Struct(msg)
+	// FIXME: We can't allow empty namespace because currently DIDs are stored as did.id -> did.
+	// FIXME: So 'did:cheqd:mainnet:abc' and 'did:cheqd:abc' will be counted as different DIDs.
+	err := msg.Validate([]string{namespace})
 	if err != nil {
 		return nil, types.ErrNamespaceValidation.Wrap(err.Error())
 	}
 
-	// Static
-	// Verification methods -> no duplicates
-	// Verification methods -> valid types, corresponding properties are set
-	// Verification relationships -> no duplicates
-	// Verification relationships -> valid references
-	// Services -> valid types
-
-	// Dynamic
-
 	// Validate DID doesn't exist
-	if k.HasDid(ctx, msg.Payload.Id) {
+	if k.HasDid(&ctx, msg.Payload.Id) {
 		return nil, types.ErrDidDocExists.Wrap(msg.Payload.Id)
 	}
 
-	// Verify that all controllers have at least one authentication key of supported type
+
+	// Build metadata and stateValue
 	did := msg.Payload.ToDid()
-	controllers := did.AggregateControllerDids()
-	for _, v := range controllers {
-		// ValidateDIDHasAtLeaseOneSupportedAuthKey
+	metadata := types.NewMetadataFromContext(ctx)
+	stateValue, err := types.NewStateValue(&did, &metadata)
+	if err != nil {
+		return nil, err
 	}
 
-	//if err := k.ValidateDidControllers(&ctx, payload.Id, payload.Controller, payload.VerificationMethod); err != nil {
-	//	return nil, err
-	//}
+	// Check there is at least one validation method
+	if len(did.VerificationMethod) < 1 {
+		return nil, types.ErrBadRequestInvalidVerMethod.Wrap("there should be at least one verification method")
+	}
 
+	// Check controllers' existence
+	controllers := did.AggregateControllerDids()
+	for _, controller := range controllers {
+		_, found, err := FindDid(&k.Keeper, &ctx, controller, map[string]types.StateValue{did.Id: stateValue})
+		if err != nil {
+			return nil, err
+		}
+
+		if !found {
+			return nil, types.ErrDidDocNotFound.Wrapf("controller not found: %s", controller)
+		}
+	}
 
 	// Verify signatures
 	if err := k.VerifySignature(&ctx, payload, payload.GetSigners(), msg.GetSignatures()); err != nil {
 		return nil, err
 	}
 
-	// Build DID and metadata
-	metadata := types.NewMetadataFromContext(ctx)
-
 	// Write to state
-	id, err := k.AppendDid(ctx, did, &metadata)
+	id, err := k.AppendDid(&ctx, &did, &metadata)
 	if err != nil {
 		return nil, err
 	}
 
 	// Build response
 	return &types.MsgCreateDidResponse{
-		Id: *id,
+		Id: id,
 	}, nil
 }
 
@@ -113,38 +122,12 @@ func (msg *MsgCreateDidPayload) ValidateDynamic(namespace string) error {
 	return nil
 }
 
-
 func ValidateVerificationMethods(namespace string, did string, vms []*VerificationMethod) error {
 	for i, vm := range vms {
 		if err := ValidateVerificationMethod(namespace, vm); err != nil {
 			return ErrBadRequestInvalidVerMethod.Wrap(sdkerrors.Wrapf(err, "index %d, value %s", i, vm.Id).Error())
 		}
 	}
-}
-
-func ValidateVerificationMethod(namespace string, vm *VerificationMethod) error {
-	switch utils.GetVerificationMethodType(vm.Type) {
-	case utils.PublicKeyJwk:
-		if len(vm.PublicKeyJwk) == 0 {
-			return ErrBadRequest.Wrapf("%s: should contain `PublicKeyJwk` verification material property", vm.Type)
-		}
-	case utils.PublicKeyMultibase:
-		if len(vm.PublicKeyMultibase) == 0 {
-			return ErrBadRequest.Wrapf("%s: should contain `PublicKeyMultibase` verification material property", vm.Type)
-		}
-	default:
-		return ErrBadRequest.Wrapf("%s: unsupported verification method type", vm.Type)
-	}
-
-	if len(vm.PublicKeyMultibase) == 0 && vm.PublicKeyJwk == nil {
-		return ErrBadRequest.Wrap("The verification method must contain either a PublicKeyMultibase or a PublicKeyJwk")
-	}
-
-	if len(vm.Controller) == 0 {
-		return ErrBadRequestIsRequired.Wrap("Controller")
-	}
-
-	return nil
 }
 
 func ValidateServices(namespace string, did string, services []*Service) error {

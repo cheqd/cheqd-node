@@ -16,22 +16,24 @@ func NewMsgServer(keeper Keeper) types.MsgServer {
 
 var _ types.MsgServer = msgServer{}
 
-func ResolveDid(k *Keeper, ctx *sdk.Context, did string, inMemoryDIDs map[string]types.StateValue) (types.StateValue, error) {
+func FindDid(k *Keeper, ctx *sdk.Context, did string, inMemoryDIDs map[string]types.StateValue) (res types.StateValue, found bool, err error) {
+	// Look in inMemory dict
 	value, found := inMemoryDIDs[did]
 	if found {
-		return value, nil
+		return value, true, nil
 	}
 
-	stateValue, err := k.GetDid(ctx, did)
-	if err != nil {
-		return types.StateValue{}, err
+	// Look in state
+	if k.HasDid(ctx, did) {
+		value, err := k.GetDid(ctx, did)
+		if err != nil {
+			return types.StateValue{}, false, err
+		}
+
+		return value, true, nil
 	}
 
-	return stateValue, nil
-}
-
-func ValidateDIDHasSupportedAuthKey() {
-
+	return types.StateValue{}, false, nil
 }
 
 

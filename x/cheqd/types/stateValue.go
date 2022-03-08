@@ -21,13 +21,13 @@ func (m *StateValue) UnpackInterfaces(unpacker types.AnyUnpacker) error {
 	return unpacker.UnpackAny(m.Data, &data)
 }
 
-func NewStateValue(data StateValueData, metadata *Metadata) (*StateValue, error) {
+func NewStateValue(data StateValueData, metadata *Metadata) (StateValue, error) {
 	any, err := types.NewAnyWithValue(data)
 	if err != nil {
-		return nil, err
+		return StateValue{}, err
 	}
 
-	return &StateValue{Data: any, Metadata: metadata}, nil
+	return StateValue{Data: any, Metadata: metadata}, nil
 }
 
 func NewMetadataFromContext(ctx sdk.Context) Metadata {

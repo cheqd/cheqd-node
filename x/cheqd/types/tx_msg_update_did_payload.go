@@ -26,8 +26,24 @@ func (msg *MsgUpdateDidPayload) ToDid() Did {
 
 // Validation
 
-func (msg MsgUpdateDidPayload) Validate() error {
+func (msg MsgUpdateDidPayload) Validate(allowedNamespaces []string) error {
+	err := msg.ToDid().Validate(allowedNamespaces)
+	if err != nil {
+		return err
+	}
+
 	return validation.ValidateStruct(&msg,
 		validation.Field(&msg.VersionId, validation.Required),
 	)
+}
+
+func ValidMsgUpdateDidPayload(allowedNamespaces []string) *CustomErrorRule {
+	return NewCustomErrorRule(func(value interface{}) error {
+		casted, ok := value.(*MsgUpdateDidPayload)
+		if !ok {
+			panic("ValidMsgUpdateDidPayload must be only applied on MsgUpdateDidPayload properties")
+		}
+
+		return casted.Validate(allowedNamespaces)
+	})
 }

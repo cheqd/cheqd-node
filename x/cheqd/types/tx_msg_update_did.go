@@ -37,11 +37,6 @@ func (msg *MsgUpdateDid) ValidateBasic() error {
 		return ErrBasicValidation.Wrap(err.Error())
 	}
 
-	err = msg.Payload.ToDid().Validate(nil)
-	if err != nil {
-		return ErrBasicValidation.Wrap(err.Error())
-	}
-
 	return nil
 }
 
@@ -49,7 +44,7 @@ func (msg *MsgUpdateDid) ValidateBasic() error {
 
 func (msg MsgUpdateDid) Validate(allowedNamespaces []string) error {
 	return validation.ValidateStruct(&msg,
-		validation.Field(&msg.Payload, validation.Required),
+		validation.Field(&msg.Payload, validation.Required, ValidMsgUpdateDidPayload(allowedNamespaces)),
 		validation.Field(&msg.Signatures, IsUniqueSignInfoList(), validation.Each(ValidSignInfo(allowedNamespaces))),
 	)
 }
