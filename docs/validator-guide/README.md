@@ -88,19 +88,17 @@ P.S. in case of using Ledger Nano device it would be helpful to use [this instru
    * **gas-adjustment** (optional): If you're using `auto` gas calculation, this parameter multiplies the auto-calculated amount by the specified factor, e.g., `1.2`. This is recommended so that it leaves enough margin of error to add a bit more gas to the transaction and ensure it successfully goes through.
    * **`gas-prices`**: Maximum gas price set by the validator
 
-   _Example transaction:_
-   
 Please note the parameters below are just an “**example**”.
-   
-When setting, for example, the commission, please look at this example for commissions: https://www.mintscan.io/cosmos/validators
 
-You will see the commission they set, the max rate they set, and the rate of change. Please use this as a guide when thinking of your own commission configurations. This is important to get right, because the _commission-max-rate_ and _commission-max-change-rate_ cannot be changed after they are initially set. 
+When setting parameters such as the commission rate, a good benchmark is to consider the [commission rates set by validators on existing networks such as Cosmos ATOM chain](https://www.mintscan.io/cosmos/validators).
+
+You will see the commission they set, the max rate they set, and the rate of change. Please use this as a guide when thinking of your own commission configurations. This is important to get right, because the `commission-max-rate` and `commission-max-change-rate` cannot be changed after they are initially set.
 
    ```bash
    cheqd-noded tx staking create-validator --amount 1000000000ncheq --from key-alias-name --moniker mainnet-validator-name --chain-id cheqd-mainnet-1 --min-self-delegation="1" --gas auto --gas-adjustment 1.2 --gas-prices="25ncheq" --pubkey '{"@type":"/cosmos.crypto.ed25519.PubKey","key":"4anVUO8WhmRMqG1t4z6VxqmqZL3V7q6HqucjwZePiUw="}' --commission-max-change-rate 0.01 --commission-max-rate 0.2 --commission-rate 0.01 --node https://rpc.cheqd.net:443
    ```
 
-4. **Check that your validator node is bonded**
+1. **Check that your validator node is bonded**
 
    Checking that the validator is correctly bonded can be checked via any node:
 
@@ -110,7 +108,7 @@ You will see the commission they set, the max rate they set, and the rate of cha
 
    Find your node by `moniker` and make sure that `status` is `BOND_STATUS_BONDED`.
 
-5. **Check that your validator node is signing blocks and taking part in consensus**
+2. **Check that your validator node is signing blocks and taking part in consensus**
 
    Find out your [validator node's hex-encoded address](../cheqd-cli/cheqd-cli-node-management.md) and look for `"ValidatorInfo":{"Address":"..."}`:
 
