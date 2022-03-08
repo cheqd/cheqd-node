@@ -1,7 +1,10 @@
 name: "Build and Test"
 
 on:
-  push:
+  workflow_run:
+    workflows: [Lint]
+    types:
+      - completed
     paths-ignore:
     - '**.md'
     - 'docs/**'
