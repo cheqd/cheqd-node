@@ -32,7 +32,7 @@ Each cheqd validator node has at least two keys.
 
 ### Creating a key
 
-When a new key is created, an **account address** and a **mnemonic backup phrase **will be printed. Keep mnemonic safe. This is the only way to restore access to the account if they keyring cannot be recovered.
+When a new key is created, an **account address** and a **mnemonic backup phrase** will be printed. Keep mnemonic safe. This is the only way to restore access to the account if they keyring cannot be recovered.
 
 #### Command
 

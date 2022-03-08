@@ -1,4 +1,6 @@
-# Node Operator Setup Help
+# Frequently Asked Questions (FAQs) for Validators
+
+
 
 ### How do I **stake** more tokens after setting up a validator node?
 

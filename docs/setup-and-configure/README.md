@@ -50,13 +50,14 @@ Node operators should ensure there are no existing services running on these por
 
 #### P2P port
 
-The P2P port is used for peer-to-peer communication between nodes.
-
-Further details on [how P2P settings work is defined in Tendermint documentation](https://docs.tendermint.com/v0.35/nodes/configuration.html#p2p-settings).
+The P2P port is used for peer-to-peer communication between nodes. This port is used for your node to discover and connect to other nodes on the network. It should allow traffic to/from any IP address range.
 
 * By default, the P2P port is set to `26656`.
-* Inbound and outbound TCP connections must be allowed from any IPv4 address range.
+* Inbound TCP connections on port `26656` (or your custom port) should be allowed from *any* IP address range.
+* Outbound TCP connections must be allowed on *all* ports to *any* IP address range.
 * The default P2P port can be changed in `$HOME/.cheqdnode/config/config.toml`.
+
+Further details on [how P2P settings work is defined in Tendermint documentation](https://docs.tendermint.com/v0.35/nodes/configuration.html#p2p-settings).
 
 #### RPC port
 
