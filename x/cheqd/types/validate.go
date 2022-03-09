@@ -99,6 +99,17 @@ func IsMultibase() *CustomErrorRule {
 	})
 }
 
+func IsJWK() *CustomErrorRule {
+	return NewCustomErrorRule(func(value interface{}) error {
+		casted, ok := value.(string)
+		if !ok {
+			panic("IsJWK must be only applied on string properties")
+		}
+
+		return utils.ValidateJWKEncoding(casted)
+	})
+}
+
 func HasPrefix(prefix string) *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.(string)

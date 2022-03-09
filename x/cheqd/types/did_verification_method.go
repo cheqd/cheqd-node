@@ -68,7 +68,8 @@ func (vm VerificationMethod) Validate(baseDid string, allowedNamespaces []string
 			validation.When(utils.Contains(JwkMethodTypes, vm.Type), validation.Required).Else(validation.Empty),
 		),
 		validation.Field(&vm.PublicKeyMultibase,
-			validation.When(utils.Contains(MultibaseMethodTypes, vm.Type), validation.Required, IsMultibase()).Else(validation.Empty),
+			validation.When(utils.Contains(MultibaseMethodTypes, vm.Type), validation.Required, IsMultibase()),
+			validation.When(utils.Contains(JwkMethodTypes, vm.Type), validation.Required, IsJWK()).Else(validation.Empty),
 		),
 	)
 }
