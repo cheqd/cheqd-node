@@ -18,8 +18,10 @@ import (
 // Having multiple namespaces is impossible now. Do we need fix?
 // Do we need check references existence? It's not necessary according to spec but was implemented.
 // Validate keys in verification methods - Andrew N.
+// Rename DID to DIDDoc
 // TODO: Low priority
 // Migrate old tests for static validation
+// Check if signatures are checked in static validation most likely no
 
 func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*types.MsgCreateDidResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
