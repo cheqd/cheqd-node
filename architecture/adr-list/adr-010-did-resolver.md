@@ -12,12 +12,33 @@
 
 ## Summary
 
-This document defines the architecture of two DID resolvers: a DID resolver for the [cheqd DID method](adr-002-cheqd-did-method.md), and a DID driver for the [Universal Resolver](https://github.com/decentralized-identity/universal-resolver) project.
+This document defines the architecture of two DID resolvers: 
+
+- A cheqd DID Resolver, as a module written in Go, or a standalone web service (the goal of which is to generate a spec compliant DIDDoc, based on the [cheqd DID method](adr-002-cheqd-did-method.md)), and
+- A [Universal Resolver Driver](https://github.com/decentralized-identity/universal-resolver) (the goal of this, as a microservice, is to relay requests to the above DID resolver, and to provide greater accessibility to third parties resolving cheqd DIDs). 
 
 ## Context
 
-First, let's look at the discrepancies between the DID Doc model stored in the ledger and the format from the specification. Data is written to the ledger based on protobufs, which is due to the use of the Cosmos framework. However, according to the specification, DID Doc must be provided in JSON format, which provides more features that are not achievable in protobuffs.
-Therefore, a new DID resolver is needed.
+DID resolution functions resolve a DID into a DID document by using the "Read" operation of the applicable DID method, in our case, the [cheqd DID method](adr-002-cheqd-did-method.md).
+
+All conforming DID resolvers implement the functions below, which have the following abstract forms:
+
+    resolve(did, resolutionOptions) → 
+    « didResolutionMetadata, didDocument, didDocumentMetadata »
+
+    resolveRepresentation(did, resolutionOptions) → 
+    « didResolutionMetadata, didDocumentStream, didDocumentMetadata »
+    
+These two functions enable:
+
+- **Resolve function**: resolution of a DID to a [map](https://www.w3.org/TR/did-core/#did-resolution), with the relevant DID Document, DID Document Metadata and DID Resolution Metadata populated;
+- **resolveRepresentation function**: the resolution of a byte stream format of a DID (in say JSON, JSON-LD or CBOR) back into the [map](https://www.w3.org/TR/did-core/#did-resolution) structure. 
+
+Owing to the use of the Cosmos SDK and Cosmos ecosystem, on which cheqd has been built, data written to the ledger uses the serialisation method Google Protocol Buffers (protobuf). Therefore, in order to conform with the correct syntax and structure for the map produced after resolution, cheqd's DID Resolver must implement a resolveRepresentation function that is able to take output in protobuf and convert it into a corresponding, conformant map in JSON, according to the DID core specification. 
+
+This ADR will define the relevant architecture to achieve this through the use of the gRPC endpoint in the Cosmos SDK. 
+
+### General cleanup and QoL changes
 
 Inconsistencies between DIDDoc from the ledger and specification that should be corrected:
 
@@ -37,19 +58,53 @@ Inconsistencies between DIDDoc from the ledger and specification that should be 
 - Marshal/unmarshal JSON - object - protobuff
 - Programming language: Go (?)
 
-## Architecture of DID Resolver(s)
+## Overall Architecture of DID Resolver(s)
 
-### DID Resolution from the cheqd network ledger
+### cheqd DID Resolver + Universal Resolver Driver
 
-Host the resolver separately from the ledger as an additional resolution service. Interaction with other applications and resolvers will implement the following schema:
+This overall DID resolver architecture is intended to be decoupled from the cheqd on-ledger services, as an additional resource service, meaning updates to the resolver module do not need an on-chain upgrade. 
+
+It therefore, has multiple components, of which, are flexible and can be implemented in different ways:
+- A cheqd Resolver (implemented either as a Library (go module) or as a standalone web service);
+- A Universal Resolver Driver that acts as a proxy and relay service to the above cheqd Resolver
+
+This is detailed by the following flow:
 
 ![Cheqd did resolver](assets/adr-010-did-resolver/universal-resolver-sequence-diagram.png)
 [Cheqd did sequence diagram. Schema 1.](assets/adr-010-did-resolver/universal-resolver-sequence-diagram.puml)
 
+Cheqd DIDDoc resolving module at this stage will implement simple functionality that can be a lightweight architecture of threads without synchronization. Just several classes without the use of complex design patterns.
+
+![cheqd did resolver class diagram](assets/adr-010-did-resolver/resolver-class-diagram.png)
+[Cheqd did resolver class diagram](assets/adr-010-did-resolver/resolver-class-diagram.puml)
+
+## cheqd DID resolver
+
+There are two ways to use the cheqd Resolver to return compliant DID Documents: 
+- As a library (go module), and
+- As a standalone web service.
+
+#### Library (go module)
+- In the first case, the module can be imported simply by adding the necessary import:
+
+```golang
+import (
+     "github.com/cheqd/cheqd-did-resolver/src"
+)
+```
+#### Standalone Web Service
+
+- In the second case, by launching the application with the command.
+
+```bash
+go run cheqd_resolver_web_service.go
+```
+
 #### Pros
 
 - Updating the resolver software does not need updating the application on the node side
-- Separation of the system into microservices, moving away from a monolithic structure
+- This avoids having to go through an on-ledger governance vote, and voting period to make a change
+- Separation of the system into microservices, which provides more flexibility to third parties in how they choose to resolve cheqd DIDs
 
 #### Cons
 
@@ -58,33 +113,11 @@ All options for application interaction will be described in more detail below i
 
 - Longer chain of trust. As a result, more resources required by the client to maintain the security of the system (`node + resolver` instead of `node`)
 
+## Universal Resolver Driver
 
-Cheqd DIDDoc resolving module at this stage will implement simple functionality that can be a lightweight architecture of threads without synchronization. Just several classes without the use of complex design patterns.
+A **Universal Resolver Driver** is not an essential component of the architecture, it functions as an additional service, since the **cheqd Resolver** will be able to implement all the base needs of Universal resolver. In case of unexpected issues with its integration, the cheqd-did-resolver module can always be used to import as a library.
 
-![cheqd did resolver class diagram](assets/adr-010-did-resolver/resolver-class-diagram.png)
-[Cheqd did resolver class diagram](assets/adr-010-did-resolver/resolver-class-diagram.puml)
-
-There are two ways to use Cheqd DIDDoc resolving module. As a library (go module) and as a standalone web service.
-
-- In the first case, the module can be imported simply by adding the necessary import:
-
-```golang
-import (
-     "github.com/cheqd/cheqd-did-resolver/src"
-)
-```
-
-- In the second one, by launching the application with the command.
-
-```bash
-go run cheqd_resolver_web_service.go
-```
-
-### Universal resolver driver
-
-A universal resolver driver is not required, since the resolver web application will be able to implement all the needs of Universal resolver. In case of unexpected issues with its integration, the cheqd-did-resolver module can always be used to import as a library.
-
-Put the resolver inside Cheqd-node as a new module or as a new handler (keeper) inside the node application.
+As a library, this would enable the resolver to be inserted into cheqd-node as a new module or as a new handler (keeper), as part of the node application.
 
 #### Pros
 
