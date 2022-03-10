@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"github.com/lestrrat-go/jwx/jwk"
 	multibase "github.com/multiformats/go-multibase"
 )
 
@@ -27,14 +26,4 @@ func ValidateMultibaseEncoding(data string, expectedEncoding multibase.Encoding)
 
 func ValidateBase58(data string) error {
 	return ValidateMultibaseEncoding(string(multibase.Base58BTC) + data, multibase.Base58BTC)
-}
-
-
-func ValidateJWKEncoding(jwk_string string) error {
-	_, err := jwk.ParseString(jwk_string)
-	if err != nil {
-		return fmt.Errorf("invalid format for JWK key, error from validation: %s", err.Error())
-	}
-
-	return nil
 }

@@ -36,7 +36,6 @@ var	NotValidJWKKey = TestJWKKey{
 var ValidJWKByte, _ = json.Marshal(ValidJWKKey)
 var NotValidJWKByte, _ = json.Marshal(NotValidJWKKey)
 
-
 func TestValidateMultibase(t *testing.T) {
 	cases := []struct {
 		name string
@@ -88,7 +87,7 @@ func TestValidateBase58(t *testing.T) {
 	}
 }
 
-func TestValidateJWKEncoding(t *testing.T) {
+func TestValidateJWK(t *testing.T) {
 	cases := []struct {
 		name string
 		data  string
@@ -101,7 +100,7 @@ func TestValidateJWKEncoding(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			err := ValidateJWKEncoding(tc.data)
+			err := ValidateJWK(tc.data)
 
 			if tc.valid {
 				require.NoError(t, err)

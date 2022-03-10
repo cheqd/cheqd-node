@@ -1,9 +1,11 @@
 package types
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
+	"github.com/multiformats/go-multibase"
 	"strings"
 )
 
@@ -99,14 +101,39 @@ func IsMultibase() *CustomErrorRule {
 	})
 }
 
-func IsJWK() *CustomErrorRule {
+func IsMultibaseEncodedEd25519PubKey() *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.(string)
 		if !ok {
-			panic("IsJWK must be only applied on string properties")
+			panic("IsMultibaseEncodedEd25519PubKey must be only applied on string properties")
 		}
 
-		return utils.ValidateJWKEncoding(casted)
+		_, keyBytes, err := multibase.Decode(casted)
+		if err != nil {
+			return err
+		}
+
+		err = utils.ValidateEd25519PubKey(keyBytes)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
+func IsJWK() *CustomErrorRule {
+	return NewCustomErrorRule(func(value interface{}) error {
+		casted, ok := value.([]*KeyValuePair)
+		if !ok {
+			panic("IsJWK must be only applied on KeyValuePair array properties")
+		}
+		mjson := PubKeyJWKToMap(casted)
+		jsonStr, err_ := json.Marshal(mjson)
+		if err_ != nil {
+			return fmt.Errorf("internal error: PublicKeyJWK is not valid JSON")
+		}
+		return utils.ValidateJWK(string(jsonStr))
 	})
 }
 
