@@ -210,6 +210,21 @@ This flow is demonstrated in the second "Client <-> Web Service Resolver" sectio
 - Still non-empty trust chain
 
 
+#### 5. Set up Cheqd resolver web service on a client side
+
+The same with a previous case - [Using third party Cheqd resolver web service directly](#4-using-third-party-cheqd-resolver-web-service-directly).
+But the client sets up Cheqd resolver web service by themselves.
+
+##### Pros
+
+- The shorter trust chain then in the previous option [Using third party Cheqd resolver web service directly](#4-using-third-party-cheqd-resolver-web-service-directly).
+
+##### Cons
+
+- Set up an additional service is needed
+- Client should trust the Cheqd Node or set up its own.
+
+
 ## Decision
 
 Add a new application/library for did-resolution
