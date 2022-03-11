@@ -53,7 +53,7 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 			return nil, types.ErrSignatureNotFound.Wrapf("signer: %s", signer)
 		}
 
-		err := VerifySignature(&k.Keeper, &ctx, inMemoryDids, signature)
+		err := VerifySignature(&k.Keeper, &ctx, inMemoryDids, msg.Payload.GetSignBytes(), signature)
 		if err != nil {
 			return nil, err
 		}

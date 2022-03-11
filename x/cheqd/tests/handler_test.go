@@ -4,7 +4,6 @@ import (
 	"crypto/ed25519"
 	"testing"
 
-	"github.com/btcsuite/btcutil/base58"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/multiformats/go-multibase"
 
@@ -28,17 +27,17 @@ func TestCreateDID(t *testing.T) {
 			valid: true,
 			name:  "Works",
 			keys: map[string]KeyPair{
-				"did:cheqd:test:123456qwertyui2#key-1": GenerateKeyPair(),
+				"did:cheqd:test:123456qwertyu2ws#key-1": GenerateKeyPair(),
 			},
-			signers: []string{"did:cheqd:test:123456qwertyui2#key-1"},
+			signers: []string{"did:cheqd:test:123456qwertyu2ws#key-1"},
 			msg: &types.MsgCreateDidPayload{
-				Id:             "did:cheqd:test:123456qwertyui2",
-				Authentication: []string{"did:cheqd:test:123456qwertyui2#key-1"},
+				Id:             "did:cheqd:test:123456qwertyu2ws",
+				Authentication: []string{"did:cheqd:test:123456qwertyu2ws#key-1"},
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:         "did:cheqd:test:123456qwertyui2#key-1",
+						Id:         "did:cheqd:test:123456qwertyu2ws#key-1",
 						Type:       "Ed25519VerificationKey2020",
-						Controller: "did:cheqd:test:123456qwertyui2",
+						Controller: "did:cheqd:test:123456qwertyu2ws",
 					},
 				},
 			},
@@ -446,7 +445,8 @@ func TestCreateDID(t *testing.T) {
 			msg := tc.msg
 
 			for _, vm := range msg.VerificationMethod {
-				vm.PublicKeyMultibase = "z" + base58.Encode(tc.keys[vm.Id].PublicKey)
+				vm.PublicKeyMultibase, err = multibase.Encode(multibase.Base58BTC, tc.keys[vm.Id].PublicKey)
+				require.NoError(t, err)
 			}
 
 			signerKeys := map[string]ed25519.PrivateKey{}

@@ -88,7 +88,7 @@ func MustFindVerificationMethod(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[st
 	return res, nil
 }
 
-func VerifySignature(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.StateValue, signature types.SignInfo) error {
+func VerifySignature(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.StateValue, message []byte, signature types.SignInfo) error {
 	verificationMethod, err := MustFindVerificationMethod(k, ctx, inMemoryDIDs, signature.VerificationMethodId)
 	if err != nil {
 		return err
@@ -99,7 +99,7 @@ func VerifySignature(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.
 		return err
 	}
 
-	err = types.VerifySignature(verificationMethod, signatureBytes)
+	err = types.VerifySignature(verificationMethod, message, signatureBytes)
 	if err != nil {
 		return types.ErrInvalidSignature.Wrapf("method id: %s, error: %s", signature.VerificationMethodId, err.Error())
 	}

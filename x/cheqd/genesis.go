@@ -16,13 +16,13 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 			panic(fmt.Sprintf("Cannot import geneses case: %s", err.Error()))
 		}
 
-		if err = k.SetDid(ctx, *did, elem.Metadata); err != nil {
+		if err = k.SetDid(&ctx, did, elem.Metadata); err != nil {
 			panic(fmt.Sprintf("Cannot set did case: %s", err.Error()))
 		}
 	}
 
 	// Set nym count
-	k.SetDidCount(ctx, uint64(len(genState.DidList)))
+	k.SetDidCount(&ctx, uint64(len(genState.DidList)))
 
 	k.SetDidNamespace(ctx, genState.DidNamespace)
 }
@@ -33,7 +33,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	// this line is used by starport scaffolding # genesis/module/export
 	// Get all did
-	didList := k.GetAllDid(ctx)
+	didList := k.GetAllDid(&ctx)
 	for _, elem := range didList {
 		elem := elem
 		genesis.DidList = append(genesis.DidList, &elem)
