@@ -56,7 +56,8 @@ Inconsistencies between DIDDoc from the ledger and specification that should be 
 - Parallel executing of requests
 - Synchronous replying for client requests (?)
 - Marshal/unmarshal JSON - object - protobuff
-- Programming language: Go (?)
+- Programming language: Go
+- Use a framework like Goji or Echo, because it handles things like HTTP status codes etc that are part of DID resolution, handling and catching errors.
 
 ## Overall Architecture of DID Resolver(s)
 
@@ -115,27 +116,21 @@ All options for application interaction will be described in more detail below i
 
 ## Universal Resolver Driver
 
-A **Universal Resolver Driver** is not an essential component of the architecture, it functions as an additional service, since the **cheqd Resolver** will be able to implement all the base needs of Universal resolver. In case of unexpected issues with its integration, the cheqd-did-resolver module can always be used to import as a library.
+A Universal Resolver Driver is *only* a small Node.js package that targets a *remote*
+DID Resolver endpoint (could be run by someone else) that
+relays/proxies requests. This allows clients who don't want to run the
+full resolver to just proxy/relay their requests to someone else. Can be
+spun up as a Docker container (required for Universal Resolver), but
+equally can be spun as an entirely serverless Cloudflare Worker with a
+very small compute footprint.
+Can be implemented via **itty-router**, which is a tiny NPM module that can run 
+very fast and happily on serverless platforms.
 
-As a library, this would enable the resolver to be inserted into cheqd-node as a new module or as a new handler (keeper), as part of the node application.
-
-#### Pros
-
-The presentation of the data takes place next to the base where the data is stored. This
-
-- speeds up the process due to because of unnecessary data transferring between services
-- does not allow compromising the resolver, only the entire node, which is a more difficult task
-- fault tolerance and availability of the blockchain network is higher than a single web server
-
-#### Cons
-
-- Unable to update resolver without updating node. However, expanding the functionality without breaking changes is also possible with minor releases, which allows update the node without upgrade transaction.
-
-### Possible flows for DID resolution
+## Possible flows for DID resolution
 
 To level out downsides of this approach a client can choose one of suitable flows.
 
-#### 1. Universal resolver on DIF side
+### 1. Universal resolver on DIF side
 
 DIF company has an experimental setup of Universal Resolver on the https://dev.uniresolver.io
 The first "Universal Resolver" section from the [schema 1](#did-resolution-from-the-cheqd-network-ledger) shows this flow.
@@ -145,26 +140,26 @@ The first "Universal Resolver" section from the [schema 1](#did-resolution-from-
 - Cheqd DID Resolver generates an answer for the client request based on received DID Doc.
 - And sends a response to the client throw Cheqd Universal Resolver Driver and Universal Resolver
 
-##### Pros
+#### Pros
 
 - Development can be started without additional library dependencies and setting up additional services.
 
-##### Cons
+#### Cons
 
 - https://dev.uniresolver.io can be used only for development, can't be use in production goals.
 - The longest trust chain where the client must trust all sides
 
-#### 2. Universal resolver on a client side
+### 2. Universal resolver on a client side
 
 Absolutely the same with [Universal resolver on DIF side flow](#1-universal-resolver-on-dif-side). 
 But the client sets up Universal Resolver with Drivers by themselves.
 
-##### Pros
+#### Pros
 
 - Can be used in production
 - Trust DIF servers is not needed
 
-##### Cons
+#### Cons
 
 - Setting up Universal Resolver and Drivers are needed
 - The trust chain where the client must trust all sides, but smaller ten in previous case.
@@ -173,7 +168,7 @@ But the client sets up Universal Resolver with Drivers by themselves.
 **Note.** We don't consider an option Universal Resolver + Cheqd Resolver on the client side without setting up Cheqd Node
 because it has the same set of upsides with this option but more downsides: new additional setup is needed.
 
-#### 3. Universal resolver + Cheqd resolver + Cheqd Node on a client side
+### 3. Universal resolver + Cheqd resolver + Cheqd Node on a client side
 
 The same with a previous case - [Universal resolver on a client side](#2-universal-resolver-on-a-client-side). 
 But the client sets up 
@@ -182,47 +177,64 @@ But the client sets up
 - Cheqd resolver web service,
 - Cheqd node.
 
-##### Pros
+#### Pros
 
 - Maximum Trust Combination.
 
-##### Cons
+#### Cons
 
 - Setting up too many services are needed
 
 
-#### 4. Using third party Cheqd resolver web service directly 
+### 4. Using third party Cheqd resolver web service directly 
 
 Cheqd provide its own web service with a DID resolver. If a client doesn't need in Universal Resolver then requests can 
 be sent directly to Cheqd Resolver Web Servise. 
-This flow is demonstrated in the second "Client <-> Web Service Resolver" section from the [schema 1](#did-resolution-from-the-cheqd-network-ledger) shows this flow.
+This flow is demonstrated in the second "Client <-> Web Service Resolver" section from the [schema 1](#did-resolution-from-the-cheqd-network-ledger).
 - A client sends a request to Cheqd DID Resolver web service.
 - Cheqd DID Resolver gets DID Doc in protobuf format from the ledger throw Cosmos SDK gRPC API
 - Cheqd DID Resolver generates and sends an answer for the client request based on received DID Doc.
 
-##### Pros
+#### Pros
 
 - The shorter trust chain where the client must trust only Cheqd web service and Cheqd Node
 
-##### Cons
+#### Cons
 
 - No Universal Resolver with other DID methods
 - Still non-empty trust chain
 
 
-#### 5. Set up Cheqd resolver web service on a client side
+### 5. Set up Cheqd resolver web service on a client side
 
 The same with a previous case - [Using third party Cheqd resolver web service directly](#4-using-third-party-cheqd-resolver-web-service-directly).
 But the client sets up Cheqd resolver web service by themselves.
 
-##### Pros
+#### Pros
 
 - The shorter trust chain then in the previous option [Using third party Cheqd resolver web service directly](#4-using-third-party-cheqd-resolver-web-service-directly).
 
-##### Cons
+#### Cons
 
 - Set up an additional service is needed
 - Client should trust the Cheqd Node or set up its own.
+
+
+### 6. Using Cheqd resolver as a Go module (library)
+
+A client application can use Cheqq Resolver as a library. 
+This flow is demonstrated in the third "Client <-> Ledger" section from the [schema 1](#did-resolution-from-the-cheqd-network-ledger).
+- A client sends a request directly to Cheqd Node throw Cosmos SDK gRPC API
+- Received DID Doc in protobuf the client application can format to resolvable DID Document or DID fragment in JSON format. 
+
+#### Pros
+
+- There are no third party services. And the client can set up the own node for excluding security risks absolutely.
+
+#### Cons
+
+- No Universal Resolver with other DID methods
+- The client application should use Golang
 
 
 ## Decision

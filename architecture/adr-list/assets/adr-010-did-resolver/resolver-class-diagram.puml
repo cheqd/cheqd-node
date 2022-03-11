@@ -3,6 +3,7 @@ RequestService: JSON resolveUrl(string url)
 
 DIDDocService: Json marshall(ProtoMsg)
 DIDDocService: Map prepareJWKPubkey(List<Pair>) - list of pair to map
+DIDDocService: Json getResolutionDIDMetadata(contentType, error)
 DIDDocService: Json getDIDMetadata(protoStateValue)
 DIDDocService: Json getDIDFragment(protoStateValue, string fragmentId)
 
