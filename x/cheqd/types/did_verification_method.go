@@ -94,8 +94,8 @@ func VerifySignature(vm VerificationMethod, message []byte, signature []byte) er
 		case *ecdsa.PublicKey:
 			verificationError = utils.VerifyECDSASignature(*pubKey, message, signature)
 			break
-		case *ed25519.PublicKey:
-			verificationError = utils.VerifyED25519Signature(*pubKey, message, signature)
+		case ed25519.PublicKey:
+			verificationError = utils.VerifyED25519Signature(pubKey, message, signature)
 		default:
 			panic("unsupported jwk key") // This should have been checked during basic validation
 		}

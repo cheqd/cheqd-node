@@ -1,7 +1,15 @@
 package types
 
 import (
+	"crypto"
+	"crypto/ecdsa"
+	"crypto/ed25519"
+	"crypto/elliptic"
+	"crypto/rand"
+	"crypto/rsa"
 	"encoding/json"
+	"github.com/lestrrat-go/jwx/jwk"
+	"github.com/multiformats/go-multibase"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -172,4 +180,113 @@ func TestVerificationMethodValidation(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestEd25519SignatureVerification(t *testing.T) {
+	message := "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod " +
+		"tempor incididunt ut labore et dolore magna aliqua."
+	msgBytes := []byte(message)
+
+	pubKey, privKey, err := ed25519.GenerateKey(rand.Reader)
+	require.NoError(t, err)
+	signature := ed25519.Sign(privKey, msgBytes)
+
+	pubKeyStr, err := multibase.Encode(multibase.Base58BTC, pubKey)
+	require.NoError(t, err)
+
+	vm := VerificationMethod{
+		Id:                 "",
+		Type:               "Ed25519VerificationKey2020",
+		Controller:         "",
+		PublicKeyJwk:       nil,
+		PublicKeyMultibase: pubKeyStr,
+	}
+
+	err = VerifySignature(vm, msgBytes, signature)
+	require.NoError(t, err)
+
+	jwk_, err := jwk.New(pubKey)
+	require.NoError(t, err)
+	json_, err := json.MarshalIndent(jwk_, "", "  ")
+	require.NoError(t, err)
+	pubKeyJwk := JSONToPubKeyJWK(string(json_))
+
+	vm2 := VerificationMethod{
+		Id:                 "",
+		Type:               "JsonWebKey2020",
+		Controller:         "",
+		PublicKeyJwk:       pubKeyJwk,
+		PublicKeyMultibase: "",
+	}
+
+	err = VerifySignature(vm2, msgBytes, signature)
+	require.NoError(t, err)
+}
+
+func TestECDSASignatureVerification(t *testing.T) {
+	message := "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod " +
+		"tempor incididunt ut labore et dolore magna aliqua."
+	msgBytes := []byte(message)
+
+	hasher := crypto.SHA256.New()
+	hasher.Write(msgBytes)
+	msgDigest := hasher.Sum(nil)
+
+	privKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	require.NoError(t, err)
+	pubKey := privKey.PublicKey
+
+	signature, err := ecdsa.SignASN1(rand.Reader, privKey, msgDigest)
+	require.NoError(t, err)
+
+	jwk_, err := jwk.New(pubKey)
+	require.NoError(t, err)
+	json_, err := json.MarshalIndent(jwk_, "", "  ")
+	require.NoError(t, err)
+	pubKeyJwk := JSONToPubKeyJWK(string(json_))
+
+	vm2 := VerificationMethod{
+		Id:                 "",
+		Type:               "JsonWebKey2020",
+		Controller:         "",
+		PublicKeyJwk:       pubKeyJwk,
+		PublicKeyMultibase: "",
+	}
+
+	err = VerifySignature(vm2, msgBytes, signature)
+	require.NoError(t, err)
+}
+
+func TestRSASignatureVerification(t *testing.T) {
+	message := "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod " +
+		"tempor incididunt ut labore et dolore magna aliqua."
+	msgBytes := []byte(message)
+
+	hasher := crypto.SHA256.New()
+	hasher.Write(msgBytes)
+	msgDigest := hasher.Sum(nil)
+
+	privKey, err := rsa.GenerateKey(rand.Reader, 2048)
+	require.NoError(t, err)
+	pubKey := privKey.PublicKey
+
+	signature, err := rsa.SignPSS(rand.Reader, privKey, crypto.SHA256, msgDigest, nil)
+	require.NoError(t, err)
+
+	jwk_, err := jwk.New(pubKey)
+	require.NoError(t, err)
+	json_, err := json.MarshalIndent(jwk_, "", "  ")
+	require.NoError(t, err)
+	pubKeyJwk := JSONToPubKeyJWK(string(json_))
+
+	vm2 := VerificationMethod{
+		Id:                 "",
+		Type:               "JsonWebKey2020",
+		Controller:         "",
+		PublicKeyJwk:       pubKeyJwk,
+		PublicKeyMultibase: "",
+	}
+
+	err = VerifySignature(vm2, msgBytes, signature)
+	require.NoError(t, err)
 }

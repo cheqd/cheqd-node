@@ -24,8 +24,8 @@ func ValidateJWK(jwk_string string) error {
 		break
 	case *ecdsa.PublicKey:
 		break
-	case *ed25519.PublicKey:
-		err := ValidateEd25519PubKey(*key)
+	case ed25519.PublicKey:
+		err := ValidateEd25519PubKey(key)
 		if err != nil {
 			return err
 		}
