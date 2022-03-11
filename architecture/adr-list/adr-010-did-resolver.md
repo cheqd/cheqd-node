@@ -139,10 +139,10 @@ To level out downsides of this approach a client can choose one of suitable flow
 
 DIF company has an experimental setup of Universal Resolver on the https://dev.uniresolver.io
 The first "Universal Resolver" section from the [schema 1](#did-resolution-from-the-cheqd-network-ledger) shows this flow.
-- A client just send a request to https://dev.uniresolver.io. 
+- A client just sends a request to https://dev.uniresolver.io. 
 - Universal Resolver on DIF servers uses Cheqd Universal Resolver Driver to redirect client request to Cheqd DID Resolver.
-- Cheqd DID Resolver get DID Doc in protobuf format from the ledger throw Cosmos SDK gRPC API
-- Cheqd DID Resolver generate an answer for the client request based on received DID Doc.
+- Cheqd DID Resolver gets DID Doc in protobuf format from the ledger throw Cosmos SDK gRPC API
+- Cheqd DID Resolver generates an answer for the client request based on received DID Doc.
 - And sends a response to the client throw Cheqd Universal Resolver Driver and Universal Resolver
 
 ##### Pros
@@ -154,7 +154,7 @@ The first "Universal Resolver" section from the [schema 1](#did-resolution-from-
 - https://dev.uniresolver.io can be used only for development, can't be use in production goals.
 - The longest trust chain where the client must trust all sides
 
-#### 2.  Universal resolver on a client side
+#### 2. Universal resolver on a client side
 
 Absolutely the same with [Universal resolver on DIF side flow](#1-universal-resolver-on-dif-side). 
 But the client sets up Universal Resolver with Drivers by themselves.
@@ -168,6 +168,46 @@ But the client sets up Universal Resolver with Drivers by themselves.
 
 - Setting up Universal Resolver and Drivers are needed
 - The trust chain where the client must trust all sides, but smaller ten in previous case.
+
+
+**Note.** We don't consider an option Universal Resolver + Cheqd Resolver on the client side without setting up Cheqd Node
+because it has the same set of upsides with this option but more downsides: new additional setup is needed.
+
+#### 3. Universal resolver + Cheqd resolver + Cheqd Node on a client side
+
+The same with a previous case - [Universal resolver on a client side](#2-universal-resolver-on-a-client-side). 
+But the client sets up 
+- Universal Resolver,
+- Universal Resolver Drivers,
+- Cheqd resolver web service,
+- Cheqd node.
+
+##### Pros
+
+- Maximum Trust Combination.
+
+##### Cons
+
+- Setting up too many services are needed
+
+
+#### 4. Using third party Cheqd resolver web service directly 
+
+Cheqd provide its own web service with a DID resolver. If a client doesn't need in Universal Resolver then requests can 
+be sent directly to Cheqd Resolver Web Servise. 
+This flow is demonstrated in the second "Client <-> Web Service Resolver" section from the [schema 1](#did-resolution-from-the-cheqd-network-ledger) shows this flow.
+- A client sends a request to Cheqd DID Resolver web service.
+- Cheqd DID Resolver gets DID Doc in protobuf format from the ledger throw Cosmos SDK gRPC API
+- Cheqd DID Resolver generates and sends an answer for the client request based on received DID Doc.
+
+##### Pros
+
+- The shorter trust chain where the client must trust only Cheqd web service and Cheqd Node
+
+##### Cons
+
+- No Universal Resolver with other DID methods
+- Still non-empty trust chain
 
 
 ## Decision
