@@ -13,16 +13,28 @@ func NewSignInfo(verificationMethodId string, signature string) *SignInfo {
 
 // Helpers
 
-func GetSignInfoIds(vms []*SignInfo) []string {
-	res := make([]string, len(vms))
+func GetSignInfoIds(infos []*SignInfo) []string {
+	res := make([]string, len(infos))
 
-	for i := range vms {
-		res[i] = vms[i].VerificationMethodId
+	for i := range infos {
+		res[i] = infos[i].VerificationMethodId
 	}
 
 	return res
 }
 
+// FindSignInfoBySigner returns the first sign info that corresponds to the provided signer's did
+func FindSignInfoBySigner(infos []*SignInfo, signer string) (res SignInfo, found bool) {
+	for _, info := range infos{
+		did, _, _, _ := utils.MustSplitDIDUrl(info.VerificationMethodId)
+
+		if did == signer {
+			return *info, true
+		}
+	}
+
+	return SignInfo{}, false
+}
 
 // Validate
 

@@ -1,10 +1,30 @@
 package types
 
 import (
+	"crypto/ed25519"
 	"errors"
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/multiformats/go-multibase"
 )
+
+const (
+	JsonWebKey2020             = "JsonWebKey2020"
+	Ed25519VerificationKey2020 = "Ed25519VerificationKey2020"
+)
+
+var SupportedMethodTypes = []string{
+	JsonWebKey2020,
+	Ed25519VerificationKey2020,
+}
+
+var JwkMethodTypes = []string{
+	JsonWebKey2020,
+}
+
+var MultibaseMethodTypes = []string{
+	Ed25519VerificationKey2020,
+}
 
 func NewVerificationMethod(id string, type_ string, controller string, publicKeyJwk []*KeyValuePair, publicKeyMultibase string) *VerificationMethod {
 	return &VerificationMethod{
@@ -39,25 +59,31 @@ func GetVerificationMethodIds(vms []*VerificationMethod) []string {
 	return res
 }
 
+func VerifySignature(vm VerificationMethod, message []byte, signature []byte) error {
+	switch vm.Type {
+	case Ed25519VerificationKey2020:
+		_, keyBytes, err := multibase.Decode(vm.PublicKeyMultibase)
+		if err != nil {
+			return err
+		}
+
+		valid := ed25519.Verify(keyBytes, message, signature)
+		if !valid {
+			return ErrInvalidSignature.Wrapf("verification method: %s", vm.Id)
+		}
+
+		return nil
+
+	case JsonWebKey2020:
+		// TODO: Implement
+		return nil
+
+	default:
+		return ErrSignatureNotSupported.Wrapf("verification method: %s, signature type: %s", vm.Id, vm.Type)
+	}
+}
+
 // Validation
-
-const (
-	JsonWebKey2020             = "JsonWebKey2020"
-	Ed25519VerificationKey2020 = "Ed25519VerificationKey2020"
-)
-
-var SupportedMethodTypes = []string{
-	JsonWebKey2020,
-	Ed25519VerificationKey2020,
-}
-
-var JwkMethodTypes = []string{
-	JsonWebKey2020,
-}
-
-var MultibaseMethodTypes = []string{
-	Ed25519VerificationKey2020,
-}
 
 func (vm VerificationMethod) Validate(baseDid string, allowedNamespaces []string) error {
 	return validation.ValidateStruct(&vm,

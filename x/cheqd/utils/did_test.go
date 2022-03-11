@@ -64,6 +64,13 @@ func TestIsDid(t *testing.T) {
 	}
 }
 
+func TestMustSplitDID(t *testing.T) {
+	require.Panicsf(t, func() {
+		MustSplitDID("not did")
+	}, "must panic")
 
-
-
+	method, namespace, id := MustSplitDID("did:cheqd:mainnet:qqqqqqqqqqqqqqqq")
+	require.Equal(t, "cheqd", method)
+	require.Equal(t, "mainnet", namespace)
+	require.Equal(t, "qqqqqqqqqqqqqqqq", id)
+}

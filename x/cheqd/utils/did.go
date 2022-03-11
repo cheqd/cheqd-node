@@ -29,6 +29,14 @@ func TrySplitDID(did string) (method string, namespace string, id string, err er
 	return match[1], match[3], match[4], nil
 }
 
+func MustSplitDID(did string) (method string, namespace string, id string) {
+	method, namespace, id, err := TrySplitDID(did)
+	if err != nil {
+		panic(err.Error())
+	}
+	return
+}
+
 // ValidateDID checks method and allowed namespaces only when the corresponding parameters are specified.
 func ValidateDID(did string, method string, allowedNamespaces []string) error {
 	sMethod, sNamespace, sUniqueId, err := TrySplitDID(did)

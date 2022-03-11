@@ -1,7 +1,9 @@
 package keeper
 
 import (
+	"encoding/base64"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -16,7 +18,7 @@ func NewMsgServer(keeper Keeper) types.MsgServer {
 
 var _ types.MsgServer = msgServer{}
 
-func FindDid(k *Keeper, ctx *sdk.Context, did string, inMemoryDIDs map[string]types.StateValue) (res types.StateValue, found bool, err error) {
+func FindDid(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.StateValue, did string) (res types.StateValue, found bool, err error) {
 	// Look in inMemory dict
 	value, found := inMemoryDIDs[did]
 	if found {
@@ -36,65 +38,71 @@ func FindDid(k *Keeper, ctx *sdk.Context, did string, inMemoryDIDs map[string]ty
 	return types.StateValue{}, false, nil
 }
 
+func MustFindDid(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.StateValue, did string) (res types.StateValue, err error) {
+	res, found, err := FindDid(k, ctx, inMemoryDIDs, did)
 
-//func ValidateVerificationMethod(namespace string, vm *VerificationMethod) error {
-//	switch utils.GetVerificationMethodType(vm.Type) {
-//	case utils.PublicKeyJwk:
-//		if len(vm.PublicKeyJwk) == 0 {
-//			return ErrBadRequest.Wrapf("%s: should contain `PublicKeyJwk` verification material property", vm.Type)
-//		}
-//	case utils.PublicKeyMultibase:
-//		if len(vm.PublicKeyMultibase) == 0 {
-//			return ErrBadRequest.Wrapf("%s: should contain `PublicKeyMultibase` verification material property", vm.Type)
-//		}
-//	default:
-//		return ErrBadRequest.Wrapf("%s: unsupported verification method type", vm.Type)
-//	}
-//
-//	if len(vm.PublicKeyMultibase) == 0 && vm.PublicKeyJwk == nil {
-//		return ErrBadRequest.Wrap("The verification method must contain either a PublicKeyMultibase or a PublicKeyJwk")
-//	}
-//
-//	if len(vm.Controller) == 0 {
-//		return ErrBadRequestIsRequired.Wrap("Controller")
-//	}
-//
-//	return nil
-//}
+	if err != nil {
+		return types.StateValue{}, err
+	}
 
+	if !found {
+		return types.StateValue{}, types.ErrDidDocNotFound.Wrap(did)
+	}
 
+	return res, nil
+}
 
-//func AppendSignerIfNeed(signers []types.Signer, controller string, msg *types.MsgUpdateDidPayload) []types.Signer {
-//	for _, signer := range signers {
-//		if signer.Signer == controller {
-//			return signers
-//		}
-//	}
-//
-//	signer := types.Signer{
-//		Signer: controller,
-//	}
-//
-//	if controller == msg.Id {
-//		signer.VerificationMethod = msg.VerificationMethod
-//		signer.Authentication = msg.Authentication
-//	}
-//
-//	return append(signers, signer)
-//}
-//
-//func (k msgServer) ValidateDidControllers(ctx *sdk.Context, id string, controllers []string, verMethods []*types.VerificationMethod) error {
-//
-//	for _, verificationMethod := range verMethods {
-//		if err := k.ValidateController(ctx, id, verificationMethod.Controller); err != nil {
-//			return err
-//		}
-//	}
-//
-//	for _, didController := range controllers {
-//		if err := k.ValidateController(ctx, id, didController); err != nil {
-//			return err
-//		}
-//	}
-//	return nil
-//}
+func FindVerificationMethod(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.StateValue, didUrl string) (res types.VerificationMethod, found bool, err error) {
+	did, _, _, _ := utils.MustSplitDIDUrl(didUrl)
+
+	stateValue, found, err := FindDid(k, ctx, inMemoryDIDs, did)
+	if err != nil || !found {
+		return types.VerificationMethod{}, found, err
+	}
+
+	didDoc, err := stateValue.UnpackDataAsDid()
+	if err != nil {
+		return types.VerificationMethod{}, false, err
+	}
+
+	for _, vm := range didDoc.VerificationMethod {
+		if vm.Id == didUrl {
+			return *vm, true, nil
+		}
+	}
+
+	return types.VerificationMethod{}, false, nil
+}
+
+func MustFindVerificationMethod(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.StateValue, didUrl string) (res types.VerificationMethod, err error) {
+	res, found, err := FindVerificationMethod(k, ctx, inMemoryDIDs, didUrl)
+
+	if err != nil {
+		return types.VerificationMethod{}, err
+	}
+
+	if !found {
+		return types.VerificationMethod{}, types.ErrVerificationMethodNotFound.Wrap(didUrl)
+	}
+
+	return res, nil
+}
+
+func VerifySignature(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.StateValue, signature types.SignInfo) error {
+	verificationMethod, err := MustFindVerificationMethod(k, ctx, inMemoryDIDs, signature.VerificationMethodId)
+	if err != nil {
+		return err
+	}
+
+	signatureBytes, err := base64.StdEncoding.DecodeString(signature.Signature)
+	if err != nil {
+		return err
+	}
+
+	err = types.VerifySignature(verificationMethod, signatureBytes)
+	if err != nil {
+		return types.ErrInvalidSignature.Wrapf("method id: %s, error: %s", signature.VerificationMethodId, err.Error())
+	}
+
+	return nil
+}
