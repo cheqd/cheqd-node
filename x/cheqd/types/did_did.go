@@ -66,6 +66,6 @@ func (did Did) Validate(allowedNamespaces []string) error {
 		),
 
 		validation.Field(&did.Service, IsUniqueServiceList(), validation.Each(ValidService(did.Id, allowedNamespaces))),
-		validation.Field(&did.AlsoKnownAs, IsUniqueStrList(), validation.Each(IsDID(allowedNamespaces))),
+		validation.Field(&did.AlsoKnownAs, IsUniqueStrList(), validation.Each(IsURI())),
 	)
 }
