@@ -4,34 +4,45 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
 // Helpers
 
 type PublicKeyJWK []*KeyValuePair
 
-func PubKeyJWKToMap(pjwk PublicKeyJWK) map[string]string {
-	rmap := make(map[string]string)
-	for _, kv := range pjwk {
-		rmap[kv.Key] = kv.Value
+func PubKeyJWKToMap(key PublicKeyJWK) map[string]string {
+	map_ := make(map[string]string)
+	for _, kv := range key {
+		map_[kv.Key] = kv.Value
 	}
-	return rmap
+	return map_
 }
 
 func JSONToPubKeyJWK(jsonStr string) PublicKeyJWK {
-	mjson := make(map[string]string)
-	newPJWK := PublicKeyJWK{}
-	err_ := json.Unmarshal([]byte(jsonStr), &mjson)
-	if err_ != nil {
+	map_ := make(map[string]string)
+	res := PublicKeyJWK{}
+	err := json.Unmarshal([]byte(jsonStr), &map_)
+	if err != nil {
 		panic(fmt.Errorf("internal error: Cannot unmarshal JSON string: %s", jsonStr))
 	}
-	for k, v := range mjson {
-		newPJWK = append(newPJWK, &KeyValuePair{
+	for k, v := range map_ {
+		res = append(res, &KeyValuePair{
 			Key:   k,
 			Value: v,
 		})
 	}
-	return newPJWK
+	return res
+}
+
+func PubKeyJWKToJson(key PublicKeyJWK) (string, error) {
+	map_ := PubKeyJWKToMap(key)
+	json_, err_ := json.Marshal(map_)
+	if err_ != nil {
+		return "", errors.New("can't marshal PublicKeyJWK map to JSON")
+	}
+
+	return string(json_), nil
 }
 
 func IsUniqueKVSet(key PublicKeyJWK) bool {
@@ -54,4 +65,11 @@ func IsUniqueKeyValuePairSet() *CustomErrorRule {
 
 		return nil
 	})
+}
+
+func (p KeyValuePair)Validate() error {
+	return validation.ValidateStruct(&p,
+		validation.Field(&p.Key, validation.Required),
+		validation.Field(&p.Value, validation.Required),
+	)
 }

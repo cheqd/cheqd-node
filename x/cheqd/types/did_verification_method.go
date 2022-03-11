@@ -1,10 +1,14 @@
 package types
 
 import (
+	"crypto/ecdsa"
 	"crypto/ed25519"
+	"crypto/rsa"
 	"errors"
+	"fmt"
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/multiformats/go-multibase"
 )
 
@@ -60,6 +64,8 @@ func GetVerificationMethodIds(vms []*VerificationMethod) []string {
 }
 
 func VerifySignature(vm VerificationMethod, message []byte, signature []byte) error {
+	var verificationError error
+
 	switch vm.Type {
 	case Ed25519VerificationKey2020:
 		_, keyBytes, err := multibase.Decode(vm.PublicKeyMultibase)
@@ -67,20 +73,43 @@ func VerifySignature(vm VerificationMethod, message []byte, signature []byte) er
 			return err
 		}
 
-		valid := ed25519.Verify(keyBytes, message, signature)
-		if !valid {
-			return ErrInvalidSignature.Wrapf("verification method: %s", vm.Id)
+		verificationError = utils.VerifyED25519Signature(keyBytes, message, signature)
+		break
+	case JsonWebKey2020:
+		keyJson, err := PubKeyJWKToJson(vm.PublicKeyJwk)
+		if err != nil {
+			return err
 		}
 
-		return nil
+		var raw interface{}
+		err = jwk.ParseRawKey([]byte(keyJson), &raw)
+		if err != nil {
+			return fmt.Errorf("can't parse jwk: %s", err.Error())
+		}
 
-	case JsonWebKey2020:
-		// TODO: Implement
-		return nil
+		switch pubKey := raw.(type) {
+		case *rsa.PublicKey:
+			verificationError = utils.VerifyRSASignature(*pubKey, message, signature)
+			break
+		case *ecdsa.PublicKey:
+			verificationError = utils.VerifyECDSASignature(*pubKey, message, signature)
+			break
+		case *ed25519.PublicKey:
+			verificationError = utils.VerifyED25519Signature(*pubKey, message, signature)
+		default:
+			panic("unsupported jwk key") // This should have been checked during basic validation
+		}
 
+		break
 	default:
-		return ErrSignatureNotSupported.Wrapf("verification method: %s, signature type: %s", vm.Id, vm.Type)
+		panic("unsupported verification method type")  // This should have also been checked during basic validation
 	}
+
+	if verificationError != nil {
+		return ErrInvalidSignature.Wrapf("verification method: %s, err: %s", vm.Id, verificationError.Error())
+	}
+
+	return nil
 }
 
 // Validation

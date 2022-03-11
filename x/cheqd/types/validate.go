@@ -1,7 +1,6 @@
 package types
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
@@ -128,12 +127,13 @@ func IsJWK() *CustomErrorRule {
 		if !ok {
 			panic("IsJWK must be only applied on KeyValuePair array properties")
 		}
-		mjson := PubKeyJWKToMap(casted)
-		jsonStr, err_ := json.Marshal(mjson)
-		if err_ != nil {
-			return fmt.Errorf("internal error: PublicKeyJWK is not valid JSON")
+
+		keyJson, err := PubKeyJWKToJson(casted)
+		if err != nil {
+			return err
 		}
-		return utils.ValidateJWK(string(jsonStr))
+
+		return utils.ValidateJWK(keyJson)
 	})
 }
 

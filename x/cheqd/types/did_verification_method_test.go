@@ -144,7 +144,19 @@ func TestVerificationMethodValidation(t *testing.T) {
 				PublicKeyMultibase: "",
 			},
 			isValid:  false,
-			errorMsg: "public_key_jwk: invalid format for JWK key, error from validation: failed to unmarshal JWK set: failed to parse sole key in key set: invalid key type from JSON (SomeOtherKeyType).",
+			errorMsg: "public_key_jwk: can't parse jwk: failed to parse key: invalid key type from JSON (SomeOtherKeyType).",
+		},
+		{
+			name: "all keys and values are required in jwk",
+			struct_: VerificationMethod{
+				Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#qwe",
+				Type:               "JsonWebKey2020",
+				Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
+				PublicKeyJwk:       append(ValidPublicKeyJWK, &KeyValuePair{Key: "", Value: ""}),
+				PublicKeyMultibase: "",
+			},
+			isValid:  false,
+			errorMsg: "public_key_jwk: (6: (key: cannot be blank; value: cannot be blank.).).",
 		},
 	}
 
