@@ -12,30 +12,18 @@ This document provides guidance on how to install and configure a node for the c
 
 1. **Download** [**the latest release of `cheqd-node` .deb**](https://github.com/cheqd/cheqd-node/releases/latest) **package**
 
-   For mainnet nodes, use v0.3.1+
+   For example:
 
    ```bash
-   wget https://github.com/cheqd/cheqd-node/releases/download/v0.3.1/cheqd-node_0.3.1_amd64.deb
-   ```
-
-   For testnet nodes, use v0.4.0:
-
-   ```bash
-   wget https://github.com/cheqd/cheqd-node/releases/download/v0.4.0/cheqd-node_0.4.0_amd64.deb
+   wget https://github.com/cheqd/cheqd-node/releases/download/v0.4.1/cheqd-node_0.4.1_amd64.deb
    ```
 
 2. **Install the package**
 
-   For mainnet nodes on v0.3.1+
+   For example:
 
    ```bash
-   sudo dpkg -i cheqd-node_0.3.1_amd64.deb
-   ```
-
-   For testnet nodes on v0.4.0 (or below):
-
-   ```bash
-   sudo dpkg -i cheqd-node_0.4.0_amd64.deb
+   sudo dpkg -i cheqd-node_0.4.1_amd64.deb
    ```
 
    As a part of installation `cheqd` user will be created. By default, `HOME` directory for the user is `/home/cheqd`, but it can be changed by setting `CHEQD_HOME_DIR` environment variable before running `dpkg` command. Additionnally, a custom logging directory can also be defined by passing the environment variable `CHEQD_LOG_DIR` (defaults to `/home/cheqd/.cheqdnode/log`):
@@ -43,7 +31,7 @@ This document provides guidance on how to install and configure a node for the c
    Example custom directories:
 
    ```bash
-   sudo CHEQD_HOME_DIR=/path/to/desired/home/directory dpkg -i cheqd-node_0.3.1_amd64.deb
+   sudo CHEQD_HOME_DIR=/path/to/desired/home/directory dpkg -i cheqd-node_0.4.1_amd64.deb
    ```
 
 3. **Switch to the `cheqd` system user**
@@ -138,7 +126,7 @@ This document provides guidance on how to install and configure a node for the c
       This step is necessary only if you want to allow incoming client application connections to your node. Otherwise, the node will be accessible only locally. Further details about the RPC endpoints is available in the [cheqd node setup guide](../README.md).
 
       ```bash
-      cheqd-noded configure rpc-laddr "tcp:\/\/0.0.0.0:26657"
+      cheqd-noded configure rpc-laddr "tcp://0.0.0.0:26657"
       ```
 
 11. **Enable and start the `cheqd-noded` system service**
