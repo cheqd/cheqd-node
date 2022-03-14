@@ -80,3 +80,11 @@ func ToInterfaces(list []string) []interface{} {
 
 	return res
 }
+
+func ReplaceInSlice(list []string, old, new string) {
+	for i, _ := range list {
+		if list[i] == old {
+			list[i] = new
+		}
+	}
+}

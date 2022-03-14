@@ -28,8 +28,8 @@ func NewDid(context []string, id string, controller []string, verificationMethod
 
 // Helpers
 
-// AggregateControllerDids returns controller DIDs used in both did.controllers and did.verification_method.controller
-func (did *Did) AggregateControllerDids() []string {
+// AllControllerDids returns controller DIDs used in both did.controllers and did.verification_method.controller
+func (did *Did) AllControllerDids() []string {
 	result := did.Controller
 
 	for _, vm := range did.VerificationMethod {
@@ -38,6 +38,30 @@ func (did *Did) AggregateControllerDids() []string {
 
 	return utils.Unique(result)
 }
+
+// ReplaceAllControllerDids replaces controller DIDs in both did.controllers and did.verification_method.controller
+func (did Did) ReplaceAllControllerDids(old, new string) {
+	utils.ReplaceInSlice(did.Controller, old, new)
+
+	for _, vm := range did.VerificationMethod {
+		if vm.Controller == old {
+			vm.Controller = new
+		}
+	}
+}
+
+func (did *Did) GetControllersOrSubject() []string {
+	result := did.Controller
+
+	if len(result) == 0 {
+		result = append(result, did.Id)
+	}
+
+	return result
+}
+
+getVMControllers
+
 
 // Validation
 

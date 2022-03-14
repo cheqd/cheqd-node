@@ -35,7 +35,7 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 	inMemoryDids := map[string]types.StateValue{did.Id: stateValue}
 
 	// Check controllers' existence
-	controllers := did.AggregateControllerDids()
+	controllers := did.AllControllerDids()
 	for _, controller := range controllers {
 		_, err := MustFindDid(&k.Keeper, &ctx, inMemoryDids, controller)
 
@@ -72,11 +72,8 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 }
 
 func GetSignerDIDsForDIDCreation(did types.Did) []string {
-	res := did.AggregateControllerDids()
-
-	if len(did.Controller) == 0 {
-		res = append(res, did.Id)
-	}
+	res := did.GetControllersOrSubject()
+	res = append(res, did.AllControllerDids()...)
 
 	return utils.Unique(res)
 }

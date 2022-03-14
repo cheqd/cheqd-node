@@ -10,7 +10,7 @@ func TestIndexOf(t *testing.T) {
 	cases := []struct {
 		array          []string
 		searchElement  string
-		fromIndex	   int
+		fromIndex      int
 		expectedResult int
 	}{
 		{[]string{}, "", 0, -1},
@@ -28,7 +28,6 @@ func TestIndexOf(t *testing.T) {
 		require.Equal(t, tc.expectedResult, actual)
 	}
 }
-
 
 func TestContains(t *testing.T) {
 	cases := []struct {
@@ -49,7 +48,6 @@ func TestContains(t *testing.T) {
 		require.Equal(t, tc.expectedResult, actual)
 	}
 }
-
 
 func TestSubtract(t *testing.T) {
 	cases := []struct {
@@ -94,4 +92,11 @@ func TestUnique(t *testing.T) {
 		sort.Strings(actual)
 		require.Equal(t, tc.expected, actual)
 	}
+}
+
+func TestReplaceInList(t *testing.T) {
+	list := []string{"1", "2", "3", "2"}
+	ReplaceInSlice(list, "2", "3")
+
+	require.Equal(t, []string{"1", "3", "3", "3"}, list)
 }

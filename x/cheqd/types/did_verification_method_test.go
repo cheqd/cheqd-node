@@ -8,10 +8,11 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"encoding/json"
+	"testing"
+
 	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/multiformats/go-multibase"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 type TestJWKKey struct {
