@@ -1,5 +1,7 @@
 package utils
 
+import "sort"
+
 func IndexOf(array []string, searchElement string, fromIndex int) int {
 	for i, v := range array[fromIndex:] {
 		if v == searchElement {
@@ -79,4 +81,10 @@ func ToInterfaces(list []string) []interface{} {
 	}
 
 	return res
+}
+
+func UniqueSorted(ls []string) []string {
+	tmp_ := Unique(ls)
+	sort.Strings(tmp_)
+	return tmp_
 }

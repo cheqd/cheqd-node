@@ -95,3 +95,22 @@ func TestUnique(t *testing.T) {
 		require.Equal(t, tc.expected, actual)
 	}
 }
+
+func TestUniqueSorted(t *testing.T) {
+	cases := []struct {
+		name   string
+		input  []string
+		output []string
+	}{
+		{"General alphabet list", []string{"aa", "bb"},[]string{"aa", "bb"}},
+		{"General alphabet reverse list", []string{"bb", "aa"},[]string{"aa", "bb"}},
+		{"General number list", []string{"22", "11"},[]string{"11", "22"}},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			res := UniqueSorted(tc.input)
+			require.Equal(t, res, tc.output)
+		})
+	}
+}
