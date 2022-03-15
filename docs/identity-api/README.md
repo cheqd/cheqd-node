@@ -6,6 +6,8 @@ This page describes how identity domain transactions need to be implemented by c
 
 Details on how identity transactions are defined is available in [ADR 002: Identity entities and transactions](../../architecture/adr-list/adr-002-cheqd-did-method.md).
 
+## Ledger transactions/operations
+
 ### Base write flow
 
 1. **Build a request** _Example_: `build_create_did_request(id, verkey, alias)`
@@ -14,9 +16,9 @@ Details on how identity transactions are defined is available in [ADR 002: Ident
 4. **Sign the transaction** _Example_: `cheqd_keys_sign(wallet_handle, key_alias, tx)`.
 5. **Broadcast a signed transaction** _Example_: `broadcast_tx_commit(pool_alias, signed)`.
 
-#### Response format
+#### Example output
 
-```text
+```protobuf
   Response {
    check_tx: TxResult {
       code: 0,
@@ -32,7 +34,7 @@ Details on how identity transactions are defined is available in [ADR 002: Ident
    deliver_tx: TxResult {
       code: 0,
       data: Some(Data([...])),
-      log: "[{\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"send\"},{\"key\":\"sender\",\"value\":\"cheqd1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"cheqds1pvnjjy3vz0ga6hexv32gdxydzxth7f86mekcpg\"},{\"key\":\"sender\",\"value\":\"cheqd1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd\"},{\"key\":\"amount\",\"value\":\"1000ncheq\"}]}]}]",
+      log: "[{\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"send\"},{\"key\":\"sender\",\"value\":\"cheqd1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"cheqd1pvnjjy3vz0ga6hexv32gdxydzxth7f86mekcpg\"},{\"key\":\"sender\",\"value\":\"cheqd1fknpjldck6n3v2wu86arpz8xjnfc60f99ylcjd\"},{\"key\":\"amount\",\"value\":\"500000ncheq\"}]}]}]",
       info: "",
       gas_wanted: 0,
       gas_used: 0,
@@ -44,416 +46,163 @@ Details on how identity transactions are defined is available in [ADR 002: Ident
 }
 ```
 
-**`hash`** : Transaction hash
-
-**`height`**: Ledger height
-
-## DID transactions
-
 ### Create DID
 
-#### cheqd-sdk function
+Used to create a new DID. The unique ID is generated client-side by VDR Tools SDK, but checked for uniqueness on the ledger before being committed.
 
-`build_create_did_request(id, verkey, alias)`
+#### Input parameters
 
-#### Request format
+* `id` (string): Target DID as Base58-encoded string with 16 or 32 byte long unique identifier.
+* `verkey` (string): All Verification Method key(s) linked to this DID and its DID controller(s). At least one Verification Method key *must* be defined.
 
-```json
-CreateDidRequest 
-{
-    "data": {
-               "id": "GEzcdDLhCpGCYRHW82kjHd",
-               "verkey": "~HmUWn928bnFT6Ephf65YXv",
-               "alias": "DID for Alice"
-             },
-    "owner": "GEzcdDLhCpGCYRHW82kjHd",
-    "signature": "49W5WP5jr7x1fZhtpAhHFbuUDqUYZ3AKht88gUjrz8TEJZr5MZUPjskpfBFdboLPZXKjbGjutoVascfKiMD5W7Ba",
-    "metadata": {}
-}
+#### Method call
+
+The `CreateDidRequest` must be signed by the controller DID(s) and their associated key(s) defined. It is invoked as follows:
+
+```rust
+build_create_did_request(id, verkey)
 ```
 
-* `id` \(base58-encoded string\): Target DID as base58-encoded string for 16 or 32 byte DID value
-* `verkey` \(base58-encoded string, possibly starting with "~"; optional\): Target verification key. It can start with "~", which means that it is an abbreviated `verkey` and should be 16 bytes long when decoded. Otherwise, it's a full `verkey` which should be 32 bytes long when decoded.
-* `alias` \(string; optional\)
+If successful, the fully-qualified DID with unique identifier is returned as a `key` string. This `key` is how the DID is uniquely referenced when it is stored in the ledger state.
 
-#### Response format
-
-```text
+```rust
 CreateDidResponse {
-    "key": "did:GEzcdDLhCpGCYRHW82kjHd" 
+    "key": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue" 
 }
 ```
 
-* `key`\(string\): A unique key is used to store this DID in a state
+#### Example response data
 
-#### Response validation
-
-* `CreateDidRequest` must be signed by the DID from `id` field. It means that this DID must be an owner of this DID transaction.
+```jsonc
+{
+  "data": {
+    "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue", // DID with unique defined in the method call parameters
+    "controller": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue"],
+    "verificationMethod": [
+        {
+          "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#verkey", // id#verkey
+          "type": "Ed25519VerificationKey2020",
+          "controller": "did:cheqd:mainnet:N22N22KY2Dyvmuu2PyyqSFKue",
+          "publicKeyMultibase": "zAKJP3f7BD6W4iWEQ9jwndVTCBq8ua2Utt8EEjJ6Vxsf"
+        }
+    ],
+    "authentication": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#verkey"]
+  },
+  "signatures": {
+    "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#verkey": "49W5WP5jr7x1fZhtpAhHFbuUDqUYZ3AKht88gUjrz8TEJZr5MZUPjskpfBFdboLPZXKjbGjutoVascfKiMD5W7Ba"
+    // Multiple verification methods and corresponding signatures can be added here
+  },
+  "metadata": {}
+}
+```
 
 ### Update DID
 
-#### cheqd-sdk function
+Update an existing DID on the cheqd network ledger. The fully-qualified DID must be stored on ledger already, otherwise the request fails.
 
-`build_update_did_request(id, verkey, alias)`
+#### Input parameters
 
-#### Request format
+* `id` (string): Target DID as Base58-encoded string with 16 or 32 byte long unique identifier.
+* `verkey` (string): All Verification Method key(s) linked to this DID and its DID controller(s).
+* `versionId` (string): Transaction hash of the last applicable DIDDoc version.
 
-```text
-UpdateDidRequest 
-{
-    "data": {
-               "id": "GEzcdDLhCpGCYRHW82kjHd",
-               "verkey": "~HmUWn928bnFT6Ephf65YXv",
-               "alias": "DID for Alice"
-             },
-    "owner": "GEzcdDLhCpGCYRHW82kjHd",
-    "signature": "49W5WP5jr7x1fZhtpAhHFbuUDqUYZ3AKht88gUjrz8TEJZr5MZUPjskpfBFdboLPZXKjbGjutoVascfKiMD5W7Ba",
-    "metadata": {}
+#### Method call
+
+All DID controller(s) from `controller` field must already be stored on ledger, from a previous `CreateDidRequest`.
+
+The DID update request must be signed by DIDs from `controller` field, or if `controller` does not exist, by at least one key from `authentication`.
+
+```rust
+build_update_did_request(id, verkey, version_id)
+```
+
+If successful, the fully-qualified DID with unique identifier is returned as a `key` string. This `key` is how the DID is uniquely referenced when it is stored in the ledger state.
+
+```rust
+UpdateDidRequest {
+    "key": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue" 
 }
 ```
 
-* `id` \(base58-encoded string\): Target DID as base58-encoded string for 16 or 32 byte DID value.
-* `verkey` \(base58-encoded string, possibly starting with "~"; optional\): Target verification key. It can start with "~", which means that it is an abbreviated `verkey` and should be 16 bytes long when decoded. Otherwise, it's a full `verkey` which should be 32 bytes long when decoded.
-* `alias` \(string; optional\).
-
-#### Response format
-
-```text
-UpdateDidResponse {
-    "key": "did:GEzcdDLhCpGCYRHW82kjHd" 
-}
-```
-
-* `key`\(string\): A unique key is used to store this DID in a state
-
-#### Response validation
-
-* A transaction with `id` from `UpdateDidRequest`must already be in a ledger created by `CreateDidRequest`
-* `UpdateDidRequest` must be signed by the DID from `id` field. It means that this DID must be an owner of this DID transaction.
-
-### Get DID
-
-#### cheqd-sdk function
-
-`build_query_get_did(id)`
-
-* `id` \(base58-encoded string\): Target DID as base58-encoded string for 16 or 32 byte DID value.
-
-#### Request format
-
-```text
-Request 
-{
-    "path": "/store/cheqd/key",
-    "data": <bytes>,
-    "height": 642,
-    "prove": true
-}
-```
-
-* `path`: Path for RPC endpoint for cheqd pool
-* `data`: Query with an entity key from a state. String `did:<id>` encoded to bytes
-* `height`: Ledger height \(size\). `None` for auto calculation
-* `prove`:  Boolean value. `True` for getting state proof in a pool response
-
-#### Response format
-
-```text
-QueryGetDidResponse{
-        "did": {
-               "id": "GEzcdDLhCpGCYRHW82kjHd",
-               "verkey": "~HmUWn928bnFT6Ephf65YXv",
-               "alias": "DID for Alice"
-             },
-}
-```
-
-## ATTRIB transactions
-
-### Create ATTRIB
-
-#### cheqd-sdk function
-
-`build_create_attrib_request(did, raw)`
-
-#### Request format
-
-```text
-CreateAttribRequest 
-{
-    "data": {
-               "did": "GEzcdDLhCpGCYRHW82kjHd",
-               "raw": "{'name': 'Alice'}"
-             },
-    "owner": "GEzcdDLhCpGCYRHW82kjHd",
-    "signature": "49W5WP5jr7x1fZhtpAhHFbuUDqUYZ3AKht88gUjrz8TEJZr5MZUPjskpfBFdboLPZXKjbGjutoVascfKiMD5W7Ba",
-    "metadata": {}
-}
-```
-
-* `did` \(base58-encoded string\): Target DID as base58-encoded string for 16 or 32 byte DID value.
-* `raw` \(JSON; mutually exclusive with `hash` and `enc`\): Raw data represented as JSON, where the key is attribute name and value is attribute value.
-
-#### Response format
-
-```text
-CreateAttribResponse {
-    "key": "attrib:GEzcdDLhCpGCYRHW82kjHd" 
-}
-```
-
-* `key`\(string\): A unique key is used to store these attributes in a state
-
-#### Response validation
-
-* A DID transaction with `id` from `UpdateAttribRequest`must already be in a ledger created by `CreateDidRequest`
-* `CreateAttribRequest` must be signed by the DID from `did` field. It means that this DID must be an owner of this ATTRIB transaction.
-
-### Update ATTRIB
-
-#### cheqd-sdk function
-
-`build_update_attrib_request(id, raw)`
-
-#### Request format
-
-```text
-UpdateAttribRequest 
-{
-    "data": {
-               "did": "GEzcdDLhCpGCYRHW82kjHd",
-               "raw": "{'name': 'Alice'}"
-             },
-    "owner": "GEzcdDLhCpGCYRHW82kjHd",
-    "signature": "49W5WP5jr7x1fZhtpAhHFbuUDqUYZ3AKht88gUjrz8TEJZr5MZUPjskpfBFdboLPZXKjbGjutoVascfKiMD5W7Ba",
-    "metadata": {}
-}
-```
-
-* `did` \(base58-encoded string\): Target DID as base58-encoded string for 16 or 32 byte DID value.
-* `raw` \(JSON; mutually exclusive with `hash` and `enc`\): Raw data represented as JSON, where the key is attribute name and value is attribute value.
-
-#### Response format
-
-```text
-UpdateAttribResponse {
-        "key": "attrib:GEzcdDLhCpGCYRHW82kjHd" 
-}
-```
-
-* `key`\(string\): A unique key is used to store these attributes in a state
-
-#### Response validation
-
-* A DID transaction with `id` from `UpdateAttribRequest`must already be in a ledger created by `CreateDidRequest`
-* `UpdateAttribRequest` must be signed by  DID from `did` field. It means that this DID must be an owner of this ATTRIB transaction.
-
-### Get ATTRIB
-
-#### cheqd-sdk function
-
-`build_query_get_attrib(did)`
-
-* `did` \(base58-encoded string\) Target DID as base58-encoded string for 16 or 32 byte DID value.
-
-#### Request format
-
-```text
-Request 
-{
-    "path": "/store/cheqd/key",
-    "data": <bytes>,
-    "height": 642,
-    "prove": true
-}
-```
-
-* `path`: Path for RPC endpoint for cheqd pool
-* `data`: Query with an entity key from a state. String `did:<id>` encoded to bytes
-* `height`: Ledger height \(size\). `None` for auto calculation
-* `prove`:  Boolean value. `True` for getting state proof in a pool response
-
-#### Response format
-
-```text
-QueryGetAttribResponse{
-        "attrib": {
-               "did": "GEzcdDLhCpGCYRHW82kjHd",
-               "raw": "{'name': 'Alice'}"
-             },
-}
-```
-
-## SCHEMA transactions
-
-### Create SCHEMA
-
-#### cheqd-sdk function
-
-`build\_create\_schema\_request\(version, name, attr\_names\)`
-
-#### Request format
-
-```text
-CreateSchemaRequest 
-{
-    "data": {
-            "version": "1.0",
-            "name": "Degree",
-            "attr_names": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
-             },
-    "owner": "GEzcdDLhCpGCYRHW82kjHd",
-    "signature": "49W5WP5jr7x1fZhtpAhHFbuUDqUYZ3AKht88gUjrz8TEJZr5MZUPjskpfBFdboLPZXKjbGjutoVascfKiMD5W7Ba",
-    "metadata": {}
-}
-```
-
-* `attr_names`\(array\): Array of attribute name strings \(125 attributes maximum\)
-* `name`\(string\): Schema's name string
-* `version`\(string\): Schema's version string
-
-#### Response format
-
-```text
-CreateSchemaResponse {
-        "key": "schema:GEzcdDLhCpGCYRHW82kjHd:Degree:1.0" 
-}
-```
-
-* `key`\(string\): A key is used to store this schema in a state
-
-#### Response validation
-
-* A SCHEMA transaction with DID from `owner` field must already be in a ledger created by `CreateDidRequest`
-* `CreateSchemaRequest` must be signed by  DID from `owner` field.
-
-### Get Schema
-
-#### cheqd-sdk function
-
-`build\_query\_get\_schema\(name, version, owner\)`
-
-* `name`\(string\): Schema's name string
-* `version`\(string\): Schema's version string
-* `owner` \(string\): Schema's owner did
-
-#### Request format
-
-```text
-Request 
-{
-    "path": "/store/cheqd/key",
-    "data": <bytes>,
-    "height": 642,
-    "prove": true
-}
-```
-
-* `path`: Path for RPC Endpoint for cheqd pool
-* `data`: Query with an entity key from a state. String `schema:<owner>:<name>:<version>` encoded to bytes
-* `height`: Ledger height \(size\). `None` for auto calculation;
-* `prove`: Boolean value. `True` for getting state proof in a pool response.
-
-#### Response format
-
-```text
-QueryGetSchemaResponse{
-        "attrib": {
-                "version": "1.0",
-                "name": "Degree",
-                "attr_names": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
-             },
-}
-```
-
-## CRED\_DEF
-
-### Create Credential Definition
-
-#### cheqd-sdk function
-
-`build\_create\_cred\_def\_request\(cred\_def, schema\_id, signature\_type, tag\)`
-
-#### Request format
-
-```text
-CreateCredDefRequest 
-{
-    "data": {
-                "signature_type": "CL",
-                "schema_id": "schema:GEzcdDLhCpGCYRHW82kjHd:Degree:1.0",
-                "tag": "some_tag",    
-                "cred_def": {
-                    "primary": ....,
-                    "revocation": ....
-            },
-    "owner": "GEzcdDLhCpGCYRHW82kjHd",
-    "signature": "49W5WP5jr7x1fZhtpAhHFbuUDqUYZ3AKht88gUjrz8TEJZr5MZUPjskpfBFdboLPZXKjbGjutoVascfKiMD5W7Ba",
-    "metadata": {}
-}
-```
-
-* `cred_def` \(dict\): Dictionary with Credential Definition's data:
-  * `primary` \(dict\): Primary credential public key
-  * `revocation` \(dict\): Revocation credential public key
-* `schema_id` \(string\): Schema's key from a state
-* `signature_type` \(string\): Type of the Credential Definition \(that is credential signature\). `CL` \(Camenisch-Lysyanskaya\) is the only supported type now.
-* `tag` \(string, optional\): A unique tag to have multiple public keys for the same Schema and type issued by the same DID. A default tag `tag` will be used if not specified.
-
-#### Response format
-
-```text
-CreateCredDefResponse {
-        "key": "cred_def:GEzcdDLhCpGCYRHW82kjHd:schema:GEzcdDLhCpGCYRHW82kjHd:Degree:1.0:some_tag:CL" 
-}
-```
-
-* `key`\(string\): A unique key that is used to store this Credential Definition in a state
-
-#### Response validation
-
-* A CRED\_DEF transaction with DID from `owner` field must already be in a ledger created by `CreateDidRequest`
-* `CreateCredDefRequest` must be signed by  DID from `owner` field.
-
-### Get Credential Definition
-
-#### cheqd-sdk function
-
-`build\_query\_get\_cred\_def\(name, version, owner\)`
-
-* `schema_id`\(string\): Schema's key from a state
-* `signature_type`\(string\): Type of the Credential Definition \(that is credential signature\). CL \(Camenisch-Lysyanskaya\) is the only supported type now.
-* `owner` \(string\): Credential Definition's owner DID
-* `tag` \(string, optional\): A unique tag to have multiple public keys for the same Schema and type issued by the same DID. A default tag `tag` will be used if not specified.
-
-#### Request format
-
-```text
-Request 
-{
-    "path": "/store/cheqd/key",
-    "data": <bytes>,
-    "height": 642,
-    "prove": true
-}
-```
-
-* `path`: Path for RPC endpoint for cheqd pool
-* `data`: Query with an entity key from a state. String `cred_def:<owner>:<schema_id>:<tag>:<signature_type>` encoded to bytes
-* `height`: Ledger height \(size\). `None` for auto calculation
-* `prove`: Boolean value. `True` for getting state proof in a pool response.
-
-#### Response format
+#### Example response data
 
 ```jsonc
-QueryGetCredDefResponse{
-    "cred_def": {
-            "signature_type": "CL",
-            "schema_id": "schema:GEzcdDLhCpGCYRHW82kjHd:Degree:1.0",
-            "tag": "some_tag",    
-            "cred_def": {
-                "primary": "...",// Primary
-                "revocation": "..." // Revocation registry
-        },
+{
+  "data": {
+    "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
+    "controller": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue"],
+    "verificationMethod": [
+      {
+        "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#verkey",
+        "type": "Ed25519VerificationKey2020", // external (property value)
+        "controller": "did:cheqd:mainnet:N22N22KY2Dyvmuu2PyyqSFKue",
+        "publicKeyMultibase": "zAKJP3f7BD6W4iWEQ9jwndVTCBq8ua2Utt8EEjJ6Vxsf"
+      }
+    ],
+    "authentication": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#verkey"],
+    "versionId": "1B3B00849B4D50E8FCCF50193E35FD6CA5FD4686ED6AD8F847AC8C5E466CFD3E"
+  },
+  "signatures": {
+    "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#verkey": "49W5WP5jr7x1fZhtpAhHFbuUDqUYZ3AKht88gUjrz8TEJZr5MZUPjskpfBFdboLPZXKjbGjutoVascfKiMD5W7Ba"
+    // Multiple verification methods and corresponding signatures can be added here
+  },
+  "metadata": {}
+}
+```
+
+### Query DID
+
+Fetch DID Document and metadata associated with a specified DID. The fully-qualified DID must be stored on ledger already, otherwise the request fails.
+
+#### Method call
+
+The only input that the query/get DID method requires is the `id` associated with the DID that needs to be fetched.
+
+```rust
+build_query_get_did(id)
+```
+
+The request itself is wrapped inside an envelope that requires the following details:
+
+```protobuf
+Request 
+{
+    "path": "<pool-rpc-endpoint>",
+    "data": <bytes>,
+    "height": 642,
+    "prove": true
+}
+```
+
+The values required above are:
+
+* `path`: Path for the Tendermint RPC endpoint from which the response was returned.
+* `data`: Query with an `key` that corresponds to a specific DID state, encoded to bytes.
+* `height`: Block height from which the state is to be fetched. This can be set to `none` for auto-calculation that fetches from latest ledger state, while providing a previously block height can be used to query the DID state at a previous block height / equivalent time.
+* `prove`: Boolean value (`true` or `false`) that defines whether the state proof should be fetched along with the response.
+
+#### Example response data
+
+```jsonc
+QueryGetDidResponse{
+  "did": {
+    "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue",
+    "controller": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue"],
+    "verificationMethod": [
+      {
+        "id": "did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#verkey",
+        "type": "Ed25519VerificationKey2020", // external (property value)
+        "controller": "did:cheqd:mainnet:N22N22KY2Dyvmuu2PyyqSFKue",
+        "publicKeyMultibase": "zAKJP3f7BD6W4iWEQ9jwndVTCBq8ua2Utt8EEjJ6Vxsf"
+      }
+  ],
+  "authentication": ["did:cheqd:mainnet:N22KY2Dyvmuu2PyyqSFKue#verkey"],
+  },
+  "metadata": {
+    "created": "2020-12-20T19:17:47Z",
+    "updated": "2020-12-20T19:19:47Z",
+    "deactivated": false,
+    "versionId": "N22KY2Dyvmuu2PyyqSFKueN22KY2Dyvmuu2PyyqSFKue",
+  }
 }
 ```

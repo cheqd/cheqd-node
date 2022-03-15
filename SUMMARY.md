@@ -12,9 +12,10 @@
     * [Upgrading a cheqd node using Debian package releases](docs/setup-and-configure/debian/deb-package-upgrade.md)
   * [Installing cheqd-node with Docker](docs/setup-and-configure/docker-install.md)
   * [Installing a cheqd node from binary package releases](docs/setup-and-configure/binary-install.md)
-  * [Configure a cheqd node as validator](docs/setup-and-configure/configure-new-validator.md)
+* [Setting up and configuring validators](docs/validator-guide/README.md)
+  * [FAQs for validator operators](docs/validator-guide/validator-faq.md)
 * [cheqd Cosmos CLI](docs/cheqd-cli/README.md)
-  * [cheqd Command Line Interface \(CLI\) guide](docs/cheqd-cli/README.md)
+  * [cheqd Command Line Interface (CLI) guide](docs/cheqd-cli/README.md)
   * [Using cheqd Cosmos CLI to manage keys](docs/cheqd-cli/cheqd-cli-key-management.md)
   * [Using cheqd Cosmos CLI to manage accounts](docs/cheqd-cli/cheqd-cli-accounts.md)
   * [Using cheqd Cosmos CLI to manage a node](docs/cheqd-cli/cheqd-cli-node-management.md)
@@ -25,20 +26,23 @@
   * [Docker Compose Based Localnet](docs/build-and-networks/local-docker-compose-network.md)
   * [Setting up a new network](docs/build-and-networks/manual-network-setup.md)
 * [Client-app Identity APIs](docs/identity-api/README.md)
+  * [Account and key management in VDR Tools SDK](docs/identity-api/vdr-tools-sdk-accounts-keys.md)
+  * [Ledger connections in VDR Tools SDK](docs/identity-api/vdr-tools-sdk-ledger-connection.md)
   * [Error messages](docs/identity-api/identity-api-error-messages.md)
 
 ## Architecture
 
-* [Architecture Decision Record \(ADR\) Process](architecture/README.md)
+* [Architecture Decision Record (ADR) Process](architecture/README.md)
 * [List of ADRs](architecture/adr-list/README.md)
   * [ADR 001: Payment mechanism for issuing credentials](architecture/adr-list/adr-001-payment-mechanism-for-issuing-credentials.md)
   * [ADR 002: cheqd DID method, identity entities, and transactions](architecture/adr-list/adr-002-cheqd-did-method.md)
-  * [ADR 003: Command Line Interface \(CLI\) tools](architecture/adr-list/adr-003-cli-tools.md)
+  * [ADR 003: Command Line Interface (CLI) tools](architecture/adr-list/adr-003-cli-tools.md)
   * [ADR 004: Token fractions](architecture/adr-list/adr-004-token-fractions.md)
   * [ADR 005: Genesis parameters](architecture/adr-list/adr-005-genesis-parameters.md)
   * [ADR 006: Community tax](architecture/adr-list/adr-006-community-tax.md)
   * [ADR 007: Revocation registry](architecture/adr-list/adr-007-revocation-registry.md)
   * [ADR 008: cheqd DIDDOc resources: Schemas and Credential Definitions](architecture/adr-list/adr-008-identity-resources.md)
+  * [ADR 009: Importing/exporting mnemonic keys from Cosmos](architecture/adr-list/adr-009-mnemonic-keys-cosmos.md)
   * [ADR {ADR-NUMBER}: {TITLE}](architecture/adr-list/adr-template.md)
 
 ---

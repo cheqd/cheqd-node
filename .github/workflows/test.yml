@@ -1,7 +1,10 @@
-name: Test
+name: "Build and Test"
 
 on:
-  push:
+  workflow_run:
+    workflows: [Lint]
+    types:
+      - completed
     paths-ignore:
     - '**.md'
     - 'docs/**'
@@ -9,10 +12,9 @@ on:
     - '.gitbook/**'
 
 env:
-  NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/tests/networks/docker-compose-localnet/network-config"
+  NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/docker/localnet/network-config"
 
 jobs:
-
   run-unit-test:
     name: Run unit tests
     runs-on: ubuntu-20.04
@@ -43,15 +45,15 @@ jobs:
           GOLANG_PROTOBUF_VERSION: 1.3.5
           GOGO_PROTOBUF_VERSION: 1.3.2
           GRPC_GATEWAY_VERSION: 1.14.7
+        # Taken from: tendermintdev/sdk-proto-gen:v0.2
         run: |
-          # Taken from: tendermintdev/sdk-proto-gen:v0.2
           go get \
-            github.com/golang/protobuf/protoc-gen-go@v${GOLANG_PROTOBUF_VERSION} \
-            github.com/gogo/protobuf/protoc-gen-gogo@v${GOGO_PROTOBUF_VERSION} \
-            github.com/gogo/protobuf/protoc-gen-gogofast@v${GOGO_PROTOBUF_VERSION} \
-            github.com/gogo/protobuf/protoc-gen-gogofaster@v${GOGO_PROTOBUF_VERSION} \
-            github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@v${GRPC_GATEWAY_VERSION} \
-            github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@v${GRPC_GATEWAY_VERSION} \
+            github.com/golang/protobuf/protoc-gen-go@v"$GOLANG_PROTOBUF_VERSION" \
+            github.com/gogo/protobuf/protoc-gen-gogo@v"$GOGO_PROTOBUF_VERSION" \
+            github.com/gogo/protobuf/protoc-gen-gogofast@v"$GOGO_PROTOBUF_VERSION" \
+            github.com/gogo/protobuf/protoc-gen-gogofaster@v"$GOGO_PROTOBUF_VERSION" \
+            github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@v"$GRPC_GATEWAY_VERSION" \
+            github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@v"$GRPC_GATEWAY_VERSION" \
             github.com/regen-network/cosmos-proto/protoc-gen-gocosmos@latest
 
       - name: Install buf
@@ -152,10 +154,11 @@ jobs:
           fetch-depth: 0 # Required to fetch version
 
       - name: Build cheqd-cli with 'cheqd-noded' as entrypoint
-        run: docker build --target base -t cheqd-cli -f docker/Dockerfile --build-arg UID=$(id -u) --build-arg GID=$(id -g) . # TODO: Get rid of UID and GID
+        # TODO: Get rid of UID and GID
+        run: docker build --target base -t cheqd-cli -f docker/Dockerfile --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" . 
 
       - name: Build cheqd-node with 'node-start' as entrypoint
-        run: docker build --target node -t cheqd-node -f docker/Dockerfile --build-arg UID=$(id -u) --build-arg GID=$(id -g) .
+        run: docker build --target node -t cheqd-node -f docker/Dockerfile --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" .
 
       - name: Save cheqd-cli
         run: docker save -o cheqd-cli-image.tar cheqd-cli
@@ -175,34 +178,6 @@ jobs:
           name: cheqd-node-image.tar
           path: cheqd-node-image.tar
 
-  build-testnet-image:
-    name: Build cheqd-testnet image
-    runs-on: ubuntu-20.04
-    needs: build-node-images
-    steps:
-      - name: Check out
-        uses: actions/checkout@v2
-
-      - name: Download node image
-        uses: actions/download-artifact@v2
-        with:
-          name: cheqd-cli-image.tar
-
-      - name: Load node image
-        run: docker load -i cheqd-cli-image.tar
-
-      - name: Build
-        run: docker build -f tests/networks/docker-localnet/Dockerfile --no-cache -t cheqd-testnet .
-
-      - name: Save
-        run: docker save -o cheqd-testnet-image.tar cheqd-testnet
-
-      - name: Store artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: cheqd-testnet-image.tar
-          path: cheqd-testnet-image.tar
-
   test-new-node-setup-from-deb:
     name: Test new node setup from deb
     runs-on: ubuntu-20.04
@@ -221,35 +196,35 @@ jobs:
       - name: Download node image
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-cli-image.tar
+          name: cheqd-node-image.tar
 
       - name: Load node image
-        run: docker load -i cheqd-cli-image.tar
+        run: docker load -i cheqd-node-image.tar
 
       - name: Check out
         uses: actions/checkout@v2
 
-      - name: Set up 4 validators + 2 observers node docker pool  # TODO: Replace with testnet image
-        working-directory: ./tests/networks/docker-compose-localnet
+      - name: Set up 4 validators + 2 observers node docker pool
+        working-directory: ./docker/localnet
         run: |
           bash gen-network-config.sh
-          docker-compose up -d
+          CHEQD_NODE_IMAGE=cheqd-node CHEQD_NODE_VERSION=latest docker compose up -d
 
       - name: Wait for chain
-        run: bash tests/networks/tools/wait-for-chain.sh
+        run: bash tests/tools/wait-for-chain.sh
 
       - name: Add observer node
-        working-directory: ./tests/networks/docker-compose-localnet
+        working-directory: ./tests/e2e-complex/deb-install
         run: |
           ./add-observer.sh
           cheqd-noded status -n tcp://localhost:26677 2>&1
-          ./wait.sh '[[ $(cheqd-noded status -n '"'"'tcp://localhost:26677'"'"' 2>&1 | wc -l) == 1 ]] && echo "New node returns status!"'
+          ./wait.sh "[[ $(cheqd-noded status -n '"'"'tcp://localhost:26677'"'"' 2>&1 | wc -l) == 1 ]] && echo "New node returns status!""
 
       - name: Promote observer to validator
-        working-directory: ./tests/networks/docker-compose-localnet
+        working-directory: ./tests/e2e-complex/deb-install
         run: |
-          bash -x promote-validator.sh
-          cheqd-noded query staking validators --node "http://localhost:26657" | sed -nr 's/.*status: (.*?).*/\1/p' $1 | while read x; do [[ "BOND_STATUS_BONDED" == $x ]] && echo "Validator's status is bonded!" || exit 1 ; done
+          ./promote-validator.sh
+          cheqd-noded query staking validators --node "http://localhost:26657" | sed -nr 's/.*status: (.*?).*/\1/p' "$1" | while read -r x; do [[ "BOND_STATUS_BONDED" == "$x" ]] && echo "Validator's status is bonded!" || exit 1 ; done
           ./wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*signature": (.*?).*/\1/p'"'"' | wc -l) == 5 ]] && echo "There are 5 validators signatures in block!"'
           ./wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*(signature": null).*/\1/p'"'"' | wc -l) == 0 ]] && echo "There are no null signatures in block!"'
 
@@ -257,11 +232,6 @@ jobs:
         if: ${{ failure() }}
         run: |
           journalctl -ex | grep cheqd
-
-      - name: Gather logs on failure 2
-        if: ${{ failure() }}
-        run: |
-          journalctl -u service-name.service --no-pager
 
   run-python-based-integration-tests:
     name: Run python based cosmos and identity tests
@@ -280,50 +250,55 @@ jobs:
       - name: Download node image
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-cli-image.tar
+          name: cheqd-node-image.tar
 
       - name: Load node image
-        run: docker load -i cheqd-cli-image.tar
+        run: docker load -i cheqd-node-image.tar
 
-      - uses: actions/checkout@v2
+      - name: Check out
+        uses: actions/checkout@v2
 
-      - name: Set up 4 validators + 2 observers node docker pool for local test run # Replace with testnet image
-        working-directory: ./tests/networks/docker-compose-localnet
+      - name: Set up 4 validators + 2 observers node docker pool
+        working-directory: ./docker/localnet
         run: |
           bash gen-network-config.sh
-          docker-compose up -d
+          CHEQD_NODE_IMAGE=cheqd-node CHEQD_NODE_VERSION=latest docker compose up -d
 
       - name: Wait for chain
-        run: bash tests/networks/tools/wait-for-chain.sh
+        run: bash tests/tools/wait-for-chain.sh
 
       - name: Set up test environment
-        working-directory: ./tests/e2e
+        working-directory: ./tests/e2e-pytest
         run: |
           pip3 install -r requirements.txt >> /dev/null
-          cp -Rf ${NODE_CONFIGS_BASE}/validator-0/. /home/runner/.cheqdnode
-          cp -Rf ${NODE_CONFIGS_BASE}/validator-1/. /home/runner/.cheqdnode
+          cp -Rf "${NODE_CONFIGS_BASE}"/validator-0/. /home/runner/.cheqdnode
+          cp -Rf "${NODE_CONFIGS_BASE}"/validator-1/. /home/runner/.cheqdnode
           sudo chmod -R 777 /home/runner
 
       - name: Run cosmos-related tests
+        working-directory: ./tests/e2e-pytest
         run: |
           set -euxo pipefail
-          export OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/validator-0" | sed -nr 's/.*address: (.*?).*/\1/p' | sed 's/\r//g')
-          export OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/validator-1" | sed -nr 's/.*address: (.*?).*/\1/p' | sed 's/\r//g')
-          pytest -v -rP tests/e2e/test_cosmos.py
+          OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/validator-0" | sed -nr 's/.*address: (.*?).*/\1/p' | sed 's/\r//g')
+          export OP0_ADDRESS
+          OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/validator-1" | sed -nr 's/.*address: (.*?).*/\1/p' | sed 's/\r//g')
+          export OP1_ADDRESS
+          pytest -v -rP test_cosmos.py
 
       - name: Run identity-related tests # TODO: Move into separate stage?
+        working-directory: ./tests/e2e-pytest
         run: |
-          export OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
-          export OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p | sed 's/\r//g')
-          pytest -v -rP tests/e2e/test_identity.py
+          OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
+          export OP0_ADDRESS
+          OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p | sed 's/\r//g')
+          export OP1_ADDRESS
+          pytest -v -rP test_identity.py
 
   run-bash-based-integration-tests:
     name: Run bash based identity tests
     runs-on: ubuntu-20.04
-    needs: [build-binary, build-testnet-image]
+    needs: [build-binary, build-node-images]
     steps:
-      - uses: actions/checkout@v2
-
       - name: Load binary artifact
         uses: actions/download-artifact@v2
         with:
@@ -333,23 +308,34 @@ jobs:
       - name: Restore binary permissions
         run: sudo chmod +x /home/runner/.local/bin/cheqd-noded
 
-      - name: Download testnet image
+      - name: Download node image
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-testnet-image.tar
+          name: cheqd-node-image.tar
 
-      - name: Load testnet image
-        run: docker load -i cheqd-testnet-image.tar
+      - name: Load node image
+        run: docker load -i cheqd-node-image.tar
 
-      - name: Run test net container
+      - name: Check out
+        uses: actions/checkout@v2
+
+      - name: Set up 4 validators + 2 observers node docker pool
+        working-directory: ./docker/localnet
         run: |
-          docker run -d --rm -p "26657:26657" -p "1317:1317" cheqd-testnet
-          bash tests/networks/tools/wait-for-chain.sh
+          bash gen-network-config.sh
+          CHEQD_NODE_IMAGE=cheqd-node CHEQD_NODE_VERSION=latest docker compose up -d
 
-      - name: Set up and run tests
-        working-directory: tests/cli
+      - name: Wait for chain
+        run: bash tests/tools/wait-for-chain.sh
+
+      - name: Import keys
+        working-directory: docker/localnet
         run: |
           bash import_keys.sh
+
+      - name: Set up and run tests
+        working-directory: tests/e2e-bash
+        run: |
           bash run_all.sh
 
   run-upgrade-test-positive-case:
@@ -361,25 +347,25 @@ jobs:
         with:
           fetch-depth: 0 # It's needed for getting the full version of package by `git describe`
 
-      - name: Download node image
+      - name: Download cli image
         uses: actions/download-artifact@v2
         with:
           name: cheqd-cli-image.tar
 
-      - name: Load node image
+      - name: Load cli image
         run: docker load -i cheqd-cli-image.tar
 
       - name: Chown for current user
-        run: sudo chown $USER:$USER .
+        run: sudo chown "$USER":"$USER" .
 
       - name: Prepare nodes for checking upgrade
-        working-directory: ./tests/upgrade
+        working-directory: ./tests/e2e-complex/upgrade
         run: bash prepare.sh
 
       - name: Initiate the upgrade process
-        working-directory: ./tests/upgrade
+        working-directory: ./tests/e2e-complex/upgrade
         run: bash initiate_upgrade.sh
 
       - name: Make the upgrade and check results
-        working-directory: ./tests/upgrade
+        working-directory: ./tests/e2e-complex/upgrade
         run: bash upgrade_and_check.sh
