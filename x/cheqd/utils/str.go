@@ -39,7 +39,7 @@ func Subtract(minuend []string, subtrahend []string) []string {
 
 	result := make([]string, 0, len(m))
 
-	for k, _ := range m {
+	for k := range m {
 		result = append(result, k)
 	}
 
@@ -56,7 +56,7 @@ func Unique(array []string) []string {
 
 	result := make([]string, 0, len(m))
 
-	for k, _ := range m {
+	for k := range m {
 		result = append(result, k)
 	}
 
@@ -84,7 +84,7 @@ func ToInterfaces(list []string) []interface{} {
 }
 
 func ReplaceInSlice(list []string, old, new string) {
-	for i, _ := range list {
+	for i := range list {
 		if list[i] == old {
 			list[i] = new
 		}

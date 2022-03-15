@@ -74,7 +74,6 @@ func VerifySignature(vm VerificationMethod, message []byte, signature []byte) er
 		}
 
 		verificationError = utils.VerifyED25519Signature(keyBytes, message, signature)
-		break
 	case JsonWebKey2020:
 		keyJson, err := PubKeyJWKToJson(vm.PublicKeyJwk)
 		if err != nil {
@@ -90,10 +89,8 @@ func VerifySignature(vm VerificationMethod, message []byte, signature []byte) er
 		switch pubKey := raw.(type) {
 		case *rsa.PublicKey:
 			verificationError = utils.VerifyRSASignature(*pubKey, message, signature)
-			break
 		case *ecdsa.PublicKey:
 			verificationError = utils.VerifyECDSASignature(*pubKey, message, signature)
-			break
 		case ed25519.PublicKey:
 			verificationError = utils.VerifyED25519Signature(pubKey, message, signature)
 		default:
