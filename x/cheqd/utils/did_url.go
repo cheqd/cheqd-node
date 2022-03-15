@@ -19,8 +19,6 @@ var SplitDIDURLRegexp, _ = regexp.Compile(`([^/?#]*)?([^?#]*)(\?([^#]*))?(#([^#]
 var DIDPathAbemptyRegexp, _ = regexp.Compile(`^([/a-zA-Z0-9\-\.\_\~\!\$\&\'\(\)\*\+\,\;\=\:\@]*|(%[0-9A-Fa-f]{2})*)*$`)
 var DIDQueryRegexp, _ = regexp.Compile(`^([/a-zA-Z0-9\-\.\_\~\!\$\&\'\(\)\*\+\,\;\=\:\@\/\?]*|(%[0-9A-Fa-f]{2})*)*$`)
 var DIDFragmentRegexp, _ = regexp.Compile(`^([/a-zA-Z0-9\-\.\_\~\!\$\&\'\(\)\*\+\,\;\=\:\@\/\?]*|(%[0-9A-Fa-f]{2})*)*$`)
-// Goes from RFC: https://www.rfc-editor.org/rfc/rfc3986#appendix-B
-var ValidURIRegexp, _ = regexp.Compile(`^(([^:\/?#]+):)?(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?`)
 
 // TrySplitDIDUrl Validates generic format of DIDUrl. It doesn't validate path, query and fragment content.
 // Call ValidateDIDUrl for further validation.
@@ -100,13 +98,4 @@ func IsValidDIDUrl(didUrl string, method string, allowedNamespaces []string) boo
 	err := ValidateDIDUrl(didUrl, method, allowedNamespaces)
 
 	return nil == err
-}
-
-func ValidateURI(uri string) error {
-	// Match with Regexp from RFC
-	if !ValidURIRegexp.MatchString(uri) {
-		return fmt.Errorf("URI: %s does not match regexp: %s", uri, ValidURIRegexp)
-	}
-
-	return nil
 }

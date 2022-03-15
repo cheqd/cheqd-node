@@ -262,7 +262,7 @@ func TestCreateDID(t *testing.T) {
 			keys: map[string]KeyPair{
 				AliceKey1: keys[BobKey1],
 			},
-			errMsg: fmt.Sprintf("method id: %s : invalid signature detected", AliceKey1),
+			errMsg: fmt.Sprintf("method id: %s: invalid signature detected", AliceKey1),
 		},
 		{
 			valid: false,

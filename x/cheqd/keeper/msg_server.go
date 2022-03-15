@@ -101,7 +101,7 @@ func VerifySignature(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.
 
 	err = types.VerifySignature(verificationMethod, message, signatureBytes)
 	if err != nil {
-		return types.ErrInvalidSignature.Wrapf("method id: %s ", signature.VerificationMethodId)
+		return types.ErrInvalidSignature.Wrapf("method id: %s", signature.VerificationMethodId)
 	}
 
 	return nil
