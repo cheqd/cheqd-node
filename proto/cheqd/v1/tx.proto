@@ -3,7 +3,6 @@ package cheqdid.cheqdnode.cheqd.v1;
 
 option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
-import "gogoproto/gogo.proto";
 import "google/protobuf/any.proto";
 import "cheqd/v1/did.proto";
 
@@ -31,8 +30,8 @@ message SignInfo {
 
 message MsgCreateDidPayload {
   repeated string context = 1;
-  string id = 2 [(gogoproto.moretags) = "validate:\"required\""]; //did
-  repeated string controller = 3; // did-array
+  string id = 2;
+  repeated string controller = 3;
   repeated VerificationMethod verification_method = 4;
   repeated string authentication = 5;
   repeated string assertion_method = 6;
