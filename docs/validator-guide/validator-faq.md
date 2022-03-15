@@ -40,8 +40,8 @@ And then since this VM is not running a node, you can then append the --node par
 
 That way:
 
-1.  The second node doesn't need to sync the full blockchain; and
-2.  You can separate out the keys/wallets, since the IP address of your actual node will be public by definition and people can attack it or try to break in
+1. The second node doesn't need to sync the full blockchain; and
+2. You can separate out the keys/wallets, since the IP address of your actual node will be public by definition and people can attack it or try to break in
 
 ## What is Commission rate and is it important?
 
