@@ -25,7 +25,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 		return nil, types.ErrNamespaceValidation.Wrap(err.Error())
 	}
 
-	// Retrieve existing state value
+	// Retrieve existing state value and did
 	existingStateValue, err := k.GetDid(&ctx, msg.Payload.Id)
 	if err != nil {
 		return nil, err
@@ -41,12 +41,13 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 		return nil, types.ErrUnexpectedDidVersion.Wrapf("got: %s, must be: %s", msg.Payload.VersionId, existingStateValue.Metadata.VersionId)
 	}
 
-	// Construct updated did
-	updatedDid := msg.Payload.ToDid()
-	// TODO: Remove
+	// Get sign bytes before modifying payload
 	signBytes := msg.Payload.GetSignBytes()
 
-	updatedDid.ReplaceIds(updatedDid.Id, updatedDid.Id+UpdatedPostfix) // Temporary replace id
+	// Construct the new version of the DID and temporary rename it and its self references
+	// in order to consider old and new versions different DIDs during signatures validation
+	updatedDid := msg.Payload.ToDid()
+	updatedDid.ReplaceIds(updatedDid.Id, updatedDid.Id+UpdatedPostfix)
 
 	updatedMetadata := types.NewMetadataFromContext(ctx)
 	updatedMetadata.Created = existingStateValue.Metadata.Created
@@ -57,7 +58,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 		return nil, err
 	}
 
-	// Consider did that we are going to update with during did resolutions
+	// Consider the new version of the DID a separate DID
 	inMemoryDids := map[string]types.StateValue{updatedDid.Id: updatedStateValue}
 
 	// Check controllers existence
@@ -71,17 +72,18 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 	}
 
 	// Verify signatures
+	// Duplicate signatures that reference the old version, make them reference a new (in memory) version
 	signers := GetSignerDIDsForDIDUpdate(*existingDid, updatedDid)
 	extendedSignatures := DuplicateSignatures(msg.Signatures, existingDid.Id, updatedDid.Id)
 	for _, signer := range signers {
-		signatures := types.FindSignInfosBySigner(extendedSignatures, signer)
+		signaturesBySigner := types.FindSignInfosBySigner(extendedSignatures, signer)
 
-		if len(signatures) == 0 {
+		if len(signaturesBySigner) == 0 {
 			return nil, types.ErrSignatureNotFound.Wrapf("there should be at least one signature by %s", signer)
 		}
 
 		found := false
-		for _, signature := range signatures {
+		for _, signature := range signaturesBySigner {
 			err := VerifySignature(&k.Keeper, &ctx, inMemoryDids, signBytes, signature)
 			if err == nil {
 				found = true
@@ -94,8 +96,8 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 		}
 	}
 
-	// Apply changes
-	updatedDid.ReplaceIds(updatedDid.Id, existingDid.Id) // Return original id
+	// Apply changes: return original id and modify state
+	updatedDid.ReplaceIds(updatedDid.Id, existingDid.Id)
 	err = k.SetDid(&ctx, &updatedDid, &updatedMetadata)
 	if err != nil {
 		return nil, err
