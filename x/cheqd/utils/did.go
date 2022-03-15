@@ -10,7 +10,6 @@ import (
 var SplitDIDRegexp, _ = regexp.Compile(`^did:([^:]+?)(:([^:]+?))?:([^:]+)$`)
 var DidNamespaceRegexp, _ = regexp.Compile(`^[a-zA-Z0-9]*$`)
 
-
 // TrySplitDID Validates generic format of DID. It doesn't validate method, name and id content.
 // Call ValidateDID for further validation.
 func TrySplitDID(did string) (method string, namespace string, id string, err error) {
@@ -35,6 +34,16 @@ func MustSplitDID(did string) (method string, namespace string, id string) {
 		panic(err.Error())
 	}
 	return
+}
+
+func JoinDID(method, namespace, id string) string {
+	res := "did:" + method
+
+	if namespace != "" {
+		res = res + ":" + namespace
+	}
+
+	return res + ":" + id
 }
 
 // ValidateDID checks method and allowed namespaces only when the corresponding parameters are specified.

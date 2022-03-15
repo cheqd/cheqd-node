@@ -43,7 +43,10 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 
 	// Construct updated did
 	updatedDid := msg.Payload.ToDid()
-	updatedDid.ReplaceId(updatedDid.Id, updatedDid.Id+UpdatedPostfix) // Temporary replace id
+	// TODO: Remove
+	signBytes := msg.Payload.GetSignBytes()
+
+	updatedDid.ReplaceIds(updatedDid.Id, updatedDid.Id+UpdatedPostfix) // Temporary replace id
 
 	updatedMetadata := types.NewMetadataFromContext(ctx)
 	updatedMetadata.Created = existingStateValue.Metadata.Created
@@ -69,21 +72,30 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 
 	// Verify signatures
 	signers := GetSignerDIDsForDIDUpdate(*existingDid, updatedDid)
+	extendedSignatures := DuplicateSignatures(msg.Signatures, existingDid.Id, updatedDid.Id)
 	for _, signer := range signers {
-		signature, found := types.FindSignInfoBySigner(msg.Signatures, signer)
+		signatures := types.FindSignInfosBySigner(extendedSignatures, signer)
 
-		if !found {
-			return nil, types.ErrSignatureNotFound.Wrapf("signer: %s", signer)
+		if len(signatures) == 0 {
+			return nil, types.ErrSignatureNotFound.Wrapf("there should be at least one signature by %s", signer)
 		}
 
-		err := VerifySignature(&k.Keeper, &ctx, inMemoryDids, msg.Payload.GetSignBytes(), signature)
-		if err != nil {
-			return nil, err
+		found := false
+		for _, signature := range signatures {
+			err := VerifySignature(&k.Keeper, &ctx, inMemoryDids, signBytes, signature)
+			if err == nil {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			return nil, types.ErrSignatureNotFound.Wrapf("there should be at least one valid signature by %s", signer)
 		}
 	}
 
 	// Apply changes
-	updatedDid.ReplaceId(updatedDid.Id, existingDid.Id) // Return original id
+	updatedDid.ReplaceIds(updatedDid.Id, existingDid.Id) // Return original id
 	err = k.SetDid(&ctx, &updatedDid, &updatedMetadata)
 	if err != nil {
 		return nil, err
@@ -93,6 +105,26 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 	return &types.MsgUpdateDidResponse{
 		Id: updatedDid.Id,
 	}, nil
+}
+
+func DuplicateSignatures(signatures []*types.SignInfo, didToDuplicate string, newDid string) []*types.SignInfo {
+	var result []*types.SignInfo
+
+	for _, signature := range signatures {
+		result = append(result, signature)
+
+		did, path, query, fragment := utils.MustSplitDIDUrl(signature.VerificationMethodId)
+		if did == didToDuplicate {
+			duplicate := types.SignInfo{
+				VerificationMethodId: utils.JoinDIDUrl(newDid, path, query, fragment),
+				Signature:            signature.Signature,
+			}
+
+			result = append(result, &duplicate)
+		}
+	}
+
+	return result
 }
 
 func GetSignerDIDsForDIDUpdate(existingDid types.Did, updatedDid types.Did) []string {
@@ -109,12 +141,12 @@ func GetSignerDIDsForDIDUpdate(existingDid types.Did, updatedDid types.Did) []st
 		if !found {
 			signers = append(signers, updatedVM.Controller)
 			break
- 		}
+		}
 
- 		// VM updated
- 		if !reflect.DeepEqual(existingVM, updatedVM) {
+		// VM updated
+		if !reflect.DeepEqual(existingVM, updatedVM) {
 			signers = append(signers, existingVM.Controller, updatedVM.Controller)
- 			break
+			break
 		}
 
 		// VM not changed

@@ -7,10 +7,10 @@ import (
 
 func TestIsDid(t *testing.T) {
 	cases := []struct {
-		name string
-		valid bool
-		did   string
-		method string
+		name      string
+		valid     bool
+		did       string
+		method    string
 		allowedNS []string
 	}{
 		{"Valid: Inputs: Method and namespace are set", true, "did:cheqd:testnet:123456789abcdefg", "cheqd", []string{"testnet"}},
@@ -48,7 +48,6 @@ func TestIsDid(t *testing.T) {
 		{"Not valid: UniqueID less then 16 symbols", false, "did:cheqd:testnet:123", "cheqd", []string{}},
 		{"Not valid: UniqueID more then 16 symbols but less then 32", false, "did:cheqd:testnet:123456789abcdefgABCDEF", "cheqd", []string{}},
 		{"Not valid: UniqueID more then 32 symbols", false, "did:cheqd:testnet:123456789abcdefg123456789abcdefgABCDEF", "cheqd", []string{}},
-
 	}
 
 	for _, tc := range cases {
@@ -60,6 +59,27 @@ func TestIsDid(t *testing.T) {
 			} else {
 				require.False(t, isDid)
 			}
+		})
+	}
+}
+
+func TestSplitJoin(t *testing.T) {
+	cases := []string{
+		"did:cheqd:testnet:123456789abcdefg",
+		"did:cheqd:testnet:123456789abcdefg",
+		"did:cheqd:testnet:123456789abcdefg",
+		"did:cheqd:testnet:123456789abcdefg",
+		"did:cheqd:123456789abcdefg",
+		"did:NOTcheqd:123456789abcdefg",
+		"did:NOTcheqd:123456789abcdefg123456789abcdefg",
+		"did:cheqd:testnet:123456789abcdefg",
+	}
+
+	for _, tc := range cases {
+		// Test split/join
+		t.Run("split/join "+tc, func(t *testing.T) {
+			method, namespace, id := MustSplitDID(tc)
+			require.Equal(t, tc, JoinDID(method, namespace, id))
 		})
 	}
 }

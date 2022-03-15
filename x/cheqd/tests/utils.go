@@ -16,7 +16,6 @@ func randSeq(n int) string {
 	return string(b)
 }
 
-
 func GenerateDID() string {
 	return "did:cheqd:test:" + randSeq(16)
 }
@@ -40,7 +39,7 @@ func GenerateTestKeys() map[string]KeyPair {
 	}
 }
 
-func InitEnv(t *testing.T, keys map[string]KeyPair) (TestSetup){
+func InitEnv(t *testing.T, keys map[string]KeyPair) TestSetup {
 	setup := Setup()
 	err := setup.CreateTestDIDs(keys)
 	require.NoError(t, err)

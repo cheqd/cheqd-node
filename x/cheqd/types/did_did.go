@@ -36,8 +36,8 @@ func (did *Did) AllControllerDids() []string {
 	return utils.Unique(result)
 }
 
-// ReplaceId replaces ids in all controller and id fields
-func (did Did) ReplaceId(old, new string) {
+// ReplaceIds replaces ids in all controller and id fields
+func (did *Did) ReplaceIds(old, new string) {
 	// Controllers
 	utils.ReplaceInSlice(did.Controller, old, new)
 
@@ -58,7 +58,7 @@ func (did Did) ReplaceId(old, new string) {
 			did = new
 		}
 
-		vm.Id = did + path + query + fragment
+		vm.Id = utils.JoinDIDUrl(did, path, query, fragment)
 	}
 }
 
