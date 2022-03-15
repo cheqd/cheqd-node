@@ -2,6 +2,7 @@ package types
 
 import (
 	"reflect"
+	"time"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	"github.com/cosmos/cosmos-sdk/codec/types"
@@ -31,10 +32,14 @@ func NewStateValue(data StateValueData, metadata *Metadata) (StateValue, error) 
 }
 
 func NewMetadataFromContext(ctx sdk.Context) Metadata {
-	created := ctx.BlockTime().String()
+	created := ctx.BlockTime().Format(time.RFC3339)
 	txHash := utils.GetTxHash(ctx.TxBytes())
 
 	return Metadata{Created: created, Deactivated: false, VersionId: txHash}
+}
+
+func (m *Metadata) Update(ctx sdk.Context) {
+	m.Updated = ctx.BlockTime().Format(time.RFC3339)
 }
 
 func (m StateValue) UnpackData() (StateValueData, error) {

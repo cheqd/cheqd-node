@@ -46,7 +46,7 @@ func Test_NewMetadataFromContext(t *testing.T) {
 	ctx := sdk.NewContext(nil, tmproto.Header{ChainID: "test_chain_id", Time: createdTime}, true, nil)
 	ctx.WithTxBytes([]byte("test_tx"))
 	expectedMetadata := Metadata{
-		Created:     createdTime.UTC().String(),
+		Created:     createdTime.UTC().Format(time.RFC3339),
 		Updated:     "",
 		Deactivated: false,
 		VersionId:   utils.GetTxHash(ctx.TxBytes()),
@@ -56,4 +56,31 @@ func Test_NewMetadataFromContext(t *testing.T) {
 
 	require.Equal(t, expectedMetadata, metadata)
 
+}
+
+func Test_UpdateMetadata(t *testing.T) {
+	createdTime := time.Now()
+	updatedTime := createdTime.Add(time.Hour)
+
+	ctx1 := NewContext(createdTime, []byte("test1_tx"))
+	ctx2 := NewContext(updatedTime, []byte("test1_tx"))
+
+	expectedMetadata := Metadata{
+		Created:     createdTime.UTC().Format(time.RFC3339),
+		Updated:     updatedTime.UTC().Format(time.RFC3339),
+		Deactivated: false,
+		VersionId:   utils.GetTxHash(ctx2.TxBytes()),
+	}
+
+	metadata := NewMetadataFromContext(ctx1)
+	metadata.Update(ctx2)
+
+	require.Equal(t, expectedMetadata, metadata)
+
+}
+
+func NewContext(time time.Time, txBytes []byte) sdk.Context {
+	ctx := sdk.NewContext(nil, tmproto.Header{ChainID: "test_chain_id", Time: time}, true, nil)
+	ctx.WithTxBytes(txBytes)
+	return ctx
 }
