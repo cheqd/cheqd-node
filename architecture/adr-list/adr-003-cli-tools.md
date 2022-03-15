@@ -1,4 +1,4 @@
-# ADR 003: Command Line Interface \(CLI\) tools
+# ADR 003: Command Line Interface (CLI) tools
 
 ## Status
 
@@ -11,10 +11,10 @@
 
 ## Summary
 
-Due to the nature of the cheqd project merging concepts from the [Cosmos blockchain framework](https://github.com/cosmos/cosmos-sdk) and self-sovereign identity \(SSI\), there are two potential options for creating Command Line Interface \(CLI\) tools for developers to use:
+Due to the nature of the cheqd project merging concepts from the [Cosmos blockchain framework](https://github.com/cosmos/cosmos-sdk) and self-sovereign identity (SSI), there are two potential options for creating Command Line Interface (CLI) tools for developers to use:
 
 1. **Cosmos-based CLI:** Most likely route for Cosmos projects for their node application. Most existing Cosmos node validators will be familiar with this method of managing their node.
-2. **VDR CLI**: Traditionally, a lot of SSI networks have used [Hyperledger Indy](https://github.com/hyperledger/indy-node) and therefore the Indy CLI tool for managing and interacting with the ledger. This has now been renamed to [Verifiable Data Registry \(VDR\) Tools CLI](https://gitlab.com/evernym/verity/vdr-tools) and is the tool that most existing SSI node operators \("stewards"\) would be familiar with.
+2. **VDR CLI**: Traditionally, a lot of SSI networks have used [Hyperledger Indy](https://github.com/hyperledger/indy-node) and therefore the Indy CLI tool for managing and interacting with the ledger. This has now been renamed to [Verifiable Data Registry (VDR) Tools CLI](https://gitlab.com/evernym/verity/vdr-tools) and is the tool that most existing SSI node operators ("stewards") would be familiar with.
 
 Ideally, the `cheqd-node` project would provide a consistent set of CLI tools rather than two separate tools with varying feature sets between them.
 
@@ -96,13 +96,13 @@ Based on the options considerations above and an analysis of development require
 | Only available in Cosmos CLI | In both Cosmos CLI and VDR CLI | Only available in VDR CLI |
 | :--- | :--- | :--- |
 | Cosmos transactions + Queries | Signing service + Key storage | Identity transactions + Queries |
-| MultiSig | \(Transaction + Query\) sending + Proof validation | DIDs + VCs \(+ DID storage\) |
+| MultiSig | (Transaction + Query) sending + Proof validation | DIDs + VCs (+ DID storage) |
 | Network bootstrapping commands |  |  |
 
 ### CLI components overview
 
 
-> [Editable versions of the diagrams](https://github.com/cheqd/cheqd-node/tree/e5f850355609f35a9a62c557ebf4adc73e766a44/architecture/adr-list/assets/adr003-cli-components-editable.excalidraw) \(in Excalidraw format\)
+> [Editable versions of the diagrams](https://github.com/cheqd/cheqd-node/tree/e5f850355609f35a9a62c557ebf4adc73e766a44/architecture/adr-list/assets/adr003-cli-components-editable.excalidraw) (in Excalidraw format)
 
 ## Consequences
 

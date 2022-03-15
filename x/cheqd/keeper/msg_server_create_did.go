@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -35,7 +34,7 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 	inMemoryDids := map[string]types.StateValue{did.Id: stateValue}
 
 	// Check controllers' existence
-	controllers := did.AggregateControllerDids()
+	controllers := did.AllControllerDids()
 	for _, controller := range controllers {
 		_, err := MustFindDid(&k.Keeper, &ctx, inMemoryDids, controller)
 
@@ -60,23 +59,20 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 	}
 
 	// Apply changes
-	id, err := k.AppendDid(&ctx, &did, &metadata)
+	err = k.AppendDid(&ctx, &did, &metadata)
 	if err != nil {
 		return nil, err
 	}
 
 	// Build and return response
 	return &types.MsgCreateDidResponse{
-		Id: id,
+		Id: did.Id,
 	}, nil
 }
 
 func GetSignerDIDsForDIDCreation(did types.Did) []string {
-	res := did.AggregateControllerDids()
+	res := did.GetControllersOrSubject()
+	res = append(res, did.GetVerificationMethodControllers()...)
 
-	if len(did.Controller) == 0 {
-		res = append(res, did.Id)
-	}
-
-	return utils.Unique(res)
+	return utils.UniqueSorted(res)
 }

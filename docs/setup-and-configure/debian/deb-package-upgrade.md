@@ -12,7 +12,7 @@ Before carrying out an upgrade, please read our [guide to Debian packages for `c
 
 | :warning: WARNING |
 | :--- |
-| Please make sure any accounts keys are backed up or exported before attempting uninstallation |
+| Please make sure you have backed up `node_key.json`, `priv_validator_key.json` and any account keys are backed up or exported before attempting any upgrade |
 
 The package upgrade process is idempotent and it should not affect service files, configurations or any other user data.
 
@@ -26,7 +26,7 @@ However, as best practice we recommend backing up the [app data directories for 
 
 2. **Stop the existing `cheqd-noded` service**
 
-   To stop the `cheqd-noded` service \(with `sudo` privileges or as `root` user, if necessary\):
+   To stop the `cheqd-noded` service (with `sudo` privileges or as `root` user, if necessary):
 
    ```bash
     systemctl stop cheqd-noded
@@ -40,15 +40,25 @@ However, as best practice we recommend backing up the [app data directories for 
 
 3. **Install the new .deb package version**
 
-   Install the `cheqd-node` package downloaded in step 1 \(with `sudo` privileges or as `root` user, if necessary\):
+   | :warning: WARNING |
+   | :--- |
+   | If you are [upgrading from v0.2.x to any higher release version](#upgrade-from-02x), the default home directory folder has changed and may need to be manually configured |
+
+   Install the `cheqd-node` package downloaded (with `sudo` privileges or as `root` user, if necessary):
 
    ```bash
    dpkg -i <path/to/package>
    ```
 
+   To specify [a custom home directory location](deb-package-install.md), use the following command instead:
+
+   ```bash
+   sudo CHEQD_HOME_DIR=/path/to/home/directory dpkg -i cheqd-node_0.4.0_amd64.deb
+   ```
+
 4. **Re-start the `cheqd-noded` service and confirm it is running**
 
-   To start the `cheqd-noded` service \(with `sudo` privileges or as `root` user, if necessary\):
+   To start the `cheqd-noded` service (with `sudo` privileges or as `root` user, if necessary):
 
    ```bash
    systemctl start cheqd-noded
@@ -83,13 +93,14 @@ An alternative method to check a node's status is via the RPC interface, if it h
 * Remotely via the RPC interface: `cheqd-noded status --node <rpc-address>`
 * By opening the JSONRPC over HTTP status page through a web browser: `<node-address:rpc-port>/status`
 
-## Upgrade from `0.2.3` to `0.3.1`
+## Upgrade from `0.2.x`
 
-According to debian package usage on AWS instances and recovering after crashes we introduced new storage and mount points approach.
-For now, `$HOME` directory excepts to be `/home/cheqd` by default or it can be changed while `.deb` package install, like:
+One of the changes made from v0.2.x to the higher software release versions was to allow the home directory for cheqd data to be customised.
+
+The default home directory in v0.2.x used to be `/var/lib/cheqd`, but can be modified as desc:
 
 ```bash
-sudo CHEQD_HOME_DIR=/path/to/home/directory dpkg -i cheqd-node_0.3.1_amd64.deb
+sudo CHEQD_HOME_DIR=/path/to/home/directory dpkg -i cheqd-node_0.3.3_amd64.deb
 ```
 
 In general, it's not required and up to system administrators how to ensure safe revocring after crashes.

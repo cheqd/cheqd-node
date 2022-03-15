@@ -38,22 +38,22 @@ func (k Keeper) SetDidCount(ctx *sdk.Context, count uint64) {
 }
 
 // AppendDid appends a did in the store with a new id and updates the count
-func (k Keeper) AppendDid(ctx *sdk.Context, did *types.Did, metadata *types.Metadata) (string, error) {
+func (k Keeper) AppendDid(ctx *sdk.Context, did *types.Did, metadata *types.Metadata) error {
 	// Check that did doesn't exist
 	if k.HasDid(ctx, did.Id) {
-		return "", types.ErrDidDocNotFound.Wrapf(did.Id)
+		return types.ErrDidDocNotFound.Wrapf(did.Id)
 	}
 
 	// Create the did
 	count := k.GetDidCount(ctx)
 	err := k.SetDid(ctx, did, metadata)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	// Update did count
 	k.SetDidCount(ctx, count+1)
-	return did.Id, nil
+	return nil
 }
 
 // SetDid set a specific did in the store

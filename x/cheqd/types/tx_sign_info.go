@@ -23,17 +23,30 @@ func GetSignInfoIds(infos []*SignInfo) []string {
 	return res
 }
 
-// FindSignInfoBySigner returns the first sign info that corresponds to the provided signer's did
-func FindSignInfoBySigner(infos []*SignInfo, signer string) (res SignInfo, found bool) {
-	for _, info := range infos{
+// FindSignInfosBySigner returns the sign infos that corresponds to the provided signer's did
+func FindSignInfosBySigner(infos []*SignInfo, signer string) []SignInfo {
+	var result []SignInfo
+
+	for _, info := range infos {
 		did, _, _, _ := utils.MustSplitDIDUrl(info.VerificationMethodId)
 
 		if did == signer {
-			return *info, true
+			result = append(result, *info)
 		}
 	}
 
-	return SignInfo{}, false
+	return result
+}
+
+// FindSignInfoBySigner returns the first sign info that corresponds to the provided signer's did
+func FindSignInfoBySigner(infos []*SignInfo, signer string) (info SignInfo, found bool) {
+	infos_ := FindSignInfosBySigner(infos, signer)
+
+	if len(infos_) == 0 {
+		return SignInfo{}, false
+	}
+
+	return infos_[0], true
 }
 
 // Validate

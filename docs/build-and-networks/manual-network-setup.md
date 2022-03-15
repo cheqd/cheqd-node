@@ -14,7 +14,7 @@ Minimal:
 * 25GB of disk space
 * 1.4 GHz CPU
 
-Recommended \(for highload applications\):
+Recommended (for highload applications):
 
 * 2GB RAM
 * 100GB SSD
@@ -33,20 +33,20 @@ All participants should [setup their nodes](../setup-and-configure/README.md) us
 #### Generating genesis file
 
 1. Participants must choose `<chain_id>` for the network.
-2. Each participant \(one by one\) should:
+2. Each participant (one by one) should:
    * **Generate local keys for the future account:**
 
      Command `cheqd-noded keys add <key_name>`
 
      Example `cheqd-noded keys add alice`
 
-   * **\(Each participant except the first one\) Get genesis config from the another participant:**
+   * **(Each participant except the first one) Get genesis config from the another participant:**
 
      Location on the previous participant's machine: `$HOME/.cheqdnode/config/genesis.json`
 
      Destination folder on the current participant's machine: `$HOME/.cheqdnode/config/`
 
-   * **\(Each participant except the first one\) Get genesis node transactions from the previous participant:**
+   * **(Each participant except the first one) Get genesis node transactions from the previous participant:**
 
      Location on the previous participant's machine: `$HOME/.cheqdnode/config/gentx/`
 
@@ -116,7 +116,7 @@ All participants should share their peer info with each other. See [node setup i
   * **Start node:** `systemctl start cheqd-noded`
   * **Make sure the node process is running:** `systemctl status cheqd-noded`
 
-Congratulations, you should have node\(s\) deployed and running on a network if the above steps succeed.
+Congratulations, you should have node(s) deployed and running on a network if the above steps succeed.
 
 ## Support
 

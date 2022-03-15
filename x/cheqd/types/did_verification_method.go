@@ -40,7 +40,6 @@ func NewVerificationMethod(id string, type_ string, controller string, publicKey
 	}
 }
 
-
 // Helpers
 
 func FindVerificationMethod(vms []VerificationMethod, id string) (VerificationMethod, bool) {
@@ -74,7 +73,7 @@ func VerifySignature(vm VerificationMethod, message []byte, signature []byte) er
 		}
 
 		verificationError = utils.VerifyED25519Signature(keyBytes, message, signature)
-		break
+
 	case JsonWebKey2020:
 		keyJson, err := PubKeyJWKToJson(vm.PublicKeyJwk)
 		if err != nil {
@@ -90,19 +89,16 @@ func VerifySignature(vm VerificationMethod, message []byte, signature []byte) er
 		switch pubKey := raw.(type) {
 		case *rsa.PublicKey:
 			verificationError = utils.VerifyRSASignature(*pubKey, message, signature)
-			break
 		case *ecdsa.PublicKey:
 			verificationError = utils.VerifyECDSASignature(*pubKey, message, signature)
-			break
 		case ed25519.PublicKey:
 			verificationError = utils.VerifyED25519Signature(pubKey, message, signature)
 		default:
 			panic("unsupported jwk key") // This should have been checked during basic validation
 		}
 
-		break
 	default:
-		panic("unsupported verification method type")  // This should have also been checked during basic validation
+		panic("unsupported verification method type") // This should have also been checked during basic validation
 	}
 
 	if verificationError != nil {
@@ -110,6 +106,16 @@ func VerifySignature(vm VerificationMethod, message []byte, signature []byte) er
 	}
 
 	return nil
+}
+
+func VerificationMethodListToMap(vms []*VerificationMethod) map[string]VerificationMethod {
+	result := map[string]VerificationMethod{}
+
+	for _, vm := range vms {
+		result[vm.Id] = *vm
+	}
+
+	return result
 }
 
 // Validation

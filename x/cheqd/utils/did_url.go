@@ -42,6 +42,20 @@ func MustSplitDIDUrl(didUrl string) (did string, path string, query string, frag
 	return
 }
 
+func JoinDIDUrl(did string, path string, query string, fragment string) string {
+	res := did + path
+
+	if query != "" {
+		res = res + "?" + query
+	}
+
+	if fragment != "" {
+		res = res + "#" + fragment
+	}
+
+	return res
+}
+
 // ValidateDIDUrl checks method and allowed namespaces only when the corresponding parameters are specified.
 func ValidateDIDUrl(didUrl string, method string, allowedNamespaces []string) error {
 	did, path, query, fragment, err := TrySplitDIDUrl(didUrl)
