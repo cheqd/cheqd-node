@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -75,5 +74,5 @@ func GetSignerDIDsForDIDCreation(did types.Did) []string {
 	res := did.GetControllersOrSubject()
 	res = append(res, did.GetVerificationMethodControllers()...)
 
-	return utils.Unique(res)
+	return utils.UniqueSorted(res)
 }

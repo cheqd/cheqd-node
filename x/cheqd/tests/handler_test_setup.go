@@ -87,7 +87,7 @@ func (s *TestSetup) CreateDid(pubKey ed25519.PublicKey, did string) *types.MsgCr
 	}
 
 	Service := types.Service{
-		Id:              "#service-2",
+		Id:              did + "#service-2",
 		Type:            "DIDCommMessaging",
 		ServiceEndpoint: "endpoint",
 	}
@@ -220,18 +220,7 @@ func ConcatKeys(dst map[string]ed25519.PrivateKey, src map[string]ed25519.Privat
 	return dst
 }
 
-func (s TestSetup) CreateTestDIDs() (map[string]KeyPair, error) {
-	keys := map[string]KeyPair{
-		AliceKey1: GenerateKeyPair(),
-		AliceKey2: GenerateKeyPair(),
-		BobKey1: GenerateKeyPair(),
-		BobKey2: GenerateKeyPair(),
-		BobKey3: GenerateKeyPair(),
-		BobKey4: GenerateKeyPair(),
-		CharlieKey1: GenerateKeyPair(),
-		CharlieKey2: GenerateKeyPair(),
-		CharlieKey3: GenerateKeyPair(),
-	}
+func (s TestSetup) CreateTestDIDs(keys map[string]KeyPair) (error) {
 
 	testDIDs := []struct {
 		signers []string
@@ -288,7 +277,7 @@ func (s TestSetup) CreateTestDIDs() (map[string]KeyPair, error) {
 			},
 		},
 		{
-			signers: []string{CharlieKey2},
+			signers: []string{CharlieKey2, BobKey2},
 			msg: &types.MsgCreateDidPayload{
 				Id: CharlieDID,
 				Authentication: []string{
@@ -323,7 +312,7 @@ func (s TestSetup) CreateTestDIDs() (map[string]KeyPair, error) {
 		for _, vm := range msg.VerificationMethod {
 			encoded, err :=  multibase.Encode(multibase.Base58BTC, keys[vm.Id].PublicKey)
 			if err != nil {
-				return nil, err
+				return err
 			}
 			vm.PublicKeyMultibase = encoded
 		}
@@ -333,12 +322,11 @@ func (s TestSetup) CreateTestDIDs() (map[string]KeyPair, error) {
 			signerKeys[signer] = keys[signer].PrivateKey
 		}
 
-		for keyId, key := range keys {
-			keys[keyId] = key
+		_, err := s.SendCreateDid(msg, signerKeys)
+		if err != nil {
+			return err
 		}
-
-		_, _ = s.SendCreateDid(msg, signerKeys)
 	}
 
-	return keys, nil
+	return nil
 }

@@ -1,5 +1,7 @@
 package utils
 
+import "sort"
+
 func IndexOf(array []string, searchElement string, fromIndex int) int {
 	for i, v := range array[fromIndex:] {
 		if v == searchElement {
@@ -62,7 +64,7 @@ func Unique(array []string) []string {
 }
 
 func IsUnique(list []string) bool {
-	set :=map[string]bool{}
+	set := map[string]bool{}
 
 	for _, did := range list {
 		set[did] = true
@@ -87,4 +89,10 @@ func ReplaceInSlice(list []string, old, new string) {
 			list[i] = new
 		}
 	}
+}
+
+func UniqueSorted(ls []string) []string {
+	tmp_ := Unique(ls)
+	sort.Strings(tmp_)
+	return tmp_
 }

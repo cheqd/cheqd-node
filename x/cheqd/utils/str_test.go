@@ -1,9 +1,10 @@
 package utils
 
 import (
-	"github.com/stretchr/testify/require"
 	"sort"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestIndexOf(t *testing.T) {
@@ -99,4 +100,23 @@ func TestReplaceInList(t *testing.T) {
 	ReplaceInSlice(list, "2", "3")
 
 	require.Equal(t, []string{"1", "3", "3", "3"}, list)
+}
+
+func TestUniqueSorted(t *testing.T) {
+	cases := []struct {
+		name   string
+		input  []string
+		output []string
+	}{
+		{"General alphabet list", []string{"aa", "bb"}, []string{"aa", "bb"}},
+		{"General alphabet reverse list", []string{"bb", "aa"}, []string{"aa", "bb"}},
+		{"General number list", []string{"22", "11"}, []string{"11", "22"}},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			res := UniqueSorted(tc.input)
+			require.Equal(t, res, tc.output)
+		})
+	}
 }
