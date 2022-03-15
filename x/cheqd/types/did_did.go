@@ -31,22 +31,34 @@ func NewDid(context []string, id string, controller []string, verificationMethod
 // AllControllerDids returns controller DIDs used in both did.controllers and did.verification_method.controller
 func (did *Did) AllControllerDids() []string {
 	result := did.Controller
-
-	for _, vm := range did.VerificationMethod {
-		result = append(result, vm.Controller)
-	}
+	result = append(result, did.GetVerificationMethodControllers()...)
 
 	return utils.Unique(result)
 }
 
-// ReplaceAllControllerDids replaces controller DIDs in both did.controllers and did.verification_method.controller
-func (did Did) ReplaceAllControllerDids(old, new string) {
+// ReplaceId replaces ids in all controller and id fields
+func (did Did) ReplaceId(old, new string) {
+	// Controllers
 	utils.ReplaceInSlice(did.Controller, old, new)
 
+	// Id
+	if did.Id == old {
+		did.Id = new
+	}
+
 	for _, vm := range did.VerificationMethod {
+		// Controller
 		if vm.Controller == old {
 			vm.Controller = new
 		}
+
+		// Id
+		did, path, query, fragment := utils.MustSplitDIDUrl(vm.Id)
+		if did == old {
+			did = new
+		}
+
+		vm.Id = did + path + query + fragment
 	}
 }
 
@@ -60,8 +72,15 @@ func (did *Did) GetControllersOrSubject() []string {
 	return result
 }
 
-getVMControllers
+func (did *Did) GetVerificationMethodControllers() []string {
+	var result []string
 
+	for _, vm := range did.VerificationMethod {
+		result = append(result, vm.Controller)
+	}
+
+	return result
+}
 
 // Validation
 

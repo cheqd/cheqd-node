@@ -112,6 +112,16 @@ func VerifySignature(vm VerificationMethod, message []byte, signature []byte) er
 	return nil
 }
 
+func VerificationMethodListToMap(vms []*VerificationMethod) map [string]VerificationMethod {
+	result := map[string]VerificationMethod{}
+
+	for _, vm := range vms {
+		result[vm.Id] = *vm
+	}
+
+	return result
+}
+
 // Validation
 
 func (vm VerificationMethod) Validate(baseDid string, allowedNamespaces []string) error {

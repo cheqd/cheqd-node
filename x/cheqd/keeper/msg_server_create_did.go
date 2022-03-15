@@ -60,20 +60,20 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 	}
 
 	// Apply changes
-	id, err := k.AppendDid(&ctx, &did, &metadata)
+	err = k.AppendDid(&ctx, &did, &metadata)
 	if err != nil {
 		return nil, err
 	}
 
 	// Build and return response
 	return &types.MsgCreateDidResponse{
-		Id: id,
+		Id: did.Id,
 	}, nil
 }
 
 func GetSignerDIDsForDIDCreation(did types.Did) []string {
 	res := did.GetControllersOrSubject()
-	res = append(res, did.AllControllerDids()...)
+	res = append(res, did.GetVerificationMethodControllers()...)
 
 	return utils.Unique(res)
 }

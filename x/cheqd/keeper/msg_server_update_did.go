@@ -5,7 +5,10 @@ import (
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"reflect"
 )
+
+const UpdatedPostfix string = "-updated"
 
 func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*types.MsgUpdateDidResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -33,22 +36,28 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 		return nil, err
 	}
 
-	// Build updated did
+	// Check version id
+	if msg.Payload.VersionId != existingStateValue.Metadata.VersionId {
+		return nil, types.ErrUnexpectedDidVersion.Wrapf("got: %s, must be: %s", msg.Payload.VersionId, existingStateValue.Metadata.VersionId)
+	}
+
+	// Construct updated did
 	updatedDid := msg.Payload.ToDid()
+	updatedDid.ReplaceId(updatedDid.Id, updatedDid.Id+UpdatedPostfix) // Temporary replace id
 
-	// Temporary update id to distinguish between links to existing and updated versions of the did
-	updatedDid.ReplaceAllControllerDids(updatedDid.Id, updatedDid.Id + "-updated")
+	updatedMetadata := types.NewMetadataFromContext(ctx)
+	updatedMetadata.Created = existingStateValue.Metadata.Created
+	updatedMetadata.Updated = ctx.BlockTime().String()
 
-	metadata := types.NewMetadataFromContext(ctx)
-	updatedStateValue, err := types.NewStateValue(&updatedDid, &metadata)
+	updatedStateValue, err := types.NewStateValue(&updatedDid, &updatedMetadata)
 	if err != nil {
 		return nil, err
 	}
 
-	// Consider did that we are going to create during did resolutions
+	// Consider did that we are going to update with during did resolutions
 	inMemoryDids := map[string]types.StateValue{updatedDid.Id: updatedStateValue}
 
-	// Check controllers' existence
+	// Check controllers existence
 	controllers := updatedDid.AllControllerDids()
 	for _, controller := range controllers {
 		_, err := MustFindDid(&k.Keeper, &ctx, inMemoryDids, controller)
@@ -74,24 +83,52 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 	}
 
 	// Apply changes
-	id, err := k.AppendDid(&ctx, &did, &metadata)
+	updatedDid.ReplaceId(updatedDid.Id, existingDid.Id) // Return original id
+	err = k.SetDid(&ctx, &updatedDid, &updatedMetadata)
 	if err != nil {
 		return nil, err
 	}
 
 	// Build and return response
 	return &types.MsgUpdateDidResponse{
-		Id: id,
+		Id: updatedDid.Id,
 	}, nil
 }
 
-func GetSignerDIDsForDIDUpdate(existing types.Did, updated types.Did) []string {
-	res := existing.AllControllerDids()
-	res = append(res, updated.AllControllerDids()...)
+func GetSignerDIDsForDIDUpdate(existingDid types.Did, updatedDid types.Did) []string {
+	signers := existingDid.GetControllersOrSubject()
+	signers = append(signers, updatedDid.GetControllersOrSubject()...)
 
-	if len(did.Controller) == 0 {
-		res = append(res, did.Id)
+	existingVMMap := types.VerificationMethodListToMap(existingDid.VerificationMethod)
+	updatedVMMap := types.VerificationMethodListToMap(updatedDid.VerificationMethod)
+
+	for _, updatedVM := range updatedDid.VerificationMethod {
+		existingVM, found := existingVMMap[updatedVM.Id]
+
+		// VM added
+		if !found {
+			signers = append(signers, updatedVM.Controller)
+			break
+ 		}
+
+ 		// VM updated
+ 		if !reflect.DeepEqual(existingVM, updatedVM) {
+			signers = append(signers, existingVM.Controller, updatedVM.Controller)
+ 			break
+		}
+
+		// VM not changed
 	}
 
-	return utils.Unique(res)
+	for _, existingVM := range existingDid.VerificationMethod {
+		_, found := updatedVMMap[existingVM.Id]
+
+		// VM removed
+		if !found {
+			signers = append(signers, existingVM.Controller)
+			break
+		}
+	}
+
+	return utils.Unique(signers)
 }
