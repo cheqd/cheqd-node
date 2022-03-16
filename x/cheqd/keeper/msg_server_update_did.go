@@ -101,7 +101,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 	updatedDid.ReplaceIds(updatedDid.Id, existingDid.Id)
 	err = k.SetDid(&ctx, &updatedDid, &updatedMetadata)
 	if err != nil {
-		return nil, err
+		return nil, types.ErrInternal.Wrapf(err.Error())
 	}
 
 	// Build and return response
