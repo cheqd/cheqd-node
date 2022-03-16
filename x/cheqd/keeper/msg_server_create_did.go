@@ -46,15 +46,23 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 	// Verify signatures
 	signers := GetSignerDIDsForDIDCreation(did)
 	for _, signer := range signers {
-		signature, found := types.FindSignInfoBySigner(msg.Signatures, signer)
+		signaturesBySigner := types.FindSignInfosBySigner(msg.Signatures, signer)
 
-		if !found {
-			return nil, types.ErrSignatureNotFound.Wrapf("signer: %s", signer)
+		if len(signaturesBySigner) == 0 {
+			return nil, types.ErrSignatureNotFound.Wrapf("there should be at least one signature by %s", signer)
 		}
 
-		err := VerifySignature(&k.Keeper, &ctx, inMemoryDids, msg.Payload.GetSignBytes(), signature)
-		if err != nil {
-			return nil, err
+		found := false
+		for _, signature := range signaturesBySigner {
+			err := VerifySignature(&k.Keeper, &ctx, inMemoryDids, msg.Payload.GetSignBytes(), signature)
+			if err == nil {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			return nil, types.ErrSignatureNotFound.Wrapf("there should be at least one valid signature by %s", signer)
 		}
 	}
 
