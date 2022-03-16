@@ -45,6 +45,6 @@ func (msg *MsgUpdateDid) ValidateBasic() error {
 func (msg MsgUpdateDid) Validate(allowedNamespaces []string) error {
 	return validation.ValidateStruct(&msg,
 		validation.Field(&msg.Payload, validation.Required, ValidMsgUpdateDidPayload(allowedNamespaces)),
-		validation.Field(&msg.Signatures, IsUniqueSignInfoList(), validation.Each(ValidSignInfo(allowedNamespaces))),
+		validation.Field(&msg.Signatures, IsFullUniqueSignInfoListRule(), validation.Each(ValidSignInfo(allowedNamespaces))),
 	)
 }

@@ -33,7 +33,7 @@ func (did *Did) AllControllerDids() []string {
 	result := did.Controller
 	result = append(result, did.GetVerificationMethodControllers()...)
 
-	return utils.Unique(result)
+	return utils.UniqueSorted(result)
 }
 
 // ReplaceIds replaces ids in all controller and id fields

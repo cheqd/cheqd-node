@@ -155,13 +155,13 @@ func GetSignerDIDsForDIDUpdate(existingDid types.Did, updatedDid types.Did) []st
 		// VM added
 		if !found {
 			signers = append(signers, updatedVM.Controller)
-			break
+			continue
 		}
 
 		// VM updated
 		if !reflect.DeepEqual(existingVM, updatedVM) {
 			signers = append(signers, existingVM.Controller, updatedVM.Controller)
-			break
+			continue
 		}
 
 		// VM not changed
@@ -173,9 +173,9 @@ func GetSignerDIDsForDIDUpdate(existingDid types.Did, updatedDid types.Did) []st
 		// VM removed
 		if !found {
 			signers = append(signers, existingVM.Controller)
-			break
+			continue
 		}
 	}
 
-	return utils.Unique(signers)
+	return utils.UniqueSorted(signers)
 }

@@ -19,7 +19,7 @@ func TestDIDDocControllerChanged(t *testing.T) {
 
 	updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
 	updatedDidDoc.Controller = append(updatedDidDoc.Controller, BobDID)
-	receivedDid, _ := setup.SendUpdateDid(updatedDidDoc, ConcatKeys(aliceKeys, bobKeys))
+	receivedDid, _ := setup.SendUpdateDid(updatedDidDoc, MapToListOfSignerKeys(ConcatKeys(aliceKeys, bobKeys)))
 
 	// check
 	require.NotEqual(t, aliceDid.Controller, receivedDid.Controller)
@@ -36,7 +36,7 @@ func TestDIDDocVerificationMethodChangedWithoutOldSignature(t *testing.T) {
 
 	updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
 	updatedDidDoc.VerificationMethod[0].Type = Ed25519VerificationKey2020
-	_, err := setup.SendUpdateDid(updatedDidDoc, bobKeys)
+	_, err := setup.SendUpdateDid(updatedDidDoc, MapToListOfSignerKeys(bobKeys))
 
 	// check
 	require.Error(t, err)
@@ -52,7 +52,7 @@ func TestDIDDocVerificationMethodControllerChangedWithoutOldSignature(t *testing
 
 	updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
 	updatedDidDoc.VerificationMethod[0].Controller = BobDID
-	_, err := setup.SendUpdateDid(updatedDidDoc, bobKeys)
+	_, err := setup.SendUpdateDid(updatedDidDoc, MapToListOfSignerKeys(bobKeys))
 
 	// check
 	require.Error(t, err)
@@ -68,7 +68,7 @@ func TestDIDDocControllerChangedWithoutOldSignature(t *testing.T) {
 
 	updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
 	updatedDidDoc.Controller = append(updatedDidDoc.Controller, BobDID)
-	_, err := setup.SendUpdateDid(updatedDidDoc, bobKeys)
+	_, err := setup.SendUpdateDid(updatedDidDoc, MapToListOfSignerKeys(bobKeys))
 
 	// check
 	require.Error(t, err)
@@ -99,7 +99,7 @@ func TestDIDDocVerificationMethodDeletedWithoutOldSignature(t *testing.T) {
 	updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
 	updatedDidDoc.VerificationMethod = []*types.VerificationMethod{aliceDid.VerificationMethod[0]}
 	updatedDidDoc.Authentication = []string{aliceDid.Authentication[0]}
-	_, err := setup.SendUpdateDid(updatedDidDoc, aliceKeys)
+	_, err := setup.SendUpdateDid(updatedDidDoc, MapToListOfSignerKeys(aliceKeys))
 
 	// check
 	require.Error(t, err)
@@ -129,7 +129,7 @@ func TestDIDDocVerificationMethodDeleted(t *testing.T) {
 	updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
 	updatedDidDoc.Authentication = []string{aliceDid.Authentication[0]}
 	updatedDidDoc.VerificationMethod = []*types.VerificationMethod{aliceDid.VerificationMethod[0]}
-	receivedDid, _ := setup.SendUpdateDid(updatedDidDoc, ConcatKeys(aliceKeys, bobKeys))
+	receivedDid, _ := setup.SendUpdateDid(updatedDidDoc, MapToListOfSignerKeys(ConcatKeys(aliceKeys, bobKeys)))
 
 	// check
 	require.NotEqual(t, len(aliceDid.VerificationMethod), len(receivedDid.VerificationMethod))

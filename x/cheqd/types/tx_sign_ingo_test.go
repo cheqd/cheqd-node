@@ -56,3 +56,70 @@ func TestSignInfoValidation(t *testing.T) {
 		})
 	}
 }
+
+func TestFullSignInfoDublicateValidation(t *testing.T) {
+	cases := []struct {
+		name              string
+		structs_          []*SignInfo
+		isValid           bool
+	}{
+		{
+			name: "positive",
+			structs_ : []*SignInfo{
+				{
+					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
+					Signature:            "aaa="},
+				{
+					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
+					Signature:            "bbb="},
+			},
+			isValid:           true,
+		},
+		{
+			name: "positive with all different pieces",
+			structs_ : []*SignInfo{
+				{
+					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
+					Signature:            "aaa="},
+				{
+					VerificationMethodId: "did:cheqd:bbbbbbbbbbbbbbbb#method1",
+					Signature:            "bbb="},
+			},
+			isValid:           true,
+		},
+		{
+			name: "negative",
+			structs_ : []*SignInfo{
+				{
+					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
+					Signature:            "aaa="},
+				{
+					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
+					Signature:            "aaa="},
+			},
+			isValid:           false,
+		},
+		{
+			name: "negative with a lot of same elems",
+			structs_ : []*SignInfo{
+				{
+					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
+					Signature:            "aaa="},
+				{
+					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
+					Signature:            "aaa="},
+				{
+					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
+					Signature:            "aaa="},
+			},
+			isValid:           false,
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			res_ := IsFullUniqueSignInfoList(tc.structs_)
+			require.Equal(t, res_, tc.isValid)
+		})
+	}
+}

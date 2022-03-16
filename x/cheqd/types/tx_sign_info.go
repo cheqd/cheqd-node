@@ -23,6 +23,17 @@ func GetSignInfoIds(infos []*SignInfo) []string {
 	return res
 }
 
+func IsFullUniqueSignInfoList(infos []*SignInfo) bool {
+	var tmp_ = map[SignInfo]int{}
+	for _, si := range infos {
+		if tmp_[*si] > 0 {
+			return false
+		}
+		tmp_[*si] = tmp_[*si] + 1
+	}
+	return true
+}
+
 // FindSignInfosBySigner returns the sign infos that corresponds to the provided signer's did
 func FindSignInfosBySigner(infos []*SignInfo, signer string) []SignInfo {
 	var result []SignInfo
@@ -69,7 +80,7 @@ func ValidSignInfo(allowedNamespaces []string) *CustomErrorRule {
 	})
 }
 
-func IsUniqueSignInfoList() *CustomErrorRule {
+func IsUniqueSignInfoListById() *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.([]*SignInfo)
 		if !ok {
@@ -78,7 +89,22 @@ func IsUniqueSignInfoList() *CustomErrorRule {
 
 		ids := GetSignInfoIds(casted)
 		if !utils.IsUnique(ids) {
-			return errors.New("there are sign info duplicates")
+			return errors.New("there are sign info records with the same ID")
+		}
+
+		return nil
+	})
+}
+
+func IsFullUniqueSignInfoListRule() *CustomErrorRule {
+	return NewCustomErrorRule(func(value interface{}) error {
+		casted, ok := value.([]*SignInfo)
+		if !ok {
+			panic("IsUniqueVerificationMethodList must be only applied on VM lists")
+		}
+
+		if !IsFullUniqueSignInfoList(casted){
+			return errors.New("there are full sign info duplicates")
 		}
 
 		return nil
