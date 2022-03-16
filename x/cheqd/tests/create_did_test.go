@@ -226,7 +226,7 @@ func TestCreateDID(t *testing.T) {
 			keys: map[string]KeyPair{
 				AliceKey1: keys[AliceKey1],
 			},
-			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", BobDID),
+			errMsg: fmt.Sprintf("signer: %s: signature is required but not found", BobDID),
 		},
 		{
 			valid: false,
@@ -235,7 +235,7 @@ func TestCreateDID(t *testing.T) {
 				Id:         ImposterDID,
 				Controller: []string{AliceDID, BobDID},
 			},
-			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", AliceDID),
+			errMsg: fmt.Sprintf("signer: %s: signature is required but not found", AliceDID),
 		},
 		{
 			valid: false,
@@ -262,7 +262,7 @@ func TestCreateDID(t *testing.T) {
 			keys: map[string]KeyPair{
 				AliceKey1: keys[BobKey1],
 			},
-			errMsg: fmt.Sprintf("there should be at least one valid signature by %s: signature is required but not found", AliceDID),
+			errMsg: fmt.Sprintf("method id: %s: invalid signature detected", AliceKey1),
 		},
 		{
 			valid: false,
@@ -283,7 +283,7 @@ func TestCreateDID(t *testing.T) {
 			keys: map[string]KeyPair{
 				AliceKey1: keys[AliceKey1],
 			},
-			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", ImposterDID),
+			errMsg: fmt.Sprintf("signer: %s: signature is required but not found", ImposterDID),
 		},
 		{
 			valid: false,
@@ -304,7 +304,7 @@ func TestCreateDID(t *testing.T) {
 			keys: map[string]KeyPair{
 				ImposterKey2: GenerateKeyPair(),
 			},
-			errMsg: fmt.Sprintf("there should be at least one valid signature by %s: signature is required but not found", ImposterDID),
+			errMsg: fmt.Sprintf("%s: verification method not found", ImposterKey2),
 		},
 		{
 			valid: false,
@@ -327,7 +327,7 @@ func TestCreateDID(t *testing.T) {
 				AliceKey1:    keys[AliceKey1],
 				ImposterKey2: GenerateKeyPair(),
 			},
-			errMsg: fmt.Sprintf("there should be at least one valid signature by %s: signature is required but not found", ImposterDID),
+			errMsg: fmt.Sprintf("%s: verification method not found", ImposterKey2),
 		},
 		{
 			valid: false,
