@@ -77,9 +77,10 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 	extendedSignatures := DuplicateSignatures(msg.Signatures, existingDid.Id, updatedDid.Id)
 	for _, signer := range signers {
 		signaturesBySigner := types.FindSignInfosBySigner(extendedSignatures, signer)
+		signerForErrorMessage := GetSignerIdForErrorMessage(signer, existingDid.Id, updatedDid.Id)
 
 		if len(signaturesBySigner) == 0 {
-			return nil, types.ErrSignatureNotFound.Wrapf("there should be at least one signature by %s", signer)
+			return nil, types.ErrSignatureNotFound.Wrapf("there should be at least one signature by %s", signerForErrorMessage)
 		}
 
 		found := false
@@ -92,7 +93,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 		}
 
 		if !found {
-			return nil, types.ErrSignatureNotFound.Wrapf("there should be at least one valid signature by %s", signer)
+			return nil, types.ErrSignatureNotFound.Wrapf("there should be at least one valid signature by %s", signerForErrorMessage)
 		}
 	}
 
@@ -107,6 +108,18 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 	return &types.MsgUpdateDidResponse{
 		Id: updatedDid.Id,
 	}, nil
+}
+
+func GetSignerIdForErrorMessage(signerId string, existingVersionId string, updatedVersionId string) interface{} {
+	if signerId == existingVersionId {	// oldDid->id
+		return existingVersionId + " (old version)"
+	}
+
+	if signerId == updatedVersionId {	// oldDid->id + UpdatedPrefix
+		return existingVersionId + " (new version)"
+	}
+
+	return signerId
 }
 
 func DuplicateSignatures(signatures []*types.SignInfo, didToDuplicate string, newDid string) []*types.SignInfo {
