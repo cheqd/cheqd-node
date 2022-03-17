@@ -46,7 +46,7 @@ new_cheqd_noded_docker() {
     -u root \
     -e HOME=/cheqd \
     --entrypoint "cheqd-noded" \
-    ${CHEQD_IMAGE_TO} "$@"
+    ${CHEQD_IMAGE_TO} "$@" --home node_configs/client/.cheqdnode/ --keyring-backend test
 }
 
 # Parameters
