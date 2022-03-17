@@ -182,6 +182,7 @@ function send_did() {
         --chain-id $CHAIN_ID \
         --output json \
         --home node_configs/client/.cheqdnode/ \
+        --keyring-backend test
         -y)
 
 
