@@ -37,11 +37,11 @@ func (msg MsgUpdateDidPayload) Validate(allowedNamespaces []string) error {
 	)
 }
 
-func ValidMsgUpdateDidPayload(allowedNamespaces []string) *CustomErrorRule {
+func ValidMsgUpdateDidPayloadRule(allowedNamespaces []string) *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.(*MsgUpdateDidPayload)
 		if !ok {
-			panic("ValidMsgUpdateDidPayload must be only applied on MsgUpdateDidPayload properties")
+			panic("ValidMsgUpdateDidPayloadRule must be only applied on MsgUpdateDidPayload properties")
 		}
 
 		return casted.Validate(allowedNamespaces)

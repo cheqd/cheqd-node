@@ -23,13 +23,14 @@ func GetSignInfoIds(infos []*SignInfo) []string {
 	return res
 }
 
-func IsFullUniqueSignInfoList(infos []*SignInfo) bool {
-	var tmp_ = map[SignInfo]int{}
+func IsUniqueSignInfoList(infos []*SignInfo) bool {
+	var tmp_ = map[SignInfo]bool{}
 	for _, si := range infos {
-		if tmp_[*si] > 0 {
+		_, found := tmp_[*si]
+		if  found {
 			return false
 		}
-		tmp_[*si] = tmp_[*si] + 1
+		tmp_[*si] = true
 	}
 	return true
 }
@@ -69,22 +70,22 @@ func (si SignInfo) Validate(allowedNamespaces []string) error {
 	)
 }
 
-func ValidSignInfo(allowedNamespaces []string) *CustomErrorRule {
+func ValidSignInfoRule(allowedNamespaces []string) *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.(SignInfo)
 		if !ok {
-			panic("ValidSignInfo must be only applied on sign infos")
+			panic("ValidSignInfoRule must be only applied on sign infos")
 		}
 
 		return casted.Validate(allowedNamespaces)
 	})
 }
 
-func IsUniqueSignInfoListById() *CustomErrorRule {
+func IsUniqueSignInfoListByIdRule() *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.([]*SignInfo)
 		if !ok {
-			panic("IsUniqueVerificationMethodList must be only applied on VM lists")
+			panic("IsUniqueVerificationMethodListByIdRule must be only applied on VM lists")
 		}
 
 		ids := GetSignInfoIds(casted)
@@ -96,14 +97,14 @@ func IsUniqueSignInfoListById() *CustomErrorRule {
 	})
 }
 
-func IsFullUniqueSignInfoListRule() *CustomErrorRule {
+func IsUniqueSignInfoListRule() *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.([]*SignInfo)
 		if !ok {
-			panic("IsUniqueVerificationMethodList must be only applied on VM lists")
+			panic("IsUniqueVerificationMethodListByIdRule must be only applied on VM lists")
 		}
 
-		if !IsFullUniqueSignInfoList(casted){
+		if !IsUniqueSignInfoList(casted){
 			return errors.New("there are full sign info duplicates")
 		}
 

@@ -118,7 +118,7 @@ func TestFullSignInfoDublicateValidation(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			res_ := IsFullUniqueSignInfoList(tc.structs_)
+			res_ := IsUniqueSignInfoList(tc.structs_)
 			require.Equal(t, res_, tc.isValid)
 		})
 	}

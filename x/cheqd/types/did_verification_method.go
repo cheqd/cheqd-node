@@ -126,7 +126,7 @@ func (vm VerificationMethod) Validate(baseDid string, allowedNamespaces []string
 		validation.Field(&vm.Controller, validation.Required, IsDID(allowedNamespaces)),
 		validation.Field(&vm.Type, validation.Required, validation.In(utils.ToInterfaces(SupportedMethodTypes)...)),
 		validation.Field(&vm.PublicKeyJwk,
-			validation.When(utils.Contains(JwkMethodTypes, vm.Type), validation.Required, IsUniqueKeyValuePairSet(), IsJWK()).Else(validation.Empty),
+			validation.When(utils.Contains(JwkMethodTypes, vm.Type), validation.Required, IsUniqueKeyValuePairSetRule(), IsJWK()).Else(validation.Empty),
 		),
 		validation.Field(&vm.PublicKeyMultibase,
 			validation.When(utils.Contains(MultibaseMethodTypes, vm.Type), validation.Required, IsMultibase(), IsMultibaseEncodedEd25519PubKey()).Else(validation.Empty),
@@ -134,22 +134,22 @@ func (vm VerificationMethod) Validate(baseDid string, allowedNamespaces []string
 	)
 }
 
-func ValidVerificationMethod(baseDid string, allowedNamespaces []string) *CustomErrorRule {
+func ValidVerificationMethodRule(baseDid string, allowedNamespaces []string) *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.(VerificationMethod)
 		if !ok {
-			panic("ValidVerificationMethod must be only applied on verification methods")
+			panic("ValidVerificationMethodRule must be only applied on verification methods")
 		}
 
 		return casted.Validate(baseDid, allowedNamespaces)
 	})
 }
 
-func IsUniqueVerificationMethodList() *CustomErrorRule {
+func IsUniqueVerificationMethodListByIdRule() *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.([]*VerificationMethod)
 		if !ok {
-			panic("IsUniqueVerificationMethodList must be only applied on VM lists")
+			panic("IsUniqueVerificationMethodListByIdRule must be only applied on VM lists")
 		}
 
 		ids := GetVerificationMethodIds(casted)

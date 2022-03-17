@@ -45,31 +45,31 @@ func PubKeyJWKToJson(key PublicKeyJWK) (string, error) {
 	return string(json_), nil
 }
 
-func IsUniqueKVSet(key PublicKeyJWK) bool {
+func IsUniqueKeyValuePairSet(key PublicKeyJWK) bool {
 	map_ := PubKeyJWKToMap(key)
 	return len(map_) == len(key)
 }
 
 // Validation
 
-func IsUniqueKeyValuePairSet() *CustomErrorRule {
-	return NewCustomErrorRule(func(value interface{}) error {
-		casted, ok := value.([]*KeyValuePair)
-		if !ok {
-			panic("IsUniqueKeyValuePairSet must be only applied on KeyValuePair array properties")
-		}
-
-		if !IsUniqueKVSet(casted) {
-			return errors.New("the list of KeyValuePair should be without duplicates")
-		}
-
-		return nil
-	})
-}
-
 func (p KeyValuePair)Validate() error {
 	return validation.ValidateStruct(&p,
 		validation.Field(&p.Key, validation.Required),
 		validation.Field(&p.Value, validation.Required),
 	)
+}
+
+func IsUniqueKeyValuePairSetRule() *CustomErrorRule {
+	return NewCustomErrorRule(func(value interface{}) error {
+		casted, ok := value.([]*KeyValuePair)
+		if !ok {
+			panic("IsUniqueKeyValuePairSetRule must be only applied on KeyValuePair array properties")
+		}
+
+		if !IsUniqueKeyValuePairSet(casted) {
+			return errors.New("the list of KeyValuePair should be without duplicates")
+		}
+
+		return nil
+	})
 }

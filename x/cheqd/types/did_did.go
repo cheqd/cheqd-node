@@ -89,7 +89,7 @@ func (did Did) Validate(allowedNamespaces []string) error {
 		validation.Field(&did.Id, validation.Required, IsDID(allowedNamespaces)),
 		validation.Field(&did.Controller, IsUniqueStrList(), validation.Each(IsDID(allowedNamespaces))),
 		validation.Field(&did.VerificationMethod,
-			IsUniqueVerificationMethodList(), validation.Each(ValidVerificationMethod(did.Id, allowedNamespaces)),
+			IsUniqueVerificationMethodListByIdRule(), validation.Each(ValidVerificationMethodRule(did.Id, allowedNamespaces)),
 		),
 
 		validation.Field(&did.Authentication,
@@ -108,7 +108,7 @@ func (did Did) Validate(allowedNamespaces []string) error {
 			IsUniqueStrList(), validation.Each(IsDIDUrl(allowedNamespaces, Empty, Empty, Required), HasPrefix(did.Id)),
 		),
 
-		validation.Field(&did.Service, IsUniqueServiceList(), validation.Each(ValidService(did.Id, allowedNamespaces))),
+		validation.Field(&did.Service, IsUniqueServiceListByIdRule(), validation.Each(ValidServiceRule(did.Id, allowedNamespaces))),
 		validation.Field(&did.AlsoKnownAs, IsUniqueStrList(), validation.Each(IsURI())),
 	)
 }
