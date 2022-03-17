@@ -181,6 +181,7 @@ function send_did() {
         --gas-prices "25ncheq" \
         --chain-id $CHAIN_ID \
         --output json \
+        --home node_configs/client/.cheqdnode/ \
         -y)
 
 
