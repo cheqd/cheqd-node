@@ -126,7 +126,7 @@ func (vm VerificationMethod) Validate(baseDid string, allowedNamespaces []string
 		validation.Field(&vm.Controller, validation.Required, IsDID(allowedNamespaces)),
 		validation.Field(&vm.Type, validation.Required, validation.In(utils.ToInterfaces(SupportedMethodTypes)...)),
 		validation.Field(&vm.PublicKeyJwk,
-			validation.When(utils.Contains(JwkMethodTypes, vm.Type), validation.Required, IsUniqueKeyValuePairSetRule(), IsJWK()).Else(validation.Empty),
+			validation.When(utils.Contains(JwkMethodTypes, vm.Type), validation.Required, IsUniqueKeyValuePairListByKeyRule(), IsJWK()).Else(validation.Empty),
 		),
 		validation.Field(&vm.PublicKeyMultibase,
 			validation.When(utils.Contains(MultibaseMethodTypes, vm.Type), validation.Required, IsMultibase(), IsMultibaseEncodedEd25519PubKey()).Else(validation.Empty),
