@@ -136,8 +136,7 @@ function send_did () {
     MSG_CREATE_DID='{"id":"'${did_to_write}'","verification_method":[{"id":"'"${KEY_ID}"'","type":"Ed25519VerificationKey2020","controller":"'${did_to_write}'","public_key_multibase":"'${ALICE_VER_PUB_MULTIBASE_58}'"}],"authentication":["'${KEY_ID}'"]}'
 
     # Post the message
-    did=$(local_client_tx tx cheqd create-did "${MSG_CREATE_DID}" "${KEY_ID}" \
-        --ver-key "${ALICE_VER_PRIV_BASE_64}" \
+    did=$(local_client_tx tx cheqd create-did "${MSG_CREATE_DID}" "${KEY_ID}" "${ALICE_VER_PRIV_BASE_64}" \
         --from operator0 \
         --gas-prices "25ncheq" \
         --chain-id $CHAIN_ID \

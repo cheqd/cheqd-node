@@ -22,7 +22,10 @@ export DELAYED_VESTING_ACCOUNT="delayed_vesting_account"
 export PERIODIC_VESTING_ACCOUNT="periodic_vesting_account"
 
 function random_string() {
-  echo $RANDOM | base64 | head -c 20
+  LENGTH=${1:-16} # Default LENGTH is 16
+  ALPHABET=${2:-"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"} # Default is base58
+
+  yes $RANDOM | base64 | tr -dc "$ALPHABET" | head -c "${LENGTH}"
   return 0
 }
 
@@ -55,4 +58,15 @@ function assert_tx_code() {
     OUTPUT=$1
     CODE=$2
     assert_eq "$(echo "${OUTPUT}" | jq -r ".code")" "$CODE"
+}
+
+function assert_str_contains() {
+    STR=$1
+    SUBSTR=$2
+
+    if [[ $STR == *$SUBSTR* ]]; then
+      return 0
+    fi
+
+    return 1
 }

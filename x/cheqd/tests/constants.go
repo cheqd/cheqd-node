@@ -18,4 +18,5 @@ const (
 	CharlieKey1 = CharlieDID + "#key-1"
 	CharlieKey2 = CharlieDID + "#key-2"
 	CharlieKey3 = CharlieDID + "#key-3"
+	CharlieKey4 = CharlieDID + "#key-4"
 )

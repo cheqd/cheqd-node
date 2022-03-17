@@ -1,7 +1,8 @@
 package tests
 
 import (
-	"crypto/ed25519"
+	"fmt"
+	"github.com/btcsuite/btcutil/base58"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/multiformats/go-multibase"
 	"github.com/stretchr/testify/require"
@@ -9,6 +10,7 @@ import (
 )
 
 func TestUpdateDid(t *testing.T) {
+	var err error
 	keys := map[string]KeyPair{
 		AliceKey1:    GenerateKeyPair(),
 		AliceKey2:    GenerateKeyPair(),
@@ -19,248 +21,212 @@ func TestUpdateDid(t *testing.T) {
 		CharlieKey1:  GenerateKeyPair(),
 		CharlieKey2:  GenerateKeyPair(),
 		CharlieKey3:  GenerateKeyPair(),
+		CharlieKey4:  GenerateKeyPair(),
 		ImposterKey1: GenerateKeyPair(),
 	}
 
 	cases := []struct {
 		valid   bool
 		name    string
+		signerKeys []SignerKey
 		signers []string
 		msg     *types.MsgUpdateDidPayload
 		errMsg  string
 	}{
 		{
 			valid:   true,
-			name:    "Key rotation works",
-			signers: []string{AliceKey1, AliceKey2},
-			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				VerificationMethod: []*types.VerificationMethod{
-					{
-						Id:         AliceKey2,
-						Type:       "Ed25519VerificationKey2020",
-						Controller: AliceDID,
-					},
+			name:    "Valid: Key rotation works",
+			signerKeys: []SignerKey{
+				{
+					signer: AliceKey1,
+					key:    keys[AliceKey1].PrivateKey,
+				},
+				{
+					signer: AliceKey1,
+					key:    keys[AliceKey2].PrivateKey,
 				},
 			},
-		},
-		{
-			valid:   false,
-			name:    "Try to add controller without self-signature",
-			signers: []string{BobKey1},
 			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
-				Controller:     []string{BobDID},
-				Authentication: []string{AliceKey1},
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey1,
-						Type:       "Ed25519VerificationKey2020",
+						Type:       Ed25519VerificationKey2020,
 						Controller: AliceDID,
+						PublicKeyMultibase: "z" + base58.Encode(keys[AliceKey2].PublicKey),
 					},
 				},
 			},
-			errMsg: "signature did:cheqd:test:alice not found: invalid signature detected",
 		},
 		{
-			valid:   false,
-			name:    "Add controller and replace authentication without old signature do not work",
+			valid:   true,
+			name:    "Valid: Add controller works",
 			signers: []string{BobKey1, AliceKey1},
 			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
 				Controller:     []string{BobDID},
-				Authentication: []string{AliceKey1},
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey1,
-						Type:       "Ed25519VerificationKey2020",
+						Type:       Ed25519VerificationKey2020,
 						Controller: AliceDID,
 					},
 				},
 			},
-			errMsg: "did:cheqd:test:alice#key-1: verification method not found: invalid signature detected",
+			errMsg: "",
 		},
 		{
-			valid:   true,
-			name:    "Add controller work",
-			signers: []string{BobKey1, AliceKey2},
+			valid:   false,
+			name:    "Not Valid: Add controller without old signature",
+			signers: []string{BobKey1},
 			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
 				Controller:     []string{BobDID},
-				Authentication: []string{AliceKey2},
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:         AliceKey2,
-						Type:       "Ed25519VerificationKey2020",
+						Id:         AliceKey1,
+						Type:       Ed25519VerificationKey2020,
 						Controller: AliceDID,
 					},
 				},
 			},
-		},
-		{
-			valid:   true,
-			name:    "Add controller without signature work (signatures of old controllers are present)",
-			signers: []string{BobKey1, AliceKey2},
-			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Controller:     []string{BobDID, CharlieDID},
-				Authentication: []string{AliceKey2},
-				VerificationMethod: []*types.VerificationMethod{
-					{
-						Id:         AliceKey2,
-						Type:       "Ed25519VerificationKey2020",
-						Controller: AliceDID,
-					},
-				},
-			},
-			errMsg: "signature did:cheqd:test:charlie not found: invalid signature detected",
+			errMsg: fmt.Sprintf("there should be at least one signature by %s (old version): signature is required but not found", AliceDID),
 		},
 		{
 			valid:   false,
-			name:    "Replace controller work without new signature do not work",
-			signers: []string{BobKey1, AliceKey2},
+			name:    "Not Valid: Add controller without signature doesn't work (signatures of old controllers are required for now)",
+			signers: []string{BobKey1, CharlieKey1},
 			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
-				Controller:     []string{CharlieDID},
-				Authentication: []string{AliceKey2},
+				Controller:     []string{BobDID, CharlieDID},
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:         AliceKey2,
-						Type:       "Ed25519VerificationKey2020",
+						Id:         AliceKey1,
+						Type:       Ed25519VerificationKey2020,
 						Controller: AliceDID,
 					},
 				},
 			},
-			errMsg: "signature did:cheqd:test:charlie not found: invalid signature detected",
+			errMsg: fmt.Sprintf("there should be at least one signature by %s (old version): signature is required but not found", AliceDID),
 		},
 		{
 			valid:   false,
-			name:    "Replace controller without old signature do not work",
-			signers: []string{AliceKey2, CharlieKey3},
+			name:    "Not Valid: replacing controller and Verification method ID does not work without new sign",
+			signers: []string{AliceKey2, BobKey1, AliceKey1},
 			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
 				Controller:     []string{CharlieDID},
-				Authentication: []string{AliceKey2},
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
-						Type:       "Ed25519VerificationKey2020",
+						Type:       Ed25519VerificationKey2020,
 						Controller: AliceDID,
 					},
 				},
 			},
-			errMsg: "signature did:cheqd:test:bob not found: invalid signature detected",
+			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", CharlieDID),
 		},
 		{
 			valid:   true,
-			name:    "Replace controller work",
-			signers: []string{AliceKey2, CharlieKey3, BobKey1},
+			name:    "Valid: Replacing VM controller works with one signature",
+			signers: []string{AliceKey1, BobKey1},
 			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
-				Controller:     []string{CharlieDID},
-				Authentication: []string{AliceKey2},
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:         AliceKey2,
-						Type:       "Ed25519VerificationKey2020",
-						Controller: AliceDID,
-					},
-				},
-			},
-		},
-		{
-			valid:   true,
-			name:    "Add second controller works",
-			signers: []string{AliceKey2, CharlieKey3, BobKey1},
-			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Controller:     []string{BobDID, CharlieDID},
-				Authentication: []string{AliceKey2},
-				VerificationMethod: []*types.VerificationMethod{
-					{
-						Id:         AliceKey2,
-						Type:       "Ed25519VerificationKey2020",
-						Controller: AliceDID,
+						Id:         AliceKey1,
+						Type:       Ed25519VerificationKey2020,
+						Controller: BobDID,
 					},
 				},
 			},
 		},
 		{
-			valid:   true,
-			name:    "Add verification method without signature controller work",
-			signers: []string{CharlieKey3, BobKey1},
+			valid:   false,
+			name:    "Valid: Replacing VM controller does not work without new signature",
+			signers: []string{AliceKey1},
 			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
-				Controller:     []string{BobDID, CharlieDID},
-				Authentication: []string{AliceKey2},
-				KeyAgreement:   []string{AliceKey1},
+				VerificationMethod: []*types.VerificationMethod{
+					{
+						Id:         AliceKey1,
+						Type:       Ed25519VerificationKey2020,
+						Controller: BobDID,
+					},
+				},
+			},
+			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", BobDID),
+		},
+		{
+			valid:   true,
+			name:    "Valid: Adding second controller works",
+			signers: []string{AliceKey1, CharlieKey3},
+			msg: &types.MsgUpdateDidPayload{
+				Id:             AliceDID,
+				Controller:     []string{AliceDID, CharlieDID},
+				VerificationMethod: []*types.VerificationMethod{
+					{
+						Id:         AliceKey1,
+						Type:       Ed25519VerificationKey2020,
+						Controller: AliceDID,
+					},
+				},
+			},
+		},
+		{
+			valid:   false,
+			name:    "Not Valid: Adding second controller does not work without new signature",
+			signers: []string{AliceKey1},
+			msg: &types.MsgUpdateDidPayload{
+				Id:             AliceDID,
+				Controller:     []string{AliceDID, CharlieDID},
+				VerificationMethod: []*types.VerificationMethod{
+					{
+						Id:         AliceKey1,
+						Type:       Ed25519VerificationKey2020,
+						Controller: AliceDID,
+					},
+				},
+			},
+			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", CharlieDID),
+		},
+		{
+			valid:   true,
+			name:    "Valid: Adding verification method with the same controller works",
+			signers: []string{AliceKey1, AliceKey2},
+			msg: &types.MsgUpdateDidPayload{
+				Id:             AliceDID,
+				Controller:     []string{AliceDID},
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
-						Type:       "Ed25519VerificationKey2020",
+						Type:       Ed25519VerificationKey2020,
 						Controller: AliceDID,
 					},
 					{
 						Id:         AliceKey1,
-						Type:       "Ed25519VerificationKey2020",
+						Type:       Ed25519VerificationKey2020,
 						Controller: AliceDID,
 					},
 				},
 			},
-		},
-		{
-			valid:   false,
-			name:    "Remove verification method without signature controller do not work",
-			signers: []string{CharlieKey3, BobKey1},
-			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Controller:     []string{BobDID, CharlieDID},
-				Authentication: []string{AliceKey2},
-				VerificationMethod: []*types.VerificationMethod{
-					{
-						Id:         AliceKey2,
-						Type:       "Ed25519VerificationKey2020",
-						Controller: AliceDID,
-					},
-				},
-			},
-			errMsg: "signature did:cheqd:test:alice not found: invalid signature detected",
-		},
-		{
-			valid:   false,
-			name:    "Remove verification method wrong authentication detected",
-			signers: []string{AliceKey1, CharlieKey3, BobKey1},
-			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Controller:     []string{BobDID, CharlieDID},
-				Authentication: []string{AliceKey2},
-				VerificationMethod: []*types.VerificationMethod{
-					{
-						Id:         AliceKey2,
-						Type:       "Ed25519VerificationKey2020",
-						Controller: AliceDID,
-					},
-				},
-			},
-			errMsg: "did:cheqd:test:alice#key-1: verification method not found: invalid signature detected",
 		},
 		{
 			valid:   true,
-			name:    "Add second authentication works",
-			signers: []string{AliceKey2, CharlieKey3, BobKey1},
+			name:    "Valid: Adding another verification method",
+			signers: []string{AliceKey1, BobKey1},
 			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
-				Controller:     []string{BobDID, CharlieDID},
-				Authentication: []string{AliceKey1, AliceKey2},
+				Controller:     []string{AliceDID},
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey1,
-						Type:       "Ed25519VerificationKey2020",
+						Type:       Ed25519VerificationKey2020,
 						Controller: AliceDID,
 					},
 					{
 						Id:         AliceKey2,
-						Type:       "Ed25519VerificationKey2020",
+						Type:       Ed25519VerificationKey2020,
 						Controller: BobDID,
 					},
 				},
@@ -268,139 +234,57 @@ func TestUpdateDid(t *testing.T) {
 		},
 		{
 			valid:   false,
-			name:    "Remove self authentication without signature do not work",
-			signers: []string{CharlieKey3, BobKey1},
+			name:    "Not Valid: Adding another verification method without new sign",
+			signers: []string{AliceKey1},
 			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
-				Controller:     []string{BobDID, CharlieDID},
-				Authentication: []string{AliceKey2},
-				VerificationMethod: []*types.VerificationMethod{
-					{
-						Id:         AliceKey2,
-						Type:       "Ed25519VerificationKey2020",
-						Controller: BobDID,
-					},
-				},
-			},
-			errMsg: "signature did:cheqd:test:alice not found: invalid signature detected",
-		},
-		{
-			valid:   false,
-			name:    "Change self controller verification without signature do not work",
-			signers: []string{CharlieKey3, BobKey1},
-			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Controller:     []string{BobDID, CharlieDID},
-				Authentication: []string{AliceKey1, AliceKey2},
+				Controller:     []string{AliceDID},
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey1,
-						Type:       "Ed25519VerificationKey2020",
-						Controller: CharlieDID,
+						Type:       Ed25519VerificationKey2020,
+						Controller: AliceDID,
 					},
 					{
 						Id:         AliceKey2,
-						Type:       "Ed25519VerificationKey2020",
+						Type:       Ed25519VerificationKey2020,
 						Controller: BobDID,
 					},
 				},
 			},
-			errMsg: "signature did:cheqd:test:alice not found: invalid signature detected",
+			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", BobDID),
 		},
 		{
 			valid:   true,
-			signers: []string{AliceKey2, CharlieKey3, BobKey1},
+			name:    "Valid: Keeping VM with controller different then subject untouched during update should not require Bob signature",
+			signers: []string{CharlieKey1},
 			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Controller:     []string{BobDID, CharlieDID},
-				Authentication: []string{AliceKey2},
+				Id: CharlieDID,
+				Authentication: []string{
+					CharlieKey1,
+					CharlieKey2,
+					CharlieKey3,
+				},
+
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:         AliceKey2,
-						Type:       "Ed25519VerificationKey2020",
+						Id:         CharlieKey1,
+						Type:       Ed25519VerificationKey2020,
 						Controller: BobDID,
 					},
-				},
-			},
-		},
-		{
-			valid:   false,
-			name:    "Change controller to self without old controllers signatures does not work",
-			signers: []string{AliceKey2},
-			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Authentication: []string{AliceKey2},
-				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:         AliceKey2,
-						Type:       "Ed25519VerificationKey2020",
+						Id:         CharlieKey2,
+						Type:       Ed25519VerificationKey2020,
 						Controller: BobDID,
 					},
-				},
-			},
-			errMsg: "signature did:cheqd:test:bob not found: invalid signature detected",
-		},
-		{
-			valid:   true,
-			name:    "Change controller to self works",
-			signers: []string{AliceKey2, CharlieKey3, BobKey1},
-			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Authentication: []string{AliceKey2},
-				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:         AliceKey2,
-						Type:       "Ed25519VerificationKey2020",
+						Id:         CharlieKey3,
+						Type:       Ed25519VerificationKey2020,
 						Controller: BobDID,
 					},
-				},
-			},
-		},
-		{
-			valid:   false,
-			name:    "Change verification method controller without old signature",
-			signers: []string{AliceKey2, CharlieKey3},
-			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Authentication: []string{AliceKey2},
-				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:         AliceKey2,
-						Type:       "Ed25519VerificationKey2020",
-						Controller: CharlieDID,
-					},
-				},
-			},
-			errMsg: "signature did:cheqd:test:bob not found: invalid signature detected",
-		},
-		{
-			valid:   false,
-			name:    "Change verification method controller without new signature",
-			signers: []string{AliceKey2, BobKey1},
-			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Authentication: []string{AliceKey2},
-				VerificationMethod: []*types.VerificationMethod{
-					{
-						Id:         AliceKey2,
-						Type:       "Ed25519VerificationKey2020",
-						Controller: CharlieDID,
-					},
-				},
-			},
-			errMsg: "signature did:cheqd:test:charlie not found: invalid signature detected",
-		},
-		{
-			valid:   true,
-			name:    "Change verification method controller",
-			signers: []string{AliceKey2, BobKey1, CharlieKey3},
-			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Authentication: []string{AliceKey2},
-				VerificationMethod: []*types.VerificationMethod{
-					{
-						Id:         AliceKey2,
-						Type:       "Ed25519VerificationKey2020",
+						Id:         CharlieKey4,
+						Type:       Ed25519VerificationKey2020,
 						Controller: CharlieDID,
 					},
 				},
@@ -408,36 +292,19 @@ func TestUpdateDid(t *testing.T) {
 		},
 		{
 			valid:   false,
-			name:    "Change to self verification method without controller signature",
-			signers: []string{AliceKey2},
+			name:    "Not Valid: Removing verification method without old signature does not work",
+			signers: []string{CharlieKey3, BobKey1},
 			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
-				Authentication: []string{AliceKey2},
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
-						Type:       "Ed25519VerificationKey2020",
+						Type:       Ed25519VerificationKey2020,
 						Controller: AliceDID,
 					},
 				},
 			},
-			errMsg: "signature did:cheqd:test:charlie not found: invalid signature detected",
-		},
-		{
-			valid:   true,
-			name:    "Change to self verification method without controller signature",
-			signers: []string{AliceKey2, CharlieKey3},
-			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Authentication: []string{AliceKey2},
-				VerificationMethod: []*types.VerificationMethod{
-					{
-						Id:         AliceKey2,
-						Type:       "Ed25519VerificationKey2020",
-						Controller: AliceDID,
-					},
-				},
-			},
+			errMsg: fmt.Sprintf("there should be at least one signature by %s (old version): signature is required but not found", AliceDID),
 		},
 	}
 
@@ -446,15 +313,24 @@ func TestUpdateDid(t *testing.T) {
 			setup := InitEnv(t, keys)
 			msg := tc.msg
 
+
 			for _, vm := range msg.VerificationMethod {
-				encoded, err := multibase.Encode(multibase.Base58BTC, keys[vm.Id].PublicKey)
+				if vm.PublicKeyMultibase == "" {
+					vm.PublicKeyMultibase, err = multibase.Encode(multibase.Base58BTC, keys[vm.Id].PublicKey)
+				}
 				require.NoError(t, err)
-				vm.PublicKeyMultibase = encoded
 			}
 
-			signerKeys := map[string]ed25519.PrivateKey{}
-			for _, signer := range tc.signers {
-				signerKeys[signer] = keys[signer].PrivateKey
+			signerKeys := []SignerKey{}
+			if tc.signerKeys != nil {
+				signerKeys = tc.signerKeys
+			} else {
+				for _, signer := range tc.signers {
+					signerKeys = append(signerKeys, SignerKey{
+						signer: signer,
+						key   : keys[signer].PrivateKey,
+					})
+				}
 			}
 
 			did, err := setup.SendUpdateDid(msg, signerKeys)

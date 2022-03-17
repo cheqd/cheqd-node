@@ -77,9 +77,10 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 	extendedSignatures := DuplicateSignatures(msg.Signatures, existingDid.Id, updatedDid.Id)
 	for _, signer := range signers {
 		signaturesBySigner := types.FindSignInfosBySigner(extendedSignatures, signer)
+		signerForErrorMessage := GetSignerIdForErrorMessage(signer, existingDid.Id, updatedDid.Id)
 
 		if len(signaturesBySigner) == 0 {
-			return nil, types.ErrSignatureNotFound.Wrapf("there should be at least one signature by %s", signer)
+			return nil, types.ErrSignatureNotFound.Wrapf("there should be at least one signature by %s", signerForErrorMessage)
 		}
 
 		found := false
@@ -92,7 +93,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 		}
 
 		if !found {
-			return nil, types.ErrSignatureNotFound.Wrapf("there should be at least one valid signature by %s", signer)
+			return nil, types.ErrSignatureNotFound.Wrapf("there should be at least one valid signature by %s", signerForErrorMessage)
 		}
 	}
 
@@ -100,13 +101,25 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 	updatedDid.ReplaceIds(updatedDid.Id, existingDid.Id)
 	err = k.SetDid(&ctx, &updatedDid, updatedMetadata)
 	if err != nil {
-		return nil, err
+		return nil, types.ErrInternal.Wrapf(err.Error())
 	}
 
 	// Build and return response
 	return &types.MsgUpdateDidResponse{
 		Id: updatedDid.Id,
 	}, nil
+}
+
+func GetSignerIdForErrorMessage(signerId string, existingVersionId string, updatedVersionId string) interface{} {
+	if signerId == existingVersionId { // oldDid->id
+		return existingVersionId + " (old version)"
+	}
+
+	if signerId == updatedVersionId { // oldDid->id + UpdatedPrefix
+		return existingVersionId + " (new version)"
+	}
+
+	return signerId
 }
 
 func DuplicateSignatures(signatures []*types.SignInfo, didToDuplicate string, newDid string) []*types.SignInfo {
@@ -133,36 +146,40 @@ func GetSignerDIDsForDIDUpdate(existingDid types.Did, updatedDid types.Did) []st
 	signers := existingDid.GetControllersOrSubject()
 	signers = append(signers, updatedDid.GetControllersOrSubject()...)
 
-	existingVMMap := types.VerificationMethodListToMap(existingDid.VerificationMethod)
-	updatedVMMap := types.VerificationMethodListToMap(updatedDid.VerificationMethod)
+	existingVMMap := types.VerificationMethodListToMapByFragment(existingDid.VerificationMethod)
+	updatedVMMap := types.VerificationMethodListToMapByFragment(updatedDid.VerificationMethod)
 
 	for _, updatedVM := range updatedDid.VerificationMethod {
-		existingVM, found := existingVMMap[updatedVM.Id]
+		_, _, _, fragment := utils.MustSplitDIDUrl(updatedVM.Id)
+		existingVM, found := existingVMMap[fragment]
 
 		// VM added
 		if !found {
 			signers = append(signers, updatedVM.Controller)
-			break
+			continue
 		}
 
 		// VM updated
-		if !reflect.DeepEqual(existingVM, updatedVM) {
+		// We don't compare ids because they will be different after replacing ids on the updated version of DID.
+		// Fragments equality is checked above.
+		if !types.CompareVerificationMethodsWithoutIds(existingVM, *updatedVM) {
 			signers = append(signers, existingVM.Controller, updatedVM.Controller)
-			break
+			continue
 		}
 
 		// VM not changed
 	}
 
 	for _, existingVM := range existingDid.VerificationMethod {
-		_, found := updatedVMMap[existingVM.Id]
+		_, _, _, fragment := utils.MustSplitDIDUrl(existingVM.Id)
+		_, found := updatedVMMap[fragment]
 
 		// VM removed
 		if !found {
 			signers = append(signers, existingVM.Controller)
-			break
+			continue
 		}
 	}
 
-	return utils.Unique(signers)
+	return utils.UniqueSorted(signers)
 }

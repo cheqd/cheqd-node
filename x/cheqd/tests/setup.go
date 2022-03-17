@@ -35,6 +35,12 @@ type TestSetup struct {
 	Handler sdk.Handler
 }
 
+
+type SignerKey struct {
+	signer string
+	key ed25519.PrivateKey
+}
+
 func Setup() TestSetup {
 	// Init Codec
 	ir := codectypes.NewInterfaceRegistry()
@@ -141,14 +147,14 @@ func (s *TestSetup) WrapCreateRequest(payload *types.MsgCreateDidPayload, keys m
 	}
 }
 
-func (s *TestSetup) WrapUpdateRequest(payload *types.MsgUpdateDidPayload, keys map[string]ed25519.PrivateKey) *types.MsgUpdateDid {
+func (s *TestSetup) WrapUpdateRequest(payload *types.MsgUpdateDidPayload, keys []SignerKey) *types.MsgUpdateDid {
 	var signatures []*types.SignInfo
 	signingInput := payload.GetSignBytes()
 
-	for privKeyId, privKey := range keys {
-		signature := base64.StdEncoding.EncodeToString(ed25519.Sign(privKey, signingInput))
+	for _, skey := range keys {
+		signature := base64.StdEncoding.EncodeToString(ed25519.Sign(skey.key, signingInput))
 		signatures = append(signatures, &types.SignInfo{
-			VerificationMethodId: privKeyId,
+			VerificationMethodId: skey.signer,
 			Signature:            signature,
 		})
 	}
@@ -186,7 +192,7 @@ func (s *TestSetup) InitDid(did string) (map[string]ed25519.PrivateKey, *types.M
 	return keys, didMsg, nil
 }
 
-func (s *TestSetup) SendUpdateDid(msg *types.MsgUpdateDidPayload, keys map[string]ed25519.PrivateKey) (*types.Did, error) {
+func (s *TestSetup) SendUpdateDid(msg *types.MsgUpdateDidPayload, keys []SignerKey) (*types.Did, error) {
 	// query Did
 	state, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
 	if len(msg.VersionId) == 0 {
@@ -218,6 +224,17 @@ func ConcatKeys(dst map[string]ed25519.PrivateKey, src map[string]ed25519.Privat
 	}
 
 	return dst
+}
+
+func MapToListOfSignerKeys(mp map[string]ed25519.PrivateKey) []SignerKey {
+	var rlist = []SignerKey{}
+	for k, v := range mp {
+		rlist = append(rlist, SignerKey{
+			signer: k,
+			key:    v,
+		})
+	}
+	return rlist
 }
 
 func (s TestSetup) CreateTestDIDs(keys map[string]KeyPair) (error) {

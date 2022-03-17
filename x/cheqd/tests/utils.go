@@ -2,7 +2,7 @@ package tests
 
 import (
 	"github.com/stretchr/testify/require"
-	"github.com/tendermint/tendermint/libs/rand"
+	"math/rand"
 	"testing"
 )
 

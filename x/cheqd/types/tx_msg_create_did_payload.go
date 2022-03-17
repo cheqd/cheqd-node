@@ -28,11 +28,11 @@ func (msg MsgCreateDidPayload) Validate(allowedNamespaces []string) error {
 	return msg.ToDid().Validate(allowedNamespaces)
 }
 
-func ValidMsgCreateDidPayload(allowedNamespaces []string) *CustomErrorRule {
+func ValidMsgCreateDidPayloadRule(allowedNamespaces []string) *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.(*MsgCreateDidPayload)
 		if !ok {
-			panic("ValidMsgCreateDidPayload must be only applied on MsgCreateDidPayload properties")
+			panic("ValidMsgCreateDidPayloadRule must be only applied on MsgCreateDidPayload properties")
 		}
 
 		return casted.Validate(allowedNamespaces)

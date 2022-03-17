@@ -10,6 +10,7 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/multiformats/go-multibase"
+	"reflect"
 )
 
 const (
@@ -108,14 +109,22 @@ func VerifySignature(vm VerificationMethod, message []byte, signature []byte) er
 	return nil
 }
 
-func VerificationMethodListToMap(vms []*VerificationMethod) map[string]VerificationMethod {
+func VerificationMethodListToMapByFragment(vms []*VerificationMethod) map[string]VerificationMethod {
 	result := map[string]VerificationMethod{}
 
 	for _, vm := range vms {
-		result[vm.Id] = *vm
+		_, _, _, fragment := utils.MustSplitDIDUrl(vm.Id)
+		result[fragment] = *vm
 	}
 
 	return result
+}
+
+func CompareVerificationMethodsWithoutIds(vm1, vm2 VerificationMethod) bool {
+	// We can override ids because  on local copies
+	vm1.Id = ""
+	vm2.Id = ""
+	return reflect.DeepEqual(vm1, vm2)
 }
 
 // Validation
@@ -126,7 +135,7 @@ func (vm VerificationMethod) Validate(baseDid string, allowedNamespaces []string
 		validation.Field(&vm.Controller, validation.Required, IsDID(allowedNamespaces)),
 		validation.Field(&vm.Type, validation.Required, validation.In(utils.ToInterfaces(SupportedMethodTypes)...)),
 		validation.Field(&vm.PublicKeyJwk,
-			validation.When(utils.Contains(JwkMethodTypes, vm.Type), validation.Required, IsUniqueKeyValuePairSet(), IsJWK()).Else(validation.Empty),
+			validation.When(utils.Contains(JwkMethodTypes, vm.Type), validation.Required, IsUniqueKeyValuePairListByKeyRule(), IsJWK()).Else(validation.Empty),
 		),
 		validation.Field(&vm.PublicKeyMultibase,
 			validation.When(utils.Contains(MultibaseMethodTypes, vm.Type), validation.Required, IsMultibase(), IsMultibaseEncodedEd25519PubKey()).Else(validation.Empty),
@@ -134,22 +143,22 @@ func (vm VerificationMethod) Validate(baseDid string, allowedNamespaces []string
 	)
 }
 
-func ValidVerificationMethod(baseDid string, allowedNamespaces []string) *CustomErrorRule {
+func ValidVerificationMethodRule(baseDid string, allowedNamespaces []string) *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.(VerificationMethod)
 		if !ok {
-			panic("ValidVerificationMethod must be only applied on verification methods")
+			panic("ValidVerificationMethodRule must be only applied on verification methods")
 		}
 
 		return casted.Validate(baseDid, allowedNamespaces)
 	})
 }
 
-func IsUniqueVerificationMethodList() *CustomErrorRule {
+func IsUniqueVerificationMethodListByIdRule() *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.([]*VerificationMethod)
 		if !ok {
-			panic("IsUniqueVerificationMethodList must be only applied on VM lists")
+			panic("IsUniqueVerificationMethodListByIdRule must be only applied on VM lists")
 		}
 
 		ids := GetVerificationMethodIds(casted)
