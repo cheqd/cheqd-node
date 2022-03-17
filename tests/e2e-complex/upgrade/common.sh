@@ -3,13 +3,12 @@
 set -euox pipefail
 
 CHEQD_IMAGE_FROM="ghcr.io/cheqd/cheqd-node:0.4.0"
-NEW_CHEQD_IMAGE_FROM="cheqd-node"
 # shellcheck disable=SC2034
 CHEQD_IMAGE_TO="cheqd-cli"
 # shellcheck disable=SC2034
 CHEQD_VERSION_TO=$(git describe --always --tag --match "v*" | sed 's/^v//')
 # shellcheck disable=SC2034
-UPGRADE_NAME="v0.4"
+UPGRADE_NAME="v0.5"
 VOTING_PERIOD=30
 EXPECTED_BLOCK_SECOND=5
 EXTRA_BLOCKS=5
@@ -29,7 +28,6 @@ DID_1="did:cheqd:testnet:abcdef"
 DID_2="did:cheqd:testnet:higklm"
 
 # cheqd_noded docker wrapper
-
 cheqd_noded_docker() {
   docker run --rm \
     -v "$(pwd):/cheqd" \
@@ -40,9 +38,7 @@ cheqd_noded_docker() {
     ${CHEQD_IMAGE_FROM} "$@"
 }
 
-
 # new cheqd_noded docker wrapper
-
 new_cheqd_noded_docker() {
   docker run --rm \
     -v "$(pwd):/cheqd" \
@@ -50,7 +46,7 @@ new_cheqd_noded_docker() {
     -u root \
     -e HOME=/cheqd \
     --entrypoint "cheqd-noded" \
-    ${NEW_CHEQD_IMAGE_FROM} "$@"
+    ${CHEQD_IMAGE_TO} "$@"
 }
 
 # Parameters
