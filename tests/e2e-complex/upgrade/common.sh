@@ -120,7 +120,37 @@ function send_tokens() {
 
 # Send DID
 # input: DID to write
-function send_did () {
+function send_did_old() {
+    did_to_write=$1
+
+    # Generate Alice identity key
+    ALICE_VER_KEY="$(cheqd_noded_docker debug ed25519 random)"
+    ALICE_VER_PUB_BASE_64=$(echo "${ALICE_VER_KEY}" | jq -r ".pub_key_base_64")
+    ALICE_VER_PRIV_BASE_64=$(echo "${ALICE_VER_KEY}" | jq -r ".priv_key_base_64")
+    ALICE_VER_PUB_MULTIBASE_58=$(cheqd_noded_docker debug encoding base64-multibase58 "${ALICE_VER_PUB_BASE_64}")
+
+    # Build CreateDid message
+    KEY_ID="${did_to_write}#key1"
+
+    # shellcheck disable=SC2089
+    MSG_CREATE_DID='{"id":"'${did_to_write}'","verification_method":[{"id":"'"${KEY_ID}"'","type":"Ed25519VerificationKey2020","controller":"'${did_to_write}'","public_key_multibase":"'${ALICE_VER_PUB_MULTIBASE_58}'"}],"authentication":["'${KEY_ID}'"]}'
+
+    # Post the message
+    did=$(local_client_tx tx cheqd create-did "${MSG_CREATE_DID}" "${KEY_ID}" --ver-key "${ALICE_VER_PRIV_BASE_64}" \
+        --from operator0 \
+        --gas-prices "25ncheq" \
+        --chain-id $CHAIN_ID \
+        --output json \
+        -y)
+
+
+    txhash=$(echo "$did" | jq ".txhash" | tr -d '"')
+    echo "$txhash" >> $FNAME_TXHASHES
+}
+
+# Send DID
+# input: DID to write
+function send_did() {
     did_to_write=$1
 
     # Generate Alice identity key

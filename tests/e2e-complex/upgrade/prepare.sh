@@ -29,7 +29,7 @@ OP2_ADDRESS=${addresses[2]}
 send_tokens "$OP2_ADDRESS"
 
 # Send DID transaction
-send_did "$DID_1"
+send_did_old "$DID_1"
 
 # Check that token transaction exists
 check_tx_hashes
