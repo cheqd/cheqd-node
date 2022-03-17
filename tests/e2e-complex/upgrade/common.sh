@@ -3,6 +3,7 @@
 set -euox pipefail
 
 CHEQD_IMAGE_FROM="ghcr.io/cheqd/cheqd-node:0.4.0"
+NEW_CHEQD_IMAGE_FROM="cheqd-node"
 # shellcheck disable=SC2034
 CHEQD_IMAGE_TO="cheqd-cli"
 # shellcheck disable=SC2034
@@ -39,6 +40,19 @@ cheqd_noded_docker() {
     ${CHEQD_IMAGE_FROM} "$@"
 }
 
+
+# new cheqd_noded docker wrapper
+
+new_cheqd_noded_docker() {
+  docker run --rm \
+    -v "$(pwd):/cheqd" \
+    --network host \
+    -u root \
+    -e HOME=/cheqd \
+    --entrypoint "cheqd-noded" \
+    ${NEW_CHEQD_IMAGE_FROM} "$@"
+}
+
 # Parameters
 # $1 - Name of container to run command inside
 # $2 - The full command to run
@@ -60,12 +74,12 @@ function docker_compose_up () {
     export CHEQD_IMAGE_NAME="$1"
     export MOUNT_POINT="$2"
 
-    docker-compose --env-file .env up -d
+    docker compose --env-file .env up -d
 }
 
 # Stop docker-compose
 function docker_compose_down () {
-    docker-compose --env-file .env down 
+    docker compose --env-file .env down 
 }
 
 # Clean environment
@@ -76,7 +90,7 @@ function clean_env () {
 
 # Run command using local generated keys from node_configs/client
 function local_client_tx () {
-    cheqd_noded_docker "$@" --home node_configs/client/.cheqdnode/ --keyring-backend test
+    new_cheqd_noded_docker "$@" --home node_configs/client/.cheqdnode/ --keyring-backend test
 }
 
 function make_777 () {
@@ -154,10 +168,10 @@ function send_did() {
     did_to_write=$1
 
     # Generate Alice identity key
-    ALICE_VER_KEY="$(cheqd_noded_docker debug ed25519 random)"
+    ALICE_VER_KEY="$(new_cheqd_noded_docker debug ed25519 random)"
     ALICE_VER_PUB_BASE_64=$(echo "${ALICE_VER_KEY}" | jq -r ".pub_key_base_64")
     ALICE_VER_PRIV_BASE_64=$(echo "${ALICE_VER_KEY}" | jq -r ".priv_key_base_64")
-    ALICE_VER_PUB_MULTIBASE_58=$(cheqd_noded_docker debug encoding base64-multibase58 "${ALICE_VER_PUB_BASE_64}")
+    ALICE_VER_PUB_MULTIBASE_58=$(new_cheqd_noded_docker debug encoding base64-multibase58 "${ALICE_VER_PUB_BASE_64}")
 
     # Build CreateDid message
     KEY_ID="${did_to_write}#key1"
