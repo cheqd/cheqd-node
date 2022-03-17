@@ -58,57 +58,7 @@ func TestUpdateDid(t *testing.T) {
 				},
 			},
 		},
-		{
-			valid:   true,
-			name:    "Valid: Add controller works",
-			signers: []string{BobKey1, AliceKey1},
-			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Controller:     []string{BobDID},
-				VerificationMethod: []*types.VerificationMethod{
-					{
-						Id:         AliceKey1,
-						Type:       Ed25519VerificationKey2020,
-						Controller: AliceDID,
-					},
-				},
-			},
-			errMsg: "",
-		},
-		{
-			valid:   false,
-			name:    "Not Valid: Add controller without old signature",
-			signers: []string{BobKey1},
-			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Controller:     []string{BobDID},
-				VerificationMethod: []*types.VerificationMethod{
-					{
-						Id:         AliceKey1,
-						Type:       Ed25519VerificationKey2020,
-						Controller: AliceDID,
-					},
-				},
-			},
-			errMsg: fmt.Sprintf("there should be at least one signature by %s (old version): signature is required but not found", AliceDID),
-		},
-		{
-			valid:   false,
-			name:    "Not Valid: Add controller without signature doesn't work (signatures of old controllers are required for now)",
-			signers: []string{BobKey1, CharlieKey1},
-			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Controller:     []string{BobDID, CharlieDID},
-				VerificationMethod: []*types.VerificationMethod{
-					{
-						Id:         AliceKey1,
-						Type:       Ed25519VerificationKey2020,
-						Controller: AliceDID,
-					},
-				},
-			},
-			errMsg: fmt.Sprintf("there should be at least one signature by %s (old version): signature is required but not found", AliceDID),
-		},
+		// VM and Controller replacing tests
 		{
 			valid:   false,
 			name:    "Not Valid: replacing controller and Verification method ID does not work without new sign",
@@ -128,6 +78,34 @@ func TestUpdateDid(t *testing.T) {
 		},
 		{
 			valid:   true,
+			name:    "Valid: replacing controller and Verification method ID works with all signatures",
+			signers: []string{AliceKey1, CharlieKey1, AliceKey2},
+			msg: &types.MsgUpdateDidPayload{
+				Id:             AliceDID,
+				Controller:     []string{CharlieDID},
+				VerificationMethod: []*types.VerificationMethod{
+					{
+						Id:         AliceKey2,
+						Type:       Ed25519VerificationKey2020,
+						Controller: AliceDID,
+					},
+				},
+			},
+			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", CharlieDID),
+		},
+		// Verification method's tests
+		// cases:
+		// - replacing VM controller works
+		// - replacing VM controller does not work without new signature
+		// - replacing VM controller does not work without old signature     ??????
+		// - replacing VM doesn't work without new signature
+		// - replacing VM doesn't work without old signature
+		// - replacing VM works with all signatures
+		// --- adding new VM works
+		// --- adding new VM without new signature
+		// --- adding new VM without old signature
+		{
+			valid:   true,
 			name:    "Valid: Replacing VM controller works with one signature",
 			signers: []string{AliceKey1, BobKey1},
 			msg: &types.MsgUpdateDidPayload{
@@ -143,7 +121,7 @@ func TestUpdateDid(t *testing.T) {
 		},
 		{
 			valid:   false,
-			name:    "Valid: Replacing VM controller does not work without new signature",
+			name:    "Not Valid: Replacing VM controller does not work without new signature",
 			signers: []string{AliceKey1},
 			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
@@ -158,59 +136,53 @@ func TestUpdateDid(t *testing.T) {
 			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", BobDID),
 		},
 		{
-			valid:   true,
-			name:    "Valid: Adding second controller works",
-			signers: []string{AliceKey1, CharlieKey3},
-			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Controller:     []string{AliceDID, CharlieDID},
-				VerificationMethod: []*types.VerificationMethod{
-					{
-						Id:         AliceKey1,
-						Type:       Ed25519VerificationKey2020,
-						Controller: AliceDID,
-					},
-				},
-			},
-		},
-		{
 			valid:   false,
-			name:    "Not Valid: Adding second controller does not work without new signature",
+			name:    "Not Valid: Replacing VM does not work without new signature",
 			signers: []string{AliceKey1},
 			msg: &types.MsgUpdateDidPayload{
 				Id:             AliceDID,
-				Controller:     []string{AliceDID, CharlieDID},
-				VerificationMethod: []*types.VerificationMethod{
-					{
-						Id:         AliceKey1,
-						Type:       Ed25519VerificationKey2020,
-						Controller: AliceDID,
-					},
-				},
-			},
-			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", CharlieDID),
-		},
-		{
-			valid:   true,
-			name:    "Valid: Adding verification method with the same controller works",
-			signers: []string{AliceKey1, AliceKey2},
-			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Controller:     []string{AliceDID},
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
 						Type:       Ed25519VerificationKey2020,
 						Controller: AliceDID,
 					},
+				},
+			},
+			errMsg: fmt.Sprintf("there should be at least one valid signature by %s (new version): signature is required but not found", AliceDID),
+		},
+		{
+			valid:   false,
+			name:    "Not Valid: Replacing VM does not work without old signature",
+			signers: []string{AliceKey2},
+			msg: &types.MsgUpdateDidPayload{
+				Id:             AliceDID,
+				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:         AliceKey1,
+						Id:         AliceKey2,
+						Type:       Ed25519VerificationKey2020,
+						Controller: AliceDID,
+					},
+				},
+			},
+			errMsg: fmt.Sprintf("there should be at least one valid signature by %s (old version): signature is required but not found", AliceDID),
+		},
+		{
+			valid:   true,
+			name:    "Not Valid: Replacing VM works with all signatures",
+			signers: []string{AliceKey1, AliceKey2},
+			msg: &types.MsgUpdateDidPayload{
+				Id:             AliceDID,
+				VerificationMethod: []*types.VerificationMethod{
+					{
+						Id:         AliceKey2,
 						Type:       Ed25519VerificationKey2020,
 						Controller: AliceDID,
 					},
 				},
 			},
 		},
+		// Adding VM
 		{
 			valid:   true,
 			name:    "Valid: Adding another verification method",
@@ -255,6 +227,161 @@ func TestUpdateDid(t *testing.T) {
 			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", BobDID),
 		},
 		{
+			valid:   false,
+			name:    "Not Valid: Adding another verification method without old sign",
+			signers: []string{AliceKey2},
+			msg: &types.MsgUpdateDidPayload{
+				Id:             AliceDID,
+				Controller:     []string{AliceDID},
+				VerificationMethod: []*types.VerificationMethod{
+					{
+						Id:         AliceKey1,
+						Type:       Ed25519VerificationKey2020,
+						Controller: AliceDID,
+					},
+					{
+						Id:         AliceKey2,
+						Type:       Ed25519VerificationKey2020,
+						Controller: AliceDID,
+					},
+				},
+			},
+			errMsg: fmt.Sprintf("there should be at least one valid signature by %s (old version): signature is required but not found", AliceDID),
+		},
+
+		// Controller's tests
+		// cases:
+		// - replacing Controller works with all signatures
+		// - replacing Controller doesn't work without old signature
+		// - replacing Controller doesn't work without new signature
+		// --- adding Controller works with all signatures
+		// --- adding Controller doesn't work without old signature
+		// --- adding Controller doesn't work without new signature
+		{
+			valid:   true,
+			name:    "Valid: Replace controller works with all signatures",
+			signers: []string{BobKey1, AliceKey1},
+			msg: &types.MsgUpdateDidPayload{
+				Id:             AliceDID,
+				Controller:     []string{BobDID},
+				VerificationMethod: []*types.VerificationMethod{
+					{
+						Id:         AliceKey1,
+						Type:       Ed25519VerificationKey2020,
+						Controller: AliceDID,
+					},
+				},
+			},
+		},
+		{
+			valid:   false,
+			name:    "Not Valid: Replace controller doesn't work without old signatures",
+			signers: []string{BobKey1},
+			msg: &types.MsgUpdateDidPayload{
+				Id:             AliceDID,
+				Controller:     []string{BobDID},
+				VerificationMethod: []*types.VerificationMethod{
+					{
+						Id:         AliceKey1,
+						Type:       Ed25519VerificationKey2020,
+						Controller: AliceDID,
+					},
+				},
+			},
+			errMsg: fmt.Sprintf("there should be at least one signature by %s (old version): signature is required but not found", AliceDID),
+		},
+		{
+			valid:   false,
+			name:    "Not Valid: Replace controller doesn't work without new signatures",
+			signers: []string{AliceKey1},
+			msg: &types.MsgUpdateDidPayload{
+				Id:             AliceDID,
+				Controller:     []string{BobDID},
+				VerificationMethod: []*types.VerificationMethod{
+					{
+						Id:         AliceKey1,
+						Type:       Ed25519VerificationKey2020,
+						Controller: AliceDID,
+					},
+				},
+			},
+			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", BobDID),
+		},
+		// add Controller
+		{
+			valid:   true,
+			name:    "Valid: Adding second controller works",
+			signers: []string{AliceKey1, CharlieKey3},
+			msg: &types.MsgUpdateDidPayload{
+				Id:             AliceDID,
+				Controller:     []string{AliceDID, CharlieDID},
+				VerificationMethod: []*types.VerificationMethod{
+					{
+						Id:         AliceKey1,
+						Type:       Ed25519VerificationKey2020,
+						Controller: AliceDID,
+					},
+				},
+			},
+		},
+		{
+			valid:   false,
+			name:    "Not Valid: Adding controller without old signature",
+			signers: []string{BobKey1},
+			msg: &types.MsgUpdateDidPayload{
+				Id:             AliceDID,
+				Controller:     []string{AliceDID, BobDID},
+				VerificationMethod: []*types.VerificationMethod{
+					{
+						Id:         AliceKey1,
+						Type:       Ed25519VerificationKey2020,
+						Controller: AliceDID,
+					},
+				},
+			},
+			errMsg: fmt.Sprintf("there should be at least one signature by %s (old version): signature is required but not found", AliceDID),
+		},
+		{
+			valid:   false,
+			name:    "Not Valid: Add controller without new signature doesn't work",
+			signers: []string{AliceKey1},
+			msg: &types.MsgUpdateDidPayload{
+				Id:             AliceDID,
+				Controller:     []string{AliceDID, BobDID},
+				VerificationMethod: []*types.VerificationMethod{
+					{
+						Id:         AliceKey1,
+						Type:       Ed25519VerificationKey2020,
+						Controller: AliceDID,
+					},
+				},
+			},
+			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", BobDID),
+		},
+
+
+		{
+			valid:   true,
+			name:    "Valid: Adding verification method with the same controller works",
+			signers: []string{AliceKey1, AliceKey2},
+			msg: &types.MsgUpdateDidPayload{
+				Id:             AliceDID,
+				Controller:     []string{AliceDID},
+				VerificationMethod: []*types.VerificationMethod{
+					{
+						Id:         AliceKey2,
+						Type:       Ed25519VerificationKey2020,
+						Controller: AliceDID,
+					},
+					{
+						Id:         AliceKey1,
+						Type:       Ed25519VerificationKey2020,
+						Controller: AliceDID,
+					},
+				},
+			},
+		},
+		{
 			valid:   true,
 			name:    "Valid: Keeping VM with controller different then subject untouched during update should not require Bob signature",
 			signers: []string{CharlieKey1},
@@ -291,20 +418,20 @@ func TestUpdateDid(t *testing.T) {
 			},
 		},
 		{
-			valid:   false,
-			name:    "Not Valid: Removing verification method without old signature does not work",
-			signers: []string{CharlieKey3, BobKey1},
+			valid:   true,
+			name:    "Valid: Removing verification method is possible with any kind of valid Bob's key",
+			signers: []string{BobKey1},
 			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
+				Id:             BobDID,
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:         AliceKey2,
+						Id:         BobKey1,
 						Type:       Ed25519VerificationKey2020,
-						Controller: AliceDID,
+						Controller: BobDID,
 					},
 				},
 			},
-			errMsg: fmt.Sprintf("there should be at least one signature by %s (old version): signature is required but not found", AliceDID),
+			errMsg: fmt.Sprintf("there should be at least one signature by %s (old version): signature is required but not found", BobDID),
 		},
 	}
 
