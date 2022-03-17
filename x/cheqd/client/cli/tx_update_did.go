@@ -18,7 +18,7 @@ func CmdUpdateDid() *cobra.Command {
 			"[priv-key-1] is base base64 encoded ed25519 private key for signature N." +
 			"If 'interactive' value is used for a key, the key will be read interactively. " +
 			"Prefer interactive mode, use inline mode only for tests.",
-		Args: cobra.ExactArgs(2),
+		Args: cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 

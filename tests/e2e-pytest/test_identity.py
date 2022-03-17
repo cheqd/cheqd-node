@@ -143,7 +143,7 @@ def test_did_wrong_version_update():
     run(
         "cheqd-noded tx",
         "cheqd create-did",
-        f" '{msg_create_did}' {key_id} --from {LOCAL_SENDER_ADDRESS} --ver-key {priv_key_base_64} {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} {KEYRING_BACKEND_TEST}",
+        f" '{msg_create_did}' {key_id} {priv_key_base_64} --from {LOCAL_SENDER_ADDRESS} {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} {KEYRING_BACKEND_TEST}",
         fr"{CODE_0}")
 
     # Get the created DID for getting version_id
@@ -170,7 +170,7 @@ def test_did_wrong_version_update():
     run(
         "cheqd-noded tx",
         "cheqd update-did",
-        f" '{json.dumps(msg_update_did)}' {key_id} --from {LOCAL_SENDER_ADDRESS} --ver-key {priv_key_base_64} {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} {KEYRING_BACKEND_TEST}",
+        f" '{json.dumps(msg_update_did)}' {key_id} {priv_key_base_64} --from {LOCAL_SENDER_ADDRESS} {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} {KEYRING_BACKEND_TEST}",
         fr"{CODE_1203}(.*?)\"raw_log\":\"(.*?)Expected(.*?)unexpected DID version")
 
 
@@ -200,7 +200,7 @@ def test_did_wrong_verkey_update():
     run(
         "cheqd-noded tx",
         "cheqd create-did",
-        f" '{msg_create_did}' {key_id} --from {LOCAL_SENDER_ADDRESS} --ver-key {priv_key_base_64} {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} {KEYRING_BACKEND_TEST}",
+        f" '{msg_create_did}' {key_id} {priv_key_base_64} --from {LOCAL_SENDER_ADDRESS} {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} {KEYRING_BACKEND_TEST}",
         fr"{CODE_0}")
 
     # Get the created DID for getting version_id
@@ -228,5 +228,5 @@ def test_did_wrong_verkey_update():
     run(
         "cheqd-noded tx",
         "cheqd update-did",
-        f" '{json.dumps(msg_update_did)}' {key_id} --from {LOCAL_SENDER_ADDRESS} --ver-key {new_priv_key_base_64} {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} {KEYRING_BACKEND_TEST}",
+        f" '{json.dumps(msg_update_did)}' {key_id} {new_priv_key_base_64} --from {LOCAL_SENDER_ADDRESS} {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} {KEYRING_BACKEND_TEST}",
         fr"{CODE_1100}(.*?)\"raw_log\":\"(.*?)invalid signature detected")
