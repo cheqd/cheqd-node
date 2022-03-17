@@ -1,11 +1,10 @@
 package utils
 
 import (
-	"encoding/base64"
 	"fmt"
 
 	multibase "github.com/multiformats/go-multibase"
-	"github.com/tendermint/tendermint/crypto/tmhash"
+	"github.com/tendermint/tendermint/types"
 )
 
 func ValidateMultibase(data string) error {
@@ -32,5 +31,6 @@ func ValidateBase58(data string) error {
 }
 
 func GetTxHash(txBytes []byte) string {
-	return base64.StdEncoding.EncodeToString(tmhash.Sum(txBytes))
+	//return base64.StdEncoding.EncodeToString(tmhash.Sum(txBytes))
+	return fmt.Sprintf("%X", types.Tx(txBytes).Hash())
 }
