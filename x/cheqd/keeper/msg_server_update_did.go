@@ -5,7 +5,6 @@ import (
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"reflect"
 )
 
 const UpdatedPostfix string = "-updated"
@@ -111,11 +110,11 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 }
 
 func GetSignerIdForErrorMessage(signerId string, existingVersionId string, updatedVersionId string) interface{} {
-	if signerId == existingVersionId {	// oldDid->id
+	if signerId == existingVersionId { // oldDid->id
 		return existingVersionId + " (old version)"
 	}
 
-	if signerId == updatedVersionId {	// oldDid->id + UpdatedPrefix
+	if signerId == updatedVersionId { // oldDid->id + UpdatedPrefix
 		return existingVersionId + " (new version)"
 	}
 
@@ -146,11 +145,12 @@ func GetSignerDIDsForDIDUpdate(existingDid types.Did, updatedDid types.Did) []st
 	signers := existingDid.GetControllersOrSubject()
 	signers = append(signers, updatedDid.GetControllersOrSubject()...)
 
-	existingVMMap := types.VerificationMethodListToMap(existingDid.VerificationMethod)
-	updatedVMMap := types.VerificationMethodListToMap(updatedDid.VerificationMethod)
+	existingVMMap := types.VerificationMethodListToMapByFragment(existingDid.VerificationMethod)
+	updatedVMMap := types.VerificationMethodListToMapByFragment(updatedDid.VerificationMethod)
 
 	for _, updatedVM := range updatedDid.VerificationMethod {
-		existingVM, found := existingVMMap[updatedVM.Id]
+		_, _, _, fragment := utils.MustSplitDIDUrl(updatedVM.Id)
+		existingVM, found := existingVMMap[fragment]
 
 		// VM added
 		if !found {
@@ -159,7 +159,9 @@ func GetSignerDIDsForDIDUpdate(existingDid types.Did, updatedDid types.Did) []st
 		}
 
 		// VM updated
-		if !reflect.DeepEqual(existingVM, updatedVM) {
+		// We don't compare ids because they will be different after replacing ids on the updated version of DID.
+		// Fragments equality is checked above.
+		if !types.CompareVerificationMethodsWithoutIds(existingVM, *updatedVM) {
 			signers = append(signers, existingVM.Controller, updatedVM.Controller)
 			continue
 		}
@@ -168,7 +170,8 @@ func GetSignerDIDsForDIDUpdate(existingDid types.Did, updatedDid types.Did) []st
 	}
 
 	for _, existingVM := range existingDid.VerificationMethod {
-		_, found := updatedVMMap[existingVM.Id]
+		_, _, _, fragment := utils.MustSplitDIDUrl(existingVM.Id)
+		_, found := updatedVMMap[fragment]
 
 		// VM removed
 		if !found {

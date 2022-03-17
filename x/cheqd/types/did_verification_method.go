@@ -10,6 +10,7 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/multiformats/go-multibase"
+	"reflect"
 )
 
 const (
@@ -108,14 +109,22 @@ func VerifySignature(vm VerificationMethod, message []byte, signature []byte) er
 	return nil
 }
 
-func VerificationMethodListToMap(vms []*VerificationMethod) map[string]VerificationMethod {
+func VerificationMethodListToMapByFragment(vms []*VerificationMethod) map[string]VerificationMethod {
 	result := map[string]VerificationMethod{}
 
 	for _, vm := range vms {
-		result[vm.Id] = *vm
+		_, _, _, fragment := utils.MustSplitDIDUrl(vm.Id)
+		result[fragment] = *vm
 	}
 
 	return result
+}
+
+func CompareVerificationMethodsWithoutIds(vm1, vm2 VerificationMethod) bool {
+	// We can override ids because  on local copies
+	vm1.Id = ""
+	vm2.Id = ""
+	return reflect.DeepEqual(vm1, vm2)
 }
 
 // Validation
