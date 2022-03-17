@@ -30,7 +30,7 @@ MSG_CREATE_DID='{
 
 # Post the message
 # shellcheck disable=SC2086
-RESULT=$(cheqd-noded tx cheqd create-did "${MSG_CREATE_DID}" "${KEY_ID}" --ver-key "${ALICE_VER_PRIV_BASE_64}" \
-  --from "${BASE_ACCOUNT_1}" ${TX_PARAMS})
+RESULT=$(cheqd-noded tx cheqd create-did "${MSG_CREATE_DID}" "${KEY_ID}" "${ALICE_VER_PRIV_BASE_64}" \
+  --from "${BASE_ACCOUNT_1}" ${TX_PARAMS} 2>&1  || true)  # Allow command to fail, redirect stderr to stdout
 
-assert_tx_code "$RESULT" "1100"
+assert_str_contains "$RESULT" "public_key_multibase: ed25519: bad public key length: 23"
