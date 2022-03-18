@@ -49,10 +49,10 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 	updatedDid := msg.Payload.ToDid()
 	updatedDid.ReplaceIds(updatedDid.Id, updatedDid.Id+UpdatedPostfix)
 
-	updatedMetadata := existingStateValue.Metadata
+	updatedMetadata := *existingStateValue.Metadata
 	updatedMetadata.Update(ctx)
 
-	updatedStateValue, err := types.NewStateValue(&updatedDid, updatedMetadata)
+	updatedStateValue, err := types.NewStateValue(&updatedDid, &updatedMetadata)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 
 	// Apply changes: return original id and modify state
 	updatedDid.ReplaceIds(updatedDid.Id, existingDid.Id)
-	err = k.SetDid(&ctx, &updatedDid, updatedMetadata)
+	err = k.SetDid(&ctx, &updatedDid, &updatedMetadata)
 	if err != nil {
 		return nil, types.ErrInternal.Wrapf(err.Error())
 	}
