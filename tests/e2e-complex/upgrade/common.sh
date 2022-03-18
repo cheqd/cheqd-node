@@ -53,7 +53,7 @@ function docker_exec () {
 function docker_compose_up () {
     pushd "node_configs/node0"
     NODE_0_ID=$(cheqd_noded_docker tendermint show-node-id | sed 's/\r//g')
-    export NODE_0_ID
+    export NODE_0_ID="$NODE_0_ID"
     popd
     
     export CHEQD_IMAGE_NAME="$1"

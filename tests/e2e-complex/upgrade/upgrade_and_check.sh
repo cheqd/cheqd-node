@@ -7,10 +7,9 @@ set -euox pipefail
 
 cheqd_noded_docker() {
     docker run --rm \
-        -v "$(pwd):/cheqd" \
+        -v "$(pwd):/home/cheqd" \
         --network host \
         -u root \
-        -e HOME=/cheqd \
         --entrypoint "cheqd-noded" \
         ${CHEQD_IMAGE_TO} "$@"
 }
