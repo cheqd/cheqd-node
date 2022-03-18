@@ -7,18 +7,8 @@ import (
 
 // GetDidNamespace get did namespace
 func (k Keeper) GetDidNamespace(ctx sdk.Context) string {
-	return k.GetFromState(ctx, types.DidNamespaceKey)
-}
-
-// SetDidNamespace set did namespace
-func (k Keeper) SetDidNamespace(ctx sdk.Context, namespace string) {
-	k.SetToState(ctx, types.DidNamespaceKey, []byte(namespace))
-}
-
-// GetDidNamespace - get State value
-func (k Keeper) GetFromState(ctx sdk.Context, stateKey string) string {
 	store := ctx.KVStore(k.storeKey)
-	byteKey := types.KeyPrefix(stateKey)
+	byteKey := types.KeyPrefix(types.DidNamespaceKey)
 	bz := store.Get(byteKey)
 
 	// Parse bytes
@@ -26,16 +16,11 @@ func (k Keeper) GetFromState(ctx sdk.Context, stateKey string) string {
 	return namespace
 }
 
-// SetToState - set State value
-func (k Keeper) SetToState(ctx sdk.Context, stateKey string, stateValue []byte) {
+// SetDidNamespace set did namespace
+func (k Keeper) SetDidNamespace(ctx sdk.Context, namespace string) {
 	store := ctx.KVStore(k.storeKey)
 	byteKey := types.KeyPrefix(types.DidNamespaceKey)
-	store.Set(byteKey, stateValue)
-}
 
-// DeteteFromState - remove value from State by key
-func (k Keeper) DeteteFromState(ctx sdk.Context, stateKey string) {
-	store := ctx.KVStore(k.storeKey)
-	byteKey := types.KeyPrefix(types.DidNamespaceKey)
-	store.Delete(byteKey)
+	bz := []byte(namespace)
+	store.Set(byteKey, bz)
 }
