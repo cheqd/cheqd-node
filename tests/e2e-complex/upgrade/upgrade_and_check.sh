@@ -5,6 +5,16 @@ set -euox pipefail
 # shellcheck disable=SC1091
 . common.sh
 
+cheqd_noded_docker() {
+    docker run --rm \
+        -v "$(pwd):/home/cheqd" \
+        --network host \
+        -u root \
+        -e HOME=/home/cheqd \
+        --entrypoint "cheqd-noded" \
+        ${CHEQD_IMAGE_TO} "$@"
+}
+
 # Wait for upgrade height
 bash ../../tools/wait-for-chain.sh "$UPGRADE_HEIGHT" $((2 * VOTING_PERIOD))
 
@@ -46,7 +56,7 @@ check_did "$DID_1"
 send_tokens "$OP_ADDRESS_AFTER"
 
 # Send DID after upgrade
-send_did "$DID_2"
+send_did_new "$DID_2"
 
 # Check balance after token sending
 check_balance "$OP_ADDRESS_AFTER"
