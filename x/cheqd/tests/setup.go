@@ -35,6 +35,12 @@ type TestSetup struct {
 	Handler sdk.Handler
 }
 
+
+type SignerKey struct {
+	signer string
+	key ed25519.PrivateKey
+}
+
 func Setup() TestSetup {
 	// Init Codec
 	ir := codectypes.NewInterfaceRegistry()
@@ -87,7 +93,7 @@ func (s *TestSetup) CreateDid(pubKey ed25519.PublicKey, did string) *types.MsgCr
 	}
 
 	Service := types.Service{
-		Id:              "#service-2",
+		Id:              did + "#service-2",
 		Type:            "DIDCommMessaging",
 		ServiceEndpoint: "endpoint",
 	}
@@ -141,14 +147,14 @@ func (s *TestSetup) WrapCreateRequest(payload *types.MsgCreateDidPayload, keys m
 	}
 }
 
-func (s *TestSetup) WrapUpdateRequest(payload *types.MsgUpdateDidPayload, keys map[string]ed25519.PrivateKey) *types.MsgUpdateDid {
+func (s *TestSetup) WrapUpdateRequest(payload *types.MsgUpdateDidPayload, keys []SignerKey) *types.MsgUpdateDid {
 	var signatures []*types.SignInfo
 	signingInput := payload.GetSignBytes()
 
-	for privKeyId, privKey := range keys {
-		signature := base64.StdEncoding.EncodeToString(ed25519.Sign(privKey, signingInput))
+	for _, skey := range keys {
+		signature := base64.StdEncoding.EncodeToString(ed25519.Sign(skey.key, signingInput))
 		signatures = append(signatures, &types.SignInfo{
-			VerificationMethodId: privKeyId,
+			VerificationMethodId: skey.signer,
 			Signature:            signature,
 		})
 	}
@@ -186,7 +192,7 @@ func (s *TestSetup) InitDid(did string) (map[string]ed25519.PrivateKey, *types.M
 	return keys, didMsg, nil
 }
 
-func (s *TestSetup) SendUpdateDid(msg *types.MsgUpdateDidPayload, keys map[string]ed25519.PrivateKey) (*types.Did, error) {
+func (s *TestSetup) SendUpdateDid(msg *types.MsgUpdateDidPayload, keys []SignerKey) (*types.Did, error) {
 	// query Did
 	state, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
 	if len(msg.VersionId) == 0 {
@@ -220,18 +226,18 @@ func ConcatKeys(dst map[string]ed25519.PrivateKey, src map[string]ed25519.Privat
 	return dst
 }
 
-func (s TestSetup) CreateTestDIDs() (map[string]KeyPair, error) {
-	keys := map[string]KeyPair{
-		AliceKey1: GenerateKeyPair(),
-		AliceKey2: GenerateKeyPair(),
-		BobKey1: GenerateKeyPair(),
-		BobKey2: GenerateKeyPair(),
-		BobKey3: GenerateKeyPair(),
-		BobKey4: GenerateKeyPair(),
-		CharlieKey1: GenerateKeyPair(),
-		CharlieKey2: GenerateKeyPair(),
-		CharlieKey3: GenerateKeyPair(),
+func MapToListOfSignerKeys(mp map[string]ed25519.PrivateKey) []SignerKey {
+	var rlist = []SignerKey{}
+	for k, v := range mp {
+		rlist = append(rlist, SignerKey{
+			signer: k,
+			key:    v,
+		})
 	}
+	return rlist
+}
+
+func (s TestSetup) CreateTestDIDs(keys map[string]KeyPair) (error) {
 
 	testDIDs := []struct {
 		signers []string
@@ -288,7 +294,7 @@ func (s TestSetup) CreateTestDIDs() (map[string]KeyPair, error) {
 			},
 		},
 		{
-			signers: []string{CharlieKey2},
+			signers: []string{CharlieKey2, BobKey2},
 			msg: &types.MsgCreateDidPayload{
 				Id: CharlieDID,
 				Authentication: []string{
@@ -323,7 +329,7 @@ func (s TestSetup) CreateTestDIDs() (map[string]KeyPair, error) {
 		for _, vm := range msg.VerificationMethod {
 			encoded, err :=  multibase.Encode(multibase.Base58BTC, keys[vm.Id].PublicKey)
 			if err != nil {
-				return nil, err
+				return err
 			}
 			vm.PublicKeyMultibase = encoded
 		}
@@ -333,12 +339,11 @@ func (s TestSetup) CreateTestDIDs() (map[string]KeyPair, error) {
 			signerKeys[signer] = keys[signer].PrivateKey
 		}
 
-		for keyId, key := range keys {
-			keys[keyId] = key
+		_, err := s.SendCreateDid(msg, signerKeys)
+		if err != nil {
+			return err
 		}
-
-		_, _ = s.SendCreateDid(msg, signerKeys)
 	}
 
-	return keys, nil
+	return nil
 }

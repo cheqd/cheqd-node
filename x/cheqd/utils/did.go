@@ -1,80 +1,96 @@
 package utils
 
 import (
+	"errors"
+	"fmt"
 	"regexp"
 	"strings"
 )
 
-var DidForbiddenSymbolsRegexp, _ = regexp.Compile(`^[^#?&/\\]+$`)
+var SplitDIDRegexp, _ = regexp.Compile(`^did:([^:]+?)(:([^:]+?))?:([^:]+)$`)
+var DidNamespaceRegexp, _ = regexp.Compile(`^[a-zA-Z0-9]*$`)
 
-func SplitDidUrlIntoDidAndFragment(didUrl string) (string, string) {
-	fragments := strings.Split(didUrl, "#")
-	return fragments[0], fragments[1]
+// TrySplitDID Validates generic format of DID. It doesn't validate method, name and id content.
+// Call ValidateDID for further validation.
+func TrySplitDID(did string) (method string, namespace string, id string, err error) {
+	// Example: did:cheqd:testnet:base58str1ng1111
+	// match [0] - the whole string
+	// match [1] - cheqd                - method
+	// match [2] - :testnet
+	// match [3] - testnet              - namespace
+	// match [4] - base58str1ng1111     - id
+	matches := SplitDIDRegexp.FindAllStringSubmatch(did, -1)
+	if len(matches) != 1 {
+		return "", "", "", errors.New("unable to split did into method, namespace and id")
+	}
+
+	match := matches[0]
+	return match[1], match[3], match[4], nil
 }
 
-func IsDidFragment(prefix string, didUrl string) bool {
-	if !strings.Contains(didUrl, "#") {
-		return false
+func MustSplitDID(did string) (method string, namespace string, id string) {
+	method, namespace, id, err := TrySplitDID(did)
+	if err != nil {
+		panic(err.Error())
 	}
-
-	if didUrl[0] == '#' {
-		return true
-	}
-
-	did, _ := SplitDidUrlIntoDidAndFragment(didUrl)
-	return IsValidDid(prefix, did)
+	return
 }
 
-func IsFullDidFragment(prefix string, didUrl string) bool {
-	if !strings.Contains(didUrl, "#") {
-		return false
+func JoinDID(method, namespace, id string) string {
+	res := "did:" + method
+
+	if namespace != "" {
+		res = res + ":" + namespace
 	}
 
-	did, _ := SplitDidUrlIntoDidAndFragment(didUrl)
-	return IsValidDid(prefix, did)
+	return res + ":" + id
 }
 
-func ResolveId(did string, methodId string) string {
-	result := methodId
-
-	methodDid, methodFragment := SplitDidUrlIntoDidAndFragment(methodId)
-	if len(methodDid) == 0 {
-		result = did + "#" + methodFragment
+// ValidateDID checks method and allowed namespaces only when the corresponding parameters are specified.
+func ValidateDID(did string, method string, allowedNamespaces []string) error {
+	sMethod, sNamespace, sUniqueId, err := TrySplitDID(did)
+	if err != nil {
+		return err
 	}
 
-	return result
+	// check method
+	if method != "" && method != sMethod {
+		return fmt.Errorf("did method must be: %s", method)
+	}
+
+	// check namespaces
+	if !DidNamespaceRegexp.MatchString(sNamespace) {
+		return errors.New("invalid did namespace")
+	}
+
+	if len(allowedNamespaces) > 0 && !Contains(allowedNamespaces, sNamespace) {
+		return fmt.Errorf("did namespace must be one of: %s", strings.Join(allowedNamespaces[:], ", "))
+	}
+
+	// check unique-id
+	err = ValidateUniqueId(sUniqueId)
+	if err != nil {
+		return err
+	}
+
+	return err
 }
 
-func IsNotValidDIDArray(prefix string, array []string) (bool, int) {
-	for i, did := range array {
-		if !IsValidDid(prefix, did) {
-			return true, i
-		}
+func ValidateUniqueId(uniqueId string) error {
+	// Length should be 16 or 32 symbols
+	if len(uniqueId) != 16 && len(uniqueId) != 32 {
+		return fmt.Errorf("unique id length should be 16 or 32 symbols")
 	}
 
-	return false, 0
+	// Base58 check
+	if err := ValidateBase58(uniqueId); err != nil {
+		return fmt.Errorf("unique id must be valid base58 string: %s", err)
+	}
+
+	return nil
 }
 
-func IsNotValidDIDArrayFragment(prefix string, array []string) (bool, int) {
-	for i, did := range array {
-		if !IsDidFragment(prefix, did) {
-			return true, i
-		}
-	}
-
-	return false, 0
-}
-
-func IsValidDid(prefix string, did string) bool {
-	if len(did) == 0 {
-		return false
-	}
-
-	if !DidForbiddenSymbolsRegexp.MatchString(did) {
-		return false
-	}
-
-	// FIXME: Empty namespace must be allowed even if namespace is set in state
-	// https://github.com/cheqd/cheqd-node/blob/main/architecture/adr-list/adr-002-cheqd-did-method.md#method-specific-identifier
-	return strings.HasPrefix(did, prefix)
+func IsValidDID(did string, method string, allowedNamespaces []string) bool {
+	err := ValidateDID(did, method, allowedNamespaces)
+	return err == nil
 }

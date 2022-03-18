@@ -11,7 +11,7 @@ import "cheqd/v1/stateValue.proto";
 // Query defines the gRPC querier service.
 service Query {
 	rpc Did(QueryGetDidRequest) returns (QueryGetDidResponse) {
-		option (google.api.http).get = "/cheqd/cheqdnode/cheqd/did/{id}";
+		option (google.api.http).get = "/cheqd/v1/did/{id}";
 	}
 }
 

@@ -33,5 +33,3 @@ message Service {
   string type = 2;
   string service_endpoint = 3;
 }
-
-

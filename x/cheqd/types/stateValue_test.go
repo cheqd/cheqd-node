@@ -1,6 +1,7 @@
 package types
 
 import (
+	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/stretchr/testify/assert"
@@ -26,7 +27,7 @@ func Test_PackUnpackAny(t *testing.T) {
 	var any types.Any
 	err = any.Unmarshal(bz)
 	assert.NoError(t, err)
-	assert.Equal(t, any.TypeUrl, MsgTypeURL(&Did{}))
+	assert.Equal(t, any.TypeUrl, utils.MsgTypeURL(&Did{}))
 
 	// Unmarshal
 	var decoded StateValueData

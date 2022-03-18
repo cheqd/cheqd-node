@@ -30,14 +30,14 @@ MSG_CREATE_DID='{
 }';
 
 # shellcheck disable=SC2086
-RESULT=$(cheqd-noded tx cheqd create-did "${MSG_CREATE_DID}" "${KEY_ID}" --ver-key "${ALICE_VER_PRIV_BASE_64}" \
+RESULT=$(cheqd-noded tx cheqd create-did "${MSG_CREATE_DID}" "${KEY_ID}" "${ALICE_VER_PRIV_BASE_64}" \
   --from "${BASE_ACCOUNT_1}" ${TX_PARAMS})
 
 assert_tx_successful "$RESULT"
 
 
 # Query DID
-RESULT=$(curl "http://localhost:1317/cheqd/cheqdnode/cheqd/did/${DID}")
+RESULT=$(curl "http://localhost:1317/cheqd/v1/did/${DID}")
 
 EXPECTED='{
    "context":[],
