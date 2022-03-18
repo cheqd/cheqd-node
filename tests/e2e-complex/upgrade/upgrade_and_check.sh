@@ -56,7 +56,7 @@ check_did "$DID_1"
 send_tokens "$OP_ADDRESS_AFTER"
 
 # Send DID after upgrade
-send_did "$DID_2"
+send_did_new "$DID_2"
 
 # Check balance after token sending
 check_balance "$OP_ADDRESS_AFTER"
