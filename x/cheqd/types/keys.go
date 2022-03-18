@@ -16,6 +16,10 @@ const (
 	DidMethod = ModuleName
 )
 
+func KeyPrefix(p string) []byte {
+	return []byte(p)
+}
+
 const (
 	DidKey          = "did:"
 	DidCountKey     = "did-count:"
