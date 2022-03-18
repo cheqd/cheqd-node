@@ -35,17 +35,12 @@ RESULT=$(cheqd-noded tx cheqd create-did "${MSG_CREATE_DID}" "${KEY_ID}" "${OLD_
 
 assert_tx_successful "$RESULT"
 
-# Query DID to find out version id
-# shellcheck disable=SC2086
-RESULT=$(cheqd-noded query cheqd did "${DID}" ${QUERY_PARAMS})
-VERSION_ID=$(echo "${RESULT}" | jq -r ".metadata.version_id")
-
-
 # Updating DID
 NEW_VER_KEY="$(cheqd-noded debug ed25519 random)"
 NEW_VER_PUB_BASE_64=$(echo "${NEW_VER_KEY}" | jq -r ".pub_key_base_64")
 NEW_VER_PRIV_BASE_64=$(echo "${NEW_VER_KEY}" | jq -r ".priv_key_base_64")
 NEW_VER_PUB_MULTIBASE_58=$(cheqd-noded debug encoding base64-multibase58 "${NEW_VER_PUB_BASE_64}")
+VERSION_ID=$(echo "${RESULT}" | jq -r ".txhash")
 
 MSG_UPDATE_DID='{
   "id": "'${DID}'",

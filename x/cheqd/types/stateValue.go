@@ -1,12 +1,13 @@
 package types
 
 import (
-	"encoding/base64"
+	"reflect"
+	"time"
+
+	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gogo/protobuf/proto"
-	"github.com/tendermint/tendermint/crypto/tmhash"
-	"reflect"
 )
 
 // StateValueData is interface uniting possible types to be used for stateValue.data field
@@ -31,10 +32,14 @@ func NewStateValue(data StateValueData, metadata *Metadata) (StateValue, error) 
 }
 
 func NewMetadataFromContext(ctx sdk.Context) Metadata {
-	created := ctx.BlockTime().String()
-	txHash := base64.StdEncoding.EncodeToString(tmhash.Sum(ctx.TxBytes()))
+	created := ctx.BlockTime().Format(time.RFC3339)
+	txHash := utils.GetTxHash(ctx.TxBytes())
 
-	return Metadata{Created: created, Updated: created, Deactivated: false, VersionId: txHash}
+	return Metadata{Created: created, Deactivated: false, VersionId: txHash}
+}
+
+func (m *Metadata) Update(ctx sdk.Context) {
+	m.Updated = ctx.BlockTime().Format(time.RFC3339)
 }
 
 func (m StateValue) UnpackData() (StateValueData, error) {
