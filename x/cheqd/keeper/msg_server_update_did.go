@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -48,9 +49,8 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 	updatedDid := msg.Payload.ToDid()
 	updatedDid.ReplaceIds(updatedDid.Id, updatedDid.Id+UpdatedPostfix)
 
-	updatedMetadata := types.NewMetadataFromContext(ctx)
-	updatedMetadata.Created = existingStateValue.Metadata.Created
-	updatedMetadata.Updated = ctx.BlockTime().String()
+	updatedMetadata := *existingStateValue.Metadata
+	updatedMetadata.Update(ctx)
 
 	updatedStateValue, err := types.NewStateValue(&updatedDid, &updatedMetadata)
 	if err != nil {
