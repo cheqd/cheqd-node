@@ -30,10 +30,10 @@ DID_2="did:cheqd:testnet:2222222222222222"
 # cheqd_noded docker wrapper
 cheqd_noded_docker() {
     docker run --rm \
-        -v "$(pwd):/home/cheqd" \
+        -v "$(pwd):/cheqd" \
         --network host \
-        -u cheqd \
-        -e HOME=/home/cheqd \
+        -u root \
+        -e HOME=/cheqd \
         --entrypoint "cheqd-noded" \
         ${CHEQD_IMAGE_FROM} "$@"
 }
