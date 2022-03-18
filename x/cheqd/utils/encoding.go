@@ -2,8 +2,7 @@ package utils
 
 import (
 	"fmt"
-
-	multibase "github.com/multiformats/go-multibase"
+	"github.com/multiformats/go-multibase"
 )
 
 func ValidateMultibase(data string) error {
