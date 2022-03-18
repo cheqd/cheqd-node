@@ -9,7 +9,7 @@ cheqd_noded_docker() {
     docker run --rm \
         -v "$(pwd):/home/cheqd" \
         --network host \
-        -u root \
+        -u cheqd \
         -e HOME=/home/cheqd \
         --entrypoint "cheqd-noded" \
         "${CHEQD_IMAGE_TO}" "$@"
