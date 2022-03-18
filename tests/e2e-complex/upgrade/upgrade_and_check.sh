@@ -16,7 +16,7 @@ cheqd_noded_docker() {
 }
 
 # Wait for upgrade height
-bash ../../tools/wait-for-chain.sh "$UPGRADE_HEIGHT" $((2 * VOTING_PERIOD))
+bash ../../tools/wait-for-chain.sh "$UPGRADE_HEIGHT" $((3 * VOTING_PERIOD))
 
 # Stop docker-compose service
 docker_compose_down
