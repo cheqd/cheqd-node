@@ -4,8 +4,8 @@ import pytest
 
 from helpers import run, LOCAL_SENDER_ADDRESS, LOCAL_RECEIVER_ADDRESS, LOCAL_NET_DESTINATION, GAS_PRICE, YES_FLAG, \
     KEYRING_BACKEND_TEST, get_gas_extimation, CODE_0, TEST_NET_GAS_X_GAS_PRICES, generate_ed25519_key, random_string, \
-    build_create_did_msg, json_loads, build_update_did_msg, CODE_1100, CODE_1203, get_balance, GAS_AMOUNT, CODE_5, \
-    CODE_11
+    build_create_did_msg, json_loads, build_update_did_msg, CODE_1101, CODE_1203, get_balance, GAS_AMOUNT, CODE_5, \
+    CODE_11, generate_public_multibase, generate_did
 
 
 @pytest.mark.parametrize("magic_number_positive", [1.3, 2, 3, 10])
@@ -114,11 +114,11 @@ def test_did_query_non_existent():
         "cheqd-noded query",
         "cheqd did",
         fr"{did}",
-        fr"Error: rpc error: code = InvalidArgument desc = not found: invalid request")
+        fr"Error: rpc error: code = InvalidArgument desc = did:cheqd:testnet:AbCdEfGh: not found: invalid request")
 
 
 def test_did_wrong_version_update():
-    did = fr"did:cheqd:testnet:{random_string(5)}"
+    did = fr"did:cheqd:testnet:{generate_did()}"
     key_id = fr"{did}#key1"
 
     # Generate ed25519 key
@@ -171,11 +171,11 @@ def test_did_wrong_version_update():
         "cheqd-noded tx",
         "cheqd update-did",
         f" '{json.dumps(msg_update_did)}' {key_id} {priv_key_base_64} --from {LOCAL_SENDER_ADDRESS} {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} {KEYRING_BACKEND_TEST}",
-        fr"{CODE_1203}(.*?)\"raw_log\":\"(.*?)Expected(.*?)unexpected DID version")
+        fr"{CODE_1203}(.*?)\"raw_log\":\"(.*?)unexpected DID version")
 
 
 def test_did_wrong_verkey_update():
-    did = fr"did:cheqd:testnet:{random_string(5)}"
+    did = fr"did:cheqd:testnet:{generate_did()}"
     key_id = fr"{did}#key1"
 
     # Generate ed25519 key
@@ -216,7 +216,7 @@ def test_did_wrong_verkey_update():
     # Prepare and send update did message for getting an error
     msg_update_did = build_update_did_msg(did,
                                           key_id,
-                                          ver_pub_multibase_58 + "abc",
+                                          generate_public_multibase(),
                                           version_id)
 
     msg_update_did["capability_delegation"] = [key_id]
@@ -224,9 +224,9 @@ def test_did_wrong_verkey_update():
     # Create another ed25519 key for using the new one for signing
     new_priv_key_base_64 = generate_ed25519_key()["priv_key_base_64"]
 
-    # here we are expecting an 1203 error about wrong version_id
+    # here we are expecting an 1100 error about wrong version_id
     run(
         "cheqd-noded tx",
         "cheqd update-did",
         f" '{json.dumps(msg_update_did)}' {key_id} {new_priv_key_base_64} --from {LOCAL_SENDER_ADDRESS} {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} {KEYRING_BACKEND_TEST}",
-        fr"{CODE_1100}(.*?)\"raw_log\":\"(.*?)invalid signature detected")
+        fr"{CODE_1101}(.*?)\"raw_log\":\"(.*?)signature is required but not found")

@@ -8,7 +8,7 @@ CHEQD_IMAGE_TO="cheqd-cli"
 # shellcheck disable=SC2034
 CHEQD_VERSION_TO=$(git describe --always --tag --match "v*" | sed 's/^v//')
 # shellcheck disable=SC2034
-UPGRADE_NAME="v0.4"
+UPGRADE_NAME="v0.5"
 VOTING_PERIOD=30
 EXPECTED_BLOCK_SECOND=5
 EXTRA_BLOCKS=5
@@ -23,20 +23,19 @@ AMOUNT_BEFORE="19000000000000000"
 CHEQ_AMOUNT="1ncheq"
 CHEQ_AMOUNT_NUMBER="1"
 # shellcheck disable=SC2034
-DID_1="did:cheqd:testnet:abcdef"
+DID_1="did:cheqd:testnet:1111111111111111"
 # shellcheck disable=SC2034
-DID_2="did:cheqd:testnet:higklm"
+DID_2="did:cheqd:testnet:2222222222222222"
 
 # cheqd_noded docker wrapper
-
 cheqd_noded_docker() {
-  docker run --rm \
-    -v "$(pwd):/cheqd" \
-    --network host \
-    -u root \
-    -e HOME=/cheqd \
-    --entrypoint "cheqd-noded" \
-    ${CHEQD_IMAGE_FROM} "$@"
+    docker run --rm \
+        -v "$(pwd):/cheqd" \
+        --network host \
+        -u root \
+        -e HOME=/cheqd \
+        --entrypoint "cheqd-noded" \
+        ${CHEQD_IMAGE_FROM} "$@"
 }
 
 # Parameters
@@ -54,18 +53,18 @@ function docker_exec () {
 function docker_compose_up () {
     pushd "node_configs/node0"
     NODE_0_ID=$(cheqd_noded_docker tendermint show-node-id | sed 's/\r//g')
-    export NODE_0_ID
+    export NODE_0_ID="$NODE_0_ID"
     popd
     
     export CHEQD_IMAGE_NAME="$1"
     export MOUNT_POINT="$2"
 
-    docker-compose --env-file .env up -d
+    docker compose --env-file .env up -d
 }
 
 # Stop docker-compose
 function docker_compose_down () {
-    docker-compose --env-file .env down 
+    docker compose --env-file .env down 
 }
 
 # Clean environment
@@ -84,7 +83,6 @@ function make_777 () {
 }
 
 
-
 # Transaction related funcs
 
 function random_string() {
@@ -95,6 +93,7 @@ function random_string() {
 function get_addresses () {
     all_keys=$(local_client_tx keys list)
     mapfile -t addresses < <(echo "$all_keys" | grep -o 'cheqd1.*')
+#    addresses=( $(echo "$all_keys" | grep -o 'cheqd1.*') )
     echo "${addresses[@]}"
 }
 
@@ -120,37 +119,7 @@ function send_tokens() {
 
 # Send DID
 # input: DID to write
-function send_did_old() {
-    did_to_write=$1
-
-    # Generate Alice identity key
-    ALICE_VER_KEY="$(cheqd_noded_docker debug ed25519 random)"
-    ALICE_VER_PUB_BASE_64=$(echo "${ALICE_VER_KEY}" | jq -r ".pub_key_base_64")
-    ALICE_VER_PRIV_BASE_64=$(echo "${ALICE_VER_KEY}" | jq -r ".priv_key_base_64")
-    ALICE_VER_PUB_MULTIBASE_58=$(cheqd_noded_docker debug encoding base64-multibase58 "${ALICE_VER_PUB_BASE_64}")
-
-    # Build CreateDid message
-    KEY_ID="${did_to_write}#key1"
-
-    # shellcheck disable=SC2089
-    MSG_CREATE_DID='{"id":"'${did_to_write}'","verification_method":[{"id":"'"${KEY_ID}"'","type":"Ed25519VerificationKey2020","controller":"'${did_to_write}'","public_key_multibase":"'${ALICE_VER_PUB_MULTIBASE_58}'"}],"authentication":["'${KEY_ID}'"]}'
-
-    # Post the message
-    did=$(local_client_tx tx cheqd create-did "${MSG_CREATE_DID}" "${KEY_ID}" --ver-key "${ALICE_VER_PRIV_BASE_64}" \
-        --from operator0 \
-        --gas-prices "25ncheq" \
-        --chain-id $CHAIN_ID \
-        --output json \
-        -y)
-
-
-    txhash=$(echo "$did" | jq ".txhash" | tr -d '"')
-    echo "$txhash" >> $FNAME_TXHASHES
-}
-
-# Send DID
-# input: DID to write
-function send_did() {
+function send_did_new () {
     did_to_write=$1
 
     # Generate Alice identity key
@@ -167,6 +136,37 @@ function send_did() {
 
     # Post the message
     did=$(local_client_tx tx cheqd create-did "${MSG_CREATE_DID}" "${KEY_ID}" "${ALICE_VER_PRIV_BASE_64}" \
+        --from operator0 \
+        --gas-prices "25ncheq" \
+        --chain-id $CHAIN_ID \
+        --output json \
+        -y)
+
+
+    txhash=$(echo "$did" | jq ".txhash" | tr -d '"')
+    echo "$txhash" >> $FNAME_TXHASHES
+}
+
+# Send DID
+# input: DID to write
+function send_did () {
+    did_to_write=$1
+
+    # Generate Alice identity key
+    ALICE_VER_KEY="$(cheqd_noded_docker debug ed25519 random)"
+    ALICE_VER_PUB_BASE_64=$(echo "${ALICE_VER_KEY}" | jq -r ".pub_key_base_64")
+    ALICE_VER_PRIV_BASE_64=$(echo "${ALICE_VER_KEY}" | jq -r ".priv_key_base_64")
+    ALICE_VER_PUB_MULTIBASE_58=$(cheqd_noded_docker debug encoding base64-multibase58 "${ALICE_VER_PUB_BASE_64}")
+
+    # Build CreateDid message
+    KEY_ID="${did_to_write}#key1"
+
+    # shellcheck disable=SC2089
+    MSG_CREATE_DID='{"id":"'${did_to_write}'","verification_method":[{"id":"'"${KEY_ID}"'","type":"Ed25519VerificationKey2020","controller":"'${did_to_write}'","public_key_multibase":"'${ALICE_VER_PUB_MULTIBASE_58}'"}],"authentication":["'${KEY_ID}'"]}'
+
+    # Post the message
+    did=$(local_client_tx tx cheqd create-did "${MSG_CREATE_DID}" "${KEY_ID}" \
+        --ver-key "${ALICE_VER_PRIV_BASE_64}" \
         --from operator0 \
         --gas-prices "25ncheq" \
         --chain-id $CHAIN_ID \

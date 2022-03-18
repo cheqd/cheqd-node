@@ -41,7 +41,7 @@ func (k Keeper) SetDidCount(ctx *sdk.Context, count uint64) {
 func (k Keeper) AppendDid(ctx *sdk.Context, did *types.Did, metadata *types.Metadata) error {
 	// Check that did doesn't exist
 	if k.HasDid(ctx, did.Id) {
-		return types.ErrDidDocNotFound.Wrapf(did.Id)
+		return types.ErrDidDocExists.Wrapf(did.Id)
 	}
 
 	// Create the did

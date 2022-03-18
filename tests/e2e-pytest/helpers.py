@@ -47,6 +47,7 @@ CODE_5 = "\"code\":5"
 CODE_11 = "\"code\":11"
 CODE_1203 = "\"code\":1203"
 CODE_1100 = "\"code\":1100"
+CODE_1101 = "\"code\":1101"
 CODE_0_DIGIT = 0
 
 
@@ -160,3 +161,20 @@ def generate_ed25519_key() -> dict:
         "",
         "")
     return json_loads(cli.read())
+
+def generate_public_multibase() -> str:
+    ed25519_key = generate_ed25519_key()
+    pub_key_base_64 = ed25519_key["pub_key_base_64"]
+
+    # Get multibase58 represantation
+    cli = run(
+        "cheqd-noded debug",
+        "encoding base64-multibase58",
+        fr"{pub_key_base_64}",
+        "")
+
+    return cli.read().strip()
+
+def generate_did() -> str:
+    letters = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+    return ''.join(random.choice(letters) for i in range(16))

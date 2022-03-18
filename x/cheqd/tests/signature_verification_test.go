@@ -4,6 +4,7 @@ import (
 	"crypto/ed25519"
 	"crypto/rand"
 	"fmt"
+	"github.com/btcsuite/btcutil/base58"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/stretchr/testify/require"
 	"reflect"
@@ -40,7 +41,7 @@ func TestDIDDocVerificationMethodChangedWithoutOldSignature(t *testing.T) {
 
 	// check
 	require.Error(t, err)
-	require.Equal(t, fmt.Sprintf("signature %s not found: invalid signature detected", AliceDID), err.Error())
+	require.Equal(t, fmt.Sprintf("there should be at least one signature by %s (old version): signature is required but not found", AliceDID), err.Error())
 }
 
 func TestDIDDocVerificationMethodControllerChangedWithoutOldSignature(t *testing.T) {
@@ -56,7 +57,7 @@ func TestDIDDocVerificationMethodControllerChangedWithoutOldSignature(t *testing
 
 	// check
 	require.Error(t, err)
-	require.Equal(t, fmt.Sprintf("signature %s not found: invalid signature detected", AliceDID), err.Error())
+	require.Equal(t, fmt.Sprintf("there should be at least one signature by %s (old version): signature is required but not found", AliceDID), err.Error())
 }
 
 func TestDIDDocControllerChangedWithoutOldSignature(t *testing.T) {
@@ -72,58 +73,61 @@ func TestDIDDocControllerChangedWithoutOldSignature(t *testing.T) {
 
 	// check
 	require.Error(t, err)
-	require.Equal(t, fmt.Sprintf("signature %s not found: invalid signature detected", AliceDID), err.Error())
+	require.Equal(t, fmt.Sprintf("there should be at least one signature by %s (old version): signature is required but not found", AliceDID), err.Error())
 }
 
 func TestDIDDocVerificationMethodDeletedWithoutOldSignature(t *testing.T) {
 	setup := Setup()
 
 	//Init did
-	_, bodDidDoc, _ := setup.InitDid(BobDID)
 
-	pubKey, privKey, _ := ed25519.GenerateKey(rand.Reader)
-	aliceDid := setup.CreateDid(pubKey, AliceDID)
+	ApubKey, AprivKey, _ := ed25519.GenerateKey(rand.Reader)
+	BpubKey, BprivKey, _ := ed25519.GenerateKey(rand.Reader)
+	aliceDid := setup.CreateDid(ApubKey, AliceDID)
+	bobDid := setup.CreateDid(BpubKey, BobDID)
 
 	aliceDid.VerificationMethod = append(aliceDid.VerificationMethod, &types.VerificationMethod{
 		Id:                 AliceKey2,
 		Controller:         BobDID,
 		Type:               Ed25519VerificationKey2020,
-		PublicKeyMultibase: bodDidDoc.VerificationMethod[0].PublicKeyMultibase,
+		PublicKeyMultibase: "z" + base58.Encode(BpubKey),
 	})
 
-	aliceDid.Authentication = append(aliceDid.Authentication, "did:cheqd:test:alice#key-2")
-
-	aliceKeys := map[string]ed25519.PrivateKey{AliceKey1: privKey}
+	aliceKeys := map[string]ed25519.PrivateKey{AliceKey1: AprivKey, BobKey1: BprivKey}
+	bobKeys := map[string]ed25519.PrivateKey{BobKey1: BprivKey}
+	_, _ = setup.SendCreateDid(bobDid, bobKeys)
 	_, _ = setup.SendCreateDid(aliceDid, aliceKeys)
 
 	updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
 	updatedDidDoc.VerificationMethod = []*types.VerificationMethod{aliceDid.VerificationMethod[0]}
 	updatedDidDoc.Authentication = []string{aliceDid.Authentication[0]}
-	_, err := setup.SendUpdateDid(updatedDidDoc, MapToListOfSignerKeys(aliceKeys))
+	_, err := setup.SendUpdateDid(updatedDidDoc, MapToListOfSignerKeys(bobKeys))
 
 	// check
 	require.Error(t, err)
-	require.Equal(t, "signature did:cheqd:test:bob not found: invalid signature detected", err.Error())
+	require.Equal(t, fmt.Sprintf("there should be at least one signature by %s (old version): signature is required but not found", AliceDID), err.Error())
 }
 
 func TestDIDDocVerificationMethodDeleted(t *testing.T) {
 	setup := Setup()
 
-	//Init did
-	bobKeys, bodDidDoc, _ := setup.InitDid(BobDID)
+	ApubKey, AprivKey, _ := ed25519.GenerateKey(rand.Reader)
+	BpubKey, BprivKey, _ := ed25519.GenerateKey(rand.Reader)
 
-	pubKey, privKey, _ := ed25519.GenerateKey(rand.Reader)
-	aliceDid := setup.CreateDid(pubKey, AliceDID)
+	aliceDid := setup.CreateDid(ApubKey, AliceDID)
+	bobDid := setup.CreateDid(BpubKey, BobDID)
 
 	aliceDid.Authentication = append(aliceDid.Authentication, AliceKey2)
 	aliceDid.VerificationMethod = append(aliceDid.VerificationMethod, &types.VerificationMethod{
 		Id:                 AliceKey2,
 		Controller:         BobDID,
 		Type:               Ed25519VerificationKey2020,
-		PublicKeyMultibase: bodDidDoc.VerificationMethod[0].PublicKeyMultibase,
+		PublicKeyMultibase: "z" + base58.Encode(BpubKey),
 	})
 
-	aliceKeys := map[string]ed25519.PrivateKey{AliceKey1: privKey}
+	aliceKeys := map[string]ed25519.PrivateKey{AliceKey1: AprivKey, BobKey1: BprivKey}
+	bobKeys := map[string]ed25519.PrivateKey{BobKey1: BprivKey}
+	_, _ = setup.SendCreateDid(bobDid, bobKeys)
 	_, _ = setup.SendCreateDid(aliceDid, aliceKeys)
 
 	updatedDidDoc := setup.CreateToUpdateDid(aliceDid)

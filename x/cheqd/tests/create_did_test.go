@@ -394,9 +394,9 @@ func TestCreateDID(t *testing.T) {
 func TestHandler_DidDocAlreadyExists(t *testing.T) {
 	setup := Setup()
 
-	_, _, _ = setup.InitDid("did:cheqd:test:alice")
-	_, _, err := setup.InitDid("did:cheqd:test:alice")
+	_, _, _ = setup.InitDid(AliceDID)
+	_, _, err := setup.InitDid(AliceDID)
 
 	require.Error(t, err)
-	require.Equal(t, "DID is already used by DIDDoc did:cheqd:test:alice: DID Doc exists", err.Error())
+	require.Equal(t, fmt.Sprintf("%s: DID Doc exists", AliceDID), err.Error())
 }

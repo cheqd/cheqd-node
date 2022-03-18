@@ -11,13 +11,12 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
 type SignInput struct {
 	verificationMethodId string
-	privKey ed25519.PrivateKey
+	privKey              ed25519.PrivateKey
 }
 
 // GetTxCmd returns the transaction commands for this module
@@ -38,7 +37,7 @@ func GetTxCmd() *cobra.Command {
 
 func GetPayloadAndSignInputs(clientCtx client.Context, args []string) (string, []SignInput, error) {
 	// Check for args count
-	if len(args) %2 != 1 {
+	if len(args)%2 != 1 {
 		return "", []SignInput{}, fmt.Errorf("invalid number of arguments: %d. must be an odd number", len(args))
 	}
 
@@ -50,7 +49,7 @@ func GetPayloadAndSignInputs(clientCtx client.Context, args []string) (string, [
 
 	for i := 1; i < len(args); i += 2 {
 		vmId := args[i]
-		privKey := args[i + 1]
+		privKey := args[i+1]
 
 		if privKey == "interactive" {
 			inBuf := bufio.NewReader(clientCtx.Input)
@@ -65,7 +64,7 @@ func GetPayloadAndSignInputs(clientCtx client.Context, args []string) (string, [
 
 		privKeyBytes, err := base64.StdEncoding.DecodeString(privKey)
 		if err != nil {
-			return "", nil, errors.Wrap(err, "unable to decode private key")
+			return "", nil, fmt.Errorf("unable to decode private key: %s", err.Error())
 		}
 
 		signInput := SignInput{

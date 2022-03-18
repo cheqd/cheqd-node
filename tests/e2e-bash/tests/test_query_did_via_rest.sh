@@ -37,7 +37,7 @@ assert_tx_successful "$RESULT"
 
 
 # Query DID
-RESULT=$(curl "http://localhost:1317/cheqd/cheqdnode/cheqd/did/${DID}")
+RESULT=$(curl "http://localhost:1317/cheqd/v1/did/${DID}")
 
 EXPECTED='{
    "context":[],
