@@ -21,7 +21,7 @@ docker pull ghcr.io/cheqd/cheqd-node:latest
 To build the image:
 
 * Go to the repository root;
-* Run `docker build -f docker/Dockerfile -t cheqd-node .`.
+* Run `docker build --target node -t cheqd-node -f docker/Dockerfile .`.
 
 Default home directory for `cheqd` user is `/cheqd`. It can be overridden via `CHEQD_HOME_DIR` build argument. Example: `--build-arg CHEQD_HOME_DIR=/home/cheqd`.
 
@@ -47,7 +47,7 @@ Parameters that can be passed via environment variables:
 
 * `NODE_MONIKER` - node moniker;
 * `GENESIS` - base64 encoded content of `genesis.json`;
-* `NODE_ARGS` \(optional\) - argument string passed to the `cheqd-noded start` command.
+* `NODE_ARGS` (optional) - argument string passed to the `cheqd-noded start` command.
 
 Additional parameters that will be applied via `cheqd-noded configure`:
 

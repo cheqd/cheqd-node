@@ -1,5 +1,7 @@
 package utils
 
+import "sort"
+
 func IndexOf(array []string, searchElement string, fromIndex int) int {
 	for i, v := range array[fromIndex:] {
 		if v == searchElement {
@@ -37,7 +39,7 @@ func Subtract(minuend []string, subtrahend []string) []string {
 
 	result := make([]string, 0, len(m))
 
-	for k, _ := range m {
+	for k := range m {
 		result = append(result, k)
 	}
 
@@ -54,7 +56,7 @@ func Unique(array []string) []string {
 
 	result := make([]string, 0, len(m))
 
-	for k, _ := range m {
+	for k := range m {
 		result = append(result, k)
 	}
 
@@ -62,7 +64,7 @@ func Unique(array []string) []string {
 }
 
 func IsUnique(list []string) bool {
-	set :=map[string]bool{}
+	set := map[string]bool{}
 
 	for _, did := range list {
 		set[did] = true
@@ -79,4 +81,18 @@ func ToInterfaces(list []string) []interface{} {
 	}
 
 	return res
+}
+
+func ReplaceInSlice(list []string, old, new string) {
+	for i := range list {
+		if list[i] == old {
+			list[i] = new
+		}
+	}
+}
+
+func UniqueSorted(ls []string) []string {
+	tmp_ := Unique(ls)
+	sort.Strings(tmp_)
+	return tmp_
 }

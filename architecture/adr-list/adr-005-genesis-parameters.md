@@ -21,13 +21,13 @@ Genesis consists of Tendermint consensus engine parameters and Cosmos app-specif
 
 ### Consensus parameters
 
-Tendermint requires [genesis parameters](https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#genesis) to be defined for basic consensus conditions on any Cosmos network.
+Tendermint requires [genesis parameters](https://docs.tendermint.com/v0.35/tendermint-core/using-tendermint.html#genesis) to be defined for basic consensus conditions on any Cosmos network.
 
 * **`block`**
-  * `max_bytes` = `200000` \(~200 KB\)
-    * Cosmos Hub: `200000` \(~200 KB\)
-  * `max_gas` = `2000000` \(~20 txs\)
-    * Cosmos Hub: `2000000` \(~20 txs\)
+  * `max_bytes` = `200000` (~200 KB)
+    * Cosmos Hub: `200000` (~200 KB)
+  * `max_gas` = `2000000` (~20 txs)
+    * Cosmos Hub: `2000000` (~20 txs)
   * `time_iota_ms` = `1000` (1 second)
 * **`evidence`**
   * `max_age_num_blocks` = `121000`
@@ -60,8 +60,8 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
   * `default_send_enabled` = `true`
     * The default send enabled value allows send transfers for all coin denominations
 * **`crisis`**
-  * `constant_fee` = `{ "denom": "ncheq", "amount": "10000000000000" }` \(10,000 `cheq`\)
-    * The fee is used to verify the [invariant\(s\)](https://docs.cosmos.network/v0.44/building-modules/invariants.html) in the `crisis` module.
+  * `constant_fee` = `{ "denom": "ncheq", "amount": "10000000000000" }` (10,000 `cheq`)
+    * The fee is used to verify the [invariant(s)](https://docs.cosmos.network/v0.44/building-modules/invariants.html) in the `crisis` module.
 * **`distribution`**
   * `community_tax` = `0.02`
     * The percent of rewards that goes to the community fund pool
@@ -73,12 +73,12 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
     * Whether withdrawal address can be changed or not. By default, it's the delegator's address.
 * **`gov`**
   * `deposit_params`
-    * min\_deposit = `[{ "denom": "ncheq", "amount": "8000000000000" }]` \(8,000 `cheq`\)
+    * min\_deposit = `[{ "denom": "ncheq", "amount": "8000000000000" }]` (8,000 `cheq`)
       * The minimum deposit for a proposal to enter the voting period.
-    * `max_deposit_period` = `604800s` \(1 week\)
+    * `max_deposit_period` = `604800s` (1 week)
       * The maximum period for Atom holders to deposit on a proposal. Initial value: 2 months.
   * `voting_params`
-    * voting\_period = `604800s` \(1 week\)
+    * voting\_period = `604800s` (1 week)
   * `tally_params`
     * `quorum` = `0.334`
       * Minimum percentage of total stake needed to vote for a result to be considered valid.
@@ -104,7 +104,7 @@ Cosmos application is divided [into a list of modules](https://docs.cosmos.netwo
     * Cosmos Hub: `4360000`
 * **`slashing`**
   * `signed_blocks_window` = `25920` (expressed in blocks, equates to 259200 seconds or ~3 days)
-    * Cosmos Hub: `10000` \(~20h\)
+    * Cosmos Hub: `10000` (~20h)
     * Number of blocks a validator can miss signing before it is slashed
   * `min_signed_per_window`= `0.50`
     * This percentage of blocks must be signed within the window
@@ -162,5 +162,4 @@ The parameters above were agreed to be used for the cheqd network testnet, with 
 ## References
 
 * [List of Cosmos modules](https://docs.cosmos.network/v0.44/modules/)
-* [Tendermint genesis parameters](https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#genesis)
-
+* [Tendermint genesis parameters](https://docs.tendermint.com/v0.35/tendermint-core/using-tendermint.html#genesis)

@@ -89,6 +89,17 @@ func IsDIDUrl(allowedNamespaces []string, pathRule, queryRule, fragmentRule Vali
 	})
 }
 
+func IsURI() *CustomErrorRule {
+	return NewCustomErrorRule(func(value interface{}) error {
+		casted, ok := value.(string)
+		if !ok {
+			panic("IsURI must be only applied on string properties")
+		}
+
+		return utils.ValidateURI(casted)
+	})
+}
+
 func IsMultibase() *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.(string)

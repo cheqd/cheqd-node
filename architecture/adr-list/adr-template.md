@@ -17,7 +17,7 @@ What is the status, such as proposed, accepted, rejected, deprecated, superseded
 
 ## Summary
 
-> A short \(~100 word\) description of the issue being addressed. "If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the ADR.
+> A short (~100 word) description of the issue being addressed. "If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the ADR.
 
 ## Context
 

@@ -43,22 +43,22 @@ func (s Service) Validate(baseDid string, allowedNamespaces []string) error {
 	)
 }
 
-func ValidService(baseDid string, allowedNamespaces []string) *CustomErrorRule {
+func ValidServiceRule(baseDid string, allowedNamespaces []string) *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.(Service)
 		if !ok {
-			panic("ValidVerificationMethod must be only applied on verification methods")
+			panic("ValidVerificationMethodRule must be only applied on verification methods")
 		}
 
 		return casted.Validate(baseDid, allowedNamespaces)
 	})
 }
 
-func IsUniqueServiceList() *CustomErrorRule {
+func IsUniqueServiceListByIdRule() *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.([]*Service)
 		if !ok {
-			panic("IsUniqueServiceList must be only applied on service lists")
+			panic("IsUniqueServiceListByIdRule must be only applied on service lists")
 		}
 
 		ids := GetServiceIds(casted)
