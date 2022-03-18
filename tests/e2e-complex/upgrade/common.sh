@@ -59,7 +59,7 @@ function docker_compose_up () {
     export CHEQD_IMAGE_NAME="$1"
     export MOUNT_POINT="$2"
 
-    docker compose --env-file .env up
+    docker compose --env-file .env up -d
 }
 
 # Stop docker-compose
