@@ -5,6 +5,16 @@ set -euox pipefail
 # shellcheck disable=SC1091
 . common.sh
 
+cheqd_noded_docker() {
+    docker run --rm \
+        -v "$(pwd):/cheqd" \
+        --network host \
+        -u root \
+        -e HOME=/cheqd \
+        --entrypoint "cheqd-noded" \
+        ${CHEQD_IMAGE_TO} "$@"
+}
+
 # Wait for upgrade height
 bash ../../tools/wait-for-chain.sh "$UPGRADE_HEIGHT" $((2 * VOTING_PERIOD))
 
