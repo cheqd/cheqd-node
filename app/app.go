@@ -214,6 +214,9 @@ type App struct {
 
 	// the module manager
 	mm *module.Manager
+
+	// module configurator
+	configurator module.Configurator
 }
 
 // New returns a reference to an initialized Gaia.
@@ -300,30 +303,6 @@ func New(
 		app.GetSubspace(crisistypes.ModuleName), invCheckPeriod, app.BankKeeper, authtypes.FeeCollectorName,
 	)
 	app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath, app.BaseApp)
-
-	// Upgrade handler
-	app.UpgradeKeeper.SetUpgradeHandler("v0.3", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("Handler for upgrade plan: v0.3")
-
-		app.TestNetMigration(ctx)
-		initialVM := app.mm.GetVersionMap()
-		return initialVM, nil
-	})
-
-	app.UpgradeKeeper.SetUpgradeHandler("v0.4", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("Handler for upgrade plan: v0.4")
-
-		initialVM := app.mm.GetVersionMap()
-		return initialVM, nil
-	})
-
-	app.UpgradeKeeper.SetUpgradeHandler("v0.5", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("Handler for upgrade plan: v0.5")
-
-		app.Migration05(ctx)
-		initialVM := app.mm.GetVersionMap()
-		return initialVM, nil
-	})
 
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
@@ -457,7 +436,30 @@ func New(
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter(), encodingConfig.Amino)
-	app.mm.RegisterServices(module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter()))
+	app.configurator = module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
+	app.mm.RegisterServices(app.configurator)
+
+	// Upgrade handlers
+	app.UpgradeKeeper.SetUpgradeHandler("v0.3", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx.Logger().Info("Handler for upgrade plan: v0.3")
+
+		app.TestNetMigration(ctx)
+		initialVM := app.mm.GetVersionMap()
+		return initialVM, nil
+	})
+
+	app.UpgradeKeeper.SetUpgradeHandler("v0.4", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx.Logger().Info("Handler for upgrade plan: v0.4")
+
+		initialVM := app.mm.GetVersionMap()
+		return initialVM, nil
+	})
+
+	app.UpgradeKeeper.SetUpgradeHandler("v0.5", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx.Logger().Info("Handler for upgrade plan: v0.5")
+
+		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
+	})
 
 	// initialize stores
 	app.MountKVStores(keys)
