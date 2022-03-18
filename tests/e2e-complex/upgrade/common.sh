@@ -136,7 +136,6 @@ function send_did_new () {
 
     # Post the message
     did=$(cheqd_noded_docker tx cheqd create-did "${MSG_CREATE_DID}" "${KEY_ID}" "${ALICE_VER_PRIV_BASE_64}" \
-        --ver-key "${ALICE_VER_PRIV_BASE_64}" \
         --from operator0 \
         --gas-prices "25ncheq" \
         --chain-id $CHAIN_ID \
