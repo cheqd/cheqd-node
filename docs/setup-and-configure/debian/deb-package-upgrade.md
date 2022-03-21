@@ -44,6 +44,11 @@ However, as best practice we recommend backing up the [app data directories for 
    | :--- |
    | If you are [upgrading from v0.2.x to any higher release version](#upgrade-from-02x), the default home directory folder has changed and may need to be manually configured |
 
+   | :warning: WARNING |
+   | :--- |
+   | If you have `0.4.x` already installed we recommend to remove previous one and install new package insted of just installing th new one (over `0.4.x`) |
+4. | For make it you can run `$ sudo dpkg -r cheqd-node` and the install command after as usual |
+
    Install the `cheqd-node` package downloaded (with `sudo` privileges or as `root` user, if necessary):
 
    ```bash
@@ -56,7 +61,7 @@ However, as best practice we recommend backing up the [app data directories for 
    sudo CHEQD_HOME_DIR=/path/to/home/directory dpkg -i cheqd-node_0.4.0_amd64.deb
    ```
 
-4. **Re-start the `cheqd-noded` service and confirm it is running**
+5. **Re-start the `cheqd-noded` service and confirm it is running**
 
    To start the `cheqd-noded` service (with `sudo` privileges or as `root` user, if necessary):
 
