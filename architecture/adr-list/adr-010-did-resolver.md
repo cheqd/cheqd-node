@@ -53,11 +53,10 @@ Inconsistencies between DIDDoc from the ledger and specification that should be 
 
  helping to define its architecture in detail:
 
-- Parallel executing of requests
-- Synchronous replying for client requests (?)
-- Marshal/unmarshal JSON - object - protobuff
-- Programming language: Go
+- Cheqd DID Resolver has to marshal/unmarshal protobuf object to a resealable JSON DIDDoc.
+- Use Golang programming language for Cheqd DID Resolver.
 - Use a framework like Goji or Echo, because it handles things like HTTP status codes etc that are part of DID resolution, handling and catching errors.
+- Use Node.js ( +itty-router ) proxy for Universal Resolver Driver.
 
 ## Overall Architecture of DID Resolver(s)
 
@@ -133,7 +132,7 @@ To level out downsides of this approach a client can choose one of suitable flow
 ### 1. Universal resolver on DIF side
 
 DIF company has an experimental setup of Universal Resolver on the https://dev.uniresolver.io
-The first "Universal Resolver" section from the [schema 1](#did-resolution-from-the-cheqd-network-ledger) shows this flow.
+The first "Universal Resolver" section from the [schema 1](#cheqd-did-resolver--universal-resolver-driver) shows this flow.
 - A client just sends a request to https://dev.uniresolver.io. 
 - Universal Resolver on DIF servers uses Cheqd Universal Resolver Driver to redirect client request to Cheqd DID Resolver.
 - Cheqd DID Resolver gets DID Doc in protobuf format from the ledger throw Cosmos SDK gRPC API
@@ -190,7 +189,7 @@ But the client sets up
 
 Cheqd provide its own web service with a DID resolver. If a client doesn't need in Universal Resolver then requests can 
 be sent directly to Cheqd Resolver Web Servise. 
-This flow is demonstrated in the second "Client <-> Web Service Resolver" section from the [schema 1](#did-resolution-from-the-cheqd-network-ledger).
+This flow is demonstrated in the second "Client <-> Web Service Resolver" section from the [schema 1](#cheqd-did-resolver--universal-resolver-driver).
 - A client sends a request to Cheqd DID Resolver web service.
 - Cheqd DID Resolver gets DID Doc in protobuf format from the ledger throw Cosmos SDK gRPC API
 - Cheqd DID Resolver generates and sends an answer for the client request based on received DID Doc.
@@ -223,7 +222,7 @@ But the client sets up Cheqd resolver web service by themselves.
 ### 6. Using Cheqd resolver as a Go module (library)
 
 A client application can use Cheqq Resolver as a library. 
-This flow is demonstrated in the third "Client <-> Ledger" section from the [schema 1](#did-resolution-from-the-cheqd-network-ledger).
+This flow is demonstrated in the third "Client <-> Ledger" section from the [schema 1](#cheqd-did-resolver--universal-resolver-driver).
 - A client sends a request directly to Cheqd Node throw Cosmos SDK gRPC API
 - Received DID Doc in protobuf the client application can format to resolvable DID Document or DID fragment in JSON format. 
 
