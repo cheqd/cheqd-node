@@ -46,8 +46,7 @@ However, as best practice we recommend backing up the [app data directories for 
 
    | :warning: WARNING |
    | :--- |
-   | If you have `0.4.x` already installed we recommend to remove previous one and install new package insted of just installing th new one (over `0.4.x`) |
-4. | For make it you can run `$ sudo dpkg -r cheqd-node` and the install command after as usual |
+   | If you have `0.4.x` already installed we recommend to remove previous one and install new package insted of just installing th new one (over `0.4.x`). For make it you can run `$ sudo dpkg -r cheqd-node` and the install command after as usual |
 
    Install the `cheqd-node` package downloaded (with `sudo` privileges or as `root` user, if necessary):
 
