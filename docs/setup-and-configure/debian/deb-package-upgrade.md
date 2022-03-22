@@ -152,17 +152,17 @@ and check the service status or just check RPC endpoint.
 Due to changes in the `postremove` script it's highly recommended not to install packages `0.4.1` and higher version just over `0.4.0` one cause it requires double installing for it.
 We recommend using the next schema for upgrading from `0.4.0` version:
 
-- Remove `0.4.0` package by calling:
+* Remove `0.4.0` package by calling:
 
-```bash
-$ sudo dpkg -r cheqd-node
-```
+    ```bash
+    sudo dpkg -r cheqd-node
+    ```
 
-- Install new package in a general way:
+* Install new package in a general way:
 
-```bash
-$ sudo dpkg -i <cheqd-node-package>
-```
+    ```bash
+    sudo dpkg -i <cheqd-node-package>
+    ```
 
 ## Next steps
 
