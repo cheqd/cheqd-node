@@ -44,6 +44,10 @@ However, as best practice we recommend backing up the [app data directories for 
    | :--- |
    | If you are [upgrading from v0.2.x to any higher release version](#upgrade-from-02x), the default home directory folder has changed and may need to be manually configured |
 
+   | :warning: WARNING |
+   | :--- |
+   | If you are [upgrading from `0.4.0` to any higher release version](#upgrade-from-040), we recommend to remove previous one and install the new package instead of "simple installing" (over `0.4.x`). |
+
    Install the `cheqd-node` package downloaded (with `sudo` privileges or as `root` user, if necessary):
 
    ```bash
@@ -103,7 +107,7 @@ The default home directory in v0.2.x used to be `/var/lib/cheqd`, but can be mod
 sudo CHEQD_HOME_DIR=/path/to/home/directory dpkg -i cheqd-node_0.3.3_amd64.deb
 ```
 
-In general, it's not required and up to system administrators how to ensure safe revocring after crashes.
+In general, it's not required and up to system administrators how to ensure safe recovering after crashes.
 
 If you have `0.2.3` version installed and you want to follow the new `$HOME` directory approach the next steps can help with it:
 
@@ -142,6 +146,23 @@ If you have `0.2.3` version installed and you want to follow the new `$HOME` dir
    ```
 
 and check the service status or just check RPC endpoint.
+
+## Upgrade from `0.4.0`
+
+Due to changes in the `postremove` script it's highly recommended not to install packages `0.4.1` and higher version just over `0.4.0` one cause it requires double installing for it.
+We recommend using the next schema for upgrading from `0.4.0` version:
+
+* Remove `0.4.0` package by calling:
+
+    ```bash
+    sudo dpkg -r cheqd-node
+    ```
+
+* Install new package in a general way:
+
+    ```bash
+    sudo dpkg -i <cheqd-node-package>
+    ```
 
 ## Next steps
 
