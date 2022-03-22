@@ -60,7 +60,7 @@ However, as best practice we recommend backing up the [app data directories for 
    sudo CHEQD_HOME_DIR=/path/to/home/directory dpkg -i cheqd-node_0.4.0_amd64.deb
    ```
 
-5. **Re-start the `cheqd-noded` service and confirm it is running**
+4. **Re-start the `cheqd-noded` service and confirm it is running**
 
    To start the `cheqd-noded` service (with `sudo` privileges or as `root` user, if necessary):
 
