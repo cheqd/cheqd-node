@@ -35,6 +35,11 @@ jobs:
       - name: Restore binary permissions
         run: sudo chmod +x cheqd-noded
 
+      - name: Debug
+        run: |
+          ls -la cheqd-noded
+          ./cheqd-noded version
+
       - name: Set RC version
         id: set-version
         run: |
