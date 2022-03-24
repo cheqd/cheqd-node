@@ -17,8 +17,6 @@ fi
 
 PKG_NAME="cheqd-node"
 
-echo $VERSION
-exit 1
 BUILD_DIR="build"
 OUTPUT_DIR="output"
 
