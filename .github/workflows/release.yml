@@ -31,7 +31,7 @@ jobs:
     name: Run a pre-release
     runs-on: ubuntu-20.04
     environment: Pre-Release
-    needs: wait-for-tests
+    needs: wait-for-all-previous
     steps:
       - name: Get artifact from tests
         uses: dawidd6/action-download-artifact@v2
