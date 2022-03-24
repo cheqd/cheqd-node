@@ -35,15 +35,10 @@ jobs:
       - name: Restore binary permissions
         run: sudo chmod +x cheqd-noded
 
-      - name: Debug
-        run: |
-          ls -la cheqd-noded
-          ./cheqd-noded version
-
       - name: Set RC version
         id: set-version
         run: |
-          VERSION=$(cheqd-noded version 2>&1)
+          VERSION=$(./cheqd-noded version 2>&1)
           echo "::set-output name=RCVERSION::$VERSION-rc"
 
 
@@ -148,7 +143,7 @@ jobs:
       - name: Set release version
         id: set-version
         run: |
-          VERSION=$(cheqd-noded version 2>&1)
+          VERSION=$(./cheqd-noded version 2>&1)
           echo "::set-output name=VERSION::$VERSION-rc"
 
 
