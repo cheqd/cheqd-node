@@ -21,7 +21,7 @@ jobs:
     name: Wait for linter
     runs-on: ubuntu-20.04
     steps:
-      - name: Wait for job 'Finished' from linter
+      - name: Wait for jobs finished on lint workflow
         uses: lewagon/wait-on-check-action@v1.0.0
         with:
           ref: ${{ github.ref }}
@@ -45,7 +45,7 @@ jobs:
         run: go test -v ./...
 
   build-binary:
-    name: Build binary
+    name: "Build: binary"
     runs-on: ubuntu-20.04
     needs: wait-for-lint
     outputs:
@@ -101,7 +101,7 @@ jobs:
           echo "::set-output name=VERSION::$VERSION"
 
   build-tar-package:
-    name: Build tar package
+    name: "Build: tar package"
     runs-on: ubuntu-20.04
     needs: build-binary
     env:
@@ -129,7 +129,7 @@ jobs:
           path: build-tools/output/cheqd-node_${{ env.VERSION }}.tar.gz
 
   build-deb-package:
-    name: Build deb package
+    name: "Build: deb package"
     runs-on: ubuntu-20.04
     needs: build-binary
     env:
@@ -162,7 +162,7 @@ jobs:
           path: build-tools/output/cheqd-node_${{ env.VERSION }}_amd64.deb
 
   build-node-images:
-    name: Build cheqd-node and cheqd-cli images
+    name: "Build: cheqd-node and cheqd-cli images"
     runs-on: ubuntu-20.04
     needs: wait-for-lint
     steps:
@@ -196,7 +196,7 @@ jobs:
           path: cheqd-node-image.tar
 
 #  test-new-node-setup-from-deb:
-#    name: Test new node setup from deb
+#    name: "Test: New node setup from deb"
 #    runs-on: ubuntu-20.04
 #    needs: [build-binary, build-deb-package, build-node-images]
 #    env:
@@ -251,7 +251,7 @@ jobs:
 #          journalctl -ex | grep cheqd
 #
 #  run-python-based-integration-tests:
-#    name: Run python based cosmos and identity tests
+#    name: "Test: Run python based cosmos and identity tests"
 #    runs-on: ubuntu-20.04
 #    needs: [build-node-images, build-binary]
 #    steps:
@@ -312,7 +312,7 @@ jobs:
 #          pytest -v -rP test_identity.py
 #
 #  run-bash-based-integration-tests:
-#    name: Run bash based identity tests
+#    name: "Test: Run bash based identity tests"
 #    runs-on: ubuntu-20.04
 #    needs: [build-binary, build-node-images]
 #    steps:
@@ -356,7 +356,7 @@ jobs:
 #          bash run_all.sh
 #
 #  run-upgrade-test-positive-case:
-#    name: Run positive case for upgrade
+#    name: "Test: Run positive case for upgrade"
 #    runs-on: ubuntu-20.04
 #    needs: build-node-images
 #    steps:
