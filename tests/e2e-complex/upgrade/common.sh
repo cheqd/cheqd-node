@@ -31,7 +31,7 @@ DID_2="did:cheqd:testnet:2222222222222222"
 
 
 GAS="auto"
-GAS_ADJUSTMENT="1.5"
+GAS_ADJUSTMENT="2"
 GAS_PRICES="25ncheqd"
 TX_PARAMS="--gas ${GAS} --gas-adjustment ${GAS_ADJUSTMENT} --gas-prices ${GAS_PRICES} --chain-id ${CHAIN_ID} -y"
 
