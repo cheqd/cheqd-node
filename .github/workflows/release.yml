@@ -38,7 +38,7 @@ jobs:
       - name: Set RC version
         id: set-version
         run: |
-          VERSION=$(build/cheqd-noded version 2>&1)
+          VERSION=$(cheqd-noded version 2>&1)
           echo "::set-output name=RCVERSION::$VERSION-rc"
 
 
@@ -143,7 +143,7 @@ jobs:
       - name: Set release version
         id: set-version
         run: |
-          VERSION=$(build/cheqd-noded version 2>&1)
+          VERSION=$(cheqd-noded version 2>&1)
           echo "::set-output name=VERSION::$VERSION-rc"
 
 
