@@ -156,39 +156,39 @@ jobs:
           name: cheqd-node_${{ env.VERSION }}_amd64.deb
           path: build-tools/output/cheqd-node_${{ env.VERSION }}_amd64.deb
 
-#  build-node-images:
-#    name: "Build: cheqd-node and cheqd-cli images"
-#    runs-on: ubuntu-20.04
-#    needs: wait-for-lint
-#    steps:
-#      - uses: actions/checkout@v2
-#        with:
-#          fetch-depth: 0 # Required to fetch version
-#
-#      - name: Build cheqd-cli with 'cheqd-noded' as entrypoint
-#        # TODO: Get rid of UID and GID
-#        run: docker build --target base -t cheqd-cli -f docker/Dockerfile --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" .
-#
-#      - name: Build cheqd-node with 'node-start' as entrypoint
-#        run: docker build --target node -t cheqd-node -f docker/Dockerfile --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" .
-#
-#      - name: Save cheqd-cli
-#        run: docker save -o cheqd-cli-image.tar cheqd-cli
-#
-#      - name: Save cheqd-node
-#        run: docker save -o cheqd-node-image.tar cheqd-node
-#
-#      - name: Store cheqd-cli artifact
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: cheqd-cli-image.tar
-#          path: cheqd-cli-image.tar
-#
-#      - name: Store cheqd-node artifact
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: cheqd-node-image.tar
-#          path: cheqd-node-image.tar
+  build-node-images:
+    name: "Build: cheqd-node and cheqd-cli images"
+    runs-on: ubuntu-20.04
+    needs: wait-for-lint
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # Required to fetch version
+
+      - name: Build cheqd-cli with 'cheqd-noded' as entrypoint
+        # TODO: Get rid of UID and GID
+        run: docker build --target base -t cheqd-cli -f docker/Dockerfile --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" .
+
+      - name: Build cheqd-node with 'node-start' as entrypoint
+        run: docker build --target node -t cheqd-node -f docker/Dockerfile --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" .
+
+      - name: Save cheqd-cli
+        run: docker save -o cheqd-cli-image.tar cheqd-cli
+
+      - name: Save cheqd-node
+        run: docker save -o cheqd-node-image.tar cheqd-node
+
+      - name: Store cheqd-cli artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: cheqd-cli-image.tar
+          path: cheqd-cli-image.tar
+
+      - name: Store cheqd-node artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: cheqd-node-image.tar
+          path: cheqd-node-image.tar
 
 #  test-new-node-setup-from-deb:
 #    name: "Test: New node setup from deb"
