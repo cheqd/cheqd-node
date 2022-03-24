@@ -22,11 +22,12 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Get artifact from tests
-        uses: dawidd6/action-download-artifact@v2
+        uses: lewagon/wait-on-check-action@v1.0.0
         with:
-          workflow: lint.yml
-      - name: Check artifacts
-        run: ls -la
+          ref: ${{ github.ref }}
+          check-name: 'Linter finished'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 10
 
   run-unit-test:
     name: Run unit tests
