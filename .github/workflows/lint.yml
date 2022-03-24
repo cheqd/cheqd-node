@@ -71,15 +71,8 @@ jobs:
         VALIDATE_YAML: true
 
   end-linting:
-    name: End for all checks
+    name: Linter finished
     runs-on: ubuntu-20.04
     needs: [super-lint, sh-euox-pipefail-check, md-link-check, go-lint]
     steps:
-      - name: Create a simple file
-        run: touch finished.txt
-
-      - name: Store artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: result
-          path: finished.txt
+      - name: Wait for all jobs to finish
