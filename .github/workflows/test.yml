@@ -21,11 +21,11 @@ jobs:
     name: Wait for linter
     runs-on: ubuntu-20.04
     steps:
-      - name: Get artifact from tests
+      - name: Wait for job 'Finished' from linter
         uses: lewagon/wait-on-check-action@v1.0.0
         with:
           ref: ${{ github.ref }}
-          check-name: 'Linter finished'
+          running-workflow-name: 'Lint'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 10
 
