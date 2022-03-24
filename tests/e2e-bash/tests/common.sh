@@ -6,7 +6,7 @@ set -euox pipefail
 export RPC_URL="http://localhost:26657"
 export CHAIN_ID="cheqd"
 export GAS="auto"
-export GAS_ADJUSTMENT="1.2"
+export GAS_ADJUSTMENT="1.3"
 export GAS_PRICES="25ncheq"
 export KEYRING_BACKEND="test"
 export OUTPUT_FORMAT="json"
