@@ -49,6 +49,7 @@ jobs:
     needs: pre-release
     env:
       RCVERSION: ${{ needs.pre-release.outputs.RCVERSION }}
+      REGISTRY: ghcr.io
     steps:
       - name: Get cheqd-cli image from tests
         uses: dawidd6/action-download-artifact@v2
@@ -98,6 +99,8 @@ jobs:
     env:
       RCVERSION: ${{ needs.pre-release.outputs.RCVERSION }}}
     steps:
+      - uses: actions/checkout@v2
+
       - name: Get artifact from tests
         uses: dawidd6/action-download-artifact@v2
         with:
@@ -154,6 +157,8 @@ jobs:
     outputs:
       VERSION: ${{ steps.release.outputs.VERSION }}
     steps:
+      - uses: actions/checkout@v2
+
       - name: Get artifact from tests
         uses: dawidd6/action-download-artifact@v2
         with:
@@ -185,6 +190,7 @@ jobs:
     needs: release
     env:
       VERSION: ${{ needs.release.outputs.VERSION }}
+      REGISTRY: ghcr.io
     steps:
       - name: Get cheqd-cli image from tests
         uses: dawidd6/action-download-artifact@v2
