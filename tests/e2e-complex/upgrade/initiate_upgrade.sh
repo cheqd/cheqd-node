@@ -6,44 +6,32 @@ set -euox pipefail
 . common.sh
 
 # Send proposal to pool
+# shellcheck disable=SC2086
 local_client_tx tx gov submit-proposal software-upgrade \
     "$UPGRADE_NAME" \
     --title "Upgrade-to-new-version" \
     --description "Description-of-upgrade-to-new-version" \
     --upgrade-height "$UPGRADE_HEIGHT" \
     --from operator1 \
-    --gas auto \
-    --gas-adjustment 1.2 \
-    --gas-prices "25ncheq" \
-    --chain-id "$CHAIN_ID" \
-    -y
+    ${TX_PARAMS}
 
 # Set the deposit from operator0
+# shellcheck disable=SC2086
 local_client_tx tx gov deposit 1 \
     "${DEPOSIT_AMOUNT}ncheq" \
     --from operator0 \
-    --gas auto \
-    --gas-adjustment 1.2 \
-    --gas-prices 25ncheq \
-    --chain-id "$CHAIN_ID" \
-    -y
+    ${TX_PARAMS}
 
 # Make a vote for operator0
+# shellcheck disable=SC2086
 local_client_tx tx gov vote 1 \
     yes \
     --from operator0 \
-    --gas auto \
-    --gas-adjustment 1.3 \
-    --gas-prices 25ncheq \
-    --chain-id "$CHAIN_ID" \
-    -y
+    ${TX_PARAMS}
 
 # Make a vote for operator1
+# shellcheck disable=SC2086
 local_client_tx tx gov vote 1 \
     yes \
     --from operator1 \
-    --gas auto \
-    --gas-adjustment 1.3 \
-    --gas-prices 25ncheq \
-    --chain-id "$CHAIN_ID" \
-    -y
+    ${TX_PARAMS}
