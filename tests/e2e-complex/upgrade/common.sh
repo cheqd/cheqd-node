@@ -31,8 +31,8 @@ DID_2="did:cheqd:testnet:2222222222222222"
 
 
 GAS="auto"
-GAS_ADJUSTMENT="2"
-GAS_PRICES="25ncheqd"
+GAS_ADJUSTMENT="1.3"
+GAS_PRICES="25ncheq"
 TX_PARAMS="--gas ${GAS} --gas-adjustment ${GAS_ADJUSTMENT} --gas-prices ${GAS_PRICES} --chain-id ${CHAIN_ID} -y"
 
 # cheqd_noded docker wrapper
