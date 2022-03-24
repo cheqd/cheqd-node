@@ -6,7 +6,11 @@ on:
       - completed
     workflows:
       - "Build and Test"
-  push:
+    tags:
+      - "v*"
+    branches:
+      - main
+#  push:
 #    tags:
 #      - "v*"
 

@@ -17,6 +17,17 @@ env:
   NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/docker/localnet/network-config"
 
 jobs:
+#  wait-for-lint:
+#    name: Wait for linter
+#    runs-on: ubuntu-20.04
+#    steps:
+#      - name: Get artifact from tests
+#        uses: dawidd6/action-download-artifact@v2
+#        with:
+#          workflow: lint.yml
+#      - name: Check artifacts
+#        run: ls -la
+
   run-unit-test:
     name: Run unit tests
     runs-on: ubuntu-20.04
