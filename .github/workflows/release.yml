@@ -97,7 +97,7 @@ jobs:
     runs-on: ubuntu-20.04
     needs: pre-release
     env:
-      RCVERSION: ${{ needs.pre-release.outputs.RCVERSION }}}
+      RCVERSION: ${{ needs.pre-release.outputs.RCVERSION }}
     steps:
       - uses: actions/checkout@v2
 
