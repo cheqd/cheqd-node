@@ -1,15 +1,6 @@
 name: Release
 
 on:
-#  workflow_run:
-#    types:
-#      - completed
-#    workflows:
-#      - "Build and Test"
-#    tags:
-#      - "v*"
-#    branches:
-#      - main
   push:
 #    tags:
 #      - "v*"
@@ -38,7 +29,7 @@ jobs:
         with:
           workflow: test.yml
       - name: Check artifacts
-        run: ls -la
+        run: ls -la cheqd-node_0.5.0.*
 
 
 

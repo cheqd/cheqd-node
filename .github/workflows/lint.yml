@@ -1,56 +1,58 @@
 name: Lint
-on: workflow_call
-defaults:
-  run:
-    shell: bash
-concurrency: 
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+#on: [push]
+on:
+  push:
+    branches:
+      - master
 
 jobs:
+
+  # We can't use VALIDATE_GO from super linter because of this issue:
+  # https://github.com/github/super-linter/issues/143
+  go-lint:
+    name: "Lint: lint Go"
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.43.0
+          args: --timeout 5m0s
+
+  md-link-check:
+    name: "Lint: Check Markdown links"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Check if Markdown links are valid
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with: 
+          config-file: '.github/linters/mlc_config.json'
+          folder-path: "."
 
   sh-euox-pipefail-check:
     name: "Lint: Check for 'set -euox pipefail' in shell scripts"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: Check that all shell scripts use 'set -euox pipefail'
         run: bash .github/scripts/ensure_set_euox_pipefail.sh
 
-  # We can't use VALIDATE_GO from super linter because of this issue:
-  # https://github.com/github/super-linter/issues/143
-  go-lint:
-    name: "Lint: Golang"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/setup-go@v2
-      - uses: actions/checkout@v3
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v2
-        with:
-          version: latest
-          args: --timeout 5m0s
-
-  md-link-check:
-    name: "Lint: Check for broken Markdown links"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Check if Markdown links are valid
-        uses: gaurav-nelson/github-action-markdown-link-check@v1
-        with:
-          config-file: '.github/linters/mlc_config.json'
-          use-quiet-mode: 'yes'
-          use-verbose-mode: 'yes'
-
   super-lint:
-    name: "Lint: Super Linter"
+    name: "Lint: Run super linter"
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v2
       with:
         fetch-depth: 0 # Required to fetch version
-    - name: Run Super Linter
+
+    - name: Super-Linter
       uses: github/super-linter/slim@v4
       env:
         IGNORE_GITIGNORED_FILES: true
@@ -61,7 +63,7 @@ jobs:
         MULTI_STATUS: true
 
         VALIDATE_BASH: true
-        VALIDATE_GITHUB_ACTIONS: true
+        # VALIDATE_GITHUB_ACTIONS: true
         VALIDATE_JSON: true
         VALIDATE_MARKDOWN: true
         VALIDATE_OPENAPI: true
