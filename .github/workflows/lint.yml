@@ -7,7 +7,7 @@ jobs:
   # We can't use VALIDATE_GO from super linter because of this issue:
   # https://github.com/github/super-linter/issues/143
   go-lint:
-    name: Lint Go
+    name: "Lint: lint Go"
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -18,7 +18,7 @@ jobs:
           args: --timeout 5m0s
 
   md-link-check:
-    name: Check Markdown links
+    name: "Lint: Check Markdown links"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -31,7 +31,7 @@ jobs:
           folder-path: "."
 
   sh-euox-pipefail-check:
-    name: Check for 'set -euox pipefail' in shell scripts
+    name: "Lint: Check for 'set -euox pipefail' in shell scripts"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -41,7 +41,7 @@ jobs:
         run: bash .github/scripts/ensure_set_euox_pipefail.sh
 
   super-lint:
-    name: Run super linter
+    name: "Lint: Run super linter"
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -69,10 +69,10 @@ jobs:
         VALIDATE_XML: true
         VALIDATE_YAML: true
 
-  end-linting:
-    name: Linter finished
-    runs-on: ubuntu-20.04
-    needs: [super-lint, sh-euox-pipefail-check, md-link-check, go-lint]
-    steps:
-      - name: Wait for all jobs to finish
-        run: echo "Mark workflow finished"
+#  end-linting:
+#    name: Linter finished
+#    runs-on: ubuntu-20.04
+#    needs: [super-lint, sh-euox-pipefail-check, md-link-check, go-lint]
+#    steps:
+#      - name: Wait for all jobs to finish
+#        run: echo "Mark workflow finished"
