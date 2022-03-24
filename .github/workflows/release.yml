@@ -15,15 +15,15 @@ on:
 #      - "v*"
 
 jobs:
-  wait-for-tests:
-    name: Wait for Tests
+  wait-for-all-previous:
+    name: Wait for all previous jobs
     runs-on: ubuntu-20.04
     steps:
       - name: Wait for all jobs finished on workflow Test
         uses: lewagon/wait-on-check-action@v1.0.0
         with:
           ref: ${{ github.ref }}
-          check-regexp: Build:.?
+          running-workflow-name: 'Wait for all previous jobs'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 10
 
