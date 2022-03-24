@@ -70,10 +70,10 @@ jobs:
         VALIDATE_XML: true
         VALIDATE_YAML: true
 
-  end-linting:
-    name: Linter finished
-    runs-on: ubuntu-20.04
-    needs: [super-lint, sh-euox-pipefail-check, md-link-check, go-lint]
-    steps:
-      - name: Wait for all jobs to finish
-        run: echo "Mark workflow finished"
+#  end-linting:
+#    name: Linter finished
+#    runs-on: ubuntu-20.04
+#    needs: [super-lint, sh-euox-pipefail-check, md-link-check, go-lint]
+#    steps:
+#      - name: Wait for all jobs to finish
+#        run: echo "Mark workflow finished"
