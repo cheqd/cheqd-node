@@ -75,3 +75,4 @@ jobs:
     needs: [super-lint, sh-euox-pipefail-check, md-link-check, go-lint]
     steps:
       - name: Wait for all jobs to finish
+        run: echo "Mark workflow finished"
