@@ -11,7 +11,7 @@ on:
 env:
   NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/docker/localnet/network-config"
 
-#jobs:
+jobs:
 #  wait-for-lint:
 #    name: Wait for linter
 #    runs-on: ubuntu-20.04
