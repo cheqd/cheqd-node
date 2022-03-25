@@ -41,9 +41,6 @@ jobs:
           VERSION=$(./cheqd-noded version 2>&1)
           echo "::set-output name=RCVERSION::$VERSION-rc"
 
-
-
-
   push-rc-images:
     name: Push RC images
     runs-on: ubuntu-20.04
@@ -139,9 +136,6 @@ jobs:
             build-tools/output/cheqd-node_${{ env.RCVERSION }}_amd64.deb
             build-tools/output/cheqd-node_${{ env.RCVERSION }}.tar.gz
 
-
-
-
   release:
     name: Release
     runs-on: ubuntu-20.04
@@ -164,8 +158,6 @@ jobs:
         run: |
           VERSION=$(./cheqd-noded version 2>&1)
           echo "::set-output name=VERSION::$VERSION"
-
-
 
   build-release-debs:
     name: Push release packages
@@ -198,7 +190,7 @@ jobs:
       - name: Build tar
         working-directory: ./build-tools
         run: |
-          ./build-tar.sh "../cheqd-noded" "${{ env.VERSION }}"
+          ./build-tar.sh "../cheqd-noded"
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -209,7 +201,6 @@ jobs:
           files: |
             build-tools/output/cheqd-node_${{ env.VERSION }}_amd64.deb
             build-tools/output/cheqd-node_${{ env.VERSION }}.tar.gz
-
 
   push-release-images:
     name: Push release images
