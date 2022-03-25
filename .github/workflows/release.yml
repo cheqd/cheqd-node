@@ -88,7 +88,7 @@ jobs:
 #          docker tag cheqd-cli ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
 #          docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
 
-  build-rc-debs:
+  push-rc-debs:
     name: Push RC packages
     runs-on: ubuntu-20.04
     needs: pre-release
@@ -131,7 +131,8 @@ jobs:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "${{ env.GITHUB_REF_NAME }}"
           prerelease: true
-          title: "${{ env.RCVERSION }}"
+          draft: true
+          title: "v${{ env.RCVERSION }}"
           files: |
             build-tools/output/cheqd-node_${{ env.RCVERSION }}_amd64.deb
             build-tools/output/cheqd-node_${{ env.RCVERSION }}.tar.gz
@@ -140,7 +141,7 @@ jobs:
     name: Release
     runs-on: ubuntu-20.04
     environment: Release
-    needs: [ build-rc-debs, push-rc-images]
+    needs: [ push-rc-debs, push-rc-images]
     outputs:
       VERSION: ${{ steps.set-version.outputs.VERSION }}
     steps:
@@ -159,7 +160,7 @@ jobs:
           VERSION=$(./cheqd-noded version 2>&1)
           echo "::set-output name=VERSION::$VERSION"
 
-  build-release-debs:
+  push-release-debs:
     name: Push release packages
     runs-on: ubuntu-20.04
     needs: release
@@ -197,7 +198,7 @@ jobs:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "${{ env.GITHUB_REF_NAME }}"
           prerelease: true
-          title: "${{ env.VERSION }}"
+          title: "v${{ env.VERSION }}"
           files: |
             build-tools/output/cheqd-node_${{ env.VERSION }}_amd64.deb
             build-tools/output/cheqd-node_${{ env.VERSION }}.tar.gz
