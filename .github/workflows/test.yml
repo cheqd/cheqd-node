@@ -22,7 +22,7 @@ jobs:
           ref: ${{ github.ref }}
           check-regexp: Lint:.?
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 10
+          wait-interval: 30
 
   run-unit-test:
     name: Run unit tests
