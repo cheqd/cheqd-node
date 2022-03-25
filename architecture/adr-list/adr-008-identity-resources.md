@@ -1,4 +1,4 @@
-# ADR 008: cheqd DIDDOc resources: Schemas and Credential Definitions
+# ADR 008: cheqd DIDDoc resources: Schemas and Credential Definitions
 
 ## Status
 
@@ -11,11 +11,12 @@
 
 ## Summary
 
-This ADR defines the cheqd DID method and describes the identity entities, queries, and transaction types for the cheqd network: a purpose-built self-sovereign identity (SSI) network based on the [Cosmos blockchain framework](https://github.com/cosmos/cosmos-sdk).
+In this ADR we look only at CL (Camenisch-Lysyanskaya) schema and credential definition transactions that are needed for verifying issued Verifiable Credentials.
+
+This ADR will define how Verifiable Credential schemas can be represented through the use of a DID URL, which when dereferenced, fetches the credential schemas a resource. 
 
 The identity entities and transactions for the cheqd network are designed to support usage scenarios and functionality currently supported by [Hyperledger Indy](https://github.com/hyperledger/indy-node).
 
-In this ADR we look only at CL(Camenisch-Lysyanskaya) schema and credential definition transactions that needed for verify issued credentials.
 
 ## Context
 
@@ -36,15 +37,30 @@ The following identity-domain transactions from Indy were considered:
 
 Revocation registries for credentials are not covered under the scope of this ADR. This topic is discussed separately in [ADR 007: **Revocation registry**](adr-007-revocation-registry.md) as there is ongoing research by the cheqd project on how to improve the privacy and scalability of credential revocations.
 
+### Resolving DID vs Dereferencing DID
+
+Before diving into the specific architecture of cheqd's schemas, it is imporntant to understand the difference between resolving a DID and dereferencing a DID URL. 
+
+When you resolve a DID, a DID Document is returned. For example, resolving: "did:cheqd:example1234" would return the full DID Document associated with the specific DID "did:cheqd:example1234". 
+
+Dereferecing a DID URL is slightly different. When you dereference a DID URL, you are parsing the URL for specific actions, such as to take a certain path, highlight a specific fragment, or query a specific resource. 
+
+For example, "did:cheqd:example1234?service=ExampleSchema" can be dereferenced. In this case it will query the service of type "ExampleSchema" within the DID Document and will return the resource specified at the Service Endpoint within the DID Document. It is this type of architecture that cheqd uses in this ADR to fetch schemas. 
+
 ## Decision
 
 ### Schema
 
-This transaction is used to create a Schema associated with credentials.
+There are two important parts of this architecture to understand:
 
-It is not possible to update an existing Schema, to ensure the original schema used to issue any credentials in the past are always available.
+- Schemas will need to be created with their own specific transaction input in a Command Line; and
+- Each Schema will also have its own DID Document, which are able to be resolved or dereferenced. 
 
-If a Schema evolves, a new schema with a new version or name needs to be created.
+Different results will be returned for a resolved or dereferenced Schema DID URL, this ill be explained below.
+
+#### Creating a Schema usoing a CLI transaction
+
+The transaction below is used to create a Schema:
 
 - **`id`**: DID as base58-encoded string for 16 or 32 byte DID value with cheqd DID Method prefix `did:cheqd:<namespace>:` and a resource
 type at the end.
@@ -55,7 +71,8 @@ type at the end.
 - **`controller`**: DIDs list of strings or only one string of a schema
 controller(s). All DIDs must exist.
 
-`SCHEMA` entity transaction format:
+
+In JSON, once the schema is created, it will be represented in the following format:
 
 ```jsonc
 {
@@ -68,38 +85,47 @@ controller(s). All DIDs must exist.
 }
 ```
 
-Don't store Schema DIDDoc in the State.
+#### Schema DID Document
 
-Schema URL: `did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue`
-
-Schema Entity URL: `did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?service=CL-Schema`
-
-[TODO: add language about resolving the DID (and getting the DID Doc) vs
-dereferencing the DID (and getting the schema)]
-
-`SCHEMA` DID Document transaction format:
+This is an example of a Schema's DID Document:
 
 ```jsonc
 {
-  "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue",
+  "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue", // Schema's public DID
   "controller": "did:cheqd:mainnet-1:IK22KY2Dyvmuu2PyyqSFKu", // Schema Issuer DID
   "service":[
     {
-      "id": "cheqd-schema",
-      "type": "CL-Schema",
-      "serviceEndpoint": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?service=CL-Schema"
+      "id": "cheqd-schema", 
+      "type": "CL-Schema", // What is queried in the service
+      "serviceEndpoint": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?service=CL-Schema" // the Resource that is returned
     }
   ]
 }
 ```
-
-**Note**: `SCHEMA` **cannot** be updated
 
 **`SCHEMA` State format:**
 
 - `"schema:<id>" -> {SchemaEntity, txHash, txTimestamp}`
 
 `id` example: `did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue`
+
+**Note**
+
+This DID Document will be returned if the schema is **Resolved**
+
+The Schema's DID Document URL is: `did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue`
+
+The Schema's specific Entity URL is: `did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?service=CL-Schema`
+
+If the former is resolved it will return the DID Document. If the latter is dereferenced it will return the specific schema. 
+
+
+#### Updating a Schema
+
+It is not possible to update an existing Schema using this architecture. This is because there are no verification methods specified for the DID Document. Therefore, it is a persistent Schema to ensure the original schema used to issue any credentials in the past are always available.
+
+If a Schema evolves, a new Schema with a new version or name needs to be created.
+
 
 #### Credential Definition
 
