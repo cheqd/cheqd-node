@@ -19,7 +19,7 @@ jobs:
           wait-interval: 10
 
   pre-release:
-    name: Create pre-release
+    name: Pre-release
     runs-on: ubuntu-20.04
     environment: Pre-Release
     needs: wait-for-all-previous
@@ -43,8 +43,9 @@ jobs:
 
 
 
+
   push-rc-images:
-    name: Tag release candidate images
+    name: Push RC images
     runs-on: ubuntu-20.04
     needs: pre-release
     env:
@@ -90,10 +91,8 @@ jobs:
 #          docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:${{ env.RCVERSION }}
 #          docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
 
-
-
   build-rc-debs:
-    name: Create release candidate debian packages
+    name: Push RC packages
     runs-on: ubuntu-20.04
     needs: pre-release
     env:
@@ -125,9 +124,26 @@ jobs:
           name: cheqd-node_${{ env.RCVERSION }}_amd64.deb
           path: build-tools/output/cheqd-node_${{ env.RCVERSION }}_amd64.deb
 
+      - name: Build tar
+        working-directory: ./build-tools
+        run: |
+          ./build-tar.sh "../cheqd-noded" "${{ env.RCVERSION }}"
+
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "${{ env.GITHUB_REF_NAME }}"
+          prerelease: true
+          title: "${{ env.RCVERSION }}"
+          files: |
+            build-tools/output/cheqd-node_${{ env.RCVERSION }}_amd64.deb
+            build-tools/output/cheqd-node_${{ env.RCVERSION }}.tar.gz
+
+
+
 
   release:
-    name: Create Release
+    name: Release
     runs-on: ubuntu-20.04
     environment: Release
     needs: [ build-rc-debs, push-rc-images]
@@ -147,15 +163,16 @@ jobs:
         id: set-version
         run: |
           VERSION=$(./cheqd-noded version 2>&1)
-          echo "::set-output name=VERSION::$VERSION-rc"
+          echo "::set-output name=VERSION::$VERSION"
+
 
 
   build-release-debs:
-    name: Create release debian packages
+    name: Push release packages
     runs-on: ubuntu-20.04
     needs: release
-    outputs:
-      VERSION: ${{ steps.release.outputs.VERSION }}
+    env:
+      VERSION: ${{ needs.release.outputs.VERSION }}
     steps:
       - uses: actions/checkout@v2
 
@@ -178,14 +195,24 @@ jobs:
         run: |
           ./build-deb.sh "../cheqd-noded"
 
-      - name: Store release deb package artifact
-        uses: actions/upload-artifact@v2
+      - name: Build tar
+        working-directory: ./build-tools
+        run: |
+          ./build-tar.sh "../cheqd-noded" "${{ env.VERSION }}"
+
+      - uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          name: cheqd-node_${{ env.VERSION }}_amd64.deb
-          path: build-tools/output/cheqd-node_${{ env.VERSION }}_amd64.deb
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "${{ env.GITHUB_REF_NAME }}"
+          prerelease: true
+          title: "${{ env.VERSION }}"
+          files: |
+            build-tools/output/cheqd-node_${{ env.VERSION }}_amd64.deb
+            build-tools/output/cheqd-node_${{ env.VERSION }}.tar.gz
+
 
   push-release-images:
-    name: Tag release candidate images
+    name: Push release images
     runs-on: ubuntu-20.04
     needs: release
     env:
