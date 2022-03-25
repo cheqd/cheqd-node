@@ -2,8 +2,8 @@ name: Release
 
 on:
   push:
-    tags:
-      - "v*"
+#    tags:
+#      - "v*"
 
 jobs:
   wait-for-all-previous:
@@ -77,15 +77,15 @@ jobs:
       - name: Push cheqd-node image
         run: |
           docker tag cheqd-node ghcr.io/${{ github.repository }}:${{ env.RCVERSION }}
-#          docker tag cheqd-node ghcr.io/${{ github.repository }}:latest
           docker push ghcr.io/${{ github.repository }}:${{ env.RCVERSION }}
+#          docker tag cheqd-node ghcr.io/${{ github.repository }}:latest
 #          docker push ghcr.io/${{ github.repository }}:latest
 
       - name: Push cheqd-cli image
         run: |
           docker tag cheqd-cli ghcr.io/${{ github.repository_owner }}/cheqd-cli:${{ env.RCVERSION }}
-#          docker tag cheqd-cli ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
           docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:${{ env.RCVERSION }}
+#          docker tag cheqd-cli ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
 #          docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
 
   build-rc-debs:
