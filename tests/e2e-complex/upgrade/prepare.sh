@@ -31,8 +31,6 @@ send_tokens "$OP2_ADDRESS"
 # Send DID transaction
 send_did "$DID_1"
 
-sleep 5
-
 # Check that token transaction exists
 check_tx_hashes
 
