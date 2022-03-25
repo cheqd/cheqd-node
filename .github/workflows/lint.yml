@@ -3,7 +3,6 @@ name: Lint
 on: [push]
 
 jobs:
-
   # We can't use VALIDATE_GO from super linter because of this issue:
   # https://github.com/github/super-linter/issues/143
   go-lint:
