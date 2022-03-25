@@ -51,53 +51,35 @@ For example, "did:cheqd:example1234?service=ExampleSchema" can be dereferenced. 
 
 ### Schema
 
-There are two important parts of this architecture to understand:
+The most important concept to understand for this architecture is that each Schema will have its own DID Document, which is able to be resolved or dereferenced.  
 
-- Schemas will need to be created with their own specific transaction input in a Command Line; and
-- Each Schema will also have its own DID Document, which are able to be resolved or dereferenced. 
+Different results will be returned for a resolved or dereferenced Schema DID URL, this will be explained below.
 
-Different results will be returned for a resolved or dereferenced Schema DID URL, this ill be explained below.
+#### Creating a Schema
 
-#### Creating a Schema usoing a CLI transaction
-
-The transaction below is used to create a Schema:
+This transaction is used to create a Schema associated with credentials:
 
 - **`id`**: DID as base58-encoded string for 16 or 32 byte DID value with cheqd DID Method prefix `did:cheqd:<namespace>:` and a resource
 type at the end.
-- **`type`**: String with a schema type. Now only `CL-Schema` is supported.
+- **`type`**: String with a schema type. Currently only `CL-Schema` is supported.
 - **`attrNames`**: Array of attribute name strings (125 attributes maximum)
 - **`name`**: Schema's name string
 - **`version`**: Schema's version string
-- **`controller`**: DIDs list of strings or only one string of a schema
-controller(s). All DIDs must exist.
+- **`controller`**: DIDs list of strings or only one string of a schema controller(s). All DIDs must exist.
 
-
-In JSON, once the schema is created, it will be represented in the following format:
-
-```jsonc
-{
-  "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?service=CL-Schema",
-  "type": "CL-Schema",
-  "controller": "did:cheqd:mainnet-1:IK22KY2Dyvmuu2PyyqSFKu",  // Schema Issuer DID
-  "version": "1.0",
-  "name": "Degree",
-  "attrNames": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
-}
-```
-
-#### Schema DID Document
+#### Schema DID Document URL
 
 This is an example of a Schema's DID Document:
 
 ```jsonc
 {
   "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue", // Schema's public DID
-  "controller": "did:cheqd:mainnet-1:IK22KY2Dyvmuu2PyyqSFKu", // Schema Issuer DID
+  "controller": "did:cheqd:mainnet-1:IK22KY2Dyvmuu2PyyqSFKu", // Schema issuer's DID
   "service":[
     {
       "id": "cheqd-schema", 
       "type": "CL-Schema", // What is queried in the service
-      "serviceEndpoint": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?service=CL-Schema" // the Resource that is returned
+      "serviceEndpoint": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?service=CL-Schema" // the Resource that is returned (Schema Entity)
     }
   ]
 }
@@ -111,14 +93,28 @@ This is an example of a Schema's DID Document:
 
 **Note**
 
-This DID Document will be returned if the schema is **Resolved**
+This DID Document will be returned if the Schema DID Document URL, did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue, is **Resolved**
 
-The Schema's DID Document URL is: `did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue`
+If the Schema's specific Entity, did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?service=CL-Schema, if attempted to be **Resolved**, the Resolver will **Dereference** the URL and will return the specific schema, found within the "service" section of the DID Document: did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?service=CL-Schema.
 
-The Schema's specific Entity URL is: `did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?service=CL-Schema`
+#### Schema Entity URL
 
-If the former is resolved it will return the DID Document. If the latter is dereferenced it will return the specific schema. 
+If the Schema Entity URL is fetched through dereferencing, the Schema entity is represented in the following format:
 
+```jsonc
+{
+  "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?service=CL-Schema",
+  "type": "CL-Schema",
+  "controller": "did:cheqd:mainnet-1:IK22KY2Dyvmuu2PyyqSFKu",  // Schema Issuer DID
+  "version": "1.0",
+  "name": "Degree",
+  "attrNames": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
+}
+```
+
+**Note**
+
+This Schema will be returned if the Schema Entity did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?service=CL-Schema is dereferenced. 
 
 #### Updating a Schema
 
