@@ -57,6 +57,8 @@ Different results will be returned for a resolved or dereferenced Schema DID URL
 
 #### Creating a Schema
 
+The first stage of using this Schema architecture is creating the Schema as a transaction on ledger. 
+
 This transaction is used to create a Schema associated with credentials:
 
 - **`id`**: DID as base58-encoded string for 16 or 32 byte DID value with cheqd DID Method prefix `did:cheqd:<namespace>:` and a resource
@@ -66,6 +68,20 @@ type at the end.
 - **`name`**: Schema's name string
 - **`version`**: Schema's version string
 - **`controller`**: DIDs list of strings or only one string of a schema controller(s). All DIDs must exist.
+
+An example of this schema transaction, written in JSON would be:
+
+```jsonc
+{
+  "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?service=CL-Schema",
+  "type": "CL-Schema",
+  "controller": "did:cheqd:mainnet-1:IK22KY2Dyvmuu2PyyqSFKu",  // Schema Issuer DID
+  "version": "1.0",
+  "name": "Degree",
+  "attrNames": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
+}
+```
+This creates an artifact, that when dereferenced will return the appropriate fields for the schema. 
 
 #### Schema DID Document URL
 
@@ -99,22 +115,14 @@ If the Schema's specific Entity, did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?serv
 
 #### Schema Entity URL
 
-If the Schema Entity URL is fetched through dereferencing, the Schema entity is represented in the following format:
+If the Schema Entity URL is fetched through dereferencing, the following information is returned:
 
-```jsonc
-{
   "id": "did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?service=CL-Schema",
   "type": "CL-Schema",
   "controller": "did:cheqd:mainnet-1:IK22KY2Dyvmuu2PyyqSFKu",  // Schema Issuer DID
   "version": "1.0",
   "name": "Degree",
   "attrNames": ["undergrad", "last_name", "first_name", "birth_date", "postgrad", "expiry_date"]
-}
-```
-
-**Note**
-
-This Schema will be returned if the Schema Entity did:cheqd:mainnet-1:N22KY2Dyvmuu2PyyqSFKue?service=CL-Schema is dereferenced. 
 
 #### Updating a Schema
 
