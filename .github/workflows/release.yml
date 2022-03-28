@@ -78,15 +78,15 @@ jobs:
         run: |
           docker tag cheqd-node ghcr.io/${{ github.repository }}:${{ env.RCVERSION }}
           docker push ghcr.io/${{ github.repository }}:${{ env.RCVERSION }}
-#          docker tag cheqd-node ghcr.io/${{ github.repository }}:latest
-#          docker push ghcr.io/${{ github.repository }}:latest
+          docker tag cheqd-node ghcr.io/${{ github.repository }}:latest
+          docker push ghcr.io/${{ github.repository }}:latest
 
       - name: Push cheqd-cli image
         run: |
           docker tag cheqd-cli ghcr.io/${{ github.repository_owner }}/cheqd-cli:${{ env.RCVERSION }}
           docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:${{ env.RCVERSION }}
-#          docker tag cheqd-cli ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
-#          docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
+          docker tag cheqd-cli ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
+          docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
 
   push-rc-debs:
     name: Push RC packages
@@ -240,12 +240,12 @@ jobs:
         run: |
           docker tag cheqd-node ghcr.io/${{ github.repository }}:${{ env.VERSION }}
           docker push ghcr.io/${{ github.repository }}:${{ env.VERSION }}
-#          docker tag cheqd-node ghcr.io/${{ github.repository }}:latest
-#          docker push ghcr.io/${{ github.repository }}:latest
+          docker tag cheqd-node ghcr.io/${{ github.repository }}:latest
+          docker push ghcr.io/${{ github.repository }}:latest
 
       - name: Push cheqd-cli image
         run: |
           docker tag cheqd-cli ghcr.io/${{ github.repository_owner }}/cheqd-cli:${{ env.VERSION }}
           docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:${{ env.VERSION }}
-#          docker tag cheqd-cli ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
-#          docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
+          docker tag cheqd-cli ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
+          docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
