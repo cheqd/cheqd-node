@@ -16,18 +16,18 @@ jobs:
           version: v1.43.0
           args: --timeout 5m0s
 
-  md-link-check:
-    name: "Lint: Check Markdown links"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Check if Markdown links are valid
-        uses: gaurav-nelson/github-action-markdown-link-check@v1
-        with: 
-          config-file: '.github/linters/mlc_config.json'
-          folder-path: "."
+#  md-link-check:
+#    name: "Lint: Check Markdown links"
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v2
+#
+#      - name: Check if Markdown links are valid
+#        uses: gaurav-nelson/github-action-markdown-link-check@v1
+#        with:
+#          config-file: '.github/linters/mlc_config.json'
+#          folder-path: "."
 
   sh-euox-pipefail-check:
     name: "Lint: Check for 'set -euox pipefail' in shell scripts"
