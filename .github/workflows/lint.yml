@@ -1,15 +1,26 @@
 name: Lint
-on: [push]
+on: push
+defaults:
+  run:
+    shell: bash
 concurrency: 
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
 
+  sh-euox-pipefail-check:
+  name: "Lint: Check for 'set -euox pipefail' in shell scripts"
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v3
+    - name: Check that all shell scripts use 'set -euox pipefail'
+      run: bash .github/scripts/ensure_set_euox_pipefail.sh
+
   # We can't use VALIDATE_GO from super linter because of this issue:
   # https://github.com/github/super-linter/issues/143
   go-lint:
-    name: "Lint: lint Go"
+    name: "Lint: Golang"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-go@v2
@@ -21,38 +32,25 @@ jobs:
           args: --timeout 5m0s
 
   md-link-check:
-    name: "Lint: Check Markdown links"
+    name: "Lint: Check for broken Markdown links"
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
+      - uses: actions/checkout@v3
       - name: Check if Markdown links are valid
         uses: gaurav-nelson/github-action-markdown-link-check@v1
         with:
           config-file: '.github/linters/mlc_config.json'
-          folder-path: "."
-
-  sh-euox-pipefail-check:
-    name: "Lint: Check for 'set -euox pipefail' in shell scripts"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Check that all shell scripts use 'set -euox pipefail'
-        run: bash .github/scripts/ensure_set_euox_pipefail.sh
+          use-quiet-mode: 'yes'
+          use-verbose-mode: 'yes'
 
   super-lint:
-    name: "Lint: Run super linter"
+    name: "Lint: Super Linter"
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0 # Required to fetch version
-
-    - name: Super-Linter
+    - name: Run Super Linter
       uses: github/super-linter/slim@v4
       env:
         IGNORE_GITIGNORED_FILES: true
@@ -61,7 +59,7 @@ jobs:
         LOG_LEVEL: WARN
         VALIDATE_ALL_CODEBASE: true
         MULTI_STATUS: true
-
+        
         VALIDATE_BASH: true
         VALIDATE_GITHUB_ACTIONS: true
         VALIDATE_JSON: true
