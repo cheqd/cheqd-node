@@ -10,14 +10,14 @@ jobs:
   # https://github.com/github/super-linter/issues/143
   go-lint:
     name: "Lint: lint Go"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
+      - uses: actions/setup-go@v2
       - uses: actions/checkout@v3
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2
         with:
           version: v1.43.0
-          args: --timeout 5m0s
 
   md-link-check:
     name: "Lint: Check Markdown links"
