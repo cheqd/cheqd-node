@@ -8,16 +8,16 @@ concurrency:
 jobs:
 
   # call-lint:
-  #   name: "Lint workflow"
+  #   name: "Lint"
   #   uses: ./.github/workflows/lint.yml
 
   call-build:
-    name: "Build workflow"
+    name: "Build"
     # needs: call-lint
     uses: ./.github/workflows/build.yml
   
   call-test:
-    name: "Test workflow"
+    name: "Test"
     needs: call-build
     uses: ./.github/workflows/test.yml
     with:
