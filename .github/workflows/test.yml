@@ -22,17 +22,30 @@ jobs:
       contents: read
       security-events: write
 
-    steps:      
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.17'
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+             
       - name: Setup CodeQL
         uses: github/codeql-action/init@v2
         with:
           languages: 'go'
           queries: security-and-quality
       
-      - name: Load binary artifact from build
-        uses: actions/download-artifact@v3
-        with:
-          name: cheqd-noded
+      - name: Build
+        run: |
+          make proto-gen build
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
@@ -58,26 +71,25 @@ jobs:
       - name: Load node Docker image
         run: docker load -i cheqd-node-image.tar
 
-      - name: Check out
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Set up 4 validators + 2 observers node docker pool
+      - name: Setup 4 Validators + 2 Observers Docker localnet
         working-directory: ./docker/localnet
         run: |
           bash gen-network-config.sh
           CHEQD_NODE_IMAGE=cheqd-node CHEQD_NODE_VERSION=latest docker compose up -d
 
-      - name: Wait for chain
+      - name: Check all Docker localnet nodes are active
         run: bash tests/tools/wait-for-chain.sh
 
-      - name: Add observer node
+      - name: Add an Observer node using Debian package
         working-directory: ./tests/e2e-complex/deb-install
         run: |
           ./add-observer.sh
           cheqd-noded status -n tcp://localhost:26677 2>&1
           ./wait.sh "[[ $(cheqd-noded status -n 'tcp://localhost:26677' 2>&1 | wc -l) == 1 ]] && echo "New node returns status!""
 
-      - name: Promote observer to validator
+      - name: Promote Observer to Validator
         working-directory: ./tests/e2e-complex/deb-install
         run: |
           ./promote-validator.sh
@@ -185,15 +197,15 @@ jobs:
           CHEQD_NODE_IMAGE=cheqd-node CHEQD_NODE_VERSION=latest docker compose up -d
 
       - name: Wait for chain
-        run: bash tests/tools/wait-for-chain.sh
+        run: bash ./tests/tools/wait-for-chain.sh
 
       - name: Import keys
-        working-directory: docker/localnet
+        working-directory: ./docker/localnet
         run: |
           bash import_keys.sh
 
       - name: Set up and run tests
-        working-directory: tests/e2e-bash
+        working-directory: ./tests/e2e-bash
         run: |
           bash run_all.sh
 
