@@ -20,8 +20,8 @@ PKG_NAME="cheqd-node"
 BUILD_DIR="build"
 OUTPUT_DIR="output"
 
-mkdir "${BUILD_DIR}"
-mkdir "${OUTPUT_DIR}"
+mkdir -p "${BUILD_DIR}"
+mkdir -p "${OUTPUT_DIR}"
 
 # Prepare content
 PACKAGE_CONTENT="${BUILD_DIR}/deb-package-content"
