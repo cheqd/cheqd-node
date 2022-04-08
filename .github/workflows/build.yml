@@ -1,7 +1,7 @@
 name: "Build"
 on: workflow_call
   outputs:
-  VERSION: ${{ jobs.build-binary.outputs.VERSION }}
+    VERSION: ${{ jobs.build-binary.outputs.VERSION }}
 defaults:
   run:
     shell: bash
