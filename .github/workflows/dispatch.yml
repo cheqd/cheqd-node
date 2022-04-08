@@ -4,8 +4,8 @@ on: push
 
 jobs:
   call-lint:
-    uses: ./.github/workflows/lint.yml@main
+    uses: cheqd/cheqd-node/.github/workflows/lint.yml@main
 
   call-test:
     needs: call-lint
-    uses: ./.github/workflows/test.yml@main
+    uses: cheqd/cheqd-node/.github/workflows/test.yml@main
