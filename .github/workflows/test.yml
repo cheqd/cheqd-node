@@ -9,7 +9,7 @@ defaults:
   run:
     shell: bash
 env:
-  NODE_CONFIGS_BASE: "/home/runner/cheqd/network-config"
+  NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/docker/localnet/network-config"
 
 
 jobs:
@@ -27,15 +27,6 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: '1.17'
-      
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
              
       - name: Setup CodeQL
         uses: github/codeql-action/init@v2
@@ -137,10 +128,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: cheqd-noded
-          path: /home/runner/local/bin
+          path: /home/runner/.local/bin
 
       - name: Restore binary permissions
-        run: sudo chmod +x /home/runner/local/bin/cheqd-noded
+        run: sudo chmod +x /home/runner/.local/bin/cheqd-noded
 
       - name: Download node Docker image
         uses: actions/download-artifact@v3
@@ -197,10 +188,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: cheqd-noded
-          path: /home/runner/local/bin
+          path: /home/runner/.local/bin
 
       - name: Restore binary permissions
-        run: sudo chmod +x /home/runner/local/bin/cheqd-noded
+        run: sudo chmod +x /home/runner/.local/bin/cheqd-noded
 
       - name: Download node image
         uses: actions/download-artifact@v3
