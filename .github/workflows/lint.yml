@@ -8,7 +8,7 @@ defaults:
 jobs:
 
   sh-euox-pipefail-check:
-    name: "Lint: Shell pipefail check"
+    name: "Shell pipefail check"
     runs-on: ubuntu-latest
     
     steps:
@@ -17,7 +17,7 @@ jobs:
         run: bash ./.github/scripts/ensure_set_euox_pipefail.sh
   
   md-link-check:
-    name: "Lint: Broken Markdown links"
+    name: "Broken Markdown links"
     runs-on: ubuntu-latest
     
     steps:
@@ -32,7 +32,7 @@ jobs:
   # We can't use VALIDATE_GO from super linter because of this issue:
   # https://github.com/github/super-linter/issues/143
   go-lint:
-    name: "Lint: Golang"
+    name: "Golang"
     runs-on: ubuntu-latest
     
     steps:
@@ -48,7 +48,7 @@ jobs:
           args: --timeout 5m0s
 
   super-lint:
-    name: "Lint: Super Linter"
+    name: "Super Linter"
     runs-on: ubuntu-latest
     
     steps:
@@ -72,6 +72,6 @@ jobs:
         VALIDATE_MARKDOWN: true
         VALIDATE_OPENAPI: true
         # VALIDATE_PROTOBUF: true
-        VALIDATE_PYTHON_PYLINT: true
+        VALIDATE_PYTHON_PYtrue
         VALIDATE_XML: true
         VALIDATE_YAML: true

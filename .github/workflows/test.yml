@@ -9,13 +9,13 @@ defaults:
   run:
     shell: bash
 env:
-  NODE_CONFIGS_BASE: "/home/runner/cheqd/docker/localnet/network-config"
+  NODE_CONFIGS_BASE: "/home/runner/cheqd/network-config"
 
 
 jobs:
 
   codeql-analysis:
-    name: "Test: CodeQL Analysis"
+    name: "CodeQL Analysis"
     runs-on: ubuntu-latest
     permissions:
       actions: read
@@ -27,7 +27,7 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: '1.17'
-
+      
       - uses: actions/cache@v3
         with:
           path: |
@@ -42,6 +42,22 @@ jobs:
         with:
           languages: 'go'
           queries: security-and-quality
+      
+      - name: Fetch Golang protoc compiler plugins
+        env:
+          GOLANG_PROTOBUF_VERSION: 1.3.5
+          GOGO_PROTOBUF_VERSION: 1.3.2
+          GRPC_GATEWAY_VERSION: 1.14.7
+        # Taken from: tendermintdev/sdk-proto-gen:v0.2
+        run: |
+          go get \
+            github.com/golang/protobuf/protoc-gen-go@v"$GOLANG_PROTOBUF_VERSION" \
+            github.com/gogo/protobuf/protoc-gen-gogo@v"$GOGO_PROTOBUF_VERSION" \
+            github.com/gogo/protobuf/protoc-gen-gogofast@v"$GOGO_PROTOBUF_VERSION" \
+            github.com/gogo/protobuf/protoc-gen-gogofaster@v"$GOGO_PROTOBUF_VERSION" \
+            github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@v"$GRPC_GATEWAY_VERSION" \
+            github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@v"$GRPC_GATEWAY_VERSION" \
+            github.com/regen-network/cosmos-proto/protoc-gen-gocosmos@latest      
       
       - name: Install buf
         env:
@@ -59,7 +75,7 @@ jobs:
         uses: github/codeql-action/analyze@v2
 
   test-new-node-setup:
-    name: "Test: Node setup"
+    name: "New node setup"
     runs-on: ubuntu-latest
 
     steps:
@@ -113,11 +129,11 @@ jobs:
           journalctl -ex | grep cheqd
 
   python-integration-tests:
-    name: "Test: Python-based Cosmos and identity tests"
+    name: "Python-based Cosmos and identity tests"
     runs-on: ubuntu-latest
 
     steps:
-      - name: Load binary artifact
+      - name: Load node binary artifact
         uses: actions/download-artifact@v3
         with:
           name: cheqd-noded
@@ -126,18 +142,17 @@ jobs:
       - name: Restore binary permissions
         run: sudo chmod +x /home/runner/local/bin/cheqd-noded
 
-      - name: Download node image
+      - name: Download node Docker image
         uses: actions/download-artifact@v3
         with:
           name: cheqd-node-image.tar
 
-      - name: Load node image
+      - name: Load node Docker image
         run: docker load -i cheqd-node-image.tar
 
-      - name: Check out
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Set up 4 validators + 2 observers node docker pool
+      - name: Setup 4 Validators + 2 Observers Docker localnet 
         working-directory: ./docker/localnet
         run: |
           bash gen-network-config.sh
@@ -174,7 +189,7 @@ jobs:
           pytest -v -rP test_identity.py
 
   bash-integration-tests:
-    name: "Test: Bash-based identity tests"
+    name: "Bash-based identity tests"
     runs-on: ubuntu-latest
 
     steps:
@@ -218,7 +233,7 @@ jobs:
           bash run_all.sh
 
   node-upgrade-test:
-    name: "Test: Run positive case for upgrade"
+    name: "Run positive case for upgrade"
     runs-on: ubuntu-latest
 
     steps:

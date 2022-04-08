@@ -13,7 +13,7 @@ defaults:
 jobs:
 
   go-unit-tests:
-    name: "Build: Golang unit tests"
+    name: "Golang unit tests"
     runs-on: ubuntu-latest
     
     steps:
@@ -26,7 +26,7 @@ jobs:
         run: go test -v ./...
 
   build-binary:
-    name: "Build: Node binary"
+    name: "Node binary"
     needs: go-unit-tests
     runs-on: ubuntu-latest
     outputs:
@@ -91,7 +91,7 @@ jobs:
           echo "::set-output name=VERSION::$VERSION"
   
   build-tarball-package:
-    name: "Build: Tarball package"
+    name: "Tarball package"
     runs-on: ubuntu-latest
     needs: build-binary
     env:
@@ -120,7 +120,7 @@ jobs:
           path: build-tools/output/cheqd-node_${{ env.VERSION }}.tar.gz
   
   build-debian-package:
-    name: "Build: Debian package"
+    name: "Debian package"
     runs-on: ubuntu-latest
     needs: build-binary
     env:
@@ -154,7 +154,7 @@ jobs:
           path: build-tools/output/cheqd-node_${{ env.VERSION }}_amd64.deb
 
   build-docker-images:
-    name: "Build: Docker images"
+    name: "Docker images"
     runs-on: ubuntu-latest
     needs: go-unit-tests
 
