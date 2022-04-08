@@ -35,9 +35,6 @@ jobs:
         language: [ 'go' ]
     
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0 # Required to fetch version
       - uses: actions/setup-go@v3
         with:
           go-version: '1.17'      
@@ -64,7 +61,10 @@ jobs:
         run: |
           curl -sSL "https://github.com/bufbuild/buf/releases/download/v${VERSION}/buf-$(uname -s)-$(uname -m).tar.gz" | \
           sudo tar -xvzf - -C "${PREFIX}" --strip-components 1
-
+      
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Required to fetch version
       - name: Build proto-gen
         run: |
           make proto-gen build
