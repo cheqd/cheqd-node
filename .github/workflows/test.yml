@@ -31,22 +31,7 @@ jobs:
     runs-on: ubuntu-20.04
     outputs:
       VERSION: ${{ steps.set-version.outputs.VERSION }}
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
-    strategy:
-      fail-fast: false
-      matrix:
-        # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby' ]
-        language: [ 'go' ]
     steps:
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v1
-        with:
-          languages: ${{ matrix.language }}
-          # this covers a larger set of checks but are experimental right now
-          queries: security-and-quality
       - name: Set up Go 1.17
         uses: actions/setup-go@v2
         with:
@@ -83,9 +68,6 @@ jobs:
       - name: Build
         run: |
           make proto-gen build
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v1
 
       - name: Store artifact
         uses: actions/upload-artifact@v2
