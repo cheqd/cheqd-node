@@ -1,20 +1,26 @@
 name: "Build"
-
 on: workflow_call
-
+defaults:
+  run:
+    shell: bash
+outputs:
+  VERSION: ${{ jobs.build-binary.outputs.VERSION }}
 env:
   NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/docker/localnet/network-config"
+
 
 jobs:
 
   run-go-unit-tests:
     name: "Build: Golang unit tests"
     runs-on: ubuntu-latest
+    
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
           go-version: '1.17'
+      
       - name: Run Golang unit tests
         run: go test -v ./...
 
@@ -74,12 +80,13 @@ jobs:
           VERSION=$(build/cheqd-noded version 2>&1)
           echo "::set-output name=VERSION::$VERSION"
   
-  build-packages:
-    name: "Build: Debian and Tarball packages"
+  build-tarball-package:
+    name: "Build: Tarball package"
     runs-on: ubuntu-latest
     needs: build-binary
     env:
       VERSION: ${{ needs.build-binary.outputs.VERSION }}
+    
     steps:
       - uses: actions/checkout@v3
 
@@ -101,6 +108,24 @@ jobs:
         with:
           name: cheqd-node_${{ env.VERSION }}.tar.gz
           path: build-tools/output/cheqd-node_${{ env.VERSION }}.tar.gz
+  
+  build-debian-package:
+    name: "Build: Debian package"
+    runs-on: ubuntu-latest
+    needs: build-binary
+    env:
+      VERSION: ${{ needs.build-binary.outputs.VERSION }}
+    
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Load binary artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: cheqd-noded
+
+      - name: Restore binary permissions
+        run: sudo chmod +x cheqd-noded
       
       - name: Install fpm
         run: |
@@ -112,7 +137,7 @@ jobs:
         run: |
           ./build-deb.sh "../cheqd-noded"
 
-      - name: Store deb package artifact
+      - name: Store Debian package artifact
         uses: actions/upload-artifact@v3
         with:
           name: cheqd-node_${{ env.VERSION }}_amd64.deb
@@ -131,17 +156,17 @@ jobs:
       - name: Build cheqd-node Docker image with 'node-start' as entrypoint
         run: docker build --target node -t cheqd-node -f docker/Dockerfile --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" .
 
-      - name: Save cheqd-cli
+      - name: Save and store cheqd-cli
         run: docker save -o cheqd-cli-image.tar cheqd-cli
-
-      - name: Save cheqd-node
-        run: docker save -o cheqd-node-image.tar cheqd-node
 
       - name: Store cheqd-cli artifact
         uses: actions/upload-artifact@v3
         with:
           name: cheqd-cli-image.tar
           path: cheqd-cli-image.tar
+
+      - name: Save cheqd-node
+        run: docker save -o cheqd-node-image.tar cheqd-node
 
       - name: Store cheqd-node artifact
         uses: actions/upload-artifact@v3

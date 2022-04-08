@@ -1,16 +1,16 @@
 name: "Lint"
-
 on: workflow_call
-
 defaults:
   run:
     shell: bash
+
 
 jobs:
 
   sh-euox-pipefail-check:
     name: "Lint: Shell pipefail check"
     runs-on: ubuntu-latest
+    
     steps:
       - uses: actions/checkout@v3
       - name: Run 'set -euox pipefail' check
@@ -19,6 +19,7 @@ jobs:
   md-link-check:
     name: "Lint: Broken Markdown links"
     runs-on: ubuntu-latest
+    
     steps:
       - uses: actions/checkout@v3
       - name: Run Markdown link check
@@ -33,11 +34,13 @@ jobs:
   go-lint:
     name: "Lint: Golang"
     runs-on: ubuntu-latest
+    
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
           go-version: '1.17'
+      
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v2
         with:
@@ -47,10 +50,12 @@ jobs:
   super-lint:
     name: "Lint: Super Linter"
     runs-on: ubuntu-latest
+    
     steps:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0 # Required to fetch version
+    
     - name: Run Super Linter
       uses: github/super-linter/slim@v4
       env:
