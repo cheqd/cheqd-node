@@ -12,7 +12,7 @@ jobs:
     name: "Lint workflow"
     uses: ./.github/workflows/lint.yml
 
-  call-test:
-    name: "Test workflow"
+  call-build:
+    name: "Build workflow"
     needs: call-lint
-    uses: ./.github/workflows/test.yml
+    uses: ./.github/workflows/build.yml
