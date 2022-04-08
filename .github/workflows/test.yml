@@ -4,7 +4,6 @@ on:
     inputs:
       VERSION:
         description: "Build version number"
-        required: true
         type: string
 defaults:
   run:
@@ -38,27 +37,25 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
 
-  test-new-node-setup-from-deb:
-    name: "Test: New node setup from deb"
+  test-new-node-setup:
+    name: "Test: Node setup"
     runs-on: ubuntu-latest
-    needs: [build-binary, build-deb-package, build-node-images]
-    env:
-      VERSION: ${{ needs.build-binary.outputs.VERSION }}
+
     steps:
-      - name: Download deb
+      - name: Download Debian package
         uses: actions/download-artifact@v3
         with:
-          name: cheqd-node_${{ env.VERSION }}_amd64.deb
+          name: cheqd-node_${{ inputs.VERSION }}_amd64.deb
 
-      - name: Install deb
-        run: sudo CHEQD_HOME_DIR=/home/runner/cheqd dpkg -i cheqd-node_${{ env.VERSION }}_amd64.deb
+      - name: Install Debian package
+        run: sudo CHEQD_HOME_DIR=/home/runner/cheqd dpkg -i cheqd-node_${{ inputs.VERSION }}_amd64.deb
 
-      - name: Download node image
+      - name: Download node Docker image
         uses: actions/download-artifact@v3
         with:
           name: cheqd-node-image.tar
 
-      - name: Load node image
+      - name: Load node Docker image
         run: docker load -i cheqd-node-image.tar
 
       - name: Check out
@@ -95,10 +92,10 @@ jobs:
         run: |
           journalctl -ex | grep cheqd
 
-  run-python-based-integration-tests:
-    name: "Test: Run python based cosmos and identity tests"
+  python-integration-tests:
+    name: "Test: Cosmos SDK and identity integration"
     runs-on: ubuntu-latest
-    needs: [build-node-images, build-binary]
+
     steps:
       - name: Load binary artifact
         uses: actions/download-artifact@v3
@@ -156,10 +153,10 @@ jobs:
           export OP1_ADDRESS
           pytest -v -rP test_identity.py
 
-  run-bash-based-integration-tests:
+  bash-integration-tests:
     name: "Test: Run bash based identity tests"
     runs-on: ubuntu-latest
-    needs: [build-binary, build-node-images]
+
     steps:
       - name: Load binary artifact
         uses: actions/download-artifact@v3
@@ -200,14 +197,12 @@ jobs:
         run: |
           bash run_all.sh
 
-  run-upgrade-test-positive-case:
+  node-upgrade-test:
     name: "Test: Run positive case for upgrade"
     runs-on: ubuntu-latest
-    needs: build-node-images
+
     steps:
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0 # It's needed for getting the full version of package by `git describe`
 
       - name: Download cli image
         uses: actions/download-artifact@v3
