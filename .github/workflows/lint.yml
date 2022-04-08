@@ -9,7 +9,7 @@ defaults:
 jobs:
 
   sh-euox-pipefail-check:
-    name: "Lint: Shell script pipefail check"
+    name: "Lint: Shell pipefail check"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -31,7 +31,7 @@ jobs:
           args: --timeout 5m0s
 
   md-link-check:
-    name: "Lint: Check for broken Markdown links"
+    name: "Lint: Broken Markdown links"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
