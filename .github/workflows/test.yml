@@ -1,7 +1,7 @@
 name: "Build and Test"
 
 on:
-  push:
+  workflow_call:
     paths-ignore:
     - '**.md'
     - 'docs/**'
@@ -12,17 +12,6 @@ env:
   NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/docker/localnet/network-config"
 
 jobs:
-  wait-for-lint:
-    name: Wait for linter
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Wait for jobs finished on lint workflow
-        uses: lewagon/wait-on-check-action@v1.0.0
-        with:
-          ref: ${{ github.ref }}
-          check-regexp: Lint:.?
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 30
 
   run-unit-test:
     name: Run unit tests
