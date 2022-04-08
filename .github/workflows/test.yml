@@ -12,31 +12,29 @@ defaults:
 env:
   NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/docker/localnet/network-config"
 
+
 jobs:
 
   codeql-analysis:
     name: "Test: CodeQL Analysis"
+    runs-on: ubuntu-latest
     permissions:
-    actions: read
-    contents: read
-    security-events: write
+      actions: read
+      contents: read
+      security-events: write
 
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Load binary artifact from build
-        uses: actions/download-artifact@v3
-        with:
-          name: cheqd-noded
-      
+    steps:      
       - name: Setup CodeQL
         uses: github/codeql-action/init@v2
         with:
           languages: 'go'
           queries: security-and-quality
-
-      - name
       
+      - name: Load binary artifact from build
+        uses: actions/download-artifact@v3
+        with:
+          name: cheqd-noded
+
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
 
