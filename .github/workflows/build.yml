@@ -1,14 +1,11 @@
 name: "Build"
-on: workflow_call
-  outputs:
-    version:
-      description: "Build version number"
-      value: ${{ jobs.build-binary.outputs.VERSION }}
+on:
+  workflow_call:
+    outputs:
+      VERSION: ${{ jobs.build-binary.outputs.VERSION }}
 defaults:
   run:
     shell: bash
-env:
-  NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/docker/localnet/network-config"
 
 
 jobs:
