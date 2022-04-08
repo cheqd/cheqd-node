@@ -18,25 +18,25 @@ jobs:
 
   # We can't use VALIDATE_GO from super linter because of this issue:
   # https://github.com/github/super-linter/issues/143
-  # go-lint:
-  #   name: "Lint: Golang"
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: actions/setup-go@v3
-  #     - uses: actions/cache@v3
-  #       with:
-  #         path: |
-  #           ~/.cache/go-build
-  #           ~/go/pkg/mod
-  #         key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-go-
-  #     - name: Run golangci-lint
-  #       uses: golangci/golangci-lint-action@v2
-  #       with:
-  #         version: latest
-  #         args: --timeout 5m0s
+  go-lint:
+    name: "Lint: Golang"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: latest
+          args: --timeout 5m0s
 
   md-link-check:
     name: "Lint: Broken Markdown links"
@@ -69,7 +69,6 @@ jobs:
 
         VALIDATE_BASH: true
         VALIDATE_GITHUB_ACTIONS: true
-        VALIDATE_GO: true
         VALIDATE_JSON: true
         VALIDATE_MARKDOWN: true
         VALIDATE_OPENAPI: true

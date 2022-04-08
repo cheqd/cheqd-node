@@ -33,9 +33,20 @@ jobs:
     outputs:
       VERSION: ${{ steps.set-version.outputs.VERSION }}
     steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Required to fetch version
       - uses: actions/setup-go@v3
         with:
           go-version: '1.17'
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
       
       - name: Fetch Golang protoc compiler plugins
         env:
@@ -60,21 +71,8 @@ jobs:
         run: |
           curl -sSL "https://github.com/bufbuild/buf/releases/download/v${VERSION}/buf-$(uname -s)-$(uname -m).tar.gz" | \
           sudo tar -xvzf - -C "${PREFIX}" --strip-components 1
-      
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-      
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0 # Required to fetch version
 
-      - name: Build
+      - name: Build proto-gen
         run: |
           make proto-gen build
 
@@ -84,86 +82,67 @@ jobs:
           name: cheqd-noded
           path: build/cheqd-noded
 
-      - name: Set version
+      - name: Set version number
         id: set-version
         run: |
           VERSION=$(build/cheqd-noded version 2>&1)
           echo "::set-output name=VERSION::$VERSION"
 
-  build-tar-package:
-    name: "Build: tar package"
+  build-packages:
+    name: "Build: Debian and Tarball packages"
     runs-on: ubuntu-latest
     needs: build-binary
     env:
       VERSION: ${{ needs.build-binary.outputs.VERSION }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Load binary artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: cheqd-noded
 
       - name: Restore binary permissions
         run: sudo chmod +x cheqd-noded
 
-      - name: Build tar
+      - name: Build tarball
         working-directory: ./build-tools
         run: |
           ./build-tar.sh "../cheqd-noded"
 
-      - name: Store tar package artifact
-        uses: actions/upload-artifact@v2
+      - name: Store tarball artifact
+        uses: actions/upload-artifact@v3
         with:
           name: cheqd-node_${{ env.VERSION }}.tar.gz
           path: build-tools/output/cheqd-node_${{ env.VERSION }}.tar.gz
-
-  build-deb-package:
-    name: "Build: deb package"
-    runs-on: ubuntu-latest
-    needs: build-binary
-    env:
-      VERSION: ${{ needs.build-binary.outputs.VERSION }}
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Load binary artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: cheqd-noded
-
-      - name: Restore binary permissions
-        run: sudo chmod +x cheqd-noded
-
+      
       - name: Install fpm
         run: |
           sudo apt-get install ruby ruby-dev rubygems build-essential
           sudo gem install --no-document fpm
 
-      - name: Build deb
+      - name: Build Debian package
         working-directory: ./build-tools
         run: |
           ./build-deb.sh "../cheqd-noded"
 
       - name: Store deb package artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: cheqd-node_${{ env.VERSION }}_amd64.deb
           path: build-tools/output/cheqd-node_${{ env.VERSION }}_amd64.deb
 
-  build-node-images:
-    name: "Build: cheqd-node and cheqd-cli images"
+  build-docker-images:
+    name: "Build: Docker images"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0 # Required to fetch version
-
-      - name: Build cheqd-cli with 'cheqd-noded' as entrypoint
+      - uses: actions/checkout@v3
+      
+      - name: Build cheqd-cli Docker image 'cheqd-noded' as entrypoint
         # TODO: Get rid of UID and GID
         run: docker build --target base -t cheqd-cli -f docker/Dockerfile --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" .
 
-      - name: Build cheqd-node with 'node-start' as entrypoint
+      - name: Build cheqd-node Docker image with 'node-start' as entrypoint
         run: docker build --target node -t cheqd-node -f docker/Dockerfile --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" .
 
       - name: Save cheqd-cli
@@ -173,13 +152,13 @@ jobs:
         run: docker save -o cheqd-node-image.tar cheqd-node
 
       - name: Store cheqd-cli artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: cheqd-cli-image.tar
           path: cheqd-cli-image.tar
 
       - name: Store cheqd-node artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: cheqd-node-image.tar
           path: cheqd-node-image.tar
@@ -192,7 +171,7 @@ jobs:
       VERSION: ${{ needs.build-binary.outputs.VERSION }}
     steps:
       - name: Download deb
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: cheqd-node_${{ env.VERSION }}_amd64.deb
 
@@ -200,7 +179,7 @@ jobs:
         run: sudo CHEQD_HOME_DIR=/home/runner/cheqd dpkg -i cheqd-node_${{ env.VERSION }}_amd64.deb
 
       - name: Download node image
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: cheqd-node-image.tar
 
@@ -208,7 +187,7 @@ jobs:
         run: docker load -i cheqd-node-image.tar
 
       - name: Check out
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up 4 validators + 2 observers node docker pool
         working-directory: ./docker/localnet
@@ -247,7 +226,7 @@ jobs:
     needs: [build-node-images, build-binary]
     steps:
       - name: Load binary artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: cheqd-noded
           path: /home/runner/.local/bin
@@ -256,7 +235,7 @@ jobs:
         run: sudo chmod +x /home/runner/.local/bin/cheqd-noded
 
       - name: Download node image
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: cheqd-node-image.tar
 
@@ -264,7 +243,7 @@ jobs:
         run: docker load -i cheqd-node-image.tar
 
       - name: Check out
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up 4 validators + 2 observers node docker pool
         working-directory: ./docker/localnet
@@ -308,7 +287,7 @@ jobs:
     needs: [build-binary, build-node-images]
     steps:
       - name: Load binary artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: cheqd-noded
           path: /home/runner/.local/bin
@@ -317,7 +296,7 @@ jobs:
         run: sudo chmod +x /home/runner/.local/bin/cheqd-noded
 
       - name: Download node image
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: cheqd-node-image.tar
 
@@ -325,7 +304,7 @@ jobs:
         run: docker load -i cheqd-node-image.tar
 
       - name: Check out
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up 4 validators + 2 observers node docker pool
         working-directory: ./docker/localnet
@@ -351,12 +330,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-node-images
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # It's needed for getting the full version of package by `git describe`
 
       - name: Download cli image
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: cheqd-cli-image.tar
 
