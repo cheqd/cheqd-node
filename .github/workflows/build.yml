@@ -15,14 +15,6 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version: '1.17'
-      # - uses: actions/cache@v3
-      #   with:
-      #     path: |
-      #       ~/.cache/go-build
-      #       ~/go/pkg/mod
-      #     key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-go-
       - name: Run Golang unit tests
         run: go test -v ./...
 
@@ -48,16 +40,7 @@ jobs:
           fetch-depth: 0 # Required to fetch version
       - uses: actions/setup-go@v3
         with:
-          go-version: '1.17'
-      # - uses: actions/cache@v3
-      #   with:
-      #     path: |
-      #       ~/.cache/go-build
-      #       ~/go/pkg/mod
-      #     key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-go-
-      
+          go-version: '1.17'      
       - name: Fetch Golang protoc compiler plugins
         env:
           GOLANG_PROTOBUF_VERSION: 1.3.5
