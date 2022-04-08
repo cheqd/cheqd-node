@@ -1,5 +1,5 @@
 name: Lint
-on: push
+on: workflow_call
 defaults:
   run:
     shell: bash
@@ -59,7 +59,7 @@ jobs:
         LOG_LEVEL: WARN
         VALIDATE_ALL_CODEBASE: true
         MULTI_STATUS: true
-        
+
         VALIDATE_BASH: true
         VALIDATE_GITHUB_ACTIONS: true
         VALIDATE_JSON: true
