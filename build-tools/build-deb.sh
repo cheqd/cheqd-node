@@ -7,7 +7,14 @@ if [ -z ${1+x} ]; then
 fi
 
 BINARY_PATH="$1"
-VERSION=$("${BINARY_PATH}" version 2>&1)
+# It's needed for creating an RC deb package
+if [ -z ${2+x} ];
+then
+  VERSION=$("${BINARY_PATH}" version 2>&1)
+else
+  VERSION="$2"
+fi
+
 PKG_NAME="cheqd-node"
 
 BUILD_DIR="build"

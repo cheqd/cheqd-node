@@ -1,7 +1,7 @@
 name: "Build and Test"
 
 on:
-  push:
+  workflow_call:
     paths-ignore:
     - '**.md'
     - 'docs/**'
@@ -12,9 +12,11 @@ env:
   NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/docker/localnet/network-config"
 
 jobs:
+
   run-unit-test:
     name: Run unit tests
     runs-on: ubuntu-20.04
+    needs: wait-for-lint
     steps:
       - name: Set up Go 1.17
         uses: actions/setup-go@v2
@@ -27,8 +29,9 @@ jobs:
         run: go test -v ./...
 
   build-binary:
-    name: Build binary
+    name: "Build: binary"
     runs-on: ubuntu-20.04
+    needs: wait-for-lint
     outputs:
       VERSION: ${{ steps.set-version.outputs.VERSION }}
     steps:
@@ -82,7 +85,7 @@ jobs:
           echo "::set-output name=VERSION::$VERSION"
 
   build-tar-package:
-    name: Build tar package
+    name: "Build: tar package"
     runs-on: ubuntu-20.04
     needs: build-binary
     env:
@@ -110,7 +113,7 @@ jobs:
           path: build-tools/output/cheqd-node_${{ env.VERSION }}.tar.gz
 
   build-deb-package:
-    name: Build deb package
+    name: "Build: deb package"
     runs-on: ubuntu-20.04
     needs: build-binary
     env:
@@ -143,8 +146,9 @@ jobs:
           path: build-tools/output/cheqd-node_${{ env.VERSION }}_amd64.deb
 
   build-node-images:
-    name: Build cheqd-node and cheqd-cli images
+    name: "Build: cheqd-node and cheqd-cli images"
     runs-on: ubuntu-20.04
+    needs: wait-for-lint
     steps:
       - uses: actions/checkout@v2
         with:
@@ -152,7 +156,7 @@ jobs:
 
       - name: Build cheqd-cli with 'cheqd-noded' as entrypoint
         # TODO: Get rid of UID and GID
-        run: docker build --target base -t cheqd-cli -f docker/Dockerfile --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" . 
+        run: docker build --target base -t cheqd-cli -f docker/Dockerfile --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" .
 
       - name: Build cheqd-node with 'node-start' as entrypoint
         run: docker build --target node -t cheqd-node -f docker/Dockerfile --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" .
@@ -163,20 +167,20 @@ jobs:
       - name: Save cheqd-node
         run: docker save -o cheqd-node-image.tar cheqd-node
 
-      - name: Store cheqd-cli artifact 
+      - name: Store cheqd-cli artifact
         uses: actions/upload-artifact@v2
         with:
           name: cheqd-cli-image.tar
           path: cheqd-cli-image.tar
-      
-      - name: Store cheqd-node artifact 
+
+      - name: Store cheqd-node artifact
         uses: actions/upload-artifact@v2
         with:
           name: cheqd-node-image.tar
           path: cheqd-node-image.tar
 
   test-new-node-setup-from-deb:
-    name: Test new node setup from deb
+    name: "Test: New node setup from deb"
     runs-on: ubuntu-20.04
     needs: [build-binary, build-deb-package, build-node-images]
     env:
@@ -222,7 +226,9 @@ jobs:
         run: |
           ./promote-validator.sh
           cheqd-noded query staking validators --node "http://localhost:26657" | sed -nr 's/.*status: (.*?).*/\1/p' "$1" | while read -r x; do [[ "BOND_STATUS_BONDED" == "$x" ]] && echo "Validator's status is bonded!" || exit 1 ; done
+          # shellcheck disable=SC2016
           ./wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*signature": (.*?).*/\1/p'"'"' | wc -l) == 5 ]] && echo "There are 5 validators signatures in block!"'
+          # shellcheck disable=SC2016
           ./wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*(signature": null).*/\1/p'"'"' | wc -l) == 0 ]] && echo "There are no null signatures in block!"'
 
       - name: Gather logs on failure
@@ -231,7 +237,7 @@ jobs:
           journalctl -ex | grep cheqd
 
   run-python-based-integration-tests:
-    name: Run python based cosmos and identity tests
+    name: "Test: Run python based cosmos and identity tests"
     runs-on: ubuntu-20.04
     needs: [build-node-images, build-binary]
     steps:
@@ -292,7 +298,7 @@ jobs:
           pytest -v -rP test_identity.py
 
   run-bash-based-integration-tests:
-    name: Run bash based identity tests
+    name: "Test: Run bash based identity tests"
     runs-on: ubuntu-20.04
     needs: [build-binary, build-node-images]
     steps:
@@ -336,7 +342,7 @@ jobs:
           bash run_all.sh
 
   run-upgrade-test-positive-case:
-    name: Run positive case for upgrade
+    name: "Test: Run positive case for upgrade"
     runs-on: ubuntu-20.04
     needs: build-node-images
     steps:

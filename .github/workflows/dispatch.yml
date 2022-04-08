@@ -1,0 +1,11 @@
+name: "Workflow Dispatch"
+
+on: push
+
+jobs:
+  call-lint:
+    uses: ./.github/workflows/lint.yml
+
+  call-test:
+    needs: call-lint
+    uses: ./.github/workflows/test.yml
