@@ -1,12 +1,6 @@
-name: "Build and Test"
+name: Test
 
-on:
-  workflow_call:
-    paths-ignore:
-    - '**.md'
-    - 'docs/**'
-    - 'architecture/**'
-    - '.gitbook/**'
+on: workflow_call
 
 env:
   NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/docker/localnet/network-config"

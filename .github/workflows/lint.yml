@@ -1,8 +1,11 @@
 name: Lint
+
 on: workflow_call
+
 defaults:
   run:
     shell: bash
+
 concurrency: 
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -10,12 +13,12 @@ concurrency:
 jobs:
 
   sh-euox-pipefail-check:
-  name: "Lint: Check for 'set -euox pipefail' in shell scripts"
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v3
-    - name: Check that all shell scripts use 'set -euox pipefail'
-      run: bash .github/scripts/ensure_set_euox_pipefail.sh
+    name: "Lint: Check for 'set -euox pipefail' in shell scripts"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Check that all shell scripts use 'set -euox pipefail'
+        run: bash .github/scripts/ensure_set_euox_pipefail.sh
 
   # We can't use VALIDATE_GO from super linter because of this issue:
   # https://github.com/github/super-linter/issues/143
