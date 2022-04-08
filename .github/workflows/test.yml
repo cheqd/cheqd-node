@@ -10,7 +10,6 @@ jobs:
   run-unit-test:
     name: Run unit tests
     runs-on: ubuntu-20.04
-    needs: wait-for-lint
     steps:
       - name: Set up Go 1.17
         uses: actions/setup-go@v2
@@ -25,7 +24,6 @@ jobs:
   build-binary:
     name: "Build: binary"
     runs-on: ubuntu-20.04
-    needs: wait-for-lint
     outputs:
       VERSION: ${{ steps.set-version.outputs.VERSION }}
     steps:
@@ -142,7 +140,6 @@ jobs:
   build-node-images:
     name: "Build: cheqd-node and cheqd-cli images"
     runs-on: ubuntu-20.04
-    needs: wait-for-lint
     steps:
       - uses: actions/checkout@v2
         with:
