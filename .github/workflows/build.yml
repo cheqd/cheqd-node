@@ -1,7 +1,7 @@
 name: "Build"
 on: workflow_call
   outputs:
-    VERSION:
+    BUILD_VERSION:
       description: "Build version number"
       value: ${{ jobs.build-binary.outputs.VERSION }}
 defaults:
