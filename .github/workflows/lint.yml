@@ -13,12 +13,12 @@ concurrency:
 jobs:
 
   sh-euox-pipefail-check:
-    name: "Lint: Check for 'set -euox pipefail' in shell scripts"
+    name: "Lint: Shell script pipefail check"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Check that all shell scripts use 'set -euox pipefail'
-        run: bash .github/scripts/ensure_set_euox_pipefail.sh
+      - name: Run 'set -euox pipefail' check
+        run: bash ./.github/scripts/ensure_set_euox_pipefail.sh
 
   # We can't use VALIDATE_GO from super linter because of this issue:
   # https://github.com/github/super-linter/issues/143
@@ -27,8 +27,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
       - uses: actions/checkout@v3
-      - name: golangci-lint
+      - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v2
         with:
           version: latest
@@ -39,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Check if Markdown links are valid
+      - name: Run Markdown link check
         uses: gaurav-nelson/github-action-markdown-link-check@v1
         with:
           config-file: '.github/linters/mlc_config.json'
