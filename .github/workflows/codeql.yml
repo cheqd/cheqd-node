@@ -1,41 +1,65 @@
 name: "CodeQL"
-
 on:
-  push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
   schedule:
-    - cron: '15 3 * * 4'
+    - cron: '0 17 * * *'
+defaults:
+  run:
+    shell: bash
+
 
 jobs:
-  analyze:
-    name: Analyze
+
+  codeql-analysis:
+    name: "CodeQL Analysis"
     runs-on: ubuntu-latest
     permissions:
       actions: read
       contents: read
       security-events: write
 
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [ 'go', 'python' ]
-        # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby' ]
+    steps:             
+      - name: Setup CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: 'go'
+          queries: security-and-quality
+      
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.17'
 
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Fetch Golang protoc compiler plugins
+        env:
+          GOLANG_PROTOBUF_VERSION: 1.3.5
+          GOGO_PROTOBUF_VERSION: 1.3.2
+          GRPC_GATEWAY_VERSION: 1.14.7
+        # Taken from: tendermintdev/sdk-proto-gen:v0.2
+        run: |
+          go get \
+            github.com/golang/protobuf/protoc-gen-go@v"$GOLANG_PROTOBUF_VERSION" \
+            github.com/gogo/protobuf/protoc-gen-gogo@v"$GOGO_PROTOBUF_VERSION" \
+            github.com/gogo/protobuf/protoc-gen-gogofast@v"$GOGO_PROTOBUF_VERSION" \
+            github.com/gogo/protobuf/protoc-gen-gogofaster@v"$GOGO_PROTOBUF_VERSION" \
+            github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@v"$GRPC_GATEWAY_VERSION" \
+            github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@v"$GRPC_GATEWAY_VERSION" \
+            github.com/regen-network/cosmos-proto/protoc-gen-gocosmos@latest      
+      
+      - name: Install buf
+        env:
+          PREFIX: "/usr/local"
+          VERSION: "1.0.0-rc8"
+        run: |
+          curl -sSL "https://github.com/bufbuild/buf/releases/download/v${VERSION}/buf-$(uname -s)-$(uname -m).tar.gz" | \
+          sudo tar -xvzf - -C "${PREFIX}" --strip-components 1
 
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
-      with:
-        languages: ${{ matrix.language }}
-        # this covers a larger portion of checks but are experimental right now
-        queries: security-and-quality
-    - run: |
-       make build
+      - uses: actions/checkout@v3
 
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
+      - name: Build
+        run: |
+          make proto-gen build
 
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
