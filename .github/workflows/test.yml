@@ -7,9 +7,9 @@ env:
 
 jobs:
 
-  run-unit-test:
+  run-go-unit-tests:
     name: Run unit tests
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Set up Go 1.17
         uses: actions/setup-go@v2
@@ -23,7 +23,7 @@ jobs:
 
   build-binary:
     name: "Build: binary"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     outputs:
       VERSION: ${{ steps.set-version.outputs.VERSION }}
     steps:
@@ -78,7 +78,7 @@ jobs:
 
   build-tar-package:
     name: "Build: tar package"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     needs: build-binary
     env:
       VERSION: ${{ needs.build-binary.outputs.VERSION }}
@@ -106,7 +106,7 @@ jobs:
 
   build-deb-package:
     name: "Build: deb package"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     needs: build-binary
     env:
       VERSION: ${{ needs.build-binary.outputs.VERSION }}
@@ -139,7 +139,7 @@ jobs:
 
   build-node-images:
     name: "Build: cheqd-node and cheqd-cli images"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
         with:
@@ -172,7 +172,7 @@ jobs:
 
   test-new-node-setup-from-deb:
     name: "Test: New node setup from deb"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     needs: [build-binary, build-deb-package, build-node-images]
     env:
       VERSION: ${{ needs.build-binary.outputs.VERSION }}
@@ -229,7 +229,7 @@ jobs:
 
   run-python-based-integration-tests:
     name: "Test: Run python based cosmos and identity tests"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     needs: [build-node-images, build-binary]
     steps:
       - name: Load binary artifact
@@ -290,7 +290,7 @@ jobs:
 
   run-bash-based-integration-tests:
     name: "Test: Run bash based identity tests"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     needs: [build-binary, build-node-images]
     steps:
       - name: Load binary artifact
@@ -334,7 +334,7 @@ jobs:
 
   run-upgrade-test-positive-case:
     name: "Test: Run positive case for upgrade"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     needs: build-node-images
     steps:
       - uses: actions/checkout@v2
