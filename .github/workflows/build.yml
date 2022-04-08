@@ -2,7 +2,9 @@ name: "Build"
 on:
   workflow_call:
     outputs:
-      VERSION: ${{ jobs.build-binary.outputs.VERSION }}
+      VERSION:
+        description: "Build version number"
+        value: ${{ jobs.build-binary.outputs.VERSION }}
 defaults:
   run:
     shell: bash
