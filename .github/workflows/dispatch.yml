@@ -15,3 +15,10 @@ jobs:
     name: "Build workflow"
     needs: call-lint
     uses: ./.github/workflows/build.yml
+  
+  call-test:
+    name: "Test workflow"
+    needs: call-build
+    uses: ./.github/workflows/test.yml
+    with:
+      VERSION: ${{ needs.call-build.outputs.VERSION }}
