@@ -7,6 +7,32 @@ env:
 
 jobs:
 
+  codeql-analysis:
+    name: "Test: CodeQL Analysis"
+    permissions:
+    actions: read
+    contents: read
+    security-events: write
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Load binary artifact from build
+        uses: actions/download-artifact@v3
+        with:
+          name: cheqd-noded
+      
+      - name: Setup CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: 'go'
+          queries: security-and-quality
+
+      - name
+      
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
   test-new-node-setup-from-deb:
     name: "Test: New node setup from deb"
     runs-on: ubuntu-latest
