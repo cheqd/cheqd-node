@@ -42,19 +42,21 @@ jobs:
       - name: Setup 4 Validators + 2 Observers Docker localnet
         working-directory: ./docker/localnet
         run: |
+          set -euo pipefail
           bash gen-network-config.sh
           CHEQD_NODE_IMAGE=cheqd-node CHEQD_NODE_VERSION=latest docker compose up -d
 
       - name: Check all Docker localnet nodes are active
-        run: bash tests/tools/wait-for-chain.sh
+        run: |
+          set -euo pipefail
+          bash tests/tools/wait-for-chain.sh
 
       - name: Add an Observer node using Debian package
         working-directory: ./tests/e2e-complex/deb-install
         run: |
-          set -euxo pipefail
+          set -euo pipefail
           ./add-observer.sh
-          cheqd-noded status -n tcp://localhost:26677 2>&1
-          ./wait.sh "[[ $(cheqd-noded status -n 'tcp://localhost:26677' 2>&1 | wc -l) == 1 ]] && echo "New node returns status!""
+          ./wait.sh "[[ $(cheqd-noded status -n 'tcp://localhost:26677' 2>&1 | wc -l) == 1 ]] && echo "Observer node is up""
 
       - name: Promote Observer to Validator
         working-directory: ./tests/e2e-complex/deb-install
@@ -75,7 +77,6 @@ jobs:
   python-integration-tests:
     name: "Python based Cosmos and identity tests"
     runs-on: ubuntu-latest
-    needs: test-new-node-setup
 
     steps:
       - uses: actions/checkout@v3
@@ -136,7 +137,6 @@ jobs:
   bash-integration-tests:
     name: "Bash-based identity tests"
     runs-on: ubuntu-latest
-    needs: test-new-node-setup
 
     steps:
       - uses: actions/checkout@v3
@@ -180,7 +180,6 @@ jobs:
   node-upgrade-test:
     name: "Run positive case for upgrade"
     runs-on: ubuntu-latest
-    needs: test-new-node-setup
 
     steps:
       - uses: actions/checkout@v3
