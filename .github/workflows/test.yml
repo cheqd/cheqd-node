@@ -21,6 +21,8 @@ jobs:
       VERSION: ${{ inputs.VERSION }}
     
     steps:
+      - uses: actions/checkout@v3
+      
       - name: Download Debian package
         uses: actions/download-artifact@v3
         with:
@@ -36,8 +38,6 @@ jobs:
 
       - name: Load node Docker image
         run: docker load -i cheqd-node-image.tar
-
-      - uses: actions/checkout@v3
 
       - name: Setup 4 Validators + 2 Observers Docker localnet
         working-directory: ./docker/localnet
