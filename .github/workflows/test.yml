@@ -17,15 +17,17 @@ jobs:
   test-new-node-setup:
     name: "New node setup"
     runs-on: ubuntu-latest
-
+    env:
+      VERSION: ${{ inputs.VERSION }}
+    
     steps:
       - name: Download Debian package
         uses: actions/download-artifact@v3
         with:
-          name: cheqd-node_${{ inputs.VERSION }}_amd64.deb
+          name: cheqd-node_${{ env.VERSION }}_amd64.deb
 
       - name: Install Debian package
-        run: sudo CHEQD_HOME_DIR=/home/runner/cheqd dpkg -i cheqd-node_${{ inputs.VERSION }}_amd64.deb
+        run: sudo CHEQD_HOME_DIR=/home/runner/cheqd dpkg -i cheqd-node_${{ env.VERSION }}_amd64.deb
 
       - name: Download node Docker image
         uses: actions/download-artifact@v3
@@ -49,19 +51,19 @@ jobs:
       - name: Add an Observer node using Debian package
         working-directory: ./tests/e2e-complex/deb-install
         run: |
-          bash add-observer.sh
+          ./add-observer.sh
           cheqd-noded status -n tcp://localhost:26677 2>&1
-          bash wait.sh "[[ $(cheqd-noded status -n 'tcp://localhost:26677' 2>&1 | wc -l) == 1 ]] && echo "New node returns status!""
+          ./wait.sh "[[ $(cheqd-noded status -n 'tcp://localhost:26677' 2>&1 | wc -l) == 1 ]] && echo "New node returns status!""
 
       - name: Promote Observer to Validator
         working-directory: ./tests/e2e-complex/deb-install
         run: |
-          bash promote-validator.sh
+          ./promote-validator.sh
           cheqd-noded query staking validators --node "http://localhost:26657" | sed -nr 's/.*status: (.*?).*/\1/p' "$1" | while read -r x; do [[ "BOND_STATUS_BONDED" == "$x" ]] && echo "Validator's status is bonded!" || exit 1 ; done
           # shellcheck disable=SC2016
-          bash wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*signature": (.*?).*/\1/p'"'"' | wc -l) == 5 ]] && echo "There are 5 validators signatures in block!"'
+          ./wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*signature": (.*?).*/\1/p'"'"' | wc -l) == 5 ]] && echo "There are 5 validators signatures in block!"'
           # shellcheck disable=SC2016
-          bash wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*(signature": null).*/\1/p'"'"' | wc -l) == 0 ]] && echo "There are no null signatures in block!"'
+          ./wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*(signature": null).*/\1/p'"'"' | wc -l) == 0 ]] && echo "There are no null signatures in block!"'
 
       - name: Gather logs on failure
         if: ${{ failure() }}
@@ -69,7 +71,7 @@ jobs:
           journalctl -ex | grep cheqd
 
   python-integration-tests:
-    name: "Python-based Cosmos and identity tests"
+    name: "Python based Cosmos and identity tests"
     runs-on: ubuntu-latest
 
     steps:
