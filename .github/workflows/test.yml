@@ -61,7 +61,7 @@ jobs:
       - name: Promote Observer to Validator
         working-directory: ./tests/e2e-complex/deb-install
         run: |
-          set -euxo pipefail
+          set -euo pipefail
           bash promote-validator.sh
           cheqd-noded query staking validators --node "http://localhost:26657" | sed -nr 's/.*status: (.*?).*/\1/p' "$1" | while read -r x; do [[ "BOND_STATUS_BONDED" == "$x" ]] && echo "Validator's status is bonded!" || exit 1 ; done
           # shellcheck disable=SC2016
@@ -104,18 +104,19 @@ jobs:
           bash gen-network-config.sh
           CHEQD_NODE_IMAGE=cheqd-node CHEQD_NODE_VERSION=latest docker compose up -d
 
-      - name: Wait for chain
+      - name: Check all Docker localnet nodes are active
         run: bash tests/tools/wait-for-chain.sh
 
-      - name: Set up test environment
+      - name: Setup Python environment
         working-directory: ./tests/e2e-pytest
         run: |
+          set -euo pipefail
           pip3 install -r requirements.txt >> /dev/null
           cp -Rf "${NODE_CONFIGS_BASE}"/validator-0/. /home/runner/cheqd/
           cp -Rf "${NODE_CONFIGS_BASE}"/validator-1/. /home/runner/cheqd/
           sudo chmod -R 755 /home/runner/cheqd/
 
-      - name: Run cosmos-related tests
+      - name: Run Cosmos-related tests
         working-directory: ./tests/e2e-pytest
         run: |
           set -euo pipefail
@@ -159,13 +160,13 @@ jobs:
       - name: Load node Docker image
         run: docker load -i cheqd-node-image.tar
 
-      - name: Set up 4 validators + 2 observers node docker pool
+      - name: Setup 4 Validators + 2 Observers Docker localnet
         working-directory: ./docker/localnet
         run: |
           bash gen-network-config.sh
           CHEQD_NODE_IMAGE=cheqd-node CHEQD_NODE_VERSION=latest docker compose up -d
 
-      - name: Wait for chain
+      - name: Check all Docker localnet nodes are active
         run: bash ./tests/tools/wait-for-chain.sh
 
       - name: Import keys
@@ -173,7 +174,7 @@ jobs:
         run: |
           bash import_keys.sh
 
-      - name: Set up and run tests
+      - name: Run tests
         working-directory: ./tests/e2e-bash
         run: |
           bash run_all.sh
@@ -196,14 +197,14 @@ jobs:
       - name: Give current user ownership
         run: sudo chown "$USER":"$USER" .
 
-      - name: Prepare nodes for checking upgrade
+      - name: Prepare nodes for upgrade
         working-directory: ./tests/e2e-complex/upgrade
         run: bash prepare.sh
 
-      - name: Initiate the upgrade process
+      - name: Initiate upgrade
         working-directory: ./tests/e2e-complex/upgrade
         run: bash initiate_upgrade.sh
 
-      - name: Make the upgrade and check results
+      - name: Check for successful upgrade
         working-directory: ./tests/e2e-complex/upgrade
         run: bash upgrade_and_check.sh
