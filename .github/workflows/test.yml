@@ -51,6 +51,7 @@ jobs:
       - name: Add an Observer node using Debian package
         working-directory: ./tests/e2e-complex/deb-install
         run: |
+          set -euxo pipefail
           ./add-observer.sh
           cheqd-noded status -n tcp://localhost:26677 2>&1
           ./wait.sh "[[ $(cheqd-noded status -n 'tcp://localhost:26677' 2>&1 | wc -l) == 1 ]] && echo "New node returns status!""
@@ -58,6 +59,7 @@ jobs:
       - name: Promote Observer to Validator
         working-directory: ./tests/e2e-complex/deb-install
         run: |
+          set -euxo pipefail
           ./promote-validator.sh
           cheqd-noded query staking validators --node "http://localhost:26657" | sed -nr 's/.*status: (.*?).*/\1/p' "$1" | while read -r x; do [[ "BOND_STATUS_BONDED" == "$x" ]] && echo "Validator's status is bonded!" || exit 1 ; done
           # shellcheck disable=SC2016
