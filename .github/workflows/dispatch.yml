@@ -28,3 +28,5 @@ jobs:
     needs: call-test
     if: startsWith(github.ref, 'refs/tags/v')
     uses: ./.github/workflows/release.yml
+    with:
+      BUILD_VERSION: ${{ needs.call-build.outputs.VERSION }}
