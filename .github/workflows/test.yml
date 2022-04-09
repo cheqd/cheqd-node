@@ -73,8 +73,11 @@ jobs:
   python-integration-tests:
     name: "Python based Cosmos and identity tests"
     runs-on: ubuntu-latest
+    needs: test-new-node-setup
 
     steps:
+      - uses: actions/checkout@v3
+
       - name: Load node binary artifact
         uses: actions/download-artifact@v3
         with:
@@ -91,8 +94,6 @@ jobs:
 
       - name: Load node Docker image
         run: docker load -i cheqd-node-image.tar
-
-      - uses: actions/checkout@v3
 
       - name: Setup 4 Validators + 2 Observers Docker localnet 
         working-directory: ./docker/localnet
@@ -133,8 +134,11 @@ jobs:
   bash-integration-tests:
     name: "Bash-based identity tests"
     runs-on: ubuntu-latest
+    needs: test-new-node-setup
 
     steps:
+      - uses: actions/checkout@v3
+
       - name: Load binary artifact
         uses: actions/download-artifact@v3
         with:
@@ -151,9 +155,6 @@ jobs:
 
       - name: Load node image
         run: docker load -i cheqd-node-image.tar
-
-      - name: Check out
-        uses: actions/checkout@v3
 
       - name: Set up 4 validators + 2 observers node docker pool
         working-directory: ./docker/localnet
@@ -177,6 +178,7 @@ jobs:
   node-upgrade-test:
     name: "Run positive case for upgrade"
     runs-on: ubuntu-latest
+    needs: test-new-node-setup
 
     steps:
       - uses: actions/checkout@v3
