@@ -112,9 +112,9 @@ jobs:
         run: |
           set -euo pipefail
           pip3 install -r requirements.txt >> /dev/null
-          cp -Rf "${NODE_CONFIGS_BASE}"/validator-0/. /home/runner/cheqd/
-          cp -Rf "${NODE_CONFIGS_BASE}"/validator-1/. /home/runner/cheqd/
-          sudo chmod -R 755 /home/runner/cheqd/
+          cp -Rf "${NODE_CONFIGS_BASE}"/validator-0/. /home/runner/.cheqdnode/
+          cp -Rf "${NODE_CONFIGS_BASE}"/validator-1/. /home/runner/.cheqdnode/
+          sudo chmod -R 777 /home/runner/
 
       - name: Run Cosmos-related tests
         working-directory: ./tests/e2e-pytest
@@ -185,6 +185,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Download cheqd-cli Docker image
         uses: actions/download-artifact@v3
