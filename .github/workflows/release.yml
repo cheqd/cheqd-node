@@ -9,6 +9,7 @@ jobs:
 
   set-release-version:
     name: "Set release version number from commit tag"
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     outputs:
       RELEASE_VERSION: ${{ steps.set-version.outputs.VERSION }}

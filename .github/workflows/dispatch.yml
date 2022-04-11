@@ -23,8 +23,21 @@ jobs:
   #   with:
   #     VERSION: ${{ needs.call-build.outputs.VERSION }}
 
+  # check-for-release-tag:
+  #   name: "Check for release tag"
+  #   needs: call-build
+  #   if: startsWith(github.ref, 'refs/tags/v')
+  #   run: 
+
   call-release:
     name: "Release"
     needs: call-build
-    if: startsWith(github.ref, 'refs/tags/v')
-    uses: ./.github/workflows/release.yml
+
+    steps:
+      - name: "Check for release tag" 
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: echo "Release tag found. Will trigger Release workflow"
+      
+      - name: "Trigger release workflow"
+        if: ${{ success() }}
+        uses: ./.github/workflows/release.yml
