@@ -32,7 +32,7 @@ jobs:
     outputs:
       VERSION: ${{ steps.set-version.outputs.VERSION }}
     env:
-      VERSION: ${{ steps.set-version.outputs.VERSION }}
+      VERSION: ${{ needs.set-version.outputs.VERSION }}
 
     steps:
       - uses: actions/setup-go@v3
