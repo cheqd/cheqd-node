@@ -26,8 +26,11 @@ jobs:
   check-for-release-tag:
     name: "Check for release tag"
     needs: call-lint
+    runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
-    run: echo "Release tag found. Will trigger Release workflow"
+    
+    steps:
+      - run: echo "Release tag found. Will trigger Release workflow"
 
   call-release:
     name: "Release"
