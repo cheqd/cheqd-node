@@ -61,9 +61,8 @@ jobs:
       - name: Promote Observer to Validator
         working-directory: ./tests/e2e-complex/deb-install
         run: |
-          set -euo pipefail
           bash promote-validator.sh
-          cheqd-noded query staking validators --node "http://localhost:26657" | sed -nr 's/.*status: (.*?).*/\1/p' "$1" | while read -r x; do [[ "BOND_STATUS_BONDED" == "$x" ]] && echo "Validator's status is bonded!" || exit 1 ; done
+          bash check_promotion.sh
           # shellcheck disable=SC2016
           bash wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*signature": (.*?).*/\1/p'"'"' | wc -l) == 5 ]] && echo "There are 5 validators signatures in block!"'
           # shellcheck disable=SC2016
@@ -112,9 +111,9 @@ jobs:
         run: |
           set -euo pipefail
           pip3 install -r requirements.txt >> /dev/null
-          cp -Rf "${NODE_CONFIGS_BASE}"/validator-0/. /home/runner/cheqd/
-          cp -Rf "${NODE_CONFIGS_BASE}"/validator-1/. /home/runner/cheqd/
-          sudo chmod -R 755 /home/runner/cheqd/
+          cp -Rf "${NODE_CONFIGS_BASE}"/validator-0/. /home/runner/.cheqdnode/
+          cp -Rf "${NODE_CONFIGS_BASE}"/validator-1/. /home/runner/.cheqdnode/
+          sudo chmod -R 777 /home/runner/
 
       - name: Run Cosmos-related tests
         working-directory: ./tests/e2e-pytest
@@ -185,6 +184,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Download cheqd-cli Docker image
         uses: actions/download-artifact@v3
