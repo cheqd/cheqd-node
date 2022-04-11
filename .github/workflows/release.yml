@@ -25,12 +25,12 @@ jobs:
       - name: Download tarball package
         uses: actions/download-artifact@v3
         with:
-          name: cheqd-node_${{ inputs.VERSION }}.tar.gz
+          name: cheqd-node_${{ inputs.BUILD_VERSION }}.tar.gz
 
       - name: Download Debian package
         uses: actions/download-artifact@v3
         with:
-          name: cheqd-node_${{ env.VERSION }}_amd64.deb
+          name: cheqd-node_${{ inputs.BUILD_VERSION }}_amd64.deb
 
 
 
