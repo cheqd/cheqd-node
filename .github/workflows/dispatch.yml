@@ -7,9 +7,9 @@ concurrency:
 
 jobs:
 
-  call-lint:
-    name: "Lint"
-    uses: ./.github/workflows/lint.yml
+  # call-lint:
+  #   name: "Lint"
+  #   uses: ./.github/workflows/lint.yml
 
   call-build:
     name: "Build"
@@ -23,10 +23,10 @@ jobs:
     with:
       VERSION: ${{ needs.call-build.outputs.VERSION }}
 
-  call-release:
-    name: "Release"
-    needs: call-test
-    if: startsWith(github.ref, 'refs/tags/v')
-    uses: ./.github/workflows/release.yml
-    with:
-      BUILD_VERSION: ${{ needs.call-build.outputs.VERSION }}
+  # call-release:
+  #   name: "Release"
+  #   needs: call-test
+  #   if: startsWith(github.ref, 'refs/tags/v')
+  #   uses: ./.github/workflows/release.yml
+  #   with:
+  #     BUILD_VERSION: ${{ needs.call-build.outputs.VERSION }}
