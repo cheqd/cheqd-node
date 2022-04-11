@@ -52,7 +52,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cheqd-node_${{ env.RELEASE_VERSION }}.tar.gz
-          path: build-tools/output/cheqd-node_${{ env.RELEASE_VERSION }}.tar.gz
+          path: releases/{{ env.RELEASE_VERSION }}/cheqd-node_${{ env.RELEASE_VERSION }}.tar.gz
 
       - name: Build Debian package for release
         working-directory: ./build-tools
@@ -63,16 +63,17 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
-          path: build-tools/output/cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
+          path: releases/{{ env.RELEASE_VERSION }}/cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
 
       - name: Publish new release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "cheqd-node_${{ env.RELEASE_VERSION }}.tar.gz,cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb"
+          artifacts: "releases/{{ env.RELEASE_VERSION }}/**"
           artifactErrorsFailBuild: true
           draft: true
           prerelease: true
           generateReleaseNotes: true
+          replacesArtifacts: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
   release-docker-images:
