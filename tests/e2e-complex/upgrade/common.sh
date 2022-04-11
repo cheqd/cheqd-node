@@ -77,8 +77,8 @@ function docker_compose_down () {
 
 # Clean environment
 function clean_env () {
-    rm -rf node_configs
-    rm -f $FNAME_TXHASHES
+    sudo rm -rf node_configs
+    sudo rm -f $FNAME_TXHASHES
 }
 
 # Run command using local generated keys from node_configs/client
