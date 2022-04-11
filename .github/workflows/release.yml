@@ -1,10 +1,5 @@
 name: "Release"
-on:
-  workflow_call:
-    inputs:
-      RELEASE_VERSION:
-        description: "Release version number from commit tag"
-        type: string
+on: workflow_call
 defaults:
   run:
     shell: bash
@@ -12,11 +7,25 @@ defaults:
 
 jobs:
 
+  set-release-version:
+    name: "Set release version number from commit tag"
+    runs-on: ubuntu-latest
+    outputs:
+      RELEASE_VERSION: ${{ steps.set-version.outputs.VERSION }}
+
+    steps:
+      - name: Set version
+        id: set-version
+        run: echo ::set-output name=RELEASE_VERSION::${GITHUB_REF/refs\/tags\//}
+
   release-packages:
     name: "Create new pre-release and publish tar/Debian packages"
     runs-on: ubuntu-latest
+    needs: set-release-version
     permissions:
       contents: write
+    env:
+      RELEASE_VERSION: ${{ needs.set-release-version.outputs.RELEASE_VERSION }}
     
     steps:
       - uses: actions/checkout@v3
@@ -42,8 +51,8 @@ jobs:
       - name: Store tarball artifact for release
         uses: actions/upload-artifact@v3
         with:
-          name: cheqd-node_${{ inputs.RELEASE_VERSION }}.tar.gz
-          path: build-tools/output/cheqd-node_${{ inputs.RELEASE_VERSION }}.tar.gz
+          name: cheqd-node_${{ env.RELEASE_VERSION }}.tar.gz
+          path: build-tools/output/cheqd-node_${{ env.RELEASE_VERSION }}.tar.gz
 
       - name: Build Debian package for release
         working-directory: ./build-tools
@@ -53,13 +62,13 @@ jobs:
       - name: Store Debian package artifact for release
         uses: actions/upload-artifact@v3
         with:
-          name: cheqd-node_${{ inputs.RELEASE_VERSION }}_amd64.deb
-          path: build-tools/output/cheqd-node_${{ inputs.RELEASE_VERSION }}_amd64.deb
+          name: cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
+          path: build-tools/output/cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
 
       - name: Publish new release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "cheqd-node_${{ inputs.RELEASE_VERSION }}.tar.gz,cheqd-node_${{ inputs.RELEASE_VERSION }}_amd64.deb"
+          artifacts: "cheqd-node_${{ env.RELEASE_VERSION }}.tar.gz,cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb"
           artifactErrorsFailBuild: true
           draft: true
           prerelease: true
@@ -69,8 +78,10 @@ jobs:
   release-docker-images:
     name: "Publish Docker images for new version"
     runs-on: ubuntu-latest
+    needs: set-release-version
     env:
       REGISTRY: ghcr.io
+      RELEASE_VERSION: ${{ needs.set-release-version.outputs.RELEASE_VERSION }}
     
     steps:
       - uses: actions/checkout@v3
@@ -100,24 +111,24 @@ jobs:
 
       - name: Push cheqd-node image
         run: |
-          docker tag cheqd-node ghcr.io/${{ github.repository }}:${{ inputs.RELEASE_VERSION }}
+          docker tag cheqd-node ghcr.io/${{ github.repository }}:${{ env.RELEASE_VERSION }}
           docker tag cheqd-node ghcr.io/${{ github.repository }}:latest
-          docker push ghcr.io/${{ github.repository }}:${{ inputs.RELEASE_VERSION }}
+          docker push ghcr.io/${{ github.repository }}:${{ env.RELEASE_VERSION }}
           docker push ghcr.io/${{ github.repository }}:latest
 
       - name: Push cheqd-cli image
         run: |
-          docker tag cheqd-cli ghcr.io/${{ github.repository_owner }}/cheqd-cli:${{ inputs.RELEASE_VERSION }}
+          docker tag cheqd-cli ghcr.io/${{ github.repository_owner }}/cheqd-cli:${{ env.RELEASE_VERSION }}
           docker tag cheqd-cli ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
-          docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:${{ inputs.RELEASE_VERSION }}
+          docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:${{ env.RELEASE_VERSION }}
           docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
 
       - name: Download deb
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-node_${{ inputs.RELEASE_VERSION }}_amd64.deb
+          name: cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
 
       - name: Download tar
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-node_${{ inputs.RELEASE_VERSION }}.tar.gz
+          name: cheqd-node_${{ env.RELEASE_VERSION }}.tar.gz
