@@ -7,28 +7,31 @@ defaults:
 
 jobs:
 
-  set-release-version:
-    name: "Set release version number from commit tag"
-    runs-on: ubuntu-latest
-    outputs:
-      RELEASE_VERSION: ${{ steps.set-version.outputs.VERSION }}
+  # set-release-version:
+  #   name: "Set release version number from commit tag"
+  #   runs-on: ubuntu-latest
+  #   # outputs:
+  #   #   RELEASE_VERSION: ${{ steps.set-version.outputs.VERSION }}
 
-    steps:
-      - name: Set version
-        id: set-version
-        run: echo ::set-output name=RELEASE_VERSION::"${GITHUB_REF##*/}"
+  #   steps:
+  #     - name: Set version
+  #       id: set-version
+  #       run: echo ::set-output name=RELEASE_VERSION::"${GITHUB_REF##*/}" >> "$GITHUB_ENV"
 
   release-packages:
     name: "Create new pre-release and publish tar/Debian packages"
     runs-on: ubuntu-latest
-    needs: set-release-version
+    # needs: set-release-version
     permissions:
       contents: write
-    env:
-      RELEASE_VERSION: ${{ needs.set-release-version.outputs.RELEASE_VERSION }}
+    # env:
+    #   RELEASE_VERSION: ${{ needs.set-release-version.outputs.RELEASE_VERSION }}
     
     steps:
       - uses: actions/checkout@v3
+
+      - name: Set release version
+        run: echo ::set-output name=RELEASE_VERSION::"${GITHUB_REF##*/}" >> "$GITHUB_ENV"
 
       - name: Download node binary from build stage
         uses: actions/download-artifact@v3
@@ -79,13 +82,16 @@ jobs:
   release-docker-images:
     name: "Publish Docker images for new version"
     runs-on: ubuntu-latest
-    needs: set-release-version
+    # needs: set-release-version
     env:
       REGISTRY: ghcr.io
-      RELEASE_VERSION: ${{ needs.set-release-version.outputs.RELEASE_VERSION }}
+      # RELEASE_VERSION: ${{ needs.set-release-version.outputs.RELEASE_VERSION }}
     
     steps:
       - uses: actions/checkout@v3
+
+      - name: Set release version
+        run: echo ::set-output name=RELEASE_VERSION::"${GITHUB_REF##*/}" >> "$GITHUB_ENV"
 
       - name: Download cheqd-cli Docker image
         uses: actions/download-artifact@v3

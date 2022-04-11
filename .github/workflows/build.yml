@@ -4,7 +4,7 @@ on:
     outputs:
       VERSION:
         description: "Build version number"
-        value: ${{ jobs.build-binary.outputs.VERSION }}
+        value: ${{ jobs.build-packages.outputs.VERSION }}
 defaults:
   run:
     shell: bash
@@ -25,7 +25,7 @@ jobs:
       - name: Run Golang unit tests
         run: go test -v ./...
 
-  build-binary-and-packages:
+  build-packages:
     name: "Node binary"
     needs: go-unit-tests
     runs-on: ubuntu-latest
@@ -79,7 +79,7 @@ jobs:
         id: set-version
         run: |
           VERSION=$(build/cheqd-noded version 2>&1)
-          echo "::set-output name=VERSION::$VERSION"
+          echo "::set-output name=VERSION::$VERSION" >> "$GITHUB_ENV"
       
       - name: Build tarball
         working-directory: ./build-tools
