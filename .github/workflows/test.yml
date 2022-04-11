@@ -61,7 +61,6 @@ jobs:
       - name: Promote Observer to Validator
         working-directory: ./tests/e2e-complex/deb-install
         run: |
-          set -euo pipefail
           bash promote-validator.sh
           cheqd-noded query staking validators --node "http://localhost:26657" | sed -nr 's/.*status: (.*?).*/\1/p' "$1" | while read -r x; do [[ "BOND_STATUS_BONDED" == "$x" ]] && echo "Validator's status is bonded!" || exit 1 ; done
           # shellcheck disable=SC2016
