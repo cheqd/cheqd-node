@@ -78,8 +78,8 @@ jobs:
       - name: Set version number
         id: set-version
         run: |
-          VERSION=$(build/cheqd-noded version 2>&1)
-          echo "::set-output name=VERSION::$VERSION" >> "$GITHUB_ENV"
+          VERSION=$(build/cheqd-noded version 2>&1) >> "$GITHUB_ENV"
+          echo ::set-output name=VERSION::"$VERSION"
 
       - name: Download node binary from build stage
         uses: actions/download-artifact@v3
