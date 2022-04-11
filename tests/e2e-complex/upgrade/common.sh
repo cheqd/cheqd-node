@@ -86,7 +86,7 @@ function local_client_tx () {
     cheqd_noded_docker "$@" --home node_configs/client/.cheqdnode/ --keyring-backend test
 }
 
-function make_777 () {
+function make_775 () {
     sudo chmod -R 775 node_configs
 }
 

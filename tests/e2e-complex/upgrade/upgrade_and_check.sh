@@ -22,7 +22,7 @@ bash ../../tools/wait-for-chain.sh "$UPGRADE_HEIGHT" $((3 * VOTING_PERIOD))
 docker_compose_down
 
 # Make all the data accessible
-make_777
+make_775
 
 # Start docker-compose with new base image on new version
 docker_compose_up "$CHEQD_IMAGE_TO" "$(pwd)"
