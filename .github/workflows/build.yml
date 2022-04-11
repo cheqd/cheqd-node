@@ -31,8 +31,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       VERSION: ${{ steps.set-version.outputs.VERSION }}
-    env:
-      VERSION: ${{ needs.set-version.outputs.VERSION }}
 
     steps:
       - uses: actions/setup-go@v3
@@ -80,7 +78,7 @@ jobs:
       - name: Set version number
         id: set-version
         run: |
-          VERSION=$(build/cheqd-noded version 2>&1)
+          VERSION=$(build/cheqd-noded version 2>&1) >> "$GITHUB_ENV"
           echo ::set-output name=VERSION::"$VERSION"
 
       - name: Download node binary from build stage
