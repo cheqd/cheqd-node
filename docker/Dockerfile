@@ -52,6 +52,9 @@ RUN make proto-gen build
 ###############################################################
 
 FROM ubuntu:focal AS base
+LABEL org.opencontainers.image.description "cheqd CLI Docker image"
+LABEL org.opencontainers.image.source "https://github.com/cheqd/cheqd-node"
+LABEL org.opencontainers.image.documentation "https://docs.cheqd.io/node"
 
 # Copy compiled node binary from Stage 1
 COPY --from=builder /app/build/cheqd-noded /bin
@@ -83,6 +86,9 @@ ENTRYPOINT [ "cheqd-noded" ]
 ###############################################################
 
 FROM base AS node
+LABEL org.opencontainers.image.description "cheqd Node Docker image"
+LABEL org.opencontainers.image.source "https://github.com/cheqd/cheqd-node"
+LABEL org.opencontainers.image.documentation "https://docs.cheqd.io/node"
 
 # Set runner script
 COPY --chown=cheqd:cheqd docker/entrypoint.sh /bin/node-start
