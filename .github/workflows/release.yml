@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Set version
         id: set-version
-        run: echo ::set-output name=RELEASE_VERSION::${GITHUB_REF/refs\/tags\//}
+        run: echo ::set-output name=RELEASE_VERSION::"${GITHUB_REF##*/}"
 
   release-packages:
     name: "Create new pre-release and publish tar/Debian packages"
