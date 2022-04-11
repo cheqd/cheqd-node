@@ -87,7 +87,7 @@ function local_client_tx () {
 }
 
 function make_777 () {
-    sudo chmod -R 777 node_configs
+    sudo chmod -R 775 node_configs
 }
 
 
