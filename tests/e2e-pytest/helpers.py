@@ -12,11 +12,11 @@ IMPLICIT_TIMEOUT = 30
 ENCODING = "utf-8"
 READ_BUFFER = 60000
 
-TEST_NET_NETWORK = "cheqd-testnet-2"
+TEST_NET_NETWORK = "cheqd-testnet-4"
 LOCAL_NET_NETWORK = "cheqd"
-TEST_NET_NODE_TCP = "--node 'tcp://rpc.cheqd.network:443'"
+TEST_NET_NODE_TCP = "--node tcp://rpc.cheqd.network:443"
 TEST_NET_NODE_HTTP = "--node https://rpc.cheqd.network/"
-LOCAL_NET_NODE_TCP = "--node 'tcp://localhost:26657'"
+LOCAL_NET_NODE_TCP = "--node tcp://localhost:26657"
 LOCAL_NET_NODE_HTTP = "--node http://localhost:26657/"
 TEST_NET_DESTINATION = f"{TEST_NET_NODE_TCP} --chain-id 'cheqd-testnet-4'"
 TEST_NET_DESTINATION_HTTP = f"{TEST_NET_NODE_HTTP} --chain-id 'cheqd-testnet-4'"
