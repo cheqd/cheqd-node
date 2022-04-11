@@ -80,7 +80,15 @@ jobs:
         run: |
           VERSION=$(build/cheqd-noded version 2>&1)
           echo "::set-output name=VERSION::$VERSION" >> "$GITHUB_ENV"
-      
+
+      - name: Download node binary from build stage
+        uses: actions/download-artifact@v3
+        with:
+          name: cheqd-noded
+
+      - name: Restore binary permissions
+        run: sudo chmod +x cheqd-noded
+
       - name: Build tarball
         working-directory: ./build-tools
         run: |

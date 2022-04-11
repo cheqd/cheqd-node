@@ -13,6 +13,7 @@ jobs:
     
     steps:
       - uses: actions/checkout@v3
+
       - name: Run 'set -euox pipefail' check
         run: bash ./.github/scripts/ensure_set_euox_pipefail.sh
   
@@ -22,6 +23,7 @@ jobs:
     
     steps:
       - uses: actions/checkout@v3
+
       - name: Run Markdown link check
         uses: gaurav-nelson/github-action-markdown-link-check@v1
         with:
@@ -37,6 +39,7 @@ jobs:
     
     steps:
       - uses: actions/checkout@v3
+
       - uses: actions/setup-go@v3
         with:
           go-version: '1.17'
