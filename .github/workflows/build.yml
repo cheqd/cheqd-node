@@ -79,53 +79,6 @@ jobs:
           VERSION=$(build/cheqd-noded version 2>&1)
           echo ::set-output name=VERSION::"$VERSION"
 
-  build-tarball-package:
-    name: "Tarball package"
-    runs-on: ubuntu-latest
-    needs: build-binary
-    env:
-      VERSION: ${{ needs.build-binary.outputs.VERSION }}
-    
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Load binary artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: cheqd-noded
-
-      - name: Restore binary permissions
-        run: sudo chmod +x cheqd-noded
-
-      - name: Build tarball
-        working-directory: ./build-tools
-        run: |
-          ./build-tar.sh "../cheqd-noded"
-      
-      - name: Store tarball artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: cheqd-node_${{ env.VERSION }}.tar.gz
-          path: build-tools/output/cheqd-node_${{ env.VERSION }}.tar.gz
-  
-  build-debian-package:
-    name: "Debian package"
-    runs-on: ubuntu-latest
-    needs: build-binary
-    env:
-      VERSION: ${{ needs.build-binary.outputs.VERSION }}
-    
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Load binary artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: cheqd-noded
-
-      - name: Restore binary permissions
-        run: sudo chmod +x cheqd-noded
-      
       - name: Install fpm
         run: |
           sudo apt-get install ruby ruby-dev rubygems build-essential
@@ -138,6 +91,7 @@ jobs:
       
       - name: Store Debian package artifact
         uses: actions/upload-artifact@v3
+        env:
         with:
           name: cheqd-node_${{ env.VERSION }}_amd64.deb
           path: build-tools/output/cheqd-node_${{ env.VERSION }}_amd64.deb
