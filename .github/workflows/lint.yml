@@ -31,9 +31,9 @@ jobs:
           use-quiet-mode: 'yes'
           use-verbose-mode: 'yes'
   
-  # We can't use VALIDATE_GO from super linter because of this issue:
-  # https://github.com/github/super-linter/issues/143
   go-lint:
+    # We can't use VALIDATE_GO from super linter because of this issue:
+    # https://github.com/github/super-linter/issues/143
     name: "Golang"
     runs-on: ubuntu-latest
     
