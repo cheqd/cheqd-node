@@ -27,7 +27,6 @@ jobs:
 
   build-binary:
     name: "Node binary"
-    needs: go-unit-tests
     runs-on: ubuntu-latest
     outputs:
       VERSION: ${{ steps.set-version.outputs.VERSION }}
@@ -147,7 +146,6 @@ jobs:
   build-docker-images:
     name: "Docker images"
     runs-on: ubuntu-latest
-    needs: go-unit-tests
 
     steps:
       - uses: actions/checkout@v3
