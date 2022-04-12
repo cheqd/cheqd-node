@@ -1,11 +1,11 @@
 name: "Release"
-on: workflow_call
-# on:
-#   workflow_call:
-#     inputs:
-#       RELEASE_VERSION:
-#         description: "Release version number"
-#         type: string
+# on: workflow_call
+on:
+  workflow_call:
+    inputs:
+      RELEASE_VERSION:
+        description: "Release version number"
+        type: string
 defaults:
   run:
     shell: bash
@@ -19,7 +19,7 @@ jobs:
     permissions:
       contents: write
     env:
-      RELEASE_VERSION: ${{ env.GITHUB_REF_NAME }}
+      RELEASE_VERSION: ${{ inputs.RELEASE_VERSION }}
     
     steps:
       - uses: actions/checkout@v3
@@ -77,7 +77,7 @@ jobs:
     # needs: set-release-version
     env:
       REGISTRY: ghcr.io
-      RELEASE_VERSION: ${{ env.GITHUB_REF_NAME }}
+      RELEASE_VERSION: ${{ inputs.RELEASE_VERSION }}
     
     steps:
       - uses: actions/checkout@v3
