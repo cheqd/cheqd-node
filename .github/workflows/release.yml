@@ -38,17 +38,6 @@ jobs:
           sudo apt-get install ruby ruby-dev rubygems build-essential
           sudo gem install --no-document fpm
 
-      - name: Build tarball package for release
-        working-directory: ./build-tools
-        run: |
-          ./build-tar.sh "../cheqd-noded"
-
-      - name: Store tarball artifact for release
-        uses: actions/upload-artifact@v3
-        with:
-          name: cheqd-node_${{ env.RELEASE_VERSION }}.tar.gz
-          path: build-tools/output/cheqd-node_${{ env.RELEASE_VERSION }}.tar.gz
-
       - name: Build Debian package for release
         working-directory: ./build-tools
         run: |
@@ -68,7 +57,6 @@ jobs:
           draft: true
           files: |
             build-tools/output/cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
-            build-tools/output/cheqd-node_${{ env.RELEASE_VERSION }}.tar.gz
             cheqd-noded
 
   release-docker-images:
