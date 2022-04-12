@@ -16,16 +16,16 @@ jobs:
     needs: call-lint
     uses: ./.github/workflows/build.yml
   
-  # call-test:
-  #   name: "Test"
-  #   needs: call-build
-  #   uses: ./.github/workflows/test.yml
-  #   with:
-  #     VERSION: ${{ needs.call-build.outputs.VERSION }}
+  call-test:
+    name: "Test"
+    needs: call-build
+    uses: ./.github/workflows/test.yml
+    with:
+      VERSION: ${{ needs.call-build.outputs.VERSION }}
 
   call-release:
     name: "Release"
-    needs: call-build
+    needs: [call-test, call-build]
     if: startsWith(github.ref, 'refs/tags/v')
     uses: ./.github/workflows/release.yml
     with:
