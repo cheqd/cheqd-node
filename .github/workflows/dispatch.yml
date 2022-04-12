@@ -38,8 +38,8 @@ jobs:
 
   call-release:
     name: "Release"
+    needs: call-test
     if: startsWith(github.ref, 'refs/tags/v')
-    # needs: check-for-release-tag
     uses: ./.github/workflows/release.yml
     # with:
     #   RELEASE_VERSION: ${{ needs.check-for-release-tag.outputs.RELEASE_VERSION }}
