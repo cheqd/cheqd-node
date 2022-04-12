@@ -92,6 +92,7 @@ jobs:
       - name: Store Debian package artifact
         uses: actions/upload-artifact@v3
         env:
+          VERSION: ${{ steps.set-version.outputs.VERSION }}
         with:
           name: cheqd-node_${{ env.VERSION }}_amd64.deb
           path: build-tools/output/cheqd-node_${{ env.VERSION }}_amd64.deb
