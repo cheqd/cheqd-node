@@ -62,7 +62,7 @@ jobs:
         working-directory: ./tests/e2e-complex/deb-install
         run: |
           bash promote-validator.sh
-          bash check_promotion.sh
+          bash check-promotion.sh
           # shellcheck disable=SC2016
           bash wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*signature": (.*?).*/\1/p'"'"' | wc -l) == 5 ]] && echo "There are 5 validators signatures in block!"'
           # shellcheck disable=SC2016
@@ -113,7 +113,7 @@ jobs:
           pip3 install -r requirements.txt >> /dev/null
           cp -Rf "${NODE_CONFIGS_BASE}"/validator-0/. /home/runner/.cheqdnode/
           cp -Rf "${NODE_CONFIGS_BASE}"/validator-1/. /home/runner/.cheqdnode/
-          sudo chmod -R 777 /home/runner/
+          sudo chmod -R 775 /home/runner/
 
       - name: Run Cosmos-related tests
         working-directory: ./tests/e2e-pytest

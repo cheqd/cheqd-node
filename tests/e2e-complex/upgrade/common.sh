@@ -77,8 +77,8 @@ function docker_compose_down () {
 
 # Clean environment
 function clean_env () {
-    rm -rf node_configs
-    rm -f $FNAME_TXHASHES
+    sudo rm -rf node_configs
+    sudo rm -f $FNAME_TXHASHES
 }
 
 # Run command using local generated keys from node_configs/client
@@ -86,8 +86,8 @@ function local_client_tx () {
     cheqd_noded_docker "$@" --home node_configs/client/.cheqdnode/ --keyring-backend test
 }
 
-function make_777 () {
-    sudo chmod -R 777 node_configs
+function make_775 () {
+    sudo chmod -R 775 node_configs
 }
 
 
