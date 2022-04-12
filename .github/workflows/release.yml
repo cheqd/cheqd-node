@@ -1,5 +1,4 @@
 name: "Release"
-# on: workflow_call
 on:
   workflow_call:
     inputs:
@@ -39,17 +38,6 @@ jobs:
           sudo apt-get install ruby ruby-dev rubygems build-essential
           sudo gem install --no-document fpm
 
-      - name: Build tarball package for release
-        working-directory: ./build-tools
-        run: |
-          ./build-tar.sh "../cheqd-noded"
-
-      - name: Store tarball artifact for release
-        uses: actions/upload-artifact@v3
-        with:
-          name: cheqd-node_${{ env.RELEASE_VERSION }}.tar.gz
-          path: build-tools/output/cheqd-node_${{ env.RELEASE_VERSION }}.tar.gz
-
       - name: Build Debian package for release
         working-directory: ./build-tools
         run: |
@@ -69,12 +57,11 @@ jobs:
           draft: true
           files: |
             build-tools/output/cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
-            build-tools/output/cheqd-node_${{ env.RELEASE_VERSION }}.tar.gz
+            cheqd-noded
 
   release-docker-images:
     name: "Publish Docker images for new version"
     runs-on: ubuntu-latest
-    # needs: set-release-version
     env:
       REGISTRY: ghcr.io
       RELEASE_VERSION: ${{ inputs.RELEASE_VERSION }}
@@ -84,24 +71,12 @@ jobs:
         with:
           fetch-depth: 0 # Required to fetch version
 
-      # - name: Set release version
-      #   run: echo ::set-output name=RELEASE_VERSION::"${GITHUB_REF##*/}" >> "$GITHUB_ENV"
+      - name: Build cheqd-cli Docker image 'cheqd-noded' as entrypoint and no build args
+        # TODO: Get rid of UID and GID
+        run: docker build --target base -t cheqd-cli -f docker/Dockerfile .
 
-      - name: Download cheqd-cli Docker image
-        uses: actions/download-artifact@v3
-        with:
-          name: cheqd-cli-image.tar
-
-      - name: Download cheqd-node Docker image
-        uses: actions/download-artifact@v3
-        with:
-          name: cheqd-node-image.tar
-
-      - name: Load cheqd-cli image
-        run: docker load -i cheqd-cli-image.tar
-
-      - name: Load cheqd-node image
-        run: docker load -i cheqd-node-image.tar
+      - name: Build cheqd-node Docker image with 'node-start' as entrypoint and no build args
+        run: docker build --target node -t cheqd-node -f docker/Dockerfile .
 
       - name: Login to Container registry
         uses: docker/login-action@v1
@@ -123,13 +98,3 @@ jobs:
           docker tag cheqd-cli ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
           docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:${{ env.RELEASE_VERSION }}
           docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
-
-      - name: Download deb
-        uses: actions/download-artifact@v2
-        with:
-          name: cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
-
-      - name: Download tar
-        uses: actions/download-artifact@v2
-        with:
-          name: cheqd-node_${{ env.RELEASE_VERSION }}.tar.gz
