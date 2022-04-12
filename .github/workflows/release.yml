@@ -45,7 +45,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cheqd-node_${{ inputs.RELEASE_VERSION }}.tar.gz
-          path: releases/cheqd-node_${{ inputs.RELEASE_VERSION }}.tar.gz
+          path: build-tools/output/cheqd-node_${{ inputs.RELEASE_VERSION }}.tar.gz
 
       - name: Build Debian package for release
         working-directory: ./build-tools
@@ -56,12 +56,12 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cheqd-node_${{ inputs.RELEASE_VERSION }}_amd64.deb
-          path: releases/cheqd-node_${{ inputs.RELEASE_VERSION }}_amd64.deb
+          path: build-tools/output/cheqd-node_${{ inputs.RELEASE_VERSION }}_amd64.deb
 
       - name: Publish new release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "releases/*"
+          artifacts: "build-tools/output/*"
           artifactErrorsFailBuild: true
           draft: true
           prerelease: true
