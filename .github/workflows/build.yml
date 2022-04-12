@@ -65,6 +65,7 @@ jobs:
       - name: Build node binary
         run: |
           make proto-gen build
+          
       - name: Store artifact
         uses: actions/upload-artifact@v3
         with:
@@ -84,7 +85,7 @@ jobs:
       - name: Build Debian package
         working-directory: ./build-tools
         run: |
-          ./build-deb.sh "../cheqd-noded"
+          ./build-deb.sh "../build/cheqd-noded"
       
       - name: Store Debian package artifact
         uses: actions/upload-artifact@v3
