@@ -72,7 +72,6 @@ jobs:
           fetch-depth: 0 # Required to fetch version
 
       - name: Build cheqd-cli Docker image 'cheqd-noded' as entrypoint and no build args
-        # TODO: Get rid of UID and GID
         run: docker build --target base -t cheqd-cli -f docker/Dockerfile .
 
       - name: Build cheqd-node Docker image with 'node-start' as entrypoint and no build args
