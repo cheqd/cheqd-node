@@ -1,55 +1,64 @@
-name: Lint
+name: "Lint"
 on: workflow_call
 defaults:
   run:
     shell: bash
-concurrency: 
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+
 
 jobs:
 
   sh-euox-pipefail-check:
-    name: "Lint: Check for 'set -euox pipefail' in shell scripts"
+    name: "Shell pipefail check"
     runs-on: ubuntu-latest
+    
     steps:
       - uses: actions/checkout@v3
-      - name: Check that all shell scripts use 'set -euox pipefail'
-        run: bash .github/scripts/ensure_set_euox_pipefail.sh
 
-  # We can't use VALIDATE_GO from super linter because of this issue:
-  # https://github.com/github/super-linter/issues/143
-  go-lint:
-    name: "Lint: Golang"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/setup-go@v2
-      - uses: actions/checkout@v3
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v2
-        with:
-          version: latest
-          args: --timeout 5m0s
-
+      - name: Run 'set -euox pipefail' check
+        run: bash ./.github/scripts/ensure_set_euox_pipefail.sh
+  
   md-link-check:
-    name: "Lint: Check for broken Markdown links"
+    name: "Broken Markdown links"
     runs-on: ubuntu-latest
+    
     steps:
       - uses: actions/checkout@v3
-      - name: Check if Markdown links are valid
+
+      - name: Run Markdown link check
         uses: gaurav-nelson/github-action-markdown-link-check@v1
         with:
           config-file: '.github/linters/mlc_config.json'
           use-quiet-mode: 'yes'
           use-verbose-mode: 'yes'
+  
+  go-lint:
+    # We can't use VALIDATE_GO from super linter because of this issue:
+    # https://github.com/github/super-linter/issues/143
+    name: "Golang"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '1.17'
+      
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: latest
+          args: --timeout 5m0s
 
   super-lint:
-    name: "Lint: Super Linter"
+    name: "Super Linter"
     runs-on: ubuntu-latest
+    
     steps:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0 # Required to fetch version
+    
     - name: Run Super Linter
       uses: github/super-linter/slim@v4
       env:

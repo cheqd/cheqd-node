@@ -11,7 +11,7 @@ sudo -u cheqd cheqd-noded configure p2p persistent-peers "${PERSISTENT_PEERS}"
 
 sudo cp "${NODE_CONFIGS_BASE}/validator-0/config/genesis.json" "/home/runner/cheqd/.cheqdnode/config"
 
-sudo chmod -R 777 "/home/runner/cheqd/.cheqdnode"
+sudo chmod -R 755 "/home/runner/cheqd/.cheqdnode"
 
 # Configure ports because they conflict with localnet
 sudo -u cheqd cheqd-noded configure p2p laddr "tcp://0.0.0.0:26676"

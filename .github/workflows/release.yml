@@ -1,141 +1,35 @@
-name: Release
-
+name: "Release"
 on:
-  push:
-    tags:
-      - "v[0-9]+.[0-9]+.[0-9]+"
+  workflow_call:
+    inputs:
+      RELEASE_VERSION:
+        description: "Release version number"
+        type: string
+defaults:
+  run:
+    shell: bash
+
 
 jobs:
-  wait-for-all-previous:
-    name: Wait for test and lint workflows
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Wait for all jobs finished on workflow Test and Lint
-        uses: lewagon/wait-on-check-action@v1.0.0
-        with:
-          ref: ${{ github.sha }}
-          running-workflow-name: 'Wait for test and lint workflows'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 30
 
-  # ToDo: Get rid of it while moving test images to volumes
-  # This duplicating is needed because we have to pass GID and UID params
-  # while building docker images for tests
-  build-node-images:
-    name: Build cheqd-node and cheqd-cli images
-    runs-on: ubuntu-20.04
-    needs: wait-for-all-previous
+  release-packages:
+    name: "Release tar/Debian packages"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      RELEASE_VERSION: ${{ inputs.RELEASE_VERSION }}
+    
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # Required to fetch version
 
-      - name: Build cheqd-cli with 'cheqd-noded' as entrypoint
-        run: docker build --target base -t cheqd-cli -f docker/Dockerfile .
-
-      - name: Build cheqd-node with 'node-start' as entrypoint
-        run: docker build --target node -t cheqd-node -f docker/Dockerfile .
-
-      - name: Save cheqd-cli
-        run: docker save -o cheqd-cli-image.tar cheqd-cli
-
-      - name: Save cheqd-node
-        run: docker save -o cheqd-node-image.tar cheqd-node
-
-      - name: Store cheqd-cli artifact
-        uses: actions/upload-artifact@v2
+      - name: Download node binary from build stage
+        uses: actions/download-artifact@v3
         with:
-          name: cheqd-cli-image.tar
-          path: cheqd-cli-image.tar
-
-      - name: Store cheqd-node artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: cheqd-node-image.tar
-          path: cheqd-node-image.tar
-
-  pre-release:
-    name: Pre-release
-    runs-on: ubuntu-20.04
-    environment: Pre-Release
-    needs: build-node-images
-    outputs:
-      RCVERSION: ${{ steps.set-version.outputs.RCVERSION }}
-    steps:
-      - name: Get artifact from tests
-        uses: dawidd6/action-download-artifact@v2
-        with:
-          workflow: test.yml
           name: cheqd-noded
 
-      - name: Restore binary permissions
-        run: sudo chmod +x cheqd-noded
-
-      - name: Set RC version
-        id: set-version
-        run: |
-          VERSION=$(./cheqd-noded version 2>&1)
-          echo "::set-output name=RCVERSION::$VERSION-rc"
-
-  push-rc-images:
-    name: Push RC images
-    runs-on: ubuntu-20.04
-    needs: pre-release
-    env:
-      RCVERSION: ${{ needs.pre-release.outputs.RCVERSION }}
-      REGISTRY: ghcr.io
-    steps:
-      - name: Get cheqd-cli image from tests
-        uses: actions/download-artifact@v2
-        with:
-          name: cheqd-cli-image.tar
-
-      - name: Get cheqd-node image from tests
-        uses: actions/download-artifact@v2
-        with:
-          name: cheqd-node-image.tar
-
-      - name: Load cli image
-        run: docker load -i cheqd-cli-image.tar
-
-      - name: Load node image
-        run: docker load -i cheqd-node-image.tar
-
-      - name: Log in to the Container registry
-        uses: docker/login-action@v1
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Push cheqd-node image
-        run: |
-          docker tag cheqd-node ghcr.io/${{ github.repository }}:${{ env.RCVERSION }}
-          docker push ghcr.io/${{ github.repository }}:${{ env.RCVERSION }}
-          docker tag cheqd-node ghcr.io/${{ github.repository }}:latest
-          docker push ghcr.io/${{ github.repository }}:latest
-
-      - name: Push cheqd-cli image
-        run: |
-          docker tag cheqd-cli ghcr.io/${{ github.repository_owner }}/cheqd-cli:${{ env.RCVERSION }}
-          docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:${{ env.RCVERSION }}
-          docker tag cheqd-cli ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
-          docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
-
-  push-rc-debs:
-    name: Push RC packages
-    runs-on: ubuntu-20.04
-    needs: pre-release
-    env:
-      RCVERSION: ${{ needs.pre-release.outputs.RCVERSION }}
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Get artifact from tests
-        uses: dawidd6/action-download-artifact@v2
-        with:
-          workflow: test.yml
-          name: cheqd-noded
       - name: Restore binary permissions
         run: sudo chmod +x cheqd-noded
 
@@ -144,21 +38,16 @@ jobs:
           sudo apt-get install ruby ruby-dev rubygems build-essential
           sudo gem install --no-document fpm
 
-      - name: Build RC deb
+      - name: Build Debian package for release
         working-directory: ./build-tools
         run: |
-          ./build-deb.sh "../cheqd-noded" "${{ env.RCVERSION }}"
+          ./build-deb.sh "../cheqd-noded"
 
-      - name: Store RC deb package artifact
-        uses: actions/upload-artifact@v2
+      - name: Store Debian package artifact for release
+        uses: actions/upload-artifact@v3
         with:
-          name: cheqd-node_${{ env.RCVERSION }}_amd64.deb
-          path: build-tools/output/cheqd-node_${{ env.RCVERSION }}_amd64.deb
-
-      - name: Build tar
-        working-directory: ./build-tools
-        run: |
-          ./build-tar.sh "../cheqd-noded" "${{ env.RCVERSION }}"
+          name: cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
+          path: build-tools/output/cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -166,102 +55,29 @@ jobs:
           automatic_release_tag: "${{ env.GITHUB_REF_NAME }}"
           prerelease: true
           draft: true
-          title: "v${{ env.RCVERSION }}"
           files: |
-            build-tools/output/cheqd-node_${{ env.RCVERSION }}_amd64.deb
-            build-tools/output/cheqd-node_${{ env.RCVERSION }}.tar.gz
+            build-tools/output/cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
+            cheqd-noded
 
-  release:
-    name: Release
-    runs-on: ubuntu-20.04
-    environment: Release
-    needs: [ push-rc-debs, push-rc-images]
-    outputs:
-      VERSION: ${{ steps.set-version.outputs.VERSION }}
-    steps:
-      - name: Get artifact from tests
-        uses: dawidd6/action-download-artifact@v2
-        with:
-          workflow: test.yml
-          name: cheqd-noded
-
-      - name: Restore binary permissions
-        run: sudo chmod +x cheqd-noded
-
-      - name: Set release version
-        id: set-version
-        run: |
-          VERSION=$(./cheqd-noded version 2>&1)
-          echo "::set-output name=VERSION::$VERSION"
-
-  push-release-debs:
-    name: Push release packages
-    runs-on: ubuntu-20.04
-    needs: release
+  release-docker-images:
+    name: "Publish Docker images for new version"
+    runs-on: ubuntu-latest
     env:
-      VERSION: ${{ needs.release.outputs.VERSION }}
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Get artifact from tests
-        uses: dawidd6/action-download-artifact@v2
-        with:
-          workflow: test.yml
-          name: cheqd-noded
-
-      - name: Restore binary permissions
-        run: sudo chmod +x cheqd-noded
-
-      - name: Install fpm
-        run: |
-          sudo apt-get install ruby ruby-dev rubygems build-essential
-          sudo gem install --no-document fpm
-
-      - name: Build release deb
-        working-directory: ./build-tools
-        run: |
-          ./build-deb.sh "../cheqd-noded"
-
-      - name: Build tar
-        working-directory: ./build-tools
-        run: |
-          ./build-tar.sh "../cheqd-noded"
-
-      - uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "${{ env.GITHUB_REF_NAME }}"
-          prerelease: true
-          title: "v${{ env.VERSION }}"
-          files: |
-            build-tools/output/cheqd-node_${{ env.VERSION }}_amd64.deb
-            build-tools/output/cheqd-node_${{ env.VERSION }}.tar.gz
-
-  push-release-images:
-    name: Push release images
-    runs-on: ubuntu-20.04
-    needs: release
-    env:
-      VERSION: ${{ needs.release.outputs.VERSION }}
       REGISTRY: ghcr.io
+      RELEASE_VERSION: ${{ inputs.RELEASE_VERSION }}
+    
     steps:
-      - name: Get cheqd-cli image from tests
-        uses: actions/download-artifact@v2
+      - uses: actions/checkout@v3
         with:
-          name: cheqd-cli-image.tar
+          fetch-depth: 0 # Required to fetch version
 
-      - name: Get cheqd-node image from tests
-        uses: actions/download-artifact@v2
-        with:
-          name: cheqd-node-image.tar
+      - name: Build cheqd-cli Docker image 'cheqd-noded' as entrypoint and no build args
+        run: docker build --target base -t cheqd-cli -f docker/Dockerfile .
 
-      - name: Load cli image
-        run: docker load -i cheqd-cli-image.tar
+      - name: Build cheqd-node Docker image with 'node-start' as entrypoint and no build args
+        run: docker build --target node -t cheqd-node -f docker/Dockerfile .
 
-      - name: Load node image
-        run: docker load -i cheqd-node-image.tar
-
-      - name: Log in to the Container registry
+      - name: Login to Container registry
         uses: docker/login-action@v1
         with:
           registry: ${{ env.REGISTRY }}
@@ -270,14 +86,14 @@ jobs:
 
       - name: Push cheqd-node image
         run: |
-          docker tag cheqd-node ghcr.io/${{ github.repository }}:${{ env.VERSION }}
-          docker push ghcr.io/${{ github.repository }}:${{ env.VERSION }}
+          docker tag cheqd-node ghcr.io/${{ github.repository }}:${{ env.RELEASE_VERSION }}
           docker tag cheqd-node ghcr.io/${{ github.repository }}:latest
+          docker push ghcr.io/${{ github.repository }}:${{ env.RELEASE_VERSION }}
           docker push ghcr.io/${{ github.repository }}:latest
 
       - name: Push cheqd-cli image
         run: |
-          docker tag cheqd-cli ghcr.io/${{ github.repository_owner }}/cheqd-cli:${{ env.VERSION }}
-          docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:${{ env.VERSION }}
+          docker tag cheqd-cli ghcr.io/${{ github.repository_owner }}/cheqd-cli:${{ env.RELEASE_VERSION }}
           docker tag cheqd-cli ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
+          docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:${{ env.RELEASE_VERSION }}
           docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
