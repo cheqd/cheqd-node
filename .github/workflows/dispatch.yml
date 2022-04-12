@@ -23,22 +23,23 @@ jobs:
     with:
       VERSION: ${{ needs.call-build.outputs.VERSION }}
 
-  check-for-release-tag:
-    name: "Check for release tag"
-    needs: call-test
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
-    outputs:
-      RELEASE_VERSION: ${{ steps.set-version.outputs.RELEASE_VERSION }}
+  # check-for-release-tag:
+  #   name: "Check for release tag"
+  #   needs: call-test
+  #   runs-on: ubuntu-latest
+  #   if: startsWith(github.ref, 'refs/tags/v')
+  #   outputs:
+  #     RELEASE_VERSION: ${{ steps.set-version.outputs.RELEASE_VERSION }}
 
-    steps:
-      - name: Set release version
-        id: set-version
-        run: echo ::set-output name=RELEASE_VERSION::${GITHUB_REF##*/}
+  #   steps:
+  #     - name: Set release version
+  #       id: set-version
+  #       run: echo ::set-output name=RELEASE_VERSION::${GITHUB_REF##*/}
 
   call-release:
     name: "Release"
-    needs: check-for-release-tag
+    if: startsWith(github.ref, 'refs/tags/v')
+    # needs: check-for-release-tag
     uses: ./.github/workflows/release.yml
-    with:
-      RELEASE_VERSION: ${{ needs.check-for-release-tag.outputs.RELEASE_VERSION }}
+    # with:
+    #   RELEASE_VERSION: ${{ needs.check-for-release-tag.outputs.RELEASE_VERSION }}
