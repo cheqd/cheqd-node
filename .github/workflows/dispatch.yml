@@ -16,30 +16,31 @@ jobs:
     # needs: call-lint
     uses: ./.github/workflows/build.yml
   
-  call-test:
-    name: "Test"
-    needs: call-build
-    uses: ./.github/workflows/test.yml
-    with:
-      VERSION: ${{ needs.call-build.outputs.VERSION }}
+  # call-test:
+  #   name: "Test"
+  #   needs: call-build
+  #   uses: ./.github/workflows/test.yml
+  #   with:
+  #     VERSION: ${{ needs.call-build.outputs.VERSION }}
 
-  check-for-release-tag:
-    name: "Check for release tag"
-    needs: call-test
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
-    outputs:
-      RELEASE_VERSION: ${{ steps.set-version.outputs.RELEASE_VERSION }}
+  # check-for-release-tag:
+  #   name: "Check for release tag"
+  #   needs: call-build
+  #   runs-on: ubuntu-latest
+  #   if: startsWith(github.ref, 'refs/tags/v')
+  #   outputs:
+  #     RELEASE_VERSION: ${{ steps.set-version.outputs.RELEASE_VERSION }}
 
-    steps:
-      - name: Set release version
-        id: set-version
-        run: echo ::set-output name=RELEASE_VERSION::${GITHUB_REF##*/}
+  #   steps:
+  #     - name: Set release version
+  #       id: set-version
+  #       run: echo ::set-output name=RELEASE_VERSION::${GITHUB_REF##*/}
 
   call-release:
     name: "Release"
-    needs: call-test
+    needs: call-build
     if: startsWith(github.ref, 'refs/tags/v')
     uses: ./.github/workflows/release.yml
     with:
-      RELEASE_VERSION: ${{ needs.check-for-release-tag.outputs.RELEASE_VERSION }}
+      # RELEASE_VERSION: ${{ needs.check-for-release-tag.outputs.RELEASE_VERSION }}
+      RELEASE_VERSION: ${{ needs.call-build.outputs.VERSION }}
