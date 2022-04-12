@@ -13,7 +13,7 @@ defaults:
 jobs:
 
   release-packages:
-    name: "Create new pre-release and publish tar/Debian packages"
+    name: "Release tar/Debian packages"
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -22,6 +22,8 @@ jobs:
     
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Required to fetch version
 
       - name: Download node binary from build stage
         uses: actions/download-artifact@v3
@@ -44,8 +46,8 @@ jobs:
       - name: Store tarball artifact for release
         uses: actions/upload-artifact@v3
         with:
-          name: cheqd-node_${{ inputs.RELEASE_VERSION }}.tar.gz
-          path: build-tools/output/cheqd-node_${{ inputs.RELEASE_VERSION }}.tar.gz
+          name: cheqd-node_${{ env.GITHUB_REF_NAME }}.tar.gz
+          path: build-tools/output/cheqd-node_${{ env.GITHUB_REF_NAME }}.tar.gz
 
       - name: Build Debian package for release
         working-directory: ./build-tools
@@ -55,19 +57,18 @@ jobs:
       - name: Store Debian package artifact for release
         uses: actions/upload-artifact@v3
         with:
-          name: cheqd-node_${{ inputs.RELEASE_VERSION }}_amd64.deb
-          path: build-tools/output/cheqd-node_${{ inputs.RELEASE_VERSION }}_amd64.deb
+          name: cheqd-node_${{ env.GITHUB_REF_NAME }}_amd64.deb
+          path: build-tools/output/cheqd-node_${{ env.GITHUB_REF_NAME }}_amd64.deb
 
-      - name: Publish new release
-        uses: ncipollo/release-action@v1
+      - uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          artifacts: "build-tools/output/*"
-          artifactErrorsFailBuild: true
-          draft: true
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "${{ env.GITHUB_REF_NAME }}"
           prerelease: true
-          generateReleaseNotes: true
-          replacesArtifacts: true
-          token: ${{ secrets.GITHUB_TOKEN }}
+          draft: true
+          files: |
+            build-tools/output/cheqd-node_${{ env.GITHUB_REF_NAME }}_amd64.deb
+            build-tools/output/cheqd-node_${{ env.GITHUB_REF_NAME }}.tar.gz
 
   release-docker-images:
     name: "Publish Docker images for new version"
@@ -108,24 +109,24 @@ jobs:
 
       - name: Push cheqd-node image
         run: |
-          docker tag cheqd-node ghcr.io/${{ github.repository }}:${{ inputs.RELEASE_VERSION }}
+          docker tag cheqd-node ghcr.io/${{ github.repository }}:${{ env.GITHUB_REF_NAME }}
           docker tag cheqd-node ghcr.io/${{ github.repository }}:latest
-          docker push ghcr.io/${{ github.repository }}:${{ inputs.RELEASE_VERSION }}
+          docker push ghcr.io/${{ github.repository }}:${{ env.GITHUB_REF_NAME }}
           docker push ghcr.io/${{ github.repository }}:latest
 
       - name: Push cheqd-cli image
         run: |
-          docker tag cheqd-cli ghcr.io/${{ github.repository_owner }}/cheqd-cli:${{ inputs.RELEASE_VERSION }}
+          docker tag cheqd-cli ghcr.io/${{ github.repository_owner }}/cheqd-cli:${{ env.GITHUB_REF_NAME }}
           docker tag cheqd-cli ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
-          docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:${{ inputs.RELEASE_VERSION }}
+          docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:${{ env.GITHUB_REF_NAME }}
           docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
 
       - name: Download deb
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-node_${{ inputs.RELEASE_VERSION }}_amd64.deb
+          name: cheqd-node_${{ env.GITHUB_REF_NAME }}_amd64.deb
 
       - name: Download tar
         uses: actions/download-artifact@v2
         with:
-          name: cheqd-node_${{ inputs.RELEASE_VERSION }}.tar.gz
+          name: cheqd-node_${{ env.GITHUB_REF_NAME }}.tar.gz
