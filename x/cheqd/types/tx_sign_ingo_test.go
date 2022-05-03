@@ -1,8 +1,9 @@
 package types
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestSignInfoValidation(t *testing.T) {
@@ -19,8 +20,8 @@ func TestSignInfoValidation(t *testing.T) {
 				VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
 				Signature:            "aaa=",
 			},
-			isValid:           true,
-			errorMsg:          "",
+			isValid:  true,
+			errorMsg: "",
 		},
 		{
 			name: "negative: namespace",
@@ -59,60 +60,69 @@ func TestSignInfoValidation(t *testing.T) {
 
 func TestFullSignInfoDublicateValidation(t *testing.T) {
 	cases := []struct {
-		name              string
-		structs_          []*SignInfo
-		isValid           bool
+		name     string
+		structs_ []*SignInfo
+		isValid  bool
 	}{
 		{
 			name: "positive",
-			structs_ : []*SignInfo{
+			structs_: []*SignInfo{
 				{
 					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
-					Signature:            "aaa="},
+					Signature:            "aaa=",
+				},
 				{
 					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
-					Signature:            "bbb="},
+					Signature:            "bbb=",
+				},
 			},
-			isValid:           true,
+			isValid: true,
 		},
 		{
 			name: "positive with all different pieces",
-			structs_ : []*SignInfo{
+			structs_: []*SignInfo{
 				{
 					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
-					Signature:            "aaa="},
+					Signature:            "aaa=",
+				},
 				{
 					VerificationMethodId: "did:cheqd:bbbbbbbbbbbbbbbb#method1",
-					Signature:            "bbb="},
+					Signature:            "bbb=",
+				},
 			},
-			isValid:           true,
+			isValid: true,
 		},
 		{
 			name: "negative",
-			structs_ : []*SignInfo{
+			structs_: []*SignInfo{
 				{
 					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
-					Signature:            "aaa="},
+					Signature:            "aaa=",
+				},
 				{
 					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
-					Signature:            "aaa="},
+					Signature:            "aaa=",
+				},
 			},
-			isValid:           false,
+			isValid: false,
 		},
 		{
 			name: "negative with a lot of same elems",
-			structs_ : []*SignInfo{
+			structs_: []*SignInfo{
 				{
 					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
-					Signature:            "aaa="},
+					Signature:            "aaa=",
+				},
 				{
 					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
-					Signature:            "aaa="},
+					Signature:            "aaa=",
+				},
 				{
 					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
-					Signature:            "aaa="},
+					Signature:            "aaa=",
+				},
 			},
-			isValid:           false,
+			isValid: false,
 		},
 	}
 

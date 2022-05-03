@@ -46,7 +46,7 @@ func CmdUpdateDid() *cobra.Command {
 				Signatures: identitySignatures,
 			}
 
-			//Set fee-payer if not set
+			// Set fee-payer if not set
 			err = SetFeePayerFromSigner(&clientCtx)
 			if err != nil {
 				return err

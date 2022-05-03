@@ -2,11 +2,12 @@ package tests
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/multiformats/go-multibase"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestUpdateDid(t *testing.T) {
@@ -26,16 +27,16 @@ func TestUpdateDid(t *testing.T) {
 	}
 
 	cases := []struct {
-		valid   bool
-		name    string
+		valid      bool
+		name       string
 		signerKeys []SignerKey
-		signers []string
-		msg     *types.MsgUpdateDidPayload
-		errMsg  string
+		signers    []string
+		msg        *types.MsgUpdateDidPayload
+		errMsg     string
 	}{
 		{
-			valid:   true,
-			name:    "Valid: Key rotation works",
+			valid: true,
+			name:  "Valid: Key rotation works",
 			signerKeys: []SignerKey{
 				{
 					signer: AliceKey1,
@@ -47,12 +48,12 @@ func TestUpdateDid(t *testing.T) {
 				},
 			},
 			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
+				Id: AliceDID,
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:         AliceKey1,
-						Type:       Ed25519VerificationKey2020,
-						Controller: AliceDID,
+						Id:                 AliceKey1,
+						Type:               Ed25519VerificationKey2020,
+						Controller:         AliceDID,
 						PublicKeyMultibase: "z" + base58.Encode(keys[AliceKey2].PublicKey),
 					},
 				},
@@ -64,8 +65,8 @@ func TestUpdateDid(t *testing.T) {
 			name:    "Not Valid: replacing controller and Verification method ID does not work without new sign",
 			signers: []string{AliceKey2, BobKey1, AliceKey1},
 			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Controller:     []string{CharlieDID},
+				Id:         AliceDID,
+				Controller: []string{CharlieDID},
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
@@ -81,8 +82,8 @@ func TestUpdateDid(t *testing.T) {
 			name:    "Valid: replacing controller and Verification method ID works with all signatures",
 			signers: []string{AliceKey1, CharlieKey1, AliceKey2},
 			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Controller:     []string{CharlieDID},
+				Id:         AliceDID,
+				Controller: []string{CharlieDID},
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
@@ -109,7 +110,7 @@ func TestUpdateDid(t *testing.T) {
 			name:    "Valid: Replacing VM controller works with one signature",
 			signers: []string{AliceKey1, BobKey1},
 			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
+				Id: AliceDID,
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey1,
@@ -124,7 +125,7 @@ func TestUpdateDid(t *testing.T) {
 			name:    "Not Valid: Replacing VM controller does not work without new signature",
 			signers: []string{AliceKey1},
 			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
+				Id: AliceDID,
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey1,
@@ -140,7 +141,7 @@ func TestUpdateDid(t *testing.T) {
 			name:    "Not Valid: Replacing VM does not work without new signature",
 			signers: []string{AliceKey1},
 			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
+				Id: AliceDID,
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
@@ -156,7 +157,7 @@ func TestUpdateDid(t *testing.T) {
 			name:    "Not Valid: Replacing VM does not work without old signature",
 			signers: []string{AliceKey2},
 			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
+				Id: AliceDID,
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
@@ -172,7 +173,7 @@ func TestUpdateDid(t *testing.T) {
 			name:    "Not Valid: Replacing VM works with all signatures",
 			signers: []string{AliceKey1, AliceKey2},
 			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
+				Id: AliceDID,
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
@@ -188,8 +189,8 @@ func TestUpdateDid(t *testing.T) {
 			name:    "Valid: Adding another verification method",
 			signers: []string{AliceKey1, BobKey1},
 			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Controller:     []string{AliceDID},
+				Id:         AliceDID,
+				Controller: []string{AliceDID},
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey1,
@@ -209,8 +210,8 @@ func TestUpdateDid(t *testing.T) {
 			name:    "Not Valid: Adding another verification method without new sign",
 			signers: []string{AliceKey1},
 			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Controller:     []string{AliceDID},
+				Id:         AliceDID,
+				Controller: []string{AliceDID},
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey1,
@@ -231,8 +232,8 @@ func TestUpdateDid(t *testing.T) {
 			name:    "Not Valid: Adding another verification method without old sign",
 			signers: []string{AliceKey2},
 			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Controller:     []string{AliceDID},
+				Id:         AliceDID,
+				Controller: []string{AliceDID},
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey1,
@@ -262,8 +263,8 @@ func TestUpdateDid(t *testing.T) {
 			name:    "Valid: Replace controller works with all signatures",
 			signers: []string{BobKey1, AliceKey1},
 			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Controller:     []string{BobDID},
+				Id:         AliceDID,
+				Controller: []string{BobDID},
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey1,
@@ -278,8 +279,8 @@ func TestUpdateDid(t *testing.T) {
 			name:    "Not Valid: Replace controller doesn't work without old signatures",
 			signers: []string{BobKey1},
 			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Controller:     []string{BobDID},
+				Id:         AliceDID,
+				Controller: []string{BobDID},
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey1,
@@ -295,8 +296,8 @@ func TestUpdateDid(t *testing.T) {
 			name:    "Not Valid: Replace controller doesn't work without new signatures",
 			signers: []string{AliceKey1},
 			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Controller:     []string{BobDID},
+				Id:         AliceDID,
+				Controller: []string{BobDID},
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey1,
@@ -313,8 +314,8 @@ func TestUpdateDid(t *testing.T) {
 			name:    "Valid: Adding second controller works",
 			signers: []string{AliceKey1, CharlieKey3},
 			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Controller:     []string{AliceDID, CharlieDID},
+				Id:         AliceDID,
+				Controller: []string{AliceDID, CharlieDID},
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey1,
@@ -329,8 +330,8 @@ func TestUpdateDid(t *testing.T) {
 			name:    "Not Valid: Adding controller without old signature",
 			signers: []string{BobKey1},
 			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Controller:     []string{AliceDID, BobDID},
+				Id:         AliceDID,
+				Controller: []string{AliceDID, BobDID},
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey1,
@@ -346,8 +347,8 @@ func TestUpdateDid(t *testing.T) {
 			name:    "Not Valid: Add controller without new signature doesn't work",
 			signers: []string{AliceKey1},
 			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Controller:     []string{AliceDID, BobDID},
+				Id:         AliceDID,
+				Controller: []string{AliceDID, BobDID},
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey1,
@@ -359,14 +360,13 @@ func TestUpdateDid(t *testing.T) {
 			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", BobDID),
 		},
 
-
 		{
 			valid:   true,
 			name:    "Valid: Adding verification method with the same controller works",
 			signers: []string{AliceKey1, AliceKey2},
 			msg: &types.MsgUpdateDidPayload{
-				Id:             AliceDID,
-				Controller:     []string{AliceDID},
+				Id:         AliceDID,
+				Controller: []string{AliceDID},
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         AliceKey2,
@@ -422,7 +422,7 @@ func TestUpdateDid(t *testing.T) {
 			name:    "Valid: Removing verification method is possible with any kind of valid Bob's key",
 			signers: []string{BobKey1},
 			msg: &types.MsgUpdateDidPayload{
-				Id:             BobDID,
+				Id: BobDID,
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         BobKey1,
@@ -440,7 +440,6 @@ func TestUpdateDid(t *testing.T) {
 			setup := InitEnv(t, keys)
 			msg := tc.msg
 
-
 			for _, vm := range msg.VerificationMethod {
 				if vm.PublicKeyMultibase == "" {
 					vm.PublicKeyMultibase, err = multibase.Encode(multibase.Base58BTC, keys[vm.Id].PublicKey)
@@ -455,7 +454,7 @@ func TestUpdateDid(t *testing.T) {
 				for _, signer := range tc.signers {
 					signerKeys = append(signerKeys, SignerKey{
 						signer: signer,
-						key   : keys[signer].PrivateKey,
+						key:    keys[signer].PrivateKey,
 					})
 				}
 			}

@@ -6,10 +6,12 @@ import (
 	"crypto/ed25519"
 	"crypto/rsa"
 	"errors"
-	"filippo.io/edwards25519"
 	"fmt"
-	"github.com/lestrrat-go/jwx/jwk"
 	"reflect"
+
+	"filippo.io/edwards25519"
+
+	"github.com/lestrrat-go/jwx/jwk"
 )
 
 func ValidateJWK(jwk_string string) error {

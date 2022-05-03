@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -37,7 +38,6 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 	controllers := did.AllControllerDids()
 	for _, controller := range controllers {
 		_, err := MustFindDid(&k.Keeper, &ctx, inMemoryDids, controller)
-
 		if err != nil {
 			return nil, err
 		}

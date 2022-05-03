@@ -6,11 +6,12 @@ import (
 	"crypto/rsa"
 	"errors"
 	"fmt"
+	"reflect"
+
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/multiformats/go-multibase"
-	"reflect"
 )
 
 const (

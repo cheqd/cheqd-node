@@ -1,9 +1,10 @@
 package app
 
 import (
+	"testing"
+
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func Test_MsgCreateDidPayload_UnmarshalJSON(t *testing.T) {

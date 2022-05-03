@@ -3,9 +3,10 @@ package types
 import (
 	"errors"
 	"fmt"
+	"strings"
+
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	"github.com/multiformats/go-multibase"
-	"strings"
 )
 
 // Helper enums
@@ -162,7 +163,6 @@ func HasPrefix(prefix string) *CustomErrorRule {
 		return nil
 	})
 }
-
 
 func IsUniqueStrList() *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {

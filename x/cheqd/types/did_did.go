@@ -9,8 +9,8 @@ var _ StateValueData = &Did{}
 
 func NewDid(context []string, id string, controller []string, verificationMethod []*VerificationMethod,
 	authentication []string, assertionMethod []string, capabilityInvocation []string, capabilityDelegation []string,
-	keyAgreement []string, service []*Service, alsoKnownAs []string) *Did {
-
+	keyAgreement []string, service []*Service, alsoKnownAs []string,
+) *Did {
 	return &Did{
 		Context:              context,
 		Id:                   id,

@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+
 	"github.com/multiformats/go-multibase"
 	"github.com/spf13/cobra"
 )
@@ -41,10 +42,10 @@ func ed25519RandomCmd() *cobra.Command {
 			}
 
 			keyInfo := struct {
-				PubKeyBase64    	string `json:"pub_key_base_64"`
-				PrivKeyBase64   	string `json:"priv_key_base_64"`
+				PubKeyBase64  string `json:"pub_key_base_64"`
+				PrivKeyBase64 string `json:"priv_key_base_64"`
 			}{
-				PubKeyBase64: base64.StdEncoding.EncodeToString(pubKey),
+				PubKeyBase64:  base64.StdEncoding.EncodeToString(pubKey),
 				PrivKeyBase64: base64.StdEncoding.EncodeToString(privKey),
 			}
 
@@ -78,7 +79,7 @@ func base64toMultibase58Cmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "base64-multibase58 [input]",
 		Short: "Convert base64 string to multibase58 string",
-		Args: cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			base64Str := args[0]
 			bytes, err := base64.StdEncoding.DecodeString(base64Str)
