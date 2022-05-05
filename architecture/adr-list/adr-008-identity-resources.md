@@ -131,7 +131,7 @@ It is not possible to update an existing Schema using this architecture. This is
 If a Schema evolves, a new Schema with a new version or name needs to be created.
 
 
-#### Credential Definition
+## Credential Definitions
 
 A Credential Definition is an on-ledger artifact used in Hyperledger Indy. Its purpose is:
 - To references the DID of the issuer and the public keys of the issuer
