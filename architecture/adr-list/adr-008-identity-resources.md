@@ -164,10 +164,6 @@ For example, A DID Document could specify that did:cheqd:example:1234#key1 can *
 
 - Since schemas do not have a public key per attribute, but reference a set of attributes, cheqd-based Credentials with CL-schemas on ledger will not enable the same compostability in terms of predicate proofs as Indy-based Credentials. 
 - Indy-based revocation is currently operative and functional, whilst cheqd's privacy-preserving revocation is still a work in progress, and in the meantime, companies may need to rely on RevocationList2020 or StatusList 2021.
-- Adding all Cred Defs to Issuer's DIDDoc makes it too large. For every DIDDoc or Cred Def request
-  a client will receive the whole list of Issuer's Cred Defs.
-- Impossible to put a few controllers for Cred Def.
-- In theory, we need to make Credential Definitions mutable.
 
 ##### Neutral
 
