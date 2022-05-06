@@ -22,7 +22,7 @@ This ADR will also address the following architectural considerations:
 - cheqd full DID Resolver has to marshal/unmarshal protobuf object into a resealable JSON DID Document.
 - cheqd full DID Resolver will use Golang programming language.
 - cheqd full DID resolver can be implemented locally on client side, or used as a hosted web service.
-- cheqd Universal Resolver Driver will use a framework like Goji or Echo, because it handles HTTP status codes etc., that are part of DID resolution, handling and catching errors.
+- cheqd full DID resolver will use a framework like Goji or Echo, because it handles HTTP status codes etc., that are part of DID resolution, handling and catching errors.
 - cheqd Universal Resolver Driver will use Node.js ( +itty-router ) proxy.
 
 ## Context
@@ -70,7 +70,7 @@ In the first case, the Go module can be imported simply into a client's own libr
 
 ```golang
 import (
-     "github.com/cheqd/cheqd-did-resolver/src"
+     "github.com/cheqd/cheqd-did-resolver/services"
 )
 ```
 The flow for DID resolution is illustrated in the third "Client <-> Ledger" section from [figure 1](#cheqd-did-resolver--universal-resolver-driver).
@@ -151,7 +151,7 @@ To summarise the flow:
 
 #### Pros
 
-- The Reesolver can be utilised without additional library dependencies and without setting up additional services.
+- The resolution endpoint can be utilised without additional library dependencies and without setting up additional services.
 
 #### Cons
 
