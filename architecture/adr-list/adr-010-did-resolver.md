@@ -113,7 +113,7 @@ go run cheqd_resolver_web_service.go
 
 ### 3. Standalone Web Service (fully implemented client side)
 
-If a client chooses, it may be in their interest to implement the full cheqd resolver web service on their own client side. 
+If a client chooses, it may be in their interest to setup the full cheqd resolver web service on their own client side. 
 
 This will offer full oversight of the DID resolver, and as such, a higher level of security.
 
@@ -162,7 +162,7 @@ To summarise the flow:
 
 There is also an option of using the Universal Resolver on the client side, which is a similar flow to [Universal resolver on DIF side](#1-universal-resolver-on-dif-side). 
 
-Here, however, the client sets up Universal Resolver with drivers in their own environment.
+Here, however, the client sets up the Universal Resolver with drivers in their own environment.
 
 #### Pros
 
@@ -186,7 +186,7 @@ The client will need to implement:
 
 #### Pros
 
-- This is the combination for maxmimum trust and security for DID resolution.
+- This is the combination for maxmimum trust and security for using the Universal DID Resolver.
 
 #### Cons
 
