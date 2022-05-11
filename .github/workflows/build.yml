@@ -66,6 +66,10 @@ jobs:
         run: |
           make proto-gen build
           
+      - name: Build cosmovisor
+        run: |
+          go install github.com/cosmos/cosmos-sdk/cosmovisor/cmd/cosmovisor@v1.1.0
+
       - name: Store artifact
         uses: actions/upload-artifact@v3
         with:
@@ -85,7 +89,7 @@ jobs:
       - name: Build Debian package
         working-directory: ./build-tools
         run: |
-          ./build-deb.sh "../build/cheqd-noded"
+          ./build-deb.sh "../build/cheqd-noded" "~/go/bin/cosmovisor"
       
       - name: Store Debian package artifact
         uses: actions/upload-artifact@v3
@@ -94,6 +98,10 @@ jobs:
         with:
           name: cheqd-node_${{ env.VERSION }}_amd64.deb
           path: build-tools/output/cheqd-node_${{ env.VERSION }}_amd64.deb
+
+      - name: Get Artifact URL
+        run: |
+          curl -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/${{github.repository_owner}}/${{github.repository}}/actions/runs/${{github.run_id}}/artifacts
   
   build-docker-images:
     name: "Docker images"
