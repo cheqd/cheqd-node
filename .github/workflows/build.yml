@@ -29,6 +29,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       VERSION: ${{ steps.set-version.outputs.VERSION }}
+    env:
+      REGISTRY: ghcr.io
 
     steps:
       - uses: actions/setup-go@v3
@@ -65,10 +67,6 @@ jobs:
       - name: Build node binary
         run: |
           make proto-gen build
-          
-      - name: Build cosmovisor
-        run: |
-          go install github.com/cosmos/cosmos-sdk/cosmovisor/cmd/cosmovisor@v1.1.0
 
       - name: Store artifact
         uses: actions/upload-artifact@v3
@@ -132,7 +130,7 @@ jobs:
         run: |
           docker tag cheqd-node ghcr.io/${{ github.repository }}:cosmovisor
           docker push ghcr.io/${{ github.repository }}:cosmovisor
-          
+
       - name: Store cheqd-cli artifact
         uses: actions/upload-artifact@v3
         with:
