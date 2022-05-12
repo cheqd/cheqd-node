@@ -118,21 +118,6 @@ jobs:
       - name: Save cheqd-cli Docker image
         run: docker save -o cheqd-cli-image.tar cheqd-cli
 
-      - name: Store cheqd-cli artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: cheqd-cli-image.tar
-          path: cheqd-cli-image.tar
-
-      - name: Save cheqd-node Docker image
-        run: docker save -o cheqd-node-image.tar cheqd-node
-
-      - name: Store cheqd-node artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: cheqd-node-image.tar
-          path: cheqd-node-image.tar
-
       - name: Build cosmovisor Docker image with 'cosmovisor run' as entrypoint and no build args
         run: docker build -f docker/Dockerfile --target cosmovisor -t cheqd-noded:cosmovisor .
 
@@ -147,3 +132,18 @@ jobs:
         run: |
           docker tag cheqd-node ghcr.io/${{ github.repository }}:cosmovisor
           docker push ghcr.io/${{ github.repository }}:cosmovisor
+          
+      - name: Store cheqd-cli artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: cheqd-cli-image.tar
+          path: cheqd-cli-image.tar
+
+      - name: Save cheqd-node Docker image
+        run: docker save -o cheqd-node-image.tar cheqd-node
+
+      - name: Store cheqd-node artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: cheqd-node-image.tar
+          path: cheqd-node-image.tar
