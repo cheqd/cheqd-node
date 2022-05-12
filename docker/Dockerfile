@@ -98,3 +98,43 @@ RUN chmod +x /bin/node-start
 
 # Default entrypoint for cheqd-noded CLI usage
 ENTRYPOINT [ "node-start" ]
+
+
+###############################################################
+###        Stage 4 build cosmovisor                        ###
+###############################################################
+
+FROM golang:1.17.8-buster AS cosmos_builder
+RUN apt-get update && apt-get -y install --no-install-recommends git 
+
+RUN git clone https://github.com/cosmos/cosmos-sdk.git
+WORKDIR /go/cosmos-sdk/
+RUN git status
+RUN git checkout cosmovisor/v1.1.0
+RUN make cosmovisor
+
+
+###############################################################
+###          Stage 5 Use cosmovisor as a starter           ###
+###############################################################
+
+FROM base AS cosmovisor
+
+COPY --from=cosmos_builder /go/cosmos-sdk/cosmovisor/cosmovisor /bin
+COPY --chown=cheqd:cheqd docker/cosmovisor.sh /bin/cosmovisor.sh
+
+ARG CHEQD_HOME_DIR="/home/cheqd"
+
+RUN chmod +x /bin/cosmovisor.sh
+
+USER root
+RUN apt update && apt install ca-certificates  -y
+
+USER cheqd
+
+ENV DAEMON_HOME=${CHEQD_HOME_DIR}/.cheqdnode
+ENV DAEMON_NAME=cheqd-noded
+ENV DAEMON_ALLOW_DOWNLOAD_BINARIES=true
+ENV DAEMON_RESTART_AFTER_UPGRADE=true
+
+ENTRYPOINT [ "cosmovisor.sh" ]
