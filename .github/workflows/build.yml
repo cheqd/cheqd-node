@@ -29,8 +29,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       VERSION: ${{ steps.set-version.outputs.VERSION }}
-    env:
-      REGISTRY: ghcr.io
 
     steps:
       - uses: actions/setup-go@v3
@@ -100,6 +98,8 @@ jobs:
   build-docker-images:
     name: "Docker images"
     runs-on: ubuntu-latest
+    env:
+      REGISTRY: ghcr.io
 
     steps:
       - uses: actions/checkout@v3
