@@ -16,12 +16,12 @@ jobs:
     needs: call-lint
     uses: ./.github/workflows/build.yml
   
-  # call-test:
-  #   name: "Test"
-  #   needs: call-build
-  #   uses: cheqd/cheqd-node/.github/workflows/test.yml@main
-  #   with:
-  #     VERSION: ${{ needs.call-build.outputs.VERSION }}
+  call-test:
+    name: "Test"
+    needs: call-build
+    uses: cheqd/cheqd-node/.github/workflows/test.yml@main
+    with:
+      VERSION: ${{ needs.call-build.outputs.VERSION }}
 
   call-release:
     name: "Release"

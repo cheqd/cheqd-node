@@ -2,11 +2,11 @@
 
 COSMOVISOR_ROOT_DIR=${HOME}/.cheqdnode/cosmovisor
 
-mkdir ${HOME}/.cheqdnode
-mkdir ${COSMOVISOR_ROOT_DIR}
-mkdir ${COSMOVISOR_ROOT_DIR}/genesis
-mkdir ${COSMOVISOR_ROOT_DIR}/genesis/bin/
-mkdir ${COSMOVISOR_ROOT_DIR}/upgrades
+mkdir -p ${HOME}/.cheqdnode
+mkdir -p ${COSMOVISOR_ROOT_DIR}
+mkdir -p ${COSMOVISOR_ROOT_DIR}/genesis
+mkdir -p ${COSMOVISOR_ROOT_DIR}/genesis/bin/
+mkdir -p ${COSMOVISOR_ROOT_DIR}/upgrades
 
 cp /bin/cheqd-noded ${COSMOVISOR_ROOT_DIR}/genesis/bin/
 

@@ -6,6 +6,10 @@ if [ -z ${1+x} ]; then
   echo "Binary path must be passed as the first parameter"
 fi
 
+ if [ ! -z "${2}" ]; then
+  COSMOVISOR_BIN=${2}
+ fi
+
 BINARY_PATH="$1"
 # It's needed for creating an RC deb package
 if [ -z ${2+x} ];
@@ -27,6 +31,10 @@ mkdir -p "${OUTPUT_DIR}"
 PACKAGE_CONTENT="${BUILD_DIR}/deb-package-content"
 mkdir -p "${PACKAGE_CONTENT}/usr/bin/"
 cp "${BINARY_PATH}" "${PACKAGE_CONTENT}/usr/bin/"
+
+ if [ ! -z "${COSMOVISOR_BIN}" ]; then
+  cp "${COSMOVISOR_BIN}" "${PACKAGE_CONTENT}/usr/bin/"
+ fi
 
 # Make intermediate archive
 PACKAGE_CONTENT_TAR="${BUILD_DIR}/deb-package-content.tar.gz"

@@ -7,11 +7,12 @@ services:
       - "26656:26656" # p2p
       - "26657:26657" # rpc
     volumes:
-      - "${MOUNT_POINT}/node_configs/node0:/cheqd"
+      - "${MOUNT_POINT}/node_configs/node0:${HOME_CHEQD}"
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.2
     user: cheqd
-    environment:
-      - HOME=/cheqd
-    command: start --rpc.laddr tcp://0.0.0.0:26657
+    command: run start --rpc.laddr tcp://0.0.0.0:26657
 
   node1:
     image: "${CHEQD_IMAGE_NAME}"
@@ -19,11 +20,12 @@ services:
       - "26659:26656" # p2p
       - "26660:26657" # rpc
     volumes:
-      - "${MOUNT_POINT}/node_configs/node1:/cheqd"
+      - "${MOUNT_POINT}/node_configs/node1:${HOME_CHEQD}"
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.3
     user: cheqd
-    environment:
-      - HOME=/cheqd
-    command: start --rpc.laddr tcp://0.0.0.0:26657 --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
+    command: run start --rpc.laddr tcp://0.0.0.0:26657 --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
 
   node2:
     image: "${CHEQD_IMAGE_NAME}"
@@ -31,11 +33,12 @@ services:
       - "26662:26656" # p2p
       - "26663:26657" # rpc
     volumes:
-      - "${MOUNT_POINT}/node_configs/node2:/cheqd"
+      - "${MOUNT_POINT}/node_configs/node2:${HOME_CHEQD}"
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.4
     user: cheqd
-    environment:
-      - HOME=/cheqd
-    command: start --rpc.laddr tcp://0.0.0.0:26657 --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
+    command: run start --rpc.laddr tcp://0.0.0.0:26657 --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
 
   node3:
     image: "${CHEQD_IMAGE_NAME}"
@@ -43,11 +46,12 @@ services:
       - "26665:26656" # p2p
       - "26666:26657" # rpc
     volumes:
-      - "${MOUNT_POINT}/node_configs/node3:/cheqd"
+      - "${MOUNT_POINT}/node_configs/node3:${HOME_CHEQD}"
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.5
     user: cheqd
-    environment:
-      - HOME=/cheqd
-    command: start --rpc.laddr tcp://0.0.0.0:26657 --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
+    command: run start --rpc.laddr tcp://0.0.0.0:26657 --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
 
   observer0:
     image: "${CHEQD_IMAGE_NAME}"
@@ -55,11 +59,12 @@ services:
       - "26668:26656" # p2p
       - "26669:26657" # rpc
     volumes:
-      - "${MOUNT_POINT}/node_configs/observer0:/cheqd"
+      - "${MOUNT_POINT}/node_configs/observer0:${HOME_CHEQD}"
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.6
     user: cheqd
-    environment:
-      - HOME=/cheqd
-    command: start --rpc.laddr tcp://0.0.0.0:26657 --minimum-gas-prices "1cheq" --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
+    command: run start --rpc.laddr tcp://0.0.0.0:26657 --minimum-gas-prices "1cheq" --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
 
   observer1:
     image: "${CHEQD_IMAGE_NAME}"
@@ -67,9 +72,31 @@ services:
       - "26671:26656" # p2p
       - "26672:26657" # rpc
     volumes:
-      - "${MOUNT_POINT}/node_configs/observer1:/cheqd"
+      - "${MOUNT_POINT}/node_configs/observer1:${HOME_CHEQD}"
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.7
     user: cheqd
-    environment:
-      - HOME=/cheqd
-    command: start --rpc.laddr tcp://0.0.0.0:26657 --minimum-gas-prices "1cheq" --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
+    command: run start --rpc.laddr tcp://0.0.0.0:26657 --minimum-gas-prices "1cheq" --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
+
+  binary_server:
+    image: python:3.9
+    ports:
+      - "8000:8000"
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.10
+    volumes:
+      - "${BINARY_DIR}:/root"
+    working_dir: "/root"
+    command: python3 -m http.server
+    
+
+networks:
+  vpcbr:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+          gateway: 10.5.0.1
     
