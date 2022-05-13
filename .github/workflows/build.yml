@@ -99,7 +99,7 @@ jobs:
       - name: Build Tar archive
         working-directory: ./build-tools
         run: |
-          ./build-tar.sh "../build/cheqd-noded" "/home/runner/cosmos-sdk/cosmovisor/cosmovisor"
+          ./build-tar.sh "../build/cheqd-noded"
       
       - name: Store Debian package artifact
         uses: actions/upload-artifact@v3
