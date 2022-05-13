@@ -181,6 +181,8 @@ jobs:
   node-upgrade-test:
     name: "Run positive case for upgrade"
     runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ inputs.VERSION }}
 
     steps:
       - uses: actions/checkout@v3

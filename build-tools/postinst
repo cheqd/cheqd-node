@@ -99,7 +99,7 @@ function remove_service () {
   systemctl reset-failed
 }
 
-funtion create_cosmovisor_env () {
+function create_cosmovisor_env () {
   COSMOVISOR_ROOT_DIR=${CHEQD_ROOT_DIR}/cosmovisor
 
   mkdir ${COSMOVISOR_ROOT_DIR}
