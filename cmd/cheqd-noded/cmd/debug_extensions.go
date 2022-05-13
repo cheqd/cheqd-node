@@ -72,6 +72,9 @@ func ed25519PubKeyBase64ToJwkCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pubKeyBase64 := args[0]
 			pubKeyBytes, err := base64.StdEncoding.DecodeString(pubKeyBase64)
+			if err != nil {
+				return err
+			}
 
 			pubKey := ed25519.PublicKey(pubKeyBytes)
 
