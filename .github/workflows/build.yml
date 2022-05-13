@@ -64,7 +64,7 @@ jobs:
 
       - name: Build node binary
         run: |
-          make proto-gen Build
+          make proto-gen build
         
       - name: Store artifact
         uses: actions/upload-artifact@v3
