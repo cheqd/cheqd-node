@@ -12,11 +12,11 @@ fi
 
 BINARY_PATH="$1"
 # It's needed for creating an RC deb package
-if [ -z ${2+x} ];
+if [ -z ${3+x} ];
 then
   VERSION=$("${BINARY_PATH}" version 2>&1)
 else
-  VERSION="$2"
+  VERSION="$3"
 fi
 
 PKG_NAME="cheqd-node"

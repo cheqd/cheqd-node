@@ -96,7 +96,7 @@ jobs:
         run: |
           ./build-deb.sh "../build/cheqd-noded" "/home/runner/cosmos-sdk/cosmovisor/cosmovisor"
 
-      - name: Build Debian package
+      - name: Build Tar archive
         working-directory: ./build-tools
         run: |
           ./build-tar.sh "../build/cheqd-noded" "/home/runner/cosmos-sdk/cosmovisor/cosmovisor"
