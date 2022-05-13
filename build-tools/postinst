@@ -9,6 +9,23 @@ fi
 
 CHEQD_ROOT_DIR=${CHEQD_HOME_DIR}/.cheqdnode
 
+# If there is an argument then assume using as binary + script instead of apt
+if [ -n "$1" ] && [ -f "$1" ] ; then
+  cp "$1" /usr/bin/
+fi
+
+# Create cheqd user
+if ! /usr/bin/getent passwd ${CHEQD_USER_NAME} > /dev/null 2>&1 ; then
+  # Create group and user named "cheqd"
+  addgroup ${CHEQD_USER_NAME} --quiet
+  echo "Home directory for user ${CHEQD_USER_NAME} will be set up as ${CHEQD_HOME_DIR}"
+  adduser --system ${CHEQD_USER_NAME} --home ${CHEQD_HOME_DIR} --shell /bin/bash --ingroup ${CHEQD_USER_NAME} --quiet
+  mkdir -p ${CHEQD_ROOT_DIR}
+  chown -R ${CHEQD_USER_NAME}:${CHEQD_USER_NAME} ${CHEQD_ROOT_DIR}
+else
+  echo "User home directory already exists. Skipping user initialisation."
+fi
+
 # package can be installed with the supporting cosmovisor inside
 if [ -z ${WITH_COSMOVISOR+x} ]; then
   WITH_COSMOVISOR="false"
@@ -17,10 +34,8 @@ else
 
   systemctl stop $SERVICE_NAME
   systemctl disable $SERVICE_NAME
-  rm /etc/systemd/system/$SERVICE_NAME
-  rm /etc/systemd/system/$SERVICE_NAME # and symlinks that might be related
-  rm /usr/lib/systemd/system/$SERVICE_NAME 
-  rm /usr/lib/systemd/system/$SERVICE_NAME # and symlinks that might be related
+  rm /lib/systemd/system/$SERVICE_NAME 
+  rm /lib/systemd/system/$SERVICE_NAME # and symlinks that might be related
   systemctl daemon-reload
   systemctl reset-failed
 
@@ -72,22 +87,6 @@ EOF
   ln -s ${COSMOVISOR_ROOT_DIR}/current /usr/bin/cheqd-noded
 fi
 
-# If there is an argument then assume using as binary + script instead of apt
-if [ -n "$1" ] && [ -f "$1" ] ; then
-  cp "$1" /usr/bin/
-fi
-
-# Create cheqd user
-if ! /usr/bin/getent passwd ${CHEQD_USER_NAME} > /dev/null 2>&1 ; then
-  # Create group and user named "cheqd"
-  addgroup ${CHEQD_USER_NAME} --quiet
-  echo "Home directory for user ${CHEQD_USER_NAME} will be set up as ${CHEQD_HOME_DIR}"
-  adduser --system ${CHEQD_USER_NAME} --home ${CHEQD_HOME_DIR} --shell /bin/bash --ingroup ${CHEQD_USER_NAME} --quiet
-  mkdir -p ${CHEQD_ROOT_DIR}
-  chown -R ${CHEQD_USER_NAME}:${CHEQD_USER_NAME} ${CHEQD_ROOT_DIR}
-else
-  echo "User home directory already exists. Skipping user initialisation."
-fi
 
 # Log directory can be overwritten while running dpkg
 if [ -z ${CHEQD_LOG_DIR+x} ]; then
