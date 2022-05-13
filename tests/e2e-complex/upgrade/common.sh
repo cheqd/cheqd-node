@@ -4,7 +4,7 @@ set -euox pipefail
 
 # TODO: Assert that transactions are successful
 
-CHEQD_IMAGE_FROM="cheqd-noded:cosmovisor"
+CHEQD_IMAGE_FROM="ghcr.io/cheqd/cheqd-node:cosmovisor"
 # shellcheck disable=SC2034
 CHEQD_IMAGE_TO="cheqd-noded:cosmovisor_to"
 # shellcheck disable=SC2034
