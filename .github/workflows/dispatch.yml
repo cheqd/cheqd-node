@@ -9,17 +9,17 @@ jobs:
 
   call-lint:
     name: "Lint"
-    uses: cheqd/cheqd-node/.github/workflows/lint.yml@main
+    uses: ./.github/workflows/lint.yml
 
   call-build:
     name: "Build"
     needs: call-lint
-    uses: cheqd/cheqd-node/.github/workflows/build.yml@main
+    uses: ./.github/workflows/build.yml
   
   call-test:
     name: "Test"
     needs: call-build
-    uses: cheqd/cheqd-node/.github/workflows/test.yml@main
+    uses: ./.github/workflows/test.yml
     with:
       VERSION: ${{ needs.call-build.outputs.VERSION }}
 
@@ -27,6 +27,6 @@ jobs:
     name: "Release"
     needs: [call-test, call-build]
     if: startsWith(github.ref, 'refs/tags/v')
-    uses: cheqd/cheqd-node/.github/workflows/release.yml@main
+    uses: ./.github/workflows/release.yml
     with:
       RELEASE_VERSION: ${{ needs.call-build.outputs.VERSION }}
