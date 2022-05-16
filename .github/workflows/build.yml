@@ -169,7 +169,7 @@ jobs:
           path: cheqd-node-image.tar
 
       - name: Save cheqd-node:cosmovisor_to Docker image
-        run: docker save -o cheqd-cosmovisor-to.tar cheqd-noded:cosmovisor_to
+        run: docker save -o cheqd-cosmovisor-to.tar cheqd-node:cosmovisor_to
 
       - name: Store cheqd-node artifact
         uses: actions/upload-artifact@v3
