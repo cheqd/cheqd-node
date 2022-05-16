@@ -6,7 +6,7 @@ set -euox pipefail
 
 CHEQD_IMAGE_FROM="ghcr.io/cheqd/cheqd-node:cosmovisor"
 # shellcheck disable=SC2034
-CHEQD_IMAGE_TO="cheqd-noded:cosmovisor_to"
+CHEQD_IMAGE_TO="cheqd-node:cosmovisor_to"
 # shellcheck disable=SC2034
 CHEQD_VERSION_TO=$(git describe --always --tag --match "v*" | sed 's/^v//')
 # shellcheck disable=SC2034

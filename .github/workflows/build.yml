@@ -139,7 +139,7 @@ jobs:
         run: docker save -o cheqd-cli-image.tar cheqd-cli
 
       - name: Build cosmovisor Docker image with 'cosmovisor run' as entrypoint and no build args
-        run: docker build -f docker/Dockerfile --target cosmovisor -t cheqd-noded:cosmovisor_to .
+        run: docker build -f docker/Dockerfile --target cosmovisor -t cheqd-node:cosmovisor .
 
       - name: Login to Container registry
         uses: docker/login-action@v1
@@ -150,7 +150,7 @@ jobs:
 
       - name: Push cheqd-node image
         run: |
-          docker tag cheqd-noded:cosmovisor ghcr.io/${{ github.repository }}:cosmovisor
+          docker tag cheqd-node:cosmovisor ghcr.io/${{ github.repository }}:cosmovisor
           docker push ghcr.io/${{ github.repository }}:cosmovisor
 
       - name: Store cheqd-cli artifact
