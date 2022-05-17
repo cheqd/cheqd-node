@@ -2,6 +2,8 @@
 
 set -euox pipefail
 
+# TODO: Assert that transactions are successful
+
 CHEQD_IMAGE_FROM="ghcr.io/cheqd/cheqd-node:0.4.0"
 # shellcheck disable=SC2034
 CHEQD_IMAGE_TO="cheqd-cli"
@@ -26,6 +28,12 @@ CHEQ_AMOUNT_NUMBER="1"
 DID_1="did:cheqd:testnet:1111111111111111"
 # shellcheck disable=SC2034
 DID_2="did:cheqd:testnet:2222222222222222"
+
+
+GAS="auto"
+GAS_ADJUSTMENT="1.3"
+GAS_PRICES="25ncheq"
+TX_PARAMS="--gas ${GAS} --gas-adjustment ${GAS_ADJUSTMENT} --gas-prices ${GAS_PRICES} --chain-id ${CHAIN_ID} -y"
 
 # cheqd_noded docker wrapper
 cheqd_noded_docker() {
@@ -69,8 +77,8 @@ function docker_compose_down () {
 
 # Clean environment
 function clean_env () {
-    rm -rf node_configs
-    rm -f $FNAME_TXHASHES
+    sudo rm -rf node_configs
+    sudo rm -f $FNAME_TXHASHES
 }
 
 # Run command using local generated keys from node_configs/client
@@ -78,8 +86,8 @@ function local_client_tx () {
     cheqd_noded_docker "$@" --home node_configs/client/.cheqdnode/ --keyring-backend test
 }
 
-function make_777 () {
-    sudo chmod -R 777 node_configs
+function make_775 () {
+    sudo chmod -R 775 node_configs
 }
 
 
@@ -105,14 +113,11 @@ function send_tokens() {
     OP_ADDRESS_TO="$1"
     OP0_ADDRESS=${addresses[0]}
 
+    # shellcheck disable=SC2086
     send_res=$(local_client_tx tx \
                     bank \
                     send "$OP0_ADDRESS" "$OP_ADDRESS_TO" $CHEQ_AMOUNT \
-                    --gas auto \
-                    --gas-adjustment 1.2 \
-                    --gas-prices "25ncheq" \
-                    --chain-id $CHAIN_ID \
-                    -y)
+                    ${TX_PARAMS})
     txhash="$(echo "$send_res" | jq ".txhash" | tr -d '"')"
     echo "$txhash" >> "$FNAME_TXHASHES"
 }

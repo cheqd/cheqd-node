@@ -1,10 +1,10 @@
 # cheqd: Node Documentation
 
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/cheqd/cheqd-node/Test/main?style=flat-square)](https://github.com/cheqd/cheqd-node/actions/workflows/test.yml) [![GitHub Super-Linter](https://github.com/cheqd/cheqd-node/workflows/Lint/badge.svg?style=flat-square)](https://github.com/cheqd/cheqd-node/actions/workflows/lint.yml)
+[![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/cheqd/cheqd-node/Build%20and%20Test/main?style=flat-square)](https://github.com/cheqd/cheqd-node/actions/workflows/test.yml) [![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/cheqd/cheqd-node/Lint/main?label=lint&style=flat-square)](https://github.com/cheqd/cheqd-node/actions/workflows/lint.yml)
 
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/cheqd/cheqd-node?color=green&label=stable+version&style=flat-square)](https://github.com/cheqd/cheqd-node/releases/latest) ![GitHub Release Date](https://img.shields.io/github/release-date/cheqd/cheqd-node?style=flat-square)
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/cheqd/cheqd-node?color=green&label=stable&sort=semver&style=flat-square)](https://github.com/cheqd/cheqd-node/releases/latest) ![GitHub Release Date](https://img.shields.io/github/release-date/cheqd/cheqd-node?style=flat-square)
 
-[![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/cheqd/cheqd-node?include_prereleases&label=pre-release&style=flat-square)](https://github.com/cheqd/cheqd-node/releases/) ![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/cheqd/cheqd-node/latest?style=flat-square)
+[![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/cheqd/cheqd-node?include_prereleases&label=latest%20%28incl.%20pre-release%29&sort=semver&style=flat-square)](https://github.com/cheqd/cheqd-node/releases/) ![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/cheqd/cheqd-node/latest?style=flat-square)
 
 [![GitHub contributors](https://img.shields.io/github/contributors/cheqd/cheqd-node?style=flat-square)](https://github.com/cheqd/cheqd-node/graphs/contributors) ![GitHub repo size](https://img.shields.io/github/repo-size/cheqd/cheqd-node?style=flat-square)
 
@@ -24,7 +24,7 @@ Either the cheqd team, or one of your fellow node operators will be happy to off
 
 Getting started as a node operator on the cheqd network [mainnet](https://explorer.cheqd.io) is as simple as...
 
-1. [Install the `cheqd-node` software](docs/setup-and-configure/README.md) (**version 0.4.0+**) on a hosting platform of your choice
+1. [Install the `cheqd-node` software](docs/setup-and-configure/README.md) (**version 0.5.0+**) on a hosting platform of your choice
 2. Once you have acquired CHEQ tokens, [promote your node to a validator](docs/validator-guide/README.md)
 
 If successfully configured, your node would become the latest validator on the cheqd mainnet. Welcome to the new digital ID revolution!
@@ -33,7 +33,7 @@ If successfully configured, your node would become the latest validator on the c
 
 Our [testnet](https://testnet-explorer.cheqd.io/) is the easiest place for developers and node operators to get started if you're not *quite* ready yet to dive into building apps on our mainnet. To get started...
 
-1. Install [v0.4.0 of cheqd-node](https://github.com/cheqd/cheqd-node/releases/tag/v0.4.0) (same version as that on mainnet)
+1. Install [v0.5.0 of cheqd-node](https://github.com/cheqd/cheqd-node/releases/tag/v0.5.0) (same version as that on mainnet)
 2. Acquire testnet CHEQ tokens through [our testnet faucet](https://testnet-faucet.cheqd.io).
 
 ## 🧑‍💻 Using cheqd

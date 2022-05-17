@@ -23,7 +23,7 @@ The aim of this ADR is to define how ["community tax" as described in the Cosmos
 
 `communityTax` is a value set in genesis for each Cosmos network and defined as a percentage that is applied to the fees collected in each block.
 
-Tokens collected through this process accumulate in the **community pool**. The percentage charged as `communityTax` can be changed by [making proposals on the network and voting for acceptance](https://docs.cosmos.network/v0.42/modules/gov/) by the network.
+Tokens collected through this process accumulate in the **community pool**. The percentage charged as `communityTax` can be changed by [making proposals on the network and voting for acceptance](https://docs.cosmos.network/v0.44/modules/gov/) by the network.
 
 ### Community tax collection
 
@@ -74,5 +74,5 @@ More information about fee distribution is available in the [**End Block** secti
 ## References
 
 * [Cosmos SDK `distribution` module parameters](https://docs.cosmos.network/v0.44/modules/distribution/07_params.html#parameters)
-* [Cosmos SDK `governance` module](https://docs.cosmos.network/v0.42/modules/gov/)
+* [Cosmos SDK `governance` module](https://docs.cosmos.network/v0.44/modules/gov/)
 
