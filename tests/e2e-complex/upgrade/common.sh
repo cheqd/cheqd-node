@@ -106,8 +106,8 @@ function random_string() {
 
 function get_addresses () {
     all_keys=$(local_client_tx keys list)
-    # mapfile -t addresses < <(echo "$all_keys" | grep -o 'cheqd1.*')
-    addresses=( $(echo "$all_keys" | grep -o 'cheqd1.*') )
+    mapfile -t addresses < <(echo "$all_keys" | grep -o 'cheqd1.*')
+    # addresses=( $(echo "$all_keys" | grep -o 'cheqd1.*') )
     echo "${addresses[@]}"
 }
 
