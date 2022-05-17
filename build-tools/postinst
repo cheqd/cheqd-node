@@ -26,68 +26,6 @@ else
   echo "User home directory already exists. Skipping user initialisation."
 fi
 
-# package can be installed with the supporting cosmovisor inside
-if [ -z ${WITH_COSMOVISOR+x} ]; then
-  WITH_COSMOVISOR="false"
-else
-  SERVICE_NAME="cheqd-noded.service"
-
-  systemctl stop $SERVICE_NAME
-  systemctl disable $SERVICE_NAME
-  rm /lib/systemd/system/$SERVICE_NAME 
-  rm /lib/systemd/system/$SERVICE_NAME # and symlinks that might be related
-  systemctl daemon-reload
-  systemctl reset-failed
-
-  # Create service with cosmovisor
-
-  cat <<EOF > /usr/lib/systemd/system/$SERVICE_NAME
-[Unit]
-Description=Service for running cosmovisor and cheqd-noded inside
-After=network.target
-Documentation=https://docs.cheqd.io/node
-
-[Service]
-Environment="DAEMON_HOME=${CHEQD_ROOT_DIR}"
-Environment="DAEMON_NAME=cheqd-noded"
-Environment="DAEMON_ALLOW_DOWNLOAD_BINARIES=true"
-Environment="DAEMON_RESTART_AFTER_UPGRADE=true"
-Type=simple
-User=cheqd
-ExecStart=/usr/bin/cosmovisor run start
-Restart=on-failure
-RestartSec=30
-StartLimitBurst=5
-StartLimitInterval=60
-TimeoutSec=120
-StandardOutput=syslog
-StandardError=syslog
-SyslogFacility=syslog
-SyslogIdentifier=cheqd-noded
-LimitNOFILE=65535
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-  systemctl daemon-reload
-  systemctl reset-failed
-
-  systemctl enable $SERVICE_NAME
-
-  # Create cosmovisor environment
-
-  COSMOVISOR_ROOT_DIR=${CHEQD_ROOT_DIR}/cosmovisor
-
-  mkdir ${COSMOVISOR_ROOT_DIR}
-  mkdir ${COSMOVISOR_ROOT_DIR}/genesis
-  mkdir ${COSMOVISOR_ROOT_DIR}/genesis/bin/
-  mkdir ${COSMOVISOR_ROOT_DIR}/upgrades
-  mv /usr/bin/cheqd-noded ${COSMOVISOR_ROOT_DIR}/genesis/bin/
-  ln -s ${COSMOVISOR_ROOT_DIR}/current /usr/bin/cheqd-noded
-fi
-
-
 # Log directory can be overwritten while running dpkg
 if [ -z ${CHEQD_LOG_DIR+x} ]; then
   CHEQD_LOG_DIR=${CHEQD_ROOT_DIR}/log
