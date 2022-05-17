@@ -138,23 +138,23 @@ jobs:
       - name: Save cheqd-cli Docker image
         run: docker save -o cheqd-cli-image.tar cheqd-cli
 
-      # - name: Build cosmovisor Docker image with 'cosmovisor run' as entrypoint and no build args
-      #   run: docker build -f docker/Dockerfile --target cosmovisor -t cheqd-node:cosmovisor_to --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" .
-
       - name: Build cosmovisor Docker image with 'cosmovisor run' as entrypoint and no build args
-        run: docker build -f docker/Dockerfile --target cosmovisor -t cheqd-node:cosmovisor --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" .
+        run: docker build -f docker/Dockerfile --target cosmovisor -t cheqd-node:cosmovisor_to --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" .
 
-      - name: Login to Container registry
-        uses: docker/login-action@v1
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Build cosmovisor Docker image with 'cosmovisor run' as entrypoint and no build args
+      #   run: docker build -f docker/Dockerfile --target cosmovisor -t cheqd-node:cosmovisor --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" .
 
-      - name: Push cheqd-node image
-        run: |
-          docker tag cheqd-node:cosmovisor ghcr.io/${{ github.repository }}:cosmovisor
-          docker push ghcr.io/${{ github.repository }}:cosmovisor
+      # - name: Login to Container registry
+      #   uses: docker/login-action@v1
+      #   with:
+      #     registry: ${{ env.REGISTRY }}
+      #     username: ${{ github.actor }}
+      #     password: ${{ secrets.GITHUB_TOKEN }}
+
+      # - name: Push cheqd-node image
+      #   run: |
+      #     docker tag cheqd-node:cosmovisor ghcr.io/${{ github.repository }}:cosmovisor
+      #     docker push ghcr.io/${{ github.repository }}:cosmovisor
 
       - name: Store cheqd-cli artifact
         uses: actions/upload-artifact@v3
