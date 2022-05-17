@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 COSMOVISOR_ROOT_DIR=${HOME}/.cheqdnode/cosmovisor
 
