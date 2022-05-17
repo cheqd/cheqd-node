@@ -14,6 +14,9 @@ clean_env
 # Generate config files
 bash gen_node_configs.sh
 
+# Add all needed permissions
+make_775
+
 # Start the network on version which will be upgraded from
 docker_compose_up "${CHEQD_IMAGE_FROM}" "$(pwd)"
 
