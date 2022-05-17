@@ -11,6 +11,7 @@ CHEQD_IMAGE_TO="cheqd-node:cosmovisor_to"
 CHEQD_VERSION_TO=$(git describe --always --tag --match "v*" | sed 's/^v//')
 # shellcheck disable=SC2034
 UPGRADE_NAME="cosmovisor_test"
+# shellcheck disable=SC2034
 UPGRADE_INFO="{
   \"binaries\": {
     \"linux/amd64\":\"http://10.5.0.10:8000/cheqd-noded.tar.gz\"
