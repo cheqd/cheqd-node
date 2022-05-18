@@ -48,7 +48,7 @@ jobs:
         uses: golangci/golangci-lint-action@v2
         with:
           version: latest
-          args: --timeout 5m0s
+          args: --config .github/linters/.golangci.yaml
 
   super-lint:
     name: "Super Linter"
