@@ -1,16 +1,27 @@
+run:
+  timeout: 5m
+
+
 linters:
   enable:
     - deadcode
     - errcheck
     - gosimple
+    - gofumpt
     - govet
     - ineffassign
+    - misspell
+    - nestif
     - staticcheck
     - structcheck
     - typecheck
     - unused
     - varcheck
-    - gofumpt
 
-run:
-  timeout: 5m
+
+
+linters-settings:
+  misspell:
+    locale: UK
+    ignore-words:
+      - cheqd
