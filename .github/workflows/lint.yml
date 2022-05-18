@@ -79,7 +79,7 @@ jobs:
 
         VALIDATE_BASH: true
         VALIDATE_DOCKERFILE_HADOLINT: true
-        DOCKERFILE_HADOLINT_FILE_NAME: .github/linters/.hadolint.yml
+        DOCKERFILE_HADOLINT_FILE_NAME: './.github/linters/.hadolint.yml'
         VALIDATE_GITHUB_ACTIONS: true
         VALIDATE_JSON: true
         VALIDATE_MARKDOWN: true
