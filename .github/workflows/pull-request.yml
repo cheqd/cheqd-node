@@ -1,17 +1,6 @@
 name: PR Title Check
 on:
-  pull_request_target:
-    branches:
-      - main
-      - master
-      - cheqd
-    types:
-      - opened
-      - edited
-      - synchronize
-concurrency: 
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_call:
 
 
 jobs:
