@@ -19,9 +19,7 @@ linters:
     - varcheck
 
 
-
 linters-settings:
   misspell:
-    locale: UK
     ignore-words:
       - cheqd
