@@ -25,6 +25,8 @@ RUN go get \
     github.com/regen-network/cosmos-proto/protoc-gen-gocosmos@latest
 
 # Install buf
+SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
+
 RUN PREFIX="/usr/local" && \
     VERSION="1.0.0-rc8" && \
     curl -sSL "https://github.com/bufbuild/buf/releases/download/v${VERSION}/buf-$(uname -s)-$(uname -m).tar.gz" | \
