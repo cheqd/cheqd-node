@@ -117,3 +117,5 @@ go.sum: go.mod
 
 proto-gen:
 	bash scripts/protocgen.sh
+
+test:
