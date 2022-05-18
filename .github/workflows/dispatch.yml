@@ -1,11 +1,26 @@
 name: "Workflow Dispatch"
-on: push
+on:
+  pull_request_target:
+    branches:
+      - main
+      - 'release/**'
+    types:
+      - opened
+      - reopened
+      - edited
+      - synchronize
+      - ready_for_review
+      - review_requested
 concurrency: 
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 
 jobs:
+
+  call-title-check:
+    name: "PR Title Check"
+    uses: ./.github/workflows/pull-request.yml
 
   call-lint:
     name: "Lint"
@@ -19,7 +34,7 @@ jobs:
   call-test:
     name: "Test"
     needs: call-build
-    uses: cheqd/cheqd-node/.github/workflows/test.yml@DEV-1278
+    uses: ./.github/workflows/test.yml
     with:
       VERSION: ${{ needs.call-build.outputs.VERSION }}
 
