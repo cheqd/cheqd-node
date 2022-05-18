@@ -1,7 +1,7 @@
 name: "Workflow Dispatch"
 on:
-  pull_request:
   push:
+  pull_request_target:
     branches:
       - main
 
