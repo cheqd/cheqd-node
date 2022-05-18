@@ -4,12 +4,13 @@ import (
 	"crypto/ed25519"
 	"crypto/rand"
 	"encoding/base64"
+	"time"
+
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cheqd/cheqd-node/x/cheqd"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/multiformats/go-multibase"
-	"time"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store"
@@ -35,10 +36,9 @@ type TestSetup struct {
 	Handler sdk.Handler
 }
 
-
 type SignerKey struct {
 	signer string
-	key ed25519.PrivateKey
+	key    ed25519.PrivateKey
 }
 
 func Setup() TestSetup {
@@ -227,7 +227,7 @@ func ConcatKeys(dst map[string]ed25519.PrivateKey, src map[string]ed25519.Privat
 }
 
 func MapToListOfSignerKeys(mp map[string]ed25519.PrivateKey) []SignerKey {
-	var rlist = []SignerKey{}
+	rlist := []SignerKey{}
 	for k, v := range mp {
 		rlist = append(rlist, SignerKey{
 			signer: k,
@@ -237,8 +237,7 @@ func MapToListOfSignerKeys(mp map[string]ed25519.PrivateKey) []SignerKey {
 	return rlist
 }
 
-func (s TestSetup) CreateTestDIDs(keys map[string]KeyPair) (error) {
-
+func (s TestSetup) CreateTestDIDs(keys map[string]KeyPair) error {
 	testDIDs := []struct {
 		signers []string
 		msg     *types.MsgCreateDidPayload
@@ -327,7 +326,7 @@ func (s TestSetup) CreateTestDIDs(keys map[string]KeyPair) (error) {
 		msg := prefilled.msg
 
 		for _, vm := range msg.VerificationMethod {
-			encoded, err :=  multibase.Encode(multibase.Base58BTC, keys[vm.Id].PublicKey)
+			encoded, err := multibase.Encode(multibase.Base58BTC, keys[vm.Id].PublicKey)
 			if err != nil {
 				return err
 			}

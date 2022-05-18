@@ -55,7 +55,6 @@ func Test_NewMetadataFromContext(t *testing.T) {
 	metadata := NewMetadataFromContext(ctx)
 
 	require.Equal(t, expectedMetadata, metadata)
-
 }
 
 func Test_UpdateMetadata(t *testing.T) {
@@ -76,7 +75,6 @@ func Test_UpdateMetadata(t *testing.T) {
 	metadata.Update(ctx2)
 
 	require.Equal(t, expectedMetadata, metadata)
-
 }
 
 func NewContext(time time.Time, txBytes []byte) sdk.Context {

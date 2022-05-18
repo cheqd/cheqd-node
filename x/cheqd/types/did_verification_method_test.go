@@ -42,11 +42,15 @@ var NotValidJWKKey = TestJWKKey{
 	Kid: "6a8ba5652a7044121d4fedac8f14d14c54e4895b",
 }
 
-var ValidJWKByte, _ = json.Marshal(ValidJWKKey)
-var NotValidJWKByte, _ = json.Marshal(NotValidJWKKey)
+var (
+	ValidJWKByte, _    = json.Marshal(ValidJWKKey)
+	NotValidJWKByte, _ = json.Marshal(NotValidJWKKey)
+)
 
-var ValidPublicKeyJWK = JSONToPubKeyJWK(string(ValidJWKByte))
-var NotValidPublicKeyJWK = JSONToPubKeyJWK(string(NotValidJWKByte))
+var (
+	ValidPublicKeyJWK    = JSONToPubKeyJWK(string(ValidJWKByte))
+	NotValidPublicKeyJWK = JSONToPubKeyJWK(string(NotValidJWKByte))
+)
 
 func TestVerificationMethodValidation(t *testing.T) {
 	cases := []struct {

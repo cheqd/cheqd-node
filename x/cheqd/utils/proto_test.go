@@ -1,9 +1,10 @@
 package utils
 
 import (
+	"testing"
+
 	bank_types "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func Test_MsgTypeUrl(t *testing.T) {

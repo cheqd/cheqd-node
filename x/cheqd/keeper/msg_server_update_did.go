@@ -64,7 +64,6 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 	controllers := updatedDid.AllControllerDids()
 	for _, controller := range controllers {
 		_, err := MustFindDid(&k.Keeper, &ctx, inMemoryDids, controller)
-
 		if err != nil {
 			return nil, err
 		}

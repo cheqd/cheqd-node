@@ -1,15 +1,16 @@
 package utils
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestIsDidURL(t *testing.T) {
 	cases := []struct {
-		name string
-		valid bool
-		didUrl   string
+		name   string
+		valid  bool
+		didUrl string
 	}{
 		// Path: all the possible symbols
 		{"Valid: the whole alphabet for path", true, "did:cheqd:testnet:123456789abcdefg/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~!$&'()*+,;=:@%20%ff"},
@@ -84,7 +85,7 @@ func TestDidURLJoin(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		t.Run("split/join" + tc, func(t *testing.T) {
+		t.Run("split/join"+tc, func(t *testing.T) {
 			did, path, query, fragment := MustSplitDIDUrl(tc)
 			require.Equal(t, tc, JoinDIDUrl(did, path, query, fragment))
 		})

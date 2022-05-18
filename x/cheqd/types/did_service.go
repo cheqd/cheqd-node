@@ -2,6 +2,7 @@ package types
 
 import (
 	"errors"
+
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
@@ -19,7 +20,6 @@ func NewService(id string, type_ string, serviceEndpoint string) *Service {
 	}
 }
 
-
 // Helpers
 
 func GetServiceIds(vms []*Service) []string {
@@ -31,7 +31,6 @@ func GetServiceIds(vms []*Service) []string {
 
 	return res
 }
-
 
 // Validation
 

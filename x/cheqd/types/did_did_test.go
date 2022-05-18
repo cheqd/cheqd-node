@@ -2,15 +2,18 @@ package types
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
-var ValidTestDID = "did:cheqd:testnet:123456789abcdefg"
-var ValidTestDID2 = "did:cheqd:testnet:gfedcba987654321"
-var InvalidTestDID = "badDid"
-var ValidEd25519PubKey = "zF1hVGXXK9rmx5HhMTpGnGQJiab9qrFJbQXBRhSmYjQWX"
-var NotValidEd25519PubKey = "zF1hVGXXK9rmx5HhMTpGnGQJi"
+var (
+	ValidTestDID          = "did:cheqd:testnet:123456789abcdefg"
+	ValidTestDID2         = "did:cheqd:testnet:gfedcba987654321"
+	InvalidTestDID        = "badDid"
+	ValidEd25519PubKey    = "zF1hVGXXK9rmx5HhMTpGnGQJiab9qrFJbQXBRhSmYjQWX"
+	NotValidEd25519PubKey = "zF1hVGXXK9rmx5HhMTpGnGQJi"
+)
 
 func TestDidValidation(t *testing.T) {
 	cases := []struct {
@@ -195,7 +198,7 @@ func TestDidValidation(t *testing.T) {
 		{
 			name: "VM duplicated: negative",
 			struct_: &Did{
-				Id:         ValidTestDID,
+				Id: ValidTestDID,
 				VerificationMethod: []*VerificationMethod{
 					{
 						Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),

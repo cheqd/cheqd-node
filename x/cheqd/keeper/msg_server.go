@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"encoding/base64"
+
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -40,7 +41,6 @@ func FindDid(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.StateVal
 
 func MustFindDid(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.StateValue, did string) (res types.StateValue, err error) {
 	res, found, err := FindDid(k, ctx, inMemoryDIDs, did)
-
 	if err != nil {
 		return types.StateValue{}, err
 	}
@@ -76,7 +76,6 @@ func FindVerificationMethod(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string
 
 func MustFindVerificationMethod(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.StateValue, didUrl string) (res types.VerificationMethod, err error) {
 	res, found, err := FindVerificationMethod(k, ctx, inMemoryDIDs, didUrl)
-
 	if err != nil {
 		return types.VerificationMethod{}, err
 	}

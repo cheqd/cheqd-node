@@ -4,17 +4,18 @@ import (
 	"crypto/ed25519"
 	"crypto/rand"
 	"fmt"
+	"reflect"
+	"testing"
+
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/stretchr/testify/require"
-	"reflect"
-	"testing"
 )
 
 func TestDIDDocControllerChanged(t *testing.T) {
 	setup := Setup()
 
-	//Init did
+	// Init did
 	aliceKeys, aliceDid, _ := setup.InitDid(AliceDID)
 	bobKeys, _, _ := setup.InitDid(BobDID)
 
@@ -31,7 +32,7 @@ func TestDIDDocControllerChanged(t *testing.T) {
 func TestDIDDocVerificationMethodChangedWithoutOldSignature(t *testing.T) {
 	setup := Setup()
 
-	//Init did
+	// Init did
 	_, aliceDid, _ := setup.InitDid(AliceDID)
 	bobKeys, _, _ := setup.InitDid(BobDID)
 
@@ -47,7 +48,7 @@ func TestDIDDocVerificationMethodChangedWithoutOldSignature(t *testing.T) {
 func TestDIDDocVerificationMethodControllerChangedWithoutOldSignature(t *testing.T) {
 	setup := Setup()
 
-	//Init did
+	// Init did
 	_, aliceDid, _ := setup.InitDid(AliceDID)
 	bobKeys, _, _ := setup.InitDid(BobDID)
 
@@ -63,7 +64,7 @@ func TestDIDDocVerificationMethodControllerChangedWithoutOldSignature(t *testing
 func TestDIDDocControllerChangedWithoutOldSignature(t *testing.T) {
 	setup := Setup()
 
-	//Init did
+	// Init did
 	_, aliceDid, _ := setup.InitDid(AliceDID)
 	bobKeys, _, _ := setup.InitDid(BobDID)
 
@@ -79,7 +80,7 @@ func TestDIDDocControllerChangedWithoutOldSignature(t *testing.T) {
 func TestDIDDocVerificationMethodDeletedWithoutOldSignature(t *testing.T) {
 	setup := Setup()
 
-	//Init did
+	// Init did
 
 	ApubKey, AprivKey, _ := ed25519.GenerateKey(rand.Reader)
 	BpubKey, BprivKey, _ := ed25519.GenerateKey(rand.Reader)
