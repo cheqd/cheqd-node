@@ -8,6 +8,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
     curl \
     libprotobuf-dev \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 # Get go protoc compiler plugins. Taken from: tendermintdev/sdk-proto-gen:v0.2
