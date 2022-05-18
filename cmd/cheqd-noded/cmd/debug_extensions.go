@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/multiformats/go-multibase"
 	"github.com/spf13/cobra"
 )
@@ -25,7 +26,7 @@ func ed25519Cmd() *cobra.Command {
 		Short: "ed25519 tools",
 	}
 
-	cmd.AddCommand(ed25519RandomCmd())
+	cmd.AddCommand(ed25519RandomCmd(), ed25519PubKeyBase64ToJwkCmd())
 
 	return cmd
 }
@@ -55,6 +56,39 @@ func ed25519RandomCmd() *cobra.Command {
 			}
 
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), string(keyInfoJson))
+			return err
+		},
+	}
+
+	return cmd
+}
+
+// ed25519PubKeyBase64ToJwk returns cobra Command.
+func ed25519PubKeyBase64ToJwkCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "pubkey-base64-to-jwk",
+		Short: "Convert ed25519 pubkey base64 to jwk",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			pubKeyBase64 := args[0]
+			pubKeyBytes, err := base64.StdEncoding.DecodeString(pubKeyBase64)
+			if err != nil {
+				return err
+			}
+
+			pubKey := ed25519.PublicKey(pubKeyBytes)
+
+			pubKeyJwk, err := jwk.New(pubKey)
+			if err != nil {
+				return err
+			}
+
+			pubKeyJwkJson, err := json.Marshal(pubKeyJwk)
+			if err != nil {
+				return err
+			}
+
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), string(pubKeyJwkJson))
 			return err
 		},
 	}
