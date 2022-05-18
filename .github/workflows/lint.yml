@@ -1,13 +1,6 @@
 name: "Lint"
 on:
   workflow_call:
-  pull_request_target:
-    branches:
-      - main
-    types:
-      - opened
-      - edited
-      - synchronize
 defaults:
   run:
     shell: bash
