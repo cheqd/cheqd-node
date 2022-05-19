@@ -8,6 +8,22 @@ defaults:
 
 jobs:
 
+  lint-pr:
+    name: "PR title check"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: CondeNast/conventional-pull-request-action@v0.1.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # to override config-conventional rules, specify a relative path to your rules module, actions/checkout is required for this setting!
+          commitlintRulesPath: ".github/linters/.commitlint.rules.js" # default: undefined
+          # if the PR contains a single commit, fail if the commit message and the PR title do not match
+          commitTitleMatch: "false" # default: 'true'
+
   sh-euox-pipefail-check:
     name: "Shell pipefail check"
     runs-on: ubuntu-latest
