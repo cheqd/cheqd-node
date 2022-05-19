@@ -1,16 +1,14 @@
 name: "Workflow Dispatch"
-on:
-  pull_request_target:
-    branches:
-      - main
-      - 'release/**'
-    types:
-      - opened
-      - reopened
-      - edited
-      - synchronize
-      - ready_for_review
-      - review_requested
+on: push
+  # pull_request:
+  #   types:
+  #     - opened
+  #     - reopened
+  #     - edited
+  #     - closed
+  #     - synchronize
+  #     - ready_for_review
+  #     - review_requested
 concurrency: 
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
