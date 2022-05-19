@@ -7,6 +7,7 @@ FROM golang:1.17.8-buster as builder
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
     curl \
+    git \
     libprotobuf-dev \
     && rm -rf /var/lib/apt/lists/*
 
@@ -54,6 +55,7 @@ RUN make proto-gen build
 ###############################################################
 
 FROM ubuntu:focal AS base
+
 LABEL org.opencontainers.image.description "cheqd CLI Docker image"
 LABEL org.opencontainers.image.source "https://github.com/cheqd/cheqd-node"
 LABEL org.opencontainers.image.documentation "https://docs.cheqd.io/node"
@@ -88,6 +90,7 @@ ENTRYPOINT [ "cheqd-noded" ]
 ###############################################################
 
 FROM base AS node
+
 LABEL org.opencontainers.image.description "cheqd Node Docker image"
 LABEL org.opencontainers.image.source "https://github.com/cheqd/cheqd-node"
 LABEL org.opencontainers.image.documentation "https://docs.cheqd.io/node"
@@ -104,12 +107,7 @@ ENTRYPOINT [ "node-start" ]
 ###          STAGE 4: Cosmovisor starter image              ###
 ###############################################################
 
-FROM base AS cosmovisor
-
-RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends \
-    git \
-    && rm -rf /var/lib/apt/lists/*
+FROM builder AS cosmovisor
 
 RUN git clone https://github.com/cosmos/cosmos-sdk.git
 

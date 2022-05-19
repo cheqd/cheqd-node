@@ -1,6 +1,6 @@
 name: PR Title Check
 on:
-  pull_request:
+  pull_request_target:
     branches:
       - main
       - 'release/**'
@@ -8,7 +8,6 @@ on:
       - opened
       - reopened
       - edited
-      - closed
       - synchronize
       - ready_for_review
       - review_requested
