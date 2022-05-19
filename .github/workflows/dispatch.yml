@@ -1,24 +1,11 @@
 name: "Workflow Dispatch"
 on: push
-  # pull_request:
-  #   types:
-  #     - opened
-  #     - reopened
-  #     - edited
-  #     - closed
-  #     - synchronize
-  #     - ready_for_review
-  #     - review_requested
 concurrency: 
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 
 jobs:
-
-  call-title-check:
-    name: "PR Title Check"
-    uses: ./.github/workflows/pull-request.yml
 
   call-lint:
     name: "Lint"

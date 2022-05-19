@@ -1,6 +1,17 @@
 name: PR Title Check
 on:
-  workflow_call:
+  pull_request:
+    branches:
+      - main
+      - 'release/**'
+    types:
+      - opened
+      - reopened
+      - edited
+      - closed
+      - synchronize
+      - ready_for_review
+      - review_requested
 
 
 jobs:
