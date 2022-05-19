@@ -104,24 +104,35 @@ ENTRYPOINT [ "node-start" ]
 
 
 ###############################################################
-###          STAGE 4: Cosmovisor starter image              ###
+###        STAGE 4: Build Cosmovisor                        ###
 ###############################################################
 
-FROM builder AS cosmovisor
+FROM golang:1.17.8-buster AS cosmos_builder 
 
 RUN git clone https://github.com/cosmos/cosmos-sdk.git
 
 WORKDIR /go/cosmos-sdk/
 
-RUN git checkout cosmovisor/v1.1.0
-RUN make cosmovisor
+RUN git status \
+    && git checkout cosmovisor/v1.1.0 \
+    && make cosmovisor
 
-COPY /go/cosmos-sdk/cosmovisor/cosmovisor /bin
+
+###############################################################
+###          STAGE 5: Cosmovisor-based node image           ###
+###############################################################
+
+FROM base AS cosmovisor
+
+COPY --from=cosmos_builder /go/cosmos-sdk/cosmovisor/cosmovisor /bin
 COPY --chown=cheqd:cheqd docker/cosmovisor.sh /bin/cosmovisor.sh
 
 ARG CHEQD_HOME_DIR="/home/cheqd"
 
 RUN chmod +x /bin/cosmovisor.sh
+
+USER root
+RUN apt update && apt install ca-certificates  -y
 
 USER cheqd
 
