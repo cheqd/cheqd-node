@@ -4,11 +4,12 @@ failure-threshold: warning
 # List of ignored rules
 # See list for reference: https://github.com/hadolint/hadolint#rules
 ignored:
-  - DL3008
 
 # Override default levels for specific rules
 override:
   error:
   warning:
   info:
+    - DL3008
+    - DL3027
   style:

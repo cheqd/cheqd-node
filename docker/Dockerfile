@@ -131,9 +131,6 @@ ARG CHEQD_HOME_DIR="/home/cheqd"
 
 RUN chmod +x /bin/cosmovisor.sh
 
-USER root
-RUN apt update && apt install ca-certificates  -y
-
 USER cheqd
 
 ENV DAEMON_HOME=${CHEQD_HOME_DIR}/.cheqdnode
