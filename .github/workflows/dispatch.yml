@@ -16,6 +16,10 @@ concurrency:
 
 jobs:
 
+  call-title-check:
+    name: "PR Title Check"
+    uses: ./.github/workflows/pull-request.yml
+
   call-lint:
     name: "Lint"
     uses: ./.github/workflows/lint.yml
