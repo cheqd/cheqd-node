@@ -12,6 +12,7 @@ local_client_tx tx gov submit-proposal software-upgrade \
     --title "Upgrade-to-new-version" \
     --description "Description-of-upgrade-to-new-version" \
     --upgrade-height "$UPGRADE_HEIGHT" \
+    --upgrade-info "$UPGRADE_INFO" \
     --from operator1 \
     ${TX_PARAMS}
 

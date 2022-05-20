@@ -326,6 +326,13 @@ func New(
 		return initialVM, nil
 	})
 
+	app.UpgradeKeeper.SetUpgradeHandler("cosmovisor_test", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx.Logger().Info("Handler for upgrade plan: cosmovisor_test")
+
+		initialVM := app.mm.GetVersionMap()
+		return initialVM, nil
+	})
+
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.StakingKeeper = *stakingKeeper.SetHooks(

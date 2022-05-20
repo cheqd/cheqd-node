@@ -7,6 +7,7 @@ FROM golang:1.17.8-buster as builder
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
     curl \
+    git \
     libprotobuf-dev \
     && rm -rf /var/lib/apt/lists/*
 
@@ -54,6 +55,7 @@ RUN make proto-gen build
 ###############################################################
 
 FROM ubuntu:focal AS base
+
 LABEL org.opencontainers.image.description "cheqd CLI Docker image"
 LABEL org.opencontainers.image.source "https://github.com/cheqd/cheqd-node"
 LABEL org.opencontainers.image.documentation "https://docs.cheqd.io/node"
@@ -88,6 +90,7 @@ ENTRYPOINT [ "cheqd-noded" ]
 ###############################################################
 
 FROM base AS node
+
 LABEL org.opencontainers.image.description "cheqd Node Docker image"
 LABEL org.opencontainers.image.source "https://github.com/cheqd/cheqd-node"
 LABEL org.opencontainers.image.documentation "https://docs.cheqd.io/node"
@@ -98,3 +101,41 @@ RUN chmod +x /bin/node-start
 
 # Default entrypoint for cheqd-noded CLI usage
 ENTRYPOINT [ "node-start" ]
+
+
+###############################################################
+###        STAGE 4: Build Cosmovisor                        ###
+###############################################################
+
+FROM golang:1.17.8-buster AS cosmos_builder 
+
+RUN git clone https://github.com/cosmos/cosmos-sdk.git
+
+WORKDIR /go/cosmos-sdk/
+
+RUN git status \
+    && git checkout cosmovisor/v1.1.0 \
+    && make cosmovisor
+
+
+###############################################################
+###          STAGE 5: Cosmovisor-based node image           ###
+###############################################################
+
+FROM base AS cosmovisor
+
+COPY --from=cosmos_builder /go/cosmos-sdk/cosmovisor/cosmovisor /bin
+COPY --chown=cheqd:cheqd docker/cosmovisor.sh /bin/cosmovisor.sh
+
+ARG CHEQD_HOME_DIR="/home/cheqd"
+
+RUN chmod +x /bin/cosmovisor.sh
+
+USER cheqd
+
+ENV DAEMON_HOME=${CHEQD_HOME_DIR}/.cheqdnode
+ENV DAEMON_NAME=cheqd-noded
+ENV DAEMON_ALLOW_DOWNLOAD_BINARIES=true
+ENV DAEMON_RESTART_AFTER_UPGRADE=true
+
+ENTRYPOINT [ "cosmovisor.sh" ]

@@ -76,4 +76,3 @@ EOF
 systemctl restart logrotate.service
 systemctl restart logrotate.timer
 fi
-

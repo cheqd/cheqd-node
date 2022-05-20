@@ -15,17 +15,17 @@ cheqd_noded_docker() {
         "${CHEQD_IMAGE_TO}" "$@"
 }
 
-# Wait for upgrade height
-bash ../../tools/wait-for-chain.sh "$UPGRADE_HEIGHT" $((3 * VOTING_PERIOD))
+# # Wait for upgrade height
+# bash ../../tools/wait-for-chain.sh "$UPGRADE_HEIGHT" $((3 * VOTING_PERIOD))
 
-# Stop docker-compose service
-docker_compose_down
+# # Stop docker-compose service
+# docker_compose_down
 
-# Make all the data accessible
-make_775
+# # Make all the data accessible
+# make_775
 
-# Start docker-compose with new base image on new version
-docker_compose_up "$CHEQD_IMAGE_TO" "$(pwd)"
+# # Start docker-compose with new base image on new version
+# docker_compose_up "$CHEQD_IMAGE_TO" "$(pwd)"
 
 # Check that upgrade was successful
 

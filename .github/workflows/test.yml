@@ -181,19 +181,30 @@ jobs:
   node-upgrade-test:
     name: "Run positive case for upgrade"
     runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ inputs.VERSION }}
 
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Download cheqd-cli Docker image
+      - name: Download tar archive
         uses: actions/download-artifact@v3
         with:
-          name: cheqd-cli-image.tar
+          name: cheqd-node_${{ env.VERSION }}.tar.gz
+
+      - name: Rename tar archive
+        run: |
+          mv cheqd-node_${{ env.VERSION }}.tar.gz cheqd-noded.tar.gz
+
+      - name: Download cheqd-cosmovisor Docker image
+        uses: actions/download-artifact@v3
+        with:
+          name: cheqd-cosmovisor-to.tar
 
       - name: Load cheqd-cli Docker image
-        run: docker load -i cheqd-cli-image.tar
+        run: docker load -i cheqd-cosmovisor-to.tar
 
       - name: Give current user ownership
         run: sudo chown "$USER":"$USER" .

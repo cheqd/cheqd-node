@@ -3,15 +3,14 @@ on:
   pull_request_target:
     branches:
       - main
-      - master
-      - cheqd
+      - 'release/**'
     types:
       - opened
+      - reopened
       - edited
       - synchronize
-concurrency: 
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+      - ready_for_review
+      - review_requested
 
 
 jobs:

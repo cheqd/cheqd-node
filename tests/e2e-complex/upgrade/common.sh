@@ -4,13 +4,19 @@ set -euox pipefail
 
 # TODO: Assert that transactions are successful
 
-CHEQD_IMAGE_FROM="ghcr.io/cheqd/cheqd-node:0.4.0"
+CHEQD_IMAGE_FROM="ghcr.io/cheqd/cheqd-node:cosmovisor"
 # shellcheck disable=SC2034
-CHEQD_IMAGE_TO="cheqd-cli"
+CHEQD_IMAGE_TO="cheqd-node:cosmovisor_to"
 # shellcheck disable=SC2034
 CHEQD_VERSION_TO=$(git describe --always --tag --match "v*" | sed 's/^v//')
 # shellcheck disable=SC2034
-UPGRADE_NAME="v0.5"
+UPGRADE_NAME="cosmovisor_test"
+# shellcheck disable=SC2034
+UPGRADE_INFO="{
+  \"binaries\": {
+    \"linux/amd64\":\"http://10.5.0.10:8000/cheqd-noded.tar.gz\"
+  }
+}"
 VOTING_PERIOD=15
 EXPECTED_BLOCK_SECOND=5
 EXTRA_BLOCKS=10
@@ -28,6 +34,7 @@ CHEQ_AMOUNT_NUMBER="1"
 DID_1="did:cheqd:testnet:1111111111111111"
 # shellcheck disable=SC2034
 DID_2="did:cheqd:testnet:2222222222222222"
+CHEQD_HOME="/home/cheqd"
 
 
 GAS="auto"
@@ -38,10 +45,10 @@ TX_PARAMS="--gas ${GAS} --gas-adjustment ${GAS_ADJUSTMENT} --gas-prices ${GAS_PR
 # cheqd_noded docker wrapper
 cheqd_noded_docker() {
     docker run --rm \
-        -v "$(pwd):/cheqd" \
+        -v "$(pwd):${CHEQD_HOME}" \
         --network host \
         -u root \
-        -e HOME=/cheqd \
+        -e HOME=${CHEQD_HOME} \
         --entrypoint "cheqd-noded" \
         ${CHEQD_IMAGE_FROM} "$@"
 }
@@ -101,7 +108,7 @@ function random_string() {
 function get_addresses () {
     all_keys=$(local_client_tx keys list)
     mapfile -t addresses < <(echo "$all_keys" | grep -o 'cheqd1.*')
-#    addresses=( $(echo "$all_keys" | grep -o 'cheqd1.*') )
+    # addresses=( $(echo "$all_keys" | grep -o 'cheqd1.*') )
     echo "${addresses[@]}"
 }
 
