@@ -17,15 +17,16 @@ During the downtime of a Validator Node, it is common for the Node to miss impor
 
 Therefore, the first step is checking that your node is up to date. You can execute the command
 
-'''
+~~~
 cheqd-noded version
-'''
+~~~
 
 The expected response will be the latest cheqd-noded software release. At the time of writing, the expected response would be 
 
-'''
+~~~
 0.5.0
-'''
+~~~
+
 ## Step 2: Upgrading to latest software
 
 If your node is not up to date, please [follow the instructions here](https://github.com/cheqd/cheqd-node/blob/main/docs/setup-and-configure/debian/deb-package-upgrade.md)
@@ -39,13 +40,16 @@ Expected response: In the output, look for the text latest_block_height and note
 The node is fully caught up when the parameter catching_up returns the output false.
 
 Additionally,, you can check this has worked:
-'''
+~~~
 http://<your node ip or domain name>:26657/abci_info
-'''
+~~~
 It shows you a page and field "version": "0.5.0"
 ____
 
 ## Step 4: Unjailing command
 
 If everything is OK, then you can unjail your node using this command in the cheqd CLI:
+
+~~~
 cheqd-noded tx slashing unjail --from <address_alias> --gas auto --gas-adjustment 1.2 --gas-prices 25ncheq --chain-id cheqd-mainnet-1
+~~~
