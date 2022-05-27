@@ -35,9 +35,9 @@ If your node is not up to date, please [follow the instructions here](https://gi
 
 Once again, check if your node is up to date, following Step 1.
 
-Expected response: In the output, look for the text latest_block_height and note the value. Execute the status command above a few times and make sure the value of latest_block_height has increased each time.
+Expected response: In the output, look for the text ```latest_block_height``` and note the value. Execute the status command above a few times and make sure the value of ```latest_block_height``` has increased each time.
 
-The node is fully caught up when the parameter catching_up returns the output false.
+The node is fully caught up when the parameter ```catching_up``` returns the output false.
 
 Additionally,, you can check this has worked:
 ~~~
@@ -48,7 +48,7 @@ ____
 
 ## Step 4: Unjailing command
 
-If everything is OK, then you can unjail your node using this command in the cheqd CLI:
+If everything is up to date, and the node has fully caught, you can now unjail your node using this command in the cheqd CLI:
 
 ~~~
 cheqd-noded tx slashing unjail --from <address_alias> --gas auto --gas-adjustment 1.2 --gas-prices 25ncheq --chain-id cheqd-mainnet-1
