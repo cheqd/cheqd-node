@@ -14,14 +14,20 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     git \
     jq
 
+
+# From https://github.com/CosmWasm/wasmd/blob/master/Dockerfile
+# For more details see https://github.com/CosmWasm/wasmvm#builds-of-libwasmvm
+ADD https://github.com/CosmWasm/wasmvm/releases/download/v1.0.0-beta7/libwasmvm_muslc.a /lib/libwasmvm_muslc.a
+
+
 # App
 WORKDIR /app
 
-RUN git clone --depth 1 --branch v4.2.0 https://github.com/osmosis-labs/osmosis
+RUN git clone --depth 1 --branch v8.0.0 https://github.com/osmosis-labs/osmosis
 
 WORKDIR /app/osmosis
 
-RUN make install
+RUN BUILD_TAGS=muslc make install
 
 
 #####  Run container  #####

@@ -58,7 +58,7 @@ docker-compose exec hermes hermes keys restore cheqd --mnemonic "$CHEQD_RELAYER_
 docker-compose exec hermes hermes keys restore osmosis --mnemonic "$OSMOSIS_RELAYER_MNEMONIC" --name osmosis-key
 
 info "Open channel" # ---
-docker-compose exec hermes hermes create channel cheqd osmosis --port-a transfer --port-b transfer
+docker-compose exec hermes hermes create channel cheqd --chain-b osmosis --port-a transfer --port-b transfer --new-client-connection -y
 
 info "Start hermes" # ---
 docker-compose exec -d hermes hermes start
