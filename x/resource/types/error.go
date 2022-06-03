@@ -6,17 +6,17 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// x/cheqd module sentinel errors
+// x/resource module sentinel errors
 var (
-	ErrBadRequest                 = sdkerrors.Register(ModuleName, 1000, "bad request")
-	ErrInvalidSignature           = sdkerrors.Register(ModuleName, 1100, "invalid signature detected")
-	ErrSignatureNotFound          = sdkerrors.Register(ModuleName, 1101, "signature is required but not found")
-	ErrDidDocExists               = sdkerrors.Register(ModuleName, 1200, "DID Doc exists")
-	ErrDidDocNotFound             = sdkerrors.Register(ModuleName, 1201, "DID Doc not found")
-	ErrVerificationMethodNotFound = sdkerrors.Register(ModuleName, 1202, "verification method not found")
-	ErrUnexpectedDidVersion       = sdkerrors.Register(ModuleName, 1203, "unexpected DID version")
-	ErrBasicValidation            = sdkerrors.Register(ModuleName, 1205, "basic validation failed")
-	ErrNamespaceValidation        = sdkerrors.Register(ModuleName, 1206, "DID namespace validation failed")
-	ErrUnpackStateValue           = sdkerrors.Register(ModuleName, 1300, "invalid did state value")
-	ErrInternal                   = sdkerrors.Register(ModuleName, 1500, "internal error")
+	ErrBadRequest                 = sdkerrors.Register(ModuleName, 2000, "bad request")
+	ErrInvalidSignature           = sdkerrors.Register(ModuleName, 2100, "invalid signature detected")
+	ErrSignatureNotFound          = sdkerrors.Register(ModuleName, 2101, "signature is required but not found")
+	ErrResourceExists             = sdkerrors.Register(ModuleName, 2200, "Resoure exists")
+	ErrDidDocNotFound             = sdkerrors.Register(ModuleName, 2201, "DID Doc not found")
+	ErrVerificationMethodNotFound = sdkerrors.Register(ModuleName, 2202, "verification method not found")
+	ErrUnexpectedDidVersion       = sdkerrors.Register(ModuleName, 2203, "unexpected DID version")
+	ErrBasicValidation            = sdkerrors.Register(ModuleName, 2205, "basic validation failed")
+	ErrNamespaceValidation        = sdkerrors.Register(ModuleName, 2206, "DID namespace validation failed")
+	ErrUnpackStateValue           = sdkerrors.Register(ModuleName, 2300, "invalid did state value")
+	ErrInternal                   = sdkerrors.Register(ModuleName, 2500, "internal error")
 )

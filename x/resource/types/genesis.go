@@ -4,32 +4,31 @@ import (
 	"fmt"
 )
 
-const DefaultDidNamespace = "testnet"
+const DefaultResourceNamespace = "testnet"
 
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		DidList:      []*StateValue{},
-		DidNamespace: DefaultDidNamespace,
+		ResourceList: []*Resource{},
 	}
 }
 
 // Validate performs basic genesis state validation returning an error upon any
 // failure.
 func (gs GenesisState) Validate() error {
-	didIdMap := make(map[string]bool)
+	resourceIdMap := make(map[string]bool)
 
-	for _, elem := range gs.DidList {
-		did, err := elem.UnpackDataAsDid()
+	for _, elem := range gs.ResourceList {
+		resource, err := elem.UnpackDataAsResource()
 		if err != nil {
 			return err
 		}
 
-		if _, ok := didIdMap[did.Id]; ok {
-			return fmt.Errorf("duplicated id for did")
+		if _, ok := resourceIdMap[resource.Id]; ok {
+			return fmt.Errorf("duplicated id for resource")
 		}
 
-		didIdMap[did.Id] = true
+		resourceIdMap[resource.Id] = true
 	}
 
 	return nil

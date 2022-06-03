@@ -3,16 +3,16 @@ package keeper
 import (
 	"strconv"
 
-	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	"github.com/cheqd/cheqd-node/x/resource/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// GetDidCount get the total number of did
-func (k Keeper) GetDidCount(ctx *sdk.Context) uint64 {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidCountKey))
-	byteKey := types.KeyPrefix(types.DidCountKey)
+// GetResourceCount get the total number of resource
+func (k Keeper) GetResourceCount(ctx *sdk.Context) uint64 {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.ResourceCountKey))
+	byteKey := types.KeyPrefix(types.ResourceCountKey)
 	bz := store.Get(byteKey)
 
 	// Count doesn't exist: no element
@@ -30,77 +30,72 @@ func (k Keeper) GetDidCount(ctx *sdk.Context) uint64 {
 	return count
 }
 
-// SetDidCount set the total number of did
-func (k Keeper) SetDidCount(ctx *sdk.Context, count uint64) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidCountKey))
-	byteKey := types.KeyPrefix(types.DidCountKey)
+// SetResourceCount set the total number of resource
+func (k Keeper) SetResourceCount(ctx *sdk.Context, count uint64) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.ResourceCountKey))
+	byteKey := types.KeyPrefix(types.ResourceCountKey)
 	bz := []byte(strconv.FormatUint(count, 10))
 	store.Set(byteKey, bz)
 }
 
-// AppendDid appends a did in the store with a new id and updates the count
-func (k Keeper) AppendDid(ctx *sdk.Context, did *types.Did, metadata *types.Metadata) error {
-	// Check that did doesn't exist
-	if k.HasDid(ctx, did.Id) {
-		return types.ErrDidDocExists.Wrapf(did.Id)
+// AppendResource appends a resource in the store with a new id and updates the count
+func (k Keeper) AppendResource(ctx *sdk.Context, resource *types.Resource) error {
+	// Check that resource doesn't exist
+	if k.HasResource(ctx, resource.CollectionId, resource.Id) {
+		return types.ErrResourceExists.Wrapf(resource.Id)
 	}
 
-	// Create the did
-	count := k.GetDidCount(ctx)
-	err := k.SetDid(ctx, did, metadata)
+	// Create the resource
+	count := k.GetResourceCount(ctx)
+	err := k.SetResource(ctx, resource)
 	if err != nil {
 		return err
 	}
 
-	// Update did count
-	k.SetDidCount(ctx, count+1)
+	// Update resource count
+	k.SetResourceCount(ctx, count+1)
 	return nil
 }
 
-// SetDid set a specific did in the store
-func (k Keeper) SetDid(ctx *sdk.Context, did *types.Did, metadata *types.Metadata) error {
-	stateValue, err := types.NewStateValue(did, metadata)
-	if err != nil {
-		return err
-	}
-
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
-	b := k.cdc.MustMarshal(&stateValue)
-	store.Set(GetDidIDBytes(did.Id), b)
+// SetResource set a specific resource in the store
+func (k Keeper) SetResource(ctx *sdk.Context, resource *types.Resource) error {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.ResourceKey))
+	b := k.cdc.MustMarshal(&resource)
+	store.Set(GetResourceKeyBytes(resource.CollectionId, resource.Id), b)
 	return nil
 }
 
-// GetDid returns a did from its id
-func (k Keeper) GetDid(ctx *sdk.Context, id string) (types.StateValue, error) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
+// GetResource returns a resource from its id
+func (k Keeper) GetResource(ctx *sdk.Context, collectionId string, id string) (types.Resource, error) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.ResourceKey))
 
-	if !k.HasDid(ctx, id) {
-		return types.StateValue{}, sdkerrors.ErrNotFound.Wrap(id)
+	if !k.HasResource(ctx, collectionId, id) {
+		return types.Resource{}, sdkerrors.ErrNotFound.Wrap(id)
 	}
 
-	var value types.StateValue
-	bytes := store.Get(GetDidIDBytes(id))
+	var value types.Resource
+	bytes := store.Get(GetResourceKeyBytes(collectionId, id))
 	if err := k.cdc.Unmarshal(bytes, &value); err != nil {
-		return types.StateValue{}, sdkerrors.Wrap(sdkerrors.ErrInvalidType, err.Error())
+		return types.Resource{}, sdkerrors.Wrap(sdkerrors.ErrInvalidType, err.Error())
 	}
 
 	return value, nil
 }
 
-// HasDid checks if the did exists in the store
-func (k Keeper) HasDid(ctx *sdk.Context, id string) bool {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
-	return store.Has(GetDidIDBytes(id))
+// HasResource checks if the resource exists in the store
+func (k Keeper) HasResource(ctx *sdk.Context, collectionId string, id string) bool {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.ResourceKey))
+	return store.Has(GetResourceKeyBytes(collectionId, id))
 }
 
-// GetDidIDBytes returns the byte representation of the ID
-func GetDidIDBytes(id string) []byte {
-	return []byte(id)
+// GetResourceKeyBytes returns the byte representation of resource key
+func GetResourceKeyBytes(collectionId string, id string) []byte {
+	return []byte(collectionId + ":" + id)
 }
 
-// GetAllDid returns all did
-func (k Keeper) GetAllDid(ctx *sdk.Context) (list []types.StateValue) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
+// GetAllResource returns all resource
+func (k Keeper) GetAllResource(ctx *sdk.Context) (list []types.Resource) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.ResourceKey))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 
 	defer func(iterator sdk.Iterator) {
@@ -111,7 +106,7 @@ func (k Keeper) GetAllDid(ctx *sdk.Context) (list []types.StateValue) {
 	}(iterator)
 
 	for ; iterator.Valid(); iterator.Next() {
-		var val types.StateValue
+		var val types.Resource
 		k.cdc.MustUnmarshal(iterator.Value(), &val)
 		list = append(list, val)
 	}

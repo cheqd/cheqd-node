@@ -1,5 +1,7 @@
 package types
 
 const (
-	QueryGetDid = "get-did"
+	QueryGetResource            = "get-resource"
+	QueryGetCollectionResources = "get-collection-resources"
+	QueryGetAllResourceVersions = "get-all-resource-versions"
 )

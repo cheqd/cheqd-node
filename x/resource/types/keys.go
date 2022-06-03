@@ -2,7 +2,7 @@ package types
 
 const (
 	// ModuleName defines the module name
-	ModuleName = "cheqd"
+	ModuleName = "resource"
 
 	// StoreKey defines the primary module store key
 	StoreKey = ModuleName
@@ -13,7 +13,7 @@ const (
 	// QuerierRoute defines the module's query routing key
 	QuerierRoute = ModuleName
 
-	DidMethod = ModuleName
+	ResourceMethod = ModuleName
 )
 
 func KeyPrefix(p string) []byte {
@@ -21,7 +21,7 @@ func KeyPrefix(p string) []byte {
 }
 
 const (
-	DidKey          = "did:"
-	DidCountKey     = "did-count:"
-	DidNamespaceKey = "did-namespace:"
+	ResourceKey          = "resource:"
+	ResourceCountKey     = "resource-count:"
+	ResourceNamespaceKey = "resource-namespace:"
 )
