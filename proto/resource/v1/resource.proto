@@ -1,0 +1,18 @@
+syntax = "proto3";
+package cheqdid.cheqdnode.resource.v1;
+
+option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
+
+
+message Resource {
+  string collection_id = 1;
+  string id = 2;
+  string name = 3;
+  string resource_type = 4;
+  string mime_type = 5;
+  bytes data = 6;
+  string created = 7;
+  string checksum = 8;
+  string previous_version_id = 9;
+  string next_version_id = 10;
+}
