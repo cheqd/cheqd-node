@@ -12,7 +12,7 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgCreateResource{}, "resource/CreateResource", nil)
 
 	// State value data
-	// cdc.RegisterInterface((*StateValueData)(nil), nil)
+	cdc.RegisterInterface((*Resource)(nil), nil)
 	cdc.RegisterConcrete(&Resource{}, "resource/Resource", nil)
 }
 
@@ -23,8 +23,8 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	)
 
 	// State value data
-	// registry.RegisterInterface("StateValueData", (*StateValueData)(nil))
-	// registry.RegisterImplementations((*StateValueData)(nil), &Resource{})
+	registry.RegisterInterface("Resource", (*Resource)(nil))
+	registry.RegisterImplementations((*Resource)(nil), &Resource{})
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }

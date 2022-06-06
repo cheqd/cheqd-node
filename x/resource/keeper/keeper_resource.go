@@ -94,7 +94,7 @@ func GetResourceKeyBytes(collectionId string, id string) []byte {
 }
 
 // GetAllResource returns all resource
-func (k Keeper) GetAllResource(ctx *sdk.Context) (list []types.Resource) {
+func (k Keeper) GetAllResources(ctx *sdk.Context) (list []types.Resource) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.ResourceKey))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 

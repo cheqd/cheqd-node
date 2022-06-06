@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	"github.com/cheqd/cheqd-node/x/resource/types"
 )
 
 type queryServer struct {

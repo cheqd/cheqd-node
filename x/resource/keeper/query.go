@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	"github.com/cheqd/cheqd-node/x/resource/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -17,8 +17,12 @@ func NewQuerier(k Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 		)
 
 		switch path[0] {
-		case types.QueryGetResourceRequest:
-			return getResourceRequest(ctx, path[1], k, legacyQuerierCdc)
+		case types.QueryGetResource:
+			return getResource(ctx, path[1], path[2], k, legacyQuerierCdc)
+		// case types.QueryGetCollectionResources:
+		// 	return getCollectionResources(ctx, path[1], k, legacyQuerierCdc)
+		// case types.QueryGetAllResourceVersions:
+		// 	return getAllResourceVersions(ctx, path[1], k, legacyQuerierCdc)
 
 		default:
 			err = sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown %s query endpoint: %s", types.ModuleName, path[0])

@@ -17,9 +17,9 @@ func NewMsgServer(keeper Keeper) types.MsgServer {
 
 var _ types.MsgServer = msgServer{}
 
-func FindResource(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.Resource, collectionId string, id string) (res types.Resource, found bool, err error) {
+func FindResource(k *Keeper, ctx *sdk.Context, inMemoryResources map[string]types.Resource, collectionId string, id string) (res types.Resource, found bool, err error) {
 	// Look in inMemory dict
-	value, found := inMemoryDIDs[collectionId+id]
+	value, found := inMemoryResources[collectionId+id]
 	if found {
 		return value, true, nil
 	}
@@ -37,7 +37,7 @@ func FindResource(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.Res
 	return types.Resource{}, false, nil
 }
 
-func VerifySignature(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.Resource, message []byte, signature cheqd_types.SignInfo) error {
+func VerifySignature(k *Keeper, ctx *sdk.Context, inMemoryResources map[string]types.Resource, message []byte, signature cheqd_types.SignInfo) error {
 	//TODO: implement
 	return nil
 }
