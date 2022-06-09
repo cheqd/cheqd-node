@@ -1,0 +1,566 @@
+import datetime
+import os
+import subprocess
+import sys
+import urllib.error
+from pathlib import Path
+import urllib.request as request
+import json
+import re
+import functools
+import pwd
+import shutil
+import signal
+import time
+import threading
+
+
+ONLY_DIGIT_VERSIONS=re.compile(r'.*([0-9]+)\.([0-9]+)\.([0-9]+)$')
+LAST_N_RELEASES = 5
+LAST_VERSION_WITH_TARBALL = "v0.5.0"
+
+DEFAULT_COSMOVISOR_TAR_URL = "https://github.com/cosmos/cosmos-sdk/releases/download/cosmovisor%2Fv1.1.0/cosmovisor-v1.1.0-linux-amd64.tar.gz"
+DEFAULT_HOME = "/home/cheqd"
+DEFAULT_USE_COSMOVISOR = "yes"
+DEFAULT_INIT_FROM_SNAPSHOT = "yes"
+DEVAULT_VERSION = "v0.5.0"
+DEFAULT_INSTALL_PATH = "/usr/bin"
+DEFAULT_CHEQD_USER = "cheqd"
+DEFAULT_BINARY_NAME = "cheqd-noded"
+DEFAULT_LOGROTATE_FILE = "/etc/logrotate.d/cheqd-node"
+DEFAULT_RSYSLOG_FILE = "/etc/rsyslog.d/cheqd-node.conf"
+DEFAULT_SNAPSHOT_SERVER = "https://snapshots.cheqd.net"
+DEFAULT_CHAINS = ['testnet', 'mainnet']
+DEFAULT_CHAIN = "testnet"
+
+TESTNET_URL_TEMPLATE = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/testnet/latest/cheqd-testnet-4_{}.tar.gz"
+MAINNET_URL_TEMPLATE = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/mainnet/latest/cheqd-mainnet-1_{}.tar.gz"
+
+GENESIS_URL_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/{}/genesis.json"
+SEEDS_URL_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/{}/seeds.txt"
+
+SERVICE_FILE_URL = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/build-tools/cheqd-noded.service"
+SERVICE_FILE_PATH = "/lib/systemd/system/cheqd-noded.service"
+
+CHEQD_NODED_NAME = "cheqd-noded"
+PRINT_PREFIX = "********* "
+
+def sigint_handler(signal, frame):
+    print ('Exiting from cheqd-node installer')
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, sigint_handler)
+
+class Release:
+    def __init__(self, release_map):
+        self.version = release_map['tag_name']
+        self.url = release_map['html_url']
+        self.assets = release_map['assets']
+
+    def get_tar_gz_url(self):
+        archive_urls = [ a['browser_download_url'] for a in self.assets if a['browser_download_url'].find("tar.gz") > 0]
+        if len(archive_urls) == 0:
+            failure_exit(f"No tar.gz in release: {self.version}")
+        return archive_urls[0]
+
+    def get_binary_url(self):
+        binary_urls = [ a['browser_download_url'] for a in self.assets if a['name'] == CHEQD_NODED_NAME]
+        if len(binary_urls) == 0:
+            failure_exit(f"No binaries in release: {self.version}")
+        return binary_urls[0]
+
+    def __str__(self):
+        return f"Name: {self.version}, Tar URL: {self.get_tar_gz_url()}"
+
+def failure_exit(reason):
+    print(f"Reason of failure: {reason}")
+    print("Exiting....")
+    sys.exit(1)
+
+class Installer():
+    def __init__(self, interviewer):
+        self.version = interviewer.release.version
+        self.release = interviewer.release
+        self.verbose = True
+        self.interviewer = interviewer
+
+    @property
+    def binary_path(self):
+        return self.get_binary_path()
+
+    def get_binary_path(self):
+        return os.path.join(os.path.realpath(os.path.curdir), CHEQD_NODED_NAME)
+
+    @property
+    def cosmovisor_service_cfg(self):
+        return f"""
+[Unit]
+Description=Service for running cheqd-node daemon
+After=network.target
+Documentation=https://docs.cheqd.io/node
+
+[Service]
+Environment="DAEMON_HOME={self.cheqd_root_dir}"
+Environment="DAEMON_NAME={DEFAULT_BINARY_NAME}"
+Environment="DAEMON_ALLOW_DOWNLOAD_BINARIES=true"
+Environment="DAEMON_RESTART_AFTER_UPGRADE=true"
+Type=simple
+User=cheqd
+ExecStart=/usr/bin/cosmovisor run start
+Restart=on-failure
+RestartSec=30
+StartLimitBurst=5
+StartLimitInterval=60
+TimeoutSec=120
+StandardOutput=syslog
+StandardError=syslog
+SyslogFacility=syslog
+SyslogIdentifier=cosmovisor
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target
+"""
+
+    @property
+    def default_logrotate_cfg(self):
+        return """
+%s/stdout.log {
+  rotate 7
+  daily
+  maxsize 100M
+  notifempty
+  copytruncate
+  compress
+  maxage 7
+}
+""" % self.cheqd_log_dir
+
+    @property
+    def default_rsyslog_cfg(self):
+        binary_name = "cosmovisor" if self.interviewer.is_cosmo_needed else "cheqd-noded"
+        return f"""
+if $programname == '{binary_name}' then {self.cheqd_log_dir}/stdout.log
+& stop
+"""
+
+    @property
+    def cheqd_root_dir(self):
+        return os.path.join(self.interviewer.home_dir, ".cheqdnode")
+
+    @property
+    def cheqd_config_dir(self):
+        return os.path.join(self.cheqd_root_dir, "config")
+
+    @property
+    def cheqd_data_dir(self):
+        return os.path.join(self.cheqd_root_dir, "data")
+
+    @property
+    def cheqd_log_dir(self):
+        return os.path.join(self.cheqd_root_dir, "log")
+
+    @property
+    def cosmovisor_root_dir(self):
+        return os.path.join(self.cheqd_root_dir, "cosmovisor")
+
+    def post_process(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwds):
+            try:
+                _allow_error = kwds.get('allow_error', False)
+                value = func(*args)
+            except subprocess.CalledProcessError as err:
+                if err.returncode and _allow_error:
+                    return err
+                failure_exit(err)
+            return value
+
+        return wrapper
+
+    def log(self, msg):
+        if self.verbose:
+            print(f"{PRINT_PREFIX} {msg}")
+
+    @post_process
+    def exec(self, cmd):
+        self.log(f"Executing command: {cmd}")
+        return subprocess.run(cmd, shell=True, check=True, capture_output=True)
+
+    def get_binary(self):
+        if self.release.version <= LAST_VERSION_WITH_TARBALL:
+            self.exec(f"wget -qO - {self.release.get_tar_gz_url()}  | tar xz")
+        else:
+            self.exec(f"wget -qo cheqd-noded {self.release.get_binary_url()}")
+
+    def is_user_exists(self, username) -> bool:
+        try:
+            pwd.getpwnam(username)
+        except KeyError:
+            return False
+        return True
+
+    def install(self):
+        self.log("Download the binary")
+        self.get_binary()
+
+        self.log(f"Moving binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}")
+        self.exec("sudo mv {} {}".format(self.binary_path, DEFAULT_INSTALL_PATH))
+
+        self.log(f"Create a user {DEFAULT_CHEQD_USER} if it's not created yet")
+        if not self.is_user_exists(DEFAULT_CHEQD_USER):
+            self.prepare_cheqd_user()
+
+        self.log("Setup log directory")
+        if not os.path.exists(self.cheqd_log_dir):
+            self.setup_log_dir()
+
+        self.log("Make a link to /var/log/cheqd-node")
+        if os.path.exists("/var/log/cheqd-node") and not os.path.islink("/var/log/cheqd-node"):
+            os.symlink(self.cheqd_log_dir, "/var/log/cheqd-node", target_is_directory=True)
+
+        self.log("Configure rsyslog")
+        if os.path.exists("/etc/rsyslog.d/"):
+            if not os.path.exists(DEFAULT_RSYSLOG_FILE):
+                with open(DEFAULT_RSYSLOG_FILE, mode="w") as fd:
+                    fd.write(self.default_rsyslog_cfg)
+                # Sometimes it can take a lot of time: https://github.com/rsyslog/rsyslog/issues/3133
+                self.exec("systemctl restart rsyslog")
+
+        self.log("Add config for logrotation")
+        if not os.path.exists(DEFAULT_LOGROTATE_FILE):
+            if not os.path.exists(DEFAULT_LOGROTATE_FILE):
+                with open(DEFAULT_LOGROTATE_FILE, mode="w") as fd:
+                    fd.write(self.default_logrotate_cfg)
+                # Sometimes it can take a lot of time: https://github.com/rsyslog/rsyslog/issues/3133
+                self.exec("systemctl restart rsyslog")
+
+        self.log("Restart logrotate services")
+        self.exec("systemctl restart logrotate.service")
+        self.exec("systemctl restart logrotate.timer")
+
+        self.log("Setup systemctl service config")
+        if self.interviewer.is_cosmo_needed:
+            with open(SERVICE_FILE_PATH, mode="w") as fd:
+                fd.write(self.cosmovisor_service_cfg)
+        else:
+            self.exec(f"curl -s {SERVICE_FILE_URL} > {SERVICE_FILE_PATH}")
+
+        self.log("Enabling systemctl service")
+        self.exec("systemctl enable cheqd-noded")
+
+        if self.interviewer.is_cosmo_needed:
+            self.log("Setup the cosmovisor")
+            self.setup_cosmovisor()
+
+        if self.interviewer.is_setup_needed:
+            self.post_install()
+
+        if self.interviewer.init_from_snapshot:
+            self.log("Going to download the archive and untar it on a fly. It can took a really HUGE AMOUNT OF TIME")
+            self.untar_from_snapshot()
+
+    def post_install(self):
+        # Init the node with provided moniker
+        self.exec(f"sudo -u {DEFAULT_CHEQD_USER} cheqd-noded init {self.interviewer.moniker}")
+
+        # Downloading genesis file
+        self.exec(f"curl -s {GENESIS_URL_TEMPLATE.format(self.interviewer.chain)} > {os.path.join(self.cheqd_config_dir, 'genesis.json')}")
+        shutil.chown(os.path.join(self.cheqd_config_dir, 'genesis.json'),
+                     DEFAULT_CHEQD_USER,
+                     DEFAULT_CHEQD_USER)
+
+        # Setting up the external_address
+        if self.interviewer.external_address:
+            self.exec(f"sudo -u {DEFAULT_CHEQD_USER} cheqd-noded configure p2p external-address {self.interviewer.external_address}")
+
+        # Setting up the seeds
+        seeds = self.exec(f"curl -s {SEEDS_URL_TEMPLATE.format(self.interviewer.chain)}").stdout.decode("utf-8").strip()
+        self.exec(f"sudo -u {DEFAULT_CHEQD_USER} cheqd-noded configure p2p seeds {seeds}")
+
+    def prepare_cheqd_user(self):
+        self.log(f"Create group, {DEFAULT_CHEQD_USER} by default")
+        self.exec(f"addgroup {DEFAULT_CHEQD_USER} --quiet")
+
+        self.log(f"Create user, {DEFAULT_CHEQD_USER} by default")
+        self.exec(
+            f"adduser --system {DEFAULT_CHEQD_USER} --home {self.interviewer.home_dir} --shell /bin/bash --ingroup {DEFAULT_CHEQD_USER} --quiet")
+
+        self.log("Make root directory for cheqd-node")
+        self.mkdir_p(self.cheqd_root_dir)
+
+        self.log(f"Chown to default cheqd user: {DEFAULT_CHEQD_USER}")
+        self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_root_dir}")
+
+    def mkdir_p(self, dir_name):
+        try:
+            os.mkdir(dir_name)
+        except FileExistsError as err:
+            self.log(f"Directory {dir_name} already exists")
+
+    def setup_log_dir(self):
+        self.mkdir_p(self.cheqd_log_dir)
+        Path(os.path.join(self.cheqd_log_dir, "stdout.log")).touch()
+        self.exec(f"chown -R syslog:syslog {self.cheqd_log_dir}")
+
+    def setup_cosmovisor(self):
+        self.exec(f"wget -qO - {DEFAULT_COSMOVISOR_TAR_URL}  | tar xz")
+        self.mkdir_p(self.cosmovisor_root_dir)
+        self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis"))
+        self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis/bin"))
+        self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "upgrades"))
+        if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, "cosmovisor")):
+            shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
+        if not os.path.exists(os.path.join(self.cosmovisor_root_dir, f"genesis/bin/{DEFAULT_BINARY_NAME}")):
+            os.symlink(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME),
+                       os.path.join(self.cosmovisor_root_dir, f"genesis/bin/{DEFAULT_BINARY_NAME}"))
+        self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
+
+    def untar_from_snapshot(self):
+        self.mkdir_p(self.cheqd_data_dir)
+        cmd = f"wget -qO - {self.interviewer.snapshot_url}  | sudo -u {DEFAULT_CHEQD_USER} tar xzf - -C {os.path.join(self.cheqd_root_dir, 'data')}"
+        thread = threading.Thread(target=functools.partial(self.exec, cmd))
+        thread.start()
+        sec_counter = 0
+        while thread.is_alive():
+            time.sleep(60)
+            sec_counter += 60
+            self.log(f"Downloading is alive, it took: {str(datetime.timedelta(seconds=sec_counter))}")
+        # self.exec(f"tar xzf data.tar.gz -C {data_dir}")
+        self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_data_dir}")
+
+
+class Interviewer:
+    def __init__(self,
+                 home_dir=DEFAULT_HOME,
+                 chain=DEFAULT_CHAIN):
+        self._home_dir = home_dir
+        self._is_cosmo_needed = True
+        self._init_from_snapshot = False
+        self._release = None
+        self._chain = chain
+        self.verbose = True
+        self._snapshot_url = self.prepare_url_for_latest()
+        self._is_setup_needed = False
+        self._moniker = ""
+        self._external_address = ""
+
+    @property
+    def release(self) -> Release:
+        return self._release
+
+    @property
+    def home_dir(self) -> str:
+        return self._home_dir
+
+    @property
+    def is_cosmo_needed(self) -> bool:
+        return self._is_cosmo_needed
+
+    @property
+    def init_from_snapshot(self) -> bool:
+        return self._init_from_snapshot
+
+    @property
+    def chain(self) -> str:
+        return self._chain
+
+    @property
+    def snapshot_url(self) -> str:
+        return self._snapshot_url
+
+    @property
+    def is_setup_needed(self) -> bool:
+        return self._is_setup_needed
+
+    @property
+    def moniker(self) -> str:
+        return self._moniker
+
+    @property
+    def external_address(self) -> str:
+        return self._external_address
+
+    @release.setter
+    def release(self, release):
+        self._release = release
+
+    @home_dir.setter
+    def home_dir(self, hd):
+        self._home_dir = hd
+
+    @is_cosmo_needed.setter
+    def is_cosmo_needed(self, icn):
+        self._is_cosmo_needed = icn
+
+    @init_from_snapshot.setter
+    def init_from_snapshot(self, ifs):
+        self._init_from_snapshot = ifs
+
+    @chain.setter
+    def chain(self, chain):
+        self._chain = chain
+
+    @snapshot_url.setter
+    def snapshot_url(self, su):
+        self._snapshot_url = su
+
+    @is_setup_needed.setter
+    def is_setup_needed(self, is_setup_needed):
+        self._is_setup_needed = is_setup_needed
+
+    @moniker.setter
+    def moniker(self, moniker):
+        self._moniker = moniker
+
+    @external_address.setter
+    def external_address(self, external_address):
+        self._external_address = external_address
+
+    def log(self, msg):
+        if self.verbose:
+            print(f"{PRINT_PREFIX} {msg}")
+
+    def get_releases(self):
+        req = request.Request("https://api.github.com/repos/cheqd/cheqd-node/releases")
+        req.add_header("Accept", "application/vnd.github.v3+json")
+
+        with request.urlopen(req) as response:
+            r_list = json.loads(response.read().decode("utf-8"))
+            return [Release(r) for r in r_list]
+
+    def r_filter(self, releases):
+        return [r for r in releases if ONLY_DIGIT_VERSIONS.match(r.version)]
+
+    def ask_for_version(self):
+        all_releases = self.get_releases()
+        last_n_releases = self.r_filter(all_releases)[:LAST_N_RELEASES]
+        default = last_n_releases[0].version
+        answer = self.ask(
+            f"Which version do you want to install? Or type 'list' for get the list of releases: ", default=default)
+        if answer == default:
+            self.release = last_n_releases[0]
+        elif answer == "list":
+            for i, release in enumerate(last_n_releases):
+                print(f"{i + 1}) {release.version}")
+            try:
+                num = int(input("Please insert the number for picking up the version: "))
+            except ValueError as err:
+                failure_exit("Version number should be integer value.")
+            self.release = last_n_releases[num - 1]
+        else:
+            if answer[0] != "v":
+                answer = f"v{answer}"
+            _t = [a for a in all_releases if a.version == answer]
+            if len(_t) > 0:
+                self.release = _t[0]
+            else:
+                failure_exit(f"Version: {answer} is not exist")
+
+    def default_answer(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwds):
+            _default = kwds.get('default', "")
+            if _default:
+                args = list(args)
+                args[-1] += f"[{_default}] {os.linesep}"
+            value = func(*args)
+            return value if value != "" else _default
+
+        return wrapper
+
+    @default_answer
+    def ask(self, question):
+        return str(input(question))
+
+    def ask_for_home_directory(self, default) -> str:
+        answer = self.ask(
+            f"Please, type here the path to home directory for user cheqd. For keeping default value, just type "
+            f"'Enter': ", default=default)
+        self.home_dir = answer
+
+    def ask_for_cosmovisor(self, default) -> str:
+        answer = self.ask(
+            f"Do you want to use Cosmovisor? "
+            f"Please type any kind of variants: yes, no, y, n. ", default=default)
+        self.is_cosmo_needed = True if answer.lower() in ['yes', 'y'] else False
+
+    def ask_for_init_from_snapshot(self):
+        answer = self.ask(
+            f"Do you want to deploy the latest snapshot from {DEFAULT_SNAPSHOT_SERVER}? "
+            f"Please type any kind of variants: yes, no, y, n. ",
+            default="No"
+        )
+        self.init_from_snapshot = True if answer.lower() in ['yes', 'y'] else False
+
+    def ask_for_chain(self):
+        answer = self.ask(
+            f"Which chain do you want to use?",
+            default="testnet"
+        )
+        self.chain = answer if answer in DEFAULT_CHAINS else failure_exit(f"Possible chains are: {DEFAULT_CHAINS}")
+
+    def ask_for_snapshot_url(self):
+        answer = self.ask(
+            f"Which snapshot do you want to use? Please type the full URL to archive or press return to use the latest ",
+            default=self.prepare_url_for_latest()
+        )
+        self.snapshot_url = answer
+
+    def ask_for_setup(self):
+        answer = self.ask(
+            f"Do you want to setup node after installation? "
+            f"Please type any kind of variants: yes, no, y, n. ",
+            default="No"
+        )
+        self.is_setup_needed = True if answer.lower() in ['yes', 'y'] else False
+
+    def ask_for_moniker(self):
+        answer = self.ask(
+            f"Please, type the moniker for your node: {os.linesep}",
+            default=""
+        )
+        self.moniker = answer
+
+    def ask_for_external_address(self):
+        answer = self.ask(
+            f"What is external IP address for your node? Please type in format: <ip_address>:<port>{os.linesep}",
+            default=""
+        )
+        self.external_address = answer
+
+    def prepare_url_for_latest(self) -> str:
+        template = TESTNET_URL_TEMPLATE if self.chain == "testnet" else MAINNET_URL_TEMPLATE
+        _date = datetime.date.today()
+        _url = template.format(_date.strftime("%Y-%m-%d"))
+        while not self.is_url_exists(_url):
+            _date -= datetime.timedelta(days=1)
+            _url = template.format(_date.strftime("%Y-%m-%d"))
+        return _url
+
+    def is_url_exists(self, url):
+        try:
+            request.urlopen(request.Request(url))
+        except urllib.error.HTTPError:
+            return False
+        return True
+
+if __name__ == '__main__':
+    # Ask user for information
+    interviewer = Interviewer()
+    interviewer.ask_for_version()
+    interviewer.ask_for_home_directory(default=DEFAULT_HOME)
+    interviewer.ask_for_cosmovisor(default=DEFAULT_USE_COSMOVISOR)
+    interviewer.ask_for_init_from_snapshot()
+    if interviewer.init_from_snapshot:
+        interviewer.ask_for_snapshot_url()
+    interviewer.ask_for_chain()
+
+    interviewer.ask_for_setup()
+    if interviewer.is_setup_needed:
+        interviewer.ask_for_moniker()
+        interviewer.ask_for_external_address()
+
+    # Install
+    installer = Installer(interviewer)
+    installer.install()
