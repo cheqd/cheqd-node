@@ -1,4 +1,4 @@
-package cheqd
+package recource
 
 import (
 	"fmt"
