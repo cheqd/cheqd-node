@@ -325,7 +325,7 @@ if $programname == '{binary_name}' then {self.cheqd_log_dir}/stdout.log
         while thread.is_alive():
             time.sleep(60)
             sec_counter += 60
-            self.log(f"Downloading is alive, it took: {str(datetime.timedelta(seconds=sec_counter))}")
+            self.log(f"Downloading is alive, it already took: {str(datetime.timedelta(seconds=sec_counter))}")
         # self.exec(f"tar xzf data.tar.gz -C {data_dir}")
         self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_data_dir}")
 
