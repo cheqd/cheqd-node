@@ -1,6 +1,6 @@
 #####  Build container  #####
 
-FROM golang:buster as builder
+FROM golang:1.17.8-buster as builder
 
 RUN apt-get update \
     && export DEBIAN_FRONTEND=noninteractive \
