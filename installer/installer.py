@@ -104,6 +104,7 @@ Environment="DAEMON_HOME={self.cheqd_root_dir}"
 Environment="DAEMON_NAME={DEFAULT_BINARY_NAME}"
 Environment="DAEMON_ALLOW_DOWNLOAD_BINARIES=true"
 Environment="DAEMON_RESTART_AFTER_UPGRADE=true"
+Environment="UNSAFE_SKIP_BACKUP=true"
 Type=simple
 User=cheqd
 ExecStart=/usr/bin/cosmovisor run start
@@ -257,7 +258,7 @@ if $programname == '{binary_name}' then {self.cheqd_log_dir}/stdout.log
             self.post_install()
 
         if self.interviewer.init_from_snapshot:
-            self.log("Going to download the archive and untar it on a fly. It can took a really HUGE AMOUNT OF TIME")
+            self.log("Going to download the archive and untar it on a fly. It can take a really LONG TIME")
             self.untar_from_snapshot()
 
     def post_install(self):
@@ -495,7 +496,7 @@ class Interviewer:
 
     def ask_for_chain(self):
         answer = self.ask(
-            f"Which chain do you want to use?",
+            f"Which chain do you want to use? Possible variants are: {', '.join(DEFAULT_CHAINS)} ",
             default="testnet"
         )
         self.chain = answer if answer in DEFAULT_CHAINS else failure_exit(f"Possible chains are: {DEFAULT_CHAINS}")
@@ -551,10 +552,10 @@ if __name__ == '__main__':
     interviewer.ask_for_version()
     interviewer.ask_for_home_directory(default=DEFAULT_HOME)
     interviewer.ask_for_cosmovisor(default=DEFAULT_USE_COSMOVISOR)
+    interviewer.ask_for_chain()
     interviewer.ask_for_init_from_snapshot()
     if interviewer.init_from_snapshot:
         interviewer.ask_for_snapshot_url()
-    interviewer.ask_for_chain()
 
     interviewer.ask_for_setup()
     if interviewer.is_setup_needed:
