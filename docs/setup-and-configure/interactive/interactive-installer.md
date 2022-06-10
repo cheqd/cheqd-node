@@ -18,9 +18,7 @@ All the questions at the end have the default value in [] brackets, like `[v0.5.
 
 The list of questions while installing:
 
-1. `Which version do you want to install? Or type 'list' for get the list of releases: [v0.5.0]`. Possible answers here:
-  - Exact version, like `0.4.0` or `0.5.0`.
-  - `list`. In this case the last 5 releases will be printed and you can choose what the version is needed:
+1. `Which version do you want to install? Or type 'list' for get the list of releases: [v0.5.0]`. Possible answers are exact version, like `0.4.0` or `0.5.0` or `list`. In this case the last 5 releases will be printed and you can choose what the version is needed:
 
 ```text
 Which version do you want to install? Or type 'list' for get the list of releases: [v0.5.0]
