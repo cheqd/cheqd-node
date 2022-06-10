@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
@@ -52,7 +53,7 @@ func IsUniqueKeyValuePairListByKey(key PublicKeyJWK) bool {
 
 // Validation
 
-func (p KeyValuePair)Validate() error {
+func (p KeyValuePair) Validate() error {
 	return validation.ValidateStruct(&p,
 		validation.Field(&p.Key, validation.Required),
 		validation.Field(&p.Value, validation.Required),

@@ -1,8 +1,9 @@
 package types
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestMsgCreateDidValidation(t *testing.T) {
@@ -16,7 +17,7 @@ func TestMsgCreateDidValidation(t *testing.T) {
 			name: "positive",
 			struct_: &MsgCreateDid{
 				Payload: &MsgCreateDidPayload{
-					Id:         "did:cheqd:testnet:123456789abcdefg",
+					Id: "did:cheqd:testnet:123456789abcdefg",
 					VerificationMethod: []*VerificationMethod{
 						{
 							Id:                 "did:cheqd:testnet:123456789abcdefg#key1",
@@ -25,17 +26,17 @@ func TestMsgCreateDidValidation(t *testing.T) {
 							PublicKeyMultibase: ValidEd25519PubKey,
 						},
 					},
-					Authentication:       []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#aaa"},
+					Authentication: []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#aaa"},
 				},
 				Signatures: nil,
 			},
-			isValid:  true,
+			isValid: true,
 		},
 		{
 			name: "negative: relationship duplicates",
 			struct_: &MsgCreateDid{
 				Payload: &MsgCreateDidPayload{
-					Id:         "did:cheqd:testnet:123456789abcdefg",
+					Id: "did:cheqd:testnet:123456789abcdefg",
 					VerificationMethod: []*VerificationMethod{
 						{
 							Id:                 "did:cheqd:testnet:123456789abcdefg#key1",
@@ -44,7 +45,7 @@ func TestMsgCreateDidValidation(t *testing.T) {
 							PublicKeyMultibase: ValidEd25519PubKey,
 						},
 					},
-					Authentication:       []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#key1"},
+					Authentication: []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#key1"},
 				},
 				Signatures: nil,
 			},

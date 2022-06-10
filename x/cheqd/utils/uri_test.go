@@ -1,13 +1,14 @@
 package utils
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestValidateURI(t *testing.T) {
 	cases := []struct {
-		name string
+		name  string
 		valid bool
 		URI   string
 	}{

@@ -1,8 +1,9 @@
 package types
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestMsgUpdateDidValidation(t *testing.T) {
@@ -16,7 +17,7 @@ func TestMsgUpdateDidValidation(t *testing.T) {
 			name: "positive",
 			struct_: &MsgUpdateDid{
 				Payload: &MsgUpdateDidPayload{
-					Id:         "did:cheqd:testnet:123456789abcdefg",
+					Id: "did:cheqd:testnet:123456789abcdefg",
 					VerificationMethod: []*VerificationMethod{
 						{
 							Id:                 "did:cheqd:testnet:123456789abcdefg#key1",
@@ -25,18 +26,18 @@ func TestMsgUpdateDidValidation(t *testing.T) {
 							PublicKeyMultibase: ValidEd25519PubKey,
 						},
 					},
-					Authentication:       []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#aaa"},
-					VersionId: "version1",
+					Authentication: []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#aaa"},
+					VersionId:      "version1",
 				},
 				Signatures: nil,
 			},
-			isValid:  true,
+			isValid: true,
 		},
 		{
 			name: "negative: relationship duplicates",
 			struct_: &MsgUpdateDid{
 				Payload: &MsgUpdateDidPayload{
-					Id:         "did:cheqd:testnet:123456789abcdefg",
+					Id: "did:cheqd:testnet:123456789abcdefg",
 					VerificationMethod: []*VerificationMethod{
 						{
 							Id:                 "did:cheqd:testnet:123456789abcdefg#key1",
@@ -45,8 +46,8 @@ func TestMsgUpdateDidValidation(t *testing.T) {
 							PublicKeyMultibase: ValidEd25519PubKey,
 						},
 					},
-					Authentication:       []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#key1"},
-					VersionId: "version1",
+					Authentication: []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#key1"},
+					VersionId:      "version1",
 				},
 				Signatures: nil,
 			},
@@ -57,7 +58,7 @@ func TestMsgUpdateDidValidation(t *testing.T) {
 			name: "negative: version id is required",
 			struct_: &MsgUpdateDid{
 				Payload: &MsgUpdateDidPayload{
-					Id:         "did:cheqd:testnet:123456789abcdefg",
+					Id: "did:cheqd:testnet:123456789abcdefg",
 					VerificationMethod: []*VerificationMethod{
 						{
 							Id:                 "did:cheqd:testnet:123456789abcdefg#key1",
@@ -66,7 +67,7 @@ func TestMsgUpdateDidValidation(t *testing.T) {
 							PublicKeyMultibase: ValidEd25519PubKey,
 						},
 					},
-					Authentication:       []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#aaa"},
+					Authentication: []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#aaa"},
 				},
 				Signatures: nil,
 			},

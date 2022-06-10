@@ -25,7 +25,7 @@ jobs:
         run: go test -v ./...
 
   build-binary:
-    name: "Node binary"
+    name: "Node binary/tar archive"
     runs-on: ubuntu-latest
     outputs:
       VERSION: ${{ steps.set-version.outputs.VERSION }}
@@ -65,7 +65,7 @@ jobs:
       - name: Build node binary
         run: |
           make proto-gen build
-          
+        
       - name: Store artifact
         uses: actions/upload-artifact@v3
         with:
@@ -77,6 +77,7 @@ jobs:
         run: |
           VERSION=$(build/cheqd-noded version 2>&1)
           echo ::set-output name=VERSION::"$VERSION"
+
       - name: Install fpm
         run: |
           sudo apt-get install ruby ruby-dev rubygems build-essential
@@ -86,6 +87,11 @@ jobs:
         working-directory: ./build-tools
         run: |
           ./build-deb.sh "../build/cheqd-noded"
+
+      - name: Build Tar archive
+        working-directory: ./build-tools
+        run: |
+          ./build-tar.sh "../build/cheqd-noded"
       
       - name: Store Debian package artifact
         uses: actions/upload-artifact@v3
@@ -94,10 +100,20 @@ jobs:
         with:
           name: cheqd-node_${{ env.VERSION }}_amd64.deb
           path: build-tools/output/cheqd-node_${{ env.VERSION }}_amd64.deb
-  
+
+      - name: Store Tar archive artifact
+        uses: actions/upload-artifact@v3
+        env:
+          VERSION: ${{ steps.set-version.outputs.VERSION }}
+        with:
+          name: cheqd-node_${{ env.VERSION }}.tar.gz
+          path: build-tools/output/cheqd-node_${{ env.VERSION }}.tar.gz
+
   build-docker-images:
     name: "Docker images"
     runs-on: ubuntu-latest
+    env:
+      REGISTRY: ghcr.io
 
     steps:
       - uses: actions/checkout@v3
@@ -114,6 +130,9 @@ jobs:
       - name: Save cheqd-cli Docker image
         run: docker save -o cheqd-cli-image.tar cheqd-cli
 
+      - name: Build cosmovisor Docker image with 'cosmovisor run' as entrypoint and no build args
+        run: docker build -f docker/Dockerfile --target cosmovisor -t cheqd-node:cosmovisor_to --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" .
+
       - name: Store cheqd-cli artifact
         uses: actions/upload-artifact@v3
         with:
@@ -128,3 +147,12 @@ jobs:
         with:
           name: cheqd-node-image.tar
           path: cheqd-node-image.tar
+
+      - name: Save cheqd-node:cosmovisor_to Docker image
+        run: docker save -o cheqd-cosmovisor-to.tar cheqd-node:cosmovisor_to
+
+      - name: Store cheqd-node artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: cheqd-cosmovisor-to.tar
+          path: cheqd-cosmovisor-to.tar

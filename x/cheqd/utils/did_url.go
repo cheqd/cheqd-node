@@ -16,9 +16,12 @@ import (
 // 6 - [^#]+[\$]?    - fragment only															  (key1???)
 // Number of queries is not limited.
 var SplitDIDURLRegexp, _ = regexp.Compile(`([^/?#]*)?([^?#]*)(\?([^#]*))?(#([^#]+$))?$`)
-var DIDPathAbemptyRegexp, _ = regexp.Compile(`^([/a-zA-Z0-9\-\.\_\~\!\$\&\'\(\)\*\+\,\;\=\:\@]*|(%[0-9A-Fa-f]{2})*)*$`)
-var DIDQueryRegexp, _ = regexp.Compile(`^([/a-zA-Z0-9\-\.\_\~\!\$\&\'\(\)\*\+\,\;\=\:\@\/\?]*|(%[0-9A-Fa-f]{2})*)*$`)
-var DIDFragmentRegexp, _ = regexp.Compile(`^([/a-zA-Z0-9\-\.\_\~\!\$\&\'\(\)\*\+\,\;\=\:\@\/\?]*|(%[0-9A-Fa-f]{2})*)*$`)
+
+var (
+	DIDPathAbemptyRegexp, _ = regexp.Compile(`^([/a-zA-Z0-9\-\.\_\~\!\$\&\'\(\)\*\+\,\;\=\:\@]*|(%[0-9A-Fa-f]{2})*)*$`)
+	DIDQueryRegexp, _       = regexp.Compile(`^([/a-zA-Z0-9\-\.\_\~\!\$\&\'\(\)\*\+\,\;\=\:\@\/\?]*|(%[0-9A-Fa-f]{2})*)*$`)
+	DIDFragmentRegexp, _    = regexp.Compile(`^([/a-zA-Z0-9\-\.\_\~\!\$\&\'\(\)\*\+\,\;\=\:\@\/\?]*|(%[0-9A-Fa-f]{2})*)*$`)
+)
 
 // TrySplitDIDUrl Validates generic format of DIDUrl. It doesn't validate path, query and fragment content.
 // Call ValidateDIDUrl for further validation.

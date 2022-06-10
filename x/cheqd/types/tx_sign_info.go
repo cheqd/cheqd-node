@@ -2,6 +2,7 @@ package types
 
 import (
 	"errors"
+
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
@@ -24,10 +25,10 @@ func GetSignInfoIds(infos []*SignInfo) []string {
 }
 
 func IsUniqueSignInfoList(infos []*SignInfo) bool {
-	var tmp_ = map[SignInfo]bool{}
+	tmp_ := map[SignInfo]bool{}
 	for _, si := range infos {
 		_, found := tmp_[*si]
-		if  found {
+		if found {
 			return false
 		}
 		tmp_[*si] = true
@@ -104,7 +105,7 @@ func IsUniqueSignInfoListRule() *CustomErrorRule {
 			panic("IsUniqueVerificationMethodListByIdRule must be only applied on VM lists")
 		}
 
-		if !IsUniqueSignInfoList(casted){
+		if !IsUniqueSignInfoList(casted) {
 			return errors.New("there are full sign info duplicates")
 		}
 

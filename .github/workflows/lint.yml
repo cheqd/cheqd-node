@@ -1,5 +1,6 @@
 name: "Lint"
-on: workflow_call
+on:
+  workflow_call:
 defaults:
   run:
     shell: bash
@@ -45,10 +46,10 @@ jobs:
           go-version: '1.17'
       
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v2
+        uses: golangci/golangci-lint-action@v3
         with:
           version: latest
-          args: --timeout 5m0s
+          args: --config .github/linters/.golangci.yaml
 
   super-lint:
     name: "Super Linter"
@@ -70,11 +71,12 @@ jobs:
         MULTI_STATUS: true
 
         VALIDATE_BASH: true
+        VALIDATE_DOCKERFILE_HADOLINT: true
+        DOCKERFILE_HADOLINT_FILE_NAME: '../linters/.hadolint.yml'
         VALIDATE_GITHUB_ACTIONS: true
         VALIDATE_JSON: true
         VALIDATE_MARKDOWN: true
         VALIDATE_OPENAPI: true
-        # VALIDATE_PROTOBUF: true
         VALIDATE_PYTHON_PYLINT: true
         VALIDATE_XML: true
         VALIDATE_YAML: true

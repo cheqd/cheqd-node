@@ -3,8 +3,9 @@ package tests
 import (
 	"crypto/ed25519"
 	"fmt"
-	"github.com/btcsuite/btcutil/base58"
 	"testing"
+
+	"github.com/btcsuite/btcutil/base58"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/multiformats/go-multibase"
@@ -148,13 +149,13 @@ func TestCreateDID(t *testing.T) {
 				"did:cheqd:test:1111111111111111#key-3": GenerateKeyPair(),
 				"did:cheqd:test:1111111111111111#key-4": GenerateKeyPair(),
 				"did:cheqd:test:1111111111111111#key-5": GenerateKeyPair(),
-				AliceKey1:                             keys[AliceKey1],
-				BobKey1:                               keys[BobKey1],
-				BobKey2:                               keys[BobKey2],
-				BobKey3:                               keys[BobKey3],
-				CharlieKey1:                           keys[CharlieKey1],
-				CharlieKey2:                           keys[CharlieKey2],
-				CharlieKey3:                           keys[CharlieKey3],
+				AliceKey1:                               keys[AliceKey1],
+				BobKey1:                                 keys[BobKey1],
+				BobKey2:                                 keys[BobKey2],
+				BobKey3:                                 keys[BobKey3],
+				CharlieKey1:                             keys[CharlieKey1],
+				CharlieKey2:                             keys[CharlieKey2],
+				CharlieKey3:                             keys[CharlieKey3],
 			},
 			signers: []string{
 				"did:cheqd:test:1111111111111111#key-1",

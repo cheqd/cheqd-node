@@ -14,6 +14,8 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 # Starport
 # RUN curl https://get.starport.network/starport! | bash
 # There is an issue with the latest starport, especially 0.18 version
+SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
+
 RUN wget -qO- https://github.com/tendermint/starport/releases/download/v0.18.6/starport_0.18.6_linux_amd64.tar.gz | tar xvz -C /tmp/ && cp /tmp/starport /usr/bin
 
 # App

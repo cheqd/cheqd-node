@@ -7,8 +7,10 @@ import (
 	"strings"
 )
 
-var SplitDIDRegexp, _ = regexp.Compile(`^did:([^:]+?)(:([^:]+?))?:([^:]+)$`)
-var DidNamespaceRegexp, _ = regexp.Compile(`^[a-zA-Z0-9]*$`)
+var (
+	SplitDIDRegexp, _     = regexp.Compile(`^did:([^:]+?)(:([^:]+?))?:([^:]+)$`)
+	DidNamespaceRegexp, _ = regexp.Compile(`^[a-zA-Z0-9]*$`)
+)
 
 // TrySplitDID Validates generic format of DID. It doesn't validate method, name and id content.
 // Call ValidateDID for further validation.

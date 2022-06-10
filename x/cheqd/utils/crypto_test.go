@@ -1,9 +1,10 @@
 package utils
 
 import (
+	"testing"
+
 	"github.com/multiformats/go-multibase"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestValidateEd25519PubKey(t *testing.T) {
