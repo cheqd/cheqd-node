@@ -504,7 +504,7 @@ class Interviewer:
         return wrapper
 
     @default_answer
-    def ask(self, question):
+    def ask(self, question, **kwargs):
         return str(input(question))
 
     def ask_for_home_directory(self, default) -> str:
