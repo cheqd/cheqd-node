@@ -171,11 +171,12 @@ if $programname == '{binary_name}' then {self.cheqd_log_dir}/stdout.log
     def cosmovisor_bin_path(self):
         return os.path.join(self.cosmovisor_root_dir, f"genesis/bin/{DEFAULT_BINARY_NAME}")
 
+    @staticmethod
     def post_process(func):
         @functools.wraps(func)
         def wrapper(*args, **kwds):
+            _allow_error = kwds.get('allow_error', False)
             try:
-                _allow_error = kwds.get('allow_error', False)
                 value = func(*args)
             except subprocess.CalledProcessError as err:
                 if err.returncode and _allow_error:
@@ -489,6 +490,7 @@ class Interviewer:
             else:
                 failure_exit(f"Version: {answer} is not exist")
 
+    @staticmethod
     def default_answer(func):
         @functools.wraps(func)
         def wrapper(*args, **kwds):
