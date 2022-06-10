@@ -165,6 +165,10 @@ if $programname == '{binary_name}' then {self.cheqd_log_dir}/stdout.log
     def cosmovisor_root_dir(self):
         return os.path.join(self.cheqd_root_dir, "cosmovisor")
 
+    @property
+    def cosmovisor_bin_path(self):
+        return os.path.join(self.cosmovisor_root_dir, f"genesis/bin/{DEFAULT_BINARY_NAME}")
+
     def post_process(func):
         @functools.wraps(func)
         def wrapper(*args, **kwds):
@@ -205,32 +209,40 @@ if $programname == '{binary_name}' then {self.cheqd_log_dir}/stdout.log
         self.log("Download the binary")
         self.get_binary()
 
-        self.log(f"Moving binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}")
-        self.exec("sudo mv {} {}".format(self.binary_path, DEFAULT_INSTALL_PATH))
+        if not self.interviewer.is_cosmo_needed:
+            self.log(f"Moving binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}")
+            self.exec("sudo mv {} {}".format(self.binary_path, DEFAULT_INSTALL_PATH))
 
-        self.log(f"Create a user {DEFAULT_CHEQD_USER} if it's not created yet")
         if not self.is_user_exists(DEFAULT_CHEQD_USER):
+            self.log(f"Create a user {DEFAULT_CHEQD_USER} cause it's not created yet")
             self.prepare_cheqd_user()
 
-        self.log("Setup log directory")
+        if not os.path.exists(self.cheqd_root_dir):
+            self.log("Make root directory for cheqd-node")
+            self.mkdir_p(self.cheqd_root_dir)
+
+            self.log(f"Chown to default cheqd user: {DEFAULT_CHEQD_USER}")
+            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_root_dir}")
+
         if not os.path.exists(self.cheqd_log_dir):
+            self.log("Setup log directory")
             self.setup_log_dir()
 
-        self.log("Make a link to /var/log/cheqd-node")
         if os.path.exists("/var/log/cheqd-node") and not os.path.islink("/var/log/cheqd-node"):
+            self.log("Make a link to /var/log/cheqd-node")
             os.symlink(self.cheqd_log_dir, "/var/log/cheqd-node", target_is_directory=True)
 
-        self.log("Configure rsyslog")
         if os.path.exists("/etc/rsyslog.d/"):
             if not os.path.exists(DEFAULT_RSYSLOG_FILE):
+                self.log("Configure rsyslog")
                 with open(DEFAULT_RSYSLOG_FILE, mode="w") as fd:
                     fd.write(self.default_rsyslog_cfg)
                 # Sometimes it can take a lot of time: https://github.com/rsyslog/rsyslog/issues/3133
                 self.exec("systemctl restart rsyslog")
 
-        self.log("Add config for logrotation")
         if not os.path.exists(DEFAULT_LOGROTATE_FILE):
             if not os.path.exists(DEFAULT_LOGROTATE_FILE):
+                self.log("Add config for logrotation")
                 with open(DEFAULT_LOGROTATE_FILE, mode="w") as fd:
                     fd.write(self.default_logrotate_cfg)
                 # Sometimes it can take a lot of time: https://github.com/rsyslog/rsyslog/issues/3133
@@ -247,7 +259,7 @@ if $programname == '{binary_name}' then {self.cheqd_log_dir}/stdout.log
         else:
             self.exec(f"curl -s {SERVICE_FILE_URL} > {SERVICE_FILE_PATH}")
 
-        self.log("Enabling systemctl service")
+        self.log("Enable systemctl service")
         self.exec("systemctl enable cheqd-noded")
 
         if self.interviewer.is_cosmo_needed:
@@ -287,12 +299,6 @@ if $programname == '{binary_name}' then {self.cheqd_log_dir}/stdout.log
         self.exec(
             f"adduser --system {DEFAULT_CHEQD_USER} --home {self.interviewer.home_dir} --shell /bin/bash --ingroup {DEFAULT_CHEQD_USER} --quiet")
 
-        self.log("Make root directory for cheqd-node")
-        self.mkdir_p(self.cheqd_root_dir)
-
-        self.log(f"Chown to default cheqd user: {DEFAULT_CHEQD_USER}")
-        self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_root_dir}")
-
     def mkdir_p(self, dir_name):
         try:
             os.mkdir(dir_name)
@@ -311,10 +317,18 @@ if $programname == '{binary_name}' then {self.cheqd_log_dir}/stdout.log
         self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis/bin"))
         self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "upgrades"))
         if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, "cosmovisor")):
+            self.log(f"Moving cosmovisor binary to default installation directory")
             shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
-        if not os.path.exists(os.path.join(self.cosmovisor_root_dir, f"genesis/bin/{DEFAULT_BINARY_NAME}")):
-            os.symlink(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME),
-                       os.path.join(self.cosmovisor_root_dir, f"genesis/bin/{DEFAULT_BINARY_NAME}"))
+
+        self.log(f"Moving binary from {self.binary_path} to {self.cosmovisor_bin_path}")
+        self.exec("sudo mv {} {}".format(self.binary_path, self.cosmovisor_bin_path))
+
+        if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
+            self.log(f"Making symlink to {self.cosmovisor_bin_path}")
+            os.symlink(self.cosmovisor_bin_path,
+                       os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+
+        self.log(f"Changing owner to {DEFAULT_CHEQD_USER} user")
         self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
 
     def untar_from_snapshot(self):
@@ -327,7 +341,22 @@ if $programname == '{binary_name}' then {self.cheqd_log_dir}/stdout.log
             time.sleep(60)
             sec_counter += 60
             self.log(f"Downloading is alive, it already took: {str(datetime.timedelta(seconds=sec_counter))}")
-        # self.exec(f"tar xzf data.tar.gz -C {data_dir}")
+
+        # Some kind of hacks cause cosmovisor expects upgrade-info.json file in cosmovisor/current directory also
+        if self.interviewer.is_cosmo_needed and \
+                not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
+            self.log(f"Making symlink current -> genesis")
+            os.symlink(os.path.join(self.cosmovisor_root_dir, "genesis"),
+                       os.path.join(self.cosmovisor_root_dir, "current"))
+
+            if os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
+                self.log(f"Copying upgrade-info.json file to cosmovisor/current/")
+                shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
+                            os.path.join(self.cosmovisor_root_dir, "current"))
+
+            self.log(f"Changing owner to {DEFAULT_CHEQD_USER} user")
+            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
+
         self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_data_dir}")
 
 
