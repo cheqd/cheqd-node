@@ -19,6 +19,7 @@ All the questions at the end have the default value in [] brackets, like `[v0.5.
 The list of questions while installing:
 
 * `Which version do you want to install? Or type 'list' for get the list of releases: [v0.5.0]`. Possible answers are exact version, like `0.4.0` or `0.5.0` or `list`. In this case the last 5 releases will be printed and you can choose what the version is needed:
+
 ```text
 Which version do you want to install? Or type 'list' for get the list of releases: [v0.5.0]
 list
@@ -29,6 +30,7 @@ list
 5) v0.3.3
 Please insert the number for picking up the version: 1
 ```
+
 * `Please, type here the path to home directory for user cheqd. For keeping default value, just type 'Enter': [/home/cheqd]`. Here you need to specify the path tohome directory for new user `cheqd`. By default `/home/cheqd` will be used.
 * `Do you want to use Cosmovisor? Please type any kind of variants: yes, no, y, n. [yes]`. With current installer we are proposing the ability to setup cosmovisor. It will help you with upgrades, it allows to do it in the full automatic mode. Possible variants for answering `y, n, yes, no`.
 * `Which chain do you want to use? Possible variants are: testnet, mainnet [testnet]`. For now, we have 2 networks, `testnet` and `mainnet`. Please, type here what the chain do you want to use or just keep default pressing `Enter`.
