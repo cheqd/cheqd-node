@@ -18,8 +18,7 @@ All the questions at the end have the default value in [] brackets, like `[v0.5.
 
 The list of questions while installing:
 
-1. `Which version do you want to install? Or type 'list' for get the list of releases: [v0.5.0]`. Possible answers are exact version, like `0.4.0` or `0.5.0` or `list`. In this case the last 5 releases will be printed and you can choose what the version is needed:
-
+* `Which version do you want to install? Or type 'list' for get the list of releases: [v0.5.0]`. Possible answers are exact version, like `0.4.0` or `0.5.0` or `list`. In this case the last 5 releases will be printed and you can choose what the version is needed:
 ```text
 Which version do you want to install? Or type 'list' for get the list of releases: [v0.5.0]
 list
@@ -30,15 +29,14 @@ list
 5) v0.3.3
 Please insert the number for picking up the version: 1
 ```
-
-2. `Please, type here the path to home directory for user cheqd. For keeping default value, just type 'Enter': [/home/cheqd]`. Here you need to specify the path tohome directory for new user `cheqd`. By default `/home/cheqd` will be used.
-3. `Do you want to use Cosmovisor? Please type any kind of variants: yes, no, y, n. [yes]`. With current installer we are proposing the ability to setup cosmovisor. It will help you with upgrades, it allows to do it in the full automatic mode. Possible variants for answering `y, n, yes, no`.
-4. `Which chain do you want to use? Possible variants are: testnet, mainnet [testnet]`. For now, we have 2 networks, `testnet` and `mainnet`. Please, type here what the chain do you want to use or just keep default pressing `Enter`.
-5. `Do you want to deploy the latest snapshot? Please type any kind of variants: yes, no, y, n. [No]`. Such ability can help you with fast catchup to our network. Possible variants for answering `y, n, yes, no`.
-6. If you chose 'Yes' answering on previous question the next question will be about the URL to snapshot: `Which snapshot do you want to use? Please type the full URL to archive or press return to use the latest [https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/testnet/latest/cheqd-testnet-4_2022-06-10.tar.gz]`. By default, installer suggests to use the latest snapshot from `https://snapshots.cheqd.net` and calculates the link the latest snapshot due to the chain you chose on step 4.
-7. `Do you want to setup node after installation? Please type any kind of variants: yes, no, y, n. [No]`. In case of installing the node from the beginning, you can use this ability to setup your node. Possible variants for answering `y, n, yes, no`. If the answer was `Yes`, the next questions will be about the config settings.
-8. `Please, type the moniker for your node:`. Here you need to specify the name for your node
-9. `What is external IP address for your node? Please type in format: <ip_address>:<port>`. Here you need to specify the external address of your machine and P2P port also. For example, `8.8.8.8:26656`.
+* `Please, type here the path to home directory for user cheqd. For keeping default value, just type 'Enter': [/home/cheqd]`. Here you need to specify the path tohome directory for new user `cheqd`. By default `/home/cheqd` will be used.
+* `Do you want to use Cosmovisor? Please type any kind of variants: yes, no, y, n. [yes]`. With current installer we are proposing the ability to setup cosmovisor. It will help you with upgrades, it allows to do it in the full automatic mode. Possible variants for answering `y, n, yes, no`.
+* `Which chain do you want to use? Possible variants are: testnet, mainnet [testnet]`. For now, we have 2 networks, `testnet` and `mainnet`. Please, type here what the chain do you want to use or just keep default pressing `Enter`.
+* `Do you want to deploy the latest snapshot? Please type any kind of variants: yes, no, y, n. [No]`. Such ability can help you with fast catchup to our network. Possible variants for answering `y, n, yes, no`.
+* If you chose 'Yes' answering on previous question the next question will be about the URL to snapshot: `Which snapshot do you want to use? Please type the full URL to archive or press return to use the latest [https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/testnet/latest/cheqd-testnet-4_2022-06-10.tar.gz]`. By default, installer suggests to use the latest snapshot from `https://snapshots.cheqd.net` and calculates the link the latest snapshot due to the chain you chose on step 4.
+* `Do you want to setup node after installation? Please type any kind of variants: yes, no, y, n. [No]`. In case of installing the node from the beginning, you can use this ability to setup your node. Possible variants for answering `y, n, yes, no`. If the answer was `Yes`, the next questions will be about the config settings.
+* `Please, type the moniker for your node:`. Here you need to specify the name for your node
+* `What is external IP address for your node? Please type in format: <ip_address>:<port>`. Here you need to specify the external address of your machine and P2P port also. For example, `8.8.8.8:26656`.
 
 P.S. cause snapshots are too big, it will take a long time for downloading. During this period script will print some message about the process each minute.
 
