@@ -519,7 +519,7 @@ class Interviewer:
 
     def ask_for_init_from_snapshot(self):
         answer = self.ask(
-            f"Do you want to deploy the latest snapshot from {DEFAULT_SNAPSHOT_SERVER}? "
+            f"Do you want to deploy the latest snapshot? "
             f"Please type any kind of variants: yes, no, y, n. ",
             default="No"
         )
