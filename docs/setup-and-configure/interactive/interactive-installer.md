@@ -4,7 +4,7 @@ This document provides information about how-to use new interactive installer an
 
 ## Installation process
 
-By default, oru target platform already has `python3` under the hood and no additional packages are needed and other preparation steps.
+By default, our target platform already has `python3` under the hood and no additional packages are needed and other preparation steps.
 
 For running installer the next command can be used:
 
@@ -14,42 +14,42 @@ wget -q https://raw.githubusercontent.com/cheqd/cheqd-node/3866783bd3282dcb7fb90
 
 ## Questions
 
-All the questions at the end have the default value in [] brackets, like `[v0.5.0]`. If a default value exists you can just press `Enter` without type the whole answer.
+All the questions at the end have the default value in [] brackets, like `[v0.5.0]`. If a default value exists you can just press `Enter` without needing to type the whole answer.
 
-The list of questions while installing:
+During the installation process you will see the following questions:
 
-* `Which version do you want to install? Or type 'list' for get the list of releases: [v0.5.0]`. Possible answers are exact version, like `0.4.0` or `0.5.0` or `list`. In this case the last 5 releases will be printed and you can choose what the version is needed:
+* `Which version do you want to install? Or type 'list' to get the list of releases: [v0.5.0]`. Possible answers are the exact versions that currently exist, for example type `0.4.0` or `0.5.0` or `list`(in this case the last 5 releases will be printed and you can choose what the version is needed)
 
 ```text
-Which version do you want to install? Or type 'list' for get the list of releases: [v0.5.0]
+Which version do you want to install? Or type 'list' to get the list of releases: [v0.5.0]
 list
 1) v0.5.0
 2) v0.4.1
 3) v0.3.5
 4) v0.3.4
 5) v0.3.3
-Please insert the number for picking up the version: 1
+Please insert the number by picking up the version: 1
 ```
 
-* `Please, type here the path to home directory for user cheqd. For keeping default value, just type 'Enter': [/home/cheqd]`. Here you need to specify the path tohome directory for new user `cheqd`. By default `/home/cheqd` will be used.
+* `Please, type the path to home directory for user cheqd. To keep the default value, just type 'Enter': [/home/cheqd]`. Here you need to specify the path tohome directory for the new user `cheqd`. By default `/home/cheqd` will be used.
 * `Do you want to use Cosmovisor? Please type any kind of variants: yes, no, y, n. [yes]`. With current installer we are proposing the ability to setup cosmovisor. It will help you with upgrades, it allows to do it in the full automatic mode. Possible variants for answering `y, n, yes, no`.
-* `Which chain do you want to use? Possible variants are: testnet, mainnet [testnet]`. For now, we have 2 networks, `testnet` and `mainnet`. Please, type here what the chain do you want to use or just keep default pressing `Enter`.
-* `Do you want to deploy the latest snapshot? Please type any kind of variants: yes, no, y, n. [No]`. Such ability can help you with fast catchup to our network. Possible variants for answering `y, n, yes, no`.
-* If you chose 'Yes' answering on previous question the next question will be about the URL to snapshot: `Which snapshot do you want to use? Please type the full URL to archive or press return to use the latest [https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/testnet/latest/cheqd-testnet-4_2022-06-10.tar.gz]`. By default, installer suggests to use the latest snapshot from `https://snapshots.cheqd.net` and calculates the link the latest snapshot due to the chain you chose on step 4.
-* `Do you want to setup node after installation? Please type any kind of variants: yes, no, y, n. [No]`. In case of installing the node from the beginning, you can use this ability to setup your node. Possible variants for answering `y, n, yes, no`. If the answer was `Yes`, the next questions will be about the config settings.
-* `Please, type the moniker for your node:`. Here you need to specify the name for your node
-* `What is external IP address for your node? Please type in format: <ip_address>:<port>`. Here you need to specify the external address of your machine and P2P port also. For example, `8.8.8.8:26656`.
+* `Which chain do you want to use? Possible variants are: testnet, mainnet [testnet]`. For now, we have 2 networks, `testnet` and `mainnet`. Please, type here which chain you want to use or just keep the default by clicking `Enter`.
+* `Do you want to deploy the latest snapshot? Please type any kind of variants: yes, no, y, n. [No]`. This can help you speed up the catchup to cheqd network. Possible variants for answering `y, n, yes, no`.
+* If you chose 'Yes' answering on previous question the next question will be about the URL to snapshot: `Which snapshot do you want to use? Please type the full URL to archive or press return to use the latest [https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/testnet/latest/cheqd-testnet-4_2022-06-10.tar.gz]`. By default, the installer will suggest the latest snapshot from `https://snapshots.cheqd.net` and calculate the link the latest snapshot based on the chain you chose on step 4.
+* `Do you want to setup the node after installation? Please type any kind of variants: yes, no, y, n. [No]`. If you are installing the node from the beginning, you can use this ability to setup your node. Possible variants for answering `y, n, yes, no`. If the answer was `Yes`, the next questions will be about the config settings.
+* `Please, type the moniker for your node:`. Here you need to specify a nickname for your node. This will be used in various user facing places such as on block explorers where a user is deciding where to delegate their tokens. 
+* `What is the external IP address of your node? Please type in format: <ip_address>:<port>`. Here you need to specify the external address of your machine and P2P port also. For example, `8.8.8.8:26656`.
 
-P.S. cause snapshots are too big, it will take a long time for downloading. During this period script will print some message about the process each minute.
+P.S. Due to the size of the snapshots it will take a long time to download. During this period the script will print some message about the process each minute.
 
-P.P.S It's possible to run the installer again in case of failure or typo. But it will not override already created files.
+P.P.S It's possible to run the installer again in case of failure or a typo however it **will not override already created files.**
 
 ### Example of installing
 
 ```text
-Which version do you want to install? Or type 'list' for get the list of releases: [v0.5.0]
+Which version do you want to install? Or type 'list' to get the list of releases: [v0.5.0]
 
-Please, type here the path to home directory for user cheqd. For keeping default value, just type 'Enter': [/home/cheqd]
+Please type the path to the home directory for user cheqd. To keep the default value, just type 'Enter': [/home/cheqd]
 /root
 Do you want to use Cosmovisor? Please type any kind of variants: yes, no, y, n. [yes]
 
@@ -57,9 +57,9 @@ Which chain do you want to use? Possible variants are: testnet, mainnet [testnet
 
 Do you want to deploy the latest snapshot from https://snapshots.cheqd.net? Please type any kind of variants: yes, no, y, n. [No]
 y
-Which snapshot do you want to use? Please type the full URL to archive or press return to use the latest [https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/testnet/latest/cheqd-testnet-4_2022-06-10.tar.gz]
+Which snapshot do you want to use? Please type the full URL to archive or click return to use the latest [https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/testnet/latest/cheqd-testnet-4_2022-06-10.tar.gz]
 
-Do you want to setup node after installation? Please type any kind of variants: yes, no, y, n. [No]
+Do you want to setup a node after installation? Please type any kind of variants: yes, no, y, n. [No]
 y
 Please, type the moniker for your node:
 test
@@ -116,7 +116,7 @@ What is external IP address for your node? Please type in format: <ip_address>:<
 *********  Executing command: chown -R cheqd:cheqd /root/.cheqdnode/data
 ```
 
-After installation process ends you can start the `systemctl` service:
+After the installation process ends you can start the `systemctl` service:
 
 ```bash
 sudo systemctl start cheqd-noded
