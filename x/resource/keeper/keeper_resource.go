@@ -60,7 +60,7 @@ func (k Keeper) AppendResource(ctx *sdk.Context, resource *types.Resource) error
 // SetResource set a specific resource in the store
 func (k Keeper) SetResource(ctx *sdk.Context, resource *types.Resource) error {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.ResourceKey))
-	b := k.cdc.MustMarshal(&resource)
+	b := k.cdc.MustMarshal(resource)
 	store.Set(GetResourceKeyBytes(resource.CollectionId, resource.Id), b)
 	return nil
 }
