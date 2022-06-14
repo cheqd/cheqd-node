@@ -18,11 +18,7 @@ func DefaultGenesis() *GenesisState {
 func (gs GenesisState) Validate() error {
 	resourceIdMap := make(map[string]bool)
 
-	for _, elem := range gs.ResourceList {
-		resource, err := elem.UnpackDataAsResource()
-		if err != nil {
-			return err
-		}
+	for _, resource := range gs.ResourceList {
 
 		if _, ok := resourceIdMap[resource.Id]; ok {
 			return fmt.Errorf("duplicated id for resource")
