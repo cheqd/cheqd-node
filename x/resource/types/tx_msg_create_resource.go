@@ -3,6 +3,7 @@ package types
 import (
 	cheqd_types "github.com/cheqd/cheqd-node/x/cheqd/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
 var _ sdk.Msg = &MsgCreateResource{}
@@ -43,6 +44,7 @@ func (msg *MsgCreateResource) ValidateBasic() error {
 // Validate
 
 func (msg MsgCreateResource) Validate() error {
-	//TODO: implement
-	return nil
+	return validation.ValidateStruct(&msg,
+		validation.Field(&msg.Payload, validation.Required, ValidMsgCreateResourcePayload()),
+	)
 }
