@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	cheqdutils "github.com/cheqd/cheqd-node/x/cheqd/utils"
 	"github.com/cheqd/cheqd-node/x/resource/types"
@@ -23,38 +24,30 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 		return nil, types.ErrResourceExists.Wrap(msg.Payload.Id)
 	}
 
+	// Validate signatures
+	didDocStateValue, err := k.cheqdKeeper.GetDid(&ctx, did)
+	didDoc, err := didDocStateValue.UnpackDataAsDid()
+	if err != nil {
+		return nil, err
+	}
 
-	// TODO: validation
-
-
-	//
-	//// getDid
-	//// get signatures for did modification
-	////
-	//
-	//// Verify signatures
-	//signers := GetSignerDIDsForResourceCreation(resource)
-	//for _, signer := range signers {
-	//	signature, found := cheqdtypes.FindSignInfoBySigner(msg.Signatures, signer)
-	//
-	//	if !found {
-	//		return nil, cheqdtypes.ErrSignatureNotFound.Wrapf("signer: %s", signer)
-	//	}
-	//
-	//	err := VerifySignature(&k.Keeper, &ctx, inMemoryResources, msg.Payload.GetSignBytes(), signature)
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//}
-
+	// We can use the same signers as for DID creation because didDoc stays the same
+	signers := cheqdkeeper.GetSignerDIDsForDIDCreation(*didDoc)
+	err = cheqdkeeper.VerifyAllSignersHaveAllValidSignatures(&k.cheqdKeeper, &ctx, map[string]cheqdtypes.StateValue{},
+		msg.Payload.GetSignBytes(), signers, msg.Signatures)
+	if err != nil {
+		return nil, err
+	}
 
 	// Build Resource
 	resource := msg.Payload.ToResource()
 
 	// TODO: set created, checksum
+	// TODO: set backlink to didDoc
+	// TODO: set version + update forward and backward links
 
 	// Apply changes
-	err := k.SetResource(&ctx, &resource)
+	err = k.SetResource(&ctx, &resource)
 	if err != nil {
 		return nil, types.ErrInternal.Wrapf(err.Error())
 	}
@@ -63,9 +56,4 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	return &types.MsgCreateResourceResponse{
 		Resource: &resource,
 	}, nil
-}
-
-func GetSignerDIDsForResourceCreation(resource types.Resource) []string {
-	//TODO: implement
-	return []string{}
 }
