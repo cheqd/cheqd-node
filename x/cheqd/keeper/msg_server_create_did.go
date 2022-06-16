@@ -45,7 +45,7 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 
 	// Verify signatures
 	signers := GetSignerDIDsForDIDCreation(did)
-	err = VerifyAllSignersHaveExactlyOneValidSignature(&k.Keeper, &ctx, inMemoryDids, msg.GetSignBytes(), signers, msg.GetSignatures())
+	err = VerifyAllSignersHaveAllValidSignatures(&k.Keeper, &ctx, inMemoryDids, msg.Payload.GetSignBytes(), signers, msg.Signatures)
 	if err != nil {
 		return nil, err
 	}

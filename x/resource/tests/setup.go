@@ -7,6 +7,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/cheqd/cheqd-node/x/cheqd"
+	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
+
 	// "github.com/btcsuite/btcutil/base58"
 	cheqdtests "github.com/cheqd/cheqd-node/x/cheqd/tests"
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
@@ -28,33 +31,35 @@ import (
 )
 
 type TestSetup struct {
-	Cdc     codec.Codec
-	Ctx     sdk.Context
-	Keeper  keeper.Keeper
-	Handler sdk.Handler
+	cheqdtests.TestSetup
+
+	resourceKeeper  keeper.Keeper
+	resourceHandler sdk.Handler
 }
 
-
 func Setup() TestSetup {
-
-	cheqdtests.Setup()
-
 	// Init Codec
 	ir := codectypes.NewInterfaceRegistry()
 	types.RegisterInterfaces(ir)
+	cheqdtypes.RegisterInterfaces(ir)
 	cdc := codec.NewProtoCodec(ir)
 
 	// Init KVSore
 	db := dbm.NewMemDB()
 
 	dbStore := store.NewCommitMultiStore(db)
-	storeKey := sdk.NewKVStoreKey(types.StoreKey)
-	dbStore.MountStoreWithDB(storeKey, sdk.StoreTypeIAVL, nil)
+
+	cheqdStoreKey := sdk.NewKVStoreKey(cheqdtypes.StoreKey)
+	resourceStoreKey := sdk.NewKVStoreKey(types.StoreKey)
+
+	dbStore.MountStoreWithDB(cheqdStoreKey, sdk.StoreTypeIAVL, nil)
+	dbStore.MountStoreWithDB(resourceStoreKey, sdk.StoreTypeIAVL, nil)
 
 	_ = dbStore.LoadLatestVersion()
 
 	// Init Keepers
-	newKeeper := keeper.NewKeeper(cdc, storeKey)
+	cheqdKeeper := cheqdkeeper.NewKeeper(cdc, cheqdStoreKey)
+	resourceKeeper := keeper.NewKeeper(cdc, resourceStoreKey)
 
 	// Create Tx
 	txBytes := make([]byte, 28)
@@ -66,14 +71,20 @@ func Setup() TestSetup {
 		tmproto.Header{ChainID: "test", Time: blockTime},
 		false, log.NewNopLogger()).WithTxBytes(txBytes)
 
-	handler := resource.NewHandler(*newKeeper)
+	cheqdHandler := cheqd.NewHandler(*cheqdKeeper)
+	resourceHandler := resource.NewHandler(*resourceKeeper, *cheqdKeeper)
 
 	setup := TestSetup{
-		Cdc:     cdc,
-		Ctx:     ctx,
-		Keeper:  *newKeeper,
-		Handler: handler,
+		TestSetup: cheqdtests.TestSetup{
+			Cdc:     cdc,
+			Ctx:     ctx,
+			Keeper:  *cheqdKeeper,
+			Handler: cheqdHandler,
+		},
+		resourceKeeper:  *resourceKeeper,
+		resourceHandler: resourceHandler,
 	}
+
 	return setup
 }
 
@@ -112,28 +123,26 @@ func (s *TestSetup) SendCreateResource(msg *types.MsgCreateResourcePayload, keys
 		return nil, err
 	}
 
-	created, _ := s.Keeper.GetResource(&s.Ctx, msg.CollectionId, msg.Id)
+	created, _ := s.resourceKeeper.GetResource(&s.Ctx, msg.CollectionId, msg.Id)
 	return &created, nil
 }
 
-
-func InitEnv(t *testing.T, publicKey ed25519.PublicKey, privateKey ed25519.PrivateKey) (TestSetup, cheqdtests.TestSetup) {
+func InitEnv(t *testing.T, publicKey ed25519.PublicKey, privateKey ed25519.PrivateKey) TestSetup {
 	resourceSetup := Setup()
-	didSetup := cheqdtests.Setup()
 
-	didDoc := didSetup.CreateDid(publicKey, ExistingDID)
-	_, err := didSetup.SendCreateDid(didDoc, map[string]ed25519.PrivateKey{ExistingDIDKey: privateKey})
+	didDoc := resourceSetup.CreateDid(publicKey, ExistingDID)
+	_, err := resourceSetup.SendCreateDid(didDoc, map[string]ed25519.PrivateKey{ExistingDIDKey: privateKey})
 	require.NoError(t, err)
 
 	resourcePayload := GenerateCreateResourcePayload(ExistingResource())
 	_, err = resourceSetup.SendCreateResource(resourcePayload, map[string]ed25519.PrivateKey{ExistingDIDKey: privateKey})
 	require.NoError(t, err)
 
-	return resourceSetup, didSetup
+	return resourceSetup
 }
 
 func GenerateTestKeys() map[string]cheqdtests.KeyPair {
 	return map[string]cheqdtests.KeyPair{
-		ExistingDIDKey:    cheqdtests.GenerateKeyPair(),
+		ExistingDIDKey: cheqdtests.GenerateKeyPair(),
 	}
 }

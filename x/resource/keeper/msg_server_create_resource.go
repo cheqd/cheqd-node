@@ -24,37 +24,37 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	}
 
 
+	// TODO: validation
 
 
-
-
-
-
-	// getDid
-	// get signatures for did modification
 	//
+	//// getDid
+	//// get signatures for did modification
+	////
+	//
+	//// Verify signatures
+	//signers := GetSignerDIDsForResourceCreation(resource)
+	//for _, signer := range signers {
+	//	signature, found := cheqdtypes.FindSignInfoBySigner(msg.Signatures, signer)
+	//
+	//	if !found {
+	//		return nil, cheqdtypes.ErrSignatureNotFound.Wrapf("signer: %s", signer)
+	//	}
+	//
+	//	err := VerifySignature(&k.Keeper, &ctx, inMemoryResources, msg.Payload.GetSignBytes(), signature)
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//}
 
-	// Verify signatures
-	signers := GetSignerDIDsForResourceCreation(resource)
-	for _, signer := range signers {
-		signature, found := cheqdtypes.FindSignInfoBySigner(msg.Signatures, signer)
-
-		if !found {
-			return nil, cheqdtypes.ErrSignatureNotFound.Wrapf("signer: %s", signer)
-		}
-
-		err := VerifySignature(&k.Keeper, &ctx, inMemoryResources, msg.Payload.GetSignBytes(), signature)
-		if err != nil {
-			return nil, err
-		}
-	}
 
 	// Build Resource
 	resource := msg.Payload.ToResource()
-	// set created, checksum
+
+	// TODO: set created, checksum
 
 	// Apply changes
-	err := k.AppendResource(&ctx, &resource)
+	err := k.SetResource(&ctx, &resource)
 	if err != nil {
 		return nil, types.ErrInternal.Wrapf(err.Error())
 	}

@@ -11,7 +11,6 @@ var (
 	ErrBadRequest                 = sdkerrors.Register(ModuleName, 1000, "bad request")
 	ErrInvalidSignature           = sdkerrors.Register(ModuleName, 1100, "invalid signature detected")
 	ErrSignatureNotFound          = sdkerrors.Register(ModuleName, 1101, "signature is required but not found")
-	ErrMultipleSignatures         = sdkerrors.Register(ModuleName, 1102, "signature is required but not found")
 	ErrDidDocExists               = sdkerrors.Register(ModuleName, 1200, "DID Doc exists")
 	ErrDidDocNotFound             = sdkerrors.Register(ModuleName, 1201, "DID Doc not found")
 	ErrVerificationMethodNotFound = sdkerrors.Register(ModuleName, 1202, "verification method not found")

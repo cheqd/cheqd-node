@@ -106,7 +106,7 @@ func VerifySignature(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.
 	return nil
 }
 
-func VerifyAllSignersHaveExactlyOneValidSignature(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.StateValue, message []byte, signers []string, signatures []*types.SignInfo) error {
+func VerifyAllSignersHaveAllValidSignatures(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.StateValue, message []byte, signers []string, signatures []*types.SignInfo) error {
 	for _, signer := range signers {
 		signatures := types.FindSignInfosBySigner(signatures, signer)
 
@@ -114,15 +114,11 @@ func VerifyAllSignersHaveExactlyOneValidSignature(k *Keeper, ctx *sdk.Context, i
 			return types.ErrSignatureNotFound.Wrapf("signer: %s", signer)
 		}
 
-		if len(signatures) > 1 {
-			return types.ErrMultipleSignatures.Wrapf("signer: %s", signer)
-		}
-
-		signature := signatures[0]
-
-		err := VerifySignature(k, ctx, inMemoryDIDs, message, signature)
-		if err != nil {
-			return err
+		for _, signature := range signatures {
+			err := VerifySignature(k, ctx, inMemoryDIDs, message, signature)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
