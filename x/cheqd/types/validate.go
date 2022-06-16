@@ -3,6 +3,7 @@ package types
 import (
 	"errors"
 	"fmt"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"strings"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
@@ -20,6 +21,8 @@ const (
 )
 
 // Custom error rule
+
+var _ validation.Rule = &CustomErrorRule{}
 
 type CustomErrorRule struct {
 	fn func(value interface{}) error

@@ -7,6 +7,7 @@ import (
 )
 
 // x/resource module sentinel errors
+// TODO: Rework these errors to be used in the module
 var (
 	ErrBadRequest                 = sdkerrors.Register(ModuleName, 2000, "bad request")
 	ErrInvalidSignature           = sdkerrors.Register(ModuleName, 2100, "invalid signature detected")
