@@ -1,4 +1,3 @@
-// TODO:
 package types
 
 import (

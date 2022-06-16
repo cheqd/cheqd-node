@@ -38,6 +38,17 @@ func (c CustomErrorRule) Validate(value interface{}) error {
 
 // Validation helpers
 
+func IsID() *CustomErrorRule {
+	return NewCustomErrorRule(func(value interface{}) error {
+		casted, ok := value.(string)
+		if !ok {
+			panic("IsID must be only applied on string properties")
+		}
+
+		return utils.ValidateID(casted)
+	})
+}
+
 func IsDID(allowedNamespaces []string) *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.(string)

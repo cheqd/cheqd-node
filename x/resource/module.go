@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
 	"log"
 
 	"github.com/cheqd/cheqd-node/x/resource/client/cli"
@@ -100,17 +101,19 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 // AppModule
 // ----------------------------------------------------------------------------
 
-// AppModule implements the AppModule interface for the capability module.
+// AppModule implements the AppModule interface for the resource module.
 type AppModule struct {
 	AppModuleBasic
 
 	keeper keeper.Keeper
+	cheqdKeeper cheqdkeeper.Keeper
 }
 
-func NewAppModule(cdc codec.Codec, keeper keeper.Keeper) AppModule {
+func NewAppModule(cdc codec.Codec, keeper keeper.Keeper, cheqdKeeper cheqdkeeper.Keeper) AppModule {
 	return AppModule{
 		AppModuleBasic: NewAppModuleBasic(cdc),
 		keeper:         keeper,
+		cheqdKeeper:    cheqdKeeper,
 	}
 }
 
@@ -119,7 +122,7 @@ func NewAppModule(cdc codec.Codec, keeper keeper.Keeper) AppModule {
 // introduced by the module. To avoid wrong/empty versions, the initial version
 // should be set to 1.
 func (am AppModule) ConsensusVersion() uint64 {
-	return 3
+	return 1
 }
 
 // Name returns the capability module's name.
@@ -129,7 +132,7 @@ func (am AppModule) Name() string {
 
 // Route returns the capability module's message routing key.
 func (am AppModule) Route() sdk.Route {
-	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper))
+	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper, am.cheqdKeeper))
 }
 
 // QuerierRoute returns the capability module's query routing key.

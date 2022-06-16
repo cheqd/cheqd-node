@@ -12,8 +12,6 @@ func (msg *MsgCreateResourcePayload) GetSignBytes() []byte {
 }
 
 func (msg *MsgCreateResourcePayload) ToResource() Resource {
-	created := ""
-	checksum := ""
 	return Resource{
 		CollectionId: msg.CollectionId,
 		Id:           msg.Id,
@@ -21,8 +19,8 @@ func (msg *MsgCreateResourcePayload) ToResource() Resource {
 		ResourceType: msg.ResourceType,
 		MimeType:     msg.MimeType,
 		Data:         msg.Data,
-		Created:      created,
-		Checksum:     checksum,
+		Created:      "",
+		Checksum:     "",
 	}
 }
 
@@ -30,7 +28,12 @@ func (msg *MsgCreateResourcePayload) ToResource() Resource {
 
 func (msg MsgCreateResourcePayload) Validate() error {
 	return validation.ValidateStruct(&msg,
-		validation.Field(&msg.CollectionId, validation.Required, IsUUID()),	// TODO: Wrong
+		validation.Field(&msg.CollectionId, validation.Required, cheqdTypes.IsID()),
+		validation.Field(&msg.Id, validation.Required, IsUUID()),
+		validation.Field(&msg.Name, validation.Required, validation.Length(1, 64)),
+		// TODO: add validation for resource type
+		// TODO: add validation for mime type
+		validation.Field(&msg.Data, validation.Required, validation.Length(1, 1024*1024)), // 1MB
 	)
 }
 

@@ -33,7 +33,7 @@ func (msg *MsgCreateResource) GetSignBytes() []byte {
 }
 
 func (msg *MsgCreateResource) ValidateBasic() error {
-	err := msg.Validate()
+	err := msg.Validate([]string{})
 	if err != nil {
 		return ErrBasicValidation.Wrap(err.Error())
 	}
@@ -43,8 +43,9 @@ func (msg *MsgCreateResource) ValidateBasic() error {
 
 // Validate
 
-func (msg MsgCreateResource) Validate() error {
+func (msg MsgCreateResource) Validate(allowedNamespaces []string) error {
 	return validation.ValidateStruct(&msg,
 		validation.Field(&msg.Payload, validation.Required, ValidMsgCreateResourcePayload()),
+		validation.Field(&msg.Signatures, cheqd_types.IsUniqueSignInfoListRule(), validation.Each(cheqd_types.ValidSignInfoRule(allowedNamespaces))),
 	)
 }

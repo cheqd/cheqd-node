@@ -101,7 +101,7 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 // AppModule
 // ----------------------------------------------------------------------------
 
-// AppModule implements the AppModule interface for the capability module.
+// AppModule implements the AppModule interface for the cheqd module.
 type AppModule struct {
 	AppModuleBasic
 
