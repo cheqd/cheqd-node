@@ -3,6 +3,7 @@ package types
 import (
 	"errors"
 	"fmt"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"strings"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
@@ -21,6 +22,8 @@ const (
 
 // Custom error rule
 
+var _ validation.Rule = &CustomErrorRule{}
+
 type CustomErrorRule struct {
 	fn func(value interface{}) error
 }
@@ -34,6 +37,17 @@ func (c CustomErrorRule) Validate(value interface{}) error {
 }
 
 // Validation helpers
+
+func IsID() *CustomErrorRule {
+	return NewCustomErrorRule(func(value interface{}) error {
+		casted, ok := value.(string)
+		if !ok {
+			panic("IsID must be only applied on string properties")
+		}
+
+		return utils.ValidateID(casted)
+	})
+}
 
 func IsDID(allowedNamespaces []string) *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {

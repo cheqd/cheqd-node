@@ -99,6 +99,7 @@ func GetDidIDBytes(id string) []byte {
 }
 
 // GetAllDid returns all did
+// Loads all DIDs in memory. Use only for genesis export.
 func (k Keeper) GetAllDid(ctx *sdk.Context) (list []types.StateValue) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})

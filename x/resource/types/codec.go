@@ -10,10 +10,6 @@ import (
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	// Sdk messages
 	cdc.RegisterConcrete(&MsgCreateResource{}, "resource/CreateResource", nil)
-
-	// State value data
-	cdc.RegisterInterface((*Resource)(nil), nil)
-	cdc.RegisterConcrete(&Resource{}, "resource/Resource", nil)
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
@@ -21,10 +17,6 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreateResource{},
 	)
-
-	// State value data
-	registry.RegisterInterface("Resource", (*Resource)(nil))
-	registry.RegisterImplementations((*Resource)(nil), &Resource{})
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }

@@ -12,8 +12,6 @@ const (
 
 	// QuerierRoute defines the module's query routing key
 	QuerierRoute = ModuleName
-
-	ResourceMethod = ModuleName
 )
 
 func KeyPrefix(p string) []byte {
@@ -21,7 +19,6 @@ func KeyPrefix(p string) []byte {
 }
 
 const (
-	ResourceKey          = "resource:"
-	ResourceCountKey     = "resource-count:"
-	ResourceNamespaceKey = "resource-namespace:"
+	ResourceKey      = "resource:"
+	ResourceCountKey = "resource-count:"
 )

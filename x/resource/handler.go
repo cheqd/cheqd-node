@@ -2,6 +2,7 @@ package resource
 
 import (
 	"fmt"
+	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
 
 	"github.com/cheqd/cheqd-node/x/resource/keeper"
 	"github.com/cheqd/cheqd-node/x/resource/types"
@@ -9,8 +10,8 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func NewHandler(k keeper.Keeper) sdk.Handler {
-	msgServer := keeper.NewMsgServer(k)
+func NewHandler(k keeper.Keeper, cheqdKeeper cheqdkeeper.Keeper) sdk.Handler {
+	msgServer := keeper.NewMsgServer(k, cheqdKeeper)
 
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
@@ -19,10 +20,6 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case *types.MsgCreateResource:
 			res, err := msgServer.CreateResource(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
-		//
-		//case *types.Msg:
-		//	res, err := msgServer.UpdateDid(sdk.WrapSDKContext(ctx), msg)
-		//	return sdk.WrapServiceResult(ctx, res, err)
 
 		default:
 			errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName, msg)

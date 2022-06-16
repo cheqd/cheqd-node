@@ -4,8 +4,6 @@ import (
 	"fmt"
 )
 
-const DefaultResourceNamespace = "testnet"
-
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
@@ -16,6 +14,7 @@ func DefaultGenesis() *GenesisState {
 // Validate performs basic genesis state validation returning an error upon any
 // failure.
 func (gs GenesisState) Validate() error {
+	// TODO: Are resource ids unique within a collection or globally?
 	resourceIdMap := make(map[string]bool)
 
 	for _, resource := range gs.ResourceList {
