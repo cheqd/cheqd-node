@@ -168,8 +168,8 @@ if $programname == '{binary_name}' then {self.cheqd_log_dir}/stdout.log
         return os.path.join(self.cheqd_root_dir, "cosmovisor")
 
     @property
-    def cosmovisor_bin_path(self):
-        return os.path.join(self.cosmovisor_root_dir, f"genesis/bin/{DEFAULT_BINARY_NAME}")
+    def cosmovisor_cheqd_bin_path(self):
+        return os.path.join(self.cosmovisor_root_dir, f"current/bin/{DEFAULT_BINARY_NAME}")
 
     @staticmethod
     def post_process(func):
@@ -205,12 +205,20 @@ if $programname == '{binary_name}' then {self.cheqd_log_dir}/stdout.log
         try:
             pwd.getpwnam(username)
         except KeyError:
+            self.log(f"User {username} does not exist")
             return False
+        self.log(f"User {username} already exists")
         return True
 
+    def is_already_installed(self) -> bool:
+        return self.is_user_exists(DEFAULT_CHEQD_USER)
+
     def install(self):
-        self.log("Download the binary")
-        self.get_binary()
+        if not self.is_already_installed():
+            self.log("Download the binary")
+            self.get_binary()
+        else:
+            failure_exit("Looks like installation already exists.")
 
         if not self.interviewer.is_cosmo_needed:
             self.log(f"Moving binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}")
@@ -278,13 +286,14 @@ if $programname == '{binary_name}' then {self.cheqd_log_dir}/stdout.log
 
     def post_install(self):
         # Init the node with provided moniker
-        self.exec(f"sudo -u {DEFAULT_CHEQD_USER} cheqd-noded init {self.interviewer.moniker}")
+        if not os.path.exists(os.path.join(self.cheqd_config_dir, 'genesis.json')):
+            self.exec(f"sudo -u {DEFAULT_CHEQD_USER} cheqd-noded init {self.interviewer.moniker}")
 
-        # Downloading genesis file
-        self.exec(f"curl -s {GENESIS_URL_TEMPLATE.format(self.interviewer.chain)} > {os.path.join(self.cheqd_config_dir, 'genesis.json')}")
-        shutil.chown(os.path.join(self.cheqd_config_dir, 'genesis.json'),
-                     DEFAULT_CHEQD_USER,
-                     DEFAULT_CHEQD_USER)
+            # Downloading genesis file
+            self.exec(f"curl -s {GENESIS_URL_TEMPLATE.format(self.interviewer.chain)} > {os.path.join(self.cheqd_config_dir, 'genesis.json')}")
+            shutil.chown(os.path.join(self.cheqd_config_dir, 'genesis.json'),
+                         DEFAULT_CHEQD_USER,
+                         DEFAULT_CHEQD_USER)
 
         # Setting up the external_address
         if self.interviewer.external_address:
@@ -323,12 +332,17 @@ if $programname == '{binary_name}' then {self.cheqd_log_dir}/stdout.log
             self.log(f"Moving cosmovisor binary to default installation directory")
             shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
 
-        self.log(f"Moving binary from {self.binary_path} to {self.cosmovisor_bin_path}")
-        self.exec("sudo mv {} {}".format(self.binary_path, self.cosmovisor_bin_path))
+        self.log(f"Moving binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
+        self.exec("sudo mv {} {}".format(self.binary_path, self.cosmovisor_cheqd_bin_path))
+
+        if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
+            self.log(f"Making symlink current -> genesis")
+            os.symlink(os.path.join(self.cosmovisor_root_dir, "genesis"),
+                       os.path.join(self.cosmovisor_root_dir, "current"))
 
         if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
-            self.log(f"Making symlink to {self.cosmovisor_bin_path}")
-            os.symlink(self.cosmovisor_bin_path,
+            self.log(f"Making symlink to {self.cosmovisor_cheqd_bin_path}")
+            os.symlink(self.cosmovisor_cheqd_bin_path,
                        os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
 
         self.log(f"Changing owner to {DEFAULT_CHEQD_USER} user")
@@ -346,12 +360,7 @@ if $programname == '{binary_name}' then {self.cheqd_log_dir}/stdout.log
             self.log(f"Downloading is alive, it already took: {str(datetime.timedelta(seconds=sec_counter))}")
 
         # Some kind of hacks cause cosmovisor expects upgrade-info.json file in cosmovisor/current directory also
-        if self.interviewer.is_cosmo_needed and \
-                not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
-            self.log(f"Making symlink current -> genesis")
-            os.symlink(os.path.join(self.cosmovisor_root_dir, "genesis"),
-                       os.path.join(self.cosmovisor_root_dir, "current"))
-
+        if self.interviewer.is_cosmo_needed:
             if os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
                 self.log(f"Copying upgrade-info.json file to cosmovisor/current/")
                 shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
@@ -488,7 +497,7 @@ class Interviewer:
             if len(_t) > 0:
                 self.release = _t[0]
             else:
-                failure_exit(f"Version: {answer} is not exist")
+                failure_exit(f"Version: {answer} does not exist")
 
     @staticmethod
     def default_answer(func):
