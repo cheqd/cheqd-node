@@ -4,13 +4,18 @@ import (
 	"crypto/ed25519"
 	"crypto/rand"
 	"encoding/base64"
+	"testing"
 	"time"
 
-	"github.com/btcsuite/btcutil/base58"
-	"github.com/cheqd/cheqd-node/x/cheqd"
-	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	// "github.com/btcsuite/btcutil/base58"
+	cheqdtests "github.com/cheqd/cheqd-node/x/cheqd/tests"
+	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	"github.com/cheqd/cheqd-node/x/resource"
+	"github.com/cheqd/cheqd-node/x/resource/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
-	"github.com/multiformats/go-multibase"
+	"github.com/stretchr/testify/require"
+
+	// "github.com/multiformats/go-multibase"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store"
@@ -18,16 +23,9 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/cheqd/cheqd-node/x/cheqd/keeper"
+	"github.com/cheqd/cheqd-node/x/resource/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
-
-const Ed25519VerificationKey2020 = "Ed25519VerificationKey2020"
-
-type KeyPair struct {
-	PrivateKey ed25519.PrivateKey
-	PublicKey  ed25519.PublicKey
-}
 
 type TestSetup struct {
 	Cdc     codec.Codec
@@ -36,12 +34,11 @@ type TestSetup struct {
 	Handler sdk.Handler
 }
 
-type SignerKey struct {
-	signer string
-	key    ed25519.PrivateKey
-}
 
 func Setup() TestSetup {
+
+	cheqdtests.Setup()
+
 	// Init Codec
 	ir := codectypes.NewInterfaceRegistry()
 	types.RegisterInterfaces(ir)
@@ -69,7 +66,7 @@ func Setup() TestSetup {
 		tmproto.Header{ChainID: "test", Time: blockTime},
 		false, log.NewNopLogger()).WithTxBytes(txBytes)
 
-	handler := cheqd.NewHandler(*newKeeper)
+	handler := resource.NewHandler(*newKeeper)
 
 	setup := TestSetup{
 		Cdc:     cdc,
@@ -80,267 +77,63 @@ func Setup() TestSetup {
 	return setup
 }
 
-func (s *TestSetup) CreateDid(pubKey ed25519.PublicKey, did string) *types.MsgCreateDidPayload {
-	PublicKeyMultibase := "z" + base58.Encode(pubKey)
-
-	VerificationMethod := types.VerificationMethod{
-		Id:                 did + "#key-1",
-		Type:               Ed25519VerificationKey2020,
-		Controller:         did,
-		PublicKeyMultibase: PublicKeyMultibase,
-	}
-
-	Service := types.Service{
-		Id:              did + "#service-2",
-		Type:            "DIDCommMessaging",
-		ServiceEndpoint: "endpoint",
-	}
-
-	return &types.MsgCreateDidPayload{
-		Id:                   did,
-		Controller:           nil,
-		VerificationMethod:   []*types.VerificationMethod{&VerificationMethod},
-		Authentication:       []string{did + "#key-1"},
-		AssertionMethod:      []string{did + "#key-1"},
-		CapabilityInvocation: []string{did + "#key-1"},
-		CapabilityDelegation: []string{did + "#key-1"},
-		KeyAgreement:         []string{did + "#key-1"},
-		AlsoKnownAs:          []string{did + "#key-1"},
-		Context:              []string{"Context"},
-		Service:              []*types.Service{&Service},
+func GenerateCreateResourcePayload(resource types.Resource) *types.MsgCreateResourcePayload {
+	return &types.MsgCreateResourcePayload{
+		CollectionId: resource.CollectionId,
+		Id:           resource.Id,
+		Name:         resource.Name,
+		ResourceType: resource.ResourceType,
+		MimeType:     resource.MimeType,
+		Data:         resource.Data,
 	}
 }
 
-func (s *TestSetup) CreateToUpdateDid(did *types.MsgCreateDidPayload) *types.MsgUpdateDidPayload {
-	return &types.MsgUpdateDidPayload{
-		Id:                   did.Id,
-		Controller:           did.Controller,
-		VerificationMethod:   did.VerificationMethod,
-		Authentication:       did.Authentication,
-		AssertionMethod:      did.AssertionMethod,
-		CapabilityInvocation: did.CapabilityInvocation,
-		CapabilityDelegation: did.CapabilityDelegation,
-		KeyAgreement:         did.KeyAgreement,
-		AlsoKnownAs:          did.AlsoKnownAs,
-		Service:              did.Service,
-		Context:              did.Context,
-	}
-}
-
-func (s *TestSetup) WrapCreateRequest(payload *types.MsgCreateDidPayload, keys map[string]ed25519.PrivateKey) *types.MsgCreateDid {
-	var signatures []*types.SignInfo
+func (s *TestSetup) WrapCreateRequest(payload *types.MsgCreateResourcePayload, keys map[string]ed25519.PrivateKey) *types.MsgCreateResource {
+	var signatures []*cheqdtypes.SignInfo
 	signingInput := payload.GetSignBytes()
 
 	for privKeyId, privKey := range keys {
 		signature := base64.StdEncoding.EncodeToString(ed25519.Sign(privKey, signingInput))
-		signatures = append(signatures, &types.SignInfo{
+		signatures = append(signatures, &cheqdtypes.SignInfo{
 			VerificationMethodId: privKeyId,
 			Signature:            signature,
 		})
 	}
 
-	return &types.MsgCreateDid{
+	return &types.MsgCreateResource{
 		Payload:    payload,
 		Signatures: signatures,
 	}
 }
 
-func (s *TestSetup) WrapUpdateRequest(payload *types.MsgUpdateDidPayload, keys []SignerKey) *types.MsgUpdateDid {
-	var signatures []*types.SignInfo
-	signingInput := payload.GetSignBytes()
-
-	for _, skey := range keys {
-		signature := base64.StdEncoding.EncodeToString(ed25519.Sign(skey.key, signingInput))
-		signatures = append(signatures, &types.SignInfo{
-			VerificationMethodId: skey.signer,
-			Signature:            signature,
-		})
-	}
-
-	return &types.MsgUpdateDid{
-		Payload:    payload,
-		Signatures: signatures,
-	}
-}
-
-func GenerateKeyPair() KeyPair {
-	PublicKey, PrivateKey, _ := ed25519.GenerateKey(rand.Reader)
-	return KeyPair{PrivateKey, PublicKey}
-}
-
-func (s *TestSetup) InitDid(did string) (map[string]ed25519.PrivateKey, *types.MsgCreateDidPayload, error) {
-	pubKey, privKey, _ := ed25519.GenerateKey(rand.Reader)
-
-	// add new Did
-	didMsg := s.CreateDid(pubKey, did)
-
-	keyId := did + "#key-1"
-	keys := map[string]ed25519.PrivateKey{keyId: privKey}
-
-	result, err := s.Handler(s.Ctx, s.WrapCreateRequest(didMsg, keys))
-	if err != nil {
-		return nil, nil, err
-	}
-
-	didResponse := types.MsgCreateDidResponse{}
-	if err := didResponse.Unmarshal(result.Data); err != nil {
-		return nil, nil, err
-	}
-
-	return keys, didMsg, nil
-}
-
-func (s *TestSetup) SendUpdateDid(msg *types.MsgUpdateDidPayload, keys []SignerKey) (*types.Did, error) {
-	// query Did
-	state, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
-	if len(msg.VersionId) == 0 {
-		msg.VersionId = state.Metadata.VersionId
-	}
-
-	_, err := s.Handler(s.Ctx, s.WrapUpdateRequest(msg, keys))
-	if err != nil {
-		return nil, err
-	}
-
-	updated, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
-	return updated.UnpackDataAsDid()
-}
-
-func (s *TestSetup) SendCreateDid(msg *types.MsgCreateDidPayload, keys map[string]ed25519.PrivateKey) (*types.Did, error) {
+func (s *TestSetup) SendCreateResource(msg *types.MsgCreateResourcePayload, keys map[string]ed25519.PrivateKey) (*types.Resource, error) {
 	_, err := s.Handler(s.Ctx, s.WrapCreateRequest(msg, keys))
 	if err != nil {
 		return nil, err
 	}
 
-	created, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
-	return created.UnpackDataAsDid()
+	created, _ := s.Keeper.GetResource(&s.Ctx, msg.CollectionId, msg.Id)
+	return &created, nil
 }
 
-func ConcatKeys(dst map[string]ed25519.PrivateKey, src map[string]ed25519.PrivateKey) map[string]ed25519.PrivateKey {
-	for k, v := range src {
-		dst[k] = v
-	}
 
-	return dst
+func InitEnv(t *testing.T, publicKey ed25519.PublicKey, privateKey ed25519.PrivateKey) (TestSetup, cheqdtests.TestSetup) {
+	resourceSetup := Setup()
+	didSetup := cheqdtests.Setup()
+
+	didDoc := didSetup.CreateDid(publicKey, ExistingDID)
+	_, err := didSetup.SendCreateDid(didDoc, map[string]ed25519.PrivateKey{ExistingDIDKey: privateKey})
+	require.NoError(t, err)
+
+	resourcePayload := GenerateCreateResourcePayload(ExistingResource())
+	_, err = resourceSetup.SendCreateResource(resourcePayload, map[string]ed25519.PrivateKey{ExistingDIDKey: privateKey})
+	require.NoError(t, err)
+
+	return resourceSetup, didSetup
 }
 
-func MapToListOfSignerKeys(mp map[string]ed25519.PrivateKey) []SignerKey {
-	rlist := []SignerKey{}
-	for k, v := range mp {
-		rlist = append(rlist, SignerKey{
-			signer: k,
-			key:    v,
-		})
+func GenerateTestKeys() map[string]cheqdtests.KeyPair {
+	return map[string]cheqdtests.KeyPair{
+		ExistingDIDKey:    cheqdtests.GenerateKeyPair(),
 	}
-	return rlist
-}
-
-func (s TestSetup) CreateTestDIDs(keys map[string]KeyPair) error {
-	testDIDs := []struct {
-		signers []string
-		msg     *types.MsgCreateDidPayload
-	}{
-		{
-			signers: []string{AliceKey1},
-			msg: &types.MsgCreateDidPayload{
-				Id:             AliceDID,
-				Authentication: []string{AliceKey1},
-				VerificationMethod: []*types.VerificationMethod{
-					{
-						Id:         AliceKey1,
-						Type:       Ed25519VerificationKey2020,
-						Controller: AliceDID,
-					},
-				},
-			},
-		},
-		{
-			signers: []string{BobKey2},
-			msg: &types.MsgCreateDidPayload{
-				Id: BobDID,
-				Authentication: []string{
-					BobKey1,
-					BobKey2,
-					BobKey3,
-				},
-				CapabilityDelegation: []string{
-					BobKey4,
-				},
-				VerificationMethod: []*types.VerificationMethod{
-					{
-						Id:         BobKey1,
-						Type:       Ed25519VerificationKey2020,
-						Controller: BobDID,
-					},
-					{
-						Id:         BobKey2,
-						Type:       Ed25519VerificationKey2020,
-						Controller: BobDID,
-					},
-					{
-						Id:         BobKey3,
-						Type:       Ed25519VerificationKey2020,
-						Controller: BobDID,
-					},
-					{
-						Id:         BobKey4,
-						Type:       Ed25519VerificationKey2020,
-						Controller: BobDID,
-					},
-				},
-			},
-		},
-		{
-			signers: []string{CharlieKey2, BobKey2},
-			msg: &types.MsgCreateDidPayload{
-				Id: CharlieDID,
-				Authentication: []string{
-					CharlieKey1,
-					CharlieKey2,
-					CharlieKey3,
-				},
-				VerificationMethod: []*types.VerificationMethod{
-					{
-						Id:         CharlieKey1,
-						Type:       Ed25519VerificationKey2020,
-						Controller: BobDID,
-					},
-					{
-						Id:         CharlieKey2,
-						Type:       Ed25519VerificationKey2020,
-						Controller: BobDID,
-					},
-					{
-						Id:         CharlieKey3,
-						Type:       Ed25519VerificationKey2020,
-						Controller: BobDID,
-					},
-				},
-			},
-		},
-	}
-
-	for _, prefilled := range testDIDs {
-		msg := prefilled.msg
-
-		for _, vm := range msg.VerificationMethod {
-			encoded, err := multibase.Encode(multibase.Base58BTC, keys[vm.Id].PublicKey)
-			if err != nil {
-				return err
-			}
-			vm.PublicKeyMultibase = encoded
-		}
-
-		signerKeys := map[string]ed25519.PrivateKey{}
-		for _, signer := range prefilled.signers {
-			signerKeys[signer] = keys[signer].PrivateKey
-		}
-
-		_, err := s.SendCreateDid(msg, signerKeys)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }

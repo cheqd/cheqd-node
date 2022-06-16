@@ -1,22 +1,34 @@
 package tests
 
-const (
-	AliceDID     = "did:cheqd:test:aaaaaaaaaaaaaaaa"
-	BobDID       = "did:cheqd:test:bbbbbbbbbbbbbbbb"
-	CharlieDID   = "did:cheqd:test:cccccccccccccccc"
-	ImposterDID  = "did:cheqd:test:nananananananana"
-	NotFounDID   = "did:cheqd:test:nfdnfdnfdnfdnfdd"
-	AliceKey1    = AliceDID + "#key-1"
-	AliceKey2    = AliceDID + "#key-2"
-	BobKey1      = BobDID + "#key-1"
-	BobKey2      = BobDID + "#key-2"
-	BobKey3      = BobDID + "#key-3"
-	BobKey4      = BobDID + "#key-4"
-	ImposterKey1 = ImposterDID + "#key-1"
-	ImposterKey2 = ImposterDID + "#key-2"
-	NotFoundKey1 = NotFounDID + "#key-1"
-	CharlieKey1  = CharlieDID + "#key-1"
-	CharlieKey2  = CharlieDID + "#key-2"
-	CharlieKey3  = CharlieDID + "#key-3"
-	CharlieKey4  = CharlieDID + "#key-4"
+import (
+	"crypto/sha256"
+
+	"github.com/cheqd/cheqd-node/x/resource/types"
 )
+
+const (
+	CLSchemaType        = "CL-Schema"
+	SchemaData          = "{\"attr\":[\"name\",\"age\"]}"
+	TestResourceName    = "Test Resource Name"
+	JsonResourceType    = "application/json"
+	ResourceId          = "988b0ab3-6a39-4598-83ec-b84c6cf8da15"
+	IncorrectResourceId = "1234"
+
+	NotFounDID     = "did:cheqd:test:nfdnfdnfdnfdnfdd"
+	ExistingDID    = "did:cheqd:test:aaaaaaaaaaaaaaaa"
+	ExistingDIDKey = ExistingDID + "#key-1"
+)
+
+func ExistingResource() types.Resource {
+	data := []byte(SchemaData)
+	checksum := string(sha256.New().Sum(data))
+	return types.Resource{
+		CollectionId: ExistingDID,
+		Id:           "a09abea0-22e0-4b35-8f70-9cc3a6d0b5fd",
+		Name:         "Existing Resource Name",
+		ResourceType: CLSchemaType,
+		MimeType:     JsonResourceType,
+		Data:         data,
+		Checksum:     checksum,
+	}
+}
