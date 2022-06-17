@@ -33,8 +33,8 @@ import (
 type TestSetup struct {
 	cheqdtests.TestSetup
 
-	resourceKeeper  keeper.Keeper
-	resourceHandler sdk.Handler
+	ResourceKeeper  keeper.Keeper
+	ResourceHandler sdk.Handler
 }
 
 func Setup() TestSetup {
@@ -81,10 +81,11 @@ func Setup() TestSetup {
 			Keeper:  *cheqdKeeper,
 			Handler: cheqdHandler,
 		},
-		resourceKeeper:  *resourceKeeper,
-		resourceHandler: resourceHandler,
+		ResourceKeeper:  *resourceKeeper,
+		ResourceHandler: resourceHandler,
 	}
 
+	setup.Keeper.SetDidNamespace(ctx, "test")
 	return setup
 }
 
@@ -118,12 +119,12 @@ func (s *TestSetup) WrapCreateRequest(payload *types.MsgCreateResourcePayload, k
 }
 
 func (s *TestSetup) SendCreateResource(msg *types.MsgCreateResourcePayload, keys map[string]ed25519.PrivateKey) (*types.Resource, error) {
-	_, err := s.Handler(s.Ctx, s.WrapCreateRequest(msg, keys))
+	_, err := s.ResourceHandler(s.Ctx, s.WrapCreateRequest(msg, keys))
 	if err != nil {
 		return nil, err
 	}
 
-	created, _ := s.resourceKeeper.GetResource(&s.Ctx, msg.CollectionId, msg.Id)
+	created, _ := s.ResourceKeeper.GetResource(&s.Ctx, msg.CollectionId, msg.Id)
 	return &created, nil
 }
 

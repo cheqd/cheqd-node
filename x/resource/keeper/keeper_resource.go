@@ -58,7 +58,7 @@ func (k Keeper) SetResource(ctx *sdk.Context, resource *types.Resource) error {
 // GetResource returns a resource from its id
 func (k Keeper) GetResource(ctx *sdk.Context, collectionId string, id string) (types.Resource, error) {
 	if !k.HasResource(ctx, collectionId, id) {
-		return types.Resource{}, sdkerrors.ErrNotFound.Wrap(id)
+		return types.Resource{}, sdkerrors.ErrNotFound.Wrap("resource " + collectionId + ":" + id)
 	}
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.ResourceKey))
