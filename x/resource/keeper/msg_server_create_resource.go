@@ -49,8 +49,18 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	resource.Created = time.Now().UTC().Format(time.RFC3339)
 
 	// Find previous version and upgrade backward and forward version links
+	previousResourceVersion, found := k.GetLastResourceVersion(&ctx, resource.CollectionId, resource.Name, resource.ResourceType, resource.MimeType)
+	if found {
+		// Set links
+		previousResourceVersion.NextVersionId = resource.Id
+		resource.PreviousVersionId = previousResourceVersion.Id
 
-
+		// Update previous version
+		err := k.SetResource(&ctx, &previousResourceVersion)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	// Append backlink to didDoc
 	didDocStateValue.Metadata.Resources = append(didDocStateValue.Metadata.Resources, resource.Id)
