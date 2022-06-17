@@ -3,6 +3,8 @@ package tests
 import (
 	"crypto/ed25519"
 	"crypto/sha256"
+	"github.com/cheqd/cheqd-node/x/cheqd/utils"
+
 	// "crypto/sha256"
 	"fmt"
 	"testing"
@@ -37,7 +39,6 @@ func TestCreateResource(t *testing.T) {
 				Data:         []byte(SchemaData),
 			},
 			previousVersionId: "",
-			errMsg: "",
 		},
 		{
 			valid: true,
@@ -54,7 +55,6 @@ func TestCreateResource(t *testing.T) {
 				Data:         ExistingResource().Data,
 			},
 			previousVersionId: ExistingResource().Id,
-			errMsg: "",
 		},
 		{
 			valid:      false,
@@ -96,7 +96,7 @@ func TestCreateResource(t *testing.T) {
 				MimeType:     JsonResourceType,
 				Data:         []byte(SchemaData),
 			},
-			errMsg: fmt.Sprintf("signer: %s: signature is required but not found", ExistingDID),
+			errMsg: fmt.Sprintf("did:cheqd:test:%s: not found", NotFoundDIDIdentifier),
 		},
 	}
 
@@ -109,7 +109,8 @@ func TestCreateResource(t *testing.T) {
 			if tc.valid {
 				require.Nil(t, err)
 
-				didStateValue, err := resourceSetup.Keeper.GetDid(&resourceSetup.Ctx, resource.CollectionId)
+				did := utils.JoinDID("cheqd", "test", resource.CollectionId)
+				didStateValue, err := resourceSetup.Keeper.GetDid(&resourceSetup.Ctx, did)
 				require.Nil(t, err)
 				require.Contains(t, didStateValue.Metadata.Resources, resource.Id)
 
@@ -119,11 +120,8 @@ func TestCreateResource(t *testing.T) {
 				require.Equal(t, tc.msg.ResourceType, resource.ResourceType)
 				require.Equal(t, tc.msg.Data, resource.Data)
 				require.Equal(t, tc.msg.Name, resource.Name)
-				require.Equal(t, string(sha256.New().Sum(resource.Data)), resource.Checksum)
+				require.Equal(t, sha256.New().Sum(resource.Data), resource.Checksum)
 				require.Equal(t, tc.previousVersionId, resource.PreviousVersionId)
-				// if tc.previousVersionId != "" {
-				// 	require.Equal(t, resource.Id, resource.NextVersionId)
-				// }
 			} else {
 				require.Error(t, err)
 				require.Equal(t, tc.errMsg, err.Error())
@@ -131,13 +129,3 @@ func TestCreateResource(t *testing.T) {
 		})
 	}
 }
-
-// func TestHandler_ResourceDocAlreadyExists(t *testing.T) {
-// 	setup := Setup()
-
-// 	_, _, _ = setup.InitDid(AliceDID)
-// 	_, _, err := setup.InitDid(AliceDID)
-
-// 	require.Error(t, err)
-// 	require.Equal(t, fmt.Sprintf("%s: DID Doc exists", AliceDID), err.Error())
-// }

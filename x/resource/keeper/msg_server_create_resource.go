@@ -18,6 +18,10 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	// Validate corresponding DIDDoc exists
 	namespace := k.cheqdKeeper.GetDidNamespace(ctx)
 	did := cheqdutils.JoinDID(cheqdtypes.DidMethod, namespace, msg.Payload.CollectionId)
+	didDocStateValue, err := k.cheqdKeeper.GetDid(&ctx, did)
+	if err != nil {
+		return nil, err
+	}
 
 	// Validate Resource doesn't exist
 	if k.HasResource(&ctx, msg.Payload.CollectionId, msg.Payload.Id) {
@@ -25,7 +29,6 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	}
 
 	// Validate signatures
-	didDocStateValue, err := k.cheqdKeeper.GetDid(&ctx, did)
 	didDoc, err := didDocStateValue.UnpackDataAsDid()
 	if err != nil {
 		return nil, err
@@ -44,7 +47,20 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 
 	resource.Checksum = sha256.New().Sum(resource.Data)
 	resource.Created = time.Now().UTC().Format(time.RFC3339)
-	// TODO: set version + update forward and backward links
+
+	// Find previous version and upgrade backward and forward version links
+	previousResourceVersion, found := k.GetLastResourceVersion(&ctx, resource.CollectionId, resource.Name, resource.ResourceType, resource.MimeType)
+	if found {
+		// Set links
+		previousResourceVersion.NextVersionId = resource.Id
+		resource.PreviousVersionId = previousResourceVersion.Id
+
+		// Update previous version
+		err := k.SetResource(&ctx, &previousResourceVersion)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	// Append backlink to didDoc
 	didDocStateValue.Metadata.Resources = append(didDocStateValue.Metadata.Resources, resource.Id)
