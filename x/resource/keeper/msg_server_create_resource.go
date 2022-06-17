@@ -44,7 +44,6 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 
 	resource.Checksum = string(sha256.New().Sum(resource.Data))
 	resource.Created = time.Now().UTC().Format(time.RFC3339)
-	// TODO: set backlink to didDoc
 	// TODO: set version + update forward and backward links
 
 	// Append backlink to didDoc
