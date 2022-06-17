@@ -120,7 +120,7 @@ func TestCreateResource(t *testing.T) {
 				require.Equal(t, tc.msg.ResourceType, resource.ResourceType)
 				require.Equal(t, tc.msg.Data, resource.Data)
 				require.Equal(t, tc.msg.Name, resource.Name)
-				require.Equal(t, string(sha256.New().Sum(resource.Data)), resource.Checksum)
+				require.Equal(t, sha256.New().Sum(resource.Data), resource.Checksum)
 				require.Equal(t, tc.previousVersionId, resource.PreviousVersionId)
 			} else {
 				require.Error(t, err)

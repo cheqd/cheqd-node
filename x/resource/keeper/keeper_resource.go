@@ -83,8 +83,8 @@ func GetResourceKeyBytes(collectionId string, id string) []byte {
 	return []byte(collectionId + ":" + id)
 }
 
-func (k Keeper) GetLastResourceVersion(collectionId, id, name, resourceType, mimeType string) (uint64, error) {
-	store := prefix.NewStore(k.ctx.KVStore(k.storeKey), types.KeyPrefix(types.ResourceKey))
+//func (k Keeper) GetLastResourceVersion(collectionId, id, name, resourceType, mimeType string) (uint64, error) {
+//	store := prefix.NewStore(k.ctx.KVStore(k.storeKey), types.KeyPrefix(types.ResourceKey))
 
 
 // GetAllResources returns all resources as a list

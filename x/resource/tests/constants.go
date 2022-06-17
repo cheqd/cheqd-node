@@ -22,7 +22,7 @@ const (
 
 func ExistingResource() types.Resource {
 	data := []byte(SchemaData)
-	checksum := string(sha256.New().Sum(data))
+	checksum := sha256.New().Sum(data)
 	return types.Resource{
 		CollectionId: ExistingDIDIdentifier,
 		Id:           "a09abea0-22e0-4b35-8f70-9cc3a6d0b5fd",
