@@ -18,22 +18,22 @@ func IsUUID() *cheqdTypes.CustomErrorRule {
 	})
 }
 
-func isResourceTypeAllowed()*cheqdTypes.CustomErrorRule {
+func IsAllowedResourceType()*cheqdTypes.CustomErrorRule {
 	return cheqdTypes.NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.(string)
 		if !ok {
-			panic("IsDID must be only applied on string properties")
+			panic("IsAllowedResourceType must be only applied on string properties")
 		}
 
 		return utils.ValidateResourceType(casted)
 	})
 }
 
-func isMimeTypeAllowed()*cheqdTypes.CustomErrorRule {
+func IsAllowedMimeType()*cheqdTypes.CustomErrorRule {
 	return cheqdTypes.NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.(string)
 		if !ok {
-			panic("IsDID must be only applied on string properties")
+			panic("IsAllowedMimeType must be only applied on string properties")
 		}
 
 		return utils.ValidateMimeType(casted)

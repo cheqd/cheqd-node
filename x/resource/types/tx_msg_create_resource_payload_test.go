@@ -19,7 +19,7 @@ func TestMsgUpdateDidValidation(t *testing.T) {
 				Id:           "ba62c728-cb15-498b-8e9e-9259cc242186",
 				Name:         "Test Resource",
 				ResourceType: "CL-Schema",
-				MimeType:     "text/plain",
+				MimeType:     "application/json",
 				Data:         []byte {1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 			},
 			isValid: true,

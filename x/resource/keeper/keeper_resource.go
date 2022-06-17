@@ -83,12 +83,9 @@ func GetResourceKeyBytes(collectionId string, id string) []byte {
 	return []byte(collectionId + ":" + id)
 }
 
-// GetAllCollectionResourceIterator returns an iterator over all resources of a collection
-// It's up to the caller to close the iterator
-func (k Keeper) GetAllCollectionResourceIterator(ctx *sdk.Context, collectionId string) (iterator sdk.Iterator) {
-	collectionPrefix := types.KeyPrefix(types.ResourceKey + collectionId + ":")
-	return sdk.KVStorePrefixIterator(ctx.KVStore(k.storeKey), collectionPrefix)
-}
+func (k Keeper) GetLastResourceVersion(collectionId, id, name, resourceType, mimeType string) (uint64, error) {
+	store := prefix.NewStore(k.ctx.KVStore(k.storeKey), types.KeyPrefix(types.ResourceKey))
+
 
 // GetAllResources returns all resources as a list
 // Loads everything in memory. Use only for genesis export!

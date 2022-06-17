@@ -31,8 +31,8 @@ func (msg MsgCreateResourcePayload) Validate() error {
 		validation.Field(&msg.CollectionId, validation.Required, cheqdTypes.IsID()),
 		validation.Field(&msg.Id, validation.Required, IsUUID()),
 		validation.Field(&msg.Name, validation.Required, validation.Length(1, 64)),
-		validation.Field(&msg.ResourceType, validation.Required, isResourceTypeAllowed()),
-		validation.Field(&msg.ResourceType, validation.Required, isMimeTypeAllowed()),
+		validation.Field(&msg.ResourceType, validation.Required, IsAllowedResourceType()),
+		validation.Field(&msg.MimeType, validation.Required, IsAllowedMimeType()),
 		validation.Field(&msg.Data, validation.Required, validation.Length(1, 1024*1024)), // 1MB
 	)
 }
