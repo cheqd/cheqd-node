@@ -22,7 +22,7 @@ func isResourceTypeAllowed()*cheqdTypes.CustomErrorRule {
 	return cheqdTypes.NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.(string)
 		if !ok {
-			panic("IsDID must be only applied on string properties")
+			panic("isResourceTypeAllowed must be only applied on string properties")
 		}
 
 		return utils.ValidateResourceType(casted)
@@ -33,7 +33,7 @@ func isMimeTypeAllowed()*cheqdTypes.CustomErrorRule {
 	return cheqdTypes.NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.(string)
 		if !ok {
-			panic("IsDID must be only applied on string properties")
+			panic("isMimeTypeAllowed must be only applied on string properties")
 		}
 
 		return utils.ValidateMimeType(casted)

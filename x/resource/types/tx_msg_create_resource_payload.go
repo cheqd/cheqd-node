@@ -20,7 +20,7 @@ func (msg *MsgCreateResourcePayload) ToResource() Resource {
 		MimeType:     msg.MimeType,
 		Data:         msg.Data,
 		Created:      "",
-		Checksum:     "",
+		Checksum:     []byte {},
 	}
 }
 
@@ -32,7 +32,7 @@ func (msg MsgCreateResourcePayload) Validate() error {
 		validation.Field(&msg.Id, validation.Required, IsUUID()),
 		validation.Field(&msg.Name, validation.Required, validation.Length(1, 64)),
 		validation.Field(&msg.ResourceType, validation.Required, isResourceTypeAllowed()),
-		validation.Field(&msg.ResourceType, validation.Required, isMimeTypeAllowed()),
+		validation.Field(&msg.MimeType, validation.Required, isMimeTypeAllowed()),
 		validation.Field(&msg.Data, validation.Required, validation.Length(1, 1024*1024)), // 1MB
 	)
 }

@@ -11,7 +11,7 @@ var AllowedMimeTypes = []string {"application/json", "image/png"}
 
 func ValidateMimeType(rt string) error {
 	if ! cheqdUtils.Contains(AllowedMimeTypes, rt) {
-		return errors.New(rt + " mime type is not allowed. Only " + strings.Join(AllowedResourceTypes, ",") + " .")
+		return errors.New(rt + " mime type is not allowed. Only " + strings.Join(AllowedMimeTypes, ","))
 	}
 
 	return nil
