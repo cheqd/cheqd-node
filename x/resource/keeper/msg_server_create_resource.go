@@ -18,10 +18,6 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	// Validate corresponding DIDDoc exists
 	namespace := k.cheqdKeeper.GetDidNamespace(ctx)
 	did := cheqdutils.JoinDID(cheqdtypes.DidMethod, namespace, msg.Payload.CollectionId)
-	didDoc, err := k.cheqdKeeper.GetDid(&ctx, did)
-	if err != nil {
-		return nil, cheqdtypes.ErrDidDocNotFound.Wrapf(did)
-	}
 
 	// Validate Resource doesn't exist
 	if k.HasResource(&ctx, msg.Payload.CollectionId, msg.Payload.Id) {
@@ -48,17 +44,17 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 
 	resource.Checksum = sha256.New().Sum(resource.Data)
 	resource.Created = time.Now().UTC().Format(time.RFC3339)
-	// TODO: set backlink to didDoc
 	// TODO: set version + update forward and backward links
 
-	// Apply changes
-	err = k.SetResource(&ctx, &resource)
+	// Append backlink to didDoc
+	didDocStateValue.Metadata.Resources = append(didDocStateValue.Metadata.Resources, resource.Id)
+	err = k.cheqdKeeper.SetDid(&ctx, &didDocStateValue)
 	if err != nil {
 		return nil, types.ErrInternal.Wrapf(err.Error())
 	}
-	updatedMetadata := didDoc.Metadata
-	updatedMetadata.Resources = append(updatedMetadata.Resources, )
-	err = k.cheqdKeeper.SetDid(&ctx, didDoc.Data, &updatedMetadata)
+
+	// Persist resource
+	err = k.SetResource(&ctx, &resource)
 	if err != nil {
 		return nil, types.ErrInternal.Wrapf(err.Error())
 	}

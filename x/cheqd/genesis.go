@@ -2,7 +2,6 @@ package cheqd
 
 import (
 	"fmt"
-
 	"github.com/cheqd/cheqd-node/x/cheqd/keeper"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -12,12 +11,7 @@ import (
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 	for _, elem := range genState.DidList {
-		did, err := elem.UnpackDataAsDid()
-		if err != nil {
-			panic(fmt.Sprintf("Cannot import geneses case: %s", err.Error()))
-		}
-
-		if err = k.SetDid(&ctx, did, elem.Metadata); err != nil {
+		if err := k.SetDid(&ctx, elem); err != nil {
 			panic(fmt.Sprintf("Cannot set did case: %s", err.Error()))
 		}
 	}

@@ -50,8 +50,13 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 		return nil, err
 	}
 
-	// Apply changes
-	err = k.AppendDid(&ctx, &did, &metadata)
+	// Build state value
+	value, err := types.NewStateValue(&did, &metadata)
+	if err != nil {
+		return nil, err
+	}
+
+	err = k.SetDid(&ctx, &value)
 	if err != nil {
 		return nil, types.ErrInternal.Wrapf(err.Error())
 	}
