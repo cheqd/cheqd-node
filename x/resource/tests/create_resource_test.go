@@ -108,9 +108,9 @@ func TestCreateResource(t *testing.T) {
 			if tc.valid {
 				require.Nil(t, err)
 
-				// didStateValue, err := resourceSetup.Keeper.GetDid(&resourceSetup.Ctx, resource.CollectionId)
-				// require.Nil(t, err)
-				// require.Contains(t, didStateValue.Metadata.Resources, resource.Id)
+				didStateValue, err := resourceSetup.Keeper.GetDid(&resourceSetup.Ctx, resource.CollectionId)
+				require.Nil(t, err)
+				require.Contains(t, didStateValue.Metadata.Resources, resource.Id)
 
 				require.Equal(t, tc.msg.CollectionId, resource.CollectionId)
 				require.Equal(t, tc.msg.Id, resource.Id)

@@ -14,7 +14,8 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	// Validate corresponding DIDDoc exists
 	namespace := k.cheqdKeeper.GetDidNamespace(ctx)
 	did := cheqdutils.JoinDID(cheqdtypes.DidMethod, namespace, msg.Payload.CollectionId)
-	if !k.cheqdKeeper.HasDid(&ctx, did) {
+	didDoc, err := k.cheqdKeeper.GetDid(&ctx, did)
+	if err != nil {
 		return nil, cheqdtypes.ErrDidDocNotFound.Wrapf(did)
 	}
 
@@ -55,6 +56,12 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 
 	// Apply changes
 	err := k.SetResource(&ctx, &resource)
+	if err != nil {
+		return nil, types.ErrInternal.Wrapf(err.Error())
+	}
+	updatedMetadata := didDoc.Metadata
+	updatedMetadata.Resources = append(updatedMetadata.Resources, )
+	err = k.cheqdKeeper.SetDid(&ctx, didDoc.Data, &updatedMetadata)
 	if err != nil {
 		return nil, types.ErrInternal.Wrapf(err.Error())
 	}
