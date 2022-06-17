@@ -81,9 +81,16 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 		return nil, err
 	}
 
-	// Apply changes: return original id and modify state
+	// Return original id
 	updatedDid.ReplaceIds(updatedDid.Id, existingDid.Id)
-	err = k.SetDid(&ctx, &updatedDid, &updatedMetadata)
+
+	// Modify state
+	updatedStateValue, err = types.NewStateValue(&updatedDid, &updatedMetadata)
+	if err != nil {
+		return nil, err
+	}
+
+	err = k.SetDid(&ctx, &updatedStateValue)
 	if err != nil {
 		return nil, types.ErrInternal.Wrapf(err.Error())
 	}
