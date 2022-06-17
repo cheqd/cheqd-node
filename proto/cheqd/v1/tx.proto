@@ -10,6 +10,7 @@ import "cheqd/v1/did.proto";
 service Msg {
   rpc CreateDid(MsgCreateDid) returns (MsgCreateDidResponse);
   rpc UpdateDid(MsgUpdateDid) returns (MsgUpdateDidResponse);
+  rpc DeactivateDid(MsgUpdateDid) returns (MsgDeactivateDidResponse);
 }
 
 // this line is used by starport scaffolding # proto/tx/message
@@ -23,9 +24,36 @@ message MsgUpdateDid {
   repeated SignInfo signatures = 2;
 }
 
+// created DeactivateDid message
+message MsgDeactivateDid {
+  MsgUpdateDidPayload payload = 1;
+  repeated SignInfo signatures = 2;
+}
+
+
 message SignInfo {
   string verification_method_id = 1;
   string signature = 2;
+}
+
+// created DeactivateDid payload
+message MsgDeactivateDidPayload {
+  repeated string context = 1;
+  string id = 2;
+  repeated string controller = 3;
+  repeated VerificationMethod verification_method = 4;
+  repeated string authentication = 5;
+  repeated string assertion_method = 6;
+  repeated string capability_invocation = 7;
+  repeated string capability_delegation = 8;
+  repeated string key_agreement = 9;
+  repeated string also_known_as = 10;
+  repeated Service service = 11;
+}
+
+//created DeactivateDid response
+message MsgDeactivateDidResponse {
+  string id = 1; 
 }
 
 message MsgCreateDidPayload {
