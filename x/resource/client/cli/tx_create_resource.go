@@ -1,7 +1,8 @@
 package cli
 
 import (
-	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	cheqdcli "github.com/cheqd/cheqd-node/x/cheqd/client/cli"
+	"github.com/cheqd/cheqd-node/x/resource/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -10,10 +11,10 @@ import (
 
 func CmdCreateDid() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-did [payload-json] [ver-method-id-1] [priv-key-1] [ver-method-id-N] [priv-key-N] ...",
-		Short: "Creates a new DID.",
-		Long: "Creates a new DID. " +
-			"[payload-json] is JSON encoded MsgCreateDidPayload. " +
+		Use:   "create-resource [payload-json] [ver-method-id-1] [priv-key-1] [ver-method-id-N] [priv-key-N] ...",
+		Short: "Creates a new Resource.",
+		Long: "Creates a new Resource. " +
+			"[payload-json] is JSON encoded MsgCreateResourcePayload. " +
 			"[ver-method-id-N] is the DID fragment that points to the public part of the key in the ledger for the signature N." +
 			"[priv-key-1] is base base64 encoded ed25519 private key for signature N." +
 			"If 'interactive' value is used for a key, the key will be read interactively. " +
@@ -25,13 +26,13 @@ func CmdCreateDid() *cobra.Command {
 				return err
 			}
 
-			payloadJson, signInputs, err := GetPayloadAndSignInputs(clientCtx, args)
+			payloadJson, signInputs, err := cheqdcli.GetPayloadAndSignInputs(clientCtx, args)
 			if err != nil {
 				return err
 			}
 
 			// Unmarshal payload
-			var payload types.MsgCreateDidPayload
+			var payload types.MsgCreateResourcePayload
 			err = clientCtx.Codec.UnmarshalJSON([]byte(payloadJson), &payload)
 			if err != nil {
 				return err
@@ -39,15 +40,15 @@ func CmdCreateDid() *cobra.Command {
 
 			// Build identity message
 			signBytes := payload.GetSignBytes()
-			identitySignatures := SignWithSignInputs(signBytes, signInputs)
+			identitySignatures := cheqdcli.SignWithSignInputs(signBytes, signInputs)
 
-			msg := types.MsgCreateDid{
+			msg := types.MsgCreateResource{
 				Payload:    &payload,
 				Signatures: identitySignatures,
 			}
 
 			// Set fee-payer if not set
-			err = SetFeePayerFromSigner(&clientCtx)
+			err = cheqdcli.SetFeePayerFromSigner(&clientCtx)
 			if err != nil {
 				return err
 			}
