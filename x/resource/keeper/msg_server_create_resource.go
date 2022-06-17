@@ -2,6 +2,9 @@ package keeper
 
 import (
 	"context"
+	"crypto/sha256"
+	"time"
+
 	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	cheqdutils "github.com/cheqd/cheqd-node/x/cheqd/utils"
@@ -43,7 +46,8 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	// Build Resource
 	resource := msg.Payload.ToResource()
 
-	// TODO: set created, checksum
+	resource.Checksum = string(sha256.New().Sum(resource.Data))
+	resource.Created = time.Now().UTC().Format(time.RFC3339)
 	// TODO: set backlink to didDoc
 	// TODO: set version + update forward and backward links
 
