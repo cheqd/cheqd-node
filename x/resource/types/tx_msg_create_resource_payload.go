@@ -20,7 +20,7 @@ func (msg *MsgCreateResourcePayload) ToResource() Resource {
 		MimeType:     msg.MimeType,
 		Data:         msg.Data,
 		Created:      "",
-		Checksum:     "",
+		Checksum:     []byte{},
 	}
 }
 

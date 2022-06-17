@@ -18,7 +18,7 @@ func IsUUID() *cheqdTypes.CustomErrorRule {
 	})
 }
 
-func IsAllowedResourceType()*cheqdTypes.CustomErrorRule {
+func IsAllowedResourceType() *cheqdTypes.CustomErrorRule {
 	return cheqdTypes.NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.(string)
 		if !ok {
@@ -29,7 +29,7 @@ func IsAllowedResourceType()*cheqdTypes.CustomErrorRule {
 	})
 }
 
-func IsAllowedMimeType()*cheqdTypes.CustomErrorRule {
+func IsAllowedMimeType() *cheqdTypes.CustomErrorRule {
 	return cheqdTypes.NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.(string)
 		if !ok {

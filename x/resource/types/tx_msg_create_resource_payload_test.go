@@ -1,11 +1,12 @@
 package types
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
-func TestMsgUpdateDidValidation(t *testing.T) {
+func TestMsgCreateResourcePayloadValidation(t *testing.T) {
 	cases := []struct {
 		name     string
 		struct_  *MsgCreateResourcePayload
@@ -20,9 +21,35 @@ func TestMsgUpdateDidValidation(t *testing.T) {
 				Name:         "Test Resource",
 				ResourceType: "CL-Schema",
 				MimeType:     "application/json",
-				Data:         []byte {1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+				Data:         []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 			},
 			isValid: true,
+		},
+		{
+			name: "negative resource type",
+			struct_: &MsgCreateResourcePayload{
+				CollectionId: "123456789abcdefg",
+				Id:           "ba62c728-cb15-498b-8e9e-9259cc242186",
+				Name:         "Test Resource",
+				ResourceType: "Not-CL-Schema",
+				MimeType:     "image/png",
+				Data:         []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+			},
+			isValid:  false,
+			errorMsg: "resource_type: Not-CL-Schema resource type is not allowed. Only CL-Schema,JSONSchema2020.",
+		},
+		{
+			name: "negative mime type",
+			struct_: &MsgCreateResourcePayload{
+				CollectionId: "123456789abcdefg",
+				Id:           "ba62c728-cb15-498b-8e9e-9259cc242186",
+				Name:         "Test Resource",
+				ResourceType: "CL-Schema",
+				MimeType:     "text/data",
+				Data:         []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+			},
+			isValid:  false,
+			errorMsg: "mime_type: text/data mime type is not allowed. Only application/json,image/png.",
 		},
 	}
 

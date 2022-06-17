@@ -12,7 +12,7 @@ message Resource {
   string mime_type = 5;
   bytes data = 6;
   string created = 7;
-  string checksum = 8;
+  bytes checksum = 8;
   string previous_version_id = 9;
   string next_version_id = 10;
 }
