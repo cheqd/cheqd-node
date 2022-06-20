@@ -41,14 +41,14 @@ assert_tx_successful "$RESULT"
 
 # Build CreateResource message
 RESOURCE_ID=$(uuidgen)
-RESOURCE_NAME="Test resource"
-RESOURCE_DATA="dGVzdCBiYXNlNTYgZW5jb2RlZCBkYXRh"
 
 MSG_CREATE_RESOURCE='{
   "collection_id": "'${ID}'",
   "id": "'${RESOURCE_ID}'",
-  "name": "'${RESOURCE_NAME}'",
-  "data": "'${RESOURCE_DATA}'"
+  "name": "Test resource",
+  "mime_type": "application/json",
+  "resource_type": "CL-Schema",
+  "data": "dGVzdCBiYXNlNTYgZW5jb2RlZCBkYXRh"
 }';
 
 # Post the message
@@ -57,3 +57,18 @@ RESULT=$(cheqd-noded tx resource create-resource "${MSG_CREATE_RESOURCE}" "${KEY
   --from "${BASE_ACCOUNT_1}" ${TX_PARAMS})
 
 assert_tx_successful "$RESULT"
+
+# Query Resource
+# shellcheck disable=SC2086
+RESULT=$(cheqd-noded query resource resource "${ID}" ${RESOURCE_ID}  ${QUERY_PARAMS})
+
+EXPECTED='{
+  "collection_id": "'${ID}'",
+  "id": "'${RESOURCE_ID}'",
+  "name": "Test resource",
+  "mime_type": "application/json",
+  "resource_type": "CL-Schema",
+  "data": "dGVzdCBiYXNlNTYgZW5jb2RlZCBkYXRh"
+}'
+
+assert_json_eq "$(echo "$RESULT" | jq -r ".resource | del(.checksum, .created, .next_version_id, .previous_version_id)")" "${EXPECTED}"
