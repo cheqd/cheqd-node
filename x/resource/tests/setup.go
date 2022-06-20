@@ -35,6 +35,7 @@ type TestSetup struct {
 
 	ResourceKeeper  keeper.Keeper
 	ResourceHandler sdk.Handler
+	QueryServer     types.QueryServer
 }
 
 func Setup() TestSetup {
@@ -60,6 +61,7 @@ func Setup() TestSetup {
 	// Init Keepers
 	cheqdKeeper := cheqdkeeper.NewKeeper(cdc, cheqdStoreKey)
 	resourceKeeper := keeper.NewKeeper(cdc, resourceStoreKey)
+	queryServer := keeper.NewQueryServer(*resourceKeeper)
 
 	// Create Tx
 	txBytes := make([]byte, 28)
@@ -83,6 +85,7 @@ func Setup() TestSetup {
 		},
 		ResourceKeeper:  *resourceKeeper,
 		ResourceHandler: resourceHandler,
+		QueryServer: queryServer,
 	}
 
 	setup.Keeper.SetDidNamespace(ctx, "test")

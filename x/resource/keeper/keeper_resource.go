@@ -114,6 +114,29 @@ func (k Keeper) GetAllResourceVersions(ctx *sdk.Context, collectionId, name, res
 	return result
 }
 
+func (k Keeper) GetResourceCollection(ctx *sdk.Context, collectionId string) []*types.Resource {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.ResourceKey))
+	iterator := sdk.KVStorePrefixIterator(store, GetResourceCollectionPrefixBytes(collectionId))
+
+	resources := []*types.Resource{}
+
+	defer func(iterator sdk.Iterator) {
+		err := iterator.Close()
+		if err != nil {
+			panic(err.Error())
+		}
+	}(iterator)
+
+	for ; iterator.Valid(); iterator.Next() {
+		var val types.Resource
+		k.cdc.MustUnmarshal(iterator.Value(), &val)
+		resources = append(resources, &val)
+
+	}
+
+	return resources
+}
+
 func (k Keeper) GetLastResourceVersion(ctx *sdk.Context, collectionId, name, resourceType, mimeType string) (types.Resource, bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.ResourceKey))
 	iterator := sdk.KVStorePrefixIterator(store, GetResourceCollectionPrefixBytes(collectionId))

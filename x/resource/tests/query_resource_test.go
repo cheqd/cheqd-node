@@ -61,7 +61,7 @@ func TestQueryGetResource(t *testing.T) {
 			msg := tc.msg
 			resourceSetup := InitEnv(t, keys[ExistingDIDKey].PublicKey, keys[ExistingDIDKey].PrivateKey)
 
-			queryResponse, err := resourceSetup.ResourceKeeper.Resource(sdk.WrapSDKContext(resourceSetup.Ctx), msg)
+			queryResponse, err := resourceSetup.QueryServer.Resource(sdk.WrapSDKContext(resourceSetup.Ctx), msg)
 
 			if tc.valid {
 				resource := queryResponse.Resource
