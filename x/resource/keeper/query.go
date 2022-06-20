@@ -18,7 +18,7 @@ func NewQuerier(k Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 
 		switch path[0] {
 		case types.QueryGetResource:
-			return getResource(ctx, path[1], path[2], k, legacyQuerierCdc)
+			return resource(ctx, k, legacyQuerierCdc, path[1], path[2])
 		// case types.QueryGetCollectionResources:
 		// 	return getCollectionResources(ctx, path[1], k, legacyQuerierCdc)
 		// case types.QueryGetAllResourceVersions:
