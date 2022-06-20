@@ -19,10 +19,10 @@ func NewQuerier(k Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 		switch path[0] {
 		case types.QueryGetResource:
 			return resource(ctx, k, legacyQuerierCdc, path[1], path[2])
-		// case types.QueryGetCollectionResources:
-		// 	return getCollectionResources(ctx, path[1], k, legacyQuerierCdc)
-		// case types.QueryGetAllResourceVersions:
-		// 	return getAllResourceVersions(ctx, path[1], k, legacyQuerierCdc)
+		//case types.QueryGetCollectionResources:
+		//	return getCollectionResources(ctx, path[1], k, legacyQuerierCdc)
+		case types.QueryGetAllResourceVersions:
+			return allResourceVersions(ctx, k, legacyQuerierCdc, path[1], path[2], path[3], path[4])
 
 		default:
 			err = sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown %s query endpoint: %s", types.ModuleName, path[0])
