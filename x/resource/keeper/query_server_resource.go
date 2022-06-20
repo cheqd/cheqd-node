@@ -9,14 +9,14 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) Resource(c context.Context, req *types.QueryGetResourceRequest) (*types.QueryGetResourceResponse, error) {
+func (ms msgServer) Resource(c context.Context, req *types.QueryGetResourceRequest) (*types.QueryGetResourceResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
 	ctx := sdk.UnwrapSDKContext(c)
 
-	resource, err := k.GetResource(&ctx, req.CollectionId, req.Id)
+	resource, err := ms.GetResource(&ctx, req.CollectionId, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -24,17 +24,17 @@ func (k Keeper) Resource(c context.Context, req *types.QueryGetResourceRequest) 
 	return &types.QueryGetResourceResponse{Resource: &resource}, nil
 }
 
-func (k Keeper) CollectionResources(c context.Context, req *types.QueryGetCollectionResourcesRequest) (*types.QueryGetCollectionResourcesResponse, error) {
+func (ms msgServer) CollectionResources(c context.Context, req *types.QueryGetCollectionResourcesRequest) (*types.QueryGetCollectionResourcesResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
-	// ctx := sdk.UnwrapSDKContext(c)
+	ctx := sdk.UnwrapSDKContext(c)
 
-	// stateResource, err := k.GetAllResource(&ctx, req.CollectionId)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	stateResource, err := ms.GetResourceCollection(&ctx, req.CollectionId)
+	if err != nil {
+		return nil, err
+	}
 
 	// resource, err := stateResource.UnpackDataAsResource()
 	// if err != nil {
@@ -44,7 +44,7 @@ func (k Keeper) CollectionResources(c context.Context, req *types.QueryGetCollec
 	return &types.QueryGetCollectionResourcesResponse{Resources: []*types.Resource{}}, nil
 }
 
-func (k Keeper) AllResourceVersions(c context.Context, req *types.QueryGetAllResourceVersionsRequest) (*types.QueryGetAllResourceVersionsResponse, error) {
+func (m msgServer) AllResourceVersions(c context.Context, req *types.QueryGetAllResourceVersionsRequest) (*types.QueryGetAllResourceVersionsResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}

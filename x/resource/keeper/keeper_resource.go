@@ -72,6 +72,21 @@ func (k Keeper) GetResource(ctx *sdk.Context, collectionId string, id string) (t
 	return value, nil
 }
 
+// GetAllResource return a list of resources for corresponded DID
+func (ms msgServer) GetResourceCollection(ctx *sdk.Context, didId string) (types.Resource, error) {
+	didDocStateValue, err := ms.cheqdKeeper.GetDid(ctx, didId)
+	if err != nil {
+		return nil, err
+	}
+
+	value := []types.Resource
+	for rId := range didDocStateValue.Metadata.Resources {
+
+	}
+
+	return nil, err
+}
+
 // HasResource checks if the resource exists in the store
 func (k Keeper) HasResource(ctx *sdk.Context, collectionId string, id string) bool {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.ResourceKey))
