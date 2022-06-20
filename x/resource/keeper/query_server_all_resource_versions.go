@@ -1,17 +1,23 @@
 package keeper
 
-//func getResource(ctx sdk.Context, collectionId string, id string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
-//	queryServer := NewQueryServer(keeper)
-//
-//	resp, err := queryServer.Resource(sdk.WrapSDKContext(ctx), &types.QueryGetResourceRequest{CollectionId: collectionId, Id: id})
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, resp)
-//	if err != nil {
-//		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
-//	}
-//
-//	return bz, nil
-//}
+import (
+	"context"
+	"github.com/cheqd/cheqd-node/x/resource/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+)
+
+func (m queryServer) AllResourceVersions(c context.Context, req *types.QueryGetAllResourceVersionsRequest) (*types.QueryGetAllResourceVersionsResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(c)
+
+	versions := m.GetAllResourceVersions(&ctx, req.CollectionId, req.Name, req.ResourceType, req.MimeType)
+
+	return &types.QueryGetAllResourceVersionsResponse{
+		Resources: versions,
+	}, nil
+}
