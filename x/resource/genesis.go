@@ -12,7 +12,6 @@ import (
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 	for _, resource := range genState.ResourceList {
-
 		if err := k.SetResource(&ctx, resource); err != nil {
 			panic(fmt.Sprintf("Cannot set resource case: %s", err.Error()))
 		}
@@ -21,7 +20,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	// Set nym count
 	k.SetResourceCount(&ctx, uint64(len(genState.ResourceList)))
 
-	//k.SetResourceNamespace(ctx, genState.ResourceNamespace)
+	// k.SetResourceNamespace(ctx, genState.ResourceNamespace)
 }
 
 // ExportGenesis returns the cheqd module's exported genesis.

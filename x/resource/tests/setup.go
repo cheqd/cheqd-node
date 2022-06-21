@@ -85,7 +85,7 @@ func Setup() TestSetup {
 		},
 		ResourceKeeper:  *resourceKeeper,
 		ResourceHandler: resourceHandler,
-		QueryServer: queryServer,
+		QueryServer:     queryServer,
 	}
 
 	setup.Keeper.SetDidNamespace(&ctx, "test")

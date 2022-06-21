@@ -1,13 +1,14 @@
 package utils
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestValidateResourceType(t *testing.T) {
 	cases := []struct {
-		rt  string
+		rt    string
 		valid bool
 	}{
 		{"CL-Schema", true},

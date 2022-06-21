@@ -3,8 +3,9 @@ package types
 import (
 	"errors"
 	"fmt"
-	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"strings"
+
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	"github.com/multiformats/go-multibase"

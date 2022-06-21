@@ -1,11 +1,12 @@
 package app
 
 import (
-	"github.com/cheqd/cheqd-node/x/resource"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
+
+	"github.com/cheqd/cheqd-node/x/resource"
 
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
@@ -218,7 +219,7 @@ type App struct {
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
-	cheqdKeeper cheqdkeeper.Keeper
+	cheqdKeeper    cheqdkeeper.Keeper
 	resourceKeeper resourcekeeper.Keeper
 
 	// the module manager

@@ -4,8 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
 	"log"
+
+	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
 
 	"github.com/cheqd/cheqd-node/x/resource/client/cli"
 	"github.com/cheqd/cheqd-node/x/resource/types"
@@ -105,7 +106,7 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 type AppModule struct {
 	AppModuleBasic
 
-	keeper keeper.Keeper
+	keeper      keeper.Keeper
 	cheqdKeeper cheqdkeeper.Keeper
 }
 

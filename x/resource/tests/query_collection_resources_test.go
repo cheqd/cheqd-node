@@ -14,7 +14,7 @@ import (
 
 func TestQueryGetCollectionResources(t *testing.T) {
 	keys := GenerateTestKeys()
-	//existingResource := ExistingResource()
+	// existingResource := ExistingResource()
 	cases := []struct {
 		valid    bool
 		name     string

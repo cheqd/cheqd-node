@@ -13,7 +13,7 @@ type msgServer struct {
 // NewMsgServer returns an implementation of the MsgServer interface for the provided Keeper.
 func NewMsgServer(keeper Keeper, cheqdKeeper cheqdkeeper.Keeper) types.MsgServer {
 	return &msgServer{
-		Keeper: keeper,
+		Keeper:      keeper,
 		cheqdKeeper: cheqdKeeper,
 	}
 }

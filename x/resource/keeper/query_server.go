@@ -13,7 +13,7 @@ type queryServer struct {
 // NewQueryServer returns an implementation of the MsgServer interface for the provided Keeper.
 func NewQueryServer(keeper Keeper, cheqdKeeper cheqdkeeper.Keeper) types.QueryServer {
 	return &queryServer{
-		Keeper: keeper,
+		Keeper:      keeper,
 		cheqdKeeper: cheqdKeeper,
 	}
 }

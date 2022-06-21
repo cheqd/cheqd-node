@@ -3,11 +3,12 @@ package tests
 import (
 	"crypto/ed25519"
 	"crypto/sha256"
+	"fmt"
+	"testing"
+
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 
 	// "crypto/sha256"
-	"fmt"
-	"testing"
 
 	"github.com/cheqd/cheqd-node/x/resource/types"
 

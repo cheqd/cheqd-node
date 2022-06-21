@@ -2,8 +2,9 @@ package utils
 
 import (
 	"errors"
-	"github.com/google/uuid"
 	"strconv"
+
+	"github.com/google/uuid"
 )
 
 const StandardUuidLength = 36
