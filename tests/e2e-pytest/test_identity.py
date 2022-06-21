@@ -229,4 +229,4 @@ def test_did_wrong_verkey_update():
         "cheqd-noded tx",
         "cheqd update-did",
         f" '{json.dumps(msg_update_did)}' {key_id} {new_priv_key_base_64} --from {LOCAL_SENDER_ADDRESS} {LOCAL_NET_DESTINATION} {TEST_NET_GAS_X_GAS_PRICES} {YES_FLAG} {KEYRING_BACKEND_TEST}",
-        fr"{CODE_1101}(.*?)\"raw_log\":\"(.*?)signature is required but not found")
+        fr"{CODE_1100}(.*?)\"raw_log\":\"(.*?)there should be at least one valid signature by")
