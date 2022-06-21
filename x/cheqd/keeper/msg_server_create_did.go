@@ -17,7 +17,7 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 	}
 
 	// Validate namespaces
-	namespace := k.GetDidNamespace(ctx)
+	namespace := k.GetDidNamespace(&ctx)
 	err := msg.Validate([]string{namespace})
 	if err != nil {
 		return nil, types.ErrNamespaceValidation.Wrap(err.Error())

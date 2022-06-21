@@ -6,7 +6,7 @@ import (
 
 func (app *App) Migration05(ctx sdk.Context) {
 	oldKey := "testnettestnet"
-	namespase := app.cheqdKeeper.GetFromState(ctx, oldKey)
-	app.cheqdKeeper.DeteteFromState(ctx, oldKey)
-	app.cheqdKeeper.SetDidNamespace(ctx, namespase)
+	namespase := app.cheqdKeeper.GetFromState(&ctx, oldKey)
+	app.cheqdKeeper.DeleteFromState(&ctx, oldKey)
+	app.cheqdKeeper.SetDidNamespace(&ctx, namespase)
 }

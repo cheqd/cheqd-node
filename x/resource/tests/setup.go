@@ -61,7 +61,7 @@ func Setup() TestSetup {
 	// Init Keepers
 	cheqdKeeper := cheqdkeeper.NewKeeper(cdc, cheqdStoreKey)
 	resourceKeeper := keeper.NewKeeper(cdc, resourceStoreKey)
-	queryServer := keeper.NewQueryServer(*resourceKeeper)
+	queryServer := keeper.NewQueryServer(*resourceKeeper, *cheqdKeeper)
 
 	// Create Tx
 	txBytes := make([]byte, 28)
@@ -88,7 +88,7 @@ func Setup() TestSetup {
 		QueryServer: queryServer,
 	}
 
-	setup.Keeper.SetDidNamespace(ctx, "test")
+	setup.Keeper.SetDidNamespace(&ctx, "test")
 	return setup
 }
 

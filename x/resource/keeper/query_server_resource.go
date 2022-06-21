@@ -2,6 +2,8 @@ package keeper
 
 import (
 	"context"
+	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	cheqdutils "github.com/cheqd/cheqd-node/x/cheqd/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -15,6 +17,13 @@ func (q queryServer) Resource(c context.Context, req *types.QueryGetResourceRequ
 	}
 
 	ctx := sdk.UnwrapSDKContext(c)
+
+	// Validate corresponding DIDDoc exists
+	namespace := q.cheqdKeeper.GetDidNamespace(&ctx)
+	did := cheqdutils.JoinDID(cheqdtypes.DidMethod, namespace, req.CollectionId)
+	if !q.cheqdKeeper.HasDid(&ctx, did) {
+		return nil, cheqdtypes.ErrDidDocNotFound.Wrap(did)
+	}
 
 	resource, err := q.GetResource(&ctx, req.CollectionId, req.Id)
 	if err != nil {

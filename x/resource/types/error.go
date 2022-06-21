@@ -13,7 +13,6 @@ var (
 	ErrInvalidSignature           = sdkerrors.Register(ModuleName, 2100, "invalid signature detected")
 	ErrSignatureNotFound          = sdkerrors.Register(ModuleName, 2101, "signature is required but not found")
 	ErrResourceExists             = sdkerrors.Register(ModuleName, 2200, "Resoure exists")
-	ErrDidDocNotFound             = sdkerrors.Register(ModuleName, 2201, "DID Doc not found")
 	ErrVerificationMethodNotFound = sdkerrors.Register(ModuleName, 2202, "verification method not found")
 	ErrUnexpectedDidVersion       = sdkerrors.Register(ModuleName, 2203, "unexpected DID version")
 	ErrBasicValidation            = sdkerrors.Register(ModuleName, 2205, "basic validation failed")

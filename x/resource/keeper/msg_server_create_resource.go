@@ -16,7 +16,7 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Validate corresponding DIDDoc exists
-	namespace := k.cheqdKeeper.GetDidNamespace(ctx)
+	namespace := k.cheqdKeeper.GetDidNamespace(&ctx)
 	did := cheqdutils.JoinDID(cheqdtypes.DidMethod, namespace, msg.Payload.CollectionId)
 	didDocStateValue, err := k.cheqdKeeper.GetDid(&ctx, did)
 	if err != nil {

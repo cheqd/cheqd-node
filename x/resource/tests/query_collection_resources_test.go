@@ -14,7 +14,7 @@ import (
 
 func TestQueryGetCollectionResources(t *testing.T) {
 	keys := GenerateTestKeys()
-	existingResource := ExistingResource()
+	//existingResource := ExistingResource()
 	cases := []struct {
 		valid    bool
 		name     string
@@ -50,7 +50,7 @@ func TestQueryGetCollectionResources(t *testing.T) {
 				CollectionId: NotFoundDIDIdentifier,
 			},
 			response: nil,
-			errMsg:   fmt.Sprintf("resource %s:%s: not found", NotFoundDIDIdentifier, existingResource.Id),
+			errMsg:   fmt.Sprintf("did:cheqd:test:%s: DID Doc not found", NotFoundDIDIdentifier),
 		},
 	}
 

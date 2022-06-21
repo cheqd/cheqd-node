@@ -587,7 +587,7 @@ func (app *App) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.Respo
 
 func (app *App) TestNetMigration(ctx sdk.Context) {
 	if ctx.ChainID() == "cheqd-testnet-2" {
-		app.cheqdKeeper.SetDidNamespace(ctx, "testnet")
+		app.cheqdKeeper.SetDidNamespace(&ctx, "testnet")
 	}
 }
 

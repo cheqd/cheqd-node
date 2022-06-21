@@ -118,7 +118,7 @@ func (k Keeper) GetResourceCollection(ctx *sdk.Context, collectionId string) []*
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.ResourceKey))
 	iterator := sdk.KVStorePrefixIterator(store, GetResourceCollectionPrefixBytes(collectionId))
 
-	resources := []*types.Resource{}
+	var resources []*types.Resource
 
 	defer func(iterator sdk.Iterator) {
 		err := iterator.Close()

@@ -19,7 +19,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	// Set nym count
 	k.SetDidCount(&ctx, uint64(len(genState.DidList)))
 
-	k.SetDidNamespace(ctx, genState.DidNamespace)
+	k.SetDidNamespace(&ctx, genState.DidNamespace)
 }
 
 // ExportGenesis returns the cheqd module's exported genesis.
@@ -34,7 +34,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 		genesis.DidList = append(genesis.DidList, &elem)
 	}
 
-	genesis.DidNamespace = k.GetDidNamespace(ctx)
+	genesis.DidNamespace = k.GetDidNamespace(&ctx)
 
 	return genesis
 }
