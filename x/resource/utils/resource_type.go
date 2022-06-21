@@ -15,7 +15,7 @@ func IsValidResourceType(rt string) bool {
 
 func ValidateResourceType(rt string) error {
 	if !IsValidResourceType(rt) {
-		return errors.New(rt + " resource type is not allowed. Only " + strings.Join(AllowedResourceTypes, ","))
+		return errors.New(rt + " resource type is not allowed. Only " + strings.Join(AllowedResourceTypes, ", "))
 	}
 
 	return nil

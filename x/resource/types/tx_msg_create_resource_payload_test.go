@@ -36,7 +36,7 @@ func TestMsgCreateResourcePayloadValidation(t *testing.T) {
 				Data:         []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 			},
 			isValid:  false,
-			errorMsg: "resource_type: Not-CL-Schema resource type is not allowed. Only CL-Schema,JSONSchema2020.",
+			errorMsg: "mime_type: image/png mime type is not allowed. Only application/json, application/octet-stream, text/plain; resource_type: Not-CL-Schema resource type is not allowed. Only CL-Schema, JSONSchema2020.",
 		},
 		{
 			name: "negative mime type",
@@ -49,7 +49,7 @@ func TestMsgCreateResourcePayloadValidation(t *testing.T) {
 				Data:         []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 			},
 			isValid:  false,
-			errorMsg: "mime_type: text/data mime type is not allowed. Only application/json,image/png.",
+			errorMsg: "mime_type: text/data mime type is not allowed. Only application/json, application/octet-stream, text/plain.",
 		},
 	}
 

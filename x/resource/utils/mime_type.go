@@ -15,7 +15,7 @@ func IsValidMimeType(rt string) bool {
 
 func ValidateMimeType(rt string) error {
 	if !IsValidMimeType(rt) {
-		return errors.New(rt + " mime type is not allowed. Only " + strings.Join(AllowedMimeTypes, ","))
+		return errors.New(rt + " mime type is not allowed. Only " + strings.Join(AllowedMimeTypes, ", "))
 	}
 
 	return nil
