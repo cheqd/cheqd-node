@@ -12,6 +12,7 @@ const (
 	TestResourceName    = "Test Resource Name"
 	JsonResourceType    = "application/json"
 	ResourceId          = "988b0ab3-6a39-4598-83ec-b84c6cf8da15"
+	AnotherResourceId   = "71583c78-f16f-11ec-9dd4-cba0f34eb177"
 	IncorrectResourceId = "1234"
 
 	NotFoundDIDIdentifier = "nfdnfdnfdnfdnfdd"

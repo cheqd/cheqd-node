@@ -1,9 +1,6 @@
 package tests
 
 import (
-
-	// "crypto/sha256"
-	// "crypto/ed25519"
 	"fmt"
 	"testing"
 
@@ -14,7 +11,7 @@ import (
 
 func TestQueryGetCollectionResources(t *testing.T) {
 	keys := GenerateTestKeys()
-	// existingResource := ExistingResource()
+	existingResource := ExistingResource()
 	cases := []struct {
 		valid    bool
 		name     string
@@ -22,27 +19,17 @@ func TestQueryGetCollectionResources(t *testing.T) {
 		response *types.QueryGetCollectionResourcesResponse
 		errMsg   string
 	}{
-		// {
-		// 	valid: true,
-		// 	name:  "Valid: Works",
-		// 	msg: &types.QueryGetCollectionResourcesRequest{
-		// 		CollectionId: ExistingDIDIdentifier,
-		// 	},
-		// 	response: &types.QueryGetCollectionResourcesResponse{
-		// 		Resources: []*types.Resource{&existingResource},
-		// 	},
-		// 	errMsg: "",
-		// },
-		// {
-		// 	valid: false,
-		// 	name:  "Not Valid: Resource is not found",
-		// 	msg: &types.QueryGetCollectionResources{
-		// 		CollectionId: ExistingDIDIdentifier,
-		// 		Id:           ResourceId,
-		// 	},
-		// 	response: nil,
-		// 	errMsg:   fmt.Sprintf("resource %s:%s: not found", ExistingDIDIdentifier, ResourceId),
-		// },
+		{
+			valid: true,
+			name:  "Valid: Works",
+			msg: &types.QueryGetCollectionResourcesRequest{
+				CollectionId: ExistingDIDIdentifier,
+			},
+			response: &types.QueryGetCollectionResourcesResponse{
+				Resources: []*types.Resource{&existingResource},
+			},
+			errMsg: "",
+		},
 		{
 			valid: false,
 			name:  "Not Valid: DID Doc is not found",
@@ -59,23 +46,11 @@ func TestQueryGetCollectionResources(t *testing.T) {
 			msg := tc.msg
 			resourceSetup := InitEnv(t, keys[ExistingDIDKey].PublicKey, keys[ExistingDIDKey].PrivateKey)
 
-			// newResourcePayload := GenerateCreateResourcePayload(ExistingResource())
-			// newResourcePayload.Id = ResourceId
-			// didKey := map[string]ed25519.PrivateKey{
-			// 	ExistingDIDKey: keys[ExistingDIDKey].PrivateKey,
-			// }
-			// createdResource, err := resourceSetup.SendCreateResource(newResourcePayload, didKey)
-			// require.Nil(t, err)
-
 			queryResponse, err := resourceSetup.QueryServer.CollectionResources(sdk.WrapSDKContext(resourceSetup.Ctx), msg)
 
 			if tc.valid {
 				resources := queryResponse.Resources
 				expectedResources := tc.response.Resources
-				// expectedResources := map[string]types.Resource {
-				// 	existingResource.Id: existingResource,
-				// 	createdResource.Id: *createdResource,
-				// }
 				require.Nil(t, err)
 				require.Equal(t, len(expectedResources), len(resources))
 				for i, r := range resources {
