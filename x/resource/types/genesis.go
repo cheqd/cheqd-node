@@ -14,13 +14,13 @@ func DefaultGenesis() *GenesisState {
 // Validate performs basic genesis state validation returning an error upon any
 // failure.
 func (gs GenesisState) Validate() error {
-	// TODO: Are resource ids unique within a collection or globally?
 	resourceIdMap := make(map[string]bool)
 
 	for _, resource := range gs.ResourceList {
+		collectionResourceId := resource.CollectionId + ":" + resource.Id
 
-		if _, ok := resourceIdMap[resource.Id]; ok {
-			return fmt.Errorf("duplicated id for resource")
+		if _, ok := resourceIdMap[collectionResourceId]; ok {
+			return fmt.Errorf("duplicated id for resource within the same collection: %s", collectionResourceId)
 		}
 
 		resourceIdMap[resource.Id] = true

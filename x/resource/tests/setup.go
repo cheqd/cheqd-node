@@ -10,15 +10,12 @@ import (
 	"github.com/cheqd/cheqd-node/x/cheqd"
 	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
 
-	// "github.com/btcsuite/btcutil/base58"
 	cheqdtests "github.com/cheqd/cheqd-node/x/cheqd/tests"
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cheqd/cheqd-node/x/resource"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/stretchr/testify/require"
-
-	// "github.com/multiformats/go-multibase"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store"

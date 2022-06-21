@@ -12,7 +12,6 @@ func TestValidateMimeType(t *testing.T) {
 		valid bool
 	}{
 		{"application/json", true},
-		{"image/png", true},
 		{"my/mime", false},
 		{"notMine/type", false},
 	}

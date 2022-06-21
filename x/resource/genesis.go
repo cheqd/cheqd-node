@@ -8,7 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// InitGenesis initializes the cheqd module's state from a provided genesis
+// InitGenesis initializes the resource module's state from a provided genesis
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 	for _, resource := range genState.ResourceList {
@@ -16,26 +16,18 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 			panic(fmt.Sprintf("Cannot set resource case: %s", err.Error()))
 		}
 	}
-
-	// Set nym count
-	k.SetResourceCount(&ctx, uint64(len(genState.ResourceList)))
-
-	// k.SetResourceNamespace(ctx, genState.ResourceNamespace)
 }
 
 // ExportGenesis returns the cheqd module's exported genesis.
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
-	genesis := types.DefaultGenesis()
+	genesis := types.GenesisState{}
 
-	// this line is used by starport scaffolding # genesis/module/export
 	// Get all resource
-	//resourceList := k.GetAllResource(&ctx)
-	//for _, elem := range resourceList {
-	//	elem := elem
-	//	genesis.ResourceList = append(genesis.ResourceList, &elem)
-	//}
-	//
-	//genesis.ResourceNamespace = k.GetResourceNamespace(ctx)
+	resourceList := k.GetAllResources(&ctx)
+	for _, elem := range resourceList {
+		elem := elem
+		genesis.ResourceList = append(genesis.ResourceList, &elem)
+	}
 
-	return genesis
+	return &genesis
 }
