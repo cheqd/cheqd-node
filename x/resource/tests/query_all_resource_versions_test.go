@@ -11,7 +11,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-
 func SendAnotherResourceVersion(t require.TestingT, resourceSetup TestSetup, keys map[string]cheqdtests.KeyPair) types.Resource {
 	newResourcePayload := GenerateCreateResourcePayload(ExistingResource())
 	newResourcePayload.Id = AnotherResourceId
@@ -24,7 +23,6 @@ func SendAnotherResourceVersion(t require.TestingT, resourceSetup TestSetup, key
 
 	return *createdResource
 }
-
 
 func TestQueryGetAllResourceVersions(t *testing.T) {
 	keys := GenerateTestKeys()
@@ -41,9 +39,9 @@ func TestQueryGetAllResourceVersions(t *testing.T) {
 			name:  "Valid: Works",
 			msg: &types.QueryGetAllResourceVersionsRequest{
 				CollectionId: ExistingDIDIdentifier,
-				Name: existingResource.Name,
+				Name:         existingResource.Name,
 				ResourceType: existingResource.ResourceType,
-				MimeType: existingResource.MimeType,
+				MimeType:     existingResource.MimeType,
 			},
 			response: &types.QueryGetAllResourceVersionsResponse{
 				Resources: []*types.Resource{&existingResource},
@@ -55,9 +53,9 @@ func TestQueryGetAllResourceVersions(t *testing.T) {
 			name:  "Not Valid: DID Doc is not found",
 			msg: &types.QueryGetAllResourceVersionsRequest{
 				CollectionId: NotFoundDIDIdentifier,
-				Name: existingResource.Name,
+				Name:         existingResource.Name,
 				ResourceType: existingResource.ResourceType,
-				MimeType: existingResource.MimeType,
+				MimeType:     existingResource.MimeType,
 			},
 			response: nil,
 			errMsg:   fmt.Sprintf("did:cheqd:test:%s: DID Doc not found", NotFoundDIDIdentifier),
@@ -86,9 +84,9 @@ func TestQueryGetAllResourceVersions(t *testing.T) {
 			if tc.valid {
 				resources := queryResponse.Resources
 				existingResource.NextVersionId = createdResource.Id
-				expectedResources := map[string]types.Resource {
+				expectedResources := map[string]types.Resource{
 					existingResource.Id: existingResource,
-					createdResource.Id: *createdResource,
+					createdResource.Id:  *createdResource,
 				}
 				require.Nil(t, err)
 				require.Equal(t, len(expectedResources), len(resources))
