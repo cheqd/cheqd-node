@@ -74,10 +74,40 @@ class Release:
     def __str__(self):
         return f"Name: {self.version}, Tar URL: {self.get_tar_gz_url()}"
 
+
 def failure_exit(reason):
     print(f"Reason of failure: {reason}")
     print("Exiting....")
     sys.exit(1)
+
+
+def post_process(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwds):
+        _allow_error = kwds.get('allow_error', False)
+        try:
+            value = func(*args)
+        except subprocess.CalledProcessError as err:
+            if err.returncode and _allow_error:
+                return err
+            failure_exit(err)
+        return value
+
+    return wrapper
+
+
+def default_answer(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwds):
+        _default = kwds.get('default', "")
+        if _default:
+            args = list(args)
+            args[-1] += f"[{_default}] {os.linesep}"
+        value = func(*args)
+        return value if value != "" else _default
+
+    return wrapper
+
 
 class Installer():
     def __init__(self, interviewer):
@@ -170,21 +200,6 @@ if $programname == '{binary_name}' then {self.cheqd_log_dir}/stdout.log
     @property
     def cosmovisor_cheqd_bin_path(self):
         return os.path.join(self.cosmovisor_root_dir, f"current/bin/{DEFAULT_BINARY_NAME}")
-
-    @staticmethod
-    def post_process(func):
-        @functools.wraps(func)
-        def wrapper(*args, **kwds):
-            _allow_error = kwds.get('allow_error', False)
-            try:
-                value = func(*args)
-            except subprocess.CalledProcessError as err:
-                if err.returncode and _allow_error:
-                    return err
-                failure_exit(err)
-            return value
-
-        return wrapper
 
     def log(self, msg):
         if self.verbose:
@@ -354,6 +369,9 @@ if $programname == '{binary_name}' then {self.cheqd_log_dir}/stdout.log
         thread = threading.Thread(target=functools.partial(self.exec, cmd))
         thread.start()
         sec_counter = 0
+
+        # wait small period of time for waiting the command running
+        time.sleep(3)
         while thread.is_alive():
             time.sleep(60)
             sec_counter += 60
@@ -498,19 +516,6 @@ class Interviewer:
                 self.release = _t[0]
             else:
                 failure_exit(f"Version: {answer} does not exist")
-
-    @staticmethod
-    def default_answer(func):
-        @functools.wraps(func)
-        def wrapper(*args, **kwds):
-            _default = kwds.get('default', "")
-            if _default:
-                args = list(args)
-                args[-1] += f"[{_default}] {os.linesep}"
-            value = func(*args)
-            return value if value != "" else _default
-
-        return wrapper
 
     @default_answer
     def ask(self, question, **kwargs):
