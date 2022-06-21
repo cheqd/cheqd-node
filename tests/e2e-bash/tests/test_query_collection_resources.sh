@@ -105,6 +105,58 @@ RESULT=$(cheqd-noded tx resource create-resource "${MSG_CREATE_RESOURCE1_V2}" "$
 assert_tx_successful "$RESULT"
 
 
+########## Creating DID 2 ##########
+
+ID2="$(random_string)"
+DID2="did:cheqd:testnet:$ID2"
+KEY2_ID="${DID2}#key1"
+
+MSG_CREATE_DID_2='{
+  "id": "'${DID2}'",
+  "verification_method": [{
+    "id": "'${KEY2_ID}'",
+    "type": "Ed25519VerificationKey2020",
+    "controller": "'${DID2}'",
+    "public_key_multibase": "'${ALICE_VER_PUB_MULTIBASE_58}'"
+  }],
+  "authentication": [
+    "'${KEY2_ID}'"
+  ]
+}';
+
+# Post the message
+# shellcheck disable=SC2086
+RESULT=$(cheqd-noded tx cheqd create-did "${MSG_CREATE_DID_2}" "${KEY2_ID}" "${ALICE_VER_PRIV_BASE_64}" \
+  --from "${BASE_ACCOUNT_1}" ${TX_PARAMS})
+
+assert_tx_successful "$RESULT"
+
+
+########## Creating Resource 2 ##########
+
+RESOURCE2_ID=$(uuidgen)
+RESOURCE2_DATA='dGVzdCBiYXNlNTYgZW5jb2RlZCBkYXRhdGVzdCBiYXNlNTYgZW5jb2RlZCBkYXRh';
+RESOURCE2_NAME="Resource 2"
+RESOURCE2_MIME_TYPE="application/json"
+RESOURCE2_RESOURCE_TYPE="CL-Schema"
+
+MSG_CREATE_RESOURCE2='{
+  "collection_id": "'${ID2}'",
+  "id": "'${RESOURCE2_ID}'",
+  "name": "'${RESOURCE2_NAME}'",
+  "mime_type": "'${RESOURCE2_MIME_TYPE}'",
+  "resource_type": "'${RESOURCE2_RESOURCE_TYPE}'",
+  "data": "'${RESOURCE2_DATA}'"
+}';
+
+# Post the message
+# shellcheck disable=SC2086
+RESULT=$(cheqd-noded tx resource create-resource "${MSG_CREATE_RESOURCE2}" "${KEY2_ID}" "${ALICE_VER_PRIV_BASE_64}" \
+  --from "${BASE_ACCOUNT_1}" ${TX_PARAMS})
+
+assert_tx_successful "$RESULT"
+
+
 ########## Querying All Resource 1 versions ##########
 
 EXPECTED_RES1_V2='{
@@ -117,7 +169,7 @@ EXPECTED_RES1_V2='{
 }'
 
 # shellcheck disable=SC2086
-RESULT=$(cheqd-noded query resource all-resource-versions "${ID1}" "${RESOURCE1_V1_NAME}" ${RESOURCE1_V1_RESOURCE_TYPE} ${RESOURCE1_V1_MIME_TYPE} ${QUERY_PARAMS})
+RESULT=$(cheqd-noded query resource collection-resources "${ID1}" ${QUERY_PARAMS})
 
 assert_eq "$(echo "$RESULT" | jq -r ".resources | length")" "2"
 assert_json_eq "$(echo "$RESULT" | jq -r '.resources[] | select(.id == "'"${RESOURCE1_V1_ID}"'") | '"${DEL_FILTER}"'')" "${EXPECTED_RES1_V1}"
