@@ -20,8 +20,8 @@ func NewQuerier(k Keeper, cheqdKeeper cheqdkeeper.Keeper, legacyQuerierCdc *code
 		switch path[0] {
 		case types.QueryGetResource:
 			return resource(ctx, k, cheqdKeeper, legacyQuerierCdc, path[1], path[2])
-		// case types.QueryGetCollectionResources:
-		//	return getCollectionResources(ctx, path[1], k, legacyQuerierCdc)
+		case types.QueryGetCollectionResources:
+			return collectionResources(ctx, k, cheqdKeeper, legacyQuerierCdc, path[1])
 		case types.QueryGetAllResourceVersions:
 			return allResourceVersions(ctx, k, cheqdKeeper, legacyQuerierCdc, path[1], path[2], path[3], path[4])
 
