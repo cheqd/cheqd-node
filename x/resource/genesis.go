@@ -22,7 +22,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis := types.GenesisState{}
 
-	//Get all resource
+	// Get all resource
 	resourceList := k.GetAllResources(&ctx)
 	for _, elem := range resourceList {
 		elem := elem
