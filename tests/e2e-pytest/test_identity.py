@@ -5,7 +5,7 @@ import pytest
 from helpers import run, LOCAL_SENDER_ADDRESS, LOCAL_RECEIVER_ADDRESS, LOCAL_NET_DESTINATION, GAS_PRICE, YES_FLAG, \
     KEYRING_BACKEND_TEST, get_gas_extimation, CODE_0, TEST_NET_GAS_X_GAS_PRICES, generate_ed25519_key, random_string, \
     build_create_did_msg, json_loads, build_update_did_msg, CODE_1101, CODE_1203, get_balance, GAS_AMOUNT, CODE_5, \
-    CODE_11, generate_public_multibase, generate_didбб CODE_1100
+    CODE_11, generate_public_multibase, generate_did, CODE_1100
 
 
 @pytest.mark.parametrize("magic_number_positive", [1.3, 2, 3, 10])
