@@ -52,7 +52,7 @@ func TestQueryGetResource(t *testing.T) {
 				Id:           existingResource.Id,
 			},
 			response: nil,
-			errMsg:   fmt.Sprintf("resource %s:%s: not found", NotFoundDIDIdentifier, existingResource.Id),
+			errMsg:   fmt.Sprintf("did:cheqd:test:%s: DID Doc not found", NotFoundDIDIdentifier),
 		},
 	}
 
