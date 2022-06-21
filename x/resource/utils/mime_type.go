@@ -7,7 +7,7 @@ import (
 	cheqdUtils "github.com/cheqd/cheqd-node/x/cheqd/utils"
 )
 
-var AllowedMimeTypes = []string{"application/json", "image/png"}
+var AllowedMimeTypes = []string{"application/json", "application/octet-stream", "text/plain"}
 
 func IsValidMimeType(rt string) bool {
 	return cheqdUtils.Contains(AllowedMimeTypes, rt)
