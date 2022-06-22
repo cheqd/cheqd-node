@@ -572,7 +572,7 @@ class Interviewer:
 
     def ask_for_external_address(self):
         answer = self.ask(
-            f"What is external IP address for your node? Please type in format: <ip_address>:<port>{os.linesep}",
+            f"What are the external IP address and the P2P port (default is 26656) for your node? Please type in format: <ip_address>:<port>{os.linesep}",
             default=""
         )
         self.external_address = answer
