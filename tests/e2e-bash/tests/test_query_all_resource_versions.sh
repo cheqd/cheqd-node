@@ -60,7 +60,7 @@ MSG_CREATE_RESOURCE1='{
 
 # Post the message
 # shellcheck disable=SC2086
-RESULT=$(cheqd-noded tx resource create-resource "${MSG_CREATE_RESOURCE1}" "${KEY1_ID}" "${ALICE_VER_PRIV_BASE_64}" \
+RESULT=$(cheqd-noded tx resource create-resource-raw "${MSG_CREATE_RESOURCE1}" "${KEY1_ID}" "${ALICE_VER_PRIV_BASE_64}" \
   --from "${BASE_ACCOUNT_1}" ${TX_PARAMS})
 
 assert_tx_successful "$RESULT"
@@ -99,7 +99,7 @@ MSG_CREATE_RESOURCE1_V2='{
 
 # Post the message
 # shellcheck disable=SC2086
-RESULT=$(cheqd-noded tx resource create-resource "${MSG_CREATE_RESOURCE1_V2}" "${KEY1_ID}" "${ALICE_VER_PRIV_BASE_64}" \
+RESULT=$(cheqd-noded tx resource create-resource-raw "${MSG_CREATE_RESOURCE1_V2}" "${KEY1_ID}" "${ALICE_VER_PRIV_BASE_64}" \
   --from "${BASE_ACCOUNT_1}" ${TX_PARAMS})
 
 assert_tx_successful "$RESULT"
@@ -124,7 +124,7 @@ MSG_CREATE_RESOURCE2='{
 
 # Post the message
 # shellcheck disable=SC2086
-RESULT=$(cheqd-noded tx resource create-resource "${MSG_CREATE_RESOURCE2}" "${KEY1_ID}" "${ALICE_VER_PRIV_BASE_64}" \
+RESULT=$(cheqd-noded tx resource create-resource-raw "${MSG_CREATE_RESOURCE2}" "${KEY1_ID}" "${ALICE_VER_PRIV_BASE_64}" \
   --from "${BASE_ACCOUNT_1}" ${TX_PARAMS})
 
 assert_tx_successful "$RESULT"
