@@ -1,0 +1,27 @@
+[Unit]
+Description=Service for running cheqd-node daemon
+After=network.target
+Documentation=https://docs.cheqd.io/node
+
+[Service]
+Environment="DAEMON_HOME={self.cheqd_root_dir}"
+Environment="DAEMON_NAME={DEFAULT_BINARY_NAME}"
+Environment="DAEMON_ALLOW_DOWNLOAD_BINARIES=true"
+Environment="DAEMON_RESTART_AFTER_UPGRADE=true"
+Environment="UNSAFE_SKIP_BACKUP=true"
+Type=simple
+User=cheqd
+ExecStart=/usr/bin/cosmovisor run start
+Restart=on-failure
+RestartSec=30
+StartLimitBurst=5
+StartLimitInterval=60
+TimeoutSec=120
+StandardOutput=syslog
+StandardError=syslog
+SyslogFacility=syslog
+SyslogIdentifier=cosmovisor
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target
