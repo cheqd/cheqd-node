@@ -173,7 +173,6 @@ func (k Keeper) GetAllResources(ctx *sdk.Context) (list []types.Resource) {
 	defer closeIteratorOrPanic(headerIterator)
 	defer closeIteratorOrPanic(dataIterator)
 
-
 	for headerIterator.Valid() {
 		if !dataIterator.Valid() {
 			panic("number of headers and data don't match")

@@ -33,6 +33,6 @@ func ExistingResource() types.Resource {
 			MimeType:     JsonResourceType,
 			Checksum:     checksum,
 		},
-		Data:         data,
+		Data: data,
 	}
 }
