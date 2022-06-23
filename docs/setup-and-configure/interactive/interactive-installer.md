@@ -21,7 +21,7 @@ During the installation process you will see the following questions:
 * `Which version do you want to install? Or type 'list' to get the list of releases: [v0.5.0]`. Possible answers are the exact versions that currently exist, for example type `0.4.0` or `0.5.0` or `list`(in this case the last 5 releases will be printed and you can choose what the version is needed)
 
 ```text
-Which version do you want to install? Or type 'list' to get the list of releases: [v0.5.0]
+Which version below do you want to install? Please enter the list item number below [1]: 
 list
 1) v0.5.0
 2) v0.4.1
@@ -32,13 +32,13 @@ Please insert the number by picking up the version: 1
 ```
 
 * `Please, type the path to home directory for user cheqd. To keep the default value, just type 'Enter': [/home/cheqd]`. Here you need to specify the path to home directory for the new user `cheqd`. By default `/home/cheqd` will be used.
+* `Do you want to run a node or just use the CLI? [No]`. If you are installing the node from the beginning, you can use this ability to setup your node. Possible variants for answering `y, n, yes, no`. If the answer was `Yes`, the next questions will be about the config settings.
 * `Do you want to use Cosmovisor? Please type any kind of variants (yes/no) [yes]:`. With current installer we are proposing the ability to setup cosmovisor. It will help you with upgrades, it allows to do it in the full automatic mode. Possible variants for answering (yes/no) [yes].
 * `Which chain do you want to use? Possible variants are: testnet, mainnet [testnet]`. For now, we have 2 networks, `testnet` and `mainnet`. Please, type here which chain you want to use or just keep the default by clicking `Enter`.
-* `Do you want to deploy the latest snapshot? Please type any kind of variants: yes, no, y, n. [No]`. This can help you speed up the catchup to cheqd network. Possible variants for answering `y, n, yes, no`.
-* If you chose 'Yes' answering on previous question the next question will be about the URL to snapshot: `Which snapshot do you want to use? Please type the full URL to archive or press return to use the latest [https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/testnet/latest/cheqd-testnet-4_2022-06-10.tar.gz]`. By default, the installer will suggest the latest snapshot from `https://snapshots.cheqd.net` and calculate the link the latest snapshot based on the chain you chose on step 4.
-* `Do you want to setup the node after installation? Please type any kind of variants: yes, no, y, n. [No]`. If you are installing the node from the beginning, you can use this ability to setup your node. Possible variants for answering `y, n, yes, no`. If the answer was `Yes`, the next questions will be about the config settings.
+* `Do you want to download the latest ledger snapshot to speed up node setup process? Please type any kind of variants: yes, no, y, n. [No]`. This can help you speed up the catchup to cheqd network. Possible variants for answering `y, n, yes, no`.
+* `Do you want to setup systemctl services after installation? Please type any kind of variants: yes, no, y, n. [Yes]`. If you are installing the node from the beginning, you can use this ability to setup your node. Possible variants for answering `y, n, yes, no`. If the answer was `Yes`, the next questions will be about the config settings.
 * `Please, type the moniker for your node:`. Here you need to specify a nickname for your node. This will be used in various user facing places such as on block explorers where a user is deciding where to delegate their tokens.
-* `What is the external IP address of your node? Please type in format: <ip_address>:<port>`. Here you need to specify the external address of your machine and P2P port also. For example, `8.8.8.8:26656`.
+* `What is the external address of your node? Please type in format: <ip-address-or-dns-name>:<port>`. Here you need to specify the external address of your machine and P2P port also. For example, `8.8.8.8:26656`.
 
 P.S. Due to the size of the snapshots it will take a long time to download. During this period the script will print some message about the process each minute.
 

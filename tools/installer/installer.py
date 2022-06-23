@@ -377,7 +377,7 @@ if $programname == '{binary_name}' then {self.cheqd_log_dir}/stdout.log
 
     def untar_from_snapshot(self):
         self.mkdir_p(self.cheqd_data_dir)
-        cmd = f"wget -qO - {self.interviewer.snapshot_url}  | sudo -u {DEFAULT_CHEQD_USER} tar xzf - -C {os.path.join(self.cheqd_root_dir, 'data')}"
+        cmd = f"wget -c -O - {self.interviewer.snapshot_url}  | sudo -u {DEFAULT_CHEQD_USER} tar xzf - -C {os.path.join(self.cheqd_root_dir, 'data')}"
         thread = threading.Thread(target=functools.partial(self.exec, cmd))
         thread.start()
         sec_counter = 0
