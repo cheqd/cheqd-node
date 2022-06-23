@@ -31,8 +31,8 @@ list
 Please insert the number by picking up the version: 1
 ```
 
-* `Please, type the path to home directory for user cheqd. To keep the default value, just type 'Enter': [/home/cheqd]`. Here you need to specify the path tohome directory for the new user `cheqd`. By default `/home/cheqd` will be used.
-* `Do you want to use Cosmovisor? Please type any kind of variants: yes, no, y, n. [yes]`. With current installer we are proposing the ability to setup cosmovisor. It will help you with upgrades, it allows to do it in the full automatic mode. Possible variants for answering `y, n, yes, no`.
+* `Please, type the path to home directory for user cheqd. To keep the default value, just type 'Enter': [/home/cheqd]`. Here you need to specify the path to home directory for the new user `cheqd`. By default `/home/cheqd` will be used.
+* `Do you want to use Cosmovisor? Please type any kind of variants (yes/no) [yes]:`. With current installer we are proposing the ability to setup cosmovisor. It will help you with upgrades, it allows to do it in the full automatic mode. Possible variants for answering (yes/no) [yes].
 * `Which chain do you want to use? Possible variants are: testnet, mainnet [testnet]`. For now, we have 2 networks, `testnet` and `mainnet`. Please, type here which chain you want to use or just keep the default by clicking `Enter`.
 * `Do you want to deploy the latest snapshot? Please type any kind of variants: yes, no, y, n. [No]`. This can help you speed up the catchup to cheqd network. Possible variants for answering `y, n, yes, no`.
 * If you chose 'Yes' answering on previous question the next question will be about the URL to snapshot: `Which snapshot do you want to use? Please type the full URL to archive or press return to use the latest [https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/testnet/latest/cheqd-testnet-4_2022-06-10.tar.gz]`. By default, the installer will suggest the latest snapshot from `https://snapshots.cheqd.net` and calculate the link the latest snapshot based on the chain you chose on step 4.
