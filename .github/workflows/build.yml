@@ -84,12 +84,12 @@ jobs:
           sudo gem install --no-document fpm
       
       - name: Build Debian package
-        working-directory: ./build-tools
+        working-directory: ./tools/build
         run: |
           ./build-deb.sh "../build/cheqd-noded"
 
       - name: Build Tar archive
-        working-directory: ./build-tools
+        working-directory: ./tools/build
         run: |
           ./build-tar.sh "../build/cheqd-noded"
       
@@ -99,7 +99,7 @@ jobs:
           VERSION: ${{ steps.set-version.outputs.VERSION }}
         with:
           name: cheqd-node_${{ env.VERSION }}_amd64.deb
-          path: build-tools/output/cheqd-node_${{ env.VERSION }}_amd64.deb
+          path: tools/build/output/cheqd-node_${{ env.VERSION }}_amd64.deb
 
       - name: Store Tar archive artifact
         uses: actions/upload-artifact@v3
@@ -107,7 +107,7 @@ jobs:
           VERSION: ${{ steps.set-version.outputs.VERSION }}
         with:
           name: cheqd-node_${{ env.VERSION }}.tar.gz
-          path: build-tools/output/cheqd-node_${{ env.VERSION }}.tar.gz
+          path: tools/build/output/cheqd-node_${{ env.VERSION }}.tar.gz
 
   build-docker-images:
     name: "Docker images"
