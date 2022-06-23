@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+
+# Python package imports
 import datetime
 import os
 import subprocess
@@ -17,35 +19,45 @@ import time
 import threading
 
 
-ONLY_DIGIT_VERSIONS=re.compile(r'.*([0-9]+)\.([0-9]+)\.([0-9]+)$')
+# Installation Parameters
+# ONLY_DIGIT_VERSIONS=re.compile(r'.*([0-9]+)\.([0-9]+)\.([0-9]+)$')
 LAST_N_RELEASES = 5
-LAST_VERSION_WITH_TARBALL = "v0.5.0"
-
-DEFAULT_COSMOVISOR_TAR_URL = "https://github.com/cosmos/cosmos-sdk/releases/download/cosmovisor%2Fv1.1.0/cosmovisor-v1.1.0-linux-amd64.tar.gz"
+# LAST_VERSION_WITH_TARBALL = "v0.5.0"
 DEFAULT_HOME = "/home/cheqd"
-DEFAULT_USE_COSMOVISOR = "yes"
-DEFAULT_INIT_FROM_SNAPSHOT = "yes"
-DEVAULT_VERSION = "v0.5.0"
+# DEVAULT_VERSION = "v0.5.0"
 DEFAULT_INSTALL_PATH = "/usr/bin"
 DEFAULT_CHEQD_USER = "cheqd"
 DEFAULT_BINARY_NAME = "cheqd-noded"
+DEFAULT_CHAINS = ['testnet', 'mainnet']
+DEFAULT_CHAIN = "mainnet"
+PRINT_PREFIX = "********* "
+
+
+### Cosmovisor Config
+COSMOVISOR_BINARY = "https://github.com/cosmos/cosmos-sdk/releases/download/cosmovisor%2Fv1.1.0/cosmovisor-v1.1.0-linux-amd64.tar.gz"
+DEFAULT_USE_COSMOVISOR = "yes"
+
+
+### Genesis and Seeds
+GENESIS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/{}/genesis.json"
+SEEDS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/{}/seeds.txt"
+
+###############################################################
+###     				Node snapshots      				###
+###############################################################
+DEFAULT_SNAPSHOT_SERVER = "https://snapshots.cheqd.net"
+DEFAULT_INIT_FROM_SNAPSHOT = "yes"
+TESTNET_SNAPSHOT = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/testnet/latest/cheqd-testnet-4_{}.tar.gz"
+MAINNET_SNAPSHOT = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/mainnet/latest/cheqd-mainnet-1_{}.tar.gz"
+
+###############################################################
+###     				Systemd Config      				###
+###############################################################
+SERVICE_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/tools/build/cheqd-noded.service"
+SERVICE_FILE_PATH = "/lib/systemd/system/cheqd-noded.service"
 DEFAULT_LOGROTATE_FILE = "/etc/logrotate.d/cheqd-node"
 DEFAULT_RSYSLOG_FILE = "/etc/rsyslog.d/cheqd-node.conf"
-DEFAULT_SNAPSHOT_SERVER = "https://snapshots.cheqd.net"
-DEFAULT_CHAINS = ['testnet', 'mainnet']
-DEFAULT_CHAIN = "testnet"
 
-TESTNET_URL_TEMPLATE = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/testnet/latest/cheqd-testnet-4_{}.tar.gz"
-MAINNET_URL_TEMPLATE = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/mainnet/latest/cheqd-mainnet-1_{}.tar.gz"
-
-GENESIS_URL_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/{}/genesis.json"
-SEEDS_URL_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/{}/seeds.txt"
-
-SERVICE_FILE_URL = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/build-tools/cheqd-noded.service"
-SERVICE_FILE_PATH = "/lib/systemd/system/cheqd-noded.service"
-
-CHEQD_NODED_NAME = "cheqd-noded"
-PRINT_PREFIX = "********* "
 
 def sigint_handler(signal, frame):
     print ('Exiting from cheqd-node installer')
@@ -66,7 +78,7 @@ class Release:
         return archive_urls[0]
 
     def get_binary_url(self):
-        binary_urls = [ a['browser_download_url'] for a in self.assets if a['name'] == CHEQD_NODED_NAME]
+        binary_urls = [ a['browser_download_url'] for a in self.assets if a['name'] == DEFAULT_BINARY_NAME]
         if len(binary_urls) == 0:
             failure_exit(f"No binaries in release: {self.version}")
         return binary_urls[0]
@@ -121,7 +133,7 @@ class Installer():
         return self.get_binary_path()
 
     def get_binary_path(self):
-        return os.path.join(os.path.realpath(os.path.curdir), CHEQD_NODED_NAME)
+        return os.path.join(os.path.realpath(os.path.curdir), DEFAULT_BINARY_NAME)
 
     @property
     def cosmovisor_service_cfg(self):
@@ -283,7 +295,7 @@ if $programname == '{binary_name}' then {self.cheqd_log_dir}/stdout.log
             with open(SERVICE_FILE_PATH, mode="w") as fd:
                 fd.write(self.cosmovisor_service_cfg)
         else:
-            self.exec(f"curl -s {SERVICE_FILE_URL} > {SERVICE_FILE_PATH}")
+            self.exec(f"curl -s {SERVICE_FILE} > {SERVICE_FILE_PATH}")
 
         self.log("Enable systemctl service")
         self.exec("systemctl enable cheqd-noded")
@@ -305,7 +317,7 @@ if $programname == '{binary_name}' then {self.cheqd_log_dir}/stdout.log
             self.exec(f"sudo -u {DEFAULT_CHEQD_USER} cheqd-noded init {self.interviewer.moniker}")
 
             # Downloading genesis file
-            self.exec(f"curl -s {GENESIS_URL_TEMPLATE.format(self.interviewer.chain)} > {os.path.join(self.cheqd_config_dir, 'genesis.json')}")
+            self.exec(f"curl -s {GENESIS_FILE.format(self.interviewer.chain)} > {os.path.join(self.cheqd_config_dir, 'genesis.json')}")
             shutil.chown(os.path.join(self.cheqd_config_dir, 'genesis.json'),
                          DEFAULT_CHEQD_USER,
                          DEFAULT_CHEQD_USER)
@@ -315,7 +327,7 @@ if $programname == '{binary_name}' then {self.cheqd_log_dir}/stdout.log
             self.exec(f"sudo -u {DEFAULT_CHEQD_USER} cheqd-noded configure p2p external-address {self.interviewer.external_address}")
 
         # Setting up the seeds
-        seeds = self.exec(f"curl -s {SEEDS_URL_TEMPLATE.format(self.interviewer.chain)}").stdout.decode("utf-8").strip()
+        seeds = self.exec(f"curl -s {SEEDS_FILE.format(self.interviewer.chain)}").stdout.decode("utf-8").strip()
         self.exec(f"sudo -u {DEFAULT_CHEQD_USER} cheqd-noded configure p2p seeds {seeds}")
 
     def prepare_cheqd_user(self):
@@ -338,7 +350,7 @@ if $programname == '{binary_name}' then {self.cheqd_log_dir}/stdout.log
         self.exec(f"chown -R syslog:syslog {self.cheqd_log_dir}")
 
     def setup_cosmovisor(self):
-        self.exec(f"wget -qO - {DEFAULT_COSMOVISOR_TAR_URL}  | tar xz")
+        self.exec(f"wget -qO - {COSMOVISOR_BINARY}  | tar xz")
         self.mkdir_p(self.cosmovisor_root_dir)
         self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis"))
         self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis/bin"))
@@ -578,7 +590,7 @@ class Interviewer:
         self.external_address = answer
 
     def prepare_url_for_latest(self) -> str:
-        template = TESTNET_URL_TEMPLATE if self.chain == "testnet" else MAINNET_URL_TEMPLATE
+        template = TESTNET_SNAPSHOT if self.chain == "testnet" else MAINNET_SNAPSHOT
         _date = datetime.date.today()
         _url = template.format(_date.strftime("%Y-%m-%d"))
         while not self.is_url_exists(_url):
