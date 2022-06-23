@@ -25,12 +25,14 @@ func ExistingResource() types.Resource {
 	data := []byte(SchemaData)
 	checksum := sha256.New().Sum(data)
 	return types.Resource{
-		CollectionId: ExistingDIDIdentifier,
-		Id:           "a09abea0-22e0-4b35-8f70-9cc3a6d0b5fd",
-		Name:         "Existing Resource Name",
-		ResourceType: CLSchemaType,
-		MimeType:     JsonResourceType,
+		Header: &types.ResourceHeader{
+			CollectionId: ExistingDIDIdentifier,
+			Id:           "a09abea0-22e0-4b35-8f70-9cc3a6d0b5fd",
+			Name:         "Existing Resource Name",
+			ResourceType: CLSchemaType,
+			MimeType:     JsonResourceType,
+			Checksum:     checksum,
+		},
 		Data:         data,
-		Checksum:     checksum,
 	}
 }

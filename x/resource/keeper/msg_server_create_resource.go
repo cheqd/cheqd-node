@@ -45,25 +45,25 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	// Build Resource
 	resource := msg.Payload.ToResource()
 
-	resource.Checksum = sha256.New().Sum(resource.Data)
-	resource.Created = time.Now().UTC().Format(time.RFC3339)
+	resource.Header.Checksum = sha256.New().Sum(resource.Data)
+	resource.Header.Created = time.Now().UTC().Format(time.RFC3339)
 
 	// Find previous version and upgrade backward and forward version links
-	previousResourceVersion, found := k.GetLastResourceVersion(&ctx, resource.CollectionId, resource.Name, resource.ResourceType, resource.MimeType)
+	previousResourceVersionHeader, found := k.GetLastResourceVersionHeader(&ctx, resource.Header.CollectionId, resource.Header.Name, resource.Header.ResourceType, resource.Header.MimeType)
 	if found {
 		// Set links
-		previousResourceVersion.NextVersionId = resource.Id
-		resource.PreviousVersionId = previousResourceVersion.Id
+		previousResourceVersionHeader.NextVersionId = resource.Header.Id
+		resource.Header.PreviousVersionId = previousResourceVersionHeader.Id
 
 		// Update previous version
-		err := k.SetResource(&ctx, &previousResourceVersion)
+		err := k.UpdateResourceHeader(&ctx, &previousResourceVersionHeader)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	// Append backlink to didDoc
-	didDocStateValue.Metadata.Resources = append(didDocStateValue.Metadata.Resources, resource.Id)
+	didDocStateValue.Metadata.Resources = append(didDocStateValue.Metadata.Resources, resource.Header.Id)
 	err = k.cheqdKeeper.SetDid(&ctx, &didDocStateValue)
 	if err != nil {
 		return nil, types.ErrInternal.Wrapf(err.Error())

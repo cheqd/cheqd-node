@@ -91,11 +91,11 @@ func Setup() TestSetup {
 
 func GenerateCreateResourcePayload(resource types.Resource) *types.MsgCreateResourcePayload {
 	return &types.MsgCreateResourcePayload{
-		CollectionId: resource.CollectionId,
-		Id:           resource.Id,
-		Name:         resource.Name,
-		ResourceType: resource.ResourceType,
-		MimeType:     resource.MimeType,
+		CollectionId: resource.Header.CollectionId,
+		Id:           resource.Header.Id,
+		Name:         resource.Header.Name,
+		ResourceType: resource.Header.ResourceType,
+		MimeType:     resource.Header.MimeType,
 		Data:         resource.Data,
 	}
 }

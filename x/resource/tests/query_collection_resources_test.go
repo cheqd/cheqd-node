@@ -26,7 +26,7 @@ func TestQueryGetCollectionResources(t *testing.T) {
 				CollectionId: ExistingDIDIdentifier,
 			},
 			response: &types.QueryGetCollectionResourcesResponse{
-				Resources: []*types.Resource{&existingResource},
+				Resources: []*types.ResourceHeader{existingResource.Header},
 			},
 			errMsg: "",
 		},
@@ -54,7 +54,8 @@ func TestQueryGetCollectionResources(t *testing.T) {
 				require.Nil(t, err)
 				require.Equal(t, len(expectedResources), len(resources))
 				for i, r := range resources {
-					CompareResources(t, expectedResources[i], *r)
+					r.Created = expectedResources[i].Created
+					require.Equal(t, expectedResources[i], r)
 				}
 			} else {
 				require.Error(t, err)

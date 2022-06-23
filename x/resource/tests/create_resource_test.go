@@ -48,14 +48,14 @@ func TestCreateResource(t *testing.T) {
 				ExistingDIDKey: keys[ExistingDIDKey].PrivateKey,
 			},
 			msg: &types.MsgCreateResourcePayload{
-				CollectionId: ExistingResource().CollectionId,
+				CollectionId: ExistingResource().Header.CollectionId,
 				Id:           ResourceId,
-				Name:         ExistingResource().Name,
-				ResourceType: ExistingResource().ResourceType,
-				MimeType:     ExistingResource().MimeType,
+				Name:         ExistingResource().Header.Name,
+				ResourceType: ExistingResource().Header.ResourceType,
+				MimeType:     ExistingResource().Header.MimeType,
 				Data:         ExistingResource().Data,
 			},
-			previousVersionId: ExistingResource().Id,
+			previousVersionId: ExistingResource().Header.Id,
 		},
 		{
 			valid:      false,
@@ -110,19 +110,19 @@ func TestCreateResource(t *testing.T) {
 			if tc.valid {
 				require.Nil(t, err)
 
-				did := utils.JoinDID("cheqd", "test", resource.CollectionId)
+				did := utils.JoinDID("cheqd", "test", resource.Header.CollectionId)
 				didStateValue, err := resourceSetup.Keeper.GetDid(&resourceSetup.Ctx, did)
 				require.Nil(t, err)
-				require.Contains(t, didStateValue.Metadata.Resources, resource.Id)
+				require.Contains(t, didStateValue.Metadata.Resources, resource.Header.Id)
 
-				require.Equal(t, tc.msg.CollectionId, resource.CollectionId)
-				require.Equal(t, tc.msg.Id, resource.Id)
-				require.Equal(t, tc.msg.MimeType, resource.MimeType)
-				require.Equal(t, tc.msg.ResourceType, resource.ResourceType)
+				require.Equal(t, tc.msg.CollectionId, resource.Header.CollectionId)
+				require.Equal(t, tc.msg.Id, resource.Header.Id)
+				require.Equal(t, tc.msg.MimeType, resource.Header.MimeType)
+				require.Equal(t, tc.msg.ResourceType, resource.Header.ResourceType)
 				require.Equal(t, tc.msg.Data, resource.Data)
-				require.Equal(t, tc.msg.Name, resource.Name)
-				require.Equal(t, sha256.New().Sum(resource.Data), resource.Checksum)
-				require.Equal(t, tc.previousVersionId, resource.PreviousVersionId)
+				require.Equal(t, tc.msg.Name, resource.Header.Name)
+				require.Equal(t, sha256.New().Sum(resource.Data), resource.Header.Checksum)
+				require.Equal(t, tc.previousVersionId, resource.Header.PreviousVersionId)
 			} else {
 				require.Error(t, err)
 				require.Equal(t, tc.errMsg, err.Error())

@@ -70,17 +70,17 @@ assert_tx_successful "$RESULT"
 # shellcheck disable=SC2086
 RESULT=$(cheqd-noded query resource resource "${ID1}" ${RESOURCE1_V1_ID}  ${QUERY_PARAMS})
 
-EXPECTED_RES1_V1='{
+EXPECTED_RES1_V1_HEADER='{
   "collection_id": "'${ID1}'",
   "id": "'${RESOURCE1_V1_ID}'",
   "name": "'${RESOURCE1_NAME}'",
   "mime_type": "'${RESOURCE1_MIME_TYPE}'",
-  "resource_type": "'${RESOURCE1_RESOURCE_TYPE}'",
-  "data": "'${RESOURCE1_V1_DATA}'"
+  "resource_type": "'${RESOURCE1_RESOURCE_TYPE}'"
 }'
 
 DEL_FILTER='del(.checksum, .created, .next_version_id, .previous_version_id)'
-assert_json_eq "$(echo "$RESULT" | jq -r ".resource | ${DEL_FILTER}")" "${EXPECTED_RES1_V1}"
+assert_json_eq "$(echo "$RESULT" | jq -r ".resource.header | ${DEL_FILTER}")" "${EXPECTED_RES1_V1_HEADER}"
+assert_json_eq "$(echo "$RESULT" | jq -r ".resource.data")" "${RESOURCE1_V1_DATA}"
 
 
 ########## Creating Resource 1 v2 ##########
@@ -132,18 +132,17 @@ assert_tx_successful "$RESULT"
 
 ########## Querying All Resource 1 versions ##########
 
-EXPECTED_RES1_V2='{
+EXPECTED_RES1_V2_HEADER='{
   "collection_id": "'${ID1}'",
   "id": "'${RESOURCE1_V2_ID}'",
   "name": "'${RESOURCE1_NAME}'",
   "mime_type": "'${RESOURCE1_MIME_TYPE}'",
-  "resource_type": "'${RESOURCE1_RESOURCE_TYPE}'",
-  "data": "'${RESOURCE1_V2_DATA}'"
+  "resource_type": "'${RESOURCE1_RESOURCE_TYPE}'"
 }'
 
 # shellcheck disable=SC2086
 RESULT=$(cheqd-noded query resource all-resource-versions "${ID1}" "${RESOURCE1_NAME}" ${RESOURCE1_RESOURCE_TYPE} ${RESOURCE1_MIME_TYPE} ${QUERY_PARAMS})
 
 assert_eq "$(echo "$RESULT" | jq -r ".resources | length")" "2"
-assert_json_eq "$(echo "$RESULT" | jq -r '.resources[] | select(.id == "'"${RESOURCE1_V1_ID}"'") | '"${DEL_FILTER}"'')" "${EXPECTED_RES1_V1}"
-assert_json_eq "$(echo "$RESULT" | jq -r '.resources[] | select(.id == "'"${RESOURCE1_V2_ID}"'") | '"${DEL_FILTER}"'')" "${EXPECTED_RES1_V2}"
+assert_json_eq "$(echo "$RESULT" | jq -r '.resources[] | select(.id == "'"${RESOURCE1_V1_ID}"'") | '"${DEL_FILTER}"'')" "${EXPECTED_RES1_V1_HEADER}"
+assert_json_eq "$(echo "$RESULT" | jq -r '.resources[] | select(.id == "'"${RESOURCE1_V2_ID}"'") | '"${DEL_FILTER}"'')" "${EXPECTED_RES1_V2_HEADER}"

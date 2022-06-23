@@ -13,14 +13,14 @@ func (msg *MsgCreateResourcePayload) GetSignBytes() []byte {
 
 func (msg *MsgCreateResourcePayload) ToResource() Resource {
 	return Resource{
-		CollectionId: msg.CollectionId,
-		Id:           msg.Id,
-		Name:         msg.Name,
-		ResourceType: msg.ResourceType,
-		MimeType:     msg.MimeType,
-		Data:         msg.Data,
-		Created:      "",
-		Checksum:     []byte{},
+		Header: &ResourceHeader{
+			CollectionId: msg.CollectionId,
+			Id:           msg.Id,
+			Name:         msg.Name,
+			ResourceType: msg.ResourceType,
+			MimeType:     msg.MimeType,
+		},
+		Data: msg.Data,
 	}
 }
 

@@ -39,12 +39,12 @@ func TestQueryGetAllResourceVersions(t *testing.T) {
 			name:  "Valid: Works",
 			msg: &types.QueryGetAllResourceVersionsRequest{
 				CollectionId: ExistingDIDIdentifier,
-				Name:         existingResource.Name,
-				ResourceType: existingResource.ResourceType,
-				MimeType:     existingResource.MimeType,
+				Name:         existingResource.Header.Name,
+				ResourceType: existingResource.Header.ResourceType,
+				MimeType:     existingResource.Header.MimeType,
 			},
 			response: &types.QueryGetAllResourceVersionsResponse{
-				Resources: []*types.Resource{&existingResource},
+				Resources: []*types.ResourceHeader{existingResource.Header},
 			},
 			errMsg: "",
 		},
@@ -53,9 +53,9 @@ func TestQueryGetAllResourceVersions(t *testing.T) {
 			name:  "Not Valid: DID Doc is not found",
 			msg: &types.QueryGetAllResourceVersionsRequest{
 				CollectionId: NotFoundDIDIdentifier,
-				Name:         existingResource.Name,
-				ResourceType: existingResource.ResourceType,
-				MimeType:     existingResource.MimeType,
+				Name:         existingResource.Header.Name,
+				ResourceType: existingResource.Header.ResourceType,
+				MimeType:     existingResource.Header.MimeType,
 			},
 			response: nil,
 			errMsg:   fmt.Sprintf("did:cheqd:test:%s: DID Doc not found", NotFoundDIDIdentifier),
@@ -83,15 +83,16 @@ func TestQueryGetAllResourceVersions(t *testing.T) {
 
 			if tc.valid {
 				resources := queryResponse.Resources
-				existingResource.NextVersionId = createdResource.Id
+				existingResource.Header.NextVersionId = createdResource.Header.Id
 				expectedResources := map[string]types.Resource{
-					existingResource.Id: existingResource,
-					createdResource.Id:  *createdResource,
+					existingResource.Header.Id: existingResource,
+					createdResource.Header.Id:  *createdResource,
 				}
 				require.Nil(t, err)
 				require.Equal(t, len(expectedResources), len(resources))
 				for _, r := range resources {
-					CompareResources(t, r, expectedResources[r.Id])
+					r.Created = expectedResources[r.Id].Header.Created
+					require.Equal(t, r, expectedResources[r.Id].Header)
 				}
 			} else {
 				require.Error(t, err)

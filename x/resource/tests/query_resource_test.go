@@ -27,7 +27,7 @@ func TestQueryGetResource(t *testing.T) {
 			name:  "Valid: Works",
 			msg: &types.QueryGetResourceRequest{
 				CollectionId: ExistingDIDIdentifier,
-				Id:           existingResource.Id,
+				Id:           existingResource.Header.Id,
 			},
 			response: &types.QueryGetResourceResponse{
 				Resource: &existingResource,
@@ -49,7 +49,7 @@ func TestQueryGetResource(t *testing.T) {
 			name:  "Not Valid: DID Doc is not found",
 			msg: &types.QueryGetResourceRequest{
 				CollectionId: NotFoundDIDIdentifier,
-				Id:           existingResource.Id,
+				Id:           existingResource.Header.Id,
 			},
 			response: nil,
 			errMsg:   fmt.Sprintf("did:cheqd:test:%s: DID Doc not found", NotFoundDIDIdentifier),
@@ -66,15 +66,15 @@ func TestQueryGetResource(t *testing.T) {
 			if tc.valid {
 				resource := queryResponse.Resource
 				require.Nil(t, err)
-				require.Equal(t, tc.response.Resource.CollectionId, resource.CollectionId)
-				require.Equal(t, tc.response.Resource.Id, resource.Id)
-				require.Equal(t, tc.response.Resource.MimeType, resource.MimeType)
-				require.Equal(t, tc.response.Resource.ResourceType, resource.ResourceType)
+				require.Equal(t, tc.response.Resource.Header.CollectionId, resource.Header.CollectionId)
+				require.Equal(t, tc.response.Resource.Header.Id, resource.Header.Id)
+				require.Equal(t, tc.response.Resource.Header.MimeType, resource.Header.MimeType)
+				require.Equal(t, tc.response.Resource.Header.ResourceType, resource.Header.ResourceType)
 				require.Equal(t, tc.response.Resource.Data, resource.Data)
-				require.Equal(t, tc.response.Resource.Name, resource.Name)
-				require.Equal(t, sha256.New().Sum(tc.response.Resource.Data), resource.Checksum)
-				require.Equal(t, tc.response.Resource.PreviousVersionId, resource.PreviousVersionId)
-				require.Equal(t, tc.response.Resource.NextVersionId, resource.NextVersionId)
+				require.Equal(t, tc.response.Resource.Header.Name, resource.Header.Name)
+				require.Equal(t, sha256.New().Sum(tc.response.Resource.Data), resource.Header.Checksum)
+				require.Equal(t, tc.response.Resource.Header.PreviousVersionId, resource.Header.PreviousVersionId)
+				require.Equal(t, tc.response.Resource.Header.NextVersionId, resource.Header.NextVersionId)
 			} else {
 				require.Error(t, err)
 				require.Equal(t, tc.errMsg, err.Error())

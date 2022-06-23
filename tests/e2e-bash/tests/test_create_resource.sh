@@ -61,9 +61,9 @@ assert_tx_successful "$RESULT"
 # shellcheck disable=SC2086
 RESULT=$(cheqd-noded query resource resource "${ID}" ${RESOURCE_ID}  ${QUERY_PARAMS})
 
-assert_eq "$(echo "$RESULT" | jq -r ".resource.collection_id")" "${ID}"
-assert_eq "$(echo "$RESULT" | jq -r ".resource.id")" "${RESOURCE_ID}"
-assert_eq "$(echo "$RESULT" | jq -r ".resource.name")" "${RESOURCE_NAME}"
-assert_eq "$(echo "$RESULT" | jq -r ".resource.resource_type")" "${RESOURCE_RESOURCE_TYPE}"
-assert_eq "$(echo "$RESULT" | jq -r ".resource.mime_type")" "${RESOURCE_MIME_TYPE}"
+assert_eq "$(echo "$RESULT" | jq -r ".resource.header.collection_id")" "${ID}"
+assert_eq "$(echo "$RESULT" | jq -r ".resource.header.id")" "${RESOURCE_ID}"
+assert_eq "$(echo "$RESULT" | jq -r ".resource.header.name")" "${RESOURCE_NAME}"
+assert_eq "$(echo "$RESULT" | jq -r ".resource.header.resource_type")" "${RESOURCE_RESOURCE_TYPE}"
+assert_eq "$(echo "$RESULT" | jq -r ".resource.header.mime_type")" "${RESOURCE_MIME_TYPE}"
 assert_eq "$(echo "$RESULT" | jq -r ".resource.data")" "$(echo "${RESOURCE_DATA}" | base64 -w 0)"
