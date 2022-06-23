@@ -7,17 +7,6 @@ import (
 
 // Validation helpers
 
-func IsUUID() *cheqdTypes.CustomErrorRule {
-	return cheqdTypes.NewCustomErrorRule(func(value interface{}) error {
-		casted, ok := value.(string)
-		if !ok {
-			panic("IsDID must be only applied on string properties")
-		}
-
-		return utils.ValidateUUID(casted)
-	})
-}
-
 func IsAllowedResourceType() *cheqdTypes.CustomErrorRule {
 	return cheqdTypes.NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.(string)

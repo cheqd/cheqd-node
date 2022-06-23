@@ -1,11 +1,11 @@
 package types
 
 import (
-	cheqdTypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
-var _ cheqdTypes.IdentityMsg = &MsgCreateResourcePayload{}
+var _ cheqdtypes.IdentityMsg = &MsgCreateResourcePayload{}
 
 func (msg *MsgCreateResourcePayload) GetSignBytes() []byte {
 	return ModuleCdc.MustMarshal(msg)
@@ -28,8 +28,8 @@ func (msg *MsgCreateResourcePayload) ToResource() Resource {
 
 func (msg MsgCreateResourcePayload) Validate() error {
 	return validation.ValidateStruct(&msg,
-		validation.Field(&msg.CollectionId, validation.Required, cheqdTypes.IsID()),
-		validation.Field(&msg.Id, validation.Required, IsUUID()),
+		validation.Field(&msg.CollectionId, validation.Required, cheqdtypes.IsID()),
+		validation.Field(&msg.Id, validation.Required, cheqdtypes.IsUUID()),
 		validation.Field(&msg.Name, validation.Required, validation.Length(1, 64)),
 		validation.Field(&msg.ResourceType, validation.Required, IsAllowedResourceType()),
 		validation.Field(&msg.MimeType, validation.Required, IsAllowedMimeType()),
@@ -37,8 +37,8 @@ func (msg MsgCreateResourcePayload) Validate() error {
 	)
 }
 
-func ValidMsgCreateResourcePayload() *cheqdTypes.CustomErrorRule {
-	return cheqdTypes.NewCustomErrorRule(func(value interface{}) error {
+func ValidMsgCreateResourcePayload() *cheqdtypes.CustomErrorRule {
+	return cheqdtypes.NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.(*MsgCreateResourcePayload)
 		if !ok {
 			panic("ValidMsgCreateResourcePayload must be only applied on MsgCreateDidPayload properties")

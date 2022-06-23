@@ -17,3 +17,7 @@ func ValidateUUID(u string) error {
 	_, err := uuid.Parse(u)
 	return err
 }
+
+func IsValidUUID(u string) bool {
+	return ValidateUUID(u) == nil
+}

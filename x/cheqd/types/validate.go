@@ -193,3 +193,14 @@ func IsUniqueStrList() *CustomErrorRule {
 		return nil
 	})
 }
+
+func IsUUID() *CustomErrorRule {
+	return NewCustomErrorRule(func(value interface{}) error {
+		casted, ok := value.(string)
+		if !ok {
+			panic("IsDID must be only applied on string properties")
+		}
+
+		return utils.ValidateUUID(casted)
+	})
+}

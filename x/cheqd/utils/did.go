@@ -84,14 +84,12 @@ func IsValidDID(did string, method string, allowedNamespaces []string) bool {
 }
 
 func ValidateID(id string) error {
-	// Length should be 16 or 32 symbols
-	if len(id) != 16 && len(id) != 32 {
-		return fmt.Errorf("unique id length should be 16 or 32 symbols")
-	}
+	isValidId := len(id) == 16 && IsValidBase58(id) ||
+		len(id) == 32 && IsValidBase58(id) ||
+		IsValidUUID(id)
 
-	// Base58 check
-	if err := ValidateBase58(id); err != nil {
-		return fmt.Errorf("unique id must be valid base58 string: %s", err)
+	if !isValidId {
+		return errors.New("unique id should be one of: 16 symbols base58 string, 32 symbols base58 string, or UUID")
 	}
 
 	return nil
