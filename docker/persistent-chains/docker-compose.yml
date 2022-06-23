@@ -75,9 +75,9 @@ services:
 
 configs:
   genesis:
-    file: ../../persistent_chains/${CHEQD_NETWORK}/genesis.json
+    file: ../../networks/${CHEQD_NETWORK}/genesis.json
   seeds:
-    file: ../../persistent_chains/${CHEQD_NETWORK}/seeds.txt
+    file: ../../networks/${CHEQD_NETWORK}/seeds.txt
 
 volumes:
   cheqd_volume:
