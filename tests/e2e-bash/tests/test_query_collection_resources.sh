@@ -135,7 +135,6 @@ assert_tx_successful "$RESULT"
 RESOURCE2_ID=$(uuidgen)
 RESOURCE2_DATA=$(echo '{ "content": "resource 2" }' | base64 -w 0);
 RESOURCE2_NAME="Resource 2"
-RESOURCE2_MEDIA_TYPE="application/json"
 RESOURCE2_RESOURCE_TYPE="CL-Schema"
 
 MSG_CREATE_RESOURCE2='{
