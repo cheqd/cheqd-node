@@ -68,7 +68,7 @@ func TestQueryGetResource(t *testing.T) {
 				require.Nil(t, err)
 				require.Equal(t, tc.response.Resource.Header.CollectionId, resource.Header.CollectionId)
 				require.Equal(t, tc.response.Resource.Header.Id, resource.Header.Id)
-				require.Equal(t, tc.response.Resource.Header.MimeType, resource.Header.MimeType)
+				require.Equal(t, tc.response.Resource.Header.MediaType, resource.Header.MediaType)
 				require.Equal(t, tc.response.Resource.Header.ResourceType, resource.Header.ResourceType)
 				require.Equal(t, tc.response.Resource.Data, resource.Data)
 				require.Equal(t, tc.response.Resource.Header.Name, resource.Header.Name)

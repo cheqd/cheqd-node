@@ -36,7 +36,7 @@ func TestCreateResource(t *testing.T) {
 				Id:           ResourceId,
 				Name:         "Test Resource Name",
 				ResourceType: CLSchemaType,
-				MimeType:     JsonResourceType,
+				MediaType:    JsonResourceType,
 				Data:         []byte(SchemaData),
 			},
 			previousVersionId: "",
@@ -52,7 +52,7 @@ func TestCreateResource(t *testing.T) {
 				Id:           ResourceId,
 				Name:         ExistingResource().Header.Name,
 				ResourceType: ExistingResource().Header.ResourceType,
-				MimeType:     ExistingResource().Header.MimeType,
+				MediaType:    ExistingResource().Header.MediaType,
 				Data:         ExistingResource().Data,
 			},
 			previousVersionId: ExistingResource().Header.Id,
@@ -66,7 +66,7 @@ func TestCreateResource(t *testing.T) {
 				Id:           ResourceId,
 				Name:         "Test Resource Name",
 				ResourceType: CLSchemaType,
-				MimeType:     JsonResourceType,
+				MediaType:    JsonResourceType,
 				Data:         []byte(SchemaData),
 			},
 			errMsg: fmt.Sprintf("signer: %s: signature is required but not found", ExistingDID),
@@ -80,7 +80,7 @@ func TestCreateResource(t *testing.T) {
 				Id:           IncorrectResourceId,
 				Name:         "Test Resource Name",
 				ResourceType: CLSchemaType,
-				MimeType:     JsonResourceType,
+				MediaType:    JsonResourceType,
 				Data:         []byte(SchemaData),
 			},
 			errMsg: fmt.Sprintf("signer: %s: signature is required but not found", ExistingDID),
@@ -94,7 +94,7 @@ func TestCreateResource(t *testing.T) {
 				Id:           IncorrectResourceId,
 				Name:         "Test Resource Name",
 				ResourceType: CLSchemaType,
-				MimeType:     JsonResourceType,
+				MediaType:    JsonResourceType,
 				Data:         []byte(SchemaData),
 			},
 			errMsg: fmt.Sprintf("did:cheqd:test:%s: not found", NotFoundDIDIdentifier),
@@ -117,7 +117,7 @@ func TestCreateResource(t *testing.T) {
 
 				require.Equal(t, tc.msg.CollectionId, resource.Header.CollectionId)
 				require.Equal(t, tc.msg.Id, resource.Header.Id)
-				require.Equal(t, tc.msg.MimeType, resource.Header.MimeType)
+				require.Equal(t, tc.msg.MediaType, resource.Header.MediaType)
 				require.Equal(t, tc.msg.ResourceType, resource.Header.ResourceType)
 				require.Equal(t, tc.msg.Data, resource.Data)
 				require.Equal(t, tc.msg.Name, resource.Header.Name)

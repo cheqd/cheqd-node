@@ -30,7 +30,7 @@ func ExistingResource() types.Resource {
 			Id:           "a09abea0-22e0-4b35-8f70-9cc3a6d0b5fd",
 			Name:         "Existing Resource Name",
 			ResourceType: CLSchemaType,
-			MimeType:     JsonResourceType,
+			MediaType:    JsonResourceType,
 			Checksum:     checksum,
 		},
 		Data: data,

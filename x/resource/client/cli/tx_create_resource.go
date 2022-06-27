@@ -32,7 +32,7 @@ func CmdCreateResource() *cobra.Command {
 			id := args[1]
 			name := args[2]
 			resourceType := args[3]
-			mimeType := args[4]
+			mediaType := args[4]
 
 			data, err := ioutil.ReadFile(args[5])
 			if err != nil {
@@ -45,7 +45,7 @@ func CmdCreateResource() *cobra.Command {
 				Id:           id,
 				Name:         name,
 				ResourceType: resourceType,
-				MimeType:     mimeType,
+				MediaType:    mediaType,
 				Data:         data,
 			}
 

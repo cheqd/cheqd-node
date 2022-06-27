@@ -18,7 +18,7 @@ func (msg *MsgCreateResourcePayload) ToResource() Resource {
 			Id:           msg.Id,
 			Name:         msg.Name,
 			ResourceType: msg.ResourceType,
-			MimeType:     msg.MimeType,
+			MediaType:    msg.MediaType,
 		},
 		Data: msg.Data,
 	}
@@ -32,7 +32,7 @@ func (msg MsgCreateResourcePayload) Validate() error {
 		validation.Field(&msg.Id, validation.Required, cheqdtypes.IsUUID()),
 		validation.Field(&msg.Name, validation.Required, validation.Length(1, 64)),
 		validation.Field(&msg.ResourceType, validation.Required, IsAllowedResourceType()),
-		validation.Field(&msg.MimeType, validation.Required, IsAllowedMimeType()),
+		validation.Field(&msg.MediaType, validation.Required, IsAllowedMediaType()),
 		validation.Field(&msg.Data, validation.Required, validation.Length(1, 1024*1024)), // 1MB
 	)
 }

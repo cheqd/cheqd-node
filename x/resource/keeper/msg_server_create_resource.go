@@ -49,7 +49,7 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	resource.Header.Created = time.Now().UTC().Format(time.RFC3339)
 
 	// Find previous version and upgrade backward and forward version links
-	previousResourceVersionHeader, found := k.GetLastResourceVersionHeader(&ctx, resource.Header.CollectionId, resource.Header.Name, resource.Header.ResourceType, resource.Header.MimeType)
+	previousResourceVersionHeader, found := k.GetLastResourceVersionHeader(&ctx, resource.Header.CollectionId, resource.Header.Name, resource.Header.ResourceType, resource.Header.MediaType)
 	if found {
 		// Set links
 		previousResourceVersionHeader.NextVersionId = resource.Header.Id

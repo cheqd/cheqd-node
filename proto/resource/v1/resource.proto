@@ -14,7 +14,7 @@ message ResourceHeader {
   string id = 2;
   string name = 3;
   string resource_type = 4;
-  string mime_type = 5;
+  string media_type = 5;
   string created = 6;
   bytes checksum = 7;
   string previous_version_id = 8;

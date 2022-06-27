@@ -45,7 +45,7 @@ assert_tx_successful "$RESULT"
 
 RESOURCE1_V1_ID=$(uuidgen)
 RESOURCE1_V1_NAME="Resource 1"
-RESOURCE1_V1_MIME_TYPE="application/json"
+RESOURCE1_V1_MEDIA_TYPE="application/json"
 RESOURCE1_V1_RESOURCE_TYPE="CL-Schema"
 RESOURCE1_V1_DATA='dGVzdCBiYXNlNTYgZW5jb2RlZCBkYXRh';
 
@@ -53,7 +53,7 @@ MSG_CREATE_RESOURCE1='{
   "collection_id": "'${ID1}'",
   "id": "'${RESOURCE1_V1_ID}'",
   "name": "'${RESOURCE1_V1_NAME}'",
-  "mime_type": "'${RESOURCE1_V1_MIME_TYPE}'",
+  "media_type": "'${RESOURCE1_V1_MEDIA_TYPE}'",
   "resource_type": "'${RESOURCE1_V1_RESOURCE_TYPE}'",
   "data": "'${RESOURCE1_V1_DATA}'"
 }';
@@ -74,7 +74,7 @@ EXPECTED_RES1_V1_HEADER='{
   "collection_id": "'${ID1}'",
   "id": "'${RESOURCE1_V1_ID}'",
   "name": "'${RESOURCE1_V1_NAME}'",
-  "mime_type": "'${RESOURCE1_V1_MIME_TYPE}'",
+  "media_type": "'${RESOURCE1_V1_MEDIA_TYPE}'",
   "resource_type": "'${RESOURCE1_V1_RESOURCE_TYPE}'"
 }'
 
@@ -92,7 +92,7 @@ MSG_CREATE_RESOURCE1_V2='{
   "collection_id": "'${ID1}'",
   "id": "'${RESOURCE1_V2_ID}'",
   "name": "'${RESOURCE1_V1_NAME}'",
-  "mime_type": "'${RESOURCE1_V1_MIME_TYPE}'",
+  "media_type": "'${RESOURCE1_V1_MEDIA_TYPE}'",
   "resource_type": "'${RESOURCE1_V1_RESOURCE_TYPE}'",
   "data": "'${RESOURCE1_V2_DATA}'"
 }';
@@ -137,14 +137,14 @@ assert_tx_successful "$RESULT"
 RESOURCE2_ID=$(uuidgen)
 RESOURCE2_DATA='dGVzdCBiYXNlNTYgZW5jb2RlZCBkYXRhdGVzdCBiYXNlNTYgZW5jb2RlZCBkYXRh';
 RESOURCE2_NAME="Resource 2"
-RESOURCE2_MIME_TYPE="application/json"
+RESOURCE2_MEDIA_TYPE="application/json"
 RESOURCE2_RESOURCE_TYPE="CL-Schema"
 
 MSG_CREATE_RESOURCE2='{
   "collection_id": "'${ID2}'",
   "id": "'${RESOURCE2_ID}'",
   "name": "'${RESOURCE2_NAME}'",
-  "mime_type": "'${RESOURCE2_MIME_TYPE}'",
+  "media_type": "'${RESOURCE2_MEDIA_TYPE}'",
   "resource_type": "'${RESOURCE2_RESOURCE_TYPE}'",
   "data": "'${RESOURCE2_DATA}'"
 }';
@@ -163,7 +163,7 @@ EXPECTED_RES1_V2_HEADER='{
   "collection_id": "'${ID1}'",
   "id": "'${RESOURCE1_V2_ID}'",
   "name": "'${RESOURCE1_V1_NAME}'",
-  "mime_type": "'${RESOURCE1_V1_MIME_TYPE}'",
+  "media_type": "'${RESOURCE1_V1_MEDIA_TYPE}'",
   "resource_type": "'${RESOURCE1_V1_RESOURCE_TYPE}'"
 }'
 

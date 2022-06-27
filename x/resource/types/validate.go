@@ -18,13 +18,13 @@ func IsAllowedResourceType() *cheqdTypes.CustomErrorRule {
 	})
 }
 
-func IsAllowedMimeType() *cheqdTypes.CustomErrorRule {
+func IsAllowedMediaType() *cheqdTypes.CustomErrorRule {
 	return cheqdTypes.NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.(string)
 		if !ok {
-			panic("IsAllowedMimeType must be only applied on string properties")
+			panic("IsAllowedMediaType must be only applied on string properties")
 		}
 
-		return utils.ValidateMimeType(casted)
+		return utils.ValidateMediaType(casted)
 	})
 }

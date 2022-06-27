@@ -7,7 +7,7 @@ import (
 	cheqdUtils "github.com/cheqd/cheqd-node/x/cheqd/utils"
 )
 
-var AllowedMimeTypes = []string{
+var AllowedMediaTypes = []string{
 	"application/json",
 	"application/octet-stream",
 	"text/plain",
@@ -20,13 +20,13 @@ var AllowedMimeTypes = []string{
 	"image/webp",
 }
 
-func IsValidMimeType(rt string) bool {
-	return cheqdUtils.Contains(AllowedMimeTypes, rt)
+func IsValidMediaType(rt string) bool {
+	return cheqdUtils.Contains(AllowedMediaTypes, rt)
 }
 
-func ValidateMimeType(rt string) error {
-	if !IsValidMimeType(rt) {
-		return errors.New(rt + " mime type is not allowed. Only " + strings.Join(AllowedMimeTypes, ", "))
+func ValidateMediaType(rt string) error {
+	if !IsValidMediaType(rt) {
+		return errors.New(rt + " mime type is not allowed. Only " + strings.Join(AllowedMediaTypes, ", "))
 	}
 
 	return nil

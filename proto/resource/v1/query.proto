@@ -41,7 +41,7 @@ message QueryGetAllResourceVersionsRequest {
   string collection_id = 1;  // Mapped to URL path
   string name = 2;      // Mapped to URL parameter `name`
   string resource_type = 3;  // Mapped to URL parameter `resource_type`
-  string mime_type = 4;    // Mapped to URL parameter `mime_type`
+  string media_type = 4;    // Mapped to URL parameter `media_type`
 }
 
 message QueryGetAllResourceVersionsResponse {

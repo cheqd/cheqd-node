@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestValidateMimeType(t *testing.T) {
+func TestValidateMediaType(t *testing.T) {
 	cases := []struct {
 		mt    string
 		valid bool
@@ -18,7 +18,7 @@ func TestValidateMimeType(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.mt, func(t *testing.T) {
-			err_ := ValidateMimeType(tc.mt)
+			err_ := ValidateMediaType(tc.mt)
 
 			if tc.valid {
 				require.NoError(t, err_)
