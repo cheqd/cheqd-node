@@ -3,8 +3,9 @@ package keeper
 import (
 	"context"
 	"crypto/sha256"
-	"github.com/cheqd/cheqd-node/x/resource/utils"
 	"time"
+
+	"github.com/cheqd/cheqd-node/x/resource/utils"
 
 	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"

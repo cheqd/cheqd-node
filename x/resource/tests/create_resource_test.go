@@ -22,6 +22,7 @@ func TestCreateResource(t *testing.T) {
 		name              string
 		signerKeys        map[string]ed25519.PrivateKey
 		msg               *types.MsgCreateResourcePayload
+		mediaType         string
 		previousVersionId string
 		errMsg            string
 	}{
@@ -36,9 +37,9 @@ func TestCreateResource(t *testing.T) {
 				Id:           ResourceId,
 				Name:         "Test Resource Name",
 				ResourceType: CLSchemaType,
-				MediaType:    JsonResourceType,
 				Data:         []byte(SchemaData),
 			},
+			mediaType:         JsonResourceType,
 			previousVersionId: "",
 		},
 		{
@@ -52,9 +53,9 @@ func TestCreateResource(t *testing.T) {
 				Id:           ResourceId,
 				Name:         ExistingResource().Header.Name,
 				ResourceType: ExistingResource().Header.ResourceType,
-				MediaType:    ExistingResource().Header.MediaType,
 				Data:         ExistingResource().Data,
 			},
+			mediaType:         ExistingResource().Header.MediaType,
 			previousVersionId: ExistingResource().Header.Id,
 		},
 		{
@@ -66,10 +67,10 @@ func TestCreateResource(t *testing.T) {
 				Id:           ResourceId,
 				Name:         "Test Resource Name",
 				ResourceType: CLSchemaType,
-				MediaType:    JsonResourceType,
 				Data:         []byte(SchemaData),
 			},
-			errMsg: fmt.Sprintf("signer: %s: signature is required but not found", ExistingDID),
+			mediaType: JsonResourceType,
+			errMsg:    fmt.Sprintf("signer: %s: signature is required but not found", ExistingDID),
 		},
 		{
 			valid:      false,
@@ -80,10 +81,10 @@ func TestCreateResource(t *testing.T) {
 				Id:           IncorrectResourceId,
 				Name:         "Test Resource Name",
 				ResourceType: CLSchemaType,
-				MediaType:    JsonResourceType,
 				Data:         []byte(SchemaData),
 			},
-			errMsg: fmt.Sprintf("signer: %s: signature is required but not found", ExistingDID),
+			mediaType: JsonResourceType,
+			errMsg:    fmt.Sprintf("signer: %s: signature is required but not found", ExistingDID),
 		},
 		{
 			valid:      false,
@@ -94,10 +95,10 @@ func TestCreateResource(t *testing.T) {
 				Id:           IncorrectResourceId,
 				Name:         "Test Resource Name",
 				ResourceType: CLSchemaType,
-				MediaType:    JsonResourceType,
 				Data:         []byte(SchemaData),
 			},
-			errMsg: fmt.Sprintf("did:cheqd:test:%s: not found", NotFoundDIDIdentifier),
+			mediaType: JsonResourceType,
+			errMsg:    fmt.Sprintf("did:cheqd:test:%s: not found", NotFoundDIDIdentifier),
 		},
 	}
 
@@ -117,7 +118,7 @@ func TestCreateResource(t *testing.T) {
 
 				require.Equal(t, tc.msg.CollectionId, resource.Header.CollectionId)
 				require.Equal(t, tc.msg.Id, resource.Header.Id)
-				require.Equal(t, tc.msg.MediaType, resource.Header.MediaType)
+				require.Equal(t, tc.mediaType, resource.Header.MediaType)
 				require.Equal(t, tc.msg.ResourceType, resource.Header.ResourceType)
 				require.Equal(t, tc.msg.Data, resource.Data)
 				require.Equal(t, tc.msg.Name, resource.Header.Name)

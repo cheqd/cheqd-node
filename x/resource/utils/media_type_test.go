@@ -10,13 +10,13 @@ import (
 func TestValidateMediaType(t *testing.T) {
 	cases := []struct {
 		path string
-		mt    string
+		mt   string
 	}{
-		{ "testdata/resource.txt", "text/plain; charset=utf-8" },
-		{ "testdata/resource.csv", "text/csv" },
-		{ "testdata/resource.dat", "application/octet-stream" },
-		{ "testdata/resource.json", "application/json" },
-		{ "testdata/resource.pdf", "application/pdf" },
+		{"testdata/resource.txt", "text/plain; charset=utf-8"},
+		{"testdata/resource.csv", "text/csv"},
+		{"testdata/resource.dat", "application/octet-stream"},
+		{"testdata/resource.json", "application/json"},
+		{"testdata/resource.pdf", "application/pdf"},
 	}
 
 	for _, tc := range cases {

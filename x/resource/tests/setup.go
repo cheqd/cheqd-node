@@ -95,7 +95,6 @@ func GenerateCreateResourcePayload(resource types.Resource) *types.MsgCreateReso
 		Id:           resource.Header.Id,
 		Name:         resource.Header.Name,
 		ResourceType: resource.Header.ResourceType,
-		MediaType:    resource.Header.MediaType,
 		Data:         resource.Data,
 	}
 }
