@@ -47,13 +47,12 @@ RESOURCE1_V1_ID=$(uuidgen)
 RESOURCE1_NAME="Resource 1"
 RESOURCE1_MEDIA_TYPE="application/json"
 RESOURCE1_RESOURCE_TYPE="CL-Schema"
-RESOURCE1_V1_DATA='dGVzdCBiYXNlNTYgZW5jb2RlZCBkYXRh';
+RESOURCE1_V1_DATA=$(echo '{ "content": "resource 1 v1" }'| base64 -w 0);
 
 MSG_CREATE_RESOURCE1='{
   "collection_id": "'${ID1}'",
   "id": "'${RESOURCE1_V1_ID}'",
   "name": "'${RESOURCE1_NAME}'",
-  "media_type": "'${RESOURCE1_MEDIA_TYPE}'",
   "resource_type": "'${RESOURCE1_RESOURCE_TYPE}'",
   "data": "'${RESOURCE1_V1_DATA}'"
 }';
@@ -86,13 +85,12 @@ assert_json_eq "$(echo "$RESULT" | jq -r ".resource.data")" "${RESOURCE1_V1_DATA
 ########## Creating Resource 1 v2 ##########
 
 RESOURCE1_V2_ID=$(uuidgen)
-RESOURCE1_V2_DATA='dGVzdCBiYXNlNTYgZW5jb2RlZCBkYXRhLg==';
+RESOURCE1_V2_DATA=$(echo '{ "content": "resource 1 v2" }'| base64 -w 0);
 
 MSG_CREATE_RESOURCE1_V2='{
   "collection_id": "'${ID1}'",
   "id": "'${RESOURCE1_V2_ID}'",
   "name": "'${RESOURCE1_NAME}'",
-  "media_type": "'${RESOURCE1_MEDIA_TYPE}'",
   "resource_type": "'${RESOURCE1_RESOURCE_TYPE}'",
   "data": "'${RESOURCE1_V2_DATA}'"
 }';
@@ -108,7 +106,7 @@ assert_tx_successful "$RESULT"
 ########## Creating Resource 2 ##########
 
 RESOURCE2_ID=$(uuidgen)
-RESOURCE2_DATA='dGVzdCBiYXNlNTYgZW5jb2RlZCBkYXRhdGVzdCBiYXNlNTYgZW5jb2RlZCBkYXRh';
+RESOURCE2_DATA=$(echo '{ "content": "resource 2" }'| base64 -w 0);
 RESOURCE2_NAME="Resource 2"
 RESOURCE2_MEDIA_TYPE="application/json"
 RESOURCE2_RESOURCE_TYPE="CL-Schema"
@@ -117,7 +115,6 @@ MSG_CREATE_RESOURCE2='{
   "collection_id": "'${ID1}'",
   "id": "'${RESOURCE2_ID}'",
   "name": "'${RESOURCE2_NAME}'",
-  "media_type": "'${RESOURCE2_MEDIA_TYPE}'",
   "resource_type": "'${RESOURCE2_RESOURCE_TYPE}'",
   "data": "'${RESOURCE2_DATA}'"
 }';

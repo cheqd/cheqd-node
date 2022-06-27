@@ -22,7 +22,6 @@ message MsgCreateResourcePayload {
   string id = 2;
   string name = 3;
   string resource_type = 4;
-  string media_type = 5;
   bytes data = 6;
 }
 

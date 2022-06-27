@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 	"crypto/sha256"
+	"github.com/cheqd/cheqd-node/x/resource/utils"
 	"time"
 
 	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
@@ -47,6 +48,7 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 
 	resource.Header.Checksum = sha256.New().Sum(resource.Data)
 	resource.Header.Created = time.Now().UTC().Format(time.RFC3339)
+	resource.Header.MediaType = utils.DetectMediaType(resource.Data)
 
 	// Find previous version and upgrade backward and forward version links
 	previousResourceVersionHeader, found := k.GetLastResourceVersionHeader(&ctx, resource.Header.CollectionId, resource.Header.Name, resource.Header.ResourceType, resource.Header.MediaType)
