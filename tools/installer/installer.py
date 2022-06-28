@@ -20,11 +20,8 @@ import threading
 
 
 # Installation Parameters
-# ONLY_DIGIT_VERSIONS=re.compile(r'.*([0-9]+)\.([0-9]+)\.([0-9]+)$')
 LAST_N_RELEASES = 5
-# LAST_VERSION_WITH_TARBALL = "v0.5.0"
 DEFAULT_HOME = "/home/cheqd"
-# DEVAULT_VERSION = "v0.5.0"
 DEFAULT_INSTALL_PATH = "/usr/bin"
 DEFAULT_CHEQD_USER = "cheqd"
 DEFAULT_BINARY_NAME = "cheqd-noded"
@@ -39,8 +36,8 @@ DEFAULT_USE_COSMOVISOR = "yes"
 
 
 ### Genesis and Seeds
-GENESIS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/{}/genesis.json"
-SEEDS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/persistent_chains/{}/seeds.txt"
+GENESIS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/networks/{}/genesis.json"
+SEEDS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/networks/{}/seeds.txt"
 
 ###############################################################
 ###     				Node snapshots      				###
