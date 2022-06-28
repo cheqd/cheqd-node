@@ -46,9 +46,24 @@ func GetPayloadAndSignInputs(clientCtx client.Context, args []string) (string, [
 	payloadJson := args[0]
 
 	// Get signInputs
+	signInputs, err := GetSignInputs(clientCtx, args[1:])
+	if err != nil {
+		return "", []SignInput{}, err
+	}
+
+	return payloadJson, signInputs, nil
+}
+
+func GetSignInputs(clientCtx client.Context, args []string) ([]SignInput, error) {
+	// Check for args count
+	if len(args)%2 != 0 {
+		return []SignInput{}, fmt.Errorf("can't read sign inputs. invalid number of arguments: %d", len(args))
+	}
+
+	// Get signInputs
 	var signInputs []SignInput
 
-	for i := 1; i < len(args); i += 2 {
+	for i := 0; i < len(args); i += 2 {
 		vmId := args[i]
 		privKey := args[i+1]
 
@@ -59,13 +74,13 @@ func GetPayloadAndSignInputs(clientCtx client.Context, args []string) (string, [
 			privKey, err = input.GetString("Enter base64 encoded verification key", inBuf)
 
 			if err != nil {
-				return "", nil, err
+				return nil, err
 			}
 		}
 
 		privKeyBytes, err := base64.StdEncoding.DecodeString(privKey)
 		if err != nil {
-			return "", nil, fmt.Errorf("unable to decode private key: %s", err.Error())
+			return nil, fmt.Errorf("unable to decode private key: %s", err.Error())
 		}
 
 		signInput := SignInput{
@@ -76,7 +91,7 @@ func GetPayloadAndSignInputs(clientCtx client.Context, args []string) (string, [
 		signInputs = append(signInputs, signInput)
 	}
 
-	return payloadJson, signInputs, nil
+	return signInputs, nil
 }
 
 func SignWithSignInputs(signBytes []byte, signInputs []SignInput) []*types.SignInfo {

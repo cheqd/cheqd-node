@@ -1,0 +1,49 @@
+syntax = "proto3";
+package cheqdid.cheqdnode.resource.v1;
+
+option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
+
+import "google/api/annotations.proto";
+import "resource/v1/resource.proto";
+
+
+// Query defines the gRPC querier service.
+service Query {
+  rpc Resource(QueryGetResourceRequest) returns (QueryGetResourceResponse) {
+    option (google.api.http).get = "/1.0/identifiers/{collection_id}/resources/{id}";
+  }
+  rpc CollectionResources(QueryGetCollectionResourcesRequest) returns (QueryGetCollectionResourcesResponse) {
+    option (google.api.http).get = "/1.0/identifiers/{collection_id}/resources";
+  }
+  rpc AllResourceVersions(QueryGetAllResourceVersionsRequest) returns (QueryGetAllResourceVersionsResponse) {
+    option (google.api.http).get = "/1.0/identifiers/{collection_id}/resources/versions";
+  }
+}
+
+message QueryGetResourceRequest {
+  string collection_id = 1;
+  string id = 2;
+}
+
+message QueryGetResourceResponse {
+  Resource resource = 1;
+}
+
+message QueryGetCollectionResourcesRequest {
+  string collection_id = 1;
+}
+
+message QueryGetCollectionResourcesResponse {
+  repeated ResourceHeader resources = 1;
+}
+
+message QueryGetAllResourceVersionsRequest {
+  string collection_id = 1;  // Mapped to URL path
+  string name = 2;      // Mapped to URL parameter `name`
+  string resource_type = 3;  // Mapped to URL parameter `resource_type`
+  string media_type = 4;    // Mapped to URL parameter `media_type`
+}
+
+message QueryGetAllResourceVersionsResponse {
+  repeated ResourceHeader resources = 1;
+}

@@ -6,7 +6,10 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/cheqd/cheqd-node/x/resource"
+
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
@@ -37,6 +40,7 @@ import (
 	appparams "github.com/cheqd/cheqd-node/app/params"
 	"github.com/cheqd/cheqd-node/x/cheqd"
 	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
+	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
@@ -147,6 +151,7 @@ var (
 		feegrantmodule.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
 		cheqd.AppModuleBasic{},
+		resource.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -214,7 +219,8 @@ type App struct {
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
-	cheqdKeeper cheqdkeeper.Keeper
+	cheqdKeeper    cheqdkeeper.Keeper
+	resourceKeeper resourcekeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -243,7 +249,7 @@ func New(
 		govtypes.StoreKey, paramstypes.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, capabilitytypes.StoreKey, feegrant.StoreKey,
 		ibchost.StoreKey, ibctransfertypes.StoreKey, authzkeeper.StoreKey,
-		cheqdtypes.StoreKey,
+		cheqdtypes.StoreKey, resourcetypes.StoreKey,
 	)
 
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -378,6 +384,10 @@ func New(
 		appCodec, keys[cheqdtypes.StoreKey],
 	)
 
+	app.resourceKeeper = *resourcekeeper.NewKeeper(
+		appCodec, keys[resourcetypes.StoreKey],
+	)
+
 	app.GovKeeper = govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
 		&stakingKeeper, govRouter,
@@ -418,6 +428,7 @@ func New(
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeegrantKeeper, app.interfaceRegistry),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		cheqd.NewAppModule(appCodec, app.cheqdKeeper),
+		resource.NewAppModule(appCodec, app.resourceKeeper, app.cheqdKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
 	)
@@ -437,6 +448,7 @@ func New(
 		stakingtypes.ModuleName,
 		ibchost.ModuleName,
 		cheqdtypes.ModuleName,
+		resourcetypes.ModuleName,
 		genutiltypes.ModuleName,
 		banktypes.ModuleName,
 		crisistypes.ModuleName,
@@ -461,6 +473,7 @@ func New(
 		evidencetypes.ModuleName,
 		ibchost.ModuleName,
 		cheqdtypes.ModuleName,
+		resourcetypes.ModuleName,
 		genutiltypes.ModuleName,
 		banktypes.ModuleName,
 		ibctransfertypes.ModuleName,
@@ -493,6 +506,7 @@ func New(
 		feegrant.ModuleName,
 		authz.ModuleName,
 		cheqdtypes.ModuleName,
+		resourcetypes.ModuleName,
 		vestingtypes.ModuleName,
 		upgradetypes.ModuleName,
 		paramstypes.ModuleName,
@@ -515,6 +529,7 @@ func New(
 		feegrant.ModuleName,
 		authz.ModuleName,
 		cheqdtypes.ModuleName,
+		resourcetypes.ModuleName,
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
 		upgradetypes.ModuleName,
@@ -573,7 +588,7 @@ func (app *App) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.Respo
 
 func (app *App) TestNetMigration(ctx sdk.Context) {
 	if ctx.ChainID() == "cheqd-testnet-2" {
-		app.cheqdKeeper.SetDidNamespace(ctx, "testnet")
+		app.cheqdKeeper.SetDidNamespace(&ctx, "testnet")
 	}
 }
 

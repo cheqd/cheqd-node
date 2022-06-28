@@ -7,11 +7,6 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
-var SupportedServiceTypes = []string{
-	"LinkedDomains",
-	"DIDCommMessaging",
-}
-
 func NewService(id string, type_ string, serviceEndpoint string) *Service {
 	return &Service{
 		Id:              id,
@@ -37,7 +32,7 @@ func GetServiceIds(vms []*Service) []string {
 func (s Service) Validate(baseDid string, allowedNamespaces []string) error {
 	return validation.ValidateStruct(&s,
 		validation.Field(&s.Id, validation.Required, IsDIDUrl(allowedNamespaces, Empty, Empty, Required), HasPrefix(baseDid)),
-		validation.Field(&s.Type, validation.Required, validation.In(utils.ToInterfaces(SupportedServiceTypes)...)),
+		validation.Field(&s.Type, validation.Required, validation.Length(1, 255)),
 		validation.Field(&s.ServiceEndpoint, validation.Required),
 	)
 }
