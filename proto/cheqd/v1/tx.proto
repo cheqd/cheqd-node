@@ -5,12 +5,13 @@ option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
 import "google/protobuf/any.proto";
 import "cheqd/v1/did.proto";
+import "cheqd/v1/stateValue.proto";
 
 // Msg defines the Msg service.
 service Msg {
   rpc CreateDid(MsgCreateDid) returns (MsgCreateDidResponse);
   rpc UpdateDid(MsgUpdateDid) returns (MsgUpdateDidResponse);
-  rpc DeactivateDid(MsgUpdateDid) returns (MsgDeactivateDidResponse);
+  rpc DeactivateDid(MsgDeactivateDid) returns (MsgDeactivateDidResponse);
 }
 
 // this line is used by starport scaffolding # proto/tx/message
@@ -26,7 +27,7 @@ message MsgUpdateDid {
 
 // created DeactivateDid message
 message MsgDeactivateDid {
-  MsgUpdateDidPayload payload = 1;
+  MsgDeactivateDidPayload payload = 1;
   repeated SignInfo signatures = 2;
 }
 
@@ -38,22 +39,14 @@ message SignInfo {
 
 // created DeactivateDid payload
 message MsgDeactivateDidPayload {
-  repeated string context = 1;
-  string id = 2;
-  repeated string controller = 3;
-  repeated VerificationMethod verification_method = 4;
-  repeated string authentication = 5;
-  repeated string assertion_method = 6;
-  repeated string capability_invocation = 7;
-  repeated string capability_delegation = 8;
-  repeated string key_agreement = 9;
-  repeated string also_known_as = 10;
-  repeated Service service = 11;
+  string id = 1;
 }
 
 //created DeactivateDid response
 message MsgDeactivateDidResponse {
-  string id = 1; 
+   Did did = 1;
+   Metadata metadata = 2;
+
 }
 
 message MsgCreateDidPayload {
