@@ -1,10 +1,12 @@
 ### APP-SPECIFIC EXCLUSIONS ###
-.github
-*.md
-tools/build/*
-docs/*
-architecture/*
-persistent_chains/*
+tools/**
+
+# Tests
+**/network-config
+
+# Python
+.pytest_cache
+**/__pycache__
 
 ### GENERAL EXCLUSIONS ###
 
