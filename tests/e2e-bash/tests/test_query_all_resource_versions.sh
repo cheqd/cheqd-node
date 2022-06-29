@@ -47,19 +47,17 @@ RESOURCE1_V1_ID=$(uuidgen)
 RESOURCE1_NAME="Resource 1"
 RESOURCE1_MEDIA_TYPE="application/json"
 RESOURCE1_RESOURCE_TYPE="CL-Schema"
-RESOURCE1_V1_DATA=$(echo '{ "content": "resource 1 v1" }'| base64 -w 0);
-
-MSG_CREATE_RESOURCE1='{
-  "collection_id": "'${ID1}'",
-  "id": "'${RESOURCE1_V1_ID}'",
-  "name": "'${RESOURCE1_NAME}'",
-  "resource_type": "'${RESOURCE1_RESOURCE_TYPE}'",
-  "data": "'${RESOURCE1_V1_DATA}'"
-}';
+RESOURCE1_V1_DATA='{ "content": "resource 1 v1" }';
 
 # Post the message
 # shellcheck disable=SC2086
-RESULT=$(cheqd-noded tx resource create-resource-raw "${MSG_CREATE_RESOURCE1}" "${KEY1_ID}" "${ALICE_VER_PRIV_BASE_64}" \
+RESULT=$(cheqd-noded tx resource create-resource \
+  --collection-id "${ID1}" \
+  --resource-id "${RESOURCE1_V1_ID}" \
+  --resource-name "${RESOURCE1_NAME}" \
+  --resource-type "${RESOURCE1_RESOURCE_TYPE}" \
+  --resource-file <(echo "${RESOURCE1_V1_DATA}") \
+  "${KEY1_ID}" "${ALICE_VER_PRIV_BASE_64}" \
   --from "${BASE_ACCOUNT_1}" ${TX_PARAMS})
 
 assert_tx_successful "$RESULT"
@@ -79,25 +77,23 @@ EXPECTED_RES1_V1_HEADER='{
 
 DEL_FILTER='del(.checksum, .created, .next_version_id, .previous_version_id)'
 assert_json_eq "$(echo "$RESULT" | jq -r ".resource.header | ${DEL_FILTER}")" "${EXPECTED_RES1_V1_HEADER}"
-assert_json_eq "$(echo "$RESULT" | jq -r ".resource.data")" "${RESOURCE1_V1_DATA}"
+assert_json_eq "$(echo "$RESULT" | jq -r ".resource.data")" "$(echo "${RESOURCE1_V1_DATA}" | base64 -w 0)"
 
 
 ########## Creating Resource 1 v2 ##########
 
 RESOURCE1_V2_ID=$(uuidgen)
-RESOURCE1_V2_DATA=$(echo '{ "content": "resource 1 v2" }'| base64 -w 0);
-
-MSG_CREATE_RESOURCE1_V2='{
-  "collection_id": "'${ID1}'",
-  "id": "'${RESOURCE1_V2_ID}'",
-  "name": "'${RESOURCE1_NAME}'",
-  "resource_type": "'${RESOURCE1_RESOURCE_TYPE}'",
-  "data": "'${RESOURCE1_V2_DATA}'"
-}';
+RESOURCE1_V2_DATA='{ "content": "resource 1 v2" }';
 
 # Post the message
 # shellcheck disable=SC2086
-RESULT=$(cheqd-noded tx resource create-resource-raw "${MSG_CREATE_RESOURCE1_V2}" "${KEY1_ID}" "${ALICE_VER_PRIV_BASE_64}" \
+RESULT=$(cheqd-noded tx resource create-resource \
+  --collection-id "${ID1}" \
+  --resource-id "${RESOURCE1_V2_ID}" \
+  --resource-name "${RESOURCE1_NAME}" \
+  --resource-type "${RESOURCE1_RESOURCE_TYPE}" \
+  --resource-file <(echo "${RESOURCE1_V2_DATA}") \
+   "${KEY1_ID}" "${ALICE_VER_PRIV_BASE_64}" \
   --from "${BASE_ACCOUNT_1}" ${TX_PARAMS})
 
 assert_tx_successful "$RESULT"
@@ -110,17 +106,16 @@ RESOURCE2_DATA=$(echo '{ "content": "resource 2" }'| base64 -w 0);
 RESOURCE2_NAME="Resource 2"
 RESOURCE2_RESOURCE_TYPE="CL-Schema"
 
-MSG_CREATE_RESOURCE2='{
-  "collection_id": "'${ID1}'",
-  "id": "'${RESOURCE2_ID}'",
-  "name": "'${RESOURCE2_NAME}'",
-  "resource_type": "'${RESOURCE2_RESOURCE_TYPE}'",
-  "data": "'${RESOURCE2_DATA}'"
-}';
 
 # Post the message
 # shellcheck disable=SC2086
-RESULT=$(cheqd-noded tx resource create-resource-raw "${MSG_CREATE_RESOURCE2}" "${KEY1_ID}" "${ALICE_VER_PRIV_BASE_64}" \
+RESULT=$(cheqd-noded tx resource create-resource \
+  --collection-id "${ID1}" \
+  --resource-id "${RESOURCE2_ID}" \
+  --resource-name "${RESOURCE2_NAME}" \
+  --resource-type "${RESOURCE2_RESOURCE_TYPE}" \
+  --resource-file <(echo "${RESOURCE2_DATA}") \
+  "${KEY1_ID}" "${ALICE_VER_PRIV_BASE_64}" \
   --from "${BASE_ACCOUNT_1}" ${TX_PARAMS})
 
 assert_tx_successful "$RESULT"
@@ -137,7 +132,7 @@ EXPECTED_RES1_V2_HEADER='{
 }'
 
 # shellcheck disable=SC2086
-RESULT=$(cheqd-noded query resource all-resource-versions "${ID1}" "${RESOURCE1_NAME}" ${RESOURCE1_RESOURCE_TYPE} ${RESOURCE1_MEDIA_TYPE} ${QUERY_PARAMS})
+RESULT=$(cheqd-noded query resource all-resource-versions "${ID1}" "${RESOURCE1_NAME}" ${QUERY_PARAMS})
 
 assert_eq "$(echo "$RESULT" | jq -r ".resources | length")" "2"
 assert_json_eq "$(echo "$RESULT" | jq -r '.resources[] | select(.id == "'"${RESOURCE1_V1_ID}"'") | '"${DEL_FILTER}"'')" "${EXPECTED_RES1_V1_HEADER}"

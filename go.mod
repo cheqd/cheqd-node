@@ -5,7 +5,7 @@ go 1.17
 require (
 	filippo.io/edwards25519 v1.0.0-beta.2
 	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce
-	github.com/cosmos/cosmos-sdk v0.45.5
+	github.com/cosmos/cosmos-sdk v0.45.6
 	github.com/cosmos/ibc-go v1.4.0
 	github.com/gabriel-vasile/mimetype v1.4.0
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
@@ -18,7 +18,7 @@ require (
 	github.com/multiformats/go-multibase v0.0.3
 	github.com/rakyll/statik v0.1.7
 	github.com/spf13/cast v1.4.1
-	github.com/spf13/cobra v1.4.0
+	github.com/spf13/cobra v1.5.0
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.10.1
 	github.com/stretchr/testify v1.7.1

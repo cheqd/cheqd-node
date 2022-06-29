@@ -11,29 +11,56 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	FlagCollectionId = "collection-id"
+	FlagResourceId   = "resource-id"
+	FlagResourceName = "resource-name"
+	FlagResourceType = "resource-type"
+	FlagResourceFile = "resource-file"
+)
+
 func CmdCreateResource() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-resource [collection-id] [id] [name] [resource-type] [file-path] [ver-method-id-1] [priv-key-1] [ver-method-id-N] [priv-key-N] ...",
+		Use:   "create-resource [ver-method-id-1] [priv-key-1] [ver-method-id-N] [priv-key-N] ...",
 		Short: "Creates a new Resource.",
 		Long: "Creates a new Resource. " +
 			"[ver-method-id-N] is the DID fragment that points to the public part of the key in the ledger for the signature N." +
-			"[priv-key-1] is base base64 encoded ed25519 private key for signature N." +
+			"[priv-key-N] is base base64 encoded ed25519 private key for signature N." +
 			"If 'interactive' value is used for a key, the key will be read interactively. " +
 			"Prefer interactive mode, use inline mode only for tests.",
-		Args: cobra.MinimumNArgs(5),
+		Args: cobra.MinimumNArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			collectionId := args[0]
+			collectionId, err := cmd.Flags().GetString(FlagCollectionId)
+			if err != nil {
+				return err
+			}
 
-			id := args[1]
-			name := args[2]
-			resourceType := args[3]
+			resourceId, err := cmd.Flags().GetString(FlagResourceId)
+			if err != nil {
+				return err
+			}
 
-			data, err := ioutil.ReadFile(args[4])
+			resourceName, err := cmd.Flags().GetString(FlagResourceName)
+			if err != nil {
+				return err
+			}
+
+			resourceType, err := cmd.Flags().GetString(FlagResourceType)
+			if err != nil {
+				return err
+			}
+
+			resourceFile, err := cmd.Flags().GetString(FlagResourceFile)
+			if err != nil {
+				return err
+			}
+
+			data, err := ioutil.ReadFile(resourceFile)
 			if err != nil {
 				return err
 			}
@@ -41,14 +68,14 @@ func CmdCreateResource() *cobra.Command {
 			// Prepare payload
 			payload := types.MsgCreateResourcePayload{
 				CollectionId: collectionId,
-				Id:           id,
-				Name:         name,
+				Id:           resourceId,
+				Name:         resourceName,
 				ResourceType: resourceType,
 				Data:         data,
 			}
 
 			// Read signatures
-			signInputs, err := cheqdcli.GetSignInputs(clientCtx, args[5:])
+			signInputs, err := cheqdcli.GetSignInputs(clientCtx, args)
 			if err != nil {
 				return err
 			}
@@ -73,6 +100,26 @@ func CmdCreateResource() *cobra.Command {
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
+
+	cmd.Flags().String(FlagCollectionId, "", "Collection ID")
+	err := cobra.MarkFlagRequired(cmd.Flags(), FlagCollectionId)
+	panicIfErr(err)
+
+	cmd.Flags().String(FlagResourceId, "", "Resource ID")
+	err = cobra.MarkFlagRequired(cmd.Flags(), FlagResourceId)
+	panicIfErr(err)
+
+	cmd.Flags().String(FlagResourceName, "", "Resource name")
+	err = cobra.MarkFlagRequired(cmd.Flags(), FlagResourceName)
+	panicIfErr(err)
+
+	cmd.Flags().String(FlagResourceType, "", "Resource type")
+	err = cobra.MarkFlagRequired(cmd.Flags(), FlagResourceType)
+	panicIfErr(err)
+
+	cmd.Flags().String(FlagResourceFile, "", "Resource file")
+	err = cobra.MarkFlagRequired(cmd.Flags(), FlagResourceFile)
+	panicIfErr(err)
 
 	return cmd
 }
