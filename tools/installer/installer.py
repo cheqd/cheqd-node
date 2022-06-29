@@ -475,12 +475,27 @@ class Installer():
         self.log(f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
         self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
 
-    def untar_from_snapshot(self):
+    def download_snapshot(self):
         archive_name = os.path.basename(self.interviewer.snapshot_url)
         self.mkdir_p(self.cheqd_data_dir)
-        self.log("Install additional tool for showing the progress")
-        self.exec("apt install pv -y")
-        self.exec(f"wget -c {self.interviewer.snapshot_url}")
+        # Fetch size of snapshot archive. Uses curl to fetch headers and looks for Content-Length.
+        archive_size = self.exec(f"curl --head {self.interviewer.snapshot_url} | awk  '/Length/ {{print $2}}'").stdout.strip()
+        # Check how much free disk space is available wherever the cheqd root directory is mounted
+        free_disk_space = self.exec("df -P {self.cheqd_root_dir} | tail -1 | cut -d' ' -f 3").stdout.strip()
+        if int(archive_size) < int(free_disk_space):
+            self.log(f"Downloading snapshot archive. This may take a while...")
+            self.exec(f"wget -c {self.interviewer.snapshot_url} ")
+        elif int(archive_size) > int(free_disk_space):
+            self.log(f"Not enough free disk space in {self.cheqd_root_dir} to download snapshot.")
+            self.log(f"Please free up adequate disk space and try again. Exiting now...")
+            sys.exit(1)
+        else:
+            self.log(f"Unable to download snapshot archive. Exiting now...")
+            sys.exit(1)
+        
+
+    def untar_from_snapshot(self):
+        
         self.exec(f"sudo su -c 'pv {archive_name} | tar xzf - -C {os.path.join(self.cheqd_root_dir, 'data')}'")
         self.exec(f"rm {archive_name}")
 
