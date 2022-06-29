@@ -48,11 +48,11 @@ MAINNET_SNAPSHOT = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/m
 ###############################################################
 ###     				Systemd Config      				###
 ###############################################################
-STANDALONE_SERVICE_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/b0e5ee4de6daf44f2dd8e49d5ed4a38b3c299873/tools/build/node-standalone.service"
-COSMOVISOR_SERVICE_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/57978fe6dcac0634ad22936c9cc98bf968e573c6/tools/build/node-cosmovisor.service"
+STANDALONE_SERVICE_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/tools/build/node-standalone.service"
+COSMOVISOR_SERVICE_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/tools/build/node-cosmovisor.service"
 
-LOGROTATE_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/57978fe6dcac0634ad22936c9cc98bf968e573c6/tools/build/logrotate.conf"
-RSYSLOG_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/57978fe6dcac0634ad22936c9cc98bf968e573c6/tools/build/rsyslog.conf"
+LOGROTATE_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/tools/build/logrotate.conf"
+RSYSLOG_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/tools/build/rsyslog.conf"
 
 DEFAULT_STANDALONE_SERVICE_NAME = 'cheqd-noded'
 DEFAULT_COSMOVISOR_SERVICE_NAME = 'cheqd-cosmovisor'
@@ -100,8 +100,8 @@ class Release:
 
 
 def failure_exit(reason):
-    print(f"Reason of failure: {reason}")
-    print("Exiting....")
+    print(f"Reason for failure: {reason}")
+    print("Exiting...")
     sys.exit(1)
 
 
@@ -234,7 +234,7 @@ class Installer():
         return subprocess.run(cmd, **kwargs)
 
     def get_binary(self):
-        self.log("Download the binary")
+        self.log("Downloading cheqd-noded binary...")
         tar_url = self.release.get_tar_gz_url()
         fname= os.path.basename(tar_url)
         self.exec(f"wget -c {tar_url}")
@@ -273,22 +273,22 @@ class Installer():
 
     def prepare_directory_tree(self):
         """
-        Needs only in case of Clean installation
+        Needed only in case of clean installation
 
         """
         if not os.path.exists(self.cheqd_root_dir):
-            self.log("Make root directory for cheqd-node")
+            self.log("Creating main directory for cheqd-noded")
             self.mkdir_p(self.cheqd_root_dir)
 
-            self.log(f"Chown to default cheqd user: {DEFAULT_CHEQD_USER}")
+            self.log(f"Setting directory permissions to default cheqd user: {DEFAULT_CHEQD_USER}")
             self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.home_dir}")
 
         if not os.path.exists(self.cheqd_log_dir):
-            self.log("Setup log directory")
+            self.log("Creating log directory for cheqd-noded")
             self.setup_log_dir()
 
         if os.path.exists("/var/log/cheqd-node") and not os.path.islink("/var/log/cheqd-node"):
-            self.log("Make a link to /var/log/cheqd-node")
+            self.log("Creating a symlink from cheqd-noded log folder to /var/log/cheqd-node")
             os.symlink(self.cheqd_log_dir, "/var/log/cheqd-node", target_is_directory=True)
 
     def is_service_file_exists(self) -> bool:
@@ -296,7 +296,7 @@ class Installer():
             os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
 
     def setup_systemctl_services(self):
-        self.log("Setup systemctl service config")
+        self.log("Setting up systemd config")
         if not self.interviewer.is_upgrade or \
                 self.interviewer.rewrite_systemd or \
                 not self.is_service_file_exists():
@@ -309,7 +309,7 @@ class Installer():
             else:
                 self.exec(f"curl -s {STANDALONE_SERVICE_FILE} > {DEFAULT_STANDALONE_SERVICE_FILE_PATH}")
 
-            self.log("Enable systemctl service")
+            self.log("Enabling systemd service for cheqd-noded")
             self.exec(f"systemctl enable {DEFAULT_COSMOVISOR_SERVICE_NAME if self.interviewer.is_cosmo_needed else DEFAULT_STANDALONE_SERVICE_NAME}")
 
     def check_systemd_service_on(self, service_name) -> bool:
@@ -326,30 +326,29 @@ class Installer():
             self.log(f"Disable systemd service: {service_name}")
             self.exec(f"systemctl disable {service_name}")
 
-            self.log("Reset failed services")
+            self.log("Reset failed systemd services (if any)")
             self.exec("systemctl reset-failed")
 
-            self.log("Daemon-reload")
+            self.log("Reload systemd config")
             self.exec('systemctl daemon-reload')
 
     def setup_system_configs(self):
         if os.path.exists("/etc/rsyslog.d/"):
             if not os.path.exists(DEFAULT_RSYSLOG_FILE) or self.interviewer.rewrite_rsyslog:
-                self.log("Configure rsyslog")
+                self.log("Configuring syslog systemd service for cheqd-noded logging")
                 with open(DEFAULT_RSYSLOG_FILE, mode="w") as fd:
                     fd.write(self.rsyslog_cfg)
                 # Sometimes it can take a lot of time: https://github.com/rsyslog/rsyslog/issues/3133
+                self.log("Restarting rsyslog service")
                 self.exec("systemctl restart rsyslog")
 
         if os.path.exists("/etc/logrotate.d"):
             if not os.path.exists(DEFAULT_LOGROTATE_FILE) or self.interviewer.rewrite_logrotate:
-                self.log("Add config for logrotation")
+                self.log("Configuring log rotation systemd service for cheqd-noded logging")
                 with open(DEFAULT_LOGROTATE_FILE, mode="w") as fd:
                     fd.write(self.logrotate_cfg)
-                # Sometimes it can take a long period of time: https://github.com/rsyslog/rsyslog/issues/3133
-                self.exec("systemctl restart rsyslog")
 
-        self.log("Restart logrotate services")
+        self.log("Restarting logrotate services")
         self.exec("systemctl restart logrotate.service")
         self.exec("systemctl restart logrotate.timer")
 
@@ -360,15 +359,15 @@ class Installer():
 
         """
         Steps:
-        - remove all data and configs if needed
-        - download cheqd-noded binary
-        - prepare cheqd user
-        - prepare directory tree
-        - setup systemctl configs
-        - setup cosmovisor if needed
-        - copy cheqd-noded binary to cosmovisor or /usr/bin
-        - postinstall if needed
-        - snapshot if needed
+        - Remove all data and configurations (if needed)
+        - Download cheqd-noded binary
+        - Prepare cheqd user
+        - Prepare directory tree
+        - Setup systemctl configs
+        - Setup Cosmovisor (if selected by user)
+        - Install cheqd-noded binary at system bin or Cosmovisor bin path
+        - Carry out post-install actions
+        - Restore and download snapshot (if selected by user)
         """
         self.pre_install()
 
@@ -381,7 +380,7 @@ class Installer():
         self.setup_system_configs()
 
         if self.interviewer.is_cosmo_needed:
-            self.log("Setup the cosmovisor")
+            self.log("Setting up Cosmovisor")
             self.setup_cosmovisor()
 
         if not self.interviewer.is_cosmo_needed:
@@ -392,7 +391,7 @@ class Installer():
             self.post_install()
 
         if self.interviewer.init_from_snapshot:
-            self.log("Going to download the archive and untar it. It can take a really LONG TIME")
+            self.log("Downloading snapshot and extracting archive. This can take a *really* long time...")
             self.untar_from_snapshot()
 
     def post_install(self):
@@ -401,7 +400,7 @@ class Installer():
             self.exec(f"sudo su -c 'cheqd-noded init {self.interviewer.moniker}' {DEFAULT_CHEQD_USER}")
 
             # Downloading genesis file
-            self.exec(f"curl -s {GENESIS_FILE.format(self.interviewer.chain)} > {os.path.join(self.cheqd_config_dir, 'genesis.json')}")
+            self.exec(f"curl {GENESIS_FILE.format(self.interviewer.chain)} > {os.path.join(self.cheqd_config_dir, 'genesis.json')}")
             shutil.chown(os.path.join(self.cheqd_config_dir, 'genesis.json'),
                          DEFAULT_CHEQD_USER,
                          DEFAULT_CHEQD_USER)
@@ -411,7 +410,7 @@ class Installer():
             self.exec(f"sudo su -c 'cheqd-noded configure p2p external-address {self.interviewer.external_address}:{self.interviewer.p2p_port}' {DEFAULT_CHEQD_USER}")
 
         # Setting up the seeds
-        seeds = self.exec(f"curl -s {SEEDS_FILE.format(self.interviewer.chain)}").stdout.decode("utf-8").strip()
+        seeds = self.exec(f"curl {SEEDS_FILE.format(self.interviewer.chain)}").stdout.decode("utf-8").strip()
         self.exec(f"sudo su -c 'cheqd-noded configure p2p seeds {seeds}' {DEFAULT_CHEQD_USER}")
 
         # Setting up the RPC port
@@ -425,10 +424,10 @@ class Installer():
 
     def prepare_cheqd_user(self):
         if not self.is_user_exists(DEFAULT_CHEQD_USER):
-            self.log(f"Create group, {DEFAULT_CHEQD_USER} by default")
-            self.exec(f"addgroup {DEFAULT_CHEQD_USER} --quiet")
+            self.log(f"Creating {DEFAULT_CHEQD_USER} group")
+            self.exec(f"addgroup {DEFAULT_CHEQD_USER} --quiet --system")
 
-            self.log(f"Create user, {DEFAULT_CHEQD_USER} by default")
+            self.log(f"Creating {DEFAULT_CHEQD_USER} user and adding to {DEFAULT_CHEQD_USER} group")
             self.exec(
                 f"adduser --system {DEFAULT_CHEQD_USER} --home {self.interviewer.home_dir} --shell /bin/bash --ingroup {DEFAULT_CHEQD_USER} --quiet")
 
@@ -441,12 +440,13 @@ class Installer():
     def setup_log_dir(self):
         self.mkdir_p(self.cheqd_log_dir)
         Path(os.path.join(self.cheqd_log_dir, "stdout.log")).touch()
+        self.log(f"Setting up ownership permissions for {self.cheqd_log_dir} directory")
         self.exec(f"chown -R syslog:cheqd {self.cheqd_log_dir}")
 
     def setup_cosmovisor(self):
         fname= os.path.basename(COSMOVISOR_BINARY_URL)
         self.exec(f"wget -c {COSMOVISOR_BINARY_URL}")
-        self.exec(f"tar xzf {fname}")
+        self.exec(f"tar -xzf {fname}")
         self.remove_safe(fname)
         # Remove cosmovisor artifacts...
         self.remove_safe("CHANGELOG.md")
@@ -456,11 +456,11 @@ class Installer():
         self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis/bin"))
         self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "upgrades"))
         if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)):
-            self.log(f"Moving cosmovisor binary to default installation directory")
+            self.log(f"Moving Cosmovisor binary to installation directory")
             shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
 
         if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
-            self.log(f"Making symlink current -> genesis")
+            self.log(f"Creating symlink for current Cosmovisor version")
             os.symlink(os.path.join(self.cosmovisor_root_dir, "genesis"),
                        os.path.join(self.cosmovisor_root_dir, "current"))
 
@@ -468,16 +468,15 @@ class Installer():
         self.exec("sudo mv {} {}".format(self.binary_path, self.cosmovisor_cheqd_bin_path))
 
         if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
-            self.log(f"Making symlink to {self.cosmovisor_cheqd_bin_path}")
+            self.log(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
             os.symlink(self.cosmovisor_cheqd_bin_path,
                        os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
 
-        self.log(f"Changing owner to {DEFAULT_CHEQD_USER} user")
+        self.log(f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
         self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
 
     def untar_from_snapshot(self):
         archive_name = os.path.basename(self.interviewer.snapshot_url)
-
         self.mkdir_p(self.cheqd_data_dir)
         self.log("Install additional tool for showing the progress")
         self.exec("apt install pv -y")
