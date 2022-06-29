@@ -51,7 +51,13 @@ RESOURCE_DATA='{ "content": "test data" }';
 
 # Post the message
 # shellcheck disable=SC2086
-RESULT=$(cheqd-noded tx resource create-resource ${ID} ${RESOURCE_ID} "${RESOURCE_NAME}" ${RESOURCE_RESOURCE_TYPE} <(echo "${RESOURCE_DATA}") "${KEY_ID}" "${ALICE_VER_PRIV_BASE_64}" \
+RESULT=$(cheqd-noded tx resource create-resource \
+  --collection-id ${ID} \
+  --resource-id ${RESOURCE_ID} \
+  --resource-name "${RESOURCE_NAME}" \
+  --resource-type ${RESOURCE_RESOURCE_TYPE} \
+  --resource-file <(echo "${RESOURCE_DATA}") \
+  "${KEY_ID}" "${ALICE_VER_PRIV_BASE_64}" \
   --from "${BASE_ACCOUNT_1}" ${TX_PARAMS})
 
 assert_tx_successful "$RESULT"

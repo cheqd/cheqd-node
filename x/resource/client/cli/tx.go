@@ -18,8 +18,13 @@ func GetTxCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	cmd.AddCommand(CmdCreateResource(),
-		CmdCreateResourceRaw())
+	cmd.AddCommand(CmdCreateResource())
 
 	return cmd
+}
+
+func panicIfErr(err error) {
+	if err != nil {
+		panic(err)
+	}
 }
