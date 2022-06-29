@@ -26,7 +26,7 @@ func (m queryServer) AllResourceVersions(c context.Context, req *types.QueryGetA
 	}
 
 	// Get all versions
-	versions := m.GetAllResourceVersions(&ctx, req.CollectionId, req.Name, req.ResourceType, req.MediaType)
+	versions := m.GetAllResourceVersions(&ctx, req.CollectionId, req.Name)
 
 	return &types.QueryGetAllResourceVersionsResponse{
 		Resources: versions,

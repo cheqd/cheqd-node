@@ -132,7 +132,7 @@ EXPECTED_RES1_V2_HEADER='{
 }'
 
 # shellcheck disable=SC2086
-RESULT=$(cheqd-noded query resource all-resource-versions "${ID1}" "${RESOURCE1_NAME}" ${RESOURCE1_RESOURCE_TYPE} ${RESOURCE1_MEDIA_TYPE} ${QUERY_PARAMS})
+RESULT=$(cheqd-noded query resource all-resource-versions "${ID1}" "${RESOURCE1_NAME}" ${QUERY_PARAMS})
 
 assert_eq "$(echo "$RESULT" | jq -r ".resources | length")" "2"
 assert_json_eq "$(echo "$RESULT" | jq -r '.resources[] | select(.id == "'"${RESOURCE1_V1_ID}"'") | '"${DEL_FILTER}"'')" "${EXPECTED_RES1_V1_HEADER}"

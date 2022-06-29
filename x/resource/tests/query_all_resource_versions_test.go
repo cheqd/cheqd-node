@@ -40,8 +40,6 @@ func TestQueryGetAllResourceVersions(t *testing.T) {
 			msg: &types.QueryGetAllResourceVersionsRequest{
 				CollectionId: ExistingDIDIdentifier,
 				Name:         existingResource.Header.Name,
-				ResourceType: existingResource.Header.ResourceType,
-				MediaType:    existingResource.Header.MediaType,
 			},
 			response: &types.QueryGetAllResourceVersionsResponse{
 				Resources: []*types.ResourceHeader{existingResource.Header},
@@ -54,8 +52,6 @@ func TestQueryGetAllResourceVersions(t *testing.T) {
 			msg: &types.QueryGetAllResourceVersionsRequest{
 				CollectionId: NotFoundDIDIdentifier,
 				Name:         existingResource.Header.Name,
-				ResourceType: existingResource.Header.ResourceType,
-				MediaType:    existingResource.Header.MediaType,
 			},
 			response: nil,
 			errMsg:   fmt.Sprintf("did:cheqd:test:%s: DID Doc not found", NotFoundDIDIdentifier),

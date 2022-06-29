@@ -88,7 +88,7 @@ func (k Keeper) HasResource(ctx *sdk.Context, collectionId string, id string) bo
 	return store.Has(GetResourceHeaderKeyBytes(collectionId, id))
 }
 
-func (k Keeper) GetAllResourceVersions(ctx *sdk.Context, collectionId, name, resourceType, mediaType string) []*types.ResourceHeader {
+func (k Keeper) GetAllResourceVersions(ctx *sdk.Context, collectionId, name string) []*types.ResourceHeader {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, GetResourceHeaderCollectionPrefixBytes(collectionId))
 
@@ -100,9 +100,7 @@ func (k Keeper) GetAllResourceVersions(ctx *sdk.Context, collectionId, name, res
 		var val types.ResourceHeader
 		k.cdc.MustUnmarshal(iterator.Value(), &val)
 
-		if val.Name == name &&
-			val.ResourceType == resourceType &&
-			val.MediaType == mediaType {
+		if val.Name == name {
 			result = append(result, &val)
 		}
 	}
@@ -137,10 +135,7 @@ func (k Keeper) GetLastResourceVersionHeader(ctx *sdk.Context, collectionId, nam
 		var val types.ResourceHeader
 		k.cdc.MustUnmarshal(iterator.Value(), &val)
 
-		if val.Name == name &&
-			val.ResourceType == resourceType &&
-			val.MediaType == mediaType &&
-			val.NextVersionId == "" {
+		if val.Name == name && val.NextVersionId == "" {
 			return val, true
 		}
 	}
