@@ -23,6 +23,7 @@ DEFAULT_HOME = "/home/cheqd"
 DEFAULT_INSTALL_PATH = "/usr/bin"
 DEFAULT_CHEQD_USER = "cheqd"
 DEFAULT_BINARY_NAME = "cheqd-noded"
+DEFAULT_COSMOVISOR_BINARY_NAME = "cosmovisor"
 DEFAULT_CHAINS = ['testnet', 'mainnet']
 DEFAULT_CHAIN = "mainnet"
 PRINT_PREFIX = "********* "
@@ -175,7 +176,7 @@ class Installer():
 
     @property
     def rsyslog_cfg(self):
-        binary_name = "cosmovisor" if self.interviewer.is_cosmo_needed else DEFAULT_BINARY_NAME
+        binary_name = DEFAULT_COSMOVISOR_BINARY_NAME if self.interviewer.is_cosmo_needed else DEFAULT_BINARY_NAME
         fname = os.path.basename(RSYSLOG_TEMPLATE)
         self.exec(f"wget -c {RSYSLOG_TEMPLATE}")
         with open(fname) as f:
@@ -262,6 +263,9 @@ class Installer():
             self.log("Removing user's data and configs")
             self.remove_safe(self.cheqd_root_dir, is_dir=True)
 
+            self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+            self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
+
             self.remove_safe(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH)
             self.remove_safe(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
             self.remove_safe(DEFAULT_RSYSLOG_FILE)
@@ -277,7 +281,7 @@ class Installer():
             self.mkdir_p(self.cheqd_root_dir)
 
             self.log(f"Chown to default cheqd user: {DEFAULT_CHEQD_USER}")
-            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_root_dir}")
+            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.home_dir}")
 
         if not os.path.exists(self.cheqd_log_dir):
             self.log("Setup log directory")
@@ -324,9 +328,6 @@ class Installer():
 
             self.log("Reset failed services")
             self.exec("systemctl reset-failed")
-
-            self.log(f"Remove service file")
-            self.remove_safe(DEFAULT_STANDALONE_SERVICE_FILE_PATH if service_name == DEFAULT_STANDALONE_SERVICE_NAME else DEFAULT_COSMOVISOR_SERVICE_FILE_PATH)
 
             self.log("Daemon-reload")
             self.exec('systemctl daemon-reload')
@@ -440,7 +441,7 @@ class Installer():
     def setup_log_dir(self):
         self.mkdir_p(self.cheqd_log_dir)
         Path(os.path.join(self.cheqd_log_dir, "stdout.log")).touch()
-        self.exec(f"chown -R syslog:syslog {self.cheqd_log_dir}")
+        self.exec(f"chown -R syslog:cheqd {self.cheqd_log_dir}")
 
     def setup_cosmovisor(self):
         fname= os.path.basename(COSMOVISOR_BINARY_URL)
@@ -454,7 +455,7 @@ class Installer():
         self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis"))
         self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis/bin"))
         self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "upgrades"))
-        if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, "cosmovisor")):
+        if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)):
             self.log(f"Moving cosmovisor binary to default installation directory")
             shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
 
@@ -479,7 +480,7 @@ class Installer():
 
         self.mkdir_p(self.cheqd_data_dir)
         self.log("Install additional tool for showing the progress")
-        self.exec("apt install pv")
+        self.exec("apt install pv -y")
         self.exec(f"wget -c {self.interviewer.snapshot_url}")
         self.exec(f"sudo su -c 'pv {archive_name} | tar xzf - -C {os.path.join(self.cheqd_root_dir, 'data')}'")
         self.exec(f"rm {archive_name}")
@@ -841,9 +842,9 @@ if __name__ == '__main__':
             if interviewer.is_systemd_config_exists():
                 interviewer.ask_for_rewrite_systemd()
             interviewer.ask_for_cosmovisor(f"Do you use Cosmovisor now? Please type any kind of variants: yes/no ", default=DEFAULT_USE_COSMOVISOR)
-        elif not interviewer.is_upgrade:
+        else:
             interviewer.ask_for_install_from_scratch()
-    else:
+    if not interviewer.is_upgrade:
         interviewer.ask_for_cosmovisor(f"Do you want to use Cosmovisor? Please type any kind of variants: yes/no ", default=DEFAULT_USE_COSMOVISOR)
     if not interviewer.is_upgrade:
         interviewer.ask_for_chain()
