@@ -36,8 +36,6 @@ func (k msgServer) DeactivateDid(goCtx context.Context, msg *types.MsgDeactivate
 		return nil, err
 	}
 
-	
-
 	updatedMetadata := *existingStateValue.Metadata
 	updatedMetadata.Update(ctx)
 	updatedMetadata.Deactivated = true
@@ -47,7 +45,6 @@ func (k msgServer) DeactivateDid(goCtx context.Context, msg *types.MsgDeactivate
 		return nil, err
 	}
 
-	
 	// Consider did that we are going to create during did resolutions
 	inMemoryDids := map[string]types.StateValue{existingDid.Id: updatedStateValue}
 
@@ -61,7 +58,11 @@ func (k msgServer) DeactivateDid(goCtx context.Context, msg *types.MsgDeactivate
 	}
 
 	// Verify signatures
-	signers := GetSignerDIDsForDIDCreation(*existingDid)
+	updatedDid, err := updatedStateValue.UnpackDataAsDid()
+	if err != nil {
+		return nil, err
+	}
+	signers := GetSignerDIDsForDIDDeactivation(*existingDid, *updatedDid)
 	for _, signer := range signers {
 		signature, found := types.FindSignInfoBySigner(msg.Signatures, signer)
 
@@ -83,53 +84,16 @@ func (k msgServer) DeactivateDid(goCtx context.Context, msg *types.MsgDeactivate
 
 	// Build and return response
 	return &types.MsgDeactivateDidResponse{
-		Did: existingDid,
+		Did:      existingDid,
 		Metadata: &updatedMetadata,
 	}, nil
 }
 
+func GetSignerDIDsForDIDDeactivation(existingDid types.Did, updatedDid types.Did) []string { 
+	res := existingDid.GetControllersOrSubject()
+	res = append(res, updatedDid.GetControllersOrSubject()...)
+	res = append(res, existingDid.GetVerificationMethodControllers()...)
+	res = append(res, updatedDid.GetVerificationMethodControllers()...)
 
-
-
-
-func GetSignerDIDsForDIDDeactivate(existingDid types.Did, updatedDid types.Did) []string { //
-	signers := existingDid.GetControllersOrSubject()
-	signers = append(signers, updatedDid.GetControllersOrSubject()...)
-
-	existingVMMap := types.VerificationMethodListToMapByFragment(existingDid.VerificationMethod)
-	updatedVMMap := types.VerificationMethodListToMapByFragment(updatedDid.VerificationMethod)
-
-	for _, updatedVM := range updatedDid.VerificationMethod {
-		_, _, _, fragment := utils.MustSplitDIDUrl(updatedVM.Id)
-		existingVM, found := existingVMMap[fragment]
-
-		// VM added
-		if !found {
-			signers = append(signers, updatedVM.Controller)
-			continue
-		}
-
-		// VM updated
-		// We don't compare ids because they will be different after replacing ids on the updated version of DID.
-		// Fragments equality is checked above.
-		if !types.CompareVerificationMethodsWithoutIds(existingVM, *updatedVM) {
-			signers = append(signers, existingVM.Controller, updatedVM.Controller)
-			continue
-		}
-
-		// VM not changed
-	}
-
-	for _, existingVM := range existingDid.VerificationMethod {
-		_, _, _, fragment := utils.MustSplitDIDUrl(existingVM.Id)
-		_, found := updatedVMMap[fragment]
-
-		// VM removed
-		if !found {
-			signers = append(signers, existingVM.Controller)
-			continue
-		}
-	}
-
-	return utils.UniqueSorted(signers)
+	return utils.UniqueSorted(res)
 }
