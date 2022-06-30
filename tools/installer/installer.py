@@ -90,17 +90,15 @@ class Release:
         self.assets = release_map['assets']
         self.is_prerelease = release_map['prerelease']
 
-    def get_tar_gz_url(self):
-        archive_urls = [ a['browser_download_url'] for a in self.assets if a['browser_download_url'].find("tar.gz") > 0]
-        if len(archive_urls) == 0:
-            failure_exit(f"No tar.gz in release: {self.version}")
-        return archive_urls[0]
-
-    def get_binary_url(self):
-        binary_urls = [ a['browser_download_url'] for a in self.assets if a['name'] == DEFAULT_BINARY_NAME]
-        if len(binary_urls) == 0:
-            failure_exit(f"No binaries in release: {self.version}")
-        return binary_urls[0]
+    def get_release_url(self):
+        try:
+            release_urls = [ a['browser_download_url'] for a in self.assets if (a['browser_download_url'].find("cheqd-node") > 0 and a['browser_download_url'].find(".deb")) == -1]
+            if len(release_urls) > 0:
+                return release_urls[0]
+            else:
+                failure_exit(f"No asset found to download for release: {self.version}")
+        except:
+            failure_exit(f"Failed to get cheqd-node binaries from Github")
 
     def __str__(self):
         return f"Name: {self.version}"
@@ -133,7 +131,7 @@ def default_answer(func):
         _default = kwds.get('default', "")
         if _default:
             args = list(args)
-            args[-1] += f"[{_default}]:{os.linesep}"
+            args[-1] += f" [default: {_default}]:{os.linesep}"
         value = func(*args)
         return value if value != "" else _default
 
@@ -242,20 +240,27 @@ class Installer():
 
     def get_binary(self):
         self.log("Downloading cheqd-noded binary...")
-        tar_url = self.release.get_tar_gz_url()
-        fname = os.path.basename(tar_url)
-        self.exec(f"wget -c {tar_url}")
-        self.exec(f"tar xzf {fname}")
-        self.remove_safe(fname)
+        binary_url = self.release.get_release_url()
+        fname = os.path.basename(binary_url)
+        try:
+            self.exec(f"wget -c {binary_url}")
+            if fname.find(".tar.gz") != -1:
+                self.exec(f"tar -xzf {fname}")
+                self.remove_safe(fname)
+            else:
+                self.exec(f"mv {fname} {DEFAULT_BINARY_NAME}")
+        except:
+            failure_exit("Failed to download binary")
 
     def is_user_exists(self, username) -> bool:
         try:
             pwd.getpwnam(username)
+            self.log(f"User {username} already exists")
+            return True
         except KeyError:
             self.log(f"User {username} does not exist")
             return False
-        self.log(f"User {username} already exists")
-        return True
+        
 
     def remove_safe(self, path, is_dir=False):
         if is_dir and os.path.exists(path):
@@ -280,20 +285,23 @@ class Installer():
         Needed only in case of clean installation
 
         """
-        if not os.path.exists(self.cheqd_root_dir):
-            self.log("Creating main directory for cheqd-noded")
-            self.mkdir_p(self.cheqd_root_dir)
+        try:
+            if not os.path.exists(self.cheqd_root_dir):
+                self.log("Creating main directory for cheqd-noded")
+                self.mkdir_p(self.cheqd_root_dir)
 
-            self.log(f"Setting directory permissions to default cheqd user: {DEFAULT_CHEQD_USER}")
-            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.interviewer.home_dir}")
+                self.log(f"Setting directory permissions to default cheqd user: {DEFAULT_CHEQD_USER}")
+                self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.interviewer.home_dir}")
 
-        if not os.path.exists(self.cheqd_log_dir):
-            self.log("Creating log directory for cheqd-noded")
-            self.setup_log_dir()
+            if not os.path.exists(self.cheqd_log_dir):
+                self.log("Creating log directory for cheqd-noded")
+                self.setup_log_dir()
 
-        if os.path.exists("/var/log/cheqd-node") and not os.path.islink("/var/log/cheqd-node"):
-            self.log("Creating a symlink from cheqd-noded log folder to /var/log/cheqd-node")
-            os.symlink(self.cheqd_log_dir, "/var/log/cheqd-node", target_is_directory=True)
+            if os.path.exists("/var/log/cheqd-node") and not os.path.islink("/var/log/cheqd-node"):
+                self.log("Creating a symlink from cheqd-noded log folder to /var/log/cheqd-node")
+                os.symlink(self.cheqd_log_dir, "/var/log/cheqd-node", target_is_directory=True)
+        except:
+            failure_exit("Failed to prepare directory tree for {DEFAULT_CHEQD_USER}")
 
     def is_service_file_exists(self) -> bool:
         return os.path.exists(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH) or \
@@ -424,12 +432,15 @@ class Installer():
         self.exec(f"sudo su -c 'cheqd-noded configure min-gas-prices {self.interviewer.gas_price}' {DEFAULT_CHEQD_USER}")
 
     def prepare_cheqd_user(self):
-        if not self.is_user_exists(DEFAULT_CHEQD_USER):
-            self.log(f"Creating {DEFAULT_CHEQD_USER} group")
-            self.exec(f"addgroup {DEFAULT_CHEQD_USER} --quiet --system")
-            self.log(f"Creating {DEFAULT_CHEQD_USER} user and adding to {DEFAULT_CHEQD_USER} group")
-            self.exec(
-                f"adduser --system {DEFAULT_CHEQD_USER} --home {self.interviewer.home_dir} --shell /bin/bash --ingroup {DEFAULT_CHEQD_USER} --quiet")
+        try:
+            if not self.is_user_exists(DEFAULT_CHEQD_USER):
+                self.log(f"Creating {DEFAULT_CHEQD_USER} group")
+                self.exec(f"addgroup {DEFAULT_CHEQD_USER} --quiet --system")
+                self.log(f"Creating {DEFAULT_CHEQD_USER} user and adding to {DEFAULT_CHEQD_USER} group")
+                self.exec(
+                    f"adduser --system {DEFAULT_CHEQD_USER} --home {self.interviewer.home_dir} --shell /bin/bash --ingroup {DEFAULT_CHEQD_USER} --quiet")
+        except:
+            failure_exit(f"Failed to create {DEFAULT_CHEQD_USER} user")
 
     def mkdir_p(self, dir_name):
         try:
@@ -438,42 +449,49 @@ class Installer():
             self.log(f"Directory {dir_name} already exists")
 
     def setup_log_dir(self):
-        self.mkdir_p(self.cheqd_log_dir)
-        Path(os.path.join(self.cheqd_log_dir, "stdout.log")).touch()
-        self.log(f"Setting up ownership permissions for {self.cheqd_log_dir} directory")
-        self.exec(f"chown -R syslog:cheqd {self.cheqd_log_dir}")
+        try:
+            self.mkdir_p(self.cheqd_log_dir)
+            Path(os.path.join(self.cheqd_log_dir, "stdout.log")).touch()
+            self.log(f"Setting up ownership permissions for {self.cheqd_log_dir} directory")
+            self.exec(f"chown -R syslog:cheqd {self.cheqd_log_dir}")
+        except:
+            failure_exit(f"Failed to setup {self.cheqd_log_dir} directory")
 
     def setup_cosmovisor(self):
-        fname= os.path.basename(COSMOVISOR_BINARY_URL)
-        self.exec(f"wget -c {COSMOVISOR_BINARY_URL}")
-        self.exec(f"tar -xzf {fname}")
-        self.remove_safe(fname)
-        # Remove cosmovisor artifacts...
-        self.remove_safe("CHANGELOG.md")
-        self.remove_safe("README.md")
-        self.mkdir_p(self.cosmovisor_root_dir)
-        self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis"))
-        self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis/bin"))
-        self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "upgrades"))
-        if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)):
-            self.log(f"Moving Cosmovisor binary to installation directory")
-            shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
+        try:
+            fname= os.path.basename(COSMOVISOR_BINARY_URL)
+            self.exec(f"wget -c {COSMOVISOR_BINARY_URL}")
+            self.exec(f"tar -xzf {fname}")
+            self.remove_safe(fname)
+            
+            # Remove cosmovisor artifacts...
+            self.remove_safe("CHANGELOG.md")
+            self.remove_safe("README.md")
+            self.mkdir_p(self.cosmovisor_root_dir)
+            self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis"))
+            self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis/bin"))
+            self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "upgrades"))
+            if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)):
+                self.log(f"Moving Cosmovisor binary to installation directory")
+                shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
 
-        if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
-            self.log(f"Creating symlink for current Cosmovisor version")
-            os.symlink(os.path.join(self.cosmovisor_root_dir, "genesis"),
-                       os.path.join(self.cosmovisor_root_dir, "current"))
+            if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
+                self.log(f"Creating symlink for current Cosmovisor version")
+                os.symlink(os.path.join(self.cosmovisor_root_dir, "genesis"),
+                        os.path.join(self.cosmovisor_root_dir, "current"))
 
-        self.log(f"Moving binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
-        self.exec("sudo mv {} {}".format(self.binary_path, self.cosmovisor_cheqd_bin_path))
+            self.log(f"Moving binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
+            self.exec("sudo mv {} {}".format(self.binary_path, self.cosmovisor_cheqd_bin_path))
 
-        if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
-            self.log(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
-            os.symlink(self.cosmovisor_cheqd_bin_path,
-                       os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
-    
-        self.log(f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
-        self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
+            if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
+                self.log(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
+                os.symlink(self.cosmovisor_cheqd_bin_path,
+                        os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+        
+            self.log(f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
+            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
+        except:
+            failure_exit(f"Failed to setup Cosmovisor")
 
     def compare_checksum(self, file_path):
         # Set URL for correct checksum file for snapshot
@@ -492,51 +510,62 @@ class Installer():
             failure_exit(f"Error encountered when comparing checksums.")
 
     def install_dependencies(self):
-        self.log("Installing dependencies")
-        self.exec("sudo apt-get update")
-        self.log(f"Install pv to show progress of extraction")
-        self.exec("sudo apt-get install -y pv")
+        try:
+            self.log("Installing dependencies")
+            self.exec("sudo apt-get update")
+            self.log(f"Install pv to show progress of extraction")
+            self.exec("sudo apt-get install -y pv")
+        except:
+            failure_exit(f"Failed to install dependencies")
 
     def download_snapshot(self):
-        archive_name = os.path.basename(self.interviewer.snapshot_url)
-        self.mkdir_p(self.cheqd_data_dir)
-        # Fetch size of snapshot archive. Uses curl to fetch headers and looks for Content-Length.
-        archive_size = self.exec(f"curl -s --head {self.interviewer.snapshot_url} | awk '/Length/ {{print $2}}'").stdout.strip()
-        # Check how much free disk space is available wherever the cheqd root directory is mounted
-        free_disk_space = self.exec(f"df -P -B1 {self.cheqd_root_dir} | tail -1 | awk '{{print $4}}'").stdout.strip()
-        if int(archive_size) < int(free_disk_space):
-            self.log(f"Downloading snapshot archive. This may take a while...")
-            self.exec(f"wget -c {self.interviewer.snapshot_url} -P {self.cheqd_root_dir}")
-            archive_path = os.path.join(self.cheqd_root_dir, archive_name)
-            if self.compare_checksum(archive_path) is True:
-                self.log(f"Snapshot download was successful and checksums match.")
+        try:
+            archive_name = os.path.basename(self.interviewer.snapshot_url)
+            self.mkdir_p(self.cheqd_data_dir)
+            # Fetch size of snapshot archive. Uses curl to fetch headers and looks for Content-Length.
+            archive_size = self.exec(f"curl -s --head {self.interviewer.snapshot_url} | awk '/Length/ {{print $2}}'").stdout.strip()
+            # Check how much free disk space is available wherever the cheqd root directory is mounted
+            free_disk_space = self.exec(f"df -P -B1 {self.cheqd_root_dir} | tail -1 | awk '{{print $4}}'").stdout.strip()
+            if int(archive_size) < int(free_disk_space):
+                self.log(f"Downloading snapshot archive. This may take a while...")
+                self.exec(f"wget -c {self.interviewer.snapshot_url} -P {self.cheqd_root_dir}")
+                archive_path = os.path.join(self.cheqd_root_dir, archive_name)
+                if self.compare_checksum(archive_path) is True:
+                    self.log(f"Snapshot download was successful and checksums match.")
+                else:
+                    self.log(f"Snapshot download was successful but checksums do not match.")
+                    failure_exit(f"Snapshot download was successful but checksums do not match.")
+            elif int(archive_size) > int(free_disk_space):
+                failure_exit (f"Snapshot archive is too large to fit in free disk space. Please free up some space and try again.")
             else:
-                self.log(f"Snapshot download was successful but checksums do not match.")
-                failure_exit(f"Snapshot download was successful but checksums do not match.")
-        elif int(archive_size) > int(free_disk_space):
-            failure_exit (f"Snapshot archive is too large to fit in free disk space. Please free up some space and try again.")
-        else:
-            failure_exit (f"Error encountered when downloading snapshot archive.")
+                failure_exit (f"Error encountered when downloading snapshot archive.")
+        except:
+            failure_exit(f"Failed to download snapshot")
         
     def untar_from_snapshot(self):
-        archive_path = os.path.join(self.cheqd_root_dir, os.path.basename(self.interviewer.snapshot_url))
-        # Check if there is enough space to extract snapshot archive
-        self.install_dependencies()
-        self.log(f"Extracting snapshot archive. This may take a while...")
-        # Extract to cheqd node data directory EXCEPT for validator state
-        self.exec(f"sudo su -c 'pv {archive_path} | tar xzf - -C {self.cheqd_data_dir} --exclude priv_validator_state.json' {DEFAULT_CHEQD_USER}")
-        # Delete snapshot archive file
-        self.log(f"Snapshot extraction was successful. Deleting snapshot archive.")
-        self.remove_safe(archive_path)
-        # Workaround to make this work with Cosmovisor since it expects upgrade-info.json file in cosmovisor/current directory
-        if self.interviewer.is_cosmo_needed:
-            if os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
-                self.log(f"Copying upgrade-info.json file to cosmovisor/current/")
-                shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
-                            os.path.join(self.cosmovisor_root_dir, "current"))
-            self.log(f"Changing owner to {DEFAULT_CHEQD_USER} user")
-            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
-        self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_data_dir}")
+        try:
+            archive_path = os.path.join(self.cheqd_root_dir, os.path.basename(self.interviewer.snapshot_url))
+            # Check if there is enough space to extract snapshot archive
+            self.install_dependencies()
+            self.log(f"Extracting snapshot archive. This may take a while...")
+
+            # Extract to cheqd node data directory EXCEPT for validator state
+            self.exec(f"sudo su -c 'pv {archive_path} | tar xzf - -C {self.cheqd_data_dir} --exclude priv_validator_state.json' {DEFAULT_CHEQD_USER}")
+            
+            # Delete snapshot archive file
+            self.log(f"Snapshot extraction was successful. Deleting snapshot archive.")
+            self.remove_safe(archive_path)
+            # Workaround to make this work with Cosmovisor since it expects upgrade-info.json file in cosmovisor/current directory
+            if self.interviewer.is_cosmo_needed:
+                if os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
+                    self.log(f"Copying upgrade-info.json file to cosmovisor/current/")
+                    shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
+                                os.path.join(self.cosmovisor_root_dir, "current"))
+                self.log(f"Changing owner to {DEFAULT_CHEQD_USER} user")
+                self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
+            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_data_dir}")
+        except:
+            failure_exit(f"Failed to extract snapshot")
         
 
 class Interviewer:
@@ -721,7 +750,7 @@ class Interviewer:
         elif not os.path.exists(self.home_dir) and not os.path.exists(self.cheqd_root_dir):
             return False
         else:
-            failure_exit(f"Could not check if cheqd-node is already installed. ")
+            failure_exit(f"Could not check if cheqd-node is already installed.")
 
     def is_systemd_config_exists(self) -> bool:
         return os.path.exists(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH) or \
@@ -763,7 +792,6 @@ class Interviewer:
                 copy_r_list.pop(i)
                 return copy_r_list
 
-
     def ask_for_version(self):
         default = self.get_latest_release()
         all_releases = self.get_releases()
@@ -771,11 +799,10 @@ class Interviewer:
         self.log(f"List of cheqd-noded releases: ")
         all_releases = self.remove_release_from_list(all_releases, default)
         all_releases.insert(0, default)
-        # d_index = all_releases.index(default)
         for i, release in enumerate(all_releases[0: LAST_N_RELEASES]):
             print(f"{i + 1}) {release.version}")
-        release_num = self.ask("Choose list option above to select version of cheqd-node to install [default: 1]: ", 
-            default=1).stdin.strip()
+        release_num = self.ask("Choose list option number above to select version of cheqd-node to install", 
+            default=1)
         if release_num >= 1 and release_num <= len(all_releases):
             self.release = all_releases[release_num - 1]
         else:
@@ -787,11 +814,11 @@ class Interviewer:
 
     def ask_for_home_directory(self, default) -> str:
         self.home_dir = self.ask(
-            f"Set path for cheqd user's home directory [default: /home/cheqd]: ", default=default)
+            f"Set path for cheqd user's home directory", default=default)
 
     def ask_for_upgrade(self):
         answer = self.ask(
-            f"Existing cheqd-node configuration folder detected. Do you want to upgrade an existing cheqd-node installation? (yes/no) [default: no]: ", default="no")
+            f"Existing cheqd-node configuration folder detected. Do you want to upgrade an existing cheqd-node installation? (yes/no)", default="no")
         if answer.lower().startswith("y"):
             self.is_upgrade = True
         elif answer.lower().startswith("n"):
@@ -803,7 +830,7 @@ class Interviewer:
         answer = self.ask(
             f"WARNING: Doing a fresh installation of cheqd-node will remove ALL existing configuration and data. "
             f"CAUTION: Please ensure you have a backup of your existing configuration and data before proceeding. "
-            f"Do you want to do fresh installation of cheqd-node? (yes/no) [default: no]: ", default="no")
+            f"Do you want to do fresh installation of cheqd-node? (yes/no)", default="no")
         if answer.lower().startswith("y"):
             self.is_from_scratch = True
         elif answer.lower().startswith("n"):
@@ -813,7 +840,7 @@ class Interviewer:
 
     def ask_for_rewrite_systemd(self):
         answer = self.ask(
-            f"Overwrite existing systemd configuration for cheqd-node? (yes/no) [default: yes]: ", default="yes")
+            f"Overwrite existing systemd configuration for cheqd-node? (yes/no)", default="yes")
         if answer.lower().startswith("y"):
             self.rewrite_systemd = True
         elif answer.lower().startswith("n"):
@@ -823,7 +850,7 @@ class Interviewer:
 
     def ask_for_rewrite_logrotate(self):
         answer = self.ask(
-            f"Overwrite existing configuration for logrotate? (yes/no) [default: yes]: ", default="yes")
+            f"Overwrite existing configuration for logrotate? (yes/no)", default="yes")
         if answer.lower().startswith("y"):
             self.rewrite_logrotate = True
         elif answer.lower().startswith("n"):
@@ -833,7 +860,7 @@ class Interviewer:
 
     def ask_for_rewrite_rsyslog(self):
         answer = self.ask(
-            f"Overwrite existing configuration for cheqd-node logging? (yes/no) [default: yes]: ", default="yes")
+            f"Overwrite existing configuration for cheqd-node logging? (yes/no)", default="yes")
         if answer.lower().startswith("y"):
             self.rewrite_rsyslog = True
         elif answer.lower().startswith("n"):
@@ -843,7 +870,7 @@ class Interviewer:
 
     def ask_for_cosmovisor(self):
         self.log(f"INFO: Installing cheqd-node with Cosmovisor allows for automatic unattended upgrades for valid software upgrade proposals.")
-        answer = self.ask(f"Install cheqd-noded using Cosmovisor? (yes/no) [default: {DEFAULT_USE_COSMOVISOR}]: ", default=DEFAULT_USE_COSMOVISOR)
+        answer = self.ask(f"Install cheqd-noded using Cosmovisor? (yes/no)", default=DEFAULT_USE_COSMOVISOR)
         if answer.lower().startswith("y"):
             self.is_cosmo_needed = True
         elif answer.lower().startswith("n"):
@@ -854,7 +881,7 @@ class Interviewer:
     def ask_for_init_from_snapshot(self):
         answer = self.ask(
             f"CAUTION: Downloading a snapshot replaces your existing copy of chain data. Usually safe to use this option when doing a fresh installation. "
-            f"Do you want to download a snapshot of the existing chain to speed up node synchronisation? (yes/no) [default: yes]: ", default="yes")
+            f"Do you want to download a snapshot of the existing chain to speed up node synchronisation? (yes/no)", default="yes")
         if answer.lower().startswith("y"):
             self.snapshot_url = self.prepare_url_for_latest()
             self.init_from_snapshot = True
@@ -865,7 +892,7 @@ class Interviewer:
 
     def ask_for_chain(self):
         answer = self.ask(
-            f"Select cheqd network to join ({', '.join(DEFAULT_CHAINS)}) [default: mainnet]: ", default="mainnet")
+            f"Select cheqd network to join ({'/'.join(DEFAULT_CHAINS)})", default="mainnet")
         if answer in DEFAULT_CHAINS:
             self.chain = answer
         else:
@@ -873,7 +900,7 @@ class Interviewer:
 
     def ask_for_setup(self):
         answer = self.ask(
-            f"Do you want to setup a new cheqd-node? (yes/no) [default: yes]: ", default="yes")
+            f"Do you want to setup a new cheqd-node? (yes/no)", default="yes")
         if answer.lower().startswith("y"):
             self.is_setup_needed = True
         elif answer.lower().startswith("n"):
@@ -883,7 +910,7 @@ class Interviewer:
 
     def ask_for_moniker(self):
         answer = self.ask(
-            f"Provide a moniker for your cheqd-node [default: {platform.node()}]: ", default=platform.node())
+            f"Provide a moniker for your cheqd-node", default=platform.node())
         if answer is not None:
             self.moniker = answer
         else:
@@ -891,7 +918,7 @@ class Interviewer:
 
     def ask_for_external_address(self):
         answer = self.ask(
-            f"What is the externally-reachable IP address or DNS name for your cheqd-node? [default: Fetch automatically via DNS resolver lookup]: ")
+            f"What is the externally-reachable IP address or DNS name for your cheqd-node? [default: Fetch automatically via DNS resolver lookup]: {os.linesep}")
         if answer is not None:
             self.external_address = answer
         else:
@@ -902,15 +929,15 @@ class Interviewer:
 
     def ask_for_rpc_port(self):
         self.rpc_port = self.ask(
-            f"Specify port for Tendermint RPC [default: {DEFAULT_RPC_PORT}]: ", default=DEFAULT_RPC_PORT)
+            f"Specify port for Tendermint RPC", default=DEFAULT_RPC_PORT)
 
     def ask_for_p2p_port(self):
         self.p2p_port = self.ask(
-            f"Specify port for Tendermint P2P [default: {DEFAULT_P2P_PORT}]: ", default=DEFAULT_P2P_PORT)
+            f"Specify port for Tendermint P2P", default=DEFAULT_P2P_PORT)
 
     def ask_for_gas_price(self):
         self.gas_price = self.ask(
-            f"Specify minimum gas price for transactions [default: {DEFAULT_GAS_PRICE}]: ", default=DEFAULT_GAS_PRICE)
+            f"Specify minimum gas price for transactions", default=DEFAULT_GAS_PRICE)
 
     def prepare_url_for_latest(self) -> str:
         template = TESTNET_SNAPSHOT if self.chain == "testnet" else MAINNET_SNAPSHOT
