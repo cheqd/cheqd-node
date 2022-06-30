@@ -12,7 +12,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 
 # Get go protoc compiler plugins. Taken from: tendermintdev/sdk-proto-gen:v0.2
 ENV GOLANG_PROTOBUF_VERSION=1.5.2 \
-    GOGO_PROTOBUF_VERSION=1.3.3 \
+    GOGO_PROTOBUF_VERSION=1.3.2 \
     GRPC_GATEWAY_VERSION=1.16.0
 
 RUN go get \
