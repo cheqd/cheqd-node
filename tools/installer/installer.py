@@ -18,6 +18,7 @@ import pwd
 import shutil
 import signal
 import platform
+import copy
 
 ###############################################################
 ###     				Installer defaults    				###
@@ -102,7 +103,7 @@ class Release:
         return binary_urls[0]
 
     def __str__(self):
-        return f"Name: {self.version}, Tar URL: {self.get_tar_gz_url()}"
+        return f"Name: {self.version}"
 
 
 def failure_exit(reason):
@@ -750,22 +751,36 @@ class Interviewer:
             r_list = json.loads(response.read().decode("utf-8"))
             return [Release(r) for r in r_list]
 
-    def get_last_prerelease(self, r_list) -> Release:
-        for r in r_list:
-            if not r.is_prerelease:
-                return r
+    def get_latest_release(self):
+        req = request.Request("https://api.github.com/repos/cheqd/cheqd-node/releases/latest")
+        req.add_header("Accept", "application/vnd.github.v3+json")
+        with request.urlopen(req) as response:
+            return Release(json.loads(response.read().decode("utf-8")))
+
+    def remove_release_from_list(self, r_list, elem):
+        copy_r_list = copy.deepcopy(r_list)
+        for i, release in enumerate(r_list):
+            if release.version == elem.version:
+                copy_r_list.pop(i)
+                return copy_r_list
+
 
     def ask_for_version(self):
+        default = self.get_latest_release()
         all_releases = self.get_releases()
-        default = self.get_last_prerelease(all_releases)
         self.log(f"Latest stable cheqd-noded release version is {default}")
-        d_index = all_releases.index(default)
-        last_n_releases = all_releases[d_index:LAST_N_RELEASES]
-        for i, release in enumerate(last_n_releases):
+        self.log(f"List of cheqd-noded releases: ")
+        all_releases = self.remove_release_from_list(all_releases, default)
+        all_releases.insert(0, default)
+        # d_index = all_releases.index(default)
+        for i, release in enumerate(all_releases[0: LAST_N_RELEASES]):
             print(f"{i + 1}) {release.version}")
-        num = self.ask("Choose list option below to select version of cheqd-node to install [default: 1]: ", 
-            default=1)
-        self.release = last_n_releases[num - 1]
+        release_num = self.ask("Choose list option above to select version of cheqd-node to install [default: 1]: ", 
+            default=1).stdin.strip()
+        if release_num >= 1 and release_num <= len(all_releases):
+            self.release = all_releases[release_num - 1]
+        else:
+            failure_exit(f"Invalid release number picked from list of releases: {release_num}")
 
     @default_answer
     def ask(self, question, **kwargs):
