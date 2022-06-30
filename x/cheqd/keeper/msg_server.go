@@ -105,3 +105,52 @@ func VerifySignature(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.
 
 	return nil
 }
+
+func VerifyAllSignersHaveAllValidSignatures(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.StateValue, message []byte, signers []string, signatures []*types.SignInfo) error {
+	for _, signer := range signers {
+		signatures := types.FindSignInfosBySigner(signatures, signer)
+
+		if len(signatures) == 0 {
+			return types.ErrSignatureNotFound.Wrapf("signer: %s", signer)
+		}
+
+		for _, signature := range signatures {
+			err := VerifySignature(k, ctx, inMemoryDIDs, message, signature)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+// VerifyAllSignersHaveAtLeastOneValidSignature verifies that all signers have at least one valid signature.
+// Omit DIDtoBeUpdated and updatedDID if not updating a DID. Otherwise those values will be used to better format error messages.
+func VerifyAllSignersHaveAtLeastOneValidSignature(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.StateValue,
+	message []byte, signers []string, signatures []*types.SignInfo, DIDToBeUpdated string, updatedDID string,
+) error {
+	for _, signer := range signers {
+		signaturesBySigner := types.FindSignInfosBySigner(signatures, signer)
+		signerForErrorMessage := GetSignerIdForErrorMessage(signer, DIDToBeUpdated, updatedDID)
+
+		if len(signaturesBySigner) == 0 {
+			return types.ErrSignatureNotFound.Wrapf("there should be at least one signature by %s", signerForErrorMessage)
+		}
+
+		found := false
+		for _, signature := range signaturesBySigner {
+			err := VerifySignature(k, ctx, inMemoryDIDs, message, signature)
+			if err == nil {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			return types.ErrInvalidSignature.Wrapf("there should be at least one valid signature by %s", signerForErrorMessage)
+		}
+	}
+
+	return nil
+}

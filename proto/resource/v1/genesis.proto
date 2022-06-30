@@ -1,0 +1,12 @@
+syntax = "proto3";
+package cheqdid.cheqdnode.resource.v1;
+
+option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
+
+import "resource/v1/resource.proto";
+
+// GenesisState defines the cheqd module's genesis state.
+message GenesisState {
+  repeated Resource resourceList = 1;
+}
+

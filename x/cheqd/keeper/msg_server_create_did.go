@@ -17,7 +17,7 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 	}
 
 	// Validate namespaces
-	namespace := k.GetDidNamespace(ctx)
+	namespace := k.GetDidNamespace(&ctx)
 	err := msg.Validate([]string{namespace})
 	if err != nil {
 		return nil, types.ErrNamespaceValidation.Wrap(err.Error())
@@ -45,21 +45,18 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 
 	// Verify signatures
 	signers := GetSignerDIDsForDIDCreation(did)
-	for _, signer := range signers {
-		signature, found := types.FindSignInfoBySigner(msg.Signatures, signer)
-
-		if !found {
-			return nil, types.ErrSignatureNotFound.Wrapf("signer: %s", signer)
-		}
-
-		err := VerifySignature(&k.Keeper, &ctx, inMemoryDids, msg.Payload.GetSignBytes(), signature)
-		if err != nil {
-			return nil, err
-		}
+	err = VerifyAllSignersHaveAllValidSignatures(&k.Keeper, &ctx, inMemoryDids, msg.Payload.GetSignBytes(), signers, msg.Signatures)
+	if err != nil {
+		return nil, err
 	}
 
-	// Apply changes
-	err = k.AppendDid(&ctx, &did, &metadata)
+	// Build state value
+	value, err := types.NewStateValue(&did, &metadata)
+	if err != nil {
+		return nil, err
+	}
+
+	err = k.SetDid(&ctx, &value)
 	if err != nil {
 		return nil, types.ErrInternal.Wrapf(err.Error())
 	}
