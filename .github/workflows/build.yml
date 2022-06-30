@@ -70,7 +70,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cheqd-noded
-          path: ./tools/build/cheqd-noded
+          path: build/cheqd-noded
 
       - name: Set version number
         id: set-version
@@ -86,12 +86,12 @@ jobs:
       - name: Build Debian package
         working-directory: ./tools/build
         run: |
-          ./build-tar.sh "./tools/build/cheqd-noded"
+          ./build-tar.sh "../../build/cheqd-noded"
 
       - name: Build Tar archive
         working-directory: ./tools/build
         run: |
-          ./build-tar.sh "./tools/build/cheqd-noded"
+          ./build-tar.sh "../../tools/build/cheqd-noded"
       
       - name: Store Debian package artifact
         uses: actions/upload-artifact@v3
@@ -99,7 +99,7 @@ jobs:
           VERSION: ${{ steps.set-version.outputs.VERSION }}
         with:
           name: cheqd-node_${{ env.VERSION }}_amd64.deb
-          path: tools/build/output/cheqd-node_${{ env.VERSION }}_amd64.deb
+          path: build/output/cheqd-node_${{ env.VERSION }}_amd64.deb
 
       - name: Store Tar archive artifact
         uses: actions/upload-artifact@v3
@@ -107,7 +107,7 @@ jobs:
           VERSION: ${{ steps.set-version.outputs.VERSION }}
         with:
           name: cheqd-node_${{ env.VERSION }}.tar.gz
-          path: tools/build/output/cheqd-node_${{ env.VERSION }}.tar.gz
+          path: build/output/cheqd-node_${{ env.VERSION }}.tar.gz
 
   build-docker-images:
     name: "Docker images"
