@@ -43,7 +43,9 @@ SEEDS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/networks/{
 DEFAULT_SNAPSHOT_SERVER = "https://snapshots.cheqd.net"
 DEFAULT_INIT_FROM_SNAPSHOT = "yes"
 TESTNET_SNAPSHOT = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/testnet/latest/cheqd-testnet-4_{}.tar.gz"
+TESTNET_CHECKSUM = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/testnet/latest/md5sum.txt"
 MAINNET_SNAPSHOT = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/mainnet/latest/cheqd-mainnet-1_{}.tar.gz"
+MAINNET_CHECKSUM = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/mainnet/latest/md5sum.txt"
 
 ###############################################################
 ###     				Systemd Config      				###
@@ -258,14 +260,11 @@ class Installer():
 
 
     def pre_install(self):
-
         if self.interviewer.is_from_scratch:
             self.log("Removing user's data and configs")
             self.remove_safe(self.cheqd_root_dir, is_dir=True)
-
             self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
             self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
-
             self.remove_safe(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH)
             self.remove_safe(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
             self.remove_safe(DEFAULT_RSYSLOG_FILE)
@@ -392,6 +391,7 @@ class Installer():
 
         if self.interviewer.init_from_snapshot:
             self.log("Downloading snapshot and extracting archive. This can take a *really* long time...")
+            self.download_snapshot()
             self.untar_from_snapshot()
 
     def post_install(self):
@@ -495,7 +495,6 @@ class Installer():
         
 
     def untar_from_snapshot(self):
-        
         self.exec(f"sudo su -c 'pv {archive_name} | tar xzf - -C {os.path.join(self.cheqd_root_dir, 'data')}'")
         self.exec(f"rm {archive_name}")
 
