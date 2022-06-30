@@ -2,21 +2,20 @@
 ###        STAGE 1: Build node binary pre-requisites        ###
 ###############################################################
 
-FROM golang:1.17.8-buster as builder
+FROM golang:1.18-buster as builder
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
     curl \
-    git \
     libprotobuf-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Get go protoc compiler plugins. Taken from: tendermintdev/sdk-proto-gen:v0.2
-ENV GOLANG_PROTOBUF_VERSION=1.3.5 \
-    GOGO_PROTOBUF_VERSION=1.3.2 \
-    GRPC_GATEWAY_VERSION=1.14.7
+ENV GOLANG_PROTOBUF_VERSION=1.3.3 \
+    GOGO_PROTOBUF_VERSION=1.3.3 \
+    GRPC_GATEWAY_VERSION=1.16.0
 
-RUN go get \
+RUN go install \
     github.com/golang/protobuf/protoc-gen-go@v${GOLANG_PROTOBUF_VERSION} \
     github.com/gogo/protobuf/protoc-gen-gogo@v${GOGO_PROTOBUF_VERSION} \
     github.com/gogo/protobuf/protoc-gen-gogofast@v${GOGO_PROTOBUF_VERSION} \
