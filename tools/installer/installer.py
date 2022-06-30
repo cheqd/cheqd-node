@@ -17,7 +17,7 @@ import functools
 import pwd
 import shutil
 import signal
-
+import platform
 
 ###############################################################
 ###     				Installer defaults    				###
@@ -746,14 +746,13 @@ class Interviewer:
     def ask_for_version(self):
         all_releases = self.get_releases()
         default = self.get_last_prerelease(all_releases)
-        self.log(f"Default version is: {default}")
+        self.log(f"Latest stable cheqd-noded release version is {default}")
         d_index = all_releases.index(default)
         last_n_releases = all_releases[d_index:LAST_N_RELEASES]
-        print(f"Which version below do you want to install?")
         for i, release in enumerate(last_n_releases):
             print(f"{i + 1}) {release.version}")
-        num = self.ask("Please insert the number for picking up the version ",
-                       default=1)
+        num = self.ask("Choose list option below to select version of cheqd-node to install [default: 1]: ", 
+            default=1).stdin.strip()
         self.release = last_n_releases[num - 1]
 
     @default_answer
@@ -761,102 +760,130 @@ class Interviewer:
         return str(input(question))
 
     def ask_for_home_directory(self, default) -> str:
-        answer = self.ask(
-            f"Please, type here the path to home directory for user cheqd. For keeping default value, just type "
-            f"'Enter'", default=default)
-        self.home_dir = answer
+        self.home_dir = self.ask(
+            f"Set path for cheqd user's home directory [default: /home/cheqd]: ", default=default).stdin.strip()
 
     def ask_for_upgrade(self):
         answer = self.ask(
-            f"Looks like installation already exists. Do you want to upgrade it? yes/no ", default="No")
-        self.is_upgrade = True if answer.lower() in ['yes', 'y'] else False
+            f"Existing cheqd-node configuration folder detected. Do you want to upgrade an existing cheqd-node installation? (yes/no) [default: no]: ", default="no").stdin.strip()
+        if answer.lower.startswith("y"):
+            self.is_upgrade = True
+        elif answer.lower.startswith("n"):
+            self.is_upgrade = False
+        else:
+            failure_exit(f"Invalid input provided during installation.")
 
     def ask_for_install_from_scratch(self):
         answer = self.ask(
-            f"Do you want to install from scratch (clean installation)? "
-            f"In case of yes it will remove all your configs and data. "
-            f"Please make sure that you copied all your configs and private keys. "
-            f"Typing no means exit. yes/no ", default="No")
-        self.is_from_scratch = True if answer.lower() in ['yes', 'y'] else failure_exit("Aborting...")
+            f"WARNING: Doing a fresh installation of cheqd-node will remove ALL existing configuration and data. "
+            f"CAUTION: Please ensure you have a backup of your existing configuration and data before proceeding. "
+            f"Do you want to do fresh installation of cheqd-node? (yes/no) [default: no]: ", default="no").stdin.strip()
+        if answer.lower.startswith("y"):
+            self.is_from_scratch = True
+        elif answer.lower.startswith("n"):
+            self.is_from_scratch = False
+        else:
+            failure_exit(f"Invalid input provided during installation.")
 
     def ask_for_rewrite_systemd(self):
         answer = self.ask(
-            f"Do you want to rewrite current systemd configs? yes/no ", default="No")
-        self.rewrite_systemd = True if answer.lower() in ['yes', 'y'] else False
+            f"Overwrite existing systemd configuration for cheqd-node? (yes/no) [default: yes]: ", default="yes").stdin.strip()
+        if answer.lower.startswith("y"):
+            self.rewrite_systemd = True
+        elif answer.lower.startswith("n"):
+            self.rewrite_systemd = False
+        else:
+            failure_exit(f"Invalid input provided during installation.")
 
     def ask_for_rewrite_logrotate(self):
         answer = self.ask(
-            f"Do you want to rewrite current logrotate config? yes/no ", default="No")
-        self.rewrite_logrotate = True if answer.lower() in ['yes', 'y'] else False
+            f"Overwrite existing configuration for logrotate? (yes/no) [default: yes]: ", default="yes").stdin.strip()
+        if answer.lower.startswith("y"):
+            self.rewrite_logrotate = True
+        elif answer.lower.startswith("n"):
+            self.rewrite_logrotate = False
+        else:
+            failure_exit(f"Invalid input provided during installation.")
 
     def ask_for_rewrite_rsyslog(self):
         answer = self.ask(
-            f"Do you want to rewrite current rsyslog config? yes/no ", default="No")
-        self.rewrite_rsyslog = True if answer.lower() in ['yes', 'y'] else False
+            f"Overwrite existing configuration for cheqd-node logging? (yes/no) [default: yes]: ", default="yes").stdin.strip()
+        if answer.lower.startswith("y"):
+            self.rewrite_rsyslog = True
+        elif answer.lower.startswith("n"):
+            self.rewrite_rsyslog = False
+        else:
+            failure_exit(f"Invalid input provided during installation.")
 
     def ask_for_cosmovisor(self, text, default) -> str:
-        answer = self.ask(text, default=default)
-        self.is_cosmo_needed = True if answer.lower() in ['yes', 'y'] else False
+        answer = self.ask(text, default=default).stdin.strip()
+        if answer.lower.startswith("y"):
+            self.is_cosmo_needed = True
+        elif answer.lower.startswith("n"):
+            self.is_cosmo_needed = False
+        else:
+            failure_exit(f"Invalid input provided during installation.")
 
     def ask_for_init_from_snapshot(self):
         answer = self.ask(
-            f"Do you want to deploy the latest snapshot? "
-            f"Please type any kind of variants: yes/no. ",
-            default="No"
-        )
-        self.init_from_snapshot = True if answer.lower() in ['yes', 'y'] else False
-        if self.init_from_snapshot:
+            f"CAUTION: Downloading a snapshot replaces your existing copy of chain data. Usually safe to use this option when doing a fresh installation. "
+            f"Do you want to download a snapshot of the existing chain to speed up node synchronisation? (yes/no) [default: yes]: ", default="yes").stdin.strip()
+        if answer.lower.startswith("y"):
             self.snapshot_url = self.prepare_url_for_latest()
+            self.init_from_snapshot = True
+        elif answer.lower.startswith("n"):
+            self.init_from_snapshot = False
+        else:
+            failure_exit(f"Invalid input provided during installation.")
 
     def ask_for_chain(self):
         answer = self.ask(
-            f"Which chain do you want to use? Possible variants are: {', '.join(DEFAULT_CHAINS)} ",
-            default=DEFAULT_CHAIN
-        )
-        self.chain = answer if answer in DEFAULT_CHAINS else failure_exit(f"Possible chains are: {DEFAULT_CHAINS}")
+            f"Select cheqd network to join ({', '.join(DEFAULT_CHAINS)}) [default: mainnet]: ", default="mainnet").stdin.strip()
+        if answer in DEFAULT_CHAINS:
+            self.chain = answer
+        else:
+            failure_exit(f"Invalid network selected during installation.")
 
     def ask_for_setup(self):
         answer = self.ask(
-            f"Do you want to setup node after installation? "
-            f"Please type any kind of variants: yes/no. ",
-            default="No"
-        )
-        self.is_setup_needed = True if answer.lower() in ['yes', 'y'] else False
+            f"Do you want to setup a new cheqd-node? (yes/no) [default: yes]: ", default="yes").stdin.strip()
+        if answer.lower.startswith("y"):
+            self.is_setup = True
+        elif answer.lower.startswith("n"):
+            self.is_setup = False
+        else:
+            failure_exit(f"Invalid input provided during installation.")
 
     def ask_for_moniker(self):
         answer = self.ask(
-            f"Please, type the moniker for your node: {os.linesep}",
-            default=""
-        )
-        self.moniker = answer
+            f"Provide a moniker for your cheqd-node [default: {platform.node()}]: ", default=platform.node()).stdin.strip()
+        if answer is not None:
+            self.moniker = answer
+        else:
+            failure_exit(f"Invalid moniker provided during cheqd-noded setup.")
 
     def ask_for_external_address(self):
         answer = self.ask(
-            f"What are the external IP address for your node? {os.linesep}",
-            default=""
-        )
-        self.external_address = answer
+            f"What is the externally-reachable IP address or DNS name for your cheqd-node? [default: Fetch automatically via DNS resolver lookup]: ").stdin.strip()
+        if answer is not None:
+            self.external_address = answer
+        else:
+            try:
+                self.external_address = self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout.replace('"', '').strip()
+            except:
+                failure_exit(f"Unable to fetch external IP address for your node.")
 
     def ask_for_rpc_port(self):
-        answer = self.ask(
-            f"What is the RPC port? ",
-            default=DEFAULT_RPC_PORT
-        )
-        self.rpc_port = answer
+        self.rpc_port = self.ask(
+            f"Specify port for Tendermint RPC [default: {DEFAULT_RPC_PORT}]: ", default=DEFAULT_RPC_PORT).stdin.strip()
 
     def ask_for_p2p_port(self):
-        answer = self.ask(
-            f"What is the P2P port? ",
-            default=DEFAULT_P2P_PORT
-        )
-        self.p2p_port = answer
+        self.p2p_port = self.ask(
+            f"Specify port for Tendermint P2P [default: {DEFAULT_P2P_PORT}]: ", default=DEFAULT_P2P_PORT).stdin.strip()
 
     def ask_for_gas_price(self):
-        answer = self.ask(
-            f"What is the gas-price? ",
-            default=DEFAULT_GAS_PRICE
-        )
-        self.gas_price = answer
+        self.gas_price = self.ask(
+            f"Specify minimum gas price for transactions [default: {DEFAULT_GAS_PRICE}]: ", default=DEFAULT_GAS_PRICE).stdin.strip()
 
     def prepare_url_for_latest(self) -> str:
         template = TESTNET_SNAPSHOT if self.chain == "testnet" else MAINNET_SNAPSHOT
@@ -879,6 +906,8 @@ if __name__ == '__main__':
     interviewer = Interviewer()
     interviewer.ask_for_version()
     interviewer.ask_for_home_directory(default=DEFAULT_HOME)
+    if interviewer.is_already_installed is False:
+        interviewer.ask_for_setup()
     if interviewer.is_already_installed():
         interviewer.ask_for_upgrade()
         if interviewer.is_upgrade:
@@ -888,7 +917,8 @@ if __name__ == '__main__':
                 interviewer.ask_for_rewrite_rsyslog()
             if interviewer.is_systemd_config_exists():
                 interviewer.ask_for_rewrite_systemd()
-            interviewer.ask_for_cosmovisor(f"Do you use Cosmovisor now? Please type any kind of variants: yes/no ", default=DEFAULT_USE_COSMOVISOR)
+            print("INFO: Installing cheqd-node with Cosmovisor allows for automatic unattended upgrades for valid software upgrade proposals.")
+            interviewer.ask_for_cosmovisor(f"Install cheqd-noded using Cosmovisor? (yes/no) [default: {DEFAULT_USE_COSMOVISOR}]: ", default=DEFAULT_USE_COSMOVISOR)
         else:
             interviewer.ask_for_install_from_scratch()
     if not interviewer.is_upgrade:
