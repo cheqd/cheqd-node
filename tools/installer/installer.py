@@ -766,7 +766,7 @@ class Interviewer:
         for i, release in enumerate(all_releases):
             print(f"{i + 1}) {release.version}")
         release_num = self.ask("Choose list option above to select version of cheqd-node to install [default: 1]: ", 
-            default=1).stdin.strip()
+            default=1)
         if release_num >= 1 and release_num <= len(all_releases):
             self.release = all_releases[release_num - 1]
         else:
