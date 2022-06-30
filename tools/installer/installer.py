@@ -520,30 +520,23 @@ class Installer():
     def untar_from_snapshot(self):
         archive_path = os.path.join(self.cheqd_root_dir, os.path.basename(self.interviewer.snapshot_url))
         # Check if there is enough space to extract snapshot archive
-        free_disk_space = self.exec("df -P {self.cheqd_root_dir} | tail -1 | cut -d' ' -f 3").stdout.strip()
-        extracted_archive_estimate = self.exec(f"zcat {archive_path} | wc -c").stdout.strip()
-        if int(extracted_archive_estimate) < int(free_disk_space):
-            self.install_dependencies()
-            self.log(f"Extracting snapshot archive. This may take a while...")
-            # Extract to cheqd node data directory EXCEPT for validator state
-            self.exec(f"sudo su -c 'pv {archive_path} | tar xzf -C {self.cheqd_data_dir} --exclude priv_validator_state.json' {DEFAULT_CHEQD_USER}")
-            # Delete snapshot archive file
-            self.log(f"Snapshot extraction was successful. Deleting snapshot archive.")
-            self.remove_safe(archive_path)
-            # Workaround to make this work with Cosmovisor since it expects upgrade-info.json file in cosmovisor/current directory
-            if self.interviewer.is_cosmo_needed:
-                if os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
-                    self.log(f"Copying upgrade-info.json file to cosmovisor/current/")
-                    shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
-                                os.path.join(self.cosmovisor_root_dir, "current"))
-                self.log(f"Changing owner to {DEFAULT_CHEQD_USER} user")
-                self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
-            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_data_dir}")
-        elif int(extracted_archive_estimate) > int(free_disk_space):
-            failure_exit(f"Insufficient disk space to snapshot archive. Please free up adequate disk space and try again.")
-        else:
-            failure_exit(f"Error encountered when extracting snapshot archive.")
-
+        self.install_dependencies()
+        self.log(f"Extracting snapshot archive. This may take a while...")
+        # Extract to cheqd node data directory EXCEPT for validator state
+        self.exec(f"sudo su -c 'pv {archive_path} | tar xzf -C {self.cheqd_data_dir} --exclude priv_validator_state.json' {DEFAULT_CHEQD_USER}")
+        # Delete snapshot archive file
+        self.log(f"Snapshot extraction was successful. Deleting snapshot archive.")
+        self.remove_safe(archive_path)
+        # Workaround to make this work with Cosmovisor since it expects upgrade-info.json file in cosmovisor/current directory
+        if self.interviewer.is_cosmo_needed:
+            if os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
+                self.log(f"Copying upgrade-info.json file to cosmovisor/current/")
+                shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
+                            os.path.join(self.cosmovisor_root_dir, "current"))
+            self.log(f"Changing owner to {DEFAULT_CHEQD_USER} user")
+            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
+        self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_data_dir}")
+        
 
 class Interviewer:
     def __init__(self,
@@ -729,6 +722,21 @@ class Interviewer:
         return os.path.exists(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH) or \
             os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
 
+    @post_process
+    def exec(self, cmd, use_stdout=True, suppress_err=False):
+        self.log(f"Executing command: {cmd}")
+        kwargs = {
+            "shell": True,
+            "check": True,
+        }
+        if use_stdout:
+            kwargs["stdout"] = subprocess.PIPE
+        else:
+            kwargs["capture_output"] = True
+
+        if suppress_err:
+            kwargs["stderr"] = subprocess.DEVNULL
+        return subprocess.run(cmd, **kwargs)
 
     def get_releases(self):
         req = request.Request("https://api.github.com/repos/cheqd/cheqd-node/releases")
@@ -752,20 +760,20 @@ class Interviewer:
         for i, release in enumerate(last_n_releases):
             print(f"{i + 1}) {release.version}")
         num = self.ask("Choose list option below to select version of cheqd-node to install [default: 1]: ", 
-            default=1).stdin.strip()
+            default=1)
         self.release = last_n_releases[num - 1]
 
     @default_answer
     def ask(self, question, **kwargs):
-        return str(input(question))
+        return str(input(question)).strip()
 
     def ask_for_home_directory(self, default) -> str:
         self.home_dir = self.ask(
-            f"Set path for cheqd user's home directory [default: /home/cheqd]: ", default=default).stdin.strip()
+            f"Set path for cheqd user's home directory [default: /home/cheqd]: ", default=default)
 
     def ask_for_upgrade(self):
         answer = self.ask(
-            f"Existing cheqd-node configuration folder detected. Do you want to upgrade an existing cheqd-node installation? (yes/no) [default: no]: ", default="no").stdin.strip()
+            f"Existing cheqd-node configuration folder detected. Do you want to upgrade an existing cheqd-node installation? (yes/no) [default: no]: ", default="no")
         if answer.lower.startswith("y"):
             self.is_upgrade = True
         elif answer.lower.startswith("n"):
@@ -777,7 +785,7 @@ class Interviewer:
         answer = self.ask(
             f"WARNING: Doing a fresh installation of cheqd-node will remove ALL existing configuration and data. "
             f"CAUTION: Please ensure you have a backup of your existing configuration and data before proceeding. "
-            f"Do you want to do fresh installation of cheqd-node? (yes/no) [default: no]: ", default="no").stdin.strip()
+            f"Do you want to do fresh installation of cheqd-node? (yes/no) [default: no]: ", default="no")
         if answer.lower.startswith("y"):
             self.is_from_scratch = True
         elif answer.lower.startswith("n"):
@@ -787,7 +795,7 @@ class Interviewer:
 
     def ask_for_rewrite_systemd(self):
         answer = self.ask(
-            f"Overwrite existing systemd configuration for cheqd-node? (yes/no) [default: yes]: ", default="yes").stdin.strip()
+            f"Overwrite existing systemd configuration for cheqd-node? (yes/no) [default: yes]: ", default="yes")
         if answer.lower.startswith("y"):
             self.rewrite_systemd = True
         elif answer.lower.startswith("n"):
@@ -797,7 +805,7 @@ class Interviewer:
 
     def ask_for_rewrite_logrotate(self):
         answer = self.ask(
-            f"Overwrite existing configuration for logrotate? (yes/no) [default: yes]: ", default="yes").stdin.strip()
+            f"Overwrite existing configuration for logrotate? (yes/no) [default: yes]: ", default="yes")
         if answer.lower.startswith("y"):
             self.rewrite_logrotate = True
         elif answer.lower.startswith("n"):
@@ -807,7 +815,7 @@ class Interviewer:
 
     def ask_for_rewrite_rsyslog(self):
         answer = self.ask(
-            f"Overwrite existing configuration for cheqd-node logging? (yes/no) [default: yes]: ", default="yes").stdin.strip()
+            f"Overwrite existing configuration for cheqd-node logging? (yes/no) [default: yes]: ", default="yes")
         if answer.lower.startswith("y"):
             self.rewrite_rsyslog = True
         elif answer.lower.startswith("n"):
@@ -816,7 +824,7 @@ class Interviewer:
             failure_exit(f"Invalid input provided during installation.")
 
     def ask_for_cosmovisor(self, text, default) -> str:
-        answer = self.ask(text, default=default).stdin.strip()
+        answer = self.ask(text, default=default)
         if answer.lower.startswith("y"):
             self.is_cosmo_needed = True
         elif answer.lower.startswith("n"):
@@ -827,7 +835,7 @@ class Interviewer:
     def ask_for_init_from_snapshot(self):
         answer = self.ask(
             f"CAUTION: Downloading a snapshot replaces your existing copy of chain data. Usually safe to use this option when doing a fresh installation. "
-            f"Do you want to download a snapshot of the existing chain to speed up node synchronisation? (yes/no) [default: yes]: ", default="yes").stdin.strip()
+            f"Do you want to download a snapshot of the existing chain to speed up node synchronisation? (yes/no) [default: yes]: ", default="yes")
         if answer.lower.startswith("y"):
             self.snapshot_url = self.prepare_url_for_latest()
             self.init_from_snapshot = True
@@ -838,7 +846,7 @@ class Interviewer:
 
     def ask_for_chain(self):
         answer = self.ask(
-            f"Select cheqd network to join ({', '.join(DEFAULT_CHAINS)}) [default: mainnet]: ", default="mainnet").stdin.strip()
+            f"Select cheqd network to join ({', '.join(DEFAULT_CHAINS)}) [default: mainnet]: ", default="mainnet")
         if answer in DEFAULT_CHAINS:
             self.chain = answer
         else:
@@ -846,7 +854,7 @@ class Interviewer:
 
     def ask_for_setup(self):
         answer = self.ask(
-            f"Do you want to setup a new cheqd-node? (yes/no) [default: yes]: ", default="yes").stdin.strip()
+            f"Do you want to setup a new cheqd-node? (yes/no) [default: yes]: ", default="yes")
         if answer.lower.startswith("y"):
             self.is_setup = True
         elif answer.lower.startswith("n"):
@@ -856,7 +864,7 @@ class Interviewer:
 
     def ask_for_moniker(self):
         answer = self.ask(
-            f"Provide a moniker for your cheqd-node [default: {platform.node()}]: ", default=platform.node()).stdin.strip()
+            f"Provide a moniker for your cheqd-node [default: {platform.node()}]: ", default=platform.node())
         if answer is not None:
             self.moniker = answer
         else:
@@ -864,7 +872,7 @@ class Interviewer:
 
     def ask_for_external_address(self):
         answer = self.ask(
-            f"What is the externally-reachable IP address or DNS name for your cheqd-node? [default: Fetch automatically via DNS resolver lookup]: ").stdin.strip()
+            f"What is the externally-reachable IP address or DNS name for your cheqd-node? [default: Fetch automatically via DNS resolver lookup]: ")
         if answer is not None:
             self.external_address = answer
         else:
@@ -875,15 +883,15 @@ class Interviewer:
 
     def ask_for_rpc_port(self):
         self.rpc_port = self.ask(
-            f"Specify port for Tendermint RPC [default: {DEFAULT_RPC_PORT}]: ", default=DEFAULT_RPC_PORT).stdin.strip()
+            f"Specify port for Tendermint RPC [default: {DEFAULT_RPC_PORT}]: ", default=DEFAULT_RPC_PORT)
 
     def ask_for_p2p_port(self):
         self.p2p_port = self.ask(
-            f"Specify port for Tendermint P2P [default: {DEFAULT_P2P_PORT}]: ", default=DEFAULT_P2P_PORT).stdin.strip()
+            f"Specify port for Tendermint P2P [default: {DEFAULT_P2P_PORT}]: ", default=DEFAULT_P2P_PORT)
 
     def ask_for_gas_price(self):
         self.gas_price = self.ask(
-            f"Specify minimum gas price for transactions [default: {DEFAULT_GAS_PRICE}]: ", default=DEFAULT_GAS_PRICE).stdin.strip()
+            f"Specify minimum gas price for transactions [default: {DEFAULT_GAS_PRICE}]: ", default=DEFAULT_GAS_PRICE)
 
     def prepare_url_for_latest(self) -> str:
         template = TESTNET_SNAPSHOT if self.chain == "testnet" else MAINNET_SNAPSHOT
