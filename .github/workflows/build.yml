@@ -70,7 +70,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cheqd-noded
-          path: build/cheqd-noded
+          path: ./tools/build/cheqd-noded
 
       - name: Set version number
         id: set-version
@@ -86,12 +86,12 @@ jobs:
       - name: Build Debian package
         working-directory: ./tools/build
         run: |
-          ./build-deb.sh "../build/cheqd-noded"
+          ./build-tar.sh cheqd-noded
 
       - name: Build Tar archive
         working-directory: ./tools/build
         run: |
-          ./build-tar.sh "../build/cheqd-noded"
+          ./build-tar.sh cheqd-noded
       
       - name: Store Debian package artifact
         uses: actions/upload-artifact@v3
