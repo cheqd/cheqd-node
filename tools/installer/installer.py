@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
 
-# Python package imports
+###############################################################
+###     		    Python package imports      			###
+###############################################################
 import datetime
 import os
 import subprocess
@@ -17,7 +19,9 @@ import shutil
 import signal
 
 
-# Installation Parameters
+###############################################################
+###     				Installer defaults    				###
+###############################################################
 LAST_N_RELEASES = 5
 DEFAULT_HOME = "/home/cheqd"
 DEFAULT_INSTALL_PATH = "/usr/bin"
@@ -28,12 +32,29 @@ DEFAULT_CHAINS = ['testnet', 'mainnet']
 DEFAULT_CHAIN = "mainnet"
 PRINT_PREFIX = "********* "
 
-### Cosmovisor Config
+###############################################################
+###     				Cosmovisor Config      				###
+###############################################################
 COSMOVISOR_BINARY_URL = "https://github.com/cosmos/cosmos-sdk/releases/download/cosmovisor%2Fv1.1.0/cosmovisor-v1.1.0-linux-amd64.tar.gz"
 DEFAULT_USE_COSMOVISOR = "yes"
 
+###############################################################
+###     				Systemd Config      				###
+###############################################################
+STANDALONE_SERVICE_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/tools/build/node-standalone.service"
+COSMOVISOR_SERVICE_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/tools/build/node-cosmovisor.service"
+LOGROTATE_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/tools/build/logrotate.conf"
+RSYSLOG_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/tools/build/rsyslog.conf"
+DEFAULT_STANDALONE_SERVICE_NAME = 'cheqd-noded'
+DEFAULT_COSMOVISOR_SERVICE_NAME = 'cheqd-cosmovisor'
+DEFAULT_STANDALONE_SERVICE_FILE_PATH = f"/lib/systemd/system/{DEFAULT_STANDALONE_SERVICE_NAME}.service"
+DEFAULT_COSMOVISOR_SERVICE_FILE_PATH = f"/lib/systemd/system/{DEFAULT_COSMOVISOR_SERVICE_NAME}.service"
+DEFAULT_LOGROTATE_FILE = "/etc/logrotate.d/cheqd-node"
+DEFAULT_RSYSLOG_FILE = "/etc/rsyslog.d/cheqd-node.conf"
 
-### Genesis and Seeds
+###############################################################
+###     		Network configuration files    				###
+###############################################################
 GENESIS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/networks/{}/genesis.json"
 SEEDS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/networks/{}/seeds.txt"
 
@@ -47,24 +68,8 @@ MAINNET_SNAPSHOT = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/m
 CHECKSUM_URL_BASE = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/"
 
 ###############################################################
-###     				Systemd Config      				###
+###     	    Default node configuration      			###
 ###############################################################
-STANDALONE_SERVICE_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/tools/build/node-standalone.service"
-COSMOVISOR_SERVICE_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/tools/build/node-cosmovisor.service"
-
-LOGROTATE_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/tools/build/logrotate.conf"
-RSYSLOG_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/tools/build/rsyslog.conf"
-
-DEFAULT_STANDALONE_SERVICE_NAME = 'cheqd-noded'
-DEFAULT_COSMOVISOR_SERVICE_NAME = 'cheqd-cosmovisor'
-
-DEFAULT_STANDALONE_SERVICE_FILE_PATH = f"/lib/systemd/system/{DEFAULT_STANDALONE_SERVICE_NAME}.service"
-DEFAULT_COSMOVISOR_SERVICE_FILE_PATH = f"/lib/systemd/system/{DEFAULT_COSMOVISOR_SERVICE_NAME}.service"
-DEFAULT_LOGROTATE_FILE = "/etc/logrotate.d/cheqd-node"
-DEFAULT_RSYSLOG_FILE = "/etc/rsyslog.d/cheqd-node.conf"
-
-### Default parameters
-
 DEFAULT_RPC_PORT = "26657"
 DEFAULT_P2P_PORT = "26656"
 DEFAULT_GAS_PRICE = "25ncheq"
