@@ -359,7 +359,6 @@ class Installer():
 
 
     def install(self):
-
         """
         Steps:
         - Remove all data and configurations (if needed)
@@ -372,14 +371,11 @@ class Installer():
         - Carry out post-install actions
         - Restore and download snapshot (if selected by user)
         """
+
         self.pre_install()
-
         self.get_binary()
-
         self.prepare_cheqd_user()
-
         self.prepare_directory_tree()
-
         self.setup_system_configs()
 
         if self.interviewer.is_cosmo_needed:
@@ -430,7 +426,6 @@ class Installer():
         if not self.is_user_exists(DEFAULT_CHEQD_USER):
             self.log(f"Creating {DEFAULT_CHEQD_USER} group")
             self.exec(f"addgroup {DEFAULT_CHEQD_USER} --quiet --system")
-
             self.log(f"Creating {DEFAULT_CHEQD_USER} user and adding to {DEFAULT_CHEQD_USER} group")
             self.exec(
                 f"adduser --system {DEFAULT_CHEQD_USER} --home {self.interviewer.home_dir} --shell /bin/bash --ingroup {DEFAULT_CHEQD_USER} --quiet")
