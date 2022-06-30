@@ -47,7 +47,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
-          path: build/output/cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
+          path: build//cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -56,7 +56,7 @@ jobs:
           prerelease: true
           draft: true
           files: |
-            build/output/cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
+            build//cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
             cheqd-noded
 
   release-docker-images:

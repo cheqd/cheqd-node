@@ -198,7 +198,7 @@ jobs:
         run: |
           mv cheqd-node_${{ env.VERSION }}.tar.gz cheqd-noded.tar.gz
 
-      - name: Download cheqd-cosmovisor Docker image
+      - name: Download cheqd-node Docker image
         uses: actions/download-artifact@v3
         with:
           name: cheqd-node-image.tar
