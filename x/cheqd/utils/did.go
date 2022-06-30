@@ -70,7 +70,7 @@ func ValidateDID(did string, method string, allowedNamespaces []string) error {
 	}
 
 	// check unique-id
-	err = ValidateUniqueId(sUniqueId)
+	err = ValidateID(sUniqueId)
 	if err != nil {
 		return err
 	}
@@ -78,21 +78,24 @@ func ValidateDID(did string, method string, allowedNamespaces []string) error {
 	return err
 }
 
-func ValidateUniqueId(uniqueId string) error {
-	// Length should be 16 or 32 symbols
-	if len(uniqueId) != 16 && len(uniqueId) != 32 {
-		return fmt.Errorf("unique id length should be 16 or 32 symbols")
-	}
+func IsValidDID(did string, method string, allowedNamespaces []string) bool {
+	err := ValidateDID(did, method, allowedNamespaces)
+	return err == nil
+}
 
-	// Base58 check
-	if err := ValidateBase58(uniqueId); err != nil {
-		return fmt.Errorf("unique id must be valid base58 string: %s", err)
+func ValidateID(id string) error {
+	isValidId := len(id) == 16 && IsValidBase58(id) ||
+		len(id) == 32 && IsValidBase58(id) ||
+		IsValidUUID(id)
+
+	if !isValidId {
+		return errors.New("unique id should be one of: 16 symbols base58 string, 32 symbols base58 string, or UUID")
 	}
 
 	return nil
 }
 
-func IsValidDID(did string, method string, allowedNamespaces []string) bool {
-	err := ValidateDID(did, method, allowedNamespaces)
+func IsValidID(id string) bool {
+	err := ValidateID(id)
 	return err == nil
 }

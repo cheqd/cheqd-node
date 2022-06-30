@@ -12,12 +12,7 @@ import (
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 	for _, elem := range genState.DidList {
-		did, err := elem.UnpackDataAsDid()
-		if err != nil {
-			panic(fmt.Sprintf("Cannot import geneses case: %s", err.Error()))
-		}
-
-		if err = k.SetDid(&ctx, did, elem.Metadata); err != nil {
+		if err := k.SetDid(&ctx, elem); err != nil {
 			panic(fmt.Sprintf("Cannot set did case: %s", err.Error()))
 		}
 	}
@@ -25,7 +20,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	// Set nym count
 	k.SetDidCount(&ctx, uint64(len(genState.DidList)))
 
-	k.SetDidNamespace(ctx, genState.DidNamespace)
+	k.SetDidNamespace(&ctx, genState.DidNamespace)
 }
 
 // ExportGenesis returns the cheqd module's exported genesis.
@@ -40,7 +35,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 		genesis.DidList = append(genesis.DidList, &elem)
 	}
 
-	genesis.DidNamespace = k.GetDidNamespace(ctx)
+	genesis.DidNamespace = k.GetDidNamespace(&ctx)
 
 	return genesis
 }

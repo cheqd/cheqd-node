@@ -38,34 +38,23 @@ func (k Keeper) SetDidCount(ctx *sdk.Context, count uint64) {
 	store.Set(byteKey, bz)
 }
 
-// AppendDid appends a did in the store with a new id and updates the count
-func (k Keeper) AppendDid(ctx *sdk.Context, did *types.Did, metadata *types.Metadata) error {
-	// Check that did doesn't exist
-	if k.HasDid(ctx, did.Id) {
-		return types.ErrDidDocExists.Wrapf(did.Id)
+// SetDid set a specific did in the store. Updates DID counter if the DID is new.
+func (k Keeper) SetDid(ctx *sdk.Context, stateValue *types.StateValue) error {
+	// Unpack
+	did, err := stateValue.UnpackDataAsDid()
+	if err != nil {
+		return err
+	}
+
+	// Update counter
+	if !k.HasDid(ctx, did.Id) {
+		count := k.GetDidCount(ctx)
+		k.SetDidCount(ctx, count+1)
 	}
 
 	// Create the did
-	count := k.GetDidCount(ctx)
-	err := k.SetDid(ctx, did, metadata)
-	if err != nil {
-		return err
-	}
-
-	// Update did count
-	k.SetDidCount(ctx, count+1)
-	return nil
-}
-
-// SetDid set a specific did in the store
-func (k Keeper) SetDid(ctx *sdk.Context, did *types.Did, metadata *types.Metadata) error {
-	stateValue, err := types.NewStateValue(did, metadata)
-	if err != nil {
-		return err
-	}
-
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
-	b := k.cdc.MustMarshal(&stateValue)
+	b := k.cdc.MustMarshal(stateValue)
 	store.Set(GetDidIDBytes(did.Id), b)
 	return nil
 }
@@ -99,6 +88,7 @@ func GetDidIDBytes(id string) []byte {
 }
 
 // GetAllDid returns all did
+// Loads all DIDs in memory. Use only for genesis export.
 func (k Keeper) GetAllDid(ctx *sdk.Context) (list []types.StateValue) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
