@@ -1,6 +1,6 @@
 module github.com/cheqd/cheqd-node
 
-go 1.17
+go 1.18
 
 require (
 	filippo.io/edwards25519 v1.0.0-beta.2
@@ -139,7 +139,7 @@ require (
 )
 
 replace (
-	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.45.4-cheqd-tag
+	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.45.6
 
 	// Fix upstream GHSA-h395-qcrw-5vmq vulnerability.
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.7.0
