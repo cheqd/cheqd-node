@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+
 	"github.com/cheqd/cheqd-node/x/resource"
 
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
@@ -14,16 +16,16 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	authzmodule "github.com/cosmos/cosmos-sdk/x/authz/module"
-	"github.com/cosmos/ibc-go/modules/apps/transfer"
-	ibctransferkeeper "github.com/cosmos/ibc-go/modules/apps/transfer/keeper"
-	ibctransfertypes "github.com/cosmos/ibc-go/modules/apps/transfer/types"
-	ibc "github.com/cosmos/ibc-go/modules/core"
-	ibcclient "github.com/cosmos/ibc-go/modules/core/02-client"
-	ibcclientclient "github.com/cosmos/ibc-go/modules/core/02-client/client"
-	ibcclienttypes "github.com/cosmos/ibc-go/modules/core/02-client/types"
-	porttypes "github.com/cosmos/ibc-go/modules/core/05-port/types"
-	ibchost "github.com/cosmos/ibc-go/modules/core/24-host"
-	ibckeeper "github.com/cosmos/ibc-go/modules/core/keeper"
+	"github.com/cosmos/ibc-go/v3/modules/apps/transfer"
+	ibctransferkeeper "github.com/cosmos/ibc-go/v3/modules/apps/transfer/keeper"
+	ibctransfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
+	ibc "github.com/cosmos/ibc-go/v3/modules/core"
+	ibcclient "github.com/cosmos/ibc-go/v3/modules/core/02-client"
+	ibcclientclient "github.com/cosmos/ibc-go/v3/modules/core/02-client/client"
+	ibcclienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
+	porttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
+	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
+	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
 
 	"github.com/gorilla/mux"
 	"github.com/rakyll/statik/fs"
@@ -102,6 +104,13 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
+
+	ica "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts"
+	icacontrollertypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/controller/types"
+	icahost "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host"
+	icahostkeeper "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host/keeper"
+	icahosttypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host/types"
+	icatypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/types"
 )
 
 const (
@@ -212,12 +221,14 @@ type App struct {
 	EvidenceKeeper   evidencekeeper.Keeper
 	FeegrantKeeper   feegrantkeeper.Keeper
 	IBCKeeper        *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+	ICAHostKeeper    icahostkeeper.Keeper
 	TransferKeeper   ibctransferkeeper.Keeper
 	AuthzKeeper      authzkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
+	ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
 
 	cheqdKeeper    cheqdkeeper.Keeper
 	resourceKeeper resourcekeeper.Keeper
@@ -277,6 +288,7 @@ func New(
 	// grant capabilities for the ibc and ibc-transfer modules
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
+	scopedICAHostKeeper := app.CapabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
 
 	// Applications that wish to enforce statically created ScopedKeepers should call `Seal` after creating
 	// their scoped modules in `NewApp` with `ScopeToModule`
@@ -308,37 +320,6 @@ func New(
 	)
 	app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath, app.BaseApp)
 
-	// Upgrade handler
-	app.UpgradeKeeper.SetUpgradeHandler("v0.3", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("Handler for upgrade plan: v0.3")
-
-		app.TestNetMigration(ctx)
-		initialVM := app.mm.GetVersionMap()
-		return initialVM, nil
-	})
-
-	app.UpgradeKeeper.SetUpgradeHandler("v0.4", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("Handler for upgrade plan: v0.4")
-
-		initialVM := app.mm.GetVersionMap()
-		return initialVM, nil
-	})
-
-	app.UpgradeKeeper.SetUpgradeHandler("v0.5", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("Handler for upgrade plan: v0.5")
-
-		app.Migration05(ctx)
-		initialVM := app.mm.GetVersionMap()
-		return initialVM, nil
-	})
-
-	app.UpgradeKeeper.SetUpgradeHandler("cosmovisor_test", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("Handler for upgrade plan: cosmovisor_test")
-
-		initialVM := app.mm.GetVersionMap()
-		return initialVM, nil
-	})
-
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.StakingKeeper = *stakingKeeper.SetHooks(
@@ -367,11 +348,30 @@ func New(
 
 	// Create Transfer Keepers
 	app.TransferKeeper = ibctransferkeeper.NewKeeper(
-		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName),
-		app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
-		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
+		appCodec,
+		keys[ibctransfertypes.StoreKey],
+		app.GetSubspace(ibctransfertypes.ModuleName),
+		app.IBCKeeper.ChannelKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		app.AccountKeeper,
+		app.BankKeeper,
+		scopedTransferKeeper,
 	)
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
+	transferIBCModule := transfer.NewIBCModule(app.TransferKeeper)
+
+	app.ICAHostKeeper = icahostkeeper.NewKeeper(
+		appCodec, keys[icahosttypes.StoreKey],
+		app.GetSubspace(icahosttypes.SubModuleName),
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		app.AccountKeeper,
+		scopedICAHostKeeper,
+		app.MsgServiceRouter(),
+	)
+	icaModule := ica.NewAppModule(nil, &app.ICAHostKeeper)
+	icaHostIBCModule := icahost.NewIBCModule(app.ICAHostKeeper)
 
 	// Create evidence Keeper for to register the IBC light client misbehaviour evidence route
 	evidenceKeeper := evidencekeeper.NewKeeper(
@@ -395,7 +395,8 @@ func New(
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferModule)
+	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule).
+		AddRoute(icahosttypes.SubModuleName, icaHostIBCModule)
 	app.IBCKeeper.SetRouter(ibcRouter)
 
 	/****  Module Options ****/
@@ -431,6 +432,7 @@ func New(
 		resource.NewAppModule(appCodec, app.resourceKeeper, app.cheqdKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
+		icaModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -453,6 +455,7 @@ func New(
 		banktypes.ModuleName,
 		crisistypes.ModuleName,
 		ibctransfertypes.ModuleName,
+		icatypes.ModuleName,
 		govtypes.ModuleName,
 		feegrant.ModuleName,
 		authz.ModuleName,
@@ -477,6 +480,7 @@ func New(
 		genutiltypes.ModuleName,
 		banktypes.ModuleName,
 		ibctransfertypes.ModuleName,
+		icatypes.ModuleName,
 		feegrant.ModuleName,
 		authz.ModuleName,
 		paramstypes.ModuleName,
@@ -503,6 +507,7 @@ func New(
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
+		icatypes.ModuleName,
 		feegrant.ModuleName,
 		authz.ModuleName,
 		cheqdtypes.ModuleName,
@@ -526,6 +531,7 @@ func New(
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
+		icatypes.ModuleName,
 		feegrant.ModuleName,
 		authz.ModuleName,
 		cheqdtypes.ModuleName,
@@ -564,11 +570,81 @@ func New(
 	app.SetAnteHandler(anteHandler)
 	app.SetEndBlocker(app.EndBlocker)
 
+	// Upgrade handlers
+	app.UpgradeKeeper.SetUpgradeHandler("v0.3", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx.Logger().Info("Handler for upgrade plan: v0.3")
+
+		app.TestNetMigration(ctx)
+		initialVM := app.mm.GetVersionMap()
+		return initialVM, nil
+	})
+
+	app.UpgradeKeeper.SetUpgradeHandler("v0.4", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx.Logger().Info("Handler for upgrade plan: v0.4")
+
+		initialVM := app.mm.GetVersionMap()
+		return initialVM, nil
+	})
+
+	app.UpgradeKeeper.SetUpgradeHandler("v0.5", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx.Logger().Info("Handler for upgrade plan: v0.5")
+
+		app.Migration05(ctx)
+		initialVM := app.mm.GetVersionMap()
+		return initialVM, nil
+	})
+
+	app.UpgradeKeeper.SetUpgradeHandler("v0.6", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx.Logger().Info("Handler for upgrade plan: v0.6")
+
+		// set the ICS27 consensus version so InitGenesis is not run
+		fromVM[icatypes.ModuleName] = icaModule.ConsensusVersion()
+
+		// create ICS27 Controller submodule params
+		controllerParams := icacontrollertypes.Params{
+			ControllerEnabled: true,
+		}
+
+		// create ICS27 Host submodule params
+		hostParams := icahosttypes.Params{
+			HostEnabled:   true,
+			AllowMessages: []string{"/cosmos.bank.v1beta1.MsgSend"},
+		}
+
+		// initialize ICS27 module
+		icaModule.InitModule(ctx, controllerParams, hostParams)
+
+		return fromVM, nil
+	})
+
+	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
+	if err != nil {
+		panic(err)
+	}
+
+	if upgradeInfo.Name == "v0.6" && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		storeUpgrades := storetypes.StoreUpgrades{
+			Added: []string{icacontrollertypes.StoreKey, icahosttypes.StoreKey},
+		}
+
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
+	}
+
+	app.UpgradeKeeper.SetUpgradeHandler("cosmovisor_test", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx.Logger().Info("Handler for upgrade plan: cosmovisor_test")
+
+		return fromVM, nil
+	})
+
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
-			tmos.Exit(err.Error())
+			panic(err)
 		}
 	}
+
+	app.ScopedIBCKeeper = scopedIBCKeeper
+	app.ScopedICAHostKeeper = scopedICAHostKeeper
+	app.ScopedTransferKeeper = scopedTransferKeeper
 
 	return app
 }
