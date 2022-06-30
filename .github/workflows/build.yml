@@ -91,7 +91,7 @@ jobs:
       - name: Build Tar archive
         working-directory: ./tools/build
         run: |
-          ./build-tar.sh "../../tools/build/cheqd-noded"
+          ./build-tar.sh "../../build/cheqd-noded"
       
       - name: Store Debian package artifact
         uses: actions/upload-artifact@v3
