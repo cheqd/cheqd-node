@@ -715,8 +715,12 @@ class Interviewer:
             print(f"{PRINT_PREFIX} {msg}")
 
     def is_already_installed(self) -> bool:
-        return os.path.exists(self.home_dir) and \
-            os.path.exists(self.cheqd_root_dir)
+        if os.path.exists(self.home_dir) and os.path.exists(self.cheqd_root_dir):
+            return True
+        elif not os.path.exists(self.home_dir) and not os.path.exists(self.cheqd_root_dir):
+            return False
+        else:
+            failure_exit(f"Could not check if cheqd-node is already installed. ")
 
     def is_systemd_config_exists(self) -> bool:
         return os.path.exists(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH) or \
@@ -823,8 +827,9 @@ class Interviewer:
         else:
             failure_exit(f"Invalid input provided during installation.")
 
-    def ask_for_cosmovisor(self, text, default) -> str:
-        answer = self.ask(text, default=default)
+    def ask_for_cosmovisor(self):
+        self.log(f"INFO: Installing cheqd-node with Cosmovisor allows for automatic unattended upgrades for valid software upgrade proposals.")
+        answer = self.ask(f"Install cheqd-noded using Cosmovisor? (yes/no) [default: {DEFAULT_USE_COSMOVISOR}]: ", default=DEFAULT_USE_COSMOVISOR)
         if answer.lower().startswith("y"):
             self.is_cosmo_needed = True
         elif answer.lower().startswith("n"):
@@ -910,38 +915,49 @@ class Interviewer:
         return True
 
 if __name__ == '__main__':
+    # Steps to execute if installing from scratch
+    def install_steps():
+        interviewer.ask_for_setup()
+        interviewer.ask_for_chain()
+        interviewer.ask_for_cosmovisor()
+        interviewer.ask_for_init_from_snapshot()
+        if interviewer.is_setup_needed:
+            interviewer.ask_for_moniker()
+            interviewer.ask_for_external_address()
+            interviewer.ask_for_rpc_port()
+            interviewer.ask_for_p2p_port()
+            interviewer.ask_for_gas_price()
+
+    # Steps to execute if upgrading existing node
+    def upgrade_steps():
+        interviewer.ask_for_cosmovisor()
+        if interviewer.is_systemd_config_exists():
+            interviewer.ask_for_rewrite_systemd()
+        if os.path.exists(DEFAULT_RSYSLOG_FILE):
+            interviewer.ask_for_rewrite_rsyslog()
+        if os.path.exists(DEFAULT_LOGROTATE_FILE):
+            interviewer.ask_for_rewrite_logrotate()
+    
     # Ask user for information
     interviewer = Interviewer()
     interviewer.ask_for_version()
     interviewer.ask_for_home_directory(default=DEFAULT_HOME)
-    if interviewer.is_already_installed is False:
-        interviewer.ask_for_setup()
-    if interviewer.is_already_installed():
+
+    # Check if cheqd configuration directory exists
+    is_installed = interviewer.is_already_installed()
+    
+    # First-time new node setup
+    if is_installed is False:
+        install_steps()
+    elif is_installed is True:
+        # Check if user wants to upgrade existing cheqd-node installation
         interviewer.ask_for_upgrade()
-        if interviewer.is_upgrade:
-            if os.path.exists(DEFAULT_LOGROTATE_FILE):
-                interviewer.ask_for_rewrite_logrotate()
-            if os.path.exists(DEFAULT_RSYSLOG_FILE):
-                interviewer.ask_for_rewrite_rsyslog()
-            if interviewer.is_systemd_config_exists():
-                interviewer.ask_for_rewrite_systemd()
-            print("INFO: Installing cheqd-node with Cosmovisor allows for automatic unattended upgrades for valid software upgrade proposals.")
-            interviewer.ask_for_cosmovisor(f"Install cheqd-noded using Cosmovisor? (yes/no) [default: {DEFAULT_USE_COSMOVISOR}]: ", default=DEFAULT_USE_COSMOVISOR)
-        else:
+        if interviewer.is_upgrade is True:
+            upgrade_steps()
+        elif interviewer.is_upgrade is False:
             interviewer.ask_for_install_from_scratch()
-    if not interviewer.is_upgrade:
-        interviewer.ask_for_cosmovisor(f"Do you want to use Cosmovisor? Please type any kind of variants: yes/no ", default=DEFAULT_USE_COSMOVISOR)
-    if not interviewer.is_upgrade:
-        interviewer.ask_for_chain()
-        interviewer.ask_for_init_from_snapshot()
-    if not interviewer.is_upgrade:
-        interviewer.ask_for_setup()
-    if interviewer.is_setup_needed:
-        interviewer.ask_for_moniker()
-        interviewer.ask_for_external_address()
-        interviewer.ask_for_rpc_port()
-        interviewer.ask_for_p2p_port()
-        interviewer.ask_for_gas_price()
+            if interviewer.is_from_scratch:
+                install_steps()
 
     # Install
     installer = Installer(interviewer)
