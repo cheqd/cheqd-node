@@ -41,10 +41,10 @@ DEFAULT_USE_COSMOVISOR = "yes"
 ###############################################################
 ###     				Systemd Config      				###
 ###############################################################
-STANDALONE_SERVICE_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/tools/build/node-standalone.service"
-COSMOVISOR_SERVICE_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/tools/build/node-cosmovisor.service"
-LOGROTATE_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/tools/build/logrotate.conf"
-RSYSLOG_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/tools/build/rsyslog.conf"
+STANDALONE_SERVICE_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/de487a0cfc095d92bd579b142c7708f64b6f1536/tools/build/node-standalone.service"
+COSMOVISOR_SERVICE_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/de487a0cfc095d92bd579b142c7708f64b6f1536/tools/build/node-cosmovisor.service"
+LOGROTATE_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/de487a0cfc095d92bd579b142c7708f64b6f1536/tools/build/logrotate.conf"
+RSYSLOG_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/de487a0cfc095d92bd579b142c7708f64b6f1536/tools/build/rsyslog.conf"
 DEFAULT_STANDALONE_SERVICE_NAME = 'cheqd-noded'
 DEFAULT_COSMOVISOR_SERVICE_NAME = 'cheqd-cosmovisor'
 DEFAULT_STANDALONE_SERVICE_FILE_PATH = f"/lib/systemd/system/{DEFAULT_STANDALONE_SERVICE_NAME}.service"
@@ -284,7 +284,7 @@ class Installer():
             self.mkdir_p(self.cheqd_root_dir)
 
             self.log(f"Setting directory permissions to default cheqd user: {DEFAULT_CHEQD_USER}")
-            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.home_dir}")
+            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.interviewer.home_dir}")
 
         if not os.path.exists(self.cheqd_log_dir):
             self.log("Creating log directory for cheqd-noded")
@@ -470,13 +470,13 @@ class Installer():
             self.log(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
             os.symlink(self.cosmovisor_cheqd_bin_path,
                        os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
-
+    
         self.log(f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
         self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
 
     def compare_checksum(self, file_path):
         # Set URL for correct checksum file for snapshot
-        checksum_url = CHECKSUM_URL_BASE + {self.interviewer.chain} + "/latest/md5sum.txt"
+        checksum_url = os.path.join(CHECKSUM_URL_BASE, self.interviewer.chain, "latest/md5sum.txt")
         # Get checksum file
         published_checksum = self.exec(f"curl -s {checksum_url} | tail -1 | cut -d' ' -f 1").stdout.strip()
         self.log(f"Comparing published checksum with local checksum")
@@ -500,9 +500,9 @@ class Installer():
         archive_name = os.path.basename(self.interviewer.snapshot_url)
         self.mkdir_p(self.cheqd_data_dir)
         # Fetch size of snapshot archive. Uses curl to fetch headers and looks for Content-Length.
-        archive_size = self.exec(f"curl --head {self.interviewer.snapshot_url} | awk  '/Length/ {{print $2}}'").stdout.strip()
+        archive_size = self.exec(f"curl -s --head {self.interviewer.snapshot_url} | awk '/Length/ {{print $2}}'").stdout.strip()
         # Check how much free disk space is available wherever the cheqd root directory is mounted
-        free_disk_space = self.exec("df -P {self.cheqd_root_dir} | tail -1 | cut -d' ' -f 3").stdout.strip()
+        free_disk_space = self.exec(f"df -P -B1 {self.cheqd_root_dir} | tail -1 | awk '{{print $4}}'").stdout.strip()
         if int(archive_size) < int(free_disk_space):
             self.log(f"Downloading snapshot archive. This may take a while...")
             self.exec(f"wget -c {self.interviewer.snapshot_url} -P {self.cheqd_root_dir}")
@@ -523,7 +523,7 @@ class Installer():
         self.install_dependencies()
         self.log(f"Extracting snapshot archive. This may take a while...")
         # Extract to cheqd node data directory EXCEPT for validator state
-        self.exec(f"sudo su -c 'pv {archive_path} | tar xzf -C {self.cheqd_data_dir} --exclude priv_validator_state.json' {DEFAULT_CHEQD_USER}")
+        self.exec(f"sudo su -c 'pv {archive_path} | tar xzf - -C {self.cheqd_data_dir} --exclude priv_validator_state.json' {DEFAULT_CHEQD_USER}")
         # Delete snapshot archive file
         self.log(f"Snapshot extraction was successful. Deleting snapshot archive.")
         self.remove_safe(archive_path)
@@ -774,9 +774,9 @@ class Interviewer:
     def ask_for_upgrade(self):
         answer = self.ask(
             f"Existing cheqd-node configuration folder detected. Do you want to upgrade an existing cheqd-node installation? (yes/no) [default: no]: ", default="no")
-        if answer.lower.startswith("y"):
+        if answer.lower().startswith("y"):
             self.is_upgrade = True
-        elif answer.lower.startswith("n"):
+        elif answer.lower().startswith("n"):
             self.is_upgrade = False
         else:
             failure_exit(f"Invalid input provided during installation.")
@@ -786,9 +786,9 @@ class Interviewer:
             f"WARNING: Doing a fresh installation of cheqd-node will remove ALL existing configuration and data. "
             f"CAUTION: Please ensure you have a backup of your existing configuration and data before proceeding. "
             f"Do you want to do fresh installation of cheqd-node? (yes/no) [default: no]: ", default="no")
-        if answer.lower.startswith("y"):
+        if answer.lower().startswith("y"):
             self.is_from_scratch = True
-        elif answer.lower.startswith("n"):
+        elif answer.lower().startswith("n"):
             self.is_from_scratch = False
         else:
             failure_exit(f"Invalid input provided during installation.")
@@ -796,9 +796,9 @@ class Interviewer:
     def ask_for_rewrite_systemd(self):
         answer = self.ask(
             f"Overwrite existing systemd configuration for cheqd-node? (yes/no) [default: yes]: ", default="yes")
-        if answer.lower.startswith("y"):
+        if answer.lower().startswith("y"):
             self.rewrite_systemd = True
-        elif answer.lower.startswith("n"):
+        elif answer.lower().startswith("n"):
             self.rewrite_systemd = False
         else:
             failure_exit(f"Invalid input provided during installation.")
@@ -806,9 +806,9 @@ class Interviewer:
     def ask_for_rewrite_logrotate(self):
         answer = self.ask(
             f"Overwrite existing configuration for logrotate? (yes/no) [default: yes]: ", default="yes")
-        if answer.lower.startswith("y"):
+        if answer.lower().startswith("y"):
             self.rewrite_logrotate = True
-        elif answer.lower.startswith("n"):
+        elif answer.lower().startswith("n"):
             self.rewrite_logrotate = False
         else:
             failure_exit(f"Invalid input provided during installation.")
@@ -816,18 +816,18 @@ class Interviewer:
     def ask_for_rewrite_rsyslog(self):
         answer = self.ask(
             f"Overwrite existing configuration for cheqd-node logging? (yes/no) [default: yes]: ", default="yes")
-        if answer.lower.startswith("y"):
+        if answer.lower().startswith("y"):
             self.rewrite_rsyslog = True
-        elif answer.lower.startswith("n"):
+        elif answer.lower().startswith("n"):
             self.rewrite_rsyslog = False
         else:
             failure_exit(f"Invalid input provided during installation.")
 
     def ask_for_cosmovisor(self, text, default) -> str:
         answer = self.ask(text, default=default)
-        if answer.lower.startswith("y"):
+        if answer.lower().startswith("y"):
             self.is_cosmo_needed = True
-        elif answer.lower.startswith("n"):
+        elif answer.lower().startswith("n"):
             self.is_cosmo_needed = False
         else:
             failure_exit(f"Invalid input provided during installation.")
@@ -836,10 +836,10 @@ class Interviewer:
         answer = self.ask(
             f"CAUTION: Downloading a snapshot replaces your existing copy of chain data. Usually safe to use this option when doing a fresh installation. "
             f"Do you want to download a snapshot of the existing chain to speed up node synchronisation? (yes/no) [default: yes]: ", default="yes")
-        if answer.lower.startswith("y"):
+        if answer.lower().startswith("y"):
             self.snapshot_url = self.prepare_url_for_latest()
             self.init_from_snapshot = True
-        elif answer.lower.startswith("n"):
+        elif answer.lower().startswith("n"):
             self.init_from_snapshot = False
         else:
             failure_exit(f"Invalid input provided during installation.")
@@ -855,10 +855,10 @@ class Interviewer:
     def ask_for_setup(self):
         answer = self.ask(
             f"Do you want to setup a new cheqd-node? (yes/no) [default: yes]: ", default="yes")
-        if answer.lower.startswith("y"):
-            self.is_setup = True
-        elif answer.lower.startswith("n"):
-            self.is_setup = False
+        if answer.lower().startswith("y"):
+            self.is_setup_needed = True
+        elif answer.lower().startswith("n"):
+            self.is_setup_needed = False
         else:
             failure_exit(f"Invalid input provided during installation.")
 
@@ -872,7 +872,7 @@ class Interviewer:
 
     def ask_for_external_address(self):
         answer = self.ask(
-            f"What is the externally-reachable IP address or DNS name for your cheqd-node? [default: Fetch automatically via DNS resolver lookup]: ")
+            f"What is the externally-reachable IP address or DNS name for your cheqd-node? [default: Fetch automatically via DNS resolver lookup]: {os.linesep}")
         if answer is not None:
             self.external_address = answer
         else:
