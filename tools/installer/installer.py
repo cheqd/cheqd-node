@@ -747,7 +747,7 @@ class Interviewer:
         req = request.Request("https://api.github.com/repos/cheqd/cheqd-node/releases")
         req.add_header("Accept", "application/vnd.github.v3+json")
         with request.urlopen(req) as response:
-            r_list = json.loads(response.read().decode("utf-8")).strip()
+            r_list = json.loads(response.read().decode("utf-8").strip())
             return [Release(r) for r in r_list]
 
     def get_latest_release(self):
