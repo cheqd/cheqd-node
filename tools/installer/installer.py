@@ -43,9 +43,8 @@ SEEDS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/networks/{
 DEFAULT_SNAPSHOT_SERVER = "https://snapshots.cheqd.net"
 DEFAULT_INIT_FROM_SNAPSHOT = "yes"
 TESTNET_SNAPSHOT = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/testnet/latest/cheqd-testnet-4_{}.tar.gz"
-TESTNET_CHECKSUM = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/testnet/latest/md5sum.txt"
 MAINNET_SNAPSHOT = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/mainnet/latest/cheqd-mainnet-1_{}.tar.gz"
-MAINNET_CHECKSUM = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/mainnet/latest/md5sum.txt"
+CHECKSUM_URL_BASE = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/"
 
 ###############################################################
 ###     				Systemd Config      				###
@@ -238,7 +237,7 @@ class Installer():
     def get_binary(self):
         self.log("Downloading cheqd-noded binary...")
         tar_url = self.release.get_tar_gz_url()
-        fname= os.path.basename(tar_url)
+        fname = os.path.basename(tar_url)
         self.exec(f"wget -c {tar_url}")
         self.exec(f"tar xzf {fname}")
         self.remove_safe(fname)
@@ -475,6 +474,28 @@ class Installer():
         self.log(f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
         self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
 
+    def compare_checksum(self, file_path):
+        # Set URL for correct checksum file for snapshot
+        checksum_url = CHECKSUM_URL_BASE + {self.interviewer.chain} + "/latest/md5sum.txt"
+        # Get checksum file
+        published_checksum = self.exec(f"curl -s {checksum_url} | tail -1 | cut -d' ' -f 1").stdout.strip()
+        self.log(f"Comparing published checksum with local checksum")
+        local_checksum = self.exec(f"md5sum {file_path} | tail -1 | cut -d' ' -f 1").stdout.strip()
+        if published_checksum == local_checksum:
+            self.log(f"Checksums match. Download is OK.")
+            return True
+        elif published_checksum != local_checksum:
+            self.log(f"Checksums do not match. Download got corrupted.")
+            return False
+        else:
+            failure_exit(f"Error encountered when comparing checksums.")
+
+    def install_dependencies(self):
+        self.log("Installing dependencies")
+        self.exec("sudo apt-get update")
+        self.log(f"Install pv to show progress of extraction")
+        self.exec("sudo apt-get install -y pv")
+
     def download_snapshot(self):
         archive_name = os.path.basename(self.interviewer.snapshot_url)
         self.mkdir_p(self.cheqd_data_dir)
@@ -484,31 +505,44 @@ class Installer():
         free_disk_space = self.exec("df -P {self.cheqd_root_dir} | tail -1 | cut -d' ' -f 3").stdout.strip()
         if int(archive_size) < int(free_disk_space):
             self.log(f"Downloading snapshot archive. This may take a while...")
-            self.exec(f"wget -c {self.interviewer.snapshot_url} ")
+            self.exec(f"wget -c {self.interviewer.snapshot_url} -P {self.cheqd_root_dir}")
+            archive_path = os.path.join(self.cheqd_root_dir, archive_name)
+            if self.compare_checksum(archive_path) is True:
+                self.log(f"Snapshot download was successful and checksums match.")
+            else:
+                self.log(f"Snapshot download was successful but checksums do not match.")
+                failure_exit(f"Snapshot download was successful but checksums do not match.")
         elif int(archive_size) > int(free_disk_space):
-            self.log(f"Not enough free disk space in {self.cheqd_root_dir} to download snapshot.")
-            self.log(f"Please free up adequate disk space and try again. Exiting now...")
-            sys.exit(1)
+            failure_exit (f"Snapshot archive is too large to fit in free disk space. Please free up some space and try again.")
         else:
-            self.log(f"Unable to download snapshot archive. Exiting now...")
-            sys.exit(1)
+            failure_exit (f"Error encountered when downloading snapshot archive.")
         
-
     def untar_from_snapshot(self):
-        self.exec(f"sudo su -c 'pv {archive_name} | tar xzf - -C {os.path.join(self.cheqd_root_dir, 'data')}'")
-        self.exec(f"rm {archive_name}")
-
-        # Some kind of hacks cause cosmovisor expects upgrade-info.json file in cosmovisor/current directory also
-        if self.interviewer.is_cosmo_needed:
-            if os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
-                self.log(f"Copying upgrade-info.json file to cosmovisor/current/")
-                shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
-                            os.path.join(self.cosmovisor_root_dir, "current"))
-
-            self.log(f"Changing owner to {DEFAULT_CHEQD_USER} user")
-            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
-
-        self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_data_dir}")
+        archive_path = os.path.join(self.cheqd_root_dir, os.path.basename(self.interviewer.snapshot_url))
+        # Check if there is enough space to extract snapshot archive
+        free_disk_space = self.exec("df -P {self.cheqd_root_dir} | tail -1 | cut -d' ' -f 3").stdout.strip()
+        extracted_archive_estimate = self.exec(f"zcat {archive_path} | wc -c").stdout.strip()
+        if int(extracted_archive_estimate) < int(free_disk_space):
+            self.install_dependencies()
+            self.log(f"Extracting snapshot archive. This may take a while...")
+            # Extract to cheqd node data directory EXCEPT for validator state
+            self.exec(f"sudo su -c 'pv {archive_path} | tar xzf -C {self.cheqd_data_dir} --exclude priv_validator_state.json' {DEFAULT_CHEQD_USER}")
+            # Delete snapshot archive file
+            self.log(f"Snapshot extraction was successful. Deleting snapshot archive.")
+            self.remove_safe(archive_path)
+            # Workaround to make this work with Cosmovisor since it expects upgrade-info.json file in cosmovisor/current directory
+            if self.interviewer.is_cosmo_needed:
+                if os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
+                    self.log(f"Copying upgrade-info.json file to cosmovisor/current/")
+                    shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
+                                os.path.join(self.cosmovisor_root_dir, "current"))
+                self.log(f"Changing owner to {DEFAULT_CHEQD_USER} user")
+                self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
+            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_data_dir}")
+        elif int(extracted_archive_estimate) > int(free_disk_space):
+            failure_exit(f"Insufficient disk space to snapshot archive. Please free up adequate disk space and try again.")
+        else:
+            failure_exit(f"Error encountered when extracting snapshot archive.")
 
 
 class Interviewer:
