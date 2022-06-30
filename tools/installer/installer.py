@@ -745,27 +745,32 @@ class Interviewer:
     def get_releases(self):
         req = request.Request("https://api.github.com/repos/cheqd/cheqd-node/releases")
         req.add_header("Accept", "application/vnd.github.v3+json")
-
         with request.urlopen(req) as response:
-            r_list = json.loads(response.read().decode("utf-8"))
+            r_list = json.loads(response.read().decode("utf-8")).strip()
             return [Release(r) for r in r_list]
 
-    def get_last_prerelease(self, r_list) -> Release:
-        for r in r_list:
-            if not r.is_prerelease:
-                return r
+    def get_latest_release(self):
+        req = request.Request("https://api.github.com/repos/cheqd/cheqd-node/releases/latest")
+        req.add_header("Accept", "application/vnd.github.v3+json")
+        with request.urlopen(req) as response:
+            return Release(json.loads(response.read().decode("utf-8"))).strip()
 
     def ask_for_version(self):
+        default = self.get_latest_release()
         all_releases = self.get_releases()
-        default = self.get_last_prerelease(all_releases)
         self.log(f"Latest stable cheqd-noded release version is {default}")
-        d_index = all_releases.index(default)
-        last_n_releases = all_releases[d_index:LAST_N_RELEASES]
-        for i, release in enumerate(last_n_releases):
+        self.log(f"List of cheqd-noded releases: ")
+        all_releases.pop(all_releases.index(default))
+        all_releases.insert(0, default)
+        # d_index = all_releases.index(default)
+        for i, release in enumerate(all_releases):
             print(f"{i + 1}) {release.version}")
-        num = self.ask("Choose list option below to select version of cheqd-node to install [default: 1]: ", 
-            default=1)
-        self.release = last_n_releases[num - 1]
+        release_num = self.ask("Choose list option above to select version of cheqd-node to install [default: 1]: ", 
+            default=1).stdin.strip()
+        if release_num >= 1 and release_num <= len(all_releases):
+            self.release = all_releases[release_num - 1]
+        else:
+            failure_exit(f"Invalid release number picked from list of releases: {release_num}")
 
     @default_answer
     def ask(self, question, **kwargs):
@@ -877,7 +882,7 @@ class Interviewer:
 
     def ask_for_external_address(self):
         answer = self.ask(
-            f"What is the externally-reachable IP address or DNS name for your cheqd-node? [default: Fetch automatically via DNS resolver lookup]: {os.linesep}")
+            f"What is the externally-reachable IP address or DNS name for your cheqd-node? [default: Fetch automatically via DNS resolver lookup]: ")
         if answer is not None:
             self.external_address = answer
         else:
@@ -915,6 +920,7 @@ class Interviewer:
         return True
 
 if __name__ == '__main__':
+    
     # Steps to execute if installing from scratch
     def install_steps():
         interviewer.ask_for_setup()
@@ -956,9 +962,18 @@ if __name__ == '__main__':
             upgrade_steps()
         elif interviewer.is_upgrade is False:
             interviewer.ask_for_install_from_scratch()
-            if interviewer.is_from_scratch:
+            if interviewer.is_from_scratch is True:
                 install_steps()
+            else:
+                failure_exit("Aborting installation to prevent overwriting existing cheqd-node.")
+        else:
+            failure_exit("Unable to determine upgrade/installation mode.")
+    else:
+        failure_exit("Could not execute either install or upgrade steps.")
 
     # Install
     installer = Installer(interviewer)
-    installer.install()
+    try:
+        installer.install()
+    except:
+        failure_exit("Unable to install cheqd-node.")
