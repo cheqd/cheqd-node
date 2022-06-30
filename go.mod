@@ -1,6 +1,6 @@
 module github.com/cheqd/cheqd-node
 
-go 1.18
+go 1.17
 
 require (
 	filippo.io/edwards25519 v1.0.0-beta.2
