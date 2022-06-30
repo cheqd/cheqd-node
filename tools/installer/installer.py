@@ -325,8 +325,10 @@ class Installer():
             self.exec(f"systemctl enable {DEFAULT_COSMOVISOR_SERVICE_NAME if self.interviewer.is_cosmo_needed else DEFAULT_STANDALONE_SERVICE_NAME}")
 
     def check_systemd_service_on(self, service_name) -> bool:
+        # pylint: disable=E1123
         stat = self.exec(f'systemctl is-active {service_name}', suppress_err=True, allow_error=True).returncode
         if stat != 0:
+            # pylint: disable=E1123
             stat = self.exec(f'systemctl is-enabled {service_name}', suppress_err=True, allow_error=True).returncode
         return stat == 0
 
