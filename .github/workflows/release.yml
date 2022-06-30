@@ -41,7 +41,7 @@ jobs:
       - name: Build Debian package for release
         working-directory: ./tools/build
         run: |
-          ./build-deb.sh "../cheqd-noded"
+          ./build-deb.sh "../../build/cheqd-noded"
 
       - name: Store Debian package artifact for release
         uses: actions/upload-artifact@v3
