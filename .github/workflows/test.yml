@@ -199,7 +199,7 @@ jobs:
         run: |
           mv cheqd-node_${{ env.VERSION }}.tar.gz cheqd-noded.tar.gz
 
-      - name: Download cheqd-node Docker image
+      - name: Download cheqd-cli Docker image
         uses: actions/download-artifact@v3
         with:
           name: cheqd-cli-image.tar
