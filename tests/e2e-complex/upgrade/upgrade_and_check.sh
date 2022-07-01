@@ -67,6 +67,12 @@ check_did "$DID_2"
 # Check that token transaction exists after upgrade too
 check_tx_hashes
 
+# Send new resource
+send_resource_new "$DID_2" "$RESOURCE_1"
+
+# Check new resource
+check_resource "$DID_2" "$RESOURCE_1"
+
 # Stop docker compose
 docker_compose_down
 

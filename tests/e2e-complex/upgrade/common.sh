@@ -34,6 +34,7 @@ CHEQ_AMOUNT_NUMBER="1"
 DID_1="did:cheqd:testnet:1111111111111111"
 # shellcheck disable=SC2034
 DID_2="did:cheqd:testnet:2222222222222222"
+RESOURCE_1="82aadc50-58e4-4e00-bf35-36062c2784be"
 CHEQD_HOME="/home/cheqd"
 
 
@@ -159,6 +160,40 @@ function send_did_new () {
     echo "$txhash" >> $FNAME_TXHASHES
 }
 
+# Send resource
+# input: resource to write
+function send_resource_new () {
+    collection_id_to_write=$1
+    resource_to_write=$2
+
+    # Generate Alice identity key
+    ALICE_VER_KEY="$(cheqd_noded_docker debug ed25519 random)"
+    ALICE_VER_PUB_BASE_64=$(echo "${ALICE_VER_KEY}" | jq -r ".pub_key_base_64")
+    ALICE_VER_PRIV_BASE_64=$(echo "${ALICE_VER_KEY}" | jq -r ".priv_key_base_64")
+    ALICE_VER_PUB_MULTIBASE_58=$(cheqd_noded_docker debug encoding base64-multibase58 "${ALICE_VER_PUB_BASE_64}")
+
+    # Build CreateDid message
+    KEY_ID="${collection_id_to_write}#key1"
+
+    RESOURCE_NAME="Resource 1"
+    RESOURCE_RESOURCE_TYPE="CL-Schema"
+    RESOURCE_DATA='{ "content": "test data" }';
+
+    # Post the message
+    # shellcheck disable=SC2086
+    resource=$(cheqd-noded tx resource create-resource \
+    --collection-id ${collection_id_to_write} \
+    --resource-id ${resource_to_write} \
+    --resource-name "${RESOURCE_NAME}" \
+    --resource-type ${RESOURCE_RESOURCE_TYPE} \
+    --resource-file <(echo "${RESOURCE_DATA}") \
+    "${KEY_ID}" "${ALICE_VER_PRIV_BASE_64}" \
+    --from "${BASE_ACCOUNT_1}" ${TX_PARAMS})
+
+    txhash=$(echo "$resource" | jq ".txhash" | tr -d '"')
+    echo "$txhash" >> $FNAME_TXHASHES
+}
+
 # Send DID
 # input: DID to write
 function send_did () {
@@ -214,6 +249,12 @@ function get_did () {
     cheqd_noded_docker query cheqd did "$requested_did" --output json
 }
 
+function get_resource () {
+    collection_id=$1
+    resource_id=$2
+    cheqd_noded_docker query resource resource "$collection_id" "$resource_id" --output json
+}
+
 # Check that balance of operator3 increased to CHEQ_AMOUNT
 # Input: Address to check
 function check_balance () {
@@ -231,6 +272,18 @@ function check_did () {
     did_to_check=$1
     did_from=$(get_did "$did_to_check" | jq ".did.id" | tr -d '"')
     if [ "$did_from" != "$did_to_check" ];
+    then
+        echo "There is no any $did_to_check on server"
+        exit 1
+    fi
+}
+
+# Check that $DID exists
+function check_resource () {
+    collection_id_to_check=$1
+    resource_to_check=$2
+    resource_from=$(get_resource "$collection_id_to_check" "resource_to_check" | jq ".resource.id" | tr -d '"')
+    if [ "$resource_from" != "$resource_to_check" ];
     then
         echo "There is no any $did_to_check on server"
         exit 1
