@@ -99,7 +99,7 @@ jobs:
           VERSION: ${{ steps.set-version.outputs.VERSION }}
         with:
           name: cheqd-node_${{ env.VERSION }}_amd64.deb
-          path: build/cheqd-node_${{ env.VERSION }}_amd64.deb
+          path: build/output/cheqd-node_${{ env.VERSION }}_amd64.deb
 
       - name: Store Tar archive artifact
         uses: actions/upload-artifact@v3
@@ -107,7 +107,7 @@ jobs:
           VERSION: ${{ steps.set-version.outputs.VERSION }}
         with:
           name: cheqd-node_${{ env.VERSION }}.tar.gz
-          path: build/cheqd-node_${{ env.VERSION }}.tar.gz
+          path: build/output/cheqd-node_${{ env.VERSION }}.tar.gz
 
   build-docker-images:
     name: "Docker images"
