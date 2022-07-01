@@ -25,7 +25,7 @@ jobs:
         run: go test -v ./...
 
   build-binary:
-    name: "Node binary/tar archive"
+    name: "Node binary"
     runs-on: ubuntu-latest
     outputs:
       VERSION: ${{ steps.set-version.outputs.VERSION }}
@@ -144,4 +144,3 @@ jobs:
         with:
           name: cheqd-node-image.tar
           path: cheqd-node-image.tar
-
