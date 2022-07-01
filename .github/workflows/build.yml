@@ -144,4 +144,3 @@ jobs:
         with:
           name: cheqd-node-image.tar
           path: cheqd-node-image.tar
-
