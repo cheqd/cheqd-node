@@ -34,6 +34,7 @@ CHEQ_AMOUNT_NUMBER="1"
 DID_1="did:cheqd:testnet:1111111111111111"
 # shellcheck disable=SC2034
 DID_2="did:cheqd:testnet:2222222222222222"
+# shellcheck disable=SC2034
 RESOURCE_1="82aadc50-58e4-4e00-bf35-36062c2784be"
 CHEQD_HOME="/home/cheqd"
 
