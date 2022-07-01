@@ -189,6 +189,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Download tar archive
+        uses: actions/download-artifact@v3
+        with:
+          name: cheqd-node_${{ env.VERSION }}.tar.gz
+
+
       - name: Rename tar archive
         run: |
           mv cheqd-node_${{ env.VERSION }}.tar.gz cheqd-noded.tar.gz
