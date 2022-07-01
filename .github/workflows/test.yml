@@ -194,6 +194,7 @@ jobs:
         with:
           name: cheqd-node_${{ env.VERSION }}.tar.gz
 
+
       - name: Rename tar archive
         run: |
           mv cheqd-node_${{ env.VERSION }}.tar.gz cheqd-noded.tar.gz
