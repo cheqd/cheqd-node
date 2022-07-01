@@ -4,7 +4,7 @@ set -euox pipefail
 
 # TODO: Assert that transactions are successful
 
-CHEQD_IMAGE_FROM="ghcr.io/cheqd/cheqd-node:0.4.0"
+CHEQD_IMAGE_FROM="ghcr.io/cheqd/cheqd-cli:0.5.0"
 # shellcheck disable=SC2034
 CHEQD_IMAGE_TO="cheqd-node:cheqd-cli"
 # shellcheck disable=SC2034
