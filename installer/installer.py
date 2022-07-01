@@ -42,10 +42,10 @@ DEFAULT_USE_COSMOVISOR = "yes"
 ###############################################################
 ###     				Systemd Config      				###
 ###############################################################
-STANDALONE_SERVICE_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/de487a0cfc095d92bd579b142c7708f64b6f1536/build/node-standalone.service"
-COSMOVISOR_SERVICE_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/de487a0cfc095d92bd579b142c7708f64b6f1536/build/node-cosmovisor.service"
-LOGROTATE_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/de487a0cfc095d92bd579b142c7708f64b6f1536/build/logrotate.conf"
-RSYSLOG_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/de487a0cfc095d92bd579b142c7708f64b6f1536/build/rsyslog.conf"
+STANDALONE_SERVICE_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/de487a0cfc095d92bd579b142c7708f64b6f1536/build-tools/node-standalone.service"
+COSMOVISOR_SERVICE_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/de487a0cfc095d92bd579b142c7708f64b6f1536/build-tools/node-cosmovisor.service"
+LOGROTATE_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/de487a0cfc095d92bd579b142c7708f64b6f1536/build-tools/logrotate.conf"
+RSYSLOG_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/de487a0cfc095d92bd579b142c7708f64b6f1536/build-tools/rsyslog.conf"
 DEFAULT_STANDALONE_SERVICE_NAME = 'cheqd-noded'
 DEFAULT_COSMOVISOR_SERVICE_NAME = 'cheqd-cosmovisor'
 DEFAULT_STANDALONE_SERVICE_FILE_PATH = f"/lib/systemd/system/{DEFAULT_STANDALONE_SERVICE_NAME}.service"

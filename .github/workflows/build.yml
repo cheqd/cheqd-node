@@ -84,12 +84,12 @@ jobs:
           sudo gem install --no-document fpm
       
       - name: Build Debian package
-        working-directory: ./build
+        working-directory: ./build-tools
         run: |
           ./build-tar.sh "../build/cheqd-noded"
 
       - name: Build Tar archive
-        working-directory: ./build
+        working-directory: ./build-tools
         run: |
           ./build-tar.sh "../build/cheqd-noded"
       

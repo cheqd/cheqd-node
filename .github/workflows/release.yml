@@ -39,7 +39,7 @@ jobs:
           sudo gem install --no-document fpm
 
       - name: Build Debian package for release
-        working-directory: ./build
+        working-directory: ./build-tools
         run: |
           ./build-deb.sh "../build/cheqd-noded"
 
