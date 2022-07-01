@@ -36,6 +36,8 @@ tar -cvzf "${PACKAGE_CONTENT_TAR}" -C "${PACKAGE_CONTENT}" "."
 ARCH="amd64"
 DEB_PACKAGE="${OUTPUT_DIR}/${PKG_NAME}_${VERSION}_${ARCH}.deb"
 
+mv node-standalone.service cheqd-noded.service
+
 fpm \
   --input-type "tar" \
   --output-type "deb" \
@@ -49,7 +51,7 @@ fpm \
   --after-install "postinst" \
   --deb-after-purge "postpurge" \
   --deb-systemd-enable \
-  --deb-systemd node-standalone.service \
+  --deb-systemd cheqd-noded.service \
   --depends "logrotate" \
   --verbose \
   --package "${DEB_PACKAGE}" \
