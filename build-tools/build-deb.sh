@@ -49,7 +49,7 @@ fpm \
   --after-install "postinst" \
   --deb-after-purge "postpurge" \
   --deb-systemd-enable \
-  --deb-systemd cheqd-noded.service \
+  --deb-systemd node-standalone.service \
   --depends "logrotate" \
   --verbose \
   --package "${DEB_PACKAGE}" \
