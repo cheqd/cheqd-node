@@ -139,7 +139,7 @@ require (
 )
 
 replace (
-	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.45.4-cheqd-tag
+	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.45.5-cheqd-tag
 
 	// Fix upstream GHSA-h395-qcrw-5vmq vulnerability.
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.7.0
