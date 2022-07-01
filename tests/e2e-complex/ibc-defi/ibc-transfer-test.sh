@@ -34,7 +34,7 @@ sleep 15 # Wait for chains
 
 info "Create relayer user on cheqd"  # ---
 CHEQD_RELAYER_KEY_NAME="cheqd-relayer"
-CHEQD_RELAYER_ACCOUNT=$(docker-compose exec cheqd cheqd-noded keys add ${CHEQD_RELAYER_KEY_NAME} --keyring-backend test --output json)
+CHEQD_RELAYER_ACCOUNT=$(docker-compose exec cheqd cheqd-noded keys add ${CHEQD_RELAYER_KEY_NAME} --keyring-backend test --output json 2>&1)
 CHEQD_RELAYER_ADDRESS=$(echo "${CHEQD_RELAYER_ACCOUNT}" | jq --raw-output '.address')
 CHEQD_RELAYER_MNEMONIC=$(echo "${CHEQD_RELAYER_ACCOUNT}" | jq --raw-output '.mnemonic')
 
@@ -44,7 +44,7 @@ assert_tx_successful "${RES}"
 
 info "Create relayer user on osmosis" # ---
 OSMOSIS_RELAYER_KEY_NAME="osmosis-relayer"
-OSMOSIS_RELAYER_ACCOUNT=$(docker-compose exec osmosis osmosisd keys add ${OSMOSIS_RELAYER_KEY_NAME} --output json --keyring-backend test)
+OSMOSIS_RELAYER_ACCOUNT=$(docker-compose exec osmosis osmosisd keys add ${OSMOSIS_RELAYER_KEY_NAME} --output json --keyring-backend test 2>&1)
 OSMOSIS_RELAYER_ADDRESS=$(echo "${OSMOSIS_RELAYER_ACCOUNT}" | jq --raw-output '.address')
 OSMOSIS_RELAYER_MNEMONIC=$(echo "${OSMOSIS_RELAYER_ACCOUNT}" | jq --raw-output '.mnemonic')
 
@@ -58,7 +58,7 @@ docker-compose exec hermes hermes keys restore cheqd --mnemonic "$CHEQD_RELAYER_
 docker-compose exec hermes hermes keys restore osmosis --mnemonic "$OSMOSIS_RELAYER_MNEMONIC" --name osmosis-key
 
 info "Open channel" # ---
-docker-compose exec hermes hermes create channel cheqd --chain-b osmosis --port-a transfer --port-b transfer --new-client-connection -y
+docker-compose exec hermes hermes create channel cheqd --chain-b osmosis --port-a transfer --port-b transfer --new-client-connection
 
 info "Start hermes" # ---
 docker-compose exec -d hermes hermes start
