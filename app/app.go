@@ -8,6 +8,7 @@ import (
 
 	"github.com/cheqd/cheqd-node/x/resource"
 
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	"github.com/cosmos/cosmos-sdk/version"
@@ -306,38 +307,33 @@ func New(
 	app.CrisisKeeper = crisiskeeper.NewKeeper(
 		app.GetSubspace(crisistypes.ModuleName), invCheckPeriod, app.BankKeeper, authtypes.FeeCollectorName,
 	)
+	
 	app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath, app.BaseApp)
 
-	// Upgrade handler
-	app.UpgradeKeeper.SetUpgradeHandler("v0.3", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("Handler for upgrade plan: v0.3")
-
-		app.TestNetMigration(ctx)
-		initialVM := app.mm.GetVersionMap()
-		return initialVM, nil
-	})
-
-	app.UpgradeKeeper.SetUpgradeHandler("v0.4", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("Handler for upgrade plan: v0.4")
-
-		initialVM := app.mm.GetVersionMap()
-		return initialVM, nil
-	})
-
-	app.UpgradeKeeper.SetUpgradeHandler("v0.5", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("Handler for upgrade plan: v0.5")
-
-		app.Migration05(ctx)
-		initialVM := app.mm.GetVersionMap()
-		return initialVM, nil
-	})
-
-	app.UpgradeKeeper.SetUpgradeHandler("cosmovisor_test", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("Handler for upgrade plan: cosmovisor_test")
-
-		initialVM := app.mm.GetVersionMap()
-		return initialVM, nil
-	})
+		// Latest upgrade handler
+		app.UpgradeKeeper.SetUpgradeHandler("v0.6", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			ctx.Logger().Info("Handler for upgrade plan: v0.6")
+	
+			
+			ctx.Logger().Info("start to run module migrations...")
+			return fromVM, nil
+		})
+	
+		// Store migration for the latest upgrade
+		upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
+		if err != nil {
+			panic(err)
+		}
+	
+		if upgradeInfo.Name == "v0.6" && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+			storeUpgrades := storetypes.StoreUpgrades{
+				Added: []string{
+					resourcetypes.StoreKey,
+				},
+			}
+	
+			app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
+		}
 
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
