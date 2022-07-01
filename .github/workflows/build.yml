@@ -37,9 +37,9 @@ jobs:
       
       - name: Fetch Golang protoc compiler plugins
         env:
-          GOLANG_PROTOBUF_VERSION: 1.3.5
+          GOLANG_PROTOBUF_VERSION: 1.5.2
           GOGO_PROTOBUF_VERSION: 1.3.2
-          GRPC_GATEWAY_VERSION: 1.14.7
+          GRPC_GATEWAY_VERSION: 1.16.0
         # Taken from: tendermintdev/sdk-proto-gen:v0.2
         run: |
           go get \
@@ -50,10 +50,11 @@ jobs:
             github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@v"$GRPC_GATEWAY_VERSION" \
             github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@v"$GRPC_GATEWAY_VERSION" \
             github.com/regen-network/cosmos-proto/protoc-gen-gocosmos@latest
+      
       - name: Install buf
         env:
           PREFIX: "/usr/local"
-          VERSION: "1.0.0-rc8"
+          VERSION: "1.6.0"
         run: |
           curl -sSL "https://github.com/bufbuild/buf/releases/download/v${VERSION}/buf-$(uname -s)-$(uname -m).tar.gz" | \
           sudo tar -xvzf - -C "${PREFIX}" --strip-components 1
@@ -130,9 +131,6 @@ jobs:
       - name: Save cheqd-cli Docker image
         run: docker save -o cheqd-cli-image.tar cheqd-cli
 
-      - name: Build cosmovisor Docker image with 'cosmovisor run' as entrypoint and no build args
-        run: docker build -f docker/Dockerfile --target cosmovisor -t cheqd-node:cosmovisor_to --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" .
-
       - name: Store cheqd-cli artifact
         uses: actions/upload-artifact@v3
         with:
@@ -147,12 +145,3 @@ jobs:
         with:
           name: cheqd-node-image.tar
           path: cheqd-node-image.tar
-
-      - name: Save cheqd-node:cosmovisor_to Docker image
-        run: docker save -o cheqd-cosmovisor-to.tar cheqd-node:cosmovisor_to
-
-      - name: Store cheqd-node artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: cheqd-cosmovisor-to.tar
-          path: cheqd-cosmovisor-to.tar
