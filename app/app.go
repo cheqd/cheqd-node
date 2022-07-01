@@ -12,7 +12,6 @@ import (
 
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
