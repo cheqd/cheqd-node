@@ -1,33 +1,27 @@
 #####  Build container  #####
 
-FROM golang:buster as builder
+# Taken from: https://github.com/osmosis-labs/osmosis/blob/v10.0.1/Dockerfile
+FROM golang:1.18.2-alpine3.15 as build
 
-RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends \
-    curl \
-    make \
-    gcc \
-    python \
-    protobuf-compiler \
-    libprotobuf-dev \
-    wget \
-    git \
-    jq
+RUN set -eux; apk add --no-cache ca-certificates build-base;
+RUN apk add git
+# Needed by github.com/zondax/hid
+RUN apk add linux-headers
 
-
-# From https://github.com/CosmWasm/wasmd/blob/master/Dockerfile
-# For more details see https://github.com/CosmWasm/wasmvm#builds-of-libwasmvm
-ADD https://github.com/CosmWasm/wasmvm/releases/download/v1.0.0-beta7/libwasmvm_muslc.a /lib/libwasmvm_muslc.a
-
-
-# App
-WORKDIR /app
-
+WORKDIR /
 RUN git clone --depth 1 --branch v8.0.0 https://github.com/osmosis-labs/osmosis
+WORKDIR /osmosis
 
-WORKDIR /app/osmosis
+# CosmWasm: see https://github.com/CosmWasm/wasmvm/releases
+ADD https://github.com/CosmWasm/wasmvm/releases/download/v1.0.0/libwasmvm_muslc.aarch64.a /lib/libwasmvm_muslc.aarch64.a
+ADD https://github.com/CosmWasm/wasmvm/releases/download/v1.0.0/libwasmvm_muslc.x86_64.a /lib/libwasmvm_muslc.x86_64.a
+RUN sha256sum /lib/libwasmvm_muslc.aarch64.a | grep 7d2239e9f25e96d0d4daba982ce92367aacf0cbd95d2facb8442268f2b1cc1fc
+RUN sha256sum /lib/libwasmvm_muslc.x86_64.a | grep f6282df732a13dec836cda1f399dd874b1e3163504dbd9607c6af915b2740479
 
-RUN BUILD_TAGS=muslc make install
+# CosmWasm: copy the right library according to architecture. The final location will be found by the linker flag `-lwasmvm_muslc`
+RUN cp /lib/libwasmvm_muslc.$(uname -m).a /lib/libwasmvm_muslc.a
+
+RUN BUILD_TAGS=muslc LINK_STATICALLY=true make build
 
 
 #####  Run container  #####
@@ -42,7 +36,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     netcat
 
 # Node binary
-COPY --from=builder /go/bin/osmosisd /bin
+COPY --from=build /osmosis/build/osmosisd /bin/osmosisd
 
 RUN groupadd --system --gid 1000 osmosis && \
     useradd --system --create-home --home-dir /osmosis --shell /bin/bash --gid osmosis --uid 1000 osmosis
