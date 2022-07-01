@@ -39,15 +39,15 @@ jobs:
           sudo gem install --no-document fpm
 
       - name: Build Debian package for release
-        working-directory: ./tools/build
+        working-directory: ./build
         run: |
-          ./build-deb.sh "../../build/cheqd-noded"
+          ./build-deb.sh "../build/cheqd-noded"
 
       - name: Store Debian package artifact for release
         uses: actions/upload-artifact@v3
         with:
           name: cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
-          path: build/cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
+          path: build/output/cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -56,7 +56,7 @@ jobs:
           prerelease: true
           draft: true
           files: |
-            build/cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
+            build/output/cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
             cheqd-noded
 
   release-docker-images:
