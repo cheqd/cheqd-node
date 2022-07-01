@@ -189,11 +189,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download tar archive
-        uses: actions/download-artifact@v3
-        with:
-          name: cheqd-node_${{ env.VERSION }}.tar.gz
-
       - name: Rename tar archive
         run: |
           mv cheqd-node_${{ env.VERSION }}.tar.gz cheqd-noded.tar.gz
@@ -201,10 +196,10 @@ jobs:
       - name: Download cheqd-node Docker image
         uses: actions/download-artifact@v3
         with:
-          name: cheqd-node-image.tar
+          name: cheqd-cli-image.tar
 
       - name: Load cheqd-cli Docker image
-        run: docker load -i cheqd-node-image.tar
+        run: docker load -i cheqd-cli-image.tar
 
       - name: Give current user ownership
         run: sudo chown "$USER":"$USER" .
