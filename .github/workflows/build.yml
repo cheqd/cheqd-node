@@ -70,12 +70,12 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cheqd-noded
-          path: tools/build/cheqd-noded
+          path: build-tools/cheqd-noded
 
       - name: Set version number
         id: set-version
         run: |
-          VERSION=$(build/cheqd-noded version 2>&1)
+          VERSION=$(build-tools/cheqd-noded version 2>&1)
           echo ::set-output name=VERSION::"$VERSION"
 
       - name: Install fpm
@@ -84,12 +84,12 @@ jobs:
           sudo gem install --no-document fpm
       
       - name: Build Debian package
-        working-directory: tools/build
+        working-directory: build-tools
         run: |
           ./build-deb.sh "cheqd-noded"
 
       - name: Build Tar archive
-        working-directory: tools/build
+        working-directory: build-tools
         run: |
           ./build-tar.sh "cheqd-noded"
       
@@ -99,7 +99,7 @@ jobs:
           VERSION: ${{ steps.set-version.outputs.VERSION }}
         with:
           name: cheqd-node_${{ env.VERSION }}_amd64.deb
-          path: tools/build/cheqd-node_${{ env.VERSION }}_amd64.deb
+          path: build-tools/output/cheqd-node_${{ env.VERSION }}_amd64.deb
 
       - name: Store Tar archive artifact
         uses: actions/upload-artifact@v3
@@ -107,7 +107,7 @@ jobs:
           VERSION: ${{ steps.set-version.outputs.VERSION }}
         with:
           name: cheqd-node_${{ env.VERSION }}.tar.gz
-          path: tools/build/cheqd-node_${{ env.VERSION }}.tar.gz
+          path: build-tools/output/cheqd-node_${{ env.VERSION }}.tar.gz
 
   build-docker-images:
     name: "Docker images"

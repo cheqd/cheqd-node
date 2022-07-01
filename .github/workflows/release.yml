@@ -29,6 +29,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: cheqd-noded
+          path: build-tools
 
       - name: Restore binary permissions
         run: sudo chmod +x cheqd-noded
@@ -39,7 +40,7 @@ jobs:
           sudo gem install --no-document fpm
 
       - name: Build Debian package for release
-        working-directory: ./tools/build
+        working-directory: build-tools
         run: |
           ./build-deb.sh "cheqd-noded"
 
@@ -47,7 +48,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
-          path: tools/build/cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
+          path: build-tools/output/cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -56,8 +57,8 @@ jobs:
           prerelease: true
           draft: true
           files: |
-            tools/build/cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
-            cheqd-noded
+            build-tools/output/cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
+            build-tools/cheqd-noded
 
   release-docker-images:
     name: "Publish Docker images for new version"
