@@ -1,11 +1,16 @@
-version: '3.2'
+version: '3.7'
 
 services:
   cheqd:
     image: cheqd
     build:
-      context: ./cheqd
-      dockerfile: cheqd.Dockerfile
+      context: ../../../
+      dockerfile: docker/Dockerfile
+      target: base
+    configs:
+      - source: cheqd-init
+        target: /home/cheqd/cheqd-init.sh
+    entrypoint: /home/cheqd/cheqd-init.sh
     ports:
       - "26656:26656" # p2p
       - "26657:26657" # rpc
@@ -32,3 +37,7 @@ services:
       - "3000:3000" # rest
       - "3001:3001" # telemetry
     entrypoint: tail -f /dev/null
+
+configs:
+  cheqd-init:
+    file: ./cheqd/cheqd-init.sh
