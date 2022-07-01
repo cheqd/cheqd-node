@@ -86,7 +86,7 @@ jobs:
       - name: Build Debian package
         working-directory: ./build-tools
         run: |
-          ./build-tar.sh "../build/cheqd-noded"
+          ./build-deb.sh "../build/cheqd-noded"
 
       - name: Build Tar archive
         working-directory: ./build-tools
