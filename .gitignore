@@ -2,6 +2,7 @@
 
 # Tests
 **/network-config
+**/node_configs
 
 # Python
 .pytest_cache
