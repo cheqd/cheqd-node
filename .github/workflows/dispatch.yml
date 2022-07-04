@@ -13,6 +13,7 @@ jobs:
 
   call-build:
     name: "Build"
+    needs: call-lint
     uses: ./.github/workflows/build.yml
   
   call-test:
