@@ -40,8 +40,6 @@ DID_2="${DID_METHOD}${DID_2_IDENTIFIER}"
 # shellcheck disable=SC2034
 RESOURCE_1="82aadc50-58e4-4e00-bf35-36062c2784be"
 CHEQD_HOME="/home/cheqd"
-DID_PRIVATE
-
 
 GAS="auto"
 GAS_ADJUSTMENT="1.3"
