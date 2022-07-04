@@ -177,6 +177,7 @@ function send_resource_new () {
     RESOURCE_NAME="Resource 1"
     RESOURCE_RESOURCE_TYPE="CL-Schema"
     RESOURCE_DATA='{ "content": "test data" }';
+    echo ${RESOURCE_DATA} > resource_data.json
 
     # Post the message
     # shellcheck disable=SC2086
@@ -185,9 +186,13 @@ function send_resource_new () {
     --resource-id ${resource_to_write} \
     --resource-name "${RESOURCE_NAME}" \
     --resource-type "${RESOURCE_RESOURCE_TYPE}" \
-    --resource-file (echo "${RESOURCE_DATA}") \
+    --resource-file ./resource_data.json \
     "${KEY_ID}" "${ALICE_VER_PRIV_BASE_64}" \
-    --from "${BASE_ACCOUNT_1}" "${TX_PARAMS}")
+    --from operator0 \
+    --gas-prices "25ncheq" \
+    --chain-id $CHAIN_ID \
+    --output json \
+    -y)
 
     txhash=$(echo "$resource" | jq ".txhash" | tr -d '"')
     echo "$txhash" >> $FNAME_TXHASHES
