@@ -1,31 +1,3 @@
-#####  Build container  #####
-
-FROM golang:buster as builder
-
-RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends \
-    curl \
-    make \
-    gcc \
-    python \
-    protobuf-compiler \
-    libprotobuf-dev \
-    wget \
-    git \
-    jq
-
-# App
-WORKDIR /app
-
-RUN git clone --depth 1 --branch v4.2.0 https://github.com/osmosis-labs/osmosis
-
-WORKDIR /app/osmosis
-
-RUN make install
-
-
-#####  Run container  #####
-
 FROM debian:buster
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
@@ -36,20 +8,21 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     netcat
 
 # Node binary
-COPY --from=builder /go/bin/osmosisd /bin
+COPY --from=osmolabs/osmosis:10 /bin/osmosisd /bin/osmosisd
 
-RUN groupadd --system --gid 1000 osmosis && \
-    useradd --system --create-home --home-dir /osmosis --shell /bin/bash --gid osmosis --uid 1000 osmosis
-RUN chown -R osmosis /osmosis
+ARG USER=osmosis
+ARG GROUP=osmosis
 
-WORKDIR /osmosis
-USER osmosis
+ARG HOME=/home/$USER
 
-EXPOSE 26656 26657
-STOPSIGNAL SIGTERM
+# User
+RUN groupadd --system --gid 1000 $USER && \
+    useradd --system --create-home --home-dir $HOME --shell /bin/bash --gid $GROUP --uid 1000 $USER
 
-# Init network
-COPY osmosis_init.sh .
-RUN bash osmosis_init.sh
+WORKDIR $HOME
+
+RUN chown -R $USER $HOME
+USER $USER
+
 
 ENTRYPOINT [ "osmosisd", "start" ]

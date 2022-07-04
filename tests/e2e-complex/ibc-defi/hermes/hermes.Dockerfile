@@ -12,7 +12,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 
 WORKDIR /app
 
-RUN git clone --depth 1 --branch v0.9.0 https://github.com/informalsystems/ibc-rs
+RUN git clone --depth 1 --branch v0.15.0 https://github.com/informalsystems/ibc-rs
 
 WORKDIR /app/ibc-rs
 
@@ -34,21 +34,18 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 # Node binary
 COPY --from=builder /app/ibc-rs/target/release/hermes /bin
 
+ARG USER=hermes
+ARG GROUP=hermes
+
+ARG HOME=/home/$USER
+
 # User
-RUN groupadd --system --gid 1000 hermes && \
-    useradd --system --create-home --home-dir /hermes --shell /bin/bash --gid hermes --uid 1000 hermes
+RUN groupadd --system --gid 1000 $USER && \
+    useradd --system --create-home --home-dir $HOME --shell /bin/bash --gid $GROUP --uid 1000 $USER
 
-WORKDIR /hermes
+WORKDIR $HOME
 
-# Init
-COPY hermes_init.sh .
-RUN bash hermes_init.sh
-
-# Config
-RUN mkdir .hermes
-COPY config.toml .hermes
-
-RUN chown -R hermes /hermes
-USER hermes
+RUN chown -R $USER $HOME
+USER $USER
 
 ENTRYPOINT [ "hermes" ]
