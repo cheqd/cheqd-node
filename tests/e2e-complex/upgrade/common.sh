@@ -177,7 +177,7 @@ function send_resource_new () {
     RESOURCE_NAME="Resource 1"
     RESOURCE_RESOURCE_TYPE="CL-Schema"
     RESOURCE_DATA='{ "content": "test data" }';
-    echo ${RESOURCE_DATA} > resource_data.json
+    echo "${RESOURCE_DATA}" > resource_data.json
 
     # Post the message
     # shellcheck disable=SC2086
