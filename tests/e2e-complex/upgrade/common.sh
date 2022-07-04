@@ -186,10 +186,10 @@ function send_resource_new () {
     --collection-id ${collection_id_to_write} \
     --resource-id ${resource_to_write} \
     --resource-name "${RESOURCE_NAME}" \
-    --resource-type ${RESOURCE_RESOURCE_TYPE} \
-    --resource-file <(echo "${RESOURCE_DATA}") \
+    --resource-type "${RESOURCE_RESOURCE_TYPE}" \
+    --resource-file (echo "${RESOURCE_DATA}") \
     "${KEY_ID}" "${ALICE_VER_PRIV_BASE_64}" \
-    --from "${BASE_ACCOUNT_1}" ${TX_PARAMS})
+    --from "${BASE_ACCOUNT_1}" "${TX_PARAMS}")
 
     txhash=$(echo "$resource" | jq ".txhash" | tr -d '"')
     echo "$txhash" >> $FNAME_TXHASHES
