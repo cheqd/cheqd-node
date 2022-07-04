@@ -285,7 +285,7 @@ function check_did () {
 function check_resource () {
     collection_id_to_check=$1
     resource_to_check=$2
-    resource_from=$(get_resource "$collection_id_to_check" "$resource_to_check" | jq ".resource.id" | tr -d '"')
+    resource_from=$(get_resource "$collection_id_to_check" "$resource_to_check" | jq ".resource.header.id" | tr -d '"')
     if [ "$resource_from" != "$resource_to_check" ];
     then
         echo "There is no any $resource_to_check on server"
