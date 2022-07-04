@@ -68,10 +68,10 @@ check_did "$DID_2"
 check_tx_hashes
 
 # Send new resource
-send_resource_new "$DID_2" "$RESOURCE_1"
+send_resource_new "$DID_2_IDENTIFIER" "$RESOURCE_1"
 
 # Check new resource
-check_resource "$DID_2" "$RESOURCE_1"
+check_resource "$DID_2_IDENTIFIER" "$RESOURCE_1"
 
 # Stop docker compose
 docker_compose_down
