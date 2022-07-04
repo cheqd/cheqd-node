@@ -40,6 +40,7 @@ DID_2="${DID_METHOD}${DID_2_IDENTIFIER}"
 # shellcheck disable=SC2034
 RESOURCE_1="82aadc50-58e4-4e00-bf35-36062c2784be"
 CHEQD_HOME="/home/cheqd"
+DID_PRIVATE
 
 
 GAS="auto"
@@ -143,6 +144,7 @@ function send_did_new () {
     ALICE_VER_KEY="$(cheqd_noded_docker debug ed25519 random)"
     ALICE_VER_PUB_BASE_64=$(echo "${ALICE_VER_KEY}" | jq -r ".pub_key_base_64")
     ALICE_VER_PRIV_BASE_64=$(echo "${ALICE_VER_KEY}" | jq -r ".priv_key_base_64")
+    export -n ALICE_VER_PRIV_BASE_64=$ALICE_VER_PRIV_BASE_64
     ALICE_VER_PUB_MULTIBASE_58=$(cheqd_noded_docker debug encoding base64-multibase58 "${ALICE_VER_PUB_BASE_64}")
 
     # Build CreateDid message
@@ -169,10 +171,6 @@ function send_did_new () {
 function send_resource_new () {
     collection_id_to_write=$1
     resource_to_write=$2
-
-    # Generate Alice identity key
-    ALICE_VER_KEY="$(cheqd_noded_docker debug ed25519 random)"
-    ALICE_VER_PRIV_BASE_64=$(echo "${ALICE_VER_KEY}" | jq -r ".priv_key_base_64")
 
     # Build CreateDid message
     KEY_ID="${DID_METHOD}${collection_id_to_write}#key1"
