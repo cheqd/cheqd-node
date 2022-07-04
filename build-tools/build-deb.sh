@@ -36,6 +36,8 @@ tar -cvzf "${PACKAGE_CONTENT_TAR}" -C "${PACKAGE_CONTENT}" "."
 ARCH="amd64"
 DEB_PACKAGE="${OUTPUT_DIR}/${PKG_NAME}_${VERSION}_${ARCH}.deb"
 
+mv node-standalone.service cheqd-noded.service
+
 fpm \
   --input-type "tar" \
   --output-type "deb" \

@@ -19,7 +19,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 	}
 
 	// Validate namespaces
-	namespace := k.GetDidNamespace(ctx)
+	namespace := k.GetDidNamespace(&ctx)
 	err := msg.Validate([]string{namespace})
 	if err != nil {
 		return nil, types.ErrNamespaceValidation.Wrap(err.Error())
@@ -71,33 +71,26 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 
 	// Verify signatures
 	// Duplicate signatures that reference the old version, make them reference a new (in memory) version
+	// We can't use VerifySignatures because we can't uniquely identify a verification method corresponding to a given signInfo.
+	// In other words if a signature belongs to the did being updated, there is no way to know which did version it belongs to: old or new.
+	// To eliminate this problem we have to add pubkey to the signInfo in future.
 	signers := GetSignerDIDsForDIDUpdate(*existingDid, updatedDid)
 	extendedSignatures := DuplicateSignatures(msg.Signatures, existingDid.Id, updatedDid.Id)
-	for _, signer := range signers {
-		signaturesBySigner := types.FindSignInfosBySigner(extendedSignatures, signer)
-		signerForErrorMessage := GetSignerIdForErrorMessage(signer, existingDid.Id, updatedDid.Id)
-
-		if len(signaturesBySigner) == 0 {
-			return nil, types.ErrSignatureNotFound.Wrapf("there should be at least one signature by %s", signerForErrorMessage)
-		}
-
-		found := false
-		for _, signature := range signaturesBySigner {
-			err := VerifySignature(&k.Keeper, &ctx, inMemoryDids, signBytes, signature)
-			if err == nil {
-				found = true
-				break
-			}
-		}
-
-		if !found {
-			return nil, types.ErrSignatureNotFound.Wrapf("there should be at least one valid signature by %s", signerForErrorMessage)
-		}
+	err = VerifyAllSignersHaveAtLeastOneValidSignature(&k.Keeper, &ctx, inMemoryDids, signBytes, signers, extendedSignatures, existingDid.Id, updatedDid.Id)
+	if err != nil {
+		return nil, err
 	}
 
-	// Apply changes: return original id and modify state
+	// Return original id
 	updatedDid.ReplaceIds(updatedDid.Id, existingDid.Id)
-	err = k.SetDid(&ctx, &updatedDid, &updatedMetadata)
+
+	// Modify state
+	updatedStateValue, err = types.NewStateValue(&updatedDid, &updatedMetadata)
+	if err != nil {
+		return nil, err
+	}
+
+	err = k.SetDid(&ctx, &updatedStateValue)
 	if err != nil {
 		return nil, types.ErrInternal.Wrapf(err.Error())
 	}

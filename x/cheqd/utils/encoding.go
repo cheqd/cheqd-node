@@ -28,3 +28,7 @@ func ValidateMultibaseEncoding(data string, expectedEncoding multibase.Encoding)
 func ValidateBase58(data string) error {
 	return ValidateMultibaseEncoding(string(multibase.Base58BTC)+data, multibase.Base58BTC)
 }
+
+func IsValidBase58(data string) bool {
+	return ValidateBase58(data) == nil
+}

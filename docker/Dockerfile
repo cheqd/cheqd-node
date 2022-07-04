@@ -61,7 +61,7 @@ LABEL org.opencontainers.image.source "https://github.com/cheqd/cheqd-node"
 LABEL org.opencontainers.image.documentation "https://docs.cheqd.io/node"
 
 # Copy compiled node binary from Stage 1
-COPY --from=builder /app/build/cheqd-noded /bin
+COPY --from=builder /app/build-tools/cheqd-noded /bin
 
 # Set user directory and details
 ARG CHEQD_HOME_DIR="/home/cheqd"

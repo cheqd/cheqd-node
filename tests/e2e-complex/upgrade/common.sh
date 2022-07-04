@@ -4,13 +4,13 @@ set -euox pipefail
 
 # TODO: Assert that transactions are successful
 
-CHEQD_IMAGE_FROM="ghcr.io/cheqd/cheqd-node:cosmovisor"
+CHEQD_IMAGE_FROM="ghcr.io/cheqd/cheqd-cli:0.5.0"
 # shellcheck disable=SC2034
-CHEQD_IMAGE_TO="cheqd-node:cosmovisor_to"
+CHEQD_IMAGE_TO="cheqd-cli:latest"
 # shellcheck disable=SC2034
 CHEQD_VERSION_TO=$(git describe --always --tag --match "v*" | sed 's/^v//')
 # shellcheck disable=SC2034
-UPGRADE_NAME="cosmovisor_test"
+UPGRADE_NAME="v0.6"
 # shellcheck disable=SC2034
 UPGRADE_INFO="{
   \"binaries\": {
@@ -94,7 +94,7 @@ function local_client_tx () {
 }
 
 function make_775 () {
-    sudo chmod -R 775 node_configs
+    sudo chmod -R 777 node_configs
 }
 
 

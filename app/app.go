@@ -6,7 +6,11 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/cheqd/cheqd-node/x/resource"
+
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
@@ -37,6 +41,7 @@ import (
 	appparams "github.com/cheqd/cheqd-node/app/params"
 	"github.com/cheqd/cheqd-node/x/cheqd"
 	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
+	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
@@ -147,6 +152,7 @@ var (
 		feegrantmodule.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
 		cheqd.AppModuleBasic{},
+		resource.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -214,7 +220,8 @@ type App struct {
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
-	cheqdKeeper cheqdkeeper.Keeper
+	cheqdKeeper    cheqdkeeper.Keeper
+	resourceKeeper resourcekeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -243,7 +250,7 @@ func New(
 		govtypes.StoreKey, paramstypes.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, capabilitytypes.StoreKey, feegrant.StoreKey,
 		ibchost.StoreKey, ibctransfertypes.StoreKey, authzkeeper.StoreKey,
-		cheqdtypes.StoreKey,
+		cheqdtypes.StoreKey, resourcetypes.StoreKey,
 	)
 
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -300,38 +307,32 @@ func New(
 	app.CrisisKeeper = crisiskeeper.NewKeeper(
 		app.GetSubspace(crisistypes.ModuleName), invCheckPeriod, app.BankKeeper, authtypes.FeeCollectorName,
 	)
+
 	app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath, app.BaseApp)
 
-	// Upgrade handler
-	app.UpgradeKeeper.SetUpgradeHandler("v0.3", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("Handler for upgrade plan: v0.3")
+	// Latest upgrade handler
+	app.UpgradeKeeper.SetUpgradeHandler("v0.6", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx.Logger().Info("Handler for upgrade plan: v0.6")
 
-		app.TestNetMigration(ctx)
-		initialVM := app.mm.GetVersionMap()
-		return initialVM, nil
+		ctx.Logger().Info("start to run module migrations...")
+		return fromVM, nil
 	})
 
-	app.UpgradeKeeper.SetUpgradeHandler("v0.4", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("Handler for upgrade plan: v0.4")
+	// Store migration for the latest upgrade
+	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
+	if err != nil {
+		panic(err)
+	}
 
-		initialVM := app.mm.GetVersionMap()
-		return initialVM, nil
-	})
+	if upgradeInfo.Name == "v0.6" && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		storeUpgrades := storetypes.StoreUpgrades{
+			Added: []string{
+				resourcetypes.StoreKey,
+			},
+		}
 
-	app.UpgradeKeeper.SetUpgradeHandler("v0.5", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("Handler for upgrade plan: v0.5")
-
-		app.Migration05(ctx)
-		initialVM := app.mm.GetVersionMap()
-		return initialVM, nil
-	})
-
-	app.UpgradeKeeper.SetUpgradeHandler("cosmovisor_test", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("Handler for upgrade plan: cosmovisor_test")
-
-		initialVM := app.mm.GetVersionMap()
-		return initialVM, nil
-	})
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
+	}
 
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
@@ -378,6 +379,10 @@ func New(
 		appCodec, keys[cheqdtypes.StoreKey],
 	)
 
+	app.resourceKeeper = *resourcekeeper.NewKeeper(
+		appCodec, keys[resourcetypes.StoreKey],
+	)
+
 	app.GovKeeper = govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
 		&stakingKeeper, govRouter,
@@ -418,6 +423,7 @@ func New(
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeegrantKeeper, app.interfaceRegistry),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		cheqd.NewAppModule(appCodec, app.cheqdKeeper),
+		resource.NewAppModule(appCodec, app.resourceKeeper, app.cheqdKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
 	)
@@ -437,6 +443,7 @@ func New(
 		stakingtypes.ModuleName,
 		ibchost.ModuleName,
 		cheqdtypes.ModuleName,
+		resourcetypes.ModuleName,
 		genutiltypes.ModuleName,
 		banktypes.ModuleName,
 		crisistypes.ModuleName,
@@ -461,6 +468,7 @@ func New(
 		evidencetypes.ModuleName,
 		ibchost.ModuleName,
 		cheqdtypes.ModuleName,
+		resourcetypes.ModuleName,
 		genutiltypes.ModuleName,
 		banktypes.ModuleName,
 		ibctransfertypes.ModuleName,
@@ -493,6 +501,7 @@ func New(
 		feegrant.ModuleName,
 		authz.ModuleName,
 		cheqdtypes.ModuleName,
+		resourcetypes.ModuleName,
 		vestingtypes.ModuleName,
 		upgradetypes.ModuleName,
 		paramstypes.ModuleName,
@@ -515,6 +524,7 @@ func New(
 		feegrant.ModuleName,
 		authz.ModuleName,
 		cheqdtypes.ModuleName,
+		resourcetypes.ModuleName,
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
 		upgradetypes.ModuleName,
@@ -573,7 +583,7 @@ func (app *App) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.Respo
 
 func (app *App) TestNetMigration(ctx sdk.Context) {
 	if ctx.ChainID() == "cheqd-testnet-2" {
-		app.cheqdKeeper.SetDidNamespace(ctx, "testnet")
+		app.cheqdKeeper.SetDidNamespace(&ctx, "testnet")
 	}
 }
 

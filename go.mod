@@ -5,25 +5,27 @@ go 1.17
 require (
 	filippo.io/edwards25519 v1.0.0-beta.2
 	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce
-	github.com/cosmos/cosmos-sdk v0.45.4
+	github.com/cosmos/cosmos-sdk v0.45.6
 	github.com/cosmos/ibc-go v1.4.0
+	github.com/gabriel-vasile/mimetype v1.4.0
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.2
+	github.com/google/uuid v1.3.0
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/lestrrat-go/jwx v1.2.20
 	github.com/multiformats/go-multibase v0.0.3
 	github.com/rakyll/statik v0.1.7
 	github.com/spf13/cast v1.4.1
-	github.com/spf13/cobra v1.4.0
+	github.com/spf13/cobra v1.5.0
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.10.1
 	github.com/stretchr/testify v1.7.1
 	github.com/tendermint/tendermint v0.34.19
 	github.com/tendermint/tm-db v0.6.6
-	google.golang.org/genproto v0.0.0-20211223182754-3ac035c7e7cb
-	google.golang.org/grpc v1.45.0
+	google.golang.org/genproto v0.0.0-20220519153652-3a47de7e79bd
+	google.golang.org/grpc v1.46.2
 )
 
 require (
@@ -65,6 +67,7 @@ require (
 	github.com/gogo/gateway v1.1.0 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/google/btree v1.0.0 // indirect
+	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/google/orderedcode v0.0.1 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
@@ -124,14 +127,14 @@ require (
 	github.com/zondax/hid v0.9.0 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
-	golang.org/x/net v0.0.0-20211208012354-db4efeb81f4b // indirect
+	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
 	golang.org/x/sys v0.0.0-20220114195835-da31bd327af9 // indirect
-	golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1 // indirect
+	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	google.golang.org/protobuf v1.27.1 // indirect
+	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/ini.v1 v1.66.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 	nhooyr.io/websocket v1.8.6 // indirect
 )
 

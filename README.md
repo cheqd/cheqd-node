@@ -24,8 +24,8 @@ Either the cheqd team, or one of your fellow node operators will be happy to off
 
 Getting started as a node operator on the cheqd network [mainnet](https://explorer.cheqd.io) is as simple as...
 
-1. [Install the `cheqd-node` software](docs/setup-and-configure/README.md) (**version 0.5.0+**) on a hosting platform of your choice
-2. Once you have acquired CHEQ tokens, [promote your node to a validator](docs/validator-guide/README.md)
+1. [Install the `cheqd-node` software](https://docs.cheqd.io/node/docs/setup-and-configure) (**version 0.5.0+**) on a hosting platform of your choice
+2. Once you have acquired CHEQ tokens, [promote your node to a validator](https://docs.cheqd.io/node/docs/validator-guide)
 
 If successfully configured, your node would become the latest validator on the cheqd mainnet. Welcome to the new digital ID revolution!
 
@@ -38,7 +38,7 @@ Our [testnet](https://testnet-explorer.cheqd.io/) is the easiest place for devel
 
 ## 🧑‍💻 Using cheqd
 
-Once installed, `cheqd-node` can be controlled using the [cheqd Cosmos CLI guide](docs/cheqd-cli/README.md).
+Once installed, `cheqd-node` can be controlled using the [cheqd Cosmos CLI guide](https://docs.cheqd.io/node/docs/setup-and-configure).
 
 ### 📌 Currently supported functionality
 
@@ -46,7 +46,7 @@ Once installed, `cheqd-node` can be controlled using the [cheqd Cosmos CLI guide
 * Creating, managing, and configuring accounts and keys on a cheqd node
 * Staking and participating in public-permissionless governance
 * Governance framework for public-permissionless self-sovereign identity networks
-* Creating [`did:cheqd` method DIDs](architecture/adr-list/adr-002-cheqd-did-method.md), DID Documents ("DIDDocs"), and querying full DIDDocs
+* Creating [`did:cheqd` method DIDs](https://docs.cheqd.io/node/architecture/adr-list/adr-002-cheqd-did-method), DID Documents ("DIDDocs"), and querying full DIDDocs
 
 ### 🔮 Upcoming functionality
 
@@ -62,11 +62,7 @@ We plan on adding new functionality rapidly and on a regular basis and welcome f
 
 `cheqd-node` is written in Go and built using Cosmos SDK. The [Cosmos SDK Developer Guide](https://docs.cosmos.network/) explains a lot of the [basic concepts](https://docs.cosmos.network/v0.44/basics/app-anatomy.html) of how the cheqd network functions.
 
-If you want to build a node from source or contribute to the code, please read our guide to [building and testing](docs/build-and-networks/README.md).
-
-### Creating a local network
-
-If you are building from source, or otherwise interested in running a local network, we have [instructions on how to set up a new network](docs/setup-and-configure/README.md) for development purposes.
+If you want to build a node from source or contribute to the code, please read our guide to [building and testing](https://docs.cheqd.io/node/docs/build-and-networks).
 
 ## 🐞 Bug reports & 🤔 feature requests
 
