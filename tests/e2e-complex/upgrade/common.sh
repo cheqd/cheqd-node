@@ -30,12 +30,12 @@ FNAME_TXHASHES="txs.hashes"
 AMOUNT_BEFORE="19000000000000000"
 CHEQ_AMOUNT="1ncheq"
 CHEQ_AMOUNT_NUMBER="1"
+DID_METHOD="did:cheqd:testnet:"
 # shellcheck disable=SC2034
 DID_1="did:cheqd:testnet:1111111111111111"
 # shellcheck disable=SC2034
 DID_2_IDENTIFIER="2222222222222222"
-# shellcheck disable=SC2034
-DID_2="did:cheqd:testnet:${DID_2_IDENTIFIER}"
+DID_2="${DID_METHOD}:${DID_2_IDENTIFIER}"
 # shellcheck disable=SC2034
 RESOURCE_1="82aadc50-58e4-4e00-bf35-36062c2784be"
 CHEQD_HOME="/home/cheqd"
@@ -174,7 +174,7 @@ function send_resource_new () {
     ALICE_VER_PRIV_BASE_64=$(echo "${ALICE_VER_KEY}" | jq -r ".priv_key_base_64")
 
     # Build CreateDid message
-    KEY_ID="${collection_id_to_write}#key1"
+    KEY_ID="${DID_METHOD}${collection_id_to_write}#key1"
 
     RESOURCE_NAME="Resource 1"
     RESOURCE_RESOURCE_TYPE="CL-Schema"
