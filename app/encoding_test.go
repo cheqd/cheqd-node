@@ -8,7 +8,7 @@ import (
 )
 
 func Test_MsgCreateDidPayload_UnmarshalJSON(t *testing.T) {
-	cdc := MakeEncodingConfig()
+	cdc := MakeTestEncodingConfig()
 
 	createPayloadJson := `{"id": "did:cheqd:alice"}`
 
