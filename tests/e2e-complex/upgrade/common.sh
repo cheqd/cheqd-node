@@ -169,9 +169,7 @@ function send_resource_new () {
 
     # Generate Alice identity key
     ALICE_VER_KEY="$(cheqd_noded_docker debug ed25519 random)"
-    ALICE_VER_PUB_BASE_64=$(echo "${ALICE_VER_KEY}" | jq -r ".pub_key_base_64")
     ALICE_VER_PRIV_BASE_64=$(echo "${ALICE_VER_KEY}" | jq -r ".priv_key_base_64")
-    ALICE_VER_PUB_MULTIBASE_58=$(cheqd_noded_docker debug encoding base64-multibase58 "${ALICE_VER_PUB_BASE_64}")
 
     # Build CreateDid message
     KEY_ID="${collection_id_to_write}#key1"
@@ -182,14 +180,19 @@ function send_resource_new () {
 
     # Post the message
     # shellcheck disable=SC2086
-    resource=$(cheqd-noded tx resource create-resource \
+    resource=$(local_client_tx tx resource create-resource \
     --collection-id ${collection_id_to_write} \
     --resource-id ${resource_to_write} \
     --resource-name "${RESOURCE_NAME}" \
     --resource-type ${RESOURCE_RESOURCE_TYPE} \
     --resource-file <(echo "${RESOURCE_DATA}") \
     "${KEY_ID}" "${ALICE_VER_PRIV_BASE_64}" \
-    --from "${BASE_ACCOUNT_1}" ${TX_PARAMS})
+    --from operator0 \
+    --gas-prices "25ncheq" \
+    --chain-id $CHAIN_ID \
+    --output json \
+    -y)
+
 
     txhash=$(echo "$resource" | jq ".txhash" | tr -d '"')
     echo "$txhash" >> $FNAME_TXHASHES
@@ -253,7 +256,7 @@ function get_did () {
 function get_resource () {
     collection_id=$1
     resource_id=$2
-    cheqd_noded_docker query resource resource "$collection_id" "$resource_id" --output json
+    local_client_tx query resource resource "$collection_id" "$resource_id" --output json
 }
 
 # Check that balance of operator3 increased to CHEQ_AMOUNT
@@ -286,7 +289,7 @@ function check_resource () {
     resource_from=$(get_resource "$collection_id_to_check" "resource_to_check" | jq ".resource.id" | tr -d '"')
     if [ "$resource_from" != "$resource_to_check" ];
     then
-        echo "There is no any $did_to_check on server"
+        echo "There is no any $resource_to_check on server"
         exit 1
     fi
 }
