@@ -1,29 +1,3 @@
-#####  Build container  #####
-
-# Taken from: https://github.com/osmosis-labs/osmosis/blob/v10.0.1/Dockerfile
-FROM golang:1.18.2-alpine3.15 as build
-
-RUN set -eux; apk add --no-cache ca-certificates build-base;
-RUN apk add git
-# Needed by github.com/zondax/hid
-RUN apk add linux-headers
-
-WORKDIR /
-RUN git clone --depth 1 --branch v8.0.0 https://github.com/osmosis-labs/osmosis
-WORKDIR /osmosis
-
-# CosmWasm: see https://github.com/CosmWasm/wasmvm/releases
-ADD https://github.com/CosmWasm/wasmvm/releases/download/v1.0.0/libwasmvm_muslc.aarch64.a /lib/libwasmvm_muslc.aarch64.a
-ADD https://github.com/CosmWasm/wasmvm/releases/download/v1.0.0/libwasmvm_muslc.x86_64.a /lib/libwasmvm_muslc.x86_64.a
-
-# CosmWasm: copy the right library according to architecture. The final location will be found by the linker flag `-lwasmvm_muslc`
-RUN cp "/lib/libwasmvm_muslc.$(uname -m).a" /lib/libwasmvm_muslc.a
-
-RUN BUILD_TAGS=muslc LINK_STATICALLY=true make build
-
-
-#####  Run container  #####
-
 FROM debian:buster
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
@@ -34,20 +8,21 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     netcat
 
 # Node binary
-COPY --from=build /osmosis/build/osmosisd /bin/osmosisd
+COPY --from=osmolabs/osmosis:10 /bin/osmosisd /bin/osmosisd
 
-RUN groupadd --system --gid 1000 osmosis && \
-    useradd --system --create-home --home-dir /osmosis --shell /bin/bash --gid osmosis --uid 1000 osmosis
-RUN chown -R osmosis /osmosis
+ARG USER=osmosis
+ARG GROUP=osmosis
 
-WORKDIR /osmosis
-USER osmosis
+ARG HOME=/home/$USER
 
-EXPOSE 26656 26657
-STOPSIGNAL SIGTERM
+# User
+RUN groupadd --system --gid 1000 $USER && \
+    useradd --system --create-home --home-dir $HOME --shell /bin/bash --gid $GROUP --uid 1000 $USER
 
-# Init network
-COPY osmosis_init.sh .
-RUN bash osmosis_init.sh
+WORKDIR $HOME
+
+RUN chown -R $USER $HOME
+USER $USER
+
 
 ENTRYPOINT [ "osmosisd", "start" ]
