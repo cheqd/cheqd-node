@@ -145,7 +145,7 @@ func VerifyAllSignersHaveAtLeastOneValidSignature(k *Keeper, ctx *sdk.Context, i
 		}
 
 		if !found {
-			return types.ErrInvalidSignature.Wrapf("there should be at least one valid signature by %s", signerForErrorMessage)
+			return types.ErrSignatureNotFound.Wrapf("there should be at least one valid signature by %s", signerForErrorMessage)
 		}
 	}
 
