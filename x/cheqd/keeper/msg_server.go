@@ -114,7 +114,7 @@ func VerifyAllSignersHaveAllValidSignatures(k *Keeper, ctx *sdk.Context, inMemor
 			return types.ErrSignatureNotFound.Wrapf("signer: %s", signer)
 		}
 
-		err := VerifySignature(&k.Keeper, &ctx, inMemoryDids, message, signature)
+		err := VerifySignature(k, ctx, inMemoryDIDs, message, signature)
 		if err != nil {
 			return err
 		}
