@@ -32,23 +32,7 @@ jobs:
           path: build-tools
 
       - name: Restore binary permissions
-        run: sudo chmod +x cheqd-noded
-
-      - name: Install fpm
-        run: |
-          sudo apt-get install ruby ruby-dev rubygems build-essential
-          sudo gem install --no-document fpm
-
-      - name: Build Debian package for release
-        working-directory: build-tools
-        run: |
-          ./build-deb.sh "cheqd-noded"
-
-      - name: Store Debian package artifact for release
-        uses: actions/upload-artifact@v3
-        with:
-          name: cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
-          path: build-tools/output/cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
+        run: sudo chmod +x build-tools/cheqd-noded
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -57,7 +41,6 @@ jobs:
           prerelease: true
           draft: true
           files: |
-            build-tools/output/cheqd-node_${{ env.RELEASE_VERSION }}_amd64.deb
             build-tools/cheqd-noded
 
   release-docker-images:
