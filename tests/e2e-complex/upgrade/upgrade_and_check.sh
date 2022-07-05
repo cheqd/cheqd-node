@@ -15,17 +15,17 @@ cheqd_noded_docker() {
         "${CHEQD_IMAGE_TO}" "$@"
 }
 
-# # Wait for upgrade height
-# bash ../../tools/wait-for-chain.sh "$UPGRADE_HEIGHT" $((3 * VOTING_PERIOD))
+# Wait for upgrade height
+bash ../../tools/wait-for-chain.sh "$UPGRADE_HEIGHT" $((3 * VOTING_PERIOD))
 
-# # Stop docker-compose service
-# docker_compose_down
+# Stop docker-compose service
+docker_compose_down
 
-# # Make all the data accessible
-# make_775
+# Make all the data accessible
+make_775
 
-# # Start docker-compose with new base image on new version
-# docker_compose_up "$CHEQD_IMAGE_TO" "$(pwd)"
+# Start docker-compose with new base image on new version
+docker_compose_up "$CHEQD_IMAGE_TO" "$(pwd)"
 
 # Check that upgrade was successful
 
@@ -66,6 +66,12 @@ check_did "$DID_2"
 
 # Check that token transaction exists after upgrade too
 check_tx_hashes
+
+# Send new resource
+send_resource_new "$DID_2_IDENTIFIER" "$RESOURCE_1"
+
+# Check new resource
+check_resource "$DID_2_IDENTIFIER" "$RESOURCE_1"
 
 # Stop docker compose
 docker_compose_down

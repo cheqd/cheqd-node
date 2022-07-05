@@ -4,13 +4,13 @@ set -euox pipefail
 
 # TODO: Assert that transactions are successful
 
-CHEQD_IMAGE_FROM="ghcr.io/cheqd/cheqd-node:cosmovisor"
+CHEQD_IMAGE_FROM="ghcr.io/cheqd/cheqd-cli:0.5.0"
 # shellcheck disable=SC2034
-CHEQD_IMAGE_TO="cheqd-node:cosmovisor_to"
+CHEQD_IMAGE_TO="cheqd-cli:latest"
 # shellcheck disable=SC2034
 CHEQD_VERSION_TO=$(git describe --always --tag --match "v*" | sed 's/^v//')
 # shellcheck disable=SC2034
-UPGRADE_NAME="cosmovisor_test"
+UPGRADE_NAME="v0.6"
 # shellcheck disable=SC2034
 UPGRADE_INFO="{
   \"binaries\": {
@@ -30,12 +30,16 @@ FNAME_TXHASHES="txs.hashes"
 AMOUNT_BEFORE="19000000000000000"
 CHEQ_AMOUNT="1ncheq"
 CHEQ_AMOUNT_NUMBER="1"
+DID_METHOD="did:cheqd:testnet:"
 # shellcheck disable=SC2034
 DID_1="did:cheqd:testnet:1111111111111111"
 # shellcheck disable=SC2034
-DID_2="did:cheqd:testnet:2222222222222222"
+DID_2_IDENTIFIER="2222222222222222"
+# shellcheck disable=SC2034
+DID_2="${DID_METHOD}${DID_2_IDENTIFIER}"
+# shellcheck disable=SC2034
+RESOURCE_1="82aadc50-58e4-4e00-bf35-36062c2784be"
 CHEQD_HOME="/home/cheqd"
-
 
 GAS="auto"
 GAS_ADJUSTMENT="1.3"
@@ -94,7 +98,7 @@ function local_client_tx () {
 }
 
 function make_775 () {
-    sudo chmod -R 775 node_configs
+    sudo chmod -R 777 node_configs
 }
 
 
@@ -138,6 +142,7 @@ function send_did_new () {
     ALICE_VER_KEY="$(cheqd_noded_docker debug ed25519 random)"
     ALICE_VER_PUB_BASE_64=$(echo "${ALICE_VER_KEY}" | jq -r ".pub_key_base_64")
     ALICE_VER_PRIV_BASE_64=$(echo "${ALICE_VER_KEY}" | jq -r ".priv_key_base_64")
+    export -n ALICE_VER_PRIV_BASE_64=$ALICE_VER_PRIV_BASE_64
     ALICE_VER_PUB_MULTIBASE_58=$(cheqd_noded_docker debug encoding base64-multibase58 "${ALICE_VER_PUB_BASE_64}")
 
     # Build CreateDid message
@@ -156,6 +161,39 @@ function send_did_new () {
 
 
     txhash=$(echo "$did" | jq ".txhash" | tr -d '"')
+    echo "$txhash" >> $FNAME_TXHASHES
+}
+
+# Send resource
+# input: resource to write
+function send_resource_new () {
+    collection_id_to_write=$1
+    resource_to_write=$2
+
+    # Build CreateDid message
+    KEY_ID="${DID_METHOD}${collection_id_to_write}#key1"
+
+    RESOURCE_NAME="Resource 1"
+    RESOURCE_RESOURCE_TYPE="CL-Schema"
+    RESOURCE_DATA='{ "content": "test data" }';
+    echo "${RESOURCE_DATA}" > resource_data.json
+
+    # Post the message
+    # shellcheck disable=SC2086
+    resource=$(local_client_tx tx resource create-resource \
+    --collection-id ${collection_id_to_write} \
+    --resource-id ${resource_to_write} \
+    --resource-name "${RESOURCE_NAME}" \
+    --resource-type "${RESOURCE_RESOURCE_TYPE}" \
+    --resource-file ./resource_data.json \
+    "${KEY_ID}" "${ALICE_VER_PRIV_BASE_64}" \
+    --from operator0 \
+    --gas-prices "25ncheq" \
+    --chain-id $CHAIN_ID \
+    --output json \
+    -y)
+
+    txhash=$(echo "$resource" | jq ".txhash" | tr -d '"')
     echo "$txhash" >> $FNAME_TXHASHES
 }
 
@@ -214,6 +252,12 @@ function get_did () {
     cheqd_noded_docker query cheqd did "$requested_did" --output json
 }
 
+function get_resource () {
+    collection_id=$1
+    resource_id=$2
+    cheqd_noded_docker query resource resource "$collection_id" "$resource_id" --output json
+}
+
 # Check that balance of operator3 increased to CHEQ_AMOUNT
 # Input: Address to check
 function check_balance () {
@@ -233,6 +277,18 @@ function check_did () {
     if [ "$did_from" != "$did_to_check" ];
     then
         echo "There is no any $did_to_check on server"
+        exit 1
+    fi
+}
+
+# Check that $DID exists
+function check_resource () {
+    collection_id_to_check=$1
+    resource_to_check=$2
+    resource_from=$(get_resource "$collection_id_to_check" "$resource_to_check" | jq ".resource.header.id" | tr -d '"')
+    if [ "$resource_from" != "$resource_to_check" ];
+    then
+        echo "There is no any $resource_to_check on server"
         exit 1
     fi
 }

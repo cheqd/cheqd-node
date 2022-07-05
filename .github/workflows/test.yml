@@ -194,17 +194,18 @@ jobs:
         with:
           name: cheqd-node_${{ env.VERSION }}.tar.gz
 
+
       - name: Rename tar archive
         run: |
           mv cheqd-node_${{ env.VERSION }}.tar.gz cheqd-noded.tar.gz
 
-      - name: Download cheqd-cosmovisor Docker image
+      - name: Download cheqd-cli Docker image
         uses: actions/download-artifact@v3
         with:
-          name: cheqd-cosmovisor-to.tar
+          name: cheqd-cli-image.tar
 
       - name: Load cheqd-cli Docker image
-        run: docker load -i cheqd-cosmovisor-to.tar
+        run: docker load -i cheqd-cli-image.tar
 
       - name: Give current user ownership
         run: sudo chown "$USER":"$USER" .

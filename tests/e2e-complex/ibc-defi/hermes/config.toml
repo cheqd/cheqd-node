@@ -21,7 +21,6 @@ enabled = false
 enabled = true
 clear_interval = 100
 clear_on_start = true
-filter = false
 tx_confirmation = true
 
 [rest]
@@ -44,12 +43,14 @@ account_prefix = 'cheqd'
 key_name = 'cheqd-key'
 address_type = { derivation = 'cosmos' }
 store_prefix = 'ibc'
-max_gas = 3000000
+default_gas = 100000
+max_gas = 2000000
 gas_price = { price = 25, denom = 'ncheq' }
 gas_adjustment = 0.1
 max_msg_num = 30
 max_tx_size = 2097152
 clock_drift = '5s'
+max_block_time = '30s'
 trusting_period = '14days'
 trust_threshold = { numerator = '1', denominator = '3' }
 
@@ -62,12 +63,14 @@ rpc_timeout = '10s'
 account_prefix = 'osmo'
 key_name = 'osmosis-key'
 store_prefix = 'ibc'
-max_gas = 3000000
+default_gas = 100000
+max_gas = 400000
 gas_price = { price = 0, denom = 'stake' }
 gas_adjustment = 0.1
 max_msg_num = 30
 max_tx_size = 2097152
 clock_drift = '5s'
+max_block_time = '30s'
 trusting_period = '14days'
 trust_threshold = { numerator = '1', denominator = '3' }
 address_type = { derivation = 'cosmos' }

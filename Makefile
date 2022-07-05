@@ -7,7 +7,7 @@ APPNAME ?= $(NAME)d
 LEDGER_ENABLED ?= true
 
 BINDIR ?= $(GOPATH)/bin
-BUILDDIR ?= $(CURDIR)/build
+BUILDDIR ?= $(CURDIR)/build-tools
 
 export GO111MODULE = on
 
