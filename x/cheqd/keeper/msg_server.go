@@ -108,15 +108,15 @@ func VerifySignature(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.
 
 func VerifyAllSignersHaveAllValidSignatures(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.StateValue, message []byte, signers []string, signatures []*types.SignInfo) error {
 	for _, signer := range signers {
-		signature, found := types.FindSignInfoBySigner(msg.Signatures, signer)
+		signature, found := types.FindSignInfoBySigner(signatures, signer)
 
 		if !found {
-			return nil, types.ErrSignatureNotFound.Wrapf("signer: %s", signer)
+			return types.ErrSignatureNotFound.Wrapf("signer: %s", signer)
 		}
 
-		err := VerifySignature(&k.Keeper, &ctx, inMemoryDids, msg.Payload.GetSignBytes(), signature)
+		err := VerifySignature(&k.Keeper, &ctx, inMemoryDids, message, signature)
 		if err != nil {
-			return nil, err
+			return err
 		}
 	}
 	return nil
