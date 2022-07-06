@@ -48,7 +48,7 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	resource := msg.Payload.ToResource()
 
 	resource.Header.Checksum = sha256.New().Sum(resource.Data)
-	resource.Header.Created = time.Now().UTC().Format(time.RFC3339)
+	resource.Header.Created = ctx.BlockTime().Format(time.RFC3339)
 	resource.Header.MediaType = utils.DetectMediaType(resource.Data)
 
 	// Find previous version and upgrade backward and forward version links
