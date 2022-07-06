@@ -150,7 +150,7 @@ func TestUpdateDid(t *testing.T) {
 					},
 				},
 			},
-			errMsg: fmt.Sprintf("there should be at least one valid signature by %s (new version): invalid signature detected", AliceDID),
+			errMsg: fmt.Sprintf("there should be at least one valid signature by %s (new version): signature is required but not found", AliceDID),
 		},
 		{
 			valid:   false,
@@ -166,7 +166,7 @@ func TestUpdateDid(t *testing.T) {
 					},
 				},
 			},
-			errMsg: fmt.Sprintf("there should be at least one valid signature by %s (old version): invalid signature detected", AliceDID),
+			errMsg: fmt.Sprintf("there should be at least one valid signature by %s (old version): signature is required but not found", AliceDID),
 		},
 		{
 			valid:   true,
@@ -247,7 +247,7 @@ func TestUpdateDid(t *testing.T) {
 					},
 				},
 			},
-			errMsg: fmt.Sprintf("there should be at least one valid signature by %s (old version): invalid signature detected", AliceDID),
+			errMsg: fmt.Sprintf("there should be at least one valid signature by %s (old version): signature is required but not found", AliceDID),
 		},
 
 		// Controller's tests
