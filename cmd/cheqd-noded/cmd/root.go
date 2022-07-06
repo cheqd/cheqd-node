@@ -46,7 +46,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	// Set config for prefixes
 	app.SetConfig()
 
-	encodingConfig := app.MakeEncodingConfig()
+	encodingConfig := app.MakeTestEncodingConfig()
 	initClientCtx := client.Context{}.
 		WithCodec(encodingConfig.Codec).
 		WithInterfaceRegistry(encodingConfig.InterfaceRegistry).
