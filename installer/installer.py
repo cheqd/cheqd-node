@@ -42,10 +42,10 @@ DEFAULT_USE_COSMOVISOR = "yes"
 ###############################################################
 ###     				Systemd Config      				###
 ###############################################################
-STANDALONE_SERVICE_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/de487a0cfc095d92bd579b142c7708f64b6f1536/build-tools/node-standalone.service"
-COSMOVISOR_SERVICE_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/de487a0cfc095d92bd579b142c7708f64b6f1536/build-tools/node-cosmovisor.service"
-LOGROTATE_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/de487a0cfc095d92bd579b142c7708f64b6f1536/build-tools/logrotate.conf"
-RSYSLOG_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/de487a0cfc095d92bd579b142c7708f64b6f1536/build-tools/rsyslog.conf"
+STANDALONE_SERVICE_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/build-tools/node-standalone.service"
+COSMOVISOR_SERVICE_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/build-tools/node-cosmovisor.service"
+LOGROTATE_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/build-tools/logrotate.conf"
+RSYSLOG_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/build-tools/rsyslog.conf"
 DEFAULT_STANDALONE_SERVICE_NAME = 'cheqd-noded'
 DEFAULT_COSMOVISOR_SERVICE_NAME = 'cheqd-cosmovisor'
 DEFAULT_STANDALONE_SERVICE_FILE_PATH = f"/lib/systemd/system/{DEFAULT_STANDALONE_SERVICE_NAME}.service"
@@ -247,8 +247,7 @@ class Installer():
             if fname.find(".tar.gz") != -1:
                 self.exec(f"tar -xzf {fname}")
                 self.remove_safe(fname)
-            else:
-                self.exec(f"mv {fname} {DEFAULT_BINARY_NAME}")
+            self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
         except:
             failure_exit("Failed to download binary")
 
@@ -489,6 +488,15 @@ class Installer():
                 self.log(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
                 os.symlink(self.cosmovisor_cheqd_bin_path,
                         os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+
+            if self.interviewer.is_upgrade and \
+                os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
+
+                self.log(f"Copying upgrade-info.json file to cosmovisor/current/")
+                shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
+                            os.path.join(self.cosmovisor_root_dir, "current"))
+                self.log(f"Changing owner to {DEFAULT_CHEQD_USER} user")
+                self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
         
             self.log(f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
             self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
@@ -803,8 +811,8 @@ class Interviewer:
         all_releases.insert(0, default)
         for i, release in enumerate(all_releases[0: LAST_N_RELEASES]):
             print(f"{i + 1}) {release.version}")
-        release_num = self.ask("Choose list option number above to select version of cheqd-node to install", 
-            default=1)
+        release_num = int(self.ask("Choose list option number above to select version of cheqd-node to install", 
+            default=1))
         if release_num >= 1 and release_num <= len(all_releases):
             self.release = all_releases[release_num - 1]
         else:
