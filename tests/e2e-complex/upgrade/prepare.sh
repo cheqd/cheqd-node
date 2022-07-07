@@ -23,6 +23,12 @@ docker_compose_up "${CHEQD_IMAGE_FROM}" "$(pwd)"
 # Wait for start ordering, till height 1
 bash ../../tools/wait-for-chain.sh 1
 
+
+###
+# Test data
+###
+
+
 # Get address of operator which will be used for sending tokens before upgrade
 get_addresses
 # shellcheck disable=SC2154

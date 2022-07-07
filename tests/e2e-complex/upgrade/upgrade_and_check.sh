@@ -72,9 +72,3 @@ send_resource_new "$DID_2_IDENTIFIER" "$RESOURCE_1"
 
 # Check new resource
 check_resource "$DID_2_IDENTIFIER" "$RESOURCE_1"
-
-# Stop docker compose
-docker_compose_down
-
-# Clean environment after test
-clean_env

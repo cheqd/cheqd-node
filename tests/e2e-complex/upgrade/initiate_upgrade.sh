@@ -9,8 +9,8 @@ set -euox pipefail
 # shellcheck disable=SC2086
 local_client_tx tx gov submit-proposal software-upgrade \
     "$UPGRADE_NAME" \
-    --title "Upgrade-to-new-version" \
-    --description "Description-of-upgrade-to-new-version" \
+    --title "Upgrade-to--the-new-version" \
+    --description "Description-of-the-upgrade-to-the-new-version" \
     --upgrade-height "$UPGRADE_HEIGHT" \
     --upgrade-info "$UPGRADE_INFO" \
     --from operator1 \
