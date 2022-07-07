@@ -11,7 +11,7 @@ import (
 
 func CmdGetAllResourceVersions() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "all-resource-versions [collectionId] [name] [resourceType] [mediaType]",
+		Use:   "all-resource-versions [collectionId] [name]",
 		Short: "Query all resource versions",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
