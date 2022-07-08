@@ -48,6 +48,7 @@ TX_PARAMS="--gas ${GAS} --gas-adjustment ${GAS_ADJUSTMENT} --gas-prices ${GAS_PR
 
 # cheqd_noded docker wrapper
 cheqd_noded_docker() {
+    # echo "old docker"
     docker run --rm \
         -v "$(pwd):${CHEQD_HOME}" \
         --network host \
@@ -103,6 +104,18 @@ function make_775 () {
 
 
 # Transaction related funcs
+
+function assert_tx_successful() {
+  RES="$1"
+
+  if [[ $(echo "${RES}" | jq --raw-output '.code') == 0 ]]
+  then
+    echo "tx successful"
+  else
+    echo "non zero tx return code"
+    exit 1
+  fi
+}
 
 function random_string() {
   echo $RANDOM | base64 | head -c 20
@@ -193,6 +206,8 @@ function send_resource_new () {
     --output json \
     -y)
 
+    assert_tx_successful "$resource"
+
     txhash=$(echo "$resource" | jq ".txhash" | tr -d '"')
     echo "$txhash" >> $FNAME_TXHASHES
 }
@@ -281,7 +296,7 @@ function check_did () {
     fi
 }
 
-# Check that $DID exists
+# Check that $RESOURCE exists
 function check_resource () {
     collection_id_to_check=$1
     resource_to_check=$2

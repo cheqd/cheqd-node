@@ -9,40 +9,62 @@ set -euox pipefail
 TEST_IBC=true
 
 
-echo "Cleanup"
+echo "########## Cleanup"
 
-docker compose down --volumes --remove-orphans # TODO: Replace
-sudo rm -rf ".cheqdnode"
-sudo rm -rf "node_configs"
-
-bash "prepare.sh"
-
+bash "tear-down.sh"
 
 if [[ "$TEST_IBC" == "true" ]]
 then
-    # Setup
-    echo "Setup Running IBC environment"
-    # bash "ibc-transfer-test.sh"
-
-    # Execute
+    echo "########## Cleanup IBC"
+    # (cd ibc && bash ibc-tear-down.sh)
 fi
 
 
-bash "initiate_upgrade.sh"
-bash "upgrade_and_check.sh"
 
+echo "########## Setup"
+
+bash "setup.sh"
 
 if [[ "$TEST_IBC" == "true" ]]
 then
-    # Check
-    echo "Asserting IBC"
-    # bash "ibc-transfer-test.sh"
+    echo "########## IBC setup"
+    # (cd ibc && bash ibc_setup.sh)
 fi
 
-echo "Cleanup"
 
-# Stop docker compose
-docker_compose_down
-# Clean environment after test
-clean_env
-sudo rm -rf "network-config"
+
+echo "########## Before upgrade"
+
+bash "before-upgrade.sh"
+
+if [[ "$TEST_IBC" == "true" ]]
+then
+    echo "IBC before upgrade"
+fi
+
+
+echo "########## Upgrade"
+
+bash "upgrade.sh"
+
+
+
+echo "########## After upgrade"
+
+bash "after-upgrade.sh"
+
+if [[ "$TEST_IBC" == "true" ]]
+then
+    echo "IBC after upgrade"
+fi
+
+
+echo "########## Tear down"
+
+bash "tear-down.sh"
+
+if [[ "$TEST_IBC" == "true" ]]
+then
+    echo "########## IBC tear down"
+    # (cd ibc && bash ibc-tear-down.sh)
+fi

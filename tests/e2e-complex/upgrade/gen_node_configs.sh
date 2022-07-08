@@ -149,4 +149,22 @@ do
     popd
 done
 
+for ((i=0 ; i<VALIDATORS_COUNT ; i++))
+do
+    NODE_HOME="node$i"
+
+    pushd $NODE_HOME
+pwd
+    APP_TOML=".cheqdnode/config/app.toml"
+    CONFIG_TOML=".cheqdnode/config/config.toml"
+
+    sed -i $sed_extension 's/timeout_propose = "3s"/timeout_propose = "500ms"/g' "${CONFIG_TOML}"
+    sed -i $sed_extension 's/timeout_prevote = "1s"/timeout_prevote = "500ms"/g' "${CONFIG_TOML}"
+    sed -i $sed_extension 's/timeout_precommit = "1s"/timeout_precommit = "500ms"/g' "${CONFIG_TOML}"
+    sed -i $sed_extension 's/timeout_commit = "5s"/timeout_commit = "500ms"/g' "${CONFIG_TOML}"
+
+    popd
+done
+
+
 popd # node_configs

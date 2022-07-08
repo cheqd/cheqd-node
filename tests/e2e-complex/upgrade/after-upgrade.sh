@@ -5,7 +5,10 @@ set -euox pipefail
 # shellcheck disable=SC1091
 . common.sh
 
+
+# Use new version
 cheqd_noded_docker() {
+    # echo "new docker"
     docker run --rm \
         -v "$(pwd):/home/cheqd" \
         --network host \
@@ -14,30 +17,6 @@ cheqd_noded_docker() {
         --entrypoint "cheqd-noded" \
         "${CHEQD_IMAGE_TO}" "$@"
 }
-
-# Wait for upgrade height
-bash ../../tools/wait-for-chain.sh "$UPGRADE_HEIGHT" $((3 * VOTING_PERIOD))
-
-# Stop docker-compose service
-docker_compose_down
-
-# Make all the data accessible
-make_775
-
-# Start docker-compose with new base image on new version
-docker_compose_up "$CHEQD_IMAGE_TO" "$(pwd)"
-
-# Check that upgrade was successful
-
-# Wait for upgrade height
-bash ../../tools/wait-for-chain.sh $((UPGRADE_HEIGHT + 2))
-
-CURRENT_VERSION=$(docker run --entrypoint cheqd-noded "$CHEQD_IMAGE_TO" version 2>&1)
-
-if [ "$CURRENT_VERSION" != "$CHEQD_VERSION_TO" ] ; then
-     echo "Upgrade to version $CHEQD_VERSION_TO was not successful"
-     exit 1
-fi
 
 get_addresses
 # "To" address was used for sending tokens before upgrade
