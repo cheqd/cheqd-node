@@ -227,6 +227,10 @@ jobs:
       - name: Load cheqd-cli Docker image
         run: docker load -i cheqd-cli-image.tar
 
+      - name: Install cheqd-noded binary
+        working-directory: ./tests/e2e-complex/upgrade/cosmovisor
+        run: sudo sh -c 'python3 ../../../../installer/installer.py 1 < .answers'
+
       - name: Give current user ownership
         run: sudo chown "$USER":"$USER" .
 
