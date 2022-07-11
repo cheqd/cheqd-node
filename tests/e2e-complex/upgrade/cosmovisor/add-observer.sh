@@ -5,11 +5,18 @@ sudo chown -R cheqd:cheqd "/home/runner/cheqd/"
 
 sudo -u cheqd cheqd-noded init node5
 
-VALIDATOR_0_ID=$(cat "${NODE_CONFIGS_BASE}/validator-0/node_id.txt")
+if [ -z ${GENESIS_PATH+x} ]; then
+  GENESIS_PATH=${NODE_CONFIGS_BASE}/node0/config/genesis.json
+fi
+
+if [ -z ${VALIDATOR_0_ID+x} ]; then
+  VALIDATOR_0_ID=`cat "${NODE_CONFIGS_BASE}/node0/node_id.txt"`
+fi
+
 PERSISTENT_PEERS="${VALIDATOR_0_ID}@127.0.0.1:26656"
 sudo -u cheqd cheqd-noded configure p2p persistent-peers "${PERSISTENT_PEERS}"
 
-sudo cp "${NODE_CONFIGS_BASE}/validator-0/config/genesis.json" "/home/runner/cheqd/.cheqdnode/config"
+sudo cp "${GENESIS_PATH}" "/home/runner/cheqd/.cheqdnode/config"
 
 sudo chmod -R 755 "/home/runner/cheqd/.cheqdnode"
 
@@ -25,5 +32,16 @@ sudo -u cheqd sed -i.bak 's|address = "tcp://0.0.0.0:1317"|address = "tcp://0.0.
 sudo -u cheqd sed -i.bak 's|address = ":8080"|address = ":8090"|g' /home/runner/cheqd/.cheqdnode/config/app.toml
 
 sudo systemctl start cheqd-cosmovisor
-sleep 10
+sleep 2
 systemctl status cheqd-cosmovisor
+
+bash wait.sh "[[ $(cheqd-noded status -n 'tcp://localhost:26677' 2>&1 | wc -l) == 1 ]] && echo \"Observer node is up\""
+
+NODE_CONFIGS_BASE=${NODE_CONFIGS_BASE} bash promote-validator.sh
+
+bash check-promotion.sh
+# shellcheck disable=SC2016
+bash wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*signature": (.*?).*/\1/p'"'"' | wc -l) == 5 ]] && echo "There are 5 validators signatures in block!"'
+# shellcheck disable=SC2016
+bash wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*(signature": null).*/\1/p'"'"' | wc -l) == 0 ]] && echo "There are no null signatures in block!"'
+

@@ -207,3 +207,45 @@ jobs:
       - name: Check for successful upgrade
         working-directory: ./tests/e2e-complex/upgrade
         run: bash upgrade_and_check.sh
+
+  node-cosmovisor-upgrade-test:
+    name: "Run positive case for upgrade with Cosmovisor installed"
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ inputs.VERSION }}
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Download cheqd-cli Docker image
+        uses: actions/download-artifact@v3
+        with:
+          name: cheqd-cli-image.tar
+
+      - name: Load cheqd-cli Docker image
+        run: docker load -i cheqd-cli-image.tar
+
+      - name: Give current user ownership
+        run: sudo chown "$USER":"$USER" .
+
+      - name: Prepare nodes for upgrade
+        working-directory: ./tests/e2e-complex/upgrade
+        run: bash prepare.sh
+
+      - name: Add observer with Cosmovisor
+        working-directory: ./tests/e2e-complex/upgrade/cosmovisor
+        run: NODE_CONFIGS_BASE=../node_configs bash add-observer.sh
+
+      - name: Initiate upgrade
+        working-directory: ./tests/e2e-complex/upgrade
+        run: bash initiate_upgrade.sh
+
+      - name: Check for successful upgrade
+        working-directory: ./tests/e2e-complex/upgrade
+        run: bash upgrade_and_check.sh
+
+      - name: Check that node with Cosmovisor was upgraded
+        run: cheqd-noded status --node http://localhost:26677
+
