@@ -6,12 +6,10 @@ sudo chown -R cheqd:cheqd "/home/runner/cheqd/"
 sudo -u cheqd cheqd-noded init node5
 
 if [ -z ${GENESIS_PATH+x} ]; then
-  GENESIS_PATH=${NODE_CONFIGS_BASE}/node0/config/genesis.json
+  GENESIS_PATH=${NODE_CONFIGS_BASE}/node0/.cheqdnode/config/genesis.json
 fi
 
-if [ -z ${VALIDATOR_0_ID+x} ]; then
-  VALIDATOR_0_ID=`cat "${NODE_CONFIGS_BASE}/node0/node_id.txt"`
-fi
+VALIDATOR_0_ID=`cheqd-noded tendermint show-node-id --home ${NODE_CONFIGS_BASE}/node0/.cheqdnode`
 
 PERSISTENT_PEERS="${VALIDATOR_0_ID}@127.0.0.1:26656"
 sudo -u cheqd cheqd-noded configure p2p persistent-peers "${PERSISTENT_PEERS}"
