@@ -3,7 +3,7 @@
 set -euox pipefail
 
 # shellcheck disable=SC1091
-. common.sh
+. "common.sh"
 
 
 ###

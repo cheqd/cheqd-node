@@ -10,14 +10,17 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 # Node binary
 COPY --from=osmolabs/osmosis:10 /bin/osmosisd /bin/osmosisd
 
+ARG UID=1000
+ARG GID=1000
+
 ARG USER=osmosis
 ARG GROUP=osmosis
 
 ARG HOME=/home/$USER
 
 # User
-RUN groupadd --system --gid 1000 $USER && \
-    useradd --system --create-home --home-dir $HOME --shell /bin/bash --gid $GROUP --uid 1000 $USER
+RUN groupadd --system --gid $GID $USER && \
+    useradd --system --create-home --home-dir $HOME --shell /bin/bash --gid $GROUP --uid $UID $USER
 
 WORKDIR $HOME
 

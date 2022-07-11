@@ -9,6 +9,8 @@ services:
     volumes:
       - "${MOUNT_POINT}/node_configs/node0:${HOME_CHEQD}"
     user: cheqd
+    networks:
+      - upgrade-test
     command: start --rpc.laddr tcp://0.0.0.0:26657
 
   node1:
@@ -19,6 +21,8 @@ services:
     volumes:
       - "${MOUNT_POINT}/node_configs/node1:${HOME_CHEQD}"
     user: cheqd
+    networks:
+      - upgrade-test
     command:  start --rpc.laddr tcp://0.0.0.0:26657 --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
 
   node2:
@@ -29,6 +33,8 @@ services:
     volumes:
       - "${MOUNT_POINT}/node_configs/node2:${HOME_CHEQD}"
     user: cheqd
+    networks:
+      - upgrade-test
     command:  start --rpc.laddr tcp://0.0.0.0:26657 --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
 
   node3:
@@ -39,6 +45,8 @@ services:
     volumes:
       - "${MOUNT_POINT}/node_configs/node3:${HOME_CHEQD}"
     user: cheqd
+    networks:
+      - upgrade-test
     command:  start --rpc.laddr tcp://0.0.0.0:26657 --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
 
   observer0:
@@ -59,4 +67,10 @@ services:
     volumes:
       - "${MOUNT_POINT}/node_configs/observer1:${HOME_CHEQD}"
     user: cheqd
+    networks:
+      - upgrade-test
     command:  start --rpc.laddr tcp://0.0.0.0:26657 --minimum-gas-prices "1cheq" --p2p.persistent_peers "${NODE_0_ID}@node0:26656"
+
+networks:
+  upgrade-test:
+    external: true

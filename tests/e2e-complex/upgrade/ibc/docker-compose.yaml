@@ -7,12 +7,12 @@ services:
       context: osmosis
       dockerfile: osmosis.Dockerfile
     ports:
-      - "26666:26656" # p2p
-      - "26667:26657" # rpc
+      - "27656:26656" # p2p
+      - "27657:26657" # rpc
       - "9190:9090" # grpc
       - "9191:9091" # grpc-web
     networks:
-      - upgrade_default
+      - upgrade-test
     entrypoint: tail -f /dev/null
 
   hermes:
@@ -22,12 +22,12 @@ services:
       dockerfile: hermes.Dockerfile
     configs:
       - source: hermes-config
-        target: /hermes/.hermes/config.toml
+        target: /home/hermes/.hermes/config.toml
     ports:
       - "3000:3000" # rest
       - "3001:3001" # telemetry
     networks:
-      - upgrade_default
+      - upgrade-test
     entrypoint: tail -f /dev/null
 
 configs:
@@ -35,5 +35,5 @@ configs:
     file: ./hermes/config.toml
 
 networks:
-  upgrade_default:
+  upgrade-test:
     external: true

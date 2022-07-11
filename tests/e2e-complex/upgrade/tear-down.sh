@@ -8,6 +8,10 @@ set -euox pipefail
 
 # Stop docker compose
 docker_compose_down
+
+# Network cleanup
+docker network rm ${NETWORK_NAME} || true
+
 # Clean environment after test
 clean_env
 

@@ -2,6 +2,15 @@
 
 set -euox pipefail
 
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+source "${SCRIPT_DIR}/../../tools/helpers.sh"
+
+NETWORK_NAME="upgrade-test"
+
+
+### Old
+
 # TODO: Assert that transactions are successful
 
 CHEQD_IMAGE_FROM="ghcr.io/cheqd/cheqd-cli:0.5.0"

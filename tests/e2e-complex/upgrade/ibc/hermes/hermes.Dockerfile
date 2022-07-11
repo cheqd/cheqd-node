@@ -12,7 +12,6 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 
 WORKDIR /app
 
-# TODO: ! Replace with binary pulling
 RUN git clone --depth 1 --branch v0.15.0 https://github.com/informalsystems/ibc-rs
 
 WORKDIR /app/ibc-rs
@@ -35,16 +34,22 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 # Node binary
 COPY --from=builder /app/ibc-rs/target/release/hermes /bin
 
+ARG UID=1000
+ARG GID=1000
+
 ARG USER=hermes
 ARG GROUP=hermes
 
 ARG HOME=/home/$USER
 
 # User
-RUN groupadd --system --gid 1000 $USER && \
-    useradd --system --create-home --home-dir $HOME --shell /bin/bash --gid $GROUP --uid 1000 $USER
+RUN groupadd --system --gid $GID $USER && \
+    useradd --system --create-home --home-dir $HOME --shell /bin/bash --gid $GROUP --uid $UID $USER
 
 WORKDIR $HOME
+
+# Permissions fix for docker configs
+RUN mkdir -p $HOME/.hermes
 
 RUN chown -R $USER $HOME
 USER $USER
