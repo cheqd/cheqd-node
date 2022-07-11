@@ -26,4 +26,4 @@ sudo -u cheqd sed -i.bak 's|address = ":8080"|address = ":8090"|g' /home/runner/
 
 sudo systemctl start cheqd-cosmovisor
 sleep 10
-systemctl status cheqd-noded
+systemctl status cheqd-cosmovisor
