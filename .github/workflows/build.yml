@@ -72,6 +72,12 @@ jobs:
           name: cheqd-noded
           path: build-tools/cheqd-noded
 
+      - name: Set version number
+        id: set-version
+        run: |
+          VERSION=$(build-tools/cheqd-noded version 2>&1)
+          echo ::set-output name=VERSION::"$VERSION"
+
   build-docker-images:
     name: "Docker images"
     runs-on: ubuntu-latest

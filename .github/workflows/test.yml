@@ -25,7 +25,7 @@ jobs:
 
       - name: Install cheqd-noded binary
         working-directory: ./tests/e2e-complex/interactive-install
-        run: cat .answers | sudo python3 ../../../installer/installer.py
+        run: sudo python3 ../../../installer/installer.py 1 < .answers
 
       - name: Download node Docker image
         uses: actions/download-artifact@v3
