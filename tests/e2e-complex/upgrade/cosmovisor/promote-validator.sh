@@ -14,6 +14,8 @@ OP5_ADDRESS=$(sudo -u cheqd cheqd-noded keys list --keyring-backend "test"| sed 
 
 NODE5_PUBKEY=$(sudo -u cheqd cheqd-noded tendermint show-validator | sed 's/\r//g')
 
+cheqd-noded status --node http://localhost:26657 
+
 # Send tokens from operator0
 cheqd-noded tx bank send "${OP0_ADDRESS}" "${OP5_ADDRESS}" 1100000000000000ncheq --chain-id cheqd --fees 5000000ncheq --node "http://localhost:26657" -y --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/client/.cheqdnode"
 
