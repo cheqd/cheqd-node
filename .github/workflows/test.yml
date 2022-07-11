@@ -212,7 +212,7 @@ jobs:
     name: "Run positive case for upgrade with Cosmovisor installed"
     runs-on: ubuntu-latest
     env:
-      VERSION: ${{ inputs.VERSION }}
+      NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/tests/e2e-complex/upgrade/node_configs"
 
     steps:
       - uses: actions/checkout@v3
@@ -240,7 +240,7 @@ jobs:
 
       - name: Add observer with Cosmovisor
         working-directory: ./tests/e2e-complex/upgrade/cosmovisor
-        run: NODE_CONFIGS_BASE=../node_configs bash add-observer.sh
+        run: bash add-observer.sh
 
       - name: Initiate upgrade
         working-directory: ./tests/e2e-complex/upgrade
