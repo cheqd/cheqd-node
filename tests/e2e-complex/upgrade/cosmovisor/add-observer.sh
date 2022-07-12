@@ -46,3 +46,4 @@ bash wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*signature": 
 # shellcheck disable=SC2016
 bash wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*(signature": null).*/\1/p'"'"' | wc -l) == 0 ]] && echo "There are no null signatures in block!"'
 
+cheqd-noded status
