@@ -2,7 +2,7 @@
 
 set -euox pipefail
 
-sudo chown -R runner:docker "${NODE_CONFIGS_BASE}"
+# sudo chown -R runner:docker "${NODE_CONFIGS_BASE}"
 cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/client/.cheqdnode"
 
 # Get operator0 address by setting --home flag
@@ -23,11 +23,9 @@ pushd ../
 # shellcheck disable=SC1091
 . common.sh
 
-local_client_tx status
+cheqd_noded_docker query bank balances "${OP0_ADDRESS}"
 
-local_client_tx cheqd-noded query bank balances "${OP0_ADDRESS}"
-
-local_client_tx tx bank send "${OP0_ADDRESS}" "${OP5_ADDRESS}" 1100000000000000ncheq
+local_client_tx tx bank send "${OP0_ADDRESS}" "${OP5_ADDRESS}" 1100000000000000ncheq --chain-id cheqd --fees 5000000ncheq -y
 
 popd
 
