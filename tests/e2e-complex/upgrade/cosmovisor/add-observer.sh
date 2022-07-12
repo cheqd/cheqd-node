@@ -3,7 +3,7 @@
 set -euox pipefail
 sudo chown -R cheqd:cheqd "/home/runner/cheqd/"
 
-sudo -u cheqd cheqd-noded init node5
+sudo su -c 'cheqd-noded init node5' cheqd
 
 if [ -z ${GENESIS_PATH+x} ]; then
   GENESIS_PATH=${NODE_CONFIGS_BASE}/node0/.cheqdnode/config/genesis.json
@@ -12,22 +12,24 @@ fi
 VALIDATOR_0_ID=`cheqd-noded tendermint show-node-id --home ${NODE_CONFIGS_BASE}/node0/.cheqdnode`
 
 PERSISTENT_PEERS="${VALIDATOR_0_ID}@127.0.0.1:26656"
-sudo -u cheqd cheqd-noded configure p2p persistent-peers "${PERSISTENT_PEERS}"
+sudo su -c 'cheqd-noded configure p2p persistent-peers "${PERSISTENT_PEERS}"' cheqd
 
 sudo cp "${GENESIS_PATH}" "/home/runner/cheqd/.cheqdnode/config"
 
 sudo chmod -R 755 "/home/runner/cheqd/.cheqdnode"
 
 # Configure ports because they conflict with localnet
-sudo -u cheqd cheqd-noded configure p2p laddr "tcp://0.0.0.0:26676"
-sudo -u cheqd cheqd-noded configure rpc-laddr "tcp://0.0.0.0:26677"
+sudo su -c 'cheqd-noded configure p2p laddr "tcp://0.0.0.0:26676"' cheqd 
+sudo su -c 'cheqd-noded configure rpc-laddr "tcp://0.0.0.0:26677"' cheqd
 
 # TODO: Use environment variables
-sudo -u cheqd sed -i.bak 's|pprof_laddr = "localhost:6060"|pprof_laddr = "localhost:6070"|g' /home/runner/cheqd/.cheqdnode/config/config.toml
-sudo -u cheqd sed -i.bak 's|address = "0.0.0.0:9090"|address = "0.0.0.0:9100"|g' /home/runner/cheqd/.cheqdnode/config/app.toml
-sudo -u cheqd sed -i.bak 's|address = "0.0.0.0:9091"|address = "0.0.0.0:9101"|g' /home/runner/cheqd/.cheqdnode/config/app.toml
-sudo -u cheqd sed -i.bak 's|address = "tcp://0.0.0.0:1317"|address = "tcp://0.0.0.0:1327"|g' /home/runner/cheqd/.cheqdnode/config/app.toml
-sudo -u cheqd sed -i.bak 's|address = ":8080"|address = ":8090"|g' /home/runner/cheqd/.cheqdnode/config/app.toml
+sudo sed -i.bak 's|pprof_laddr = "localhost:6060"|pprof_laddr = "localhost:6070"|g' /home/runner/cheqd/.cheqdnode/config/config.toml
+sudo sed -i.bak 's|address = "0.0.0.0:9090"|address = "0.0.0.0:9100"|g' /home/runner/cheqd/.cheqdnode/config/app.toml
+sudo sed -i.bak 's|address = "0.0.0.0:9091"|address = "0.0.0.0:9101"|g' /home/runner/cheqd/.cheqdnode/config/app.toml
+sudo sed -i.bak 's|address = "tcp://0.0.0.0:1317"|address = "tcp://0.0.0.0:1327"|g' /home/runner/cheqd/.cheqdnode/config/app.toml
+sudo sed -i.bak 's|address = ":8080"|address = ":8090"|g' /home/runner/cheqd/.cheqdnode/config/app.toml
+
+sudo chown -R cheqd:cheqd "/home/runner/cheqd/"
 
 sudo systemctl start cheqd-cosmovisor
 sleep 2
