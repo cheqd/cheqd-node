@@ -18,9 +18,12 @@ sleep 10
 
 cheqd-noded version
 
-cheqd-noded query bank balances "${OP0_ADDRESS}"
-
 pushd ../
+
+local_client_tx status
+
+local_client_tx cheqd-noded query bank balances "${OP0_ADDRESS}"
+
 # shellcheck disable=SC1091
 . common.sh
 
@@ -28,7 +31,6 @@ local_client_tx tx bank send "${OP0_ADDRESS}" "${OP5_ADDRESS}" 1100000000000000n
 
 popd
 
-cheqd-noded status --node http://localhost:26657
 # Send tokens from operator0
 # sudo -u runner -H cheqd-noded tx bank send "${OP0_ADDRESS}" "${OP5_ADDRESS}" 1100000000000000ncheq --chain-id cheqd --fees 5000000ncheq --node http://127.0.0.1:26657 --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/client/.cheqdnode" -y
 
