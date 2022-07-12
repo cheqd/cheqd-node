@@ -31,6 +31,8 @@ services:
         target: /node_key
       - source: validator-0-priv-val-key
         target: /priv_validator_key
+    networks:
+      - localnet
 
   validator-1:
     image: ${CHEQD_NODE_IMAGE}:${CHEQD_NODE_VERSION}
@@ -62,6 +64,8 @@ services:
         target: /node_key
       - source: validator-1-priv-val-key
         target: /priv_validator_key
+    networks:
+      - localnet
 
   validator-2:
     image: ${CHEQD_NODE_IMAGE}:${CHEQD_NODE_VERSION}
@@ -93,6 +97,8 @@ services:
         target: /node_key
       - source: validator-2-priv-val-key
         target: /priv_validator_key
+    networks:
+      - localnet
 
   validator-3:
     image: ${CHEQD_NODE_IMAGE}:${CHEQD_NODE_VERSION}
@@ -124,6 +130,8 @@ services:
         target: /node_key
       - source: validator-3-priv-val-key
         target: /priv_validator_key
+    networks:
+      - localnet
 
   seed-0:
     image: ${CHEQD_NODE_IMAGE}:${CHEQD_NODE_VERSION}
@@ -155,6 +163,8 @@ services:
         target: /node_key
       - source: seed-0-priv-val-key
         target: /priv_validator_key
+    networks:
+      - localnet
 
   observer-0:
     image: ${CHEQD_NODE_IMAGE}:${CHEQD_NODE_VERSION}
@@ -186,6 +196,8 @@ services:
         target: /node_key
       - source: observer-0-priv-val-key
         target: /priv_validator_key
+    networks:
+      - localnet
 
 configs:
   # Genesis and seeds
@@ -237,3 +249,7 @@ volumes:
   validator-3-data:
   seed-0-data:
   observer-0-data:
+
+networks:
+  localnet:
+    external: ${NETWORK_EXTERNAL}

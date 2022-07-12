@@ -6,7 +6,7 @@ set -euox pipefail
 source common.sh
 
 
-TEST_IBC=true
+TEST_IBC=false
 TEST_MODULES=false
 
 

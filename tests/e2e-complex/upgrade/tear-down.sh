@@ -2,20 +2,15 @@
 
 set -euox pipefail
 
-# shellcheck disable=SC1091
-. common.sh
+. "../../tools/helpers.sh"
+. "common.sh"
 
+# Shut down the network
+set_new_compose_env
+localnet_compose down --volumes --remove-orphans
 
-# Stop docker compose
-docker_compose_down
+# Remove configuration
+(cd ${LOCALNET_PATH} && rm -rf "network-config")
 
-# Network cleanup
-docker network rm ${NETWORK_NAME} || true
-
-# Clean environment after test
-clean_env
-
-sudo rm -rf "network-config"
-sudo rm -rf ".cheqdnode"
-rm "txs.hashes" 2> /dev/null || true
-rm "resource_data.json" 2> /dev/null || true
+# Remove docker network
+docker network remove "${LOCALNET_NETWORK}" || true

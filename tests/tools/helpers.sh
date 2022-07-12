@@ -3,6 +3,14 @@
 set -euox pipefail
 
 
+# Constants
+
+LOCALNET_NETWORK="localnet"
+LOCALNET_PATH="$(git rev-parse --show-toplevel)/docker/localnet"
+
+
+# Methods
+
 function random_string() {
   LENGTH=${1:-16} # Default LENGTH is 16
   ALPHABET=${2:-"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"} # Default is base58

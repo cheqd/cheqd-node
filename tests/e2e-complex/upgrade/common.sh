@@ -2,21 +2,51 @@
 
 set -euox pipefail
 
+CHEQD_IMAGE_FROM="ghcr.io/cheqd/cheqd-node"
+CHEQD_TAG_FROM="0.5.0"
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-source "${SCRIPT_DIR}/../../tools/helpers.sh"
+CHEQD_IMAGE_TO="cheqd-node"
+CHEQD_TAG_TO="latest"
 
-NETWORK_NAME="upgrade-test"
+VOTING_PERIOD="10"
+EXPECTED_BLOCK_SECOND="1"
+EXTRA_BLOCKS="5"
+
+CHAIN_ID="cheqd"
+
+GAS="auto"
+GAS_ADJUSTMENT="1.3"
+GAS_PRICES="25ncheq"
+TX_PARAMS="--gas ${GAS} \
+    --gas-adjustment ${GAS_ADJUSTMENT} \
+    --gas-prices ${GAS_PRICES} \
+    --chain-id ${CHAIN_ID} \
+    -y \
+    --keyring-backend test"
+
+
+function set_old_compose_env() {
+    export CHEQD_NODE_IMAGE=${CHEQD_IMAGE_FROM}
+    export CHEQD_NODE_VERSION=${CHEQD_TAG_FROM}
+    export NETWORK_EXTERNAL="true"
+}
+
+function set_new_compose_env() {
+    export CHEQD_NODE_IMAGE=${CHEQD_IMAGE_TO}
+    export CHEQD_NODE_VERSION=${CHEQD_TAG_TO}
+    export NETWORK_EXTERNAL="true"
+}
+
+function localnet_compose() {
+    (cd "${LOCALNET_PATH}" && docker-compose "${@}")
+}
+
 
 
 ### Old
 
 # TODO: Assert that transactions are successful
 
-CHEQD_IMAGE_FROM="ghcr.io/cheqd/cheqd-cli:0.5.0"
-# shellcheck disable=SC2034
-CHEQD_IMAGE_TO="cheqd-cli:latest"
-# shellcheck disable=SC2034
 CHEQD_VERSION_TO=$(git describe --always --tag --match "v*" | sed 's/^v//')
 # shellcheck disable=SC2034
 UPGRADE_NAME="v0.6"
@@ -26,14 +56,10 @@ UPGRADE_INFO="{
     \"linux/amd64\":\"http://10.5.0.10:8000/cheqd-noded.tar.gz\"
   }
 }"
-VOTING_PERIOD=15
-EXPECTED_BLOCK_SECOND=1
-EXTRA_BLOCKS=15
 # shellcheck disable=SC2034
 UPGRADE_HEIGHT=$((VOTING_PERIOD / EXPECTED_BLOCK_SECOND + EXTRA_BLOCKS))
 # shellcheck disable=SC2034
 DEPOSIT_AMOUNT=10000000
-CHAIN_ID="cheqd"
 CHEQD_USER="cheqd"
 FNAME_TXHASHES="txs.hashes"
 AMOUNT_BEFORE="19000000000000000"
@@ -50,10 +76,6 @@ DID_2="${DID_METHOD}${DID_2_IDENTIFIER}"
 RESOURCE_1="82aadc50-58e4-4e00-bf35-36062c2784be"
 CHEQD_HOME="/home/cheqd"
 
-GAS="auto"
-GAS_ADJUSTMENT="1.3"
-GAS_PRICES="25ncheq"
-TX_PARAMS="--gas ${GAS} --gas-adjustment ${GAS_ADJUSTMENT} --gas-prices ${GAS_PRICES} --chain-id ${CHAIN_ID} -y"
 
 # cheqd_noded docker wrapper
 cheqd_noded_docker() {

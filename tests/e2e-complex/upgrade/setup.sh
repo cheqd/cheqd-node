@@ -2,30 +2,33 @@
 
 set -euox pipefail
 
-# shellcheck disable=SC1091
-. common.sh
+. "../../tools/helpers.sh"
+. "common.sh"
 
+# Network configuration
+(cd ${LOCALNET_PATH} && bash "gen-network-config.sh")
 
+# Docker network
+docker network create "${LOCALNET_NETWORK}" || true
 
+# Run network
+set_old_compose_env
+localnet_compose up -d
 
+# Wait for the network
+(cd ${LOCALNET_PATH} && compose_wait_for_chain_height "validator-0" "cheqd-noded")
 
-# Generate config files
-bash gen_node_configs.sh
+# Copy keys
+VALIDATORS_COUNT=4
 
-# Add all needed permissions
-make_775
+for ((i=0 ; i<VALIDATORS_COUNT ; i++))
+do
+    MONIKER="validator-$i"
 
-# Network setup
-docker network create ${NETWORK_NAME}
+    USER="cheqd"
+    GROUP="cheqd"
+    HOME="/home/cheqd"
 
-# Start the network on version which will be upgraded from
-docker_compose_up "${CHEQD_IMAGE_FROM}" "$(pwd)"
-
-
-# TODO: Remove the workaround
-docker-compose cp node_configs/client/.cheqdnode/keyring-test node0:/home/cheqd/.cheqdnode
-
-
-# Wait for start ordering, till height 1
-# bash ../../tools/wait-for-chain.sh 1
-compose_wait_for_chain_height node0 cheqd-noded
+    localnet_compose cp network-config/${MONIKER}/keyring-test ${MONIKER}:home/cheqd/.cheqdnode
+    localnet_compose exec -it --user root ${MONIKER} chown -R ${USER}:${GROUP} ${HOME}
+done
