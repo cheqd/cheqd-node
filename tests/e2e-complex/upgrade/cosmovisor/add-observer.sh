@@ -32,6 +32,8 @@ sudo sed -i.bak 's|address = ":8080"|address = ":8090"|g' /home/runner/cheqd/.ch
 sudo chown -R cheqd:cheqd "/home/runner/cheqd/"
 
 sudo systemctl start cheqd-cosmovisor
+systemctl status cheqd-cosmovisor
+tail -n 50 /home/runner/cheqd/.cheqdnode/log/stdout.log
 
 bash wait.sh "[[ $(cheqd-noded status -n 'tcp://localhost:26677' 2>&1 | wc -l) == 1 ]] && echo \"Observer node is up\""
 
