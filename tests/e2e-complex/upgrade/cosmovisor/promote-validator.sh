@@ -19,7 +19,7 @@ cheqd-noded status --node http://localhost:26657
 cheqd-noded version
 
 # Send tokens from operator0
-cheqd-noded tx bank send "${OP0_ADDRESS}" "${OP5_ADDRESS}" 1100000000000000ncheq --chain-id cheqd --fees 5000000ncheq --node http://127.0.0.1:26657 --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/client/.cheqdnode" -y
+sudo -u runner -H cheqd-noded tx bank send "${OP0_ADDRESS}" "${OP5_ADDRESS}" 1100000000000000ncheq --chain-id cheqd --fees 5000000ncheq --node http://127.0.0.1:26657 --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/client/.cheqdnode" -y
 
 # Send promote validator from operator5
 sudo -H -u cheqd cheqd-noded tx staking create-validator --amount 1000000000000000ncheq --from node5-operator --chain-id cheqd --min-self-delegation="1" --gas-prices="25ncheq" --pubkey "${NODE5_PUBKEY}" --commission-max-change-rate="0.02" --commission-max-rate="0.02" --commission-rate="0.01" --gas 500000 --node http://127.0.0.1:26657 --keyring-backend "test" -y
