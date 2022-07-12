@@ -20,12 +20,12 @@ cheqd-noded version
 
 pushd ../
 
+# shellcheck disable=SC1091
+. common.sh
+
 local_client_tx status
 
 local_client_tx cheqd-noded query bank balances "${OP0_ADDRESS}"
-
-# shellcheck disable=SC1091
-. common.sh
 
 local_client_tx tx bank send "${OP0_ADDRESS}" "${OP5_ADDRESS}" 1100000000000000ncheq
 
