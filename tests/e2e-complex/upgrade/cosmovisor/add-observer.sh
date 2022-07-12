@@ -33,6 +33,7 @@ sudo chown -R cheqd:cheqd "/home/runner/cheqd/"
 
 sudo systemctl start cheqd-cosmovisor
 systemctl status cheqd-cosmovisor
+sleep 10
 journalctl --since "2 days ago" | grep cosmovisor
 
 bash wait.sh "[[ $(cheqd-noded status -n 'tcp://localhost:26677' 2>&1 | wc -l) == 1 ]] && echo \"Observer node is up\""
