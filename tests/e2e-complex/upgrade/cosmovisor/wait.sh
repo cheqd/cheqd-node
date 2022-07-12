@@ -7,7 +7,7 @@ set -euox pipefail
 cmd="$1"
 
 for _ in 1 2 3 4 5 6 7 8 9; do
-    sleep 2
+    sleep 5
     if eval "$cmd"; then
         echo "Waiter returned success!"
         exit 0
