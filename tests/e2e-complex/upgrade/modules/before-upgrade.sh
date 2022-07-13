@@ -16,7 +16,7 @@ get_addresses
 # shellcheck disable=SC2154
 OP2_ADDRESS=${addresses[2]}
 
-# Send tokens before upgrade
+# Send tokens operator-0 -> operator-1
 send_tokens "$OP2_ADDRESS"
 
 # Send DID transaction

@@ -67,7 +67,7 @@ assert_tx_successful "${RES}"
 (cd ${LOCALNET_PATH} && compose_wait_for_chain_height "validator-0" "cheqd-noded" "$VOTING_END_HEIGHT")
 
 # TODO: Check that the proposal is accepted
-STATUS=$(localnet_compose exec validator-0 cheqd-noded query gov proposal 1 --output json | jq -r '.status')
+STATUS=$(localnet_compose exec validator-0 cheqd-noded query gov proposal 1 ${QUERY_PARAMS} | jq -r '.status')
 assert_eq "${STATUS}" "PROPOSAL_STATUS_PASSED"
 
 # Wait for upgrade height
