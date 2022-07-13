@@ -244,7 +244,7 @@ jobs:
 
       - name: Initiate upgrade
         working-directory: ./tests/e2e-complex/upgrade
-        run: START_HEIGHT=15  bash initiate_upgrade.sh
+        run: START_HEIGHT=$(printf '%d' `cheqd-noded status 2>&1 | jq ".SyncInfo.latest_block_height" | tr -d '"'`)  bash initiate_upgrade.sh
 
       - name: Check for successful upgrade
         working-directory: ./tests/e2e-complex/upgrade
