@@ -9,7 +9,7 @@ if [ -z ${GENESIS_PATH+x} ]; then
   GENESIS_PATH=${NODE_CONFIGS_BASE}/node0/.cheqdnode/config/genesis.json
 fi
 
-VALIDATOR_0_ID=`cheqd-noded tendermint show-node-id --home ${NODE_CONFIGS_BASE}/node0/.cheqdnode`
+VALIDATOR_0_ID=$(cheqd-noded tendermint show-node-id --home "${NODE_CONFIGS_BASE}"/node0/.cheqdnode)
 
 PERSISTENT_PEERS="${VALIDATOR_0_ID}@127.0.0.1:26656"
 sudo -u cheqd -H cheqd-noded configure p2p persistent-peers "${PERSISTENT_PEERS}"
