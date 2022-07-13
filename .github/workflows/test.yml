@@ -236,7 +236,7 @@ jobs:
 
       - name: Prepare nodes for upgrade
         working-directory: ./tests/e2e-complex/upgrade
-        run: bash prepare.sh
+        run: START_HEIGHT=$(cheqd-noded status 2>&1 | jq ".SyncInfo.latest_block_height") bash prepare.sh
 
       - name: Add observer with Cosmovisor
         working-directory: ./tests/e2e-complex/upgrade/cosmovisor

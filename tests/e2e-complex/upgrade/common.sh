@@ -14,18 +14,19 @@ UPGRADE_NAME="v0.6"
 # shellcheck disable=SC2034
 UPGRADE_INFO="{
   \"binaries\": {
-    \"linux/amd64\":\"http://10.5.0.10:8000/cheqd-noded.tar.gz\"
+    \"linux/amd64\":\"https://github.com/cheqd/cheqd-node/releases/download/v0.6.0/cheqd-noded\"
   }
 }"
 VOTING_PERIOD=15
 EXPECTED_BLOCK_SECOND=5
+EXTRA_BLOCKS=10
 
-if [ -z ${EXTRA_BLOCKS+x} ]; then
-  EXTRA_BLOCKS=10
+if [ -z ${START_HEIGHT+x} ]; then
+  START_HEIGHT=0
 fi
 
 # shellcheck disable=SC2034
-UPGRADE_HEIGHT=$((VOTING_PERIOD / EXPECTED_BLOCK_SECOND + EXTRA_BLOCKS))
+UPGRADE_HEIGHT=$((START_HEIGHT + VOTING_PERIOD / EXPECTED_BLOCK_SECOND + EXTRA_BLOCKS))
 # shellcheck disable=SC2034
 DEPOSIT_AMOUNT=10000000
 CHAIN_ID="cheqd"
