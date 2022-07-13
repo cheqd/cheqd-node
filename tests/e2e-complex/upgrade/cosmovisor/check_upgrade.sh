@@ -3,7 +3,7 @@
 set -euox pipefail
 
 # shellcheck disable=SC1091
-. common.sh
+. ../common.sh
 
 if [ "$(cheqd-noded version 2>&1)" != "$UPGRADE_VERSION_COSMOVISOR" ]; then
     echo "Looks like it was not upgraded"
