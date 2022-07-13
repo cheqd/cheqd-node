@@ -6,7 +6,7 @@ set -euox pipefail
 cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/client/.cheqdnode"
 
 # Get operator0 address by setting --home flag
-OP3_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/client/.cheqdnode" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 4p | sed 's/\r//g')
+OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/client/.cheqdnode" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p | sed 's/\r//g')
 
 # Create operator5 by running it under the `cheqd` user.
 sudo su -c 'cheqd-noded keys add node5-operator --keyring-backend "test"' cheqd
@@ -23,9 +23,9 @@ pushd ../
 # shellcheck disable=SC1091
 . common.sh
 
-cheqd_noded_docker query bank balances "${OP3_ADDRESS}"
+cheqd_noded_docker query bank balances "${OP1_ADDRESS}"
 
-local_client_tx tx bank send "${OP3_ADDRESS}" "${OP5_ADDRESS}" 1100000000000000ncheq --chain-id cheqd --fees 5000000ncheq -y
+local_client_tx tx bank send "${OP1_ADDRESS}" "${OP5_ADDRESS}" 1100000000000000ncheq --chain-id cheqd --fees 5000000ncheq -y
 
 popd
 
