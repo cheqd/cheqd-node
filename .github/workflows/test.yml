@@ -244,12 +244,13 @@ jobs:
 
       - name: Initiate upgrade
         working-directory: ./tests/e2e-complex/upgrade
-        run: START_HEIGHT=$(cheqd-noded status 2>&1 | jq ".SyncInfo.latest_block_height")  bash initiate_upgrade.sh
+        run: START_HEIGHT=15  bash initiate_upgrade.sh
 
       - name: Check for successful upgrade
         working-directory: ./tests/e2e-complex/upgrade
         run: bash upgrade_and_check.sh
 
       - name: Check that node with Cosmovisor was upgraded
-        run: cheqd-noded status --node http://localhost:26677
+        working-directory: ./tests/e2e-complex/upgrade/cosmovisor
+        run: bash cheqd_upgrade.sh
 
