@@ -538,6 +538,7 @@ class Installer():
         try:
             archive_name = os.path.basename(self.interviewer.snapshot_url)
             self.mkdir_p(self.cheqd_data_dir)
+            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_data_dir}")
             # Fetch size of snapshot archive. Uses curl to fetch headers and looks for Content-Length.
             archive_size = self.exec(f"curl -s --head {self.interviewer.snapshot_url} | awk '/Length/ {{print $2}}'").stdout.strip()
             # Check how much free disk space is available wherever the cheqd root directory is mounted
