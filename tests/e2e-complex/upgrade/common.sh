@@ -12,6 +12,7 @@ VOTING_PERIOD="10"
 EXPECTED_BLOCK_SECOND="1"
 EXTRA_BLOCKS="5"
 
+UPGRADE_NAME="v0.6"
 DEPOSIT_AMOUNT="10000000"
 
 CHAIN_ID="cheqd"
@@ -24,8 +25,8 @@ TX_PARAMS="--gas ${GAS} \
     --gas-adjustment ${GAS_ADJUSTMENT} \
     --gas-prices ${GAS_PRICES} \
     --chain-id ${CHAIN_ID} \
-    --keyring-backend test" \
-    -y
+    --keyring-backend test \
+    -y"
 QUERY_PARAMS="--output json"
 
 function set_old_compose_env() {

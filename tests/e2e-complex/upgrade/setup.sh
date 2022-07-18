@@ -27,8 +27,8 @@ do
 
     USER="cheqd"
     GROUP="cheqd"
-    HOME="/home/cheqd"
+    DOCKER_HOME="/home/cheqd"
 
-    localnet_compose cp network-config/${MONIKER}/keyring-test ${MONIKER}:home/cheqd/.cheqdnode
-    localnet_compose exec -it --user root ${MONIKER} chown -R ${USER}:${GROUP} ${HOME}
+    localnet_compose cp network-config/${MONIKER}/keyring-test ${MONIKER}:/home/cheqd/.cheqdnode
+    localnet_compose exec -it --user root ${MONIKER} chown -R ${USER}:${GROUP} ${DOCKER_HOME}
 done
