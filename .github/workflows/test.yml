@@ -22,14 +22,10 @@ jobs:
     
     steps:
       - uses: actions/checkout@v3
-      
-      - name: Download Debian package
-        uses: actions/download-artifact@v3
-        with:
-          name: cheqd-node_${{ env.VERSION }}_amd64.deb
 
-      - name: Install Debian package
-        run: sudo CHEQD_HOME_DIR=/home/runner/cheqd dpkg -i cheqd-node_${{ env.VERSION }}_amd64.deb
+      - name: Install cheqd-noded binary
+        working-directory: ./tests/e2e-complex/interactive-install
+        run: sudo sh -c 'python3 ../../../installer/installer.py 1 < .answers'
 
       - name: Download node Docker image
         uses: actions/download-artifact@v3
@@ -51,15 +47,15 @@ jobs:
           set -euo pipefail
           bash ./tests/tools/wait-for-chain.sh
 
-      - name: Add an Observer node using Debian package
-        working-directory: ./tests/e2e-complex/deb-install
+      - name: Add an Observer node using Interactive installer
+        working-directory: ./tests/e2e-complex/interactive-install
         run: |
           set -euo pipefail
           bash add-observer.sh
           bash wait.sh "[[ $(cheqd-noded status -n 'tcp://localhost:26677' 2>&1 | wc -l) == 1 ]] && echo "Observer node is up""
 
       - name: Promote Observer to Validator
-        working-directory: ./tests/e2e-complex/deb-install
+        working-directory: ./tests/e2e-complex/interactive-install
         run: |
           bash promote-validator.sh
           bash check-promotion.sh
@@ -189,16 +185,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download tar archive
-        uses: actions/download-artifact@v3
-        with:
-          name: cheqd-node_${{ env.VERSION }}.tar.gz
-
-
-      - name: Rename tar archive
-        run: |
-          mv cheqd-node_${{ env.VERSION }}.tar.gz cheqd-noded.tar.gz
-
       - name: Download cheqd-cli Docker image
         uses: actions/download-artifact@v3
         with:
@@ -221,3 +207,54 @@ jobs:
       - name: Check for successful upgrade
         working-directory: ./tests/e2e-complex/upgrade
         run: bash upgrade_and_check.sh
+
+  node-cosmovisor-upgrade-test:
+    name: "Run positive case for upgrade with Cosmovisor installed"
+    runs-on: ubuntu-latest
+    env:
+      NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/tests/e2e-complex/upgrade/node_configs"
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Download cheqd-cli Docker image
+        uses: actions/download-artifact@v3
+        with:
+          name: cheqd-cli-image.tar
+
+      - name: Load cheqd-cli Docker image
+        run: docker load -i cheqd-cli-image.tar
+
+      - name: Install cheqd-noded binary
+        working-directory: ./tests/e2e-complex/upgrade/cosmovisor
+        run: sudo sh -c 'python3 ../../../../installer/installer.py 1 < .answers'
+
+      - name: Give current user ownership
+        run: sudo chown "$USER":"$USER" .
+
+      - name: Prepare nodes for upgrade
+        working-directory: ./tests/e2e-complex/upgrade
+        run: bash prepare.sh
+
+      - name: Add observer with Cosmovisor
+        working-directory: ./tests/e2e-complex/upgrade/cosmovisor
+        run: bash add-observer.sh
+
+      - name: Initiate upgrade
+        id: initiate-upgrade
+        working-directory: ./tests/e2e-complex/upgrade
+        run: |
+          START_HEIGHT=$(printf '%d' "$(cheqd-noded status 2>&1 | jq ".SyncInfo.latest_block_height" | tr -d '"')")
+          echo ::set-output name=START_HEIGHT::"$START_HEIGHT"
+          START_HEIGHT=$START_HEIGHT bash initiate_upgrade.sh
+
+      - name: Check for successful upgrade
+        working-directory: ./tests/e2e-complex/upgrade
+        run: START_HEIGHT=${{ steps.initiate-upgrade.outputs.START_HEIGHT }} bash upgrade_and_check.sh
+
+      - name: Check that node with Cosmovisor was upgraded
+        working-directory: ./tests/e2e-complex/upgrade/cosmovisor
+        run: START_HEIGHT=${{ steps.initiate-upgrade.outputs.START_HEIGHT }} bash check_upgrade.sh
+

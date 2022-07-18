@@ -13,7 +13,7 @@ defaults:
 jobs:
 
   release-packages:
-    name: "Release tar/Debian packages"
+    name: "Release cheqd-noded binary"
     runs-on: ubuntu-latest
     permissions:
       contents: write
