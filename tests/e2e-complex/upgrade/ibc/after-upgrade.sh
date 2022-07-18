@@ -12,6 +12,7 @@ CHEQD_BALANCE_2=$(cat cheqd-balance-2.txt)
 
 DENOM=$(cat denom.txt)
 
+set_new_compose_env
 
 info "Back transfer" # ---
 PORT="transfer"
@@ -20,7 +21,7 @@ docker-compose exec osmosis osmosisd tx ibc-transfer transfer $PORT $CHANNEL "$C
 sleep 30 # Wait for relayer
 
 info "Check balances for the last time" # ---
-CHEQD_BALANCE_3=$(cd .. && docker-compose exec ${CHEQD_SERVICE} cheqd-noded query bank balances "$CHEQD_USER_ADDRESS" --output json)
+CHEQD_BALANCE_3=$(set +x && localnet_compose exec ${CHEQD_SERVICE} cheqd-noded query bank balances "$CHEQD_USER_ADDRESS" --output json)
 docker-compose exec osmosis osmosisd query bank balances "$OSMOSIS_USER_ADDRESS"
 
 CHEQD_BALANCE_1=$(echo "$CHEQD_BALANCE_1" | jq --raw-output '.balances[0].amount')
@@ -51,3 +52,5 @@ else
   err "fee error"
   exit 1
 fi
+
+echo "$CHEQD_BALANCE_3" > cheqd-balance-3.txt

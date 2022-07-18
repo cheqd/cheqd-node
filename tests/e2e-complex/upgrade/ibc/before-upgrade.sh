@@ -3,11 +3,13 @@
 set -euox pipefail
 
 source common.sh
+source ../common.sh
 
 
 CHEQD_USER_ADDRESS="$(cat cheqd-user-address.txt)"
 OSMOSIS_USER_ADDRESS="$(cat osmosis-user-address.txt)"
 
+set_old_compose_env
 
 info "Forward transfer" # ---
 PORT="transfer"
@@ -16,7 +18,7 @@ CHANNEL="channel-0"
 sleep 30 # Wait for relayer
 
 info "Check balances the second time" # ---
-CHEQD_BALANCE_2=$(cd .. && docker-compose exec ${CHEQD_SERVICE} cheqd-noded query bank balances "$CHEQD_USER_ADDRESS" --output json)
+CHEQD_BALANCE_2=$(set +x && localnet_compose exec ${CHEQD_SERVICE} cheqd-noded query bank balances "$CHEQD_USER_ADDRESS" --output json)
 BALANCES=$(docker-compose exec osmosis osmosisd query bank balances "$OSMOSIS_USER_ADDRESS" --output json)
 
 info "Denom trace" # ---

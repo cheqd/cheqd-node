@@ -7,8 +7,8 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 source "${SCRIPT_DIR}/../../../tools/helpers.sh"
 
 # TMP
-CHEQD_SERVICE="node0"
-CHEQD_USER="operator0"
+CHEQD_SERVICE="validator-0"
+CHEQD_USER="operator-0"
 
 
 

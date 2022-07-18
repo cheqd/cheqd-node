@@ -9,10 +9,10 @@ services:
     ports:
       - "27656:26656" # p2p
       - "27657:26657" # rpc
-      - "9190:9090" # grpc
-      - "9191:9091" # grpc-web
+      - "9990:9090" # grpc
+      - "9991:9091" # grpc-web
     networks:
-      - upgrade-test
+      - localnet
     entrypoint: tail -f /dev/null
 
   hermes:
@@ -27,7 +27,7 @@ services:
       - "3000:3000" # rest
       - "3001:3001" # telemetry
     networks:
-      - upgrade-test
+      - localnet
     entrypoint: tail -f /dev/null
 
 configs:
@@ -35,5 +35,5 @@ configs:
     file: ./hermes/config.toml
 
 networks:
-  upgrade-test:
+  localnet:
     external: true
