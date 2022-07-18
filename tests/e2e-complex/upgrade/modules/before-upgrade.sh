@@ -3,32 +3,20 @@
 set -euox pipefail
 
 # shellcheck disable=SC1091
-. common.sh
+. "common.sh"
 
-# Stop docker compose
-docker_compose_down
 
-# Clean environment (for reproducable purposes in future)
-clean_env
+###
+# Test data
+###
 
-# Generate config files
-bash gen_node_configs.sh
-
-# Add all needed permissions
-make_775
-
-# Start the network on version which will be upgraded from
-docker_compose_up "${CHEQD_IMAGE_FROM}" "$(pwd)"
-
-# Wait for start ordering, till height 1
-bash ../../tools/wait-for-chain.sh 1
 
 # Get address of operator which will be used for sending tokens before upgrade
 get_addresses
 # shellcheck disable=SC2154
 OP2_ADDRESS=${addresses[2]}
 
-# Send tokens before upgrade
+# Send tokens operator-0 -> operator-1
 send_tokens "$OP2_ADDRESS"
 
 # Send DID transaction

@@ -1,0 +1,39 @@
+version: '3.7'
+
+services:
+  osmosis:
+    image: osmosis
+    build:
+      context: osmosis
+      dockerfile: osmosis.Dockerfile
+    ports:
+      - "27656:26656" # p2p
+      - "27657:26657" # rpc
+      - "9190:9090" # grpc
+      - "9191:9091" # grpc-web
+    networks:
+      - upgrade-test
+    entrypoint: tail -f /dev/null
+
+  hermes:
+    image: hermes
+    build:
+      context: ./hermes
+      dockerfile: hermes.Dockerfile
+    configs:
+      - source: hermes-config
+        target: /home/hermes/.hermes/config.toml
+    ports:
+      - "3000:3000" # rest
+      - "3001:3001" # telemetry
+    networks:
+      - upgrade-test
+    entrypoint: tail -f /dev/null
+
+configs:
+  hermes-config:
+    file: ./hermes/config.toml
+
+networks:
+  upgrade-test:
+    external: true
