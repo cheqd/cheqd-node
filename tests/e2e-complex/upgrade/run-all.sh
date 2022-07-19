@@ -41,7 +41,7 @@ fi
 if [[ "$TEST_IBC" == "true" ]]
 then
     echo "### IBC before upgrade ###"
-    # (cd ibc && bash before-upgrade.sh)
+    (cd ibc && bash before-upgrade.sh)
 fi
 
 
