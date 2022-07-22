@@ -165,6 +165,24 @@ func (s *TestSetup) WrapUpdateRequest(payload *types.MsgUpdateDidPayload, keys [
 	}
 }
 
+func (s *TestSetup) WrapDeactivateRequest(payload *types.MsgDeactivateDidPayload, keys []SignerKey) *types.MsgDeactivateDid {
+	var signatures []*types.SignInfo
+	signingInput := payload.GetSignBytes()
+
+	for _, skey := range keys {
+		signature := base64.StdEncoding.EncodeToString(ed25519.Sign(skey.key, signingInput))
+		signatures = append(signatures, &types.SignInfo{
+			VerificationMethodId: skey.signer,
+			Signature:            signature,
+		})
+	}
+
+	return &types.MsgDeactivateDid{
+		Payload:    payload,
+		Signatures: signatures,
+	}
+}
+
 func GenerateKeyPair() KeyPair {
 	PublicKey, PrivateKey, _ := ed25519.GenerateKey(rand.Reader)
 	return KeyPair{PrivateKey, PublicKey}
@@ -216,6 +234,17 @@ func (s *TestSetup) SendCreateDid(msg *types.MsgCreateDidPayload, keys map[strin
 
 	created, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
 	return created.UnpackDataAsDid()
+}
+
+func (s *TestSetup) SendDeactivateDid(msg *types.MsgDeactivateDidPayload, keys []SignerKey) (*types.Did, error) {
+	
+	_, err := s.Handler(s.Ctx, s.WrapDeactivateRequest(msg, keys))
+	if err != nil {
+		return nil, err
+	}
+
+	updated, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
+	return updated.UnpackDataAsDid()
 }
 
 func ConcatKeys(dst map[string]ed25519.PrivateKey, src map[string]ed25519.PrivateKey) map[string]ed25519.PrivateKey {
