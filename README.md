@@ -1,4 +1,4 @@
-# cheqd: Node Documentation
+# cheqd-node: Ledger software for decentralised identity
 
 [![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/cheqd/cheqd-node/Build%20and%20Test/main?style=flat-square)](https://github.com/cheqd/cheqd-node/actions/workflows/test.yml) [![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/cheqd/cheqd-node/Lint/main?label=lint&style=flat-square)](https://github.com/cheqd/cheqd-node/actions/workflows/lint.yml)
 
@@ -24,8 +24,8 @@ Either the cheqd team, or one of your fellow node operators will be happy to off
 
 Getting started as a node operator on the cheqd network [mainnet](https://explorer.cheqd.io) is as simple as...
 
-1. Install [the latest stable release](https://github.com/cheqd/cheqd-node/releases/latest) of `cheqd-node` software (currently `v0.6.x`) on a hosting platform of your choice by [following the setup guide](docs/setup-and-configure/README.md).
-2. Once you have acquired CHEQ tokens, [promote your node to a validator](docs/validator-guide/README.md)
+1. Install [the latest stable release](https://github.com/cheqd/cheqd-node/releases/latest) of `cheqd-node` software (currently `v0.6.x`) on a hosting platform of your choice by [following the setup guide](https://docs.cheqd.io/node/docs/setup-and-configure).
+2. Once you have acquired CHEQ tokens, [promote your node to a validator](https://docs.cheqd.io/node/docs/validator-guide)
 
 If successfully configured, your node would become the latest validator on the cheqd mainnet. Welcome to the new digital ID revolution!
 
@@ -33,12 +33,13 @@ If successfully configured, your node would become the latest validator on the c
 
 Our [testnet](https://testnet-explorer.cheqd.io/) is the easiest place for developers and node operators to get started if you're not *quite* ready yet to dive into building apps on our mainnet. To get started...
 
-1. Install [the latest stable release](https://github.com/cheqd/cheqd-node/releases/latest) of `cheqd-node` software (currently `v0.6.x`) on a hosting platform of your choice by [following the setup guide](docs/setup-and-configure/README.md).
+1. Install [the latest stable release](https://github.com/cheqd/cheqd-node/releases/latest) of `cheqd-node` software (currently `v0.6.x`) on a hosting platform of your choice by [following the setup guide](https://docs.cheqd.io/node/docs/setup-and-configure).
 2. Acquire testnet CHEQ tokens through [our testnet faucet](https://testnet-faucet.cheqd.io).
+3. Once you have acquired CHEQ tokens, [promote your node to a validator](https://docs.cheqd.io/node/docs/validator-guide)
 
 ## 🧑‍💻 Using cheqd
 
-Once installed, `cheqd-node` can be controlled using the [cheqd Cosmos CLI guide](docs/cheqd-cli/README.md).
+Once installed, `cheqd-node` can be controlled using the [cheqd Cosmos CLI guide](https://docs.cheqd.io/node/docs/cheqd-cli).
 
 ### 📌 Currently supported functionality
 
@@ -69,7 +70,7 @@ If you want to build a node from source or contribute to the code, please read o
 
 ### Creating a local network
 
-If you are building from source, or otherwise interested in running a local network, we have [instructions on how to set up a new network](docs/setup-and-configure/README.md) for development purposes.
+If you are building from source, or otherwise interested in running a local network, we have [instructions on how to set up a new network](https://docs.cheqd.io/node/docs/build-and-networks) for development purposes.
 
 ## 🐞 Bug reports & 🤔 feature requests
 
