@@ -1,0 +1,20 @@
+name: "Lint"
+on:
+  workflow_call:
+defaults:
+  run:
+    shell: bash
+
+
+jobs:
+  lint-proto:
+    name: "Lint proto files"
+    runs-on: ubuntu-latest
+
+    - uses: actions/checkout@v2
+    # Install the `buf` CLI
+    - uses: bufbuild/buf-setup-action@v1
+    # Lint protobuf sources
+    - uses: bufbuild/buf-lint-action@v1
+      with:
+        input: proto
