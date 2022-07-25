@@ -1,6 +1,9 @@
 version: v1
-name: "resource"
-deps: []
+name: "cheqd"
+deps:
+  - buf.build/cosmos/cosmos-proto
+  - buf.build/cosmos/gogo-proto
+  - buf.build/googleapis/googleapis
 build:
   excludes: []
 lint:
