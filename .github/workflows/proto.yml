@@ -29,4 +29,4 @@ jobs:
       - uses: bufbuild/buf-breaking-action@v1
         with:
           input: "proto"
-          against: "https://github.com/${{ github.repository }}.git#branch=${{ github.event.pull_request.base.ref }},ref=HEAD~1,subdir=proto"
+          against: "https://github.com/${{ github.repository }}.git#branch=${{ github.base_ref }},ref=HEAD~1,subdir=proto"
