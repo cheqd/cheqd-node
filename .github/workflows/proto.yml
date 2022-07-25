@@ -7,6 +7,19 @@ defaults:
 
 
 jobs:
+
+  trigger-build:
+    name: "Trigger build on ts-proto"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Invoke workflow in another repo with inputs
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: Build
+          ref: "DEV-1546"
+          repo: cheqd/ts-proto
+          token: ${{ secrets.PERSONAL_TOKEN }}
+
   lint-proto:
     name: "Lint proto files"
     runs-on: ubuntu-latest
