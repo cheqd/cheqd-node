@@ -18,7 +18,7 @@ jobs:
           workflow: Build
           ref: "DEV-1546"
           repo: cheqd/ts-proto
-          token: ${{ secrets.PERSONAL_TOKEN }}
+          token: ${{ secrets.TS_PROTO }}
 
   lint-proto:
     name: "Lint proto files"
