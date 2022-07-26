@@ -55,4 +55,6 @@ jobs:
           token: ${{ secrets.GH_PAT }}
           repository: cheqd/ts-proto
           event-type: buf-changed
+        env:
+          token: ${{ secrets.GH_PAT }}
       
