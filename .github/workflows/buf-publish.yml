@@ -1,7 +1,6 @@
 name: "Buf Build"
 on:
-  pull_request:
-    types: [opened, edited, reopened, synchronize]
+  workflow_call:
 defaults:
   run:
     shell: bash
