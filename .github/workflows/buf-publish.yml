@@ -27,22 +27,34 @@ jobs:
         working-directory: proto
         run: buf generate --template buf.gen.gogo.yaml buf.build/cheqd/cheqd-protos
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
 
         
-      - uses: bufbuild/buf-breaking-action@v1
-        with:
-          input: proto
-          against: https://github.com/${GITHUB_REPOSITORY}.git#branch=main
+      # - uses: bufbuild/buf-breaking-action@v1
+      #   with:
+      #     input: proto
+      #     against: https://github.com/${GITHUB_REPOSITORY}.git#branch=main
 
-      - uses: bufbuild/buf-lint-action@v1
-        with:
-          input: proto
+      # - uses: bufbuild/buf-lint-action@v1
+      #   with:
+      #     input: proto
 
       - uses: bufbuild/buf-push-action@v1
         with:
           input: 'proto'
           buf_token: ${{ secrets.BUF_TOKEN }}
 
+
+  dispatch:
+    name: "Run buf lint, breaking, build, and push"
+    runs-on: ubuntu-latest
+    needs: buf-build
+    steps:
+      -name: Dispatch to ts-proto
+       uses: peter-evans/repository-dispatch@v2
+       with:
+        token: ${{ secrets.GH_PAT }}
+        repository: cheqd/ts-proto
+        event-type: buf-changed
       
