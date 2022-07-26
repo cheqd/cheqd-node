@@ -11,19 +11,35 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+      - name: Install yarn
+        run: npm install --global yarn
+
+      - name: Install ts-proto version 1.85.0
+        run: yarn global add ts-proto@1.85.0
+
+      - name: Generating the ts code
+        working-directory: proto
+        run: buf generate --template buf.gen.gogo.yaml buf.build/cheqd/cheqd-protos
+
       - uses: bufbuild/buf-setup-action@v1
         with:
           version: '1.6.0'
-      # - uses: bufbuild/buf-lint-action@v1
-      #   with:
-      #     input: proto
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
       - uses: bufbuild/buf-breaking-action@v1
         with:
           input: proto
           against: https://github.com/${GITHUB_REPOSITORY}.git#branch=main
+
+      - uses: bufbuild/buf-lint-action@v1
+        with:
+          input: proto
+
       - uses: bufbuild/buf-push-action@v1
         with:
           input: 'proto'
           buf_token: ${{ secrets.BUF_TOKEN }}
+
+      

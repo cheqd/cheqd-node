@@ -1,5 +1,6 @@
 version: v1
 plugins:
-  - remote: buf.build/stephenh/plugins/ts-proto
-    out: ../
-    opt: plugins=grpc,Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types,esModuleInterop=true,forceLong=long,useOptionals=true,paths=source_relative
+  - name: ts
+    path: /home/runner/.config/yarn/global/node_modules/ts-proto/protoc-gen-ts_proto
+    out: ../cheqd-ts-proto
+    opt: esModuleInterop=true,forceLong=long,useOptionals=messages,useDate=false 

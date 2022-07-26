@@ -7,26 +7,31 @@ concurrency:
 
 jobs:
 
-  call-lint:
-    name: "Lint"
-    uses: ./.github/workflows/lint.yml
+  # call-lint:
+  #   name: "Lint"
+  #   uses: ./.github/workflows/lint.yml
 
-  call-build:
-    name: "Build"
-    needs: call-lint
-    uses: ./.github/workflows/build.yml
+  # call-build:
+  #   name: "Build"
+  #   needs: call-lint
+  #   uses: ./.github/workflows/build.yml
   
-  call-test:
-    name: "Test"
-    needs: call-build
-    uses: ./.github/workflows/test.yml
-    with:
-      VERSION: ${{ needs.call-build.outputs.VERSION }}
+  # call-test:
+  #   name: "Test"
+  #   needs: call-build
+  #   uses: ./.github/workflows/test.yml
+  #   with:
+  #     VERSION: ${{ needs.call-build.outputs.VERSION }}
 
-  call-release:
-    name: "Release"
-    needs: [call-test, call-build]
-    if: startsWith(github.ref, 'refs/tags/v')
-    uses: ./.github/workflows/release.yml
-    with:
-      RELEASE_VERSION: ${{ needs.call-build.outputs.VERSION }}
+  # call-release:
+  #   name: "Release"
+  #   needs: [call-test, call-build]
+  #   if: startsWith(github.ref, 'refs/tags/v')
+  #   uses: ./.github/workflows/release.yml
+  #   with:
+  #     RELEASE_VERSION: ${{ needs.call-build.outputs.VERSION }}
+
+  call-proto:
+    name: "Push to ts-proto"
+    if: github.ref == 'refs/heads/DEV-1546'
+    uses: ./.github/workflows/buf-publish.yml
