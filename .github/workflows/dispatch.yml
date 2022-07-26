@@ -33,5 +33,5 @@ jobs:
 
   call-proto:
     name: "Push to ts-proto"
-    if: github.ref == 'refs/heads/DEV-1546'
+    if: github.ref == 'refs/heads/proto-generation-with-buf'
     uses: ./.github/workflows/buf-publish.yml
