@@ -52,9 +52,9 @@ jobs:
     steps:
       - uses: peter-evans/repository-dispatch@v2
         with:
-          token: ${{ secrets.GH_PAT }}
+          token: ${{ secrets.TS_PROTO }}
           repository: cheqd/ts-proto
           event-type: buf-changed
         env:
-          token: ${{ secrets.GH_PAT }}
+          token: ${{ secrets.TS_PROTO }}
       
