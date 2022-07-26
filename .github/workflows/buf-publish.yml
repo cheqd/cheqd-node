@@ -26,14 +26,15 @@ jobs:
       - name: Generating the ts code
         working-directory: proto
         run: buf generate --template buf.gen.gogo.yaml buf.build/cheqd/cheqd-protos
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
         
       - uses: bufbuild/buf-breaking-action@v1
         with:
           input: proto
           against: https://github.com/${GITHUB_REPOSITORY}.git#branch=main
-
-      # - name: Setup tmate session
-      #   uses: mxschmitt/action-tmate@v3
 
       - uses: bufbuild/buf-lint-action@v1
         with:
