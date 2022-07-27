@@ -39,10 +39,10 @@ jobs:
       #   with:
       #     input: proto
 
-#       - uses: bufbuild/buf-push-action@v1
-#         with:
-#           input: 'proto'
-#           buf_token: ${{ secrets.BUF_TOKEN }}
+      - uses: bufbuild/buf-push-action@v1
+        with:
+          input: 'proto'
+          buf_token: ${{ secrets.BUF_TOKEN }}
 
 
   dispatch:
