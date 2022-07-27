@@ -40,11 +40,18 @@ jobs:
       #   with:
       #     input: proto
 
-      - name: Buf Push
-        working-directory: proto
-        run: |
-          echo ${{ secrets.BUF_TOKEN }} | buf registry login --username cheqd --token-stdin
-          buf push
+      - uses: bufbuild/buf-push-action@v1
+        env:
+          BUF_TOKEN: ${{secrets.BUF_TOKEN}}
+        with:
+          input: "proto"
+          buf_token: ${{ secrets.BUF_TOKEN }}
+
+      # - name: Buf Push
+      #   working-directory: proto
+      #   run: |
+      #     echo ${{ secrets.BUF_TOKEN }} | buf registry login --username cheqd --token-stdin
+      #     buf push
 
   dispatch:
     name: "Dispatch to ts-proto repo"
