@@ -6,7 +6,6 @@ defaults:
     shell: bash
 jobs:
   buf-build:
-    environment: buf-push
     name: "Run buf lint, breaking, build, and push"
     runs-on: ubuntu-latest
     steps:
