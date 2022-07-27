@@ -42,7 +42,7 @@ jobs:
 
       - uses: bufbuild/buf-push-action@v1
         env:
-          BUF_TOKEN: ${{github.env.BUF_TOKEN}}
+          BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
         with:
           input: "proto"
           buf_token: ${{ secrets.BUF_TOKEN }}
