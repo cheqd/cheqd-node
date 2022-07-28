@@ -11,17 +11,24 @@ CHEQD_IMAGE_TO="cheqd-cli:latest"
 CHEQD_VERSION_TO=$(git describe --always --tag --match "v*" | sed 's/^v//')
 # shellcheck disable=SC2034
 UPGRADE_NAME="v0.6"
+UPGRADE_VERSION_COSMOVISOR="0.6.0"
 # shellcheck disable=SC2034
 UPGRADE_INFO="{
   \"binaries\": {
-    \"linux/amd64\":\"http://10.5.0.10:8000/cheqd-noded.tar.gz\"
+    \"linux/amd64\":\"https://github.com/cheqd/cheqd-node/releases/download/v${UPGRADE_VERSION_COSMOVISOR}/cheqd-noded\"
   }
 }"
 VOTING_PERIOD=15
 EXPECTED_BLOCK_SECOND=5
-EXTRA_BLOCKS=10
+EXTRA_BLOCKS=7
+
+if [ -z ${START_HEIGHT+x} ]; then
+  START_HEIGHT=0
+fi
+
+
 # shellcheck disable=SC2034
-UPGRADE_HEIGHT=$((VOTING_PERIOD / EXPECTED_BLOCK_SECOND + EXTRA_BLOCKS))
+UPGRADE_HEIGHT=$((START_HEIGHT + VOTING_PERIOD / EXPECTED_BLOCK_SECOND + EXTRA_BLOCKS))
 # shellcheck disable=SC2034
 DEPOSIT_AMOUNT=10000000
 CHAIN_ID="cheqd"

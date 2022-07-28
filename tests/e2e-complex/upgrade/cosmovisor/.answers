@@ -1,0 +1,9 @@
+1
+/home/runner/cheqd
+no
+testnet
+yes
+no
+
+# This list of answers means that we need to install pre-release binary (it's 2nd for now. After releasing it should be changed to 1)
+# Another option - install with Cosmovisor and without setting up after

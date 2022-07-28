@@ -24,6 +24,6 @@ sudo -u cheqd sed -i.bak 's|address = "0.0.0.0:9091"|address = "0.0.0.0:9101"|g'
 sudo -u cheqd sed -i.bak 's|address = "tcp://0.0.0.0:1317"|address = "tcp://0.0.0.0:1327"|g' /home/runner/cheqd/.cheqdnode/config/app.toml
 sudo -u cheqd sed -i.bak 's|address = ":8080"|address = ":8090"|g' /home/runner/cheqd/.cheqdnode/config/app.toml
 
-sudo systemctl start cheqd-noded
+sudo systemctl start cheqd-cosmovisor
 sleep 10
-systemctl status cheqd-noded
+systemctl status cheqd-cosmovisor

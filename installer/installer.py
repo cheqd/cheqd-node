@@ -291,14 +291,20 @@ class Installer():
 
                 self.log(f"Setting directory permissions to default cheqd user: {DEFAULT_CHEQD_USER}")
                 self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.interviewer.home_dir}")
+            else:
+                self.log(f"Skipping main directory creation because {self.cheqd_root_dir} already exists")
 
             if not os.path.exists(self.cheqd_log_dir):
                 self.log("Creating log directory for cheqd-noded")
                 self.setup_log_dir()
+            else:
+                self.log(f"Skipping log directory creation because {self.cheqd_log_dir} already exists")
 
-            if os.path.exists("/var/log/cheqd-node") and not os.path.islink("/var/log/cheqd-node"):
+            if not os.path.exists("/var/log/cheqd-node"):
                 self.log("Creating a symlink from cheqd-noded log folder to /var/log/cheqd-node")
                 os.symlink(self.cheqd_log_dir, "/var/log/cheqd-node", target_is_directory=True)
+            else:
+                self.log("Skipping linking because /var/log/cheqd-node already exists")
         except:
             failure_exit("Failed to prepare directory tree for {DEFAULT_CHEQD_USER}")
 
@@ -532,6 +538,7 @@ class Installer():
         try:
             archive_name = os.path.basename(self.interviewer.snapshot_url)
             self.mkdir_p(self.cheqd_data_dir)
+            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_data_dir}")
             # Fetch size of snapshot archive. Uses curl to fetch headers and looks for Content-Length.
             archive_size = self.exec(f"curl -s --head {self.interviewer.snapshot_url} | awk '/Length/ {{print $2}}'").stdout.strip()
             # Check how much free disk space is available wherever the cheqd root directory is mounted
