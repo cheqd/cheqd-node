@@ -1,6 +1,8 @@
 version: v1
 plugins:
-  - name: ts
-    path: /home/runner/.config/yarn/global/node_modules/ts-proto/protoc-gen-ts_proto
-    out: ../cheqd-ts-proto
-    opt: esModuleInterop=true,forceLong=long,useOptionals=messages,useDate=false 
+  - name: gocosmos
+    out: ..
+    opt: plugins=grpc,Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types
+  - name: grpc-gateway
+    out: ..
+    opt: logtostderr=true,allow_colon_final_segments=true
