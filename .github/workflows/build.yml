@@ -39,8 +39,11 @@ jobs:
         with:
           version: '1.6.0'
 
-      - name: Generate typescript code
-        run: buf generate --template proto/buf.gen.gogo.yaml --out x
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
+      - name: Generate golang code
+        run: buf generate --template proto/buf.gen.gogo.yaml --output x
 
       - uses: actions/checkout@v3
         with:
