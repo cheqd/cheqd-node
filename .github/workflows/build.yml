@@ -31,6 +31,10 @@ jobs:
       VERSION: ${{ steps.set-version.outputs.VERSION }}
 
     steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Required to fetch version
+          
       - uses: actions/setup-go@v3
         with:
           go-version: '1.17'
@@ -44,10 +48,6 @@ jobs:
 
       - name: Generate golang code
         run: buf generate --template proto/buf.gen.gogo.yaml --output x
-
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0 # Required to fetch version
 
       - name: Build node binary
         run: |
