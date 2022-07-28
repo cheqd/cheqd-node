@@ -11,10 +11,10 @@ jobs:
   #   name: "Lint"
   #   uses: ./.github/workflows/lint.yml
 
-  # call-build:
-  #   name: "Build"
-  #   needs: call-lint
-  #   uses: ./.github/workflows/build.yml
+  call-build:
+    name: "Build"
+    # needs: call-lint
+    uses: ./.github/workflows/build.yml
   
   # call-test:
   #   name: "Test"
@@ -31,7 +31,7 @@ jobs:
   #   with:
   #     RELEASE_VERSION: ${{ needs.call-build.outputs.VERSION }}
 
-  call-proto:
-    name: "Push to ts-proto"
-    uses: ./.github/workflows/buf-publish.yml
-    secrets: inherit
+  # call-proto:
+  #   name: "Push to ts-proto"
+  #   uses: ./.github/workflows/buf-publish.yml
+  #   secrets: inherit
