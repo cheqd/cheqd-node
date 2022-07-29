@@ -47,7 +47,7 @@ Once installed, `cheqd-node` can be controlled using the [cheqd Cosmos CLI guide
 * Creating, managing, and configuring accounts and keys on a cheqd node
 * Staking and participating in public-permissionless governance
 * Governance framework for public-permissionless self-sovereign identity networks
-* Creating [`did:cheqd` method DIDs](architecture/adr-list/adr-002-cheqd-did-method.md), DID Documents ("DIDDocs")
+* Creating [`did:cheqd` method DIDs](https://docs.cheqd.io/node/architecture/adr-list/adr-002-cheqd-did-method), DID Documents ("DIDDocs")
 * Querying DIDs/DIDDocs using our [Universal Resolver driver](https://github.com/cheqd/did-resolver)
 * Creating and managing Verifiable Credentials anchored to DIDs on cheqd mainnet
 * Creating [on-ledger "resources" (e.g., schemas, visual representations of credentials, etc)](https://blog.cheqd.io/our-approach-to-resources-on-ledger-25bf5690c975) that can be used in DIDDocs and Verifiable Credentials.
@@ -66,7 +66,7 @@ We plan on adding new functionality rapidly and on a regular basis and welcome f
 
 `cheqd-node` is written in Go and built using Cosmos SDK. The [Cosmos SDK Developer Guide](https://docs.cosmos.network/) explains a lot of the [basic concepts](https://docs.cosmos.network/v0.45/basics/app-anatomy.html) of how the cheqd network functions.
 
-If you want to build a node from source or contribute to the code, please read our guide to [building and testing](docs/build-and-networks/README.md).
+If you want to build a node from source or contribute to the code, please read our guide to [building and testing](https://docs.cheqd.io/node/docs/build-and-networks).
 
 ### Creating a local network
 
