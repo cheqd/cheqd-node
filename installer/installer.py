@@ -929,7 +929,7 @@ class Interviewer:
         answer = self.ask(
             f"Provide a moniker for your cheqd-node", default=platform.node())
         if answer is not None:
-            self.moniker = answer
+            self.moniker = answer if answer.find(' ') == -1 else '\"' + answer + '\"'
         else:
             failure_exit(f"Invalid moniker provided during cheqd-noded setup.")
 
