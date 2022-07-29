@@ -11,18 +11,18 @@ defaults:
 
 
 jobs:
-  go-unit-tests:
-    name: "Golang unit tests"
-    runs-on: ubuntu-latest
+  # go-unit-tests:
+  #   name: "Golang unit tests"
+  #   runs-on: ubuntu-latest
     
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
-        with:
-          go-version: '1.17'
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/setup-go@v3
+  #       with:
+  #         go-version: '1.17'
       
-      - name: Run Golang unit tests
-        run: go test -v ./...
+  #     - name: Run Golang unit tests
+  #       run: go test -v ./...
 
   build-binary:
     name: "Node binary"
@@ -31,10 +31,6 @@ jobs:
       VERSION: ${{ steps.set-version.outputs.VERSION }}
 
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0 # Required to fetch version
-
       - uses: actions/setup-go@v3
         with:
           go-version: '1.17'
@@ -61,6 +57,10 @@ jobs:
         run: |
           curl -sSL "https://github.com/bufbuild/buf/releases/download/v${VERSION}/buf-$(uname -s)-$(uname -m).tar.gz" | \
           sudo tar -xvzf - -C "${PREFIX}" --strip-components 1
+      
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Required to fetch version
 
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
@@ -84,38 +84,38 @@ jobs:
           VERSION=$(build-tools/cheqd-noded version 2>&1)
           echo ::set-output name=VERSION::"$VERSION"
 
-  build-docker-images:
-    name: "Docker images"
-    runs-on: ubuntu-latest
-    env:
-      REGISTRY: ghcr.io
+  # build-docker-images:
+  #   name: "Docker images"
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     REGISTRY: ghcr.io
 
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0 # Required to fetch version
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         fetch-depth: 0 # Required to fetch version
       
-      - name: Build cheqd-cli Docker image 'cheqd-noded' as entrypoint
-        # TODO: Get rid of UID and GID
-        run: docker build --target base -t cheqd-cli -f docker/Dockerfile --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" .
+  #     - name: Build cheqd-cli Docker image 'cheqd-noded' as entrypoint
+  #       # TODO: Get rid of UID and GID
+  #       run: docker build --target base -t cheqd-cli -f docker/Dockerfile --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" .
 
-      - name: Build cheqd-node Docker image with 'node-start' as entrypoint
-        run: docker build --target node -t cheqd-node -f docker/Dockerfile --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" .
+  #     - name: Build cheqd-node Docker image with 'node-start' as entrypoint
+  #       run: docker build --target node -t cheqd-node -f docker/Dockerfile --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" .
 
-      - name: Save cheqd-cli Docker image
-        run: docker save -o cheqd-cli-image.tar cheqd-cli
+  #     - name: Save cheqd-cli Docker image
+  #       run: docker save -o cheqd-cli-image.tar cheqd-cli
 
-      - name: Store cheqd-cli artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: cheqd-cli-image.tar
-          path: cheqd-cli-image.tar
+  #     - name: Store cheqd-cli artifact
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: cheqd-cli-image.tar
+  #         path: cheqd-cli-image.tar
 
-      - name: Save cheqd-node Docker image
-        run: docker save -o cheqd-node-image.tar cheqd-node
+  #     - name: Save cheqd-node Docker image
+  #       run: docker save -o cheqd-node-image.tar cheqd-node
 
-      - name: Store cheqd-node artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: cheqd-node-image.tar
-          path: cheqd-node-image.tar
+  #     - name: Store cheqd-node artifact
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: cheqd-node-image.tar
+  #         path: cheqd-node-image.tar
