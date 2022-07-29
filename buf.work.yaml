@@ -1,3 +1,5 @@
+# Protobuf generation for cheqd-node modules
+
 version: v1
 
 directories:
