@@ -1,8 +1,0 @@
-version: v1
-plugins:
-  - name: gocosmos
-    out: ../x     
-    opt: plugins=grpc,Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types,paths=source_relative
-  - name: grpc-gateway
-    out: ../x
-    opt: logtostderr=true,allow_colon_final_segments=true,paths=source_relative
