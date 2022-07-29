@@ -7,14 +7,15 @@ concurrency:
 
 jobs:
 
-  # call-lint:
-  #   name: "Lint"
-  #   uses: ./.github/workflows/lint.yml
+  call-lint:
+    name: "Lint"
+    uses: ./.github/workflows/lint.yml
 
   call-build:
     name: "Build"
     # needs: call-lint
     uses: ./.github/workflows/build.yml
+    secrets: inherit
   
   # call-test:
   #   name: "Test"
@@ -30,8 +31,3 @@ jobs:
   #   uses: ./.github/workflows/release.yml
   #   with:
   #     RELEASE_VERSION: ${{ needs.call-build.outputs.VERSION }}
-
-  # call-proto:
-  #   name: "Push to ts-proto"
-  #   uses: ./.github/workflows/buf-publish.yml
-  #   secrets: inherit
