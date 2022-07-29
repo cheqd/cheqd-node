@@ -1,4 +1,4 @@
-# cheqd-node: Ledger software for decentralised identity
+# cheqd: Node Documentation
 
 [![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/cheqd/cheqd-node/Build%20and%20Test/main?style=flat-square)](https://github.com/cheqd/cheqd-node/actions/workflows/test.yml) [![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/cheqd/cheqd-node/Lint/main?label=lint&style=flat-square)](https://github.com/cheqd/cheqd-node/actions/workflows/lint.yml)
 
