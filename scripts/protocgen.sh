@@ -8,10 +8,10 @@ go get github.com/cosmos/gogoproto 2>/dev/null
 echo "Generating gogo proto code"
 cd proto
 proto_dirs=$(find ./ -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
-for dir in $proto_dirs; do
-  find "${dir}" -maxdepth 1 -name '*.proto' | while IFS= read -r -d '' file; do
-    if grep go_package $file &> /dev/null ; then
-      buf generate --template buf.gen.gogo.yaml $file
+for proto_dir in $proto_dirs; do
+  for f in $(find "${proto_dir}" -maxdepth 1 -name '*.proto'); do
+    if grep go_package $f &>/dev/null; then
+      buf generate --template buf.gen.gogo.yaml $f
     fi
   done
 done
