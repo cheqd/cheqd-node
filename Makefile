@@ -1,22 +1,47 @@
-export VERSION := $(shell echo $(shell git describe --always --tag --match "v*") | sed 's/^v//')
-export TMVERSION := $(shell go list -m github.com/tendermint/tendermint | sed 's:.* ::')
-export COMMIT := $(shell git log -1 --format='%H')
+#!/usr/bin/make -f
 
-NAME ?= cheqd-node
-APPNAME ?= $(NAME)d
+export GO111MODULE=on
+
+BUILD_DIR ?= $(CURDIR)/build
+REGEN_DIR := $(CURDIR)/app/regen
+
+BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+COMMIT := $(shell git log -1 --format='%H')
+
+ifeq (,$(VERSION))
+  VERSION := $(shell git describe --exact-match 2>/dev/null)
+  ifeq (,$(VERSION))
+    VERSION := $(BRANCH)-$(COMMIT)
+  endif
+endif
+
+SDK_VERSION := $(shell go list -m github.com/cosmos/cosmos-sdk | sed 's:.* ::')
+TM_VERSION := $(shell go list -m github.com/tendermint/tendermint | sed 's:.* ::')
+
+EXPERIMENTAL ?= false
 LEDGER_ENABLED ?= true
+DB_BACKEND ?= goleveldb
 
-BINDIR ?= $(GOPATH)/bin
-BUILDDIR ?= $(CURDIR)/build-tools
+###############################################################################
+###                            Build Tags/Flags                             ###
+###############################################################################
 
-export GO111MODULE = on
+# process build tags
 
-
-### Process build tags
 build_tags = netgo
+
+ifeq ($(EXPERIMENTAL),true)
+	build_tags += experimental
+endif
+
 ifeq ($(LEDGER_ENABLED),true)
   ifeq ($(OS),Windows_NT)
-    $(error Windows OS is not supported currently, exiting)
+    GCCEXE = $(shell where gcc.exe 2> NUL)
+    ifeq ($(GCCEXE),)
+      $(error gcc.exe not installed for ledger support, please install or set LEDGER_ENABLED=false)
+    else
+      build_tags += ledger
+    endif
   else
     UNAME_S = $(shell uname -s)
     ifeq ($(UNAME_S),OpenBSD)
@@ -32,88 +57,259 @@ ifeq ($(LEDGER_ENABLED),true)
   endif
 endif
 
-ifeq (cleveldb,$(findstring cleveldb,$(COSMOS_BUILD_OPTIONS)))
+ifeq ($(DB_BACKEND), goleveldb)
+  build_tags += goleveldb
+endif
+
+ifeq ($(DB_BACKEND), cleveldb)
   build_tags += gcc
+  build_tags += cleveldb
 endif
 
-whitespace :=
-whitespace += $(whitespace)
-comma := ,
-build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
-
-
-### Process linker flags
-ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=$(NAME)\
-		  -X github.com/cosmos/cosmos-sdk/version.AppName=$(APPNAME) \
-		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
-		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
-		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)" \
-			-X github.com/tendermint/tendermint/version.TMCoreSemVer=$(TMVERSION)
-
-
-# DB backend selection
-ifeq (cleveldb,$(findstring cleveldb,$(COSMOS_BUILD_OPTIONS)))
-  ldflags += -X github.com/cosmos/cosmos-sdk/types.DBBackend=cleveldb
+ifeq ($(DB_BACKEND), boltdb)
+  build_tags += boltdb
 endif
 
-ifeq (,$(findstring nostrip,$(COSMOS_BUILD_OPTIONS)))
-  ldflags += -w -s
+ifeq ($(DB_BACKEND), rocksdb)
+  build_tags += rocksdb
 endif
 
-ldflags += $(LDFLAGS)
-ldflags := $(strip $(ldflags))
+ifeq ($(DB_BACKEND), badgerdb)
+  build_tags += badgerdb
+endif
 
 build_tags += $(BUILD_TAGS)
 build_tags := $(strip $(build_tags))
 
+# process linker flags
 
-### Resulting build flags
-BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
+empty :=
+whitespace := $(empty) $(empty)
+comma := ,
+build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
 
-# Check for nostrip option
-ifeq (,$(findstring nostrip,$(COSMOS_BUILD_OPTIONS)))
+ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=regen \
+	-X github.com/cosmos/cosmos-sdk/version.AppName=regen \
+	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
+	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
+	-X github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)
+
+ifeq ($(DB_BACKEND), goleveldb)
+  ldflags += -X github.com/cosmos/cosmos-sdk/types.DBBackend=goleveldb
+endif
+
+ifeq ($(DB_BACKEND), cleveldb)
+  ldflags += -X github.com/cosmos/cosmos-sdk/types.DBBackend=cleveldb
+endif
+
+ifeq ($(DB_BACKEND), boltdb)
+  ldflags += -X github.com/cosmos/cosmos-sdk/types.DBBackend=boltdb
+endif
+
+ifeq ($(DB_BACKEND), rocksdb)
+  ldflags += -X github.com/cosmos/cosmos-sdk/types.DBBackend=rocksdb
+endif
+
+ifeq ($(DB_BACKEND), badgerdb)
+  ldflags += -X github.com/cosmos/cosmos-sdk/types.DBBackend=badgerdb
+endif
+
+ldflags += -X github.com/tendermint/tendermint/version.TMCoreSemVer=$(TM_VERSION)
+
+ifeq ($(NO_STRIP),false)
+  ldflags += -w -s
+endif
+
+ldflags += $(LD_FLAGS)
+ldflags := $(strip $(ldflags))
+
+# set build flags
+
+BUILD_FLAGS := -tags '$(build_tags)' -ldflags '$(ldflags)'
+
+ifeq ($(NO_STRIP),false)
   BUILD_FLAGS += -trimpath
 endif
 
-# Check for debug option
-ifeq (debug,$(findstring debug,$(COSMOS_BUILD_OPTIONS)))
-  BUILD_FLAGS += -gcflags "all=-N -l"
-endif
-
-
 ###############################################################################
-###                                  Build                                  ###
+###                             Build / Install                             ###
 ###############################################################################
 
+all: build
 
-all: install
+install: go.sum go-version
+	@if $(EXPERIMENTAL); then ./scripts/experimental.sh; fi
+	go install -mod=readonly $(BUILD_FLAGS) $(REGEN_DIR)
+	@if $(EXPERIMENTAL); then ./scripts/experimental_post.sh; fi
 
-build: go.sum $(BUILDDIR)
-	go build -mod=readonly $(BUILD_FLAGS) -o $(BUILDDIR)/cheqd-noded ./cmd/cheqd-noded
+build: go.sum go-version
+	@mkdir -p $(BUILD_DIR)
+	@if $(EXPERIMENTAL); then ./scripts/experimental.sh; fi
+	go build -mod=readonly -o $(BUILD_DIR) $(BUILD_FLAGS) $(REGEN_DIR)
+	@if $(EXPERIMENTAL); then ./scripts/experimental_post.sh; fi
 
-install: go.sum
-	go install -mod=readonly $(BUILD_FLAGS) ./cmd/cheqd-noded
-
-$(BUILDDIR):
-	mkdir -p $(BUILDDIR)
+build-linux:
+	GOOS=linux GOARCH=amd64 LEDGER_ENABLED=false $(MAKE) build
 
 clean:
-	rm -rf \
-    $(BUILDDIR)/ \
-    artifacts/ \
-    tmp-swagger-gen/
+	rm -rf $(BUILD_DIR)
 
-.PHONY: all clean build install
+.PHONY: build build-linux install clean
+
+###############################################################################
+###                               Go Version                                ###
+###############################################################################
+
+GO_MAJOR_VERSION = $(shell go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f1)
+GO_MINOR_VERSION = $(shell go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f2)
+MIN_GO_MAJOR_VERSION = 1
+MIN_GO_MINOR_VERSION = 18
+GO_VERSION_ERROR = Golang version $(GO_MAJOR_VERSION).$(GO_MINOR_VERSION) is not supported, \
+please update to at least $(MIN_GO_MAJOR_VERSION).$(MIN_GO_MINOR_VERSION)
+
+go-version:
+	@echo "Verifying go version..."
+	@if [ $(GO_MAJOR_VERSION) -gt $(MIN_GO_MAJOR_VERSION) ]; then \
+		exit 0; \
+	elif [ $(GO_MAJOR_VERSION) -lt $(MIN_GO_MAJOR_VERSION) ]; then \
+		echo $(GO_VERSION_ERROR); \
+		exit 1; \
+	elif [ $(GO_MINOR_VERSION) -lt $(MIN_GO_MINOR_VERSION) ]; then \
+		echo $(GO_VERSION_ERROR); \
+		exit 1; \
+	fi
+
+.PHONY: go-version
+
+###############################################################################
+###                               Go Modules                                ###
+###############################################################################
 
 go.sum: go.mod
-	echo "Ensure dependencies have not been modified ..." >&2
+	@echo "Ensuring app dependencies have not been modified..."
 	go mod verify
 	go mod tidy
 
+verify:
+	@echo "Verifying all go module dependencies..."
+	@find . -name 'go.mod' -type f -execdir go mod verify \;
+
+tidy:
+	@echo "Cleaning up all go module dependencies..."
+	@find . -name 'go.mod' -type f -execdir go mod tidy \;
+
+.PHONY: verify tidy
 
 ###############################################################################
-###                                  Protobuf                               ###
+###                               Go Generate                               ###
 ###############################################################################
 
-proto-gen:
-	bash scripts/protocgen.sh
+generate:
+	@echo "Generating source files from directives..."
+	@find . -name 'go.mod' -type f -execdir go generate ./... \;
+
+.PHONY: generate
+
+###############################################################################
+###                             Lint / Format                               ###
+###############################################################################
+
+lint:
+	golangci-lint run --out-format=tab
+
+lint-fix:
+	golangci-lint run --fix --out-format=tab --issues-exit-code=0
+
+format_filter = -name '*.go' -type f \
+	-not -path '*.git*' \
+	-not -name '*.pb.go' \
+	-not -name '*.gw.go' \
+	-not -name '*.pulsar.go' \
+	-not -name '*.cosmos_orm.go' \
+	-not -name 'statik.go'
+
+format:
+	@find . $(format_filter) | xargs gofmt -w -s
+	@find . $(format_filter) | xargs misspell -w
+	@find . $(format_filter) | xargs goimports -w
+
+.PHONY: lint lint-fix format
+
+###############################################################################
+###                                  Tools                                  ###
+###############################################################################
+
+tools: go-version
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	go install github.com/client9/misspell/cmd/misspell@latest
+	go install golang.org/x/tools/cmd/goimports@latest
+
+.PHONY: tools
+
+###############################################################################
+###                                Protobuf                                 ###
+###############################################################################
+
+include make/proto.mk
+
+###############################################################################
+###                                  Tests                                  ###
+###############################################################################
+
+include make/tests.mk
+
+###############################################################################
+###                               Simulations                               ###
+###############################################################################
+
+include make/sims.mk
+
+###############################################################################
+###                              Documentation                              ###
+###############################################################################
+
+docs-dev:
+	@echo "Starting regen-ledger static documentation site..."
+	@cd docs && yarn && yarn dev
+
+docs-build:
+	@echo "Building regen-ledger static documentation site..."
+	@cd docs && yarn && yarn build
+
+godocs:
+	@echo "Wait a few seconds and then visit http://localhost:6060/pkg/github.com/regen-network/regen-ledger/v4/"
+	godoc -http=:6060
+
+.PHONY: docs-dev docs-build godocs
+
+###############################################################################
+###                                Swagger                                  ###
+###############################################################################
+
+swagger: proto-swagger-gen
+	@./scripts/generate_swagger_docs.sh
+
+.PHONY: swagger
+
+###############################################################################
+###                                Localnet                                 ###
+###############################################################################
+
+DOCKER := $(shell which docker)
+
+localnet-build-env:
+	$(MAKE) -C contrib/images regen-env
+
+localnet-build-nodes:
+	$(DOCKER) run --rm -v $(CURDIR)/.testnets:/data regenledger/regen-env \
+			  testnet init-files --v 4 -o /data --starting-ip-address 192.168.10.2 --keyring-backend=test
+	docker-compose up -d
+
+# localnet-start will run a 4-node testnet locally. The nodes are
+# based off the docker images in: ./contrib/images/regen-env
+localnet-start: localnet-stop localnet-build-env localnet-build-nodes
+
+localnet-stop:
+	docker-compose down -v
+
+.PHONY: localnet-start localnet-stop localnet-build-nodes localnet-build-env
