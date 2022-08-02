@@ -1,6 +1,6 @@
 # this script is for generating protobuf files for the new google.golang.org/protobuf API
 
-set -eo pipefail
+set -euox pipefail
 
 protoc_gen_install() {
   go install github.com/cosmos/cosmos-proto/cmd/protoc-gen-go-pulsar@latest #2>/dev/null
