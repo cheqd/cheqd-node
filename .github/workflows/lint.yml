@@ -18,19 +18,19 @@ jobs:
       - name: Run 'set -euox pipefail' check
         run: bash ./.github/scripts/ensure_set_euox_pipefail.sh
   
-  md-link-check:
-    name: "Broken Markdown links"
-    runs-on: ubuntu-latest
+  # md-link-check:
+  #   name: "Broken Markdown links"
+  #   runs-on: ubuntu-latest
     
-    steps:
-      - uses: actions/checkout@v3
+  #   steps:
+  #     - uses: actions/checkout@v3
 
-      - name: Run Markdown link check
-        uses: gaurav-nelson/github-action-markdown-link-check@v1
-        with:
-          config-file: '.github/linters/mlc_config.json'
-          use-quiet-mode: 'yes'
-          use-verbose-mode: 'yes'
+  #     - name: Run Markdown link check
+  #       uses: gaurav-nelson/github-action-markdown-link-check@v1
+  #       with:
+  #         config-file: '.github/linters/mlc_config.json'
+  #         use-quiet-mode: 'yes'
+  #         use-verbose-mode: 'yes'
   
   go-lint:
     # We can't use VALIDATE_GO from super linter because of this issue:
