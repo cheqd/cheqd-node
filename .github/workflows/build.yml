@@ -11,18 +11,18 @@ defaults:
 
 
 jobs:
-  # go-unit-tests:
-  #   name: "Golang unit tests"
-  #   runs-on: ubuntu-latest
+  go-unit-tests:
+    name: "Golang unit tests"
+    runs-on: ubuntu-latest
     
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: actions/setup-go@v3
-  #       with:
-  #         go-version: '1.17'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '1.17'
       
-  #     - name: Run Golang unit tests
-  #       run: go test -v ./...
+      - name: Run Golang unit tests
+        run: go test -v ./...
 
   build-binary:
     name: "Node binary"
