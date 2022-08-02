@@ -28,7 +28,7 @@ proto-lint:
 	@$(DOCKER_BUF) lint --error-format=json
 
 proto-check-breaking:
-	@$(DOCKER_BUF) breaking --against https://github.com/cheqd/cheqd-node.git#branch=master
+	@$(DOCKER_BUF) breaking --against https://github.com/cheqd/cheqd-node.git#branch=main
 
 GOGO_PROTO_URL           = https://raw.githubusercontent.com/regen-network/protobuf/cosmos
 GOOGLE_PROTO_URL         = https://raw.githubusercontent.com/googleapis/googleapis/master
