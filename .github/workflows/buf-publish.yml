@@ -13,14 +13,14 @@ jobs:
 
       - uses: bufbuild/buf-setup-action@v1
         with:
-          version: '1.6.0'
+          version: '1.7.0'
 
       - name: Generating the ts code
         working-directory: proto
         run: buf generate --template buf.gen.gogo.yaml buf.build/cheqd/cheqd-protos
 
-      # - name: Setup tmate session
-      #   uses: mxschmitt/action-tmate@v3
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
 
         
       # - uses: bufbuild/buf-breaking-action@v1
