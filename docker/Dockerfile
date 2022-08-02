@@ -17,6 +17,7 @@ COPY app ./app
 COPY cmd ./cmd
 COPY scripts ./scripts
 COPY proto ./proto
+COPY make ./make
 COPY x ./x
 COPY go.mod .
 COPY go.sum .
