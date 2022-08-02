@@ -54,7 +54,7 @@ RUN make proto-gen build
 ###      STAGE 2: Build cheqd binary base container         ###
 ###############################################################
 
-FROM ubuntu:focal AS base
+FROM ubuntu:20.04 AS base
 
 LABEL org.opencontainers.image.description "cheqd CLI Docker image"
 LABEL org.opencontainers.image.source "https://github.com/cheqd/cheqd-node"
