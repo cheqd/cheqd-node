@@ -44,6 +44,7 @@ jobs:
         env:
           BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
 
+      # Calls a section in Makefile > Makefile > make/proto.mk > protocgen.sh
       - name: Generate golang code
         run: make proto-gen
 
