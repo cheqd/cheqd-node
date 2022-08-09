@@ -20,6 +20,10 @@ linters:
 
 
 linters-settings:
+
+  gofumpt:
+    lang-version: "1.17"
+    
   misspell:
     ignore-words:
       - cheqd

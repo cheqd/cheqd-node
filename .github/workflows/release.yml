@@ -55,6 +55,9 @@ jobs:
         with:
           fetch-depth: 0 # Required to fetch version
 
+      - name: Generate golang code
+        run: make proto-gen
+
       - name: Build cheqd-cli Docker image 'cheqd-noded' as entrypoint and no build args
         run: docker build --target base -t cheqd-cli -f docker/Dockerfile .
 

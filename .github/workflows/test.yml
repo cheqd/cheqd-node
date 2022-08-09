@@ -10,7 +10,9 @@ defaults:
     shell: bash
 env:
   NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/docker/localnet/network-config"
-
+permissions:
+  contents: write
+  packages: read
 
 jobs:
 
