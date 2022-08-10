@@ -2,13 +2,16 @@
 ###        STAGE 1: Build node binary pre-requisites        ###
 ###############################################################
 
-FROM golang:1.17.8-buster as builder
+FROM golang:1.17-alpine AS builder
 
-RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends \
+RUN apk update && apk add --no-cache \
     curl \
     git \
-    && rm -rf /var/lib/apt/lists/*
+    bash \
+    make \
+    gcc \
+    libc-dev \
+    linux-headers
 
 # Copy pre-requisites before building the node binary
 WORKDIR /app
@@ -32,7 +35,7 @@ RUN make build
 ###      STAGE 2: Build cheqd binary base container         ###
 ###############################################################
 
-FROM ubuntu:focal AS base
+FROM alpine:3.16 AS base
 
 LABEL org.opencontainers.image.description "cheqd CLI Docker image"
 LABEL org.opencontainers.image.source "https://github.com/cheqd/cheqd-node"
@@ -46,9 +49,14 @@ ARG CHEQD_HOME_DIR="/home/cheqd"
 ARG UID=1000
 ARG GID=1000
 
+# Install pre-requisites
+RUN apk update && apk add --no-cache \
+    bash \
+    ca-certificates
+
 # Add cheqd user to use in the container
-RUN groupadd --system --gid $GID cheqd \
-    && useradd --system --create-home --home-dir ${CHEQD_HOME_DIR} --shell /bin/bash --gid cheqd --uid $UID cheqd
+RUN addgroup -S -g $GID cheqd \
+    && adduser -S -h ${CHEQD_HOME_DIR} -s /bin/bash -G cheqd -u $UID cheqd
 
 WORKDIR ${CHEQD_HOME_DIR}
 USER cheqd
@@ -85,9 +93,18 @@ ENTRYPOINT [ "node-start" ]
 ###        STAGE 4: Build Cosmovisor                        ###
 ###############################################################
 
-FROM golang:1.17.8-buster AS cosmos_builder 
+FROM golang:1.17-alpine AS cosmos_builder
+
+RUN apk update && apk add --no-cache git
 
 RUN git clone https://github.com/cosmos/cosmos-sdk.git
+
+RUN apk add \
+    bash \
+    make \
+    gcc \
+    libc-dev \
+    linux-headers
 
 WORKDIR /go/cosmos-sdk/
 
