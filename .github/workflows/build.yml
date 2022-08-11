@@ -11,19 +11,6 @@ defaults:
 
 
 jobs:
-  
-  unit-tests:
-    name: "Unit Tests"
-    runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
-        with:
-          go-version-file: ./go.mod
-      
-      - name: Run Golang unit tests
-        run: go test -v ./...
 
   build-binary:
     name: "Build node binary"
@@ -39,13 +26,16 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version-file: ./go.mod
-      
-      - uses: bufbuild/buf-setup-action@v1.7.0
-        env:
-          BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
+
+      - name: Run Golang unit tests
+        run: go test -v ./...
+
+      # - uses: bufbuild/buf-setup-action@v1.7.0
+      #   env:
+      #     BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
 
       # Calls a section in Makefile > Makefile > make/proto.mk > protocgen.sh
-      - name: Generate golang code
+      - name: Generate Protobufs
         run: make proto-gen
 
       - name: Build node binary
