@@ -132,6 +132,7 @@ install: go.sum go-version
 
 build: go.sum go-version
 	@mkdir -p $(BUILD_DIR)
+	@echo $(BUILD_FLAGS)
 	go build -mod=readonly -o $(BUILD_DIR) $(BUILD_FLAGS) $(CHEQD_DIR)
 
 build-linux:
