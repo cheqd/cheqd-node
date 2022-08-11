@@ -1,0 +1,79 @@
+# Goreleaser configuration file
+
+project_name: cheqd-node
+
+before:
+  hooks:
+    - go mod tidy -compat=1.17
+    - go mod download
+
+builds:
+  - 
+    env:
+      - CGO_ENABLED=0
+    main: .
+    binary: cheqd-noded
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+
+
+archives:
+  - 
+    replacements:
+        darwin: Darwin
+        linux: Linux
+        amd64: x86_64
+    format: tar.gz
+    wrap_in_directory: true
+    name_template: "{{ .Binary }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    files:
+      - LICENSE
+      - README.md
+
+checksum:
+  name_template: 'checksums.txt'
+
+changelog:
+  use: github
+  sort: asc
+  groups:
+  - title: Features
+    regexp: "^.*feat[(\\w)]*:+.*$"
+    order: 0
+  - title: 'Fixes'
+    regexp: "^.*fix[(\\w)]*:+.*$"
+    order: 1
+  - title: 'Performance Improvements'
+    regexp: "^.*perf[(\\w)]*:+.*$"
+    order: 2
+  - title: 'Build Improvements'
+    regexp: "^.*build[(\\w)]*:+.*$"
+    order: 3
+  - title: 'Security'
+    regexp: "^.*build[(\\w)]*:+.*$"
+    order: 4
+  - title: 'Other changes'
+    order: 999
+  filters:
+    exclude:
+      - '^docs'
+      - '^test'
+      - '^ci'
+      - '^refactor'
+      - '^revert'
+      - '^style'
+
+release:
+  github:
+    owner: cheqd
+    name: cheqd-node
+  
+  draft: false
+  prerelease: auto
+  mode: append
+  header: |
+    # Release Notes for {{.ProjectName}} v{{.Version}}
