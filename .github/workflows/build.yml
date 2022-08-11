@@ -56,12 +56,12 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cheqd-noded
-          path: build-tools/cheqd-noded
+          path: build/cheqd-noded
 
       - name: Set version number
         id: set-version
         run: |
-          VERSION=$(build-tools/cheqd-noded version 2>&1)
+          VERSION=$(build/cheqd-noded version 2>&1)
           echo ::set-output name=VERSION::"$VERSION"
 
   build-docker-images:

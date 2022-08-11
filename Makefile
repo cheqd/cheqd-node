@@ -2,7 +2,7 @@
 
 export GO111MODULE=on
 
-BUILD_DIR ?= $(CURDIR)/build-tools
+BUILD_DIR ?= $(CURDIR)/build
 CHEQD_DIR := $(CURDIR)/cmd/cheqd-noded
 
 BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
