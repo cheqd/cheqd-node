@@ -9,7 +9,7 @@ BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 COMMIT := $(shell git log -1 --format='%H')
 
 ifeq (,$(VERSION))
-  VERSION := $(shell echo $(shell git describe --always --tag --match "v*") | sed 's/^v//')
+  VERSION := $(shell git describe --exact-match 2>/dev/null)
   ifeq (,$(VERSION))
     VERSION := $(BRANCH)-$(COMMIT)
   endif
@@ -78,8 +78,8 @@ whitespace := $(empty) $(empty)
 comma := ,
 build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
 
-ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=cheqd-noded \
-	-X github.com/cosmos/cosmos-sdk/version.AppName=cheqd-noded \
+ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=cheqd-node \
+	-X github.com/cosmos/cosmos-sdk/version.AppName=cheqd-node \
 	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
 	-X github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)
