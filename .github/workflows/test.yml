@@ -198,6 +198,9 @@ jobs:
       - name: Give current user ownership
         run: sudo chown "$USER":"$USER" .
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
       - name: Prepare nodes for upgrade
         working-directory: ./tests/e2e-complex/upgrade
         run: bash prepare.sh
