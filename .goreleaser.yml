@@ -12,7 +12,10 @@ builds:
     env:
       - CGO_ENABLED=0
     main: ./cmd/cheqd-noded
-    binary: cheqd-noded
+    binary: ./build-tools/cheqd-noded
+    hooks:
+      pre:
+       - make build
     command: test
     goos:
       - linux
