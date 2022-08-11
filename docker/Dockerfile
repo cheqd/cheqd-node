@@ -27,8 +27,7 @@ FROM alpine:3.16 AS node
 RUN apk update && apk add --no-cache bash ca-certificates
 
 # Set working directory & bash defaults
-ENV HOME /home/cheqd
-WORKDIR $HOME
+WORKDIR /cheqd-node
 SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 
 # Copy over binaries from the build-env
@@ -37,5 +36,4 @@ COPY --from=builder /go/src/github.com/cheqd/cheqd-node/build/cheqd-noded /bin/c
 EXPOSE 26656 26657 26660 1317 9090 9091
 
 # Set plain vanilla default entrypoint/command
-ENTRYPOINT [ "cheqd-noded" "start" ]
-CMD [ "--home ${HOME}" ]
+CMD [ "cheqd-noded" ]
