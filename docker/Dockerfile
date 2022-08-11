@@ -4,32 +4,18 @@
 
 FROM golang:1.17-alpine AS builder
 
-RUN apk update && apk add --no-cache \
-    curl \
-    git \
-    bash \
-    make \
-    gcc \
-    libc-dev \
-    linux-headers
+# Install minimum necessary dependencies
+ENV PACKAGES curl make git libc-dev bash gcc linux-headers eudev-dev python3
+RUN apk update && apk add --no-cache $PACKAGES
 
-# Copy pre-requisites before building the node binary
-WORKDIR /app
+# Set working directory for the build
+WORKDIR /go/src/github.com/cheqd/cheqd-node
 
-COPY app ./app
-COPY cmd ./cmd
-COPY scripts ./scripts
-COPY proto ./proto
-COPY make ./make
-COPY x ./x
-COPY go.mod .
-COPY go.sum .
-COPY Makefile .
-# Required to fetch version
-COPY .git .
+# Add source files
+COPY . .
 
 # Make node binary
-RUN make build
+RUN make build-linux
 
 ###############################################################
 ###      STAGE 2: Build cheqd binary base container         ###
