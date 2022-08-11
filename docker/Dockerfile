@@ -21,11 +21,22 @@ RUN make build-linux
 ###             STAGE 3: Build cheqd-node image             ###
 ###############################################################
 
-FROM builder AS node
+FROM alpine:3.16 AS node
 
-# Set runner script
-COPY --chown=cheqd:cheqd docker/entrypoint.sh /bin/node-start
-RUN chmod +x /bin/node-start
+# Install pre-requisites
+RUN apk update && apk add --no-cache bash ca-certificates
 
-# Default entrypoint for cheqd-noded CLI usage
-ENTRYPOINT [ "node-start" ]
+# Set working directory & bash defaults
+ENV HOME /home/cheqd
+WORKDIR $HOME
+SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
+
+# Copy over binaries from the build-env
+COPY --from=builder /go/src/github.com/cheqd/cheqd-node/build/cheqd-noded /bin/cheqd-noded
+
+EXPOSE 26656 26657 26660 1317 9090 9091
+
+ENTRYPOINT [ "cheqd-noded" ]
+
+# Define default command variables
+CMD [ "--home " ]
