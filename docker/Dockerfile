@@ -36,7 +36,6 @@ COPY --from=builder /go/src/github.com/cheqd/cheqd-node/build/cheqd-noded /bin/c
 
 EXPOSE 26656 26657 26660 1317 9090 9091
 
-ENTRYPOINT [ "cheqd-noded start" ]
-
-# Define default command variables
-CMD [ "--home " ]
+# Set plain vanilla default entrypoint/command
+ENTRYPOINT [ "cheqd-noded" "start" ]
+CMD [ "--home ${HOME}" ]
