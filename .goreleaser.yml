@@ -11,12 +11,23 @@ builds:
   - 
     env:
       - CGO_ENABLED=0
+      - TM_VERSION=$(go list -m github.com/tendermint/tendermint | sed 's:.* ::')
     main: ./cmd/cheqd-noded
-    binary: ./build-tools/cheqd-noded
-    hooks:
-      pre:
-       - make build
-    command: test
+    binary: cheqd-noded
+
+    tags:
+      - netgo
+      - ledger
+      - goleveldb
+    
+    ldflags:
+      -X github.com/cosmos/cosmos-sdk/version.Name=cheqd-noded 
+      -X github.com/cosmos/cosmos-sdk/version.AppName=cheqd-noded 
+      -X github.com/cosmos/cosmos-sdk/version.Version=(( .Version ))
+      -X github.com/cosmos/cosmos-sdk/version.Commit=(( .Commit ))
+      -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger,goleveldb 
+      -X github.com/cosmos/cosmos-sdk/types.DBBackend=goleveldb 
+      -X github.com/tendermint/tendermint/version.TMCoreSemVer=(( .Env.TM_VERSION ))
     goos:
       - linux
       - darwin
