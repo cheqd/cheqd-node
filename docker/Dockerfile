@@ -18,10 +18,10 @@ COPY . .
 RUN make build-linux
 
 ###############################################################
-###             STAGE 3: Build cheqd-node image             ###
+###             STAGE 2: Build cheqd-node image             ###
 ###############################################################
 
-FROM alpine:3.16 AS node
+FROM alpine:3.16 AS runner
 
 # Install pre-requisites
 RUN apk update && apk add --no-cache bash ca-certificates

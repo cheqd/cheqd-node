@@ -54,41 +54,30 @@ jobs:
           VERSION=$(build/cheqd-noded version 2>&1)
           echo ::set-output name=VERSION::"$VERSION"
 
-  build-docker-images:
-    name: "Docker images"
+  build-docker:
+    name: "Build Docker image"
     runs-on: ubuntu-latest
     env:
-      REGISTRY: ghcr.io
+      TEST_TAG: ${{ github.repository }}:test
 
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # Required to fetch version
+          fetch-depth: 0
 
-      - name: Generate golang code
-        run: make proto-gen
-      
-      - name: Build cheqd-cli Docker image 'cheqd-noded' as entrypoint
-        # TODO: Get rid of UID and GID
-        run: docker build --target base -t cheqd-cli -f docker/Dockerfile --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" .
-
-      - name: Build cheqd-node Docker image with 'node-start' as entrypoint
-        run: docker build --target node -t cheqd-node -f docker/Dockerfile --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" .
-
-      - name: Save cheqd-cli Docker image
-        run: docker save -o cheqd-cli-image.tar cheqd-cli
-
-      - name: Store cheqd-cli artifact
-        uses: actions/upload-artifact@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        id: buildx
         with:
-          name: cheqd-cli-image.tar
-          path: cheqd-cli-image.tar
+          install: true
+          version: latest
 
-      - name: Save cheqd-node Docker image
-        run: docker save -o cheqd-node-image.tar cheqd-node
-
-      - name: Store cheqd-node artifact
-        uses: actions/upload-artifact@v3
+      - name: Build image
+        uses: docker/build-push-action@v3
         with:
-          name: cheqd-node-image.tar
-          path: cheqd-node-image.tar
+          context: .
+          file: docker/Dockerfile
+          platforms: linux/amd64
+          load: true
+          target: runner
+          tags: ${{ env.TEST_TAG }}
