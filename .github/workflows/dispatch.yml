@@ -11,11 +11,11 @@ jobs:
     name: "Lint"
     uses: ./.github/workflows/lint.yml
 
-  call-build:
-    name: "Build"
-    # needs: call-lint
-    uses: ./.github/workflows/build.yml
-    secrets: inherit
+  # call-build:
+  #   name: "Build"
+  #   # needs: call-lint
+  #   uses: ./.github/workflows/build.yml
+  #   secrets: inherit
   
   # call-test:
   #   name: "Test"
