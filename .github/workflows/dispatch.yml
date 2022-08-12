@@ -11,11 +11,11 @@ jobs:
     name: "Lint"
     uses: ./.github/workflows/lint.yml
 
-  # call-build:
-  #   name: "Build"
-  #   # needs: call-lint
-  #   uses: ./.github/workflows/build.yml
-  #   secrets: inherit
+  call-build:
+    name: "Build"
+    # needs: call-lint
+    uses: ./.github/workflows/build.yml
+    secrets: inherit
   
   # call-test:
   #   name: "Test"
@@ -24,12 +24,12 @@ jobs:
   #   with:
   #     VERSION: ${{ needs.call-build.outputs.VERSION }}
 
-  call-release:
-    name: "Release"
-    # needs: [call-test, call-build]
-    # needs: call-build
-    # if: ${{ github.ref_protected == true }}
-    uses: ./.github/workflows/release.yml
-    # with:
-    #   RELEASE_VERSION: ${{ needs.call-build.outputs.VERSION }}
-    secrets: inherit
+  # call-release:
+  #   name: "Release"
+  #   # needs: [call-test, call-build]
+  #   # needs: call-build
+  #   # if: ${{ github.ref_protected == true }}
+  #   uses: ./.github/workflows/release.yml
+  #   # with:
+  #   #   RELEASE_VERSION: ${{ needs.call-build.outputs.VERSION }}
+  #   secrets: inherit
