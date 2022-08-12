@@ -57,29 +57,42 @@ jobs:
       - name: Generate golang code
         run: make proto-gen
 
-      - name: Build cheqd-cli Docker image 'cheqd-noded' as entrypoint and no build args
-        run: docker build --target base -t cheqd-cli -f docker/Dockerfile .
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        id: buildx
+        with:
+          version: latest
 
-      - name: Build cheqd-node Docker image with 'node-start' as entrypoint and no build args
-        run: docker build --target node -t cheqd-node -f docker/Dockerfile .
-
-      - name: Login to Container registry
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Configure Docker image metadata
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/${{ github.repository}}
+          flavor: |
+            latest=auto
+          tags: |
+            type=semver,pattern={{version}},value=${{ needs.release-binary.outputs.VERSION }}
+          labels: |
+            org.opencontainers.image.title="cheqd Node Docker Image"
+            org.opencontainers.image.description="Node for cheqd network"
+            org.opencontainers.image.source="https://github.com/cheqd/cheqd-node"
+            org.opencontainers.image.vendor="Cheqd Foundation Limited"
+            org.opencontainers.image.created={{date 'dddd, MMMM Do YYYY, h:mm:ss a'}}
+            org.opencontainers.image.documentation="https://docs.cheqd.io/node"
 
-      - name: Push cheqd-node image
-        run: |
-          docker tag cheqd-node ghcr.io/${{ github.repository }}:${{ env.RELEASE_VERSION }}
-          docker tag cheqd-node ghcr.io/${{ github.repository }}:latest
-          docker push ghcr.io/${{ github.repository }}:${{ env.RELEASE_VERSION }}
-          docker push ghcr.io/${{ github.repository }}:latest
-
-      - name: Push cheqd-cli image
-        run: |
-          docker tag cheqd-cli ghcr.io/${{ github.repository_owner }}/cheqd-cli:${{ env.RELEASE_VERSION }}
-          docker tag cheqd-cli ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
-          docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:${{ env.RELEASE_VERSION }}
-          docker push ghcr.io/${{ github.repository_owner }}/cheqd-cli:latest
+      - name: Build and push image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: docker/Dockerfile
+          platforms: linux/amd64, linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
