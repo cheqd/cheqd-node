@@ -2,6 +2,9 @@
 
 project_name: cheqd-node
 
+env:
+  - GO111MODULE=on
+
 before:
   hooks:
     - make clean
@@ -9,12 +12,21 @@ before:
     - go mod download
 
 builds:
-
-  - 
-    env:
-      - CGO_ENABLED=0
+  - id: cheqd-linux-amd64
     main: ./cmd/cheqd-noded
     binary: cheqd-noded
+    env:
+      - CGO_ENABLED=1
+      - CC=x86_64-linux-gnu-gcc
+      - CXX=x86_64-linux-gnu-g++
+    goarch:
+      - amd64
+    goos:
+      - linux
+    flags:
+      - -mod=readonly
+      - -tags="netgo ledger"
+      - -trimpath
     hooks:
       pre: make proto-gen
     flags:
@@ -27,22 +39,21 @@ builds:
       -X github.com/cosmos/cosmos-sdk/version.Version={{ .Version }}
       -X github.com/cosmos/cosmos-sdk/version.Commit={{ .Commit }}
       -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger,goleveldb
-    goos:
-      - linux
-      - darwin
-    goarch:
-      - amd64
-      - arm64
 
 archives:
-  - 
+  - id: release-archives
+    builds:
+      - cheqd-linux-amd64
+      # - cheqd-linux-arm64
+      # - cheqd-darwin-amd64
+      # - cheqd-darwin-arm64
     replacements:
         darwin: Darwin
         linux: Linux
         amd64: x86_64
     format: tar.gz
     wrap_in_directory: true
-    name_template: "{{ .Binary }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    name_template: "{{ .Binary }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}"
     files:
       - LICENSE
       - README.md
