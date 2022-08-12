@@ -27,9 +27,6 @@ jobs:
         with:
           go-version-file: ./go.mod
 
-      - name: Run Golang unit tests
-        run: go test -v ./...
-
       # # Calls a section in Makefile > Makefile > make/proto.mk > protocgen.sh
       # - name: Generate Protobufs
       #   run: make proto-gen
@@ -39,7 +36,7 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: build --rm-dist --single-target
+          args: build --single-target --skip-validate
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
@@ -48,6 +45,9 @@ jobs:
         with:
           name: cheqd-noded
           path: dist/cheqd-noded
+
+      - name: Run Golang unit tests
+        run: go test -v ./...
 
       # - name: Set version number
       #   id: set-version
