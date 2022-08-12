@@ -8,6 +8,9 @@ on:
 defaults:
   run:
     shell: bash
+permissions:
+  contents: write
+  packages: write
 
 
 jobs:
