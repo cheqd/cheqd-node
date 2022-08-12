@@ -25,7 +25,7 @@ builds:
       -X github.com/cosmos/cosmos-sdk/version.AppName=cheqd-noded 
       -X github.com/cosmos/cosmos-sdk/version.Version={{ .Version }}
       -X github.com/cosmos/cosmos-sdk/version.Commit={{ .Commit }}
-      -X github.com/cosmos/cosmos-sdk/version.BuildTags={{ .Env.BUILD_TAGS }} 
+      -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger,goleveldb
       -X github.com/cosmos/cosmos-sdk/types.DBBackend={{ .Env.DB_BACKEND }} 
       -X github.com/tendermint/tendermint/version.TMCoreSemVer={{ .Env.TM_VERSION }}
     goos:
