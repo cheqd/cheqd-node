@@ -43,7 +43,7 @@ USER ${USER}
 SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 
 # Set runner script
-COPY --chown=cheqd:cheqd docker/entrypoint.sh /bin/node-start
+COPY --chown=cheqd:cheqd ./docker/entrypoint.sh /bin/node-start
 RUN chmod +x /bin/node-start
 
 EXPOSE 26656 26657 26660 1317 9090 9091
