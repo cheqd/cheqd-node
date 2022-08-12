@@ -78,7 +78,7 @@ whitespace := $(empty) $(empty)
 comma := ,
 build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
 
-ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=cheqd-node \
+ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=cheqd-noded \
 	-X github.com/cosmos/cosmos-sdk/version.AppName=cheqd-noded \
 	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
