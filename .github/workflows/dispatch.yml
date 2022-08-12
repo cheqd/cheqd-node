@@ -21,8 +21,6 @@ jobs:
   #   name: "Test"
   #   needs: call-build
   #   uses: ./.github/workflows/test.yml
-  #   with:
-  #     VERSION: ${{ needs.call-build.outputs.VERSION }}
 
   # call-release:
   #   name: "Release"

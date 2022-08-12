@@ -41,7 +41,7 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: build --single-target --snapshot
+          args: build --rm-dist --snapshot --single-target
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TM_VERSION: ${{ steps.set-env-variables.outputs.TM_VERSION }}
@@ -61,7 +61,7 @@ jobs:
     name: "Build Docker image"
     runs-on: ubuntu-latest
     env:
-      DOCKER_TEST_IMAGE: ${{ github.repository }}:test
+      DOCKER_TEST_IMAGE: ${{ github.repository }}:${{ github.sha }}
 
     steps:
       - uses: actions/checkout@v3
