@@ -12,8 +12,8 @@ defaults:
 
 jobs:
 
-  release-packages:
-    name: "Release cheqd-noded binary"
+  release-binary:
+    name: "Release binaries"
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -45,8 +45,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TM_VERSION: ${{ steps.set-tm-version.outputs.TM_VERSION }}
 
-  release-docker-images:
-    name: "Publish Docker images for new version"
+  release-docker:
+    name: "Release Docker images"
     runs-on: ubuntu-latest
     env:
       REGISTRY: ghcr.io
