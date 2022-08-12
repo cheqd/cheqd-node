@@ -34,11 +34,12 @@ builds:
       - -tags="netgo ledger goleveldb"
       - -trimpath
     ldflags:
-      -X github.com/cosmos/cosmos-sdk/version.Name=cheqd-noded 
-      -X github.com/cosmos/cosmos-sdk/version.AppName=cheqd-noded 
-      -X github.com/cosmos/cosmos-sdk/version.Version={{ .Version }}
-      -X github.com/cosmos/cosmos-sdk/version.Commit={{ .Commit }}
-      -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger,goleveldb
+      - -s -w
+      - -X github.com/cosmos/cosmos-sdk/version.Name=cheqd-noded 
+      - -X github.com/cosmos/cosmos-sdk/version.AppName=cheqd-noded 
+      - -X github.com/cosmos/cosmos-sdk/version.Version={{ .Version }}
+      - -X github.com/cosmos/cosmos-sdk/version.Commit={{ .Commit }}
+      - -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger,goleveldb
 
 archives:
   - id: release-archives
