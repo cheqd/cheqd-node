@@ -190,10 +190,10 @@ jobs:
       - name: Download cheqd-cli Docker image
         uses: actions/download-artifact@v3
         with:
-          name: cheqd-cli-image.tar
+          name: cheqd-node-image.tar
 
       - name: Load cheqd-cli Docker image
-        run: docker load -i cheqd-cli-image.tar
+        run: docker load -i cheqd-node-image.tar
 
       - name: Give current user ownership
         run: sudo chown "$USER":"$USER" .
@@ -224,10 +224,10 @@ jobs:
       - name: Download cheqd-cli Docker image
         uses: actions/download-artifact@v3
         with:
-          name: cheqd-cli-image.tar
+          name: cheqd-node-image.tar
 
       - name: Load cheqd-cli Docker image
-        run: docker load -i cheqd-cli-image.tar
+        run: docker load -i cheqd-node-image.tar
 
       - name: Install cheqd-noded binary
         working-directory: ./tests/e2e-complex/upgrade/cosmovisor
