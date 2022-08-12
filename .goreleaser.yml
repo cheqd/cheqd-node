@@ -8,24 +8,23 @@ before:
     - go mod download
 
 builds:
+
   - 
     env:
       - CGO_ENABLED=0
     main: ./cmd/cheqd-noded
     binary: cheqd-noded
-
     tags:
       - netgo
       - ledger
       - goleveldb
-    
     ldflags:
       -X github.com/cosmos/cosmos-sdk/version.Name=cheqd-noded 
       -X github.com/cosmos/cosmos-sdk/version.AppName=cheqd-noded 
       -X github.com/cosmos/cosmos-sdk/version.Version={{ .Version }}
       -X github.com/cosmos/cosmos-sdk/version.Commit={{ .Commit }}
-      -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger,goleveldb 
-      -X github.com/cosmos/cosmos-sdk/types.DBBackend=goleveldb 
+      -X github.com/cosmos/cosmos-sdk/version.BuildTags={{ .Env.BUILD_TAGS }} 
+      -X github.com/cosmos/cosmos-sdk/types.DBBackend={{ .Env.DB_BACKEND }} 
       -X github.com/tendermint/tendermint/version.TMCoreSemVer={{ .Env.TM_VERSION }}
     goos:
       - linux
@@ -33,7 +32,6 @@ builds:
     goarch:
       - amd64
       - arm64
-
 
 archives:
   - 
