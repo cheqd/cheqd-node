@@ -17,7 +17,7 @@ require (
 	github.com/lestrrat-go/jwx v1.2.20
 	github.com/multiformats/go-multibase v0.0.3
 	github.com/rakyll/statik v0.1.7
-	github.com/spf13/cast v1.4.1
+	github.com/spf13/cast v1.5.0
 	github.com/spf13/cobra v1.5.0
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.10.1
