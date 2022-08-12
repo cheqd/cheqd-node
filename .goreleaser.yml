@@ -48,7 +48,7 @@ archives:
       - README.md
 
 checksum:
-  name_template: 'checksums.txt'
+  algorithm: sha256
 
 changelog:
   use: github
