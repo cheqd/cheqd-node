@@ -69,6 +69,7 @@ jobs:
 
   release-docker:
     name: "Release Docker images"
+    needs: release-binary
     runs-on: ubuntu-latest
     env:
       REGISTRY: ghcr.io

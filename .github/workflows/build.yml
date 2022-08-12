@@ -31,6 +31,16 @@ jobs:
       # - name: Generate Protobufs
       #   run: make proto-gen
 
+      - name: Set build environment variables
+        id: set-env-variables
+        run: |
+          TM_VERSION=$(go list -m github.com/tendermint/tendermint | sed 's:.* ::')
+          echo ::set-output name=TM_VERSION::"$TM_VERSION"
+          DB_BACKEND="goleveldb"
+          echo ::set-output name=DB_BACKEND::"$DB_BACKEND"
+          BUILD_TAGS="netgo,ledger,goleveldb"
+          echo ::set-output name=BUILD_TAGS::"$BUILD_TAGS"
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v3
         with:
@@ -39,7 +49,10 @@ jobs:
           args: build --single-target --skip-validate
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
+          TM_VERSION: ${{ steps.set-env-variables.outputs.TM_VERSION }}
+          DB_BACKEND: ${{ steps.set-env-variables.outputs.DB_BACKEND }}
+          BUILD_TAGS: ${{ steps.set-env-variables.outputs.BUILD_TAGS }}
+
       - name: Store artifact
         uses: actions/upload-artifact@v3
         with:
