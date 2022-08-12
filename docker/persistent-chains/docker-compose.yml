@@ -67,6 +67,11 @@ services:
     env_file:
       - container.env
     entrypoint: [ "node-start" ]
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:26657/status"]
       interval: 5m

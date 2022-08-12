@@ -3,7 +3,6 @@
 
 # Skip build/test folders
 build-tools/
-docker/
 installer/
 networks/
 tests/
