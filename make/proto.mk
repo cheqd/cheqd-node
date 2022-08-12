@@ -6,9 +6,9 @@
 
 containerProtoVer=v0.7
 containerProtoImage=tendermintdev/sdk-proto-gen:$(containerProtoVer)
-containerProtoGen=regen-ledger-proto-gen-$(containerProtoVer)
-containerProtoFmt=regen-ledger-proto-fmt-$(containerProtoVer)
-containerProtoGenSwagger=regen-ledger-proto-gen-swagger-$(containerProtoVer)
+containerProtoGen=cheqd-node-proto-gen-$(containerProtoVer)
+containerProtoFmt=cheqd-node-proto-fmt-$(containerProtoVer)
+containerProtoGenSwagger=cheqd-node-proto-gen-swagger-$(containerProtoVer)
 
 proto-all: proto-lint proto-format proto-gen proto-check-breaking
 

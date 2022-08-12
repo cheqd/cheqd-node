@@ -90,6 +90,9 @@ function docker_compose_up () {
 
 # Stop docker-compose
 function docker_compose_down () {
+    # Move this values to default
+    export CHEQD_IMAGE_NAME="cheqd-node"
+    export MOUNT_POINT="."
     docker compose --env-file .env down 
 }
 

@@ -42,7 +42,7 @@ jobs:
         run: |
           set -euo pipefail
           bash gen-network-config.sh
-          CHEQD_NODE_IMAGE=cheqd-node CHEQD_NODE_VERSION=latest docker compose up -d
+          CHEQD_NODE_IMAGE=cheqd-node DOCKER_IMAGE_VERSION=latest docker compose up -d
 
       - name: Check all Docker localnet nodes are active
         run: |
@@ -99,7 +99,7 @@ jobs:
         working-directory: ./docker/localnet
         run: |
           bash gen-network-config.sh
-          CHEQD_NODE_IMAGE=cheqd-node CHEQD_NODE_VERSION=latest docker compose up -d
+          CHEQD_NODE_IMAGE=cheqd-node DOCKER_IMAGE_VERSION=latest docker compose up -d
 
       - name: Check all Docker localnet nodes are active
         run: bash tests/tools/wait-for-chain.sh
@@ -161,7 +161,7 @@ jobs:
         working-directory: ./docker/localnet
         run: |
           bash gen-network-config.sh
-          CHEQD_NODE_IMAGE=cheqd-node CHEQD_NODE_VERSION=latest docker compose up -d
+          CHEQD_NODE_IMAGE=cheqd-node DOCKER_IMAGE_VERSION=latest docker compose up -d
 
       - name: Check all Docker localnet nodes are active
         run: bash ./tests/tools/wait-for-chain.sh
@@ -190,16 +190,13 @@ jobs:
       - name: Download cheqd-cli Docker image
         uses: actions/download-artifact@v3
         with:
-          name: cheqd-cli-image.tar
+          name: cheqd-node-image.tar
 
       - name: Load cheqd-cli Docker image
-        run: docker load -i cheqd-cli-image.tar
+        run: docker load -i cheqd-node-image.tar
 
       - name: Give current user ownership
         run: sudo chown "$USER":"$USER" .
-
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
 
       - name: Prepare nodes for upgrade
         working-directory: ./tests/e2e-complex/upgrade
@@ -227,10 +224,10 @@ jobs:
       - name: Download cheqd-cli Docker image
         uses: actions/download-artifact@v3
         with:
-          name: cheqd-cli-image.tar
+          name: cheqd-node-image.tar
 
       - name: Load cheqd-cli Docker image
-        run: docker load -i cheqd-cli-image.tar
+        run: docker load -i cheqd-node-image.tar
 
       - name: Install cheqd-noded binary
         working-directory: ./tests/e2e-complex/upgrade/cosmovisor

@@ -2,14 +2,14 @@
 
 export GO111MODULE=on
 
-BUILD_DIR ?= $(CURDIR)/build-tools
+BUILD_DIR ?= $(CURDIR)/build
 CHEQD_DIR := $(CURDIR)/cmd/cheqd-noded
 
 BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 COMMIT := $(shell git log -1 --format='%H')
 
 ifeq (,$(VERSION))
-  VERSION := $(shell echo $(shell git describe --always --tag --match "v*") | sed 's/^v//')
+  VERSION := $(shell git describe --exact-match 2>/dev/null)
   ifeq (,$(VERSION))
     VERSION := $(BRANCH)-$(COMMIT)
   endif
