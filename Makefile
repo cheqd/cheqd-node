@@ -79,7 +79,7 @@ comma := ,
 build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
 
 ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=cheqd-node \
-	-X github.com/cosmos/cosmos-sdk/version.AppName=cheqd-node \
+	-X github.com/cosmos/cosmos-sdk/version.AppName=cheqd-noded \
 	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
 	-X github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)
