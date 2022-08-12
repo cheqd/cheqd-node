@@ -4,6 +4,7 @@ project_name: cheqd-node
 
 before:
   hooks:
+    - make clean
     - go mod tidy
     - go mod download
 
@@ -16,18 +17,16 @@ builds:
     binary: cheqd-noded
     hooks:
       pre: make proto-gen
-    tags:
-      - netgo
-      - ledger
-      - goleveldb
+    flags:
+      - -mod=readonly
+      - -tags="netgo ledger goleveldb"
+      - -trimpath
     ldflags:
       -X github.com/cosmos/cosmos-sdk/version.Name=cheqd-noded 
       -X github.com/cosmos/cosmos-sdk/version.AppName=cheqd-noded 
       -X github.com/cosmos/cosmos-sdk/version.Version={{ .Version }}
       -X github.com/cosmos/cosmos-sdk/version.Commit={{ .Commit }}
-      -X github.com/cosmos/cosmos-sdk/version.BuildTags={{ .Env.BUILD_TAGS }} 
-      -X github.com/cosmos/cosmos-sdk/types.DBBackend={{ .Env.DB_BACKEND }} 
-      -X github.com/tendermint/tendermint/version.TMCoreSemVer={{ .Env.TM_VERSION }}
+      -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger,goleveldb
     goos:
       - linux
       - darwin
