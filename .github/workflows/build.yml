@@ -41,7 +41,7 @@ jobs:
         run: go test -v ./...
 
   build-docker:
-    name: "Build Docker image"
+    name: "Docker image"
     runs-on: ubuntu-latest
     env:
       DOCKER_TEST_IMAGE: ${{ github.repository }}:${{ github.sha }}
@@ -59,7 +59,7 @@ jobs:
       - name: Generate Protobufs
         run: make proto-gen
 
-      - name: Set up Docker Buildx
+      - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v2
         id: buildx
         with:
@@ -77,7 +77,7 @@ jobs:
           tags: ${{ env.DOCKER_TEST_IMAGE }}
           outputs: type=docker,dest=/tmp/cheqd-node-image.tar
 
-      - name: Store Docker test image artifact
+      - name: Upload Docker test image
         uses: actions/upload-artifact@v3
         with:
           name: cheqd-node-image.tar
