@@ -27,7 +27,7 @@ DB_BACKEND ?= goleveldb
 
 # process build tags
 
-build_tags = netgo
+BUILD_TAGS = netgo
 
 ifeq ($(LEDGER_ENABLED),true)
   ifeq ($(OS),Windows_NT)
@@ -41,48 +41,49 @@ ifeq ($(LEDGER_ENABLED),true)
       ifeq ($(GCC),)
         $(error gcc not installed for ledger support, please install or set LEDGER_ENABLED=false)
       else
-        build_tags += ledger
+        BUILD_TAGS += ledger
       endif
     endif
   endif
 endif
 
 ifeq ($(DB_BACKEND), goleveldb)
-  build_tags += goleveldb
+  BUILD_TAGS += goleveldb
 endif
 
 ifeq ($(DB_BACKEND), cleveldb)
-  build_tags += gcc
-  build_tags += cleveldb
+  BUILD_TAGS += gcc
+  BUILD_TAGS += cleveldb
 endif
 
 ifeq ($(DB_BACKEND), boltdb)
-  build_tags += boltdb
+  BUILD_TAGS += boltdb
 endif
 
 ifeq ($(DB_BACKEND), rocksdb)
-  build_tags += rocksdb
+  BUILD_TAGS += rocksdb
 endif
 
 ifeq ($(DB_BACKEND), badgerdb)
-  build_tags += badgerdb
+  BUILD_TAGS += badgerdb
 endif
 
-build_tags += $(BUILD_TAGS)
-build_tags := $(strip $(build_tags))
+BUILD_TAGS += $(BUILD_TAGS)
+BUILD_TAGS := $(strip $(BUILD_TAGS))
 
 # process linker flags
 
 empty :=
 whitespace := $(empty) $(empty)
 comma := ,
-build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
+BUILD_TAGS_comma_sep := $(subst $(whitespace),$(comma),$(BUILD_TAGS))
 
 ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=cheqd-noded \
 	-X github.com/cosmos/cosmos-sdk/version.AppName=cheqd-noded \
 	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
-	-X github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)
+	-X github.com/cosmos/cosmos-sdk/version.BuildTags=$(BUILD_TAGS_comma_sep) \
+	-X github.com/tendermint/tendermint/version.TMCoreSemVer=$(TM_VERSION)
 
 ifeq ($(DB_BACKEND), goleveldb)
   ldflags += -X github.com/cosmos/cosmos-sdk/types.DBBackend=goleveldb
@@ -104,8 +105,6 @@ ifeq ($(DB_BACKEND), badgerdb)
   ldflags += -X github.com/cosmos/cosmos-sdk/types.DBBackend=badgerdb
 endif
 
-ldflags += -X github.com/tendermint/tendermint/version.TMCoreSemVer=$(TM_VERSION)
-
 ifeq ($(NO_STRIP),false)
   ldflags += -w -s
 endif
@@ -115,7 +114,7 @@ ldflags := $(strip $(ldflags))
 
 # set build flags
 
-BUILD_FLAGS := -tags '$(build_tags)' -ldflags '$(ldflags)'
+BUILD_FLAGS := -tags '$(BUILD_TAGS)' -ldflags '$(ldflags)'
 
 ifeq ($(NO_STRIP),false)
   BUILD_FLAGS += -trimpath
