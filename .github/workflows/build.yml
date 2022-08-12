@@ -58,7 +58,7 @@ jobs:
     name: "Build Docker image"
     runs-on: ubuntu-latest
     env:
-      TEST_TAG: ${{ github.repository }}:test
+      DOCKER_TEST_IMAGE: ${{ github.repository }}:test
 
     steps:
       - uses: actions/checkout@v3
@@ -87,4 +87,11 @@ jobs:
           platforms: linux/amd64
           load: true
           target: runner
-          tags: ${{ env.TEST_TAG }}
+          tags: ${{ env.DOCKER_TEST_IMAGE }}
+          outputs: type=docker,dest=/tmp/cheqd-node-image.tar
+
+      - name: Store Docker test image artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: cheqd-node-image.tar
+          path: /tmp/cheqd-node-image.tar
