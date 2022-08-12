@@ -1,10 +1,6 @@
 name: "Release"
 on:
   workflow_call:
-    # inputs:
-    #   RELEASE_VERSION:
-    #     description: "Release version number"
-    #     type: string
 defaults:
   run:
     shell: bash
@@ -16,10 +12,10 @@ permissions:
 jobs:
 
   release-binary:
-    name: "Release binaries"
+    name: "Node binary"
     runs-on: ubuntu-latest
     outputs:
-      VERSION: ${{ steps.set-version.outputs.VERSION }}
+      RELEASE_VERSION: ${{ steps.set-version.outputs.RELEASE_VERSION }}
     
     steps:
       - uses: actions/checkout@v3
@@ -29,6 +25,7 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version-file: ./go.mod
+          cache: true
 
       # Node.js setup is needed to run Semantic Release
       - uses: actions/setup-node@v3
@@ -61,19 +58,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set version number
+      - name: Set release version number
         id: set-version
         run: |
-          VERSION=$( git describe --tags ${{ github.sha }})
-          echo ::set-output name=VERSION::"$VERSION"
+          RELEASE_VERSION=$( git describe --tags ${{ github.sha }})
+          echo ::set-output name=RELEASE_VERSION::"$RELEASE_VERSION"
 
   release-docker:
-    name: "Release Docker images"
+    name: "Docker image"
     needs: release-binary
     runs-on: ubuntu-latest
-    env:
-      REGISTRY: ghcr.io
-      # RELEASE_VERSION: ${{ inputs.RELEASE_VERSION }}
     
     steps:
       - uses: actions/checkout@v3
@@ -83,6 +77,7 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version-file: ./go.mod
+          cache: true
 
       - name: Generate golang code
         run: make proto-gen
