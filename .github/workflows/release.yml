@@ -103,7 +103,7 @@ jobs:
           flavor: |
             latest=auto
           tags: |
-            type=semver,pattern={{version}},value=${{ needs.release-binary.outputs.VERSION }}
+            type=semver,pattern={{version}},value=${{ needs.release-binary.outputs.RELEASE_VERSION }}
           labels: |
             org.opencontainers.image.title="cheqd Node Docker Image"
             org.opencontainers.image.description="Node for cheqd network"
