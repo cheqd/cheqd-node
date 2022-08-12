@@ -28,8 +28,6 @@ jobs:
           distribution: goreleaser
           version: latest
           args: build --rm-dist --snapshot --single-target
-        # env:
-        #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Store artifact
         uses: actions/upload-artifact@v3
