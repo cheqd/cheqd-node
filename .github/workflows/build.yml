@@ -13,7 +13,7 @@ defaults:
 jobs:
 
   build-binary:
-    name: "Build node binary"
+    name: "Node binary"
     runs-on: ubuntu-latest
     # outputs:
     #   VERSION: ${{ steps.set-version.outputs.VERSION }}
@@ -46,7 +46,7 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: build --single-target --skip-validate
+          args: build --single-target --snapshot
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TM_VERSION: ${{ steps.set-env-variables.outputs.TM_VERSION }}
