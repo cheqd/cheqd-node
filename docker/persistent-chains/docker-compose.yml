@@ -2,7 +2,7 @@ version: '3.8'
 
 # CAUTION: Please ensure you edit necessary values in container.env and docker-compose.env before using this Docker Compose file.
 
-# SYNTAX: docker-compose -f docker/persistent-chains/docker-compose.yml --env-file docker/persistent-chains/docker-compose.env up --no-build
+# SYNTAX: docker compose -f docker/persistent-chains/docker-compose.yml --env-file docker/persistent-chains/docker-compose.env up --detach --no-build
 
 services:
   cheqd_node:
@@ -66,7 +66,7 @@ services:
     # Defines cheqd-noded configuration variables INSIDE the container 
     env_file:
       - container.env
-    entrypoint: docker/entrypoint.sh
+    entrypoint: [ "node-start" ]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:26657/status"]
       interval: 5m
