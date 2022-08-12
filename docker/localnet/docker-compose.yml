@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   validator-0:
-    image: ${CHEQD_NODE_IMAGE}:${CHEQD_NODE_VERSION}
+    image: ${CHEQD_NODE_IMAGE}:${DOCKER_IMAGE_VERSION}
     ports:
       - target: 26656
         published: 26656    # Tendermint peer-to-peer (P2P) port
@@ -33,7 +33,7 @@ services:
         target: /priv_validator_key
 
   validator-1:
-    image: ${CHEQD_NODE_IMAGE}:${CHEQD_NODE_VERSION}
+    image: ${CHEQD_NODE_IMAGE}:${DOCKER_IMAGE_VERSION}
     ports:
       - target: 26656
         published: 26756    # Tendermint peer-to-peer (P2P) port
@@ -64,7 +64,7 @@ services:
         target: /priv_validator_key
 
   validator-2:
-    image: ${CHEQD_NODE_IMAGE}:${CHEQD_NODE_VERSION}
+    image: ${CHEQD_NODE_IMAGE}:${DOCKER_IMAGE_VERSION}
     ports:
       - target: 26656
         published: 26856    # Tendermint peer-to-peer (P2P) port
@@ -95,7 +95,7 @@ services:
         target: /priv_validator_key
 
   validator-3:
-    image: ${CHEQD_NODE_IMAGE}:${CHEQD_NODE_VERSION}
+    image: ${CHEQD_NODE_IMAGE}:${DOCKER_IMAGE_VERSION}
     ports:
       - target: 26656
         published: 26956    # Tendermint peer-to-peer (P2P) port
@@ -126,7 +126,7 @@ services:
         target: /priv_validator_key
 
   seed-0:
-    image: ${CHEQD_NODE_IMAGE}:${CHEQD_NODE_VERSION}
+    image: ${CHEQD_NODE_IMAGE}:${DOCKER_IMAGE_VERSION}
     ports:
       - target: 26656
         published: 27056    # Tendermint peer-to-peer (P2P) port
@@ -157,7 +157,7 @@ services:
         target: /priv_validator_key
 
   observer-0:
-    image: ${CHEQD_NODE_IMAGE}:${CHEQD_NODE_VERSION}
+    image: ${CHEQD_NODE_IMAGE}:${DOCKER_IMAGE_VERSION}
     ports:
       - target: 26656
         published: 27156    # Tendermint peer-to-peer (P2P) port
