@@ -65,7 +65,7 @@ jobs:
         run: docker build --target node -t cheqd-node -f docker/Dockerfile .
 
       - name: Login to Container registry
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
