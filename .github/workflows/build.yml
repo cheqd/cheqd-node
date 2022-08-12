@@ -1,10 +1,10 @@
 name: "Build"
 on:
   workflow_call:
-    outputs:
-      VERSION:
-        description: "Build version number"
-        value: ${{ jobs.build-binary.outputs.VERSION }}
+    # outputs:
+    #   VERSION:
+    #     description: "Build version number"
+    #     value: ${{ jobs.build-binary.outputs.VERSION }}
 defaults:
   run:
     shell: bash
@@ -15,8 +15,8 @@ jobs:
   build-binary:
     name: "Build node binary"
     runs-on: ubuntu-latest
-    outputs:
-      VERSION: ${{ steps.set-version.outputs.VERSION }}
+    # outputs:
+    #   VERSION: ${{ steps.set-version.outputs.VERSION }}
 
     steps:
       - uses: actions/checkout@v3
@@ -30,23 +30,22 @@ jobs:
       - name: Run Golang unit tests
         run: go test -v ./...
 
-      # - uses: bufbuild/buf-setup-action@v1.7.0
-      #   env:
-      #     BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
-
       # Calls a section in Makefile > Makefile > make/proto.mk > protocgen.sh
       - name: Generate Protobufs
         run: make proto-gen
 
-      - name: Build node binary
-        run: |
-          make build
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v3
+        with:
+          distribution: goreleaser
+          version: latest
+          args: build --rm-dist --single-target
         
       - name: Store artifact
         uses: actions/upload-artifact@v3
         with:
           name: cheqd-noded
-          path: build/cheqd-noded
+          path: dist/cheqd-noded
 
       - name: Set version number
         id: set-version
