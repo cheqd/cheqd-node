@@ -30,9 +30,9 @@ jobs:
       - name: Run Golang unit tests
         run: go test -v ./...
 
-      # Calls a section in Makefile > Makefile > make/proto.mk > protocgen.sh
-      - name: Generate Protobufs
-        run: make proto-gen
+      # # Calls a section in Makefile > Makefile > make/proto.mk > protocgen.sh
+      # - name: Generate Protobufs
+      #   run: make proto-gen
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v3

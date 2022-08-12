@@ -18,8 +18,6 @@ jobs:
   release-binary:
     name: "Release binaries"
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     outputs:
       VERSION: ${{ steps.set-version.outputs.VERSION }}
     
