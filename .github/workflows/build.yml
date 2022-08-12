@@ -49,11 +49,11 @@ jobs:
           name: cheqd-noded
           path: dist/cheqd-noded
 
-      - name: Set version number
-        id: set-version
-        run: |
-          VERSION=$(build/cheqd-noded version 2>&1)
-          echo ::set-output name=VERSION::"$VERSION"
+      # - name: Set version number
+      #   id: set-version
+      #   run: |
+      #     VERSION=$(build/cheqd-noded version 2>&1)
+      #     echo ::set-output name=VERSION::"$VERSION"
 
   build-docker:
     name: "Build Docker image"
