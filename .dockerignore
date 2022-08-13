@@ -8,5 +8,5 @@ networks/
 tests/
 
 # Skip Git-related folders
-.github
-.git
+.github/
+.git/
