@@ -5,21 +5,24 @@ on:
       days:
         description: 'Retain days'
         required: true
+        type: number
         default: 30
       minimum_runs:
         description: 'Minimum runs to keep for each workflow'
         required: true
-        default: 6
+        type: number
+        default: 0
       delete_workflow_pattern:
         description: 'Name/filename of workflow. Default is all.'
         required: false
+        type: string
       delete_workflow_by_state_pattern:
         description: 'Remove workflow by state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually'
         required: true
-        default: "All"
+        default: All
         type: choice
         options:
-          - "All"
+          - All
           - active
           - deleted
           - disabled_inactivity
@@ -27,6 +30,7 @@ on:
       dry_run:
         description: 'Dry run?'
         required: false
+        type: boolean
 
 jobs:
   
