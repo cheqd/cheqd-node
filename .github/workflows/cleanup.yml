@@ -5,12 +5,12 @@ on:
       days:
         description: 'Retain days'
         required: true
-        type: string
+        type: number
         default: 30
       minimum_runs:
         description: 'Minimum runs to keep for each workflow'
         required: true
-        type: string
+        type: number
         default: 0
       delete_workflow_pattern:
         description: 'Name/filename of workflow. Default is all.'
@@ -27,6 +27,10 @@ on:
           - deleted
           - disabled_inactivity
           - disabled_manually
+      dry_run:
+        description: 'Dry run?'
+        required: false
+        type: boolean
 
 jobs:
   
@@ -43,4 +47,4 @@ jobs:
           keep_minimum_runs: ${{ github.event.inputs.minimum_runs }}
           delete_workflow_pattern: ${{ github.event.inputs.delete_workflow_pattern }}
           delete_workflow_by_state_pattern: ${{ github.event.inputs.delete_workflow_by_state_pattern }}
-
+          dry_run: ${{ github.event.inputs.dry_run }}
