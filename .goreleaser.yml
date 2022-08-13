@@ -17,11 +17,8 @@ builds:
     binary: cheqd-noded
     env:
       - CGO_ENABLED=1
-    goos:
-      - linux
-    goarch:
-      - amd64
-      - arm64
+    targets:
+      - linux_amd64
     hooks:
       pre: make proto-gen
     flags:
