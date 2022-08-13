@@ -10,36 +10,17 @@ before:
     - make clean
     - go mod tidy
     - go mod download
-    - make proto-gen
 
 builds:
-  - id: ubuntu-latest-amd64
+  - id: cheqd-linux
     main: ./cmd/cheqd-noded
     binary: cheqd-noded
-    targets:
-      - "linux_amd64"
     env:
       - CGO_ENABLED=1
-    flags:
-      - -mod=readonly
-      - -tags="netgo ledger"
-      - -trimpath
-    ldflags:
-      - -s -w
-      - -X github.com/cosmos/cosmos-sdk/version.Name=cheqd-noded 
-      - -X github.com/cosmos/cosmos-sdk/version.AppName=cheqd-noded 
-      - -X github.com/cosmos/cosmos-sdk/version.Version={{ .Version }}
-      - -X github.com/cosmos/cosmos-sdk/version.Commit={{ .Commit }}
-      - -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger,goleveldb
-
-  - id: ubuntu-latest-arm64
-    main: ./cmd/cheqd-noded
-    binary: cheqd-noded
     targets:
-      - "linux_arm64"
+      - linux_amd64
     hooks:
-      pre:
-        - sudo apt update && sudo apt install clang gcc-multilib g++-multilib -y
+      pre: make proto-gen
     flags:
       - -mod=readonly
       - -tags="netgo ledger"
@@ -51,7 +32,6 @@ builds:
       - -X github.com/cosmos/cosmos-sdk/version.Version={{ .Version }}
       - -X github.com/cosmos/cosmos-sdk/version.Commit={{ .Commit }}
       - -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger,goleveldb
-
 
 archives:
   - id: release-archives
@@ -70,7 +50,8 @@ checksum:
   algorithm: sha256
 
 changelog:
-  use: github-native
+  use: github
+  sort: asc
   groups:
   - title: Features
     regexp: "^.*feat[(\\w)]*:+.*$"
@@ -89,7 +70,14 @@ changelog:
     order: 4
   - title: 'Other changes'
     order: 999
-
+  filters:
+    exclude:
+      - '^docs'
+      - '^test'
+      - '^ci'
+      - '^refactor'
+      - '^revert'
+      - '^style'
 
 release:
   github:

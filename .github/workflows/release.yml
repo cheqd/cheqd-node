@@ -21,11 +21,11 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # Required to fetch version
-          persist-credentials: false
 
       - uses: actions/setup-go@v3
         with:
           go-version-file: ./go.mod
+          cache: true
 
       # Node.js setup is needed to run Semantic Release
       - uses: actions/setup-node@v3
@@ -34,10 +34,6 @@ jobs:
           cache: 'npm'
           cache-dependency-path: '**/package-lock.json'
 
-      # Setup for pushing to Buf.build later
-      - uses: bufbuild/buf-setup-action@v1.7.0
-
-      # Required for short-lived token provided to Semantic Release
       - name: "Obtain Github App token"
         id: app-token
         uses: getsentry/action-github-app-token@v1.0.6
@@ -68,12 +64,6 @@ jobs:
           RELEASE_VERSION=$( git describe --tags ${{ github.sha }})
           echo ::set-output name=RELEASE_VERSION::"$RELEASE_VERSION"
 
-      # Push Protobufs to Buf.build registry
-      - uses: bufbuild/buf-push-action@v1
-        with:
-          input: proto
-          buf_token: ${{ secrets.BUF_TOKEN }}
-
   release-docker:
     name: "Docker image"
     needs: release-binary
@@ -83,11 +73,14 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # Required to fetch version
-          persist-credentials: false
 
       - uses: actions/setup-go@v3
         with:
           go-version-file: ./go.mod
+          cache: true
+
+      - name: Generate golang code
+        run: make proto-gen
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -112,6 +105,9 @@ jobs:
           tags: |
             type=semver,pattern={{version}},value=${{ needs.release-binary.outputs.RELEASE_VERSION }}
           labels: |
+            org.opencontainers.image.title="cheqd Node Docker Image"
+            org.opencontainers.image.description="Node for cheqd network"
+            org.opencontainers.image.source="https://github.com/cheqd/cheqd-node"
             org.opencontainers.image.vendor="Cheqd Foundation Limited"
             org.opencontainers.image.created={{date 'dddd, MMMM Do YYYY, h:mm:ss a'}}
             org.opencontainers.image.documentation="https://docs.cheqd.io/node"

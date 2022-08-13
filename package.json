@@ -1,7 +1,7 @@
 {
   "name": "cheqd-node",
   "version": "1.0.0",
-  "description": "Ledger/node code for cheqd network",
+  "description": "DID Resolver for did:cheqd method",
   "license": "Apache-2.0",
   "author": "Cheqd Foundation Limited (https://github.com/cheqd)",
   "homepage": "https://github.com/cheqd/cheqd-node#readme",
