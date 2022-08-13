@@ -23,15 +23,11 @@ builds:
       - amd64
     goos:
       - linux
-    flags:
-      - -mod=readonly
-      - -tags="netgo ledger"
-      - -trimpath
     hooks:
       pre: make proto-gen
     flags:
       - -mod=readonly
-      - -tags="netgo ledger goleveldb"
+      - -tags="netgo ledger"
       - -trimpath
     ldflags:
       - -s -w
