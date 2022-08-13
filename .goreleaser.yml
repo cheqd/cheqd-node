@@ -12,17 +12,16 @@ before:
     - go mod download
 
 builds:
-  - id: cheqd-linux-amd64
+  - id: cheqd-linux
     main: ./cmd/cheqd-noded
     binary: cheqd-noded
     env:
       - CGO_ENABLED=1
-      - CC=x86_64-linux-gnu-gcc
-      - CXX=x86_64-linux-gnu-g++
-    goarch:
-      - amd64
     goos:
       - linux
+    goarch:
+      - amd64
+      - arm64
     hooks:
       pre: make proto-gen
     flags:
@@ -39,11 +38,6 @@ builds:
 
 archives:
   - id: release-archives
-    builds:
-      - cheqd-linux-amd64
-      # - cheqd-linux-arm64
-      # - cheqd-darwin-amd64
-      # - cheqd-darwin-arm64
     replacements:
         darwin: Darwin
         linux: Linux
