@@ -1,4 +1,6 @@
 ### APP-SPECIFIC EXCLUSIONS ###
+build/
+dist/
 
 # Tests
 **/network-config

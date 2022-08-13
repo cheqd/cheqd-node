@@ -1,10 +1,6 @@
 name: "Build"
 on:
   workflow_call:
-    outputs:
-      VERSION:
-        description: "Build version number"
-        value: ${{ jobs.build-binary.outputs.VERSION }}
 defaults:
   run:
     shell: bash
@@ -13,10 +9,8 @@ defaults:
 jobs:
 
   build-binary:
-    name: "Build node binary"
+    name: "Node binary"
     runs-on: ubuntu-latest
-    outputs:
-      VERSION: ${{ steps.set-version.outputs.VERSION }}
 
     steps:
       - uses: actions/checkout@v3
@@ -26,39 +20,29 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version-file: ./go.mod
+          cache: true
 
-      - name: Run Golang unit tests
-        run: go test -v ./...
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v3
+        with:
+          distribution: goreleaser
+          version: latest
+          args: build --rm-dist --snapshot --single-target
 
-      # - uses: bufbuild/buf-setup-action@v1.7.0
-      #   env:
-      #     BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
-
-      # Calls a section in Makefile > Makefile > make/proto.mk > protocgen.sh
-      - name: Generate Protobufs
-        run: make proto-gen
-
-      - name: Build node binary
-        run: |
-          make build
-        
       - name: Store artifact
         uses: actions/upload-artifact@v3
         with:
           name: cheqd-noded
-          path: build/cheqd-noded
+          path: dist/**/cheqd-noded
 
-      - name: Set version number
-        id: set-version
-        run: |
-          VERSION=$(build/cheqd-noded version 2>&1)
-          echo ::set-output name=VERSION::"$VERSION"
+      - name: Run Golang unit tests
+        run: go test -v ./...
 
   build-docker:
-    name: "Build Docker image"
+    name: "Docker image"
     runs-on: ubuntu-latest
     env:
-      DOCKER_TEST_IMAGE: ${{ github.repository }}:test
+      DOCKER_TEST_IMAGE: ${{ github.repository }}:${{ github.sha }}
 
     steps:
       - uses: actions/checkout@v3
@@ -68,11 +52,12 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version-file: ./go.mod
+          cache: true
 
       - name: Generate Protobufs
         run: make proto-gen
 
-      - name: Set up Docker Buildx
+      - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v2
         id: buildx
         with:
@@ -90,7 +75,7 @@ jobs:
           tags: ${{ env.DOCKER_TEST_IMAGE }}
           outputs: type=docker,dest=/tmp/cheqd-node-image.tar
 
-      - name: Store Docker test image artifact
+      - name: Upload Docker test image
         uses: actions/upload-artifact@v3
         with:
           name: cheqd-node-image.tar

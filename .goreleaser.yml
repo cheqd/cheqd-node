@@ -1,0 +1,91 @@
+# Goreleaser configuration file
+
+project_name: cheqd-node
+
+env:
+  - GO111MODULE=on
+
+before:
+  hooks:
+    - make clean
+    - go mod tidy
+    - go mod download
+
+builds:
+  - id: cheqd-linux
+    main: ./cmd/cheqd-noded
+    binary: cheqd-noded
+    env:
+      - CGO_ENABLED=1
+    targets:
+      - linux_amd64
+    hooks:
+      pre: make proto-gen
+    flags:
+      - -mod=readonly
+      - -tags="netgo ledger"
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X github.com/cosmos/cosmos-sdk/version.Name=cheqd-noded 
+      - -X github.com/cosmos/cosmos-sdk/version.AppName=cheqd-noded 
+      - -X github.com/cosmos/cosmos-sdk/version.Version={{ .Version }}
+      - -X github.com/cosmos/cosmos-sdk/version.Commit={{ .Commit }}
+      - -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger,goleveldb
+
+archives:
+  - id: release-archives
+    replacements:
+        darwin: Darwin
+        linux: Linux
+        amd64: x86_64
+    format: tar.gz
+    wrap_in_directory: true
+    name_template: "{{ .Binary }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}"
+    files:
+      - LICENSE
+      - README.md
+
+checksum:
+  algorithm: sha256
+
+changelog:
+  use: github
+  sort: asc
+  groups:
+  - title: Features
+    regexp: "^.*feat[(\\w)]*:+.*$"
+    order: 0
+  - title: 'Fixes'
+    regexp: "^.*fix[(\\w)]*:+.*$"
+    order: 1
+  - title: 'Performance Improvements'
+    regexp: "^.*perf[(\\w)]*:+.*$"
+    order: 2
+  - title: 'Build Improvements'
+    regexp: "^.*build[(\\w)]*:+.*$"
+    order: 3
+  - title: 'Security'
+    regexp: "^.*build[(\\w)]*:+.*$"
+    order: 4
+  - title: 'Other changes'
+    order: 999
+  filters:
+    exclude:
+      - '^docs'
+      - '^test'
+      - '^ci'
+      - '^refactor'
+      - '^revert'
+      - '^style'
+
+release:
+  github:
+    owner: cheqd
+    name: cheqd-node
+  
+  draft: false
+  prerelease: true
+  mode: append
+  header: |
+    # Release Notes for {{.ProjectName}} v{{.Version}}
