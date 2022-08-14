@@ -40,6 +40,7 @@ jobs:
 
   build-docker:
     name: "Docker image"
+    needs: build-binary
     runs-on: ubuntu-latest
     env:
       DOCKER_TEST_IMAGE: ${{ github.repository }}:${{ github.sha }}
@@ -53,9 +54,6 @@ jobs:
         with:
           go-version-file: ./go.mod
           cache: true
-
-      - name: Generate Protobufs
-        run: make proto-gen
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v2
