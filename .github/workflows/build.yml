@@ -40,7 +40,6 @@ jobs:
 
   build-docker:
     name: "Docker image"
-    needs: build-binary
     runs-on: ubuntu-latest
     env:
       DOCKER_TEST_IMAGE: ${{ github.repository }}:${{ github.sha }}
