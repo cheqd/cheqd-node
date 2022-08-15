@@ -74,8 +74,6 @@ jobs:
         with:
           input: proto
           buf_token: ${{ secrets.BUF_TOKEN }}
-        # env:
-        #   BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
 
   release-docker:
     name: "Docker image"
