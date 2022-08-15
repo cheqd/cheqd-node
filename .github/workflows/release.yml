@@ -73,9 +73,9 @@ jobs:
       - uses: bufbuild/buf-push-action@v1
         with:
           input: proto
-          buf_token: ${{ env.BUF_TOKEN }}
-        env:
-          BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
+          buf_token: ${{ secrets.BUF_TOKEN }}
+        # env:
+        #   BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
 
   release-docker:
     name: "Docker image"
