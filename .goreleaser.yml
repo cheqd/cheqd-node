@@ -10,6 +10,7 @@ before:
     - make clean
     - go mod tidy
     - go mod download
+    - make proto-gen
 
 builds:
   - id: cheqd-linux
@@ -19,8 +20,6 @@ builds:
       - "linux_amd64"
     env:
       - CGO_ENABLED=1
-    hooks:
-      pre: make proto-gen
     flags:
       - -mod=readonly
       - -tags="netgo ledger"
@@ -36,8 +35,6 @@ builds:
   - id: cheqd-linux-arm64
     main: ./cmd/cheqd-noded
     binary: cheqd-noded
-    hooks:
-      pre: make proto-gen
     targets:
       - "linux_arm64"
     flags:
