@@ -15,16 +15,12 @@ builds:
   - id: cheqd-linux
     main: ./cmd/cheqd-noded
     binary: cheqd-noded
-    goarch:
-      - amd64
-    goos:
-      - darwin
+    targets:
+      - "linux_amd64"
     env:
       - CGO_ENABLED=1
-    targets:
-      - linux_amd64
-    # hooks:
-    #   pre: make proto-gen
+    hooks:
+      pre: make proto-gen
     flags:
       - -mod=readonly
       - -tags="netgo ledger"
@@ -40,15 +36,10 @@ builds:
   - id: cheqd-linux-arm64
     main: ./cmd/cheqd-noded
     binary: cheqd-noded
-    goarch:
-      - arm64
-    goos:
-      - linux
-    env:
-      - CGO_ENABLED=1
-      # - CC=/home/runner/work/osxcross/target/target/bin/o64-clang
-      # - CXX=/home/runner/work/osxcross/target/target/bin/o64-clang++
-      # - LD_LIBRARY_PATH=/home/runner/work/osxcross/target/binaries/lib
+    hooks:
+      pre: make proto-gen
+    targets:
+      - "linux_arm64"
     flags:
       - -mod=readonly
       - -tags="netgo ledger"
@@ -61,26 +52,26 @@ builds:
       - -X github.com/cosmos/cosmos-sdk/version.Commit={{ .Commit }}
       - -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger,goleveldb
 
-  - id: regen-darwin-arm64
-    binary: regen
-    main: ./app/regen
-    goarch:
-      - arm64
-    goos:
-      - darwin
-    env:
-      - LD_LIBRARY_PATH=/home/runner/work/osxcross/target/binaries/lib
-    flags:
-      - -mod=readonly
-      - -tags="netgo ledger"
-      - -trimpath
-    ldflags:
-      - -s -w
-      - -X github.com/cosmos/cosmos-sdk/version.Name=regen
-      - -X github.com/cosmos/cosmos-sdk/version.AppName=regen
-      - -X github.com/cosmos/cosmos-sdk/version.Version={{.Version}}
-      - -X github.com/cosmos/cosmos-sdk/version.Commit={{.Commit}}
-      - -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger
+  # - id: cheqd-darwin-arm64
+  #   main: ./cmd/cheqd-noded
+  #   binary: cheqd-noded
+  #   # hooks:
+  #   #   pre: make proto-gen
+  #   goarch:
+  #     - arm64
+  #   goos:
+  #     - darwin
+  #   flags:
+  #     - -mod=readonly
+  #     - -tags="netgo ledger"
+  #     - -trimpath
+  #   ldflags:
+  #     - -s -w
+  #     - -X github.com/cosmos/cosmos-sdk/version.Name=cheqd-noded 
+  #     - -X github.com/cosmos/cosmos-sdk/version.AppName=cheqd-noded 
+  #     - -X github.com/cosmos/cosmos-sdk/version.Version={{ .Version }}
+  #     - -X github.com/cosmos/cosmos-sdk/version.Commit={{ .Commit }}
+  #     - -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger,goleveldb
 
 
 archives:
