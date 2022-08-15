@@ -13,7 +13,7 @@ before:
     - make proto-gen
 
 builds:
-  - id: cheqd-linux
+  - id: cheqd-linux-amd64
     main: ./cmd/cheqd-noded
     binary: cheqd-noded
     targets:
@@ -52,10 +52,29 @@ builds:
   # - id: cheqd-darwin-arm64
   #   main: ./cmd/cheqd-noded
   #   binary: cheqd-noded
-  #   # hooks:
-  #   #   pre: make proto-gen
   #   goarch:
   #     - arm64
+  #   goos:
+  #     - darwin
+  #   flags:
+  #     - -mod=readonly
+  #     - -tags="netgo ledger"
+  #     - -trimpath
+  #   ldflags:
+  #     - -s -w
+  #     - -X github.com/cosmos/cosmos-sdk/version.Name=cheqd-noded 
+  #     - -X github.com/cosmos/cosmos-sdk/version.AppName=cheqd-noded 
+  #     - -X github.com/cosmos/cosmos-sdk/version.Version={{ .Version }}
+  #     - -X github.com/cosmos/cosmos-sdk/version.Commit={{ .Commit }}
+  #     - -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger,goleveldb
+
+  # - id: cheqd-darwin-amd64
+  #   main: ./cmd/cheqd-noded
+  #   binary: cheqd-noded
+  #   command:
+  #     - {{ if index .Os }}{{ build }}{{ else }}test{{ end }}
+  #   goarch:
+  #     - amd64
   #   goos:
   #     - darwin
   #   flags:
