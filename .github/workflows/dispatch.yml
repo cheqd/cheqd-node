@@ -7,24 +7,24 @@ concurrency:
 
 jobs:
 
-  # call-lint:
-  #   name: "Lint"
-  #   uses: ./.github/workflows/lint.yml
+  call-lint:
+    name: "Lint"
+    uses: ./.github/workflows/lint.yml
 
   call-build:
     name: "Build"
-    # needs: call-lint
+    needs: call-lint
     uses: ./.github/workflows/build.yml
     secrets: inherit
   
-  # call-test:
-  #   name: "Test"
-  #   needs: call-build
-  #   uses: ./.github/workflows/test.yml
+  call-test:
+    name: "Test"
+    needs: call-build
+    uses: ./.github/workflows/test.yml
 
   call-release:
     name: "Release"
-    # needs: [call-test, call-build]
+    needs: [call-test, call-build]
     needs: call-build
     if: ${{ github.ref_protected == true }}
     uses: ./.github/workflows/release.yml

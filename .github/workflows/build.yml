@@ -35,7 +35,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cheqd-noded
-          path: dist/**/cheqd-noded
+          path: dist/cheqd-linux-amd64_linux_amd64_v1/cheqd-noded
 
       - name: Run Golang unit tests
         run: go test -v ./...
