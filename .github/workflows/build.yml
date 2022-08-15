@@ -22,7 +22,7 @@ jobs:
           go-version-file: ./go.mod
 
       - name: Install needed packages
-        run: sudo apt update && apt install clang gcc-multilib g++-multilib -y
+        run: sudo apt update && sudo apt install clang gcc-multilib g++-multilib -y
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v3
