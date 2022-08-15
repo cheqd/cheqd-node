@@ -15,7 +15,7 @@ WORKDIR /go/src/github.com/cheqd/cheqd-node
 COPY . .
 
 # Make node binary
-RUN make install && make build
+RUN go mod download && make build-linux
 
 ###############################################################
 ###             STAGE 2: Build cheqd-node image             ###
