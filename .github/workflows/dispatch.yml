@@ -21,14 +21,11 @@ jobs:
   #   name: "Test"
   #   needs: call-build
   #   uses: ./.github/workflows/test.yml
-  #   with:
-  #     VERSION: ${{ needs.call-build.outputs.VERSION }}
 
-  # call-release:
-  #   name: "Release"
-  #   # needs: [call-test, call-build]
-  #   needs: call-build
-  #   if: ${{ github.ref_protected == true }}
-  #   uses: ./.github/workflows/release.yml
-  #   with:
-  #     RELEASE_VERSION: ${{ needs.call-build.outputs.VERSION }}
+  call-release:
+    name: "Release"
+    # needs: [call-test, call-build]
+    needs: call-build
+    if: ${{ github.ref_protected == true }}
+    uses: ./.github/workflows/release.yml
+    secrets: inherit

@@ -16,6 +16,7 @@ services:
         published: 9091     # gRPC-Gateway port
       - target: 26660
         published: 26660    # Prometheus metrics port
+    entrypoint: [ "node-start" ]
     volumes:
       - type: volume
         source: validator-0-data
@@ -47,6 +48,7 @@ services:
         published: 9191     # gRPC-Gateway port
       - target: 26660
         published: 26760    # Prometheus metrics port
+    entrypoint: [ "node-start" ]
     volumes:
       - type: volume
         source: validator-1-data
@@ -78,6 +80,7 @@ services:
         published: 9291     # gRPC-Gateway port
       - target: 26660
         published: 26860    # Prometheus metrics port
+    entrypoint: [ "node-start" ]
     volumes:
       - type: volume
         source: validator-2-data
@@ -109,6 +112,7 @@ services:
         published: 9391     # gRPC-Gateway port
       - target: 26660
         published: 26960    # Prometheus metrics port
+    entrypoint: [ "node-start" ]
     volumes:
       - type: volume
         source: validator-3-data

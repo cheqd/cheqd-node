@@ -2,11 +2,11 @@
 **/*.md
 
 # Skip build/test folders
-build-tools/
-installer/
-networks/
-tests/
+build-tools/**
+installer/**
+networks/**
+tests/**
 
 # Skip Git-related folders
-.github
-.git
+.github/**
+**/.git
