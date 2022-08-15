@@ -28,13 +28,18 @@ jobs:
         with:
           languages: 'go'
           queries: security-and-quality
+      
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: ./go.mod
 
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # Required to fetch version
       
       - name: Build
-        run: make proto-gen build
+        run: |
+          make proto-gen build
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
