@@ -15,7 +15,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/lestrrat-go/jwx v1.2.25
-	github.com/multiformats/go-multibase v0.0.3
+	github.com/multiformats/go-multibase v0.1.1
 	github.com/rakyll/statik v0.1.7
 	github.com/spf13/cast v1.5.0
 	github.com/spf13/cobra v1.5.0
