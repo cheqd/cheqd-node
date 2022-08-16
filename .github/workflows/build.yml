@@ -10,7 +10,12 @@ jobs:
 
   build-binary:
     name: "Node binary"
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        runner: [ ubuntu-latest, macos-latest ]
+        os: [ linux, darwin ]
+        arch: [ amd64, arm64 ]
+    runs-on: ${{ matrix.runner }}
 
     steps:
       - uses: actions/checkout@v3
@@ -29,12 +34,12 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: build --rm-dist --snapshot --id cheqd-linux-amd64
+          args: build --rm-dist --snapshot --id ${{ matrix.os }}-${{ matrix.arch }}
 
       - name: Store artifact
         uses: actions/upload-artifact@v3
         with:
-          name: cheqd-noded
+          name: cheqd-noded-${{ matrix.os }}-${{ matrix.arch }}
           path: dist/**/cheqd-noded
 
       - name: Run Golang unit tests
