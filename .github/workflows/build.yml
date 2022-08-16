@@ -10,12 +10,7 @@ jobs:
 
   build-binary:
     name: "Node binary"
-    strategy:
-      matrix:
-        os: [ ubuntu-latest, macos-latest ]
-        arch: [ amd64, arm64 ]
-    runs-on: ${{ matrix.os }}
-    continue-on-error: true
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
@@ -25,21 +20,19 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version-file: ./go.mod
-
-      # - name: Install needed packages
-      #   run: sudo apt update && sudo apt install clang gcc-multilib g++-multilib -y
+          cache: true
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v3
         with:
           distribution: goreleaser
           version: latest
-          args: build --rm-dist --snapshot --id ${{ matrix.os }}-${{ matrix.arch }}
+          args: build --rm-dist --snapshot --id ubuntu-latest-amd64
 
       - name: Store artifact
         uses: actions/upload-artifact@v3
         with:
-          name: cheqd-noded-${{ matrix.os }}-${{ matrix.arch }}
+          name: cheqd-noded
           path: dist/**/cheqd-noded
 
       - name: Run Golang unit tests
