@@ -52,24 +52,6 @@ builds:
       - -X github.com/cosmos/cosmos-sdk/version.Commit={{ .Commit }}
       - -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger,goleveldb
 
-  - id: macos-latest-amd64
-    main: ./cmd/cheqd-noded
-    binary: cheqd-noded
-    targets:
-      - "darwin_amd64"
-    env:
-      - CGO_ENABLED=1
-    flags:
-      - -mod=readonly
-      - -tags="netgo ledger"
-      - -trimpath
-    ldflags:
-      - -s -w
-      - -X github.com/cosmos/cosmos-sdk/version.Name=cheqd-noded 
-      - -X github.com/cosmos/cosmos-sdk/version.AppName=cheqd-noded 
-      - -X github.com/cosmos/cosmos-sdk/version.Version={{ .Version }}
-      - -X github.com/cosmos/cosmos-sdk/version.Commit={{ .Commit }}
-      - -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger,goleveldb
 
 archives:
   - id: release-archives
