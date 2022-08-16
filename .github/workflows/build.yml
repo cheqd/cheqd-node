@@ -21,21 +21,21 @@ jobs:
         with:
           go-version-file: ./go.mod
 
-      - name: Install needed packages
-        run: sudo apt update && sudo apt install clang gcc-multilib g++-multilib -y
+      # - name: Install needed packages
+      #   run: sudo apt update && sudo apt install clang gcc-multilib g++-multilib -y
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v3
         with:
           distribution: goreleaser
           version: latest
-          args: build --rm-dist --snapshot --single-target
+          args: build --rm-dist --snapshot --id cheqd-linux-amd64
 
       - name: Store artifact
         uses: actions/upload-artifact@v3
         with:
           name: cheqd-noded
-          path: dist/cheqd-linux-amd64_linux_amd64_v1/cheqd-noded
+          path: dist/**/cheqd-noded
 
       - name: Run Golang unit tests
         run: go test -v ./...
