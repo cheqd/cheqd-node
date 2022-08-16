@@ -13,7 +13,7 @@ before:
     - make proto-gen
 
 builds:
-  - id: linux-amd64
+  - id: ubuntu-latest-amd64
     main: ./cmd/cheqd-noded
     binary: cheqd-noded
     targets:
@@ -32,7 +32,7 @@ builds:
       - -X github.com/cosmos/cosmos-sdk/version.Commit={{ .Commit }}
       - -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger,goleveldb
 
-  - id: linux-arm64
+  - id: ubuntu-latest-arm64
     main: ./cmd/cheqd-noded
     binary: cheqd-noded
     targets:
@@ -52,7 +52,7 @@ builds:
       - -X github.com/cosmos/cosmos-sdk/version.Commit={{ .Commit }}
       - -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger,goleveldb
 
-  - id: darwin-amd64
+  - id: macos-latest-amd64
     main: ./cmd/cheqd-noded
     binary: cheqd-noded
     targets:
