@@ -112,9 +112,6 @@ jobs:
           tags: |
             type=semver,pattern={{version}},value=${{ needs.release-binary.outputs.RELEASE_VERSION }}
           labels: |
-            org.opencontainers.image.title="cheqd Node Docker Image"
-            org.opencontainers.image.description="Node for cheqd network"
-            org.opencontainers.image.source="https://github.com/cheqd/cheqd-node"
             org.opencontainers.image.vendor="Cheqd Foundation Limited"
             org.opencontainers.image.created={{date 'dddd, MMMM Do YYYY, h:mm:ss a'}}
             org.opencontainers.image.documentation="https://docs.cheqd.io/node"
