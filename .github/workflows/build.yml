@@ -12,10 +12,9 @@ jobs:
     name: "Node binary"
     strategy:
       matrix:
-        runner: [ ubuntu-latest, macos-latest ]
-        os: [ linux, darwin ]
+        os: [ ubuntu-latest, macos-latest ]
         arch: [ amd64, arm64 ]
-    runs-on: ${{ matrix.runner }}
+    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v3
