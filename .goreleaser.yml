@@ -37,6 +37,9 @@ builds:
     binary: cheqd-noded
     targets:
       - "linux_arm64"
+    hooks:
+      pre:
+        - sudo apt update && sudo apt install clang gcc-multilib g++-multilib -y
     flags:
       - -mod=readonly
       - -tags="netgo ledger"
@@ -67,7 +70,6 @@ checksum:
 
 changelog:
   use: github-native
-  sort: asc
   groups:
   - title: Features
     regexp: "^.*feat[(\\w)]*:+.*$"
@@ -86,14 +88,7 @@ changelog:
     order: 4
   - title: 'Other changes'
     order: 999
-  filters:
-    exclude:
-      - '^docs'
-      - '^test'
-      - '^ci'
-      - '^refactor'
-      - '^revert'
-      - '^style'
+
 
 release:
   github:
