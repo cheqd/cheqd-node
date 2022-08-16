@@ -1,8 +1,8 @@
-# Buf Build config for cheqd-node DID module
+# Buf Build config for cheqd Cosmos SDK modules
 
 version: v1
 
-name: buf.build/cheqd/cheqd-node
+name: buf.build/cheqd/cheqd-proto
 
 deps:
   - buf.build/cosmos/cosmos-sdk
