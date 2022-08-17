@@ -64,8 +64,9 @@ SEEDS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/networks/{
 ###############################################################
 DEFAULT_SNAPSHOT_SERVER = "https://snapshots.cheqd.net"
 DEFAULT_INIT_FROM_SNAPSHOT = "yes"
-TESTNET_SNAPSHOT = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/testnet/latest/cheqd-testnet-4_{}.tar.gz"
-MAINNET_SNAPSHOT = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/mainnet/latest/cheqd-mainnet-1_{}.tar.gz"
+TESTNET_SNAPSHOT = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/testnet/{}/cheqd-testnet-4_{}.tar.gz"
+MAINNET_SNAPSHOT = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/mainnet/{}/cheqd-mainnet-1_{}.tar.gz"
+MAX_SNAPSHOT_DAYS = 7
 CHECKSUM_URL_BASE = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/"
 
 ###############################################################
@@ -596,7 +597,7 @@ class Interviewer:
         self._release = None
         self._chain = chain
         self.verbose = True
-        self._snapshot_url = self.prepare_url_for_latest()
+        self._snapshot_url = ""
         self._is_setup_needed = False
         self._moniker = ""
         self._external_address = ""
@@ -959,10 +960,18 @@ class Interviewer:
     def prepare_url_for_latest(self) -> str:
         template = TESTNET_SNAPSHOT if self.chain == "testnet" else MAINNET_SNAPSHOT
         _date = datetime.date.today()
-        _url = template.format(_date.strftime("%Y-%m-%d"))
-        while not self.is_url_exists(_url):
+        _days_counter = 0
+        _is_url_valid = False
+
+        while not _is_url_valid and _days_counter <= MAX_SNAPSHOT_DAYS:
+            _url = template.format(_date.strftime("%Y-%m-%d"), _date.strftime("%Y-%m-%d"))
+
+            _is_url_valid = self.is_url_exists(_url)
+            _days_counter += 1
             _date -= datetime.timedelta(days=1)
-            _url = template.format(_date.strftime("%Y-%m-%d"))
+
+        if not _is_url_valid:
+            failure_exit("Could not find the valid snapshot for the last {} days".format(MAX_SNAPSHOT_DAYS))
         return _url
 
     def is_url_exists(self, url):
