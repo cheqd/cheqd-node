@@ -33,7 +33,7 @@ jobs:
           go get github.com/onsi/gomega/...
 
       - name: Run Ginkgo tests
-        run: ginkgo -r --race --randomizeAllSpecs --randomizeSuites -v
+        run: ginkgo -r --race --randomize-all --randomize-suites -v
 
   # test-new-node-setup:
   #   name: "New node setup"
