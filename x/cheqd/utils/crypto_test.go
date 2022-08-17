@@ -9,7 +9,7 @@ import (
 	. "github.com/cheqd/cheqd-node/x/cheqd/utils"
 )
 
-var _ = Describe("Utils", func() {
+var _ = Describe("Crypto", func() {
 	Describe("ValidateEd25519PubKey", func() {
 		Context("Valid: General Ed25519 public key", func() {
 			It("should return no error", func() {
