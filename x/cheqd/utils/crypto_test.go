@@ -3,25 +3,25 @@ package utils_test
 import (
 	// "testing"
 
-	"github.com/multiformats/go-multibase"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	. "github.com/cheqd/cheqd-node/x/cheqd/utils"
+	"github.com/multiformats/go-multibase"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Crypto", func() {
 	Describe("ValidateEd25519PubKey", func() {
 		Context("Valid: General Ed25519 public key", func() {
 			It("should return no error", func() {
-				_, keyBytes, _ := multibase.Decode("zF1hVGXXK9rmx5HhMTpGnGQJiab9qrFJbQXBRhSmYjQWX")	
+				_, keyBytes, _ := multibase.Decode("zF1hVGXXK9rmx5HhMTpGnGQJiab9qrFJbQXBRhSmYjQWX")
 				err := ValidateEd25519PubKey(keyBytes)
 				Expect(err).To(BeNil())
 			})
 		})
-		
+
 		Context("NotValid: Bad Ed25519 public key length", func() {
 			It("should return error", func() {
-				_, keyBytes, _ := multibase.Decode("zF1hVGXXK9rmx5HhMTpGnGQJiab9qr1111111111111")	
+				_, keyBytes, _ := multibase.Decode("zF1hVGXXK9rmx5HhMTpGnGQJiab9qr1111111111111")
 				err := ValidateEd25519PubKey(keyBytes)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("ed25519: bad public key length: 31"))

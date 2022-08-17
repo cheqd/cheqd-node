@@ -1,41 +1,40 @@
 package utils_test
 
 import (
-	. "github.com/onsi/ginkgo/extensions/table"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	. "github.com/cheqd/cheqd-node/x/cheqd/utils"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("DID-URL tests", func() {
 	DescribeTable("Check the DID-URL join functionality (without functionality)",
 
-	func(did_url string) {
-		did, path, query, fragment := MustSplitDIDUrl(did_url)
-		joined_did_url := JoinDIDUrl(did, path, query, fragment)
-		Expect(joined_did_url).To(Equal(did_url))
-	},
-	Entry("All symbols", "did:cheqd:testnet:123456789abcdefg/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~!$&'()*+,;=:@%20%ff"),
-	Entry("All symbols for path", "did:cheqd:testnet:123456789abcdefg/path/to/some/other/place/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~!$&'()*+,;=:@%20%ff/"),
-	Entry("All symbols for path and query", "did:cheqd:testnet:123456789abcdefg/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~!$&'()*+,;=:@%20%ff?query"),
-	Entry("All symbols for path and query and fragment", "did:cheqd:testnet:123456789abcdefg/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~!$&'()*+,;=:@%20%ff?query#fragment"),
-	Entry("All variants for path", "did:cheqd:testnet:123456789abcdefg/12/ab/AB/-/./_/~/!/$/&/'/(/)/*/+/,/;/=/:/@/%20/%ff"),
-	Entry("Empty path", "did:cheqd:testnet:123456789abcdefg/"),
-	Entry("All symbols for query", "did:cheqd:testnet:123456789abcdefg/path?abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~!$&'()*+,;=:@%20%ff?"),
-	Entry("All symbols for query and a lot of queries", "did:cheqd:testnet:123456789abcdefg/path?abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~!$&'()*+,;=:@%20%ff?query=2?query=3/query=%A4"),
-	Entry("All symbols for fragment", "did:cheqd:testnet:123456789abcdefg/path?query#abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~!$&'()*+,;=:@%20%ff"),
-	Entry("All symbols for fragment and query", "did:cheqd:testnet:123456789abcdefg/path?query#abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~!$&'()*+,;=:@%20%ff?"),
-	Entry("Just fragment", "did:cheqd:testnet:123456789abcdefg#fragment"),
-	Entry("Just query", "did:cheqd:testnet:123456789abcdefg?query"),
+		func(did_url string) {
+			did, path, query, fragment := MustSplitDIDUrl(did_url)
+			joined_did_url := JoinDIDUrl(did, path, query, fragment)
+			Expect(joined_did_url).To(Equal(did_url))
+		},
+		Entry("All symbols", "did:cheqd:testnet:123456789abcdefg/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~!$&'()*+,;=:@%20%ff"),
+		Entry("All symbols for path", "did:cheqd:testnet:123456789abcdefg/path/to/some/other/place/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~!$&'()*+,;=:@%20%ff/"),
+		Entry("All symbols for path and query", "did:cheqd:testnet:123456789abcdefg/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~!$&'()*+,;=:@%20%ff?query"),
+		Entry("All symbols for path and query and fragment", "did:cheqd:testnet:123456789abcdefg/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~!$&'()*+,;=:@%20%ff?query#fragment"),
+		Entry("All variants for path", "did:cheqd:testnet:123456789abcdefg/12/ab/AB/-/./_/~/!/$/&/'/(/)/*/+/,/;/=/:/@/%20/%ff"),
+		Entry("Empty path", "did:cheqd:testnet:123456789abcdefg/"),
+		Entry("All symbols for query", "did:cheqd:testnet:123456789abcdefg/path?abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~!$&'()*+,;=:@%20%ff?"),
+		Entry("All symbols for query and a lot of queries", "did:cheqd:testnet:123456789abcdefg/path?abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~!$&'()*+,;=:@%20%ff?query=2?query=3/query=%A4"),
+		Entry("All symbols for fragment", "did:cheqd:testnet:123456789abcdefg/path?query#abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~!$&'()*+,;=:@%20%ff"),
+		Entry("All symbols for fragment and query", "did:cheqd:testnet:123456789abcdefg/path?query#abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~!$&'()*+,;=:@%20%ff?"),
+		Entry("Just fragment", "did:cheqd:testnet:123456789abcdefg#fragment"),
+		Entry("Just query", "did:cheqd:testnet:123456789abcdefg?query"),
 	)
 
 	DescribeTable("Check the DID-URL Validation",
 
-	func(expected bool, did_url string) {
-		isValid := IsValidDIDUrl(did_url, "", []string{})
+		func(expected bool, did_url string) {
+			isValid := IsValidDIDUrl(did_url, "", []string{})
 
-		Expect(isValid).To(Equal(expected))
-	},
+			Expect(isValid).To(Equal(expected))
+		},
 		// Path: all the possible symbols
 		Entry("Valid: the whole alphabet for path", true, "did:cheqd:testnet:123456789abcdefg/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~!$&'()*+,;=:@%20%ff"),
 		Entry("Valid: several paths", true, "did:cheqd:testnet:123456789abcdefg/path/to/some/other/place/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~!$&'()*+,;=:@%20%ff/"),
@@ -142,8 +141,8 @@ var _ = Describe("DID-URL tests", func() {
 // 	}
 // }
 
-// func TestDidURLJoin(t *testing.T) Entry("", 
-// 	cases := []stringEntry("", 
+// func TestDidURLJoin(t *testing.T) Entry("",
+// 	cases := []stringEntry("",
 // 		"did:cheqd:testnet:123456789abcdefg/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~!$&'()*+,;=:@%20%ff",
 // 		"did:cheqd:testnet:123456789abcdefg/path/to/some/other/place/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~!$&'()*+,;=:@%20%ff/",
 // 		"did:cheqd:testnet:123456789abcdefg/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~!$&'()*+,;=:@%20%ff?query",
@@ -158,7 +157,7 @@ var _ = Describe("DID-URL tests", func() {
 // 		"did:cheqd:testnet:123456789abcdefg?query",
 // 	}
 
-// 	for _, tc := range cases Entry("", 
+// 	for _, tc := range cases Entry("",
 // 		t.Run("split/join"+tc, func(t *testing.T) {
 // 			did, path, query, fragment := MustSplitDIDUrl(tc)
 // 			require.Equal(t, tc, JoinDIDUrl(did, path, query, fragment))
