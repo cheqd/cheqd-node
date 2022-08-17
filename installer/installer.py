@@ -64,10 +64,10 @@ SEEDS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/networks/{
 ###############################################################
 DEFAULT_SNAPSHOT_SERVER = "https://snapshots.cheqd.net"
 DEFAULT_INIT_FROM_SNAPSHOT = "yes"
-TESTNET_SNAPSHOT = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/testnet/{}/cheqd-testnet-4_{}.tar.gz"
-MAINNET_SNAPSHOT = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/mainnet/{}/cheqd-mainnet-1_{}.tar.gz"
+TESTNET_SNAPSHOT = "https://snapshots-cdn.cheqd.net/testnet/{}/cheqd-testnet-4_{}.tar.gz"
+MAINNET_SNAPSHOT = "https://snapshots-cdn.cheqd.net/mainnet/{}/cheqd-mainnet-1_{}.tar.gz"
 MAX_SNAPSHOT_DAYS = 7
-CHECKSUM_URL_BASE = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/"
+CHECKSUM_URL_BASE = "https://snapshots-cdn.cheqd.net/"
 
 ###############################################################
 ###     	    Default node configuration      			###
@@ -965,7 +965,6 @@ class Interviewer:
 
         while not _is_url_valid and _days_counter <= MAX_SNAPSHOT_DAYS:
             _url = template.format(_date.strftime("%Y-%m-%d"), _date.strftime("%Y-%m-%d"))
-
             _is_url_valid = self.is_url_exists(_url)
             _days_counter += 1
             _date -= datetime.timedelta(days=1)
