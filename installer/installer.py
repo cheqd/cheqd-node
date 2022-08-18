@@ -62,12 +62,11 @@ SEEDS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/networks/{
 ###############################################################
 ###     				Node snapshots      				###
 ###############################################################
-DEFAULT_SNAPSHOT_SERVER = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com"
+DEFAULT_SNAPSHOT_SERVER = "https://snapshots-cdn.cheqd.net"
 DEFAULT_INIT_FROM_SNAPSHOT = "yes"
-TESTNET_SNAPSHOT = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/testnet/{}/cheqd-testnet-4_{}.tar.gz"
-MAINNET_SNAPSHOT = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/mainnet/{}/cheqd-mainnet-1_{}.tar.gz"
+TESTNET_SNAPSHOT = "https://snapshots-cdn.cheqd.net/testnet/{}/cheqd-testnet-4_{}.tar.gz"
+MAINNET_SNAPSHOT = "https://snapshots-cdn.cheqd.net/mainnet/{}/cheqd-mainnet-1_{}.tar.gz"
 MAX_SNAPSHOT_DAYS = 7
-CHECKSUM_URL_BASE = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/"
 
 ###############################################################
 ###     	    Default node configuration      			###
@@ -775,11 +774,11 @@ class Interviewer:
             os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
 
     @post_process
-    def exec(self, cmd, use_stdout=True, suppress_err=False):
+    def exec(self, cmd, use_stdout=True, suppress_err=False, check=True):
         self.log(f"Executing command: {cmd}")
         kwargs = {
             "shell": True,
-            "check": True,
+            "check": check,
         }
         if use_stdout:
             kwargs["stdout"] = subprocess.PIPE
@@ -974,11 +973,12 @@ class Interviewer:
         return _url
 
     def is_url_exists(self, url):
-        try:
-            request.urlopen(request.Request(url))
-        except urllib.error.HTTPError:
-            return False
-        return True
+        curr_verbose = self.verbose
+        self.verbose = False
+        if self.exec("curl --output /dev/null --silent --head --fail {url}".format(url=url), check=False).returncode == 0:
+            return True
+        self.verbose = curr_verbose
+        return False
 
 if __name__ == '__main__':
     
