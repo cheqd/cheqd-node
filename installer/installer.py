@@ -244,8 +244,8 @@ class Installer():
         fname = os.path.basename(binary_url)
         try:
             self.exec(f"wget -c {binary_url}")
-            if fname.find(".tar.gz") != -1:
-                self.exec(f"tar -xzf {fname}")
+            if fname.find(".tar.lz4") != -1:
+                self.exec(f"tar -I -xf {fname}")
                 self.remove_safe(fname)
             self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
         except:
