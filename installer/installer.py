@@ -64,8 +64,8 @@ SEEDS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/networks/{
 ###############################################################
 DEFAULT_SNAPSHOT_SERVER = "https://snapshots-cdn.cheqd.net"
 DEFAULT_INIT_FROM_SNAPSHOT = "yes"
-TESTNET_SNAPSHOT = "https://snapshots-cdn.cheqd.net/testnet/{}/cheqd-testnet-4_{}.tar.gz"
-MAINNET_SNAPSHOT = "https://snapshots-cdn.cheqd.net/mainnet/{}/cheqd-mainnet-1_{}.tar.gz"
+TESTNET_SNAPSHOT = "https://snapshots-cdn.cheqd.net/testnet/{}/cheqd-testnet-4_{}.tar.lz4"
+MAINNET_SNAPSHOT = "https://snapshots-cdn.cheqd.net/mainnet/{}/cheqd-mainnet-1_{}.tar.lz4"
 MAX_SNAPSHOT_DAYS = 7
 
 ###############################################################
@@ -540,7 +540,7 @@ class Installer():
             self.mkdir_p(self.cheqd_data_dir)
             self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_data_dir}")
             # Fetch size of snapshot archive. Uses curl to fetch headers and looks for Content-Length.
-            archive_size = self.exec(f"curl -s --head {self.interviewer.snapshot_url} | awk '/Length/ {{print $2}}'").stdout.strip()
+            archive_size = self.exec(f"curl -s --head {self.interviewer.snapshot_url} | awk '/content-length/ {{print $2}}'").stdout.strip()
             # Check how much free disk space is available wherever the cheqd root directory is mounted
             free_disk_space = self.exec(f"df -P -B1 {self.cheqd_root_dir} | tail -1 | awk '{{print $4}}'").stdout.strip()
             if int(archive_size) < int(free_disk_space):
@@ -567,7 +567,7 @@ class Installer():
             self.log(f"Extracting snapshot archive. This may take a while...")
 
             # Extract to cheqd node data directory EXCEPT for validator state
-            self.exec(f"sudo su -c 'pv {archive_path} | tar xzf - -C {self.cheqd_data_dir} --exclude priv_validator_state.json' {DEFAULT_CHEQD_USER}")
+            self.exec(f"sudo su -c 'pv {archive_path} | tar --use-compress-program=lz4 -xf - -C {self.cheqd_data_dir} --exclude priv_validator_state.json' {DEFAULT_CHEQD_USER}")
             
             # Delete snapshot archive file
             self.log(f"Snapshot extraction was successful. Deleting snapshot archive.")
