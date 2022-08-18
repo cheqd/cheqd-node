@@ -62,12 +62,12 @@ SEEDS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/networks/{
 ###############################################################
 ###     				Node snapshots      				###
 ###############################################################
-DEFAULT_SNAPSHOT_SERVER = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com"
+DEFAULT_SNAPSHOT_SERVER = "https://snapshots-cdn.cheqd.net"
 DEFAULT_INIT_FROM_SNAPSHOT = "yes"
-TESTNET_SNAPSHOT = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/testnet/{}/cheqd-testnet-4_{}.tar.gz"
-MAINNET_SNAPSHOT = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/mainnet/{}/cheqd-mainnet-1_{}.tar.gz"
+TESTNET_SNAPSHOT = "https://snapshots-cdn.cheqd.net/testnet/{}/cheqd-testnet-4_{}.tar.lz4"
+MAINNET_SNAPSHOT = "https://snapshots-cdn.cheqd.net/mainnet/{}/cheqd-mainnet-1_{}.tar.lz4"
 MAX_SNAPSHOT_DAYS = 7
-CHECKSUM_URL_BASE = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/"
+CHECKSUM_URL_BASE = "https://snapshots-cdn.cheqd.net/"
 
 ###############################################################
 ###     	    Default node configuration      			###
@@ -245,8 +245,8 @@ class Installer():
         fname = os.path.basename(binary_url)
         try:
             self.exec(f"wget -c {binary_url}")
-            if fname.find(".tar.gz") != -1:
-                self.exec(f"tar -xzf {fname}")
+            if fname.find(".tar.lz4") != -1:
+                self.exec(f"tar -I -xf {fname}")
                 self.remove_safe(fname)
             self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
         except:
