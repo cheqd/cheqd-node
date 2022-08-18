@@ -62,12 +62,12 @@ SEEDS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/networks/{
 ###############################################################
 ###     				Node snapshots      				###
 ###############################################################
-DEFAULT_SNAPSHOT_SERVER = "https://snapshots.cheqd.net"
+DEFAULT_SNAPSHOT_SERVER = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com"
 DEFAULT_INIT_FROM_SNAPSHOT = "yes"
-TESTNET_SNAPSHOT = "https://snapshots-cdn.cheqd.net/testnet/{}/cheqd-testnet-4_{}.tar.gz"
-MAINNET_SNAPSHOT = "https://snapshots-cdn.cheqd.net/mainnet/{}/cheqd-mainnet-1_{}.tar.gz"
+TESTNET_SNAPSHOT = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/testnet/{}/cheqd-testnet-4_{}.tar.gz"
+MAINNET_SNAPSHOT = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/mainnet/{}/cheqd-mainnet-1_{}.tar.gz"
 MAX_SNAPSHOT_DAYS = 7
-CHECKSUM_URL_BASE = "https://snapshots-cdn.cheqd.net/"
+CHECKSUM_URL_BASE = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/"
 
 ###############################################################
 ###     	    Default node configuration      			###
@@ -512,7 +512,7 @@ class Installer():
 
     def compare_checksum(self, file_path):
         # Set URL for correct checksum file for snapshot
-        checksum_url = os.path.join(CHECKSUM_URL_BASE, self.interviewer.chain, "latest/md5sum.txt")
+        checksum_url = os.path.join(os.path.dirname(self.interviewer.snapshot_url), "md5sum.txt")
         # Get checksum file
         published_checksum = self.exec(f"curl -s {checksum_url} | tail -1 | cut -d' ' -f 1").stdout.strip()
         self.log(f"Comparing published checksum with local checksum")
