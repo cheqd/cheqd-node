@@ -92,7 +92,8 @@ class Release:
 
     def get_release_url(self):
         try:
-            release_urls = [ a['browser_download_url'] for a in self.assets if (a['browser_download_url'].find("cheqd-node") > 0 and a['browser_download_url'].find(".deb")) == -1]
+            os_arch = platform.machine()
+            release_urls = [ a['browser_download_url'] for a in self.assets if (a['browser_download_url'].find(os_arch) == True) or (a['browser_download_url'].endsWith("cheqd-noded")) == True ]
             if len(release_urls) > 0:
                 return release_urls[0]
             else:
@@ -244,8 +245,8 @@ class Installer():
         fname = os.path.basename(binary_url)
         try:
             self.exec(f"wget -c {binary_url}")
-            if fname.find(".tar.lz4") != -1:
-                self.exec(f"tar -I -xf {fname}")
+            if fname.find(".tar.gz") != -1:
+                self.exec(f"tar -xzf {fname} -C . --strip-components=1")
                 self.remove_safe(fname)
             self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
         except:
