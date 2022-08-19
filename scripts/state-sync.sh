@@ -13,16 +13,16 @@ fi
 # set environment variables
 export GOPATH=~/go
 export PATH=$PATH:~/go/bin
-export RPC=https://rpc.cheqd.net:443
-export RPCN=https://rpc.cheqd.net:443
+export RPC=https://eu-rpc.cheqd.net:443
+export RPCN=https://ap-rpc.cheqd.net:443
 export APPNAME=CHEQD_NODED
 
 # Install Gaia
-go install -tags rocksdb ./...
+go install -tags goleveldb ./...
 
 # MAKE HOME FOLDER AND GET GENESIS
-cheqd-noded init "$NODE_MONIKER" --home /others/cheqd
-wget -O /others/cheqd/config/genesis.json https://github.com/cheqd/cheqd-node/raw/main/networks/mainnet/genesis.json
+cheqd-noded init "$NODE_MONIKER" --home /home/cheqd
+wget -O /home/cheqd/.cheqdnode/config/genesis.json https://github.com/cheqd/cheqd-node/raw/main/networks/mainnet/genesis.json
 wget -O seeds.txt https://github.com/cheqd/cheqd-node/raw/main/networks/mainnet/seeds.txt
 
 INTERVAL=1000
@@ -48,7 +48,7 @@ export ${APPNAME}_STATESYNC_TRUST_HASH="$TRUST_HASH"
 export ${APPNAME}_P2P_SEEDS="$(cat seeds.txt)"
 
 
-cheqd-noded start --x-crisis-skip-assert-invariants --home /others/cheqd --grpc-web.address 127.0.0.1:5050
+cheqd-noded start --x-crisis-skip-assert-invariants --home /home/cheqd/.cheqdnode --grpc-web.address 127.0.0.1:9091
 
 
 # THIS WILL FIX THE APP VERSION, contributed by callum and claimens
@@ -56,7 +56,7 @@ git clone https://github.com/tendermint/tendermint
 cd tendermint
 git checkout remotes/origin/callum/app-version
 go install ./...
-tendermint set-app-version 1 --home ~/others/cheqd
+tendermint set-app-version 1 --home ~/home/cheqd/.cheqdnode
 
 
-cheqd-noded start --x-crisis-skip-assert-invariants --home /others/cheqd --grpc-web.address 127.0.0.1:5050
+cheqd-noded start --x-crisis-skip-assert-invariants --home /home/cheqd/.cheqdnode --grpc-web.address 127.0.0.1:9091
