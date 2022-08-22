@@ -92,9 +92,13 @@ class Release:
 
     def get_release_url(self):
         try:
-            release_urls = [ a['browser_download_url'] for a in self.assets if (a['browser_download_url'].find("cheqd-node") > 0 and a['browser_download_url'].find(".deb")) == -1]
-            if len(release_urls) > 0:
-                return release_urls[0]
+            os_arch = platform.machine()
+            os_name = platform.system()
+            for _url_item in self.assets:
+                _url = _url_item["browser_download_url"]
+                if os.path.basename(_url) == f"cheqd-noded-{self.version}-{os_name}-{os_arch}.tar.gz" or \
+                    os.path.basename(_url) == "cheqd-noded":
+                    return _url          
             else:
                 failure_exit(f"No asset found to download for release: {self.version}")
         except:
@@ -244,8 +248,8 @@ class Installer():
         fname = os.path.basename(binary_url)
         try:
             self.exec(f"wget -c {binary_url}")
-            if fname.find(".tar.lz4") != -1:
-                self.exec(f"tar -I -xf {fname}")
+            if fname.find(".tar.gz") != -1:
+                self.exec(f"tar -xzf {fname} -C . --strip-components=1")
                 self.remove_safe(fname)
             self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
         except:
@@ -409,6 +413,7 @@ class Installer():
             self.log("Downloading snapshot and extracting archive. This can take a *really* long time...")
             self.download_snapshot()
             self.untar_from_snapshot()
+        self.print_success()
 
     def post_install(self):
         # Init the node with provided moniker
@@ -583,6 +588,9 @@ class Installer():
             self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_data_dir}")
         except:
             failure_exit(f"Failed to extract snapshot")
+
+    def print_success(self):
+        self.log("The cheqd-noded has been successfully installed")
         
 
 class Interviewer:
