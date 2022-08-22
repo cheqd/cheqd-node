@@ -2,6 +2,11 @@
     "branches": [
         "main",
         {
+            "name": "release/0.6.x",
+            "range": "0.6.x",
+            "channel": "0.6.x"
+        },
+        {
             "name": "develop",
             "channel": "beta",
             "prerelease": true
