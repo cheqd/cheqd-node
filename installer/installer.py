@@ -62,11 +62,11 @@ SEEDS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/networks/{
 ###############################################################
 ###     				Node snapshots      				###
 ###############################################################
-DEFAULT_SNAPSHOT_SERVER = "https://snapshots.cheqd.net"
+DEFAULT_SNAPSHOT_SERVER = "https://snapshots-cdn.cheqd.net"
 DEFAULT_INIT_FROM_SNAPSHOT = "yes"
-TESTNET_SNAPSHOT = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/testnet/latest/cheqd-testnet-4_{}.tar.gz"
-MAINNET_SNAPSHOT = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/mainnet/latest/cheqd-mainnet-1_{}.tar.gz"
-CHECKSUM_URL_BASE = "https://cheqd-node-backups.ams3.cdn.digitaloceanspaces.com/"
+TESTNET_SNAPSHOT = "https://snapshots-cdn.cheqd.net/testnet/{}/cheqd-testnet-4_{}.tar.lz4"
+MAINNET_SNAPSHOT = "https://snapshots-cdn.cheqd.net/mainnet/{}/cheqd-mainnet-1_{}.tar.lz4"
+MAX_SNAPSHOT_DAYS = 7
 
 ###############################################################
 ###     	    Default node configuration      			###
@@ -92,9 +92,13 @@ class Release:
 
     def get_release_url(self):
         try:
-            release_urls = [ a['browser_download_url'] for a in self.assets if (a['browser_download_url'].find("cheqd-node") > 0 and a['browser_download_url'].find(".deb")) == -1]
-            if len(release_urls) > 0:
-                return release_urls[0]
+            os_arch = platform.machine()
+            os_name = platform.system()
+            for _url_item in self.assets:
+                _url = _url_item["browser_download_url"]
+                if os.path.basename(_url) == f"cheqd-noded-{self.version}-{os_name}-{os_arch}.tar.gz" or \
+                    os.path.basename(_url) == "cheqd-noded":
+                    return _url          
             else:
                 failure_exit(f"No asset found to download for release: {self.version}")
         except:
@@ -245,7 +249,7 @@ class Installer():
         try:
             self.exec(f"wget -c {binary_url}")
             if fname.find(".tar.gz") != -1:
-                self.exec(f"tar -xzf {fname}")
+                self.exec(f"tar -xzf {fname} -C . --strip-components=1")
                 self.remove_safe(fname)
             self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
         except:
@@ -409,6 +413,7 @@ class Installer():
             self.log("Downloading snapshot and extracting archive. This can take a *really* long time...")
             self.download_snapshot()
             self.untar_from_snapshot()
+        self.print_success()
 
     def post_install(self):
         # Init the node with provided moniker
@@ -511,7 +516,7 @@ class Installer():
 
     def compare_checksum(self, file_path):
         # Set URL for correct checksum file for snapshot
-        checksum_url = os.path.join(CHECKSUM_URL_BASE, self.interviewer.chain, "latest/md5sum.txt")
+        checksum_url = os.path.join(os.path.dirname(self.interviewer.snapshot_url), "md5sum.txt")
         # Get checksum file
         published_checksum = self.exec(f"curl -s {checksum_url} | tail -1 | cut -d' ' -f 1").stdout.strip()
         self.log(f"Comparing published checksum with local checksum")
@@ -540,7 +545,7 @@ class Installer():
             self.mkdir_p(self.cheqd_data_dir)
             self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_data_dir}")
             # Fetch size of snapshot archive. Uses curl to fetch headers and looks for Content-Length.
-            archive_size = self.exec(f"curl -s --head {self.interviewer.snapshot_url} | awk '/Length/ {{print $2}}'").stdout.strip()
+            archive_size = self.exec(f"curl -s --head {self.interviewer.snapshot_url} | awk '/content-length/ {{print $2}}'").stdout.strip()
             # Check how much free disk space is available wherever the cheqd root directory is mounted
             free_disk_space = self.exec(f"df -P -B1 {self.cheqd_root_dir} | tail -1 | awk '{{print $4}}'").stdout.strip()
             if int(archive_size) < int(free_disk_space):
@@ -567,7 +572,7 @@ class Installer():
             self.log(f"Extracting snapshot archive. This may take a while...")
 
             # Extract to cheqd node data directory EXCEPT for validator state
-            self.exec(f"sudo su -c 'pv {archive_path} | tar xzf - -C {self.cheqd_data_dir} --exclude priv_validator_state.json' {DEFAULT_CHEQD_USER}")
+            self.exec(f"sudo su -c 'pv {archive_path} | tar --use-compress-program=lz4 -xf - -C {self.cheqd_root_dir} --exclude priv_validator_state.json' {DEFAULT_CHEQD_USER}")
             
             # Delete snapshot archive file
             self.log(f"Snapshot extraction was successful. Deleting snapshot archive.")
@@ -583,6 +588,9 @@ class Installer():
             self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_data_dir}")
         except:
             failure_exit(f"Failed to extract snapshot")
+
+    def print_success(self):
+        self.log("The cheqd-noded has been successfully installed")
         
 
 class Interviewer:
@@ -596,7 +604,7 @@ class Interviewer:
         self._release = None
         self._chain = chain
         self.verbose = True
-        self._snapshot_url = self.prepare_url_for_latest()
+        self._snapshot_url = ""
         self._is_setup_needed = False
         self._moniker = ""
         self._external_address = ""
@@ -774,11 +782,11 @@ class Interviewer:
             os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
 
     @post_process
-    def exec(self, cmd, use_stdout=True, suppress_err=False):
+    def exec(self, cmd, use_stdout=True, suppress_err=False, check=True):
         self.log(f"Executing command: {cmd}")
         kwargs = {
             "shell": True,
-            "check": True,
+            "check": check,
         }
         if use_stdout:
             kwargs["stdout"] = subprocess.PIPE
@@ -959,18 +967,26 @@ class Interviewer:
     def prepare_url_for_latest(self) -> str:
         template = TESTNET_SNAPSHOT if self.chain == "testnet" else MAINNET_SNAPSHOT
         _date = datetime.date.today()
-        _url = template.format(_date.strftime("%Y-%m-%d"))
-        while not self.is_url_exists(_url):
+        _days_counter = 0
+        _is_url_valid = False
+
+        while not _is_url_valid and _days_counter <= MAX_SNAPSHOT_DAYS:
+            _url = template.format(_date.strftime("%Y-%m-%d"), _date.strftime("%Y-%m-%d"))
+            _is_url_valid = self.is_url_exists(_url)
+            _days_counter += 1
             _date -= datetime.timedelta(days=1)
-            _url = template.format(_date.strftime("%Y-%m-%d"))
+
+        if not _is_url_valid:
+            failure_exit("Could not find the valid snapshot for the last {} days".format(MAX_SNAPSHOT_DAYS))
         return _url
 
     def is_url_exists(self, url):
-        try:
-            request.urlopen(request.Request(url))
-        except urllib.error.HTTPError:
-            return False
-        return True
+        curr_verbose = self.verbose
+        self.verbose = False
+        if self.exec("curl --output /dev/null --silent --head --fail {url}".format(url=url), check=False).returncode == 0:
+            return True
+        self.verbose = curr_verbose
+        return False
 
 if __name__ == '__main__':
     
