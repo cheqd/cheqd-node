@@ -1,11 +1,10 @@
-package utils
+package utils_test
 
 import (
 	"encoding/json"
-	"testing"
-
-	"github.com/multiformats/go-multibase"
-	"github.com/stretchr/testify/require"
+	. "github.com/cheqd/cheqd-node/x/cheqd/utils"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 type TestJWKKey struct {
@@ -40,76 +39,53 @@ var (
 	NotValidJWKByte, _ = json.Marshal(NotValidJWKKey)
 )
 
-func TestValidateMultibase(t *testing.T) {
-	cases := []struct {
-		name     string
-		data     string
-		encoding multibase.Encoding
-		valid    bool
-	}{
-		{"Valid: General pmbkey", "zABCDEFG123456789", multibase.Base58BTC, true},
-		{"Not Valid: cannot be empty", "", multibase.Base58BTC, false},
-		{"Not Valid: without z but base58", "ABCDEFG123456789", multibase.Base58BTC, false},
-		{"Not Valid: without z and not base58", "OIl0ABCDEFG123456789", multibase.Base58BTC, false},
-		{"Not Valid: with z but not base58", "zOIl0ABCDEFG123456789", multibase.Base58BTC, false},
-	}
+var _ = Describe("Encoding checks", func() {
+	DescribeTable("Is valid multibase key",
 
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			err := ValidateMultibase(tc.data)
-
-			if tc.valid {
-				require.NoError(t, err)
+		func(data string, isValid bool) {
+			_err := ValidateMultibase(data)
+			if isValid {
+				Ω(_err).ShouldNot(HaveOccurred())
 			} else {
-				require.Error(t, err)
+				Ω(_err).Should(HaveOccurred())
 			}
-		})
-	}
-}
+		},
 
-func TestValidateBase58(t *testing.T) {
-	cases := []struct {
-		name  string
-		data  string
-		valid bool
-	}{
-		{"Valid: General pmbkey", "ABCDEFG123456789", true},
-		{"Not Valid: cannot be empty", "", false},
-		{"Not Valid: not base58", "OIl0ABCDEFG123456789", false},
-	}
+		Entry("Valid: General pmbkey", "zABCDEFG123456789",  true),
+		Entry("Not Valid: cannot be empty", "", false),
+		Entry("Not Valid: without z but base58", "ABCDEFG123456789", false),
+		Entry("Not Valid: without z and not base58", "OIl0ABCDEFG123456789", false),
+		Entry("Not Valid: with z but not base58", "zOIl0ABCDEFG123456789", false),
+	)
 
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			err := ValidateBase58(tc.data)
+	DescribeTable("Validate Base58",
 
-			if tc.valid {
-				require.NoError(t, err)
+		func(data string, isValid bool) {
+			_err := ValidateBase58(data)
+			if isValid {
+				Ω(_err).ShouldNot(HaveOccurred())
 			} else {
-				require.Error(t, err)
-			}
-		})
-	}
-}
+				Ω(_err).Should(HaveOccurred())
+			}			
+		},
 
-func TestValidateJWK(t *testing.T) {
-	cases := []struct {
-		name  string
-		data  string
-		valid bool
-	}{
-		{"Valid: General jwk", string(ValidJWKByte), true},
-		{"Not Valid: Bad jwk", string(NotValidJWKByte), false},
-	}
+		Entry("Valid: General pmbkey", "ABCDEFG123456789", true),
+		Entry("Not Valid: cannot be empty", "", false),
+		Entry("Not Valid: not base58", "OIl0ABCDEFG123456789", false),
+	)
 
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			err := ValidateJWK(tc.data)
+	DescribeTable("Validate JWK",
 
-			if tc.valid {
-				require.NoError(t, err)
-			} else {
-				require.Error(t, err)
-			}
-		})
-	}
-}
+	func(data string, isValid bool) {
+		_err := ValidateJWK(data)
+		if isValid {
+			Ω(_err).ShouldNot(HaveOccurred())
+		} else {
+			Ω(_err).Should(HaveOccurred())
+		}
+	},
+
+	Entry("Valid: General jwk", string(ValidJWKByte), true),
+	Entry("Not Valid: Bad jwk", string(NotValidJWKByte), false),
+)
+})
