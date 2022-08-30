@@ -8,18 +8,17 @@ import (
 
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cheqd/cheqd-node/x/cheqd"
+	"github.com/cheqd/cheqd-node/x/cheqd/keeper"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
-	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
-	"github.com/multiformats/go-multibase"
-
 	"github.com/cosmos/cosmos-sdk/codec"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/store"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/multiformats/go-multibase"
 	"github.com/tendermint/tendermint/libs/log"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
-
-	"github.com/cheqd/cheqd-node/x/cheqd/keeper"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const Ed25519VerificationKey2020 = "Ed25519VerificationKey2020"
@@ -52,7 +51,7 @@ func Setup() TestSetup {
 
 	dbStore := store.NewCommitMultiStore(db)
 	storeKey := sdk.NewKVStoreKey(types.StoreKey)
-	dbStore.MountStoreWithDB(storeKey, sdk.StoreTypeIAVL, nil)
+	dbStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, nil)
 
 	_ = dbStore.LoadLatestVersion()
 

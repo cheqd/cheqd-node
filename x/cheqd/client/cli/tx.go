@@ -131,7 +131,7 @@ func AccAddrByKeyRef(keyring keyring.Keyring, keyRef string) (sdk.AccAddress, er
 	info, err := keyring.Key(keyRef)
 
 	if err == nil {
-		return info.GetAddress(), nil
+		return info.GetAddress()
 	}
 
 	if !sdkerrors.IsOf(err, sdkerrors.ErrIO, sdkerrors.ErrKeyNotFound) {

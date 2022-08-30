@@ -9,22 +9,20 @@ import (
 
 	"github.com/cheqd/cheqd-node/x/cheqd"
 	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
-
 	cheqdtests "github.com/cheqd/cheqd-node/x/cheqd/tests"
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cheqd/cheqd-node/x/resource"
+	"github.com/cheqd/cheqd-node/x/resource/keeper"
 	"github.com/cheqd/cheqd-node/x/resource/types"
-	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
-	"github.com/stretchr/testify/require"
-
 	"github.com/cosmos/cosmos-sdk/codec"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/store"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/libs/log"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
-
-	"github.com/cheqd/cheqd-node/x/resource/keeper"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type TestSetup struct {
@@ -50,8 +48,8 @@ func Setup() TestSetup {
 	cheqdStoreKey := sdk.NewKVStoreKey(cheqdtypes.StoreKey)
 	resourceStoreKey := sdk.NewKVStoreKey(types.StoreKey)
 
-	dbStore.MountStoreWithDB(cheqdStoreKey, sdk.StoreTypeIAVL, nil)
-	dbStore.MountStoreWithDB(resourceStoreKey, sdk.StoreTypeIAVL, nil)
+	dbStore.MountStoreWithDB(cheqdStoreKey, storetypes.StoreTypeIAVL, nil)
+	dbStore.MountStoreWithDB(resourceStoreKey, storetypes.StoreTypeIAVL, nil)
 
 	_ = dbStore.LoadLatestVersion()
 
