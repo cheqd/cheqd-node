@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/smartystreets/goconvey/convey"
-	"github.com/stretchr/testify/assert"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 )
@@ -15,7 +14,6 @@ func TestIsValidDIDSpec(t *testing.T) {
 
 	type args struct {
 		did               string
-		method            string
 		allowedNamespaces []string
 	}
 
@@ -28,7 +26,6 @@ func TestIsValidDIDSpec(t *testing.T) {
 			name: "indy-style did (32)",
 			args: args{
 				did:               "did:cheqd:mainnet:zF7rhDBfUt9d1gJPjx7s1JXfUY7oVWkY",
-				method:            "cheqd",
 				allowedNamespaces: []string{"mainnet"},
 			},
 			expected: true,
@@ -37,7 +34,6 @@ func TestIsValidDIDSpec(t *testing.T) {
 			name: "indy-style did (16)",
 			args: args{
 				did:               "did:cheqd:testnet:DAzMQo4MDMxCjgwM",
-				method:            "cheqd",
 				allowedNamespaces: []string{"testnet"},
 			},
 			expected: true,
@@ -46,7 +42,6 @@ func TestIsValidDIDSpec(t *testing.T) {
 			name: "indy-style did (no namespace)",
 			args: args{
 				did:               "did:cheqd:6cgbu8ZPoWTnR5Rv",
-				method:            "cheqd",
 				allowedNamespaces: []string{},
 			},
 			expected: true,
@@ -55,7 +50,6 @@ func TestIsValidDIDSpec(t *testing.T) {
 			name: "uuid-style did",
 			args: args{
 				did:               "did:cheqd:mainnet:de9786cd-ec53-458c-857c-9342cf264f80",
-				method:            "cheqd",
 				allowedNamespaces: []string{"mainnet"},
 			},
 			expected: true,
@@ -64,7 +58,6 @@ func TestIsValidDIDSpec(t *testing.T) {
 			name: "uuid-style did (no namespace)",
 			args: args{
 				did:               "did:cheqd:de9786cd-ec53-458c-857c-9342cf264f80",
-				method:            "cheqd",
 				allowedNamespaces: []string{},
 			},
 			expected: true,
@@ -73,7 +66,6 @@ func TestIsValidDIDSpec(t *testing.T) {
 			name: "did with key",
 			args: args{
 				did:               "did:cheqd:testnet:DAzMQo4MDMxCjgwM",
-				method:            "cheqd",
 				allowedNamespaces: []string{},
 			},
 			expected: true,
@@ -82,7 +74,6 @@ func TestIsValidDIDSpec(t *testing.T) {
 			name: "did with namespace not allowed",
 			args: args{
 				did:               "did:cheqd:testnet:DAzMQo4MDMxCjgwM",
-				method:            "cheqd",
 				allowedNamespaces: []string{"mainnet"},
 			},
 			expected: false,
@@ -91,7 +82,6 @@ func TestIsValidDIDSpec(t *testing.T) {
 			name: "did with invalid method",
 			args: args{
 				did:               "did:notcheqd:testnet:DAzMQo4MDMxCjgwM",
-				method:            "cheqd",
 				allowedNamespaces: []string{"testnet"},
 			},
 			expected: false,
@@ -100,7 +90,7 @@ func TestIsValidDIDSpec(t *testing.T) {
 
 	for _, tt := range tests {
 		convey.Convey(fmt.Sprintf("Given %s: %s", tt.name, tt.args.did), t, func() {
-			isValid := utils.IsValidDID(tt.args.did, tt.args.method, tt.args.allowedNamespaces)
+			isValid := utils.IsValidDID(tt.args.did, "cheqd", tt.args.allowedNamespaces)
 
 			var not string
 			if !isValid {
@@ -115,7 +105,5 @@ func TestIsValidDIDSpec(t *testing.T) {
 				}
 			})
 		})
-
-		assert.Equal(t, tt.expected, utils.IsValidDID(tt.args.did, tt.args.method, tt.args.allowedNamespaces))
 	}
 }
