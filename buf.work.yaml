@@ -1,0 +1,6 @@
+# Buf Workspace file for cheqd-node
+
+version: v1
+
+directories:
+  - proto

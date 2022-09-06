@@ -1,146 +1,78 @@
 name: "Build"
 on:
   workflow_call:
-    outputs:
-      VERSION:
-        description: "Build version number"
-        value: ${{ jobs.build-binary.outputs.VERSION }}
 defaults:
   run:
     shell: bash
 
 
 jobs:
-  go-unit-tests:
-    name: "Golang unit tests"
-    runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
-        with:
-          go-version: '1.17'
-      
-      - name: Run Golang unit tests
-        run: go test -v ./...
 
   build-binary:
     name: "Node binary"
     runs-on: ubuntu-latest
-    outputs:
-      VERSION: ${{ steps.set-version.outputs.VERSION }}
 
     steps:
-      - uses: actions/setup-go@v3
-        with:
-          go-version: '1.17'
-      
-      - name: Fetch Golang protoc compiler plugins
-        env:
-          GOLANG_PROTOBUF_VERSION: 1.3.5
-          GOGO_PROTOBUF_VERSION: 1.3.2
-          GRPC_GATEWAY_VERSION: 1.14.7
-        # Taken from: tendermintdev/sdk-proto-gen:v0.2
-        run: |
-          go get \
-            github.com/golang/protobuf/protoc-gen-go@v"$GOLANG_PROTOBUF_VERSION" \
-            github.com/gogo/protobuf/protoc-gen-gogo@v"$GOGO_PROTOBUF_VERSION" \
-            github.com/gogo/protobuf/protoc-gen-gogofast@v"$GOGO_PROTOBUF_VERSION" \
-            github.com/gogo/protobuf/protoc-gen-gogofaster@v"$GOGO_PROTOBUF_VERSION" \
-            github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@v"$GRPC_GATEWAY_VERSION" \
-            github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@v"$GRPC_GATEWAY_VERSION" \
-            github.com/regen-network/cosmos-proto/protoc-gen-gocosmos@latest
-      - name: Install buf
-        env:
-          PREFIX: "/usr/local"
-          VERSION: "1.0.0-rc8"
-        run: |
-          curl -sSL "https://github.com/bufbuild/buf/releases/download/v${VERSION}/buf-$(uname -s)-$(uname -m).tar.gz" | \
-          sudo tar -xvzf - -C "${PREFIX}" --strip-components 1
-      
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # Required to fetch version
+      
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: ./go.mod
+          cache: true
 
-      - name: Build node binary
-        run: |
-          make proto-gen build
-        
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v3
+        with:
+          distribution: goreleaser
+          version: latest
+          args: build --rm-dist --snapshot --id ubuntu-latest-amd64
+
       - name: Store artifact
         uses: actions/upload-artifact@v3
         with:
           name: cheqd-noded
-          path: build-tools/cheqd-noded
+          path: dist/**/cheqd-noded
 
-      - name: Set version number
-        id: set-version
-        run: |
-          VERSION=$(build-tools/cheqd-noded version 2>&1)
-          echo ::set-output name=VERSION::"$VERSION"
+      - name: Run Golang unit tests
+        run: go test -v ./...
 
-      - name: Install fpm
-        run: |
-          sudo apt-get install ruby ruby-dev rubygems build-essential
-          sudo gem install --no-document fpm
-      
-      - name: Build Debian package
-        working-directory: build-tools
-        run: |
-          ./build-deb.sh "./cheqd-noded"
-
-      - name: Build Tar archive
-        working-directory: build-tools
-        run: |
-          ./build-tar.sh "./cheqd-noded"
-      
-      - name: Store Debian package artifact
-        uses: actions/upload-artifact@v3
-        env:
-          VERSION: ${{ steps.set-version.outputs.VERSION }}
-        with:
-          name: cheqd-node_${{ env.VERSION }}_amd64.deb
-          path: build-tools/output/cheqd-node_${{ env.VERSION }}_amd64.deb
-
-      - name: Store Tar archive artifact
-        uses: actions/upload-artifact@v3
-        env:
-          VERSION: ${{ steps.set-version.outputs.VERSION }}
-        with:
-          name: cheqd-node_${{ env.VERSION }}.tar.gz
-          path: build-tools/output/cheqd-node_${{ env.VERSION }}.tar.gz
-
-  build-docker-images:
-    name: "Docker images"
+  build-docker:
+    name: "Docker image"
     runs-on: ubuntu-latest
     env:
-      REGISTRY: ghcr.io
+      DOCKER_TEST_IMAGE: ${{ github.repository }}:${{ github.sha }}
 
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # Required to fetch version
-      
-      - name: Build cheqd-cli Docker image 'cheqd-noded' as entrypoint
-        # TODO: Get rid of UID and GID
-        run: docker build --target base -t cheqd-cli -f docker/Dockerfile --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" .
+          fetch-depth: 0
 
-      - name: Build cheqd-node Docker image with 'node-start' as entrypoint
-        run: docker build --target node -t cheqd-node -f docker/Dockerfile --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" .
-
-      - name: Save cheqd-cli Docker image
-        run: docker save -o cheqd-cli-image.tar cheqd-cli
-
-      - name: Store cheqd-cli artifact
-        uses: actions/upload-artifact@v3
+      - uses: actions/setup-go@v3
         with:
-          name: cheqd-cli-image.tar
-          path: cheqd-cli-image.tar
+          go-version-file: ./go.mod
 
-      - name: Save cheqd-node Docker image
-        run: docker save -o cheqd-node-image.tar cheqd-node
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        id: buildx
+        with:
+          install: true
+          version: latest
 
-      - name: Store cheqd-node artifact
+      - name: Build image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: docker/Dockerfile
+          platforms: linux/amd64
+          load: true
+          target: runner
+          tags: ${{ env.DOCKER_TEST_IMAGE }}
+          outputs: type=docker,dest=/tmp/cheqd-node-image.tar
+
+      - name: Upload Docker test image
         uses: actions/upload-artifact@v3
         with:
           name: cheqd-node-image.tar
-          path: cheqd-node-image.tar
+          path: /tmp/cheqd-node-image.tar

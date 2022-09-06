@@ -31,39 +31,14 @@ jobs:
       
       - uses: actions/setup-go@v3
         with:
-          go-version: '1.17'
-
-      - name: Fetch Golang protoc compiler plugins
-        env:
-          GOLANG_PROTOBUF_VERSION: 1.3.5
-          GOGO_PROTOBUF_VERSION: 1.3.2
-          GRPC_GATEWAY_VERSION: 1.14.7
-        # Taken from: tendermintdev/sdk-proto-gen:v0.2
-        run: |
-          go get \
-            github.com/golang/protobuf/protoc-gen-go@v"$GOLANG_PROTOBUF_VERSION" \
-            github.com/gogo/protobuf/protoc-gen-gogo@v"$GOGO_PROTOBUF_VERSION" \
-            github.com/gogo/protobuf/protoc-gen-gogofast@v"$GOGO_PROTOBUF_VERSION" \
-            github.com/gogo/protobuf/protoc-gen-gogofaster@v"$GOGO_PROTOBUF_VERSION" \
-            github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@v"$GRPC_GATEWAY_VERSION" \
-            github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@v"$GRPC_GATEWAY_VERSION" \
-            github.com/regen-network/cosmos-proto/protoc-gen-gocosmos@latest      
-      
-      - name: Install buf
-        env:
-          PREFIX: "/usr/local"
-          VERSION: "1.0.0-rc8"
-        run: |
-          curl -sSL "https://github.com/bufbuild/buf/releases/download/v${VERSION}/buf-$(uname -s)-$(uname -m).tar.gz" | \
-          sudo tar -xvzf - -C "${PREFIX}" --strip-components 1
+          go-version: 1.17
 
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # Required to fetch version
       
       - name: Build
-        run: |
-          make proto-gen build
+        run: make proto-gen build
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2

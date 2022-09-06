@@ -1,8 +1,8 @@
-version: '3.7'
+version: '3.8'
 
 # CAUTION: Please ensure you edit necessary values in container.env and docker-compose.env before using this Docker Compose file.
 
-# SYNTAX: docker-compose -f docker/persistent-chains/docker-compose.yml --env-file docker/persistent-chains/docker-compose.env up --no-build
+# SYNTAX: docker compose -f docker/persistent-chains/docker-compose.yml --env-file docker/persistent-chains/docker-compose.env up --detach --no-build
 
 services:
   cheqd_node:
@@ -10,16 +10,15 @@ services:
     # Default is to pull in the pre-published image on GitHub Container Registry
     # SYNTAX: docker-compose -f docker/persistent-chains/docker-compose.yml --env-file docker/persistent-chains/docker-compose.env build --no-cache
     # build:
-    #  context: ../..
-    #  dockerfile: docker/Dockerfile
-    #  target: node
-    #  args:
-    #    CHEQD_HOME_DIR: ${CHEQD_HOME_DIR}
-    #    UID: ${UID}
-    #    GID: ${GID}
-    # CAUTION: Change CHEQD_NODE_VERSION to local in docker-compose.env if building your own image in section below
-    # image: cheqd-node-custom-build:${CHEQD_NODE_VERSION}
-    image: ghcr.io/cheqd/cheqd-node:${CHEQD_NODE_VERSION}
+    #   context: .
+    #   dockerfile: docker/Dockerfile
+    #   target: runner
+    #   args:
+    #     HOME_DIR: ${CHEQD_HOME_DIR}
+    #     USER: cheqd
+    # CAUTION: Change DOCKER_IMAGE_VERSION to local in docker-compose.env if building your own image in section below
+    # image: cheqd-node-custom-build:${DOCKER_IMAGE_VERSION}
+    image: ghcr.io/cheqd/cheqd-node:${DOCKER_IMAGE_VERSION}
     user: cheqd
     configs:
       - source: genesis
@@ -67,11 +66,23 @@ services:
     # Defines cheqd-noded configuration variables INSIDE the container 
     env_file:
       - container.env
+    entrypoint: [ "node-start" ]
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:26657/status"]
+      interval: 5m
+      timeout: 10s
+      retries: 3
+      start_period: 1m
+    restart: unless-stopped
     volumes:
       - type: volume
         source: ${CHEQD_DOCKER_VOLUME_SOURCE} # Defaults to cheqd_volume, defined below
-        target: /home/cheqd # Do NOT change mount point inside the container unless rebuilding the image
-    entrypoint: [ "node-start" ]
+        target: ${CHEQD_HOME_DIR} # Do NOT change mount point inside the container unless rebuilding the image
 
 configs:
   genesis:
