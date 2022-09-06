@@ -1,10 +1,12 @@
-package utils
+package utils_test
 
 import (
 	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 )
 
 func TestIndexOf(t *testing.T) {
@@ -25,7 +27,7 @@ func TestIndexOf(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		actual := IndexOf(tc.array, tc.searchElement, tc.fromIndex)
+		actual := utils.IndexOf(tc.array, tc.searchElement, tc.fromIndex)
 		require.Equal(t, tc.expectedResult, actual)
 	}
 }
@@ -45,7 +47,7 @@ func TestContains(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		actual := Contains(tc.array, tc.searchElement)
+		actual := utils.Contains(tc.array, tc.searchElement)
 		require.Equal(t, tc.expectedResult, actual)
 	}
 }
@@ -68,7 +70,7 @@ func TestSubtract(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		actual := Subtract(tc.first, tc.second)
+		actual := utils.Subtract(tc.first, tc.second)
 		// We can't compare arrays directly cause result of `subtract` is not deterministic
 		sort.Strings(actual)
 		require.Equal(t, tc.expected, actual)
@@ -88,7 +90,7 @@ func TestUnique(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		actual := Unique(tc.array)
+		actual := utils.Unique(tc.array)
 		// We can't compare arrays directly cause result of `unique` is not deterministic
 		sort.Strings(actual)
 		require.Equal(t, tc.expected, actual)
@@ -97,7 +99,7 @@ func TestUnique(t *testing.T) {
 
 func TestReplaceInList(t *testing.T) {
 	list := []string{"1", "2", "3", "2"}
-	ReplaceInSlice(list, "2", "3")
+	utils.ReplaceInSlice(list, "2", "3")
 
 	require.Equal(t, []string{"1", "3", "3", "3"}, list)
 }
@@ -115,7 +117,7 @@ func TestUniqueSorted(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			res := UniqueSorted(tc.input)
+			res := utils.UniqueSorted(tc.input)
 			require.Equal(t, res, tc.output)
 		})
 	}

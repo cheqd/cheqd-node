@@ -1,9 +1,11 @@
-package utils
+package utils_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 )
 
 func TestValidateURI(t *testing.T) {
@@ -20,7 +22,7 @@ func TestValidateURI(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			err_ := ValidateURI(tc.URI)
+			err_ := utils.ValidateURI(tc.URI)
 
 			if tc.valid {
 				require.NoError(t, err_)

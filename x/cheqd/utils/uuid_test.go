@@ -1,9 +1,11 @@
-package utils
+package utils_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 )
 
 func TestValidateUUID(t *testing.T) {
@@ -21,7 +23,7 @@ func TestValidateUUID(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.uuid, func(t *testing.T) {
-			err_ := ValidateUUID(tc.uuid)
+			err_ := utils.ValidateUUID(tc.uuid)
 
 			if tc.valid {
 				require.NoError(t, err_)

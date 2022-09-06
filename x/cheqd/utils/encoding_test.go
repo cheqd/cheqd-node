@@ -1,4 +1,4 @@
-package utils
+package utils_test
 
 import (
 	"encoding/json"
@@ -6,6 +6,8 @@ import (
 
 	"github.com/multiformats/go-multibase"
 	"github.com/stretchr/testify/require"
+
+	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 )
 
 type TestJWKKey struct {
@@ -56,7 +58,7 @@ func TestValidateMultibase(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			err := ValidateMultibase(tc.data)
+			err := utils.ValidateMultibase(tc.data)
 
 			if tc.valid {
 				require.NoError(t, err)
@@ -80,7 +82,7 @@ func TestValidateBase58(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			err := ValidateBase58(tc.data)
+			err := utils.ValidateBase58(tc.data)
 
 			if tc.valid {
 				require.NoError(t, err)
@@ -103,7 +105,7 @@ func TestValidateJWK(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			err := ValidateJWK(tc.data)
+			err := utils.ValidateJWK(tc.data)
 
 			if tc.valid {
 				require.NoError(t, err)

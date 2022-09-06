@@ -1,9 +1,11 @@
-package utils
+package utils_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 )
 
 func TestIsDidURL(t *testing.T) {
@@ -57,7 +59,7 @@ func TestIsDidURL(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			isDid := IsValidDIDUrl(tc.didUrl, "", []string{})
+			isDid := utils.IsValidDIDUrl(tc.didUrl, "", []string{})
 
 			if tc.valid {
 				require.True(t, isDid)
@@ -86,8 +88,8 @@ func TestDidURLJoin(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run("split/join"+tc, func(t *testing.T) {
-			did, path, query, fragment := MustSplitDIDUrl(tc)
-			require.Equal(t, tc, JoinDIDUrl(did, path, query, fragment))
+			did, path, query, fragment := utils.MustSplitDIDUrl(tc)
+			require.Equal(t, tc, utils.JoinDIDUrl(did, path, query, fragment))
 		})
 	}
 }

@@ -1,9 +1,11 @@
-package utils
+package utils_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 )
 
 func TestIsId(t *testing.T) {
@@ -21,7 +23,7 @@ func TestIsId(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.id, func(t *testing.T) {
-			isDid := IsValidID(tc.id)
+			isDid := utils.IsValidID(tc.id)
 
 			if tc.valid {
 				require.True(t, isDid)
@@ -79,7 +81,7 @@ func TestIsDid(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			isDid := IsValidDID(tc.did, tc.method, tc.allowedNS)
+			isDid := utils.IsValidDID(tc.did, tc.method, tc.allowedNS)
 
 			if tc.valid {
 				require.True(t, isDid)
@@ -88,36 +90,4 @@ func TestIsDid(t *testing.T) {
 			}
 		})
 	}
-}
-
-func TestSplitJoin(t *testing.T) {
-	cases := []string{
-		"did:cheqd:testnet:123456789abcdefg",
-		"did:cheqd:testnet:123456789abcdefg",
-		"did:cheqd:testnet:123456789abcdefg",
-		"did:cheqd:testnet:123456789abcdefg",
-		"did:cheqd:123456789abcdefg",
-		"did:NOTcheqd:123456789abcdefg",
-		"did:NOTcheqd:123456789abcdefg123456789abcdefg",
-		"did:cheqd:testnet:123456789abcdefg",
-	}
-
-	for _, tc := range cases {
-		// Test split/join
-		t.Run("split/join "+tc, func(t *testing.T) {
-			method, namespace, id := MustSplitDID(tc)
-			require.Equal(t, tc, JoinDID(method, namespace, id))
-		})
-	}
-}
-
-func TestMustSplitDID(t *testing.T) {
-	require.Panicsf(t, func() {
-		MustSplitDID("not did")
-	}, "must panic")
-
-	method, namespace, id := MustSplitDID("did:cheqd:mainnet:qqqqqqqqqqqqqqqq")
-	require.Equal(t, "cheqd", method)
-	require.Equal(t, "mainnet", namespace)
-	require.Equal(t, "qqqqqqqqqqqqqqqq", id)
 }

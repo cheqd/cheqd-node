@@ -1,10 +1,12 @@
-package utils
+package utils_test
 
 import (
 	"testing"
 
 	"github.com/multiformats/go-multibase"
 	"github.com/stretchr/testify/require"
+
+	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 )
 
 func TestValidateEd25519PubKey(t *testing.T) {
@@ -21,7 +23,7 @@ func TestValidateEd25519PubKey(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			_, keyBytes, _ := multibase.Decode(tc.key)
-			err := ValidateEd25519PubKey(keyBytes)
+			err := utils.ValidateEd25519PubKey(keyBytes)
 
 			if tc.valid {
 				require.NoError(t, err)
@@ -47,7 +49,7 @@ func TestValidateJwk(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			err := ValidateJWK(tc.key)
+			err := utils.ValidateJWK(tc.key)
 
 			if tc.valid {
 				require.NoError(t, err)
