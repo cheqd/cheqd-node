@@ -1,6 +1,6 @@
 name: "Workflow Dispatch"
 on: push
-concurrency: 
+concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
@@ -16,7 +16,7 @@ jobs:
     needs: call-lint
     uses: ./.github/workflows/build.yml
     secrets: inherit
-  
+
   call-test:
     name: "Test"
     needs: call-build
@@ -24,7 +24,8 @@ jobs:
 
   call-release:
     name: "Release"
-    needs: [call-test, call-build]
+    # needs: [call-test, call-build]
+    needs: call-build
     if: ${{ github.ref_protected == true }}
     uses: ./.github/workflows/release.yml
     secrets: inherit

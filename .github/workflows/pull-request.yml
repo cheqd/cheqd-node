@@ -31,3 +31,19 @@ jobs:
           commitlintRulesPath: "./.github/linters/.commitlint.rules.js" # default: undefined
           # if the PR contains a single commit, fail if the commit message and the PR title do not match
           commitTitleMatch: "false" # default: 'true'
+
+
+  run-tests:
+    name: "Run Go tests"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Required to fetch version
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: ./go.mod
+          cache: true
+

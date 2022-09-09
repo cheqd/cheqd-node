@@ -1,13 +1,10 @@
 name: "Test"
 on:
   workflow_call:
-    inputs:
-      VERSION:
-        description: "Build version number"
-        type: string
 defaults:
   run:
     shell: bash
+
 env:
   NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/docker/localnet/network-config"
 permissions:
@@ -15,8 +12,9 @@ permissions:
   packages: read
 
 jobs:
-  ginkgo-tests:
-    name: "Ginkgo-based unit tests"
+
+  go-tests:
+    name: "Go Tests (GoConvey)"
     runs-on: ubuntu-latest
 
     steps:
@@ -27,7 +25,7 @@ jobs:
           go-version-file: ./go.mod
           cache: true
 
-      - name: Get GoConvey
+      - name: Install goconvey
         run: |
           go get github.com/smartystreets/goconvey
 
@@ -39,7 +37,7 @@ jobs:
         uses: guyarb/golang-test-annotations@v0.5.1
         with:
           test-results: test.json
-#          package-name: foobar # optio
+#          package-name: foobar # optional, if using custom package name, github.com/owner/repo stripped from the pathname by default
 
     # test-new-node-setup:
     #   name: "New node setup"
