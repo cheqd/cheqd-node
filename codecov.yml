@@ -1,0 +1,8 @@
+ignore:
+  - "examples"
+  - "proto"
+coverage:
+  status:
+    changes: false
+    patch: true
+    project: true

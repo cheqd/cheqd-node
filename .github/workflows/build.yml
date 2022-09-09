@@ -35,12 +35,8 @@ jobs:
           name: cheqd-noded
           path: dist/**/cheqd-noded
 
-      - name: Run Golang unit tests
-        run: go test -v ./...
-
-      - name: Golang Test Annotations
-        uses: guyarb/golang-test-annotations@v0.6.0
-
+#      - name: Run Golang unit tests
+#        run: go test -v ./...
 
   build-docker:
     name: "Docker image"
