@@ -38,6 +38,10 @@ jobs:
       - name: Run Golang unit tests
         run: go test -v ./...
 
+      - name: Golang Test Annotations
+        uses: guyarb/golang-test-annotations@v0.6.0
+
+
   build-docker:
     name: "Docker image"
     runs-on: ubuntu-latest
