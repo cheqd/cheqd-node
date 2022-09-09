@@ -1,41 +1,46 @@
 name: "Build"
 on:
   workflow_call:
-defaults:
-  run:
-    shell: bash
-
+#defaults:
+#  run:
+#    shell: bash
 
 jobs:
 
   build-binary:
-    name: "Node binary"
-    runs-on: ubuntu-latest
+    name: "Build"
+    runs-on: ubuntu-18.04
 
     steps:
-      - uses: actions/checkout@v3
+      - name: checkout
+        uses: actions/checkout@v2
 
-      - uses: actions/setup-go@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
         with:
-          go-version-file: ./go.mod
-          cache: true
+          go-version: 1.17.x
 
-      - name: Install goconvey
-        run: |
-          go get github.com/smartystreets/goconvey
-
-      - name: Run tests
+      - name: run tests
         run: go test -json ./... > test.json
 
       - name: Annotate tests
         if: always()
-        uses: guyarb/golang-test-annotations@v0.5.1
+        uses: guyarb/golang-test-annotations@v0.4.0
         with:
           test-results: test.json
-      #          package-name: foobar # optional, if using custom package name, github.com/owner/repo stripped from the pathname by default
 
-# - name: Run Golang unit tests
-      #   run: go test -v ./...
+#      - name: Run GoReleaser
+#        uses: goreleaser/goreleaser-action@v3
+#        with:
+#          distribution: goreleaser
+#          version: latest
+#          args: build --rm-dist --snapshot --id ubuntu-latest-amd64
+#
+#      - name: Store artifact
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: cheqd-noded
+#          path: dist/**/cheqd-noded
 
   build-docker:
     name: "Docker image"
