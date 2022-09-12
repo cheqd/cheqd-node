@@ -12,10 +12,19 @@ RUN apk update && apk add --no-cache $PACKAGES
 WORKDIR /go/src/github.com/cheqd/cheqd-node
 
 # Add source files
-COPY . .
+COPY app ./app
+COPY cmd ./cmd
+COPY scripts ./scripts
+COPY proto ./proto
+COPY x ./x
+COPY go.mod .
+COPY go.sum .
+COPY Makefile .
+COPY make ./make
+COPY .git .
 
 # Make node binary
-RUN go mod download && make build-linux
+RUN make build
 
 ###############################################################
 ###             STAGE 2: Build cheqd-node image             ###
@@ -32,14 +41,21 @@ COPY --from=builder /go/src/github.com/cheqd/cheqd-node/build/cheqd-noded /bin/c
 # Set user directory and details
 ARG HOME_DIR="/home/cheqd"
 ARG USER="cheqd"
+ARG GROUP=${USER}
+ARG UID=1000
+ARG GID=${UID}
 
 # Add cheqd user to use in the container
-RUN addgroup --system ${USER} \
-    && adduser ${USER} --system --home ${HOME_DIR} --shell /bin/bash
+RUN addgroup --system ${GROUP} --gid ${GID} \
+    && adduser ${USER} --uid ${UID} -G ${GROUP} --system --home ${HOME_DIR} --shell /bin/bash
 
 # Set entrypoint script
-COPY --chown=cheqd:cheqd docker/entrypoint.sh /bin/node-start
+COPY --chown=${USER}:${GROUP} docker/entrypoint.sh /bin/node-start
 RUN chmod +x /bin/node-start
+
+# Set working directory permissions
+RUN mkdir -p ${HOME_DIR} \
+    && chown -R ${USER}:${GROUP} ${HOME_DIR}
 
 # Set working directory & bash defaults
 WORKDIR ${HOME_DIR}

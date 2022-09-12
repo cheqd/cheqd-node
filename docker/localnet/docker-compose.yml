@@ -34,6 +34,8 @@ services:
         target: /priv_validator_key
     networks:
       - localnet
+    depends_on:
+      - seed-0
 
   validator-1:
     image: ${CHEQD_NODE_IMAGE}:${DOCKER_IMAGE_VERSION}
@@ -68,6 +70,8 @@ services:
         target: /priv_validator_key
     networks:
       - localnet
+    depends_on:
+      - seed-0
 
   validator-2:
     image: ${CHEQD_NODE_IMAGE}:${DOCKER_IMAGE_VERSION}
@@ -102,6 +106,8 @@ services:
         target: /priv_validator_key
     networks:
       - localnet
+    depends_on:
+      - seed-0
 
   validator-3:
     image: ${CHEQD_NODE_IMAGE}:${DOCKER_IMAGE_VERSION}
@@ -136,6 +142,8 @@ services:
         target: /priv_validator_key
     networks:
       - localnet
+    depends_on:
+      - seed-0
 
   seed-0:
     image: ${CHEQD_NODE_IMAGE}:${DOCKER_IMAGE_VERSION}
