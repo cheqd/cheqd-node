@@ -2,15 +2,18 @@
 
 set -euo pipefail
 
-. "../../tools/helpers.sh"
-. "common.sh"
+BASE_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 
-# Shut down the network
+. "${BASE_DIR}/../../tools/helpers.sh"
+. "${BASE_DIR}/common.sh"
+
+
+echo "=> Shutting down network"
 set_new_compose_env
 localnet_compose down --volumes --remove-orphans
 
-# Remove configuration
+echo "=> Removing network configuration"
 in_localnet_path rm -rf "network-config"
 
-# Remove docker network
+echo "=> Removing docker network"
 docker network remove "${LOCALNET_NETWORK}" || true

@@ -158,21 +158,21 @@ do
 
   cp "${TMP_NODE_HOME}/config/genesis.json" "${NODE_HOME}/config/genesis.json"
 
-  cheqd-noded keys add "operator-$i" --keyring-backend "test" --home "${NODE_HOME}"
-  cheqd-noded add-genesis-account "operator-$i" 20000000000000000ncheq --keyring-backend "test" --home "${NODE_HOME}"
+  cheqd-noded keys add "operator-$i" --keyring-backend "test" --home "${NODE_HOME}" > /dev/null 2>&1
+  cheqd-noded add-genesis-account "operator-$i" 20000000000000000ncheq --keyring-backend "test" --home "${NODE_HOME}" > /dev/null 2>&1
 
   NODE_ID=$(cheqd-noded tendermint show-node-id --home "${NODE_HOME}")
   NODE_VAL_PUBKEY=$(cheqd-noded tendermint show-validator --home "${NODE_HOME}")
   cheqd-noded gentx "operator-$i" 1000000000000000ncheq --chain-id "${CHAIN_ID}" --node-id "${NODE_ID}" \
-    --pubkey "${NODE_VAL_PUBKEY}" --keyring-backend "test"  --home "${NODE_HOME}"
+    --pubkey "${NODE_VAL_PUBKEY}" --keyring-backend "test"  --home "${NODE_HOME}" > /dev/null 2>&1
 
   cp "${NODE_HOME}/config/genesis.json" "${TMP_NODE_HOME}/config/genesis.json"
   cp -R "${NODE_HOME}/config/gentx/." "${TMP_NODE_HOME}/config/gentx"
 done
 
 
-echo "Collecting gentxs"
-cheqd-noded collect-gentxs --home "${TMP_NODE_HOME}"
+echo "=> Collecting gentxs"
+cheqd-noded collect-gentxs --home "${TMP_NODE_HOME}" 2> /dev/null
 cheqd-noded validate-genesis --home "${TMP_NODE_HOME}"
 
 # Distribute final genesis
@@ -224,3 +224,5 @@ echo "${SEEDS_STR}" > "${NETWORK_CONFIG_DIR}/seeds.txt"
 
 # We don't need the tmp node anymore
 rm -rf "${TMP_NODE_HOME}"
+
+echo "=> Network configuration is ready"

@@ -3,7 +3,7 @@
 set -euo pipefail
 
 CHEQD_IMAGE_FROM="ghcr.io/cheqd/cheqd-node"
-CHEQD_TAG_FROM="0.6.7"
+CHEQD_TAG_FROM="0.5.0"
 
 CHEQD_IMAGE_TO="cheqd-node"
 CHEQD_TAG_TO="latest"

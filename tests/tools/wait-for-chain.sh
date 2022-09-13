@@ -26,5 +26,5 @@ while true; do
         exit 1
     fi
 
-    echo "Waiting for height: $TARGET_HEIGHT... Current height: $CURRENT_HEIGHT, time waited: $WAITED, time limit: $WAIT_TIME."
+    echo "Waiting for height: $TARGET_HEIGHT. Current height: $CURRENT_HEIGHT, time waited: $WAITED, time limit: $WAIT_TIME."
 done

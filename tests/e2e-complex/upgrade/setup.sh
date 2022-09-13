@@ -2,23 +2,26 @@
 
 set -euo pipefail
 
-. "../../tools/helpers.sh"
-. "common.sh"
+BASE_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 
-# Network configuration
+. "${BASE_DIR}/../../tools/helpers.sh"
+. "${BASE_DIR}/common.sh"
+
+
+echo "=> Genegrating network configuration"
 in_localnet_path bash "gen-network-config.sh"
 
-# Docker network
+echo "=> Creating docker network"
 docker network create "${LOCALNET_NETWORK}" || true
 
-# Run network
+echo "=> Starting network"
 set_old_compose_env
 localnet_compose up -d
 
-# Wait for the network
-(cd ${LOCALNET_PATH} && compose_wait_for_chain_height "validator-0" "cheqd-noded")
+echo "=> Waiting for network to start"
+in_localnet_path compose_wait_for_chain_height "validator-0" "cheqd-noded"
 
-# Copy keys
+echo "=> Copying keys"
 VALIDATORS_COUNT=4
 
 for ((i=0 ; i<VALIDATORS_COUNT ; i++))

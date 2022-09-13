@@ -2,18 +2,19 @@
 
 set -euo pipefail
 
-# shellcheck disable=SC1091
-source common.sh
+BASE_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+
+. "${BASE_DIR}/common.sh"
 
 
-TEST_IBC=true
+TEST_IBC=false
 TEST_MODULES=false
 
 
 
 echo "########## Cleanup ##########"
 
-(cd ibc && bash tear-down.sh)
+# (cd ibc && bash tear-down.sh)
 bash "tear-down.sh" # Main tear down should be run last beacuse it owns the network
 
 

@@ -3,14 +3,13 @@
 set -euox pipefail
 
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-source "${SCRIPT_DIR}/../../../tools/helpers.sh"
+BASE_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+
+. "${BASE_DIR}/../../../tools/helpers.sh"
 
 # TMP
 CHEQD_SERVICE="validator-0"
 CHEQD_USER="operator-0"
-
-
 
 # Colors
 RED='\033[0;31m'

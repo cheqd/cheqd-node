@@ -2,9 +2,10 @@
 
 set -euo pipefail
 
-# shellcheck disable=SC1091
-. "../../tools/helpers.sh"
-. "common.sh"
+BASE_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+
+. "${BASE_DIR}/../../tools/helpers.sh"
+. "${BASE_DIR}/common.sh"
 
 set_old_compose_env
 
@@ -14,7 +15,8 @@ UPGRADE_HEIGHT=$((CURRENT_HEIGHT + VOTING_PERIOD / EXPECTED_BLOCK_SECOND + EXTRA
 
 set_old_compose_env
 
-# Send proposal
+echo "=> Sending upgrade proposal"
+
 RES=$(localnet_compose exec validator-0 \
     cheqd-noded tx gov submit-proposal software-upgrade \
     "$UPGRADE_NAME" \
@@ -26,7 +28,8 @@ RES=$(localnet_compose exec validator-0 \
     ${TX_PARAMS})
 assert_tx_successful "${RES}"
 
-# Set the deposit from operator0
+echo "=> Setting deposit"
+
 RES=$(localnet_compose exec validator-0 \
     cheqd-noded tx gov deposit 1 \
     "${DEPOSIT_AMOUNT}ncheq" \
@@ -34,28 +37,32 @@ RES=$(localnet_compose exec validator-0 \
     ${TX_PARAMS})
 assert_tx_successful "${RES}"
 
-# Make a vote for operator0
+echo "=> Making a vote for operator0"
+
 RES=$(localnet_compose exec validator-0 \
     cheqd-noded tx gov vote 1 yes \
     --from operator-0 \
     ${TX_PARAMS})
 assert_tx_successful "${RES}"
 
-# Make a vote for operator1
+echo "=> Making a vote for operator1"
+
 RES=$(localnet_compose exec validator-1 \
     cheqd-noded tx gov vote 1 yes \
     --from operator-1 \
     ${TX_PARAMS})
 assert_tx_successful "${RES}"
 
-# Make a vote for operator2
+echo "=> Making a vote for operator2"
+
 RES=$(localnet_compose exec validator-2 \
     cheqd-noded tx gov vote 1 yes \
     --from operator-2 \
     ${TX_PARAMS})
 assert_tx_successful "${RES}"
 
-# Make a vote for operator3
+echo "=> Making a vote for operator3"
+
 RES=$(localnet_compose exec validator-3 \
     cheqd-noded tx gov vote 1 yes \
     --from operator-3 \
@@ -63,26 +70,26 @@ RES=$(localnet_compose exec validator-3 \
 assert_tx_successful "${RES}"
 
 
-# Wait for the end of voting
+echo "=> Waiting for the end of voting"
 in_localnet_path compose_wait_for_chain_height "validator-0" "cheqd-noded" "$VOTING_END_HEIGHT"
 
-# TODO: Check that the proposal is accepted
+echo "=> Checking that the proposal is accepted"
 STATUS=$(localnet_compose exec validator-0 cheqd-noded query gov proposal 1 ${QUERY_PARAMS} | jq -r '.status')
 assert_eq "${STATUS}" "PROPOSAL_STATUS_PASSED"
 
-# Wait for upgrade height
+echo "=> Waiting for upgrade height"
 in_localnet_path compose_wait_for_chain_height "validator-0" "cheqd-noded" "$UPGRADE_HEIGHT"
 
-# Shut down network
+echo "=> Shutting down network"
 localnet_compose down
 
-# Bump node version
+echo "=> Bumping node version"
 set_new_compose_env
 
-# Restart network
+echo "=> Restarting network"
 localnet_compose up -d
 
-# Wait for upgrade height + 2
+echo "=> Waiting for upgrade height + 2"
 in_localnet_path compose_wait_for_chain_height "validator-0" "cheqd-noded" "$((UPGRADE_HEIGHT + 2))"
 
-echo "Upgrade successfull"
+echo "=> Upgrade successfull"
