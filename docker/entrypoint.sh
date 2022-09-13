@@ -2,7 +2,7 @@
 
 # Inits node configuration and runs the node.
 # e -> exit immediately, u -> treat unset variables as errors and immediately, o -> sets the exit code to the rightmost command 
-set -euox pipefail
+set -euo pipefail
 
 # within the container, $HOME=/home/cheqd
 CHEQD_ROOT_DIR="$HOME/.cheqdnode"

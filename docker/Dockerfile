@@ -35,11 +35,6 @@ FROM alpine:3.16 AS runner
 # Install pre-requisites
 RUN apk update && apk add --no-cache bash ca-certificates
 
-# Add docker compose wait tool
-ENV WAIT_FOR_VERSION v2.2.3
-ADD https://github.com/eficode/wait-for/releases/download/$WAIT_FOR_VERSION/wait-for /bin/wait-for
-RUN chmod +rx /bin/wait-for
-
 # Copy over binaries from the build-env
 COPY --from=builder /go/src/github.com/cheqd/cheqd-node/build/cheqd-noded /bin/cheqd-noded
 
@@ -57,10 +52,6 @@ RUN addgroup --system ${GROUP} --gid ${GID} \
 # Set entrypoint script
 COPY --chown=${USER}:${GROUP} docker/entrypoint.sh /bin/node-start
 RUN chmod +rx /bin/node-start
-
-# Set working directory permissions
-RUN mkdir -p ${HOME_DIR} \
-    && chown -R ${USER}:${GROUP} ${HOME_DIR}
 
 # Set working directory & bash defaults
 WORKDIR ${HOME_DIR}

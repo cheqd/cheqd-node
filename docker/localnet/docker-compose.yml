@@ -17,7 +17,6 @@ services:
       - target: 26660
         published: 26660    # Prometheus metrics port
     entrypoint: [ "node-start" ]
-    # command: wait-for seed-0:26656 && node-start
     volumes:
       - type: volume
         source: validator-0-data
@@ -52,7 +51,6 @@ services:
       - target: 26660
         published: 26760    # Prometheus metrics port
     entrypoint: [ "node-start" ]
-    # command: wait-for seed-0:26656 && node-start
     volumes:
       - type: volume
         source: validator-1-data
@@ -87,7 +85,6 @@ services:
       - target: 26660
         published: 26860    # Prometheus metrics port
     entrypoint: [ "node-start" ]
-    # command: wait-for seed-0:26656 && node-start
     volumes:
       - type: volume
         source: validator-2-data
@@ -122,7 +119,6 @@ services:
       - target: 26660
         published: 26960    # Prometheus metrics port
     entrypoint: [ "node-start" ]
-    # command: wait-for seed-0:26656 && node-start
     volumes:
       - type: volume
         source: validator-3-data
@@ -191,7 +187,6 @@ services:
       - target: 26660
         published: 27160    # Prometheus metrics port
     entrypoint: [ "node-start" ]
-    # command: wait-for seed-0:26656 && node-start
     volumes:
       - type: volume
         source: observer-0-data

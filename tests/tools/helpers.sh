@@ -8,14 +8,12 @@ set -euo pipefail
 LOCALNET_NETWORK="localnet"
 LOCALNET_PATH="$(git rev-parse --show-toplevel)/docker/localnet"
 
-
 # Localnet
 
 function in_localnet_path() {
-    pushd "${LOCALNET_PATH}" # > /dev/null
+    pushd "${LOCALNET_PATH}" > /dev/null
     "$@"
-    popd # > /dev/null
-    # (cd "${LOCALNET_PATH}" && "${@}")
+    popd > /dev/null
 }
 
 function localnet_compose() {

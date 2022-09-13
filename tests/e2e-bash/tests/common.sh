@@ -2,7 +2,9 @@
 
 set -euox pipefail
 
-source "../../tools/helpers.sh"
+BASE_DIR="$(dirname $(readlink -e ${0}))"
+
+source "${BASE_DIR}../../tools/helpers.sh"
 
 # Params
 export RPC_URL="http://localhost:26657"
@@ -19,8 +21,8 @@ export TX_PARAMS="--node ${RPC_URL} --keyring-backend ${KEYRING_BACKEND} --outpu
   --gas ${GAS} --gas-adjustment ${GAS_ADJUSTMENT} --gas-prices ${GAS_PRICES} --yes --home /home/shalteor/Documents/@Cheqd/cheqd-node/tests/e2e-complex/upgrade/node_configs/client/.cheqdnode/"
 
 # Accounts
-export BASE_ACCOUNT_1="operator0"
-export BASE_ACCOUNT_2="operator1"
+export BASE_ACCOUNT_1="base_account_1"
+export BASE_ACCOUNT_2="base_account_2"
 export BASE_VESTING_ACCOUNT="base_vesting_account"
 export CONTINOUS_VESTING_ACCOUNT="continous_vesting_account"
 export DELAYED_VESTING_ACCOUNT="delayed_vesting_account"
