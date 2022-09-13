@@ -1,12 +1,12 @@
 #!/bin/bash
 
-set -euox pipefail
+set -euo pipefail
 
 . "../../tools/helpers.sh"
 . "common.sh"
 
 # Network configuration
-(cd ${LOCALNET_PATH} && bash "gen-network-config.sh")
+in_localnet_path bash "gen-network-config.sh"
 
 # Docker network
 docker network create "${LOCALNET_NETWORK}" || true

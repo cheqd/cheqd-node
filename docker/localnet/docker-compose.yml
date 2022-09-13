@@ -17,6 +17,7 @@ services:
       - target: 26660
         published: 26660    # Prometheus metrics port
     entrypoint: [ "node-start" ]
+    # command: wait-for seed-0:26656 && node-start
     volumes:
       - type: volume
         source: validator-0-data
@@ -34,8 +35,6 @@ services:
         target: /priv_validator_key
     networks:
       - localnet
-    depends_on:
-      - seed-0
 
   validator-1:
     image: ${CHEQD_NODE_IMAGE}:${DOCKER_IMAGE_VERSION}
@@ -53,6 +52,7 @@ services:
       - target: 26660
         published: 26760    # Prometheus metrics port
     entrypoint: [ "node-start" ]
+    # command: wait-for seed-0:26656 && node-start
     volumes:
       - type: volume
         source: validator-1-data
@@ -70,8 +70,6 @@ services:
         target: /priv_validator_key
     networks:
       - localnet
-    depends_on:
-      - seed-0
 
   validator-2:
     image: ${CHEQD_NODE_IMAGE}:${DOCKER_IMAGE_VERSION}
@@ -89,6 +87,7 @@ services:
       - target: 26660
         published: 26860    # Prometheus metrics port
     entrypoint: [ "node-start" ]
+    # command: wait-for seed-0:26656 && node-start
     volumes:
       - type: volume
         source: validator-2-data
@@ -106,8 +105,6 @@ services:
         target: /priv_validator_key
     networks:
       - localnet
-    depends_on:
-      - seed-0
 
   validator-3:
     image: ${CHEQD_NODE_IMAGE}:${DOCKER_IMAGE_VERSION}
@@ -125,6 +122,7 @@ services:
       - target: 26660
         published: 26960    # Prometheus metrics port
     entrypoint: [ "node-start" ]
+    # command: wait-for seed-0:26656 && node-start
     volumes:
       - type: volume
         source: validator-3-data
@@ -142,8 +140,6 @@ services:
         target: /priv_validator_key
     networks:
       - localnet
-    depends_on:
-      - seed-0
 
   seed-0:
     image: ${CHEQD_NODE_IMAGE}:${DOCKER_IMAGE_VERSION}
@@ -160,6 +156,7 @@ services:
         published: 9491     # gRPC-Gateway port
       - target: 26660
         published: 27060    # Prometheus metrics port
+    entrypoint: [ "node-start" ]
     volumes:
       - type: volume
         source: seed-0-data
@@ -193,6 +190,8 @@ services:
         published: 9591     # gRPC-Gateway port
       - target: 26660
         published: 27160    # Prometheus metrics port
+    entrypoint: [ "node-start" ]
+    # command: wait-for seed-0:26656 && node-start
     volumes:
       - type: volume
         source: observer-0-data

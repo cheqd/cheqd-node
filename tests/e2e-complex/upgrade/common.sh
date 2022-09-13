@@ -1,9 +1,9 @@
 #!/bin/bash
 
-set -euox pipefail
+set -euo pipefail
 
 CHEQD_IMAGE_FROM="ghcr.io/cheqd/cheqd-node"
-CHEQD_TAG_FROM="0.5.0"
+CHEQD_TAG_FROM="0.6.7"
 
 CHEQD_IMAGE_TO="cheqd-node"
 CHEQD_TAG_TO="latest"
@@ -31,16 +31,12 @@ QUERY_PARAMS="--output json"
 
 function set_old_compose_env() {
     export CHEQD_NODE_IMAGE=${CHEQD_IMAGE_FROM}
-    export CHEQD_NODE_VERSION=${CHEQD_TAG_FROM}
+    export DOCKER_IMAGE_VERSION=${CHEQD_TAG_FROM}
     export NETWORK_EXTERNAL="true"
 }
 
 function set_new_compose_env() {
     export CHEQD_NODE_IMAGE=${CHEQD_IMAGE_TO}
-    export CHEQD_NODE_VERSION=${CHEQD_TAG_TO}
+    export DOCKER_IMAGE_VERSION=${CHEQD_TAG_TO}
     export NETWORK_EXTERNAL="true"
-}
-
-function localnet_compose() {
-    (cd "${LOCALNET_PATH}" && docker-compose "${@}")
 }

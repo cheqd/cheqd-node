@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euox pipefail
+set -euo pipefail
 
 
 # Constants
@@ -9,7 +9,20 @@ LOCALNET_NETWORK="localnet"
 LOCALNET_PATH="$(git rev-parse --show-toplevel)/docker/localnet"
 
 
-# Methods
+# Localnet
+
+function in_localnet_path() {
+    pushd "${LOCALNET_PATH}" # > /dev/null
+    "$@"
+    popd # > /dev/null
+    # (cd "${LOCALNET_PATH}" && "${@}")
+}
+
+function localnet_compose() {
+    in_localnet_path docker compose "${@}"
+}
+
+# Helpers
 
 function random_string() {
   LENGTH=${1:-16} # Default LENGTH is 16
@@ -74,8 +87,9 @@ function compose_wait_for_chain_height() {
     while true; do
         sleep "${WAIT_INTERVAL}"
         WAITED=$((WAITED + WAIT_INTERVAL))
-
-        CURRENT_HEIGHT=$(docker-compose exec ${SERVICE} ${BINARY} status 2>&1 | jq -r '.SyncInfo.latest_block_height' || echo "-1")
+        
+        DOCKER_COMPOSE_STATUS="$(docker compose exec ${SERVICE} ${BINARY} status 2>&1)"
+        CURRENT_HEIGHT="$(echo ${DOCKER_COMPOSE_STATUS} | jq -r '.SyncInfo.latest_block_height' || echo '-1')" 
 
         if ((CURRENT_HEIGHT >= TARGET_HEIGHT)); then
             echo "Height ${TARGET_HEIGHT} is reached in $WAITED seconds"

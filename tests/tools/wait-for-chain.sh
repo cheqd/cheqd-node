@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euox pipefail
+set -euo pipefail
 
 
 TARGET_HEIGHT=${1:-1} # Default is 1
