@@ -21,14 +21,14 @@ sleep 30 # Wait for relayer
 
 info "Check balances the second time" # ---
 CHEQD_BALANCE_2=$(set +x && localnet_compose exec ${CHEQD_SERVICE} cheqd-noded query bank balances "$CHEQD_USER_ADDRESS" --output json)
-BALANCES=$(docker-compose exec osmosis osmosisd query bank balances "$OSMOSIS_USER_ADDRESS" --output json)
+BALANCES=$(docker compose exec osmosis osmosisd query bank balances "$OSMOSIS_USER_ADDRESS" --output json)
 
 echo "$BALANCES" > osmosis-balances-1.txt
 
 info "Denom trace" # ---
 DENOM=$(echo "$BALANCES" | jq --raw-output '.balances[0].denom')
 DENOM_CUT=$(echo "$DENOM" | cut -c 5-)
-docker-compose exec osmosis osmosisd query ibc-transfer denom-trace "$DENOM_CUT" > "denom_trace.txt"
+docker compose exec osmosis osmosisd query ibc-transfer denom-trace "$DENOM_CUT" > "denom_trace.txt"
 
 
 echo "$CHEQD_BALANCE_2" > cheqd-balance-2.txt

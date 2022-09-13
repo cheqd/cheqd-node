@@ -22,14 +22,14 @@ info "Back transfer" # ---
 PORT="transfer"
 CHANNEL="channel-0"
 # read -n 1 -p "Press any key to continue..."
-docker-compose exec osmosis osmosisd tx ibc-transfer transfer $PORT $CHANNEL "$CHEQD_USER_ADDRESS" 10000000000"${DENOM}" --from osmosis-user --chain-id osmosis --keyring-backend test -y
+docker compose exec osmosis osmosisd tx ibc-transfer transfer $PORT $CHANNEL "$CHEQD_USER_ADDRESS" 10000000000"${DENOM}" --from osmosis-user --chain-id osmosis --keyring-backend test -y
 
 # TODO: Fix the bug with time shift
 sleep $((5*60)) # Wait for relayer
 
 info "Check balances for the last time" # ---
 CHEQD_BALANCE_4=$(set +x && localnet_compose exec ${CHEQD_SERVICE} cheqd-noded query bank balances "$CHEQD_USER_ADDRESS" --output json)
-docker-compose exec osmosis osmosisd query bank balances "$OSMOSIS_USER_ADDRESS"
+docker compose exec osmosis osmosisd query bank balances "$OSMOSIS_USER_ADDRESS"
 
 CHEQD_BALANCE_1=$(echo "$CHEQD_BALANCE_1" | jq --raw-output '.balances[0].amount')
 CHEQD_BALANCE_2=$(echo "$CHEQD_BALANCE_2" | jq --raw-output '.balances[0].amount')
