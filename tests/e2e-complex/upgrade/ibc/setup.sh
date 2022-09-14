@@ -2,8 +2,13 @@
 
 set -euox pipefail
 
-source common.sh
-source ../common.sh
+BASE_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+
+# shellcheck disable=SC1091
+. "${BASE_DIR}/common.sh"
+
+# shellcheck disable=SC1091
+. "${BASE_DIR}/../common.sh"
 
 
 info "Cleanup"
@@ -23,13 +28,13 @@ set_old_compose_env
 
 info "Create relayer user on cheqd"  # ---
 CHEQD_RELAYER_KEY_NAME="cheqd-relayer"
-CHEQD_RELAYER_ACCOUNT=$(set +x && localnet_compose exec ${CHEQD_SERVICE} cheqd-noded keys add ${CHEQD_RELAYER_KEY_NAME} --keyring-backend test --output json 2>&1)
+CHEQD_RELAYER_ACCOUNT=$(set +x && localnet_compose exec "${CHEQD_SERVICE}" cheqd-noded keys add ${CHEQD_RELAYER_KEY_NAME} --keyring-backend test --output json 2>&1)
 CHEQD_RELAYER_ADDRESS=$(echo "${CHEQD_RELAYER_ACCOUNT}" | jq --raw-output '.address')
 CHEQD_RELAYER_MNEMONIC=$(echo "${CHEQD_RELAYER_ACCOUNT}" | jq --raw-output '.mnemonic')
 
 info "Send some tokens to it" # ---
 # TODO: Refactor users
-RES=$(set +x && localnet_compose exec ${CHEQD_SERVICE} cheqd-noded tx bank send ${CHEQD_USER} "${CHEQD_RELAYER_ADDRESS}" 1000000000000ncheq --gas-prices 25ncheq --chain-id cheqd -y --keyring-backend test)
+RES=$(set +x && localnet_compose exec "${CHEQD_SERVICE}" cheqd-noded tx bank send "${CHEQD_USER}" "${CHEQD_RELAYER_ADDRESS}" 1000000000000ncheq --gas-prices 25ncheq --chain-id cheqd -y --keyring-backend test)
 assert_tx_successful "${RES}"
 
 info "Create relayer user on osmosis" # ---
@@ -61,13 +66,13 @@ docker compose exec -d hermes bash -c "hermes start > log.txt 2>&1"
 
 
 info "Check balances" # ---
-CHEQD_USER_ADDRESS=$(set +x && localnet_compose exec ${CHEQD_SERVICE} cheqd-noded keys show --address ${CHEQD_USER} --keyring-backend test | sed 's/\r//g')
+CHEQD_USER_ADDRESS=$(set +x && localnet_compose exec "${CHEQD_SERVICE}" cheqd-noded keys show --address "${CHEQD_USER}" --keyring-backend test | sed 's/\r//g')
 OSMOSIS_USER_ADDRESS=$(docker compose exec osmosis osmosisd keys show --address osmosis-user --keyring-backend test | sed 's/\r//g')
 
-CHEQD_BALANCE_1=$(set +x && localnet_compose exec ${CHEQD_SERVICE} cheqd-noded query bank balances "$CHEQD_USER_ADDRESS" --output json)
+CHEQD_BALANCE_1=$(set +x && localnet_compose exec "${CHEQD_SERVICE}" cheqd-noded query bank balances "$CHEQD_USER_ADDRESS" --output json)
 docker compose exec osmosis osmosisd query bank balances "$OSMOSIS_USER_ADDRESS"
 
-echo ${CHEQD_USER_ADDRESS} > cheqd-user-address.txt
-echo ${OSMOSIS_USER_ADDRESS} > osmosis-user-address.txt
+echo "${CHEQD_USER_ADDRESS}" > cheqd-user-address.txt
+echo "${OSMOSIS_USER_ADDRESS}" > osmosis-user-address.txt
 
-echo ${CHEQD_BALANCE_1} > cheqd-balance-1.txt
+echo "${CHEQD_BALANCE_1}" > cheqd-balance-1.txt

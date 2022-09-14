@@ -4,6 +4,7 @@ set -euo pipefail
 
 BASE_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 
+# shellcheck disable=SC1091
 . "${BASE_DIR}/common.sh"
 
 

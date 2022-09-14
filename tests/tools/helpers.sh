@@ -5,7 +5,7 @@ set -euo pipefail
 
 # Constants
 
-LOCALNET_NETWORK="localnet"
+export LOCALNET_NETWORK="localnet"
 LOCALNET_PATH="$(git rev-parse --show-toplevel)/docker/localnet"
 
 # Localnet
@@ -86,8 +86,8 @@ function compose_wait_for_chain_height() {
         sleep "${WAIT_INTERVAL}"
         WAITED=$((WAITED + WAIT_INTERVAL))
         
-        DOCKER_COMPOSE_STATUS="$(docker compose exec ${SERVICE} ${BINARY} status 2>&1)"
-        CURRENT_HEIGHT="$(echo ${DOCKER_COMPOSE_STATUS} | jq -r '.SyncInfo.latest_block_height' || echo '-1')" 
+        DOCKER_COMPOSE_STATUS="$(docker compose exec "${SERVICE}" "${BINARY}" status 2>&1)"
+        CURRENT_HEIGHT="$(echo "${DOCKER_COMPOSE_STATUS}" | jq -r '.SyncInfo.latest_block_height' || echo '-1')" 
 
         if ((CURRENT_HEIGHT >= TARGET_HEIGHT)); then
             echo "Height ${TARGET_HEIGHT} is reached in $WAITED seconds"

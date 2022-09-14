@@ -2,8 +2,13 @@
 
 set -euox pipefail
 
-source common.sh
-. ../common.sh
+BASE_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+
+# shellcheck disable=SC1091
+. "${BASE_DIR}/common.sh"
+
+# shellcheck disable=SC1091
+. "${BASE_DIR}/../common.sh"
 
 CHEQD_USER_ADDRESS="$(cat cheqd-user-address.txt)"
 OSMOSIS_USER_ADDRESS="$(cat osmosis-user-address.txt)"
@@ -16,7 +21,7 @@ DENOM=$(cat denom.txt)
 set_new_compose_env
 
 info "Check balances for the pre last time" # ---
-CHEQD_BALANCE_3=$(set +x && localnet_compose exec ${CHEQD_SERVICE} cheqd-noded query bank balances "$CHEQD_USER_ADDRESS" --output json)
+CHEQD_BALANCE_3=$(set +x && localnet_compose exec "${CHEQD_SERVICE}" cheqd-noded query bank balances "$CHEQD_USER_ADDRESS" --output json)
 
 info "Back transfer" # ---
 PORT="transfer"
@@ -28,7 +33,7 @@ docker compose exec osmosis osmosisd tx ibc-transfer transfer $PORT $CHANNEL "$C
 sleep $((5*60)) # Wait for relayer
 
 info "Check balances for the last time" # ---
-CHEQD_BALANCE_4=$(set +x && localnet_compose exec ${CHEQD_SERVICE} cheqd-noded query bank balances "$CHEQD_USER_ADDRESS" --output json)
+CHEQD_BALANCE_4=$(set +x && localnet_compose exec "${CHEQD_SERVICE}" cheqd-noded query bank balances "$CHEQD_USER_ADDRESS" --output json)
 docker compose exec osmosis osmosisd query bank balances "$OSMOSIS_USER_ADDRESS"
 
 CHEQD_BALANCE_1=$(echo "$CHEQD_BALANCE_1" | jq --raw-output '.balances[0].amount')

@@ -5,11 +5,12 @@ set -euox pipefail
 
 BASE_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 
+# shellcheck disable=SC1091
 . "${BASE_DIR}/../../../tools/helpers.sh"
 
 # TMP
-CHEQD_SERVICE="validator-0"
-CHEQD_USER="operator-0"
+export CHEQD_SERVICE="validator-0"
+export CHEQD_USER="operator-0"
 
 # Colors
 RED='\033[0;31m'

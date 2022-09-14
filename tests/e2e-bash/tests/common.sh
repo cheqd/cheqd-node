@@ -2,9 +2,10 @@
 
 set -euox pipefail
 
-BASE_DIR="$(dirname $(readlink -e ${0}))"
+BASE_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 
-source "${BASE_DIR}../../tools/helpers.sh"
+# shellcheck disable=SC1090
+. "${BASE_DIR}../../tools/helpers.sh"
 
 # Params
 export RPC_URL="http://localhost:26657"

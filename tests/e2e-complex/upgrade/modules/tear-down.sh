@@ -2,4 +2,4 @@
 
 set -euox pipefail
 
-rm $FNAME_TXHASHES
+rm "$FNAME_TXHASHES"

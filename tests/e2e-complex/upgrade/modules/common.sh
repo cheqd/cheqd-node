@@ -8,10 +8,10 @@ AMOUNT_BEFORE="19000000000000000"
 CHEQ_AMOUNT="1ncheq"
 CHEQ_AMOUNT_NUMBER="1"
 DID_METHOD="did:cheqd:testnet:"
-DID_1="did:cheqd:testnet:1111111111111111"
+export DID_1="did:cheqd:testnet:1111111111111111"
 DID_2_IDENTIFIER="2222222222222222"
-DID_2="${DID_METHOD}${DID_2_IDENTIFIER}"
-RESOURCE_1="82aadc50-58e4-4e00-bf35-36062c2784be"
+export DID_2="${DID_METHOD}${DID_2_IDENTIFIER}"
+export RESOURCE_1="82aadc50-58e4-4e00-bf35-36062c2784be"
 
 function get_addresses () {
     all_keys=$(local_client_tx keys list)
@@ -59,7 +59,7 @@ function send_did_new () {
     did=$(local_client_tx tx cheqd create-did "${MSG_CREATE_DID}" "${KEY_ID}" "${ALICE_VER_PRIV_BASE_64}" \
         --from operator0 \
         --gas-prices "25ncheq" \
-        --chain-id $CHAIN_ID \
+        --chain-id "$CHAIN_ID" \
         --output json \
         -y)
 
@@ -125,7 +125,7 @@ function send_did () {
         --ver-key "${ALICE_VER_PRIV_BASE_64}" \
         --from operator0 \
         --gas-prices "25ncheq" \
-        --chain-id $CHAIN_ID \
+        --chain-id "$CHAIN_ID" \
         --output json \
         -y)
 
