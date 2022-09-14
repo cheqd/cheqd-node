@@ -3,17 +3,18 @@ package utils_test
 import (
 	// "testing"
 
-	. "github.com/cheqd/cheqd-node/x/cheqd/utils"
 	"github.com/multiformats/go-multibase"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+
+	. "github.com/cheqd/cheqd-node/x/cheqd/utils"
 )
 
 var _ = Describe("Crypto", func() {
 	Describe("ValidateEd25519PubKey", func() {
 		Context("Valid: General Ed25519 public key", func() {
 			It("should return no error", func() {
-				_, keyBytes, _ := multibase.Decode("zF1hVGXXK9rmx5HhMTpGnGQJiab9qrFJbQXBRhSmYjQWX")
+				_, keyBytes, _ := multibase.Decode("zF1hVGXXK9rmx5HhMTpGnGQJiab9qrFJbQXBRhSmYjQWXforcingwrong")
 				err := ValidateEd25519PubKey(keyBytes)
 				Expect(err).To(BeNil())
 			})
