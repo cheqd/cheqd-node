@@ -187,28 +187,17 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download cheqd-cli Docker image
+      - name: Download cheqd-node Docker image
         uses: actions/download-artifact@v3
         with:
           name: cheqd-node-image.tar
 
-      - name: Load cheqd-cli Docker image
+      - name: Load cheqd-node Docker image
         run: docker load -i cheqd-node-image.tar
 
-      - name: Give current user ownership
-        run: sudo chown "$USER":"$USER" .
-
-      - name: Prepare nodes for upgrade
+      - name: Run test
         working-directory: ./tests/e2e-complex/upgrade
-        run: bash prepare.sh
-
-      - name: Initiate upgrade
-        working-directory: ./tests/e2e-complex/upgrade
-        run: bash initiate_upgrade.sh
-
-      - name: Check for successful upgrade
-        working-directory: ./tests/e2e-complex/upgrade
-        run: bash upgrade_and_check.sh
+        run: bash run-all.sh
 
   node-cosmovisor-upgrade-test:
     name: "Run positive case for upgrade with Cosmovisor installed"
@@ -221,12 +210,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download cheqd-cli Docker image
+      - name: Download cheqd-node Docker image
         uses: actions/download-artifact@v3
         with:
           name: cheqd-node-image.tar
 
-      - name: Load cheqd-cli Docker image
+      - name: Load cheqd-node Docker image
         run: docker load -i cheqd-node-image.tar
 
       - name: Install cheqd-noded binary
