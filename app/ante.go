@@ -1,19 +1,19 @@
 package app
 
 import (
+	cheqdante "github.com/cheqd/cheqd-node/ante"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
+	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-	cheqdante "github.com/cheqd/cheqd-node/ante"
 )
 
 // HandlerOptions are the options required for constructing a default SDK AnteHandler.
 // Here we extend the default exposed `BankKeeper` with our own extended `BankKeeper` interface.
 // This allows us to add our own custom logic to the default SDK AnteHandler.
-// Our custom logic is: 
+// Our custom logic is:
 // 1. To burn portion of the transaction fee.
 // 2. Distribute a pre-defined portion of the transaction fee to the foundation.
 // 3. Distribute a pre-defined portion of the transaction fee to the validators as rewards (default behavior).
