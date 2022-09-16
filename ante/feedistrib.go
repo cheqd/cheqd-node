@@ -9,7 +9,6 @@ import (
 
 const (
 	BurnFeePortion int = iota
-	FoundationFeePortion
 	RewardsFeePortion
 
 	FeePortionCount
