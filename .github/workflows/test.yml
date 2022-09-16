@@ -195,6 +195,15 @@ jobs:
       - name: Load cheqd-node Docker image
         run: docker load -i cheqd-node-image.tar
 
+      - name: Load binary artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: cheqd-noded
+          path: /home/runner/.local/bin
+
+      - name: Restore binary permissions
+        run: sudo chmod +x /home/runner/.local/bin/cheqd-noded
+
       - name: Run test
         working-directory: ./tests/e2e-complex/upgrade
         run: bash run-all.sh
