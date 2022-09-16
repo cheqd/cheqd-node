@@ -154,9 +154,7 @@ var (
 	}
 )
 
-var (
-	_ servertypes.Application = (*SimApp)(nil)
-)
+var _ servertypes.Application = (*SimApp)(nil)
 
 // SimApp extends an ABCI application, but with most of its parameters exported.
 // They are exported for convenience in creating helper functions, as object
@@ -500,7 +498,6 @@ func (app *SimApp) setAnteHandler(txConfig client.TxConfig) {
 			SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
 		},
 	)
-
 	if err != nil {
 		panic(err)
 	}

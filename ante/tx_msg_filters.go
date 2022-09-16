@@ -17,13 +17,11 @@ const (
 
 type TaxableMsgFee = [TaxableMsgFeeCount]sdk.Coins
 
-var (
-	TaxableMsgFees = TaxableMsgFee{
-		MsgCreateDid:      sdk.NewCoins(sdk.Coin{Denom: "ncheq", Amount: math.NewInt(int64(MinimalIdentityFee * CheqFactor))}),
-		MsgUpdateDid:      sdk.NewCoins(sdk.Coin{Denom: "ncheq", Amount: math.NewInt(int64(MinimalIdentityFee * CheqFactor))}),
-		MsgCreateResource: sdk.NewCoins(sdk.Coin{Denom: "ncheq", Amount: math.NewInt(int64(MinimalIdentityFee * CheqFactor))}),
-	}
-)
+var TaxableMsgFees = TaxableMsgFee{
+	MsgCreateDid:      sdk.NewCoins(sdk.Coin{Denom: "ncheq", Amount: math.NewInt(int64(MinimalIdentityFee * CheqFactor))}),
+	MsgUpdateDid:      sdk.NewCoins(sdk.Coin{Denom: "ncheq", Amount: math.NewInt(int64(MinimalIdentityFee * CheqFactor))}),
+	MsgCreateResource: sdk.NewCoins(sdk.Coin{Denom: "ncheq", Amount: math.NewInt(int64(MinimalIdentityFee * CheqFactor))}),
+}
 
 func GetTaxableMsgFee(msg interface{}) (sdk.Coins, bool) {
 	switch msg.(type) {

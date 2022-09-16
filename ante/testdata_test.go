@@ -2,6 +2,7 @@ package ante_test
 
 import (
 	"crypto/ed25519"
+
 	cheqdante "github.com/cheqd/cheqd-node/ante"
 	cheqdtests "github.com/cheqd/cheqd-node/x/cheqd/tests"
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
