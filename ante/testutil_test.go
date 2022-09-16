@@ -156,7 +156,6 @@ func (s *AnteTestSuite) CreateTestTx(privs []cryptotypes.PrivKey, accNums []uint
 // TestCase represents a test case used in test tables.
 type TestCase struct {
 	desc     string
-	malleate func()
 	simulate bool
 	expPass  bool
 	expErr   error
