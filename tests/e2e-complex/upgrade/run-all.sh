@@ -8,74 +8,55 @@ BASE_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 . "${BASE_DIR}/common.sh"
 
 
-TEST_IBC=false
-TEST_MODULES=false
+# Test modules
+MODULES=("cheqd-1" "resource-2")
 
 
+function run_module_script() {
+    MODULE=$1
+    STAGE=$2
 
-echo "########## Cleanup ##########"
+    if [[ -f "${BASE_DIR}/${MODULE}/${STAGE}.sh" ]]; then
+        echo "=> Run ${STAGE} handler for ${MODULE} module"
+        "${BASE_DIR}/${MODULE}/${STAGE}.sh"
+    else
+        echo "=> Skip ${STAGE} handler for ${MODULE} module"
+    fi
+}
 
-# (cd ibc && bash tear-down.sh)
-bash "tear-down.sh" # Main tear down should be run last beacuse it owns the network
 
-
-
-echo "########## Setup ##########"
+echo "===> Run setup"
 
 bash "setup.sh"
 
-if [[ "$TEST_IBC" == "true" ]]
-then
-    echo "########## IBC setup ##########"
-    (cd ibc && bash setup.sh)
-fi
+for MODULE in "${MODULES[@]}"; do
+    run_module_script "${MODULE}" "setup"
+done
 
 
+echo "===> Run before upgrade handlers"
 
-echo "########## Before upgrade ##########"
-
-if [[ "$TEST_MODULES" == "true" ]]
-then
-    echo "### Before upgrade modules ###"
-    bash before-upgrade.sh
-fi
-
-if [[ "$TEST_IBC" == "true" ]]
-then
-    echo "### IBC before upgrade ###"
-    (cd ibc && bash before-upgrade.sh)
-fi
+for MODULE in "${MODULES[@]}"; do
+    run_module_script "${MODULE}" "before-upgrade"
+done
 
 
-
-echo "########## Upgrade ##########"
+echo "===> Run upgrade"
 
 bash "upgrade.sh"
 
 
+echo "===> Run after upgrade handlers"
 
-echo "########## After upgrade ##########"
-
-if [[ "$TEST_MODULES" == "true" ]]
-then
-    echo "### After upgrade modules ###"
-    bash after-upgrade.sh
-fi
-
-if [[ "$TEST_IBC" == "true" ]]
-then
-    echo "### IBC after upgrade ###"
-    (cd ibc && bash after-upgrade.sh)
-fi
+for MODULE in "${MODULES[@]}"; do
+    run_module_script "${MODULE}" "after-upgrade"
+done
 
 
+echo "===> Run cleanup"
 
-echo "########## Tear down ##########"
+for MODULE in "${MODULES[@]}"; do
+    run_module_script "${MODULE}" "cleanup"
+done
 
-bash "tear-down.sh"
-
-if [[ "$TEST_IBC" == "true" ]]
-then
-    echo "########## IBC tear down ##########"
-    (cd ibc && bash tear-down.sh)
-fi
+bash "cleanup.sh"
