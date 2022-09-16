@@ -95,15 +95,13 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	// cheqd specific imports
-	cheqd "github.com/cheqd/cheqd-node/x/cheqd"
-	resource "github.com/cheqd/cheqd-node/x/resource"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
-	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
-	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
-	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
 	cheqdapp "github.com/cheqd/cheqd-node/app"
-
-
+	cheqd "github.com/cheqd/cheqd-node/x/cheqd"
+	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
+	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	resource "github.com/cheqd/cheqd-node/x/resource"
+	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
+	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
@@ -152,7 +150,7 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		nft.ModuleName:                 nil,
-		cheqdtypes.ModuleName:			{authtypes.Burner},
+		cheqdtypes.ModuleName:          {authtypes.Burner},
 	}
 )
 
@@ -195,7 +193,6 @@ type SimApp struct {
 	NFTKeeper        nftkeeper.Keeper
 	CheqdKeeper      cheqdkeeper.Keeper
 	ResourceKeeper   resourcekeeper.Keeper
-
 
 	// the module manager
 	mm *module.Manager

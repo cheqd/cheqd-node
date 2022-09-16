@@ -18,11 +18,11 @@ package ante
 import (
 	"fmt"
 
+	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 )
 
 // TxFeeChecker check if the provided fee is enough and returns the effective fee and tx priority,
@@ -307,7 +307,7 @@ func IsSufficientCustomFee(ctx sdk.Context, feeRequired sdk.Coins, fee sdk.Coins
 	// TODO: If yes, we might need a max threshold for fees provided by the user and revert to just the required fee if it exceeds the threshold *OR* fail & revert tx.
 	// TODO: At any case, we need to also decide on handling reverting txs if the dynamic validation fails (e.g. if the identity signatures are invalid, verification method is not supported yet, etc).
 	// TODO: This is achieved with defining a `postHandler` in the `anteHandler` and reverting the tx if the dynamic validation fails.
-	//* NOTE: Here we are accepting the total fee provided by the user, if it is greater than or equal to the required fee. 
+	//* NOTE: Here we are accepting the total fee provided by the user, if it is greater than or equal to the required fee.
 	distrFeeAlloc, err := GetDistributionFee(fee)
 	if err != nil {
 		return distrFeeAlloc, err

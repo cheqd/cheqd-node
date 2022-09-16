@@ -18,8 +18,8 @@ type DistributionFeeAllocation = [FeePortionCount]sdk.Coins
 
 func GetDistributionFee(fee sdk.Coins) (DistributionFeeAllocation, error) {
 	distrFeeAlloc := DistributionFeeAllocation{
-		BurnFeePortion:       sdk.NewCoins(fee...).QuoInt(sdk.NewInt(int64(BurnFeeDivisor))),
-		RewardsFeePortion:    sdk.NewCoins(fee...).Sub(sdk.NewCoins(fee...).QuoInt(sdk.NewInt(int64(BurnFeeDivisor)))...),
+		BurnFeePortion:    sdk.NewCoins(fee...).QuoInt(sdk.NewInt(int64(BurnFeeDivisor))),
+		RewardsFeePortion: sdk.NewCoins(fee...).Sub(sdk.NewCoins(fee...).QuoInt(sdk.NewInt(int64(BurnFeeDivisor)))...),
 	}
 
 	if ValidateDistributionFee(fee, distrFeeAlloc) != nil {

@@ -92,7 +92,7 @@ func (s *AnteTestSuite) CreateTestAccounts(numAccs int) []TestAccount {
 		s.Require().NoError(err)
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
 		someCoins := sdk.Coins{
-			sdk.NewInt64Coin("ncheq", 1000000 * 1e9), // 1mn CHEQ
+			sdk.NewInt64Coin("ncheq", 1000000*1e9), // 1mn CHEQ
 		}
 		err = s.app.BankKeeper.MintCoins(s.ctx, minttypes.ModuleName, someCoins)
 		s.Require().NoError(err)
