@@ -1,0 +1,62 @@
+package app
+
+import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/cosmos-sdk/types/tx/signing"
+	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
+	"github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/cosmos/cosmos-sdk/x/auth/ante"
+	cheqdante "github.com/cheqd/cheqd-node/ante"
+)
+
+// HandlerOptions are the options required for constructing a default SDK AnteHandler.
+// Here we extend the default exposed `BankKeeper` with our own extended `BankKeeper` interface.
+// This allows us to add our own custom logic to the default SDK AnteHandler.
+// Our custom logic is: 
+// 1. To burn portion of the transaction fee.
+// 2. Distribute a pre-defined portion of the transaction fee to the foundation.
+// 3. Distribute a pre-defined portion of the transaction fee to the validators as rewards (default behavior).
+type HandlerOptions struct {
+	AccountKeeper          ante.AccountKeeper
+	BankKeeper             cheqdante.BankKeeper
+	ExtensionOptionChecker ante.ExtensionOptionChecker
+	FeegrantKeeper         ante.FeegrantKeeper
+	SignModeHandler        authsigning.SignModeHandler
+	SigGasConsumer         func(meter sdk.GasMeter, sig signing.SignatureV2, params types.Params) error
+	TxFeeChecker           cheqdante.TxFeeChecker
+}
+
+// NewAnteHandler returns an AnteHandler that checks and increments sequence
+// numbers, checks signatures & account numbers, and deducts fees from the first
+// signer.
+func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
+	if options.AccountKeeper == nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "account keeper is required for ante builder")
+	}
+
+	if options.BankKeeper == nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "bank keeper is required for ante builder")
+	}
+
+	if options.SignModeHandler == nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "sign mode handler is required for ante builder")
+	}
+
+	anteDecorators := []sdk.AnteDecorator{
+		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
+		ante.NewExtensionOptionsDecorator(options.ExtensionOptionChecker),
+		ante.NewValidateBasicDecorator(),
+		ante.NewTxTimeoutHeightDecorator(),
+		ante.NewValidateMemoDecorator(options.AccountKeeper),
+		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
+		cheqdante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, options.TxFeeChecker),
+		ante.NewSetPubKeyDecorator(options.AccountKeeper), // SetPubKeyDecorator must be called before all signature verification decorators
+		ante.NewValidateSigCountDecorator(options.AccountKeeper),
+		ante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),
+		ante.NewSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
+		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
+	}
+
+	return sdk.ChainAnteDecorators(anteDecorators...), nil
+}
