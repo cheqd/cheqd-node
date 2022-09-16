@@ -20,7 +20,8 @@ func (s *AnteTestSuite) TestDeductFeeDecorator_ZeroGas() {
 	// keys and addresses
 	priv1, _, addr1 := testdata.KeyTestPubAddr()
 	coins := sdk.NewCoins(sdk.NewCoin("cheq", sdk.NewInt(300)))
-	testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
+	err := testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
+	s.Require().NoError(err)
 
 	// msg and signatures
 	msg := testdata.NewTestMsg(addr1)
@@ -54,7 +55,8 @@ func (s *AnteTestSuite) TestEnsureMempoolFees() {
 	// keys and addresses
 	priv1, _, addr1 := testdata.KeyTestPubAddr()
 	coins := sdk.NewCoins(sdk.NewCoin("cheq", sdk.NewInt(300)))
-	testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
+	err := testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
+	s.Require().NoError(err)
 
 	// msg and signatures
 	msg := testdata.NewTestMsg(addr1)
@@ -129,6 +131,7 @@ func (s *AnteTestSuite) TestDeductFees() {
 	acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
 	s.app.AccountKeeper.SetAccount(s.ctx, acc)
 	coins := sdk.NewCoins(sdk.NewCoin("cheq", sdk.NewInt(10)))
+	//nocheck:errcheck
 	err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
 	s.Require().NoError(err)
 
