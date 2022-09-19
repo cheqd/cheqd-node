@@ -2,16 +2,18 @@
 
 set -euo pipefail
 
+BASE_DIR_HELPERS=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 
 # Constants
 
 export LOCALNET_NETWORK="localnet"
-LOCALNET_PATH="$(git rev-parse --show-toplevel)/docker/localnet"
+LOCALNET_PATH="${BASE_DIR_HELPERS}/../../docker/localnet"
 
 # Localnet
 
 function in_localnet_path() {
     pushd "${LOCALNET_PATH}" > /dev/null
+    pwd
     "$@"
     popd > /dev/null
 }

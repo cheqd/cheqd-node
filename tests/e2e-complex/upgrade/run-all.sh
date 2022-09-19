@@ -9,7 +9,7 @@ BASE_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 
 
 # Test modules
-MODULES=("cheqd-1" "resource-2")
+MODULES=("ibc")
 
 
 function run_module_script() {
@@ -24,39 +24,37 @@ function run_module_script() {
     fi
 }
 
+function run_module_scripts() {
+    STAGE=$1
 
-echo "===> Run setup"
-
-bash "setup.sh"
-
-for MODULE in "${MODULES[@]}"; do
-    run_module_script "${MODULE}" "setup"
-done
-
-
-echo "===> Run before upgrade handlers"
-
-for MODULE in "${MODULES[@]}"; do
-    run_module_script "${MODULE}" "before-upgrade"
-done
-
-
-echo "===> Run upgrade"
-
-bash "upgrade.sh"
-
-
-echo "===> Run after upgrade handlers"
-
-for MODULE in "${MODULES[@]}"; do
-    run_module_script "${MODULE}" "after-upgrade"
-done
+    for MODULE in "${MODULES[@]}"; do
+        run_module_script "${MODULE}" "${STAGE}"
+    done
+}
 
 
 echo "===> Run cleanup"
+run_module_scripts "cleanup"
+"${BASE_DIR}/cleanup.sh"
 
-for MODULE in "${MODULES[@]}"; do
-    run_module_script "${MODULE}" "cleanup"
-done
 
-bash "cleanup.sh"
+echo "===> Run setup"
+"${BASE_DIR}/setup.sh"
+run_module_scripts "setup"
+
+
+echo "===> Run before upgrade handlers"
+run_module_scripts "before-upgrade"
+
+
+echo "===> Run upgrade"
+"${BASE_DIR}/upgrade.sh"
+
+
+echo "===> Run after upgrade handlers"
+run_module_scripts "after-upgrade"
+
+
+echo "===> Run cleanup"
+run_module_scripts "cleanup"
+"${BASE_DIR}/cleanup.sh"
