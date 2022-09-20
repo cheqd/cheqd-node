@@ -45,6 +45,11 @@ func (k Keeper) SetDid(ctx *sdk.Context, stateValue *types.StateValue) error {
 	if err != nil {
 		return err
 	}
+	types.UpdateUUIDIdentifiers(did)
+	newStateValue, err := types.NewStateValue(did, stateValue.Metadata)
+	if err != nil {
+		return err
+	}
 
 	// Update counter
 	if !k.HasDid(ctx, did.Id) {
@@ -54,7 +59,7 @@ func (k Keeper) SetDid(ctx *sdk.Context, stateValue *types.StateValue) error {
 
 	// Create the did
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
-	b := k.cdc.MustMarshal(stateValue)
+	b := k.cdc.MustMarshal(&newStateValue)
 	store.Set(GetDidIDBytes(did.Id), b)
 	return nil
 }
@@ -84,7 +89,7 @@ func (k Keeper) HasDid(ctx *sdk.Context, id string) bool {
 
 // GetDidIDBytes returns the byte representation of the ID
 func GetDidIDBytes(id string) []byte {
-	return []byte(id)
+	return []byte(types.UpdateUUIDForDID(id))
 }
 
 // GetAllDid returns all did

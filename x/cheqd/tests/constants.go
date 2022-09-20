@@ -3,7 +3,7 @@ package tests
 const (
 	AliceDID     = "did:cheqd:test:aaaaaaaaaaaaaaaa"                     // 16 chars base58
 	BobDID       = "did:cheqd:test:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"     // 32 chars base58
-	CharlieDID   = "did:cheqd:test:babbba14-f294-458a-9b9c-474d188680fd" // UUID
+	CharlieDID   = "did:cheqd:test:BAbbba14-f294-458a-9b9c-474d188680fd" // UUID
 	ImposterDID  = "did:cheqd:test:nananananananana"
 	NotFounDID   = "did:cheqd:test:nfdnfdnfdnfdnfdd"
 	AliceKey1    = AliceDID + "#key-1"

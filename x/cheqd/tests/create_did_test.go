@@ -401,3 +401,62 @@ func TestHandler_DidDocAlreadyExists(t *testing.T) {
 	require.Error(t, err)
 	require.Equal(t, fmt.Sprintf("%s: DID Doc exists", AliceDID), err.Error())
 }
+
+func TestHandler_Identifiers(t *testing.T) {
+	keys := GenerateTestKeys()
+	didPrefix := "did:cheqd:test:"
+	cases := []struct {
+		name     string
+		id       string
+		resultId string
+	}{
+		{
+			name:     "Low Case UUID",
+			id:       didPrefix + "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
+			resultId: didPrefix + "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
+		},
+		{
+			name:     "Upper Case UUID",
+			id:       didPrefix + "A86F9CAE-0902-4A7C-A144-96B60CED2FC9",
+			resultId: didPrefix + "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
+		},
+		{
+			name:     "Mixed Case UUID",
+			id:       didPrefix + "A86F9CAE-0902-4a7c-a144-96b60ced2FC9",
+			resultId: didPrefix + "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
+		},
+		{
+			name:     "Indy-style id",
+			id:       didPrefix + "MjYxNzYKMjYxNzYK",
+			resultId: didPrefix + "MjYxNzYKMjYxNzYK",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			setup := InitEnv(t, keys)
+
+			key := GenerateKeyPair()
+			keyAlias := tc.id + "#key1"
+			publicKeyMultibase, _ := multibase.Encode(multibase.Base58BTC, key.PublicKey)
+			signerKeys := map[string]ed25519.PrivateKey{keyAlias: key.PrivateKey}
+			msg := &types.MsgCreateDidPayload{
+				Id:             tc.id,
+				Authentication: []string{keyAlias},
+				VerificationMethod: []*types.VerificationMethod{
+					{
+						Id:                 keyAlias,
+						Type:               Ed25519VerificationKey2020,
+						Controller:         tc.id,
+						PublicKeyMultibase: publicKeyMultibase,
+					},
+				},
+			}
+
+			did, err := setup.SendCreateDid(msg, signerKeys)
+
+			require.Nil(t, err)
+			require.Equal(t, tc.resultId, did.Id)
+		})
+	}
+}
