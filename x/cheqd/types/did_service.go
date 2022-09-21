@@ -81,6 +81,9 @@ func UpdateUUIDForFragmentUrl(didUrl string) string {
 	if err != nil {
 		return didUrl
 	}
+	if fragmentId == "" {
+		return UpdateUUIDForDID(id)
+	}
 	return UpdateUUIDForDID(id) + "#" + fragmentId
 }
 
@@ -102,6 +105,9 @@ func UpdateUUIDIdentifiers(didDoc *Did) {
 }
 
 func UpdateDidKeyIdentifiersList(keys []string) []string {
+	if keys == nil {
+		return nil
+	}
 	newKeys := []string{}
 	for _, id := range keys {
 		newKeys = append(newKeys, UpdateUUIDForFragmentUrl(id))

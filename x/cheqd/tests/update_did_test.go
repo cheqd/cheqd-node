@@ -75,7 +75,7 @@ func TestUpdateDid(t *testing.T) {
 					},
 				},
 			},
-			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", CharlieDID),
+			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", types.UpdateUUIDForDID(CharlieDID)),
 		},
 		{
 			valid:   true,
@@ -92,7 +92,7 @@ func TestUpdateDid(t *testing.T) {
 					},
 				},
 			},
-			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", CharlieDID),
+			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", types.UpdateUUIDForDID(CharlieDID)),
 		},
 		// Verification method's tests
 		// cases:
