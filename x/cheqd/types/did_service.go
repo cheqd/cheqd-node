@@ -87,7 +87,7 @@ func UpdateUUIDForFragmentUrl(didUrl string) string {
 	return UpdateUUIDForDID(id) + "#" + fragmentId
 }
 
-func UpdateUUIDIdentifiers(didDoc *Did) {
+func UpdateUUIDIdentifiers(didDoc *Did) *Did {
 	didDoc.Id = UpdateUUIDForDID(didDoc.Id)
 	for _, vm := range didDoc.VerificationMethod {
 		vm.Controller = UpdateUUIDForDID(vm.Controller)
@@ -102,6 +102,7 @@ func UpdateUUIDIdentifiers(didDoc *Did) {
 	didDoc.CapabilityDelegation = UpdateDidKeyIdentifiersList(didDoc.CapabilityDelegation)
 	didDoc.KeyAgreement = UpdateDidKeyIdentifiersList(didDoc.KeyAgreement)
 	didDoc.AlsoKnownAs = UpdateDidKeyIdentifiersList(didDoc.AlsoKnownAs)
+	return didDoc
 }
 
 func UpdateDidKeyIdentifiersList(keys []string) []string {

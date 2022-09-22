@@ -122,7 +122,7 @@ func DuplicateSignatures(signatures []*types.SignInfo, didToDuplicate string, ne
 		result = append(result, signature)
 
 		did, path, query, fragment := utils.MustSplitDIDUrl(signature.VerificationMethodId)
-		if did == didToDuplicate {
+		if types.UpdateUUIDForDID(did) == didToDuplicate {
 			duplicate := types.SignInfo{
 				VerificationMethodId: utils.JoinDIDUrl(newDid, path, query, fragment),
 				Signature:            signature.Signature,
@@ -136,7 +136,6 @@ func DuplicateSignatures(signatures []*types.SignInfo, didToDuplicate string, ne
 }
 
 func GetSignerDIDsForDIDUpdate(existingDid types.Did, updatedDid types.Did) []string {
-	types.UpdateUUIDIdentifiers(&updatedDid)
 	signers := existingDid.GetControllersOrSubject()
 	signers = append(signers, updatedDid.GetControllersOrSubject()...)
 

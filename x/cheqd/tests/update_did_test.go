@@ -460,20 +460,22 @@ func TestUpdateDid(t *testing.T) {
 			}
 
 			did, err := setup.SendUpdateDid(msg, signerKeys)
+			rawExpectedDid := tc.msg.ToDid()
+			expectedMsg := types.UpdateUUIDIdentifiers(&rawExpectedDid)
 
 			if tc.valid {
 				require.Nil(t, err)
-				require.Equal(t, tc.msg.Id, did.Id)
-				require.Equal(t, tc.msg.Controller, did.Controller)
-				require.Equal(t, tc.msg.VerificationMethod, did.VerificationMethod)
-				require.Equal(t, tc.msg.Authentication, did.Authentication)
-				require.Equal(t, tc.msg.AssertionMethod, did.AssertionMethod)
-				require.Equal(t, tc.msg.CapabilityInvocation, did.CapabilityInvocation)
-				require.Equal(t, tc.msg.CapabilityDelegation, did.CapabilityDelegation)
-				require.Equal(t, tc.msg.KeyAgreement, did.KeyAgreement)
-				require.Equal(t, tc.msg.AlsoKnownAs, did.AlsoKnownAs)
-				require.Equal(t, tc.msg.Service, did.Service)
-				require.Equal(t, tc.msg.Context, did.Context)
+				require.Equal(t, expectedMsg.Id, did.Id)
+				require.Equal(t, expectedMsg.Controller, did.Controller)
+				require.Equal(t, expectedMsg.VerificationMethod, did.VerificationMethod)
+				require.Equal(t, expectedMsg.Authentication, did.Authentication)
+				require.Equal(t, expectedMsg.AssertionMethod, did.AssertionMethod)
+				require.Equal(t, expectedMsg.CapabilityInvocation, did.CapabilityInvocation)
+				require.Equal(t, expectedMsg.CapabilityDelegation, did.CapabilityDelegation)
+				require.Equal(t, expectedMsg.KeyAgreement, did.KeyAgreement)
+				require.Equal(t, expectedMsg.AlsoKnownAs, did.AlsoKnownAs)
+				require.Equal(t, expectedMsg.Service, did.Service)
+				require.Equal(t, expectedMsg.Context, did.Context)
 			} else {
 				require.Error(t, err)
 				require.Equal(t, tc.errMsg, err.Error())
