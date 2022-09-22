@@ -104,7 +104,6 @@ func TestUpdateUUIDForDID(t *testing.T) {
 			result := UpdateUUIDForDID(tc.did)
 
 			require.Equal(t, tc.expectedDid, result)
-
 		})
 	}
 }
@@ -137,7 +136,6 @@ func TestUpdateUUIDIdentifiers(t *testing.T) {
 			UpdateUUIDIdentifiers(&did)
 
 			require.Equal(t, expectedDid, did)
-
 		})
 	}
 }
