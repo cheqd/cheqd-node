@@ -2,8 +2,6 @@ package tests
 
 import (
 
-	// "crypto/sha256"
-	"crypto/sha256"
 	"fmt"
 	"testing"
 
@@ -72,7 +70,7 @@ func TestQueryGetResource(t *testing.T) {
 				require.Equal(t, tc.response.Resource.Header.ResourceType, resource.Header.ResourceType)
 				require.Equal(t, tc.response.Resource.Data, resource.Data)
 				require.Equal(t, tc.response.Resource.Header.Name, resource.Header.Name)
-				require.Equal(t, sha256.New().Sum(tc.response.Resource.Data), resource.Header.Checksum)
+				require.Equal(t, CreateChecksum(tc.response.Resource.Data), resource.Header.Checksum)
 				require.Equal(t, tc.response.Resource.Header.PreviousVersionId, resource.Header.PreviousVersionId)
 				require.Equal(t, tc.response.Resource.Header.NextVersionId, resource.Header.NextVersionId)
 			} else {

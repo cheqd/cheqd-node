@@ -2,7 +2,6 @@ package tests
 
 import (
 	"crypto/ed25519"
-	"crypto/sha256"
 	"fmt"
 	"testing"
 
@@ -122,7 +121,7 @@ func TestCreateResource(t *testing.T) {
 				require.Equal(t, tc.msg.ResourceType, resource.Header.ResourceType)
 				require.Equal(t, tc.msg.Data, resource.Data)
 				require.Equal(t, tc.msg.Name, resource.Header.Name)
-				require.Equal(t, sha256.New().Sum(resource.Data), resource.Header.Checksum)
+				require.Equal(t, CreateChecksum(resource.Data), resource.Header.Checksum)
 				require.Equal(t, tc.previousVersionId, resource.Header.PreviousVersionId)
 			} else {
 				require.Error(t, err)

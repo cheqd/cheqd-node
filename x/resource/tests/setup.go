@@ -3,6 +3,7 @@ package tests
 import (
 	"crypto/ed25519"
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/base64"
 	"testing"
 	"time"
@@ -145,4 +146,10 @@ func GenerateTestKeys() map[string]cheqdtests.KeyPair {
 	return map[string]cheqdtests.KeyPair{
 		ExistingDIDKey: cheqdtests.GenerateKeyPair(),
 	}
+}
+
+func CreateChecksum(data []byte) []byte {
+	h := sha256.New()
+	h.Write(data) 
+	return h.Sum(nil)
 }

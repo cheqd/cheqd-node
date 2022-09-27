@@ -1,7 +1,6 @@
 package tests
 
 import (
-	"crypto/sha256"
 
 	"github.com/cheqd/cheqd-node/x/resource/types"
 )
@@ -23,7 +22,7 @@ const (
 
 func ExistingResource() types.Resource {
 	data := []byte(SchemaData)
-	checksum := sha256.New().Sum(data)
+	checksum := CreateChecksum(data)
 	return types.Resource{
 		Header: &types.ResourceHeader{
 			CollectionId: ExistingDIDIdentifier,
