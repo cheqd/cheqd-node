@@ -45,7 +45,7 @@ func (k Keeper) SetDid(ctx *sdk.Context, stateValue *types.StateValue) error {
 	if err != nil {
 		return err
 	}
-	types.UpdateUUIDIdentifiers(did)
+	types.NormalizeDID(did)
 	newStateValue, err := types.NewStateValue(did, stateValue.Metadata)
 	if err != nil {
 		return err
@@ -89,7 +89,7 @@ func (k Keeper) HasDid(ctx *sdk.Context, id string) bool {
 
 // GetDidIDBytes returns the byte representation of the ID
 func GetDidIDBytes(id string) []byte {
-	return []byte(types.UpdateUUIDForDID(id))
+	return []byte(types.NormalizeIdentifier(id))
 }
 
 // GetAllDid returns all did

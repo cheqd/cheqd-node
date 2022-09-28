@@ -75,7 +75,7 @@ func TestUpdateDid(t *testing.T) {
 					},
 				},
 			},
-			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", types.UpdateUUIDForDID(CharlieDID)),
+			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", types.NormalizeIdentifier(CharlieDID)),
 		},
 		{
 			valid:   true,
@@ -92,7 +92,7 @@ func TestUpdateDid(t *testing.T) {
 					},
 				},
 			},
-			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", types.UpdateUUIDForDID(CharlieDID)),
+			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", types.NormalizeIdentifier(CharlieDID)),
 		},
 		// Verification method's tests
 		// cases:
@@ -461,7 +461,7 @@ func TestUpdateDid(t *testing.T) {
 
 			did, err := setup.SendUpdateDid(msg, signerKeys)
 			rawExpectedDid := tc.msg.ToDid()
-			expectedMsg := types.UpdateUUIDIdentifiers(&rawExpectedDid)
+			expectedMsg := types.NormalizeDID(&rawExpectedDid)
 
 			if tc.valid {
 				require.Nil(t, err)

@@ -65,7 +65,7 @@ func IsUniqueServiceListByIdRule() *CustomErrorRule {
 	})
 }
 
-func UpdateUUIDForDID(did string) string {
+func NormalizeIdentifier(did string) string {
 	_, _, sUniqueId, err := utils.TrySplitDID(did)
 	if err != nil {
 		return did
@@ -76,48 +76,49 @@ func UpdateUUIDForDID(did string) string {
 	return did
 }
 
-func UpdateUUIDForFragmentUrl(didUrl string) string {
+func NormalizeIdForFragmentUrl(didUrl string) string {
 	id, _, _, fragmentId, err := utils.TrySplitDIDUrl(didUrl)
 	if err != nil {
 		return didUrl
 	}
 	if fragmentId == "" {
-		return UpdateUUIDForDID(id)
+		return NormalizeIdentifier(id)
 	}
-	return UpdateUUIDForDID(id) + "#" + fragmentId
+	return NormalizeIdentifier(id) + "#" + fragmentId
 }
 
-func UpdateUUIDIdentifiers(didDoc *Did) *Did {
-	didDoc.Id = UpdateUUIDForDID(didDoc.Id)
+func NormalizeDID(didDoc *Did) *Did {
+	didDoc.Id = NormalizeIdentifier(didDoc.Id)
 	for _, vm := range didDoc.VerificationMethod {
-		vm.Controller = UpdateUUIDForDID(vm.Controller)
-		vm.Id = UpdateUUIDForFragmentUrl(vm.Id)
+		vm.Controller = NormalizeIdentifier(vm.Controller)
+		vm.Id = NormalizeIdForFragmentUrl(vm.Id)
 	}
 	for _, s := range didDoc.Service {
-		s.Id = UpdateUUIDForFragmentUrl(s.Id)
+		s.Id = NormalizeIdForFragmentUrl(s.Id)
 	}
-	didDoc.Authentication = UpdateDidKeyIdentifiersList(didDoc.Authentication)
-	didDoc.AssertionMethod = UpdateDidKeyIdentifiersList(didDoc.AssertionMethod)
-	didDoc.CapabilityInvocation = UpdateDidKeyIdentifiersList(didDoc.CapabilityInvocation)
-	didDoc.CapabilityDelegation = UpdateDidKeyIdentifiersList(didDoc.CapabilityDelegation)
-	didDoc.KeyAgreement = UpdateDidKeyIdentifiersList(didDoc.KeyAgreement)
-	didDoc.AlsoKnownAs = UpdateDidKeyIdentifiersList(didDoc.AlsoKnownAs)
+	didDoc.Controller = NormalizeIdentifiersList(didDoc.Controller)
+	didDoc.Authentication = NormalizeIdentifiersList(didDoc.Authentication)
+	didDoc.AssertionMethod = NormalizeIdentifiersList(didDoc.AssertionMethod)
+	didDoc.CapabilityInvocation = NormalizeIdentifiersList(didDoc.CapabilityInvocation)
+	didDoc.CapabilityDelegation = NormalizeIdentifiersList(didDoc.CapabilityDelegation)
+	didDoc.KeyAgreement = NormalizeIdentifiersList(didDoc.KeyAgreement)
+	didDoc.AlsoKnownAs = NormalizeIdentifiersList(didDoc.AlsoKnownAs)
 	return didDoc
 }
 
-func UpdateDidKeyIdentifiersList(keys []string) []string {
+func NormalizeIdentifiersList(keys []string) []string {
 	if keys == nil {
 		return nil
 	}
 	newKeys := []string{}
 	for _, id := range keys {
-		newKeys = append(newKeys, UpdateUUIDForFragmentUrl(id))
+		newKeys = append(newKeys, NormalizeIdForFragmentUrl(id))
 	}
 	return newKeys
 }
 
-func UpdateSignatureUUIDIdentifiers(signatures []*SignInfo) {
+func NormalizeSignatureUUIDIdentifiers(signatures []*SignInfo) {
 	for _, s := range signatures {
-		s.VerificationMethodId = UpdateUUIDForFragmentUrl(s.VerificationMethodId)
+		s.VerificationMethodId = NormalizeIdForFragmentUrl(s.VerificationMethodId)
 	}
 }

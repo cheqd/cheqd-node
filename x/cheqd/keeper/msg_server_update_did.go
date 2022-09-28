@@ -13,11 +13,6 @@ const UpdatedPostfix string = "-updated"
 func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*types.MsgUpdateDidResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// Validate DID does exist
-	if !k.HasDid(&ctx, msg.Payload.Id) {
-		return nil, types.ErrDidDocNotFound.Wrap(msg.Payload.Id)
-	}
-
 	// Validate namespaces
 	namespace := k.GetDidNamespace(&ctx)
 	err := msg.Validate([]string{namespace})
@@ -25,8 +20,19 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 		return nil, types.ErrNamespaceValidation.Wrap(err.Error())
 	}
 
+	// Construct the new version of the DID and temporary rename it and its self references
+	// in order to consider old and new versions different DIDs during signatures validation
+	updatedDid := msg.Payload.ToDid()
+	updatedDid.ReplaceIds(updatedDid.Id, updatedDid.Id+UpdatedPostfix)
+	types.NormalizeSignatureUUIDIdentifiers(msg.Signatures)
+
+	// Validate DID does exist
+	if !k.HasDid(&ctx, updatedDid.Id) {
+		return nil, types.ErrDidDocNotFound.Wrap(updatedDid.Id)
+	}
+
 	// Retrieve existing state value and did
-	existingStateValue, err := k.GetDid(&ctx, msg.Payload.Id)
+	existingStateValue, err := k.GetDid(&ctx, updatedDid.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -43,11 +49,6 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 
 	// Get sign bytes before modifying payload
 	signBytes := msg.Payload.GetSignBytes()
-
-	// Construct the new version of the DID and temporary rename it and its self references
-	// in order to consider old and new versions different DIDs during signatures validation
-	updatedDid := msg.Payload.ToDid()
-	updatedDid.ReplaceIds(updatedDid.Id, types.UpdateUUIDForDID(updatedDid.Id)+UpdatedPostfix)
 
 	updatedMetadata := *existingStateValue.Metadata
 	updatedMetadata.Update(ctx)
@@ -76,8 +77,6 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 	// To eliminate this problem we have to add pubkey to the signInfo in future.
 	signers := GetSignerDIDsForDIDUpdate(*existingDid, updatedDid)
 	extendedSignatures := DuplicateSignatures(msg.Signatures, existingDid.Id, updatedDid.Id)
-	types.UpdateSignatureUUIDIdentifiers(extendedSignatures)
-	signers = types.UpdateDidKeyIdentifiersList(signers)
 	err = VerifyAllSignersHaveAtLeastOneValidSignature(&k.Keeper, &ctx, inMemoryDids, signBytes, signers, extendedSignatures, existingDid.Id, updatedDid.Id)
 	if err != nil {
 		return nil, err
@@ -122,7 +121,7 @@ func DuplicateSignatures(signatures []*types.SignInfo, didToDuplicate string, ne
 		result = append(result, signature)
 
 		did, path, query, fragment := utils.MustSplitDIDUrl(signature.VerificationMethodId)
-		if types.UpdateUUIDForDID(did) == didToDuplicate {
+		if did == didToDuplicate {
 			duplicate := types.SignInfo{
 				VerificationMethodId: utils.JoinDIDUrl(newDid, path, query, fragment),
 				Signature:            signature.Signature,

@@ -374,7 +374,7 @@ func TestCreateDID(t *testing.T) {
 			if tc.valid {
 				require.Nil(t, err)
 				require.Equal(t, tc.msg.Id, did.Id)
-				require.Equal(t, tc.msg.Controller, did.Controller)
+				require.Equal(t, types.NormalizeIdentifiersList(tc.msg.Controller), did.Controller)
 				require.Equal(t, tc.msg.VerificationMethod, did.VerificationMethod)
 				require.Equal(t, tc.msg.Authentication, did.Authentication)
 				require.Equal(t, tc.msg.AssertionMethod, did.AssertionMethod)
