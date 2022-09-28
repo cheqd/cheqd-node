@@ -15,10 +15,13 @@ const (
 	AnotherResourceId   = "71583c78-f16f-11ec-9dd4-cba0f34eb177"
 	IncorrectResourceId = "1234"
 
-	NotFoundDIDIdentifier = "nfdnfdnfdnfdnfdd"
-	ExistingDIDIdentifier = "eeeeeeeeeeeeeeee"
-	ExistingDID           = "did:cheqd:test:" + ExistingDIDIdentifier
-	ExistingDIDKey        = ExistingDID + "#key-1"
+	NotFoundDIDIdentifier    = "nfdnfdnfdnfdnfdd"
+	ExistingDIDIdentifier    = "eeeeeeeeeeeeeeee"
+	ExistingDID              = "did:cheqd:test:" + ExistingDIDIdentifier
+	ExistingDIDKey           = ExistingDID + "#key-1"
+	DeactivatedDIDIdentifier = "dddddddddddddddd"
+	DeactivatedDID           = "did:cheqd:test:" + DeactivatedDIDIdentifier
+	DeactivatedDIDKey        = DeactivatedDID + "#key-1"
 )
 
 func ExistingResource() types.Resource {

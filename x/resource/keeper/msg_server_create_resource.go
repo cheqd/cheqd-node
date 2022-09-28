@@ -25,6 +25,11 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 		return nil, err
 	}
 
+	// Validate if already deactivated
+	if didDocStateValue.Metadata.Deactivated {
+		return nil, cheqdtypes.ErrDIDDocDeactivated.Wrap(did)
+	}
+
 	// Validate Resource doesn't exist
 	if k.HasResource(&ctx, msg.Payload.CollectionId, msg.Payload.Id) {
 		return nil, types.ErrResourceExists.Wrap(msg.Payload.Id)

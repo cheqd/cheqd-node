@@ -8,8 +8,6 @@ import (
 
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 
-	// "crypto/sha256"
-
 	"github.com/cheqd/cheqd-node/x/resource/types"
 
 	"github.com/stretchr/testify/require"
@@ -100,12 +98,29 @@ func TestCreateResource(t *testing.T) {
 			mediaType: JsonResourceType,
 			errMsg:    fmt.Sprintf("did:cheqd:test:%s: not found", NotFoundDIDIdentifier),
 		},
+		{
+			valid: false,
+			name:  "Not Valid: Cannot create resource for deactivated DID",
+			signerKeys: map[string]ed25519.PrivateKey{
+				ExistingDIDKey: keys[ExistingDIDKey].PrivateKey,
+			},
+			msg: &types.MsgCreateResourcePayload{
+				CollectionId: DeactivatedDIDIdentifier,
+				Id:           ResourceId,
+				Name:         "Test Resource Name",
+				ResourceType: CLSchemaType,
+				Data:         []byte(SchemaData),
+			},
+			mediaType:         JsonResourceType,
+			previousVersionId: "",
+			errMsg:            DeactivatedDID + ": DID Doc already deactivated",
+		},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			msg := tc.msg
-			resourceSetup := InitEnv(t, keys[ExistingDIDKey].PublicKey, keys[ExistingDIDKey].PrivateKey)
+			resourceSetup := InitEnv(t, keys)
 
 			resource, err := resourceSetup.SendCreateResource(msg, tc.signerKeys)
 			if tc.valid {

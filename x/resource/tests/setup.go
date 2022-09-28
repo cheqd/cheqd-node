@@ -127,15 +127,22 @@ func (s *TestSetup) SendCreateResource(msg *types.MsgCreateResourcePayload, keys
 	return &created, nil
 }
 
-func InitEnv(t *testing.T, publicKey ed25519.PublicKey, privateKey ed25519.PrivateKey) TestSetup {
+func InitEnv(t *testing.T, keys map[string]cheqdtests.KeyPair) TestSetup {
 	resourceSetup := Setup()
 
-	didDoc := resourceSetup.CreateDid(publicKey, ExistingDID)
-	_, err := resourceSetup.SendCreateDid(didDoc, map[string]ed25519.PrivateKey{ExistingDIDKey: privateKey})
+	didDoc := resourceSetup.CreateDid(keys[ExistingDIDKey].PublicKey, ExistingDID)
+	_, err := resourceSetup.SendCreateDid(didDoc, map[string]ed25519.PrivateKey{ExistingDIDKey: keys[ExistingDIDKey].PrivateKey})
+	require.NoError(t, err)
+
+	didDoc = resourceSetup.CreateDid(keys[DeactivatedDIDKey].PublicKey, DeactivatedDID)
+	_, err = resourceSetup.SendCreateDid(didDoc, map[string]ed25519.PrivateKey{DeactivatedDIDKey: keys[DeactivatedDIDKey].PrivateKey})
+	require.NoError(t, err)
+	msg := &cheqdtypes.MsgDeactivateDidPayload{Id: DeactivatedDID}
+	_, err = resourceSetup.SendDeactivateDid(msg, map[string]ed25519.PrivateKey{DeactivatedDIDKey: keys[DeactivatedDIDKey].PrivateKey})
 	require.NoError(t, err)
 
 	resourcePayload := GenerateCreateResourcePayload(ExistingResource())
-	_, err = resourceSetup.SendCreateResource(resourcePayload, map[string]ed25519.PrivateKey{ExistingDIDKey: privateKey})
+	_, err = resourceSetup.SendCreateResource(resourcePayload, map[string]ed25519.PrivateKey{ExistingDIDKey: keys[ExistingDIDKey].PrivateKey})
 	require.NoError(t, err)
 
 	return resourceSetup
@@ -143,6 +150,7 @@ func InitEnv(t *testing.T, publicKey ed25519.PublicKey, privateKey ed25519.Priva
 
 func GenerateTestKeys() map[string]cheqdtests.KeyPair {
 	return map[string]cheqdtests.KeyPair{
-		ExistingDIDKey: cheqdtests.GenerateKeyPair(),
+		ExistingDIDKey:    cheqdtests.GenerateKeyPair(),
+		DeactivatedDIDKey: cheqdtests.GenerateKeyPair(),
 	}
 }

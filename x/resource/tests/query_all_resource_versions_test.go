@@ -61,7 +61,7 @@ func TestQueryGetAllResourceVersions(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			msg := tc.msg
-			resourceSetup := InitEnv(t, keys[ExistingDIDKey].PublicKey, keys[ExistingDIDKey].PrivateKey)
+			resourceSetup := InitEnv(t, keys)
 
 			newResourcePayload := GenerateCreateResourcePayload(ExistingResource())
 			newResourcePayload.Id = ResourceId
