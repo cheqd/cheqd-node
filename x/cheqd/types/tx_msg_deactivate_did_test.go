@@ -35,17 +35,6 @@ func TestMsgDeactivateDidValidation(t *testing.T) {
 			errorMsg: "payload: (id: did method must be: cheqd.).: basic validation failed",
 		},
 		{
-			name: "negative: invalid namespace",
-			struct_: &MsgDeactivateDid{
-				Payload: &MsgDeactivateDidPayload{
-					Id: "did:cheqd:fakenamespace:123456789abcdefg",
-				},
-				Signatures: nil,
-			},
-			isValid:  false,
-			errorMsg: "payload: (version_id: cannot be blank.).: basic validation failed",
-		},
-		{
 			name: "negative: id is required",
 			struct_: &MsgDeactivateDid{
 				Payload:    &MsgDeactivateDidPayload{},
