@@ -2,8 +2,8 @@ package tests
 
 import (
 	"crypto/ed25519"
-	"testing"
 	"fmt"
+	"testing"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/stretchr/testify/require"
@@ -60,7 +60,7 @@ func TestDeactivateDid(t *testing.T) {
 				Id: DeactivatedDID,
 			},
 			deactivared: true,
-			errMsg: DeactivatedDID + ": DID Doc already deactivated",
+			errMsg:      DeactivatedDID + ": DID Doc already deactivated",
 		},
 		{
 			valid: false,
@@ -75,7 +75,7 @@ func TestDeactivateDid(t *testing.T) {
 				Id: AliceDID,
 			},
 			deactivared: false,
-			errMsg: fmt.Sprintf("signer: %s: signature is required but not found", AliceDID),
+			errMsg:      fmt.Sprintf("signer: %s: signature is required but not found", AliceDID),
 		},
 	}
 	for _, tc := range cases {

@@ -13,17 +13,17 @@ import (
 func TestUpdateDid(t *testing.T) {
 	var err error
 	keys := map[string]KeyPair{
-		AliceKey1:    GenerateKeyPair(),
-		AliceKey2:    GenerateKeyPair(),
-		BobKey1:      GenerateKeyPair(),
-		BobKey2:      GenerateKeyPair(),
-		BobKey3:      GenerateKeyPair(),
-		BobKey4:      GenerateKeyPair(),
-		CharlieKey1:  GenerateKeyPair(),
-		CharlieKey2:  GenerateKeyPair(),
-		CharlieKey3:  GenerateKeyPair(),
-		CharlieKey4:  GenerateKeyPair(),
-		ImposterKey1: GenerateKeyPair(),
+		AliceKey1:         GenerateKeyPair(),
+		AliceKey2:         GenerateKeyPair(),
+		BobKey1:           GenerateKeyPair(),
+		BobKey2:           GenerateKeyPair(),
+		BobKey3:           GenerateKeyPair(),
+		BobKey4:           GenerateKeyPair(),
+		CharlieKey1:       GenerateKeyPair(),
+		CharlieKey2:       GenerateKeyPair(),
+		CharlieKey3:       GenerateKeyPair(),
+		CharlieKey4:       GenerateKeyPair(),
+		ImposterKey1:      GenerateKeyPair(),
 		DeactivatedDIDKey: GenerateKeyPair(),
 	}
 

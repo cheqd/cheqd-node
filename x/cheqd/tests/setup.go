@@ -237,7 +237,6 @@ func (s *TestSetup) SendCreateDid(msg *types.MsgCreateDidPayload, keys map[strin
 }
 
 func (s *TestSetup) SendDeactivateDid(msg *types.MsgDeactivateDidPayload, keys map[string]ed25519.PrivateKey) (*types.Metadata, error) {
-
 	_, err := s.Handler(s.Ctx, s.WrapDeactivateRequest(msg, keys))
 	if err != nil {
 		return nil, err
