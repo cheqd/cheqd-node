@@ -32,7 +32,7 @@ func (k msgServer) DeactivateDid(goCtx context.Context, msg *types.MsgDeactivate
 
 	// Validate if already deactivated
 	if existingStateValue.Metadata.Deactivated {
-		return nil, types.ErrDIDDocAlreadyDeactivated.Wrap(msg.Payload.Id)
+		return nil, types.ErrDIDDocDeactivated.Wrap(msg.Payload.Id)
 	}
 
 	existingDid, err := existingStateValue.UnpackDataAsDid()

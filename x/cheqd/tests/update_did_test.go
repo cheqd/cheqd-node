@@ -24,6 +24,7 @@ func TestUpdateDid(t *testing.T) {
 		CharlieKey3:  GenerateKeyPair(),
 		CharlieKey4:  GenerateKeyPair(),
 		ImposterKey1: GenerateKeyPair(),
+		DeactivatedDIDKey: GenerateKeyPair(),
 	}
 
 	cases := []struct {
@@ -432,6 +433,23 @@ func TestUpdateDid(t *testing.T) {
 				},
 			},
 			errMsg: fmt.Sprintf("there should be at least one signature by %s (old version): signature is required but not found", BobDID),
+		},
+		{
+			valid:   false,
+			name:    "Not Valid: Deactivated DID cant be updated",
+			signers: []string{AliceKey1, CharlieKey3},
+			msg: &types.MsgUpdateDidPayload{
+				Id:         DeactivatedDID,
+				Controller: []string{DeactivatedDID, CharlieDID},
+				VerificationMethod: []*types.VerificationMethod{
+					{
+						Id:         DeactivatedDIDKey,
+						Type:       Ed25519VerificationKey2020,
+						Controller: DeactivatedDID,
+					},
+				},
+			},
+			errMsg: DeactivatedDID + ": DID Doc already deactivated",
 		},
 	}
 
