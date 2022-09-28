@@ -15,18 +15,17 @@ jobs:
     name: "Build"
     needs: call-lint
     uses: ./.github/workflows/build.yml
+    secrets: inherit
   
-  call-test:
-    name: "Test"
-    needs: call-build
-    uses: ./.github/workflows/test.yml
-    with:
-      VERSION: ${{ needs.call-build.outputs.VERSION }}
+  # call-test:
+  #   name: "Test"
+  #   needs: call-build
+  #   uses: ./.github/workflows/test.yml
 
   call-release:
     name: "Release"
-    needs: [call-test, call-build]
-    if: startsWith(github.ref, 'refs/tags/v')
+    # needs: [call-test, call-build]
+    needs: call-build
+    if: ${{ github.ref_protected == true }}
     uses: ./.github/workflows/release.yml
-    with:
-      RELEASE_VERSION: ${{ needs.call-build.outputs.VERSION }}
+    secrets: inherit
