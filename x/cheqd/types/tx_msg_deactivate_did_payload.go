@@ -1,5 +1,7 @@
 package types
 
+import validation "github.com/go-ozzo/ozzo-validation/v4"
+
 var _ IdentityMsg = &MsgDeactivateDidPayload{}
 
 func (msg *MsgDeactivateDidPayload) GetSignBytes() []byte {
@@ -15,7 +17,9 @@ func (msg *MsgDeactivateDidPayload) ToDid() Did {
 // Validation
 
 func (msg MsgDeactivateDidPayload) Validate(allowedNamespaces []string) error {
-	return msg.ToDid().Validate(allowedNamespaces)
+	return validation.ValidateStruct(&msg,
+		validation.Field(&msg.Id, validation.Required, IsDID(allowedNamespaces)),
+	)
 }
 
 func ValidMsgDeactivateDidPayloadRule(allowedNamespaces []string) *CustomErrorRule {

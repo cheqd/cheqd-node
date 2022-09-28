@@ -27,22 +27,25 @@ func GenerateFragment(did string) string {
 
 func GenerateTestKeys() map[string]KeyPair {
 	return map[string]KeyPair{
-		AliceKey1:    GenerateKeyPair(),
-		AliceKey2:    GenerateKeyPair(),
-		BobKey1:      GenerateKeyPair(),
-		BobKey2:      GenerateKeyPair(),
-		BobKey3:      GenerateKeyPair(),
-		BobKey4:      GenerateKeyPair(),
-		CharlieKey1:  GenerateKeyPair(),
-		CharlieKey2:  GenerateKeyPair(),
-		CharlieKey3:  GenerateKeyPair(),
-		ImposterKey1: GenerateKeyPair(),
+		AliceKey1:         GenerateKeyPair(),
+		AliceKey2:         GenerateKeyPair(),
+		BobKey1:           GenerateKeyPair(),
+		BobKey2:           GenerateKeyPair(),
+		BobKey3:           GenerateKeyPair(),
+		BobKey4:           GenerateKeyPair(),
+		CharlieKey1:       GenerateKeyPair(),
+		CharlieKey2:       GenerateKeyPair(),
+		CharlieKey3:       GenerateKeyPair(),
+		ImposterKey1:      GenerateKeyPair(),
+		DeactivatedDIDKey: GenerateKeyPair(),
 	}
 }
 
 func InitEnv(t *testing.T, keys map[string]KeyPair) TestSetup {
 	setup := Setup()
 	err := setup.CreateTestDIDs(keys)
+	require.NoError(t, err)
+	err = setup.DeactivateTestDid(keys)
 	require.NoError(t, err)
 	return setup
 }

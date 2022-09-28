@@ -10,10 +10,10 @@ import (
 
 func CmdDeactivateDid() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "deactivate-did [payload-json] [ver-method-id-1] [priv-key-1] [ver-method-id-N] [priv-key-N] ...",
+		Use:   "deactivate-did [id] [ver-method-id-1] [priv-key-1] [ver-method-id-N] [priv-key-N] ...",
 		Short: "Deactivates a DID.",
 		Long: "Deactivates a DID. " +
-			"[payload-json] is JSON encoded MsgDeactivateDidPayload. " +
+			"[id] is DID Document id. " +
 			"[ver-method-id-N] is the DID fragment that points to the public part of the key in the ledger for the signature N." +
 			"[priv-key-1] is base base64 encoded ed25519 private key for signature N." +
 			"If 'interactive' value is used for a key, the key will be read interactively. " +
@@ -25,16 +25,14 @@ func CmdDeactivateDid() *cobra.Command {
 				return err
 			}
 
-			payloadJson, signInputs, err := GetPayloadAndSignInputs(clientCtx, args)
+			did, signInputs, err := GetPayloadAndSignInputs(clientCtx, args)
 			if err != nil {
 				return err
 			}
 
-			// Unmarshal payload
-			var payload types.MsgDeactivateDidPayload
-			err = clientCtx.Codec.UnmarshalJSON([]byte(payloadJson), &payload)
-			if err != nil {
-				return err
+			// Build payload
+			payload := &types.MsgDeactivateDidPayload{
+				Id: did,
 			}
 
 			// Build identity message
@@ -42,7 +40,7 @@ func CmdDeactivateDid() *cobra.Command {
 			identitySignatures := SignWithSignInputs(signBytes, signInputs)
 
 			msg := types.MsgDeactivateDid{
-				Payload:    &payload,
+				Payload:    payload,
 				Signatures: identitySignatures,
 			}
 

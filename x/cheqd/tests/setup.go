@@ -165,14 +165,14 @@ func (s *TestSetup) WrapUpdateRequest(payload *types.MsgUpdateDidPayload, keys [
 	}
 }
 
-func (s *TestSetup) WrapDeactivateRequest(payload *types.MsgDeactivateDidPayload, keys []SignerKey) *types.MsgDeactivateDid {
+func (s *TestSetup) WrapDeactivateRequest(payload *types.MsgDeactivateDidPayload, keys map[string]ed25519.PrivateKey) *types.MsgDeactivateDid {
 	var signatures []*types.SignInfo
 	signingInput := payload.GetSignBytes()
 
-	for _, skey := range keys {
-		signature := base64.StdEncoding.EncodeToString(ed25519.Sign(skey.key, signingInput))
+	for privKeyId, privKey := range keys {
+		signature := base64.StdEncoding.EncodeToString(ed25519.Sign(privKey, signingInput))
 		signatures = append(signatures, &types.SignInfo{
-			VerificationMethodId: skey.signer,
+			VerificationMethodId: privKeyId,
 			Signature:            signature,
 		})
 	}
@@ -236,15 +236,15 @@ func (s *TestSetup) SendCreateDid(msg *types.MsgCreateDidPayload, keys map[strin
 	return created.UnpackDataAsDid()
 }
 
-func (s *TestSetup) SendDeactivateDid(msg *types.MsgDeactivateDidPayload, keys []SignerKey) (*types.Did, error) {
-	
+func (s *TestSetup) SendDeactivateDid(msg *types.MsgDeactivateDidPayload, keys map[string]ed25519.PrivateKey) (*types.Metadata, error) {
+
 	_, err := s.Handler(s.Ctx, s.WrapDeactivateRequest(msg, keys))
 	if err != nil {
 		return nil, err
 	}
 
 	updated, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
-	return updated.UnpackDataAsDid()
+	return updated.Metadata, nil
 }
 
 func ConcatKeys(dst map[string]ed25519.PrivateKey, src map[string]ed25519.PrivateKey) map[string]ed25519.PrivateKey {
@@ -349,6 +349,20 @@ func (s TestSetup) CreateTestDIDs(keys map[string]KeyPair) error {
 				},
 			},
 		},
+		{
+			signers: []string{DeactivatedDIDKey},
+			msg: &types.MsgCreateDidPayload{
+				Id:             DeactivatedDID,
+				Authentication: []string{DeactivatedDIDKey},
+				VerificationMethod: []*types.VerificationMethod{
+					{
+						Id:         DeactivatedDIDKey,
+						Type:       Ed25519VerificationKey2020,
+						Controller: DeactivatedDID,
+					},
+				},
+			},
+		},
 	}
 
 	for _, prefilled := range testDIDs {
@@ -371,6 +385,19 @@ func (s TestSetup) CreateTestDIDs(keys map[string]KeyPair) error {
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (s TestSetup) DeactivateTestDid(keys map[string]KeyPair) error {
+	msg := &types.MsgDeactivateDidPayload{
+		Id: DeactivatedDID,
+	}
+	signerKeys := map[string]ed25519.PrivateKey{DeactivatedDIDKey: keys[DeactivatedDIDKey].PrivateKey}
+	_, err := s.SendDeactivateDid(msg, signerKeys)
+	if err != nil {
+		return err
 	}
 
 	return nil

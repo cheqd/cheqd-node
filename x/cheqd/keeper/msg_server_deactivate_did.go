@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
-	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -19,7 +18,7 @@ func (k msgServer) DeactivateDid(goCtx context.Context, msg *types.MsgDeactivate
 	}
 
 	// Validate namespaces
-	namespace := k.GetDidNamespace(ctx)
+	namespace := k.GetDidNamespace(&ctx)
 	err := msg.Validate([]string{namespace})
 	if err != nil {
 		return nil, types.ErrNamespaceValidation.Wrap(err.Error())
@@ -29,6 +28,11 @@ func (k msgServer) DeactivateDid(goCtx context.Context, msg *types.MsgDeactivate
 	existingStateValue, err := k.GetDid(&ctx, msg.Payload.Id)
 	if err != nil {
 		return nil, err
+	}
+
+	// Validate if already deactivated
+	if existingStateValue.Metadata.Deactivated {
+		return nil, types.ErrDIDDocAlreadyDeactivated.Wrap(msg.Payload.Id)
 	}
 
 	existingDid, err := existingStateValue.UnpackDataAsDid()
@@ -58,11 +62,7 @@ func (k msgServer) DeactivateDid(goCtx context.Context, msg *types.MsgDeactivate
 	}
 
 	// Verify signatures
-	updatedDid, err := updatedStateValue.UnpackDataAsDid()
-	if err != nil {
-		return nil, err
-	}
-	signers := GetSignerDIDsForDIDDeactivation(*existingDid, *updatedDid)
+	signers := GetSignerDIDsForDIDCreation(*existingDid)
 	for _, signer := range signers {
 		signature, found := types.FindSignInfoBySigner(msg.Signatures, signer)
 
@@ -75,9 +75,13 @@ func (k msgServer) DeactivateDid(goCtx context.Context, msg *types.MsgDeactivate
 			return nil, err
 		}
 	}
-
+	// Modify state
+	updatedStateValue, err = types.NewStateValue(existingDid, &updatedMetadata)
+	if err != nil {
+		return nil, err
+	}
 	// Apply changes: return original id and modify state
-	err = k.SetDid(&ctx, existingDid, &updatedMetadata)
+	err = k.SetDid(&ctx, &updatedStateValue)
 	if err != nil {
 		return nil, types.ErrInternal.Wrapf(err.Error())
 	}
@@ -87,13 +91,4 @@ func (k msgServer) DeactivateDid(goCtx context.Context, msg *types.MsgDeactivate
 		Did:      existingDid,
 		Metadata: &updatedMetadata,
 	}, nil
-}
-
-func GetSignerDIDsForDIDDeactivation(existingDid types.Did, updatedDid types.Did) []string { 
-	res := existingDid.GetControllersOrSubject()
-	res = append(res, updatedDid.GetControllersOrSubject()...)
-	res = append(res, existingDid.GetVerificationMethodControllers()...)
-	res = append(res, updatedDid.GetVerificationMethodControllers()...)
-
-	return utils.UniqueSorted(res)
 }

@@ -1,51 +1,81 @@
 package tests
 
 import (
+	"crypto/ed25519"
 	"testing"
+	"fmt"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/stretchr/testify/require"
 )
 
 func TestDeactivateDid(t *testing.T) {
-	keys := map[string]KeyPair{
-		AliceKey1:    GenerateKeyPair(),
-		AliceKey2:    GenerateKeyPair(),
-		BobKey1:      GenerateKeyPair(),
-		BobKey2:      GenerateKeyPair(),
-		BobKey3:      GenerateKeyPair(),
-		BobKey4:      GenerateKeyPair(),
-		CharlieKey1:  GenerateKeyPair(),
-		CharlieKey2:  GenerateKeyPair(),
-		CharlieKey3:  GenerateKeyPair(),
-		CharlieKey4:  GenerateKeyPair(),
-		ImposterKey1: GenerateKeyPair(),
-	}
+	keys := GenerateTestKeys()
 
 	cases := []struct {
-		valid      bool
-		name       string
-		signerKeys []SignerKey
-		signers    []string
-		msg        *types.MsgDeactivateDidPayload
-		errMsg     string
+		valid       bool
+		name        string
+		signerKeys  []SignerKey
+		msg         *types.MsgDeactivateDidPayload
+		deactivared bool
+		errMsg      string
 	}{
 		{
 			valid: true,
-			name:  "Valid: Key rotation works",
+			name:  "Valid: Deactivate DID",
 			signerKeys: []SignerKey{
 				{
 					signer: AliceKey1,
 					key:    keys[AliceKey1].PrivateKey,
 				},
+			},
+			msg: &types.MsgDeactivateDidPayload{
+				Id: AliceDID,
+			},
+		},
+		{
+			valid: false,
+			name:  "Not Valid: Not found",
+			signerKeys: []SignerKey{
 				{
 					signer: AliceKey1,
-					key:    keys[AliceKey2].PrivateKey,
+					key:    keys[AliceKey1].PrivateKey,
+				},
+			},
+			msg: &types.MsgDeactivateDidPayload{
+				Id: NotFounDID,
+			},
+			errMsg: NotFounDID + ": DID Doc not found",
+		},
+		{
+			valid: false,
+			name:  "Not Valid: Already deactivated",
+			signerKeys: []SignerKey{
+				{
+					signer: DeactivatedDIDKey,
+					key:    keys[DeactivatedDIDKey].PrivateKey,
+				},
+			},
+			msg: &types.MsgDeactivateDidPayload{
+				Id: DeactivatedDID,
+			},
+			deactivared: true,
+			errMsg: DeactivatedDID + ": DID Doc already deactivated",
+		},
+		{
+			valid: false,
+			name:  "Not Valid: Invalid signature",
+			signerKeys: []SignerKey{
+				{
+					signer: BobKey1,
+					key:    keys[BobKey1].PrivateKey,
 				},
 			},
 			msg: &types.MsgDeactivateDidPayload{
 				Id: AliceDID,
 			},
+			deactivared: false,
+			errMsg: fmt.Sprintf("signer: %s: signature is required but not found", AliceDID),
 		},
 	}
 	for _, tc := range cases {
@@ -53,28 +83,22 @@ func TestDeactivateDid(t *testing.T) {
 			setup := InitEnv(t, keys)
 			msg := tc.msg
 
-
-
-			signerKeys := []SignerKey{}
-			if tc.signerKeys != nil {
-				signerKeys = tc.signerKeys
-			} else {
-				for _, signer := range tc.signers {
-					signerKeys = append(signerKeys, SignerKey{
-						signer: signer,
-						key:    keys[signer].PrivateKey,
-					})
-				}
+			signerKeys := map[string]ed25519.PrivateKey{}
+			for _, signature := range tc.signerKeys {
+				signerKeys[signature.signer] = signature.key
 			}
 
 			did, err := setup.SendDeactivateDid(msg, signerKeys)
 
 			if tc.valid {
 				require.Nil(t, err)
-				require.Equal(t, tc.msg.Id, did.Id)
+				require.True(t, did.Deactivated)
 			} else {
 				require.Error(t, err)
 				require.Equal(t, tc.errMsg, err.Error())
+				if did != nil {
+					require.Equal(t, tc.deactivared, did.Deactivated)
+				}
 			}
 		})
 	}
