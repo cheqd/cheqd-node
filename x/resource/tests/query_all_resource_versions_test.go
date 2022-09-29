@@ -18,6 +18,7 @@ func SendAnotherResourceVersion(t require.TestingT, resourceSetup TestSetup, key
 		ExistingDIDKey: keys[ExistingDIDKey].PrivateKey,
 	}
 	newResourcePayload.Name = "AnotherResourceVersion"
+	newResourcePayload.ResourceType = "AnotherResourceType"
 	createdResource, err := resourceSetup.SendCreateResource(newResourcePayload, didKey)
 	require.Nil(t, err)
 
@@ -40,11 +41,35 @@ func TestQueryGetAllResourceVersions(t *testing.T) {
 			msg: &types.QueryGetAllResourceVersionsRequest{
 				CollectionId: ExistingDIDIdentifier,
 				Name:         existingResource.Header.Name,
+				ResourceType: existingResource.Header.ResourceType,
 			},
 			response: &types.QueryGetAllResourceVersionsResponse{
-				Resources: []*types.ResourceHeader{existingResource.Header},
+				Resources: []*types.ResourceHeader{
+					existingResource.Header,
+					&types.ResourceHeader{
+						CollectionId: existingResource.Header.CollectionId,
+						Id:           AnotherResourceId,
+						Name:         "AnotherResourceVersion",
+						ResourceType: "AnotherResourceType",
+						MediaType:    existingResource.Header.MediaType,
+						Checksum:     existingResource.Header.Checksum,
+					},
+				},
 			},
 			errMsg: "",
+		},
+		{
+			valid: true,
+			name:  "Valid: For another resoure type should be empty",
+			msg: &types.QueryGetAllResourceVersionsRequest{
+				CollectionId: ExistingDIDIdentifier,
+				Name:         existingResource.Header.Name,
+				ResourceType: "NotTheSameResourceType",
+			},
+			response: &types.QueryGetAllResourceVersionsResponse{
+				Resources: []*types.ResourceHeader{},
+			},
+			errMsg:   "",
 		},
 		{
 			valid: false,
@@ -52,6 +77,7 @@ func TestQueryGetAllResourceVersions(t *testing.T) {
 			msg: &types.QueryGetAllResourceVersionsRequest{
 				CollectionId: NotFoundDIDIdentifier,
 				Name:         existingResource.Header.Name,
+				ResourceType: existingResource.Header.ResourceType,
 			},
 			response: nil,
 			errMsg:   fmt.Sprintf("did:cheqd:test:%s: DID Doc not found", NotFoundDIDIdentifier),
@@ -79,16 +105,19 @@ func TestQueryGetAllResourceVersions(t *testing.T) {
 
 			if tc.valid {
 				resources := queryResponse.Resources
-				existingResource.Header.NextVersionId = createdResource.Header.Id
-				expectedResources := map[string]types.Resource{
-					existingResource.Header.Id: existingResource,
-					createdResource.Header.Id:  *createdResource,
-				}
 				require.Nil(t, err)
-				require.Equal(t, len(expectedResources), len(resources))
-				for _, r := range resources {
-					r.Created = expectedResources[r.Id].Header.Created
-					require.Equal(t, r, expectedResources[r.Id].Header)
+				if tc.response != nil && len(tc.response.Resources) != 0{
+					require.Equal(t, len(resources), len(tc.response.Resources))
+					existingResource.Header.NextVersionId = createdResource.Header.Id
+					expectedResources := map[string]types.Resource{
+						existingResource.Header.Id: existingResource,
+						createdResource.Header.Id:  *createdResource,
+					}
+					require.Equal(t, len(expectedResources), len(resources))
+					for _, r := range resources {
+						r.Created = expectedResources[r.Id].Header.Created
+						require.Equal(t, r, expectedResources[r.Id].Header)
+					}
 				}
 			} else {
 				require.Error(t, err)

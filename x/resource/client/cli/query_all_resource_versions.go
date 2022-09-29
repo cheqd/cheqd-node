@@ -21,10 +21,12 @@ func CmdGetAllResourceVersions() *cobra.Command {
 
 			collectionId := args[0]
 			name := args[1]
+			resourceType := args[2]
 
 			params := &types.QueryGetAllResourceVersionsRequest{
 				CollectionId: collectionId,
 				Name:         name,
+				ResourceType: resourceType,
 			}
 
 			resp, err := queryClient.AllResourceVersions(context.Background(), params)

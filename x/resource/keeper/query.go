@@ -23,7 +23,7 @@ func NewQuerier(k Keeper, cheqdKeeper cheqdkeeper.Keeper, legacyQuerierCdc *code
 		case types.QueryGetCollectionResources:
 			return collectionResources(ctx, k, cheqdKeeper, legacyQuerierCdc, path[1])
 		case types.QueryGetAllResourceVersions:
-			return allResourceVersions(ctx, k, cheqdKeeper, legacyQuerierCdc, path[1], path[2])
+			return allResourceVersions(ctx, k, cheqdKeeper, legacyQuerierCdc, path[1], path[2], path[3])
 
 		default:
 			err = sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown %s query endpoint: %s", types.ModuleName, path[0])
