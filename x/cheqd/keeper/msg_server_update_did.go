@@ -31,7 +31,7 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 		return nil, err
 	}
 
-	// Validate if DID deactivated
+	// Validate DID is not deactivated
 	if existingStateValue.Metadata.Deactivated {
 		return nil, types.ErrDIDDocDeactivated.Wrap(msg.Payload.Id)
 	}

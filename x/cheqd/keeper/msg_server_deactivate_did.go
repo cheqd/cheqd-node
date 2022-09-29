@@ -30,7 +30,7 @@ func (k msgServer) DeactivateDid(goCtx context.Context, msg *types.MsgDeactivate
 		return nil, err
 	}
 
-	// Validate if already deactivated
+	// Validate DID is not deactivated
 	if existingStateValue.Metadata.Deactivated {
 		return nil, types.ErrDIDDocDeactivated.Wrap(msg.Payload.Id)
 	}
@@ -49,38 +49,23 @@ func (k msgServer) DeactivateDid(goCtx context.Context, msg *types.MsgDeactivate
 		return nil, err
 	}
 
-	// Consider did that we are going to create during did resolutions
-	inMemoryDids := map[string]types.StateValue{existingDid.Id: updatedStateValue}
-
-	// Check controllers' existence
-	controllers := existingDid.AllControllerDids()
-	for _, controller := range controllers {
-		_, err := MustFindDid(&k.Keeper, &ctx, inMemoryDids, controller)
-		if err != nil {
-			return nil, err
-		}
-	}
+	// We neither create dids nor update
+	inMemoryDids := map[string]types.StateValue{}
 
 	// Verify signatures
 	signers := GetSignerDIDsForDIDCreation(*existingDid)
-	for _, signer := range signers {
-		signature, found := types.FindSignInfoBySigner(msg.Signatures, signer)
-
-		if !found {
-			return nil, types.ErrSignatureNotFound.Wrapf("signer: %s", signer)
-		}
-
-		err := VerifySignature(&k.Keeper, &ctx, inMemoryDids, msg.Payload.GetSignBytes(), signature)
-		if err != nil {
-			return nil, err
-		}
+	err = VerifyAllSignersHaveAllValidSignatures(&k.Keeper, &ctx, inMemoryDids, msg.Payload.GetSignBytes(), signers, msg.Signatures)
+	if err != nil {
+		return nil, err
 	}
-	// Modify state
+
+	// Build new state value
 	updatedStateValue, err = types.NewStateValue(existingDid, &updatedMetadata)
 	if err != nil {
 		return nil, err
 	}
-	// Apply changes: return original id and modify state
+
+	// Modify state
 	err = k.SetDid(&ctx, &updatedStateValue)
 	if err != nil {
 		return nil, types.ErrInternal.Wrapf(err.Error())

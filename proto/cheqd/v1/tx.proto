@@ -25,7 +25,6 @@ message MsgUpdateDid {
   repeated SignInfo signatures = 2;
 }
 
-// created DeactivateDid message
 message MsgDeactivateDid {
   MsgDeactivateDidPayload payload = 1;
   repeated SignInfo signatures = 2;
@@ -37,16 +36,13 @@ message SignInfo {
   string signature = 2;
 }
 
-// created DeactivateDid payload
 message MsgDeactivateDidPayload {
   string id = 1;
 }
 
-//created DeactivateDid response
 message MsgDeactivateDidResponse {
    Did did = 1;
    Metadata metadata = 2;
-
 }
 
 message MsgCreateDidPayload {
