@@ -4,7 +4,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// Here we need to make all the links the 
+// Here we need to make all the links the
 func (app *App) Migration07(ctx sdk.Context) {
 	resourceList := app.resourceKeeper.GetAllResources(&ctx)
 	for _, resource := range resourceList {
@@ -15,7 +15,10 @@ func (app *App) Migration07(ctx sdk.Context) {
 			resource.Header.PreviousVersionId = previousResourceVersionHeader.Id
 
 			// Update previous version
-			app.resourceKeeper.UpdateResourceHeader(&ctx, &previousResourceVersionHeader)
+			err := app.resourceKeeper.UpdateResourceHeader(&ctx, &previousResourceVersionHeader)
+			if err != nil {
+				return 
+			}
 		}
 	}
 }

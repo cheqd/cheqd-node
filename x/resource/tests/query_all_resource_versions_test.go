@@ -46,7 +46,7 @@ func TestQueryGetAllResourceVersions(t *testing.T) {
 			response: &types.QueryGetAllResourceVersionsResponse{
 				Resources: []*types.ResourceHeader{
 					existingResource.Header,
-					&types.ResourceHeader{
+					{
 						CollectionId: existingResource.Header.CollectionId,
 						Id:           AnotherResourceId,
 						Name:         "AnotherResourceVersion",
@@ -69,7 +69,7 @@ func TestQueryGetAllResourceVersions(t *testing.T) {
 			response: &types.QueryGetAllResourceVersionsResponse{
 				Resources: []*types.ResourceHeader{},
 			},
-			errMsg:   "",
+			errMsg: "",
 		},
 		{
 			valid: false,
@@ -106,7 +106,7 @@ func TestQueryGetAllResourceVersions(t *testing.T) {
 			if tc.valid {
 				resources := queryResponse.Resources
 				require.Nil(t, err)
-				if tc.response != nil && len(tc.response.Resources) != 0{
+				if tc.response != nil && len(tc.response.Resources) != 0 {
 					require.Equal(t, len(resources), len(tc.response.Resources))
 					existingResource.Header.NextVersionId = createdResource.Header.Id
 					expectedResources := map[string]types.Resource{
