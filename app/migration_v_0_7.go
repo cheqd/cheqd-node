@@ -17,7 +17,7 @@ func (app *App) Migration07(ctx sdk.Context) {
 			// Update previous version
 			err := app.resourceKeeper.UpdateResourceHeader(&ctx, &previousResourceVersionHeader)
 			if err != nil {
-				return 
+				return
 			}
 		}
 	}
