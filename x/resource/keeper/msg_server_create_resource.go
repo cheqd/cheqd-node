@@ -48,7 +48,7 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	resource := msg.Payload.ToResource()
 
 	h := sha256.New()
-	h.Write(resource.Data) 
+	h.Write(resource.Data)
 	resource.Header.Checksum = h.Sum(nil)
 	resource.Header.Created = ctx.BlockTime().Format(time.RFC3339)
 	resource.Header.MediaType = utils.DetectMediaType(resource.Data)

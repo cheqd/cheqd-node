@@ -1,7 +1,6 @@
 package tests
 
 import (
-
 	"github.com/cheqd/cheqd-node/x/resource/types"
 )
 
