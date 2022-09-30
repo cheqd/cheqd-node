@@ -1,8 +1,9 @@
 syntax = "proto3";
-package cheqdid.cheqdnode.cheqd.v1;
+package cheqd.v2;
+
 import "google/protobuf/any.proto";
 
-option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types/v1";
+option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
 message StateValue {
   google.protobuf.Any data = 1;
