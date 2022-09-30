@@ -23,16 +23,17 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 	// Construct the new version of the DID and temporary rename it and its self references
 	// in order to consider old and new versions different DIDs during signatures validation
 	updatedDid := msg.Payload.ToDid()
+	did := updatedDid.Id
 	updatedDid.ReplaceIds(updatedDid.Id, updatedDid.Id+UpdatedPostfix)
 	types.NormalizeSignatureUUIDIdentifiers(msg.Signatures)
 
 	// Validate DID does exist
-	if !k.HasDid(&ctx, updatedDid.Id) {
-		return nil, types.ErrDidDocNotFound.Wrap(updatedDid.Id)
+	if !k.HasDid(&ctx, did) {
+		return nil, types.ErrDidDocNotFound.Wrap(did)
 	}
 
 	// Retrieve existing state value and did
-	existingStateValue, err := k.GetDid(&ctx, updatedDid.Id)
+	existingStateValue, err := k.GetDid(&ctx, did)
 	if err != nil {
 		return nil, err
 	}
