@@ -1,4 +1,5 @@
 syntax = "proto3";
+
 package cheqd.v2;
 
 import "google/protobuf/any.proto";

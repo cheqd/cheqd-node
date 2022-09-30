@@ -1,9 +1,10 @@
 syntax = "proto3";
+
 package cheqd.v2;
 
 option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
-import "cheqd/v1/stateValue.proto";
+import "cheqd/v2/stateValue.proto";
 
 // GenesisState defines the cheqd module's genesis state.
 message GenesisState {

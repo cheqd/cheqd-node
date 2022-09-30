@@ -15,6 +15,9 @@ breaking:
     - FILE
 
 lint:
+  ignore:
+    - cheqd/v1
+    - resource/v1
   use:
     - DEFAULT
     - COMMENTS

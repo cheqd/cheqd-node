@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package cheqd.v2;
+
+option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
+
+import "google/protobuf/any.proto";
+import "cheqd/v2/common.proto";
+
+message DidDoc {
+  repeated string context = 1;
+  string id = 2;
+  repeated string controller = 3;
+  repeated VerificationMethod verification_method = 4;
+  repeated string authentication = 5;
+  repeated string assertion_method = 6;
+  repeated string capability_invocation = 7;
+  repeated string capability_delegation = 8;
+  repeated string key_agreement = 9;
+  repeated Service service = 10;
+  repeated string also_known_as = 11;
+}
+
+message VerificationMethod {
+  string id = 1;
+  string type = 2;
+  string controller = 3;
+  repeated KeyValuePair public_key_jwk = 4; // optional
+  string public_key_multibase = 5; // optional
+}
+
+message Service {
+  string id = 1;
+  string type = 2;
+  string service_endpoint = 3;
+}
