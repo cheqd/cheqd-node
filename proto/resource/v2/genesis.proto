@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package resource.v2;
+
+import "resource/v2/resource.proto";
+
+option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
+
+message GenesisState {
+  repeated ResourceWithMetadata resources = 1;
+}

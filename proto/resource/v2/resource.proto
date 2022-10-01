@@ -1,15 +1,19 @@
 syntax = "proto3";
-package cheqdid.cheqdnode.resource.v1;
 
-option go_package = "github.com/cheqd/cheqd-node/x/resource/types/v1";
+package resource.v2;
 
+option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
 
 message Resource {
-  ResourceHeader header = 1;
-  bytes data = 2;
+  bytes data = 1;
 }
 
-message ResourceHeader {
+message ResourceWithMetadata {
+  Resource resource = 1;
+  Metadata metadata = 2;
+}
+
+message Metadata {
   string collection_id = 1;
   string id = 2;
   string name = 3;

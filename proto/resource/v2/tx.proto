@@ -1,10 +1,11 @@
 syntax = "proto3";
-package cheqdid.cheqdnode.resource.v1;
 
-option go_package = "github.com/cheqd/cheqd-node/x/resource/types/v1";
+package resource.v2;
 
-import "cheqd/v1/tx.proto";
-import "resource/v1/resource.proto";
+import "cheqd/v2/tx.proto";
+import "resource/v2/resource.proto";
+
+option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
 
 // Msg defines the Msg service.
 service Msg {
@@ -14,7 +15,7 @@ service Msg {
 // this line is used by starport scaffolding # proto/tx/message
 message MsgCreateResource {
   MsgCreateResourcePayload payload = 1;
-  repeated cheqdid.cheqdnode.cheqd.v1.SignInfo signatures = 2;
+  repeated cheqd.v2.SignInfo signatures = 2;
 }
 
 message MsgCreateResourcePayload {
@@ -26,5 +27,5 @@ message MsgCreateResourcePayload {
 }
 
 message MsgCreateResourceResponse {
-  Resource resource = 1; // Not necessary
+  Metadata resource = 1; // Not necessary
 }

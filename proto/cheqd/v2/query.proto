@@ -2,13 +2,11 @@ syntax = "proto3";
 
 package cheqd.v2;
 
-option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
-
 import "google/api/annotations.proto";
 import "cheqd/v2/diddoc.proto";
 
+option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
-// Query defines the gRPC querier service.
 service Query {
 	rpc DidDoc(QueryGetDidDocRequest) returns (QueryGetDidDocResponse) {
 		option (google.api.http).get = "/cheqd/v1/diddoc/{id}";

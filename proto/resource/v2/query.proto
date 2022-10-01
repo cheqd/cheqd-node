@@ -1,16 +1,18 @@
 syntax = "proto3";
-package cheqdid.cheqdnode.resource.v1;
 
-option go_package = "github.com/cheqd/cheqd-node/x/resource/types/v1";
+package resource.v2;
 
 import "google/api/annotations.proto";
-import "resource/v1/resource.proto";
+import "resource/v2/resource.proto";
 
+option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
 
-// Query defines the gRPC querier service.
 service Query {
   rpc Resource(QueryGetResourceRequest) returns (QueryGetResourceResponse) {
     option (google.api.http).get = "/1.0/identifiers/{collection_id}/resources/{id}";
+  }
+  rpc ResourceMetadata(QueryGetResourceMetadataRequest) returns (QueryGetResourceMetadataResponse) {
+    option (google.api.http).get = "/1.0/identifiers/{collection_id}/resources/{id}/metadata";
   }
   rpc CollectionResources(QueryGetCollectionResourcesRequest) returns (QueryGetCollectionResourcesResponse) {
     option (google.api.http).get = "/1.0/identifiers/{collection_id}/resources/all";
@@ -26,7 +28,16 @@ message QueryGetResourceRequest {
 }
 
 message QueryGetResourceResponse {
-  Resource resource = 1;
+  ResourceWithMetadata resource = 1;
+}
+
+message QueryGetResourceMetadataRequest {
+  string collection_id = 1;
+  string id = 2;
+}
+
+message QueryGetResourceMetadataResponse {
+  Metadata resource = 1;
 }
 
 message QueryGetCollectionResourcesRequest {
@@ -34,7 +45,7 @@ message QueryGetCollectionResourcesRequest {
 }
 
 message QueryGetCollectionResourcesResponse {
-  repeated ResourceHeader resources = 1;
+  repeated Metadata resources = 1;
 }
 
 message QueryGetAllResourceVersionsRequest {
@@ -43,5 +54,5 @@ message QueryGetAllResourceVersionsRequest {
 }
 
 message QueryGetAllResourceVersionsResponse {
-  repeated ResourceHeader resources = 1;
+  repeated Metadata resources = 1;
 }

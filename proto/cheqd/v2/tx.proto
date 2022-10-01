@@ -2,11 +2,10 @@ syntax = "proto3";
 
 package cheqd.v2;
 
-option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
-
 import "cheqd/v2/diddoc.proto";
 
-// Msg defines the Msg service.
+option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
+
 service Msg {
   rpc CreateDidDoc(MsgCreateDidDoc) returns (MsgCreateDidDocResponse);
   rpc UpdateDidDoc(MsgUpdateDidDoc) returns (MsgUpdateDidDocResponse);
@@ -24,7 +23,7 @@ message MsgUpdateDidDoc {
 
 message SignInfo {
   string verification_method_id = 1;
-  string signature = 2;
+  bytes signature = 2;
 }
 
 message MsgCreateDidDocPayload {
