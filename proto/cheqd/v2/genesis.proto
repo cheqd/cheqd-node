@@ -4,10 +4,10 @@ package cheqd.v2;
 
 option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
-import "cheqd/v2/stateValue.proto";
+import "cheqd/v2/diddoc.proto";
 
 // GenesisState defines the cheqd module's genesis state.
 message GenesisState {
   string did_namespace = 1;
-  repeated StateValue didList = 2;
+  repeated DidDocWithMetadata did_docs = 2;
 }

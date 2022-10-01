@@ -4,23 +4,21 @@ package cheqd.v2;
 
 option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
-import "google/protobuf/any.proto";
 import "cheqd/v2/diddoc.proto";
 
 // Msg defines the Msg service.
 service Msg {
-  rpc CreateDid(MsgCreateDid) returns (MsgCreateDidResponse);
-  rpc UpdateDid(MsgUpdateDid) returns (MsgUpdateDidResponse);
+  rpc CreateDidDoc(MsgCreateDidDoc) returns (MsgCreateDidDocResponse);
+  rpc UpdateDidDoc(MsgUpdateDidDoc) returns (MsgUpdateDidDocResponse);
 }
 
-// this line is used by starport scaffolding # proto/tx/message
-message MsgCreateDid {
-  MsgCreateDidPayload payload = 1;
+message MsgCreateDidDoc {
+  MsgCreateDidDocPayload payload = 1;
   repeated SignInfo signatures = 2;
 }
 
-message MsgUpdateDid {
-  MsgUpdateDidPayload payload = 1;
+message MsgUpdateDidDoc {
+  MsgUpdateDidDocPayload payload = 1;
   repeated SignInfo signatures = 2;
 }
 
@@ -29,8 +27,7 @@ message SignInfo {
   string signature = 2;
 }
 
-message MsgCreateDidPayload {
-  repeated string context = 1;
+message MsgCreateDidDocPayload {
   string id = 2;
   repeated string controller = 3;
   repeated VerificationMethod verification_method = 4;
@@ -43,12 +40,11 @@ message MsgCreateDidPayload {
   repeated Service service = 11;
 }
 
-message MsgCreateDidResponse {
-  string id = 1; // Not necessary
+message MsgCreateDidDocResponse {
+  DidDocWithMetadata value = 1;
 }
 
-message MsgUpdateDidPayload {
-  repeated string context = 1;
+message MsgUpdateDidDocPayload {
   string id = 2;
   repeated string controller = 3;
   repeated VerificationMethod verification_method = 4;
@@ -62,6 +58,6 @@ message MsgUpdateDidPayload {
   string version_id = 12;
 }
 
-message MsgUpdateDidResponse {
-  string id = 1; // Not necessary
+message MsgUpdateDidDocResponse {
+  DidDocWithMetadata value = 1;
 }
