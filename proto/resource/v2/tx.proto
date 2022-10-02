@@ -12,7 +12,6 @@ service Msg {
   rpc CreateResource(MsgCreateResource) returns (MsgCreateResourceResponse);
 }
 
-// this line is used by starport scaffolding # proto/tx/message
 message MsgCreateResource {
   MsgCreateResourcePayload payload = 1;
   repeated cheqd.v2.SignInfo signatures = 2;
@@ -27,5 +26,5 @@ message MsgCreateResourcePayload {
 }
 
 message MsgCreateResourceResponse {
-  Metadata resource = 1; // Not necessary
+  Metadata resource = 1;
 }
