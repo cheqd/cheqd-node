@@ -84,8 +84,7 @@ func IsValidDID(did string, method string, allowedNamespaces []string) bool {
 }
 
 func ValidateID(id string) error {
-	isValidId := len(id) == 16 && IsValidBase58(id) ||
-		len(id) == 32 && IsValidBase58(id) ||
+	isValidId := len(id) >= 16 && len(id) <= 32 && IsValidBase58(id) ||
 		IsValidUUID(id)
 
 	if !isValidId {

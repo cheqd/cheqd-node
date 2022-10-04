@@ -12,6 +12,7 @@ func TestIsId(t *testing.T) {
 		id    string
 	}{
 		{true, "123456789abcdefg"},
+		{true, "123456789abcdefgre"},
 		{true, "123456789abcdefg123456789abcdefg"},
 		{true, "3b9b8eec-5b5d-4382-86d8-9185126ff130"},
 		{false, "sdf"},
