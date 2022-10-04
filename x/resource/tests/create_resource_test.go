@@ -12,7 +12,7 @@ import (
 
 	"github.com/cheqd/cheqd-node/x/resource/types"
 
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	cheqdutils "github.com/cheqd/cheqd-node/x/cheqd/utils"
 	"github.com/stretchr/testify/require"
 )
 
@@ -71,7 +71,7 @@ func TestCreateResource(t *testing.T) {
 				Data:         []byte(SchemaData),
 			},
 			mediaType: JsonResourceType,
-			errMsg:    fmt.Sprintf("signer: %s: signature is required but not found", cheqdtypes.NormalizeIdentifier(ExistingDID)),
+			errMsg:    fmt.Sprintf("signer: %s: signature is required but not found", cheqdutils.NormalizeIdentifier(ExistingDID)),
 		},
 		{
 			valid:      false,
@@ -85,7 +85,7 @@ func TestCreateResource(t *testing.T) {
 				Data:         []byte(SchemaData),
 			},
 			mediaType: JsonResourceType,
-			errMsg:    fmt.Sprintf("signer: %s: signature is required but not found", cheqdtypes.NormalizeIdentifier(ExistingDID)),
+			errMsg:    fmt.Sprintf("signer: %s: signature is required but not found", cheqdutils.NormalizeIdentifier(ExistingDID)),
 		},
 		{
 			valid:      false,
@@ -117,8 +117,8 @@ func TestCreateResource(t *testing.T) {
 				require.Nil(t, err)
 				require.Contains(t, didStateValue.Metadata.Resources, resource.Header.Id)
 
-				require.Equal(t, cheqdtypes.NormalizeIdentifier(tc.msg.CollectionId), resource.Header.CollectionId)
-				require.Equal(t, cheqdtypes.NormalizeIdentifier(tc.msg.Id), resource.Header.Id)
+				require.Equal(t, cheqdutils.NormalizeIdentifier(tc.msg.CollectionId), resource.Header.CollectionId)
+				require.Equal(t, cheqdutils.NormalizeIdentifier(tc.msg.Id), resource.Header.Id)
 				require.Equal(t, tc.mediaType, resource.Header.MediaType)
 				require.Equal(t, tc.msg.ResourceType, resource.Header.ResourceType)
 				require.Equal(t, tc.msg.Data, resource.Data)

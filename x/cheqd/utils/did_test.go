@@ -6,32 +6,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestIsId(t *testing.T) {
-	cases := []struct {
-		valid bool
-		id    string
-	}{
-		{true, "123456789abcdefg"},
-		{true, "123456789abcdefg123456789abcdefg"},
-		{true, "3b9b8eec-5b5d-4382-86d8-9185126ff130"},
-		{false, "sdf"},
-		{false, "sdf:sdf"},
-		{false, "12345"},
-	}
-
-	for _, tc := range cases {
-		t.Run(tc.id, func(t *testing.T) {
-			isDid := IsValidID(tc.id)
-
-			if tc.valid {
-				require.True(t, isDid)
-			} else {
-				require.False(t, isDid)
-			}
-		})
-	}
-}
-
 func TestIsDid(t *testing.T) {
 	cases := []struct {
 		name      string

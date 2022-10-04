@@ -6,6 +6,7 @@ import (
 
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	"github.com/multiformats/go-multibase"
 	"github.com/stretchr/testify/require"
 )
@@ -75,7 +76,7 @@ func TestUpdateDid(t *testing.T) {
 					},
 				},
 			},
-			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", types.NormalizeIdentifier(CharlieDID)),
+			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", utils.NormalizeIdentifier(CharlieDID)),
 		},
 		{
 			valid:   true,
@@ -92,7 +93,7 @@ func TestUpdateDid(t *testing.T) {
 					},
 				},
 			},
-			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", types.NormalizeIdentifier(CharlieDID)),
+			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", utils.NormalizeIdentifier(CharlieDID)),
 		},
 		// Verification method's tests
 		// cases:

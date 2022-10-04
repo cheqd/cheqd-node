@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -89,7 +90,7 @@ func (k Keeper) HasDid(ctx *sdk.Context, id string) bool {
 
 // GetDidIDBytes returns the byte representation of the ID
 func GetDidIDBytes(id string) []byte {
-	return []byte(types.NormalizeIdentifier(id))
+	return []byte(utils.NormalizeIdentifier(id))
 }
 
 // GetAllDid returns all did

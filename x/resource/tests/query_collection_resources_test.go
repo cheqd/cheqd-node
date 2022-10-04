@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	cheqdutils "github.com/cheqd/cheqd-node/x/cheqd/utils"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
@@ -55,8 +55,8 @@ func TestQueryGetCollectionResources(t *testing.T) {
 				require.Nil(t, err)
 				require.Equal(t, len(expectedResources), len(resources))
 				for i, r := range resources {
-					expectedResources[i].CollectionId = cheqdtypes.NormalizeIdentifier(expectedResources[i].CollectionId)
-					expectedResources[i].Id = cheqdtypes.NormalizeIdentifier(expectedResources[i].Id)
+					expectedResources[i].CollectionId = cheqdutils.NormalizeIdentifier(expectedResources[i].CollectionId)
+					expectedResources[i].Id = cheqdutils.NormalizeIdentifier(expectedResources[i].Id)
 					r.Created = expectedResources[i].Created
 					require.Equal(t, expectedResources[i], r)
 				}

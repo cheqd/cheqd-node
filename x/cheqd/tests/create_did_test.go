@@ -8,6 +8,7 @@ import (
 	"github.com/btcsuite/btcutil/base58"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	"github.com/multiformats/go-multibase"
 
 	"github.com/stretchr/testify/require"
@@ -374,7 +375,7 @@ func TestCreateDID(t *testing.T) {
 			if tc.valid {
 				require.Nil(t, err)
 				require.Equal(t, tc.msg.Id, did.Id)
-				require.Equal(t, types.NormalizeIdentifiersList(tc.msg.Controller), did.Controller)
+				require.Equal(t, utils.NormalizeIdentifiersList(tc.msg.Controller), did.Controller)
 				require.Equal(t, tc.msg.VerificationMethod, did.VerificationMethod)
 				require.Equal(t, tc.msg.Authentication, did.Authentication)
 				require.Equal(t, tc.msg.AssertionMethod, did.AssertionMethod)

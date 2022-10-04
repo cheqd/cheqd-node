@@ -98,16 +98,6 @@ func UUIDTestCases() []struct {
 	}
 }
 
-func TestUpdateUUIDForDID(t *testing.T) {
-	for _, tc := range UUIDTestCases() {
-		t.Run(tc.name, func(t *testing.T) {
-			result := NormalizeIdentifier(tc.did)
-
-			require.Equal(t, tc.expectedDid, result)
-		})
-	}
-}
-
 func TestUpdateUUIDIdentifiers(t *testing.T) {
 	for _, tc := range UUIDTestCases() {
 		t.Run(tc.name, func(t *testing.T) {
