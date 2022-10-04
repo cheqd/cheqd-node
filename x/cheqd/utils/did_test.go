@@ -51,6 +51,7 @@ func TestIsDid(t *testing.T) {
 		{"Valid: Inputs: Method and Namespaces are not set and passed for NOTcheqd", true, "did:NOTcheqd:123456789abcdefg123456789abcdefg", "", []string{}},
 
 		{"Valid: Inputs: Order of namespaces changed", true, "did:cheqd:testnet:123456789abcdefg", "cheqd", []string{"mainnet", "testnet"}},
+		{"Valid: UniqueID more then 16 symbols and less then 32", true, "did:cheqd:testnet:123456789abcdefgABCDEF", "cheqd", []string{}},
 		// Wrong splitting (^did:([^:]+?)(:([^:]+?))?:([^:]+)$)
 		{"Not valid: DID is not started from 'did'", false, "did123:cheqd:::123456789abcdefg", "cheqd", []string{"testnet"}},
 		{"Not valid: empty namespace", false, "did:cheqd::123456789abcdefg", "cheqd", []string{"testnet"}},
@@ -74,7 +75,6 @@ func TestIsDid(t *testing.T) {
 		{"Not valid: 0 - is not allowed for UniqueID", false, "did:cheqd:testnet:123456789abcdef0", "cheqd", []string{}},
 		// Length checks (should be exactly 16 or 32)
 		{"Not valid: UniqueID less then 16 symbols", false, "did:cheqd:testnet:123", "cheqd", []string{}},
-		{"Not valid: UniqueID more then 16 symbols but less then 32", false, "did:cheqd:testnet:123456789abcdefgABCDEF", "cheqd", []string{}},
 		{"Not valid: UniqueID more then 32 symbols", false, "did:cheqd:testnet:123456789abcdefg123456789abcdefgABCDEF", "cheqd", []string{}},
 	}
 

@@ -27,6 +27,7 @@ func TestIsDidURL(t *testing.T) {
 		{"Valid: the whole alphabet with query and apth", true, "did:cheqd:testnet:123456789abcdefg/path?query#abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~!$&'()*+,;=:@%20%ff?"},
 		{"Valid: only fragment", true, "did:cheqd:testnet:123456789abcdefg#fragment"},
 		{"Valid: only query", true, "did:cheqd:testnet:123456789abcdefg?query"},
+		{"Valid: UniqueID more then 16 symbols and less then 32", true, "did:cheqd:testnet:123456789abcdefgABCDEF/path?query#fragment"},
 		// Wrong cases
 		{"Not valid: wrong HEXDIG for path (pct-encoded phrase)", false, "did:cheqd:testnet:123456789abcdefg/path%20%zz"},
 		{"Not valid: wrong HEXDIG for query (pct-encoded phrase)", false, "did:cheqd:testnet:123456789abcdefg/path?query%20%zz"},
@@ -50,7 +51,6 @@ func TestIsDidURL(t *testing.T) {
 		{"Not valid: 0 - is not allowed for base58", false, "did:cheqd:testnet:123456789abcdef0/path?query#fragment"},
 		// Length checks (should be exactly 16 or 32)
 		{"Not valid: UniqueID less then 16 symbols", false, "did:cheqd:testnet:123/path?query#fragment"},
-		{"Not valid: UniqueID more then 16 symbols but less then 32", false, "did:cheqd:testnet:123456789abcdefgABCDEF/path?query#fragment"},
 		{"Not valid: UniqueID more then 32 symbols", false, "did:cheqd:testnet:123456789abcdefg123456789abcdefgABCDEF/path?query#fragment"},
 		{"Not valid: Split should return error", false, "qwerty"},
 	}
