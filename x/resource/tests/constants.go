@@ -11,12 +11,12 @@ const (
 	SchemaData          = "{\"attr\":[\"name\",\"age\"]}"
 	TestResourceName    = "Test Resource Name"
 	JsonResourceType    = "application/json"
-	ResourceId          = "988b0ab3-6a39-4598-83ec-b84c6cf8da15"
-	AnotherResourceId   = "71583c78-f16f-11ec-9dd4-cba0f34eb177"
+	ResourceId          = "988B0AB3-6a39-4598-83ec-b84c6cf8da15"
+	AnotherResourceId   = "71583C78-f16f-11ec-9dd4-cba0f34eb177"
 	IncorrectResourceId = "1234"
 
 	NotFoundDIDIdentifier = "nfdnfdnfdnfdnfdd"
-	ExistingDIDIdentifier = "eeeeeeeeeeeeeeee"
+	ExistingDIDIdentifier = "6F41febb-2278-413b-8d34-f7d67f252c56"
 	ExistingDID           = "did:cheqd:test:" + ExistingDIDIdentifier
 	ExistingDIDKey        = ExistingDID + "#key-1"
 )

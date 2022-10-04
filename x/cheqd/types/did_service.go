@@ -68,7 +68,7 @@ func IsUniqueServiceListByIdRule() *CustomErrorRule {
 func NormalizeIdentifier(did string) string {
 	_, _, sUniqueId, err := utils.TrySplitDID(did)
 	if err != nil {
-		return did
+		sUniqueId = did
 	}
 	if utils.IsValidUUID(sUniqueId) {
 		return strings.ToLower(did)

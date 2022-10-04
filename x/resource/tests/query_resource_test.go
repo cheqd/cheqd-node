@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"testing"
 
+	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
@@ -66,8 +67,8 @@ func TestQueryGetResource(t *testing.T) {
 			if tc.valid {
 				resource := queryResponse.Resource
 				require.Nil(t, err)
-				require.Equal(t, tc.response.Resource.Header.CollectionId, resource.Header.CollectionId)
-				require.Equal(t, tc.response.Resource.Header.Id, resource.Header.Id)
+				require.Equal(t, cheqdtypes.NormalizeIdentifier(tc.response.Resource.Header.CollectionId), resource.Header.CollectionId)
+				require.Equal(t, cheqdtypes.NormalizeIdentifier(tc.response.Resource.Header.Id), resource.Header.Id)
 				require.Equal(t, tc.response.Resource.Header.MediaType, resource.Header.MediaType)
 				require.Equal(t, tc.response.Resource.Header.ResourceType, resource.Header.ResourceType)
 				require.Equal(t, tc.response.Resource.Data, resource.Data)

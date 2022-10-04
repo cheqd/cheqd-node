@@ -17,17 +17,20 @@ import (
 func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateResource) (*types.MsgCreateResourceResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	resource := msg.Payload.ToResource()
+	cheqdtypes.NormalizeSignatureUUIDIdentifiers(msg.Signatures)
+
 	// Validate corresponding DIDDoc exists
 	namespace := k.cheqdKeeper.GetDidNamespace(&ctx)
-	did := cheqdutils.JoinDID(cheqdtypes.DidMethod, namespace, msg.Payload.CollectionId)
+	did := cheqdutils.JoinDID(cheqdtypes.DidMethod, namespace, resource.Header.CollectionId)
 	didDocStateValue, err := k.cheqdKeeper.GetDid(&ctx, did)
 	if err != nil {
 		return nil, err
 	}
 
 	// Validate Resource doesn't exist
-	if k.HasResource(&ctx, msg.Payload.CollectionId, msg.Payload.Id) {
-		return nil, types.ErrResourceExists.Wrap(msg.Payload.Id)
+	if k.HasResource(&ctx, resource.Header.CollectionId, resource.Header.Id) {
+		return nil, types.ErrResourceExists.Wrap(resource.Header.Id)
 	}
 
 	// Validate signatures
@@ -45,8 +48,6 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	}
 
 	// Build Resource
-	resource := msg.Payload.ToResource()
-
 	resource.Header.Checksum = sha256.New().Sum(resource.Data)
 	resource.Header.Created = ctx.BlockTime().Format(time.RFC3339)
 	resource.Header.MediaType = utils.DetectMediaType(resource.Data)

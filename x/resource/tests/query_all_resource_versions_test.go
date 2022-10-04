@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	cheqdtests "github.com/cheqd/cheqd-node/x/cheqd/tests"
+	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
@@ -87,6 +88,8 @@ func TestQueryGetAllResourceVersions(t *testing.T) {
 				require.Nil(t, err)
 				require.Equal(t, len(expectedResources), len(resources))
 				for _, r := range resources {
+					expectedResources[r.Id].Header.CollectionId = cheqdtypes.NormalizeIdentifier(expectedResources[r.Id].Header.CollectionId)
+					expectedResources[r.Id].Header.Id = cheqdtypes.NormalizeIdentifier(expectedResources[r.Id].Header.Id)
 					r.Created = expectedResources[r.Id].Header.Created
 					require.Equal(t, r, expectedResources[r.Id].Header)
 				}

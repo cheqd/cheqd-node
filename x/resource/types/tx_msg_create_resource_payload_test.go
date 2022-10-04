@@ -17,7 +17,7 @@ func TestMsgCreateResourcePayloadValidation(t *testing.T) {
 			name: "positive",
 			struct_: &MsgCreateResourcePayload{
 				CollectionId: "123456789abcdefg",
-				Id:           "ba62c728-cb15-498b-8e9e-9259cc242186",
+				Id:           "BA62c728-cb15-498b-8e9e-9259cc242186",
 				Name:         "Test Resource",
 				ResourceType: "CL-Schema",
 				Data:         []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},

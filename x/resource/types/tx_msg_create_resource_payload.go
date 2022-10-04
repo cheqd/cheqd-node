@@ -14,8 +14,8 @@ func (msg *MsgCreateResourcePayload) GetSignBytes() []byte {
 func (msg *MsgCreateResourcePayload) ToResource() Resource {
 	return Resource{
 		Header: &ResourceHeader{
-			CollectionId: msg.CollectionId,
-			Id:           msg.Id,
+			CollectionId: cheqdtypes.NormalizeIdentifier(msg.CollectionId),
+			Id:           cheqdtypes.NormalizeIdentifier(msg.Id),
 			Name:         msg.Name,
 			ResourceType: msg.ResourceType,
 		},
