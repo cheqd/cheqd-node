@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package cheqd.v2;
 
-option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
+option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types/v2";
 
 message DidDoc {
   repeated string context = 1;
