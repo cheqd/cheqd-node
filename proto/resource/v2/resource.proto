@@ -17,10 +17,13 @@ message Metadata {
   string collection_id = 1;
   string id = 2;
   string name = 3;
-  string resource_type = 4;
-  string media_type = 5;
-  string created = 6;
-  bytes checksum = 7;
-  string previous_version_id = 8;
-  string next_version_id = 9;
+  string version = 4;
+  string resource_type = 5;
+  repeated string also_known_as = 6;
+
+  string media_type = 7;
+  string created = 8;
+  bytes checksum = 9;
+  string previous_version_id = 10;
+  string next_version_id = 11;
 }
