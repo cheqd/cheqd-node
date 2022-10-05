@@ -32,12 +32,12 @@ type TaxableMsgFee = [TaxableMsgFeeCount]sdk.Coins
 type BurnFactor = [BurnFactorCount]sdk.Dec
 
 var TaxableMsgFees = TaxableMsgFee{
-	MsgCreateDid:      			(sdk.Coins)(nil),
-	MsgUpdateDid:      			(sdk.Coins)(nil),
-	MsgDeactivateDid:  			(sdk.Coins)(nil),
-	MsgCreateResourceDefault: 	(sdk.Coins)(nil),
-	MsgCreateResourceImage: 	(sdk.Coins)(nil),
-	MsgCreateResourceJson: 		(sdk.Coins)(nil),
+	MsgCreateDid:             (sdk.Coins)(nil),
+	MsgUpdateDid:             (sdk.Coins)(nil),
+	MsgDeactivateDid:         (sdk.Coins)(nil),
+	MsgCreateResourceDefault: (sdk.Coins)(nil),
+	MsgCreateResourceImage:   (sdk.Coins)(nil),
+	MsgCreateResourceJson:    (sdk.Coins)(nil),
 }
 
 var BurnFactors = BurnFactor{
@@ -90,7 +90,7 @@ func GetResourceTaxableMsgFee(ctx sdk.Context, msg *resourcetypes.MsgCreateResou
 	return TaxableMsgFees[MsgCreateResourceDefault], GetBurnFeePortion(ctx, BurnFactors[BurnFactorResource], TaxableMsgFees[MsgCreateResourceDefault]), true
 }
 
-func checkFeeParamsFromState(ctx sdk.Context, cheqdKeeper CheqdKeeper, resourceKeeper ResourceKeeper) (bool) {
+func checkFeeParamsFromState(ctx sdk.Context, cheqdKeeper CheqdKeeper, resourceKeeper ResourceKeeper) bool {
 	cheqdParams := cheqdKeeper.GetParams(ctx)
 	createDidFeeCoins := sdk.NewCoins(cheqdParams.CreateDid)
 	updateDidFeeCoins := sdk.NewCoins(cheqdParams.UpdateDid)
@@ -135,7 +135,6 @@ func checkFeeParamsFromState(ctx sdk.Context, cheqdKeeper CheqdKeeper, resourceK
 
 	return true
 }
-
 
 func IsIdentityTx(ctx sdk.Context, cheqdKeeper CheqdKeeper, resourceKeeper ResourceKeeper, tx sdk.Tx) (bool, sdk.Coins, sdk.Coins) {
 	_ = checkFeeParamsFromState(ctx, cheqdKeeper, resourceKeeper)

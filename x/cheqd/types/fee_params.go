@@ -17,10 +17,10 @@ func ParamKeyTable() paramstypes.KeyTable {
 // DefaultFeeParams returns default cheqd module tx fee parameters
 func DefaultFeeParams() *FeeParams {
 	return &FeeParams{
-		CreateDid: sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultCreateDidTxFee)),
-		UpdateDid: sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultUpdateDidTxFee)),
+		CreateDid:     sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultCreateDidTxFee)),
+		UpdateDid:     sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultUpdateDidTxFee)),
 		DeactivateDid: sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultDeactivateDidTxFee)),
-		BurnFactor: sdk.NewDecWithPrec(DefaultBurnFactorRepresentation * _PrecisionFactor, _Precision),
+		BurnFactor:    sdk.NewDecWithPrec(DefaultBurnFactorRepresentation*_PrecisionFactor, _Precision),
 	}
 }
 

@@ -459,4 +459,4 @@ func ValidateEventEmissionLogic(s *AnteTestSuite, events sdk.Events, addr1 sdk.A
 	s.Require().Equal(events[10].Attributes[0].Value, cheqdModuleAccAddrValue)       // 2.11.b Value matches `cheqd` module account address
 
 	return nil
-} 
+}

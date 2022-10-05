@@ -3,14 +3,12 @@ package types
 import (
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
-var (
-	ParamStoreKeyFeeParams = []byte("feeparams")
-)
+var ParamStoreKeyFeeParams = []byte("feeparams")
 
 // ParamKeyTable returns the key declaration for parameters
 func ParamKeyTable() paramstypes.KeyTable {
@@ -22,10 +20,10 @@ func ParamKeyTable() paramstypes.KeyTable {
 // DefaultFeeParams returns default cheqd module tx fee parameters
 func DefaultFeeParams() *FeeParams {
 	return &FeeParams{
-		Image: sdk.NewCoin(cheqdtypes.BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceImageFee)),
-		Json: sdk.NewCoin(cheqdtypes.BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceJsonFee)),
-		Default: sdk.NewCoin(cheqdtypes.BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceDefaultFee)),
-		BurnFactor: sdk.NewDecWithPrec(DefaultBurnFactorRepresentation * _PrecisionFactor, _Precision),
+		Image:      sdk.NewCoin(cheqdtypes.BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceImageFee)),
+		Json:       sdk.NewCoin(cheqdtypes.BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceJsonFee)),
+		Default:    sdk.NewCoin(cheqdtypes.BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceDefaultFee)),
+		BurnFactor: sdk.NewDecWithPrec(DefaultBurnFactorRepresentation*_PrecisionFactor, _Precision),
 	}
 }
 

@@ -58,7 +58,7 @@ func Setup() TestSetup {
 	// paramSpace := types.ParamSubspace{}
 
 	// Init Keepers
-	newKeeper := keeper.NewKeeper(cdc, storeKey, )
+	newKeeper := keeper.NewKeeper(cdc, storeKey)
 
 	// Create Tx
 	txBytes := make([]byte, 28)

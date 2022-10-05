@@ -1,9 +1,9 @@
 package ante
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type BankKeeper interface {

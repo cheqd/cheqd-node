@@ -1,7 +1,6 @@
 package ante_test
 
 import (
-	"math"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -32,12 +31,12 @@ import (
 )
 
 const (
-	RangeSlippage = 12_000
+	RangeSlippage                   = 12_000
 	ComputationalGasMsgCreateDid    = 134110
 	ComputationalGasMsgCreateDid80x = 2110398 // 80x the MsgCreateDid gas usage
 )
 
-var blockMaxGas = uint64(cheqdsimapp.DefaultConsensusParams.Block.MaxGas)
+// blockMaxGas = uint64(cheqdsimapp.DefaultConsensusParams.Block.MaxGas) // 200000 keeping this for reference on TODOs
 var keyPair = cheqdtests.GenerateKeyPair()
 
 func TestBaseApp_BlockGas(t *testing.T) {
@@ -236,8 +235,8 @@ func TestBaseApp_BlockGas(t *testing.T) {
 				tc.gasToConsume = txtypes.MaxGasWanted
 			}
 			// CONTRACT: gasToConsume is +/- 12k gas units from the actual gas consumed (required for larger computations)
-			require.GreaterOrEqual(t, tc.gasToConsume + 12_000, ctx.BlockGasMeter().GasConsumed())
-			require.LessOrEqual(t, tc.gasToConsume - 12_000, ctx.BlockGasMeter().GasConsumed())
+			require.GreaterOrEqual(t, tc.gasToConsume+12_000, ctx.BlockGasMeter().GasConsumed())
+			require.LessOrEqual(t, tc.gasToConsume-12_000, ctx.BlockGasMeter().GasConsumed())
 			// tx fee is always deducted
 			require.Equal(t, int64(0), app.BankKeeper.GetBalance(ctx, addr1, feeCoin.Denom).Amount.Int64())
 			// sender's sequence is always increased
@@ -299,12 +298,4 @@ func createTestTx(txConfig client.TxConfig, txBuilder client.TxBuilder, privs []
 	}
 
 	return txBuilder.GetTx(), txBytes, nil
-}
-
-func addUint64Saturating(a, b uint64) uint64 {
-	if math.MaxUint64-a < b {
-		return math.MaxUint64
-	}
-
-	return a + b
 }

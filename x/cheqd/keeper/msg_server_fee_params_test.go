@@ -16,7 +16,7 @@ import (
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/params/types/proposal"
-	//stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	// stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
 type HandlerTestSuite struct {
@@ -51,9 +51,9 @@ func (suite *HandlerTestSuite) TestProposalHandler() {
 		{
 			"all fields",
 			testProposal(proposal.ParamChange{
-				Subspace: cheqdtypes.ModuleName, 
-				Key: cheqdtypes.FeeParamsKey,
-				Value: `{"create_did": {"denom": "ncheq", "amount": "10000000000"}, "update_did": {"denom": "ncheq", "amount": "4000000000"}, "deactivate_did": {"denom": "ncheq", "amount": "2000000000"}, "burn_factor": "0.600000000000000000"}`,
+				Subspace: cheqdtypes.ModuleName,
+				Key:      cheqdtypes.FeeParamsKey,
+				Value:    `{"create_did": {"denom": "ncheq", "amount": "10000000000"}, "update_did": {"denom": "ncheq", "amount": "4000000000"}, "deactivate_did": {"denom": "ncheq", "amount": "2000000000"}, "burn_factor": "0.600000000000000000"}`,
 			}),
 			func() {
 				// TODO: Refactor to comply with v.0.46.1 ParamsKeeper Subspace API

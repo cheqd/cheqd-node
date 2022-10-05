@@ -5,12 +5,12 @@ import (
 	"encoding/base64"
 
 	"github.com/btcsuite/btcutil/base58"
-	"github.com/google/uuid"
 	cheqdtests "github.com/cheqd/cheqd-node/x/cheqd/tests"
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	resourcetests "github.com/cheqd/cheqd-node/x/resource/tests"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/google/uuid"
 )
 
 const (
@@ -8149,7 +8149,7 @@ func NewTestResourceMsg_Json_Valid(keyPair interface{}, data string) *resourcety
 	}
 	signature := base64.StdEncoding.EncodeToString(ed25519.Sign(keyPairI.PrivateKey, payload.GetSignBytes()))
 	return &resourcetypes.MsgCreateResource{
-		Payload:    payload,
+		Payload: payload,
 		Signatures: []*cheqdtypes.SignInfo{
 			{
 				VerificationMethodId: msgCreateDid.Payload.VerificationMethod[0].Id,

@@ -4,13 +4,16 @@ import (
 	"fmt"
 )
 
-const DefaultDidNamespace = "testnet"
-const DefaultCreateDidTxFee = 5e9
-const DefaultUpdateDidTxFee = 2e9
-const DefaultDeactivateDidTxFee = 1e9
-const DefaultBurnFactorRepresentation = 0.500000000000000000 // 0.5 or 50%
-const _Precision = 1
-const _PrecisionFactor = 1e1 // CONTRACT: 1e(`_Precision`) <-- `sdk.Dec(1 <= `gs.BurnFactor` < `_PrecisionFactor`, `_Precision`).
+const (
+	DefaultDidNamespace             = "testnet"
+	DefaultCreateDidTxFee           = 5e9
+	DefaultUpdateDidTxFee           = 2e9
+	DefaultDeactivateDidTxFee       = 1e9
+	DefaultBurnFactorRepresentation = 0.500000000000000000 // 0.5 or 50%
+	_Precision                      = 1
+	_PrecisionFactor                = 1e1 // CONTRACT: 1e(`_Precision`) <-- `sdk.Dec(1 <= `gs.BurnFactor` < `_PrecisionFactor`, `_Precision`).
+)
+
 // Bump `_Precision` if more decimals are needed, along with the exponent.
 // e.g. `DefaultBurnFactor = 0.510000000000000000` --> `_Precision = 2` and `_PrecisionFactor = 1e2`, etc.
 
@@ -19,7 +22,7 @@ func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		DidList:      []*StateValue{},
 		DidNamespace: DefaultDidNamespace,
-		FeeParams: DefaultFeeParams(),
+		FeeParams:    DefaultFeeParams(),
 	}
 }
 

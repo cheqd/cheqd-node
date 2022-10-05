@@ -23,7 +23,7 @@ type HandlerOptions struct {
 	ExtensionOptionChecker ante.ExtensionOptionChecker
 	FeegrantKeeper         ante.FeegrantKeeper
 	CheqdKeeper            cheqdante.CheqdKeeper
-	ResourceKeeper		   cheqdante.ResourceKeeper
+	ResourceKeeper         cheqdante.ResourceKeeper
 	SignModeHandler        authsigning.SignModeHandler
 	SigGasConsumer         func(meter sdk.GasMeter, sig signing.SignatureV2, params types.Params) error
 	TxFeeChecker           cheqdante.TxFeeChecker

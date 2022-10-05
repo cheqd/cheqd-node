@@ -25,7 +25,7 @@ func BurnFee(bankKeeper BankKeeper, ctx sdk.Context, fee sdk.Coins) error {
 func GetBurnFeePortion(ctx sdk.Context, burnFactor sdk.Dec, fee sdk.Coins) sdk.Coins {
 	feeDecCoins := sdk.NewDecCoinsFromCoins(fee...)
 
-	burnFeePortion, _ := feeDecCoins.MulDec(burnFactor).TruncateDecimal();
+	burnFeePortion, _ := feeDecCoins.MulDec(burnFactor).TruncateDecimal()
 
 	return burnFeePortion
 }

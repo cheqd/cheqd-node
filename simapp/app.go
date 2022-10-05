@@ -350,7 +350,7 @@ func NewSimApp(
 	app.EvidenceKeeper = *evidenceKeeper
 
 	app.CheqdKeeper = *cheqdkeeper.NewKeeper(
-		appCodec, keys[cheqdtypes.StoreKey], 
+		appCodec, keys[cheqdtypes.StoreKey],
 	)
 
 	app.ResourceKeeper = *resourcekeeper.NewKeeper(
