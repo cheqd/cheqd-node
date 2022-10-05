@@ -604,10 +604,12 @@ func New(
 	app.MountTransientStores(tkeys)
 	app.MountMemoryStores(memKeys)
 
-	anteHandler, err := ante.NewAnteHandler(ante.HandlerOptions{
+	anteHandler, err := NewAnteHandler(HandlerOptions{
 		AccountKeeper:   app.AccountKeeper,
 		BankKeeper:      app.BankKeeper,
 		FeegrantKeeper:  app.FeeGrantKeeper,
+		CheqdKeeper:     app.cheqdKeeper,
+		ResourceKeeper:  app.resourceKeeper,
 		SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 		SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
 	})

@@ -29,7 +29,7 @@ import (
 // the effective fee should be deducted later, and the priority should be returned in abci response.
 // Here the default fee checker type is augmented to return a boolean flag to indicate if the tx is an identity tx,
 // hence a custom fee logic is applied and the total custom fee is returned as well.
-type TxFeeChecker func(ctx sdk.Context, tx sdk.Tx) (sdk.Coins, int64, bool, error)
+type TxFeeChecker func(ctx sdk.Context, cheqdKeeper CheqdKeeper, resourceKeeper ResourceKeeper, tx sdk.Tx) (sdk.Coins, sdk.Coins, int64, bool, error)
 
 // DeductFeeDecorator deducts fees from the first signer of the tx
 // If the first signer does not have the funds to pay for the fees, return with InsufficientFunds error
@@ -39,10 +39,12 @@ type DeductFeeDecorator struct {
 	accountKeeper  ante.AccountKeeper
 	bankKeeper     BankKeeper
 	feegrantKeeper ante.FeegrantKeeper
+	cheqdKeeper    CheqdKeeper
+	resourceKeeper ResourceKeeper
 	txFeeChecker   TxFeeChecker
 }
 
-func NewDeductFeeDecorator(ak ante.AccountKeeper, bk BankKeeper, fk ante.FeegrantKeeper, tfc TxFeeChecker) DeductFeeDecorator {
+func NewDeductFeeDecorator(ak ante.AccountKeeper, bk BankKeeper, fk ante.FeegrantKeeper, ck CheqdKeeper, rk ResourceKeeper, tfc TxFeeChecker) DeductFeeDecorator {
 	if tfc == nil {
 		tfc = checkTxFeeWithCustomFixedFee
 	}
@@ -51,6 +53,8 @@ func NewDeductFeeDecorator(ak ante.AccountKeeper, bk BankKeeper, fk ante.Feegran
 		accountKeeper:  ak,
 		bankKeeper:     bk,
 		feegrantKeeper: fk,
+		cheqdKeeper:    ck,
+		resourceKeeper: rk,
 		txFeeChecker:   tfc,
 	}
 }
@@ -72,14 +76,20 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 	)
 
 	fee := feeTx.GetFee()
+	burn := (sdk.Coins)(nil)
+	// CONTRACT: simulate=true means the fee is ignored at this point, as we don't support a fixed fee for simulation mode for `TaxableMsg` Tx.
+	// As a result, a lite version of `IsIdentityTx` is called to check if the tx is an identity tx, as the most minimal check.
+	// If true, an *error* bubbles up to indicate that the tx is an identity tx and a fixed fee is not supported in simulation mode.
 	if !simulate {
-		fee, priority, isCustomFee, err = dfd.txFeeChecker(ctx, tx)
+		fee, burn, priority, isCustomFee, err = dfd.txFeeChecker(ctx, dfd.cheqdKeeper, dfd.resourceKeeper, tx)
 		if err != nil {
 			return ctx, err
 		}
+	} else {
+		isCustomFee = IsIdentityTxLite(feeTx)
 	}
 
-	if err := dfd.checkDeductFeeWithFixedFee(ctx, tx, isCustomFee, fee, simulate); err != nil {
+	if err := dfd.checkDeductFeeWithFixedFee(ctx, tx, isCustomFee, fee, burn, simulate); err != nil {
 		return ctx, err
 	}
 
@@ -88,7 +98,7 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 	return next(newCtx, tx, simulate)
 }
 
-func (dfd DeductFeeDecorator) checkDeductFeeWithFixedFee(ctx sdk.Context, sdkTx sdk.Tx, isCustomFee bool, fee sdk.Coins, simulate bool) error {
+func (dfd DeductFeeDecorator) checkDeductFeeWithFixedFee(ctx sdk.Context, sdkTx sdk.Tx, isCustomFee bool, fee sdk.Coins, burnFeePortion sdk.Coins, simulate bool) error {
 	feeTx, ok := sdkTx.(sdk.FeeTx)
 	if !ok {
 		return sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a FeeTx")
@@ -147,27 +157,21 @@ func (dfd DeductFeeDecorator) checkDeductFeeWithFixedFee(ctx sdk.Context, sdkTx 
 	}
 	ctx.EventManager().EmitEvents(events)
 
-	distrFeeAlloc, err := GetDistributionFee(fee)
+	distrFeeAlloc, err := GetDistributionFee(ctx, fee, burnFeePortion)
 	if err != nil {
 		return err
 	}
 
 	// 1. Fixed fee resides in the cheqd module account now
 	//		a. Predefined amount of fixed fee is burnt
-	//*		b. Predefined amount of fixed fee is distributed to the foundation (REDUNDANT)
-	//		c. Predefined amount of fixed fee is distributed to the validators as rewards
+	//		b. Predefined amount of fixed fee is distributed to the validators as rewards
 
 	// 1a. Burn fixed fee
 	if err := BurnFee(dfd.bankKeeper, ctx, distrFeeAlloc[BurnFeePortion]); err != nil {
 		return err
 	}
 
-	// 1b. Distribute fixed fee to the foundation
-	// if err := DistributeFeeToAccount(dfd.bankKeeper, ctx, distrFeeAlloc[FoundationFeePortion]); err != nil {
-	// 	return err
-	// }
-
-	// 1c. Distribute fixed fee to the validators as rewards
+	// 1b. Distribute fixed fee to the validators as rewards
 	if err := DistributeFeeToModule(dfd.bankKeeper, ctx, distrFeeAlloc[RewardsFeePortion]); err != nil {
 		return err
 	}
@@ -261,14 +265,14 @@ func DeductFeesToModule(bankKeeper types.BankKeeper, ctx sdk.Context, acc types.
 
 // checkTxWithCustomMinGasPrices checks if the provided fee is enough for `cheqd`, `resource` module specific Msg and returns the effective fee and tx priority,
 // otherwise it returns the default fee and priority.
-func checkTxFeeWithCustomFixedFee(ctx sdk.Context, tx sdk.Tx) (sdk.Coins, int64, bool, error) {
+func checkTxFeeWithCustomFixedFee(ctx sdk.Context, cheqdKeeper CheqdKeeper, resourceKeeper ResourceKeeper, tx sdk.Tx) (sdk.Coins, sdk.Coins, int64, bool, error) {
 	feeTx, ok := tx.(sdk.FeeTx)
 	if !ok {
-		return nil, 0, false, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a FeeTx")
+		return nil, nil, 0, false, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a FeeTx")
 	}
 
 	// check if the provided fee is enough for `cheqd`, `resource` module specific Msg
-	isIdentityTx, fee := IsIdentityTx(feeTx)
+	isIdentityTx, fee, burn := IsIdentityTx(ctx, cheqdKeeper, resourceKeeper, feeTx)
 	if !isIdentityTx {
 		return checkTxFeeWithValidatorMinGasPrices(ctx, feeTx)
 	}
@@ -280,35 +284,32 @@ func checkTxFeeWithCustomFixedFee(ctx sdk.Context, tx sdk.Tx) (sdk.Coins, int64,
 	// if this is a CheckTx. This is only for local mempool purposes, and thus
 	// is only ran on check tx.
 	if ctx.IsCheckTx() || ctx.IsReCheckTx() {
-		_, err := IsSufficientCustomFee(ctx, fee, feeCoins, int64(gas))
+		_, err := IsSufficientCustomFee(ctx, fee, feeCoins, burn, int64(gas))
 		if err != nil {
-			return nil, 0, false, err
+			return nil, nil, 0, false, err
 		}
 	}
 
 	priority := getTxPriority(feeCoins, int64(gas))
-	return feeCoins, priority, true, nil
+	return fee, burn, priority, true, nil
 }
 
-func IsSufficientCustomFee(ctx sdk.Context, feeRequired sdk.Coins, fee sdk.Coins, gasRequested int64) (DistributionFeeAllocation, error) {
+func IsSufficientCustomFee(ctx sdk.Context, feeRequired sdk.Coins, fee sdk.Coins, burnFeePortion sdk.Coins, gasRequested int64) (DistributionFeeAllocation, error) {
 	// 1. Check if the provided fee is enough for `cheqd`, `resource` module specific Msg
 	// 2. Calculate further distributions
 	// 3. Check with the default validator min gas prices based on rewards distribution
 	// 4. If the fee is not sufficient, return error
 
 	// 1. Check if the provided fee is enough for `cheqd`, `resource` module specific Msg
-	fmt.Println("fee is: ", fee, "feeRequired is: ", feeRequired, "fee is any greater or equal than feeRequired: ", fee.IsAnyGTE(feeRequired))
 	if !fee.IsAnyGTE(feeRequired) {
 		return DistributionFeeAllocation{}, sdkerrors.Wrapf(sdkerrors.ErrInsufficientFee, "insufficient fees; got: %s required: %s", fee, feeRequired)
 	}
 
 	// 2. Calculate further distributions
-	// TODO: Decide on if we want to keep extra fees provided by the user or revert to just the required fee.
-	// TODO: If yes, we might need a max threshold for fees provided by the user and revert to just the required fee if it exceeds the threshold *OR* fail & revert tx.
 	// TODO: At any case, we need to also decide on handling reverting txs if the dynamic validation fails (e.g. if the identity signatures are invalid, verification method is not supported yet, etc).
 	// TODO: This is achieved with defining a `postHandler` in the `anteHandler` and reverting the tx if the dynamic validation fails.
 	//* NOTE: Here we are accepting the total fee provided by the user, if it is greater than or equal to the required fee.
-	distrFeeAlloc, err := GetDistributionFee(fee)
+	distrFeeAlloc, err := GetDistributionFee(ctx, feeRequired, burnFeePortion)
 	if err != nil {
 		return distrFeeAlloc, err
 	}

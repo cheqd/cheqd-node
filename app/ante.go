@@ -22,6 +22,8 @@ type HandlerOptions struct {
 	BankKeeper             cheqdante.BankKeeper
 	ExtensionOptionChecker ante.ExtensionOptionChecker
 	FeegrantKeeper         ante.FeegrantKeeper
+	CheqdKeeper            cheqdante.CheqdKeeper
+	ResourceKeeper		   cheqdante.ResourceKeeper
 	SignModeHandler        authsigning.SignModeHandler
 	SigGasConsumer         func(meter sdk.GasMeter, sig signing.SignatureV2, params types.Params) error
 	TxFeeChecker           cheqdante.TxFeeChecker
@@ -39,6 +41,14 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "bank keeper is required for ante builder")
 	}
 
+	if options.CheqdKeeper == nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "cheqd keeper is required for ante builder")
+	}
+
+	if options.ResourceKeeper == nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "resource keeper is required for ante builder")
+	}
+
 	if options.SignModeHandler == nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "sign mode handler is required for ante builder")
 	}
@@ -50,7 +60,7 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		ante.NewTxTimeoutHeightDecorator(),
 		ante.NewValidateMemoDecorator(options.AccountKeeper),
 		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
-		cheqdante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, options.TxFeeChecker),
+		cheqdante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, options.CheqdKeeper, options.ResourceKeeper, options.TxFeeChecker),
 		ante.NewSetPubKeyDecorator(options.AccountKeeper), // SetPubKeyDecorator must be called before all signature verification decorators
 		ante.NewValidateSigCountDecorator(options.AccountKeeper),
 		ante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),

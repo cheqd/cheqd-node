@@ -4,10 +4,13 @@ package cheqdid.cheqdnode.cheqd.v1;
 option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
 import "cheqd/v1/stateValue.proto";
+import "cheqd/v1/fee.proto";
+import "cosmos/base/v1beta1/coin.proto";
 
 // GenesisState defines the cheqd module's genesis state.
 message GenesisState {
   string did_namespace = 1;
   repeated StateValue didList = 2;
+  FeeParams fee_params = 3;
 }
 

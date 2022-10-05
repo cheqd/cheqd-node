@@ -4,10 +4,21 @@ import (
 	"fmt"
 )
 
-// DefaultGenesis returns the default Capability genesis state
+const DefaultCreateResourceImageFee = 5e9
+const DefaultCreateResourceJsonFee = 2e9
+const DefaultCreateResourceDefaultFee = 1e9
+const DefaultBurnFactorRepresentation = 0.500000000000000000 // 0.5 or 50%
+const _Precision = 1
+const _PrecisionFactor = 1e1 // CONTRACT: 1e(`_Precision`) <-- `sdk.Dec(1 <= `gs.BurnFactor` < `_PrecisionFactor`, `_Precision`).
+// Bump `_Precision` if more decimals are needed, along with the exponent.
+// e.g. `DefaultBurnFactor = 0.510000000000000000` --> `_Precision = 2` and `_PrecisionFactor = 1e2`, etc.
+
+
+// DefaultGenesis returns the default `resource` genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		ResourceList: []*Resource{},
+		FeeParams: DefaultFeeParams(),
 	}
 }
 
@@ -24,6 +35,10 @@ func (gs GenesisState) Validate() error {
 		}
 
 		resourceIdMap[collectionResourceId] = true
+	}
+
+	if err := gs.FeeParams.ValidateBasic(); err != nil {
+		return err
 	}
 
 	return nil

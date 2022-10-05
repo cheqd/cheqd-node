@@ -71,6 +71,8 @@ func (s *AnteTestSuite) SetupTest(isCheckTx bool) {
 			AccountKeeper:   s.app.AccountKeeper,
 			BankKeeper:      s.app.BankKeeper,
 			FeegrantKeeper:  s.app.FeeGrantKeeper,
+			CheqdKeeper:     s.app.CheqdKeeper,
+			ResourceKeeper:  s.app.ResourceKeeper,
 			SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 			SigGasConsumer:  sdkante.DefaultSigVerificationGasConsumer,
 		},

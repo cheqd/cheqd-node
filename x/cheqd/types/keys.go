@@ -24,4 +24,7 @@ const (
 	DidKey          = "did:"
 	DidCountKey     = "did-count:"
 	DidNamespaceKey = "did-namespace:"
+
+	// Fee related keys
+	FeeParamsKey = "fee-params-" + ModuleName + ":"
 )

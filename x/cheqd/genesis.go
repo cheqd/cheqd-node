@@ -17,7 +17,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		}
 	}
 
-	// Set nym count
+	// Set did count
 	k.SetDidCount(&ctx, uint64(len(genState.DidList)))
 
 	k.SetDidNamespace(&ctx, genState.DidNamespace)

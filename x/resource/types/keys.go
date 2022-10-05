@@ -22,4 +22,7 @@ const (
 	ResourceHeaderKey = "resource-header:"
 	ResourceDataKey   = "resource-data:"
 	ResourceCountKey  = "resource-count:"
+
+	// FeeParamsKey is the store key string for fee params
+	FeeParamsKey = "fee-params-" + ModuleName + ":"
 )

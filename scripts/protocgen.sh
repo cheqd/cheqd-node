@@ -6,7 +6,7 @@ set -euox pipefail
 go get github.com/cosmos/gogoproto 2>/dev/null
 
 echo "Generating gogo proto code"
-cd proto
+cd ../proto
 proto_dirs=$(find ./ -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
 for proto_dir in $proto_dirs; do
   proto_files=$(find "${proto_dir}" -maxdepth 1 -name '*.proto')

@@ -3,8 +3,12 @@ package cheqdid.cheqdnode.cheqd.v1;
 
 option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
+import "gogoproto/gogo.proto";
 import "google/protobuf/any.proto";
+import "cosmos_proto/cosmos.proto";
+import "cosmos/msg/v1/msg.proto";
 import "cheqd/v1/did.proto";
+import "cheqd/v1/fee.proto";
 
 // Msg defines the Msg service.
 service Msg {
@@ -46,7 +50,7 @@ message MsgCreateDidResponse {
   string id = 1; // Not necessary
 }
 
-message MsgUpdateDidPayload {
+message MsgUpdateDidPayload {           
   repeated string context = 1;
   string id = 2;
   repeated string controller = 3;

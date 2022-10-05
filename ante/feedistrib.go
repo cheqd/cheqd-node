@@ -16,10 +16,11 @@ const (
 
 type DistributionFeeAllocation = [FeePortionCount]sdk.Coins
 
-func GetDistributionFee(fee sdk.Coins) (DistributionFeeAllocation, error) {
+func GetDistributionFee(ctx sdk.Context, fee sdk.Coins, burnFeePortion sdk.Coins) (DistributionFeeAllocation, error) {
+	rewardsFeePortion := sdk.NewCoins(fee...).Sub(burnFeePortion...)
 	distrFeeAlloc := DistributionFeeAllocation{
-		BurnFeePortion:    sdk.NewCoins(fee...).QuoInt(sdk.NewInt(int64(BurnFeeDivisor))),
-		RewardsFeePortion: sdk.NewCoins(fee...).Sub(sdk.NewCoins(fee...).QuoInt(sdk.NewInt(int64(BurnFeeDivisor)))...),
+		BurnFeePortion:    burnFeePortion,
+		RewardsFeePortion: rewardsFeePortion,
 	}
 
 	if ValidateDistributionFee(fee, distrFeeAlloc) != nil {
@@ -50,15 +51,6 @@ func ValidateDistributionFee(fee sdk.Coins, distrFeeAlloc DistributionFeeAllocat
 
 	return nil
 }
-
-//* Redundant, but useful for custom distribution later. Will be removed eventually.
-// func DistributeFeeToAccount(bankKeeper BankKeeper, ctx sdk.Context, fee sdk.Coins) error {
-// 	if fee.IsZero() {
-// 		return sdkerrors.Wrap(sdkerrors.ErrLogic, "fee to be distributed is zero")
-// 	}
-
-// 	return bankKeeper.SendCoinsFromModuleToAccount(ctx, cheqdtypes.ModuleName, sdk.AccAddress(FoundationAccAddr), fee)
-// }
 
 func DistributeFeeToModule(bankKeeper BankKeeper, ctx sdk.Context, fee sdk.Coins) error {
 	if fee.IsZero() {

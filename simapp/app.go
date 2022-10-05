@@ -350,7 +350,7 @@ func NewSimApp(
 	app.EvidenceKeeper = *evidenceKeeper
 
 	app.CheqdKeeper = *cheqdkeeper.NewKeeper(
-		appCodec, keys[cheqdtypes.StoreKey],
+		appCodec, keys[cheqdtypes.StoreKey], 
 	)
 
 	app.ResourceKeeper = *resourcekeeper.NewKeeper(
@@ -495,6 +495,8 @@ func (app *SimApp) setAnteHandler(txConfig client.TxConfig) {
 			BankKeeper:      app.BankKeeper,
 			SignModeHandler: txConfig.SignModeHandler(),
 			FeegrantKeeper:  app.FeeGrantKeeper,
+			CheqdKeeper:     app.CheqdKeeper,
+			ResourceKeeper:  app.ResourceKeeper,
 			SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
 		},
 	)
@@ -674,6 +676,8 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(slashingtypes.ModuleName)
 	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govv1.ParamKeyTable())
 	paramsKeeper.Subspace(crisistypes.ModuleName)
+	paramsKeeper.Subspace(cheqdtypes.ModuleName).WithKeyTable(cheqdtypes.ParamKeyTable())
+	paramsKeeper.Subspace(resourcetypes.ModuleName).WithKeyTable(resourcetypes.ParamKeyTable())
 
 	return paramsKeeper
 }
