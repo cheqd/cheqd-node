@@ -3,10 +3,12 @@ syntax = "proto3";
 package cheqd.v2;
 
 import "cheqd/v2/diddoc.proto";
+import "cheqd/v2/fee.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types/v2";
 
 message GenesisState {
   string did_namespace = 1;
   repeated DidDocWithMetadata did_docs = 2;
+  FeeParams fee_params = 3;
 }
