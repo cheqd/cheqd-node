@@ -9,7 +9,7 @@ option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types/v2";
 
 service Query {
 	rpc DidDoc(QueryGetDidDocRequest) returns (QueryGetDidDocResponse) {
-		option (google.api.http).get = "/cheqd/v1/diddoc/{id}";
+		option (google.api.http).get = "/cheqd/did/v2/diddoc/{id}";
 	}
 }
 

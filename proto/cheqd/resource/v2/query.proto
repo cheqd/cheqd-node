@@ -9,16 +9,16 @@ option go_package = "github.com/cheqd/cheqd-node/x/resource/types/v2";
 
 service Query {
   rpc Resource(QueryGetResourceRequest) returns (QueryGetResourceResponse) {
-    option (google.api.http).get = "/1.0/identifiers/{collection_id}/resources/{id}";
+    option (google.api.http).get = "/cheqd/resource/v2/collection/{collection_id}/resources/{id}";
   }
   rpc ResourceMetadata(QueryGetResourceMetadataRequest) returns (QueryGetResourceMetadataResponse) {
-    option (google.api.http).get = "/1.0/identifiers/{collection_id}/resources/{id}/metadata";
+    option (google.api.http).get = "/cheqd/resource/v2/collection/{collection_id}/resources/{id}/metadata";
   }
   rpc CollectionResources(QueryGetCollectionResourcesRequest) returns (QueryGetCollectionResourcesResponse) {
-    option (google.api.http).get = "/1.0/identifiers/{collection_id}/resources/all";
+    option (google.api.http).get = "/cheqd/resource/v2/collection/{collection_id}/resources";
   }
   rpc AllResourceVersions(QueryGetAllResourceVersionsRequest) returns (QueryGetAllResourceVersionsResponse) {
-    option (google.api.http).get = "/1.0/identifiers/{collection_id}/resources/versions/{name}";
+    option (google.api.http).get = "/cheqd/resource/v2/collection/{collection_id}/resources/versions/{name}";
   }
 }
 
