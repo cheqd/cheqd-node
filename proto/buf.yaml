@@ -16,11 +16,10 @@ breaking:
 
 lint:
   ignore:
-    - cheqd/v1
-    - resource/v1
+    - cheqd/did/v1
+    - cheqd/resource/v1
   use:
     - DEFAULT
-    # - COMMENTS
   except:
     - SERVICE_SUFFIX
     - RPC_REQUEST_STANDARD_NAME

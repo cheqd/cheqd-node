@@ -4,7 +4,7 @@ package cheqdid.cheqdnode.cheqd.v1;
 option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
 import "google/protobuf/any.proto";
-import "cheqd/v1/did.proto";
+import "cheqd/did/v1/did.proto";
 
 // Msg defines the Msg service.
 service Msg {

@@ -4,8 +4,8 @@ package cheqdid.cheqdnode.cheqd.v1;
 option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
 import "google/api/annotations.proto";
-import "cheqd/v1/did.proto";
-import "cheqd/v1/stateValue.proto";
+import "cheqd/did/v1/did.proto";
+import "cheqd/did/v1/stateValue.proto";
 
 
 // Query defines the gRPC querier service.
