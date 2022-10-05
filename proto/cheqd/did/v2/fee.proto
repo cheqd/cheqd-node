@@ -1,5 +1,5 @@
 syntax = "proto3";
-package cheqd.v2;
+package cheqd.did.v2;
 
 option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types/v2";
 option (gogoproto.equal_all) = true;
