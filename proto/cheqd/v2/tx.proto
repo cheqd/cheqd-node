@@ -27,6 +27,7 @@ message SignInfo {
 }
 
 message MsgCreateDidDocPayload {
+  repeated string context = 1;
   string id = 2;
   repeated string controller = 3;
   repeated VerificationMethod verification_method = 4;
@@ -44,6 +45,7 @@ message MsgCreateDidDocResponse {
 }
 
 message MsgUpdateDidDocPayload {
+  repeated string context = 1;
   string id = 2;
   repeated string controller = 3;
   repeated VerificationMethod verification_method = 4;

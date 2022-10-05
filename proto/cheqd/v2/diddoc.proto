@@ -5,6 +5,7 @@ package cheqd.v2;
 option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
 message DidDoc {
+  repeated string context = 1;
   string id = 2;
   repeated string controller = 3;
   repeated VerificationMethod verification_method = 4;
