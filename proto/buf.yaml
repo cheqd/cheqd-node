@@ -20,7 +20,6 @@ lint:
     - cheqd/resource/v1
   use:
     - DEFAULT
-    # - COMMENTS
   except:
     - SERVICE_SUFFIX
     - RPC_REQUEST_STANDARD_NAME
