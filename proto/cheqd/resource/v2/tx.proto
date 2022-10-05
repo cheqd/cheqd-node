@@ -1,9 +1,9 @@
 syntax = "proto3";
 
-package resource.v2;
+package cheqd.resource.v2;
 
-import "cheqd/v2/tx.proto";
-import "resource/v2/resource.proto";
+import "cheqd/did/v2/tx.proto";
+import "cheqd/resource/v2/resource.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/resource/types/v2";
 
@@ -14,7 +14,7 @@ service Msg {
 
 message MsgCreateResource {
   MsgCreateResourcePayload payload = 1;
-  repeated cheqd.v2.SignInfo signatures = 2;
+  repeated cheqd.did.v2.SignInfo signatures = 2;
 }
 
 message MsgCreateResourcePayload {
