@@ -5,138 +5,127 @@ import (
 	"crypto/rand"
 	"fmt"
 	"reflect"
-	"testing"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
-	"github.com/stretchr/testify/require"
 )
 
-func TestDIDDocControllerChanged(t *testing.T) {
-	setup := Setup()
-
-	// Init did
-	aliceKeys, aliceDid, _ := setup.InitDid(AliceDID)
-	bobKeys, _, _ := setup.InitDid(BobDID)
-
-	updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
-	updatedDidDoc.Controller = append(updatedDidDoc.Controller, BobDID)
-	receivedDid, _ := setup.SendUpdateDid(updatedDidDoc, MapToListOfSignerKeys(ConcatKeys(aliceKeys, bobKeys)))
-
-	// check
-	require.NotEqual(t, aliceDid.Controller, receivedDid.Controller)
-	require.NotEqual(t, []string{AliceDID, BobDID}, receivedDid.Controller)
-	require.Equal(t, []string{BobDID}, receivedDid.Controller)
-}
-
-func TestDIDDocVerificationMethodChangedWithoutOldSignature(t *testing.T) {
-	setup := Setup()
-
-	// Init did
-	_, aliceDid, _ := setup.InitDid(AliceDID)
-	bobKeys, _, _ := setup.InitDid(BobDID)
-
-	updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
-	updatedDidDoc.VerificationMethod[0].Type = Ed25519VerificationKey2020
-	_, err := setup.SendUpdateDid(updatedDidDoc, MapToListOfSignerKeys(bobKeys))
-
-	// check
-	require.Error(t, err)
-	require.Equal(t, fmt.Sprintf("there should be at least one signature by %s (old version): signature is required but not found", AliceDID), err.Error())
-}
-
-func TestDIDDocVerificationMethodControllerChangedWithoutOldSignature(t *testing.T) {
-	setup := Setup()
-
-	// Init did
-	_, aliceDid, _ := setup.InitDid(AliceDID)
-	bobKeys, _, _ := setup.InitDid(BobDID)
-
-	updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
-	updatedDidDoc.VerificationMethod[0].Controller = BobDID
-	_, err := setup.SendUpdateDid(updatedDidDoc, MapToListOfSignerKeys(bobKeys))
-
-	// check
-	require.Error(t, err)
-	require.Equal(t, fmt.Sprintf("there should be at least one signature by %s (old version): signature is required but not found", AliceDID), err.Error())
-}
-
-func TestDIDDocControllerChangedWithoutOldSignature(t *testing.T) {
-	setup := Setup()
-
-	// Init did
-	_, aliceDid, _ := setup.InitDid(AliceDID)
-	bobKeys, _, _ := setup.InitDid(BobDID)
-
-	updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
-	updatedDidDoc.Controller = append(updatedDidDoc.Controller, BobDID)
-	_, err := setup.SendUpdateDid(updatedDidDoc, MapToListOfSignerKeys(bobKeys))
-
-	// check
-	require.Error(t, err)
-	require.Equal(t, fmt.Sprintf("there should be at least one signature by %s (old version): signature is required but not found", AliceDID), err.Error())
-}
-
-func TestDIDDocVerificationMethodDeletedWithoutOldSignature(t *testing.T) {
-	setup := Setup()
-
-	// Init did
-
-	ApubKey, AprivKey, _ := ed25519.GenerateKey(rand.Reader)
-	BpubKey, BprivKey, _ := ed25519.GenerateKey(rand.Reader)
-	aliceDid := setup.CreateDid(ApubKey, AliceDID)
-	bobDid := setup.CreateDid(BpubKey, BobDID)
-
-	aliceDid.VerificationMethod = append(aliceDid.VerificationMethod, &types.VerificationMethod{
-		Id:                 AliceKey2,
-		Controller:         BobDID,
-		Type:               Ed25519VerificationKey2020,
-		PublicKeyMultibase: "z" + base58.Encode(BpubKey),
+var _ = Describe("Signature Verification", func() {
+	var setup TestSetup
+	var aliceKeys, bobKeys map[string]ed25519.PrivateKey
+	var aliceDid *types.MsgCreateDidPayload
+	BeforeEach(func() {
+		setup = Setup()
+		aliceKeys, aliceDid, _ = setup.InitDid(AliceDID)
+		bobKeys, _, _ = setup.InitDid(BobDID)
 	})
 
-	aliceKeys := map[string]ed25519.PrivateKey{AliceKey1: AprivKey, BobKey1: BprivKey}
-	bobKeys := map[string]ed25519.PrivateKey{BobKey1: BprivKey}
-	_, _ = setup.SendCreateDid(bobDid, bobKeys)
-	_, _ = setup.SendCreateDid(aliceDid, aliceKeys)
+	It("should has changed DIDDoc controller", func() {
+		updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
+		updatedDidDoc.Controller = append(updatedDidDoc.Controller, BobDID)
+		receivedDid, _ := setup.SendUpdateDid(updatedDidDoc, MapToListOfSignerKeys(ConcatKeys(aliceKeys, bobKeys)))
 
-	updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
-	updatedDidDoc.VerificationMethod = []*types.VerificationMethod{aliceDid.VerificationMethod[0]}
-	updatedDidDoc.Authentication = []string{aliceDid.Authentication[0]}
-	_, err := setup.SendUpdateDid(updatedDidDoc, MapToListOfSignerKeys(bobKeys))
-
-	// check
-	require.Error(t, err)
-	require.Equal(t, fmt.Sprintf("there should be at least one signature by %s (old version): signature is required but not found", AliceDID), err.Error())
-}
-
-func TestDIDDocVerificationMethodDeleted(t *testing.T) {
-	setup := Setup()
-
-	ApubKey, AprivKey, _ := ed25519.GenerateKey(rand.Reader)
-	BpubKey, BprivKey, _ := ed25519.GenerateKey(rand.Reader)
-
-	aliceDid := setup.CreateDid(ApubKey, AliceDID)
-	bobDid := setup.CreateDid(BpubKey, BobDID)
-
-	aliceDid.Authentication = append(aliceDid.Authentication, AliceKey2)
-	aliceDid.VerificationMethod = append(aliceDid.VerificationMethod, &types.VerificationMethod{
-		Id:                 AliceKey2,
-		Controller:         BobDID,
-		Type:               Ed25519VerificationKey2020,
-		PublicKeyMultibase: "z" + base58.Encode(BpubKey),
+		Expect(aliceDid.Controller).To(Not(Equal(receivedDid.Controller)))
+		Expect([]string{AliceDID, BobDID}).To(Not(Equal(receivedDid.Controller)))
+		Expect([]string{BobDID}, receivedDid.Controller)
 	})
 
-	aliceKeys := map[string]ed25519.PrivateKey{AliceKey1: AprivKey, BobKey1: BprivKey}
-	bobKeys := map[string]ed25519.PrivateKey{BobKey1: BprivKey}
-	_, _ = setup.SendCreateDid(bobDid, bobKeys)
-	_, _ = setup.SendCreateDid(aliceDid, aliceKeys)
+	It("should fails cause we need old signature for changing verification method", func() {
+		updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
+		updatedDidDoc.VerificationMethod[0].Type = Ed25519VerificationKey2020
+		_, err := setup.SendUpdateDid(updatedDidDoc, MapToListOfSignerKeys(bobKeys))
 
-	updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
-	updatedDidDoc.Authentication = []string{aliceDid.Authentication[0]}
-	updatedDidDoc.VerificationMethod = []*types.VerificationMethod{aliceDid.VerificationMethod[0]}
-	receivedDid, _ := setup.SendUpdateDid(updatedDidDoc, MapToListOfSignerKeys(ConcatKeys(aliceKeys, bobKeys)))
+		// check
+		Expect(err).To(Not(BeNil()))
+		Expect(err.Error()).To(Equal(fmt.Sprintf("there should be at least one signature by %s (old version): signature is required but not found", AliceDID)))
+	})
 
-	// check
-	require.NotEqual(t, len(aliceDid.VerificationMethod), len(receivedDid.VerificationMethod))
-	require.True(t, reflect.DeepEqual(aliceDid.VerificationMethod[0], receivedDid.VerificationMethod[0]))
-}
+	It("should fails cause we need old signature for changing verification method controller", func() {
+		updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
+		updatedDidDoc.VerificationMethod[0].Controller = BobDID
+		_, err := setup.SendUpdateDid(updatedDidDoc, MapToListOfSignerKeys(bobKeys))
+
+		// check
+		Expect(err).To(Not(BeNil()))
+		Expect(err.Error()).To(Equal(fmt.Sprintf("there should be at least one signature by %s (old version): signature is required but not found", AliceDID)))
+	})
+
+	It("should fails cause we need old signature for changing DIDDoc controller", func() {
+		updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
+		updatedDidDoc.Controller = append(updatedDidDoc.Controller, BobDID)
+		_, err := setup.SendUpdateDid(updatedDidDoc, MapToListOfSignerKeys(bobKeys))
+
+		// check
+		Expect(err).To(Not(BeNil()))
+		Expect(err.Error()).To(Equal(fmt.Sprintf("there should be at least one signature by %s (old version): signature is required but not found", AliceDID)))
+	})
+})
+
+var _ = Describe("Signature Verification. Remove signature/VM", func() {
+	var setup TestSetup
+	var ApubKey, BpubKey ed25519.PublicKey
+	var AprivKey, BprivKey ed25519.PrivateKey
+	var aliceDid, bobDid *types.MsgCreateDidPayload
+	var aliceKeys, bobKeys map[string]ed25519.PrivateKey
+
+	BeforeEach(func() {
+		setup = Setup()
+		// Generate keys
+		ApubKey, AprivKey, _ = ed25519.GenerateKey(rand.Reader)
+		BpubKey, BprivKey, _ = ed25519.GenerateKey(rand.Reader)
+
+		// Create dids
+		aliceDid = setup.CreateDid(ApubKey, AliceDID)
+		bobDid = setup.CreateDid(BpubKey, BobDID)
+		
+		// Collect private keys
+		aliceKeys = map[string]ed25519.PrivateKey{AliceKey1: AprivKey, BobKey1: BprivKey}
+		bobKeys = map[string]ed25519.PrivateKey{BobKey1: BprivKey}
+
+		// Add verification method
+		aliceDid.VerificationMethod = append(aliceDid.VerificationMethod, &types.VerificationMethod{
+			Id:                 AliceKey2,
+			Controller:         BobDID,
+			Type:               Ed25519VerificationKey2020,
+			PublicKeyMultibase: "z" + base58.Encode(BpubKey),
+		})
+
+	})
+
+	It("should fails cause old signature is required for removing this signature", func() {
+
+		// Send dids
+		_, _ = setup.SendCreateDid(bobDid, bobKeys)
+		_, _ = setup.SendCreateDid(aliceDid, aliceKeys)
+
+		updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
+		updatedDidDoc.VerificationMethod = []*types.VerificationMethod{aliceDid.VerificationMethod[0]}
+		updatedDidDoc.Authentication = []string{aliceDid.Authentication[0]}
+		_, err := setup.SendUpdateDid(updatedDidDoc, MapToListOfSignerKeys(bobKeys))
+
+		// check
+		Expect(err).To(Not(BeNil()))
+		Expect(err.Error()).To(Equal(fmt.Sprintf("there should be at least one signature by %s (old version): signature is required but not found", AliceDID)))
+	})
+
+	It("should not fails while removing the whole verification method", func() {
+		aliceDid.Authentication = append(aliceDid.Authentication, AliceKey2)
+
+		// Send dids
+		_, _ = setup.SendCreateDid(bobDid, bobKeys)
+		_, _ = setup.SendCreateDid(aliceDid, aliceKeys)
+
+		updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
+		updatedDidDoc.Authentication = []string{aliceDid.Authentication[0]}
+		updatedDidDoc.VerificationMethod = []*types.VerificationMethod{aliceDid.VerificationMethod[0]}
+		receivedDid, _ := setup.SendUpdateDid(updatedDidDoc, MapToListOfSignerKeys(ConcatKeys(aliceKeys, bobKeys)))
+
+			// check
+		Expect(len(aliceDid.VerificationMethod)).To(Not(Equal(len(receivedDid.VerificationMethod))))
+		Expect(reflect.DeepEqual(aliceDid.VerificationMethod[0], receivedDid.VerificationMethod[0])).To(BeTrue())
+
+	})
+})
