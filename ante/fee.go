@@ -308,7 +308,6 @@ func IsSufficientCustomFee(ctx sdk.Context, feeRequired sdk.Coins, fee sdk.Coins
 	// 2. Calculate further distributions
 	// TODO: At any case, we need to also decide on handling reverting txs if the dynamic validation fails (e.g. if the identity signatures are invalid, verification method is not supported yet, etc).
 	// TODO: This is achieved with defining a `postHandler` in the `anteHandler` and reverting the tx if the dynamic validation fails.
-	//* NOTE: Here we are accepting the total fee provided by the user, if it is greater than or equal to the required fee.
 	distrFeeAlloc, err := GetDistributionFee(ctx, feeRequired, burnFeePortion)
 	if err != nil {
 		return distrFeeAlloc, err

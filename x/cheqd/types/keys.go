@@ -26,5 +26,5 @@ const (
 	DidNamespaceKey = "did-namespace:"
 
 	// Fee related keys
-	FeeParamsKey = "fee-params-" + ModuleName + ":"
+	FeeParamsKey = "feeparams"
 )

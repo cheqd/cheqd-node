@@ -24,5 +24,5 @@ const (
 	ResourceCountKey  = "resource-count:"
 
 	// FeeParamsKey is the store key string for fee params
-	FeeParamsKey = "fee-params-" + ModuleName + ":"
+	FeeParamsKey = "feeparams"
 )
