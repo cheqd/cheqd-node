@@ -234,7 +234,7 @@ func TestBaseApp_BlockGas(t *testing.T) {
 				// capped by gasLimit
 				tc.gasToConsume = txtypes.MaxGasWanted
 			}
-			// CONTRACT: gasToConsume is +/- 12k gas units from the actual gas consumed (required for larger computations)
+			// CONTRACT: gasToConsume is +/- `RangeSlippage` gas units from the actual gas consumed (required for larger computations)
 			require.GreaterOrEqual(t, tc.gasToConsume+RangeSlippage, ctx.BlockGasMeter().GasConsumed())
 			require.LessOrEqual(t, tc.gasToConsume-RangeSlippage, ctx.BlockGasMeter().GasConsumed())
 			// tx fee is always deducted
