@@ -1,4 +1,4 @@
-package tests
+package tests_test
 
 import (
 	"crypto/ed25519"
@@ -8,6 +8,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	. "github.com/cheqd/cheqd-node/x/cheqd/tests"
 
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"

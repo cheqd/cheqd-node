@@ -2,9 +2,7 @@ package tests
 
 import (
 	"math/rand"
-	"testing"
-
-	"github.com/stretchr/testify/require"
+	. "github.com/onsi/gomega"
 )
 
 var letters = []rune("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz")
@@ -40,9 +38,9 @@ func GenerateTestKeys() map[string]KeyPair {
 	}
 }
 
-func InitEnv(t *testing.T, keys map[string]KeyPair) TestSetup {
+func InitEnv(keys map[string]KeyPair) TestSetup {
 	setup := Setup()
 	err := setup.CreateTestDIDs(keys)
-	require.NoError(t, err)
+	Expect(err).To(BeNil())
 	return setup
 }
