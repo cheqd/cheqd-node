@@ -8,12 +8,14 @@ import (
 
 const CLI_BINARY_NAME = "cheqd-noded"
 
-const CHAIN_ID = "cheqd"
-const KEYRING_BACKEND = "test"
-const OUTPUT_FORMAT = "json"
-const GAS = "auto"
-const GAS_ADJUSTMENT = "2.0"
-const GAS_PRICES = "25ncheq"
+const (
+	CHAIN_ID        = "cheqd"
+	KEYRING_BACKEND = "test"
+	OUTPUT_FORMAT   = "json"
+	GAS             = "auto"
+	GAS_ADJUSTMENT  = "2.0"
+	GAS_PRICES      = "25ncheq"
+)
 
 func Exec(args ...string) (string, error) {
 	cmd := exec.Command(CLI_BINARY_NAME, args...)
