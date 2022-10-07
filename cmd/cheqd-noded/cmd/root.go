@@ -46,7 +46,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	// Set config for prefixes
 	app.SetConfig()
 
-	// Why test config?
+	// TODO: Why test config?
 	encodingConfig := app.MakeTestEncodingConfig()
 	initClientCtx := client.Context{}.
 		WithCodec(encodingConfig.Codec).
