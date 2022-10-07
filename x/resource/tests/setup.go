@@ -4,7 +4,6 @@ import (
 	"crypto/ed25519"
 	"crypto/rand"
 	"encoding/base64"
-	// "testing"
 	"time"
 
 	"github.com/cheqd/cheqd-node/x/cheqd"
@@ -15,7 +14,6 @@ import (
 	"github.com/cheqd/cheqd-node/x/resource"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
-	// "github.com/stretchr/testify/require"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store"
@@ -126,20 +124,6 @@ func (s *TestSetup) SendCreateResource(msg *types.MsgCreateResourcePayload, keys
 	created, _ := s.ResourceKeeper.GetResource(&s.Ctx, msg.CollectionId, msg.Id)
 	return &created, nil
 }
-
-/* func InitEnv(t *testing.T, publicKey ed25519.PublicKey, privateKey ed25519.PrivateKey) TestSetup {
-	resourceSetup := Setup()
-
-	didDoc := resourceSetup.CreateDid(publicKey, ExistingDID)
-	_, err := resourceSetup.SendCreateDid(didDoc, map[string]ed25519.PrivateKey{ExistingDIDKey: privateKey})
-	require.NoError(t, err)
-
-	resourcePayload := GenerateCreateResourcePayload(ExistingResource())
-	_, err = resourceSetup.SendCreateResource(resourcePayload, map[string]ed25519.PrivateKey{ExistingDIDKey: privateKey})
-	require.NoError(t, err)
-
-	return resourceSetup
-} */
 
 func GenerateTestKeys() map[string]cheqdtests.KeyPair {
 	return map[string]cheqdtests.KeyPair{
