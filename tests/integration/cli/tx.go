@@ -26,8 +26,8 @@ var CLI_TX_PARAMS = []string{
 	"--yes",
 }
 
-func SendTx(module, txName, from string, otherArgs ...string) (sdk.TxResponse, error) {
-	args := []string{"tx", module, txName}
+func Tx(module, tx, from string, txArgs ...string) (sdk.TxResponse, error) {
+	args := []string{"tx", module, tx}
 
 	// Common params
 	args = append(args, CLI_TX_PARAMS...)
@@ -36,7 +36,7 @@ func SendTx(module, txName, from string, otherArgs ...string) (sdk.TxResponse, e
 	args = append(args, "--from", from)
 
 	// Other args
-	args = append(args, otherArgs...)
+	args = append(args, txArgs...)
 
 	output, err := Exec(args...)
 	if err != nil {
@@ -71,5 +71,23 @@ func CreateDid(payload types.MsgCreateDidPayload, signInputs []cli.SignInput, fr
 		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivKey))
 	}
 
-	return SendTx("cheqd", "create-did", from, args...)
+	return Tx("cheqd", "create-did", from, args...)
+}
+
+func UpdateDid(payload types.MsgUpdateDidPayload, signInputs []cli.SignInput, from string) (sdk.TxResponse, error) {
+	// Payload
+	payloadJson, err := helpers.Codec.MarshalJSON(&payload)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	args := []string{string(payloadJson)}
+
+	// Sign inputs
+	for _, signInput := range signInputs {
+		args = append(args, signInput.VerificationMethodId)
+		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivKey))
+	}
+
+	return Tx("cheqd", "update-did", from, args...)
 }
