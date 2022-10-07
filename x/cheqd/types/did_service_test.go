@@ -1,66 +1,70 @@
-package types
+package types_test
 
 import (
-	"testing"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 
-	"github.com/stretchr/testify/require"
+	. "github.com/cheqd/cheqd-node/x/cheqd/types"
 )
 
-func TestServiceValidation(t *testing.T) {
-	cases := []struct {
-		name              string
-		struct_           Service
-		baseDid           string
-		allowedNamespaces []string
-		isValid           bool
-		errorMsg          string
-	}{
-		{
-			name: "positive",
-			struct_: Service{
-				Id:              "did:cheqd:aaaaaaaaaaaaaaaa#service1",
-				Type:            "DIDCommMessaging",
-				ServiceEndpoint: "endpoint",
-			},
-			baseDid:           "did:cheqd:aaaaaaaaaaaaaaaa",
-			allowedNamespaces: []string{""},
-			isValid:           true,
-			errorMsg:          "",
-		},
-		{
-			name: "negative: namespace",
-			struct_: Service{
-				Id:              "did:cheqd:aaaaaaaaaaaaaaaa#service1",
-				Type:            "DIDCommMessaging",
-				ServiceEndpoint: "endpoint",
-			},
-			allowedNamespaces: []string{"mainnet"},
-			isValid:           false,
-			errorMsg:          "id: did namespace must be one of: mainnet.",
-		},
-		{
-			name: "negative: base did",
-			struct_: Service{
-				Id:              "did:cheqd:aaaaaaaaaaaaaaaa#service1",
-				Type:            "DIDCommMessaging",
-				ServiceEndpoint: "endpoint",
-			},
-			baseDid:  "did:cheqd:baaaaaaaaaaaaaab",
-			isValid:  false,
-			errorMsg: "id: must have prefix: did:cheqd:baaaaaaaaaaaaaab.",
-		},
-	}
+var _ = Describe("DID Validation tests", func() {
 
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			err := tc.struct_.Validate(tc.baseDid, tc.allowedNamespaces)
+	var struct_           Service
+	var baseDid           string
+	var allowedNamespaces []string
+	var isValid           bool
+	var errorMsg          string
 
-			if tc.isValid {
-				require.NoError(t, err)
+	BeforeEach(func() {
+		struct_ = Service{}
+		baseDid = ""
+		allowedNamespaces = []string{}
+		isValid = false
+		errorMsg = ""
+	})
+
+	AfterEach(func() {
+		err := struct_.Validate(baseDid, allowedNamespaces)
+
+			if isValid {
+				Expect(err).To(BeNil())
 			} else {
-				require.Error(t, err)
-				require.Equal(t, err.Error(), tc.errorMsg)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring(errorMsg))
 			}
-		})
-	}
-}
+	})
+
+	It("Positive case", func() {
+		struct_ = Service{
+			Id:              "did:cheqd:aaaaaaaaaaaaaaaa#service1",
+			Type:            "DIDCommMessaging",
+			ServiceEndpoint: "endpoint",
+		}
+		baseDid = "did:cheqd:aaaaaaaaaaaaaaaa"
+		allowedNamespaces = []string{""}
+		isValid = true
+		errorMsg = ""
+	})
+
+	It("Negative: namespace", func() {
+		struct_ = Service{
+			Id:              "did:cheqd:aaaaaaaaaaaaaaaa#service1",
+			Type:            "DIDCommMessaging",
+			ServiceEndpoint: "endpoint",
+		}
+		allowedNamespaces = []string{"mainnet"}
+		isValid = false
+		errorMsg = "id: did namespace must be one of: mainnet."
+	})
+
+	It("Negative: Base did", func() {
+		struct_ = Service{
+			Id:              "did:cheqd:aaaaaaaaaaaaaaaa#service1",
+			Type:            "DIDCommMessaging",
+			ServiceEndpoint: "endpoint",
+		}
+		baseDid = "did:cheqd:baaaaaaaaaaaaaab"
+		isValid = false
+		errorMsg = "id: must have prefix: did:cheqd:baaaaaaaaaaaaaab."
+	})
+})
