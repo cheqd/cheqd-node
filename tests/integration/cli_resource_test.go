@@ -8,7 +8,7 @@ import (
 )
 
 var _ = Describe("cheqd cli", func() {
-	It("works", func() {
+	It("can create resource", func() {
 		Expect(true).To(BeTrue())
 	})
 })

@@ -1,4 +1,4 @@
-//nogo:build integration
+//go:build integration
 
 package integration
 
