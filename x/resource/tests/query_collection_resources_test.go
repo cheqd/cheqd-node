@@ -1,66 +1,71 @@
-package tests
+package tests_test
 
 import (
+	"crypto/ed25519"
 	"fmt"
-	"testing"
 
-	"github.com/cheqd/cheqd-node/x/resource/types"
+	resourcetests "github.com/cheqd/cheqd-node/x/resource/tests"
+	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/stretchr/testify/require"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
-func TestQueryGetCollectionResources(t *testing.T) {
-	keys := GenerateTestKeys()
-	existingResource := ExistingResource()
-	cases := []struct {
-		valid    bool
-		name     string
-		msg      *types.QueryGetCollectionResourcesRequest
-		response *types.QueryGetCollectionResourcesResponse
-		errMsg   string
-	}{
-		{
-			valid: true,
-			name:  "Valid: Works",
-			msg: &types.QueryGetCollectionResourcesRequest{
-				CollectionId: ExistingDIDIdentifier,
-			},
-			response: &types.QueryGetCollectionResourcesResponse{
-				Resources: []*types.ResourceHeader{existingResource.Header},
-			},
-			errMsg: "",
-		},
-		{
-			valid: false,
-			name:  "Not Valid: DID Doc is not found",
-			msg: &types.QueryGetCollectionResourcesRequest{
-				CollectionId: NotFoundDIDIdentifier,
-			},
-			response: nil,
-			errMsg:   fmt.Sprintf("did:cheqd:test:%s: DID Doc not found", NotFoundDIDIdentifier),
-		},
-	}
-
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			msg := tc.msg
-			resourceSetup := InitEnv(t, keys[ExistingDIDKey].PublicKey, keys[ExistingDIDKey].PrivateKey)
-
-			queryResponse, err := resourceSetup.QueryServer.CollectionResources(sdk.WrapSDKContext(resourceSetup.Ctx), msg)
-
-			if tc.valid {
-				resources := queryResponse.Resources
-				expectedResources := tc.response.Resources
-				require.Nil(t, err)
-				require.Equal(t, len(expectedResources), len(resources))
-				for i, r := range resources {
-					r.Created = expectedResources[i].Created
-					require.Equal(t, expectedResources[i], r)
-				}
-			} else {
-				require.Error(t, err)
-				require.Equal(t, tc.errMsg, err.Error())
-			}
+var _ = Describe("QueryCollectionResources", func() {
+	Describe("Validate", func() {
+		var setup resourcetests.TestSetup
+		keys := resourcetests.GenerateTestKeys()
+		BeforeEach(func() {
+			setup = resourcetests.Setup()
+			didDoc := setup.CreateDid(keys[resourcetests.ExistingDIDKey].PublicKey, resourcetests.ExistingDID)
+			_, err := setup.SendCreateDid(didDoc, map[string]ed25519.PrivateKey{resourcetests.ExistingDIDKey: keys[resourcetests.ExistingDIDKey].PrivateKey})
+			Expect(err).To(BeNil())
+			payload := resourcetests.GenerateCreateResourcePayload(resourcetests.ExistingResource())
+			_, err = setup.SendCreateResource(payload, map[string]ed25519.PrivateKey{resourcetests.ExistingDIDKey: keys[resourcetests.ExistingDIDKey].PrivateKey})
+			Expect(err).To(BeNil())
 		})
-	}
-}
+		DescribeTable("Validate QueryCollectionResources",
+			func(
+				valid bool,
+				msg *resourcetypes.QueryGetCollectionResourcesRequest,
+				response *resourcetypes.QueryGetCollectionResourcesResponse,
+				errMsg string,
+			) {
+				queryResponse, err := setup.QueryServer.CollectionResources(sdk.WrapSDKContext(setup.Ctx), msg)
+
+				if valid {
+					resources := queryResponse.Resources
+					expectedResources := response.Resources
+					Expect(err).To(BeNil())
+					Expect(len(expectedResources)).To(Equal(len(resources)))
+					for i, r := range resources {
+						r.Created = expectedResources[i].Created
+						Expect(expectedResources[i]).To(Equal(r))
+					}
+				} else {
+					Expect(err).To(HaveOccurred())
+					Expect(errMsg).To(Equal(err.Error()))
+				}
+			},
+			Entry("Valid: Works",
+				true,
+				&resourcetypes.QueryGetCollectionResourcesRequest{
+					CollectionId: resourcetests.ExistingDIDIdentifier,
+				},
+				&resourcetypes.QueryGetCollectionResourcesResponse{
+					Resources: []*resourcetypes.ResourceHeader{resourcetests.ExistingResource().Header},
+				},
+				"",
+			),
+			Entry("Invalid: DID Doc is not found",
+				false,
+				&resourcetypes.QueryGetCollectionResourcesRequest{
+					CollectionId: resourcetests.NotFoundDIDIdentifier,
+				},
+				nil,
+				fmt.Errorf("did:cheqd:test:%s: DID Doc not found", resourcetests.NotFoundDIDIdentifier).Error(),
+			),
+		)
+	})
+})

@@ -23,7 +23,7 @@ const (
 
 func ExistingResource() types.Resource {
 	data := []byte(SchemaData)
-	checksum := sha256.New().Sum(data)
+	checksum := sha256.Sum256(data)
 	return types.Resource{
 		Header: &types.ResourceHeader{
 			CollectionId: ExistingDIDIdentifier,
@@ -31,7 +31,7 @@ func ExistingResource() types.Resource {
 			Name:         "Existing Resource Name",
 			ResourceType: CLSchemaType,
 			MediaType:    JsonResourceType,
-			Checksum:     checksum,
+			Checksum:     checksum[:],
 		},
 		Data: data,
 	}

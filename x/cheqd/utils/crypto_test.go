@@ -1,7 +1,6 @@
 package utils_test
 
 import (
-
 	"github.com/multiformats/go-multibase"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
