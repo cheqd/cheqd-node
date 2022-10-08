@@ -49,11 +49,14 @@ jobs:
         run: |
           bash import_keys.sh
 
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: ./go.mod
+
       - name: Install ginkgo
         run: |
-          go install github.com/onsi/ginkgo/v2/ginkgo@latest
+          go install github.com/onsi/ginkgo/v2/ginkgo
 
       - name: Run tests
-        working-directory: ./tests/e2e-bash
         run: |
           ginkgo -r --tags integration tests/integration
