@@ -191,6 +191,7 @@ services:
       - type: volume
         source: observer-0-data
         target: /home/cheqd
+    entrypoint: [ "node-start" ]
     env_file:
       - container-env/observer-0.env
     configs:
