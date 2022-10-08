@@ -56,7 +56,7 @@ jobs:
       - name: Install ginkgo
         working-directory: ./..
         run: |
-          go install github.com/onsi/ginkgo/v2/ginkgo
+          go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
       - name: Run tests
         run: |
