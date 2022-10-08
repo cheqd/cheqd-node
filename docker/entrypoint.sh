@@ -7,11 +7,6 @@ set -euo pipefail
 # within the container, $HOME=/home/cheqd
 CHEQD_ROOT_DIR="$HOME/.cheqdnode"
 
-# DODO: Remove
-id -u
-id -g
-ls -la /
-
 # Init node config directory
 if [ ! -d "${CHEQD_ROOT_DIR}/config" ]
 then

@@ -38,6 +38,7 @@ jobs:
         working-directory: ./docker/localnet
         run: |
           bash gen-network-config.sh
+          sudo chown -R 1000:1000 network-config
           CHEQD_NODE_IMAGE=${{ github.repository }} DOCKER_IMAGE_VERSION=${{ github.sha }} docker compose up
 
       - name: Check all Docker localnet nodes are active
