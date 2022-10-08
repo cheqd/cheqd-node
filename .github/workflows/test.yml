@@ -39,7 +39,7 @@ jobs:
         run: |
           bash gen-network-config.sh
           sudo chown -R 1000:1000 network-config
-          CHEQD_NODE_IMAGE=${{ github.repository }} DOCKER_IMAGE_VERSION=${{ github.sha }} docker compose up
+          CHEQD_NODE_IMAGE=${{ github.repository }} DOCKER_IMAGE_VERSION=${{ github.sha }} docker compose up -d
 
       - name: Check all Docker localnet nodes are active
         run: bash ./tests/tools/wait-for-chain.sh
