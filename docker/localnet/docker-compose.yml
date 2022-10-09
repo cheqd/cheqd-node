@@ -144,6 +144,7 @@ services:
         published: 9491     # gRPC-Gateway port
       - target: 26660
         published: 27060    # Prometheus metrics port
+    entrypoint: [ "node-start" ]
     volumes:
       - type: volume
         source: seed-0-data
@@ -175,6 +176,7 @@ services:
         published: 9591     # gRPC-Gateway port
       - target: 26660
         published: 27160    # Prometheus metrics port
+    entrypoint: [ "node-start" ]
     volumes:
       - type: volume
         source: observer-0-data
