@@ -1,21 +1,38 @@
-package types
+package types_test
 
 import (
-	"testing"
+. "github.com/onsi/ginkgo/v2"
+. "github.com/onsi/gomega"
 
-	"github.com/stretchr/testify/require"
+. "github.com/cheqd/cheqd-node/x/cheqd/types"
 )
 
-func TestMsgUpdateDidValidation(t *testing.T) {
-	cases := []struct {
-		name     string
-		struct_  *MsgUpdateDid
-		isValid  bool
-		errorMsg string
-	}{
-		{
-			name: "positive",
-			struct_: &MsgUpdateDid{
+var _ = Describe("Message for DID creation", func() {
+
+	var struct_           *MsgUpdateDid
+	var isValid           bool
+	var errorMsg          string
+
+	BeforeEach(func() {
+		struct_ = &MsgUpdateDid{}
+		isValid = false
+		errorMsg = ""
+	})
+
+	AfterEach(func() {
+		err := struct_.ValidateBasic()
+
+			if isValid {
+				Expect(err).To(BeNil())
+			} else {
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring(errorMsg))
+			}
+	})
+
+	When("all fields are set properly", func() {
+		It("Will pass", func() {
+			struct_ = &MsgUpdateDid{
 				Payload: &MsgUpdateDidPayload{
 					Id: "did:cheqd:testnet:123456789abcdefg",
 					VerificationMethod: []*VerificationMethod{
@@ -30,12 +47,14 @@ func TestMsgUpdateDidValidation(t *testing.T) {
 					VersionId:      "version1",
 				},
 				Signatures: nil,
-			},
-			isValid: true,
-		},
-		{
-			name: "negative: relationship duplicates",
-			struct_: &MsgUpdateDid{
+			}
+			isValid = true
+		})
+	})
+
+	When("IDs are duplicated", func() {
+		It("should fail the validation", func() {
+			struct_ = &MsgUpdateDid{
 				Payload: &MsgUpdateDidPayload{
 					Id: "did:cheqd:testnet:123456789abcdefg",
 					VerificationMethod: []*VerificationMethod{
@@ -50,13 +69,17 @@ func TestMsgUpdateDidValidation(t *testing.T) {
 					VersionId:      "version1",
 				},
 				Signatures: nil,
-			},
-			isValid:  false,
-			errorMsg: "payload: (authentication: there should be no duplicates.).: basic validation failed",
-		},
-		{
-			name: "negative: version id is required",
-			struct_: &MsgUpdateDid{
+			}
+			isValid = false
+			errorMsg = "payload: (authentication: there should be no duplicates.).: basic validation failed"
+
+
+		})
+	})
+
+	When("VersionId is empty", func() {
+		It("should fail on validation", func() {
+			struct_ = &MsgUpdateDid{
 				Payload: &MsgUpdateDidPayload{
 					Id: "did:cheqd:testnet:123456789abcdefg",
 					VerificationMethod: []*VerificationMethod{
@@ -70,22 +93,9 @@ func TestMsgUpdateDidValidation(t *testing.T) {
 					Authentication: []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#aaa"},
 				},
 				Signatures: nil,
-			},
-			isValid:  false,
-			errorMsg: "payload: (version_id: cannot be blank.).: basic validation failed",
-		},
-	}
-
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			err := tc.struct_.ValidateBasic()
-
-			if tc.isValid {
-				require.NoError(t, err)
-			} else {
-				require.Error(t, err)
-				require.Equal(t, err.Error(), tc.errorMsg)
 			}
+			isValid = false
+			errorMsg = "payload: (version_id: cannot be blank.).: basic validation failed"
 		})
-	}
-}
+	})
+})

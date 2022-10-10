@@ -34,197 +34,220 @@ var _ = Describe("DID Validation tests", func() {
 			}
 	})
 
-	It("Valid: Id: allowed DID", func() {
-		struct_ = &Did{
-			Id: ValidTestDID,
-			VerificationMethod: []*VerificationMethod{
-				{
-					Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
-					Type:               "Ed25519VerificationKey2020",
-					Controller:         ValidTestDID,
-					PublicKeyJwk:       nil,
-					PublicKeyMultibase: ValidEd25519PubKey,
+	When("DID is allowed", func() {
+		It("is valid", func() {
+			struct_ = &Did{
+				Id: ValidTestDID,
+				VerificationMethod: []*VerificationMethod{
+					{
+						Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
+						Type:               "Ed25519VerificationKey2020",
+						Controller:         ValidTestDID,
+						PublicKeyJwk:       nil,
+						PublicKeyMultibase: ValidEd25519PubKey,
+					},
 				},
-			},
-		}
-		isValid =  true
-		errorMsg = ""
+			}
+			isValid =  true
+			errorMsg = ""
+		})
 	})
 
-	It("Not valid: Id: not allowed DID", func() {
-		struct_ = &Did{
-			Id: InvalidTestDID,
-			VerificationMethod: []*VerificationMethod{
-				{
-					Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
-					Type:               "Ed25519VerificationKey2020",
-					Controller:         ValidTestDID,
-					PublicKeyJwk:       nil,
-					PublicKeyMultibase: ValidEd25519PubKey,
+	When("DID is not allowed", func() {
+		It("should fail with error", func() {
+			struct_ = &Did{
+				Id: InvalidTestDID,
+				VerificationMethod: []*VerificationMethod{
+					{
+						Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
+						Type:               "Ed25519VerificationKey2020",
+						Controller:         ValidTestDID,
+						PublicKeyJwk:       nil,
+						PublicKeyMultibase: ValidEd25519PubKey,
+					},
 				},
-			},
-		}
-		isValid = false
-		errorMsg = "id: unable to split did into method, namespace and id; verification_method: (0: (id: must have prefix: badDid.).)."
+			}
+			isValid = false
+			errorMsg = "id: unable to split did into method, namespace and id; verification_method: (0: (id: must have prefix: badDid.).)."
+		})
 	})
 
-	It("Valid: Verification Method: all is fine with type Ed25519VerificationKey2020", func() {
-		struct_ = &Did{
-			Id: ValidTestDID,
-			VerificationMethod: []*VerificationMethod{
-				{
-					Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
-					Type:               "Ed25519VerificationKey2020",
-					Controller:         ValidTestDID,
-					PublicKeyJwk:       nil,
-					PublicKeyMultibase: ValidEd25519PubKey,
+	When("Verification method is Ed25519VerificationKey2020", func() {
+		It("is valid", func() {
+			struct_ = &Did{
+				Id: ValidTestDID,
+				VerificationMethod: []*VerificationMethod{
+					{
+						Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
+						Type:               "Ed25519VerificationKey2020",
+						Controller:         ValidTestDID,
+						PublicKeyJwk:       nil,
+						PublicKeyMultibase: ValidEd25519PubKey,
+					},
 				},
-			},
-		}
-		isValid = true
-		errorMsg = ""
+			}
+			isValid = true
+			errorMsg = ""
+		})
 	})
 
-	It("Valid: Verification Method: all is fine with type jwk", func() {
-		struct_ = &Did{
-			Id: ValidTestDID,
-			VerificationMethod: []*VerificationMethod{
-				{
-					Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
-					Type:               "JsonWebKey2020",
-					Controller:         ValidTestDID,
-					PublicKeyJwk:       ValidPublicKeyJWK,
-					PublicKeyMultibase: "",
+	When("Verification method is jwk", func() {
+		It("is valid", func() {
+			struct_ = &Did{
+				Id: ValidTestDID,
+				VerificationMethod: []*VerificationMethod{
+					{
+						Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
+						Type:               "JsonWebKey2020",
+						Controller:         ValidTestDID,
+						PublicKeyJwk:       ValidPublicKeyJWK,
+						PublicKeyMultibase: "",
+					},
 				},
-			},
-		}
-		isValid = true
-		errorMsg = ""
+			}
+			isValid = true
+			errorMsg = ""
+		})
 	})
 
-	It("Not valid: Verification Method: Wrong id", func() {
-		struct_ = &Did{
-			Id: ValidTestDID,
-			VerificationMethod: []*VerificationMethod{
-				{
-					Id:                 InvalidTestDID,
-					Type:               "JsonWebKey2020",
-					Controller:         ValidTestDID,
-					PublicKeyJwk:       ValidPublicKeyJWK,
-					PublicKeyMultibase: "",
+	When("verification method has wrong id", func() {
+		It("should fail with corresponding error", func() {
+			struct_ = &Did{
+				Id: ValidTestDID,
+				VerificationMethod: []*VerificationMethod{
+					{
+						Id:                 InvalidTestDID,
+						Type:               "JsonWebKey2020",
+						Controller:         ValidTestDID,
+						PublicKeyJwk:       ValidPublicKeyJWK,
+						PublicKeyMultibase: "",
+					},
 				},
-			},
-		}
-		isValid = false
-		errorMsg = "verification_method: (0: (id: unable to split did into method, namespace and id.).)."
+			}
+			isValid = false
+			errorMsg = "verification_method: (0: (id: unable to split did into method, namespace and id.).)."
+		})
+	})
+	When("verification method has wrong controller", func() {
+		It("should fail with corresponding error", func() {
+			struct_ = &Did{
+				Id: ValidTestDID,
+				VerificationMethod: []*VerificationMethod{
+					{
+						Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
+						Type:               "JsonWebKey2020",
+						Controller:         InvalidTestDID,
+						PublicKeyJwk:       ValidPublicKeyJWK,
+						PublicKeyMultibase: "",
+					},
+				},
+			}
+			isValid = false
+			errorMsg = "verification_method: (0: (controller: unable to split did into method, namespace and id.).)."
+		})
 	})
 
-	It("Not valid: Verification Method: Wrong controller", func() {
-		struct_ = &Did{
-			Id: ValidTestDID,
-			VerificationMethod: []*VerificationMethod{
-				{
-					Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
-					Type:               "JsonWebKey2020",
-					Controller:         InvalidTestDID,
-					PublicKeyJwk:       ValidPublicKeyJWK,
-					PublicKeyMultibase: "",
+	When("list of DIDs in cotroller is allowed", func() {
+		It("s valid", func() {
+			struct_ = &Did{
+				Id:         ValidTestDID,
+				Controller: []string{ValidTestDID, ValidTestDID2},
+				VerificationMethod: []*VerificationMethod{
+					{
+						Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
+						Type:               "Ed25519VerificationKey2020",
+						Controller:         ValidTestDID,
+						PublicKeyMultibase: ValidEd25519PubKey,
+					},
 				},
-			},
-		}
-		isValid = false
-		errorMsg = "verification_method: (0: (controller: unable to split did into method, namespace and id.).)."
+			}
+			isValid = true
+			errorMsg = ""
+		})
 	})
 
-	It("Valid: Controller: List of DIDs allowed", func() {
-		struct_ = &Did{
-			Id:         ValidTestDID,
-			Controller: []string{ValidTestDID, ValidTestDID2},
-			VerificationMethod: []*VerificationMethod{
-				{
-					Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
-					Type:               "Ed25519VerificationKey2020",
-					Controller:         ValidTestDID,
-					PublicKeyMultibase: ValidEd25519PubKey,
+	When("list of DIDs in cotroller is not allowed", func() {
+		It("should fail with corresponding error", func() {
+			struct_ = &Did{
+				Context:    nil,
+				Id:         ValidTestDID,
+				Controller: []string{ValidTestDID, InvalidTestDID},
+				VerificationMethod: []*VerificationMethod{
+					{
+						Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
+						Type:               "Ed25519VerificationKey2020",
+						Controller:         ValidTestDID,
+						PublicKeyMultibase: ValidEd25519PubKey,
+					},
 				},
-			},
-		}
-		isValid = true
-		errorMsg = ""
+			}
+			isValid = false
+			errorMsg = "controller: (1: unable to split did into method, namespace and id.)."
+		})
 	})
 
-	It("Not valid: Controller: List of DIDs is not allowed", func() {
-		struct_ = &Did{
-			Context:    nil,
-			Id:         ValidTestDID,
-			Controller: []string{ValidTestDID, InvalidTestDID},
-			VerificationMethod: []*VerificationMethod{
-				{
-					Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
-					Type:               "Ed25519VerificationKey2020",
-					Controller:         ValidTestDID,
-					PublicKeyMultibase: ValidEd25519PubKey,
+	When("namespace in controleer is not in list of allowed", func() {
+		It("should fail", func() {
+			struct_ = &Did{
+				Id:         ValidTestDID,
+				Controller: []string{ValidTestDID},
+				VerificationMethod: []*VerificationMethod{
+					{
+						Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
+						Type:               "Ed25519VerificationKey2020",
+						Controller:         ValidTestDID,
+						PublicKeyMultibase: ValidEd25519PubKey,
+					},
 				},
-			},
-		}
-		isValid = false
-		errorMsg = "controller: (1: unable to split did into method, namespace and id.)."
+			}
+			allowedNamespaces = []string{"mainnet"}
+			isValid = false
+			errorMsg = "controller: (0: did namespace must be one of: mainnet.); id: did namespace must be one of: mainnet; verification_method: (0: (controller: did namespace must be one of: mainnet; id: did namespace must be one of: mainnet.).)."
+		})
 	})
 
-	It("Allowed namespaces: Negative", func() {
-		struct_ = &Did{
-			Id:         ValidTestDID,
-			Controller: []string{ValidTestDID},
-			VerificationMethod: []*VerificationMethod{
-				{
-					Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
-					Type:               "Ed25519VerificationKey2020",
-					Controller:         ValidTestDID,
-					PublicKeyMultibase: ValidEd25519PubKey,
+	When("controller is duplicated", func() {
+
+		It("should fail", func() {
+			struct_ = &Did{
+				Id:         ValidTestDID,
+				Controller: []string{ValidTestDID, ValidTestDID},
+				VerificationMethod: []*VerificationMethod{
+					{
+						Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
+						Type:               "Ed25519VerificationKey2020",
+						Controller:         ValidTestDID,
+						PublicKeyMultibase: ValidEd25519PubKey,
+					},
 				},
-			},
-		}
-		allowedNamespaces = []string{"mainnet"}
-		isValid = false
-		errorMsg = "controller: (0: did namespace must be one of: mainnet.); id: did namespace must be one of: mainnet; verification_method: (0: (controller: did namespace must be one of: mainnet; id: did namespace must be one of: mainnet.).)."
+			}
+			isValid = false
+			errorMsg = "controller: there should be no duplicates."
+		})
 	})
 
-	It("Controller duplicated: negative", func() {
-		struct_ = &Did{
-			Id:         ValidTestDID,
-			Controller: []string{ValidTestDID, ValidTestDID},
-			VerificationMethod: []*VerificationMethod{
-				{
-					Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
-					Type:               "Ed25519VerificationKey2020",
-					Controller:         ValidTestDID,
-					PublicKeyMultibase: ValidEd25519PubKey,
-				},
-			},
-		}
-		isValid = false
-		errorMsg = "controller: there should be no duplicates."
-	})
+	When("verification method is duplicated", func() {
 
-	It("VM duplicated: negative", func() {
-		struct_ = &Did{
-			Id: ValidTestDID,
-			VerificationMethod: []*VerificationMethod{
-				{
-					Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
-					Type:               "Ed25519VerificationKey2020",
-					Controller:         ValidTestDID,
-					PublicKeyMultibase: ValidEd25519PubKey,
+		It("should fail", func() {
+			struct_ = &Did{
+				Id: ValidTestDID,
+				VerificationMethod: []*VerificationMethod{
+					{
+						Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
+						Type:               "Ed25519VerificationKey2020",
+						Controller:         ValidTestDID,
+						PublicKeyMultibase: ValidEd25519PubKey,
+					},
+					{
+						Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
+						Type:               "Ed25519VerificationKey2020",
+						Controller:         ValidTestDID,
+						PublicKeyMultibase: ValidEd25519PubKey,
+					},
 				},
-				{
-					Id:                 fmt.Sprintf("%s#fragment", ValidTestDID),
-					Type:               "Ed25519VerificationKey2020",
-					Controller:         ValidTestDID,
-					PublicKeyMultibase: ValidEd25519PubKey,
-				},
-			},
-		}
-		isValid = false
-		errorMsg = "verification_method: there are verification method duplicates."
+			}
+			isValid = false
+			errorMsg = "verification_method: there are verification method duplicates."
+		})
 	})
 })

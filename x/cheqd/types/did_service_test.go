@@ -46,25 +46,30 @@ var _ = Describe("DID Validation tests", func() {
 		errorMsg = ""
 	})
 
-	It("Negative: namespace", func() {
-		struct_ = Service{
-			Id:              "did:cheqd:aaaaaaaaaaaaaaaa#service1",
-			Type:            "DIDCommMessaging",
-			ServiceEndpoint: "endpoint",
-		}
-		allowedNamespaces = []string{"mainnet"}
-		isValid = false
-		errorMsg = "id: did namespace must be one of: mainnet."
+	When("Namespace is not allowed", func() {
+
+		It("should fail", func() {
+			struct_ = Service{
+				Id:              "did:cheqd:aaaaaaaaaaaaaaaa#service1",
+				Type:            "DIDCommMessaging",
+				ServiceEndpoint: "endpoint",
+			}
+			allowedNamespaces = []string{"mainnet"}
+			isValid = false
+			errorMsg = "id: did namespace must be one of: mainnet."
+		})
 	})
 
-	It("Negative: Base did", func() {
-		struct_ = Service{
-			Id:              "did:cheqd:aaaaaaaaaaaaaaaa#service1",
-			Type:            "DIDCommMessaging",
-			ServiceEndpoint: "endpoint",
-		}
-		baseDid = "did:cheqd:baaaaaaaaaaaaaab"
-		isValid = false
-		errorMsg = "id: must have prefix: did:cheqd:baaaaaaaaaaaaaab."
+	When("base DID is not the same as in id", func() {
+		It("should fail", func() {
+			struct_ = Service{
+				Id:              "did:cheqd:aaaaaaaaaaaaaaaa#service1",
+				Type:            "DIDCommMessaging",
+				ServiceEndpoint: "endpoint",
+			}
+			baseDid = "did:cheqd:baaaaaaaaaaaaaab"
+			isValid = false
+			errorMsg = "id: must have prefix: did:cheqd:baaaaaaaaaaaaaab."
+		})
 	})
 })
