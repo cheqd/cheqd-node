@@ -80,7 +80,7 @@ var _ = Describe("Signature Verification. Remove signature/VM", func() {
 		// Create dids
 		aliceDid = setup.CreateDid(ApubKey, AliceDID)
 		bobDid = setup.CreateDid(BpubKey, BobDID)
-		
+
 		// Collect private keys
 		aliceKeys = map[string]ed25519.PrivateKey{AliceKey1: AprivKey, BobKey1: BprivKey}
 		bobKeys = map[string]ed25519.PrivateKey{BobKey1: BprivKey}
@@ -92,11 +92,9 @@ var _ = Describe("Signature Verification. Remove signature/VM", func() {
 			Type:               Ed25519VerificationKey2020,
 			PublicKeyMultibase: "z" + base58.Encode(BpubKey),
 		})
-
 	})
 
 	It("should fails cause old signature is required for removing this signature", func() {
-
 		// Send dids
 		_, _ = setup.SendCreateDid(bobDid, bobKeys)
 		_, _ = setup.SendCreateDid(aliceDid, aliceKeys)
@@ -123,9 +121,8 @@ var _ = Describe("Signature Verification. Remove signature/VM", func() {
 		updatedDidDoc.VerificationMethod = []*types.VerificationMethod{aliceDid.VerificationMethod[0]}
 		receivedDid, _ := setup.SendUpdateDid(updatedDidDoc, MapToListOfSignerKeys(ConcatKeys(aliceKeys, bobKeys)))
 
-			// check
+		// check
 		Expect(len(aliceDid.VerificationMethod)).To(Not(Equal(len(receivedDid.VerificationMethod))))
 		Expect(reflect.DeepEqual(aliceDid.VerificationMethod[0], receivedDid.VerificationMethod[0])).To(BeTrue())
-
 	})
 })

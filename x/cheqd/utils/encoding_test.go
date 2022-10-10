@@ -2,6 +2,7 @@ package utils_test
 
 import (
 	"encoding/json"
+
 	. "github.com/cheqd/cheqd-node/x/cheqd/utils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -51,7 +52,7 @@ var _ = Describe("Encoding checks", func() {
 			}
 		},
 
-		Entry("Valid: General pmbkey", "zABCDEFG123456789",  true),
+		Entry("Valid: General pmbkey", "zABCDEFG123456789", true),
 		Entry("Not Valid: cannot be empty", "", false),
 		Entry("Not Valid: without z but base58", "ABCDEFG123456789", false),
 		Entry("Not Valid: without z and not base58", "OIl0ABCDEFG123456789", false),
@@ -66,7 +67,7 @@ var _ = Describe("Encoding checks", func() {
 				Ω(_err).ShouldNot(HaveOccurred())
 			} else {
 				Ω(_err).Should(HaveOccurred())
-			}			
+			}
 		},
 
 		Entry("Valid: General pmbkey", "ABCDEFG123456789", true),
@@ -76,16 +77,16 @@ var _ = Describe("Encoding checks", func() {
 
 	DescribeTable("Validate JWK",
 
-	func(data string, isValid bool) {
-		_err := ValidateJWK(data)
-		if isValid {
-			Ω(_err).ShouldNot(HaveOccurred())
-		} else {
-			Ω(_err).Should(HaveOccurred())
-		}
-	},
+		func(data string, isValid bool) {
+			_err := ValidateJWK(data)
+			if isValid {
+				Ω(_err).ShouldNot(HaveOccurred())
+			} else {
+				Ω(_err).Should(HaveOccurred())
+			}
+		},
 
-	Entry("Valid: General jwk", string(ValidJWKByte), true),
-	Entry("Not Valid: Bad jwk", string(NotValidJWKByte), false),
-)
+		Entry("Valid: General jwk", string(ValidJWKByte), true),
+		Entry("Not Valid: Bad jwk", string(NotValidJWKByte), false),
+	)
 })

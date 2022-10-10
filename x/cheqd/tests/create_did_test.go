@@ -19,11 +19,11 @@ var _ = Describe("Create DID tests", func() {
 	var keys map[string]KeyPair
 	var signers []string
 	var msg *types.MsgCreateDidPayload
-	var errMsg = ""
+	errMsg := ""
 
 	var setup TestSetup
 	var err error
-	var mainKeys = GenerateTestKeys()
+	mainKeys := GenerateTestKeys()
 
 	BeforeEach(func() {
 		// setup
@@ -35,7 +35,6 @@ var _ = Describe("Create DID tests", func() {
 	})
 
 	AfterEach(func() {
-		
 		setup = InitEnv(mainKeys)
 
 		for _, vm := range msg.VerificationMethod {
@@ -160,7 +159,7 @@ var _ = Describe("Create DID tests", func() {
 			AliceKey1:    mainKeys[AliceKey1],
 		}
 		signers = []string{AliceKey1, ImposterKey1}
-		msg= &types.MsgCreateDidPayload{
+		msg = &types.MsgCreateDidPayload{
 			Id:                   ImposterDID,
 			CapabilityInvocation: []string{ImposterKey1},
 			Controller:           []string{AliceDID},
@@ -263,9 +262,9 @@ var _ = Describe("Create DID tests", func() {
 		}
 	})
 
-// ************************** 
-// ***** Negative cases *****
-// **************************
+	// **************************
+	// ***** Negative cases *****
+	// **************************
 
 	It("Not Valid: Second controller did not sign request", func() {
 		valid = false
@@ -280,7 +279,7 @@ var _ = Describe("Create DID tests", func() {
 		errMsg = fmt.Sprintf("signer: %s: signature is required but not found", BobDID)
 	})
 
-	It("Not Valid: No signature", func(){
+	It("Not Valid: No signature", func() {
 		valid = false
 		msg = &types.MsgCreateDidPayload{
 			Id:         ImposterDID,
@@ -288,8 +287,8 @@ var _ = Describe("Create DID tests", func() {
 		}
 		errMsg = fmt.Sprintf("signer: %s: signature is required but not found", AliceDID)
 	})
-	
-	It("Not Valid: Controller not found", func(){
+
+	It("Not Valid: Controller not found", func() {
 		valid = false
 		msg = &types.MsgCreateDidPayload{
 			Id:         ImposterDID,
@@ -300,10 +299,10 @@ var _ = Describe("Create DID tests", func() {
 			AliceKey1:    mainKeys[AliceKey1],
 			ImposterKey1: GenerateKeyPair(),
 		}
-		errMsg = fmt.Sprintf("%s: DID Doc not found", NotFounDID)	
+		errMsg = fmt.Sprintf("%s: DID Doc not found", NotFounDID)
 	})
 
-	It("Not Valid: Wrong signature", func(){
+	It("Not Valid: Wrong signature", func() {
 		valid = false
 		msg = &types.MsgCreateDidPayload{
 			Id:         ImposterDID,
@@ -316,8 +315,8 @@ var _ = Describe("Create DID tests", func() {
 		errMsg = fmt.Sprintf("method id: %s: invalid signature detected", AliceKey1)
 	})
 
-	It("Not Valid: DID signed by wrong controller", func(){
-		valid =false
+	It("Not Valid: DID signed by wrong controller", func() {
+		valid = false
 		msg = &types.MsgCreateDidPayload{
 			Id:             ImposterDID,
 			Authentication: []string{ImposterKey1},
@@ -337,7 +336,7 @@ var _ = Describe("Create DID tests", func() {
 		errMsg = fmt.Sprintf("signer: %s: signature is required but not found", ImposterDID)
 	})
 
-	It("Not Valid: DID self-signed by not existing verification method", func(){
+	It("Not Valid: DID self-signed by not existing verification method", func() {
 		valid = false
 		msg = &types.MsgCreateDidPayload{
 			Id:             ImposterDID,
@@ -358,7 +357,7 @@ var _ = Describe("Create DID tests", func() {
 		errMsg = fmt.Sprintf("%s: verification method not found", ImposterKey2)
 	})
 
-	It("Not Valid: Self-signature not found", func(){
+	It("Not Valid: Self-signature not found", func() {
 		valid = false
 		msg = &types.MsgCreateDidPayload{
 			Id:             ImposterDID,
@@ -381,7 +380,7 @@ var _ = Describe("Create DID tests", func() {
 		errMsg = fmt.Sprintf("%s: verification method not found", ImposterKey2)
 	})
 
-	It("Not Valid: DID Doc already exists", func(){
+	It("Not Valid: DID Doc already exists", func() {
 		valid = false
 		keys = map[string]KeyPair{
 			CharlieKey1: GenerateKeyPair(),

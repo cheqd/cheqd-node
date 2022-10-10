@@ -1,10 +1,11 @@
 package utils_test
 
 import (
+	"sort"
+
 	. "github.com/cheqd/cheqd-node/x/cheqd/utils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"sort"
 )
 
 var _ = Describe("Str utils functionality", func() {
@@ -36,7 +37,6 @@ var _ = Describe("Str utils functionality", func() {
 		Entry("Desired element exists at the position 2. Expected: true", []string{"1", "2", "3"}, "2", true),
 		Entry("Desired element exists at the position 3. Expected: true", []string{"1", "2", "3"}, "3", true),
 		Entry("Desired element is absent. Expected: false", []string{"1", "2", "3"}, "123", false),
-
 	)
 
 	DescribeTable("Substract function",
@@ -82,7 +82,6 @@ var _ = Describe("Str utils functionality", func() {
 		Entry("Replace 2 with 3", []string{"1", "2", "3", "2"}, "2", "3", []string{"1", "3", "3", "3"}),
 	)
 
-
 	DescribeTable("UniqueSorted function",
 
 		func(input []string, expected []string) {
@@ -92,5 +91,4 @@ var _ = Describe("Str utils functionality", func() {
 		Entry("General alphabet reverse list", []string{"bb", "aa"}, []string{"aa", "bb"}),
 		Entry("General number list", []string{"22", "11"}, []string{"11", "22"}),
 	)
-
 })

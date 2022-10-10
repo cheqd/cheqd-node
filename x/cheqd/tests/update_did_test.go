@@ -17,23 +17,23 @@ var _ = Describe("Update DID tests", func() {
 	var signers []string
 	var signerKeys []SignerKey
 	var msg *types.MsgUpdateDidPayload
-	var errMsg = ""
+	errMsg := ""
 
 	var setup TestSetup
 	var err error
-	var mainKeys = map[string]KeyPair{
-				AliceKey1:    GenerateKeyPair(),
-				AliceKey2:    GenerateKeyPair(),
-				BobKey1:      GenerateKeyPair(),
-				BobKey2:      GenerateKeyPair(),
-				BobKey3:      GenerateKeyPair(),
-				BobKey4:      GenerateKeyPair(),
-				CharlieKey1:  GenerateKeyPair(),
-				CharlieKey2:  GenerateKeyPair(),
-				CharlieKey3:  GenerateKeyPair(),
-				CharlieKey4:  GenerateKeyPair(),
-				ImposterKey1: GenerateKeyPair(),
-			}
+	mainKeys := map[string]KeyPair{
+		AliceKey1:    GenerateKeyPair(),
+		AliceKey2:    GenerateKeyPair(),
+		BobKey1:      GenerateKeyPair(),
+		BobKey2:      GenerateKeyPair(),
+		BobKey3:      GenerateKeyPair(),
+		BobKey4:      GenerateKeyPair(),
+		CharlieKey1:  GenerateKeyPair(),
+		CharlieKey2:  GenerateKeyPair(),
+		CharlieKey3:  GenerateKeyPair(),
+		CharlieKey4:  GenerateKeyPair(),
+		ImposterKey1: GenerateKeyPair(),
+	}
 
 	BeforeEach(func() {
 		// setup
@@ -45,9 +45,8 @@ var _ = Describe("Update DID tests", func() {
 	})
 
 	AfterEach(func() {
-		
 		setup = InitEnv(mainKeys)
-		
+
 		for _, vm := range msg.VerificationMethod {
 			if vm.PublicKeyMultibase == "" {
 				vm.PublicKeyMultibase, err = multibase.Encode(multibase.Base58BTC, mainKeys[vm.Id].PublicKey)
@@ -159,7 +158,6 @@ var _ = Describe("Update DID tests", func() {
 	// --- adding new VM without new signature
 	// --- adding new VM without old signature
 
-
 	It("Valid: Replacing VM controller works with one signature", func() {
 		valid = true
 		signers = []string{AliceKey1, BobKey1}
@@ -176,7 +174,7 @@ var _ = Describe("Update DID tests", func() {
 	})
 
 	It("Not Valid: Replacing VM controller does not work without new signature", func() {
-		valid =false
+		valid = false
 		signers = []string{AliceKey1}
 		msg = &types.MsgUpdateDidPayload{
 			Id: AliceDID,
@@ -207,7 +205,7 @@ var _ = Describe("Update DID tests", func() {
 		errMsg = fmt.Sprintf("there should be at least one valid signature by %s (new version): invalid signature detected", AliceDID)
 	})
 	It("Not Valid: Replacing VM does not work without old signature", func() {
-		valid =false
+		valid = false
 		signers = []string{AliceKey2}
 		msg = &types.MsgUpdateDidPayload{
 			Id: AliceDID,
@@ -469,7 +467,7 @@ var _ = Describe("Update DID tests", func() {
 					Controller: CharlieDID,
 				},
 			},
-		}		
+		}
 	})
 
 	It("Valid: Removing verification method is possible with any kind of valid Bob's key", func() {

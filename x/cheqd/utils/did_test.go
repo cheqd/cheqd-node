@@ -1,16 +1,16 @@
 package utils_test
 
 import (
+	. "github.com/cheqd/cheqd-node/x/cheqd/utils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	. "github.com/cheqd/cheqd-node/x/cheqd/utils"
 )
 
 var _ = Describe("DID checks", func() {
 	DescribeTable("Check is valid ID (for example did:cheqD:testnet:123456789abcdefg and ID is 123456789abcdefg)",
 
 		func(expected bool, did string) {
-			Expect(IsValidID(did)).To(Equal(expected))			
+			Expect(IsValidID(did)).To(Equal(expected))
 		},
 		Entry("Valid base58, 16 symbols", true, "123456789abcdefg"),
 		Entry("Valid base58, 32 symbols", true, "123456789abcdefg123456789abcdefg"),
@@ -24,7 +24,7 @@ var _ = Describe("DID checks", func() {
 	DescribeTable("DID validation",
 
 		func(expected bool, did string, method string, allowedNamespaces []string) {
-			Expect(IsValidDID(did, method, allowedNamespaces)).To(Equal(expected))			
+			Expect(IsValidDID(did, method, allowedNamespaces)).To(Equal(expected))
 		},
 
 		Entry("Valid: Inputs: Method and namespace are set", true, "did:cheqd:testnet:123456789abcdefg", "cheqd", []string{"testnet"}),
@@ -66,7 +66,6 @@ var _ = Describe("DID checks", func() {
 
 	// The next test will check more functionality aspects. This one is for testing corner cases
 	Describe("Check splitting functionality", func() {
-
 		Context("Valid DID", func() {
 			It("should return expected method, namespace and DID", func() {
 				method, namespace, id := MustSplitDID("did:cheqd:mainnet:qqqqqqqqqqqqqqqq")
@@ -79,19 +78,19 @@ var _ = Describe("DID checks", func() {
 		Context("Not valid DID string at all", func() {
 			It("should panic", func() {
 				panicDID := "Not 	"
-				Expect(func (){
+				Expect(func() {
 					MustSplitDID(panicDID)
-					}).To(Panic())
+				}).To(Panic())
 			})
 		})
 	})
 
 	DescribeTable("Check DID splitting and joining",
 
-	func(did string) {
-		method, namespace, id := MustSplitDID(did)
-		Expect(did).To(Equal(JoinDID(method, namespace, id)))
-	},
+		func(did string) {
+			method, namespace, id := MustSplitDID(did)
+			Expect(did).To(Equal(JoinDID(method, namespace, id)))
+		},
 		Entry("Full DID", "did:cheqd:testnet:123456789abcdefg"),
 		Entry("Without namespace", "did:cheqd:123456789abcdefg"),
 		Entry("Not cheqd method", "did:NOTcheqd:123456789abcdefg"),
