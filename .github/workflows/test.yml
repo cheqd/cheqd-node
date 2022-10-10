@@ -46,7 +46,16 @@ jobs:
           go install github.com/jstemmer/go-junit-report/v2@latest
 
       - name: Run Ginkgo tests
-        run: ginkgo -r --race --randomize-all --randomize-suites -v
+        run: ginkgo -r --race --randomize-all --randomize-suites --junit-report report.xml
+
+      - uses: dorny/test-reporter@v1
+        if: success() || failure()        # run this step even if previous step failed
+        with:
+          name: JEST Tests                  # Name of the check run which will be created
+          path: report.xml                     # Path to test results (inside artifact .zip)
+          reporter: java-junit              # Format of test results
+          max-annotations: '50'
+          fail-on-error: false
 
 
     # test-new-node-setup:
