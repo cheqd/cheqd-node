@@ -1,8 +1,9 @@
 package types_test
+
 import (
 	"encoding/json"
+
 	. "github.com/cheqd/cheqd-node/x/cheqd/types"
-	
 )
 
 var (

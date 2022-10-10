@@ -8,12 +8,11 @@ import (
 )
 
 var _ = Describe("DID Validation tests", func() {
-
-	var struct_           Service
-	var baseDid           string
+	var struct_ Service
+	var baseDid string
 	var allowedNamespaces []string
-	var isValid           bool
-	var errorMsg          string
+	var isValid bool
+	var errorMsg string
 
 	BeforeEach(func() {
 		struct_ = Service{}
@@ -26,12 +25,12 @@ var _ = Describe("DID Validation tests", func() {
 	AfterEach(func() {
 		err := struct_.Validate(baseDid, allowedNamespaces)
 
-			if isValid {
-				Expect(err).To(BeNil())
-			} else {
-				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring(errorMsg))
-			}
+		if isValid {
+			Expect(err).To(BeNil())
+		} else {
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring(errorMsg))
+		}
 	})
 
 	It("Positive case", func() {
@@ -47,7 +46,6 @@ var _ = Describe("DID Validation tests", func() {
 	})
 
 	When("Namespace is not allowed", func() {
-
 		It("should fail", func() {
 			struct_ = Service{
 				Id:              "did:cheqd:aaaaaaaaaaaaaaaa#service1",

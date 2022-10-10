@@ -39,7 +39,7 @@ var _ = Describe("Str utils functionality", func() {
 		Entry("Desired element is absent. Expected: false", []string{"1", "2", "3"}, "123", false),
 	)
 
-	DescribeTable("Substract function",
+	DescribeTable("Subtract function",
 
 		func(first []string, second []string, expected []string) {
 			actual := Subtract(first, second)
@@ -51,11 +51,11 @@ var _ = Describe("Str utils functionality", func() {
 		Entry("nil as the first and the empty second. Expected empty list", nil, []string{}, []string{}),
 		Entry("nil as the first and nil as the second. Expected empty list", nil, nil, []string{}),
 		Entry("The same lists. Expected empty list", []string{"1", "2"}, []string{"1", "2"}, []string{}),
-		Entry("Substract with empty list. Exected: first array", []string{"1", "2", "3"}, []string{}, []string{"1", "2", "3"}),
-		Entry("Substract with nil as the second. Exected: first array", []string{"1", "2", "3"}, nil, []string{"1", "2", "3"}),
-		Entry("Substract with totally different list. Expected: first array", []string{"1", "2", "3"}, []string{"4", "5", "6"}, []string{"1", "2", "3"}),
-		Entry("Substract. General case. Expected: [1, 2]", []string{"1", "2", "3"}, []string{"1", "5", "2"}, []string{"3"}),
-		Entry("Substract. General case. Expected: [3, 4, 6]", []string{"4", "1", "6", "2", "3"}, []string{"1", "5", "2"}, []string{"3", "4", "6"}),
+		Entry("Subtract with empty list. Exected: first array", []string{"1", "2", "3"}, []string{}, []string{"1", "2", "3"}),
+		Entry("Subtract with nil as the second. Exected: first array", []string{"1", "2", "3"}, nil, []string{"1", "2", "3"}),
+		Entry("Subtract with totally different list. Expected: first array", []string{"1", "2", "3"}, []string{"4", "5", "6"}, []string{"1", "2", "3"}),
+		Entry("Subtract. General case. Expected: [1, 2]", []string{"1", "2", "3"}, []string{"1", "5", "2"}, []string{"3"}),
+		Entry("Subtract. General case. Expected: [3, 4, 6]", []string{"4", "1", "6", "2", "3"}, []string{"1", "5", "2"}, []string{"3", "4", "6"}),
 	)
 
 	DescribeTable("Unique function",

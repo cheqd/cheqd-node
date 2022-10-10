@@ -8,11 +8,10 @@ import (
 )
 
 var _ = Describe("SignInfo validation tests", func() {
-
-	var struct_           SignInfo
+	var struct_ SignInfo
 	var allowedNamespaces []string
-	var isValid           bool
-	var errorMsg          string
+	var isValid bool
+	var errorMsg string
 
 	BeforeEach(func() {
 		struct_ = SignInfo{}
@@ -24,12 +23,12 @@ var _ = Describe("SignInfo validation tests", func() {
 	AfterEach(func() {
 		err := struct_.Validate(allowedNamespaces)
 
-			if isValid {
-				Expect(err).To(BeNil())
-			} else {
-				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring(errorMsg))
-			}
+		if isValid {
+			Expect(err).To(BeNil())
+		} else {
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring(errorMsg))
+		}
 	})
 
 	It("Positive case", func() {
@@ -63,12 +62,11 @@ var _ = Describe("SignInfo validation tests", func() {
 			errorMsg = "signature: must be encoded in Base64."
 		})
 	})
-
 })
 
 var _ = Describe("Full SignInfo duplicates tests", func() {
 	var structs_ []*SignInfo
-	var isValid  bool
+	var isValid bool
 
 	BeforeEach(func() {
 		structs_ = []*SignInfo{}
@@ -92,7 +90,7 @@ var _ = Describe("Full SignInfo duplicates tests", func() {
 					Signature:            "bbb=",
 				},
 			}
-			isValid  = true
+			isValid = true
 		})
 	})
 

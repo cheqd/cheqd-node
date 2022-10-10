@@ -1,17 +1,16 @@
 package types_test
 
 import (
-. "github.com/onsi/ginkgo/v2"
-. "github.com/onsi/gomega"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 
-. "github.com/cheqd/cheqd-node/x/cheqd/types"
+	. "github.com/cheqd/cheqd-node/x/cheqd/types"
 )
 
 var _ = Describe("Message for DID creation", func() {
-
-	var struct_           *MsgCreateDid
-	var isValid           bool
-	var errorMsg          string
+	var struct_ *MsgCreateDid
+	var isValid bool
+	var errorMsg string
 
 	BeforeEach(func() {
 		struct_ = &MsgCreateDid{}
@@ -22,12 +21,12 @@ var _ = Describe("Message for DID creation", func() {
 	AfterEach(func() {
 		err := struct_.ValidateBasic()
 
-			if isValid {
-				Expect(err).To(BeNil())
-			} else {
-				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring(errorMsg))
-			}
+		if isValid {
+			Expect(err).To(BeNil())
+		} else {
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring(errorMsg))
+		}
 	})
 
 	When("all fields are set properly", func() {
@@ -71,6 +70,5 @@ var _ = Describe("Message for DID creation", func() {
 			isValid = false
 			errorMsg = "payload: (authentication: there should be no duplicates.).: basic validation failed"
 		})
-
 	})
 })

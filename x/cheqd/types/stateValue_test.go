@@ -2,6 +2,7 @@ package types_test
 
 import (
 	"time"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
@@ -15,14 +16,12 @@ import (
 )
 
 var _ = Describe(`StaeValue tests`, func() {
-
 	Context("Pack/unpack functionality", func() {
 		It("should pack and unpack withour any errors", func() {
-
 			original := &Did{
 				Id: "test",
 			}
-			
+
 			// Construct codec
 			registry := types.NewInterfaceRegistry()
 			RegisterInterfaces(registry)
@@ -68,24 +67,23 @@ var _ = Describe(`StaeValue tests`, func() {
 		It("should has ", func() {
 			createdTime := time.Now()
 			updatedTime := createdTime.Add(time.Hour)
-		
+
 			ctx1 := NewContext(createdTime, []byte("test1_tx"))
 			ctx2 := NewContext(updatedTime, []byte("test1_tx"))
-		
+
 			expectedMetadata := Metadata{
 				Created:     createdTime.UTC().Format(time.RFC3339),
 				Updated:     updatedTime.UTC().Format(time.RFC3339),
 				Deactivated: false,
 				VersionId:   utils.GetTxHash(ctx2.TxBytes()),
 			}
-		
+
 			metadata := NewMetadataFromContext(ctx1)
 			metadata.Update(ctx2)
-		
+
 			Expect(expectedMetadata).To(Equal(metadata))
 		})
 	})
-
 })
 
 func NewContext(time time.Time, txBytes []byte) sdk.Context {

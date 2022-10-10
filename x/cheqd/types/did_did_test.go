@@ -10,11 +10,10 @@ import (
 )
 
 var _ = Describe("DID Validation tests", func() {
-
-	var struct_           *Did
+	var struct_ *Did
 	var allowedNamespaces []string
-	var isValid           bool
-	var errorMsg          string
+	var isValid bool
+	var errorMsg string
 
 	BeforeEach(func() {
 		struct_ = &Did{}
@@ -26,12 +25,12 @@ var _ = Describe("DID Validation tests", func() {
 	AfterEach(func() {
 		err := struct_.Validate(allowedNamespaces)
 
-			if isValid {
-				Expect(err).To(BeNil())
-			} else {
-				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring(errorMsg))
-			}
+		if isValid {
+			Expect(err).To(BeNil())
+		} else {
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring(errorMsg))
+		}
 	})
 
 	When("DID is allowed", func() {
@@ -48,7 +47,7 @@ var _ = Describe("DID Validation tests", func() {
 					},
 				},
 			}
-			isValid =  true
+			isValid = true
 			errorMsg = ""
 		})
 	})
@@ -207,7 +206,6 @@ var _ = Describe("DID Validation tests", func() {
 	})
 
 	When("controller is duplicated", func() {
-
 		It("should fail", func() {
 			struct_ = &Did{
 				Id:         ValidTestDID,
@@ -227,7 +225,6 @@ var _ = Describe("DID Validation tests", func() {
 	})
 
 	When("verification method is duplicated", func() {
-
 		It("should fail", func() {
 			struct_ = &Did{
 				Id: ValidTestDID,

@@ -6,7 +6,6 @@ import (
 	"crypto/ed25519"
 	"crypto/elliptic"
 	"crypto/rand"
-
 	"crypto/rsa"
 	"encoding/json"
 
@@ -18,7 +17,6 @@ import (
 )
 
 var _ = Describe("Verification Method Validation tests", func() {
-
 	var struct_ VerificationMethod
 	var baseDid string
 	var allowedNamespaces []string
@@ -44,7 +42,6 @@ var _ = Describe("Verification Method Validation tests", func() {
 		}
 	})
 	When("verification method with expected multibase key", func() {
-
 		It("is valid", func() {
 			struct_ = VerificationMethod{
 				Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#qwe",
@@ -59,7 +56,6 @@ var _ = Describe("Verification Method Validation tests", func() {
 	})
 
 	When("verification method with expected jwk key", func() {
-
 		It("is valid", func() {
 			struct_ = VerificationMethod{
 				Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#rty",
@@ -74,7 +70,6 @@ var _ = Describe("Verification Method Validation tests", func() {
 	})
 
 	When("id has expected DID as a base", func() {
-
 		It("is valid", func() {
 			struct_ = VerificationMethod{
 				Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#rty",
@@ -90,7 +85,6 @@ var _ = Describe("Verification Method Validation tests", func() {
 	})
 
 	When("id does not have expected DID as a base", func() {
-
 		It("should fail", func() {
 			struct_ = VerificationMethod{
 				Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#rty",
@@ -106,7 +100,6 @@ var _ = Describe("Verification Method Validation tests", func() {
 	})
 
 	When("namespace is allowed", func() {
-
 		It("is valid", func() {
 			struct_ = VerificationMethod{
 				Id:                 "did:cheqd:mainnet:aaaaaaaaaaaaaaaa#rty",
@@ -121,7 +114,6 @@ var _ = Describe("Verification Method Validation tests", func() {
 	})
 
 	When("namespace is not allowed", func() {
-
 		It("should fail", func() {
 			struct_ = VerificationMethod{
 				Id:                 "did:cheqd:mainnet:aaaaaaaaaaaaaaaa#rty",
@@ -137,7 +129,6 @@ var _ = Describe("Verification Method Validation tests", func() {
 	})
 
 	When("JWK key has expected format", func() {
-
 		It("is valid", func() {
 			struct_ = VerificationMethod{
 				Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#qwe",
@@ -165,7 +156,6 @@ var _ = Describe("Verification Method Validation tests", func() {
 	})
 
 	When("not all keys and valuesin JWK have expected format", func() {
-
 		It("should fail", func() {
 			struct_ = VerificationMethod{
 				Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#qwe",
@@ -181,13 +171,12 @@ var _ = Describe("Verification Method Validation tests", func() {
 })
 
 var _ = Describe("Validation ed25519 Signature in verification method", func() {
-
 	var pubKey ed25519.PublicKey
 	var privKey ed25519.PrivateKey
 	var err error
-	var message = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod " +
+	message := "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod " +
 		"tempor incididunt ut labore et dolore magna aliqua."
-	var msgBytes = []byte(message)
+	msgBytes := []byte(message)
 	var signature []byte
 
 	pubKey, privKey, err = ed25519.GenerateKey(rand.Reader)
@@ -197,7 +186,6 @@ var _ = Describe("Validation ed25519 Signature in verification method", func() {
 
 	Context("when ed25519 key is placed", func() {
 		It("is valid", func() {
-
 			pubKeyStr, err := multibase.Encode(multibase.Base58BTC, pubKey)
 			Expect(err).To(BeNil())
 
@@ -235,14 +223,12 @@ var _ = Describe("Validation ed25519 Signature in verification method", func() {
 			err = VerifySignature(vm2, msgBytes, signature)
 			Expect(err).To(BeNil())
 		})
-	})	
-
+	})
 })
 
 var _ = Describe("Validation ECDSA Signature in verification method", func() {
-
 	Context("ECDSA signature preparations and verification", func() {
-			It("is positive case", func() {
+		It("is positive case", func() {
 			message := "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod " +
 				"tempor incididunt ut labore et dolore magna aliqua."
 
@@ -280,12 +266,9 @@ var _ = Describe("Validation ECDSA Signature in verification method", func() {
 			Expect(err).To(BeNil())
 		})
 	})
-
 })
 
-
 var _ = Describe("Validation RSA Signature in verification method", func() {
-
 	Context("RSA signature preparations and verification", func() {
 		It("is positive case", func() {
 			message := "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod " +
@@ -324,5 +307,4 @@ var _ = Describe("Validation RSA Signature in verification method", func() {
 			Expect(err).To(BeNil())
 		})
 	})
-
 })
