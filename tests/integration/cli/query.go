@@ -9,10 +9,8 @@ import (
 )
 
 var CLI_QUERY_PARAMS = []string{
-	"--chain-id",
-	network.CHAIN_ID,
-	"--output",
-	OUTPUT_FORMAT,
+	"--chain-id", network.CHAIN_ID,
+	"--output", OUTPUT_FORMAT,
 }
 
 func Query(module, query string, queryArgs ...string) (string, error) {
