@@ -13,7 +13,7 @@ import (
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 )
 
-var _ = Describe("Signature Verification", func() {
+var _ = Describe("Signature Verification while updating DID", func() {
 	var setup TestSetup
 	var aliceKeys, bobKeys map[string]ed25519.PrivateKey
 	var aliceDid *types.MsgCreateDidPayload
@@ -23,7 +23,7 @@ var _ = Describe("Signature Verification", func() {
 		bobKeys, _, _ = setup.InitDid(BobDID)
 	})
 
-	It("should has changed DIDDoc controller", func() {
+	It("should have changed DIDDoc controller", func() {
 		updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
 		updatedDidDoc.Controller = append(updatedDidDoc.Controller, BobDID)
 		receivedDid, _ := setup.SendUpdateDid(updatedDidDoc, MapToListOfSignerKeys(ConcatKeys(aliceKeys, bobKeys)))
@@ -33,14 +33,16 @@ var _ = Describe("Signature Verification", func() {
 		Expect([]string{BobDID}, receivedDid.Controller)
 	})
 
-	It("should fails cause we need old signature for changing verification method", func() {
-		updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
-		updatedDidDoc.VerificationMethod[0].Type = Ed25519VerificationKey2020
-		_, err := setup.SendUpdateDid(updatedDidDoc, MapToListOfSignerKeys(bobKeys))
+	When("Old signature in verification method is absent", func() {
+		It("should fail", func() {
+			updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
+			updatedDidDoc.VerificationMethod[0].Type = Ed25519VerificationKey2020
+			_, err := setup.SendUpdateDid(updatedDidDoc, MapToListOfSignerKeys(bobKeys))
 
-		// check
-		Expect(err).To(Not(BeNil()))
-		Expect(err.Error()).To(Equal(fmt.Sprintf("there should be at least one signature by %s (old version): signature is required but not found", AliceDID)))
+			// check
+			Expect(err).To(Not(BeNil()))
+			Expect(err.Error()).To(Equal(fmt.Sprintf("there should be at least one signature by %s (old version): signature is required but not found", AliceDID)))
+		})
 	})
 
 	It("should fails cause we need old signature for changing verification method controller", func() {

@@ -30,7 +30,7 @@ var _ = Describe("Message for DID creation", func() {
 	})
 
 	When("all fields are set properly", func() {
-		It("Will pass", func() {
+		It("should pass", func() {
 			struct_ = &MsgCreateDid{
 				Payload: &MsgCreateDidPayload{
 					Id: "did:cheqd:testnet:123456789abcdefg",
