@@ -5,9 +5,10 @@ package integration
 import (
 	"crypto/ed25519"
 
-	test_cli "github.com/cheqd/cheqd-node/tests/integration/cli"
+	"github.com/cheqd/cheqd-node/tests/integration/cli"
+	"github.com/cheqd/cheqd-node/tests/integration/network"
 	"github.com/cheqd/cheqd-node/tests/integration/testdata"
-	"github.com/cheqd/cheqd-node/x/cheqd/client/cli"
+	cli_types "github.com/cheqd/cheqd-node/x/cheqd/client/cli"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/google/uuid"
 	"github.com/multiformats/go-multibase"
@@ -19,7 +20,7 @@ import (
 var _ = Describe("cheqd cli", func() {
 	It("can create diddoc, update it and query the result", func() {
 		// Create a new DID Doc
-		did := "did:cheqd:testnet:" + uuid.NewString()
+		did := "did:cheqd:" + network.DID_NAMESPACE + ":" + uuid.NewString()
 		keyId := did + "#key1"
 
 		pubKey, privKey, err := ed25519.GenerateKey(nil)
@@ -41,14 +42,14 @@ var _ = Describe("cheqd cli", func() {
 			Authentication: []string{keyId},
 		}
 
-		signInputs := []cli.SignInput{
+		signInputs := []cli_types.SignInput{
 			{
 				VerificationMethodId: keyId,
 				PrivKey:              privKey,
 			},
 		}
 
-		res, err := test_cli.CreateDid(payload, signInputs, testdata.BASE_ACCOUNT_1)
+		res, err := cli.CreateDid(payload, signInputs, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -73,7 +74,7 @@ var _ = Describe("cheqd cli", func() {
 			VersionId:      res.TxHash,
 		}
 
-		signInputs2 := []cli.SignInput{
+		signInputs2 := []cli_types.SignInput{
 			{
 				VerificationMethodId: keyId,
 				PrivKey:              privKey,
@@ -84,12 +85,12 @@ var _ = Describe("cheqd cli", func() {
 			},
 		}
 
-		res2, err := test_cli.UpdateDid(payload2, signInputs2, testdata.BASE_ACCOUNT_1)
+		res2, err := cli.UpdateDid(payload2, signInputs2, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(BeNil())
 		Expect(res2.Code).To(BeEquivalentTo(0))
 
 		// Query the DID Doc
-		resp, err := test_cli.QueryDid(did)
+		resp, err := cli.QueryDid(did)
 		Expect(err).To(BeNil())
 
 		didDoc := resp.Did

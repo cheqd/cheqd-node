@@ -5,24 +5,19 @@ import (
 	"strings"
 
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
+	"github.com/cheqd/cheqd-node/tests/integration/network"
 	"github.com/cheqd/cheqd-node/x/cheqd/client/cli"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var CLI_TX_PARAMS = []string{
-	"--chain-id",
-	CHAIN_ID,
-	"--keyring-backend",
-	KEYRING_BACKEND,
-	"--output",
-	OUTPUT_FORMAT,
-	"--gas",
-	GAS,
-	"--gas-adjustment",
-	GAS_ADJUSTMENT,
-	"--gas-prices",
-	GAS_PRICES,
+	"--chain-id", network.CHAIN_ID,
+	"--keyring-backend", KEYRING_BACKEND,
+	"--output", OUTPUT_FORMAT,
+	"--gas", GAS,
+	"--gas-adjustment", GAS_ADJUSTMENT,
+	"--gas-prices", GAS_PRICES,
 	"--yes",
 }
 
@@ -90,4 +85,23 @@ func UpdateDid(payload types.MsgUpdateDidPayload, signInputs []cli.SignInput, fr
 	}
 
 	return Tx("cheqd", "update-did", from, args...)
+}
+
+func CreateResource(collectionId, resourceId, resourceName, resourceType, resourceFile string, signInputs []cli.SignInput, from string) (sdk.TxResponse, error) {
+	// Payload fragments
+	args := []string{
+		"--collection-id", collectionId,
+		"--resource-id", resourceId,
+		"--resource-name", resourceName,
+		"--resource-type", resourceType,
+		"--resource-file", resourceFile,
+	}
+
+	// Sign inputs
+	for _, signInput := range signInputs {
+		args = append(args, signInput.VerificationMethodId)
+		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivKey))
+	}
+
+	return Tx("resource", "create-resource", from, args...)
 }
