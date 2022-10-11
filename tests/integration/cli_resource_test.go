@@ -146,7 +146,7 @@ var _ = Describe("cheqd cli", func() {
 		Expect(len(res4.Resources)).To(Equal(2))
 		Expect(res4.Resources[0].CollectionId).To(Equal(collectionId))
 		Expect(res4.Resources[1].CollectionId).To(Equal(collectionId))
-		Expect([]string{res3.Resources[0].Id, res3.Resources[1].Id}).To(ContainElements(resourceId, nextResourceId))
+		Expect([]string{res4.Resources[0].Id, res4.Resources[1].Id}).To(ContainElements(resourceId, nextResourceId))
 
 		// Query second Resource Collection
 		res5, err := cli.QueryResourceCollection(secondCollectionId)
