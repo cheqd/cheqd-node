@@ -78,21 +78,6 @@ func Setup() TestSetup {
 	return setup
 }
 
-func (s *TestSetup) BuildMsgCreateDidPayload(did string, keyId string, key ed25519.PublicKey) *types.MsgCreateDidPayload {
-	return &types.MsgCreateDidPayload{
-		Id: did,
-		VerificationMethod: []*types.VerificationMethod{
-			{
-				Id:                 keyId,
-				Type:               types.Ed25519VerificationKey2020,
-				Controller:         did,
-				PublicKeyMultibase: MustEncodeBase58(key),
-			},
-		},
-		Authentication: []string{keyId},
-	}
-}
-
 func (s *TestSetup) CreateToUpdateDid(did *types.MsgCreateDidPayload) *types.MsgUpdateDidPayload {
 	return &types.MsgUpdateDidPayload{
 		Id:                   did.Id,
@@ -128,68 +113,6 @@ func (s *TestSetup) WrapCreateRequest(payload *types.MsgCreateDidPayload, keys m
 	}
 }
 
-func (s *TestSetup) CreateDid(payload *types.MsgCreateDidPayload, signInputs []SignInput) (*types.MsgCreateDidResponse, error) {
-	signBytes := payload.GetSignBytes()
-	var signatures []*types.SignInfo
-
-	for _, input := range signInputs {
-		signature := ed25519.Sign(input.Key, signBytes)
-
-		signatures = append(signatures, &types.SignInfo{
-			VerificationMethodId: input.VerificationMethodId,
-			Signature:            base64.StdEncoding.EncodeToString(signature),
-		})
-	}
-
-	msg := &types.MsgCreateDid{
-		Payload:    payload,
-		Signatures: signatures,
-	}
-
-	return s.MsgServer.CreateDid(s.StdCtx, msg)
-}
-
-func (s *TestSetup) CreateTestDid() (string, KeyPair, string) {
-	did := GenerateDID(Base58_16chars)
-	keypair := GenerateKeyPair()
-	keyId := did + "#key-1"
-
-	msg := types.MsgCreateDidPayload{
-		Id: did,
-		VerificationMethod: []*types.VerificationMethod{
-			{
-				Id:                 keyId,
-				Type:               types.Ed25519VerificationKey2020,
-				Controller:         did,
-				PublicKeyMultibase: MustEncodeBase58(keypair.Public),
-			},
-		},
-		Authentication: []string{keyId},
-	}
-
-	signatures := []SignInput{
-		{
-			VerificationMethodId: keyId,
-			Key:                  keypair.Private,
-		},
-	}
-
-	_, err := s.CreateDid(&msg, signatures)
-	if err != nil {
-		panic(err)
-	}
-
-	return did, keypair, keyId
-}
-
-func (s *TestSetup) QueryDid(did string) (*types.QueryGetDidResponse, error) {
-	req := &types.QueryGetDidRequest{
-		Id: did,
-	}
-
-	return s.QueryServer.Did(s.StdCtx, req)
-}
-
 func (s *TestSetup) WrapUpdateRequest(payload *types.MsgUpdateDidPayload, keys []SignInput) *types.MsgUpdateDid {
 	var signatures []*types.SignInfo
 	signingInput := payload.GetSignBytes()
@@ -206,23 +129,6 @@ func (s *TestSetup) WrapUpdateRequest(payload *types.MsgUpdateDidPayload, keys [
 		Payload:    payload,
 		Signatures: signatures,
 	}
-}
-
-func (s *TestSetup) InitDid(did string) (map[string]ed25519.PrivateKey, *types.MsgCreateDidPayload, error) {
-	pubKey, privKey, _ := ed25519.GenerateKey(rand.Reader)
-	keyId := did + "#key-1"
-
-	// add new Did
-	didMsg := s.BuildMsgCreateDidPayload(did, keyId, pubKey)
-
-	keys := map[string]ed25519.PrivateKey{keyId: privKey}
-
-	_, err := s.MsgServer.CreateDid(s.StdCtx, s.WrapCreateRequest(didMsg, keys))
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return keys, didMsg, nil
 }
 
 func (s *TestSetup) SendUpdateDid(msg *types.MsgUpdateDidPayload, keys []SignInput) (*types.Did, error) {

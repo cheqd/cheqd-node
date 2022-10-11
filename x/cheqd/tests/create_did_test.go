@@ -9,7 +9,7 @@ import (
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 )
 
-var _ = Describe("Create DID tests new", func() {
+var _ = Describe("Create DID tests", func() {
 	var setup TestSetup
 
 	BeforeEach(func() {
@@ -52,8 +52,8 @@ var _ = Describe("Create DID tests new", func() {
 
 	It("Valid: DID with external controllers", func() {
 		// Alice
-		aliceDid, aliceKeypair, aliceKeyId := setup.CreateTestDid()
-		annaDid, annaKeypair, annaKeyId := setup.CreateTestDid()
+		alice := setup.CreateSimpleDid()
+		anna := setup.CreateSimpleDid()
 
 		// Bob
 		bobDid := GenerateDID(Base58_16chars)
@@ -62,28 +62,19 @@ var _ = Describe("Create DID tests new", func() {
 
 		msg := &types.MsgCreateDidPayload{
 			Id:             bobDid,
-			Controller:     []string{aliceDid, annaDid},
+			Controller:     []string{alice.Did, anna.Did},
 			Authentication: []string{bobKeyId},
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:                 bobKeyId,
 					Type:               types.Ed25519VerificationKey2020,
-					Controller:         annaDid,
+					Controller:         anna.Did,
 					PublicKeyMultibase: MustEncodeBase58(bobKeypair.Public),
 				},
 			},
 		}
 
-		signatures := []SignInput{
-			{
-				VerificationMethodId: aliceKeyId,
-				Key:                  aliceKeypair.Private,
-			},
-			{
-				VerificationMethodId: annaKeyId,
-				Key:                  annaKeypair.Private,
-			},
-		}
+		signatures := []SignInput{alice.SignInput, anna.SignInput}
 
 		_, err := setup.CreateDid(msg, signatures)
 		Expect(err).To(BeNil())
@@ -176,7 +167,7 @@ var _ = Describe("Create DID tests new", func() {
 
 	It("Not Valid: Second controller did not sign request", func() {
 		// Alice
-		aliceDid, _, _ := setup.CreateTestDid()
+		alice := setup.CreateSimpleDid()
 
 		// Bob
 		bobDid := GenerateDID(Base58_16chars)
@@ -185,7 +176,7 @@ var _ = Describe("Create DID tests new", func() {
 
 		msg := &types.MsgCreateDidPayload{
 			Id:             bobDid,
-			Controller:     []string{aliceDid, bobDid},
+			Controller:     []string{alice.Did, bobDid},
 			Authentication: []string{bobKeyId},
 			VerificationMethod: []*types.VerificationMethod{
 				{
@@ -205,7 +196,7 @@ var _ = Describe("Create DID tests new", func() {
 		}
 
 		_, err := setup.CreateDid(msg, signatures)
-		Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("signer: %s: signature is required but not found", aliceDid)))
+		Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("signer: %s: signature is required but not found", alice.Did)))
 	})
 
 	It("Not Valid: No signature", func() {
@@ -294,7 +285,7 @@ var _ = Describe("Create DID tests new", func() {
 
 	It("Not Valid: DID signed by wrong controller", func() {
 		// Alice
-		_, aliceKeypair, aliceKeyId := setup.CreateTestDid()
+		alice := setup.CreateSimpleDid()
 
 		// Bob
 		bobDid := GenerateDID(Base58_16chars)
@@ -315,12 +306,7 @@ var _ = Describe("Create DID tests new", func() {
 			},
 		}
 
-		signatures := []SignInput{
-			{
-				VerificationMethodId: aliceKeyId,
-				Key:                  aliceKeypair.Private,
-			},
-		}
+		signatures := []SignInput{alice.SignInput}
 
 		_, err := setup.CreateDid(msg, signatures)
 		Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("signer: %s: signature is required but not found", bobDid)))
@@ -360,29 +346,24 @@ var _ = Describe("Create DID tests new", func() {
 
 	It("Not Valid: DID Doc already exists", func() {
 		// Alice
-		aliceDid, aliceKeypair, aliceKeyId := setup.CreateTestDid()
+		alice := setup.CreateSimpleDid()
 
 		msg := &types.MsgCreateDidPayload{
-			Id:             aliceDid,
-			Authentication: []string{aliceKeyId},
+			Id:             alice.Did,
+			Authentication: []string{alice.KeyId},
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                 aliceKeyId,
+					Id:                 alice.KeyId,
 					Type:               types.Ed25519VerificationKey2020,
-					Controller:         aliceDid,
-					PublicKeyMultibase: MustEncodeBase58(aliceKeypair.Public),
+					Controller:         alice.Did,
+					PublicKeyMultibase: MustEncodeBase58(alice.KeyPair.Public),
 				},
 			},
 		}
 
-		signatures := []SignInput{
-			{
-				VerificationMethodId: aliceKeyId,
-				Key:                  aliceKeypair.Private,
-			},
-		}
+		signatures := []SignInput{alice.SignInput}
 
 		_, err := setup.CreateDid(msg, signatures)
-		Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("%s: DID Doc exists", aliceDid)))
+		Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("%s: DID Doc exists", alice.Did)))
 	})
 })

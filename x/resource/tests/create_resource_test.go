@@ -20,7 +20,7 @@ var _ = Describe("CreateResource", func() {
 		keys := GenerateTestKeys()
 		BeforeEach(func() {
 			setup = Setup()
-			didDoc := setup.BuildMsgCreateDidPayload(ExistingDID, ExistingDIDKey, keys[ExistingDIDKey].Public)
+			didDoc := setup.BuildSimpleCreateDidPayload(ExistingDID, ExistingDIDKey, keys[ExistingDIDKey].Public)
 			_, err = setup.SendCreateDid(didDoc, map[string]ed25519.PrivateKey{ExistingDIDKey: keys[ExistingDIDKey].Private})
 			Expect(err).To(BeNil())
 			resourcePayload := GenerateCreateResourcePayload(ExistingResource())
