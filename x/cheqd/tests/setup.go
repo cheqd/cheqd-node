@@ -1,13 +1,12 @@
 package tests
 
 import (
+	"context"
 	"crypto/ed25519"
 	"crypto/rand"
 	"encoding/base64"
 	"time"
 
-	"github.com/btcsuite/btcutil/base58"
-	"github.com/cheqd/cheqd-node/x/cheqd"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/multiformats/go-multibase"
@@ -22,13 +21,15 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-const Ed25519VerificationKey2020 = "Ed25519VerificationKey2020"
-
 type TestSetup struct {
-	Cdc     codec.Codec
-	Ctx     sdk.Context
-	Keeper  keeper.Keeper
-	Handler sdk.Handler
+	Cdc codec.Codec
+
+	SdkCtx sdk.Context
+	StdCtx context.Context
+
+	Keeper      keeper.Keeper
+	MsgServer   types.MsgServer
+	QueryServer types.QueryServer
 }
 
 func Setup() TestSetup {
@@ -59,21 +60,29 @@ func Setup() TestSetup {
 		tmproto.Header{ChainID: "test", Time: blockTime},
 		false, log.NewNopLogger()).WithTxBytes(txBytes)
 
-	handler := cheqd.NewHandler(*newKeeper)
+	msgServer := keeper.NewMsgServer(*newKeeper)
+	queryServer := keeper.NewQueryServer(*newKeeper)
 
 	setup := TestSetup{
-		Cdc:     cdc,
-		Ctx:     ctx,
-		Keeper:  *newKeeper,
-		Handler: handler,
+		Cdc: cdc,
+
+		SdkCtx: ctx,
+		StdCtx: sdk.WrapSDKContext(ctx),
+
+		Keeper:      *newKeeper,
+		MsgServer:   msgServer,
+		QueryServer: queryServer,
 	}
 
-	setup.Keeper.SetDidNamespace(&ctx, "test")
+	setup.Keeper.SetDidNamespace(&ctx, DID_NAMESPACE)
 	return setup
 }
 
 func (s *TestSetup) CreateDid(pubKey ed25519.PublicKey, did string) *types.MsgCreateDidPayload {
-	PublicKeyMultibase := "z" + base58.Encode(pubKey)
+	PublicKeyMultibase, err := multibase.Encode(multibase.Base58BTC, pubKey)
+	if err != nil {
+		panic(err)
+	}
 
 	VerificationMethod := types.VerificationMethod{
 		Id:                 did + "#key-1",
@@ -155,11 +164,6 @@ func (s *TestSetup) WrapUpdateRequest(payload *types.MsgUpdateDidPayload, keys [
 	}
 }
 
-func GenerateKeyPair() KeyPair {
-	PublicKey, PrivateKey, _ := ed25519.GenerateKey(rand.Reader)
-	return KeyPair{PrivateKey, PublicKey}
-}
-
 func (s *TestSetup) InitDid(did string) (map[string]ed25519.PrivateKey, *types.MsgCreateDidPayload, error) {
 	pubKey, privKey, _ := ed25519.GenerateKey(rand.Reader)
 
@@ -169,13 +173,8 @@ func (s *TestSetup) InitDid(did string) (map[string]ed25519.PrivateKey, *types.M
 	keyId := did + "#key-1"
 	keys := map[string]ed25519.PrivateKey{keyId: privKey}
 
-	result, err := s.Handler(s.Ctx, s.WrapCreateRequest(didMsg, keys))
+	_, err := s.MsgServer.CreateDid(s.StdCtx, s.WrapCreateRequest(didMsg, keys))
 	if err != nil {
-		return nil, nil, err
-	}
-
-	didResponse := types.MsgCreateDidResponse{}
-	if err := didResponse.Unmarshal(result.Data); err != nil {
 		return nil, nil, err
 	}
 
@@ -183,29 +182,40 @@ func (s *TestSetup) InitDid(did string) (map[string]ed25519.PrivateKey, *types.M
 }
 
 func (s *TestSetup) SendUpdateDid(msg *types.MsgUpdateDidPayload, keys []SignInput) (*types.Did, error) {
-	// query Did
-	state, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
+	req := types.QueryGetDidRequest{
+		Id: msg.Id,
+	}
+
+	state, _ := s.QueryServer.Did(s.StdCtx, &req)
 	if len(msg.VersionId) == 0 {
 		msg.VersionId = state.Metadata.VersionId
 	}
 
-	_, err := s.Handler(s.Ctx, s.WrapUpdateRequest(msg, keys))
+	_, err := s.MsgServer.UpdateDid(s.StdCtx, s.WrapUpdateRequest(msg, keys))
 	if err != nil {
 		return nil, err
 	}
 
-	updated, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
-	return updated.UnpackDataAsDid()
+	req = types.QueryGetDidRequest{
+		Id: msg.Id,
+	}
+
+	updated, _ := s.QueryServer.Did(s.StdCtx, &req)
+	return updated.Did, nil
 }
 
 func (s *TestSetup) SendCreateDid(msg *types.MsgCreateDidPayload, keys map[string]ed25519.PrivateKey) (*types.Did, error) {
-	_, err := s.Handler(s.Ctx, s.WrapCreateRequest(msg, keys))
+	_, err := s.MsgServer.CreateDid(s.StdCtx, s.WrapCreateRequest(msg, keys))
 	if err != nil {
 		return nil, err
 	}
 
-	created, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
-	return created.UnpackDataAsDid()
+	req := types.QueryGetDidRequest{
+		Id: msg.Id,
+	}
+
+	created, _ := s.QueryServer.Did(s.StdCtx, &req)
+	return created.Did, nil
 }
 
 func ConcatKeys(dst map[string]ed25519.PrivateKey, src map[string]ed25519.PrivateKey) map[string]ed25519.PrivateKey {

@@ -6,12 +6,9 @@ import (
 	"encoding/base64"
 	"time"
 
-	"github.com/cheqd/cheqd-node/x/cheqd"
 	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
-
 	cheqdtests "github.com/cheqd/cheqd-node/x/cheqd/tests"
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
-	"github.com/cheqd/cheqd-node/x/resource"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 
@@ -28,9 +25,9 @@ import (
 type TestSetup struct {
 	cheqdtests.TestSetup
 
-	ResourceKeeper  keeper.Keeper
-	ResourceHandler sdk.Handler
-	QueryServer     types.QueryServer
+	ResourceKeeper      keeper.Keeper
+	ResourceMsgServer   types.MsgServer
+	ResourceQueryServer types.QueryServer
 }
 
 func Setup() TestSetup {
@@ -56,7 +53,6 @@ func Setup() TestSetup {
 	// Init Keepers
 	cheqdKeeper := cheqdkeeper.NewKeeper(cdc, cheqdStoreKey)
 	resourceKeeper := keeper.NewKeeper(cdc, resourceStoreKey)
-	queryServer := keeper.NewQueryServer(*resourceKeeper, *cheqdKeeper)
 
 	// Create Tx
 	txBytes := make([]byte, 28)
@@ -68,22 +64,31 @@ func Setup() TestSetup {
 		tmproto.Header{ChainID: "test", Time: blockTime},
 		false, log.NewNopLogger()).WithTxBytes(txBytes)
 
-	cheqdHandler := cheqd.NewHandler(*cheqdKeeper)
-	resourceHandler := resource.NewHandler(*resourceKeeper, *cheqdKeeper)
+	// Init servers
+	cheqdMsgServer := cheqdkeeper.NewMsgServer(*cheqdKeeper)
+	cheqdQueryServer := cheqdkeeper.NewQueryServer(*cheqdKeeper)
+
+	msgServer := keeper.NewMsgServer(*resourceKeeper, *cheqdKeeper)
+	queryServer := keeper.NewQueryServer(*resourceKeeper, *cheqdKeeper)
 
 	setup := TestSetup{
 		TestSetup: cheqdtests.TestSetup{
-			Cdc:     cdc,
-			Ctx:     ctx,
-			Keeper:  *cheqdKeeper,
-			Handler: cheqdHandler,
+			Cdc: cdc,
+
+			SdkCtx: ctx,
+			StdCtx: sdk.WrapSDKContext(ctx),
+
+			Keeper:      *cheqdKeeper,
+			MsgServer:   cheqdMsgServer,
+			QueryServer: cheqdQueryServer,
 		},
-		ResourceKeeper:  *resourceKeeper,
-		ResourceHandler: resourceHandler,
-		QueryServer:     queryServer,
+
+		ResourceKeeper:      *resourceKeeper,
+		ResourceMsgServer:   msgServer,
+		ResourceQueryServer: queryServer,
 	}
 
-	setup.Keeper.SetDidNamespace(&ctx, "test")
+	setup.Keeper.SetDidNamespace(&ctx, cheqdtests.DID_NAMESPACE)
 	return setup
 }
 
@@ -116,13 +121,18 @@ func (s *TestSetup) WrapCreateRequest(payload *types.MsgCreateResourcePayload, k
 }
 
 func (s *TestSetup) SendCreateResource(msg *types.MsgCreateResourcePayload, keys map[string]ed25519.PrivateKey) (*types.Resource, error) {
-	_, err := s.ResourceHandler(s.Ctx, s.WrapCreateRequest(msg, keys))
+	_, err := s.ResourceMsgServer.CreateResource(s.StdCtx, s.WrapCreateRequest(msg, keys))
 	if err != nil {
 		return nil, err
 	}
 
-	created, _ := s.ResourceKeeper.GetResource(&s.Ctx, msg.CollectionId, msg.Id)
-	return &created, nil
+	req := &types.QueryGetResourceRequest{
+		CollectionId: msg.CollectionId,
+		Id:           msg.Id,
+	}
+
+	created, _ := s.ResourceQueryServer.Resource(s.StdCtx, req)
+	return created.Resource, nil
 }
 
 func GenerateTestKeys() map[string]cheqdtests.KeyPair {

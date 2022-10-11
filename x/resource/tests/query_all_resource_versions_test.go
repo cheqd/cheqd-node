@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/cheqd/cheqd-node/x/resource/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -49,7 +48,7 @@ var _ = Describe("QueryAllResourceVersions", func() {
 				Expect(differentResource).ToNot(Equal(existingResource))
 				Expect(differentResource).ToNot(Equal(nextVersionResource))
 
-				queryResponse, err := setup.QueryServer.AllResourceVersions(sdk.WrapSDKContext(setup.Ctx), msg)
+				queryResponse, err := setup.ResourceQueryServer.AllResourceVersions(setup.StdCtx, msg)
 
 				if valid {
 					resources := queryResponse.Resources

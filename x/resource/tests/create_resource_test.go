@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 
+	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	cheqdutils "github.com/cheqd/cheqd-node/x/cheqd/utils"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 
@@ -40,7 +41,8 @@ var _ = Describe("CreateResource", func() {
 					Expect(err).To(BeNil())
 
 					did := cheqdutils.JoinDID("cheqd", "test", resource.Header.CollectionId)
-					didStateValue, err := setup.Keeper.GetDid(&setup.Ctx, did)
+					req := cheqdtypes.QueryGetDidRequest{Id: did}
+					didStateValue, err := setup.QueryServer.Did(setup.StdCtx, &req)
 					Expect(err).To(BeNil())
 					Expect(didStateValue.Metadata.Resources).Should(ContainElement(resource.Header.Id))
 

@@ -1,7 +1,9 @@
 package tests
 
 import (
-	"math/rand"
+	"crypto/ed25519"
+	"crypto/rand"
+	mathrand "math/rand"
 
 	. "github.com/onsi/gomega"
 )
@@ -11,7 +13,7 @@ var base58Runes = []rune("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuv
 func randBase58Seq(n int) string {
 	b := make([]rune, n)
 	for i := range b {
-		b[i] = base58Runes[rand.Intn(len(base58Runes))]
+		b[i] = base58Runes[mathrand.Intn(len(base58Runes))]
 	}
 	return string(b)
 }
@@ -44,4 +46,9 @@ func InitEnv(keys map[string]KeyPair) TestSetup {
 	err := setup.CreateTestDIDs(keys)
 	Expect(err).To(BeNil())
 	return setup
+}
+
+func GenerateKeyPair() KeyPair {
+	PublicKey, PrivateKey, _ := ed25519.GenerateKey(rand.Reader)
+	return KeyPair{PrivateKey, PublicKey}
 }

@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -32,7 +31,7 @@ var _ = Describe("QueryGetResource", func() {
 				response *resourcetypes.QueryGetResourceResponse,
 				errMsg string,
 			) {
-				queryResponse, err := setup.QueryServer.Resource(sdk.WrapSDKContext(setup.Ctx), msg)
+				queryResponse, err := setup.ResourceQueryServer.Resource(setup.StdCtx, msg)
 
 				if valid {
 					resource := queryResponse.Resource
