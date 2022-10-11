@@ -104,7 +104,7 @@ var _ = Describe("Update DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         AliceKey1,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: AliceDID,
 					// TODO: Use multibase encoding
 					PublicKeyMultibase: "z" + base58.Encode(mainKeys[AliceKey2].Public),
@@ -122,7 +122,7 @@ var _ = Describe("Update DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         AliceKey2,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: AliceDID,
 				},
 			},
@@ -139,7 +139,7 @@ var _ = Describe("Update DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         AliceKey2,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: AliceDID,
 				},
 			},
@@ -167,7 +167,7 @@ var _ = Describe("Update DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         AliceKey1,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: BobDID,
 				},
 			},
@@ -182,7 +182,7 @@ var _ = Describe("Update DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         AliceKey1,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: BobDID,
 				},
 			},
@@ -198,7 +198,7 @@ var _ = Describe("Update DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         AliceKey2,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: AliceDID,
 				},
 			},
@@ -213,7 +213,7 @@ var _ = Describe("Update DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         AliceKey2,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: AliceDID,
 				},
 			},
@@ -229,7 +229,7 @@ var _ = Describe("Update DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         AliceKey2,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: AliceDID,
 				},
 			},
@@ -247,12 +247,12 @@ var _ = Describe("Update DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         AliceKey1,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: AliceDID,
 				},
 				{
 					Id:         AliceKey2,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: BobDID,
 				},
 			},
@@ -268,12 +268,12 @@ var _ = Describe("Update DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         AliceKey1,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: AliceDID,
 				},
 				{
 					Id:         AliceKey2,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: BobDID,
 				},
 			},
@@ -290,12 +290,12 @@ var _ = Describe("Update DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         AliceKey1,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: AliceDID,
 				},
 				{
 					Id:         AliceKey2,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: AliceDID,
 				},
 			},
@@ -321,7 +321,7 @@ var _ = Describe("Update DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         AliceKey1,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: AliceDID,
 				},
 			},
@@ -337,7 +337,7 @@ var _ = Describe("Update DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         AliceKey1,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: AliceDID,
 				},
 			},
@@ -354,7 +354,7 @@ var _ = Describe("Update DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         AliceKey1,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: AliceDID,
 				},
 			},
@@ -373,7 +373,7 @@ var _ = Describe("Update DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         AliceKey1,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: AliceDID,
 				},
 			},
@@ -389,7 +389,7 @@ var _ = Describe("Update DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         AliceKey1,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: AliceDID,
 				},
 			},
@@ -406,7 +406,7 @@ var _ = Describe("Update DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         AliceKey1,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: AliceDID,
 				},
 			},
@@ -423,12 +423,12 @@ var _ = Describe("Update DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         AliceKey2,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: AliceDID,
 				},
 				{
 					Id:         AliceKey1,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: AliceDID,
 				},
 			},
@@ -449,22 +449,22 @@ var _ = Describe("Update DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         CharlieKey1,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: BobDID,
 				},
 				{
 					Id:         CharlieKey2,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: BobDID,
 				},
 				{
 					Id:         CharlieKey3,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: BobDID,
 				},
 				{
 					Id:         CharlieKey4,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: CharlieDID,
 				},
 			},
@@ -479,7 +479,7 @@ var _ = Describe("Update DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         BobKey1,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: BobDID,
 				},
 			},

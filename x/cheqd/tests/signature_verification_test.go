@@ -9,7 +9,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/btcsuite/btcutil/base58"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 )
 
@@ -36,7 +35,7 @@ var _ = Describe("Signature Verification while updating DID", func() {
 	When("Old signature in verification method is absent", func() {
 		It("should fail", func() {
 			updatedDidDoc := setup.CreateToUpdateDid(aliceDid)
-			updatedDidDoc.VerificationMethod[0].Type = Ed25519VerificationKey2020
+			updatedDidDoc.VerificationMethod[0].Type = types.Ed25519VerificationKey2020
 			_, err := setup.SendUpdateDid(updatedDidDoc, MapToListOfSignerKeys(bobKeys))
 
 			// check
@@ -80,8 +79,8 @@ var _ = Describe("Signature Verification. Remove signature/VM", func() {
 		BpubKey, BprivKey, _ = ed25519.GenerateKey(rand.Reader)
 
 		// Create dids
-		aliceDid = setup.BuildMsgCreateDidPayload(AliceDID, ApubKey)
-		bobDid = setup.BuildMsgCreateDidPayload(BobDID, BpubKey)
+		aliceDid = setup.BuildMsgCreateDidPayload(AliceDID, AliceKey1, ApubKey)
+		bobDid = setup.BuildMsgCreateDidPayload(BobDID, BobKey1, BpubKey)
 
 		// Collect private keys
 		aliceKeys = map[string]ed25519.PrivateKey{AliceKey1: AprivKey, BobKey1: BprivKey}
@@ -91,8 +90,8 @@ var _ = Describe("Signature Verification. Remove signature/VM", func() {
 		aliceDid.VerificationMethod = append(aliceDid.VerificationMethod, &types.VerificationMethod{
 			Id:                 AliceKey2,
 			Controller:         BobDID,
-			Type:               Ed25519VerificationKey2020,
-			PublicKeyMultibase: "z" + base58.Encode(BpubKey),
+			Type:               types.Ed25519VerificationKey2020,
+			PublicKeyMultibase: MustEncodeBase58(BpubKey),
 		})
 	})
 

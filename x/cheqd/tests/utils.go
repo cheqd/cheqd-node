@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	mathrand "math/rand"
 
+	"github.com/google/uuid"
 	"github.com/multiformats/go-multibase"
 	. "github.com/onsi/gomega"
 )
@@ -19,12 +20,27 @@ func randBase58Seq(n int) string {
 	return string(b)
 }
 
-func GenerateDID() string {
-	return "did:cheqd:test:" + randBase58Seq(16)
-}
+type IDType int
 
-func GenerateFragment(did string) string {
-	return did + "#key-1"
+const (
+	Base58_16chars IDType = iota
+	Base58_32chars IDType = iota
+	UUID           IDType = iota
+)
+
+func GenerateDID(idtype IDType) string {
+	prefix := "did:cheqd:" + DID_NAMESPACE + ":"
+
+	switch idtype {
+	case Base58_16chars:
+		return prefix + randBase58Seq(16)
+	case Base58_32chars:
+		return prefix + randBase58Seq(32)
+	case UUID:
+		return prefix + uuid.NewString()
+	default:
+		panic("Unknown ID type")
+	}
 }
 
 func GenerateTestKeys() map[string]KeyPair {

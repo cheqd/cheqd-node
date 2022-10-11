@@ -7,71 +7,89 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/btcsuite/btcutil/base58"
-
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/multiformats/go-multibase"
 )
 
-// var _ = Describe("Create DID tests new", func() {
-// 	var setup TestSetup
+var _ = Describe("Create DID tests new", func() {
+	var setup TestSetup
 
-// 	BeforeEach(func() {
-// 		setup = Setup()
-// 	})
+	BeforeEach(func() {
+		setup = Setup()
+	})
 
-// 	It("Valid: Works", func() {
-// 		valid = true
-// 		keys = map[string]KeyPair{
-// 			ImposterKey1: GenerateKeyPair(),
-// 		}
-// 		signers = []string{ImposterKey1}
-// 		msg = &types.MsgCreateDidPayload{
-// 			Id:             ImposterDID,
-// 			Authentication: []string{ImposterKey1},
-// 			VerificationMethod: []*types.VerificationMethod{
-// 				{
-// 					Id:         ImposterKey1,
-// 					Type:       Ed25519VerificationKey2020,
-// 					Controller: ImposterDID,
-// 				},
-// 			},
-// 		}
+	It("Valid: Works", func() {
+		did := GenerateDID(Base58_16chars)
+		keypair := GenerateKeyPair()
+		keyId := did + "#key-1"
 
-// 		for _, vm := range msg.VerificationMethod {
-// 			if vm.PublicKeyMultibase == "" {
-// 				vm.PublicKeyMultibase, err = multibase.Encode(multibase.Base58BTC, keys[vm.Id].Public)
-// 			}
-// 			Expect(err).To(BeNil())
-// 		}
+		msg := &types.MsgCreateDidPayload{
+			Id:             did,
+			Authentication: []string{keyId},
+			VerificationMethod: []*types.VerificationMethod{
+				{
+					Id:                 keyId,
+					Type:               types.Ed25519VerificationKey2020,
+					Controller:         did,
+					PublicKeyMultibase: MustEncodeBase58(keypair.Public),
+				},
+			},
+		}
 
-// 		signerKeys := map[string]ed25519.PrivateKey{}
-// 		for _, signer := range signers {
-// 			signerKeys[signer] = keys[signer].Private
-// 		}
+		signatures := []SignInput{
+			{
+				VerificationMethodId: keyId,
+				Key:                  keypair.Private,
+			},
+		}
 
-// 		did, err := setup.SendCreateDid(msg, signerKeys)
+		_, err := setup.CreateDid(msg, signatures)
+		Expect(err).To(BeNil())
 
-// 		if valid {
-// 			Expect(err).To(BeNil())
-// 			Expect(msg.Id).To(Equal(did.Id))
-// 			Expect(msg.Controller).To(Equal(did.Controller))
-// 			Expect(msg.VerificationMethod).To(Equal(did.VerificationMethod))
-// 			Expect(msg.Authentication).To(Equal(did.Authentication))
-// 			Expect(msg.AssertionMethod).To(Equal(did.AssertionMethod))
-// 			Expect(msg.CapabilityInvocation).To(Equal(did.CapabilityInvocation))
-// 			Expect(msg.CapabilityDelegation).To(Equal(did.CapabilityDelegation))
-// 			Expect(msg.KeyAgreement).To(Equal(did.KeyAgreement))
-// 			Expect(msg.AlsoKnownAs).To(Equal(did.AlsoKnownAs))
-// 			Expect(msg.Service).To(Equal(did.Service))
-// 			Expect(msg.Context).To(Equal(did.Context))
-// 		} else {
-// 			Expect(err).To(HaveOccurred())
-// 			Expect(errMsg).To(Equal(err.Error()))
-// 		}
+		// check
+		created, err := setup.QueryDid(did)
+		Expect(err).To(BeNil())
+		Expect(msg.ToDid()).To(Equal(*created.Did))
+	})
 
-// 	})
-// })
+	// **************************
+	// ***** Negative cases *****
+	// **************************
+
+	It("Not Valid: Second controller did not sign request", func() {
+		// Alice
+		aliceDid, _, _ := setup.CreateTestDid()
+
+		// Bob
+		bobDid := GenerateDID(Base58_16chars)
+		bobKeypair := GenerateKeyPair()
+		bobKeyId := bobDid + "#key-1"
+
+		msg := &types.MsgCreateDidPayload{
+			Id:             bobDid,
+			Controller:     []string{aliceDid, bobDid},
+			Authentication: []string{bobKeyId},
+			VerificationMethod: []*types.VerificationMethod{
+				{
+					Id:                 bobKeyId,
+					Type:               types.Ed25519VerificationKey2020,
+					Controller:         bobDid,
+					PublicKeyMultibase: MustEncodeBase58(bobKeypair.Public),
+				},
+			},
+		}
+
+		signatures := []SignInput{
+			{
+				VerificationMethodId: bobKeyId,
+				Key:                  bobKeypair.Private,
+			},
+		}
+
+		_, err := setup.CreateDid(msg, signatures)
+		Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("signer: %s: signature is required but not found", aliceDid)))
+	})
+})
 
 var _ = Describe("Create DID tests", func() {
 	// params for cases
@@ -142,7 +160,7 @@ var _ = Describe("Create DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         ImposterKey1,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: ImposterDID,
 				},
 			},
@@ -163,7 +181,7 @@ var _ = Describe("Create DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         ImposterKey1,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: ImposterDID,
 				},
 			},
@@ -184,7 +202,7 @@ var _ = Describe("Create DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         ImposterKey1,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: ImposterDID,
 				},
 			},
@@ -205,7 +223,7 @@ var _ = Describe("Create DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         ImposterKey1,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: ImposterDID,
 				},
 			},
@@ -226,7 +244,7 @@ var _ = Describe("Create DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         ImposterKey1,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: ImposterDID,
 				},
 			},
@@ -295,17 +313,17 @@ var _ = Describe("Create DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         "did:cheqd:test:yyyyyyyyyyyyyyyy#key-1",
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: "did:cheqd:test:yyyyyyyyyyyyyyyy",
 				},
 				{
 					Id:         "did:cheqd:test:yyyyyyyyyyyyyyyy#key-2",
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: "did:cheqd:test:yyyyyyyyyyyyyyyy",
 				},
 				{
 					Id:         "did:cheqd:test:yyyyyyyyyyyyyyyy#key-3",
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: "did:cheqd:test:yyyyyyyyyyyyyyyy",
 				},
 				{
@@ -383,9 +401,9 @@ var _ = Describe("Create DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:                 ImposterKey1,
-					Type:               Ed25519VerificationKey2020,
+					Type:               types.Ed25519VerificationKey2020,
 					Controller:         ImposterDID,
-					PublicKeyMultibase: "z" + base58.Encode(mainKeys[ImposterKey1].Public),
+					PublicKeyMultibase: MustEncodeBase58(mainKeys[ImposterKey1].Public),
 				},
 			},
 		}
@@ -404,9 +422,9 @@ var _ = Describe("Create DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:                 ImposterKey1,
-					Type:               Ed25519VerificationKey2020,
+					Type:               types.Ed25519VerificationKey2020,
 					Controller:         ImposterDID,
-					PublicKeyMultibase: "z" + base58.Encode(mainKeys[ImposterKey1].Public),
+					PublicKeyMultibase: MustEncodeBase58(mainKeys[ImposterKey1].Public),
 				},
 			},
 		}
@@ -426,9 +444,9 @@ var _ = Describe("Create DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:                 ImposterKey1,
-					Type:               Ed25519VerificationKey2020,
+					Type:               types.Ed25519VerificationKey2020,
 					Controller:         ImposterDID,
-					PublicKeyMultibase: "z" + base58.Encode(mainKeys[ImposterKey1].Public),
+					PublicKeyMultibase: MustEncodeBase58(mainKeys[ImposterKey1].Public),
 				},
 			},
 		}
@@ -452,7 +470,7 @@ var _ = Describe("Create DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:         CharlieKey1,
-					Type:       Ed25519VerificationKey2020,
+					Type:       types.Ed25519VerificationKey2020,
 					Controller: CharlieDID,
 				},
 			},
