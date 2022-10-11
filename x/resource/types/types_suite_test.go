@@ -9,5 +9,5 @@ import (
 
 func TestTypes(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Resource Types Suite")
+	RunSpecs(t, "Resource Module Types")
 }

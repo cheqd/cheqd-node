@@ -1,10 +1,9 @@
-package tests_test
+package tests
 
 import (
 	"crypto/ed25519"
 	"fmt"
 
-	resourcetests "github.com/cheqd/cheqd-node/x/resource/tests"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -14,15 +13,15 @@ import (
 
 var _ = Describe("QueryAllResourceVersions", func() {
 	Describe("Validate", func() {
-		var setup resourcetests.TestSetup
-		keys := resourcetests.GenerateTestKeys()
+		var setup TestSetup
+		keys := GenerateTestKeys()
 		BeforeEach(func() {
-			setup = resourcetests.Setup()
-			didDoc := setup.CreateDid(keys[resourcetests.ExistingDIDKey].PublicKey, resourcetests.ExistingDID)
-			_, err := setup.SendCreateDid(didDoc, map[string]ed25519.PrivateKey{resourcetests.ExistingDIDKey: keys[resourcetests.ExistingDIDKey].PrivateKey})
+			setup = Setup()
+			didDoc := setup.CreateDid(keys[ExistingDIDKey].Public, ExistingDID)
+			_, err := setup.SendCreateDid(didDoc, map[string]ed25519.PrivateKey{ExistingDIDKey: keys[ExistingDIDKey].Private})
 			Expect(err).To(BeNil())
-			payload := resourcetests.GenerateCreateResourcePayload(resourcetests.ExistingResource())
-			_, err = setup.SendCreateResource(payload, map[string]ed25519.PrivateKey{resourcetests.ExistingDIDKey: keys[resourcetests.ExistingDIDKey].PrivateKey})
+			payload := GenerateCreateResourcePayload(ExistingResource())
+			_, err = setup.SendCreateResource(payload, map[string]ed25519.PrivateKey{ExistingDIDKey: keys[ExistingDIDKey].Private})
 			Expect(err).To(BeNil())
 		})
 		DescribeTable("Validate QueryGetAllResourceVersionsRequest",
@@ -33,17 +32,17 @@ var _ = Describe("QueryAllResourceVersions", func() {
 				response *types.QueryGetAllResourceVersionsResponse,
 				errMsg string,
 			) {
-				existingResource := resourcetests.ExistingResource()
+				existingResource := ExistingResource()
 
-				payload := resourcetests.GenerateCreateResourcePayload(existingResource)
-				payload.Id = resourcetests.ResourceId
+				payload := GenerateCreateResourcePayload(existingResource)
+				payload.Id = ResourceId
 
 				nextVersionResource, err := setup.SendCreateResource(payload, signerKeys)
 				Expect(err).To(BeNil())
 				Expect(nextVersionResource).ToNot(Equal(existingResource))
 
-				payload = resourcetests.GenerateCreateResourcePayload(existingResource)
-				payload.Id = resourcetests.AnotherResourceId
+				payload = GenerateCreateResourcePayload(existingResource)
+				payload.Id = AnotherResourceId
 				payload.Name = "AnotherResourceVersion"
 				differentResource, err := setup.SendCreateResource(payload, signerKeys)
 				Expect(err).To(BeNil())
@@ -72,27 +71,27 @@ var _ = Describe("QueryAllResourceVersions", func() {
 			},
 			Entry("Valid: should return all resources",
 				true,
-				map[string]ed25519.PrivateKey{resourcetests.ExistingDIDKey: keys[resourcetests.ExistingDIDKey].PrivateKey},
+				map[string]ed25519.PrivateKey{ExistingDIDKey: keys[ExistingDIDKey].Private},
 				&types.QueryGetAllResourceVersionsRequest{
-					CollectionId: resourcetests.ExistingDIDIdentifier,
-					Name:         resourcetests.ExistingResource().Header.Name,
+					CollectionId: ExistingDIDIdentifier,
+					Name:         ExistingResource().Header.Name,
 				},
 				&types.QueryGetAllResourceVersionsResponse{
 					Resources: []*types.ResourceHeader{
-						resourcetests.ExistingResource().Header,
+						ExistingResource().Header,
 					},
 				},
 				"",
 			),
 			Entry("Invalid: should return an error if the collection id is invalid",
 				false,
-				map[string]ed25519.PrivateKey{resourcetests.ExistingDIDKey: keys[resourcetests.ExistingDIDKey].PrivateKey},
+				map[string]ed25519.PrivateKey{ExistingDIDKey: keys[ExistingDIDKey].Private},
 				&types.QueryGetAllResourceVersionsRequest{
-					CollectionId: resourcetests.NotFoundDIDIdentifier,
-					Name:         resourcetests.ExistingResource().Header.Name,
+					CollectionId: NotFoundDIDIdentifier,
+					Name:         ExistingResource().Header.Name,
 				},
 				nil,
-				fmt.Errorf("did:cheqd:test:%s: DID Doc not found", resourcetests.NotFoundDIDIdentifier).Error(),
+				fmt.Errorf("did:cheqd:test:%s: DID Doc not found", NotFoundDIDIdentifier).Error(),
 			),
 		)
 	})

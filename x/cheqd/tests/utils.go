@@ -6,18 +6,18 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var letters = []rune("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz")
+var base58Runes = []rune("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz")
 
-func randSeq(n int) string {
+func randBase58Seq(n int) string {
 	b := make([]rune, n)
 	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
+		b[i] = base58Runes[rand.Intn(len(base58Runes))]
 	}
 	return string(b)
 }
 
 func GenerateDID() string {
-	return "did:cheqd:test:" + randSeq(16)
+	return "did:cheqd:test:" + randBase58Seq(16)
 }
 
 func GenerateFragment(did string) string {

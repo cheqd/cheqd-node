@@ -39,14 +39,14 @@ var _ = Describe("Create DID tests", func() {
 
 		for _, vm := range msg.VerificationMethod {
 			if vm.PublicKeyMultibase == "" {
-				vm.PublicKeyMultibase, err = multibase.Encode(multibase.Base58BTC, keys[vm.Id].PublicKey)
+				vm.PublicKeyMultibase, err = multibase.Encode(multibase.Base58BTC, keys[vm.Id].Public)
 			}
 			Expect(err).To(BeNil())
 		}
 
 		signerKeys := map[string]ed25519.PrivateKey{}
 		for _, signer := range signers {
-			signerKeys[signer] = keys[signer].PrivateKey
+			signerKeys[signer] = keys[signer].Private
 		}
 
 		did, err := setup.SendCreateDid(msg, signerKeys)
@@ -325,7 +325,7 @@ var _ = Describe("Create DID tests", func() {
 					Id:                 ImposterKey1,
 					Type:               Ed25519VerificationKey2020,
 					Controller:         ImposterDID,
-					PublicKeyMultibase: "z" + base58.Encode(mainKeys[ImposterKey1].PublicKey),
+					PublicKeyMultibase: "z" + base58.Encode(mainKeys[ImposterKey1].Public),
 				},
 			},
 		}
@@ -346,7 +346,7 @@ var _ = Describe("Create DID tests", func() {
 					Id:                 ImposterKey1,
 					Type:               Ed25519VerificationKey2020,
 					Controller:         ImposterDID,
-					PublicKeyMultibase: "z" + base58.Encode(mainKeys[ImposterKey1].PublicKey),
+					PublicKeyMultibase: "z" + base58.Encode(mainKeys[ImposterKey1].Public),
 				},
 			},
 		}
@@ -368,7 +368,7 @@ var _ = Describe("Create DID tests", func() {
 					Id:                 ImposterKey1,
 					Type:               Ed25519VerificationKey2020,
 					Controller:         ImposterDID,
-					PublicKeyMultibase: "z" + base58.Encode(mainKeys[ImposterKey1].PublicKey),
+					PublicKeyMultibase: "z" + base58.Encode(mainKeys[ImposterKey1].Public),
 				},
 			},
 		}

@@ -15,7 +15,7 @@ var _ = Describe("Update DID tests", func() {
 	// params for cases
 	var valid bool
 	var signers []string
-	var signerKeys []SignerKey
+	var signerKeys []SignInput
 	var msg *types.MsgUpdateDidPayload
 	errMsg := ""
 
@@ -39,7 +39,7 @@ var _ = Describe("Update DID tests", func() {
 		// setup
 		valid = false
 		signers = []string{}
-		signerKeys = []SignerKey{}
+		signerKeys = []SignInput{}
 		msg = &types.MsgUpdateDidPayload{}
 		errMsg = ""
 	})
@@ -49,19 +49,19 @@ var _ = Describe("Update DID tests", func() {
 
 		for _, vm := range msg.VerificationMethod {
 			if vm.PublicKeyMultibase == "" {
-				vm.PublicKeyMultibase, err = multibase.Encode(multibase.Base58BTC, mainKeys[vm.Id].PublicKey)
+				vm.PublicKeyMultibase, err = multibase.Encode(multibase.Base58BTC, mainKeys[vm.Id].Public)
 			}
 			Expect(err).To(BeNil())
 		}
 
-		compiledKeys := []SignerKey{}
+		compiledKeys := []SignInput{}
 		if len(signerKeys) > 0 {
 			compiledKeys = signerKeys
 		} else {
 			for _, signer := range signers {
-				compiledKeys = append(compiledKeys, SignerKey{
-					signer: signer,
-					key:    mainKeys[signer].PrivateKey,
+				compiledKeys = append(compiledKeys, SignInput{
+					VerificationMethodId: signer,
+					Key:                  mainKeys[signer].Private,
 				})
 			}
 		}
@@ -89,24 +89,25 @@ var _ = Describe("Update DID tests", func() {
 
 	It("Valid: Key rotation works", func() {
 		valid = true
-		signerKeys = []SignerKey{
+		signerKeys = []SignInput{
 			{
-				signer: AliceKey1,
-				key:    mainKeys[AliceKey1].PrivateKey,
+				VerificationMethodId: AliceKey1,
+				Key:                  mainKeys[AliceKey1].Private,
 			},
 			{
-				signer: AliceKey1,
-				key:    mainKeys[AliceKey2].PrivateKey,
+				VerificationMethodId: AliceKey1,
+				Key:                  mainKeys[AliceKey2].Private,
 			},
 		}
 		msg = &types.MsgUpdateDidPayload{
 			Id: AliceDID,
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                 AliceKey1,
-					Type:               Ed25519VerificationKey2020,
-					Controller:         AliceDID,
-					PublicKeyMultibase: "z" + base58.Encode(mainKeys[AliceKey2].PublicKey),
+					Id:         AliceKey1,
+					Type:       Ed25519VerificationKey2020,
+					Controller: AliceDID,
+					// TODO: Use multibase encoding
+					PublicKeyMultibase: "z" + base58.Encode(mainKeys[AliceKey2].Public),
 				},
 			},
 		}

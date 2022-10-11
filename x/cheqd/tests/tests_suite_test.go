@@ -1,4 +1,4 @@
-package tests_test
+package tests
 
 import (
 	"testing"
@@ -9,5 +9,5 @@ import (
 
 func TestTestsGeneral(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "General Tests Suite")
+	RunSpecs(t, "Cheqd Module")
 }

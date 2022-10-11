@@ -1,4 +1,4 @@
-package tests_test
+package tests
 
 import (
 	"crypto/ed25519"
@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	cheqdutils "github.com/cheqd/cheqd-node/x/cheqd/utils"
-	resourcetests "github.com/cheqd/cheqd-node/x/resource/tests"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -15,16 +14,16 @@ import (
 
 var _ = Describe("CreateResource", func() {
 	Describe("Validate", func() {
-		var setup resourcetests.TestSetup
+		var setup TestSetup
 		var err error
-		keys := resourcetests.GenerateTestKeys()
+		keys := GenerateTestKeys()
 		BeforeEach(func() {
-			setup = resourcetests.Setup()
-			didDoc := setup.CreateDid(keys[resourcetests.ExistingDIDKey].PublicKey, resourcetests.ExistingDID)
-			_, err = setup.SendCreateDid(didDoc, map[string]ed25519.PrivateKey{resourcetests.ExistingDIDKey: keys[resourcetests.ExistingDIDKey].PrivateKey})
+			setup = Setup()
+			didDoc := setup.CreateDid(keys[ExistingDIDKey].Public, ExistingDID)
+			_, err = setup.SendCreateDid(didDoc, map[string]ed25519.PrivateKey{ExistingDIDKey: keys[ExistingDIDKey].Private})
 			Expect(err).To(BeNil())
-			resourcePayload := resourcetests.GenerateCreateResourcePayload(resourcetests.ExistingResource())
-			_, err = setup.SendCreateResource(resourcePayload, map[string]ed25519.PrivateKey{resourcetests.ExistingDIDKey: keys[resourcetests.ExistingDIDKey].PrivateKey})
+			resourcePayload := GenerateCreateResourcePayload(ExistingResource())
+			_, err = setup.SendCreateResource(resourcePayload, map[string]ed25519.PrivateKey{ExistingDIDKey: keys[ExistingDIDKey].Private})
 			Expect(err).To(BeNil())
 		})
 		DescribeTable("Validate MsgCreateResource",
@@ -60,73 +59,73 @@ var _ = Describe("CreateResource", func() {
 			},
 			Entry("Valid: Works",
 				true,
-				map[string]ed25519.PrivateKey{resourcetests.ExistingDIDKey: keys[resourcetests.ExistingDIDKey].PrivateKey},
+				map[string]ed25519.PrivateKey{ExistingDIDKey: keys[ExistingDIDKey].Private},
 				&resourcetypes.MsgCreateResourcePayload{
-					CollectionId: resourcetests.ExistingDIDIdentifier,
-					Id:           resourcetests.ResourceId,
+					CollectionId: ExistingDIDIdentifier,
+					Id:           ResourceId,
 					Name:         "Test Resource Name",
-					ResourceType: resourcetests.CLSchemaType,
-					Data:         []byte(resourcetests.SchemaData),
+					ResourceType: CLSchemaType,
+					Data:         []byte(SchemaData),
 				},
-				resourcetests.JsonResourceType,
+				JsonResourceType,
 				"",
 				"",
 			),
 			Entry("Valid: Add new resource version",
 				true,
-				map[string]ed25519.PrivateKey{resourcetests.ExistingDIDKey: keys[resourcetests.ExistingDIDKey].PrivateKey},
+				map[string]ed25519.PrivateKey{ExistingDIDKey: keys[ExistingDIDKey].Private},
 				&resourcetypes.MsgCreateResourcePayload{
-					CollectionId: resourcetests.ExistingResource().Header.CollectionId,
-					Id:           resourcetests.ResourceId,
-					Name:         resourcetests.ExistingResource().Header.Name,
-					ResourceType: resourcetests.ExistingResource().Header.ResourceType,
-					Data:         resourcetests.ExistingResource().Data,
+					CollectionId: ExistingResource().Header.CollectionId,
+					Id:           ResourceId,
+					Name:         ExistingResource().Header.Name,
+					ResourceType: ExistingResource().Header.ResourceType,
+					Data:         ExistingResource().Data,
 				},
-				resourcetests.ExistingResource().Header.MediaType,
-				resourcetests.ExistingResource().Header.Id,
+				ExistingResource().Header.MediaType,
+				ExistingResource().Header.Id,
 				"",
 			),
 			Entry("Invalid: No signature",
 				false,
 				map[string]ed25519.PrivateKey{},
 				&resourcetypes.MsgCreateResourcePayload{
-					CollectionId: resourcetests.ExistingDIDIdentifier,
-					Id:           resourcetests.ResourceId,
+					CollectionId: ExistingDIDIdentifier,
+					Id:           ResourceId,
 					Name:         "Test Resource Name",
-					ResourceType: resourcetests.CLSchemaType,
-					Data:         []byte(resourcetests.SchemaData),
+					ResourceType: CLSchemaType,
+					Data:         []byte(SchemaData),
 				},
-				resourcetests.JsonResourceType,
+				JsonResourceType,
 				"",
-				fmt.Errorf("signer: %s: signature is required but not found", resourcetests.ExistingDID).Error(),
+				fmt.Errorf("signer: %s: signature is required but not found", ExistingDID).Error(),
 			),
 			Entry("Invalid: Resource Id is not an acceptable format",
 				false,
 				map[string]ed25519.PrivateKey{},
 				&resourcetypes.MsgCreateResourcePayload{
-					CollectionId: resourcetests.ExistingDIDIdentifier,
-					Id:           resourcetests.IncorrectResourceId,
+					CollectionId: ExistingDIDIdentifier,
+					Id:           IncorrectResourceId,
 					Name:         "Test Resource Name",
-					ResourceType: resourcetests.CLSchemaType,
-					Data:         []byte(resourcetests.SchemaData),
+					ResourceType: CLSchemaType,
+					Data:         []byte(SchemaData),
 				},
-				resourcetests.JsonResourceType,
+				JsonResourceType,
 				"",
-				fmt.Errorf("signer: %s: signature is required but not found", resourcetests.ExistingDID).Error(),
+				fmt.Errorf("signer: %s: signature is required but not found", ExistingDID).Error(),
 			),
 			Entry("Invalid: DidDoc not found",
 				false,
 				map[string]ed25519.PrivateKey{},
 				&resourcetypes.MsgCreateResourcePayload{
-					CollectionId: resourcetests.NotFoundDIDIdentifier,
-					Id:           resourcetests.IncorrectResourceId,
+					CollectionId: NotFoundDIDIdentifier,
+					Id:           IncorrectResourceId,
 					Name:         "Test Resource Name",
-					ResourceType: resourcetests.CLSchemaType,
-					Data:         []byte(resourcetests.SchemaData),
+					ResourceType: CLSchemaType,
+					Data:         []byte(SchemaData),
 				},
-				resourcetests.JsonResourceType,
+				JsonResourceType,
 				"",
-				fmt.Errorf("did:cheqd:test:%s: not found", resourcetests.NotFoundDIDIdentifier).Error(),
+				fmt.Errorf("did:cheqd:test:%s: not found", NotFoundDIDIdentifier).Error(),
 			),
 		)
 	})

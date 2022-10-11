@@ -1,11 +1,10 @@
-package tests_test
+package tests
 
 import (
 	"crypto/ed25519"
 	"crypto/sha256"
 	"fmt"
 
-	resourcetests "github.com/cheqd/cheqd-node/x/resource/tests"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	. "github.com/onsi/ginkgo/v2"
@@ -14,16 +13,16 @@ import (
 
 var _ = Describe("QueryGetResource", func() {
 	Describe("Validate", func() {
-		var setup resourcetests.TestSetup
-		keys := resourcetests.GenerateTestKeys()
-		existingResource := resourcetests.ExistingResource()
+		var setup TestSetup
+		keys := GenerateTestKeys()
+		existingResource := ExistingResource()
 		BeforeEach(func() {
-			setup = resourcetests.Setup()
-			didDoc := setup.CreateDid(keys[resourcetests.ExistingDIDKey].PublicKey, resourcetests.ExistingDID)
-			_, err := setup.SendCreateDid(didDoc, map[string]ed25519.PrivateKey{resourcetests.ExistingDIDKey: keys[resourcetests.ExistingDIDKey].PrivateKey})
+			setup = Setup()
+			didDoc := setup.CreateDid(keys[ExistingDIDKey].Public, ExistingDID)
+			_, err := setup.SendCreateDid(didDoc, map[string]ed25519.PrivateKey{ExistingDIDKey: keys[ExistingDIDKey].Private})
 			Expect(err).To(BeNil())
-			payload := resourcetests.GenerateCreateResourcePayload(resourcetests.ExistingResource())
-			_, err = setup.SendCreateResource(payload, map[string]ed25519.PrivateKey{resourcetests.ExistingDIDKey: keys[resourcetests.ExistingDIDKey].PrivateKey})
+			payload := GenerateCreateResourcePayload(ExistingResource())
+			_, err = setup.SendCreateResource(payload, map[string]ed25519.PrivateKey{ExistingDIDKey: keys[ExistingDIDKey].Private})
 			Expect(err).To(BeNil())
 		})
 		DescribeTable("Validate QueryGetResourceRequest",
@@ -56,7 +55,7 @@ var _ = Describe("QueryGetResource", func() {
 			Entry("Valid: Works",
 				true,
 				&resourcetypes.QueryGetResourceRequest{
-					CollectionId: resourcetests.ExistingDIDIdentifier,
+					CollectionId: ExistingDIDIdentifier,
 					Id:           existingResource.Header.Id,
 				},
 				&resourcetypes.QueryGetResourceResponse{
@@ -67,20 +66,20 @@ var _ = Describe("QueryGetResource", func() {
 			Entry("Invalid: Resource not found",
 				false,
 				&resourcetypes.QueryGetResourceRequest{
-					CollectionId: resourcetests.ExistingDIDIdentifier,
-					Id:           resourcetests.AnotherResourceId,
+					CollectionId: ExistingDIDIdentifier,
+					Id:           AnotherResourceId,
 				},
 				nil,
-				fmt.Errorf("resource %s:%s: not found", resourcetests.ExistingDIDIdentifier, resourcetests.AnotherResourceId).Error(),
+				fmt.Errorf("resource %s:%s: not found", ExistingDIDIdentifier, AnotherResourceId).Error(),
 			),
 			Entry("Invalid: DIDDoc not found",
 				false,
 				&resourcetypes.QueryGetResourceRequest{
-					CollectionId: resourcetests.NotFoundDIDIdentifier,
+					CollectionId: NotFoundDIDIdentifier,
 					Id:           existingResource.Header.Id,
 				},
 				nil,
-				fmt.Errorf("did:cheqd:test:%s: DID Doc not found", resourcetests.NotFoundDIDIdentifier).Error(),
+				fmt.Errorf("did:cheqd:test:%s: DID Doc not found", NotFoundDIDIdentifier).Error(),
 			),
 		)
 	})

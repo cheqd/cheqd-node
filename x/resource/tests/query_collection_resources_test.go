@@ -1,10 +1,9 @@
-package tests_test
+package tests
 
 import (
 	"crypto/ed25519"
 	"fmt"
 
-	resourcetests "github.com/cheqd/cheqd-node/x/resource/tests"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -14,15 +13,15 @@ import (
 
 var _ = Describe("QueryCollectionResources", func() {
 	Describe("Validate", func() {
-		var setup resourcetests.TestSetup
-		keys := resourcetests.GenerateTestKeys()
+		var setup TestSetup
+		keys := GenerateTestKeys()
 		BeforeEach(func() {
-			setup = resourcetests.Setup()
-			didDoc := setup.CreateDid(keys[resourcetests.ExistingDIDKey].PublicKey, resourcetests.ExistingDID)
-			_, err := setup.SendCreateDid(didDoc, map[string]ed25519.PrivateKey{resourcetests.ExistingDIDKey: keys[resourcetests.ExistingDIDKey].PrivateKey})
+			setup = Setup()
+			didDoc := setup.CreateDid(keys[ExistingDIDKey].Public, ExistingDID)
+			_, err := setup.SendCreateDid(didDoc, map[string]ed25519.PrivateKey{ExistingDIDKey: keys[ExistingDIDKey].Private})
 			Expect(err).To(BeNil())
-			payload := resourcetests.GenerateCreateResourcePayload(resourcetests.ExistingResource())
-			_, err = setup.SendCreateResource(payload, map[string]ed25519.PrivateKey{resourcetests.ExistingDIDKey: keys[resourcetests.ExistingDIDKey].PrivateKey})
+			payload := GenerateCreateResourcePayload(ExistingResource())
+			_, err = setup.SendCreateResource(payload, map[string]ed25519.PrivateKey{ExistingDIDKey: keys[ExistingDIDKey].Private})
 			Expect(err).To(BeNil())
 		})
 		DescribeTable("Validate QueryCollectionResources",
@@ -51,20 +50,20 @@ var _ = Describe("QueryCollectionResources", func() {
 			Entry("Valid: Works",
 				true,
 				&resourcetypes.QueryGetCollectionResourcesRequest{
-					CollectionId: resourcetests.ExistingDIDIdentifier,
+					CollectionId: ExistingDIDIdentifier,
 				},
 				&resourcetypes.QueryGetCollectionResourcesResponse{
-					Resources: []*resourcetypes.ResourceHeader{resourcetests.ExistingResource().Header},
+					Resources: []*resourcetypes.ResourceHeader{ExistingResource().Header},
 				},
 				"",
 			),
 			Entry("Invalid: DID Doc is not found",
 				false,
 				&resourcetypes.QueryGetCollectionResourcesRequest{
-					CollectionId: resourcetests.NotFoundDIDIdentifier,
+					CollectionId: NotFoundDIDIdentifier,
 				},
 				nil,
-				fmt.Errorf("did:cheqd:test:%s: DID Doc not found", resourcetests.NotFoundDIDIdentifier).Error(),
+				fmt.Errorf("did:cheqd:test:%s: DID Doc not found", NotFoundDIDIdentifier).Error(),
 			),
 		)
 	})

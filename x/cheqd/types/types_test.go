@@ -9,5 +9,5 @@ import (
 
 func TestUtils(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Types Tests Suite")
+	RunSpecs(t, "Cheqd Module Types")
 }

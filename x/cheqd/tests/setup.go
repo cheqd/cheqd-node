@@ -24,21 +24,11 @@ import (
 
 const Ed25519VerificationKey2020 = "Ed25519VerificationKey2020"
 
-type KeyPair struct {
-	PrivateKey ed25519.PrivateKey
-	PublicKey  ed25519.PublicKey
-}
-
 type TestSetup struct {
 	Cdc     codec.Codec
 	Ctx     sdk.Context
 	Keeper  keeper.Keeper
 	Handler sdk.Handler
-}
-
-type SignerKey struct {
-	signer string
-	key    ed25519.PrivateKey
 }
 
 func Setup() TestSetup {
@@ -147,14 +137,14 @@ func (s *TestSetup) WrapCreateRequest(payload *types.MsgCreateDidPayload, keys m
 	}
 }
 
-func (s *TestSetup) WrapUpdateRequest(payload *types.MsgUpdateDidPayload, keys []SignerKey) *types.MsgUpdateDid {
+func (s *TestSetup) WrapUpdateRequest(payload *types.MsgUpdateDidPayload, keys []SignInput) *types.MsgUpdateDid {
 	var signatures []*types.SignInfo
 	signingInput := payload.GetSignBytes()
 
 	for _, skey := range keys {
-		signature := base64.StdEncoding.EncodeToString(ed25519.Sign(skey.key, signingInput))
+		signature := base64.StdEncoding.EncodeToString(ed25519.Sign(skey.Key, signingInput))
 		signatures = append(signatures, &types.SignInfo{
-			VerificationMethodId: skey.signer,
+			VerificationMethodId: skey.VerificationMethodId,
 			Signature:            signature,
 		})
 	}
@@ -192,7 +182,7 @@ func (s *TestSetup) InitDid(did string) (map[string]ed25519.PrivateKey, *types.M
 	return keys, didMsg, nil
 }
 
-func (s *TestSetup) SendUpdateDid(msg *types.MsgUpdateDidPayload, keys []SignerKey) (*types.Did, error) {
+func (s *TestSetup) SendUpdateDid(msg *types.MsgUpdateDidPayload, keys []SignInput) (*types.Did, error) {
 	// query Did
 	state, _ := s.Keeper.GetDid(&s.Ctx, msg.Id)
 	if len(msg.VersionId) == 0 {
@@ -226,12 +216,12 @@ func ConcatKeys(dst map[string]ed25519.PrivateKey, src map[string]ed25519.Privat
 	return dst
 }
 
-func MapToListOfSignerKeys(mp map[string]ed25519.PrivateKey) []SignerKey {
-	rlist := []SignerKey{}
+func MapToListOfSignerKeys(mp map[string]ed25519.PrivateKey) []SignInput {
+	rlist := []SignInput{}
 	for k, v := range mp {
-		rlist = append(rlist, SignerKey{
-			signer: k,
-			key:    v,
+		rlist = append(rlist, SignInput{
+			VerificationMethodId: k,
+			Key:                  v,
 		})
 	}
 	return rlist
@@ -326,7 +316,7 @@ func (s TestSetup) CreateTestDIDs(keys map[string]KeyPair) error {
 		msg := prefilled.msg
 
 		for _, vm := range msg.VerificationMethod {
-			encoded, err := multibase.Encode(multibase.Base58BTC, keys[vm.Id].PublicKey)
+			encoded, err := multibase.Encode(multibase.Base58BTC, keys[vm.Id].Public)
 			if err != nil {
 				return err
 			}
@@ -335,7 +325,7 @@ func (s TestSetup) CreateTestDIDs(keys map[string]KeyPair) error {
 
 		signerKeys := map[string]ed25519.PrivateKey{}
 		for _, signer := range prefilled.signers {
-			signerKeys[signer] = keys[signer].PrivateKey
+			signerKeys[signer] = keys[signer].Private
 		}
 
 		_, err := s.SendCreateDid(msg, signerKeys)

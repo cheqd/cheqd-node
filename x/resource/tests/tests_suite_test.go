@@ -1,4 +1,4 @@
-package tests_test
+package tests
 
 import (
 	"testing"
@@ -9,5 +9,5 @@ import (
 
 func TestTests(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Tests Suite")
+	RunSpecs(t, "Resource Module")
 }
