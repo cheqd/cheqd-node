@@ -78,29 +78,18 @@ func Setup() TestSetup {
 	return setup
 }
 
-func (s *TestSetup) CreateDid(pubKey ed25519.PublicKey, did string) *types.MsgCreateDidPayload {
-	PublicKeyMultibase, err := multibase.Encode(multibase.Base58BTC, pubKey)
-	if err != nil {
-		panic(err)
-	}
-
-	VerificationMethod := types.VerificationMethod{
-		Id:                 did + "#key-1",
-		Type:               Ed25519VerificationKey2020,
-		Controller:         did,
-		PublicKeyMultibase: PublicKeyMultibase,
-	}
-
-	Service := types.Service{
-		Id:              did + "#service-2",
-		Type:            "DIDCommMessaging",
-		ServiceEndpoint: "endpoint",
-	}
-
+func (s *TestSetup) BuildMsgCreateDidPayload(did string, key ed25519.PublicKey) *types.MsgCreateDidPayload {
 	return &types.MsgCreateDidPayload{
-		Id:                   did,
-		Controller:           nil,
-		VerificationMethod:   []*types.VerificationMethod{&VerificationMethod},
+		Id:         did,
+		Controller: nil,
+		VerificationMethod: []*types.VerificationMethod{
+			{
+				Id:                 did + "#key-1",
+				Type:               Ed25519VerificationKey2020,
+				Controller:         did,
+				PublicKeyMultibase: MustEncodeBase58(key),
+			},
+		},
 		Authentication:       []string{did + "#key-1"},
 		AssertionMethod:      []string{did + "#key-1"},
 		CapabilityInvocation: []string{did + "#key-1"},
@@ -108,7 +97,13 @@ func (s *TestSetup) CreateDid(pubKey ed25519.PublicKey, did string) *types.MsgCr
 		KeyAgreement:         []string{did + "#key-1"},
 		AlsoKnownAs:          []string{did + "#key-1"},
 		Context:              []string{"Context"},
-		Service:              []*types.Service{&Service},
+		Service: []*types.Service{
+			{
+				Id:              did + "#service-2",
+				Type:            "DIDCommMessaging",
+				ServiceEndpoint: "endpoint",
+			},
+		},
 	}
 }
 
@@ -168,7 +163,7 @@ func (s *TestSetup) InitDid(did string) (map[string]ed25519.PrivateKey, *types.M
 	pubKey, privKey, _ := ed25519.GenerateKey(rand.Reader)
 
 	// add new Did
-	didMsg := s.CreateDid(pubKey, did)
+	didMsg := s.BuildMsgCreateDidPayload(did, pubKey)
 
 	keyId := did + "#key-1"
 	keys := map[string]ed25519.PrivateKey{keyId: privKey}

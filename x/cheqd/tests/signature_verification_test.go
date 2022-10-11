@@ -80,8 +80,8 @@ var _ = Describe("Signature Verification. Remove signature/VM", func() {
 		BpubKey, BprivKey, _ = ed25519.GenerateKey(rand.Reader)
 
 		// Create dids
-		aliceDid = setup.CreateDid(ApubKey, AliceDID)
-		bobDid = setup.CreateDid(BpubKey, BobDID)
+		aliceDid = setup.BuildMsgCreateDidPayload(AliceDID, ApubKey)
+		bobDid = setup.BuildMsgCreateDidPayload(BobDID, BpubKey)
 
 		// Collect private keys
 		aliceKeys = map[string]ed25519.PrivateKey{AliceKey1: AprivKey, BobKey1: BprivKey}

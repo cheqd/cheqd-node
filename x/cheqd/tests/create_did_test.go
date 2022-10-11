@@ -13,82 +13,65 @@ import (
 	"github.com/multiformats/go-multibase"
 )
 
-var _ = Describe("Create DID tests new", func() {
-	// params for cases
-	var valid bool
-	var keys map[string]KeyPair
-	var signers []string
-	var msg *types.MsgCreateDidPayload
-	errMsg := ""
+// var _ = Describe("Create DID tests new", func() {
+// 	var setup TestSetup
 
-	var setup TestSetup
-	var err error
-	mainKeys := GenerateTestKeys()
+// 	BeforeEach(func() {
+// 		setup = Setup()
+// 	})
 
-	BeforeEach(func() {
-		// setup
-		valid = false
-		keys = map[string]KeyPair{}
-		signers = []string{}
-		msg = &types.MsgCreateDidPayload{}
-		errMsg = ""
-	})
+// 	It("Valid: Works", func() {
+// 		valid = true
+// 		keys = map[string]KeyPair{
+// 			ImposterKey1: GenerateKeyPair(),
+// 		}
+// 		signers = []string{ImposterKey1}
+// 		msg = &types.MsgCreateDidPayload{
+// 			Id:             ImposterDID,
+// 			Authentication: []string{ImposterKey1},
+// 			VerificationMethod: []*types.VerificationMethod{
+// 				{
+// 					Id:         ImposterKey1,
+// 					Type:       Ed25519VerificationKey2020,
+// 					Controller: ImposterDID,
+// 				},
+// 			},
+// 		}
 
-	AfterEach(func() {
-		setup = InitEnv(mainKeys)
+// 		for _, vm := range msg.VerificationMethod {
+// 			if vm.PublicKeyMultibase == "" {
+// 				vm.PublicKeyMultibase, err = multibase.Encode(multibase.Base58BTC, keys[vm.Id].Public)
+// 			}
+// 			Expect(err).To(BeNil())
+// 		}
 
-		for _, vm := range msg.VerificationMethod {
-			if vm.PublicKeyMultibase == "" {
-				vm.PublicKeyMultibase, err = multibase.Encode(multibase.Base58BTC, keys[vm.Id].Public)
-			}
-			Expect(err).To(BeNil())
-		}
+// 		signerKeys := map[string]ed25519.PrivateKey{}
+// 		for _, signer := range signers {
+// 			signerKeys[signer] = keys[signer].Private
+// 		}
 
-		signerKeys := map[string]ed25519.PrivateKey{}
-		for _, signer := range signers {
-			signerKeys[signer] = keys[signer].Private
-		}
+// 		did, err := setup.SendCreateDid(msg, signerKeys)
 
-		did, err := setup.SendCreateDid(msg, signerKeys)
+// 		if valid {
+// 			Expect(err).To(BeNil())
+// 			Expect(msg.Id).To(Equal(did.Id))
+// 			Expect(msg.Controller).To(Equal(did.Controller))
+// 			Expect(msg.VerificationMethod).To(Equal(did.VerificationMethod))
+// 			Expect(msg.Authentication).To(Equal(did.Authentication))
+// 			Expect(msg.AssertionMethod).To(Equal(did.AssertionMethod))
+// 			Expect(msg.CapabilityInvocation).To(Equal(did.CapabilityInvocation))
+// 			Expect(msg.CapabilityDelegation).To(Equal(did.CapabilityDelegation))
+// 			Expect(msg.KeyAgreement).To(Equal(did.KeyAgreement))
+// 			Expect(msg.AlsoKnownAs).To(Equal(did.AlsoKnownAs))
+// 			Expect(msg.Service).To(Equal(did.Service))
+// 			Expect(msg.Context).To(Equal(did.Context))
+// 		} else {
+// 			Expect(err).To(HaveOccurred())
+// 			Expect(errMsg).To(Equal(err.Error()))
+// 		}
 
-		if valid {
-			Expect(err).To(BeNil())
-			Expect(msg.Id).To(Equal(did.Id))
-			Expect(msg.Controller).To(Equal(did.Controller))
-			Expect(msg.VerificationMethod).To(Equal(did.VerificationMethod))
-			Expect(msg.Authentication).To(Equal(did.Authentication))
-			Expect(msg.AssertionMethod).To(Equal(did.AssertionMethod))
-			Expect(msg.CapabilityInvocation).To(Equal(did.CapabilityInvocation))
-			Expect(msg.CapabilityDelegation).To(Equal(did.CapabilityDelegation))
-			Expect(msg.KeyAgreement).To(Equal(did.KeyAgreement))
-			Expect(msg.AlsoKnownAs).To(Equal(did.AlsoKnownAs))
-			Expect(msg.Service).To(Equal(did.Service))
-			Expect(msg.Context).To(Equal(did.Context))
-		} else {
-			Expect(err).To(HaveOccurred())
-			Expect(errMsg).To(Equal(err.Error()))
-		}
-	})
-
-	It("Valid: Works", func() {
-		valid = true
-		keys = map[string]KeyPair{
-			ImposterKey1: GenerateKeyPair(),
-		}
-		signers = []string{ImposterKey1}
-		msg = &types.MsgCreateDidPayload{
-			Id:             ImposterDID,
-			Authentication: []string{ImposterKey1},
-			VerificationMethod: []*types.VerificationMethod{
-				{
-					Id:         ImposterKey1,
-					Type:       Ed25519VerificationKey2020,
-					Controller: ImposterDID,
-				},
-			},
-		}
-	})
-})
+// 	})
+// })
 
 var _ = Describe("Create DID tests", func() {
 	// params for cases

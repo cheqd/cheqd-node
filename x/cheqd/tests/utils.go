@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	mathrand "math/rand"
 
+	"github.com/multiformats/go-multibase"
 	. "github.com/onsi/gomega"
 )
 
@@ -51,4 +52,10 @@ func InitEnv(keys map[string]KeyPair) TestSetup {
 func GenerateKeyPair() KeyPair {
 	PublicKey, PrivateKey, _ := ed25519.GenerateKey(rand.Reader)
 	return KeyPair{PrivateKey, PublicKey}
+}
+
+func MustEncodeBase58(data []byte) string {
+	encoded, err := multibase.Encode(multibase.Base58BTC, data)
+	Expect(err).To(BeNil())
+	return encoded
 }
