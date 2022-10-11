@@ -54,3 +54,33 @@ func QueryResource(collectionId string, resourceId string) (resource_types.Query
 
 	return resp, nil
 }
+
+func QueryAllResourceVersions(collectionId string, resourceName string) (resource_types.QueryGetAllResourceVersionsResponse, error) {
+	res, err := Query("resource", "all-resource-versions", collectionId, resourceName)
+	if err != nil {
+		return resource_types.QueryGetAllResourceVersionsResponse{}, err
+	}
+
+	var resp resource_types.QueryGetAllResourceVersionsResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return resource_types.QueryGetAllResourceVersionsResponse{}, err
+	}
+
+	return resp, nil
+}
+
+func QueryResourceCollection(collectionId string) (resource_types.QueryGetCollectionResourcesResponse, error) {
+	res, err := Query("resource", "collection-resources", collectionId)
+	if err != nil {
+		return resource_types.QueryGetCollectionResourcesResponse{}, err
+	}
+
+	var resp resource_types.QueryGetCollectionResourcesResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return resource_types.QueryGetCollectionResourcesResponse{}, err
+	}
+
+	return resp, nil
+}
