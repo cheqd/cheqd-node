@@ -4,6 +4,7 @@ on:
     branches:
       - main
       - develop
+      - dragonberry
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true

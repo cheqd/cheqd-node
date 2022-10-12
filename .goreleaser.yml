@@ -56,7 +56,6 @@ builds:
 archives:
   - id: release-archives
     replacements:
-        darwin: Darwin
         linux: Linux
         amd64: x86_64
     format: tar.gz
@@ -94,7 +93,7 @@ changelog:
 release:
   github:
     owner: cheqd
-    name: cheqd-node
+    name: dragonberry-cheqd
   
   draft: false
   prerelease: true

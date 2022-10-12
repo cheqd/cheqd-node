@@ -30,7 +30,6 @@ jobs:
         with:
           config-file: '.github/linters/mlc_config.json'
           use-quiet-mode: 'yes'
-          use-verbose-mode: 'yes'
   
   go-lint:
     # We can't use VALIDATE_GO from super linter because of this issue:
@@ -64,7 +63,7 @@ jobs:
       uses: github/super-linter/slim@v4
       env:
         IGNORE_GITIGNORED_FILES: true
-        DEFAULT_BRANCH: main
+        DEFAULT_BRANCH: dragonberry
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         LOG_LEVEL: WARN
         VALIDATE_ALL_CODEBASE: true
