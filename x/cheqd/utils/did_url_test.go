@@ -27,7 +27,7 @@ func TestIsDidURL(t *testing.T) {
 		{"Valid: the whole alphabet with query and apth", true, "did:cheqd:testnet:123456789abcdefg/path?query#abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~!$&'()*+,;=:@%20%ff?"},
 		{"Valid: only fragment", true, "did:cheqd:testnet:123456789abcdefg#fragment"},
 		{"Valid: only query", true, "did:cheqd:testnet:123456789abcdefg?query"},
-		{"Valid: UniqueID more then 16 symbols and less then 32", true, "did:cheqd:testnet:123456789abcdefgABCDEF/path?query#fragment"},
+		{"Valid: UniqueID more then 16 symbols and less then 32", true, "did:cheqd:testnet:123456789abcdefgABCDEF#fragment"},
 		// Wrong cases
 		{"Not valid: wrong HEXDIG for path (pct-encoded phrase)", false, "did:cheqd:testnet:123456789abcdefg/path%20%zz"},
 		{"Not valid: wrong HEXDIG for query (pct-encoded phrase)", false, "did:cheqd:testnet:123456789abcdefg/path?query%20%zz"},
