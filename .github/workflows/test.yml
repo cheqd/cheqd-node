@@ -71,68 +71,6 @@ jobs:
         run: |
           journalctl -ex | grep cheqd
 
-  python-integration-tests:
-    name: "Python based Cosmos and identity tests"
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Load node binary artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: cheqd-noded
-          path: /home/runner/.local/bin
-
-      - name: Restore binary permissions
-        run: sudo chmod +x /home/runner/.local/bin/cheqd-noded
-
-      - name: Download node Docker image
-        uses: actions/download-artifact@v3
-        with:
-          name: cheqd-node-image.tar
-
-      - name: Load node Docker image
-        run: docker load -i cheqd-node-image.tar
-
-      - name: Setup 4 Validators + 2 Observers Docker localnet 
-        working-directory: ./docker/localnet
-        run: |
-          bash gen-network-config.sh
-          CHEQD_NODE_IMAGE=cheqd-node DOCKER_IMAGE_VERSION=latest docker compose up -d
-
-      - name: Check all Docker localnet nodes are active
-        run: bash tests/tools/wait-for-chain.sh
-
-      - name: Setup Python environment
-        working-directory: ./tests/e2e-pytest
-        run: |
-          set -euo pipefail
-          pip3 install -r requirements.txt >> /dev/null
-          cp -Rf "${NODE_CONFIGS_BASE}"/validator-0/. /home/runner/.cheqdnode/
-          cp -Rf "${NODE_CONFIGS_BASE}"/validator-1/. /home/runner/.cheqdnode/
-          sudo chmod -R 775 /home/runner/
-
-      - name: Run Cosmos-related tests
-        working-directory: ./tests/e2e-pytest
-        run: |
-          set -euo pipefail
-          OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/validator-0" | sed -nr 's/.*address: (.*?).*/\1/p' | sed 's/\r//g')
-          export OP0_ADDRESS
-          OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/validator-1" | sed -nr 's/.*address: (.*?).*/\1/p' | sed 's/\r//g')
-          export OP1_ADDRESS
-          pytest -v -rP test_cosmos.py
-
-      - name: Run identity-related tests # TODO: Move into separate stage?
-        working-directory: ./tests/e2e-pytest
-        run: |
-          set -euo pipefail
-          OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
-          export OP0_ADDRESS
-          OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p | sed 's/\r//g')
-          export OP1_ADDRESS
-          pytest -v -rP test_identity.py
-
   bash-integration-tests:
     name: "Bash-based identity tests"
     runs-on: ubuntu-latest
