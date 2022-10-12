@@ -144,6 +144,7 @@ services:
         published: 9491     # gRPC-Gateway port
       - target: 26660
         published: 27060    # Prometheus metrics port
+    entrypoint: [ "node-start" ]
     volumes:
       - type: volume
         source: seed-0-data
@@ -179,6 +180,7 @@ services:
       - type: volume
         source: observer-0-data
         target: /home/cheqd
+    entrypoint: [ "node-start" ]
     env_file:
       - container-env/observer-0.env
     configs:
