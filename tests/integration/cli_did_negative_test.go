@@ -200,7 +200,8 @@ var _ = Describe("cheqd cli negative", func() {
 
 		// Generate second controller
 		did2 := "did:cheqd:" + network.DID_NAMESPACE + ":" + uuid.NewString()
-		keyId2 := did + "#key2"
+		keyId2 := did2 + "#key1"
+		keyId2AsExtraController := did + "#key2"
 
 		pubKey2, privKey2, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
@@ -228,6 +229,14 @@ var _ = Describe("cheqd cli negative", func() {
 				PrivKey:              privKey2,
 			},
 		}
+
+		signInputs2AsExtraController := []cli_types.SignInput{
+			{
+				VerificationMethodId: keyId2AsExtraController,
+				PrivKey:              privKey2,
+			},
+		}
+
 
 		res_, err := cli.CreateDid(payload2, signInputs2, testdata.BASE_ACCOUNT_2)
 		Expect(err).To(BeNil())
@@ -267,17 +276,19 @@ var _ = Describe("cheqd cli negative", func() {
 
 		// Following valid DID Doc to be updated
 		followingUpdatedPayload := updatedPayload
+		followingUpdatedPayload.Controller = []string{did, did2}
 		followingUpdatedPayload.VerificationMethod = append(followingUpdatedPayload.VerificationMethod, &types.VerificationMethod{
-			Id:                 keyId2,
+			Id:                 keyId2AsExtraController,
 			Type:               "Ed25519VerificationKey2020",
 			Controller:         did2,
 			PublicKeyMultibase: string(pubKeyMultibase582),
 		})
+		followingUpdatedPayload.Authentication = append(followingUpdatedPayload.Authentication, keyId2AsExtraController)
 		followingUpdatedPayload.CapabilityDelegation = []string{keyId}
 		followingUpdatedPayload.CapabilityInvocation = []string{keyId}
 		followingUpdatedPayload.VersionId = res.TxHash
 
-		signInputsAugmented := append(signInputs, signInputs2...)
+		signInputsAugmented := append(signInputs, signInputs2AsExtraController......)
 
 		// Fail to update the DID Doc with missing cli arguments
 		//   a. missing payload, sign inputs and account
@@ -333,7 +344,7 @@ var _ = Describe("cheqd cli negative", func() {
 		//  d. non-matching private key
 		_, err = cli.UpdateDid(followingUpdatedPayload, []cli_types.SignInput{
 			{
-				VerificationMethodId: keyId2,
+				VerificationMethodId: keyId2AsExtraController,
 				PrivKey:              privKey,
 			},
 			{
@@ -350,7 +361,7 @@ var _ = Describe("cheqd cli negative", func() {
 				PrivKey:              privKeyFuzzedExtra,
 			},
 			{
-				VerificationMethodId: keyId2,
+				VerificationMethodId: keyId2AsExtraController,
 				PrivKey:              privKey2,
 			},
 		}, testdata.BASE_ACCOUNT_1)
