@@ -288,7 +288,7 @@ var _ = Describe("cheqd cli negative", func() {
 		followingUpdatedPayload.CapabilityInvocation = []string{keyId}
 		followingUpdatedPayload.VersionId = res.TxHash
 
-		signInputsAugmented := append(signInputs, signInputs2AsExtraController......)
+		signInputsAugmented := append(signInputs, signInputs2AsExtraController...)
 
 		// Fail to update the DID Doc with missing cli arguments
 		//   a. missing payload, sign inputs and account
