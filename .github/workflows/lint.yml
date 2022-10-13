@@ -80,3 +80,17 @@ jobs:
         VALIDATE_PYTHON_PYLINT: true
         VALIDATE_XML: true
         VALIDATE_YAML: true
+
+  lint-protos:
+    name: "Lint proto files"
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      # Install the `buf` CLI
+      - uses: bufbuild/buf-setup-action@v1
+      # Lint
+      - uses: bufbuild/buf-lint-action@v1
+      # Breacking change detection
+      - uses: bufbuild/buf-breaking-action@v1
+        with:
+          against: 'https://github.com/cheqd/cheqd-node.git#branch=main'
