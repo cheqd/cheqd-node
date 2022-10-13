@@ -80,7 +80,6 @@ jobs:
         VALIDATE_PYTHON_PYLINT: true
         VALIDATE_XML: true
         VALIDATE_YAML: true
-        VALIDATE_PROTOBUF: true
 
   lint-protos:
     name: "Proto files"
