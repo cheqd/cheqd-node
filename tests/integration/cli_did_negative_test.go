@@ -4,6 +4,7 @@ package integration
 
 import (
 	"crypto/ed25519"
+	"fmt"
 
 	"github.com/cheqd/cheqd-node/tests/integration/cli"
 	helpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
@@ -292,6 +293,9 @@ var _ = Describe("cheqd cli negative", func() {
 
 		signInputsAugmented := append(signInputs, signInputs2AsExtraController...)
 
+		fmt.Println("updatedPayload", updatedPayload)
+		fmt.Println("followingUpdatedPayload", followingUpdatedPayload)
+
 		// Fail to update the DID Doc with missing cli arguments
 		//   a. missing payload, sign inputs and account
 		_, err = cli.UpdateDid(types.MsgUpdateDidPayload{}, []cli_types.SignInput{}, "")
@@ -376,12 +380,18 @@ var _ = Describe("cheqd cli negative", func() {
 		_, err = cli.UpdateDid(invalidVmTypePayload, signInputsAugmented, testdata.BASE_ACCOUNT_1)
 		Expect(err).ToNot(BeNil())
 
+		fmt.Println("followingUpdatedPayload", followingUpdatedPayload)
+		fmt.Println("invalidVmTypePayload", invalidVmTypePayload)
+
 		// Fail to update a non-existing DID Doc
 		nonExistingDid := "did:cheqd:" + network.DID_NAMESPACE + ":" + uuid.NewString()
 		nonExistingDidPayload := deepCopierUpdateDid.DeepCopy(followingUpdatedPayload)
 		nonExistingDidPayload.Id = nonExistingDid
 		_, err = cli.UpdateDid(nonExistingDidPayload, signInputsAugmented, testdata.BASE_ACCOUNT_1)
 		Expect(err).ToNot(BeNil())
+
+		fmt.Println("followingUpdatedPayload", followingUpdatedPayload)
+		fmt.Println("nonExistingDidPayload", nonExistingDidPayload)
 
 		// Finally, update the DID Doc
 		res, err = cli.UpdateDid(followingUpdatedPayload, signInputsAugmented, testdata.BASE_ACCOUNT_1)
