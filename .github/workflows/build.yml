@@ -35,9 +35,6 @@ jobs:
           name: cheqd-noded
           path: dist/**/cheqd-noded
 
-      - name: Run Golang unit tests
-        run: go test -v ./...
-
   build-docker:
     name: "Docker image"
     runs-on: ubuntu-latest
