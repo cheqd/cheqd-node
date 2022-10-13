@@ -6,10 +6,10 @@ import (
 	"crypto/ed25519"
 
 	"github.com/cheqd/cheqd-node/tests/integration/cli"
+	helpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
 	"github.com/cheqd/cheqd-node/tests/integration/testdata"
 	cli_types "github.com/cheqd/cheqd-node/x/cheqd/client/cli"
-	helpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/google/uuid"
 	"github.com/multiformats/go-multibase"
@@ -155,7 +155,7 @@ var _ = Describe("cheqd cli negative", func() {
 		Expect(err).To(BeNil())
 
 		payload := types.MsgCreateDidPayload{
-			Id: did,
+			Id:         did,
 			Controller: []string{did},
 			VerificationMethod: []*types.VerificationMethod{
 				{
@@ -192,7 +192,7 @@ var _ = Describe("cheqd cli negative", func() {
 			},
 			Authentication:  []string{keyId},
 			AssertionMethod: []string{keyId},
-			VersionId:	     res.TxHash,
+			VersionId:       res.TxHash,
 		}
 
 		res, err = cli.UpdateDid(updatedPayload, signInputs, testdata.BASE_ACCOUNT_1)
@@ -211,7 +211,7 @@ var _ = Describe("cheqd cli negative", func() {
 		Expect(err).To(BeNil())
 
 		payload2 := types.MsgCreateDidPayload{
-			Id: did2,
+			Id:         did2,
 			Controller: []string{did2},
 			VerificationMethod: []*types.VerificationMethod{
 				{
@@ -237,7 +237,6 @@ var _ = Describe("cheqd cli negative", func() {
 				PrivKey:              privKey2,
 			},
 		}
-
 
 		res_, err := cli.CreateDid(payload2, signInputs2, testdata.BASE_ACCOUNT_2)
 		Expect(err).To(BeNil())

@@ -6,8 +6,10 @@ import (
 	"path"
 )
 
-const JSON_FILE_NAME = "test.json"
-const JSON_FILE_CONTENT = `{"test": "test"}`
+const (
+	JSON_FILE_NAME    = "test.json"
+	JSON_FILE_CONTENT = `{"test": "test"}`
+)
 
 func CreateTestFile(dir string, name string, content []byte) (string, error) {
 	file := path.Join(dir, name)
