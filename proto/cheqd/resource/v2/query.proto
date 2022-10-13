@@ -17,9 +17,6 @@ service Query {
   rpc CollectionResources(QueryGetCollectionResourcesRequest) returns (QueryGetCollectionResourcesResponse) {
     option (google.api.http).get = "/cheqd/resource/v2/collection/{collection_id}/resources";
   }
-  rpc AllResourceVersions(QueryGetAllResourceVersionsRequest) returns (QueryGetAllResourceVersionsResponse) {
-    option (google.api.http).get = "/cheqd/resource/v2/collection/{collection_id}/resources/versions/{name}";
-  }
 }
 
 message QueryGetResourceRequest {
