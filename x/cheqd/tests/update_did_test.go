@@ -9,48 +9,69 @@ import (
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 )
 
-var _ = Describe("Update DID tests", func() {
+var _ = Describe("DID Doc update", func() {
 	var setup TestSetup
 
 	BeforeEach(func() {
 		setup = Setup()
 	})
 
-	It("Valid: Key rotation works", func() {
-		// Create did
-		did := setup.CreateSimpleDid()
+	Describe("Key rotation", func() {
+		var did CreatedDidInfo
+		var newKeyPair KeyPair
+		var msg *types.MsgUpdateDidPayload
 
-		// Update did
-		newKeyPair := GenerateKeyPair()
-
-		msg := &types.MsgUpdateDidPayload{
-			Id: did.Did,
-			VerificationMethod: []*types.VerificationMethod{
-				{
-					Id:                 did.KeyId,
-					Type:               types.Ed25519VerificationKey2020,
-					Controller:         did.Did,
-					PublicKeyMultibase: MustEncodeBase58(newKeyPair.Public),
+		BeforeEach(func() {
+			did = setup.CreateSimpleDid()
+			newKeyPair = GenerateKeyPair()
+			msg = &types.MsgUpdateDidPayload{
+				Id: did.Did,
+				VerificationMethod: []*types.VerificationMethod{
+					{
+						Id:                 did.KeyId,
+						Type:               types.Ed25519VerificationKey2020,
+						Controller:         did.Did,
+						PublicKeyMultibase: MustEncodeBase58(newKeyPair.Public),
+					},
 				},
-			},
-			VersionId: did.VersionId,
-		}
+				VersionId: did.VersionId,
+			}
+		})
 
-		signatures := []SignInput{
-			did.SignInput, // Old signature
-			{
-				VerificationMethodId: did.KeyId, // New signature
+		It("Works with two signatures", func() {
+			signatures := []SignInput{
+				did.SignInput, // Old signature
+				{
+					VerificationMethodId: did.KeyId, // New signature
+					Key:                  newKeyPair.Private,
+				},
+			}
+
+			_, err := setup.UpdateDid(msg, signatures)
+			Expect(err).To(BeNil())
+
+			// check
+			created, err := setup.QueryDid(did.Did)
+			Expect(err).To(BeNil())
+			Expect(msg.ToDid()).To(Equal(*created.Did))
+		})
+
+		It("Doesn't work without new signature", func() {
+			signatures := []SignInput{did.SignInput}
+
+			_, err := setup.UpdateDid(msg, signatures)
+			Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("there should be at least one valid signature by %s (new version): invalid signature detected", did.Did)))
+		})
+
+		It("Doesn't work without old signature", func() {
+			signatures := []SignInput{{
+				VerificationMethodId: did.KeyId,
 				Key:                  newKeyPair.Private,
-			},
-		}
+			}}
 
-		_, err := setup.UpdateDid(msg, signatures)
-		Expect(err).To(BeNil())
-
-		// check
-		created, err := setup.QueryDid(did.Did)
-		Expect(err).To(BeNil())
-		Expect(msg.ToDid()).To(Equal(*created.Did))
+			_, err := setup.UpdateDid(msg, signatures)
+			Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("there should be at least one valid signature by %s (old version): invalid signature detected", did.Did)))
+		})
 	})
 
 	It("Not Valid: Did doc update does not work without DID doc controllers signature", func() {
@@ -353,80 +374,80 @@ var _ = Describe("Update DID tests", func() {
 		Expect(*created).ToNot(Equal(msg.ToDid()))
 	})
 
-	It("Not Valid: Adding another verification method without new sign", func() {
-		// Setup
-		alice := setup.CreateSimpleDid()
+	// It("Not Valid: Adding another verification method without new sign", func() {
+	// 	// Setup
+	// 	alice := setup.CreateSimpleDid()
 
-		// Update did
-		newKeyId := alice.Did + "#key-2"
-		newKey := GenerateKeyPair()
+	// 	// Update did
+	// 	newKeyId := alice.Did + "#key-2"
+	// 	newKey := GenerateKeyPair()
 
-		msg := &types.MsgUpdateDidPayload{
-			Id: alice.Did,
-			VerificationMethod: []*types.VerificationMethod{
-				{
-					Id:                 alice.KeyId,
-					Type:               types.Ed25519VerificationKey2020,
-					Controller:         alice.Did,
-					PublicKeyMultibase: MustEncodeBase58(alice.KeyPair.Public),
-				},
-				{
-					Id:                 newKeyId,
-					Type:               types.Ed25519VerificationKey2020,
-					Controller:         alice.Did,
-					PublicKeyMultibase: MustEncodeBase58(newKey.Public),
-				},
-			},
-			Authentication: []string{alice.KeyId},
-			VersionId:      alice.VersionId,
-		}
+	// 	msg := &types.MsgUpdateDidPayload{
+	// 		Id: alice.Did,
+	// 		VerificationMethod: []*types.VerificationMethod{
+	// 			{
+	// 				Id:                 alice.KeyId,
+	// 				Type:               types.Ed25519VerificationKey2020,
+	// 				Controller:         alice.Did,
+	// 				PublicKeyMultibase: MustEncodeBase58(alice.KeyPair.Public),
+	// 			},
+	// 			{
+	// 				Id:                 newKeyId,
+	// 				Type:               types.Ed25519VerificationKey2020,
+	// 				Controller:         alice.Did,
+	// 				PublicKeyMultibase: MustEncodeBase58(newKey.Public),
+	// 			},
+	// 		},
+	// 		Authentication: []string{alice.KeyId},
+	// 		VersionId:      alice.VersionId,
+	// 	}
 
-		signatures := []SignInput{
-			alice.SignInput,
-		}
+	// 	signatures := []SignInput{
+	// 		alice.SignInput,
+	// 	}
 
-		_, err := setup.UpdateDid(msg, signatures)
-		Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", BobDID)))
-	})
+	// 	_, err := setup.UpdateDid(msg, signatures)
+	// 	Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", BobDID)))
+	// })
 
-	It("Not Valid: Adding another verification method without old sign", func() {
-		// Setup
-		alice := setup.CreateSimpleDid()
+	// It("Not Valid: Adding another verification method without old sign", func() {
+	// 	// Setup
+	// 	alice := setup.CreateSimpleDid()
 
-		// Update did
-		newKeyId := alice.Did + "#key-2"
-		newKey := GenerateKeyPair()
+	// 	// Update did
+	// 	newKeyId := alice.Did + "#key-2"
+	// 	newKey := GenerateKeyPair()
 
-		msg := &types.MsgUpdateDidPayload{
-			Id: alice.Did,
-			VerificationMethod: []*types.VerificationMethod{
-				{
-					Id:                 alice.KeyId,
-					Type:               types.Ed25519VerificationKey2020,
-					Controller:         alice.Did,
-					PublicKeyMultibase: MustEncodeBase58(alice.KeyPair.Public),
-				},
-				{
-					Id:                 newKeyId,
-					Type:               types.Ed25519VerificationKey2020,
-					Controller:         alice.Did,
-					PublicKeyMultibase: MustEncodeBase58(newKey.Public),
-				},
-			},
-			Authentication: []string{alice.KeyId},
-			VersionId:      alice.VersionId,
-		}
+	// 	msg := &types.MsgUpdateDidPayload{
+	// 		Id: alice.Did,
+	// 		VerificationMethod: []*types.VerificationMethod{
+	// 			{
+	// 				Id:                 alice.KeyId,
+	// 				Type:               types.Ed25519VerificationKey2020,
+	// 				Controller:         alice.Did,
+	// 				PublicKeyMultibase: MustEncodeBase58(alice.KeyPair.Public),
+	// 			},
+	// 			{
+	// 				Id:                 newKeyId,
+	// 				Type:               types.Ed25519VerificationKey2020,
+	// 				Controller:         alice.Did,
+	// 				PublicKeyMultibase: MustEncodeBase58(newKey.Public),
+	// 			},
+	// 		},
+	// 		Authentication: []string{alice.KeyId},
+	// 		VersionId:      alice.VersionId,
+	// 	}
 
-		signatures := []SignInput{
-			{
-				VerificationMethodId: newKeyId,
-				Key:                  newKey.Private,
-			},
-		}
+	// 	signatures := []SignInput{
+	// 		{
+	// 			VerificationMethodId: newKeyId,
+	// 			Key:                  newKey.Private,
+	// 		},
+	// 	}
 
-		_, err := setup.UpdateDid(msg, signatures)
-		Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("there should be at least one valid signature by %s (old version): invalid signature detected", AliceDID)))
-	})
+	// 	_, err := setup.UpdateDid(msg, signatures)
+	// 	Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("there should be at least one valid signature by %s (old version): invalid signature detected", AliceDID)))
+	// })
 
 	// // Controller's tests
 	// // cases:
