@@ -48,12 +48,13 @@ func (d *DeepCopyCreateResource) DeepCopy(src resourcetypes.MsgCreateResource) r
 
 // TODO: Add generics after bumping to Go 1.18 and remove this workaround.
 func deepCopy(src interface{}) interface{} {
-	var dst, reflection reflect.Value
+	var reflection interface{}
+	var dst reflect.Value
 
 	switch actualSrc := (src).(type) {
 	case cheqdtypes.MsgCreateDidPayload:
 		// Create a reflection slice of the same length as the source slice
-		reflection = reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(actualSrc)), 1, 1)
+		reflection = reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(actualSrc)), 1, 1).Interface()
 		// Extract destination value as definition
 		dst = reflect.ValueOf(reflection)
 		// Define source value as slice
@@ -64,7 +65,7 @@ func deepCopy(src interface{}) interface{} {
 		return dst.Index(0).Interface().(cheqdtypes.MsgCreateDidPayload)
 	case cheqdtypes.MsgUpdateDidPayload:
 		// Create a reflection slice of the same length as the source slice
-		reflection = reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(actualSrc)), 1, 1)
+		reflection = reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(actualSrc)), 1, 1).Interface()
 		// Extract destination value as definition
 		dst = reflect.ValueOf(reflection)
 		// Define source value as slice
@@ -75,7 +76,7 @@ func deepCopy(src interface{}) interface{} {
 		return dst.Index(0).Interface().(cheqdtypes.MsgUpdateDidPayload)
 	case resourcetypes.MsgCreateResource:
 		// Create a reflection slice of the same length as the source slice
-		reflection = reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(actualSrc)), 1, 1)
+		reflection = reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(actualSrc)), 1, 1).Interface()
 		// Extract destination value as definition
 		dst = reflect.ValueOf(reflection)
 		// Define source value as slice
