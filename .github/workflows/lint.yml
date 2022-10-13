@@ -80,9 +80,10 @@ jobs:
         VALIDATE_PYTHON_PYLINT: true
         VALIDATE_XML: true
         VALIDATE_YAML: true
+        VALIDATE_PROTOBUF: true
 
   lint-protos:
-    name: "Lint proto files"
+    name: "Proto files"
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
