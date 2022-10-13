@@ -176,7 +176,7 @@ var _ = Describe("cheqd cli negative", func() {
 
 		res, err := cli.CreateDid(payload, signInputs, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(BeNil())
-		Expect(res.Code).To(Equal(0))
+		Expect(res.Code).To(BeEquivalentTo(0))
 
 		// Update the DID Doc
 		updatedPayload := types.MsgUpdateDidPayload{
@@ -196,7 +196,7 @@ var _ = Describe("cheqd cli negative", func() {
 
 		res, err = cli.UpdateDid(updatedPayload, signInputs, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(BeNil())
-		Expect(res.Code).To(Equal(0))
+		Expect(res.Code).To(BeEquivalentTo(0))
 
 		// Generate second controller
 		did2 := "did:cheqd:" + network.DID_NAMESPACE + ":" + uuid.NewString()
@@ -231,7 +231,7 @@ var _ = Describe("cheqd cli negative", func() {
 
 		res_, err := cli.CreateDid(payload2, signInputs2, testdata.BASE_ACCOUNT_2)
 		Expect(err).To(BeNil())
-		Expect(res_.Code).To(Equal(0))
+		Expect(res_.Code).To(BeEquivalentTo(0))
 
 		// Extra fuzzed sign inputs
 		//   a. first sign input
@@ -242,7 +242,7 @@ var _ = Describe("cheqd cli negative", func() {
 
 		//	   ii. fuzzed private key, invalid and non-matching
 		privKeyFuzzedExtra := testdata.GenerateByteEntropy()
-		Expect(len(privKeyFuzzedExtra)).NotTo(Equal(len(privKeyFuzzed)))
+		Expect(len(privKeyFuzzedExtra)).NotTo(BeEquivalentTo(len(privKeyFuzzed)))
 
 		//   b. second sign input
 		//	   i. fresh keys
@@ -252,7 +252,7 @@ var _ = Describe("cheqd cli negative", func() {
 
 		//	   ii. fuzzed private key, invalid and non-matching
 		privKeyFuzzedExtra2 := testdata.GenerateByteEntropy()
-		Expect(len(privKeyFuzzedExtra2)).NotTo(Equal(len(privKeyFuzzed2)))
+		Expect(len(privKeyFuzzedExtra2)).NotTo(BeEquivalentTo(len(privKeyFuzzed2)))
 
 		signInputsFuzzed := []cli_types.SignInput{
 			{
@@ -372,7 +372,7 @@ var _ = Describe("cheqd cli negative", func() {
 		// Finally, update the DID Doc
 		res, err = cli.UpdateDid(followingUpdatedPayload, signInputsAugmented, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(BeNil())
-		Expect(res.Code).To(Equal(0))
+		Expect(res.Code).To(BeEquivalentTo(0))
 
 		// Fail to update the DID Doc with an unchanged payload
 		_, err = cli.UpdateDid(followingUpdatedPayload, signInputsAugmented, testdata.BASE_ACCOUNT_1)
