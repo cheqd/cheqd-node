@@ -9,6 +9,7 @@ import (
 	"github.com/cheqd/cheqd-node/tests/integration/network"
 	"github.com/cheqd/cheqd-node/tests/integration/testdata"
 	cli_types "github.com/cheqd/cheqd-node/x/cheqd/client/cli"
+	helpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/google/uuid"
 	"github.com/multiformats/go-multibase"
@@ -275,7 +276,7 @@ var _ = Describe("cheqd cli negative", func() {
 		}
 
 		// Following valid DID Doc to be updated
-		followingUpdatedPayload := updatedPayload
+		followingUpdatedPayload := helpers.DeepCopy(updatedPayload)
 		followingUpdatedPayload.Controller = []string{did, did2}
 		followingUpdatedPayload.VerificationMethod = append(followingUpdatedPayload.VerificationMethod, &types.VerificationMethod{
 			Id:                 keyId2AsExtraController,
@@ -368,14 +369,15 @@ var _ = Describe("cheqd cli negative", func() {
 		Expect(err).ToNot(BeNil())
 
 		// Fail to update the DID Doc with a non-supported VM type
-		invalidVmTypePayload := followingUpdatedPayload
+		invalidVmTypePayload := helpers.DeepCopy(followingUpdatedPayload)
 		invalidVmTypePayload.VerificationMethod[1].Type = "NonSupportedVMType"
+		invalidVmTypePayload.VerificationMethod[1].PublicKeyMultibase = ""
 		_, err = cli.UpdateDid(invalidVmTypePayload, signInputsAugmented, testdata.BASE_ACCOUNT_1)
 		Expect(err).ToNot(BeNil())
 
 		// Fail to update a non-existing DID Doc
 		nonExistingDid := "did:cheqd:" + network.DID_NAMESPACE + ":" + uuid.NewString()
-		nonExistingDidPayload := followingUpdatedPayload
+		nonExistingDidPayload := helpers.DeepCopy(followingUpdatedPayload)
 		nonExistingDidPayload.Id = nonExistingDid
 		_, err = cli.UpdateDid(nonExistingDidPayload, signInputsAugmented, testdata.BASE_ACCOUNT_1)
 		Expect(err).ToNot(BeNil())
