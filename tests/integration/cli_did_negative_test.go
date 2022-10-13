@@ -289,7 +289,6 @@ var _ = Describe("cheqd cli negative", func() {
 		followingUpdatedPayload.Authentication = append(followingUpdatedPayload.Authentication, keyId2AsExtraController)
 		followingUpdatedPayload.CapabilityDelegation = []string{keyId}
 		followingUpdatedPayload.CapabilityInvocation = []string{keyId}
-		followingUpdatedPayload.VersionId = res.TxHash
 
 		signInputsAugmented := append(signInputs, signInputs2AsExtraController...)
 
@@ -375,8 +374,15 @@ var _ = Describe("cheqd cli negative", func() {
 
 		// Fail to update the DID Doc with a non-supported VM type
 		invalidVmTypePayload := deepCopierUpdateDid.DeepCopy(followingUpdatedPayload)
-		invalidVmTypePayload.VerificationMethod[1].Type = "NonSupportedVMType"
-		invalidVmTypePayload.VerificationMethod[1].PublicKeyMultibase = ""
+		invalidVmTypePayload.VerificationMethod = []*types.VerificationMethod{
+			followingUpdatedPayload.VerificationMethod[0],
+			{
+				Id: followingUpdatedPayload.VerificationMethod[1].Id,
+				Type: "NonSupportedVmType",
+				Controller: followingUpdatedPayload.VerificationMethod[1].Controller,
+				PublicKeyMultibase: "pretty-long-public-key-multibase",
+			},
+		}
 		_, err = cli.UpdateDid(invalidVmTypePayload, signInputsAugmented, testdata.BASE_ACCOUNT_1)
 		Expect(err).ToNot(BeNil())
 
