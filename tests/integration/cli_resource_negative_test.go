@@ -128,8 +128,6 @@ var _ = Describe("cheqd cli negative", func() {
 	It("Query Resource. Missing/wrong arguments", func() {
 		// *********************** Negative cases ***********************
 
-		// Create a new DID Doc
-
 		println("*********************** Query Resource negative cases start ***********************")
 
 		resourceId := uuid.NewString()
@@ -149,8 +147,6 @@ var _ = Describe("cheqd cli negative", func() {
 
 	It("QueryAllResourceVersions. Missing/wrong arguments", func() {
 		// *********************** Negative cases ***********************
-
-		// Create a new DID Doc
 
 		println("*********************** QueryAllResourceVersions negative cases start ***********************")
 
@@ -172,9 +168,7 @@ var _ = Describe("cheqd cli negative", func() {
 
 	It("QueryResourceCollection. Missing/wrong arguments", func() {
 		// *********************** Negative cases ***********************
-
-		// Create a new DID Doc
-
+		
 		println("*********************** QueryResourceCollection negative cases start ***********************")
 
 		collectionId = uuid.NewString()
