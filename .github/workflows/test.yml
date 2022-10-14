@@ -11,8 +11,8 @@ permissions:
   packages: read
 
 jobs:
-  ginkgo-tests:
-    name: "Ginkgo-based unit tests"
+  unit-tests:
+    name: "Unit Tests"
     runs-on: ubuntu-latest
 
     steps:
