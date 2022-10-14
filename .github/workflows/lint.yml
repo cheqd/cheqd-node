@@ -30,6 +30,7 @@ jobs:
         with:
           config-file: '.github/linters/mlc_config.json'
           use-quiet-mode: 'yes'
+          use-verbose-mode: 'yes'
   
   go-lint:
     # We can't use VALIDATE_GO from super linter because of this issue:
@@ -43,7 +44,6 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version-file: ./go.mod
-          cache: true
       
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v3
