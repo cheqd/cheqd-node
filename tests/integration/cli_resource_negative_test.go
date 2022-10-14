@@ -1,3 +1,4 @@
+//go:build integration
 package integration
 
 import (
@@ -16,10 +17,14 @@ import (
 )
 
 var _ = Describe("cheqd cli negative", func() {
-	collectionId := ""
+	var collectionId string
+	var did string
+	var signInputs []cli_types.SignInput
+	var resourceId string
+	var resourceName string
 
 	BeforeEach(func() {
-		collectionId := uuid.NewString()
+		collectionId = uuid.NewString()
 		did := "did:cheqd:" + network.DID_NAMESPACE + ":" + collectionId
 		keyId := did + "#key1"
 
@@ -42,7 +47,7 @@ var _ = Describe("cheqd cli negative", func() {
 			Authentication: []string{keyId},
 		}
 
-		signInputs := []cli_types.SignInput{
+		signInputs = []cli_types.SignInput{
 			{
 				VerificationMethodId: keyId,
 				PrivKey:              privKey,
@@ -52,128 +57,165 @@ var _ = Describe("cheqd cli negative", func() {
 		res, err := cli.CreateDid(payload, signInputs, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
+
+		// Initialize shared resourceId
+		resourceId = uuid.NewString()
+		resourceName = "TestName"
 	})
 
-	It("Create Resource. Cannot create resource missing arguments, wrong collectionId", func() {
-		// *********************** Negative cases ***********************
+	It("cannot create resource missing cli arguments, sign inputs mismatch, ", func() {
+		// Generate a new DID Doc
+		collectionId2 := uuid.NewString()
 
-		println("*********************** Create Resource negative cases start ***********************")
-
-		collectionId := uuid.NewString()
-		did := "did:cheqd:" + network.DID_NAMESPACE + ":" + collectionId
-		keyId := did + "#key1"
-
-		_, privKey, err := ed25519.GenerateKey(nil)
+		// Generate extra sign inputs
+		keyId2 := did + "#key2"
+		_, privKey2, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
-
-		signInputs := []cli_types.SignInput{
+		signInputs2 := []cli_types.SignInput{
 			{
-				VerificationMethodId: keyId,
-				PrivKey:              privKey,
+				VerificationMethodId: keyId2,
+				PrivKey:              privKey2,
 			},
 		}
 
-		// Create resource Resource with invalid DID
-		resourceId := uuid.NewString()
-		resourceName := "TestResource"
+		// Fail to create a resource in non-existing collection
+		resourceName = "TestResource"
 		resourceType := "TestType"
 		resourceFile, err := testdata.CreateTestJson(GinkgoT().TempDir())
 		Expect(err).To(BeNil())
 
-		// Wrong CollectionId
-		_, err = cli.CreateResource(collectionId, resourceId, resourceName, resourceType, resourceFile, signInputs, testdata.BASE_ACCOUNT_1)
+		_, err = cli.CreateResource(collectionId2, resourceId, resourceName, resourceType, resourceFile, signInputs, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(HaveOccurred())
 
-		// Missing
-		// "--collection-id", collectionId,
-		// "--resource-id", resourceId,
-		// "--resource-name", resourceName,
-		// "--resource-type", resourceType,
-		// "--resource-file", resourceFile,
-
-		// Missing collectionId
+		// Fail to create a resource with missing cli arguments
+		//   a. missing collection id
 		_, err = cli.CreateResource("", resourceId, resourceName, resourceType, resourceFile, signInputs, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(HaveOccurred())
 
-		// Missing resourceId
+		//  b. missing resource id
 		_, err = cli.CreateResource(collectionId, "", resourceName, resourceType, resourceFile, signInputs, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(HaveOccurred())
 
-		// Missing resourceName
+		// c. missing resource name
 		_, err = cli.CreateResource(collectionId, resourceId, "", resourceType, resourceFile, signInputs, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(HaveOccurred())
 
-		// Missing resourceType
+		// d. missing resource type
 		_, err = cli.CreateResource(collectionId, resourceId, resourceName, "", resourceFile, signInputs, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(HaveOccurred())
 
-		// Missing resourceFile
+		// e. missing resource file
 		_, err = cli.CreateResource(collectionId, resourceId, resourceName, resourceType, "", signInputs, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(HaveOccurred())
 
-		// Empty signInputs
+		// f. missing sign inputs
 		_, err = cli.CreateResource(collectionId, resourceId, resourceName, resourceType, resourceFile, []cli_types.SignInput{}, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(HaveOccurred())
 
-		// Missing from
+		// g. missing account
 		_, err = cli.CreateResource(collectionId, resourceId, resourceName, resourceType, resourceFile, signInputs, "")
 		Expect(err).To(HaveOccurred())
 
-		println("*********************** Create Resource negative cases finish ***********************")
+		// Fail to create a resource with sign inputs mismatch
+		//   a. sign inputs mismatch
+		_, err = cli.CreateResource(collectionId, resourceId, resourceName, resourceType, resourceFile, signInputs2, testdata.BASE_ACCOUNT_1)
+		Expect(err).To(HaveOccurred())
+
+		//   b. non-existing key id
+		_, err = cli.CreateResource(collectionId, resourceId, resourceName, resourceType, resourceFile, []cli_types.SignInput{
+			{
+				VerificationMethodId: "non-existing-key-id",
+				PrivKey:              signInputs[0].PrivKey,
+			},
+		}, testdata.BASE_ACCOUNT_1)
+		Expect(err).To(HaveOccurred())
+
+		//   c. non-matching private key
+		_, err = cli.CreateResource(collectionId, resourceId, resourceName, resourceType, resourceFile, []cli_types.SignInput{
+			{
+				VerificationMethodId: signInputs[0].VerificationMethodId,
+				PrivKey:              privKey2,
+			},
+		}, testdata.BASE_ACCOUNT_1)
+		Expect(err).To(HaveOccurred())
+
+		//   d. invalid private key
+		_, err = cli.CreateResource(collectionId, resourceId, resourceName, resourceType, resourceFile, []cli_types.SignInput{
+			{
+				VerificationMethodId: signInputs[0].VerificationMethodId,
+				PrivKey:              testdata.GenerateByteEntropy(),
+			},
+		}, testdata.BASE_ACCOUNT_1)
+		Expect(err).To(HaveOccurred())
+
+		// Finally, create the resource
+		res, err := cli.CreateResource(collectionId, resourceId, resourceName, resourceType, resourceFile, signInputs, testdata.BASE_ACCOUNT_1)
+		Expect(err).To(BeNil())
+		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 
-	It("Query Resource. Missing/wrong arguments", func() {
-		// *********************** Negative cases ***********************
+	It("cannot query a resource with missing cli arguments, non-existing collection, non-existing resource", func() {
+		collectionId2 := uuid.NewString()
+		resourceId2 := uuid.NewString()
 
-		println("*********************** Query Resource negative cases start ***********************")
-
-		resourceId := uuid.NewString()
-
-		// Unknown resourceId
-		_, err := cli.QueryResource(collectionId, resourceId)
+		// Fail to query a resource with missing cli arguments
+		//   a. missing collection id, resource id
+		_, err := cli.QueryResource("", "")
 		Expect(err).To(HaveOccurred())
 
-		collectionId = uuid.NewString()
-
-		// Unknown collectionId
-		_, err = cli.QueryResource(collectionId, resourceId)
+		//   b. missing collection id
+		_, err = cli.QueryResource("", resourceId2)
 		Expect(err).To(HaveOccurred())
 
-		println("*********************** Query Resource negative cases finish ***********************")
+		//   c. missing resource id
+		_, err = cli.QueryResource(collectionId2, "")
+		Expect(err).To(HaveOccurred())
+
+		// Fail to query a resource with non-existing collection id
+		_, err = cli.QueryResource(collectionId2, resourceId)
+		Expect(err).To(HaveOccurred())
+
+		// Fail to query a resource with non-existing resource id
+		_, err = cli.QueryResource(collectionId, resourceId2)
+		Expect(err).To(HaveOccurred())
 	})
 
-	It("QueryAllResourceVersions. Missing/wrong arguments", func() {
-		// *********************** Negative cases ***********************
+	It("cannot query all resource versions with missing cli arguments, non-existing collection, non-existing resource", func() {
+		collectionId2 := uuid.NewString()
+		resourceName2 := rand.Str(10)
 
-		println("*********************** QueryAllResourceVersions negative cases start ***********************")
-
-		resourceId := uuid.NewString()
-		resourceName := rand.Str(10)
-
-		// Unknown resourceName
-		_, err := cli.QueryAllResourceVersions(collectionId, resourceName)
+		// Fail to query all resource versions with missing cli arguments
+		//   a. missing collection id, resource name
+		_, err := cli.QueryAllResourceVersions("", "")
 		Expect(err).To(HaveOccurred())
 
-		collectionId = uuid.NewString()
-
-		// Unknown collectionId
-		_, err = cli.QueryResource(collectionId, resourceId)
+		//   b. missing collection id
+		_, err = cli.QueryAllResourceVersions("", resourceName)
 		Expect(err).To(HaveOccurred())
 
-		println("*********************** QueryAllResourceVersions negative cases finish ***********************")
+		//   c. missing resource name
+		_, err = cli.QueryAllResourceVersions(collectionId2, "")
+		Expect(err).To(HaveOccurred())
+
+		// Fail to query all resource versions with non-existing collection id
+		_, err = cli.QueryAllResourceVersions(collectionId2, resourceName)
+		Expect(err).To(HaveOccurred())
+
+		// Fail to query all resource versions with non-existing resource name
+		_, err = cli.QueryAllResourceVersions(collectionId, resourceName2)
+		Expect(err).To(HaveOccurred())
 	})
 
-	It("QueryResourceCollection. Missing/wrong arguments", func() {
-		// *********************** Negative cases ***********************
+	It("cannot query resource collection with missing cli arguments, non-existing collection id", func() {
+		collectionId2 := uuid.NewString()
 
-		println("*********************** QueryResourceCollection negative cases start ***********************")
-
-		collectionId = uuid.NewString()
-
-		// Unknown collectionId
-		_, err := cli.QueryResourceCollection(collectionId)
+		// Fail to query resource collection with missing cli arguments
+		//   a. missing collection id
+		_, err := cli.QueryResourceCollection("")
 		Expect(err).To(HaveOccurred())
 
-		println("*********************** QueryResourceCollection negative cases finish ***********************")
+		// Fail to query resource collection with non-existing collection id
+		_, err = cli.QueryResourceCollection(collectionId2)
+		Expect(err).To(HaveOccurred())
 	})
 })

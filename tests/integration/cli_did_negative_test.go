@@ -18,7 +18,7 @@ import (
 )
 
 var _ = Describe("cheqd cli negative", func() {
-	It("cannot create diddoc with missing arguments, sign inputs mismatch, non-supported VM type, already existing did", func() {
+	It("cannot create diddoc with missing cli arguments, sign inputs mismatch, non-supported VM type, already existing did", func() {
 		// Define a valid new DID Doc
 		did := "did:cheqd:" + network.DID_NAMESPACE + ":" + uuid.NewString()
 		keyId := did + "#key1"
@@ -390,5 +390,17 @@ var _ = Describe("cheqd cli negative", func() {
 		// Fail to update the DID Doc with an unchanged payload
 		_, err = cli.UpdateDid(followingUpdatedPayload, signInputsAugmented, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(BeNil()) // TODO: Decide if this should be an error, if the DID Doc is unchanged
+	})
+
+	It("cannot query a diddoc with missing cli arguments, non-existing diddoc", func() {
+		// Fail to query the DID Doc with missing cli arguments
+		//   a. missing did
+		_, err := cli.QueryDid("")
+		Expect(err).ToNot(BeNil())
+
+		// Fail to query a non-existing DID Doc
+		nonExistingDid := "did:cheqd:" + network.DID_NAMESPACE + ":" + uuid.NewString()
+		_, err = cli.QueryDid(nonExistingDid)
+		Expect(err).ToNot(BeNil())
 	})
 })
