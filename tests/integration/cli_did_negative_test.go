@@ -4,7 +4,6 @@ package integration
 
 import (
 	"crypto/ed25519"
-	"fmt"
 
 	"github.com/cheqd/cheqd-node/tests/integration/cli"
 	helpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
@@ -205,7 +204,7 @@ var _ = Describe("cheqd cli negative", func() {
 		// Generate second controller
 		did2 := "did:cheqd:" + network.DID_NAMESPACE + ":" + uuid.NewString()
 		keyId2 := did2 + "#key1"
-		keyId2AsExtraController := did + "#key2"
+		keyId2AsExtraController := did2 + "#key1"
 
 		pubKey2, privKey2, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
@@ -230,13 +229,6 @@ var _ = Describe("cheqd cli negative", func() {
 		signInputs2 := []cli_types.SignInput{
 			{
 				VerificationMethodId: keyId2,
-				PrivKey:              privKey2,
-			},
-		}
-
-		signInputs2AsExtraController := []cli_types.SignInput{
-			{
-				VerificationMethodId: keyId2AsExtraController,
 				PrivKey:              privKey2,
 			},
 		}
@@ -290,10 +282,7 @@ var _ = Describe("cheqd cli negative", func() {
 		followingUpdatedPayload.CapabilityDelegation = []string{keyId}
 		followingUpdatedPayload.CapabilityInvocation = []string{keyId}
 
-		signInputsAugmented := append(signInputs, signInputs2AsExtraController...)
-
-		fmt.Println("updatedPayload", updatedPayload)
-		fmt.Println("followingUpdatedPayload", followingUpdatedPayload)
+		signInputsAugmented := append(signInputs, signInputs2...)
 
 		// Fail to update the DID Doc with missing cli arguments
 		//   a. missing payload, sign inputs and account
@@ -386,18 +375,12 @@ var _ = Describe("cheqd cli negative", func() {
 		_, err = cli.UpdateDid(invalidVmTypePayload, signInputsAugmented, testdata.BASE_ACCOUNT_1)
 		Expect(err).ToNot(BeNil())
 
-		fmt.Println("followingUpdatedPayload", followingUpdatedPayload)
-		fmt.Println("invalidVmTypePayload", invalidVmTypePayload)
-
 		// Fail to update a non-existing DID Doc
 		nonExistingDid := "did:cheqd:" + network.DID_NAMESPACE + ":" + uuid.NewString()
 		nonExistingDidPayload := deepCopierUpdateDid.DeepCopy(followingUpdatedPayload)
 		nonExistingDidPayload.Id = nonExistingDid
 		_, err = cli.UpdateDid(nonExistingDidPayload, signInputsAugmented, testdata.BASE_ACCOUNT_1)
 		Expect(err).ToNot(BeNil())
-
-		fmt.Println("followingUpdatedPayload", followingUpdatedPayload)
-		fmt.Println("nonExistingDidPayload", nonExistingDidPayload)
 
 		// Finally, update the DID Doc
 		res, err = cli.UpdateDid(followingUpdatedPayload, signInputsAugmented, testdata.BASE_ACCOUNT_1)
