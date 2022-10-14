@@ -6,7 +6,7 @@ require (
 	filippo.io/edwards25519 v1.0.0-beta.2
 	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce
 	github.com/cosmos/cosmos-sdk v0.45.5
-	github.com/cosmos/ibc-go/v3 v3.1.1
+	github.com/cosmos/ibc-go/v3 v3.1.0
 	github.com/gabriel-vasile/mimetype v1.4.1
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/gogo/protobuf v1.3.3
