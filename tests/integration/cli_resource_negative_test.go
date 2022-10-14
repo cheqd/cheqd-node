@@ -202,8 +202,9 @@ var _ = Describe("cheqd cli negative", func() {
 		Expect(err).To(HaveOccurred())
 
 		// Fail to query all resource versions with non-existing resource name
-		_, err = cli.QueryAllResourceVersions(collectionId, resourceName2)
-		Expect(err).To(HaveOccurred())
+		res, err := cli.QueryAllResourceVersions(collectionId, resourceName2)
+		Expect(err).To(BeNil())
+		Expect(len(res.Resources)).To(BeEquivalentTo(0))
 	})
 
 	It("cannot query resource collection with missing cli arguments, non-existing collection id", func() {
