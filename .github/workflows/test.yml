@@ -25,15 +25,13 @@ jobs:
 
       - name: Install ginkgo
         run: |
-          go install -mod=mod github.com/onsi/ginkgo/v2/ginkgo
+          go get github.com/onsi/ginkgo/v2/ginkgo
           go get github.com/onsi/gomega/...
-          go install github.com/jstemmer/go-junit-report/v2@latest
-          go mod tidy
 
       - name: Run Ginkgo tests
         run: ginkgo -r --race --randomize-all --randomize-suites --junit-report report.xml
 
-      - uses: mikepenz/action-junit-report@v3
-        if: success() || failure()        # run this step even if previous step failed
-        with:
-          report_paths: 'report.xml'
+      # - uses: mikepenz/action-junit-report@v3
+      #   if: success() || failure()        # run this step even if previous step failed
+      #   with:
+      #     report_paths: 'report.xml'
