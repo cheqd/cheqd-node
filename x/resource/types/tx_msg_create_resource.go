@@ -28,7 +28,7 @@ func (msg *MsgCreateResource) GetSigners() []sdk.AccAddress {
 }
 
 func (msg *MsgCreateResource) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
+	bz := ModuleCdc.MustMarshal(msg)
 	return sdk.MustSortJSON(bz)
 }
 
