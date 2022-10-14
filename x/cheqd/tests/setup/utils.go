@@ -1,4 +1,4 @@
-package tests
+package setup
 
 import (
 	"crypto/ed25519"
@@ -41,28 +41,6 @@ func GenerateDID(idtype IDType) string {
 	default:
 		panic("Unknown ID type")
 	}
-}
-
-func GenerateTestKeys() map[string]KeyPair {
-	return map[string]KeyPair{
-		AliceKey1:    GenerateKeyPair(),
-		AliceKey2:    GenerateKeyPair(),
-		BobKey1:      GenerateKeyPair(),
-		BobKey2:      GenerateKeyPair(),
-		BobKey3:      GenerateKeyPair(),
-		BobKey4:      GenerateKeyPair(),
-		CharlieKey1:  GenerateKeyPair(),
-		CharlieKey2:  GenerateKeyPair(),
-		CharlieKey3:  GenerateKeyPair(),
-		ImposterKey1: GenerateKeyPair(),
-	}
-}
-
-func InitEnv(keys map[string]KeyPair) TestSetup {
-	setup := Setup()
-	err := setup.CreateTestDIDs(keys)
-	Expect(err).To(BeNil())
-	return setup
 }
 
 func GenerateKeyPair() KeyPair {

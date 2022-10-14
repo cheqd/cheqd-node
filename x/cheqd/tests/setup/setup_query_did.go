@@ -1,4 +1,4 @@
-package tests
+package setup
 
 import "github.com/cheqd/cheqd-node/x/cheqd/types"
 

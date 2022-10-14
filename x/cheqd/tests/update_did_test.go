@@ -3,6 +3,8 @@ package tests
 import (
 	"fmt"
 
+	. "github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 

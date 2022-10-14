@@ -1,4 +1,4 @@
-package tests
+package setup
 
 import (
 	"crypto/ed25519"

@@ -3,14 +3,17 @@ package tests
 import (
 	"fmt"
 
+	. "github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	"github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 )
 
 var _ = Describe("Create DID tests", func() {
-	var setup TestSetup
+	var setup setup.TestSetup
 
 	BeforeEach(func() {
 		setup = Setup()
