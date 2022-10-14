@@ -16,9 +16,9 @@ import (
 )
 
 var _ = Describe("cheqd cli negative", func() {
-	var collectionId = ""
+	collectionId := ""
 
-	BeforeEach( func ()  {
+	BeforeEach(func() {
 		collectionId := uuid.NewString()
 		did := "did:cheqd:" + network.DID_NAMESPACE + ":" + collectionId
 		keyId := did + "#key1"
@@ -73,8 +73,6 @@ var _ = Describe("cheqd cli negative", func() {
 			},
 		}
 
-
-
 		// Create resource Resource with invalid DID
 		resourceId := uuid.NewString()
 		resourceName := "TestResource"
@@ -86,7 +84,7 @@ var _ = Describe("cheqd cli negative", func() {
 		_, err = cli.CreateResource(collectionId, resourceId, resourceName, resourceType, resourceFile, signInputs, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(HaveOccurred())
 
-		// Missing 
+		// Missing
 		// "--collection-id", collectionId,
 		// "--resource-id", resourceId,
 		// "--resource-name", resourceName,
@@ -123,7 +121,6 @@ var _ = Describe("cheqd cli negative", func() {
 
 		println("*********************** Create Resource negative cases finish ***********************")
 	})
-
 
 	It("Query Resource. Missing/wrong arguments", func() {
 		// *********************** Negative cases ***********************
@@ -168,7 +165,7 @@ var _ = Describe("cheqd cli negative", func() {
 
 	It("QueryResourceCollection. Missing/wrong arguments", func() {
 		// *********************** Negative cases ***********************
-		
+
 		println("*********************** QueryResourceCollection negative cases start ***********************")
 
 		collectionId = uuid.NewString()
