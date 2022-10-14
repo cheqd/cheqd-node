@@ -59,7 +59,25 @@ jobs:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0 # Required to fetch version
-    
+
+  proto-lint:
+    name: "Protobuf"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      # Install the `buf` CLI
+      - uses: bufbuild/buf-setup-action@v1.8.0
+      
+      # Lint
+      - uses: bufbuild/buf-lint-action@v1
+      
+      # Breaking change detection
+      - uses: bufbuild/buf-breaking-action@v1
+        with:
+          input: 'proto'
+          against: 'https://github.com/cheqd/cheqd-node.git#branch=main,ref=HEAD~1,subdir=proto'
+
     - name: Run Super Linter
       uses: github/super-linter/slim@v4
       env:
@@ -80,20 +98,3 @@ jobs:
         VALIDATE_PYTHON_PYLINT: true
         VALIDATE_XML: true
         VALIDATE_YAML: true
-
-  lint-protos:
-    name: "Proto files"
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-      
-      # Install the `buf` CLI
-      - uses: bufbuild/buf-setup-action@v1
-      
-      # Lint
-      - uses: bufbuild/buf-lint-action@v1
-      
-      # Breacking change detection
-      - uses: bufbuild/buf-breaking-action@v1
-        with:
-          against: 'https://github.com/cheqd/cheqd-node.git#branch=main'
