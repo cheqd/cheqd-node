@@ -26,6 +26,7 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version-file: ./go.mod
+          cache: true
 
       # Node.js setup is needed to run Semantic Release
       - uses: actions/setup-node@v3
@@ -78,16 +79,14 @@ jobs:
     name: "Docker image"
     needs: release-binary
     runs-on: ubuntu-latest
-    
+    env:
+      IMAGE_NAME: ${{ github.repository }}
+
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # Required to fetch version
           persist-credentials: false
-
-      - uses: actions/setup-go@v3
-        with:
-          go-version-file: ./go.mod
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -111,6 +110,8 @@ jobs:
             latest=auto
           tags: |
             type=semver,pattern={{version}},value=${{ needs.release-binary.outputs.RELEASE_VERSION }}
+            type=raw,value=production-latest
+            type=sha,format=long
           labels: |
             org.opencontainers.image.vendor="Cheqd Foundation Limited"
             org.opencontainers.image.created={{date 'dddd, MMMM Do YYYY, h:mm:ss a'}}
@@ -125,3 +126,5 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+                    cache-from: type=gha
+          cache-to: type=gha,mode=max
