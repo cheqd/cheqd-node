@@ -13,6 +13,9 @@ deps:
 breaking:
   use:
     - FILE
+  ignore:
+    - cheqd/v1
+    - resource/v1
 
 lint:
   ignore:
