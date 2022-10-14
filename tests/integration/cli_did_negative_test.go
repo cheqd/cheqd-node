@@ -204,7 +204,7 @@ var _ = Describe("cheqd cli negative", func() {
 		// Generate second controller
 		did2 := "did:cheqd:" + network.DID_NAMESPACE + ":" + uuid.NewString()
 		keyId2 := did2 + "#key1"
-		keyId2AsExtraController := did2 + "#key1"
+		keyId2AsExtraController := did + "#key2"
 
 		pubKey2, privKey2, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
