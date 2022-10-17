@@ -143,8 +143,14 @@ require (
 )
 
 replace (
+	// Dragonberry fix
+	github.com/confio/ics23/go => github.com/cosmos/cosmos-sdk/ics23/go v0.8.0
+
 	// Fix upstream GHSA-h395-qcrw-5vmq vulnerability.
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.7.0
+
+	// Fee payer support
+	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.45.9-cheqd-tag
 
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/tecbot/gorocksdb => github.com/cosmos/gorocksdb v1.2.0
