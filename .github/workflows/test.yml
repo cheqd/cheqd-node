@@ -1,16 +1,5 @@
 name: "Test"
 on:
-  pull_request_target:
-    branches:
-      - main
-      - develop
-    types:
-      - opened
-      - reopened
-      - edited
-      - synchronize
-      - ready_for_review
-      - review_requested
   workflow_call:
 defaults:
   run:
