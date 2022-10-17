@@ -62,7 +62,6 @@ func minGasPricesCmd(defaultNodeHome string) *cobra.Command {
 
 			return updateCosmConfig(clientCtx.HomeDir, func(config *cosmcfg.Config) {
 				config.MinGasPrices = args[0]
-				config.IAVLDisableFastNode = false
 			})
 		},
 	}
