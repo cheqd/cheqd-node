@@ -479,6 +479,7 @@ class Installer():
             # Remove cosmovisor artifacts...
             self.remove_safe("CHANGELOG.md")
             self.remove_safe("README.md")
+            self.remove_safe("LICENSE")
             self.mkdir_p(self.cosmovisor_root_dir)
             self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis"))
             self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis/bin"))
@@ -495,6 +496,7 @@ class Installer():
             self.log(f"Moving binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
             self.exec("sudo mv {} {}".format(self.binary_path, self.cosmovisor_cheqd_bin_path))
             self.exec("sudo chown {} {}".format(f'{DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}', f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
+            self.exec("sudo chmod +x {}".format(f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
 
             if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
                 self.log(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
