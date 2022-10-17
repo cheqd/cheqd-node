@@ -16,16 +16,16 @@ jobs:
     needs: call-lint
     uses: cheqd/cheqd-node/.github/workflows/build.yml@develop
   
-  # call-test:
-  #   name: "Test"
-  #   needs: call-build
-  #   uses: ./.github/workflows/test.yml
-  #   secrets: inherit
+  call-test:
+    name: "Test"
+    needs: call-build
+    uses: cheqd/cheqd-node/.github/workflows/test.yml@develop
+    secrets: inherit
 
   call-release:
     name: "Release"
-    # needs: call-test
-    needs: call-build
+    needs: call-test
+    # needs: call-build
     if: ${{ github.ref_protected == true }}
     uses: cheqd/cheqd-node/.github/workflows/release.yml@develop
     secrets: inherit
