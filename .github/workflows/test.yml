@@ -4,14 +4,15 @@ on:
 defaults:
   run:
     shell: bash
+env:
+  NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/docker/localnet/network-config"
 permissions:
-  id-token: write
   contents: write
-  checks: write
+  packages: read
 
 jobs:
   unit-tests:
-    name: "Unit tests"
+    name: "Unit Tests"
     runs-on: ubuntu-latest
 
     steps:
