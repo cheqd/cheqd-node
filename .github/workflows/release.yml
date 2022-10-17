@@ -1,6 +1,8 @@
 name: "Release"
 on:
-  workflow_call:
+  push:
+    tags:
+      - "0.**"
 defaults:
   run:
     shell: bash
@@ -14,8 +16,6 @@ jobs:
   release-binary:
     name: "Node binary"
     runs-on: ubuntu-latest
-    outputs:
-      RELEASE_VERSION: ${{ steps.set-version.outputs.RELEASE_VERSION }}
     
     steps:
       - uses: actions/checkout@v3
@@ -28,32 +28,6 @@ jobs:
           go-version-file: ./go.mod
           cache: true
 
-      # Node.js setup is needed to run Semantic Release
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
-
-      # Setup for pushing to Buf.build later
-      - uses: bufbuild/buf-setup-action@v1.8.0
-
-      # Required for short-lived token provided to Semantic Release
-      - name: "Obtain Github App token"
-        id: app-token
-        uses: getsentry/action-github-app-token@v1.0.6
-        with:
-          app_id: ${{ secrets.BOT_APP_ID }}
-          private_key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
-
-      - name: "Install Semantic Release dependencies"
-        run: npm ci
-
-      - name: "Execute Semantic Release"
-        run: npx semantic-release
-        env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v3
         with:
@@ -63,21 +37,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set release version number
-        id: set-version
-        run: |
-          RELEASE_VERSION=$( git describe --tags ${{ github.sha }})
-          echo ::set-output name=RELEASE_VERSION::"$RELEASE_VERSION"
-
-      # Push Protobufs to Buf.build registry
-      - uses: bufbuild/buf-push-action@v1
-        with:
-          input: proto
-          buf_token: ${{ secrets.BUF_TOKEN }}
-
   release-docker:
     name: "Docker image"
-    needs: release-binary
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: ${{ github.repository }}

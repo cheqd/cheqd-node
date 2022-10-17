@@ -149,3 +149,5 @@ replace (
 	github.com/tecbot/gorocksdb => github.com/cosmos/gorocksdb v1.2.0
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 )
+
+replace github.com/confio/ics23/go => ./ics23/
