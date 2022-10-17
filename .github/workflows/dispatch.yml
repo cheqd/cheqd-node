@@ -21,6 +21,7 @@ jobs:
     name: "Test"
     needs: call-build
     uses: ./.github/workflows/test.yml
+    secrets: inherit
 
  call-release:
     name: "Release"
