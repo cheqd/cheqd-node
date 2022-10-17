@@ -44,7 +44,6 @@ func (s *TestSetup) BuildSimpleResource(collectionId, data, name, _type string) 
 func (s *TestSetup) CreateSimpleResource(collectionId, data, name, _type string, signInputs []setup.SignInput) *types.MsgCreateResourceResponse {
 	resource := s.BuildSimpleResource(collectionId, data, name, _type)
 	res, err := s.CreateResource(&resource, signInputs)
-
 	if err != nil {
 		panic(err)
 	}
