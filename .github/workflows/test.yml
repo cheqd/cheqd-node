@@ -34,9 +34,9 @@ jobs:
           cache: true
 
       - name: Install ginkgo
+        working-directory: ./..
         run: |
-          go install -mod=mod github.com/onsi/ginkgo/v2/ginkgo
-          go get github.com/onsi/gomega/...
+          go install github.com/onsi/ginkgo/v2/ginkgo@latest
           go install github.com/jstemmer/go-junit-report/v2@latest
 
       - name: Run Ginkgo tests
