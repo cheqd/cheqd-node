@@ -17,11 +17,12 @@ type SignInput struct {
 }
 
 type DidInfo struct {
-	Msg       *types.MsgCreateDidPayload
-	Did       string
-	KeyPair   KeyPair
-	KeyId     string
-	SignInput SignInput
+	Msg          *types.MsgCreateDidPayload
+	Did          string
+	CollectionId string
+	KeyPair      KeyPair
+	KeyId        string
+	SignInput    SignInput
 }
 
 type CreatedDidInfo struct {

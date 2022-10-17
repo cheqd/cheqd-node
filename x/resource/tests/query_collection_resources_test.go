@@ -1,69 +1,42 @@
 package tests
 
 import (
-	"crypto/ed25519"
-	"fmt"
+	. "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 
-	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+	cheqdsetup "github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
+	"github.com/cheqd/cheqd-node/x/resource/types"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("QueryCollectionResources", func() {
-	Describe("Validate", func() {
-		var setup TestSetup
-		keys := GenerateTestKeys()
-		BeforeEach(func() {
-			setup = Setup()
-			didDoc := setup.BuildSimpleCreateDidPayload(ExistingDID, ExistingDIDKey, keys[ExistingDIDKey].Public)
-			_, err := setup.SendCreateDid(didDoc, map[string]ed25519.PrivateKey{ExistingDIDKey: keys[ExistingDIDKey].Private})
-			Expect(err).To(BeNil())
-			payload := GenerateCreateResourcePayload(ExistingResource())
-			_, err = setup.SendCreateResource(payload, map[string]ed25519.PrivateKey{ExistingDIDKey: keys[ExistingDIDKey].Private})
-			Expect(err).To(BeNil())
-		})
-		DescribeTable("Validate QueryCollectionResources",
-			func(
-				valid bool,
-				msg *resourcetypes.QueryGetCollectionResourcesRequest,
-				response *resourcetypes.QueryGetCollectionResourcesResponse,
-				errMsg string,
-			) {
-				queryResponse, err := setup.ResourceQueryServer.CollectionResources(setup.StdCtx, msg)
+var _ = Describe("Query Collection Resources", func() {
+	var setup TestSetup
+	var alice cheqdsetup.CreatedDidInfo
 
-				if valid {
-					resources := queryResponse.Resources
-					expectedResources := response.Resources
-					Expect(err).To(BeNil())
-					Expect(len(expectedResources)).To(Equal(len(resources)))
-					for i, r := range resources {
-						r.Created = expectedResources[i].Created
-						Expect(expectedResources[i]).To(Equal(r))
-					}
-				} else {
-					Expect(err).To(HaveOccurred())
-					Expect(errMsg).To(Equal(err.Error()))
-				}
-			},
-			Entry("Valid: Works",
-				true,
-				&resourcetypes.QueryGetCollectionResourcesRequest{
-					CollectionId: ExistingDIDIdentifier,
-				},
-				&resourcetypes.QueryGetCollectionResourcesResponse{
-					Resources: []*resourcetypes.ResourceHeader{ExistingResource().Header},
-				},
-				"",
-			),
-			Entry("Invalid: DID Doc is not found",
-				false,
-				&resourcetypes.QueryGetCollectionResourcesRequest{
-					CollectionId: NotFoundDIDIdentifier,
-				},
-				nil,
-				fmt.Errorf("did:cheqd:test:%s: DID Doc not found", NotFoundDIDIdentifier).Error(),
-			),
-		)
+	var res1v1 *types.MsgCreateResourceResponse
+	var res1v2 *types.MsgCreateResourceResponse
+	var res2v1 *types.MsgCreateResourceResponse
+
+	BeforeEach(func() {
+		setup = Setup()
+
+		alice = setup.CreateSimpleDid()
+
+		res1v1 = setup.CreateSimpleResource(alice.CollectionId, SchemaData, "Resource 1", CLSchemaType, []cheqdsetup.SignInput{alice.SignInput})
+		res1v2 = setup.CreateSimpleResource(alice.CollectionId, SchemaData, "Resource 1", CLSchemaType, []cheqdsetup.SignInput{alice.SignInput})
+		res2v1 = setup.CreateSimpleResource(alice.CollectionId, SchemaData, "Resource 2", CLSchemaType, []cheqdsetup.SignInput{alice.SignInput})
+	})
+
+	It("Should return all 3 headerrs", func() {
+		versions, err := setup.CollectionResources(alice.CollectionId)
+		Expect(err).To(BeNil())
+		Expect(versions.Resources).To(HaveLen(3))
+
+		ids := []string{versions.Resources[0].Id, versions.Resources[1].Id, versions.Resources[2].Id}
+
+		Expect(ids).To(ContainElement(res1v1.Resource.Header.Id))
+		Expect(ids).To(ContainElement(res1v2.Resource.Header.Id))
+		Expect(ids).To(ContainElement(res2v1.Resource.Header.Id))
 	})
 })

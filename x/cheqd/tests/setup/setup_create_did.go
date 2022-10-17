@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 )
 
 func (s *TestSetup) CreateDid(payload *types.MsgCreateDidPayload, signInputs []SignInput) (*types.MsgCreateDidResponse, error) {
@@ -30,6 +31,8 @@ func (s *TestSetup) CreateDid(payload *types.MsgCreateDidPayload, signInputs []S
 
 func (s *TestSetup) BuildSimpleDid() DidInfo {
 	did := GenerateDID(Base58_16chars)
+	_, _, collectionId := utils.MustSplitDID(did)
+
 	keyPair := GenerateKeyPair()
 	keyId := did + "#key-1"
 
@@ -52,11 +55,12 @@ func (s *TestSetup) BuildSimpleDid() DidInfo {
 	}
 
 	return DidInfo{
-		Did:       did,
-		KeyPair:   keyPair,
-		KeyId:     keyId,
-		Msg:       msg,
-		SignInput: signInput,
+		Did:          did,
+		CollectionId: collectionId,
+		KeyPair:      keyPair,
+		KeyId:        keyId,
+		Msg:          msg,
+		SignInput:    signInput,
 	}
 }
 

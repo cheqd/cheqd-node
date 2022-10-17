@@ -1,13 +1,11 @@
-package tests
+package setup
 
 import (
-	"crypto/ed25519"
 	"crypto/rand"
-	"encoding/base64"
 	"time"
 
 	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
-	cheqdtests "github.com/cheqd/cheqd-node/x/cheqd/tests"
+	cheqdsetup "github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -23,7 +21,7 @@ import (
 )
 
 type TestSetup struct {
-	cheqdtests.TestSetup
+	cheqdsetup.TestSetup
 
 	ResourceKeeper      keeper.Keeper
 	ResourceMsgServer   types.MsgServer
@@ -72,7 +70,7 @@ func Setup() TestSetup {
 	queryServer := keeper.NewQueryServer(*resourceKeeper, *cheqdKeeper)
 
 	setup := TestSetup{
-		TestSetup: cheqdtests.TestSetup{
+		TestSetup: cheqdsetup.TestSetup{
 			Cdc: cdc,
 
 			SdkCtx: ctx,
@@ -88,55 +86,6 @@ func Setup() TestSetup {
 		ResourceQueryServer: queryServer,
 	}
 
-	setup.Keeper.SetDidNamespace(&ctx, cheqdtests.DID_NAMESPACE)
+	setup.Keeper.SetDidNamespace(&ctx, cheqdsetup.DID_NAMESPACE)
 	return setup
-}
-
-func GenerateCreateResourcePayload(resource types.Resource) *types.MsgCreateResourcePayload {
-	return &types.MsgCreateResourcePayload{
-		CollectionId: resource.Header.CollectionId,
-		Id:           resource.Header.Id,
-		Name:         resource.Header.Name,
-		ResourceType: resource.Header.ResourceType,
-		Data:         resource.Data,
-	}
-}
-
-func (s *TestSetup) WrapCreateRequest(payload *types.MsgCreateResourcePayload, keys map[string]ed25519.PrivateKey) *types.MsgCreateResource {
-	var signatures []*cheqdtypes.SignInfo
-	signingInput := payload.GetSignBytes()
-
-	for privKeyId, privKey := range keys {
-		signature := base64.StdEncoding.EncodeToString(ed25519.Sign(privKey, signingInput))
-		signatures = append(signatures, &cheqdtypes.SignInfo{
-			VerificationMethodId: privKeyId,
-			Signature:            signature,
-		})
-	}
-
-	return &types.MsgCreateResource{
-		Payload:    payload,
-		Signatures: signatures,
-	}
-}
-
-func (s *TestSetup) SendCreateResource(msg *types.MsgCreateResourcePayload, keys map[string]ed25519.PrivateKey) (*types.Resource, error) {
-	_, err := s.ResourceMsgServer.CreateResource(s.StdCtx, s.WrapCreateRequest(msg, keys))
-	if err != nil {
-		return nil, err
-	}
-
-	req := &types.QueryGetResourceRequest{
-		CollectionId: msg.CollectionId,
-		Id:           msg.Id,
-	}
-
-	created, _ := s.ResourceQueryServer.Resource(s.StdCtx, req)
-	return created.Resource, nil
-}
-
-func GenerateTestKeys() map[string]cheqdtests.KeyPair {
-	return map[string]cheqdtests.KeyPair{
-		ExistingDIDKey: cheqdtests.GenerateKeyPair(),
-	}
 }
