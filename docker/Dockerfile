@@ -12,16 +12,7 @@ RUN apk update && apk add --no-cache $PACKAGES
 WORKDIR /go/src/github.com/cheqd/cheqd-node
 
 # Add source files
-COPY app ./app
-COPY cmd ./cmd
-COPY scripts ./scripts
-COPY proto ./proto
-COPY x ./x
-COPY go.mod .
-COPY go.sum .
-COPY Makefile .
-COPY make ./make
-COPY .git .
+COPY . .
 
 # Make node binary
 RUN make build
