@@ -45,6 +45,9 @@ func applyConfigDefaults(cmd *cobra.Command) error {
 
 	err = updateCosmConfig(clientCtx.HomeDir, func(config *cosmcfg.Config) {
 		config.BaseConfig.MinGasPrices = "25ncheq"
+
+		// Workaroud for Cosmos's bug
+		config.BaseConfig.PruningKeepEvery = "0"
 	})
 	if err != nil {
 		return err
