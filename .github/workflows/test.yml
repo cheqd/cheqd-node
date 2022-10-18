@@ -74,10 +74,23 @@ jobs:
         run: |
           docker compose --env-file docker-compose.env up --detach --no-build
 
-      - name: Check all Docker localnet nodes are active
-        run: bash ./tests/tools/wait-for-chain.sh
+      # - name: Check all Docker localnet nodes are active
+      #   run: bash ./tests/tools/wait-for-chain.sh
 
       - name: Import keys
         working-directory: ./docker/localnet
         run: |
           bash import-keys.sh
+
+      # - uses: actions/setup-go@v3
+      #   with:
+      #     go-version-file: ./go.mod
+      #     cache: true
+
+      # - name: Install ginkgo
+      #   working-directory: ./..
+      #   run: |
+      #     go install github.com/onsi/ginkgo/v2/ginkgo@latest
+      # - name: Run tests
+      #   run: |
+      #     ginkgo -r --tags integration tests/integration
