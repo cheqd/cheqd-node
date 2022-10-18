@@ -50,13 +50,7 @@ jobs:
         id: download
         with:
           name: cheqd-noded
-          # path: ${{ env.RUNNER_BIN_DIR }}
- 
-      - name: 'Echo download path'
-        run: |
-          echo ${{ github.workspace }}
-          echo "$PATH"
-          ls -R ${{ github.workspace }}
+          path: ${{ env.RUNNER_BIN_DIR }}
 
       - name: Restore binary permissions
         run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded

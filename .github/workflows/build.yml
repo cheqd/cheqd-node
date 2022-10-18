@@ -31,7 +31,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cheqd-noded
-          path: dist/**/
+          path: dist/ubuntu-latest-amd64_linux_amd64_v1/cheqd-noded
 
   build-docker:
     name: "Docker image"
