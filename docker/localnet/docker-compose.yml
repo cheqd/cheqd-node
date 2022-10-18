@@ -17,6 +17,12 @@ services:
       - target: 26660
         published: 26660    # Prometheus metrics port
     entrypoint: [ "node-start" ]
+    healthcheck:
+      test: curl -s http://localhost:26657/syncing | grep -c false || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     volumes:
       - type: volume
         source: validator-0-data
