@@ -9,8 +9,8 @@ import (
 
 var _ = Describe("Message for DID creation", func() {
 	type TestCaseMsgCreateDID struct {
-		msg *MsgCreateDid
-		isValid bool
+		msg      *MsgCreateDid
+		isValid  bool
 		errorMsg string
 	}
 
@@ -25,46 +25,47 @@ var _ = Describe("Message for DID creation", func() {
 		}
 	},
 
-	Entry(
-		"All fields are set properly", 
-		TestCaseMsgCreateDID{
-			msg: &MsgCreateDid{
-				Payload: &MsgCreateDidPayload{
-					Id: "did:cheqd:testnet:123456789abcdefg",
-					VerificationMethod: []*VerificationMethod{
-						{
-							Id:                 "did:cheqd:testnet:123456789abcdefg#key1",
-							Type:               "Ed25519VerificationKey2020",
-							Controller:         "did:cheqd:testnet:123456789abcdefg",
-							PublicKeyMultibase: ValidEd25519PubKey,
+		Entry(
+			"All fields are set properly",
+			TestCaseMsgCreateDID{
+				msg: &MsgCreateDid{
+					Payload: &MsgCreateDidPayload{
+						Id: "did:cheqd:testnet:123456789abcdefg",
+						VerificationMethod: []*VerificationMethod{
+							{
+								Id:                 "did:cheqd:testnet:123456789abcdefg#key1",
+								Type:               "Ed25519VerificationKey2020",
+								Controller:         "did:cheqd:testnet:123456789abcdefg",
+								PublicKeyMultibase: ValidEd25519PubKey,
+							},
 						},
+						Authentication: []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#aaa"},
 					},
-					Authentication: []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#aaa"},
+					Signatures: nil,
 				},
-				Signatures: nil,
-			},
-			isValid: true}),
+				isValid: true,
+			}),
 
-	Entry(
-		"IDs are duplicated", 
-		TestCaseMsgCreateDID{
-			msg: &MsgCreateDid{
-				Payload: &MsgCreateDidPayload{
-					Id: "did:cheqd:testnet:123456789abcdefg",
-					VerificationMethod: []*VerificationMethod{
-						{
-							Id:                 "did:cheqd:testnet:123456789abcdefg#key1",
-							Type:               "Ed25519VerificationKey2020",
-							Controller:         "did:cheqd:testnet:123456789abcdefg",
-							PublicKeyMultibase: ValidEd25519PubKey,
+		Entry(
+			"IDs are duplicated",
+			TestCaseMsgCreateDID{
+				msg: &MsgCreateDid{
+					Payload: &MsgCreateDidPayload{
+						Id: "did:cheqd:testnet:123456789abcdefg",
+						VerificationMethod: []*VerificationMethod{
+							{
+								Id:                 "did:cheqd:testnet:123456789abcdefg#key1",
+								Type:               "Ed25519VerificationKey2020",
+								Controller:         "did:cheqd:testnet:123456789abcdefg",
+								PublicKeyMultibase: ValidEd25519PubKey,
+							},
 						},
+						Authentication: []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#key1"},
 					},
-					Authentication: []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#key1"},
+					Signatures: nil,
 				},
-				Signatures: nil,
-			},
-			isValid: false,
-			errorMsg: "payload: (authentication: there should be no duplicates.).: basic validation failed",
-		}),
+				isValid:  false,
+				errorMsg: "payload: (authentication: there should be no duplicates.).: basic validation failed",
+			}),
 	)
 })

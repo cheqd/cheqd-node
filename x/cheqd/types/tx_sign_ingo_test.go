@@ -9,10 +9,10 @@ import (
 
 var _ = Describe("SignInfo tests", func() {
 	type TestCaseSignInfoStruct struct {
-		si SignInfo
+		si                SignInfo
 		allowedNamespaces []string
-		isValid bool
-		errorMsg string
+		isValid           bool
+		errorMsg          string
 	}
 
 	DescribeTable("SignInfo validation tests", func(testCase TestCaseSignInfoStruct) {
@@ -26,46 +26,46 @@ var _ = Describe("SignInfo tests", func() {
 		}
 	},
 
-	Entry(
-		"Positive case", 
-		TestCaseSignInfoStruct{
-			si: SignInfo{
-				VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
-				Signature:            "aaa=",
-			},
-			isValid: true,
-			errorMsg: "",
-		}),
+		Entry(
+			"Positive case",
+			TestCaseSignInfoStruct{
+				si: SignInfo{
+					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
+					Signature:            "aaa=",
+				},
+				isValid:  true,
+				errorMsg: "",
+			}),
 
-	Entry(
-		"Namespace is not allowed", 
-		TestCaseSignInfoStruct{
-			si: SignInfo{
-				VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#service1",
-				Signature:            "DIDCommMessaging",
-			},
-			allowedNamespaces: []string{"mainnet"},
-			isValid: false,
-			errorMsg: "verification_method_id: did namespace must be one of: mainnet.",
-		}),
+		Entry(
+			"Namespace is not allowed",
+			TestCaseSignInfoStruct{
+				si: SignInfo{
+					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#service1",
+					Signature:            "DIDCommMessaging",
+				},
+				allowedNamespaces: []string{"mainnet"},
+				isValid:           false,
+				errorMsg:          "verification_method_id: did namespace must be one of: mainnet.",
+			}),
 
-	Entry(
-		"Signature is not valid base64 string", 
-		TestCaseSignInfoStruct{
-			si: SignInfo{
-				VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#service1",
-				Signature:            "!@#",
-			},
-			isValid: false,
-			errorMsg: "signature: must be encoded in Base64.",
-		}),
+		Entry(
+			"Signature is not valid base64 string",
+			TestCaseSignInfoStruct{
+				si: SignInfo{
+					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#service1",
+					Signature:            "!@#",
+				},
+				isValid:  false,
+				errorMsg: "signature: must be encoded in Base64.",
+			}),
 	)
 })
 
 var _ = Describe("Full SignInfo duplicates tests", func() {
 	type TestCaseSignInfosStruct struct {
-		signInfos []*SignInfo 
-		isValid bool
+		signInfos []*SignInfo
+		isValid   bool
 	}
 
 	DescribeTable("SignInfo duplicates tests", func(testCase TestCaseSignInfosStruct) {
@@ -73,72 +73,72 @@ var _ = Describe("Full SignInfo duplicates tests", func() {
 		Expect(res_).To(Equal(testCase.isValid))
 	},
 
-	Entry(
-		"Signatures are different", 
-		TestCaseSignInfosStruct{
-			signInfos: []*SignInfo{
-				{
-					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
-					Signature:            "aaa=",
+		Entry(
+			"Signatures are different",
+			TestCaseSignInfosStruct{
+				signInfos: []*SignInfo{
+					{
+						VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
+						Signature:            "aaa=",
+					},
+					{
+						VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
+						Signature:            "bbb=",
+					},
 				},
-				{
-					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
-					Signature:            "bbb=",
-				},
-			},
-			isValid: true,
-		}),
+				isValid: true,
+			}),
 
-	Entry(
-		"All fields are different", 
-		TestCaseSignInfosStruct{
-			signInfos: []*SignInfo{
-				{
-					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
-					Signature:            "aaa=",
+		Entry(
+			"All fields are different",
+			TestCaseSignInfosStruct{
+				signInfos: []*SignInfo{
+					{
+						VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
+						Signature:            "aaa=",
+					},
+					{
+						VerificationMethodId: "did:cheqd:bbbbbbbbbbbbbbbb#method1",
+						Signature:            "bbb=",
+					},
 				},
-				{
-					VerificationMethodId: "did:cheqd:bbbbbbbbbbbbbbbb#method1",
-					Signature:            "bbb=",
-				},
-			},
-			isValid: true,
-		}),
+				isValid: true,
+			}),
 
-	Entry(
-		"All fields are the same", 
-		TestCaseSignInfosStruct{
-			signInfos: []*SignInfo{
-				{
-					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
-					Signature:            "aaa=",
+		Entry(
+			"All fields are the same",
+			TestCaseSignInfosStruct{
+				signInfos: []*SignInfo{
+					{
+						VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
+						Signature:            "aaa=",
+					},
+					{
+						VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
+						Signature:            "aaa=",
+					},
 				},
-				{
-					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
-					Signature:            "aaa=",
-				},
-			},
-			isValid: false,
-		}),
+				isValid: false,
+			}),
 
-	Entry(
-		"All fields are the same and more elments", 
-		TestCaseSignInfosStruct{
-			signInfos: []*SignInfo{
-				{
-					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
-					Signature:            "aaa=",
+		Entry(
+			"All fields are the same and more elments",
+			TestCaseSignInfosStruct{
+				signInfos: []*SignInfo{
+					{
+						VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
+						Signature:            "aaa=",
+					},
+					{
+						VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
+						Signature:            "aaa=",
+					},
+					{
+						VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
+						Signature:            "aaa=",
+					},
 				},
-				{
-					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
-					Signature:            "aaa=",
-				},
-				{
-					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
-					Signature:            "aaa=",
-				},
-			},
-			isValid: false,
-		}),
+				isValid: false,
+			}),
 	)
 })

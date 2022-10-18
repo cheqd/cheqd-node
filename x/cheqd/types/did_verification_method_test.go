@@ -18,15 +18,14 @@ import (
 
 var _ = Describe("Verification Method tests", func() {
 	type TestCaseVerificationMethodStruct struct {
-		vm VerificationMethod
-		baseDid string
+		vm                VerificationMethod
+		baseDid           string
 		allowedNamespaces []string
-		isValid bool
-		errorMsg string
+		isValid           bool
+		errorMsg          string
 	}
 
 	DescribeTable("Verification Method Validation tests", func(testCase TestCaseVerificationMethodStruct) {
-	
 		err := testCase.vm.Validate(testCase.baseDid, testCase.allowedNamespaces)
 
 		if testCase.isValid {
@@ -37,130 +36,130 @@ var _ = Describe("Verification Method tests", func() {
 		}
 	},
 
-	Entry(
-		"Verification method with expected multibase key", 
-		TestCaseVerificationMethodStruct{
-			vm: VerificationMethod{
-				Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#qwe",
-				Type:               "Ed25519VerificationKey2020",
-				Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
-				PublicKeyJwk:       nil,
-				PublicKeyMultibase: ValidEd25519PubKey,
-			},
-			isValid: true,
-			errorMsg: "",
-		}),
+		Entry(
+			"Verification method with expected multibase key",
+			TestCaseVerificationMethodStruct{
+				vm: VerificationMethod{
+					Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#qwe",
+					Type:               "Ed25519VerificationKey2020",
+					Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
+					PublicKeyJwk:       nil,
+					PublicKeyMultibase: ValidEd25519PubKey,
+				},
+				isValid:  true,
+				errorMsg: "",
+			}),
 
-	Entry(
-		"Verification method with expected jwk key", 
-		TestCaseVerificationMethodStruct{
-			vm: VerificationMethod{
-				Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#rty",
-				Type:               "JsonWebKey2020",
-				Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
-				PublicKeyJwk:       ValidPublicKeyJWK,
-				PublicKeyMultibase: "",
-			},
-			isValid: true,
-			errorMsg: "",
-		}),
+		Entry(
+			"Verification method with expected jwk key",
+			TestCaseVerificationMethodStruct{
+				vm: VerificationMethod{
+					Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#rty",
+					Type:               "JsonWebKey2020",
+					Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
+					PublicKeyJwk:       ValidPublicKeyJWK,
+					PublicKeyMultibase: "",
+				},
+				isValid:  true,
+				errorMsg: "",
+			}),
 
-	Entry(
-		"Id has expected DID as a base", 
-		TestCaseVerificationMethodStruct{
-			vm: VerificationMethod{
-				Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#rty",
-				Type:               "JsonWebKey2020",
-				Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
-				PublicKeyJwk:       ValidPublicKeyJWK,
-				PublicKeyMultibase: "",
-			},
-			baseDid: "did:cheqd:aaaaaaaaaaaaaaaa",
-			isValid: true,
-			errorMsg: "",
-		}),
+		Entry(
+			"Id has expected DID as a base",
+			TestCaseVerificationMethodStruct{
+				vm: VerificationMethod{
+					Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#rty",
+					Type:               "JsonWebKey2020",
+					Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
+					PublicKeyJwk:       ValidPublicKeyJWK,
+					PublicKeyMultibase: "",
+				},
+				baseDid:  "did:cheqd:aaaaaaaaaaaaaaaa",
+				isValid:  true,
+				errorMsg: "",
+			}),
 
-	Entry(
-		"Id does not have expected DID as a base", 
-		TestCaseVerificationMethodStruct{
-			vm: VerificationMethod{
-				Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#rty",
-				Type:               "JsonWebKey2020",
-				Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
-				PublicKeyJwk:       ValidPublicKeyJWK,
-				PublicKeyMultibase: "",
-			},
-			baseDid: "did:cheqd:bbbbbbbbbbbbbbbb",
-			isValid: false,
-			errorMsg: "id: must have prefix: did:cheqd:bbbbbbbbbbbbbbbb.",
-		}),
+		Entry(
+			"Id does not have expected DID as a base",
+			TestCaseVerificationMethodStruct{
+				vm: VerificationMethod{
+					Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#rty",
+					Type:               "JsonWebKey2020",
+					Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
+					PublicKeyJwk:       ValidPublicKeyJWK,
+					PublicKeyMultibase: "",
+				},
+				baseDid:  "did:cheqd:bbbbbbbbbbbbbbbb",
+				isValid:  false,
+				errorMsg: "id: must have prefix: did:cheqd:bbbbbbbbbbbbbbbb.",
+			}),
 
-	Entry(
-		"Namespace is allowed", 
-		TestCaseVerificationMethodStruct{
-			vm: VerificationMethod{
-				Id:                 "did:cheqd:mainnet:aaaaaaaaaaaaaaaa#rty",
-				Type:               "JsonWebKey2020",
-				Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
-				PublicKeyJwk:       ValidPublicKeyJWK,
-				PublicKeyMultibase: "",
-			},
-			allowedNamespaces: []string{"mainnet", ""},
-			isValid: true,
-		}),
+		Entry(
+			"Namespace is allowed",
+			TestCaseVerificationMethodStruct{
+				vm: VerificationMethod{
+					Id:                 "did:cheqd:mainnet:aaaaaaaaaaaaaaaa#rty",
+					Type:               "JsonWebKey2020",
+					Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
+					PublicKeyJwk:       ValidPublicKeyJWK,
+					PublicKeyMultibase: "",
+				},
+				allowedNamespaces: []string{"mainnet", ""},
+				isValid:           true,
+			}),
 
-	Entry(
-		"Namespace is not allowed", 
-		TestCaseVerificationMethodStruct{
-			vm: VerificationMethod{
-				Id:                 "did:cheqd:mainnet:aaaaaaaaaaaaaaaa#rty",
-				Type:               "JsonWebKey2020",
-				Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
-				PublicKeyJwk:       ValidPublicKeyJWK,
-				PublicKeyMultibase: "",
-			},
-			allowedNamespaces: []string{"testnet"},
-			isValid: false,
-			errorMsg: "controller: did namespace must be one of: testnet; id: did namespace must be one of: testnet.",
-		}),
-	Entry(
-		"JWK key has expected format", 
-		TestCaseVerificationMethodStruct{
-			vm: VerificationMethod{
-				Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#qwe",
-				Type:               "JsonWebKey2020",
-				Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
-				PublicKeyJwk:       ValidPublicKeyJWK,
-				PublicKeyMultibase: "",
-			},
-			isValid: true,
-		}),
-	Entry(
-		"JWK key has unexpected format", 
-		TestCaseVerificationMethodStruct{
-			vm: VerificationMethod{
-				Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#qwe",
-				Type:               "JsonWebKey2020",
-				Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
-				PublicKeyJwk:       NotValidPublicKeyJWK,
-				PublicKeyMultibase: "",
-			},
-			isValid: false,
-			errorMsg: "public_key_jwk: can't parse jwk: failed to parse key: invalid key type from JSON (SomeOtherKeyType).",
-		}),
-	Entry(
-		"Not all keys and valuesin JWK have expected format", 
-		TestCaseVerificationMethodStruct{
-			vm: VerificationMethod{
-				Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#qwe",
-				Type:               "JsonWebKey2020",
-				Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
-				PublicKeyJwk:       append(ValidPublicKeyJWK, &KeyValuePair{Key: "", Value: ""}),
-				PublicKeyMultibase: "",
-			},
-			isValid: false,
-			errorMsg: "public_key_jwk: (6: (key: cannot be blank; value: cannot be blank.).).",
-		}),
+		Entry(
+			"Namespace is not allowed",
+			TestCaseVerificationMethodStruct{
+				vm: VerificationMethod{
+					Id:                 "did:cheqd:mainnet:aaaaaaaaaaaaaaaa#rty",
+					Type:               "JsonWebKey2020",
+					Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
+					PublicKeyJwk:       ValidPublicKeyJWK,
+					PublicKeyMultibase: "",
+				},
+				allowedNamespaces: []string{"testnet"},
+				isValid:           false,
+				errorMsg:          "controller: did namespace must be one of: testnet; id: did namespace must be one of: testnet.",
+			}),
+		Entry(
+			"JWK key has expected format",
+			TestCaseVerificationMethodStruct{
+				vm: VerificationMethod{
+					Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#qwe",
+					Type:               "JsonWebKey2020",
+					Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
+					PublicKeyJwk:       ValidPublicKeyJWK,
+					PublicKeyMultibase: "",
+				},
+				isValid: true,
+			}),
+		Entry(
+			"JWK key has unexpected format",
+			TestCaseVerificationMethodStruct{
+				vm: VerificationMethod{
+					Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#qwe",
+					Type:               "JsonWebKey2020",
+					Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
+					PublicKeyJwk:       NotValidPublicKeyJWK,
+					PublicKeyMultibase: "",
+				},
+				isValid:  false,
+				errorMsg: "public_key_jwk: can't parse jwk: failed to parse key: invalid key type from JSON (SomeOtherKeyType).",
+			}),
+		Entry(
+			"Not all keys and valuesin JWK have expected format",
+			TestCaseVerificationMethodStruct{
+				vm: VerificationMethod{
+					Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#qwe",
+					Type:               "JsonWebKey2020",
+					Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
+					PublicKeyJwk:       append(ValidPublicKeyJWK, &KeyValuePair{Key: "", Value: ""}),
+					PublicKeyMultibase: "",
+				},
+				isValid:  false,
+				errorMsg: "public_key_jwk: (6: (key: cannot be blank; value: cannot be blank.).).",
+			}),
 	)
 })
 
