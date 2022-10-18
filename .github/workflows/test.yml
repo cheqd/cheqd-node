@@ -76,4 +76,4 @@ jobs:
       - name: Import keys
         working-directory: ./docker/localnet
         run: |
-          bash import_keys.sh
+          bash import-keys.sh
