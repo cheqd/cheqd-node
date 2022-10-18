@@ -82,15 +82,16 @@ jobs:
         run: |
           bash import-keys.sh
 
-      # - uses: actions/setup-go@v3
-      #   with:
-      #     go-version-file: ./go.mod
-      #     cache: true
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: ./go.mod
+          cache: true
 
       # - name: Install ginkgo
       #   working-directory: ./..
       #   run: |
       #     go install github.com/onsi/ginkgo/v2/ginkgo@latest
-      # - name: Run tests
-      #   run: |
-      #     ginkgo -r --tags integration tests/integration
+
+      - name: Run tests
+        run: |
+          go run github.com/onsi/ginkgo/v2/ginkgo -r --tags integration tests/integration
