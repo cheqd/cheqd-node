@@ -86,12 +86,10 @@ jobs:
           go-version-file: ./go.mod
           cache: true
 
-      # - name: Install ginkgo
-      #   working-directory: ./..
-      #   run: |
-      #     go install github.com/onsi/ginkgo/v2/ginkgo@latest
+      - name: Install ginkgo
+        working-directory: ./..
+        run: go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
       - name: Run tests
-        working-directory: ./
-        run: |
-          go run github.com/onsi/ginkgo/v2/ginkgo -r --tags integration tests/integration
+        working-directory: ./tests/integration
+        run: ginkgo -r --tags integration
