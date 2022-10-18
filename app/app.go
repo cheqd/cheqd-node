@@ -593,6 +593,11 @@ func New(
 
 	app.configurator = module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
 	app.mm.RegisterServices(app.configurator)
+	app.configurator.RegisterMigration(
+		cheqdtypes.ModuleName,
+		cheqdtypes.ConsensusVersion(),
+		migrationHandler
+	)
 
 	// initialize stores
 	app.MountKVStores(keys)
@@ -661,7 +666,7 @@ func New(
 		icaModule.InitModule(ctx, controllerParams, hostParams)
 
 		ctx.Logger().Info("start to run module migrations...")
-		return fromVM, nil
+		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 	})
 
 	// Store migration for the latest upgrade
