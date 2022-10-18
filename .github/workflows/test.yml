@@ -55,7 +55,7 @@ jobs:
       - name: 'Echo download path'
         run: |
           echo ${{ github.workspace }}
-          echo ${{ GITHUB_PATH }}
+          echo "$PATH"
           ls -R ${{ github.workspace }}
 
       - name: Restore binary permissions
