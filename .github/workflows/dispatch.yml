@@ -9,23 +9,22 @@ jobs:
 
   call-lint:
     name: "Lint"
-    uses: cheqd/cheqd-node/.github/workflows/lint.yml@develop
+    uses: ./.github/workflows/lint.yml
 
   call-build:
     name: "Build"
     needs: call-lint
-    uses: cheqd/cheqd-node/.github/workflows/build.yml@develop
+    uses: ./.github/workflows/build.yml
   
-  # call-test:
-  #   name: "Test"
-  #   needs: call-build
-  #   uses: ./.github/workflows/test.yml
-  #   secrets: inherit
+  call-test:
+    name: "Test"
+    needs: call-build
+    uses: ./.github/workflows/test.yml
+    secrets: inherit
 
   call-release:
     name: "Release"
-    # needs: call-test
-    needs: call-build
+    needs: [call-build, call-test]
     if: ${{ github.ref_protected == true }}
-    uses: cheqd/cheqd-node/.github/workflows/release.yml@develop
+    uses: ./.github/workflows/release.yml
     secrets: inherit
