@@ -28,6 +28,9 @@ jobs:
           go get github.com/onsi/ginkgo/v2/ginkgo
           go get github.com/onsi/gomega/...
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
       - name: Run Ginkgo tests
         run: ginkgo -r --race --randomize-all --randomize-suites --junit-report report.xml
 
