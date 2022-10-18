@@ -63,12 +63,16 @@ jobs:
       - name: Load node Docker image
         run: docker load -i cheqd-node-build.tar
 
-      - name: Setup 4 Validators + 2 Observers Docker localnet
+      - name: Generate localnet configs
         working-directory: ./docker/localnet
         run: |
           bash gen-network-config.sh
           sudo chown -R 1000:1000 network-config
-          docker compose up -d
+
+      - name: Setup 4 Validators + 2 Observers Docker localnet
+        working-directory: ./docker/localnet
+        run: |
+          docker compose --env-file docker-compose.env up --detach --no-build
 
       - name: Check all Docker localnet nodes are active
         run: bash ./tests/tools/wait-for-chain.sh
