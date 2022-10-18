@@ -1,5 +1,6 @@
 name: "Build"
-on: [pull_request, workflow_call]
+on:
+  workflow_call:
 defaults:
   run:
     shell: bash
