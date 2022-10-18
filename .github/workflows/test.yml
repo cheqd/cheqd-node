@@ -53,7 +53,7 @@ jobs:
           path: ${{ env.RUNNER_BIN_DIR }}
  
       - name: 'Echo download path'
-        run: echo ${{steps.download.outputs.download-path}}
+        run: echo ${{ steps.download.outputs.download-path }}
 
       - name: Restore binary permissions
         run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
