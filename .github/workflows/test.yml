@@ -6,7 +6,6 @@ defaults:
     shell: bash
 env:
   RUNNER_BIN_DIR: /home/runner/.local/bin
-  NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/docker/localnet/network-config"
 permissions:
   contents: write
   packages: read
@@ -93,6 +92,6 @@ jobs:
       #     go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
       - name: Run tests
-        working-directory: ./tests/integration
+        working-directory: ./..
         run: |
-          go run github.com/onsi/ginkgo/v2/ginkgo -r --tags integration
+          go run github.com/onsi/ginkgo/v2/ginkgo -r --tags integration tests/integration/...
