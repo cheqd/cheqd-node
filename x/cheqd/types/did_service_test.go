@@ -7,67 +7,64 @@ import (
 	. "github.com/cheqd/cheqd-node/x/cheqd/types"
 )
 
-var _ = Describe("DID Validation tests", func() {
-	var struct_ Service
-	var baseDid string
-	var allowedNamespaces []string
-	var isValid bool
-	var errorMsg string
+var _ = Describe("Service tests", func() {
+	type TestCaseServiceStruct struct {
+		service *Service
+		baseDid string
+		allowedNamespaces []string
+		isValid bool
+		errorMsg string
+	}
 
-	BeforeEach(func() {
-		struct_ = Service{}
-		baseDid = ""
-		allowedNamespaces = []string{}
-		isValid = false
-		errorMsg = ""
-	})
+	DescribeTable("Service Validation tests", func(testCase TestCaseServiceStruct) {
+		err := testCase.service.Validate(testCase.baseDid, testCase.allowedNamespaces)
 
-	AfterEach(func() {
-		err := struct_.Validate(baseDid, allowedNamespaces)
-
-		if isValid {
+		if testCase.isValid {
 			Expect(err).To(BeNil())
 		} else {
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring(errorMsg))
+			Expect(err.Error()).To(ContainSubstring(testCase.errorMsg))
 		}
-	})
+	},
 
-	It("Positive case", func() {
-		struct_ = Service{
-			Id:              "did:cheqd:aaaaaaaaaaaaaaaa#service1",
-			Type:            "DIDCommMessaging",
-			ServiceEndpoint: "endpoint",
-		}
-		baseDid = "did:cheqd:aaaaaaaaaaaaaaaa"
-		allowedNamespaces = []string{""}
-		isValid = true
-		errorMsg = ""
-	})
-
-	When("Namespace is not allowed", func() {
-		It("should fail", func() {
-			struct_ = Service{
+	Entry(
+		"Positive case", 
+		TestCaseServiceStruct{
+			service: &Service{
 				Id:              "did:cheqd:aaaaaaaaaaaaaaaa#service1",
 				Type:            "DIDCommMessaging",
 				ServiceEndpoint: "endpoint",
-			}
-			allowedNamespaces = []string{"mainnet"}
-			isValid = false
-			errorMsg = "id: did namespace must be one of: mainnet."
-		})
-	})
+			},
+			baseDid: "did:cheqd:aaaaaaaaaaaaaaaa",
+			allowedNamespaces: []string{""},
+			isValid: true,
+			errorMsg: "",
+		}),
 
-	When("base DID is not the same as in id", func() {
-		It("should fail", func() {
-			struct_ = Service{
+	Entry(
+		"Namespace is not allowed", 
+		TestCaseServiceStruct{
+			service: &Service{
 				Id:              "did:cheqd:aaaaaaaaaaaaaaaa#service1",
 				Type:            "DIDCommMessaging",
 				ServiceEndpoint: "endpoint",
-			}
-			baseDid = "did:cheqd:baaaaaaaaaaaaaab"
-			isValid = false
-			errorMsg = "id: must have prefix: did:cheqd:baaaaaaaaaaaaaab."
-		})
-	})
+			},
+			allowedNamespaces: []string{"mainnet"},
+			isValid: false,
+			errorMsg: "id: did namespace must be one of: mainnet.",
+		}),
+
+	Entry(
+		"Base DID is not the same as in id", 
+		TestCaseServiceStruct{ 
+			service: &Service{
+				Id:              "did:cheqd:aaaaaaaaaaaaaaaa#service1",
+				Type:            "DIDCommMessaging",
+				ServiceEndpoint: "endpoint",
+			},
+			baseDid: "did:cheqd:baaaaaaaaaaaaaab",
+			isValid: false,
+			errorMsg: "id: must have prefix: did:cheqd:baaaaaaaaaaaaaab.",
+		}),
+	)
 })

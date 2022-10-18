@@ -7,31 +7,28 @@ import (
 	. "github.com/cheqd/cheqd-node/x/cheqd/types"
 )
 
-var _ = Describe("Message for DID creation", func() {
-	var struct_ *MsgUpdateDid
-	var isValid bool
-	var errorMsg string
+var _ = Describe("Message for DID updating", func() {
+	type TestCaseMsgUpdateDID struct {
+		msg *MsgUpdateDid
+		isValid bool
+		errorMsg string
+	}
 
-	BeforeEach(func() {
-		struct_ = &MsgUpdateDid{}
-		isValid = false
-		errorMsg = ""
-	})
+	DescribeTable("Tests for message for DID updating", func(testCase TestCaseMsgUpdateDID) {
+		err := testCase.msg.ValidateBasic()
 
-	AfterEach(func() {
-		err := struct_.ValidateBasic()
-
-		if isValid {
+		if testCase.isValid {
 			Expect(err).To(BeNil())
 		} else {
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring(errorMsg))
+			Expect(err.Error()).To(ContainSubstring(testCase.errorMsg))
 		}
-	})
+	},
 
-	When("all fields are set properly", func() {
-		It("Will pass", func() {
-			struct_ = &MsgUpdateDid{
+	Entry(
+		"All fields are set properly", 
+		TestCaseMsgUpdateDID{
+			msg: &MsgUpdateDid{
 				Payload: &MsgUpdateDidPayload{
 					Id: "did:cheqd:testnet:123456789abcdefg",
 					VerificationMethod: []*VerificationMethod{
@@ -46,14 +43,14 @@ var _ = Describe("Message for DID creation", func() {
 					VersionId:      "version1",
 				},
 				Signatures: nil,
-			}
-			isValid = true
-		})
-	})
+			},
+			isValid: true,
+		}),
 
-	When("IDs are duplicated", func() {
-		It("should fail the validation", func() {
-			struct_ = &MsgUpdateDid{
+	Entry(
+		"IDs are duplicated", 
+		TestCaseMsgUpdateDID{
+			msg: &MsgUpdateDid{
 				Payload: &MsgUpdateDidPayload{
 					Id: "did:cheqd:testnet:123456789abcdefg",
 					VerificationMethod: []*VerificationMethod{
@@ -68,15 +65,14 @@ var _ = Describe("Message for DID creation", func() {
 					VersionId:      "version1",
 				},
 				Signatures: nil,
-			}
-			isValid = false
-			errorMsg = "payload: (authentication: there should be no duplicates.).: basic validation failed"
-		})
-	})
-
-	When("VersionId is empty", func() {
-		It("should fail on validation", func() {
-			struct_ = &MsgUpdateDid{
+			},
+			isValid: false,
+			errorMsg: "payload: (authentication: there should be no duplicates.).: basic validation failed",
+		}),
+	Entry(
+		"VersionId is empty", 
+		TestCaseMsgUpdateDID{
+			msg: &MsgUpdateDid{
 				Payload: &MsgUpdateDidPayload{
 					Id: "did:cheqd:testnet:123456789abcdefg",
 					VerificationMethod: []*VerificationMethod{
@@ -90,9 +86,9 @@ var _ = Describe("Message for DID creation", func() {
 					Authentication: []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#aaa"},
 				},
 				Signatures: nil,
-			}
-			isValid = false
-			errorMsg = "payload: (version_id: cannot be blank.).: basic validation failed"
-		})
-	})
+			},
+			isValid: false,
+			errorMsg: "payload: (version_id: cannot be blank.).: basic validation failed",
+		}),
+	)
 })

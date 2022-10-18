@@ -16,158 +16,152 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Verification Method Validation tests", func() {
-	var struct_ VerificationMethod
-	var baseDid string
-	var allowedNamespaces []string
-	var isValid bool
-	var errorMsg string
+var _ = Describe("Verification Method tests", func() {
+	type TestCaseVerificationMethodStruct struct {
+		vm VerificationMethod
+		baseDid string
+		allowedNamespaces []string
+		isValid bool
+		errorMsg string
+	}
 
-	BeforeEach(func() {
-		struct_ = VerificationMethod{}
-		baseDid = ""
-		allowedNamespaces = []string{}
-		isValid = false
-		errorMsg = ""
-	})
+	DescribeTable("Verification Method Validation tests", func(testCase TestCaseVerificationMethodStruct) {
+	
+		err := testCase.vm.Validate(testCase.baseDid, testCase.allowedNamespaces)
 
-	AfterEach(func() {
-		err := struct_.Validate(baseDid, allowedNamespaces)
-
-		if isValid {
+		if testCase.isValid {
 			Expect(err).To(BeNil())
 		} else {
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring(errorMsg))
+			Expect(err.Error()).To(ContainSubstring(testCase.errorMsg))
 		}
-	})
-	When("verification method with expected multibase key", func() {
-		It("is valid", func() {
-			struct_ = VerificationMethod{
+	},
+
+	Entry(
+		"Verification method with expected multibase key", 
+		TestCaseVerificationMethodStruct{
+			vm: VerificationMethod{
 				Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#qwe",
 				Type:               "Ed25519VerificationKey2020",
 				Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
 				PublicKeyJwk:       nil,
 				PublicKeyMultibase: ValidEd25519PubKey,
-			}
-			isValid = true
-			errorMsg = ""
-		})
-	})
+			},
+			isValid: true,
+			errorMsg: "",
+		}),
 
-	When("verification method with expected jwk key", func() {
-		It("is valid", func() {
-			struct_ = VerificationMethod{
+	Entry(
+		"Verification method with expected jwk key", 
+		TestCaseVerificationMethodStruct{
+			vm: VerificationMethod{
 				Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#rty",
 				Type:               "JsonWebKey2020",
 				Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
 				PublicKeyJwk:       ValidPublicKeyJWK,
 				PublicKeyMultibase: "",
-			}
-			isValid = true
-			errorMsg = ""
-		})
-	})
+			},
+			isValid: true,
+			errorMsg: "",
+		}),
 
-	When("id has expected DID as a base", func() {
-		It("is valid", func() {
-			struct_ = VerificationMethod{
+	Entry(
+		"Id has expected DID as a base", 
+		TestCaseVerificationMethodStruct{
+			vm: VerificationMethod{
 				Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#rty",
 				Type:               "JsonWebKey2020",
 				Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
 				PublicKeyJwk:       ValidPublicKeyJWK,
 				PublicKeyMultibase: "",
-			}
-			baseDid = "did:cheqd:aaaaaaaaaaaaaaaa"
-			isValid = true
-			errorMsg = ""
-		})
-	})
+			},
+			baseDid: "did:cheqd:aaaaaaaaaaaaaaaa",
+			isValid: true,
+			errorMsg: "",
+		}),
 
-	When("id does not have expected DID as a base", func() {
-		It("should fail", func() {
-			struct_ = VerificationMethod{
+	Entry(
+		"Id does not have expected DID as a base", 
+		TestCaseVerificationMethodStruct{
+			vm: VerificationMethod{
 				Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#rty",
 				Type:               "JsonWebKey2020",
 				Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
 				PublicKeyJwk:       ValidPublicKeyJWK,
 				PublicKeyMultibase: "",
-			}
-			baseDid = "did:cheqd:bbbbbbbbbbbbbbbb"
-			isValid = false
-			errorMsg = "id: must have prefix: did:cheqd:bbbbbbbbbbbbbbbb."
-		})
-	})
+			},
+			baseDid: "did:cheqd:bbbbbbbbbbbbbbbb",
+			isValid: false,
+			errorMsg: "id: must have prefix: did:cheqd:bbbbbbbbbbbbbbbb.",
+		}),
 
-	When("namespace is allowed", func() {
-		It("is valid", func() {
-			struct_ = VerificationMethod{
+	Entry(
+		"Namespace is allowed", 
+		TestCaseVerificationMethodStruct{
+			vm: VerificationMethod{
 				Id:                 "did:cheqd:mainnet:aaaaaaaaaaaaaaaa#rty",
 				Type:               "JsonWebKey2020",
 				Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
 				PublicKeyJwk:       ValidPublicKeyJWK,
 				PublicKeyMultibase: "",
-			}
-			allowedNamespaces = []string{"mainnet", ""}
-			isValid = true
-		})
-	})
+			},
+			allowedNamespaces: []string{"mainnet", ""},
+			isValid: true,
+		}),
 
-	When("namespace is not allowed", func() {
-		It("should fail", func() {
-			struct_ = VerificationMethod{
+	Entry(
+		"Namespace is not allowed", 
+		TestCaseVerificationMethodStruct{
+			vm: VerificationMethod{
 				Id:                 "did:cheqd:mainnet:aaaaaaaaaaaaaaaa#rty",
 				Type:               "JsonWebKey2020",
 				Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
 				PublicKeyJwk:       ValidPublicKeyJWK,
 				PublicKeyMultibase: "",
-			}
-			allowedNamespaces = []string{"testnet"}
-			isValid = false
-			errorMsg = "controller: did namespace must be one of: testnet; id: did namespace must be one of: testnet."
-		})
-	})
-
-	When("JWK key has expected format", func() {
-		It("is valid", func() {
-			struct_ = VerificationMethod{
+			},
+			allowedNamespaces: []string{"testnet"},
+			isValid: false,
+			errorMsg: "controller: did namespace must be one of: testnet; id: did namespace must be one of: testnet.",
+		}),
+	Entry(
+		"JWK key has expected format", 
+		TestCaseVerificationMethodStruct{
+			vm: VerificationMethod{
 				Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#qwe",
 				Type:               "JsonWebKey2020",
 				Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
 				PublicKeyJwk:       ValidPublicKeyJWK,
 				PublicKeyMultibase: "",
-			}
-			isValid = true
-		})
-	})
-
-	When("JWK key has unexpected format", func() {
-		It("is not valid", func() {
-			struct_ = VerificationMethod{
+			},
+			isValid: true,
+		}),
+	Entry(
+		"JWK key has unexpected format", 
+		TestCaseVerificationMethodStruct{
+			vm: VerificationMethod{
 				Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#qwe",
 				Type:               "JsonWebKey2020",
 				Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
 				PublicKeyJwk:       NotValidPublicKeyJWK,
 				PublicKeyMultibase: "",
-			}
-			isValid = false
-			errorMsg = "public_key_jwk: can't parse jwk: failed to parse key: invalid key type from JSON (SomeOtherKeyType)."
-		})
-	})
-
-	When("not all keys and valuesin JWK have expected format", func() {
-		It("should fail", func() {
-			struct_ = VerificationMethod{
+			},
+			isValid: false,
+			errorMsg: "public_key_jwk: can't parse jwk: failed to parse key: invalid key type from JSON (SomeOtherKeyType).",
+		}),
+	Entry(
+		"Not all keys and valuesin JWK have expected format", 
+		TestCaseVerificationMethodStruct{
+			vm: VerificationMethod{
 				Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#qwe",
 				Type:               "JsonWebKey2020",
 				Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
 				PublicKeyJwk:       append(ValidPublicKeyJWK, &KeyValuePair{Key: "", Value: ""}),
 				PublicKeyMultibase: "",
-			}
-			isValid = false
-			errorMsg = "public_key_jwk: (6: (key: cannot be blank; value: cannot be blank.).)."
-		})
-	})
+			},
+			isValid: false,
+			errorMsg: "public_key_jwk: (6: (key: cannot be blank; value: cannot be blank.).).",
+		}),
+	)
 })
 
 var _ = Describe("Validation ed25519 Signature in verification method", func() {

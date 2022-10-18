@@ -8,30 +8,27 @@ import (
 )
 
 var _ = Describe("Message for DID creation", func() {
-	var struct_ *MsgCreateDid
-	var isValid bool
-	var errorMsg string
+	type TestCaseMsgCreateDID struct {
+		msg *MsgCreateDid
+		isValid bool
+		errorMsg string
+	}
 
-	BeforeEach(func() {
-		struct_ = &MsgCreateDid{}
-		isValid = false
-		errorMsg = ""
-	})
+	DescribeTable("Tests for message for DID creation", func(testCase TestCaseMsgCreateDID) {
+		err := testCase.msg.ValidateBasic()
 
-	AfterEach(func() {
-		err := struct_.ValidateBasic()
-
-		if isValid {
+		if testCase.isValid {
 			Expect(err).To(BeNil())
 		} else {
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring(errorMsg))
+			Expect(err.Error()).To(ContainSubstring(testCase.errorMsg))
 		}
-	})
+	},
 
-	When("all fields are set properly", func() {
-		It("should pass", func() {
-			struct_ = &MsgCreateDid{
+	Entry(
+		"All fields are set properly", 
+		TestCaseMsgCreateDID{
+			msg: &MsgCreateDid{
 				Payload: &MsgCreateDidPayload{
 					Id: "did:cheqd:testnet:123456789abcdefg",
 					VerificationMethod: []*VerificationMethod{
@@ -45,14 +42,13 @@ var _ = Describe("Message for DID creation", func() {
 					Authentication: []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#aaa"},
 				},
 				Signatures: nil,
-			}
-			isValid = true
-		})
-	})
+			},
+			isValid: true}),
 
-	When("IDs are duplicated", func() {
-		It("should fail the validation", func() {
-			struct_ = &MsgCreateDid{
+	Entry(
+		"IDs are duplicated", 
+		TestCaseMsgCreateDID{
+			msg: &MsgCreateDid{
 				Payload: &MsgCreateDidPayload{
 					Id: "did:cheqd:testnet:123456789abcdefg",
 					VerificationMethod: []*VerificationMethod{
@@ -66,9 +62,9 @@ var _ = Describe("Message for DID creation", func() {
 					Authentication: []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#key1"},
 				},
 				Signatures: nil,
-			}
-			isValid = false
-			errorMsg = "payload: (authentication: there should be no duplicates.).: basic validation failed"
-		})
-	})
+			},
+			isValid: false,
+			errorMsg: "payload: (authentication: there should be no duplicates.).: basic validation failed",
+		}),
+	)
 })

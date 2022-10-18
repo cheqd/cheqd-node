@@ -7,80 +7,76 @@ import (
 	. "github.com/cheqd/cheqd-node/x/cheqd/types"
 )
 
-var _ = Describe("SignInfo validation tests", func() {
-	var struct_ SignInfo
-	var allowedNamespaces []string
-	var isValid bool
-	var errorMsg string
+var _ = Describe("SignInfo tests", func() {
+	type TestCaseSignInfoStruct struct {
+		si SignInfo
+		allowedNamespaces []string
+		isValid bool
+		errorMsg string
+	}
 
-	BeforeEach(func() {
-		struct_ = SignInfo{}
-		allowedNamespaces = []string{}
-		isValid = false
-		errorMsg = ""
-	})
+	DescribeTable("SignInfo validation tests", func(testCase TestCaseSignInfoStruct) {
+		err := testCase.si.Validate(testCase.allowedNamespaces)
 
-	AfterEach(func() {
-		err := struct_.Validate(allowedNamespaces)
-
-		if isValid {
+		if testCase.isValid {
 			Expect(err).To(BeNil())
 		} else {
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring(errorMsg))
+			Expect(err.Error()).To(ContainSubstring(testCase.errorMsg))
 		}
-	})
+	},
 
-	It("Positive case", func() {
-		struct_ = SignInfo{
-			VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
-			Signature:            "aaa=",
-		}
-		isValid = true
-		errorMsg = ""
-	})
+	Entry(
+		"Positive case", 
+		TestCaseSignInfoStruct{
+			si: SignInfo{
+				VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
+				Signature:            "aaa=",
+			},
+			isValid: true,
+			errorMsg: "",
+		}),
 
-	When("namespace is not allowed", func() {
-		It("should fail", func() {
-			struct_ = SignInfo{
+	Entry(
+		"Namespace is not allowed", 
+		TestCaseSignInfoStruct{
+			si: SignInfo{
 				VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#service1",
 				Signature:            "DIDCommMessaging",
-			}
-			allowedNamespaces = []string{"mainnet"}
-			isValid = false
-			errorMsg = "verification_method_id: did namespace must be one of: mainnet."
-		})
-	})
+			},
+			allowedNamespaces: []string{"mainnet"},
+			isValid: false,
+			errorMsg: "verification_method_id: did namespace must be one of: mainnet.",
+		}),
 
-	When("signature is not valid base64 string", func() {
-		It("should fail", func() {
-			struct_ = SignInfo{
+	Entry(
+		"Signature is not valid base64 string", 
+		TestCaseSignInfoStruct{
+			si: SignInfo{
 				VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#service1",
 				Signature:            "!@#",
-			}
-			isValid = false
-			errorMsg = "signature: must be encoded in Base64."
-		})
-	})
+			},
+			isValid: false,
+			errorMsg: "signature: must be encoded in Base64.",
+		}),
+	)
 })
 
 var _ = Describe("Full SignInfo duplicates tests", func() {
-	var structs_ []*SignInfo
-	var isValid bool
+	type TestCaseSignInfosStruct struct {
+		signInfos []*SignInfo 
+		isValid bool
+	}
 
-	BeforeEach(func() {
-		structs_ = []*SignInfo{}
-		isValid = false
-	})
+	DescribeTable("SignInfo duplicates tests", func(testCase TestCaseSignInfosStruct) {
+		res_ := IsUniqueSignInfoList(testCase.signInfos)
+		Expect(res_).To(Equal(testCase.isValid))
+	},
 
-	AfterEach(func() {
-		res_ := IsUniqueSignInfoList(structs_)
-		Expect(res_).To(Equal(isValid))
-	})
-
-	When("signatures are different", func() {
-		It("should pass", func() {
-			structs_ = []*SignInfo{
+	Entry(
+		"Signatures are different", 
+		TestCaseSignInfosStruct{
+			signInfos: []*SignInfo{
 				{
 					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
 					Signature:            "aaa=",
@@ -89,14 +85,14 @@ var _ = Describe("Full SignInfo duplicates tests", func() {
 					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
 					Signature:            "bbb=",
 				},
-			}
-			isValid = true
-		})
-	})
+			},
+			isValid: true,
+		}),
 
-	When("all fields are different", func() {
-		It("should pass", func() {
-			structs_ = []*SignInfo{
+	Entry(
+		"All fields are different", 
+		TestCaseSignInfosStruct{
+			signInfos: []*SignInfo{
 				{
 					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
 					Signature:            "aaa=",
@@ -105,14 +101,14 @@ var _ = Describe("Full SignInfo duplicates tests", func() {
 					VerificationMethodId: "did:cheqd:bbbbbbbbbbbbbbbb#method1",
 					Signature:            "bbb=",
 				},
-			}
-			isValid = true
-		})
-	})
+			},
+			isValid: true,
+		}),
 
-	When("all fields are the same", func() {
-		It("should fail", func() {
-			structs_ = []*SignInfo{
+	Entry(
+		"All fields are the same", 
+		TestCaseSignInfosStruct{
+			signInfos: []*SignInfo{
 				{
 					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
 					Signature:            "aaa=",
@@ -121,14 +117,14 @@ var _ = Describe("Full SignInfo duplicates tests", func() {
 					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
 					Signature:            "aaa=",
 				},
-			}
-			isValid = false
-		})
-	})
+			},
+			isValid: false,
+		}),
 
-	When("all fields are the same and more elments", func() {
-		It("should fail", func() {
-			structs_ = []*SignInfo{
+	Entry(
+		"All fields are the same and more elments", 
+		TestCaseSignInfosStruct{
+			signInfos: []*SignInfo{
 				{
 					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
 					Signature:            "aaa=",
@@ -141,8 +137,8 @@ var _ = Describe("Full SignInfo duplicates tests", func() {
 					VerificationMethodId: "did:cheqd:aaaaaaaaaaaaaaaa#method1",
 					Signature:            "aaa=",
 				},
-			}
-			isValid = false
-		})
-	})
+			},
+			isValid: false,
+		}),
+	)
 })
