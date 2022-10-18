@@ -18,11 +18,11 @@ services:
         published: 26660    # Prometheus metrics port
     entrypoint: [ "node-start" ]
     healthcheck:
-      test: curl -s http://localhost:26657/syncing | grep -c false
+      test: curl -s http://localhost:26657/status | grep -c false
       interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
+      timeout: 2s
+      retries: 6
+      start_period: 15s
     volumes:
       - type: volume
         source: validator-0-data
@@ -55,6 +55,12 @@ services:
       - target: 26660
         published: 26760    # Prometheus metrics port
     entrypoint: [ "node-start" ]
+    healthcheck:
+      test: curl -s http://localhost:26757/status | grep -c false
+      interval: 10s
+      timeout: 2s
+      retries: 6
+      start_period: 15s
     volumes:
       - type: volume
         source: validator-1-data
@@ -87,6 +93,12 @@ services:
       - target: 26660
         published: 26860    # Prometheus metrics port
     entrypoint: [ "node-start" ]
+    healthcheck:
+      test: curl -s http://localhost:26857/status | grep -c false
+      interval: 10s
+      timeout: 2s
+      retries: 6
+      start_period: 15s
     volumes:
       - type: volume
         source: validator-2-data
@@ -119,6 +131,12 @@ services:
       - target: 26660
         published: 26960    # Prometheus metrics port
     entrypoint: [ "node-start" ]
+    healthcheck:
+      test: curl -s http://localhost:26957/status | grep -c false
+      interval: 10s
+      timeout: 2s
+      retries: 6
+      start_period: 15s
     volumes:
       - type: volume
         source: validator-3-data
@@ -151,6 +169,12 @@ services:
       - target: 26660
         published: 27060    # Prometheus metrics port
     entrypoint: [ "node-start" ]
+    healthcheck:
+      test: curl -s http://localhost:27057/status | grep -c false
+      interval: 10s
+      timeout: 2s
+      retries: 6
+      start_period: 15s
     volumes:
       - type: volume
         source: seed-0-data
@@ -187,6 +211,12 @@ services:
         source: observer-0-data
         target: /home/cheqd
     entrypoint: [ "node-start" ]
+    healthcheck:
+      test: curl -s http://localhost:27157/status | grep -c false
+      interval: 10s
+      timeout: 2s
+      retries: 6
+      start_period: 15s
     env_file:
       - container-env/observer-0.env
     configs:
