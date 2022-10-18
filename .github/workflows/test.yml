@@ -54,9 +54,9 @@ jobs:
  
       - name: 'Echo download path'
         run: |
-        echo ${{ github.workspace }}
-        ls -R ${{ github.workspace }}
-        echo ${{ steps.download.outputs.download-path }}
+          echo ${{ github.workspace }}
+          ls -R ${{ github.workspace }}
+          echo ${{ steps.download.outputs.download-path }}
 
       - name: Restore binary permissions
         run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
