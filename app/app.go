@@ -106,11 +106,12 @@ import (
 	tmjson "github.com/tendermint/tendermint/libs/json"
 
 	ica "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts"
-	icacontrollertypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/controller/types"
 	icahost "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host"
 	icahostkeeper "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host/keeper"
 	icahosttypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host/types"
 	icatypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/types"
+
+	migrations "github.com/cheqd/cheqd-node/app/migrations"
 )
 
 var (
@@ -593,11 +594,27 @@ func New(
 
 	app.configurator = module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
 	app.mm.RegisterServices(app.configurator)
-	app.configurator.RegisterMigration(
+
+	// Init Migrators
+	cheqdMigrator := migrations.NewCheqdMigrator(app.cheqdKeeper)
+	resourceMigrator := migrations.NewResourceMigrator(app.cheqdKeeper, app.resourceKeeper)
+
+	// Register upgrade store migrations per module
+	if err := app.configurator.RegisterMigration(
 		cheqdtypes.ModuleName,
-		cheqdtypes.ConsensusVersion(),
-		migrationHandler
-	)
+		app.mm.GetVersionMap()[cheqdtypes.ModuleName],
+		cheqdMigrator.Migrate06to1,
+	); err != nil {
+		panic(err)
+	}
+
+	if err := app.configurator.RegisterMigration(
+		resourcetypes.ModuleName,
+		app.mm.GetVersionMap()[resourcetypes.ModuleName],
+		resourceMigrator.Migrate06to1,
+	); err != nil {
+		panic(err)
+	}
 
 	// initialize stores
 	app.MountKVStores(keys)
@@ -622,50 +639,8 @@ func New(
 
 	// Latest upgrade handler
 	app.UpgradeKeeper.SetUpgradeHandler(UpgradeName, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("Handler for upgrade plan: v0.6")
-
-		// set the ICS27 consensus version so InitGenesis is not run
-		fromVM[icatypes.ModuleName] = icaModule.ConsensusVersion()
-
-		// create ICS27 Controller submodule params
-		controllerParams := icacontrollertypes.Params{
-			ControllerEnabled: true,
-		}
-
-		// create ICS27 Host submodule params
-		hostParams := icahosttypes.Params{
-			HostEnabled: true,
-			AllowMessages: []string{
-				authzMsgExec,
-				authzMsgGrant,
-				authzMsgRevoke,
-				bankMsgSend,
-				bankMsgMultiSend,
-				distrMsgSetWithdrawAddr,
-				distrMsgWithdrawValidatorCommission,
-				distrMsgFundCommunityPool,
-				distrMsgWithdrawDelegatorReward,
-				feegrantMsgGrantAllowance,
-				feegrantMsgRevokeAllowance,
-				govMsgVoteWeighted,
-				govMsgSubmitProposal,
-				govMsgDeposit,
-				govMsgVote,
-				stakingMsgEditValidator,
-				stakingMsgDelegate,
-				stakingMsgUndelegate,
-				stakingMsgBeginRedelegate,
-				stakingMsgCreateValidator,
-				vestingMsgCreateVestingAccount,
-				ibcMsgTransfer,
-			},
-		}
-
-		// initialize ICS27 module
-		ctx.Logger().Info("start to init interchainaccount module...")
-		icaModule.InitModule(ctx, controllerParams, hostParams)
-
-		ctx.Logger().Info("start to run module migrations...")
+		ctx.Logger().Info("Handler for upgrade plan: v1.0.0")
+		// TODO: Add upgrade plan logic here
 		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 	})
 
@@ -675,6 +650,8 @@ func New(
 		panic(err)
 	}
 
+	// Perform in-place store migrations if the modules are new
+	// TODO: Remove this since no new modules are added
 	if upgradeInfo.Name == UpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		storeUpgrades := storetypes.StoreUpgrades{
 			Added: []string{

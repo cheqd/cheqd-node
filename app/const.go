@@ -4,7 +4,7 @@ const (
 	Name = "cheqd-node"
 	Home = ".cheqdnode"
 
-	UpgradeName           = "v0.6"
+	UpgradeName           = "v1.0.0"
 	CosmovisorTestUpgrade = "cosmovisor_test"
 
 	// allowed msg types of ica host
