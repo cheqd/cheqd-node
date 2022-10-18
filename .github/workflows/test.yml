@@ -12,30 +12,30 @@ permissions:
 
 jobs:
 
-  unit-tests:
-    name: "Unit Tests"
-    runs-on: ubuntu-latest
+  # unit-tests:
+  #   name: "Unit Tests"
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v3
+  #   steps:
+  #     - uses: actions/checkout@v3
 
-      - uses: actions/setup-go@v3
-        with:
-          go-version-file: ./go.mod
-          cache: true
+  #     - uses: actions/setup-go@v3
+  #       with:
+  #         go-version-file: ./go.mod
+  #         cache: true
 
-      - name: Install ginkgo
-        run: |
-          go get github.com/onsi/ginkgo/v2/ginkgo
-          go get github.com/onsi/gomega/...
+  #     - name: Install ginkgo
+  #       run: |
+  #         go get github.com/onsi/ginkgo/v2/ginkgo
+  #         go get github.com/onsi/gomega/...
 
-      # - name: Run Ginkgo tests
-      #   run: ginkgo -r --race --randomize-all --randomize-suites --junit-report report.xml
+  #     # - name: Run Ginkgo tests
+  #     #   run: ginkgo -r --race --randomize-all --randomize-suites --junit-report report.xml
 
-      # - uses: mikepenz/action-junit-report@v3
-      #   if: success() || failure()        # run this step even if previous step failed
-      #   with:
-      #     report_paths: 'report.xml'
+  #     # - uses: mikepenz/action-junit-report@v3
+  #     #   if: success() || failure()        # run this step even if previous step failed
+  #     #   with:
+  #     #     report_paths: 'report.xml'
 
   integration-tests:
     name: "Integration tests"
@@ -94,4 +94,4 @@ jobs:
       - name: Run tests
         working-directory: ./..
         run: |
-          go run github.com/onsi/ginkgo/v2/ginkgo -r --tags integration tests/integration/...
+          go run github.com/onsi/ginkgo/v2/ginkgo -r --tags integration tests/integration
