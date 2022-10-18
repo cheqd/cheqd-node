@@ -5,7 +5,7 @@ defaults:
   run:
     shell: bash
 env:
-  RUNNER_BASE_DIR: ${{ github.workspace }}
+  RUNNER_BIN_DIR: /home/runner/.local/bin
   NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/docker/localnet/network-config"
 permissions:
   contents: write
@@ -49,10 +49,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: cheqd-noded
-          path: ${{ env.RUNNER_BASE_DIR }}/bin
+          path: ${{ env.RUNNER_BIN_DIR }}
 
       - name: Restore binary permissions
-        run: sudo chmod +x ${{ env.RUNNER_BASE_DIR }}/bin/cheqd-noded
+        run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
 
       - name: Download node Docker image
         uses: actions/download-artifact@v3
