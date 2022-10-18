@@ -12,11 +12,10 @@ function import_key() {
 
     if cheqd-noded keys show "${ALIAS}" --keyring-backend ${KEYRING_BACKEND}
     then
-      echo "Key already exists"
+      echo "Key ${ALIAS} already exists"
       return 0
     fi
 
-    echo "Key doesn't exist"
     echo "${MNEMONIC}" | cheqd-noded keys add "${ALIAS}" --keyring-backend ${KEYRING_BACKEND} --recover
 }
 
