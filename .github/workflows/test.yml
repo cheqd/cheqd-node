@@ -25,7 +25,7 @@ jobs:
 
       - name: Install ginkgo
         run: |
-          go get github.com/onsi/ginkgo/v2/ginkgo
+          go install github.com/onsi/ginkgo/v2/ginkgo
           go get github.com/onsi/gomega/...
 
       - name: Setup tmate session
