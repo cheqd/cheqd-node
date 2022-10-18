@@ -25,13 +25,13 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: build --rm-dist --snapshot --id ubuntu-latest-amd64
+          args: build --rm-dist --snapshot --id ubuntu-latest-amd64 --output ${{ github.workspace }}/dist
 
       - name: Store artifact
         uses: actions/upload-artifact@v3
         with:
           name: cheqd-noded
-          path: dist/**/cheqd-noded
+          path: dist
 
   build-docker:
     name: "Docker image"
