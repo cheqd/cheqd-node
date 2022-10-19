@@ -34,5 +34,5 @@ jobs:
       - uses: mikepenz/action-junit-report@v3
         if: success() || failure()        # run this step even if previous step failed
         with:
-          report_paths: 'report*'
+          report_paths: 'report.xml'
           token: ${{ secrets.GH_PAT }}
