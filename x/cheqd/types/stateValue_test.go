@@ -15,7 +15,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-var _ = Describe(`StaeValue tests`, func() {
+var _ = Describe(`StateValue tests`, func() {
 	Context("Pack/unpack functionality", func() {
 		It("should pack and unpack withour any errors", func() {
 			original := &Did{

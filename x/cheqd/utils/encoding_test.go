@@ -46,9 +46,9 @@ var _ = Describe("Encoding checks", func() {
 		func(data string, isValid bool) {
 			_err := ValidateMultibase(data)
 			if isValid {
-				Ω(_err).ShouldNot(HaveOccurred())
+				Expect(_err).ShouldNot(HaveOccurred())
 			} else {
-				Ω(_err).Should(HaveOccurred())
+				Expect(_err).Should(HaveOccurred())
 			}
 		},
 
@@ -64,9 +64,9 @@ var _ = Describe("Encoding checks", func() {
 		func(data string, isValid bool) {
 			_err := ValidateBase58(data)
 			if isValid {
-				Ω(_err).ShouldNot(HaveOccurred())
+				Expect(_err).ShouldNot(HaveOccurred())
 			} else {
-				Ω(_err).Should(HaveOccurred())
+				Expect(_err).Should(HaveOccurred())
 			}
 		},
 
@@ -80,9 +80,9 @@ var _ = Describe("Encoding checks", func() {
 		func(data string, isValid bool) {
 			_err := ValidateJWK(data)
 			if isValid {
-				Ω(_err).ShouldNot(HaveOccurred())
+				Expect(_err).ShouldNot(HaveOccurred())
 			} else {
-				Ω(_err).Should(HaveOccurred())
+				Expect(_err).Should(HaveOccurred())
 			}
 		},
 

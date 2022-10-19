@@ -1,3 +1,3 @@
 package setup
 
-const DID_NAMESPACE = "test"
+const DID_NAMESPACE = "testnet"
