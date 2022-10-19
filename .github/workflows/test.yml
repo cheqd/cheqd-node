@@ -96,5 +96,5 @@ jobs:
         if: always()
         with:
           name: JEST Tests
-          path: report.xml
+          path: ./report.xml
           reporter: jest-junit 
