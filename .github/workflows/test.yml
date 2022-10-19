@@ -35,3 +35,4 @@ jobs:
         if: success() || failure()        # run this step even if previous step failed
         with:
           report_paths: 'report.xml'
+          token: ${{ secrets.GITHUB_TOKEN }}
