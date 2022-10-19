@@ -73,9 +73,6 @@ jobs:
         run: |
           docker compose --env-file docker-compose.env up --detach --no-build
 
-      # - name: Check all Docker localnet nodes are active
-      #   run: bash ./tests/tools/wait-for-chain.sh
-
       - name: Import keys
         working-directory: ./docker/localnet
         run: |
@@ -92,4 +89,4 @@ jobs:
 
       - name: Run tests
         working-directory: ./tests/integration
-        run: ginkgo -r --tags integration
+        run: ginkgo -r --tags integration --race --randomize-suites --keep-going --trace
