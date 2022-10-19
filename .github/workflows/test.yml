@@ -89,4 +89,9 @@ jobs:
 
       - name: Run tests
         working-directory: ./tests/integration
-        run: ginkgo -r --tags integration --race --randomize-suites --keep-going --trace
+        run: ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --junit-report report.xml
+
+      - uses: mikepenz/action-junit-report@v3
+        if: success() || failure()        # run this step even if previous step failed
+        with:
+          report_paths: 'report.xml'
