@@ -26,10 +26,7 @@ jobs:
       - name: Install ginkgo
         working-directory: ./..
         run: |
-          go install github.com/onsi/ginkgo/v2/ginkgo@v2.1.6
-
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
+          go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
       - name: Run Ginkgo tests
         run: ginkgo -r --race --randomize-all --randomize-suites --junit-report report.xml
