@@ -26,9 +26,7 @@ jobs:
       - name: Install ginkgo
         working-directory: ./..
         run: |
-          cp cheqd-node/go.mod ./
-          cp cheqd-node/go.sum ./
-          go install github.com/onsi/ginkgo/v2/ginkgo
+          go install github.com/onsi/ginkgo/v2/ginkgo@v2.1.6
 
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
