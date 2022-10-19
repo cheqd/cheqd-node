@@ -91,7 +91,10 @@ jobs:
         working-directory: ./tests/integration
         run: ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --junit-report report.xml
 
-      - uses: mikepenz/action-junit-report@v3
-        if: always()        # run it in any situations
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: always()
         with:
-          report_paths: 'report.xml'
+          name: JEST Tests
+          path: report.xml
+          reporter: jest-junit 
