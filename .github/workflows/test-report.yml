@@ -35,6 +35,7 @@ jobs:
         with:
           report_paths: 'report.xml'
           token: ${{ secrets.GITHUB_TOKEN }}
+          check_name: ""
           suite_regex: '*'
           include_passed: true
           detailed_summary: true
