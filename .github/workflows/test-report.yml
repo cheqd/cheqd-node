@@ -1,0 +1,43 @@
+name: "Tests report"
+on:
+  workflow_call:
+defaults:
+  run:
+    shell: bash
+permissions:
+  checks: write
+
+jobs:
+  report_paths:
+    name: "Tests report"
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - name: Download unit tests report
+        with:
+          name: report-unit.xml
+
+      - name: Download integration tests report
+        with:
+          name: report-integration.xml
+
+      
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
+      - name: Combine test results
+        run: |
+          python .github/scripts/xml_combine.py report-unit.xml report-integration.yml > report.xml
+
+      - uses: mikepenz/action-junit-report@v3
+        if: success() || failure()
+        with:
+          report_paths: 'report.xml'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          suite_regex: '*'
+          include_passed: true
+          detailed_summary: true

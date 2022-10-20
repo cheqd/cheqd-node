@@ -32,11 +32,8 @@ jobs:
       - name: Run Ginkgo tests
         run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --junit-report report-unit.xml
 
-      - uses: mikepenz/action-junit-report@v3
-        if: success() || failure()
+      - name: Upload unit tests result
+        uses: actions/upload-artifact@v3
         with:
-          report_paths: 'report-unit.xml'
-          token: ${{ secrets.GITHUB_TOKEN }}
-          suite_regex: '*'
-          include_passed: true
-          detailed_summary: true
+          name: report-unit.xml
+          path: report-unit.xml

@@ -63,15 +63,9 @@ jobs:
       - name: Run tests
         working-directory: ./tests/integration
         run: ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --junit-report report-integration.xml
-
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-
-      - uses: mikepenz/action-junit-report@v3
-        if: success() || failure()
+      
+      - name: Upload unit tests result
+        uses: actions/upload-artifact@v3
         with:
-          report_paths: 'report-integration.xml'
-          token: ${{ secrets.GITHUB_TOKEN }}
-          suite_regex: '*'
-          include_passed: true
-          detailed_summary: true
+          name: report-unit.xml
+          path: report-unit.xml
