@@ -90,11 +90,3 @@ jobs:
       - name: Run tests
         working-directory: ./tests/integration
         run: ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --junit-report report.xml
-
-      # - name: Test Report
-      #   uses: dorny/test-reporter@v1
-      #   if: always()
-      #   with:
-      #     name: JEST Tests
-      #     path: ./report.xml
-      #     reporter: jest-junit 
