@@ -46,5 +46,5 @@ jobs:
         with:
           name: JSON reports            # Name of the check run which will be created
           path: 'report.json'    # Path to test results
-          reporter: mocha-json
+          reporter: flutter-json
           token: ${{ secrets.GITHUB_TOKEN }}
