@@ -16,10 +16,16 @@ jobs:
     needs: call-lint
     uses: ./.github/workflows/build.yml
   
-  call-test:
-    name: "Test"
+  call-unit-test:
+    name: "Tests. Unit"
     needs: call-build
-    uses: ./.github/workflows/test.yml
+    uses: ./.github/workflows/test-unit.yml
+    secrets: inherit
+
+  call-integration-test:
+    name: "Tests. Integration"
+    needs: call-build
+    uses: ./.github/workflows/test-integration.yml
     secrets: inherit
 
   call-release:

@@ -1,0 +1,42 @@
+name: "Unit tests"
+on:
+  workflow_call:
+defaults:
+  run:
+    shell: bash
+env:
+  RUNNER_BIN_DIR: /home/runner/.local/bin
+permissions:
+  contents: write
+  packages: read
+  checks: write
+
+jobs:
+
+  unit-tests:
+    name: "Unit Tests"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: ./go.mod
+          cache: true
+
+      - name: Install ginkgo
+        working-directory: ./..
+        run: |
+          go install github.com/onsi/ginkgo/v2/ginkgo@latest
+      - name: Run Ginkgo tests
+        run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --junit-report report-unit.xml
+
+      - uses: mikepenz/action-junit-report@v3
+        if: success() || failure()
+        with:
+          report_paths: 'report-unit.xml'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          suite_regex: '*'
+          include_passed: true
+          detailed_summary: true
