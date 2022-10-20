@@ -16,25 +16,14 @@ jobs:
     needs: call-lint
     uses: ./.github/workflows/build.yml
   
-  call-unit-test:
+  call-test:
     name: "Tests"
     needs: call-build
-    uses: ./.github/workflows/test-unit.yml
-
-  call-integration-test:
-    name: "Tests"
-    needs: call-build
-    uses: ./.github/workflows/test-integration.yml
-
-  call-test-report:
-    name: "Tests"
-    needs: [call-unit-test, call-integration-test]
-    uses: ./.github/workflows/test-report.yml
-    secrets: inherit
+    uses: ./.github/workflows/test.yml
 
   call-release:
     name: "Release"
-    needs: [call-test-report]
+    needs: [call-test]
     if: ${{ github.ref_protected == true }}
     uses: ./.github/workflows/release.yml
     secrets: inherit
