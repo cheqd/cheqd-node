@@ -9,6 +9,7 @@ env:
 permissions:
   contents: write
   packages: read
+  checks: write
 
 jobs:
   unit-tests:
@@ -24,14 +25,18 @@ jobs:
           cache: true
 
       - name: Install ginkgo
+        working-directory: ./..
         run: |
-          go get github.com/onsi/ginkgo/v2/ginkgo
-          go get github.com/onsi/gomega/...
+          go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
-      # - name: Run Ginkgo tests
-      #   run: ginkgo -r --race --randomize-all --randomize-suites --junit-report report.xml
+      - name: Run Ginkgo tests
+        run: ginkgo -r --race --randomize-all --randomize-suites --junit-report report.xml --json-report=report.json
 
-      # - uses: mikepenz/action-junit-report@v3
-      #   if: success() || failure()        # run this step even if previous step failed
-      #   with:
-      #     report_paths: 'report.xml'
+      - uses: mikepenz/action-junit-report@v3
+        if: success() || failure()        # run this step even if previous step failed
+        with:
+          report_paths: 'report.xml'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          suite_regex: '*'
+          include_passed: true
+          detailed_summary: true

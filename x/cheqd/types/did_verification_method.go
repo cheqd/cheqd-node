@@ -6,7 +6,6 @@ import (
 	"crypto/rsa"
 	"errors"
 	"fmt"
-	"reflect"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -121,11 +120,20 @@ func VerificationMethodListToMapByFragment(vms []*VerificationMethod) map[string
 	return result
 }
 
-func CompareVerificationMethodsWithoutIds(vm1, vm2 VerificationMethod) bool {
-	// We can override ids because  on local copies
-	vm1.Id = ""
-	vm2.Id = ""
-	return reflect.DeepEqual(vm1, vm2)
+// ReplaceIds replaces ids in all fields
+func (vm *VerificationMethod) ReplaceIds(old, new string) {
+	// Controller
+	if vm.Controller == old {
+		vm.Controller = new
+	}
+
+	// Id
+	did, path, query, fragment := utils.MustSplitDIDUrl(vm.Id)
+	if did == old {
+		did = new
+	}
+
+	vm.Id = utils.JoinDIDUrl(did, path, query, fragment)
 }
 
 // Validation
