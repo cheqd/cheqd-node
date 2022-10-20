@@ -40,11 +40,3 @@ jobs:
           suite_regex: '*'
           include_passed: true
           detailed_summary: true
-
-      - uses: dorny/test-reporter@v1
-        if: success() || failure()    # run this step even if previous step failed
-        with:
-          name: JSON reports            # Name of the check run which will be created
-          path: 'report.json'    # Path to test results
-          reporter: dart-json
-          token: ${{ secrets.GITHUB_TOKEN }}
