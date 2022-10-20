@@ -143,7 +143,7 @@ var _ = Describe("cheqd cli negative", func() {
 		Expect(err).ToNot(BeNil())
 	})
 
-	var deepCopierUpdateDid = helpers.DeepCopyUpdateDid{}
+	deepCopierUpdateDid := helpers.DeepCopyUpdateDid{}
 
 	It("cannot update a DID Doc with missing cli arguments, sign inputs mismatch, non-supported VM type, non-existing did, unchanged payload", func() {
 		// Define a valid DID Doc to be updated
@@ -366,9 +366,9 @@ var _ = Describe("cheqd cli negative", func() {
 		invalidVmTypePayload.VerificationMethod = []*types.VerificationMethod{
 			followingUpdatedPayload.VerificationMethod[0],
 			{
-				Id: followingUpdatedPayload.VerificationMethod[1].Id,
-				Type: "NonSupportedVmType",
-				Controller: followingUpdatedPayload.VerificationMethod[1].Controller,
+				Id:                 followingUpdatedPayload.VerificationMethod[1].Id,
+				Type:               "NonSupportedVmType",
+				Controller:         followingUpdatedPayload.VerificationMethod[1].Controller,
 				PublicKeyMultibase: "pretty-long-public-key-multibase",
 			},
 		}
