@@ -11,7 +11,6 @@ func Exec(args ...string) (string, error) {
 	out, err := cmd.CombinedOutput()
 
 	if err != nil {
-		println(string(out))
 		return "", errors.Wrap(err, string(out))
 	}
 

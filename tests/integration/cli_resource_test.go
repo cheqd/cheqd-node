@@ -3,6 +3,7 @@
 package integration
 
 import (
+	"fmt"
 	"crypto/ed25519"
 
 	"github.com/cheqd/cheqd-node/tests/integration/cli"
@@ -16,7 +17,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("cheqd cli", func() {
+var _ = Describe("cheqd cli - positive resource", func() {
 	It("can create diddoc, create resource, query it, query all resource versions of the same resource name, query resource collection", func() {
 		// Create a new DID Doc
 		collectionId := uuid.NewString()
@@ -53,6 +54,7 @@ var _ = Describe("cheqd cli", func() {
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
+		AddReportEntry("Integration", fmt.Sprintf("{{green}}Positive: %s", "can create resource"))
 		// Create a new Resource
 		resourceId := uuid.NewString()
 		resourceName := "TestResource"
@@ -64,6 +66,7 @@ var _ = Describe("cheqd cli", func() {
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
+		AddReportEntry("Integration", fmt.Sprintf("{{green}}Positive: %s", "can query resource"))
 		// Query the Resource
 		res2, err := cli.QueryResource(collectionId, resourceId)
 		Expect(err).To(BeNil())
@@ -86,6 +89,7 @@ var _ = Describe("cheqd cli", func() {
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
+		AddReportEntry("Integration", fmt.Sprintf("{{green}}Positive: %s", "can query all resource versions"))
 		// Query all Resource versions
 		res3, err := cli.QueryAllResourceVersions(collectionId, resourceName)
 		Expect(err).To(BeNil())
@@ -140,6 +144,7 @@ var _ = Describe("cheqd cli", func() {
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
+		AddReportEntry("Integration", fmt.Sprintf("{{green}}Positive: %s", "can query resource collection"))
 		// Query Resource Collection
 		res4, err := cli.QueryResourceCollection(collectionId)
 		Expect(err).To(BeNil())
