@@ -17,19 +17,19 @@ jobs:
     uses: ./.github/workflows/build.yml
   
   call-unit-test:
-    name: "Tests. Unit"
+    name: "Tests"
     needs: call-build
     uses: ./.github/workflows/test-unit.yml
     # secrets: inherit
 
   call-integration-test:
-    name: "Tests. Integration"
+    name: "Tests"
     needs: call-build
     uses: ./.github/workflows/test-integration.yml
     # secrets: inherit
 
   call-test-report:
-    name: "Tests. Report"
+    name: "Tests"
     needs: [call-unit-test, call-integration-test]
     uses: ./.github/workflows/test-report.yml
     secrets: inherit

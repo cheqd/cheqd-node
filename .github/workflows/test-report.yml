@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   report_paths:
-    name: "Tests report"
+    name: "Report"
     runs-on: ubuntu-latest
 
     steps:
