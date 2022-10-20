@@ -3,6 +3,7 @@
 package integration
 
 import (
+	"fmt"
 	"crypto/ed25519"
 
 	"github.com/cheqd/cheqd-node/tests/integration/cli"
@@ -17,8 +18,9 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("cheqd cli", func() {
+var _ = Describe("cheqd cli - positive did", func() {
 	It("can create diddoc, update it and query the result", func() {
+		AddReportEntry("Integration", fmt.Sprintf("{{green}}Positive: %s", "can create diddoc"))
 		// Create a new DID Doc
 		did := "did:cheqd:" + network.DID_NAMESPACE + ":" + uuid.NewString()
 		keyId := did + "#key1"
@@ -53,6 +55,7 @@ var _ = Describe("cheqd cli", func() {
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
+		AddReportEntry("Integration", fmt.Sprintf("{{green}}Positive: %s", "can update diddoc"))
 		// Update the DID Doc
 		newPubKey, newPrivKey, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
@@ -89,6 +92,7 @@ var _ = Describe("cheqd cli", func() {
 		Expect(err).To(BeNil())
 		Expect(res2.Code).To(BeEquivalentTo(0))
 
+		AddReportEntry("Integration", fmt.Sprintf("{{green}}Positive: %s", "can query diddoc"))
 		// Query the DID Doc
 		resp, err := cli.QueryDid(did)
 		Expect(err).To(BeNil())

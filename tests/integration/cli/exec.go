@@ -10,9 +10,8 @@ func Exec(args ...string) (string, error) {
 	cmd := exec.Command(CLI_BINARY_NAME, args...)
 	out, err := cmd.CombinedOutput()
 
-	println(string(out))
-
 	if err != nil {
+		println(string(out))
 		return "", errors.Wrap(err, string(out))
 	}
 
