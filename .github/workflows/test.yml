@@ -30,12 +30,12 @@ jobs:
         run: |
           go install github.com/onsi/ginkgo/v2/ginkgo@latest
       - name: Run Ginkgo tests
-        run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --junit-report report.xml
+        run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --junit-report report-unit.xml
 
       - uses: mikepenz/action-junit-report@v3
         if: success() || failure()
         with:
-          report_paths: 'report.xml'
+          report_paths: 'report-unit.xml'
           token: ${{ secrets.GITHUB_TOKEN }}
           suite_regex: '*'
           include_passed: true
@@ -90,12 +90,12 @@ jobs:
 
       - name: Run tests
         working-directory: ./tests/integration
-        run: ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --junit-report report.xml
+        run: ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --junit-report report-integration.xml
 
       - uses: mikepenz/action-junit-report@v3
-        if: success() || failure()        # run this step even if previous step failed
+        if: success() || failure()
         with:
-          report_paths: 'report.xml'
+          report_paths: 'report-integration.xml'
           token: ${{ secrets.GITHUB_TOKEN }}
           suite_regex: '*'
           include_passed: true
