@@ -11,7 +11,7 @@ def run(files):
         else:
             first.extend(data)
     if first is not None:
-        print(ElementTree.tostring(first))
+        print(ElementTree.tostring(first).decode('utf-8'))
 
 if __name__ == "__main__":
     run(sys.argv[1:])
