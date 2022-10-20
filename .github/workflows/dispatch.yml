@@ -34,7 +34,7 @@ jobs:
 
   call-release:
     name: "Release"
-    needs: [call-unit-test, call-integration-test]
+    needs: [call-test-report]
     if: ${{ github.ref_protected == true }}
     uses: ./.github/workflows/release.yml
     secrets: inherit
