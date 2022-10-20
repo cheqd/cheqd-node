@@ -3,8 +3,8 @@
 package integration
 
 import (
-	"fmt"
 	"crypto/ed25519"
+	"fmt"
 
 	"github.com/cheqd/cheqd-node/tests/integration/cli"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
@@ -20,7 +20,7 @@ import (
 
 var _ = Describe("cheqd cli - positive did", func() {
 	It("can create diddoc, update it and query the result", func() {
-		AddReportEntry("Integration", fmt.Sprintf("{{green}}Positive: %s", "can create diddoc"))
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.GREEN, "can create diddoc"))
 		// Create a new DID Doc
 		did := "did:cheqd:" + network.DID_NAMESPACE + ":" + uuid.NewString()
 		keyId := did + "#key1"
@@ -55,7 +55,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
-		AddReportEntry("Integration", fmt.Sprintf("{{green}}Positive: %s", "can update diddoc"))
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.GREEN, "can update diddoc"))
 		// Update the DID Doc
 		newPubKey, newPrivKey, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
@@ -92,7 +92,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 		Expect(err).To(BeNil())
 		Expect(res2.Code).To(BeEquivalentTo(0))
 
-		AddReportEntry("Integration", fmt.Sprintf("{{green}}Positive: %s", "can query diddoc"))
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.GREEN, "can query diddoc"))
 		// Query the DID Doc
 		resp, err := cli.QueryDid(did)
 		Expect(err).To(BeNil())
