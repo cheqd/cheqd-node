@@ -11,6 +11,6 @@ const (
 )
 
 const (
-	GREEN  = "\033[1;32m%s\033[0m"
-	PURPLE = "\033[1;34m%s\033[0m"
+	GREEN  = "\033[32m"
+	PURPLE = "\033[35m"
 )
