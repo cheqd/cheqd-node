@@ -64,6 +64,9 @@ jobs:
         working-directory: ./tests/integration
         run: ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --junit-report report-integration.xml
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
       - uses: mikepenz/action-junit-report@v3
         if: success() || failure()
         with:

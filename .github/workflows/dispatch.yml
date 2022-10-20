@@ -7,20 +7,20 @@ concurrency:
 
 jobs:
 
-  call-lint:
-    name: "Lint"
-    uses: ./.github/workflows/lint.yml
+  # call-lint:
+  #   name: "Lint"
+  #   uses: ./.github/workflows/lint.yml
 
   call-build:
     name: "Build"
     needs: call-lint
     uses: ./.github/workflows/build.yml
   
-  call-unit-test:
-    name: "Tests. Unit"
-    needs: call-build
-    uses: ./.github/workflows/test-unit.yml
-    secrets: inherit
+  # call-unit-test:
+  #   name: "Tests. Unit"
+  #   needs: call-build
+  #   uses: ./.github/workflows/test-unit.yml
+  #   secrets: inherit
 
   call-integration-test:
     name: "Tests. Integration"
@@ -28,9 +28,9 @@ jobs:
     uses: ./.github/workflows/test-integration.yml
     secrets: inherit
 
-  call-release:
-    name: "Release"
-    needs: [call-unit-test, call-integration-test]
-    if: ${{ github.ref_protected == true }}
-    uses: ./.github/workflows/release.yml
-    secrets: inherit
+  # call-release:
+  #   name: "Release"
+  #   needs: [call-unit-test, call-integration-test]
+  #   if: ${{ github.ref_protected == true }}
+  #   uses: ./.github/workflows/release.yml
+  #   secrets: inherit
