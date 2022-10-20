@@ -3,8 +3,8 @@
 package integration
 
 import (
-	"fmt"
 	"crypto/ed25519"
+	"fmt"
 
 	"github.com/cheqd/cheqd-node/tests/integration/cli"
 	helpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
@@ -84,7 +84,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 			},
 		}
 
-		AddReportEntry("Integration", fmt.Sprintf("{{purple}}Negative: %s", "cannot create diddoc with missing cli arguments"))
+		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.PURPLE, "cannot create diddoc with missing cli arguments"))
 		// Fail to create a new DID Doc with missing cli arguments
 		//   a. missing payload, sign inputs and account
 		_, err = cli.CreateDid(types.MsgCreateDidPayload{}, []cli_types.SignInput{}, "")
@@ -112,7 +112,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 		_, err = cli.CreateDid(payload2, signInputs2, "")
 		Expect(err).ToNot(BeNil())
 
-		AddReportEntry("Integration", fmt.Sprintf("{{purple}}Negative: %s", "cannot create diddoc with sign inputs mismatch"))
+		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.PURPLE, "cannot create diddoc with sign inputs mismatch"))
 		// Fail to create a new DID Doc with sign inputs mismatch
 		//   a. sign inputs mismatch
 		_, err = cli.CreateDid(payload2, signInputs, testdata.BASE_ACCOUNT_2)
@@ -135,14 +135,14 @@ var _ = Describe("cheqd cli - negative did", func() {
 			},
 		}, testdata.BASE_ACCOUNT_2)
 
-		AddReportEntry("Integration", fmt.Sprintf("{{purple}}Negative: %s", "cannot create diddoc with non-supported VM type"))
+		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.PURPLE, "cannot create diddoc with non-supported VM type"))
 		// Fail to create a new DID Doc with non-supported VM type
 		payload3 := payload2
 		payload3.VerificationMethod[0].Type = "NonSupportedVMType"
 		_, err = cli.CreateDid(payload3, signInputs2, testdata.BASE_ACCOUNT_2)
 		Expect(err).ToNot(BeNil())
 
-		AddReportEntry("Integration", fmt.Sprintf("{{purple}}Negative: %s", "cannot create diddoc with already existing DID"))
+		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.PURPLE, "cannot create diddoc with already existing DID"))
 		// Fail to create a new DID Doc with already existing DID
 		_, err = cli.CreateDid(payload, signInputs, testdata.BASE_ACCOUNT_1)
 		Expect(err).ToNot(BeNil())
@@ -289,7 +289,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 
 		signInputsAugmented := append(signInputs, signInputs2...)
 
-		AddReportEntry("Integration", fmt.Sprintf("{{purple}}Negative: %s", "cannot update diddoc with missing cli arguments"))
+		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.PURPLE, "cannot update diddoc with missing cli arguments"))
 		// Fail to update the DID Doc with missing cli arguments
 		//   a. missing payload, sign inputs and account
 		_, err = cli.UpdateDid(types.MsgUpdateDidPayload{}, []cli_types.SignInput{}, "")
@@ -319,7 +319,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 		_, err = cli.UpdateDid(followingUpdatedPayload, signInputs, "")
 		Expect(err).ToNot(BeNil())
 
-		AddReportEntry("Integration", fmt.Sprintf("{{purple}}Negative: %s", "cannot update diddoc with sign inputs mismatch"))
+		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.PURPLE, "cannot update diddoc with sign inputs mismatch"))
 		// Fail to update the DID Doc with sign inputs mismatch
 		//   a. sign inputs total mismatch
 		_, err = cli.UpdateDid(followingUpdatedPayload, signInputsFuzzed, testdata.BASE_ACCOUNT_1)
@@ -368,7 +368,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 		}, testdata.BASE_ACCOUNT_1)
 		Expect(err).ToNot(BeNil())
 
-		AddReportEntry("Integration", fmt.Sprintf("{{purple}}Negative: %s", "cannot update diddoc with a non-supported VM type"))
+		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.PURPLE, "cannot update diddoc with a non-supported VM type"))
 		// Fail to update the DID Doc with a non-supported VM type
 		invalidVmTypePayload := deepCopierUpdateDid.DeepCopy(followingUpdatedPayload)
 		invalidVmTypePayload.VerificationMethod = []*types.VerificationMethod{
@@ -383,7 +383,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 		_, err = cli.UpdateDid(invalidVmTypePayload, signInputsAugmented, testdata.BASE_ACCOUNT_1)
 		Expect(err).ToNot(BeNil())
 
-		AddReportEntry("Integration", fmt.Sprintf("{{purple}}Negative: %s", "cannot update diddoc with a non-existing DID"))
+		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.PURPLE, "cannot update diddoc with a non-existing DID"))
 		// Fail to update a non-existing DID Doc
 		nonExistingDid := "did:cheqd:" + network.DID_NAMESPACE + ":" + uuid.NewString()
 		nonExistingDidPayload := deepCopierUpdateDid.DeepCopy(followingUpdatedPayload)
@@ -396,20 +396,20 @@ var _ = Describe("cheqd cli - negative did", func() {
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
-		AddReportEntry("Integration", fmt.Sprintf("{{purple}}Positive: %s", "cannot update diddoc with an unchanged payload"))
+		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.PURPLE, "cannot update diddoc with an unchanged payload"))
 		// Fail to update the DID Doc with an unchanged payload
 		_, err = cli.UpdateDid(followingUpdatedPayload, signInputsAugmented, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(BeNil()) // TODO: Decide if this should be an error, if the DID Doc is unchanged
 	})
 
 	It("cannot query a diddoc with missing cli arguments, non-existing diddoc", func() {
-		AddReportEntry("Integration", fmt.Sprintf("{{purple}}Negative: %s", "cannot query diddoc with missing cli arguments"))
+		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.PURPLE, "cannot query diddoc with missing cli arguments"))
 		// Fail to query the DID Doc with missing cli arguments
 		//   a. missing did
 		_, err := cli.QueryDid("")
 		Expect(err).ToNot(BeNil())
 
-		AddReportEntry("Integration", fmt.Sprintf("{{purple}}Negative: %s", "cannot query diddoc with a non-existing DID"))
+		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.PURPLE, "cannot query diddoc with a non-existing DID"))
 		// Fail to query a non-existing DID Doc
 		nonExistingDid := "did:cheqd:" + network.DID_NAMESPACE + ":" + uuid.NewString()
 		_, err = cli.QueryDid(nonExistingDid)
