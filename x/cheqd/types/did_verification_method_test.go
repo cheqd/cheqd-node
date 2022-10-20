@@ -47,7 +47,7 @@ var _ = Describe("Verification Method tests", func() {
 					PublicKeyMultibase: ValidEd25519PubKey,
 				},
 				isValid:  true,
-				errorMsg: "",
+				errorMsg: "123",
 			}),
 
 		Entry(
