@@ -26,11 +26,6 @@ jobs:
         with:
           name: report-integration.xml
 
-      
-
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-
       - name: Combine test results
         run: |
           python .github/scripts/xml_combine.py report-unit.xml report-integration.xml > report.xml
