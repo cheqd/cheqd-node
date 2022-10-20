@@ -9,33 +9,37 @@ env:
 permissions:
   contents: write
   packages: read
+  checks: write
 
 jobs:
 
-  # unit-tests:
-  #   name: "Unit Tests"
-  #   runs-on: ubuntu-latest
+  unit-tests:
+    name: "Unit Tests"
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - uses: actions/checkout@v3
+    steps:
+      - uses: actions/checkout@v3
 
-  #     - uses: actions/setup-go@v3
-  #       with:
-  #         go-version-file: ./go.mod
-  #         cache: true
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: ./go.mod
+          cache: true
 
-  #     - name: Install ginkgo
-  #       run: |
-  #         go get github.com/onsi/ginkgo/v2/ginkgo
-  #         go get github.com/onsi/gomega/...
+      - name: Install ginkgo
+        working-directory: ./..
+        run: |
+          go install github.com/onsi/ginkgo/v2/ginkgo@latest
+      - name: Run Ginkgo tests
+        run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --junit-report report.xml
 
-  #     # - name: Run Ginkgo tests
-  #     #   run: ginkgo -r --race --randomize-all --randomize-suites --junit-report report.xml
-
-  #     # - uses: mikepenz/action-junit-report@v3
-  #     #   if: success() || failure()        # run this step even if previous step failed
-  #     #   with:
-  #     #     report_paths: 'report.xml'
+      - uses: mikepenz/action-junit-report@v3
+        if: success() || failure()
+        with:
+          report_paths: 'report.xml'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          suite_regex: '*'
+          include_passed: true
+          detailed_summary: true
 
   integration-tests:
     name: "Integration tests"
@@ -67,17 +71,14 @@ jobs:
         run: |
           bash gen-network-config.sh
           sudo chown -R 1000:1000 network-config
-
       - name: Set up Docker localnet
         working-directory: ./docker/localnet
         run: |
           docker compose --env-file docker-compose.env up --detach --no-build
-
       - name: Import keys
         working-directory: ./docker/localnet
         run: |
           bash import-keys.sh
-
       - uses: actions/setup-go@v3
         with:
           go-version-file: ./go.mod
@@ -90,3 +91,12 @@ jobs:
       - name: Run tests
         working-directory: ./tests/integration
         run: ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --junit-report report.xml
+
+      - uses: mikepenz/action-junit-report@v3
+        if: success() || failure()        # run this step even if previous step failed
+        with:
+          report_paths: 'report.xml'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          suite_regex: '*'
+          include_passed: true
+          detailed_summary: true
