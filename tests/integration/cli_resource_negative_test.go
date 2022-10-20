@@ -3,6 +3,7 @@
 package integration
 
 import (
+	"fmt"
 	"crypto/ed25519"
 
 	"github.com/cheqd/cheqd-node/tests/integration/cli"
@@ -17,7 +18,7 @@ import (
 	"github.com/tendermint/tendermint/libs/rand"
 )
 
-var _ = Describe("cheqd cli negative", func() {
+var _ = Describe("cheqd cli - negative resource", func() {
 	var collectionId string
 	var did string
 	var signInputs []cli_types.SignInput
@@ -64,7 +65,7 @@ var _ = Describe("cheqd cli negative", func() {
 		resourceName = "TestName"
 	})
 
-	It("cannot create resource missing cli arguments, sign inputs mismatch, ", func() {
+	It("cannot create resource with missing cli arguments, sign inputs mismatch", func() {
 		// Generate a new DID Doc
 		collectionId2 := uuid.NewString()
 
@@ -88,6 +89,7 @@ var _ = Describe("cheqd cli negative", func() {
 		_, err = cli.CreateResource(collectionId2, resourceId, resourceName, resourceType, resourceFile, signInputs, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(HaveOccurred())
 
+		AddReportEntry("Integration", fmt.Sprintf("{{purple}}Negative: %s", "cannot create resource with missing cli arguments"))
 		// Fail to create a resource with missing cli arguments
 		//   a. missing collection id
 		_, err = cli.CreateResource("", resourceId, resourceName, resourceType, resourceFile, signInputs, testdata.BASE_ACCOUNT_1)
@@ -117,6 +119,7 @@ var _ = Describe("cheqd cli negative", func() {
 		_, err = cli.CreateResource(collectionId, resourceId, resourceName, resourceType, resourceFile, signInputs, "")
 		Expect(err).To(HaveOccurred())
 
+		AddReportEntry("Integration", fmt.Sprintf("{{purple}}Negative: %s", "cannot create resource with sign inputs mismatch"))
 		// Fail to create a resource with sign inputs mismatch
 		//   a. sign inputs mismatch
 		_, err = cli.CreateResource(collectionId, resourceId, resourceName, resourceType, resourceFile, signInputs2, testdata.BASE_ACCOUNT_1)
@@ -159,6 +162,7 @@ var _ = Describe("cheqd cli negative", func() {
 		collectionId2 := uuid.NewString()
 		resourceId2 := uuid.NewString()
 
+		AddReportEntry("Integration", fmt.Sprintf("{{purple}}Negative: %s", "cannot query a resource with missing cli arguments"))
 		// Fail to query a resource with missing cli arguments
 		//   a. missing collection id, resource id
 		_, err := cli.QueryResource("", "")
@@ -172,10 +176,12 @@ var _ = Describe("cheqd cli negative", func() {
 		_, err = cli.QueryResource(collectionId2, "")
 		Expect(err).To(HaveOccurred())
 
+		AddReportEntry("Integration", fmt.Sprintf("{{purple}}Negative: %s", "cannot query a resource with non-existing collection id"))
 		// Fail to query a resource with non-existing collection id
 		_, err = cli.QueryResource(collectionId2, resourceId)
 		Expect(err).To(HaveOccurred())
 
+		AddReportEntry("Integration", fmt.Sprintf("{{purple}}Negative: %s", "cannot query a resource with non-existing resource id"))
 		// Fail to query a resource with non-existing resource id
 		_, err = cli.QueryResource(collectionId, resourceId2)
 		Expect(err).To(HaveOccurred())
@@ -185,6 +191,7 @@ var _ = Describe("cheqd cli negative", func() {
 		collectionId2 := uuid.NewString()
 		resourceName2 := rand.Str(10)
 
+		AddReportEntry("Integration", fmt.Sprintf("{{purple}}Negative: %s", "cannot query all resource versions with missing cli arguments"))
 		// Fail to query all resource versions with missing cli arguments
 		//   a. missing collection id, resource name
 		_, err := cli.QueryAllResourceVersions("", "")
@@ -198,10 +205,12 @@ var _ = Describe("cheqd cli negative", func() {
 		_, err = cli.QueryAllResourceVersions(collectionId2, "")
 		Expect(err).To(HaveOccurred())
 
+		AddReportEntry("Integration", fmt.Sprintf("{{purple}}Negative: %s", "cannot query all resource versions with non-existing collection id"))
 		// Fail to query all resource versions with non-existing collection id
 		_, err = cli.QueryAllResourceVersions(collectionId2, resourceName)
 		Expect(err).To(HaveOccurred())
 
+		AddReportEntry("Integration", fmt.Sprintf("{{purple}}Negative: %s", "cannot query all resource versions with non-existing resource name"))
 		// Fail to query all resource versions with non-existing resource name
 		res, err := cli.QueryAllResourceVersions(collectionId, resourceName2)
 		Expect(err).To(BeNil())
@@ -211,11 +220,13 @@ var _ = Describe("cheqd cli negative", func() {
 	It("cannot query resource collection with missing cli arguments, non-existing collection id", func() {
 		collectionId2 := uuid.NewString()
 
+		AddReportEntry("Integration", fmt.Sprintf("{{purple}}Negative: %s", "cannot query resource collection with missing cli arguments"))
 		// Fail to query resource collection with missing cli arguments
 		//   a. missing collection id
 		_, err := cli.QueryResourceCollection("")
 		Expect(err).To(HaveOccurred())
 
+		AddReportEntry("Integration", fmt.Sprintf("{{purple}}Negative: %s", "cannot query resource collection with non-existing collection id"))
 		// Fail to query resource collection with non-existing collection id
 		_, err = cli.QueryResourceCollection(collectionId2)
 		Expect(err).To(HaveOccurred())
