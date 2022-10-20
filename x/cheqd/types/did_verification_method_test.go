@@ -46,7 +46,7 @@ var _ = Describe("Verification Method tests", func() {
 					PublicKeyJwk:       nil,
 					PublicKeyMultibase: ValidEd25519PubKey,
 				},
-				isValid:  true,
+				isValid:  false,
 				errorMsg: "123",
 			}),
 
