@@ -17,14 +17,14 @@ jobs:
     uses: ./.github/workflows/build.yml
   
   call-test:
-    name: "Test"
+    name: "Tests"
     needs: call-build
     uses: ./.github/workflows/test.yml
     secrets: inherit
 
   call-release:
     name: "Release"
-    needs: [call-build, call-test]
+    needs: [call-test]
     if: ${{ github.ref_protected == true }}
     uses: ./.github/workflows/release.yml
     secrets: inherit
