@@ -91,7 +91,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 
 		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.GREEN, "can query all resource versions"))
 		// Query all Resource versions
-		res3, err := cli.QueryAllResourceVersions(collectionId, resourceName)
+		res3, err := cli.QueryAllResourceVersions(collectionId, resourceName, resourceType)
 		Expect(err).To(BeNil())
 		Expect(len(res3.Resources)).To(Equal(2))
 		Expect(res3.Resources[0].CollectionId).To(Equal(collectionId))
