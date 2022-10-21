@@ -3,7 +3,6 @@ package keeper
 import (
 	"context"
 	"crypto/sha256"
-
 	"time"
 
 	"github.com/cheqd/cheqd-node/x/resource/utils"
