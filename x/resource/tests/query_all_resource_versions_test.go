@@ -1,14 +1,13 @@
 package tests
 
 import (
-	"crypto/ed25519"
-	"fmt"
-	"testing"
+	. "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 
-	cheqdtests "github.com/cheqd/cheqd-node/x/cheqd/tests"
+	cheqdsetup "github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
 	"github.com/cheqd/cheqd-node/x/resource/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/stretchr/testify/require"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 func SendAnotherResourceVersion(t require.TestingT, resourceSetup TestSetup, keys map[string]cheqdtests.KeyPair) types.Resource {
@@ -18,7 +17,6 @@ func SendAnotherResourceVersion(t require.TestingT, resourceSetup TestSetup, key
 		ExistingDIDKey: keys[ExistingDIDKey].PrivateKey,
 	}
 	newResourcePayload.Name = "AnotherResourceVersion"
-	newResourcePayload.ResourceType = "AnotherResourceType"
 	createdResource, err := resourceSetup.SendCreateResource(newResourcePayload, didKey)
 	require.Nil(t, err)
 
@@ -41,33 +39,9 @@ func TestQueryGetAllResourceVersions(t *testing.T) {
 			msg: &types.QueryGetAllResourceVersionsRequest{
 				CollectionId: ExistingDIDIdentifier,
 				Name:         existingResource.Header.Name,
-				ResourceType: existingResource.Header.ResourceType,
 			},
 			response: &types.QueryGetAllResourceVersionsResponse{
-				Resources: []*types.ResourceHeader{
-					existingResource.Header,
-					{
-						CollectionId: existingResource.Header.CollectionId,
-						Id:           AnotherResourceId,
-						Name:         "AnotherResourceVersion",
-						ResourceType: "AnotherResourceType",
-						MediaType:    existingResource.Header.MediaType,
-						Checksum:     existingResource.Header.Checksum,
-					},
-				},
-			},
-			errMsg: "",
-		},
-		{
-			valid: true,
-			name:  "Valid: For another resoure type should be empty",
-			msg: &types.QueryGetAllResourceVersionsRequest{
-				CollectionId: ExistingDIDIdentifier,
-				Name:         existingResource.Header.Name,
-				ResourceType: "NotTheSameResourceType",
-			},
-			response: &types.QueryGetAllResourceVersionsResponse{
-				Resources: []*types.ResourceHeader{},
+				Resources: []*types.ResourceHeader{existingResource.Header},
 			},
 			errMsg: "",
 		},
@@ -77,47 +51,42 @@ func TestQueryGetAllResourceVersions(t *testing.T) {
 			msg: &types.QueryGetAllResourceVersionsRequest{
 				CollectionId: NotFoundDIDIdentifier,
 				Name:         existingResource.Header.Name,
-				ResourceType: existingResource.Header.ResourceType,
 			},
 			response: nil,
 			errMsg:   fmt.Sprintf("did:cheqd:test:%s: DID Doc not found", NotFoundDIDIdentifier),
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			msg := tc.msg
-			resourceSetup := InitEnv(t, keys[ExistingDIDKey].PublicKey, keys[ExistingDIDKey].PrivateKey)
+	It("Should return 2 versions for resource 1", func() {
+		versions, err := setup.AllResourceVersions(alice.CollectionId, res1v1.Resource.Header.Name)
+		Expect(err).To(BeNil())
+		Expect(versions.Resources).To(HaveLen(2))
 
-			newResourcePayload := GenerateCreateResourcePayload(ExistingResource())
-			newResourcePayload.Id = ResourceId
-			didKey := map[string]ed25519.PrivateKey{
-				ExistingDIDKey: keys[ExistingDIDKey].PrivateKey,
-			}
-			// Resource with the same version but another Id
-			createdResource, err := resourceSetup.SendCreateResource(newResourcePayload, didKey)
-			require.Nil(t, err)
+		ids := []string{versions.Resources[0].Id, versions.Resources[1].Id}
 
-			// Send another Resource but with another Name (should affect the version choosing)
-			SendAnotherResourceVersion(t, resourceSetup, keys)
+		Expect(ids).To(ContainElement(res1v1.Resource.Header.Id))
+		Expect(ids).To(ContainElement(res1v2.Resource.Header.Id))
+	})
 
-			queryResponse, err := resourceSetup.QueryServer.AllResourceVersions(sdk.WrapSDKContext(resourceSetup.Ctx), msg)
+	It("Should return 1 version for resource 2", func() {
+		versions, err := setup.AllResourceVersions(alice.CollectionId, res2v1.Resource.Header.Name)
+		Expect(err).To(BeNil())
+		Expect(versions.Resources).To(HaveLen(1))
+		Expect(versions.Resources[0].Id).To(Equal(res2v1.Resource.Header.Id))
+	})
 
 			if tc.valid {
 				resources := queryResponse.Resources
+				existingResource.Header.NextVersionId = createdResource.Header.Id
+				expectedResources := map[string]types.Resource{
+					existingResource.Header.Id: existingResource,
+					createdResource.Header.Id:  *createdResource,
+				}
 				require.Nil(t, err)
-				if tc.response != nil && len(tc.response.Resources) != 0 {
-					require.Equal(t, len(resources), len(tc.response.Resources))
-					existingResource.Header.NextVersionId = createdResource.Header.Id
-					expectedResources := map[string]types.Resource{
-						existingResource.Header.Id: existingResource,
-						createdResource.Header.Id:  *createdResource,
-					}
-					require.Equal(t, len(expectedResources), len(resources))
-					for _, r := range resources {
-						r.Created = expectedResources[r.Id].Header.Created
-						require.Equal(t, r, expectedResources[r.Id].Header)
-					}
+				require.Equal(t, len(expectedResources), len(resources))
+				for _, r := range resources {
+					r.Created = expectedResources[r.Id].Header.Created
+					require.Equal(t, r, expectedResources[r.Id].Header)
 				}
 			} else {
 				require.Error(t, err)

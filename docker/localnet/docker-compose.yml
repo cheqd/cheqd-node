@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   validator-0:
-    image: ${CHEQD_NODE_IMAGE}:${DOCKER_IMAGE_VERSION}
+    image: ${BUILD_IMAGE}
     ports:
       - target: 26656
         published: 26656    # Tendermint peer-to-peer (P2P) port
@@ -17,6 +17,12 @@ services:
       - target: 26660
         published: 26660    # Prometheus metrics port
     entrypoint: [ "node-start" ]
+    healthcheck:
+      test: curl -s http://localhost:26657/status | grep -c false
+      interval: 10s
+      timeout: 2s
+      retries: 6
+      start_period: 15s
     volumes:
       - type: volume
         source: validator-0-data
@@ -34,7 +40,7 @@ services:
         target: /priv_validator_key
 
   validator-1:
-    image: ${CHEQD_NODE_IMAGE}:${DOCKER_IMAGE_VERSION}
+    image: ${BUILD_IMAGE}
     ports:
       - target: 26656
         published: 26756    # Tendermint peer-to-peer (P2P) port
@@ -49,6 +55,12 @@ services:
       - target: 26660
         published: 26760    # Prometheus metrics port
     entrypoint: [ "node-start" ]
+    healthcheck:
+      test: curl -s http://localhost:26757/status | grep -c false
+      interval: 10s
+      timeout: 2s
+      retries: 6
+      start_period: 15s
     volumes:
       - type: volume
         source: validator-1-data
@@ -66,7 +78,7 @@ services:
         target: /priv_validator_key
 
   validator-2:
-    image: ${CHEQD_NODE_IMAGE}:${DOCKER_IMAGE_VERSION}
+    image: ${BUILD_IMAGE}
     ports:
       - target: 26656
         published: 26856    # Tendermint peer-to-peer (P2P) port
@@ -81,6 +93,12 @@ services:
       - target: 26660
         published: 26860    # Prometheus metrics port
     entrypoint: [ "node-start" ]
+    healthcheck:
+      test: curl -s http://localhost:26857/status | grep -c false
+      interval: 10s
+      timeout: 2s
+      retries: 6
+      start_period: 15s
     volumes:
       - type: volume
         source: validator-2-data
@@ -98,7 +116,7 @@ services:
         target: /priv_validator_key
 
   validator-3:
-    image: ${CHEQD_NODE_IMAGE}:${DOCKER_IMAGE_VERSION}
+    image: ${BUILD_IMAGE}
     ports:
       - target: 26656
         published: 26956    # Tendermint peer-to-peer (P2P) port
@@ -113,6 +131,12 @@ services:
       - target: 26660
         published: 26960    # Prometheus metrics port
     entrypoint: [ "node-start" ]
+    healthcheck:
+      test: curl -s http://localhost:26957/status | grep -c false
+      interval: 10s
+      timeout: 2s
+      retries: 6
+      start_period: 15s
     volumes:
       - type: volume
         source: validator-3-data
@@ -130,7 +154,7 @@ services:
         target: /priv_validator_key
 
   seed-0:
-    image: ${CHEQD_NODE_IMAGE}:${DOCKER_IMAGE_VERSION}
+    image: ${BUILD_IMAGE}
     ports:
       - target: 26656
         published: 27056    # Tendermint peer-to-peer (P2P) port
@@ -144,6 +168,13 @@ services:
         published: 9491     # gRPC-Gateway port
       - target: 26660
         published: 27060    # Prometheus metrics port
+    entrypoint: [ "node-start" ]
+    healthcheck:
+      test: curl -s http://localhost:27057/status | grep -c false
+      interval: 10s
+      timeout: 2s
+      retries: 6
+      start_period: 15s
     volumes:
       - type: volume
         source: seed-0-data
@@ -161,7 +192,7 @@ services:
         target: /priv_validator_key
 
   observer-0:
-    image: ${CHEQD_NODE_IMAGE}:${DOCKER_IMAGE_VERSION}
+    image: ${BUILD_IMAGE}
     ports:
       - target: 26656
         published: 27156    # Tendermint peer-to-peer (P2P) port
@@ -179,6 +210,13 @@ services:
       - type: volume
         source: observer-0-data
         target: /home/cheqd
+    entrypoint: [ "node-start" ]
+    healthcheck:
+      test: curl -s http://localhost:27157/status | grep -c false
+      interval: 10s
+      timeout: 2s
+      retries: 6
+      start_period: 15s
     env_file:
       - container-env/observer-0.env
     configs:
