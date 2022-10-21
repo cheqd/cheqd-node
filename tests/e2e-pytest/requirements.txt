@@ -1,4 +1,0 @@
-pytest==6.0.2
-pytest-asyncio==0.16.0
-pexpect==4.8.0
-hypothesis==6.23.3

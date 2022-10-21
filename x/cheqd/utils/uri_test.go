@@ -1,32 +1,25 @@
-package utils
+package utils_test
 
 import (
-	"testing"
-
-	"github.com/stretchr/testify/require"
+	. "github.com/cheqd/cheqd-node/x/cheqd/utils"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
-func TestValidateURI(t *testing.T) {
-	cases := []struct {
-		name  string
-		valid bool
-		URI   string
-	}{
-		// Path: all the possible symbols
-		{"Valid: General http URI path", true, "http://a.com/a/b/c/d/?query=123#fragment=another_part"},
-		{"Valid: General https URI path", true, "https://a.com/a/b/c/d/?query=123#fragment=another_part"},
-		{"Valid: only alphabet symbols", true, "SomeAnotherPath"},
-	}
+var _ = Describe("URI validation", func() {
+	DescribeTable("ValidateURI",
 
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			err_ := ValidateURI(tc.URI)
-
-			if tc.valid {
-				require.NoError(t, err_)
+		func(isValid bool, uri string) {
+			err_ := ValidateURI(uri)
+			if isValid {
+				Expect(err_).To(BeNil())
 			} else {
-				require.Error(t, err_)
+				Expect(err_).ToNot(BeNil())
 			}
-		})
-	}
-}
+		},
+
+		Entry("Valid: General http URI path", true, "http://a.com/a/b/c/d/?query=123#fragment=another_part"),
+		Entry("Valid: General https URI path", true, "https://a.com/a/b/c/d/?query=123#fragment=another_part"),
+		Entry("Valid: only alphabet symbols", true, "SomeAnotherPath"),
+	)
+})

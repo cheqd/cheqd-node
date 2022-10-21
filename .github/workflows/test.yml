@@ -1,262 +1,132 @@
-name: "Test"
+name: "Unit"
 on:
   workflow_call:
-    inputs:
-      VERSION:
-        description: "Build version number"
-        type: string
 defaults:
   run:
     shell: bash
 env:
-  NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/docker/localnet/network-config"
+  RUNNER_BIN_DIR: /home/runner/.local/bin
 permissions:
   contents: write
   packages: read
+  checks: write
 
 jobs:
 
-  test-new-node-setup:
-    name: "New node setup"
+  unit-tests:
+    name: "Unit Tests"
     runs-on: ubuntu-latest
-    env:
-      VERSION: ${{ inputs.VERSION }}
-    
+
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install cheqd-noded binary
-        working-directory: ./tests/e2e-complex/interactive-install
-        run: sudo sh -c 'python3 ../../../installer/installer.py 1 < .answers'
-
-      - name: Download node Docker image
-        uses: actions/download-artifact@v3
+      - uses: actions/setup-go@v3
         with:
-          name: cheqd-node-image.tar
+          go-version-file: ./go.mod
+          cache: true
 
-      - name: Load node Docker image
-        run: docker load -i cheqd-node-image.tar
-
-      - name: Setup 4 Validators + 2 Observers Docker localnet
-        working-directory: ./docker/localnet
+      - name: Install ginkgo
+        working-directory: ./..
         run: |
-          set -euo pipefail
-          bash gen-network-config.sh
-          CHEQD_NODE_IMAGE=cheqd-node DOCKER_IMAGE_VERSION=latest docker compose up -d
+          go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
-      - name: Check all Docker localnet nodes are active
-        run: |
-          set -euo pipefail
-          bash ./tests/tools/wait-for-chain.sh
+      - name: Run Ginkgo tests
+        run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --junit-report report-unit.xml
 
-      - name: Add an Observer node using Interactive installer
-        working-directory: ./tests/e2e-complex/interactive-install
-        run: |
-          set -euo pipefail
-          bash add-observer.sh
-          bash wait.sh "[[ $(cheqd-noded status -n 'tcp://localhost:26677' 2>&1 | wc -l) == 1 ]] && echo "Observer node is up""
+      - name: Upload unit tests result
+        uses: actions/upload-artifact@v3
+        with:
+          name: report-unit.xml
+          path: report-unit.xml
 
-      - name: Promote Observer to Validator
-        working-directory: ./tests/e2e-complex/interactive-install
-        run: |
-          bash promote-validator.sh
-          bash check-promotion.sh
-          # shellcheck disable=SC2016
-          bash wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*signature": (.*?).*/\1/p'"'"' | wc -l) == 5 ]] && echo "There are 5 validators signatures in block!"'
-          # shellcheck disable=SC2016
-          bash wait.sh '[[ $(curl -s localhost:26657/block | sed -nr '"'"'s/.*(signature": null).*/\1/p'"'"' | wc -l) == 0 ]] && echo "There are no null signatures in block!"'
-
-      - name: Gather logs on failure
-        if: ${{ failure() }}
-        run: |
-          journalctl -ex | grep cheqd
-
-  python-integration-tests:
-    name: "Python based Cosmos and identity tests"
+  integration-tests:
+    name: "Integration Test"
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Load node binary artifact
+      - name: Download binary artifact
         uses: actions/download-artifact@v3
+        id: download
         with:
           name: cheqd-noded
-          path: /home/runner/.local/bin
+          path: ${{ env.RUNNER_BIN_DIR }}
 
       - name: Restore binary permissions
-        run: sudo chmod +x /home/runner/.local/bin/cheqd-noded
+        run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
 
       - name: Download node Docker image
         uses: actions/download-artifact@v3
         with:
-          name: cheqd-node-image.tar
+          name: cheqd-node-build.tar
 
       - name: Load node Docker image
-        run: docker load -i cheqd-node-image.tar
+        run: docker load -i cheqd-node-build.tar
 
-      - name: Setup 4 Validators + 2 Observers Docker localnet 
+      - name: Generate localnet configs
         working-directory: ./docker/localnet
         run: |
           bash gen-network-config.sh
-          CHEQD_NODE_IMAGE=cheqd-node DOCKER_IMAGE_VERSION=latest docker compose up -d
+          sudo chown -R 1000:1000 network-config
 
-      - name: Check all Docker localnet nodes are active
-        run: bash tests/tools/wait-for-chain.sh
-
-      - name: Setup Python environment
-        working-directory: ./tests/e2e-pytest
-        run: |
-          set -euo pipefail
-          pip3 install -r requirements.txt >> /dev/null
-          cp -Rf "${NODE_CONFIGS_BASE}"/validator-0/. /home/runner/.cheqdnode/
-          cp -Rf "${NODE_CONFIGS_BASE}"/validator-1/. /home/runner/.cheqdnode/
-          sudo chmod -R 775 /home/runner/
-
-      - name: Run Cosmos-related tests
-        working-directory: ./tests/e2e-pytest
-        run: |
-          set -euo pipefail
-          OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/validator-0" | sed -nr 's/.*address: (.*?).*/\1/p' | sed 's/\r//g')
-          export OP0_ADDRESS
-          OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" --home "${NODE_CONFIGS_BASE}/validator-1" | sed -nr 's/.*address: (.*?).*/\1/p' | sed 's/\r//g')
-          export OP1_ADDRESS
-          pytest -v -rP test_cosmos.py
-
-      - name: Run identity-related tests # TODO: Move into separate stage?
-        working-directory: ./tests/e2e-pytest
-        run: |
-          set -euo pipefail
-          OP0_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 1p | sed 's/\r//g')
-          export OP0_ADDRESS
-          OP1_ADDRESS=$(cheqd-noded keys list --keyring-backend "test" | sed -nr 's/.*address: (.*?).*/\1/p' | sed -n 2p | sed 's/\r//g')
-          export OP1_ADDRESS
-          pytest -v -rP test_identity.py
-
-  bash-integration-tests:
-    name: "Bash-based identity tests"
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Load binary artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: cheqd-noded
-          path: /home/runner/.local/bin
-
-      - name: Restore binary permissions
-        run: sudo chmod +x /home/runner/.local/bin/cheqd-noded
-
-      - name: Download node Docker image
-        uses: actions/download-artifact@v3
-        with:
-          name: cheqd-node-image.tar
-
-      - name: Load node Docker image
-        run: docker load -i cheqd-node-image.tar
-
-      - name: Setup 4 Validators + 2 Observers Docker localnet
+      - name: Set up Docker localnet
         working-directory: ./docker/localnet
         run: |
-          bash gen-network-config.sh
-          CHEQD_NODE_IMAGE=cheqd-node DOCKER_IMAGE_VERSION=latest docker compose up -d
-
-      - name: Check all Docker localnet nodes are active
-        run: bash ./tests/tools/wait-for-chain.sh
+          docker compose --env-file docker-compose.env up --detach --no-build
 
       - name: Import keys
         working-directory: ./docker/localnet
         run: |
-          bash import_keys.sh
+          bash import-keys.sh
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: ./go.mod
+          cache: true
+
+      - name: Install ginkgo
+        working-directory: ./..
+        run: go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
       - name: Run tests
-        working-directory: ./tests/e2e-bash
-        run: |
-          bash run_all.sh
+        working-directory: ./tests/integration
+        run: ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --junit-report ../../report-integration.xml
+      
+      - name: Upload integration tests result
+        uses: actions/upload-artifact@v3
+        with:
+          name: report-integration.xml
+          path: report-integration.xml
 
-  node-upgrade-test:
-    name: "Run positive case for upgrade"
+  report-results:
+    name: "Report"
     runs-on: ubuntu-latest
-    env:
-      VERSION: ${{ inputs.VERSION }}
+    needs: [unit-tests, integration-tests]
+    if: always()
 
     steps:
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
-      - name: Download cheqd-cli Docker image
+      - name: Download unit tests report
         uses: actions/download-artifact@v3
         with:
-          name: cheqd-node-image.tar
+          name: report-unit.xml
 
-      - name: Load cheqd-cli Docker image
-        run: docker load -i cheqd-node-image.tar
-
-      - name: Give current user ownership
-        run: sudo chown "$USER":"$USER" .
-
-      - name: Prepare nodes for upgrade
-        working-directory: ./tests/e2e-complex/upgrade
-        run: bash prepare.sh
-
-      - name: Initiate upgrade
-        working-directory: ./tests/e2e-complex/upgrade
-        run: bash initiate_upgrade.sh
-
-      - name: Check for successful upgrade
-        working-directory: ./tests/e2e-complex/upgrade
-        run: bash upgrade_and_check.sh
-
-  node-cosmovisor-upgrade-test:
-    name: "Run positive case for upgrade with Cosmovisor installed"
-    runs-on: ubuntu-latest
-    env:
-      NODE_CONFIGS_BASE: "/home/runner/work/cheqd-node/cheqd-node/tests/e2e-complex/upgrade/node_configs"
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Download cheqd-cli Docker image
+      - name: Download integration tests report
         uses: actions/download-artifact@v3
         with:
-          name: cheqd-node-image.tar
+          name: report-integration.xml
 
-      - name: Load cheqd-cli Docker image
-        run: docker load -i cheqd-node-image.tar
-
-      - name: Install cheqd-noded binary
-        working-directory: ./tests/e2e-complex/upgrade/cosmovisor
-        run: sudo sh -c 'python3 ../../../../installer/installer.py 1 < .answers'
-
-      - name: Give current user ownership
-        run: sudo chown "$USER":"$USER" .
-
-      - name: Prepare nodes for upgrade
-        working-directory: ./tests/e2e-complex/upgrade
-        run: bash prepare.sh
-
-      - name: Add observer with Cosmovisor
-        working-directory: ./tests/e2e-complex/upgrade/cosmovisor
-        run: bash add-observer.sh
-
-      - name: Initiate upgrade
-        id: initiate-upgrade
-        working-directory: ./tests/e2e-complex/upgrade
+      - name: Combine test results
         run: |
-          START_HEIGHT=$(printf '%d' "$(cheqd-noded status 2>&1 | jq ".SyncInfo.latest_block_height" | tr -d '"')")
-          echo ::set-output name=START_HEIGHT::"$START_HEIGHT"
-          START_HEIGHT=$START_HEIGHT bash initiate_upgrade.sh
+          python .github/scripts/xml_combine.py report-integration.xml report-unit.xml > report.xml
 
-      - name: Check for successful upgrade
-        working-directory: ./tests/e2e-complex/upgrade
-        run: START_HEIGHT=${{ steps.initiate-upgrade.outputs.START_HEIGHT }} bash upgrade_and_check.sh
-
-      - name: Check that node with Cosmovisor was upgraded
-        working-directory: ./tests/e2e-complex/upgrade/cosmovisor
-        run: START_HEIGHT=${{ steps.initiate-upgrade.outputs.START_HEIGHT }} bash check_upgrade.sh
-
+      - uses: mikepenz/action-junit-report@v3
+        with:
+          report_paths: 'report.xml'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          check_name: ""
+          suite_regex: '*'
+          include_passed: true
+          detailed_summary: true
