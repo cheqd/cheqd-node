@@ -10,55 +10,26 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func SendAnotherResourceVersion(t require.TestingT, resourceSetup TestSetup, keys map[string]cheqdtests.KeyPair) types.Resource {
-	newResourcePayload := GenerateCreateResourcePayload(ExistingResource())
-	newResourcePayload.Id = AnotherResourceId
-	didKey := map[string]ed25519.PrivateKey{
-		ExistingDIDKey: keys[ExistingDIDKey].PrivateKey,
-	}
-	newResourcePayload.Name = "AnotherResourceVersion"
-	createdResource, err := resourceSetup.SendCreateResource(newResourcePayload, didKey)
-	require.Nil(t, err)
+var _ = Describe("Query All Resource Versions", func() {
+	var setup TestSetup
+	var alice cheqdsetup.CreatedDidInfo
 
-	return *createdResource
-}
+	var res1v1 *types.MsgCreateResourceResponse
+	var res1v2 *types.MsgCreateResourceResponse
+	var res2v1 *types.MsgCreateResourceResponse
 
-func TestQueryGetAllResourceVersions(t *testing.T) {
-	keys := GenerateTestKeys()
-	existingResource := ExistingResource()
-	cases := []struct {
-		valid    bool
-		name     string
-		msg      *types.QueryGetAllResourceVersionsRequest
-		response *types.QueryGetAllResourceVersionsResponse
-		errMsg   string
-	}{
-		{
-			valid: true,
-			name:  "Valid: Works",
-			msg: &types.QueryGetAllResourceVersionsRequest{
-				CollectionId: ExistingDIDIdentifier,
-				Name:         existingResource.Header.Name,
-			},
-			response: &types.QueryGetAllResourceVersionsResponse{
-				Resources: []*types.ResourceHeader{existingResource.Header},
-			},
-			errMsg: "",
-		},
-		{
-			valid: false,
-			name:  "Not Valid: DID Doc is not found",
-			msg: &types.QueryGetAllResourceVersionsRequest{
-				CollectionId: NotFoundDIDIdentifier,
-				Name:         existingResource.Header.Name,
-			},
-			response: nil,
-			errMsg:   fmt.Sprintf("did:cheqd:test:%s: DID Doc not found", NotFoundDIDIdentifier),
-		},
-	}
+	BeforeEach(func() {
+		setup = Setup()
+
+		alice = setup.CreateSimpleDid()
+
+		res1v1 = setup.CreateSimpleResource(alice.CollectionId, SchemaData, "Resource 1", CLSchemaType, []cheqdsetup.SignInput{alice.SignInput})
+		res1v2 = setup.CreateSimpleResource(alice.CollectionId, SchemaData, "Resource 1", CLSchemaType, []cheqdsetup.SignInput{alice.SignInput})
+		res2v1 = setup.CreateSimpleResource(alice.CollectionId, SchemaData, "Resource 2", CLSchemaType, []cheqdsetup.SignInput{alice.SignInput})
+	})
 
 	It("Should return 2 versions for resource 1", func() {
-		versions, err := setup.AllResourceVersions(alice.CollectionId, res1v1.Resource.Header.Name)
+		versions, err := setup.AllResourceVersions(alice.CollectionId, res1v1.Resource.Header.Name, CLSchemaType)
 		Expect(err).To(BeNil())
 		Expect(versions.Resources).To(HaveLen(2))
 
@@ -69,29 +40,21 @@ func TestQueryGetAllResourceVersions(t *testing.T) {
 	})
 
 	It("Should return 1 version for resource 2", func() {
-		versions, err := setup.AllResourceVersions(alice.CollectionId, res2v1.Resource.Header.Name)
+		versions, err := setup.AllResourceVersions(alice.CollectionId, res2v1.Resource.Header.Name, CLSchemaType)
 		Expect(err).To(BeNil())
 		Expect(versions.Resources).To(HaveLen(1))
 		Expect(versions.Resources[0].Id).To(Equal(res2v1.Resource.Header.Id))
 	})
 
-			if tc.valid {
-				resources := queryResponse.Resources
-				existingResource.Header.NextVersionId = createdResource.Header.Id
-				expectedResources := map[string]types.Resource{
-					existingResource.Header.Id: existingResource,
-					createdResource.Header.Id:  *createdResource,
-				}
-				require.Nil(t, err)
-				require.Equal(t, len(expectedResources), len(resources))
-				for _, r := range resources {
-					r.Created = expectedResources[r.Id].Header.Created
-					require.Equal(t, r, expectedResources[r.Id].Header)
-				}
-			} else {
-				require.Error(t, err)
-				require.Equal(t, tc.errMsg, err.Error())
-			}
-		})
-	}
-}
+	It("Should return 0 versions for non-existing resource", func() {
+		versions, err := setup.AllResourceVersions(alice.CollectionId, "non-existing", CLSchemaType)
+		Expect(err).To(BeNil())
+		Expect(versions.Resources).To(HaveLen(0))
+	})
+
+	It("Should return 0 versions for existing resource but with unexpected schema", func() {
+		versions, err := setup.AllResourceVersions(alice.CollectionId, res1v1.Resource.Header.Name, "non-existing-schema-type")
+		Expect(err).To(BeNil())
+		Expect(versions.Resources).To(HaveLen(0))
+	})
+})
