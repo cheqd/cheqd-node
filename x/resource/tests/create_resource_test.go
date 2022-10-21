@@ -19,9 +19,8 @@ func ExpectPayloadToMatchResource(payload *resourcetypes.MsgCreateResourcePayloa
 	Expect(payload.ResourceType).To(Equal(resource.Header.ResourceType))
 
 	// Generated header
-	// TODO: Uncomment once fixed
-	// hash := sha256.Sum256(payload.Data)
-	// Expect(resource.Header.Checksum).To(Equal(hash))
+	hash := CreateChecksum(payload.Data)
+	Expect(resource.Header.Checksum).To(Equal(hash))
 
 	// Provided data
 	Expect(payload.Data).To(Equal(resource.Data))

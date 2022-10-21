@@ -2,6 +2,7 @@ package setup
 
 import (
 	"crypto/rand"
+	"crypto/sha256"
 	"time"
 
 	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
@@ -88,4 +89,9 @@ func Setup() TestSetup {
 
 	setup.Keeper.SetDidNamespace(&ctx, cheqdsetup.DID_NAMESPACE)
 	return setup
+}
+
+func CreateChecksum(data []byte) []byte {
+	checksum := sha256.Sum256([]byte(data))
+	return checksum[:]
 }
