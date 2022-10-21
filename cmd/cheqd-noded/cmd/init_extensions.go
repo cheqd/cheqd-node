@@ -35,6 +35,9 @@ func applyConfigDefaults(cmd *cobra.Command) error {
 		config.P2P.SendRate = 20000000
 		config.P2P.RecvRate = 20000000
 		config.P2P.MaxPacketMsgPayloadSize = 10240
+
+		// Workaroud for Tendermint's bug
+		config.Storage = tmcfg.DefaultStorageConfig()
 	})
 	if err != nil {
 		return err
@@ -42,6 +45,9 @@ func applyConfigDefaults(cmd *cobra.Command) error {
 
 	err = updateCosmConfig(clientCtx.HomeDir, func(config *cosmcfg.Config) {
 		config.BaseConfig.MinGasPrices = "25ncheq"
+
+		// Workaroud for Cosmos's bug
+		config.BaseConfig.PruningKeepEvery = "0"
 	})
 	if err != nil {
 		return err
