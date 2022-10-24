@@ -22,7 +22,7 @@ func ExpectPayloadToMatchResource(payload *resourcetypes.MsgCreateResourcePayloa
 
 	// Generated header
 	hash := sha256.Sum256(payload.Data)
-	Expect(resource.Header.Checksum).To(Equal(hash))
+	Expect(resource.Header.Checksum).To(Equal(hash[:]))
 
 	// Provided data
 	Expect(payload.Data).To(Equal(resource.Data))
