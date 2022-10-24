@@ -1,6 +1,8 @@
 package tests
 
 import (
+	"crypto/sha256"
+
 	. "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 	"github.com/google/uuid"
 
@@ -19,7 +21,7 @@ func ExpectPayloadToMatchResource(payload *resourcetypes.MsgCreateResourcePayloa
 	Expect(payload.ResourceType).To(Equal(resource.Header.ResourceType))
 
 	// Generated header
-	hash := CreateChecksum(payload.Data)
+	hash := sha256.Sum256(payload.Data)
 	Expect(resource.Header.Checksum).To(Equal(hash))
 
 	// Provided data
