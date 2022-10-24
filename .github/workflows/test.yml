@@ -73,7 +73,7 @@ jobs:
       - name: Set up Docker localnet
         working-directory: ./docker/localnet
         run: |
-          docker compose --env-file docker-compose.env up --no-build
+          docker compose --env-file docker-compose.env up --detach --no-build
 
       - name: Import keys
         working-directory: ./docker/localnet
