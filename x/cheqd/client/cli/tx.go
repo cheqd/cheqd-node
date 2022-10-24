@@ -16,8 +16,8 @@ import (
 )
 
 type SignInput struct {
-	verificationMethodId string
-	privKey              ed25519.PrivateKey
+	VerificationMethodId string
+	PrivKey              ed25519.PrivateKey
 }
 
 // GetTxCmd returns the transaction commands for this module
@@ -84,8 +84,8 @@ func GetSignInputs(clientCtx client.Context, args []string) ([]SignInput, error)
 		}
 
 		signInput := SignInput{
-			verificationMethodId: vmId,
-			privKey:              privKeyBytes,
+			VerificationMethodId: vmId,
+			PrivKey:              privKeyBytes,
 		}
 
 		signInputs = append(signInputs, signInput)
@@ -98,10 +98,10 @@ func SignWithSignInputs(signBytes []byte, signInputs []SignInput) []*types.SignI
 	var signatures []*types.SignInfo
 
 	for _, signInput := range signInputs {
-		signatureBytes := ed25519.Sign(signInput.privKey, signBytes)
+		signatureBytes := ed25519.Sign(signInput.PrivKey, signBytes)
 
 		signInfo := types.SignInfo{
-			VerificationMethodId: signInput.verificationMethodId,
+			VerificationMethodId: signInput.VerificationMethodId,
 			Signature:            base64.StdEncoding.EncodeToString(signatureBytes),
 		}
 
