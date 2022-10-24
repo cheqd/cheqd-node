@@ -91,10 +91,91 @@ jobs:
         working-directory: ./tests/integration
         run: ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --junit-report report.xml
 
-      # - name: Test Report
-      #   uses: dorny/test-reporter@v1
-      #   if: always()
-      #   with:
-      #     name: JEST Tests
-      #     path: ./report.xml
-      #     reporter: jest-junit 
+  upgrade-migration-tests:
+    name: "Upgrade/migration tests"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Pull Docker image @latest release
+        run: |
+          export BUILD_IMAGE=ghcr.io/cheqd/cheqd-node:latest
+          docker pull ${BUILD_IMAGE}
+
+      - name: Generate localnet configs
+        working-directory: ./docker/localnet
+        run: |
+          bash gen-network-config.sh
+          sudo chown -R 1000:1000 network-config
+
+      - name: Set up Docker localnet @latest
+        working-directory: ./docker/localnet
+        run: |
+          docker compose up --detach --no-build
+
+      - name: Import keys
+        working-directory: ./docker/localnet
+        run: |
+          bash import-keys.sh
+
+      - name: Install binary @latest release
+        run: |
+          export BUILD_IMAGE=ghcr.io/cheqd/cheqd-node:latest
+          docker tag ${BUILD_IMAGE} cheqd-node:latest
+          docker cp $(docker create cheqd-node:latest):/bin/cheqd-noded ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
+
+      - name: Restore binary permissions
+        run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
+
+      #
+      # Run pre-upgrade tests
+      #
+
+      #
+      # Upgrade
+      #
+
+      #
+      # Run post-upgrade tests
+      #
+
+      #
+      # Run migration tests
+      #
+
+      - name: Download binary artifact
+        uses: actions/download-artifact@v3
+        id: download
+        with:
+          name: cheqd-noded
+          path: ${{ env.RUNNER_BIN_DIR }}
+
+      - name: Restore binary permissions
+        run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
+
+      - name: Download node Docker image
+        uses: actions/download-artifact@v3
+        with:
+          name: cheqd-node-build.tar
+
+      - name: Load node Docker image
+        run: docker load -i cheqd-node-build.tar
+
+      - name: Set up Docker localnet
+        working-directory: ./docker/localnet
+        run: |
+          docker compose --env-file docker-compose.env up --detach --no-build
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: ./go.mod
+          cache: true
+
+      - name: Install ginkgo
+        working-directory: ./..
+        run: go install github.com/onsi/ginkgo/v2/ginkgo@latest
+
+      - name: Run pre-upgrade tests
+        working-directory: ./tests/upgrade/pre_upgrade
+        run: ginkgo -r --tags pre_upgrade --race --randomize-suites --keep-going --trace --junit-report report.xml
