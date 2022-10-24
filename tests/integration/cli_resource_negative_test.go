@@ -190,29 +190,30 @@ var _ = Describe("cheqd cli - negative resource", func() {
 	It("cannot query all resource versions with missing cli arguments, non-existing collection, non-existing resource", func() {
 		collectionId2 := uuid.NewString()
 		resourceName2 := rand.Str(10)
+		resourceType := "TestType"
 
 		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.PURPLE, "cannot query all resource versions with missing cli arguments"))
 		// Fail to query all resource versions with missing cli arguments
-		//   a. missing collection id, resource name
-		_, err := cli.QueryAllResourceVersions("", "")
+		//   a. missing collection id, resource name, resource type
+		_, err := cli.QueryAllResourceVersions("", "", "")
 		Expect(err).To(HaveOccurred())
 
 		//   b. missing collection id
-		_, err = cli.QueryAllResourceVersions("", resourceName)
+		_, err = cli.QueryAllResourceVersions("", resourceName, resourceType)
 		Expect(err).To(HaveOccurred())
 
 		//   c. missing resource name
-		_, err = cli.QueryAllResourceVersions(collectionId2, "")
+		_, err = cli.QueryAllResourceVersions(collectionId2, "", resourceType)
 		Expect(err).To(HaveOccurred())
 
 		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.PURPLE, "cannot query all resource versions with non-existing collection id"))
 		// Fail to query all resource versions with non-existing collection id
-		_, err = cli.QueryAllResourceVersions(collectionId2, resourceName)
+		_, err = cli.QueryAllResourceVersions(collectionId2, resourceName, resourceType)
 		Expect(err).To(HaveOccurred())
 
 		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.PURPLE, "cannot query all resource versions with non-existing resource name"))
 		// Fail to query all resource versions with non-existing resource name
-		res, err := cli.QueryAllResourceVersions(collectionId, resourceName2)
+		res, err := cli.QueryAllResourceVersions(collectionId, resourceName2, resourceType)
 		Expect(err).To(BeNil())
 		Expect(len(res.Resources)).To(BeEquivalentTo(0))
 	})

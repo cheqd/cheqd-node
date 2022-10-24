@@ -55,8 +55,8 @@ func QueryResource(collectionId string, resourceId string) (resource_types.Query
 	return resp, nil
 }
 
-func QueryAllResourceVersions(collectionId string, resourceName string) (resource_types.QueryGetAllResourceVersionsResponse, error) {
-	res, err := Query("resource", "all-resource-versions", collectionId, resourceName)
+func QueryAllResourceVersions(collectionId, resourceName, resourceType string) (resource_types.QueryGetAllResourceVersionsResponse, error) {
+	res, err := Query("resource", "all-resource-versions", collectionId, resourceName, resourceType)
 	if err != nil {
 		return resource_types.QueryGetAllResourceVersionsResponse{}, err
 	}
