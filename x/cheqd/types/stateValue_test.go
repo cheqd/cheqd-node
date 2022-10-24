@@ -1,81 +1,90 @@
-package types
+package types_test
 
 import (
-	"testing"
 	"time"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+
+	. "github.com/cheqd/cheqd-node/x/cheqd/types"
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 )
 
-func Test_PackUnpackAny(t *testing.T) {
-	original := &Did{
-		Id: "test",
-	}
+var _ = Describe(`StateValue tests`, func() {
+	Context("Pack/unpack functionality", func() {
+		It("should pack and unpack withour any errors", func() {
+			original := &Did{
+				Id: "test",
+			}
 
-	// Construct codec
-	registry := types.NewInterfaceRegistry()
-	RegisterInterfaces(registry)
-	cdc := codec.NewProtoCodec(registry)
+			// Construct codec
+			registry := types.NewInterfaceRegistry()
+			RegisterInterfaces(registry)
+			cdc := codec.NewProtoCodec(registry)
 
-	// Marshal
-	bz, err := cdc.MarshalInterface(original)
-	require.NoError(t, err)
+			// Marshal
+			bz, err := cdc.MarshalInterface(original)
+			Expect(err).To(BeNil())
 
-	// Assert type url
-	var any types.Any
-	err = any.Unmarshal(bz)
-	assert.NoError(t, err)
-	assert.Equal(t, any.TypeUrl, utils.MsgTypeURL(&Did{}))
+			// Assert type url
+			var any types.Any
+			err = any.Unmarshal(bz)
+			Expect(err).To(BeNil())
+			Expect(any.TypeUrl).To(Equal(utils.MsgTypeURL(&Did{})))
 
-	// Unmarshal
-	var decoded StateValueData
-	err = cdc.UnmarshalInterface(bz, &decoded)
-	require.NoError(t, err)
-	require.IsType(t, &Did{}, decoded)
-	require.Equal(t, original, decoded)
-}
+			// Unmarshal
+			var decoded StateValueData
+			err = cdc.UnmarshalInterface(bz, &decoded)
+			Expect(err).To(BeNil())
+			Expect(&Did{}).To(BeAssignableToTypeOf(decoded))
+			Expect(original).To(Equal(decoded))
+		})
+	})
 
-func Test_NewMetadataFromContext(t *testing.T) {
-	createdTime := time.Now()
-	ctx := sdk.NewContext(nil, tmproto.Header{ChainID: "test_chain_id", Time: createdTime}, true, nil)
-	ctx.WithTxBytes([]byte("test_tx"))
-	expectedMetadata := Metadata{
-		Created:     createdTime.UTC().Format(time.RFC3339),
-		Updated:     "",
-		Deactivated: false,
-		VersionId:   utils.GetTxHash(ctx.TxBytes()),
-	}
+	When("New metadata is created from context", func() {
+		It("should be the same as original", func() {
+			createdTime := time.Now()
+			ctx := sdk.NewContext(nil, tmproto.Header{ChainID: "test_chain_id", Time: createdTime}, true, nil)
+			ctx.WithTxBytes([]byte("test_tx"))
+			expectedMetadata := Metadata{
+				Created:     createdTime.UTC().Format(time.RFC3339),
+				Updated:     "",
+				Deactivated: false,
+				VersionId:   utils.GetTxHash(ctx.TxBytes()),
+			}
 
-	metadata := NewMetadataFromContext(ctx)
+			metadata := NewMetadataFromContext(ctx)
+			Expect(expectedMetadata).To(Equal(metadata))
+		})
+	})
 
-	require.Equal(t, expectedMetadata, metadata)
-}
+	When("Metadata is updated", func() {
+		It("should has ", func() {
+			createdTime := time.Now()
+			updatedTime := createdTime.Add(time.Hour)
 
-func Test_UpdateMetadata(t *testing.T) {
-	createdTime := time.Now()
-	updatedTime := createdTime.Add(time.Hour)
+			ctx1 := NewContext(createdTime, []byte("test1_tx"))
+			ctx2 := NewContext(updatedTime, []byte("test1_tx"))
 
-	ctx1 := NewContext(createdTime, []byte("test1_tx"))
-	ctx2 := NewContext(updatedTime, []byte("test1_tx"))
+			expectedMetadata := Metadata{
+				Created:     createdTime.UTC().Format(time.RFC3339),
+				Updated:     updatedTime.UTC().Format(time.RFC3339),
+				Deactivated: false,
+				VersionId:   utils.GetTxHash(ctx2.TxBytes()),
+			}
 
-	expectedMetadata := Metadata{
-		Created:     createdTime.UTC().Format(time.RFC3339),
-		Updated:     updatedTime.UTC().Format(time.RFC3339),
-		Deactivated: false,
-		VersionId:   utils.GetTxHash(ctx2.TxBytes()),
-	}
+			metadata := NewMetadataFromContext(ctx1)
+			metadata.Update(ctx2)
 
-	metadata := NewMetadataFromContext(ctx1)
-	metadata.Update(ctx2)
-
-	require.Equal(t, expectedMetadata, metadata)
-}
+			Expect(expectedMetadata).To(Equal(metadata))
+		})
+	})
+})
 
 func NewContext(time time.Time, txBytes []byte) sdk.Context {
 	ctx := sdk.NewContext(nil, tmproto.Header{ChainID: "test_chain_id", Time: time}, true, nil)
