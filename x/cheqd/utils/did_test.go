@@ -62,7 +62,6 @@ var _ = Describe("DID checks", func() {
 		Entry("Not valid: 0 - is not allowed for UniqueID", false, "did:cheqd:testnet:123456789abcdef0", "cheqd", []string{}),
 		// Length checks (should be exactly 16 or 32)
 		Entry("Not valid: UniqueID less then 16 symbols", false, "did:cheqd:testnet:123", "cheqd", []string{}),
-		Entry("Not valid: UniqueID more then 16 symbols but less then 32", false, "did:cheqd:testnet:123456789abcdefgABCDEF", "cheqd", []string{}),
 		Entry("Not valid: UniqueID more then 32 symbols", false, "did:cheqd:testnet:123456789abcdefg123456789abcdefgABCDEF", "cheqd", []string{}),
 	)
 

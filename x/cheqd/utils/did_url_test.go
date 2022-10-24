@@ -74,7 +74,6 @@ var _ = Describe("DID-URL tests", func() {
 		Entry("Not valid: 0 - is not allowed for base58", false, "did:cheqd:testnet:123456789abcdef0/path?query#fragment"),
 		// Length checks (should be exactly 16 or 32)
 		Entry("Not valid: UniqueID less then 16 symbols", false, "did:cheqd:testnet:123/path?query#fragment"),
-		Entry("Not valid: UniqueID more then 16 symbols but less then 32", false, "did:cheqd:testnet:123456789abcdefgABCDEF/path?query#fragment"),
 		Entry("Not valid: UniqueID more then 32 symbols", false, "did:cheqd:testnet:123456789abcdefg123456789abcdefgABCDEF/path?query#fragment"),
 		Entry("Not valid: Split should return error", false, "qwerty"),
 	)
