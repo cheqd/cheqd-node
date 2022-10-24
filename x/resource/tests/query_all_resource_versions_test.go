@@ -1,11 +1,9 @@
 package tests
 
 import (
-	"crypto/ed25519"
-	"fmt"
-	"testing"
+	. "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 
-	cheqdtests "github.com/cheqd/cheqd-node/x/cheqd/tests"
+	cheqdsetup "github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"

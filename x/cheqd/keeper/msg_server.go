@@ -8,16 +8,16 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-type msgServer struct {
+type MsgServer struct {
 	Keeper
 }
 
 // NewMsgServer returns an implementation of the MsgServer interface for the provided Keeper.
 func NewMsgServer(keeper Keeper) types.MsgServer {
-	return &msgServer{Keeper: keeper}
+	return &MsgServer{Keeper: keeper}
 }
 
-var _ types.MsgServer = msgServer{}
+var _ types.MsgServer = MsgServer{}
 
 func FindDid(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.StateValue, did string) (res types.StateValue, found bool, err error) {
 	// Look in inMemory dict

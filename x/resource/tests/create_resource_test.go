@@ -1,12 +1,13 @@
 package tests
 
 import (
-	"crypto/ed25519"
-	"crypto/sha256"
-	"fmt"
-	"testing"
+	. "github.com/cheqd/cheqd-node/x/resource/tests/setup"
+	"github.com/google/uuid"
 
-	"github.com/cheqd/cheqd-node/x/cheqd/utils"
+	cheqdsetup "github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
+	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+
+	// "crypto/sha256"
 
 	"github.com/cheqd/cheqd-node/x/resource/types"
 
@@ -98,23 +99,6 @@ func TestCreateResource(t *testing.T) {
 			mediaType: JsonResourceType,
 			errMsg:    fmt.Sprintf("did:cheqd:test:%s: not found", NotFoundDIDIdentifier),
 		},
-		{
-			valid: false,
-			name:  "Not Valid: Cannot create resource for deactivated DID",
-			signerKeys: map[string]ed25519.PrivateKey{
-				ExistingDIDKey: keys[ExistingDIDKey].PrivateKey,
-			},
-			msg: &types.MsgCreateResourcePayload{
-				CollectionId: DeactivatedDIDIdentifier,
-				Id:           ResourceId,
-				Name:         "Test Resource Name",
-				ResourceType: CLSchemaType,
-				Data:         []byte(SchemaData),
-			},
-			mediaType:         JsonResourceType,
-			previousVersionId: "",
-			errMsg:            DeactivatedDID + ": DID Doc already deactivated",
-		},
 	}
 
 	for _, tc := range cases {
@@ -144,5 +128,5 @@ func TestCreateResource(t *testing.T) {
 				require.Equal(t, tc.errMsg, err.Error())
 			}
 		})
-	}
-}
+	})
+})

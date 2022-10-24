@@ -2,29 +2,29 @@ package tests
 
 import (
 	"fmt"
-	"testing"
 
-	"github.com/btcsuite/btcutil/base58"
+	. "github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
-	"github.com/multiformats/go-multibase"
-	"github.com/stretchr/testify/require"
 )
 
 func TestUpdateDid(t *testing.T) {
 	var err error
 	keys := map[string]KeyPair{
-		AliceKey1:         GenerateKeyPair(),
-		AliceKey2:         GenerateKeyPair(),
-		BobKey1:           GenerateKeyPair(),
-		BobKey2:           GenerateKeyPair(),
-		BobKey3:           GenerateKeyPair(),
-		BobKey4:           GenerateKeyPair(),
-		CharlieKey1:       GenerateKeyPair(),
-		CharlieKey2:       GenerateKeyPair(),
-		CharlieKey3:       GenerateKeyPair(),
-		CharlieKey4:       GenerateKeyPair(),
-		ImposterKey1:      GenerateKeyPair(),
-		DeactivatedDIDKey: GenerateKeyPair(),
+		AliceKey1:    GenerateKeyPair(),
+		AliceKey2:    GenerateKeyPair(),
+		BobKey1:      GenerateKeyPair(),
+		BobKey2:      GenerateKeyPair(),
+		BobKey3:      GenerateKeyPair(),
+		BobKey4:      GenerateKeyPair(),
+		CharlieKey1:  GenerateKeyPair(),
+		CharlieKey2:  GenerateKeyPair(),
+		CharlieKey3:  GenerateKeyPair(),
+		CharlieKey4:  GenerateKeyPair(),
+		ImposterKey1: GenerateKeyPair(),
 	}
 
 	cases := []struct {
@@ -361,39 +361,73 @@ func TestUpdateDid(t *testing.T) {
 			errMsg: fmt.Sprintf("there should be at least one signature by %s: signature is required but not found", BobDID),
 		},
 
-		{
-			valid:   true,
-			name:    "Valid: Adding verification method with the same controller works",
-			signers: []string{AliceKey1, AliceKey2},
-			msg: &types.MsgUpdateDidPayload{
-				Id:         AliceDID,
-				Controller: []string{AliceDID},
+			msg = &types.MsgUpdateDidPayload{
+				Id: alice.Did,
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:         AliceKey2,
-						Type:       Ed25519VerificationKey2020,
-						Controller: AliceDID,
+						Id:                 alice.KeyId,
+						Type:               types.Ed25519VerificationKey2020,
+						Controller:         alice.Did,
+						PublicKeyMultibase: MustEncodeBase58(alice.KeyPair.Public),
 					},
 					{
-						Id:         AliceKey1,
-						Type:       Ed25519VerificationKey2020,
-						Controller: AliceDID,
+						Id:                 newKeyId,
+						Type:               types.Ed25519VerificationKey2020,
+						Controller:         alice.Did,
+						PublicKeyMultibase: MustEncodeBase58(newKey.Public),
 					},
 				},
-			},
-		},
-		{
-			valid:   true,
-			name:    "Valid: Keeping VM with controller different then subject untouched during update should not require Bob signature",
-			signers: []string{CharlieKey1},
-			msg: &types.MsgUpdateDidPayload{
-				Id: CharlieDID,
-				Authentication: []string{
-					CharlieKey1,
-					CharlieKey2,
-					CharlieKey3,
-				},
+				Authentication: []string{alice.KeyId},
+				VersionId:      alice.VersionId,
+			}
+		})
 
+		It("Works with only old VM signature", func() {
+			signatures := []SignInput{
+				alice.SignInput,
+			}
+
+			_, err := setup.UpdateDid(msg, signatures)
+			Expect(err).To(BeNil())
+
+			// check
+			created, err := setup.QueryDid(alice.Did)
+			Expect(err).To(BeNil())
+			Expect(*created).ToNot(Equal(msg.ToDid()))
+		})
+
+		It("Doesn't work with only new VM signature", func() {
+			signatures := []SignInput{
+				{
+					VerificationMethodId: newKeyId,
+					Key:                  newKey.Private,
+				},
+			}
+
+			_, err := setup.UpdateDid(msg, signatures)
+			Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("there should be at least one valid signature by %s (old version): invalid signature detected", alice.Did)))
+		})
+	})
+
+	Describe("Verification method: removing existing one", func() {
+		var alice CreatedDidInfo
+		var secondKeyId string
+		var secondKey KeyPair
+		var secondSignInput SignInput
+		var msg *types.MsgUpdateDidPayload
+
+		BeforeEach(func() {
+			alice = setup.CreateSimpleDid()
+
+			secondKeyId = alice.Did + "#key-2"
+			secondKey = GenerateKeyPair()
+			secondSignInput = SignInput{
+				VerificationMethodId: secondKeyId,
+				Key:                  secondKey.Private,
+			}
+
+			addSecondKeyMsg := &types.MsgUpdateDidPayload{
+				Id: alice.Did,
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         CharlieKey1,
@@ -410,6 +444,16 @@ func TestUpdateDid(t *testing.T) {
 						Type:       Ed25519VerificationKey2020,
 						Controller: BobDID,
 					},
+				Authentication: []string{alice.KeyId},
+				VersionId:      alice.VersionId,
+			}
+
+			_, err := setup.UpdateDid(addSecondKeyMsg, []SignInput{alice.SignInput})
+			Expect(err).To(BeNil())
+
+			msg = &types.MsgUpdateDidPayload{
+				Id: alice.Did,
+				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:         CharlieKey4,
 						Type:       Ed25519VerificationKey2020,
@@ -434,23 +478,6 @@ func TestUpdateDid(t *testing.T) {
 			},
 			errMsg: fmt.Sprintf("there should be at least one signature by %s (old version): signature is required but not found", BobDID),
 		},
-		{
-			valid:   false,
-			name:    "Not Valid: Deactivated DID cant be updated",
-			signers: []string{AliceKey1, CharlieKey3},
-			msg: &types.MsgUpdateDidPayload{
-				Id:         DeactivatedDID,
-				Controller: []string{DeactivatedDID, CharlieDID},
-				VerificationMethod: []*types.VerificationMethod{
-					{
-						Id:         DeactivatedDIDKey,
-						Type:       Ed25519VerificationKey2020,
-						Controller: DeactivatedDID,
-					},
-				},
-			},
-			errMsg: DeactivatedDID + ": DID Doc already deactivated",
-		},
 	}
 
 	for _, tc := range cases {
@@ -465,37 +492,20 @@ func TestUpdateDid(t *testing.T) {
 				require.NoError(t, err)
 			}
 
-			signerKeys := []SignerKey{}
-			if tc.signerKeys != nil {
-				signerKeys = tc.signerKeys
-			} else {
-				for _, signer := range tc.signers {
-					signerKeys = append(signerKeys, SignerKey{
-						signer: signer,
-						key:    keys[signer].PrivateKey,
-					})
-				}
-			}
+			_, err := setup.UpdateDid(msg, signatures)
+			Expect(err).To(BeNil())
 
-			did, err := setup.SendUpdateDid(msg, signerKeys)
-
-			if tc.valid {
-				require.Nil(t, err)
-				require.Equal(t, tc.msg.Id, did.Id)
-				require.Equal(t, tc.msg.Controller, did.Controller)
-				require.Equal(t, tc.msg.VerificationMethod, did.VerificationMethod)
-				require.Equal(t, tc.msg.Authentication, did.Authentication)
-				require.Equal(t, tc.msg.AssertionMethod, did.AssertionMethod)
-				require.Equal(t, tc.msg.CapabilityInvocation, did.CapabilityInvocation)
-				require.Equal(t, tc.msg.CapabilityDelegation, did.CapabilityDelegation)
-				require.Equal(t, tc.msg.KeyAgreement, did.KeyAgreement)
-				require.Equal(t, tc.msg.AlsoKnownAs, did.AlsoKnownAs)
-				require.Equal(t, tc.msg.Service, did.Service)
-				require.Equal(t, tc.msg.Context, did.Context)
-			} else {
-				require.Error(t, err)
-				require.Equal(t, tc.errMsg, err.Error())
-			}
+			// check
+			created, err := setup.QueryDid(alice.Did)
+			Expect(err).To(BeNil())
+			Expect(*created).ToNot(Equal(msg.ToDid()))
 		})
-	}
-}
+
+		It("Doesn't work with only second VM signature (which is get deleted)", func() {
+			signatures := []SignInput{secondSignInput}
+
+			_, err := setup.UpdateDid(msg, signatures)
+			Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("there should be at least one valid signature by %s (new version): invalid signature detected", alice.Did)))
+		})
+	})
+})

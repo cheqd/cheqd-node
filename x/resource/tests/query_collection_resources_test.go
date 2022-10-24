@@ -1,66 +1,42 @@
 package tests
 
 import (
-	"fmt"
-	"testing"
+	. "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 
+	cheqdsetup "github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
 	"github.com/cheqd/cheqd-node/x/resource/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/stretchr/testify/require"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
-func TestQueryGetCollectionResources(t *testing.T) {
-	keys := GenerateTestKeys()
-	existingResource := ExistingResource()
-	cases := []struct {
-		valid    bool
-		name     string
-		msg      *types.QueryGetCollectionResourcesRequest
-		response *types.QueryGetCollectionResourcesResponse
-		errMsg   string
-	}{
-		{
-			valid: true,
-			name:  "Valid: Works",
-			msg: &types.QueryGetCollectionResourcesRequest{
-				CollectionId: ExistingDIDIdentifier,
-			},
-			response: &types.QueryGetCollectionResourcesResponse{
-				Resources: []*types.ResourceHeader{existingResource.Header},
-			},
-			errMsg: "",
-		},
-		{
-			valid: false,
-			name:  "Not Valid: DID Doc is not found",
-			msg: &types.QueryGetCollectionResourcesRequest{
-				CollectionId: NotFoundDIDIdentifier,
-			},
-			response: nil,
-			errMsg:   fmt.Sprintf("did:cheqd:test:%s: DID Doc not found", NotFoundDIDIdentifier),
-		},
-	}
+var _ = Describe("Query Collection Resources", func() {
+	var setup TestSetup
+	var alice cheqdsetup.CreatedDidInfo
+
+	var res1v1 *types.MsgCreateResourceResponse
+	var res1v2 *types.MsgCreateResourceResponse
+	var res2v1 *types.MsgCreateResourceResponse
+
+	BeforeEach(func() {
+		setup = Setup()
+
+		alice = setup.CreateSimpleDid()
+
+		res1v1 = setup.CreateSimpleResource(alice.CollectionId, SchemaData, "Resource 1", CLSchemaType, []cheqdsetup.SignInput{alice.SignInput})
+		res1v2 = setup.CreateSimpleResource(alice.CollectionId, SchemaData, "Resource 1", CLSchemaType, []cheqdsetup.SignInput{alice.SignInput})
+		res2v1 = setup.CreateSimpleResource(alice.CollectionId, SchemaData, "Resource 2", CLSchemaType, []cheqdsetup.SignInput{alice.SignInput})
+	})
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			msg := tc.msg
-			resourceSetup := InitEnv(t, keys)
+			resourceSetup := InitEnv(t, keys[ExistingDIDKey].PublicKey, keys[ExistingDIDKey].PrivateKey)
 
-			queryResponse, err := resourceSetup.QueryServer.CollectionResources(sdk.WrapSDKContext(resourceSetup.Ctx), msg)
+		ids := []string{versions.Resources[0].Id, versions.Resources[1].Id, versions.Resources[2].Id}
 
-			if tc.valid {
-				resources := queryResponse.Resources
-				expectedResources := tc.response.Resources
-				require.Nil(t, err)
-				require.Equal(t, len(expectedResources), len(resources))
-				for i, r := range resources {
-					r.Created = expectedResources[i].Created
-					require.Equal(t, expectedResources[i], r)
-				}
-			} else {
-				require.Error(t, err)
-				require.Equal(t, tc.errMsg, err.Error())
-			}
-		})
-	}
-}
+		Expect(ids).To(ContainElement(res1v1.Resource.Header.Id))
+		Expect(ids).To(ContainElement(res1v2.Resource.Header.Id))
+		Expect(ids).To(ContainElement(res2v1.Resource.Header.Id))
+	})
+})
