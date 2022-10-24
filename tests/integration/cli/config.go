@@ -9,3 +9,8 @@ const (
 	GAS_ADJUSTMENT  = "1.3"
 	GAS_PRICES      = "25ncheq"
 )
+
+const (
+	GREEN  = "\033[32m"
+	PURPLE = "\033[35m"
+)
