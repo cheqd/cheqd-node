@@ -29,7 +29,7 @@ var _ = Describe("Query All Resource Versions", func() {
 	})
 
 	It("Should return 2 versions for resource 1", func() {
-		versions, err := setup.AllResourceVersions(alice.CollectionId, res1v1.Resource.Header.Name)
+		versions, err := setup.AllResourceVersions(alice.CollectionId, res1v1.Resource.Header.Name, CLSchemaType)
 		Expect(err).To(BeNil())
 		Expect(versions.Resources).To(HaveLen(2))
 
@@ -40,14 +40,20 @@ var _ = Describe("Query All Resource Versions", func() {
 	})
 
 	It("Should return 1 version for resource 2", func() {
-		versions, err := setup.AllResourceVersions(alice.CollectionId, res2v1.Resource.Header.Name)
+		versions, err := setup.AllResourceVersions(alice.CollectionId, res2v1.Resource.Header.Name, CLSchemaType)
 		Expect(err).To(BeNil())
 		Expect(versions.Resources).To(HaveLen(1))
 		Expect(versions.Resources[0].Id).To(Equal(res2v1.Resource.Header.Id))
 	})
 
 	It("Should return 0 versions for non-existing resource", func() {
-		versions, err := setup.AllResourceVersions(alice.CollectionId, "non-existing")
+		versions, err := setup.AllResourceVersions(alice.CollectionId, "non-existing", CLSchemaType)
+		Expect(err).To(BeNil())
+		Expect(versions.Resources).To(HaveLen(0))
+	})
+
+	It("Should return 0 versions for existing resource but with unexpected schema", func() {
+		versions, err := setup.AllResourceVersions(alice.CollectionId, res1v1.Resource.Header.Name, "non-existing-schema-type")
 		Expect(err).To(BeNil())
 		Expect(versions.Resources).To(HaveLen(0))
 	})

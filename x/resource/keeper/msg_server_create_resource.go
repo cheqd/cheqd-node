@@ -51,7 +51,7 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	resource.Header.MediaType = utils.DetectMediaType(resource.Data)
 
 	// Find previous version and upgrade backward and forward version links
-	previousResourceVersionHeader, found := k.GetLastResourceVersionHeader(&ctx, resource.Header.CollectionId, resource.Header.Name, resource.Header.ResourceType, resource.Header.MediaType)
+	previousResourceVersionHeader, found := k.GetLastResourceVersionHeader(&ctx, resource.Header.CollectionId, resource.Header.Name, resource.Header.ResourceType)
 	if found {
 		// Set links
 		previousResourceVersionHeader.NextVersionId = resource.Header.Id
