@@ -143,7 +143,6 @@ require (
 )
 
 replace (
-
 	// Miscelaneous fixes
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.1.7-0.20210622111912-ef00f8ac3d76
 	// Dragonberry fix
@@ -159,5 +158,4 @@ replace (
 	github.com/jhump/protoreflect => github.com/jhump/protoreflect v1.9.0
 	github.com/tecbot/gorocksdb => github.com/cosmos/gorocksdb v1.2.0
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
-
 )
