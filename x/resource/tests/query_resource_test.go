@@ -31,10 +31,9 @@ var _ = Describe("Query Collection Resources", func() {
 	It("Returns error if resource does not exist", func() {
 		nonExistingResource := uuid.NewString()
 
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			msg := tc.msg
-			resourceSetup := InitEnv(t, keys[ExistingDIDKey].PublicKey, keys[ExistingDIDKey].PrivateKey)
+		_, err := setup.QueryResource(alice.CollectionId, nonExistingResource)
+		Expect(err.Error()).To(ContainSubstring("not found"))
+	})
 
 	It("Returns error if collection does not exist", func() {
 		nonExistingCollection := cheqdsetup.GenerateDID(cheqdsetup.Base58_16chars)

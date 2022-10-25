@@ -28,10 +28,10 @@ var _ = Describe("Query Collection Resources", func() {
 		res2v1 = setup.CreateSimpleResource(alice.CollectionId, SchemaData, "Resource 2", CLSchemaType, []cheqdsetup.SignInput{alice.SignInput})
 	})
 
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			msg := tc.msg
-			resourceSetup := InitEnv(t, keys[ExistingDIDKey].PublicKey, keys[ExistingDIDKey].PrivateKey)
+	It("Should return all 3 headerrs", func() {
+		versions, err := setup.CollectionResources(alice.CollectionId)
+		Expect(err).To(BeNil())
+		Expect(versions.Resources).To(HaveLen(3))
 
 		ids := []string{versions.Resources[0].Id, versions.Resources[1].Id, versions.Resources[2].Id}
 
