@@ -40,6 +40,7 @@ message QueryGetCollectionResourcesResponse {
 message QueryGetAllResourceVersionsRequest {
   string collection_id = 1;
   string name = 2;
+  string resourceType = 3;
 }
 
 message QueryGetAllResourceVersionsResponse {

@@ -36,7 +36,7 @@ jobs:
           cache-dependency-path: '**/package-lock.json'
 
       # Setup for pushing to Buf.build later
-      - uses: bufbuild/buf-setup-action@v1.8.0
+      - uses: bufbuild/buf-setup-action@v1.9.0
 
       # Required for short-lived token provided to Semantic Release
       - name: "Obtain Github App token"
@@ -85,7 +85,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # Required to fetch version
           persist-credentials: false
 
       - name: Set up Docker Buildx
