@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"io/ioutil"
+	"os"
 
 	cheqdcli "github.com/cheqd/cheqd-node/x/cheqd/client/cli"
 	"github.com/cheqd/cheqd-node/x/resource/types"
@@ -60,7 +60,7 @@ func CmdCreateResource() *cobra.Command {
 				return err
 			}
 
-			data, err := ioutil.ReadFile(resourceFile)
+			data, err := os.ReadFile(resourceFile)
 			if err != nil {
 				return err
 			}

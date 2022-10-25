@@ -15,18 +15,16 @@ jobs:
     name: "Build"
     needs: call-lint
     uses: ./.github/workflows/build.yml
-    secrets: inherit
   
-  # call-test:
-  #   name: "Test"
-  #   needs: call-build
-  #   uses: ./.github/workflows/test.yml
-  #   secrets: inherit
+  call-test:
+    name: "Tests"
+    needs: call-build
+    uses: ./.github/workflows/test.yml
+    secrets: inherit
 
   call-release:
     name: "Release"
-    # needs: call-test
-    needs: call-build
+    needs: call-test
     if: ${{ github.ref_protected == true }}
     uses: ./.github/workflows/release.yml
     secrets: inherit
