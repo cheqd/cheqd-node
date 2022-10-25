@@ -22,7 +22,7 @@ linters:
 linters-settings:
 
   gofumpt:
-    lang-version: "1.17"
+    lang-version: "1.18"
     
   misspell:
     ignore-words:
