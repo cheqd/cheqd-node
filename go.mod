@@ -186,6 +186,4 @@ replace (
 
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/jhump/protoreflect => github.com/jhump/protoreflect v1.9.0
-	github.com/tecbot/gorocksdb => github.com/cosmos/gorocksdb v1.2.0
-	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 )
