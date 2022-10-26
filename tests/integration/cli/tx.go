@@ -21,7 +21,7 @@ var CLI_TX_PARAMS = []string{
 	"--yes",
 }
 
-func Tx(module, tx, from string, txArgs ...string) (sdk.TxResponse, error) {
+func Tx(module string, tx string, from string, txArgs ...string) (sdk.TxResponse, error) {
 	args := []string{"tx", module, tx}
 
 	// Common params

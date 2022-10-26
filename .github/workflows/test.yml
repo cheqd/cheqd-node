@@ -103,11 +103,6 @@ jobs:
     name: "Upgrade/migration tests"
     runs-on: ubuntu-latest
     steps:
-    - name: Pull Docker image @latest release
-      run: |
-        export BUILD_IMAGE=ghcr.io/cheqd/cheqd-node:latest
-        docker pull ${BUILD_IMAGE}
-
     - name: Generate localnet configs
       working-directory: ./docker/localnet
       run: |
@@ -170,6 +165,7 @@ jobs:
     - name: Set up Docker localnet
       working-directory: ./docker/localnet
       run: |
+        unset BUILD_IMAGE
         docker compose --env-file docker-compose.env up --detach --no-build
 
     - uses: actions/setup-go@v3
