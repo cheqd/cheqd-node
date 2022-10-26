@@ -6,8 +6,6 @@ import (
 	"os"
 	"path/filepath"
 
-	// this line is used by starport scaffolding # stargate/root/import
-
 	"github.com/cheqd/cheqd-node/app"
 	"github.com/cheqd/cheqd-node/app/params"
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -67,6 +65,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 			}
 
 			// Allows us to overwrite the SDK's default server config.
+			// TODO: Use this instead of extending init command.
 			customAppTemplate := serverconfig.DefaultConfigTemplate
 			customAppConfig := serverconfig.DefaultConfig()
 			customAppTmConfig := tmconfig.DefaultConfig()
@@ -192,7 +191,7 @@ func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, a
 	}
 
 	snapshotDir := filepath.Join(cast.ToString(appOpts.Get(flags.FlagHome)), "data", "snapshots")
-	snapshotDB, err := dbm.NewDB("metadata", dbm.GoLevelDBBackend, snapshotDir)
+	snapshotDB, err := dbm.NewDB("metadata", server.GetAppDBBackend(appOpts), snapshotDir)
 	if err != nil {
 		panic(err)
 	}
@@ -209,7 +208,6 @@ func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, a
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
 		a.encCfg,
-		// this line is used by starport scaffolding # stargate/root/appArgument
 		appOpts,
 		baseapp.SetPruning(pruningOpts),
 		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),
