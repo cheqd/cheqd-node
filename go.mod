@@ -19,7 +19,7 @@ require (
 	github.com/onsi/gomega v1.22.1
 	github.com/rakyll/statik v0.1.7
 	github.com/spf13/cast v1.5.0
-	github.com/spf13/cobra v1.6.0
+	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.13.0
 	github.com/tendermint/tendermint v0.34.22
@@ -175,12 +175,18 @@ require (
 
 replace (
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.1.7-0.20210622111912-ef00f8ac3d76
+
 	// Dragonberry fix
 	github.com/confio/ics23/go => github.com/cosmos/cosmos-sdk/ics23/go v0.8.0
 	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.46.3
 
+
 	// Fix upstream GHSA-h395-qcrw-5vmq vulnerability.
 	// TODO Remove it: https://github.com/cosmos/cosmos-sdk/issues/10409
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.7.0
+
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
+	github.com/jhump/protoreflect => github.com/jhump/protoreflect v1.9.0
+	github.com/tecbot/gorocksdb => github.com/cosmos/gorocksdb v1.2.0
+	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 )
