@@ -12,7 +12,7 @@
             "prerelease": true
         }
     ],
-    "tagFormat": "${version}",
+    "tagFormat": "v${version}",
     "ci": true,
     "preset": "conventionalcommits",
     "plugins": [
