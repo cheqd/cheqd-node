@@ -415,21 +415,21 @@ var _ = Describe("Check upper/lower case for DID creation", func() {
 		Expect(created.Did.Id).To(Equal(testCase.resultId))
 	},
 
-	Entry("Low Case UUID", TestCaseUUIDDidStruct{
-		inputId:  didPrefix + "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
-		resultId: didPrefix + "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
-	}),
-	Entry("Upper Case UUID", TestCaseUUIDDidStruct{
-		inputId:  didPrefix + "A86F9CAE-0902-4A7C-A144-96B60CED2FC9",
-		resultId: didPrefix + "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
-	}),
-	Entry("Mixed Case UUID", TestCaseUUIDDidStruct{
-		inputId:  didPrefix + "A86F9CAE-0902-4a7c-a144-96b60ced2FC9",
-		resultId: didPrefix + "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
-	}),
-	Entry("Low Case UUID", TestCaseUUIDDidStruct{
-		inputId:  didPrefix + "MjYxNzYKMjYxNzYK",
-		resultId: didPrefix + "MjYxNzYKMjYxNzYK",
-	}),
+		Entry("Low Case UUID", TestCaseUUIDDidStruct{
+			inputId:  didPrefix + "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
+			resultId: didPrefix + "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
+		}),
+		Entry("Upper Case UUID", TestCaseUUIDDidStruct{
+			inputId:  didPrefix + "A86F9CAE-0902-4A7C-A144-96B60CED2FC9",
+			resultId: didPrefix + "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
+		}),
+		Entry("Mixed Case UUID", TestCaseUUIDDidStruct{
+			inputId:  didPrefix + "A86F9CAE-0902-4a7c-a144-96b60ced2FC9",
+			resultId: didPrefix + "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
+		}),
+		Entry("Low Case UUID", TestCaseUUIDDidStruct{
+			inputId:  didPrefix + "MjYxNzYKMjYxNzYK",
+			resultId: didPrefix + "MjYxNzYKMjYxNzYK",
+		}),
 	)
 })

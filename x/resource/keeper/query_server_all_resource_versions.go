@@ -16,6 +16,8 @@ func (m queryServer) AllResourceVersions(c context.Context, req *types.QueryGetA
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
+	req = req.Normalize()
+
 	ctx := sdk.UnwrapSDKContext(c)
 
 	// Validate corresponding DIDDoc exists

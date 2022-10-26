@@ -46,3 +46,18 @@ func ValidMsgCreateResourcePayload() *cheqdtypes.CustomErrorRule {
 		return casted.Validate()
 	})
 }
+
+// Normalize
+func (msg MsgCreateResourcePayload) Normalize() *MsgCreateResourcePayload {
+	msg.CollectionId = cheqdutils.NormalizeIdentifier(msg.CollectionId)
+	msg.Id = cheqdutils.NormalizeIdentifier(msg.Id)
+	return &msg
+}
+
+func (msg MsgCreateResource) Normalize() *MsgCreateResource {
+	cheqdtypes.NormalizeSignatureUUIDIdentifiers(msg.Signatures)
+	return &MsgCreateResource{
+		Payload:    msg.Payload.Normalize(),
+		Signatures: msg.Signatures,
+	}
+}

@@ -17,6 +17,11 @@ var _ = Describe("DID Validation tests", func() {
 		errorMsg          string
 	}
 
+	type TestCaseUUIDDidStruct struct {
+		inputId    string
+		expectedId string
+	}
+
 	DescribeTable("DID Validation tests", func(testCase TestCaseDIDStruct) {
 		err := testCase.did.Validate(testCase.allowedNamespaces)
 
@@ -235,6 +240,62 @@ var _ = Describe("DID Validation tests", func() {
 				},
 				isValid:  false,
 				errorMsg: "verification_method: there are verification method duplicates.",
+			}),
+	)
+
+	DescribeTable("UUID validation tests", func(testCase TestCaseUUIDDidStruct) {
+		inputDid := Did{
+			Id:             testCase.inputId,
+			Authentication: []string{testCase.inputId + "#key1"},
+			VerificationMethod: []*VerificationMethod{
+				{
+					Id:         testCase.inputId + "#key1",
+					Type:       Ed25519VerificationKey2020,
+					Controller: testCase.inputId,
+				},
+			},
+		}
+		expectedDid := Did{
+			Id:             testCase.expectedId,
+			Authentication: []string{testCase.expectedId + "#key1"},
+			VerificationMethod: []*VerificationMethod{
+				{
+					Id:         testCase.expectedId + "#key1",
+					Type:       Ed25519VerificationKey2020,
+					Controller: testCase.expectedId,
+				},
+			},
+		}
+		NormalizeDID(&inputDid)
+		Expect(inputDid).To(Equal(expectedDid))
+	},
+
+		Entry(
+			"base58 identifier - not changed",
+			TestCaseUUIDDidStruct{
+				inputId:    "did:cheqd:testnet:aaaaaaaaaaaaaaaa",
+				expectedId: "did:cheqd:testnet:aaaaaaaaaaaaaaaa",
+			}),
+
+		Entry(
+			"Mixed case UUID",
+			TestCaseUUIDDidStruct{
+				inputId:    "did:cheqd:testnet:BAbbba14-f294-458a-9b9c-474d188680fd",
+				expectedId: "did:cheqd:testnet:babbba14-f294-458a-9b9c-474d188680fd",
+			}),
+
+		Entry(
+			"Low case UUID",
+			TestCaseUUIDDidStruct{
+				inputId:    "did:cheqd:testnet:babbba14-f294-458a-9b9c-474d188680fd",
+				expectedId: "did:cheqd:testnet:babbba14-f294-458a-9b9c-474d188680fd",
+			}),
+
+		Entry(
+			"Upper case UUID",
+			TestCaseUUIDDidStruct{
+				inputId:    "did:cheqd:testnet:A86F9CAE-0902-4a7c-a144-96b60ced2FC9",
+				expectedId: "did:cheqd:testnet:a86f9cae-0902-4a7c-a144-96b60ced2fc9",
 			}),
 	)
 })

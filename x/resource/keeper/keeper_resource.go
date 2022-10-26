@@ -3,7 +3,6 @@ package keeper
 import (
 	"strconv"
 
-	cheqdutils "github.com/cheqd/cheqd-node/x/cheqd/utils"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -191,21 +190,16 @@ func (k Keeper) GetAllResources(ctx *sdk.Context) (list []types.Resource) {
 
 // GetResourceHeaderKeyBytes returns the byte representation of resource key
 func GetResourceHeaderKeyBytes(collectionId string, id string) []byte {
-	collectionId = cheqdutils.NormalizeIdentifier(collectionId)
-	id = cheqdutils.NormalizeIdentifier(id)
 	return []byte(types.ResourceHeaderKey + collectionId + ":" + id)
 }
 
 // GetResourceHeaderCollectionPrefixBytes used to iterate over all resource headers in a collection
 func GetResourceHeaderCollectionPrefixBytes(collectionId string) []byte {
-	collectionId = cheqdutils.NormalizeIdentifier(collectionId)
 	return []byte(types.ResourceHeaderKey + collectionId + ":")
 }
 
 // GetResourceDataKeyBytes returns the byte representation of resource key
 func GetResourceDataKeyBytes(collectionId string, id string) []byte {
-	collectionId = cheqdutils.NormalizeIdentifier(collectionId)
-	id = cheqdutils.NormalizeIdentifier(id)
 	return []byte(types.ResourceDataKey + collectionId + ":" + id)
 }
 

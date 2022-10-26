@@ -2,12 +2,14 @@ package tests
 
 import (
 	"crypto/sha256"
+	"strings"
 
 	. "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 	"github.com/google/uuid"
 
 	cheqdsetup "github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	cheqdutils "github.com/cheqd/cheqd-node/x/cheqd/utils"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -134,6 +136,37 @@ var _ = Describe("Create Resource Tests", func() {
 				Expect(err).ToNot(BeNil())
 				Expect(err.Error()).To(ContainSubstring(alice.Did + ": DID Doc already deactivated"))
 			})
+		})
+	})
+
+	Describe("UUID with capital letters", func() {
+		var UUID string = "A86F9CAE-0902-4a7c-a144-96b60ced2FC9"
+
+		It("Should work even for UUID with capital letters", func() {
+			msg := resourcetypes.MsgCreateResourcePayload{
+				CollectionId: alice.CollectionId,
+				Id:           UUID,
+				Name:         "Resource with capital letters in UUID",
+				ResourceType: CLSchemaType,
+				Data:         []byte(SchemaData),
+			}
+
+			_, err := setup.CreateResource(&msg, []cheqdsetup.SignInput{alice.SignInput})
+			Expect(err).To(BeNil())
+
+			// check for the same UUID
+			created, err := setup.QueryResource(alice.CollectionId, UUID)
+			Expect(err).To(BeNil())
+
+			Expect(created.Resource.Header.Id).To(Equal(strings.ToLower(UUID)))
+
+			// check for already normalized UUID
+			created, err = setup.QueryResource(
+				cheqdutils.NormalizeIdentifier(alice.CollectionId),
+				cheqdutils.NormalizeIdentifier(UUID))
+			Expect(err).To(BeNil())
+
+			Expect(created.Resource.Header.Id).To(Equal(strings.ToLower(UUID)))
 		})
 	})
 })

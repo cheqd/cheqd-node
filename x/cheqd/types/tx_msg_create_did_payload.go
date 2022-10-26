@@ -18,7 +18,7 @@ func (msg *MsgCreateDidPayload) ToDid() Did {
 		CapabilityDelegation: msg.CapabilityDelegation,
 		KeyAgreement:         msg.KeyAgreement,
 		AlsoKnownAs:          msg.AlsoKnownAs,
-		Service:			  msg.Service,
+		Service:              msg.Service,
 	}
 }
 
@@ -34,7 +34,7 @@ func (msg *MsgCreateDidPayload) ToMsg(did *Did) *MsgCreateDidPayload {
 		CapabilityDelegation: did.CapabilityDelegation,
 		KeyAgreement:         did.KeyAgreement,
 		AlsoKnownAs:          did.AlsoKnownAs,
-		Service:			  did.Service,
+		Service:              did.Service,
 	}
 }
 
@@ -59,14 +59,14 @@ func ValidMsgCreateDidPayloadRule(allowedNamespaces []string) *CustomErrorRule {
 func (msg MsgCreateDidPayload) Normalize() *MsgCreateDidPayload {
 	did := msg.ToDid()
 	normilizedDid := NormalizeDID(&did)
-	
+
 	return msg.ToMsg(normilizedDid)
 }
 
 func (msg MsgCreateDid) Normalize() *MsgCreateDid {
 	NormalizeSignatureUUIDIdentifiers(msg.Signatures)
 	return &MsgCreateDid{
-			Payload:    msg.Payload.Normalize(),
-			Signatures: msg.Signatures,
+		Payload:    msg.Payload.Normalize(),
+		Signatures: msg.Signatures,
 	}
 }

@@ -12,7 +12,7 @@ func (k MsgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Get sign bytes before modifying payload
-    signBytes := msg.Payload.GetSignBytes()
+	signBytes := msg.Payload.GetSignBytes()
 
 	// Normilaize UUID identifiers
 	msg = msg.Normalize()
@@ -26,7 +26,6 @@ func (k MsgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 
 	// Build metadata and stateValue
 	did := msg.Payload.ToDid()
-	// types.NormalizeSignatureUUIDIdentifiers(msg.Signatures)
 
 	// Validate DID doesn't exist
 	if k.HasDid(&ctx, did.Id) {

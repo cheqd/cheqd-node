@@ -14,6 +14,12 @@ const UpdatedPostfix string = "-updated"
 func (k MsgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*types.MsgUpdateDidResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	// Get sign bytes before modifying payload
+	signBytes := msg.Payload.GetSignBytes()
+
+	// Normilaize UUID identifiers
+	msg = msg.Normalize()
+
 	// Validate namespaces
 	namespace := k.GetDidNamespace(&ctx)
 	err := msg.Validate([]string{namespace})
@@ -26,7 +32,6 @@ func (k MsgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 	updatedDid := msg.Payload.ToDid()
 	did := updatedDid.Id
 	updatedDid.ReplaceIds(updatedDid.Id, updatedDid.Id+UpdatedPostfix)
-	types.NormalizeSignatureUUIDIdentifiers(msg.Signatures)
 
 	// Validate DID does exist
 	if !k.HasDid(&ctx, did) {
@@ -53,9 +58,6 @@ func (k MsgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 	if msg.Payload.VersionId != existingStateValue.Metadata.VersionId {
 		return nil, types.ErrUnexpectedDidVersion.Wrapf("got: %s, must be: %s", msg.Payload.VersionId, existingStateValue.Metadata.VersionId)
 	}
-
-	// Get sign bytes before modifying payload
-	signBytes := msg.Payload.GetSignBytes()
 
 	updatedMetadata := *existingStateValue.Metadata
 	updatedMetadata.Update(ctx)

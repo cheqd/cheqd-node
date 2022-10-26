@@ -64,8 +64,62 @@ func (s *TestSetup) BuildSimpleDid() DidInfo {
 	}
 }
 
+func (s *TestSetup) BuildUUIDDid(uuid string) DidInfo {
+	did := "did:cheqd:" + DID_NAMESPACE + ":" + uuid
+	_, _, collectionId := utils.MustSplitDID(did)
+
+	keyPair := GenerateKeyPair()
+	keyId := did + "#key-1"
+
+	msg := &types.MsgCreateDidPayload{
+		Id: did,
+		VerificationMethod: []*types.VerificationMethod{
+			{
+				Id:                 keyId,
+				Type:               types.Ed25519VerificationKey2020,
+				Controller:         did,
+				PublicKeyMultibase: MustEncodeBase58(keyPair.Public),
+			},
+		},
+		Authentication: []string{keyId},
+	}
+
+	signInput := SignInput{
+		VerificationMethodId: keyId,
+		Key:                  keyPair.Private,
+	}
+
+	return DidInfo{
+		Did:          did,
+		CollectionId: collectionId,
+		KeyPair:      keyPair,
+		KeyId:        keyId,
+		Msg:          msg,
+		SignInput:    signInput,
+	}
+}
+
 func (s *TestSetup) CreateSimpleDid() CreatedDidInfo {
 	did := s.BuildSimpleDid()
+
+	_, err := s.CreateDid(did.Msg, []SignInput{did.SignInput})
+	if err != nil {
+		panic(err)
+	}
+
+	created, err := s.QueryDid(did.Did)
+	if err != nil {
+		panic(err)
+	}
+
+	return CreatedDidInfo{
+		DidInfo:   did,
+		VersionId: created.Metadata.VersionId,
+	}
+}
+
+func (s *TestSetup) CreateUUIDDid(uuid string) CreatedDidInfo {
+	did := s.BuildUUIDDid(uuid)
 
 	_, err := s.CreateDid(did.Msg, []SignInput{did.SignInput})
 	if err != nil {
