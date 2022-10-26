@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package cheqd.did.v2;
+
+import "google/api/annotations.proto";
+import "cheqd/did/v2/diddoc.proto";
+
+option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types/v2";
+
+service Query {
+	rpc DidDoc(QueryGetDidDocRequest) returns (QueryGetDidDocResponse) {
+		option (google.api.http).get = "/cheqd/did/v2/diddoc/{id}";
+	}
+}
+
+message QueryGetDidDocRequest {
+	string id = 1;
+}
+
+message QueryGetDidDocResponse {
+	DidDocWithMetadata value = 1;
+}

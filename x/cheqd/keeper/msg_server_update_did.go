@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"reflect"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
@@ -10,7 +11,7 @@ import (
 
 const UpdatedPostfix string = "-updated"
 
-func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*types.MsgUpdateDidResponse, error) {
+func (k MsgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*types.MsgUpdateDidResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Validate namespaces
@@ -36,6 +37,11 @@ func (k msgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 	existingStateValue, err := k.GetDid(&ctx, did)
 	if err != nil {
 		return nil, err
+	}
+
+	// Validate DID is not deactivated
+	if existingStateValue.Metadata.Deactivated {
+		return nil, types.ErrDIDDocDeactivated.Wrap(msg.Payload.Id)
 	}
 
 	existingDid, err := existingStateValue.UnpackDataAsDid()
@@ -153,9 +159,13 @@ func GetSignerDIDsForDIDUpdate(existingDid types.Did, updatedDid types.Did) []st
 		}
 
 		// VM updated
-		// We don't compare ids because they will be different after replacing ids on the updated version of DID.
-		// Fragments equality is checked above.
-		if !types.CompareVerificationMethodsWithoutIds(existingVM, *updatedVM) {
+		// We have to revert renaming before comparing veriifcation methods.
+		// Otherwise we will detect id and controller change
+		// for non changed VMs because of `-updated` postfix.
+		originalUpdatedVM := *updatedVM
+		originalUpdatedVM.ReplaceIds(updatedDid.Id, existingDid.Id)
+
+		if !reflect.DeepEqual(existingVM, originalUpdatedVM) {
 			signers = append(signers, existingVM.Controller, updatedVM.Controller)
 			continue
 		}

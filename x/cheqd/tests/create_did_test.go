@@ -1,162 +1,156 @@
 package tests
 
 import (
-	"crypto/ed25519"
 	"fmt"
-	"testing"
 
-	"github.com/btcsuite/btcutil/base58"
+	. "github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
-	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	"github.com/multiformats/go-multibase"
 
 	"github.com/stretchr/testify/require"
 )
 
-func TestCreateDID(t *testing.T) {
-	var err error
-	keys := GenerateTestKeys()
-	cases := []struct {
-		valid   bool
-		name    string
-		keys    map[string]KeyPair
-		signers []string
-		msg     *types.MsgCreateDidPayload
-		errMsg  string
-	}{
-		{
-			valid: true,
-			name:  "Valid: Works",
-			keys: map[string]KeyPair{
-				ImposterKey1: GenerateKeyPair(),
-			},
-			signers: []string{ImposterKey1},
-			msg: &types.MsgCreateDidPayload{
-				Id:             ImposterDID,
-				Authentication: []string{ImposterKey1},
-				VerificationMethod: []*types.VerificationMethod{
-					{
-						Id:         ImposterKey1,
-						Type:       Ed25519VerificationKey2020,
-						Controller: ImposterDID,
-					},
+var _ = Describe("Create DID tests", func() {
+	var setup setup.TestSetup
+
+	BeforeEach(func() {
+		setup = Setup()
+	})
+
+	It("Valid: Works for simple did doc", func() {
+		did := GenerateDID(Base58_16chars)
+		keypair := GenerateKeyPair()
+		keyId := did + "#key-1"
+
+		msg := &types.MsgCreateDidPayload{
+			Id:             did,
+			Authentication: []string{keyId},
+			VerificationMethod: []*types.VerificationMethod{
+				{
+					Id:                 keyId,
+					Type:               types.Ed25519VerificationKey2020,
+					Controller:         did,
+					PublicKeyMultibase: MustEncodeBase58(keypair.Public),
 				},
 			},
-		},
-		{
-			valid: true,
-			name:  "Valid: Works with Key Agreement",
-			keys: map[string]KeyPair{
-				ImposterKey1: GenerateKeyPair(),
-				AliceKey1:    keys[AliceKey1],
+		}
+
+		signatures := []SignInput{
+			{
+				VerificationMethodId: keyId,
+				Key:                  keypair.Private,
 			},
-			signers: []string{ImposterKey1, AliceKey1},
-			msg: &types.MsgCreateDidPayload{
-				Id:           ImposterDID,
-				KeyAgreement: []string{ImposterKey1},
-				Controller:   []string{AliceDID},
-				VerificationMethod: []*types.VerificationMethod{
-					{
-						Id:         ImposterKey1,
-						Type:       Ed25519VerificationKey2020,
-						Controller: ImposterDID,
-					},
+		}
+
+		_, err := setup.CreateDid(msg, signatures)
+		Expect(err).To(BeNil())
+
+		// check
+		created, err := setup.QueryDid(did)
+		Expect(err).To(BeNil())
+		Expect(msg.ToDid()).To(Equal(*created.Did))
+	})
+
+	It("Valid: DID with external controllers", func() {
+		// Alice
+		alice := setup.CreateSimpleDid()
+		anna := setup.CreateSimpleDid()
+
+		// Bob
+		bobDid := GenerateDID(Base58_16chars)
+		bobKeypair := GenerateKeyPair()
+		bobKeyId := bobDid + "#key-1"
+
+		msg := &types.MsgCreateDidPayload{
+			Id:             bobDid,
+			Controller:     []string{alice.Did, anna.Did},
+			Authentication: []string{bobKeyId},
+			VerificationMethod: []*types.VerificationMethod{
+				{
+					Id:                 bobKeyId,
+					Type:               types.Ed25519VerificationKey2020,
+					Controller:         anna.Did,
+					PublicKeyMultibase: MustEncodeBase58(bobKeypair.Public),
 				},
 			},
-		},
-		{
-			valid: true,
-			name:  "Valid: Works with Assertion Method",
-			keys: map[string]KeyPair{
-				ImposterKey1: GenerateKeyPair(),
-				AliceKey1:    keys[AliceKey1],
-			},
-			signers: []string{AliceKey1, ImposterKey1},
-			msg: &types.MsgCreateDidPayload{
-				Id:              ImposterDID,
-				AssertionMethod: []string{ImposterKey1},
-				Controller:      []string{AliceDID},
-				VerificationMethod: []*types.VerificationMethod{
-					{
-						Id:         ImposterKey1,
-						Type:       Ed25519VerificationKey2020,
-						Controller: ImposterDID,
-					},
+		}
+
+		signatures := []SignInput{alice.SignInput, anna.SignInput}
+
+		_, err := setup.CreateDid(msg, signatures)
+		Expect(err).To(BeNil())
+
+		// check
+		created, err := setup.QueryDid(bobDid)
+		Expect(err).To(BeNil())
+		Expect(msg.ToDid()).To(Equal(*created.Did))
+	})
+
+	It("Valid: Works for the did doc witha all properties", func() {
+		did := GenerateDID(Base58_16chars)
+
+		keypair1 := GenerateKeyPair()
+		keyId1 := did + "#key-1"
+
+		keypair2 := GenerateKeyPair()
+		keyId2 := did + "#key-2"
+
+		keypair3 := GenerateKeyPair()
+		keyId3 := did + "#key-3"
+
+		keypair4 := GenerateKeyPair()
+		keyId4 := did + "#key-4"
+
+		msg := &types.MsgCreateDidPayload{
+			Context:    []string{"abc", "def"},
+			Id:         did,
+			Controller: []string{did},
+			VerificationMethod: []*types.VerificationMethod{
+				{
+					Id:                 keyId1,
+					Type:               types.Ed25519VerificationKey2020,
+					Controller:         did,
+					PublicKeyMultibase: MustEncodeBase58(keypair1.Public),
+				},
+				{
+					Id:                 keyId2,
+					Type:               types.Ed25519VerificationKey2020,
+					Controller:         did,
+					PublicKeyMultibase: MustEncodeBase58(keypair2.Public),
+				},
+				{
+					Id:                 keyId3,
+					Type:               types.Ed25519VerificationKey2020,
+					Controller:         did,
+					PublicKeyMultibase: MustEncodeBase58(keypair3.Public),
+				},
+				{
+					Id:                 keyId4,
+					Type:               types.Ed25519VerificationKey2020,
+					Controller:         did,
+					PublicKeyMultibase: MustEncodeBase58(keypair4.Public),
 				},
 			},
-		},
-		{
-			valid: true,
-			name:  "Valid: Works with Capability Delegation",
-			keys: map[string]KeyPair{
-				ImposterKey1: GenerateKeyPair(),
-				AliceKey1:    keys[AliceKey1],
-			},
-			signers: []string{AliceKey1, ImposterKey1},
-			msg: &types.MsgCreateDidPayload{
-				Id:                   ImposterDID,
-				CapabilityDelegation: []string{ImposterKey1},
-				Controller:           []string{AliceDID},
-				VerificationMethod: []*types.VerificationMethod{
-					{
-						Id:         ImposterKey1,
-						Type:       Ed25519VerificationKey2020,
-						Controller: ImposterDID,
-					},
+			Authentication:       []string{keyId1, keyId2},
+			AssertionMethod:      []string{keyId3},
+			CapabilityInvocation: []string{keyId4, keyId1},
+			CapabilityDelegation: []string{keyId4, keyId2},
+			KeyAgreement:         []string{keyId1, keyId2, keyId3, keyId4},
+			Service: []*types.Service{
+				{
+					Id:              did + "#service-1",
+					Type:            "type-1",
+					ServiceEndpoint: "endpoint-1",
 				},
 			},
-		},
-		{
-			valid: true,
-			name:  "Valid: Works with Capability Invocation",
-			keys: map[string]KeyPair{
-				ImposterKey1: GenerateKeyPair(),
-				AliceKey1:    keys[AliceKey1],
-			},
-			signers: []string{AliceKey1, ImposterKey1},
-			msg: &types.MsgCreateDidPayload{
-				Id:                   ImposterDID,
-				CapabilityInvocation: []string{ImposterKey1},
-				Controller:           []string{AliceDID},
-				VerificationMethod: []*types.VerificationMethod{
-					{
-						Id:         ImposterKey1,
-						Type:       Ed25519VerificationKey2020,
-						Controller: ImposterDID,
-					},
-				},
-			},
-		},
-		{
-			valid: true,
-			name:  "Valid: With controller works",
-			msg: &types.MsgCreateDidPayload{
-				Id:         ImposterDID,
-				Controller: []string{AliceDID, BobDID},
-			},
-			signers: []string{AliceKey1, BobKey3},
-			keys: map[string]KeyPair{
-				AliceKey1: keys[AliceKey1],
-				BobKey3:   keys[BobKey3],
-			},
-		},
-		{
-			valid: true,
-			name:  "Valid: Full message works",
-			keys: map[string]KeyPair{
-				"did:cheqd:test:yyyyyyyyyyyyyyyy#key-1": GenerateKeyPair(),
-				"did:cheqd:test:yyyyyyyyyyyyyyyy#key-2": GenerateKeyPair(),
-				"did:cheqd:test:yyyyyyyyyyyyyyyy#key-3": GenerateKeyPair(),
-				"did:cheqd:test:yyyyyyyyyyyyyyyy#key-4": GenerateKeyPair(),
-				"did:cheqd:test:yyyyyyyyyyyyyyyy#key-5": GenerateKeyPair(),
-				AliceKey1:                               keys[AliceKey1],
-				BobKey1:                                 keys[BobKey1],
-				BobKey2:                                 keys[BobKey2],
-				BobKey3:                                 keys[BobKey3],
-				CharlieKey1:                             keys[CharlieKey1],
-				CharlieKey2:                             keys[CharlieKey2],
-				CharlieKey3:                             keys[CharlieKey3],
+			AlsoKnownAs: []string{"alias-1", "alias-2"},
+		}
+
+		signatures := []SignInput{
+			{
+				VerificationMethodId: keyId1,
+				Key:                  keypair1.Private,
 			},
 			signers: []string{
 				"did:cheqd:test:yyyyyyyyyyyyyyyy#key-1",
@@ -401,63 +395,4 @@ func TestHandler_DidDocAlreadyExists(t *testing.T) {
 
 	require.Error(t, err)
 	require.Equal(t, fmt.Sprintf("%s: DID Doc exists", AliceDID), err.Error())
-}
-
-func TestHandler_Identifiers(t *testing.T) {
-	keys := GenerateTestKeys()
-	didPrefix := "did:cheqd:test:"
-	cases := []struct {
-		name     string
-		id       string
-		resultId string
-	}{
-		{
-			name:     "Low Case UUID",
-			id:       didPrefix + "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
-			resultId: didPrefix + "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
-		},
-		{
-			name:     "Upper Case UUID",
-			id:       didPrefix + "A86F9CAE-0902-4A7C-A144-96B60CED2FC9",
-			resultId: didPrefix + "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
-		},
-		{
-			name:     "Mixed Case UUID",
-			id:       didPrefix + "A86F9CAE-0902-4a7c-a144-96b60ced2FC9",
-			resultId: didPrefix + "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
-		},
-		{
-			name:     "Indy-style id",
-			id:       didPrefix + "MjYxNzYKMjYxNzYK",
-			resultId: didPrefix + "MjYxNzYKMjYxNzYK",
-		},
-	}
-
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			setup := InitEnv(t, keys)
-
-			key := GenerateKeyPair()
-			keyAlias := tc.id + "#key1"
-			publicKeyMultibase, _ := multibase.Encode(multibase.Base58BTC, key.PublicKey)
-			signerKeys := map[string]ed25519.PrivateKey{keyAlias: key.PrivateKey}
-			msg := &types.MsgCreateDidPayload{
-				Id:             tc.id,
-				Authentication: []string{keyAlias},
-				VerificationMethod: []*types.VerificationMethod{
-					{
-						Id:                 keyAlias,
-						Type:               Ed25519VerificationKey2020,
-						Controller:         tc.id,
-						PublicKeyMultibase: publicKeyMultibase,
-					},
-				},
-			}
-
-			did, err := setup.SendCreateDid(msg, signerKeys)
-
-			require.Nil(t, err)
-			require.Equal(t, tc.resultId, did.Id)
-		})
-	}
 }

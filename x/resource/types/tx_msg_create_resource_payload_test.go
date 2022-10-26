@@ -1,9 +1,9 @@
-package types
+package types_test
 
 import (
-	"testing"
-
-	"github.com/stretchr/testify/require"
+	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 func TestMsgCreateResourcePayloadValidation(t *testing.T) {
@@ -17,7 +17,7 @@ func TestMsgCreateResourcePayloadValidation(t *testing.T) {
 			name: "positive",
 			struct_: &MsgCreateResourcePayload{
 				CollectionId: "123456789abcdefg",
-				Id:           "BA62c728-cb15-498b-8e9e-9259cc242186",
+				Id:           "ba62c728-cb15-498b-8e9e-9259cc242186",
 				Name:         "Test Resource",
 				ResourceType: "CL-Schema",
 				Data:         []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},

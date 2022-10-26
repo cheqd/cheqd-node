@@ -28,6 +28,11 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 		return nil, err
 	}
 
+	// Validate DID is not deactivated
+	if didDocStateValue.Metadata.Deactivated {
+		return nil, cheqdtypes.ErrDIDDocDeactivated.Wrap(did)
+	}
+
 	// Validate Resource doesn't exist
 	if k.HasResource(&ctx, resource.Header.CollectionId, resource.Header.Id) {
 		return nil, types.ErrResourceExists.Wrap(resource.Header.Id)
@@ -48,12 +53,14 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	}
 
 	// Build Resource
-	resource.Header.Checksum = sha256.New().Sum(resource.Data)
+	resource := msg.Payload.ToResource()
+	checksum := sha256.Sum256([]byte(resource.Data))
+	resource.Header.Checksum = checksum[:]
 	resource.Header.Created = ctx.BlockTime().Format(time.RFC3339)
 	resource.Header.MediaType = utils.DetectMediaType(resource.Data)
 
 	// Find previous version and upgrade backward and forward version links
-	previousResourceVersionHeader, found := k.GetLastResourceVersionHeader(&ctx, resource.Header.CollectionId, resource.Header.Name, resource.Header.ResourceType, resource.Header.MediaType)
+	previousResourceVersionHeader, found := k.GetLastResourceVersionHeader(&ctx, resource.Header.CollectionId, resource.Header.Name, resource.Header.ResourceType)
 	if found {
 		// Set links
 		previousResourceVersionHeader.NextVersionId = resource.Header.Id

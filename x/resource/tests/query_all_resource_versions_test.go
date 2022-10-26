@@ -1,15 +1,13 @@
 package tests
 
 import (
-	"crypto/ed25519"
-	"fmt"
-	"testing"
+	. "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 
 	cheqdtests "github.com/cheqd/cheqd-node/x/cheqd/tests"
-	cheqdutils "github.com/cheqd/cheqd-node/x/cheqd/utils"
 	"github.com/cheqd/cheqd-node/x/resource/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/stretchr/testify/require"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 func SendAnotherResourceVersion(t require.TestingT, resourceSetup TestSetup, keys map[string]cheqdtests.KeyPair) types.Resource {
@@ -88,8 +86,6 @@ func TestQueryGetAllResourceVersions(t *testing.T) {
 				require.Nil(t, err)
 				require.Equal(t, len(expectedResources), len(resources))
 				for _, r := range resources {
-					expectedResources[r.Id].Header.CollectionId = cheqdutils.NormalizeIdentifier(expectedResources[r.Id].Header.CollectionId)
-					expectedResources[r.Id].Header.Id = cheqdutils.NormalizeIdentifier(expectedResources[r.Id].Header.Id)
 					r.Created = expectedResources[r.Id].Header.Created
 					require.Equal(t, r, expectedResources[r.Id].Header)
 				}

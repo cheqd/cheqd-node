@@ -38,9 +38,7 @@ func readCosmConfig(homeDir string) (cosmcfg.Config, error) {
 		return cosmcfg.Config{}, fmt.Errorf("failed to read in app.toml: %w", err)
 	}
 
-	config := cosmcfg.GetConfig(v)
-
-	return config, nil
+	return cosmcfg.GetConfig(v)
 }
 
 func writeCosmConfig(homeDir string, config *cosmcfg.Config) {

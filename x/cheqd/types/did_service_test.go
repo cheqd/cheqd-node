@@ -1,15 +1,15 @@
-package types
+package types_test
 
 import (
-	"testing"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 
-	"github.com/stretchr/testify/require"
+	. "github.com/cheqd/cheqd-node/x/cheqd/types"
 )
 
-func TestServiceValidation(t *testing.T) {
-	cases := []struct {
-		name              string
-		struct_           Service
+var _ = Describe("Service tests", func() {
+	type TestCaseServiceStruct struct {
+		service           *Service
 		baseDid           string
 		allowedNamespaces []string
 		isValid           bool
@@ -61,71 +61,6 @@ func TestServiceValidation(t *testing.T) {
 				require.Error(t, err)
 				require.Equal(t, err.Error(), tc.errorMsg)
 			}
-		})
-	}
-}
-
-func UUIDTestCases() []struct {
-	name        string
-	did         string
-	expectedDid string
-} {
-	return []struct {
-		name        string
-		did         string
-		expectedDid string
-	}{
-		{
-			name:        "base58 identifier - not changed",
-			did:         "did:cheqd:aaaaaaaaaaaaaaaa",
-			expectedDid: "did:cheqd:aaaaaaaaaaaaaaaa",
-		},
-		{
-			name:        "Mixed case UUID",
-			did:         "did:cheqd:test:BAbbba14-f294-458a-9b9c-474d188680fd",
-			expectedDid: "did:cheqd:test:babbba14-f294-458a-9b9c-474d188680fd",
-		},
-		{
-			name:        "Low case UUID",
-			did:         "did:cheqd:test:babbba14-f294-458a-9b9c-474d188680fd",
-			expectedDid: "did:cheqd:test:babbba14-f294-458a-9b9c-474d188680fd",
-		},
-		{
-			name:        "Upper case UUID",
-			did:         "did:cheqd:test:A86F9CAE-0902-4a7c-a144-96b60ced2FC9",
-			expectedDid: "did:cheqd:test:a86f9cae-0902-4a7c-a144-96b60ced2fc9",
-		},
-	}
-}
-
-func TestUpdateUUIDIdentifiers(t *testing.T) {
-	for _, tc := range UUIDTestCases() {
-		t.Run(tc.name, func(t *testing.T) {
-			did := Did{
-				Id:             tc.did,
-				Authentication: []string{tc.did + "#key1"},
-				VerificationMethod: []*VerificationMethod{
-					{
-						Id:         tc.did + "#key1",
-						Type:       Ed25519VerificationKey2020,
-						Controller: tc.did,
-					},
-				},
-			}
-			expectedDid := Did{
-				Id:             tc.expectedDid,
-				Authentication: []string{tc.expectedDid + "#key1"},
-				VerificationMethod: []*VerificationMethod{
-					{
-						Id:         tc.expectedDid + "#key1",
-						Type:       Ed25519VerificationKey2020,
-						Controller: tc.expectedDid,
-					},
-				},
-			}
-			NormalizeDID(&did)
-
-			require.Equal(t, expectedDid, did)
 		})
 	}
 }
