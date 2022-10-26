@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package cheqd.did.v2;
+
+option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types/v2";
+
+message DidDoc {
+  repeated string context = 1;
+  string id = 2;
+  repeated string controller = 3;
+  repeated VerificationMethod verification_method = 4;
+  repeated string authentication = 5;
+  repeated string assertion_method = 6;
+  repeated string capability_invocation = 7;
+  repeated string capability_delegation = 8;
+  repeated string key_agreement = 9;
+  repeated Service service = 10;
+  repeated string also_known_as = 11;
+}
+
+message VerificationMethod {
+  string id = 1;
+  string type = 2;
+  string controller = 3;
+  string verification_material = 4;
+}
+
+message Service {
+  string id = 1;
+  string type = 2;
+  repeated string service_endpoint = 3;
+}
+
+message DidDocWithMetadata {
+  DidDoc did_doc = 1;
+  Metadata metadata = 2;
+}
+
+message Metadata {
+  string created = 1;
+  string updated = 2;
+  bool deactivated = 3;
+  string version_id = 4;
+  string next_version_id = 5;
+  string previous_version_id = 6;
+}
