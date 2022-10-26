@@ -44,12 +44,3 @@ message QueryGetCollectionResourcesRequest {
 message QueryGetCollectionResourcesResponse {
   repeated Metadata resources = 1;
 }
-
-message QueryGetAllResourceVersionsRequest {
-  string collection_id = 1;
-  string name = 2;
-}
-
-message QueryGetAllResourceVersionsResponse {
-  repeated Metadata resources = 1;
-}
