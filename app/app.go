@@ -110,8 +110,6 @@ var (
 	// DefaultNodeHome default home directories for the application daemon
 	DefaultNodeHome string
 
-	EnvPrefix = "CHEQD"
-
 	// ModuleBasics defines the module BasicManager is in charge of setting up basic,
 	// non-dependant module elements, such as codec registration
 	// and genesis verification.
@@ -622,7 +620,7 @@ func New(
 	app.SetEndBlocker(app.EndBlocker)
 
 	// ibc v3 -> v4 migration
-	app.UpgradeKeeper.SetUpgradeHandler("MigrateTraces",
+	// TODO: Can we merge it into a single hewwvc cc  fcc icc ateTraces",
 		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 			// transfer module consensus version has been bumped to 2
 			return app.mm.RunMigrations(ctx, app.configurator, fromVM)
