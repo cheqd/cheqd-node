@@ -21,6 +21,11 @@ message MsgUpdateDidDoc {
   repeated SignInfo signatures = 2;
 }
 
+message MsgDeactivateDid {
+  MsgDeactivateDidPayload payload = 1;
+  repeated SignInfo signatures = 2;
+}
+
 message SignInfo {
   string verification_method_id = 1;
   bytes signature = 2;
@@ -60,5 +65,14 @@ message MsgUpdateDidDocPayload {
 }
 
 message MsgUpdateDidDocResponse {
+  DidDocWithMetadata value = 1;
+}
+
+message MsgDeactivateDidPayload {
+  string id = 1;
+  string version_id = 2;
+}
+
+message MsgDeactivateDidResponse {
   DidDocWithMetadata value = 1;
 }
