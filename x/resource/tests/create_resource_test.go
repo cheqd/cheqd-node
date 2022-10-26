@@ -1,10 +1,13 @@
 package tests
 
 import (
+	"crypto/sha256"
+
 	. "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 	"github.com/google/uuid"
 
 	cheqdsetup "github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
+	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -19,9 +22,8 @@ func ExpectPayloadToMatchResource(payload *resourcetypes.MsgCreateResourcePayloa
 	Expect(payload.ResourceType).To(Equal(resource.Header.ResourceType))
 
 	// Generated header
-	// TODO: Uncomment once fixed
-	// hash := sha256.Sum256(payload.Data)
-	// Expect(resource.Header.Checksum).To(Equal(hash))
+	hash := sha256.Sum256(payload.Data)
+	Expect(resource.Header.Checksum).To(Equal(hash[:]))
 
 	// Provided data
 	Expect(payload.Data).To(Equal(resource.Data))
@@ -98,6 +100,40 @@ var _ = Describe("Create Resource Tests", func() {
 
 			ExpectPayloadToMatchResource(&msg, created.Resource)
 			Expect(created.Resource.Header.PreviousVersionId).To(Equal(existingResource.Resource.Header.Id))
+		})
+	})
+
+	Describe("Resource for deactivated DID", func() {
+		var msg *resourcetypes.MsgCreateResourcePayload
+
+		BeforeEach(func() {
+			msg = &resourcetypes.MsgCreateResourcePayload{
+				CollectionId: alice.CollectionId,
+				Id:           uuid.NewString(),
+				Name:         "Test Resource Name",
+				ResourceType: CLSchemaType,
+				Data:         []byte(SchemaData),
+			}
+		})
+
+		When("DIDDoc is deactivated", func() {
+			It("Should fail with error", func() {
+				// Deactivate DID
+				DeactivateMsg := &cheqdtypes.MsgDeactivateDidPayload{
+					Id: alice.Did,
+				}
+
+				signatures := []cheqdsetup.SignInput{alice.DidInfo.SignInput}
+
+				res, err := setup.DeactivateDid(DeactivateMsg, signatures)
+				Expect(err).To(BeNil())
+				Expect(res.Metadata.Deactivated).To(BeTrue())
+
+				// Create resource
+				_, err = setup.CreateResource(msg, []cheqdsetup.SignInput{alice.SignInput})
+				Expect(err).ToNot(BeNil())
+				Expect(err.Error()).To(ContainSubstring(alice.Did + ": DID Doc already deactivated"))
+			})
 		})
 	})
 })
