@@ -1,4 +1,5 @@
 //go:build upgrade
+
 package upgrade
 
 import (

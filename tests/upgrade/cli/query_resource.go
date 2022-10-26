@@ -1,8 +1,8 @@
 package cli
 
 import (
-	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
+	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 )
 
 func QueryResource(collectionId string, resourceId string, container string) (resourcetypes.QueryGetResourceResponse, error) {

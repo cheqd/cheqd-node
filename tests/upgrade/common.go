@@ -1,3 +1,3 @@
 //go:build upgrade
-package upgrade
 
+package upgrade

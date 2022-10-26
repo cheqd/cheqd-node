@@ -1,22 +1,22 @@
 package migration
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type Migration struct {
-	name string
+	name     string
 	expected interface{}
-	handler func(ctx sdk.Context) error
+	handler  func(ctx sdk.Context) error
 }
 
 func NewMigration(name string, expected interface{}, handler func(ctx sdk.Context) error) Migration {
 	return Migration{
-		name: name,
+		name:     name,
 		expected: expected,
-		handler: handler,
+		handler:  handler,
 	}
 }
 
@@ -33,16 +33,16 @@ func (m Migration) Handler() func(ctx sdk.Context) error {
 }
 
 type CheqdMigration struct {
-	name string
+	name     string
 	expected cheqdtypes.MsgCreateDidPayload
-	handler func(ctx sdk.Context) error
+	handler  func(ctx sdk.Context) error
 }
 
 func NewCheqdMigration(name string, expected cheqdtypes.MsgCreateDidPayload, handler func(ctx sdk.Context) error) CheqdMigration {
 	return CheqdMigration{
-		name: name,
+		name:     name,
 		expected: expected,
-		handler: handler,
+		handler:  handler,
 	}
 }
 
@@ -59,16 +59,16 @@ func (m CheqdMigration) Handler() func(ctx sdk.Context) error {
 }
 
 type ResourceMigration struct {
-	name string
+	name     string
 	expected resourcetypes.MsgCreateResourcePayload
-	handler func(ctx sdk.Context) error
+	handler  func(ctx sdk.Context) error
 }
 
 func NewResourceMigration(name string, expected resourcetypes.MsgCreateResourcePayload, handler func(ctx sdk.Context) error) ResourceMigration {
 	return ResourceMigration{
-		name: name,
+		name:     name,
 		expected: expected,
-		handler: handler,
+		handler:  handler,
 	}
 }
 

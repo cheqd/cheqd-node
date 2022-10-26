@@ -3,6 +3,7 @@ package cli
 import (
 	"strconv"
 	"strings"
+
 	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -74,7 +75,7 @@ func DepositGov(container string) (sdk.TxResponse, error) {
 		"tx", "gov", "deposit", "1", DEPOSIT_AMOUNT,
 		"--from", OperatorAccounts[container],
 	}, TX_PARAMS...)
-	
+
 	out, err := LocalnetExecExec(container, args...)
 	if err != nil {
 		return sdk.TxResponse{}, err

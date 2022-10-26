@@ -2,10 +2,11 @@ package cli
 
 import (
 	"fmt"
-	"time"
 	"sync"
-	tmcoretypes "github.com/tendermint/tendermint/rpc/core/types"
+	"time"
+
 	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
+	tmcoretypes "github.com/tendermint/tendermint/rpc/core/types"
 )
 
 func GetNodeStatus(container string, binary string) (tmcoretypes.ResultStatus, error) {

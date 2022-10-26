@@ -1,8 +1,8 @@
 package cli
 
 import (
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 )
 
 func Query(container string, binary string, module, query string, queryArgs ...string) (string, error) {

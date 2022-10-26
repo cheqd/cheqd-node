@@ -3,22 +3,23 @@ package cli
 import (
 	"os"
 	"os/exec"
+
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const (
-	DOCKER_LOCALNET = "localnet"
-	DOCKER_LOCALNET_PATH = "../../../docker/localnet"
-	DOCKER_COMPOSE = "docker compose"
+	DOCKER_LOCALNET         = "localnet"
+	DOCKER_LOCALNET_PATH    = "../../../docker/localnet"
+	DOCKER_COMPOSE          = "docker compose"
 	DOCKER_IN_LOCALNET_PATH = DOCKER_LOCALNET_PATH + "/" + DOCKER_COMPOSE
-	OPERATOR0 = "operator0"
-	OPERATOR1 = "operator1"
-	OPERATOR2 = "operator2"
-	OPERATOR3 = "operator3"
-	VALIDATOR0 = "validator-0"
-	VALIDATOR1 = "validator-1"
-	VALIDATOR2 = "validator-2"
-	VALIDATOR3 = "validator-3"
+	OPERATOR0               = "operator0"
+	OPERATOR1               = "operator1"
+	OPERATOR2               = "operator2"
+	OPERATOR3               = "operator3"
+	VALIDATOR0              = "validator-0"
+	VALIDATOR1              = "validator-1"
+	VALIDATOR2              = "validator-2"
+	VALIDATOR3              = "validator-3"
 )
 
 type OperatorAccount map[string]string

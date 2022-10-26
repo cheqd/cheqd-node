@@ -2,8 +2,9 @@ package cli
 
 import (
 	"encoding/base64"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	cheqdcli "github.com/cheqd/cheqd-node/x/cheqd/client/cli"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func CreateResource(collectionId string, resourceId string, resourceName string, resourceType string, resourceFile string, signInputs []cheqdcli.SignInput, container string) (sdk.TxResponse, error) {
