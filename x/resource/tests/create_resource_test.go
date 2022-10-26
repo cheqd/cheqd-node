@@ -10,15 +10,8 @@ import (
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 
-<<<<<<< HEAD
-	"github.com/cheqd/cheqd-node/x/resource/types"
-
-	cheqdutils "github.com/cheqd/cheqd-node/x/cheqd/utils"
-	"github.com/stretchr/testify/require"
-=======
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
->>>>>>> origin/develop
 )
 
 func ExpectPayloadToMatchResource(payload *resourcetypes.MsgCreateResourcePayload, resource *resourcetypes.Resource) {
@@ -55,67 +48,6 @@ var _ = Describe("Create Resource Tests", func() {
 				Name:         "Test Resource Name",
 				ResourceType: CLSchemaType,
 				Data:         []byte(SchemaData),
-<<<<<<< HEAD
-			},
-			mediaType: JsonResourceType,
-			errMsg:    fmt.Sprintf("signer: %s: signature is required but not found", cheqdutils.NormalizeIdentifier(ExistingDID)),
-		},
-		{
-			valid:      false,
-			name:       "Not Valid: Invalid Resource Id",
-			signerKeys: map[string]ed25519.PrivateKey{},
-			msg: &types.MsgCreateResourcePayload{
-				CollectionId: ExistingDIDIdentifier,
-				Id:           IncorrectResourceId,
-				Name:         "Test Resource Name",
-				ResourceType: CLSchemaType,
-				Data:         []byte(SchemaData),
-			},
-			mediaType: JsonResourceType,
-			errMsg:    fmt.Sprintf("signer: %s: signature is required but not found", cheqdutils.NormalizeIdentifier(ExistingDID)),
-		},
-		{
-			valid:      false,
-			name:       "Not Valid: DID Doc is not found",
-			signerKeys: map[string]ed25519.PrivateKey{},
-			msg: &types.MsgCreateResourcePayload{
-				CollectionId: NotFoundDIDIdentifier,
-				Id:           IncorrectResourceId,
-				Name:         "Test Resource Name",
-				ResourceType: CLSchemaType,
-				Data:         []byte(SchemaData),
-			},
-			mediaType: JsonResourceType,
-			errMsg:    fmt.Sprintf("did:cheqd:test:%s: not found", NotFoundDIDIdentifier),
-		},
-	}
-
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			msg := tc.msg
-			resourceSetup := InitEnv(t, keys[ExistingDIDKey].PublicKey, keys[ExistingDIDKey].PrivateKey)
-
-			resource, err := resourceSetup.SendCreateResource(msg, tc.signerKeys)
-			if tc.valid {
-				require.Nil(t, err)
-
-				did := utils.JoinDID("cheqd", "test", resource.Header.CollectionId)
-				didStateValue, err := resourceSetup.Keeper.GetDid(&resourceSetup.Ctx, did)
-				require.Nil(t, err)
-				require.Contains(t, didStateValue.Metadata.Resources, resource.Header.Id)
-
-				require.Equal(t, cheqdutils.NormalizeIdentifier(tc.msg.CollectionId), resource.Header.CollectionId)
-				require.Equal(t, cheqdutils.NormalizeIdentifier(tc.msg.Id), resource.Header.Id)
-				require.Equal(t, tc.mediaType, resource.Header.MediaType)
-				require.Equal(t, tc.msg.ResourceType, resource.Header.ResourceType)
-				require.Equal(t, tc.msg.Data, resource.Data)
-				require.Equal(t, tc.msg.Name, resource.Header.Name)
-				require.Equal(t, sha256.New().Sum(resource.Data), resource.Header.Checksum)
-				require.Equal(t, tc.previousVersionId, resource.Header.PreviousVersionId)
-			} else {
-				require.Error(t, err)
-				require.Equal(t, tc.errMsg, err.Error())
-=======
 			}
 		})
 
@@ -181,7 +113,6 @@ var _ = Describe("Create Resource Tests", func() {
 				Name:         "Test Resource Name",
 				ResourceType: CLSchemaType,
 				Data:         []byte(SchemaData),
->>>>>>> origin/develop
 			}
 		})
 

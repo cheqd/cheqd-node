@@ -4,11 +4,7 @@ import (
 	. "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 	"github.com/google/uuid"
 
-	// "crypto/sha256"
-	"crypto/sha256"
-	"fmt"
-	"testing"
-
+	cheqdsetup "github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -42,22 +38,7 @@ var _ = Describe("Query Collection Resources", func() {
 	It("Returns error if collection does not exist", func() {
 		nonExistingCollection := cheqdsetup.GenerateDID(cheqdsetup.Base58_16chars)
 
-			if tc.valid {
-				resource := queryResponse.Resource
-				require.Nil(t, err)
-				require.Equal(t, tc.response.Resource.Header.CollectionId, resource.Header.CollectionId)
-				require.Equal(t, tc.response.Resource.Header.Id, resource.Header.Id)
-				require.Equal(t, tc.response.Resource.Header.MediaType, resource.Header.MediaType)
-				require.Equal(t, tc.response.Resource.Header.ResourceType, resource.Header.ResourceType)
-				require.Equal(t, tc.response.Resource.Data, resource.Data)
-				require.Equal(t, tc.response.Resource.Header.Name, resource.Header.Name)
-				require.Equal(t, sha256.New().Sum(tc.response.Resource.Data), resource.Header.Checksum)
-				require.Equal(t, tc.response.Resource.Header.PreviousVersionId, resource.Header.PreviousVersionId)
-				require.Equal(t, tc.response.Resource.Header.NextVersionId, resource.Header.NextVersionId)
-			} else {
-				require.Error(t, err)
-				require.Equal(t, tc.errMsg, err.Error())
-			}
-		})
-	}
-}
+		_, err := setup.QueryResource(nonExistingCollection, resource.Resource.Header.Id)
+		Expect(err.Error()).To(ContainSubstring("DID Doc not found"))
+	})
+})

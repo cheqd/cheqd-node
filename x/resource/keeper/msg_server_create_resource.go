@@ -53,7 +53,6 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	}
 
 	// Build Resource
-	resource := msg.Payload.ToResource()
 	checksum := sha256.Sum256([]byte(resource.Data))
 	resource.Header.Checksum = checksum[:]
 	resource.Header.Created = ctx.BlockTime().Format(time.RFC3339)

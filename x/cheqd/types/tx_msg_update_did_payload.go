@@ -9,27 +9,19 @@ func (msg *MsgUpdateDidPayload) GetSignBytes() []byte {
 }
 
 func (msg *MsgUpdateDidPayload) ToDid() Did {
-	did := &Did{
+	return Did{
 		Context:              msg.Context,
 		Id:                   msg.Id,
 		Controller:           msg.Controller,
+		VerificationMethod:   msg.VerificationMethod,
 		Authentication:       msg.Authentication,
 		AssertionMethod:      msg.AssertionMethod,
 		CapabilityInvocation: msg.CapabilityInvocation,
 		CapabilityDelegation: msg.CapabilityDelegation,
 		KeyAgreement:         msg.KeyAgreement,
 		AlsoKnownAs:          msg.AlsoKnownAs,
+		Service:              msg.Service,
 	}
-	for _, vm := range msg.VerificationMethod {
-		newVM := VerificationMethod(*vm)
-		did.VerificationMethod = append(did.VerificationMethod, &newVM)
-	}
-	for _, s := range msg.Service {
-		newS := Service(*s)
-		did.Service = append(did.Service, &newS)
-	}
-	NormalizeDID(did)
-	return *did
 }
 
 // Validation

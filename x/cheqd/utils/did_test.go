@@ -6,21 +6,6 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-<<<<<<< HEAD
-func TestIsDid(t *testing.T) {
-	cases := []struct {
-		name      string
-		valid     bool
-		did       string
-		method    string
-		allowedNS []string
-	}{
-		{"Valid: Inputs: Method and namespace are set", true, "did:cheqd:testnet:123456789abcdefg", "cheqd", []string{"testnet"}},
-		{"Valid: Inputs: Method and namespaces are set", true, "did:cheqd:testnet:123456789abcdefg", "cheqd", []string{"testnet", "mainnet"}},
-		{"Valid: Inputs: Method not set", true, "did:cheqd:testnet:123456789abcdefg", "", []string{"testnet"}},
-		{"Valid: Inputs: Method and namespaces are empty", true, "did:cheqd:testnet:123456789abcdefg", "", []string{}},
-		{"Valid: Namespace is absent in DID", true, "did:cheqd:123456789abcdefg", "", []string{}},
-=======
 var _ = Describe("DID checks", func() {
 	DescribeTable("Check is valid ID (for example did:cheqD:testnet:123456789abcdefg and ID is 123456789abcdefg)",
 
@@ -47,7 +32,6 @@ var _ = Describe("DID checks", func() {
 		Entry("Valid: Inputs: Method not set", true, "did:cheqd:testnet:123456789abcdefg", "", []string{"testnet"}),
 		Entry("Valid: Inputs: Method and namespaces are empty", true, "did:cheqd:testnet:123456789abcdefg", "", []string{}),
 		Entry("Valid: Namespace is absent in DID", true, "did:cheqd:123456789abcdefg", "", []string{}),
->>>>>>> origin/develop
 		// Generic method validation
 		Entry("Valid: Inputs: Method is not set and passed for NOTcheqd", true, "did:NOTcheqd:123456789abcdefg", "", []string{}),
 		Entry("Valid: Inputs: Method and Namespaces are not set and passed for NOTcheqd", true, "did:NOTcheqd:123456789abcdefg123456789abcdefg", "", []string{}),

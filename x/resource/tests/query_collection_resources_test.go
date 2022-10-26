@@ -3,6 +3,7 @@ package tests
 import (
 	. "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 
+	cheqdsetup "github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -34,19 +35,8 @@ var _ = Describe("Query Collection Resources", func() {
 
 		ids := []string{versions.Resources[0].Id, versions.Resources[1].Id, versions.Resources[2].Id}
 
-			if tc.valid {
-				resources := queryResponse.Resources
-				expectedResources := tc.response.Resources
-				require.Nil(t, err)
-				require.Equal(t, len(expectedResources), len(resources))
-				for i, r := range resources {
-					r.Created = expectedResources[i].Created
-					require.Equal(t, expectedResources[i], r)
-				}
-			} else {
-				require.Error(t, err)
-				require.Equal(t, tc.errMsg, err.Error())
-			}
-		})
-	}
-}
+		Expect(ids).To(ContainElement(res1v1.Resource.Header.Id))
+		Expect(ids).To(ContainElement(res1v2.Resource.Header.Id))
+		Expect(ids).To(ContainElement(res2v1.Resource.Header.Id))
+	})
+})
