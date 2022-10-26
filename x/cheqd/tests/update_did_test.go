@@ -539,7 +539,7 @@ var _ = Describe("DID Doc update", func() {
 			bob = setup.CreateSimpleDid()
 
 			updateMsg = &types.MsgUpdateDidPayload{
-				Id:         alice.Did,
+				Id: alice.Did,
 				VerificationMethod: []*types.VerificationMethod{
 					{
 						Id:                 alice.DidInfo.KeyId,
@@ -549,7 +549,7 @@ var _ = Describe("DID Doc update", func() {
 					},
 				},
 				Authentication: []string{alice.KeyId},
-				VersionId: alice.VersionId,
+				VersionId:      alice.VersionId,
 			}
 		})
 
@@ -571,11 +571,10 @@ var _ = Describe("DID Doc update", func() {
 					alice.SignInput,
 					bob.SignInput,
 				}
-	
+
 				_, err = setup.UpdateDid(updateMsg, signatures)
 				Expect(err.Error()).ToNot(BeNil())
 				Expect(err.Error()).To(ContainSubstring(alice.DidInfo.Did + ": DID Doc already deactivated"))
-
 			})
 		})
 	})

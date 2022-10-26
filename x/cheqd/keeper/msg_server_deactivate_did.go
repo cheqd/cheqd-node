@@ -38,15 +38,6 @@ func (k MsgServer) DeactivateDid(goCtx context.Context, msg *types.MsgDeactivate
 		return nil, err
 	}
 
-	updatedMetadata := *existingStateValue.Metadata
-	updatedMetadata.Update(ctx)
-	updatedMetadata.Deactivated = true
-
-	updatedStateValue, err := types.NewStateValue(existingDid, &updatedMetadata)
-	if err != nil {
-		return nil, err
-	}
-
 	// We neither create dids nor update
 	inMemoryDids := map[string]types.StateValue{}
 
@@ -58,7 +49,11 @@ func (k MsgServer) DeactivateDid(goCtx context.Context, msg *types.MsgDeactivate
 	}
 
 	// Build new state value
-	updatedStateValue, err = types.NewStateValue(existingDid, &updatedMetadata)
+	updatedMetadata := *existingStateValue.Metadata
+	updatedMetadata.Update(ctx)
+	updatedMetadata.Deactivated = true
+
+	updatedStateValue, err := types.NewStateValue(existingDid, &updatedMetadata)
 	if err != nil {
 		return nil, err
 	}

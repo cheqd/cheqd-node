@@ -6,9 +6,8 @@ import (
 	. "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 	"github.com/google/uuid"
 
-
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	cheqdsetup "github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
+	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -123,9 +122,9 @@ var _ = Describe("Create Resource Tests", func() {
 				DeactivateMsg := &cheqdtypes.MsgDeactivateDidPayload{
 					Id: alice.Did,
 				}
-		
+
 				signatures := []cheqdsetup.SignInput{alice.DidInfo.SignInput}
-		
+
 				res, err := setup.DeactivateDid(DeactivateMsg, signatures)
 				Expect(err).To(BeNil())
 				Expect(res.Metadata.Deactivated).To(BeTrue())

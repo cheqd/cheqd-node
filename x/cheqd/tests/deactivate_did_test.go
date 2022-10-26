@@ -12,14 +12,14 @@ import (
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 )
 
-var _ = Describe("Create DID tests", func() {
+var _ = Describe("Deactivate DID tests", func() {
 	var setup setup.TestSetup
 
 	BeforeEach(func() {
 		setup = Setup()
 	})
 
-	It("Valid: Deactivate DID", func(){
+	It("Valid: Deactivate DID", func() {
 		// Alice
 		alice := setup.CreateSimpleDid()
 		msg := &types.MsgDeactivateDidPayload{
@@ -71,7 +71,7 @@ var _ = Describe("Create DID tests", func() {
 	})
 
 	When("Signatures are invalid", func() {
-		It("Should return an error", func(){
+		It("Should return an error", func() {
 			// Alice
 			alice := setup.CreateSimpleDid()
 			// Bob
