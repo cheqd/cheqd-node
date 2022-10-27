@@ -5,7 +5,12 @@ import validation "github.com/go-ozzo/ozzo-validation/v4"
 var _ IdentityMsg = &MsgDeactivateDidPayload{}
 
 func (msg *MsgDeactivateDidPayload) GetSignBytes() []byte {
-	return ModuleCdc.MustMarshal(msg)
+	bytes, err := msg.Marshal()
+	if err != nil {
+		panic(err)
+	}
+
+	return bytes
 }
 
 func (msg *MsgDeactivateDidPayload) ToDid() Did {

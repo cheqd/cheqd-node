@@ -3,7 +3,12 @@ package types
 var _ IdentityMsg = &MsgCreateDidPayload{}
 
 func (msg *MsgCreateDidPayload) GetSignBytes() []byte {
-	return ModuleCdc.MustMarshal(msg)
+	bytes, err := msg.Marshal()
+	if err != nil {
+		panic(err)
+	}
+
+	return bytes
 }
 
 func (msg *MsgCreateDidPayload) ToDid() Did {
