@@ -63,6 +63,9 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
+	"github.com/cosmos/cosmos-sdk/x/group"
+	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
+	groupmodule "github.com/cosmos/cosmos-sdk/x/group/module"
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
@@ -139,6 +142,7 @@ var (
 		vesting.AppModuleBasic{},
 		feegrantmodule.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
+		groupmodule.AppModuleBasic{},
 		cheqd.AppModuleBasic{},
 		resource.AppModuleBasic{},
 		ica.AppModuleBasic{},
@@ -196,6 +200,7 @@ type App struct {
 	TransferKeeper   ibctransferkeeper.Keeper
 	FeeGrantKeeper   feegrantkeeper.Keeper
 	AuthzKeeper      authzkeeper.Keeper
+	GroupKeeper      groupkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -258,6 +263,7 @@ func New(
 		capabilitytypes.StoreKey,
 		feegrant.StoreKey,
 		authzkeeper.StoreKey,
+		group.StoreKey,
 		icahosttypes.StoreKey,
 		cheqdtypes.StoreKey,
 		resourcetypes.StoreKey,
@@ -318,6 +324,15 @@ func New(
 		appCodec,
 		app.MsgServiceRouter(),
 		app.AccountKeeper,
+	)
+
+	groupConfig := group.DefaultConfig()
+	app.GroupKeeper = groupkeeper.NewKeeper(
+		keys[group.StoreKey],
+		appCodec,
+		app.MsgServiceRouter(),
+		app.AccountKeeper,
+		groupConfig,
 	)
 
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(
@@ -499,6 +514,7 @@ func New(
 		evidence.NewAppModule(app.EvidenceKeeper),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
+		groupmodule.NewAppModule(appCodec, app.GroupKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
@@ -529,6 +545,7 @@ func New(
 		icatypes.ModuleName,
 		genutiltypes.ModuleName,
 		authz.ModuleName,
+		group.ModuleName,
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
@@ -555,6 +572,7 @@ func New(
 		icatypes.ModuleName,
 		feegrant.ModuleName,
 		authz.ModuleName,
+		group.ModuleName,
 		paramstypes.ModuleName,
 		authtypes.ModuleName,
 		vestingtypes.ModuleName,
@@ -582,6 +600,7 @@ func New(
 		icatypes.ModuleName,
 		feegrant.ModuleName,
 		authz.ModuleName,
+		group.ModuleName,
 		cheqdtypes.ModuleName,
 		resourcetypes.ModuleName,
 		vestingtypes.ModuleName,
