@@ -3,7 +3,6 @@ package keeper
 import (
 	"strconv"
 
-	cheqdutils "github.com/cheqd/cheqd-node/x/cheqd/utils"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -89,7 +88,7 @@ func (k Keeper) HasResource(ctx *sdk.Context, collectionId string, id string) bo
 	return store.Has(GetResourceHeaderKeyBytes(collectionId, id))
 }
 
-func (k Keeper) GetAllResourceVersions(ctx *sdk.Context, collectionId, name string) []*types.ResourceHeader {
+func (k Keeper) GetAllResourceVersions(ctx *sdk.Context, collectionId, name, resourceType string) []*types.ResourceHeader {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, GetResourceHeaderCollectionPrefixBytes(collectionId))
 
@@ -101,7 +100,7 @@ func (k Keeper) GetAllResourceVersions(ctx *sdk.Context, collectionId, name stri
 		var val types.ResourceHeader
 		k.cdc.MustUnmarshal(iterator.Value(), &val)
 
-		if val.Name == name {
+		if val.Name == name && val.ResourceType == resourceType {
 			result = append(result, &val)
 		}
 	}
@@ -127,7 +126,7 @@ func (k Keeper) GetResourceCollection(ctx *sdk.Context, collectionId string) []*
 	return resources
 }
 
-func (k Keeper) GetLastResourceVersionHeader(ctx *sdk.Context, collectionId, name, resourceType, mediaType string) (types.ResourceHeader, bool) {
+func (k Keeper) GetLastResourceVersionHeader(ctx *sdk.Context, collectionId, name, resourceType string) (types.ResourceHeader, bool) {
 	iterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.storeKey), GetResourceHeaderCollectionPrefixBytes(collectionId))
 
 	defer closeIteratorOrPanic(iterator)
@@ -136,7 +135,7 @@ func (k Keeper) GetLastResourceVersionHeader(ctx *sdk.Context, collectionId, nam
 		var val types.ResourceHeader
 		k.cdc.MustUnmarshal(iterator.Value(), &val)
 
-		if val.Name == name && val.NextVersionId == "" {
+		if val.Name == name && val.ResourceType == resourceType && val.NextVersionId == "" {
 			return val, true
 		}
 	}
@@ -191,21 +190,16 @@ func (k Keeper) GetAllResources(ctx *sdk.Context) (list []types.Resource) {
 
 // GetResourceHeaderKeyBytes returns the byte representation of resource key
 func GetResourceHeaderKeyBytes(collectionId string, id string) []byte {
-	collectionId = cheqdutils.NormalizeIdentifier(collectionId)
-	id = cheqdutils.NormalizeIdentifier(id)
 	return []byte(types.ResourceHeaderKey + collectionId + ":" + id)
 }
 
 // GetResourceHeaderCollectionPrefixBytes used to iterate over all resource headers in a collection
 func GetResourceHeaderCollectionPrefixBytes(collectionId string) []byte {
-	collectionId = cheqdutils.NormalizeIdentifier(collectionId)
 	return []byte(types.ResourceHeaderKey + collectionId + ":")
 }
 
 // GetResourceDataKeyBytes returns the byte representation of resource key
 func GetResourceDataKeyBytes(collectionId string, id string) []byte {
-	collectionId = cheqdutils.NormalizeIdentifier(collectionId)
-	id = cheqdutils.NormalizeIdentifier(id)
 	return []byte(types.ResourceDataKey + collectionId + ":" + id)
 }
 

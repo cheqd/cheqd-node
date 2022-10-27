@@ -8,8 +8,14 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*types.MsgCreateDidResponse, error) {
+func (k MsgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*types.MsgCreateDidResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// Get sign bytes before modifying payload
+	signBytes := msg.Payload.GetSignBytes()
+
+	// Normilaize UUID identifiers
+	msg = msg.Normalize()
 
 	// Validate namespaces
 	namespace := k.GetDidNamespace(&ctx)
@@ -20,7 +26,6 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 
 	// Build metadata and stateValue
 	did := msg.Payload.ToDid()
-	types.NormalizeSignatureUUIDIdentifiers(msg.Signatures)
 
 	// Validate DID doesn't exist
 	if k.HasDid(&ctx, did.Id) {
@@ -47,7 +52,7 @@ func (k msgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 
 	// Verify signatures
 	signers := GetSignerDIDsForDIDCreation(did)
-	err = VerifyAllSignersHaveAllValidSignatures(&k.Keeper, &ctx, inMemoryDids, msg.Payload.GetSignBytes(), signers, msg.Signatures)
+	err = VerifyAllSignersHaveAllValidSignatures(&k.Keeper, &ctx, inMemoryDids, signBytes, signers, msg.Signatures)
 	if err != nil {
 		return nil, err
 	}

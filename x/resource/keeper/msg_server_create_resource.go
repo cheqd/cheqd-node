@@ -17,6 +17,11 @@ import (
 func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateResource) (*types.MsgCreateResourceResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	// Remember bytes before modifying payload
+	signBytes := msg.Payload.GetSignBytes()
+
+	msg = msg.Normalize()
+
 	resource := msg.Payload.ToResource()
 	cheqdtypes.NormalizeSignatureUUIDIdentifiers(msg.Signatures)
 
@@ -26,6 +31,11 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	didDocStateValue, err := k.cheqdKeeper.GetDid(&ctx, did)
 	if err != nil {
 		return nil, err
+	}
+
+	// Validate DID is not deactivated
+	if didDocStateValue.Metadata.Deactivated {
+		return nil, cheqdtypes.ErrDIDDocDeactivated.Wrap(did)
 	}
 
 	// Validate Resource doesn't exist
@@ -42,18 +52,19 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	// We can use the same signers as for DID creation because didDoc stays the same
 	signers := cheqdkeeper.GetSignerDIDsForDIDCreation(*didDoc)
 	err = cheqdkeeper.VerifyAllSignersHaveAllValidSignatures(&k.cheqdKeeper, &ctx, map[string]cheqdtypes.StateValue{},
-		msg.Payload.GetSignBytes(), signers, msg.Signatures)
+		signBytes, signers, msg.Signatures)
 	if err != nil {
 		return nil, err
 	}
 
 	// Build Resource
-	resource.Header.Checksum = sha256.New().Sum(resource.Data)
+	checksum := sha256.Sum256([]byte(resource.Data))
+	resource.Header.Checksum = checksum[:]
 	resource.Header.Created = ctx.BlockTime().Format(time.RFC3339)
 	resource.Header.MediaType = utils.DetectMediaType(resource.Data)
 
 	// Find previous version and upgrade backward and forward version links
-	previousResourceVersionHeader, found := k.GetLastResourceVersionHeader(&ctx, resource.Header.CollectionId, resource.Header.Name, resource.Header.ResourceType, resource.Header.MediaType)
+	previousResourceVersionHeader, found := k.GetLastResourceVersionHeader(&ctx, resource.Header.CollectionId, resource.Header.Name, resource.Header.ResourceType)
 	if found {
 		// Set links
 		previousResourceVersionHeader.NextVersionId = resource.Header.Id

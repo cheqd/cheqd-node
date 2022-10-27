@@ -47,18 +47,7 @@ func (did *Did) ReplaceIds(old, new string) {
 	}
 
 	for _, vm := range did.VerificationMethod {
-		// Controller
-		if vm.Controller == old {
-			vm.Controller = new
-		}
-
-		// Id
-		did, path, query, fragment := utils.MustSplitDIDUrl(vm.Id)
-		if did == old {
-			did = new
-		}
-
-		vm.Id = utils.JoinDIDUrl(did, path, query, fragment)
+		vm.ReplaceIds(old, new)
 	}
 }
 

@@ -18,6 +18,8 @@ func (m queryServer) CollectionResources(c context.Context, request *types.Query
 
 	ctx := sdk.UnwrapSDKContext(c)
 
+	request = request.Normalize()
+
 	// Validate corresponding DIDDoc exists
 	namespace := m.cheqdKeeper.GetDidNamespace(&ctx)
 	did := cheqdutils.JoinDID(cheqdtypes.DidMethod, namespace, request.CollectionId)
