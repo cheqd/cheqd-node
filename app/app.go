@@ -81,7 +81,6 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	ica "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts"
-	icacontrollertypes "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts/controller/types"
 	icahost "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts/host"
 	icahostkeeper "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts/host/keeper"
 	icahosttypes "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts/host/types"
@@ -619,84 +618,21 @@ func New(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 
-	// ibc v3 -> v4 migration
-	app.UpgradeKeeper.SetUpgradeHandler("MigrateTraces",
+	// Upgrade handler for the next release
+	app.UpgradeKeeper.SetUpgradeHandler(UpgradeName,
 		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			ctx.Logger().Info("Handler for upgrade plan: " + UpgradeName)
+
+			// ibc v3 -> v4 migration
 			// transfer module consensus version has been bumped to 2
 			return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 		})
 
-	// Latest upgrade handler
-	app.UpgradeKeeper.SetUpgradeHandler(UpgradeName, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("Handler for upgrade plan: v0.6")
-
-		// set the ICS27 consensus version so InitGenesis is not run
-		fromVM[icatypes.ModuleName] = icaModule.ConsensusVersion()
-
-		// create ICS27 Controller submodule params
-		controllerParams := icacontrollertypes.Params{
-			ControllerEnabled: true,
-		}
-
-		// create ICS27 Host submodule params
-		hostParams := icahosttypes.Params{
-			HostEnabled: true,
-			AllowMessages: []string{
-				authzMsgExec,
-				authzMsgGrant,
-				authzMsgRevoke,
-				bankMsgSend,
-				bankMsgMultiSend,
-				distrMsgSetWithdrawAddr,
-				distrMsgWithdrawValidatorCommission,
-				distrMsgFundCommunityPool,
-				distrMsgWithdrawDelegatorReward,
-				feegrantMsgGrantAllowance,
-				feegrantMsgRevokeAllowance,
-				govMsgVoteWeighted,
-				govMsgSubmitProposal,
-				govMsgDeposit,
-				govMsgVote,
-				stakingMsgEditValidator,
-				stakingMsgDelegate,
-				stakingMsgUndelegate,
-				stakingMsgBeginRedelegate,
-				stakingMsgCreateValidator,
-				vestingMsgCreateVestingAccount,
-				ibcMsgTransfer,
-			},
-		}
-
-		// initialize ICS27 module
-		ctx.Logger().Info("start to init interchainaccount module...")
-		icaModule.InitModule(ctx, controllerParams, hostParams)
-
-		ctx.Logger().Info("start to run module migrations...")
-		return fromVM, nil
-	})
-
-	// Store migration for the latest upgrade
-	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
-	if err != nil {
-		panic(err)
-	}
-
-	if upgradeInfo.Name == UpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
-		storeUpgrades := storetypes.StoreUpgrades{
-			Added: []string{
-				icahosttypes.StoreKey,
-				resourcetypes.StoreKey,
-			},
-		}
-
-		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
-	}
-
 	// Test upgrade handler
 	app.UpgradeKeeper.SetUpgradeHandler(CosmovisorTestUpgrade, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("Handler for upgrade plan: cosmovisor_test")
+		ctx.Logger().Info("Handler for upgrade plan: " + CosmovisorTestUpgrade)
 
-		return fromVM, nil
+		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 	})
 
 	if loadLatest {
