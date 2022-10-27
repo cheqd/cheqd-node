@@ -8,7 +8,12 @@ import (
 var _ cheqdtypes.IdentityMsg = &MsgCreateResourcePayload{}
 
 func (msg *MsgCreateResourcePayload) GetSignBytes() []byte {
-	return ModuleCdc.MustMarshal(msg)
+	bytes, err := msg.Marshal()
+	if err != nil {
+		panic(err)
+	}
+
+	return bytes
 }
 
 func (msg *MsgCreateResourcePayload) ToResource() Resource {
