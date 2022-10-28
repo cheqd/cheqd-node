@@ -2,6 +2,7 @@ package types
 
 import (
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	cheqdutils "github.com/cheqd/cheqd-node/x/cheqd/utils"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
@@ -19,8 +20,8 @@ func (msg *MsgCreateResourcePayload) GetSignBytes() []byte {
 func (msg *MsgCreateResourcePayload) ToResource() Resource {
 	return Resource{
 		Header: &ResourceHeader{
-			CollectionId: msg.CollectionId,
-			Id:           msg.Id,
+			CollectionId: cheqdutils.NormalizeId(msg.CollectionId),
+			Id:           cheqdutils.NormalizeUUID(msg.Id),
 			Name:         msg.Name,
 			ResourceType: msg.ResourceType,
 		},
@@ -49,4 +50,11 @@ func ValidMsgCreateResourcePayload() *cheqdtypes.CustomErrorRule {
 
 		return casted.Validate()
 	})
+}
+
+// Normalize
+
+func (msg *MsgCreateResourcePayload) Normalize() {
+	msg.CollectionId = cheqdutils.NormalizeId(msg.CollectionId)
+	msg.Id = cheqdutils.NormalizeId(msg.Id)
 }

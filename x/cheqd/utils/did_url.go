@@ -116,3 +116,22 @@ func IsValidDIDUrl(didUrl string, method string, allowedNamespaces []string) boo
 
 	return nil == err
 }
+
+// Normalization
+
+func NormalizeDIDUrl(didUrl string) string {
+	did, path, query, fragment := MustSplitDIDUrl(didUrl)
+	did = NormalizeDID(did)
+	return JoinDIDUrl(did, path, query, fragment)
+}
+
+func NormalizeDIDUrlList(didUrls []string) []string {
+	if didUrls == nil {
+		return nil
+	}
+	newDIDUrls := []string{}
+	for _, id := range didUrls {
+		newDIDUrls = append(newDIDUrls, NormalizeDIDUrl(id))
+	}
+	return newDIDUrls
+}

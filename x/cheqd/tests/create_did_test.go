@@ -370,3 +370,66 @@ var _ = Describe("Create DID tests", func() {
 		Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("%s: DID Doc exists", alice.Did)))
 	})
 })
+
+var _ = Describe("Check upper/lower case for DID creation", func() {
+	var setup setup.TestSetup
+	var didPrefix string = "did:cheqd:testnet:"
+
+	type TestCaseUUIDDidStruct struct {
+		inputId  string
+		resultId string
+	}
+
+	DescribeTable("Check upper/lower case for DID creation", func(testCase TestCaseUUIDDidStruct) {
+		setup = Setup()
+		did := testCase.inputId
+		keypair := GenerateKeyPair()
+		keyId := did + "#key-1"
+
+		msg := &types.MsgCreateDidPayload{
+			Id:             did,
+			Authentication: []string{keyId},
+			VerificationMethod: []*types.VerificationMethod{
+				{
+					Id:                 keyId,
+					Type:               types.Ed25519VerificationKey2020,
+					Controller:         did,
+					PublicKeyMultibase: MustEncodeBase58(keypair.Public),
+				},
+			},
+		}
+
+		signatures := []SignInput{
+			{
+				VerificationMethodId: keyId,
+				Key:                  keypair.Private,
+			},
+		}
+
+		_, err := setup.CreateDid(msg, signatures)
+		Expect(err).To(BeNil())
+
+		// check
+		created, err := setup.QueryDid(did)
+		Expect(err).To(BeNil())
+		Expect(created.Did.Id).To(Equal(testCase.resultId))
+	},
+
+		Entry("Low Case UUID", TestCaseUUIDDidStruct{
+			inputId:  didPrefix + "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
+			resultId: didPrefix + "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
+		}),
+		Entry("Upper Case UUID", TestCaseUUIDDidStruct{
+			inputId:  didPrefix + "A86F9CAE-0902-4A7C-A144-96B60CED2FC9",
+			resultId: didPrefix + "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
+		}),
+		Entry("Mixed Case UUID", TestCaseUUIDDidStruct{
+			inputId:  didPrefix + "A86F9CAE-0902-4a7c-a144-96b60ced2FC9",
+			resultId: didPrefix + "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
+		}),
+		Entry("Low Case UUID", TestCaseUUIDDidStruct{
+			inputId:  didPrefix + "MjYxNzYKMjYxNzYK",
+			resultId: didPrefix + "MjYxNzYKMjYxNzYK",
+		}),
+	)
+})
