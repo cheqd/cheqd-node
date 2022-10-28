@@ -17,6 +17,7 @@ import (
 	dbm "github.com/tendermint/tm-db"
 
 	"github.com/cheqd/cheqd-node/x/resource/keeper"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -43,8 +44,8 @@ func Setup() TestSetup {
 	cheqdStoreKey := sdk.NewKVStoreKey(cheqdtypes.StoreKey)
 	resourceStoreKey := sdk.NewKVStoreKey(types.StoreKey)
 
-	dbStore.MountStoreWithDB(cheqdStoreKey, sdk.StoreTypeIAVL, nil)
-	dbStore.MountStoreWithDB(resourceStoreKey, sdk.StoreTypeIAVL, nil)
+	dbStore.MountStoreWithDB(cheqdStoreKey, storetypes.StoreTypeIAVL, nil)
+	dbStore.MountStoreWithDB(resourceStoreKey, storetypes.StoreTypeIAVL, nil)
 
 	_ = dbStore.LoadLatestVersion()
 

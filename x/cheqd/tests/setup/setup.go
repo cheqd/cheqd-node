@@ -15,6 +15,7 @@ import (
 	dbm "github.com/tendermint/tm-db"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/keeper"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -40,7 +41,7 @@ func Setup() TestSetup {
 
 	dbStore := store.NewCommitMultiStore(db)
 	storeKey := sdk.NewKVStoreKey(types.StoreKey)
-	dbStore.MountStoreWithDB(storeKey, sdk.StoreTypeIAVL, nil)
+	dbStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, nil)
 
 	_ = dbStore.LoadLatestVersion()
 
