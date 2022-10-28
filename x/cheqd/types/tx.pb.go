@@ -283,7 +283,7 @@ func (m *MsgDeactivateDidPayload) GetId() string {
 	return ""
 }
 
-//created DeactivateDid response
+// created DeactivateDid response
 type MsgDeactivateDidResponse struct {
 	Did      *Did      `protobuf:"bytes,1,opt,name=did,proto3" json:"did,omitempty"`
 	Metadata *Metadata `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
