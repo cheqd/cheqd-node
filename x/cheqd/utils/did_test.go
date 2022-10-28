@@ -12,14 +12,12 @@ var _ = Describe("DID checks", func() {
 		expectedDID string
 	}
 
-	DescribeTable("Check is valid ID (for example did:cheqD:testnet:123456789abcdefg and ID is 123456789abcdefg)",
+	DescribeTable("Check is valid ID (for example did:cheqD:testnet:zABCDEFG123456789abcd and ID is zABCDEFG123456789abcd)",
 
 		func(expected bool, did string) {
 			Expect(IsValidID(did)).To(Equal(expected))
 		},
-		Entry("Valid base58, 16 symbols", true, "123456789abcdefg"),
-		Entry("Valid indy-style identifier", true, "123456789abcdefgre"),
-		Entry("Valid base58, 32 symbols", true, "123456789abcdefg123456789abcdefg"),
+		Entry("Valid indy-style identifier", true, "zABCDEFG123456789abcd"),
 		Entry("Valid UUID", true, "3b9b8eec-5b5d-4382-86d8-9185126ff130"),
 		Entry("Not valid, not base58 symbols", false, "12345678abcdIlO0"),
 		Entry("Not valid, length", false, "sdf"),
@@ -33,41 +31,38 @@ var _ = Describe("DID checks", func() {
 			Expect(IsValidDID(did, method, allowedNamespaces)).To(Equal(expected))
 		},
 
-		Entry("Valid: Inputs: Method and namespace are set", true, "did:cheqd:testnet:123456789abcdefg", "cheqd", []string{"testnet"}),
-		Entry("Valid: Inputs: Method and namespaces are set", true, "did:cheqd:testnet:123456789abcdefg", "cheqd", []string{"testnet", "mainnet"}),
-		Entry("Valid: Inputs: Method not set", true, "did:cheqd:testnet:123456789abcdefg", "", []string{"testnet"}),
-		Entry("Valid: Inputs: Method and namespaces are empty", true, "did:cheqd:testnet:123456789abcdefg", "", []string{}),
-		Entry("Valid: Namespace is absent in DID", true, "did:cheqd:123456789abcdefg", "", []string{}),
+		Entry("Valid: Inputs: Method and namespace are set", true, "did:cheqd:testnet:zABCDEFG123456789abcd", "cheqd", []string{"testnet"}),
+		Entry("Valid: Inputs: Method and namespaces are set", true, "did:cheqd:testnet:zABCDEFG123456789abcd", "cheqd", []string{"testnet", "mainnet"}),
+		Entry("Valid: Inputs: Method not set", true, "did:cheqd:testnet:zABCDEFG123456789abcd", "", []string{"testnet"}),
+		Entry("Valid: Inputs: Method and namespaces are empty", true, "did:cheqd:testnet:zABCDEFG123456789abcd", "", []string{}),
+		Entry("Valid: Namespace is absent in DID", true, "did:cheqd:zABCDEFG123456789abcd", "", []string{}),
 		// Generic method validation
-		Entry("Valid: Inputs: Method is not set and passed for NOTcheqd", true, "did:NOTcheqd:123456789abcdefg", "", []string{}),
-		Entry("Valid: Inputs: Method and Namespaces are not set and passed for NOTcheqd", true, "did:NOTcheqd:123456789abcdefg123456789abcdefg", "", []string{}),
+		Entry("Valid: Inputs: Method is not set and passed for NOTcheqd", true, "did:NOTcheqd:zABCDEFG123456789abcd", "", []string{}),
 
-		Entry("Valid: Inputs: Order of namespaces changed", true, "did:cheqd:testnet:123456789abcdefg", "cheqd", []string{"mainnet", "testnet"}),
-		Entry("Valid: UniqueID more then 16 symbols and less then 32", true, "did:cheqd:testnet:123456789abcdefgABCDEF", "cheqd", []string{"mainnet", "testnet"}),
+		Entry("Valid: Inputs: Order of namespaces changed", true, "did:cheqd:testnet:zABCDEFG123456789abcd", "cheqd", []string{"mainnet", "testnet"}),
 		// Wrong splitting (^did:([^:]+?)(:([^:]+?))?:([^:]+)$)
-		Entry("Not valid: DID is not started from 'did'", false, "did123:cheqd:::123456789abcdefg", "cheqd", []string{"testnet"}),
-		Entry("Not valid: empty namespace", false, "did:cheqd::123456789abcdefg", "cheqd", []string{"testnet"}),
-		Entry("Not valid: a lot of ':'", false, "did:cheqd:::123456789abcdefg", "cheqd", []string{"testnet"}),
-		Entry("Not valid: several DIDs in one string", false, "did:cheqd:testnet:123456789abcdefg:did:cheqd:testnet:123456789abcdefg", "cheqd", []string{"testnet"}),
+		Entry("Not valid: DID is not started from 'did'", false, "did123:cheqd:::zABCDEFG123456789abcd", "cheqd", []string{"testnet"}),
+		Entry("Not valid: empty namespace", false, "did:cheqd::zABCDEFG123456789abcd", "cheqd", []string{"testnet"}),
+		Entry("Not valid: a lot of ':'", false, "did:cheqd:::zABCDEFG123456789abcd", "cheqd", []string{"testnet"}),
+		Entry("Not valid: several DIDs in one string", false, "did:cheqd:testnet:zABCDEFG123456789abcd:did:cheqd:testnet:zABCDEFG123456789abcd", "cheqd", []string{"testnet"}),
 		// Wrong method
-		Entry("Not valid: method in DID is not the same as from Inputs", false, "did:NOTcheqd:testnet:123456789abcdefg", "cheqd", []string{"mainnet", "testnet"}),
-		Entry("Not valid: method in Inputs is not the same as from DID", false, "did:cheqd:testnet:123456789abcdefg", "NOTcheqd", []string{"mainnet", "testnet"}),
+		Entry("Not valid: method in DID is not the same as from Inputs", false, "did:NOTcheqd:testnet:zABCDEFG123456789abcd", "cheqd", []string{"mainnet", "testnet"}),
+		Entry("Not valid: method in Inputs is not the same as from DID", false, "did:cheqd:testnet:zABCDEFG123456789abcd", "NOTcheqd", []string{"mainnet", "testnet"}),
 		// Wrong namespace (^[a-zA-Z0-9]*)
-		Entry("Not valid: / is not allowed for namespace", false, "did:cheqd:testnet/:123456789abcdefg", "cheqd", []string{}),
-		Entry("Not valid: _ is not allowed for namespace", false, "did:cheqd:testnet_:123456789abcdefg", "cheqd", []string{}),
-		Entry("Not valid: % is not allowed for namespace", false, "did:cheqd:testnet%:123456789abcdefg", "cheqd", []string{}),
-		Entry("Not valid: * is not allowed for namespace", false, "did:cheqd:testnet*:123456789abcdefg", "cheqd", []string{}),
-		Entry("Not valid: & is not allowed for namespace", false, "did:cheqd:testnet&:123456789abcdefg", "cheqd", []string{}),
-		Entry("Not valid: @ is not allowed for namespace", false, "did:cheqd:testnet@:123456789abcdefg", "cheqd", []string{}),
-		Entry("Not valid: namespace from Inputs is not the same as from DID", false, "did:cheqd:testnet:123456789abcdefg", "cheqd", []string{"not_testnet"}),
+		Entry("Not valid: / is not allowed for namespace", false, "did:cheqd:testnet/:zABCDEFG123456789abcd", "cheqd", []string{}),
+		Entry("Not valid: _ is not allowed for namespace", false, "did:cheqd:testnet_:zABCDEFG123456789abcd", "cheqd", []string{}),
+		Entry("Not valid: % is not allowed for namespace", false, "did:cheqd:testnet%:zABCDEFG123456789abcd", "cheqd", []string{}),
+		Entry("Not valid: * is not allowed for namespace", false, "did:cheqd:testnet*:zABCDEFG123456789abcd", "cheqd", []string{}),
+		Entry("Not valid: & is not allowed for namespace", false, "did:cheqd:testnet&:zABCDEFG123456789abcd", "cheqd", []string{}),
+		Entry("Not valid: @ is not allowed for namespace", false, "did:cheqd:testnet@:zABCDEFG123456789abcd", "cheqd", []string{}),
+		Entry("Not valid: namespace from Inputs is not the same as from DID", false, "did:cheqd:testnet:zABCDEFG123456789abcd", "cheqd", []string{"not_testnet"}),
 		// Base58 checks (^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]*$)
 		Entry("Not valid: O - is not allowed for UniqueID", false, "did:cheqd:testnet:123456789abcdefO", "cheqd", []string{}),
 		Entry("Not valid: I - is not allowed for UniqueID", false, "did:cheqd:testnet:123456789abcdefI", "cheqd", []string{}),
 		Entry("Not valid: l - is not allowed for UniqueID", false, "did:cheqd:testnet:123456789abcdefl", "cheqd", []string{}),
 		Entry("Not valid: 0 - is not allowed for UniqueID", false, "did:cheqd:testnet:123456789abcdef0", "cheqd", []string{}),
-		// Length checks (should be exactly 16 or 32)
-		Entry("Not valid: UniqueID less then 16 symbols", false, "did:cheqd:testnet:123", "cheqd", []string{}),
-		Entry("Not valid: UniqueID more then 32 symbols", false, "did:cheqd:testnet:123456789abcdefg123456789abcdefgABCDEF", "cheqd", []string{}),
+		// Length checks (should be exactly 16 bytes)
+		Entry("Not valid: UniqueID less then 16 bytes", false, "did:cheqd:testnet:123", "cheqd", []string{}),
 	)
 
 	// The next test will check more functionality aspects. This one is for testing corner cases
@@ -97,10 +92,9 @@ var _ = Describe("DID checks", func() {
 			method, namespace, id := MustSplitDID(did)
 			Expect(did).To(Equal(JoinDID(method, namespace, id)))
 		},
-		Entry("Full DID", "did:cheqd:testnet:123456789abcdefg"),
-		Entry("Without namespace", "did:cheqd:123456789abcdefg"),
-		Entry("Not cheqd method", "did:NOTcheqd:123456789abcdefg"),
-		Entry("32-symbols ID", "did:NOTcheqd:123456789abcdefg123456789abcdefg"),
+		Entry("Full DID", "did:cheqd:testnet:zABCDEFG123456789abcd"),
+		Entry("Without namespace", "did:cheqd:zABCDEFG123456789abcd"),
+		Entry("Not cheqd method", "did:NOTcheqd:zABCDEFG123456789abcd"),
 	)
 
 	DescribeTable("UUID test cases", func(testCase TestCaseUUIDIdStruct) {
@@ -111,8 +105,8 @@ var _ = Describe("DID checks", func() {
 		Entry(
 			"base58 identifier - not changed",
 			TestCaseUUIDIdStruct{
-				inputDID:    "did:cheqd:testnet:aaaaaaaaaaaaaaaa",
-				expectedDID: "did:cheqd:testnet:aaaaaaaaaaaaaaaa",
+				inputDID:    "did:cheqd:testnet:zABCDEFG123456789abcd",
+				expectedDID: "did:cheqd:testnet:zABCDEFG123456789abcd",
 			}),
 
 		Entry(

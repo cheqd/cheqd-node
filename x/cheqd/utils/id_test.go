@@ -18,8 +18,7 @@ var _ = Describe("Identifier Validation tests", func() {
 		}
 	},
 
-		Entry("Base58 string, 16 symbols", true, "123456789abcdefg"),
-		Entry("Base58 string, 32 symbols", true, "123456789abcdefg123456789abcdefg"),
+		Entry("Base58 string, 16 bytes", true, "zABCDEFG123456789abcd"),
 		Entry("UUID string", true, "3b9b8eec-5b5d-4382-86d8-9185126ff130"),
 		Entry("Too short", false, "sdf"),
 		Entry("Unexpected :", false, "sdf:sdf"),
