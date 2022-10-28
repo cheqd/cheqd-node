@@ -82,3 +82,22 @@ func IsValidDID(did string, method string, allowedNamespaces []string) bool {
 	err := ValidateDID(did, method, allowedNamespaces)
 	return err == nil
 }
+
+// Normalization
+
+func NormalizeDID(did string) string {
+	method, namespace, id := MustSplitDID(did)
+	id = NormalizeId(id)
+	return JoinDID(method, namespace, id)
+}
+
+func NormalizeDIDList(didList []string) []string {
+	if didList == nil {
+		return nil
+	}
+	newDIDs := []string{}
+	for _, did := range didList {
+		newDIDs = append(newDIDs, NormalizeDID(did))
+	}
+	return newDIDs
+}

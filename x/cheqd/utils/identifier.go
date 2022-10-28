@@ -2,7 +2,6 @@ package utils
 
 import (
 	"errors"
-	"strings"
 )
 
 func ValidateID(id string) error {
@@ -24,35 +23,20 @@ func IsValidID(id string) bool {
 
 // Normalization
 
-func NormalizeIdentifier(did string) string {
-	_, _, sUniqueId, err := TrySplitDID(did)
-	if err != nil {
-		sUniqueId = did
+func NormalizeId(id string) string {
+	if IsValidUUID(id) {
+		return NormalizeUUID(id)
 	}
-	if IsValidUUID(sUniqueId) {
-		return strings.ToLower(did)
-	}
-	return did
+	return id
 }
 
-func NormalizeIdForFragmentUrl(didUrl string) string {
-	id, _, _, fragmentId, err := TrySplitDIDUrl(didUrl)
-	if err != nil {
-		return didUrl
-	}
-	if fragmentId == "" {
-		return NormalizeIdentifier(id)
-	}
-	return NormalizeIdentifier(id) + "#" + fragmentId
-}
-
-func NormalizeIdentifiersList(keys []string) []string {
+func NormalizeIdList(keys []string) []string {
 	if keys == nil {
 		return nil
 	}
 	newKeys := []string{}
 	for _, id := range keys {
-		newKeys = append(newKeys, NormalizeIdForFragmentUrl(id))
+		newKeys = append(newKeys, NormalizeId(id))
 	}
 	return newKeys
 }

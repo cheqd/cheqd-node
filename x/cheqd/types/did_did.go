@@ -104,27 +104,8 @@ func (did Did) Validate(allowedNamespaces []string) error {
 
 // Normalization
 
-func NormalizeDID(didDoc *Did) *Did {
-	didDoc.Id = utils.NormalizeIdentifier(didDoc.Id)
-	for _, vm := range didDoc.VerificationMethod {
-		vm.Controller = utils.NormalizeIdentifier(vm.Controller)
-		vm.Id = utils.NormalizeIdForFragmentUrl(vm.Id)
-	}
-	for _, s := range didDoc.Service {
-		s.Id = utils.NormalizeIdForFragmentUrl(s.Id)
-	}
-	didDoc.Controller = utils.NormalizeIdentifiersList(didDoc.Controller)
-	didDoc.Authentication = utils.NormalizeIdentifiersList(didDoc.Authentication)
-	didDoc.AssertionMethod = utils.NormalizeIdentifiersList(didDoc.AssertionMethod)
-	didDoc.CapabilityInvocation = utils.NormalizeIdentifiersList(didDoc.CapabilityInvocation)
-	didDoc.CapabilityDelegation = utils.NormalizeIdentifiersList(didDoc.CapabilityDelegation)
-	didDoc.KeyAgreement = utils.NormalizeIdentifiersList(didDoc.KeyAgreement)
-	didDoc.AlsoKnownAs = utils.NormalizeIdentifiersList(didDoc.AlsoKnownAs)
-	return didDoc
-}
-
 func NormalizeSignatureUUIDIdentifiers(signatures []*SignInfo) {
 	for _, s := range signatures {
-		s.VerificationMethodId = utils.NormalizeIdForFragmentUrl(s.VerificationMethodId)
+		s.VerificationMethodId = utils.NormalizeDIDUrl(s.VerificationMethodId)
 	}
 }

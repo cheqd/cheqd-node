@@ -162,8 +162,8 @@ var _ = Describe("Create Resource Tests", func() {
 
 			// check for already normalized UUID
 			created, err = setup.QueryResource(
-				cheqdutils.NormalizeIdentifier(alice.CollectionId),
-				cheqdutils.NormalizeIdentifier(UUID))
+				cheqdutils.NormalizeId(alice.CollectionId),
+				cheqdutils.NormalizeId(UUID))
 			Expect(err).To(BeNil())
 
 			Expect(created.Resource.Header.Id).To(Equal(strings.ToLower(UUID)))

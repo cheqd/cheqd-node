@@ -15,8 +15,8 @@ func (msg *MsgCreateResourcePayload) GetSignBytes() []byte {
 func (msg *MsgCreateResourcePayload) ToResource() Resource {
 	return Resource{
 		Header: &ResourceHeader{
-			CollectionId: cheqdutils.NormalizeIdentifier(msg.CollectionId),
-			Id:           cheqdutils.NormalizeIdentifier(msg.Id),
+			CollectionId: cheqdutils.NormalizeId(msg.CollectionId),
+			Id:           cheqdutils.NormalizeId(msg.Id),
 			Name:         msg.Name,
 			ResourceType: msg.ResourceType,
 		},
@@ -48,16 +48,12 @@ func ValidMsgCreateResourcePayload() *cheqdtypes.CustomErrorRule {
 }
 
 // Normalize
-func (msg MsgCreateResourcePayload) Normalize() *MsgCreateResourcePayload {
-	msg.CollectionId = cheqdutils.NormalizeIdentifier(msg.CollectionId)
-	msg.Id = cheqdutils.NormalizeIdentifier(msg.Id)
-	return &msg
+func (msg *MsgCreateResourcePayload) Normalize() {
+	msg.CollectionId = cheqdutils.NormalizeId(msg.CollectionId)
+	msg.Id = cheqdutils.NormalizeId(msg.Id)
 }
 
-func (msg MsgCreateResource) Normalize() *MsgCreateResource {
+func (msg *MsgCreateResource) Normalize() {
+	msg.Payload.Normalize()
 	cheqdtypes.NormalizeSignatureUUIDIdentifiers(msg.Signatures)
-	return &MsgCreateResource{
-		Payload:    msg.Payload.Normalize(),
-		Signatures: msg.Signatures,
-	}
 }

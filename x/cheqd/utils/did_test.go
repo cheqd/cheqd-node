@@ -7,6 +7,11 @@ import (
 )
 
 var _ = Describe("DID checks", func() {
+	type TestCaseUUIDIdStruct struct {
+		inputDID    string
+		expectedDID string
+	}
+
 	DescribeTable("Check is valid ID (for example did:cheqD:testnet:123456789abcdefg and ID is 123456789abcdefg)",
 
 		func(expected bool, did string) {
@@ -96,4 +101,39 @@ var _ = Describe("DID checks", func() {
 		Entry("Not cheqd method", "did:NOTcheqd:123456789abcdefg"),
 		Entry("32-symbols ID", "did:NOTcheqd:123456789abcdefg123456789abcdefg"),
 	)
+
+	DescribeTable("UUID test cases", func(testCase TestCaseUUIDIdStruct) {
+		result := NormalizeDID(testCase.inputDID)
+		Expect(result).To(Equal(testCase.expectedDID))
+	},
+
+		Entry(
+			"base58 identifier - not changed",
+			TestCaseUUIDIdStruct{
+				inputDID:    "did:cheqd:testnet:aaaaaaaaaaaaaaaa",
+				expectedDID: "did:cheqd:testnet:aaaaaaaaaaaaaaaa",
+			}),
+
+		Entry(
+			"Mixed case UUID",
+			TestCaseUUIDIdStruct{
+				inputDID:    "did:cheqd:testnet:BAbbba14-f294-458a-9b9c-474d188680fd",
+				expectedDID: "did:cheqd:testnet:babbba14-f294-458a-9b9c-474d188680fd",
+			}),
+
+		Entry(
+			"Low case UUID",
+			TestCaseUUIDIdStruct{
+				inputDID:    "did:cheqd:testnet:babbba14-f294-458a-9b9c-474d188680fd",
+				expectedDID: "did:cheqd:testnet:babbba14-f294-458a-9b9c-474d188680fd",
+			}),
+
+		Entry(
+			"Upper case UUID",
+			TestCaseUUIDIdStruct{
+				inputDID:    "did:cheqd:testnet:A86F9CAE-0902-4a7c-a144-96b60ced2FC9",
+				expectedDID: "did:cheqd:testnet:a86f9cae-0902-4a7c-a144-96b60ced2fc9",
+			}),
+	)
+	//ToDo: tests for list of DIDs
 })

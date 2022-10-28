@@ -1,6 +1,9 @@
 package types
 
-import validation "github.com/go-ozzo/ozzo-validation/v4"
+import (
+	"github.com/cheqd/cheqd-node/x/cheqd/utils"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
+)
 
 var _ IdentityMsg = &MsgUpdateDidPayload{}
 
@@ -65,18 +68,24 @@ func ValidMsgUpdateDidPayloadRule(allowedNamespaces []string) *CustomErrorRule {
 }
 
 // Normalize
-func (msg MsgUpdateDidPayload) Normalize() *MsgUpdateDidPayload {
-	did := msg.ToDid()
-	normilizedDid := NormalizeDID(&did)
-	normalized := msg.ToMsg(normilizedDid)
-	normalized.VersionId = msg.VersionId
-	return normalized
+func (msg *MsgUpdateDidPayload) Normalize() {
+	msg.Id = utils.NormalizeDID(msg.Id)
+	for _, vm := range msg.VerificationMethod {
+		vm.Controller = utils.NormalizeDID(vm.Controller)
+		vm.Id = utils.NormalizeDIDUrl(vm.Id)
+	}
+	for _, s := range msg.Service {
+		s.Id = utils.NormalizeDIDUrl(s.Id)
+	}
+	msg.Controller = utils.NormalizeDIDList(msg.Controller)
+	msg.Authentication = utils.NormalizeDIDUrlList(msg.Authentication)
+	msg.AssertionMethod = utils.NormalizeDIDUrlList(msg.AssertionMethod)
+	msg.CapabilityInvocation = utils.NormalizeDIDUrlList(msg.CapabilityInvocation)
+	msg.CapabilityDelegation = utils.NormalizeDIDUrlList(msg.CapabilityDelegation)
+	msg.KeyAgreement = utils.NormalizeDIDUrlList(msg.KeyAgreement)
 }
 
-func (msg MsgUpdateDid) Normalize() *MsgUpdateDid {
+func (msg *MsgUpdateDid) Normalize() {
+	msg.Payload.Normalize()
 	NormalizeSignatureUUIDIdentifiers(msg.Signatures)
-	return &MsgUpdateDid{
-		Payload:    msg.Payload.Normalize(),
-		Signatures: msg.Signatures,
-	}
 }

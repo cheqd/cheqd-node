@@ -4,9 +4,7 @@ import (
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 )
 
-func (query *QueryGetResourceRequest) Normalize() *QueryGetResourceRequest {
-	return &QueryGetResourceRequest{
-		CollectionId: utils.NormalizeIdentifier(query.CollectionId),
-		Id:           utils.NormalizeIdentifier(query.Id),
-	}
+func (query *QueryGetResourceRequest) Normalize() {
+	query.CollectionId = utils.NormalizeId(query.CollectionId)
+	query.Id = utils.NormalizeId(query.Id)
 }

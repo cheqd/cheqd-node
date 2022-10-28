@@ -3,6 +3,7 @@ package utils
 import (
 	"errors"
 	"strconv"
+	"strings"
 
 	"github.com/google/uuid"
 )
@@ -20,4 +21,10 @@ func ValidateUUID(u string) error {
 
 func IsValidUUID(u string) bool {
 	return ValidateUUID(u) == nil
+}
+
+// Normalization
+
+func NormalizeUUID(uuid string) string {
+	return strings.ToLower(uuid)
 }

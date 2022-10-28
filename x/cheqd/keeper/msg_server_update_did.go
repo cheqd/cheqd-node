@@ -17,8 +17,8 @@ func (k MsgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 	// Get sign bytes before modifying payload
 	signBytes := msg.Payload.GetSignBytes()
 
-	// Normilaize UUID identifiers
-	msg = msg.Normalize()
+	// Normalize UUID identifiers
+	msg.Normalize()
 
 	// Validate namespaces
 	namespace := k.GetDidNamespace(&ctx)

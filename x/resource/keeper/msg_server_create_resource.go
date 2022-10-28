@@ -20,7 +20,7 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	// Remember bytes before modifying payload
 	signBytes := msg.Payload.GetSignBytes()
 
-	msg = msg.Normalize()
+	msg.Normalize()
 
 	resource := msg.Payload.ToResource()
 	cheqdtypes.NormalizeSignatureUUIDIdentifiers(msg.Signatures)

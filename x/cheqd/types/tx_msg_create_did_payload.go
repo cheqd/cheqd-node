@@ -1,5 +1,7 @@
 package types
 
+import "github.com/cheqd/cheqd-node/x/cheqd/utils"
+
 var _ IdentityMsg = &MsgCreateDidPayload{}
 
 func (msg *MsgCreateDidPayload) GetSignBytes() []byte {
@@ -56,17 +58,24 @@ func ValidMsgCreateDidPayloadRule(allowedNamespaces []string) *CustomErrorRule {
 }
 
 // Normalize
-func (msg MsgCreateDidPayload) Normalize() *MsgCreateDidPayload {
-	did := msg.ToDid()
-	normilizedDid := NormalizeDID(&did)
-
-	return msg.ToMsg(normilizedDid)
+func (msg *MsgCreateDidPayload) Normalize() {
+	msg.Id = utils.NormalizeDID(msg.Id)
+	for _, vm := range msg.VerificationMethod {
+		vm.Controller = utils.NormalizeDID(vm.Controller)
+		vm.Id = utils.NormalizeDIDUrl(vm.Id)
+	}
+	for _, s := range msg.Service {
+		s.Id = utils.NormalizeDIDUrl(s.Id)
+	}
+	msg.Controller = utils.NormalizeDIDList(msg.Controller)
+	msg.Authentication = utils.NormalizeDIDUrlList(msg.Authentication)
+	msg.AssertionMethod = utils.NormalizeDIDUrlList(msg.AssertionMethod)
+	msg.CapabilityInvocation = utils.NormalizeDIDUrlList(msg.CapabilityInvocation)
+	msg.CapabilityDelegation = utils.NormalizeDIDUrlList(msg.CapabilityDelegation)
+	msg.KeyAgreement = utils.NormalizeDIDUrlList(msg.KeyAgreement)
 }
 
-func (msg MsgCreateDid) Normalize() *MsgCreateDid {
+func (msg *MsgCreateDid) Normalize() {
+	msg.Payload.Normalize()
 	NormalizeSignatureUUIDIdentifiers(msg.Signatures)
-	return &MsgCreateDid{
-		Payload:    msg.Payload.Normalize(),
-		Signatures: msg.Signatures,
-	}
 }

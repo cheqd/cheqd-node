@@ -58,7 +58,7 @@ var _ = Describe("Query Collection Resources", func() {
 
 	It("Should work with capital letters in UUID. Ask with already normalized collectionId", func() {
 		// Here we are asking for normalized UUID but it was written with capital letters
-		normalizedId := cheqdutils.NormalizeIdentifier(uuidDID.CollectionId)
+		normalizedId := cheqdutils.NormalizeId(uuidDID.CollectionId)
 		versions, err := setup.CollectionResources(normalizedId)
 		Expect(err).To(BeNil())
 		Expect(versions.Resources).To(HaveLen(1))
