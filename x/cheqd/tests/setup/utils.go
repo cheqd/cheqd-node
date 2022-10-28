@@ -13,14 +13,6 @@ import (
 
 var base58Runes = []rune("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz")
 
-func randBase58Seq(n int) string {
-	b := make([]rune, n)
-	for i := range b {
-		b[i] = base58Runes[mathrand.Intn(len(base58Runes))]
-	}
-	return string(b)
-}
-
 func rand16BytesBase58Seq(n int) string {
 	b := []rune{}
 	for !utils.IsValidBase58Length(string(b)) {

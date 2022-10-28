@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+
 	"github.com/multiformats/go-multibase"
 )
 
@@ -25,7 +26,6 @@ func ValidateMultibaseEncoding(data string, expectedEncoding multibase.Encoding)
 }
 
 func ValidateBase58(data string) error {
-
 	return ValidateMultibaseEncoding(string(multibase.Base58BTC)+data, multibase.Base58BTC)
 }
 

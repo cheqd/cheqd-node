@@ -11,7 +11,7 @@ const (
 )
 
 func ValidateID(id string) error {
-	isValidId := IsValidBase58(id) && IsValidBase58Length(id)|| IsValidUUID(id)
+	isValidId := IsValidBase58(id) && IsValidBase58Length(id) || IsValidUUID(id)
 
 	if !isValidId {
 		return errors.New("unique id should be one of: 16 bytes of decoded base58 string or UUID")
