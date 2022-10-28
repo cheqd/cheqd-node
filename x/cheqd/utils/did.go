@@ -83,18 +83,21 @@ func IsValidDID(did string, method string, allowedNamespaces []string) bool {
 	return err == nil
 }
 
-func ValidateID(id string) error {
-	isValidId := len(id) >= 16 && len(id) <= 32 && IsValidBase58(id) ||
-		IsValidUUID(id)
+// Normalization
 
-	if !isValidId {
-		return errors.New("unique id should be one of: 16 symbols base58 string, 32 symbols base58 string, or UUID")
-	}
-
-	return nil
+func NormalizeDID(did string) string {
+	method, namespace, id := MustSplitDID(did)
+	id = NormalizeId(id)
+	return JoinDID(method, namespace, id)
 }
 
-func IsValidID(id string) bool {
-	err := ValidateID(id)
-	return err == nil
+func NormalizeDIDList(didList []string) []string {
+	if didList == nil {
+		return nil
+	}
+	newDIDs := []string{}
+	for _, did := range didList {
+		newDIDs = append(newDIDs, NormalizeDID(did))
+	}
+	return newDIDs
 }

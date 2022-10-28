@@ -16,6 +16,8 @@ func (m queryServer) AllResourceVersions(c context.Context, req *types.QueryGetA
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
+	req.Normalize()
+
 	ctx := sdk.UnwrapSDKContext(c)
 
 	// Validate corresponding DIDDoc exists
@@ -26,7 +28,7 @@ func (m queryServer) AllResourceVersions(c context.Context, req *types.QueryGetA
 	}
 
 	// Get all versions
-	versions := m.GetAllResourceVersions(&ctx, req.CollectionId, req.Name)
+	versions := m.GetAllResourceVersions(&ctx, req.CollectionId, req.Name, req.ResourceType)
 
 	return &types.QueryGetAllResourceVersionsResponse{
 		Resources: versions,

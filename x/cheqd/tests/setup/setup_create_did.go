@@ -29,8 +29,7 @@ func (s *TestSetup) CreateDid(payload *types.MsgCreateDidPayload, signInputs []S
 	return s.MsgServer.CreateDid(s.StdCtx, msg)
 }
 
-func (s *TestSetup) BuildSimpleDid() DidInfo {
-	did := GenerateDID(Base58_16chars)
+func (s *TestSetup) BuildDidDocWithCustomDID(did string) DidInfo {
 	_, _, collectionId := utils.MustSplitDID(did)
 
 	keyPair := GenerateKeyPair()
@@ -64,23 +63,36 @@ func (s *TestSetup) BuildSimpleDid() DidInfo {
 	}
 }
 
-func (s *TestSetup) CreateSimpleDid() CreatedDidInfo {
-	did := s.BuildSimpleDid()
+func (s *TestSetup) BuildDidWithCustomId(uuid string) DidInfo {
+	did := "did:cheqd:" + DID_NAMESPACE + ":" + uuid
+	return s.BuildDidDocWithCustomDID(did)
+}
 
-	_, err := s.CreateDid(did.Msg, []SignInput{did.SignInput})
+func (s *TestSetup) BuildSimpleDid() DidInfo {
+	did := GenerateDID(Base58_16chars)
+	return s.BuildDidDocWithCustomDID(did)
+}
+
+func (s *TestSetup) CreateCustomDid(info DidInfo) CreatedDidInfo {
+	_, err := s.CreateDid(info.Msg, []SignInput{info.SignInput})
 	if err != nil {
 		panic(err)
 	}
 
-	created, err := s.QueryDid(did.Did)
+	created, err := s.QueryDid(info.Did)
 	if err != nil {
 		panic(err)
 	}
 
 	return CreatedDidInfo{
-		DidInfo:   did,
+		DidInfo:   info,
 		VersionId: created.Metadata.VersionId,
 	}
+}
+
+func (s *TestSetup) CreateSimpleDid() CreatedDidInfo {
+	did := s.BuildSimpleDid()
+	return s.CreateCustomDid(did)
 }
 
 func (s *TestSetup) CreateDidWithExternalConterllers(controllers []string, signInputs []SignInput) CreatedDidInfo {

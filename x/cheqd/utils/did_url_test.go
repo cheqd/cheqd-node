@@ -7,6 +7,11 @@ import (
 )
 
 var _ = Describe("DID-URL tests", func() {
+	type TestCaseUUIDIdStruct struct {
+		inputDIDUrl    string
+		expectedDIDUrl string
+	}
+
 	DescribeTable("Check the DID-URL join functionality (without functionality)",
 
 		func(did_url string) {
@@ -76,5 +81,39 @@ var _ = Describe("DID-URL tests", func() {
 		Entry("Not valid: UniqueID less then 16 symbols", false, "did:cheqd:testnet:123/path?query#fragment"),
 		Entry("Not valid: UniqueID more then 32 symbols", false, "did:cheqd:testnet:123456789abcdefg123456789abcdefgABCDEF/path?query#fragment"),
 		Entry("Not valid: Split should return error", false, "qwerty"),
+	)
+
+	DescribeTable("UUID test cases", func(testCase TestCaseUUIDIdStruct) {
+		result := NormalizeDIDUrl(testCase.inputDIDUrl)
+		Expect(result).To(Equal(testCase.expectedDIDUrl))
+	},
+
+		Entry(
+			"base58 identifier - not changed",
+			TestCaseUUIDIdStruct{
+				inputDIDUrl:    "did:cheqd:testnet:aaaaaaaaaaaaaaaa#key1",
+				expectedDIDUrl: "did:cheqd:testnet:aaaaaaaaaaaaaaaa#key1",
+			}),
+
+		Entry(
+			"Mixed case UUID",
+			TestCaseUUIDIdStruct{
+				inputDIDUrl:    "did:cheqd:testnet:BAbbba14-f294-458a-9b9c-474d188680fd#key1",
+				expectedDIDUrl: "did:cheqd:testnet:babbba14-f294-458a-9b9c-474d188680fd#key1",
+			}),
+
+		Entry(
+			"Low case UUID",
+			TestCaseUUIDIdStruct{
+				inputDIDUrl:    "did:cheqd:testnet:babbba14-f294-458a-9b9c-474d188680fd#key1",
+				expectedDIDUrl: "did:cheqd:testnet:babbba14-f294-458a-9b9c-474d188680fd#key1",
+			}),
+
+		Entry(
+			"Upper case UUID",
+			TestCaseUUIDIdStruct{
+				inputDIDUrl:    "did:cheqd:testnet:A86F9CAE-0902-4a7c-a144-96b60ced2FC9#key1",
+				expectedDIDUrl: "did:cheqd:testnet:a86f9cae-0902-4a7c-a144-96b60ced2fc9#key1",
+			}),
 	)
 })
