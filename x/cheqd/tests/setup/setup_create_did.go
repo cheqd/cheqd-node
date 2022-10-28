@@ -69,7 +69,7 @@ func (s *TestSetup) BuildDidWithCustomId(uuid string) DidInfo {
 }
 
 func (s *TestSetup) BuildSimpleDid() DidInfo {
-	did := GenerateDID(Base58_16chars)
+	did := GenerateDID(Base58_16bytes)
 	return s.BuildDidDocWithCustomDID(did)
 }
 

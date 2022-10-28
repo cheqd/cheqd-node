@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	mathrand "math/rand"
 
+	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	"github.com/google/uuid"
 	"github.com/multiformats/go-multibase"
 	. "github.com/onsi/gomega"
@@ -20,11 +21,18 @@ func randBase58Seq(n int) string {
 	return string(b)
 }
 
+func rand16BytesBase58Seq(n int) string {
+	b := []rune{}
+	for !utils.IsValidBase58Length(string(b)) {
+		b = append(b, base58Runes[mathrand.Intn(len(base58Runes))])
+	}
+	return string(b)
+}
+
 type IDType int
 
 const (
-	Base58_16chars IDType = iota
-	Base58_32chars IDType = iota
+	Base58_16bytes IDType = iota
 	UUID           IDType = iota
 )
 
@@ -32,10 +40,8 @@ func GenerateDID(idtype IDType) string {
 	prefix := "did:cheqd:" + DID_NAMESPACE + ":"
 
 	switch idtype {
-	case Base58_16chars:
-		return prefix + randBase58Seq(16)
-	case Base58_32chars:
-		return prefix + randBase58Seq(32)
+	case Base58_16bytes:
+		return prefix + rand16BytesBase58Seq(16)
 	case UUID:
 		return prefix + uuid.NewString()
 	default:

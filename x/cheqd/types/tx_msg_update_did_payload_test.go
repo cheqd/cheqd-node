@@ -44,8 +44,8 @@ var _ = Describe("Update DID Payload Validation tests", func() {
 		Entry(
 			"base58 identifier - not changed",
 			TestCaseUUIDDidStruct{
-				inputId:    "did:cheqd:testnet:aaaaaaaaaaaaaaaa",
-				expectedId: "did:cheqd:testnet:aaaaaaaaaaaaaaaa",
+				inputId:    "did:cheqd:testnet:zABCDEFG123456789abcd",
+				expectedId: "did:cheqd:testnet:zABCDEFG123456789abcd",
 			}),
 
 		Entry(

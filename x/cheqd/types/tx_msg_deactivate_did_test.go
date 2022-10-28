@@ -30,7 +30,7 @@ var _ = Describe("Message for DID updating", func() {
 			TestCaseMsgDeactivateDID{
 				msg: &MsgDeactivateDid{
 					Payload: &MsgDeactivateDidPayload{
-						Id: "did:cheqd:testnet:123456789abcdefg",
+						Id: "did:cheqd:testnet:zABCDEFG123456789abcd",
 					},
 					Signatures: nil,
 				},
@@ -42,7 +42,7 @@ var _ = Describe("Message for DID updating", func() {
 			TestCaseMsgDeactivateDID{
 				msg: &MsgDeactivateDid{
 					Payload: &MsgDeactivateDidPayload{
-						Id: "did:cheqdttt:testnet:123456789abcdefg",
+						Id: "did:cheqdttt:testnet:zABCDEFG123456789abcd",
 					},
 					Signatures: nil,
 				},

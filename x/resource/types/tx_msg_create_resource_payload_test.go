@@ -19,7 +19,7 @@ var _ = Describe("TxMsgCreateResourcePayload", func() {
 		Context("Valid: MsgCreateResourcePayload", func() {
 			It("should return nil if the message is valid", func() {
 				msg = &resourcetypes.MsgCreateResourcePayload{
-					CollectionId: "123456789abcdefg",
+					CollectionId: "zABCDEFG123456789abcd",
 					Id:           "ba62c728-cb15-498b-8e9e-9259cc242186",
 					Name:         "Test Resource",
 					ResourceType: "CL-Schema",
@@ -32,7 +32,7 @@ var _ = Describe("TxMsgCreateResourcePayload", func() {
 		Context("Invalid: MsgCreateResourcePayload", func() {
 			It("should return error if the resource type is empty", func() {
 				msg = &resourcetypes.MsgCreateResourcePayload{
-					CollectionId: "123456789abcdefg",
+					CollectionId: "zABCDEFG123456789abcd",
 					Id:           "ba62c728-cb15-498b-8e9e-9259cc242186",
 					Name:         "Test Resource",
 					ResourceType: "",
@@ -65,10 +65,10 @@ var _ = Describe("TxMsgCreateResourcePayload", func() {
 		Entry(
 			"base58 identifier - not changed",
 			TestCaseUUIDDidStruct{
-				inputCollectionId:    "aaaaaaaaaaaaaaaa",
-				inputId:              "aaaaaaaaaaaaaaaa",
-				expectedCollectionId: "aaaaaaaaaaaaaaaa",
-				expectedId:           "aaaaaaaaaaaaaaaa",
+				inputCollectionId:    "zABCDEFG123456789abcd",
+				inputId:              "zABCDEFG123456789abcd",
+				expectedCollectionId: "zABCDEFG123456789abcd",
+				expectedId:           "zABCDEFG123456789abcd",
 			}),
 
 		Entry(

@@ -31,11 +31,11 @@ var _ = Describe("Service tests", func() {
 			"Positive case",
 			TestCaseServiceStruct{
 				service: &Service{
-					Id:              "did:cheqd:aaaaaaaaaaaaaaaa#service1",
+					Id:              "did:cheqd:zABCDEFG123456789abcd#service1",
 					Type:            "DIDCommMessaging",
 					ServiceEndpoint: "endpoint",
 				},
-				baseDid:           "did:cheqd:aaaaaaaaaaaaaaaa",
+				baseDid:           "did:cheqd:zABCDEFG123456789abcd",
 				allowedNamespaces: []string{""},
 				isValid:           true,
 				errorMsg:          "",
@@ -45,7 +45,7 @@ var _ = Describe("Service tests", func() {
 			"Namespace is not allowed",
 			TestCaseServiceStruct{
 				service: &Service{
-					Id:              "did:cheqd:aaaaaaaaaaaaaaaa#service1",
+					Id:              "did:cheqd:zABCDEFG123456789abcd#service1",
 					Type:            "DIDCommMessaging",
 					ServiceEndpoint: "endpoint",
 				},
@@ -58,13 +58,13 @@ var _ = Describe("Service tests", func() {
 			"Base DID is not the same as in id",
 			TestCaseServiceStruct{
 				service: &Service{
-					Id:              "did:cheqd:aaaaaaaaaaaaaaaa#service1",
+					Id:              "did:cheqd:zABCDEFG123456789abcd#service1",
 					Type:            "DIDCommMessaging",
 					ServiceEndpoint: "endpoint",
 				},
-				baseDid:  "did:cheqd:baaaaaaaaaaaaaab",
+				baseDid:  "did:cheqd:zABCDEFG987654321abcd",
 				isValid:  false,
-				errorMsg: "id: must have prefix: did:cheqd:baaaaaaaaaaaaaab.",
+				errorMsg: "id: must have prefix: did:cheqd:zABCDEFG987654321abcd",
 			}),
 	)
 })
