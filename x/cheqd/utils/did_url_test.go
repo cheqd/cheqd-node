@@ -116,6 +116,4 @@ var _ = Describe("DID-URL tests", func() {
 				expectedDIDUrl: "did:cheqd:testnet:a86f9cae-0902-4a7c-a144-96b60ced2fc9#key1",
 			}),
 	)
-
-	//ToDo: tests for list of DIDUrls
 })

@@ -23,7 +23,7 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	msg.Normalize()
 
 	resource := msg.Payload.ToResource()
-	cheqdtypes.NormalizeSignatureUUIDIdentifiers(msg.Signatures)
+	cheqdtypes.NormalizeSignInfoList(msg.Signatures)
 
 	// Validate corresponding DIDDoc exists
 	namespace := k.cheqdKeeper.GetDidNamespace(&ctx)

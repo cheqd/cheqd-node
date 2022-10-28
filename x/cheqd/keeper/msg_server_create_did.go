@@ -17,6 +17,11 @@ func (k MsgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 	// Normalize UUID identifiers
 	msg.Normalize()
 
+	// Validate DID doesn't exist
+	if k.HasDid(&ctx, msg.Payload.Id) {
+		return nil, types.ErrDidDocExists.Wrap(msg.Payload.Id)
+	}
+
 	// Validate namespaces
 	namespace := k.GetDidNamespace(&ctx)
 	err := msg.Validate([]string{namespace})
@@ -26,12 +31,6 @@ func (k MsgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 
 	// Build metadata and stateValue
 	did := msg.Payload.ToDid()
-
-	// Validate DID doesn't exist
-	if k.HasDid(&ctx, did.Id) {
-		return nil, types.ErrDidDocExists.Wrap(msg.Payload.Id)
-	}
-
 	metadata := types.NewMetadataFromContext(ctx)
 	stateValue, err := types.NewStateValue(&did, &metadata)
 	if err != nil {

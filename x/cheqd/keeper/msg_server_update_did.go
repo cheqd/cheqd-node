@@ -27,19 +27,8 @@ func (k MsgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 		return nil, types.ErrNamespaceValidation.Wrap(err.Error())
 	}
 
-	// Construct the new version of the DID and temporary rename it and its self references
-	// in order to consider old and new versions different DIDs during signatures validation
-	updatedDid := msg.Payload.ToDid()
-	did := updatedDid.Id
-	updatedDid.ReplaceIds(updatedDid.Id, updatedDid.Id+UpdatedPostfix)
-
-	// Validate DID does exist
-	if !k.HasDid(&ctx, did) {
-		return nil, types.ErrDidDocNotFound.Wrap(did)
-	}
-
 	// Retrieve existing state value and did
-	existingStateValue, err := k.GetDid(&ctx, did)
+	existingStateValue, err := k.GetDid(&ctx, msg.Payload.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -58,6 +47,11 @@ func (k MsgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*t
 	if msg.Payload.VersionId != existingStateValue.Metadata.VersionId {
 		return nil, types.ErrUnexpectedDidVersion.Wrapf("got: %s, must be: %s", msg.Payload.VersionId, existingStateValue.Metadata.VersionId)
 	}
+
+	// Construct the new version of the DID and temporary rename it and its self references
+	// in order to consider old and new versions different DIDs during signatures validation
+	updatedDid := msg.Payload.ToDid()
+	updatedDid.ReplaceIds(updatedDid.Id, updatedDid.Id+UpdatedPostfix)
 
 	updatedMetadata := *existingStateValue.Metadata
 	updatedMetadata.Update(ctx)

@@ -1,10 +1,9 @@
 package types_test
 
 import (
-
+	. "github.com/cheqd/cheqd-node/x/cheqd/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	. "github.com/cheqd/cheqd-node/x/cheqd/types"
 )
 
 var _ = Describe("Create DID Payload Validation tests", func() {

@@ -27,22 +27,6 @@ func (msg *MsgUpdateDidPayload) ToDid() Did {
 	}
 }
 
-func (msg *MsgUpdateDidPayload) ToMsg(did *Did) *MsgUpdateDidPayload {
-	return &MsgUpdateDidPayload{
-		Context:              did.Context,
-		Id:                   did.Id,
-		Controller:           did.Controller,
-		VerificationMethod:   did.VerificationMethod,
-		Authentication:       did.Authentication,
-		AssertionMethod:      did.AssertionMethod,
-		CapabilityInvocation: did.CapabilityInvocation,
-		CapabilityDelegation: did.CapabilityDelegation,
-		KeyAgreement:         did.KeyAgreement,
-		AlsoKnownAs:          did.AlsoKnownAs,
-		Service:              did.Service,
-	}
-}
-
 // Validation
 
 func (msg MsgUpdateDidPayload) Validate(allowedNamespaces []string) error {
@@ -68,6 +52,7 @@ func ValidMsgUpdateDidPayloadRule(allowedNamespaces []string) *CustomErrorRule {
 }
 
 // Normalize
+
 func (msg *MsgUpdateDidPayload) Normalize() {
 	msg.Id = utils.NormalizeDID(msg.Id)
 	for _, vm := range msg.VerificationMethod {
@@ -83,9 +68,4 @@ func (msg *MsgUpdateDidPayload) Normalize() {
 	msg.CapabilityInvocation = utils.NormalizeDIDUrlList(msg.CapabilityInvocation)
 	msg.CapabilityDelegation = utils.NormalizeDIDUrlList(msg.CapabilityDelegation)
 	msg.KeyAgreement = utils.NormalizeDIDUrlList(msg.KeyAgreement)
-}
-
-func (msg *MsgUpdateDid) Normalize() {
-	msg.Payload.Normalize()
-	NormalizeSignatureUUIDIdentifiers(msg.Signatures)
 }

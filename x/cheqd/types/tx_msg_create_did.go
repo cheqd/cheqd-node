@@ -48,3 +48,10 @@ func (msg MsgCreateDid) Validate(allowedNamespaces []string) error {
 		validation.Field(&msg.Signatures, IsUniqueSignInfoListByIdRule(), validation.Each(ValidSignInfoRule(allowedNamespaces))),
 	)
 }
+
+// Normalize
+
+func (msg *MsgCreateDid) Normalize() {
+	msg.Payload.Normalize()
+	NormalizeSignInfoList(msg.Signatures)
+}

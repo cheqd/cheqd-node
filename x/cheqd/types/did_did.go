@@ -101,11 +101,3 @@ func (did Did) Validate(allowedNamespaces []string) error {
 		validation.Field(&did.AlsoKnownAs, IsUniqueStrList(), validation.Each(IsURI())),
 	)
 }
-
-// Normalization
-
-func NormalizeSignatureUUIDIdentifiers(signatures []*SignInfo) {
-	for _, s := range signatures {
-		s.VerificationMethodId = utils.NormalizeDIDUrl(s.VerificationMethodId)
-	}
-}

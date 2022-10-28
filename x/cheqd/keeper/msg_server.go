@@ -92,6 +92,7 @@ func VerifySignature(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.
 	if err != nil {
 		return err
 	}
+
 	signatureBytes, err := base64.StdEncoding.DecodeString(signature.Signature)
 	if err != nil {
 		return err

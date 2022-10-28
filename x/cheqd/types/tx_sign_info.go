@@ -112,3 +112,15 @@ func IsUniqueSignInfoListRule() *CustomErrorRule {
 		return nil
 	})
 }
+
+// Normalization
+
+func (si *SignInfo) Normalize() {
+	si.VerificationMethodId = utils.NormalizeDIDUrl(si.VerificationMethodId)
+}
+
+func NormalizeSignInfoList(signatures []*SignInfo) {
+	for _, s := range signatures {
+		s.Normalize()
+	}
+}

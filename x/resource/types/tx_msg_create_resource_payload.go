@@ -55,5 +55,5 @@ func (msg *MsgCreateResourcePayload) Normalize() {
 
 func (msg *MsgCreateResource) Normalize() {
 	msg.Payload.Normalize()
-	cheqdtypes.NormalizeSignatureUUIDIdentifiers(msg.Signatures)
+	cheqdtypes.NormalizeSignInfoList(msg.Signatures)
 }
