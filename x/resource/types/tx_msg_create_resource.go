@@ -1,14 +1,14 @@
 package types
 
 import (
-	cheqd_types "github.com/cheqd/cheqd-node/x/cheqd/types"
+	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
 var _ sdk.Msg = &MsgCreateResource{}
 
-func NewMsgCreateResource(payload *MsgCreateResourcePayload, signatures []*cheqd_types.SignInfo) *MsgCreateResource {
+func NewMsgCreateResource(payload *MsgCreateResourcePayload, signatures []*cheqdtypes.SignInfo) *MsgCreateResource {
 	return &MsgCreateResource{
 		Payload:    payload,
 		Signatures: signatures,
@@ -46,6 +46,13 @@ func (msg *MsgCreateResource) ValidateBasic() error {
 func (msg MsgCreateResource) Validate(allowedNamespaces []string) error {
 	return validation.ValidateStruct(&msg,
 		validation.Field(&msg.Payload, validation.Required, ValidMsgCreateResourcePayload()),
-		validation.Field(&msg.Signatures, cheqd_types.IsUniqueSignInfoListRule(), validation.Each(cheqd_types.ValidSignInfoRule(allowedNamespaces))),
+		validation.Field(&msg.Signatures, cheqdtypes.IsUniqueSignInfoListRule(), validation.Each(cheqdtypes.ValidSignInfoRule(allowedNamespaces))),
 	)
+}
+
+// Normalize
+
+func (msg *MsgCreateResource) Normalize() {
+	msg.Payload.Normalize()
+	cheqdtypes.NormalizeSignInfoList(msg.Signatures)
 }

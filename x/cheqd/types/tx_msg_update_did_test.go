@@ -1,91 +1,94 @@
-package types
+package types_test
 
 import (
-	"testing"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 
-	"github.com/stretchr/testify/require"
+	. "github.com/cheqd/cheqd-node/x/cheqd/types"
 )
 
-func TestMsgUpdateDidValidation(t *testing.T) {
-	cases := []struct {
-		name     string
-		struct_  *MsgUpdateDid
+var _ = Describe("Message for DID updating", func() {
+	type TestCaseMsgUpdateDID struct {
+		msg      *MsgUpdateDid
 		isValid  bool
 		errorMsg string
-	}{
-		{
-			name: "positive",
-			struct_: &MsgUpdateDid{
-				Payload: &MsgUpdateDidPayload{
-					Id: "did:cheqd:testnet:123456789abcdefg",
-					VerificationMethod: []*VerificationMethod{
-						{
-							Id:                 "did:cheqd:testnet:123456789abcdefg#key1",
-							Type:               "Ed25519VerificationKey2020",
-							Controller:         "did:cheqd:testnet:123456789abcdefg",
-							PublicKeyMultibase: ValidEd25519PubKey,
-						},
-					},
-					Authentication: []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#aaa"},
-					VersionId:      "version1",
-				},
-				Signatures: nil,
-			},
-			isValid: true,
-		},
-		{
-			name: "negative: relationship duplicates",
-			struct_: &MsgUpdateDid{
-				Payload: &MsgUpdateDidPayload{
-					Id: "did:cheqd:testnet:123456789abcdefg",
-					VerificationMethod: []*VerificationMethod{
-						{
-							Id:                 "did:cheqd:testnet:123456789abcdefg#key1",
-							Type:               "Ed25519VerificationKey2020",
-							Controller:         "did:cheqd:testnet:123456789abcdefg",
-							PublicKeyMultibase: ValidEd25519PubKey,
-						},
-					},
-					Authentication: []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#key1"},
-					VersionId:      "version1",
-				},
-				Signatures: nil,
-			},
-			isValid:  false,
-			errorMsg: "payload: (authentication: there should be no duplicates.).: basic validation failed",
-		},
-		{
-			name: "negative: version id is required",
-			struct_: &MsgUpdateDid{
-				Payload: &MsgUpdateDidPayload{
-					Id: "did:cheqd:testnet:123456789abcdefg",
-					VerificationMethod: []*VerificationMethod{
-						{
-							Id:                 "did:cheqd:testnet:123456789abcdefg#key1",
-							Type:               "Ed25519VerificationKey2020",
-							Controller:         "did:cheqd:testnet:123456789abcdefg",
-							PublicKeyMultibase: ValidEd25519PubKey,
-						},
-					},
-					Authentication: []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#aaa"},
-				},
-				Signatures: nil,
-			},
-			isValid:  false,
-			errorMsg: "payload: (version_id: cannot be blank.).: basic validation failed",
-		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			err := tc.struct_.ValidateBasic()
+	DescribeTable("Tests for message for DID updating", func(testCase TestCaseMsgUpdateDID) {
+		err := testCase.msg.ValidateBasic()
 
-			if tc.isValid {
-				require.NoError(t, err)
-			} else {
-				require.Error(t, err)
-				require.Equal(t, err.Error(), tc.errorMsg)
-			}
-		})
-	}
-}
+		if testCase.isValid {
+			Expect(err).To(BeNil())
+		} else {
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring(testCase.errorMsg))
+		}
+	},
+
+		Entry(
+			"All fields are set properly",
+			TestCaseMsgUpdateDID{
+				msg: &MsgUpdateDid{
+					Payload: &MsgUpdateDidPayload{
+						Id: "did:cheqd:testnet:123456789abcdefg",
+						VerificationMethod: []*VerificationMethod{
+							{
+								Id:                 "did:cheqd:testnet:123456789abcdefg#key1",
+								Type:               "Ed25519VerificationKey2020",
+								Controller:         "did:cheqd:testnet:123456789abcdefg",
+								PublicKeyMultibase: ValidEd25519PubKey,
+							},
+						},
+						Authentication: []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#aaa"},
+						VersionId:      "version1",
+					},
+					Signatures: nil,
+				},
+				isValid: true,
+			}),
+
+		Entry(
+			"IDs are duplicated",
+			TestCaseMsgUpdateDID{
+				msg: &MsgUpdateDid{
+					Payload: &MsgUpdateDidPayload{
+						Id: "did:cheqd:testnet:123456789abcdefg",
+						VerificationMethod: []*VerificationMethod{
+							{
+								Id:                 "did:cheqd:testnet:123456789abcdefg#key1",
+								Type:               "Ed25519VerificationKey2020",
+								Controller:         "did:cheqd:testnet:123456789abcdefg",
+								PublicKeyMultibase: ValidEd25519PubKey,
+							},
+						},
+						Authentication: []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#key1"},
+						VersionId:      "version1",
+					},
+					Signatures: nil,
+				},
+				isValid:  false,
+				errorMsg: "payload: (authentication: there should be no duplicates.).: basic validation failed",
+			}),
+		Entry(
+			"VersionId is empty",
+			TestCaseMsgUpdateDID{
+				msg: &MsgUpdateDid{
+					Payload: &MsgUpdateDidPayload{
+						Id: "did:cheqd:testnet:123456789abcdefg",
+						VerificationMethod: []*VerificationMethod{
+							{
+								Id:                 "did:cheqd:testnet:123456789abcdefg#key1",
+								Type:               "Ed25519VerificationKey2020",
+								Controller:         "did:cheqd:testnet:123456789abcdefg",
+								PublicKeyMultibase: ValidEd25519PubKey,
+							},
+						},
+						Authentication: []string{"did:cheqd:testnet:123456789abcdefg#key1", "did:cheqd:testnet:123456789abcdefg#aaa"},
+					},
+					Signatures: nil,
+				},
+				isValid:  false,
+				errorMsg: "payload: (version_id: cannot be blank.).: basic validation failed",
+			}),
+	)
+})

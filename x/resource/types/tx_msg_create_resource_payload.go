@@ -2,20 +2,26 @@ package types
 
 import (
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	cheqdutils "github.com/cheqd/cheqd-node/x/cheqd/utils"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
 var _ cheqdtypes.IdentityMsg = &MsgCreateResourcePayload{}
 
 func (msg *MsgCreateResourcePayload) GetSignBytes() []byte {
-	return ModuleCdc.MustMarshal(msg)
+	bytes, err := msg.Marshal()
+	if err != nil {
+		panic(err)
+	}
+
+	return bytes
 }
 
 func (msg *MsgCreateResourcePayload) ToResource() Resource {
 	return Resource{
 		Header: &ResourceHeader{
-			CollectionId: msg.CollectionId,
-			Id:           msg.Id,
+			CollectionId: cheqdutils.NormalizeId(msg.CollectionId),
+			Id:           cheqdutils.NormalizeUUID(msg.Id),
 			Name:         msg.Name,
 			ResourceType: msg.ResourceType,
 		},
@@ -44,4 +50,11 @@ func ValidMsgCreateResourcePayload() *cheqdtypes.CustomErrorRule {
 
 		return casted.Validate()
 	})
+}
+
+// Normalize
+
+func (msg *MsgCreateResourcePayload) Normalize() {
+	msg.CollectionId = cheqdutils.NormalizeId(msg.CollectionId)
+	msg.Id = cheqdutils.NormalizeId(msg.Id)
 }

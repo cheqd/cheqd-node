@@ -14,6 +14,8 @@ func (k Keeper) Did(c context.Context, req *types.QueryGetDidRequest) (*types.Qu
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
+	req.Normalize()
+
 	ctx := sdk.UnwrapSDKContext(c)
 
 	stateValue, err := k.GetDid(&ctx, req.Id)
