@@ -22,12 +22,9 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 
 	msg.Normalize()
 
-	resource := msg.Payload.ToResource()
-	cheqdtypes.NormalizeSignInfoList(msg.Signatures)
-
 	// Validate corresponding DIDDoc exists
 	namespace := k.cheqdKeeper.GetDidNamespace(&ctx)
-	did := cheqdutils.JoinDID(cheqdtypes.DidMethod, namespace, resource.Header.CollectionId)
+	did := cheqdutils.JoinDID(cheqdtypes.DidMethod, namespace, msg.Payload.CollectionId)
 	didDocStateValue, err := k.cheqdKeeper.GetDid(&ctx, did)
 	if err != nil {
 		return nil, err
@@ -39,8 +36,8 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	}
 
 	// Validate Resource doesn't exist
-	if k.HasResource(&ctx, resource.Header.CollectionId, resource.Header.Id) {
-		return nil, types.ErrResourceExists.Wrap(resource.Header.Id)
+	if k.HasResource(&ctx, msg.Payload.CollectionId, msg.Payload.Id) {
+		return nil, types.ErrResourceExists.Wrap(msg.Payload.Id)
 	}
 
 	// Validate signatures
@@ -58,6 +55,7 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	}
 
 	// Build Resource
+	resource := msg.Payload.ToResource()
 	checksum := sha256.Sum256([]byte(resource.Data))
 	resource.Header.Checksum = checksum[:]
 	resource.Header.Created = ctx.BlockTime().Format(time.RFC3339)

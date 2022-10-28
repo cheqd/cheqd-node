@@ -1,21 +1,18 @@
 package types_test
 
 import (
-
+	. "github.com/cheqd/cheqd-node/x/cheqd/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	. "github.com/cheqd/cheqd-node/x/cheqd/types"
 )
 
 var _ = Describe("Update DID Payload Validation tests", func() {
-
 	type TestCaseUUIDDidStruct struct {
 		inputId    string
 		expectedId string
 	}
 
 	DescribeTable("UUID validation tests", func(testCase TestCaseUUIDDidStruct) {
-
 		inputMsg := MsgUpdateDidPayload{
 			Id:             testCase.inputId,
 			Authentication: []string{testCase.inputId + "#key1"},

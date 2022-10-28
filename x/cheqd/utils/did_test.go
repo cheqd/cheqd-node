@@ -135,5 +135,5 @@ var _ = Describe("DID checks", func() {
 				expectedDID: "did:cheqd:testnet:a86f9cae-0902-4a7c-a144-96b60ced2fc9",
 			}),
 	)
-	//ToDo: tests for list of DIDs
+	// ToDo: tests for list of DIDs
 })

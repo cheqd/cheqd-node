@@ -16,7 +16,7 @@ func (msg *MsgCreateResourcePayload) ToResource() Resource {
 	return Resource{
 		Header: &ResourceHeader{
 			CollectionId: cheqdutils.NormalizeId(msg.CollectionId),
-			Id:           cheqdutils.NormalizeId(msg.Id),
+			Id:           cheqdutils.NormalizeUUID(msg.Id),
 			Name:         msg.Name,
 			ResourceType: msg.ResourceType,
 		},
@@ -48,12 +48,8 @@ func ValidMsgCreateResourcePayload() *cheqdtypes.CustomErrorRule {
 }
 
 // Normalize
+
 func (msg *MsgCreateResourcePayload) Normalize() {
 	msg.CollectionId = cheqdutils.NormalizeId(msg.CollectionId)
 	msg.Id = cheqdutils.NormalizeId(msg.Id)
-}
-
-func (msg *MsgCreateResource) Normalize() {
-	msg.Payload.Normalize()
-	cheqdtypes.NormalizeSignInfoList(msg.Signatures)
 }

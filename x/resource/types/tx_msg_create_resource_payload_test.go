@@ -10,8 +10,8 @@ var _ = Describe("TxMsgCreateResourcePayload", func() {
 	var msg *resourcetypes.MsgCreateResourcePayload
 	type TestCaseUUIDDidStruct struct {
 		inputCollectionId    string
-		inputId    			 string
-		expectedId 			 string
+		inputId              string
+		expectedId           string
 		expectedCollectionId string
 	}
 
@@ -44,7 +44,6 @@ var _ = Describe("TxMsgCreateResourcePayload", func() {
 	})
 
 	DescribeTable("UUID validation tests", func(testCase TestCaseUUIDDidStruct) {
-
 		inputMsg := resourcetypes.MsgCreateResourcePayload{
 			CollectionId: testCase.inputCollectionId,
 			Id:           testCase.inputId,
@@ -61,42 +60,42 @@ var _ = Describe("TxMsgCreateResourcePayload", func() {
 		}
 		inputMsg.Normalize()
 		Expect(inputMsg).To(Equal(expectedMsg))
-		},
+	},
 
 		Entry(
 			"base58 identifier - not changed",
 			TestCaseUUIDDidStruct{
 				inputCollectionId:    "aaaaaaaaaaaaaaaa",
-				inputId:    	      "aaaaaaaaaaaaaaaa",
+				inputId:              "aaaaaaaaaaaaaaaa",
 				expectedCollectionId: "aaaaaaaaaaaaaaaa",
-				expectedId: 	      "aaaaaaaaaaaaaaaa",
+				expectedId:           "aaaaaaaaaaaaaaaa",
 			}),
 
 		Entry(
 			"Mixed case UUID",
 			TestCaseUUIDDidStruct{
 				inputCollectionId:    "BAbbba14-f294-458a-9b9c-474d188680fd",
-				inputId:    	   	  "BAbbba14-f294-458a-9b9c-474d188680fd",
+				inputId:              "BAbbba14-f294-458a-9b9c-474d188680fd",
 				expectedCollectionId: "babbba14-f294-458a-9b9c-474d188680fd",
-				expectedId: 	  	  "babbba14-f294-458a-9b9c-474d188680fd",
+				expectedId:           "babbba14-f294-458a-9b9c-474d188680fd",
 			}),
 
 		Entry(
 			"Low case UUID",
 			TestCaseUUIDDidStruct{
 				inputCollectionId:    "babbba14-f294-458a-9b9c-474d188680fd",
-				inputId:   	          "babbba14-f294-458a-9b9c-474d188680fd",
+				inputId:              "babbba14-f294-458a-9b9c-474d188680fd",
 				expectedCollectionId: "babbba14-f294-458a-9b9c-474d188680fd",
-				expectedId: 	      "babbba14-f294-458a-9b9c-474d188680fd",
+				expectedId:           "babbba14-f294-458a-9b9c-474d188680fd",
 			}),
 
 		Entry(
 			"Upper case UUID",
 			TestCaseUUIDDidStruct{
 				inputCollectionId:    "A86F9CAE-0902-4a7c-a144-96b60ced2FC9",
-				inputId:   	          "A86F9CAE-0902-4a7c-a144-96b60ced2FC9",
+				inputId:              "A86F9CAE-0902-4a7c-a144-96b60ced2FC9",
 				expectedCollectionId: "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
-				expectedId: 	      "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
+				expectedId:           "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
 			}),
 	)
 })

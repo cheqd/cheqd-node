@@ -140,12 +140,10 @@ var _ = Describe("Create Resource Tests", func() {
 	})
 
 	Describe("UUID with capital letters", func() {
-		var UUID string = "A86F9CAE-0902-4a7c-a144-96b60ced2FC9"
-
 		It("Should work even for UUID with capital letters", func() {
 			msg := resourcetypes.MsgCreateResourcePayload{
 				CollectionId: alice.CollectionId,
-				Id:           UUID,
+				Id:           UUIDString,
 				Name:         "Resource with capital letters in UUID",
 				ResourceType: CLSchemaType,
 				Data:         []byte(SchemaData),
@@ -155,18 +153,18 @@ var _ = Describe("Create Resource Tests", func() {
 			Expect(err).To(BeNil())
 
 			// check for the same UUID
-			created, err := setup.QueryResource(alice.CollectionId, UUID)
+			created, err := setup.QueryResource(alice.CollectionId, UUIDString)
 			Expect(err).To(BeNil())
 
-			Expect(created.Resource.Header.Id).To(Equal(strings.ToLower(UUID)))
+			Expect(created.Resource.Header.Id).To(Equal(strings.ToLower(UUIDString)))
 
 			// check for already normalized UUID
 			created, err = setup.QueryResource(
 				cheqdutils.NormalizeId(alice.CollectionId),
-				cheqdutils.NormalizeId(UUID))
+				cheqdutils.NormalizeId(UUIDString))
 			Expect(err).To(BeNil())
 
-			Expect(created.Resource.Header.Id).To(Equal(strings.ToLower(UUID)))
+			Expect(created.Resource.Header.Id).To(Equal(strings.ToLower(UUIDString)))
 		})
 	})
 })

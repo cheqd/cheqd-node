@@ -6,5 +6,5 @@ import (
 
 func (query *QueryGetResourceRequest) Normalize() {
 	query.CollectionId = utils.NormalizeId(query.CollectionId)
-	query.Id = utils.NormalizeId(query.Id)
+	query.Id = utils.NormalizeUUID(query.Id)
 }

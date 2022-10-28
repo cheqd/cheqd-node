@@ -7,14 +7,12 @@ import (
 )
 
 var _ = Describe("Create DID Payload Validation tests", func() {
-
 	type TestCaseUUIDDidStruct struct {
 		inputId    string
 		expectedId string
 	}
 
 	DescribeTable("UUID validation tests", func(testCase TestCaseUUIDDidStruct) {
-
 		inputMsg := MsgCreateDidPayload{
 			Id:             testCase.inputId,
 			Authentication: []string{testCase.inputId + "#key1"},

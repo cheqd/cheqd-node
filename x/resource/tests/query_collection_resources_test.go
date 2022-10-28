@@ -25,7 +25,7 @@ var _ = Describe("Query Collection Resources", func() {
 		setup = Setup()
 
 		alice = setup.CreateSimpleDid()
-		uuidDID = setup.CreateCustomDid(setup.BuildDidWithCustomId(UUIDString)
+		uuidDID = setup.CreateCustomDid(setup.BuildDidWithCustomId(UUIDString))
 
 		res1v1 = setup.CreateSimpleResource(alice.CollectionId, SchemaData, "Resource 1", CLSchemaType, []cheqdsetup.SignInput{alice.SignInput})
 		res1v2 = setup.CreateSimpleResource(alice.CollectionId, SchemaData, "Resource 1", CLSchemaType, []cheqdsetup.SignInput{alice.SignInput})
