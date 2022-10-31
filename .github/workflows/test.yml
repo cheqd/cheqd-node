@@ -100,86 +100,87 @@ jobs:
           path: report-integration.xml
 
   upgrade-migration-tests:
-    name: "Upgrade/migration tests"
+    name: "Upgrade - Migration tests"
     runs-on: ubuntu-latest
     steps:
-    - name: Generate localnet configs
-      working-directory: ./docker/localnet
-      run: |
-        bash gen-network-config.sh
-        sudo chown -R 1000:1000 network-config
+      - uses: actions/checkout@v3
+      - name: Generate localnet configs
+        working-directory: ./docker/localnet
+        run: |
+          bash gen-network-config.sh
+          sudo chown -R 1000:1000 network-config
 
-    - name: Set up Docker localnet @latest
-      working-directory: ./docker/localnet
-      run: |
-        docker compose up --detach --no-build
+      - name: Set up Docker localnet @latest
+        working-directory: ./docker/localnet
+        run: |
+          docker compose up --detach --no-build
 
-    - name: Import keys
-      working-directory: ./docker/localnet
-      run: |
-        bash import-keys.sh
+      - name: Import keys
+        working-directory: ./docker/localnet
+        run: |
+          bash import-keys.sh
 
-    - name: Install binary @latest release
-      run: |
-        export BUILD_IMAGE=ghcr.io/cheqd/cheqd-node:latest
-        docker tag ${BUILD_IMAGE} cheqd-node:latest
-        docker cp "$(docker create cheqd-node:latest)":/bin/cheqd-noded ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
+      - name: Install binary @latest release
+        run: |
+          export BUILD_IMAGE=ghcr.io/cheqd/cheqd-node:latest
+          docker tag ${BUILD_IMAGE} cheqd-node:latest
+          docker cp "$(docker create cheqd-node:latest)":/bin/cheqd-noded ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
 
-    - name: Restore binary permissions
-      run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
+      - name: Restore binary permissions
+        run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
 
-    #
-    # Run pre-upgrade tests
-    #
+      #
+      # Run pre-upgrade tests
+      #
 
-    #
-    # Upgrade
-    #
+      #
+      # Upgrade
+      #
 
-    #
-    # Run post-upgrade tests
-    #
+      #
+      # Run post-upgrade tests
+      #
 
-    #
-    # Run migration tests
-    #
+      #
+      # Run migration tests
+      #
 
-    - name: Download binary artifact
-      uses: actions/download-artifact@v3
-      id: download
-      with:
-        name: cheqd-noded
-        path: ${{ env.RUNNER_BIN_DIR }}
+      - name: Install ginkgo
+        working-directory: ./..
+        run: go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
-    - name: Restore binary permissions
-      run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
+      - name: Run pre-upgrade tests
+        working-directory: ./tests/upgrade/pre_upgrade
+        run: ginkgo -r --tags upgrade --race
 
-    - name: Download node Docker image
-      uses: actions/download-artifact@v3
-      with:
-        name: cheqd-node-build.tar
+      - name: Download binary artifact
+        uses: actions/download-artifact@v3
+        id: download
+        with:
+          name: cheqd-noded
+          path: ${{ env.RUNNER_BIN_DIR }}
 
-    - name: Load node Docker image
-      run: docker load -i cheqd-node-build.tar
+      - name: Restore binary permissions
+        run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
 
-    - name: Set up Docker localnet
-      working-directory: ./docker/localnet
-      run: |
-        unset BUILD_IMAGE
-        docker compose --env-file docker-compose.env up --detach --no-build
+      - name: Download node Docker image
+        uses: actions/download-artifact@v3
+        with:
+          name: cheqd-node-build.tar
 
-    - uses: actions/setup-go@v3
-      with:
-        go-version-file: ./go.mod
-        cache: true
+      - name: Load node Docker image
+        run: docker load -i cheqd-node-build.tar
 
-    - name: Install ginkgo
-      working-directory: ./..
-      run: go install github.com/onsi/ginkgo/v2/ginkgo@latest
+      - name: Set up Docker localnet
+        working-directory: ./docker/localnet
+        run: |
+          unset BUILD_IMAGE
+          docker compose --env-file docker-compose.env up --detach --no-build
 
-    - name: Run pre-upgrade tests
-      working-directory: ./tests/upgrade/pre_upgrade
-      run: ginkgo -r --tags pre_upgrade --race --randomize-suites --keep-going --trace --junit-report report.xml
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: ./go.mod
+          cache: true
 
   report-results:
     name: "Report"

@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/cli"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -83,7 +83,7 @@ var _ = Describe("Upgrade - Execute", func() {
 			By("sending a QueryUpgradeProposal Msg from `validator0` container")
 			proposal, err := cli.QueryUpgradeProposal(cli.VALIDATOR0)
 			Expect(err).To(BeNil())
-			Expect(proposal.Proposal.Status).To(Equal(govtypes.ProposalStatus_name[int32(govtypes.StatusPassed)]))
+			Expect(proposal.Proposal.Status).To(Equal(govtypesv1.ProposalStatus_name[int32(govtypesv1.StatusPassed)]))
 		})
 
 		It("should wait for the upgrade height to be reached", func() {
