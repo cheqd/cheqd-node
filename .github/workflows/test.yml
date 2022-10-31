@@ -105,16 +105,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install binary @latest release
-        run: |
-          export BUILD_IMAGE=ghcr.io/cheqd/cheqd-node:latest
-          docker pull $BUILD_IMAGE
-          docker tag ${BUILD_IMAGE} cheqd-node:latest
-          docker cp "$(docker create cheqd-node:latest)":/bin/cheqd-noded ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
-
-      - name: Restore binary permissions
-        run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
-
       - name: Download next version binary artifact
         uses: actions/download-artifact@v3
         id: download
@@ -124,6 +114,16 @@ jobs:
 
       - name: Restore binary next version permissions
         run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded-new
+
+      - name: Install binary @latest release
+        run: |
+          export BUILD_IMAGE=ghcr.io/cheqd/cheqd-node:latest
+          docker pull $BUILD_IMAGE
+          docker tag ${BUILD_IMAGE} cheqd-node:latest
+          docker cp "$(docker create cheqd-node:latest)":/bin/cheqd-noded ${{ env.RUNNER_BIN_DIR }}
+
+      - name: Restore binary permissions
+        run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
 
       - name: Generate localnet configs
         working-directory: ./docker/localnet
