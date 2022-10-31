@@ -10,8 +10,6 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var base58Runes = []rune("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz")
-
 func randBase58Seq(bytes int) string {
 	b := make([]byte, bytes)
 
