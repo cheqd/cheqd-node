@@ -104,6 +104,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - name: Install binary @latest release
+        run: |
+          export BUILD_IMAGE=ghcr.io/cheqd/cheqd-node:latest
+          docker tag ${BUILD_IMAGE} cheqd-node:latest
+          docker cp "$(docker create cheqd-node:latest)":/bin/cheqd-noded ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
+
+      - name: Restore binary permissions
+        run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
+
       - name: Generate localnet configs
         working-directory: ./docker/localnet
         run: |
@@ -119,15 +129,6 @@ jobs:
         working-directory: ./docker/localnet
         run: |
           bash import-keys.sh
-
-      - name: Install binary @latest release
-        run: |
-          export BUILD_IMAGE=ghcr.io/cheqd/cheqd-node:latest
-          docker tag ${BUILD_IMAGE} cheqd-node:latest
-          docker cp "$(docker create cheqd-node:latest)":/bin/cheqd-noded ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
-
-      - name: Restore binary permissions
-        run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
 
       #
       # Run pre-upgrade tests
