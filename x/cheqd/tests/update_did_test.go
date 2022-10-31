@@ -528,4 +528,54 @@ var _ = Describe("DID Doc update", func() {
 			Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("there should be at least one valid signature by %s (new version): invalid signature detected", alice.Did)))
 		})
 	})
+
+	Describe("Deactivating", func() {
+		var alice CreatedDidInfo
+		var bob CreatedDidInfo
+		var updateMsg *types.MsgUpdateDidPayload
+
+		BeforeEach(func() {
+			alice = setup.CreateSimpleDid()
+			bob = setup.CreateSimpleDid()
+
+			updateMsg = &types.MsgUpdateDidPayload{
+				Id: alice.Did,
+				VerificationMethod: []*types.VerificationMethod{
+					{
+						Id:                 alice.DidInfo.KeyId,
+						Type:               types.Ed25519VerificationKey2020,
+						Controller:         alice.DidInfo.Did,
+						PublicKeyMultibase: MustEncodeBase58(alice.DidInfo.KeyPair.Public),
+					},
+				},
+				Authentication: []string{alice.KeyId},
+				VersionId:      alice.VersionId,
+			}
+		})
+
+		When("Updating already deactivated DID", func() {
+			It("Should fail with error", func() {
+				// Deactivate DID
+				deactivateMsg := &types.MsgDeactivateDidPayload{
+					Id: alice.Did,
+				}
+
+				signatures := []SignInput{alice.DidInfo.SignInput}
+
+				res, err := setup.DeactivateDid(deactivateMsg, signatures)
+				Expect(err).To(BeNil())
+				Expect(res.Metadata.Deactivated).To(BeTrue())
+
+				// Update deactivated DID
+				signatures = []SignInput{
+					alice.SignInput,
+					bob.SignInput,
+				}
+
+				_, err = setup.UpdateDid(updateMsg, signatures)
+				Expect(err.Error()).ToNot(BeNil())
+				Expect(err.Error()).To(ContainSubstring(alice.DidInfo.Did + ": DID Doc already deactivated"))
+			})
+		})
+	})
 })

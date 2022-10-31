@@ -1,34 +1,37 @@
 syntax = "proto3";
-package cheqdid.cheqdnode.cheqd.v1;
 
-option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
+package cheqd.did.v2;
 
-import "google/protobuf/any.proto";
-import "cheqd/v1/did.proto";
+import "cheqd/did/v2/diddoc.proto";
 
-// Msg defines the Msg service.
+option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types/v2";
+
 service Msg {
-  rpc CreateDid(MsgCreateDid) returns (MsgCreateDidResponse);
-  rpc UpdateDid(MsgUpdateDid) returns (MsgUpdateDidResponse);
+  rpc CreateDidDoc(MsgCreateDidDoc) returns (MsgCreateDidDocResponse);
+  rpc UpdateDidDoc(MsgUpdateDidDoc) returns (MsgUpdateDidDocResponse);
 }
 
-// this line is used by starport scaffolding # proto/tx/message
-message MsgCreateDid {
-  MsgCreateDidPayload payload = 1;
+message MsgCreateDidDoc {
+  MsgCreateDidDocPayload payload = 1;
   repeated SignInfo signatures = 2;
 }
 
-message MsgUpdateDid {
-  MsgUpdateDidPayload payload = 1;
+message MsgUpdateDidDoc {
+  MsgUpdateDidDocPayload payload = 1;
+  repeated SignInfo signatures = 2;
+}
+
+message MsgDeactivateDid {
+  MsgDeactivateDidPayload payload = 1;
   repeated SignInfo signatures = 2;
 }
 
 message SignInfo {
   string verification_method_id = 1;
-  string signature = 2;
+  bytes signature = 2;
 }
 
-message MsgCreateDidPayload {
+message MsgCreateDidDocPayload {
   repeated string context = 1;
   string id = 2;
   repeated string controller = 3;
@@ -42,11 +45,11 @@ message MsgCreateDidPayload {
   repeated Service service = 11;
 }
 
-message MsgCreateDidResponse {
-  string id = 1; // Not necessary
+message MsgCreateDidDocResponse {
+  DidDocWithMetadata value = 1;
 }
 
-message MsgUpdateDidPayload {
+message MsgUpdateDidDocPayload {
   repeated string context = 1;
   string id = 2;
   repeated string controller = 3;
@@ -61,6 +64,15 @@ message MsgUpdateDidPayload {
   string version_id = 12;
 }
 
-message MsgUpdateDidResponse {
-  string id = 1; // Not necessary
+message MsgUpdateDidDocResponse {
+  DidDocWithMetadata value = 1;
+}
+
+message MsgDeactivateDidPayload {
+  string id = 1;
+  string version_id = 2;
+}
+
+message MsgDeactivateDidResponse {
+  DidDocWithMetadata value = 1;
 }

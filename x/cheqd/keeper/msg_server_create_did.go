@@ -11,6 +11,12 @@ import (
 func (k MsgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*types.MsgCreateDidResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	// Get sign bytes before modifying payload
+	signBytes := msg.Payload.GetSignBytes()
+
+	// Normalize UUID identifiers
+	msg.Normalize()
+
 	// Validate DID doesn't exist
 	if k.HasDid(&ctx, msg.Payload.Id) {
 		return nil, types.ErrDidDocExists.Wrap(msg.Payload.Id)
@@ -45,7 +51,7 @@ func (k MsgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*t
 
 	// Verify signatures
 	signers := GetSignerDIDsForDIDCreation(did)
-	err = VerifyAllSignersHaveAllValidSignatures(&k.Keeper, &ctx, inMemoryDids, msg.Payload.GetSignBytes(), signers, msg.Signatures)
+	err = VerifyAllSignersHaveAllValidSignatures(&k.Keeper, &ctx, inMemoryDids, signBytes, signers, msg.Signatures)
 	if err != nil {
 		return nil, err
 	}

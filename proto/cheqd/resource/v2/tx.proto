@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package cheqd.resource.v2;
+
+import "cheqd/did/v2/tx.proto";
+import "cheqd/resource/v2/resource.proto";
+
+option go_package = "github.com/cheqd/cheqd-node/x/resource/types/v2";
+
+// Msg defines the Msg service.
+service Msg {
+  rpc CreateResource(MsgCreateResource) returns (MsgCreateResourceResponse);
+}
+
+message MsgCreateResource {
+  MsgCreateResourcePayload payload = 1;
+  repeated cheqd.did.v2.SignInfo signatures = 2;
+}
+
+message MsgCreateResourcePayload {
+  string collection_id = 1;
+  string id = 2;
+  string name = 3;
+  string version = 4;
+  string resource_type = 5;
+  repeated string also_known_as = 6;
+}
+
+message MsgCreateResourceResponse {
+  Metadata resource = 1;
+}
