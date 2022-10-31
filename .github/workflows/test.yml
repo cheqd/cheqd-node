@@ -118,6 +118,11 @@ jobs:
       - name: Restore binary next version permissions
         run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded-next
 
+      - name: Download node Docker next image
+        uses: actions/download-artifact@v3
+        with:
+          name: cheqd-node-build.tar
+
       - name: Install binary @latest release
         run: |
           export BUILD_IMAGE=ghcr.io/cheqd/cheqd-node:latest
@@ -128,6 +133,9 @@ jobs:
 
       - name: Restore binary permissions
         run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
+
+      - name: Install musl-tools
+        run: sudo apt-get install musl-tools
 
       - name: Generate localnet configs
         working-directory: ./docker/localnet
