@@ -7,8 +7,8 @@ import (
 )
 
 var (
-	ValidTestDID          = "did:cheqd:testnet:123456789abcdefg"
-	ValidTestDID2         = "did:cheqd:testnet:gfedcba987654321"
+	ValidTestDID          = "did:cheqd:testnet:zABCDEFG123456789abcd"
+	ValidTestDID2         = "did:cheqd:testnet:zABCDEFG987654321abcd"
 	InvalidTestDID        = "badDid"
 	ValidEd25519PubKey    = "zF1hVGXXK9rmx5HhMTpGnGQJiab9qrFJbQXBRhSmYjQWX"
 	NotValidEd25519PubKey = "zF1hVGXXK9rmx5HhMTpGnGQJi"

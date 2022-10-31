@@ -70,7 +70,7 @@ var _ = Describe("Create Resource Tests", func() {
 		})
 
 		It("Can't be created with invalid collection id", func() {
-			msg.CollectionId = cheqdsetup.GenerateDID(cheqdsetup.Base58_16chars)
+			msg.CollectionId = cheqdsetup.GenerateDID(cheqdsetup.Base58_16bytes)
 
 			_, err := setup.CreateResource(msg, []cheqdsetup.SignInput{alice.SignInput})
 			Expect(err.Error()).To(ContainSubstring("not found"))

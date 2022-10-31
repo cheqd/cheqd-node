@@ -35,7 +35,7 @@ var _ = Describe("Deactivate DID tests", func() {
 
 	When("DID is not found", func() {
 		It("Should return error", func() {
-			NotFoundDID := GenerateDID(Base58_16chars)
+			NotFoundDID := GenerateDID(Base58_16bytes)
 
 			msg := &types.MsgDeactivateDidPayload{
 				Id: NotFoundDID,

@@ -40,9 +40,9 @@ var _ = Describe("Verification Method tests", func() {
 			"Verification method with expected multibase key",
 			TestCaseVerificationMethodStruct{
 				vm: VerificationMethod{
-					Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#qwe",
+					Id:                 "did:cheqd:zABCDEFG123456789abcd#qwe",
 					Type:               "Ed25519VerificationKey2020",
-					Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
+					Controller:         "did:cheqd:zABCDEFG987654321abcd",
 					PublicKeyJwk:       nil,
 					PublicKeyMultibase: ValidEd25519PubKey,
 				},
@@ -54,9 +54,9 @@ var _ = Describe("Verification Method tests", func() {
 			"Verification method with expected jwk key",
 			TestCaseVerificationMethodStruct{
 				vm: VerificationMethod{
-					Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#rty",
+					Id:                 "did:cheqd:zABCDEFG123456789abcd#rty",
 					Type:               "JsonWebKey2020",
-					Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
+					Controller:         "did:cheqd:zABCDEFG987654321abcd",
 					PublicKeyJwk:       ValidPublicKeyJWK,
 					PublicKeyMultibase: "",
 				},
@@ -68,13 +68,13 @@ var _ = Describe("Verification Method tests", func() {
 			"Id has expected DID as a base",
 			TestCaseVerificationMethodStruct{
 				vm: VerificationMethod{
-					Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#rty",
+					Id:                 "did:cheqd:zABCDEFG123456789abcd#rty",
 					Type:               "JsonWebKey2020",
-					Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
+					Controller:         "did:cheqd:zABCDEFG987654321abcd",
 					PublicKeyJwk:       ValidPublicKeyJWK,
 					PublicKeyMultibase: "",
 				},
-				baseDid:  "did:cheqd:aaaaaaaaaaaaaaaa",
+				baseDid:  "did:cheqd:zABCDEFG123456789abcd",
 				isValid:  true,
 				errorMsg: "",
 			}),
@@ -83,24 +83,24 @@ var _ = Describe("Verification Method tests", func() {
 			"Id does not have expected DID as a base",
 			TestCaseVerificationMethodStruct{
 				vm: VerificationMethod{
-					Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#rty",
+					Id:                 "did:cheqd:zABCDEFG123456789abcd#rty",
 					Type:               "JsonWebKey2020",
-					Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
+					Controller:         "did:cheqd:zABCDEFG987654321abcd",
 					PublicKeyJwk:       ValidPublicKeyJWK,
 					PublicKeyMultibase: "",
 				},
-				baseDid:  "did:cheqd:bbbbbbbbbbbbbbbb",
+				baseDid:  "did:cheqd:zABCDEFG987654321abcd",
 				isValid:  false,
-				errorMsg: "id: must have prefix: did:cheqd:bbbbbbbbbbbbbbbb.",
+				errorMsg: "id: must have prefix: did:cheqd:zABCDEFG987654321abcd.",
 			}),
 
 		Entry(
 			"Namespace is allowed",
 			TestCaseVerificationMethodStruct{
 				vm: VerificationMethod{
-					Id:                 "did:cheqd:mainnet:aaaaaaaaaaaaaaaa#rty",
+					Id:                 "did:cheqd:mainnet:zABCDEFG123456789abcd#rty",
 					Type:               "JsonWebKey2020",
-					Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
+					Controller:         "did:cheqd:zABCDEFG987654321abcd",
 					PublicKeyJwk:       ValidPublicKeyJWK,
 					PublicKeyMultibase: "",
 				},
@@ -112,9 +112,9 @@ var _ = Describe("Verification Method tests", func() {
 			"Namespace is not allowed",
 			TestCaseVerificationMethodStruct{
 				vm: VerificationMethod{
-					Id:                 "did:cheqd:mainnet:aaaaaaaaaaaaaaaa#rty",
+					Id:                 "did:cheqd:mainnet:zABCDEFG123456789abcd#rty",
 					Type:               "JsonWebKey2020",
-					Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
+					Controller:         "did:cheqd:zABCDEFG987654321abcd",
 					PublicKeyJwk:       ValidPublicKeyJWK,
 					PublicKeyMultibase: "",
 				},
@@ -126,9 +126,9 @@ var _ = Describe("Verification Method tests", func() {
 			"JWK key has expected format",
 			TestCaseVerificationMethodStruct{
 				vm: VerificationMethod{
-					Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#qwe",
+					Id:                 "did:cheqd:zABCDEFG123456789abcd#qwe",
 					Type:               "JsonWebKey2020",
-					Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
+					Controller:         "did:cheqd:zABCDEFG987654321abcd",
 					PublicKeyJwk:       ValidPublicKeyJWK,
 					PublicKeyMultibase: "",
 				},
@@ -138,9 +138,9 @@ var _ = Describe("Verification Method tests", func() {
 			"JWK key has unexpected format",
 			TestCaseVerificationMethodStruct{
 				vm: VerificationMethod{
-					Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#qwe",
+					Id:                 "did:cheqd:zABCDEFG123456789abcd#qwe",
 					Type:               "JsonWebKey2020",
-					Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
+					Controller:         "did:cheqd:zABCDEFG987654321abcd",
 					PublicKeyJwk:       NotValidPublicKeyJWK,
 					PublicKeyMultibase: "",
 				},
@@ -151,9 +151,9 @@ var _ = Describe("Verification Method tests", func() {
 			"Not all keys and valuesin JWK have expected format",
 			TestCaseVerificationMethodStruct{
 				vm: VerificationMethod{
-					Id:                 "did:cheqd:aaaaaaaaaaaaaaaa#qwe",
+					Id:                 "did:cheqd:zABCDEFG123456789abcd#qwe",
 					Type:               "JsonWebKey2020",
-					Controller:         "did:cheqd:bbbbbbbbbbbbbbbb",
+					Controller:         "did:cheqd:zABCDEFG987654321abcd",
 					PublicKeyJwk:       append(ValidPublicKeyJWK, &KeyValuePair{Key: "", Value: ""}),
 					PublicKeyMultibase: "",
 				},

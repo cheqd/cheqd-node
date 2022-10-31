@@ -20,7 +20,7 @@ var _ = Describe("Create DID tests", func() {
 	})
 
 	It("Valid: Works for simple did doc", func() {
-		did := GenerateDID(Base58_16chars)
+		did := GenerateDID(Base58_16bytes)
 		keypair := GenerateKeyPair()
 		keyId := did + "#key-1"
 
@@ -59,7 +59,7 @@ var _ = Describe("Create DID tests", func() {
 		anna := setup.CreateSimpleDid()
 
 		// Bob
-		bobDid := GenerateDID(Base58_16chars)
+		bobDid := GenerateDID(Base58_16bytes)
 		bobKeypair := GenerateKeyPair()
 		bobKeyId := bobDid + "#key-1"
 
@@ -89,7 +89,7 @@ var _ = Describe("Create DID tests", func() {
 	})
 
 	It("Valid: Works for the did doc witha all properties", func() {
-		did := GenerateDID(Base58_16chars)
+		did := GenerateDID(Base58_16bytes)
 
 		keypair1 := GenerateKeyPair()
 		keyId1 := did + "#key-1"
@@ -173,7 +173,7 @@ var _ = Describe("Create DID tests", func() {
 		alice := setup.CreateSimpleDid()
 
 		// Bob
-		bobDid := GenerateDID(Base58_16chars)
+		bobDid := GenerateDID(Base58_16bytes)
 		bobKeypair := GenerateKeyPair()
 		bobKeyId := bobDid + "#key-1"
 
@@ -203,7 +203,7 @@ var _ = Describe("Create DID tests", func() {
 	})
 
 	It("Not Valid: No signature", func() {
-		did := GenerateDID(Base58_16chars)
+		did := GenerateDID(Base58_16bytes)
 		keypair := GenerateKeyPair()
 		keyId := did + "#key-1"
 
@@ -228,11 +228,11 @@ var _ = Describe("Create DID tests", func() {
 	})
 
 	It("Not Valid: Controller not found", func() {
-		did := GenerateDID(Base58_16chars)
+		did := GenerateDID(Base58_16bytes)
 		keypair := GenerateKeyPair()
 		keyId := did + "#key-1"
 
-		nonExistingDid := GenerateDID(Base58_16chars)
+		nonExistingDid := GenerateDID(Base58_16bytes)
 
 		msg := &types.MsgCreateDidPayload{
 			Id:             did,
@@ -255,7 +255,7 @@ var _ = Describe("Create DID tests", func() {
 	})
 
 	It("Not Valid: Wrong signature", func() {
-		did := GenerateDID(Base58_16chars)
+		did := GenerateDID(Base58_16bytes)
 		keypair := GenerateKeyPair()
 		keyId := did + "#key-1"
 
@@ -291,7 +291,7 @@ var _ = Describe("Create DID tests", func() {
 		alice := setup.CreateSimpleDid()
 
 		// Bob
-		bobDid := GenerateDID(Base58_16chars)
+		bobDid := GenerateDID(Base58_16bytes)
 		bobKeypair := GenerateKeyPair()
 		bobKeyId := bobDid + "#key-1"
 
@@ -316,7 +316,7 @@ var _ = Describe("Create DID tests", func() {
 	})
 
 	It("Not Valid: DID self-signed by not existing verification method", func() {
-		did := GenerateDID(Base58_16chars)
+		did := GenerateDID(Base58_16bytes)
 		keypair := GenerateKeyPair()
 		keyId := did + "#key-1"
 
@@ -427,9 +427,9 @@ var _ = Describe("Check upper/lower case for DID creation", func() {
 			inputId:  didPrefix + "A86F9CAE-0902-4a7c-a144-96b60ced2FC9",
 			resultId: didPrefix + "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
 		}),
-		Entry("Low Case UUID", TestCaseUUIDDidStruct{
-			inputId:  didPrefix + "MjYxNzYKMjYxNzYK",
-			resultId: didPrefix + "MjYxNzYKMjYxNzYK",
+		Entry("Base58 string", TestCaseUUIDDidStruct{
+			inputId:  didPrefix + "zABCDEFG123456789abcd",
+			resultId: didPrefix + "zABCDEFG123456789abcd",
 		}),
 	)
 })

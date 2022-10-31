@@ -2,15 +2,19 @@ package utils
 
 import (
 	"errors"
+
+	"github.com/mr-tron/base58"
+)
+
+const (
+	IndyIdLength = 16
 )
 
 func ValidateID(id string) error {
-	isValidId := len(id) == 16 && IsValidBase58(id) ||
-		len(id) == 32 && IsValidBase58(id) ||
-		IsValidUUID(id)
+	isValidId := IsValidIndyId(id) || IsValidUUID(id)
 
 	if !isValidId {
-		return errors.New("unique id should be one of: 16 symbols base58 string, 32 symbols base58 string, or UUID")
+		return errors.New("unique id should be one of: 16 bytes of decoded base58 string or UUID")
 	}
 
 	return nil
@@ -19,6 +23,14 @@ func ValidateID(id string) error {
 func IsValidID(id string) bool {
 	err := ValidateID(id)
 	return err == nil
+}
+
+func IsValidIndyId(data string) bool {
+	bytes, err := base58.Decode(data)
+	if err != nil {
+		return false
+	}
+	return len(bytes) == IndyIdLength
 }
 
 // Normalization

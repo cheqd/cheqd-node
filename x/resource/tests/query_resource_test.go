@@ -36,7 +36,7 @@ var _ = Describe("Query Collection Resources", func() {
 	})
 
 	It("Returns error if collection does not exist", func() {
-		nonExistingCollection := cheqdsetup.GenerateDID(cheqdsetup.Base58_16chars)
+		nonExistingCollection := cheqdsetup.GenerateDID(cheqdsetup.Base58_16bytes)
 
 		_, err := setup.QueryResource(nonExistingCollection, resource.Resource.Header.Id)
 		Expect(err.Error()).To(ContainSubstring("DID Doc not found"))
