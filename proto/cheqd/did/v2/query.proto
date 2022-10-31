@@ -5,7 +5,7 @@ package cheqd.did.v2;
 import "google/api/annotations.proto";
 import "cheqd/did/v2/diddoc.proto";
 
-option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types/v2";
+option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
 
 service Query {
 	rpc DidDoc(QueryGetDidDocRequest) returns (QueryGetDidDocResponse) {

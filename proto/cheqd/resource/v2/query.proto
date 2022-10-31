@@ -5,7 +5,7 @@ package cheqd.resource.v2;
 import "google/api/annotations.proto";
 import "cheqd/resource/v2/resource.proto";
 
-option go_package = "github.com/cheqd/cheqd-node/x/resource/types/v2";
+option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
 
 service Query {
   rpc Resource(QueryGetResourceRequest) returns (QueryGetResourceResponse) {

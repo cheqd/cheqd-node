@@ -5,7 +5,7 @@ package cheqd.resource.v2;
 import "cheqd/did/v2/tx.proto";
 import "cheqd/resource/v2/resource.proto";
 
-option go_package = "github.com/cheqd/cheqd-node/x/resource/types/v2";
+option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
 
 // Msg defines the Msg service.
 service Msg {
