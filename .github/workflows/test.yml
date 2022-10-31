@@ -123,7 +123,7 @@ jobs:
       run: |
         export BUILD_IMAGE=ghcr.io/cheqd/cheqd-node:latest
         docker tag ${BUILD_IMAGE} cheqd-node:latest
-        docker cp $(docker create cheqd-node:latest):/bin/cheqd-noded ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
+        docker cp "$(docker create cheqd-node:latest)":/bin/cheqd-noded ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
 
     - name: Restore binary permissions
       run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded

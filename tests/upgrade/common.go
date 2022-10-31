@@ -59,7 +59,7 @@ var (
 
 // Migration
 var (
-	QueriedDidDoc cheqdtypes.Did
+	QueriedDidDoc   cheqdtypes.Did
 	QueriedResource resourcetypes.Resource
 )
 

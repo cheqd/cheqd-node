@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/cheqd/cheqd-node/app/ante"
+	migrations "github.com/cheqd/cheqd-node/app/migrations"
 	appparams "github.com/cheqd/cheqd-node/app/params"
 	"github.com/cheqd/cheqd-node/x/cheqd"
 	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
@@ -107,7 +108,6 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
-	migrations "github.com/cheqd/cheqd-node/app/migrations"
 )
 
 var (
