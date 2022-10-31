@@ -2,7 +2,7 @@ package cli
 
 import (
 	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 )
 
 func Query(container string, binary string, module, query string, queryArgs ...string) (string, error) {
@@ -19,7 +19,7 @@ func Query(container string, binary string, module, query string, queryArgs ...s
 	return LocalnetExecExec(container, args...)
 }
 
-func QueryUpgradeProposal(container string) (govtypes.QueryProposalResponse, error) {
+func QueryUpgradeProposal(container string) (govtypesv1.QueryProposalResponse, error) {
 	args := append([]string{
 		CLI_BINARY_NAME,
 		"query", "gov", "proposal", "1",
@@ -27,14 +27,14 @@ func QueryUpgradeProposal(container string) (govtypes.QueryProposalResponse, err
 
 	out, err := LocalnetExecExec(container, args...)
 	if err != nil {
-		return govtypes.QueryProposalResponse{}, err
+		return govtypesv1.QueryProposalResponse{}, err
 	}
 
-	var resp govtypes.QueryProposalResponse
+	var resp govtypesv1.QueryProposalResponse
 
 	err = integrationhelpers.Codec.UnmarshalJSON([]byte(out), &resp)
 	if err != nil {
-		return govtypes.QueryProposalResponse{}, err
+		return govtypesv1.QueryProposalResponse{}, err
 	}
 	return resp, nil
 }
