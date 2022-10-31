@@ -99,12 +99,11 @@ var _ = Describe("Upgrade - Execute", func() {
 		})
 
 		It("should ensure the localnet environment is running @new version", func() {
-			By("setting the localnet environment variables to the new version")
-			err := cli.SetNewDockerComposeEnv()
-			Expect(err).To(BeNil())
+			By("replacing the binary with the new version")
+			_, err := cli.ReplaceBinaryWithPermissions("old-to-new")
 
-			By("executing the container up command")
-			_, err = cli.LocalnetExecUp()
+			By("executing the container up command for the new version")
+			_, err = cli.LocalnetExecUpWithNewImage()
 			Expect(err).To(BeNil())
 
 			By("checking if the localnet environment is running via health check")
@@ -121,9 +120,5 @@ var _ = Describe("Upgrade - Execute", func() {
 		})
 
 		fmt.Printf("%s Upgrade successful.", cli.GREEN)
-	})
-
-	It("should upgrade", func() {
-		Expect(true).To(BeTrue())
 	})
 })

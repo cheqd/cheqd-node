@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 
@@ -11,7 +12,11 @@ const (
 	DOCKER_LOCALNET         = "localnet"
 	DOCKER_LOCALNET_PATH    = "../../../docker/localnet"
 	DOCKER_COMPOSE          = "docker compose"
-	DOCKER_IN_LOCALNET_PATH = DOCKER_LOCALNET_PATH + "/" + DOCKER_COMPOSE
+	DOCKER_LOAD             = "docker load"
+	DOCKER_COMPOSE_IN_LOCALNET_PATH = DOCKER_LOCALNET_PATH + "/" + DOCKER_COMPOSE
+	DOCKER_LOAD_IN_LOCALNET_PATH    = DOCKER_LOCALNET_PATH + "/" + DOCKER_LOAD
+	DOCKER_IMAGE_NAME       = "cheqd-node-image.tar"
+	RUNNER_BIN_DIR		    = "$(echo $RUNNER_BIN_DIR)"
 	OPERATOR0               = "operator0"
 	OPERATOR1               = "operator1"
 	OPERATOR2               = "operator2"
@@ -31,8 +36,44 @@ var OperatorAccounts OperatorAccount = OperatorAccount{
 	VALIDATOR3: OPERATOR3,
 }
 
+var (
+	DOCKER_LOAD_IMAGE_ARGS = []string{
+		"-i", DOCKER_IMAGE_NAME,
+	}
+	RENAME_BINARY_CURRENT_TO_OLD_ARGS = []string{
+		"cp",
+		"-f",
+		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME,
+		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME + "-old",
+	}
+	RENAME_BINARY_NEW_TO_CURRENT_ARGS = []string{
+		"cp",
+		"-f",
+		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME + "-new",
+		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME,
+	}
+	RENAME_BINARY_OLD_TO_CURRENT_ARGS = []string{
+		"cp",
+		"-f",
+		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME + "-old",
+		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME,
+	}
+	RENAME_BINARY_CURRENT_TO_NEW_ARGS = []string{
+		"cp",
+		"-f",
+		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME,
+		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME + "-new",
+	}
+	RESTORE_BINARY_PERMISSIONS_ARGS = []string{
+		"sudo",
+		"chmod",
+		"-x",
+		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME,
+	}
+)
+
 func LocalnetExec(args ...string) (string, error) {
-	cmd := exec.Command(DOCKER_IN_LOCALNET_PATH, args...)
+	cmd := exec.Command(DOCKER_COMPOSE_IN_LOCALNET_PATH, args...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return "", sdkerrors.Wrap(err, string(out))
@@ -46,11 +87,32 @@ func LocalnetExecExec(container string, args ...string) (string, error) {
 }
 
 func LocalnetExecUp() (string, error) {
-	return LocalnetExec("up", "-d")
+	return LocalnetExec("up", "--detach", "--no-build")
 }
 
 func LocalnetExecDown() (string, error) {
 	return LocalnetExec("down")
+}
+
+func LocalnetLoadImage(args ...string) (string, error) {
+	cmd := exec.Command(DOCKER_LOAD_IN_LOCALNET_PATH)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return "", sdkerrors.Wrap(err, string(out))
+	}
+	return string(out), err
+}
+
+func LocalnetExecUpWithNewImage() (string, error) {
+	err := SetNewDockerComposeEnv()
+	if err != nil {
+		return "", err
+	}
+	_, err = LocalnetLoadImage(DOCKER_LOAD_IMAGE_ARGS...)
+	if err != nil {
+		return "", err
+	}
+	return LocalnetExecUp()
 }
 
 func SetOldDockerComposeEnv() error {
@@ -63,4 +125,31 @@ func SetNewDockerComposeEnv() error {
 	os.Setenv("CHEQD_IMAGE_TO", CHEQD_IMAGE_TO)
 	os.Setenv("CHEQD_TAG_TO", CHEQD_TAG_TO)
 	return nil
+}
+
+func ReplaceBinaryWithPermissions(action string) (string, error) {
+	switch(action) {
+	case "old-to-new":
+		_, err := Exec(RENAME_BINARY_CURRENT_TO_OLD_ARGS...)
+		if err != nil {
+			return "", err
+		}
+		_, err = Exec(RENAME_BINARY_NEW_TO_CURRENT_ARGS...)
+		if err != nil {
+			return "", err
+		}
+		return Exec(RESTORE_BINARY_PERMISSIONS_ARGS...)
+	case "new-to-old":
+		_, err := Exec(RENAME_BINARY_CURRENT_TO_NEW_ARGS...)
+		if err != nil {
+			return "", err
+		}
+		_, err = Exec(RENAME_BINARY_OLD_TO_CURRENT_ARGS...)
+		if err != nil {
+			return "", err
+		}
+		return Exec(RESTORE_BINARY_PERMISSIONS_ARGS...)
+	default:
+		return "", fmt.Errorf("invalid action")
+	}
 }
