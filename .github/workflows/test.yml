@@ -109,11 +109,13 @@ jobs:
         uses: actions/download-artifact@v3
         id: download
         with:
-          name: cheqd-noded-new
+          name: cheqd-noded
           path: ${{ env.RUNNER_BIN_DIR }}
+        run: |
+          sudo mv ${{ env.RUNNER_BIN_DIR }}/cheqd-noded ${{ env.RUNNER_BIN_DIR }}/cheqd-noded-next
 
       - name: Restore binary next version permissions
-        run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded-new
+        run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded-next
 
       - name: Install binary @latest release
         run: |

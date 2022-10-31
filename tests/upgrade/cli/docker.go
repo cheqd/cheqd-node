@@ -40,29 +40,25 @@ var (
 	DOCKER_LOAD_IMAGE_ARGS = []string{
 		"-i", DOCKER_IMAGE_NAME,
 	}
-	RENAME_BINARY_CURRENT_TO_OLD_ARGS = []string{
-		"cp",
-		"-f",
+	RENAME_BINARY_CURRENT_TO_PREVIOUS_ARGS = []string{
+		"mv",
 		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME,
-		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME + "-old",
+		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME + "-previous",
 	}
-	RENAME_BINARY_NEW_TO_CURRENT_ARGS = []string{
-		"cp",
-		"-f",
-		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME + "-new",
+	RENAME_BINARY_NEXT_TO_CURRENT_ARGS = []string{
+		"mv",
+		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME + "-next",
 		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME,
 	}
-	RENAME_BINARY_OLD_TO_CURRENT_ARGS = []string{
-		"cp",
-		"-f",
-		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME + "-old",
+	RENAME_BINARY_PREVIOUS_TO_CURRENT_ARGS = []string{
+		"mv",
+		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME + "-previous",
 		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME,
 	}
-	RENAME_BINARY_CURRENT_TO_NEW_ARGS = []string{
-		"cp",
-		"-f",
+	RENAME_BINARY_CURRENT_TO_NEXT_ARGS = []string{
+		"mv",
 		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME,
-		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME + "-new",
+		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME + "-next",
 	}
 	RESTORE_BINARY_PERMISSIONS_ARGS = []string{
 		"sudo",
@@ -129,22 +125,22 @@ func SetNewDockerComposeEnv() error {
 
 func ReplaceBinaryWithPermissions(action string) (string, error) {
 	switch action {
-	case "old-to-new":
-		_, err := Exec(RENAME_BINARY_CURRENT_TO_OLD_ARGS...)
+	case "previous-to-next":
+		_, err := Exec(RENAME_BINARY_CURRENT_TO_PREVIOUS_ARGS...)
 		if err != nil {
 			return "", err
 		}
-		_, err = Exec(RENAME_BINARY_NEW_TO_CURRENT_ARGS...)
+		_, err = Exec(RENAME_BINARY_NEXT_TO_CURRENT_ARGS...)
 		if err != nil {
 			return "", err
 		}
 		return Exec(RESTORE_BINARY_PERMISSIONS_ARGS...)
-	case "new-to-old":
-		_, err := Exec(RENAME_BINARY_CURRENT_TO_NEW_ARGS...)
+	case "next-to-previous":
+		_, err := Exec(RENAME_BINARY_CURRENT_TO_NEXT_ARGS...)
 		if err != nil {
 			return "", err
 		}
-		_, err = Exec(RENAME_BINARY_OLD_TO_CURRENT_ARGS...)
+		_, err = Exec(RENAME_BINARY_PREVIOUS_TO_CURRENT_ARGS...)
 		if err != nil {
 			return "", err
 		}

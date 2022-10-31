@@ -100,7 +100,7 @@ var _ = Describe("Upgrade - Execute", func() {
 
 		It("should ensure the localnet environment is running @new version", func() {
 			By("replacing the binary with the new version")
-			_, err := cli.ReplaceBinaryWithPermissions("old-to-new")
+			_, err := cli.ReplaceBinaryWithPermissions("previous-to-next")
 
 			By("executing the container up command for the new version")
 			_, err = cli.LocalnetExecUpWithNewImage()
