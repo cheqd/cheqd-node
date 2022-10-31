@@ -9,22 +9,22 @@ import (
 )
 
 const (
-	DOCKER_LOCALNET         = "localnet"
-	DOCKER_LOCALNET_PATH    = "../../../docker/localnet"
-	DOCKER_COMPOSE          = "docker compose"
-	DOCKER_LOAD             = "docker load"
+	DOCKER_LOCALNET                 = "localnet"
+	DOCKER_LOCALNET_PATH            = "../../../docker/localnet"
+	DOCKER_COMPOSE                  = "docker compose"
+	DOCKER_LOAD                     = "docker load"
 	DOCKER_COMPOSE_IN_LOCALNET_PATH = DOCKER_LOCALNET_PATH + "/" + DOCKER_COMPOSE
 	DOCKER_LOAD_IN_LOCALNET_PATH    = DOCKER_LOCALNET_PATH + "/" + DOCKER_LOAD
-	DOCKER_IMAGE_NAME       = "cheqd-node-image.tar"
-	RUNNER_BIN_DIR		    = "$(echo $RUNNER_BIN_DIR)"
-	OPERATOR0               = "operator0"
-	OPERATOR1               = "operator1"
-	OPERATOR2               = "operator2"
-	OPERATOR3               = "operator3"
-	VALIDATOR0              = "validator-0"
-	VALIDATOR1              = "validator-1"
-	VALIDATOR2              = "validator-2"
-	VALIDATOR3              = "validator-3"
+	DOCKER_IMAGE_NAME               = "cheqd-node-image.tar"
+	RUNNER_BIN_DIR                  = "$(echo $RUNNER_BIN_DIR)"
+	OPERATOR0                       = "operator0"
+	OPERATOR1                       = "operator1"
+	OPERATOR2                       = "operator2"
+	OPERATOR3                       = "operator3"
+	VALIDATOR0                      = "validator-0"
+	VALIDATOR1                      = "validator-1"
+	VALIDATOR2                      = "validator-2"
+	VALIDATOR3                      = "validator-3"
 )
 
 type OperatorAccount map[string]string
@@ -128,7 +128,7 @@ func SetNewDockerComposeEnv() error {
 }
 
 func ReplaceBinaryWithPermissions(action string) (string, error) {
-	switch(action) {
+	switch action {
 	case "old-to-new":
 		_, err := Exec(RENAME_BINARY_CURRENT_TO_OLD_ARGS...)
 		if err != nil {
