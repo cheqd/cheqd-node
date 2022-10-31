@@ -13,8 +13,6 @@ import (
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	"github.com/google/uuid"
 	"github.com/multiformats/go-multibase"
-
-	. "github.com/onsi/ginkgo/v2"
 )
 
 // Pre
@@ -26,9 +24,10 @@ var (
 )
 
 var (
-	ResourcePayload               resourcetypes.MsgCreateResourcePayload
-	ResourceFile, ResourceFileErr = integrationtestdata.CreateTestJson(GinkgoT().TempDir())
-	ResourceErr                   = GenerateResource(&ResourcePayload)
+	ResourcePayload resourcetypes.MsgCreateResourcePayload
+	ResourceFile    string
+	ResourceFileErr error
+	ResourceErr     = GenerateResource(&ResourcePayload)
 )
 
 var (
@@ -46,9 +45,10 @@ var (
 )
 
 var (
-	PostResourcePayload                   resourcetypes.MsgCreateResourcePayload
-	PostResourceFile, PostResourceFileErr = integrationtestdata.CreateTestJson(GinkgoT().TempDir())
-	PostResourceErr                       error
+	PostResourcePayload resourcetypes.MsgCreateResourcePayload
+	PostResourceFile    string
+	PostResourceFileErr error
+	PostResourceErr     error
 )
 
 var (

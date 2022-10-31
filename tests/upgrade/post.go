@@ -4,7 +4,8 @@ package upgrade
 
 import (
 	"fmt"
-	"os"
+
+	integrationtestdata "github.com/cheqd/cheqd-node/tests/integration/testdata"
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/cli"
 	migration "github.com/cheqd/cheqd-node/tests/upgrade/migration"
 	. "github.com/onsi/ginkgo/v2"
@@ -15,9 +16,6 @@ import (
 // Idiomatically, it is called from the upgrade_suite_test.go file, in the BeforeSuite() function.
 // We will keep both AfterSuite() and Post() callback here for easiness of conceptual understanding.
 var _ = AfterSuite(func() {
-	DeferCleanup(func() error {
-		return os.RemoveAll(GinkgoT().TempDir())
-	})
 	err := Post()
 	Expect(err).To(BeNil())
 
@@ -45,6 +43,7 @@ func Post() error {
 
 	By("Ensuring the CreateResource Tx is successful for a new Resource")
 	PostResourceErr = GenerateResource(&PostResourcePayload)
+	PostResourceFile, PostResourceFileErr = integrationtestdata.CreateTestJson(GinkgoT().TempDir())
 	Expect(PostResourceErr).To(BeNil())
 	resp, err = cli.CreateResource(PostResourcePayload.CollectionId, PostResourcePayload.Id, PostResourcePayload.Name, PostResourcePayload.ResourceType, PostResourceFile, PostSignInputs, cli.VALIDATOR1)
 	Expect(err).To(BeNil())

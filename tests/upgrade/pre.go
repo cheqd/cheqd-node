@@ -5,6 +5,7 @@ package upgrade
 import (
 	"fmt"
 
+	integrationtestdata "github.com/cheqd/cheqd-node/tests/integration/testdata"
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/cli"
 	migration "github.com/cheqd/cheqd-node/tests/upgrade/migration"
 	. "github.com/onsi/ginkgo/v2"
@@ -31,6 +32,7 @@ func Pre() error {
 	Expect(err).To(BeNil())
 	Expect(res.Code).To(BeEquivalentTo(0))
 
+	ResourceFile, ResourceFileErr := integrationtestdata.CreateTestJson(GinkgoT().TempDir())
 	By("Ensuring the ResourceFileErr in memory is nil")
 	Expect(ResourceFileErr).To(BeNil())
 
