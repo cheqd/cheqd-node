@@ -17,8 +17,10 @@ var _ = Describe("DID checks", func() {
 		func(expected bool, did string) {
 			Expect(IsValidID(did)).To(Equal(expected))
 		},
-		Entry("Valid indy-style identifier", true, "zABCDEFG123456789abcd"),
+		Entry("Valid indy-style identifier 22 chars", true, "FgvC1XcJMRcdRz243A38s5"),
+		Entry("Valid indy-style identifier 21 chars", true, "esUzsmZQKCjHHhdkQ5vJA"),
 		Entry("Valid UUID", true, "3b9b8eec-5b5d-4382-86d8-9185126ff130"),
+		Entry("Not valid indy-style identifier length", false, "esUzsmZQKCjHHhdkQ5vJ"),
 		Entry("Not valid, not base58 symbols", false, "12345678abcdIlO0"),
 		Entry("Not valid, length", false, "sdf"),
 		Entry("Not valid, length and format", false, "sdf:sdf"),

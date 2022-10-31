@@ -31,11 +31,11 @@ var _ = Describe("Service tests", func() {
 			"Positive case",
 			TestCaseServiceStruct{
 				service: &Service{
-					Id:              "did:cheqd:zABCDEFG123456789abcd#service1",
+					Id:              "did:cheqd:aABCDEFG123456789abcd#service1",
 					Type:            "DIDCommMessaging",
 					ServiceEndpoint: "endpoint",
 				},
-				baseDid:           "did:cheqd:zABCDEFG123456789abcd",
+				baseDid:           "did:cheqd:aABCDEFG123456789abcd",
 				allowedNamespaces: []string{""},
 				isValid:           true,
 				errorMsg:          "",

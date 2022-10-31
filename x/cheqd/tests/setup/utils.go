@@ -3,22 +3,24 @@ package setup
 import (
 	"crypto/ed25519"
 	"crypto/rand"
-	mathrand "math/rand"
 
-	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	"github.com/google/uuid"
+	"github.com/mr-tron/base58"
 	"github.com/multiformats/go-multibase"
 	. "github.com/onsi/gomega"
 )
 
 var base58Runes = []rune("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz")
 
-func rand16BytesBase58Seq(n int) string {
-	b := []rune{}
-	for !utils.IsValidBase58Length(string(b)) {
-		b = append(b, base58Runes[mathrand.Intn(len(base58Runes))])
+func randBase58Seq(bytes int) string {
+	b := make([]byte, bytes)
+
+	_, err := rand.Read(b)
+	if err != nil {
+		panic(err)
 	}
-	return string(b)
+
+	return base58.Encode(b)
 }
 
 type IDType int
@@ -33,7 +35,7 @@ func GenerateDID(idtype IDType) string {
 
 	switch idtype {
 	case Base58_16bytes:
-		return prefix + rand16BytesBase58Seq(16)
+		return prefix + randBase58Seq(16)
 	case UUID:
 		return prefix + uuid.NewString()
 	default:

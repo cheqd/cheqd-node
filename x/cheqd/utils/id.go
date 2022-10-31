@@ -7,11 +7,11 @@ import (
 )
 
 const (
-	Base58Length = 16
+	IndyIdLength = 16
 )
 
 func ValidateID(id string) error {
-	isValidId := IsValidBase58(id) && IsValidBase58Length(id) || IsValidUUID(id)
+	isValidId := IsValidIndyId(id) || IsValidUUID(id)
 
 	if !isValidId {
 		return errors.New("unique id should be one of: 16 bytes of decoded base58 string or UUID")
@@ -25,12 +25,12 @@ func IsValidID(id string) bool {
 	return err == nil
 }
 
-func IsValidBase58Length(data string) bool {
+func IsValidIndyId(data string) bool {
 	bytes, err := base58.Decode(data)
 	if err != nil {
 		return false
 	}
-	return len(bytes) == Base58Length
+	return len(bytes) == IndyIdLength
 }
 
 // Normalization
