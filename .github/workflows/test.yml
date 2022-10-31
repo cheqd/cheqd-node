@@ -124,7 +124,7 @@ jobs:
           docker pull $BUILD_IMAGE
           docker tag ${BUILD_IMAGE} cheqd-node:latest
           docker cp "$(docker create cheqd-node:latest)":/bin/cheqd-noded ${{ env.RUNNER_BIN_DIR }}
-          ls -la ${{ env.RUNNER_BIN_DIR }} | grep cheqd-noded
+          ls -la ${{ env.RUNNER_BIN_DIR }}
 
       - name: Restore binary permissions
         run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
