@@ -111,8 +111,9 @@ jobs:
         with:
           name: cheqd-noded
           path: ${{ env.RUNNER_BIN_DIR }}
-        run: |
-          sudo mv ${{ env.RUNNER_BIN_DIR }}/cheqd-noded ${{ env.RUNNER_BIN_DIR }}/cheqd-noded-next
+
+      - name: Rename binary to next
+        run: mv ${{ env.RUNNER_BIN_DIR }}/cheqd-noded ${{ env.RUNNER_BIN_DIR }}/cheqd-noded-next
 
       - name: Restore binary next version permissions
         run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded-next
