@@ -16,6 +16,11 @@ type SignInput struct {
 	Key                  ed25519.PrivateKey
 }
 
+type MinimalDidInfo struct {
+	Msg *types.MsgCreateDidPayload
+	SignInput SignInput
+}
+
 type DidInfo struct {
 	Msg          *types.MsgCreateDidPayload
 	Did          string

@@ -1,0 +1,25 @@
+{
+    "context": [],
+    "id": "did:cheqd:testnet:z6LNquFfzPNhCQ8n",
+    "controller": [
+        "did:cheqd:testnet:z6LNquFfzPNhCQ8n"
+    ],
+    "authentication": [
+        "did:cheqd:testnet:z6LNquFfzPNhCQ8n#key-1"
+    ],
+    "assertionMethod": [],
+    "capabilityInvocation": [],
+    "capabilityDelegation": [],
+    "keyAgreement": [],
+    "alsoKnownAs": [],
+    "verificationMethod": [
+        {
+            "id": "did:cheqd:testnet:z6LNquFfzPNhCQ8n#key-1",
+            "type": "Ed25519VerificationKey2020",
+            "controller": "did:cheqd:testnet:z6LNquFfzPNhCQ8n",
+            "publicKeyMultibase": "z6LNquFfzPNhCQ8nbCWSMBQjosLT7ayEqGSYrN2Y1FdmS",
+            "publicKeyJwk": []
+        }
+    ],
+    "service": []
+}

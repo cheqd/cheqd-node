@@ -163,6 +163,10 @@ jobs:
         working-directory: ./..
         run: go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
+      #
+      # Pre-Generated Payloads in .json files
+      #
+
       - name: Run upgrade & migration tests
         working-directory: ./tests/upgrade
         run: ginkgo -r --tags upgrade --race

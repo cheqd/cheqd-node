@@ -1,0 +1,7 @@
+{
+    "collectionId": "z6LNquFfzPNhCQ8n",
+    "id": "7f2589aa-1279-4bd7-b704-f868772b460a",
+    "name": "Test Resource",
+    "resourceType": "test-resource-type",
+    "data": "{\"message\": \"hello world\"}"
+}

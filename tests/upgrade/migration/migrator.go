@@ -11,15 +11,17 @@ import (
 type MigrationScenario struct {
 	name     string
 	setup    func()
+	existing interface{}
 	expected interface{}
 	handler  func(ctx sdk.Context) error
 	validate func(actual interface{}) error
 }
 
-func NewMigrationScenario(name string, setup func(), expected interface{}, handler func(ctx sdk.Context) error, validate func(actual interface{}) error) MigrationScenario {
+func NewMigrationScenario(name string, setup func(), existing interface{}, expected interface{}, handler func(ctx sdk.Context) error, validate func(actual interface{}) error) MigrationScenario {
 	return MigrationScenario{
 		name:     name,
 		setup:    setup,
+		existing: existing,
 		expected: expected,
 		handler:  handler,
 		validate: validate,
@@ -32,6 +34,10 @@ func (m MigrationScenario) Name() string {
 
 func (m MigrationScenario) Setup() {
 	m.setup()
+}
+
+func (m MigrationScenario) Existing() interface{} {
+	return m.existing
 }
 
 func (m MigrationScenario) Expected() interface{} {
@@ -49,15 +55,17 @@ func (m MigrationScenario) Validate(actual interface{}) error {
 type CheqdMigrationScenario struct {
 	name     string
 	setup    func() cheqdtestssetup.TestSetup
+	existing cheqdtestssetup.MinimalDidInfo
 	expected cheqdtypes.Did
 	handler  func(ctx sdk.Context) error
 	validate func(actual cheqdtypes.Did) error
 }
 
-func NewCheqdMigrationScenario(name string, setup func() cheqdtestssetup.TestSetup, expected cheqdtypes.Did, handler func(ctx sdk.Context) error, validate func(actual cheqdtypes.Did) error) CheqdMigrationScenario {
+func NewCheqdMigrationScenario(name string, setup func() cheqdtestssetup.TestSetup, existing cheqdtestssetup.MinimalDidInfo, expected cheqdtypes.Did, handler func(ctx sdk.Context) error, validate func(actual cheqdtypes.Did) error) CheqdMigrationScenario {
 	return CheqdMigrationScenario{
 		name:     name,
 		setup:    setup,
+		existing: existing,
 		expected: expected,
 		handler:  handler,
 		validate: validate,
@@ -70,6 +78,10 @@ func (m CheqdMigrationScenario) Name() string {
 
 func (m CheqdMigrationScenario) Setup() cheqdtestssetup.TestSetup {
 	return m.setup()
+}
+
+func (m CheqdMigrationScenario) Existing() cheqdtestssetup.MinimalDidInfo {
+	return m.existing
 }
 
 func (m CheqdMigrationScenario) Expected() cheqdtypes.Did {
@@ -87,15 +99,19 @@ func (m CheqdMigrationScenario) Validate(actual cheqdtypes.Did) error {
 type ResourceMigrationScenario struct {
 	name     string
 	setup    func() resourcetestssetup.TestSetup
-	expected resourcetypes.Resource
+	existing resourcetypes.MsgCreateResourcePayload
+	didInfo  cheqdtestssetup.MinimalDidInfo
+	expected resourcetypes.ResourceHeader
 	handler  func(ctx sdk.Context) error
-	validate func(actual resourcetypes.Resource) error
+	validate func(actual resourcetypes.ResourceHeader) error
 }
 
-func NewResourceMigrationScenario(name string, setup func() resourcetestssetup.TestSetup, expected resourcetypes.Resource, handler func(ctx sdk.Context) error, validate func(actual resourcetypes.Resource) error) ResourceMigrationScenario {
+func NewResourceMigrationScenario(name string, setup func() resourcetestssetup.TestSetup, existing resourcetypes.MsgCreateResourcePayload, didInfo cheqdtestssetup.MinimalDidInfo, expected resourcetypes.ResourceHeader, handler func(ctx sdk.Context) error, validate func(actual resourcetypes.ResourceHeader) error) ResourceMigrationScenario {
 	return ResourceMigrationScenario{
 		name:     name,
 		setup:    setup,
+		existing: existing,
+		didInfo:  didInfo,
 		expected: expected,
 		handler:  handler,
 		validate: validate,
@@ -110,7 +126,15 @@ func (m ResourceMigrationScenario) Setup() resourcetestssetup.TestSetup {
 	return m.setup()
 }
 
-func (m ResourceMigrationScenario) Expected() resourcetypes.Resource {
+func (m ResourceMigrationScenario) Existing() resourcetypes.MsgCreateResourcePayload {
+	return m.existing
+}
+
+func (m ResourceMigrationScenario) DidInfo() cheqdtestssetup.MinimalDidInfo {
+	return m.didInfo
+}
+
+func (m ResourceMigrationScenario) Expected() resourcetypes.ResourceHeader {
 	return m.expected
 }
 
@@ -118,7 +142,7 @@ func (m ResourceMigrationScenario) Handler() func(ctx sdk.Context) error {
 	return m.handler
 }
 
-func (m ResourceMigrationScenario) Validate(actual resourcetypes.Resource) error {
+func (m ResourceMigrationScenario) Validate(actual resourcetypes.ResourceHeader) error {
 	return m.validate(actual)
 }
 
@@ -139,11 +163,23 @@ func NewCheqdMigrator(migrations []CheqdMigrationScenario) CheqdMigrator {
 func (m CheqdMigrator) Migrate(ctx sdk.Context) error {
 	for _, migration := range m.migrations {
 		setup := migration.Setup()
-		err := migration.Handler()(setup.SdkCtx)
+		_, err := setup.CreateDid(migration.existing.Msg, []cheqdtestssetup.SignInput{migration.existing.SignInput})
 		if err != nil {
 			return err
 		}
-		err = migration.Validate(migration.Expected())
+		err = migration.Handler()(setup.SdkCtx)
+		if err != nil {
+			return err
+		}
+		data, err := setup.Keeper.GetDid(&setup.SdkCtx, migration.existing.Msg.Id)
+		if err != nil {
+			return err
+		}
+		actual, err := data.UnpackDataAsDid()
+		if err != nil {
+			return err
+		}
+		err = migration.Validate(*actual)
 		if err != nil {
 			return err
 		}
@@ -164,11 +200,23 @@ func NewResourceMigrator(migrations []ResourceMigrationScenario) ResourceMigrato
 func (m ResourceMigrator) Migrate() error {
 	for _, migration := range m.migrations {
 		setup := migration.Setup()
-		err := migration.Handler()(setup.SdkCtx)
+		_, err := setup.CreateDid(migration.didInfo.Msg, []cheqdtestssetup.SignInput{migration.didInfo.SignInput})
 		if err != nil {
 			return err
 		}
-		err = migration.Validate(migration.Expected())
+		_, err = setup.CreateResource(&migration.existing, []cheqdtestssetup.SignInput{migration.didInfo.SignInput})
+		if err != nil {
+			return err
+		}
+		err = migration.Handler()(setup.SdkCtx)
+		if err != nil {
+			return err
+		}
+		actual, err := setup.QueryResource(migration.existing.CollectionId, migration.existing.Id)
+		if err != nil {
+			return err
+		}
+		err = migration.Validate(*actual.Resource.Header)
 		if err != nil {
 			return err
 		}

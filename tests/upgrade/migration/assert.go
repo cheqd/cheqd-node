@@ -15,8 +15,10 @@ func AssertHandlers() error {
 	// Essentially, we are matching the expected pre-generated payloads with the actual payloads that were generated during an actual migration scenario.
 
 	By("Ensuring the ResourceChecksum migration scenario is successful")
+	err := InitResourceChecksumScenario()
+	Expect(err).To(BeNil())
 	migrator := NewResourceMigrator([]ResourceMigrationScenario{ResourceChecksumScenario})
-	err := migrator.Migrate()
+	err = migrator.Migrate()
 	Expect(err).To(BeNil())
 
 	// TODO: Add more migration scenarios here.
