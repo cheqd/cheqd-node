@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	. "github.com/cheqd/cheqd-node/x/cheqd/utils"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -11,17 +12,18 @@ import (
 
 // GetDidCount get the total number of did
 func (k Keeper) GetDidCount(ctx *sdk.Context) uint64 {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidCountKey))
-	byteKey := types.KeyPrefix(types.DidCountKey)
-	bz := store.Get(byteKey)
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), StrBytes(types.DidCountKey))
+
+	key := StrBytes(types.DidCountKey)
+	valueBytes := store.Get(key)
 
 	// Count doesn't exist: no element
-	if bz == nil {
+	if valueBytes == nil {
 		return 0
 	}
 
 	// Parse bytes
-	count, err := strconv.ParseUint(string(bz), 10, 64)
+	count, err := strconv.ParseUint(string(valueBytes), 10, 64)
 	if err != nil {
 		// Panic because the count should be always formattable to iint64
 		panic("cannot decode count")
@@ -32,65 +34,57 @@ func (k Keeper) GetDidCount(ctx *sdk.Context) uint64 {
 
 // SetDidCount set the total number of did
 func (k Keeper) SetDidCount(ctx *sdk.Context, count uint64) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidCountKey))
-	byteKey := types.KeyPrefix(types.DidCountKey)
-	bz := []byte(strconv.FormatUint(count, 10))
-	store.Set(byteKey, bz)
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), StrBytes(types.DidCountKey))
+
+	key := StrBytes(types.DidCountKey)
+	valueBytes := []byte(strconv.FormatUint(count, 10))
+
+	store.Set(key, valueBytes)
 }
 
 // SetDid set a specific did in the store. Updates DID counter if the DID is new.
-func (k Keeper) SetDid(ctx *sdk.Context, stateValue *types.StateValue) error {
-	// Unpack
-	did, err := stateValue.UnpackDataAsDid()
-	if err != nil {
-		return err
-	}
-
+func (k Keeper) SetDid(ctx *sdk.Context, value *types.DidDocWithMetadata) error {
 	// Update counter
-	if !k.HasDid(ctx, did.Id) {
+	if !k.HasDid(ctx, value.DidDoc.Id) {
 		count := k.GetDidCount(ctx)
 		k.SetDidCount(ctx, count+1)
 	}
 
 	// Create the did
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
-	b := k.cdc.MustMarshal(stateValue)
-	store.Set(GetDidIDBytes(did.Id), b)
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), StrBytes(types.DidKey))
+
+	key := StrBytes(value.DidDoc.Id)
+	valueBytes := k.cdc.MustMarshal(value)
+	store.Set(key, valueBytes)
+
 	return nil
 }
 
 // GetDid returns a did from its id
-func (k Keeper) GetDid(ctx *sdk.Context, id string) (types.StateValue, error) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
+func (k Keeper) GetDid(ctx *sdk.Context, id string) (types.DidDocWithMetadata, error) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), StrBytes(types.DidKey))
 
 	if !k.HasDid(ctx, id) {
-		return types.StateValue{}, sdkerrors.ErrNotFound.Wrap(id)
+		return types.DidDocWithMetadata{}, sdkerrors.ErrNotFound.Wrap(id)
 	}
 
-	var value types.StateValue
-	bytes := store.Get(GetDidIDBytes(id))
-	if err := k.cdc.Unmarshal(bytes, &value); err != nil {
-		return types.StateValue{}, sdkerrors.Wrap(sdkerrors.ErrInvalidType, err.Error())
-	}
+	var value types.DidDocWithMetadata
+	key := store.Get(StrBytes(id))
+	k.cdc.MustUnmarshal(key, &value)
 
 	return value, nil
 }
 
 // HasDid checks if the did exists in the store
 func (k Keeper) HasDid(ctx *sdk.Context, id string) bool {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
-	return store.Has(GetDidIDBytes(id))
-}
-
-// GetDidIDBytes returns the byte representation of the ID
-func GetDidIDBytes(id string) []byte {
-	return []byte(id)
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), StrBytes(types.DidKey))
+	return store.Has(StrBytes(id))
 }
 
 // GetAllDid returns all did
 // Loads all DIDs in memory. Use only for genesis export.
-func (k Keeper) GetAllDid(ctx *sdk.Context) (list []types.StateValue) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.DidKey))
+func (k Keeper) GetAllDid(ctx *sdk.Context) (list []types.DidDocWithMetadata) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), StrBytes(types.DidKey))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 
 	defer func(iterator sdk.Iterator) {
@@ -101,7 +95,7 @@ func (k Keeper) GetAllDid(ctx *sdk.Context) (list []types.StateValue) {
 	}(iterator)
 
 	for ; iterator.Valid(); iterator.Next() {
-		var val types.StateValue
+		var val types.DidDocWithMetadata
 		k.cdc.MustUnmarshal(iterator.Value(), &val)
 		list = append(list, val)
 	}

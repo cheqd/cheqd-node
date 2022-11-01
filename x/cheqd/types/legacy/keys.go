@@ -1,4 +1,4 @@
-package types
+package legacy
 
 const (
 	// ModuleName defines the module name

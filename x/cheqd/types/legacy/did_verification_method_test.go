@@ -1,4 +1,4 @@
-package types_test
+package legacy_test
 
 import (
 	"crypto"

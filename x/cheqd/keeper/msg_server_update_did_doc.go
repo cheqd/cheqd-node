@@ -11,7 +11,7 @@ import (
 
 const UpdatedPostfix string = "-updated"
 
-func (k MsgServer) UpdateDid(goCtx context.Context, msg *types.MsgUpdateDid) (*types.MsgUpdateDidResponse, error) {
+func (k MsgServer) UpdateDidDoc(goCtx context.Context, msg *types.MsgUpdateDid) (*types.MsgUpdateDidResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Get sign bytes before modifying payload

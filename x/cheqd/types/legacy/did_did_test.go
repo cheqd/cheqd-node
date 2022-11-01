@@ -1,4 +1,4 @@
-package types_test
+package legacy_test
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	. "github.com/cheqd/cheqd-node/x/cheqd/types"
+	. "github.com/cheqd/cheqd-node/x/cheqd/types/v1"
 )
 
 var _ = Describe("DID Validation tests", func() {

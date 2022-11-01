@@ -8,7 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k MsgServer) CreateDid(goCtx context.Context, msg *types.MsgCreateDid) (*types.MsgCreateDidResponse, error) {
+func (k MsgServer) CreateDidDoc(goCtx context.Context, msg *types.MsgCreateDidDoc) (*types.MsgCreateDidDocResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Get sign bytes before modifying payload

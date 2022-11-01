@@ -1,4 +1,4 @@
-package types
+package legacy
 
 type IdentityMsg interface {
 	GetSignBytes() []byte

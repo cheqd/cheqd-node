@@ -96,3 +96,7 @@ func UniqueSorted(ls []string) []string {
 	sort.Strings(tmp_)
 	return tmp_
 }
+
+func StrBytes(p string) []byte {
+	return []byte(p)
+}

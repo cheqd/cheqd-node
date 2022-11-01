@@ -1,4 +1,4 @@
-package types_test
+package legacy_test
 
 import (
 	. "github.com/onsi/ginkgo/v2"
