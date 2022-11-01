@@ -1,32 +1,32 @@
-package types
+package v1
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
-var _ sdk.Msg = &MsgCreateDidDoc{}
+var _ sdk.Msg = &MsgCreateDid{}
 
-func NewMsgCreateDid(payload *MsgCreateDidDocPayload, signatures []*SignInfo) *MsgCreateDidDoc {
-	return &MsgCreateDidDoc{
+func NewMsgCreateDid(payload *MsgCreateDidPayload, signatures []*SignInfo) *MsgCreateDid {
+	return &MsgCreateDid{
 		Payload:    payload,
 		Signatures: signatures,
 	}
 }
 
-func (msg *MsgCreateDidDoc) Route() string {
+func (msg *MsgCreateDid) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgCreateDidDoc) Type() string {
+func (msg *MsgCreateDid) Type() string {
 	return "MsgCreateDid"
 }
 
-func (msg *MsgCreateDidDoc) GetSigners() []sdk.AccAddress {
+func (msg *MsgCreateDid) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{}
 }
 
-func (msg *MsgCreateDidDoc) GetSignBytes() []byte {
+func (msg *MsgCreateDid) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
