@@ -1,25 +1,26 @@
 package migration
 
 import (
-	"fmt"
-	"encoding/base64"
 	"bytes"
+	"encoding/base64"
+	"fmt"
 
 	appmigrations "github.com/cheqd/cheqd-node/app/migrations"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	cheqdtestssetup "github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
+	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	resourcetestssetup "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-var err error
-var didDoc cheqdtypes.MsgCreateDidPayload
-var didInfo cheqdtestssetup.MinimalDidInfo
-var existingChecksumResource resourcetypes.MsgCreateResourcePayload
-var expectedChecksumResourceHeader resourcetypes.ResourceHeader
-var ResourceChecksumScenario ResourceMigrationScenario
-
+var (
+	err                            error
+	didDoc                         cheqdtypes.MsgCreateDidPayload
+	didInfo                        cheqdtestssetup.MinimalDidInfo
+	existingChecksumResource       resourcetypes.MsgCreateResourcePayload
+	expectedChecksumResourceHeader resourcetypes.ResourceHeader
+	ResourceChecksumScenario       ResourceMigrationScenario
+)
 
 func InitResourceChecksumScenario() error {
 	err = Loader("generated/payload/diddoc_multibase_16.json", &didDoc)
@@ -47,7 +48,7 @@ func InitResourceChecksumScenario() error {
 		Msg: &didDoc,
 		SignInput: cheqdtestssetup.SignInput{
 			VerificationMethodId: signInput.VerificationMethodId,
-			Key: privateKey,
+			Key:                  privateKey,
 		},
 	}
 

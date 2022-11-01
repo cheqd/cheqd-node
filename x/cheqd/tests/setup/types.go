@@ -17,7 +17,7 @@ type SignInput struct {
 }
 
 type MinimalDidInfo struct {
-	Msg *types.MsgCreateDidPayload
+	Msg       *types.MsgCreateDidPayload
 	SignInput SignInput
 }
 
