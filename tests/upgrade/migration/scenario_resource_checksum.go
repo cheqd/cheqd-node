@@ -23,20 +23,20 @@ var (
 )
 
 func InitResourceChecksumScenario() error {
-	err = Loader("generated/payload/diddoc_multibase_16.json", &didDoc)
+	err = Loader(GENERATED_JSON_DIR + "/payload/existing/diddoc_multibase_16.json", &didDoc)
 	if err != nil {
 		return err
 	}
 	var signInput SignInput
-	err = Loader("generated/keys/signinput_multibase_16.json", &signInput)
+	err = Loader(GENERATED_JSON_DIR + "/keys/signinput_multibase_16.json", &signInput)
 	if err != nil {
 		return err
 	}
-	err = Loader("generated/payload/existing/resource_checksum.json", &existingChecksumResource)
+	err = Loader(GENERATED_JSON_DIR + "/payload/existing/resource_checksum.json", &existingChecksumResource)
 	if err != nil {
 		return err
 	}
-	err = Loader("generated/payload/expected/resource_checksum.json", &expectedChecksumResourceHeader)
+	err = Loader(GENERATED_JSON_DIR + "/payload/expected/resource_checksum.json", &expectedChecksumResourceHeader)
 	if err != nil {
 		return err
 	}
