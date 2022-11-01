@@ -31,7 +31,7 @@ var _ = Describe("SignInfo tests", func() {
 			TestCaseSignInfoStruct{
 				si: SignInfo{
 					VerificationMethodId: "did:cheqd:zABCDEFG123456789abcd#method1",
-					Signature:            "aaa=",
+					Signature:            []byte("aaa="),
 				},
 				isValid:  true,
 				errorMsg: "",
@@ -42,7 +42,7 @@ var _ = Describe("SignInfo tests", func() {
 			TestCaseSignInfoStruct{
 				si: SignInfo{
 					VerificationMethodId: "did:cheqd:zABCDEFG123456789abcd#service1",
-					Signature:            "DIDCommMessaging",
+					Signature:            []byte("DIDCommMessaging"),
 				},
 				allowedNamespaces: []string{"mainnet"},
 				isValid:           false,
@@ -54,7 +54,7 @@ var _ = Describe("SignInfo tests", func() {
 			TestCaseSignInfoStruct{
 				si: SignInfo{
 					VerificationMethodId: "did:cheqd:zABCDEFG123456789abcd#service1",
-					Signature:            "!@#",
+					Signature:            []byte("!@#"),
 				},
 				isValid:  false,
 				errorMsg: "signature: must be encoded in Base64.",
@@ -79,11 +79,11 @@ var _ = Describe("Full SignInfo duplicates tests", func() {
 				signInfos: []*SignInfo{
 					{
 						VerificationMethodId: "did:cheqd:zABCDEFG123456789abcd#method1",
-						Signature:            "aaa=",
+						Signature:            []byte("aaa="),
 					},
 					{
 						VerificationMethodId: "did:cheqd:zABCDEFG123456789abcd#method1",
-						Signature:            "bbb=",
+						Signature:            []byte("bbb="),
 					},
 				},
 				isValid: true,
@@ -95,11 +95,11 @@ var _ = Describe("Full SignInfo duplicates tests", func() {
 				signInfos: []*SignInfo{
 					{
 						VerificationMethodId: "did:cheqd:zABCDEFG123456789abcd#method1",
-						Signature:            "aaa=",
+						Signature:            []byte("aaa="),
 					},
 					{
 						VerificationMethodId: "did:cheqd:zABCDEFG123456789abcd#method1",
-						Signature:            "bbb=",
+						Signature:            []byte("bbb="),
 					},
 				},
 				isValid: true,
@@ -111,11 +111,11 @@ var _ = Describe("Full SignInfo duplicates tests", func() {
 				signInfos: []*SignInfo{
 					{
 						VerificationMethodId: "did:cheqd:zABCDEFG123456789abcd#method1",
-						Signature:            "aaa=",
+						Signature:            []byte("aaa="),
 					},
 					{
 						VerificationMethodId: "did:cheqd:zABCDEFG123456789abcd#method1",
-						Signature:            "aaa=",
+						Signature:            []byte("aaa="),
 					},
 				},
 				isValid: false,
@@ -127,15 +127,15 @@ var _ = Describe("Full SignInfo duplicates tests", func() {
 				signInfos: []*SignInfo{
 					{
 						VerificationMethodId: "did:cheqd:zABCDEFG123456789abcd#method1",
-						Signature:            "aaa=",
+						Signature:            []byte("aaa="),
 					},
 					{
 						VerificationMethodId: "did:cheqd:zABCDEFG123456789abcd#method1",
-						Signature:            "aaa=",
+						Signature:            []byte("aaa="),
 					},
 					{
 						VerificationMethodId: "did:cheqd:zABCDEFG123456789abcd#method1",
-						Signature:            "aaa=",
+						Signature:            []byte("aaa="),
 					},
 				},
 				isValid: false,

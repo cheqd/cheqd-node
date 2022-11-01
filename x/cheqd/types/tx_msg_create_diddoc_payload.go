@@ -1,10 +1,10 @@
-package v1
+package types
 
 import "github.com/cheqd/cheqd-node/x/cheqd/utils"
 
-var _ IdentityMsg = &MsgCreateDidPayload{}
+var _ IdentityMsg = &MsgCreateDidDocPayload{}
 
-func (msg *MsgCreateDidPayload) GetSignBytes() []byte {
+func (msg *MsgCreateDidDocPayload) GetSignBytes() []byte {
 	bytes, err := msg.Marshal()
 	if err != nil {
 		panic(err)
@@ -13,8 +13,8 @@ func (msg *MsgCreateDidPayload) GetSignBytes() []byte {
 	return bytes
 }
 
-func (msg *MsgCreateDidPayload) ToDid() Did {
-	return Did{
+func (msg *MsgCreateDidDocPayload) ToDid() DidDoc {
+	return DidDoc{
 		Context:              msg.Context,
 		Id:                   msg.Id,
 		Controller:           msg.Controller,
@@ -31,7 +31,7 @@ func (msg *MsgCreateDidPayload) ToDid() Did {
 
 // Validation
 
-func (msg MsgCreateDidPayload) Validate(allowedNamespaces []string) error {
+func (msg MsgCreateDidDocPayload) Validate(allowedNamespaces []string) error {
 	return msg.ToDid().Validate(allowedNamespaces)
 }
 
@@ -48,7 +48,7 @@ func ValidMsgCreateDidPayloadRule(allowedNamespaces []string) *CustomErrorRule {
 
 // Normalize
 
-func (msg *MsgCreateDidPayload) Normalize() {
+func (msg *MsgCreateDidDocPayload) Normalize() {
 	msg.Id = utils.NormalizeDID(msg.Id)
 	for _, vm := range msg.VerificationMethod {
 		vm.Controller = utils.NormalizeDID(vm.Controller)

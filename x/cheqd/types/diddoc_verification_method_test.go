@@ -1,4 +1,4 @@
-package v1_test
+package types_test
 
 import (
 	"crypto"
@@ -141,7 +141,7 @@ var _ = Describe("Verification Method tests", func() {
 					Id:                 "did:cheqd:zABCDEFG123456789abcd#qwe",
 					Type:               "JsonWebKey2020",
 					Controller:         "did:cheqd:zABCDEFG987654321abcd",
-					PublicKeyJwk:       NotValidPublicKeyJWK,
+					PublicKeyJwk:       InvalidPublicKeyJWK,
 					PublicKeyMultibase: "",
 				},
 				isValid:  false,

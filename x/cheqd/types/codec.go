@@ -11,7 +11,7 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	// Sdk messages
 	cdc.RegisterConcrete(&MsgCreateDidDoc{}, "did/CreateDid", nil)
 	cdc.RegisterConcrete(&MsgUpdateDidDoc{}, "did/UpdateDid", nil)
-	cdc.RegisterConcrete(&MsgDeactivateDid{}, "did/DeleteDid", nil)
+	cdc.RegisterConcrete(&MsgDeactivateDidDoc{}, "did/DeleteDid", nil)
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
@@ -19,11 +19,8 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreateDidDoc{},
 		&MsgUpdateDidDoc{},
+		&MsgDeactivateDidDoc{},
 	)
-
-	// State value data
-	registry.RegisterInterface("StateValueData", (*StateValueData)(nil))
-	registry.RegisterImplementations((*StateValueData)(nil), &Did{})
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }

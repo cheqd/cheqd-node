@@ -1,4 +1,4 @@
-package v1
+package types
 
 import (
 	"errors"
@@ -7,7 +7,7 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
-func NewService(id string, type_ string, serviceEndpoint string) *Service {
+func NewService(id string, type_ string, serviceEndpoint []string) *Service {
 	return &Service{
 		Id:              id,
 		Type:            type_,
@@ -33,7 +33,7 @@ func (s Service) Validate(baseDid string, allowedNamespaces []string) error {
 	return validation.ValidateStruct(&s,
 		validation.Field(&s.Id, validation.Required, IsDIDUrl(allowedNamespaces, Empty, Empty, Required), HasPrefix(baseDid)),
 		validation.Field(&s.Type, validation.Required, validation.Length(1, 255)),
-		validation.Field(&s.ServiceEndpoint, validation.Required),
+		validation.Field(&s.ServiceEndpoint, validation.Each(validation.Required)),
 	)
 }
 

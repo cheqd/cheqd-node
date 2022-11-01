@@ -6,9 +6,10 @@ import (
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
+	"github.com/mr-tron/base58"
 )
 
-func NewSignInfo(verificationMethodId string, signature string) *SignInfo {
+func NewSignInfo(verificationMethodId string, signature []byte) *SignInfo {
 	return &SignInfo{VerificationMethodId: verificationMethodId, Signature: signature}
 }
 
@@ -25,13 +26,20 @@ func GetSignInfoIds(infos []*SignInfo) []string {
 }
 
 func IsUniqueSignInfoList(infos []*SignInfo) bool {
-	tmp_ := map[SignInfo]bool{}
+	hash := func(si *SignInfo) string {
+		return si.VerificationMethodId + ":" + base58.Encode(si.Signature)
+	}
+
+	tmp_ := map[string]bool{}
 	for _, si := range infos {
-		_, found := tmp_[*si]
+		h := hash(si)
+
+		_, found := tmp_[h]
 		if found {
 			return false
 		}
-		tmp_[*si] = true
+
+		tmp_[h] = true
 	}
 	return true
 }

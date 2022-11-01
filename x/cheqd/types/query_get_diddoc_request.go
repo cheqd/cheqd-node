@@ -1,9 +1,9 @@
-package v1
+package types
 
 import (
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 )
 
-func (query *QueryGetDidRequest) Normalize() {
+func (query *QueryGetDidDocRequest) Normalize() {
 	query.Id = utils.NormalizeDID(query.Id)
 }

@@ -31,7 +31,7 @@ func (msg *MsgCreateDidDoc) GetSignBytes() []byte {
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgCreateDid) ValidateBasic() error {
+func (msg *MsgCreateDidDoc) ValidateBasic() error {
 	err := msg.Validate(nil)
 	if err != nil {
 		return ErrBasicValidation.Wrap(err.Error())
@@ -42,7 +42,7 @@ func (msg *MsgCreateDid) ValidateBasic() error {
 
 // Validate
 
-func (msg MsgCreateDid) Validate(allowedNamespaces []string) error {
+func (msg MsgCreateDidDoc) Validate(allowedNamespaces []string) error {
 	return validation.ValidateStruct(&msg,
 		validation.Field(&msg.Payload, validation.Required, ValidMsgCreateDidPayloadRule(allowedNamespaces)),
 		validation.Field(&msg.Signatures, IsUniqueSignInfoListByIdRule(), validation.Each(ValidSignInfoRule(allowedNamespaces))),
@@ -51,7 +51,7 @@ func (msg MsgCreateDid) Validate(allowedNamespaces []string) error {
 
 // Normalize
 
-func (msg *MsgCreateDid) Normalize() {
+func (msg *MsgCreateDidDoc) Normalize() {
 	msg.Payload.Normalize()
 	NormalizeSignInfoList(msg.Signatures)
 }

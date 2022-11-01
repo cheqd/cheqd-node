@@ -1,4 +1,4 @@
-package v1
+package types
 
 import (
 	"errors"
@@ -150,17 +150,12 @@ func IsMultibaseEncodedEd25519PubKey() *CustomErrorRule {
 
 func IsJWK() *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
-		casted, ok := value.([]*KeyValuePair)
+		casted, ok := value.(string)
 		if !ok {
 			panic("IsJWK must be only applied on KeyValuePair array properties")
 		}
 
-		keyJson, err := PubKeyJWKToJson(casted)
-		if err != nil {
-			return err
-		}
-
-		return utils.ValidateJWK(keyJson)
+		return utils.ValidateJWK(casted)
 	})
 }
 

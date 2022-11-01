@@ -1,4 +1,4 @@
-package v1_test
+package types_test
 
 import (
 	. "github.com/onsi/ginkgo/v2"
@@ -33,7 +33,7 @@ var _ = Describe("Service tests", func() {
 				service: &Service{
 					Id:              "did:cheqd:aABCDEFG123456789abcd#service1",
 					Type:            "DIDCommMessaging",
-					ServiceEndpoint: "endpoint",
+					ServiceEndpoint: []string{"endpoint1", "endpoint2"},
 				},
 				baseDid:           "did:cheqd:aABCDEFG123456789abcd",
 				allowedNamespaces: []string{""},
@@ -47,7 +47,7 @@ var _ = Describe("Service tests", func() {
 				service: &Service{
 					Id:              "did:cheqd:zABCDEFG123456789abcd#service1",
 					Type:            "DIDCommMessaging",
-					ServiceEndpoint: "endpoint",
+					ServiceEndpoint: []string{"endpoint"},
 				},
 				allowedNamespaces: []string{"mainnet"},
 				isValid:           false,
@@ -60,7 +60,7 @@ var _ = Describe("Service tests", func() {
 				service: &Service{
 					Id:              "did:cheqd:zABCDEFG123456789abcd#service1",
 					Type:            "DIDCommMessaging",
-					ServiceEndpoint: "endpoint",
+					ServiceEndpoint: []string{"endpoint"},
 				},
 				baseDid:  "did:cheqd:zABCDEFG987654321abcd",
 				isValid:  false,

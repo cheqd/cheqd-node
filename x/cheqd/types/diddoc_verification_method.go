@@ -1,43 +1,31 @@
-package v1
+package types
 
 import (
 	"crypto/ecdsa"
 	"crypto/ed25519"
 	"crypto/rsa"
+	"encoding/json"
 	"errors"
 	"fmt"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/multiformats/go-multibase"
 )
 
-const (
-	JsonWebKey2020             = "JsonWebKey2020"
-	Ed25519VerificationKey2020 = "Ed25519VerificationKey2020"
-)
-
 var SupportedMethodTypes = []string{
-	JsonWebKey2020,
-	Ed25519VerificationKey2020,
+	JsonWebKey2020{}.Type(),
+	Ed25519VerificationKey2020{}.Type(),
 }
 
-var JwkMethodTypes = []string{
-	JsonWebKey2020,
-}
-
-var MultibaseMethodTypes = []string{
-	Ed25519VerificationKey2020,
-}
-
-func NewVerificationMethod(id string, type_ string, controller string, publicKeyJwk []*KeyValuePair, publicKeyMultibase string) *VerificationMethod {
+func NewVerificationMethod(id string, type_ string, controller string, verificationMaterial string) *VerificationMethod {
 	return &VerificationMethod{
-		Id:                 id,
-		Type:               type_,
-		Controller:         controller,
-		PublicKeyJwk:       publicKeyJwk,
-		PublicKeyMultibase: publicKeyMultibase,
+		Id:                   id,
+		Type:                 type_,
+		Controller:           controller,
+		VerificationMaterial: verificationMaterial,
 	}
 }
 
@@ -67,22 +55,29 @@ func VerifySignature(vm VerificationMethod, message []byte, signature []byte) er
 	var verificationError error
 
 	switch vm.Type {
-	case Ed25519VerificationKey2020:
-		_, keyBytes, err := multibase.Decode(vm.PublicKeyMultibase)
+	case Ed25519VerificationKey2020{}.Type():
+		var ed25519VerificationKey2020 Ed25519VerificationKey2020
+		err := json.Unmarshal([]byte(vm.VerificationMaterial), &ed25519VerificationKey2020)
+		if err != nil {
+			return sdkerrors.Wrapf(err, "failed to unmarshal verification material for %s", vm.Id)
+		}
+
+		_, keyBytes, err := multibase.Decode(ed25519VerificationKey2020.PublicKeyMultibase)
 		if err != nil {
 			return err
 		}
 
 		verificationError = utils.VerifyED25519Signature(keyBytes, message, signature)
 
-	case JsonWebKey2020:
-		keyJson, err := PubKeyJWKToJson(vm.PublicKeyJwk)
+	case JsonWebKey2020{}.Type():
+		var jsonWebKey2020 JsonWebKey2020
+		err := json.Unmarshal([]byte(vm.VerificationMaterial), &jsonWebKey2020)
 		if err != nil {
-			return err
+			return sdkerrors.Wrapf(err, "failed to unmarshal verification material for %s", vm.Id)
 		}
 
 		var raw interface{}
-		err = jwk.ParseRawKey([]byte(keyJson), &raw)
+		err = jwk.ParseRawKey([]byte(jsonWebKey2020.PublicKeyJwk), &raw)
 		if err != nil {
 			return fmt.Errorf("can't parse jwk: %s", err.Error())
 		}
@@ -143,11 +138,11 @@ func (vm VerificationMethod) Validate(baseDid string, allowedNamespaces []string
 		validation.Field(&vm.Id, validation.Required, IsDIDUrl(allowedNamespaces, Empty, Empty, Required), HasPrefix(baseDid)),
 		validation.Field(&vm.Controller, validation.Required, IsDID(allowedNamespaces)),
 		validation.Field(&vm.Type, validation.Required, validation.In(utils.ToInterfaces(SupportedMethodTypes)...)),
-		validation.Field(&vm.PublicKeyJwk,
-			validation.When(utils.Contains(JwkMethodTypes, vm.Type), validation.Required, IsUniqueKeyValuePairListByKeyRule(), IsJWK()).Else(validation.Empty),
+		validation.Field(&vm.VerificationMaterial,
+			validation.When(vm.VerificationMaterial == Ed25519VerificationKey2020{}.Type(), validation.Required, ValidEd25519VerificationKey2020Rule()),
 		),
-		validation.Field(&vm.PublicKeyMultibase,
-			validation.When(utils.Contains(MultibaseMethodTypes, vm.Type), validation.Required, IsMultibase(), IsMultibaseEncodedEd25519PubKey()).Else(validation.Empty),
+		validation.Field(&vm.VerificationMaterial,
+			validation.When(vm.VerificationMaterial == JsonWebKey2020{}.Type(), validation.Required, ValidJsonWebKey2020Rule()),
 		),
 	)
 }
