@@ -5,13 +5,14 @@ import (
 
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	cheqdutils "github.com/cheqd/cheqd-node/x/cheqd/utils"
-	"github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	"github.com/cheqd/cheqd-node/x/resource/types"
 )
 
-func (m queryServer) AllResourceVersions(c context.Context, req *types.QueryGetAllResourceVersionsRequest) (*types.QueryGetAllResourceVersionsResponse, error) {
+func (q queryServer) ResourceMetadata(c context.Context, req *types.QueryGetResourceMetadataRequest) (*types.QueryGetResourceMetadataResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -21,16 +22,18 @@ func (m queryServer) AllResourceVersions(c context.Context, req *types.QueryGetA
 	ctx := sdk.UnwrapSDKContext(c)
 
 	// Validate corresponding DIDDoc exists
-	namespace := m.cheqdKeeper.GetDidNamespace(&ctx)
+	namespace := q.cheqdKeeper.GetDidNamespace(&ctx)
 	did := cheqdutils.JoinDID(cheqdtypes.DidMethod, namespace, req.CollectionId)
-	if !m.cheqdKeeper.HasDid(&ctx, did) {
+	if !q.cheqdKeeper.HasDidDoc(&ctx, did) {
 		return nil, cheqdtypes.ErrDidDocNotFound.Wrap(did)
 	}
 
-	// Get all versions
-	versions := m.GetAllResourceVersions(&ctx, req.CollectionId, req.Name, req.ResourceType)
+	metadata, err := q.GetResourceMetadata(&ctx, req.CollectionId, req.Id)
+	if err != nil {
+		return nil, err
+	}
 
-	return &types.QueryGetAllResourceVersionsResponse{
-		Resources: versions,
+	return &types.QueryGetResourceMetadataResponse{
+		Resource: &metadata,
 	}, nil
 }

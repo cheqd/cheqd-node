@@ -2,7 +2,6 @@ package setup
 
 import (
 	"crypto/ed25519"
-	"encoding/base64"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
@@ -19,7 +18,7 @@ func (s *TestSetup) CreateResource(payload *types.MsgCreateResourcePayload, sign
 
 		signatures = append(signatures, &cheqdtypes.SignInfo{
 			VerificationMethodId: input.VerificationMethodId,
-			Signature:            base64.StdEncoding.EncodeToString(signature),
+			Signature:            signature,
 		})
 	}
 

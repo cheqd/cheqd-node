@@ -16,19 +16,19 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func ExpectPayloadToMatchResource(payload *resourcetypes.MsgCreateResourcePayload, resource *resourcetypes.Resource) {
+func ExpectPayloadToMatchResource(payload *resourcetypes.MsgCreateResourcePayload, resource *resourcetypes.ResourceWithMetadata) {
 	// Provided header
-	Expect(payload.Id).To(Equal(resource.Header.Id))
-	Expect(payload.CollectionId).To(Equal(resource.Header.CollectionId))
-	Expect(payload.Name).To(Equal(resource.Header.Name))
-	Expect(payload.ResourceType).To(Equal(resource.Header.ResourceType))
+	Expect(payload.Id).To(Equal(resource.Metadata.Id))
+	Expect(payload.CollectionId).To(Equal(resource.Metadata.CollectionId))
+	Expect(payload.Name).To(Equal(resource.Metadata.Name))
+	Expect(payload.ResourceType).To(Equal(resource.Metadata.ResourceType))
 
 	// Generated header
 	hash := sha256.Sum256(payload.Data)
-	Expect(resource.Header.Checksum).To(Equal(hash[:]))
+	Expect(resource.Metadata.Checksum).To(Equal(hash[:]))
 
 	// Provided data
-	Expect(payload.Data).To(Equal(resource.Data))
+	Expect(payload.Data).To(Equal(resource.Resource.Data))
 }
 
 var _ = Describe("Create Resource Tests", func() {
@@ -88,7 +88,7 @@ var _ = Describe("Create Resource Tests", func() {
 			msg := resourcetypes.MsgCreateResourcePayload{
 				CollectionId: alice.CollectionId,
 				Id:           uuid.NewString(),
-				Name:         existingResource.Resource.Header.Name,
+				Name:         existingResource.Resource.Name,
 				ResourceType: CLSchemaType,
 				Data:         []byte(SchemaData),
 			}
@@ -101,7 +101,7 @@ var _ = Describe("Create Resource Tests", func() {
 			Expect(err).To(BeNil())
 
 			ExpectPayloadToMatchResource(&msg, created.Resource)
-			Expect(created.Resource.Header.PreviousVersionId).To(Equal(existingResource.Resource.Header.Id))
+			Expect(created.Resource.Metadata.PreviousVersionId).To(Equal(existingResource.Resource.Id))
 		})
 	})
 
@@ -121,7 +121,7 @@ var _ = Describe("Create Resource Tests", func() {
 		When("DIDDoc is deactivated", func() {
 			It("Should fail with error", func() {
 				// Deactivate DID
-				DeactivateMsg := &cheqdtypes.MsgDeactivateDidPayload{
+				DeactivateMsg := &cheqdtypes.MsgDeactivateDidDocPayload{
 					Id: alice.Did,
 				}
 
@@ -129,7 +129,7 @@ var _ = Describe("Create Resource Tests", func() {
 
 				res, err := setup.DeactivateDid(DeactivateMsg, signatures)
 				Expect(err).To(BeNil())
-				Expect(res.Metadata.Deactivated).To(BeTrue())
+				Expect(res.Value.Metadata.Deactivated).To(BeTrue())
 
 				// Create resource
 				_, err = setup.CreateResource(msg, []cheqdsetup.SignInput{alice.SignInput})
@@ -156,7 +156,7 @@ var _ = Describe("Create Resource Tests", func() {
 			created, err := setup.QueryResource(alice.CollectionId, UUIDString)
 			Expect(err).To(BeNil())
 
-			Expect(created.Resource.Header.Id).To(Equal(strings.ToLower(UUIDString)))
+			Expect(created.Resource.Metadata.Id).To(Equal(strings.ToLower(UUIDString)))
 
 			// check for already normalized UUID
 			created, err = setup.QueryResource(
@@ -164,7 +164,7 @@ var _ = Describe("Create Resource Tests", func() {
 				cheqdutils.NormalizeId(UUIDString))
 			Expect(err).To(BeNil())
 
-			Expect(created.Resource.Header.Id).To(Equal(strings.ToLower(UUIDString)))
+			Expect(created.Resource.Metadata.Id).To(Equal(strings.ToLower(UUIDString)))
 		})
 	})
 })

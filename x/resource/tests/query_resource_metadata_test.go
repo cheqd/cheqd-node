@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Query Resource", func() {
+var _ = Describe("Query Resource Metadata", func() {
 	var setup TestSetup
 	var alice cheqdsetup.CreatedDidInfo
 	var resource *types.MsgCreateResourceResponse
@@ -23,9 +23,9 @@ var _ = Describe("Query Resource", func() {
 	})
 
 	It("Works", func() {
-		resp, err := setup.QueryResource(alice.CollectionId, resource.Resource.Id)
+		metadata, err := setup.QueryResourceMetadata(alice.CollectionId, resource.Resource.Id)
 		Expect(err).To(BeNil())
-		Expect(resp.Resource.Metadata.Id).To(Equal(resource.Resource.Id))
+		Expect(metadata.Resource).To(Equal(resource.Resource))
 	})
 
 	It("Returns error if resource does not exist", func() {

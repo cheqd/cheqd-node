@@ -40,9 +40,9 @@ var _ = Describe("Query Collection Resources", func() {
 
 		ids := []string{versions.Resources[0].Id, versions.Resources[1].Id, versions.Resources[2].Id}
 
-		Expect(ids).To(ContainElement(res1v1.Resource.Header.Id))
-		Expect(ids).To(ContainElement(res1v2.Resource.Header.Id))
-		Expect(ids).To(ContainElement(res2v1.Resource.Header.Id))
+		Expect(ids).To(ContainElement(res1v1.Resource.Id))
+		Expect(ids).To(ContainElement(res1v2.Resource.Id))
+		Expect(ids).To(ContainElement(res2v1.Resource.Id))
 	})
 
 	It("Should work with capital letters in UUID", func() {
@@ -53,7 +53,7 @@ var _ = Describe("Query Collection Resources", func() {
 
 		ids := []string{versions.Resources[0].Id}
 
-		Expect(ids).To(ContainElement(resUUID.Resource.Header.Id))
+		Expect(ids).To(ContainElement(resUUID.Resource.Id))
 	})
 
 	It("Should work with capital letters in UUID. Ask with already normalized collectionId", func() {
@@ -65,6 +65,6 @@ var _ = Describe("Query Collection Resources", func() {
 
 		ids := []string{versions.Resources[0].Id}
 
-		Expect(ids).To(ContainElement(resUUID.Resource.Header.Id))
+		Expect(ids).To(ContainElement(resUUID.Resource.Id))
 	})
 })

@@ -17,15 +17,17 @@ func (msg *MsgCreateResourcePayload) GetSignBytes() []byte {
 	return bytes
 }
 
-func (msg *MsgCreateResourcePayload) ToResource() Resource {
-	return Resource{
-		Header: &ResourceHeader{
+func (msg *MsgCreateResourcePayload) ToResource() ResourceWithMetadata {
+	return ResourceWithMetadata{
+		Metadata: &Metadata{
 			CollectionId: cheqdutils.NormalizeId(msg.CollectionId),
 			Id:           cheqdutils.NormalizeUUID(msg.Id),
 			Name:         msg.Name,
 			ResourceType: msg.ResourceType,
 		},
-		Data: msg.Data,
+		Resource: &Resource{
+			Data: msg.Data,
+		},
 	}
 }
 
@@ -36,6 +38,7 @@ func (msg MsgCreateResourcePayload) Validate() error {
 		validation.Field(&msg.CollectionId, validation.Required, cheqdtypes.IsID()),
 		validation.Field(&msg.Id, validation.Required, cheqdtypes.IsUUID()),
 		validation.Field(&msg.Name, validation.Required, validation.Length(1, 64)),
+		validation.Field(&msg.Version, validation.Required, validation.Length(1, 64)),
 		validation.Field(&msg.ResourceType, validation.Required, validation.Length(1, 64)),
 		validation.Field(&msg.Data, validation.Required, validation.Length(1, 200*1024)), // 200KB
 	)

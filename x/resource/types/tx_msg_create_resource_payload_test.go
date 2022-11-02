@@ -22,6 +22,7 @@ var _ = Describe("TxMsgCreateResourcePayload", func() {
 					CollectionId: "zABCDEFG123456789abcd",
 					Id:           "ba62c728-cb15-498b-8e9e-9259cc242186",
 					Name:         "Test Resource",
+					Version:      "1.0",
 					ResourceType: "CL-Schema",
 					Data:         []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 				}
@@ -35,6 +36,7 @@ var _ = Describe("TxMsgCreateResourcePayload", func() {
 					CollectionId: "zABCDEFG123456789abcd",
 					Id:           "ba62c728-cb15-498b-8e9e-9259cc242186",
 					Name:         "Test Resource",
+					Version:      "1.0",
 					ResourceType: "",
 					Data:         []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 				}

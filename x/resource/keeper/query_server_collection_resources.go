@@ -23,7 +23,7 @@ func (m queryServer) CollectionResources(c context.Context, req *types.QueryGetC
 	// Validate corresponding DIDDoc exists
 	namespace := m.cheqdKeeper.GetDidNamespace(&ctx)
 	did := cheqdutils.JoinDID(cheqdtypes.DidMethod, namespace, req.CollectionId)
-	if !m.cheqdKeeper.HasDid(&ctx, did) {
+	if !m.cheqdKeeper.HasDidDoc(&ctx, did) {
 		return nil, cheqdtypes.ErrDidDocNotFound.Wrap(did)
 	}
 

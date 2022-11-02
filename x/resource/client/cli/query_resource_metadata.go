@@ -9,27 +9,25 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdGetAllResourceVersions() *cobra.Command {
+func CmdGetResourceMetadata() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "all-resource-versions [collectionId] [name] [resource type]",
-		Short: "Query all resource versions",
-		Args:  cobra.ExactArgs(3),
+		Use:   "resource-metadata [collectionId] [id]",
+		Short: "Query a resource",
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
 			queryClient := types.NewQueryClient(clientCtx)
 
 			collectionId := args[0]
-			name := args[1]
-			resourceType := args[2]
+			id := args[1]
 
-			params := &types.QueryGetAllResourceVersionsRequest{
+			params := &types.QueryGetResourceMetadataRequest{
 				CollectionId: collectionId,
-				Name:         name,
-				ResourceType: resourceType,
+				Id:           id,
 			}
 
-			resp, err := queryClient.AllResourceVersions(context.Background(), params)
+			resp, err := queryClient.ResourceMetadata(context.Background(), params)
 			if err != nil {
 				return err
 			}
