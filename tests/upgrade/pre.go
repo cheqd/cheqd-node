@@ -19,7 +19,8 @@ var _ = BeforeSuite(func() {
 	err := migration.AssertHandlers()
 	Expect(err).To(BeNil())
 
-	// Cleanup Docker Localnet Volumes
+	// TODO: Add localnet volume mount cleanup here.
+	// This allows for a clean start of the localnet containers.
 
 	err = Pre()
 	Expect(err).To(BeNil())

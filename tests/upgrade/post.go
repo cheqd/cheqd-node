@@ -21,6 +21,9 @@ var _ = AfterSuite(func() {
 
 	err = migration.AssertMigration(&QueriedDidDoc, &QueriedResource)
 	Expect(err).To(BeNil())
+
+	// TODO: Add localnet volume mount cleanup & cli binary cleanup
+	// This allows for a clean run of the upgrade test suite, even if the run is done locally.
 })
 
 func Post() error {
