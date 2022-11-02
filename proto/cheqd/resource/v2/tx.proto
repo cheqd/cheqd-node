@@ -18,12 +18,13 @@ message MsgCreateResource {
 }
 
 message MsgCreateResourcePayload {
-  string collection_id = 1;
-  string id = 2;
-  string name = 3;
-  string version = 4;
-  string resource_type = 5;
-  repeated string also_known_as = 6;
+  bytes data = 1;
+  string collection_id = 2;
+  string id = 3;
+  string name = 4;
+  string version = 5;
+  string resource_type = 6;
+  repeated string also_known_as = 7;
 }
 
 message MsgCreateResourceResponse {
