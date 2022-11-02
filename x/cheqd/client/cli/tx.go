@@ -30,7 +30,7 @@ func GetTxCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	cmd.AddCommand(CmdCreateDid())
+	cmd.AddCommand(CmdCreateDidDoc())
 	cmd.AddCommand(CmdUpdateDid())
 
 	return cmd
@@ -102,7 +102,7 @@ func SignWithSignInputs(signBytes []byte, signInputs []SignInput) []*types.SignI
 
 		signInfo := types.SignInfo{
 			VerificationMethodId: signInput.VerificationMethodId,
-			Signature:            base64.StdEncoding.EncodeToString(signatureBytes),
+			Signature:            signatureBytes,
 		}
 
 		signatures = append(signatures, &signInfo)

@@ -11,31 +11,28 @@ import (
 // InitGenesis initializes the cheqd module's state from a provided genesis
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
+	// Set didocs
 	for _, elem := range genState.DidDocs {
-		if err := k.SetDid(&ctx, elem); err != nil {
+		if err := k.SetDidDoc(&ctx, elem); err != nil {
 			panic(fmt.Sprintf("Cannot set did case: %s", err.Error()))
 		}
 	}
 
-	// Set nym count
-	k.SetDidDocCount(&ctx, uint64(len(genState.DidList)))
-
+	// Set did namespace
 	k.SetDidNamespace(&ctx, genState.DidNamespace)
 }
 
 // ExportGenesis returns the cheqd module's exported genesis.
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
-	genesis := types.DefaultGenesis()
-
-	// this line is used by starport scaffolding # genesis/module/export
-	// Get all did
-	didList := k.GetAllDid(&ctx)
-	for _, elem := range didList {
-		elem := elem
-		genesis.DidList = append(genesis.DidList, &elem)
+	genesis := types.GenesisState{
+		DidNamespace: k.GetDidNamespace(&ctx),
 	}
 
-	genesis.DidNamespace = k.GetDidNamespace(&ctx)
+	// Add diddocs
+	didDocs := k.GetAllDidDocs(&ctx)
+	for _, elem := range didDocs {
+		genesis.DidDocs = append(genesis.DidDocs, &elem)
+	}
 
-	return genesis
+	return &genesis
 }

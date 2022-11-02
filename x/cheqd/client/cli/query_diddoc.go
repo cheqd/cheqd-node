@@ -11,8 +11,8 @@ import (
 
 func CmdGetDid() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "did [id]",
-		Short: "Query a did",
+		Use:   "diddoc [id]",
+		Short: "Query a diddoc by id",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -20,11 +20,11 @@ func CmdGetDid() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			did := args[0]
-			params := &types.QueryGetDidRequest{
+			params := &types.QueryGetDidDocRequest{
 				Id: did,
 			}
 
-			resp, err := queryClient.Did(context.Background(), params)
+			resp, err := queryClient.DidDoc(context.Background(), params)
 			if err != nil {
 				return err
 			}

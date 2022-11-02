@@ -10,9 +10,9 @@ import (
 
 func CmdUpdateDid() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-did [payload-json] [ver-method-id-1] [priv-key-1] [ver-method-id-N] [priv-key-N] ...",
-		Short: "Update a DID.",
-		Long: "Updates a DID. " +
+		Use:   "update-diddoc [payload-json] [ver-method-id-1] [priv-key-1] [ver-method-id-N] [priv-key-N] ...",
+		Short: "Updates a DIDDoc.",
+		Long: "Updates a DIDDoc. " +
 			"[payload-json] is JSON encoded MsgUpdateDidPayload. " +
 			"[ver-method-id-N] is the DID fragment that points to the public part of the key in the ledger for the signature N." +
 			"[priv-key-1] is base base64 encoded ed25519 private key for signature N." +
@@ -31,7 +31,7 @@ func CmdUpdateDid() *cobra.Command {
 			}
 
 			// Unmarshal payload
-			var payload types.MsgUpdateDidPayload
+			var payload types.MsgUpdateDidDocPayload
 			err = clientCtx.Codec.UnmarshalJSON([]byte(payloadJson), &payload)
 			if err != nil {
 				return err
@@ -41,7 +41,7 @@ func CmdUpdateDid() *cobra.Command {
 			signBytes := payload.GetSignBytes()
 			identitySignatures := SignWithSignInputs(signBytes, signInputs)
 
-			msg := types.MsgUpdateDid{
+			msg := types.MsgUpdateDidDoc{
 				Payload:    &payload,
 				Signatures: identitySignatures,
 			}

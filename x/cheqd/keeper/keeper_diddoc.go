@@ -81,9 +81,9 @@ func (k Keeper) HasDidDoc(ctx *sdk.Context, id string) bool {
 	return store.Has(StrBytes(id))
 }
 
-// GetAllDidDocsWithMetadata returns all did
+// GetAllDidDocs returns all did
 // Loads all DIDs in memory. Use only for genesis export.
-func (k Keeper) GetAllDidDocsWithMetadata(ctx *sdk.Context) (list []types.DidDocWithMetadata) {
+func (k Keeper) GetAllDidDocs(ctx *sdk.Context) (list []types.DidDocWithMetadata) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), StrBytes(types.DidKey))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 

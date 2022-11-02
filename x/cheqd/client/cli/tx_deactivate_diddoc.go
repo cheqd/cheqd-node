@@ -10,9 +10,9 @@ import (
 
 func CmdDeactivateDid() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "deactivate-did [id] [ver-method-id-1] [priv-key-1] [ver-method-id-N] [priv-key-N] ...",
-		Short: "Deactivates a DID.",
-		Long: "Deactivates a DID. " +
+		Use:   "deactivate-diddoc [id] [ver-method-id-1] [priv-key-1] [ver-method-id-N] [priv-key-N] ...",
+		Short: "Deactivates a DIDDoc.",
+		Long: "Deactivates a DIDDoc. " +
 			"[id] is DID Document id. " +
 			"[ver-method-id-N] is the DID fragment that points to the public part of the key in the ledger for the signature N." +
 			"[priv-key-1] is base base64 encoded ed25519 private key for signature N." +
@@ -31,7 +31,7 @@ func CmdDeactivateDid() *cobra.Command {
 			}
 
 			// Build payload
-			payload := &types.MsgDeactivateDidPayload{
+			payload := &types.MsgDeactivateDidDocPayload{
 				Id: did,
 			}
 
@@ -39,7 +39,7 @@ func CmdDeactivateDid() *cobra.Command {
 			signBytes := payload.GetSignBytes()
 			identitySignatures := SignWithSignInputs(signBytes, signInputs)
 
-			msg := types.MsgDeactivateDid{
+			msg := types.MsgDeactivateDidDoc{
 				Payload:    payload,
 				Signatures: identitySignatures,
 			}

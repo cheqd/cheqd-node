@@ -130,7 +130,7 @@ func (am AppModule) Name() string {
 
 // Route returns the cheqd module's message routing key.
 func (am AppModule) Route() sdk.Route {
-	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper))
+	return sdk.NewRoute(types.RouterKey, keeper.NewHandler(am.keeper))
 }
 
 // QuerierRoute returns the cheqd module's query routing key.
