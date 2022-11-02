@@ -9,7 +9,7 @@ import (
 
 var _ = Describe("Message for DID creation", func() {
 	type TestCaseMsgCreateDID struct {
-		msg      *MsgCreateDid
+		msg      *MsgCreateDidDoc
 		isValid  bool
 		errorMsg string
 	}
@@ -28,15 +28,15 @@ var _ = Describe("Message for DID creation", func() {
 		Entry(
 			"All fields are set properly",
 			TestCaseMsgCreateDID{
-				msg: &MsgCreateDid{
-					Payload: &MsgCreateDidPayload{
+				msg: &MsgCreateDidDoc{
+					Payload: &MsgCreateDidDocPayload{
 						Id: "did:cheqd:testnet:zABCDEFG123456789abcd",
 						VerificationMethod: []*VerificationMethod{
 							{
-								Id:                 "did:cheqd:testnet:zABCDEFG123456789abcd#key1",
-								Type:               "Ed25519VerificationKey2020",
-								Controller:         "did:cheqd:testnet:zABCDEFG123456789abcd",
-								PublicKeyMultibase: ValidEd25519PubKey,
+								Id:                   "did:cheqd:testnet:zABCDEFG123456789abcd#key1",
+								Type:                 "Ed25519VerificationKey2020",
+								Controller:           "did:cheqd:testnet:zABCDEFG123456789abcd",
+								VerificationMaterial: ValidEd25519VerificationMaterial,
 							},
 						},
 						Authentication: []string{"did:cheqd:testnet:zABCDEFG123456789abcd#key1", "did:cheqd:testnet:zABCDEFG123456789abcd#aaa"},
@@ -49,15 +49,15 @@ var _ = Describe("Message for DID creation", func() {
 		Entry(
 			"IDs are duplicated",
 			TestCaseMsgCreateDID{
-				msg: &MsgCreateDid{
-					Payload: &MsgCreateDidPayload{
+				msg: &MsgCreateDidDoc{
+					Payload: &MsgCreateDidDocPayload{
 						Id: "did:cheqd:testnet:zABCDEFG123456789abcd",
 						VerificationMethod: []*VerificationMethod{
 							{
-								Id:                 "did:cheqd:testnet:zABCDEFG123456789abcd#key1",
-								Type:               "Ed25519VerificationKey2020",
-								Controller:         "did:cheqd:testnet:zABCDEFG123456789abcd",
-								PublicKeyMultibase: ValidEd25519PubKey,
+								Id:                   "did:cheqd:testnet:zABCDEFG123456789abcd#key1",
+								Type:                 "Ed25519VerificationKey2020",
+								Controller:           "did:cheqd:testnet:zABCDEFG123456789abcd",
+								VerificationMaterial: ValidEd25519VerificationMaterial,
 							},
 						},
 						Authentication: []string{"did:cheqd:testnet:zABCDEFG123456789abcd#key1", "did:cheqd:testnet:zABCDEFG123456789abcd#key1"},

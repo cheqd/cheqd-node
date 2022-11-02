@@ -5,13 +5,11 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
-var _ StateValueData = &Did{}
-
-func NewDid(context []string, id string, controller []string, verificationMethod []*VerificationMethod,
+func NewDidDoc(context []string, id string, controller []string, verificationMethod []*VerificationMethod,
 	authentication []string, assertionMethod []string, capabilityInvocation []string, capabilityDelegation []string,
 	keyAgreement []string, service []*Service, alsoKnownAs []string,
-) *Did {
-	return &Did{
+) *DidDoc {
+	return &DidDoc{
 		Context:              context,
 		Id:                   id,
 		Controller:           controller,
@@ -29,42 +27,42 @@ func NewDid(context []string, id string, controller []string, verificationMethod
 // Helpers
 
 // AllControllerDids returns controller DIDs used in both did.controllers and did.verification_method.controller
-func (did *Did) AllControllerDids() []string {
-	result := did.Controller
-	result = append(result, did.GetVerificationMethodControllers()...)
+func (didDoc *DidDoc) AllControllerDids() []string {
+	result := didDoc.Controller
+	result = append(result, didDoc.GetVerificationMethodControllers()...)
 
 	return utils.UniqueSorted(result)
 }
 
-// ReplaceIds replaces ids in all controller and id fields
-func (did *Did) ReplaceIds(old, new string) {
+// ReplaceDids replaces ids in all controller and id fields
+func (didDoc *DidDoc) ReplaceDids(old, new string) {
 	// Controllers
-	utils.ReplaceInSlice(did.Controller, old, new)
+	utils.ReplaceInSlice(didDoc.Controller, old, new)
 
 	// Id
-	if did.Id == old {
-		did.Id = new
+	if didDoc.Id == old {
+		didDoc.Id = new
 	}
 
-	for _, vm := range did.VerificationMethod {
-		vm.ReplaceIds(old, new)
+	for _, vm := range didDoc.VerificationMethod {
+		vm.ReplaceDids(old, new)
 	}
 }
 
-func (did *Did) GetControllersOrSubject() []string {
-	result := did.Controller
+func (didDoc *DidDoc) GetControllersOrSubject() []string {
+	result := didDoc.Controller
 
 	if len(result) == 0 {
-		result = append(result, did.Id)
+		result = append(result, didDoc.Id)
 	}
 
 	return result
 }
 
-func (did *Did) GetVerificationMethodControllers() []string {
+func (didDoc *DidDoc) GetVerificationMethodControllers() []string {
 	var result []string
 
-	for _, vm := range did.VerificationMethod {
+	for _, vm := range didDoc.VerificationMethod {
 		result = append(result, vm.Controller)
 	}
 
@@ -73,31 +71,31 @@ func (did *Did) GetVerificationMethodControllers() []string {
 
 // Validation
 
-func (did Did) Validate(allowedNamespaces []string) error {
-	return validation.ValidateStruct(&did,
-		validation.Field(&did.Id, validation.Required, IsDID(allowedNamespaces)),
-		validation.Field(&did.Controller, IsUniqueStrList(), validation.Each(IsDID(allowedNamespaces))),
-		validation.Field(&did.VerificationMethod,
-			IsUniqueVerificationMethodListByIdRule(), validation.Each(ValidVerificationMethodRule(did.Id, allowedNamespaces)),
+func (didDoc DidDoc) Validate(allowedNamespaces []string) error {
+	return validation.ValidateStruct(&didDoc,
+		validation.Field(&didDoc.Id, validation.Required, IsDID(allowedNamespaces)),
+		validation.Field(&didDoc.Controller, IsUniqueStrList(), validation.Each(IsDID(allowedNamespaces))),
+		validation.Field(&didDoc.VerificationMethod,
+			IsUniqueVerificationMethodListByIdRule(), validation.Each(ValidVerificationMethodRule(didDoc.Id, allowedNamespaces)),
 		),
 
-		validation.Field(&did.Authentication,
-			IsUniqueStrList(), validation.Each(IsDIDUrl(allowedNamespaces, Empty, Empty, Required), HasPrefix(did.Id)),
+		validation.Field(&didDoc.Authentication,
+			IsUniqueStrList(), validation.Each(IsDIDUrl(allowedNamespaces, Empty, Empty, Required), HasPrefix(didDoc.Id)),
 		),
-		validation.Field(&did.AssertionMethod,
-			IsUniqueStrList(), validation.Each(IsDIDUrl(allowedNamespaces, Empty, Empty, Required), HasPrefix(did.Id)),
+		validation.Field(&didDoc.AssertionMethod,
+			IsUniqueStrList(), validation.Each(IsDIDUrl(allowedNamespaces, Empty, Empty, Required), HasPrefix(didDoc.Id)),
 		),
-		validation.Field(&did.CapabilityInvocation,
-			IsUniqueStrList(), validation.Each(IsDIDUrl(allowedNamespaces, Empty, Empty, Required), HasPrefix(did.Id)),
+		validation.Field(&didDoc.CapabilityInvocation,
+			IsUniqueStrList(), validation.Each(IsDIDUrl(allowedNamespaces, Empty, Empty, Required), HasPrefix(didDoc.Id)),
 		),
-		validation.Field(&did.CapabilityDelegation,
-			IsUniqueStrList(), validation.Each(IsDIDUrl(allowedNamespaces, Empty, Empty, Required), HasPrefix(did.Id)),
+		validation.Field(&didDoc.CapabilityDelegation,
+			IsUniqueStrList(), validation.Each(IsDIDUrl(allowedNamespaces, Empty, Empty, Required), HasPrefix(didDoc.Id)),
 		),
-		validation.Field(&did.KeyAgreement,
-			IsUniqueStrList(), validation.Each(IsDIDUrl(allowedNamespaces, Empty, Empty, Required), HasPrefix(did.Id)),
+		validation.Field(&didDoc.KeyAgreement,
+			IsUniqueStrList(), validation.Each(IsDIDUrl(allowedNamespaces, Empty, Empty, Required), HasPrefix(didDoc.Id)),
 		),
 
-		validation.Field(&did.Service, IsUniqueServiceListByIdRule(), validation.Each(ValidServiceRule(did.Id, allowedNamespaces))),
-		validation.Field(&did.AlsoKnownAs, IsUniqueStrList(), validation.Each(IsURI())),
+		validation.Field(&didDoc.Service, IsUniqueServiceListByIdRule(), validation.Each(ValidServiceRule(didDoc.Id, allowedNamespaces))),
+		validation.Field(&didDoc.AlsoKnownAs, IsUniqueStrList(), validation.Each(IsURI())),
 	)
 }

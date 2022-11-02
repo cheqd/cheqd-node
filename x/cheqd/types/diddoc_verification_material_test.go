@@ -50,7 +50,7 @@ var _ = DescribeTable("Verification Method Validation tests", func(testCase Veri
 				PublicKeyMultibase: InvalidEd25519PubKey,
 			},
 			isValid:  false,
-			errorMsg: "invalid verification material",
+			errorMsg: "publicKeyMultibase: ed25519: bad public key length: 18",
 		}),
 
 	Entry(
@@ -60,6 +60,6 @@ var _ = DescribeTable("Verification Method Validation tests", func(testCase Veri
 				PublicKeyJwk: InvalidPublicKeyJWK,
 			},
 			isValid:  false,
-			errorMsg: "invalid verification material",
+			errorMsg: "can't parse jwk: failed to parse key",
 		}),
 )

@@ -9,7 +9,7 @@ import (
 
 var _ = Describe("Message for DID updating", func() {
 	type TestCaseMsgUpdateDID struct {
-		msg      *MsgUpdateDid
+		msg      *MsgUpdateDidDoc
 		isValid  bool
 		errorMsg string
 	}
@@ -28,15 +28,15 @@ var _ = Describe("Message for DID updating", func() {
 		Entry(
 			"All fields are set properly",
 			TestCaseMsgUpdateDID{
-				msg: &MsgUpdateDid{
-					Payload: &MsgUpdateDidPayload{
+				msg: &MsgUpdateDidDoc{
+					Payload: &MsgUpdateDidDocPayload{
 						Id: "did:cheqd:testnet:zABCDEFG123456789abcd",
 						VerificationMethod: []*VerificationMethod{
 							{
-								Id:                 "did:cheqd:testnet:zABCDEFG123456789abcd#key1",
-								Type:               "Ed25519VerificationKey2020",
-								Controller:         "did:cheqd:testnet:zABCDEFG123456789abcd",
-								PublicKeyMultibase: ValidEd25519PubKey,
+								Id:                   "did:cheqd:testnet:zABCDEFG123456789abcd#key1",
+								Type:                 "Ed25519VerificationKey2020",
+								Controller:           "did:cheqd:testnet:zABCDEFG123456789abcd",
+								VerificationMaterial: ValidEd25519VerificationMaterial,
 							},
 						},
 						Authentication: []string{"did:cheqd:testnet:zABCDEFG123456789abcd#key1", "did:cheqd:testnet:zABCDEFG123456789abcd#aaa"},
@@ -50,15 +50,15 @@ var _ = Describe("Message for DID updating", func() {
 		Entry(
 			"IDs are duplicated",
 			TestCaseMsgUpdateDID{
-				msg: &MsgUpdateDid{
-					Payload: &MsgUpdateDidPayload{
+				msg: &MsgUpdateDidDoc{
+					Payload: &MsgUpdateDidDocPayload{
 						Id: "did:cheqd:testnet:zABCDEFG123456789abcd",
 						VerificationMethod: []*VerificationMethod{
 							{
-								Id:                 "did:cheqd:testnet:zABCDEFG123456789abcd#key1",
-								Type:               "Ed25519VerificationKey2020",
-								Controller:         "did:cheqd:testnet:zABCDEFG123456789abcd",
-								PublicKeyMultibase: ValidEd25519PubKey,
+								Id:                   "did:cheqd:testnet:zABCDEFG123456789abcd#key1",
+								Type:                 "Ed25519VerificationKey2020",
+								Controller:           "did:cheqd:testnet:zABCDEFG123456789abcd",
+								VerificationMaterial: ValidEd25519VerificationMaterial,
 							},
 						},
 						Authentication: []string{"did:cheqd:testnet:zABCDEFG123456789abcd#key1", "did:cheqd:testnet:zABCDEFG123456789abcd#key1"},
@@ -72,15 +72,15 @@ var _ = Describe("Message for DID updating", func() {
 		Entry(
 			"VersionId is empty",
 			TestCaseMsgUpdateDID{
-				msg: &MsgUpdateDid{
-					Payload: &MsgUpdateDidPayload{
+				msg: &MsgUpdateDidDoc{
+					Payload: &MsgUpdateDidDocPayload{
 						Id: "did:cheqd:testnet:zABCDEFG123456789abcd",
 						VerificationMethod: []*VerificationMethod{
 							{
-								Id:                 "did:cheqd:testnet:zABCDEFG123456789abcd#key1",
-								Type:               "Ed25519VerificationKey2020",
-								Controller:         "did:cheqd:testnet:zABCDEFG123456789abcd",
-								PublicKeyMultibase: ValidEd25519PubKey,
+								Id:                   "did:cheqd:testnet:zABCDEFG123456789abcd#key1",
+								Type:                 "Ed25519VerificationKey2020",
+								Controller:           "did:cheqd:testnet:zABCDEFG123456789abcd",
+								VerificationMaterial: ValidEd25519VerificationMaterial,
 							},
 						},
 						Authentication: []string{"did:cheqd:testnet:zABCDEFG123456789abcd#key1", "did:cheqd:testnet:zABCDEFG123456789abcd#aaa"},

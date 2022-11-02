@@ -5,33 +5,33 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
-var _ sdk.Msg = &MsgUpdateDid{}
+var _ sdk.Msg = &MsgUpdateDidDoc{}
 
-func NewMsgUpdateDid(payload *MsgUpdateDidPayload, signatures []*SignInfo) *MsgUpdateDid {
-	return &MsgUpdateDid{
+func NewMsgUpdateDid(payload *MsgUpdateDidDocPayload, signatures []*SignInfo) *MsgUpdateDidDoc {
+	return &MsgUpdateDidDoc{
 		Payload:    payload,
 		Signatures: signatures,
 	}
 }
 
-func (msg *MsgUpdateDid) Route() string {
+func (msg *MsgUpdateDidDoc) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgUpdateDid) Type() string {
-	return "WriteRequest"
+func (msg *MsgUpdateDidDoc) Type() string {
+	return "MsgUpdateDidDoc"
 }
 
-func (msg *MsgUpdateDid) GetSigners() []sdk.AccAddress {
+func (msg *MsgUpdateDidDoc) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{}
 }
 
-func (msg *MsgUpdateDid) GetSignBytes() []byte {
+func (msg *MsgUpdateDidDoc) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgUpdateDid) ValidateBasic() error {
+func (msg *MsgUpdateDidDoc) ValidateBasic() error {
 	err := msg.Validate(nil)
 	if err != nil {
 		return ErrBasicValidation.Wrap(err.Error())
@@ -42,7 +42,7 @@ func (msg *MsgUpdateDid) ValidateBasic() error {
 
 // Validate
 
-func (msg MsgUpdateDid) Validate(allowedNamespaces []string) error {
+func (msg MsgUpdateDidDoc) Validate(allowedNamespaces []string) error {
 	return validation.ValidateStruct(&msg,
 		validation.Field(&msg.Payload, validation.Required, ValidMsgUpdateDidPayloadRule(allowedNamespaces)),
 		validation.Field(&msg.Signatures, IsUniqueSignInfoListRule(), validation.Each(ValidSignInfoRule(allowedNamespaces))),
@@ -51,7 +51,7 @@ func (msg MsgUpdateDid) Validate(allowedNamespaces []string) error {
 
 // Normalize
 
-func (msg *MsgUpdateDid) Normalize() {
+func (msg *MsgUpdateDidDoc) Normalize() {
 	msg.Payload.Normalize()
 	NormalizeSignInfoList(msg.Signatures)
 }

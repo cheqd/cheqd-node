@@ -5,9 +5,9 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
-var _ IdentityMsg = &MsgUpdateDidPayload{}
+var _ IdentityMsg = &MsgUpdateDidDocPayload{}
 
-func (msg *MsgUpdateDidPayload) GetSignBytes() []byte {
+func (msg *MsgUpdateDidDocPayload) GetSignBytes() []byte {
 	bytes, err := msg.Marshal()
 	if err != nil {
 		panic(err)
@@ -16,8 +16,8 @@ func (msg *MsgUpdateDidPayload) GetSignBytes() []byte {
 	return bytes
 }
 
-func (msg *MsgUpdateDidPayload) ToDid() Did {
-	return Did{
+func (msg *MsgUpdateDidDocPayload) ToDid() DidDoc {
+	return DidDoc{
 		Context:              msg.Context,
 		Id:                   msg.Id,
 		Controller:           msg.Controller,
@@ -34,7 +34,7 @@ func (msg *MsgUpdateDidPayload) ToDid() Did {
 
 // Validation
 
-func (msg MsgUpdateDidPayload) Validate(allowedNamespaces []string) error {
+func (msg MsgUpdateDidDocPayload) Validate(allowedNamespaces []string) error {
 	err := msg.ToDid().Validate(allowedNamespaces)
 	if err != nil {
 		return err
@@ -47,7 +47,7 @@ func (msg MsgUpdateDidPayload) Validate(allowedNamespaces []string) error {
 
 func ValidMsgUpdateDidPayloadRule(allowedNamespaces []string) *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
-		casted, ok := value.(*MsgUpdateDidPayload)
+		casted, ok := value.(*MsgUpdateDidDocPayload)
 		if !ok {
 			panic("ValidMsgUpdateDidPayloadRule must be only applied on MsgUpdateDidPayload properties")
 		}
@@ -58,7 +58,7 @@ func ValidMsgUpdateDidPayloadRule(allowedNamespaces []string) *CustomErrorRule {
 
 // Normalize
 
-func (msg *MsgUpdateDidPayload) Normalize() {
+func (msg *MsgUpdateDidDocPayload) Normalize() {
 	msg.Id = utils.NormalizeDID(msg.Id)
 	for _, vm := range msg.VerificationMethod {
 		vm.Controller = utils.NormalizeDID(vm.Controller)

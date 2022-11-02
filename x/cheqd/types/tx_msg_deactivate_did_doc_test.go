@@ -9,7 +9,7 @@ import (
 
 var _ = Describe("Message for DID updating", func() {
 	type TestCaseMsgDeactivateDID struct {
-		msg      *MsgDeactivateDid
+		msg      *MsgDeactivateDidDoc
 		isValid  bool
 		errorMsg string
 	}
@@ -28,8 +28,8 @@ var _ = Describe("Message for DID updating", func() {
 		Entry(
 			"All fields are set properly",
 			TestCaseMsgDeactivateDID{
-				msg: &MsgDeactivateDid{
-					Payload: &MsgDeactivateDidPayload{
+				msg: &MsgDeactivateDidDoc{
+					Payload: &MsgDeactivateDidDocPayload{
 						Id: "did:cheqd:testnet:zABCDEFG123456789abcd",
 					},
 					Signatures: nil,
@@ -40,8 +40,8 @@ var _ = Describe("Message for DID updating", func() {
 		Entry(
 			"Negative: Invalid DID Method",
 			TestCaseMsgDeactivateDID{
-				msg: &MsgDeactivateDid{
-					Payload: &MsgDeactivateDidPayload{
+				msg: &MsgDeactivateDidDoc{
+					Payload: &MsgDeactivateDidDocPayload{
 						Id: "did:cheqdttt:testnet:zABCDEFG123456789abcd",
 					},
 					Signatures: nil,
@@ -53,8 +53,8 @@ var _ = Describe("Message for DID updating", func() {
 		Entry(
 			"Negative: Id is required",
 			TestCaseMsgDeactivateDID{
-				msg: &MsgDeactivateDid{
-					Payload:    &MsgDeactivateDidPayload{},
+				msg: &MsgDeactivateDidDoc{
+					Payload:    &MsgDeactivateDidDocPayload{},
 					Signatures: nil,
 				},
 				isValid:  false,

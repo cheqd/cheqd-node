@@ -37,7 +37,7 @@ func (msg MsgCreateDidDocPayload) Validate(allowedNamespaces []string) error {
 
 func ValidMsgCreateDidPayloadRule(allowedNamespaces []string) *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
-		casted, ok := value.(*MsgCreateDidPayload)
+		casted, ok := value.(*MsgCreateDidDocPayload)
 		if !ok {
 			panic("ValidMsgCreateDidPayloadRule must be only applied on MsgCreateDidPayload properties")
 		}

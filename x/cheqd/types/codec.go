@@ -9,9 +9,9 @@ import (
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	// Sdk messages
-	cdc.RegisterConcrete(&MsgCreateDidDoc{}, "did/CreateDid", nil)
-	cdc.RegisterConcrete(&MsgUpdateDidDoc{}, "did/UpdateDid", nil)
-	cdc.RegisterConcrete(&MsgDeactivateDidDoc{}, "did/DeleteDid", nil)
+	cdc.RegisterConcrete(&MsgCreateDidDoc{}, "did/CreateDidDoc", nil)
+	cdc.RegisterConcrete(&MsgUpdateDidDoc{}, "did/UpdateDidDoc", nil)
+	cdc.RegisterConcrete(&MsgDeactivateDidDoc{}, "did/DeleteDidDoc", nil)
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {

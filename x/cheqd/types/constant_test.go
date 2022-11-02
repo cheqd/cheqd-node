@@ -2,8 +2,6 @@ package types_test
 
 import (
 	"encoding/json"
-
-	. "github.com/cheqd/cheqd-node/x/cheqd/types"
 )
 
 var (
@@ -32,7 +30,7 @@ var ValidJWKKey = TestJWKKey{
 	Kid: "6a8ba5652a7044121d4fedac8f14d14c54e4895b",
 }
 
-var NotValidJWKKey = TestJWKKey{
+var InvalidJWKKey = TestJWKKey{
 	Kty: "SomeOtherKeyType",
 	N:   "o76AudS2rsCvlz_3D47sFkpuz3NJxgLbXr1cHdmbo9xOMttPMJI97f0rHiSl9stltMi87KIOEEVQWUgMLaWQNaIZThgI1seWDAGRw59AO5sctgM1wPVZYt40fj2Qw4KT7m4RLMsZV1M5NYyXSd1lAAywM4FT25N0RLhkm3u8Hehw2Szj_2lm-rmcbDXzvjeXkodOUszFiOqzqBIS0Bv3c2zj2sytnozaG7aXa14OiUMSwJb4gmBC7I0BjPv5T85CH88VOcFDV51sO9zPJaBQnNBRUWNLh1vQUbkmspIANTzj2sN62cTSoxRhSdnjZQ9E_jraKYEW5oizE9Dtow4EvQ",
 	Use: "sig",
@@ -43,5 +41,13 @@ var NotValidJWKKey = TestJWKKey{
 
 var (
 	ValidPublicKeyJWK, _   = json.Marshal(ValidJWKKey)
-	InvalidPublicKeyJWK, _ = json.Marshal(NotValidJWKKey)
+	InvalidPublicKeyJWK, _ = json.Marshal(InvalidJWKKey)
+)
+
+var (
+	ValidEd25519VerificationMaterial   = "{\"publicKeyMultibase\":\"" + ValidEd25519PubKey + "\"}"
+	InvalidEd25519VerificationMaterial = "{\"publicKeyMultibase\":\"" + InvalidEd25519PubKey + "\"}"
+
+	ValidJWKKeyVerificationMaterial   = "{\"publicKeyJwk\":" + string(ValidPublicKeyJWK) + "}"
+	InvalidJWKKeyVerificationMaterial = "{\"publicKeyJwk\":" + string(InvalidPublicKeyJWK) + "}"
 )

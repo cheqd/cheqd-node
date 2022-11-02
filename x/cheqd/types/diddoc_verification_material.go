@@ -42,9 +42,7 @@ func (vm JsonWebKey2020) Type() string {
 }
 
 func (vm JsonWebKey2020) Validate() error {
-	return validation.ValidateStruct(&vm,
-		validation.Field(&vm.PublicKeyJwk, validation.Required, IsJWK()),
-	)
+	return validation.Validate(string(vm.PublicKeyJwk), validation.Required, IsJWK())
 }
 
 // Validation

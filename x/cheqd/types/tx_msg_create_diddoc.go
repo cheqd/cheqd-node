@@ -19,7 +19,7 @@ func (msg *MsgCreateDidDoc) Route() string {
 }
 
 func (msg *MsgCreateDidDoc) Type() string {
-	return "MsgCreateDid"
+	return "MsgCreateDidDoc"
 }
 
 func (msg *MsgCreateDidDoc) GetSigners() []sdk.AccAddress {

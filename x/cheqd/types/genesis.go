@@ -21,6 +21,8 @@ func (gs GenesisState) Validate() error {
 	if err != nil {
 		return err
 	}
+
+	return gs.ValidateBasic()
 }
 
 func (gs GenesisState) ValidateNoDuplicates() error {
@@ -40,7 +42,7 @@ func (gs GenesisState) ValidateNoDuplicates() error {
 
 func (gs GenesisState) ValidateBasic() error {
 	for _, didDoc := range gs.DidDocs {
-		err := didDoc.DidDoc.Validate()
+		err := didDoc.DidDoc.Validate(nil)
 		if err != nil {
 			return err
 		}

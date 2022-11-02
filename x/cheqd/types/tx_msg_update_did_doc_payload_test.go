@@ -13,25 +13,25 @@ var _ = Describe("Update DID Payload Validation tests", func() {
 	}
 
 	DescribeTable("UUID validation tests", func(testCase TestCaseUUIDDidStruct) {
-		inputMsg := MsgUpdateDidPayload{
+		inputMsg := MsgUpdateDidDocPayload{
 			Id:             testCase.inputId,
 			Authentication: []string{testCase.inputId + "#key1"},
 			VerificationMethod: []*VerificationMethod{
 				{
 					Id:         testCase.inputId + "#key1",
-					Type:       Ed25519VerificationKey2020,
+					Type:       Ed25519VerificationKey2020{}.Type(),
 					Controller: testCase.inputId,
 				},
 			},
 			VersionId: "1234567890",
 		}
-		expectedMsg := MsgUpdateDidPayload{
+		expectedMsg := MsgUpdateDidDocPayload{
 			Id:             testCase.expectedId,
 			Authentication: []string{testCase.expectedId + "#key1"},
 			VerificationMethod: []*VerificationMethod{
 				{
 					Id:         testCase.expectedId + "#key1",
-					Type:       Ed25519VerificationKey2020,
+					Type:       Ed25519VerificationKey2020{}.Type(),
 					Controller: testCase.expectedId,
 				},
 			},

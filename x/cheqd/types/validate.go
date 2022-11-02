@@ -152,7 +152,7 @@ func IsJWK() *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.(string)
 		if !ok {
-			panic("IsJWK must be only applied on KeyValuePair array properties")
+			panic("IsJWK must be only applied on string properties")
 		}
 
 		return utils.ValidateJWK(casted)

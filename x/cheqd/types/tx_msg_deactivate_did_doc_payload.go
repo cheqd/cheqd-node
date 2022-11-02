@@ -2,9 +2,9 @@ package types
 
 import validation "github.com/go-ozzo/ozzo-validation/v4"
 
-var _ IdentityMsg = &MsgDeactivateDidPayload{}
+var _ IdentityMsg = &MsgDeactivateDidDocPayload{}
 
-func (msg *MsgDeactivateDidPayload) GetSignBytes() []byte {
+func (msg *MsgDeactivateDidDocPayload) GetSignBytes() []byte {
 	bytes, err := msg.Marshal()
 	if err != nil {
 		panic(err)
@@ -13,15 +13,9 @@ func (msg *MsgDeactivateDidPayload) GetSignBytes() []byte {
 	return bytes
 }
 
-func (msg *MsgDeactivateDidPayload) ToDid() Did {
-	return Did{
-		Id: msg.Id,
-	}
-}
-
 // Validation
 
-func (msg MsgDeactivateDidPayload) Validate(allowedNamespaces []string) error {
+func (msg MsgDeactivateDidDocPayload) Validate(allowedNamespaces []string) error {
 	return validation.ValidateStruct(&msg,
 		validation.Field(&msg.Id, validation.Required, IsDID(allowedNamespaces)),
 	)
@@ -29,7 +23,7 @@ func (msg MsgDeactivateDidPayload) Validate(allowedNamespaces []string) error {
 
 func ValidMsgDeactivateDidPayloadRule(allowedNamespaces []string) *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
-		casted, ok := value.(*MsgDeactivateDidPayload)
+		casted, ok := value.(*MsgDeactivateDidDocPayload)
 		if !ok {
 			panic("ValidMsgDeactivateDidPayloadRule must be only applied on MsgDeactivateDidPayload properties")
 		}

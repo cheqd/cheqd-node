@@ -115,8 +115,8 @@ func VerificationMethodListToMapByFragment(vms []*VerificationMethod) map[string
 	return result
 }
 
-// ReplaceIds replaces ids in all fields
-func (vm *VerificationMethod) ReplaceIds(old, new string) {
+// ReplaceDids replaces ids in all fields
+func (vm *VerificationMethod) ReplaceDids(old, new string) {
 	// Controller
 	if vm.Controller == old {
 		vm.Controller = new
@@ -139,10 +139,10 @@ func (vm VerificationMethod) Validate(baseDid string, allowedNamespaces []string
 		validation.Field(&vm.Controller, validation.Required, IsDID(allowedNamespaces)),
 		validation.Field(&vm.Type, validation.Required, validation.In(utils.ToInterfaces(SupportedMethodTypes)...)),
 		validation.Field(&vm.VerificationMaterial,
-			validation.When(vm.VerificationMaterial == Ed25519VerificationKey2020{}.Type(), validation.Required, ValidEd25519VerificationKey2020Rule()),
+			validation.When(vm.Type == Ed25519VerificationKey2020{}.Type(), validation.Required, ValidEd25519VerificationKey2020Rule()),
 		),
 		validation.Field(&vm.VerificationMaterial,
-			validation.When(vm.VerificationMaterial == JsonWebKey2020{}.Type(), validation.Required, ValidJsonWebKey2020Rule()),
+			validation.When(vm.Type == JsonWebKey2020{}.Type(), validation.Required, ValidJsonWebKey2020Rule()),
 		),
 	)
 }

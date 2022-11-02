@@ -5,33 +5,33 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
-var _ sdk.Msg = &MsgDeactivateDid{}
+var _ sdk.Msg = &MsgDeactivateDidDoc{}
 
-func NewMsgDeactivateDid(payload *MsgDeactivateDidPayload, signatures []*SignInfo) *MsgDeactivateDid {
-	return &MsgDeactivateDid{
+func NewMsgDeactivateDid(payload *MsgDeactivateDidDocPayload, signatures []*SignInfo) *MsgDeactivateDidDoc {
+	return &MsgDeactivateDidDoc{
 		Payload:    payload,
 		Signatures: signatures,
 	}
 }
 
-func (msg *MsgDeactivateDid) Route() string {
+func (msg *MsgDeactivateDidDoc) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgDeactivateDid) Type() string {
-	return "WriteRequest"
+func (msg *MsgDeactivateDidDoc) Type() string {
+	return "MsgDeactivateDidDoc"
 }
 
-func (msg *MsgDeactivateDid) GetSigners() []sdk.AccAddress {
+func (msg *MsgDeactivateDidDoc) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{}
 }
 
-func (msg *MsgDeactivateDid) GetSignBytes() []byte {
+func (msg *MsgDeactivateDidDoc) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshal(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgDeactivateDid) ValidateBasic() error {
+func (msg *MsgDeactivateDidDoc) ValidateBasic() error {
 	err := msg.Validate(nil)
 	if err != nil {
 		return ErrBasicValidation.Wrap(err.Error())
@@ -42,7 +42,7 @@ func (msg *MsgDeactivateDid) ValidateBasic() error {
 
 // Validate
 
-func (msg MsgDeactivateDid) Validate(allowedNamespaces []string) error {
+func (msg MsgDeactivateDidDoc) Validate(allowedNamespaces []string) error {
 	return validation.ValidateStruct(&msg,
 		validation.Field(&msg.Payload, validation.Required, ValidMsgDeactivateDidPayloadRule(allowedNamespaces)),
 		validation.Field(&msg.Signatures, IsUniqueSignInfoListRule(), validation.Each(ValidSignInfoRule(allowedNamespaces))),
