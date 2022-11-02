@@ -14,10 +14,13 @@ const (
 	DOCKER_LOCALNET      = "localnet"
 	DOCKER_LOCALNET_PATH = "../../docker/localnet"
 	DOCKER_COMPOSE_FILE  = "docker-compose.yml"
+	DOCKER_COMPOSE_ENV   = "docker-compose.env"
 	DOCKER               = "docker"
 	DOCKER_COMPOSE       = "compose"
 	DOCKER_LOAD          = "load"
+	DOCKER_BUILD_IMG_ENV = "BUILD_IMAGE"
 	DOCKER_IMAGE_NAME    = "cheqd-node-image.tar"
+	DOCKER_LATEST_IMAGE  = "ghcr.io/cheqd/cheqd-node:latest"
 	RUNNER_BIN_DIR       = "$(echo $RUNNER_BIN_DIR)"
 	OPERATOR0            = "operator0"
 	OPERATOR1            = "operator1"
@@ -89,6 +92,7 @@ func LocalnetExecExec(container string, args ...string) (string, error) {
 }
 
 func LocalnetExecUp() (string, error) {
+	os.Setenv(DOCKER_BUILD_IMG_ENV, DOCKER_LATEST_IMAGE)
 	return LocalnetExec("up", "--detach", "--no-build")
 }
 
@@ -104,6 +108,11 @@ func LocalnetLoadImage(args ...string) (string, error) {
 		return "", sdkerrors.Wrap(err, string(out))
 	}
 	return string(out), err
+}
+
+func LocalnetExecUpWithBuildImage() (string, error) {
+	os.Unsetenv(DOCKER_BUILD_IMG_ENV)
+	return LocalnetExec("--env-file", DOCKER_COMPOSE_ENV, "up", "--detach", "--no-build")
 }
 
 func LocalnetExecUpWithNewImage() (string, error) {
