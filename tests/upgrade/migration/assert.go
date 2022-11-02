@@ -1,6 +1,8 @@
 package migration
 
 import (
+	"fmt"
+
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	. "github.com/onsi/ginkgo/v2"
@@ -16,6 +18,7 @@ func AssertHandlers() error {
 
 	By("Ensuring the ResourceChecksum migration scenario is successful")
 	err := InitResourceChecksumScenario()
+	fmt.Println(err)
 	Expect(err).To(BeNil())
 	migrator := NewResourceMigrator([]ResourceMigrationScenario{ResourceChecksumScenario})
 	err = migrator.Migrate()

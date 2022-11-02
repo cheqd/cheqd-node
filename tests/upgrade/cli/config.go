@@ -12,6 +12,11 @@ const (
 )
 
 const (
+	CLI_BINARY_NAME_PREVIOUS = CLI_BINARY_NAME + "-previous"
+	CLI_BINARY_NAME_NEXT     = CLI_BINARY_NAME + "-next"
+)
+
+const (
 	KEYRING_BACKEND = integrationcli.KEYRING_BACKEND
 	OUTPUT_FORMAT   = integrationcli.OUTPUT_FORMAT
 	GAS             = integrationcli.GAS

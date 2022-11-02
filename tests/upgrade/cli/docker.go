@@ -4,17 +4,18 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const (
 	DOCKER_LOCALNET                 = "localnet"
-	DOCKER_LOCALNET_PATH            = "../../../docker/localnet"
+	DOCKER_LOCALNET_PATH            = "../../docker/localnet"
 	DOCKER_COMPOSE                  = "docker compose"
 	DOCKER_LOAD                     = "docker load"
-	DOCKER_COMPOSE_IN_LOCALNET_PATH = DOCKER_LOCALNET_PATH + "/" + DOCKER_COMPOSE
-	DOCKER_LOAD_IN_LOCALNET_PATH    = DOCKER_LOCALNET_PATH + "/" + DOCKER_LOAD
+	DOCKER_COMPOSE_IN_LOCALNET_PATH = DOCKER_LOCALNET_PATH + string(filepath.Separator) + DOCKER_COMPOSE
+	DOCKER_LOAD_IN_LOCALNET_PATH    = DOCKER_LOCALNET_PATH + string(filepath.Separator) + DOCKER_LOAD
 	DOCKER_IMAGE_NAME               = "cheqd-node-image.tar"
 	RUNNER_BIN_DIR                  = "$(echo $RUNNER_BIN_DIR)"
 	OPERATOR0                       = "operator0"
@@ -42,34 +43,38 @@ var (
 	}
 	RENAME_BINARY_CURRENT_TO_PREVIOUS_ARGS = []string{
 		"mv",
-		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME,
-		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME + "-previous",
+		filepath.Join(RUNNER_BIN_DIR, CLI_BINARY_NAME),
+		filepath.Join(RUNNER_BIN_DIR, CLI_BINARY_NAME_PREVIOUS),
 	}
 	RENAME_BINARY_NEXT_TO_CURRENT_ARGS = []string{
 		"mv",
-		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME + "-next",
-		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME,
+		filepath.Join(RUNNER_BIN_DIR, CLI_BINARY_NAME_NEXT),
+		filepath.Join(RUNNER_BIN_DIR, CLI_BINARY_NAME),
 	}
 	RENAME_BINARY_PREVIOUS_TO_CURRENT_ARGS = []string{
 		"mv",
-		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME + "-previous",
-		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME,
+		filepath.Join(RUNNER_BIN_DIR, CLI_BINARY_NAME_PREVIOUS),
+		filepath.Join(RUNNER_BIN_DIR, CLI_BINARY_NAME),
 	}
 	RENAME_BINARY_CURRENT_TO_NEXT_ARGS = []string{
 		"mv",
-		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME,
-		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME + "-next",
+		filepath.Join(RUNNER_BIN_DIR, CLI_BINARY_NAME),
+		filepath.Join(RUNNER_BIN_DIR, CLI_BINARY_NAME_NEXT),
 	}
 	RESTORE_BINARY_PERMISSIONS_ARGS = []string{
 		"sudo",
 		"chmod",
 		"-x",
-		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME,
+		filepath.Join(RUNNER_BIN_DIR, CLI_BINARY_NAME),
 	}
 )
 
 func LocalnetExec(args ...string) (string, error) {
-	cmd := exec.Command(DOCKER_COMPOSE_IN_LOCALNET_PATH, args...)
+	cwd, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	cmd := exec.Command(filepath.Join(cwd, DOCKER_COMPOSE_IN_LOCALNET_PATH), args...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return "", sdkerrors.Wrap(err, string(out))
@@ -91,7 +96,11 @@ func LocalnetExecDown() (string, error) {
 }
 
 func LocalnetLoadImage(args ...string) (string, error) {
-	cmd := exec.Command(DOCKER_LOAD_IN_LOCALNET_PATH)
+	cwd, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	cmd := exec.Command(filepath.Join(cwd, DOCKER_LOAD_IN_LOCALNET_PATH), args...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return "", sdkerrors.Wrap(err, string(out))

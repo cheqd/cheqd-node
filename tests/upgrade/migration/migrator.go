@@ -1,8 +1,12 @@
 package migration
 
 import (
+	"fmt"
+
+	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
 	cheqdtestssetup "github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
 	resourcetestssetup "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -13,11 +17,11 @@ type MigrationScenario struct {
 	setup    func()
 	existing interface{}
 	expected interface{}
-	handler  func(ctx sdk.Context) error
+	handler  func(ctx sdk.Context, cheqdKeeper cheqdkeeper.Keeper) error
 	validate func(actual interface{}) error
 }
 
-func NewMigrationScenario(name string, setup func(), existing interface{}, expected interface{}, handler func(ctx sdk.Context) error, validate func(actual interface{}) error) MigrationScenario {
+func NewMigrationScenario(name string, setup func(), existing interface{}, expected interface{}, handler func(ctx sdk.Context, cheqdKeeper cheqdkeeper.Keeper) error, validate func(actual interface{}) error) MigrationScenario {
 	return MigrationScenario{
 		name:     name,
 		setup:    setup,
@@ -44,7 +48,7 @@ func (m MigrationScenario) Expected() interface{} {
 	return m.expected
 }
 
-func (m MigrationScenario) Handler() func(ctx sdk.Context) error {
+func (m MigrationScenario) Handler() func(ctx sdk.Context, cheqdKeeper cheqdkeeper.Keeper) error {
 	return m.handler
 }
 
@@ -57,11 +61,11 @@ type CheqdMigrationScenario struct {
 	setup    func() cheqdtestssetup.TestSetup
 	existing cheqdtestssetup.MinimalDidInfo
 	expected cheqdtypes.Did
-	handler  func(ctx sdk.Context) error
+	handler  func(ctx sdk.Context, cheqdKeeper cheqdkeeper.Keeper) error
 	validate func(actual cheqdtypes.Did) error
 }
 
-func NewCheqdMigrationScenario(name string, setup func() cheqdtestssetup.TestSetup, existing cheqdtestssetup.MinimalDidInfo, expected cheqdtypes.Did, handler func(ctx sdk.Context) error, validate func(actual cheqdtypes.Did) error) CheqdMigrationScenario {
+func NewCheqdMigrationScenario(name string, setup func() cheqdtestssetup.TestSetup, existing cheqdtestssetup.MinimalDidInfo, expected cheqdtypes.Did, handler func(ctx sdk.Context, cheqdKeeper cheqdkeeper.Keeper) error, validate func(actual cheqdtypes.Did) error) CheqdMigrationScenario {
 	return CheqdMigrationScenario{
 		name:     name,
 		setup:    setup,
@@ -88,7 +92,7 @@ func (m CheqdMigrationScenario) Expected() cheqdtypes.Did {
 	return m.expected
 }
 
-func (m CheqdMigrationScenario) Handler() func(ctx sdk.Context) error {
+func (m CheqdMigrationScenario) Handler() func(ctx sdk.Context, cheqdKeeper cheqdkeeper.Keeper) error {
 	return m.handler
 }
 
@@ -102,11 +106,11 @@ type ResourceMigrationScenario struct {
 	existing resourcetypes.MsgCreateResourcePayload
 	didInfo  cheqdtestssetup.MinimalDidInfo
 	expected resourcetypes.ResourceHeader
-	handler  func(ctx sdk.Context) error
+	handler  func(ctx sdk.Context, cheqdKeeper cheqdkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error
 	validate func(actual resourcetypes.ResourceHeader) error
 }
 
-func NewResourceMigrationScenario(name string, setup func() resourcetestssetup.TestSetup, existing resourcetypes.MsgCreateResourcePayload, didInfo cheqdtestssetup.MinimalDidInfo, expected resourcetypes.ResourceHeader, handler func(ctx sdk.Context) error, validate func(actual resourcetypes.ResourceHeader) error) ResourceMigrationScenario {
+func NewResourceMigrationScenario(name string, setup func() resourcetestssetup.TestSetup, existing resourcetypes.MsgCreateResourcePayload, didInfo cheqdtestssetup.MinimalDidInfo, expected resourcetypes.ResourceHeader, handler func(ctx sdk.Context, cheqdKeeper cheqdkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error, validate func(actual resourcetypes.ResourceHeader) error) ResourceMigrationScenario {
 	return ResourceMigrationScenario{
 		name:     name,
 		setup:    setup,
@@ -138,7 +142,7 @@ func (m ResourceMigrationScenario) Expected() resourcetypes.ResourceHeader {
 	return m.expected
 }
 
-func (m ResourceMigrationScenario) Handler() func(ctx sdk.Context) error {
+func (m ResourceMigrationScenario) Handler() func(ctx sdk.Context, cheqdKeeper cheqdkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error {
 	return m.handler
 }
 
@@ -167,7 +171,7 @@ func (m CheqdMigrator) Migrate(ctx sdk.Context) error {
 		if err != nil {
 			return err
 		}
-		err = migration.Handler()(setup.SdkCtx)
+		err = migration.Handler()(setup.SdkCtx, setup.Keeper)
 		if err != nil {
 			return err
 		}
@@ -200,6 +204,7 @@ func NewResourceMigrator(migrations []ResourceMigrationScenario) ResourceMigrato
 func (m ResourceMigrator) Migrate() error {
 	for _, migration := range m.migrations {
 		setup := migration.Setup()
+		fmt.Println(migration.didInfo.Msg)
 		_, err := setup.CreateDid(migration.didInfo.Msg, []cheqdtestssetup.SignInput{migration.didInfo.SignInput})
 		if err != nil {
 			return err
@@ -208,7 +213,7 @@ func (m ResourceMigrator) Migrate() error {
 		if err != nil {
 			return err
 		}
-		err = migration.Handler()(setup.SdkCtx)
+		err = migration.Handler()(setup.SdkCtx, setup.Keeper, setup.ResourceKeeper)
 		if err != nil {
 			return err
 		}

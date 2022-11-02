@@ -2,19 +2,20 @@ package migration
 
 import (
 	"bytes"
-	"encoding/base64"
 	"fmt"
+	"path/filepath"
 
 	appmigrations "github.com/cheqd/cheqd-node/app/migrations"
+	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
 	cheqdtestssetup "github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
 	resourcetestssetup "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var (
-	err                            error
 	didDoc                         cheqdtypes.MsgCreateDidPayload
 	didInfo                        cheqdtestssetup.MinimalDidInfo
 	existingChecksumResource       resourcetypes.MsgCreateResourcePayload
@@ -23,32 +24,33 @@ var (
 )
 
 func InitResourceChecksumScenario() error {
-	err = Loader(GENERATED_JSON_DIR+"/payload/existing/diddoc_multibase_16.json", &didDoc)
+	err := Loader(filepath.Join("payload", "existing", "diddoc_uuid.json"), &didDoc)
 	if err != nil {
+		fmt.Println("Error loading didDoc")
 		return err
 	}
 	var signInput SignInput
-	err = Loader(GENERATED_JSON_DIR+"/keys/signinput_multibase_16.json", &signInput)
+	err = Loader(filepath.Join("keys", "signinput_uuid.json"), &signInput)
 	if err != nil {
+		fmt.Println("Error loading signInput")
 		return err
 	}
-	err = Loader(GENERATED_JSON_DIR+"/payload/existing/resource_checksum.json", &existingChecksumResource)
+	err = Loader(filepath.Join("payload", "existing", "resource_checksum.json"), &existingChecksumResource)
 	if err != nil {
+		fmt.Println("Error loading existingChecksumResource")
 		return err
 	}
-	err = Loader(GENERATED_JSON_DIR+"/payload/expected/resource_checksum.json", &expectedChecksumResourceHeader)
+	err = Loader(filepath.Join("payload", "expected", "resource_checksum.json"), &expectedChecksumResourceHeader)
 	if err != nil {
+		fmt.Println("Error loading expectedChecksumResourceHeader")
 		return err
 	}
-	privateKey, err := base64.StdEncoding.DecodeString(signInput.PrivateKey)
-	if err != nil {
-		return err
-	}
+
 	didInfo = cheqdtestssetup.MinimalDidInfo{
 		Msg: &didDoc,
 		SignInput: cheqdtestssetup.SignInput{
 			VerificationMethodId: signInput.VerificationMethodId,
-			Key:                  privateKey,
+			Key:                  signInput.PrivateKey,
 		},
 	}
 
@@ -58,9 +60,8 @@ func InitResourceChecksumScenario() error {
 		existingChecksumResource,
 		didInfo,
 		expectedChecksumResourceHeader,
-		func(ctx sdk.Context) error {
-			setup := resourcetestssetup.Setup()
-			return appmigrations.MigrateResourceV1(ctx, setup.Keeper, setup.ResourceKeeper)
+		func(ctx sdk.Context, cheqdKeeper cheqdkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error {
+			return appmigrations.MigrateResourceV1(ctx, cheqdKeeper, resourceKeeper)
 		},
 		func(actual resourcetypes.ResourceHeader) error {
 			if !bytes.Equal(actual.Checksum, expectedChecksumResourceHeader.Checksum) {
