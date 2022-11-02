@@ -13,8 +13,9 @@ const (
 	ROOT_REL_PATH        = "../.."
 	DOCKER_LOCALNET      = "localnet"
 	DOCKER_LOCALNET_PATH = "../../docker/localnet"
-	DOCKER_COMPOSE       = "docker compose"
-	DOCKER_LOAD          = "docker load"
+	DOCKER               = "docker"
+	DOCKER_COMPOSE       = "compose"
+	DOCKER_LOAD          = "load"
 	DOCKER_IMAGE_NAME    = "cheqd-node-image.tar"
 	RUNNER_BIN_DIR       = "$(echo $RUNNER_BIN_DIR)"
 	OPERATOR0            = "operator0"
@@ -72,8 +73,8 @@ var (
 )
 
 func LocalnetExec(args ...string) (string, error) {
-	args = append(DOCKER_COMPOSE_ARGS, args...)
-	cmd := exec.Command(DOCKER_COMPOSE, DOCKER_COMPOSE_ARGS...)
+	args = append(append([]string{DOCKER_COMPOSE}, DOCKER_COMPOSE_ARGS...), args...)
+	cmd := exec.Command(DOCKER, args...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return "", sdkerrors.Wrap(err, string(out))
@@ -95,7 +96,8 @@ func LocalnetExecDown() (string, error) {
 }
 
 func LocalnetLoadImage(args ...string) (string, error) {
-	cmd := exec.Command(DOCKER_LOAD, args...)
+	args = append([]string{DOCKER_LOAD}, args...)
+	cmd := exec.Command(DOCKER, args...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return "", sdkerrors.Wrap(err, string(out))
