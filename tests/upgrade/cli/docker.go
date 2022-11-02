@@ -10,22 +10,21 @@ import (
 )
 
 const (
-	DOCKER_LOCALNET                 = "localnet"
-	DOCKER_LOCALNET_PATH            = "../../docker/localnet"
-	DOCKER_COMPOSE                  = "docker compose"
-	DOCKER_LOAD                     = "docker load"
-	DOCKER_COMPOSE_IN_LOCALNET_PATH = DOCKER_LOCALNET_PATH + string(filepath.Separator) + DOCKER_COMPOSE
-	DOCKER_LOAD_IN_LOCALNET_PATH    = DOCKER_LOCALNET_PATH + string(filepath.Separator) + DOCKER_LOAD
-	DOCKER_IMAGE_NAME               = "cheqd-node-image.tar"
-	RUNNER_BIN_DIR                  = "$(echo $RUNNER_BIN_DIR)"
-	OPERATOR0                       = "operator0"
-	OPERATOR1                       = "operator1"
-	OPERATOR2                       = "operator2"
-	OPERATOR3                       = "operator3"
-	VALIDATOR0                      = "validator-0"
-	VALIDATOR1                      = "validator-1"
-	VALIDATOR2                      = "validator-2"
-	VALIDATOR3                      = "validator-3"
+	ROOT_REL_PATH        = "../.."
+	DOCKER_LOCALNET      = "localnet"
+	DOCKER_LOCALNET_PATH = "../../docker/localnet"
+	DOCKER_COMPOSE       = "docker compose"
+	DOCKER_LOAD          = "docker load"
+	DOCKER_IMAGE_NAME    = "cheqd-node-image.tar"
+	RUNNER_BIN_DIR       = "$(echo $RUNNER_BIN_DIR)"
+	OPERATOR0            = "operator0"
+	OPERATOR1            = "operator1"
+	OPERATOR2            = "operator2"
+	OPERATOR3            = "operator3"
+	VALIDATOR0           = "validator-0"
+	VALIDATOR1           = "validator-1"
+	VALIDATOR2           = "validator-2"
+	VALIDATOR3           = "validator-3"
 )
 
 type OperatorAccount map[string]string
@@ -38,8 +37,11 @@ var OperatorAccounts OperatorAccount = OperatorAccount{
 }
 
 var (
+	DOCKER_COMPOSE_ARGS = []string{
+		"-f", filepath.Join(DOCKER_LOCALNET_PATH),
+	}
 	DOCKER_LOAD_IMAGE_ARGS = []string{
-		"-i", DOCKER_IMAGE_NAME,
+		"-i", filepath.Join(ROOT_REL_PATH, DOCKER_IMAGE_NAME),
 	}
 	RENAME_BINARY_CURRENT_TO_PREVIOUS_ARGS = []string{
 		"mv",
@@ -70,11 +72,8 @@ var (
 )
 
 func LocalnetExec(args ...string) (string, error) {
-	cwd, err := os.Getwd()
-	if err != nil {
-		return "", err
-	}
-	cmd := exec.Command(filepath.Join(cwd, DOCKER_COMPOSE_IN_LOCALNET_PATH), args...)
+	args = append(DOCKER_COMPOSE_ARGS, args...)
+	cmd := exec.Command(DOCKER_COMPOSE, DOCKER_COMPOSE_ARGS...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return "", sdkerrors.Wrap(err, string(out))
@@ -96,11 +95,7 @@ func LocalnetExecDown() (string, error) {
 }
 
 func LocalnetLoadImage(args ...string) (string, error) {
-	cwd, err := os.Getwd()
-	if err != nil {
-		return "", err
-	}
-	cmd := exec.Command(filepath.Join(cwd, DOCKER_LOAD_IN_LOCALNET_PATH), args...)
+	cmd := exec.Command(DOCKER_LOAD, args...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return "", sdkerrors.Wrap(err, string(out))
