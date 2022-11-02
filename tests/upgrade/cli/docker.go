@@ -13,6 +13,7 @@ const (
 	ROOT_REL_PATH        = "../.."
 	DOCKER_LOCALNET      = "localnet"
 	DOCKER_LOCALNET_PATH = "../../docker/localnet"
+	DOCKER_COMPOSE_FILE  = "docker-compose.yml"
 	DOCKER               = "docker"
 	DOCKER_COMPOSE       = "compose"
 	DOCKER_LOAD          = "load"
@@ -39,7 +40,7 @@ var OperatorAccounts OperatorAccount = OperatorAccount{
 
 var (
 	DOCKER_COMPOSE_ARGS = []string{
-		"-f", filepath.Join(DOCKER_LOCALNET_PATH),
+		"-f", filepath.Join(DOCKER_LOCALNET_PATH, DOCKER_COMPOSE_FILE),
 	}
 	DOCKER_LOAD_IMAGE_ARGS = []string{
 		"-i", filepath.Join(ROOT_REL_PATH, DOCKER_IMAGE_NAME),
