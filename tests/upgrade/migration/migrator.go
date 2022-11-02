@@ -1,8 +1,6 @@
 package migration
 
 import (
-	"fmt"
-
 	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
 	cheqdtestssetup "github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
 	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
@@ -204,7 +202,6 @@ func NewResourceMigrator(migrations []ResourceMigrationScenario) ResourceMigrato
 func (m ResourceMigrator) Migrate() error {
 	for _, migration := range m.migrations {
 		setup := migration.Setup()
-		fmt.Println(migration.didInfo.Msg)
 		_, err := setup.CreateDid(migration.didInfo.Msg, []cheqdtestssetup.SignInput{migration.didInfo.SignInput})
 		if err != nil {
 			return err
