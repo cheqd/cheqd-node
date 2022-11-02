@@ -33,6 +33,8 @@ const (
 	UPGRADE_NAME                 = cheqdapp.UpgradeName
 	DEPOSIT_AMOUNT               = "10000000"
 	QUERY_PARAMS                 = "--output json"
+	NETWORK_CONFIG_DIR           = "network-config"
+	KEYRING_DIR                  = "keyring-test"
 )
 
 var (

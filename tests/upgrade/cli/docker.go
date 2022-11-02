@@ -19,6 +19,9 @@ const (
 	DOCKER_COMPOSE       = "compose"
 	DOCKER_LOAD          = "load"
 	DOCKER_IMAGE_NAME    = "cheqd-node-image.tar"
+	DOCKER_HOME          = "/home/cheqd"
+	DOCKER_USER          = "cheqd"
+	DOCKER_USER_GROUP    = "cheqd"
 	RUNNER_BIN_DIR       = "$(echo $RUNNER_BIN_DIR)"
 	OPERATOR0            = "operator-0"
 	OPERATOR1            = "operator-1"
@@ -28,6 +31,7 @@ const (
 	VALIDATOR1           = "validator-1"
 	VALIDATOR2           = "validator-2"
 	VALIDATOR3           = "validator-3"
+	VALIDATORS           = 4
 )
 
 type OperatorAccount map[string]string
@@ -38,6 +42,8 @@ var OperatorAccounts OperatorAccount = OperatorAccount{
 	VALIDATOR2: OPERATOR2,
 	VALIDATOR3: OPERATOR3,
 }
+
+var ValidatorNodes = []string{VALIDATOR0, VALIDATOR1, VALIDATOR2, VALIDATOR3}
 
 var (
 	DOCKER_COMPOSE_ARGS = []string{
@@ -95,6 +101,24 @@ func LocalnetExecUp() (string, error) {
 
 func LocalnetExecDown() (string, error) {
 	return LocalnetExec("down")
+}
+
+func LocalnetExecCopyKeys() (string, error) {
+	for _, validator := range ValidatorNodes {
+		_, err := LocalnetExecCopyKey(validator)
+		if err != nil {
+			return "", err
+		}
+	}
+	return "", nil
+}
+
+func LocalnetExecCopyKey(validator string) (string, error) {
+	_, err := LocalnetExec("cp", filepath.Join(NETWORK_CONFIG_DIR, validator, KEYRING_DIR), filepath.Join(validator+":", DOCKER_USER, DOCKER_USER_GROUP), filepath.Join(DOCKER_HOME, ".cheqdnode"))
+	if err != nil {
+		return "", err
+	}
+	return LocalnetExec("exec", "-it", "--user", "root", validator, "chown", "-R", DOCKER_USER+":"+DOCKER_USER_GROUP, DOCKER_HOME)
 }
 
 func LocalnetLoadImage(args ...string) (string, error) {
