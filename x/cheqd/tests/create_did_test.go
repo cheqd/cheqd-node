@@ -19,20 +19,20 @@ var _ = Describe("Create DID tests", func() {
 		setup = Setup()
 	})
 
-	It("Valid: Works for simple did doc", func() {
+	It("Valid: Works for simple did doc (Ed25519VerificationKey2020)", func() {
 		did := GenerateDID(Base58_16bytes)
 		keypair := GenerateKeyPair()
 		keyId := did + "#key-1"
 
-		msg := &types.MsgCreateDidPayload{
+		msg := &types.MsgCreateDidDocPayload{
 			Id:             did,
 			Authentication: []string{keyId},
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                 keyId,
-					Type:               types.Ed25519VerificationKey2020,
-					Controller:         did,
-					PublicKeyMultibase: MustEncodeBase58(keypair.Public),
+					Id:                   keyId,
+					Type:                 types.Ed25519VerificationKey2020{}.Type(),
+					Controller:           did,
+					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
 			},
 		}
@@ -50,7 +50,41 @@ var _ = Describe("Create DID tests", func() {
 		// check
 		created, err := setup.QueryDid(did)
 		Expect(err).To(BeNil())
-		Expect(msg.ToDid()).To(Equal(*created.Did))
+		Expect(msg.ToDidDoc()).To(Equal(*created.Value.DidDoc))
+	})
+
+	It("Valid: Works for simple did doc (JsonWebKey2020)", func() {
+		did := GenerateDID(Base58_16bytes)
+		keypair := GenerateKeyPair()
+		keyId := did + "#key-1"
+
+		msg := &types.MsgCreateDidDocPayload{
+			Id:             did,
+			Authentication: []string{keyId},
+			VerificationMethod: []*types.VerificationMethod{
+				{
+					Id:                   keyId,
+					Type:                 types.JsonWebKey2020{}.Type(),
+					Controller:           did,
+					VerificationMaterial: BuildJsonWebKey2020VerificationMaterial(keypair.Public),
+				},
+			},
+		}
+
+		signatures := []SignInput{
+			{
+				VerificationMethodId: keyId,
+				Key:                  keypair.Private,
+			},
+		}
+
+		_, err := setup.CreateDid(msg, signatures)
+		Expect(err).To(BeNil())
+
+		// check
+		created, err := setup.QueryDid(did)
+		Expect(err).To(BeNil())
+		Expect(msg.ToDidDoc()).To(Equal(*created.Value.DidDoc))
 	})
 
 	It("Valid: DID with external controllers", func() {
@@ -63,16 +97,16 @@ var _ = Describe("Create DID tests", func() {
 		bobKeypair := GenerateKeyPair()
 		bobKeyId := bobDid + "#key-1"
 
-		msg := &types.MsgCreateDidPayload{
+		msg := &types.MsgCreateDidDocPayload{
 			Id:             bobDid,
 			Controller:     []string{alice.Did, anna.Did},
 			Authentication: []string{bobKeyId},
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                 bobKeyId,
-					Type:               types.Ed25519VerificationKey2020,
-					Controller:         anna.Did,
-					PublicKeyMultibase: MustEncodeBase58(bobKeypair.Public),
+					Id:                   bobKeyId,
+					Type:                 types.Ed25519VerificationKey2020{}.Type(),
+					Controller:           anna.Did,
+					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(bobKeypair.Public),
 				},
 			},
 		}
@@ -85,7 +119,7 @@ var _ = Describe("Create DID tests", func() {
 		// check
 		created, err := setup.QueryDid(bobDid)
 		Expect(err).To(BeNil())
-		Expect(msg.ToDid()).To(Equal(*created.Did))
+		Expect(msg.ToDidDoc()).To(Equal(*created.Value.DidDoc))
 	})
 
 	It("Valid: Works for the did doc witha all properties", func() {
@@ -103,34 +137,34 @@ var _ = Describe("Create DID tests", func() {
 		keypair4 := GenerateKeyPair()
 		keyId4 := did + "#key-4"
 
-		msg := &types.MsgCreateDidPayload{
+		msg := &types.MsgCreateDidDocPayload{
 			Context:    []string{"abc", "def"},
 			Id:         did,
 			Controller: []string{did},
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                 keyId1,
-					Type:               types.Ed25519VerificationKey2020,
-					Controller:         did,
-					PublicKeyMultibase: MustEncodeBase58(keypair1.Public),
+					Id:                   keyId1,
+					Type:                 types.Ed25519VerificationKey2020{}.Type(),
+					Controller:           did,
+					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keypair1.Public),
 				},
 				{
-					Id:                 keyId2,
-					Type:               types.Ed25519VerificationKey2020,
-					Controller:         did,
-					PublicKeyMultibase: MustEncodeBase58(keypair2.Public),
+					Id:                   keyId2,
+					Type:                 types.Ed25519VerificationKey2020{}.Type(),
+					Controller:           did,
+					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keypair2.Public),
 				},
 				{
-					Id:                 keyId3,
-					Type:               types.Ed25519VerificationKey2020,
-					Controller:         did,
-					PublicKeyMultibase: MustEncodeBase58(keypair3.Public),
+					Id:                   keyId3,
+					Type:                 types.Ed25519VerificationKey2020{}.Type(),
+					Controller:           did,
+					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keypair3.Public),
 				},
 				{
-					Id:                 keyId4,
-					Type:               types.Ed25519VerificationKey2020,
-					Controller:         did,
-					PublicKeyMultibase: MustEncodeBase58(keypair4.Public),
+					Id:                   keyId4,
+					Type:                 types.Ed25519VerificationKey2020{}.Type(),
+					Controller:           did,
+					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keypair4.Public),
 				},
 			},
 			Authentication:       []string{keyId1, keyId2},
@@ -142,7 +176,7 @@ var _ = Describe("Create DID tests", func() {
 				{
 					Id:              did + "#service-1",
 					Type:            "type-1",
-					ServiceEndpoint: "endpoint-1",
+					ServiceEndpoint: []string{"endpoint-1"},
 				},
 			},
 			AlsoKnownAs: []string{"alias-1", "alias-2"},
@@ -161,7 +195,7 @@ var _ = Describe("Create DID tests", func() {
 		// check
 		created, err := setup.QueryDid(did)
 		Expect(err).To(BeNil())
-		Expect(msg.ToDid()).To(Equal(*created.Did))
+		Expect(msg.ToDidDoc()).To(Equal(*created.Value.DidDoc))
 	})
 
 	// **************************
@@ -177,16 +211,16 @@ var _ = Describe("Create DID tests", func() {
 		bobKeypair := GenerateKeyPair()
 		bobKeyId := bobDid + "#key-1"
 
-		msg := &types.MsgCreateDidPayload{
+		msg := &types.MsgCreateDidDocPayload{
 			Id:             bobDid,
 			Controller:     []string{alice.Did, bobDid},
 			Authentication: []string{bobKeyId},
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                 bobKeyId,
-					Type:               types.Ed25519VerificationKey2020,
-					Controller:         bobDid,
-					PublicKeyMultibase: MustEncodeBase58(bobKeypair.Public),
+					Id:                   bobKeyId,
+					Type:                 types.Ed25519VerificationKey2020{}.Type(),
+					Controller:           bobDid,
+					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(bobKeypair.Public),
 				},
 			},
 		}
@@ -207,16 +241,16 @@ var _ = Describe("Create DID tests", func() {
 		keypair := GenerateKeyPair()
 		keyId := did + "#key-1"
 
-		msg := &types.MsgCreateDidPayload{
+		msg := &types.MsgCreateDidDocPayload{
 			Id:             did,
 			Controller:     []string{did},
 			Authentication: []string{keyId},
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                 keyId,
-					Type:               types.Ed25519VerificationKey2020,
-					Controller:         did,
-					PublicKeyMultibase: MustEncodeBase58(keypair.Public),
+					Id:                   keyId,
+					Type:                 types.Ed25519VerificationKey2020{}.Type(),
+					Controller:           did,
+					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
 			},
 		}
@@ -234,16 +268,16 @@ var _ = Describe("Create DID tests", func() {
 
 		nonExistingDid := GenerateDID(Base58_16bytes)
 
-		msg := &types.MsgCreateDidPayload{
+		msg := &types.MsgCreateDidDocPayload{
 			Id:             did,
 			Controller:     []string{nonExistingDid},
 			Authentication: []string{keyId},
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                 keyId,
-					Type:               types.Ed25519VerificationKey2020,
-					Controller:         did,
-					PublicKeyMultibase: MustEncodeBase58(keypair.Public),
+					Id:                   keyId,
+					Type:                 types.Ed25519VerificationKey2020{}.Type(),
+					Controller:           did,
+					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
 			},
 		}
@@ -259,16 +293,16 @@ var _ = Describe("Create DID tests", func() {
 		keypair := GenerateKeyPair()
 		keyId := did + "#key-1"
 
-		msg := &types.MsgCreateDidPayload{
+		msg := &types.MsgCreateDidDocPayload{
 			Id:             did,
 			Controller:     []string{did},
 			Authentication: []string{keyId},
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                 keyId,
-					Type:               types.Ed25519VerificationKey2020,
-					Controller:         did,
-					PublicKeyMultibase: MustEncodeBase58(keypair.Public),
+					Id:                   keyId,
+					Type:                 types.Ed25519VerificationKey2020{}.Type(),
+					Controller:           did,
+					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
 			},
 		}
@@ -295,16 +329,16 @@ var _ = Describe("Create DID tests", func() {
 		bobKeypair := GenerateKeyPair()
 		bobKeyId := bobDid + "#key-1"
 
-		msg := &types.MsgCreateDidPayload{
+		msg := &types.MsgCreateDidDocPayload{
 			Id:             bobDid,
 			Controller:     []string{bobDid},
 			Authentication: []string{bobKeyId},
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                 bobKeyId,
-					Type:               types.Ed25519VerificationKey2020,
-					Controller:         bobDid,
-					PublicKeyMultibase: MustEncodeBase58(bobKeypair.Public),
+					Id:                   bobKeyId,
+					Type:                 types.Ed25519VerificationKey2020{}.Type(),
+					Controller:           bobDid,
+					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(bobKeypair.Public),
 				},
 			},
 		}
@@ -320,16 +354,16 @@ var _ = Describe("Create DID tests", func() {
 		keypair := GenerateKeyPair()
 		keyId := did + "#key-1"
 
-		msg := &types.MsgCreateDidPayload{
+		msg := &types.MsgCreateDidDocPayload{
 			Id:             did,
 			Controller:     []string{did},
 			Authentication: []string{keyId},
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                 keyId,
-					Type:               types.Ed25519VerificationKey2020,
-					Controller:         did,
-					PublicKeyMultibase: MustEncodeBase58(keypair.Public),
+					Id:                   keyId,
+					Type:                 types.Ed25519VerificationKey2020{}.Type(),
+					Controller:           did,
+					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
 			},
 		}
@@ -351,15 +385,15 @@ var _ = Describe("Create DID tests", func() {
 		// Alice
 		alice := setup.CreateSimpleDid()
 
-		msg := &types.MsgCreateDidPayload{
+		msg := &types.MsgCreateDidDocPayload{
 			Id:             alice.Did,
 			Authentication: []string{alice.KeyId},
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                 alice.KeyId,
-					Type:               types.Ed25519VerificationKey2020,
-					Controller:         alice.Did,
-					PublicKeyMultibase: MustEncodeBase58(alice.KeyPair.Public),
+					Id:                   alice.KeyId,
+					Type:                 types.Ed25519VerificationKey2020{}.Type(),
+					Controller:           alice.Did,
+					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(alice.KeyPair.Public),
 				},
 			},
 		}
@@ -386,15 +420,15 @@ var _ = Describe("Check upper/lower case for DID creation", func() {
 		keypair := GenerateKeyPair()
 		keyId := did + "#key-1"
 
-		msg := &types.MsgCreateDidPayload{
+		msg := &types.MsgCreateDidDocPayload{
 			Id:             did,
 			Authentication: []string{keyId},
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                 keyId,
-					Type:               types.Ed25519VerificationKey2020,
-					Controller:         did,
-					PublicKeyMultibase: MustEncodeBase58(keypair.Public),
+					Id:                   keyId,
+					Type:                 types.Ed25519VerificationKey2020{}.Type(),
+					Controller:           did,
+					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
 			},
 		}
@@ -412,7 +446,7 @@ var _ = Describe("Check upper/lower case for DID creation", func() {
 		// check
 		created, err := setup.QueryDid(did)
 		Expect(err).To(BeNil())
-		Expect(created.Did.Id).To(Equal(testCase.resultId))
+		Expect(created.Value.DidDoc.Id).To(Equal(testCase.resultId))
 	},
 
 		Entry("Low Case UUID", TestCaseUUIDDidStruct{

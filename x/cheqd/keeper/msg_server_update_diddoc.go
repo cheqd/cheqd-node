@@ -11,7 +11,7 @@ import (
 
 const UpdatedPostfix string = "-updated"
 
-func (k MsgServer) UpdateDidDoc(goCtx context.Context, msg *types.MsgUpdateDid) (*types.MsgUpdateDidResponse, error) {
+func (k MsgServer) UpdateDidDoc(goCtx context.Context, msg *types.MsgUpdateDidDoc) (*types.MsgUpdateDidDocResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Get sign bytes before modifying payload
@@ -28,46 +28,40 @@ func (k MsgServer) UpdateDidDoc(goCtx context.Context, msg *types.MsgUpdateDid) 
 	}
 
 	// Retrieve existing state value and did
-	existingStateValue, err := k.GetDid(&ctx, msg.Payload.Id)
+	existingDidDocWithMetadata, err := k.GetDidDoc(&ctx, msg.Payload.Id)
 	if err != nil {
 		return nil, err
 	}
 
+	existingDidDoc := existingDidDocWithMetadata.DidDoc
+
 	// Validate DID is not deactivated
-	if existingStateValue.Metadata.Deactivated {
+	if existingDidDocWithMetadata.Metadata.Deactivated {
 		return nil, types.ErrDIDDocDeactivated.Wrap(msg.Payload.Id)
 	}
 
-	existingDid, err := existingStateValue.UnpackDataAsDid()
-	if err != nil {
-		return nil, err
-	}
-
 	// Check version id
-	if msg.Payload.VersionId != existingStateValue.Metadata.VersionId {
-		return nil, types.ErrUnexpectedDidVersion.Wrapf("got: %s, must be: %s", msg.Payload.VersionId, existingStateValue.Metadata.VersionId)
+	if msg.Payload.VersionId != existingDidDocWithMetadata.Metadata.VersionId {
+		return nil, types.ErrUnexpectedDidVersion.Wrapf("got: %s, must be: %s", msg.Payload.VersionId, existingDidDocWithMetadata.Metadata.VersionId)
 	}
 
 	// Construct the new version of the DID and temporary rename it and its self references
 	// in order to consider old and new versions different DIDs during signatures validation
-	updatedDid := msg.Payload.ToDid()
-	updatedDid.ReplaceIds(updatedDid.Id, updatedDid.Id+UpdatedPostfix)
+	updatedDidDoc := msg.Payload.ToDidDoc()
+	updatedDidDoc.ReplaceDids(updatedDidDoc.Id, updatedDidDoc.Id+UpdatedPostfix)
 
-	updatedMetadata := *existingStateValue.Metadata
+	updatedMetadata := *existingDidDocWithMetadata.Metadata
 	updatedMetadata.Update(ctx)
 
-	updatedStateValue, err := types.NewStateValue(&updatedDid, &updatedMetadata)
-	if err != nil {
-		return nil, err
-	}
+	updatedDidDocWithMetadata := types.NewDidDocWithMetadata(&updatedDidDoc, &updatedMetadata)
 
 	// Consider the new version of the DID a separate DID
-	inMemoryDids := map[string]types.StateValue{updatedDid.Id: updatedStateValue}
+	inMemoryDids := map[string]types.DidDocWithMetadata{updatedDidDoc.Id: updatedDidDocWithMetadata}
 
 	// Check controllers existence
-	controllers := updatedDid.AllControllerDids()
+	controllers := updatedDidDoc.AllControllerDids()
 	for _, controller := range controllers {
-		_, err := MustFindDid(&k.Keeper, &ctx, inMemoryDids, controller)
+		_, err := MustFindDidDoc(&k.Keeper, &ctx, inMemoryDids, controller)
 		if err != nil {
 			return nil, err
 		}
@@ -78,30 +72,25 @@ func (k MsgServer) UpdateDidDoc(goCtx context.Context, msg *types.MsgUpdateDid) 
 	// We can't use VerifySignatures because we can't uniquely identify a verification method corresponding to a given signInfo.
 	// In other words if a signature belongs to the did being updated, there is no way to know which did version it belongs to: old or new.
 	// To eliminate this problem we have to add pubkey to the signInfo in future.
-	signers := GetSignerDIDsForDIDUpdate(*existingDid, updatedDid)
-	extendedSignatures := DuplicateSignatures(msg.Signatures, existingDid.Id, updatedDid.Id)
-	err = VerifyAllSignersHaveAtLeastOneValidSignature(&k.Keeper, &ctx, inMemoryDids, signBytes, signers, extendedSignatures, existingDid.Id, updatedDid.Id)
+	signers := GetSignerDIDsForDIDUpdate(*existingDidDoc, updatedDidDoc)
+	extendedSignatures := DuplicateSignatures(msg.Signatures, existingDidDocWithMetadata.DidDoc.Id, updatedDidDoc.Id)
+	err = VerifyAllSignersHaveAtLeastOneValidSignature(&k.Keeper, &ctx, inMemoryDids, signBytes, signers, extendedSignatures, existingDidDoc.Id, updatedDidDoc.Id)
 	if err != nil {
 		return nil, err
 	}
 
 	// Return original id
-	updatedDid.ReplaceIds(updatedDid.Id, existingDid.Id)
+	updatedDidDoc.ReplaceDids(updatedDidDoc.Id, existingDidDoc.Id)
 
-	// Modify state
-	updatedStateValue, err = types.NewStateValue(&updatedDid, &updatedMetadata)
-	if err != nil {
-		return nil, err
-	}
-
-	err = k.SetDid(&ctx, &updatedStateValue)
+	// Update state
+	err = k.SetDidDoc(&ctx, &updatedDidDocWithMetadata)
 	if err != nil {
 		return nil, types.ErrInternal.Wrapf(err.Error())
 	}
 
 	// Build and return response
-	return &types.MsgUpdateDidResponse{
-		Id: updatedDid.Id,
+	return &types.MsgUpdateDidDocResponse{
+		Value: &updatedDidDocWithMetadata,
 	}, nil
 }
 
@@ -137,14 +126,14 @@ func DuplicateSignatures(signatures []*types.SignInfo, didToDuplicate string, ne
 	return result
 }
 
-func GetSignerDIDsForDIDUpdate(existingDid types.Did, updatedDid types.Did) []string {
-	signers := existingDid.GetControllersOrSubject()
-	signers = append(signers, updatedDid.GetControllersOrSubject()...)
+func GetSignerDIDsForDIDUpdate(existingDidDoc types.DidDoc, updatedDidDoc types.DidDoc) []string {
+	signers := existingDidDoc.GetControllersOrSubject()
+	signers = append(signers, updatedDidDoc.GetControllersOrSubject()...)
 
-	existingVMMap := types.VerificationMethodListToMapByFragment(existingDid.VerificationMethod)
-	updatedVMMap := types.VerificationMethodListToMapByFragment(updatedDid.VerificationMethod)
+	existingVMMap := types.VerificationMethodListToMapByFragment(existingDidDoc.VerificationMethod)
+	updatedVMMap := types.VerificationMethodListToMapByFragment(updatedDidDoc.VerificationMethod)
 
-	for _, updatedVM := range updatedDid.VerificationMethod {
+	for _, updatedVM := range updatedDidDoc.VerificationMethod {
 		_, _, _, fragment := utils.MustSplitDIDUrl(updatedVM.Id)
 		existingVM, found := existingVMMap[fragment]
 
@@ -159,7 +148,7 @@ func GetSignerDIDsForDIDUpdate(existingDid types.Did, updatedDid types.Did) []st
 		// Otherwise we will detect id and controller change
 		// for non changed VMs because of `-updated` postfix.
 		originalUpdatedVM := *updatedVM
-		originalUpdatedVM.ReplaceIds(updatedDid.Id, existingDid.Id)
+		originalUpdatedVM.ReplaceDids(updatedDidDoc.Id, existingDidDoc.Id)
 
 		if !reflect.DeepEqual(existingVM, originalUpdatedVM) {
 			signers = append(signers, existingVM.Controller, updatedVM.Controller)
@@ -169,7 +158,7 @@ func GetSignerDIDsForDIDUpdate(existingDid types.Did, updatedDid types.Did) []st
 		// VM not changed
 	}
 
-	for _, existingVM := range existingDid.VerificationMethod {
+	for _, existingVM := range existingDidDoc.VerificationMethod {
 		_, _, _, fragment := utils.MustSplitDIDUrl(existingVM.Id)
 		_, found := updatedVMMap[fragment]
 

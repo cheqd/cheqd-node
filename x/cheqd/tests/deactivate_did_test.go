@@ -22,7 +22,7 @@ var _ = Describe("Deactivate DID tests", func() {
 	It("Valid: Deactivate DID", func() {
 		// Alice
 		alice := setup.CreateSimpleDid()
-		msg := &types.MsgDeactivateDidPayload{
+		msg := &types.MsgDeactivateDidDocPayload{
 			Id: alice.Did,
 		}
 
@@ -30,14 +30,14 @@ var _ = Describe("Deactivate DID tests", func() {
 
 		res, err := setup.DeactivateDid(msg, signatures)
 		Expect(err).To(BeNil())
-		Expect(res.Metadata.Deactivated).To(BeTrue())
+		Expect(res.Value.Metadata.Deactivated).To(BeTrue())
 	})
 
 	When("DID is not found", func() {
 		It("Should return error", func() {
 			NotFoundDID := GenerateDID(Base58_16bytes)
 
-			msg := &types.MsgDeactivateDidPayload{
+			msg := &types.MsgDeactivateDidDocPayload{
 				Id: NotFoundDID,
 			}
 
@@ -53,7 +53,7 @@ var _ = Describe("Deactivate DID tests", func() {
 		It("Should return error", func() {
 			// Alice
 			alice := setup.CreateSimpleDid()
-			msg := &types.MsgDeactivateDidPayload{
+			msg := &types.MsgDeactivateDidDocPayload{
 				Id: alice.Did,
 			}
 
@@ -61,7 +61,7 @@ var _ = Describe("Deactivate DID tests", func() {
 
 			res, err := setup.DeactivateDid(msg, signatures)
 			Expect(err).To(BeNil())
-			Expect(res.Metadata.Deactivated).To(BeTrue())
+			Expect(res.Value.Metadata.Deactivated).To(BeTrue())
 
 			// Deactivate again
 			_, err = setup.DeactivateDid(msg, signatures)
@@ -77,7 +77,7 @@ var _ = Describe("Deactivate DID tests", func() {
 			// Bob
 			bob := setup.CreateSimpleDid()
 
-			msg := &types.MsgDeactivateDidPayload{
+			msg := &types.MsgDeactivateDidDocPayload{
 				Id: alice.Did,
 			}
 

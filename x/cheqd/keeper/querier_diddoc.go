@@ -7,10 +7,10 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func getDid(ctx sdk.Context, id string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
+func getDidDoc(ctx sdk.Context, id string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	queryServer := NewQueryServer(keeper)
 
-	resp, err := queryServer.Did(sdk.WrapSDKContext(ctx), &types.QueryGetDidRequest{Id: id})
+	resp, err := queryServer.DidDoc(sdk.WrapSDKContext(ctx), &types.QueryGetDidDocRequest{Id: id})
 	if err != nil {
 		return nil, err
 	}

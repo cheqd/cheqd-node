@@ -31,6 +31,7 @@ func ValidateJWK(jwk_string string) error {
 		if err != nil {
 			return err
 		}
+		break
 	default:
 		return fmt.Errorf("unsupported jwk type: %s. supported types are: rsa/pub, ecdsa/pub, ed25519/pub", reflect.TypeOf(raw).Name())
 	}

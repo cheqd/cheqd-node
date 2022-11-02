@@ -17,7 +17,7 @@ type SignInput struct {
 }
 
 type DidInfo struct {
-	Msg          *types.MsgCreateDidPayload
+	Msg          *types.MsgCreateDidDocPayload
 	Did          string
 	CollectionId string
 	KeyPair      KeyPair

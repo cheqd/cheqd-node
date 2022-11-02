@@ -265,7 +265,7 @@ var _ = Describe("Validation RSA Signature in verification method", func() {
 			jwk_, err := jwk.New(pubKey)
 			Expect(err).To(BeNil())
 
-			json_, err := json.MarshalIndent(jwk_, "", "  ")
+			json_, err := json.Marshal(jwk_)
 			Expect(err).To(BeNil())
 
 			vm2 := VerificationMethod{

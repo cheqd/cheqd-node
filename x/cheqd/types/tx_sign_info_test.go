@@ -48,17 +48,6 @@ var _ = Describe("SignInfo tests", func() {
 				isValid:           false,
 				errorMsg:          "verification_method_id: did namespace must be one of: mainnet.",
 			}),
-
-		Entry(
-			"Signature is not valid base64 string",
-			TestCaseSignInfoStruct{
-				si: SignInfo{
-					VerificationMethodId: "did:cheqd:zABCDEFG123456789abcd#service1",
-					Signature:            []byte("!@#"),
-				},
-				isValid:  false,
-				errorMsg: "signature: must be encoded in Base64.",
-			}),
 	)
 })
 

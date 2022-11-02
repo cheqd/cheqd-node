@@ -2,12 +2,11 @@ package setup
 
 import (
 	"crypto/ed25519"
-	"encoding/base64"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 )
 
-func (s *TestSetup) UpdateDid(payload *types.MsgUpdateDidPayload, signInputs []SignInput) (*types.MsgUpdateDidResponse, error) {
+func (s *TestSetup) UpdateDid(payload *types.MsgUpdateDidDocPayload, signInputs []SignInput) (*types.MsgUpdateDidDocResponse, error) {
 	signBytes := payload.GetSignBytes()
 	var signatures []*types.SignInfo
 
@@ -16,14 +15,14 @@ func (s *TestSetup) UpdateDid(payload *types.MsgUpdateDidPayload, signInputs []S
 
 		signatures = append(signatures, &types.SignInfo{
 			VerificationMethodId: input.VerificationMethodId,
-			Signature:            base64.StdEncoding.EncodeToString(signature),
+			Signature:            signature,
 		})
 	}
 
-	msg := &types.MsgUpdateDid{
+	msg := &types.MsgUpdateDidDoc{
 		Payload:    payload,
 		Signatures: signatures,
 	}
 
-	return s.MsgServer.UpdateDid(s.StdCtx, msg)
+	return s.MsgServer.UpdateDidDoc(s.StdCtx, msg)
 }

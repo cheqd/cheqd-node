@@ -5,7 +5,6 @@ import (
 
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/mr-tron/base58"
 )
 
@@ -75,7 +74,7 @@ func FindSignInfoBySigner(infos []*SignInfo, signer string) (info SignInfo, foun
 func (si SignInfo) Validate(allowedNamespaces []string) error {
 	return validation.ValidateStruct(&si,
 		validation.Field(&si.VerificationMethodId, validation.Required, IsDIDUrl(allowedNamespaces, Empty, Empty, Required)),
-		validation.Field(&si.Signature, validation.Required, is.Base64),
+		validation.Field(&si.Signature, validation.Required),
 	)
 }
 

@@ -1,31 +1,30 @@
-package cheqd
+package keeper
 
 import (
 	"fmt"
 
-	"github.com/cheqd/cheqd-node/x/cheqd/keeper"
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func NewHandler(k keeper.Keeper) sdk.Handler {
-	msgServer := keeper.NewMsgServer(k)
+func NewHandler(k Keeper) sdk.Handler {
+	msgServer := NewMsgServer(k)
 
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 
 		switch msg := msg.(type) {
-		case *types.MsgCreateDid:
-			res, err := msgServer.CreateDid(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgCreateDidDoc:
+			res, err := msgServer.CreateDidDoc(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
-		case *types.MsgUpdateDid:
-			res, err := msgServer.UpdateDid(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgUpdateDidDoc:
+			res, err := msgServer.UpdateDidDoc(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
-		case *types.MsgDeactivateDid:
-			res, err := msgServer.DeactivateDid(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgDeactivateDidDoc:
+			res, err := msgServer.DeactivateDidDoc(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		default:

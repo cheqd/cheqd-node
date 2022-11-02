@@ -16,7 +16,7 @@ func (msg *MsgUpdateDidDocPayload) GetSignBytes() []byte {
 	return bytes
 }
 
-func (msg *MsgUpdateDidDocPayload) ToDid() DidDoc {
+func (msg *MsgUpdateDidDocPayload) ToDidDoc() DidDoc {
 	return DidDoc{
 		Context:              msg.Context,
 		Id:                   msg.Id,
@@ -35,7 +35,7 @@ func (msg *MsgUpdateDidDocPayload) ToDid() DidDoc {
 // Validation
 
 func (msg MsgUpdateDidDocPayload) Validate(allowedNamespaces []string) error {
-	err := msg.ToDid().Validate(allowedNamespaces)
+	err := msg.ToDidDoc().Validate(allowedNamespaces)
 	if err != nil {
 		return err
 	}

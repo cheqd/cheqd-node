@@ -21,21 +21,21 @@ var _ = Describe("DID Doc update", func() {
 	Describe("DIDDoc: update verification relationship", func() {
 		var alice CreatedDidInfo
 		var bob CreatedDidInfo
-		var msg *types.MsgUpdateDidPayload
+		var msg *types.MsgUpdateDidDocPayload
 
 		BeforeEach(func() {
 			alice = setup.CreateSimpleDid()
 			bob = setup.CreateDidWithExternalConterllers([]string{alice.Did}, []SignInput{alice.SignInput})
 
-			msg = &types.MsgUpdateDidPayload{
+			msg = &types.MsgUpdateDidDocPayload{
 				Id:         bob.Did,
 				Controller: []string{alice.Did},
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:                 bob.KeyId,
-						Type:               types.Ed25519VerificationKey2020,
-						Controller:         bob.Did,
-						PublicKeyMultibase: MustEncodeBase58(bob.KeyPair.Public),
+						Id:                   bob.KeyId,
+						Type:                 types.Ed25519VerificationKey2020{}.Type(),
+						Controller:           bob.Did,
+						VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(bob.KeyPair.Public),
 					},
 				},
 				Authentication:  []string{bob.KeyId},
@@ -53,7 +53,7 @@ var _ = Describe("DID Doc update", func() {
 			// check
 			created, err := setup.QueryDid(bob.Did)
 			Expect(err).To(BeNil())
-			Expect(msg.ToDid()).To(Equal(*created.Did))
+			Expect(msg.ToDidDoc()).To(Equal(*created.Value.DidDoc))
 		})
 
 		It("Doesn't work without controllers signatures", func() {
@@ -67,21 +67,21 @@ var _ = Describe("DID Doc update", func() {
 	Describe("DIDDoc: replacing controller", func() {
 		var alice CreatedDidInfo
 		var bob CreatedDidInfo
-		var msg *types.MsgUpdateDidPayload
+		var msg *types.MsgUpdateDidDocPayload
 
 		BeforeEach(func() {
 			alice = setup.CreateSimpleDid()
 			bob = setup.CreateSimpleDid()
 
-			msg = &types.MsgUpdateDidPayload{
+			msg = &types.MsgUpdateDidDocPayload{
 				Id:         alice.Did,
 				Controller: []string{bob.Did},
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:                 alice.KeyId,
-						Type:               types.Ed25519VerificationKey2020,
-						Controller:         alice.Did,
-						PublicKeyMultibase: MustEncodeBase58(alice.KeyPair.Public),
+						Id:                   alice.KeyId,
+						Type:                 types.Ed25519VerificationKey2020{}.Type(),
+						Controller:           alice.Did,
+						VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(alice.KeyPair.Public),
 					},
 				},
 				VersionId: alice.VersionId,
@@ -100,7 +100,7 @@ var _ = Describe("DID Doc update", func() {
 			// check
 			updated, err := setup.QueryDid(alice.Did)
 			Expect(err).To(BeNil())
-			Expect(*updated.Did).To(Equal(msg.ToDid()))
+			Expect(*updated.Value.DidDoc).To(Equal(msg.ToDidDoc()))
 		})
 
 		It("Doesn't work with only new controller signature", func() {
@@ -125,21 +125,21 @@ var _ = Describe("DID Doc update", func() {
 	Describe("DIDDoc: adding controller", func() {
 		var alice CreatedDidInfo
 		var bob CreatedDidInfo
-		var msg *types.MsgUpdateDidPayload
+		var msg *types.MsgUpdateDidDocPayload
 
 		BeforeEach(func() {
 			alice = setup.CreateSimpleDid()
 			bob = setup.CreateSimpleDid()
 
-			msg = &types.MsgUpdateDidPayload{
+			msg = &types.MsgUpdateDidDocPayload{
 				Id:         alice.Did,
 				Controller: []string{alice.Did, bob.Did},
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:                 alice.KeyId,
-						Type:               types.Ed25519VerificationKey2020,
-						Controller:         alice.Did,
-						PublicKeyMultibase: MustEncodeBase58(alice.KeyPair.Public),
+						Id:                   alice.KeyId,
+						Type:                 types.Ed25519VerificationKey2020{}.Type(),
+						Controller:           alice.Did,
+						VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(alice.KeyPair.Public),
 					},
 				},
 				VersionId: alice.VersionId,
@@ -158,7 +158,7 @@ var _ = Describe("DID Doc update", func() {
 			// check
 			updated, err := setup.QueryDid(alice.Did)
 			Expect(err).To(BeNil())
-			Expect(*updated.Did).To(Equal(msg.ToDid()))
+			Expect(*updated.Value.DidDoc).To(Equal(msg.ToDidDoc()))
 		})
 
 		It("Doesn't work with only new controller signatures", func() {
@@ -183,21 +183,21 @@ var _ = Describe("DID Doc update", func() {
 	Describe("DIDDoc: Keeping VM with controller different then subject untouched during update", func() {
 		var alice CreatedDidInfo
 		var bob CreatedDidInfo
-		var msg *types.MsgUpdateDidPayload
+		var msg *types.MsgUpdateDidDocPayload
 
 		BeforeEach(func() {
 			bob = setup.CreateSimpleDid()
 			alice = setup.CreateDidWithExternalConterllers([]string{bob.Did}, []SignInput{bob.SignInput})
 
-			msg = &types.MsgUpdateDidPayload{
+			msg = &types.MsgUpdateDidDocPayload{
 				Id:         alice.Did,
 				Controller: []string{bob.Did},
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:                 alice.KeyId,
-						Type:               types.Ed25519VerificationKey2020,
-						Controller:         alice.Did,
-						PublicKeyMultibase: MustEncodeBase58(alice.KeyPair.Public),
+						Id:                   alice.KeyId,
+						Type:                 types.Ed25519VerificationKey2020{}.Type(),
+						Controller:           alice.Did,
+						VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(alice.KeyPair.Public),
 					},
 				},
 				Authentication:  []string{alice.KeyId},
@@ -217,26 +217,26 @@ var _ = Describe("DID Doc update", func() {
 			// check
 			created, err := setup.QueryDid(alice.Did)
 			Expect(err).To(BeNil())
-			Expect(*created).ToNot(Equal(msg.ToDid()))
+			Expect(*created).ToNot(Equal(msg.ToDidDoc()))
 		})
 	})
 
 	Describe("Verification method: key udpate", func() {
 		var did CreatedDidInfo
 		var newKeyPair KeyPair
-		var msg *types.MsgUpdateDidPayload
+		var msg *types.MsgUpdateDidDocPayload
 
 		BeforeEach(func() {
 			did = setup.CreateSimpleDid()
 			newKeyPair = GenerateKeyPair()
-			msg = &types.MsgUpdateDidPayload{
+			msg = &types.MsgUpdateDidDocPayload{
 				Id: did.Did,
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:                 did.KeyId,
-						Type:               types.Ed25519VerificationKey2020,
-						Controller:         did.Did,
-						PublicKeyMultibase: MustEncodeBase58(newKeyPair.Public),
+						Id:                   did.KeyId,
+						Type:                 types.Ed25519VerificationKey2020{}.Type(),
+						Controller:           did.Did,
+						VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(newKeyPair.Public),
 					},
 				},
 				VersionId: did.VersionId,
@@ -258,7 +258,7 @@ var _ = Describe("DID Doc update", func() {
 			// check
 			created, err := setup.QueryDid(did.Did)
 			Expect(err).To(BeNil())
-			Expect(msg.ToDid()).To(Equal(*created.Did))
+			Expect(msg.ToDidDoc()).To(Equal(*created.Value.DidDoc))
 		})
 
 		It("Doesn't work without new signature", func() {
@@ -282,20 +282,20 @@ var _ = Describe("DID Doc update", func() {
 	Describe("Verification method: controller update", func() {
 		var alice CreatedDidInfo
 		var bob CreatedDidInfo
-		var msg *types.MsgUpdateDidPayload
+		var msg *types.MsgUpdateDidDocPayload
 
 		BeforeEach(func() {
 			alice = setup.CreateSimpleDid()
 			bob = setup.CreateSimpleDid()
 
-			msg = &types.MsgUpdateDidPayload{
+			msg = &types.MsgUpdateDidDocPayload{
 				Id: alice.Did,
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:                 alice.KeyId,
-						Type:               types.Ed25519VerificationKey2020,
-						Controller:         bob.Did,
-						PublicKeyMultibase: MustEncodeBase58(alice.KeyPair.Public),
+						Id:                   alice.KeyId,
+						Type:                 types.Ed25519VerificationKey2020{}.Type(),
+						Controller:           bob.Did,
+						VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(alice.KeyPair.Public),
 					},
 				},
 				Authentication: []string{alice.KeyId},
@@ -312,7 +312,7 @@ var _ = Describe("DID Doc update", func() {
 			// check
 			updated, err := setup.QueryDid(alice.Did)
 			Expect(err).To(BeNil())
-			Expect(*updated.Did).To(Equal(msg.ToDid()))
+			Expect(*updated.Value.DidDoc).To(Equal(msg.ToDidDoc()))
 		})
 
 		It("Doesn't work without old controller signature", func() {
@@ -333,20 +333,20 @@ var _ = Describe("DID Doc update", func() {
 	Describe("Verification method: id update", func() {
 		var alice CreatedDidInfo
 		var newKeyId string
-		var msg *types.MsgUpdateDidPayload
+		var msg *types.MsgUpdateDidDocPayload
 
 		BeforeEach(func() {
 			alice = setup.CreateSimpleDid()
 			newKeyId = alice.Did + "#key-2"
 
-			msg = &types.MsgUpdateDidPayload{
+			msg = &types.MsgUpdateDidDocPayload{
 				Id: alice.Did,
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:                 newKeyId,
-						Type:               types.Ed25519VerificationKey2020,
-						Controller:         alice.Did,
-						PublicKeyMultibase: MustEncodeBase58(alice.KeyPair.Public),
+						Id:                   newKeyId,
+						Type:                 types.Ed25519VerificationKey2020{}.Type(),
+						Controller:           alice.Did,
+						VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(alice.KeyPair.Public),
 					},
 				},
 				Authentication: []string{alice.KeyId},
@@ -388,7 +388,7 @@ var _ = Describe("DID Doc update", func() {
 			// check
 			updated, err := setup.QueryDid(alice.Did)
 			Expect(err).To(BeNil())
-			Expect(*updated.Did).To(Equal(msg.ToDid()))
+			Expect(*updated.Value.DidDoc).To(Equal(msg.ToDidDoc()))
 		})
 	})
 
@@ -396,7 +396,7 @@ var _ = Describe("DID Doc update", func() {
 		var alice CreatedDidInfo
 		var newKeyId string
 		var newKey KeyPair
-		var msg *types.MsgUpdateDidPayload
+		var msg *types.MsgUpdateDidDocPayload
 
 		BeforeEach(func() {
 			alice = setup.CreateSimpleDid()
@@ -404,20 +404,20 @@ var _ = Describe("DID Doc update", func() {
 			newKeyId = alice.Did + "#key-2"
 			newKey = GenerateKeyPair()
 
-			msg = &types.MsgUpdateDidPayload{
+			msg = &types.MsgUpdateDidDocPayload{
 				Id: alice.Did,
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:                 alice.KeyId,
-						Type:               types.Ed25519VerificationKey2020,
-						Controller:         alice.Did,
-						PublicKeyMultibase: MustEncodeBase58(alice.KeyPair.Public),
+						Id:                   alice.KeyId,
+						Type:                 types.Ed25519VerificationKey2020{}.Type(),
+						Controller:           alice.Did,
+						VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(alice.KeyPair.Public),
 					},
 					{
-						Id:                 newKeyId,
-						Type:               types.Ed25519VerificationKey2020,
-						Controller:         alice.Did,
-						PublicKeyMultibase: MustEncodeBase58(newKey.Public),
+						Id:                   newKeyId,
+						Type:                 types.Ed25519VerificationKey2020{}.Type(),
+						Controller:           alice.Did,
+						VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(newKey.Public),
 					},
 				},
 				Authentication: []string{alice.KeyId},
@@ -436,7 +436,7 @@ var _ = Describe("DID Doc update", func() {
 			// check
 			created, err := setup.QueryDid(alice.Did)
 			Expect(err).To(BeNil())
-			Expect(*created).ToNot(Equal(msg.ToDid()))
+			Expect(*created).ToNot(Equal(msg.ToDidDoc()))
 		})
 
 		It("Doesn't work with only new VM signature", func() {
@@ -457,7 +457,7 @@ var _ = Describe("DID Doc update", func() {
 		var secondKeyId string
 		var secondKey KeyPair
 		var secondSignInput SignInput
-		var msg *types.MsgUpdateDidPayload
+		var msg *types.MsgUpdateDidDocPayload
 
 		BeforeEach(func() {
 			alice = setup.CreateSimpleDid()
@@ -469,20 +469,20 @@ var _ = Describe("DID Doc update", func() {
 				Key:                  secondKey.Private,
 			}
 
-			addSecondKeyMsg := &types.MsgUpdateDidPayload{
+			addSecondKeyMsg := &types.MsgUpdateDidDocPayload{
 				Id: alice.Did,
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:                 alice.KeyId,
-						Type:               types.Ed25519VerificationKey2020,
-						Controller:         alice.Did,
-						PublicKeyMultibase: MustEncodeBase58(alice.KeyPair.Public),
+						Id:                   alice.KeyId,
+						Type:                 types.Ed25519VerificationKey2020{}.Type(),
+						Controller:           alice.Did,
+						VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(alice.KeyPair.Public),
 					},
 					{
-						Id:                 secondKeyId,
-						Type:               types.Ed25519VerificationKey2020,
-						Controller:         alice.Did,
-						PublicKeyMultibase: MustEncodeBase58(secondKey.Public),
+						Id:                   secondKeyId,
+						Type:                 types.Ed25519VerificationKey2020{}.Type(),
+						Controller:           alice.Did,
+						VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(secondKey.Public),
 					},
 				},
 				Authentication: []string{alice.KeyId},
@@ -492,14 +492,14 @@ var _ = Describe("DID Doc update", func() {
 			_, err := setup.UpdateDid(addSecondKeyMsg, []SignInput{alice.SignInput})
 			Expect(err).To(BeNil())
 
-			msg = &types.MsgUpdateDidPayload{
+			msg = &types.MsgUpdateDidDocPayload{
 				Id: alice.Did,
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:                 alice.KeyId,
-						Type:               types.Ed25519VerificationKey2020,
-						Controller:         alice.Did,
-						PublicKeyMultibase: MustEncodeBase58(alice.KeyPair.Public),
+						Id:                   alice.KeyId,
+						Type:                 types.Ed25519VerificationKey2020{}.Type(),
+						Controller:           alice.Did,
+						VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(alice.KeyPair.Public),
 					},
 				},
 				Authentication: []string{alice.KeyId},
@@ -518,7 +518,7 @@ var _ = Describe("DID Doc update", func() {
 			// check
 			created, err := setup.QueryDid(alice.Did)
 			Expect(err).To(BeNil())
-			Expect(*created).ToNot(Equal(msg.ToDid()))
+			Expect(*created).ToNot(Equal(msg.ToDidDoc()))
 		})
 
 		It("Doesn't work with only second VM signature (which is get deleted)", func() {
@@ -532,20 +532,20 @@ var _ = Describe("DID Doc update", func() {
 	Describe("Deactivating", func() {
 		var alice CreatedDidInfo
 		var bob CreatedDidInfo
-		var updateMsg *types.MsgUpdateDidPayload
+		var updateMsg *types.MsgUpdateDidDocPayload
 
 		BeforeEach(func() {
 			alice = setup.CreateSimpleDid()
 			bob = setup.CreateSimpleDid()
 
-			updateMsg = &types.MsgUpdateDidPayload{
+			updateMsg = &types.MsgUpdateDidDocPayload{
 				Id: alice.Did,
 				VerificationMethod: []*types.VerificationMethod{
 					{
-						Id:                 alice.DidInfo.KeyId,
-						Type:               types.Ed25519VerificationKey2020,
-						Controller:         alice.DidInfo.Did,
-						PublicKeyMultibase: MustEncodeBase58(alice.DidInfo.KeyPair.Public),
+						Id:                   alice.DidInfo.KeyId,
+						Type:                 types.Ed25519VerificationKey2020{}.Type(),
+						Controller:           alice.DidInfo.Did,
+						VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(alice.DidInfo.KeyPair.Public),
 					},
 				},
 				Authentication: []string{alice.KeyId},
@@ -556,7 +556,7 @@ var _ = Describe("DID Doc update", func() {
 		When("Updating already deactivated DID", func() {
 			It("Should fail with error", func() {
 				// Deactivate DID
-				deactivateMsg := &types.MsgDeactivateDidPayload{
+				deactivateMsg := &types.MsgDeactivateDidDocPayload{
 					Id: alice.Did,
 				}
 
@@ -564,7 +564,7 @@ var _ = Describe("DID Doc update", func() {
 
 				res, err := setup.DeactivateDid(deactivateMsg, signatures)
 				Expect(err).To(BeNil())
-				Expect(res.Metadata.Deactivated).To(BeTrue())
+				Expect(res.Value.Metadata.Deactivated).To(BeTrue())
 
 				// Update deactivated DID
 				signatures = []SignInput{

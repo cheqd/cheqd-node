@@ -11,7 +11,7 @@ import (
 )
 
 // GetDidCount get the total number of did
-func (k Keeper) GetDidCount(ctx *sdk.Context) uint64 {
+func (k Keeper) GetDidDocCount(ctx *sdk.Context) uint64 {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), StrBytes(types.DidCountKey))
 
 	key := StrBytes(types.DidCountKey)
@@ -33,7 +33,7 @@ func (k Keeper) GetDidCount(ctx *sdk.Context) uint64 {
 }
 
 // SetDidCount set the total number of did
-func (k Keeper) SetDidCount(ctx *sdk.Context, count uint64) {
+func (k Keeper) SetDidDocCount(ctx *sdk.Context, count uint64) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), StrBytes(types.DidCountKey))
 
 	key := StrBytes(types.DidCountKey)
@@ -43,11 +43,11 @@ func (k Keeper) SetDidCount(ctx *sdk.Context, count uint64) {
 }
 
 // SetDid set a specific did in the store. Updates DID counter if the DID is new.
-func (k Keeper) SetDid(ctx *sdk.Context, value *types.DidDocWithMetadata) error {
+func (k Keeper) SetDidDoc(ctx *sdk.Context, value *types.DidDocWithMetadata) error {
 	// Update counter
-	if !k.HasDid(ctx, value.DidDoc.Id) {
-		count := k.GetDidCount(ctx)
-		k.SetDidCount(ctx, count+1)
+	if !k.HasDidDoc(ctx, value.DidDoc.Id) {
+		count := k.GetDidDocCount(ctx)
+		k.SetDidDocCount(ctx, count+1)
 	}
 
 	// Create the did
@@ -61,10 +61,10 @@ func (k Keeper) SetDid(ctx *sdk.Context, value *types.DidDocWithMetadata) error 
 }
 
 // GetDid returns a did from its id
-func (k Keeper) GetDid(ctx *sdk.Context, id string) (types.DidDocWithMetadata, error) {
+func (k Keeper) GetDidDoc(ctx *sdk.Context, id string) (types.DidDocWithMetadata, error) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), StrBytes(types.DidKey))
 
-	if !k.HasDid(ctx, id) {
+	if !k.HasDidDoc(ctx, id) {
 		return types.DidDocWithMetadata{}, sdkerrors.ErrNotFound.Wrap(id)
 	}
 
@@ -76,14 +76,14 @@ func (k Keeper) GetDid(ctx *sdk.Context, id string) (types.DidDocWithMetadata, e
 }
 
 // HasDid checks if the did exists in the store
-func (k Keeper) HasDid(ctx *sdk.Context, id string) bool {
+func (k Keeper) HasDidDoc(ctx *sdk.Context, id string) bool {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), StrBytes(types.DidKey))
 	return store.Has(StrBytes(id))
 }
 
-// GetAllDid returns all did
+// GetAllDidDocsWithMetadata returns all did
 // Loads all DIDs in memory. Use only for genesis export.
-func (k Keeper) GetAllDid(ctx *sdk.Context) (list []types.DidDocWithMetadata) {
+func (k Keeper) GetAllDidDocsWithMetadata(ctx *sdk.Context) (list []types.DidDocWithMetadata) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), StrBytes(types.DidKey))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 

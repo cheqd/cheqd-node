@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/multiformats/go-multibase"
@@ -31,4 +32,22 @@ func ValidateBase58(data string) error {
 
 func IsValidBase58(data string) bool {
 	return ValidateBase58(data) == nil
+}
+
+func MustEncodeMultibaseBase58(data []byte) string {
+	encoded, err := multibase.Encode(multibase.Base58BTC, data)
+	if err != nil {
+		panic(err)
+	}
+
+	return encoded
+}
+
+func MustEncodeJson(data interface{}) string {
+	encoded, err := json.Marshal(data)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(encoded)
 }

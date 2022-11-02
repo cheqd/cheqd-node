@@ -18,7 +18,7 @@ func (k MsgServer) CreateDidDoc(goCtx context.Context, msg *types.MsgCreateDidDo
 	msg.Normalize()
 
 	// Validate DID doesn't exist
-	if k.HasDid(&ctx, msg.Payload.Id) {
+	if k.HasDidDoc(&ctx, msg.Payload.Id) {
 		return nil, types.ErrDidDocExists.Wrap(msg.Payload.Id)
 	}
 
@@ -30,50 +30,41 @@ func (k MsgServer) CreateDidDoc(goCtx context.Context, msg *types.MsgCreateDidDo
 	}
 
 	// Build metadata and stateValue
-	did := msg.Payload.ToDid()
+	didDoc := msg.Payload.ToDidDoc()
 	metadata := types.NewMetadataFromContext(ctx)
-	stateValue, err := types.NewStateValue(&did, &metadata)
-	if err != nil {
-		return nil, err
-	}
+	didDocWithMetadata := types.NewDidDocWithMetadata(&didDoc, &metadata)
 
 	// Consider did that we are going to create during did resolutions
-	inMemoryDids := map[string]types.StateValue{did.Id: stateValue}
+	inMemoryDids := map[string]types.DidDocWithMetadata{didDoc.Id: didDocWithMetadata}
 
 	// Check controllers' existence
-	controllers := did.AllControllerDids()
+	controllers := didDoc.AllControllerDids()
 	for _, controller := range controllers {
-		_, err := MustFindDid(&k.Keeper, &ctx, inMemoryDids, controller)
+		_, err := MustFindDidDoc(&k.Keeper, &ctx, inMemoryDids, controller)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	// Verify signatures
-	signers := GetSignerDIDsForDIDCreation(did)
+	signers := GetSignerDIDsForDIDCreation(didDoc)
 	err = VerifyAllSignersHaveAllValidSignatures(&k.Keeper, &ctx, inMemoryDids, signBytes, signers, msg.Signatures)
 	if err != nil {
 		return nil, err
 	}
 
-	// Build state value
-	value, err := types.NewStateValue(&did, &metadata)
-	if err != nil {
-		return nil, err
-	}
-
-	err = k.SetDid(&ctx, &value)
+	err = k.SetDidDoc(&ctx, &didDocWithMetadata)
 	if err != nil {
 		return nil, types.ErrInternal.Wrapf(err.Error())
 	}
 
 	// Build and return response
-	return &types.MsgCreateDidResponse{
-		Id: did.Id,
+	return &types.MsgCreateDidDocResponse{
+		Value: &didDocWithMetadata,
 	}, nil
 }
 
-func GetSignerDIDsForDIDCreation(did types.Did) []string {
+func GetSignerDIDsForDIDCreation(did types.DidDoc) []string {
 	res := did.GetControllersOrSubject()
 	res = append(res, did.GetVerificationMethodControllers()...)
 

@@ -3,11 +3,13 @@ package setup
 import (
 	"crypto/ed25519"
 	"crypto/rand"
+	"encoding/json"
 
+	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	. "github.com/cheqd/cheqd-node/x/cheqd/utils"
 	"github.com/google/uuid"
+	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/mr-tron/base58"
-	"github.com/multiformats/go-multibase"
-	. "github.com/onsi/gomega"
 )
 
 func randBase58Seq(bytes int) string {
@@ -46,8 +48,25 @@ func GenerateKeyPair() KeyPair {
 	return KeyPair{PrivateKey, PublicKey}
 }
 
-func MustEncodeBase58(data []byte) string {
-	encoded, err := multibase.Encode(multibase.Base58BTC, data)
-	Expect(err).To(BeNil())
-	return encoded
+func BuildEd25519VerificationKey2020VerificationMaterial(publicKey ed25519.PublicKey) string {
+	return MustEncodeJson(types.Ed25519VerificationKey2020{
+		PublicKeyMultibase: MustEncodeMultibaseBase58(publicKey),
+	})
+}
+
+func BuildJsonWebKey2020VerificationMaterial(publicKey ed25519.PublicKey) string {
+
+	pubKeyJwk, err := jwk.New(publicKey)
+	if err != nil {
+		panic(err)
+	}
+
+	pubKeyJwkJson, err := json.Marshal(pubKeyJwk)
+	if err != nil {
+		panic(err)
+	}
+
+	return MustEncodeJson(types.JsonWebKey2020{
+		PublicKeyJwk: json.RawMessage(pubKeyJwkJson),
+	})
 }

@@ -13,7 +13,7 @@ func (msg *MsgCreateDidDocPayload) GetSignBytes() []byte {
 	return bytes
 }
 
-func (msg *MsgCreateDidDocPayload) ToDid() DidDoc {
+func (msg *MsgCreateDidDocPayload) ToDidDoc() DidDoc {
 	return DidDoc{
 		Context:              msg.Context,
 		Id:                   msg.Id,
@@ -32,7 +32,7 @@ func (msg *MsgCreateDidDocPayload) ToDid() DidDoc {
 // Validation
 
 func (msg MsgCreateDidDocPayload) Validate(allowedNamespaces []string) error {
-	return msg.ToDid().Validate(allowedNamespaces)
+	return msg.ToDidDoc().Validate(allowedNamespaces)
 }
 
 func ValidMsgCreateDidPayloadRule(allowedNamespaces []string) *CustomErrorRule {

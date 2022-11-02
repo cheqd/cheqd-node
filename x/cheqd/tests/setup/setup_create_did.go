@@ -2,13 +2,12 @@ package setup
 
 import (
 	"crypto/ed25519"
-	"encoding/base64"
 
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 	"github.com/cheqd/cheqd-node/x/cheqd/utils"
 )
 
-func (s *TestSetup) CreateDid(payload *types.MsgCreateDidPayload, signInputs []SignInput) (*types.MsgCreateDidResponse, error) {
+func (s *TestSetup) CreateDid(payload *types.MsgCreateDidDocPayload, signInputs []SignInput) (*types.MsgCreateDidDocResponse, error) {
 	signBytes := payload.GetSignBytes()
 	var signatures []*types.SignInfo
 
@@ -17,16 +16,16 @@ func (s *TestSetup) CreateDid(payload *types.MsgCreateDidPayload, signInputs []S
 
 		signatures = append(signatures, &types.SignInfo{
 			VerificationMethodId: input.VerificationMethodId,
-			Signature:            base64.StdEncoding.EncodeToString(signature),
+			Signature:            signature,
 		})
 	}
 
-	msg := &types.MsgCreateDid{
+	msg := &types.MsgCreateDidDoc{
 		Payload:    payload,
 		Signatures: signatures,
 	}
 
-	return s.MsgServer.CreateDid(s.StdCtx, msg)
+	return s.MsgServer.CreateDidDoc(s.StdCtx, msg)
 }
 
 func (s *TestSetup) BuildDidDocWithCustomDID(did string) DidInfo {
@@ -35,14 +34,14 @@ func (s *TestSetup) BuildDidDocWithCustomDID(did string) DidInfo {
 	keyPair := GenerateKeyPair()
 	keyId := did + "#key-1"
 
-	msg := &types.MsgCreateDidPayload{
+	msg := &types.MsgCreateDidDocPayload{
 		Id: did,
 		VerificationMethod: []*types.VerificationMethod{
 			{
-				Id:                 keyId,
-				Type:               types.Ed25519VerificationKey2020,
-				Controller:         did,
-				PublicKeyMultibase: MustEncodeBase58(keyPair.Public),
+				Id:                   keyId,
+				Type:                 types.Ed25519VerificationKey2020{}.Type(),
+				Controller:           did,
+				VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keyPair.Public),
 			},
 		},
 		Authentication: []string{keyId},
@@ -74,19 +73,14 @@ func (s *TestSetup) BuildSimpleDid() DidInfo {
 }
 
 func (s *TestSetup) CreateCustomDid(info DidInfo) CreatedDidInfo {
-	_, err := s.CreateDid(info.Msg, []SignInput{info.SignInput})
-	if err != nil {
-		panic(err)
-	}
-
-	created, err := s.QueryDid(info.Did)
+	created, err := s.CreateDid(info.Msg, []SignInput{info.SignInput})
 	if err != nil {
 		panic(err)
 	}
 
 	return CreatedDidInfo{
 		DidInfo:   info,
-		VersionId: created.Metadata.VersionId,
+		VersionId: created.Value.Metadata.VersionId,
 	}
 }
 
@@ -99,18 +93,13 @@ func (s *TestSetup) CreateDidWithExternalConterllers(controllers []string, signI
 	did := s.BuildSimpleDid()
 	did.Msg.Controller = append(did.Msg.Controller, controllers...)
 
-	_, err := s.CreateDid(did.Msg, append(signInputs, did.SignInput))
-	if err != nil {
-		panic(err)
-	}
-
-	created, err := s.QueryDid(did.Did)
+	created, err := s.CreateDid(did.Msg, append(signInputs, did.SignInput))
 	if err != nil {
 		panic(err)
 	}
 
 	return CreatedDidInfo{
 		DidInfo:   did,
-		VersionId: created.Metadata.VersionId,
+		VersionId: created.Value.Metadata.VersionId,
 	}
 }
