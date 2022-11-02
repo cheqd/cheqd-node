@@ -169,7 +169,9 @@ jobs:
 
       - name: Run upgrade & migration tests
         working-directory: ./tests/upgrade
-        run: ginkgo -r --tags upgrade --race
+        run: |
+          export BUILD_IMAGE=ghcr.io/cheqd/cheqd-node:latest
+          ginkgo -r --tags upgrade --race
 
   report-results:
     name: "Report"
