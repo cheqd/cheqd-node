@@ -13,7 +13,7 @@ func Query(container string, binary string, module, query string, queryArgs ...s
 		query,
 	}
 
-	args = append(args, QUERY_PARAMS)
+	args = append(args, QUERY_PARAMS...)
 	args = append(args, queryArgs...)
 
 	return LocalnetExecExec(container, args...)
@@ -23,7 +23,7 @@ func QueryUpgradeProposal(container string) (govtypesv1.QueryProposalResponse, e
 	args := append([]string{
 		CLI_BINARY_NAME,
 		"query", "gov", "proposal", "1",
-	}, QUERY_PARAMS)
+	}, QUERY_PARAMS...)
 
 	out, err := LocalnetExecExec(container, args...)
 	if err != nil {
