@@ -153,10 +153,10 @@ jobs:
       - name: Check Keyrings
         working-directory: ./docker/localnet
         run: |
-          docker exec -it validator-0 cheqd-noded keys show operator-0 --keyring-backend test
-          docker exec -it validator-1 cheqd-noded keys show operator-1 --keyring-backend test
-          docker exec -it validator-2 cheqd-noded keys show operator-2 --keyring-backend test
-          docker exec -it validator-3 cheqd-noded keys show operator-3 --keyring-backend test
+          docker compose exec -it validator-0 cheqd-noded keys show operator-0 --keyring-backend test
+          docker compose exec -it validator-1 cheqd-noded keys show operator-1 --keyring-backend test
+          docker compose exec -it validator-2 cheqd-noded keys show operator-2 --keyring-backend test
+          docker compose exec -it validator-3 cheqd-noded keys show operator-3 --keyring-backend test
 
       - name: Import keys
         working-directory: ./docker/localnet
