@@ -3,6 +3,7 @@ package cli
 import (
 	cheqdapp "github.com/cheqd/cheqd-node/app"
 	integrationcli "github.com/cheqd/cheqd-node/tests/integration/cli"
+	integrationnetwork "github.com/cheqd/cheqd-node/tests/integration/network"
 )
 
 const (
@@ -32,7 +33,6 @@ const (
 	EXTRA_BLOCKS           int64 = 5
 	UPGRADE_NAME                 = cheqdapp.UpgradeName
 	DEPOSIT_AMOUNT               = "10000000"
-	QUERY_PARAMS                 = "--output json"
 	NETWORK_CONFIG_DIR           = "network-config"
 	KEYRING_DIR                  = "keyring-test"
 )
@@ -44,6 +44,10 @@ var (
 		"--gas-prices", GAS_PRICES,
 		"--keyring-backend", KEYRING_BACKEND,
 		"-y",
+	}
+	QUERY_PARAMS = []string{
+		"--chain-id", integrationnetwork.CHAIN_ID,
+		"--output", OUTPUT_FORMAT,
 	}
 	CURRENT_HEIGHT    int64
 	VOTING_END_HEIGHT int64
