@@ -140,6 +140,7 @@ jobs:
         working-directory: ./docker/localnet
         run: |
           bash gen-network-config.sh
+          sudo chown -R 1000:1000 network-config
 
       - name: Set up Docker localnet @latest
         working-directory: ./docker/localnet
