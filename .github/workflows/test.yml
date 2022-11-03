@@ -140,7 +140,7 @@ jobs:
         working-directory: ./docker/localnet
         run: |
           bash gen-network-config.sh
-          sudo cp -r network-config network-config-next
+          cp -r network-config network-config-next
           export BUILD_IMAGE=ghcr.io/cheqd/cheqd-node:latest
           sudo chown -R 1000:1000 network-config
 
