@@ -140,7 +140,7 @@ func GenerateRotatedKeysDidDocWithSignInputs(payload cheqdtypes.MsgCreateDidPayl
 }
 
 func GenerateResource(didDoc cheqdtypes.MsgCreateDidPayload) (resourcetypes.MsgCreateResourcePayload, error) {
-	collectionId := strings.Replace(didDoc.Id, "did:cheqd:"+network.DID_NAMESPACE, "", 1)
+	collectionId := strings.Replace(didDoc.Id, "did:cheqd:"+network.DID_NAMESPACE+":", "", 1)
 	payload := resourcetypes.MsgCreateResourcePayload{
 		CollectionId: collectionId,
 		Id:           uuid.NewString(),
