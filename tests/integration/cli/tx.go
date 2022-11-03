@@ -109,12 +109,13 @@ func DeactivateDidDoc(did string, signInputs []cli.SignInput, from string) (sdk.
 	return Tx("cheqd", "deactivate-diddoc", from, args...)
 }
 
-func CreateResource(collectionId, resourceId, resourceName, resourceType, resourceFile string, signInputs []cli.SignInput, from string) (sdk.TxResponse, error) {
+func CreateResource(collectionId, resourceId, resourceName, resourceVersion, resourceType, resourceFile string, signInputs []cli.SignInput, from string) (sdk.TxResponse, error) {
 	// Payload fragments
 	args := []string{
 		"--collection-id", collectionId,
 		"--resource-id", resourceId,
 		"--resource-name", resourceName,
+		"--resource-version", resourceVersion,
 		"--resource-type", resourceType,
 		"--resource-file", resourceFile,
 	}
