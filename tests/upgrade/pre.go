@@ -46,6 +46,8 @@ func Pre() error {
 
 	By("Ensuring CreateResource Tx is successful")
 	res, err = cli.CreateResource(ResourcePayload.CollectionId, ResourcePayload.Id, ResourcePayload.Name, ResourcePayload.ResourceType, ResourceFile, SignInputs, cli.VALIDATOR1)
+	Expect(err).To(BeNil())
+	Expect(res.Code).To(BeEquivalentTo(0))
 
 	By("Ensuring the QueryResource query is successful")
 	res__, err := cli.QueryResource(ResourcePayload.CollectionId, ResourcePayload.Id, cli.VALIDATOR1)

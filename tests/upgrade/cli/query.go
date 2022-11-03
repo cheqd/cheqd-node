@@ -13,8 +13,8 @@ func Query(container string, binary string, module, query string, queryArgs ...s
 		query,
 	}
 
-	args = append(args, QUERY_PARAMS...)
 	args = append(args, queryArgs...)
+	args = append(args, QUERY_PARAMS...)
 
 	return LocalnetExecExec(container, args...)
 }
