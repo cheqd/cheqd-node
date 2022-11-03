@@ -20,14 +20,14 @@ var DidDoc cheqdtypes.MsgCreateDidPayload
 
 var (
 	SignInputs []cheqdcli.SignInput
-	Err        = GenerateDidDocWithSignInputs(&DidDoc, &SignInputs)
+	Err        error
 )
 
 var (
 	ResourcePayload resourcetypes.MsgCreateResourcePayload
 	ResourceFile    string
 	ResourceFileErr error
-	ResourceErr     = GenerateResource(&ResourcePayload)
+	ResourceErr     error
 )
 
 var (

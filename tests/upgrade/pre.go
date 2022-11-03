@@ -28,6 +28,7 @@ var _ = BeforeSuite(func() {
 
 func Pre() error {
 	By("Ensuring the Err in memory is nil")
+	Err = GenerateDidDocWithSignInputs(&DidDoc, &SignInputs)
 	Expect(Err).To(BeNil())
 
 	By("Ensuring CreateDid Tx is successful")
@@ -35,11 +36,12 @@ func Pre() error {
 	Expect(err).To(BeNil())
 	Expect(res.Code).To(BeEquivalentTo(0))
 
-	ResourceFile, ResourceFileErr := integrationtestdata.CreateTestJson(GinkgoT().TempDir())
 	By("Ensuring the ResourceFileErr in memory is nil")
+	ResourceFile, ResourceFileErr := integrationtestdata.CreateTestJson(GinkgoT().TempDir())
 	Expect(ResourceFileErr).To(BeNil())
 
 	By("Ensuring the ResourceErr in memory is nil")
+	ResourceErr = GenerateResource(&ResourcePayload)
 	Expect(ResourceErr).To(BeNil())
 
 	By("Ensuring CreateResource Tx is successful")
