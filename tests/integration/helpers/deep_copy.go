@@ -24,8 +24,8 @@ type DeepCopyCreateDid struct {
 	TDeepCopy
 }
 
-func (d *DeepCopyCreateDid) DeepCopy(src cheqdtypes.MsgCreateDidPayload) cheqdtypes.MsgCreateDidPayload {
-	return deepCopy(src).(cheqdtypes.MsgCreateDidPayload)
+func (d *DeepCopyCreateDid) DeepCopy(src cheqdtypes.MsgCreateDidDocPayload) cheqdtypes.MsgCreateDidDocPayload {
+	return deepCopy(src).(cheqdtypes.MsgCreateDidDocPayload)
 }
 
 // DeepCopyUpdateDid is a decorator for deep copy of type MsgUpdateDidPayload.
@@ -33,8 +33,8 @@ type DeepCopyUpdateDid struct {
 	TDeepCopy
 }
 
-func (d *DeepCopyUpdateDid) DeepCopy(src cheqdtypes.MsgUpdateDidPayload) cheqdtypes.MsgUpdateDidPayload {
-	return deepCopy(src).(cheqdtypes.MsgUpdateDidPayload)
+func (d *DeepCopyUpdateDid) DeepCopy(src cheqdtypes.MsgUpdateDidDocPayload) cheqdtypes.MsgUpdateDidDocPayload {
+	return deepCopy(src).(cheqdtypes.MsgUpdateDidDocPayload)
 }
 
 // DeepCopyCreateResource is a decorator for deep copy of type MsgCreateResource.
@@ -52,28 +52,28 @@ func deepCopy(src interface{}) interface{} {
 	var dst reflect.Value
 
 	switch actualSrc := (src).(type) {
-	case cheqdtypes.MsgCreateDidPayload:
+	case cheqdtypes.MsgCreateDidDocPayload:
 		// Create a reflection slice of the same length as the source slice
 		reflection = reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(actualSrc)), 1, 1).Interface()
 		// Extract destination value as definition
 		dst = reflect.ValueOf(reflection)
 		// Define source value as slice
-		slc := []cheqdtypes.MsgCreateDidPayload{actualSrc}
+		slc := []cheqdtypes.MsgCreateDidDocPayload{actualSrc}
 		// Copy the source value into the destination
 		reflect.Copy(dst, reflect.ValueOf(slc))
 		// Return the destination value from the reflection slice
-		return dst.Index(0).Interface().(cheqdtypes.MsgCreateDidPayload)
-	case cheqdtypes.MsgUpdateDidPayload:
+		return dst.Index(0).Interface().(cheqdtypes.MsgCreateDidDocPayload)
+	case cheqdtypes.MsgUpdateDidDocPayload:
 		// Create a reflection slice of the same length as the source slice
 		reflection = reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(actualSrc)), 1, 1).Interface()
 		// Extract destination value as definition
 		dst = reflect.ValueOf(reflection)
 		// Define source value as slice
-		slc := []cheqdtypes.MsgUpdateDidPayload{actualSrc}
+		slc := []cheqdtypes.MsgUpdateDidDocPayload{actualSrc}
 		// Copy the source value into the destination
 		reflect.Copy(dst, reflect.ValueOf(slc))
 		// Return the destination value from the reflection slice
-		return dst.Index(0).Interface().(cheqdtypes.MsgUpdateDidPayload)
+		return dst.Index(0).Interface().(cheqdtypes.MsgUpdateDidDocPayload)
 	case resourcetypes.MsgCreateResource:
 		// Create a reflection slice of the same length as the source slice
 		reflection = reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(actualSrc)), 1, 1).Interface()

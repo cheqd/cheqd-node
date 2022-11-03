@@ -51,7 +51,7 @@ func Tx(module, tx, from string, txArgs ...string) (sdk.TxResponse, error) {
 	return resp, nil
 }
 
-func CreateDid(payload types.MsgCreateDidPayload, signInputs []cli.SignInput, from string) (sdk.TxResponse, error) {
+func CreateDidDoc(payload types.MsgCreateDidDocPayload, signInputs []cli.SignInput, from string) (sdk.TxResponse, error) {
 	// Payload
 	payloadJson, err := helpers.Codec.MarshalJSON(&payload)
 	if err != nil {
@@ -66,10 +66,10 @@ func CreateDid(payload types.MsgCreateDidPayload, signInputs []cli.SignInput, fr
 		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivKey))
 	}
 
-	return Tx("cheqd", "create-did", from, args...)
+	return Tx("cheqd", "create-diddoc", from, args...)
 }
 
-func UpdateDid(payload types.MsgUpdateDidPayload, signInputs []cli.SignInput, from string) (sdk.TxResponse, error) {
+func UpdateDidDoc(payload types.MsgUpdateDidDocPayload, signInputs []cli.SignInput, from string) (sdk.TxResponse, error) {
 	// Payload
 	payloadJson, err := helpers.Codec.MarshalJSON(&payload)
 	if err != nil {
@@ -84,7 +84,29 @@ func UpdateDid(payload types.MsgUpdateDidPayload, signInputs []cli.SignInput, fr
 		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivKey))
 	}
 
-	return Tx("cheqd", "update-did", from, args...)
+	return Tx("cheqd", "update-diddoc", from, args...)
+}
+
+func DeactivateDidDoc(did string, signInputs []cli.SignInput, from string) (sdk.TxResponse, error) {
+	// Payload
+	payload := types.MsgDeactivateDidDocPayload{
+		Id: did,
+	}
+
+	payloadJson, err := helpers.Codec.MarshalJSON(&payload)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	args := []string{string(payloadJson)}
+
+	// Sign inputs
+	for _, signInput := range signInputs {
+		args = append(args, signInput.VerificationMethodId)
+		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivKey))
+	}
+
+	return Tx("cheqd", "deactivate-diddoc", from, args...)
 }
 
 func CreateResource(collectionId, resourceId, resourceName, resourceType, resourceFile string, signInputs []cli.SignInput, from string) (sdk.TxResponse, error) {

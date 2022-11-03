@@ -25,16 +25,16 @@ func Query(module, query string, queryArgs ...string) (string, error) {
 	return Exec(args...)
 }
 
-func QueryDid(did string) (cheqd_types.QueryGetDidResponse, error) {
-	res, err := Query("cheqd", "did", did)
+func QueryDidDoc(did string) (cheqd_types.QueryGetDidDocResponse, error) {
+	res, err := Query("cheqd", "diddoc", did)
 	if err != nil {
-		return cheqd_types.QueryGetDidResponse{}, err
+		return cheqd_types.QueryGetDidDocResponse{}, err
 	}
 
-	var resp cheqd_types.QueryGetDidResponse
+	var resp cheqd_types.QueryGetDidDocResponse
 	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
-		return cheqd_types.QueryGetDidResponse{}, err
+		return cheqd_types.QueryGetDidDocResponse{}, err
 	}
 
 	return resp, nil
@@ -55,16 +55,16 @@ func QueryResource(collectionId string, resourceId string) (resource_types.Query
 	return resp, nil
 }
 
-func QueryAllResourceVersions(collectionId, resourceName, resourceType string) (resource_types.QueryGetAllResourceVersionsResponse, error) {
-	res, err := Query("resource", "all-resource-versions", collectionId, resourceName, resourceType)
+func QueryResourceMetadata(collectionId string, resourceId string) (resource_types.QueryGetResourceMetadataResponse, error) {
+	res, err := Query("resource", "resource-metadata", collectionId, resourceId)
 	if err != nil {
-		return resource_types.QueryGetAllResourceVersionsResponse{}, err
+		return resource_types.QueryGetResourceMetadataResponse{}, err
 	}
 
-	var resp resource_types.QueryGetAllResourceVersionsResponse
+	var resp resource_types.QueryGetResourceMetadataResponse
 	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
-		return resource_types.QueryGetAllResourceVersionsResponse{}, err
+		return resource_types.QueryGetResourceMetadataResponse{}, err
 	}
 
 	return resp, nil
