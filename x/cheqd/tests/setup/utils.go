@@ -55,7 +55,6 @@ func BuildEd25519VerificationKey2020VerificationMaterial(publicKey ed25519.Publi
 }
 
 func BuildJsonWebKey2020VerificationMaterial(publicKey ed25519.PublicKey) string {
-
 	pubKeyJwk, err := jwk.New(publicKey)
 	if err != nil {
 		panic(err)
