@@ -13,8 +13,8 @@ import (
 
 var _ = Describe("Query Collection Resources", func() {
 	var setup TestSetup
-	var alice cheqdsetup.CreatedDidInfo
-	var uuidDID cheqdsetup.CreatedDidInfo
+	var alice cheqdsetup.CreatedDidDocInfo
+	var uuidDID cheqdsetup.CreatedDidDocInfo
 
 	var res1v1 *types.MsgCreateResourceResponse
 	var res1v2 *types.MsgCreateResourceResponse
@@ -25,7 +25,7 @@ var _ = Describe("Query Collection Resources", func() {
 		setup = Setup()
 
 		alice = setup.CreateSimpleDid()
-		uuidDID = setup.CreateCustomDid(setup.BuildDidWithCustomId(UUIDString))
+		uuidDID = setup.CreateCustomDidDoc(setup.BuildDidDocWithCustomId(UUIDString))
 
 		res1v1 = setup.CreateSimpleResource(alice.CollectionId, SchemaData, "Resource 1", CLSchemaType, []cheqdsetup.SignInput{alice.SignInput})
 		res1v2 = setup.CreateSimpleResource(alice.CollectionId, SchemaData, "Resource 1", CLSchemaType, []cheqdsetup.SignInput{alice.SignInput})

@@ -16,7 +16,7 @@ type SignInput struct {
 	Key                  ed25519.PrivateKey
 }
 
-type DidInfo struct {
+type DidDocInfo struct {
 	Msg          *types.MsgCreateDidDocPayload
 	Did          string
 	CollectionId string
@@ -25,7 +25,7 @@ type DidInfo struct {
 	SignInput    SignInput
 }
 
-type CreatedDidInfo struct {
-	DidInfo
+type CreatedDidDocInfo struct {
+	DidDocInfo
 	VersionId string
 }

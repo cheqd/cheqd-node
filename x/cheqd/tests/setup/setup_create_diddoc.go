@@ -28,7 +28,7 @@ func (s *TestSetup) CreateDid(payload *types.MsgCreateDidDocPayload, signInputs 
 	return s.MsgServer.CreateDidDoc(s.StdCtx, msg)
 }
 
-func (s *TestSetup) BuildDidDocWithCustomDID(did string) DidInfo {
+func (s *TestSetup) BuildDidDocWithCustomDID(did string) DidDocInfo {
 	_, _, collectionId := utils.MustSplitDID(did)
 
 	keyPair := GenerateKeyPair()
@@ -52,7 +52,7 @@ func (s *TestSetup) BuildDidDocWithCustomDID(did string) DidInfo {
 		Key:                  keyPair.Private,
 	}
 
-	return DidInfo{
+	return DidDocInfo{
 		Did:          did,
 		CollectionId: collectionId,
 		KeyPair:      keyPair,
@@ -62,35 +62,35 @@ func (s *TestSetup) BuildDidDocWithCustomDID(did string) DidInfo {
 	}
 }
 
-func (s *TestSetup) BuildDidWithCustomId(uuid string) DidInfo {
+func (s *TestSetup) BuildDidDocWithCustomId(uuid string) DidDocInfo {
 	did := "did:cheqd:" + DID_NAMESPACE + ":" + uuid
 	return s.BuildDidDocWithCustomDID(did)
 }
 
-func (s *TestSetup) BuildSimpleDid() DidInfo {
+func (s *TestSetup) BuildSimpleDidDoc() DidDocInfo {
 	did := GenerateDID(Base58_16bytes)
 	return s.BuildDidDocWithCustomDID(did)
 }
 
-func (s *TestSetup) CreateCustomDid(info DidInfo) CreatedDidInfo {
+func (s *TestSetup) CreateCustomDidDoc(info DidDocInfo) CreatedDidDocInfo {
 	created, err := s.CreateDid(info.Msg, []SignInput{info.SignInput})
 	if err != nil {
 		panic(err)
 	}
 
-	return CreatedDidInfo{
-		DidInfo:   info,
-		VersionId: created.Value.Metadata.VersionId,
+	return CreatedDidDocInfo{
+		DidDocInfo: info,
+		VersionId:  created.Value.Metadata.VersionId,
 	}
 }
 
-func (s *TestSetup) CreateSimpleDid() CreatedDidInfo {
-	did := s.BuildSimpleDid()
-	return s.CreateCustomDid(did)
+func (s *TestSetup) CreateSimpleDid() CreatedDidDocInfo {
+	did := s.BuildSimpleDidDoc()
+	return s.CreateCustomDidDoc(did)
 }
 
-func (s *TestSetup) CreateDidWithExternalConterllers(controllers []string, signInputs []SignInput) CreatedDidInfo {
-	did := s.BuildSimpleDid()
+func (s *TestSetup) CreateDidDocWithExternalConterllers(controllers []string, signInputs []SignInput) CreatedDidDocInfo {
+	did := s.BuildSimpleDidDoc()
 	did.Msg.Controller = append(did.Msg.Controller, controllers...)
 
 	created, err := s.CreateDid(did.Msg, append(signInputs, did.SignInput))
@@ -98,8 +98,8 @@ func (s *TestSetup) CreateDidWithExternalConterllers(controllers []string, signI
 		panic(err)
 	}
 
-	return CreatedDidInfo{
-		DidInfo:   did,
-		VersionId: created.Value.Metadata.VersionId,
+	return CreatedDidDocInfo{
+		DidDocInfo: did,
+		VersionId:  created.Value.Metadata.VersionId,
 	}
 }

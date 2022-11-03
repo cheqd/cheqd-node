@@ -26,9 +26,9 @@ var _ = Describe("Deactivate DID tests", func() {
 			Id: alice.Did,
 		}
 
-		signatures := []SignInput{alice.DidInfo.SignInput}
+		signatures := []SignInput{alice.DidDocInfo.SignInput}
 
-		res, err := setup.DeactivateDid(msg, signatures)
+		res, err := setup.DeactivateDidDoc(msg, signatures)
 		Expect(err).To(BeNil())
 		Expect(res.Value.Metadata.Deactivated).To(BeTrue())
 	})
@@ -43,7 +43,7 @@ var _ = Describe("Deactivate DID tests", func() {
 
 			signatures := []SignInput{}
 
-			_, err := setup.DeactivateDid(msg, signatures)
+			_, err := setup.DeactivateDidDoc(msg, signatures)
 			Expect(err).ToNot(BeNil())
 			Expect(err.Error()).To(Equal(NotFoundDID + ": DID Doc not found"))
 		})
@@ -57,16 +57,16 @@ var _ = Describe("Deactivate DID tests", func() {
 				Id: alice.Did,
 			}
 
-			signatures := []SignInput{alice.DidInfo.SignInput}
+			signatures := []SignInput{alice.DidDocInfo.SignInput}
 
-			res, err := setup.DeactivateDid(msg, signatures)
+			res, err := setup.DeactivateDidDoc(msg, signatures)
 			Expect(err).To(BeNil())
 			Expect(res.Value.Metadata.Deactivated).To(BeTrue())
 
 			// Deactivate again
-			_, err = setup.DeactivateDid(msg, signatures)
+			_, err = setup.DeactivateDidDoc(msg, signatures)
 			Expect(err).ToNot(BeNil())
-			Expect(err.Error()).To(Equal(alice.DidInfo.Did + ": DID Doc already deactivated"))
+			Expect(err.Error()).To(Equal(alice.DidDocInfo.Did + ": DID Doc already deactivated"))
 		})
 	})
 
@@ -81,11 +81,11 @@ var _ = Describe("Deactivate DID tests", func() {
 				Id: alice.Did,
 			}
 
-			signatures := []SignInput{bob.DidInfo.SignInput}
+			signatures := []SignInput{bob.DidDocInfo.SignInput}
 
-			_, err := setup.DeactivateDid(msg, signatures)
+			_, err := setup.DeactivateDidDoc(msg, signatures)
 			Expect(err).ToNot(BeNil())
-			Expect(err.Error()).To(Equal(fmt.Sprintf("signer: %s: signature is required but not found", alice.DidInfo.Did)))
+			Expect(err.Error()).To(Equal(fmt.Sprintf("signer: %s: signature is required but not found", alice.DidDocInfo.Did)))
 		})
 	})
 })

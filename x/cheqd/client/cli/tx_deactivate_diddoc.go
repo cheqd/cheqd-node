@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdDeactivateDid() *cobra.Command {
+func CmdDeactivateDidDoc() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "deactivate-diddoc [id] [ver-method-id-1] [priv-key-1] [ver-method-id-N] [priv-key-N] ...",
 		Short: "Deactivates a DIDDoc.",

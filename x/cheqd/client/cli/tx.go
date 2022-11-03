@@ -31,7 +31,8 @@ func GetTxCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(CmdCreateDidDoc())
-	cmd.AddCommand(CmdUpdateDid())
+	cmd.AddCommand(CmdUpdateDidDoc())
+	cmd.AddCommand(CmdDeactivateDidDoc())
 
 	return cmd
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdUpdateDid() *cobra.Command {
+func CmdUpdateDidDoc() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-diddoc [payload-json] [ver-method-id-1] [priv-key-1] [ver-method-id-N] [priv-key-N] ...",
 		Short: "Updates a DIDDoc.",

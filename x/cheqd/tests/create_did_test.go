@@ -48,7 +48,7 @@ var _ = Describe("Create DID tests", func() {
 		Expect(err).To(BeNil())
 
 		// check
-		created, err := setup.QueryDid(did)
+		created, err := setup.QueryDidDoc(did)
 		Expect(err).To(BeNil())
 		Expect(msg.ToDidDoc()).To(Equal(*created.Value.DidDoc))
 	})
@@ -82,7 +82,7 @@ var _ = Describe("Create DID tests", func() {
 		Expect(err).To(BeNil())
 
 		// check
-		created, err := setup.QueryDid(did)
+		created, err := setup.QueryDidDoc(did)
 		Expect(err).To(BeNil())
 		Expect(msg.ToDidDoc()).To(Equal(*created.Value.DidDoc))
 	})
@@ -117,7 +117,7 @@ var _ = Describe("Create DID tests", func() {
 		Expect(err).To(BeNil())
 
 		// check
-		created, err := setup.QueryDid(bobDid)
+		created, err := setup.QueryDidDoc(bobDid)
 		Expect(err).To(BeNil())
 		Expect(msg.ToDidDoc()).To(Equal(*created.Value.DidDoc))
 	})
@@ -193,7 +193,7 @@ var _ = Describe("Create DID tests", func() {
 		Expect(err).To(BeNil())
 
 		// check
-		created, err := setup.QueryDid(did)
+		created, err := setup.QueryDidDoc(did)
 		Expect(err).To(BeNil())
 		Expect(msg.ToDidDoc()).To(Equal(*created.Value.DidDoc))
 	})
@@ -444,7 +444,7 @@ var _ = Describe("Check upper/lower case for DID creation", func() {
 		Expect(err).To(BeNil())
 
 		// check
-		created, err := setup.QueryDid(did)
+		created, err := setup.QueryDidDoc(did)
 		Expect(err).To(BeNil())
 		Expect(created.Value.DidDoc.Id).To(Equal(testCase.resultId))
 	},

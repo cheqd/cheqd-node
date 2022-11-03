@@ -6,7 +6,7 @@ import (
 	"github.com/cheqd/cheqd-node/x/cheqd/types"
 )
 
-func (s *TestSetup) UpdateDid(payload *types.MsgUpdateDidDocPayload, signInputs []SignInput) (*types.MsgUpdateDidDocResponse, error) {
+func (s *TestSetup) UpdateDidDoc(payload *types.MsgUpdateDidDocPayload, signInputs []SignInput) (*types.MsgUpdateDidDocResponse, error) {
 	signBytes := payload.GetSignBytes()
 	var signatures []*types.SignInfo
 

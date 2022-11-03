@@ -13,7 +13,7 @@ import (
 
 var _ = Describe("Query Resource", func() {
 	var setup TestSetup
-	var alice cheqdsetup.CreatedDidInfo
+	var alice cheqdsetup.CreatedDidDocInfo
 	var resource *types.MsgCreateResourceResponse
 
 	BeforeEach(func() {

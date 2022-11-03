@@ -33,7 +33,7 @@ func ExpectPayloadToMatchResource(payload *resourcetypes.MsgCreateResourcePayloa
 
 var _ = Describe("Create Resource Tests", func() {
 	var setup TestSetup
-	var alice cheqdsetup.CreatedDidInfo
+	var alice cheqdsetup.CreatedDidDocInfo
 
 	BeforeEach(func() {
 		setup = Setup()
@@ -125,9 +125,9 @@ var _ = Describe("Create Resource Tests", func() {
 					Id: alice.Did,
 				}
 
-				signatures := []cheqdsetup.SignInput{alice.DidInfo.SignInput}
+				signatures := []cheqdsetup.SignInput{alice.DidDocInfo.SignInput}
 
-				res, err := setup.DeactivateDid(DeactivateMsg, signatures)
+				res, err := setup.DeactivateDidDoc(DeactivateMsg, signatures)
 				Expect(err).To(BeNil())
 				Expect(res.Value.Metadata.Deactivated).To(BeTrue())
 
