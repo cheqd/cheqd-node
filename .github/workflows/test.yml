@@ -140,11 +140,8 @@ jobs:
         working-directory: ./docker/localnet
         run: |
           bash gen-network-config.sh
+          sudo cp -r network-config network-config-next
           export BUILD_IMAGE=ghcr.io/cheqd/cheqd-node:latest
-          docker compose cp network-config/validator-0/keyring-test validator-0:/home/cheqd/.cheqdnode
-          docker compose cp network-config/validator-1/keyring-test validator-1:/home/cheqd/.cheqdnode
-          docker compose cp network-config/validator-2/keyring-test validator-2:/home/cheqd/.cheqdnode
-          docker compose cp network-config/validator-3/keyring-test validator-3:/home/cheqd/.cheqdnode
           sudo chown -R 1000:1000 network-config
 
       - name: Set up Docker localnet @latest
@@ -157,6 +154,12 @@ jobs:
       - name: Import keys
         working-directory: ./docker/localnet
         run: |
+          export BUILD_IMAGE=ghcr.io/cheqd/cheqd-node:latest
+          docker compose cp network-config-next/validator-0/keyring-test validator-0:/home/cheqd/.cheqdnode
+          docker compose cp network-config-next/validator-1/keyring-test validator-1:/home/cheqd/.cheqdnode
+          docker compose cp network-config-next/validator-2/keyring-test validator-2:/home/cheqd/.cheqdnode
+          docker compose cp network-config-next/validator-3/keyring-test validator-3:/home/cheqd/.cheqdnode
+          sudo rm -rf network-config-next
           bash import-keys.sh
 
       - uses: actions/setup-go@v3
