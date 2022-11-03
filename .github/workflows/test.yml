@@ -140,8 +140,11 @@ jobs:
         working-directory: ./docker/localnet
         run: |
           bash gen-network-config.sh
+          sudo chmod -R +r network-config/validator-0/keyring-test
+          sudo chmod -R +r network-config/validator-1/keyring-test
+          sudo chmod -R +r network-config/validator-2/keyring-test
+          sudo chmod -R +r network-config/validator-3/keyring-test
           sudo chown -R 1000:1000 network-config
-          sudo chmod -R +r network-config/validator-*/keyring-test
 
       - name: Set up Docker localnet @latest
         working-directory: ./docker/localnet
