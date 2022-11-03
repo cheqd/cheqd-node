@@ -22,9 +22,6 @@ var _ = BeforeSuite(func() {
 	// TODO: Add localnet volume mount cleanup here.
 	// This allows for a clean start of the localnet containers.
 
-	err = Setup()
-	Expect(err).To(BeNil())
-
 	err = Pre()
 	Expect(err).To(BeNil())
 })
