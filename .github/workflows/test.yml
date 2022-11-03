@@ -146,12 +146,12 @@ jobs:
         run: |
           export BUILD_IMAGE=ghcr.io/cheqd/cheqd-node:latest
           docker compose up --detach --no-build
+          docker compose ps
 
       - name: Import keys
         working-directory: ./docker/localnet
         run: |
           bash import-keys.sh
-          docker compose ps
 
       - uses: actions/setup-go@v3
         with:
