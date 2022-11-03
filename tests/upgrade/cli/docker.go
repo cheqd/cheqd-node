@@ -114,11 +114,11 @@ func LocalnetExecCopyKeys() (string, error) {
 }
 
 func LocalnetExecCopyKey(validator string) (string, error) {
-	_, err := LocalnetExec("cp", filepath.Join(DOCKER_LOCALNET_PATH, NETWORK_CONFIG_DIR, validator, KEYRING_DIR), filepath.Join(validator+":", DOCKER_HOME, ".cheqdnode"))
-	if err != nil {
-		return "", err
-	}
-	return LocalnetExec("exec", "-it", "--user", "root", validator, "chown", "-R", DOCKER_USER+":"+DOCKER_USER_GROUP, DOCKER_HOME)
+	return LocalnetExec("cp", filepath.Join(DOCKER_LOCALNET_PATH, NETWORK_CONFIG_DIR, validator, KEYRING_DIR), filepath.Join(validator+":", DOCKER_HOME, ".cheqdnode"))
+	// if err != nil {
+	// 	return "", err
+	// }
+	// return LocalnetExec("exec", "-it", "--user", "root", validator, "chown", "-R", DOCKER_USER+":"+DOCKER_USER_GROUP, DOCKER_HOME)
 }
 
 func LocalnetLoadImage(args ...string) (string, error) {
