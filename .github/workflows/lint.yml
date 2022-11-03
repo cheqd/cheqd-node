@@ -65,6 +65,7 @@ jobs:
       
       # Breaking change detection
       - uses: bufbuild/buf-breaking-action@v1
+        continue-on-error: true
         with:
           input: 'proto'
           against: 'https://github.com/cheqd/cheqd-node.git#branch=develop,ref=HEAD~1,subdir=proto'
