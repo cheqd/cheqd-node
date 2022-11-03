@@ -30,7 +30,7 @@ on:
 
 jobs:
   
-  del-runs:
+  delete-runs:
     name: "Delete old workflow runs"
     runs-on: ubuntu-latest
     
@@ -44,3 +44,10 @@ jobs:
           delete_workflow_pattern: ${{ github.event.inputs.delete_workflow_pattern }}
           delete_workflow_by_state_pattern: ${{ github.event.inputs.delete_workflow_by_state_pattern }}
 
+  delete-caches:
+    name: "Delete Actions caches"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: "Wipe Github Actions cache"
+        uses: easimon/wipe-cache@v1
