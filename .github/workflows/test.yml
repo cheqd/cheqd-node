@@ -105,23 +105,23 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Download next version binary artifact
-        uses: actions/download-artifact@v3
-        id: download
-        with:
-          name: cheqd-noded
-          path: ${{ env.RUNNER_BIN_DIR }}
+      # - name: Download next version binary artifact
+      #   uses: actions/download-artifact@v3
+      #   id: download
+      #   with:
+      #     name: cheqd-noded
+      #     path: ${{ env.RUNNER_BIN_DIR }}
 
-      - name: Rename binary to next
-        run: mv ${{ env.RUNNER_BIN_DIR }}/cheqd-noded ${{ env.RUNNER_BIN_DIR }}/cheqd-noded-next
+      # - name: Rename binary to next
+      #   run: mv ${{ env.RUNNER_BIN_DIR }}/cheqd-noded ${{ env.RUNNER_BIN_DIR }}/cheqd-noded-next
 
-      - name: Restore binary next version permissions
-        run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded-next
+      # - name: Restore binary next version permissions
+      #   run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded-next
 
-      - name: Download node Docker next image
-        uses: actions/download-artifact@v3
-        with:
-          name: cheqd-node-build.tar
+      # - name: Download node Docker next image
+      #   uses: actions/download-artifact@v3
+      #   with:
+      #     name: cheqd-node-build.tar
 
       - name: Install binary @latest release
         run: |
@@ -140,7 +140,11 @@ jobs:
         working-directory: ./docker/localnet
         run: |
           bash gen-network-config.sh
-          sudo chmod -R +r network-config
+          export BUILD_IMAGE=ghcr.io/cheqd/cheqd-node:latest
+          docker compose cp network-config/validator-0/keyring-test validator-0:/home/cheqd/.cheqdnode
+          docker compose cp network-config/validator-1/keyring-test validator-1:/home/cheqd/.cheqdnode
+          docker compose cp network-config/validator-2/keyring-test validator-2:/home/cheqd/.cheqdnode
+          docker compose cp network-config/validator-3/keyring-test validator-3:/home/cheqd/.cheqdnode
           sudo chown -R 1000:1000 network-config
 
       - name: Set up Docker localnet @latest
@@ -153,11 +157,6 @@ jobs:
       - name: Import keys
         working-directory: ./docker/localnet
         run: |
-          export BUILD_IMAGE=ghcr.io/cheqd/cheqd-node:latest
-          docker compose cp network-config/validator-0/keyring-test validator-0:/home/cheqd/.cheqdnode
-          docker compose cp network-config/validator-1/keyring-test validator-1:/home/cheqd/.cheqdnode
-          docker compose cp network-config/validator-2/keyring-test validator-2:/home/cheqd/.cheqdnode
-          docker compose cp network-config/validator-3/keyring-test validator-3:/home/cheqd/.cheqdnode
           bash import-keys.sh
 
       - uses: actions/setup-go@v3
