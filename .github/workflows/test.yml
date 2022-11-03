@@ -151,6 +151,7 @@ jobs:
         working-directory: ./docker/localnet
         run: |
           bash import-keys.sh
+          docker compose ps
 
       - uses: actions/setup-go@v3
         with:
