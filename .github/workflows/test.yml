@@ -170,6 +170,7 @@ jobs:
         working-directory: ./tests/upgrade
         run: |
           export BUILD_IMAGE=ghcr.io/cheqd/cheqd-node:latest
+          docker compose -f ../../docker/localnet/docker-compose.yml ps
           ginkgo -r --tags upgrade --race
 
   report-results:
