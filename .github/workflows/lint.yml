@@ -63,12 +63,11 @@ jobs:
       # Lint
       - uses: bufbuild/buf-lint-action@v1
       
-      # Breaking change detection
-      - uses: bufbuild/buf-breaking-action@v1
-        continue-on-error: true
-        with:
-          input: 'proto'
-          against: 'https://github.com/cheqd/cheqd-node.git#branch=develop,ref=HEAD~1,subdir=proto'
+      # # Breaking change detection
+      # - uses: bufbuild/buf-breaking-action@v1
+      #   with:
+      #     input: 'proto'
+      #     against: 'https://github.com/cheqd/cheqd-node.git#branch=develop,ref=HEAD~1,subdir=proto'
 
   super-lint:
     name: "Super Linter"
