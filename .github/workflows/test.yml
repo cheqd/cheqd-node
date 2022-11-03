@@ -145,7 +145,7 @@ jobs:
         working-directory: ./docker/localnet
         run: |
           export BUILD_IMAGE=ghcr.io/cheqd/cheqd-node:latest
-          docker compose up --detach --no-build
+          docker compose up --no-build
           docker compose ps
 
       - name: Import keys
