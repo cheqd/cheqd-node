@@ -63,21 +63,21 @@ var (
 	QueriedResource resourcetypes.Resource
 )
 
-func GenerateDidDocWithSignInputs(payload *cheqdtypes.MsgCreateDidPayload, input *[]cheqdcli.SignInput) error {
+func GenerateDidDocWithSignInputs() (cheqdtypes.MsgCreateDidPayload, []cheqdcli.SignInput, error) {
 	did := "did:cheqd:" + network.DID_NAMESPACE + ":" + uuid.NewString()
 	keyId := did + "#key1"
 
 	pubKey, privKey, err := ed25519.GenerateKey(nil)
 	if err != nil {
-		return err
+		return cheqdtypes.MsgCreateDidPayload{}, []cheqdcli.SignInput{}, err
 	}
 
 	pubKeyMultibase58, err := multibase.Encode(multibase.Base58BTC, pubKey)
 	if err != nil {
-		return err
+		return cheqdtypes.MsgCreateDidPayload{}, []cheqdcli.SignInput{}, err
 	}
 
-	payload = &cheqdtypes.MsgCreateDidPayload{
+	payload := cheqdtypes.MsgCreateDidPayload{
 		Id:         did,
 		Controller: []string{did},
 		VerificationMethod: []*cheqdtypes.VerificationMethod{
@@ -91,29 +91,29 @@ func GenerateDidDocWithSignInputs(payload *cheqdtypes.MsgCreateDidPayload, input
 		Authentication: []string{keyId},
 	}
 
-	input = &[]cheqdcli.SignInput{
+	input := []cheqdcli.SignInput{
 		{
 			VerificationMethodId: keyId,
 			PrivKey:              privKey,
 		},
 	}
-	return nil
+	return payload, input, nil
 }
 
-func GenerateRotatedKeysDidDocWithSignInputs(payload *cheqdtypes.MsgCreateDidPayload, updatedPayload *cheqdtypes.MsgUpdateDidPayload, input *[]cheqdcli.SignInput, updatedInput *[]cheqdcli.SignInput, versionId string) error {
+func GenerateRotatedKeysDidDocWithSignInputs(payload cheqdtypes.MsgCreateDidPayload, input []cheqdcli.SignInput, versionId string) (cheqdtypes.MsgUpdateDidPayload, []cheqdcli.SignInput, error) {
 	// Specifically, we want to update the DID doc by rotating keys.
 
 	pubKey, privKey, err := ed25519.GenerateKey(nil)
 	if err != nil {
-		return err
+		return cheqdtypes.MsgUpdateDidPayload{}, []cheqdcli.SignInput{}, err
 	}
 
 	pubKeyMultibase58, err := multibase.Encode(multibase.Base58BTC, pubKey)
 	if err != nil {
-		return err
+		return cheqdtypes.MsgUpdateDidPayload{}, []cheqdcli.SignInput{}, err
 	}
 
-	updatedPayload = &cheqdtypes.MsgUpdateDidPayload{
+	updatedPayload := cheqdtypes.MsgUpdateDidPayload{
 		Id:         payload.Id,
 		Controller: []string{payload.Id},
 		VerificationMethod: []*cheqdtypes.VerificationMethod{
@@ -128,20 +128,20 @@ func GenerateRotatedKeysDidDocWithSignInputs(payload *cheqdtypes.MsgCreateDidPay
 		VersionId:      versionId,
 	}
 
-	updatedInput = &[]cheqdcli.SignInput{
-		(*input)[0],
+	updatedInput := []cheqdcli.SignInput{
+		input[0],
 		{
-			VerificationMethodId: (*input)[0].VerificationMethodId,
+			VerificationMethodId: input[0].VerificationMethodId,
 			PrivKey:              privKey,
 		},
 	}
 
-	return nil
+	return updatedPayload, updatedInput, nil
 }
 
-func GenerateResource(payload *resourcetypes.MsgCreateResourcePayload) error {
-	collectionId := strings.Replace(DidDoc.Id, "did:cheqd:"+network.DID_NAMESPACE, "", 1)
-	payload = &resourcetypes.MsgCreateResourcePayload{
+func GenerateResource(didDoc cheqdtypes.MsgCreateDidPayload) (resourcetypes.MsgCreateResourcePayload, error) {
+	collectionId := strings.Replace(didDoc.Id, "did:cheqd:"+network.DID_NAMESPACE, "", 1)
+	payload := resourcetypes.MsgCreateResourcePayload{
 		CollectionId: collectionId,
 		Id:           uuid.NewString(),
 		Name:         "TestResource",
@@ -149,23 +149,5 @@ func GenerateResource(payload *resourcetypes.MsgCreateResourcePayload) error {
 		Data:         []byte(integrationtestdata.JSON_FILE_CONTENT),
 	}
 
-	return nil
-}
-
-func ResetDidDocInMem(payload *cheqdtypes.MsgCreateDidPayload, input *[]cheqdcli.SignInput) error {
-	payload = &cheqdtypes.MsgCreateDidPayload{}
-	input = &[]cheqdcli.SignInput{}
-	Err = GenerateDidDocWithSignInputs(payload, input)
-	return Err
-}
-
-func ResetRotatedKeysDidDocInMem(updatedPayload *cheqdtypes.MsgUpdateDidPayload, updatedInput *[]cheqdcli.SignInput) error {
-	updatedPayload = &cheqdtypes.MsgUpdateDidPayload{}
-	updatedInput = &[]cheqdcli.SignInput{}
-	return nil
-}
-
-func ResetResourceInMem(payload *resourcetypes.MsgCreateResourcePayload) error {
-	payload = &resourcetypes.MsgCreateResourcePayload{}
-	return nil
+	return payload, nil
 }

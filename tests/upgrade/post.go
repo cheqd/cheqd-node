@@ -38,14 +38,14 @@ func Post() error {
 	Expect(res_.Resource.Header.Id).To(BeEquivalentTo(ResourcePayload.Id))
 
 	By("Ensuring the CreateDid Tx is successful for a new DID")
-	PostErr = GenerateDidDocWithSignInputs(&PostDidDoc, &PostSignInputs)
+	PostDidDoc, PostSignInputs, PostErr = GenerateDidDocWithSignInputs()
 	Expect(PostErr).To(BeNil())
 	resp, err := cli.CreateDid(PostDidDoc, PostSignInputs, cli.VALIDATOR1)
 	Expect(err).To(BeNil())
 	Expect(resp.Code).To(BeEquivalentTo(0))
 
 	By("Ensuring the CreateResource Tx is successful for a new Resource")
-	PostResourceErr = GenerateResource(&PostResourcePayload)
+	PostResourcePayload, PostResourceErr = GenerateResource(PostDidDoc)
 	PostResourceFile, PostResourceFileErr = integrationtestdata.CreateTestJson(GinkgoT().TempDir())
 	Expect(PostResourceErr).To(BeNil())
 	resp, err = cli.CreateResource(PostResourcePayload.CollectionId, PostResourcePayload.Id, PostResourcePayload.Name, PostResourcePayload.ResourceType, PostResourceFile, PostSignInputs, cli.VALIDATOR1)
@@ -53,7 +53,7 @@ func Post() error {
 	Expect(resp.Code).To(BeEquivalentTo(0))
 
 	By("Ensuring the UpdateDid Tx is successful for a new DID")
-	PostRotatedKeysErr = GenerateRotatedKeysDidDocWithSignInputs(&PostDidDoc, &PostRotatedKeysDidDoc, &PostSignInputs, &PostRotatedKeysSignInputs, resp.TxHash)
+	PostRotatedKeysDidDoc, PostRotatedKeysSignInputs, PostRotatedKeysErr = GenerateRotatedKeysDidDocWithSignInputs(PostDidDoc, PostSignInputs, resp.TxHash)
 	Expect(PostRotatedKeysErr).To(BeNil())
 	resp, err = cli.UpdateDid(PostRotatedKeysDidDoc, PostSignInputs, cli.VALIDATOR1)
 	Expect(err).To(BeNil())

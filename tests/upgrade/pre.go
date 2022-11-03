@@ -28,8 +28,10 @@ var _ = BeforeSuite(func() {
 
 func Pre() error {
 	By("Ensuring the Err in memory is nil")
-	Err = GenerateDidDocWithSignInputs(&DidDoc, &SignInputs)
+	DidDoc, SignInputs, Err = GenerateDidDocWithSignInputs()
 	Expect(Err).To(BeNil())
+
+	fmt.Println("DidDoc: ", DidDoc)
 
 	By("Ensuring CreateDid Tx is successful")
 	res, err := cli.CreateDid(DidDoc, SignInputs, cli.VALIDATOR1)
@@ -41,14 +43,14 @@ func Pre() error {
 	Expect(ResourceFileErr).To(BeNil())
 
 	By("Ensuring the ResourceErr in memory is nil")
-	ResourceErr = GenerateResource(&ResourcePayload)
+	ResourcePayload, ResourceErr = GenerateResource(DidDoc)
 	Expect(ResourceErr).To(BeNil())
 
 	By("Ensuring CreateResource Tx is successful")
 	res, err = cli.CreateResource(ResourcePayload.CollectionId, ResourcePayload.Id, ResourcePayload.Name, ResourcePayload.ResourceType, ResourceFile, SignInputs, cli.VALIDATOR1)
 
 	By("Ensuring the RotatedKeysErr in memory is nil")
-	RotatedKeysErr = GenerateRotatedKeysDidDocWithSignInputs(&DidDoc, &RotatedKeysDidDoc, &SignInputs, &RotatedKeysSignInputs, res.TxHash)
+	RotatedKeysDidDoc, RotatedKeysSignInputs, RotatedKeysErr = GenerateRotatedKeysDidDocWithSignInputs(DidDoc, SignInputs, res.TxHash)
 	Expect(RotatedKeysErr).To(BeNil())
 
 	By("Ensuring the UpdateDid Tx is successful")
