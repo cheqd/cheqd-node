@@ -27,9 +27,6 @@ services:
       - type: volume
         source: validator-0-data
         target: /home/cheqd
-      - type: bind
-        source: ./network-config/validator-0/keyring-test
-        target: /home/cheqd/.cheqdnode/keyring-test
     env_file:
       - container-env/validator-0.env
     configs:
@@ -68,9 +65,6 @@ services:
       - type: volume
         source: validator-1-data
         target: /home/cheqd
-      - type: bind
-        source: ./network-config/validator-1/keyring-test
-        target: /home/cheqd/.cheqdnode/keyring-test
     env_file:
       - container-env/validator-1.env
     configs:
@@ -109,9 +103,6 @@ services:
       - type: volume
         source: validator-2-data
         target: /home/cheqd
-      - type: bind
-        source: ./network-config/validator-2/keyring-test
-        target: /home/cheqd/.cheqdnode/keyring-test
     env_file:
       - container-env/validator-2.env
     configs:
@@ -150,9 +141,6 @@ services:
       - type: volume
         source: validator-3-data
         target: /home/cheqd
-      - type: bind
-        source: ./network-config/validator-3/keyring-test
-        target: /home/cheqd/.cheqdnode/keyring-test
     env_file:
       - container-env/validator-3.env
     configs:
