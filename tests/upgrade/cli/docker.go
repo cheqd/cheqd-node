@@ -109,6 +109,10 @@ func LocalnetExecCopyAbsoluteWithPermissions(path string, destination string, co
 		fmt.Println("Error copying file to container: ", err)
 		return "", err
 	}
+	return LocalnetExecRestorePermissions(destination, container)
+}
+
+func LocalnetExecRestorePermissions(path string, container string) (string, error) {
 	return LocalnetExec("exec", "-it", "--user", "root", container, "chown", "-R", DOCKER_USER+":"+DOCKER_USER_GROUP, path)
 }
 
