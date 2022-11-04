@@ -1,11 +1,11 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
 	"sync"
 	"time"
 
-	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	tmcoretypes "github.com/tendermint/tendermint/rpc/core/types"
 )
 
@@ -15,7 +15,7 @@ func GetNodeStatus(container string, binary string) (tmcoretypes.ResultStatus, e
 		return tmcoretypes.ResultStatus{}, err
 	}
 	var result tmcoretypes.ResultStatus
-	err = integrationhelpers.Codec.UnmarshalInterfaceJSON([]byte(out), &result)
+	err = json.Unmarshal([]byte(out), &result)
 	if err != nil {
 		return tmcoretypes.ResultStatus{}, err
 	}
