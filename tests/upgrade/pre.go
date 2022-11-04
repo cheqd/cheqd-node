@@ -44,6 +44,10 @@ func Pre() error {
 	ResourcePayload, ResourceErr = GenerateResource(DidDoc)
 	Expect(ResourceErr).To(BeNil())
 
+	By("Ensuring the ResourceFile is copied to the localnet container")
+	_, err = cli.LocalnetExecCopyAbsoluteWithPermissions(ResourceFile, cli.VALIDATOR1)
+	Expect(err).To(BeNil())
+
 	By("Ensuring CreateResource Tx is successful")
 	res, err = cli.CreateResource(ResourcePayload.CollectionId, ResourcePayload.Id, ResourcePayload.Name, ResourcePayload.ResourceType, ResourceFile, SignInputs, cli.VALIDATOR1)
 	Expect(err).To(BeNil())

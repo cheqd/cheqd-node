@@ -103,6 +103,14 @@ func LocalnetExecDown() (string, error) {
 	return LocalnetExec("down")
 }
 
+func LocalnetExecCopyAbsoluteWithPermissions(path string, container string) (string, error) {
+	_, err := LocalnetExec("cp", filepath.Join(path), filepath.Join(container+":", path))
+	if err != nil {
+		return "", err
+	}
+	return LocalnetExec("exec", "-it", "--user", "root", container, "chown", "-R", DOCKER_USER+":"+DOCKER_USER_GROUP, path)
+}
+
 func LocalnetExecCopyKeys() (string, error) {
 	for _, validator := range ValidatorNodes {
 		_, err := LocalnetExecCopyKey(validator)
