@@ -45,7 +45,7 @@ func Pre() error {
 	Expect(ResourceErr).To(BeNil())
 
 	By("Ensuring the ResourceFile is copied to the localnet container")
-	_, err = cli.LocalnetExecCopyAbsoluteWithPermissions(ResourceFile, cli.VALIDATOR1)
+	_, err = cli.LocalnetExecCopyAbsoluteWithPermissions(ResourceFile, cli.DOCKER_HOME, cli.VALIDATOR1)
 	Expect(err).To(BeNil())
 
 	By("Ensuring CreateResource Tx is successful")

@@ -103,8 +103,8 @@ func LocalnetExecDown() (string, error) {
 	return LocalnetExec("down")
 }
 
-func LocalnetExecCopyAbsoluteWithPermissions(path string, container string) (string, error) {
-	_, err := LocalnetExec("cp", path, container+":"+path)
+func LocalnetExecCopyAbsoluteWithPermissions(path string, destination string, container string) (string, error) {
+	_, err := LocalnetExec("cp", path, filepath.Join(container+":"+destination))
 	if err != nil {
 		fmt.Println("Error copying file to container: ", err)
 		return "", err
