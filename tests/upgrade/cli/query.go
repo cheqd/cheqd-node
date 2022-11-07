@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
-	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
+	govtypesv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 )
 
 func Query(container string, binary string, module, query string, queryArgs ...string) (string, error) {
@@ -21,7 +21,7 @@ func Query(container string, binary string, module, query string, queryArgs ...s
 	return LocalnetExecExec(container, args...)
 }
 
-func QueryUpgradeProposal(container string) (govtypesv1.QueryProposalResponse, error) {
+func QueryUpgradeProposal(container string) (govtypesv1beta1.QueryProposalResponse, error) {
 	args := append([]string{
 		CLI_BINARY_NAME,
 		"query", "gov", "proposal", "1",
@@ -29,16 +29,16 @@ func QueryUpgradeProposal(container string) (govtypesv1.QueryProposalResponse, e
 
 	out, err := LocalnetExecExec(container, args...)
 	if err != nil {
-		return govtypesv1.QueryProposalResponse{}, err
+		return govtypesv1beta1.QueryProposalResponse{}, err
 	}
 
 	fmt.Println("QueryUpgradeProposal", out)
 
-	var resp govtypesv1.QueryProposalResponse
+	var resp govtypesv1beta1.QueryProposalResponse
 
 	err = integrationhelpers.Codec.UnmarshalJSON([]byte(out), &resp)
 	if err != nil {
-		return govtypesv1.QueryProposalResponse{}, err
+		return govtypesv1beta1.QueryProposalResponse{}, err
 	}
 	return resp, nil
 }
