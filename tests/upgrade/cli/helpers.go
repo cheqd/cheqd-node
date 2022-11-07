@@ -7,7 +7,12 @@ import (
 	"sync"
 	"time"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+	govtypesv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
+	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/codec/types"
 )
 
 // The following structs are overridden from the tendermint codebase.
@@ -148,4 +153,21 @@ func waitCallback(container string, binary string, height int64, period int64, w
 
 func TrimExtraLineOffset(input string, offset int) string {
 	return strings.Join(strings.Split(input, "\n")[offset:], "")
+}
+
+func MakeCodecWithExtendedRegistry() codec.Codec {
+	interfaceRegistry := types.NewInterfaceRegistry()
+
+	// Register the interfaces from the cosmos-sdk codebase.
+	interfaceRegistry.RegisterImplementations(
+		(*govtypesv1beta1.Content)(nil),
+		// nolint: staticcheck
+		&upgradetypes.SoftwareUpgradeProposal{},
+	)
+
+	interfaceRegistry.RegisterImplementations(
+		(*sdk.Msg)(nil),
+	)
+
+	return codec.NewProtoCodec(interfaceRegistry)
 }

@@ -3,7 +3,6 @@ package cli
 import (
 	"fmt"
 
-	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	govtypesv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 )
 
@@ -34,11 +33,9 @@ func QueryUpgradeProposal(container string) (govtypesv1beta1.Proposal, error) {
 
 	fmt.Println("QueryUpgradeProposal", out)
 
-	fmt.Println("Registry Implementations", integrationhelpers.Registry.ListImplementations("cosmos.gov.v1beta1.Content"))
-
 	var resp govtypesv1beta1.Proposal
 
-	err = integrationhelpers.Codec.UnmarshalJSON([]byte(out), &resp)
+	err = MakeCodecWithExtendedRegistry().UnmarshalJSON([]byte(out), &resp)
 	if err != nil {
 		return govtypesv1beta1.Proposal{}, err
 	}
