@@ -2,6 +2,7 @@ package cli
 
 import (
 	"os/exec"
+
 	integrationcli "github.com/cheqd/cheqd-node/tests/integration/cli"
 	"github.com/cosmos/cosmos-sdk/types/errors"
 )
