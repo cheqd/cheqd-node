@@ -146,7 +146,7 @@ func LocalnetLoadImage(args ...string) (string, error) {
 }
 
 func LocalnetExecUpWithBuildImage() (string, error) {
-	return LocalnetExec("--env-file", DOCKER_COMPOSE_ENV, "up", "--detach", "--no-build")
+	return LocalnetExec("--env-file", filepath.Join(DOCKER_LOCALNET_PATH, DOCKER_COMPOSE_ENV), "up", "--detach", "--no-build")
 }
 
 func LocalnetExecUpWithNewImage() (string, error) {
@@ -168,7 +168,7 @@ func SetOldDockerComposeEnv() error {
 }
 
 func SetNewDockerComposeEnv() error {
-	_, err := Exec("unset", DOCKER_IMAGE_ENV)
+	_, err := ExecDirect("unset", DOCKER_IMAGE_ENV)
 	if err != nil {
 		return err
 	}
@@ -180,25 +180,25 @@ func SetNewDockerComposeEnv() error {
 func ReplaceBinaryWithPermissions(action string) (string, error) {
 	switch action {
 	case "previous-to-next":
-		_, err := Exec(RENAME_BINARY_CURRENT_TO_PREVIOUS_ARGS...)
+		_, err := ExecDirect(RENAME_BINARY_CURRENT_TO_PREVIOUS_ARGS...)
 		if err != nil {
 			return "", err
 		}
-		_, err = Exec(RENAME_BINARY_NEXT_TO_CURRENT_ARGS...)
+		_, err = ExecDirect(RENAME_BINARY_NEXT_TO_CURRENT_ARGS...)
 		if err != nil {
 			return "", err
 		}
-		return Exec(RESTORE_BINARY_PERMISSIONS_ARGS...)
+		return ExecDirect(RESTORE_BINARY_PERMISSIONS_ARGS...)
 	case "next-to-previous":
-		_, err := Exec(RENAME_BINARY_CURRENT_TO_NEXT_ARGS...)
+		_, err := ExecDirect(RENAME_BINARY_CURRENT_TO_NEXT_ARGS...)
 		if err != nil {
 			return "", err
 		}
-		_, err = Exec(RENAME_BINARY_PREVIOUS_TO_CURRENT_ARGS...)
+		_, err = ExecDirect(RENAME_BINARY_PREVIOUS_TO_CURRENT_ARGS...)
 		if err != nil {
 			return "", err
 		}
-		return Exec(RESTORE_BINARY_PERMISSIONS_ARGS...)
+		return ExecDirect(RESTORE_BINARY_PERMISSIONS_ARGS...)
 	default:
 		return "", fmt.Errorf("invalid action")
 	}
