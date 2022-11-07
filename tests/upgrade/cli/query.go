@@ -2,7 +2,7 @@ package cli
 
 import (
 	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
-	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
+	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 )
 
 func Query(container string, binary string, module, query string, queryArgs ...string) (string, error) {
