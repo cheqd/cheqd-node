@@ -10,9 +10,9 @@ import (
 	tmcoretypes "github.com/tendermint/tendermint/rpc/core/types"
 )
 
-// The following structs are overriden from the tendermint codebase.
+// The following structs are overridden from the tendermint codebase.
 // They are used to parse the output of the `status` command.
-// We need to override them because the tendermint codebase types are overriden
+// We need to override them because the tendermint codebase types are overridden
 // by the cosmos-sdk codebase types.
 type NodeStatus struct {
 	NodeInfo      DefaultNodeInfo           `json:"NodeInfo"`
