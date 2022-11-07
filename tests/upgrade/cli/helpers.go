@@ -6,21 +6,28 @@ import (
 	"sync"
 	"time"
 
+	"github.com/tendermint/tendermint/p2p"
 	tmcoretypes "github.com/tendermint/tendermint/rpc/core/types"
 )
 
-func GetNodeStatus(container string, binary string) (tmcoretypes.ResultStatus, error) {
+type NodeStatus struct {
+	NodeInfo p2p.DefaultNodeInfo `json:"NodeInfo"`
+	SyncInfo tmcoretypes.SyncInfo `json:"SyncInfo"`
+	ValidatorInfo tmcoretypes.ValidatorInfo `json:"ValidatorInfo"`
+}
+
+func GetNodeStatus(container string, binary string) (NodeStatus, error) {
 	out, err := LocalnetExecExec(container, binary, "status")
 	if err != nil {
-		return tmcoretypes.ResultStatus{}, err
+		return NodeStatus{}, err
 	}
 	fmt.Println("out", out)
-	var result *tmcoretypes.ResultStatus
-	err = json.Unmarshal([]byte(out), result)
+	var result NodeStatus
+	err = json.Unmarshal([]byte(out), &result)
 	if err != nil {
-		return tmcoretypes.ResultStatus{}, err
+		return NodeStatus{}, err
 	}
-	return *result, nil
+	return result, nil
 }
 
 func GetCurrentBlockHeight(container string, binary string) (int64, error) {
