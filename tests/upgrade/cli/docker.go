@@ -18,7 +18,8 @@ const (
 	DOCKER               = "docker"
 	DOCKER_COMPOSE       = "compose"
 	DOCKER_LOAD          = "load"
-	DOCKER_IMAGE_NAME    = "cheqd-node-image.tar"
+	DOCKER_IMAGE_NAME    = "cheqd-node-build.tar"
+	DOCKER_IMAGE_ENV     = "BUILD_IMAGE"
 	DOCKER_HOME          = "/home/cheqd"
 	DOCKER_USER          = "cheqd"
 	DOCKER_USER_GROUP    = "cheqd"
@@ -157,7 +158,7 @@ func LocalnetExecUpWithNewImage() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return LocalnetExecUp()
+	return LocalnetExecUpWithBuildImage()
 }
 
 func SetOldDockerComposeEnv() error {
@@ -167,6 +168,10 @@ func SetOldDockerComposeEnv() error {
 }
 
 func SetNewDockerComposeEnv() error {
+	_, err := Exec("unset", DOCKER_IMAGE_ENV)
+	if err != nil {
+		return err
+	}
 	os.Setenv("CHEQD_IMAGE_TO", CHEQD_IMAGE_TO)
 	os.Setenv("CHEQD_TAG_TO", CHEQD_TAG_TO)
 	return nil
