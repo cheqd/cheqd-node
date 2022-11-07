@@ -61,6 +61,8 @@ func SubmitUpgradeProposal(upgradeHeight int64, container string) (sdk.TxRespons
 		return sdk.TxResponse{}, err
 	}
 
+	out = TrimExtraLineOffset(out, 1)
+
 	var resp sdk.TxResponse
 
 	err = integrationhelpers.Codec.UnmarshalJSON([]byte(out), &resp)
@@ -83,6 +85,8 @@ func DepositGov(container string) (sdk.TxResponse, error) {
 		return sdk.TxResponse{}, err
 	}
 
+	out = TrimExtraLineOffset(out, 1)
+
 	var resp sdk.TxResponse
 
 	err = integrationhelpers.Codec.UnmarshalJSON([]byte(out), &resp)
@@ -103,6 +107,8 @@ func VoteUpgradeProposal(container string) (sdk.TxResponse, error) {
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
+
+	out = TrimExtraLineOffset(out, 1)
 
 	var resp sdk.TxResponse
 

@@ -3,6 +3,7 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -143,4 +144,8 @@ func waitCallback(container string, binary string, height int64, period int64, w
 	}
 
 	fmt.Printf("Container %s is at height %d after %d seconds of waiting, with a max waiting period of %d.\n", container, status.SyncInfo.LatestBlockHeight, *waited, period)
+}
+
+func TrimExtraLineOffset(input string, offset int) string {
+	return strings.Join(strings.Split(input, "\n")[offset:], "")
 }
