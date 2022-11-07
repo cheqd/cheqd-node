@@ -65,7 +65,7 @@ func SubmitUpgradeProposal(upgradeHeight int64, container string) (sdk.TxRespons
 
 	err = integrationhelpers.Codec.UnmarshalJSON([]byte(out), &resp)
 	if err != nil {
-		fmt.Println("JSON unmarshal error:", err)
+		fmt.Println("JSON unmarshal error: output:", out)
 		return sdk.TxResponse{}, err
 	}
 	return resp, nil
