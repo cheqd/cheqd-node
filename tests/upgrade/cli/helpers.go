@@ -8,7 +8,6 @@ import (
 
 	sdkcrypto "github.com/cosmos/cosmos-sdk/crypto/types"
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
-	tmcoretypes "github.com/tendermint/tendermint/rpc/core/types"
 )
 
 // The following structs are overridden from the tendermint codebase.
@@ -18,9 +17,9 @@ import (
 // Also, ValidatorInfo.PubKey is replaced with cosmos-sdk crypto.PubKey, hence it needs
 // to be parsed accordingly.
 type NodeStatus struct {
-	NodeInfo      DefaultNodeInfo           `json:"NodeInfo"`
-	SyncInfo      tmcoretypes.SyncInfo      `json:"SyncInfo"`
-	ValidatorInfo tmcoretypes.ValidatorInfo `json:"ValidatorInfo"`
+	NodeInfo      DefaultNodeInfo `json:"NodeInfo"`
+	SyncInfo      SyncInfo        `json:"SyncInfo"`
+	ValidatorInfo ValidatorInfo   `json:"ValidatorInfo"`
 }
 
 type DefaultNodeInfo struct {
