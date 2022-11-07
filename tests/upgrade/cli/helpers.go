@@ -8,12 +8,15 @@ import (
 
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 	tmcoretypes "github.com/tendermint/tendermint/rpc/core/types"
+	sdkcrypto "github.com/cosmos/cosmos-sdk/crypto/types"
 )
 
 // The following structs are overridden from the tendermint codebase.
 // They are used to parse the output of the `status` command.
 // We need to override them because the tendermint codebase types are overridden
 // by the cosmos-sdk codebase types.
+// Also, ValidatorInfo.PubKey is replaced with cosmos-sdk crypto.PubKey, hence it needs
+// to be parsed accordingly.
 type NodeStatus struct {
 	NodeInfo      DefaultNodeInfo           `json:"NodeInfo"`
 	SyncInfo      tmcoretypes.SyncInfo      `json:"SyncInfo"`
@@ -40,6 +43,26 @@ type ProtocolVersion struct {
 type DefaultNodeInfoOther struct {
 	TxIndex    string `json:"tx_index"`
 	RPCAddress string `json:"rpc_address"`
+}
+
+type SyncInfo struct {
+	LatestBlockHash   tmbytes.HexBytes `json:"latest_block_hash"`
+	LatestAppHash     tmbytes.HexBytes `json:"latest_app_hash"`
+	LatestBlockHeight int64          `json:"latest_block_height,string"`
+	LatestBlockTime   time.Time      `json:"latest_block_time"`
+
+	EarliestBlockHash   tmbytes.HexBytes `json:"earliest_block_hash"`
+	EarliestAppHash     tmbytes.HexBytes `json:"earliest_app_hash"`
+	EarliestBlockHeight int64          `json:"earliest_block_height,string"`
+	EarliestBlockTime   time.Time      `json:"earliest_block_time"`
+
+	CatchingUp bool `json:"catching_up"`
+}
+
+type ValidatorInfo struct {
+	Address     tmbytes.HexBytes `json:"Address"`
+	PubKey      sdkcrypto.PubKey `json:"PubKey"`
+	VotingPower int64			 `json:"VotingPower,string"`
 }
 
 func GetNodeStatus(container string, binary string) (NodeStatus, error) {
