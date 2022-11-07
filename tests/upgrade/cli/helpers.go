@@ -6,9 +6,9 @@ import (
 	"sync"
 	"time"
 
+	sdkcrypto "github.com/cosmos/cosmos-sdk/crypto/types"
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 	tmcoretypes "github.com/tendermint/tendermint/rpc/core/types"
-	sdkcrypto "github.com/cosmos/cosmos-sdk/crypto/types"
 )
 
 // The following structs are overridden from the tendermint codebase.
@@ -48,13 +48,13 @@ type DefaultNodeInfoOther struct {
 type SyncInfo struct {
 	LatestBlockHash   tmbytes.HexBytes `json:"latest_block_hash"`
 	LatestAppHash     tmbytes.HexBytes `json:"latest_app_hash"`
-	LatestBlockHeight int64          `json:"latest_block_height,string"`
-	LatestBlockTime   time.Time      `json:"latest_block_time"`
+	LatestBlockHeight int64            `json:"latest_block_height,string"`
+	LatestBlockTime   time.Time        `json:"latest_block_time"`
 
 	EarliestBlockHash   tmbytes.HexBytes `json:"earliest_block_hash"`
 	EarliestAppHash     tmbytes.HexBytes `json:"earliest_app_hash"`
-	EarliestBlockHeight int64          `json:"earliest_block_height,string"`
-	EarliestBlockTime   time.Time      `json:"earliest_block_time"`
+	EarliestBlockHeight int64            `json:"earliest_block_height,string"`
+	EarliestBlockTime   time.Time        `json:"earliest_block_time"`
 
 	CatchingUp bool `json:"catching_up"`
 }
@@ -62,7 +62,7 @@ type SyncInfo struct {
 type ValidatorInfo struct {
 	Address     tmbytes.HexBytes `json:"Address"`
 	PubKey      sdkcrypto.PubKey `json:"PubKey"`
-	VotingPower int64			 `json:"VotingPower,string"`
+	VotingPower int64            `json:"VotingPower,string"`
 }
 
 func GetNodeStatus(container string, binary string) (NodeStatus, error) {
