@@ -167,6 +167,7 @@ func MakeCodecWithExtendedRegistry() codec.Codec {
 
 	interfaceRegistry.RegisterImplementations(
 		(*sdk.Msg)(nil),
+		&upgradetypes.MsgSoftwareUpgrade{},
 	)
 
 	return codec.NewProtoCodec(interfaceRegistry)
