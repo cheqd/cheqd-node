@@ -20,6 +20,8 @@ const (
 	DOCKER_LOAD          = "load"
 	DOCKER_IMAGE_NAME    = "cheqd-node-build.tar"
 	DOCKER_IMAGE_ENV     = "BUILD_IMAGE"
+	DOCKER_IMAGE_BUILD   = "cheqd/cheqd-node:build-latest"
+	DOCKER_IMAGE_LATEST  = "ghcr.io/cheqd/cheqd-node:latest"
 	DOCKER_HOME          = "/home/cheqd"
 	DOCKER_USER          = "cheqd"
 	DOCKER_USER_GROUP    = "cheqd"
@@ -146,7 +148,17 @@ func LocalnetLoadImage(args ...string) (string, error) {
 }
 
 func LocalnetExecUpWithBuildImage() (string, error) {
-	return LocalnetExec("--env-file", filepath.Join(DOCKER_LOCALNET_PATH, DOCKER_COMPOSE_ENV), "up", "--detach", "--no-build")
+	return ExecWithEnv(
+		[]string{DOCKER_IMAGE_ENV + "=" + DOCKER_IMAGE_BUILD},
+		DOCKER, DOCKER_COMPOSE,
+		"--env-file",
+		filepath.Join(DOCKER_LOCALNET_PATH, DOCKER_COMPOSE_ENV),
+		"-f",
+		filepath.Join(DOCKER_LOCALNET_PATH, DOCKER_COMPOSE_FILE),
+		"up",
+		"--detach",
+		"--no-build",
+	)
 }
 
 func LocalnetExecUpWithNewImage() (string, error) {
@@ -168,10 +180,6 @@ func SetOldDockerComposeEnv() error {
 }
 
 func SetNewDockerComposeEnv() error {
-	_, err := ExecDirect("unset", DOCKER_IMAGE_ENV)
-	if err != nil {
-		return err
-	}
 	os.Setenv("CHEQD_IMAGE_TO", CHEQD_IMAGE_TO)
 	os.Setenv("CHEQD_TAG_TO", CHEQD_TAG_TO)
 	return nil
