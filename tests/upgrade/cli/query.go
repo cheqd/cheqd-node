@@ -34,6 +34,8 @@ func QueryUpgradeProposal(container string) (govtypesv1beta1.Proposal, error) {
 
 	fmt.Println("QueryUpgradeProposal", out)
 
+	fmt.Println("Registry Implementations", integrationhelpers.Registry.ListImplementations("cosmos.gov.v1beta1.Content"))
+
 	var resp govtypesv1beta1.Proposal
 
 	err = integrationhelpers.Codec.UnmarshalJSON([]byte(out), &resp)
