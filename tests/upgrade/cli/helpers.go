@@ -16,7 +16,7 @@ func GetNodeStatus(container string, binary string) (tmcoretypes.ResultStatus, e
 	}
 	fmt.Println("out", out)
 	var result *tmcoretypes.ResultStatus
-	err = json.Unmarshal([]byte(out), &result)
+	err = json.Unmarshal([]byte(out), result)
 	if err != nil {
 		return tmcoretypes.ResultStatus{}, err
 	}
