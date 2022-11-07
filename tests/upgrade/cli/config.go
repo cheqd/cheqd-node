@@ -32,7 +32,7 @@ const (
 	EXPECTED_BLOCK_SECONDS int64 = 1
 	EXTRA_BLOCKS           int64 = 5
 	UPGRADE_NAME                 = cheqdapp.UpgradeName
-	DEPOSIT_AMOUNT               = "10000000"
+	DEPOSIT_AMOUNT               = "10000000ncheq"
 	NETWORK_CONFIG_DIR           = "network-config"
 	KEYRING_DIR                  = "keyring-test"
 )
