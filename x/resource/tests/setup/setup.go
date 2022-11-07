@@ -4,9 +4,9 @@ import (
 	"crypto/rand"
 	"time"
 
-	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
-	cheqdsetup "github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
+	didsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 
@@ -22,7 +22,7 @@ import (
 )
 
 type TestSetup struct {
-	cheqdsetup.TestSetup
+	didsetup.TestSetup
 
 	ResourceKeeper      keeper.Keeper
 	ResourceMsgServer   types.MsgServer
@@ -33,7 +33,7 @@ func Setup() TestSetup {
 	// Init Codec
 	ir := codectypes.NewInterfaceRegistry()
 	types.RegisterInterfaces(ir)
-	cheqdtypes.RegisterInterfaces(ir)
+	didtypes.RegisterInterfaces(ir)
 	cdc := codec.NewProtoCodec(ir)
 
 	// Init KVSore
@@ -41,16 +41,16 @@ func Setup() TestSetup {
 
 	dbStore := store.NewCommitMultiStore(db)
 
-	cheqdStoreKey := sdk.NewKVStoreKey(cheqdtypes.StoreKey)
+	didStoreKey := sdk.NewKVStoreKey(didtypes.StoreKey)
 	resourceStoreKey := sdk.NewKVStoreKey(types.StoreKey)
 
-	dbStore.MountStoreWithDB(cheqdStoreKey, storetypes.StoreTypeIAVL, nil)
+	dbStore.MountStoreWithDB(didStoreKey, storetypes.StoreTypeIAVL, nil)
 	dbStore.MountStoreWithDB(resourceStoreKey, storetypes.StoreTypeIAVL, nil)
 
 	_ = dbStore.LoadLatestVersion()
 
 	// Init Keepers
-	cheqdKeeper := cheqdkeeper.NewKeeper(cdc, cheqdStoreKey)
+	didKeeper := didkeeper.NewKeeper(cdc, didStoreKey)
 	resourceKeeper := keeper.NewKeeper(cdc, resourceStoreKey)
 
 	// Create Tx
@@ -64,22 +64,22 @@ func Setup() TestSetup {
 		false, log.NewNopLogger()).WithTxBytes(txBytes)
 
 	// Init servers
-	cheqdMsgServer := cheqdkeeper.NewMsgServer(*cheqdKeeper)
-	cheqdQueryServer := cheqdkeeper.NewQueryServer(*cheqdKeeper)
+	didMsgServer := didkeeper.NewMsgServer(*didKeeper)
+	didQueryServer := didkeeper.NewQueryServer(*didKeeper)
 
-	msgServer := keeper.NewMsgServer(*resourceKeeper, *cheqdKeeper)
-	queryServer := keeper.NewQueryServer(*resourceKeeper, *cheqdKeeper)
+	msgServer := keeper.NewMsgServer(*resourceKeeper, *didKeeper)
+	queryServer := keeper.NewQueryServer(*resourceKeeper, *didKeeper)
 
 	setup := TestSetup{
-		TestSetup: cheqdsetup.TestSetup{
+		TestSetup: didsetup.TestSetup{
 			Cdc: cdc,
 
 			SdkCtx: ctx,
 			StdCtx: sdk.WrapSDKContext(ctx),
 
-			Keeper:      *cheqdKeeper,
-			MsgServer:   cheqdMsgServer,
-			QueryServer: cheqdQueryServer,
+			Keeper:      *didKeeper,
+			MsgServer:   didMsgServer,
+			QueryServer: didQueryServer,
 		},
 
 		ResourceKeeper:      *resourceKeeper,
@@ -87,6 +87,6 @@ func Setup() TestSetup {
 		ResourceQueryServer: queryServer,
 	}
 
-	setup.Keeper.SetDidNamespace(&ctx, cheqdsetup.DID_NAMESPACE)
+	setup.Keeper.SetDidNamespace(&ctx, didsetup.DID_NAMESPACE)
 	return setup
 }

@@ -9,8 +9,8 @@ import (
 	"github.com/cheqd/cheqd-node/tests/integration/cli"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
 	"github.com/cheqd/cheqd-node/tests/integration/testdata"
-	cli_types "github.com/cheqd/cheqd-node/x/cheqd/client/cli"
-	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	cli_types "github.com/cheqd/cheqd-node/x/did/client/cli"
+	"github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/google/uuid"
 	"github.com/multiformats/go-multibase"
 	. "github.com/onsi/ginkgo/v2"
@@ -30,14 +30,14 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		pubKeyMultibase58, err := multibase.Encode(multibase.Base58BTC, pubKey)
 		Expect(err).To(BeNil())
 
-		payload := types.MsgCreateDidPayload{
+		payload := types.MsgCreateDidDocPayload{
 			Id: did,
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                 keyId,
-					Type:               "Ed25519VerificationKey2020",
-					Controller:         did,
-					PublicKeyMultibase: string(pubKeyMultibase58),
+					Id:                   keyId,
+					Type:                 "Ed25519VerificationKey2020",
+					Controller:           did,
+					VerificationMaterial: "{\"publicKeyMultibase\": \"" + string(pubKeyMultibase58) + "\"}",
 				},
 			},
 			Authentication: []string{keyId},
@@ -50,7 +50,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 			},
 		}
 
-		res, err := cli.CreateDid(payload, signInputs, testdata.BASE_ACCOUNT_1)
+		res, err := cli.CreateDidDoc(payload, signInputs, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -58,11 +58,12 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		// Create a new Resource
 		resourceId := uuid.NewString()
 		resourceName := "TestResource"
+		resourceVersion := "1.0"
 		resourceType := "TestType"
 		resourceFile, err := testdata.CreateTestJson(GinkgoT().TempDir())
 		Expect(err).To(BeNil())
 
-		res, err = cli.CreateResource(collectionId, resourceId, resourceName, resourceType, resourceFile, signInputs, testdata.BASE_ACCOUNT_1)
+		res, err = cli.CreateResource(collectionId, resourceId, resourceName, resourceVersion, resourceType, resourceFile, signInputs, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -71,32 +72,35 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		res2, err := cli.QueryResource(collectionId, resourceId)
 		Expect(err).To(BeNil())
 
-		Expect(res2.Resource.Header.CollectionId).To(BeEquivalentTo(collectionId))
-		Expect(res2.Resource.Header.Id).To(BeEquivalentTo(resourceId))
-		Expect(res2.Resource.Header.Name).To(BeEquivalentTo(resourceName))
-		Expect(res2.Resource.Header.ResourceType).To(BeEquivalentTo(resourceType))
-		Expect(res2.Resource.Header.MediaType).To(Equal("application/json"))
-		Expect(res2.Resource.Data).To(BeEquivalentTo(testdata.JSON_FILE_CONTENT))
+		Expect(res2.Resource.Metadata.CollectionId).To(BeEquivalentTo(collectionId))
+		Expect(res2.Resource.Metadata.Id).To(BeEquivalentTo(resourceId))
+		Expect(res2.Resource.Metadata.Name).To(BeEquivalentTo(resourceName))
+		Expect(res2.Resource.Metadata.ResourceType).To(BeEquivalentTo(resourceType))
+		Expect(res2.Resource.Metadata.MediaType).To(Equal("application/json"))
+		Expect(res2.Resource.Resource.Data).To(BeEquivalentTo(testdata.JSON_FILE_CONTENT))
+
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.GREEN, "can query resource metadata"))
+		// Query the Resource Metadata
+		res3, err := cli.QueryResourceMetadata(collectionId, resourceId)
+		Expect(err).To(BeNil())
+
+		Expect(res3.Resource.CollectionId).To(BeEquivalentTo(collectionId))
+		Expect(res3.Resource.Id).To(BeEquivalentTo(resourceId))
+		Expect(res3.Resource.Name).To(BeEquivalentTo(resourceName))
+		Expect(res3.Resource.ResourceType).To(BeEquivalentTo(resourceType))
+		Expect(res3.Resource.MediaType).To(Equal("application/json"))
 
 		// Create Resource next version
 		nextResourceId := uuid.NewString()
 		nextResourceName := resourceName
+		nextResourceVersion := "2.0"
 		nextResourceType := resourceType
 		nextResourceFile, err := testdata.CreateTestJson(GinkgoT().TempDir())
 		Expect(err).To(BeNil())
 
-		res, err = cli.CreateResource(collectionId, nextResourceId, nextResourceName, nextResourceType, nextResourceFile, signInputs, testdata.BASE_ACCOUNT_1)
+		res, err = cli.CreateResource(collectionId, nextResourceId, nextResourceName, nextResourceVersion, nextResourceType, nextResourceFile, signInputs, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
-
-		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.GREEN, "can query all resource versions"))
-		// Query all Resource versions
-		res3, err := cli.QueryAllResourceVersions(collectionId, resourceName, resourceType)
-		Expect(err).To(BeNil())
-		Expect(len(res3.Resources)).To(Equal(2))
-		Expect(res3.Resources[0].CollectionId).To(Equal(collectionId))
-		Expect(res3.Resources[1].CollectionId).To(Equal(collectionId))
-		Expect([]string{res3.Resources[0].Id, res3.Resources[1].Id}).To(ContainElements(resourceId, nextResourceId))
 
 		// Create a second DID Doc
 		secondCollectionId := uuid.NewString()
@@ -109,14 +113,14 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		secondPubKeyMultibase58, err := multibase.Encode(multibase.Base58BTC, secondPubKey)
 		Expect(err).To(BeNil())
 
-		secondPayload := types.MsgCreateDidPayload{
+		secondPayload := types.MsgCreateDidDocPayload{
 			Id: secondDid,
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                 secondKeyId,
-					Type:               "Ed25519VerificationKey2020",
-					Controller:         secondDid,
-					PublicKeyMultibase: string(secondPubKeyMultibase58),
+					Id:                   secondKeyId,
+					Type:                 "Ed25519VerificationKey2020",
+					Controller:           secondDid,
+					VerificationMaterial: "{\"publicKeyMultibase\": \"" + string(secondPubKeyMultibase58) + "\"}",
 				},
 			},
 			Authentication: []string{secondKeyId},
@@ -129,18 +133,19 @@ var _ = Describe("cheqd cli - positive resource", func() {
 			},
 		}
 
-		res, err = cli.CreateDid(secondPayload, secondSignInputs, testdata.BASE_ACCOUNT_2)
+		res, err = cli.CreateDidDoc(secondPayload, secondSignInputs, testdata.BASE_ACCOUNT_2)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
 		// Create a second Resource
 		secondResourceId := uuid.NewString()
 		secondResourceName := "TestResource2"
+		secondResourceVersion := "1.0"
 		secondResourceType := "TestType2"
 		secondResourceFile, err := testdata.CreateTestJson(GinkgoT().TempDir())
 		Expect(err).To(BeNil())
 
-		res, err = cli.CreateResource(secondCollectionId, secondResourceId, secondResourceName, secondResourceType, secondResourceFile, secondSignInputs, testdata.BASE_ACCOUNT_2)
+		res, err = cli.CreateResource(secondCollectionId, secondResourceId, secondResourceName, secondResourceVersion, secondResourceType, secondResourceFile, secondSignInputs, testdata.BASE_ACCOUNT_2)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 

@@ -11,7 +11,7 @@ import (
 // InitGenesis initializes the resource module's state from a provided genesis
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
-	for _, resource := range genState.ResourceList {
+	for _, resource := range genState.Resources {
 		if err := k.SetResource(&ctx, resource); err != nil {
 			panic(fmt.Sprintf("Cannot set resource case: %s", err.Error()))
 		}
@@ -25,8 +25,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	// Get all resource
 	resourceList := k.GetAllResources(&ctx)
 	for _, elem := range resourceList {
-		elem := elem
-		genesis.ResourceList = append(genesis.ResourceList, &elem)
+		genesis.Resources = append(genesis.Resources, &elem)
 	}
 
 	return &genesis

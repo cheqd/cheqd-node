@@ -7,33 +7,33 @@ import (
 	. "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 	"github.com/google/uuid"
 
-	cheqdsetup "github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
-	cheqdutils "github.com/cheqd/cheqd-node/x/cheqd/utils"
+	didsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
-func ExpectPayloadToMatchResource(payload *resourcetypes.MsgCreateResourcePayload, resource *resourcetypes.Resource) {
+func ExpectPayloadToMatchResource(payload *resourcetypes.MsgCreateResourcePayload, resource *resourcetypes.ResourceWithMetadata) {
 	// Provided header
-	Expect(payload.Id).To(Equal(resource.Header.Id))
-	Expect(payload.CollectionId).To(Equal(resource.Header.CollectionId))
-	Expect(payload.Name).To(Equal(resource.Header.Name))
-	Expect(payload.ResourceType).To(Equal(resource.Header.ResourceType))
+	Expect(payload.Id).To(Equal(resource.Metadata.Id))
+	Expect(payload.CollectionId).To(Equal(resource.Metadata.CollectionId))
+	Expect(payload.Name).To(Equal(resource.Metadata.Name))
+	Expect(payload.ResourceType).To(Equal(resource.Metadata.ResourceType))
 
 	// Generated header
 	hash := sha256.Sum256(payload.Data)
-	Expect(resource.Header.Checksum).To(Equal(hash[:]))
+	Expect(resource.Metadata.Checksum).To(Equal(hash[:]))
 
 	// Provided data
-	Expect(payload.Data).To(Equal(resource.Data))
+	Expect(payload.Data).To(Equal(resource.Resource.Data))
 }
 
 var _ = Describe("Create Resource Tests", func() {
 	var setup TestSetup
-	var alice cheqdsetup.CreatedDidInfo
+	var alice didsetup.CreatedDidDocInfo
 
 	BeforeEach(func() {
 		setup = Setup()
@@ -54,7 +54,7 @@ var _ = Describe("Create Resource Tests", func() {
 		})
 
 		It("Can be created with DIDDoc controller signature", func() {
-			_, err := setup.CreateResource(msg, []cheqdsetup.SignInput{alice.SignInput})
+			_, err := setup.CreateResource(msg, []didsetup.SignInput{alice.SignInput})
 			Expect(err).To(BeNil())
 
 			// check
@@ -65,14 +65,14 @@ var _ = Describe("Create Resource Tests", func() {
 		})
 
 		It("Can't be created without DIDDoc controller signatures", func() {
-			_, err := setup.CreateResource(msg, []cheqdsetup.SignInput{})
+			_, err := setup.CreateResource(msg, []didsetup.SignInput{})
 			Expect(err.Error()).To(ContainSubstring("signature is required but not found"))
 		})
 
 		It("Can't be created with invalid collection id", func() {
-			msg.CollectionId = cheqdsetup.GenerateDID(cheqdsetup.Base58_16bytes)
+			msg.CollectionId = didsetup.GenerateDID(didsetup.Base58_16bytes)
 
-			_, err := setup.CreateResource(msg, []cheqdsetup.SignInput{alice.SignInput})
+			_, err := setup.CreateResource(msg, []didsetup.SignInput{alice.SignInput})
 			Expect(err.Error()).To(ContainSubstring("not found"))
 		})
 	})
@@ -81,19 +81,19 @@ var _ = Describe("Create Resource Tests", func() {
 		var existingResource *resourcetypes.MsgCreateResourceResponse
 
 		BeforeEach(func() {
-			existingResource = setup.CreateSimpleResource(alice.CollectionId, SchemaData, "Test Resource Name", CLSchemaType, []cheqdsetup.SignInput{alice.SignInput})
+			existingResource = setup.CreateSimpleResource(alice.CollectionId, SchemaData, "Test Resource Name", CLSchemaType, []didsetup.SignInput{alice.SignInput})
 		})
 
 		It("Is linked to the previous one when name matches", func() {
 			msg := resourcetypes.MsgCreateResourcePayload{
 				CollectionId: alice.CollectionId,
 				Id:           uuid.NewString(),
-				Name:         existingResource.Resource.Header.Name,
+				Name:         existingResource.Resource.Name,
 				ResourceType: CLSchemaType,
 				Data:         []byte(SchemaData),
 			}
 
-			_, err := setup.CreateResource(&msg, []cheqdsetup.SignInput{alice.SignInput})
+			_, err := setup.CreateResource(&msg, []didsetup.SignInput{alice.SignInput})
 			Expect(err).To(BeNil())
 
 			// check
@@ -101,7 +101,7 @@ var _ = Describe("Create Resource Tests", func() {
 			Expect(err).To(BeNil())
 
 			ExpectPayloadToMatchResource(&msg, created.Resource)
-			Expect(created.Resource.Header.PreviousVersionId).To(Equal(existingResource.Resource.Header.Id))
+			Expect(created.Resource.Metadata.PreviousVersionId).To(Equal(existingResource.Resource.Id))
 		})
 	})
 
@@ -121,18 +121,18 @@ var _ = Describe("Create Resource Tests", func() {
 		When("DIDDoc is deactivated", func() {
 			It("Should fail with error", func() {
 				// Deactivate DID
-				DeactivateMsg := &cheqdtypes.MsgDeactivateDidPayload{
+				DeactivateMsg := &didtypes.MsgDeactivateDidDocPayload{
 					Id: alice.Did,
 				}
 
-				signatures := []cheqdsetup.SignInput{alice.DidInfo.SignInput}
+				signatures := []didsetup.SignInput{alice.DidDocInfo.SignInput}
 
-				res, err := setup.DeactivateDid(DeactivateMsg, signatures)
+				res, err := setup.DeactivateDidDoc(DeactivateMsg, signatures)
 				Expect(err).To(BeNil())
-				Expect(res.Metadata.Deactivated).To(BeTrue())
+				Expect(res.Value.Metadata.Deactivated).To(BeTrue())
 
 				// Create resource
-				_, err = setup.CreateResource(msg, []cheqdsetup.SignInput{alice.SignInput})
+				_, err = setup.CreateResource(msg, []didsetup.SignInput{alice.SignInput})
 				Expect(err).ToNot(BeNil())
 				Expect(err.Error()).To(ContainSubstring(alice.Did + ": DID Doc already deactivated"))
 			})
@@ -149,22 +149,22 @@ var _ = Describe("Create Resource Tests", func() {
 				Data:         []byte(SchemaData),
 			}
 
-			_, err := setup.CreateResource(&msg, []cheqdsetup.SignInput{alice.SignInput})
+			_, err := setup.CreateResource(&msg, []didsetup.SignInput{alice.SignInput})
 			Expect(err).To(BeNil())
 
 			// check for the same UUID
 			created, err := setup.QueryResource(alice.CollectionId, UUIDString)
 			Expect(err).To(BeNil())
 
-			Expect(created.Resource.Header.Id).To(Equal(strings.ToLower(UUIDString)))
+			Expect(created.Resource.Metadata.Id).To(Equal(strings.ToLower(UUIDString)))
 
 			// check for already normalized UUID
 			created, err = setup.QueryResource(
-				cheqdutils.NormalizeId(alice.CollectionId),
-				cheqdutils.NormalizeId(UUIDString))
+				didutils.NormalizeId(alice.CollectionId),
+				didutils.NormalizeId(UUIDString))
 			Expect(err).To(BeNil())
 
-			Expect(created.Resource.Header.Id).To(Equal(strings.ToLower(UUIDString)))
+			Expect(created.Resource.Metadata.Id).To(Equal(strings.ToLower(UUIDString)))
 		})
 	})
 })
