@@ -18,7 +18,7 @@ func (k MsgServer) CreateDidDoc(goCtx context.Context, msg *types.MsgCreateDidDo
 	msg.Normalize()
 
 	// Validate DID doesn't exist
-	if k.HasDidDoc(&ctx, msg.Payload.Id) {
+	if k.HasLatestDidDocVersion(&ctx, msg.Payload.Id) {
 		return nil, types.ErrDidDocExists.Wrap(msg.Payload.Id)
 	}
 
@@ -32,6 +32,7 @@ func (k MsgServer) CreateDidDoc(goCtx context.Context, msg *types.MsgCreateDidDo
 	// Build metadata and stateValue
 	didDoc := msg.Payload.ToDidDoc()
 	metadata := types.NewMetadataFromContext(ctx)
+	metadata.VersionId = msg.Payload.VersionId
 	didDocWithMetadata := types.NewDidDocWithMetadata(&didDoc, &metadata)
 
 	// Consider did that we are going to create during did resolutions
@@ -53,7 +54,14 @@ func (k MsgServer) CreateDidDoc(goCtx context.Context, msg *types.MsgCreateDidDo
 		return nil, err
 	}
 
-	err = k.SetDidDoc(&ctx, &didDocWithMetadata)
+	// Save first DIDDoc version
+	err = k.SetDidDocVersion(&ctx, &didDocWithMetadata)
+	if err != nil {
+		return nil, types.ErrInternal.Wrapf(err.Error())
+	}
+
+	// Save link to the latest DIDDoc version
+	err = k.SetLatestDidDocVersion(&ctx, didDocWithMetadata.DidDoc.Id, didDocWithMetadata.Metadata.VersionId)
 	if err != nil {
 		return nil, types.ErrInternal.Wrapf(err.Error())
 	}

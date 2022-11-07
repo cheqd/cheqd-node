@@ -48,3 +48,9 @@ func (msg MsgDeactivateDidDoc) Validate(allowedNamespaces []string) error {
 		validation.Field(&msg.Signatures, IsUniqueSignInfoListRule(), validation.Each(ValidSignInfoRule(allowedNamespaces))),
 	)
 }
+
+// Normalize
+
+func (msg *MsgDeactivateDidDoc) Normalize() {
+	msg.Payload.Normalize()
+}

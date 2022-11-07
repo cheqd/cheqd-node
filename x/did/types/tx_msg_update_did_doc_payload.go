@@ -41,6 +41,7 @@ func (msg MsgUpdateDidDocPayload) Validate(allowedNamespaces []string) error {
 	}
 
 	return validation.ValidateStruct(&msg,
+		validation.Field(&msg.PreviousVersionId, validation.Required),
 		validation.Field(&msg.VersionId, validation.Required),
 	)
 }
@@ -73,4 +74,7 @@ func (msg *MsgUpdateDidDocPayload) Normalize() {
 	msg.CapabilityInvocation = utils.NormalizeDIDUrlList(msg.CapabilityInvocation)
 	msg.CapabilityDelegation = utils.NormalizeDIDUrlList(msg.CapabilityDelegation)
 	msg.KeyAgreement = utils.NormalizeDIDUrlList(msg.KeyAgreement)
+
+	msg.PreviousVersionId = utils.NormalizeUUID(msg.PreviousVersionId)
+	msg.VersionId = utils.NormalizeUUID(msg.VersionId)
 }

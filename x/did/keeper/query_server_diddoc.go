@@ -18,7 +18,12 @@ func (k Keeper) DidDoc(c context.Context, req *types.QueryGetDidDocRequest) (*ty
 
 	ctx := sdk.UnwrapSDKContext(c)
 
-	didDoc, err := k.GetDidDoc(&ctx, req.Id)
+	latestVersion, err := k.GetLatestDidDocVersion(&ctx, req.Id)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, err.Error())
+	}
+
+	didDoc, err := k.GetDidDocVersion(&ctx, req.Id, latestVersion)
 	if err != nil {
 		return nil, err
 	}

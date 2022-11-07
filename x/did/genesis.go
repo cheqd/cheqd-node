@@ -13,7 +13,7 @@ import (
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 	// Set didocs
 	for _, elem := range genState.DidDocs {
-		if err := k.SetDidDoc(&ctx, elem); err != nil {
+		if err := k.SetDidDocVersion(&ctx, elem); err != nil {
 			panic(fmt.Sprintf("Cannot set did case: %s", err.Error()))
 		}
 	}

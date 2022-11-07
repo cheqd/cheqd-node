@@ -10,8 +10,14 @@ import (
 func (k MsgServer) DeactivateDidDoc(goCtx context.Context, msg *types.MsgDeactivateDidDoc) (*types.MsgDeactivateDidDocResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	// Get sign bytes before modifying payload
+	signBytes := msg.Payload.GetSignBytes()
+
+	// Normalize UUID identifiers
+	msg.Normalize()
+
 	// Validate DID does exist
-	if !k.HasDidDoc(&ctx, msg.Payload.Id) {
+	if !k.HasLatestDidDocVersion(&ctx, msg.Payload.Id) {
 		return nil, types.ErrDidDocNotFound.Wrap(msg.Payload.Id)
 	}
 
@@ -23,7 +29,12 @@ func (k MsgServer) DeactivateDidDoc(goCtx context.Context, msg *types.MsgDeactiv
 	}
 
 	// Retrieve didDoc state value and did
-	didDoc, err := k.GetDidDoc(&ctx, msg.Payload.Id)
+	latestVersion, err := k.GetLatestDidDocVersion(&ctx, msg.Payload.Id)
+	if err != nil {
+		return nil, types.ErrDidDocNotFound.Wrap(err.Error())
+	}
+
+	didDoc, err := k.GetDidDocVersion(&ctx, msg.Payload.Id, latestVersion)
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +49,7 @@ func (k MsgServer) DeactivateDidDoc(goCtx context.Context, msg *types.MsgDeactiv
 
 	// Verify signatures
 	signers := GetSignerDIDsForDIDCreation(*didDoc.DidDoc)
-	err = VerifyAllSignersHaveAllValidSignatures(&k.Keeper, &ctx, inMemoryDids, msg.Payload.GetSignBytes(), signers, msg.Signatures)
+	err = VerifyAllSignersHaveAllValidSignatures(&k.Keeper, &ctx, inMemoryDids, signBytes, signers, msg.Signatures)
 	if err != nil {
 		return nil, err
 	}
@@ -47,8 +58,8 @@ func (k MsgServer) DeactivateDidDoc(goCtx context.Context, msg *types.MsgDeactiv
 	didDoc.Metadata.Deactivated = true
 	didDoc.Metadata.Update(ctx)
 
-	// Apply changes
-	err = k.SetDidDoc(&ctx, &didDoc)
+	// Apply changes. We don't create new version on deactivation, we just update metadata
+	err = k.SetDidDocVersion(&ctx, &didDoc)
 	if err != nil {
 		return nil, types.ErrInternal.Wrapf(err.Error())
 	}

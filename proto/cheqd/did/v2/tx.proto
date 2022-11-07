@@ -44,6 +44,7 @@ message MsgCreateDidDocPayload {
   repeated string key_agreement = 9;
   repeated string also_known_as = 10;
   repeated Service service = 11;
+  string version_id = 12;
 }
 
 message MsgCreateDidDocResponse {
@@ -62,7 +63,8 @@ message MsgUpdateDidDocPayload {
   repeated string key_agreement = 9;
   repeated string also_known_as = 10;
   repeated Service service = 11;
-  string version_id = 12;
+  string previous_version_id = 12;
+  string version_id = 13;
 }
 
 message MsgUpdateDidDocResponse {
@@ -71,7 +73,7 @@ message MsgUpdateDidDocResponse {
 
 message MsgDeactivateDidDocPayload {
   string id = 1;
-  string version_id = 2;
+  string previous_version_id = 2;
 }
 
 message MsgDeactivateDidDocResponse {

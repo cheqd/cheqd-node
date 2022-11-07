@@ -19,6 +19,10 @@ func NewQuerier(k Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 		switch path[0] {
 		case types.QueryGetDidDoc:
 			return getDidDoc(ctx, path[1], k, legacyQuerierCdc)
+		case types.QueryGetAllDidDocVersions:
+			return getAllDidDocVersions(ctx, path[1], k, legacyQuerierCdc)
+		case types.QueryGetDidDocVersion:
+			return getDidDocVersion(ctx, path[1], path[2], k, legacyQuerierCdc)
 
 		default:
 			err = sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown %s query endpoint: %s", types.ModuleName, path[0])

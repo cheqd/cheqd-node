@@ -16,8 +16,31 @@ const (
 	DidMethod = ModuleName
 )
 
+// State:
+// did-namespace: -> <did-namespace>
+// did-count: -> <did-count>
+// did-latest:<did> -> <latest-version>
+// did-version:<did>:<version> -> <did-doc>
+
 const (
-	DidKey          = "did:"
-	DidCountKey     = "did-count:"
-	DidNamespaceKey = "did-namespace:"
+	LatestDidDocVersionKey = "did-latest:"
+	DidDocVersionKey       = "did-version:"
+	DidDocCountKey         = "did-count:"
+	DidNamespaceKey        = "did-namespace:"
 )
+
+func GetLatestDidDocVersionKey(did string) []byte {
+	return []byte(LatestDidDocVersionKey + did)
+}
+
+func GetDidDocVersionKey(did string, version string) []byte {
+	return []byte(DidDocVersionKey + did + ":" + version)
+}
+
+func GetLatestDidDocVersionPrefix() []byte {
+	return []byte(LatestDidDocVersionKey)
+}
+
+func GetDidDocVersionsPrefix(did string) []byte {
+	return []byte(DidDocVersionKey + did + ":")
+}
