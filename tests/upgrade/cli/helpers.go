@@ -6,7 +6,6 @@ import (
 	"sync"
 	"time"
 
-	sdkcrypto "github.com/cosmos/cosmos-sdk/crypto/types"
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 )
 
@@ -60,7 +59,7 @@ type SyncInfo struct {
 
 type ValidatorInfo struct {
 	Address     tmbytes.HexBytes `json:"Address"`
-	PubKey      sdkcrypto.PubKey `json:"PubKey"`
+	PubKey      interface{}      `json:"PubKey"`
 	VotingPower int64            `json:"VotingPower,string"`
 }
 
