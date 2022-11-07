@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"fmt"
+
 	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 )
@@ -29,6 +31,8 @@ func QueryUpgradeProposal(container string) (govtypesv1.QueryProposalResponse, e
 	if err != nil {
 		return govtypesv1.QueryProposalResponse{}, err
 	}
+
+	fmt.Println("QueryUpgradeProposal", out)
 
 	var resp govtypesv1.QueryProposalResponse
 
