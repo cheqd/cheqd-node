@@ -15,12 +15,12 @@ func GetNodeStatus(container string, binary string) (tmcoretypes.ResultStatus, e
 		return tmcoretypes.ResultStatus{}, err
 	}
 	fmt.Println("out", out)
-	var result tmcoretypes.ResultStatus
+	var result *tmcoretypes.ResultStatus
 	err = json.Unmarshal([]byte(out), &result)
 	if err != nil {
 		return tmcoretypes.ResultStatus{}, err
 	}
-	return result, nil
+	return *result, nil
 }
 
 func GetCurrentBlockHeight(container string, binary string) (int64, error) {
