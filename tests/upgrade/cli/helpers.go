@@ -80,15 +80,15 @@ func waitCallback(container string, binary string, height int64, period int64, w
 	}
 
 	if status.SyncInfo.LatestBlockHeight >= height {
-		fmt.Printf("Container %s reached height %d after %d seconds of waiting", container, height, *waited)
+		fmt.Printf("Container %s reached height %d after %d seconds of waiting.\n", container, height, *waited)
 		*waited = period + 1
 		return
 	}
 
 	if *waited == period {
-		fmt.Printf("Container %s did not reach height %d after %d seconds of waiting", container, height, *waited)
+		fmt.Printf("Container %s did not reach height %d after %d seconds of waiting.\n", container, height, *waited)
 		return
 	}
 
-	fmt.Printf("Container %s is at height %d after %d seconds of waiting, with a max waiting period of %d", container, status.SyncInfo.LatestBlockHeight, *waited, period)
+	fmt.Printf("Container %s is at height %d after %d seconds of waiting, with a max waiting period of %d.\n", container, status.SyncInfo.LatestBlockHeight, *waited, period)
 }

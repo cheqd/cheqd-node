@@ -25,6 +25,12 @@ var _ = Describe("Upgrade - Execute", func() {
 			Expect(err).To(BeNil())
 		})
 
+		It("should wait for block height increment", func() {
+			By("checking the current block height and waiting for it to reach the next block height in 60 seconds")
+			err := cli.WaitForChainHeight(cli.VALIDATOR0, cli.CLI_BINARY_NAME, 1, 60)
+			Expect(err).To(BeNil())
+		})
+
 		It("should calculate the upgrade height", func() {
 			By("getting the current block height and calculating the voting end height")
 			UPGRADE_HEIGHT, VOTING_END_HEIGHT, HEIGHT_ERROR = cli.CalculateUpgradeHeight(cli.VALIDATOR0, cli.CLI_BINARY_NAME)
