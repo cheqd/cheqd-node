@@ -11,8 +11,8 @@ import (
 )
 
 type NodeStatus struct {
-	NodeInfo p2p.DefaultNodeInfo `json:"NodeInfo"`
-	SyncInfo tmcoretypes.SyncInfo `json:"SyncInfo"`
+	NodeInfo      p2p.DefaultNodeInfo       `json:"NodeInfo"`
+	SyncInfo      tmcoretypes.SyncInfo      `json:"SyncInfo"`
 	ValidatorInfo tmcoretypes.ValidatorInfo `json:"ValidatorInfo"`
 }
 
