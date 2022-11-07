@@ -6,14 +6,40 @@ import (
 	"sync"
 	"time"
 
-	"github.com/tendermint/tendermint/p2p"
+	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 	tmcoretypes "github.com/tendermint/tendermint/rpc/core/types"
 )
 
+// The following structs are overriden from the tendermint codebase.
+// They are used to parse the output of the `status` command.
+// We need to override them because the tendermint codebase types are overriden
+// by the cosmos-sdk codebase types.
 type NodeStatus struct {
-	NodeInfo      p2p.DefaultNodeInfo       `json:"NodeInfo"`
+	NodeInfo      DefaultNodeInfo           `json:"NodeInfo"`
 	SyncInfo      tmcoretypes.SyncInfo      `json:"SyncInfo"`
 	ValidatorInfo tmcoretypes.ValidatorInfo `json:"ValidatorInfo"`
+}
+
+type DefaultNodeInfo struct {
+	ProtocolVersion ProtocolVersion      `json:"protocol_version"`
+	ID              string               `json:"id"`
+	ListenAddr      string               `json:"listen_addr"`
+	Network         string               `json:"network"`
+	Version         string               `json:"version"`
+	Channels        tmbytes.HexBytes     `json:"channels"`
+	Moniker         string               `json:"moniker"`
+	Other           DefaultNodeInfoOther `json:"other"`
+}
+
+type ProtocolVersion struct {
+	P2P   uint64 `json:"p2p,string"`
+	Block uint64 `json:"block,string"`
+	App   uint64 `json:"app,string"`
+}
+
+type DefaultNodeInfoOther struct {
+	TxIndex    string `json:"tx_index"`
+	RPCAddress string `json:"rpc_address"`
 }
 
 func GetNodeStatus(container string, binary string) (NodeStatus, error) {
