@@ -110,6 +110,8 @@ func VoteUpgradeProposal(container string) (sdk.TxResponse, error) {
 
 	out = TrimExtraLineOffset(out, 1)
 
+	fmt.Println("VoteUpgradeProposal", out)
+
 	var resp sdk.TxResponse
 
 	err = integrationhelpers.Codec.UnmarshalJSON([]byte(out), &resp)

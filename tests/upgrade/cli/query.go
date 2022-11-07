@@ -21,7 +21,7 @@ func Query(container string, binary string, module, query string, queryArgs ...s
 	return LocalnetExecExec(container, args...)
 }
 
-func QueryUpgradeProposal(container string) (govtypesv1beta1.QueryProposalResponse, error) {
+func QueryUpgradeProposal(container string) (govtypesv1beta1.Proposal, error) {
 	args := append([]string{
 		CLI_BINARY_NAME,
 		"query", "gov", "proposal", "1",
@@ -29,16 +29,16 @@ func QueryUpgradeProposal(container string) (govtypesv1beta1.QueryProposalRespon
 
 	out, err := LocalnetExecExec(container, args...)
 	if err != nil {
-		return govtypesv1beta1.QueryProposalResponse{}, err
+		return govtypesv1beta1.Proposal{}, err
 	}
 
 	fmt.Println("QueryUpgradeProposal", out)
 
-	var resp govtypesv1beta1.QueryProposalResponse
+	var resp govtypesv1beta1.Proposal
 
 	err = integrationhelpers.Codec.UnmarshalJSON([]byte(out), &resp)
 	if err != nil {
-		return govtypesv1beta1.QueryProposalResponse{}, err
+		return govtypesv1beta1.Proposal{}, err
 	}
 	return resp, nil
 }
