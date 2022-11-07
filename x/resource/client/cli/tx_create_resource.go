@@ -3,7 +3,7 @@ package cli
 import (
 	"os"
 
-	cheqdcli "github.com/cheqd/cheqd-node/x/cheqd/client/cli"
+	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -82,14 +82,14 @@ func CmdCreateResource() *cobra.Command {
 			}
 
 			// Read signatures
-			signInputs, err := cheqdcli.GetSignInputs(clientCtx, args)
+			signInputs, err := didcli.GetSignInputs(clientCtx, args)
 			if err != nil {
 				return err
 			}
 
 			// Build identity message
 			signBytes := payload.GetSignBytes()
-			identitySignatures := cheqdcli.SignWithSignInputs(signBytes, signInputs)
+			identitySignatures := didcli.SignWithSignInputs(signBytes, signInputs)
 
 			msg := types.MsgCreateResource{
 				Payload:    &payload,
@@ -97,7 +97,7 @@ func CmdCreateResource() *cobra.Command {
 			}
 
 			// Set fee-payer if not set
-			err = cheqdcli.SetFeePayerFromSigner(&clientCtx)
+			err = didcli.SetFeePayerFromSigner(&clientCtx)
 			if err != nil {
 				return err
 			}

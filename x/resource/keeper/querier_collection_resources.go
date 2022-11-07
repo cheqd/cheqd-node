@@ -1,14 +1,14 @@
 package keeper
 
 import (
-	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
+	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func collectionResources(ctx sdk.Context, keeper Keeper, cheqdKeeper cheqdkeeper.Keeper, legacyQuerierCdc *codec.LegacyAmino, collectionId string) ([]byte, error) {
+func collectionResources(ctx sdk.Context, keeper Keeper, cheqdKeeper didkeeper.Keeper, legacyQuerierCdc *codec.LegacyAmino, collectionId string) ([]byte, error) {
 	queryServer := NewQueryServer(keeper, cheqdKeeper)
 
 	resp, err := queryServer.CollectionResources(sdk.WrapSDKContext(ctx), &types.QueryGetCollectionResourcesRequest{

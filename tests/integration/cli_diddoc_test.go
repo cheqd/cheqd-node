@@ -9,8 +9,8 @@ import (
 	"github.com/cheqd/cheqd-node/tests/integration/cli"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
 	"github.com/cheqd/cheqd-node/tests/integration/testdata"
-	cli_types "github.com/cheqd/cheqd-node/x/cheqd/client/cli"
-	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	cli_types "github.com/cheqd/cheqd-node/x/did/client/cli"
+	"github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/google/uuid"
 	"github.com/multiformats/go-multibase"
 

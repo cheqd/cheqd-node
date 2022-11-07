@@ -8,9 +8,9 @@ import (
 
 	"github.com/cheqd/cheqd-node/app/ante"
 	appparams "github.com/cheqd/cheqd-node/app/params"
-	"github.com/cheqd/cheqd-node/x/cheqd"
-	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	did "github.com/cheqd/cheqd-node/x/did"
+	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/cheqd/cheqd-node/x/resource"
 	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
@@ -143,7 +143,7 @@ var (
 		feegrantmodule.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
 		groupmodule.AppModuleBasic{},
-		cheqd.AppModuleBasic{},
+		did.AppModuleBasic{},
 		resource.AppModuleBasic{},
 		ica.AppModuleBasic{},
 	)
@@ -207,7 +207,7 @@ type App struct {
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 	ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
 
-	cheqdKeeper    cheqdkeeper.Keeper
+	didKeeper      didkeeper.Keeper
 	resourceKeeper resourcekeeper.Keeper
 
 	// the module manager
@@ -265,7 +265,7 @@ func New(
 		authzkeeper.StoreKey,
 		group.StoreKey,
 		icahosttypes.StoreKey,
-		cheqdtypes.StoreKey,
+		didtypes.StoreKey,
 		resourcetypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -481,8 +481,8 @@ func New(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
-	app.cheqdKeeper = *cheqdkeeper.NewKeeper(
-		appCodec, keys[cheqdtypes.StoreKey],
+	app.didKeeper = *didkeeper.NewKeeper(
+		appCodec, keys[didtypes.StoreKey],
 	)
 
 	app.resourceKeeper = *resourcekeeper.NewKeeper(
@@ -519,8 +519,8 @@ func New(
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		icaModule,
-		cheqd.NewAppModule(appCodec, app.cheqdKeeper),
-		resource.NewAppModule(appCodec, app.resourceKeeper, app.cheqdKeeper),
+		did.NewAppModule(appCodec, app.didKeeper),
+		resource.NewAppModule(appCodec, app.resourceKeeper, app.didKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -549,7 +549,7 @@ func New(
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
-		cheqdtypes.ModuleName,
+		didtypes.ModuleName,
 		resourcetypes.ModuleName,
 	)
 
@@ -564,7 +564,7 @@ func New(
 		slashingtypes.ModuleName,
 		evidencetypes.ModuleName,
 		ibchost.ModuleName,
-		cheqdtypes.ModuleName,
+		didtypes.ModuleName,
 		resourcetypes.ModuleName,
 		genutiltypes.ModuleName,
 		banktypes.ModuleName,
@@ -601,7 +601,7 @@ func New(
 		feegrant.ModuleName,
 		authz.ModuleName,
 		group.ModuleName,
-		cheqdtypes.ModuleName,
+		didtypes.ModuleName,
 		resourcetypes.ModuleName,
 		vestingtypes.ModuleName,
 		upgradetypes.ModuleName,

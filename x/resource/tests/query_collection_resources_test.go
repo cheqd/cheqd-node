@@ -3,8 +3,8 @@ package tests
 import (
 	. "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 
-	cheqdsetup "github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
-	cheqdutils "github.com/cheqd/cheqd-node/x/cheqd/utils"
+	didsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
+	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -13,8 +13,8 @@ import (
 
 var _ = Describe("Query Collection Resources", func() {
 	var setup TestSetup
-	var alice cheqdsetup.CreatedDidDocInfo
-	var uuidDID cheqdsetup.CreatedDidDocInfo
+	var alice didsetup.CreatedDidDocInfo
+	var uuidDID didsetup.CreatedDidDocInfo
 
 	var res1v1 *types.MsgCreateResourceResponse
 	var res1v2 *types.MsgCreateResourceResponse
@@ -27,10 +27,10 @@ var _ = Describe("Query Collection Resources", func() {
 		alice = setup.CreateSimpleDid()
 		uuidDID = setup.CreateCustomDidDoc(setup.BuildDidDocWithCustomId(UUIDString))
 
-		res1v1 = setup.CreateSimpleResource(alice.CollectionId, SchemaData, "Resource 1", CLSchemaType, []cheqdsetup.SignInput{alice.SignInput})
-		res1v2 = setup.CreateSimpleResource(alice.CollectionId, SchemaData, "Resource 1", CLSchemaType, []cheqdsetup.SignInput{alice.SignInput})
-		res2v1 = setup.CreateSimpleResource(alice.CollectionId, SchemaData, "Resource 2", CLSchemaType, []cheqdsetup.SignInput{alice.SignInput})
-		resUUID = setup.CreateSimpleResource(uuidDID.CollectionId, SchemaData, "Resource UUID", CLSchemaType, []cheqdsetup.SignInput{uuidDID.SignInput})
+		res1v1 = setup.CreateSimpleResource(alice.CollectionId, SchemaData, "Resource 1", CLSchemaType, []didsetup.SignInput{alice.SignInput})
+		res1v2 = setup.CreateSimpleResource(alice.CollectionId, SchemaData, "Resource 1", CLSchemaType, []didsetup.SignInput{alice.SignInput})
+		res2v1 = setup.CreateSimpleResource(alice.CollectionId, SchemaData, "Resource 2", CLSchemaType, []didsetup.SignInput{alice.SignInput})
+		resUUID = setup.CreateSimpleResource(uuidDID.CollectionId, SchemaData, "Resource UUID", CLSchemaType, []didsetup.SignInput{uuidDID.SignInput})
 	})
 
 	It("Should return all 3 headers", func() {
@@ -58,7 +58,7 @@ var _ = Describe("Query Collection Resources", func() {
 
 	It("Should work with capital letters in UUID. Ask with already normalized collectionId", func() {
 		// Here we are asking for normalized UUID but it was written with capital letters
-		normalizedId := cheqdutils.NormalizeId(uuidDID.CollectionId)
+		normalizedId := didutils.NormalizeId(uuidDID.CollectionId)
 		versions, err := setup.CollectionResources(normalizedId)
 		Expect(err).To(BeNil())
 		Expect(versions.Resources).To(HaveLen(1))

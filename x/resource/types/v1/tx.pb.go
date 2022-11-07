@@ -6,7 +6,7 @@ package v1
 import (
 	context "context"
 	fmt "fmt"
-	v1 "github.com/cheqd/cheqd-node/x/cheqd/types/v1"
+	v1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	grpc1 "github.com/gogo/protobuf/grpc"
 	proto "github.com/gogo/protobuf/proto"
 	grpc "google.golang.org/grpc"

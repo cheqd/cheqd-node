@@ -4,8 +4,8 @@ import (
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
 
-	cheqd_types "github.com/cheqd/cheqd-node/x/cheqd/types"
-	resource_types "github.com/cheqd/cheqd-node/x/resource/types"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 )
 
 var CLI_QUERY_PARAMS = []string{
@@ -25,61 +25,61 @@ func Query(module, query string, queryArgs ...string) (string, error) {
 	return Exec(args...)
 }
 
-func QueryDidDoc(did string) (cheqd_types.QueryGetDidDocResponse, error) {
+func QueryDidDoc(did string) (didtypes.QueryGetDidDocResponse, error) {
 	res, err := Query("cheqd", "diddoc", did)
 	if err != nil {
-		return cheqd_types.QueryGetDidDocResponse{}, err
+		return didtypes.QueryGetDidDocResponse{}, err
 	}
 
-	var resp cheqd_types.QueryGetDidDocResponse
+	var resp didtypes.QueryGetDidDocResponse
 	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
-		return cheqd_types.QueryGetDidDocResponse{}, err
+		return didtypes.QueryGetDidDocResponse{}, err
 	}
 
 	return resp, nil
 }
 
-func QueryResource(collectionId string, resourceId string) (resource_types.QueryGetResourceResponse, error) {
+func QueryResource(collectionId string, resourceId string) (resourcetypes.QueryGetResourceResponse, error) {
 	res, err := Query("resource", "resource", collectionId, resourceId)
 	if err != nil {
-		return resource_types.QueryGetResourceResponse{}, err
+		return resourcetypes.QueryGetResourceResponse{}, err
 	}
 
-	var resp resource_types.QueryGetResourceResponse
+	var resp resourcetypes.QueryGetResourceResponse
 	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
-		return resource_types.QueryGetResourceResponse{}, err
+		return resourcetypes.QueryGetResourceResponse{}, err
 	}
 
 	return resp, nil
 }
 
-func QueryResourceMetadata(collectionId string, resourceId string) (resource_types.QueryGetResourceMetadataResponse, error) {
+func QueryResourceMetadata(collectionId string, resourceId string) (resourcetypes.QueryGetResourceMetadataResponse, error) {
 	res, err := Query("resource", "resource-metadata", collectionId, resourceId)
 	if err != nil {
-		return resource_types.QueryGetResourceMetadataResponse{}, err
+		return resourcetypes.QueryGetResourceMetadataResponse{}, err
 	}
 
-	var resp resource_types.QueryGetResourceMetadataResponse
+	var resp resourcetypes.QueryGetResourceMetadataResponse
 	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
-		return resource_types.QueryGetResourceMetadataResponse{}, err
+		return resourcetypes.QueryGetResourceMetadataResponse{}, err
 	}
 
 	return resp, nil
 }
 
-func QueryResourceCollection(collectionId string) (resource_types.QueryGetCollectionResourcesResponse, error) {
+func QueryResourceCollection(collectionId string) (resourcetypes.QueryGetCollectionResourcesResponse, error) {
 	res, err := Query("resource", "collection-resources", collectionId)
 	if err != nil {
-		return resource_types.QueryGetCollectionResourcesResponse{}, err
+		return resourcetypes.QueryGetCollectionResourcesResponse{}, err
 	}
 
-	var resp resource_types.QueryGetCollectionResourcesResponse
+	var resp resourcetypes.QueryGetCollectionResourcesResponse
 	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
-		return resource_types.QueryGetCollectionResourcesResponse{}, err
+		return resourcetypes.QueryGetCollectionResourcesResponse{}, err
 	}
 
 	return resp, nil

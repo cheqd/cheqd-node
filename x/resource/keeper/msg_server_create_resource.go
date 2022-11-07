@@ -7,9 +7,9 @@ import (
 
 	"github.com/cheqd/cheqd-node/x/resource/utils"
 
-	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
-	cheqdutils "github.com/cheqd/cheqd-node/x/cheqd/utils"
+	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -23,16 +23,16 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	msg.Normalize()
 
 	// Validate corresponding DIDDoc exists
-	namespace := k.cheqdKeeper.GetDidNamespace(&ctx)
-	did := cheqdutils.JoinDID(cheqdtypes.DidMethod, namespace, msg.Payload.CollectionId)
-	didDoc, err := k.cheqdKeeper.GetDidDoc(&ctx, did)
+	namespace := k.didKeeper.GetDidNamespace(&ctx)
+	did := didutils.JoinDID(didtypes.DidMethod, namespace, msg.Payload.CollectionId)
+	didDoc, err := k.didKeeper.GetDidDoc(&ctx, did)
 	if err != nil {
 		return nil, err
 	}
 
 	// Validate DID is not deactivated
 	if didDoc.Metadata.Deactivated {
-		return nil, cheqdtypes.ErrDIDDocDeactivated.Wrap(did)
+		return nil, didtypes.ErrDIDDocDeactivated.Wrap(did)
 	}
 
 	// Validate Resource doesn't exist
@@ -41,8 +41,8 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	}
 
 	// We can use the same signers as for DID creation because didDoc stays the same
-	signers := cheqdkeeper.GetSignerDIDsForDIDCreation(*didDoc.DidDoc)
-	err = cheqdkeeper.VerifyAllSignersHaveAllValidSignatures(&k.cheqdKeeper, &ctx, map[string]cheqdtypes.DidDocWithMetadata{},
+	signers := didkeeper.GetSignerDIDsForDIDCreation(*didDoc.DidDoc)
+	err = didkeeper.VerifyAllSignersHaveAllValidSignatures(&k.didKeeper, &ctx, map[string]didtypes.DidDocWithMetadata{},
 		signBytes, signers, msg.Signatures)
 	if err != nil {
 		return nil, err
