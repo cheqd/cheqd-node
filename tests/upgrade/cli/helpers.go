@@ -24,6 +24,8 @@ func GetNodeStatus(container string, binary string) (tmcoretypes.ResultStatus, e
 
 func GetCurrentBlockHeight(container string, binary string) (int64, error) {
 	status, err := GetNodeStatus(container, binary)
+	fmt.Println("status", status)
+	fmt.Println("current height", status.SyncInfo.LatestBlockHeight)
 	if err != nil {
 		return 0, err
 	}
