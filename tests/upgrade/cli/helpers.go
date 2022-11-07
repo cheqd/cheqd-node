@@ -68,7 +68,6 @@ func GetNodeStatus(container string, binary string) (NodeStatus, error) {
 	if err != nil {
 		return NodeStatus{}, err
 	}
-	fmt.Println("out", out)
 	var result NodeStatus
 	err = json.Unmarshal([]byte(out), &result)
 	if err != nil {
@@ -79,8 +78,6 @@ func GetNodeStatus(container string, binary string) (NodeStatus, error) {
 
 func GetCurrentBlockHeight(container string, binary string) (int64, error) {
 	status, err := GetNodeStatus(container, binary)
-	fmt.Println("status", status)
-	fmt.Println("current height", status.SyncInfo.LatestBlockHeight)
 	if err != nil {
 		return 0, err
 	}

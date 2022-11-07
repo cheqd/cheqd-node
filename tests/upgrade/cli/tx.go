@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -64,6 +65,7 @@ func SubmitUpgradeProposal(upgradeHeight int64, container string) (sdk.TxRespons
 
 	err = integrationhelpers.Codec.UnmarshalJSON([]byte(out), &resp)
 	if err != nil {
+		fmt.Println("JSON unmarshal error:", err)
 		return sdk.TxResponse{}, err
 	}
 	return resp, nil
