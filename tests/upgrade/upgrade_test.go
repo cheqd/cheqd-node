@@ -83,7 +83,7 @@ var _ = Describe("Upgrade - Execute", func() {
 			By("sending a QueryUpgradeProposal Msg from `validator0` container")
 			proposal, err := cli.QueryUpgradeProposal(cli.VALIDATOR0)
 			Expect(err).To(BeNil())
-			Expect(proposal.Status).To(Equal(int32(govtypesv1beta1.StatusPassed)))
+			Expect(proposal.Status).To(BeEquivalentTo(govtypesv1beta1.StatusPassed))
 		})
 
 		It("should wait for the upgrade height to be reached", func() {
