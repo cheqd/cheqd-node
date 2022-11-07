@@ -43,14 +43,14 @@ func Tx(container string, binary string, module, tx, from string, txArgs ...stri
 	return resp, nil
 }
 
-func SubmitUpgradeProposal(container string) (sdk.TxResponse, error) {
+func SubmitUpgradeProposal(upgradeHeight int64, container string) (sdk.TxResponse, error) {
 	args := append([]string{
 		CLI_BINARY_NAME,
 		"tx", "gov", "submit-proposal", "software-upgrade",
 		UPGRADE_NAME,
 		"--title", "Upgrade Title",
 		"--description", "Upgrade Description",
-		"--upgrade-height", strconv.FormatInt(UPGRADE_HEIGHT, 10),
+		"--upgrade-height", strconv.FormatInt(upgradeHeight, 10),
 		"--upgrade-info", "Upgrade Info",
 		"--from", OperatorAccounts[container],
 	}, TX_PARAMS...)

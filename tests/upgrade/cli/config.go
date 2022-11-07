@@ -49,7 +49,4 @@ var (
 		"--chain-id", integrationnetwork.CHAIN_ID,
 		"--output", OUTPUT_FORMAT,
 	}
-	CURRENT_HEIGHT    int64
-	VOTING_END_HEIGHT int64
-	UPGRADE_HEIGHT    int64
 )

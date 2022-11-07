@@ -27,13 +27,13 @@ var _ = Describe("Upgrade - Execute", func() {
 
 		It("should calculate the upgrade height", func() {
 			By("getting the current block height and calculating the voting end height")
-			err := cli.CalculateUpgradeHeight(cli.VALIDATOR0, cli.CLI_BINARY_NAME)
-			Expect(err).To(BeNil())
+			UPGRADE_HEIGHT, VOTING_END_HEIGHT, HEIGHT_ERROR = cli.CalculateUpgradeHeight(cli.VALIDATOR0, cli.CLI_BINARY_NAME)
+			Expect(HEIGHT_ERROR).To(BeNil())
 		})
 
 		It("should submit a software upgrade proposal", func() {
 			By("sending a SubmitUpgradeProposal transaction from `validator0` container")
-			res, err := cli.SubmitUpgradeProposal(cli.VALIDATOR0)
+			res, err := cli.SubmitUpgradeProposal(UPGRADE_HEIGHT, cli.VALIDATOR0)
 			Expect(err).To(BeNil())
 			Expect(res.Code).To(BeEquivalentTo(0))
 		})
@@ -75,7 +75,7 @@ var _ = Describe("Upgrade - Execute", func() {
 
 		It("should wait for the voting end height to be reached", func() {
 			By("pinging the node status until the voting end height is reached")
-			err := cli.WaitForChainHeight(cli.VALIDATOR0, cli.CLI_BINARY_NAME, cli.VOTING_END_HEIGHT, cli.VOTING_PERIOD)
+			err := cli.WaitForChainHeight(cli.VALIDATOR0, cli.CLI_BINARY_NAME, VOTING_END_HEIGHT, cli.VOTING_PERIOD)
 			Expect(err).To(BeNil())
 		})
 
@@ -88,7 +88,7 @@ var _ = Describe("Upgrade - Execute", func() {
 
 		It("should wait for the upgrade height to be reached", func() {
 			By("pinging the node status until the upgrade height is reached")
-			err := cli.WaitForChainHeight(cli.VALIDATOR0, cli.CLI_BINARY_NAME, cli.UPGRADE_HEIGHT, cli.VOTING_PERIOD)
+			err := cli.WaitForChainHeight(cli.VALIDATOR0, cli.CLI_BINARY_NAME, UPGRADE_HEIGHT, cli.VOTING_PERIOD)
 			Expect(err).To(BeNil())
 		})
 
@@ -115,7 +115,7 @@ var _ = Describe("Upgrade - Execute", func() {
 
 		It("should wait for the upgrade height plus 2 blocks to be reached", func() {
 			By("pinging the node status until the upgrade height plus 2 blocks is reached")
-			err := cli.WaitForChainHeight(cli.VALIDATOR0, cli.CLI_BINARY_NAME, cli.UPGRADE_HEIGHT+2, cli.VOTING_PERIOD)
+			err := cli.WaitForChainHeight(cli.VALIDATOR0, cli.CLI_BINARY_NAME, UPGRADE_HEIGHT+2, cli.VOTING_PERIOD)
 			Expect(err).To(BeNil())
 		})
 

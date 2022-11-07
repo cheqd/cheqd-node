@@ -22,31 +22,28 @@ func GetNodeStatus(container string, binary string) (tmcoretypes.ResultStatus, e
 	return result, nil
 }
 
-func GetCurrentBlockHeight(container string, binary string) error {
+func GetCurrentBlockHeight(container string, binary string) (int64, error) {
 	status, err := GetNodeStatus(container, binary)
 	if err != nil {
-		return err
+		return 0, err
 	}
-	CURRENT_HEIGHT = status.SyncInfo.LatestBlockHeight
-	return nil
+	return status.SyncInfo.LatestBlockHeight, nil
 }
 
-func GetVotingEndHeight() error {
-	VOTING_END_HEIGHT = CURRENT_HEIGHT + VOTING_PERIOD/EXPECTED_BLOCK_SECONDS + EXTRA_BLOCKS
-	return nil
+func GetVotingEndHeight(currentHeight int64) (int64, error) {
+	return currentHeight + VOTING_PERIOD/EXPECTED_BLOCK_SECONDS + EXTRA_BLOCKS, nil
 }
 
-func CalculateUpgradeHeight(container string, binary string) error {
-	err := GetCurrentBlockHeight(container, binary)
+func CalculateUpgradeHeight(container string, binary string) (int64, int64, error) {
+	currentHeight, err := GetCurrentBlockHeight(container, binary)
 	if err != nil {
-		return err
+		return 0, 0, err
 	}
-	err = GetVotingEndHeight()
+	votingEndHeight, err := GetVotingEndHeight(currentHeight)
 	if err != nil {
-		return err
+		return 0, 0, err
 	}
-	UPGRADE_HEIGHT = CURRENT_HEIGHT + VOTING_PERIOD/EXPECTED_BLOCK_SECONDS + EXTRA_BLOCKS*2
-	return nil
+	return currentHeight + VOTING_PERIOD/EXPECTED_BLOCK_SECONDS + EXTRA_BLOCKS*2, votingEndHeight, nil
 }
 
 // Added to wait for the upgrade to be applied.

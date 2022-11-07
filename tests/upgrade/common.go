@@ -16,6 +16,13 @@ import (
 )
 
 // Pre
+var (
+	CURRENT_HEIGHT    int64
+	VOTING_END_HEIGHT int64
+	UPGRADE_HEIGHT    int64
+	HEIGHT_ERROR	  error
+)
+
 var DidDoc cheqdtypes.MsgCreateDidPayload
 
 var (
