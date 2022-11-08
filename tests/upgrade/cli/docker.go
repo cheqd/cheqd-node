@@ -156,7 +156,6 @@ func LocalnetExecUpWithBuildImage() (string, error) {
 		"-f",
 		filepath.Join(DOCKER_LOCALNET_PATH, DOCKER_COMPOSE_FILE),
 		"up",
-		"--detach",
 		"--no-build",
 	)
 }
