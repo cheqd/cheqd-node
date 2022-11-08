@@ -46,9 +46,18 @@ func Post() error {
 
 	By("Ensuring the CreateResource Tx is successful for a new Resource")
 	PostResourcePayload, PostResourceErr = GenerateResource(PostDidDoc)
-	PostResourceFile, PostResourceFileErr = integrationtestdata.CreateTestJson(GinkgoT().TempDir())
 	Expect(PostResourceErr).To(BeNil())
-	resp, err = cli.CreateResource(PostResourcePayload.CollectionId, PostResourcePayload.Id, PostResourcePayload.Name, PostResourcePayload.ResourceType, PostResourceFile, PostSignInputs, cli.VALIDATOR1)
+
+	By("Ensuring the PostResourceFileErr in memory is nil")
+	PostResourceFile, PostResourceFileErr = integrationtestdata.CreateTestJson(GinkgoT().TempDir())
+	Expect(PostResourceFileErr).To(BeNil())
+
+	By("Ensuring the PostResourceFile is copied to the localnet container")
+	_, err = cli.LocalnetExecCopyAbsoluteWithPermissions(PostResourceFile, cli.DOCKER_HOME, cli.VALIDATOR1)
+	Expect(err).To(BeNil())
+
+	By("Ensuring CreateResource Tx is successful")
+	resp, err = cli.CreateResource(PostResourcePayload.CollectionId, PostResourcePayload.Id, PostResourcePayload.Name, PostResourcePayload.ResourceType, integrationtestdata.JSON_FILE_NAME, PostSignInputs, cli.VALIDATOR1)
 	Expect(err).To(BeNil())
 	Expect(resp.Code).To(BeEquivalentTo(0))
 
