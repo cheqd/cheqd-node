@@ -24,7 +24,7 @@ proto-format:
 
 DOCKER_BUF := docker run -v $(shell pwd):/workspace --workdir /workspace bufbuild/buf:1.7.0
 
-# Uncomment next lines while working on pulsar nad swagger functionality
+# Uncomment next lines while working on pulsar and swagger functionality
 
 
 # proto-lint:

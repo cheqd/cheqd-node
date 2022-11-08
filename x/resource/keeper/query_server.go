@@ -1,20 +1,20 @@
 package keeper
 
 import (
-	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
+	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 )
 
 type queryServer struct {
 	Keeper
-	cheqdKeeper cheqdkeeper.Keeper
+	didKeeper didkeeper.Keeper
 }
 
 // NewQueryServer returns an implementation of the MsgServer interface for the provided Keeper.
-func NewQueryServer(keeper Keeper, cheqdKeeper cheqdkeeper.Keeper) types.QueryServer {
+func NewQueryServer(keeper Keeper, cheqdKeeper didkeeper.Keeper) types.QueryServer {
 	return &queryServer{
-		Keeper:      keeper,
-		cheqdKeeper: cheqdKeeper,
+		Keeper:    keeper,
+		didKeeper: cheqdKeeper,
 	}
 }
 

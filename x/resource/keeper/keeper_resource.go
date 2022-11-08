@@ -40,84 +40,81 @@ func (k Keeper) SetResourceCount(ctx *sdk.Context, count uint64) {
 }
 
 // SetResource create or update a specific resource in the store
-func (k Keeper) SetResource(ctx *sdk.Context, resource *types.Resource) error {
-	if !k.HasResource(ctx, resource.Header.CollectionId, resource.Header.Id) {
+func (k Keeper) SetResource(ctx *sdk.Context, resource *types.ResourceWithMetadata) error {
+	if !k.HasResource(ctx, resource.Metadata.CollectionId, resource.Metadata.Id) {
 		count := k.GetResourceCount(ctx)
 		k.SetResourceCount(ctx, count+1)
 	}
 
 	store := ctx.KVStore(k.storeKey)
 
-	// Set header
-	headerKey := GetResourceHeaderKeyBytes(resource.Header.CollectionId, resource.Header.Id)
-	headerBytes := k.cdc.MustMarshal(resource.Header)
-	store.Set(headerKey, headerBytes)
+	// Set metadata
+	metadataKey := GetResourceMetadataKeyBytes(resource.Metadata.CollectionId, resource.Metadata.Id)
+	metadataBytes := k.cdc.MustMarshal(resource.Metadata)
+	store.Set(metadataKey, metadataBytes)
 
 	// Set data
-	dataKey := GetResourceDataKeyBytes(resource.Header.CollectionId, resource.Header.Id)
-	store.Set(dataKey, resource.Data)
+	dataKey := GetResourceDataKeyBytes(resource.Metadata.CollectionId, resource.Metadata.Id)
+	store.Set(dataKey, resource.Resource.Data)
 
 	return nil
 }
 
 // GetResource returns a resource from its id
-func (k Keeper) GetResource(ctx *sdk.Context, collectionId string, id string) (types.Resource, error) {
+func (k Keeper) GetResource(ctx *sdk.Context, collectionId string, id string) (types.ResourceWithMetadata, error) {
 	if !k.HasResource(ctx, collectionId, id) {
-		return types.Resource{}, sdkerrors.ErrNotFound.Wrap("resource " + collectionId + ":" + id)
+		return types.ResourceWithMetadata{}, sdkerrors.ErrNotFound.Wrap("resource " + collectionId + ":" + id)
 	}
 
 	store := ctx.KVStore(k.storeKey)
 
-	headerBytes := store.Get(GetResourceHeaderKeyBytes(collectionId, id))
-	var header types.ResourceHeader
-	if err := k.cdc.Unmarshal(headerBytes, &header); err != nil {
-		return types.Resource{}, sdkerrors.ErrInvalidType.Wrap(err.Error())
+	metadataBytes := store.Get(GetResourceMetadataKeyBytes(collectionId, id))
+	var metadata types.Metadata
+	if err := k.cdc.Unmarshal(metadataBytes, &metadata); err != nil {
+		return types.ResourceWithMetadata{}, sdkerrors.ErrInvalidType.Wrap(err.Error())
 	}
 
 	dataBytes := store.Get(GetResourceDataKeyBytes(collectionId, id))
+	data := types.Resource{Data: dataBytes}
 
-	return types.Resource{
-		Header: &header,
-		Data:   dataBytes,
+	return types.ResourceWithMetadata{
+		Metadata: &metadata,
+		Resource: &data,
 	}, nil
+}
+
+func (k Keeper) GetResourceMetadata(ctx *sdk.Context, collectionId string, id string) (types.Metadata, error) {
+	if !k.HasResource(ctx, collectionId, id) {
+		return types.Metadata{}, sdkerrors.ErrNotFound.Wrap("resource " + collectionId + ":" + id)
+	}
+
+	store := ctx.KVStore(k.storeKey)
+
+	metadataBytes := store.Get(GetResourceMetadataKeyBytes(collectionId, id))
+	var metadata types.Metadata
+	if err := k.cdc.Unmarshal(metadataBytes, &metadata); err != nil {
+		return types.Metadata{}, sdkerrors.ErrInvalidType.Wrap(err.Error())
+	}
+
+	return metadata, nil
 }
 
 // HasResource checks if the resource exists in the store
 func (k Keeper) HasResource(ctx *sdk.Context, collectionId string, id string) bool {
 	store := ctx.KVStore(k.storeKey)
-	return store.Has(GetResourceHeaderKeyBytes(collectionId, id))
+	return store.Has(GetResourceMetadataKeyBytes(collectionId, id))
 }
 
-func (k Keeper) GetAllResourceVersions(ctx *sdk.Context, collectionId, name string) []*types.ResourceHeader {
+func (k Keeper) GetResourceCollection(ctx *sdk.Context, collectionId string) []*types.Metadata {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, GetResourceHeaderCollectionPrefixBytes(collectionId))
+	iterator := sdk.KVStorePrefixIterator(store, GetResourceMetadataCollectionPrefixBytes(collectionId))
 
-	defer closeIteratorOrPanic(iterator)
-
-	var result []*types.ResourceHeader
-
-	for ; iterator.Valid(); iterator.Next() {
-		var val types.ResourceHeader
-		k.cdc.MustUnmarshal(iterator.Value(), &val)
-
-		if val.Name == name {
-			result = append(result, &val)
-		}
-	}
-
-	return result
-}
-
-func (k Keeper) GetResourceCollection(ctx *sdk.Context, collectionId string) []*types.ResourceHeader {
-	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, GetResourceHeaderCollectionPrefixBytes(collectionId))
-
-	var resources []*types.ResourceHeader
+	var resources []*types.Metadata
 
 	defer closeIteratorOrPanic(iterator)
 
 	for ; iterator.Valid(); iterator.Next() {
-		var val types.ResourceHeader
+		var val types.Metadata
 		k.cdc.MustUnmarshal(iterator.Value(), &val)
 		resources = append(resources, &val)
 
@@ -126,76 +123,78 @@ func (k Keeper) GetResourceCollection(ctx *sdk.Context, collectionId string) []*
 	return resources
 }
 
-func (k Keeper) GetLastResourceVersionHeader(ctx *sdk.Context, collectionId, name, resourceType, mediaType string) (types.ResourceHeader, bool) {
-	iterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.storeKey), GetResourceHeaderCollectionPrefixBytes(collectionId))
+func (k Keeper) GetLastResourceVersionMetadata(ctx *sdk.Context, collectionId, name, resourceType string) (types.Metadata, bool) {
+	iterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.storeKey), GetResourceMetadataCollectionPrefixBytes(collectionId))
 
 	defer closeIteratorOrPanic(iterator)
 
 	for ; iterator.Valid(); iterator.Next() {
-		var val types.ResourceHeader
-		k.cdc.MustUnmarshal(iterator.Value(), &val)
+		var metadata types.Metadata
+		k.cdc.MustUnmarshal(iterator.Value(), &metadata)
 
-		if val.Name == name && val.NextVersionId == "" {
-			return val, true
+		if metadata.Name == name && metadata.ResourceType == resourceType && metadata.NextVersionId == "" {
+			return metadata, true
 		}
 	}
 
-	return types.ResourceHeader{}, false
+	return types.Metadata{}, false
 }
 
-// UpdateResourceHeader update the header of a resource. Returns an error if the resource doesn't exist
-func (k Keeper) UpdateResourceHeader(ctx *sdk.Context, header *types.ResourceHeader) error {
-	if !k.HasResource(ctx, header.CollectionId, header.Id) {
-		return sdkerrors.ErrNotFound.Wrap("resource " + header.CollectionId + ":" + header.Id)
+// UpdateResourceMetadata update the metadata of a resource. Returns an error if the resource doesn't exist
+func (k Keeper) UpdateResourceMetadata(ctx *sdk.Context, metadata *types.Metadata) error {
+	if !k.HasResource(ctx, metadata.CollectionId, metadata.Id) {
+		return sdkerrors.ErrNotFound.Wrap("resource " + metadata.CollectionId + ":" + metadata.Id)
 	}
 
 	store := ctx.KVStore(k.storeKey)
 
-	// Set header
-	headerKey := GetResourceHeaderKeyBytes(header.CollectionId, header.Id)
-	headerBytes := k.cdc.MustMarshal(header)
-	store.Set(headerKey, headerBytes)
+	// Set metadata
+	metadataKey := GetResourceMetadataKeyBytes(metadata.CollectionId, metadata.Id)
+	metadataBytes := k.cdc.MustMarshal(metadata)
+	store.Set(metadataKey, metadataBytes)
 
 	return nil
 }
 
 // GetAllResources returns all resources as a list
 // Loads everything in memory. Use only for genesis export!
-func (k Keeper) GetAllResources(ctx *sdk.Context) (list []types.Resource) {
-	headerIterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.storeKey), types.KeyPrefix(types.ResourceHeaderKey))
+func (k Keeper) GetAllResources(ctx *sdk.Context) (list []types.ResourceWithMetadata) {
+	metadataIterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.storeKey), types.KeyPrefix(types.ResourceMetadataKey))
 	dataIterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.storeKey), types.KeyPrefix(types.ResourceDataKey))
 
-	defer closeIteratorOrPanic(headerIterator)
+	defer closeIteratorOrPanic(metadataIterator)
 	defer closeIteratorOrPanic(dataIterator)
 
-	for headerIterator.Valid() {
+	for metadataIterator.Valid() {
 		if !dataIterator.Valid() {
 			panic("number of headers and data don't match")
 		}
 
-		var val types.ResourceHeader
-		k.cdc.MustUnmarshal(headerIterator.Value(), &val)
+		var metadata types.Metadata
+		k.cdc.MustUnmarshal(metadataIterator.Value(), &metadata)
 
-		list = append(list, types.Resource{
-			Header: &val,
-			Data:   dataIterator.Value(),
+		data := types.Resource{Data: dataIterator.Value()}
+
+		list = append(list, types.ResourceWithMetadata{
+			Metadata: &metadata,
+			Resource: &data,
 		})
 
-		headerIterator.Next()
+		metadataIterator.Next()
 		dataIterator.Next()
 	}
 
 	return
 }
 
-// GetResourceHeaderKeyBytes returns the byte representation of resource key
-func GetResourceHeaderKeyBytes(collectionId string, id string) []byte {
-	return []byte(types.ResourceHeaderKey + collectionId + ":" + id)
+// GetResourceMetadataKeyBytes returns the byte representation of resource key
+func GetResourceMetadataKeyBytes(collectionId string, id string) []byte {
+	return []byte(types.ResourceMetadataKey + collectionId + ":" + id)
 }
 
-// GetResourceHeaderCollectionPrefixBytes used to iterate over all resource headers in a collection
-func GetResourceHeaderCollectionPrefixBytes(collectionId string) []byte {
-	return []byte(types.ResourceHeaderKey + collectionId + ":")
+// GetResourceMetadataCollectionPrefixBytes used to iterate over all resource metadatas in a collection
+func GetResourceMetadataCollectionPrefixBytes(collectionId string) []byte {
+	return []byte(types.ResourceMetadataKey + collectionId + ":")
 }
 
 // GetResourceDataKeyBytes returns the byte representation of resource key

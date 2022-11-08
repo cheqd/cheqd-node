@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package cheqd.did.v2;
+
+import "cheqd/did/v2/diddoc.proto";
+
+option go_package = "github.com/cheqd/cheqd-node/x/did/types";
+
+service Msg {
+  rpc CreateDidDoc(MsgCreateDidDoc) returns (MsgCreateDidDocResponse);
+  rpc UpdateDidDoc(MsgUpdateDidDoc) returns (MsgUpdateDidDocResponse);
+  rpc DeactivateDidDoc(MsgDeactivateDidDoc) returns (MsgDeactivateDidDocResponse);
+}
+
+message MsgCreateDidDoc {
+  MsgCreateDidDocPayload payload = 1;
+  repeated SignInfo signatures = 2;
+}
+
+message MsgUpdateDidDoc {
+  MsgUpdateDidDocPayload payload = 1;
+  repeated SignInfo signatures = 2;
+}
+
+message MsgDeactivateDidDoc {
+  MsgDeactivateDidDocPayload payload = 1;
+  repeated SignInfo signatures = 2;
+}
+
+message SignInfo {
+  string verification_method_id = 1;
+  bytes signature = 2;
+}
+
+message MsgCreateDidDocPayload {
+  repeated string context = 1;
+  string id = 2;
+  repeated string controller = 3;
+  repeated VerificationMethod verification_method = 4;
+  repeated string authentication = 5;
+  repeated string assertion_method = 6;
+  repeated string capability_invocation = 7;
+  repeated string capability_delegation = 8;
+  repeated string key_agreement = 9;
+  repeated string also_known_as = 10;
+  repeated Service service = 11;
+}
+
+message MsgCreateDidDocResponse {
+  DidDocWithMetadata value = 1;
+}
+
+message MsgUpdateDidDocPayload {
+  repeated string context = 1;
+  string id = 2;
+  repeated string controller = 3;
+  repeated VerificationMethod verification_method = 4;
+  repeated string authentication = 5;
+  repeated string assertion_method = 6;
+  repeated string capability_invocation = 7;
+  repeated string capability_delegation = 8;
+  repeated string key_agreement = 9;
+  repeated string also_known_as = 10;
+  repeated Service service = 11;
+  string version_id = 12;
+}
+
+message MsgUpdateDidDocResponse {
+  DidDocWithMetadata value = 1;
+}
+
+message MsgDeactivateDidDocPayload {
+  string id = 1;
+  string version_id = 2;
+}
+
+message MsgDeactivateDidDocResponse {
+  DidDocWithMetadata value = 1;
+}

@@ -1,0 +1,25 @@
+syntax = "proto3";
+package cheqdid.cheqdnode.cheqd.v1;
+
+option go_package = "github.com/cheqd/cheqd-node/x/did/types/v1";
+
+import "google/api/annotations.proto";
+import "cheqd/did/v1/did.proto";
+import "cheqd/did/v1/stateValue.proto";
+
+
+// Query defines the gRPC querier service.
+service Query {
+	rpc Did(QueryGetDidRequest) returns (QueryGetDidResponse) {
+		option (google.api.http).get = "/cheqd/v1/did/{id}";
+	}
+}
+
+message QueryGetDidRequest {
+	string id = 1;
+}
+
+message QueryGetDidResponse {
+	Did did = 1;
+	Metadata metadata = 2;
+}

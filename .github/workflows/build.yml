@@ -31,7 +31,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cheqd-noded
-          path: dist/**/cheqd-noded
+          path: dist/ubuntu-latest-amd64_linux_amd64_v1/cheqd-noded
 
   build-docker:
     name: "Docker image"
@@ -71,7 +71,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           outputs: type=docker,dest=/tmp/cheqd-node-build.tar
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to: type=gha,mode=min
 
       - name: Upload Docker build image
         uses: actions/upload-artifact@v3

@@ -19,7 +19,7 @@ func KeyPrefix(p string) []byte {
 }
 
 const (
-	ResourceHeaderKey = "resource-header:"
-	ResourceDataKey   = "resource-data:"
-	ResourceCountKey  = "resource-count:"
+	ResourceMetadataKey = "resource-metadata:"
+	ResourceDataKey     = "resource-data:"
+	ResourceCountKey    = "resource-count:"
 )
