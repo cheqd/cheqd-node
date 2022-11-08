@@ -695,6 +695,8 @@ func New(
 			fromVM[capabilitytypes.ModuleName] = versionMap[capabilitytypes.ModuleName]
 			// Skip distribution module
 			fromVM[distrtypes.ModuleName] = versionMap[distrtypes.ModuleName]
+			// Skip staking module
+			fromVM[stakingtypes.ModuleName] = versionMap[stakingtypes.ModuleName]
 
 			// ibc v3 -> v4 migration
 			// transfer module consensus version has been bumped to 2
