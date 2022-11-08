@@ -93,17 +93,8 @@ var _ = Describe("Upgrade - Execute", func() {
 		})
 
 		It("should halt the localnet environment", func() {
-			By("executing the container stop command")
-			_, err := cli.LocalnetExecDown()
-			Expect(err).To(BeNil())
-		})
-
-		It("should ensure the localnet environment is running @new version", func() {
-			By("replacing the binary with the new version")
-			_, err := cli.ReplaceBinaryWithPermissions("previous-to-next")
-
 			By("switching genesis.json to the new version for each validator node")
-			_, err = cli.LocalnetExecSwitchGenesis(cli.VALIDATOR0)
+			_, err := cli.LocalnetExecSwitchGenesis(cli.VALIDATOR0)
 			Expect(err).To(BeNil())
 			_, err = cli.LocalnetExecSwitchGenesis(cli.VALIDATOR1)
 			Expect(err).To(BeNil())
@@ -111,6 +102,15 @@ var _ = Describe("Upgrade - Execute", func() {
 			Expect(err).To(BeNil())
 			_, err = cli.LocalnetExecSwitchGenesis(cli.VALIDATOR3)
 			Expect(err).To(BeNil())
+
+			By("executing the container stop command")
+			_, err = cli.LocalnetExecDown()
+			Expect(err).To(BeNil())
+		})
+
+		It("should ensure the localnet environment is running @new version", func() {
+			By("replacing the binary with the new version")
+			_, err := cli.ReplaceBinaryWithPermissions("previous-to-next")
 
 			By("executing the container up command for the new version")
 			_, err = cli.LocalnetExecUpWithNewImage()
