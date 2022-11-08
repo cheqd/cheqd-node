@@ -102,6 +102,16 @@ var _ = Describe("Upgrade - Execute", func() {
 			By("replacing the binary with the new version")
 			_, err := cli.ReplaceBinaryWithPermissions("previous-to-next")
 
+			By("switching genesis.json to the new version for each validator node")
+			_, err = cli.LocalnetExecSwitchGenesis(cli.VALIDATOR0)
+			Expect(err).To(BeNil())
+			_, err = cli.LocalnetExecSwitchGenesis(cli.VALIDATOR1)
+			Expect(err).To(BeNil())
+			_, err = cli.LocalnetExecSwitchGenesis(cli.VALIDATOR2)
+			Expect(err).To(BeNil())
+			_, err = cli.LocalnetExecSwitchGenesis(cli.VALIDATOR3)
+			Expect(err).To(BeNil())
+
 			By("executing the container up command for the new version")
 			_, err = cli.LocalnetExecUpWithNewImage()
 			Expect(err).To(BeNil())

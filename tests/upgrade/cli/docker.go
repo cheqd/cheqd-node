@@ -106,6 +106,14 @@ func LocalnetExecDown() (string, error) {
 	return LocalnetExec("down")
 }
 
+func LocalnetExecSwitchGenesis(container string) (string, error) {
+	_, err := LocalnetExec("exec", "-it", container, "mv", filepath.Join(DOCKER_HOME, ".cheqdnode/config/genesis.json"), filepath.Join(DOCKER_HOME, ".cheqdnode/config/genesis.json.bak"))
+	if err != nil {
+		return "", err
+	}
+	return LocalnetExec("exec", "-it", container, "mv", filepath.Join(DOCKER_HOME, ".cheqdnode/config/genesis-next.json"), filepath.Join(DOCKER_HOME, ".cheqdnode/config/genesis.json"))
+}
+
 func LocalnetExecCopyAbsoluteWithPermissions(path string, destination string, container string) (string, error) {
 	_, err := LocalnetExec("cp", path, filepath.Join(container+":"+destination))
 	if err != nil {

@@ -62,10 +62,6 @@ function configure_genesis() {
   # Default denom
   sed -i $SED_EXT 's/"stake"/"ncheq"/' "${GENESIS}"
 
-  # Default min commission rate
-  jq '.app_state.staking.params += {"min_commission_rate": "0.0100000000000000000"}' "${GENESIS}" > "${GENESIS_TMP}" && \
-    mv "${GENESIS_TMP}" "${GENESIS}"
-
   # Short voting period
   sed -i $SED_EXT 's/"voting_period": "172800s"/"voting_period": "12s"/' "${GENESIS}"
 
