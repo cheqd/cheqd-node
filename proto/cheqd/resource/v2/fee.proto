@@ -1,7 +1,7 @@
 syntax = "proto3";
 package cheqd.resource.v2;
 
-option go_package = "github.com/cheqd/cheqd-node/x/resource/types/v2";
+option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
 option (gogoproto.equal_all) = true;
 
 import "gogoproto/gogo.proto";

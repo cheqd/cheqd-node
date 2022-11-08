@@ -2,24 +2,23 @@ package setup
 
 import (
 	"crypto/ed25519"
-	"encoding/base64"
 
-	"github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	"github.com/cheqd/cheqd-node/x/did/tests/setup"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	"github.com/google/uuid"
 )
 
 func (s *TestSetup) CreateResource(payload *types.MsgCreateResourcePayload, signInputs []setup.SignInput) (*types.MsgCreateResourceResponse, error) {
 	signBytes := payload.GetSignBytes()
-	var signatures []*cheqdtypes.SignInfo
+	var signatures []*didtypes.SignInfo
 
 	for _, input := range signInputs {
 		signature := ed25519.Sign(input.Key, signBytes)
 
-		signatures = append(signatures, &cheqdtypes.SignInfo{
+		signatures = append(signatures, &didtypes.SignInfo{
 			VerificationMethodId: input.VerificationMethodId,
-			Signature:            base64.StdEncoding.EncodeToString(signature),
+			Signature:            signature,
 		})
 	}
 
