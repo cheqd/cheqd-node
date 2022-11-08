@@ -3,17 +3,16 @@ package types
 import (
 	"time"
 
-	"github.com/cheqd/cheqd-node/x/did/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func NewMetadataFromContext(ctx sdk.Context) Metadata {
+func NewMetadataFromContext(ctx sdk.Context, version string) Metadata {
 	created := ctx.BlockTime().Format(time.RFC3339)
-	txHash := utils.GetTxHash(ctx.TxBytes())
 
-	return Metadata{Created: created, Deactivated: false, VersionId: txHash}
+	return Metadata{Created: created, Updated: created, Deactivated: false, VersionId: version}
 }
 
-func (m *Metadata) Update(ctx sdk.Context) {
+func (m *Metadata) Update(ctx sdk.Context, version string) {
 	m.Updated = ctx.BlockTime().Format(time.RFC3339)
+	m.VersionId = version
 }

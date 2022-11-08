@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	. "github.com/cheqd/cheqd-node/x/did/tests/setup"
+	"github.com/google/uuid"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -35,6 +36,7 @@ var _ = Describe("Create DID tests", func() {
 					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
 			},
+			VersionId: uuid.NewString(),
 		}
 
 		signatures := []SignInput{
@@ -69,6 +71,7 @@ var _ = Describe("Create DID tests", func() {
 					VerificationMaterial: BuildJsonWebKey2020VerificationMaterial(keypair.Public),
 				},
 			},
+			VersionId: uuid.NewString(),
 		}
 
 		signatures := []SignInput{
@@ -109,6 +112,7 @@ var _ = Describe("Create DID tests", func() {
 					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(bobKeypair.Public),
 				},
 			},
+			VersionId: uuid.NewString(),
 		}
 
 		signatures := []SignInput{alice.SignInput, anna.SignInput}
@@ -180,6 +184,7 @@ var _ = Describe("Create DID tests", func() {
 				},
 			},
 			AlsoKnownAs: []string{"alias-1", "alias-2"},
+			VersionId:   uuid.NewString(),
 		}
 
 		signatures := []SignInput{
@@ -223,6 +228,7 @@ var _ = Describe("Create DID tests", func() {
 					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(bobKeypair.Public),
 				},
 			},
+			VersionId: uuid.NewString(),
 		}
 
 		signatures := []SignInput{
@@ -253,6 +259,7 @@ var _ = Describe("Create DID tests", func() {
 					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
 			},
+			VersionId: uuid.NewString(),
 		}
 
 		signatures := []SignInput{}
@@ -280,6 +287,7 @@ var _ = Describe("Create DID tests", func() {
 					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
 			},
+			VersionId: uuid.NewString(),
 		}
 
 		signatures := []SignInput{}
@@ -305,6 +313,7 @@ var _ = Describe("Create DID tests", func() {
 					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
 			},
+			VersionId: uuid.NewString(),
 		}
 
 		invalidKey := GenerateKeyPair()
@@ -341,6 +350,7 @@ var _ = Describe("Create DID tests", func() {
 					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(bobKeypair.Public),
 				},
 			},
+			VersionId: uuid.NewString(),
 		}
 
 		signatures := []SignInput{alice.SignInput}
@@ -366,6 +376,7 @@ var _ = Describe("Create DID tests", func() {
 					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
 			},
+			VersionId: uuid.NewString(),
 		}
 
 		invalidKeyId := did + "#key-2"
@@ -431,6 +442,7 @@ var _ = Describe("Check upper/lower case for DID creation", func() {
 					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
 			},
+			VersionId: uuid.NewString(),
 		}
 
 		signatures := []SignInput{

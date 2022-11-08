@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	. "github.com/cheqd/cheqd-node/x/did/tests/setup"
+	"github.com/google/uuid"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -38,9 +39,10 @@ var _ = Describe("DID Doc update", func() {
 						VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(bob.KeyPair.Public),
 					},
 				},
-				Authentication:  []string{bob.KeyId},
-				AssertionMethod: []string{bob.KeyId},
-				VersionId:       bob.VersionId,
+				Authentication:    []string{bob.KeyId},
+				AssertionMethod:   []string{bob.KeyId},
+				PreviousVersionId: bob.VersionId,
+				VersionId:         uuid.NewString(),
 			}
 		})
 
@@ -84,7 +86,8 @@ var _ = Describe("DID Doc update", func() {
 						VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(alice.KeyPair.Public),
 					},
 				},
-				VersionId: alice.VersionId,
+				PreviousVersionId: alice.VersionId,
+				VersionId:         uuid.NewString(),
 			}
 		})
 
@@ -142,7 +145,8 @@ var _ = Describe("DID Doc update", func() {
 						VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(alice.KeyPair.Public),
 					},
 				},
-				VersionId: alice.VersionId,
+				PreviousVersionId: alice.VersionId,
+				VersionId:         uuid.NewString(),
 			}
 		})
 
@@ -200,9 +204,10 @@ var _ = Describe("DID Doc update", func() {
 						VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(alice.KeyPair.Public),
 					},
 				},
-				Authentication:  []string{alice.KeyId},
-				AssertionMethod: []string{alice.KeyId}, // Adding new VM
-				VersionId:       alice.VersionId,
+				Authentication:    []string{alice.KeyId},
+				AssertionMethod:   []string{alice.KeyId}, // Adding new VM
+				PreviousVersionId: alice.VersionId,
+				VersionId:         uuid.NewString(),
 			}
 		})
 
@@ -239,7 +244,8 @@ var _ = Describe("DID Doc update", func() {
 						VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(newKeyPair.Public),
 					},
 				},
-				VersionId: did.VersionId,
+				PreviousVersionId: did.VersionId,
+				VersionId:         uuid.NewString(),
 			}
 		})
 
@@ -298,8 +304,9 @@ var _ = Describe("DID Doc update", func() {
 						VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(alice.KeyPair.Public),
 					},
 				},
-				Authentication: []string{alice.KeyId},
-				VersionId:      alice.VersionId,
+				Authentication:    []string{alice.KeyId},
+				PreviousVersionId: alice.VersionId,
+				VersionId:         uuid.NewString(),
 			}
 		})
 
@@ -349,8 +356,9 @@ var _ = Describe("DID Doc update", func() {
 						VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(alice.KeyPair.Public),
 					},
 				},
-				Authentication: []string{alice.KeyId},
-				VersionId:      alice.VersionId,
+				Authentication:    []string{alice.KeyId},
+				PreviousVersionId: alice.VersionId,
+				VersionId:         uuid.NewString(),
 			}
 		})
 
@@ -420,8 +428,9 @@ var _ = Describe("DID Doc update", func() {
 						VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(newKey.Public),
 					},
 				},
-				Authentication: []string{alice.KeyId},
-				VersionId:      alice.VersionId,
+				Authentication:    []string{alice.KeyId},
+				PreviousVersionId: alice.VersionId,
+				VersionId:         uuid.NewString(),
 			}
 		})
 
@@ -485,8 +494,9 @@ var _ = Describe("DID Doc update", func() {
 						VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(secondKey.Public),
 					},
 				},
-				Authentication: []string{alice.KeyId},
-				VersionId:      alice.VersionId,
+				Authentication:    []string{alice.KeyId},
+				PreviousVersionId: alice.VersionId,
+				VersionId:         uuid.NewString(),
 			}
 
 			_, err := setup.UpdateDidDoc(addSecondKeyMsg, []SignInput{alice.SignInput})
@@ -502,8 +512,9 @@ var _ = Describe("DID Doc update", func() {
 						VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(alice.KeyPair.Public),
 					},
 				},
-				Authentication: []string{alice.KeyId},
-				VersionId:      alice.VersionId,
+				Authentication:    []string{alice.KeyId},
+				PreviousVersionId: addSecondKeyMsg.VersionId,
+				VersionId:         uuid.NewString(),
 			}
 		})
 
@@ -548,8 +559,9 @@ var _ = Describe("DID Doc update", func() {
 						VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(alice.DidDocInfo.KeyPair.Public),
 					},
 				},
-				Authentication: []string{alice.KeyId},
-				VersionId:      alice.VersionId,
+				Authentication:    []string{alice.KeyId},
+				PreviousVersionId: alice.VersionId,
+				VersionId:         uuid.NewString(),
 			}
 		})
 
@@ -557,7 +569,9 @@ var _ = Describe("DID Doc update", func() {
 			It("Should fail with error", func() {
 				// Deactivate DID
 				deactivateMsg := &types.MsgDeactivateDidDocPayload{
-					Id: alice.Did,
+					Id:                alice.Did,
+					PreviousVersionId: alice.VersionId,
+					VersionId:         uuid.NewString(),
 				}
 
 				signatures := []SignInput{alice.DidDocInfo.SignInput}

@@ -28,15 +28,9 @@ func (k MsgServer) UpdateDidDoc(goCtx context.Context, msg *types.MsgUpdateDidDo
 	}
 
 	// Check if DID exists and get latest version
-	latestVersion, err := k.GetLatestDidDocVersion(&ctx, msg.Payload.Id)
+	existingDidDocWithMetadata, err := k.GetLatestDidDoc(&ctx, msg.Payload.Id)
 	if err != nil {
 		return nil, types.ErrDidDocNotFound.Wrap(err.Error())
-	}
-
-	// Retrieve existing value
-	existingDidDocWithMetadata, err := k.GetDidDocVersion(&ctx, msg.Payload.Id, latestVersion)
-	if err != nil {
-		return nil, err
 	}
 
 	existingDidDoc := existingDidDocWithMetadata.DidDoc
@@ -57,8 +51,7 @@ func (k MsgServer) UpdateDidDoc(goCtx context.Context, msg *types.MsgUpdateDidDo
 	updatedDidDoc.ReplaceDids(updatedDidDoc.Id, updatedDidDoc.Id+UpdatedPostfix)
 
 	updatedMetadata := *existingDidDocWithMetadata.Metadata
-	updatedMetadata.Update(ctx)
-	updatedMetadata.VersionId = msg.Payload.VersionId
+	updatedMetadata.Update(ctx, msg.Payload.VersionId)
 
 	updatedDidDocWithMetadata := types.NewDidDocWithMetadata(&updatedDidDoc, &updatedMetadata)
 
@@ -90,13 +83,7 @@ func (k MsgServer) UpdateDidDoc(goCtx context.Context, msg *types.MsgUpdateDidDo
 	updatedDidDoc.ReplaceDids(updatedDidDoc.Id, existingDidDoc.Id)
 
 	// Update state
-	err = k.SetDidDocVersion(&ctx, &updatedDidDocWithMetadata)
-	if err != nil {
-		return nil, types.ErrInternal.Wrapf(err.Error())
-	}
-
-	// Update latest version link
-	err = k.SetLatestDidDocVersion(&ctx, updatedDidDoc.Id, updatedMetadata.VersionId)
+	err = k.AddNewDidDocVersion(&ctx, &updatedDidDocWithMetadata)
 	if err != nil {
 		return nil, types.ErrInternal.Wrapf(err.Error())
 	}

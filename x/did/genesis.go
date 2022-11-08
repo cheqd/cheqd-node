@@ -1,8 +1,6 @@
 package cheqd
 
 import (
-	"fmt"
-
 	"github.com/cheqd/cheqd-node/x/did/keeper"
 	"github.com/cheqd/cheqd-node/x/did/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -12,10 +10,12 @@ import (
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 	// Set didocs
-	for _, elem := range genState.DidDocs {
-		if err := k.SetDidDocVersion(&ctx, elem); err != nil {
-			panic(fmt.Sprintf("Cannot set did case: %s", err.Error()))
+	for _, versionSet := range genState.VersionSets {
+		for _, didDoc := range versionSet.DidDocs {
+			k.SetDidDocVersion(&ctx, didDoc, false)
 		}
+
+		k.SetLatestDidDocVersion(&ctx, versionSet.DidDocs[0].DidDoc.Id, versionSet.LatestVersion)
 	}
 
 	// Set did namespace
@@ -26,12 +26,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis := types.GenesisState{
 		DidNamespace: k.GetDidNamespace(&ctx),
-	}
-
-	// Add diddocs
-	didDocs := k.GetAllDidDocs(&ctx)
-	for _, elem := range didDocs {
-		genesis.DidDocs = append(genesis.DidDocs, &elem)
+		VersionSets:  k.GetAllDidDocs(&ctx),
 	}
 
 	return &genesis

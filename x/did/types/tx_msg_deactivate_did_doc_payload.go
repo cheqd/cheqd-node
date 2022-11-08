@@ -22,6 +22,7 @@ func (msg MsgDeactivateDidDocPayload) Validate(allowedNamespaces []string) error
 	return validation.ValidateStruct(&msg,
 		validation.Field(&msg.Id, validation.Required, IsDID(allowedNamespaces)),
 		validation.Field(&msg.PreviousVersionId, validation.Required, IsUUID()),
+		validation.Field(&msg.VersionId, validation.Required, IsUUID()),
 	)
 }
 
@@ -41,4 +42,5 @@ func ValidMsgDeactivateDidPayloadRule(allowedNamespaces []string) *CustomErrorRu
 func (msg *MsgDeactivateDidDocPayload) Normalize() {
 	msg.Id = utils.NormalizeDID(msg.Id)
 	msg.PreviousVersionId = utils.NormalizeUUID(msg.PreviousVersionId)
+	msg.VersionId = utils.NormalizeUUID(msg.VersionId)
 }

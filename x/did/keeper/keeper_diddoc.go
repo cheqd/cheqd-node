@@ -43,9 +43,62 @@ func (k Keeper) SetDidDocCount(ctx *sdk.Context, count uint64) {
 	store.Set(key, valueBytes)
 }
 
+func (k Keeper) AddNewDidDocVersion(ctx *sdk.Context, didDoc *types.DidDocWithMetadata) error {
+	// Check if the diddoc version already exists
+	if k.HasDidDocVersion(ctx, didDoc.DidDoc.Id, didDoc.Metadata.VersionId) {
+		return types.ErrDidDocExists.Wrapf("diddoc version already exists for did %s, version %s", didDoc.DidDoc.Id, didDoc.Metadata.VersionId)
+	}
+
+	// Link to the previous version if it exists
+	if k.HasDidDoc(ctx, didDoc.DidDoc.Id) {
+		latestVersionId, err := k.GetLatestDidDocVersion(ctx, didDoc.DidDoc.Id)
+		if err != nil {
+			return err
+		}
+
+		latestVersion, err := k.GetDidDocVersion(ctx, didDoc.DidDoc.Id, latestVersionId)
+		if err != nil {
+			return err
+		}
+
+		// Update version links
+		latestVersion.Metadata.NextVersionId = didDoc.Metadata.VersionId
+		didDoc.Metadata.PreviousVersionId = latestVersion.Metadata.VersionId
+
+		// Update previous version with override
+		err = k.SetDidDocVersion(ctx, &latestVersion, true)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Update latest version
+	err := k.SetLatestDidDocVersion(ctx, didDoc.DidDoc.Id, didDoc.Metadata.VersionId)
+	if err != nil {
+		return err
+	}
+
+	// Write new version (no override)
+	return k.SetDidDocVersion(ctx, didDoc, false)
+}
+
+func (k Keeper) GetLatestDidDoc(ctx *sdk.Context, did string) (types.DidDocWithMetadata, error) {
+	latestVersionId, err := k.GetLatestDidDocVersion(ctx, did)
+	if err != nil {
+		return types.DidDocWithMetadata{}, err
+	}
+
+	latestVersion, err := k.GetDidDocVersion(ctx, did, latestVersionId)
+	if err != nil {
+		return types.DidDocWithMetadata{}, err
+	}
+
+	return latestVersion, nil
+}
+
 // SetDid set a specific did in the store. Updates DID counter if the DID is new.
-func (k Keeper) SetDidDocVersion(ctx *sdk.Context, value *types.DidDocWithMetadata) error {
-	if k.HasDidDocVersion(ctx, value.DidDoc.Id, value.Metadata.VersionId) {
+func (k Keeper) SetDidDocVersion(ctx *sdk.Context, value *types.DidDocWithMetadata, override bool) error {
+	if !override && k.HasDidDocVersion(ctx, value.DidDoc.Id, value.Metadata.VersionId) {
 		return types.ErrDidDocExists.Wrap("diddoc version already exists")
 	}
 
@@ -68,8 +121,8 @@ func (k Keeper) GetDidDocVersion(ctx *sdk.Context, id, version string) (types.Di
 	}
 
 	var value types.DidDocWithMetadata
-	key := store.Get(StrBytes(id))
-	k.cdc.MustUnmarshal(key, &value)
+	valueBytes := store.Get(types.GetDidDocVersionKey(id, version))
+	k.cdc.MustUnmarshal(valueBytes, &value)
 
 	return value, nil
 }
@@ -102,13 +155,15 @@ func (k Keeper) GetLatestDidDocVersion(ctx *sdk.Context, id string) (string, err
 	return string(store.Get(types.GetLatestDidDocVersionKey(id))), nil
 }
 
-// HasDid checks if the did exists in the store
+func (k Keeper) HasDidDoc(ctx *sdk.Context, id string) bool {
+	return k.HasLatestDidDocVersion(ctx, id)
+}
+
 func (k Keeper) HasLatestDidDocVersion(ctx *sdk.Context, id string) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has(types.GetLatestDidDocVersionKey(id))
 }
 
-// HasDid checks if the did exists in the store
 func (k Keeper) HasDidDocVersion(ctx *sdk.Context, id, version string) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has(types.GetDidDocVersionKey(id, version))
@@ -116,12 +171,12 @@ func (k Keeper) HasDidDocVersion(ctx *sdk.Context, id, version string) bool {
 
 // GetAllDidDocs returns all did
 // Loads all DIDs in memory. Use only for genesis export.
-func (k Keeper) GetAllDidDocs(ctx *sdk.Context) []types.DidDocVersionSet {
+func (k Keeper) GetAllDidDocs(ctx *sdk.Context) []*types.DidDocVersionSet {
 	store := ctx.KVStore(k.storeKey)
 	latestVresionIterator := sdk.KVStorePrefixIterator(store, types.GetLatestDidDocVersionPrefix())
 	defer closeIteratorOrPanic(latestVresionIterator)
 
-	var didDocs []types.DidDocVersionSet
+	var didDocs []*types.DidDocVersionSet
 
 	for ; latestVresionIterator.Valid(); latestVresionIterator.Next() {
 		// Get did from key

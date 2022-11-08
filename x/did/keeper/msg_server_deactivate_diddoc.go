@@ -17,7 +17,7 @@ func (k MsgServer) DeactivateDidDoc(goCtx context.Context, msg *types.MsgDeactiv
 	msg.Normalize()
 
 	// Validate DID does exist
-	if !k.HasLatestDidDocVersion(&ctx, msg.Payload.Id) {
+	if !k.HasDidDoc(&ctx, msg.Payload.Id) {
 		return nil, types.ErrDidDocNotFound.Wrap(msg.Payload.Id)
 	}
 
@@ -29,12 +29,7 @@ func (k MsgServer) DeactivateDidDoc(goCtx context.Context, msg *types.MsgDeactiv
 	}
 
 	// Retrieve didDoc state value and did
-	latestVersion, err := k.GetLatestDidDocVersion(&ctx, msg.Payload.Id)
-	if err != nil {
-		return nil, types.ErrDidDocNotFound.Wrap(err.Error())
-	}
-
-	didDoc, err := k.GetDidDocVersion(&ctx, msg.Payload.Id, latestVersion)
+	didDoc, err := k.GetLatestDidDoc(&ctx, msg.Payload.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -42,6 +37,11 @@ func (k MsgServer) DeactivateDidDoc(goCtx context.Context, msg *types.MsgDeactiv
 	// Validate DID is not deactivated
 	if didDoc.Metadata.Deactivated {
 		return nil, types.ErrDIDDocDeactivated.Wrap(msg.Payload.Id)
+	}
+
+	// Check version id
+	if msg.Payload.PreviousVersionId != didDoc.Metadata.VersionId {
+		return nil, types.ErrUnexpectedDidVersion.Wrapf("got: %s, must be: %s", msg.Payload.VersionId, didDoc.Metadata.VersionId)
 	}
 
 	// We neither create dids nor update
@@ -56,10 +56,10 @@ func (k MsgServer) DeactivateDidDoc(goCtx context.Context, msg *types.MsgDeactiv
 
 	// Update metadata
 	didDoc.Metadata.Deactivated = true
-	didDoc.Metadata.Update(ctx)
+	didDoc.Metadata.Update(ctx, msg.Payload.VersionId)
 
 	// Apply changes. We don't create new version on deactivation, we just update metadata
-	err = k.SetDidDocVersion(&ctx, &didDoc)
+	err = k.AddNewDidDocVersion(&ctx, &didDoc)
 	if err != nil {
 		return nil, types.ErrInternal.Wrapf(err.Error())
 	}

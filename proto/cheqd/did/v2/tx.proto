@@ -74,6 +74,7 @@ message MsgUpdateDidDocResponse {
 message MsgDeactivateDidDocPayload {
   string id = 1;
   string previous_version_id = 2;
+  string version_id = 3;
 }
 
 message MsgDeactivateDidDocResponse {

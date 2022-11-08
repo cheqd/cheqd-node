@@ -122,7 +122,9 @@ var _ = Describe("Create Resource Tests", func() {
 			It("Should fail with error", func() {
 				// Deactivate DID
 				DeactivateMsg := &didtypes.MsgDeactivateDidDocPayload{
-					Id: alice.Did,
+					Id:                alice.Did,
+					PreviousVersionId: alice.VersionId,
+					VersionId:         uuid.NewString(),
 				}
 
 				signatures := []didsetup.SignInput{alice.DidDocInfo.SignInput}

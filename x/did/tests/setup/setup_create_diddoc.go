@@ -5,6 +5,7 @@ import (
 
 	"github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/cheqd/cheqd-node/x/did/utils"
+	"github.com/google/uuid"
 )
 
 func (s *TestSetup) CreateDid(payload *types.MsgCreateDidDocPayload, signInputs []SignInput) (*types.MsgCreateDidDocResponse, error) {
@@ -45,6 +46,7 @@ func (s *TestSetup) BuildDidDocWithCustomDID(did string) DidDocInfo {
 			},
 		},
 		Authentication: []string{keyId},
+		VersionId:      uuid.NewString(),
 	}
 
 	signInput := SignInput{
