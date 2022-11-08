@@ -1,4 +1,4 @@
-name: "Branch Cleanup"
+name: "Cache Cleanup - Automatic"
 on:
   pull_request:
     types:
