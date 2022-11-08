@@ -50,7 +50,7 @@ func (k Keeper) SetResource(ctx *sdk.Context, resource *types.ResourceWithMetada
 
 	// Set metadata
 	metadataKey := GetResourceMetadataKeyBytes(resource.Metadata.CollectionId, resource.Metadata.Id)
-	metadataBytes := k.Cdc.MustMarshal(resource.Metadata)
+	metadataBytes := k.cdc.MustMarshal(resource.Metadata)
 	store.Set(metadataKey, metadataBytes)
 
 	// Set data
@@ -70,7 +70,7 @@ func (k Keeper) GetResource(ctx *sdk.Context, collectionId string, id string) (t
 
 	metadataBytes := store.Get(GetResourceMetadataKeyBytes(collectionId, id))
 	var metadata types.Metadata
-	if err := k.Cdc.Unmarshal(metadataBytes, &metadata); err != nil {
+	if err := k.cdc.Unmarshal(metadataBytes, &metadata); err != nil {
 		return types.ResourceWithMetadata{}, sdkerrors.ErrInvalidType.Wrap(err.Error())
 	}
 
@@ -94,7 +94,7 @@ func (k Keeper) GetAllResourceVersions(ctx *sdk.Context, collectionId, name, res
 
 	metadataBytes := store.Get(GetResourceMetadataKeyBytes(collectionId, id))
 	var metadata types.Metadata
-	if err := k.Cdc.Unmarshal(metadataBytes, &metadata); err != nil {
+	if err := k.cdc.Unmarshal(metadataBytes, &metadata); err != nil {
 		return types.Metadata{}, sdkerrors.ErrInvalidType.Wrap(err.Error())
 	}
 

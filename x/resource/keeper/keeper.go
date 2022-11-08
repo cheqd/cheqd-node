@@ -13,13 +13,13 @@ import (
 )
 
 type Keeper struct {
-	Cdc      codec.BinaryCodec
+	cdc      codec.BinaryCodec
 	StoreKey storetypes.StoreKey
 }
 
 func NewKeeper(cdc codec.BinaryCodec, storeKey storetypes.StoreKey) *Keeper {
 	return &Keeper{
-		Cdc:      cdc,
+		cdc:      cdc,
 		StoreKey: storeKey,
 	}
 }

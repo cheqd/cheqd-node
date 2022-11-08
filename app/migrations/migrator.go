@@ -1,70 +1,41 @@
 package migrations
 
 import (
-	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
+	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/gogo/protobuf/codec"
 )
 
-type Migration func(sdk.Context, ...interface{}) error
+type MigrationContext struct {
+	codec codec.Codec
 
-type Migrator struct {
-	migrations []Migration
-	keeper     interface{}
-}
-
-func NewMigrator(keeper interface{}, migrations ...Migration) Migrator {
-	return Migrator{
-		migrations: migrations,
-		keeper:     keeper,
-	}
-}
-
-type CheqdMigration func(sdk.Context, cheqdkeeper.Keeper, resourcekeeper.Keeper) error
-
-type CheqdMigrator struct {
-	migrations  []CheqdMigration
-	cheqdKeeper cheqdkeeper.Keeper
+	didKeeper      didkeeper.Keeper
 	resourceKeeper resourcekeeper.Keeper
 }
 
-func NewCheqdMigrator(cheqdKeeper cheqdkeeper.Keeper, resourceKeeper resourcekeeper.Keeper, migrations ...CheqdMigration) CheqdMigrator {
+type CheqdMigration func(ctx MigrationContext) error
+
+type CheqdMigrator struct {
+	migrations []CheqdMigration
+	context    MigrationContext
+}
+
+func NewCheqdMigrator(codec codec.Codec, didKeeper didkeeper.Keeper, resourceKeeper resourcekeeper.Keeper, migrations ...CheqdMigration) CheqdMigrator {
 	return CheqdMigrator{
-		cheqdKeeper: cheqdKeeper,
-		resourceKeeper: resourceKeeper,
-		migrations:  migrations,
+		migrations: migrations,
+		context: MigrationContext{
+			didKeeper:      didKeeper,
+			resourceKeeper: resourceKeeper,
+
+			codec: codec,
+		},
 	}
 }
 
 func (m *CheqdMigrator) Migrate(ctx sdk.Context) error {
 	for _, migration := range m.migrations {
-		err := migration(ctx, m.cheqdKeeper, m.resourceKeeper)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-type ResourceMigration func(sdk.Context, cheqdkeeper.Keeper, resourcekeeper.Keeper) error
-
-type ResourceMigrator struct {
-	migrations     []ResourceMigration
-	cheqdKeeper    cheqdkeeper.Keeper
-	resourceKeeper resourcekeeper.Keeper
-}
-
-func NewResourceMigrator(cheqdKeeper cheqdkeeper.Keeper, resourceKeeper resourcekeeper.Keeper, migrations ...ResourceMigration) ResourceMigrator {
-	return ResourceMigrator{
-		migrations:     migrations,
-		cheqdKeeper:    cheqdKeeper,
-		resourceKeeper: resourceKeeper,
-	}
-}
-
-func (m *ResourceMigrator) Migrate(ctx sdk.Context) error {
-	for _, migration := range m.migrations {
-		err := migration(ctx, m.cheqdKeeper, m.resourceKeeper)
+		err := migration(m.context)
 		if err != nil {
 			return err
 		}

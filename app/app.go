@@ -619,13 +619,13 @@ func New(
 	app.mm.RegisterServices(app.configurator)
 
 	// Init Migrators
-	cheqdMigrator := migrations.NewCheqdMigrator(app.cheqdKeeper, app.resourceKeeper, migrations.MigrateCheqdV1)
-	resourceMigrator := migrations.NewResourceMigrator(app.cheqdKeeper, app.resourceKeeper, migrations.MigrateResourceV1)
+	didtypes.StoreKey
+	cheqdMigrator := migrations.NewCheqdMigrator(app.appCodec, app.didKeeper, app.resourceKeeper, migrations.MigrateCheqdV1)
 
 	// Register upgrade store migrations per module
 	if err := app.configurator.RegisterMigration(
-		cheqdtypes.ModuleName,
-		app.mm.GetVersionMap()[cheqdtypes.ModuleName],
+		didtypes.ModuleName,
+		app.mm.GetVersionMap()[didtypes.ModuleName],
 		cheqdMigrator.Migrate,
 	); err != nil {
 		panic(err)
