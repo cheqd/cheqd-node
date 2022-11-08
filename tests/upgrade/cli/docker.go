@@ -166,11 +166,17 @@ func LocalnetExecUpWithNewImage() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	_, err = LocalnetLoadImage(DOCKER_LOAD_IMAGE_ARGS...)
+	out, err := LocalnetLoadImage(DOCKER_LOAD_IMAGE_ARGS...)
 	if err != nil {
+		fmt.Println("Error on loading build image", out)
 		return "", err
 	}
-	return LocalnetExecUpWithBuildImage()
+	out, err = LocalnetExecUpWithBuildImage()
+	if err != nil {
+		fmt.Println("Error on rebooting localnet with new image", out)
+		return "", err
+	}
+	return out, nil
 }
 
 func SetOldDockerComposeEnv() error {
