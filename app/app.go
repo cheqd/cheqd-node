@@ -689,6 +689,10 @@ func New(
 		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 			ctx.Logger().Info("Handler for upgrade plan: " + UpgradeName)
 
+			// Add defaults for staking subspace
+			stakingSubspace, _ := app.ParamsKeeper.GetSubspace(stakingtypes.ModuleName)
+			stakingSubspace.Set(ctx, stakingtypes.KeyMinCommissionRate, sdk.NewDec(0))
+
 			// Get version map from previous upgrade
 			versionMap := app.mm.GetVersionMap()
 			// Skip capability module
