@@ -3616,7 +3616,8 @@
                 "historical_entries": 10000,
                 "max_entries": 7,
                 "max_validators": 125,
-                "unbonding_time": "259200s"
+                "unbonding_time": "259200s",
+                "min_commission_rate": "0.000000000000000000"
             },
             "redelegations": [],
             "unbonding_delegations": [],
