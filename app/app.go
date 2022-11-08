@@ -689,6 +689,9 @@ func New(
 		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 			ctx.Logger().Info("Handler for upgrade plan: " + UpgradeName)
 
+			// Skip capability module
+			fromVM[capabilitytypes.ModuleName] = app.mm.GetVersionMap()[capabilitytypes.ModuleName]
+
 			// ibc v3 -> v4 migration
 			// transfer module consensus version has been bumped to 2
 			return app.mm.RunMigrations(ctx, app.configurator, fromVM)
