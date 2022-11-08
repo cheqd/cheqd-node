@@ -71,6 +71,7 @@ type ValidatorInfo struct {
 
 func GetNodeStatus(container string, binary string) (NodeStatus, error) {
 	out, err := LocalnetExecExec(container, binary, "status")
+	fmt.Println("Node status:", out)
 	if err != nil {
 		return NodeStatus{}, err
 	}
