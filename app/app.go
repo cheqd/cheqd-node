@@ -619,7 +619,7 @@ func New(
 	app.mm.RegisterServices(app.configurator)
 
 	// Init Migrators
-	cheqdMigrator := migrations.NewCheqdMigrator(app.cheqdKeeper, migrations.MigrateCheqdV1)
+	cheqdMigrator := migrations.NewCheqdMigrator(app.cheqdKeeper, app.resourceKeeper, migrations.MigrateCheqdV1)
 	resourceMigrator := migrations.NewResourceMigrator(app.cheqdKeeper, app.resourceKeeper, migrations.MigrateResourceV1)
 
 	// Register upgrade store migrations per module

@@ -64,3 +64,22 @@ func (msg *MsgCreateDidDocPayload) Normalize() {
 	msg.CapabilityDelegation = utils.NormalizeDIDUrlList(msg.CapabilityDelegation)
 	msg.KeyAgreement = utils.NormalizeDIDUrlList(msg.KeyAgreement)
 }
+
+// Creator
+
+func MsgCreateDidPayloadFromDid(did *Did) MsgCreateDidPayload {
+	return MsgCreateDidPayload{
+		Context:              did.Context,
+		Id:                   did.Id,
+		Controller:           did.Controller,
+		VerificationMethod:   did.VerificationMethod,
+		Authentication:       did.Authentication,
+		AssertionMethod:      did.AssertionMethod,
+		CapabilityInvocation: did.CapabilityInvocation,
+		CapabilityDelegation: did.CapabilityDelegation,
+		KeyAgreement:         did.KeyAgreement,
+		AlsoKnownAs:          did.AlsoKnownAs,
+		Service:              did.Service,
+		
+	}
+}

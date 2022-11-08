@@ -20,23 +20,25 @@ func NewMigrator(keeper interface{}, migrations ...Migration) Migrator {
 	}
 }
 
-type CheqdMigration func(sdk.Context, cheqdkeeper.Keeper) error
+type CheqdMigration func(sdk.Context, cheqdkeeper.Keeper, resourcekeeper.Keeper) error
 
 type CheqdMigrator struct {
 	migrations  []CheqdMigration
 	cheqdKeeper cheqdkeeper.Keeper
+	resourceKeeper resourcekeeper.Keeper
 }
 
-func NewCheqdMigrator(cheqdKeeper cheqdkeeper.Keeper, migrations ...CheqdMigration) CheqdMigrator {
+func NewCheqdMigrator(cheqdKeeper cheqdkeeper.Keeper, resourceKeeper resourcekeeper.Keeper, migrations ...CheqdMigration) CheqdMigrator {
 	return CheqdMigrator{
 		cheqdKeeper: cheqdKeeper,
+		resourceKeeper: resourceKeeper,
 		migrations:  migrations,
 	}
 }
 
 func (m *CheqdMigrator) Migrate(ctx sdk.Context) error {
 	for _, migration := range m.migrations {
-		err := migration(ctx, m.cheqdKeeper)
+		err := migration(ctx, m.cheqdKeeper, m.resourceKeeper)
 		if err != nil {
 			return err
 		}
