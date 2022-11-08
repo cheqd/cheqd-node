@@ -171,8 +171,8 @@ func LocalnetExecUpWithNewImage() (string, error) {
 		return "", err
 	}
 	out, err = LocalnetExecUpWithBuildImage()
+	fmt.Println("Rebooting localnet with new image", out)
 	if err != nil {
-		fmt.Println("Error on rebooting localnet with new image", out)
 		return "", err
 	}
 	return out, nil
