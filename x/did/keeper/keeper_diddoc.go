@@ -191,18 +191,18 @@ func (k Keeper) HasDidDocVersion(ctx *sdk.Context, id, version string) bool {
 // Loads all DIDs in memory. Use only for genesis export.
 func (k Keeper) GetAllDidDocs(ctx *sdk.Context) []*types.DidDocVersionSet {
 	store := ctx.KVStore(k.storeKey)
-	latestVresionIterator := sdk.KVStorePrefixIterator(store, types.GetLatestDidDocVersionPrefix())
-	defer closeIteratorOrPanic(latestVresionIterator)
+	latestVersionIterator := sdk.KVStorePrefixIterator(store, types.GetLatestDidDocVersionPrefix())
+	defer closeIteratorOrPanic(latestVersionIterator)
 
 	var didDocs []*types.DidDocVersionSet
 
-	for ; latestVresionIterator.Valid(); latestVresionIterator.Next() {
+	for ; latestVersionIterator.Valid(); latestVersionIterator.Next() {
 		// Get did from key
-		key := string(latestVresionIterator.Key())
+		key := string(latestVersionIterator.Key())
 		did := strings.Split(key, ":")[1]
 
 		// Get the latest version
-		latestVersion := string(latestVresionIterator.Value())
+		latestVersion := string(latestVersionIterator.Value())
 
 		didDocVersionSet := types.DidDocVersionSet{
 			LatestVersion: latestVersion,
