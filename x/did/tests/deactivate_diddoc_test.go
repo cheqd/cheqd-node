@@ -48,7 +48,7 @@ var _ = Describe("Deactivate DID tests", func() {
 
 			_, err := setup.DeactivateDidDoc(msg, signatures)
 			Expect(err).ToNot(BeNil())
-			Expect(err.Error()).To(Equal(NotFoundDID + ": DID Doc not found"))
+			Expect(err.Error()).To(Equal(NotFoundDID + ": DIDDoc not found"))
 		})
 	})
 
@@ -71,7 +71,7 @@ var _ = Describe("Deactivate DID tests", func() {
 			// Deactivate again
 			_, err = setup.DeactivateDidDoc(msg, signatures)
 			Expect(err).ToNot(BeNil())
-			Expect(err.Error()).To(Equal(alice.DidDocInfo.Did + ": DID Doc already deactivated"))
+			Expect(err.Error()).To(Equal(alice.DidDocInfo.Did + ": DIDDoc already deactivated"))
 		})
 	})
 
