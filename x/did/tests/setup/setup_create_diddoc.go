@@ -91,7 +91,7 @@ func (s *TestSetup) CreateSimpleDid() CreatedDidDocInfo {
 	return s.CreateCustomDidDoc(did)
 }
 
-func (s *TestSetup) CreateDidDocWithExternalConterllers(controllers []string, signInputs []SignInput) CreatedDidDocInfo {
+func (s *TestSetup) CreateDidDocWithExternalControllers(controllers []string, signInputs []SignInput) CreatedDidDocInfo {
 	did := s.BuildSimpleDidDoc()
 	did.Msg.Controller = append(did.Msg.Controller, controllers...)
 

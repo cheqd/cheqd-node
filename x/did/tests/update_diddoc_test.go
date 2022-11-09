@@ -12,21 +12,21 @@ import (
 	"github.com/cheqd/cheqd-node/x/did/types"
 )
 
-var _ = Describe("DID Doc update", func() {
+var _ = Describe("DIDDoc update", func() {
 	var setup TestSetup
 
 	BeforeEach(func() {
 		setup = Setup()
 	})
 
-	Describe("DIDDoc: update verification relationship", func() {
+	Describe("DIDDoc: Update verification relationship", func() {
 		var alice CreatedDidDocInfo
 		var bob CreatedDidDocInfo
 		var msg *types.MsgUpdateDidDocPayload
 
 		BeforeEach(func() {
 			alice = setup.CreateSimpleDid()
-			bob = setup.CreateDidDocWithExternalConterllers([]string{alice.Did}, []SignInput{alice.SignInput})
+			bob = setup.CreateDidDocWithExternalControllers([]string{alice.Did}, []SignInput{alice.SignInput})
 
 			msg = &types.MsgUpdateDidDocPayload{
 				Id:         bob.Did,
@@ -46,7 +46,7 @@ var _ = Describe("DID Doc update", func() {
 			}
 		})
 
-		It("Works with DID doc controllers signature", func() {
+		It("Works with DIDDoc controllers signature", func() {
 			signatures := []SignInput{alice.SignInput}
 
 			_, err := setup.UpdateDidDoc(msg, signatures)
@@ -224,7 +224,7 @@ var _ = Describe("DID Doc update", func() {
 
 		BeforeEach(func() {
 			bob = setup.CreateSimpleDid()
-			alice = setup.CreateDidDocWithExternalConterllers([]string{bob.Did}, []SignInput{bob.SignInput})
+			alice = setup.CreateDidDocWithExternalControllers([]string{bob.Did}, []SignInput{bob.SignInput})
 
 			msg = &types.MsgUpdateDidDocPayload{
 				Id:         alice.Did,
