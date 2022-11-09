@@ -28,19 +28,19 @@ var _ = AfterSuite(func() {
 
 func Post() error {
 	By("Ensuring the QueryDid query is successful for the existing DID")
-	res, err := cli.QueryDid(DidDoc.Id, cli.VALIDATOR1)
+	res, err := cli.QueryDid(DidDoc.Id, cli.VALIDATOR0)
 	Expect(err).To(BeNil())
 	Expect(res.Did.Id).To(BeEquivalentTo(DidDoc.Id))
 
 	By("Ensuring the QueryResource query is successful for the existing Resource")
-	res_, err := cli.QueryResource(ResourcePayload.CollectionId, ResourcePayload.Id, cli.VALIDATOR1)
+	res_, err := cli.QueryResource(ResourcePayload.CollectionId, ResourcePayload.Id, cli.VALIDATOR0)
 	Expect(err).To(BeNil())
 	Expect(res_.Resource.Header.Id).To(BeEquivalentTo(ResourcePayload.Id))
 
 	By("Ensuring the CreateDid Tx is successful for a new DID")
 	PostDidDoc, PostSignInputs, PostErr = GenerateDidDocWithSignInputs()
 	Expect(PostErr).To(BeNil())
-	resp, err := cli.CreateDid(PostDidDoc, PostSignInputs, cli.VALIDATOR1)
+	resp, err := cli.CreateDid(PostDidDoc, PostSignInputs, cli.VALIDATOR0)
 	Expect(err).To(BeNil())
 	Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -53,18 +53,18 @@ func Post() error {
 	Expect(PostResourceFileErr).To(BeNil())
 
 	By("Ensuring the PostResourceFile is copied to the localnet container")
-	_, err = cli.LocalnetExecCopyAbsoluteWithPermissions(PostResourceFile, cli.DOCKER_HOME, cli.VALIDATOR1)
+	_, err = cli.LocalnetExecCopyAbsoluteWithPermissions(PostResourceFile, cli.DOCKER_HOME, cli.VALIDATOR0)
 	Expect(err).To(BeNil())
 
 	By("Ensuring CreateResource Tx is successful")
-	resp, err = cli.CreateResource(PostResourcePayload.CollectionId, PostResourcePayload.Id, PostResourcePayload.Name, PostResourcePayload.ResourceType, integrationtestdata.JSON_FILE_NAME, PostSignInputs, cli.VALIDATOR1)
+	resp, err = cli.CreateResource(PostResourcePayload.CollectionId, PostResourcePayload.Id, PostResourcePayload.Name, PostResourcePayload.ResourceType, integrationtestdata.JSON_FILE_NAME, PostSignInputs, cli.VALIDATOR0)
 	Expect(err).To(BeNil())
 	Expect(resp.Code).To(BeEquivalentTo(0))
 
 	By("Ensuring the UpdateDid Tx is successful for a new DID")
 	PostRotatedKeysDidDoc, PostRotatedKeysSignInputs, PostRotatedKeysErr = GenerateRotatedKeysDidDocWithSignInputs(PostDidDoc, PostSignInputs, resp.TxHash)
 	Expect(PostRotatedKeysErr).To(BeNil())
-	resp, err = cli.UpdateDid(PostRotatedKeysDidDoc, PostSignInputs, cli.VALIDATOR1)
+	resp, err = cli.UpdateDid(PostRotatedKeysDidDoc, PostSignInputs, cli.VALIDATOR0)
 	Expect(err).To(BeNil())
 	Expect(resp.Code).To(BeEquivalentTo(0))
 
