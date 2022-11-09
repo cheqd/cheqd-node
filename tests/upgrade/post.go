@@ -104,7 +104,7 @@ func Post() error {
 	Expect(res.Did.Authentication).To(HaveLen(1))
 	Expect(res.Did.Authentication[0]).To(BeEquivalentTo(PostRotatedKeysDidDoc.Authentication[0]))
 
-	fmt.Printf("%s Post() successful.", cli.GREEN)
+	fmt.Printf("%sPost-Upgrade successful.\n", cli.GREEN)
 
 	return nil
 }

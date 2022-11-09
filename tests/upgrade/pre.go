@@ -102,7 +102,7 @@ func Pre() error {
 
 	QueriedDidDoc = *res_.Did
 
-	fmt.Printf("%s Pre() successful.", cli.GREEN)
+	fmt.Printf("%sPre-Upgrade successful.\n", cli.GREEN)
 
 	return nil
 }

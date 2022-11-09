@@ -130,7 +130,5 @@ var _ = Describe("Upgrade - Execute", func() {
 			err := cli.WaitForChainHeight(cli.VALIDATOR0, cli.CLI_BINARY_NAME, UPGRADE_HEIGHT+2, cli.VOTING_PERIOD*6)
 			Expect(err).To(BeNil())
 		})
-
-		fmt.Printf("%s Upgrade successful.", cli.GREEN)
 	})
 })
