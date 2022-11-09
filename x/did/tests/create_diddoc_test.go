@@ -20,7 +20,7 @@ var _ = Describe("Create DID tests", func() {
 		setup = Setup()
 	})
 
-	It("Valid: Works for simple did doc (Ed25519VerificationKey2020)", func() {
+	It("Valid: Works for simple DIDDoc (Ed25519VerificationKey2020)", func() {
 		did := GenerateDID(Base58_16bytes)
 		keypair := GenerateKeyPair()
 		keyId := did + "#key-1"
@@ -55,7 +55,7 @@ var _ = Describe("Create DID tests", func() {
 		Expect(msg.ToDidDoc()).To(Equal(*created.Value.DidDoc))
 	})
 
-	It("Valid: Works for simple did doc (JsonWebKey2020)", func() {
+	It("Valid: Works for simple DIDDoc (JsonWebKey2020)", func() {
 		did := GenerateDID(Base58_16bytes)
 		keypair := GenerateKeyPair()
 		keyId := did + "#key-1"
@@ -126,7 +126,7 @@ var _ = Describe("Create DID tests", func() {
 		Expect(msg.ToDidDoc()).To(Equal(*created.Value.DidDoc))
 	})
 
-	It("Valid: Works for the did doc witha all properties", func() {
+	It("Valid: Works for DIDDoc with all properties", func() {
 		did := GenerateDID(Base58_16bytes)
 
 		keypair1 := GenerateKeyPair()
@@ -293,7 +293,7 @@ var _ = Describe("Create DID tests", func() {
 		signatures := []SignInput{}
 
 		_, err := setup.CreateDid(msg, signatures)
-		Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("%s: DID Doc not found", nonExistingDid)))
+		Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("%s: DIDDoc not found", nonExistingDid)))
 	})
 
 	It("Not Valid: Wrong signature", func() {
@@ -359,7 +359,7 @@ var _ = Describe("Create DID tests", func() {
 		Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("signer: %s: signature is required but not found", bobDid)))
 	})
 
-	It("Not Valid: DID self-signed by not existing verification method", func() {
+	It("Not Valid: DID signed by invalid verification method", func() {
 		did := GenerateDID(Base58_16bytes)
 		keypair := GenerateKeyPair()
 		keyId := did + "#key-1"
@@ -392,7 +392,7 @@ var _ = Describe("Create DID tests", func() {
 		Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("%s: verification method not found", invalidKeyId)))
 	})
 
-	It("Not Valid: DID Doc already exists", func() {
+	It("Not Valid: DIDDoc already exists", func() {
 		// Alice
 		alice := setup.CreateSimpleDid()
 
@@ -412,7 +412,7 @@ var _ = Describe("Create DID tests", func() {
 		signatures := []SignInput{alice.SignInput}
 
 		_, err := setup.CreateDid(msg, signatures)
-		Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("%s: DID Doc exists", alice.Did)))
+		Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("%s: DIDDoc exists", alice.Did)))
 	})
 })
 
@@ -461,19 +461,19 @@ var _ = Describe("Check upper/lower case for DID creation", func() {
 		Expect(created.Value.DidDoc.Id).To(Equal(testCase.resultId))
 	},
 
-		Entry("Low Case UUID", TestCaseUUIDDidStruct{
+		Entry("Lowercase UUIDs", TestCaseUUIDDidStruct{
 			inputId:  didPrefix + "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
 			resultId: didPrefix + "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
 		}),
-		Entry("Upper Case UUID", TestCaseUUIDDidStruct{
+		Entry("Uppercase UUIDs", TestCaseUUIDDidStruct{
 			inputId:  didPrefix + "A86F9CAE-0902-4A7C-A144-96B60CED2FC9",
 			resultId: didPrefix + "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
 		}),
-		Entry("Mixed Case UUID", TestCaseUUIDDidStruct{
+		Entry("Mixed case UUIDs", TestCaseUUIDDidStruct{
 			inputId:  didPrefix + "A86F9CAE-0902-4a7c-a144-96b60ced2FC9",
 			resultId: didPrefix + "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
 		}),
-		Entry("Base58 string", TestCaseUUIDDidStruct{
+		Entry("Indy-style IDs", TestCaseUUIDDidStruct{
 			inputId:  didPrefix + "zABCDEFG123456789abcd",
 			resultId: didPrefix + "zABCDEFG123456789abcd",
 		}),
