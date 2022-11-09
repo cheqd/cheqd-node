@@ -50,6 +50,7 @@ func Tx(container string, binary string, module, tx, from string, txArgs ...stri
 }
 
 func SubmitUpgradeProposal(upgradeHeight int64, container string) (sdk.TxResponse, error) {
+	fmt.Println("Submitting upgrade proposal from", container)
 	args := append([]string{
 		CLI_BINARY_NAME,
 		"tx", "gov", "submit-proposal", "software-upgrade",
@@ -79,6 +80,7 @@ func SubmitUpgradeProposal(upgradeHeight int64, container string) (sdk.TxRespons
 }
 
 func DepositGov(container string) (sdk.TxResponse, error) {
+	fmt.Println("Depositing from", container)
 	args := append([]string{
 		CLI_BINARY_NAME,
 		"tx", "gov", "deposit", "1", DEPOSIT_AMOUNT,
@@ -102,6 +104,7 @@ func DepositGov(container string) (sdk.TxResponse, error) {
 }
 
 func VoteUpgradeProposal(container string) (sdk.TxResponse, error) {
+	fmt.Println("Voting from", container)
 	args := append([]string{
 		CLI_BINARY_NAME,
 		"tx", "gov", "vote", "1", "yes",
@@ -114,8 +117,6 @@ func VoteUpgradeProposal(container string) (sdk.TxResponse, error) {
 	}
 
 	out = TrimExtraLineOffset(out, 1)
-
-	fmt.Println("VoteUpgradeProposal", out)
 
 	var resp sdk.TxResponse
 

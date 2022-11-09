@@ -29,6 +29,8 @@ var _ = Describe("Upgrade - Execute", func() {
 			By("getting the current block height and calculating the voting end height")
 			UPGRADE_HEIGHT, VOTING_END_HEIGHT, HEIGHT_ERROR = cli.CalculateUpgradeHeight(cli.VALIDATOR0, cli.CLI_BINARY_NAME)
 			Expect(HEIGHT_ERROR).To(BeNil())
+			fmt.Printf("Upgrade height: %d\n", UPGRADE_HEIGHT)
+			fmt.Printf("Voting end height: %d\n", VOTING_END_HEIGHT)
 		})
 
 		It("should submit a software upgrade proposal", func() {

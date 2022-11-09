@@ -21,6 +21,7 @@ func Query(container string, binary string, module, query string, queryArgs ...s
 }
 
 func QueryUpgradeProposal(container string) (govtypesv1beta1.Proposal, error) {
+	fmt.Println("Querying upgrade proposal from", container)
 	args := append([]string{
 		CLI_BINARY_NAME,
 		"query", "gov", "proposal", "1",
@@ -31,7 +32,7 @@ func QueryUpgradeProposal(container string) (govtypesv1beta1.Proposal, error) {
 		return govtypesv1beta1.Proposal{}, err
 	}
 
-	fmt.Println("QueryUpgradeProposal", out)
+	fmt.Println("Proposal", out)
 
 	var resp govtypesv1beta1.Proposal
 
