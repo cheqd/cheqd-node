@@ -1,39 +1,104 @@
 package migrations
 
 import (
-	"crypto/sha256"
+	// "crypto/sha256"
 
-	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
+	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
+	. "github.com/cheqd/cheqd-node/x/did/utils"
+
+	// didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
-	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
-	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+	// resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
+	// resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func MigrateCheqdV1(ctx sdk.Context, didkeeper didkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error {
-	// TODO: implement for cheqd module
-	return nil
-}
-
-
-// Resoure migrations
-
-func MigrateResourceV1(ctx sdk.Context, didkeeper didkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error {
+func MigrateCheqdV1(sctx sdk.Context, mctx MigrationContext) error {
 	// Resource Checksum migration
-	// err := MigrateResourceChecksumV1(ctx, didkeeper, resourceKeeper)
-	// if err != nil {
-	// 	return err
-	// }
+	err := MigrateDidV1(sctx, mctx)
+	if err != nil {
+		return err
+	}
 
-	// err = MigrateResourceVersionLinksV1(ctx, didkeeper, resourceKeeper)
-	// if err != nil {
-	// 	return err
-	// }
+	err = MigrateResourceV1(sctx, mctx)
+	if err != nil {
+		return err
+	}
 	// TODO: Add more migrations for resource module
 	return nil
 }
 
-// func MigrateResourceChecksumV1(ctx sdk.Context, didkeeper didkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error {
+// Migration for the whole did module
+func MigrateDidV1(sctx sdk.Context, mctx MigrationContext) error {
+	// 
+	err := MigrateDidProtobufV1(sctx, mctx)
+	if err != nil {
+		return err
+	}
+
+	err = MigrateDidUUIDV1(sctx, mctx)
+	if err != nil {
+		return err
+	}
+
+	err = MigrateDidIndyStyleIdsV1(sctx, mctx)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Resoure migrations
+func MigrateResourceV1(sctx sdk.Context, mctx MigrationContext) error {
+	// Resource Checksum migration
+	err := MigrateResourceChecksumV1(sctx, mctx)
+	if err != nil {
+		return err
+	}
+
+	// Resource Version Links migration
+	err = MigrateResourceVersionLinksV1(sctx, mctx)
+	if err != nil {
+		return err
+	}
+	// TODO: Add more migrations for resource module
+	return nil
+}
+
+// Migration because of protobuf changes 
+func MigrateDidProtobufV1(sctx sdk.Context, mctx MigrationContext) error {
+	var iterator sdk.Iterator
+	var stateValue didtypesv1.StateValue
+	// var err error
+
+	store := prefix.NewStore(
+		sctx.KVStore(sdk.NewKVStoreKey(didtypes.StoreKey)), 
+		StrBytes(didtypes.DidKey))
+	iterator = sdk.KVStorePrefixIterator(store, []byte{})
+
+	defer func(iterator sdk.Iterator) {
+		err := iterator.Close()
+		if err != nil {
+			panic(err.Error())
+		}
+	}(iterator)
+
+	for ; iterator.Valid(); iterator.Next() {
+		mctx.codec.MustUnmarshal(iterator.Value(), &stateValue)
+		didDoc, err := UnpackDataAsDid(stateValue)
+		if err != nil {
+			return err
+		}
+		
+		store.Delete(iterator.Key())
+	}
+
+	return nil
+}
+
+func MigrateResourceChecksumV1(sctx sdk.Context, mctx MigrationContext) error {
 // 	// TODO: Loading everything into memory is not the best approach.
 // 	// Resources can be large. I would suggest to use iterator instead and load resources one by one.
 
@@ -62,10 +127,10 @@ func MigrateResourceV1(ctx sdk.Context, didkeeper didkeeper.Keeper, resourceKeep
 
 // 		headerIterator.Next()
 // 	}
-// 	return nil
-// }
+	return nil
+}
 
-// func MigrateResourceVersionLinksV1(ctx sdk.Context, didkeeper didkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error {
+func MigrateResourceVersionLinksV1(sctx sdk.Context, mctx MigrationContext) error {
 // 	// TODO: We have to reset links first. Then we can use GetLastResourceVersionHeader
 // 	// but only because resources in state are corted by creation time.
 // 	// Also, we need to avoid loading all resources in memory.
@@ -106,10 +171,10 @@ func MigrateResourceV1(ctx sdk.Context, didkeeper didkeeper.Keeper, resourceKeep
 
 // 		headerIterator.Next()
 // 	}
-// 	return nil
-// }
+	return nil
+}
 
-// func MigrateCheqdUUIDV1(ctx sdk.Context, didkeeper didkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error {
+func MigrateDidUUIDV1(sctx sdk.Context, mctx MigrationContext) error {
 // 	var iterator sdk.Iterator
 // 	var stateValue didtypes.StateValue
 // 	var payload didtypes.MsgCreateDidPayload
@@ -142,6 +207,10 @@ func MigrateResourceV1(ctx sdk.Context, didkeeper didkeeper.Keeper, resourceKeep
 // 		}
 // 		didkeeper.SetDid(&ctx, &stateValue)
 // 	}
-// 	return nil
-// }
+	return nil
+}
+
+func MigrateDidIndyStyleIdsV1(sctx sdk.Context, mctx MigrationContext) error {
+	return nil
+}
 

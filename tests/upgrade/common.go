@@ -8,8 +8,8 @@ import (
 
 	integrationtestdata "github.com/cheqd/cheqd-node/tests/integration/testdata"
 	network "github.com/cheqd/cheqd-node/tests/upgrade/network"
-	cheqdcli "github.com/cheqd/cheqd-node/x/cheqd/client/cli"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	cheqdcli "github.com/cheqd/cheqd-node/x/did/client/cli"
+	cheqdtypes "github.com/cheqd/cheqd-node/x/did/types/v1"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	"github.com/google/uuid"
 	"github.com/multiformats/go-multibase"

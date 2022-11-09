@@ -3,7 +3,7 @@ package cli
 import (
 	"encoding/base64"
 
-	cheqdcli "github.com/cheqd/cheqd-node/x/cheqd/client/cli"
+	cheqdcli "github.com/cheqd/cheqd-node/x/did/client/cli"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

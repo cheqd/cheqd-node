@@ -618,27 +618,6 @@ func New(
 	app.configurator = module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
 	app.mm.RegisterServices(app.configurator)
 
-	// Init Migrators
-	didtypes.StoreKey
-	cheqdMigrator := migrations.NewCheqdMigrator(app.appCodec, app.didKeeper, app.resourceKeeper, migrations.MigrateCheqdV1)
-
-	// Register upgrade store migrations per module
-	if err := app.configurator.RegisterMigration(
-		didtypes.ModuleName,
-		app.mm.GetVersionMap()[didtypes.ModuleName],
-		cheqdMigrator.Migrate,
-	); err != nil {
-		panic(err)
-	}
-
-	if err := app.configurator.RegisterMigration(
-		resourcetypes.ModuleName,
-		app.mm.GetVersionMap()[resourcetypes.ModuleName],
-		resourceMigrator.Migrate,
-	); err != nil {
-		panic(err)
-	}
-
 	// initialize stores
 	app.MountKVStores(keys)
 	app.MountTransientStores(tkeys)
@@ -661,22 +640,21 @@ func New(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 
+	// Init Migrators
+	cheqdMigrator := migrations.NewCheqdMigrator(app.appCodec, app.didKeeper, app.resourceKeeper, migrations.MigrateCheqdV1)
+
 	// Upgrade handler for the next release
 	app.UpgradeKeeper.SetUpgradeHandler(UpgradeName,
 		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 			ctx.Logger().Info("Handler for upgrade plan: " + UpgradeName)
 
+			// Migrate Cheqd data
+			cheqdMigrator.Migrate(ctx)
+
 			// ibc v3 -> v4 migration
 			// transfer module consensus version has been bumped to 2
 			return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 		})
-
-	// Test upgrade handler
-	app.UpgradeKeeper.SetUpgradeHandler(CosmovisorTestUpgrade, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("Handler for upgrade plan: " + CosmovisorTestUpgrade)
-
-		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
-	})
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {

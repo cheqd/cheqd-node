@@ -1,8 +1,8 @@
 package migration
 
 import (
-	cheqdtestssetup "github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	cheqdtestssetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
+	cheqdtypes "github.com/cheqd/cheqd-node/x/did/types/v1"
 	resourcetestssetup "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"

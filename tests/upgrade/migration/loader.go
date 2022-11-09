@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"os"
 
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	cheqdtypes "github.com/cheqd/cheqd-node/x/did/types/v1"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 )
 

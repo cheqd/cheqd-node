@@ -1,6 +1,9 @@
 package types
 
-import "github.com/cheqd/cheqd-node/x/did/utils"
+import (
+	"github.com/cheqd/cheqd-node/x/did/utils"
+	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
+)
 
 var _ IdentityMsg = &MsgCreateDidDocPayload{}
 
@@ -67,8 +70,8 @@ func (msg *MsgCreateDidDocPayload) Normalize() {
 
 // Creator
 
-func MsgCreateDidPayloadFromDid(did *Did) MsgCreateDidPayload {
-	return MsgCreateDidPayload{
+func MsgCreateDidPayloadFromDid(did *didtypesv1.Did) didtypesv1.MsgCreateDidPayload {
+	return didtypesv1.MsgCreateDidPayload{
 		Context:              did.Context,
 		Id:                   did.Id,
 		Controller:           did.Controller,

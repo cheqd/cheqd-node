@@ -24,10 +24,6 @@ func NewKeeper(cdc codec.BinaryCodec, storeKey storetypes.StoreKey) *Keeper {
 	}
 }
 
-func (k Keeper) MustUnmarshal(value []byte, stateValue *types.StateValue) {
-	k.cdc.MustUnmarshal(value, stateValue)
-}
-
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }

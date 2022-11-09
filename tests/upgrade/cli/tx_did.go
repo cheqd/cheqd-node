@@ -4,8 +4,8 @@ import (
 	"encoding/base64"
 
 	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
-	cheqdcli "github.com/cheqd/cheqd-node/x/cheqd/client/cli"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	cheqdcli "github.com/cheqd/cheqd-node/x/did/client/cli"
+	cheqdtypes "github.com/cheqd/cheqd-node/x/did/types/v1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

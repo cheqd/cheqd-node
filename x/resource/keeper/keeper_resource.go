@@ -10,7 +10,7 @@ import (
 
 // GetResourceCount get the total number of resource
 func (k Keeper) GetResourceCount(ctx *sdk.Context) uint64 {
-	store := ctx.KVStore(k.StoreKey)
+	store := ctx.KVStore(k.storeKey)
 	byteKey := types.KeyPrefix(types.ResourceCountKey)
 	bz := store.Get(byteKey)
 
@@ -31,7 +31,7 @@ func (k Keeper) GetResourceCount(ctx *sdk.Context) uint64 {
 
 // SetResourceCount set the total number of resource
 func (k Keeper) SetResourceCount(ctx *sdk.Context, count uint64) {
-	store := ctx.KVStore(k.StoreKey)
+	store := ctx.KVStore(k.storeKey)
 	byteKey := types.KeyPrefix(types.ResourceCountKey)
 
 	// Set bytes
@@ -46,7 +46,7 @@ func (k Keeper) SetResource(ctx *sdk.Context, resource *types.ResourceWithMetada
 		k.SetResourceCount(ctx, count+1)
 	}
 
-	store := ctx.KVStore(k.StoreKey)
+	store := ctx.KVStore(k.storeKey)
 
 	// Set metadata
 	metadataKey := GetResourceMetadataKeyBytes(resource.Metadata.CollectionId, resource.Metadata.Id)
@@ -66,7 +66,7 @@ func (k Keeper) GetResource(ctx *sdk.Context, collectionId string, id string) (t
 		return types.ResourceWithMetadata{}, sdkerrors.ErrNotFound.Wrap("resource " + collectionId + ":" + id)
 	}
 
-	store := ctx.KVStore(k.StoreKey)
+	store := ctx.KVStore(k.storeKey)
 
 	metadataBytes := store.Get(GetResourceMetadataKeyBytes(collectionId, id))
 	var metadata types.Metadata
@@ -88,9 +88,7 @@ func (k Keeper) GetResourceMetadata(ctx *sdk.Context, collectionId string, id st
 		return types.Metadata{}, sdkerrors.ErrNotFound.Wrap("resource " + collectionId + ":" + id)
 	}
 
-func (k Keeper) GetAllResourceVersions(ctx *sdk.Context, collectionId, name, resourceType string) []*types.ResourceHeader {
-	store := ctx.KVStore(k.StoreKey)
-	iterator := sdk.KVStorePrefixIterator(store, GetResourceHeaderCollectionPrefixBytes(collectionId))
+	store := ctx.KVStore(k.storeKey)
 
 	metadataBytes := store.Get(GetResourceMetadataKeyBytes(collectionId, id))
 	var metadata types.Metadata
@@ -108,16 +106,16 @@ func (k Keeper) HasResource(ctx *sdk.Context, collectionId string, id string) bo
 }
 
 func (k Keeper) GetResourceCollection(ctx *sdk.Context, collectionId string) []*types.Metadata {
-	store := ctx.KVStore(k.StoreKey)
+	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, GetResourceMetadataCollectionPrefixBytes(collectionId))
 
 	var resources []*types.Metadata
 
-	defer CloseIteratorOrPanic(iterator)
+	defer closeIteratorOrPanic(iterator)
 
 	for ; iterator.Valid(); iterator.Next() {
 		var val types.Metadata
-		k.Cdc.MustUnmarshal(iterator.Value(), &val)
+		k.cdc.MustUnmarshal(iterator.Value(), &val)
 		resources = append(resources, &val)
 
 	}
@@ -126,13 +124,13 @@ func (k Keeper) GetResourceCollection(ctx *sdk.Context, collectionId string) []*
 }
 
 func (k Keeper) GetLastResourceVersionMetadata(ctx *sdk.Context, collectionId, name, resourceType string) (types.Metadata, bool) {
-	iterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.StoreKey), GetResourceMetadataCollectionPrefixBytes(collectionId))
+	iterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.storeKey), GetResourceMetadataCollectionPrefixBytes(collectionId))
 
-	defer CloseIteratorOrPanic(iterator)
+	defer closeIteratorOrPanic(iterator)
 
 	for ; iterator.Valid(); iterator.Next() {
 		var metadata types.Metadata
-		k.Cdc.MustUnmarshal(iterator.Value(), &metadata)
+		k.cdc.MustUnmarshal(iterator.Value(), &metadata)
 
 		if metadata.Name == name && metadata.ResourceType == resourceType && metadata.NextVersionId == "" {
 			return metadata, true
@@ -148,11 +146,11 @@ func (k Keeper) UpdateResourceMetadata(ctx *sdk.Context, metadata *types.Metadat
 		return sdkerrors.ErrNotFound.Wrap("resource " + metadata.CollectionId + ":" + metadata.Id)
 	}
 
-	store := ctx.KVStore(k.StoreKey)
+	store := ctx.KVStore(k.storeKey)
 
 	// Set metadata
 	metadataKey := GetResourceMetadataKeyBytes(metadata.CollectionId, metadata.Id)
-	metadataBytes := k.Cdc.MustMarshal(metadata)
+	metadataBytes := k.cdc.MustMarshal(metadata)
 	store.Set(metadataKey, metadataBytes)
 
 	return nil
@@ -161,8 +159,8 @@ func (k Keeper) UpdateResourceMetadata(ctx *sdk.Context, metadata *types.Metadat
 // GetAllResources returns all resources as a list
 // Loads everything in memory. Use only for genesis export!
 func (k Keeper) GetAllResources(ctx *sdk.Context) (list []types.ResourceWithMetadata) {
-	metadataIterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.StoreKey), types.KeyPrefix(types.ResourceMetadataKey))
-	dataIterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.StoreKey), types.KeyPrefix(types.ResourceDataKey))
+	metadataIterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.storeKey), types.KeyPrefix(types.ResourceMetadataKey))
+	dataIterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.storeKey), types.KeyPrefix(types.ResourceDataKey))
 
 	defer closeIteratorOrPanic(metadataIterator)
 	defer closeIteratorOrPanic(dataIterator)
@@ -173,7 +171,7 @@ func (k Keeper) GetAllResources(ctx *sdk.Context) (list []types.ResourceWithMeta
 		}
 
 		var metadata types.Metadata
-		k.Cdc.MustUnmarshal(metadataIterator.Value(), &metadata)
+		k.cdc.MustUnmarshal(metadataIterator.Value(), &metadata)
 
 		data := types.Resource{Data: dataIterator.Value()}
 
@@ -187,14 +185,6 @@ func (k Keeper) GetAllResources(ctx *sdk.Context) (list []types.ResourceWithMeta
 	}
 
 	return
-}
-
-func (k Keeper) GetHeaderIterator(ctx *sdk.Context) sdk.Iterator {
-	return sdk.KVStorePrefixIterator(ctx.KVStore(k.StoreKey), types.KeyPrefix(types.ResourceHeaderKey))
-}
-
-func (k Keeper) GetDataIterator(ctx *sdk.Context) sdk.Iterator {
-	return sdk.KVStorePrefixIterator(ctx.KVStore(k.StoreKey), types.KeyPrefix(types.ResourceDataKey))
 }
 
 // GetResourceMetadataKeyBytes returns the byte representation of resource key
@@ -212,7 +202,7 @@ func GetResourceDataKeyBytes(collectionId string, id string) []byte {
 	return []byte(types.ResourceDataKey + collectionId + ":" + id)
 }
 
-func CloseIteratorOrPanic(iterator sdk.Iterator) {
+func closeIteratorOrPanic(iterator sdk.Iterator) {
 	err := iterator.Close()
 	if err != nil {
 		panic(err.Error())

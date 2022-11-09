@@ -2,7 +2,7 @@ package cli
 
 import (
 	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	cheqdtypes "github.com/cheqd/cheqd-node/x/did/types/v1"
 )
 
 func QueryDid(did string, container string) (cheqdtypes.QueryGetDidResponse, error) {
