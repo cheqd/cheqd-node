@@ -125,7 +125,7 @@ var _ = Describe("Upgrade - Execute", func() {
 
 		It("should wait for the upgrade height plus 2 blocks to be reached", func() {
 			By("pinging the node status until the upgrade height plus 2 blocks is reached")
-			err := cli.WaitForChainHeight(cli.VALIDATOR0, cli.CLI_BINARY_NAME, UPGRADE_HEIGHT+2, cli.VOTING_PERIOD*20)
+			err := cli.WaitForChainHeight(cli.VALIDATOR0, cli.CLI_BINARY_NAME, UPGRADE_HEIGHT+2, cli.VOTING_PERIOD*6)
 			Expect(err).To(BeNil())
 		})
 
