@@ -2,7 +2,7 @@ syntax = "proto3";
 package cheqdid.cheqdnode.cheqd.v1;
 import "google/protobuf/any.proto";
 
-option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
+option go_package = "github.com/cheqd/cheqd-node/x/did/types/v1";
 
 message StateValue {
   google.protobuf.Any data = 1;

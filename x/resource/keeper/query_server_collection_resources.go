@@ -3,8 +3,8 @@ package keeper
 import (
 	"context"
 
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
-	cheqdutils "github.com/cheqd/cheqd-node/x/cheqd/utils"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"
@@ -21,10 +21,10 @@ func (m queryServer) CollectionResources(c context.Context, req *types.QueryGetC
 	req.Normalize()
 
 	// Validate corresponding DIDDoc exists
-	namespace := m.cheqdKeeper.GetDidNamespace(&ctx)
-	did := cheqdutils.JoinDID(cheqdtypes.DidMethod, namespace, req.CollectionId)
-	if !m.cheqdKeeper.HasDid(&ctx, did) {
-		return nil, cheqdtypes.ErrDidDocNotFound.Wrap(did)
+	namespace := m.didKeeper.GetDidNamespace(&ctx)
+	did := didutils.JoinDID(didtypes.DidMethod, namespace, req.CollectionId)
+	if !m.didKeeper.HasDidDoc(&ctx, did) {
+		return nil, didtypes.ErrDidDocNotFound.Wrap(did)
 	}
 
 	// Get all resources

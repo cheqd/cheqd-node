@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package cheqd.resource.v2;
 
-option go_package = "github.com/cheqd/cheqd-node/x/resource/types/v2";
+option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
 
 message Resource {
   bytes data = 1;

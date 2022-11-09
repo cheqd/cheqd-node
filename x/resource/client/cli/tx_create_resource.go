@@ -3,7 +3,7 @@ package cli
 import (
 	"os"
 
-	cheqdcli "github.com/cheqd/cheqd-node/x/cheqd/client/cli"
+	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -12,16 +12,17 @@ import (
 )
 
 const (
-	FlagCollectionId = "collection-id"
-	FlagResourceId   = "resource-id"
-	FlagResourceName = "resource-name"
-	FlagResourceType = "resource-type"
-	FlagResourceFile = "resource-file"
+	FlagCollectionId    = "collection-id"
+	FlagResourceId      = "resource-id"
+	FlagResourceName    = "resource-name"
+	FlagResourceVersion = "resource-version"
+	FlagResourceType    = "resource-type"
+	FlagResourceFile    = "resource-file"
 )
 
 func CmdCreateResource() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-resource --collection-id [collection-id] --resource-id [resource-id] --resource-name [resource-name]--resource-type [resource-type] --resource-file [path/to/resource/file] [ver-method-id-1] [priv-key-1] [ver-method-id-N] [priv-key-N] ...",
+		Use:   "create-resource --collection-id [collection-id] --resource-id [resource-id] --resource-name [resource-name] --resource-version [resource-version] --resource-type [resource-type] --resource-file [path/to/resource/file] [ver-method-id-1] [priv-key-1] [ver-method-id-N] [priv-key-N] ...",
 		Short: "Creates a new Resource.",
 		Long: "Creates a new Resource. " +
 			"[ver-method-id-N] is the DID fragment that points to the public part of the key in the ledger for the signature N." +
@@ -50,6 +51,11 @@ func CmdCreateResource() *cobra.Command {
 				return err
 			}
 
+			resourceVersion, err := cmd.Flags().GetString(FlagResourceVersion)
+			if err != nil {
+				return err
+			}
+
 			resourceType, err := cmd.Flags().GetString(FlagResourceType)
 			if err != nil {
 				return err
@@ -70,19 +76,20 @@ func CmdCreateResource() *cobra.Command {
 				CollectionId: collectionId,
 				Id:           resourceId,
 				Name:         resourceName,
+				Version:      resourceVersion,
 				ResourceType: resourceType,
 				Data:         data,
 			}
 
 			// Read signatures
-			signInputs, err := cheqdcli.GetSignInputs(clientCtx, args)
+			signInputs, err := didcli.GetSignInputs(clientCtx, args)
 			if err != nil {
 				return err
 			}
 
 			// Build identity message
 			signBytes := payload.GetSignBytes()
-			identitySignatures := cheqdcli.SignWithSignInputs(signBytes, signInputs)
+			identitySignatures := didcli.SignWithSignInputs(signBytes, signInputs)
 
 			msg := types.MsgCreateResource{
 				Payload:    &payload,
@@ -90,7 +97,7 @@ func CmdCreateResource() *cobra.Command {
 			}
 
 			// Set fee-payer if not set
-			err = cheqdcli.SetFeePayerFromSigner(&clientCtx)
+			err = didcli.SetFeePayerFromSigner(&clientCtx)
 			if err != nil {
 				return err
 			}
@@ -111,6 +118,10 @@ func CmdCreateResource() *cobra.Command {
 
 	cmd.Flags().String(FlagResourceName, "", "Resource Name (a distinct DID fragment in `service` block, e.g., did:cheqd:mainnet:...#SchemaName where resource name will be 'SchemaName'")
 	err = cobra.MarkFlagRequired(cmd.Flags(), FlagResourceName)
+	panicIfErr(err)
+
+	cmd.Flags().String(FlagResourceVersion, "", "Resource Version (any string)")
+	err = cobra.MarkFlagRequired(cmd.Flags(), FlagResourceVersion)
 	panicIfErr(err)
 
 	cmd.Flags().String(FlagResourceType, "", "Resource Type (same as `type` within a DID Document `service` block)")
