@@ -6,14 +6,13 @@ import (
 
 	"github.com/cheqd/cheqd-node/x/did/types"
 	. "github.com/cheqd/cheqd-node/x/did/utils"
-	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 // GetDidCount get the total number of did
 func (k Keeper) GetDidDocCount(ctx *sdk.Context) uint64 {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), StrBytes(types.DidDocCountKey))
+	store := ctx.KVStore(k.storeKey)
 
 	key := StrBytes(types.DidDocCountKey)
 	valueBytes := store.Get(key)
@@ -35,7 +34,7 @@ func (k Keeper) GetDidDocCount(ctx *sdk.Context) uint64 {
 
 // SetDidCount set the total number of did
 func (k Keeper) SetDidDocCount(ctx *sdk.Context, count uint64) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), StrBytes(types.DidDocCountKey))
+	store := ctx.KVStore(k.storeKey)
 
 	key := StrBytes(types.DidDocCountKey)
 	valueBytes := []byte(strconv.FormatUint(count, 10))

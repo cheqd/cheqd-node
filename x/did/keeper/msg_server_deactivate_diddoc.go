@@ -58,7 +58,7 @@ func (k MsgServer) DeactivateDidDoc(goCtx context.Context, msg *types.MsgDeactiv
 	didDoc.Metadata.Deactivated = true
 	didDoc.Metadata.Update(ctx, msg.Payload.VersionId)
 
-	// Apply changes. We don't create new version on deactivation, we just update metadata
+	// Apply changes. We create a new version on deactivation to track deactivation time
 	err = k.AddNewDidDocVersion(&ctx, &didDoc)
 	if err != nil {
 		return nil, types.ErrInternal.Wrapf(err.Error())
