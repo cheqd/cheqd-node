@@ -33,7 +33,7 @@ func Tx(container string, binary string, module, tx, from string, txArgs ...stri
 
 	// Skip 'gas estimate: xxx' string
 	perLineOutput := strings.Split(output, "\n")
-	if len(perLineOutput) > 2 {
+	if len(perLineOutput) > 3 {
 		output = TrimExtraLineOffset(output, 2)
 	} else {
 		output = TrimExtraLineOffset(output, 1)
