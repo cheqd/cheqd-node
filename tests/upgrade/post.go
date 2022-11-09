@@ -87,7 +87,7 @@ func Post() error {
 	By("Ensuring the UpdateDid Tx is successful for a new DID")
 	PostRotatedKeysDidDoc, PostRotatedKeysSignInputs, PostRotatedKeysErr = GenerateRotatedKeysDidDocWithSignInputs(PostDidDoc, PostSignInputs, res.Metadata.VersionId)
 	Expect(PostRotatedKeysErr).To(BeNil())
-	resp, err = cli.UpdateDid(PostRotatedKeysDidDoc, PostSignInputs, cli.VALIDATOR0)
+	resp, err = cli.UpdateDid(PostRotatedKeysDidDoc, PostRotatedKeysSignInputs, cli.VALIDATOR0)
 	Expect(err).To(BeNil())
 	Expect(resp.Code).To(BeEquivalentTo(0))
 
