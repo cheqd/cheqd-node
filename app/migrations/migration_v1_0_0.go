@@ -1,15 +1,14 @@
 package migrations
 
 import (
-	// "crypto/sha256"
-
-	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
+	"crypto/sha256"
 	. "github.com/cheqd/cheqd-node/x/did/utils"
 
-	// didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
-	// resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
+	didtypesV1 "github.com/cheqd/cheqd-node/x/did/types/v1"
+
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+	resourcetypesV1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -83,11 +82,11 @@ func MigrateDidProtobufV1(sctx sdk.Context, mctx MigrationContext) error {
 
 func MigrateDidProtobufDIDocV1(sctx sdk.Context, mctx MigrationContext) error {
 	var iterator sdk.Iterator
-	var stateValue didtypesv1.StateValue
+	var stateValue didtypesV1.StateValue
 	// var err error
 
 	store := prefix.NewStore(
-		sctx.KVStore(sdk.NewKVStoreKey(didtypes.StoreKey)), 
+		sctx.KVStore(sdk.NewKVStoreKey(didtypesV1.StoreKey)), 
 		StrBytes(didtypes.DidKey))
 	iterator = sdk.KVStorePrefixIterator(store, []byte{})
 
@@ -100,79 +99,118 @@ func MigrateDidProtobufDIDocV1(sctx sdk.Context, mctx MigrationContext) error {
 		if err != nil {
 			return err
 		}
-		// Set new DID Doc
-		mctx.didKeeper.SetDidDoc(&sctx, &newDidDocWithMetadata)
 		
 		// Remove old DID Doc
 		store.Delete(iterator.Key())
+
+		// Set new DID Doc
+		mctx.didKeeper.SetDidDoc(&sctx, &newDidDocWithMetadata)
 	}
 
 	return nil
 }
 
 func MigrateDidProtobufResourceV1(sctx sdk.Context, mctx MigrationContext) error {
-	metadataIterator := sdk.KVStorePrefixIterator(
-		sctx.KVStore(sdk.NewKVStoreKey(resourcetypes.StoreKey)), 
-		resourcetypes.KeyPrefix(resourcetypes.ResourceMetadataKey))
 
-	closeIteratorOrPanic(metadataIterator)
+	headerStore := sctx.KVStore(sdk.NewKVStoreKey(resourcetypesV1.StoreKey))
+	dataStore := sctx.KVStore(sdk.NewKVStoreKey(resourcetypesV1.StoreKey))
+	headerIterator := sdk.KVStorePrefixIterator(
+		headerStore, 
+		resourcetypes.KeyPrefix(resourcetypesV1.ResourceHeaderKey))
+	dataIterator := sdk.KVStorePrefixIterator(
+		dataStore, 
+		resourcetypes.KeyPrefix(resourcetypesV1.ResourceDataKey))
+	
+	closeIteratorOrPanic(headerIterator)
+	closeIteratorOrPanic(dataIterator)
 
-	for ; metadataIterator.Valid(); metadataIterator.Next() {
+	for headerIterator.Valid() {
+		if !dataIterator.Valid() {
+			panic("number of headers and data don't match")
+		}
 
-		var metadata resourcetypes.Metadata
-		mctx.codec.MustUnmarshal(metadataIterator.Value(), &metadata)
+		var headerV1 resourcetypesV1.ResourceHeader
+		var dataV1 []byte
+		
+		mctx.codec.MustUnmarshal(headerIterator.Value(), &headerV1)
+		dataV1 = dataIterator.Value()
 
-		new_metadata := resourcetypes.Metadata{
-			CollectionId: 		metadata.CollectionId,
-			Id: 				metadata.Id,
-			Name: 				metadata.Name,
-			Version: 			metadata.Version,
-			ResourceType: 		metadata.ResourceType,
-			AlsoKnownAs:		metadata.AlsoKnownAs,
-			MediaType: 			metadata.MediaType,
-			Created: 			metadata.Created,
-			Checksum: 			metadata.Checksum,
-			PreviousVersionId: 	metadata.PreviousVersionId,
-			NextVersionId: 		metadata.NextVersionId,
+		newMetadata := resourcetypes.Metadata{
+
+			CollectionId: 		headerV1.CollectionId,
+			Id: 				headerV1.Id,
+			Name: 				headerV1.Name,
+			// ToDo: Fields were not placed in previous one
+			Version: 			"",
+			ResourceType: 		headerV1.ResourceType,
+			// ToDo: Fields were not placed in previous one
+			AlsoKnownAs:		[]string{},
+			MediaType: 			headerV1.MediaType,
+			Created: 			headerV1.Created,
+			Checksum: 			headerV1.Checksum,
+			PreviousVersionId: 	headerV1.PreviousVersionId,
+			NextVersionId: 		headerV1.NextVersionId,
 
 		}
 
-		mctx.resourceKeeper.UpdateResourceMetadata(&sctx, &new_metadata)
-	}
+		resourceWithMetadata := resourcetypes.ResourceWithMetadata{
+			Metadata: &newMetadata,
+			Resource: &resourcetypes.Resource{
+				Data: dataV1,
+			},
+		}
 
+		// Remove old resource data and header
+		headerStore.Delete(headerIterator.Key())
+		dataStore.Delete(dataIterator.Key())
+
+		// Write new resource
+		mctx.resourceKeeper.SetResource(&sctx, &resourceWithMetadata)
+
+		// Iterate next
+		headerIterator.Next()
+		dataIterator.Next()
+	}
 	return nil
-	
 }
 
 func MigrateResourceChecksumV1(sctx sdk.Context, mctx MigrationContext) error {
-// 	// TODO: Loading everything into memory is not the best approach.
-// 	// Resources can be large. I would suggest to use iterator instead and load resources one by one.
+	metadataStore := sctx.KVStore(sdk.NewKVStoreKey(resourcetypesV1.StoreKey))
+	dataStore := sctx.KVStore(sdk.NewKVStoreKey(resourcetypesV1.StoreKey))
+	metadataIterator := sdk.KVStorePrefixIterator(
+		metadataStore, 
+		resourcetypes.KeyPrefix(resourcetypesV1.ResourceHeaderKey))
+	dataIterator := sdk.KVStorePrefixIterator(
+		dataStore, 
+		resourcetypes.KeyPrefix(resourcetypesV1.ResourceDataKey))
+	
 
-// 	headerIterator := resourceKeeper.GetHeaderIterator(&ctx)
-// 	store := ctx.KVStore(resourceKeeper.StoreKey)
+	closeIteratorOrPanic(metadataIterator)
+	closeIteratorOrPanic(dataIterator)
 
-// 	defer resourcekeeper.CloseIteratorOrPanic(headerIterator)
+	for metadataIterator.Valid() {
+		if !dataIterator.Valid() {
+			panic("number of headers and data don't match")
+		}
 
-// 	for headerIterator.Valid() {
-// 		// Vars
-// 		var data_val []byte
-// 		var header_val resourcetypes.ResourceHeader
+		var metadata resourcetypes.Metadata
+		var data []byte
 
-// 		// Get the header
-// 		resourceKeeper.Cdc.MustUnmarshal(headerIterator.Value(), &header_val)
+		// Get metadata and data from storage
+		mctx.codec.MustUnmarshal(metadataIterator.Value(), &metadata)
+		data = dataIterator.Value()
 
-// 		data_val = store.Get(resourcekeeper.GetResourceDataKeyBytes(header_val.CollectionId, header_val.Id))
-// 		checksum := sha256.Sum256(data_val)
-// 		header_val.Checksum = checksum[:]
+		// Fix checksum
+		checksum := sha256.Sum256(data)
+		metadata.Checksum = checksum[:]
 
-// 		// Update header
-// 		err := resourceKeeper.UpdateResourceHeader(&ctx, &header_val)
-// 		if err != nil {
-// 			return err
-// 		}
+		// Update HeaderInfo
+		mctx.resourceKeeper.UpdateResourceMetadata(&sctx, &metadata)
 
-// 		headerIterator.Next()
-// 	}
+		// Iterate next
+		metadataIterator.Next()
+		dataIterator.Next()
+	}
 	return nil
 }
 
