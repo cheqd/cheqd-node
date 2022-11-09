@@ -33,7 +33,7 @@ func Tx(container string, binary string, module, tx, from string, txArgs ...stri
 
 	// Skip 'gas estimate: xxx' string
 	perLineOutput := strings.Split(output, "\n")
-	output = strings.Join(perLineOutput[len(perLineOutput)-1:], "\n")
+	output = perLineOutput[len(perLineOutput)-1]
 
 	var resp sdk.TxResponse
 
