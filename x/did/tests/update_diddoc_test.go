@@ -46,7 +46,7 @@ var _ = Describe("DIDDoc update", func() {
 			}
 		})
 
-		It("Works with DIDDoc controllers signature", func() {
+		It("Works with DIDDoc controller signatures", func() {
 			signatures := []SignInput{alice.SignInput}
 
 			_, err := setup.UpdateDidDoc(msg, signatures)
@@ -58,7 +58,7 @@ var _ = Describe("DIDDoc update", func() {
 			Expect(msg.ToDidDoc()).To(Equal(*created.Value.DidDoc))
 		})
 
-		It("Creates a new version in case of success", func() {
+		It("Creates a new DIDDoc version in case of success", func() {
 			signatures := []SignInput{alice.SignInput}
 
 			_, err := setup.UpdateDidDoc(msg, signatures)
@@ -91,7 +91,7 @@ var _ = Describe("DIDDoc update", func() {
 			Expect(versions.Versions).To(ContainElement(v2.Value.Metadata))
 		})
 
-		It("Doesn't work without controllers signatures", func() {
+		It("Doesn't work without controller signatures", func() {
 			signatures := []SignInput{}
 
 			_, err := setup.UpdateDidDoc(msg, signatures)
@@ -99,7 +99,7 @@ var _ = Describe("DIDDoc update", func() {
 		})
 	})
 
-	Describe("DIDDoc: replacing controller", func() {
+	Describe("DIDDoc: Replacing controller", func() {
 		var alice CreatedDidDocInfo
 		var bob CreatedDidDocInfo
 		var msg *types.MsgUpdateDidDocPayload
@@ -158,7 +158,7 @@ var _ = Describe("DIDDoc update", func() {
 		})
 	})
 
-	Describe("DIDDoc: adding controller", func() {
+	Describe("DIDDoc: Adding controller", func() {
 		var alice CreatedDidDocInfo
 		var bob CreatedDidDocInfo
 		var msg *types.MsgUpdateDidDocPayload
@@ -217,7 +217,7 @@ var _ = Describe("DIDDoc update", func() {
 		})
 	})
 
-	Describe("DIDDoc: Keeping VM with controller different then subject untouched during update", func() {
+	Describe("DIDDoc: Keep verification method with controller different than subject untouched during update", func() {
 		var alice CreatedDidDocInfo
 		var bob CreatedDidDocInfo
 		var msg *types.MsgUpdateDidDocPayload
@@ -238,13 +238,13 @@ var _ = Describe("DIDDoc update", func() {
 					},
 				},
 				Authentication:    []string{alice.KeyId},
-				AssertionMethod:   []string{alice.KeyId}, // Adding new VM
+				AssertionMethod:   []string{alice.KeyId}, // Adding new verification method
 				PreviousVersionId: alice.VersionId,
 				VersionId:         uuid.NewString(),
 			}
 		})
 
-		It("Doesn't require VM's controler signature", func() {
+		It("Doesn't require verification method controller signature", func() {
 			signatures := []SignInput{
 				bob.SignInput,
 			}
@@ -282,7 +282,7 @@ var _ = Describe("DIDDoc update", func() {
 			}
 		})
 
-		It("Works with two signatures", func() {
+		It("Works with old and new signatures", func() {
 			signatures := []SignInput{
 				did.SignInput, // Old signature
 				{
@@ -343,7 +343,7 @@ var _ = Describe("DIDDoc update", func() {
 			}
 		})
 
-		It("Works with old and new controller signature", func() {
+		It("Works with old and new controller signatures", func() {
 			signatures := []SignInput{alice.SignInput, bob.SignInput}
 
 			_, err := setup.UpdateDidDoc(msg, signatures)
@@ -370,7 +370,7 @@ var _ = Describe("DIDDoc update", func() {
 		})
 	})
 
-	Describe("Verification method: id update", func() {
+	Describe("Verification method: ID update", func() {
 		var alice CreatedDidDocInfo
 		var newKeyId string
 		var msg *types.MsgUpdateDidDocPayload
@@ -395,14 +395,14 @@ var _ = Describe("DIDDoc update", func() {
 			}
 		})
 
-		It("Doesn't work without new VM signature", func() {
+		It("Doesn't work without new verification method signature", func() {
 			signatures := []SignInput{alice.SignInput}
 
 			_, err := setup.UpdateDidDoc(msg, signatures)
 			Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("there should be at least one valid signature by %s (new version): invalid signature detected", alice.Did)))
 		})
 
-		It("Doesn't work without old VM signature", func() {
+		It("Doesn't work without old verification method signature", func() {
 			signatures := []SignInput{
 				{
 					VerificationMethodId: newKeyId,
@@ -414,7 +414,7 @@ var _ = Describe("DIDDoc update", func() {
 			Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("there should be at least one valid signature by %s (old version): invalid signature detected", alice.Did)))
 		})
 
-		It("Works with new and old VM signature", func() {
+		It("Works with new and old verification method signature", func() {
 			signatures := []SignInput{
 				{
 					VerificationMethodId: newKeyId,
@@ -467,7 +467,7 @@ var _ = Describe("DIDDoc update", func() {
 			}
 		})
 
-		It("Works with only old VM signature", func() {
+		It("Works with only old verification method signature", func() {
 			signatures := []SignInput{
 				alice.SignInput,
 			}
@@ -481,7 +481,7 @@ var _ = Describe("DIDDoc update", func() {
 			Expect(*created).ToNot(Equal(msg.ToDidDoc()))
 		})
 
-		It("Doesn't work with only new VM signature", func() {
+		It("Doesn't work with only new verification method signature", func() {
 			signatures := []SignInput{
 				{
 					VerificationMethodId: newKeyId,
@@ -494,7 +494,7 @@ var _ = Describe("DIDDoc update", func() {
 		})
 	})
 
-	Describe("Verification method: removing existing one", func() {
+	Describe("Verification method: removing existing", func() {
 		var alice CreatedDidDocInfo
 		var secondKeyId string
 		var secondKey KeyPair
@@ -551,7 +551,7 @@ var _ = Describe("DIDDoc update", func() {
 			}
 		})
 
-		It("Works with only first VM signature", func() {
+		It("Works with only first verification method signature", func() {
 			signatures := []SignInput{
 				alice.SignInput,
 			}
@@ -565,7 +565,7 @@ var _ = Describe("DIDDoc update", func() {
 			Expect(*created).ToNot(Equal(msg.ToDidDoc()))
 		})
 
-		It("Doesn't work with only second VM signature (which is get deleted)", func() {
+		It("Doesn't work with only second verification method signature (which will be deleted)", func() {
 			signatures := []SignInput{secondSignInput}
 
 			_, err := setup.UpdateDidDoc(msg, signatures)
