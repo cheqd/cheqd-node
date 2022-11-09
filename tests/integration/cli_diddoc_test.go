@@ -42,6 +42,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 				},
 			},
 			Authentication: []string{keyId},
+			VersionId:      uuid.NewString(),
 		}
 
 		signInputs := []cli_types.SignInput{
@@ -73,8 +74,9 @@ var _ = Describe("cheqd cli - positive did", func() {
 					VerificationMaterial: "{\"publicKeyMultibase\": \"" + string(newPubKeyMultibase58) + "\"}",
 				},
 			},
-			Authentication: []string{keyId},
-			VersionId:      res.TxHash,
+			Authentication:    []string{keyId},
+			PreviousVersionId: payload.VersionId,
+			VersionId:         uuid.NewString(),
 		}
 
 		signInputs2 := []cli_types.SignInput{

@@ -42,7 +42,7 @@ func (k MsgServer) UpdateDidDoc(goCtx context.Context, msg *types.MsgUpdateDidDo
 
 	// Check version id
 	if msg.Payload.PreviousVersionId != existingDidDocWithMetadata.Metadata.VersionId {
-		return nil, types.ErrUnexpectedDidVersion.Wrapf("got: %s, must be: %s", msg.Payload.VersionId, existingDidDocWithMetadata.Metadata.VersionId)
+		return nil, types.ErrUnexpectedDidVersion.Wrapf("got: %s, must be: %s", msg.Payload.PreviousVersionId, existingDidDocWithMetadata.Metadata.VersionId)
 	}
 
 	// Construct the new version of the DID and temporary rename it and its self references

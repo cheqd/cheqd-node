@@ -87,18 +87,11 @@ func UpdateDidDoc(payload types.MsgUpdateDidDocPayload, signInputs []cli.SignInp
 	return Tx("cheqd", "update-diddoc", from, args...)
 }
 
-func DeactivateDidDoc(did string, signInputs []cli.SignInput, from string) (sdk.TxResponse, error) {
-	// Payload
-	payload := types.MsgDeactivateDidDocPayload{
-		Id: did,
+func DeactivateDidDoc(did, previousVersionId string, signInputs []cli.SignInput, from string) (sdk.TxResponse, error) {
+	args := []string{
+		did,
+		previousVersionId,
 	}
-
-	payloadJson, err := helpers.Codec.MarshalJSON(&payload)
-	if err != nil {
-		return sdk.TxResponse{}, err
-	}
-
-	args := []string{string(payloadJson)}
 
 	// Sign inputs
 	for _, signInput := range signInputs {

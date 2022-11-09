@@ -41,6 +41,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 				},
 			},
 			Authentication: []string{keyId},
+			VersionId:      uuid.NewString(),
 		}
 
 		signInputs := []cli_types.SignInput{
@@ -75,6 +76,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 				},
 			},
 			Authentication: []string{keyId2},
+			VersionId:      uuid.NewString(),
 		}
 
 		signInputs2 := []cli_types.SignInput{
@@ -173,6 +175,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 				},
 			},
 			Authentication: []string{keyId},
+			VersionId:      uuid.NewString(),
 		}
 
 		signInputs := []cli_types.SignInput{
@@ -197,9 +200,10 @@ var _ = Describe("cheqd cli - negative did", func() {
 					VerificationMaterial: "{\"publicKeyMultibase\":\"" + string(pubKeyMultibase58) + "\"}",
 				},
 			},
-			Authentication:  []string{keyId},
-			AssertionMethod: []string{keyId},
-			VersionId:       res.TxHash,
+			Authentication:    []string{keyId},
+			AssertionMethod:   []string{keyId},
+			PreviousVersionId: payload.VersionId,
+			VersionId:         uuid.NewString(),
 		}
 
 		res, err = cli.UpdateDidDoc(updatedPayload, signInputs, testdata.BASE_ACCOUNT_1)
@@ -229,6 +233,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 				},
 			},
 			Authentication: []string{keyId2},
+			VersionId:      uuid.NewString(),
 		}
 
 		signInputs2 := []cli_types.SignInput{
@@ -286,6 +291,8 @@ var _ = Describe("cheqd cli - negative did", func() {
 		followingUpdatedPayload.Authentication = append(followingUpdatedPayload.Authentication, keyId2AsExtraController)
 		followingUpdatedPayload.CapabilityDelegation = []string{keyId}
 		followingUpdatedPayload.CapabilityInvocation = []string{keyId}
+		followingUpdatedPayload.PreviousVersionId = updatedPayload.VersionId
+		followingUpdatedPayload.VersionId = uuid.NewString()
 
 		signInputsAugmented := append(signInputs, signInputs2...)
 
@@ -380,6 +387,8 @@ var _ = Describe("cheqd cli - negative did", func() {
 				VerificationMaterial: "{\"publicKeyMultibase\":\"pretty-long-public-key-multibase\"}",
 			},
 		}
+		invalidVmTypePayload.PreviousVersionId = followingUpdatedPayload.VersionId
+		invalidVmTypePayload.VersionId = uuid.NewString()
 		_, err = cli.UpdateDidDoc(invalidVmTypePayload, signInputsAugmented, testdata.BASE_ACCOUNT_1)
 		Expect(err).ToNot(BeNil())
 
@@ -398,6 +407,8 @@ var _ = Describe("cheqd cli - negative did", func() {
 
 		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.PURPLE, "cannot update diddoc with an unchanged payload"))
 		// Fail to update the DID Doc with an unchanged payload
+		followingUpdatedPayload.PreviousVersionId = followingUpdatedPayload.VersionId
+		followingUpdatedPayload.VersionId = uuid.NewString()
 		_, err = cli.UpdateDidDoc(followingUpdatedPayload, signInputsAugmented, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(BeNil()) // TODO: Decide if this should be an error, if the DID Doc is unchanged
 	})

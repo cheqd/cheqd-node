@@ -41,6 +41,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 				},
 			},
 			Authentication: []string{keyId},
+			VersionId:      uuid.NewString(),
 		}
 
 		signInputs := []cli_types.SignInput{
@@ -124,6 +125,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 				},
 			},
 			Authentication: []string{secondKeyId},
+			VersionId:      uuid.NewString(),
 		}
 
 		secondSignInputs := []cli_types.SignInput{

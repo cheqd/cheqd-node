@@ -46,6 +46,7 @@ var _ = Describe("cheqd cli - negative resource", func() {
 				},
 			},
 			Authentication: []string{keyId},
+			VersionId:      uuid.NewString(),
 		}
 
 		signInputs = []cli_types.SignInput{
