@@ -12,7 +12,7 @@ type VerificationMaterialTestCase struct {
 	errorMsg string
 }
 
-var _ = DescribeTable("Verification Method Validation tests", func(testCase VerificationMaterialTestCase) {
+var _ = DescribeTable("Verification Method material validation tests", func(testCase VerificationMaterialTestCase) {
 	err := testCase.vm.Validate()
 
 	if testCase.isValid {
