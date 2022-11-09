@@ -2,7 +2,6 @@ package types
 
 import (
 	"github.com/cheqd/cheqd-node/x/did/utils"
-	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
@@ -68,43 +67,6 @@ func (didDoc *DidDoc) GetVerificationMethodControllers() []string {
 	}
 
 	return result
-}
-
-func NewDidDocFromV1(didV1 didtypesv1.Did) *DidDoc {
-	vms = []*VerificationMethod{}
-	for _, vm := range didV1.VerificationMethod {
-		didDoc.VerificationMethod = append(
-			vms, 
-			VerificationMethod{
-				Id: vm.Id,
-				Type: vm.Type,
-				Controller: vm.Controller,
-				PublicKeyBase58: vm.PublicKeyBase58,
-			})
-	}
-	srvs := []*Service{}
-	for _, srv := range didV1.Service {
-		srvs = append(
-			srvs,
-			Service{
-				Id: srv.Id,
-				Type: srv.Type,
-				ServiceEndpoint: []string{srv.ServiceEndpoint},
-			})
-	}
-	return &DidDoc{
-		Context:              didV1.Context,
-		Id:                   didV1.Id,
-		Controller:           didV1.Controller,
-		VerificationMethod:   vms,
-		Authentication:       didV1.Authentication,
-		AssertionMethod:      didV1.AssertionMethod,
-		CapabilityInvocation: didV1.CapabilityInvocation,
-		CapabilityDelegation: didV1.CapabilityDelegation,
-		KeyAgreement:         didV1.KeyAgreement,
-		Service:              didV1.Service,
-		AlsoKnownAs:          didV1.AlsoKnownAs,
-	}
 }
 
 // Validation

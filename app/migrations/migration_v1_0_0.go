@@ -9,7 +9,7 @@ import (
 	// didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	// resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
-	// resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -69,6 +69,19 @@ func MigrateResourceV1(sctx sdk.Context, mctx MigrationContext) error {
 
 // Migration because of protobuf changes 
 func MigrateDidProtobufV1(sctx sdk.Context, mctx MigrationContext) error {
+	err := MigrateDidProtobufDIDocV1(sctx, mctx)
+	if err != nil {
+		return err
+	}
+
+	err = MigrateDidProtobufResourceV1(sctx, mctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func MigrateDidProtobufDIDocV1(sctx sdk.Context, mctx MigrationContext) error {
 	var iterator sdk.Iterator
 	var stateValue didtypesv1.StateValue
 	// var err error
@@ -78,24 +91,57 @@ func MigrateDidProtobufV1(sctx sdk.Context, mctx MigrationContext) error {
 		StrBytes(didtypes.DidKey))
 	iterator = sdk.KVStorePrefixIterator(store, []byte{})
 
-	defer func(iterator sdk.Iterator) {
-		err := iterator.Close()
-		if err != nil {
-			panic(err.Error())
-		}
-	}(iterator)
+	closeIteratorOrPanic(iterator)
 
 	for ; iterator.Valid(); iterator.Next() {
 		mctx.codec.MustUnmarshal(iterator.Value(), &stateValue)
-		didDoc, err := UnpackDataAsDid(stateValue)
+
+		newDidDocWithMetadata, err := StateValueToDIDDocWithMetadata(stateValue)
 		if err != nil {
 			return err
 		}
+		// Set new DID Doc
+		mctx.didKeeper.SetDidDoc(&sctx, &newDidDocWithMetadata)
 		
+		// Remove old DID Doc
 		store.Delete(iterator.Key())
 	}
 
 	return nil
+}
+
+func MigrateDidProtobufResourceV1(sctx sdk.Context, mctx MigrationContext) error {
+	metadataIterator := sdk.KVStorePrefixIterator(
+		sctx.KVStore(sdk.NewKVStoreKey(resourcetypes.StoreKey)), 
+		resourcetypes.KeyPrefix(resourcetypes.ResourceMetadataKey))
+
+	closeIteratorOrPanic(metadataIterator)
+
+	for ; metadataIterator.Valid(); metadataIterator.Next() {
+
+		var metadata resourcetypes.Metadata
+		mctx.codec.MustUnmarshal(metadataIterator.Value(), &metadata)
+
+		new_metadata := resourcetypes.Metadata{
+			CollectionId: 		metadata.CollectionId,
+			Id: 				metadata.Id,
+			Name: 				metadata.Name,
+			Version: 			metadata.Version,
+			ResourceType: 		metadata.ResourceType,
+			AlsoKnownAs:		metadata.AlsoKnownAs,
+			MediaType: 			metadata.MediaType,
+			Created: 			metadata.Created,
+			Checksum: 			metadata.Checksum,
+			PreviousVersionId: 	metadata.PreviousVersionId,
+			NextVersionId: 		metadata.NextVersionId,
+
+		}
+
+		mctx.resourceKeeper.UpdateResourceMetadata(&sctx, &new_metadata)
+	}
+
+	return nil
+	
 }
 
 func MigrateResourceChecksumV1(sctx sdk.Context, mctx MigrationContext) error {
