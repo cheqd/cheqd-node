@@ -12,10 +12,16 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	// Set didocs
 	for _, versionSet := range genState.VersionSets {
 		for _, didDoc := range versionSet.DidDocs {
-			k.SetDidDocVersion(&ctx, didDoc, false)
+			err := k.SetDidDocVersion(&ctx, didDoc, false)
+			if err != nil {
+				panic(err)
+			}
 		}
 
-		k.SetLatestDidDocVersion(&ctx, versionSet.DidDocs[0].DidDoc.Id, versionSet.LatestVersion)
+		err := k.SetLatestDidDocVersion(&ctx, versionSet.DidDocs[0].DidDoc.Id, versionSet.LatestVersion)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	// Set did namespace
