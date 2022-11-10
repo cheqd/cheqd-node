@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 )
 
@@ -30,11 +30,11 @@ func Loader(path string, msg any) error {
 		return err
 	}
 	switch msg := msg.(type) {
-	case *cheqdtypes.MsgCreateDidPayload:
+	case *didtypes.MsgCreateDidDocPayload:
 		err = integrationhelpers.Codec.UnmarshalJSON(file, msg)
 	case *resourcetypes.MsgCreateResourcePayload:
 		err = integrationhelpers.Codec.UnmarshalJSON(file, msg)
-	case *resourcetypes.ResourceHeader:
+	case *resourcetypes.Metadata:
 		err = integrationhelpers.Codec.UnmarshalJSON(file, msg)
 	default:
 		err = json.Unmarshal(file, msg)

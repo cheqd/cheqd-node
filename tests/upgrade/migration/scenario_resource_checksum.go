@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 
 	appmigrations "github.com/cheqd/cheqd-node/app/migrations"
-	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
-	cheqdtestssetup "github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
+	didtestssetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
 	resourcetestssetup "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
@@ -16,10 +16,10 @@ import (
 )
 
 var (
-	didDoc                         cheqdtypes.MsgCreateDidPayload
-	didInfo                        cheqdtestssetup.MinimalDidInfo
+	didDoc                         didtypes.MsgCreateDidDocPayload
+	didInfo                        didtestssetup.MinimalDidDocInfo
 	existingChecksumResource       resourcetypes.MsgCreateResourcePayload
-	expectedChecksumResourceHeader resourcetypes.ResourceHeader
+	expectedChecksumResourceHeader resourcetypes.Metadata
 	ResourceChecksumScenario       ResourceMigrationScenario
 )
 
@@ -46,9 +46,9 @@ func InitResourceChecksumScenario() error {
 		return err
 	}
 
-	didInfo = cheqdtestssetup.MinimalDidInfo{
+	didInfo = didtestssetup.MinimalDidDocInfo{
 		Msg: &didDoc,
-		SignInput: cheqdtestssetup.SignInput{
+		SignInput: didtestssetup.SignInput{
 			VerificationMethodId: signInput.VerificationMethodId,
 			Key:                  signInput.PrivateKey,
 		},
@@ -60,10 +60,10 @@ func InitResourceChecksumScenario() error {
 		existingChecksumResource,
 		didInfo,
 		expectedChecksumResourceHeader,
-		func(ctx sdk.Context, cheqdKeeper cheqdkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error {
-			return appmigrations.MigrateResourceV1(ctx, cheqdKeeper, resourceKeeper)
+		func(ctx sdk.Context, didKeeper didkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error {
+			return appmigrations.MigrateResourceV1(ctx, didKeeper, resourceKeeper)
 		},
-		func(actual resourcetypes.ResourceHeader) error {
+		func(actual resourcetypes.Metadata) error {
 			if !bytes.Equal(actual.Checksum, expectedChecksumResourceHeader.Checksum) {
 				return fmt.Errorf("expected checksum %v, got %v", expectedChecksumResourceHeader.Checksum, actual.Checksum)
 			}

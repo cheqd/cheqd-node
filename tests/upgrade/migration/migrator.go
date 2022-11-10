@@ -1,9 +1,9 @@
 package migration
 
 import (
-	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
-	cheqdtestssetup "github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
+	didtestssetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
 	resourcetestssetup "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
@@ -15,11 +15,11 @@ type MigrationScenario struct {
 	setup    func()
 	existing interface{}
 	expected interface{}
-	handler  func(ctx sdk.Context, cheqdKeeper cheqdkeeper.Keeper) error
+	handler  func(ctx sdk.Context, didKeeper didkeeper.Keeper) error
 	validate func(actual interface{}) error
 }
 
-func NewMigrationScenario(name string, setup func(), existing interface{}, expected interface{}, handler func(ctx sdk.Context, cheqdKeeper cheqdkeeper.Keeper) error, validate func(actual interface{}) error) MigrationScenario {
+func NewMigrationScenario(name string, setup func(), existing interface{}, expected interface{}, handler func(ctx sdk.Context, didKeeper didkeeper.Keeper) error, validate func(actual interface{}) error) MigrationScenario {
 	return MigrationScenario{
 		name:     name,
 		setup:    setup,
@@ -46,7 +46,7 @@ func (m MigrationScenario) Expected() interface{} {
 	return m.expected
 }
 
-func (m MigrationScenario) Handler() func(ctx sdk.Context, cheqdKeeper cheqdkeeper.Keeper) error {
+func (m MigrationScenario) Handler() func(ctx sdk.Context, didKeeper didkeeper.Keeper) error {
 	return m.handler
 }
 
@@ -56,14 +56,14 @@ func (m MigrationScenario) Validate(actual interface{}) error {
 
 type CheqdMigrationScenario struct {
 	name     string
-	setup    func() cheqdtestssetup.TestSetup
-	existing cheqdtestssetup.MinimalDidInfo
-	expected cheqdtypes.Did
-	handler  func(ctx sdk.Context, cheqdKeeper cheqdkeeper.Keeper) error
-	validate func(actual cheqdtypes.Did) error
+	setup    func() didtestssetup.TestSetup
+	existing didtestssetup.MinimalDidDocInfo
+	expected didtypes.DidDoc
+	handler  func(ctx sdk.Context, didKeeper didkeeper.Keeper) error
+	validate func(actual didtypes.DidDoc) error
 }
 
-func NewCheqdMigrationScenario(name string, setup func() cheqdtestssetup.TestSetup, existing cheqdtestssetup.MinimalDidInfo, expected cheqdtypes.Did, handler func(ctx sdk.Context, cheqdKeeper cheqdkeeper.Keeper) error, validate func(actual cheqdtypes.Did) error) CheqdMigrationScenario {
+func NewCheqdMigrationScenario(name string, setup func() didtestssetup.TestSetup, existing didtestssetup.MinimalDidDocInfo, expected didtypes.DidDoc, handler func(ctx sdk.Context, didKeeper didkeeper.Keeper) error, validate func(actual didtypes.DidDoc) error) CheqdMigrationScenario {
 	return CheqdMigrationScenario{
 		name:     name,
 		setup:    setup,
@@ -78,23 +78,23 @@ func (m CheqdMigrationScenario) Name() string {
 	return m.name
 }
 
-func (m CheqdMigrationScenario) Setup() cheqdtestssetup.TestSetup {
+func (m CheqdMigrationScenario) Setup() didtestssetup.TestSetup {
 	return m.setup()
 }
 
-func (m CheqdMigrationScenario) Existing() cheqdtestssetup.MinimalDidInfo {
+func (m CheqdMigrationScenario) Existing() didtestssetup.MinimalDidDocInfo {
 	return m.existing
 }
 
-func (m CheqdMigrationScenario) Expected() cheqdtypes.Did {
+func (m CheqdMigrationScenario) Expected() didtypes.DidDoc {
 	return m.expected
 }
 
-func (m CheqdMigrationScenario) Handler() func(ctx sdk.Context, cheqdKeeper cheqdkeeper.Keeper) error {
+func (m CheqdMigrationScenario) Handler() func(ctx sdk.Context, didKeeper didkeeper.Keeper) error {
 	return m.handler
 }
 
-func (m CheqdMigrationScenario) Validate(actual cheqdtypes.Did) error {
+func (m CheqdMigrationScenario) Validate(actual didtypes.DidDoc) error {
 	return m.validate(actual)
 }
 
@@ -102,13 +102,13 @@ type ResourceMigrationScenario struct {
 	name     string
 	setup    func() resourcetestssetup.TestSetup
 	existing resourcetypes.MsgCreateResourcePayload
-	didInfo  cheqdtestssetup.MinimalDidInfo
-	expected resourcetypes.ResourceHeader
-	handler  func(ctx sdk.Context, cheqdKeeper cheqdkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error
-	validate func(actual resourcetypes.ResourceHeader) error
+	didInfo  didtestssetup.MinimalDidDocInfo
+	expected resourcetypes.Metadata
+	handler  func(ctx sdk.Context, didKeeper didkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error
+	validate func(actual resourcetypes.Metadata) error
 }
 
-func NewResourceMigrationScenario(name string, setup func() resourcetestssetup.TestSetup, existing resourcetypes.MsgCreateResourcePayload, didInfo cheqdtestssetup.MinimalDidInfo, expected resourcetypes.ResourceHeader, handler func(ctx sdk.Context, cheqdKeeper cheqdkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error, validate func(actual resourcetypes.ResourceHeader) error) ResourceMigrationScenario {
+func NewResourceMigrationScenario(name string, setup func() resourcetestssetup.TestSetup, existing resourcetypes.MsgCreateResourcePayload, didInfo didtestssetup.MinimalDidDocInfo, expected resourcetypes.Metadata, handler func(ctx sdk.Context, didKeeper didkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error, validate func(actual resourcetypes.Metadata) error) ResourceMigrationScenario {
 	return ResourceMigrationScenario{
 		name:     name,
 		setup:    setup,
@@ -132,19 +132,19 @@ func (m ResourceMigrationScenario) Existing() resourcetypes.MsgCreateResourcePay
 	return m.existing
 }
 
-func (m ResourceMigrationScenario) DidInfo() cheqdtestssetup.MinimalDidInfo {
+func (m ResourceMigrationScenario) DidInfo() didtestssetup.MinimalDidDocInfo {
 	return m.didInfo
 }
 
-func (m ResourceMigrationScenario) Expected() resourcetypes.ResourceHeader {
+func (m ResourceMigrationScenario) Expected() resourcetypes.Metadata {
 	return m.expected
 }
 
-func (m ResourceMigrationScenario) Handler() func(ctx sdk.Context, cheqdKeeper cheqdkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error {
+func (m ResourceMigrationScenario) Handler() func(ctx sdk.Context, didKeeper didkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error {
 	return m.handler
 }
 
-func (m ResourceMigrationScenario) Validate(actual resourcetypes.ResourceHeader) error {
+func (m ResourceMigrationScenario) Validate(actual resourcetypes.Metadata) error {
 	return m.validate(actual)
 }
 
@@ -165,7 +165,7 @@ func NewCheqdMigrator(migrations []CheqdMigrationScenario) CheqdMigrator {
 func (m CheqdMigrator) Migrate(ctx sdk.Context) error {
 	for _, migration := range m.migrations {
 		setup := migration.Setup()
-		_, err := setup.CreateDid(migration.existing.Msg, []cheqdtestssetup.SignInput{migration.existing.SignInput})
+		_, err := setup.CreateDid(migration.existing.Msg, []didtestssetup.SignInput{migration.existing.SignInput})
 		if err != nil {
 			return err
 		}
@@ -173,11 +173,11 @@ func (m CheqdMigrator) Migrate(ctx sdk.Context) error {
 		if err != nil {
 			return err
 		}
-		data, err := setup.Keeper.GetDid(&setup.SdkCtx, migration.existing.Msg.Id)
+		data, err := setup.Keeper.GetDidDoc(&setup.SdkCtx, migration.existing.Msg.Id)
 		if err != nil {
 			return err
 		}
-		actual, err := data.UnpackDataAsDid()
+		actual := data.DidDoc
 		if err != nil {
 			return err
 		}
@@ -202,11 +202,11 @@ func NewResourceMigrator(migrations []ResourceMigrationScenario) ResourceMigrato
 func (m ResourceMigrator) Migrate() error {
 	for _, migration := range m.migrations {
 		setup := migration.Setup()
-		_, err := setup.CreateDid(migration.didInfo.Msg, []cheqdtestssetup.SignInput{migration.didInfo.SignInput})
+		_, err := setup.CreateDid(migration.didInfo.Msg, []didtestssetup.SignInput{migration.didInfo.SignInput})
 		if err != nil {
 			return err
 		}
-		_, err = setup.CreateResource(&migration.existing, []cheqdtestssetup.SignInput{migration.didInfo.SignInput})
+		_, err = setup.CreateResource(&migration.existing, []didtestssetup.SignInput{migration.didInfo.SignInput})
 		if err != nil {
 			return err
 		}
@@ -218,7 +218,7 @@ func (m ResourceMigrator) Migrate() error {
 		if err != nil {
 			return err
 		}
-		err = migration.Validate(*actual.Resource.Header)
+		err = migration.Validate(*actual.Resource.Metadata)
 		if err != nil {
 			return err
 		}

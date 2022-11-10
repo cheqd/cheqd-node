@@ -1,7 +1,7 @@
 package migrations
 
 import (
-	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
+	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -20,21 +20,21 @@ func NewMigrator(keeper interface{}, migrations ...Migration) Migrator {
 	}
 }
 
-type CheqdMigration func(sdk.Context, cheqdkeeper.Keeper) error
+type DidMigration func(sdk.Context, didkeeper.Keeper) error
 
-type CheqdMigrator struct {
-	migrations  []CheqdMigration
-	cheqdKeeper cheqdkeeper.Keeper
+type DidMigrator struct {
+	migrations  []DidMigration
+	cheqdKeeper didkeeper.Keeper
 }
 
-func NewCheqdMigrator(cheqdKeeper cheqdkeeper.Keeper, migrations ...CheqdMigration) CheqdMigrator {
-	return CheqdMigrator{
+func NewDidMigrator(cheqdKeeper didkeeper.Keeper, migrations ...DidMigration) DidMigrator {
+	return DidMigrator{
 		cheqdKeeper: cheqdKeeper,
 		migrations:  migrations,
 	}
 }
 
-func (m *CheqdMigrator) Migrate(ctx sdk.Context) error {
+func (m *DidMigrator) Migrate(ctx sdk.Context) error {
 	for _, migration := range m.migrations {
 		err := migration(ctx, m.cheqdKeeper)
 		if err != nil {
@@ -44,15 +44,15 @@ func (m *CheqdMigrator) Migrate(ctx sdk.Context) error {
 	return nil
 }
 
-type ResourceMigration func(sdk.Context, cheqdkeeper.Keeper, resourcekeeper.Keeper) error
+type ResourceMigration func(sdk.Context, didkeeper.Keeper, resourcekeeper.Keeper) error
 
 type ResourceMigrator struct {
 	migrations     []ResourceMigration
-	cheqdKeeper    cheqdkeeper.Keeper
+	cheqdKeeper    didkeeper.Keeper
 	resourceKeeper resourcekeeper.Keeper
 }
 
-func NewResourceMigrator(cheqdKeeper cheqdkeeper.Keeper, resourceKeeper resourcekeeper.Keeper, migrations ...ResourceMigration) ResourceMigrator {
+func NewResourceMigrator(cheqdKeeper didkeeper.Keeper, resourceKeeper resourcekeeper.Keeper, migrations ...ResourceMigration) ResourceMigrator {
 	return ResourceMigrator{
 		migrations:     migrations,
 		cheqdKeeper:    cheqdKeeper,

@@ -3,17 +3,17 @@ package migrations
 import (
 	"crypto/sha256"
 
-	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
+	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func MigrateCheqdV1(ctx sdk.Context, cheqdKeeper cheqdkeeper.Keeper) error {
+func MigrateDidV1(ctx sdk.Context, cheqdKeeper didkeeper.Keeper) error {
 	// TODO: implement for cheqd module
 	return nil
 }
 
-func MigrateResourceV1(ctx sdk.Context, cheqdKeeper cheqdkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error {
+func MigrateResourceV1(ctx sdk.Context, cheqdKeeper didkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error {
 	// Resource Checksum migration
 	err := MigrateResourceChecksumV1(ctx, cheqdKeeper, resourceKeeper)
 	if err != nil {
@@ -23,11 +23,11 @@ func MigrateResourceV1(ctx sdk.Context, cheqdKeeper cheqdkeeper.Keeper, resource
 	return nil
 }
 
-func MigrateResourceChecksumV1(ctx sdk.Context, cheqdKeeper cheqdkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error {
+func MigrateResourceChecksumV1(ctx sdk.Context, cheqdKeeper didkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error {
 	resources := resourceKeeper.GetAllResources(&ctx)
 	for _, resource := range resources {
-		checksum := sha256.Sum256([]byte(resource.Data))
-		resource.Header.Checksum = checksum[:]
+		checksum := sha256.Sum256([]byte(resource.Metadata.Checksum))
+		resource.Metadata.Checksum = checksum[:]
 		err := resourceKeeper.SetResource(&ctx, &resource)
 		if err != nil {
 			return err
