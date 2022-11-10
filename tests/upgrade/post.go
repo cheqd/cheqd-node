@@ -5,7 +5,6 @@ package upgrade
 import (
 	"fmt"
 
-	integrationtestdata "github.com/cheqd/cheqd-node/tests/integration/testdata"
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/cli"
 	migration "github.com/cheqd/cheqd-node/tests/upgrade/migration"
 	. "github.com/onsi/ginkgo/v2"
