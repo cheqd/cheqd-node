@@ -2,7 +2,7 @@ package migration
 
 import (
 	cheqdtestssetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/did/types/v1"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types/v1"
 	resourcetestssetup "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -56,12 +56,12 @@ type CheqdMigrationScenario struct {
 	name     string
 	setup    func() cheqdtestssetup.TestSetup
 	existing cheqdtestssetup.MinimalDidInfo
-	expected cheqdtypes.Did
+	expected didtypes.Did
 	handler  func(ctx sdk.Context) error
-	validate func(actual cheqdtypes.Did) error
+	validate func(actual didtypes.Did) error
 }
 
-func NewCheqdMigrationScenario(name string, setup func() cheqdtestssetup.TestSetup, existing cheqdtestssetup.MinimalDidInfo, expected cheqdtypes.Did, handler func(ctx sdk.Context) error, validate func(actual cheqdtypes.Did) error) CheqdMigrationScenario {
+func NewCheqdMigrationScenario(name string, setup func() cheqdtestssetup.TestSetup, existing cheqdtestssetup.MinimalDidInfo, expected didtypes.Did, handler func(ctx sdk.Context) error, validate func(actual didtypes.Did) error) CheqdMigrationScenario {
 	return CheqdMigrationScenario{
 		name:     name,
 		setup:    setup,
@@ -84,7 +84,7 @@ func (m CheqdMigrationScenario) Existing() cheqdtestssetup.MinimalDidInfo {
 	return m.existing
 }
 
-func (m CheqdMigrationScenario) Expected() cheqdtypes.Did {
+func (m CheqdMigrationScenario) Expected() didtypes.Did {
 	return m.expected
 }
 
@@ -92,7 +92,7 @@ func (m CheqdMigrationScenario) Handler() func(ctx sdk.Context) error {
 	return m.handler
 }
 
-func (m CheqdMigrationScenario) Validate(actual cheqdtypes.Did) error {
+func (m CheqdMigrationScenario) Validate(actual didtypes.Did) error {
 	return m.validate(actual)
 }
 

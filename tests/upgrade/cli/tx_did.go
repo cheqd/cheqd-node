@@ -4,12 +4,12 @@ import (
 	"encoding/base64"
 
 	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
-	cheqdcli "github.com/cheqd/cheqd-node/x/did/client/cli"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/did/types/v1"
+	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types/v1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func CreateDid(payload cheqdtypes.MsgCreateDidPayload, signInputs []cheqdcli.SignInput, container string) (sdk.TxResponse, error) {
+func CreateDid(payload didtypes.MsgCreateDidPayload, signInputs []didcli.SignInput, container string) (sdk.TxResponse, error) {
 	payloadJson, err := integrationhelpers.Codec.MarshalJSON(&payload)
 	if err != nil {
 		return sdk.TxResponse{}, err
@@ -25,7 +25,7 @@ func CreateDid(payload cheqdtypes.MsgCreateDidPayload, signInputs []cheqdcli.Sig
 	return Tx(container, CLI_BINARY_NAME, "cheqd", "create-did", OperatorAccounts[container], args...)
 }
 
-func UpdateDid(payload cheqdtypes.MsgUpdateDidPayload, signInputs []cheqdcli.SignInput, container string) (sdk.TxResponse, error) {
+func UpdateDid(payload didtypes.MsgUpdateDidPayload, signInputs []didcli.SignInput, container string) (sdk.TxResponse, error) {
 	payloadJson, err := integrationhelpers.Codec.MarshalJSON(&payload)
 	if err != nil {
 		return sdk.TxResponse{}, err

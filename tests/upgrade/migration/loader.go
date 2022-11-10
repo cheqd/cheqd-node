@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"os"
 
-	cheqdtypes "github.com/cheqd/cheqd-node/x/did/types/v1"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types/v1"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 )
 
@@ -18,7 +18,7 @@ type SignInput struct {
 	PrivateKey           string `json:"privateKey"`
 }
 
-func Loader[T cheqdtypes.MsgCreateDidPayload | resourcetypes.MsgCreateResourcePayload | resourcetypes.ResourceHeader | KeyPairBase64 | SignInput](path string, msg *T) error {
+func Loader[T didtypes.MsgCreateDidPayload | resourcetypes.MsgCreateResourcePayload | resourcetypes.ResourceHeader | KeyPairBase64 | SignInput](path string, msg *T) error {
 	file, err := os.Open(path)
 	if err != nil {
 		panic(err)

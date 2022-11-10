@@ -87,7 +87,7 @@ func MigrateDidProtobufDIDocV1(sctx sdk.Context, mctx MigrationContext) error {
 
 	store := prefix.NewStore(
 		sctx.KVStore(sdk.NewKVStoreKey(didtypesV1.StoreKey)), 
-		StrBytes(didtypes.DidKey))
+		StrBytes(didtypesV1.DidKey))
 	iterator = sdk.KVStorePrefixIterator(store, []byte{})
 
 	closeIteratorOrPanic(iterator)
@@ -111,9 +111,16 @@ func MigrateDidProtobufDIDocV1(sctx sdk.Context, mctx MigrationContext) error {
 }
 
 func MigrateDidProtobufResourceV1(sctx sdk.Context, mctx MigrationContext) error {
+	// Reset counter
+	countStore := sctx.KVStore(sdk.NewKVStoreKey(resourcetypesV1.StoreKey))
+	countKey := resourcetypes.KeyPrefix(resourcetypes.ResourceCountKey)
+	countStore.Delete(countKey)
 
+	// Storages for old headers and data
 	headerStore := sctx.KVStore(sdk.NewKVStoreKey(resourcetypesV1.StoreKey))
 	dataStore := sctx.KVStore(sdk.NewKVStoreKey(resourcetypesV1.StoreKey))
+
+	// Iterators for old headers and data
 	headerIterator := sdk.KVStorePrefixIterator(
 		headerStore, 
 		resourcetypes.KeyPrefix(resourcetypesV1.ResourceHeaderKey))
@@ -140,10 +147,8 @@ func MigrateDidProtobufResourceV1(sctx sdk.Context, mctx MigrationContext) error
 			CollectionId: 		headerV1.CollectionId,
 			Id: 				headerV1.Id,
 			Name: 				headerV1.Name,
-			// ToDo: Fields were not placed in previous one
 			Version: 			"",
 			ResourceType: 		headerV1.ResourceType,
-			// ToDo: Fields were not placed in previous one
 			AlsoKnownAs:		[]string{},
 			MediaType: 			headerV1.MediaType,
 			Created: 			headerV1.Created,

@@ -2,19 +2,19 @@ package cli
 
 import (
 	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/did/types/v1"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types/v1"
 )
 
-func QueryDid(did string, container string) (cheqdtypes.QueryGetDidResponse, error) {
+func QueryDid(did string, container string) (didtypes.QueryGetDidResponse, error) {
 	res, err := Query(container, CLI_BINARY_NAME, "cheqd", "did", did)
 	if err != nil {
-		return cheqdtypes.QueryGetDidResponse{}, err
+		return didtypes.QueryGetDidResponse{}, err
 	}
 
-	var resp cheqdtypes.QueryGetDidResponse
+	var resp didtypes.QueryGetDidResponse
 	err = integrationhelpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
-		return cheqdtypes.QueryGetDidResponse{}, err
+		return didtypes.QueryGetDidResponse{}, err
 	}
 
 	return resp, nil

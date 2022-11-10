@@ -7,7 +7,7 @@ import (
 
 	appmigrations "github.com/cheqd/cheqd-node/app/migrations"
 	cheqdtestssetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/did/types/v1"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types/v1"
 	resourcetestssetup "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -15,7 +15,7 @@ import (
 
 var (
 	err                            error
-	didDoc                         cheqdtypes.MsgCreateDidPayload
+	didDoc                         didtypes.MsgCreateDidPayload
 	didInfo                        cheqdtestssetup.MinimalDidInfo
 	existingChecksumResource       resourcetypes.MsgCreateResourcePayload
 	expectedChecksumResourceHeader resourcetypes.ResourceHeader

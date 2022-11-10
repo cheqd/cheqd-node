@@ -3,11 +3,11 @@ package cli
 import (
 	"encoding/base64"
 
-	cheqdcli "github.com/cheqd/cheqd-node/x/did/client/cli"
+	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func CreateResource(collectionId string, resourceId string, resourceName string, resourceType string, resourceFile string, signInputs []cheqdcli.SignInput, container string) (sdk.TxResponse, error) {
+func CreateResource(collectionId string, resourceId string, resourceName string, resourceType string, resourceFile string, signInputs []didcli.SignInput, container string) (sdk.TxResponse, error) {
 	args := []string{
 		"--collection-id", collectionId,
 		"--resource-id", resourceId,

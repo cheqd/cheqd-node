@@ -8,18 +8,18 @@ import (
 
 	integrationtestdata "github.com/cheqd/cheqd-node/tests/integration/testdata"
 	network "github.com/cheqd/cheqd-node/tests/upgrade/network"
-	cheqdcli "github.com/cheqd/cheqd-node/x/did/client/cli"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/did/types/v1"
+	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types/v1"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	"github.com/google/uuid"
 	"github.com/multiformats/go-multibase"
 )
 
 // Pre
-var DidDoc cheqdtypes.MsgCreateDidPayload
+var DidDoc didtypes.MsgCreateDidPayload
 
 var (
-	SignInputs []cheqdcli.SignInput
+	SignInputs []didcli.SignInput
 	Err        = GenerateDidDocWithSignInputs(&DidDoc, &SignInputs)
 )
 
@@ -31,16 +31,16 @@ var (
 )
 
 var (
-	RotatedKeysDidDoc     cheqdtypes.MsgUpdateDidPayload
-	RotatedKeysSignInputs []cheqdcli.SignInput
+	RotatedKeysDidDoc     didtypes.MsgUpdateDidPayload
+	RotatedKeysSignInputs []didcli.SignInput
 	RotatedKeysErr        error
 )
 
 // Post
-var PostDidDoc cheqdtypes.MsgCreateDidPayload
+var PostDidDoc didtypes.MsgCreateDidPayload
 
 var (
-	PostSignInputs []cheqdcli.SignInput
+	PostSignInputs []didcli.SignInput
 	PostErr        error
 )
 
@@ -52,18 +52,18 @@ var (
 )
 
 var (
-	PostRotatedKeysDidDoc     cheqdtypes.MsgUpdateDidPayload
-	PostRotatedKeysSignInputs []cheqdcli.SignInput
+	PostRotatedKeysDidDoc     didtypes.MsgUpdateDidPayload
+	PostRotatedKeysSignInputs []didcli.SignInput
 	PostRotatedKeysErr        error
 )
 
 // Migration
 var (
-	QueriedDidDoc   cheqdtypes.Did
+	QueriedDidDoc   didtypes.Did
 	QueriedResource resourcetypes.Resource
 )
 
-func GenerateDidDocWithSignInputs(payload *cheqdtypes.MsgCreateDidPayload, input *[]cheqdcli.SignInput) error {
+func GenerateDidDocWithSignInputs(payload *didtypes.MsgCreateDidPayload, input *[]didcli.SignInput) error {
 	did := "did:cheqd:" + network.DID_NAMESPACE + ":" + uuid.NewString()
 	keyId := did + "#key1"
 
@@ -77,10 +77,10 @@ func GenerateDidDocWithSignInputs(payload *cheqdtypes.MsgCreateDidPayload, input
 		return err
 	}
 
-	payload = &cheqdtypes.MsgCreateDidPayload{
+	payload = &didtypes.MsgCreateDidPayload{
 		Id:         did,
 		Controller: []string{did},
-		VerificationMethod: []*cheqdtypes.VerificationMethod{
+		VerificationMethod: []*didtypes.VerificationMethod{
 			{
 				Id:                 keyId,
 				Type:               "Ed25519VerificationKey2020",
@@ -91,7 +91,7 @@ func GenerateDidDocWithSignInputs(payload *cheqdtypes.MsgCreateDidPayload, input
 		Authentication: []string{keyId},
 	}
 
-	input = &[]cheqdcli.SignInput{
+	input = &[]didcli.SignInput{
 		{
 			VerificationMethodId: keyId,
 			PrivKey:              privKey,
@@ -100,7 +100,7 @@ func GenerateDidDocWithSignInputs(payload *cheqdtypes.MsgCreateDidPayload, input
 	return nil
 }
 
-func GenerateRotatedKeysDidDocWithSignInputs(payload *cheqdtypes.MsgCreateDidPayload, updatedPayload *cheqdtypes.MsgUpdateDidPayload, input *[]cheqdcli.SignInput, updatedInput *[]cheqdcli.SignInput, versionId string) error {
+func GenerateRotatedKeysDidDocWithSignInputs(payload *didtypes.MsgCreateDidPayload, updatedPayload *didtypes.MsgUpdateDidPayload, input *[]didcli.SignInput, updatedInput *[]didcli.SignInput, versionId string) error {
 	// Specifically, we want to update the DID doc by rotating keys.
 
 	pubKey, privKey, err := ed25519.GenerateKey(nil)
@@ -113,10 +113,10 @@ func GenerateRotatedKeysDidDocWithSignInputs(payload *cheqdtypes.MsgCreateDidPay
 		return err
 	}
 
-	updatedPayload = &cheqdtypes.MsgUpdateDidPayload{
+	updatedPayload = &didtypes.MsgUpdateDidPayload{
 		Id:         payload.Id,
 		Controller: []string{payload.Id},
-		VerificationMethod: []*cheqdtypes.VerificationMethod{
+		VerificationMethod: []*didtypes.VerificationMethod{
 			{
 				Id:                 payload.VerificationMethod[0].Id,
 				Type:               "Ed25519VerificationKey2020",
@@ -128,7 +128,7 @@ func GenerateRotatedKeysDidDocWithSignInputs(payload *cheqdtypes.MsgCreateDidPay
 		VersionId:      versionId,
 	}
 
-	updatedInput = &[]cheqdcli.SignInput{
+	updatedInput = &[]didcli.SignInput{
 		(*input)[0],
 		{
 			VerificationMethodId: (*input)[0].VerificationMethodId,
@@ -152,16 +152,16 @@ func GenerateResource(payload *resourcetypes.MsgCreateResourcePayload) error {
 	return nil
 }
 
-func ResetDidDocInMem(payload *cheqdtypes.MsgCreateDidPayload, input *[]cheqdcli.SignInput) error {
-	payload = &cheqdtypes.MsgCreateDidPayload{}
-	input = &[]cheqdcli.SignInput{}
+func ResetDidDocInMem(payload *didtypes.MsgCreateDidPayload, input *[]didcli.SignInput) error {
+	payload = &didtypes.MsgCreateDidPayload{}
+	input = &[]didcli.SignInput{}
 	Err = GenerateDidDocWithSignInputs(payload, input)
 	return Err
 }
 
-func ResetRotatedKeysDidDocInMem(updatedPayload *cheqdtypes.MsgUpdateDidPayload, updatedInput *[]cheqdcli.SignInput) error {
-	updatedPayload = &cheqdtypes.MsgUpdateDidPayload{}
-	updatedInput = &[]cheqdcli.SignInput{}
+func ResetRotatedKeysDidDocInMem(updatedPayload *didtypes.MsgUpdateDidPayload, updatedInput *[]didcli.SignInput) error {
+	updatedPayload = &didtypes.MsgUpdateDidPayload{}
+	updatedInput = &[]didcli.SignInput{}
 	return nil
 }
 

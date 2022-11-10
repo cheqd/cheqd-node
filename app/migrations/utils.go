@@ -68,13 +68,28 @@ func GetVerificationMaterial(vm *didtypesv1.VerificationMethod) string{
 		for _, kv := range(vm.PublicKeyJwk) {
 			jwk[kv.Key] = kv.Value
 		}
-		res, _ := json.Marshal(jwk)
+		res, err := json.Marshal(jwk)
+		if err != nil {
+			panic(err.Error())
+		}
+
+		jwk2020 := didtypes.JsonWebKey2020{
+			PublicKeyJwk: res,
+		}
+		res, err = json.Marshal(jwk2020)
+		if err != nil {
+			panic(err.Error())
+		}
+
 		return string(res)
 	}
-	pk_multi := PubKeyMultibase{
-		publicKeyMultibase: vm.PublicKeyMultibase,
+	pk_multi := didtypes.Ed25519VerificationKey2020{
+		PublicKeyMultibase: vm.PublicKeyMultibase,
 	}
-	res, _ := json.Marshal(pk_multi)
+	res, err := json.Marshal(pk_multi)
+	if err != nil {
+		panic(err.Error())
+	}
 	return string(res)
 }
 
