@@ -45,7 +45,6 @@ services:
         target: /node_key
       - source: validator-0-priv-val-key
         target: /priv_validator_key
-      - source: validator-0-priv-val-state
 
   validator-1:
     image: ${BUILD_IMAGE}
