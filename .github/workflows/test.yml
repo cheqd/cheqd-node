@@ -168,6 +168,9 @@ jobs:
         with:
           name: cheqd-node-build.tar
 
+      - name: Load node Docker image
+        run: docker load -i cheqd-node-build.tar
+
       - name: Download binary artifact build-latest
         uses: actions/download-artifact@v3
         id: download
