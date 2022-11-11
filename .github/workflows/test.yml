@@ -114,10 +114,14 @@ jobs:
       - name: Restore binary permissions
         run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
 
-      - name: Generate localnet configs
+      - name: Generate localnet configs # In this step we generate configs for localnet with 0.6.9 version, including copies of operator keys. *This is temporary*.
         working-directory: ./docker/localnet
         run: |
           bash gen-network-config.sh
+          docker compose cp network-config/validator-0/keyring-test/operator-0.info validator-0:/home/cheqd/.cheqdnode/keyring-test/operator.info
+          docker compose cp network-config/validator-1/keyring-test/operator-1.info validator-1:/home/cheqd/.cheqdnode/keyring-test/operator.info
+          docker compose cp network-config/validator-2/keyring-test/operator-2.info validator-2:/home/cheqd/.cheqdnode/keyring-test/operator.info
+          docker compose cp network-config/validator-3/keyring-test/operator-3.info validator-3:/home/cheqd/.cheqdnode/keyring-test/operator.info
           sudo chown -R 1000:1000 network-config
 
       - name: Set up Docker localnet mainnet-latest
