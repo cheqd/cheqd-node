@@ -120,6 +120,7 @@ jobs:
           bash gen-network-config.sh
 
       - name: Keep config permissionless # This is temporary, until we have a better way to generate configs.
+        working-directory: ./docker/localnet
         run: |
           cp -r network-config network-config-0.6.9
 
