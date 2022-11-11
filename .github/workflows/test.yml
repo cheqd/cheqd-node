@@ -73,7 +73,7 @@ jobs:
       - name: Set up Docker localnet
         working-directory: ./docker/localnet
         run: |
-          docker compose --env-file docker-compose.env up --detach --no-build
+          docker compose --env-file build-latest.env up --detach --no-build
 
       - name: Import keys
         working-directory: ./docker/localnet
@@ -114,11 +114,6 @@ jobs:
 
       - name: Restore binary permissions
         run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
-
-      - name: Download node Docker image mainnet-latest
-        run: |
-          export BUILD_IMAGE=ghcr.io/cheqd/cheqd-node:0.6.9
-          docker pull $BUILD_IMAGE
 
       - name: Set up Docker localnet mainnet-latest
         working-directory: ./docker/localnet
