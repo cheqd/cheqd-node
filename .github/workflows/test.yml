@@ -107,6 +107,7 @@ jobs:
 
       - name: Download binary artifact mainnet-latest
         run: |
+          mkdir -p ${{ env.RUNNER_BIN_DIR }}
           wget -c https://github.com/cheqd/cheqd-node/releases/download/0.6.9/cheqd-noded-0.6.9-Linux-x86_64.tar.gz
           tar -xvf cheqd-noded-0.6.9-Linux-x86_64.tar.gz -C ${{ env.RUNNER_BIN_DIR }} --strip-components=1
 
