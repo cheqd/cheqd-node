@@ -137,14 +137,14 @@ jobs:
       - name: Copy keys # This is temporary.
         working-directory: ./docker/localnet
         run: |
-          docker compose --env-file mainnet-latest.env cp network-config-0.6.9/validator-0/keyring-test/operator-0.info validator-0:/home/cheqd/.cheqdnode/keyring-test/operator.info
-          docker compose --env-file mainnet-latest.env cp network-config-0.6.9/validator-1/keyring-test/operator-1.info validator-1:/home/cheqd/.cheqdnode/keyring-test/operator.info
-          docker compose --env-file mainnet-latest.env cp network-config-0.6.9/validator-2/keyring-test/operator-2.info validator-2:/home/cheqd/.cheqdnode/keyring-test/operator.info
-          docker compose --env-file mainnet-latest.env cp network-config-0.6.9/validator-3/keyring-test/operator-3.info validator-3:/home/cheqd/.cheqdnode/keyring-test/operator.info
-          docker compose exec -it --user root validator-0 chown -R cheqd:cheqd /home/cheqd
-          docker compose exec -it --user root validator-1 chown -R cheqd:cheqd /home/cheqd
-          docker compose exec -it --user root validator-2 chown -R cheqd:cheqd /home/cheqd
-          docker compose exec -it --user root validator-3 chown -R cheqd:cheqd /home/cheqd
+          docker compose --env-file mainnet-latest.env cp network-config-0.6.9/validator-0/keyring-test validator-0:/home/cheqd/.cheqdnode
+          docker compose --env-file mainnet-latest.env cp network-config-0.6.9/validator-1/keyring-test validator-1:/home/cheqd/.cheqdnode
+          docker compose --env-file mainnet-latest.env cp network-config-0.6.9/validator-2/keyring-test validator-2:/home/cheqd/.cheqdnode
+          docker compose --env-file mainnet-latest.env cp network-config-0.6.9/validator-3/keyring-test validator-3:/home/cheqd/.cheqdnode
+          docker compose --env-file mainnet-latest.env exec -it --user root validator-0 chown -R cheqd:cheqd /home/cheqd
+          docker compose --env-file mainnet-latest.env exec -it --user root validator-1 chown -R cheqd:cheqd /home/cheqd
+          docker compose --env-file mainnet-latest.env exec -it --user root validator-2 chown -R cheqd:cheqd /home/cheqd
+          docker compose --env-file mainnet-latest.env exec -it --user root validator-3 chown -R cheqd:cheqd /home/cheqd
           rm -rf network-config-0.6.9
 
       - uses: actions/setup-go@v3
