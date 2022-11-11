@@ -115,10 +115,16 @@ jobs:
       - name: Restore binary permissions
         run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
 
+      - name: Generate localnet configs
+        working-directory: ./docker/localnet
+        run: |
+          bash gen-network-config.sh
+          sudo chown -R 1000:1000 network-config
+
       - name: Set up Docker localnet mainnet-latest
         working-directory: ./docker/localnet
         run: |
-          docker compose --env-file mainnet-latest.env up --detach --no-build
+          docker compose --env-file mainnet-latest.env up --no-build
 
       - uses: actions/setup-go@v3
         with:
