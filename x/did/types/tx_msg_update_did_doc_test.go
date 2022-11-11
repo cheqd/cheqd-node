@@ -1,7 +1,6 @@
 package types_test
 
 import (
-	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
@@ -40,9 +39,8 @@ var _ = Describe("Message for DID updating", func() {
 								VerificationMaterial: ValidEd25519VerificationMaterial,
 							},
 						},
-						Authentication:    []string{"did:cheqd:testnet:zABCDEFG123456789abcd#key1", "did:cheqd:testnet:zABCDEFG123456789abcd#aaa"},
-						VersionId:         "version1",
-						PreviousVersionId: uuid.NewString(),
+						Authentication: []string{"did:cheqd:testnet:zABCDEFG123456789abcd#key1", "did:cheqd:testnet:zABCDEFG123456789abcd#aaa"},
+						VersionId:      "version1",
 					},
 					Signatures: nil,
 				},
@@ -85,8 +83,7 @@ var _ = Describe("Message for DID updating", func() {
 								VerificationMaterial: ValidEd25519VerificationMaterial,
 							},
 						},
-						Authentication:    []string{"did:cheqd:testnet:zABCDEFG123456789abcd#key1", "did:cheqd:testnet:zABCDEFG123456789abcd#aaa"},
-						PreviousVersionId: uuid.NewString(),
+						Authentication: []string{"did:cheqd:testnet:zABCDEFG123456789abcd#key1", "did:cheqd:testnet:zABCDEFG123456789abcd#aaa"},
 					},
 					Signatures: nil,
 				},

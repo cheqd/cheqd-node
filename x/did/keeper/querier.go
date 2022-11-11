@@ -20,7 +20,7 @@ func NewQuerier(k Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 		case types.QueryGetDidDoc:
 			return getDidDoc(ctx, path[1], k, legacyQuerierCdc)
 		case types.QueryGetAllDidDocVersions:
-			return getAllDidDocVersions(ctx, path[1], k, legacyQuerierCdc)
+			return getAllDidDocVersionsMetadata(ctx, path[1], k, legacyQuerierCdc)
 		case types.QueryGetDidDocVersion:
 			return getDidDocVersion(ctx, path[1], path[2], k, legacyQuerierCdc)
 

@@ -293,7 +293,7 @@ var _ = Describe("Create DID tests", func() {
 		signatures := []SignInput{}
 
 		_, err := setup.CreateDid(msg, signatures)
-		Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("%s: DIDDoc not found", nonExistingDid)))
+		Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("%s: DID Doc not found", nonExistingDid)))
 	})
 
 	It("Not Valid: Wrong signature", func() {
@@ -412,7 +412,7 @@ var _ = Describe("Create DID tests", func() {
 		signatures := []SignInput{alice.SignInput}
 
 		_, err := setup.CreateDid(msg, signatures)
-		Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("%s: DIDDoc exists", alice.Did)))
+		Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("%s: DID Doc exists", alice.Did)))
 	})
 })
 

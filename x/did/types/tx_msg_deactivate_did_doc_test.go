@@ -31,9 +31,8 @@ var _ = Describe("Message for DID updating", func() {
 			TestCaseMsgDeactivateDID{
 				msg: &MsgDeactivateDidDoc{
 					Payload: &MsgDeactivateDidDocPayload{
-						Id:                "did:cheqd:testnet:zABCDEFG123456789abcd",
-						PreviousVersionId: uuid.NewString(),
-						VersionId:         uuid.NewString(),
+						Id:        "did:cheqd:testnet:zABCDEFG123456789abcd",
+						VersionId: uuid.NewString(),
 					},
 					Signatures: nil,
 				},
@@ -45,9 +44,8 @@ var _ = Describe("Message for DID updating", func() {
 			TestCaseMsgDeactivateDID{
 				msg: &MsgDeactivateDidDoc{
 					Payload: &MsgDeactivateDidDocPayload{
-						Id:                "did:cheqdttt:testnet:zABCDEFG123456789abcd",
-						PreviousVersionId: uuid.NewString(),
-						VersionId:         uuid.NewString(),
+						Id:        "did:cheqdttt:testnet:zABCDEFG123456789abcd",
+						VersionId: uuid.NewString(),
 					},
 					Signatures: nil,
 				},
@@ -60,8 +58,7 @@ var _ = Describe("Message for DID updating", func() {
 			TestCaseMsgDeactivateDID{
 				msg: &MsgDeactivateDidDoc{
 					Payload: &MsgDeactivateDidDocPayload{
-						PreviousVersionId: uuid.NewString(),
-						VersionId:         uuid.NewString(),
+						VersionId: uuid.NewString(),
 					},
 					Signatures: nil,
 				},

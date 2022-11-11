@@ -40,6 +40,6 @@ message QueryGetAllDidDocVersionsMetadataRequest {
   string id = 1;
 }
 
-message QueryGetAllDidDocVersionsResponse {
+message QueryGetAllDidDocVersionsMetadataResponse {
   repeated Metadata versions = 1;
 }

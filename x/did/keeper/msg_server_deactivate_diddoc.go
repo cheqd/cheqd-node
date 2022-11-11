@@ -39,11 +39,6 @@ func (k MsgServer) DeactivateDidDoc(goCtx context.Context, msg *types.MsgDeactiv
 		return nil, types.ErrDIDDocDeactivated.Wrap(msg.Payload.Id)
 	}
 
-	// Check version id
-	if msg.Payload.PreviousVersionId != didDoc.Metadata.VersionId {
-		return nil, types.ErrUnexpectedDidVersion.Wrapf("got: %s, must be: %s", msg.Payload.VersionId, didDoc.Metadata.VersionId)
-	}
-
 	// We neither create dids nor update
 	inMemoryDids := map[string]types.DidDocWithMetadata{}
 

@@ -24,9 +24,8 @@ var _ = Describe("Deactivate DID tests", func() {
 		// Alice
 		alice := setup.CreateSimpleDid()
 		msg := &types.MsgDeactivateDidDocPayload{
-			Id:                alice.Did,
-			PreviousVersionId: alice.VersionId,
-			VersionId:         uuid.NewString(),
+			Id:        alice.Did,
+			VersionId: uuid.NewString(),
 		}
 
 		signatures := []SignInput{alice.DidDocInfo.SignInput}
@@ -41,14 +40,15 @@ var _ = Describe("Deactivate DID tests", func() {
 			NotFoundDID := GenerateDID(Base58_16bytes)
 
 			msg := &types.MsgDeactivateDidDocPayload{
-				Id: NotFoundDID,
+				Id:        NotFoundDID,
+				VersionId: uuid.NewString(),
 			}
 
 			signatures := []SignInput{}
 
 			_, err := setup.DeactivateDidDoc(msg, signatures)
 			Expect(err).ToNot(BeNil())
-			Expect(err.Error()).To(Equal(NotFoundDID + ": DIDDoc not found"))
+			Expect(err.Error()).To(Equal(NotFoundDID + ": DID Doc not found"))
 		})
 	})
 
@@ -57,9 +57,8 @@ var _ = Describe("Deactivate DID tests", func() {
 			// Alice
 			alice := setup.CreateSimpleDid()
 			msg := &types.MsgDeactivateDidDocPayload{
-				Id:                alice.Did,
-				PreviousVersionId: alice.VersionId,
-				VersionId:         uuid.NewString(),
+				Id:        alice.Did,
+				VersionId: uuid.NewString(),
 			}
 
 			signatures := []SignInput{alice.DidDocInfo.SignInput}
@@ -71,7 +70,7 @@ var _ = Describe("Deactivate DID tests", func() {
 			// Deactivate again
 			_, err = setup.DeactivateDidDoc(msg, signatures)
 			Expect(err).ToNot(BeNil())
-			Expect(err.Error()).To(Equal(alice.DidDocInfo.Did + ": DIDDoc already deactivated"))
+			Expect(err.Error()).To(Equal(alice.DidDocInfo.Did + ": DID Doc already deactivated"))
 		})
 	})
 
@@ -83,9 +82,8 @@ var _ = Describe("Deactivate DID tests", func() {
 			bob := setup.CreateSimpleDid()
 
 			msg := &types.MsgDeactivateDidDocPayload{
-				Id:                alice.Did,
-				PreviousVersionId: alice.VersionId,
-				VersionId:         uuid.NewString(),
+				Id:        alice.Did,
+				VersionId: uuid.NewString(),
 			}
 
 			signatures := []SignInput{bob.DidDocInfo.SignInput}

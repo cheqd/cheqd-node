@@ -7,10 +7,10 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func getAllDidDocVersions(ctx sdk.Context, id string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
+func getAllDidDocVersionsMetadata(ctx sdk.Context, id string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	queryServer := NewQueryServer(keeper)
 
-	resp, err := queryServer.AllDidDocVersions(sdk.WrapSDKContext(ctx), &types.QueryGetAllDidDocVersionsRequest{Id: id})
+	resp, err := queryServer.AllDidDocVersionsMetadata(sdk.WrapSDKContext(ctx), &types.QueryGetAllDidDocVersionsMetadataRequest{Id: id})
 	if err != nil {
 		return nil, err
 	}

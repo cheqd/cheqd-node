@@ -60,7 +60,7 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 				},
 			},
 			isValid:  false,
-			errorMsg: "id: unable to split DID into method, namespace and ID; verification_method: (0: (id: must have prefix: badDid.).).",
+			errorMsg: "id: unable to split did into method, namespace and id; verification_method: (0: (id: must have prefix: badDid.).).",
 		}),
 
 	Entry(
@@ -113,7 +113,7 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 				},
 			},
 			isValid:  false,
-			errorMsg: "verification_method: (0: (ID: unable to split DID into method, namespace and ID.).).",
+			errorMsg: "verification_method: (0: (id: unable to split did into method, namespace and id.).).",
 		}),
 	Entry(
 		"Verification method has wrong controller",
@@ -130,7 +130,7 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 				},
 			},
 			isValid:  false,
-			errorMsg: "verification_method: (0: (controller: unable to split DID into method, namespace and ID.).).",
+			errorMsg: "verification_method: (0: (controller: unable to split did into method, namespace and id.).).",
 		}),
 	Entry(
 		"List of DIDs in controller is allowed",
@@ -167,7 +167,7 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 				},
 			},
 			isValid:  false,
-			errorMsg: "controller: (1: unable to split DID into method, namespace and ID.).",
+			errorMsg: "controller: (1: unable to split did into method, namespace and id.).",
 		}),
 	Entry(
 		"Namespace in controller is not in list of allowed",
