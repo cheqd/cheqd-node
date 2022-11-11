@@ -1,11 +1,11 @@
 {
     "context": [],
-    "id": "did:cheqd:testnet:Wx9MqG9qhDuv1Xs1uhUcku",
+    "id": "did:cheqd:testnet:z6LNquFfzPNhCQ8n",
     "controller": [
-        "did:cheqd:testnet:Wx9MqG9qhDuv1Xs1uhUcku"
+        "did:cheqd:testnet:z6LNquFfzPNhCQ8n"
     ],
     "authentication": [
-        "did:cheqd:testnet:Wx9MqG9qhDuv1Xs1uhUcku#key-1"
+        "did:cheqd:testnet:z6LNquFfzPNhCQ8n#key-1"
     ],
     "assertionMethod": [],
     "capabilityInvocation": [],
@@ -14,9 +14,9 @@
     "alsoKnownAs": [],
     "verificationMethod": [
         {
-            "id": "did:cheqd:testnet:Wx9MqG9qhDuv1Xs1uhUcku#key-1",
+            "id": "did:cheqd:testnet:z6LNquFfzPNhCQ8n#key-1",
             "type": "Ed25519VerificationKey2020",
-            "controller": "did:cheqd:testnet:Wx9MqG9qhDuv1Xs1uhUcku",
+            "controller": "did:cheqd:testnet:z6LNquFfzPNhCQ8n",
             "publicKeyMultibase": "z6LNquFfzPNhCQ8nbCWSMBQjosLT7ayEqGSYrN2Y1FdmS",
             "publicKeyJwk": []
         }

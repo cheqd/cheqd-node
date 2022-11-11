@@ -21,8 +21,6 @@ var _ = Describe("Upgrade - Pre", func() {
 		var DidDocCreateSignInput []cli.SignInput
 		var DidDocUpdatePayload didtypesv1.MsgUpdateDidPayload
 		var DidDocUpdateSignInput []cli.SignInput
-		var DidDocDeactivatePayload didtypesv1.MsgDeactivateDidPayload
-		var DidDocDeactivateSignInput []cli.SignInput
 		var ResourceCreatePayload resourcetypesv1.MsgCreateResourcePayload
 		var ResourceCreateSignInput []cli.SignInput
 		var err error
@@ -62,7 +60,7 @@ var _ = Describe("Upgrade - Pre", func() {
 			By("copying the existing resource file to the container")
 			ResourceFile, err := integrationtestdata.CreateTestJson(GinkgoT().TempDir())
 			Expect(err).To(BeNil())
-			_, err = cli.LocalnetExecCopyAbsoluteWithPermissions(ResourceFile, cli.DOCKER_HOME, cli.VALIDATOR0)
+			_, err = cli.LocalnetExecCopyAbsoluteWithPermissions(integrationtestdata.JSON_FILE_NAME, cli.DOCKER_HOME, cli.VALIDATOR0)
 			Expect(err).To(BeNil())
 
 			for i, payload := range ExistingResourceCreatePayloads {
@@ -106,30 +104,6 @@ var _ = Describe("Upgrade - Pre", func() {
 				DidDocUpdatePayload.VersionId = q.Metadata.VersionId
 
 				res, err := cli.UpdateDidLegacy(DidDocUpdatePayload, DidDocUpdateSignInput, cli.VALIDATOR0)
-				Expect(err).To(BeNil())
-				Expect(res.Code).To(BeEquivalentTo(0))
-			}
-		})
-
-		It("should load and run existing diddoc payloads - case: deactivate", func() {
-			By("matching the glob pattern for existing diddoc payloads")
-			ExistingDidDocDeactivatePayloads, err = Glob(filepath.Join(GENERATED_JSON_DIR, "existing", "diddoc", "deactivate", "*.json"))
-			Expect(err).To(BeNil())
-
-			By("matching the glob pattern for existing diddoc sign input")
-			ExistingSignInputDeactivatePayloads, err = Glob(filepath.Join(GENERATED_JSON_DIR, "existing", "diddoc", "deactivate", "signinput", "*.json"))
-			Expect(err).To(BeNil())
-
-			for i, payload := range ExistingDidDocDeactivatePayloads {
-				testCase, _ := GetCase(payload)
-				By("Running: " + testCase)
-				err = Loader(payload, &DidDocDeactivatePayload)
-				Expect(err).To(BeNil())
-
-				err = Loader(ExistingSignInputDeactivatePayloads[i], &DidDocDeactivateSignInput)
-				Expect(err).To(BeNil())
-
-				res, err := cli.DeactivateDidLegacy(DidDocDeactivatePayload, DidDocDeactivateSignInput, cli.VALIDATOR0)
 				Expect(err).To(BeNil())
 				Expect(res.Code).To(BeEquivalentTo(0))
 			}
