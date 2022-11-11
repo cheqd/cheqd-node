@@ -124,6 +124,7 @@ jobs:
           cp -r network-config network-config-0.6.9
 
       - name: Restore localnet config permissions
+        run: |
           sudo chown -R 1000:1000 network-config
 
       - name: Set up Docker localnet mainnet-latest
