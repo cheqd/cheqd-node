@@ -46,7 +46,7 @@ services:
       - source: validator-0-priv-val-key
         target: /priv_validator_key
       - source: validator-0-operator-key
-        target: /operator_account_key
+        target: /home/cheqd/.cheqdnode/keyring-test/operator.info
 
   validator-1:
     image: ${BUILD_IMAGE}
@@ -86,7 +86,7 @@ services:
       - source: validator-1-priv-val-key
         target: /priv_validator_key
       - source: validator-1-operator-key
-        target: /operator_account_key
+        target: /home/cheqd/.cheqdnode/keyring-test/operator.info
 
   validator-2:
     image: ${BUILD_IMAGE}
@@ -126,7 +126,7 @@ services:
       - source: validator-2-priv-val-key
         target: /priv_validator_key
       - source: validator-2-operator-key
-        target: /operator_account_key
+        target: /home/cheqd/.cheqdnode/keyring-test/operator.info
 
   validator-3:
     image: ${BUILD_IMAGE}
@@ -166,7 +166,7 @@ services:
       - source: validator-3-priv-val-key
         target: /priv_validator_key
       - source: validator-3-operator-key
-        target: /operator_account_key
+        target: /home/cheqd/.cheqdnode/keyring-test/operator.info
 
   seed-0:
     image: ${BUILD_IMAGE}
