@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/cli"
-	migration "github.com/cheqd/cheqd-node/tests/upgrade/migration"
+	// migration "github.com/cheqd/cheqd-node/tests/upgrade/migration"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -15,11 +15,11 @@ import (
 // Idiomatically, it is called from the upgrade_suite_test.go file, in the BeforeSuite() function.
 // We will keep both AfterSuite() and Post() callback here for easiness of conceptual understanding.
 var _ = AfterSuite(func() {
-	err := Post()
+	/* err := Post()
 	Expect(err).To(BeNil())
 
 	err = migration.AssertMigration(&QueriedDidDoc, &QueriedResource)
-	Expect(err).To(BeNil())
+	Expect(err).To(BeNil()) */
 
 	// TODO: Add localnet volume mount cleanup & cli binary cleanup
 	// This allows for a clean run of the upgrade test suite, even if the run is done locally.

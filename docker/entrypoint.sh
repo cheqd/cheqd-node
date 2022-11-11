@@ -54,5 +54,14 @@ else
     echo "No private validator key file passed. Skipping and retaining existing key."
 fi
 
+# Check if a priv_validator_key file has been passed in config
+if [ -f "/operator_account_key" ]
+then
+    echo "Private validator key file passed. Replacing current key."
+    cp /operator_account_key "${CHEQD_ROOT_DIR}/config/keyring-test/operator.info"
+else
+    echo "No operator account key file passed. Skipping and retaining existing key."
+fi
+
 # Run node
 cheqd-noded start

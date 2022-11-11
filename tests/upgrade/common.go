@@ -7,12 +7,17 @@ import (
 	"strings"
 
 	integrationtestdata "github.com/cheqd/cheqd-node/tests/integration/testdata"
+	cli "github.com/cheqd/cheqd-node/tests/upgrade/cli"
 	network "github.com/cheqd/cheqd-node/tests/upgrade/network"
-	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	"github.com/google/uuid"
 	"github.com/multiformats/go-multibase"
+)
+
+var (
+	ExistingDidDocCreatePayloads, ExistingDidDocUpdatePayloads, ExistingDidDocDeactivatePayloads          []string
+	ExistingSignInputCreatePayloads, ExistingSignInputUpdatePayloads, ExistingSignInputDeactivatePayloads []string
 )
 
 // Pre
@@ -26,7 +31,7 @@ var (
 var DidDoc didtypes.MsgCreateDidDocPayload
 
 var (
-	SignInputs []didcli.SignInput
+	SignInputs []cli.SignInput
 	Err        error
 )
 
@@ -39,7 +44,7 @@ var (
 
 var (
 	RotatedKeysDidDoc     didtypes.MsgUpdateDidDocPayload
-	RotatedKeysSignInputs []didcli.SignInput
+	RotatedKeysSignInputs []cli.SignInput
 	RotatedKeysErr        error
 )
 
@@ -47,7 +52,7 @@ var (
 var PostDidDoc didtypes.MsgCreateDidDocPayload
 
 var (
-	PostSignInputs []didcli.SignInput
+	PostSignInputs []cli.SignInput
 	PostErr        error
 )
 
@@ -60,7 +65,7 @@ var (
 
 var (
 	PostRotatedKeysDidDoc     didtypes.MsgUpdateDidDocPayload
-	PostRotatedKeysSignInputs []didcli.SignInput
+	PostRotatedKeysSignInputs []cli.SignInput
 	PostRotatedKeysErr        error
 )
 
@@ -70,18 +75,18 @@ var (
 	QueriedResource resourcetypes.Resource
 )
 
-func GenerateDidDocWithSignInputs() (didtypes.MsgCreateDidDocPayload, []didcli.SignInput, error) {
+func GenerateDidDocWithSignInputs() (didtypes.MsgCreateDidDocPayload, []cli.SignInput, error) {
 	did := "did:cheqd:" + network.DID_NAMESPACE + ":" + uuid.NewString()
 	keyId := did + "#key1"
 
 	pubKey, privKey, err := ed25519.GenerateKey(nil)
 	if err != nil {
-		return didtypes.MsgCreateDidDocPayload{}, []didcli.SignInput{}, err
+		return didtypes.MsgCreateDidDocPayload{}, []cli.SignInput{}, err
 	}
 
 	pubKeyMultibase58, err := multibase.Encode(multibase.Base58BTC, pubKey)
 	if err != nil {
-		return didtypes.MsgCreateDidDocPayload{}, []didcli.SignInput{}, err
+		return didtypes.MsgCreateDidDocPayload{}, []cli.SignInput{}, err
 	}
 
 	payload := didtypes.MsgCreateDidDocPayload{
@@ -98,26 +103,26 @@ func GenerateDidDocWithSignInputs() (didtypes.MsgCreateDidDocPayload, []didcli.S
 		Authentication: []string{keyId},
 	}
 
-	input := []didcli.SignInput{
+	input := []cli.SignInput{
 		{
 			VerificationMethodId: keyId,
-			PrivKey:              privKey,
+			PrivateKey:           privKey,
 		},
 	}
 	return payload, input, nil
 }
 
-func GenerateRotatedKeysDidDocWithSignInputs(payload didtypes.MsgCreateDidDocPayload, input []didcli.SignInput, versionId string) (didtypes.MsgUpdateDidDocPayload, []didcli.SignInput, error) {
+func GenerateRotatedKeysDidDocWithSignInputs(payload didtypes.MsgCreateDidDocPayload, input []cli.SignInput, versionId string) (didtypes.MsgUpdateDidDocPayload, []cli.SignInput, error) {
 	// Specifically, we want to update the DID doc by rotating keys.
 
 	pubKey, privKey, err := ed25519.GenerateKey(nil)
 	if err != nil {
-		return didtypes.MsgUpdateDidDocPayload{}, []didcli.SignInput{}, err
+		return didtypes.MsgUpdateDidDocPayload{}, []cli.SignInput{}, err
 	}
 
 	pubKeyMultibase58, err := multibase.Encode(multibase.Base58BTC, pubKey)
 	if err != nil {
-		return didtypes.MsgUpdateDidDocPayload{}, []didcli.SignInput{}, err
+		return didtypes.MsgUpdateDidDocPayload{}, []cli.SignInput{}, err
 	}
 
 	updatedPayload := didtypes.MsgUpdateDidDocPayload{
@@ -135,11 +140,11 @@ func GenerateRotatedKeysDidDocWithSignInputs(payload didtypes.MsgCreateDidDocPay
 		VersionId:      versionId,
 	}
 
-	updatedInput := []didcli.SignInput{
+	updatedInput := []cli.SignInput{
 		input[0],
 		{
 			VerificationMethodId: input[0].VerificationMethodId,
-			PrivKey:              privKey,
+			PrivateKey:           privKey,
 		},
 	}
 

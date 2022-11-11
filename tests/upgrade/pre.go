@@ -7,7 +7,7 @@ import (
 
 	integrationtestdata "github.com/cheqd/cheqd-node/tests/integration/testdata"
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/cli"
-	migration "github.com/cheqd/cheqd-node/tests/upgrade/migration"
+	// migration "github.com/cheqd/cheqd-node/tests/upgrade/migration"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -16,14 +16,14 @@ import (
 // Idiomatically, it is called from the upgrade_suite_test.go file, in the BeforeSuite() function.
 // We will keep both BeforeSuite() and Pre() callback here for easiness of conceptual understanding.
 var _ = BeforeSuite(func() {
-	err := migration.AssertHandlers()
-	Expect(err).To(BeNil())
+	/* err := migration.AssertHandlers()
+	Expect(err).To(BeNil()) */
 
 	// TODO: Add localnet volume mount cleanup here.
 	// This allows for a clean start of the localnet containers.
 
-	err = Pre()
-	Expect(err).To(BeNil())
+	/* err = Pre()
+	Expect(err).To(BeNil()) */
 })
 
 func Pre() error {

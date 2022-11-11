@@ -117,7 +117,7 @@ jobs:
 
       - name: Install binary @latest release
         run: |
-          export BUILD_IMAGE=ghcr.io/cheqd/cheqd-node:latest
+          export BUILD_IMAGE=ghcr.io/cheqd/cheqd-node:0.6.9
           docker pull $BUILD_IMAGE
           docker exec <run gen-network.sh inside v0.6.9 container>
           docker cp <generated configs in container to runner>
@@ -140,30 +140,35 @@ jobs:
       # Pre-Generated Payloads in .json files
       #
 
-      - name: Run pre-migration tests
+      - name: Run pre-upgrade tests
         working-directory: ./tests/upgrade
         run: |
-          ginkgo -r --tags upgrade --race
+          ginkgo -r --tags upgrade --race --focus-file pre_test.go
           docker compose down
-      
+
       - name: Download node Docker next image
         uses: actions/download-artifact@v3
         with:
           name: cheqd-node-build.tar
-  
+
       - name: Set up Docker localnet build-latest
         working-directory: ./docker/localnet
         run: |
-          docker compose --env-file build-latest.env up --detach
+          docker compose --env-file build-latest.env up --detach --no-build
 
-      - name: Run post-migration tests
+      - name: Run post-upgrade tests
         working-directory: ./tests/upgrade
         run: |
           ginkgo -r --tags upgrade --race
 
+      - name: Import keys
+        working-directory: ./docker/localnet
+        run: |
+          bash import-keys.sh
+
       - name: Run integration tests
         working-directory: ./tests/integration
-        run: ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --junit-report ../../report-integration.xml
+        run: ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --junit-report ../../report-integration-post.xml
 
   report-results:
     name: "Report"
