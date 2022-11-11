@@ -115,12 +115,6 @@ jobs:
       - name: Restore binary permissions
         run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
 
-      - name: Download node Docker image mainnet-latest
-        run: |
-          export DOCKER_IMAGE=ghcr.io/cheqd/cheqd-node:0.6.9
-          docker pull $DOCKER_IMAGE
-          docker tag $DOCKER_IMAGE cheqd-node/cheqd-node:0.6.9
-
       - name: Set up Docker localnet mainnet-latest
         working-directory: ./docker/localnet
         run: |
