@@ -73,7 +73,7 @@ jobs:
       - name: Set up Docker localnet
         working-directory: ./docker/localnet
         run: |
-          docker compose --env-file build-latest.env up --no-build
+          docker compose --env-file build-latest.env up --detach --no-build
 
       - name: Import keys
         working-directory: ./docker/localnet
@@ -123,7 +123,7 @@ jobs:
       - name: Set up Docker localnet mainnet-latest
         working-directory: ./docker/localnet
         run: |
-          docker compose --env-file mainnet-latest.env up --no-build
+          docker compose --env-file mainnet-latest.env up --detach --no-build
 
       - uses: actions/setup-go@v3
         with:
