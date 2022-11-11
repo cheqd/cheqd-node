@@ -10,7 +10,7 @@ import (
 
 func CmdUpdateDidDoc() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-diddoc [payload-json] [ver-method-id-1] [priv-key-1] [ver-method-id-N] [priv-key-N] ...",
+		Use:   "update-did [payload-json] [ver-method-id-1] [priv-key-1] [ver-method-id-N] [priv-key-N] ...",
 		Short: "Updates a DIDDoc.",
 		Long: "Updates a DIDDoc. " +
 			"[payload-json] is JSON encoded MsgUpdateDidPayload. " +

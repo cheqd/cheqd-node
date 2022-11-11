@@ -11,7 +11,7 @@ import (
 
 func CmdDeactivateDidDoc() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "deactivate-diddoc [id] [previous-version-id] [ver-method-id-1] [priv-key-1] [ver-method-id-N] [priv-key-N] ...",
+		Use:   "deactivate-did [id] [ver-method-id-1] [priv-key-1] [ver-method-id-N] [priv-key-N] ...",
 		Short: "Deactivates a DIDDoc.",
 		Long: "Deactivates a DIDDoc. " +
 			"[id] is DID Document id. " +
@@ -19,7 +19,7 @@ func CmdDeactivateDidDoc() *cobra.Command {
 			"[priv-key-1] is base base64 encoded ed25519 private key for signature N." +
 			"If 'interactive' value is used for a key, the key will be read interactively. " +
 			"Prefer interactive mode, use inline mode only for tests.",
-		Args: cobra.MinimumNArgs(2),
+		Args: cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -27,18 +27,16 @@ func CmdDeactivateDidDoc() *cobra.Command {
 			}
 
 			did := args[0]
-			previousVersionId := args[1]
 
-			signInputs, err := GetSignInputs(clientCtx, args[2:])
+			signInputs, err := GetSignInputs(clientCtx, args[1:])
 			if err != nil {
 				return err
 			}
 
 			// Build payload
 			payload := &types.MsgDeactivateDidDocPayload{
-				Id:                did,
-				PreviousVersionId: previousVersionId,
-				VersionId:         uuid.NewString(),
+				Id:        did,
+				VersionId: uuid.NewString(),
 			}
 
 			// Build identity message

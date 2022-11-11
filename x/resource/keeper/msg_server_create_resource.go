@@ -30,6 +30,12 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 		return nil, err
 	}
 
+	// Validate namespaces
+	err = msg.Validate([]string{namespace})
+	if err != nil {
+		return nil, didtypes.ErrNamespaceValidation.Wrap(err.Error())
+	}
+
 	// Validate DID is not deactivated
 	if didDoc.Metadata.Deactivated {
 		return nil, didtypes.ErrDIDDocDeactivated.Wrap(did)

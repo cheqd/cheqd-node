@@ -22,6 +22,7 @@ func ExpectPayloadToMatchResource(payload *resourcetypes.MsgCreateResourcePayloa
 	Expect(payload.CollectionId).To(Equal(resource.Metadata.CollectionId))
 	Expect(payload.Name).To(Equal(resource.Metadata.Name))
 	Expect(payload.ResourceType).To(Equal(resource.Metadata.ResourceType))
+	Expect(payload.AlsoKnownAs).To(Equal(resource.Metadata.AlsoKnownAs))
 
 	// Generated header
 	hash := sha256.Sum256(payload.Data)
@@ -50,6 +51,15 @@ var _ = Describe("Create Resource Tests", func() {
 				Name:         "Test Resource Name",
 				ResourceType: CLSchemaType,
 				Data:         []byte(SchemaData),
+				AlsoKnownAs: []*resourcetypes.AlternativeUri{
+					{
+						Uri: "https://example.com/alternative-uri",
+					},
+					{
+						Uri:         "https://example.com/alternative-uri",
+						Description: "Alternative URI description",
+					},
+				},
 			}
 		})
 
@@ -62,6 +72,14 @@ var _ = Describe("Create Resource Tests", func() {
 			Expect(err).To(BeNil())
 
 			ExpectPayloadToMatchResource(msg, created.Resource)
+		})
+
+		It("Can't be created with empty also_known_as uri", func() {
+			msg.AlsoKnownAs[0].Uri = ""
+
+			_, err := setup.CreateResource(msg, []didsetup.SignInput{alice.SignInput})
+			Expect(err).ToNot(BeNil())
+			Expect(err.Error()).To(ContainSubstring("uri: cannot be blank"))
 		})
 
 		It("Can't be created without DIDDoc controller signatures", func() {

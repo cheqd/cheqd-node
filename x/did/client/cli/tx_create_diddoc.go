@@ -10,7 +10,7 @@ import (
 
 func CmdCreateDidDoc() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-diddoc [payload-json] [ver-method-id-1] [priv-key-1] [ver-method-id-N] [priv-key-N] ...",
+		Use:   "create-did [payload-json] [ver-method-id-1] [priv-key-1] [ver-method-id-N] [priv-key-N] ...",
 		Short: "Creates a new DID and associated DIDDoc.",
 		Long: "Creates a new DID and associated DIDDoc. " +
 			"[payload-json] is JSON encoded MsgCreateDidPayload. " +
