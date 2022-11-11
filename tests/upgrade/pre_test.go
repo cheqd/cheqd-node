@@ -60,7 +60,7 @@ var _ = Describe("Upgrade - Pre", func() {
 			By("copying the existing resource file to the container")
 			ResourceFile, err := integrationtestdata.CreateTestJson(GinkgoT().TempDir())
 			Expect(err).To(BeNil())
-			_, err = cli.LocalnetExecCopyAbsoluteWithPermissions(integrationtestdata.JSON_FILE_NAME, cli.DOCKER_HOME, cli.VALIDATOR0)
+			_, err = cli.LocalnetExecCopyAbsoluteWithPermissions(ResourceFile, cli.DOCKER_HOME, cli.VALIDATOR0)
 			Expect(err).To(BeNil())
 
 			for i, payload := range ExistingResourceCreatePayloads {
@@ -73,7 +73,7 @@ var _ = Describe("Upgrade - Pre", func() {
 				Expect(err).To(BeNil())
 
 				// TODO: Add resource file. Right now, it is not possible to create a resource without a file. So we need to copy a file to the container home directory.
-				res, err := cli.CreateResource(ResourceCreatePayload.CollectionId, ResourceCreatePayload.Id, ResourceCreatePayload.Name, ResourcePayload.ResourceType, ResourceFile, ResourceCreateSignInput, cli.VALIDATOR0)
+				res, err := cli.CreateResource(ResourceCreatePayload.CollectionId, ResourceCreatePayload.Id, ResourceCreatePayload.Name, ResourcePayload.ResourceType, integrationtestdata.JSON_FILE_NAME, ResourceCreateSignInput, cli.VALIDATOR0)
 				Expect(err).To(BeNil())
 				Expect(res.Code).To(BeEquivalentTo(0))
 			}
