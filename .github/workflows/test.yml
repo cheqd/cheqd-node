@@ -137,10 +137,10 @@ jobs:
       - name: Copy keys # This is temporary.
         working-directory: ./docker/localnet
         run: |
-          docker compose cp network-config/validator-0/keyring-test/operator-0.info validator-0:/home/cheqd/.cheqdnode/keyring-test/operator.info
-          docker compose cp network-config/validator-1/keyring-test/operator-1.info validator-1:/home/cheqd/.cheqdnode/keyring-test/operator.info
-          docker compose cp network-config/validator-2/keyring-test/operator-2.info validator-2:/home/cheqd/.cheqdnode/keyring-test/operator.info
-          docker compose cp network-config/validator-3/keyring-test/operator-3.info validator-3:/home/cheqd/.cheqdnode/keyring-test/operator.info
+          docker compose --env-file mainnet-latest.env cp network-config/validator-0/keyring-test/operator-0.info validator-0:/home/cheqd/.cheqdnode/keyring-test/operator.info
+          docker compose --env-file mainnet-latest.env cp network-config/validator-1/keyring-test/operator-1.info validator-1:/home/cheqd/.cheqdnode/keyring-test/operator.info
+          docker compose --env-file mainnet-latest.env cp network-config/validator-2/keyring-test/operator-2.info validator-2:/home/cheqd/.cheqdnode/keyring-test/operator.info
+          docker compose --env-file mainnet-latest.env cp network-config/validator-3/keyring-test/operator-3.info validator-3:/home/cheqd/.cheqdnode/keyring-test/operator.info
           rm -rf network-config-0.6.9
 
       - uses: actions/setup-go@v3
