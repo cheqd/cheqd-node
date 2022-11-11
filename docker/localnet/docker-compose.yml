@@ -45,8 +45,6 @@ services:
         target: /node_key
       - source: validator-0-priv-val-key
         target: /priv_validator_key
-      - source: validator-0-operator-key
-        target: /home/cheqd/.cheqdnode/keyring-test/operator.info
 
   validator-1:
     image: ${BUILD_IMAGE}
@@ -85,8 +83,6 @@ services:
         target: /node_key
       - source: validator-1-priv-val-key
         target: /priv_validator_key
-      - source: validator-1-operator-key
-        target: /home/cheqd/.cheqdnode/keyring-test/operator.info
 
   validator-2:
     image: ${BUILD_IMAGE}
@@ -125,8 +121,6 @@ services:
         target: /node_key
       - source: validator-2-priv-val-key
         target: /priv_validator_key
-      - source: validator-2-operator-key
-        target: /home/cheqd/.cheqdnode/keyring-test/operator.info
 
   validator-3:
     image: ${BUILD_IMAGE}
@@ -165,8 +159,6 @@ services:
         target: /node_key
       - source: validator-3-priv-val-key
         target: /priv_validator_key
-      - source: validator-3-operator-key
-        target: /home/cheqd/.cheqdnode/keyring-test/operator.info
 
   seed-0:
     image: ${BUILD_IMAGE}
@@ -256,32 +248,24 @@ configs:
     file: network-config/validator-0/config/node_key.json
   validator-0-priv-val-key:
     file: network-config/validator-0/config/priv_validator_key.json
-  validator-0-operator-key:
-    file: network-config/validator-0/keyring-test/operator-0.info
 
   # Validator 1
   validator-1-node-key:
     file: network-config/validator-1/config/node_key.json
   validator-1-priv-val-key:
     file: network-config/validator-1/config/priv_validator_key.json
-  validator-1-operator-key:
-    file: network-config/validator-1/keyring-test/operator-1.info
 
   # Validator 2
   validator-2-node-key:
     file: network-config/validator-2/config/node_key.json
   validator-2-priv-val-key:
     file: network-config/validator-2/config/priv_validator_key.json
-  validator-2-operator-key:
-    file: network-config/validator-2/keyring-test/operator-2.info
 
   # Validator 3
   validator-3-node-key:
     file: network-config/validator-3/config/node_key.json
   validator-3-priv-val-key:
     file: network-config/validator-3/config/priv_validator_key.json
-  validator-3-operator-key:
-    file: network-config/validator-3/keyring-test/operator-3.info
 
   # Seed 0
   seed-0-node-key:
