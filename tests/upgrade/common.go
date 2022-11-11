@@ -18,6 +18,7 @@ import (
 var (
 	ExistingDidDocCreatePayloads, ExistingDidDocUpdatePayloads, ExistingDidDocDeactivatePayloads          []string
 	ExistingSignInputCreatePayloads, ExistingSignInputUpdatePayloads, ExistingSignInputDeactivatePayloads []string
+	ExistingResourceCreatePayloads                                                                        []string
 )
 
 // Pre

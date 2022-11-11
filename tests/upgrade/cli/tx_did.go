@@ -43,7 +43,7 @@ func CreateDid(payload didtypesv2.MsgCreateDidDocPayload, signInputs []SignInput
 		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivateKey))
 	}
 
-	return Tx(container, CLI_BINARY_NAME, "cheqd", "create-did", OperatorAccounts[container], args...)
+	return Tx(container, CLI_BINARY_NAME, "cheqd", "create-diddoc", OperatorAccounts[container], args...)
 }
 
 func UpdateDidLegacy(payload didtypesv1.MsgUpdateDidPayload, signInputs []SignInput, container string) (sdk.TxResponse, error) {
@@ -75,5 +75,37 @@ func UpdateDid(payload didtypesv2.MsgUpdateDidDocPayload, signInputs []SignInput
 		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivateKey))
 	}
 
-	return Tx(container, CLI_BINARY_NAME, "cheqd", "update-did", OperatorAccounts[container], args...)
+	return Tx(container, CLI_BINARY_NAME, "cheqd", "update-diddoc", OperatorAccounts[container], args...)
+}
+
+func DeactivateDidLegacy(payload didtypesv1.MsgDeactivateDidPayload, signInputs []SignInput, container string) (sdk.TxResponse, error) {
+	payloadJson, err := integrationhelpers.Codec.MarshalJSON(&payload)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	args := []string{string(payloadJson)}
+
+	for _, signInput := range signInputs {
+		args = append(args, signInput.VerificationMethodId)
+		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivateKey))
+	}
+
+	return Tx(container, CLI_BINARY_NAME, "cheqd", "deactivate-did", OperatorAccounts[container], args...)
+}
+
+func DeactivateDid(payload didtypesv1.MsgDeactivateDidPayload, signInputs []SignInput, container string) (sdk.TxResponse, error) {
+	payloadJson, err := integrationhelpers.Codec.MarshalJSON(&payload)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	args := []string{string(payloadJson)}
+
+	for _, signInput := range signInputs {
+		args = append(args, signInput.VerificationMethodId)
+		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivateKey))
+	}
+
+	return Tx(container, CLI_BINARY_NAME, "cheqd", "deactivate-diddoc", OperatorAccounts[container], args...)
 }

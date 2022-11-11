@@ -10,31 +10,32 @@ import (
 )
 
 const (
-	ROOT_REL_PATH        = "../.."
-	DOCKER_LOCALNET      = "localnet"
-	DOCKER_LOCALNET_PATH = "../../docker/localnet"
-	DOCKER_COMPOSE_FILE  = "docker-compose.yml"
-	DOCKER_COMPOSE_ENV   = "docker-compose.env"
-	DOCKER               = "docker"
-	DOCKER_COMPOSE       = "compose"
-	DOCKER_LOAD          = "load"
-	DOCKER_IMAGE_NAME    = "cheqd-node-build.tar"
-	DOCKER_IMAGE_ENV     = "BUILD_IMAGE"
-	DOCKER_IMAGE_BUILD   = "cheqd/cheqd-node:build-latest"
-	DOCKER_IMAGE_LATEST  = "ghcr.io/cheqd/cheqd-node:latest"
-	DOCKER_HOME          = "/home/cheqd"
-	DOCKER_USER          = "cheqd"
-	DOCKER_USER_GROUP    = "cheqd"
-	RUNNER_BIN_DIR       = "$(echo $RUNNER_BIN_DIR)"
-	OPERATOR0            = "operator"
-	OPERATOR1            = "operator"
-	OPERATOR2            = "operator"
-	OPERATOR3            = "operator"
-	VALIDATOR0           = "validator-0"
-	VALIDATOR1           = "validator-1"
-	VALIDATOR2           = "validator-2"
-	VALIDATOR3           = "validator-3"
-	VALIDATORS           = 4
+	ROOT_REL_PATH         = "../.."
+	DOCKER_LOCALNET       = "localnet"
+	DOCKER_LOCALNET_PATH  = "../../docker/localnet"
+	DOCKER_COMPOSE_FILE   = "docker-compose.yml"
+	DOCKER_COMPOSE_ENV_ML = "mainnet-latest.env"
+	DOCKER_COMPOSE_ENV_BL = "build-latest.env"
+	DOCKER                = "docker"
+	DOCKER_COMPOSE        = "compose"
+	DOCKER_LOAD           = "load"
+	DOCKER_IMAGE_NAME     = "cheqd-node-build.tar"
+	DOCKER_IMAGE_ENV      = "BUILD_IMAGE"
+	DOCKER_IMAGE_BUILD    = "cheqd/cheqd-node:build-latest"
+	DOCKER_IMAGE_LATEST   = "ghcr.io/cheqd/cheqd-node:latest"
+	DOCKER_HOME           = "/home/cheqd"
+	DOCKER_USER           = "cheqd"
+	DOCKER_USER_GROUP     = "cheqd"
+	RUNNER_BIN_DIR        = "$(echo $RUNNER_BIN_DIR)"
+	OPERATOR0             = "operator"
+	OPERATOR1             = "operator"
+	OPERATOR2             = "operator"
+	OPERATOR3             = "operator"
+	VALIDATOR0            = "validator-0"
+	VALIDATOR1            = "validator-1"
+	VALIDATOR2            = "validator-2"
+	VALIDATOR3            = "validator-3"
+	VALIDATORS            = 4
 )
 
 type OperatorAccount map[string]string
@@ -49,8 +50,13 @@ var OperatorAccounts OperatorAccount = OperatorAccount{
 var ValidatorNodes = []string{VALIDATOR0, VALIDATOR1, VALIDATOR2, VALIDATOR3}
 
 var (
-	DOCKER_COMPOSE_ARGS = []string{
+	DOCKER_COMPOSE_LATEST_ARGS = []string{
 		"-f", filepath.Join(DOCKER_LOCALNET_PATH, DOCKER_COMPOSE_FILE),
+		"--env-file", filepath.Join(DOCKER_LOCALNET_PATH, DOCKER_COMPOSE_ENV_ML),
+	}
+	DOCKER_COMPOSE_BUILD_ARGS = []string{
+		"-f", filepath.Join(DOCKER_LOCALNET_PATH, DOCKER_COMPOSE_FILE),
+		"--env-file", filepath.Join(DOCKER_LOCALNET_PATH, DOCKER_COMPOSE_ENV_BL),
 	}
 	DOCKER_LOAD_IMAGE_ARGS = []string{
 		"-i", filepath.Join(ROOT_REL_PATH, DOCKER_IMAGE_NAME),
@@ -83,8 +89,8 @@ var (
 	}
 )
 
-func LocalnetExec(args ...string) (string, error) {
-	args = append(append([]string{DOCKER_COMPOSE}, DOCKER_COMPOSE_ARGS...), args...)
+func LocalnetExec(envArgs []string, args ...string) (string, error) {
+	args = append(append([]string{DOCKER_COMPOSE}, envArgs...), args...)
 	cmd := exec.Command(DOCKER, args...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
@@ -95,27 +101,27 @@ func LocalnetExec(args ...string) (string, error) {
 
 func LocalnetExecExec(container string, args ...string) (string, error) {
 	args = append([]string{"exec", container}, args...)
-	return LocalnetExec(args...)
+	return LocalnetExec(DOCKER_COMPOSE_LATEST_ARGS, args...)
 }
 
 func LocalnetExecUp() (string, error) {
-	return LocalnetExec("up", "--detach", "--no-build")
+	return LocalnetExec(DOCKER_COMPOSE_LATEST_ARGS, "up", "--detach", "--no-build")
 }
 
 func LocalnetExecDown() (string, error) {
-	return LocalnetExec("down")
+	return LocalnetExec(DOCKER_COMPOSE_LATEST_ARGS, "down")
 }
 
 func LocalnetExecSwitchGenesis(container string) (string, error) {
-	_, err := LocalnetExec("exec", "-it", container, "mv", filepath.Join(DOCKER_HOME, ".cheqdnode/config/genesis.json"), filepath.Join(DOCKER_HOME, ".cheqdnode/config/genesis.json.bak"))
+	_, err := LocalnetExec(DOCKER_COMPOSE_LATEST_ARGS, "exec", "-it", container, "mv", filepath.Join(DOCKER_HOME, ".cheqdnode/config/genesis.json"), filepath.Join(DOCKER_HOME, ".cheqdnode/config/genesis.json.bak"))
 	if err != nil {
 		return "", err
 	}
-	return LocalnetExec("exec", "-it", container, "mv", filepath.Join(DOCKER_HOME, ".cheqdnode/config/genesis-next.json"), filepath.Join(DOCKER_HOME, ".cheqdnode/config/genesis.json"))
+	return LocalnetExec(DOCKER_COMPOSE_LATEST_ARGS, "exec", "-it", container, "mv", filepath.Join(DOCKER_HOME, ".cheqdnode/config/genesis-next.json"), filepath.Join(DOCKER_HOME, ".cheqdnode/config/genesis.json"))
 }
 
 func LocalnetExecCopyAbsoluteWithPermissions(path string, destination string, container string) (string, error) {
-	_, err := LocalnetExec("cp", path, filepath.Join(container+":"+destination))
+	_, err := LocalnetExec(DOCKER_COMPOSE_LATEST_ARGS, "cp", path, filepath.Join(container+":"+destination))
 	if err != nil {
 		fmt.Println("Error copying file to container: ", err)
 		return "", err
@@ -124,7 +130,7 @@ func LocalnetExecCopyAbsoluteWithPermissions(path string, destination string, co
 }
 
 func LocalnetExecRestorePermissions(path string, container string) (string, error) {
-	return LocalnetExec("exec", "-it", "--user", "root", container, "chown", "-R", DOCKER_USER+":"+DOCKER_USER_GROUP, path)
+	return LocalnetExec(DOCKER_COMPOSE_LATEST_ARGS, "exec", "-it", "--user", "root", container, "chown", "-R", DOCKER_USER+":"+DOCKER_USER_GROUP, path)
 }
 
 func LocalnetExecCopyKeys() (string, error) {
@@ -138,11 +144,11 @@ func LocalnetExecCopyKeys() (string, error) {
 }
 
 func LocalnetExecCopyKey(validator string) (string, error) {
-	_, err := LocalnetExec("cp", filepath.Join(DOCKER_LOCALNET_PATH, NETWORK_CONFIG_DIR, validator, KEYRING_DIR), filepath.Join(validator+":", DOCKER_HOME, ".cheqdnode"))
+	_, err := LocalnetExec(DOCKER_COMPOSE_LATEST_ARGS, "cp", filepath.Join(DOCKER_LOCALNET_PATH, NETWORK_CONFIG_DIR, validator, KEYRING_DIR), filepath.Join(validator+":", DOCKER_HOME, ".cheqdnode"))
 	if err != nil {
 		return "", err
 	}
-	return LocalnetExec("exec", "-it", "--user", "root", validator, "chown", "-R", DOCKER_USER+":"+DOCKER_USER_GROUP, DOCKER_HOME)
+	return LocalnetExec(DOCKER_COMPOSE_LATEST_ARGS, "exec", "-it", "--user", "root", validator, "chown", "-R", DOCKER_USER+":"+DOCKER_USER_GROUP, DOCKER_HOME)
 }
 
 func LocalnetLoadImage(args ...string) (string, error) {
@@ -160,7 +166,7 @@ func LocalnetExecUpWithBuildImage() (string, error) {
 		[]string{DOCKER_IMAGE_ENV + "=" + DOCKER_IMAGE_BUILD},
 		DOCKER, DOCKER_COMPOSE,
 		"--env-file",
-		filepath.Join(DOCKER_LOCALNET_PATH, DOCKER_COMPOSE_ENV),
+		filepath.Join(DOCKER_LOCALNET_PATH, DOCKER_COMPOSE_ENV_BL),
 		"-f",
 		filepath.Join(DOCKER_LOCALNET_PATH, DOCKER_COMPOSE_FILE),
 		"up",
