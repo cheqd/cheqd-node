@@ -125,8 +125,6 @@ services:
         target: /node_key
       - source: validator-2-priv-val-key
         target: /priv_validator_key
-      - source: validator-2-keyring-test
-        target: /keyring-test
       - source: validator-2-operator-key
         target: /operator_account_key
 
@@ -167,8 +165,6 @@ services:
         target: /node_key
       - source: validator-3-priv-val-key
         target: /priv_validator_key
-      - source: validator-3-keyring-test
-        target: /keyring-test
       - source: validator-3-operator-key
         target: /operator_account_key
 
