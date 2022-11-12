@@ -7,7 +7,9 @@
     "authentication": [
         "did:cheqd:testnet:zBbSuTsomwfoBbCd#key-1"
     ],
-    "assertionMethod": [],
+    "assertionMethod": [
+        "did:cheqd:testnet:zBbSuTsomwfoBbCd#key-1"
+    ],
     "capabilityInvocation": [],
     "capabilityDelegation": [],
     "keyAgreement": [],
