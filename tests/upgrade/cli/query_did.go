@@ -23,7 +23,7 @@ func QueryDidLegacy(did string, container string) (didtypesv1.QueryGetDidRespons
 }
 
 func QueryDid(did string, container string) (didtypesv2.QueryGetDidDocResponse, error) {
-	res, err := Query(container, CLI_BINARY_NAME, "cheqd", "did", did)
+	res, err := Query(container, CLI_BINARY_NAME, "cheqd", "diddoc", did)
 	if err != nil {
 		return didtypesv2.QueryGetDidDocResponse{}, err
 	}

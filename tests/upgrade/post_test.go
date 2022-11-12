@@ -32,7 +32,7 @@ var _ = Describe("Upgrade - Post", func() {
 
 			for _, payload := range ExpectedDidDocCreateRecords {
 				testCase, _ := GetCase(payload)
-				By("Running: query" + testCase)
+				By("Running: query " + testCase)
 				err = Loader(payload, &DidDocCreateRecord)
 				Expect(err).To(BeNil())
 
@@ -52,7 +52,7 @@ var _ = Describe("Upgrade - Post", func() {
 
 			for _, payload := range ExpectedDidDocUpdateRecords {
 				testCase, _ := GetCase(payload)
-				By("Running: query" + testCase)
+				By("Running: query " + testCase)
 				err = Loader(payload, &DidDocUpdateRecord)
 				Expect(err).To(BeNil())
 
@@ -72,13 +72,13 @@ var _ = Describe("Upgrade - Post", func() {
 
 			for _, payload := range ExpectedResourceCreateRecords {
 				testCase, _ := GetCase(payload)
-				By("Running: query" + testCase)
+				By("Running: query " + testCase)
 				err = Loader(payload, &ResourceCreateRecord)
 				Expect(err).To(BeNil())
 
-				res, err := cli.QueryResourceLegacy(ResourceCreateRecord.CollectionId, ResourceCreateRecord.Id, cli.VALIDATOR0)
+				res, err := cli.QueryResource(ResourceCreateRecord.CollectionId, ResourceCreateRecord.Id, cli.VALIDATOR0)
 				Expect(err).To(BeNil())
-				Expect(res.Resource.Header.Id).To(Equal(ResourceCreateRecord.Id))
+				Expect(res.Resource.Metadata.Id).To(Equal(ResourceCreateRecord.Id))
 
 				// TODO: Add v1 -> v2 deep comparison cases, after defining the migration handlers.
 				// e.g.: Migration to Indy format, uuid lowercasing, etc.

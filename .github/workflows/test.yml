@@ -186,6 +186,9 @@ jobs:
           name: cheqd-noded
           path: ${{ env.RUNNER_BIN_DIR }}
 
+      - name: Restore binary permissions
+        run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
+
       - name: Set up Docker localnet build-latest
         working-directory: ./docker/localnet
         run: |
