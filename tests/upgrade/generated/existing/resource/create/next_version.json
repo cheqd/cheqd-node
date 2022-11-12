@@ -1,7 +1,7 @@
 {
     "collectionId": "97096fb1-63ea-4f81-b296-8eb5da6ab6eb",
     "id": "e6a69483-a1b1-42fa-b32a-55724a341d06",
-    "name": "Test Resource Next Version",
+    "name": "Test Resource",
     "resourceType": "TestResourceType",
     "data": "eyAibWVzc2FnZSI6ICJoZWxsbyB3b3JsZCJ9"
 }
