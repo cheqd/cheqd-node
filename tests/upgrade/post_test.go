@@ -90,6 +90,10 @@ var _ = Describe("Upgrade - Post", func() {
 				res, err := cli.QueryResourceLegacy(ResourceCreateRecord.CollectionId, ResourceCreateRecord.Id, cli.VALIDATOR0)
 				Expect(err).To(BeNil())
 				Expect(res.Resource.Header.Id).To(Equal(ResourceCreateRecord.Id))
+
+				// TODO: Add v1 -> v2 deep comparison cases, after defining the migration handlers.
+				// e.g.: Migration to Indy format, uuid lowercasing, etc.
+				// Checksum migration is already defined as an e2e example.
 			}
 		})
 	})
