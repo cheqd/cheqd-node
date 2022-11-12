@@ -36,9 +36,9 @@ var _ = Describe("Upgrade - Post", func() {
 				err = Loader(payload, &DidDocCreateRecord)
 				Expect(err).To(BeNil())
 
-				res, err := cli.QueryDid(DidDocCreateRecord.Id, cli.VALIDATOR0)
+				res, err := cli.QueryDidLegacyWithNewCli(DidDocCreateRecord.Id, cli.VALIDATOR0)
 				Expect(err).To(BeNil())
-				Expect(res.Value.DidDoc.Id).To(Equal(DidDocCreateRecord.Id))
+				Expect(res.Did.Id).To(Equal(DidDocCreateRecord.Id))
 
 				// TODO: Add v1 -> v2 deep comparison cases, after defining the migration handlers.
 				// e.g.: Migration to Indy format, uuid lowercasing, etc.
@@ -56,9 +56,9 @@ var _ = Describe("Upgrade - Post", func() {
 				err = Loader(payload, &DidDocUpdateRecord)
 				Expect(err).To(BeNil())
 
-				res, err := cli.QueryDid(DidDocUpdateRecord.Id, cli.VALIDATOR0)
+				res, err := cli.QueryDidLegacyWithNewCli(DidDocUpdateRecord.Id, cli.VALIDATOR0)
 				Expect(err).To(BeNil())
-				Expect(res.Value.DidDoc.Id).To(Equal(DidDocUpdateRecord.Id))
+				Expect(res.Did.Id).To(Equal(DidDocUpdateRecord.Id))
 
 				// TODO: Add v1 -> v2 deep comparison cases, after defining the migration handlers.
 				// e.g.: Migration to Indy format, uuid lowercasing, etc.
@@ -76,9 +76,9 @@ var _ = Describe("Upgrade - Post", func() {
 				err = Loader(payload, &ResourceCreateRecord)
 				Expect(err).To(BeNil())
 
-				res, err := cli.QueryResource(ResourceCreateRecord.CollectionId, ResourceCreateRecord.Id, cli.VALIDATOR0)
+				res, err := cli.QueryResourceLegacy(ResourceCreateRecord.CollectionId, ResourceCreateRecord.Id, cli.VALIDATOR0)
 				Expect(err).To(BeNil())
-				Expect(res.Resource.Metadata.Id).To(Equal(ResourceCreateRecord.Id))
+				Expect(res.Resource.Header.Id).To(Equal(ResourceCreateRecord.Id))
 
 				// TODO: Add v1 -> v2 deep comparison cases, after defining the migration handlers.
 				// e.g.: Migration to Indy format, uuid lowercasing, etc.
