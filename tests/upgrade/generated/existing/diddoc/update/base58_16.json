@@ -1,25 +1,23 @@
 {
     "context": [],
-    "id": "did:cheqd:testnet:z6LNquFfzPNhCQ8n",
+    "id": "did:cheqd:testnet:zBbSuTsomwfoBbCd",
     "controller": [
-        "did:cheqd:testnet:z6LNquFfzPNhCQ8n"
+        "did:cheqd:testnet:zBbSuTsomwfoBbCd"
     ],
     "authentication": [
-        "did:cheqd:testnet:z6LNquFfzPNhCQ8n#key-1"
+        "did:cheqd:testnet:zBbSuTsomwfoBbCd#key-1"
     ],
-    "assertionMethod": [
-        "did:cheqd:testnet:z6LNquFfzPNhCQ8n#key-1"
-    ],
+    "assertionMethod": [],
     "capabilityInvocation": [],
     "capabilityDelegation": [],
     "keyAgreement": [],
     "alsoKnownAs": [],
     "verificationMethod": [
         {
-            "id": "did:cheqd:testnet:z6LNquFfzPNhCQ8n#key-1",
+            "id": "did:cheqd:testnet:zBbSuTsomwfoBbCd#key-1",
             "type": "Ed25519VerificationKey2020",
-            "controller": "did:cheqd:testnet:z6LNquFfzPNhCQ8n",
-            "publicKeyMultibase": "z6LNquFfzPNhCQ8nbCWSMBQjosLT7ayEqGSYrN2Y1FdmS",
+            "controller": "did:cheqd:testnet:zBbSuTsomwfoBbCd",
+            "publicKeyMultibase": "zBbSuTsomwfoBbCdrCSixXTMwKMWFJQWiNEWxVJmJhdaT",
             "publicKeyJwk": []
         }
     ],
