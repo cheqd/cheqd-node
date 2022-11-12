@@ -21,9 +21,13 @@ func Loader(path string, msg any) error {
 	switch msg := msg.(type) {
 	case *didtypesv1.MsgCreateDidPayload:
 		err = integrationhelpers.Codec.UnmarshalJSON(file, msg)
+	case *didtypesv1.MsgUpdateDidPayload:
+		err = integrationhelpers.Codec.UnmarshalJSON(file, msg)
 	case *didtypesv1.Did:
 		err = integrationhelpers.Codec.UnmarshalJSON(file, msg)
 	case *didtypesv2.MsgCreateDidDocPayload:
+		err = integrationhelpers.Codec.UnmarshalJSON(file, msg)
+	case *didtypesv2.MsgUpdateDidDocPayload:
 		err = integrationhelpers.Codec.UnmarshalJSON(file, msg)
 	case *didtypesv2.DidDocWithMetadata:
 		err = integrationhelpers.Codec.UnmarshalJSON(file, msg)

@@ -2,6 +2,6 @@
     "collectionId": "97096fb1-63ea-4f81-b296-8eb5da6ab6eb",
     "id": "0ab505e1-4ea9-405c-a43e-35a15f1e3647",
     "name": "Test Resource",
-    "resourceType": "test-resource-type",
+    "resourceType": "TestResourceType",
     "data": "eyAibWVzc2FnZSI6ICJoZWxsbyB3b3JsZCJ9"
 }

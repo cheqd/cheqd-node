@@ -73,7 +73,7 @@ var _ = Describe("Upgrade - Pre", func() {
 				Expect(err).To(BeNil())
 
 				// TODO: Add resource file. Right now, it is not possible to create a resource without a file. So we need to copy a file to the container home directory.
-				res, err := cli.CreateResource(ResourceCreatePayload.CollectionId, ResourceCreatePayload.Id, ResourceCreatePayload.Name, ResourcePayload.ResourceType, integrationtestdata.JSON_FILE_NAME, ResourceCreateSignInput, cli.VALIDATOR0)
+				res, err := cli.CreateResourceLegacy(ResourceCreatePayload.CollectionId, ResourceCreatePayload.Id, ResourceCreatePayload.Name, ResourceCreatePayload.ResourceType, integrationtestdata.JSON_FILE_NAME, ResourceCreateSignInput, cli.VALIDATOR0)
 				Expect(err).To(BeNil())
 				Expect(res.Code).To(BeEquivalentTo(0))
 			}

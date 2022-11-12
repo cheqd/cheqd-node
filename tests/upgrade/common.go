@@ -19,6 +19,8 @@ var (
 	ExistingDidDocCreatePayloads, ExistingDidDocUpdatePayloads, ExistingDidDocDeactivatePayloads          []string
 	ExistingSignInputCreatePayloads, ExistingSignInputUpdatePayloads, ExistingSignInputDeactivatePayloads []string
 	ExistingResourceCreatePayloads                                                                        []string
+	ExpectedDidDocCreateRecords, ExpectedDidDocUpdateRecords, ExpectedDidDocDeactivateRecords             []string
+	ExpectedResourceCreateRecords                                                                         []string
 )
 
 // Pre

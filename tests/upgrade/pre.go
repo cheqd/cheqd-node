@@ -49,7 +49,7 @@ func Pre() error {
 	Expect(err).To(BeNil())
 
 	By("Ensuring CreateResource Tx is successful")
-	res, err = cli.CreateResource(ResourcePayload.CollectionId, ResourcePayload.Id, ResourcePayload.Name, ResourcePayload.ResourceType, integrationtestdata.JSON_FILE_NAME, SignInputs, cli.VALIDATOR1)
+	res, err = cli.CreateResource(ResourcePayload.CollectionId, ResourcePayload.Id, ResourcePayload.Name, "", ResourcePayload.ResourceType, integrationtestdata.JSON_FILE_NAME, SignInputs, cli.VALIDATOR1)
 	Expect(err).To(BeNil())
 	Expect(res.Code).To(BeEquivalentTo(0))
 
