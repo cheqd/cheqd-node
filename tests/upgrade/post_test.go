@@ -8,7 +8,6 @@ import (
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/cli"
 	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -19,18 +18,10 @@ var _ = Describe("Upgrade - Post", func() {
 		var DidDocUpdateRecord didtypesv1.Did
 		var ResourceCreateRecord resourcetypesv1.ResourceHeader
 		var err error
-		It("should query the software upgrade proposal and get the upgrade height", func() {
-			By("querying the software upgrade proposal from `validator0` container")
-			proposal, err := cli.QueryUpgradeProposal(cli.VALIDATOR0)
-			Expect(err).To(BeNil())
-			content, ok := proposal.GetContent().(*upgradetypes.SoftwareUpgradeProposal)
-			Expect(ok).To(BeTrue())
-			UPGRADE_HEIGHT = content.Plan.Height
-		})
 
-		It("should wait for the upgrade height plus 2 blocks to be reached", func() {
-			By("pinging the node status until the upgrade height plus 2 blocks is reached")
-			err := cli.WaitForChainHeight(cli.VALIDATOR0, cli.CLI_BINARY_NAME, UPGRADE_HEIGHT+2, cli.VOTING_PERIOD*6)
+		It("should wait for node catching up", func() {
+			By("pinging the node status until catching up is flagged as false")
+			err := cli.WaitForCaughtUp(cli.VALIDATOR0, cli.CLI_BINARY_NAME, cli.VOTING_PERIOD*6)
 			Expect(err).To(BeNil())
 		})
 

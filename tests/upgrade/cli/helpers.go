@@ -115,7 +115,7 @@ func WaitForChainHeight(container string, binary string, height int64, period in
 
 	for waited < period {
 		wg.Add(1)
-		go waitCallback(container, binary, height, period, &waited, &waitInterval, &wg)
+		go waitHeightCallback(container, binary, height, period, &waited, &waitInterval, &wg)
 		wg.Wait()
 	}
 
@@ -126,7 +126,25 @@ func WaitForChainHeight(container string, binary string, height int64, period in
 	return nil
 }
 
-func waitCallback(container string, binary string, height int64, period int64, waited *int64, waitInterval *int64, wg *sync.WaitGroup) {
+func WaitForCaughtUp(container string, binary string, period int64) error {
+	var waited int64
+	var waitInterval int64 = 1
+	var wg sync.WaitGroup
+
+	for waited < period {
+		wg.Add(1)
+		go waitCaughtUpCallback(container, binary, period, &waited, &waitInterval, &wg)
+		wg.Wait()
+	}
+
+	if waited == period {
+		return fmt.Errorf("timeout waiting for chain height")
+	}
+
+	return nil
+}
+
+func waitHeightCallback(container string, binary string, height int64, period int64, waited *int64, waitInterval *int64, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	time.Sleep(time.Duration(*waitInterval) * time.Second)
@@ -149,6 +167,31 @@ func waitCallback(container string, binary string, height int64, period int64, w
 	}
 
 	fmt.Printf("Container %s is at height %d after %d seconds of waiting, with a max waiting period of %d.\n", container, status.SyncInfo.LatestBlockHeight, *waited, period)
+}
+
+func waitCaughtUpCallback(container string, binary string, period int64, waited *int64, waitInterval *int64, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	time.Sleep(time.Duration(*waitInterval) * time.Second)
+	*waited += *waitInterval
+
+	status, err := GetNodeStatus(container, binary)
+	if err != nil {
+		panic(err)
+	}
+
+	if !status.SyncInfo.CatchingUp {
+		fmt.Printf("Container %s is caught up after %d seconds of waiting.\n", container, *waited)
+		*waited = period + 1
+		return
+	}
+
+	if *waited == period {
+		fmt.Printf("Container %s is not caught up after %d seconds of waiting.\n", container, *waited)
+		return
+	}
+
+	fmt.Printf("Container %s is still catching up after %d seconds of waiting, with a max waiting period of %d.\n", container, *waited, period)
 }
 
 func TrimExtraLineOffset(input string, offset int) string {
