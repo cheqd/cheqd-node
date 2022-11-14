@@ -139,7 +139,7 @@ jobs:
       - name: Set up Docker localnet mainnet-latest
         working-directory: ./docker/localnet
         run: |
-          docker compose --env-file mainnet-latest.env up --no-build
+          docker compose --env-file mainnet-latest.env up --detach --no-build
 
       - name: Copy keys # This is temporary.
         working-directory: ./docker/localnet
