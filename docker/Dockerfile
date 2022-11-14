@@ -9,7 +9,7 @@ ENV PACKAGES curl make git libc-dev bash gcc linux-headers
 RUN apk update && apk add --no-cache $PACKAGES
 
 # Set working directory for the build
-WORKDIR /go/src/github.com/cheqd/cheqd-node
+WORKDIR /go/src/github.com/canow-co/cheqd-node
 
 # Add source files
 COPY . .
@@ -27,7 +27,7 @@ FROM alpine:3.16 AS runner
 RUN apk update && apk add --no-cache bash ca-certificates
 
 # Copy over binaries from the build-env
-COPY --from=builder /go/src/github.com/cheqd/cheqd-node/build/cheqd-noded /bin/cheqd-noded
+COPY --from=builder /go/src/github.com/canow-co/cheqd-node/build/cheqd-noded /bin/cheqd-noded
 
 # Set user directory and details
 ARG HOME_DIR="/home/cheqd"

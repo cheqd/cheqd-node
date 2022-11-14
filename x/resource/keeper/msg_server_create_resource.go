@@ -5,12 +5,12 @@ import (
 	"crypto/sha256"
 	"time"
 
-	"github.com/cheqd/cheqd-node/x/resource/utils"
+	"github.com/canow-co/cheqd-node/x/resource/utils"
 
-	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
-	cheqdutils "github.com/cheqd/cheqd-node/x/cheqd/utils"
-	"github.com/cheqd/cheqd-node/x/resource/types"
+	cheqdkeeper "github.com/canow-co/cheqd-node/x/cheqd/keeper"
+	cheqdtypes "github.com/canow-co/cheqd-node/x/cheqd/types"
+	cheqdutils "github.com/canow-co/cheqd-node/x/cheqd/utils"
+	"github.com/canow-co/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

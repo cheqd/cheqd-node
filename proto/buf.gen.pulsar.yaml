@@ -5,7 +5,7 @@ version: v1
 managed:
   enabled: true
   go_package_prefix:
-    default: github.com/cheqd/cheqd-node/api
+    default: github.com/canow-co/cheqd-node/api
     except:
       - buf.build/googleapis/googleapis
       - buf.build/cosmos/gogo-proto

@@ -7,7 +7,7 @@ import (
 
 	"github.com/btcsuite/btcutil/base58"
 
-	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	"github.com/canow-co/cheqd-node/x/cheqd/types"
 	"github.com/multiformats/go-multibase"
 
 	"github.com/stretchr/testify/require"

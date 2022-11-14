@@ -3,8 +3,8 @@ package keeper
 import (
 	"context"
 
-	"github.com/cheqd/cheqd-node/x/cheqd/types"
-	"github.com/cheqd/cheqd-node/x/cheqd/utils"
+	"github.com/canow-co/cheqd-node/x/cheqd/types"
+	"github.com/canow-co/cheqd-node/x/cheqd/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

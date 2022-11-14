@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/cheqd/cheqd-node/x/resource/types"
+	"github.com/canow-co/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 )

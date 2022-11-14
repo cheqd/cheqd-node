@@ -1,4 +1,4 @@
-module github.com/cheqd/cheqd-node
+module github.com/canow-co/cheqd-node
 
 go 1.17
 

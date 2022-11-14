@@ -7,13 +7,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cheqd/cheqd-node/x/cheqd"
-	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
+	"github.com/canow-co/cheqd-node/x/cheqd"
+	cheqdkeeper "github.com/canow-co/cheqd-node/x/cheqd/keeper"
 
-	cheqdtests "github.com/cheqd/cheqd-node/x/cheqd/tests"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
-	"github.com/cheqd/cheqd-node/x/resource"
-	"github.com/cheqd/cheqd-node/x/resource/types"
+	cheqdtests "github.com/canow-co/cheqd-node/x/cheqd/tests"
+	cheqdtypes "github.com/canow-co/cheqd-node/x/cheqd/types"
+	"github.com/canow-co/cheqd-node/x/resource"
+	"github.com/canow-co/cheqd-node/x/resource/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/stretchr/testify/require"
 
@@ -23,7 +23,7 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/cheqd/cheqd-node/x/resource/keeper"
+	"github.com/canow-co/cheqd-node/x/resource/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

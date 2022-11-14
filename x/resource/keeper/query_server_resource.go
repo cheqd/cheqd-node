@@ -3,13 +3,13 @@ package keeper
 import (
 	"context"
 
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
-	cheqdutils "github.com/cheqd/cheqd-node/x/cheqd/utils"
+	cheqdtypes "github.com/canow-co/cheqd-node/x/cheqd/types"
+	cheqdutils "github.com/canow-co/cheqd-node/x/cheqd/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/cheqd/cheqd-node/x/resource/types"
+	"github.com/canow-co/cheqd-node/x/resource/types"
 )
 
 func (q queryServer) Resource(c context.Context, req *types.QueryGetResourceRequest) (*types.QueryGetResourceResponse, error) {

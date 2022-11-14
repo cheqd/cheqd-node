@@ -3,8 +3,8 @@ package cheqd
 import (
 	"fmt"
 
-	"github.com/cheqd/cheqd-node/x/cheqd/keeper"
-	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	"github.com/canow-co/cheqd-node/x/cheqd/keeper"
+	"github.com/canow-co/cheqd-node/x/cheqd/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )

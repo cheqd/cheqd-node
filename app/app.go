@@ -8,10 +8,10 @@ import (
 
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 
-	"github.com/cheqd/cheqd-node/x/resource"
+	"github.com/canow-co/cheqd-node/x/resource"
 
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
-	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+	cheqdtypes "github.com/canow-co/cheqd-node/x/cheqd/types"
+	resourcetypes "github.com/canow-co/cheqd-node/x/resource/types"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
@@ -39,10 +39,10 @@ import (
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
 
-	appparams "github.com/cheqd/cheqd-node/app/params"
-	"github.com/cheqd/cheqd-node/x/cheqd"
-	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
-	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
+	appparams "github.com/canow-co/cheqd-node/app/params"
+	"github.com/canow-co/cheqd-node/x/cheqd"
+	cheqdkeeper "github.com/canow-co/cheqd-node/x/cheqd/keeper"
+	resourcekeeper "github.com/canow-co/cheqd-node/x/resource/keeper"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	"github.com/cosmos/cosmos-sdk/client/rpc"

@@ -3,8 +3,8 @@ package cli
 import (
 	"io/ioutil"
 
-	cheqdcli "github.com/cheqd/cheqd-node/x/cheqd/client/cli"
-	"github.com/cheqd/cheqd-node/x/resource/types"
+	cheqdcli "github.com/canow-co/cheqd-node/x/cheqd/client/cli"
+	"github.com/canow-co/cheqd-node/x/resource/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"

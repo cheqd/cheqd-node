@@ -15,7 +15,7 @@ UPGRADE_VERSION_COSMOVISOR="0.6.0"
 # shellcheck disable=SC2034
 UPGRADE_INFO="{
   \"binaries\": {
-    \"linux/amd64\":\"https://github.com/cheqd/cheqd-node/releases/download/v${UPGRADE_VERSION_COSMOVISOR}/cheqd-noded\"
+    \"linux/amd64\":\"https://github.com/canow-co/cheqd-node/releases/download/v${UPGRADE_VERSION_COSMOVISOR}/cheqd-noded\"
   }
 }"
 VOTING_PERIOD=15

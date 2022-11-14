@@ -3,7 +3,7 @@ package keeper
 import (
 	"strconv"
 
-	"github.com/cheqd/cheqd-node/x/resource/types"
+	"github.com/canow-co/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
