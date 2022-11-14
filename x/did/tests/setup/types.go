@@ -4,7 +4,6 @@ import (
 	"crypto/ed25519"
 
 	"github.com/cheqd/cheqd-node/x/did/types"
-	"github.com/cheqd/cheqd-node/x/did/types/v1"
 )
 
 type KeyPair struct {

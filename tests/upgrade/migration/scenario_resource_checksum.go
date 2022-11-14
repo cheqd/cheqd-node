@@ -6,20 +6,18 @@ import (
 	"path/filepath"
 
 	appmigrations "github.com/cheqd/cheqd-node/app/migrations"
-	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
+	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/migration/setup"
 	didtestssetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
-	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types"
-	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
-	resourcetestssetup "github.com/cheqd/cheqd-node/x/resource/tests/setup"
+	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var (
-	err                            error
-	didDoc                         didtypes.MsgCreateDidPayload
-	didInfo                        cheqdtestssetup.MinimalDidInfo
-	existingChecksumResource       resourcetypes.MsgCreateResourcePayload
+	didDoc                         didtypesv1.MsgCreateDidPayload
+	didInfo                        migrationsetup.MinimalDidDocInfoV1
+	existingChecksumResource       resourcetypesv1.MsgCreateResourcePayload
 	expectedChecksumResourceHeader resourcetypes.Metadata
 	ResourceChecksumScenario       ResourceMigrationScenario
 )
@@ -47,7 +45,7 @@ func InitResourceChecksumScenario() error {
 		return err
 	}
 
-	didInfo = didtestssetup.MinimalDidDocInfoV1{
+	didInfo = migrationsetup.MinimalDidDocInfoV1{
 		Msg: &didDoc,
 		SignInput: didtestssetup.SignInput{
 			VerificationMethodId: signInput.VerificationMethodId,
@@ -57,12 +55,12 @@ func InitResourceChecksumScenario() error {
 
 	ResourceChecksumScenario = NewResourceMigrationScenario(
 		"ResourceChecksum",
-		resourcetestssetup.Setup,
+		migrationsetup.NewExtendedSetup,
 		existingChecksumResource,
 		didInfo,
 		expectedChecksumResourceHeader,
-		func(ctx sdk.Context, didKeeper didkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error {
-			return appmigrations.MigrateResourceV1(ctx, didKeeper, resourceKeeper)
+		func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error {
+			return appmigrations.MigrateResourceV1(ctx, migrationCtx)
 		},
 		func(actual resourcetypes.Metadata) error {
 			if !bytes.Equal(actual.Checksum, expectedChecksumResourceHeader.Checksum) {

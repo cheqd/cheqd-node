@@ -1,12 +1,12 @@
 package migration
 
 import (
-	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
+	appmigrations "github.com/cheqd/cheqd-node/app/migrations"
+	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/migration/setup"
 	didtestssetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
-	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
-	resourcetestssetup "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -15,11 +15,11 @@ type MigrationScenario struct {
 	setup    func()
 	existing interface{}
 	expected interface{}
-	handler  func(ctx sdk.Context, didKeeper didkeeper.Keeper) error
+	handler  func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error
 	validate func(actual interface{}) error
 }
 
-func NewMigrationScenario(name string, setup func(), existing interface{}, expected interface{}, handler func(ctx sdk.Context, didKeeper didkeeper.Keeper) error, validate func(actual interface{}) error) MigrationScenario {
+func NewMigrationScenario(name string, setup func(), existing interface{}, expected interface{}, handler func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error, validate func(actual interface{}) error) MigrationScenario {
 	return MigrationScenario{
 		name:     name,
 		setup:    setup,
@@ -46,7 +46,7 @@ func (m MigrationScenario) Expected() interface{} {
 	return m.expected
 }
 
-func (m MigrationScenario) Handler() func(ctx sdk.Context, didKeeper didkeeper.Keeper) error {
+func (m MigrationScenario) Handler() func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error {
 	return m.handler
 }
 
@@ -54,17 +54,17 @@ func (m MigrationScenario) Validate(actual interface{}) error {
 	return m.validate(actual)
 }
 
-type CheqdMigrationScenario struct {
+type DidMigrationScenario struct {
 	name     string
-	setup    func() didtestssetup.TestSetup
-	existing didtestssetup.MinimalDidDocInfo
+	setup    func() migrationsetup.ExtendedTestSetup
+	existing migrationsetup.MinimalDidDocInfoV1
 	expected didtypes.DidDoc
-	handler  func(ctx sdk.Context, didKeeper didkeeper.Keeper) error
+	handler  func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error
 	validate func(actual didtypes.DidDoc) error
 }
 
-func NewCheqdMigrationScenario(name string, setup func() didtestssetup.TestSetup, existing didtestssetup.MinimalDidDocInfo, expected didtypes.DidDoc, handler func(ctx sdk.Context, didKeeper didkeeper.Keeper) error, validate func(actual didtypes.DidDoc) error) CheqdMigrationScenario {
-	return CheqdMigrationScenario{
+func NewDidMigrationScenario(name string, setup func() migrationsetup.ExtendedTestSetup, existing migrationsetup.MinimalDidDocInfoV1, expected didtypes.DidDoc, handler func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error, validate func(actual didtypes.DidDoc) error) DidMigrationScenario {
+	return DidMigrationScenario{
 		name:     name,
 		setup:    setup,
 		existing: existing,
@@ -74,41 +74,41 @@ func NewCheqdMigrationScenario(name string, setup func() didtestssetup.TestSetup
 	}
 }
 
-func (m CheqdMigrationScenario) Name() string {
+func (m DidMigrationScenario) Name() string {
 	return m.name
 }
 
-func (m CheqdMigrationScenario) Setup() didtestssetup.TestSetup {
+func (m DidMigrationScenario) Setup() migrationsetup.ExtendedTestSetup {
 	return m.setup()
 }
 
-func (m CheqdMigrationScenario) Existing() didtestssetup.MinimalDidDocInfo {
+func (m DidMigrationScenario) Existing() migrationsetup.MinimalDidDocInfoV1 {
 	return m.existing
 }
 
-func (m CheqdMigrationScenario) Expected() didtypes.DidDoc {
+func (m DidMigrationScenario) Expected() didtypes.DidDoc {
 	return m.expected
 }
 
-func (m CheqdMigrationScenario) Handler() func(ctx sdk.Context, didKeeper didkeeper.Keeper) error {
+func (m DidMigrationScenario) Handler() func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error {
 	return m.handler
 }
 
-func (m CheqdMigrationScenario) Validate(actual didtypes.DidDoc) error {
+func (m DidMigrationScenario) Validate(actual didtypes.DidDoc) error {
 	return m.validate(actual)
 }
 
 type ResourceMigrationScenario struct {
 	name     string
-	setup    func() resourcetestssetup.TestSetup
-	existing resourcetypes.MsgCreateResourcePayload
-	didInfo  didtestssetup.MinimalDidDocInfoV1
+	setup    func() migrationsetup.ExtendedTestSetup
+	existing resourcetypesv1.MsgCreateResourcePayload
+	didInfo  migrationsetup.MinimalDidDocInfoV1
 	expected resourcetypes.Metadata
-	handler  func(ctx sdk.Context, didKeeper didkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error
+	handler  func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error
 	validate func(actual resourcetypes.Metadata) error
 }
 
-func NewResourceMigrationScenario(name string, setup func() resourcetestssetup.TestSetup, existing resourcetypes.MsgCreateResourcePayload, didInfo didtestssetup.MinimalDidDocInfoV1, expected resourcetypes.Metadata, handler func(ctx sdk.Context, didKeeper didkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error, validate func(actual resourcetypes.Metadata) error) ResourceMigrationScenario {
+func NewResourceMigrationScenario(name string, setup func() migrationsetup.ExtendedTestSetup, existing resourcetypesv1.MsgCreateResourcePayload, didInfo migrationsetup.MinimalDidDocInfoV1, expected resourcetypes.Metadata, handler func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error, validate func(actual resourcetypes.Metadata) error) ResourceMigrationScenario {
 	return ResourceMigrationScenario{
 		name:     name,
 		setup:    setup,
@@ -124,15 +124,15 @@ func (m ResourceMigrationScenario) Name() string {
 	return m.name
 }
 
-func (m ResourceMigrationScenario) Setup() resourcetestssetup.TestSetup {
+func (m ResourceMigrationScenario) Setup() migrationsetup.ExtendedTestSetup {
 	return m.setup()
 }
 
-func (m ResourceMigrationScenario) Existing() resourcetypes.MsgCreateResourcePayload {
+func (m ResourceMigrationScenario) Existing() resourcetypesv1.MsgCreateResourcePayload {
 	return m.existing
 }
 
-func (m ResourceMigrationScenario) DidInfo() didtestssetup.MinimalDidDocInfoV1 {
+func (m ResourceMigrationScenario) DidInfo() migrationsetup.MinimalDidDocInfoV1 {
 	return m.didInfo
 }
 
@@ -140,7 +140,7 @@ func (m ResourceMigrationScenario) Expected() resourcetypes.Metadata {
 	return m.expected
 }
 
-func (m ResourceMigrationScenario) Handler() func(ctx sdk.Context, didKeeper didkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error {
+func (m ResourceMigrationScenario) Handler() func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error {
 	return m.handler
 }
 
@@ -152,24 +152,25 @@ type Migrator interface {
 	Migrate(ctx sdk.Context) error
 }
 
-type CheqdMigrator struct {
-	migrations []CheqdMigrationScenario
+type DidMigrator struct {
+	migrations []DidMigrationScenario
 }
 
-func NewCheqdMigrator(migrations []CheqdMigrationScenario) CheqdMigrator {
-	return CheqdMigrator{
+func NewDidMigrator(migrations []DidMigrationScenario) DidMigrator {
+	return DidMigrator{
 		migrations: migrations,
 	}
 }
 
-func (m CheqdMigrator) Migrate(ctx sdk.Context) error {
+func (m DidMigrator) Migrate(ctx sdk.Context) error {
 	for _, migration := range m.migrations {
 		setup := migration.Setup()
-		_, err := setup.CreateDid(migration.existing.Msg, []didtestssetup.SignInput{migration.existing.SignInput})
+		_, err := setup.CreateDidV1(migration.existing.Msg, []didtestssetup.SignInput{migration.existing.SignInput})
 		if err != nil {
 			return err
 		}
-		err = migration.Handler()(setup.SdkCtx, setup.Keeper)
+		migrationCtx := appmigrations.NewMigrationContext(setup.Cdc, setup.Keeper, setup.ResourceKeeper)
+		err = migration.Handler()(setup.SdkCtx, migrationCtx)
 		if err != nil {
 			return err
 		}
@@ -206,11 +207,12 @@ func (m ResourceMigrator) Migrate() error {
 		if err != nil {
 			return err
 		}
-		_, err = setup.CreateResource(&migration.existing, []didtestssetup.SignInput{migration.didInfo.SignInput})
+		_, err = setup.CreateResourceV1(&migration.existing, []didtestssetup.SignInput{migration.didInfo.SignInput})
 		if err != nil {
 			return err
 		}
-		err = migration.Handler()(setup.SdkCtx, setup.Keeper, setup.ResourceKeeper)
+		migrationCtx := appmigrations.NewMigrationContext(setup.Cdc, setup.Keeper, setup.ResourceKeeper)
+		err = migration.Handler()(setup.SdkCtx, migrationCtx)
 		if err != nil {
 			return err
 		}

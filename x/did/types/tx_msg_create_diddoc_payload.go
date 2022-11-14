@@ -1,8 +1,8 @@
 package types
 
 import (
-	"github.com/cheqd/cheqd-node/x/did/utils"
 	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
+	"github.com/cheqd/cheqd-node/x/did/utils"
 )
 
 var _ IdentityMsg = &MsgCreateDidDocPayload{}
@@ -83,6 +83,5 @@ func MsgCreateDidPayloadFromDid(did *didtypesv1.Did) didtypesv1.MsgCreateDidPayl
 		KeyAgreement:         did.KeyAgreement,
 		AlsoKnownAs:          did.AlsoKnownAs,
 		Service:              did.Service,
-		
 	}
 }

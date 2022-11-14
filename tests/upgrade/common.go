@@ -2,6 +2,7 @@
 
 package upgrade
 
+// Pre
 var (
 	ExistingDidDocCreatePayloads, ExistingDidDocUpdatePayloads, ExistingDidDocDeactivatePayloads          []string
 	ExistingSignInputCreatePayloads, ExistingSignInputUpdatePayloads, ExistingSignInputDeactivatePayloads []string

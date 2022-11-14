@@ -14,10 +14,6 @@ type StateValueData interface {
 	proto.Message
 }
 
-type PubKeyMultibase struct {
-	publicKeyMultibase string
-}
-
 func UnpackData(stateValue didtypesv1.StateValue) (StateValueData, error) {
 	value, isOk := stateValue.Data.GetCachedValue().(StateValueData)
 	if !isOk {
@@ -50,22 +46,22 @@ func StateValueToDIDDocWithMetadata(stateValue didtypesv1.StateValue) (didtypes.
 	}
 	newDidDoc := NewDidDocFromV1(didDoc)
 	newMetadata := &didtypes.Metadata{
-		Created: metadata.Created,
-		Updated: metadata.Updated,
+		Created:     metadata.Created,
+		Updated:     metadata.Updated,
 		Deactivated: metadata.Deactivated,
-		VersionId: metadata.VersionId,
+		VersionId:   metadata.VersionId,
 		// ToDo: should we make it self-linked?
-		NextVersionId: metadata.VersionId,
+		NextVersionId:     metadata.VersionId,
 		PreviousVersionId: metadata.VersionId,
 	}
 
 	return didtypes.NewDidDocWithMetadata(newDidDoc, newMetadata), err
 }
 
-func GetVerificationMaterial(vm *didtypesv1.VerificationMethod) string{
+func GetVerificationMaterial(vm *didtypesv1.VerificationMethod) string {
 	if len(vm.PublicKeyJwk) != 0 {
 		jwk := make(map[string]string)
-		for _, kv := range(vm.PublicKeyJwk) {
+		for _, kv := range vm.PublicKeyJwk {
 			jwk[kv.Key] = kv.Value
 		}
 		res, err := json.Marshal(jwk)
@@ -95,13 +91,13 @@ func GetVerificationMaterial(vm *didtypesv1.VerificationMethod) string{
 
 func NewDidDocFromV1(didV1 *didtypesv1.Did) *didtypes.DidDoc {
 	vms := []*didtypes.VerificationMethod{}
-	for _, vm := range didV1.VerificationMethod { 
+	for _, vm := range didV1.VerificationMethod {
 		vms = append(
 			vms,
 			&didtypes.VerificationMethod{
-				Id: vm.Id,
-				Type: vm.Type,
-				Controller: vm.Controller,
+				Id:                   vm.Id,
+				Type:                 vm.Type,
+				Controller:           vm.Controller,
 				VerificationMaterial: GetVerificationMaterial(vm),
 			})
 	}
@@ -110,8 +106,8 @@ func NewDidDocFromV1(didV1 *didtypesv1.Did) *didtypes.DidDoc {
 		srvs = append(
 			srvs,
 			&didtypes.Service{
-				Id: srv.Id,
-				Type: srv.Type,
+				Id:              srv.Id,
+				Type:            srv.Type,
 				ServiceEndpoint: []string{srv.ServiceEndpoint},
 			})
 	}
@@ -129,7 +125,6 @@ func NewDidDocFromV1(didV1 *didtypesv1.Did) *didtypes.DidDoc {
 		AlsoKnownAs:          didV1.AlsoKnownAs,
 	}
 }
-
 
 func closeIteratorOrPanic(iterator sdk.Iterator) {
 	err := iterator.Close()

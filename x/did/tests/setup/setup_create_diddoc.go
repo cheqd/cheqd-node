@@ -2,10 +2,8 @@ package setup
 
 import (
 	"crypto/ed25519"
-	"encoding/base64"
 
 	"github.com/cheqd/cheqd-node/x/did/types"
-	"github.com/cheqd/cheqd-node/x/did/types/v1"
 	"github.com/cheqd/cheqd-node/x/did/utils"
 )
 
@@ -28,30 +26,6 @@ func (s *TestSetup) CreateDid(payload *types.MsgCreateDidDocPayload, signInputs 
 	}
 
 	return s.MsgServer.CreateDidDoc(s.StdCtx, msg)
-}
-
-func (s *TestSetup) CreateDidV1(payload *v1.MsgCreateDidPayload, signInputs []SignInput) (*v1.MsgCreateDidResponse, error) {
-	signBytes, err := payload.Marshal()
-	if err != nil {
-		panic(err)
-	}
-	var signatures []*v1.SignInfo
-
-	for _, input := range signInputs {
-		signature := ed25519.Sign(input.Key, signBytes)
-
-		signatures = append(signatures, &v1.SignInfo{
-			VerificationMethodId: input.VerificationMethodId,
-			Signature:            base64.StdEncoding.EncodeToString(signature),
-		})
-	}
-
-	msg := &v1.MsgCreateDid{
-		Payload:    payload,
-		Signatures: signatures,
-	}
-
-	return s.MsgServerV1.CreateDidDocV1(s.StdCtx, msg)
 }
 
 func (s *TestSetup) BuildDidDocWithCustomDID(did string) DidDocInfo {
