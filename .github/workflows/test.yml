@@ -31,7 +31,7 @@ jobs:
           go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
       - name: Run Ginkgo tests
-        run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --junit-report report-unit.xml
+        run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --skip-file migration_unit_test.go --skip-file pre_test.go --skip-file post_test.go --junit-report report-unit.xml
 
       - name: Upload unit tests result
         uses: actions/upload-artifact@v3
