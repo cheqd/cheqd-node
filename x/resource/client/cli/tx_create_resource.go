@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"os"
 
 	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
@@ -8,83 +9,64 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )
 
-const (
-	FlagCollectionId    = "collection-id"
-	FlagResourceId      = "resource-id"
-	FlagResourceName    = "resource-name"
-	FlagResourceVersion = "resource-version"
-	FlagResourceType    = "resource-type"
-	FlagResourceFile    = "resource-file"
-)
+type CreateResourceOptions struct {
+	CollectionId    string                  `json:"collection_id"`
+	ResourceId      string                  `json:"resource_id"`
+	ResourceName    string                  `json:"resource_name"`
+	ResourceVersion string                  `json:"resource_version"`
+	ResourceType    string                  `json:"resource_type"`
+	ResourceFile    string                  `json:"resource_file"`
+	AlsoKnownAs     []*types.AlternativeUri `json:"also_known_as"`
+}
 
 func CmdCreateResource() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-resource --collection-id [collection-id] --resource-id [resource-id] --resource-name [resource-name] --resource-version [resource-version] --resource-type [resource-type] --resource-file [path/to/resource/file] [ver-method-id-1] [priv-key-1] [ver-method-id-N] [priv-key-N] ...",
+		Use:   "create-resource [payload-file]",
 		Short: "Creates a new Resource.",
 		Long: "Creates a new Resource. " +
-			"[ver-method-id-N] is the DID fragment that points to the public part of the key in the ledger for the signature N." +
-			"[priv-key-N] is base Base64 encoded ed25519 private key for signature N." +
-			"If 'interactive' value is used for a key, the key will be read interactively. " +
-			"Prefer interactive mode, use inline mode only for tests.",
-		Args: cobra.MinimumNArgs(2),
+			"[payload-file] is JSON encoded MsgCreateDidDocPayload alongside with sign inputs.",
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			collectionId, err := cmd.Flags().GetString(FlagCollectionId)
+			payloadFile := args[0]
+
+			payloadJson, signInputs, err := didcli.ReadPayloadWithSignInputsFromFile(payloadFile)
 			if err != nil {
 				return err
 			}
 
-			resourceId, err := cmd.Flags().GetString(FlagResourceId)
+			var options CreateResourceOptions
+			err = json.Unmarshal(payloadJson, &options)
 			if err != nil {
 				return err
 			}
 
-			resourceName, err := cmd.Flags().GetString(FlagResourceName)
-			if err != nil {
-				return err
-			}
-
-			resourceVersion, err := cmd.Flags().GetString(FlagResourceVersion)
-			if err != nil {
-				return err
-			}
-
-			resourceType, err := cmd.Flags().GetString(FlagResourceType)
-			if err != nil {
-				return err
-			}
-
-			resourceFile, err := cmd.Flags().GetString(FlagResourceFile)
-			if err != nil {
-				return err
-			}
-
-			data, err := os.ReadFile(resourceFile)
+			data, err := os.ReadFile(options.ResourceFile)
 			if err != nil {
 				return err
 			}
 
 			// Prepare payload
 			payload := types.MsgCreateResourcePayload{
-				CollectionId: collectionId,
-				Id:           resourceId,
-				Name:         resourceName,
-				Version:      resourceVersion,
-				ResourceType: resourceType,
+				CollectionId: options.CollectionId,
+				Id:           options.ResourceId,
+				Name:         options.ResourceName,
+				Version:      options.ResourceVersion,
+				ResourceType: options.ResourceType,
+				AlsoKnownAs:  options.AlsoKnownAs,
 				Data:         data,
 			}
 
-			// Read signatures
-			signInputs, err := didcli.GetSignInputs(clientCtx, args)
-			if err != nil {
-				return err
+			if payload.Id == "" {
+				payload.Id = uuid.NewString()
 			}
 
 			// Build identity message
@@ -107,30 +89,6 @@ func CmdCreateResource() *cobra.Command {
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-
-	cmd.Flags().String(FlagCollectionId, "", "Collection ID (same as unique identifier portion of an existing DID)")
-	err := cobra.MarkFlagRequired(cmd.Flags(), FlagCollectionId)
-	panicIfErr(err)
-
-	cmd.Flags().String(FlagResourceId, "", "Resource ID (must be a UUID)")
-	err = cobra.MarkFlagRequired(cmd.Flags(), FlagResourceId)
-	panicIfErr(err)
-
-	cmd.Flags().String(FlagResourceName, "", "Resource Name (a distinct DID fragment in `service` block, e.g., did:cheqd:mainnet:...#SchemaName where resource name will be 'SchemaName'")
-	err = cobra.MarkFlagRequired(cmd.Flags(), FlagResourceName)
-	panicIfErr(err)
-
-	cmd.Flags().String(FlagResourceVersion, "", "Resource Version (any string)")
-	err = cobra.MarkFlagRequired(cmd.Flags(), FlagResourceVersion)
-	panicIfErr(err)
-
-	cmd.Flags().String(FlagResourceType, "", "Resource Type (same as `type` within a DID Document `service` block)")
-	err = cobra.MarkFlagRequired(cmd.Flags(), FlagResourceType)
-	panicIfErr(err)
-
-	cmd.Flags().String(FlagResourceFile, "", "Resource File (path to file to be stored as a resource)")
-	err = cobra.MarkFlagRequired(cmd.Flags(), FlagResourceFile)
-	panicIfErr(err)
 
 	return cmd
 }

@@ -19,6 +19,12 @@ import (
 )
 
 var _ = Describe("cheqd cli - positive did", func() {
+	var tmpDir string
+
+	BeforeEach(func() {
+		tmpDir = GinkgoT().TempDir()
+	})
+
 	It("can create diddoc, update it and query the result", func() {
 		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.GREEN, "can create diddoc"))
 		// Create a new DID Doc
@@ -52,7 +58,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 			},
 		}
 
-		res, err := cli.CreateDidDoc(payload, signInputs, testdata.BASE_ACCOUNT_1)
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -74,9 +80,8 @@ var _ = Describe("cheqd cli - positive did", func() {
 					VerificationMaterial: "{\"publicKeyMultibase\": \"" + string(newPubKeyMultibase58) + "\"}",
 				},
 			},
-			Authentication:    []string{keyId},
-			PreviousVersionId: payload.VersionId,
-			VersionId:         uuid.NewString(),
+			Authentication: []string{keyId},
+			VersionId:      uuid.NewString(),
 		}
 
 		signInputs2 := []cli_types.SignInput{
@@ -90,7 +95,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 			},
 		}
 
-		res2, err := cli.UpdateDidDoc(payload2, signInputs2, testdata.BASE_ACCOUNT_1)
+		res2, err := cli.UpdateDidDoc(tmpDir, payload2, signInputs2, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(BeNil())
 		Expect(res2.Code).To(BeEquivalentTo(0))
 

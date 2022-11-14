@@ -22,9 +22,3 @@ func GetTxCmd() *cobra.Command {
 
 	return cmd
 }
-
-func panicIfErr(err error) {
-	if err != nil {
-		panic(err)
-	}
-}

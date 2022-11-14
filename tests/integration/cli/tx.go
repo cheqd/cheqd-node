@@ -1,13 +1,14 @@
 package cli
 
 import (
-	"encoding/base64"
+	"encoding/json"
 	"strings"
 
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
 	"github.com/cheqd/cheqd-node/x/did/client/cli"
 	"github.com/cheqd/cheqd-node/x/did/types"
+	resourcecli "github.com/cheqd/cheqd-node/x/resource/client/cli"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -51,73 +52,90 @@ func Tx(module, tx, from string, txArgs ...string) (sdk.TxResponse, error) {
 	return resp, nil
 }
 
-func CreateDidDoc(payload types.MsgCreateDidDocPayload, signInputs []cli.SignInput, from string) (sdk.TxResponse, error) {
+func CreateDidDoc(tmpDit string, payload types.MsgCreateDidDocPayload, signInputs []cli.SignInput, from string) (sdk.TxResponse, error) {
 	// Payload
 	payloadJson, err := helpers.Codec.MarshalJSON(&payload)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
 
-	args := []string{string(payloadJson)}
-
-	// Sign inputs
-	for _, signInput := range signInputs {
-		args = append(args, signInput.VerificationMethodId)
-		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivKey))
+	payloadWithSignInputs := cli.PayloadWithSignInputs{
+		Payload:    payloadJson,
+		SignInputs: signInputs,
 	}
 
-	return Tx("cheqd", "create-diddoc", from, args...)
+	payloadWithSignInputsJson, err := json.Marshal(&payloadWithSignInputs)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	payloadFile := helpers.MustWriteTmpFile(tmpDit, []byte(payloadWithSignInputsJson))
+
+	return Tx("cheqd", "create-did", from, payloadFile)
 }
 
-func UpdateDidDoc(payload types.MsgUpdateDidDocPayload, signInputs []cli.SignInput, from string) (sdk.TxResponse, error) {
+func UpdateDidDoc(tmpDir string, payload types.MsgUpdateDidDocPayload, signInputs []cli.SignInput, from string) (sdk.TxResponse, error) {
 	// Payload
 	payloadJson, err := helpers.Codec.MarshalJSON(&payload)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
 
-	args := []string{string(payloadJson)}
-
-	// Sign inputs
-	for _, signInput := range signInputs {
-		args = append(args, signInput.VerificationMethodId)
-		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivKey))
+	payloadWithSignInputs := cli.PayloadWithSignInputs{
+		Payload:    payloadJson,
+		SignInputs: signInputs,
 	}
 
-	return Tx("cheqd", "update-diddoc", from, args...)
+	payloadWithSignInputsJson, err := json.Marshal(&payloadWithSignInputs)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	payloadFile := helpers.MustWriteTmpFile(tmpDir, []byte(payloadWithSignInputsJson))
+
+	return Tx("cheqd", "update-did", from, payloadFile)
 }
 
-func DeactivateDidDoc(did, previousVersionId string, signInputs []cli.SignInput, from string) (sdk.TxResponse, error) {
-	args := []string{
-		did,
-		previousVersionId,
+func DeactivateDidDoc(tmpDir string, payload types.MsgUpdateDidDocPayload, signInputs []cli.SignInput, from string) (sdk.TxResponse, error) {
+	// Payload
+	payloadJson, err := helpers.Codec.MarshalJSON(&payload)
+	if err != nil {
+		return sdk.TxResponse{}, err
 	}
 
-	// Sign inputs
-	for _, signInput := range signInputs {
-		args = append(args, signInput.VerificationMethodId)
-		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivKey))
+	payloadWithSignInputs := cli.PayloadWithSignInputs{
+		Payload:    payloadJson,
+		SignInputs: signInputs,
 	}
 
-	return Tx("cheqd", "deactivate-diddoc", from, args...)
+	payloadWithSignInputsJson, err := json.Marshal(&payloadWithSignInputs)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	payloadFile := helpers.MustWriteTmpFile(tmpDir, []byte(payloadWithSignInputsJson))
+
+	return Tx("cheqd", "deactivate-did", from, payloadFile)
 }
 
-func CreateResource(collectionId, resourceId, resourceName, resourceVersion, resourceType, resourceFile string, signInputs []cli.SignInput, from string) (sdk.TxResponse, error) {
-	// Payload fragments
-	args := []string{
-		"--collection-id", collectionId,
-		"--resource-id", resourceId,
-		"--resource-name", resourceName,
-		"--resource-version", resourceVersion,
-		"--resource-type", resourceType,
-		"--resource-file", resourceFile,
+func CreateResource(tmpDir string, options resourcecli.CreateResourceOptions, signInputs []cli.SignInput, from string) (sdk.TxResponse, error) {
+	// Payload
+	payloadJson, err := json.Marshal(&options)
+	if err != nil {
+		return sdk.TxResponse{}, err
 	}
 
-	// Sign inputs
-	for _, signInput := range signInputs {
-		args = append(args, signInput.VerificationMethodId)
-		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivKey))
+	payloadWithSignInputs := cli.PayloadWithSignInputs{
+		Payload:    payloadJson,
+		SignInputs: signInputs,
 	}
 
-	return Tx("resource", "create-resource", from, args...)
+	payloadWithSignInputsJson, err := json.Marshal(&payloadWithSignInputs)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	payloadFile := helpers.MustWriteTmpFile("", []byte(payloadWithSignInputsJson))
+
+	return Tx("resource", "create-resource", from, payloadFile)
 }

@@ -5,8 +5,7 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
-//validation
-
+// validation
 func (au AlternativeUri) Validate() error {
 	return validation.ValidateStruct(&au,
 		validation.Field(&au.Uri, validation.Required, validation.Length(1, 256)),
