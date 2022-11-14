@@ -1,6 +1,9 @@
 package types
 
-import "github.com/cheqd/cheqd-node/x/did/utils"
+import (
+	"github.com/cheqd/cheqd-node/x/did/utils"
+	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
+)
 
 var _ IdentityMsg = &MsgCreateDidDocPayload{}
 
@@ -63,4 +66,23 @@ func (msg *MsgCreateDidDocPayload) Normalize() {
 	msg.CapabilityInvocation = utils.NormalizeDIDUrlList(msg.CapabilityInvocation)
 	msg.CapabilityDelegation = utils.NormalizeDIDUrlList(msg.CapabilityDelegation)
 	msg.KeyAgreement = utils.NormalizeDIDUrlList(msg.KeyAgreement)
+}
+
+// Creator
+
+func MsgCreateDidPayloadFromDid(did *didtypesv1.Did) didtypesv1.MsgCreateDidPayload {
+	return didtypesv1.MsgCreateDidPayload{
+		Context:              did.Context,
+		Id:                   did.Id,
+		Controller:           did.Controller,
+		VerificationMethod:   did.VerificationMethod,
+		Authentication:       did.Authentication,
+		AssertionMethod:      did.AssertionMethod,
+		CapabilityInvocation: did.CapabilityInvocation,
+		CapabilityDelegation: did.CapabilityDelegation,
+		KeyAgreement:         did.KeyAgreement,
+		AlsoKnownAs:          did.AlsoKnownAs,
+		Service:              did.Service,
+		
+	}
 }

@@ -642,14 +642,14 @@ func New(
 	app.mm.RegisterServices(app.configurator)
 
 	// Init Migrators
-	cheqdMigrator := migrations.NewDidMigrator(app.didKeeper, migrations.MigrateDidV1)
+	didMigrator := migrations.NewDidMigrator(app.didKeeper, migrations.MigrateDidV1)
 	resourceMigrator := migrations.NewResourceMigrator(app.didKeeper, app.resourceKeeper, migrations.MigrateResourceV1)
 
 	// Register upgrade store migrations per module
 	if err := app.configurator.RegisterMigration(
 		didtypes.ModuleName,
 		app.mm.GetVersionMap()[didtypes.ModuleName],
-		cheqdMigrator.Migrate,
+		didMigrator.Migrate,
 	); err != nil {
 		panic(err)
 	}
@@ -708,13 +708,6 @@ func New(
 			// transfer module consensus version has been bumped to 2
 			return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 		})
-
-	// Test upgrade handler
-	app.UpgradeKeeper.SetUpgradeHandler(CosmovisorTestUpgrade, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("Handler for upgrade plan: " + CosmovisorTestUpgrade)
-
-		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
-	})
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {

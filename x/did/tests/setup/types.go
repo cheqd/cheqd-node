@@ -22,11 +22,6 @@ type MinimalDidDocInfo struct {
 	SignInput SignInput
 }
 
-type MinimalDidDocInfoV1 struct {
-	Msg       *v1.MsgCreateDidPayload
-	SignInput SignInput
-}
-
 type DidDocInfo struct {
 	Msg          *types.MsgCreateDidDocPayload
 	Did          string

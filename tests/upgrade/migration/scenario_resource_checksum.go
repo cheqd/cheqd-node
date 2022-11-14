@@ -8,7 +8,7 @@ import (
 	appmigrations "github.com/cheqd/cheqd-node/app/migrations"
 	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 	didtestssetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
-	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
+	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types"
 	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
 	resourcetestssetup "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
@@ -16,8 +16,9 @@ import (
 )
 
 var (
-	didDoc                         didtypesv1.MsgCreateDidPayload
-	didInfo                        didtestssetup.MinimalDidDocInfoV1
+	err                            error
+	didDoc                         didtypes.MsgCreateDidPayload
+	didInfo                        cheqdtestssetup.MinimalDidInfo
 	existingChecksumResource       resourcetypes.MsgCreateResourcePayload
 	expectedChecksumResourceHeader resourcetypes.Metadata
 	ResourceChecksumScenario       ResourceMigrationScenario
