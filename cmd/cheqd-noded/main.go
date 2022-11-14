@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/cheqd/cheqd-node/app"
-	"github.com/cheqd/cheqd-node/cmd/cheqd-noded/cmd"
+	"github.com/canow-co/cheqd-node/app"
+	"github.com/canow-co/cheqd-node/cmd/cheqd-noded/cmd"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 )
 

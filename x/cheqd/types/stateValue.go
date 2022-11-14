@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/cheqd/cheqd-node/x/cheqd/utils"
+	"github.com/canow-co/cheqd-node/x/cheqd/utils"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gogo/protobuf/proto"

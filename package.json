@@ -4,9 +4,9 @@
   "description": "Ledger/node code for cheqd network",
   "license": "Apache-2.0",
   "author": "Cheqd Foundation Limited (https://github.com/cheqd)",
-  "homepage": "https://github.com/cheqd/cheqd-node#readme",
+  "homepage": "https://github.com/canow-co/cheqd-node#readme",
   "bugs": {
-    "url": "https://github.com/cheqd/cheqd-node/issues"
+    "url": "https://github.com/canow-co/cheqd-node/issues"
   },
   "main": "main.go",
   "scripts": {
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cheqd/cheqd-node.git"
+    "url": "git+https://github.com/canow-co/cheqd-node.git"
   },
   "devDependencies": {
     "@semantic-release/commit-analyzer": "^9.0.2",

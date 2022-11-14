@@ -20,7 +20,7 @@ done
 cd ..
 
 # move proto files to the right places
-cp -r github.com/cheqd/cheqd-node/* ./
+cp -r github.com/canow-co/cheqd-node/* ./
 rm -rf github.com
 
 go mod tidy

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"testing"
 
-	cheqdtests "github.com/cheqd/cheqd-node/x/cheqd/tests"
-	"github.com/cheqd/cheqd-node/x/resource/types"
+	cheqdtests "github.com/canow-co/cheqd-node/x/cheqd/tests"
+	"github.com/canow-co/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 )

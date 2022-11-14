@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cheqd/cheqd-node/app/params"
+	"github.com/canow-co/cheqd-node/app/params"
 	"github.com/cosmos/cosmos-sdk/snapshots"
 
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
@@ -18,7 +18,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/cheqd/cheqd-node/app"
+	"github.com/canow-co/cheqd-node/app"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/config"

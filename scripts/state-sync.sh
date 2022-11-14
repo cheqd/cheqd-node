@@ -22,8 +22,8 @@ go install -tags goleveldb ./...
 
 # MAKE HOME FOLDER AND GET GENESIS
 cheqd-noded init "$NODE_MONIKER" --home /home/cheqd
-wget -O /home/cheqd/.cheqdnode/config/genesis.json https://github.com/cheqd/cheqd-node/raw/main/networks/mainnet/genesis.json
-wget -O seeds.txt https://github.com/cheqd/cheqd-node/raw/main/networks/mainnet/seeds.txt
+wget -O /home/cheqd/.cheqdnode/config/genesis.json https://github.com/canow-co/cheqd-node/raw/main/networks/mainnet/genesis.json
+wget -O seeds.txt https://github.com/canow-co/cheqd-node/raw/main/networks/mainnet/seeds.txt
 
 INTERVAL=1000
 

@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/cheqd/cheqd-node/x/cheqd/utils"
+	"github.com/canow-co/cheqd-node/x/cheqd/utils"
 
 	// "crypto/sha256"
 
-	"github.com/cheqd/cheqd-node/x/resource/types"
+	"github.com/canow-co/cheqd-node/x/resource/types"
 
 	"github.com/stretchr/testify/require"
 )

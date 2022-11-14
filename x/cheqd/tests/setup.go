@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/btcsuite/btcutil/base58"
-	"github.com/cheqd/cheqd-node/x/cheqd"
-	"github.com/cheqd/cheqd-node/x/cheqd/types"
+	"github.com/canow-co/cheqd-node/x/cheqd"
+	"github.com/canow-co/cheqd-node/x/cheqd/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/multiformats/go-multibase"
 
@@ -18,7 +18,7 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/cheqd/cheqd-node/x/cheqd/keeper"
+	"github.com/canow-co/cheqd-node/x/cheqd/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

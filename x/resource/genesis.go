@@ -3,8 +3,8 @@ package resource
 import (
 	"fmt"
 
-	"github.com/cheqd/cheqd-node/x/resource/keeper"
-	"github.com/cheqd/cheqd-node/x/resource/types"
+	"github.com/canow-co/cheqd-node/x/resource/keeper"
+	"github.com/canow-co/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
