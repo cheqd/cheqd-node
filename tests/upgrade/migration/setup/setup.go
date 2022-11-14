@@ -7,7 +7,9 @@ import (
 )
 
 type DidKeeperV1 struct {
-	cdc      codec.BinaryCodec
+	// nolint: structcheck, unused
+	cdc codec.BinaryCodec
+	// nolint: structcheck, unused
 	storeKey storetypes.KVStoreKey
 }
 
@@ -20,7 +22,9 @@ type DidQueryServerV1 struct {
 }
 
 type ResourceKeeperV1 struct {
-	cdc      codec.BinaryCodec
+	// nolint: structcheck, unused
+	cdc codec.BinaryCodec
+	// nolint: structcheck, unused
 	storeKey storetypes.KVStoreKey
 }
 
