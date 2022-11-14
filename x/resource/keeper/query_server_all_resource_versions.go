@@ -3,8 +3,8 @@ package keeper
 import (
 	"context"
 
-	didtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
-	didutils "github.com/cheqd/cheqd-node/x/cheqd/utils"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"
@@ -21,16 +21,16 @@ func (m queryServer) AllResourceVersions(c context.Context, req *types.QueryGetA
 	ctx := sdk.UnwrapSDKContext(c)
 
 	// Validate corresponding DIDDoc exists
-	namespace := m.cheqdKeeper.GetDidNamespace(&ctx)
+	namespace := m.didKeeper.GetDidNamespace(&ctx)
 	did := didutils.JoinDID(didtypes.DidMethod, namespace, req.CollectionId)
-	if !m.cheqdKeeper.HasDid(&ctx, did) {
+	if !m.didKeeper.HasDidDoc(&ctx, did) {
 		return nil, didtypes.ErrDidDocNotFound.Wrap(did)
 	}
 
 	// Get all versions
-	versions := m.GetAllResourceVersions(&ctx, req.CollectionId, req.Name, req.ResourceType)
+	versions := m.GetAllResources(&ctx, req.CollectionId, req.Name, req.ResourceType)
 
-	return &types.QueryGetAllResourceVersionsResponse{
+	return &types.Query{
 		Resources: versions,
 	}, nil
 }

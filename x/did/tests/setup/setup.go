@@ -37,13 +37,13 @@ func Setup() TestSetup {
 	// Init Codec
 	ir := codectypes.NewInterfaceRegistry()
 	types.RegisterInterfaces(ir)
-	cdc := codec.NewProtoCodec(ir)
+	Cdc := codec.NewProtoCodec(ir)
 
 	// Init KVSore
 	db := dbm.NewMemDB()
 
 	dbStore := store.NewCommitMultiStore(db)
-	storeKey := sdk.NewKVStoreKey(types.StoreKey)
+	StoreKey := sdk.NewKVStoreKey(types.StoreKey)
 	dbStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, nil)
 
 	_ = dbStore.LoadLatestVersion()

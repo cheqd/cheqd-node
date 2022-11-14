@@ -3,8 +3,8 @@ package tests
 import (
 	. "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 
-	cheqdsetup "github.com/cheqd/cheqd-node/x/cheqd/tests/setup"
-	didutils "github.com/cheqd/cheqd-node/x/cheqd/utils"
+	cheqdsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
+	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 
 	. "github.com/onsi/ginkgo/v2"
