@@ -25,7 +25,7 @@ func Loader(path string, msg any) error {
 	if err != nil {
 		return err
 	}
-	file, err := os.ReadFile(filepath.Join(cwd, "migration", GENERATED_JSON_DIR, path))
+	file, err := os.ReadFile(filepath.Join(cwd, GENERATED_JSON_DIR, path))
 	if err != nil {
 		return err
 	}

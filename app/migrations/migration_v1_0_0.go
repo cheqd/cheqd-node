@@ -5,6 +5,7 @@ import (
 
 	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
+	resourcetypesv2 "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -24,11 +25,24 @@ func MigrateResourceV1(ctx sdk.Context, cheqdKeeper didkeeper.Keeper, resourceKe
 }
 
 func MigrateResourceChecksumV1(ctx sdk.Context, cheqdKeeper didkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error {
-	resources := resourceKeeper.GetAllResources(&ctx)
+	resources := resourceKeeper.GetAllResourcesV1(&ctx)
 	for _, resource := range resources {
-		checksum := sha256.Sum256([]byte(resource.Metadata.Checksum))
-		resource.Metadata.Checksum = checksum[:]
-		err := resourceKeeper.SetResource(&ctx, &resource)
+		checksum := sha256.Sum256([]byte(resource.Header.Checksum))
+		resource.Header.Checksum = checksum[:]
+		var migratedResource resourcetypesv2.ResourceWithMetadata
+		migratedResource.Resource = &resourcetypesv2.Resource{Data: resource.Data}
+		migratedResource.Metadata = &resourcetypesv2.Metadata{
+			CollectionId:      resource.Header.CollectionId,
+			Id:                resource.Header.Id,
+			Name:              resource.Header.Name,
+			ResourceType:      resource.Header.ResourceType,
+			MediaType:         resource.Header.MediaType,
+			Checksum:          resource.Header.Checksum,
+			Created:           resource.Header.Created,
+			PreviousVersionId: resource.Header.PreviousVersionId,
+			NextVersionId:     resource.Header.NextVersionId,
+		}
+		err := resourceKeeper.SetResource(&ctx, &migratedResource)
 		if err != nil {
 			return err
 		}

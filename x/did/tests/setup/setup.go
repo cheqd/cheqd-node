@@ -28,6 +28,9 @@ type TestSetup struct {
 	Keeper      keeper.Keeper
 	MsgServer   types.MsgServer
 	QueryServer types.QueryServer
+
+	KeeperV1    KeeperV1
+	MsgServerV1 MsgServerV1
 }
 
 func Setup() TestSetup {
@@ -47,6 +50,7 @@ func Setup() TestSetup {
 
 	// Init Keepers
 	newKeeper := keeper.NewKeeper(cdc, storeKey)
+	newKeeperV1 := NewKeeperV1(cdc, storeKey)
 
 	// Create Tx
 	txBytes := make([]byte, 28)
@@ -61,6 +65,8 @@ func Setup() TestSetup {
 	msgServer := keeper.NewMsgServer(*newKeeper)
 	queryServer := keeper.NewQueryServer(*newKeeper)
 
+	msgServerV1 := NewMsgServerV1(*newKeeperV1)
+
 	setup := TestSetup{
 		Cdc: cdc,
 
@@ -70,6 +76,8 @@ func Setup() TestSetup {
 		Keeper:      *newKeeper,
 		MsgServer:   msgServer,
 		QueryServer: queryServer,
+		KeeperV1:    *newKeeperV1,
+		MsgServerV1: *msgServerV1,
 	}
 
 	setup.Keeper.SetDidNamespace(&ctx, DID_NAMESPACE)

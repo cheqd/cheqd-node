@@ -102,13 +102,13 @@ type ResourceMigrationScenario struct {
 	name     string
 	setup    func() resourcetestssetup.TestSetup
 	existing resourcetypes.MsgCreateResourcePayload
-	didInfo  didtestssetup.MinimalDidDocInfo
+	didInfo  didtestssetup.MinimalDidDocInfoV1
 	expected resourcetypes.Metadata
 	handler  func(ctx sdk.Context, didKeeper didkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error
 	validate func(actual resourcetypes.Metadata) error
 }
 
-func NewResourceMigrationScenario(name string, setup func() resourcetestssetup.TestSetup, existing resourcetypes.MsgCreateResourcePayload, didInfo didtestssetup.MinimalDidDocInfo, expected resourcetypes.Metadata, handler func(ctx sdk.Context, didKeeper didkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error, validate func(actual resourcetypes.Metadata) error) ResourceMigrationScenario {
+func NewResourceMigrationScenario(name string, setup func() resourcetestssetup.TestSetup, existing resourcetypes.MsgCreateResourcePayload, didInfo didtestssetup.MinimalDidDocInfoV1, expected resourcetypes.Metadata, handler func(ctx sdk.Context, didKeeper didkeeper.Keeper, resourceKeeper resourcekeeper.Keeper) error, validate func(actual resourcetypes.Metadata) error) ResourceMigrationScenario {
 	return ResourceMigrationScenario{
 		name:     name,
 		setup:    setup,
@@ -132,7 +132,7 @@ func (m ResourceMigrationScenario) Existing() resourcetypes.MsgCreateResourcePay
 	return m.existing
 }
 
-func (m ResourceMigrationScenario) DidInfo() didtestssetup.MinimalDidDocInfo {
+func (m ResourceMigrationScenario) DidInfo() didtestssetup.MinimalDidDocInfoV1 {
 	return m.didInfo
 }
 
@@ -202,7 +202,7 @@ func NewResourceMigrator(migrations []ResourceMigrationScenario) ResourceMigrato
 func (m ResourceMigrator) Migrate() error {
 	for _, migration := range m.migrations {
 		setup := migration.Setup()
-		_, err := setup.CreateDid(migration.didInfo.Msg, []didtestssetup.SignInput{migration.didInfo.SignInput})
+		_, err := setup.CreateDidV1(migration.didInfo.Msg, []didtestssetup.SignInput{migration.didInfo.SignInput})
 		if err != nil {
 			return err
 		}

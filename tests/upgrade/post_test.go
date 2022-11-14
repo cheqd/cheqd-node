@@ -4,16 +4,19 @@ package upgrade
 
 import (
 	"path/filepath"
+	"reflect"
 
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/cli"
 	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
+	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Upgrade - Post", func() {
 	Context("After a software upgrade execution has concluded", func() {
+		var ModuleVersionMap upgradetypes.QueryModuleVersionsResponse
 		var DidDocCreateRecord didtypesv1.Did
 		var DidDocUpdateRecord didtypesv1.Did
 		var ResourceCreateRecord resourcetypesv1.ResourceHeader
@@ -23,6 +26,17 @@ var _ = Describe("Upgrade - Post", func() {
 			By("pinging the node status until catching up is flagged as false")
 			err := cli.WaitForCaughtUp(cli.VALIDATOR0, cli.CLI_BINARY_NAME, cli.VOTING_PERIOD*6)
 			Expect(err).To(BeNil())
+		})
+
+		It("should match the expected module version map", func() {
+			By("loading the expected module version map")
+			err = Loader(filepath.Join(GENERATED_JSON_DIR, "expected", "module_version_map", "v1.json"), &ModuleVersionMap)
+
+			By("matching the expected module version map")
+			res, err := cli.QueryModuleVersionMap(cli.VALIDATOR0)
+			Expect(err).To(BeNil())
+			ok := reflect.DeepEqual(ModuleVersionMap.ModuleVersions, res.ModuleVersions)
+			Expect(ok).To(BeTrue())
 		})
 
 		It("should load and run expected diddoc payloads - case: create", func() {
@@ -36,9 +50,11 @@ var _ = Describe("Upgrade - Post", func() {
 				err = Loader(payload, &DidDocCreateRecord)
 				Expect(err).To(BeNil())
 
-				res, err := cli.QueryDidLegacyWithNewCli(DidDocCreateRecord.Id, cli.VALIDATOR0)
+				// TODO: Implement v1 -> v2 protobuf migration handlers.
+				// Right now, this will fail.
+				res, err := cli.QueryDid(DidDocCreateRecord.Id, cli.VALIDATOR0)
 				Expect(err).To(BeNil())
-				Expect(res.Did.Id).To(Equal(DidDocCreateRecord.Id))
+				Expect(res.Value.DidDoc.Id).To(Equal(DidDocCreateRecord.Id))
 
 				// TODO: Add v1 -> v2 deep comparison cases, after defining the migration handlers.
 				// e.g.: Migration to Indy format, uuid lowercasing, etc.
@@ -56,9 +72,11 @@ var _ = Describe("Upgrade - Post", func() {
 				err = Loader(payload, &DidDocUpdateRecord)
 				Expect(err).To(BeNil())
 
-				res, err := cli.QueryDidLegacyWithNewCli(DidDocUpdateRecord.Id, cli.VALIDATOR0)
+				// TODO: Implement v1 -> v2 protobuf migration handlers.
+				// Right now, this will fail.
+				res, err := cli.QueryDid(DidDocUpdateRecord.Id, cli.VALIDATOR0)
 				Expect(err).To(BeNil())
-				Expect(res.Did.Id).To(Equal(DidDocUpdateRecord.Id))
+				Expect(res.Value.DidDoc.Id).To(Equal(DidDocUpdateRecord.Id))
 
 				// TODO: Add v1 -> v2 deep comparison cases, after defining the migration handlers.
 				// e.g.: Migration to Indy format, uuid lowercasing, etc.
@@ -76,6 +94,9 @@ var _ = Describe("Upgrade - Post", func() {
 				err = Loader(payload, &ResourceCreateRecord)
 				Expect(err).To(BeNil())
 
+				// TODO: Implement v1 -> v2 protobuf migration handlers.
+				// Right now, this will fail.
+				// Specifically, the resource is written successfully, but the collectionId will report the resource as not found.
 				res, err := cli.QueryResourceLegacy(ResourceCreateRecord.CollectionId, ResourceCreateRecord.Id, cli.VALIDATOR0)
 				Expect(err).To(BeNil())
 				Expect(res.Resource.Header.Id).To(Equal(ResourceCreateRecord.Id))

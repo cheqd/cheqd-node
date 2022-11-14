@@ -4,6 +4,7 @@ import (
 	"crypto/ed25519"
 
 	"github.com/cheqd/cheqd-node/x/did/types"
+	"github.com/cheqd/cheqd-node/x/did/types/v1"
 )
 
 type KeyPair struct {
@@ -18,6 +19,11 @@ type SignInput struct {
 
 type MinimalDidDocInfo struct {
 	Msg       *types.MsgCreateDidDocPayload
+	SignInput SignInput
+}
+
+type MinimalDidDocInfoV1 struct {
+	Msg       *v1.MsgCreateDidPayload
 	SignInput SignInput
 }
 

@@ -8,7 +8,7 @@ import (
 	appmigrations "github.com/cheqd/cheqd-node/app/migrations"
 	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 	didtestssetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
-	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
 	resourcetestssetup "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
@@ -16,8 +16,8 @@ import (
 )
 
 var (
-	didDoc                         didtypes.MsgCreateDidDocPayload
-	didInfo                        didtestssetup.MinimalDidDocInfo
+	didDoc                         didtypesv1.MsgCreateDidPayload
+	didInfo                        didtestssetup.MinimalDidDocInfoV1
 	existingChecksumResource       resourcetypes.MsgCreateResourcePayload
 	expectedChecksumResourceHeader resourcetypes.Metadata
 	ResourceChecksumScenario       ResourceMigrationScenario
@@ -46,7 +46,7 @@ func InitResourceChecksumScenario() error {
 		return err
 	}
 
-	didInfo = didtestssetup.MinimalDidDocInfo{
+	didInfo = didtestssetup.MinimalDidDocInfoV1{
 		Msg: &didDoc,
 		SignInput: didtestssetup.SignInput{
 			VerificationMethodId: signInput.VerificationMethodId,
