@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -31,7 +32,12 @@ func Tx(container string, binary string, module, tx, from string, txArgs ...stri
 	}
 
 	// Skip 'gas estimate: xxx' string
-	output = strings.Split(output, "\n")[1]
+	perLineOutput := strings.Split(output, "\n")
+	if len(perLineOutput) > 3 {
+		output = TrimExtraLineOffset(output, 2)
+	} else {
+		output = TrimExtraLineOffset(output, 1)
+	}
 
 	var resp sdk.TxResponse
 
@@ -43,14 +49,15 @@ func Tx(container string, binary string, module, tx, from string, txArgs ...stri
 	return resp, nil
 }
 
-func SubmitUpgradeProposal(container string) (sdk.TxResponse, error) {
+func SubmitUpgradeProposal(upgradeHeight int64, container string) (sdk.TxResponse, error) {
+	fmt.Println("Submitting upgrade proposal from", container)
 	args := append([]string{
 		CLI_BINARY_NAME,
 		"tx", "gov", "submit-proposal", "software-upgrade",
 		UPGRADE_NAME,
 		"--title", "Upgrade Title",
 		"--description", "Upgrade Description",
-		"--upgrade-height", strconv.FormatInt(UPGRADE_HEIGHT, 10),
+		"--upgrade-height", strconv.FormatInt(upgradeHeight, 10),
 		"--upgrade-info", "Upgrade Info",
 		"--from", OperatorAccounts[container],
 	}, TX_PARAMS...)
@@ -60,16 +67,20 @@ func SubmitUpgradeProposal(container string) (sdk.TxResponse, error) {
 		return sdk.TxResponse{}, err
 	}
 
+	out = TrimExtraLineOffset(out, 1)
+
 	var resp sdk.TxResponse
 
 	err = integrationhelpers.Codec.UnmarshalJSON([]byte(out), &resp)
 	if err != nil {
+		fmt.Println("JSON unmarshal error: output:", out)
 		return sdk.TxResponse{}, err
 	}
 	return resp, nil
 }
 
 func DepositGov(container string) (sdk.TxResponse, error) {
+	fmt.Println("Depositing from", container)
 	args := append([]string{
 		CLI_BINARY_NAME,
 		"tx", "gov", "deposit", "1", DEPOSIT_AMOUNT,
@@ -81,6 +92,8 @@ func DepositGov(container string) (sdk.TxResponse, error) {
 		return sdk.TxResponse{}, err
 	}
 
+	out = TrimExtraLineOffset(out, 1)
+
 	var resp sdk.TxResponse
 
 	err = integrationhelpers.Codec.UnmarshalJSON([]byte(out), &resp)
@@ -91,6 +104,7 @@ func DepositGov(container string) (sdk.TxResponse, error) {
 }
 
 func VoteUpgradeProposal(container string) (sdk.TxResponse, error) {
+	fmt.Println("Voting from", container)
 	args := append([]string{
 		CLI_BINARY_NAME,
 		"tx", "gov", "vote", "1", "yes",
@@ -101,6 +115,8 @@ func VoteUpgradeProposal(container string) (sdk.TxResponse, error) {
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
+
+	out = TrimExtraLineOffset(out, 1)
 
 	var resp sdk.TxResponse
 

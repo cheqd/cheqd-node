@@ -93,6 +93,5 @@ func MsgCreateDidPayloadFromDid(did *didtypesv1.Did) didtypesv1.MsgCreateDidPayl
 		KeyAgreement:         did.KeyAgreement,
 		AlsoKnownAs:          did.AlsoKnownAs,
 		Service:              did.Service,
-		
 	}
 }

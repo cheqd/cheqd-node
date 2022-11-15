@@ -3,10 +3,16 @@ package helpers
 import (
 	"github.com/cheqd/cheqd-node/app/params"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/codec/types"
 )
 
-var Codec codec.Codec
+var (
+	Codec    codec.Codec
+	Registry types.InterfaceRegistry
+)
 
 func init() {
-	Codec = params.MakeEncodingConfig().Codec
+	encodingConfig := params.MakeEncodingConfig()
+	Codec = encodingConfig.Codec
+	Registry = encodingConfig.InterfaceRegistry
 }

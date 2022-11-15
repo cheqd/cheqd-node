@@ -2,67 +2,67 @@ package migration
 
 import (
 	"bytes"
-	"encoding/base64"
 	"fmt"
+	"path/filepath"
 
 	appmigrations "github.com/cheqd/cheqd-node/app/migrations"
-	cheqdtestssetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
-	didtypes "github.com/cheqd/cheqd-node/x/did/types/v1"
-	resourcetestssetup "github.com/cheqd/cheqd-node/x/resource/tests/setup"
+	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/migration/setup"
+	didtestssetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
+	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var (
-	err                            error
-	didDoc                         didtypes.MsgCreateDidPayload
-	didInfo                        cheqdtestssetup.MinimalDidInfo
-	existingChecksumResource       resourcetypes.MsgCreateResourcePayload
-	expectedChecksumResourceHeader resourcetypes.ResourceHeader
+	didDoc                         didtypesv1.MsgCreateDidPayload
+	didInfo                        migrationsetup.MinimalDidDocInfoV1
+	existingChecksumResource       resourcetypesv1.MsgCreateResourcePayload
+	expectedChecksumResourceHeader resourcetypes.Metadata
 	ResourceChecksumScenario       ResourceMigrationScenario
 )
 
 func InitResourceChecksumScenario() error {
-	err = Loader(GENERATED_JSON_DIR+"/payload/existing/diddoc_multibase_16.json", &didDoc)
+	err := Loader(filepath.Join("payload", "existing", "diddoc_uuid.json"), &didDoc)
 	if err != nil {
+		fmt.Println("Error loading didDoc")
 		return err
 	}
 	var signInput SignInput
-	err = Loader(GENERATED_JSON_DIR+"/keys/signinput_multibase_16.json", &signInput)
+	err = Loader(filepath.Join("keys", "signinput_uuid.json"), &signInput)
 	if err != nil {
+		fmt.Println("Error loading signInput")
 		return err
 	}
-	err = Loader(GENERATED_JSON_DIR+"/payload/existing/resource_checksum.json", &existingChecksumResource)
+	err = Loader(filepath.Join("payload", "existing", "resource_checksum.json"), &existingChecksumResource)
 	if err != nil {
+		fmt.Println("Error loading existingChecksumResource")
 		return err
 	}
-	err = Loader(GENERATED_JSON_DIR+"/payload/expected/resource_checksum.json", &expectedChecksumResourceHeader)
+	err = Loader(filepath.Join("payload", "expected", "resource_checksum.json"), &expectedChecksumResourceHeader)
 	if err != nil {
+		fmt.Println("Error loading expectedChecksumResourceHeader")
 		return err
 	}
-	privateKey, err := base64.StdEncoding.DecodeString(signInput.PrivateKey)
-	if err != nil {
-		return err
-	}
-	didInfo = cheqdtestssetup.MinimalDidInfo{
+
+	didInfo = migrationsetup.MinimalDidDocInfoV1{
 		Msg: &didDoc,
-		SignInput: cheqdtestssetup.SignInput{
+		SignInput: didtestssetup.SignInput{
 			VerificationMethodId: signInput.VerificationMethodId,
-			Key:                  privateKey,
+			Key:                  signInput.PrivateKey,
 		},
 	}
 
 	ResourceChecksumScenario = NewResourceMigrationScenario(
 		"ResourceChecksum",
-		resourcetestssetup.Setup,
+		migrationsetup.NewExtendedSetup,
 		existingChecksumResource,
 		didInfo,
 		expectedChecksumResourceHeader,
-		func(ctx sdk.Context) error {
-			setup := resourcetestssetup.Setup()
-			return appmigrations.MigrateResourceV1(ctx, setup.Keeper, setup.ResourceKeeper)
+		func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error {
+			return appmigrations.MigrateResourceV1(ctx, migrationCtx)
 		},
-		func(actual resourcetypes.ResourceHeader) error {
+		func(actual resourcetypes.Metadata) error {
 			if !bytes.Equal(actual.Checksum, expectedChecksumResourceHeader.Checksum) {
 				return fmt.Errorf("expected checksum %v, got %v", expectedChecksumResourceHeader.Checksum, actual.Checksum)
 			}

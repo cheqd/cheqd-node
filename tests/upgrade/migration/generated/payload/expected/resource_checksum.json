@@ -1,11 +1,11 @@
 {
-    "collectionId": "z6LNquFfzPNhCQ8n",
+    "collectionId": "97096fb1-63ea-4f81-b296-8eb5da6ab6eb",
     "id": "7f2589aa-1279-4bd7-b704-f868772b460a",
     "name": "Test Resource",
     "resourceType": "test-resource-type",
     "mediaType": "application/json",
     "created": "2022-11-01T10:54:01Z",
-    "checksum": "4f479bba31f71859d9943651538c8df2119804eceb7f58a0de241789ff214af4",
+    "checksum": "T0ebujH3GFnZlDZRU4yN8hGYBOzrf1ig3iQXif8hSvQ=",
     "previousVersionId": null,
     "nextVersionId": null
 }

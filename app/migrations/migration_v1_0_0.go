@@ -2,10 +2,12 @@ package migrations
 
 import (
 	"crypto/sha256"
+	"errors"
+
 	. "github.com/cheqd/cheqd-node/x/did/utils"
 
-	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	didtypesV1 "github.com/cheqd/cheqd-node/x/did/types/v1"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
@@ -15,24 +17,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func MigrateCheqdV1(sctx sdk.Context, mctx MigrationContext) error {
-	// Resource Checksum migration
-	err := MigrateDidV1(sctx, mctx)
-	if err != nil {
-		return err
-	}
-
-	err = MigrateResourceV1(sctx, mctx)
-	if err != nil {
-		return err
-	}
-	// TODO: Add more migrations for resource module
-	return nil
-}
-
 // Migration for the whole did module
 func MigrateDidV1(sctx sdk.Context, mctx MigrationContext) error {
-	// 
+	//
 	err := MigrateDidProtobufV1(sctx, mctx)
 	if err != nil {
 		return err
@@ -68,7 +55,7 @@ func MigrateResourceV1(sctx sdk.Context, mctx MigrationContext) error {
 	return nil
 }
 
-// Migration because of protobuf changes 
+// Migration because of protobuf changes
 func MigrateDidProtobufV1(sctx sdk.Context, mctx MigrationContext) error {
 	err := MigrateDidProtobufDIDocV1(sctx, mctx)
 	if err != nil {
@@ -88,7 +75,7 @@ func MigrateDidProtobufDIDocV1(sctx sdk.Context, mctx MigrationContext) error {
 	// var err error
 
 	store := prefix.NewStore(
-		sctx.KVStore(sdk.NewKVStoreKey(didtypesV1.StoreKey)), 
+		sctx.KVStore(sdk.NewKVStoreKey(didtypesV1.StoreKey)),
 		StrBytes(didtypesV1.DidKey))
 	iterator = sdk.KVStorePrefixIterator(store, []byte{})
 
@@ -101,12 +88,15 @@ func MigrateDidProtobufDIDocV1(sctx sdk.Context, mctx MigrationContext) error {
 		if err != nil {
 			return err
 		}
-		
+
 		// Remove old DID Doc
 		store.Delete(iterator.Key())
 
 		// Set new DID Doc
 		mctx.didKeeper.AddNewDidDocVersion(&sctx, &newDidDocWithMetadata)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -140,7 +130,7 @@ func MigrateDidProtobufResourceV1(sctx sdk.Context, mctx MigrationContext) error
 
 		var headerV1 resourcetypesV1.ResourceHeader
 		var dataV1 []byte
-		
+
 		mctx.codec.MustUnmarshal(headerIterator.Value(), &headerV1)
 		dataV1 = dataIterator.Value()
 
@@ -172,7 +162,10 @@ func MigrateDidProtobufResourceV1(sctx sdk.Context, mctx MigrationContext) error
 		dataStore.Delete(dataIterator.Key())
 
 		// Write new resource
-		mctx.resourceKeeper.SetResource(&sctx, &resourceWithMetadata)
+		err := mctx.resourceKeeper.SetResource(&sctx, &resourceWithMetadata)
+		if err != nil {
+			return err
+		}
 
 		// Iterate next
 		headerIterator.Next()
@@ -198,7 +191,7 @@ func MigrateResourceChecksumV1(sctx sdk.Context, mctx MigrationContext) error {
 
 	for metadataIterator.Valid() {
 		if !dataIterator.Valid() {
-			panic("number of headers and data don't match")
+			return errors.New("number of headers and data don't match")
 		}
 
 		var metadata resourcetypes.Metadata
@@ -213,7 +206,10 @@ func MigrateResourceChecksumV1(sctx sdk.Context, mctx MigrationContext) error {
 		metadata.Checksum = checksum[:]
 
 		// Update HeaderInfo
-		mctx.resourceKeeper.UpdateResourceMetadata(&sctx, &metadata)
+		err := mctx.resourceKeeper.UpdateResourceMetadata(&sctx, &metadata)
+		if err != nil {
+			return err
+		}
 
 		// Iterate next
 		metadataIterator.Next()
@@ -224,46 +220,46 @@ func MigrateResourceChecksumV1(sctx sdk.Context, mctx MigrationContext) error {
 
 // Recalculate resource links
 func MigrateResourceVersionLinksV1(sctx sdk.Context, mctx MigrationContext) error {
-// 	// TODO: We have to reset links first. Then we can use GetLastResourceVersionHeader
-// 	// but only because resources in state are corted by creation time.
-// 	// Also, we need to avoid loading all resources in memory.
+	// 	// TODO: We have to reset links first. Then we can use GetLastResourceVersionHeader
+	// 	// but only because resources in state are corted by creation time.
+	// 	// Also, we need to avoid loading all resources in memory.
 
-// 	headerIterator := resourceKeeper.GetHeaderIterator(&ctx)
+	// 	headerIterator := resourceKeeper.GetHeaderIterator(&ctx)
 
-// 	defer resourcekeeper.CloseIteratorOrPanic(headerIterator)
+	// 	defer resourcekeeper.CloseIteratorOrPanic(headerIterator)
 
-// 	for headerIterator.Valid() {
-// 		// Vars
-// 		var current_header resourcetypes.ResourceHeader
+	// 	for headerIterator.Valid() {
+	// 		// Vars
+	// 		var current_header resourcetypes.ResourceHeader
 
-// 		// Get the header
-// 		resourceKeeper.Cdc.MustUnmarshal(headerIterator.Value(), &current_header)
+	// 		// Get the header
+	// 		resourceKeeper.Cdc.MustUnmarshal(headerIterator.Value(), &current_header)
 
-// 		previousResourceVersionHeader, found := resourceKeeper.GetLastResourceVersionHeader(
-// 			&ctx, 
-// 			current_header.CollectionId, 
-// 			current_header.Name, 
-// 			current_header.ResourceType)
-// 		if found {
-// 			// Set links
-// 			previousResourceVersionHeader.NextVersionId = current_header.Id
-// 			current_header.PreviousVersionId = previousResourceVersionHeader.Id
+	// 		previousResourceVersionHeader, found := resourceKeeper.GetLastResourceVersionHeader(
+	// 			&ctx,
+	// 			current_header.CollectionId,
+	// 			current_header.Name,
+	// 			current_header.ResourceType)
+	// 		if found {
+	// 			// Set links
+	// 			previousResourceVersionHeader.NextVersionId = current_header.Id
+	// 			current_header.PreviousVersionId = previousResourceVersionHeader.Id
 
-// 			// Update previous version
-// 			err := resourceKeeper.UpdateResourceHeader(&ctx, &current_header)
-// 			if err != nil {
-// 				return err
-// 			}
+	// 			// Update previous version
+	// 			err := resourceKeeper.UpdateResourceHeader(&ctx, &current_header)
+	// 			if err != nil {
+	// 				return err
+	// 			}
 
-// 			// Update previous version
-// 			err = resourceKeeper.UpdateResourceHeader(&ctx, &previousResourceVersionHeader)
-// 			if err != nil {
-// 				return err
-// 			}
-// 		}
+	// 			// Update previous version
+	// 			err = resourceKeeper.UpdateResourceHeader(&ctx, &previousResourceVersionHeader)
+	// 			if err != nil {
+	// 				return err
+	// 			}
+	// 		}
 
-// 		headerIterator.Next()
-// 	}
+	// 		headerIterator.Next()
+	// 	}
 	return nil
 }
 

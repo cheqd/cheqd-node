@@ -2,29 +2,31 @@ package cli
 
 import (
 	"fmt"
-	"os"
 	"os/exec"
+	"path/filepath"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const (
-	DOCKER_LOCALNET                 = "localnet"
-	DOCKER_LOCALNET_PATH            = "../../../docker/localnet"
-	DOCKER_COMPOSE                  = "docker compose"
-	DOCKER_LOAD                     = "docker load"
-	DOCKER_COMPOSE_IN_LOCALNET_PATH = DOCKER_LOCALNET_PATH + "/" + DOCKER_COMPOSE
-	DOCKER_LOAD_IN_LOCALNET_PATH    = DOCKER_LOCALNET_PATH + "/" + DOCKER_LOAD
-	DOCKER_IMAGE_NAME               = "cheqd-node-image.tar"
-	RUNNER_BIN_DIR                  = "$(echo $RUNNER_BIN_DIR)"
-	OPERATOR0                       = "operator0"
-	OPERATOR1                       = "operator1"
-	OPERATOR2                       = "operator2"
-	OPERATOR3                       = "operator3"
-	VALIDATOR0                      = "validator-0"
-	VALIDATOR1                      = "validator-1"
-	VALIDATOR2                      = "validator-2"
-	VALIDATOR3                      = "validator-3"
+	DOCKER_LOCALNET_PATH  = "../../docker/localnet"
+	DOCKER_COMPOSE_FILE   = "docker-compose.yml"
+	DOCKER_COMPOSE_ENV_ML = "mainnet-latest.env"
+	DOCKER_COMPOSE_ENV_BL = "build-latest.env"
+	DOCKER                = "docker"
+	DOCKER_COMPOSE        = "compose"
+	DOCKER_HOME           = "/home/cheqd"
+	DOCKER_USER           = "cheqd"
+	DOCKER_USER_GROUP     = "cheqd"
+	OPERATOR0             = "operator-0"
+	OPERATOR1             = "operator-1"
+	OPERATOR2             = "operator-2"
+	OPERATOR3             = "operator-3"
+	VALIDATOR0            = "validator-0"
+	VALIDATOR1            = "validator-1"
+	VALIDATOR2            = "validator-2"
+	VALIDATOR3            = "validator-3"
+	VALIDATORS            = 4
 )
 
 type OperatorAccount map[string]string
@@ -36,40 +38,22 @@ var OperatorAccounts OperatorAccount = OperatorAccount{
 	VALIDATOR3: OPERATOR3,
 }
 
+var ValidatorNodes = []string{VALIDATOR0, VALIDATOR1, VALIDATOR2, VALIDATOR3}
+
 var (
-	DOCKER_LOAD_IMAGE_ARGS = []string{
-		"-i", DOCKER_IMAGE_NAME,
+	DOCKER_COMPOSE_LATEST_ARGS = []string{
+		"-f", filepath.Join(DOCKER_LOCALNET_PATH, DOCKER_COMPOSE_FILE),
+		"--env-file", filepath.Join(DOCKER_LOCALNET_PATH, DOCKER_COMPOSE_ENV_ML),
 	}
-	RENAME_BINARY_CURRENT_TO_PREVIOUS_ARGS = []string{
-		"mv",
-		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME,
-		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME + "-previous",
-	}
-	RENAME_BINARY_NEXT_TO_CURRENT_ARGS = []string{
-		"mv",
-		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME + "-next",
-		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME,
-	}
-	RENAME_BINARY_PREVIOUS_TO_CURRENT_ARGS = []string{
-		"mv",
-		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME + "-previous",
-		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME,
-	}
-	RENAME_BINARY_CURRENT_TO_NEXT_ARGS = []string{
-		"mv",
-		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME,
-		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME + "-next",
-	}
-	RESTORE_BINARY_PERMISSIONS_ARGS = []string{
-		"sudo",
-		"chmod",
-		"-x",
-		RUNNER_BIN_DIR + "/" + CLI_BINARY_NAME,
+	DOCKER_COMPOSE_BUILD_ARGS = []string{
+		"-f", filepath.Join(DOCKER_LOCALNET_PATH, DOCKER_COMPOSE_FILE),
+		"--env-file", filepath.Join(DOCKER_LOCALNET_PATH, DOCKER_COMPOSE_ENV_BL),
 	}
 )
 
-func LocalnetExec(args ...string) (string, error) {
-	cmd := exec.Command(DOCKER_COMPOSE_IN_LOCALNET_PATH, args...)
+func LocalnetExec(envArgs []string, args ...string) (string, error) {
+	args = append(append([]string{DOCKER_COMPOSE}, envArgs...), args...)
+	cmd := exec.Command(DOCKER, args...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return "", sdkerrors.Wrap(err, string(out))
@@ -79,73 +63,26 @@ func LocalnetExec(args ...string) (string, error) {
 
 func LocalnetExecExec(container string, args ...string) (string, error) {
 	args = append([]string{"exec", container}, args...)
-	return LocalnetExec(args...)
+	return LocalnetExec(DOCKER_COMPOSE_LATEST_ARGS, args...)
 }
 
 func LocalnetExecUp() (string, error) {
-	return LocalnetExec("up", "--detach", "--no-build")
+	return LocalnetExec(DOCKER_COMPOSE_LATEST_ARGS, "up", "--detach", "--no-build")
 }
 
 func LocalnetExecDown() (string, error) {
-	return LocalnetExec("down")
+	return LocalnetExec(DOCKER_COMPOSE_LATEST_ARGS, "down")
 }
 
-func LocalnetLoadImage(args ...string) (string, error) {
-	cmd := exec.Command(DOCKER_LOAD_IN_LOCALNET_PATH)
-	out, err := cmd.CombinedOutput()
+func LocalnetExecCopyAbsoluteWithPermissions(path string, destination string, container string) (string, error) {
+	_, err := LocalnetExec(DOCKER_COMPOSE_LATEST_ARGS, "cp", path, filepath.Join(container+":"+destination))
 	if err != nil {
-		return "", sdkerrors.Wrap(err, string(out))
-	}
-	return string(out), err
-}
-
-func LocalnetExecUpWithNewImage() (string, error) {
-	err := SetNewDockerComposeEnv()
-	if err != nil {
+		fmt.Println("Error copying file to container: ", err)
 		return "", err
 	}
-	_, err = LocalnetLoadImage(DOCKER_LOAD_IMAGE_ARGS...)
-	if err != nil {
-		return "", err
-	}
-	return LocalnetExecUp()
+	return LocalnetExecRestorePermissions(destination, container)
 }
 
-func SetOldDockerComposeEnv() error {
-	os.Setenv("CHEQD_IMAGE_FROM", CHEQD_IMAGE_FROM)
-	os.Setenv("CHEQD_TAG_FROM", CHEQD_TAG_FROM)
-	return nil
-}
-
-func SetNewDockerComposeEnv() error {
-	os.Setenv("CHEQD_IMAGE_TO", CHEQD_IMAGE_TO)
-	os.Setenv("CHEQD_TAG_TO", CHEQD_TAG_TO)
-	return nil
-}
-
-func ReplaceBinaryWithPermissions(action string) (string, error) {
-	switch action {
-	case "previous-to-next":
-		_, err := Exec(RENAME_BINARY_CURRENT_TO_PREVIOUS_ARGS...)
-		if err != nil {
-			return "", err
-		}
-		_, err = Exec(RENAME_BINARY_NEXT_TO_CURRENT_ARGS...)
-		if err != nil {
-			return "", err
-		}
-		return Exec(RESTORE_BINARY_PERMISSIONS_ARGS...)
-	case "next-to-previous":
-		_, err := Exec(RENAME_BINARY_CURRENT_TO_NEXT_ARGS...)
-		if err != nil {
-			return "", err
-		}
-		_, err = Exec(RENAME_BINARY_PREVIOUS_TO_CURRENT_ARGS...)
-		if err != nil {
-			return "", err
-		}
-		return Exec(RESTORE_BINARY_PERMISSIONS_ARGS...)
-	default:
-		return "", fmt.Errorf("invalid action")
-	}
+func LocalnetExecRestorePermissions(path string, container string) (string, error) {
+	return LocalnetExec(DOCKER_COMPOSE_LATEST_ARGS, "exec", "-it", "--user", "root", container, "chown", "-R", DOCKER_USER+":"+DOCKER_USER_GROUP, path)
 }

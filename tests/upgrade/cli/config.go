@@ -3,12 +3,18 @@ package cli
 import (
 	cheqdapp "github.com/cheqd/cheqd-node/app"
 	integrationcli "github.com/cheqd/cheqd-node/tests/integration/cli"
+	integrationnetwork "github.com/cheqd/cheqd-node/tests/integration/network"
 )
 
 const (
 	CLI_BINARY_NAME = integrationcli.CLI_BINARY_NAME
 	GREEN           = integrationcli.GREEN
 	PURPLE          = integrationcli.PURPLE
+)
+
+const (
+	CLI_BINARY_NAME_PREVIOUS = CLI_BINARY_NAME + "-previous"
+	CLI_BINARY_NAME_NEXT     = CLI_BINARY_NAME + "-next"
 )
 
 const (
@@ -26,8 +32,9 @@ const (
 	EXPECTED_BLOCK_SECONDS int64 = 1
 	EXTRA_BLOCKS           int64 = 5
 	UPGRADE_NAME                 = cheqdapp.UpgradeName
-	DEPOSIT_AMOUNT               = "10000000"
-	QUERY_PARAMS                 = "--output json"
+	DEPOSIT_AMOUNT               = "10000000ncheq"
+	NETWORK_CONFIG_DIR           = "network-config"
+	KEYRING_DIR                  = "keyring-test"
 )
 
 var (
@@ -38,7 +45,8 @@ var (
 		"--keyring-backend", KEYRING_BACKEND,
 		"-y",
 	}
-	CURRENT_HEIGHT    int64
-	VOTING_END_HEIGHT int64
-	UPGRADE_HEIGHT    int64
+	QUERY_PARAMS = []string{
+		"--chain-id", integrationnetwork.CHAIN_ID,
+		"--output", OUTPUT_FORMAT,
+	}
 )
