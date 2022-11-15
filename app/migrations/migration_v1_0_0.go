@@ -90,7 +90,7 @@ func MigrateDidProtobufDIDocV1(sctx sdk.Context, mctx MigrationContext) error {
 		store.Delete(iterator.Key())
 
 		// Set new DID Doc
-		err = mctx.didKeeper.SetDidDoc(&sctx, &newDidDocWithMetadata)
+		err = mctx.didKeeper.SetDidDocVersion(&sctx, &newDidDocWithMetadata, false)
 		if err != nil {
 			return err
 		}
@@ -102,7 +102,7 @@ func MigrateDidProtobufDIDocV1(sctx sdk.Context, mctx MigrationContext) error {
 func MigrateDidProtobufResourceV1(sctx sdk.Context, mctx MigrationContext) error {
 	// Reset counter
 	countStore := sctx.KVStore(sdk.NewKVStoreKey(resourcetypesV1.StoreKey))
-	countKey := resourcetypes.KeyPrefix(resourcetypes.ResourceCountKey)
+	countKey := []byte(resourcetypes.ResourceCountKey)
 	countStore.Delete(countKey)
 
 	// Storages for old headers and data
@@ -112,10 +112,10 @@ func MigrateDidProtobufResourceV1(sctx sdk.Context, mctx MigrationContext) error
 	// Iterators for old headers and data
 	headerIterator := sdk.KVStorePrefixIterator(
 		headerStore,
-		resourcetypes.KeyPrefix(resourcetypesV1.ResourceHeaderKey))
+		[]byte(resourcetypesV1.ResourceHeaderKey))
 	dataIterator := sdk.KVStorePrefixIterator(
 		dataStore,
-		resourcetypes.KeyPrefix(resourcetypesV1.ResourceDataKey))
+		[]byte(resourcetypesV1.ResourceDataKey))
 
 	closeIteratorOrPanic(headerIterator)
 	closeIteratorOrPanic(dataIterator)
@@ -137,7 +137,7 @@ func MigrateDidProtobufResourceV1(sctx sdk.Context, mctx MigrationContext) error
 			Name:              headerV1.Name,
 			Version:           "",
 			ResourceType:      headerV1.ResourceType,
-			AlsoKnownAs:       []string{},
+			AlsoKnownAs:       []*resourcetypes.AlternativeUri{},
 			MediaType:         headerV1.MediaType,
 			Created:           headerV1.Created,
 			Checksum:          headerV1.Checksum,
@@ -174,10 +174,10 @@ func MigrateResourceChecksumV1(sctx sdk.Context, mctx MigrationContext) error {
 	dataStore := sctx.KVStore(sdk.NewKVStoreKey(resourcetypesV1.StoreKey))
 	metadataIterator := sdk.KVStorePrefixIterator(
 		metadataStore,
-		resourcetypes.KeyPrefix(resourcetypesV1.ResourceHeaderKey))
+		[]byte(resourcetypesV1.ResourceHeaderKey))
 	dataIterator := sdk.KVStorePrefixIterator(
 		dataStore,
-		resourcetypes.KeyPrefix(resourcetypesV1.ResourceDataKey))
+		[]byte(resourcetypesV1.ResourceDataKey))
 
 	closeIteratorOrPanic(metadataIterator)
 	closeIteratorOrPanic(dataIterator)

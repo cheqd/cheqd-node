@@ -174,7 +174,7 @@ func (m DidMigrator) Migrate(ctx sdk.Context) error {
 		if err != nil {
 			return err
 		}
-		data, err := setup.Keeper.GetDidDoc(&setup.SdkCtx, migration.existing.Msg.Id)
+		data, err := setup.Keeper.GetLatestDidDoc(&setup.SdkCtx, migration.existing.Msg.Id)
 		if err != nil {
 			return err
 		}
