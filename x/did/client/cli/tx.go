@@ -1,19 +1,23 @@
 package cli
 
 import (
-	"bufio"
 	"crypto/ed25519"
-	"encoding/base64"
+	"encoding/json"
 	"fmt"
+	"os"
 
 	"github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/input"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/spf13/cobra"
 )
+
+type PayloadWithSignInputs struct {
+	Payload    json.RawMessage
+	SignInputs []SignInput
+}
 
 type SignInput struct {
 	VerificationMethodId string
@@ -35,64 +39,6 @@ func GetTxCmd() *cobra.Command {
 	cmd.AddCommand(CmdDeactivateDidDoc())
 
 	return cmd
-}
-
-func GetPayloadAndSignInputs(clientCtx client.Context, args []string) (string, []SignInput, error) {
-	// Check for args count
-	if len(args)%2 != 1 {
-		return "", []SignInput{}, fmt.Errorf("invalid number of arguments: %d. must be an odd number", len(args))
-	}
-
-	// Get payload json
-	payloadJson := args[0]
-
-	// Get signInputs
-	signInputs, err := GetSignInputs(clientCtx, args[1:])
-	if err != nil {
-		return "", []SignInput{}, err
-	}
-
-	return payloadJson, signInputs, nil
-}
-
-func GetSignInputs(clientCtx client.Context, args []string) ([]SignInput, error) {
-	// Check for args count
-	if len(args)%2 != 0 {
-		return []SignInput{}, fmt.Errorf("can't read sign inputs. invalid number of arguments: %d", len(args))
-	}
-
-	// Get signInputs
-	var signInputs []SignInput
-
-	for i := 0; i < len(args); i += 2 {
-		vmId := args[i]
-		privKey := args[i+1]
-
-		if privKey == "interactive" {
-			inBuf := bufio.NewReader(clientCtx.Input)
-
-			var err error
-			privKey, err = input.GetString("Enter base64 encoded verification key", inBuf)
-
-			if err != nil {
-				return nil, err
-			}
-		}
-
-		privKeyBytes, err := base64.StdEncoding.DecodeString(privKey)
-		if err != nil {
-			return nil, fmt.Errorf("unable to decode private key: %s", err.Error())
-		}
-
-		signInput := SignInput{
-			VerificationMethodId: vmId,
-			PrivKey:              privKeyBytes,
-		}
-
-		signInputs = append(signInputs, signInput)
-	}
-
-	return signInputs, nil
 }
 
 func SignWithSignInputs(signBytes []byte, signInputs []SignInput) []*types.SignInfo {
@@ -141,4 +87,19 @@ func AccAddrByKeyRef(keyring keyring.Keyring, keyRef string) (sdk.AccAddress, er
 
 	// Fallback: convert keyref to address
 	return sdk.AccAddressFromBech32(keyRef)
+}
+
+func ReadPayloadWithSignInputsFromFile(filePath string) (json.RawMessage, []SignInput, error) {
+	bytes, err := os.ReadFile(filePath)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	payloadWithSignInputs := &PayloadWithSignInputs{}
+	err = json.Unmarshal(bytes, payloadWithSignInputs)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return payloadWithSignInputs.Payload, payloadWithSignInputs.SignInputs, nil
 }

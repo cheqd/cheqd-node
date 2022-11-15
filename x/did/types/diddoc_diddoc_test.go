@@ -28,7 +28,7 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 },
 
 	Entry(
-		"DidDoc is valid",
+		"DIDDoc is valid",
 		DIDDocTestCase{
 			didDoc: &DidDoc{
 				Id: ValidTestDID,
@@ -46,7 +46,7 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 		}),
 
 	Entry(
-		"DIDDoc is not allowed",
+		"DIDDoc is invalid",
 		DIDDocTestCase{
 			didDoc: &DidDoc{
 				Id: InvalidTestDID,
@@ -82,7 +82,7 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 		}),
 
 	Entry(
-		"Verification method is jwk",
+		"Verification method is JWK",
 		DIDDocTestCase{
 			didDoc: &DidDoc{
 				Id: ValidTestDID,
@@ -99,7 +99,7 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 			errorMsg: "",
 		}),
 
-	Entry("Verification method has wrong id",
+	Entry("Verification method has wrong ID",
 		DIDDocTestCase{
 			didDoc: &DidDoc{
 				Id: ValidTestDID,
@@ -133,7 +133,7 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 			errorMsg: "verification_method: (0: (controller: unable to split did into method, namespace and id.).).",
 		}),
 	Entry(
-		"List of DIDs in cotroller is allowed",
+		"List of DIDs in controller is allowed",
 		DIDDocTestCase{
 			didDoc: &DidDoc{
 				Id:         ValidTestDID,
@@ -151,7 +151,7 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 			errorMsg: "",
 		}),
 	Entry(
-		"List of DIDs in cotroller is not allowed",
+		"List of DIDs in controller is not allowed",
 		DIDDocTestCase{
 			didDoc: &DidDoc{
 				Context:    nil,
@@ -170,7 +170,7 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 			errorMsg: "controller: (1: unable to split did into method, namespace and id.).",
 		}),
 	Entry(
-		"Namespace in controler is not in list of allowed",
+		"Namespace in controller is not in list of allowed",
 		DIDDocTestCase{
 			didDoc: &DidDoc{
 				Id:         ValidTestDID,

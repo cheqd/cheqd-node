@@ -7,8 +7,13 @@ import "cheqd/did/v2/fee.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/did/types";
 
+message DidDocVersionSet {
+  string latest_version = 1;
+  repeated DidDocWithMetadata did_docs = 2;
+}
+
 message GenesisState {
   string did_namespace = 1;
-  repeated DidDocWithMetadata did_docs = 2;
+  repeated DidDocVersionSet version_sets = 2;
   FeeParams fee_params = 3;
 }

@@ -9,8 +9,9 @@ import (
 	"github.com/cheqd/cheqd-node/tests/integration/cli"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
 	"github.com/cheqd/cheqd-node/tests/integration/testdata"
-	cli_types "github.com/cheqd/cheqd-node/x/did/client/cli"
+	clitypes "github.com/cheqd/cheqd-node/x/did/client/cli"
 	"github.com/cheqd/cheqd-node/x/did/types"
+	resourcecli "github.com/cheqd/cheqd-node/x/resource/client/cli"
 	"github.com/google/uuid"
 	"github.com/multiformats/go-multibase"
 	. "github.com/onsi/ginkgo/v2"
@@ -18,6 +19,12 @@ import (
 )
 
 var _ = Describe("cheqd cli - positive resource", func() {
+	var tmpDir string
+
+	BeforeEach(func() {
+		tmpDir = GinkgoT().TempDir()
+	})
+
 	It("can create diddoc, create resource, query it, query all resource versions of the same resource name, query resource collection", func() {
 		// Create a new DID Doc
 		collectionId := uuid.NewString()
@@ -41,16 +48,17 @@ var _ = Describe("cheqd cli - positive resource", func() {
 				},
 			},
 			Authentication: []string{keyId},
+			VersionId:      uuid.NewString(),
 		}
 
-		signInputs := []cli_types.SignInput{
+		signInputs := []clitypes.SignInput{
 			{
 				VerificationMethodId: keyId,
 				PrivKey:              privKey,
 			},
 		}
 
-		res, err := cli.CreateDidDoc(payload, signInputs, testdata.BASE_ACCOUNT_1)
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -63,7 +71,14 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		resourceFile, err := testdata.CreateTestJson(GinkgoT().TempDir())
 		Expect(err).To(BeNil())
 
-		res, err = cli.CreateResource(collectionId, resourceId, resourceName, resourceVersion, resourceType, resourceFile, signInputs, testdata.BASE_ACCOUNT_1)
+		res, err = cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
+			CollectionId:    collectionId,
+			ResourceId:      resourceId,
+			ResourceName:    resourceName,
+			ResourceVersion: resourceVersion,
+			ResourceType:    resourceType,
+			ResourceFile:    resourceFile,
+		}, signInputs, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -98,7 +113,14 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		nextResourceFile, err := testdata.CreateTestJson(GinkgoT().TempDir())
 		Expect(err).To(BeNil())
 
-		res, err = cli.CreateResource(collectionId, nextResourceId, nextResourceName, nextResourceVersion, nextResourceType, nextResourceFile, signInputs, testdata.BASE_ACCOUNT_1)
+		res, err = cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
+			CollectionId:    collectionId,
+			ResourceId:      nextResourceId,
+			ResourceName:    nextResourceName,
+			ResourceVersion: nextResourceVersion,
+			ResourceType:    nextResourceType,
+			ResourceFile:    nextResourceFile,
+		}, signInputs, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -124,16 +146,17 @@ var _ = Describe("cheqd cli - positive resource", func() {
 				},
 			},
 			Authentication: []string{secondKeyId},
+			VersionId:      uuid.NewString(),
 		}
 
-		secondSignInputs := []cli_types.SignInput{
+		secondSignInputs := []clitypes.SignInput{
 			{
 				VerificationMethodId: secondKeyId,
 				PrivKey:              secondPrivKey,
 			},
 		}
 
-		res, err = cli.CreateDidDoc(secondPayload, secondSignInputs, testdata.BASE_ACCOUNT_2)
+		res, err = cli.CreateDidDoc(tmpDir, secondPayload, secondSignInputs, testdata.BASE_ACCOUNT_2)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -145,7 +168,14 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		secondResourceFile, err := testdata.CreateTestJson(GinkgoT().TempDir())
 		Expect(err).To(BeNil())
 
-		res, err = cli.CreateResource(secondCollectionId, secondResourceId, secondResourceName, secondResourceVersion, secondResourceType, secondResourceFile, secondSignInputs, testdata.BASE_ACCOUNT_2)
+		res, err = cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
+			CollectionId:    secondCollectionId,
+			ResourceId:      secondResourceId,
+			ResourceName:    secondResourceName,
+			ResourceVersion: secondResourceVersion,
+			ResourceType:    secondResourceType,
+			ResourceFile:    secondResourceFile,
+		}, secondSignInputs, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 

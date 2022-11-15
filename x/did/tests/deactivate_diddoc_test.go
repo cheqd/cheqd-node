@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	. "github.com/cheqd/cheqd-node/x/did/tests/setup"
+	"github.com/google/uuid"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -23,7 +24,8 @@ var _ = Describe("Deactivate DID tests", func() {
 		// Alice
 		alice := setup.CreateSimpleDid()
 		msg := &types.MsgDeactivateDidDocPayload{
-			Id: alice.Did,
+			Id:        alice.Did,
+			VersionId: uuid.NewString(),
 		}
 
 		signatures := []SignInput{alice.DidDocInfo.SignInput}
@@ -38,7 +40,8 @@ var _ = Describe("Deactivate DID tests", func() {
 			NotFoundDID := GenerateDID(Base58_16bytes)
 
 			msg := &types.MsgDeactivateDidDocPayload{
-				Id: NotFoundDID,
+				Id:        NotFoundDID,
+				VersionId: uuid.NewString(),
 			}
 
 			signatures := []SignInput{}
@@ -54,7 +57,8 @@ var _ = Describe("Deactivate DID tests", func() {
 			// Alice
 			alice := setup.CreateSimpleDid()
 			msg := &types.MsgDeactivateDidDocPayload{
-				Id: alice.Did,
+				Id:        alice.Did,
+				VersionId: uuid.NewString(),
 			}
 
 			signatures := []SignInput{alice.DidDocInfo.SignInput}
@@ -78,7 +82,8 @@ var _ = Describe("Deactivate DID tests", func() {
 			bob := setup.CreateSimpleDid()
 
 			msg := &types.MsgDeactivateDidDocPayload{
-				Id: alice.Did,
+				Id:        alice.Did,
+				VersionId: uuid.NewString(),
 			}
 
 			signatures := []SignInput{bob.DidDocInfo.SignInput}

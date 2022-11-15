@@ -1,6 +1,7 @@
 package types_test
 
 import (
+	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
@@ -40,6 +41,7 @@ var _ = Describe("Message for DID creation", func() {
 							},
 						},
 						Authentication: []string{"did:cheqd:testnet:zABCDEFG123456789abcd#key1", "did:cheqd:testnet:zABCDEFG123456789abcd#aaa"},
+						VersionId:      uuid.NewString(),
 					},
 					Signatures: nil,
 				},

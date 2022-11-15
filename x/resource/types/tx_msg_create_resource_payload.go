@@ -20,10 +20,11 @@ func (msg *MsgCreateResourcePayload) GetSignBytes() []byte {
 func (msg *MsgCreateResourcePayload) ToResource() ResourceWithMetadata {
 	return ResourceWithMetadata{
 		Metadata: &Metadata{
-			CollectionId: didutils.NormalizeId(msg.CollectionId),
-			Id:           didutils.NormalizeUUID(msg.Id),
+			CollectionId: msg.CollectionId,
+			Id:           msg.Id,
 			Name:         msg.Name,
 			ResourceType: msg.ResourceType,
+			AlsoKnownAs:  msg.AlsoKnownAs,
 		},
 		Resource: &Resource{
 			Data: msg.Data,
@@ -38,8 +39,9 @@ func (msg MsgCreateResourcePayload) Validate() error {
 		validation.Field(&msg.CollectionId, validation.Required, didtypes.IsID()),
 		validation.Field(&msg.Id, validation.Required, didtypes.IsUUID()),
 		validation.Field(&msg.Name, validation.Required, validation.Length(1, 64)),
-		validation.Field(&msg.Version, validation.Required, validation.Length(1, 64)),
+		validation.Field(&msg.Version, validation.Length(1, 64)),
 		validation.Field(&msg.ResourceType, validation.Required, validation.Length(1, 64)),
+		validation.Field(&msg.AlsoKnownAs, validation.Each(ValidAlternativeUri())),
 		validation.Field(&msg.Data, validation.Required, validation.Length(1, 200*1024)), // 200KB
 	)
 }
