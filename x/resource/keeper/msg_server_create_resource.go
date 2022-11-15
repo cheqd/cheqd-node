@@ -25,9 +25,15 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	// Validate corresponding DIDDoc exists
 	namespace := k.didKeeper.GetDidNamespace(&ctx)
 	did := didutils.JoinDID(didtypes.DidMethod, namespace, msg.Payload.CollectionId)
-	didDoc, err := k.didKeeper.GetDidDoc(&ctx, did)
+	didDoc, err := k.didKeeper.GetLatestDidDoc(&ctx, did)
 	if err != nil {
 		return nil, err
+	}
+
+	// Validate namespaces
+	err = msg.Validate([]string{namespace})
+	if err != nil {
+		return nil, didtypes.ErrNamespaceValidation.Wrap(err.Error())
 	}
 
 	// Validate DID is not deactivated

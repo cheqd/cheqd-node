@@ -1,6 +1,7 @@
 package types_test
 
 import (
+	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
@@ -30,7 +31,8 @@ var _ = Describe("Message for DID updating", func() {
 			TestCaseMsgDeactivateDID{
 				msg: &MsgDeactivateDidDoc{
 					Payload: &MsgDeactivateDidDocPayload{
-						Id: "did:cheqd:testnet:zABCDEFG123456789abcd",
+						Id:        "did:cheqd:testnet:zABCDEFG123456789abcd",
+						VersionId: uuid.NewString(),
 					},
 					Signatures: nil,
 				},
@@ -42,7 +44,8 @@ var _ = Describe("Message for DID updating", func() {
 			TestCaseMsgDeactivateDID{
 				msg: &MsgDeactivateDidDoc{
 					Payload: &MsgDeactivateDidDocPayload{
-						Id: "did:cheqdttt:testnet:zABCDEFG123456789abcd",
+						Id:        "did:cheqdttt:testnet:zABCDEFG123456789abcd",
+						VersionId: uuid.NewString(),
 					},
 					Signatures: nil,
 				},
@@ -54,7 +57,9 @@ var _ = Describe("Message for DID updating", func() {
 			"Negative: Id is required",
 			TestCaseMsgDeactivateDID{
 				msg: &MsgDeactivateDidDoc{
-					Payload:    &MsgDeactivateDidDocPayload{},
+					Payload: &MsgDeactivateDidDocPayload{
+						VersionId: uuid.NewString(),
+					},
 					Signatures: nil,
 				},
 				isValid:  false,

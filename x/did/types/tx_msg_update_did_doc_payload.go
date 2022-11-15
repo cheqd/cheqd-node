@@ -73,4 +73,6 @@ func (msg *MsgUpdateDidDocPayload) Normalize() {
 	msg.CapabilityInvocation = utils.NormalizeDIDUrlList(msg.CapabilityInvocation)
 	msg.CapabilityDelegation = utils.NormalizeDIDUrlList(msg.CapabilityDelegation)
 	msg.KeyAgreement = utils.NormalizeDIDUrlList(msg.KeyAgreement)
+
+	msg.VersionId = utils.NormalizeUUID(msg.VersionId)
 }

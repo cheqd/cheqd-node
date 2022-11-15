@@ -24,7 +24,7 @@ type VerificationMethodTestCase struct {
 	errorMsg          string
 }
 
-var _ = DescribeTable("Verification Method Validation tests", func(testCase VerificationMethodTestCase) {
+var _ = DescribeTable("Verification Method validation tests", func(testCase VerificationMethodTestCase) {
 	err := testCase.vm.Validate(testCase.baseDid, testCase.allowedNamespaces)
 
 	if testCase.isValid {

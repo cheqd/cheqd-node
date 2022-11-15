@@ -24,7 +24,7 @@ message MsgCreateResourcePayload {
   string name = 4;
   string version = 5;
   string resource_type = 6;
-  repeated string also_known_as = 7;
+  repeated cheqd.resource.v2.AlternativeUri also_known_as = 7;
 }
 
 message MsgCreateResourceResponse {

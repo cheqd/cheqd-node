@@ -26,7 +26,7 @@ func FindDidDoc(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.DidDo
 
 	// Look in state
 	if k.HasDidDoc(ctx, did) {
-		value, err := k.GetDidDoc(ctx, did)
+		value, err := k.GetLatestDidDoc(ctx, did)
 		if err != nil {
 			return types.DidDocWithMetadata{}, false, err
 		}
