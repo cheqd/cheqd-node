@@ -6,9 +6,11 @@ import (
 
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	didtypesV1 "github.com/cheqd/cheqd-node/x/did/types/v1"
+	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	resourcetypesV1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
+
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -104,7 +106,7 @@ func MigrateDidProtobufDIDocV1(sctx sdk.Context, mctx MigrationContext) error {
 		store.Delete(iterator.Key())
 
 		// Set new DID Doc
-		mctx.didKeeper.SetDidDoc(&sctx, &newDidDocWithMetadata)
+		mctx.didKeeper.AddNewDidDocVersion(&sctx, &newDidDocWithMetadata)
 	}
 
 	return nil
@@ -113,7 +115,7 @@ func MigrateDidProtobufDIDocV1(sctx sdk.Context, mctx MigrationContext) error {
 func MigrateDidProtobufResourceV1(sctx sdk.Context, mctx MigrationContext) error {
 	// Reset counter
 	countStore := sctx.KVStore(sdk.NewKVStoreKey(resourcetypesV1.StoreKey))
-	countKey := resourcetypes.KeyPrefix(resourcetypes.ResourceCountKey)
+	countKey := didutils.StrBytes(resourcetypes.ResourceCountKey)
 	countStore.Delete(countKey)
 
 	// Storages for old headers and data
@@ -123,10 +125,10 @@ func MigrateDidProtobufResourceV1(sctx sdk.Context, mctx MigrationContext) error
 	// Iterators for old headers and data
 	headerIterator := sdk.KVStorePrefixIterator(
 		headerStore, 
-		resourcetypes.KeyPrefix(resourcetypesV1.ResourceHeaderKey))
+		didutils.StrBytes(resourcetypesV1.ResourceHeaderKey))
 	dataIterator := sdk.KVStorePrefixIterator(
 		dataStore, 
-		resourcetypes.KeyPrefix(resourcetypesV1.ResourceDataKey))
+		didutils.StrBytes(resourcetypesV1.ResourceDataKey))
 	
 	closeIteratorOrPanic(headerIterator)
 	closeIteratorOrPanic(dataIterator)
@@ -149,7 +151,7 @@ func MigrateDidProtobufResourceV1(sctx sdk.Context, mctx MigrationContext) error
 			Name: 				headerV1.Name,
 			Version: 			"",
 			ResourceType: 		headerV1.ResourceType,
-			AlsoKnownAs:		[]string{},
+			AlsoKnownAs:		[]*resourcetypes.AlternativeUri{},
 			MediaType: 			headerV1.MediaType,
 			Created: 			headerV1.Created,
 			Checksum: 			headerV1.Checksum,
@@ -185,10 +187,10 @@ func MigrateResourceChecksumV1(sctx sdk.Context, mctx MigrationContext) error {
 	dataStore := sctx.KVStore(sdk.NewKVStoreKey(resourcetypesV1.StoreKey))
 	metadataIterator := sdk.KVStorePrefixIterator(
 		metadataStore, 
-		resourcetypes.KeyPrefix(resourcetypesV1.ResourceHeaderKey))
+		didutils.StrBytes(resourcetypesV1.ResourceHeaderKey))
 	dataIterator := sdk.KVStorePrefixIterator(
 		dataStore, 
-		resourcetypes.KeyPrefix(resourcetypesV1.ResourceDataKey))
+		didutils.StrBytes(resourcetypesV1.ResourceDataKey))
 	
 
 	closeIteratorOrPanic(metadataIterator)
@@ -342,7 +344,7 @@ func MigrateDidIndyStyleIdsV1DidModule(sctx sdk.Context, mctx MigrationContext) 
 		store.Delete(iterator.Key())
 
 		// Set new DID Doc
-		mctx.didKeeper.SetDidDoc(&sctx, &didDocWithMetadata)
+		mctx.didKeeper.AddNewDidDocVersion(&sctx, &didDocWithMetadata)
 	}
 
 	return nil
@@ -352,7 +354,7 @@ func MigrateDidIndyStyleIdsV1ResourceModule(sctx sdk.Context, mctx MigrationCont
 	metadataStore := sctx.KVStore(sdk.NewKVStoreKey(resourcetypesV1.StoreKey))
 	metadataIterator := sdk.KVStorePrefixIterator(
 		metadataStore, 
-		resourcetypes.KeyPrefix(resourcetypesV1.ResourceHeaderKey))
+		didutils.StrBytes(resourcetypesV1.ResourceHeaderKey))
 	
 
 	closeIteratorOrPanic(metadataIterator)
