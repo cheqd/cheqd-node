@@ -9,7 +9,7 @@ const DefaultDidNamespace = "testnet"
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		DidDocs:      []*DidDocWithMetadata{},
+		VersionSets:  []*DidDocVersionSet{},
 		DidNamespace: DefaultDidNamespace,
 	}
 }
@@ -22,29 +22,68 @@ func (gs GenesisState) Validate() error {
 		return err
 	}
 
+	err = gs.ValidateVersionSets()
+	if err != nil {
+		return err
+	}
+
 	return gs.ValidateBasic()
 }
 
 func (gs GenesisState) ValidateNoDuplicates() error {
-	cache := make(map[string]bool)
+	// Check for duplicates in version set
+	didCache := make(map[string]bool)
 
-	for _, didDoc := range gs.DidDocs {
-
-		if _, ok := cache[didDoc.DidDoc.Id]; ok {
-			return fmt.Errorf("duplicated didDoc found with id %s", didDoc.DidDoc.Id)
+	for _, versionSet := range gs.VersionSets {
+		did := versionSet.DidDocs[0].DidDoc.Id
+		if _, ok := didCache[did]; ok {
+			return fmt.Errorf("duplicated didDoc found with id %s", did)
 		}
 
-		cache[didDoc.DidDoc.Id] = true
+		didCache[did] = true
+
+		// Check for duplicates in didDoc versions
+		versionCache := make(map[string]bool)
+
+		for _, didDoc := range versionSet.DidDocs {
+			version := didDoc.Metadata.VersionId
+			if _, ok := versionCache[version]; ok {
+				return fmt.Errorf("duplicated didDoc version found with id %s and version %s", did, version)
+			}
+
+			versionCache[version] = true
+		}
+
+		// Check that latest version is present
+		if _, ok := versionCache[versionSet.LatestVersion]; !ok {
+			return fmt.Errorf("latest version not found in didDoc with id %s", did)
+		}
+	}
+
+	return nil
+}
+
+func (gs GenesisState) ValidateVersionSets() error {
+	for _, versionSet := range gs.VersionSets {
+		did := versionSet.DidDocs[0].DidDoc.Id
+
+		for _, didDoc := range versionSet.DidDocs {
+			if did != didDoc.DidDoc.Id {
+				return fmt.Errorf("diddoc %s does not belong to version set %s", didDoc.DidDoc.Id, did)
+			}
+		}
 	}
 
 	return nil
 }
 
 func (gs GenesisState) ValidateBasic() error {
-	for _, didDoc := range gs.DidDocs {
-		err := didDoc.DidDoc.Validate(nil)
-		if err != nil {
-			return err
+	for _, versionSet := range gs.VersionSets {
+		for _, didDoc := range versionSet.DidDocs {
+			err := didDoc.DidDoc.Validate(nil)
+			if err != nil {
+				return err
+			}
 		}
 	}
 

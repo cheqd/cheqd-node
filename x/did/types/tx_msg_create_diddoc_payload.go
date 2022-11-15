@@ -3,6 +3,7 @@ package types
 import (
 	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	"github.com/cheqd/cheqd-node/x/did/utils"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
 var _ IdentityMsg = &MsgCreateDidDocPayload{}
@@ -35,7 +36,14 @@ func (msg *MsgCreateDidDocPayload) ToDidDoc() DidDoc {
 // Validation
 
 func (msg MsgCreateDidDocPayload) Validate(allowedNamespaces []string) error {
-	return msg.ToDidDoc().Validate(allowedNamespaces)
+	err := msg.ToDidDoc().Validate(allowedNamespaces)
+	if err != nil {
+		return err
+	}
+
+	return validation.ValidateStruct(&msg,
+		validation.Field(&msg.VersionId, validation.Required),
+	)
 }
 
 func ValidMsgCreateDidPayloadRule(allowedNamespaces []string) *CustomErrorRule {
@@ -66,6 +74,8 @@ func (msg *MsgCreateDidDocPayload) Normalize() {
 	msg.CapabilityInvocation = utils.NormalizeDIDUrlList(msg.CapabilityInvocation)
 	msg.CapabilityDelegation = utils.NormalizeDIDUrlList(msg.CapabilityDelegation)
 	msg.KeyAgreement = utils.NormalizeDIDUrlList(msg.KeyAgreement)
+
+	msg.VersionId = utils.NormalizeUUID(msg.VersionId)
 }
 
 // Creator

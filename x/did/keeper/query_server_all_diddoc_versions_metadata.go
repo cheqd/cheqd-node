@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) DidDoc(c context.Context, req *types.QueryGetDidDocRequest) (*types.QueryGetDidDocResponse, error) {
+func (k Keeper) AllDidDocVersionsMetadata(c context.Context, req *types.QueryGetAllDidDocVersionsMetadataRequest) (*types.QueryGetAllDidDocVersionsMetadataResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -18,10 +18,10 @@ func (k Keeper) DidDoc(c context.Context, req *types.QueryGetDidDocRequest) (*ty
 
 	ctx := sdk.UnwrapSDKContext(c)
 
-	didDoc, err := k.GetLatestDidDoc(&ctx, req.Id)
+	versions, err := k.GetAllDidDocVersions(&ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	return &types.QueryGetDidDocResponse{Value: &didDoc}, nil
+	return &types.QueryGetAllDidDocVersionsMetadataResponse{Versions: versions}, nil
 }

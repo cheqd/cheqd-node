@@ -16,7 +16,7 @@ var _ = Describe("Service tests", func() {
 		errorMsg          string
 	}
 
-	DescribeTable("Service Validation tests", func(testCase TestCaseServiceStruct) {
+	DescribeTable("Service validation tests", func(testCase TestCaseServiceStruct) {
 		err := testCase.service.Validate(testCase.baseDid, testCase.allowedNamespaces)
 
 		if testCase.isValid {
@@ -28,7 +28,7 @@ var _ = Describe("Service tests", func() {
 	},
 
 		Entry(
-			"Positive case",
+			"Valid service entry",
 			TestCaseServiceStruct{
 				service: &Service{
 					Id:              "did:cheqd:aABCDEFG123456789abcd#service1",
@@ -55,7 +55,7 @@ var _ = Describe("Service tests", func() {
 			}),
 
 		Entry(
-			"Base DID is not the same as in id",
+			"Base DID is not the same as in ID",
 			TestCaseServiceStruct{
 				service: &Service{
 					Id:              "did:cheqd:zABCDEFG123456789abcd#service1",

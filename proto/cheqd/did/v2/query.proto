@@ -2,21 +2,44 @@ syntax = "proto3";
 
 package cheqd.did.v2;
 
-import "google/api/annotations.proto";
 import "cheqd/did/v2/diddoc.proto";
+import "google/api/annotations.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/did/types";
 
 service Query {
-	rpc DidDoc(QueryGetDidDocRequest) returns (QueryGetDidDocResponse) {
-		option (google.api.http).get = "/cheqd/did/v2/diddoc/{id}";
-	}
+  rpc DidDoc(QueryGetDidDocRequest) returns (QueryGetDidDocResponse) {
+    option (google.api.http).get = "/cheqd/did/v2/diddoc/{id}";
+  }
+  rpc DidDocVersion(QueryGetDidDocVersionRequest) returns (QueryGetDidDocVersionResponse) {
+    option (google.api.http).get = "/cheqd/did/v2/diddoc/{id}/version/{version}";
+  }
+  rpc AllDidDocVersionsMetadata(QueryGetAllDidDocVersionsMetadataRequest) returns (QueryGetAllDidDocVersionsMetadataResponse) {
+    option (google.api.http).get = "/cheqd/did/v2/diddoc/{id}/metadata";
+  }
 }
 
 message QueryGetDidDocRequest {
-	string id = 1;
+  string id = 1;
 }
 
 message QueryGetDidDocResponse {
-	DidDocWithMetadata value = 1;
+  DidDocWithMetadata value = 1;
+}
+
+message QueryGetDidDocVersionRequest {
+  string id = 1;
+  string version = 2;
+}
+
+message QueryGetDidDocVersionResponse {
+  DidDocWithMetadata value = 1;
+}
+
+message QueryGetAllDidDocVersionsMetadataRequest {
+  string id = 1;
+}
+
+message QueryGetAllDidDocVersionsMetadataResponse {
+  repeated Metadata versions = 1;
 }

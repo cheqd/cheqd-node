@@ -14,12 +14,23 @@ const (
 	QuerierRoute = ModuleName
 )
 
-func KeyPrefix(p string) []byte {
-	return []byte(p)
-}
-
 const (
 	ResourceMetadataKey = "resource-metadata:"
 	ResourceDataKey     = "resource-data:"
 	ResourceCountKey    = "resource-count:"
 )
+
+// GetResourceDataKey returns the byte representation of resource key
+func GetResourceDataKey(collectionId string, id string) []byte {
+	return []byte(ResourceDataKey + collectionId + ":" + id)
+}
+
+// GetResourceMetadataKey returns the byte representation of resource key
+func GetResourceMetadataKey(collectionId string, id string) []byte {
+	return []byte(ResourceMetadataKey + collectionId + ":" + id)
+}
+
+// GetResourceMetadataCollectionPrefix used to iterate over all resource metadatas in a collection
+func GetResourceMetadataCollectionPrefix(collectionId string) []byte {
+	return []byte(ResourceMetadataKey + collectionId + ":")
+}
