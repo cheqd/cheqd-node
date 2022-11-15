@@ -17,6 +17,9 @@ type StateValueData interface {
 	proto.Message
 }
 
+// TODO: Deprecate utils file after exporting did types v1 package as expected.
+// They are used in the migration script, but a better solution is to export the types v1 package,
+// including utils and load it in the migration v1.0.0 script.
 func UnpackData(stateValue didtypesv1.StateValue) (StateValueData, error) {
 	value, isOk := stateValue.Data.GetCachedValue().(StateValueData)
 	if !isOk {
@@ -129,7 +132,6 @@ func NewDidDocFromV1(didV1 *didtypesv1.Did) *didtypes.DidDoc {
 	}
 }
 
-
 // Make Indy-Style identifiers
 
 func IndyStyleId(id string) string {
@@ -140,7 +142,7 @@ func IndyStyleId(id string) string {
 
 	// Get Hash from current id to make a 32-symbol string
 	hash := sha256.Sum256([]byte(id))
-	//Indy-style identifier is 16-byte base58 string
+	// Indy-style identifier is 16-byte base58 string
 	return base58.Encode(hash[:16])
 }
 
@@ -184,7 +186,7 @@ func IndyStyleDidUrlList(didUrls []string) []string {
 	}
 	newDIDUrls := []string{}
 	for _, id := range didUrls {
-		newDIDUrls = append(newDIDUrls,  IndyStyleDidUrl(id))
+		newDIDUrls = append(newDIDUrls, IndyStyleDidUrl(id))
 	}
 	return newDIDUrls
 }
@@ -198,15 +200,13 @@ func MoveToIndyStyleIds(didDoc *didtypes.DidDocWithMetadata) {
 	for _, s := range didDoc.DidDoc.Service {
 		s.Id = IndyStyleDidUrl(s.Id)
 	}
-	
+
 	didDoc.DidDoc.Controller = IndyStyleDidList(didDoc.DidDoc.Controller)
 	didDoc.DidDoc.Authentication = IndyStyleDidUrlList(didDoc.DidDoc.Authentication)
 	didDoc.DidDoc.AssertionMethod = IndyStyleDidUrlList(didDoc.DidDoc.AssertionMethod)
 	didDoc.DidDoc.CapabilityInvocation = IndyStyleDidUrlList(didDoc.DidDoc.CapabilityInvocation)
 	didDoc.DidDoc.CapabilityDelegation = IndyStyleDidUrlList(didDoc.DidDoc.CapabilityDelegation)
 	didDoc.DidDoc.KeyAgreement = IndyStyleDidUrlList(didDoc.DidDoc.KeyAgreement)
-
-	return
 }
 
 func closeIteratorOrPanic(iterator sdk.Iterator) {

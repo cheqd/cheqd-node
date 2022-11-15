@@ -6,8 +6,8 @@ import (
 
 	. "github.com/cheqd/cheqd-node/x/did/utils"
 
-	didtypesV1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	didtypesV1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
@@ -114,12 +114,12 @@ func MigrateDidProtobufResourceV1(sctx sdk.Context, mctx MigrationContext) error
 
 	// Iterators for old headers and data
 	headerIterator := sdk.KVStorePrefixIterator(
-		headerStore, 
+		headerStore,
 		didutils.StrBytes(resourcetypesV1.ResourceHeaderKey))
 	dataIterator := sdk.KVStorePrefixIterator(
-		dataStore, 
+		dataStore,
 		didutils.StrBytes(resourcetypesV1.ResourceDataKey))
-	
+
 	closeIteratorOrPanic(headerIterator)
 	closeIteratorOrPanic(dataIterator)
 
@@ -135,17 +135,17 @@ func MigrateDidProtobufResourceV1(sctx sdk.Context, mctx MigrationContext) error
 		dataV1 = dataIterator.Value()
 
 		newMetadata := resourcetypes.Metadata{
-			CollectionId: 		headerV1.CollectionId,
-			Id: 				headerV1.Id,
-			Name: 				headerV1.Name,
-			Version: 			"",
-			ResourceType: 		headerV1.ResourceType,
-			AlsoKnownAs:		[]*resourcetypes.AlternativeUri{},
-			MediaType: 			headerV1.MediaType,
-			Created: 			headerV1.Created,
-			Checksum: 			headerV1.Checksum,
-			PreviousVersionId: 	headerV1.PreviousVersionId,
-			NextVersionId: 		headerV1.NextVersionId,
+			CollectionId:      headerV1.CollectionId,
+			Id:                headerV1.Id,
+			Name:              headerV1.Name,
+			Version:           "",
+			ResourceType:      headerV1.ResourceType,
+			AlsoKnownAs:       []*resourcetypes.AlternativeUri{},
+			MediaType:         headerV1.MediaType,
+			Created:           headerV1.Created,
+			Checksum:          headerV1.Checksum,
+			PreviousVersionId: headerV1.PreviousVersionId,
+			NextVersionId:     headerV1.NextVersionId,
 		}
 
 		resourceWithMetadata := resourcetypes.ResourceWithMetadata{
@@ -177,12 +177,11 @@ func MigrateResourceChecksumV1(sctx sdk.Context, mctx MigrationContext) error {
 	metadataStore := sctx.KVStore(sdk.NewKVStoreKey(resourcetypesV1.StoreKey))
 	dataStore := sctx.KVStore(sdk.NewKVStoreKey(resourcetypesV1.StoreKey))
 	metadataIterator := sdk.KVStorePrefixIterator(
-		metadataStore, 
+		metadataStore,
 		didutils.StrBytes(resourcetypesV1.ResourceHeaderKey))
 	dataIterator := sdk.KVStorePrefixIterator(
-		dataStore, 
+		dataStore,
 		didutils.StrBytes(resourcetypesV1.ResourceDataKey))
-	
 
 	closeIteratorOrPanic(metadataIterator)
 	closeIteratorOrPanic(dataIterator)
@@ -263,39 +262,37 @@ func MigrateResourceVersionLinksV1(sctx sdk.Context, mctx MigrationContext) erro
 
 // Migration for making UUID case-insensitive
 func MigrateDidUUIDV1(sctx sdk.Context, mctx MigrationContext) error {
-	
-// 	var iterator sdk.Iterator
-// 	var stateValue didtypes.StateValue
-// 	var payload didtypes.MsgCreateDidPayload
-// 	var didDoc *didtypes.Did
-// 	var did didtypes.Did
-// 	var err error
+	// 	var iterator sdk.Iterator
+	// 	var stateValue didtypes.StateValue
+	// 	var payload didtypes.MsgCreateDidPayload
+	// 	var didDoc *didtypes.Did
+	// 	var did didtypes.Did
+	// 	var err error
 
+	// 	iterator = didkeeper.GetStoreIterator(ctx)
 
-// 	iterator = didkeeper.GetStoreIterator(ctx)
+	// 	defer func(iterator sdk.Iterator) {
+	// 		err := iterator.Close()
+	// 		if err != nil {
+	// 			panic(err.Error())
+	// 		}
+	// 	}(iterator)
 
-// 	defer func(iterator sdk.Iterator) {
-// 		err := iterator.Close()
-// 		if err != nil {
-// 			panic(err.Error())
-// 		}
-// 	}(iterator)
-
-// 	for ; iterator.Valid(); iterator.Next() {
-// 		didkeeper.MustUnmarshal(iterator.Value(), &stateValue)
-// 		didDoc, err = stateValue.UnpackDataAsDid()
-// 		if err != nil {
-// 			return err
-// 		}
-// 		payload = didtypes.MsgCreateDidPayloadFromDid(didDoc)
-// 		payload.Normalize()
-// 		did = payload.ToDid()
-// 		stateValue, err = didtypes.NewStateValue(&did, stateValue.GetMetadata())
-// 		if err != nil {
-// 			return err
-// 		}
-// 		didkeeper.SetDid(&ctx, &stateValue)
-// 	}
+	// 	for ; iterator.Valid(); iterator.Next() {
+	// 		didkeeper.MustUnmarshal(iterator.Value(), &stateValue)
+	// 		didDoc, err = stateValue.UnpackDataAsDid()
+	// 		if err != nil {
+	// 			return err
+	// 		}
+	// 		payload = didtypes.MsgCreateDidPayloadFromDid(didDoc)
+	// 		payload.Normalize()
+	// 		did = payload.ToDid()
+	// 		stateValue, err = didtypes.NewStateValue(&did, stateValue.GetMetadata())
+	// 		if err != nil {
+	// 			return err
+	// 		}
+	// 		didkeeper.SetDid(&ctx, &stateValue)
+	// 	}
 	return nil
 }
 
@@ -320,7 +317,7 @@ func MigrateDidIndyStyleIdsV1DidModule(sctx sdk.Context, mctx MigrationContext) 
 	// var err error
 
 	store := prefix.NewStore(
-		sctx.KVStore(sdk.NewKVStoreKey(didtypesV1.StoreKey)), 
+		sctx.KVStore(sdk.NewKVStoreKey(didtypesV1.StoreKey)),
 		StrBytes(didtypesV1.DidKey))
 	iterator = sdk.KVStorePrefixIterator(store, []byte{})
 
@@ -338,7 +335,10 @@ func MigrateDidIndyStyleIdsV1DidModule(sctx sdk.Context, mctx MigrationContext) 
 		store.Delete(iterator.Key())
 
 		// Set new DID Doc
-		mctx.didKeeper.AddNewDidDocVersion(&sctx, &didDocWithMetadata)
+		err := mctx.didKeeper.AddNewDidDocVersion(&sctx, &didDocWithMetadata)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -347,9 +347,8 @@ func MigrateDidIndyStyleIdsV1DidModule(sctx sdk.Context, mctx MigrationContext) 
 func MigrateDidIndyStyleIdsV1ResourceModule(sctx sdk.Context, mctx MigrationContext) error {
 	metadataStore := sctx.KVStore(sdk.NewKVStoreKey(resourcetypesV1.StoreKey))
 	metadataIterator := sdk.KVStorePrefixIterator(
-		metadataStore, 
+		metadataStore,
 		didutils.StrBytes(resourcetypesV1.ResourceHeaderKey))
-	
 
 	closeIteratorOrPanic(metadataIterator)
 
@@ -366,7 +365,10 @@ func MigrateDidIndyStyleIdsV1ResourceModule(sctx sdk.Context, mctx MigrationCont
 		metadata.CollectionId = IndyStyleId(metadata.CollectionId)
 
 		// Update HeaderInfo
-		mctx.resourceKeeper.UpdateResourceMetadata(&sctx, &metadata)
+		err := mctx.resourceKeeper.UpdateResourceMetadata(&sctx, &metadata)
+		if err != nil {
+			return err
+		}
 
 		// Iterate next
 		metadataIterator.Next()

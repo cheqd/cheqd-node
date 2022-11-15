@@ -1,14 +1,14 @@
 package migrations_test
 
 import (
+	. "github.com/cheqd/cheqd-node/app/migrations"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	. "github.com/cheqd/cheqd-node/app/migrations"
 )
 
 var _ = Describe("IndyStyleIdentifier", func() {
 	DescribeTable(
-		"Positive/Negative entries for checking indy style identifier compiling", 
+		"Positive/Negative entries for checking indy style identifier compiling",
 		func(id string, outputStr string) {
 			Expect(IndyStyleId(id)).To(Equal(outputStr))
 		},
