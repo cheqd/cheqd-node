@@ -415,34 +415,6 @@ class Installer():
             self.untar_from_snapshot()
         self.print_success()
 
-    def post_install(self):
-        # Init the node with provided moniker
-        if not os.path.exists(os.path.join(self.cheqd_config_dir, 'genesis.json')):
-            self.exec(f"""sudo su -c 'cheqd-noded init "{self.interviewer.moniker}"' {DEFAULT_CHEQD_USER}""")
-
-            # Downloading genesis file
-            self.exec(f"curl {GENESIS_FILE.format(self.interviewer.chain)} > {os.path.join(self.cheqd_config_dir, 'genesis.json')}")
-            shutil.chown(os.path.join(self.cheqd_config_dir, 'genesis.json'),
-                         DEFAULT_CHEQD_USER,
-                         DEFAULT_CHEQD_USER)
-
-        # Setting up the external_address
-        if self.interviewer.external_address:
-            self.exec(f"sudo su -c 'cheqd-noded configure p2p external-address {self.interviewer.external_address}:{self.interviewer.p2p_port}' {DEFAULT_CHEQD_USER}")
-
-        # Setting up the seeds
-        seeds = self.exec(f"curl {SEEDS_FILE.format(self.interviewer.chain)}").stdout.decode("utf-8").strip()
-        self.exec(f"sudo su -c 'cheqd-noded configure p2p seeds {seeds}' {DEFAULT_CHEQD_USER}")
-
-        # Setting up the RPC port
-        self.exec(f"sudo su -c 'cheqd-noded configure rpc-laddr \"tcp://0.0.0.0:{self.interviewer.rpc_port}\"' {DEFAULT_CHEQD_USER}")
-
-        # Setting up the P2P port
-        self.exec(f"sudo su -c 'cheqd-noded configure p2p laddr \"tcp://0.0.0.0:{self.interviewer.p2p_port}\"' {DEFAULT_CHEQD_USER}")
-
-        # Setting up min gas-price
-        self.exec(f"sudo su -c 'cheqd-noded configure min-gas-prices {self.interviewer.gas_price}' {DEFAULT_CHEQD_USER}")
-
     def prepare_cheqd_user(self):
         try:
             if not self.is_user_exists(DEFAULT_CHEQD_USER):
