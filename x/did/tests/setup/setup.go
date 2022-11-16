@@ -34,19 +34,19 @@ func Setup() TestSetup {
 	// Init Codec
 	ir := codectypes.NewInterfaceRegistry()
 	types.RegisterInterfaces(ir)
-	Cdc := codec.NewProtoCodec(ir)
+	cdc := codec.NewProtoCodec(ir)
 
 	// Init KVSore
 	db := dbm.NewMemDB()
 
 	dbStore := store.NewCommitMultiStore(db)
-	StoreKey := sdk.NewKVStoreKey(types.StoreKey)
-	dbStore.MountStoreWithDB(StoreKey, storetypes.StoreTypeIAVL, nil)
+	storeKey := sdk.NewKVStoreKey(types.StoreKey)
+	dbStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, nil)
 
 	_ = dbStore.LoadLatestVersion()
 
 	// Init Keepers
-	newKeeper := keeper.NewKeeper(Cdc, StoreKey)
+	newKeeper := keeper.NewKeeper(cdc, storeKey)
 
 	// Create Tx
 	txBytes := make([]byte, 28)
@@ -62,7 +62,7 @@ func Setup() TestSetup {
 	queryServer := keeper.NewQueryServer(*newKeeper)
 
 	setup := TestSetup{
-		Cdc: Cdc,
+		Cdc: cdc,
 
 		SdkCtx: ctx,
 		StdCtx: sdk.WrapSDKContext(ctx),

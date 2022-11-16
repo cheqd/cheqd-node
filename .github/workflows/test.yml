@@ -168,10 +168,10 @@ jobs:
       # Pre-Generated Payloads in .json files
       #
 
-      - name: Run migration handler unit tests
-        working-directory: ./tests/upgrade
-        run: |
-          ginkgo -r --tags upgrade --race --focus-file migration_unit_test.go
+      # - name: Run migration handler unit tests
+      #   working-directory: ./tests/upgrade
+      #   run: |
+      #     ginkgo -r --tags upgrade --race --focus-file migration_unit_test.go
 
       - name: Run pre-upgrade tests
         working-directory: ./tests/upgrade

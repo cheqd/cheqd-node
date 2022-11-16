@@ -22,12 +22,11 @@ type MinimalDidDocInfo struct {
 }
 
 type DidDocInfo struct {
-	Msg          *types.MsgCreateDidDocPayload
+	MinimalDidDocInfo
 	Did          string
 	CollectionId string
 	KeyPair      KeyPair
 	KeyId        string
-	SignInput    SignInput
 }
 
 type CreatedDidDocInfo struct {
