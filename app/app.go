@@ -6,10 +6,11 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/cheqd/cheqd-node/app/ante"
 	appparams "github.com/cheqd/cheqd-node/app/params"
-	"github.com/cheqd/cheqd-node/x/cheqd"
-	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	did "github.com/cheqd/cheqd-node/x/did"
+	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/cheqd/cheqd-node/x/resource"
 	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
@@ -26,7 +27,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/auth/ante"
+	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -62,6 +63,9 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
+	"github.com/cosmos/cosmos-sdk/x/group"
+	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
+	groupmodule "github.com/cosmos/cosmos-sdk/x/group/module"
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
@@ -81,12 +85,11 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	ica "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts"
-	icacontrollertypes "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts/controller/types"
 	icahost "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts/host"
 	icahostkeeper "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts/host/keeper"
 	icahosttypes "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts/host/types"
 	icatypes "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts/types"
-	"github.com/cosmos/ibc-go/v5/modules/apps/transfer"
+	transfer "github.com/cosmos/ibc-go/v5/modules/apps/transfer"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v5/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v5/modules/apps/transfer/types"
 	ibc "github.com/cosmos/ibc-go/v5/modules/core"
@@ -109,8 +112,6 @@ import (
 var (
 	// DefaultNodeHome default home directories for the application daemon
 	DefaultNodeHome string
-
-	EnvPrefix = "CHEQD"
 
 	// ModuleBasics defines the module BasicManager is in charge of setting up basic,
 	// non-dependant module elements, such as codec registration
@@ -141,7 +142,8 @@ var (
 		vesting.AppModuleBasic{},
 		feegrantmodule.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
-		cheqd.AppModuleBasic{},
+		groupmodule.AppModuleBasic{},
+		did.AppModuleBasic{},
 		resource.AppModuleBasic{},
 		ica.AppModuleBasic{},
 	)
@@ -199,13 +201,14 @@ type App struct {
 	TransferKeeper   ibctransferkeeper.Keeper
 	FeeGrantKeeper   feegrantkeeper.Keeper
 	AuthzKeeper      authzkeeper.Keeper
+	GroupKeeper      groupkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 	ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
 
-	cheqdKeeper    cheqdkeeper.Keeper
+	didKeeper      didkeeper.Keeper
 	resourceKeeper resourcekeeper.Keeper
 
 	// the module manager
@@ -261,8 +264,9 @@ func New(
 		capabilitytypes.StoreKey,
 		feegrant.StoreKey,
 		authzkeeper.StoreKey,
+		group.StoreKey,
 		icahosttypes.StoreKey,
-		cheqdtypes.StoreKey,
+		didtypes.StoreKey,
 		resourcetypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -305,7 +309,7 @@ func New(
 		app.GetSubspace(authtypes.ModuleName),
 		authtypes.ProtoBaseAccount,
 		maccPerms,
-		sdk.Bech32MainPrefix,
+		AccountAddressPrefix,
 	)
 
 	app.BankKeeper = bankkeeper.NewBaseKeeper(
@@ -321,6 +325,15 @@ func New(
 		appCodec,
 		app.MsgServiceRouter(),
 		app.AccountKeeper,
+	)
+
+	groupConfig := group.DefaultConfig()
+	app.GroupKeeper = groupkeeper.NewKeeper(
+		keys[group.StoreKey],
+		appCodec,
+		app.MsgServiceRouter(),
+		app.AccountKeeper,
+		groupConfig,
 	)
 
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(
@@ -438,8 +451,10 @@ func New(
 
 	// Create IBC Host Keepers
 	app.ICAHostKeeper = icahostkeeper.NewKeeper(
-		appCodec, keys[icahosttypes.StoreKey],
+		appCodec,
+		keys[icahosttypes.StoreKey],
 		app.GetSubspace(icahosttypes.SubModuleName),
+		app.IBCKeeper.ChannelKeeper,
 		app.IBCKeeper.ChannelKeeper,
 		&app.IBCKeeper.PortKeeper,
 		app.AccountKeeper,
@@ -467,8 +482,8 @@ func New(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
-	app.cheqdKeeper = *cheqdkeeper.NewKeeper(
-		appCodec, keys[cheqdtypes.StoreKey],
+	app.didKeeper = *didkeeper.NewKeeper(
+		appCodec, keys[didtypes.StoreKey],
 	)
 
 	app.resourceKeeper = *resourcekeeper.NewKeeper(
@@ -500,12 +515,13 @@ func New(
 		evidence.NewAppModule(app.EvidenceKeeper),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
+		groupmodule.NewAppModule(appCodec, app.GroupKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		icaModule,
-		cheqd.NewAppModule(appCodec, app.cheqdKeeper),
-		resource.NewAppModule(appCodec, app.resourceKeeper, app.cheqdKeeper),
+		did.NewAppModule(appCodec, app.didKeeper),
+		resource.NewAppModule(appCodec, app.resourceKeeper, app.didKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -530,10 +546,11 @@ func New(
 		icatypes.ModuleName,
 		genutiltypes.ModuleName,
 		authz.ModuleName,
+		group.ModuleName,
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
-		cheqdtypes.ModuleName,
+		didtypes.ModuleName,
 		resourcetypes.ModuleName,
 	)
 
@@ -548,7 +565,7 @@ func New(
 		slashingtypes.ModuleName,
 		evidencetypes.ModuleName,
 		ibchost.ModuleName,
-		cheqdtypes.ModuleName,
+		didtypes.ModuleName,
 		resourcetypes.ModuleName,
 		genutiltypes.ModuleName,
 		banktypes.ModuleName,
@@ -556,6 +573,7 @@ func New(
 		icatypes.ModuleName,
 		feegrant.ModuleName,
 		authz.ModuleName,
+		group.ModuleName,
 		paramstypes.ModuleName,
 		authtypes.ModuleName,
 		vestingtypes.ModuleName,
@@ -583,7 +601,8 @@ func New(
 		icatypes.ModuleName,
 		feegrant.ModuleName,
 		authz.ModuleName,
-		cheqdtypes.ModuleName,
+		group.ModuleName,
+		didtypes.ModuleName,
 		resourcetypes.ModuleName,
 		vestingtypes.ModuleName,
 		upgradetypes.ModuleName,
@@ -611,7 +630,8 @@ func New(
 		CheqdKeeper:     app.cheqdKeeper,
 		ResourceKeeper:  app.resourceKeeper,
 		SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
-		SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
+		SigGasConsumer:  authante.DefaultSigVerificationGasConsumer,
+		IBCKeeper:       app.IBCKeeper,
 	})
 	if err != nil {
 		tmos.Exit(err.Error())
@@ -622,84 +642,21 @@ func New(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 
-	// ibc v3 -> v4 migration
-	app.UpgradeKeeper.SetUpgradeHandler("MigrateTraces",
+	// Upgrade handler for the next release
+	app.UpgradeKeeper.SetUpgradeHandler(UpgradeName,
 		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			ctx.Logger().Info("Handler for upgrade plan: " + UpgradeName)
+
+			// ibc v3 -> v4 migration
 			// transfer module consensus version has been bumped to 2
 			return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 		})
 
-	// Latest upgrade handler
-	app.UpgradeKeeper.SetUpgradeHandler(UpgradeName, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("Handler for upgrade plan: v0.6")
-
-		// set the ICS27 consensus version so InitGenesis is not run
-		fromVM[icatypes.ModuleName] = icaModule.ConsensusVersion()
-
-		// create ICS27 Controller submodule params
-		controllerParams := icacontrollertypes.Params{
-			ControllerEnabled: true,
-		}
-
-		// create ICS27 Host submodule params
-		hostParams := icahosttypes.Params{
-			HostEnabled: true,
-			AllowMessages: []string{
-				authzMsgExec,
-				authzMsgGrant,
-				authzMsgRevoke,
-				bankMsgSend,
-				bankMsgMultiSend,
-				distrMsgSetWithdrawAddr,
-				distrMsgWithdrawValidatorCommission,
-				distrMsgFundCommunityPool,
-				distrMsgWithdrawDelegatorReward,
-				feegrantMsgGrantAllowance,
-				feegrantMsgRevokeAllowance,
-				govMsgVoteWeighted,
-				govMsgSubmitProposal,
-				govMsgDeposit,
-				govMsgVote,
-				stakingMsgEditValidator,
-				stakingMsgDelegate,
-				stakingMsgUndelegate,
-				stakingMsgBeginRedelegate,
-				stakingMsgCreateValidator,
-				vestingMsgCreateVestingAccount,
-				ibcMsgTransfer,
-			},
-		}
-
-		// initialize ICS27 module
-		ctx.Logger().Info("start to init interchainaccount module...")
-		icaModule.InitModule(ctx, controllerParams, hostParams)
-
-		ctx.Logger().Info("start to run module migrations...")
-		return fromVM, nil
-	})
-
-	// Store migration for the latest upgrade
-	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
-	if err != nil {
-		panic(err)
-	}
-
-	if upgradeInfo.Name == UpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
-		storeUpgrades := storetypes.StoreUpgrades{
-			Added: []string{
-				icahosttypes.StoreKey,
-				resourcetypes.StoreKey,
-			},
-		}
-
-		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
-	}
-
 	// Test upgrade handler
 	app.UpgradeKeeper.SetUpgradeHandler(CosmovisorTestUpgrade, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("Handler for upgrade plan: cosmovisor_test")
+		ctx.Logger().Info("Handler for upgrade plan: " + CosmovisorTestUpgrade)
 
-		return fromVM, nil
+		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 	})
 
 	if loadLatest {

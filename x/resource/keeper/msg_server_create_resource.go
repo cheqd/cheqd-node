@@ -7,9 +7,9 @@ import (
 
 	"github.com/cheqd/cheqd-node/x/resource/utils"
 
-	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
-	cheqdutils "github.com/cheqd/cheqd-node/x/cheqd/utils"
+	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -17,12 +17,28 @@ import (
 func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateResource) (*types.MsgCreateResourceResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	// Remember bytes before modifying payload
+	signBytes := msg.Payload.GetSignBytes()
+
+	msg.Normalize()
+
 	// Validate corresponding DIDDoc exists
-	namespace := k.cheqdKeeper.GetDidNamespace(&ctx)
-	did := cheqdutils.JoinDID(cheqdtypes.DidMethod, namespace, msg.Payload.CollectionId)
-	didDocStateValue, err := k.cheqdKeeper.GetDid(&ctx, did)
+	namespace := k.didKeeper.GetDidNamespace(&ctx)
+	did := didutils.JoinDID(didtypes.DidMethod, namespace, msg.Payload.CollectionId)
+	didDoc, err := k.didKeeper.GetLatestDidDoc(&ctx, did)
 	if err != nil {
 		return nil, err
+	}
+
+	// Validate namespaces
+	err = msg.Validate([]string{namespace})
+	if err != nil {
+		return nil, didtypes.ErrNamespaceValidation.Wrap(err.Error())
+	}
+
+	// Validate DID is not deactivated
+	if didDoc.Metadata.Deactivated {
+		return nil, didtypes.ErrDIDDocDeactivated.Wrap(did)
 	}
 
 	// Validate Resource doesn't exist
@@ -30,46 +46,33 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 		return nil, types.ErrResourceExists.Wrap(msg.Payload.Id)
 	}
 
-	// Validate signatures
-	didDoc, err := didDocStateValue.UnpackDataAsDid()
-	if err != nil {
-		return nil, err
-	}
-
 	// We can use the same signers as for DID creation because didDoc stays the same
-	signers := cheqdkeeper.GetSignerDIDsForDIDCreation(*didDoc)
-	err = cheqdkeeper.VerifyAllSignersHaveAllValidSignatures(&k.cheqdKeeper, &ctx, map[string]cheqdtypes.StateValue{},
-		msg.Payload.GetSignBytes(), signers, msg.Signatures)
+	signers := didkeeper.GetSignerDIDsForDIDCreation(*didDoc.DidDoc)
+	err = didkeeper.VerifyAllSignersHaveAllValidSignatures(&k.didKeeper, &ctx, map[string]didtypes.DidDocWithMetadata{},
+		signBytes, signers, msg.Signatures)
 	if err != nil {
 		return nil, err
 	}
 
 	// Build Resource
 	resource := msg.Payload.ToResource()
-
-	resource.Header.Checksum = sha256.New().Sum(resource.Data)
-	resource.Header.Created = ctx.BlockTime().Format(time.RFC3339)
-	resource.Header.MediaType = utils.DetectMediaType(resource.Data)
+	checksum := sha256.Sum256([]byte(resource.Resource.Data))
+	resource.Metadata.Checksum = checksum[:]
+	resource.Metadata.Created = ctx.BlockTime().Format(time.RFC3339)
+	resource.Metadata.MediaType = utils.DetectMediaType(resource.Resource.Data)
 
 	// Find previous version and upgrade backward and forward version links
-	previousResourceVersionHeader, found := k.GetLastResourceVersionHeader(&ctx, resource.Header.CollectionId, resource.Header.Name, resource.Header.ResourceType, resource.Header.MediaType)
+	previousResourceVersionHeader, found := k.GetLastResourceVersionMetadata(&ctx, resource.Metadata.CollectionId, resource.Metadata.Name, resource.Metadata.ResourceType)
 	if found {
 		// Set links
-		previousResourceVersionHeader.NextVersionId = resource.Header.Id
-		resource.Header.PreviousVersionId = previousResourceVersionHeader.Id
+		previousResourceVersionHeader.NextVersionId = resource.Metadata.Id
+		resource.Metadata.PreviousVersionId = previousResourceVersionHeader.Id
 
 		// Update previous version
-		err := k.UpdateResourceHeader(&ctx, &previousResourceVersionHeader)
+		err := k.UpdateResourceMetadata(&ctx, &previousResourceVersionHeader)
 		if err != nil {
 			return nil, err
 		}
-	}
-
-	// Append backlink to didDoc
-	didDocStateValue.Metadata.Resources = append(didDocStateValue.Metadata.Resources, resource.Header.Id)
-	err = k.cheqdKeeper.SetDid(&ctx, &didDocStateValue)
-	if err != nil {
-		return nil, types.ErrInternal.Wrapf(err.Error())
 	}
 
 	// Persist resource
@@ -80,6 +83,6 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 
 	// Build and return response
 	return &types.MsgCreateResourceResponse{
-		Resource: &resource,
+		Resource: resource.Metadata,
 	}, nil
 }

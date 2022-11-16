@@ -1,53 +1,103 @@
-package types
+package types_test
 
 import (
-	"testing"
-
-	"github.com/stretchr/testify/require"
+	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
-func TestMsgCreateResourcePayloadValidation(t *testing.T) {
-	cases := []struct {
-		name     string
-		struct_  *MsgCreateResourcePayload
-		isValid  bool
-		errorMsg string
-	}{
-		{
-			name: "positive",
-			struct_: &MsgCreateResourcePayload{
-				CollectionId: "123456789abcdefg",
-				Id:           "ba62c728-cb15-498b-8e9e-9259cc242186",
-				Name:         "Test Resource",
-				ResourceType: "CL-Schema",
-				Data:         []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-			},
-			isValid: true,
-		},
-		{
-			name: "negative resource type",
-			struct_: &MsgCreateResourcePayload{
-				CollectionId: "123456789abcdefg",
-				Id:           "ba62c728-cb15-498b-8e9e-9259cc242186",
-				Name:         "Test Resource",
-				ResourceType: "",
-				Data:         []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-			},
-			isValid:  false,
-			errorMsg: "resource_type: cannot be blank.",
-		},
+var _ = Describe("TxMsgCreateResourcePayload", func() {
+	var msg *resourcetypes.MsgCreateResourcePayload
+	type TestCaseUUIDDidStruct struct {
+		inputCollectionId    string
+		inputId              string
+		expectedId           string
+		expectedCollectionId string
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			err := tc.struct_.Validate()
-
-			if tc.isValid {
-				require.NoError(t, err)
-			} else {
-				require.Error(t, err)
-				require.Equal(t, err.Error(), tc.errorMsg)
-			}
+	Describe("Validate", func() {
+		Context("Valid: MsgCreateResourcePayload", func() {
+			It("should return nil if the message is valid", func() {
+				msg = &resourcetypes.MsgCreateResourcePayload{
+					CollectionId: "zABCDEFG123456789abcd",
+					Id:           "ba62c728-cb15-498b-8e9e-9259cc242186",
+					Name:         "Test Resource",
+					Version:      "1.0",
+					ResourceType: "CL-Schema",
+					Data:         []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+				}
+				Expect(msg.Validate()).To(BeNil())
+			})
 		})
-	}
-}
+
+		Context("Invalid: MsgCreateResourcePayload", func() {
+			It("should return error if the resource type is empty", func() {
+				msg = &resourcetypes.MsgCreateResourcePayload{
+					CollectionId: "zABCDEFG123456789abcd",
+					Id:           "ba62c728-cb15-498b-8e9e-9259cc242186",
+					Name:         "Test Resource",
+					Version:      "1.0",
+					ResourceType: "",
+					Data:         []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+				}
+				Expect(msg.Validate().Error()).To(Equal("resource_type: cannot be blank."))
+			})
+		})
+	})
+
+	DescribeTable("UUID validation tests", func(testCase TestCaseUUIDDidStruct) {
+		inputMsg := resourcetypes.MsgCreateResourcePayload{
+			CollectionId: testCase.inputCollectionId,
+			Id:           testCase.inputId,
+			Name:         "Test Resource",
+			ResourceType: "",
+			Data:         []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+		}
+		expectedMsg := resourcetypes.MsgCreateResourcePayload{
+			CollectionId: testCase.expectedCollectionId,
+			Id:           testCase.expectedId,
+			Name:         "Test Resource",
+			ResourceType: "",
+			Data:         []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+		}
+		inputMsg.Normalize()
+		Expect(inputMsg).To(Equal(expectedMsg))
+	},
+
+		Entry(
+			"base58 identifier - not changed",
+			TestCaseUUIDDidStruct{
+				inputCollectionId:    "zABCDEFG123456789abcd",
+				inputId:              "zABCDEFG123456789abcd",
+				expectedCollectionId: "zABCDEFG123456789abcd",
+				expectedId:           "zABCDEFG123456789abcd",
+			}),
+
+		Entry(
+			"Mixed case UUID",
+			TestCaseUUIDDidStruct{
+				inputCollectionId:    "BAbbba14-f294-458a-9b9c-474d188680fd",
+				inputId:              "BAbbba14-f294-458a-9b9c-474d188680fd",
+				expectedCollectionId: "babbba14-f294-458a-9b9c-474d188680fd",
+				expectedId:           "babbba14-f294-458a-9b9c-474d188680fd",
+			}),
+
+		Entry(
+			"Low case UUID",
+			TestCaseUUIDDidStruct{
+				inputCollectionId:    "babbba14-f294-458a-9b9c-474d188680fd",
+				inputId:              "babbba14-f294-458a-9b9c-474d188680fd",
+				expectedCollectionId: "babbba14-f294-458a-9b9c-474d188680fd",
+				expectedId:           "babbba14-f294-458a-9b9c-474d188680fd",
+			}),
+
+		Entry(
+			"Upper case UUID",
+			TestCaseUUIDDidStruct{
+				inputCollectionId:    "A86F9CAE-0902-4a7c-a144-96b60ced2FC9",
+				inputId:              "A86F9CAE-0902-4a7c-a144-96b60ced2FC9",
+				expectedCollectionId: "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
+				expectedId:           "a86f9cae-0902-4a7c-a144-96b60ced2fc9",
+			}),
+	)
+})
