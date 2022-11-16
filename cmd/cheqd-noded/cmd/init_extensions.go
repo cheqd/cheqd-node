@@ -7,7 +7,7 @@ import (
 	tmcfg "github.com/tendermint/tendermint/config"
 )
 
-func extendInit(initCmd *cobra.Command) *cobra.Command {
+func ExtendInit(initCmd *cobra.Command) *cobra.Command {
 	baseRunE := initCmd.RunE
 
 	initCmd.RunE = func(cmd *cobra.Command, args []string) error {

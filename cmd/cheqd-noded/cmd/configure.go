@@ -12,7 +12,7 @@ import (
 )
 
 // configureCmd returns configure cobra Command.
-func configureCmd(defaultNodeHome string) *cobra.Command {
+func ConfigureCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "configure",
 		Short: "Adjust node parameters",
