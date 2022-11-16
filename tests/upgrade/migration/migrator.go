@@ -99,16 +99,17 @@ func (m DidMigrationScenario) Validate(actual didtypes.DidDoc) error {
 }
 
 type ResourceMigrationScenario struct {
-	name     string
-	setup    func() migrationsetup.ExtendedTestSetup
-	existing resourcetypesv1.MsgCreateResourcePayload
-	didInfo  migrationsetup.MinimalDidDocInfoV1
-	expected resourcetypes.Metadata
-	handler  func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error
-	validate func(actual resourcetypes.Metadata) error
+	name              string
+	setup             func() migrationsetup.TestSetup
+	existingResources resourcetypesv1.Resource
+	existingDidDocs   didtypesv1.StateValue
+	didInfo           migrationsetup.MinimalDidDocInfoV1
+	expected          resourcetypes.Metadata
+	handler           func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error
+	validate          func(actual resourcetypes.Metadata) error
 }
 
-func NewResourceMigrationScenario(name string, setup func() migrationsetup.ExtendedTestSetup, existing resourcetypesv1.MsgCreateResourcePayload, didInfo migrationsetup.MinimalDidDocInfoV1, expected resourcetypes.Metadata, handler func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error, validate func(actual resourcetypes.Metadata) error) ResourceMigrationScenario {
+func NewResourceMigrationScenario(name string, setup func() migrationsetup.TestSetup, existing resourcetypesv1.MsgCreateResourcePayload, didInfo migrationsetup.MinimalDidDocInfoV1, expected resourcetypes.Metadata, handler func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error, validate func(actual resourcetypes.Metadata) error) ResourceMigrationScenario {
 	return ResourceMigrationScenario{
 		name:     name,
 		setup:    setup,
@@ -124,7 +125,7 @@ func (m ResourceMigrationScenario) Name() string {
 	return m.name
 }
 
-func (m ResourceMigrationScenario) Setup() migrationsetup.ExtendedTestSetup {
+func (m ResourceMigrationScenario) Setup() migrationsetup.TestSetup {
 	return m.setup()
 }
 
@@ -203,10 +204,12 @@ func NewResourceMigrator(migrations []ResourceMigrationScenario) ResourceMigrato
 func (m ResourceMigrator) Migrate() error {
 	for _, migration := range m.migrations {
 		setup := migration.Setup()
-		_, err := setup.CreateDidV1(migration.didInfo.Msg, []didtestssetup.SignInput{migration.didInfo.SignInput})
+
+		_, err := setup.DidKeekerPrevious.CreateDidV1(migration.didInfo.Msg, []didtestssetup.SignInput{migration.didInfo.SignInput})
 		if err != nil {
 			return err
 		}
+
 		_, err = setup.CreateResourceV1(&migration.existing, []didtestssetup.SignInput{migration.didInfo.SignInput})
 		if err != nil {
 			return err
