@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 
-	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
+	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 
 	"github.com/cheqd/cheqd-node/x/resource/client/cli"
 	"github.com/cheqd/cheqd-node/x/resource/types"
@@ -106,15 +106,15 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 type AppModule struct {
 	AppModuleBasic
 
-	keeper      keeper.Keeper
-	cheqdKeeper cheqdkeeper.Keeper
+	keeper    keeper.Keeper
+	didKeeper didkeeper.Keeper
 }
 
-func NewAppModule(cdc codec.Codec, keeper keeper.Keeper, cheqdKeeper cheqdkeeper.Keeper) AppModule {
+func NewAppModule(cdc codec.Codec, keeper keeper.Keeper, cheqdKeeper didkeeper.Keeper) AppModule {
 	return AppModule{
 		AppModuleBasic: NewAppModuleBasic(cdc),
 		keeper:         keeper,
-		cheqdKeeper:    cheqdKeeper,
+		didKeeper:      cheqdKeeper,
 	}
 }
 
@@ -123,7 +123,7 @@ func NewAppModule(cdc codec.Codec, keeper keeper.Keeper, cheqdKeeper cheqdkeeper
 // introduced by the module. To avoid wrong/empty versions, the initial version
 // should be set to 1.
 func (am AppModule) ConsensusVersion() uint64 {
-	return 1
+	return 2
 }
 
 // Name returns the resource module's name.
@@ -133,7 +133,7 @@ func (am AppModule) Name() string {
 
 // Route returns the resource module's message routing key.
 func (am AppModule) Route() sdk.Route {
-	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper, am.cheqdKeeper))
+	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper, am.didKeeper))
 }
 
 // QuerierRoute returns the resource module's query routing key.
@@ -141,13 +141,13 @@ func (AppModule) QuerierRoute() string { return types.QuerierRoute }
 
 // LegacyQuerierHandler returns the resource module's Querier.
 func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
-	return keeper.NewQuerier(am.keeper, am.cheqdKeeper, legacyQuerierCdc)
+	return keeper.NewQuerier(am.keeper, am.didKeeper, legacyQuerierCdc)
 }
 
 // RegisterServices registers a GRPC query service to respond to the
 // module-specific GRPC queries.
 func (am AppModule) RegisterServices(cfg module.Configurator) {
-	types.RegisterQueryServer(cfg.QueryServer(), keeper.NewQueryServer(am.keeper, am.cheqdKeeper))
+	types.RegisterQueryServer(cfg.QueryServer(), keeper.NewQueryServer(am.keeper, am.didKeeper))
 }
 
 // RegisterInvariants registers the resource module's invariants.

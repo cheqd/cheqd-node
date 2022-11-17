@@ -1,0 +1,12 @@
+syntax = "proto3";
+package cheqdid.cheqdnode.cheqd.v1;
+
+option go_package = "github.com/cheqd/cheqd-node/x/did/types/v1";
+
+import "cheqd/did/v1/stateValue.proto";
+
+// GenesisState defines the cheqd module's genesis state.
+message GenesisState {
+  string did_namespace = 1;
+  repeated StateValue didList = 2;
+}
