@@ -65,9 +65,9 @@ jobs:
       
       # Breaking change detection
       # - uses: bufbuild/buf-breaking-action@v1
-      #   with:
-      #     input: 'proto'
-      #     against: 'https://github.com/cheqd/cheqd-node.git#branch=develop,ref=HEAD~1,subdir=proto'
+        # with:
+          # input: 'proto'
+          # against: 'https://github.com/cheqd/cheqd-node.git#branch=develop,ref=HEAD~1,subdir=proto'
 
   super-lint:
     name: "Super Linter"
