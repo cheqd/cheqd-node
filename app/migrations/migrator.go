@@ -4,24 +4,31 @@ import (
 	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
 	"github.com/cosmos/cosmos-sdk/codec"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type MigrationContext struct {
+	didStoreKey *storetypes.KVStoreKey
+	resourceStoreKey *storetypes.KVStoreKey
 	codec          codec.Codec
 	didKeeper      didkeeper.Keeper
 	resourceKeeper resourcekeeper.Keeper
 }
 
 func NewMigrationContext(
+	didStoreKey *storetypes.KVStoreKey,
+	resourceStoreKey *storetypes.KVStoreKey,
 	codec codec.Codec,
 	didKeeper didkeeper.Keeper,
 	resourceKeeper resourcekeeper.Keeper,
 ) MigrationContext {
 	return MigrationContext{
-		codec:          codec,
-		didKeeper:      didKeeper,
-		resourceKeeper: resourceKeeper,
+		didStoreKey:      didStoreKey,
+		resourceStoreKey: resourceStoreKey,
+		codec:            codec,
+		didKeeper:        didKeeper,
+		resourceKeeper:   resourceKeeper,
 	}
 }
 
@@ -33,6 +40,8 @@ type Migrator struct {
 }
 
 func NewMigrator(
+	didStoreKey *storetypes.KVStoreKey,
+	resourceStoreKey *storetypes.KVStoreKey,
 	codec codec.Codec,
 	didKeeper didkeeper.Keeper,
 	resourceKeeper resourcekeeper.Keeper,
@@ -40,12 +49,13 @@ func NewMigrator(
 ) Migrator {
 	return Migrator{
 		migration: migration,
-		context: MigrationContext{
-			codec: codec,
-
-			didKeeper:      didKeeper,
-			resourceKeeper: resourceKeeper,
-		},
+		context: NewMigrationContext(
+			didStoreKey,
+			resourceStoreKey,
+			codec,
+			didKeeper,
+			resourceKeeper,
+		),
 	}
 }
 

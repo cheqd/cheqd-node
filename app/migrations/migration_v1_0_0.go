@@ -75,7 +75,7 @@ func MigrateDidProtobufDIDocV1(sctx sdk.Context, mctx MigrationContext) error {
 	// var err error
 
 	store := prefix.NewStore(
-		sctx.KVStore(sdk.NewKVStoreKey(didtypesV1.StoreKey)),
+		sctx.KVStore(mctx.didStoreKey),
 		StrBytes(didtypesV1.DidKey))
 	iterator = sdk.KVStorePrefixIterator(store, []byte{})
 
@@ -104,13 +104,13 @@ func MigrateDidProtobufDIDocV1(sctx sdk.Context, mctx MigrationContext) error {
 
 func MigrateDidProtobufResourceV1(sctx sdk.Context, mctx MigrationContext) error {
 	// Reset counter
-	countStore := sctx.KVStore(sdk.NewKVStoreKey(resourcetypesV1.StoreKey))
+	countStore := sctx.KVStore(mctx.resourceStoreKey)
 	countKey := didutils.StrBytes(resourcetypes.ResourceCountKey)
 	countStore.Delete(countKey)
 
 	// Storages for old headers and data
-	headerStore := sctx.KVStore(sdk.NewKVStoreKey(resourcetypesV1.StoreKey))
-	dataStore := sctx.KVStore(sdk.NewKVStoreKey(resourcetypesV1.StoreKey))
+	headerStore := sctx.KVStore(mctx.resourceStoreKey)
+	dataStore := sctx.KVStore(mctx.resourceStoreKey)
 
 	// Iterators for old headers and data
 	headerIterator := sdk.KVStorePrefixIterator(
@@ -174,8 +174,8 @@ func MigrateDidProtobufResourceV1(sctx sdk.Context, mctx MigrationContext) error
 
 // Migration because we need to fix the algo for checksum calculation
 func MigrateResourceChecksumV1(sctx sdk.Context, mctx MigrationContext) error {
-	metadataStore := sctx.KVStore(sdk.NewKVStoreKey(resourcetypesV1.StoreKey))
-	dataStore := sctx.KVStore(sdk.NewKVStoreKey(resourcetypesV1.StoreKey))
+	metadataStore := sctx.KVStore(mctx.resourceStoreKey)
+	dataStore := sctx.KVStore(mctx.resourceStoreKey)
 	metadataIterator := sdk.KVStorePrefixIterator(
 		metadataStore,
 		didutils.StrBytes(resourcetypesV1.ResourceHeaderKey))
@@ -317,7 +317,7 @@ func MigrateDidIndyStyleIdsV1DidModule(sctx sdk.Context, mctx MigrationContext) 
 	// var err error
 
 	store := prefix.NewStore(
-		sctx.KVStore(sdk.NewKVStoreKey(didtypesV1.StoreKey)),
+		sctx.KVStore(mctx.didStoreKey),
 		StrBytes(didtypesV1.DidKey))
 	iterator = sdk.KVStorePrefixIterator(store, []byte{})
 
@@ -345,7 +345,7 @@ func MigrateDidIndyStyleIdsV1DidModule(sctx sdk.Context, mctx MigrationContext) 
 }
 
 func MigrateDidIndyStyleIdsV1ResourceModule(sctx sdk.Context, mctx MigrationContext) error {
-	metadataStore := sctx.KVStore(sdk.NewKVStoreKey(resourcetypesV1.StoreKey))
+	metadataStore := sctx.KVStore(mctx.resourceStoreKey)
 	metadataIterator := sdk.KVStorePrefixIterator(
 		metadataStore,
 		didutils.StrBytes(resourcetypesV1.ResourceHeaderKey))

@@ -1,8 +1,13 @@
 package migration
 
 import (
+	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/migration/setup"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+
+	appmigrations "github.com/cheqd/cheqd-node/app/migrations"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -15,10 +20,31 @@ func AssertHandlers() error {
 	// Essentially, we are matching the expected pre-generated payloads with the actual payloads that were generated during an actual migration scenario.
 
 	By("Ensuring the ResourceChecksum migration scenario is successful")
-	err := InitResourceChecksumScenario()
+	dataChunk, err := InitDataChunkForResourceChecksum()
 	Expect(err).To(BeNil())
-	migrator := NewResourceMigrator([]ResourceMigrationScenario{ResourceChecksumScenario})
+	resourceChecksumScenario := NewMigrationScenario(
+		"ResourceChecksum",
+		func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error {
+			return appmigrations.MigrateResourceChecksumV1(ctx, migrationCtx)
+		},
+	)
+	// Init Migrator structure
+	setup := migrationsetup.NewExtendedSetup()
+	migrator := NewMigrator(
+		[]MigrationScenario{resourceChecksumScenario},
+		setup,
+		dataChunk)
+
+	// Prepare stage. Store all needed data structures
+	err = migrator.Prepare()
+	Expect(err).To(BeNil())
+	
+	// Make migrations
 	err = migrator.Migrate()
+	Expect(err).To(BeNil())
+
+	// Validate results
+	err = migrator.Validate()
 	Expect(err).To(BeNil())
 
 	// TODO: Add more migration scenarios here.

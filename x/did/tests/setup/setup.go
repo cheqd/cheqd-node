@@ -28,6 +28,7 @@ type TestSetup struct {
 	Keeper      keeper.Keeper
 	MsgServer   types.MsgServer
 	QueryServer types.QueryServer
+	DidStoreKey *storetypes.KVStoreKey
 }
 
 func Setup() TestSetup {
@@ -70,6 +71,7 @@ func Setup() TestSetup {
 		Keeper:      *newKeeper,
 		MsgServer:   msgServer,
 		QueryServer: queryServer,
+		DidStoreKey: storeKey,
 	}
 
 	setup.Keeper.SetDidNamespace(&ctx, DID_NAMESPACE)

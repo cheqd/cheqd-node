@@ -38,12 +38,12 @@ type ResourceQueryServerV1 struct {
 
 type ExtendedTestSetup struct {
 	resourcetestssetup.TestSetup
-	didKeeperV1           DidKeeperV1           // TODO: replace with actual type implementation
-	didMsgServerV1        DidMsgServerV1        // TODO: replace with actual type implementation
-	didQueryServerV1      DidQueryServerV1      // TODO: replace with actual type implementation
-	resourceKeeperV1      ResourceKeeperV1      // TODO: replace with actual type implementation
-	resourceMsgServerV1   ResourceMsgServerV1   // TODO: replace with actual type implementation
-	resourceQueryServerV1 ResourceQueryServerV1 // TODO: replace with actual type implementation
+	DidKeeperV1           DidKeeperV1           // TODO: replace with actual type implementation
+	DidMsgServerV1        DidMsgServerV1        // TODO: replace with actual type implementation
+	DidQueryServerV1      DidQueryServerV1      // TODO: replace with actual type implementation
+	ResourceKeeperV1      ResourceKeeperV1      // TODO: replace with actual type implementation
+	ResourceMsgServerV1   ResourceMsgServerV1   // TODO: replace with actual type implementation
+	ResourceQueryServerV1 ResourceQueryServerV1 // TODO: replace with actual type implementation
 }
 
 func NewExtendedSetup() ExtendedTestSetup {
@@ -52,11 +52,11 @@ func NewExtendedSetup() ExtendedTestSetup {
 	resourceKeeperV1 := ResourceKeeperV1{}
 	return ExtendedTestSetup{
 		TestSetup:             setup,
-		didKeeperV1:           didKeeperV1,
-		didMsgServerV1:        DidMsgServerV1{keeper: didKeeperV1},
-		didQueryServerV1:      DidQueryServerV1{keeper: didKeeperV1},
-		resourceKeeperV1:      resourceKeeperV1,
-		resourceMsgServerV1:   ResourceMsgServerV1{keeper: resourceKeeperV1},
-		resourceQueryServerV1: ResourceQueryServerV1{keeper: resourceKeeperV1},
+		DidKeeperV1:           didKeeperV1,
+		DidMsgServerV1:        DidMsgServerV1{keeper: didKeeperV1},
+		DidQueryServerV1:      DidQueryServerV1{keeper: didKeeperV1},
+		ResourceKeeperV1:      resourceKeeperV1,
+		ResourceMsgServerV1:   ResourceMsgServerV1{keeper: resourceKeeperV1},
+		ResourceQueryServerV1: ResourceQueryServerV1{keeper: resourceKeeperV1},
 	}
 }
