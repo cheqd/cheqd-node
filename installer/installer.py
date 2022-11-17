@@ -406,12 +406,17 @@ class Installer():
             self.log(f"Moving binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}")
             self.exec("sudo mv {} {}".format(self.binary_path, DEFAULT_INSTALL_PATH))
 
+        if self.interviewer.is_setup_needed:
+            self.post_install()
 
         if self.interviewer.init_from_snapshot:
             self.log("Downloading snapshot and extracting archive. This can take a *really* long time...")
             self.download_snapshot()
             self.untar_from_snapshot()
         self.print_success()
+    
+    def post_install(self):
+        pass
 
     def prepare_cheqd_user(self):
         try:
