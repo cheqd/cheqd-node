@@ -1,84 +1,44 @@
 package tests
 
 import (
+	. "github.com/cheqd/cheqd-node/x/resource/tests/setup"
+	"github.com/google/uuid"
 
-	// "crypto/sha256"
-	"crypto/sha256"
-	"fmt"
-	"testing"
-
+	didsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	"github.com/cheqd/cheqd-node/x/resource/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/stretchr/testify/require"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
-func TestQueryGetResource(t *testing.T) {
-	keys := GenerateTestKeys()
-	existingResource := ExistingResource()
-	cases := []struct {
-		valid    bool
-		name     string
-		msg      *types.QueryGetResourceRequest
-		response *types.QueryGetResourceResponse
-		errMsg   string
-	}{
-		{
-			valid: true,
-			name:  "Valid: Works",
-			msg: &types.QueryGetResourceRequest{
-				CollectionId: ExistingDIDIdentifier,
-				Id:           existingResource.Header.Id,
-			},
-			response: &types.QueryGetResourceResponse{
-				Resource: &existingResource,
-			},
-			errMsg: "",
-		},
-		{
-			valid: false,
-			name:  "Not Valid: Resource is not found",
-			msg: &types.QueryGetResourceRequest{
-				CollectionId: ExistingDIDIdentifier,
-				Id:           ResourceId,
-			},
-			response: nil,
-			errMsg:   fmt.Sprintf("resource %s:%s: not found", ExistingDIDIdentifier, ResourceId),
-		},
-		{
-			valid: false,
-			name:  "Not Valid: DID Doc is not found",
-			msg: &types.QueryGetResourceRequest{
-				CollectionId: NotFoundDIDIdentifier,
-				Id:           existingResource.Header.Id,
-			},
-			response: nil,
-			errMsg:   fmt.Sprintf("did:cheqd:test:%s: DID Doc not found", NotFoundDIDIdentifier),
-		},
-	}
+var _ = Describe("Query Resource", func() {
+	var setup TestSetup
+	var alice didsetup.CreatedDidDocInfo
+	var resource *types.MsgCreateResourceResponse
 
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			msg := tc.msg
-			resourceSetup := InitEnv(t, keys[ExistingDIDKey].PublicKey, keys[ExistingDIDKey].PrivateKey)
+	BeforeEach(func() {
+		setup = Setup()
+		alice = setup.CreateSimpleDid()
+		resource = setup.CreateSimpleResource(alice.CollectionId, SchemaData, "Resource 1", CLSchemaType, []didsetup.SignInput{alice.SignInput})
+	})
 
-			queryResponse, err := resourceSetup.QueryServer.Resource(sdk.WrapSDKContext(resourceSetup.Ctx), msg)
+	It("Works", func() {
+		resp, err := setup.QueryResource(alice.CollectionId, resource.Resource.Id)
+		Expect(err).To(BeNil())
+		Expect(resp.Resource.Metadata.Id).To(Equal(resource.Resource.Id))
+	})
 
-			if tc.valid {
-				resource := queryResponse.Resource
-				require.Nil(t, err)
-				require.Equal(t, tc.response.Resource.Header.CollectionId, resource.Header.CollectionId)
-				require.Equal(t, tc.response.Resource.Header.Id, resource.Header.Id)
-				require.Equal(t, tc.response.Resource.Header.MediaType, resource.Header.MediaType)
-				require.Equal(t, tc.response.Resource.Header.ResourceType, resource.Header.ResourceType)
-				require.Equal(t, tc.response.Resource.Data, resource.Data)
-				require.Equal(t, tc.response.Resource.Header.Name, resource.Header.Name)
-				require.Equal(t, sha256.New().Sum(tc.response.Resource.Data), resource.Header.Checksum)
-				require.Equal(t, tc.response.Resource.Header.PreviousVersionId, resource.Header.PreviousVersionId)
-				require.Equal(t, tc.response.Resource.Header.NextVersionId, resource.Header.NextVersionId)
-			} else {
-				require.Error(t, err)
-				require.Equal(t, tc.errMsg, err.Error())
-			}
-		})
-	}
-}
+	It("Returns error if resource does not exist", func() {
+		nonExistingResource := uuid.NewString()
+
+		_, err := setup.QueryResource(alice.CollectionId, nonExistingResource)
+		Expect(err.Error()).To(ContainSubstring("not found"))
+	})
+
+	It("Returns error if collection does not exist", func() {
+		nonExistingCollection := didsetup.GenerateDID(didsetup.Base58_16bytes)
+
+		_, err := setup.QueryResource(nonExistingCollection, resource.Resource.Id)
+		Expect(err.Error()).To(ContainSubstring("DID Doc not found"))
+	})
+})
