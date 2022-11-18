@@ -9,11 +9,11 @@ import (
 )
 
 type MigrationContext struct {
-	didStoreKey *storetypes.KVStoreKey
+	didStoreKey      *storetypes.KVStoreKey
 	resourceStoreKey *storetypes.KVStoreKey
-	codec          codec.Codec
-	didKeeper      didkeeper.Keeper
-	resourceKeeper resourcekeeper.Keeper
+	codec            codec.Codec
+	didKeeper        didkeeper.Keeper
+	resourceKeeper   resourcekeeper.Keeper
 }
 
 func NewMigrationContext(

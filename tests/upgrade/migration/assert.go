@@ -38,7 +38,7 @@ func AssertHandlers() error {
 	// Prepare stage. Store all needed data structures
 	err = migrator.Prepare()
 	Expect(err).To(BeNil())
-	
+
 	// Make migrations
 	err = migrator.Migrate()
 	Expect(err).To(BeNil())

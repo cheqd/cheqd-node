@@ -4,7 +4,7 @@ import (
 	// "fmt"
 	// "path/filepath"
 
-	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/migration/setup"
+	// migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/migration/setup"
 
 	// didtestssetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
@@ -14,12 +14,12 @@ import (
 	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
 )
 
-var (
-	didDoc                         didtypesv1.MsgCreateDidPayload
-	didInfo                        migrationsetup.MinimalDidDocInfoV1
-	existingChecksumResource       resourcetypesv1.MsgCreateResourcePayload
-	expectedChecksumResourceHeader resourcetypes.Metadata
-)
+// var (
+// 	didDoc                         didtypesv1.MsgCreateDidPayload
+// 	didInfo                        migrationsetup.MinimalDidDocInfoV1
+// 	existingChecksumResource       resourcetypesv1.MsgCreateResourcePayload
+// 	expectedChecksumResourceHeader resourcetypes.Metadata
+// )
 
 func InitDataChunkForResourceChecksum() (DataChunk, error) {
 	// err := Loader(filepath.Join("payload", "existing", "v1", "diddoc_uuid.json"), &didDoc)

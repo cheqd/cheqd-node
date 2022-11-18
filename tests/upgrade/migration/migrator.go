@@ -18,15 +18,16 @@ type DataChunk struct {
 }
 
 type MigrationScenario struct {
-	name      string
-	setup     func() migrationsetup.ExtendedTestSetup
-	dataChunk DataChunk
-	handler   func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error
+	name string
+	// setup func() migrationsetup.ExtendedTestSetup
+	// dataChunk DataChunk
+	handler func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error
 }
 
 func NewMigrationScenario(
 	name string,
-	handler func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error) MigrationScenario {
+	handler func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error,
+) MigrationScenario {
 	return MigrationScenario{
 		name:    name,
 		handler: handler,
