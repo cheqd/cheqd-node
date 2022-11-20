@@ -247,7 +247,7 @@ jobs:
         run: |
           bash import-keys.sh
 
-      - name: Run integration tests
+      - name: Run integration tests on the upgraded network
         working-directory: ./tests/integration
         run: ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --junit-report ../../report-integration-post.xml
 
