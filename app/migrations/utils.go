@@ -16,7 +16,6 @@ type StateValueData interface {
 	proto.Message
 }
 
-
 func StateValueToDIDDocWithMetadata(stateValue didtypesv1.StateValue) (didtypes.DidDocWithMetadata, error) {
 	var err error
 	didDoc, err := stateValue.UnpackDataAsDid()

@@ -13,7 +13,7 @@ import (
 )
 
 type ChecksumDataSet struct {
-	setup migrationsetup.TestSetup
+	setup             migrationsetup.TestSetup
 	existingDIDDocs   []didtypes.DidDocWithMetadata
 	existingResources []resourcetypes.ResourceWithMetadata
 	expectedDidDocs   []didtypes.DidDocWithMetadata
@@ -22,10 +22,10 @@ type ChecksumDataSet struct {
 
 func NewChecksumDataSet(setup migrationsetup.TestSetup) ChecksumDataSet {
 	return ChecksumDataSet{
-		setup: setup,
-		existingDIDDocs: []didtypes.DidDocWithMetadata{},
+		setup:             setup,
+		existingDIDDocs:   []didtypes.DidDocWithMetadata{},
 		existingResources: []resourcetypes.ResourceWithMetadata{},
-		expectedDidDocs: []didtypes.DidDocWithMetadata{},
+		expectedDidDocs:   []didtypes.DidDocWithMetadata{},
 		expectedResources: []resourcetypes.ResourceWithMetadata{},
 	}
 }
@@ -75,7 +75,7 @@ func (cds *ChecksumDataSet) Prepare() error {
 func (cds *ChecksumDataSet) Validate() error {
 	var (
 		resourceWithMetadata resourcetypes.ResourceWithMetadata
-		err error
+		err                  error
 	)
 
 	for _, expectedResource := range cds.expectedResources {
@@ -87,9 +87,7 @@ func (cds *ChecksumDataSet) Validate() error {
 			return err
 		}
 
-		if bytes.Compare(
-			resourceWithMetadata.Metadata.Checksum,
-			expectedResource.Metadata.Checksum) != 0 {
+		if !bytes.Equal(resourceWithMetadata.Metadata.Checksum, expectedResource.Metadata.Checksum) {
 			return fmt.Errorf("Checksum is not migrated correctly")
 		}
 	}

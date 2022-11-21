@@ -13,7 +13,7 @@ type IDataSet interface {
 }
 
 type MigrationScenario struct {
-	name string
+	name    string
 	handler func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error
 }
 
@@ -44,7 +44,8 @@ type Migrator struct {
 func NewMigrator(
 	migrations []MigrationScenario,
 	setup migrationsetup.TestSetup,
-	dataSet IDataSet) Migrator {
+	dataSet IDataSet,
+) Migrator {
 	return Migrator{
 		migrations: migrations,
 		dataSet:    dataSet,

@@ -40,8 +40,8 @@ type TestSetup struct {
 	ResourceMsgServer   resourcetypes.MsgServer
 	ResourceQueryServer resourcetypes.QueryServer
 
-	DidStoreKey *storetypes.KVStoreKey
-	ResourceStoreKey	*storetypes.KVStoreKey
+	DidStoreKey      *storetypes.KVStoreKey
+	ResourceStoreKey *storetypes.KVStoreKey
 }
 
 func Setup() TestSetup {
@@ -106,7 +106,7 @@ func Setup() TestSetup {
 		ResourceMsgServer:   resourceMsgServer,
 		ResourceQueryServer: resourceQueryServer,
 
-		DidStoreKey: didStoreKey,
+		DidStoreKey:      didStoreKey,
 		ResourceStoreKey: resourceStoreKey,
 	}
 

@@ -106,7 +106,7 @@ func (pds *ProtobufDataSet) Prepare() error {
 
 func (pds *ProtobufDataSet) Validate() error {
 	var (
-		expectedDidDoc  didtypes.DidDocWithMetadata
+		expectedDidDoc   didtypes.DidDocWithMetadata
 		expectedResource resourcetypes.ResourceWithMetadata
 	)
 	for _, expectedDidDoc = range pds.expectedDidDocs {
@@ -129,7 +129,7 @@ func (pds *ProtobufDataSet) Validate() error {
 	}
 
 	for _, expectedResource = range pds.expectedResources {
-		resource, err := pds.setup.ResourceKeeper.GetResource(&pds.setup.SdkCtx, 
+		resource, err := pds.setup.ResourceKeeper.GetResource(&pds.setup.SdkCtx,
 			expectedResource.Metadata.CollectionId,
 			expectedResource.Metadata.Id)
 		if err != nil {

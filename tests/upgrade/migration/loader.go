@@ -32,8 +32,8 @@ type DidAndMetadata struct {
 func Loader(
 	path string,
 	dataChunk any,
-	setup migrationsetup.TestSetup) error {
-
+	setup migrationsetup.TestSetup,
+) error {
 	cwd, err := os.Getwd()
 	if err != nil {
 		return err

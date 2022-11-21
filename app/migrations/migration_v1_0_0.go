@@ -10,8 +10,8 @@ import (
 	didtypesV1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 
-	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/codec"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	resourcetypesV1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
@@ -75,7 +75,7 @@ func MigrateDidProtobufV1(sctx sdk.Context, mctx MigrationContext) error {
 func MigrateDidProtobufDIDocV1(sctx sdk.Context, mctx MigrationContext) error {
 	var iterator sdk.Iterator
 	var stateValue didtypesV1.StateValue
-	
+
 	ir := codectypes.NewInterfaceRegistry()
 
 	ir.RegisterInterface("StateValueData", (*didtypesV1.StateValueData)(nil))
