@@ -15,7 +15,7 @@ const (
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		Resources: []*ResourceWithMetadata{},
-		FeeParams: &FeeParams{},
+		FeeParams: DefaultFeeParams(),
 	}
 }
 
