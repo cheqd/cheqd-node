@@ -10,7 +10,7 @@ pushd "$DIR/../../../docker/localnet"
 bash gen-network-config.sh
 
 # Start network
-docker compose --env-file mainnet-latest.env up --no-build
+docker compose --env-file mainnet-latest.env up --detach --no-build
 
 # TODO: Get rid of this sleep.
 sleep 5
