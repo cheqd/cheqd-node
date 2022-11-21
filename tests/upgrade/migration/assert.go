@@ -19,33 +19,21 @@ func AssertHandlers() error {
 	// Here we will unit Test the migration handlers, to ensure that they are working as expected.
 	// Essentially, we are matching the expected pre-generated payloads with the actual payloads that were generated during an actual migration scenario.
 
-	By("Ensuring the ResourceChecksum migration scenario is successful")
-	dataChunk, err := InitDataChunkForResourceChecksum()
-	Expect(err).To(BeNil())
-	resourceChecksumScenario := NewMigrationScenario(
-		"ResourceChecksum",
-		func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error {
-			return appmigrations.MigrateResourceChecksumV1(ctx, migrationCtx)
-		},
-	)
-	// Init Migrator structure
-	setup := migrationsetup.NewExtendedSetup()
-	migrator := NewMigrator(
-		[]MigrationScenario{resourceChecksumScenario},
-		setup,
-		dataChunk)
+	By("Ensuring the Protobuf migration handler is working as expected")
 
-	// Prepare stage. Store all needed data structures
-	err = migrator.Prepare()
-	Expect(err).To(BeNil())
-	
-	// Make migrations
-	err = migrator.Migrate()
-	Expect(err).To(BeNil())
+	// Run Protobuf migration
+	err := RunProtobufScenario()
+	if err != nil {
+		return err
+	}
 
-	// Validate results
-	err = migrator.Validate()
-	Expect(err).To(BeNil())
+	By("Ensuring the Checksum migration scenario is successful")
+
+	// Run checksum migration scenario
+	err = RunChecksumScenario()
+	if err != nil {
+		return err
+	}
 
 	// TODO: Add more migration scenarios here.
 
@@ -66,4 +54,82 @@ func AssertMigration(preUpgradeDidDoc *didtypes.DidDoc, preUpgradeResource *reso
 	// TODO: Bundle Resource migration scenarios and run them here.
 
 	return nil
+}
+
+func RunChecksumScenario() error {
+	// Init storages, keepers and setup the migration context.
+	setup := migrationsetup.Setup()
+
+	dataSet := NewChecksumDataSet(setup)
+
+	// Load data from corresponding json files
+	err := dataSet.Load()
+	if err != nil {
+		return err
+	}
+
+	resourceChecksumScenario := NewMigrationScenario(
+		"ResourceChecksum",
+		func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error {
+			return appmigrations.MigrateResourceChecksumV1(ctx, migrationCtx)
+		},
+	)
+	// Init Migrator structure
+	migrator := NewMigrator(
+		[]MigrationScenario{resourceChecksumScenario},
+		setup,
+		&dataSet)
+
+	// Prepare stage. Store all needed data structures
+	err = migrator.Prepare()
+	Expect(err).To(BeNil())
+
+	// Make migrations
+	err = migrator.Migrate()
+	Expect(err).To(BeNil())
+
+	// Validate results
+	err = migrator.Validate()
+	Expect(err).To(BeNil())
+
+	return err
+}
+
+func RunProtobufScenario() error {
+	// Init storages, keepers and setup the migration context.
+	setup := migrationsetup.Setup()
+
+	dataSet := NewProtobufDataSet(setup)
+
+	// Load data from corresponding json files
+	err := dataSet.Load()
+	if err != nil {
+		return err
+	}
+
+	resourceProtobufScenario := NewMigrationScenario(
+		"ResourceChecksum",
+		func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error {
+			return appmigrations.MigrateDidProtobufV1(ctx, migrationCtx)
+		},
+	)
+	// Init Migrator structure
+	migrator := NewMigrator(
+		[]MigrationScenario{resourceProtobufScenario},
+		setup,
+		&dataSet)
+
+	// Prepare stage. Store all needed data structures
+	err = migrator.Prepare()
+	Expect(err).To(BeNil())
+
+	// Make migrations
+	err = migrator.Migrate()
+	Expect(err).To(BeNil())
+
+	// Validate results
+	err = migrator.Validate()
+	Expect(err).To(BeNil())
+
+	return err
 }

@@ -10,6 +10,9 @@ import (
 	didtypesV1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+	"github.com/cosmos/cosmos-sdk/codec"
+
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	resourcetypesV1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
 
@@ -72,7 +75,13 @@ func MigrateDidProtobufV1(sctx sdk.Context, mctx MigrationContext) error {
 func MigrateDidProtobufDIDocV1(sctx sdk.Context, mctx MigrationContext) error {
 	var iterator sdk.Iterator
 	var stateValue didtypesV1.StateValue
-	// var err error
+	
+	ir := codectypes.NewInterfaceRegistry()
+
+	ir.RegisterInterface("StateValueData", (*didtypesV1.StateValueData)(nil))
+	ir.RegisterImplementations((*didtypesV1.StateValueData)(nil), &didtypesV1.Did{})
+
+	CdcV1 := codec.NewProtoCodec(ir)
 
 	store := prefix.NewStore(
 		sctx.KVStore(mctx.didStoreKey),
@@ -82,7 +91,7 @@ func MigrateDidProtobufDIDocV1(sctx sdk.Context, mctx MigrationContext) error {
 	closeIteratorOrPanic(iterator)
 
 	for ; iterator.Valid(); iterator.Next() {
-		mctx.codec.MustUnmarshal(iterator.Value(), &stateValue)
+		CdcV1.MustUnmarshal(iterator.Value(), &stateValue)
 
 		newDidDocWithMetadata, err := StateValueToDIDDocWithMetadata(stateValue)
 		if err != nil {
@@ -178,10 +187,10 @@ func MigrateResourceChecksumV1(sctx sdk.Context, mctx MigrationContext) error {
 	dataStore := sctx.KVStore(mctx.resourceStoreKey)
 	metadataIterator := sdk.KVStorePrefixIterator(
 		metadataStore,
-		didutils.StrBytes(resourcetypesV1.ResourceHeaderKey))
+		didutils.StrBytes(resourcetypes.ResourceMetadataKey))
 	dataIterator := sdk.KVStorePrefixIterator(
 		dataStore,
-		didutils.StrBytes(resourcetypesV1.ResourceDataKey))
+		didutils.StrBytes(resourcetypes.ResourceDataKey))
 
 	closeIteratorOrPanic(metadataIterator)
 	closeIteratorOrPanic(dataIterator)

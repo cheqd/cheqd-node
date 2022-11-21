@@ -3,7 +3,6 @@ package migrations
 import (
 	"crypto/sha256"
 	"encoding/json"
-	"reflect"
 
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
@@ -17,35 +16,10 @@ type StateValueData interface {
 	proto.Message
 }
 
-// TODO: Deprecate utils file after exporting did types v1 package as expected.
-// They are used in the migration script, but a better solution is to export the types v1 package,
-// including utils and load it in the migration v1.0.0 script.
-func UnpackData(stateValue didtypesv1.StateValue) (StateValueData, error) {
-	value, isOk := stateValue.Data.GetCachedValue().(StateValueData)
-	if !isOk {
-		return nil, didtypes.ErrUnpackStateValue.Wrapf("invalid type url: %s", stateValue.Data.TypeUrl)
-	}
-
-	return value, nil
-}
-
-func UnpackDataAsDid(stateValue didtypesv1.StateValue) (*didtypesv1.Did, error) {
-	data, err := UnpackData(stateValue)
-	if err != nil {
-		return nil, err
-	}
-
-	value, isValue := data.(*didtypesv1.Did)
-	if !isValue {
-		return nil, didtypes.ErrUnpackStateValue.Wrap(reflect.TypeOf(data).String())
-	}
-
-	return value, nil
-}
 
 func StateValueToDIDDocWithMetadata(stateValue didtypesv1.StateValue) (didtypes.DidDocWithMetadata, error) {
 	var err error
-	didDoc, err := UnpackDataAsDid(stateValue)
+	didDoc, err := stateValue.UnpackDataAsDid()
 	metadata := stateValue.Metadata
 	if err != nil {
 		return didtypes.DidDocWithMetadata{}, err

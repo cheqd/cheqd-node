@@ -1,0 +1,34 @@
+{
+    "Data": {
+        "context": [],
+        "id": "did:cheqd:testnet:97096fb1-63ea-4f81-b296-8eb5da6ab6eb",
+        "controller": [
+            "did:cheqd:testnet:97096fb1-63ea-4f81-b296-8eb5da6ab6eb"
+        ],
+        "authentication": [
+            "did:cheqd:testnet:97096fb1-63ea-4f81-b296-8eb5da6ab6eb#key-1"
+        ],
+        "assertionMethod": [],
+        "capabilityInvocation": [],
+        "capabilityDelegation": [],
+        "keyAgreement": [],
+        "alsoKnownAs": [],
+        "verificationMethod": [
+            {
+                "id": "did:cheqd:testnet:97096fb1-63ea-4f81-b296-8eb5da6ab6eb#key-1",
+                "type": "Ed25519VerificationKey2020",
+                "controller": "did:cheqd:testnet:97096fb1-63ea-4f81-b296-8eb5da6ab6eb",
+                "publicKeyMultibase": "z6LNquFfzPNhCQ8nbCWSMBQjosLT7ayEqGSYrN2Y1FdmS",
+                "publicKeyJwk": []
+            }
+        ],
+        "service": []
+    },
+    "Metadata": {
+        "Created": "2021-09-14T13:00:00Z",
+        "Updated": "2021-09-14T13:00:00Z",
+        "VersionId": "",
+        "Deactivated": false,
+        "Resources": ["7f2589aa-1279-4bd7-b704-f868772b460a"]
+    }
+}
