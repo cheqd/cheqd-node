@@ -21,10 +21,11 @@ type taxDecorator struct {
 }
 
 // NewTaxDecorator returns a new taxDecorator
-func NewTaxDecorator(ak ante.AccountKeeper, bk cheqdante.BankKeeper, dk cheqdante.DidKeeper, rk cheqdante.ResourceKeeper) taxDecorator {
+func NewTaxDecorator(ak ante.AccountKeeper, bk cheqdante.BankKeeper, fk ante.FeegrantKeeper, dk cheqdante.DidKeeper, rk cheqdante.ResourceKeeper) taxDecorator {
 	return taxDecorator{
 		accountKeeper:  ak,
 		bankKeeper:     bk,
+		feegrantKeeper: fk,
 		didKeeper:      dk,
 		resourceKeeper: rk,
 	}

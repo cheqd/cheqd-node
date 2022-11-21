@@ -266,7 +266,7 @@ func (s *AnteTestSuite) TestTaxableTxOverallLifecycleNonSimulated() {
 	dfd := cheqdante.NewDeductFeeDecorator(s.app.AccountKeeper, s.app.BankKeeper, nil, s.app.DidKeeper, s.app.ResourceKeeper, nil)
 	antehandler := sdk.ChainAnteDecorators(dfd)
 
-	taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.DidKeeper, s.app.ResourceKeeper)
+	taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper)
 	posthandler := sdk.ChainAnteDecorators(taxDecorator)
 
 	// get supply before tx
@@ -334,7 +334,7 @@ func (s *AnteTestSuite) TestTaxableTxOverallLifecycleSimulated() {
 	dfd := cheqdante.NewDeductFeeDecorator(s.app.AccountKeeper, s.app.BankKeeper, nil, s.app.DidKeeper, s.app.ResourceKeeper, nil)
 	antehandler := sdk.ChainAnteDecorators(dfd)
 
-	taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.DidKeeper, s.app.ResourceKeeper)
+	taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper)
 	posthandler := sdk.ChainAnteDecorators(taxDecorator)
 
 	// get supply before tx

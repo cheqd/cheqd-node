@@ -526,6 +526,7 @@ func (app *SimApp) setPostHandler() {
 		cheqdposthandler.HandlerOptions{
 			AccountKeeper:  app.AccountKeeper,
 			BankKeeper:     app.BankKeeper,
+			FeegrantKeeper: app.FeeGrantKeeper,
 			DidKeeper:      app.DidKeeper,
 			ResourceKeeper: app.ResourceKeeper,
 		},
