@@ -74,13 +74,6 @@ func (m *GenesisState) GetFeeParams() *FeeParams {
 	return nil
 }
 
-func (m *GenesisState) GetFeeParams() *FeeParams {
-	if m != nil {
-		return m.FeeParams
-	}
-	return nil
-}
-
 func init() {
 	proto.RegisterType((*GenesisState)(nil), "cheqd.resource.v2.GenesisState")
 }
@@ -251,42 +244,6 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 			}
 			m.Resources = append(m.Resources, &ResourceWithMetadata{})
 			if err := m.Resources[len(m.Resources)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FeeParams", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenesis
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.FeeParams == nil {
-				m.FeeParams = &FeeParams{}
-			}
-			if err := m.FeeParams.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

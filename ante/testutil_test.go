@@ -10,6 +10,9 @@ import (
 
 	cheqdapp "github.com/cheqd/cheqd-node/app"
 	"github.com/cheqd/cheqd-node/simapp"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
@@ -45,6 +48,12 @@ func createTestApp(t *testing.T, isCheckTx bool) (*simapp.SimApp, sdk.Context) {
 	ctx := app.BaseApp.NewContext(isCheckTx, tmproto.Header{})
 	app.AccountKeeper.SetParams(ctx, authtypes.DefaultParams())
 
+	// cheqd specific params
+	didFeeParams := didtypes.DefaultGenesis().FeeParams
+	app.DidKeeper.SetParams(ctx, *didFeeParams)
+	resourceFeeParams := resourcetypes.DefaultGenesis().FeeParams
+	app.ResourceKeeper.SetParams(ctx, *resourceFeeParams)
+
 	return app, ctx
 }
 
@@ -66,12 +75,12 @@ func (s *AnteTestSuite) SetupTest(isCheckTx bool) {
 	s.clientCtx = client.Context{}.
 		WithTxConfig(encodingConfig.TxConfig)
 
-	anteHandler, err := cheqdapp.NewAnteHandler(
-		cheqdapp.HandlerOptions{
+	anteHandler, err := simapp.NewAnteHandler(
+		simapp.HandlerOptions{
 			AccountKeeper:   s.app.AccountKeeper,
 			BankKeeper:      s.app.BankKeeper,
 			FeegrantKeeper:  s.app.FeeGrantKeeper,
-			CheqdKeeper:     s.app.CheqdKeeper,
+			DidKeeper:       s.app.DidKeeper,
 			ResourceKeeper:  s.app.ResourceKeeper,
 			SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 			SigGasConsumer:  sdkante.DefaultSigVerificationGasConsumer,
@@ -153,6 +162,16 @@ func (s *AnteTestSuite) CreateTestTx(privs []cryptotypes.PrivKey, accNums []uint
 	}
 
 	return s.txBuilder.GetTx(), nil
+}
+
+// SetDidFeeParams is a helper function to set did fee params.
+func (s *AnteTestSuite) SetDidFeeParams(feeParams didtypes.FeeParams) {
+	s.app.DidKeeper.SetParams(s.ctx, feeParams)
+}
+
+// SetResourceFeeParams is a helper function to set resource fee params.
+func (s *AnteTestSuite) SetResourceFeeParams(feeParams resourcetypes.FeeParams) {
+	s.app.ResourceKeeper.SetParams(s.ctx, feeParams)
 }
 
 // TestCase represents a test case used in test tables.

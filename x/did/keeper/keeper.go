@@ -12,21 +12,17 @@ import (
 
 type (
 	Keeper struct {
-		cdc      codec.BinaryCodec
-		storeKey storetypes.StoreKey
-		// paramSpace types.ParamSubspace
-		// the address capable of executing a MsgUpdateParams message. Typically, this
-		// should be the x/gov module account.
-		authority string
+		cdc        codec.BinaryCodec
+		storeKey   storetypes.StoreKey
+		paramSpace types.ParamSubspace
 	}
 )
 
-func NewKeeper(cdc codec.BinaryCodec, storeKey storetypes.StoreKey) *Keeper {
+func NewKeeper(cdc codec.BinaryCodec, storeKey storetypes.StoreKey, paramSpace types.ParamSubspace) *Keeper {
 	return &Keeper{
-		cdc:      cdc,
-		storeKey: storeKey,
-		/* paramSpace: paramSpace,
-		authority: authority, */
+		cdc:        cdc,
+		storeKey:   storeKey,
+		paramSpace: paramSpace,
 	}
 }
 

@@ -5,7 +5,6 @@ package v1
 
 import (
 	fmt "fmt"
-	_ "github.com/cosmos/cosmos-sdk/types"
 	proto "github.com/gogo/protobuf/proto"
 	io "io"
 	math "math"
@@ -27,7 +26,6 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 type GenesisState struct {
 	DidNamespace string        `protobuf:"bytes,1,opt,name=did_namespace,json=didNamespace,proto3" json:"did_namespace,omitempty"`
 	DidList      []*StateValue `protobuf:"bytes,2,rep,name=didList,proto3" json:"didList,omitempty"`
-	FeeParams    *FeeParams    `protobuf:"bytes,3,opt,name=fee_params,json=feeParams,proto3" json:"fee_params,omitempty"`
 }
 
 func (m *GenesisState) Reset()         { *m = GenesisState{} }
@@ -77,13 +75,6 @@ func (m *GenesisState) GetDidList() []*StateValue {
 	return nil
 }
 
-func (m *GenesisState) GetFeeParams() *FeeParams {
-	if m != nil {
-		return m.FeeParams
-	}
-	return nil
-}
-
 func init() {
 	proto.RegisterType((*GenesisState)(nil), "cheqdid.cheqdnode.cheqd.v1.GenesisState")
 }
@@ -128,18 +119,6 @@ func (m *GenesisState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.FeeParams != nil {
-		{
-			size, err := m.FeeParams.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintGenesis(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x1a
-	}
 	if len(m.DidList) > 0 {
 		for iNdEx := len(m.DidList) - 1; iNdEx >= 0; iNdEx-- {
 			{
@@ -190,10 +169,6 @@ func (m *GenesisState) Size() (n int) {
 			l = e.Size()
 			n += 1 + l + sovGenesis(uint64(l))
 		}
-	}
-	if m.FeeParams != nil {
-		l = m.FeeParams.Size()
-		n += 1 + l + sovGenesis(uint64(l))
 	}
 	return n
 }
@@ -296,42 +271,6 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 			}
 			m.DidList = append(m.DidList, &StateValue{})
 			if err := m.DidList[len(m.DidList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FeeParams", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenesis
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.FeeParams == nil {
-				m.FeeParams = &FeeParams{}
-			}
-			if err := m.FeeParams.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

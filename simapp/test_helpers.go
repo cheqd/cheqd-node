@@ -40,6 +40,8 @@ import (
 
 	// cheqd specific imports
 	cheqdapp "github.com/cheqd/cheqd-node/app"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 )
 
 // DefaultConsensusParams defines the default Tendermint consensus params used in
@@ -140,7 +142,7 @@ func Setup(t *testing.T, isCheckTx bool) *SimApp {
 	acc := authtypes.NewBaseAccount(senderPrivKey.PubKey().Address().Bytes(), senderPrivKey.PubKey(), 0, 0)
 	balance := banktypes.Balance{
 		Address: acc.GetAddress().String(),
-		Coins:   sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100000000000000))),
+		Coins:   sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(100000000000000))),
 	}
 
 	app := SetupWithGenesisValSet(t, valSet, []authtypes.GenesisAccount{acc}, balance)
@@ -208,6 +210,14 @@ func genesisStateWithValSet(t *testing.T,
 	// update total supply
 	bankGenesis := banktypes.NewGenesisState(banktypes.DefaultGenesisState().Params, balances, totalSupply, []banktypes.Metadata{})
 	genesisState[banktypes.ModuleName] = app.AppCodec().MustMarshalJSON(bankGenesis)
+
+	// set did module genesis state
+	didGenesis := didtypes.DefaultGenesis()
+	genesisState[didtypes.ModuleName] = app.AppCodec().MustMarshalJSON(didGenesis)
+
+	// set resource module genesis state
+	resourceGenesis := resourcetypes.DefaultGenesis()
+	genesisState[resourcetypes.ModuleName] = app.AppCodec().MustMarshalJSON(resourceGenesis)
 
 	return genesisState
 }

@@ -8,25 +8,27 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
+	ibcante "github.com/cosmos/ibc-go/v5/modules/core/ante"
+	ibckeeper "github.com/cosmos/ibc-go/v5/modules/core/keeper"
 )
 
 // HandlerOptions are the options required for constructing a default SDK AnteHandler.
 // Here we extend the default exposed `BankKeeper` with our own extended `BankKeeper` interface.
 // This allows us to add our own custom logic to the default SDK AnteHandler.
 // Our custom logic is:
-// 1. To burn portion of the transaction fee.
-// 2. Distribute a pre-defined portion of the transaction fee to the foundation.
-// 3. Distribute a pre-defined portion of the transaction fee to the validators as rewards (default behavior).
+//  1. To burn portion of the transaction fee.
+//  2. Distribute a pre-defined portion of the transaction fee to the validators as rewards (default behavior).
 type HandlerOptions struct {
 	AccountKeeper          ante.AccountKeeper
 	BankKeeper             cheqdante.BankKeeper
 	ExtensionOptionChecker ante.ExtensionOptionChecker
 	FeegrantKeeper         ante.FeegrantKeeper
-	CheqdKeeper            cheqdante.CheqdKeeper
+	DidKeeper              cheqdante.DidKeeper
 	ResourceKeeper         cheqdante.ResourceKeeper
 	SignModeHandler        authsigning.SignModeHandler
 	SigGasConsumer         func(meter sdk.GasMeter, sig signing.SignatureV2, params types.Params) error
 	TxFeeChecker           cheqdante.TxFeeChecker
+	IBCKeeper              *ibckeeper.Keeper
 }
 
 // NewAnteHandler returns an AnteHandler that checks and increments sequence
@@ -41,7 +43,7 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "bank keeper is required for ante builder")
 	}
 
-	if options.CheqdKeeper == nil {
+	if options.DidKeeper == nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "cheqd keeper is required for ante builder")
 	}
 
@@ -53,6 +55,10 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "sign mode handler is required for ante builder")
 	}
 
+	if options.IBCKeeper == nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "IBC keeper is required for ante builder")
+	}
+
 	anteDecorators := []sdk.AnteDecorator{
 		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
 		ante.NewExtensionOptionsDecorator(options.ExtensionOptionChecker),
@@ -60,12 +66,14 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		ante.NewTxTimeoutHeightDecorator(),
 		ante.NewValidateMemoDecorator(options.AccountKeeper),
 		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
-		cheqdante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, options.CheqdKeeper, options.ResourceKeeper, options.TxFeeChecker),
+		cheqdante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, options.DidKeeper, options.ResourceKeeper, options.TxFeeChecker),
 		ante.NewSetPubKeyDecorator(options.AccountKeeper), // SetPubKeyDecorator must be called before all signature verification decorators
 		ante.NewValidateSigCountDecorator(options.AccountKeeper),
 		ante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),
 		ante.NewSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
+		// Other
+		ibcante.NewRedundantRelayDecorator(options.IBCKeeper),
 	}
 
 	return sdk.ChainAnteDecorators(anteDecorators...), nil

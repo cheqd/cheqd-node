@@ -3,16 +3,16 @@ package ante
 import (
 	"strings"
 
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	resourceutils "github.com/cheqd/cheqd-node/x/resource/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const (
-	MsgCreateDid int = iota
-	MsgUpdateDid
-	MsgDeactivateDid
+	MsgCreateDidDoc int = iota
+	MsgUpdateDidDoc
+	MsgDeactivateDidDoc
 	MsgCreateResourceDefault
 	MsgCreateResourceImage
 	MsgCreateResourceJson
@@ -21,7 +21,7 @@ const (
 )
 
 const (
-	BurnFactorCheqd int = iota
+	BurnFactorDid int = iota
 	BurnFactorResource
 
 	BurnFactorCount
@@ -32,26 +32,27 @@ type TaxableMsgFee = [TaxableMsgFeeCount]sdk.Coins
 type BurnFactor = [BurnFactorCount]sdk.Dec
 
 var TaxableMsgFees = TaxableMsgFee{
-	MsgCreateDid:             (sdk.Coins)(nil),
-	MsgUpdateDid:             (sdk.Coins)(nil),
-	MsgDeactivateDid:         (sdk.Coins)(nil),
+	MsgCreateDidDoc:          (sdk.Coins)(nil),
+	MsgUpdateDidDoc:          (sdk.Coins)(nil),
+	MsgDeactivateDidDoc:      (sdk.Coins)(nil),
 	MsgCreateResourceDefault: (sdk.Coins)(nil),
 	MsgCreateResourceImage:   (sdk.Coins)(nil),
 	MsgCreateResourceJson:    (sdk.Coins)(nil),
 }
 
 var BurnFactors = BurnFactor{
-	BurnFactorCheqd:    sdk.NewDec(0),
+	BurnFactorDid:      sdk.NewDec(0),
 	BurnFactorResource: sdk.NewDec(0),
 }
 
 func GetTaxableMsg(msg interface{}) bool {
 	switch msg.(type) {
-	case *cheqdtypes.MsgCreateDid:
+	case *didtypes.MsgCreateDidDoc:
 		return true
-	case *cheqdtypes.MsgUpdateDid:
+	case *didtypes.MsgUpdateDidDoc:
 		return true
-	// TODO: Add `MsgDeactivateDid` when it will be implemented
+	case *didtypes.MsgDeactivateDidDoc:
+		return true
 	case *resourcetypes.MsgCreateResource:
 		return true
 	default:
@@ -61,11 +62,15 @@ func GetTaxableMsg(msg interface{}) bool {
 
 func GetTaxableMsgFeeWithBurnPortion(ctx sdk.Context, msg interface{}) (sdk.Coins, sdk.Coins, bool) {
 	switch msg := msg.(type) {
-	case *cheqdtypes.MsgCreateDid:
-		return TaxableMsgFees[MsgCreateDid], GetBurnFeePortion(ctx, BurnFactors[BurnFactorCheqd], TaxableMsgFees[MsgCreateDid]), true
-	case *cheqdtypes.MsgUpdateDid:
-		return TaxableMsgFees[MsgUpdateDid], GetBurnFeePortion(ctx, BurnFactors[BurnFactorCheqd], TaxableMsgFees[MsgUpdateDid]), true
-	// TODO: Add `MsgDeactivateDid` when it will be implemented
+	case *didtypes.MsgCreateDidDoc:
+		burnPortion := GetBurnFeePortion(ctx, BurnFactors[BurnFactorDid], TaxableMsgFees[MsgCreateDidDoc])
+		return GetRewardPortion(TaxableMsgFees[MsgCreateDidDoc], burnPortion), burnPortion, true
+	case *didtypes.MsgUpdateDidDoc:
+		burnPortion := GetBurnFeePortion(ctx, BurnFactors[BurnFactorDid], TaxableMsgFees[MsgUpdateDidDoc])
+		return GetRewardPortion(TaxableMsgFees[MsgUpdateDidDoc], burnPortion), burnPortion, true
+	case *didtypes.MsgDeactivateDidDoc:
+		burnPortion := GetBurnFeePortion(ctx, BurnFactors[BurnFactorDid], TaxableMsgFees[MsgDeactivateDidDoc])
+		return GetRewardPortion(TaxableMsgFees[MsgDeactivateDidDoc], burnPortion), burnPortion, true
 	case *resourcetypes.MsgCreateResource:
 		return GetResourceTaxableMsgFee(ctx, msg)
 	default:
@@ -73,93 +78,75 @@ func GetTaxableMsgFeeWithBurnPortion(ctx sdk.Context, msg interface{}) (sdk.Coin
 	}
 }
 
+func GetRewardPortion(total sdk.Coins, burnPortion sdk.Coins) sdk.Coins {
+	if burnPortion.IsZero() {
+		return total
+	}
+
+	return total.Sub(burnPortion...)
+}
+
 func GetResourceTaxableMsgFee(ctx sdk.Context, msg *resourcetypes.MsgCreateResource) (sdk.Coins, sdk.Coins, bool) {
-	mediaType := resourceutils.DetectMediaType(msg.GetPayload().ToResource().Data)
+	mediaType := resourceutils.DetectMediaType(msg.GetPayload().ToResource().Resource.Data)
 
 	// Mime type image
 	if strings.HasPrefix(mediaType, "image/") {
-		return TaxableMsgFees[MsgCreateResourceImage], GetBurnFeePortion(ctx, BurnFactors[BurnFactorResource], TaxableMsgFees[MsgCreateResourceImage]), true
+		burnPortion := GetBurnFeePortion(ctx, BurnFactors[BurnFactorResource], TaxableMsgFees[MsgCreateResourceImage])
+		return GetRewardPortion(TaxableMsgFees[MsgCreateResourceImage], burnPortion), burnPortion, true
 	}
 
 	// Mime type json
 	if strings.HasPrefix(mediaType, "application/json") {
-		return TaxableMsgFees[MsgCreateResourceJson], GetBurnFeePortion(ctx, BurnFactors[BurnFactorResource], TaxableMsgFees[MsgCreateResourceJson]), true
+		burnPortion := GetBurnFeePortion(ctx, BurnFactors[BurnFactorResource], TaxableMsgFees[MsgCreateResourceJson])
+		return GetRewardPortion(TaxableMsgFees[MsgCreateResourceJson], burnPortion), burnPortion, true
 	}
 
 	// Default mime type
-	return TaxableMsgFees[MsgCreateResourceDefault], GetBurnFeePortion(ctx, BurnFactors[BurnFactorResource], TaxableMsgFees[MsgCreateResourceDefault]), true
+	burnPortion := GetBurnFeePortion(ctx, BurnFactors[BurnFactorResource], TaxableMsgFees[MsgCreateResourceDefault])
+	return GetRewardPortion(TaxableMsgFees[MsgCreateResourceDefault], burnPortion), burnPortion, true
 }
 
-func checkFeeParamsFromState(ctx sdk.Context, cheqdKeeper CheqdKeeper, resourceKeeper ResourceKeeper) bool {
-	cheqdParams := cheqdKeeper.GetParams(ctx)
-	createDidFeeCoins := sdk.NewCoins(cheqdParams.CreateDid)
-	updateDidFeeCoins := sdk.NewCoins(cheqdParams.UpdateDid)
-	deactivateDidFeeCoins := sdk.NewCoins(cheqdParams.DeactivateDid)
+func checkFeeParamsFromSubspace(ctx sdk.Context, didKeeper DidKeeper, resourceKeeper ResourceKeeper) bool {
+	didParams := didKeeper.GetParams(ctx)
+	TaxableMsgFees[MsgCreateDidDoc] = sdk.Coins{sdk.Coin{Denom: didParams.TxTypes[didtypes.DefaultKeyCreateDid].Denom, Amount: didParams.TxTypes[didtypes.DefaultKeyCreateDid].Amount}}
+	TaxableMsgFees[MsgUpdateDidDoc] = sdk.Coins{sdk.Coin{Denom: didParams.TxTypes[didtypes.DefaultKeyUpdateDid].Denom, Amount: didParams.TxTypes[didtypes.DefaultKeyUpdateDid].Amount}}
+	TaxableMsgFees[MsgDeactivateDidDoc] = sdk.Coins{sdk.Coin{Denom: didParams.TxTypes[didtypes.DefaultKeyDeactivateDid].Denom, Amount: didParams.TxTypes[didtypes.DefaultKeyDeactivateDid].Amount}}
 
 	resourceParams := resourceKeeper.GetParams(ctx)
-	createResourceImageFeeCoins := sdk.NewCoins(resourceParams.Image)
-	createResourceJsonFeeCoins := sdk.NewCoins(resourceParams.Json)
-	createResourceDefaultFeeCoins := sdk.NewCoins(resourceParams.Default)
+	TaxableMsgFees[MsgCreateResourceImage] = sdk.Coins{sdk.Coin{Denom: resourceParams.MediaTypes[resourcetypes.DefaultKeyCreateResourceImage].Denom, Amount: resourceParams.MediaTypes[resourcetypes.DefaultKeyCreateResourceImage].Amount}}
+	TaxableMsgFees[MsgCreateResourceJson] = sdk.Coins{sdk.Coin{Denom: resourceParams.MediaTypes[resourcetypes.DefaultKeyCreateResourceJson].Denom, Amount: resourceParams.MediaTypes[resourcetypes.DefaultKeyCreateResourceJson].Amount}}
+	TaxableMsgFees[MsgCreateResourceDefault] = sdk.Coins{sdk.Coin{Denom: resourceParams.MediaTypes[resourcetypes.DefaultKeyCreateResource].Denom, Amount: resourceParams.MediaTypes[resourcetypes.DefaultKeyCreateResource].Amount}}
 
-	if !createDidFeeCoins.IsEqual(TaxableMsgFees[MsgCreateDid]) {
-		TaxableMsgFees[MsgCreateDid] = createDidFeeCoins
-	}
-
-	if !updateDidFeeCoins.IsEqual(TaxableMsgFees[MsgUpdateDid]) {
-		TaxableMsgFees[MsgUpdateDid] = updateDidFeeCoins
-	}
-
-	if !deactivateDidFeeCoins.IsEqual(TaxableMsgFees[MsgDeactivateDid]) {
-		TaxableMsgFees[MsgDeactivateDid] = deactivateDidFeeCoins
-	}
-
-	if !cheqdParams.BurnFactor.Equal(BurnFactors[BurnFactorCheqd]) {
-		BurnFactors[BurnFactorCheqd] = cheqdParams.BurnFactor
-	}
-
-	if !createResourceImageFeeCoins.IsEqual(TaxableMsgFees[MsgCreateResourceImage]) {
-		TaxableMsgFees[MsgCreateResourceImage] = createResourceImageFeeCoins
-	}
-
-	if !createResourceJsonFeeCoins.IsEqual(TaxableMsgFees[MsgCreateResourceJson]) {
-		TaxableMsgFees[MsgCreateResourceJson] = createResourceJsonFeeCoins
-	}
-
-	if !createResourceDefaultFeeCoins.IsEqual(TaxableMsgFees[MsgCreateResourceDefault]) {
-		TaxableMsgFees[MsgCreateResourceDefault] = createResourceDefaultFeeCoins
-	}
-
-	if !resourceParams.BurnFactor.Equal(BurnFactors[BurnFactorResource]) {
-		BurnFactors[BurnFactorResource] = resourceParams.BurnFactor
-	}
+	BurnFactors[BurnFactorDid] = didParams.BurnFactor
+	BurnFactors[BurnFactorResource] = resourceParams.BurnFactor
 
 	return true
 }
 
-func IsIdentityTx(ctx sdk.Context, cheqdKeeper CheqdKeeper, resourceKeeper ResourceKeeper, tx sdk.Tx) (bool, sdk.Coins, sdk.Coins) {
-	_ = checkFeeParamsFromState(ctx, cheqdKeeper, resourceKeeper)
-	fee := (sdk.Coins)(nil)
+func IsTaxableTx(ctx sdk.Context, didKeeper DidKeeper, resourceKeeper ResourceKeeper, tx sdk.Tx) (bool, sdk.Coins, sdk.Coins) {
+	_ = checkFeeParamsFromSubspace(ctx, didKeeper, resourceKeeper)
+	reward := (sdk.Coins)(nil)
 	burn := (sdk.Coins)(nil)
 	msgs := tx.GetMsgs()
 	for _, msg := range msgs {
-		identityMsgFee, burnPortion, isIdentityMsg := GetTaxableMsgFeeWithBurnPortion(ctx, msg)
+		rewardPortion, burnPortion, isIdentityMsg := GetTaxableMsgFeeWithBurnPortion(ctx, msg)
 		if !isIdentityMsg {
 			continue
 		}
-		if identityMsgFee != nil {
-			fee = fee.Add(identityMsgFee...)
+		if rewardPortion != nil {
+			reward = reward.Add(rewardPortion...)
 			burn = burn.Add(burnPortion...)
 		}
 	}
 
-	if !fee.IsZero() {
-		return true, fee, burn
+	if !reward.IsZero() {
+		return true, reward, burn
 	}
 
 	return false, nil, nil
 }
 
-func IsIdentityTxLite(tx sdk.Tx) bool {
+func IsTaxableTxLite(tx sdk.Tx) bool {
 	msgs := tx.GetMsgs()
 	for _, msg := range msgs {
 		if GetTaxableMsg(msg) {

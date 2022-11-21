@@ -1,7 +1,7 @@
 package ante
 
 import (
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -14,8 +14,8 @@ type BankKeeper interface {
 	GetBalance(ctx sdk.Context, addr sdk.AccAddress, denom string) sdk.Coin
 }
 
-type CheqdKeeper interface {
-	GetParams(ctx sdk.Context) (params cheqdtypes.FeeParams)
+type DidKeeper interface {
+	GetParams(ctx sdk.Context) (params didtypes.FeeParams)
 }
 
 type ResourceKeeper interface {

@@ -1,12 +1,12 @@
 package app
 
 import (
+	"encoding/json"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 
-	"github.com/cheqd/cheqd-node/app/ante"
 	appparams "github.com/cheqd/cheqd-node/app/params"
 	did "github.com/cheqd/cheqd-node/x/did"
 	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
@@ -103,7 +103,6 @@ import (
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
 	abci "github.com/tendermint/tendermint/abci/types"
-	tmjson "github.com/tendermint/tendermint/libs/json"
 	"github.com/tendermint/tendermint/libs/log"
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
@@ -158,7 +157,7 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
-		cheqdtypes.ModuleName:          {authtypes.Burner},
+		didtypes.ModuleName:            {authtypes.Burner},
 	}
 )
 
@@ -484,10 +483,12 @@ func New(
 
 	app.didKeeper = *didkeeper.NewKeeper(
 		appCodec, keys[didtypes.StoreKey],
+		app.GetSubspace(didtypes.ModuleName),
 	)
 
 	app.resourceKeeper = *resourcekeeper.NewKeeper(
 		appCodec, keys[resourcetypes.StoreKey],
+		app.GetSubspace(resourcetypes.ModuleName),
 	)
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
@@ -627,7 +628,7 @@ func New(
 		AccountKeeper:   app.AccountKeeper,
 		BankKeeper:      app.BankKeeper,
 		FeegrantKeeper:  app.FeeGrantKeeper,
-		CheqdKeeper:     app.cheqdKeeper,
+		DidKeeper:       app.didKeeper,
 		ResourceKeeper:  app.resourceKeeper,
 		SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 		SigGasConsumer:  authante.DefaultSigVerificationGasConsumer,
@@ -687,15 +688,11 @@ func (app *App) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.Respo
 
 // InitChainer application update at chain initialization
 func (app *App) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
-	// FIXME: This should have been done from the beginning.
-	// Now this would break consensus with existing networks.
-	// so ModuleVersionMap is initialized as part of upgrade xxx.
-	// app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
-
 	var genesisState GenesisState
-	if err := tmjson.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
+	if err := json.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
 		panic(err)
 	}
+	app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
 	return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
 }
 

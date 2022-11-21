@@ -3,9 +3,15 @@ package types
 import (
 	"fmt"
 
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
+)
+
+// Default FeeParams map keys
+const (
+	DefaultKeyCreateResourceImage = "image"
+	DefaultKeyCreateResourceJson  = "json"
+	DefaultKeyCreateResource      = "default"
 )
 
 var ParamStoreKeyFeeParams = []byte("feeparams")
@@ -13,40 +19,42 @@ var ParamStoreKeyFeeParams = []byte("feeparams")
 // ParamKeyTable returns the key declaration for parameters
 func ParamKeyTable() paramstypes.KeyTable {
 	return paramstypes.NewKeyTable(
-		paramstypes.NewParamSetPair(ParamStoreKeyFeeParams, &FeeParams{}, validateFeeParams),
+		paramstypes.NewParamSetPair(ParamStoreKeyFeeParams, FeeParams{}, validateFeeParams),
 	)
 }
 
 // DefaultFeeParams returns default cheqd module tx fee parameters
 func DefaultFeeParams() *FeeParams {
 	return &FeeParams{
-		Image:      sdk.NewCoin(cheqdtypes.BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceImageFee)),
-		Json:       sdk.NewCoin(cheqdtypes.BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceJsonFee)),
-		Default:    sdk.NewCoin(cheqdtypes.BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceDefaultFee)),
-		BurnFactor: sdk.NewDecWithPrec(DefaultBurnFactorRepresentation*_PrecisionFactor, _Precision),
+		MediaTypes: map[string]sdk.Coin{
+			DefaultKeyCreateResourceImage: sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceImageFee)),
+			DefaultKeyCreateResourceJson:  sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceJsonFee)),
+			DefaultKeyCreateResource:      sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceDefaultFee)),
+		},
+		BurnFactor: sdk.MustNewDecFromStr(DefaultBurnFactor),
 	}
 }
 
 // ValidateBasic performs basic validation of cheqd module tx fee parameters
 func (tfp *FeeParams) ValidateBasic() error {
-	if !tfp.Image.IsPositive() || tfp.Image.GetDenom() != cheqdtypes.BaseMinimalDenom {
-		return fmt.Errorf("invalid create resource image tx fee: %s", tfp.Image)
+	if !tfp.MediaTypes[DefaultKeyCreateResourceImage].IsPositive() || tfp.MediaTypes[DefaultKeyCreateResourceImage].Denom != BaseMinimalDenom {
+		return fmt.Errorf("invalid create resource image tx fee: %s", tfp.MediaTypes[DefaultKeyCreateResourceImage])
 	}
 
-	if !tfp.Json.IsPositive() || tfp.Json.GetDenom() != cheqdtypes.BaseMinimalDenom {
-		return fmt.Errorf("invalid create resource json tx fee: %s", tfp.Json)
+	if !tfp.MediaTypes[DefaultKeyCreateResourceJson].IsPositive() || tfp.MediaTypes[DefaultKeyCreateResourceJson].Denom != BaseMinimalDenom {
+		return fmt.Errorf("invalid create resource json tx fee: %s", tfp.MediaTypes[DefaultKeyCreateResourceJson])
 	}
 
-	if !tfp.Default.IsPositive() || tfp.Default.GetDenom() != cheqdtypes.BaseMinimalDenom {
-		return fmt.Errorf("invalid create resource default tx fee: %s", tfp.Default)
+	if !tfp.MediaTypes[DefaultKeyCreateResourceJson].IsPositive() || tfp.MediaTypes[DefaultKeyCreateResourceJson].Denom != BaseMinimalDenom {
+		return fmt.Errorf("invalid create resource default tx fee: %s", tfp.MediaTypes[DefaultKeyCreateResourceJson])
 	}
 
-	if !tfp.Image.IsGTE(tfp.Json) {
-		return fmt.Errorf("create resource image tx fee must be greater than or equal to create resource json tx fee: %s >= %s", tfp.Image, tfp.Json)
+	if !tfp.MediaTypes[DefaultKeyCreateResourceImage].IsGTE(tfp.MediaTypes[DefaultKeyCreateResourceJson]) {
+		return fmt.Errorf("create resource image tx fee must be greater than or equal to create resource json tx fee: %s >= %s", tfp.MediaTypes[DefaultKeyCreateResourceImage], tfp.MediaTypes[DefaultKeyCreateResourceJson])
 	}
 
-	if tfp.Json.IsLTE(tfp.Default) {
-		return fmt.Errorf("create resource json tx fee must be greater than create resource default tx fee: %s > %s", tfp.Json, tfp.Default)
+	if tfp.MediaTypes[DefaultKeyCreateResourceJson].IsLTE(tfp.MediaTypes[DefaultKeyCreateResource]) {
+		return fmt.Errorf("create resource json tx fee must be greater than create resource default tx fee: %s > %s", tfp.MediaTypes[DefaultKeyCreateResourceJson], tfp.MediaTypes[DefaultKeyCreateResource])
 	}
 
 	if !tfp.BurnFactor.IsPositive() || tfp.BurnFactor.GTE(sdk.OneDec()) {
@@ -129,20 +137,20 @@ func validateBurnFactor(i interface{}) error {
 }
 
 func validateFeeParams(i interface{}) error {
-	v, ok := i.(*FeeParams)
+	v, ok := i.(FeeParams)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
 
-	if err := validateImage(v.Image); err != nil {
+	if err := validateImage(v.MediaTypes[DefaultKeyCreateResourceImage]); err != nil {
 		return err
 	}
 
-	if err := validateJson(v.Json); err != nil {
+	if err := validateJson(v.MediaTypes[DefaultKeyCreateResourceJson]); err != nil {
 		return err
 	}
 
-	if err := validateDefault(v.Default); err != nil {
+	if err := validateDefault(v.MediaTypes[DefaultKeyCreateResource]); err != nil {
 		return err
 	}
 

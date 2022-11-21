@@ -1,7 +1,7 @@
 package ante
 
 import (
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -11,7 +11,7 @@ type GenericFeeParams struct {
 }
 
 type ModuleKeeper interface {
-	GetParams(ctx sdk.Context) cheqdtypes.FeeParams
+	GetParams(ctx sdk.Context) didtypes.FeeParams
 }
 
 func BurnFee(bankKeeper BankKeeper, ctx sdk.Context, fee sdk.Coins) error {
@@ -19,7 +19,7 @@ func BurnFee(bankKeeper BankKeeper, ctx sdk.Context, fee sdk.Coins) error {
 		return sdkerrors.Wrap(sdkerrors.ErrLogic, "fee to be burnt is zero")
 	}
 
-	return bankKeeper.BurnCoins(ctx, cheqdtypes.ModuleName, fee)
+	return bankKeeper.BurnCoins(ctx, didtypes.ModuleName, fee)
 }
 
 func GetBurnFeePortion(ctx sdk.Context, burnFactor sdk.Dec, fee sdk.Coins) sdk.Coins {

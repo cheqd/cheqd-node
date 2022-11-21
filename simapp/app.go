@@ -33,7 +33,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	"github.com/cosmos/cosmos-sdk/x/auth/posthandler"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -94,11 +93,15 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
+	// ibc
+	ibckeeper "github.com/cosmos/ibc-go/v5/modules/core/keeper"
+
 	// cheqd specific imports
 	cheqdapp "github.com/cheqd/cheqd-node/app"
-	cheqd "github.com/cheqd/cheqd-node/x/cheqd"
-	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
+	cheqdposthandler "github.com/cheqd/cheqd-node/post"
+	did "github.com/cheqd/cheqd-node/x/did"
+	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resource "github.com/cheqd/cheqd-node/x/resource"
 	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
@@ -137,7 +140,7 @@ var (
 		groupmodule.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		nftmodule.AppModuleBasic{},
-		cheqd.AppModuleBasic{},
+		did.AppModuleBasic{},
 		resource.AppModuleBasic{},
 	)
 
@@ -150,7 +153,7 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		nft.ModuleName:                 nil,
-		cheqdtypes.ModuleName:          {authtypes.Burner},
+		didtypes.ModuleName:            {authtypes.Burner},
 	}
 )
 
@@ -184,13 +187,19 @@ type SimApp struct {
 	CrisisKeeper     crisiskeeper.Keeper
 	UpgradeKeeper    upgradekeeper.Keeper
 	ParamsKeeper     paramskeeper.Keeper
+	IBCKeeper        *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
 	AuthzKeeper      authzkeeper.Keeper
 	EvidenceKeeper   evidencekeeper.Keeper
 	FeeGrantKeeper   feegrantkeeper.Keeper
 	GroupKeeper      groupkeeper.Keeper
 	NFTKeeper        nftkeeper.Keeper
-	CheqdKeeper      cheqdkeeper.Keeper
+	DidKeeper        didkeeper.Keeper
 	ResourceKeeper   resourcekeeper.Keeper
+
+	// make scoped keepers public for test purposes
+	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
+	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
+	ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
 
 	// the module manager
 	mm *module.Manager
@@ -232,7 +241,7 @@ func NewSimApp(
 		govtypes.StoreKey, paramstypes.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
 		evidencetypes.StoreKey, capabilitytypes.StoreKey,
 		authzkeeper.StoreKey, nftkeeper.StoreKey, group.StoreKey,
-		cheqdtypes.StoreKey,
+		didtypes.StoreKey,
 		resourcetypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -263,6 +272,7 @@ func NewSimApp(
 	bApp.SetParamStore(app.ParamsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramstypes.ConsensusParamsKeyTable()))
 
 	app.CapabilityKeeper = capabilitykeeper.NewKeeper(appCodec, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
+
 	// Applications that wish to enforce statically created ScopedKeepers should call `Seal` after creating
 	// their scoped modules in `NewApp` with `ScopeToModule`
 	app.CapabilityKeeper.Seal()
@@ -349,12 +359,16 @@ func NewSimApp(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
-	app.CheqdKeeper = *cheqdkeeper.NewKeeper(
-		appCodec, keys[cheqdtypes.StoreKey],
+	app.DidKeeper = *didkeeper.NewKeeper(
+		appCodec,
+		keys[didtypes.StoreKey],
+		app.GetSubspace(didtypes.ModuleName),
 	)
 
 	app.ResourceKeeper = *resourcekeeper.NewKeeper(
-		appCodec, keys[resourcetypes.StoreKey],
+		appCodec,
+		keys[resourcetypes.StoreKey],
+		app.GetSubspace(resourcetypes.ModuleName),
 	)
 
 	/****  Module Options ****/
@@ -387,8 +401,8 @@ func NewSimApp(
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		groupmodule.NewAppModule(appCodec, app.GroupKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		nftmodule.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
-		cheqd.NewAppModule(appCodec, app.CheqdKeeper),
-		resource.NewAppModule(appCodec, app.ResourceKeeper, app.CheqdKeeper),
+		did.NewAppModule(appCodec, app.DidKeeper),
+		resource.NewAppModule(appCodec, app.ResourceKeeper, app.DidKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -402,7 +416,7 @@ func NewSimApp(
 		authtypes.ModuleName, banktypes.ModuleName, govtypes.ModuleName, crisistypes.ModuleName, genutiltypes.ModuleName,
 		authz.ModuleName, feegrant.ModuleName, nft.ModuleName, group.ModuleName,
 		paramstypes.ModuleName, vestingtypes.ModuleName,
-		cheqdtypes.ModuleName,
+		didtypes.ModuleName,
 		resourcetypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
@@ -412,7 +426,7 @@ func NewSimApp(
 		genutiltypes.ModuleName, evidencetypes.ModuleName, authz.ModuleName,
 		feegrant.ModuleName, nft.ModuleName, group.ModuleName,
 		paramstypes.ModuleName, upgradetypes.ModuleName, vestingtypes.ModuleName,
-		cheqdtypes.ModuleName,
+		didtypes.ModuleName,
 		resourcetypes.ModuleName,
 	)
 
@@ -427,7 +441,7 @@ func NewSimApp(
 		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName,
 		genutiltypes.ModuleName, evidencetypes.ModuleName, authz.ModuleName,
 		feegrant.ModuleName, nft.ModuleName, group.ModuleName,
-		cheqdtypes.ModuleName,
+		didtypes.ModuleName,
 		resourcetypes.ModuleName,
 		paramstypes.ModuleName, upgradetypes.ModuleName, vestingtypes.ModuleName,
 	)
@@ -489,13 +503,13 @@ func NewSimApp(
 }
 
 func (app *SimApp) setAnteHandler(txConfig client.TxConfig) {
-	anteHandler, err := cheqdapp.NewAnteHandler(
-		cheqdapp.HandlerOptions{
+	anteHandler, err := NewAnteHandler(
+		HandlerOptions{
 			AccountKeeper:   app.AccountKeeper,
 			BankKeeper:      app.BankKeeper,
 			SignModeHandler: txConfig.SignModeHandler(),
 			FeegrantKeeper:  app.FeeGrantKeeper,
-			CheqdKeeper:     app.CheqdKeeper,
+			DidKeeper:       app.DidKeeper,
 			ResourceKeeper:  app.ResourceKeeper,
 			SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
 		},
@@ -508,8 +522,13 @@ func (app *SimApp) setAnteHandler(txConfig client.TxConfig) {
 }
 
 func (app *SimApp) setPostHandler() {
-	postHandler, err := posthandler.NewPostHandler(
-		posthandler.HandlerOptions{},
+	postHandler, err := cheqdposthandler.NewPostHandler(
+		cheqdposthandler.HandlerOptions{
+			AccountKeeper:  app.AccountKeeper,
+			BankKeeper:     app.BankKeeper,
+			DidKeeper:      app.DidKeeper,
+			ResourceKeeper: app.ResourceKeeper,
+		},
 	)
 	if err != nil {
 		panic(err)
@@ -676,7 +695,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(slashingtypes.ModuleName)
 	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govv1.ParamKeyTable())
 	paramsKeeper.Subspace(crisistypes.ModuleName)
-	paramsKeeper.Subspace(cheqdtypes.ModuleName).WithKeyTable(cheqdtypes.ParamKeyTable())
+	paramsKeeper.Subspace(didtypes.ModuleName).WithKeyTable(didtypes.ParamKeyTable())
 	paramsKeeper.Subspace(resourcetypes.ModuleName).WithKeyTable(resourcetypes.ParamKeyTable())
 
 	return paramsKeeper

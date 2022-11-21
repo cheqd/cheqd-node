@@ -26,13 +26,18 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 
 	// Set did namespace
 	k.SetDidNamespace(&ctx, genState.DidNamespace)
+
+	// Set fee params
+	k.SetParams(ctx, *genState.FeeParams)
 }
 
 // ExportGenesis returns the cheqd module's exported genesis.
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
+	feeParams := k.GetParams(ctx)
 	genesis := types.GenesisState{
 		DidNamespace: k.GetDidNamespace(&ctx),
 		VersionSets:  k.GetAllDidDocs(&ctx),
+		FeeParams:    &feeParams,
 	}
 
 	return &genesis
