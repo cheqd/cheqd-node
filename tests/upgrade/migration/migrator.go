@@ -13,13 +13,14 @@ type IDataSet interface {
 }
 
 type MigrationScenario struct {
-	name      string
-	handler   func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error
+	name string
+	handler func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error
 }
 
 func NewMigrationScenario(
 	name string,
-	handler func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error) MigrationScenario {
+	handler func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error,
+) MigrationScenario {
 	return MigrationScenario{
 		name:    name,
 		handler: handler,

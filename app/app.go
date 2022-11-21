@@ -645,15 +645,15 @@ func New(
 	didMigrator := migrations.NewMigrator(
 		keys[didtypes.StoreKey],
 		keys[resourcetypes.StoreKey],
-		app.appCodec, 
-		app.didKeeper, 
-		app.resourceKeeper, 
+		app.appCodec,
+		app.didKeeper,
+		app.resourceKeeper,
 		migrations.MigrateDidV1)
 	resourceMigrator := migrations.NewMigrator(
 		keys[didtypes.StoreKey],
 		keys[resourcetypes.StoreKey],
-		app.appCodec, 
-		app.didKeeper, 
+		app.appCodec,
+		app.didKeeper,
 		app.resourceKeeper,
 		migrations.MigrateResourceV1)
 
