@@ -1,7 +1,6 @@
 package app
 
 import (
-	"encoding/json"
 	"io"
 	"net/http"
 	"os"
@@ -106,6 +105,7 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
 	tmos "github.com/tendermint/tendermint/libs/os"
+	tmjson "github.com/tendermint/tendermint/libs/json"
 	dbm "github.com/tendermint/tm-db"
 )
 
@@ -701,11 +701,16 @@ func (app *App) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.Respo
 
 // InitChainer application update at chain initialization
 func (app *App) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
+	// FIXME: This should have been done from the beginning.
+	// Now this would break consensus with existing networks.
+	// so ModuleVersionMap is initialized as part of upgrade xxx.
+	// app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
+
 	var genesisState GenesisState
-	if err := json.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
+	if err := tmjson.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
 		panic(err)
 	}
-	app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
+	// app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
 	return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
 }
 
