@@ -546,14 +546,14 @@ func New(
 		ibchost.ModuleName,
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
+		didtypes.ModuleName,
+		resourcetypes.ModuleName,
 		genutiltypes.ModuleName,
 		authz.ModuleName,
 		group.ModuleName,
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
-		didtypes.ModuleName,
-		resourcetypes.ModuleName,
 	)
 
 	app.mm.SetOrderEndBlockers(
@@ -705,7 +705,6 @@ func (app *App) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.Res
 	// Now this would break consensus with existing networks.
 	// so ModuleVersionMap is initialized as part of upgrade xxx.
 	// app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
-
 	var genesisState GenesisState
 	if err := tmjson.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
 		panic(err)
