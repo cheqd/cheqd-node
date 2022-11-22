@@ -258,22 +258,7 @@
     },
     "cheqd": {
       "didList": [],
-      "did_namespace": "mainnet",
-      "fee_params": {
-        "create_did": {
-          "denom": "ncheq",
-          "amount": "5000000000"
-        },
-        "update_did": {
-          "denom": "ncheq",
-          "amount": "2000000000"
-        }
-        },
-        "deactivate_did": {
-          "denom": "ncheq",
-          "amount": "1000000000"
-        },
-        "burn_factor": "0.500000000000000000"
+      "did_namespace": "mainnet"
       }
     },
     "crisis": {
@@ -455,22 +440,7 @@
       "missed_blocks": []
     },
     "resource": {
-      "resource_list": [],
-      "fee_params": {
-        "image": {
-          "denom": "ncheq",
-          "amount": "50000000000"
-        },
-        "json": {
-          "denom": "ncheq",
-          "amount": "20000000000"
-        },
-        "default": {
-          "denom": "ncheq",
-          "amount": "10000000000"
-        },
-        "burn_factor": "0.500000000000000000"
-      }
+      "resource_list": []
     },
     "staking": {
       "params": {

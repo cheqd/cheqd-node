@@ -1,18 +1,5 @@
 package ante
 
-// 1. Implement `txFeeChecker` to wrap the default fee checker along with the custom fee logic
-//    a. `IsTaxableTx` returns true if the tx is an identity tx (at least 1 create, update)
-//        	i. 	If true, calculate the number of identity related Msgs and the total fee
-//    		ii.	If false, handle the fee logic as default with `checkTxFeeWithValidatorMinGasPrices`
-//    b. `checkTxFeeWithCustomFixedFee` is called second to check the custom fee logic
-// 2. Override `checkDeductFee` to wrap `DeductFees` along with the custom fee logic
-//    a. `DeductFees` is called first as default fee deduction from the fee payer to the corresponding module account (where the Msg is routed -> `did` or `resource` currently)
-//    b. `DeductFeesEvent` is emitted for fee deduction from fee payer
-//    c. `BurnFees` is called to burn portion of the fee from the module account
-//    d. `BurnFeesEvent` is emitted for a predefined portion of identity fees (deducted from module account)
-//    e. `DistributeToFeeCollector` is called to distribute the predefined amount to the fee collector account
-//    f. `DistributeToFeeCollectorEvent` is emitted for the predefined amount of identity fees (deducted from module account)
-
 import (
 	"fmt"
 
@@ -22,10 +9,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
-// TxFeeChecker check if the provided fee is enough and returns the effective fee and tx priority,
-// the effective fee should be deducted later, and the priority should be returned in abci response.
-// Here the default fee checker type is augmented to return a boolean flag to indicate if the tx is an identity tx,
-// hence a custom fee logic is applied and the total custom fee is returned as well.
 type TxFeeChecker func(ctx sdk.Context, tx sdk.Tx) (sdk.Coins, int64, error)
 
 // DeductFeeDecorator deducts fees from the first signer of the tx
