@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 
 	appparams "github.com/cheqd/cheqd-node/app/params"
-	posthandler "github.com/cheqd/cheqd-node/post"
 	did "github.com/cheqd/cheqd-node/x/did"
 	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
@@ -639,19 +638,7 @@ func New(
 		tmos.Exit(err.Error())
 	}
 
-	postHandler, err := posthandler.NewPostHandler(posthandler.HandlerOptions{
-		AccountKeeper:  app.AccountKeeper,
-		BankKeeper:     app.BankKeeper,
-		FeegrantKeeper: app.FeeGrantKeeper,
-		DidKeeper:      app.didKeeper,
-		ResourceKeeper: app.resourceKeeper,
-	})
-	if err != nil {
-		tmos.Exit(err.Error())
-	}
-
 	app.SetAnteHandler(anteHandler)
-	app.SetPostHandler(postHandler)
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
