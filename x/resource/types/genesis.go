@@ -22,7 +22,15 @@ func DefaultGenesis() *GenesisState {
 // Validate performs basic genesis state validation returning an error upon any
 // failure.
 func (gs GenesisState) Validate() error {
-	return gs.ValidateNoDuplicates()
+	if err := gs.ValidateNoDuplicates(); err != nil {
+		return err
+	}
+
+	if err := gs.FeeParams.ValidateBasic(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (gs GenesisState) ValidateNoDuplicates() error {
@@ -45,10 +53,6 @@ func (gs GenesisState) ValidateNoDuplicates() error {
 
 			resourceIdMap[resource.Metadata.Id] = true
 		}
-	}
-
-	if err := gs.FeeParams.ValidateBasic(); err != nil {
-		return err
 	}
 
 	return nil

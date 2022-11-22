@@ -34,6 +34,11 @@ func (gs GenesisState) Validate() error {
 		return err
 	}
 
+	err = gs.FeeParams.ValidateBasic()
+	if err != nil {
+		return err
+	}
+
 	return gs.ValidateBasic()
 }
 
