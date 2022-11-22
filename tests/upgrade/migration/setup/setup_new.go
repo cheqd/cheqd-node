@@ -8,8 +8,8 @@ import (
 	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 	didkeeperv1 "github.com/cheqd/cheqd-node/x/did/keeper/v1"
 	didsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
-	"github.com/cheqd/cheqd-node/x/did/types"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	// didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
 	resourcekeeperv1 "github.com/cheqd/cheqd-node/x/resource/keeper/v1"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
@@ -29,8 +29,8 @@ type TestSetup struct {
 	SdkCtx sdk.Context
 	StdCtx context.Context
 
-	DidKeekerPrevious      didkeeperv1.Keeper
-	ResourceKeeperprevious resourcekeeperv1.Keeper
+	DidKeeperV1      didkeeperv1.Keeper
+	ResourceKeeperV1 resourcekeeperv1.Keeper
 
 	DidKeeper      didkeeper.Keeper
 	DidMsgServer   didtypes.MsgServer
@@ -39,13 +39,16 @@ type TestSetup struct {
 	ResourceKeeper      resourcekeeper.Keeper
 	ResourceMsgServer   resourcetypes.MsgServer
 	ResourceQueryServer resourcetypes.QueryServer
+
+	DidStoreKey      *storetypes.KVStoreKey
+	ResourceStoreKey *storetypes.KVStoreKey
 }
 
 func Setup() TestSetup {
 	// Init Codec
 	ir := codectypes.NewInterfaceRegistry()
-	types.RegisterInterfaces(ir)
-	didtypes.RegisterInterfaces(ir) // TODO: Is v1 needed?
+	didtypes.RegisterInterfaces(ir)
+	// didtypesv1.RegisterInterfaces(ir) // TODO: Is v1 needed?
 	cdc := codec.NewProtoCodec(ir)
 
 	// Init KVSore
@@ -54,7 +57,7 @@ func Setup() TestSetup {
 	dbStore := store.NewCommitMultiStore(db)
 
 	didStoreKey := sdk.NewKVStoreKey(didtypes.StoreKey)
-	resourceStoreKey := sdk.NewKVStoreKey(types.StoreKey)
+	resourceStoreKey := sdk.NewKVStoreKey(resourcetypes.StoreKey)
 
 	dbStore.MountStoreWithDB(didStoreKey, storetypes.StoreTypeIAVL, nil)
 	dbStore.MountStoreWithDB(resourceStoreKey, storetypes.StoreTypeIAVL, nil)
@@ -92,8 +95,8 @@ func Setup() TestSetup {
 		SdkCtx: ctx,
 		StdCtx: sdk.WrapSDKContext(ctx),
 
-		DidKeekerPrevious:      *didKeeperPrevious,
-		ResourceKeeperprevious: *resourceKeeperPrevious,
+		DidKeeperV1:      *didKeeperPrevious,
+		ResourceKeeperV1: *resourceKeeperPrevious,
 
 		DidKeeper:      *didKeeper,
 		DidMsgServer:   didMsgServer,
@@ -102,6 +105,9 @@ func Setup() TestSetup {
 		ResourceKeeper:      *resourceKeeper,
 		ResourceMsgServer:   resourceMsgServer,
 		ResourceQueryServer: resourceQueryServer,
+
+		DidStoreKey:      didStoreKey,
+		ResourceStoreKey: resourceStoreKey,
 	}
 
 	setup.DidKeeper.SetDidNamespace(&ctx, didsetup.DID_NAMESPACE) // TODO: Think about it
