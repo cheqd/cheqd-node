@@ -187,41 +187,68 @@ func (k Keeper) HasDidDocVersion(ctx *sdk.Context, id, version string) bool {
 	return store.Has(types.GetDidDocVersionKey(id, version))
 }
 
-// GetAllDidDocs returns all did
-// Loads all DIDs in memory. Use only for genesis export.
-func (k Keeper) GetAllDidDocs(ctx *sdk.Context) []*types.DidDocVersionSet {
+func (k Keeper) IterateDids(ctx *sdk.Context, callback func(did string) (continue_ bool)) {
 	store := ctx.KVStore(k.storeKey)
 	latestVersionIterator := sdk.KVStorePrefixIterator(store, types.GetLatestDidDocVersionPrefix())
 	defer closeIteratorOrPanic(latestVersionIterator)
-
-	var didDocs []*types.DidDocVersionSet
 
 	for ; latestVersionIterator.Valid(); latestVersionIterator.Next() {
 		// Get did from key
 		key := string(latestVersionIterator.Key())
 		did := strings.Split(key, ":")[1]
 
-		// Get the latest version
-		latestVersion := string(latestVersionIterator.Value())
+		if !callback(did) {
+			break
+		}
+	}
+}
+
+func (k Keeper) IterateDidDocVersions(ctx *sdk.Context, did string, callback func(version types.DidDocWithMetadata) (continue_ bool)) {
+	store := ctx.KVStore(k.storeKey)
+	versionIterator := sdk.KVStorePrefixIterator(store, types.GetDidDocVersionsPrefix(did))
+	defer closeIteratorOrPanic(versionIterator)
+
+	for ; versionIterator.Valid(); versionIterator.Next() {
+		var didDoc types.DidDocWithMetadata
+		k.cdc.MustUnmarshal(versionIterator.Value(), &didDoc)
+
+		if !callback(didDoc) {
+			break
+		}
+	}
+}
+
+// GetAllDidDocs returns all did
+// Loads all DIDs in memory. Use only for genesis export.
+func (k Keeper) GetAllDidDocs(ctx *sdk.Context) ([]*types.DidDocVersionSet, error) {
+	var didDocs []*types.DidDocVersionSet
+	var err error
+
+	k.IterateDids(ctx, func(did string) bool {
+		var latestVersion string
+		latestVersion, err = k.GetLatestDidDocVersion(ctx, did)
+		if err != nil {
+			return false
+		}
 
 		didDocVersionSet := types.DidDocVersionSet{
 			LatestVersion: latestVersion,
 		}
 
-		// Get all versions
-		versionIterator := sdk.KVStorePrefixIterator(store, types.GetDidDocVersionsPrefix(did))
-		defer closeIteratorOrPanic(versionIterator)
+		k.IterateDidDocVersions(ctx, did, func(version types.DidDocWithMetadata) bool {
+			didDocVersionSet.DidDocs = append(didDocVersionSet.DidDocs, &version)
 
-		for ; versionIterator.Valid(); versionIterator.Next() {
-			// Get the diddoc
-			var didDoc types.DidDocWithMetadata
-			k.cdc.MustUnmarshal(versionIterator.Value(), &didDoc)
+			return true
+		})
 
-			didDocVersionSet.DidDocs = append(didDocVersionSet.DidDocs, &didDoc)
-		}
+		return true
+	})
+
+	if err != nil {
+		return nil, err
 	}
 
-	return didDocs
+	return didDocs, nil
 }
 
 func closeIteratorOrPanic(iterator sdk.Iterator) {
