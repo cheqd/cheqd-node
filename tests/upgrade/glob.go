@@ -7,10 +7,14 @@ import (
 	"path/filepath"
 )
 
-func Glob(path string) ([]string, error) {
+func RelGlob(relativePath ...string) ([]string, error) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		return nil, err
 	}
-	return filepath.Glob(filepath.Join(cwd, path))
+
+	relativePathJoined := filepath.Join(relativePath...)
+	fullPath := filepath.Join(cwd, relativePathJoined)
+
+	return filepath.Glob(fullPath)
 }

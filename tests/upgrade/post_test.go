@@ -16,11 +16,6 @@ import (
 
 var _ = Describe("Upgrade - Post", func() {
 	Context("After a software upgrade execution has concluded", func() {
-		var ModuleVersionMap upgradetypes.QueryModuleVersionsResponse
-		var DidDocCreateRecord didtypesv1.Did
-		var DidDocUpdateRecord didtypesv1.Did
-		var ResourceCreateRecord resourcetypesv1.ResourceHeader
-		var err error
 
 		It("should wait for node catching up", func() {
 			By("pinging the node status until catching up is flagged as false")
@@ -30,7 +25,8 @@ var _ = Describe("Upgrade - Post", func() {
 
 		It("should match the expected module version map", func() {
 			By("loading the expected module version map")
-			err = Loader(filepath.Join(GENERATED_JSON_DIR, "expected", "module_version_map", "v1.json"), &ModuleVersionMap)
+			var ModuleVersionMap upgradetypes.QueryModuleVersionsResponse
+			err := Loader(filepath.Join(GENERATED_JSON_DIR, "expected", "module_version_map", "v1.json"), &ModuleVersionMap)
 
 			By("matching the expected module version map")
 			res, err := cli.QueryModuleVersionMap(cli.VALIDATOR0)
@@ -41,11 +37,13 @@ var _ = Describe("Upgrade - Post", func() {
 
 		It("should load and run expected diddoc payloads - case: create", func() {
 			By("matching the glob pattern for existing diddoc payloads")
-			ExpectedDidDocCreateRecords, err = Glob(filepath.Join(GENERATED_JSON_DIR, "expected", "diddoc", "create", "*.json"))
+			ExpectedDidDocCreateRecords, err := RelGlob(GENERATED_JSON_DIR, "expected", "diddoc", "create", "*.json")
 			Expect(err).To(BeNil())
 
 			for _, payload := range ExpectedDidDocCreateRecords {
-				testCase, _ := GetCase(payload)
+				var DidDocCreateRecord didtypesv1.Did
+
+				testCase := GetCaseName(payload)
 				By("Running: query " + testCase)
 				err = Loader(payload, &DidDocCreateRecord)
 				Expect(err).To(BeNil())
@@ -63,11 +61,13 @@ var _ = Describe("Upgrade - Post", func() {
 
 		It("should load and run expected diddoc payloads - case: update", func() {
 			By("matching the glob pattern for existing diddoc payloads")
-			ExpectedDidDocUpdateRecords, err = Glob(filepath.Join(GENERATED_JSON_DIR, "expected", "diddoc", "update", "*.json"))
+			ExpectedDidDocUpdateRecords, err := RelGlob(GENERATED_JSON_DIR, "expected", "diddoc", "update", "*.json")
 			Expect(err).To(BeNil())
 
 			for _, payload := range ExpectedDidDocUpdateRecords {
-				testCase, _ := GetCase(payload)
+				var DidDocUpdateRecord didtypesv1.Did
+
+				testCase := GetCaseName(payload)
 				By("Running: query " + testCase)
 				err = Loader(payload, &DidDocUpdateRecord)
 				Expect(err).To(BeNil())
@@ -85,11 +85,13 @@ var _ = Describe("Upgrade - Post", func() {
 
 		It("should load and run expected resource payloads - case: create", func() {
 			By("matching the glob pattern for existing resource payloads")
-			ExpectedResourceCreateRecords, err = Glob(filepath.Join(GENERATED_JSON_DIR, "expected", "resource", "create", "*.json"))
+			ExpectedResourceCreateRecords, err := RelGlob(GENERATED_JSON_DIR, "expected", "resource", "create", "*.json")
 			Expect(err).To(BeNil())
 
 			for _, payload := range ExpectedResourceCreateRecords {
-				testCase, _ := GetCase(payload)
+				var ResourceCreateRecord resourcetypesv1.ResourceHeader
+
+				testCase := GetCaseName(payload)
 				By("Running: query " + testCase)
 				err = Loader(payload, &ResourceCreateRecord)
 				Expect(err).To(BeNil())

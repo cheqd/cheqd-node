@@ -17,24 +17,20 @@ import (
 
 var _ = Describe("Upgrade - Pre", func() {
 	Context("Before a softare upgrade execution is initiated", func() {
-		var DidDocCreatePayload didtypesv1.MsgCreateDidPayload
-		var DidDocCreateSignInput []cli.SignInput
-		var DidDocUpdatePayload didtypesv1.MsgUpdateDidPayload
-		var DidDocUpdateSignInput []cli.SignInput
-		var ResourceCreatePayload resourcetypesv1.MsgCreateResourcePayload
-		var ResourceCreateSignInput []cli.SignInput
-		var err error
 		It("should load and run existing diddoc payloads - case: create", func() {
 			By("matching the glob pattern for existing diddoc payloads")
-			ExistingDidDocCreatePayloads, err = Glob(filepath.Join(GENERATED_JSON_DIR, "existing", "diddoc", "create", "*.json"))
+			ExistingDidDocCreatePayloads, err := RelGlob(GENERATED_JSON_DIR, "existing", "diddoc", "create", "*.json")
 			Expect(err).To(BeNil())
 
 			By("matching the glob pattern for existing diddoc sign input")
-			ExistingSignInputCreatePayloads, err = Glob(filepath.Join(GENERATED_JSON_DIR, "existing", "diddoc", "create", "signinput", "*.json"))
+			ExistingSignInputCreatePayloads, err := RelGlob(GENERATED_JSON_DIR, "existing", "diddoc", "create", "signinput", "*.json")
 			Expect(err).To(BeNil())
 
 			for i, payload := range ExistingDidDocCreatePayloads {
-				testCase, _ := GetCase(payload)
+				var DidDocCreatePayload didtypesv1.MsgCreateDidPayload
+				var DidDocCreateSignInput []cli.SignInput
+
+				testCase := GetCaseName(payload)
 				By("Running: " + testCase)
 				err = Loader(payload, &DidDocCreatePayload)
 				Expect(err).To(BeNil())
@@ -50,11 +46,11 @@ var _ = Describe("Upgrade - Pre", func() {
 
 		It("should load and run existing resource payloads - case: create", func() {
 			By("matching the glob pattern for existing resource payloads")
-			ExistingResourceCreatePayloads, err = Glob(filepath.Join(GENERATED_JSON_DIR, "existing", "resource", "create", "*.json"))
+			ExistingResourceCreatePayloads, err := RelGlob(GENERATED_JSON_DIR, "existing", "resource", "create", "*.json")
 			Expect(err).To(BeNil())
 
 			By("matching the glob pattern for existing resource sign input")
-			ExistingSignInputCreatePayloads, err = Glob(filepath.Join(GENERATED_JSON_DIR, "existing", "resource", "create", "signinput", "*.json"))
+			ExistingSignInputCreatePayloads, err := RelGlob(GENERATED_JSON_DIR, "existing", "resource", "create", "signinput", "*.json")
 			Expect(err).To(BeNil())
 
 			By("copying the existing resource file to the container")
@@ -64,7 +60,10 @@ var _ = Describe("Upgrade - Pre", func() {
 			Expect(err).To(BeNil())
 
 			for i, payload := range ExistingResourceCreatePayloads {
-				testCase, _ := GetCase(payload)
+				var ResourceCreatePayload resourcetypesv1.MsgCreateResourcePayload
+				var ResourceCreateSignInput []cli.SignInput
+
+				testCase := GetCaseName(payload)
 				By("Running: " + testCase)
 				err = Loader(payload, &ResourceCreatePayload)
 				Expect(err).To(BeNil())
@@ -81,15 +80,18 @@ var _ = Describe("Upgrade - Pre", func() {
 
 		It("should load and run existing diddoc payloads - case: update", func() {
 			By("matching the glob pattern for existing diddoc payloads")
-			ExistingDidDocUpdatePayloads, err = Glob(filepath.Join(GENERATED_JSON_DIR, "existing", "diddoc", "update", "*.json"))
+			ExistingDidDocUpdatePayloads, err := RelGlob(GENERATED_JSON_DIR, "existing", "diddoc", "update", "*.json")
 			Expect(err).To(BeNil())
 
 			By("matching the glob pattern for existing diddoc sign input")
-			ExistingSignInputUpdatePayloads, err = Glob(filepath.Join(GENERATED_JSON_DIR, "existing", "diddoc", "update", "signinput", "*.json"))
+			ExistingSignInputUpdatePayloads, err := RelGlob(GENERATED_JSON_DIR, "existing", "diddoc", "update", "signinput", "*.json")
 			Expect(err).To(BeNil())
 
 			for i, payload := range ExistingDidDocUpdatePayloads {
-				testCase, _ := GetCase(payload)
+				var DidDocUpdatePayload didtypesv1.MsgUpdateDidPayload
+				var DidDocUpdateSignInput []cli.SignInput
+
+				testCase := GetCaseName(payload)
 				By("Running: " + testCase)
 				err = Loader(payload, &DidDocUpdatePayload)
 				Expect(err).To(BeNil())
@@ -109,9 +111,12 @@ var _ = Describe("Upgrade - Pre", func() {
 			}
 		})
 
+		var UPGRADE_HEIGHT int64
+		var VOTING_END_HEIGHT int64
+
 		It("should calculate the upgrade height", func() {
 			By("getting the current block height and calculating the voting end height")
-			UPGRADE_HEIGHT, VOTING_END_HEIGHT, HEIGHT_ERROR = cli.CalculateUpgradeHeight(cli.VALIDATOR0, cli.CLI_BINARY_NAME)
+			UPGRADE_HEIGHT, VOTING_END_HEIGHT, HEIGHT_ERROR := cli.CalculateUpgradeHeight(cli.VALIDATOR0, cli.CLI_BINARY_NAME)
 			Expect(HEIGHT_ERROR).To(BeNil())
 			fmt.Printf("Upgrade height: %d\n", UPGRADE_HEIGHT)
 			fmt.Printf("Voting end height: %d\n", VOTING_END_HEIGHT)
