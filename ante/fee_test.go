@@ -371,3 +371,65 @@ func (s *AnteTestSuite) TestTaxableTxOverallLifecycleSimulated() {
 
 	s.Require().Equal(feeCollectorBalance.Amount, reward.AmountOf(didtypes.BaseMinimalDenom), "Reward was not sent to the fee collector")
 }
+
+func (s *AnteTestSuite) TestNonTaxableTxOverallLifecycleSimulated() {
+	s.SetupTest(false) // setup
+	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
+
+	// keys and addresses
+	priv1, _, addr1 := testdata.KeyTestPubAddr()
+
+	// msg and signatures
+	msg := testdata.NewTestMsg(addr1)
+	feeAmount := NewTestFeeAmount()
+	gasLimit := testdata.NewTestGasLimit()
+	s.Require().NoError(s.txBuilder.SetMsgs(msg))
+	s.txBuilder.SetFeeAmount(feeAmount)
+	s.txBuilder.SetGasLimit(gasLimit)
+	s.txBuilder.SetFeePayer(addr1)
+
+	privs, accNums, accSeqs := []cryptotypes.PrivKey{priv1}, []uint64{0}, []uint64{0}
+	tx, err := s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
+	s.Require().NoError(err)
+
+	// set account with sufficient funds
+	acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
+	s.app.AccountKeeper.SetAccount(s.ctx, acc)
+	amount := sdk.NewInt(300_000_000_000)
+	err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
+	s.Require().NoError(err)
+
+	dfd := cheqdante.NewDeductFeeDecorator(s.app.AccountKeeper, s.app.BankKeeper, nil, s.app.DidKeeper, s.app.ResourceKeeper, nil)
+	antehandler := sdk.ChainAnteDecorators(dfd)
+
+	taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper)
+	posthandler := sdk.ChainAnteDecorators(taxDecorator)
+
+	// get supply before tx
+	supplyBeforeDeflation, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
+	s.Require().NoError(err)
+
+	// antehandler should not error since we make sure that the fee is sufficient in DeliverTx (simulate=false only, Posthandler will check it otherwise)
+	_, err = antehandler(s.ctx, tx, true)
+	s.Require().Nil(err, "Tx errored when fee payer had sufficient funds and provided sufficient fee")
+
+	_, err = posthandler(s.ctx, tx, true)
+	s.Require().Nil(err, "Tx errored when fee payer had sufficient funds and provided sufficient fee while subtracting tax")
+
+	// check balance of fee payer
+	balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
+	s.Require().Equal(amount.Sub(sdk.NewInt(feeAmount.AmountOf(didtypes.BaseMinimalDenom).Int64())), balance.Amount, "Tax was not subtracted from the fee payer")
+
+	// get supply after tx
+	supplyAfterDeflation, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
+	s.Require().NoError(err)
+
+	// check that supply was not deflated
+	s.Require().Equal(supplyBeforeDeflation, supplyAfterDeflation, "Supply was deflated")
+
+	// check that reward has been sent to the fee collector
+	feeCollector := s.app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName)
+	feeCollectorBalance := s.app.BankKeeper.GetBalance(s.ctx, feeCollector, didtypes.BaseMinimalDenom)
+
+	s.Require().Equal(feeCollectorBalance.Amount, feeAmount.AmountOf(didtypes.BaseMinimalDenom), "Fee was not sent to the fee collector")
+}
