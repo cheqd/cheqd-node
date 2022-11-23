@@ -56,15 +56,16 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 
 	fee := feeTx.GetFee()
 	gas := feeTx.GetGas()
-	burn := (sdk.Coins)(nil)
 
 	// check if the tx is a taxable tx
 	// CONTRACT: Taxable tx is a tx that has at least 1 taxable related Msg.
-	taxable, reward, burn := IsTaxableTx(ctx, dfd.didKeeper, dfd.resourceKeeper, tx)
+	taxable := IsTaxableTxLite(tx)
 	// if taxable, check if the fee is enough to be included in the mempool
 	if taxable {
 		// check if the fee is enough to be included in the mempool
 		if !simulate {
+			// calculate spread
+			_, reward, burn := IsTaxableTx(ctx, dfd.didKeeper, dfd.resourceKeeper, tx)
 			// define tax as the sum of reward and burn
 			tax := reward.Add(burn...)
 			_, priority, err = IsSufficientFee(ctx, tax, reward, burn, fee, int64(gas))
