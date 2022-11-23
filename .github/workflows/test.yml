@@ -231,7 +231,7 @@ jobs:
       - name: Run post-upgrade tests
         working-directory: ./tests/upgrade
         run: |
-          ginkgo -r --tags upgrade --race --focus-file post_test.go
+          ginkgo -r --tags upgrade --race --focus-file post_test.go --keep-going --trace --junit-report ../../report-upgrade-post.xml
 
       # Integration tests
 

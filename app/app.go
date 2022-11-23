@@ -705,6 +705,7 @@ func New(
 			stakingSubspace, _ := app.ParamsKeeper.GetSubspace(stakingtypes.ModuleName)
 			stakingSubspace.Set(ctx, stakingtypes.KeyMinCommissionRate, sdk.NewDec(0))
 
+			// TODO: Why do we skip modules?
 			// Get version map from previous upgrade
 			versionMap := app.mm.GetVersionMap()
 			// Skip capability module

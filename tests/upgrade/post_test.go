@@ -4,7 +4,6 @@ package upgrade
 
 import (
 	"path/filepath"
-	"reflect"
 
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/cli"
 	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
@@ -25,14 +24,14 @@ var _ = Describe("Upgrade - Post", func() {
 
 		It("should match the expected module version map", func() {
 			By("loading the expected module version map")
-			var ModuleVersionMap upgradetypes.QueryModuleVersionsResponse
-			err := Loader(filepath.Join(GENERATED_JSON_DIR, "expected", "module_version_map", "v1.json"), &ModuleVersionMap)
+			var expected upgradetypes.QueryModuleVersionsResponse
+			err := Loader(filepath.Join(GENERATED_JSON_DIR, "expected", "module_version_map", "v1.json"), &expected)
 
 			By("matching the expected module version map")
-			res, err := cli.QueryModuleVersionMap(cli.VALIDATOR0)
+			actual, err := cli.QueryModuleVersionMap(cli.VALIDATOR0)
 			Expect(err).To(BeNil())
-			ok := reflect.DeepEqual(ModuleVersionMap.ModuleVersions, res.ModuleVersions)
-			Expect(ok).To(BeTrue())
+
+			Expect(actual.ModuleVersions).To(Equal(expected.ModuleVersions), "module version map mismatch")
 		})
 
 		It("should load and run expected diddoc payloads - case: create", func() {

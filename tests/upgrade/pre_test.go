@@ -17,6 +17,12 @@ import (
 
 var _ = Describe("Upgrade - Pre", func() {
 	Context("Before a softare upgrade execution is initiated", func() {
+		It("should wait for chain to bootstrap", func() {
+			By("pinging the node status until the dvoting end height is reached")
+			err := cli.WaitForChainHeight(cli.VALIDATOR0, cli.CLI_BINARY_NAME, cli.BOOTSTRAP_HEIGHT, cli.BOOTSTRAP_PERIOD)
+			Expect(err).To(BeNil())
+		})
+
 		It("should load and run existing diddoc payloads - case: create", func() {
 			By("matching the glob pattern for existing diddoc payloads")
 			ExistingDidDocCreatePayloads, err := RelGlob(GENERATED_JSON_DIR, "existing", "diddoc", "create", "*.json")
@@ -116,8 +122,9 @@ var _ = Describe("Upgrade - Pre", func() {
 
 		It("should calculate the upgrade height", func() {
 			By("getting the current block height and calculating the voting end height")
-			UPGRADE_HEIGHT, VOTING_END_HEIGHT, HEIGHT_ERROR := cli.CalculateUpgradeHeight(cli.VALIDATOR0, cli.CLI_BINARY_NAME)
-			Expect(HEIGHT_ERROR).To(BeNil())
+			var err error
+			UPGRADE_HEIGHT, VOTING_END_HEIGHT, err = cli.CalculateUpgradeHeight(cli.VALIDATOR0, cli.CLI_BINARY_NAME)
+			Expect(err).To(BeNil())
 			fmt.Printf("Upgrade height: %d\n", UPGRADE_HEIGHT)
 			fmt.Printf("Voting end height: %d\n", VOTING_END_HEIGHT)
 		})
