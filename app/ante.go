@@ -13,11 +13,8 @@ import (
 )
 
 // HandlerOptions are the options required for constructing a default SDK AnteHandler.
-// Here we extend the default exposed `BankKeeper` with our own extended `BankKeeper` interface.
-// This allows us to add our own custom logic to the default SDK AnteHandler.
-// Our custom logic is:
-//  1. To burn portion of the transaction fee.
-//  2. Distribute a pre-defined portion of the transaction fee to the validators as rewards (default behavior).
+// Here we add the cheqd ante decorators, which extend default SDK AnteHandler.
+// didKeeper and resourceKeeper are required for the cheqd ante decorators.
 type HandlerOptions struct {
 	AccountKeeper          ante.AccountKeeper
 	BankKeeper             cheqdante.BankKeeper
