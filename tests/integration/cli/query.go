@@ -57,16 +57,16 @@ func QuerySupplyOf(denom string) (banktypes.QuerySupplyOfResponse, error) {
 	return resp, nil
 }
 
-func QueryParams(subspace, key string) (paramproposal.QueryParamsResponse, error) {
+func QueryParams(subspace, key string) (paramproposal.ParamChange, error) {
 	res, err := Query("params", "subspace", subspace, key)
 	if err != nil {
-		return paramproposal.QueryParamsResponse{}, err
+		return paramproposal.ParamChange{}, err
 	}
 
-	var resp paramproposal.QueryParamsResponse
+	var resp paramproposal.ParamChange
 	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
-		return paramproposal.QueryParamsResponse{}, err
+		return paramproposal.ParamChange{}, err
 	}
 
 	return resp, nil
