@@ -3,7 +3,6 @@
 package upgrade
 
 import (
-	"encoding/json"
 	"path/filepath"
 
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/cli"
@@ -27,7 +26,6 @@ var _ = Describe("Upgrade - Post", func() {
 			By("loading the expected module version map")
 			var expected upgradetypes.QueryModuleVersionsResponse
 			err := Loader(filepath.Join(GENERATED_JSON_DIR, "expected", "module_version_map", "v1.json"), &expected)
-			println(json.Marshal(expected))
 
 			By("matching the expected module version map")
 			actual, err := cli.QueryModuleVersionMap(cli.VALIDATOR0)
