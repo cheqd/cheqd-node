@@ -1,9 +1,8 @@
 package helpers
 
-func GenerateFees(amount, feePayer string) []string {
+func GenerateFees(amount string) []string {
 	return []string{
 		"--fees", amount,
-		"--fee-payer", feePayer,
 		"--broadcast-mode", "block",
 	}
 }

@@ -639,7 +639,7 @@ func New(
 		tmos.Exit(err.Error())
 	}
 
-	postHandler, err := posthandler.NewPostHandler(posthandler.HandlerOptions{
+	_, err = posthandler.NewPostHandler(posthandler.HandlerOptions{
 		AccountKeeper:  app.AccountKeeper,
 		BankKeeper:     app.BankKeeper,
 		FeegrantKeeper: app.FeeGrantKeeper,
@@ -651,7 +651,7 @@ func New(
 	}
 
 	app.SetAnteHandler(anteHandler)
-	app.SetPostHandler(postHandler)
+	// app.SetPostHandler(postHandler)
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
