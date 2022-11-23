@@ -7,7 +7,7 @@ import (
 	"fmt"
 
 	"github.com/cheqd/cheqd-node/tests/integration/cli"
-	"github.com/cheqd/cheqd-node/tests/integration/helpers"
+	//"github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
 	"github.com/cheqd/cheqd-node/tests/integration/testdata"
 	clitypes "github.com/cheqd/cheqd-node/x/did/client/cli"
@@ -59,7 +59,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		}
 	})
 
-	It("should tax create diddoc message - case: fixed fee", func() {
+	/* It("should tax create diddoc message - case: fixed fee", func() {
 		feeParams := helpers.GenerateFees("5000000000ncheq")
 
 		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_2, feeParams)
@@ -73,9 +73,9 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		//   2. Check supply deflation
 		//   3. Check events
 		//      - fee: {amount: 5000000000ncheq, payer: <fee payer>, granter: <granter>}
-	})
+	}) */
 
-	/* It("should tax create diddoc message - case: simulation", func() {
+	It("should tax create diddoc message - case: simulation", func() {
 		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_2, cli.CLI_SIMULATION_PARAMS)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
@@ -87,5 +87,5 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		//   2. Check supply deflation
 		//   3. Check events
 		//      - fee: {amount: 5000000000ncheq, payer: <fee payer>, granter: <granter>}
-	}) */
+	})
 })
