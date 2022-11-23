@@ -20,7 +20,7 @@ var CLI_TX_PARAMS = []string{
 	"--yes",
 }
 
-var CLI_SIMULATION_PARAMS = []string{
+var CLI_GAS_PARAMS = []string{
 	"--gas", GAS,
 	"--gas-adjustment", GAS_ADJUSTMENT,
 	"--gas-prices", GAS_PRICES,

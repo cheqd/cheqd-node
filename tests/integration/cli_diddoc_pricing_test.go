@@ -75,8 +75,8 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		//      - fee: {amount: 5000000000ncheq, payer: <fee payer>, granter: <granter>}
 	}) */
 
-	It("should tax create diddoc message - case: simulation", func() {
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_2, cli.CLI_SIMULATION_PARAMS)
+	It("should tax create diddoc message - case: gas estimation", func() {
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_2, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
