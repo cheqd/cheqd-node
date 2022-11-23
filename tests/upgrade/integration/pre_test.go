@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	integrationtestdata "github.com/cheqd/cheqd-node/tests/integration/testdata"
-	cli "github.com/cheqd/cheqd-node/tests/upgrade/cli"
+	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/cli"
 	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
 	govtypesv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"

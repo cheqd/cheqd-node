@@ -1,7 +1,7 @@
 package scenarios
 
 import (
-	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/migration/setup"
+	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/unit/setup"
 
 	appmigrations "github.com/cheqd/cheqd-node/app/migrations"
 	sdk "github.com/cosmos/cosmos-sdk/types"

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/migration/setup"
+	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/unit/setup"
 
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 
@@ -73,7 +73,7 @@ func (cb *ChecksumBuilder) buildExistingDids() error {
 func (cb *ChecksumBuilder) buildExistingResources() error {
 	var existingResource resourcetypes.ResourceWithMetadata
 	files, err := cb.loader.GetLsitOfFiles(
-		filepath.Join(GENERATED_JSON_DIR, "payload", "existing", "v2", "checksum"), 
+		filepath.Join(GENERATED_JSON_DIR, "payload", "existing", "v2", "checksum"),
 		"resource")
 	if err != nil {
 		return err

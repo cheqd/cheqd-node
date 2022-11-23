@@ -1,9 +1,8 @@
 package scenarios
 
 import (
-	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/migration/setup"
+	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/unit/setup"
 )
-
 
 type IBuilder interface {
 	buildExistingDids() error

@@ -7,9 +7,10 @@ import (
 	"strings"
 
 	// integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
-	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/migration/setup"
+	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/unit/setup"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
+
 	// didutils "github.com/cheqd/cheqd-node/x/did/utils"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
@@ -35,7 +36,7 @@ type ILoader interface {
 	GetLsitOfFiles(path_to_dir, prefix string) ([]string, error)
 }
 
-type Loader struct {}
+type Loader struct{}
 
 func (l Loader) GetLsitOfFiles(path_to_dir, prefix string) ([]string, error) {
 

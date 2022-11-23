@@ -1,9 +1,9 @@
 package migration
 
 import (
+	. "github.com/cheqd/cheqd-node/tests/upgrade/unit/scenarios"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	. "github.com/cheqd/cheqd-node/tests/upgrade/migration/scenarios"
 )
 
 var _ = Describe("Migration - Unit", func() {
@@ -12,7 +12,7 @@ var _ = Describe("Migration - Unit", func() {
 
 		// Run checksum migration scenario
 		err := RunChecksumScenario()
-		Expect(err).To(BeNil())	
+		Expect(err).To(BeNil())
 	})
 
 	It("checks that Protobuf migration handler works", func() {

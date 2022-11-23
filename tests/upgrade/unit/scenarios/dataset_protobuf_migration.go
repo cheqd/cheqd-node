@@ -5,7 +5,7 @@ import (
 
 	. "github.com/onsi/gomega"
 
-	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/migration/setup"
+	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/unit/setup"
 
 	// didtestssetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
@@ -16,16 +16,16 @@ import (
 )
 
 type ProtobufBuilder struct {
-	setup migrationsetup.TestSetup
+	setup  migrationsetup.TestSetup
 	loader Loader
-	pfd ProtobufDataSet
+	pfd    ProtobufDataSet
 }
 
 func NewProtobufBuilder(setup migrationsetup.TestSetup) ProtobufBuilder {
 	return ProtobufBuilder{
 		setup:  setup,
 		loader: Loader{},
-		pfd:   NewProtobufDataSet(setup),
+		pfd:    NewProtobufDataSet(setup),
 	}
 }
 
@@ -72,7 +72,7 @@ func (pb *ProtobufBuilder) BuildDataSet(setup migrationsetup.TestSetup) (Protobu
 func (pb *ProtobufBuilder) buildExistingDids() error {
 	var existingDidDoc didtypesv1.StateValue
 	files, err := pb.loader.GetLsitOfFiles(
-		filepath.Join(GENERATED_JSON_DIR, "payload", "existing", "v1", "protobuf"), 
+		filepath.Join(GENERATED_JSON_DIR, "payload", "existing", "v1", "protobuf"),
 		"diddoc")
 	if err != nil {
 		return err
@@ -94,7 +94,7 @@ func (pb *ProtobufBuilder) buildExistingDids() error {
 func (pb *ProtobufBuilder) buildExistingResources() error {
 	var existingResource resourcetypesv1.Resource
 	files, err := pb.loader.GetLsitOfFiles(
-		filepath.Join(GENERATED_JSON_DIR, "payload", "existing", "v1", "protobuf"), 
+		filepath.Join(GENERATED_JSON_DIR, "payload", "existing", "v1", "protobuf"),
 		"resource")
 	if err != nil {
 		return err

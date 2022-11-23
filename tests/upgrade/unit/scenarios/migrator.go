@@ -2,7 +2,7 @@ package scenarios
 
 import (
 	appmigrations "github.com/cheqd/cheqd-node/app/migrations"
-	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/migration/setup"
+	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/unit/setup"
 )
 
 type Migrator struct {
@@ -16,7 +16,7 @@ func NewMigrator(
 	setup migrationsetup.TestSetup,
 	dataSet IDataSet,
 ) Migrator {
-	
+
 	return Migrator{
 		migrations: migrations,
 		dataSet:    dataSet,

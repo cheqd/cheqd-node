@@ -5,7 +5,7 @@ package upgrade
 import (
 	"path/filepath"
 
-	cli "github.com/cheqd/cheqd-node/tests/upgrade/cli"
+	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/cli"
 	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
