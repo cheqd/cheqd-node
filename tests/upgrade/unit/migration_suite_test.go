@@ -9,5 +9,5 @@ import (
 
 func TestMigration(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Migration Suite")
+	RunSpecs(t, "Upgrade Unit Suite")
 }
