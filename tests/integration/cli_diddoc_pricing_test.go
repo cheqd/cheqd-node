@@ -60,9 +60,9 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 	})
 
 	It("should tax create diddoc message - case: fixed fee", func() {
-		feeParams := helpers.GenerateFees("5000000000ncheq")
+		feeParams := helpers.GenerateFees("5000000000ncheq", testdata.BASE_ACCOUNT_2_ADDR)
 
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_1, feeParams)
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_2, feeParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -76,7 +76,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 	})
 
 	It("should tax create diddoc message - case: simulation", func() {
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_1, cli.CLI_SIMULATION_PARAMS)
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_2, cli.CLI_SIMULATION_PARAMS)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
