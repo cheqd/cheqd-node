@@ -1,39 +1,9 @@
-package migration
+package scenarios
 
 import (
 	appmigrations "github.com/cheqd/cheqd-node/app/migrations"
 	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/migration/setup"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
-
-type IDataSet interface {
-	Load() error
-	Prepare() error
-	Validate() error
-}
-
-type MigrationScenario struct {
-	name    string
-	handler func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error
-}
-
-func NewMigrationScenario(
-	name string,
-	handler func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error,
-) MigrationScenario {
-	return MigrationScenario{
-		name:    name,
-		handler: handler,
-	}
-}
-
-func (m MigrationScenario) Name() string {
-	return m.name
-}
-
-func (m MigrationScenario) Handler() func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error {
-	return m.handler
-}
 
 type Migrator struct {
 	migrations []MigrationScenario
@@ -46,6 +16,7 @@ func NewMigrator(
 	setup migrationsetup.TestSetup,
 	dataSet IDataSet,
 ) Migrator {
+	
 	return Migrator{
 		migrations: migrations,
 		dataSet:    dataSet,
@@ -75,4 +46,24 @@ func (m Migrator) Prepare() error {
 
 func (m Migrator) Validate() error {
 	return m.dataSet.Validate()
+}
+
+func (m Migrator) Run() error {
+	// err := m.LoadDataSet()
+	// if err != nil {
+	// 	return err
+	// }
+	err := m.Prepare()
+	if err != nil {
+		return err
+	}
+	err = m.Migrate()
+	if err != nil {
+		return err
+	}
+	err = m.Validate()
+	if err != nil {
+		return err
+	}
+	return nil
 }

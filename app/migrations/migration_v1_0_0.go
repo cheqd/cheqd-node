@@ -14,7 +14,7 @@ import (
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
-	resourcetypesV1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
+	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
 
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -28,7 +28,7 @@ func MigrateDidV1(sctx sdk.Context, mctx MigrationContext) error {
 		return err
 	}
 
-	err = MigrateDidUUIDV1(sctx, mctx)
+	err = MigrateDidUUIDV2(sctx, mctx)
 	if err != nil {
 		return err
 	}
@@ -44,13 +44,13 @@ func MigrateDidV1(sctx sdk.Context, mctx MigrationContext) error {
 // Resoure migrations
 func MigrateResourceV1(sctx sdk.Context, mctx MigrationContext) error {
 	// Resource Checksum migration
-	err := MigrateResourceChecksumV1(sctx, mctx)
+	err := MigrateResourceChecksumV2(sctx, mctx)
 	if err != nil {
 		return err
 	}
 
 	// Resource Version Links migration
-	err = MigrateResourceVersionLinksV1(sctx, mctx)
+	err = MigrateResourceVersionLinksV2(sctx, mctx)
 	if err != nil {
 		return err
 	}
@@ -73,8 +73,7 @@ func MigrateDidProtobufV1(sctx sdk.Context, mctx MigrationContext) error {
 }
 
 func MigrateDidProtobufDIDocV1(sctx sdk.Context, mctx MigrationContext) error {
-	var iterator sdk.Iterator
-	var stateValue didtypesV1.StateValue
+	var didKeys []IteratorKey
 
 	ir := codectypes.NewInterfaceRegistry()
 
@@ -83,23 +82,25 @@ func MigrateDidProtobufDIDocV1(sctx sdk.Context, mctx MigrationContext) error {
 
 	CdcV1 := codec.NewProtoCodec(ir)
 
+	didKeys = CollectAllKeys(sctx, mctx.didStoreKey, StrBytes(didtypesV1.DidKey))
+
 	store := prefix.NewStore(
 		sctx.KVStore(mctx.didStoreKey),
 		StrBytes(didtypesV1.DidKey))
-	iterator = sdk.KVStorePrefixIterator(store, []byte{})
 
-	closeIteratorOrPanic(iterator)
+	for _, didKey := range didKeys {
+		var stateValue didtypesV1.StateValue
+		var newDidDocWithMetadata didtypes.DidDocWithMetadata
+		CdcV1.MustUnmarshal(store.Get(didKey), &stateValue)
 
-	for ; iterator.Valid(); iterator.Next() {
-		CdcV1.MustUnmarshal(iterator.Value(), &stateValue)
+		newDidDocWithMetadata, err := StateValueToDIDDocWithMetadata(&stateValue)
 
-		newDidDocWithMetadata, err := StateValueToDIDDocWithMetadata(stateValue)
 		if err != nil {
 			return err
 		}
 
 		// Remove old DID Doc
-		store.Delete(iterator.Key())
+		store.Delete(didKey)
 
 		// Set new DID Doc
 		err = mctx.didKeeper.AddNewDidDocVersion(&sctx, &newDidDocWithMetadata)
@@ -112,6 +113,8 @@ func MigrateDidProtobufDIDocV1(sctx sdk.Context, mctx MigrationContext) error {
 }
 
 func MigrateDidProtobufResourceV1(sctx sdk.Context, mctx MigrationContext) error {
+
+	var headerKeys []IteratorKey
 	// Reset counter
 	countStore := sctx.KVStore(mctx.resourceStoreKey)
 	countKey := didutils.StrBytes(resourcetypes.ResourceCountKey)
@@ -121,27 +124,19 @@ func MigrateDidProtobufResourceV1(sctx sdk.Context, mctx MigrationContext) error
 	headerStore := sctx.KVStore(mctx.resourceStoreKey)
 	dataStore := sctx.KVStore(mctx.resourceStoreKey)
 
-	// Iterators for old headers and data
-	headerIterator := sdk.KVStorePrefixIterator(
-		headerStore,
-		didutils.StrBytes(resourcetypesV1.ResourceHeaderKey))
-	dataIterator := sdk.KVStorePrefixIterator(
-		dataStore,
-		didutils.StrBytes(resourcetypesV1.ResourceDataKey))
+	headerKeys = CollectAllKeys(sctx, mctx.resourceStoreKey, StrBytes(resourcetypesv1.ResourceHeaderKey))
 
-	closeIteratorOrPanic(headerIterator)
-	closeIteratorOrPanic(dataIterator)
+	for _, headerKey := range headerKeys {
+		// ToDo: Make it more readable and understandable.
+		// For now it's because Dids were set using just id as a key, but resources used 2 storages with prefixes for keys
+		headerKey := []byte(resourcetypesv1.ResourceHeaderKey + string(headerKey))
+		dataKey := ResourceV1HeaderkeyToDataKey(headerKey)
 
-	for headerIterator.Valid() {
-		if !dataIterator.Valid() {
-			panic("number of headers and data don't match")
-		}
-
-		var headerV1 resourcetypesV1.ResourceHeader
+		var headerV1 resourcetypesv1.ResourceHeader
 		var dataV1 []byte
 
-		mctx.codec.MustUnmarshal(headerIterator.Value(), &headerV1)
-		dataV1 = dataIterator.Value()
+		mctx.codec.MustUnmarshal(headerStore.Get(headerKey), &headerV1)
+		dataV1 = dataStore.Get(dataKey)
 
 		newMetadata := resourcetypes.Metadata{
 			CollectionId:      headerV1.CollectionId,
@@ -165,24 +160,20 @@ func MigrateDidProtobufResourceV1(sctx sdk.Context, mctx MigrationContext) error
 		}
 
 		// Remove old resource data and header
-		headerStore.Delete(headerIterator.Key())
-		dataStore.Delete(dataIterator.Key())
+		headerStore.Delete(headerKey)
+		dataStore.Delete(dataKey)
 
 		// Write new resource
 		err := mctx.resourceKeeper.SetResource(&sctx, &resourceWithMetadata)
 		if err != nil {
 			return err
 		}
-
-		// Iterate next
-		headerIterator.Next()
-		dataIterator.Next()
 	}
 	return nil
 }
 
 // Migration because we need to fix the algo for checksum calculation
-func MigrateResourceChecksumV1(sctx sdk.Context, mctx MigrationContext) error {
+func MigrateResourceChecksumV2(sctx sdk.Context, mctx MigrationContext) error {
 	metadataStore := sctx.KVStore(mctx.resourceStoreKey)
 	dataStore := sctx.KVStore(mctx.resourceStoreKey)
 	metadataIterator := sdk.KVStorePrefixIterator(
@@ -225,7 +216,7 @@ func MigrateResourceChecksumV1(sctx sdk.Context, mctx MigrationContext) error {
 }
 
 // Recalculate resource links
-func MigrateResourceVersionLinksV1(sctx sdk.Context, mctx MigrationContext) error {
+func MigrateResourceVersionLinksV2(sctx sdk.Context, mctx MigrationContext) error {
 	// 	// TODO: We have to reset links first. Then we can use GetLastResourceVersionHeader
 	// 	// but only because resources in state are corted by creation time.
 	// 	// Also, we need to avoid loading all resources in memory.
@@ -270,7 +261,7 @@ func MigrateResourceVersionLinksV1(sctx sdk.Context, mctx MigrationContext) erro
 }
 
 // Migration for making UUID case-insensitive
-func MigrateDidUUIDV1(sctx sdk.Context, mctx MigrationContext) error {
+func MigrateDidUUIDV2(sctx sdk.Context, mctx MigrationContext) error {
 	// 	var iterator sdk.Iterator
 	// 	var stateValue didtypes.StateValue
 	// 	var payload didtypes.MsgCreateDidPayload
@@ -357,7 +348,7 @@ func MigrateDidIndyStyleIdsV1ResourceModule(sctx sdk.Context, mctx MigrationCont
 	metadataStore := sctx.KVStore(mctx.resourceStoreKey)
 	metadataIterator := sdk.KVStorePrefixIterator(
 		metadataStore,
-		didutils.StrBytes(resourcetypesV1.ResourceHeaderKey))
+		didutils.StrBytes(resourcetypesv1.ResourceHeaderKey))
 
 	closeIteratorOrPanic(metadataIterator)
 

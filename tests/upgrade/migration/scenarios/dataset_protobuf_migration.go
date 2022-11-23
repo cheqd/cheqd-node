@@ -1,7 +1,6 @@
-package migration
+package scenarios
 
 import (
-	"fmt"
 	"path/filepath"
 
 	. "github.com/onsi/gomega"
@@ -15,6 +14,20 @@ import (
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
 )
+
+type ProtobufBuilder struct {
+	setup migrationsetup.TestSetup
+	loader Loader
+	pfd ProtobufDataSet
+}
+
+func NewProtobufBuilder(setup migrationsetup.TestSetup) ProtobufBuilder {
+	return ProtobufBuilder{
+		setup:  setup,
+		loader: Loader{},
+		pfd:   NewProtobufDataSet(setup),
+	}
+}
 
 type ProtobufDataSet struct {
 	setup             migrationsetup.TestSetup
@@ -34,69 +47,125 @@ func NewProtobufDataSet(setup migrationsetup.TestSetup) ProtobufDataSet {
 	}
 }
 
-func (pds *ProtobufDataSet) Load() error {
-	var (
-		existingProtobufDidDoc   didtypesv1.StateValue
-		existingProtobufResource resourcetypesv1.Resource
+func (pb *ProtobufBuilder) BuildDataSet(setup migrationsetup.TestSetup) (ProtobufDataSet, error) {
+	err := pb.buildExistingDids()
 
-		expectedProtobufDidDoc   didtypes.DidDocWithMetadata
-		expectedProtobufResource resourcetypes.ResourceWithMetadata
-	)
-	// Get DIDDoc v1
-	err := Loader(
-		filepath.Join("payload", "existing", "v1", "protobuf", "diddoc.json"),
-		&existingProtobufDidDoc,
-		pds.setup)
 	if err != nil {
-		fmt.Println("Error loading didDoc")
-		return err
+		return ProtobufDataSet{}, err
 	}
-	// Get resource v1
-	err = Loader(
-		filepath.Join("payload", "existing", "v1", "protobuf", "resource.json"),
-		&existingProtobufResource,
-		pds.setup)
+	err = pb.buildExistingResources()
 	if err != nil {
-		fmt.Println("Error loading resource v1")
-		return err
+		return ProtobufDataSet{}, err
 	}
-	// Get DIDDoc v2
-	err = Loader(
-		filepath.Join("payload", "expected", "v2", "protobuf", "diddoc.json"),
-		&expectedProtobufDidDoc,
-		pds.setup)
+	err = pb.buildExpectedDids()
 	if err != nil {
-		fmt.Println("Error loading didDoc v2")
-		return err
+		return ProtobufDataSet{}, err
+	}
+	err = pb.buildExpectedResources()
+	if err != nil {
+		return ProtobufDataSet{}, err
 	}
 
-	// Get resource v2
-	err = Loader(
-		filepath.Join("payload", "expected", "v2", "protobuf", "resource.json"),
-		&expectedProtobufResource,
-		pds.setup)
+	return pb.pfd, err
+}
+
+func (pb *ProtobufBuilder) buildExistingDids() error {
+	var existingDidDoc didtypesv1.StateValue
+	files, err := pb.loader.GetLsitOfFiles(
+		filepath.Join(GENERATED_JSON_DIR, "payload", "existing", "v1", "protobuf"), 
+		"diddoc")
 	if err != nil {
-		fmt.Println("Error loading expectedChecksumResource")
 		return err
 	}
+	for _, path_to_file := range files {
+		err = pb.loader.LoadFile(
+			path_to_file,
+			&existingDidDoc,
+			pb.setup,
+		)
+		if err != nil {
+			return err
+		}
+		pb.pfd.existingDIDDocs = append(pb.pfd.existingDIDDocs, existingDidDoc)
+	}
+	return nil
+}
 
-	pds.existingDIDDocs = append(pds.existingDIDDocs, existingProtobufDidDoc)
-	pds.existingResources = append(pds.existingResources, existingProtobufResource)
+func (pb *ProtobufBuilder) buildExistingResources() error {
+	var existingResource resourcetypesv1.Resource
+	files, err := pb.loader.GetLsitOfFiles(
+		filepath.Join(GENERATED_JSON_DIR, "payload", "existing", "v1", "protobuf"), 
+		"resource")
+	if err != nil {
+		return err
+	}
+	for _, path_to_file := range files {
+		err = pb.loader.LoadFile(
+			path_to_file,
+			&existingResource,
+			pb.setup,
+		)
+		if err != nil {
+			return err
+		}
+		pb.pfd.existingResources = append(pb.pfd.existingResources, existingResource)
+	}
+	return nil
+}
 
-	pds.expectedDidDocs = append(pds.expectedDidDocs, expectedProtobufDidDoc)
-	pds.expectedResources = append(pds.expectedResources, expectedProtobufResource)
+func (pb *ProtobufBuilder) buildExpectedDids() error {
+	var expectedDidDoc didtypes.DidDocWithMetadata
+	files, err := pb.loader.GetLsitOfFiles(
+		filepath.Join(GENERATED_JSON_DIR, "payload", "expected", "v2", "protobuf"),
+		"diddoc")
+	if err != nil {
+		return err
+	}
+	for _, path_to_file := range files {
+		err := pb.loader.LoadFile(
+			path_to_file,
+			&expectedDidDoc,
+			pb.setup,
+		)
+		if err != nil {
+			return err
+		}
+		pb.pfd.expectedDidDocs = append(pb.pfd.expectedDidDocs, expectedDidDoc)
+	}
+	return nil
+}
+
+func (pb *ProtobufBuilder) buildExpectedResources() error {
+	var expectedResource resourcetypes.ResourceWithMetadata
+	files, err := pb.loader.GetLsitOfFiles(
+		filepath.Join(GENERATED_JSON_DIR, "payload", "expected", "v2", "protobuf"),
+		"resource")
+	if err != nil {
+		return err
+	}
+	for _, path_to_file := range files {
+		err = pb.loader.LoadFile(
+			path_to_file,
+			&expectedResource,
+			pb.setup,
+		)
+		if err != nil {
+			return err
+		}
+		pb.pfd.expectedResources = append(pb.pfd.expectedResources, expectedResource)
+	}
 	return nil
 }
 
 func (pds *ProtobufDataSet) Prepare() error {
-	for _, resource := range pds.existingResources {
-		err := pds.setup.ResourceKeeperV1.SetResource(&pds.setup.SdkCtx, &resource)
+	for _, didDoc := range pds.existingDIDDocs {
+		err := pds.setup.DidKeeperV1.SetDid(&pds.setup.SdkCtx, &didDoc)
 		if err != nil {
 			return err
 		}
 	}
-	for _, didDoc := range pds.existingDIDDocs {
-		err := pds.setup.DidKeeperV1.SetDid(&pds.setup.SdkCtx, &didDoc)
+	for _, resource := range pds.existingResources {
+		err := pds.setup.ResourceKeeperV1.SetResource(&pds.setup.SdkCtx, &resource)
 		if err != nil {
 			return err
 		}

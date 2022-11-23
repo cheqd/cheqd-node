@@ -3,10 +3,14 @@ package migrations
 import (
 	"crypto/sha256"
 	"encoding/json"
+	"strings"
 
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	didutils "github.com/cheqd/cheqd-node/x/did/utils"
+	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
+	"github.com/cosmos/cosmos-sdk/store/prefix"
+	"github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gogo/protobuf/proto"
 	"github.com/mr-tron/base58"
@@ -16,25 +20,33 @@ type StateValueData interface {
 	proto.Message
 }
 
-func StateValueToDIDDocWithMetadata(stateValue didtypesv1.StateValue) (didtypes.DidDocWithMetadata, error) {
-	var err error
+type IteratorKey []byte
+
+func StateValueToDIDDocWithMetadata(stateValue *didtypesv1.StateValue) (didtypes.DidDocWithMetadata, error) {
+
+	var newDidDoc didtypes.DidDoc
+	var newMetadata didtypes.Metadata
+
 	didDoc, err := stateValue.UnpackDataAsDid()
 	metadata := stateValue.Metadata
 	if err != nil {
 		return didtypes.DidDocWithMetadata{}, err
 	}
-	newDidDoc := NewDidDocFromV1(didDoc)
-	newMetadata := &didtypes.Metadata{
+	
+	NewDidDocFromV1(didDoc, &newDidDoc)
+	newMetadata = didtypes.Metadata{
 		Created:     metadata.Created,
 		Updated:     metadata.Updated,
 		Deactivated: metadata.Deactivated,
 		VersionId:   metadata.VersionId,
 		// ToDo: should we make it self-linked?
-		NextVersionId:     metadata.VersionId,
-		PreviousVersionId: metadata.VersionId,
+		NextVersionId:     "",
+		PreviousVersionId: "",
 	}
 
-	return didtypes.NewDidDocWithMetadata(newDidDoc, newMetadata), err
+	return didtypes.DidDocWithMetadata{
+		DidDoc:  &newDidDoc,
+		Metadata: &newMetadata}, nil
 }
 
 func GetVerificationMaterial(vm *didtypesv1.VerificationMethod) string {
@@ -68,7 +80,7 @@ func GetVerificationMaterial(vm *didtypesv1.VerificationMethod) string {
 	return string(res)
 }
 
-func NewDidDocFromV1(didV1 *didtypesv1.Did) *didtypes.DidDoc {
+func NewDidDocFromV1(didV1 *didtypesv1.Did, newDidDoc *didtypes.DidDoc) {
 	vms := []*didtypes.VerificationMethod{}
 	for _, vm := range didV1.VerificationMethod {
 		vms = append(
@@ -90,19 +102,17 @@ func NewDidDocFromV1(didV1 *didtypesv1.Did) *didtypes.DidDoc {
 				ServiceEndpoint: []string{srv.ServiceEndpoint},
 			})
 	}
-	return &didtypes.DidDoc{
-		Context:              didV1.Context,
-		Id:                   didV1.Id,
-		Controller:           didV1.Controller,
-		VerificationMethod:   vms,
-		Authentication:       didV1.Authentication,
-		AssertionMethod:      didV1.AssertionMethod,
-		CapabilityInvocation: didV1.CapabilityInvocation,
-		CapabilityDelegation: didV1.CapabilityDelegation,
-		KeyAgreement:         didV1.KeyAgreement,
-		Service:              srvs,
-		AlsoKnownAs:          didV1.AlsoKnownAs,
-	}
+	newDidDoc.Id = didV1.Id
+	newDidDoc.VerificationMethod = vms
+	newDidDoc.Service = srvs
+	newDidDoc.Context = didV1.Context
+	newDidDoc.Controller = didV1.Controller
+	newDidDoc.Authentication = didV1.Authentication
+	newDidDoc.AssertionMethod = didV1.AssertionMethod
+	newDidDoc.CapabilityDelegation = didV1.CapabilityDelegation
+	newDidDoc.CapabilityInvocation = didV1.CapabilityInvocation
+	newDidDoc.KeyAgreement = didV1.KeyAgreement
+	newDidDoc.AlsoKnownAs = didV1.AlsoKnownAs
 }
 
 // Make Indy-Style identifiers
@@ -180,6 +190,30 @@ func MoveToIndyStyleIds(didDoc *didtypes.DidDocWithMetadata) {
 	didDoc.DidDoc.CapabilityInvocation = IndyStyleDidUrlList(didDoc.DidDoc.CapabilityInvocation)
 	didDoc.DidDoc.CapabilityDelegation = IndyStyleDidUrlList(didDoc.DidDoc.CapabilityDelegation)
 	didDoc.DidDoc.KeyAgreement = IndyStyleDidUrlList(didDoc.DidDoc.KeyAgreement)
+}
+
+func CollectAllKeys(ctx sdk.Context, storeKey *types.KVStoreKey, prefixKey []byte) []IteratorKey {
+	keys := []IteratorKey{}
+	store := prefix.NewStore(
+		ctx.KVStore(storeKey),
+		prefixKey)
+
+	iterator := sdk.KVStorePrefixIterator(store, []byte{})
+	closeIteratorOrPanic(iterator)
+
+	for ; iterator.Valid(); iterator.Next() {
+		keys = append(keys, IteratorKey(iterator.Key()))
+	}
+	return keys
+}
+
+func ResourceV1HeaderkeyToDataKey(headerKey []byte) []byte {
+	return []byte(
+		strings.Replace(
+			string(headerKey),
+			string(resourcetypesv1.ResourceHeaderKey),
+			string(resourcetypesv1.ResourceDataKey),
+			1))
 }
 
 func closeIteratorOrPanic(iterator sdk.Iterator) {

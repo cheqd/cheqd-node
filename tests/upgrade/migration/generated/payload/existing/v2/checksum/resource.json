@@ -1,14 +1,14 @@
 {
     "Metadata": {
-        "CollectionId": "97096fb1-63ea-4f81-b296-8eb5da6ab6eb",
+        "Collection_Id": "97096fb1-63ea-4f81-b296-8eb5da6ab6eb",
         "Id": "7f2589aa-1279-4bd7-b704-f868772b460a",
         "Name": "Test Resource",
-        "ResourceType": "test-resource-type",
-        "MediaType": "application/json",
+        "Resource_Type": "test-resource-type",
+        "Media_Type": "application/json",
         "Created": "2022-11-01T10:54:01Z",
         "Checksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855eyAibWVzc2FnZSI6ICJoZWxsbyB3b3JsZCJ9",
-        "PreviousVersionId": null,
-        "NextVersionId": null
+        "Previous_Version_Id": null,
+        "Next_Version_Id": null
     },
     "Resource": {
         "Data": "eyAibWVzc2FnZSI6ICJoZWxsbyB3b3JsZCJ9"

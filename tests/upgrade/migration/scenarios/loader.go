@@ -1,9 +1,10 @@
-package migration
+package scenarios
 
 import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 
 	// integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/migration/setup"
@@ -29,16 +30,31 @@ type DidAndMetadata struct {
 	Metadata didtypesv1.Metadata
 }
 
-func Loader(
+type ILoader interface {
+	LoadFile(path string, dataChunk any, setup migrationsetup.TestSetup) error
+	GetLsitOfFiles(path_to_dir, prefix string) ([]string, error)
+}
+
+type Loader struct {}
+
+func (l Loader) GetLsitOfFiles(path_to_dir, prefix string) ([]string, error) {
+
+	files_to_load := []string{}
+	err := filepath.Walk(path_to_dir, func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() && strings.HasPrefix(info.Name(), prefix) {
+			files_to_load = append(files_to_load, path)
+		}
+		return nil
+	})
+	return files_to_load, err
+}
+
+func (l Loader) LoadFile(
 	path string,
 	dataChunk any,
 	setup migrationsetup.TestSetup,
 ) error {
-	cwd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-	file, err := os.ReadFile(filepath.Join(cwd, GENERATED_JSON_DIR, path))
+	file, err := os.ReadFile(path)
 	if err != nil {
 		return err
 	}
