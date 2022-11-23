@@ -12,7 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/bank/testutil"
 )
 
-func (s *AnteTestSuite) TestDeductFeeDecorator_ZeroGas() {
+func (s *AnteTestSuite) TestEnsureZeroMempoolFeesOnSimulationCheckTx() {
 	s.SetupTest(true) // setup
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
@@ -47,7 +47,7 @@ func (s *AnteTestSuite) TestDeductFeeDecorator_ZeroGas() {
 	s.Require().NoError(err)
 }
 
-func (s *AnteTestSuite) TestEnsureMempoolFees() {
+func (s *AnteTestSuite) TestEnsureMempoolFeesOnCheckTx() {
 	s.SetupTest(true) // setup
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
@@ -110,7 +110,7 @@ func (s *AnteTestSuite) TestEnsureMempoolFees() {
 	s.Require().Equal(int64(10)*didtypes.BaseFactor, newCtx.Priority())
 }
 
-func (s *AnteTestSuite) TestDeductFees() {
+func (s *AnteTestSuite) TestDeductFeesOnDeliverTx() {
 	s.SetupTest(false) // setup
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
@@ -154,48 +154,7 @@ func (s *AnteTestSuite) TestDeductFees() {
 	s.Require().Nil(err, "Tx errored after account has been set with sufficient funds")
 }
 
-func (s *AnteTestSuite) TestTaxableTxMempoolExcluded() {
-	s.SetupTest(true) // setup
-	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
-
-	// keys and addresses
-	priv1, _, addr1 := testdata.KeyTestPubAddr()
-
-	// msg and signatures
-	msg := SandboxDidDoc()
-	feeAmount := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(1_000_000_000)))
-	gasLimit := testdata.NewTestGasLimit()
-	s.Require().NoError(s.txBuilder.SetMsgs(msg))
-	s.txBuilder.SetFeeAmount(feeAmount)
-	s.txBuilder.SetGasLimit(gasLimit)
-
-	privs, accNums, accSeqs := []cryptotypes.PrivKey{priv1}, []uint64{0}, []uint64{0}
-	tx, err := s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
-	s.Require().NoError(err)
-
-	// set account with sufficient funds
-	acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
-	s.app.AccountKeeper.SetAccount(s.ctx, acc)
-	err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(10_000_000_000))))
-	s.Require().NoError(err)
-
-	dfd := cheqdante.NewDeductFeeDecorator(s.app.AccountKeeper, s.app.BankKeeper, nil, s.app.DidKeeper, s.app.ResourceKeeper, nil)
-	antehandler := sdk.ChainAnteDecorators(dfd)
-
-	_, err = antehandler(s.ctx, tx, false)
-
-	s.Require().NotNil(err, "Tx did not error when fee payer had sufficient funds and provided lower fee than required")
-
-	// set checkTx to false
-	s.ctx = s.ctx.WithIsCheckTx(false)
-
-	// antehandler should error since we make sure that the fee is sufficient in DeliverTx (simulate=false only, Posthandler will check it otherwise)
-	_, err = antehandler(s.ctx, tx, false)
-
-	s.Require().NotNil(err, "Tx did not error when fee payer had sufficient funds and provided lower fee than required when checkTx is false")
-}
-
-func (s *AnteTestSuite) TestTaxableTxMempoolIncluded() {
+func (s *AnteTestSuite) TestTaxableTxMempoolInclusionOnCheckTx() {
 	s.SetupTest(true) // setup
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
@@ -225,18 +184,18 @@ func (s *AnteTestSuite) TestTaxableTxMempoolIncluded() {
 
 	_, err = antehandler(s.ctx, tx, false)
 
-	s.Require().Nil(err, "Tx errored when fee payer had sufficient funds and provided sufficient fee")
+	s.Require().Nil(err, "Tx errored when taxable on checkTx")
 
 	// set checkTx to false
 	s.ctx = s.ctx.WithIsCheckTx(false)
 
-	// antehandler should not error since we make sure that the fee is sufficient in DeliverTx (simulate=false only, Posthandler will check it otherwise)
+	// antehandler should not error to replay in mempool or deliverTx
 	_, err = antehandler(s.ctx, tx, false)
 
-	s.Require().Nil(err, "Tx errored when fee payer had sufficient funds and provided sufficient fee when checkTx is false")
+	s.Require().Nil(err, "Tx errored when taxable on deliverTx")
 }
 
-func (s *AnteTestSuite) TestTaxableTxOverallLifecycleNonSimulated() {
+func (s *AnteTestSuite) TestTaxableTxLifecycleOnDeliverTx() {
 	s.SetupTest(false) // setup
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
@@ -273,12 +232,12 @@ func (s *AnteTestSuite) TestTaxableTxOverallLifecycleNonSimulated() {
 	supplyBeforeDeflation, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
 	s.Require().NoError(err)
 
-	// antehandler should not error since we make sure that the fee is sufficient in DeliverTx (simulate=false only, Posthandler will check it otherwise)
+	// antehandler should not error to replay in mempool or deliverTx
 	_, err = antehandler(s.ctx, tx, false)
-	s.Require().Nil(err, "Tx errored when fee payer had sufficient funds and provided sufficient fee")
+	s.Require().Nil(err, "Tx errored when taxable on deliverTx")
 
 	_, err = posthandler(s.ctx, tx, false)
-	s.Require().Nil(err, "Tx errored when fee payer had sufficient funds and provided sufficient fee while subtracting tax")
+	s.Require().Nil(err, "Tx errored when fee payer had sufficient funds and provided sufficient fee while subtracting tax on deliverTx")
 
 	// get fee params
 	feeParams := s.app.DidKeeper.GetParams(s.ctx)
@@ -293,7 +252,7 @@ func (s *AnteTestSuite) TestTaxableTxOverallLifecycleNonSimulated() {
 	s.Require().NoError(err)
 
 	// check that supply was deflated
-	burnt := cheqdante.GetBurnFeePortion(s.ctx, feeParams.BurnFactor, sdk.NewCoins(createDidTax))
+	burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(createDidTax))
 	s.Require().Equal(supplyBeforeDeflation.Sub(supplyAfterDeflation...), burnt, "Supply was not deflated")
 
 	// check that reward has been sent to the fee collector
@@ -304,76 +263,8 @@ func (s *AnteTestSuite) TestTaxableTxOverallLifecycleNonSimulated() {
 	s.Require().Equal(feeCollectorBalance.Amount, reward.AmountOf(didtypes.BaseMinimalDenom), "Reward was not sent to the fee collector")
 }
 
-func (s *AnteTestSuite) TestTaxableTxOverallLifecycleSimulated() {
-	s.SetupTest(false) // setup
-	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
-
-	// keys and addresses
-	priv1, _, addr1 := testdata.KeyTestPubAddr()
-
-	// msg and signatures
-	msg := SandboxDidDoc()
-	feeAmount := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(5_000_000_000)))
-	gasLimit := testdata.NewTestGasLimit()
-	s.Require().NoError(s.txBuilder.SetMsgs(msg))
-	s.txBuilder.SetFeeAmount(feeAmount)
-	s.txBuilder.SetGasLimit(gasLimit)
-	s.txBuilder.SetFeePayer(addr1)
-
-	privs, accNums, accSeqs := []cryptotypes.PrivKey{priv1}, []uint64{0}, []uint64{0}
-	tx, err := s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
-	s.Require().NoError(err)
-
-	// set account with sufficient funds
-	acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
-	s.app.AccountKeeper.SetAccount(s.ctx, acc)
-	amount := sdk.NewInt(100_000_000_000)
-	err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
-	s.Require().NoError(err)
-
-	dfd := cheqdante.NewDeductFeeDecorator(s.app.AccountKeeper, s.app.BankKeeper, nil, s.app.DidKeeper, s.app.ResourceKeeper, nil)
-	antehandler := sdk.ChainAnteDecorators(dfd)
-
-	taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper)
-	posthandler := sdk.ChainAnteDecorators(taxDecorator)
-
-	// get supply before tx
-	supplyBeforeDeflation, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
-	s.Require().NoError(err)
-
-	// antehandler should not error since we make sure that the fee is sufficient in DeliverTx (simulate=false only, Posthandler will check it otherwise)
-	_, err = antehandler(s.ctx, tx, true)
-	s.Require().Nil(err, "Tx errored when fee payer had sufficient funds and provided sufficient fee")
-
-	_, err = posthandler(s.ctx, tx, true)
-	s.Require().Nil(err, "Tx errored when fee payer had sufficient funds and provided sufficient fee while subtracting tax")
-
-	// get fee params
-	feeParams := s.app.DidKeeper.GetParams(s.ctx)
-
-	// check balance of fee payer
-	balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
-	createDidTax := feeParams.TxTypes[didtypes.DefaultKeyCreateDid]
-	s.Require().Equal(amount.Sub(sdk.NewInt(createDidTax.Amount.Int64())), balance.Amount, "Tax was not subtracted from the fee payer")
-
-	// get supply after tx
-	supplyAfterDeflation, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
-	s.Require().NoError(err)
-
-	// check that supply was deflated
-	burnt := cheqdante.GetBurnFeePortion(s.ctx, feeParams.BurnFactor, sdk.NewCoins(createDidTax))
-	s.Require().Equal(supplyBeforeDeflation.Sub(supplyAfterDeflation...), burnt, "Supply was not deflated")
-
-	// check that reward has been sent to the fee collector
-	reward := cheqdante.GetRewardPortion(sdk.NewCoins(createDidTax), burnt)
-	feeCollector := s.app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName)
-	feeCollectorBalance := s.app.BankKeeper.GetBalance(s.ctx, feeCollector, didtypes.BaseMinimalDenom)
-
-	s.Require().Equal(feeCollectorBalance.Amount, reward.AmountOf(didtypes.BaseMinimalDenom), "Reward was not sent to the fee collector")
-}
-
-func (s *AnteTestSuite) TestNonTaxableTxOverallLifecycleSimulated() {
-	s.SetupTest(false) // setup
+func (s *AnteTestSuite) TestNonTaxableTxLifecycleOnDeliverTx() {
+	s.SetupTest(false) // setup for DeliverTx
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
 	// keys and addresses
@@ -406,30 +297,90 @@ func (s *AnteTestSuite) TestNonTaxableTxOverallLifecycleSimulated() {
 	posthandler := sdk.ChainAnteDecorators(taxDecorator)
 
 	// get supply before tx
-	supplyBeforeDeflation, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
+	supplyBefore, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
 	s.Require().NoError(err)
 
 	// antehandler should not error since we make sure that the fee is sufficient in DeliverTx (simulate=false only, Posthandler will check it otherwise)
-	_, err = antehandler(s.ctx, tx, true)
-	s.Require().Nil(err, "Tx errored when fee payer had sufficient funds and provided sufficient fee")
+	_, err = antehandler(s.ctx, tx, false)
+	s.Require().Nil(err, "Tx errored when non-taxable on deliverTx")
 
-	_, err = posthandler(s.ctx, tx, true)
-	s.Require().Nil(err, "Tx errored when fee payer had sufficient funds and provided sufficient fee while subtracting tax")
+	_, err = posthandler(s.ctx, tx, false)
+	s.Require().Nil(err, "Tx errored when non-taxable on deliverTx from posthandler")
 
 	// check balance of fee payer
 	balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
-	s.Require().Equal(amount.Sub(sdk.NewInt(feeAmount.AmountOf(didtypes.BaseMinimalDenom).Int64())), balance.Amount, "Tax was not subtracted from the fee payer")
+	s.Require().Equal(amount.Sub(sdk.NewInt(feeAmount.AmountOf(didtypes.BaseMinimalDenom).Int64())), balance.Amount, "Fee amount subtracted was not equal to fee amount required for non-taxable tx")
 
 	// get supply after tx
-	supplyAfterDeflation, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
+	supplyAfter, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
 	s.Require().NoError(err)
 
 	// check that supply was not deflated
-	s.Require().Equal(supplyBeforeDeflation, supplyAfterDeflation, "Supply was deflated")
+	s.Require().Equal(supplyBefore, supplyAfter, "Supply was deflated")
 
 	// check that reward has been sent to the fee collector
 	feeCollector := s.app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName)
 	feeCollectorBalance := s.app.BankKeeper.GetBalance(s.ctx, feeCollector, didtypes.BaseMinimalDenom)
 
 	s.Require().Equal(feeCollectorBalance.Amount, feeAmount.AmountOf(didtypes.BaseMinimalDenom), "Fee was not sent to the fee collector")
+}
+
+func (s *AnteTestSuite) TestTaxableTxLifecycleOnDeliverTxSimulation() {
+	s.SetupTest(false) // setup
+	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
+
+	// keys and addresses
+	priv1, _, addr1 := testdata.KeyTestPubAddr()
+
+	// msg and signatures
+	msg := testdata.NewTestMsg(addr1)
+	s.Require().NoError(s.txBuilder.SetMsgs(msg))
+
+	// set zero gas
+	s.txBuilder.SetGasLimit(0)
+
+	privs, accNums, accSeqs := []cryptotypes.PrivKey{priv1}, []uint64{0}, []uint64{0}
+	tx, err := s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
+	s.Require().NoError(err)
+
+	// set account with sufficient funds
+	acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
+	s.app.AccountKeeper.SetAccount(s.ctx, acc)
+	amount := sdk.NewInt(100_000_000_000)
+	err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
+	s.Require().NoError(err)
+
+	dfd := cheqdante.NewDeductFeeDecorator(s.app.AccountKeeper, s.app.BankKeeper, nil, s.app.DidKeeper, s.app.ResourceKeeper, nil)
+	antehandler := sdk.ChainAnteDecorators(dfd)
+
+	taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper)
+	posthandler := sdk.ChainAnteDecorators(taxDecorator)
+
+	// get supply before tx
+	supplyBefore, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
+	s.Require().NoError(err)
+
+	// antehandler should not error since we make sure that the fee is sufficient in DeliverTx (simulate=false only, Posthandler will check it otherwise)
+	_, err = antehandler(s.ctx, tx, true)
+	s.Require().Nil(err, "Tx errored when taxable on deliverTx simulation mode")
+
+	_, err = posthandler(s.ctx, tx, true)
+	s.Require().Nil(err, "Tx errored when fee payer had sufficient funds and provided sufficient fee while skipping tax simulation mode")
+
+	// check balance of fee payer
+	balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
+	s.Require().Equal(amount, balance.Amount, "Tax was subtracted from fee payer when taxable tx was simulated")
+
+	// get supply after tx
+	supplyAfter, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
+	s.Require().NoError(err)
+
+	// check that supply was not deflated
+	s.Require().Equal(supplyBefore, supplyAfter, "Supply was deflated when taxable tx simulation mode")
+
+	// check that no fee has been sent to the fee collector
+	feeCollector := s.app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName)
+	feeCollectorBalance := s.app.BankKeeper.GetBalance(s.ctx, feeCollector, didtypes.BaseMinimalDenom)
+
+	s.Require().Equal(feeCollectorBalance.Amount, sdk.NewInt(0), "Reward was sent to the fee collector when taxable tx simulation mode")
 }

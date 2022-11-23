@@ -63,13 +63,13 @@ func GetTaxableMsg(msg interface{}) bool {
 func GetTaxableMsgFeeWithBurnPortion(ctx sdk.Context, msg interface{}) (sdk.Coins, sdk.Coins, bool) {
 	switch msg := msg.(type) {
 	case *didtypes.MsgCreateDidDoc:
-		burnPortion := GetBurnFeePortion(ctx, BurnFactors[BurnFactorDid], TaxableMsgFees[MsgCreateDidDoc])
+		burnPortion := GetBurnFeePortion(BurnFactors[BurnFactorDid], TaxableMsgFees[MsgCreateDidDoc])
 		return GetRewardPortion(TaxableMsgFees[MsgCreateDidDoc], burnPortion), burnPortion, true
 	case *didtypes.MsgUpdateDidDoc:
-		burnPortion := GetBurnFeePortion(ctx, BurnFactors[BurnFactorDid], TaxableMsgFees[MsgUpdateDidDoc])
+		burnPortion := GetBurnFeePortion(BurnFactors[BurnFactorDid], TaxableMsgFees[MsgUpdateDidDoc])
 		return GetRewardPortion(TaxableMsgFees[MsgUpdateDidDoc], burnPortion), burnPortion, true
 	case *didtypes.MsgDeactivateDidDoc:
-		burnPortion := GetBurnFeePortion(ctx, BurnFactors[BurnFactorDid], TaxableMsgFees[MsgDeactivateDidDoc])
+		burnPortion := GetBurnFeePortion(BurnFactors[BurnFactorDid], TaxableMsgFees[MsgDeactivateDidDoc])
 		return GetRewardPortion(TaxableMsgFees[MsgDeactivateDidDoc], burnPortion), burnPortion, true
 	case *resourcetypes.MsgCreateResource:
 		return GetResourceTaxableMsgFee(ctx, msg)
@@ -91,18 +91,18 @@ func GetResourceTaxableMsgFee(ctx sdk.Context, msg *resourcetypes.MsgCreateResou
 
 	// Mime type image
 	if strings.HasPrefix(mediaType, "image/") {
-		burnPortion := GetBurnFeePortion(ctx, BurnFactors[BurnFactorResource], TaxableMsgFees[MsgCreateResourceImage])
+		burnPortion := GetBurnFeePortion(BurnFactors[BurnFactorResource], TaxableMsgFees[MsgCreateResourceImage])
 		return GetRewardPortion(TaxableMsgFees[MsgCreateResourceImage], burnPortion), burnPortion, true
 	}
 
 	// Mime type json
 	if strings.HasPrefix(mediaType, "application/json") {
-		burnPortion := GetBurnFeePortion(ctx, BurnFactors[BurnFactorResource], TaxableMsgFees[MsgCreateResourceJson])
+		burnPortion := GetBurnFeePortion(BurnFactors[BurnFactorResource], TaxableMsgFees[MsgCreateResourceJson])
 		return GetRewardPortion(TaxableMsgFees[MsgCreateResourceJson], burnPortion), burnPortion, true
 	}
 
 	// Default mime type
-	burnPortion := GetBurnFeePortion(ctx, BurnFactors[BurnFactorResource], TaxableMsgFees[MsgCreateResourceDefault])
+	burnPortion := GetBurnFeePortion(BurnFactors[BurnFactorResource], TaxableMsgFees[MsgCreateResourceDefault])
 	return GetRewardPortion(TaxableMsgFees[MsgCreateResourceDefault], burnPortion), burnPortion, true
 }
 

@@ -38,6 +38,10 @@ func (td taxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, nex
 	if !ok {
 		return ctx, sdkerrors.Wrapf(sdkerrors.ErrTxDecode, "invalid transaction type: %T, must implement FeeTx", tx)
 	}
+	// if simulate, perform no-op
+	if simulate {
+		return next(ctx, tx, simulate)
+	}
 	// get metrics for tax
 	rewards, burn, taxable, err := td.isTaxable(ctx, feeTx)
 	if err != nil {

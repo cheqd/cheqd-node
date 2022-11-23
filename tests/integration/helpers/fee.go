@@ -1,8 +1,19 @@
 package helpers
 
+import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
+
 func GenerateFees(amount string) []string {
 	return []string{
 		"--fees", amount,
 		"--broadcast-mode", "block",
 	}
+}
+
+func GetBurntPortion(tax sdk.Coin, burnFactor sdk.Dec) sdk.Coin {
+	taxDec := sdk.NewDecCoinFromCoin(tax)
+	taxDec.Amount = taxDec.Amount.Mul(burnFactor)
+	burnt, _ := taxDec.TruncateDecimal()
+	return burnt
 }

@@ -6,6 +6,8 @@ import (
 
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 )
 
 var CLI_QUERY_PARAMS = []string{
@@ -23,6 +25,51 @@ func Query(module, query string, queryArgs ...string) (string, error) {
 	args = append(args, queryArgs...)
 
 	return Exec(args...)
+}
+
+func QueryBalance(address, denom string) (banktypes.QueryBalanceResponse, error) {
+	res, err := Query("bank", "balances", address)
+	if err != nil {
+		return banktypes.QueryBalanceResponse{}, err
+	}
+
+	var resp banktypes.QueryBalanceResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return banktypes.QueryBalanceResponse{}, err
+	}
+
+	return resp, nil
+}
+
+func QuerySupplyOf(denom string) (banktypes.QuerySupplyOfResponse, error) {
+	res, err := Query("bank", "total", denom)
+	if err != nil {
+		return banktypes.QuerySupplyOfResponse{}, err
+	}
+
+	var resp banktypes.QuerySupplyOfResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return banktypes.QuerySupplyOfResponse{}, err
+	}
+
+	return resp, nil
+}
+
+func QueryParams(subspace, key string) (paramproposal.QueryParamsResponse, error) {
+	res, err := Query("params", "subspace", subspace, key)
+	if err != nil {
+		return paramproposal.QueryParamsResponse{}, err
+	}
+
+	var resp paramproposal.QueryParamsResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return paramproposal.QueryParamsResponse{}, err
+	}
+
+	return resp, nil
 }
 
 func QueryDidDoc(did string) (didtypes.QueryGetDidDocResponse, error) {

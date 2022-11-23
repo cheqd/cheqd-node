@@ -4,10 +4,9 @@ package integration
 
 import (
 	"crypto/ed25519"
-	"fmt"
 
 	"github.com/cheqd/cheqd-node/tests/integration/cli"
-	//"github.com/cheqd/cheqd-node/tests/integration/helpers"
+	"github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
 	"github.com/cheqd/cheqd-node/tests/integration/testdata"
 	clitypes "github.com/cheqd/cheqd-node/x/did/client/cli"
@@ -21,11 +20,17 @@ import (
 
 var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 	var tmpDir string
+	var feeParams types.FeeParams
 	var payload types.MsgCreateDidDocPayload
 	var signInputs []clitypes.SignInput
 
 	BeforeEach(func() {
 		tmpDir = GinkgoT().TempDir()
+
+		// Query fee params
+		res, err := cli.QueryParams(types.ModuleName, string(types.ParamStoreKeyFeeParams))
+		Expect(err).To(BeNil())
+		err = helpers.Codec.UnmarshalJSON([]byte(res.Param.Value), &feeParams)
 
 		// Create a new DID Doc
 		did := "did:cheqd:" + network.DID_NAMESPACE + ":" + uuid.NewString()
@@ -59,10 +64,11 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		}
 	})
 
+	// TODO: Fix race condition
 	/* It("should tax create diddoc message - case: fixed fee", func() {
 		feeParams := helpers.GenerateFees("5000000000ncheq")
 
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_2, feeParams)
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_1, feeParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -75,17 +81,43 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		//      - fee: {amount: 5000000000ncheq, payer: <fee payer>, granter: <granter>}
 	}) */
 
-	It("should tax create diddoc message - case: gas estimation", func() {
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_2, cli.CLI_GAS_PARAMS)
+	It("should tax create diddoc message - case: gas auto", func() {
+		By("querying the total supply")
+		supplyBeforeDeflation, err := cli.QuerySupplyOf(types.BaseMinimalDenom)
+		Expect(err).To(BeNil())
+
+		By("querying the current account balance")
+		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_1_ADDR, types.BaseMinimalDenom)
+		Expect(err).To(BeNil())
+		Expect(balanceBefore.Balance.Denom).To(BeEquivalentTo(types.BaseMinimalDenom))
+
+		By("submitting a create diddoc message")
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
-		fmt.Println("res", res)
+		By("querying the altered account balance")
+		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_1_ADDR, types.BaseMinimalDenom)
+		Expect(err).To(BeNil())
+		Expect(balanceAfter.Balance.Denom).To(BeEquivalentTo(types.BaseMinimalDenom))
+
+		By("checking the balance difference")
+		minusTax := balanceBefore.Balance.Amount.Sub(balanceAfter.Balance.Amount)
+		tax := feeParams.TxTypes[types.DefaultKeyCreateDid]
+		Expect(minusTax).To(Equal(tax.Amount))
+
+		By("querying the deflated total supply")
+		supplyAfterDeflation, err := cli.QuerySupplyOf(types.BaseMinimalDenom)
+		Expect(err).To(BeNil())
+
+		By("checking the deflation")
+		burnt := helpers.GetBurntPortion(tax, feeParams.BurnFactor)
+		Expect(supplyBeforeDeflation.Amount.Sub(supplyAfterDeflation.Amount)).To(Equal(burnt.Amount))
 
 		// WIP:
-		// 	 1. Check the balance of fee payer account
-		//   2. Check supply deflation
-		//   3. Check events
+		// [x] 1. Check the balance of fee payer account
+		// [x] 2. Check supply deflation
+		// [_] 3. Check events
 		//      - fee: {amount: 5000000000ncheq, payer: <fee payer>, granter: <granter>}
 	})
 })
