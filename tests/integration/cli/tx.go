@@ -2,6 +2,7 @@ package cli
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
@@ -40,7 +41,12 @@ func Tx(module, tx, from string, feeParams []string, txArgs ...string) (sdk.TxRe
 	// Other args
 	args = append(args, txArgs...)
 
+	fmt.Println("tx args: ", strings.Join(args, " "))
+
 	output, err := Exec(args...)
+
+	fmt.Println("tx output: ", output)
+
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}

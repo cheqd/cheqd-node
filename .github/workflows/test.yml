@@ -91,7 +91,7 @@ jobs:
 
       - name: Run tests
         working-directory: ./tests/integration
-        run: ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --junit-report ../../report-integration.xml
+        run: ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --focus-file cli_diddoc_pricing_test.go --junit-report ../../report-integration.xml
       
       - name: Upload integration tests result
         uses: actions/upload-artifact@v3
