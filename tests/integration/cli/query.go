@@ -43,7 +43,7 @@ func QueryBalance(address, denom string) (banktypes.QueryBalanceResponse, error)
 }
 
 func QuerySupplyOf(denom string) (banktypes.QuerySupplyOfResponse, error) {
-	res, err := Query("bank", "total", denom)
+	res, err := Query("bank", "total", "--denom", denom)
 	if err != nil {
 		return banktypes.QuerySupplyOfResponse{}, err
 	}
