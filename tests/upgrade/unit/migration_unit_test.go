@@ -22,4 +22,12 @@ var _ = Describe("Migration - Unit", func() {
 		err := RunProtobufScenario()
 		Expect(err).To(BeNil())
 	})
+
+	It("checks IndyStyle Migration", func() {
+		By("Ensuring the IndyStyle migration handler is working as expected")
+
+		// Run IndyStyle migration
+		err := RunIndyStyleScenario()
+		Expect(err).To(BeNil())
+	})
 })

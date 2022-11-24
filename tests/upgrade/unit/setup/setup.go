@@ -1,62 +1,115 @@
 package setup
 
 import (
-	resourcetestssetup "github.com/cheqd/cheqd-node/x/resource/tests/setup"
+	"context"
+	"crypto/rand"
+	"time"
+
+	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
+	didkeeperv1 "github.com/cheqd/cheqd-node/x/did/keeper/v1"
+	didsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	// didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
+	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
+	resourcekeeperv1 "github.com/cheqd/cheqd-node/x/resource/keeper/v1"
+	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	"github.com/cosmos/cosmos-sdk/codec"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+	"github.com/cosmos/cosmos-sdk/store"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/tendermint/tendermint/libs/log"
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	dbm "github.com/tendermint/tm-db"
 )
 
-type DidKeeperV1 struct {
-	// nolint: structcheck, unused
-	cdc codec.BinaryCodec
-	// nolint: structcheck, unused
-	storeKey storetypes.KVStoreKey
+type TestSetup struct {
+	Cdc codec.Codec
+
+	SdkCtx sdk.Context
+	StdCtx context.Context
+
+	DidKeeperV1      didkeeperv1.Keeper
+	ResourceKeeperV1 resourcekeeperv1.Keeper
+
+	DidKeeper      didkeeper.Keeper
+	DidMsgServer   didtypes.MsgServer
+	DidQueryServer didtypes.QueryServer
+
+	ResourceKeeper      resourcekeeper.Keeper
+	ResourceMsgServer   resourcetypes.MsgServer
+	ResourceQueryServer resourcetypes.QueryServer
+
+	DidStoreKey      *storetypes.KVStoreKey
+	ResourceStoreKey *storetypes.KVStoreKey
 }
 
-type DidMsgServerV1 struct {
-	keeper DidKeeperV1
-}
+func Setup() TestSetup {
+	// Init Codec
+	ir := codectypes.NewInterfaceRegistry()
+	didtypes.RegisterInterfaces(ir)
+	// didtypesv1.RegisterInterfaces(ir) // TODO: Is v1 needed?
+	cdc := codec.NewProtoCodec(ir)
 
-type DidQueryServerV1 struct {
-	keeper DidKeeperV1
-}
+	// Init KVSore
+	db := dbm.NewMemDB()
 
-type ResourceKeeperV1 struct {
-	// nolint: structcheck, unused
-	cdc codec.BinaryCodec
-	// nolint: structcheck, unused
-	storeKey storetypes.KVStoreKey
-}
+	dbStore := store.NewCommitMultiStore(db)
 
-type ResourceMsgServerV1 struct {
-	keeper ResourceKeeperV1
-}
+	didStoreKey := sdk.NewKVStoreKey(didtypes.StoreKey)
+	resourceStoreKey := sdk.NewKVStoreKey(resourcetypes.StoreKey)
 
-type ResourceQueryServerV1 struct {
-	keeper ResourceKeeperV1
-}
+	dbStore.MountStoreWithDB(didStoreKey, storetypes.StoreTypeIAVL, nil)
+	dbStore.MountStoreWithDB(resourceStoreKey, storetypes.StoreTypeIAVL, nil)
 
-type ExtendedTestSetup struct {
-	resourcetestssetup.TestSetup
-	DidKeeperV1           DidKeeperV1           // TODO: replace with actual type implementation
-	DidMsgServerV1        DidMsgServerV1        // TODO: replace with actual type implementation
-	DidQueryServerV1      DidQueryServerV1      // TODO: replace with actual type implementation
-	ResourceKeeperV1      ResourceKeeperV1      // TODO: replace with actual type implementation
-	ResourceMsgServerV1   ResourceMsgServerV1   // TODO: replace with actual type implementation
-	ResourceQueryServerV1 ResourceQueryServerV1 // TODO: replace with actual type implementation
-}
+	_ = dbStore.LoadLatestVersion()
 
-func NewExtendedSetup() ExtendedTestSetup {
-	setup := resourcetestssetup.Setup()
-	didKeeperV1 := DidKeeperV1{}
-	resourceKeeperV1 := ResourceKeeperV1{}
-	return ExtendedTestSetup{
-		TestSetup:             setup,
-		DidKeeperV1:           didKeeperV1,
-		DidMsgServerV1:        DidMsgServerV1{keeper: didKeeperV1},
-		DidQueryServerV1:      DidQueryServerV1{keeper: didKeeperV1},
-		ResourceKeeperV1:      resourceKeeperV1,
-		ResourceMsgServerV1:   ResourceMsgServerV1{keeper: resourceKeeperV1},
-		ResourceQueryServerV1: ResourceQueryServerV1{keeper: resourceKeeperV1},
+	// Init previous keepers
+	didKeeperPrevious := didkeeperv1.NewKeeper(cdc, didStoreKey)
+	resourceKeeperPrevious := resourcekeeperv1.NewKeeper(cdc, resourceStoreKey)
+
+	// Init Keepers
+	didKeeper := didkeeper.NewKeeper(cdc, didStoreKey)
+	resourceKeeper := resourcekeeper.NewKeeper(cdc, resourceStoreKey)
+
+	// Create Tx
+	txBytes := make([]byte, 28)
+	_, _ = rand.Read(txBytes)
+
+	// Create context
+	blockTime, _ := time.Parse(time.RFC3339, "2021-01-01T00:00:00.000Z")
+	ctx := sdk.NewContext(dbStore,
+		tmproto.Header{ChainID: "test", Time: blockTime},
+		false, log.NewNopLogger()).WithTxBytes(txBytes)
+
+	// Init servers
+	didMsgServer := didkeeper.NewMsgServer(*didKeeper)
+	didQueryServer := didkeeper.NewQueryServer(*didKeeper)
+
+	resourceMsgServer := resourcekeeper.NewMsgServer(*resourceKeeper, *didKeeper)
+	resourceQueryServer := resourcekeeper.NewQueryServer(*resourceKeeper, *didKeeper)
+
+	setup := TestSetup{
+		Cdc: cdc,
+
+		SdkCtx: ctx,
+		StdCtx: sdk.WrapSDKContext(ctx),
+
+		DidKeeperV1:      *didKeeperPrevious,
+		ResourceKeeperV1: *resourceKeeperPrevious,
+
+		DidKeeper:      *didKeeper,
+		DidMsgServer:   didMsgServer,
+		DidQueryServer: didQueryServer,
+
+		ResourceKeeper:      *resourceKeeper,
+		ResourceMsgServer:   resourceMsgServer,
+		ResourceQueryServer: resourceQueryServer,
+
+		DidStoreKey:      didStoreKey,
+		ResourceStoreKey: resourceStoreKey,
 	}
+
+	setup.DidKeeper.SetDidNamespace(&ctx, didsetup.DID_NAMESPACE) // TODO: Think about it
+	return setup
 }

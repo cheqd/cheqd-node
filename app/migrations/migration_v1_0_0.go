@@ -7,7 +7,7 @@ import (
 	. "github.com/cheqd/cheqd-node/x/did/utils"
 
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
-	didtypesV1 "github.com/cheqd/cheqd-node/x/did/types/v1"
+	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -77,19 +77,22 @@ func MigrateDidProtobufDIDocV1(sctx sdk.Context, mctx MigrationContext) error {
 
 	ir := codectypes.NewInterfaceRegistry()
 
-	ir.RegisterInterface("StateValueData", (*didtypesV1.StateValueData)(nil))
-	ir.RegisterImplementations((*didtypesV1.StateValueData)(nil), &didtypesV1.Did{})
+	ir.RegisterInterface("StateValueData", (*didtypesv1.StateValueData)(nil))
+	ir.RegisterImplementations((*didtypesv1.StateValueData)(nil), &didtypesv1.Did{})
 
 	CdcV1 := codec.NewProtoCodec(ir)
 
-	didKeys = CollectAllKeys(sctx, mctx.didStoreKey, StrBytes(didtypesV1.DidKey))
+	didKeys = CollectAllKeys(
+		sctx, 
+		mctx.didStoreKey, 
+		didtypesv1.KeyPrefix(didtypesv1.DidKey))
 
 	store := prefix.NewStore(
 		sctx.KVStore(mctx.didStoreKey),
-		StrBytes(didtypesV1.DidKey))
+		StrBytes(didtypesv1.DidKey))
 
 	for _, didKey := range didKeys {
-		var stateValue didtypesV1.StateValue
+		var stateValue didtypesv1.StateValue
 		var newDidDocWithMetadata didtypes.DidDocWithMetadata
 		CdcV1.MustUnmarshal(store.Get(didKey), &stateValue)
 
@@ -117,14 +120,17 @@ func MigrateDidProtobufResourceV1(sctx sdk.Context, mctx MigrationContext) error
 	var headerKeys []IteratorKey
 	// Reset counter
 	countStore := sctx.KVStore(mctx.resourceStoreKey)
-	countKey := didutils.StrBytes(resourcetypes.ResourceCountKey)
+	countKey := didutils.StrBytes(resourcetypesv1.ResourceCountKey)
 	countStore.Delete(countKey)
 
 	// Storages for old headers and data
 	headerStore := sctx.KVStore(mctx.resourceStoreKey)
 	dataStore := sctx.KVStore(mctx.resourceStoreKey)
 
-	headerKeys = CollectAllKeys(sctx, mctx.resourceStoreKey, StrBytes(resourcetypesv1.ResourceHeaderKey))
+	headerKeys = CollectAllKeys(
+		sctx, 
+		mctx.resourceStoreKey,
+		resourcetypesv1.KeyPrefix(resourcetypesv1.ResourceHeaderKey))
 
 	for _, headerKey := range headerKeys {
 		// ToDo: Make it more readable and understandable.
@@ -313,26 +319,29 @@ func MigrateDidIndyStyleIdsV1(sctx sdk.Context, mctx MigrationContext) error {
 func MigrateDidIndyStyleIdsV1DidModule(sctx sdk.Context, mctx MigrationContext) error {
 	// This migration should be run after protobuf that's why we use new DidDocWithMetadata
 	var didDocWithMetadata didtypes.DidDocWithMetadata
-	var iterator sdk.Iterator
-	// var err error
+	var didKeys []IteratorKey
+
+	didKeys = CollectAllKeys(
+		sctx, 
+		mctx.didStoreKey,
+		didtypes.GetLatestDidDocVersionPrefix())
 
 	store := prefix.NewStore(
 		sctx.KVStore(mctx.didStoreKey),
-		StrBytes(didtypesV1.DidKey))
-	iterator = sdk.KVStorePrefixIterator(store, []byte{})
+		didtypes.GetLatestDidDocVersionPrefix())
+		
+	for _, didKey := range didKeys{
 
-	closeIteratorOrPanic(iterator)
-
-	for ; iterator.Valid(); iterator.Next() {
+	// for ; iterator.Valid(); iterator.Next() {
 		didDocWithMetadata = didtypes.DidDocWithMetadata{}
 
-		mctx.codec.MustUnmarshal(iterator.Value(), &didDocWithMetadata)
+		mctx.codec.MustUnmarshal(store.Get(didKey), &didDocWithMetadata)
 
 		// Make all dids indy style
 		MoveToIndyStyleIds(&didDocWithMetadata)
 
 		// Remove old DID Doc
-		store.Delete(iterator.Key())
+		store.Delete(didKey)
 
 		// Set new DID Doc
 		err := mctx.didKeeper.AddNewDidDocVersion(&sctx, &didDocWithMetadata)
@@ -345,12 +354,7 @@ func MigrateDidIndyStyleIdsV1DidModule(sctx sdk.Context, mctx MigrationContext) 
 }
 
 func MigrateDidIndyStyleIdsV1ResourceModule(sctx sdk.Context, mctx MigrationContext) error {
-	metadataStore := sctx.KVStore(mctx.resourceStoreKey)
-	metadataIterator := sdk.KVStorePrefixIterator(
-		metadataStore,
-		didutils.StrBytes(resourcetypesv1.ResourceHeaderKey))
-
-	closeIteratorOrPanic(metadataIterator)
+	
 
 	for metadataIterator.Valid() {
 

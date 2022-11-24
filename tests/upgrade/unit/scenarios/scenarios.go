@@ -63,3 +63,31 @@ func RunProtobufScenario() error {
 
 	return err
 }
+
+func RunIndyStyleScenario() error {
+	// Init storages, keepers and setup the migration context.
+	setup := migrationsetup.Setup()
+
+	builder := NewIndyStyleBuilder(setup)
+
+	dataSet, err := builder.BuildDataSet(setup)
+	if err != nil {
+		return err
+	}
+
+	indyStyleScenario := NewMigrationScenario(
+		"IndyStyle Migration",
+		func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error {
+			return appmigrations.MigrateDidIndyStyleIdsV1(ctx, migrationCtx)
+		},
+	)
+	// Init Migrator structure
+	migrator := NewMigrator(
+		[]MigrationScenario{indyStyleScenario},
+		setup,
+		&dataSet)
+
+	// Run migration scenario
+	err = migrator.Run()
+	return err
+}

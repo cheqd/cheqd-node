@@ -49,10 +49,6 @@ func (m Migrator) Validate() error {
 }
 
 func (m Migrator) Run() error {
-	// err := m.LoadDataSet()
-	// if err != nil {
-	// 	return err
-	// }
 	err := m.Prepare()
 	if err != nil {
 		return err

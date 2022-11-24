@@ -9,7 +9,6 @@ import (
 	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
-	"github.com/cosmos/cosmos-sdk/store/prefix"
 	"github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gogo/protobuf/proto"
@@ -192,13 +191,15 @@ func MoveToIndyStyleIds(didDoc *didtypes.DidDocWithMetadata) {
 	didDoc.DidDoc.KeyAgreement = IndyStyleDidUrlList(didDoc.DidDoc.KeyAgreement)
 }
 
-func CollectAllKeys(ctx sdk.Context, storeKey *types.KVStoreKey, prefixKey []byte) []IteratorKey {
-	keys := []IteratorKey{}
-	store := prefix.NewStore(
-		ctx.KVStore(storeKey),
-		prefixKey)
+func CollectAllKeys(
+	ctx sdk.Context, 
+	storeKey *types.KVStoreKey,
+	iteratorPrefixKey []byte) []IteratorKey {
 
-	iterator := sdk.KVStorePrefixIterator(store, []byte{})
+	keys := []IteratorKey{}
+	store := ctx.KVStore(storeKey)
+
+	iterator := sdk.KVStorePrefixIterator(store, iteratorPrefixKey)
 	closeIteratorOrPanic(iterator)
 
 	for ; iterator.Valid(); iterator.Next() {

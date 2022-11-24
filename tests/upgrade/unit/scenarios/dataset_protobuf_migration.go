@@ -6,8 +6,6 @@ import (
 	. "github.com/onsi/gomega"
 
 	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/unit/setup"
-
-	// didtestssetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 
