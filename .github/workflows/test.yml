@@ -93,6 +93,10 @@ jobs:
         working-directory: ./tests/integration
         run: ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --focus-file cli_diddoc_pricing_test.go --junit-report ../../report-integration.xml
       
+      - name: Show logs
+        working-directory: ./docker/localnet
+        run: docker compose --env-file docker-compose.env logs --tail --follow
+
       - name: Upload integration tests result
         uses: actions/upload-artifact@v3
         with:
