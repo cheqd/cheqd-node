@@ -68,7 +68,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 	/* It("should tax create diddoc message - case: fixed fee", func() {
 		feeParams := helpers.GenerateFees("5000000000ncheq")
 
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_1, feeParams)
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_2, feeParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -87,17 +87,17 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("querying the current account balance")
-		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_1_ADDR, types.BaseMinimalDenom)
+		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, types.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 		Expect(balanceBefore.Denom).To(BeEquivalentTo(types.BaseMinimalDenom))
 
 		By("submitting a create diddoc message")
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_2, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
 		By("querying the altered account balance")
-		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_1_ADDR, types.BaseMinimalDenom)
+		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, types.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 		Expect(balanceAfter.Denom).To(BeEquivalentTo(types.BaseMinimalDenom))
 
