@@ -259,7 +259,6 @@
     "cheqd": {
       "didList": [],
       "did_namespace": "mainnet"
-      }
     },
     "crisis": {
       "constant_fee": {
@@ -439,9 +438,6 @@
       "signing_infos": [],
       "missed_blocks": []
     },
-    "resource": {
-      "resource_list": []
-    },
     "staking": {
       "params": {
         "unbonding_time": "1210000s",
@@ -468,5 +464,5 @@
     },
     "upgrade": {},
     "vesting": {}
+  }
 }
-
