@@ -89,7 +89,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		By("querying the current account balance")
 		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_1_ADDR, types.BaseMinimalDenom)
 		Expect(err).To(BeNil())
-		Expect(balanceBefore.Balance.Denom).To(BeEquivalentTo(types.BaseMinimalDenom))
+		Expect(balanceBefore.Denom).To(BeEquivalentTo(types.BaseMinimalDenom))
 
 		By("submitting a create diddoc message")
 		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
@@ -99,10 +99,10 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		By("querying the altered account balance")
 		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_1_ADDR, types.BaseMinimalDenom)
 		Expect(err).To(BeNil())
-		Expect(balanceAfter.Balance.Denom).To(BeEquivalentTo(types.BaseMinimalDenom))
+		Expect(balanceAfter.Denom).To(BeEquivalentTo(types.BaseMinimalDenom))
 
 		By("checking the balance difference")
-		minusTax := balanceBefore.Balance.Amount.Sub(balanceAfter.Balance.Amount)
+		minusTax := balanceBefore.Amount.Sub(balanceAfter.Amount)
 		tax := feeParams.TxTypes[types.DefaultKeyCreateDid]
 		Expect(minusTax).To(Equal(tax.Amount))
 
