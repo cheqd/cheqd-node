@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	didutils "github.com/cheqd/cheqd-node/x/did/utils"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 
@@ -151,64 +152,79 @@ func MigrateDidIndyStyleIdsV1(sctx sdk.Context, mctx MigrationContext) error {
 
 func MigrateDidIndyStyleIdsV1DidModule(sctx sdk.Context, mctx MigrationContext) error {
 	// This migration should be run after protobuf that's why we use new DidDocWithMetadata
-	// var didDocWithMetadata didtypes.DidDocWithMetadata
-	// var didKeys []IteratorKey
+	var didDocWithMetadata didtypes.DidDocWithMetadata
+	var didKeys []IteratorKey
 
-	// didKeys = CollectAllKeys(
-	// 	sctx,
-	// 	mctx.didStoreKey,
-	// 	didtypes.GetLatestDidDocVersionPrefix())
+	didKeys = CollectAllKeys(
+		sctx,
+		mctx.didStoreKey,
+		didtypes.GetLatestDidDocVersionPrefix())
 
-	// store := prefix.NewStore(
-	// 	sctx.KVStore(mctx.didStoreKey),
-	// 	StrBytes(didtypesV1.DidKey))
-	// iterator = sdk.KVStorePrefixIterator(store, []byte{})
+	store := sctx.KVStore(mctx.didStoreKey)
 
-	// closeIteratorOrPanic(iterator)
+	for _, didKey := range didKeys {
+		didDocWithMetadata = didtypes.DidDocWithMetadata{}
 
-	// for ; iterator.Valid(); iterator.Next() {
-	// 	didDocWithMetadata = didtypes.DidDocWithMetadata{}
+		mctx.codec.MustUnmarshal(store.Get(didKey), &didDocWithMetadata)
 
-	// 	mctx.codec.MustUnmarshal(store.Get(didKey), &didDocWithMetadata)
+		// Make all dids indy style
+		MoveToIndyStyleIds(&didDocWithMetadata)
 
-	// 	// Make all dids indy style
-	// 	MoveToIndyStyleIds(&didDocWithMetadata)
+		// Remove old DID Doc
+		store.Delete(didKey)
 
-	// 	// Remove old DID Doc
-	// 	store.Delete(didKey)
-
-	// 	// Set new DID Doc
-	// 	err := mctx.didKeeper.AddNewDidDocVersion(&sctx, &didDocWithMetadata)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// }
+		// Set new DID Doc
+		err := mctx.didKeeper.AddNewDidDocVersion(&sctx, &didDocWithMetadata)
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
 
 func MigrateDidIndyStyleIdsV1ResourceModule(sctx sdk.Context, mctx MigrationContext) error {
 
-	// for metadataIterator.Valid() {
+	var metadataKeys []IteratorKey
 
-	// 	var metadata resourcetypes.Metadata
+	store := sctx.KVStore(mctx.resourceStoreKey)
+	metadataKeys = CollectAllKeys(
+		sctx,
+		mctx.resourceStoreKey,
+		didutils.StrBytes(resourcetypes.ResourceMetadataKey))
 
-	// 	// Get metadata and data from storage
-	// 	mctx.codec.MustUnmarshal(metadataIterator.Value(), &metadata)
+	for _, metadataKey := range metadataKeys {
 
-	// 	// Get corresponding DidDoc
+		var metadata resourcetypes.Metadata
+		var data []byte
+		
+		dataKey := ResourceV2MetadataKeyToDataKey(metadataKey)
 
-	// 	metadata.Id = IndyStyleId(metadata.Id)
-	// 	metadata.CollectionId = IndyStyleId(metadata.CollectionId)
+		// Get metadata and data from storage
+		mctx.codec.MustUnmarshal(store.Get(metadataKey), &metadata)
+		data = store.Get(dataKey)
 
-	// 	// Update HeaderInfo
-	// 	err := mctx.resourceKeeper.UpdateResourceMetadata(&sctx, &metadata)
-	// 	if err != nil {
-	// 		return err
-	// 	}
+		// Get corresponding DidDoc
 
-	// 	// Iterate next
-	// 	metadataIterator.Next()
-	// }
+		metadata.Id = IndyStyleId(metadata.Id)
+		metadata.CollectionId = IndyStyleId(metadata.CollectionId)
+
+		newResourceWithMetadata := resourcetypes.ResourceWithMetadata{
+			Metadata: &metadata,
+			Resource: &resourcetypes.Resource{
+				Data: data,
+			},
+		}
+
+		// Remove old values
+		store.Delete(metadataKey)
+		store.Delete(dataKey)
+
+		// Update HeaderInfo
+		err := mctx.resourceKeeper.SetResource(&sctx, &newResourceWithMetadata)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }

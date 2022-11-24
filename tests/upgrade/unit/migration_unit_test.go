@@ -51,15 +51,23 @@ var _ = Describe("Migration - Unit", func() {
 		dataSet, err := builder.BuildDataSet(setup)
 		Expect(err).To(BeNil())
 
-		resourceProtobufScenario := NewMigrationScenario(
-			"ResourceChecksum",
+		didProtobufScenario := NewMigrationScenario(
+			"ProtobufDid",
 			func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error {
-				return appmigrations.MigrateDidProtobufV1(ctx, migrationCtx)
+				return appmigrations.MigrateDidProtobuf(ctx, migrationCtx)
 			},
 		)
+
+		resourceProtobufScenario := NewMigrationScenario(
+			"ProtobufResource",
+			func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error {
+				return appmigrations.MigrateResourceProtobuf(ctx, migrationCtx)
+			},
+		)
+
 		// Init Migrator structure
 		migrator := NewMigrator(
-			[]MigrationScenario{resourceProtobufScenario},
+			[]MigrationScenario{didProtobufScenario, resourceProtobufScenario},
 			setup,
 			&dataSet)
 
