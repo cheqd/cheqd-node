@@ -79,7 +79,13 @@ func (td taxDecorator) isTaxable(ctx sdk.Context, sdkTx sdk.Tx) (rewards sdk.Coi
 	if !ok {
 		return sdk.Coins{}, sdk.Coins{}, false, sdkerrors.Wrapf(sdkerrors.ErrTxDecode, "invalid transaction type: %T, must implement FeeTx", sdkTx)
 	}
-	taxable, rewards, burn = cheqdante.IsTaxableTx(ctx, td.didKeeper, td.resourceKeeper, feeTx)
+	// run lite validation
+	taxable = cheqdante.IsTaxableTxLite(feeTx)
+	if taxable {
+		// run full validation
+		_, rewards, burn = cheqdante.IsTaxableTx(ctx, td.didKeeper, td.resourceKeeper, feeTx)
+		return rewards, burn, taxable, nil
+	}
 
 	return rewards, burn, taxable, err
 }
