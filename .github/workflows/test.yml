@@ -92,7 +92,6 @@ jobs:
       - name: Run tests
         working-directory: ./tests/integration
         run: |
-          sleep 10
           ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --focus-file cli_diddoc_pricing_test.go --junit-report ../../report-integration.xml
 
       - name: Show logs

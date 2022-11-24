@@ -1,16 +1,16 @@
 syntax = "proto3";
 package cheqdid.cheqdnode.cheqd.v1;
 
-option go_package = "github.com/cheqd/cheqd-node/x/cheqd/types";
+option go_package = "github.com/cheqd/cheqd-node/x/did/types";
 option (gogoproto.equal_all) = true;
 
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "cosmos_proto/cosmos.proto";
 
-// FeeParams defines the parameters for the `cheqd` module fixed fee.
+// FeeParams defines the parameters for the `did` module fixed fee.
 message FeeParams {
-    // Tx types define the fixed fee each for the `cheqd` module.
+    // Tx types define the fixed fee each for the `did` module.
     cosmos.base.v1beta1.Coin create_did = 1 [(gogoproto.nullable) = false];
     cosmos.base.v1beta1.Coin update_did = 2 [(gogoproto.nullable) = false];
     cosmos.base.v1beta1.Coin deactivate_did = 3 [(gogoproto.nullable) = false];

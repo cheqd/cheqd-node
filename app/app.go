@@ -604,11 +604,11 @@ func New(
 		feegrant.ModuleName,
 		authz.ModuleName,
 		group.ModuleName,
+		didtypes.ModuleName,
+		resourcetypes.ModuleName,
 		vestingtypes.ModuleName,
 		upgradetypes.ModuleName,
 		paramstypes.ModuleName,
-		didtypes.ModuleName,
-		resourcetypes.ModuleName,
 	)
 
 	// Uncomment if you want to set a custom migration order here.
