@@ -144,7 +144,7 @@ func (cds *ChecksumDataSet) Validate() error {
 		}
 
 		if !bytes.Equal(resourceWithMetadata.Metadata.Checksum, expectedResource.Metadata.Checksum) {
-			return fmt.Errorf("Checksum is not migrated correctly")
+			return fmt.Errorf("checksum is not migrated correctly")
 		}
 	}
 	return nil

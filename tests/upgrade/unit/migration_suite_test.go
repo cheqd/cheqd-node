@@ -1,4 +1,4 @@
-package migration
+package unit
 
 import (
 	"testing"

@@ -1,14 +1,12 @@
-package migration
+package unit
 
 import (
 	. "github.com/cheqd/cheqd-node/tests/upgrade/unit/scenarios"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/unit/setup"
-
 	appmigrations "github.com/cheqd/cheqd-node/app/migrations"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/unit/setup"
 )
 
 var _ = Describe("Migration - Unit", func() {
@@ -23,15 +21,13 @@ var _ = Describe("Migration - Unit", func() {
 		dataSet, err := builder.BuildDataSet(setup)
 		Expect(err).To(BeNil())
 
-		resourceChecksumScenario := NewMigrationScenario(
-			"ResourceChecksum",
-			func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error {
-				return appmigrations.MigrateResourceChecksumV2(ctx, migrationCtx)
-			},
-		)
+		resourceChecksumScenario := []appmigrations.Migration{
+			appmigrations.MigrateResourceChecksumV2,
+		}
+
 		// Init Migrator structure
 		migrator := NewMigrator(
-			[]MigrationScenario{resourceChecksumScenario},
+			resourceChecksumScenario,
 			setup,
 			&dataSet)
 
@@ -51,15 +47,14 @@ var _ = Describe("Migration - Unit", func() {
 		dataSet, err := builder.BuildDataSet(setup)
 		Expect(err).To(BeNil())
 
-		resourceProtobufScenario := NewMigrationScenario(
-			"ResourceChecksum",
-			func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error {
-				return appmigrations.MigrateDidProtobufV1(ctx, migrationCtx)
-			},
-		)
+		resourceProtobufScenario := []appmigrations.Migration{
+			appmigrations.MigrateDidProtobuf,
+			appmigrations.MigrateResourceProtobuf,
+		}
+
 		// Init Migrator structure
 		migrator := NewMigrator(
-			[]MigrationScenario{resourceProtobufScenario},
+			resourceProtobufScenario,
 			setup,
 			&dataSet)
 
@@ -80,15 +75,13 @@ var _ = Describe("Migration - Unit", func() {
 		dataSet, err := builder.BuildDataSet(setup)
 		Expect(err).To(BeNil())
 
-		indyStyleScenario := NewMigrationScenario(
-			"IndyStyle Migration",
-			func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error {
-				return appmigrations.MigrateDidIndyStyleIdsV1(ctx, migrationCtx)
-			},
-		)
+		indyStyleScenario := []appmigrations.Migration{
+			appmigrations.MigrateDidIndyStyleIdsV1,
+		}
+
 		// Init Migrator structure
 		migrator := NewMigrator(
-			[]MigrationScenario{indyStyleScenario},
+			indyStyleScenario,
 			setup,
 			&dataSet)
 

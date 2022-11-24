@@ -1,6 +1,6 @@
 //go:build upgrade
 
-package upgrade
+package integration
 
 import (
 	"fmt"
