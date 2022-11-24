@@ -6,7 +6,6 @@ import (
 	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
-	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -15,9 +14,7 @@ func MigrateDidProtobuf(ctx sdk.Context, mctx MigrationContext) error {
 
 	didKeys := CollectAllKeys(ctx, mctx.didStoreKey, didutils.StrBytes(didtypesV1.DidKey))
 
-	store := prefix.NewStore(
-		ctx.KVStore(mctx.didStoreKey),
-		didutils.StrBytes(didtypesV1.DidKey))
+	store := ctx.KVStore(mctx.didStoreKey)
 
 	for _, didKey := range didKeys {
 		var stateValue didtypesV1.StateValue

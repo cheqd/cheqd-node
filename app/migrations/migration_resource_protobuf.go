@@ -21,9 +21,6 @@ func MigrateResourceProtobuf(sctx sdk.Context, mctx MigrationContext) error {
 	headerKeys = CollectAllKeys(sctx, mctx.resourceStoreKey, didutils.StrBytes(resourcetypesv1.ResourceHeaderKey))
 
 	for _, headerKey := range headerKeys {
-		// ToDo: Make it more readable and understandable.
-		// For now it's because Dids were set using just id as a key, but resources used 2 storages with prefixes for keys
-		headerKey := []byte(resourcetypesv1.ResourceHeaderKey + string(headerKey))
 		dataKey := ResourceV1HeaderkeyToDataKey(headerKey)
 
 		var headerV1 resourcetypesv1.ResourceHeader

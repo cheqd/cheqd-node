@@ -47,14 +47,14 @@ var _ = Describe("Migration - Unit", func() {
 		dataSet, err := builder.BuildDataSet(setup)
 		Expect(err).To(BeNil())
 
-		resourceProtobufScenario := []appmigrations.Migration{
+		migrations := []appmigrations.Migration{
 			appmigrations.MigrateDidProtobuf,
 			appmigrations.MigrateResourceProtobuf,
 		}
 
 		// Init Migrator structure
 		migrator := NewMigrator(
-			resourceProtobufScenario,
+			migrations,
 			setup,
 			&dataSet)
 

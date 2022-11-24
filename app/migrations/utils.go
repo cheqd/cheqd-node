@@ -8,7 +8,9 @@ import (
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	didutils "github.com/cheqd/cheqd-node/x/did/utils"
+
 	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
+	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	"github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gogo/protobuf/proto"
@@ -214,6 +216,15 @@ func ResourceV1HeaderkeyToDataKey(headerKey []byte) []byte {
 			string(headerKey),
 			string(resourcetypesv1.ResourceHeaderKey),
 			string(resourcetypesv1.ResourceDataKey),
+			1))
+}
+
+func ResourceV2MetadataKeyToDataKey(metadataKey []byte) []byte {
+	return []byte(
+		strings.Replace(
+			string(metadataKey),
+			string(resourcetypes.ResourceMetadataKey),
+			string(resourcetypes.ResourceDataKey),
 			1))
 }
 
