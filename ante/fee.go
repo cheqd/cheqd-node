@@ -19,12 +19,10 @@ type DeductFeeDecorator struct {
 	accountKeeper  ante.AccountKeeper
 	bankKeeper     BankKeeper
 	feegrantKeeper ante.FeegrantKeeper
-	didKeeper      DidKeeper
-	resourceKeeper ResourceKeeper
 	txFeeChecker   TxFeeChecker
 }
 
-func NewDeductFeeDecorator(ak ante.AccountKeeper, bk BankKeeper, fk ante.FeegrantKeeper, dk DidKeeper, rk ResourceKeeper, tfc TxFeeChecker) DeductFeeDecorator {
+func NewDeductFeeDecorator(ak ante.AccountKeeper, bk BankKeeper, fk ante.FeegrantKeeper, tfc TxFeeChecker) DeductFeeDecorator {
 	if tfc == nil {
 		tfc = checkTxFeeWithValidatorMinGasPrices
 	}
@@ -33,8 +31,6 @@ func NewDeductFeeDecorator(ak ante.AccountKeeper, bk BankKeeper, fk ante.Feegran
 		accountKeeper:  ak,
 		bankKeeper:     bk,
 		feegrantKeeper: fk,
-		didKeeper:      dk,
-		resourceKeeper: rk,
 		txFeeChecker:   tfc,
 	}
 }

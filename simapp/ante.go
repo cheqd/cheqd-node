@@ -11,11 +11,7 @@ import (
 )
 
 // HandlerOptions are the options required for constructing a default SDK AnteHandler.
-// Here we extend the default exposed `BankKeeper` with our own extended `BankKeeper` interface.
-// This allows us to add our own custom logic to the default SDK AnteHandler.
-// Our custom logic is:
-//  1. To burn portion of the transaction fee.
-//  2. Distribute a pre-defined portion of the transaction fee to the validators as rewards (default behavior).
+// Here we bootstrap the exact same way as with the App, minus the IBC keeper (mainly used for the legacy redundant relay decorator).
 type HandlerOptions struct {
 	AccountKeeper          ante.AccountKeeper
 	BankKeeper             cheqdante.BankKeeper
@@ -59,7 +55,7 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		ante.NewTxTimeoutHeightDecorator(),
 		ante.NewValidateMemoDecorator(options.AccountKeeper),
 		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
-		cheqdante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, options.DidKeeper, options.ResourceKeeper, options.TxFeeChecker),
+		cheqdante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, options.TxFeeChecker),
 		ante.NewSetPubKeyDecorator(options.AccountKeeper), // SetPubKeyDecorator must be called before all signature verification decorators
 		ante.NewValidateSigCountDecorator(options.AccountKeeper),
 		ante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),

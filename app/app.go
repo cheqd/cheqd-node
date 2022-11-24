@@ -546,14 +546,14 @@ func New(
 		ibchost.ModuleName,
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
-		didtypes.ModuleName,
-		resourcetypes.ModuleName,
 		genutiltypes.ModuleName,
 		authz.ModuleName,
 		group.ModuleName,
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
+		didtypes.ModuleName,
+		resourcetypes.ModuleName,
 	)
 
 	app.mm.SetOrderEndBlockers(
@@ -597,8 +597,6 @@ func New(
 		minttypes.ModuleName,
 		crisistypes.ModuleName,
 		ibchost.ModuleName,
-		didtypes.ModuleName,
-		resourcetypes.ModuleName,
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
@@ -609,6 +607,8 @@ func New(
 		vestingtypes.ModuleName,
 		upgradetypes.ModuleName,
 		paramstypes.ModuleName,
+		didtypes.ModuleName,
+		resourcetypes.ModuleName,
 	)
 
 	// Uncomment if you want to set a custom migration order here.
@@ -629,8 +629,6 @@ func New(
 		AccountKeeper:   app.AccountKeeper,
 		BankKeeper:      app.BankKeeper,
 		FeegrantKeeper:  app.FeeGrantKeeper,
-		DidKeeper:       app.didKeeper,
-		ResourceKeeper:  app.resourceKeeper,
 		SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 		SigGasConsumer:  authante.DefaultSigVerificationGasConsumer,
 		IBCKeeper:       app.IBCKeeper,
