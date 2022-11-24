@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/cheqd/cheqd-node/app/ante"
-	migrations "github.com/cheqd/cheqd-node/app/migrations"
+	"github.com/cheqd/cheqd-node/app/migrations"
 	appparams "github.com/cheqd/cheqd-node/app/params"
 	did "github.com/cheqd/cheqd-node/x/did"
 	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
@@ -641,43 +641,6 @@ func New(
 	app.configurator = module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
 	app.mm.RegisterServices(app.configurator)
 
-	// Init Migrators
-	migrationContext := migrations.NewMigrationContext(
-		app.appCodec,
-		keys[didtypes.StoreKey],
-		keys[resourcetypes.StoreKey],
-		app.didKeeper,
-		app.resourceKeeper)
-
-	didMigrator := migrations.NewMigrator(
-		migrationContext,
-		[]migrations.Migration{
-			migrations.MigrateDidV1,
-		})
-
-	resourceMigrator := migrations.NewMigrator(
-		migrationContext,
-		[]migrations.Migration{
-			migrations.MigrateResourceV1,
-		})
-
-	// Register upgrade store migrations per module
-	if err := app.configurator.RegisterMigration(
-		didtypes.ModuleName,
-		app.mm.GetVersionMap()[didtypes.ModuleName],
-		didMigrator.Migrate,
-	); err != nil {
-		panic(err)
-	}
-
-	if err := app.configurator.RegisterMigration(
-		resourcetypes.ModuleName,
-		app.mm.GetVersionMap()[resourcetypes.ModuleName],
-		resourceMigrator.Migrate,
-	); err != nil {
-		panic(err)
-	}
-
 	// initialize stores
 	app.MountKVStores(keys)
 	app.MountTransientStores(tkeys)
@@ -720,6 +683,29 @@ func New(
 			fromVM[minttypes.ModuleName] = versionMap[minttypes.ModuleName]
 			// Skip staking module
 			fromVM[stakingtypes.ModuleName] = versionMap[stakingtypes.ModuleName]
+
+			// cheqd migrations
+			migrationContext := migrations.NewMigrationContext(
+				app.appCodec,
+				keys[didtypes.StoreKey],
+				keys[resourcetypes.StoreKey],
+				app.didKeeper,
+				app.resourceKeeper)
+
+			cheqdMigrator := migrations.NewMigrator(
+				migrationContext,
+				[]migrations.Migration{
+					migrations.MigrateDidProtobuf,
+					migrations.MigrateResourceProtobuf,
+
+					// migrations.MigrateDidUUIDV2,
+					// migrations.MigrateDidIndyStyleIdsV1,
+
+					// migrations.MigrateResourceChecksumV2,
+					// migrations.MigrateResourceVersionLinksV2,
+				})
+
+			cheqdMigrator.Migrate(ctx)
 
 			// ibc v3 -> v4 migration
 			// transfer module consensus version has been bumped to 2
