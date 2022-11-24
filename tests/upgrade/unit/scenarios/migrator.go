@@ -26,9 +26,9 @@ func NewMigrator(
 
 func (m Migrator) Migrate() error {
 	migrationCtx := appmigrations.NewMigrationContext(
+		m.setup.Cdc,
 		m.setup.DidStoreKey,
 		m.setup.ResourceStoreKey,
-		m.setup.Cdc,
 		m.setup.DidKeeper,
 		m.setup.ResourceKeeper)
 	for _, migration := range m.migrations {

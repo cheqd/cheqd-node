@@ -642,20 +642,24 @@ func New(
 	app.mm.RegisterServices(app.configurator)
 
 	// Init Migrators
+	migrationContext := migrations.NewMigrationContext(
+		app.appCodec,
+		keys[didtypes.StoreKey],
+		keys[resourcetypes.StoreKey],
+		app.didKeeper,
+		app.resourceKeeper)
+
 	didMigrator := migrations.NewMigrator(
-		keys[didtypes.StoreKey],
-		keys[resourcetypes.StoreKey],
-		app.appCodec,
-		app.didKeeper,
-		app.resourceKeeper,
-		migrations.MigrateDidV1)
+		migrationContext,
+		[]migrations.Migration{
+			migrations.MigrateDidV1,
+		})
+
 	resourceMigrator := migrations.NewMigrator(
-		keys[didtypes.StoreKey],
-		keys[resourcetypes.StoreKey],
-		app.appCodec,
-		app.didKeeper,
-		app.resourceKeeper,
-		migrations.MigrateResourceV1)
+		migrationContext,
+		[]migrations.Migration{
+			migrations.MigrateResourceV1,
+		})
 
 	// Register upgrade store migrations per module
 	if err := app.configurator.RegisterMigration(
