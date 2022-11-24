@@ -96,7 +96,7 @@ func UpdateDidDoc(tmpDir string, payload types.MsgUpdateDidDocPayload, signInput
 	return Tx("cheqd", "update-did", from, payloadFile)
 }
 
-func DeactivateDidDoc(tmpDir string, payload types.MsgUpdateDidDocPayload, signInputs []cli.SignInput, from string) (sdk.TxResponse, error) {
+func DeactivateDidDoc(tmpDir string, payload types.MsgDeactivateDidDocPayload, signInputs []cli.SignInput, from string) (sdk.TxResponse, error) {
 	// Payload
 	payloadJson, err := helpers.Codec.MarshalJSON(&payload)
 	if err != nil {
