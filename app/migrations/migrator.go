@@ -8,62 +8,58 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-type MigrationContext struct {
-	didStoreKey      *storetypes.KVStoreKey
-	resourceStoreKey *storetypes.KVStoreKey
-	codec            codec.Codec
-	didKeeper        didkeeper.Keeper
-	resourceKeeper   resourcekeeper.Keeper
-}
-
-func NewMigrationContext(
-	didStoreKey *storetypes.KVStoreKey,
-	resourceStoreKey *storetypes.KVStoreKey,
-	codec codec.Codec,
-	didKeeper didkeeper.Keeper,
-	resourceKeeper resourcekeeper.Keeper,
-) MigrationContext {
-	return MigrationContext{
-		didStoreKey:      didStoreKey,
-		resourceStoreKey: resourceStoreKey,
-		codec:            codec,
-		didKeeper:        didKeeper,
-		resourceKeeper:   resourceKeeper,
-	}
-}
-
-type Migration func(sctx sdk.Context, mctx MigrationContext) error
-
 type Migrator struct {
-	migration Migration
-	context   MigrationContext
+	context    MigrationContext
+	migrations []Migration
 }
 
 func NewMigrator(
-	didStoreKey *storetypes.KVStoreKey,
-	resourceStoreKey *storetypes.KVStoreKey,
-	codec codec.Codec,
-	didKeeper didkeeper.Keeper,
-	resourceKeeper resourcekeeper.Keeper,
-	migration Migration,
+	context MigrationContext,
+	migrations []Migration,
 ) Migrator {
 	return Migrator{
-		migration: migration,
-		context: NewMigrationContext(
-			didStoreKey,
-			resourceStoreKey,
-			codec,
-			didKeeper,
-			resourceKeeper,
-		),
+		context:    context,
+		migrations: migrations,
 	}
 }
 
 func (m *Migrator) Migrate(ctx sdk.Context) error {
-	err := m.migration(ctx, m.context)
-	if err != nil {
-		return err
+	for _, migration := range m.migrations {
+		err := migration(ctx, m.context)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
+}
+
+type Migration func(sctx sdk.Context, mctx MigrationContext) error
+
+type MigrationContext struct {
+	codec codec.Codec
+
+	didStoreKey      *storetypes.KVStoreKey
+	resourceStoreKey *storetypes.KVStoreKey
+
+	didKeeper      didkeeper.Keeper
+	resourceKeeper resourcekeeper.Keeper
+}
+
+func NewMigrationContext(
+	codec codec.Codec,
+	didStoreKey *storetypes.KVStoreKey,
+	resourceStoreKey *storetypes.KVStoreKey,
+	didKeeper didkeeper.Keeper,
+	resourceKeeper resourcekeeper.Keeper,
+) MigrationContext {
+	return MigrationContext{
+		codec: codec,
+
+		didStoreKey:      didStoreKey,
+		resourceStoreKey: resourceStoreKey,
+
+		didKeeper:      didKeeper,
+		resourceKeeper: resourceKeeper,
+	}
 }
