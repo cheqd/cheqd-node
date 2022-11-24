@@ -6,7 +6,7 @@ import (
 
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 )
 
@@ -27,31 +27,31 @@ func Query(module, query string, queryArgs ...string) (string, error) {
 	return Exec(args...)
 }
 
-func QueryBalance(address, denom string) (banktypes.QueryBalanceResponse, error) {
-	res, err := Query("bank", "balances", address)
+func QueryBalance(address, denom string) (sdk.Coin, error) {
+	res, err := Query("bank", "balances", address, "--denom", denom)
 	if err != nil {
-		return banktypes.QueryBalanceResponse{}, err
+		return sdk.Coin{}, err
 	}
 
-	var resp banktypes.QueryBalanceResponse
+	var resp sdk.Coin
 	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
-		return banktypes.QueryBalanceResponse{}, err
+		return sdk.Coin{}, err
 	}
 
 	return resp, nil
 }
 
-func QuerySupplyOf(denom string) (banktypes.QuerySupplyOfResponse, error) {
+func QuerySupplyOf(denom string) (sdk.Coin, error) {
 	res, err := Query("bank", "total", "--denom", denom)
 	if err != nil {
-		return banktypes.QuerySupplyOfResponse{}, err
+		return sdk.Coin{}, err
 	}
 
-	var resp banktypes.QuerySupplyOfResponse
+	var resp sdk.Coin
 	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
-		return banktypes.QuerySupplyOfResponse{}, err
+		return sdk.Coin{}, err
 	}
 
 	return resp, nil
