@@ -705,7 +705,10 @@ func New(
 					// migrations.MigrateResourceVersionLinksV2,
 				})
 
-			cheqdMigrator.Migrate(ctx)
+			err = cheqdMigrator.Migrate(ctx)
+			if err != nil {
+				panic(err)
+			}
 
 			// ibc v3 -> v4 migration
 			// transfer module consensus version has been bumped to 2

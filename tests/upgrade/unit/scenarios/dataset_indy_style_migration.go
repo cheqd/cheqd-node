@@ -12,16 +12,16 @@ import (
 )
 
 type IndyStyleBuilder struct {
-	setup  migrationsetup.TestSetup
-	loader Loader
-	is_dataset    IndyStyleDataSet
+	setup      migrationsetup.TestSetup
+	loader     Loader
+	is_dataset IndyStyleDataSet
 }
 
 func NewIndyStyleBuilder(setup migrationsetup.TestSetup) IndyStyleBuilder {
 	return IndyStyleBuilder{
-		setup:  setup,
-		loader: Loader{},
-		is_dataset:    NewIndyStyleDataSet(setup),
+		setup:      setup,
+		loader:     Loader{},
+		is_dataset: NewIndyStyleDataSet(setup),
 	}
 }
 
@@ -45,7 +45,6 @@ func NewIndyStyleDataSet(setup migrationsetup.TestSetup) IndyStyleDataSet {
 
 func (is_builder *IndyStyleBuilder) BuildDataSet(setup migrationsetup.TestSetup) (IndyStyleDataSet, error) {
 	err := is_builder.buildExistingDids()
-
 	if err != nil {
 		return IndyStyleDataSet{}, err
 	}

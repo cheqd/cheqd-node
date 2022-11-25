@@ -22,7 +22,6 @@ func MigrateDidProtobuf(ctx sdk.Context, mctx MigrationContext) error {
 		codec.MustUnmarshal(store.Get(didKey), &stateValue)
 
 		newDidDocWithMetadata, err := StateValueToDIDDocWithMetadata(&stateValue)
-
 		if err != nil {
 			return err
 		}

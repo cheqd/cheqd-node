@@ -7,7 +7,6 @@ import (
 )
 
 func MigrateResourceIndyStyle(sctx sdk.Context, mctx MigrationContext) error {
-
 	var metadataKeys []IteratorKey
 
 	store := sctx.KVStore(mctx.resourceStoreKey)
@@ -20,7 +19,7 @@ func MigrateResourceIndyStyle(sctx sdk.Context, mctx MigrationContext) error {
 
 		var metadata resourcetypes.Metadata
 		var data []byte
-		
+
 		dataKey := ResourceV2MetadataKeyToDataKey(metadataKey)
 
 		// Get metadata and data from storage

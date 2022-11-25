@@ -22,8 +22,8 @@ var _ = Describe("IndyStyleIdentifier", func() {
 		Expect(ResourceV1HeaderkeyToDataKey(headerKey)).To(Equal(expectedDataKey))
 	},
 		Entry(
-			"Valid: Expected behaviour", 
-			[]byte("resource-header:zGqsJraNJCojDzG4:ba62c728-cb15-498b-8e9e-9259cc242186"), 
+			"Valid: Expected behaviour",
+			[]byte("resource-header:zGqsJraNJCojDzG4:ba62c728-cb15-498b-8e9e-9259cc242186"),
 			[]byte("resource-data:zGqsJraNJCojDzG4:ba62c728-cb15-498b-8e9e-9259cc242186")),
-		)
+	)
 })

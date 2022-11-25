@@ -79,7 +79,7 @@ var _ = Describe("Migration - Unit", func() {
 			appmigrations.MigrateDidIndyStyle,
 			appmigrations.MigrateResourceIndyStyle,
 		}
-			
+
 		// Init Migrator structure
 		migrator := NewMigrator(
 			indyStyleScenario,

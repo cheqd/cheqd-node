@@ -193,7 +193,7 @@ var _ = Describe("Create DID tests", func() {
 				Key:                  keypair1.Private,
 			},
 		}
-		
+
 		_, err := setup.CreateDid(msg, signatures)
 		Expect(err).To(BeNil())
 

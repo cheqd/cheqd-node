@@ -24,7 +24,6 @@ type StateValueData interface {
 type IteratorKey []byte
 
 func StateValueToDIDDocWithMetadata(stateValue *didtypesv1.StateValue) (didtypes.DidDocWithMetadata, error) {
-
 	var newDidDoc didtypes.DidDoc
 	var newMetadata didtypes.Metadata
 
@@ -47,7 +46,8 @@ func StateValueToDIDDocWithMetadata(stateValue *didtypesv1.StateValue) (didtypes
 
 	return didtypes.DidDocWithMetadata{
 		DidDoc:   &newDidDoc,
-		Metadata: &newMetadata}, nil
+		Metadata: &newMetadata,
+	}, nil
 }
 
 func GetVerificationMaterial(vm *didtypesv1.VerificationMethod) string {
@@ -196,8 +196,8 @@ func MoveToIndyStyleIds(didDoc *didtypes.DidDocWithMetadata) {
 func CollectAllKeys(
 	ctx sdk.Context,
 	storeKey *types.KVStoreKey,
-	iteratorPrefixKey []byte) []IteratorKey {
-
+	iteratorPrefixKey []byte,
+) []IteratorKey {
 	keys := []IteratorKey{}
 	store := ctx.KVStore(storeKey)
 

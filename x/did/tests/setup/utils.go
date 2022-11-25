@@ -28,14 +28,14 @@ func randBase58Seq(bytes int) string {
 type IDType int
 
 const (
-	Base58_16bytes IDType = iota
+	Base58_16bytes   IDType = iota
 	Base58_16symbols IDType = iota
-	UUID           IDType = iota
+	UUID             IDType = iota
 )
 
 var letters = []rune("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz")
 
-func randSeq(n int) string {	
+func randSeq(n int) string {
 	mathrand.Seed(time.Now().UnixNano())
 	b := make([]rune, n)
 	for i := range b {

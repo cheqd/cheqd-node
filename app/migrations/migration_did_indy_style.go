@@ -9,9 +9,8 @@ import (
 func MigrateDidIndyStyle(sctx sdk.Context, mctx MigrationContext) error {
 	// This migration should be run after protobuf that's why we use new DidDocWithMetadata
 	var didDocWithMetadata didtypes.DidDocWithMetadata
-	var didKeys []IteratorKey
 
-	didKeys = CollectAllKeys(
+	didKeys := CollectAllKeys(
 		sctx,
 		mctx.didStoreKey,
 		didutils.StrBytes(didtypes.DidDocVersionKey))
