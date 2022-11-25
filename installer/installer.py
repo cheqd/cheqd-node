@@ -438,15 +438,15 @@ class Installer():
         self.exec(f"""sudo su -c 'perl -0777 -i.original -pe 's/{seeds_value_to_replace}/{seeds}/igs' {os.path.join(self.config_dir, "config.toml")}' {DEFAULT_CHEQD_USER}""")
 
         # Setting up the RPC port
-        rpc_laddr_text_fragment_to_be_replaced= '# TCP or UNIX socket address for the RPC server to listen on\nladdr = "tcp:\/\/0.0.0.0:26657"'
+        rpc_laddr_text_fragment_to_be_replaced= '# TCP or UNIX socket address for the RPC server to listen on\nladdr = "tcp:\/\/0.0.0.0:{DEFAULT_RPC_PORT}"'
         self.exec(f"""sudo su -c 'perl -0777 -i.original -pe 's/{rpc_laddr_text_fragment_to_be_replaced}/# TCP or UNIX socket address for the RPC server to listen on\nladdr = "tcp:\/\/0.0.0.0:{self.interviewer.rpc_port}"/igs' {os.path.join(self.config_dir, "config.toml")}' {DEFAULT_CHEQD_USER}""")
 
         # Setting up the P2P port
-        p2p_laddr_text_fragment_to_be_replaced='# Address to listen for incoming connections\nladdr = "tcp:\/\/0.0.0.0:26656"'
+        p2p_laddr_text_fragment_to_be_replaced='# Address to listen for incoming connections\nladdr = "tcp:\/\/0.0.0.0:{DEFAULT_P2P_PORT}"'
         self.exec(f"""sudo su -c 'perl -0777 -i.original -pe 's/{p2p_laddr_text_fragment_to_be_replaced}/# Address to listen for incoming connections\nladdr = "tcp:\/\/0.0.0.0:{self.interviewer.p2p_port}"/igs' {os.path.join(self.config_dir, "config.toml")}' {DEFAULT_CHEQD_USER}""")
 
         # Setting up min gas-price
-        min_gas_price_value_to_be_replaced='minimum-gas-prices = "25ncheq"'
+        min_gas_price_value_to_be_replaced='minimum-gas-prices = {DEFAULT_GAS_PRICE}'
         self.exec(f"""sudo su -c 'perl -0777 -i.original -pe 's/{min_gas_price_value_to_be_replaced}/'minimum-gas-prices = "{self.interviewer.gas_price}"'/igs' {os.path.join(self.config_dir, "app.toml")}' {DEFAULT_CHEQD_USER}""")
 
 
