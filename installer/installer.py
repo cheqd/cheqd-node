@@ -419,7 +419,7 @@ class Installer():
         # Init the node with provided moniker
         if not os.path.exists(os.path.join(self.cheqd_config_dir, 'genesis.json')):
             moniker_value_to_replace = 'moniker = "validator-1"'
-            self.exec(f"""sudo su -c 'perl -0777 -i.original -pe 's/{moniker_value_to_replace}/"{self.interviewer.moniker}"/igs' {os.path.join(self.config_dir, "config.toml")}' {DEFAULT_CHEQD_USER}""")
+            self.exec(f"""sudo su -c 'perl -0777 -i.original -pe 's/{moniker_value_to_replace}/"{self.interviewer.moniker}"/igs' {os.path.join(self.cheqd_config_dir, "config.toml")}' {DEFAULT_CHEQD_USER}""")
             
             # Downloading genesis file
             self.exec(f"curl {GENESIS_FILE.format(self.interviewer.chain)} > {os.path.join(self.cheqd_config_dir, 'genesis.json')}")
@@ -430,24 +430,24 @@ class Installer():
         # Setting up the external_address
         if self.interviewer.external_address:
             external_address_value_to_replace='external_address = ""'
-            self.exec(f"""sudo su -c 'perl -0777 -i.original -pe 's/{external_address_value_to_replace}/"{self.interviewer.external_address}:{self.interviewer.p2p_port}"/igs' {os.path.join(self.config_dir, "config.toml")}' {DEFAULT_CHEQD_USER}""")
+            self.exec(f"""sudo su -c 'perl -0777 -i.original -pe 's/{external_address_value_to_replace}/"{self.interviewer.external_address}:{self.interviewer.p2p_port}"/igs' {os.path.join(self.cheqd_config_dir, "config.toml")}' {DEFAULT_CHEQD_USER}""")
 
         # Setting up the seeds
         seeds = self.exec(f"curl {SEEDS_FILE.format(self.interviewer.chain)}").stdout.decode("utf-8").strip()
         seeds_value_to_replace = 'seeds = ""'
-        self.exec(f"""sudo su -c 'perl -0777 -i.original -pe 's/{seeds_value_to_replace}/{seeds}/igs' {os.path.join(self.config_dir, "config.toml")}' {DEFAULT_CHEQD_USER}""")
+        self.exec(f"""sudo su -c 'perl -0777 -i.original -pe 's/{seeds_value_to_replace}/{seeds}/igs' {os.path.join(self.cheqd_config_dir, "config.toml")}' {DEFAULT_CHEQD_USER}""")
 
         # Setting up the RPC port
         rpc_laddr_text_fragment_to_be_replaced= '# TCP or UNIX socket address for the RPC server to listen on\nladdr = "tcp:\/\/0.0.0.0:{DEFAULT_RPC_PORT}"'
-        self.exec(f"""sudo su -c 'perl -0777 -i.original -pe 's/{rpc_laddr_text_fragment_to_be_replaced}/# TCP or UNIX socket address for the RPC server to listen on\nladdr = "tcp:\/\/0.0.0.0:{self.interviewer.rpc_port}"/igs' {os.path.join(self.config_dir, "config.toml")}' {DEFAULT_CHEQD_USER}""")
+        self.exec(f"""sudo su -c 'perl -0777 -i.original -pe 's/{rpc_laddr_text_fragment_to_be_replaced}/# TCP or UNIX socket address for the RPC server to listen on\nladdr = "tcp:\/\/0.0.0.0:{self.interviewer.rpc_port}"/igs' {os.path.join(self.cheqd_config_dir, "config.toml")}' {DEFAULT_CHEQD_USER}""")
 
         # Setting up the P2P port
         p2p_laddr_text_fragment_to_be_replaced='# Address to listen for incoming connections\nladdr = "tcp:\/\/0.0.0.0:{DEFAULT_P2P_PORT}"'
-        self.exec(f"""sudo su -c 'perl -0777 -i.original -pe 's/{p2p_laddr_text_fragment_to_be_replaced}/# Address to listen for incoming connections\nladdr = "tcp:\/\/0.0.0.0:{self.interviewer.p2p_port}"/igs' {os.path.join(self.config_dir, "config.toml")}' {DEFAULT_CHEQD_USER}""")
+        self.exec(f"""sudo su -c 'perl -0777 -i.original -pe 's/{p2p_laddr_text_fragment_to_be_replaced}/# Address to listen for incoming connections\nladdr = "tcp:\/\/0.0.0.0:{self.interviewer.p2p_port}"/igs' {os.path.join(self.cheqd_config_dir, "config.toml")}' {DEFAULT_CHEQD_USER}""")
 
         # Setting up min gas-price
         min_gas_price_value_to_be_replaced='minimum-gas-prices = {DEFAULT_GAS_PRICE}'
-        self.exec(f"""sudo su -c 'perl -0777 -i.original -pe 's/{min_gas_price_value_to_be_replaced}/'minimum-gas-prices = "{self.interviewer.gas_price}"'/igs' {os.path.join(self.config_dir, "app.toml")}' {DEFAULT_CHEQD_USER}""")
+        self.exec(f"""sudo su -c 'perl -0777 -i.original -pe 's/{min_gas_price_value_to_be_replaced}/'minimum-gas-prices = "{self.interviewer.gas_price}"'/igs' {os.path.join(self.cheqd_config_dir, "app.toml")}' {DEFAULT_CHEQD_USER}""")
 
 
     def prepare_cheqd_user(self):
