@@ -9,22 +9,24 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdGetDidDoc() *cobra.Command {
+func CmdGetDidDocVersion() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "diddoc [id]",
-		Short: "Query a diddoc by id",
-		Args:  cobra.ExactArgs(1),
+		Use:   "diddoc-version [id] [version-id]",
+		Short: "Query a specific diddoc version",
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
 			queryClient := types.NewQueryClient(clientCtx)
 
 			did := args[0]
-			params := &types.QueryGetDidDocRequest{
-				Id: did,
+			versionId := args[1]
+			params := &types.QueryGetDidDocVersionRequest{
+				Id:      did,
+				Version: versionId,
 			}
 
-			resp, err := queryClient.DidDoc(context.Background(), params)
+			resp, err := queryClient.DidDocVersion(context.Background(), params)
 			if err != nil {
 				return err
 			}

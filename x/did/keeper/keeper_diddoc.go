@@ -195,7 +195,7 @@ func (k Keeper) IterateDids(ctx *sdk.Context, callback func(did string) (continu
 	for ; latestVersionIterator.Valid(); latestVersionIterator.Next() {
 		// Get did from key
 		key := string(latestVersionIterator.Key())
-		did := strings.Split(key, ":")[1]
+		did := strings.Join(strings.Split(key, ":")[1:], ":")
 
 		if !callback(did) {
 			break

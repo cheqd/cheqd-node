@@ -101,7 +101,7 @@ func ReadAllKeys(store types.KVStore, prefix []byte) []ByteStr {
 	keys := []ByteStr{}
 
 	iterator := sdk.KVStorePrefixIterator(store, prefix)
-	closeIteratorOrPanic(iterator)
+	defer closeIteratorOrPanic(iterator)
 
 	for ; iterator.Valid(); iterator.Next() {
 		keys = append(keys, ByteStr(iterator.Key()))

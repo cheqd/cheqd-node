@@ -180,18 +180,7 @@ func (pds *ProtobufDataSet) Validate() error {
 		if err != nil {
 			return err
 		}
-		Expect(didDoc.DidDoc.Id).To(Equal(expectedDidDoc.DidDoc.Id))
-		Expect(didDoc.DidDoc.Context).To(Equal(expectedDidDoc.DidDoc.Context))
-		Expect(didDoc.DidDoc.Service).To(Equal(expectedDidDoc.DidDoc.Service))
-		Expect(didDoc.DidDoc.VerificationMethod).To(Equal(expectedDidDoc.DidDoc.VerificationMethod))
-		Expect(didDoc.DidDoc.Authentication).To(Equal(expectedDidDoc.DidDoc.Authentication))
-		Expect(didDoc.DidDoc.AssertionMethod).To(Equal(expectedDidDoc.DidDoc.AssertionMethod))
-		Expect(didDoc.DidDoc.CapabilityInvocation).To(Equal(expectedDidDoc.DidDoc.CapabilityInvocation))
-		Expect(didDoc.DidDoc.CapabilityDelegation).To(Equal(expectedDidDoc.DidDoc.CapabilityDelegation))
-		Expect(didDoc.DidDoc.KeyAgreement).To(Equal(expectedDidDoc.DidDoc.KeyAgreement))
-		Expect(didDoc.DidDoc.Service).To(Equal(expectedDidDoc.DidDoc.Service))
-		Expect(didDoc.DidDoc.AlsoKnownAs).To(Equal(expectedDidDoc.DidDoc.AlsoKnownAs))
-		Expect(didDoc.Metadata).To(Equal(expectedDidDoc.Metadata))
+		Expect(didDoc).To(Equal(expectedDidDoc))
 	}
 
 	for _, expectedResource = range pds.expectedResources {

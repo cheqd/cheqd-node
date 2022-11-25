@@ -16,6 +16,7 @@ func MigrateDidProtobuf(sctx sdk.Context, mctx MigrationContext) error {
 	store := sctx.KVStore(mctx.didStoreKey)
 
 	// Migate DIDDocs
+	// TODO: Erase this key
 	mctx.didKeeperOld.SetDidCount(&sctx, 0) // Reset counter
 
 	didKeys := ReadAllKeys(store, didutils.StrBytes(didtypesv1.DidKey))
@@ -85,9 +86,9 @@ func MigrateMetadata(metadata *didtypesv1.Metadata) didtypes.Metadata {
 	}
 }
 
-func MigrateDidDoc(didV1 *didtypesv1.Did) didtypes.DidDoc {
+func MigrateDidDoc(oldDid *didtypesv1.Did) didtypes.DidDoc {
 	vms := []*didtypes.VerificationMethod{}
-	for _, vm := range didV1.VerificationMethod {
+	for _, vm := range oldDid.VerificationMethod {
 		vms = append(
 			vms,
 			&didtypes.VerificationMethod{
@@ -99,7 +100,7 @@ func MigrateDidDoc(didV1 *didtypesv1.Did) didtypes.DidDoc {
 	}
 
 	srvs := []*didtypes.Service{}
-	for _, srv := range didV1.Service {
+	for _, srv := range oldDid.Service {
 		srvs = append(
 			srvs,
 			&didtypes.Service{
@@ -110,17 +111,17 @@ func MigrateDidDoc(didV1 *didtypesv1.Did) didtypes.DidDoc {
 	}
 
 	return didtypes.DidDoc{
-		Id:                   didV1.Id,
+		Id:                   oldDid.Id,
 		VerificationMethod:   vms,
 		Service:              srvs,
-		Context:              didV1.Context,
-		Controller:           didV1.Controller,
-		Authentication:       didV1.Authentication,
-		AssertionMethod:      didV1.AssertionMethod,
-		CapabilityDelegation: didV1.CapabilityDelegation,
-		CapabilityInvocation: didV1.CapabilityInvocation,
-		KeyAgreement:         didV1.KeyAgreement,
-		AlsoKnownAs:          didV1.AlsoKnownAs,
+		Context:              oldDid.Context,
+		Controller:           oldDid.Controller,
+		Authentication:       oldDid.Authentication,
+		AssertionMethod:      oldDid.AssertionMethod,
+		CapabilityDelegation: oldDid.CapabilityDelegation,
+		CapabilityInvocation: oldDid.CapabilityInvocation,
+		KeyAgreement:         oldDid.KeyAgreement,
+		AlsoKnownAs:          oldDid.AlsoKnownAs,
 	}
 }
 

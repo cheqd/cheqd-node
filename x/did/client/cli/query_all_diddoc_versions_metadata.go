@@ -9,10 +9,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdGetDidDoc() *cobra.Command {
+func CmdGetAllDidDocVersionsMetadata() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "diddoc [id]",
-		Short: "Query a diddoc by id",
+		Use:   "all-diddoc-versions-metadata [id]",
+		Short: "Query diddoc version metadata by diddoc id",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -20,11 +20,11 @@ func CmdGetDidDoc() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			did := args[0]
-			params := &types.QueryGetDidDocRequest{
+			params := &types.QueryGetAllDidDocVersionsMetadataRequest{
 				Id: did,
 			}
 
-			resp, err := queryClient.DidDoc(context.Background(), params)
+			resp, err := queryClient.AllDidDocVersionsMetadata(context.Background(), params)
 			if err != nil {
 				return err
 			}

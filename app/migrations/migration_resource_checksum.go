@@ -20,8 +20,8 @@ func MigrateResourceChecksum(sctx sdk.Context, mctx MigrationContext) error {
 		dataStore,
 		didutils.StrBytes(resourcetypes.ResourceDataKey))
 
-	closeIteratorOrPanic(metadataIterator)
-	closeIteratorOrPanic(dataIterator)
+	defer closeIteratorOrPanic(metadataIterator)
+	defer closeIteratorOrPanic(dataIterator)
 
 	for metadataIterator.Valid() {
 		if !dataIterator.Valid() {
