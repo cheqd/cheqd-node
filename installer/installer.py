@@ -418,9 +418,8 @@ class Installer():
     def post_install(self):
         # Init the node with provided moniker
         if not os.path.exists(os.path.join(self.cheqd_config_dir, 'genesis.json')):
-            moniker_value_to_replace = 'moniker = "validator-1"'
-            self.exec(f"""sudo su -c 'perl -0777 -i.original -pe 's/{moniker_value_to_replace}/"{self.interviewer.moniker}"/igs' {os.path.join(self.cheqd_config_dir, "config.toml")}' {DEFAULT_CHEQD_USER}""")
-            
+            self.exec(f"""sudo su -c 'cheqd-noded init "{self.interviewer.moniker}"' {DEFAULT_CHEQD_USER}""")
+    
             # Downloading genesis file
             self.exec(f"curl {GENESIS_FILE.format(self.interviewer.chain)} > {os.path.join(self.cheqd_config_dir, 'genesis.json')}")
             shutil.chown(os.path.join(self.cheqd_config_dir, 'genesis.json'),
