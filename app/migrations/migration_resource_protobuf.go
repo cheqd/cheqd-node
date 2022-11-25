@@ -1,6 +1,8 @@
 package migrations
 
 import (
+	"strings"
+
 	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
@@ -8,57 +10,60 @@ import (
 )
 
 func MigrateResourceProtobuf(sctx sdk.Context, mctx MigrationContext) error {
-	var headerKeys []IteratorKey
+	// Storage for old headers and data
+	store := sctx.KVStore(mctx.resourceStoreKey)
+
 	// Reset counter
-	countStore := sctx.KVStore(mctx.resourceStoreKey)
-	countKey := didutils.StrBytes(resourcetypes.ResourceCountKey)
-	countStore.Delete(countKey)
+	mctx.resourceKeeperNew.SetResourceCount(&sctx, 0)
 
-	// Storages for old headers and data
-	headerStore := sctx.KVStore(mctx.resourceStoreKey)
-	dataStore := sctx.KVStore(mctx.resourceStoreKey)
-
-	headerKeys = CollectAllKeys(sctx, mctx.resourceStoreKey, didutils.StrBytes(resourcetypesv1.ResourceHeaderKey))
+	headerKeys := ReadAllKeys(store, didutils.StrBytes(resourcetypesv1.ResourceHeaderKey))
 
 	for _, headerKey := range headerKeys {
 		dataKey := ResourceV1HeaderkeyToDataKey(headerKey)
 
-		var headerV1 resourcetypesv1.ResourceHeader
-		var dataV1 []byte
-
-		mctx.codec.MustUnmarshal(headerStore.Get(headerKey), &headerV1)
-		dataV1 = dataStore.Get(dataKey)
+		var oldHeader resourcetypesv1.ResourceHeader
+		mctx.codec.MustUnmarshal(store.Get(headerKey), &oldHeader)
+		oldData := store.Get(dataKey)
 
 		newMetadata := resourcetypes.Metadata{
-			CollectionId:      headerV1.CollectionId,
-			Id:                headerV1.Id,
-			Name:              headerV1.Name,
+			CollectionId:      oldHeader.CollectionId,
+			Id:                oldHeader.Id,
+			Name:              oldHeader.Name,
 			Version:           "",
-			ResourceType:      headerV1.ResourceType,
+			ResourceType:      oldHeader.ResourceType,
 			AlsoKnownAs:       []*resourcetypes.AlternativeUri{},
-			MediaType:         headerV1.MediaType,
-			Created:           headerV1.Created,
-			Checksum:          headerV1.Checksum,
-			PreviousVersionId: headerV1.PreviousVersionId,
-			NextVersionId:     headerV1.NextVersionId,
+			MediaType:         oldHeader.MediaType,
+			Created:           oldHeader.Created,
+			Checksum:          oldHeader.Checksum,
+			PreviousVersionId: oldHeader.PreviousVersionId,
+			NextVersionId:     oldHeader.NextVersionId,
 		}
 
 		resourceWithMetadata := resourcetypes.ResourceWithMetadata{
 			Metadata: &newMetadata,
 			Resource: &resourcetypes.Resource{
-				Data: dataV1,
+				Data: oldData,
 			},
 		}
 
 		// Remove old resource data and header
-		headerStore.Delete(headerKey)
-		dataStore.Delete(dataKey)
+		store.Delete(headerKey)
+		store.Delete(dataKey)
 
 		// Write new resource
-		err := mctx.resourceKeeper.SetResource(&sctx, &resourceWithMetadata)
+		err := mctx.resourceKeeperNew.SetResource(&sctx, &resourceWithMetadata)
 		if err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func ResourceV1HeaderkeyToDataKey(headerKey []byte) []byte {
+	return []byte(
+		strings.Replace(
+			string(headerKey),
+			string(resourcetypesv1.ResourceHeaderKey),
+			string(resourcetypesv1.ResourceDataKey),
+			1))
 }

@@ -9,6 +9,7 @@ import (
 	didkeeperv1 "github.com/cheqd/cheqd-node/x/did/keeper/v1"
 	didsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+
 	// didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
 	resourcekeeperv1 "github.com/cheqd/cheqd-node/x/resource/keeper/v1"

@@ -688,9 +688,7 @@ func New(
 			migrationContext := migrations.NewMigrationContext(
 				app.appCodec,
 				keys[didtypes.StoreKey],
-				keys[resourcetypes.StoreKey],
-				app.didKeeper,
-				app.resourceKeeper)
+				keys[resourcetypes.StoreKey])
 
 			cheqdMigrator := migrations.NewMigrator(
 				migrationContext,

@@ -43,7 +43,7 @@ func MigrateResourceChecksumV2(sctx sdk.Context, mctx MigrationContext) error {
 		metadata.Checksum = checksum[:]
 
 		// Update HeaderInfo
-		err := mctx.resourceKeeper.UpdateResourceMetadata(&sctx, &metadata)
+		err := mctx.resourceKeeperNew.UpdateResourceMetadata(&sctx, &metadata)
 		if err != nil {
 			return err
 		}
@@ -153,14 +153,13 @@ func MigrateDidIndyStyleIdsV1(sctx sdk.Context, mctx MigrationContext) error {
 func MigrateDidIndyStyleIdsV1DidModule(sctx sdk.Context, mctx MigrationContext) error {
 	// This migration should be run after protobuf that's why we use new DidDocWithMetadata
 	var didDocWithMetadata didtypes.DidDocWithMetadata
-	var didKeys []IteratorKey
-
-	didKeys = CollectAllKeys(
-		sctx,
-		mctx.didStoreKey,
-		didtypes.GetLatestDidDocVersionPrefix())
+	var didKeys []ByteStr
 
 	store := sctx.KVStore(mctx.didStoreKey)
+
+	didKeys = ReadAllKeys(
+		store,
+		didtypes.GetLatestDidDocVersionPrefix())
 
 	for _, didKey := range didKeys {
 		didDocWithMetadata = didtypes.DidDocWithMetadata{}
@@ -174,7 +173,7 @@ func MigrateDidIndyStyleIdsV1DidModule(sctx sdk.Context, mctx MigrationContext) 
 		store.Delete(didKey)
 
 		// Set new DID Doc
-		err := mctx.didKeeper.AddNewDidDocVersion(&sctx, &didDocWithMetadata)
+		err := mctx.didKeeperNew.AddNewDidDocVersion(&sctx, &didDocWithMetadata)
 		if err != nil {
 			return err
 		}
@@ -185,12 +184,11 @@ func MigrateDidIndyStyleIdsV1DidModule(sctx sdk.Context, mctx MigrationContext) 
 
 func MigrateDidIndyStyleIdsV1ResourceModule(sctx sdk.Context, mctx MigrationContext) error {
 
-	var metadataKeys []IteratorKey
+	var metadataKeys []ByteStr
 
 	store := sctx.KVStore(mctx.resourceStoreKey)
-	metadataKeys = CollectAllKeys(
-		sctx,
-		mctx.resourceStoreKey,
+	metadataKeys = ReadAllKeys(
+		store,
 		didutils.StrBytes(resourcetypes.ResourceMetadataKey))
 
 	for _, metadataKey := range metadataKeys {
@@ -221,7 +219,7 @@ func MigrateDidIndyStyleIdsV1ResourceModule(sctx sdk.Context, mctx MigrationCont
 		store.Delete(dataKey)
 
 		// Update HeaderInfo
-		err := mctx.resourceKeeper.SetResource(&sctx, &newResourceWithMetadata)
+		err := mctx.resourceKeeperNew.SetResource(&sctx, &newResourceWithMetadata)
 		if err != nil {
 			return err
 		}
