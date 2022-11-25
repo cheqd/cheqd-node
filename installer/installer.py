@@ -438,7 +438,8 @@ class Installer():
         self.exec(f"""sudo su -c 'perl -0777 -i.original -pe 's/{seeds_value_to_replace}/{seeds}/igs' {os.path.join(self.config_dir, "config.toml")}' {DEFAULT_CHEQD_USER}""")
 
         # Setting up the RPC port
-        self.exec(f"sudo su -c 'cheqd-noded configure rpc-laddr \"tcp://0.0.0.0:{self.interviewer.rpc_port}\"' {DEFAULT_CHEQD_USER}")
+        rpc_laddr_text_fragment_to_be_replaced= '# TCP or UNIX socket address for the RPC server to listen on\nladdr = "tcp:\/\/0.0.0.0:26657"'
+        self.exec(f"""sudo su -c 'perl -0777 -i.original -pe 's/{rpc_laddr_text_fragment_to_be_replaced}/# TCP or UNIX socket address for the RPC server to listen on\nladdr = "tcp:\/\/0.0.0.0:{self.interviewer.rpc_port}"/igs' {os.path.join(self.config_dir, "config.toml")}' {DEFAULT_CHEQD_USER}""")
 
         # Setting up the P2P port
         p2p_laddr_text_fragament_to_be_replaced='# Address to listen for incoming connections\nladdr = "tcp:\/\/0.0.0.0:26656"'
