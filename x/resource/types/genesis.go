@@ -4,18 +4,33 @@ import (
 	"fmt"
 )
 
-// DefaultGenesis returns the default Capability genesis state
+const (
+	DefaultCreateResourceImageFee   = 5e9
+	DefaultCreateResourceJsonFee    = 2e9
+	DefaultCreateResourceDefaultFee = 1e9
+	DefaultBurnFactor               = "0.500000000000000000" // 0.5 or 50%
+)
+
+// DefaultGenesis returns the default `resource` genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		Resources: []*ResourceWithMetadata{},
-		FeeParams: &FeeParams{},
+		FeeParams: DefaultFeeParams(),
 	}
 }
 
 // Validate performs basic genesis state validation returning an error upon any
 // failure.
 func (gs GenesisState) Validate() error {
-	return gs.ValidateNoDuplicates()
+	if err := gs.ValidateNoDuplicates(); err != nil {
+		return err
+	}
+
+	if err := gs.FeeParams.ValidateBasic(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (gs GenesisState) ValidateNoDuplicates() error {

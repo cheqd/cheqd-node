@@ -4,13 +4,20 @@ import (
 	"fmt"
 )
 
-const DefaultDidNamespace = "testnet"
+const (
+	DefaultDidNamespace       = "testnet"
+	DefaultCreateDidTxFee     = 5e9
+	DefaultUpdateDidTxFee     = 2e9
+	DefaultDeactivateDidTxFee = 1e9
+	DefaultBurnFactor         = "0.500000000000000000" // 0.5 or 50%
+)
 
-// DefaultGenesis returns the default Capability genesis state
+// DefaultGenesis returns the default `did` genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		VersionSets:  []*DidDocVersionSet{},
 		DidNamespace: DefaultDidNamespace,
+		FeeParams:    DefaultFeeParams(),
 	}
 }
 
@@ -23,6 +30,11 @@ func (gs GenesisState) Validate() error {
 	}
 
 	err = gs.ValidateVersionSets()
+	if err != nil {
+		return err
+	}
+
+	err = gs.FeeParams.ValidateBasic()
 	if err != nil {
 		return err
 	}

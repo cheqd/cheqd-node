@@ -16,6 +16,9 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 			panic(fmt.Sprintf("Cannot set resource case: %s", err.Error()))
 		}
 	}
+
+	// set fee params
+	k.SetParams(ctx, *genState.FeeParams)
 }
 
 // ExportGenesis returns the cheqd module's exported genesis.
@@ -27,6 +30,10 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	for _, elem := range resourceList {
 		genesis.Resources = append(genesis.Resources, &elem)
 	}
+
+	// get fee params
+	feeParams := k.GetParams(ctx)
+	genesis.FeeParams = &feeParams
 
 	return &genesis
 }

@@ -17,6 +17,8 @@ import (
 	"github.com/cheqd/cheqd-node/x/did/keeper"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
+	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
 type TestSetup struct {
@@ -35,8 +37,9 @@ func Setup() TestSetup {
 	ir := codectypes.NewInterfaceRegistry()
 	types.RegisterInterfaces(ir)
 	cdc := codec.NewProtoCodec(ir)
+	aminoCdc := codec.NewLegacyAmino()
 
-	// Init KVSore
+	// Init KVStore
 	db := dbm.NewMemDB()
 
 	dbStore := store.NewCommitMultiStore(db)
@@ -45,8 +48,13 @@ func Setup() TestSetup {
 
 	_ = dbStore.LoadLatestVersion()
 
+	// Init ParamsKeeper KVStore
+	paramsStoreKey := sdk.NewKVStoreKey(paramstypes.StoreKey)
+	paramsTStoreKey := sdk.NewTransientStoreKey(paramstypes.TStoreKey)
+
 	// Init Keepers
-	newKeeper := keeper.NewKeeper(cdc, storeKey)
+	paramsKeeper := initParamsKeeper(cdc, aminoCdc, paramsStoreKey, paramsTStoreKey)
+	newKeeper := keeper.NewKeeper(cdc, storeKey, getSubspace(types.ModuleName, paramsKeeper))
 
 	// Create Tx
 	txBytes := make([]byte, 28)
@@ -74,4 +82,19 @@ func Setup() TestSetup {
 
 	setup.Keeper.SetDidNamespace(&ctx, DID_NAMESPACE)
 	return setup
+}
+
+func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino, key storetypes.StoreKey, tkey storetypes.StoreKey) paramskeeper.Keeper {
+	// create keeper
+	paramsKeeper := paramskeeper.NewKeeper(appCodec, legacyAmino, key, tkey)
+
+	// set params subspaces
+	paramsKeeper.Subspace(types.ModuleName)
+
+	return paramsKeeper
+}
+
+func getSubspace(moduleName string, paramsKeeper paramskeeper.Keeper) paramstypes.Subspace {
+	subspace, _ := paramsKeeper.GetSubspace(moduleName)
+	return subspace
 }
