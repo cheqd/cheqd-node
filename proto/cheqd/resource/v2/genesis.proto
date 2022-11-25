@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package cheqd.resource.v2;
 
-import "cheqd/resource/v2/resource.proto";
 import "cheqd/resource/v2/fee.proto";
+import "cheqd/resource/v2/resource.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
 
