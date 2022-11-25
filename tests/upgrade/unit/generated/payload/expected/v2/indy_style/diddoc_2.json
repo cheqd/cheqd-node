@@ -1,0 +1,80 @@
+{
+    "did_doc": {
+        "context": [
+            "abc",
+            "def"
+        ],
+        "id": "did:cheqd:testnet:5aayeuitt5VD2VWbL2zopg",
+        "controller": [
+            "did:cheqd:testnet:5aayeuitt5VD2VWbL2zopg"
+        ],
+        "verification_method": [
+            {
+                "id": "did:cheqd:testnet:5aayeuitt5VD2VWbL2zopg#key-1",
+                "type": "Ed25519VerificationKey2020",
+                "controller": "did:cheqd:testnet:5aayeuitt5VD2VWbL2zopg",
+                "verification_material": "{\"publicKeyMultibase\":\"z96PbHeiZGH3Zc9fVHj5K9hdD8bCqpubLJ9pb4cRpDk2X\"}"
+            },
+            {
+                "id": "did:cheqd:testnet:5aayeuitt5VD2VWbL2zopg#key-2",
+                "type": "Ed25519VerificationKey2020",
+                "controller": "did:cheqd:testnet:5aayeuitt5VD2VWbL2zopg",
+                "verification_material": "{\"publicKeyMultibase\":\"zSsYEB2VbVqp8G87RxK9fhjeoy2PGwk3PX1Buqm7hd5w\"}"
+            },
+            {
+                "id": "did:cheqd:testnet:5aayeuitt5VD2VWbL2zopg#key-3",
+                "type": "Ed25519VerificationKey2020",
+                "controller": "did:cheqd:testnet:5aayeuitt5VD2VWbL2zopg",
+                "verification_material": "{\"publicKeyMultibase\":\"z9ksW7J4SJx5W5NgfgakYofpRatvpt4bPvBKkUB9oGhEy\"}"
+            },
+            {
+                "id": "did:cheqd:testnet:5aayeuitt5VD2VWbL2zopg#key-4",
+                "type": "Ed25519VerificationKey2020",
+                "controller": "did:cheqd:testnet:5aayeuitt5VD2VWbL2zopg",
+                "verification_material": "{\"publicKeyMultibase\":\"z7V2MUiykWWkTG2n9dmDTcRTtfyN864DQMv9dVcJWLWYL\"}"
+            }
+        ],
+        "authentication": [
+            "did:cheqd:testnet:5aayeuitt5VD2VWbL2zopg#key-1",
+            "did:cheqd:testnet:5aayeuitt5VD2VWbL2zopg#key-2"
+        ],
+        "assertion_method": [
+            "did:cheqd:testnet:5aayeuitt5VD2VWbL2zopg#key-3"
+        ],
+        "capability_invocation": [
+            "did:cheqd:testnet:5aayeuitt5VD2VWbL2zopg#key-4",
+            "did:cheqd:testnet:5aayeuitt5VD2VWbL2zopg#key-1"
+        ],
+        "capability_delegation": [
+            "did:cheqd:testnet:5aayeuitt5VD2VWbL2zopg#key-4",
+            "did:cheqd:testnet:5aayeuitt5VD2VWbL2zopg#key-2"
+        ],
+        "key_agreement": [
+            "did:cheqd:testnet:5aayeuitt5VD2VWbL2zopg#key-1",
+            "did:cheqd:testnet:5aayeuitt5VD2VWbL2zopg#key-2",
+            "did:cheqd:testnet:5aayeuitt5VD2VWbL2zopg#key-3",
+            "did:cheqd:testnet:5aayeuitt5VD2VWbL2zopg#key-4"
+        ],
+        "also_known_as": [
+            "alias-1",
+            "alias-2"
+        ],
+        "service": [
+            {
+                "id": "did:cheqd:testnet:5aayeuitt5VD2VWbL2zopg#service-1",
+                "type": "type-1",
+                "service_endpoint": [
+                    "endpoint-1"
+                ]
+            }
+        ]
+    },
+    "metadata": {
+        "created": "2021-01-01T00:00:00Z",
+        "updated": "2021-01-01T00:00:00Z",
+        "deactivated": false,
+        "version_id": "7c69f199-f71b-48b3-a570-950fa5e70ded",
+        "next_version_id": "",
+        "previous_version_id": ""
+    }
+}

@@ -155,7 +155,7 @@ func (is_builder *IndyStyleBuilder) buildExpectedResources() error {
 
 func (is_dataset *IndyStyleDataSet) Prepare() error {
 	for _, did_doc := range is_dataset.existingDIDDocs {
-		err := is_dataset.setup.DidKeeper.SetDidDocVersion(&is_dataset.setup.SdkCtx, &did_doc, false)
+		err := is_dataset.setup.DidKeeper.AddNewDidDocVersion(&is_dataset.setup.SdkCtx, &did_doc)
 		if err != nil {
 			return err
 		}

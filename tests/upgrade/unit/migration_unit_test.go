@@ -26,7 +26,7 @@ var _ = Describe("Migration - Unit", func() {
 		resourceChecksumScenario := NewMigrationScenario(
 			"ResourceChecksum",
 			func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error {
-				return appmigrations.MigrateResourceChecksumV2(ctx, migrationCtx)
+				return appmigrations.MigrateResourceChecksum(ctx, migrationCtx)
 			},
 		)
 		// Init Migrator structure
@@ -88,15 +88,23 @@ var _ = Describe("Migration - Unit", func() {
 		dataSet, err := builder.BuildDataSet(setup)
 		Expect(err).To(BeNil())
 
-		indyStyleScenario := NewMigrationScenario(
-			"IndyStyle Migration",
+		indyStyleDidScenario := NewMigrationScenario(
+			"IndyStyle Migration for DID module",
 			func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error {
-				return appmigrations.MigrateDidIndyStyleIdsV1(ctx, migrationCtx)
+				return appmigrations.MigrateDidIndyStyle(ctx, migrationCtx)
 			},
 		)
+
+		indyStyleResourceScenario := NewMigrationScenario(
+			"IndyStyle Migration for Resource module",
+			func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error {
+				return appmigrations.MigrateResourceIndyStyle(ctx, migrationCtx)
+			},
+		)
+			
 		// Init Migrator structure
 		migrator := NewMigrator(
-			[]MigrationScenario{indyStyleScenario},
+			[]MigrationScenario{indyStyleDidScenario, indyStyleResourceScenario},
 			setup,
 			&dataSet)
 
