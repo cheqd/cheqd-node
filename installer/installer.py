@@ -441,7 +441,8 @@ class Installer():
         self.exec(f"sudo su -c 'cheqd-noded configure rpc-laddr \"tcp://0.0.0.0:{self.interviewer.rpc_port}\"' {DEFAULT_CHEQD_USER}")
 
         # Setting up the P2P port
-        self.exec(f"sudo su -c 'cheqd-noded configure p2p laddr \"tcp://0.0.0.0:{self.interviewer.p2p_port}\"' {DEFAULT_CHEQD_USER}")
+        p2p_laddr_text_fragament_to_be_replaced='# Address to listen for incoming connections\nladdr = "tcp:\/\/0.0.0.0:26656"'
+        self.exec(f"""sudo su -c 'perl -0777 -i.original -pe 's/{p2p_laddr_text_fragament_to_be_replaced}/# Address to listen for incoming connections\nladdr = "tcp:\/\/0.0.0.0:{self.interviewer.p2p_port}"/igs' {os.path.join(self.config_dir, "config.toml")}' {DEFAULT_CHEQD_USER}""")
 
         # Setting up min gas-price
         self.exec(f"sudo su -c 'cheqd-noded configure min-gas-prices {self.interviewer.gas_price}' {DEFAULT_CHEQD_USER}")
