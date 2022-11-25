@@ -4,8 +4,8 @@ import (
 	"crypto/sha256"
 	"errors"
 
-	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 
@@ -197,7 +197,7 @@ func MigrateDidIndyStyleIdsV1ResourceModule(sctx sdk.Context, mctx MigrationCont
 
 		var metadata resourcetypes.Metadata
 		var data []byte
-		
+
 		dataKey := ResourceV2MetadataKeyToDataKey(metadataKey)
 
 		// Get metadata and data from storage

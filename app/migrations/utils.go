@@ -9,8 +9,8 @@ import (
 	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 
-	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
 	"github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gogo/protobuf/proto"
