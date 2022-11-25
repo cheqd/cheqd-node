@@ -6,13 +6,13 @@ import (
 )
 
 type Migrator struct {
-	migrations []MigrationScenario
+	migrations []appmigrations.Migration
 	dataSet    IDataSet
 	setup      migrationsetup.TestSetup
 }
 
 func NewMigrator(
-	migrations []MigrationScenario,
+	migrations []appmigrations.Migration,
 	setup migrationsetup.TestSetup,
 	dataSet IDataSet,
 ) Migrator {
@@ -31,12 +31,14 @@ func (m Migrator) Migrate() error {
 		m.setup.ResourceStoreKey,
 		m.setup.DidKeeper,
 		m.setup.ResourceKeeper)
+
 	for _, migration := range m.migrations {
-		err := migration.Handler()(m.setup.SdkCtx, migrationCtx)
+		err := migration(m.setup.SdkCtx, migrationCtx)
 		if err != nil {
 			return err
 		}
 	}
+
 	return nil
 }
 

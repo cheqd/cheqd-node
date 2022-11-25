@@ -1,4 +1,4 @@
-package upgrade
+package integration
 
 import (
 	"testing"

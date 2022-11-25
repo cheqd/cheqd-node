@@ -1,13 +1,6 @@
 package migrations
 
 import (
-	// "crypto/sha256"
-	// "errors"
-
-	// didutils "github.com/cheqd/cheqd-node/x/did/utils"
-	// // didtypes "github.com/cheqd/cheqd-node/x/did/types"
-
-	// resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

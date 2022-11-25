@@ -1,14 +1,12 @@
-package migration
+package unit
 
 import (
 	. "github.com/cheqd/cheqd-node/tests/upgrade/unit/scenarios"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/unit/setup"
-
 	appmigrations "github.com/cheqd/cheqd-node/app/migrations"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/unit/setup"
 )
 
 var _ = Describe("Migration - Unit", func() {
@@ -23,15 +21,13 @@ var _ = Describe("Migration - Unit", func() {
 		dataSet, err := builder.BuildDataSet(setup)
 		Expect(err).To(BeNil())
 
-		resourceChecksumScenario := NewMigrationScenario(
-			"ResourceChecksum",
-			func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error {
-				return appmigrations.MigrateResourceChecksum(ctx, migrationCtx)
-			},
-		)
+		resourceChecksumScenario := []appmigrations.Migration{
+			appmigrations.MigrateResourceChecksum,
+		}
+
 		// Init Migrator structure
 		migrator := NewMigrator(
-			[]MigrationScenario{resourceChecksumScenario},
+			resourceChecksumScenario,
 			setup,
 			&dataSet)
 
@@ -51,23 +47,14 @@ var _ = Describe("Migration - Unit", func() {
 		dataSet, err := builder.BuildDataSet(setup)
 		Expect(err).To(BeNil())
 
-		didProtobufScenario := NewMigrationScenario(
-			"ProtobufDid",
-			func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error {
-				return appmigrations.MigrateDidProtobuf(ctx, migrationCtx)
-			},
-		)
-
-		resourceProtobufScenario := NewMigrationScenario(
-			"ProtobufResource",
-			func(ctx sdk.Context, migrationCtx appmigrations.MigrationContext) error {
-				return appmigrations.MigrateResourceProtobuf(ctx, migrationCtx)
-			},
-		)
+		migrations := []appmigrations.Migration{
+			appmigrations.MigrateDidProtobuf,
+			appmigrations.MigrateResourceProtobuf,
+		}
 
 		// Init Migrator structure
 		migrator := NewMigrator(
-			[]MigrationScenario{didProtobufScenario, resourceProtobufScenario},
+			migrations,
 			setup,
 			&dataSet)
 

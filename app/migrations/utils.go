@@ -9,8 +9,8 @@ import (
 	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 
-	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
 	"github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gogo/protobuf/proto"
@@ -33,7 +33,7 @@ func StateValueToDIDDocWithMetadata(stateValue *didtypesv1.StateValue) (didtypes
 	if err != nil {
 		return didtypes.DidDocWithMetadata{}, err
 	}
-	
+
 	NewDidDocFromV1(didDoc, &newDidDoc)
 	newMetadata = didtypes.Metadata{
 		Created:     metadata.Created,
@@ -46,7 +46,7 @@ func StateValueToDIDDocWithMetadata(stateValue *didtypesv1.StateValue) (didtypes
 	}
 
 	return didtypes.DidDocWithMetadata{
-		DidDoc:  &newDidDoc,
+		DidDoc:   &newDidDoc,
 		Metadata: &newMetadata}, nil
 }
 
@@ -194,7 +194,7 @@ func MoveToIndyStyleIds(didDoc *didtypes.DidDocWithMetadata) {
 }
 
 func CollectAllKeys(
-	ctx sdk.Context, 
+	ctx sdk.Context,
 	storeKey *types.KVStoreKey,
 	iteratorPrefixKey []byte) []IteratorKey {
 
