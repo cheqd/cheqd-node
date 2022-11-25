@@ -39,7 +39,6 @@ type ILoader interface {
 type Loader struct{}
 
 func (l Loader) GetLsitOfFiles(path_to_dir, prefix string) ([]string, error) {
-
 	files_to_load := []string{}
 	err := filepath.Walk(path_to_dir, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() && strings.HasPrefix(info.Name(), prefix) {

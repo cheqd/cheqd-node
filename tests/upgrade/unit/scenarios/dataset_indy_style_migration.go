@@ -12,16 +12,16 @@ import (
 )
 
 type IndyStyleBuilder struct {
-	setup  migrationsetup.TestSetup
-	loader Loader
-	is_dataset    IndyStyleDataSet
+	setup      migrationsetup.TestSetup
+	loader     Loader
+	is_dataset IndyStyleDataSet
 }
 
 func NewIndyStyleBuilder(setup migrationsetup.TestSetup) IndyStyleBuilder {
 	return IndyStyleBuilder{
-		setup:  setup,
-		loader: Loader{},
-		is_dataset:    NewIndyStyleDataSet(setup),
+		setup:      setup,
+		loader:     Loader{},
+		is_dataset: NewIndyStyleDataSet(setup),
 	}
 }
 
@@ -45,7 +45,6 @@ func NewIndyStyleDataSet(setup migrationsetup.TestSetup) IndyStyleDataSet {
 
 func (is_builder *IndyStyleBuilder) BuildDataSet(setup migrationsetup.TestSetup) (IndyStyleDataSet, error) {
 	err := is_builder.buildExistingDids()
-
 	if err != nil {
 		return IndyStyleDataSet{}, err
 	}
@@ -155,7 +154,7 @@ func (is_builder *IndyStyleBuilder) buildExpectedResources() error {
 
 func (is_dataset *IndyStyleDataSet) Prepare() error {
 	for _, did_doc := range is_dataset.existingDIDDocs {
-		err := is_dataset.setup.DidKeeper.SetDidDocVersion(&is_dataset.setup.SdkCtx, &did_doc, false)
+		err := is_dataset.setup.DidKeeper.AddNewDidDocVersion(&is_dataset.setup.SdkCtx, &did_doc)
 		if err != nil {
 			return err
 		}

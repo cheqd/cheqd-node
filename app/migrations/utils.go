@@ -80,7 +80,7 @@ func IndyStyleDidUrlList(didUrls []string) []string {
 }
 
 func MoveToIndyStyleIds(didDoc *didtypes.DidDocWithMetadata) {
-	didDoc.DidDoc.Id = IndyStyleId(didDoc.DidDoc.Id)
+	didDoc.DidDoc.Id = IndyStyleDid(didDoc.DidDoc.Id)
 	for _, vm := range didDoc.DidDoc.VerificationMethod {
 		vm.Id = IndyStyleDidUrl(vm.Id)
 		vm.Controller = IndyStyleDid(vm.Controller)

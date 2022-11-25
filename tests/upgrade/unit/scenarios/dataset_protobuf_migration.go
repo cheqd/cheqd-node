@@ -47,7 +47,6 @@ func NewProtobufDataSet(setup migrationsetup.TestSetup) ProtobufDataSet {
 
 func (pb *ProtobufBuilder) BuildDataSet(setup migrationsetup.TestSetup) (ProtobufDataSet, error) {
 	err := pb.buildExistingDids()
-
 	if err != nil {
 		return ProtobufDataSet{}, err
 	}

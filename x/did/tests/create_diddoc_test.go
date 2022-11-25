@@ -127,7 +127,7 @@ var _ = Describe("Create DID tests", func() {
 	})
 
 	It("Valid: Works for DIDDoc with all properties", func() {
-		did := GenerateDID(Base58_16symbols)
+		did := GenerateDID(Base58_16bytes)
 
 		keypair1 := GenerateKeyPair()
 		keyId1 := did + "#key-1"
@@ -194,7 +194,6 @@ var _ = Describe("Create DID tests", func() {
 			},
 		}
 
-		println(string(setup.Cdc.MustMarshalJSON(msg)))
 		_, err := setup.CreateDid(msg, signatures)
 		Expect(err).To(BeNil())
 

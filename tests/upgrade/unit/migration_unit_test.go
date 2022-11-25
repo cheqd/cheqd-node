@@ -22,7 +22,7 @@ var _ = Describe("Migration - Unit", func() {
 		Expect(err).To(BeNil())
 
 		resourceChecksumScenario := []appmigrations.Migration{
-			appmigrations.MigrateResourceChecksumV2,
+			appmigrations.MigrateResourceChecksum,
 		}
 
 		// Init Migrator structure
@@ -76,7 +76,8 @@ var _ = Describe("Migration - Unit", func() {
 		Expect(err).To(BeNil())
 
 		indyStyleScenario := []appmigrations.Migration{
-			appmigrations.MigrateDidIndyStyleIdsV1,
+			appmigrations.MigrateDidIndyStyle,
+			appmigrations.MigrateResourceIndyStyle,
 		}
 
 		// Init Migrator structure

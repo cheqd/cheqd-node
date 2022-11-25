@@ -16,7 +16,6 @@ func NewMigrator(
 	setup migrationsetup.TestSetup,
 	dataSet IDataSet,
 ) Migrator {
-
 	return Migrator{
 		migrations: migrations,
 		dataSet:    dataSet,

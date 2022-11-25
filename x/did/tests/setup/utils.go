@@ -3,8 +3,9 @@ package setup
 import (
 	"crypto/ed25519"
 	"crypto/rand"
-	mathrand "math/rand"
 	"encoding/json"
+	mathrand "math/rand"
+	"time"
 
 	"github.com/cheqd/cheqd-node/x/did/types"
 	. "github.com/cheqd/cheqd-node/x/did/utils"
@@ -27,14 +28,15 @@ func randBase58Seq(bytes int) string {
 type IDType int
 
 const (
-	Base58_16bytes IDType = iota
+	Base58_16bytes   IDType = iota
 	Base58_16symbols IDType = iota
-	UUID           IDType = iota
+	UUID             IDType = iota
 )
 
 var letters = []rune("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz")
 
 func randSeq(n int) string {
+	mathrand.Seed(time.Now().UnixNano())
 	b := make([]rune, n)
 	for i := range b {
 		b[i] = letters[mathrand.Intn(len(letters))]

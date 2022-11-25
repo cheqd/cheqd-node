@@ -46,7 +46,6 @@ func NewChecksumDataSet(setup migrationsetup.TestSetup) ChecksumDataSet {
 
 func (cb *ChecksumBuilder) BuildDataSet(setup migrationsetup.TestSetup) (ChecksumDataSet, error) {
 	err := cb.buildExistingDids()
-
 	if err != nil {
 		return ChecksumDataSet{}, err
 	}
