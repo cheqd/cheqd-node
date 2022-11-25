@@ -434,7 +434,8 @@ class Installer():
 
         # Setting up the seeds
         seeds = self.exec(f"curl {SEEDS_FILE.format(self.interviewer.chain)}").stdout.decode("utf-8").strip()
-        self.exec(f"sudo su -c 'cheqd-noded configure p2p seeds {seeds}' {DEFAULT_CHEQD_USER}")
+        seeds_value_to_replace = 'seeds = ""'
+        self.exec(f"""sudo su -c 'perl -0777 -i.original -pe 's/{seeds_value_to_replace}/{seeds}/igs' {os.path.join(self.config_dir, "config.toml")}' {DEFAULT_CHEQD_USER}""")
 
         # Setting up the RPC port
         self.exec(f"sudo su -c 'cheqd-noded configure rpc-laddr \"tcp://0.0.0.0:{self.interviewer.rpc_port}\"' {DEFAULT_CHEQD_USER}")
