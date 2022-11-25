@@ -6,16 +6,15 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+// This migration should be run after protobuf that's why we use new DidDocWithMetadata
 func MigrateDidIndyStyle(sctx sdk.Context, mctx MigrationContext) error {
-	// This migration should be run after protobuf that's why we use new DidDocWithMetadata
+	store := sctx.KVStore(mctx.didStoreKey)
+
 	var didDocWithMetadata didtypes.DidDocWithMetadata
 
-	didKeys := CollectAllKeys(
-		sctx,
-		mctx.didStoreKey,
+	didKeys := ReadAllKeys(
+		store,
 		didutils.StrBytes(didtypes.DidDocVersionKey))
-
-	store := sctx.KVStore(mctx.didStoreKey)
 
 	for _, didKey := range didKeys {
 		didDocWithMetadata = didtypes.DidDocWithMetadata{}
@@ -29,7 +28,7 @@ func MigrateDidIndyStyle(sctx sdk.Context, mctx MigrationContext) error {
 		store.Delete(didKey)
 
 		// Set new DID Doc
-		err := mctx.didKeeper.AddNewDidDocVersion(&sctx, &didDocWithMetadata)
+		err := mctx.didKeeperNew.AddNewDidDocVersion(&sctx, &didDocWithMetadata)
 		if err != nil {
 			return err
 		}

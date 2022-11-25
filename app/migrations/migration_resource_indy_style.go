@@ -7,12 +7,11 @@ import (
 )
 
 func MigrateResourceIndyStyle(sctx sdk.Context, mctx MigrationContext) error {
-	var metadataKeys []IteratorKey
+	var metadataKeys []ByteStr
 
 	store := sctx.KVStore(mctx.resourceStoreKey)
-	metadataKeys = CollectAllKeys(
-		sctx,
-		mctx.resourceStoreKey,
+	metadataKeys = ReadAllKeys(
+		store,
 		didutils.StrBytes(resourcetypes.ResourceMetadataKey))
 
 	for _, metadataKey := range metadataKeys {
@@ -43,7 +42,7 @@ func MigrateResourceIndyStyle(sctx sdk.Context, mctx MigrationContext) error {
 		store.Delete(dataKey)
 
 		// Update HeaderInfo
-		err := mctx.resourceKeeper.SetResource(&sctx, &newResourceWithMetadata)
+		err := mctx.resourceKeeperNew.SetResource(&sctx, &newResourceWithMetadata)
 		if err != nil {
 			return err
 		}

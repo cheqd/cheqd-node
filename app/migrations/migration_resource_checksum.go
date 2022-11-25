@@ -40,7 +40,7 @@ func MigrateResourceChecksum(sctx sdk.Context, mctx MigrationContext) error {
 		metadata.Checksum = checksum[:]
 
 		// Update HeaderInfo
-		err := mctx.resourceKeeper.UpdateResourceMetadata(&sctx, &metadata)
+		err := mctx.resourceKeeperNew.UpdateResourceMetadata(&sctx, &metadata)
 		if err != nil {
 			return err
 		}
