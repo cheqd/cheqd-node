@@ -9,13 +9,13 @@ option go_package = "github.com/cheqd/cheqd-node/x/did/types";
 
 service Query {
   rpc DidDoc(QueryGetDidDocRequest) returns (QueryGetDidDocResponse) {
-    option (google.api.http).get = "/cheqd/did/v2/diddoc/{id}";
+    option (google.api.http).get = "/cheqd/did/v2/{id}";
   }
   rpc DidDocVersion(QueryGetDidDocVersionRequest) returns (QueryGetDidDocVersionResponse) {
-    option (google.api.http).get = "/cheqd/did/v2/diddoc/{id}/version/{version}";
+    option (google.api.http).get = "/cheqd/did/v2/{id}/version/{version}";
   }
   rpc AllDidDocVersionsMetadata(QueryGetAllDidDocVersionsMetadataRequest) returns (QueryGetAllDidDocVersionsMetadataResponse) {
-    option (google.api.http).get = "/cheqd/did/v2/diddoc/{id}/metadata";
+    option (google.api.http).get = "/cheqd/did/v2/{id}/metadata";
   }
 }
 
