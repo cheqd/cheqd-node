@@ -137,7 +137,7 @@ func MigrateType(t string) string {
 
 func MigrateVerificationMaterial(vm *didtypesv1.VerificationMethod) string {
 	switch vm.Type {
-	case didtypesv1.Ed25519VerificationKey2020:
+	case didtypesv1.JsonWebKey2020:
 		jwk := make(map[string]string)
 		for _, kv := range vm.PublicKeyJwk {
 			jwk[kv.Key] = kv.Value
@@ -157,7 +157,7 @@ func MigrateVerificationMaterial(vm *didtypesv1.VerificationMethod) string {
 
 		return string(res)
 
-	case didtypesv1.JsonWebKey2020:
+	case didtypesv1.Ed25519VerificationKey2020:
 		pk_multi := didtypes.Ed25519VerificationKey2020{
 			PublicKeyMultibase: vm.PublicKeyMultibase,
 		}
