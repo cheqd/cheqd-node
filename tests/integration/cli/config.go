@@ -6,7 +6,7 @@ const (
 	KEYRING_BACKEND = "test"
 	OUTPUT_FORMAT   = "json"
 	GAS             = "auto"
-	GAS_ADJUSTMENT  = "1.5"
+	GAS_ADJUSTMENT  = "1.8"
 	GAS_PRICES      = "25ncheq"
 )
 
