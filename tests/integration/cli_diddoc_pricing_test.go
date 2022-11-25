@@ -82,19 +82,28 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 	}) */
 
 	It("should tax create diddoc message - case: gas auto", func() {
-		By("querying the total supply")
-		supplyBeforeDeflation, err := cli.QuerySupplyOf(types.BaseMinimalDenom)
-		Expect(err).To(BeNil())
-
 		By("querying the current account balance")
 		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, types.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 		Expect(balanceBefore.Denom).To(BeEquivalentTo(types.BaseMinimalDenom))
 
+		By("querying the total supply")
+		supplyBeforeDeflation, err := cli.QuerySupplyOf(types.BaseMinimalDenom)
+		Expect(err).To(BeNil())
+
 		By("submitting a create diddoc message")
 		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_2, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
+
+		By("querying the deflated total supply")
+		supplyAfterDeflation, err := cli.QuerySupplyOf(types.BaseMinimalDenom)
+		Expect(err).To(BeNil())
+
+		By("checking the deflation")
+		tax := feeParams.CreateDid
+		burnt := helpers.GetBurntPortion(tax, feeParams.BurnFactor)
+		Expect(supplyBeforeDeflation.Amount.Sub(supplyAfterDeflation.Amount)).To(Equal(burnt.Amount))
 
 		By("querying the altered account balance")
 		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, types.BaseMinimalDenom)
@@ -103,16 +112,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		By("checking the balance difference")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		tax := feeParams.CreateDid
 		Expect(diff).To(Equal(tax.Amount))
-
-		By("querying the deflated total supply")
-		supplyAfterDeflation, err := cli.QuerySupplyOf(types.BaseMinimalDenom)
-		Expect(err).To(BeNil())
-
-		By("checking the deflation")
-		burnt := helpers.GetBurntPortion(tax, feeParams.BurnFactor)
-		Expect(supplyBeforeDeflation.Amount.Sub(supplyAfterDeflation.Amount)).To(Equal(burnt.Amount))
 
 		// WIP:
 		// [x] 1. Check the balance of fee payer account
