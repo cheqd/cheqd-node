@@ -7,13 +7,6 @@ import (
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
-// Default FeeParams map keys
-const (
-	DefaultKeyCreateDid     = "create_did"
-	DefaultKeyUpdateDid     = "update_did"
-	DefaultKeyDeactivateDid = "deactivate_did"
-)
-
 // Parameter store key
 var (
 	ParamStoreKeyFeeParams = []byte("feeparams")
@@ -28,35 +21,33 @@ func ParamKeyTable() paramtypes.KeyTable {
 // DefaultFeeParams returns default cheqd module tx fee parameters
 func DefaultFeeParams() *FeeParams {
 	return &FeeParams{
-		TxTypes: map[string]sdk.Coin{
-			DefaultKeyCreateDid:     sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultCreateDidTxFee)),
-			DefaultKeyUpdateDid:     sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultUpdateDidTxFee)),
-			DefaultKeyDeactivateDid: sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultDeactivateDidTxFee)),
-		},
-		BurnFactor: sdk.MustNewDecFromStr(DefaultBurnFactor),
+		CreateDid:     sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultCreateDidTxFee)),
+		UpdateDid:     sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultUpdateDidTxFee)),
+		DeactivateDid: sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultDeactivateDidTxFee)),
+		BurnFactor:    sdk.MustNewDecFromStr(DefaultBurnFactor),
 	}
 }
 
 // ValidateBasic performs basic validation of cheqd module tx fee parameters
 func (tfp *FeeParams) ValidateBasic() error {
-	if !tfp.TxTypes[DefaultKeyCreateDid].IsPositive() || tfp.TxTypes[DefaultKeyCreateDid].Denom != BaseMinimalDenom {
-		return fmt.Errorf("invalid create did tx fee: %s", tfp.TxTypes[DefaultKeyCreateDid])
+	if !tfp.CreateDid.IsPositive() || tfp.CreateDid.Denom != BaseMinimalDenom {
+		return fmt.Errorf("invalid create did tx fee: %s", tfp.CreateDid)
 	}
 
-	if !tfp.TxTypes[DefaultKeyUpdateDid].IsPositive() || tfp.TxTypes[DefaultKeyUpdateDid].Denom != BaseMinimalDenom {
-		return fmt.Errorf("invalid update did tx fee: %s", tfp.TxTypes[DefaultKeyUpdateDid])
+	if !tfp.UpdateDid.IsPositive() || tfp.UpdateDid.Denom != BaseMinimalDenom {
+		return fmt.Errorf("invalid update did tx fee: %s", tfp.UpdateDid)
 	}
 
-	if !tfp.TxTypes[DefaultKeyDeactivateDid].IsPositive() || tfp.TxTypes[DefaultKeyDeactivateDid].Denom != BaseMinimalDenom {
-		return fmt.Errorf("invalid deactivate did tx fee: %s", tfp.TxTypes[DefaultKeyDeactivateDid])
+	if !tfp.DeactivateDid.IsPositive() || tfp.DeactivateDid.Denom != BaseMinimalDenom {
+		return fmt.Errorf("invalid deactivate did tx fee: %s", tfp.DeactivateDid)
 	}
 
-	if !tfp.TxTypes[DefaultKeyCreateDid].IsGTE(tfp.TxTypes[DefaultKeyUpdateDid]) {
-		return fmt.Errorf("create did tx fee must be greater than or equal to update did tx fee: %s >= %s", tfp.TxTypes[DefaultKeyCreateDid], tfp.TxTypes[DefaultKeyUpdateDid])
+	if !tfp.CreateDid.IsGTE(tfp.UpdateDid) {
+		return fmt.Errorf("create did tx fee must be greater than or equal to update did tx fee: %s >= %s", tfp.CreateDid, tfp.UpdateDid)
 	}
 
-	if tfp.TxTypes[DefaultKeyUpdateDid].IsLTE(tfp.TxTypes[DefaultKeyDeactivateDid]) {
-		return fmt.Errorf("update did tx fee must be greater than deactivate did tx fee: %s > %s", tfp.TxTypes[DefaultKeyUpdateDid], tfp.TxTypes[DefaultKeyDeactivateDid])
+	if tfp.UpdateDid.IsLTE(tfp.DeactivateDid) {
+		return fmt.Errorf("update did tx fee must be greater than deactivate did tx fee: %s > %s", tfp.UpdateDid, tfp.DeactivateDid)
 	}
 
 	if !tfp.BurnFactor.IsPositive() || tfp.BurnFactor.GTE(sdk.OneDec()) {
@@ -144,19 +135,15 @@ func validateFeeParams(i interface{}) error {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
 
-	if v.TxTypes == nil {
-		return fmt.Errorf("tx types must not be nil")
-	}
-
-	if err := validateCreateDid(v.TxTypes[DefaultKeyCreateDid]); err != nil {
+	if err := validateCreateDid(v.CreateDid); err != nil {
 		return err
 	}
 
-	if err := validateUpdateDid(v.TxTypes[DefaultKeyUpdateDid]); err != nil {
+	if err := validateUpdateDid(v.UpdateDid); err != nil {
 		return err
 	}
 
-	if err := validateDeactivateDid(v.TxTypes[DefaultKeyDeactivateDid]); err != nil {
+	if err := validateDeactivateDid(v.DeactivateDid); err != nil {
 		return err
 	}
 

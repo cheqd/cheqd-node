@@ -7,13 +7,6 @@ import (
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
-// Default FeeParams map keys
-const (
-	DefaultKeyCreateResourceImage = "image"
-	DefaultKeyCreateResourceJson  = "json"
-	DefaultKeyCreateResource      = "default"
-)
-
 var ParamStoreKeyFeeParams = []byte("feeparams")
 
 // ParamKeyTable returns the key declaration for parameters
@@ -26,35 +19,33 @@ func ParamKeyTable() paramstypes.KeyTable {
 // DefaultFeeParams returns default cheqd module tx fee parameters
 func DefaultFeeParams() *FeeParams {
 	return &FeeParams{
-		MediaTypes: map[string]sdk.Coin{
-			DefaultKeyCreateResourceImage: sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceImageFee)),
-			DefaultKeyCreateResourceJson:  sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceJsonFee)),
-			DefaultKeyCreateResource:      sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceDefaultFee)),
-		},
+		Image:      sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceImageFee)),
+		Json:       sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceJsonFee)),
+		Default:    sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceDefaultFee)),
 		BurnFactor: sdk.MustNewDecFromStr(DefaultBurnFactor),
 	}
 }
 
 // ValidateBasic performs basic validation of cheqd module tx fee parameters
 func (tfp *FeeParams) ValidateBasic() error {
-	if !tfp.MediaTypes[DefaultKeyCreateResourceImage].IsPositive() || tfp.MediaTypes[DefaultKeyCreateResourceImage].Denom != BaseMinimalDenom {
-		return fmt.Errorf("invalid create resource image tx fee: %s", tfp.MediaTypes[DefaultKeyCreateResourceImage])
+	if !tfp.Image.IsPositive() || tfp.Image.Denom != BaseMinimalDenom {
+		return fmt.Errorf("invalid create resource image tx fee: %s", tfp.Image)
 	}
 
-	if !tfp.MediaTypes[DefaultKeyCreateResourceJson].IsPositive() || tfp.MediaTypes[DefaultKeyCreateResourceJson].Denom != BaseMinimalDenom {
-		return fmt.Errorf("invalid create resource json tx fee: %s", tfp.MediaTypes[DefaultKeyCreateResourceJson])
+	if !tfp.Json.IsPositive() || tfp.Json.Denom != BaseMinimalDenom {
+		return fmt.Errorf("invalid create resource json tx fee: %s", tfp.Json)
 	}
 
-	if !tfp.MediaTypes[DefaultKeyCreateResourceJson].IsPositive() || tfp.MediaTypes[DefaultKeyCreateResourceJson].Denom != BaseMinimalDenom {
-		return fmt.Errorf("invalid create resource default tx fee: %s", tfp.MediaTypes[DefaultKeyCreateResourceJson])
+	if !tfp.Json.IsPositive() || tfp.Json.Denom != BaseMinimalDenom {
+		return fmt.Errorf("invalid create resource default tx fee: %s", tfp.Json)
 	}
 
-	if !tfp.MediaTypes[DefaultKeyCreateResourceImage].IsGTE(tfp.MediaTypes[DefaultKeyCreateResourceJson]) {
-		return fmt.Errorf("create resource image tx fee must be greater than or equal to create resource json tx fee: %s >= %s", tfp.MediaTypes[DefaultKeyCreateResourceImage], tfp.MediaTypes[DefaultKeyCreateResourceJson])
+	if !tfp.Image.IsGTE(tfp.Json) {
+		return fmt.Errorf("create resource image tx fee must be greater than or equal to create resource json tx fee: %s >= %s", tfp.Image, tfp.Json)
 	}
 
-	if tfp.MediaTypes[DefaultKeyCreateResourceJson].IsLTE(tfp.MediaTypes[DefaultKeyCreateResource]) {
-		return fmt.Errorf("create resource json tx fee must be greater than create resource default tx fee: %s > %s", tfp.MediaTypes[DefaultKeyCreateResourceJson], tfp.MediaTypes[DefaultKeyCreateResource])
+	if tfp.Json.IsLTE(tfp.Default) {
+		return fmt.Errorf("create resource json tx fee must be greater than create resource default tx fee: %s > %s", tfp.Json, tfp.Default)
 	}
 
 	if !tfp.BurnFactor.IsPositive() || tfp.BurnFactor.GTE(sdk.OneDec()) {
@@ -142,15 +133,15 @@ func validateFeeParams(i interface{}) error {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
 
-	if err := validateImage(v.MediaTypes[DefaultKeyCreateResourceImage]); err != nil {
+	if err := validateImage(v.Image); err != nil {
 		return err
 	}
 
-	if err := validateJson(v.MediaTypes[DefaultKeyCreateResourceJson]); err != nil {
+	if err := validateJson(v.Json); err != nil {
 		return err
 	}
 
-	if err := validateDefault(v.MediaTypes[DefaultKeyCreateResource]); err != nil {
+	if err := validateDefault(v.Default); err != nil {
 		return err
 	}
 

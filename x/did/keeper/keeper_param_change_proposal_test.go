@@ -50,41 +50,14 @@ func (suite *HandlerTestSuite) TestProposalHandler() {
 			testProposal(proposal.ParamChange{
 				Subspace: didtypes.ModuleName,
 				Key:      string(didtypes.ParamStoreKeyFeeParams),
-				Value:    `{"tx_types": {"create_did": {"denom": "ncheq", "amount": "10000000000"}, "update_did": {"denom": "ncheq", "amount": "4000000000"}, "deactivate_did": {"denom": "ncheq", "amount": "2000000000"}}, "burn_factor": "0.600000000000000000"}`,
+				Value:    `{"create_did": {"denom": "ncheq", "amount": "10000000000"}, "update_did": {"denom": "ncheq", "amount": "4000000000"}, "deactivate_did": {"denom": "ncheq", "amount": "2000000000"}, "burn_factor": "0.600000000000000000"}`,
 			}),
 			func() {
 				expectedFeeParams := didtypes.FeeParams{
-					TxTypes: map[string]sdk.Coin{
-						didtypes.DefaultKeyCreateDid:     {Denom: didtypes.BaseMinimalDenom, Amount: sdk.NewInt(10000000000)},
-						didtypes.DefaultKeyUpdateDid:     {Denom: didtypes.BaseMinimalDenom, Amount: sdk.NewInt(4000000000)},
-						didtypes.DefaultKeyDeactivateDid: {Denom: didtypes.BaseMinimalDenom, Amount: sdk.NewInt(2000000000)},
-					},
-					BurnFactor: sdk.MustNewDecFromStr("0.600000000000000000"),
-				}
-
-				feeParams := suite.app.DidKeeper.GetParams(suite.ctx)
-
-				suite.Require().Equal(expectedFeeParams, feeParams)
-			},
-			false,
-			"",
-		},
-		{
-			"new msg type added",
-			testProposal(proposal.ParamChange{
-				Subspace: didtypes.ModuleName,
-				Key:      string(didtypes.ParamStoreKeyFeeParams),
-				Value:    `{"tx_types": {"create_did": {"denom": "ncheq", "amount": "5000000000"}, "update_did": {"denom": "ncheq", "amount": "2000000000"}, "deactivate_did": {"denom": "ncheq", "amount": "1000000000"}, "new_msg_type": {"denom": "ncheq", "amount": "2000000000"}}, "burn_factor": "0.500000000000000000"}`,
-			}),
-			func() {
-				expectedFeeParams := didtypes.FeeParams{
-					TxTypes: map[string]sdk.Coin{
-						didtypes.DefaultKeyCreateDid:     {Denom: didtypes.BaseMinimalDenom, Amount: sdk.NewInt(didtypes.DefaultCreateDidTxFee)},
-						didtypes.DefaultKeyUpdateDid:     {Denom: didtypes.BaseMinimalDenom, Amount: sdk.NewInt(didtypes.DefaultUpdateDidTxFee)},
-						didtypes.DefaultKeyDeactivateDid: {Denom: didtypes.BaseMinimalDenom, Amount: sdk.NewInt(didtypes.DefaultDeactivateDidTxFee)},
-						"new_msg_type":                   {Denom: didtypes.BaseMinimalDenom, Amount: sdk.NewInt(2000000000)},
-					},
-					BurnFactor: sdk.MustNewDecFromStr(didtypes.DefaultBurnFactor),
+					CreateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdk.NewInt(10000000000)},
+					UpdateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdk.NewInt(4000000000)},
+					DeactivateDid: sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdk.NewInt(2000000000)},
+					BurnFactor:    sdk.MustNewDecFromStr("0.600000000000000000"),
 				}
 
 				feeParams := suite.app.DidKeeper.GetParams(suite.ctx)
@@ -110,14 +83,7 @@ func (suite *HandlerTestSuite) TestProposalHandler() {
 			testProposal(proposal.ParamChange{
 				Subspace: didtypes.ModuleName,
 				Key:      string(didtypes.ParamStoreKeyFeeParams),
-				Value: `
-				{
-					"tx_types": {
-						"create_did": {"denom": "ncheq", "amount": "10000000000"},
-						"update_did": {"denom": "ncheq", "amount": "4000000000"}
-					},
-					"burn_factor": "0.600000000000000000"
-				}`,
+				Value:    `{"create_did": {"denom": "ncheq", "amount": "10000000000"}, "update_did": {"denom": "ncheq", "amount": "4000000000"}, "burn_factor": "0.600000000000000000"}`,
 			}),
 			func() {},
 			true,
@@ -128,7 +94,7 @@ func (suite *HandlerTestSuite) TestProposalHandler() {
 			testProposal(proposal.ParamChange{
 				Subspace: didtypes.ModuleName,
 				Key:      string(didtypes.ParamStoreKeyFeeParams),
-				Value:    `{"tx_types": {"create_did": {"denom": "ncheq", "amount": "0"}, "update_did": {"denom": "ncheq", "amount": "4000000000"}, "deactivate_did": {"denom": "ncheq", "amount": "2000000000"}}, "burn_factor": "0.600000000000000000"}`,
+				Value:    `{"create_did": {"denom": "ncheq", "amount": "0"}, "update_did": {"denom": "ncheq", "amount": "4000000000"}, "deactivate_did": {"denom": "ncheq", "amount": "2000000000"}, "burn_factor": "0.600000000000000000"}`,
 			}),
 			func() {},
 			true,
@@ -139,7 +105,7 @@ func (suite *HandlerTestSuite) TestProposalHandler() {
 			testProposal(proposal.ParamChange{
 				Subspace: didtypes.ModuleName,
 				Key:      string(didtypes.ParamStoreKeyFeeParams),
-				Value:    `{"tx_types": {"create_did": {"denom": "ncheq", "amount": "10000000000"}, "update_did": {"denom": "ncheq", "amount": "0"}, "deactivate_did": {"denom": "ncheq", "amount": "2000000000"}}, "burn_factor": "0.600000000000000000"}`,
+				Value:    `{"create_did": {"denom": "ncheq", "amount": "10000000000"}, "update_did": {"denom": "ncheq", "amount": "0"}, "deactivate_did": {"denom": "ncheq", "amount": "2000000000"}, "burn_factor": "0.600000000000000000"}`,
 			}),
 			func() {},
 			true,
@@ -150,7 +116,7 @@ func (suite *HandlerTestSuite) TestProposalHandler() {
 			testProposal(proposal.ParamChange{
 				Subspace: didtypes.ModuleName,
 				Key:      string(didtypes.ParamStoreKeyFeeParams),
-				Value:    `{"tx_types": {"create_did": {"denom": "ncheq", "amount": "10000000000"}, "update_did": {"denom": "ncheq", "amount": "4000000000"}, "deactivate_did": {"denom": "ncheq", "amount": "0"}}, "burn_factor": "0.600000000000000000"}`,
+				Value:    `{"create_did": {"denom": "ncheq", "amount": "10000000000"}, "update_did": {"denom": "ncheq", "amount": "4000000000"}, "deactivate_did": {"denom": "ncheq", "amount": "0"}, "burn_factor": "0.600000000000000000"}`,
 			}),
 			func() {},
 			true,
@@ -161,7 +127,7 @@ func (suite *HandlerTestSuite) TestProposalHandler() {
 			testProposal(proposal.ParamChange{
 				Subspace: didtypes.ModuleName,
 				Key:      string(didtypes.ParamStoreKeyFeeParams),
-				Value:    `{"tx_types": {"create_did": {"denom": "ncheq", "amount": "10000000000"}, "update_did": {"denom": "ncheq", "amount": "4000000000"}, "deactivate_did": {"denom": "ncheq", "amount": "2000000000"}}, "burn_factor": "-1"}`,
+				Value:    `{"create_did": {"denom": "ncheq", "amount": "10000000000"}, "update_did": {"denom": "ncheq", "amount": "4000000000"}, "deactivate_did": {"denom": "ncheq", "amount": "2000000000"}, "burn_factor": "-1"}`,
 			}),
 			func() {},
 			true,
@@ -172,7 +138,7 @@ func (suite *HandlerTestSuite) TestProposalHandler() {
 			testProposal(proposal.ParamChange{
 				Subspace: didtypes.ModuleName,
 				Key:      string(didtypes.ParamStoreKeyFeeParams),
-				Value:    `{"tx_types": {"create_did": {"denom": "ncheq", "amount": "10000000000"}, "update_did": {"denom": "ncheq", "amount": "4000000000"}, "deactivate_did": {"denom": "ncheq", "amount": "2000000000"}}, "burn_factor": "1.1"}`,
+				Value:    `{"create_did": {"denom": "ncheq", "amount": "10000000000"}, "update_did": {"denom": "ncheq", "amount": "4000000000"}, "deactivate_did": {"denom": "ncheq", "amount": "2000000000"}, "burn_factor": "1.1"}`,
 			}),
 			func() {},
 			true,

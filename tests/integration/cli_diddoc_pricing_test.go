@@ -102,9 +102,9 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(balanceAfter.Denom).To(BeEquivalentTo(types.BaseMinimalDenom))
 
 		By("checking the balance difference")
-		minusTax := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		tax := feeParams.TxTypes[types.DefaultKeyCreateDid]
-		Expect(minusTax).To(Equal(tax.Amount))
+		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
+		tax := feeParams.CreateDid
+		Expect(diff).To(Equal(tax.Amount))
 
 		By("querying the deflated total supply")
 		supplyAfterDeflation, err := cli.QuerySupplyOf(types.BaseMinimalDenom)
