@@ -8,7 +8,7 @@ import (
 
 // InitGenesis initializes the cheqd module's state from a provided genesis
 // state.
-func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
+func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState *types.GenesisState) {
 	// Set didocs
 	for _, versionSet := range genState.VersionSets {
 		for _, didDoc := range versionSet.DidDocs {
