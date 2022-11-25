@@ -429,7 +429,8 @@ class Installer():
 
         # Setting up the external_address
         if self.interviewer.external_address:
-            self.exec(f"sudo su -c 'cheqd-noded configure p2p external-address {self.interviewer.external_address}:{self.interviewer.p2p_port}' {DEFAULT_CHEQD_USER}")
+            external_address_value_to_replace='external_address = ""'
+            self.exec(f"""sudo su -c 'perl -0777 -i.original -pe 's/{external_address_value_to_replace}/"{self.interviewer.external_address}:{self.interviewer.p2p_port}"/igs' {os.path.join(self.config_dir, "config.toml")}' {DEFAULT_CHEQD_USER}""")
 
         # Setting up the seeds
         seeds = self.exec(f"curl {SEEDS_FILE.format(self.interviewer.chain)}").stdout.decode("utf-8").strip()
