@@ -16,4 +16,4 @@ bash "$DIR_/upgrade.sh"
 
 ginkgo -r --tags upgrade --race --tags upgrade_integration --focus-file post_test.go
 
-# bash "$DIR_/cleanup.sh"
+bash "$DIR_/cleanup.sh"
