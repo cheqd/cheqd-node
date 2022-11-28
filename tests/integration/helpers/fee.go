@@ -10,6 +10,12 @@ func GenerateFees(amount string) []string {
 	}
 }
 
+func GenerateFeeGranter(granter string, feeParams []string) []string {
+	return append([]string{
+		"--fee-granter", granter,
+	}, feeParams...)
+}
+
 func GetBurntPortion(tax sdk.Coin, burnFactor sdk.Dec) sdk.Coin {
 	taxDec := sdk.NewDecCoinFromCoin(tax)
 	taxDec.Amount = taxDec.Amount.Mul(burnFactor)

@@ -558,7 +558,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
+		}, signInputs, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_2_ADDR, cli.CLI_GAS_PARAMS))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -614,7 +614,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
+		}, signInputs, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_2_ADDR, cli.CLI_GAS_PARAMS))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -670,7 +670,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
+		}, signInputs, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_2_ADDR, cli.CLI_GAS_PARAMS))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
