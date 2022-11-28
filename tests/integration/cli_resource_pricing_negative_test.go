@@ -109,7 +109,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
 		}, signInputs, testdata.BASE_ACCOUNT_2, helpers.GenerateFees(invalidTax.String()))
-		Expect(err).ToNot(BeNil())
+		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(10))
 	})
 
@@ -132,7 +132,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
 		}, signInputs, testdata.BASE_ACCOUNT_2, helpers.GenerateFees(invalidTax.String()))
-		Expect(err).ToNot(BeNil())
+		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(10))
 	})
 
@@ -155,7 +155,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
 		}, signInputs, testdata.BASE_ACCOUNT_2, helpers.GenerateFees(invalidTax.String()))
-		Expect(err).ToNot(BeNil())
+		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(10))
 	})
 

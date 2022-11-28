@@ -52,7 +52,7 @@ func (td taxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, nex
 		return next(ctx, tx, simulate)
 	}
 	// validate tax
-	err = td.validateTax(feeTx.GetFee())
+	err = td.validateTax(feeTx.GetFee(), simulate)
 	if err != nil {
 		return ctx, err
 	}
@@ -122,9 +122,13 @@ func (td taxDecorator) getFeePayer(ctx sdk.Context, feeTx sdk.FeeTx, tax sdk.Coi
 	return deductFromAcc, nil
 }
 
-func (td taxDecorator) validateTax(tax sdk.Coins) error {
+func (td taxDecorator) validateTax(tax sdk.Coins, simulate bool) error {
+	// no-op if simulate
+	if simulate {
+		return nil
+	}
 	// check if denom is accepted
-	if !tax.DenomsSubsetOf(sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.ZeroInt()))) {
+	if !tax.DenomsSubsetOf(sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(1)))) {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid denom: %s", tax)
 	}
 	// check if tax is positive

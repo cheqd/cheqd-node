@@ -87,8 +87,9 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 	It("should not succeed in create diddoc message - case: fixed fee, invalid denom", func() {
 		By("submitting create diddoc message with invalid denom")
 		invalidTax := sdk.NewCoin("invalid", sdk.NewInt(feeParams.GetCreateDid().Amount.Int64()))
-		_, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_2, helpers.GenerateFees(invalidTax.String()))
-		Expect(err).NotTo(BeNil())
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_2, helpers.GenerateFees(invalidTax.String()))
+		Expect(err).To(BeNil())
+		Expect(res.Code).To(BeEquivalentTo(10))
 	})
 
 	It("should not succeed in update diddoc message - case: fixed fee, invalid denom", func() {
@@ -115,8 +116,9 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 
 		By("submitting update diddoc message with invalid denom")
 		invalidTax := sdk.NewCoin("invalid", sdk.NewInt(feeParams.GetUpdateDid().Amount.Int64()))
-		_, err = cli.UpdateDidDoc(tmpDir, payload2, signInputs, testdata.BASE_ACCOUNT_2, helpers.GenerateFees(invalidTax.String()))
-		Expect(err).NotTo(BeNil())
+		res, err = cli.UpdateDidDoc(tmpDir, payload2, signInputs, testdata.BASE_ACCOUNT_2, helpers.GenerateFees(invalidTax.String()))
+		Expect(err).To(BeNil())
+		Expect(res.Code).To(BeEquivalentTo(10))
 	})
 
 	It("should not succeed in deactivate diddoc message - case: fixed fee, invalid denom", func() {
@@ -133,8 +135,9 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 
 		By("submitting deactivate diddoc message with invalid denom")
 		invalidTax := sdk.NewCoin("invalid", sdk.NewInt(feeParams.GetDeactivateDid().Amount.Int64()))
-		_, err = cli.DeactivateDidDoc(tmpDir, payload2, signInputs, testdata.BASE_ACCOUNT_2, helpers.GenerateFees(invalidTax.String()))
-		Expect(err).NotTo(BeNil())
+		res, err = cli.DeactivateDidDoc(tmpDir, payload2, signInputs, testdata.BASE_ACCOUNT_2, helpers.GenerateFees(invalidTax.String()))
+		Expect(err).To(BeNil())
+		Expect(res.Code).To(BeEquivalentTo(10))
 	})
 
 	It("should not fail in create diddoc message - case: fixed fee, lower amount than required", func() {
