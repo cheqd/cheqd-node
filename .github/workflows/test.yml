@@ -40,7 +40,7 @@ jobs:
           path: report-unit.xml
 
   upgrade-unit-tests:
-    name: "Upgrade unit Tests"
+    name: "Upgrade Unit Tests"
     runs-on: ubuntu-latest
 
     steps:
@@ -57,7 +57,7 @@ jobs:
           go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
       - name: Run Ginkgo tests
-        run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --tags upgrade_unit --junit-report report-upgrade-unit.xml
+        run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --tags upgrade_unit
 
       - name: Upload unit tests result
         uses: actions/upload-artifact@v3
@@ -71,7 +71,7 @@ jobs:
           ginkgo -r --tags upgrade --race --focus-file migration_unit_test.go
 
   integration-tests:
-    name: "Integration Test"
+    name: "Integration Tests"
     runs-on: ubuntu-latest
 
     steps:
@@ -131,7 +131,7 @@ jobs:
           path: report-integration.xml
 
   upgrade-migration-tests:
-    name: "Upgrade - Migration tests"
+    name: "Upgrade Integration Tests"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -216,7 +216,7 @@ jobs:
 
       - name: Combine test results
         run: |
-          python .github/scripts/xml_combine.py report-integration.xml report-unit.xml report-upgrade-unit.xml > report.xml
+          python .github/scripts/xml_combine.py report-integration.xml report-unit.xml > report.xml
 
       - uses: mikepenz/action-junit-report@v3
         with:
