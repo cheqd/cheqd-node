@@ -444,7 +444,7 @@ class Installer():
         search_and_replace(seeds_search_text, seeds_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
         # Setting up the RPC port
         rpc_laddr_search_text= 'laddr = "tcp://127.0.0.1:{}"'.format(DEFAULT_RPC_PORT)
-        rpc_laddr_replace_text= 'laddr = "tcp://127.0.0.1:{}"'.format(self.interviewer.rpc_port)
+        rpc_laddr_replace_text= 'laddr = "tcp://0.0.0.0:{}"'.format(self.interviewer.rpc_port)
         search_and_replace(rpc_laddr_search_text,rpc_laddr_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
         # Setting up the P2P port
         p2p_laddr_search_text='laddr = "tcp://0.0.0.0:{}"'.format(DEFAULT_P2P_PORT)
