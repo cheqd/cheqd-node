@@ -79,7 +79,7 @@ func MigrateMetadata(metadata *didtypesv1.Metadata) didtypes.Metadata {
 		Created:           metadata.Created,
 		Updated:           metadata.Updated,
 		Deactivated:       metadata.Deactivated,
-		VersionId:         metadata.VersionId, // TODO: Think, use hash!
+		VersionId:         metadata.VersionId,
 		NextVersionId:     "",
 		PreviousVersionId: "",
 	}
