@@ -452,9 +452,9 @@ class Installer():
         search_and_replace(p2p_laddr_search_text,p2p_laddr_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
         
         # Setting up min gas-price
-        min_gas_price_search_text='minimum-gas-prices = {DEFAULT_GAS_PRICE}'
+        min_gas_price_search_text='minimum-gas-prices = "{}"'.format(DEFAULT_GAS_PRICE)
         min_gas_price_replace_text = 'minimum-gas-prices = "{}"'.format(self.interviewer.gas_price)
-        search_and_replace(min_gas_price_replace_text, min_gas_price_replace_text, os.path.join(self.cheqd_config_dir, "app.toml"))
+        search_and_replace(min_gas_price_search_text, min_gas_price_replace_text, os.path.join(self.cheqd_config_dir, "app.toml"))
 
     def prepare_cheqd_user(self):
         try:
