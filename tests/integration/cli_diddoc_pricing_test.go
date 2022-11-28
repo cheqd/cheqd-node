@@ -537,6 +537,11 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 	})
 
 	It("should tax update diddoc message with feegrant - case: fixed fee", func() {
+		By("submitting a create diddoc message")
+		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_2, cli.CLI_GAS_PARAMS)
+		Expect(err).To(BeNil())
+		Expect(resp.Code).To(BeEquivalentTo(0))
+
 		By("preparing the update diddoc message")
 		payload2 := types.MsgUpdateDidDocPayload{
 			Id: payload.Id,
@@ -567,7 +572,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting an update diddoc message")
-		resp, err := cli.UpdateDidDoc(tmpDir, payload2, signInputs, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_2_ADDR, cli.CLI_GAS_PARAMS))
+		resp, err = cli.UpdateDidDoc(tmpDir, payload2, signInputs, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_2_ADDR, cli.CLI_GAS_PARAMS))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -594,6 +599,11 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 	})
 
 	It("should tax deactivate diddoc message with feegrant - case: fixed fee", func() {
+		By("submitting a create diddoc message")
+		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_2, cli.CLI_GAS_PARAMS)
+		Expect(err).To(BeNil())
+		Expect(resp.Code).To(BeEquivalentTo(0))
+
 		By("preparing the deactivate diddoc message")
 		payload2 := types.MsgDeactivateDidDocPayload{
 			Id:        payload.Id,
@@ -614,7 +624,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting a deactivate diddoc message")
-		resp, err := cli.DeactivateDidDoc(tmpDir, payload2, signInputs, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_2_ADDR, cli.CLI_GAS_PARAMS))
+		resp, err = cli.DeactivateDidDoc(tmpDir, payload2, signInputs, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_2_ADDR, cli.CLI_GAS_PARAMS))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
