@@ -695,12 +695,7 @@ func New(
 				[]migrations.Migration{
 					migrations.MigrateDidProtobuf,
 					migrations.MigrateResourceProtobuf,
-
-					// migrations.MigrateDidUUIDV2,
-					// migrations.MigrateDidIndyStyleIdsV1,
-
-					// migrations.MigrateResourceChecksumV2,
-					// migrations.MigrateResourceVersionLinksV2,
+					// Add more migrations here
 				})
 
 			err = cheqdMigrator.Migrate(ctx)

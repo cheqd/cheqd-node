@@ -31,7 +31,7 @@ jobs:
           go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
       - name: Run Ginkgo tests
-        run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --skip-file migration_unit_test.go --skip-file pre_test.go --skip-file post_test.go --junit-report report-unit.xml
+        run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --junit-report report-unit.xml
 
       - name: Upload unit tests result
         uses: actions/upload-artifact@v3
@@ -57,7 +57,7 @@ jobs:
           go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
       - name: Run Ginkgo tests
-        run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --skip-file migration_unit_test.go --skip-file pre_test.go --skip-file post_test.go --junit-report report-unit.xml
+        run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --tags upgrade_unit --junit-report report-upgrade-unit.xml
 
       - name: Upload unit tests result
         uses: actions/upload-artifact@v3
@@ -160,7 +160,6 @@ jobs:
       - name: Install ginkgo
         working-directory: ./..
         run: go install github.com/onsi/ginkgo/v2/ginkgo@latest
-
       
       - name: Download new version of the Docker image (build-latest)
         uses: actions/download-artifact@v3
@@ -170,22 +169,9 @@ jobs:
       - name: Load node Docker image
         run: docker load -i cheqd-node-build.tar
 
+      # Run tests
 
-      # Run unit tests. they are without localnet
-      
-      - name: Run migration handler unit tests
-        working-directory: ./tests/upgrade
-        run: |
-          ginkgo -r --tags upgrade --race --focus-file migration_unit_test.go
-      
-      # Integration tests
-
-      - name: Cleanup before test
-        working-directory: ./tests/upgrade/integration
-        run: |
-          bash scripts/cleanup.sh
-
-      - name: Setting up network with old binary inside (version as on mainnet)
+      - name: Setting up network with old binary inside (mainnet version)
         working-directory: ./tests/upgrade/integration
         run: |
           bash scripts/setup.sh
@@ -193,7 +179,7 @@ jobs:
       - name: Run pre-upgrade tests
         working-directory: ./tests/upgrade
         run: |
-          ginkgo -r --tags upgrade --race --focus-file pre_test.go
+          ginkgo -r --tags upgrade --race --tags upgrade_integration --focus-file pre_test.go
         
       - name: Restart network using new node version (build-latest)
         working-directory: ./tests/upgrade/integration
@@ -203,61 +189,12 @@ jobs:
       - name: Run post-upgrade tests
         working-directory: ./tests/upgrade
         run: |
-          ginkgo -r --tags upgrade --race --focus-file post_test.go
+          ginkgo -r --tags upgrade --race --tags upgrade_integration --focus-file post_test.go
 
       - name: Cleanup after tests
         working-directory: ./tests/upgrade/integration
         run: |
           bash scripts/cleanup.sh
-
-
-      # bash "$DIR_/setup.sh"
-
-# ginkgo -r --tags upgrade --race --focus-file pre_test.go
-
-# bash "$DIR_/upgrade.sh"
-
-# ginkgo -r --tags upgrade --race --focus-file post_test.go
-
-# bash "$DIR_/cleanup.sh"
-
-      # - name: Halt Docker localnet mainnet-latest
-      #   working-directory: ./docker/localnet
-      #   run: |
-      #     docker compose --env-file mainnet-latest.env down
-
-        
-
-      # - name: Set up Docker localnet (build-latest)
-      #   working-directory: ./docker/localnet
-      #   run: |
-      #     docker compose --env-file build-latest.env up --detach --no-build
-
-      # - name: Run post-upgrade tests
-      #   working-directory: ./tests/upgrade
-      #   run: |
-      #     ginkgo -r --tags upgrade --race --focus-file post_test.go --keep-going --trace --junit-report ../../report-upgrade-post.xml
-
-      # # Integration tests
-
-      # - name: Download new node binary (build-latest)
-      #   uses: actions/download-artifact@v3
-      #   id: download
-      #   with:
-      #     name: cheqd-noded
-      #     path: ${{ env.RUNNER_BIN_DIR }}
-
-      # - name: Restore binary permissions
-      #   run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
-
-      # - name: Import keys
-      #   working-directory: ./docker/localnet
-      #   run: |
-      #     bash import-keys.sh
-
-      # - name: Run integration tests on the upgraded network
-      #   working-directory: ./tests/integration
-      #   run: ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --junit-report ../../report-integration-post.xml
 
   report-results:
     name: "Report"
@@ -279,7 +216,7 @@ jobs:
 
       - name: Combine test results
         run: |
-          python .github/scripts/xml_combine.py report-integration.xml report-unit.xml > report.xml
+          python .github/scripts/xml_combine.py report-integration.xml report-unit.xml report-upgrade-unit.xml > report.xml
 
       - uses: mikepenz/action-junit-report@v3
         with:
