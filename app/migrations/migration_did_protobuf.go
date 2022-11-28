@@ -16,9 +16,8 @@ func MigrateDidProtobuf(sctx sdk.Context, mctx MigrationContext) error {
 	codec := NewLegacyProtoCodec()
 	store := sctx.KVStore(mctx.didStoreKey)
 
-	// Migate DIDDocs
-	// TODO: Erase this key
-	mctx.didKeeperOld.SetDidCount(&sctx, 0) // Reset counter
+	// Erase old broken count key
+	store.Delete([]byte(didtypesv1.DidCountKey + didtypesv1.DidCountKey))
 
 	didKeys := helpers.ReadAllKeys(store, didutils.StrBytes(didtypesv1.DidKey))
 
@@ -77,11 +76,10 @@ func MigrateStateValue(stateValue *didtypesv1.StateValue) (didtypes.DidDocWithMe
 
 func MigrateMetadata(metadata *didtypesv1.Metadata) didtypes.Metadata {
 	return didtypes.Metadata{
-		Created:     metadata.Created,
-		Updated:     metadata.Updated,
-		Deactivated: metadata.Deactivated,
-		VersionId:   metadata.VersionId, // TODO: Think, use hash
-		// TODO: should we make it self-linked?
+		Created:           metadata.Created,
+		Updated:           metadata.Updated,
+		Deactivated:       metadata.Deactivated,
+		VersionId:         metadata.VersionId, // TODO: Think, use hash!
 		NextVersionId:     "",
 		PreviousVersionId: "",
 	}
