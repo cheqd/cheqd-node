@@ -538,7 +538,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("creating a feegrant")
-		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_2, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
+		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_2_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -580,7 +580,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(diff).To(BeEquivalentTo(0))
 
 		By("revoking the feegrant")
-		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_2, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
+		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_2_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 	})
 
@@ -594,7 +594,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("creating a feegrant")
-		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_2, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
+		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_2_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -634,6 +634,10 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
 		Expect(diff).To(BeEquivalentTo(0))
+
+		By("revoking the feegrant")
+		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_2_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
+		Expect(err).To(BeNil())
 	})
 
 	It("should tax create resource default with feegrant - case: fixed fee", func() {
@@ -646,7 +650,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("creating a feegrant")
-		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_2, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
+		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_2_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -686,5 +690,9 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
 		Expect(diff).To(BeEquivalentTo(0))
+
+		By("revoking the feegrant")
+		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_2_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
+		Expect(err).To(BeNil())
 	})
 })

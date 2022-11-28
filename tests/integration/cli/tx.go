@@ -52,7 +52,12 @@ func Tx(module, tx, from string, feeParams []string, txArgs ...string) (sdk.TxRe
 	}
 
 	// Skip 'gas estimate: xxx' string
-	output = strings.Split(output, "\n")[1]
+	perLineOutput := strings.Split(output, "\n")
+	if len(perLineOutput) > 2 {
+		output = helpers.TrimExtraLineOffset(output, 1)
+	} else {
+		output = perLineOutput[0]
+	}
 
 	var resp sdk.TxResponse
 

@@ -497,7 +497,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 	It("should tax create diddoc message with feegrant - case: fixed fee", func() {
 		By("creating a feegrant")
-		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_2, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
+		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_2_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -532,7 +532,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(diff).To(BeEquivalentTo(0))
 
 		By("revoking the feegrant")
-		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_2, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
+		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_2_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 	})
 
@@ -554,7 +554,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		}
 
 		By("creating a feegrant")
-		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_2, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
+		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_2_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -589,7 +589,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(diff).To(BeEquivalentTo(0))
 
 		By("revoking the feegrant")
-		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_2, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
+		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_2_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 	})
 
@@ -601,7 +601,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		}
 
 		By("creating a feegrant")
-		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_2, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
+		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_2_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -636,7 +636,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(diff).To(BeEquivalentTo(0))
 
 		By("revoking the feegrant")
-		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_2, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
+		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_2_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 	})
 })
