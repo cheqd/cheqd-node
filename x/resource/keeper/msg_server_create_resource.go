@@ -61,20 +61,6 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	resource.Metadata.Created = ctx.BlockTime().Format(time.RFC3339)
 	resource.Metadata.MediaType = utils.DetectMediaType(resource.Resource.Data)
 
-	// Find previous version and upgrade backward and forward version links
-	previousResourceVersionHeader, found := k.GetLastResourceVersionMetadata(&ctx, resource.Metadata.CollectionId, resource.Metadata.Name, resource.Metadata.ResourceType)
-	if found {
-		// Set links
-		previousResourceVersionHeader.NextVersionId = resource.Metadata.Id
-		resource.Metadata.PreviousVersionId = previousResourceVersionHeader.Id
-
-		// Update previous version
-		err := k.UpdateResourceMetadata(&ctx, &previousResourceVersionHeader)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	// Persist resource
 	err = k.SetResource(&ctx, &resource)
 	if err != nil {

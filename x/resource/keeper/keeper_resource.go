@@ -47,6 +47,20 @@ func (k Keeper) SetResource(ctx *sdk.Context, resource *types.ResourceWithMetada
 		k.SetResourceCount(ctx, count+1)
 	}
 
+	// Find previous version and upgrade backward and forward version links
+	previousResourceVersionHeader, found := k.GetLastResourceVersionMetadata(ctx, resource.Metadata.CollectionId, resource.Metadata.Name, resource.Metadata.ResourceType)
+	if found {
+		// Set links
+		previousResourceVersionHeader.NextVersionId = resource.Metadata.Id
+		resource.Metadata.PreviousVersionId = previousResourceVersionHeader.Id
+
+		// Update previous version
+		err := k.UpdateResourceMetadata(ctx, &previousResourceVersionHeader)
+		if err != nil {
+			return err
+		}
+	}
+
 	store := ctx.KVStore(k.storeKey)
 
 	// Set metadata
