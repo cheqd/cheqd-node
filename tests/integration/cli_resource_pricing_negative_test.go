@@ -101,7 +101,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("submitting the json resource message with invalid denom")
 		invalidTax := sdk.NewCoin("invalid", sdk.NewInt(feeParams.Json.Amount.Int64()))
-		_, err = cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
+		res, err := cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
 			CollectionId:    collectionId,
 			ResourceId:      resourceId,
 			ResourceName:    resourceName,
@@ -110,6 +110,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceFile:    resourceFile,
 		}, signInputs, testdata.BASE_ACCOUNT_2, helpers.GenerateFees(invalidTax.String()))
 		Expect(err).ToNot(BeNil())
+		Expect(res.Code).To(BeEquivalentTo(10))
 	})
 
 	It("should not succeed in create resource image message - case: fixed fee, invalid denom", func() {
@@ -123,7 +124,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("submitting the image resource message with invalid denom")
 		invalidTax := sdk.NewCoin("invalid", sdk.NewInt(feeParams.Image.Amount.Int64()))
-		_, err = cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
+		res, err := cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
 			CollectionId:    collectionId,
 			ResourceId:      resourceId,
 			ResourceName:    resourceName,
@@ -132,6 +133,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceFile:    resourceFile,
 		}, signInputs, testdata.BASE_ACCOUNT_2, helpers.GenerateFees(invalidTax.String()))
 		Expect(err).ToNot(BeNil())
+		Expect(res.Code).To(BeEquivalentTo(10))
 	})
 
 	It("should not succeed in create resource default message - case: fixed fee, invalid denom", func() {
@@ -145,7 +147,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("submitting the default resource message with invalid denom")
 		invalidTax := sdk.NewCoin("invalid", sdk.NewInt(feeParams.Default.Amount.Int64()))
-		_, err = cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
+		res, err := cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
 			CollectionId:    collectionId,
 			ResourceId:      resourceId,
 			ResourceName:    resourceName,
@@ -154,9 +156,10 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceFile:    resourceFile,
 		}, signInputs, testdata.BASE_ACCOUNT_2, helpers.GenerateFees(invalidTax.String()))
 		Expect(err).ToNot(BeNil())
+		Expect(res.Code).To(BeEquivalentTo(10))
 	})
 
-	It("should not succeed in create resource json message - case: fixed fee, lower amount than required", func() {
+	It("should not fail in create resource json message - case: fixed fee, lower amount than required", func() {
 		By("preparing the create resource json message")
 		resourceId := uuid.NewString()
 		resourceName := "TestResource"
@@ -175,10 +178,10 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
 		}, signInputs, testdata.BASE_ACCOUNT_2, helpers.GenerateFees(lowerTax.String()))
-		Expect(err).ToNot(BeNil())
+		Expect(err).To(BeNil())
 	})
 
-	It("should not succeed in create resource image message - case: fixed fee, lower amount than required", func() {
+	It("should not fail in create resource image message - case: fixed fee, lower amount than required", func() {
 		By("preparing the create resource image message")
 		resourceId := uuid.NewString()
 		resourceName := "TestResource"
@@ -197,10 +200,10 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
 		}, signInputs, testdata.BASE_ACCOUNT_2, helpers.GenerateFees(lowerTax.String()))
-		Expect(err).ToNot(BeNil())
+		Expect(err).To(BeNil())
 	})
 
-	It("should not succeed in create resource default message - case: fixed fee, lower amount than required", func() {
+	It("should not fail in create resource default message - case: fixed fee, lower amount than required", func() {
 		By("preparing the create resource default message")
 		resourceId := uuid.NewString()
 		resourceName := "TestResource"
@@ -219,7 +222,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
 		}, signInputs, testdata.BASE_ACCOUNT_2, helpers.GenerateFees(lowerTax.String()))
-		Expect(err).ToNot(BeNil())
+		Expect(err).To(BeNil())
 	})
 
 	It("should not succeed in create resource json message - case: fixed fee, insufficient funds", func() {
@@ -240,7 +243,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.DELAYED_VESTING_ACCOUNT, helpers.GenerateFees(tax.String()))
+		}, signInputs, testdata.BASE_ACCOUNT_3, helpers.GenerateFees(tax.String()))
 		Expect(err).ToNot(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(5))
 	})
@@ -263,7 +266,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.DELAYED_VESTING_ACCOUNT, helpers.GenerateFees(tax.String()))
+		}, signInputs, testdata.BASE_ACCOUNT_3, helpers.GenerateFees(tax.String()))
 		Expect(err).ToNot(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(5))
 	})
@@ -286,7 +289,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.DELAYED_VESTING_ACCOUNT, helpers.GenerateFees(tax.String()))
+		}, signInputs, testdata.BASE_ACCOUNT_3, helpers.GenerateFees(tax.String()))
 		Expect(err).ToNot(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(5))
 	})
@@ -308,7 +311,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.DELAYED_VESTING_ACCOUNT, cli.CLI_GAS_PARAMS)
+		}, signInputs, testdata.BASE_ACCOUNT_3, cli.CLI_GAS_PARAMS)
 		Expect(err).ToNot(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(5))
 	})
@@ -330,7 +333,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.DELAYED_VESTING_ACCOUNT, cli.CLI_GAS_PARAMS)
+		}, signInputs, testdata.BASE_ACCOUNT_3, cli.CLI_GAS_PARAMS)
 		Expect(err).ToNot(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(5))
 	})
@@ -352,7 +355,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.DELAYED_VESTING_ACCOUNT, cli.CLI_GAS_PARAMS)
+		}, signInputs, testdata.BASE_ACCOUNT_3, cli.CLI_GAS_PARAMS)
 		Expect(err).ToNot(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(5))
 	})
@@ -381,7 +384,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
 		}, signInputs, testdata.BASE_ACCOUNT_2, helpers.GenerateFees(doubleTax.String()))
-		Expect(err).ToNot(BeNil())
+		Expect(err).To(BeNil())
 
 		By("querying the fee payer account balance after the transaction")
 		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2, resourcetypes.BaseMinimalDenom)
@@ -415,7 +418,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
 		}, signInputs, testdata.BASE_ACCOUNT_2, helpers.GenerateFees(doubleTax.String()))
-		Expect(err).ToNot(BeNil())
+		Expect(err).To(BeNil())
 
 		By("querying the fee payer account balance after the transaction")
 		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2, resourcetypes.BaseMinimalDenom)
@@ -449,7 +452,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
 		}, signInputs, testdata.BASE_ACCOUNT_2, helpers.GenerateFees(doubleTax.String()))
-		Expect(err).ToNot(BeNil())
+		Expect(err).To(BeNil())
 
 		By("querying the fee payer account balance after the transaction")
 		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2, resourcetypes.BaseMinimalDenom)

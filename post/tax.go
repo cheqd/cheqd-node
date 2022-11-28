@@ -51,6 +51,11 @@ func (td taxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, nex
 	if !taxable {
 		return next(ctx, tx, simulate)
 	}
+	// validate tax
+	err = td.validateTax(feeTx.GetFee())
+	if err != nil {
+		return ctx, err
+	}
 	// get fee payer and check if fee grant exists
 	tax := rewards.Add(burn...)
 	feePayer, err := td.getFeePayer(ctx, feeTx, tax, tx.GetMsgs())
@@ -115,6 +120,18 @@ func (td taxDecorator) getFeePayer(ctx sdk.Context, feeTx sdk.FeeTx, tax sdk.Coi
 	}
 
 	return deductFromAcc, nil
+}
+
+func (td taxDecorator) validateTax(tax sdk.Coins) error {
+	// check if denom is accepted
+	if !tax.DenomsSubsetOf(sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.ZeroInt()))) {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid denom: %s", tax)
+	}
+	// check if tax is positive
+	if !tax.IsAllPositive() {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid tax: %s", tax)
+	}
+	return nil
 }
 
 // deductTaxFromFeePayer deducts fees from the account
