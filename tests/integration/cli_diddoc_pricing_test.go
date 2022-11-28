@@ -529,7 +529,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
-		Expect(diff).To(BeEquivalentTo(0))
+		Expect(diff.IsZero()).To(BeTrue())
 
 		By("revoking the feegrant")
 		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_2_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
@@ -586,7 +586,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
-		Expect(diff).To(BeEquivalentTo(0))
+		Expect(diff.IsZero()).To(BeTrue())
 
 		By("revoking the feegrant")
 		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_2_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
@@ -633,7 +633,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
-		Expect(diff).To(BeEquivalentTo(0))
+		Expect(diff.IsZero()).To(BeTrue())
 
 		By("revoking the feegrant")
 		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_2_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
