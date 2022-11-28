@@ -70,7 +70,6 @@ func (cb *ChecksumBuilder) buildExistingDids() error {
 }
 
 func (cb *ChecksumBuilder) buildExistingResources() error {
-	var existingResource resourcetypes.ResourceWithMetadata
 	files, err := cb.loader.GetLsitOfFiles(
 		filepath.Join(GENERATED_JSON_DIR, "payload", "existing", "v2", "checksum"),
 		"resource")
@@ -78,6 +77,7 @@ func (cb *ChecksumBuilder) buildExistingResources() error {
 		return err
 	}
 	for _, path_to_file := range files {
+		var existingResource resourcetypes.ResourceWithMetadata
 		err := cb.loader.LoadFile(
 			path_to_file,
 			&existingResource,

@@ -87,7 +87,6 @@ func (is_builder *IndyStyleBuilder) buildExistingDids() error {
 }
 
 func (is_builder *IndyStyleBuilder) buildExistingResources() error {
-	var existingResource resourcetypes.ResourceWithMetadata
 	files, err := is_builder.loader.GetLsitOfFiles(
 		filepath.Join(GENERATED_JSON_DIR, "payload", "existing", "v2", "indy_style"),
 		"resource")
@@ -95,6 +94,7 @@ func (is_builder *IndyStyleBuilder) buildExistingResources() error {
 		return err
 	}
 	for _, path_to_file := range files {
+		var existingResource resourcetypes.ResourceWithMetadata
 		err = is_builder.loader.LoadFile(
 			path_to_file,
 			&existingResource,
@@ -178,18 +178,7 @@ func (is_dataset *IndyStyleDataSet) Validate() error {
 		if err != nil {
 			return err
 		}
-		Expect(didDoc.DidDoc.Id).To(Equal(expectedDidDoc.DidDoc.Id))
-		Expect(didDoc.DidDoc.Context).To(Equal(expectedDidDoc.DidDoc.Context))
-		Expect(didDoc.DidDoc.Service).To(Equal(expectedDidDoc.DidDoc.Service))
-		Expect(didDoc.DidDoc.VerificationMethod).To(Equal(expectedDidDoc.DidDoc.VerificationMethod))
-		Expect(didDoc.DidDoc.Authentication).To(Equal(expectedDidDoc.DidDoc.Authentication))
-		Expect(didDoc.DidDoc.AssertionMethod).To(Equal(expectedDidDoc.DidDoc.AssertionMethod))
-		Expect(didDoc.DidDoc.CapabilityInvocation).To(Equal(expectedDidDoc.DidDoc.CapabilityInvocation))
-		Expect(didDoc.DidDoc.CapabilityDelegation).To(Equal(expectedDidDoc.DidDoc.CapabilityDelegation))
-		Expect(didDoc.DidDoc.KeyAgreement).To(Equal(expectedDidDoc.DidDoc.KeyAgreement))
-		Expect(didDoc.DidDoc.Service).To(Equal(expectedDidDoc.DidDoc.Service))
-		Expect(didDoc.DidDoc.AlsoKnownAs).To(Equal(expectedDidDoc.DidDoc.AlsoKnownAs))
-		Expect(didDoc.Metadata).To(Equal(expectedDidDoc.Metadata))
+		Expect(didDoc.DidDoc).To(Equal(expectedDidDoc.DidDoc))
 	}
 
 	for _, expectedResource = range is_dataset.expectedResources {
@@ -199,15 +188,7 @@ func (is_dataset *IndyStyleDataSet) Validate() error {
 		if err != nil {
 			return err
 		}
-		Expect(resource.Metadata.Id).To(Equal(expectedResource.Metadata.Id))
-		Expect(resource.Metadata.CollectionId).To(Equal(expectedResource.Metadata.CollectionId))
-		Expect(resource.Metadata.Name).To(Equal(expectedResource.Metadata.Name))
-		Expect(resource.Metadata.Version).To(Equal(expectedResource.Metadata.Version))
-		Expect(resource.Metadata.ResourceType).To(Equal(expectedResource.Metadata.ResourceType))
-		Expect(resource.Metadata.AlsoKnownAs).To(Equal(expectedResource.Metadata.AlsoKnownAs))
-		Expect(resource.Metadata.MediaType).To(Equal(expectedResource.Metadata.MediaType))
-		Expect(resource.Metadata.Created).To(Equal(expectedResource.Metadata.Created))
-		Expect(resource.Metadata.Checksum).To(Equal(expectedResource.Metadata.Checksum))
+		Expect(resource).To(Equal(expectedResource))
 	}
 
 	return nil

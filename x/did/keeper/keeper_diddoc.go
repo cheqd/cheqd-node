@@ -218,6 +218,21 @@ func (k Keeper) IterateDidDocVersions(ctx *sdk.Context, did string, callback fun
 	}
 }
 
+func (k Keeper) IterateAllDidDocVersions(ctx *sdk.Context, callback func(version types.DidDocWithMetadata) (continue_ bool)) {
+	store := ctx.KVStore(k.storeKey)
+	allVersionsIterator := sdk.KVStorePrefixIterator(store, []byte(types.DidDocVersionKey))
+	defer closeIteratorOrPanic(allVersionsIterator)
+
+	for ; allVersionsIterator.Valid(); allVersionsIterator.Next() {
+		var didDoc types.DidDocWithMetadata
+		k.cdc.MustUnmarshal(allVersionsIterator.Value(), &didDoc)
+
+		if !callback(didDoc) {
+			break
+		}
+	}
+}
+
 // GetAllDidDocs returns all did
 // Loads all DIDs in memory. Use only for genesis export.
 func (k Keeper) GetAllDidDocs(ctx *sdk.Context) ([]*types.DidDocVersionSet, error) {
@@ -240,6 +255,8 @@ func (k Keeper) GetAllDidDocs(ctx *sdk.Context) ([]*types.DidDocVersionSet, erro
 
 			return true
 		})
+
+		didDocs = append(didDocs, &didDocVersionSet)
 
 		return true
 	})

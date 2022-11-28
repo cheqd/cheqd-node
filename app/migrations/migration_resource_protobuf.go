@@ -3,6 +3,7 @@ package migrations
 import (
 	"strings"
 
+	"github.com/cheqd/cheqd-node/app/migrations/helpers"
 	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
@@ -16,7 +17,7 @@ func MigrateResourceProtobuf(sctx sdk.Context, mctx MigrationContext) error {
 	// Reset counter
 	mctx.resourceKeeperNew.SetResourceCount(&sctx, 0)
 
-	headerKeys := ReadAllKeys(store, didutils.StrBytes(resourcetypesv1.ResourceHeaderKey))
+	headerKeys := helpers.ReadAllKeys(store, didutils.StrBytes(resourcetypesv1.ResourceHeaderKey))
 
 	for _, headerKey := range headerKeys {
 		dataKey := ResourceV1HeaderkeyToDataKey(headerKey)

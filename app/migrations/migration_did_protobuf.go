@@ -3,6 +3,7 @@ package migrations
 import (
 	"encoding/json"
 
+	"github.com/cheqd/cheqd-node/app/migrations/helpers"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	didutils "github.com/cheqd/cheqd-node/x/did/utils"
@@ -19,7 +20,7 @@ func MigrateDidProtobuf(sctx sdk.Context, mctx MigrationContext) error {
 	// TODO: Erase this key
 	mctx.didKeeperOld.SetDidCount(&sctx, 0) // Reset counter
 
-	didKeys := ReadAllKeys(store, didutils.StrBytes(didtypesv1.DidKey))
+	didKeys := helpers.ReadAllKeys(store, didutils.StrBytes(didtypesv1.DidKey))
 
 	for _, didKey := range didKeys {
 		var stateValue didtypesv1.StateValue

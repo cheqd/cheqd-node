@@ -157,6 +157,22 @@ func (k Keeper) UpdateResourceMetadata(ctx *sdk.Context, metadata *types.Metadat
 	return nil
 }
 
+func (k Keeper) IterateAllResourceMetadatas(ctx *sdk.Context, callback func(metadata types.Metadata) (continue_ bool)) {
+	headerIterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.storeKey), didutils.StrBytes(types.ResourceMetadataKey))
+	defer closeIteratorOrPanic(headerIterator)
+
+	for headerIterator.Valid() {
+		var val types.Metadata
+		k.cdc.MustUnmarshal(headerIterator.Value(), &val)
+
+		if !callback(val) {
+			break
+		}
+
+		headerIterator.Next()
+	}
+}
+
 // GetAllResources returns all resources as a list
 // Loads everything in memory. Use only for genesis export!
 func (k Keeper) GetAllResources(ctx *sdk.Context) (list []types.ResourceWithMetadata) {

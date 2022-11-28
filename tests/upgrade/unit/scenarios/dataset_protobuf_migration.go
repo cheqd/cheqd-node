@@ -89,7 +89,6 @@ func (pb *ProtobufBuilder) buildExistingDids() error {
 }
 
 func (pb *ProtobufBuilder) buildExistingResources() error {
-	var existingResource resourcetypesv1.Resource
 	files, err := pb.loader.GetLsitOfFiles(
 		filepath.Join(GENERATED_JSON_DIR, "payload", "existing", "v1", "protobuf"),
 		"resource")
@@ -97,6 +96,7 @@ func (pb *ProtobufBuilder) buildExistingResources() error {
 		return err
 	}
 	for _, path_to_file := range files {
+		var existingResource resourcetypesv1.Resource
 		err = pb.loader.LoadFile(
 			path_to_file,
 			&existingResource,

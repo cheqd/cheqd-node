@@ -1,35 +1,44 @@
 package migrations
 
 import (
-	didutils "github.com/cheqd/cheqd-node/x/did/utils"
+	"github.com/cheqd/cheqd-node/app/migrations/helpers"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func MigrateResourceIndyStyle(sctx sdk.Context, mctx MigrationContext) error {
-	var metadataKeys []ByteStr
-
 	store := sctx.KVStore(mctx.resourceStoreKey)
-	metadataKeys = ReadAllKeys(
-		store,
-		didutils.StrBytes(resourcetypes.ResourceMetadataKey))
 
-	for _, metadataKey := range metadataKeys {
+	// Reset counter
+	mctx.didKeeperNew.SetDidDocCount(&sctx, 0)
 
-		var metadata resourcetypes.Metadata
-		var data []byte
+	// Cache resources
+	var metadatas []resourcetypes.Metadata
 
-		dataKey := ResourceV2MetadataKeyToDataKey(metadataKey)
+	mctx.resourceKeeperNew.IterateAllResourceMetadatas(&sctx, func(metadata resourcetypes.Metadata) bool {
+		metadatas = append(metadatas, metadata)
+		return true
+	})
 
-		// Get metadata and data from storage
-		mctx.codec.MustUnmarshal(store.Get(metadataKey), &metadata)
-		data = store.Get(dataKey)
+	res := mctx.resourceKeeperNew.GetAllResources(&sctx)
+	println(res)
 
-		// Get corresponding DidDoc
+	// Iterate and migrate resources
+	for _, metadata := range metadatas {
+		metadataKey := resourcetypes.GetResourceMetadataKey(metadata.CollectionId, metadata.Id)
+		dataKey := resourcetypes.GetResourceDataKey(metadata.CollectionId, metadata.Id)
 
-		metadata.Id = IndyStyleId(metadata.Id)
-		metadata.CollectionId = IndyStyleId(metadata.CollectionId)
+		// Read data
+		data := store.Get(dataKey)
 
+		// Remove old values
+		store.Delete(metadataKey)
+		store.Delete(dataKey)
+
+		// Migrate
+		metadata.CollectionId = helpers.MigrateIndyStyleId(metadata.CollectionId)
+
+		// Write new value
 		newResourceWithMetadata := resourcetypes.ResourceWithMetadata{
 			Metadata: &metadata,
 			Resource: &resourcetypes.Resource{
@@ -37,15 +46,11 @@ func MigrateResourceIndyStyle(sctx sdk.Context, mctx MigrationContext) error {
 			},
 		}
 
-		// Remove old values
-		store.Delete(metadataKey)
-		store.Delete(dataKey)
-
-		// Update HeaderInfo
 		err := mctx.resourceKeeperNew.SetResource(&sctx, &newResourceWithMetadata)
 		if err != nil {
 			return err
 		}
 	}
+
 	return nil
 }

@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"errors"
 
+	"github.com/cheqd/cheqd-node/app/migrations/helpers"
 	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -20,8 +21,8 @@ func MigrateResourceChecksum(sctx sdk.Context, mctx MigrationContext) error {
 		dataStore,
 		didutils.StrBytes(resourcetypes.ResourceDataKey))
 
-	defer closeIteratorOrPanic(metadataIterator)
-	defer closeIteratorOrPanic(dataIterator)
+	defer helpers.CloseIteratorOrPanic(metadataIterator)
+	defer helpers.CloseIteratorOrPanic(dataIterator)
 
 	for metadataIterator.Valid() {
 		if !dataIterator.Valid() {
@@ -49,5 +50,6 @@ func MigrateResourceChecksum(sctx sdk.Context, mctx MigrationContext) error {
 		metadataIterator.Next()
 		dataIterator.Next()
 	}
+
 	return nil
 }

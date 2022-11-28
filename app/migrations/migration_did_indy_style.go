@@ -1,8 +1,8 @@
 package migrations
 
 import (
+	"github.com/cheqd/cheqd-node/app/migrations/helpers"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
-	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -10,25 +10,37 @@ import (
 func MigrateDidIndyStyle(sctx sdk.Context, mctx MigrationContext) error {
 	store := sctx.KVStore(mctx.didStoreKey)
 
-	var didDocWithMetadata didtypes.DidDocWithMetadata
+	// Reset counter
+	mctx.didKeeperNew.SetDidDocCount(&sctx, 0)
 
-	didKeys := ReadAllKeys(
-		store,
-		didutils.StrBytes(didtypes.DidDocVersionKey))
+	// Colect all did doc vsersions
+	var allDidDocVersions []didtypes.DidDocWithMetadata
 
-	for _, didKey := range didKeys {
-		didDocWithMetadata = didtypes.DidDocWithMetadata{}
+	mctx.didKeeperNew.IterateAllDidDocVersions(&sctx, func(metadata didtypes.DidDocWithMetadata) bool {
+		allDidDocVersions = append(allDidDocVersions, metadata)
+		return true
+	})
 
-		mctx.codec.MustUnmarshal(store.Get(didKey), &didDocWithMetadata)
+	allOld, _ := mctx.didKeeperNew.GetAllDidDocs(&sctx)
+	print(allOld)
 
-		// Make all dids indy style
-		MoveToIndyStyleIds(&didDocWithMetadata)
+	// Iterate and migrate did docs. We can use single loop for removing old values
+	// and writing new values because there is only one version of did doc in the store
+	for _, version := range allDidDocVersions {
+		// Remove last version pointer
+		latestVersionKey := didtypes.GetLatestDidDocVersionKey(version.DidDoc.Id)
+		store.Delete(latestVersionKey)
 
-		// Remove old DID Doc
-		store.Delete(didKey)
+		// Remove version
+		versionKey := didtypes.GetDidDocVersionKey(version.DidDoc.Id, version.Metadata.VersionId)
+		store.Delete(versionKey)
 
-		// Set new DID Doc
-		err := mctx.didKeeperNew.AddNewDidDocVersion(&sctx, &didDocWithMetadata)
+		// Migrate all dids, make them indy style
+		newDid := helpers.MigrateIndyStyleDid(version.DidDoc.Id)
+		version.ReplaceDids(version.DidDoc.Id, newDid)
+
+		// Create as a new did doc
+		err := mctx.didKeeperNew.AddNewDidDocVersion(&sctx, &version)
 		if err != nil {
 			return err
 		}
