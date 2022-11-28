@@ -21,9 +21,6 @@ func MigrateDidIndyStyle(sctx sdk.Context, mctx MigrationContext) error {
 		return true
 	})
 
-	allOld, _ := mctx.didKeeperNew.GetAllDidDocs(&sctx)
-	print(allOld)
-
 	// Iterate and migrate did docs. We can use single loop for removing old values
 	// and writing new values because there is only one version of did doc in the store
 	for _, version := range allDidDocVersions {
