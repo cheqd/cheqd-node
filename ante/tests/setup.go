@@ -1,9 +1,8 @@
-package ante_test
+package ante_tests
 
 import (
 	"errors"
 	"fmt"
-	"testing"
 
 	"github.com/stretchr/testify/suite"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
@@ -43,8 +42,8 @@ type AnteTestSuite struct {
 }
 
 // returns context and app with params set on account keeper
-func createTestApp(t *testing.T, isCheckTx bool) (*simapp.SimApp, sdk.Context) {
-	app := simapp.Setup(t, isCheckTx)
+func createTestApp(isCheckTx bool) (*simapp.SimApp, sdk.Context) {
+	app := simapp.SetupForGinkgo(isCheckTx)
 	ctx := app.BaseApp.NewContext(isCheckTx, tmproto.Header{})
 	app.AccountKeeper.SetParams(ctx, authtypes.DefaultParams())
 
@@ -57,15 +56,14 @@ func createTestApp(t *testing.T, isCheckTx bool) (*simapp.SimApp, sdk.Context) {
 	return app, ctx
 }
 
-func TestAnteTestSuite(t *testing.T) {
-	suite.Run(t, new(AnteTestSuite))
-}
+// func TestAnteTestSuite(t *testing.T) {
+// 	suite.Run(t, new(AnteTestSuite))
+// }
 
 // SetupTest setups a new test, with new app, context, and anteHandler.
 func (s *AnteTestSuite) SetupTest(isCheckTx bool) {
-	s.app, s.ctx = createTestApp(s.T(), isCheckTx)
+	s.app, s.ctx = createTestApp(isCheckTx)
 	s.ctx = s.ctx.WithBlockHeight(1)
-
 	// Set up TxConfig.
 	encodingConfig := cheqdapp.MakeTestEncodingConfig()
 	// We're using TestMsg encoding in some tests, so register it here.
@@ -86,8 +84,9 @@ func (s *AnteTestSuite) SetupTest(isCheckTx bool) {
 			SigGasConsumer:  sdkante.DefaultSigVerificationGasConsumer,
 		},
 	)
-
-	s.Require().NoError(err)
+	if err != nil {
+		panic(err)
+	}
 	s.anteHandler = anteHandler
 }
 
@@ -100,16 +99,22 @@ func (s *AnteTestSuite) CreateTestAccounts(numAccs int) []TestAccount {
 		priv, _, addr := testdata.KeyTestPubAddr()
 		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr)
 		err := acc.SetAccountNumber(uint64(i))
-		s.Require().NoError(err)
+		if err != nil {
+			panic(err)
+		}
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
 		someCoins := sdk.Coins{
 			sdk.NewInt64Coin("ncheq", 1000000*1e9), // 1mn CHEQ
 		}
 		err = s.app.BankKeeper.MintCoins(s.ctx, minttypes.ModuleName, someCoins)
-		s.Require().NoError(err)
+		if err != nil {
+			panic(err)
+		}
 
 		err = s.app.BankKeeper.SendCoinsFromModuleToAccount(s.ctx, minttypes.ModuleName, addr, someCoins)
-		s.Require().NoError(err)
+		if err != nil {
+			panic(err)
+		}
 
 		accounts = append(accounts, TestAccount{acc, priv})
 	}
