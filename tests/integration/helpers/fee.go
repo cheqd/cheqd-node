@@ -17,3 +17,7 @@ func GetBurntPortion(tax sdk.Coin, burnFactor sdk.Dec) sdk.Coin {
 	burnt, _ := taxDec.TruncateDecimal()
 	return burnt
 }
+
+func GetRewardPortion(tax sdk.Coin, burnt sdk.Coin) sdk.Coin {
+	return tax.Sub(burnt)
+}

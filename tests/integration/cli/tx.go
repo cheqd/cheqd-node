@@ -64,6 +64,14 @@ func Tx(module, tx, from string, feeParams []string, txArgs ...string) (sdk.TxRe
 	return resp, nil
 }
 
+func GrantFees(granter, grantee string, feeParams []string) (sdk.TxResponse, error) {
+	return Tx("feegrant", "grant", granter, feeParams, granter, grantee)
+}
+
+func RevokeFeeGrant(granter, grantee string, feeParams []string) (sdk.TxResponse, error) {
+	return Tx("feegrant", "revoke", granter, feeParams, granter, grantee)
+}
+
 func CreateDidDoc(tmpDir string, payload types.MsgCreateDidDocPayload, signInputs []cli.SignInput, from string, feeParams []string) (sdk.TxResponse, error) {
 	// Payload
 	payloadJson, err := helpers.Codec.MarshalJSON(&payload)
@@ -108,7 +116,7 @@ func UpdateDidDoc(tmpDir string, payload types.MsgUpdateDidDocPayload, signInput
 	return Tx("cheqd", "update-did", from, feeParams, payloadFile)
 }
 
-func DeactivateDidDoc(tmpDir string, payload types.MsgUpdateDidDocPayload, signInputs []cli.SignInput, from string, feeParams []string) (sdk.TxResponse, error) {
+func DeactivateDidDoc(tmpDir string, payload types.MsgDeactivateDidDocPayload, signInputs []cli.SignInput, from string, feeParams []string) (sdk.TxResponse, error) {
 	// Payload
 	payloadJson, err := helpers.Codec.MarshalJSON(&payload)
 	if err != nil {

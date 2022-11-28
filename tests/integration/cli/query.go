@@ -42,21 +42,6 @@ func QueryBalance(address, denom string) (sdk.Coin, error) {
 	return resp, nil
 }
 
-func QuerySupplyOf(denom string) (sdk.Coin, error) {
-	res, err := Query("bank", "total", "--denom", denom)
-	if err != nil {
-		return sdk.Coin{}, err
-	}
-
-	var resp sdk.Coin
-	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
-	if err != nil {
-		return sdk.Coin{}, err
-	}
-
-	return resp, nil
-}
-
 func QueryParams(subspace, key string) (paramproposal.ParamChange, error) {
 	res, err := Query("params", "subspace", subspace, key)
 	if err != nil {

@@ -14,4 +14,10 @@ const (
 	CONTINUOUS_VESTING_ACCOUNT_ADDR = "cheqd1353p46macvn444rupg2jstmx3tmz657yt9gl4l"
 	DELAYED_VESTING_ACCOUNT_ADDR    = "cheqd1njwu33lek5jt4kzlmljkp366ny4qpqusahpyrj"
 	PERIODIC_VESTING_ACCOUNT_ADDR   = "cheqd1uyngr0l3xtyj07js9sdew9mk50tqeq8lghhcfr"
+
+	//? Module accounts can be safely hardcoded, as they are generated per module name
+	//? and the hex bytes are deterministicly generated from the module name.
+	FEE_COLLECTOR_ADDR           = "cheqd17xpfvakm2amg962yls6f84z3kell8c5l7m0qqv"
+	DID_MODULE_ACCOUNT_ADDR      = "cheqd1neus3an933cxp7ewuxw6jcuf6j8ka777h32p64"
+	RESOURCE_MODULE_ACCOUNT_ADDR = ""
 )
