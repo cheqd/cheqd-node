@@ -41,7 +41,6 @@ func Tx(module, tx, from string, feeParams []string, txArgs ...string) (sdk.TxRe
 	args = append(args, txArgs...)
 
 	output, err := Exec(args...)
-
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
