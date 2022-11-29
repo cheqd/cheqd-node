@@ -1,4 +1,4 @@
-package scenarios
+package setup
 
 import (
 	"encoding/json"
@@ -6,12 +6,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	// integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
-	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/unit/setup"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 
-	// didutils "github.com/cheqd/cheqd-node/x/did/utils"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
 )
@@ -32,7 +29,7 @@ type DidAndMetadata struct {
 }
 
 type ILoader interface {
-	LoadFile(path string, dataChunk any, setup migrationsetup.TestSetup) error
+	LoadFile(path string, dataChunk any, setup TestSetup) error
 	GetLsitOfFiles(path_to_dir, prefix string) ([]string, error)
 }
 
@@ -52,7 +49,7 @@ func (l Loader) GetLsitOfFiles(path_to_dir, prefix string) ([]string, error) {
 func (l Loader) LoadFile(
 	path string,
 	dataChunk any,
-	setup migrationsetup.TestSetup,
+	setup TestSetup,
 ) error {
 	file, err := os.ReadFile(path)
 	if err != nil {

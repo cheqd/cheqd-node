@@ -19,10 +19,6 @@ func Loader(path string, msg interface{}) error {
 		return err
 	}
 
-	// encodingConfig := params.MakeEncodingConfig()
-	// Codec = encodingConfig.Codec
-	// Registry = encodingConfig.InterfaceRegistry
-
 	switch msg := msg.(type) {
 	case *didtypesv1.MsgCreateDidPayload:
 		err = integrationhelpers.Codec.UnmarshalJSON(file, msg)
