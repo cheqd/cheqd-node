@@ -440,6 +440,7 @@ class Installer():
             external_address_search_text='external_address = ""'
             external_address_replace_text='external_address = "{}:{}"'.format(self.interviewer.external_address, self.interviewer.p2p_port)
             search_and_replace(external_address_search_text, external_address_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
+       
         # Setting up the seeds
         seeds = self.exec(f"curl {SEEDS_FILE.format(self.interviewer.chain)}").stdout.decode("utf-8").strip()
         seeds_search_text = 'seeds = ""'
@@ -456,6 +457,11 @@ class Installer():
             p2p_laddr_search_text='laddr = "tcp://0.0.0.0:{}"'.format(DEFAULT_P2P_PORT)
             p2p_laddr_replace_text='laddr = "tcp://0.0.0.0:{}"'.format(self.interviewer.p2p_port)
             search_and_replace(p2p_laddr_search_text,p2p_laddr_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
+        
+        # Setting up the RPC port
+        rpc_laddr_search_text= 'laddr = "tcp://127.0.0.1:{}"'.format(DEFAULT_RPC_PORT)
+        rpc_laddr_replace_text= 'laddr = "tcp://0.0.0.0:{}"'.format(self.interviewer.rpc_port)
+        search_and_replace(rpc_laddr_search_text,rpc_laddr_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
         
         # Setting up min gas-price
         if self.interviewer.gas_price:
