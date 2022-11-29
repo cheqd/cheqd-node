@@ -1,12 +1,12 @@
 syntax = "proto3";
 package cheqd.did.v2;
 
-option go_package = "github.com/cheqd/cheqd-node/x/did/types";
-option (gogoproto.equal_all) = true;
-
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "cosmos_proto/cosmos.proto";
+
+option go_package = "github.com/cheqd/cheqd-node/x/did/types";
+option (gogoproto.equal_all) = true;
 
 // FeeParams defines the parameters for the `did` module fixed fee.
 message FeeParams {
