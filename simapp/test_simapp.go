@@ -316,17 +316,11 @@ func SignCheckDeliverForGinkgo(
 	_, res, err := app.Simulate(txBytes)
 
 	if expSimPass {
-		if err != nil {
-			panic(err)
-		}
-		if res == nil {
+		if err != nil || res == nil {
 			panic(err)
 		}
 	} else {
-		if err != nil {
-			panic(err)
-		}
-		if res == nil {
+		if err == nil || res != nil {
 			panic(err)
 		}
 	}
@@ -336,17 +330,11 @@ func SignCheckDeliverForGinkgo(
 	gInfo, res, err := app.SimDeliver(txCfg.TxEncoder(), tx)
 
 	if expPass {
-		if err != nil {
-			panic(err)
-		}
-		if res == nil {
+		if err != nil || res == nil {
 			panic(err)
 		}
 	} else {
-		if err != nil {
-			panic(err)
-		}
-		if res == nil {
+		if err == nil || res != nil {
 			panic(err)
 		}
 	}
