@@ -1,12 +1,13 @@
+//go:build upgrade_unit
+
 package unit
 
 import (
-	. "github.com/cheqd/cheqd-node/tests/upgrade/unit/scenarios"
+	. "github.com/cheqd/cheqd-node/tests/upgrade/unit/setup"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	appmigrations "github.com/cheqd/cheqd-node/app/migrations"
-	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/unit/setup"
 )
 
 var _ = Describe("Migration - Unit", func() {
@@ -14,7 +15,7 @@ var _ = Describe("Migration - Unit", func() {
 		By("Ensuring the Checksum migration scenario is successful")
 
 		// Init storages, keepers and setup the migration context.
-		setup := migrationsetup.Setup()
+		setup := Setup()
 
 		// Existing dataset
 		existingDataset := NewExistingDataset(setup)
@@ -44,7 +45,7 @@ var _ = Describe("Migration - Unit", func() {
 		By("Ensuring the Protobuf migration handler is working as expected")
 
 		// Init storages, keepers and setup the migration context.
-		setup := migrationsetup.Setup()
+		setup := Setup()
 
 		// Existing dataset
 		existingDataset := NewExistingDataset(setup)
@@ -75,7 +76,7 @@ var _ = Describe("Migration - Unit", func() {
 		By("Ensuring the IndyStyle migration handler is working as expected")
 
 		// Init storages, keepers and setup the migration context.
-		setup := migrationsetup.Setup()
+		setup := Setup()
 
 		// Existing dataset
 		existingDataset := NewExistingDataset(setup)

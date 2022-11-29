@@ -1,12 +1,11 @@
-package scenarios
+package setup
 
 import (
 	appmigrations "github.com/cheqd/cheqd-node/app/migrations"
-	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/unit/setup"
 )
 
 type Migrator struct {
-	setup migrationsetup.TestSetup
+	setup TestSetup
 
 	migrations []appmigrations.Migration
 
@@ -15,7 +14,7 @@ type Migrator struct {
 }
 
 func NewMigrator(
-	setup migrationsetup.TestSetup,
+	setup TestSetup,
 	migrations []appmigrations.Migration,
 	existingDataset ExistingDataset,
 	expectedDataset ExpectedDataset,

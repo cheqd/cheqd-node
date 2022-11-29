@@ -1,7 +1,6 @@
-package scenarios
+package setup
 
 import (
-	migrationsetup "github.com/cheqd/cheqd-node/tests/upgrade/unit/setup"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
@@ -13,7 +12,7 @@ import (
 // Existing
 
 type ExistingDataset struct {
-	setup  migrationsetup.TestSetup
+	setup  TestSetup
 	loader Loader
 
 	DidDocsV1   []didtypesv1.StateValue
@@ -23,7 +22,7 @@ type ExistingDataset struct {
 	ResourcesV2 []resourcetypes.ResourceWithMetadata
 }
 
-func NewExistingDataset(setup migrationsetup.TestSetup) *ExistingDataset {
+func NewExistingDataset(setup TestSetup) *ExistingDataset {
 	return &ExistingDataset{
 		setup:  setup,
 		loader: Loader{},
@@ -157,14 +156,14 @@ func (d *ExistingDataset) FillStore() error {
 // Expected
 
 type ExpectedDataset struct {
-	setup  migrationsetup.TestSetup
+	setup  TestSetup
 	loader Loader
 
 	DidDocs   []didtypes.DidDocWithMetadata
 	Resources []resourcetypes.ResourceWithMetadata
 }
 
-func NewExpectedDataset(setup migrationsetup.TestSetup) *ExpectedDataset {
+func NewExpectedDataset(setup TestSetup) *ExpectedDataset {
 	return &ExpectedDataset{
 		setup:  setup,
 		loader: Loader{},

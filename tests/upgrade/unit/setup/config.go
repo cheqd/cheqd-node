@@ -1,4 +1,4 @@
-package scenarios
+package setup
 
 import "path/filepath"
 
