@@ -431,7 +431,10 @@ class Installer():
             shutil.chown(os.path.join(self.cheqd_config_dir, 'genesis.json'),
                          DEFAULT_CHEQD_USER,
                          DEFAULT_CHEQD_USER)
-
+        # Replace the default rpc address
+        rpc_default_value= 'laddr = "tcp://127.0.0.1:{}"'.format(DEFAULT_RPC_PORT)
+        new_rpc_default_value = 'tcp://0.0.0.0:{}'.format(DEFAULT_RPC_PORT)
+        search_and_replace(rpc_default_value,new_rpc_default_value, os.path.join(self.cheqd_config_dir, "config.toml"))
         # Setting up the external_address
         if self.interviewer.external_address:
             external_address_search_text='external_address = ""'
@@ -968,7 +971,7 @@ class Interviewer:
             self.external_address = answer
         else:
             try:
-                self.external_address = self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout.replace('"', '').strip()
+                self.external_address = self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout
             except:
                 failure_exit(f"Unable to fetch external IP address for your node.")
 
