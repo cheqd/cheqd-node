@@ -442,13 +442,10 @@ class Installer():
             search_and_replace(external_address_search_text, external_address_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
         else:
             try:
-                self.interviewer.external_address = self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout.replace('"', '').strip()
-                print("inside post_install: updated external address automatically{}".format(self.external_address))
-                print("inside post_install: without replace and strip(): {}".format(self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout))
+                self.interviewer.external_address = self.exec(f"sudo su -c 'dig +short txt ch whoami.cloudflare @1.1.1.1' {DEFAULT_CHEQD_USER}").stdout.replace('"', '').strip()
                 external_address_search_text='external_address = ""'
                 external_address_replace_text='external_address = "{}:{}"'.format(self.interviewer.external_address, self.interviewer.p2p_port)
                 search_and_replace(external_address_search_text, external_address_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
-                print("replaced inside post_install")
             except:
                 failure_exit(f"Unable to fetch external IP address for your node.")
 
@@ -989,8 +986,6 @@ class Interviewer:
         else:
             try:
                 self.external_address = self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout.replace('"', '').strip()
-                print("ask_for_external_address: updated external address automatically{}".format(self.external_address))
-                print("ask_for_external_address without replace and strip(): {}".format(self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout))
             except:
                 failure_exit(f"Unable to fetch external IP address for your node.")
 
