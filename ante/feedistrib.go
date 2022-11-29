@@ -1,10 +1,8 @@
 package ante
 
 import (
-	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
 const (
@@ -50,12 +48,4 @@ func ValidateDistributionFee(fee sdk.Coins, distrFeeAlloc DistributionFeeAllocat
 	}
 
 	return nil
-}
-
-func DistributeFeeToModule(bankKeeper BankKeeper, ctx sdk.Context, fee sdk.Coins) error {
-	if fee.IsZero() {
-		return sdkerrors.Wrap(sdkerrors.ErrLogic, "fee to be distributed is zero")
-	}
-
-	return bankKeeper.SendCoinsFromModuleToModule(ctx, didtypes.ModuleName, types.FeeCollectorName, fee)
 }
