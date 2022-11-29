@@ -85,7 +85,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		}
 
 		// Submit the DID Doc
-		resp, err := cli.CreateDidDoc(tmpDir, didPayload, signInputs, testdata.BASE_ACCOUNT_2, cli.CLI_GAS_PARAMS)
+		resp, err := cli.CreateDidDoc(tmpDir, didPayload, signInputs, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 	})
@@ -244,7 +244,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
 		}, signInputs, testdata.BASE_ACCOUNT_3, helpers.GenerateFees(tax.String()))
-		Expect(err).ToNot(BeNil())
+		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(5))
 	})
 
@@ -267,7 +267,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
 		}, signInputs, testdata.BASE_ACCOUNT_3, helpers.GenerateFees(tax.String()))
-		Expect(err).ToNot(BeNil())
+		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(5))
 	})
 
@@ -290,7 +290,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
 		}, signInputs, testdata.BASE_ACCOUNT_3, helpers.GenerateFees(tax.String()))
-		Expect(err).ToNot(BeNil())
+		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(5))
 	})
 
@@ -312,7 +312,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
 		}, signInputs, testdata.BASE_ACCOUNT_3, cli.CLI_GAS_PARAMS)
-		Expect(err).ToNot(BeNil())
+		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(5))
 	})
 
@@ -334,7 +334,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
 		}, signInputs, testdata.BASE_ACCOUNT_3, cli.CLI_GAS_PARAMS)
-		Expect(err).ToNot(BeNil())
+		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(5))
 	})
 
@@ -356,7 +356,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
 		}, signInputs, testdata.BASE_ACCOUNT_3, cli.CLI_GAS_PARAMS)
-		Expect(err).ToNot(BeNil())
+		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(5))
 	})
 
@@ -370,7 +370,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("querying the fee payer account balance before the transaction")
-		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2, resourcetypes.BaseMinimalDenom)
+		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
 		By("submitting the json resource message with double the tax")
@@ -387,7 +387,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("querying the fee payer account balance after the transaction")
-		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2, resourcetypes.BaseMinimalDenom)
+		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, resourcetypes.BaseMinimalDenom)
 
 		By("checking that the fee payer account balance has been decreased by the tax")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
@@ -404,7 +404,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("querying the fee payer account balance before the transaction")
-		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2, resourcetypes.BaseMinimalDenom)
+		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
 		By("submitting the image resource message with double the tax")
@@ -421,7 +421,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("querying the fee payer account balance after the transaction")
-		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2, resourcetypes.BaseMinimalDenom)
+		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, resourcetypes.BaseMinimalDenom)
 
 		By("checking that the fee payer account balance has been decreased by the tax")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
@@ -438,7 +438,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("querying the fee payer account balance before the transaction")
-		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2, resourcetypes.BaseMinimalDenom)
+		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
 		By("submitting the default resource message with double the tax")
@@ -455,7 +455,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("querying the fee payer account balance after the transaction")
-		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2, resourcetypes.BaseMinimalDenom)
+		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, resourcetypes.BaseMinimalDenom)
 
 		By("checking that the fee payer account balance has been decreased by the tax")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)

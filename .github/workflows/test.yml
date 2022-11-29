@@ -92,7 +92,7 @@ jobs:
       - name: Run tests
         working-directory: ./tests/integration
         run: |
-          ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --focus-file cli_diddoc_pricing_test.go --focus-file cli_diddoc_pricing_negative_test.go --focus-file cli_resource_pricing_test.go --focus-file cli_resource_pricing_negative_test.go --junit-report ../../report-integration.xml
+          ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --junit-report ../../report-integration.xml
 
       - name: Show logs
         if: failure()
