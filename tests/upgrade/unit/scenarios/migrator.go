@@ -6,24 +6,41 @@ import (
 )
 
 type Migrator struct {
+	setup migrationsetup.TestSetup
+
 	migrations []appmigrations.Migration
-	dataSet    IDataSet
-	setup      migrationsetup.TestSetup
+
+	existingDataset ExistingDataset
+	expectedDataset ExpectedDataset
 }
 
 func NewMigrator(
-	migrations []appmigrations.Migration,
 	setup migrationsetup.TestSetup,
-	dataSet IDataSet,
+	migrations []appmigrations.Migration,
+	existingDataset ExistingDataset,
+	expectedDataset ExpectedDataset,
 ) Migrator {
 	return Migrator{
+		setup: setup,
+
 		migrations: migrations,
-		dataSet:    dataSet,
-		setup:      setup,
+
+		existingDataset: existingDataset,
+		expectedDataset: expectedDataset,
 	}
 }
 
 func (m Migrator) Migrate() error {
+
+	return nil
+}
+
+func (m Migrator) Run() error {
+	err := m.existingDataset.FillStore()
+	if err != nil {
+		return err
+	}
+
 	migrationCtx := appmigrations.NewMigrationContext(
 		m.setup.Cdc,
 		m.setup.DidStoreKey,
@@ -36,29 +53,10 @@ func (m Migrator) Migrate() error {
 		}
 	}
 
-	return nil
-}
-
-func (m Migrator) Prepare() error {
-	return m.dataSet.Prepare()
-}
-
-func (m Migrator) Validate() error {
-	return m.dataSet.Validate()
-}
-
-func (m Migrator) Run() error {
-	err := m.Prepare()
+	err = m.expectedDataset.CheckStore()
 	if err != nil {
 		return err
 	}
-	err = m.Migrate()
-	if err != nil {
-		return err
-	}
-	err = m.Validate()
-	if err != nil {
-		return err
-	}
+
 	return nil
 }

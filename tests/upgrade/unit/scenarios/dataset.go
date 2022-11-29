@@ -1,6 +1,6 @@
 package scenarios
 
 type IDataSet interface {
-	Prepare() error
-	Validate() error
+	WriteExisting() error
+	CheckExpected() error
 }

@@ -16,23 +16,27 @@ var _ = Describe("Migration - Unit", func() {
 		// Init storages, keepers and setup the migration context.
 		setup := migrationsetup.Setup()
 
-		builder := NewChecksumBuilder(setup)
+		// Existing dataset
+		existingDataset := NewExistingDataset(setup)
+		existingDataset.MustAddDidDocV2(JoinGenerated("payload", "existing", "v2", "checksum"), "diddoc")
+		existingDataset.MustAddResourceV2(JoinGenerated("payload", "existing", "v2", "checksum"), "resource")
 
-		dataSet, err := builder.BuildDataSet(setup)
-		Expect(err).To(BeNil())
+		// Expected dataset
+		expectedDataset := NewExpectedDataset(setup)
+		expectedDataset.MustAddDidDocV2(JoinGenerated("payload", "expected", "v2", "checksum"), "diddoc")
+		expectedDataset.MustAddResourceV2(JoinGenerated("payload", "expected", "v2", "checksum"), "resource")
 
-		resourceChecksumScenario := []appmigrations.Migration{
-			appmigrations.MigrateResourceChecksum,
-		}
-
-		// Init Migrator structure
+		// Migrator
 		migrator := NewMigrator(
-			resourceChecksumScenario,
 			setup,
-			&dataSet)
+			[]appmigrations.Migration{
+				appmigrations.MigrateResourceChecksum,
+			},
+			*existingDataset,
+			*expectedDataset)
 
-		// Run migration scenario
-		err = migrator.Run()
+		// Run migration
+		err := migrator.Run()
 		Expect(err).To(BeNil())
 	})
 
@@ -42,52 +46,59 @@ var _ = Describe("Migration - Unit", func() {
 		// Init storages, keepers and setup the migration context.
 		setup := migrationsetup.Setup()
 
-		builder := NewProtobufBuilder(setup)
+		// Existing dataset
+		existingDataset := NewExistingDataset(setup)
+		existingDataset.MustAddDidDocV1(JoinGenerated("payload", "existing", "v1", "protobuf"), "diddoc")
+		existingDataset.MustAddResourceV1(JoinGenerated("payload", "existing", "v1", "protobuf"), "resource")
 
-		dataSet, err := builder.BuildDataSet(setup)
-		Expect(err).To(BeNil())
+		// Expected dataset
+		expectedDataset := NewExpectedDataset(setup)
+		expectedDataset.MustAddDidDocV2(JoinGenerated("payload", "expected", "v2", "protobuf"), "diddoc")
+		expectedDataset.MustAddResourceV2(JoinGenerated("payload", "expected", "v2", "protobuf"), "resource")
 
-		migrations := []appmigrations.Migration{
-			appmigrations.MigrateDidProtobuf,
-			appmigrations.MigrateResourceProtobuf,
-		}
-
-		// Init Migrator structure
+		// Migrator
 		migrator := NewMigrator(
-			migrations,
 			setup,
-			&dataSet)
+			[]appmigrations.Migration{
+				appmigrations.MigrateDidProtobuf,
+				appmigrations.MigrateResourceProtobuf,
+			},
+			*existingDataset,
+			*expectedDataset)
 
-		// Run migration scenario
-		err = migrator.Run()
+		// Run migration
+		err := migrator.Run()
 		Expect(err).To(BeNil())
 	})
 
 	It("checks IndyStyle Migration", func() {
 		By("Ensuring the IndyStyle migration handler is working as expected")
 
-		// Run IndyStyle migration
 		// Init storages, keepers and setup the migration context.
 		setup := migrationsetup.Setup()
 
-		builder := NewIndyStyleBuilder(setup)
+		// Existing dataset
+		existingDataset := NewExistingDataset(setup)
+		existingDataset.MustAddDidDocV2(JoinGenerated("payload", "existing", "v2", "indy_style"), "diddoc")
+		existingDataset.MustAddResourceV2(JoinGenerated("payload", "existing", "v2", "indy_style"), "resource")
 
-		dataSet, err := builder.BuildDataSet(setup)
-		Expect(err).To(BeNil())
+		// Expected dataset
+		expectedDataset := NewExpectedDataset(setup)
+		expectedDataset.MustAddDidDocV2(JoinGenerated("payload", "expected", "v2", "indy_style"), "diddoc")
+		expectedDataset.MustAddResourceV2(JoinGenerated("payload", "expected", "v2", "indy_style"), "resource")
 
-		indyStyleScenario := []appmigrations.Migration{
-			appmigrations.MigrateDidIndyStyle,
-			appmigrations.MigrateResourceIndyStyle,
-		}
-
-		// Init Migrator structure
+		// Migrator
 		migrator := NewMigrator(
-			indyStyleScenario,
 			setup,
-			&dataSet)
+			[]appmigrations.Migration{
+				appmigrations.MigrateDidIndyStyle,
+				appmigrations.MigrateResourceIndyStyle,
+			},
+			*existingDataset,
+			*expectedDataset)
 
-		// Run migration scenario
-		err = migrator.Run()
+		// Run migration
+		err := migrator.Run()
 		Expect(err).To(BeNil())
 	})
 })
