@@ -117,8 +117,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 		// Check that DIDDoc is not deactivated
 		Expect(resp.Value.Metadata.Deactivated).To(BeFalse())
 
-		// TODO: Restore this
-		/* AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.GREEN, "can deactivate diddoc"))
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.GREEN, "can deactivate diddoc"))
 		// Deactivate the DID Doc
 		payload3 := types.MsgDeactivateDidDocPayload{
 			Id:        did,
@@ -132,9 +131,9 @@ var _ = Describe("cheqd cli - positive did", func() {
 			},
 		}
 
-		res3, err := cli.DeactivateDidDoc(tmpDir, payload3, signInputs3, testdata.BASE_ACCOUNT_1)
+		res3, err := cli.DeactivateDidDoc(tmpDir, payload3, signInputs3, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
-		Expect(res3.Code).To(BeEquivalentTo(0)) */
+		Expect(res3.Code).To(BeEquivalentTo(0))
 
 		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.GREEN, "can query deactivated diddoc"))
 		// Query the DID Doc

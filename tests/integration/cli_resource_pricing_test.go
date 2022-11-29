@@ -496,7 +496,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			helpers.HumanReadableEvent{
 				Type: "tx",
 				Attributes: []helpers.HumanReadableEventAttribute{
-					{Key: "fee", Value: diff.String(), Index: true},
+					{Key: "fee", Value: tax.String(), Index: true},
 					{Key: "fee_payer", Value: testdata.BASE_ACCOUNT_2_ADDR, Index: true},
 				},
 			},
