@@ -440,14 +440,6 @@ class Installer():
             external_address_search_text='external_address = ""'
             external_address_replace_text='external_address = "{}:{}"'.format(self.interviewer.external_address, self.interviewer.p2p_port)
             search_and_replace(external_address_search_text, external_address_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
-        else:
-            try:
-                self.interviewer.external_address = self.exec(f"sudo su -c 'dig +short txt ch whoami.cloudflare @1.1.1.1' {DEFAULT_CHEQD_USER}").stdout.replace('"', '').strip()
-                external_address_search_text='external_address = ""'
-                external_address_replace_text='external_address = "{}:{}"'.format(self.interviewer.external_address, self.interviewer.p2p_port)
-                search_and_replace(external_address_search_text, external_address_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
-            except:
-                failure_exit(f"Unable to fetch external IP address for your node.")
 
         # Setting up the seeds
         seeds = self.exec(f"curl {SEEDS_FILE.format(self.interviewer.chain)}").stdout.decode("utf-8").strip()
@@ -981,11 +973,15 @@ class Interviewer:
     def ask_for_external_address(self):
         answer = self.ask(
             f"What is the externally-reachable IP address or DNS name for your cheqd-node? [default: Fetch automatically via DNS resolver lookup]: {os.linesep}")
-        if answer is not None:
+        if answer:
+            print("Answer is not None, answer ->{}".format(answer))
             self.external_address = answer
+
         else:
             try:
+                print("dig getting executed")
                 self.external_address = self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout.replace('"', '').strip()
+                print("after dig got executed, {}".format(self.external_address))
             except:
                 failure_exit(f"Unable to fetch external IP address for your node.")
 
