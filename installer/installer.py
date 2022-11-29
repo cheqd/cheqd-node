@@ -434,7 +434,7 @@ class Installer():
                          
         # Replace the default RCP port to listen to anyone
         rpc_default_value= 'laddr = "tcp://127.0.0.1:{}"'.format(DEFAULT_RPC_PORT)
-        new_rpc_default_value = 'tcp://0.0.0.0:{}'.format(DEFAULT_RPC_PORT)
+        new_rpc_default_value = 'laddr = "tcp://0.0.0.0:{}"'.format(DEFAULT_RPC_PORT)
         search_and_replace(rpc_default_value,new_rpc_default_value, os.path.join(self.cheqd_config_dir, "config.toml"))
 
         # Setting up the external_address
