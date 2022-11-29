@@ -27,15 +27,15 @@ import (
 //   4. fixed fee - invalid fee amount create
 //   5. fixed fee - invalid fee amount update
 //   6. fixed fee - invalid fee amount deactivate
-//   7. fixed fee - insufficient funds create
-//   8. fixed fee - insufficient funds update
-//   9. fixed fee - insufficient funds deactivate
-//   10. gas auto - insufficient funds create
-//   11. gas auto - insufficient funds update
-//   12. gas auto - insufficient funds deactivate
-//   13. fixed fee - charge only tax if fee is more than tax create
-//   14. fixed fee - charge only tax if fee is more than tax update
-//   15. fixed fee - charge only tax if fee is more than tax deactivate
+//   7. gas auto - insufficient funds create
+//   8. gas auto - insufficient funds update
+//   9. gas auto - insufficient funds deactivate
+//   10. fixed fee - charge only tax if fee is more than tax create
+//   11. fixed fee - charge only tax if fee is more than tax update
+//   12. fixed fee - charge only tax if fee is more than tax deactivate
+//   13. fixed fee - insufficient funds create
+//   14. fixed fee - insufficient funds update
+//   15. fixed fee - insufficient funds deactivate
 
 var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 	var tmpDir string
@@ -249,62 +249,6 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		Expect(res.Code).To(BeEquivalentTo(5))
 	})
 
-	It("should not succeed in create diddoc create message - case: fixed fee, insufficient funds", func() {
-		By("submitting create diddoc message with insufficient funds")
-		tax := feeParams.CreateDid
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_6, helpers.GenerateFees(tax.String()))
-		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(5))
-	})
-
-	It("should not succeed in update diddoc message - case: fixed fee, insufficient funds", func() {
-		By("submitting the create diddoc message")
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_5, helpers.GenerateFees(feeParams.CreateDid.String()))
-		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(0))
-
-		By("preparing the update diddoc message")
-		payload2 := types.MsgUpdateDidDocPayload{
-			Id: payload.Id,
-			VerificationMethod: []*types.VerificationMethod{
-				{
-					Id:                   payload.VerificationMethod[0].Id,
-					Controller:           payload.VerificationMethod[0].Controller,
-					Type:                 payload.VerificationMethod[0].Type,
-					VerificationMaterial: payload.VerificationMethod[0].VerificationMaterial,
-				},
-			},
-			Authentication:  payload.Authentication,
-			AssertionMethod: []string{payload.VerificationMethod[0].Id}, // <-- changed
-			VersionId:       uuid.NewString(),                           // <-- changed
-		}
-
-		By("submitting update diddoc message with insufficient funds")
-		tax := feeParams.UpdateDid
-		res, err = cli.UpdateDidDoc(tmpDir, payload2, signInputs, testdata.BASE_ACCOUNT_6, helpers.GenerateFees(tax.String()))
-		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(5))
-	})
-
-	It("should not succeed in deactivate diddoc message - case: fixed fee, insufficient funds", func() {
-		By("submitting the create diddoc message")
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid.String()))
-		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(0))
-
-		By("preparing the deactivate diddoc message")
-		payload2 := types.MsgDeactivateDidDocPayload{
-			Id:        payload.Id,
-			VersionId: uuid.NewString(),
-		}
-
-		By("submitting deactivate diddoc message with insufficient funds")
-		tax := feeParams.DeactivateDid
-		res, err = cli.DeactivateDidDoc(tmpDir, payload2, signInputs, testdata.BASE_ACCOUNT_6, helpers.GenerateFees(tax.String()))
-		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(5))
-	})
-
 	It("should not charge more than tax for create diddoc message - case: fixed fee", func() {
 		By("querying the fee payer account balance before the transaction")
 		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_5_ADDR, types.BaseMinimalDenom)
@@ -398,5 +342,61 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		By("checking that the fee payer account balance has been decreased by the tax")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
 		Expect(diff).To(Equal(tax.Amount))
+	})
+
+	It("should not succeed in create diddoc create message - case: fixed fee, insufficient funds", func() {
+		By("submitting create diddoc message with insufficient funds")
+		tax := feeParams.CreateDid
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_6, helpers.GenerateFees(tax.String()))
+		Expect(err).To(BeNil())
+		Expect(res.Code).To(BeEquivalentTo(5))
+	})
+
+	It("should not succeed in update diddoc message - case: fixed fee, insufficient funds", func() {
+		By("submitting the create diddoc message")
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_5, helpers.GenerateFees(feeParams.CreateDid.String()))
+		Expect(err).To(BeNil())
+		Expect(res.Code).To(BeEquivalentTo(0))
+
+		By("preparing the update diddoc message")
+		payload2 := types.MsgUpdateDidDocPayload{
+			Id: payload.Id,
+			VerificationMethod: []*types.VerificationMethod{
+				{
+					Id:                   payload.VerificationMethod[0].Id,
+					Controller:           payload.VerificationMethod[0].Controller,
+					Type:                 payload.VerificationMethod[0].Type,
+					VerificationMaterial: payload.VerificationMethod[0].VerificationMaterial,
+				},
+			},
+			Authentication:  payload.Authentication,
+			AssertionMethod: []string{payload.VerificationMethod[0].Id}, // <-- changed
+			VersionId:       uuid.NewString(),                           // <-- changed
+		}
+
+		By("submitting update diddoc message with insufficient funds")
+		tax := feeParams.UpdateDid
+		res, err = cli.UpdateDidDoc(tmpDir, payload2, signInputs, testdata.BASE_ACCOUNT_6, helpers.GenerateFees(tax.String()))
+		Expect(err).To(BeNil())
+		Expect(res.Code).To(BeEquivalentTo(5))
+	})
+
+	It("should not succeed in deactivate diddoc message - case: fixed fee, insufficient funds", func() {
+		By("submitting the create diddoc message")
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid.String()))
+		Expect(err).To(BeNil())
+		Expect(res.Code).To(BeEquivalentTo(0))
+
+		By("preparing the deactivate diddoc message")
+		payload2 := types.MsgDeactivateDidDocPayload{
+			Id:        payload.Id,
+			VersionId: uuid.NewString(),
+		}
+
+		By("submitting deactivate diddoc message with insufficient funds")
+		tax := feeParams.DeactivateDid
+		res, err = cli.DeactivateDidDoc(tmpDir, payload2, signInputs, testdata.BASE_ACCOUNT_6, helpers.GenerateFees(tax.String()))
+		Expect(err).To(BeNil())
+		Expect(res.Code).To(BeEquivalentTo(5))
 	})
 })
