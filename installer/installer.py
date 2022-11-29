@@ -980,7 +980,7 @@ class Interviewer:
         else:
             try:
                 print("dig getting executed, {}".format(self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout))
-                self.external_address = str(self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout).replace('"','').strip()
+                self.external_address = str(self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout).strip("""b'""\\n""")
                 print("after dig got executed, {}".format(self.external_address))
             except:
                 failure_exit(f"Unable to fetch external IP address for your node.")
