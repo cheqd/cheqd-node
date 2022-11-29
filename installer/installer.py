@@ -974,14 +974,11 @@ class Interviewer:
         answer = self.ask(
             f"What is the externally-reachable IP address or DNS name for your cheqd-node? [default: Fetch automatically via DNS resolver lookup]: {os.linesep}")
         if answer:
-            print("Answer is not None, answer ->{}".format(answer))
             self.external_address = answer
 
         else:
             try:
-                print("dig getting executed, {}".format(self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout))
                 self.external_address = str(self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout).strip("""b'""\\n""")
-                print("after dig got executed, {}".format(self.external_address))
             except:
                 failure_exit(f"Unable to fetch external IP address for your node.")
 
