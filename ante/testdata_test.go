@@ -1,4 +1,4 @@
-package ante_tests
+package ante_test
 
 import (
 	"crypto/ed25519"

@@ -1,4 +1,4 @@
-package ante_tests
+package ante_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestTests(t *testing.T) {
+func TestAnte(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Tests Suite")
+	RunSpecs(t, "Ante Suite")
 }

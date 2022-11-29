@@ -1,4 +1,4 @@
-package ante_tests
+package ante_test
 
 import (
 	cheqdante "github.com/cheqd/cheqd-node/ante"
