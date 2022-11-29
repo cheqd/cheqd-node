@@ -977,7 +977,7 @@ class Interviewer:
             self.external_address = answer
         else:
             try:
-                self.external_address = self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout
+                self._external_address = self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout
             except:
                 failure_exit(f"Unable to fetch external IP address for your node.")
 
