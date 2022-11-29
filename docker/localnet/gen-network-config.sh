@@ -98,6 +98,13 @@ function configure_genesis() {
   jq '.app_state.auth.accounts += [{"@type": "/cosmos.auth.v1beta1.BaseAccount","address": "'${BASE_ACCOUNT_5}'", "pub_key": null,"account_number": "0","sequence": "0"}]' "$GENESIS" > "$GENESIS_TMP" && \
     mv "${GENESIS_TMP}" "${GENESIS}"
 
+  BASE_ACCOUNT_6="cheqd1makysw7c788c7fzkfzn7al80wyfl4at6jtjyg4"
+  # Mnemonic: gallery hospital vicious demand orient piano melody vanish remind pistol elephant bracket olive kitten caution apart capital protect junior endorse run drama tiny patrol
+  jq '.app_state.bank.balances += [{"address": "'${BASE_ACCOUNT_6}'", "coins": [{"denom": "ncheq", "amount": "100"}] }]' "$GENESIS" > "$GENESIS_TMP"  && \
+    mv "${GENESIS_TMP}" "${GENESIS}"
+  jq '.app_state.auth.accounts += [{"@type": "/cosmos.auth.v1beta1.BaseAccount","address": "'${BASE_ACCOUNT_6}'", "pub_key": null,"account_number": "0","sequence": "0"}]' "$GENESIS" > "$GENESIS_TMP" && \
+    mv "${GENESIS_TMP}" "${GENESIS}"
+
   BASE_VESTING_ACCOUNT="cheqd1lkqddnapqvz2hujx2trpj7xj6c9hmuq7uhl0md"
   # Mnemonic: coach index fence broken very cricket someone casino dial truth fitness stay habit such three jump exotic spawn planet fragile walk enact angry great
   # shellcheck disable=SC2089
