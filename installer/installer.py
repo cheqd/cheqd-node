@@ -436,11 +436,11 @@ class Installer():
         new_rpc_default_value = 'tcp://0.0.0.0:{}'.format(DEFAULT_RPC_PORT)
         search_and_replace(rpc_default_value,new_rpc_default_value, os.path.join(self.cheqd_config_dir, "config.toml"))
         # Setting up the external_address
-        if self.interviewer.external_address:
-            external_address_search_text='external_address = ""'
-            external_address_replace_text='external_address = "{}:{}"'.format(self.interviewer.external_address, self.interviewer.p2p_port)
-            search_and_replace(external_address_search_text, external_address_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
-       
+        external_address_search_text='external_address = ""'
+        external_address_replace_text='external_address = "{}:{}"'.format(self.interviewer.external_address, self.interviewer.p2p_port)
+        search_and_replace(external_address_search_text, external_address_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
+        
+
         # Setting up the seeds
         seeds = self.exec(f"curl {SEEDS_FILE.format(self.interviewer.chain)}").stdout.decode("utf-8").strip()
         seeds_search_text = 'seeds = ""'
@@ -977,7 +977,7 @@ class Interviewer:
             self.external_address = answer
         else:
             try:
-                self._external_address = self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout
+                self.external_address = self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout.replace('"', '').strip()
             except:
                 failure_exit(f"Unable to fetch external IP address for your node.")
 
