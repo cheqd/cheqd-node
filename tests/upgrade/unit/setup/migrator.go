@@ -29,11 +29,6 @@ func NewMigrator(
 	}
 }
 
-func (m Migrator) Migrate() error {
-
-	return nil
-}
-
 func (m Migrator) Run() error {
 	err := m.existingDataset.FillStore()
 	if err != nil {
