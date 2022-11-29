@@ -254,7 +254,7 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 
 	It("should not succeed in create diddoc message - case: gas auto, insufficient funds", func() {
 		By("submitting create diddoc message with insufficient funds")
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_3, helpers.GenerateFees("0.0001stake"))
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_3, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(5))
 	})
