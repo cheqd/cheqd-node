@@ -67,7 +67,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		}
 
 		// Submit the DID Doc
-		resp, err := cli.CreateDidDoc(tmpDir, didPayload, signInputs, testdata.BASE_ACCOUNT_2, cli.CLI_GAS_PARAMS)
+		resp, err := cli.CreateDidDoc(tmpDir, didPayload, signInputs, testdata.BASE_ACCOUNT_4, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 	})
@@ -82,7 +82,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("querying the fee payer account balance before the transaction")
-		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, resourcetypes.BaseMinimalDenom)
+		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 		Expect(balanceBefore.Denom).To(BeEquivalentTo(resourcetypes.BaseMinimalDenom))
 
@@ -95,12 +95,12 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_2, helpers.GenerateFees(tax.String()))
+		}, signInputs, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.String()))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
 		By("querying the altered account balance")
-		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, resourcetypes.BaseMinimalDenom)
+		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 		Expect(balanceAfter.Denom).To(BeEquivalentTo(resourcetypes.BaseMinimalDenom))
 
@@ -117,7 +117,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 				Type: "tx",
 				Attributes: []helpers.HumanReadableEventAttribute{
 					{Key: "fee", Value: tax.String(), Index: true},
-					{Key: "fee_payer", Value: testdata.BASE_ACCOUNT_2_ADDR, Index: true},
+					{Key: "fee_payer", Value: testdata.BASE_ACCOUNT_4_ADDR, Index: true},
 				},
 			},
 		))
@@ -158,7 +158,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("querying the fee payer account balance before the transaction")
-		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, resourcetypes.BaseMinimalDenom)
+		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 		Expect(balanceBefore.Denom).To(BeEquivalentTo(resourcetypes.BaseMinimalDenom))
 
@@ -170,12 +170,12 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_2, cli.CLI_GAS_PARAMS)
+		}, signInputs, testdata.BASE_ACCOUNT_4, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
 		By("querying the altered account balance")
-		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, resourcetypes.BaseMinimalDenom)
+		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 		Expect(balanceAfter.Denom).To(BeEquivalentTo(resourcetypes.BaseMinimalDenom))
 
@@ -193,7 +193,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 				Type: "tx",
 				Attributes: []helpers.HumanReadableEventAttribute{
 					{Key: "fee", Value: tax.String(), Index: true},
-					{Key: "fee_payer", Value: testdata.BASE_ACCOUNT_2_ADDR, Index: true},
+					{Key: "fee_payer", Value: testdata.BASE_ACCOUNT_4_ADDR, Index: true},
 				},
 			},
 		))
@@ -234,7 +234,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("querying the fee payer account balance before the transaction")
-		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, resourcetypes.BaseMinimalDenom)
+		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 		Expect(balanceBefore.Denom).To(BeEquivalentTo(resourcetypes.BaseMinimalDenom))
 
@@ -247,12 +247,12 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_2, helpers.GenerateFees(tax.String()))
+		}, signInputs, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.String()))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
 		By("querying the altered account balance")
-		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, resourcetypes.BaseMinimalDenom)
+		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 		Expect(balanceAfter.Denom).To(BeEquivalentTo(resourcetypes.BaseMinimalDenom))
 
@@ -269,7 +269,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 				Type: "tx",
 				Attributes: []helpers.HumanReadableEventAttribute{
 					{Key: "fee", Value: tax.String(), Index: true},
-					{Key: "fee_payer", Value: testdata.BASE_ACCOUNT_2_ADDR, Index: true},
+					{Key: "fee_payer", Value: testdata.BASE_ACCOUNT_4_ADDR, Index: true},
 				},
 			},
 		))
@@ -310,7 +310,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("querying the fee payer account balance before the transaction")
-		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, resourcetypes.BaseMinimalDenom)
+		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 		Expect(balanceBefore.Denom).To(BeEquivalentTo(resourcetypes.BaseMinimalDenom))
 
@@ -322,12 +322,12 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_2, cli.CLI_GAS_PARAMS)
+		}, signInputs, testdata.BASE_ACCOUNT_4, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
 		By("querying the altered account balance")
-		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, resourcetypes.BaseMinimalDenom)
+		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 		Expect(balanceAfter.Denom).To(BeEquivalentTo(resourcetypes.BaseMinimalDenom))
 
@@ -345,7 +345,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 				Type: "tx",
 				Attributes: []helpers.HumanReadableEventAttribute{
 					{Key: "fee", Value: tax.String(), Index: true},
-					{Key: "fee_payer", Value: testdata.BASE_ACCOUNT_2_ADDR, Index: true},
+					{Key: "fee_payer", Value: testdata.BASE_ACCOUNT_4_ADDR, Index: true},
 				},
 			},
 		))
@@ -386,7 +386,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("querying the fee payer account balance before the transaction")
-		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, resourcetypes.BaseMinimalDenom)
+		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 		Expect(balanceBefore.Denom).To(BeEquivalentTo(resourcetypes.BaseMinimalDenom))
 
@@ -399,12 +399,12 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_2, helpers.GenerateFees(tax.String()))
+		}, signInputs, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.String()))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
 		By("querying the altered account balance")
-		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, resourcetypes.BaseMinimalDenom)
+		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 		Expect(balanceAfter.Denom).To(BeEquivalentTo(resourcetypes.BaseMinimalDenom))
 
@@ -421,7 +421,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 				Type: "tx",
 				Attributes: []helpers.HumanReadableEventAttribute{
 					{Key: "fee", Value: tax.String(), Index: true},
-					{Key: "fee_payer", Value: testdata.BASE_ACCOUNT_2_ADDR, Index: true},
+					{Key: "fee_payer", Value: testdata.BASE_ACCOUNT_4_ADDR, Index: true},
 				},
 			},
 		))
@@ -462,7 +462,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("querying the fee payer account balance before the transaction")
-		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, resourcetypes.BaseMinimalDenom)
+		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 		Expect(balanceBefore.Denom).To(BeEquivalentTo(resourcetypes.BaseMinimalDenom))
 
@@ -474,12 +474,12 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_2, cli.CLI_GAS_PARAMS)
+		}, signInputs, testdata.BASE_ACCOUNT_4, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
 		By("querying the altered account balance")
-		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, resourcetypes.BaseMinimalDenom)
+		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 		Expect(balanceAfter.Denom).To(BeEquivalentTo(resourcetypes.BaseMinimalDenom))
 
@@ -497,7 +497,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 				Type: "tx",
 				Attributes: []helpers.HumanReadableEventAttribute{
 					{Key: "fee", Value: tax.String(), Index: true},
-					{Key: "fee_payer", Value: testdata.BASE_ACCOUNT_2_ADDR, Index: true},
+					{Key: "fee_payer", Value: testdata.BASE_ACCOUNT_4_ADDR, Index: true},
 				},
 			},
 		))
@@ -538,12 +538,12 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("creating a feegrant")
-		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_2_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
+		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
 		By("querying the fee granter account balance before the transaction")
-		granterBalanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, resourcetypes.BaseMinimalDenom)
+		granterBalanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
 		By("querying the fee grantee account balance before the transaction")
@@ -558,12 +558,12 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_2_ADDR, cli.CLI_GAS_PARAMS))
+		}, signInputs, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, cli.CLI_GAS_PARAMS))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
 		By("querying the fee granter account balance after the transaction")
-		granterBalanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, resourcetypes.BaseMinimalDenom)
+		granterBalanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
 		By("querying the fee grantee account balance after the transaction")
@@ -580,7 +580,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(diff.IsZero()).To(BeTrue())
 
 		By("revoking the feegrant")
-		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_2_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
+		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 	})
 
@@ -594,12 +594,12 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("creating a feegrant")
-		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_2_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
+		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
 		By("querying the fee granter account balance before the transaction")
-		granterBalanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, resourcetypes.BaseMinimalDenom)
+		granterBalanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
 		By("querying the fee grantee account balance before the transaction")
@@ -614,12 +614,12 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_2_ADDR, cli.CLI_GAS_PARAMS))
+		}, signInputs, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, cli.CLI_GAS_PARAMS))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
 		By("querying the fee granter account balance after the transaction")
-		granterBalanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, resourcetypes.BaseMinimalDenom)
+		granterBalanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
 		By("querying the fee grantee account balance after the transaction")
@@ -636,7 +636,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(diff.IsZero()).To(BeTrue())
 
 		By("revoking the feegrant")
-		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_2_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
+		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 	})
 
@@ -650,12 +650,12 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("creating a feegrant")
-		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_2_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
+		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
 		By("querying the fee granter account balance before the transaction")
-		granterBalanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, resourcetypes.BaseMinimalDenom)
+		granterBalanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
 		By("querying the fee grantee account balance before the transaction")
@@ -670,12 +670,12 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_2_ADDR, cli.CLI_GAS_PARAMS))
+		}, signInputs, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, cli.CLI_GAS_PARAMS))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
 		By("querying the fee granter account balance after the transaction")
-		granterBalanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_2_ADDR, resourcetypes.BaseMinimalDenom)
+		granterBalanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
 		By("querying the fee grantee account balance after the transaction")
@@ -692,7 +692,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(diff.IsZero()).To(BeTrue())
 
 		By("revoking the feegrant")
-		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_2_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
+		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 	})
 })
