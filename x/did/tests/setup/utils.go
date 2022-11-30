@@ -36,7 +36,6 @@ const (
 var letters = []rune("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz")
 
 func randSeq(n int) string {
-	mathrand.Seed(time.Now().UnixNano())
 	b := make([]rune, n)
 	for i := range b {
 		b[i] = letters[mathrand.Intn(len(letters))]
@@ -46,6 +45,7 @@ func randSeq(n int) string {
 
 func GenerateDID(idtype IDType) string {
 	prefix := "did:cheqd:" + DID_NAMESPACE + ":"
+	mathrand.Seed(time.Now().UnixNano())
 
 	switch idtype {
 	case Base58_16bytes:
