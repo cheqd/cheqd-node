@@ -1053,7 +1053,7 @@ class Interviewer:
 
     def ask_for_persistent_peers(self):
         self.persistent_peers = self.ask(
-            f"Specify persistent peers", default="blank, file has blank/no value")
+            f"Specify persistent peers [default: blank, file has blank/no value]")
     
     def ask_for_log_level(self):
         self.log_level = self.ask(
