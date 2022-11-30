@@ -159,7 +159,8 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 	s := new(AnteTestSuite)
 
 	BeforeEach(func() {
-		s.SetupTest(false) // setup
+		err := s.SetupTest(false) // setup
+		Expect(err).To(BeNil(), "Error on creating test app")
 		s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 	})
 

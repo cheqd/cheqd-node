@@ -42,8 +42,11 @@ type AnteTestSuite struct {
 }
 
 // returns context and app with params set on account keeper
-func createTestApp(isCheckTx bool) (*simapp.SimApp, sdk.Context) {
-	app := simapp.SetupForGinkgo(isCheckTx)
+func createTestApp(isCheckTx bool) (*simapp.SimApp, sdk.Context, error) {
+	app, err := simapp.Setup(isCheckTx)
+	if err != nil {
+		return nil, sdk.Context{}, err
+	}
 	ctx := app.BaseApp.NewContext(isCheckTx, tmproto.Header{})
 	app.AccountKeeper.SetParams(ctx, authtypes.DefaultParams())
 
@@ -53,7 +56,7 @@ func createTestApp(isCheckTx bool) (*simapp.SimApp, sdk.Context) {
 	resourceFeeParams := resourcetypes.DefaultGenesis().FeeParams
 	app.ResourceKeeper.SetParams(ctx, *resourceFeeParams)
 
-	return app, ctx
+	return app, ctx, nil
 }
 
 // func TestAnteTestSuite(t *testing.T) {
@@ -62,7 +65,11 @@ func createTestApp(isCheckTx bool) (*simapp.SimApp, sdk.Context) {
 
 // SetupTest setups a new test, with new app, context, and anteHandler.
 func (s *AnteTestSuite) SetupTest(isCheckTx bool) error {
-	s.app, s.ctx = createTestApp(isCheckTx)
+	var err error
+	s.app, s.ctx, err = createTestApp(isCheckTx)
+	if err != nil {
+		return err
+	}
 	s.ctx = s.ctx.WithBlockHeight(1)
 	// Set up TxConfig.
 	encodingConfig := cheqdapp.MakeTestEncodingConfig()
