@@ -30,45 +30,14 @@ jobs:
         run: |
           go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
-      - name: Run Ginkgo tests
-        run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --junit-report report-unit.xml
+      - name: Run Ginkgo unit tests
+        run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --tags upgrade_unit --junit-report report-unit.xml
 
       - name: Upload unit tests result
         uses: actions/upload-artifact@v3
         with:
           name: report-unit.xml
           path: report-unit.xml
-
-  upgrade-unit-tests:
-    name: "Upgrade Unit Tests"
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/setup-go@v3
-        with:
-          go-version-file: ./go.mod
-          cache: true
-
-      - name: Install ginkgo
-        working-directory: ./..
-        run: |
-          go install github.com/onsi/ginkgo/v2/ginkgo@latest
-
-      - name: Run Ginkgo tests
-        run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --tags upgrade_unit
-
-      - name: Upload unit tests result
-        uses: actions/upload-artifact@v3
-        with:
-          name: report-unit.xml
-          path: report-unit.xml
-
-      - name: Run migration handler unit tests
-        working-directory: ./tests/upgrade
-        run: |
-          ginkgo -r --tags upgrade --race --focus-file migration_unit_test.go
 
   integration-tests:
     name: "Integration Tests"
