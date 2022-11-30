@@ -175,31 +175,17 @@ func (k Keeper) IterateAllResourceMetadatas(ctx *sdk.Context, callback func(meta
 
 // GetAllResources returns all resources as a list
 // Loads everything in memory. Use only for genesis export!
-func (k Keeper) GetAllResources(ctx *sdk.Context) (list []types.ResourceWithMetadata) {
-	metadataIterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.storeKey), didutils.StrBytes(types.ResourceMetadataKey))
-	dataIterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.storeKey), didutils.StrBytes(types.ResourceDataKey))
-
-	defer closeIteratorOrPanic(metadataIterator)
-	defer closeIteratorOrPanic(dataIterator)
-
-	for metadataIterator.Valid() {
-		if !dataIterator.Valid() {
-			panic("number of headers and data don't match")
+func (k Keeper) GetAllResources(ctx *sdk.Context) (list []types.ResourceWithMetadata, err_ error) {
+	k.IterateAllResourceMetadatas(ctx, func(metadata types.Metadata) bool {
+		resource, err := k.GetResource(ctx, metadata.CollectionId, metadata.Id)
+		if err != nil {
+			err_ = err
+			return false
 		}
 
-		var metadata types.Metadata
-		k.cdc.MustUnmarshal(metadataIterator.Value(), &metadata)
-
-		data := types.Resource{Data: dataIterator.Value()}
-
-		list = append(list, types.ResourceWithMetadata{
-			Metadata: &metadata,
-			Resource: &data,
-		})
-
-		metadataIterator.Next()
-		dataIterator.Next()
-	}
+		list = append(list, resource)
+		return true
+	})
 
 	return
 }

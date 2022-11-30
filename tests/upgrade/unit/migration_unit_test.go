@@ -1,4 +1,4 @@
-//go:build upgrade_unit
+// nogo:build upgrade_unit
 
 package unit
 

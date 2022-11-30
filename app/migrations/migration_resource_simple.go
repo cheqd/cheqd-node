@@ -19,9 +19,6 @@ func MigrateResourceSimple(sctx sdk.Context, mctx MigrationContext, apply func(r
 		return true
 	})
 
-	res := mctx.resourceKeeperNew.GetAllResources(&sctx)
-	println(res)
-
 	// Iterate and migrate resources
 	for _, metadata := range metadatas {
 		// Read value
