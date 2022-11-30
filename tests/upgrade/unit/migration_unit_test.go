@@ -1,4 +1,4 @@
-//go:build upgrade_unit
+
 
 package unit
 
@@ -19,13 +19,13 @@ var _ = Describe("Migration - Unit", func() {
 
 		// Existing dataset
 		existingDataset := NewExistingDataset(setup)
-		existingDataset.MustAddDidDocV2(JoinGenerated("payload", "existing", "v2", "checksum"), "diddoc")
-		existingDataset.MustAddResourceV2(JoinGenerated("payload", "existing", "v2", "checksum"), "resource")
+		existingDataset.MustAddDidDocV2(JoinGenerated("payload", "checksum", "existing", "v2"), "diddoc")
+		existingDataset.MustAddResourceV2(JoinGenerated("payload", "checksum", "existing", "v2"), "resource")
 
 		// Expected dataset
 		expectedDataset := NewExpectedDataset(setup)
-		expectedDataset.MustAddDidDocV2(JoinGenerated("payload", "expected", "v2", "checksum"), "diddoc")
-		expectedDataset.MustAddResourceV2(JoinGenerated("payload", "expected", "v2", "checksum"), "resource")
+		expectedDataset.MustAddDidDocV2(JoinGenerated("payload", "checksum", "expected", "v2"), "diddoc")
+		expectedDataset.MustAddResourceV2(JoinGenerated("payload", "checksum", "expected", "v2"), "resource")
 
 		// Migrator
 		migrator := NewMigrator(
@@ -49,13 +49,13 @@ var _ = Describe("Migration - Unit", func() {
 
 		// Existing dataset
 		existingDataset := NewExistingDataset(setup)
-		existingDataset.MustAddDidDocV1(JoinGenerated("payload", "existing", "v1", "protobuf"), "diddoc")
-		existingDataset.MustAddResourceV1(JoinGenerated("payload", "existing", "v1", "protobuf"), "resource")
+		existingDataset.MustAddDidDocV1(JoinGenerated("payload", "protobuf", "existing", "v1"), "diddoc")
+		existingDataset.MustAddResourceV1(JoinGenerated("payload", "protobuf", "existing", "v1"), "resource")
 
 		// Expected dataset
 		expectedDataset := NewExpectedDataset(setup)
-		expectedDataset.MustAddDidDocV2(JoinGenerated("payload", "expected", "v2", "protobuf"), "diddoc")
-		expectedDataset.MustAddResourceV2(JoinGenerated("payload", "expected", "v2", "protobuf"), "resource")
+		expectedDataset.MustAddDidDocV2(JoinGenerated("payload", "protobuf", "expected", "v2"), "diddoc")
+		expectedDataset.MustAddResourceV2(JoinGenerated("payload", "protobuf", "expected", "v2"), "resource")
 
 		// Migrator
 		migrator := NewMigrator(
@@ -80,13 +80,13 @@ var _ = Describe("Migration - Unit", func() {
 
 		// Existing dataset
 		existingDataset := NewExistingDataset(setup)
-		existingDataset.MustAddDidDocV2(JoinGenerated("payload", "existing", "v2", "indy_style"), "diddoc")
-		existingDataset.MustAddResourceV2(JoinGenerated("payload", "existing", "v2", "indy_style"), "resource")
+		existingDataset.MustAddDidDocV2(JoinGenerated("payload", "indy_style", "existing", "v2"), "diddoc")
+		existingDataset.MustAddResourceV2(JoinGenerated("payload", "indy_style", "existing", "v2"), "resource")
 
 		// Expected dataset
 		expectedDataset := NewExpectedDataset(setup)
-		expectedDataset.MustAddDidDocV2(JoinGenerated("payload", "expected", "v2", "indy_style"), "diddoc")
-		expectedDataset.MustAddResourceV2(JoinGenerated("payload", "expected", "v2", "indy_style"), "resource")
+		expectedDataset.MustAddDidDocV2(JoinGenerated("payload", "indy_style", "expected", "v2"), "diddoc")
+		expectedDataset.MustAddResourceV2(JoinGenerated("payload", "indy_style", "expected", "v2"), "resource")
 
 		// Migrator
 		migrator := NewMigrator(
@@ -94,6 +94,36 @@ var _ = Describe("Migration - Unit", func() {
 			[]appmigrations.Migration{
 				appmigrations.MigrateDidIndyStyle,
 				appmigrations.MigrateResourceIndyStyle,
+			},
+			*existingDataset,
+			*expectedDataset)
+
+		// Run migration
+		err := migrator.Run()
+		Expect(err).To(BeNil())
+	})
+
+	It("checks that UUID migration works", func() {
+		By("Ensuring the UUID migration handler is working as expected")
+		// Init storages, keepers and setup the migration context.
+		setup := Setup()
+
+		// Existing dataset
+		existingDataset := NewExistingDataset(setup)
+		existingDataset.MustAddDidDocV2(JoinGenerated("payload", "uuid", "existing", "v2"), "diddoc")
+		existingDataset.MustAddResourceV2(JoinGenerated("payload", "uuid", "existing", "v2"), "resource")
+
+		// Expected dataset
+		expectedDataset := NewExpectedDataset(setup)
+		expectedDataset.MustAddDidDocV2(JoinGenerated("payload", "uuid", "expected", "v2"), "diddoc")
+		expectedDataset.MustAddResourceV2(JoinGenerated("payload", "uuid", "expected", "v2"), "resource")
+
+		// Migrator
+		migrator := NewMigrator(
+			setup,
+			[]appmigrations.Migration{
+				appmigrations.MigrateDidUUID,
+				appmigrations.MigrateResourceUUID,
 			},
 			*existingDataset,
 			*expectedDataset)
