@@ -419,11 +419,11 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Query_Resource_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"cheqd", "resource", "v2", "collection", "collection_id", "resources", "id"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_Resource_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"cheqd", "resource", "v2", "collection_id", "resources", "id"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_ResourceMetadata_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"cheqd", "resource", "v2", "collection", "collection_id", "resources", "id", "metadata"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_ResourceMetadata_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"cheqd", "resource", "v2", "collection_id", "resources", "id", "metadata"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_CollectionResources_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"cheqd", "resource", "v2", "collection", "collection_id", "resources"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_CollectionResources_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"cheqd", "resource", "v2", "collection_id", "metadata"}, "", runtime.AssumeColonVerbOpt(false)))
 )
 
 var (

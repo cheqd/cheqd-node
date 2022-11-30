@@ -3,7 +3,6 @@ package cheqdid.cheqdnode.resource.v1;
 
 option go_package = "github.com/cheqd/cheqd-node/x/resource/types/v1";
 
-
 message Resource {
   ResourceHeader header = 1;
   bytes data = 2;
