@@ -75,7 +75,7 @@ DEFAULT_RPC_PORT = "26657"
 DEFAULT_P2P_PORT = "26656"
 DEFAULT_GAS_PRICE = "25ncheq"
 DEFAULT_LOG_LEVEL = "error"
-
+DEFAULT_LOG_FORMAT = "json"
 
 def sigint_handler(signal, frame):
     print ('Exiting from cheqd-node installer')
@@ -468,11 +468,13 @@ class Installer():
             min_gas_price_replace_text = 'minimum-gas-prices = "{}"'.format(self.interviewer.gas_price)
             search_and_replace(min_gas_price_search_text, min_gas_price_replace_text, os.path.join(self.cheqd_config_dir, "app.toml"))
         
+        # Setting up persistent peers
         if self.interviewer.persistent_peers:
             persistent_peers_search_text='persistent_peers = ""'
             persistent_peers_replace_text='persistent_peers = "{}"'.format(self.interviewer.persistent_peers)
             search_and_replace(persistent_peers_search_text,persistent_peers_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
         
+        # Setting up log level
         if self.interviewer.log_level:
             log_level_search_text = 'log_level = "info"'
             log_level_replace_text = 'log_level = "{}"'.format(self.interviewer.log_level)
@@ -481,6 +483,16 @@ class Installer():
             log_level_search_text = 'log_level = "info"'
             log_level_replace_text = 'log_level = "{}"'.format(DEFAULT_LOG_LEVEL)
             search_and_replace(log_level_search_text, log_level_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
+
+        # Setting up log format
+        if self.interviewer.log_format:
+            log_format_search_text = 'log_format = "plain"'
+            log_format_replace_text = 'log_format = "{}"'.format(self.interviewer.log_format)
+            search_and_replace(log_format_search_text, log_format_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
+        else:
+            log_format_search_text = 'log_format = "plain"'
+            log_format_replace_text = 'log_format = "{}"'.format(DEFAULT_LOG_FORMAT)
+            search_and_replace(log_format_search_text, log_format_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
 
     def prepare_cheqd_user(self):
         try:
@@ -655,6 +667,7 @@ class Interviewer:
         self._gas_price = DEFAULT_GAS_PRICE
         self._persistent_peers = ""
         self._log_level = DEFAULT_LOG_LEVEL
+        self._log_format = DEFAULT_LOG_FORMAT
         self._is_from_scratch = False
         self._rewrite_systemd = False
         self._rewrite_rsyslog = False
@@ -748,6 +761,10 @@ class Interviewer:
     @property
     def log_level(self) -> str:
         return self._log_level
+    
+    @property
+    def log_format(self) -> str:
+        return self._log_format
 
     @release.setter
     def release(self, release):
@@ -824,6 +841,10 @@ class Interviewer:
     @log_level.setter
     def log_level(self, log_level):
         self._log_level = log_level
+
+    @log_format.setter
+    def log_format(self, log_format):
+        self._log_format = log_format
 
     def log(self, msg):
         if self.verbose:
@@ -1032,6 +1053,10 @@ class Interviewer:
     def ask_for_log_level(self):
         self.log_level = self.ask(
             f"Specify log level", default=DEFAULT_LOG_LEVEL)
+    
+    def ask_for_log_format(self):
+        self.log_format = self.ask(
+            f"Specify log format", default=DEFAULT_LOG_FORMAT)
 
     def prepare_url_for_latest(self) -> str:
         template = TESTNET_SNAPSHOT if self.chain == "testnet" else MAINNET_SNAPSHOT
@@ -1073,6 +1098,7 @@ if __name__ == '__main__':
             interviewer.ask_for_gas_price()
             interviewer.ask_for_persistent_peers()
             interviewer.ask_for_log_level()
+            interviewer.ask_for_log_format()
 
     # Steps to execute if upgrading existing node
     def upgrade_steps():
