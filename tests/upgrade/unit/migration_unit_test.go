@@ -1,3 +1,5 @@
+// nogo:build upgrade_unit
+
 package unit
 
 import (
