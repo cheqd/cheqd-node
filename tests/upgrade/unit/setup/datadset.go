@@ -250,6 +250,8 @@ func (d *ExpectedDataset) CheckStore() error {
 		}
 
 		Expect(didDoc.DidDoc).To(Equal(expectedDidDoc.DidDoc))
+		Expect(didDoc.Metadata.VersionId).To(Equal(expectedDidDoc.Metadata.VersionId))
+		Expect(didDoc.Metadata.Deactivated).To(Equal(expectedDidDoc.Metadata.Deactivated))
 	}
 
 	for _, expectedResource := range d.Resources {
