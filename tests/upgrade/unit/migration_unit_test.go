@@ -161,4 +161,33 @@ var _ = Describe("Migration - Unit", func() {
 		err := migrator.Run()
 		Expect(err).To(BeNil())
 	})
+
+	It("checks that Resource Version Links migration works", func() {
+		By("Ensuring the Resource Version Links migration handler is working as expected")
+		// Init storages, keepers and setup the migration context.
+		setup := Setup()
+
+		// Existing dataset
+		existingDataset := NewExistingDataset(setup)
+		existingDataset.MustAddDidDocV2(JoinGenerated("payload", "resource_links", "existing", "v2"), "diddoc")
+		existingDataset.MustAddResourceV2(JoinGenerated("payload", "resource_links", "existing", "v2"), "resource")
+
+		// Expected dataset
+		expectedDataset := NewExpectedDataset(setup)
+		expectedDataset.MustAddDidDocV2(JoinGenerated("payload", "resource_links", "expected", "v2"), "diddoc")
+		expectedDataset.MustAddResourceV2(JoinGenerated("payload", "resource_links", "expected", "v2"), "resource")
+
+		// Migrator
+		migrator := NewMigrator(
+			setup,
+			[]appmigrations.Migration{
+				appmigrations.MigrateResourceVersionLinks,
+			},
+			*existingDataset,
+			*expectedDataset)
+
+		// Run migration
+		err := migrator.Run()
+		Expect(err).To(BeNil())
+	})
 })
