@@ -74,6 +74,7 @@ MAX_SNAPSHOT_DAYS = 7
 DEFAULT_RPC_PORT = "26657"
 DEFAULT_P2P_PORT = "26656"
 DEFAULT_GAS_PRICE = "25ncheq"
+DEFAULT_LOG_LEVEL = "error"
 
 
 def sigint_handler(signal, frame):
@@ -471,6 +472,15 @@ class Installer():
             persistent_peers_search_text='persistent_peers = ""'
             persistent_peers_replace_text='persistent_peers = "{}"'.format(self.interviewer.persistent_peers)
             search_and_replace(persistent_peers_search_text,persistent_peers_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
+        
+        if self.interviewer.log_level:
+            log_level_search_text = 'log_level = "info"'
+            log_level_replace_text = 'log_level = "{}"'.format(self.interviewer.log_level)
+            search_and_replace(log_level_search_text, log_level_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
+        else:
+            log_level_search_text = 'log_level = "info"'
+            log_level_replace_text = 'log_level = "{}"'.format(DEFAULT_LOG_LEVEL)
+            search_and_replace(log_level_search_text, log_level_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
 
     def prepare_cheqd_user(self):
         try:
@@ -644,6 +654,7 @@ class Interviewer:
         self._p2p_port = DEFAULT_P2P_PORT
         self._gas_price = DEFAULT_GAS_PRICE
         self._persistent_peers = ""
+        self._log_level = DEFAULT_LOG_LEVEL
         self._is_from_scratch = False
         self._rewrite_systemd = False
         self._rewrite_rsyslog = False
@@ -733,6 +744,10 @@ class Interviewer:
     @property
     def persistent_peers(self) -> str:
         return self._persistent_peers
+    
+    @property
+    def log_level(self) -> str:
+        return self._log_level
 
     @release.setter
     def release(self, release):
@@ -801,10 +816,15 @@ class Interviewer:
     @gas_price.setter
     def gas_price(self, gas_price):
         self._gas_price = gas_price
-
+    
     @persistent_peers.setter
     def persistent_peers(self, persistent_peers):
         self._persistent_peers = persistent_peers
+    
+    @log_level.setter
+    def log_level(self, log_level):
+        self._log_level = log_level
+
     def log(self, msg):
         if self.verbose:
             print(f"{PRINT_PREFIX} {msg}")
@@ -1008,6 +1028,10 @@ class Interviewer:
     def ask_for_persistent_peers(self):
         self.persistent_peers = self.ask(
             f"Specify persistent peers", default="blank, file has blank/no value")
+    
+    def ask_for_log_level(self):
+        self.log_level = self.ask(
+            f"Specify log level", default=DEFAULT_LOG_LEVEL)
 
     def prepare_url_for_latest(self) -> str:
         template = TESTNET_SNAPSHOT if self.chain == "testnet" else MAINNET_SNAPSHOT
@@ -1048,6 +1072,7 @@ if __name__ == '__main__':
             interviewer.ask_for_p2p_port()
             interviewer.ask_for_gas_price()
             interviewer.ask_for_persistent_peers()
+            interviewer.ask_for_log_level()
 
     # Steps to execute if upgrading existing node
     def upgrade_steps():
