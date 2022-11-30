@@ -439,6 +439,11 @@ class Installer():
         new_rpc_default_value = 'laddr = "tcp://0.0.0.0:{}"'.format(DEFAULT_RPC_PORT)
         search_and_replace(rpc_default_value,new_rpc_default_value, os.path.join(self.cheqd_config_dir, "config.toml"))
 
+        # Set create empty blocks to false by default
+        create_empty_blocks_search_text = 'create_empty_blocks = true'
+        create_empty_blocks_replace_text = 'create_empty_blocks = false'
+        search_and_replace(create_empty_blocks_search_text,create_empty_blocks_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
+
         # Setting up the external_address
         if self.interviewer.external_address:
             external_address_search_text='external_address = ""'
