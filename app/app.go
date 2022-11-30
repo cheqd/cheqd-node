@@ -676,8 +676,7 @@ func New(
 				stakingSubspace, _ := app.ParamsKeeper.GetSubspace(stakingtypes.ModuleName)
 				stakingSubspace.Set(ctx, stakingtypes.KeyMinCommissionRate, sdk.NewDec(0))
 
-				// TODO: Why do we skip modules?
-				// Get version map from previous upgrade
+				// Fix version map
 				versionMap := app.mm.GetVersionMap()
 
 				for moduleName := range versionMap {
@@ -685,15 +684,6 @@ func New(
 						fromVM[moduleName] = versionMap[moduleName]
 					}
 				}
-
-				// // Skip capability module
-				// fromVM[capabilitytypes.ModuleName] = versionMap[capabilitytypes.ModuleName]
-				// // Skip distribution module
-				// fromVM[distrtypes.ModuleName] = versionMap[distrtypes.ModuleName]
-				// // Skip mint module
-				// fromVM[minttypes.ModuleName] = versionMap[minttypes.ModuleName]
-				// // Skip staking module
-				// fromVM[stakingtypes.ModuleName] = versionMap[stakingtypes.ModuleName]
 			}
 
 			// cheqd migrations
