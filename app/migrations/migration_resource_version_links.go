@@ -24,6 +24,12 @@ func MigrateResourceVersionLinks(sctx sdk.Context, mctx MigrationContext) error 
 		store.Delete(key)
 	}
 
+	// Reset version links
+	for _, resource := range resources {
+		resource.Metadata.PreviousVersionId = ""
+		resource.Metadata.NextVersionId = ""
+	}
+
 	// Sort resources by date created
 	sort.Slice(resources[:], func(i, j int) bool {
 		iCreated, err := time.Parse(time.RFC3339, resources[i].Metadata.Created)
