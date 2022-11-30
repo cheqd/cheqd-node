@@ -31,7 +31,7 @@ jobs:
           go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
       - name: Run Ginkgo tests
-        run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --junit-report report-unit.xml
+        run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --skip-file migration_unit_test.go --skip-file pre_test.go --skip-file post_test.go --junit-report report-unit.xml
 
       - name: Upload unit tests result
         uses: actions/upload-artifact@v3
@@ -73,7 +73,7 @@ jobs:
       - name: Set up Docker localnet
         working-directory: ./docker/localnet
         run: |
-          docker compose --env-file docker-compose.env up --detach --no-build
+          docker compose --env-file build-latest.env up --detach --no-build
 
       - name: Import keys
         working-directory: ./docker/localnet
@@ -89,7 +89,7 @@ jobs:
         working-directory: ./..
         run: go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
-      - name: Run tests
+      - name: Run integration tests
         working-directory: ./tests/integration
         run: |
           ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --junit-report ../../report-integration.xml
@@ -105,6 +105,127 @@ jobs:
           name: report-integration.xml
           path: report-integration.xml
 
+  upgrade-migration-tests:
+    name: "Upgrade - Migration tests"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download binary artifact mainnet-latest
+        run: |
+          mkdir -p ${{ env.RUNNER_BIN_DIR }}
+          wget -c https://github.com/cheqd/cheqd-node/releases/download/0.6.9/cheqd-noded-0.6.9-Linux-x86_64.tar.gz
+          tar -xvf cheqd-noded-0.6.9-Linux-x86_64.tar.gz -C ${{ env.RUNNER_BIN_DIR }} --strip-components=1
+
+      - name: Restore binary permissions
+        run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
+
+      - name: Generate localnet configs # In this step we generate configs for localnet with 0.6.9 version, including copies of operator keys. *This is temporary*.
+        working-directory: ./docker/localnet
+        run: |
+          bash gen-network-config.sh
+
+      - name: Keep config permissionless # This is temporary, until we have a better way to generate configs.
+        working-directory: ./docker/localnet
+        run: |
+          cp -r network-config network-config-0.6.9
+
+      - name: Restore localnet config permissions
+        working-directory: ./docker/localnet
+        run: |
+          sudo chown -R 1000:1000 network-config
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker localnet mainnet-latest
+        working-directory: ./docker/localnet
+        run: |
+          docker compose --env-file mainnet-latest.env up --detach --no-build
+
+      - name: Copy keys # This is temporary.
+        working-directory: ./docker/localnet
+        run: |
+          sleep 5
+          docker compose --env-file mainnet-latest.env cp network-config-0.6.9/validator-0/keyring-test validator-0:/home/cheqd/.cheqdnode
+          docker compose --env-file mainnet-latest.env cp network-config-0.6.9/validator-1/keyring-test validator-1:/home/cheqd/.cheqdnode
+          docker compose --env-file mainnet-latest.env cp network-config-0.6.9/validator-2/keyring-test validator-2:/home/cheqd/.cheqdnode
+          docker compose --env-file mainnet-latest.env cp network-config-0.6.9/validator-3/keyring-test validator-3:/home/cheqd/.cheqdnode
+          docker compose --env-file mainnet-latest.env exec -it --user root validator-0 chown -R cheqd:cheqd /home/cheqd
+          docker compose --env-file mainnet-latest.env exec -it --user root validator-1 chown -R cheqd:cheqd /home/cheqd
+          docker compose --env-file mainnet-latest.env exec -it --user root validator-2 chown -R cheqd:cheqd /home/cheqd
+          docker compose --env-file mainnet-latest.env exec -it --user root validator-3 chown -R cheqd:cheqd /home/cheqd
+          rm -rf network-config-0.6.9
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: ./go.mod
+          cache: true
+
+      - name: Install ginkgo
+        working-directory: ./..
+        run: go install github.com/onsi/ginkgo/v2/ginkgo@latest
+
+      #
+      # Pre-Generated Payloads in .json files
+      #
+
+      - name: Run migration handler unit tests
+        working-directory: ./tests/upgrade
+        run: |
+          ginkgo -r --tags upgrade --race --focus-file migration_unit_test.go
+
+      - name: Run pre-upgrade tests
+        working-directory: ./tests/upgrade
+        run: |
+          ginkgo -r --tags upgrade --race --focus-file pre_test.go
+
+      - name: Halt Docker localnet mainnet-latest
+        working-directory: ./docker/localnet
+        run: |
+          docker compose --env-file mainnet-latest.env down
+
+      - name: Download node Docker next image
+        uses: actions/download-artifact@v3
+        with:
+          name: cheqd-node-build.tar
+
+      - name: Load node Docker image
+        run: docker load -i cheqd-node-build.tar
+
+      - name: Download binary artifact build-latest
+        uses: actions/download-artifact@v3
+        id: download
+        with:
+          name: cheqd-noded
+          path: ${{ env.RUNNER_BIN_DIR }}
+
+      - name: Restore binary permissions
+        run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
+
+      - name: Set up Docker localnet build-latest
+        working-directory: ./docker/localnet
+        run: |
+          docker compose --env-file build-latest.env up --detach --no-build
+
+      - name: Run post-upgrade tests
+        working-directory: ./tests/upgrade
+        run: |
+          ginkgo -r --tags upgrade --race --focus-file post_test.go
+
+      - name: Import keys
+        working-directory: ./docker/localnet
+        run: |
+          bash import-keys.sh
+
+      - name: Run integration tests
+        working-directory: ./tests/integration
+        run: ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --junit-report ../../report-integration-post.xml
+
   report-results:
     name: "Report"
     runs-on: ubuntu-latest
@@ -113,7 +234,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
       - name: Download unit tests report
         uses: actions/download-artifact@v3
         with:

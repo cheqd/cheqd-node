@@ -36,7 +36,7 @@ func Setup() TestSetup {
 	// Init Codec
 	ir := codectypes.NewInterfaceRegistry()
 	types.RegisterInterfaces(ir)
-	cdc := codec.NewProtoCodec(ir)
+	Cdc := codec.NewProtoCodec(ir)
 	aminoCdc := codec.NewLegacyAmino()
 
 	// Init KVStore
@@ -53,8 +53,8 @@ func Setup() TestSetup {
 	paramsTStoreKey := sdk.NewTransientStoreKey(paramstypes.TStoreKey)
 
 	// Init Keepers
-	paramsKeeper := initParamsKeeper(cdc, aminoCdc, paramsStoreKey, paramsTStoreKey)
-	newKeeper := keeper.NewKeeper(cdc, storeKey, getSubspace(types.ModuleName, paramsKeeper))
+	paramsKeeper := initParamsKeeper(Cdc, aminoCdc, paramsStoreKey, paramsTStoreKey)
+	newKeeper := keeper.NewKeeper(Cdc, storeKey, getSubspace(types.ModuleName, paramsKeeper))
 
 	// Create Tx
 	txBytes := make([]byte, 28)
@@ -70,7 +70,7 @@ func Setup() TestSetup {
 	queryServer := keeper.NewQueryServer(*newKeeper)
 
 	setup := TestSetup{
-		Cdc: cdc,
+		Cdc: Cdc,
 
 		SdkCtx: ctx,
 		StdCtx: sdk.WrapSDKContext(ctx),

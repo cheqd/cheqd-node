@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	migrations "github.com/cheqd/cheqd-node/app/migrations"
 	appparams "github.com/cheqd/cheqd-node/app/params"
 	posthandler "github.com/cheqd/cheqd-node/post"
 	did "github.com/cheqd/cheqd-node/x/did"
@@ -612,13 +613,57 @@ func New(
 	)
 
 	// Uncomment if you want to set a custom migration order here.
-	// app.mm.SetOrderMigrations(custom order)
+	app.mm.SetOrderMigrations(
+		upgradetypes.ModuleName,
+		capabilitytypes.ModuleName,
+		minttypes.ModuleName,
+		distrtypes.ModuleName,
+		slashingtypes.ModuleName,
+		evidencetypes.ModuleName,
+		stakingtypes.ModuleName,
+		authtypes.ModuleName,
+		banktypes.ModuleName,
+		govtypes.ModuleName,
+		crisistypes.ModuleName,
+		ibchost.ModuleName,
+		ibctransfertypes.ModuleName,
+		icatypes.ModuleName,
+		genutiltypes.ModuleName,
+		authz.ModuleName,
+		group.ModuleName,
+		feegrant.ModuleName,
+		paramstypes.ModuleName,
+		vestingtypes.ModuleName,
+		didtypes.ModuleName,
+		resourcetypes.ModuleName,
+	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter(), encodingConfig.Amino)
 
 	app.configurator = module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
 	app.mm.RegisterServices(app.configurator)
+
+	// Init Migrators
+	didMigrator := migrations.NewMigrator(app.appCodec, app.didKeeper, app.resourceKeeper, migrations.MigrateDidV1)
+	resourceMigrator := migrations.NewMigrator(app.appCodec, app.didKeeper, app.resourceKeeper, migrations.MigrateResourceV1)
+
+	// Register upgrade store migrations per module
+	if err := app.configurator.RegisterMigration(
+		didtypes.ModuleName,
+		app.mm.GetVersionMap()[didtypes.ModuleName],
+		didMigrator.Migrate,
+	); err != nil {
+		panic(err)
+	}
+
+	if err := app.configurator.RegisterMigration(
+		resourcetypes.ModuleName,
+		app.mm.GetVersionMap()[resourcetypes.ModuleName],
+		resourceMigrator.Migrate,
+	); err != nil {
+		panic(err)
+	}
 
 	// initialize stores
 	app.MountKVStores(keys)
@@ -659,17 +704,25 @@ func New(
 		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 			ctx.Logger().Info("Handler for upgrade plan: " + UpgradeName)
 
+			// Add defaults for staking subspace
+			stakingSubspace, _ := app.ParamsKeeper.GetSubspace(stakingtypes.ModuleName)
+			stakingSubspace.Set(ctx, stakingtypes.KeyMinCommissionRate, sdk.NewDec(0))
+
+			// Get version map from previous upgrade
+			versionMap := app.mm.GetVersionMap()
+			// Skip capability module
+			fromVM[capabilitytypes.ModuleName] = versionMap[capabilitytypes.ModuleName]
+			// Skip distribution module
+			fromVM[distrtypes.ModuleName] = versionMap[distrtypes.ModuleName]
+			// Skip mint module
+			fromVM[minttypes.ModuleName] = versionMap[minttypes.ModuleName]
+			// Skip staking module
+			fromVM[stakingtypes.ModuleName] = versionMap[stakingtypes.ModuleName]
+
 			// ibc v3 -> v4 migration
 			// transfer module consensus version has been bumped to 2
 			return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 		})
-
-	// Test upgrade handler
-	app.UpgradeKeeper.SetUpgradeHandler(CosmovisorTestUpgrade, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("Handler for upgrade plan: " + CosmovisorTestUpgrade)
-
-		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
-	})
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
