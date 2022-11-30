@@ -36,7 +36,7 @@ PRINT_PREFIX = "********* "
 ###############################################################
 ###     				Cosmovisor Config      				###
 ###############################################################
-COSMOVISOR_BINARY_URL = "https://github.com/cosmos/cosmos-sdk/archive/refs/tags/tools/cosmovisor/v1.4.0.tar.gz"
+COSMOVISOR_BINARY_URL = "https://github.com/cosmos/cosmos-sdk/releases/download/cosmovisor%2Fv1.4.0/cosmovisor-v1.4.0-linux-amd64.tar.gz"
 DEFAULT_USE_COSMOVISOR = "yes"
 
 ###############################################################
