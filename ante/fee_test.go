@@ -15,13 +15,16 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Fee tests", func() {
+var _ = Describe("Fee tests on CheckTx", func() {
 	s := new(AnteTestSuite)
 
-	It("Test Ensure Zero Mempool Fees On Simulation CheckTx", func() {
-		s.SetupTest(true) // setup
+	BeforeEach(func() {
+		err := s.SetupTest(true) // setup
+		Expect(err).To(BeNil(), "Error on creating test app")
 		s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
+	})
 
+	It("Ensure Zero Mempool Fees On Simulation", func() {
 		mfd := cheqdante.NewDeductFeeDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, nil)
 		antehandler := sdk.ChainAnteDecorators(mfd)
 
@@ -53,10 +56,7 @@ var _ = Describe("Fee tests", func() {
 		Expect(err).To(BeNil())
 	})
 
-	It("Test Ensure Mempool Fees On CheckTx", func() {
-		s.SetupTest(true) // setup
-		s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
-
+	It("Ensure Mempool Fees", func() {
 		mfd := cheqdante.NewDeductFeeDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, nil)
 		antehandler := sdk.ChainAnteDecorators(mfd)
 
@@ -116,10 +116,54 @@ var _ = Describe("Fee tests", func() {
 		Expect(int64(10) * didtypes.BaseFactor).To(Equal(newCtx.Priority()))
 	})
 
-	It("Test Deduct Fees On Deliver Tx", func() {
+	It("TaxableTx Mempool Inclusion", func() {
+		// keys and addresses
+		priv1, _, addr1 := testdata.KeyTestPubAddr()
+
+		// msg and signatures
+		msg := SandboxDidDoc()
+		feeAmount := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(5_000_000_000)))
+		gasLimit := testdata.NewTestGasLimit()
+		Expect(s.txBuilder.SetMsgs(msg)).To(BeNil())
+		s.txBuilder.SetFeeAmount(feeAmount)
+		s.txBuilder.SetGasLimit(gasLimit)
+
+		privs, accNums, accSeqs := []cryptotypes.PrivKey{priv1}, []uint64{0}, []uint64{0}
+		tx, err := s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
+		Expect(err).To(BeNil())
+
+		// set account with sufficient funds
+		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
+		s.app.AccountKeeper.SetAccount(s.ctx, acc)
+		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(100_000_000_000))))
+		Expect(err).To(BeNil())
+
+		dfd := cheqdante.NewDeductFeeDecorator(s.app.AccountKeeper, s.app.BankKeeper, nil, nil)
+		antehandler := sdk.ChainAnteDecorators(dfd)
+
+		_, err = antehandler(s.ctx, tx, false)
+
+		Expect(err).To(BeNil(), "Tx errored when taxable on checkTx")
+
+		// set checkTx to false
+		s.ctx = s.ctx.WithIsCheckTx(false)
+
+		// antehandler should not error to replay in mempool or deliverTx
+		_, err = antehandler(s.ctx, tx, false)
+
+		Expect(err).To(BeNil(), "Tx errored when taxable on deliverTx")
+	})
+})
+
+var _ = Describe("Fee tests on DeliverTx", func() {
+	s := new(AnteTestSuite)
+
+	BeforeEach(func() {
 		s.SetupTest(false) // setup
 		s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
+	})
 
+	It("Deduct Fees", func() {
 		// keys and addresses
 		priv1, _, addr1 := testdata.KeyTestPubAddr()
 
@@ -160,51 +204,7 @@ var _ = Describe("Fee tests", func() {
 		Expect(err).To(BeNil(), "Tx errored after account has been set with sufficient funds")
 	})
 
-	It("Test TaxableTx Mempool Inclusion On CheckTx", func() {
-		s.SetupTest(true) // setup
-		s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
-
-		// keys and addresses
-		priv1, _, addr1 := testdata.KeyTestPubAddr()
-
-		// msg and signatures
-		msg := SandboxDidDoc()
-		feeAmount := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(5_000_000_000)))
-		gasLimit := testdata.NewTestGasLimit()
-		Expect(s.txBuilder.SetMsgs(msg)).To(BeNil())
-		s.txBuilder.SetFeeAmount(feeAmount)
-		s.txBuilder.SetGasLimit(gasLimit)
-
-		privs, accNums, accSeqs := []cryptotypes.PrivKey{priv1}, []uint64{0}, []uint64{0}
-		tx, err := s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
-		Expect(err).To(BeNil())
-
-		// set account with sufficient funds
-		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
-		s.app.AccountKeeper.SetAccount(s.ctx, acc)
-		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(100_000_000_000))))
-		Expect(err).To(BeNil())
-
-		dfd := cheqdante.NewDeductFeeDecorator(s.app.AccountKeeper, s.app.BankKeeper, nil, nil)
-		antehandler := sdk.ChainAnteDecorators(dfd)
-
-		_, err = antehandler(s.ctx, tx, false)
-
-		Expect(err).To(BeNil(), "Tx errored when taxable on checkTx")
-
-		// set checkTx to false
-		s.ctx = s.ctx.WithIsCheckTx(false)
-
-		// antehandler should not error to replay in mempool or deliverTx
-		_, err = antehandler(s.ctx, tx, false)
-
-		Expect(err).To(BeNil(), "Tx errored when taxable on deliverTx")
-	})
-
-	It("Test TaxableTx Lifecycle On DeliverTx", func() {
-		s.SetupTest(false) // setup
-		s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
-
+	It("TaxableTx Lifecycle", func() {
 		// keys and addresses
 		priv1, _, addr1 := testdata.KeyTestPubAddr()
 
@@ -269,10 +269,7 @@ var _ = Describe("Fee tests", func() {
 		Expect(feeCollectorBalance.Amount).To(Equal(reward.AmountOf(didtypes.BaseMinimalDenom)), "Reward was not sent to the fee collector")
 	})
 
-	It("Test Non TaxableTx Lifecycle on DeliverTx", func() {
-		s.SetupTest(false) // setup
-		s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
-
+	It("Non TaxableTx Lifecycle", func() {
 		// keys and addresses
 		priv1, _, addr1 := testdata.KeyTestPubAddr()
 
@@ -331,10 +328,7 @@ var _ = Describe("Fee tests", func() {
 		Expect(feeCollectorBalance.Amount).To(Equal(feeAmount.AmountOf(didtypes.BaseMinimalDenom)), "Fee was not sent to the fee collector")
 	})
 
-	It("Test TaxableTx Lifecycle on DeliveTx Simulation", func() {
-		s.SetupTest(false) // setup
-		s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
-
+	It("TaxableTx Lifecycle on Simulation", func() {
 		// keys and addresses
 		priv1, _, addr1 := testdata.KeyTestPubAddr()
 

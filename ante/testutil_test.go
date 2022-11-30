@@ -61,7 +61,7 @@ func createTestApp(isCheckTx bool) (*simapp.SimApp, sdk.Context) {
 // }
 
 // SetupTest setups a new test, with new app, context, and anteHandler.
-func (s *AnteTestSuite) SetupTest(isCheckTx bool) {
+func (s *AnteTestSuite) SetupTest(isCheckTx bool) error {
 	s.app, s.ctx = createTestApp(isCheckTx)
 	s.ctx = s.ctx.WithBlockHeight(1)
 	// Set up TxConfig.
@@ -85,14 +85,15 @@ func (s *AnteTestSuite) SetupTest(isCheckTx bool) {
 		},
 	)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	s.anteHandler = anteHandler
+	return nil
 }
 
 // CreateTestAccounts creates `numAccs` accounts, and return all relevant
 // information about them including their private keys.
-func (s *AnteTestSuite) CreateTestAccounts(numAccs int) []TestAccount {
+func (s *AnteTestSuite) CreateTestAccounts(numAccs int) ([]TestAccount, error) {
 	var accounts []TestAccount
 
 	for i := 0; i < numAccs; i++ {
@@ -100,7 +101,7 @@ func (s *AnteTestSuite) CreateTestAccounts(numAccs int) []TestAccount {
 		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr)
 		err := acc.SetAccountNumber(uint64(i))
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
 		someCoins := sdk.Coins{
@@ -108,18 +109,18 @@ func (s *AnteTestSuite) CreateTestAccounts(numAccs int) []TestAccount {
 		}
 		err = s.app.BankKeeper.MintCoins(s.ctx, minttypes.ModuleName, someCoins)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 
 		err = s.app.BankKeeper.SendCoinsFromModuleToAccount(s.ctx, minttypes.ModuleName, addr, someCoins)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 
 		accounts = append(accounts, TestAccount{acc, priv})
 	}
 
-	return accounts
+	return accounts, nil
 }
 
 // CreateTestTx is a helper function to create a tx given multiple inputs.
