@@ -40,12 +40,13 @@ func MigrateResourceVersionLinks(sctx sdk.Context, mctx MigrationContext) error 
 	})
 
 	// Add resources to store in the same order as they were created. This will create proper links.
-	for _, resource := range resources {
-		err = mctx.resourceKeeperNew.AddNewResourceVersion(&sctx, &resource)
-		if err != nil {
-			return err
-		}
-	}
+	// TODO: Uncomment this when Andrew's PR is merged.
+	// for _, resource := range resources {
+	// err = mctx.resourceKeeperNew.AddNewResourceVersion(&sctx, &resource)
+	// if err != nil {
+	// return err
+	// }
+	// }
 
 	return nil
 }
