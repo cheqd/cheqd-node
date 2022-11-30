@@ -102,7 +102,8 @@ class Release:
             os_name = platform.system()
             for _url_item in self.assets:
                 _url = _url_item["browser_download_url"]
-                if os.path.basename(_url) == f"cheqd-noded-{self.version}-{os_name}-{os_arch}.tar.gz" or \
+                version_without_v_prefix = self.version.replace('v','',1)
+                if os.path.basename(_url) == f"cheqd-noded-{version_without_v_prefix}-{os_name}-{os_arch}.tar.gz" or \
                     os.path.basename(_url) == "cheqd-noded":
                     return _url          
             else:
