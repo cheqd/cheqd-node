@@ -1,11 +1,10 @@
 syntax = "proto3";
 package cheqdid.cheqdnode.resource.v1;
 
-option go_package = "github.com/cheqd/cheqd-node/x/resource/types/v1";
-
-import "google/api/annotations.proto";
 import "cheqd/resource/v1/resource.proto";
+import "google/api/annotations.proto";
 
+option go_package = "github.com/cheqd/cheqd-node/x/resource/types/v1";
 
 // Query defines the gRPC querier service.
 service Query {
