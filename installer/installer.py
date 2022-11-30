@@ -466,6 +466,11 @@ class Installer():
             min_gas_price_search_text='minimum-gas-prices = "{}"'.format(DEFAULT_GAS_PRICE)
             min_gas_price_replace_text = 'minimum-gas-prices = "{}"'.format(self.interviewer.gas_price)
             search_and_replace(min_gas_price_search_text, min_gas_price_replace_text, os.path.join(self.cheqd_config_dir, "app.toml"))
+        
+        if self.interviewer.persistent_peers:
+            persistent_peers_search_text='persistent_peers = ""'
+            persistent_peers_replace_text='persistent_peers = "{}"'.format(self.interviewer.persistent_peers)
+            search_and_replace(persistent_peers_search_text,persistent_peers_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
 
     def prepare_cheqd_user(self):
         try:
@@ -638,6 +643,7 @@ class Interviewer:
         self._rpc_port = DEFAULT_RPC_PORT
         self._p2p_port = DEFAULT_P2P_PORT
         self._gas_price = DEFAULT_GAS_PRICE
+        self._persistent_peers = ""
         self._is_from_scratch = False
         self._rewrite_systemd = False
         self._rewrite_rsyslog = False
@@ -723,6 +729,10 @@ class Interviewer:
     @property
     def gas_price(self) -> str:
         return self._gas_price
+    
+    @property
+    def persistent_peers(self) -> str:
+        return self._persistent_peers
 
     @release.setter
     def release(self, release):
@@ -792,6 +802,9 @@ class Interviewer:
     def gas_price(self, gas_price):
         self._gas_price = gas_price
 
+    @persistent_peers.setter
+    def persistent_peers(self, persistent_peers):
+        self._persistent_peers = persistent_peers
     def log(self, msg):
         if self.verbose:
             print(f"{PRINT_PREFIX} {msg}")
@@ -992,6 +1005,10 @@ class Interviewer:
         self.gas_price = self.ask(
             f"Specify minimum gas price for transactions", default=DEFAULT_GAS_PRICE)
 
+    def ask_for_persistent_peers(self):
+        self.persistent_peers = self.ask(
+            f"Specify persistent peers", default="blank, file has blank/no value")
+
     def prepare_url_for_latest(self) -> str:
         template = TESTNET_SNAPSHOT if self.chain == "testnet" else MAINNET_SNAPSHOT
         _date = datetime.date.today()
@@ -1030,6 +1047,7 @@ if __name__ == '__main__':
             interviewer.ask_for_rpc_port()
             interviewer.ask_for_p2p_port()
             interviewer.ask_for_gas_price()
+            interviewer.ask_for_persistent_peers()
 
     # Steps to execute if upgrading existing node
     def upgrade_steps():
