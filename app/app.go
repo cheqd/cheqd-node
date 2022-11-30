@@ -695,9 +695,26 @@ func New(
 			cheqdMigrator := migrations.NewMigrator(
 				migrationContext,
 				[]migrations.Migration{
+					// Protobufs
 					migrations.MigrateDidProtobuf,
 					migrations.MigrateResourceProtobuf,
-					// Add more migrations here
+
+					// Indy style
+					// migrations.MigrateDidIndyStyle,
+					// migrations.MigrateResourceIndyStyle,
+
+					// UUID normalizatiion
+					// migrations.MigrateDidUUID,
+					// migrations.MigrateResourceUUID,
+
+					// Did version id
+					// migrations.MigrateDidVersionId,
+
+					// Resource checksum
+					// migrations.MigrateResourceChecksum,
+
+					// Resource version links
+					// migrations.MigrateResourceVersionLinks,
 				})
 
 			err = cheqdMigrator.Migrate(ctx)
