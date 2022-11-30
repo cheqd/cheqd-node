@@ -68,41 +68,14 @@ var _ = DescribeTable("Proposal Handler", func(testcase TestCaseKeeperProposal) 
 			testProposal(proposal.ParamChange{
 				Subspace: resourcetypes.ModuleName,
 				Key:      string(resourcetypes.ParamStoreKeyFeeParams),
-				Value:    `{"media_types": {"image": {"denom": "ncheq", "amount": "10000000000"}, "json": {"denom": "ncheq", "amount": "4000000000"}, "default": {"denom": "ncheq", "amount": "2000000000"}}, "burn_factor": "0.600000000000000000"}`,
+				Value:    `{"image": {"denom": "ncheq", "amount": "10000000000"}, "json": {"denom": "ncheq", "amount": "4000000000"}, "default": {"denom": "ncheq", "amount": "2000000000"}, "burn_factor": "0.600000000000000000"}`,
 			}),
 			func(handlerSuite *HandlerTestSuite) {
 				expectedFeeParams := resourcetypes.FeeParams{
-					MediaTypes: map[string]sdk.Coin{
-						resourcetypes.DefaultKeyCreateResourceImage: {Denom: resourcetypes.BaseMinimalDenom, Amount: sdk.NewInt(10000000000)},
-						resourcetypes.DefaultKeyCreateResourceJson:  {Denom: resourcetypes.BaseMinimalDenom, Amount: sdk.NewInt(4000000000)},
-						resourcetypes.DefaultKeyCreateResource:      {Denom: resourcetypes.BaseMinimalDenom, Amount: sdk.NewInt(2000000000)},
-					},
+					Image:      sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdk.NewInt(10000000000)},
+					Json:       sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdk.NewInt(4000000000)},
+					Default:    sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdk.NewInt(2000000000)},
 					BurnFactor: sdk.MustNewDecFromStr("0.600000000000000000"),
-				}
-
-				feeParams := handlerSuite.app.ResourceKeeper.GetParams(handlerSuite.ctx)
-
-				Expect(expectedFeeParams).To(Equal(feeParams))
-			},
-			false,
-			"",
-		}),
-	Entry("new media type added",
-		TestCaseKeeperProposal{
-			testProposal(proposal.ParamChange{
-				Subspace: resourcetypes.ModuleName,
-				Key:      string(resourcetypes.ParamStoreKeyFeeParams),
-				Value:    `{"media_types": {"image": {"denom": "ncheq", "amount": "5000000000"}, "json": {"denom": "ncheq", "amount": "2000000000"}, "default": {"denom": "ncheq", "amount": "1000000000"}, "text/html": {"denom": "ncheq", "amount": "2000000000"}}, "burn_factor": "0.500000000000000000"}`,
-			}),
-			func(handlerSuite *HandlerTestSuite) {
-				expectedFeeParams := resourcetypes.FeeParams{
-					MediaTypes: map[string]sdk.Coin{
-						resourcetypes.DefaultKeyCreateResourceImage: {Denom: resourcetypes.BaseMinimalDenom, Amount: sdk.NewInt(resourcetypes.DefaultCreateResourceImageFee)},
-						resourcetypes.DefaultKeyCreateResourceJson:  {Denom: resourcetypes.BaseMinimalDenom, Amount: sdk.NewInt(resourcetypes.DefaultCreateResourceJsonFee)},
-						resourcetypes.DefaultKeyCreateResource:      {Denom: resourcetypes.BaseMinimalDenom, Amount: sdk.NewInt(resourcetypes.DefaultCreateResourceDefaultFee)},
-						"text/html":                                 {Denom: resourcetypes.BaseMinimalDenom, Amount: sdk.NewInt(2000000000)},
-					},
-					BurnFactor: sdk.MustNewDecFromStr(resourcetypes.DefaultBurnFactor),
 				}
 
 				feeParams := handlerSuite.app.ResourceKeeper.GetParams(handlerSuite.ctx)
@@ -128,14 +101,7 @@ var _ = DescribeTable("Proposal Handler", func(testcase TestCaseKeeperProposal) 
 			testProposal(proposal.ParamChange{
 				Subspace: resourcetypes.ModuleName,
 				Key:      string(resourcetypes.ParamStoreKeyFeeParams),
-				Value: `
-				{
-					"media_types": {
-						"image": {"denom": "ncheq", "amount": "10000000000"},
-						"json": {"denom": "ncheq", "amount": "4000000000"}
-					},
-					"burn_factor": "0.600000000000000000"
-				}`,
+				Value:    `{"image": {"denom": "ncheq", "amount": "10000000000"}, "json": {"denom": "ncheq", "amount": "4000000000"}, "burn_factor": "0.600000000000000000"}`,
 			}),
 			func(*HandlerTestSuite) {},
 			true,
@@ -146,7 +112,7 @@ var _ = DescribeTable("Proposal Handler", func(testcase TestCaseKeeperProposal) 
 			testProposal(proposal.ParamChange{
 				Subspace: resourcetypes.ModuleName,
 				Key:      string(resourcetypes.ParamStoreKeyFeeParams),
-				Value:    `{"media_types": {"image": {"denom": "ncheq", "amount": "0"}, "json": {"denom": "ncheq", "amount": "4000000000"}, "default": {"denom": "ncheq", "amount": "2000000000"}}, "burn_factor": "0.600000000000000000"}`,
+				Value:    `{"image": {"denom": "ncheq", "amount": "0"}, "json": {"denom": "ncheq", "amount": "4000000000"}, "default": {"denom": "ncheq", "amount": "2000000000"}, "burn_factor": "0.600000000000000000"}`,
 			}),
 			func(*HandlerTestSuite) {},
 			true,
@@ -157,7 +123,7 @@ var _ = DescribeTable("Proposal Handler", func(testcase TestCaseKeeperProposal) 
 			testProposal(proposal.ParamChange{
 				Subspace: resourcetypes.ModuleName,
 				Key:      string(resourcetypes.ParamStoreKeyFeeParams),
-				Value:    `{"media_types": {"image": {"denom": "ncheq", "amount": "10000000000"}, "json": {"denom": "ncheq", "amount": "0"}, "default": {"denom": "ncheq", "amount": "2000000000"}}, "burn_factor": "0.600000000000000000"}`,
+				Value:    `{"image": {"denom": "ncheq", "amount": "10000000000"}, "json": {"denom": "ncheq", "amount": "0"}, "default": {"denom": "ncheq", "amount": "2000000000"}, "burn_factor": "0.600000000000000000"}`,
 			}),
 			func(*HandlerTestSuite) {},
 			true,
@@ -168,7 +134,7 @@ var _ = DescribeTable("Proposal Handler", func(testcase TestCaseKeeperProposal) 
 			testProposal(proposal.ParamChange{
 				Subspace: resourcetypes.ModuleName,
 				Key:      string(resourcetypes.ParamStoreKeyFeeParams),
-				Value:    `{"media_types": {"image": {"denom": "ncheq", "amount": "10000000000"}, "json": {"denom": "ncheq", "amount": "4000000000"}, "default": {"denom": "ncheq", "amount": "0"}}, "burn_factor": "0.600000000000000000"}`,
+				Value:    `{"image": {"denom": "ncheq", "amount": "10000000000"}, "json": {"denom": "ncheq", "amount": "4000000000"}, "default": {"denom": "ncheq", "amount": "0"}, "burn_factor": "0.600000000000000000"}`,
 			}),
 			func(*HandlerTestSuite) {},
 			true,
@@ -179,7 +145,7 @@ var _ = DescribeTable("Proposal Handler", func(testcase TestCaseKeeperProposal) 
 			testProposal(proposal.ParamChange{
 				Subspace: resourcetypes.ModuleName,
 				Key:      string(resourcetypes.ParamStoreKeyFeeParams),
-				Value:    `{"media_types": {"image": {"denom": "ncheq", "amount": "10000000000"}, "json": {"denom": "ncheq", "amount": "4000000000"}, "default": {"denom": "ncheq", "amount": "2000000000"}}, "burn_factor": "-1"}`,
+				Value:    `{"image": {"denom": "ncheq", "amount": "10000000000"}, "json": {"denom": "ncheq", "amount": "4000000000"}, "default": {"denom": "ncheq", "amount": "2000000000"}, "burn_factor": "-1"}`,
 			}),
 			func(*HandlerTestSuite) {},
 			true,
@@ -190,7 +156,7 @@ var _ = DescribeTable("Proposal Handler", func(testcase TestCaseKeeperProposal) 
 			testProposal(proposal.ParamChange{
 				Subspace: resourcetypes.ModuleName,
 				Key:      string(resourcetypes.ParamStoreKeyFeeParams),
-				Value:    `{"media_types": {"image": {"denom": "ncheq", "amount": "10000000000"}, "json": {"denom": "ncheq", "amount": "4000000000"}, "default": {"denom": "ncheq", "amount": "2000000000"}}, "burn_factor": "1.1"}`,
+				Value:    `{"image": {"denom": "ncheq", "amount": "10000000000"}, "json": {"denom": "ncheq", "amount": "4000000000"}, "default": {"denom": "ncheq", "amount": "2000000000"}, "burn_factor": "1.1"}`,
 			}),
 			func(*HandlerTestSuite) {},
 			true,

@@ -108,14 +108,14 @@ func GetResourceTaxableMsgFee(ctx sdk.Context, msg *resourcetypes.MsgCreateResou
 
 func checkFeeParamsFromSubspace(ctx sdk.Context, didKeeper DidKeeper, resourceKeeper ResourceKeeper) bool {
 	didParams := didKeeper.GetParams(ctx)
-	TaxableMsgFees[MsgCreateDidDoc] = sdk.Coins{sdk.Coin{Denom: didParams.TxTypes[didtypes.DefaultKeyCreateDid].Denom, Amount: didParams.TxTypes[didtypes.DefaultKeyCreateDid].Amount}}
-	TaxableMsgFees[MsgUpdateDidDoc] = sdk.Coins{sdk.Coin{Denom: didParams.TxTypes[didtypes.DefaultKeyUpdateDid].Denom, Amount: didParams.TxTypes[didtypes.DefaultKeyUpdateDid].Amount}}
-	TaxableMsgFees[MsgDeactivateDidDoc] = sdk.Coins{sdk.Coin{Denom: didParams.TxTypes[didtypes.DefaultKeyDeactivateDid].Denom, Amount: didParams.TxTypes[didtypes.DefaultKeyDeactivateDid].Amount}}
+	TaxableMsgFees[MsgCreateDidDoc] = sdk.NewCoins(didParams.CreateDid)
+	TaxableMsgFees[MsgUpdateDidDoc] = sdk.NewCoins(didParams.UpdateDid)
+	TaxableMsgFees[MsgDeactivateDidDoc] = sdk.NewCoins(didParams.DeactivateDid)
 
 	resourceParams := resourceKeeper.GetParams(ctx)
-	TaxableMsgFees[MsgCreateResourceImage] = sdk.Coins{sdk.Coin{Denom: resourceParams.MediaTypes[resourcetypes.DefaultKeyCreateResourceImage].Denom, Amount: resourceParams.MediaTypes[resourcetypes.DefaultKeyCreateResourceImage].Amount}}
-	TaxableMsgFees[MsgCreateResourceJson] = sdk.Coins{sdk.Coin{Denom: resourceParams.MediaTypes[resourcetypes.DefaultKeyCreateResourceJson].Denom, Amount: resourceParams.MediaTypes[resourcetypes.DefaultKeyCreateResourceJson].Amount}}
-	TaxableMsgFees[MsgCreateResourceDefault] = sdk.Coins{sdk.Coin{Denom: resourceParams.MediaTypes[resourcetypes.DefaultKeyCreateResource].Denom, Amount: resourceParams.MediaTypes[resourcetypes.DefaultKeyCreateResource].Amount}}
+	TaxableMsgFees[MsgCreateResourceImage] = sdk.NewCoins(resourceParams.Image)
+	TaxableMsgFees[MsgCreateResourceJson] = sdk.NewCoins(resourceParams.Json)
+	TaxableMsgFees[MsgCreateResourceDefault] = sdk.NewCoins(resourceParams.Default)
 
 	BurnFactors[BurnFactorDid] = didParams.BurnFactor
 	BurnFactors[BurnFactorResource] = resourceParams.BurnFactor

@@ -251,19 +251,18 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 
 		// check balance of fee payer
 		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
-		createDidTax := feeParams.TxTypes[didtypes.DefaultKeyCreateDid]
-		Expect(amount.Sub(sdk.NewInt(createDidTax.Amount.Int64()))).To(Equal(balance.Amount), "Tax was not subtracted from the fee payer")
+		Expect(amount.Sub(sdk.NewInt(feeParams.CreateDid.Amount.Int64()))).To(Equal(balance.Amount), "Tax was not subtracted from the fee payer")
 
 		// get supply after tx
 		supplyAfterDeflation, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
 		Expect(err).To(BeNil())
 
 		// check that supply was deflated
-		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(createDidTax))
+		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(feeParams.CreateDid))
 		Expect(supplyBeforeDeflation.Sub(supplyAfterDeflation...)).To(Equal(burnt), "Supply was not deflated")
 
 		// check that reward has been sent to the fee collector
-		reward := cheqdante.GetRewardPortion(sdk.NewCoins(createDidTax), burnt)
+		reward := cheqdante.GetRewardPortion(sdk.NewCoins(feeParams.CreateDid), burnt)
 		feeCollector := s.app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName)
 		feeCollectorBalance := s.app.BankKeeper.GetBalance(s.ctx, feeCollector, didtypes.BaseMinimalDenom)
 

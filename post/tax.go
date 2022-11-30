@@ -51,6 +51,11 @@ func (td taxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, nex
 	if !taxable {
 		return next(ctx, tx, simulate)
 	}
+	// validate tax
+	err = td.validateTax(feeTx.GetFee(), simulate)
+	if err != nil {
+		return ctx, err
+	}
 	// get fee payer and check if fee grant exists
 	tax := rewards.Add(burn...)
 	feePayer, err := td.getFeePayer(ctx, feeTx, tax, tx.GetMsgs())
@@ -117,6 +122,22 @@ func (td taxDecorator) getFeePayer(ctx sdk.Context, feeTx sdk.FeeTx, tax sdk.Coi
 	return deductFromAcc, nil
 }
 
+func (td taxDecorator) validateTax(tax sdk.Coins, simulate bool) error {
+	// no-op if simulate
+	if simulate {
+		return nil
+	}
+	// check if denom is accepted
+	if !tax.DenomsSubsetOf(sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(1)))) {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid denom: %s", tax)
+	}
+	// check if tax is positive
+	if !tax.IsAllPositive() {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid tax: %s", tax)
+	}
+	return nil
+}
+
 // deductTaxFromFeePayer deducts fees from the account
 func (td taxDecorator) deductTaxFromFeePayer(ctx sdk.Context, acc types.AccountI, fees sdk.Coins) error {
 	// ensure module account has been set
@@ -126,7 +147,7 @@ func (td taxDecorator) deductTaxFromFeePayer(ctx sdk.Context, acc types.AccountI
 	// deduct fees to did module account
 	err := td.bankKeeper.SendCoinsFromAccountToModule(ctx, acc.GetAddress(), didtypes.ModuleName, fees)
 	if err != nil {
-		return err
+		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "failed to deduct fees from %s: %s", acc.GetAddress(), err)
 	}
 	ctx.EventManager().EmitEvents(
 		sdk.Events{

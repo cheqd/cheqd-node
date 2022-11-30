@@ -1,21 +1,20 @@
 syntax = "proto3";
 package cheqd.did.v2;
 
-option go_package = "github.com/cheqd/cheqd-node/x/did/types";
-option (gogoproto.equal_all) = true;
-
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "cosmos_proto/cosmos.proto";
 
+option go_package = "github.com/cheqd/cheqd-node/x/did/types";
+option (gogoproto.equal_all) = true;
+
 // FeeParams defines the parameters for the `did` module fixed fee.
 message FeeParams {
     // Tx types define the fixed fee each for the `did` module.
-    map<string, cosmos.base.v1beta1.Coin> tx_types = 1 [
-        (gogoproto.nullable) = false,
-        (gogoproto.moretags) = "yaml:\"tx_types\""
-    ];
-    string burn_factor = 2 [
+    cosmos.base.v1beta1.Coin create_did = 1 [(gogoproto.nullable) = false];
+    cosmos.base.v1beta1.Coin update_did = 2 [(gogoproto.nullable) = false];
+    cosmos.base.v1beta1.Coin deactivate_did = 3 [(gogoproto.nullable) = false];
+    string burn_factor = 4 [
         (cosmos_proto.scalar) = "cosmos.Dec",
         (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
         (gogoproto.nullable) = false

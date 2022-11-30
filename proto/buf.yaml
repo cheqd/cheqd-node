@@ -2,7 +2,7 @@
 
 version: v1
 
-name: buf.build/cheqd/cheqd-proto
+name: buf.build/cheqd/proto
 
 deps:
   - buf.build/cosmos/cosmos-sdk
