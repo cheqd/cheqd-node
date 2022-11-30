@@ -145,7 +145,7 @@ func (d *ExistingDataset) FillStore() error {
 		}
 	}
 	for _, resource := range d.ResourcesV2 {
-		err := d.setup.ResourceKeeper.AddNewResourceVersion(&d.setup.SdkCtx, &resource)
+		err := d.setup.ResourceKeeper.SetResource(&d.setup.SdkCtx, &resource)
 		if err != nil {
 			return err
 		}

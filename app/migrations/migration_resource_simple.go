@@ -38,7 +38,7 @@ func MigrateResourceSimple(sctx sdk.Context, mctx MigrationContext, apply func(r
 		apply(&resourceWithMetadata)
 
 		// Write new value
-		err = mctx.resourceKeeperNew.AddNewResourceVersion(&sctx, &resourceWithMetadata)
+		err = mctx.resourceKeeperNew.SetResource(&sctx, &resourceWithMetadata)
 		if err != nil {
 			return err
 		}
