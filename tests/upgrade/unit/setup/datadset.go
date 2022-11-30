@@ -145,7 +145,7 @@ func (d *ExistingDataset) FillStore() error {
 		}
 	}
 	for _, resource := range d.ResourcesV2 {
-		err := d.setup.ResourceKeeper.SetResource(&d.setup.SdkCtx, &resource)
+		err := d.setup.ResourceKeeper.AddNewResourceVersion(&d.setup.SdkCtx, &resource)
 		if err != nil {
 			return err
 		}
@@ -250,6 +250,8 @@ func (d *ExpectedDataset) CheckStore() error {
 		}
 
 		Expect(didDoc.DidDoc).To(Equal(expectedDidDoc.DidDoc))
+		Expect(didDoc.Metadata.VersionId).To(Equal(expectedDidDoc.Metadata.VersionId))
+		Expect(didDoc.Metadata.Deactivated).To(Equal(expectedDidDoc.Metadata.Deactivated))
 	}
 
 	for _, expectedResource := range d.Resources {

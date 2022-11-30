@@ -62,7 +62,7 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	resource.Metadata.MediaType = utils.DetectMediaType(resource.Resource.Data)
 
 	// Persist resource
-	err = k.SetResource(&ctx, &resource)
+	err = k.AddNewResourceVersion(&ctx, &resource)
 	if err != nil {
 		return nil, types.ErrInternal.Wrapf(err.Error())
 	}

@@ -40,6 +40,26 @@ func (k Keeper) SetResourceCount(ctx *sdk.Context, count uint64) {
 	store.Set(byteKey, bz)
 }
 
+func (k Keeper) AddNewResourceVersion(ctx *sdk.Context, resource *types.ResourceWithMetadata) error {
+	// Find previous version and upgrade backward and forward version links
+	previousResourceVersionHeader, found := k.GetLastResourceVersionMetadata(ctx, resource.Metadata.CollectionId, resource.Metadata.Name, resource.Metadata.ResourceType)
+	if found {
+		// Set links
+		previousResourceVersionHeader.NextVersionId = resource.Metadata.Id
+		resource.Metadata.PreviousVersionId = previousResourceVersionHeader.Id
+
+		// Update previous version
+		err := k.UpdateResourceMetadata(ctx, &previousResourceVersionHeader)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Set new version
+	err := k.SetResource(ctx, resource)
+	return err
+}
+
 // SetResource create or update a specific resource in the store
 func (k Keeper) SetResource(ctx *sdk.Context, resource *types.ResourceWithMetadata) error {
 	if !k.HasResource(ctx, resource.Metadata.CollectionId, resource.Metadata.Id) {

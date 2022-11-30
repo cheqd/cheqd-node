@@ -52,7 +52,7 @@ func MigrateResourceProtobuf(sctx sdk.Context, mctx MigrationContext) error {
 		store.Delete(dataKey)
 
 		// Write new resource
-		err := mctx.resourceKeeperNew.SetResource(&sctx, &resourceWithMetadata)
+		err := mctx.resourceKeeperNew.AddNewResourceVersion(&sctx, &resourceWithMetadata)
 		if err != nil {
 			return err
 		}

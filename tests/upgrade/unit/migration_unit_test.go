@@ -1,5 +1,3 @@
-
-
 package unit
 
 import (
@@ -124,6 +122,35 @@ var _ = Describe("Migration - Unit", func() {
 			[]appmigrations.Migration{
 				appmigrations.MigrateDidUUID,
 				appmigrations.MigrateResourceUUID,
+			},
+			*existingDataset,
+			*expectedDataset)
+
+		// Run migration
+		err := migrator.Run()
+		Expect(err).To(BeNil())
+	})
+
+	It("checks that Version Id migration works", func() {
+		By("Ensuring the Version Id migration handler is working as expected")
+		// Init storages, keepers and setup the migration context.
+		setup := Setup()
+
+		// Existing dataset
+		existingDataset := NewExistingDataset(setup)
+		existingDataset.MustAddDidDocV2(JoinGenerated("payload", "version_id", "existing", "v2"), "diddoc")
+		existingDataset.MustAddResourceV2(JoinGenerated("payload", "version_id", "existing", "v2"), "resource")
+
+		// Expected dataset
+		expectedDataset := NewExpectedDataset(setup)
+		expectedDataset.MustAddDidDocV2(JoinGenerated("payload", "version_id", "expected", "v2"), "diddoc")
+		expectedDataset.MustAddResourceV2(JoinGenerated("payload", "version_id", "expected", "v2"), "resource")
+
+		// Migrator
+		migrator := NewMigrator(
+			setup,
+			[]appmigrations.Migration{
+				appmigrations.MigrateDidVersionId,
 			},
 			*existingDataset,
 			*expectedDataset)
