@@ -3,9 +3,12 @@
 package integration
 
 import (
+	"path/filepath"
+
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/cli"
 	didtypesv2 "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
+	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -23,6 +26,7 @@ var _ = Describe("Upgrade - Post", func() {
 			By("loading the expected module version map")
 			var expected upgradetypes.QueryModuleVersionsResponse
 			err := Loader(filepath.Join(GENERATED_JSON_DIR, "expected", "module_version_map", "v1.json"), &expected)
+			Expect(err).To(BeNil())
 
 			By("matching the expected module version map")
 			actual, err := cli.QueryModuleVersionMap(cli.VALIDATOR0)

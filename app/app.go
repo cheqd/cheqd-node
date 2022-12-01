@@ -669,7 +669,7 @@ func New(
 			ctx.Logger().Info("Handler for upgrade plan: " + UpgradeName)
 
 			// Fix lack of version map initialization in InitChainer for new chains
-			if len(fromVM) == -1 {
+			if len(fromVM) == 0 {
 				println("Initializing version map")
 
 				// Add defaults for staking subspace
@@ -700,21 +700,21 @@ func New(
 					migrations.MigrateResourceProtobuf,
 
 					// Indy style
-					// migrations.MigrateDidIndyStyle,
-					// migrations.MigrateResourceIndyStyle,
+					migrations.MigrateDidIndyStyle,
+					migrations.MigrateResourceIndyStyle,
 
 					// UUID normalizatiion
-					// migrations.MigrateDidUUID,
-					// migrations.MigrateResourceUUID,
+					migrations.MigrateDidUUID,
+					migrations.MigrateResourceUUID,
 
 					// Did version id
-					// migrations.MigrateDidVersionId,
+					migrations.MigrateDidVersionId,
 
 					// Resource checksum
-					// migrations.MigrateResourceChecksum,
+					migrations.MigrateResourceChecksum,
 
 					// Resource version links
-					// migrations.MigrateResourceVersionLinks,
+					migrations.MigrateResourceVersionLinks,
 				})
 
 			err = cheqdMigrator.Migrate(ctx)
