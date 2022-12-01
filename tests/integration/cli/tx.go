@@ -2,7 +2,6 @@ package cli
 
 import (
 	"encoding/json"
-	"fmt"
 	"strings"
 
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
@@ -83,8 +82,6 @@ func CreateDidDoc(tmpDir string, payload types.MsgCreateDidDocPayload, signInput
 		Payload:    payloadJson,
 		SignInputs: signInputs,
 	}
-
-	fmt.Println("payloadWithSignInputs", payloadWithSignInputs)
 
 	payloadWithSignInputsJson, err := json.Marshal(&payloadWithSignInputs)
 	if err != nil {
