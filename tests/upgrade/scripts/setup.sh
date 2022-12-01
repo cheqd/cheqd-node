@@ -4,7 +4,7 @@ set -euox pipefail
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 
-pushd "$DIR/../../../../docker/localnet"
+pushd "$DIR/../../../docker/localnet"
 
 # Generate configs (make sure old binary is installed locally)
 bash gen-network-config.sh
