@@ -73,8 +73,9 @@ MAX_SNAPSHOT_DAYS = 7
 ###############################################################
 DEFAULT_RPC_PORT = "26657"
 DEFAULT_P2P_PORT = "26656"
-DEFAULT_GAS_PRICE = "25ncheq"
-
+DEFAULT_GAS_PRICE = "50ncheq"
+DEFAULT_LOG_LEVEL = "error"
+DEFAULT_LOG_FORMAT = "json"
 
 def sigint_handler(signal, frame):
     print ('Exiting from cheqd-node installer')
@@ -82,6 +83,18 @@ def sigint_handler(signal, frame):
 
 signal.signal(signal.SIGINT, sigint_handler)
 
+def search_and_replace(search_text, replace_text, file_path):
+    file = open(file_path, "r")
+    for line in file:
+        line = line.strip()
+        if search_text in line:
+            with open(file_path, 'r') as file:
+                data = file.read()
+                data = data.replace(line, replace_text)
+            with open(file_path, 'w') as file:
+                file.write(data)    
+            
+    file.close()
 
 class Release:
     def __init__(self, release_map):
@@ -96,7 +109,8 @@ class Release:
             os_name = platform.system()
             for _url_item in self.assets:
                 _url = _url_item["browser_download_url"]
-                if os.path.basename(_url) == f"cheqd-noded-{self.version}-{os_name}-{os_arch}.tar.gz" or \
+                version_without_v_prefix = self.version.replace('v','',1)
+                if os.path.basename(_url) == f"cheqd-noded-{version_without_v_prefix}-{os_name}-{os_arch}.tar.gz" or \
                     os.path.basename(_url) == "cheqd-noded":
                     return _url          
             else:
@@ -419,29 +433,77 @@ class Installer():
         # Init the node with provided moniker
         if not os.path.exists(os.path.join(self.cheqd_config_dir, 'genesis.json')):
             self.exec(f"""sudo su -c 'cheqd-noded init "{self.interviewer.moniker}"' {DEFAULT_CHEQD_USER}""")
-
+    
             # Downloading genesis file
             self.exec(f"curl {GENESIS_FILE.format(self.interviewer.chain)} > {os.path.join(self.cheqd_config_dir, 'genesis.json')}")
             shutil.chown(os.path.join(self.cheqd_config_dir, 'genesis.json'),
-                         DEFAULT_CHEQD_USER,
-                         DEFAULT_CHEQD_USER)
+                DEFAULT_CHEQD_USER,
+                DEFAULT_CHEQD_USER)
+                         
+        # Replace the default RCP port to listen to anyone
+        rpc_default_value= 'laddr = "tcp://127.0.0.1:{}"'.format(DEFAULT_RPC_PORT)
+        new_rpc_default_value = 'laddr = "tcp://0.0.0.0:{}"'.format(DEFAULT_RPC_PORT)
+        search_and_replace(rpc_default_value,new_rpc_default_value, os.path.join(self.cheqd_config_dir, "config.toml"))
+
+        # Set create empty blocks to false by default
+        create_empty_blocks_search_text = 'create_empty_blocks = true'
+        create_empty_blocks_replace_text = 'create_empty_blocks = false'
+        search_and_replace(create_empty_blocks_search_text,create_empty_blocks_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
 
         # Setting up the external_address
         if self.interviewer.external_address:
-            self.exec(f"sudo su -c 'cheqd-noded configure p2p external-address {self.interviewer.external_address}:{self.interviewer.p2p_port}' {DEFAULT_CHEQD_USER}")
+            external_address_search_text='external_address = ""'
+            external_address_replace_text='external_address = "{}:{}"'.format(self.interviewer.external_address, self.interviewer.p2p_port)
+            search_and_replace(external_address_search_text, external_address_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
 
         # Setting up the seeds
         seeds = self.exec(f"curl {SEEDS_FILE.format(self.interviewer.chain)}").stdout.decode("utf-8").strip()
-        self.exec(f"sudo su -c 'cheqd-noded configure p2p seeds {seeds}' {DEFAULT_CHEQD_USER}")
-
+        seeds_search_text = 'seeds = ""'
+        seeds_replace_text= 'seeds = "{}"'.format(seeds)
+        search_and_replace(seeds_search_text, seeds_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
+        
         # Setting up the RPC port
-        self.exec(f"sudo su -c 'cheqd-noded configure rpc-laddr \"tcp://0.0.0.0:{self.interviewer.rpc_port}\"' {DEFAULT_CHEQD_USER}")
-
+        if self.interviewer.rpc_port:
+            rpc_laddr_search_text= 'laddr = "tcp://0.0.0.0:{}"'.format(DEFAULT_RPC_PORT)
+            rpc_laddr_replace_text= 'laddr = "tcp://0.0.0.0:{}"'.format(self.interviewer.rpc_port)
+            search_and_replace(rpc_laddr_search_text,rpc_laddr_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
         # Setting up the P2P port
-        self.exec(f"sudo su -c 'cheqd-noded configure p2p laddr \"tcp://0.0.0.0:{self.interviewer.p2p_port}\"' {DEFAULT_CHEQD_USER}")
-
+        if self.interviewer.p2p_port:
+            p2p_laddr_search_text='laddr = "tcp://0.0.0.0:{}"'.format(DEFAULT_P2P_PORT)
+            p2p_laddr_replace_text='laddr = "tcp://0.0.0.0:{}"'.format(self.interviewer.p2p_port)
+            search_and_replace(p2p_laddr_search_text,p2p_laddr_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
+        
         # Setting up min gas-price
-        self.exec(f"sudo su -c 'cheqd-noded configure min-gas-prices {self.interviewer.gas_price}' {DEFAULT_CHEQD_USER}")
+        if self.interviewer.gas_price:
+            min_gas_price_search_text='minimum-gas-prices = '
+            min_gas_price_replace_text = 'minimum-gas-prices = "{}"'.format(self.interviewer.gas_price)
+            search_and_replace(min_gas_price_search_text, min_gas_price_replace_text, os.path.join(self.cheqd_config_dir, "app.toml"))
+        
+        # Setting up persistent peers
+        if self.interviewer.persistent_peers:
+            persistent_peers_search_text='persistent_peers = ""'
+            persistent_peers_replace_text='persistent_peers = "{}"'.format(self.interviewer.persistent_peers)
+            search_and_replace(persistent_peers_search_text,persistent_peers_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
+        
+        # Setting up log level
+        if self.interviewer.log_level:
+            log_level_search_text = 'log_level'
+            log_level_replace_text = 'log_level = "{}"'.format(self.interviewer.log_level)
+            search_and_replace(log_level_search_text, log_level_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
+        else:
+            log_level_search_text = 'log_level'
+            log_level_replace_text = 'log_level = "{}"'.format(DEFAULT_LOG_LEVEL)
+            search_and_replace(log_level_search_text, log_level_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
+
+        # Setting up log format
+        if self.interviewer.log_format:
+            log_format_search_text = 'log_format'
+            log_format_replace_text = 'log_format = "{}"'.format(self.interviewer.log_format)
+            search_and_replace(log_format_search_text, log_format_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
+        else:
+            log_format_search_text = 'log_format'
+            log_format_replace_text = 'log_format = "{}"'.format(DEFAULT_LOG_FORMAT)
+            search_and_replace(log_format_search_text, log_format_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
 
     def prepare_cheqd_user(self):
         try:
@@ -614,6 +676,9 @@ class Interviewer:
         self._rpc_port = DEFAULT_RPC_PORT
         self._p2p_port = DEFAULT_P2P_PORT
         self._gas_price = DEFAULT_GAS_PRICE
+        self._persistent_peers = ""
+        self._log_level = DEFAULT_LOG_LEVEL
+        self._log_format = DEFAULT_LOG_FORMAT
         self._is_from_scratch = False
         self._rewrite_systemd = False
         self._rewrite_rsyslog = False
@@ -699,6 +764,18 @@ class Interviewer:
     @property
     def gas_price(self) -> str:
         return self._gas_price
+    
+    @property
+    def persistent_peers(self) -> str:
+        return self._persistent_peers
+    
+    @property
+    def log_level(self) -> str:
+        return self._log_level
+    
+    @property
+    def log_format(self) -> str:
+        return self._log_format
 
     @release.setter
     def release(self, release):
@@ -767,6 +844,18 @@ class Interviewer:
     @gas_price.setter
     def gas_price(self, gas_price):
         self._gas_price = gas_price
+    
+    @persistent_peers.setter
+    def persistent_peers(self, persistent_peers):
+        self._persistent_peers = persistent_peers
+    
+    @log_level.setter
+    def log_level(self, log_level):
+        self._log_level = log_level
+
+    @log_format.setter
+    def log_format(self, log_format):
+        self._log_format = log_format
 
     def log(self, msg):
         if self.verbose:
@@ -947,11 +1036,11 @@ class Interviewer:
     def ask_for_external_address(self):
         answer = self.ask(
             f"What is the externally-reachable IP address or DNS name for your cheqd-node? [default: Fetch automatically via DNS resolver lookup]: {os.linesep}")
-        if answer is not None:
+        if answer:
             self.external_address = answer
         else:
             try:
-                self.external_address = self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout.replace('"', '').strip()
+                self.external_address = str(self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout).strip("""b'"\\n""")
             except:
                 failure_exit(f"Unable to fetch external IP address for your node.")
 
@@ -966,6 +1055,20 @@ class Interviewer:
     def ask_for_gas_price(self):
         self.gas_price = self.ask(
             f"Specify minimum gas price for transactions", default=DEFAULT_GAS_PRICE)
+
+    def ask_for_persistent_peers(self):
+        self.persistent_peers = self.ask(
+            f"INFO: Persistent peers are nodes that you want to always keep connected to. "
+            f"Values for persistent peers should be specified in format: <nodeID>@<IP>:<port>,<nodeID>@<IP>:<port>... "
+            f"Specify persistent peers [default: none]: {os.linesep}")
+    
+    def ask_for_log_level(self):
+        self.log_level = self.ask(
+            f"Specify log level (error | info | debug)", default=DEFAULT_LOG_LEVEL)
+    
+    def ask_for_log_format(self):
+        self.log_format = self.ask(
+            f"Specify log format (plain | json)", default=DEFAULT_LOG_FORMAT)
 
     def prepare_url_for_latest(self) -> str:
         template = TESTNET_SNAPSHOT if self.chain == "testnet" else MAINNET_SNAPSHOT
@@ -1005,6 +1108,9 @@ if __name__ == '__main__':
             interviewer.ask_for_rpc_port()
             interviewer.ask_for_p2p_port()
             interviewer.ask_for_gas_price()
+            interviewer.ask_for_persistent_peers()
+            interviewer.ask_for_log_level()
+            interviewer.ask_for_log_format()
 
     # Steps to execute if upgrading existing node
     def upgrade_steps():
