@@ -487,21 +487,21 @@ class Installer():
         
         # Setting up log level
         if self.interviewer.log_level:
-            log_level_search_text = 'log_level = "info"'
+            log_level_search_text = 'log_level'
             log_level_replace_text = 'log_level = "{}"'.format(self.interviewer.log_level)
             search_and_replace(log_level_search_text, log_level_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
         else:
-            log_level_search_text = 'log_level = "info"'
+            log_level_search_text = 'log_level'
             log_level_replace_text = 'log_level = "{}"'.format(DEFAULT_LOG_LEVEL)
             search_and_replace(log_level_search_text, log_level_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
 
         # Setting up log format
         if self.interviewer.log_format:
-            log_format_search_text = 'log_format = "plain"'
-            log_format_replace_text = 'log_format = "{}"'.format(self.interviewer.log_format)
+            log_format_search_text = 'log_format'
+            log_format_replace_text = 'log_format'.format(self.interviewer.log_format)
             search_and_replace(log_format_search_text, log_format_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
         else:
-            log_format_search_text = 'log_format = "plain"'
+            log_format_search_text = 'log_format'
             log_format_replace_text = 'log_format = "{}"'.format(DEFAULT_LOG_FORMAT)
             search_and_replace(log_format_search_text, log_format_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
 
