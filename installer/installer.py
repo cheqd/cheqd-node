@@ -498,7 +498,7 @@ class Installer():
         # Setting up log format
         if self.interviewer.log_format:
             log_format_search_text = 'log_format'
-            log_format_replace_text = 'log_format'.format(self.interviewer.log_format)
+            log_format_replace_text = 'log_format = "{}"'.format(self.interviewer.log_format)
             search_and_replace(log_format_search_text, log_format_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
         else:
             log_format_search_text = 'log_format'
@@ -1040,7 +1040,7 @@ class Interviewer:
             self.external_address = answer
         else:
             try:
-                self.external_address = self.external_address = str(self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout).strip("""b'""\\n""")
+                self.external_address = str(self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout).replace('"', '').strip()
             except:
                 failure_exit(f"Unable to fetch external IP address for your node.")
 
