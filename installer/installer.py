@@ -84,11 +84,17 @@ def sigint_handler(signal, frame):
 signal.signal(signal.SIGINT, sigint_handler)
 
 def search_and_replace(search_text, replace_text, file_path):
-    with open(file_path, 'r') as file:
-        data = file.read()
-        data = data.replace(search_text, replace_text)
-    with open(file_path, 'w') as file:
-        file.write(data)    
+    file = open(file_path, "r")
+    for line in file:
+        line = line.strip()
+        if search_text in line:
+            with open(file_path, 'r') as file:
+                data = file.read()
+                data = data.replace(line, replace_text)
+            with open(file_path, 'w') as file:
+                file.write(data)    
+            
+    file.close()
 
 class Release:
     def __init__(self, release_map):
