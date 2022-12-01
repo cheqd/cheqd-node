@@ -475,7 +475,7 @@ class Installer():
         
         # Setting up min gas-price
         if self.interviewer.gas_price:
-            min_gas_price_search_text='minimum-gas-prices = "{}"'.format(DEFAULT_GAS_PRICE)
+            min_gas_price_search_text='minimum-gas-prices = '
             min_gas_price_replace_text = 'minimum-gas-prices = "{}"'.format(self.interviewer.gas_price)
             search_and_replace(min_gas_price_search_text, min_gas_price_replace_text, os.path.join(self.cheqd_config_dir, "app.toml"))
         
