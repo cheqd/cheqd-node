@@ -162,10 +162,10 @@ func txCommand() *cobra.Command {
 	)
 
 	app.ModuleBasics.AddTxCommands(cmd)
-	cmd.PersistentFlags().String(flags.FlagChainID, , "The network chain ID")
+	cmd.PersistentFlags().String(flags.FlagChainID, "cheqd-mainnet-1", "The network chain ID")
 	cmd.PersistentFlags().String(flags.FlagGasPrices, "50ncheq", "Gas prices in decimal format")
 	cmd.PersistentFlags().Float64(flags.FlagGasAdjustment, 1.3, "Gas adjustment factor to be multiplied against estimated gas")
-	cmd.PersistentFlags().String(flags.GasFlagAuto, "auto", "Automatically estimate gas")
+	cmd.PersistentFlags().String(flags.FlagGas, flags.GasFlagAuto, "Gas limit to set per-transaction; set to 'auto' to calculate sufficient gas automatically")
 
 	return cmd
 }
