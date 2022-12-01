@@ -47,6 +47,7 @@ func Tx(module, tx, from string, feeParams []string, txArgs ...string) (sdk.TxRe
 
 	// Skip 'gas estimate: xxx' string
 	perLineOutput := strings.Split(output, "\n")
+	output, perLineOutput = helpers.TrimImportedStdout(perLineOutput)
 	if len(perLineOutput) > 2 {
 		output = helpers.TrimExtraLineOffset(output, 1)
 	} else {
