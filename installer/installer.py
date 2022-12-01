@@ -1064,11 +1064,11 @@ class Interviewer:
     
     def ask_for_log_level(self):
         self.log_level = self.ask(
-            f"Specify log level (error/info/debug)", default=DEFAULT_LOG_LEVEL)
+            f"Specify log level (error | info | debug)", default=DEFAULT_LOG_LEVEL)
     
     def ask_for_log_format(self):
         self.log_format = self.ask(
-            f"Specify log format (plaintext/json)", default=DEFAULT_LOG_FORMAT)
+            f"Specify log format (plain | json)", default=DEFAULT_LOG_FORMAT)
 
     def prepare_url_for_latest(self) -> str:
         template = TESTNET_SNAPSHOT if self.chain == "testnet" else MAINNET_SNAPSHOT
