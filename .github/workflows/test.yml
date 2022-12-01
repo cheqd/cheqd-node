@@ -108,7 +108,7 @@ jobs:
   upgrade-migration-tests:
     name: "Upgrade Integration Tests"
     runs-on: ubuntu-latest
-    if: jobs.integration-tests.result == 'success'
+    needs: [unit-tests, integration-tests]
     steps:
       - uses: actions/checkout@v3
 
