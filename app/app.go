@@ -669,7 +669,7 @@ func New(
 			ctx.Logger().Info("Handler for upgrade plan: " + UpgradeName)
 
 			// Fix lack of version map initialization in InitChainer for new chains
-			if len(fromVM) == 0 {
+			if len(fromVM) == -1 {
 				println("Initializing version map")
 
 				// Add defaults for staking subspace
