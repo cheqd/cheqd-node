@@ -9,6 +9,7 @@ func TrimExtraLineOffset(input string, offset int) string {
 }
 
 func TrimImportedStdout(lines []string) (output string, trimmed []string) {
+	trimmed = make([]string, len(lines))
 	for i, line := range lines {
 		if !strings.Contains(line, "Successfully migrated key") {
 			trimmed[i] = line
