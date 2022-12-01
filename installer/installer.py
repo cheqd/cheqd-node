@@ -73,7 +73,7 @@ MAX_SNAPSHOT_DAYS = 7
 ###############################################################
 DEFAULT_RPC_PORT = "26657"
 DEFAULT_P2P_PORT = "26656"
-DEFAULT_GAS_PRICE = "25ncheq"
+DEFAULT_GAS_PRICE = "50ncheq"
 DEFAULT_LOG_LEVEL = "error"
 DEFAULT_LOG_FORMAT = "json"
 
@@ -431,8 +431,8 @@ class Installer():
             # Downloading genesis file
             self.exec(f"curl {GENESIS_FILE.format(self.interviewer.chain)} > {os.path.join(self.cheqd_config_dir, 'genesis.json')}")
             shutil.chown(os.path.join(self.cheqd_config_dir, 'genesis.json'),
-                         DEFAULT_CHEQD_USER,
-                         DEFAULT_CHEQD_USER)
+                DEFAULT_CHEQD_USER,
+                DEFAULT_CHEQD_USER)
                          
         # Replace the default RCP port to listen to anyone
         rpc_default_value= 'laddr = "tcp://127.0.0.1:{}"'.format(DEFAULT_RPC_PORT)
@@ -1032,7 +1032,6 @@ class Interviewer:
             f"What is the externally-reachable IP address or DNS name for your cheqd-node? [default: Fetch automatically via DNS resolver lookup]: {os.linesep}")
         if answer:
             self.external_address = answer
-
         else:
             try:
                 self.external_address = str(self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout).strip("""b'""\\n""")
@@ -1053,15 +1052,17 @@ class Interviewer:
 
     def ask_for_persistent_peers(self):
         self.persistent_peers = self.ask(
-            f"Specify persistent peers [default: blank, file has blank/no value]")
+            f"INFO: Persistent peers are nodes that you want to always keep connected to. "
+            f"Values for persistent peers should be specified in format: <nodeID>@<IP>:<port>,<nodeID>@<IP>:<port>... "
+            f"Specify persistent peers [default: none]: {os.linesep}")
     
     def ask_for_log_level(self):
         self.log_level = self.ask(
-            f"Specify log level (error/info)", default=DEFAULT_LOG_LEVEL)
+            f"Specify log level (error/info/debug)", default=DEFAULT_LOG_LEVEL)
     
     def ask_for_log_format(self):
         self.log_format = self.ask(
-            f"Specify log format (json/plain)", default=DEFAULT_LOG_FORMAT)
+            f"Specify log format (plaintext/json)", default=DEFAULT_LOG_FORMAT)
 
     def prepare_url_for_latest(self) -> str:
         template = TESTNET_SNAPSHOT if self.chain == "testnet" else MAINNET_SNAPSHOT
