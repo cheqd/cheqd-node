@@ -45,7 +45,7 @@ func Tx(module, tx, from string, feeParams []string, txArgs ...string) (sdk.TxRe
 		return sdk.TxResponse{}, err
 	}
 
-	// Skip 'gas estimate: xxx' string
+	// Skip 'gas estimate: xxx' string, trim 'Successfully migrated key' string
 	perLineOutput := strings.Split(output, "\n")
 	output, perLineOutput = helpers.TrimImportedStdout(perLineOutput)
 	if len(perLineOutput) > 2 {

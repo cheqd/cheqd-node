@@ -173,6 +173,10 @@ jobs:
         working-directory: ./tests/integration
         run: |
           ginkgo -r --tags integration --race --randomize-suites --keep-going --trace
+      - name: Show logs on failure
+        if: failure()
+        working-directory: ./docker/localnet
+        run: docker compose --env-file docker-compose.env logs --tail --follow
       - name: Submit governance fee parameter change proposal
         working-directory: ./tests/upgrade
         run: |
