@@ -3,8 +3,9 @@ package cli
 import (
 	"fmt"
 
-	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	govtypesv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
+	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 )
 
@@ -46,11 +47,51 @@ func QueryModuleVersionMap(container string) (upgradetypes.QueryModuleVersionsRe
 	return resp, nil
 }
 
-func QueryUpgradeProposalLegacy(container string) (govtypesv1beta1.Proposal, error) {
-	fmt.Println("Querying upgrade proposal from", container)
+func QueryParams(container, subspace, key string) (paramproposal.ParamChange, error) {
+	fmt.Println("Querying params from", container)
 	args := append([]string{
 		CLI_BINARY_NAME,
-		"query", "gov", "proposal", "1",
+		"query", "params", "subspace", subspace, key,
+	}, QUERY_PARAMS...)
+
+	out, err := LocalnetExecExec(container, args...)
+	if err != nil {
+		return paramproposal.ParamChange{}, err
+	}
+
+	fmt.Println("Params", out)
+
+	var resp paramproposal.ParamChange
+
+	err = MakeCodecWithExtendedRegistry().UnmarshalJSON([]byte(out), &resp)
+	if err != nil {
+		return paramproposal.ParamChange{}, err
+	}
+
+	return resp, nil
+}
+
+func QueryDidFeeParams(container, subspace, key string) (didtypes.FeeParams, error) {
+	params, err := QueryParams(container, subspace, key)
+	if err != nil {
+		return didtypes.FeeParams{}, err
+	}
+
+	var feeParams didtypes.FeeParams
+
+	err = MakeCodecWithExtendedRegistry().UnmarshalJSON([]byte(params.Value), &feeParams)
+	if err != nil {
+		return didtypes.FeeParams{}, err
+	}
+
+	return feeParams, nil
+}
+
+func QueryProposalLegacy(container, id string) (govtypesv1beta1.Proposal, error) {
+	fmt.Println("Querying proposal from", container)
+	args := append([]string{
+		CLI_BINARY_NAME,
+		"query", "gov", "proposal", id,
 	}, QUERY_PARAMS...)
 
 	out, err := LocalnetExecExec(container, args...)
@@ -65,29 +106,6 @@ func QueryUpgradeProposalLegacy(container string) (govtypesv1beta1.Proposal, err
 	err = MakeCodecWithExtendedRegistry().UnmarshalJSON([]byte(out), &resp)
 	if err != nil {
 		return govtypesv1beta1.Proposal{}, err
-	}
-	return resp, nil
-}
-
-func QueryUpgradeProposal(container string) (govtypesv1.Proposal, error) {
-	fmt.Println("Querying upgrade proposal from", container)
-	args := append([]string{
-		CLI_BINARY_NAME,
-		"query", "gov", "proposal", "1",
-	}, QUERY_PARAMS...)
-
-	out, err := LocalnetExecExec(container, args...)
-	if err != nil {
-		return govtypesv1.Proposal{}, err
-	}
-
-	fmt.Println("Proposal", out)
-
-	var resp govtypesv1.Proposal
-
-	err = MakeCodecWithExtendedRegistry().UnmarshalJSON([]byte(out), &resp)
-	if err != nil {
-		return govtypesv1.Proposal{}, err
 	}
 	return resp, nil
 }

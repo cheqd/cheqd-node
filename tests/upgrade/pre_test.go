@@ -132,29 +132,29 @@ var _ = Describe("Upgrade - Pre", func() {
 		})
 
 		It("should vote for the software upgrade proposal from `validator0` container", func() {
-			By("sending a VoteUpgradeProposal transaction from `validator0` container")
-			res, err := cli.VoteUpgradeProposal(cli.VALIDATOR0)
+			By("sending a VoteProposal transaction from `validator0` container")
+			res, err := cli.VoteProposal(cli.VALIDATOR0, "1", "yes")
 			Expect(err).To(BeNil())
 			Expect(res.Code).To(BeEquivalentTo(0))
 		})
 
 		It("should vote for the software upgrade proposal from `validator1` container", func() {
-			By("sending a VoteUpgradeProposal transaction from `validator1` container")
-			res, err := cli.VoteUpgradeProposal(cli.VALIDATOR1)
+			By("sending a VoteProposal transaction from `validator1` container")
+			res, err := cli.VoteProposal(cli.VALIDATOR1, "1", "yes")
 			Expect(err).To(BeNil())
 			Expect(res.Code).To(BeEquivalentTo(0))
 		})
 
 		It("should vote for the software upgrade proposal from `validator2` container", func() {
-			By("sending a VoteUpgradeProposal transaction from `validator2` container")
-			res, err := cli.VoteUpgradeProposal(cli.VALIDATOR2)
+			By("sending a VoteProposal transaction from `validator2` container")
+			res, err := cli.VoteProposal(cli.VALIDATOR2, "1", "yes")
 			Expect(err).To(BeNil())
 			Expect(res.Code).To(BeEquivalentTo(0))
 		})
 
 		It("should vote for the software upgrade proposal from `validator3` container", func() {
-			By("sending a VoteUpgradeProposal transaction from `validator3` container")
-			res, err := cli.VoteUpgradeProposal(cli.VALIDATOR3)
+			By("sending a VoteProposal transaction from `validator3` container")
+			res, err := cli.VoteProposal(cli.VALIDATOR3, "1", "yes")
 			Expect(err).To(BeNil())
 			Expect(res.Code).To(BeEquivalentTo(0))
 		})
@@ -166,8 +166,8 @@ var _ = Describe("Upgrade - Pre", func() {
 		})
 
 		It("should query the proposal status to ensure it has passed", func() {
-			By("sending a QueryUpgradeProposal Msg from `validator0` container")
-			proposal, err := cli.QueryUpgradeProposalLegacy(cli.VALIDATOR0)
+			By("sending a QueryProposal Msg from `validator0` container")
+			proposal, err := cli.QueryProposalLegacy(cli.VALIDATOR0, "1")
 			Expect(err).To(BeNil())
 			Expect(proposal.Status).To(BeEquivalentTo(govtypesv1beta1.StatusPassed))
 		})

@@ -1,0 +1,12 @@
+{
+    "title": "Did Param Change",
+    "description": "This is a simple example of a param change - double the values",
+    "changes": [
+        {
+            "subspace": "cheqd",
+            "key": "feeparams",
+            "value": "{\"create_did\": {\"denom\": \"ncheq\", \"amount\": \"10000000000\"}, \"update_did\": {\"denom\": \"ncheq\", \"amount\": \"4000000000\"}, \"deactivate_did\": {\"denom\": \"ncheq\", \"amount\": \"2000000000\"}, \"burn_factor\": \"0.600000000000000000\"}"
+        }
+    ],
+    "deposit": "10000000000ncheq"
+}

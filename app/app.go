@@ -704,8 +704,16 @@ func New(
 		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 			ctx.Logger().Info("Handler for upgrade plan: " + UpgradeName)
 
+			// Add defaults for did subspace
+			didSubspace := app.GetSubspace(didtypes.ModuleName)
+			didSubspace.Set(ctx, didtypes.ParamStoreKeyFeeParams, didtypes.DefaultFeeParams())
+
+			// Add defaults for resource subspace
+			resourceSubspace := app.GetSubspace(resourcetypes.ModuleName)
+			resourceSubspace.Set(ctx, resourcetypes.ParamStoreKeyFeeParams, resourcetypes.DefaultFeeParams())
+
 			// Add defaults for staking subspace
-			stakingSubspace, _ := app.ParamsKeeper.GetSubspace(stakingtypes.ModuleName)
+			stakingSubspace := app.GetSubspace(stakingtypes.ModuleName)
 			stakingSubspace.Set(ctx, stakingtypes.KeyMinCommissionRate, sdk.NewDec(0))
 
 			// Get version map from previous upgrade

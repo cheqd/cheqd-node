@@ -39,6 +39,10 @@ func Loader(path string, msg any) error {
 		err = integrationhelpers.Codec.UnmarshalJSON(file, msg)
 	case *resourcetypesv1.ResourceHeader:
 		err = integrationhelpers.Codec.UnmarshalJSON(file, msg)
+	case *didtypesv2.FeeParams:
+		err = integrationhelpers.Codec.UnmarshalJSON(file, msg)
+	case *resourcetypesv2.FeeParams:
+		err = integrationhelpers.Codec.UnmarshalJSON(file, msg)
 	default:
 		err = json.Unmarshal(file, msg)
 	}

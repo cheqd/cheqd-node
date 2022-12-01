@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -46,6 +47,28 @@ func Tx(container string, binary string, module, tx, from string, txArgs ...stri
 		return sdk.TxResponse{}, err
 	}
 
+	return resp, nil
+}
+
+func SubmitParamChangeProposal(container string, pathToDir ...string) (sdk.TxResponse, error) {
+	fmt.Println("Submitting param change proposal from", container)
+	args := append([]string{
+		CLI_BINARY_NAME,
+		"tx", "gov", "submit-proposal", "param-change", filepath.Join(pathToDir...),
+		"--from", OperatorAccounts[container],
+	}, TX_PARAMS...)
+
+	out, err := LocalnetExecExec(container, args...)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	var resp sdk.TxResponse
+
+	err = integrationhelpers.Codec.UnmarshalJSON([]byte(out), &resp)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
 	return resp, nil
 }
 
@@ -103,11 +126,11 @@ func DepositGov(container string) (sdk.TxResponse, error) {
 	return resp, nil
 }
 
-func VoteUpgradeProposal(container string) (sdk.TxResponse, error) {
+func VoteProposal(container, id, option string) (sdk.TxResponse, error) {
 	fmt.Println("Voting from", container)
 	args := append([]string{
 		CLI_BINARY_NAME,
-		"tx", "gov", "vote", "1", "yes",
+		"tx", "gov", "vote", id, option,
 		"--from", OperatorAccounts[container],
 	}, TX_PARAMS...)
 
