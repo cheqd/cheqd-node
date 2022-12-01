@@ -13,6 +13,9 @@ sudo chown -R 1000:1000 network-config
 # Start network
 docker compose --env-file mainnet-latest.env up --detach --no-build
 
+# Import keys
+bash import-keys.sh
+
 # TODO: Get rid of this sleep.
 sleep 5
 
