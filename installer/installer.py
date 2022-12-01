@@ -1034,7 +1034,7 @@ class Interviewer:
             self.external_address = answer
         else:
             try:
-                self.external_address = str(self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout).strip("""b'""\\n""")
+                self.external_address = str(self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout.replace('"', '').strip())
             except:
                 failure_exit(f"Unable to fetch external IP address for your node.")
 
