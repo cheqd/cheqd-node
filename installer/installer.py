@@ -92,8 +92,7 @@ def search_and_replace(search_text, replace_text, file_path):
                 data = file.read()
                 data = data.replace(line, replace_text)
             with open(file_path, 'w') as file:
-                file.write(data)    
-            
+                file.write(data)
     file.close()
 
 class Release:
@@ -182,7 +181,7 @@ class Installer():
                 f.read()
             )
         self.remove_safe(fname)
-        return s 
+        return s
 
     @property
     def logrotate_cfg(self):
@@ -864,7 +863,7 @@ class Interviewer:
     def is_already_installed(self) -> bool:
         if os.path.exists(self.home_dir) and os.path.exists(os.path.join(self.cheqd_config_dir, 'genesis.json')):
             return True
-        elif not os.path.exists(self.home_dir) and not os.path.exists(self.cheqd_root_dir):
+        elif not os.path.exists(self.cheqd_root_dir):
             return False
         else:
             failure_exit(f"Could not check if cheqd-node is already installed.")
