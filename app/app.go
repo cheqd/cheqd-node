@@ -722,6 +722,8 @@ func New(
 			fromVM[capabilitytypes.ModuleName] = versionMap[capabilitytypes.ModuleName]
 			// Skip distribution module
 			fromVM[distrtypes.ModuleName] = versionMap[distrtypes.ModuleName]
+			// Skip gov module
+			fromVM[govtypes.ModuleName] = versionMap[govtypes.ModuleName]
 			// Skip mint module
 			fromVM[minttypes.ModuleName] = versionMap[minttypes.ModuleName]
 			// Skip staking module
