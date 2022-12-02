@@ -23,7 +23,7 @@ jobs:
       - name: "Run interactive installer"
         working-directory: ./installer
         run: |
-          sudo bash -c "python3 installer.py < answers.txt > installer.out"
+          sudo bash -c "python3 installer.py < answers.txt"
           grep -c "Reason for failure" installer.out
 
   unit-tests:
