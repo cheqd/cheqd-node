@@ -2,7 +2,6 @@ package cli
 
 import (
 	"encoding/json"
-	"strings"
 
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
@@ -46,13 +45,7 @@ func Tx(module, tx, from string, feeParams []string, txArgs ...string) (sdk.TxRe
 	}
 
 	// Skip 'gas estimate: xxx' string, trim 'Successfully migrated key' string
-	perLineOutput := strings.Split(output, "\n")
-	output, perLineOutput = helpers.TrimImportedStdout(perLineOutput)
-	if len(perLineOutput) > 2 {
-		output = helpers.TrimExtraLineOffset(output, 2)
-	} else {
-		output = perLineOutput[0]
-	}
+	output = helpers.TrimImportedStdout(output)
 
 	var resp sdk.TxResponse
 
