@@ -34,8 +34,6 @@ func Tx(container string, binary string, module, tx, from string, txArgs ...stri
 	// Skip 'gas estimate: xxx' string, trim 'Successfully migrated key' string
 	output = integrationhelpers.TrimImportedStdout(output)
 
-	fmt.Println("Output:", output)
-
 	var resp sdk.TxResponse
 
 	err = integrationhelpers.Codec.UnmarshalJSON([]byte(output), &resp)
@@ -60,6 +58,9 @@ func SubmitParamChangeProposal(container string, pathToDir ...string) (sdk.TxRes
 		fmt.Println("Output:", out)
 		return sdk.TxResponse{}, err
 	}
+
+	// Skip 'gas estimate: xxx' string, trim 'Successfully migrated key' string
+	out = integrationhelpers.TrimImportedStdout(out)
 
 	var resp sdk.TxResponse
 
@@ -88,7 +89,8 @@ func SubmitUpgradeProposal(upgradeHeight int64, container string) (sdk.TxRespons
 		return sdk.TxResponse{}, err
 	}
 
-	out = TrimExtraLineOffset(out, 1)
+	// Skip 'gas estimate: xxx' string, trim 'Successfully migrated key' string
+	out = integrationhelpers.TrimImportedStdout(out)
 
 	var resp sdk.TxResponse
 
@@ -113,7 +115,8 @@ func DepositGov(container string) (sdk.TxResponse, error) {
 		return sdk.TxResponse{}, err
 	}
 
-	out = TrimExtraLineOffset(out, 1)
+	// Skip 'gas estimate: xxx' string, trim 'Successfully migrated key' string
+	out = integrationhelpers.TrimImportedStdout(out)
 
 	var resp sdk.TxResponse
 
@@ -137,7 +140,8 @@ func VoteProposal(container, id, option string) (sdk.TxResponse, error) {
 		return sdk.TxResponse{}, err
 	}
 
-	out = TrimExtraLineOffset(out, 1)
+	// Skip 'gas estimate: xxx' string, trim 'Successfully migrated key' string
+	out = integrationhelpers.TrimImportedStdout(out)
 
 	var resp sdk.TxResponse
 
