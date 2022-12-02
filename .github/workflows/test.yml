@@ -23,7 +23,7 @@ jobs:
       - name: "Run interactive installer"
         working-directory: ./installer
         run: |
-          sudo python3 installer.py < answers.txt > installer.out
+          sudo "python3 installer.py < answers.txt > installer.out"
           grep -c "Reason for failure" installer.out
 
   unit-tests:
