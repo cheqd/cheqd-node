@@ -157,10 +157,10 @@ jobs:
         working-directory: ./tests/upgrade
         run: |
           bash scripts/upgrade.sh
-      # - name: Run post-upgrade tests
-      #   working-directory: ./tests/upgrade
-      #   run: |
-      #     ginkgo -r --tags upgrade --race --tags upgrade --focus-file post_test.go
+      - name: Run post-upgrade tests
+        working-directory: ./tests/upgrade
+        run: |
+          ginkgo -r --tags upgrade --race --tags upgrade --focus-file post_test.go
       - name: Download binary artifact (build-latest)
         uses: actions/download-artifact@v3
         id: download

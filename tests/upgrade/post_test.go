@@ -3,23 +3,23 @@
 package upgrade
 
 import (
-	"path/filepath"
+	// "path/filepath"
 
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/cli"
-	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
-	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	// didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
+	// resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
+	// upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Upgrade - Post", func() {
 	Context("After a software upgrade execution has concluded", func() {
-		var ModuleVersionMap upgradetypes.QueryModuleVersionsResponse
+		/* var ModuleVersionMap upgradetypes.QueryModuleVersionsResponse
 		var DidDocCreateRecord didtypesv1.Did
 		var DidDocUpdateRecord didtypesv1.Did
 		var ResourceCreateRecord resourcetypesv1.ResourceHeader
-		var err error
+		var err error */
 
 		It("should wait for node catching up", func() {
 			By("pinging the node status until catching up is flagged as false")
@@ -27,7 +27,7 @@ var _ = Describe("Upgrade - Post", func() {
 			Expect(err).To(BeNil())
 		})
 
-		It("should match the expected module version map", func() {
+		/* It("should match the expected module version map", func() {
 			By("loading the expected module version map")
 			err = Loader(filepath.Join(GENERATED_JSON_DIR, "expected", "module_version_map", "v1.json"), &ModuleVersionMap)
 
@@ -103,6 +103,6 @@ var _ = Describe("Upgrade - Post", func() {
 				// e.g.: Migration to Indy format, uuid lowercasing, etc.
 				// Checksum migration is already defined as an e2e example.
 			}
-		})
+		}) */
 	})
 })
