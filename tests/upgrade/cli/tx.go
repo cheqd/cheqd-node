@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"path/filepath"
 	"strconv"
-	"strings"
 
 	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	sdk "github.com/cosmos/cosmos-sdk/types"
