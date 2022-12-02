@@ -1,7 +1,6 @@
 {
     "title": "Resource Param Change",
     "description": "This is a simple example of a param change - double the values",
-    "type": "ParameterChange",
     "changes": [
         {
             "subspace": "resource",

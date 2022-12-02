@@ -54,7 +54,7 @@ func SubmitParamChangeProposal(container string, pathToDir ...string) (sdk.TxRes
 	fmt.Println("Submitting param change proposal from", container)
 	args := append([]string{
 		CLI_BINARY_NAME,
-		"tx", "gov", "submit-legacy-proposal", filepath.Join(pathToDir...),
+		"tx", "gov", "submit-legacy-proposal", "param-change", filepath.Join(pathToDir...),
 		"--from", OperatorAccounts[container],
 	}, TX_PARAMS...)
 
