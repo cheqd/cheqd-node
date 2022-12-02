@@ -20,8 +20,12 @@ var _ = Describe("Upgrade - Fee parameter change proposal", func() {
 	})
 
 	It("should submit a parameter change proposal for did module", func() {
+		By("passing the proposal file to the container")
+		_, err := cli.LocalnetExecCopyAbsoluteWithPermissions(filepath.Join(GENERATED_JSON_DIR, "proposal", "existing", "param_change_did.json"), cli.DOCKER_HOME, cli.VALIDATOR0)
+		Expect(err).To(BeNil())
+
 		By("sending a SubmitParamChangeProposal transaction from `validator0` container")
-		res, err := cli.SubmitParamChangeProposal(cli.VALIDATOR0, GENERATED_JSON_DIR, PROPOSAL_JSON_DIR, "existing", "param_change_did.json")
+		res, err := cli.SubmitParamChangeProposal(cli.VALIDATOR0, "param_change_did.json")
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(Equal(0))
 	})
