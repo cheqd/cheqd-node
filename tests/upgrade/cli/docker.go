@@ -56,7 +56,7 @@ func LocalnetExec(envArgs []string, args ...string) (string, error) {
 	cmd := exec.Command(DOCKER, args...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return "", sdkerrors.Wrap(err, string(out))
+		return string(out), sdkerrors.Wrap(err, string(out))
 	}
 	return string(out), err
 }
