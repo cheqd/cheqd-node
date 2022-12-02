@@ -13,6 +13,17 @@ permissions:
 
 jobs:
 
+  interactive-installer:
+    name: "Interactive Installer"
+    runs-on: ubuntu-latest
+  
+  steps:
+    - uses: actions/checkout@v3
+
+    - name: "Run interactive installer"
+      working-directory: ./installer
+      run: sudo bash -c 'python3 installer.py 1 < answers.txt'
+
   unit-tests:
     name: "Unit Tests"
     runs-on: ubuntu-latest
