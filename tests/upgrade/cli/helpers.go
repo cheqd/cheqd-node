@@ -12,6 +12,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	govtypesv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
+	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 )
@@ -207,6 +208,7 @@ func MakeCodecWithExtendedRegistry() codec.Codec {
 		(*govtypesv1beta1.Content)(nil),
 		// nolint: staticcheck
 		&upgradetypes.SoftwareUpgradeProposal{},
+		&paramproposal.ParameterChangeProposal{},
 	)
 
 	interfaceRegistry.RegisterImplementations(
