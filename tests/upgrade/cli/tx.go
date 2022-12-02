@@ -34,6 +34,8 @@ func Tx(container string, binary string, module, tx, from string, txArgs ...stri
 	// Skip 'gas estimate: xxx' string, trim 'Successfully migrated key' string
 	output = integrationhelpers.TrimImportedStdout(output)
 
+	fmt.Println("Output:", output)
+
 	var resp sdk.TxResponse
 
 	err = integrationhelpers.Codec.UnmarshalJSON([]byte(output), &resp)
