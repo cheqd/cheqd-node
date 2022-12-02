@@ -39,7 +39,7 @@ PRINT_PREFIX = "********* "
 DEFAULT_LATEST_COSMOVISOR_VERSION = "v1.3.0"
 COSMOVISOR_BINARY_URL = f"https://github.com/cosmos/cosmos-sdk/releases/download/cosmovisor%2F{DEFAULT_LATEST_COSMOVISOR_VERSION}/cosmovisor-{DEFAULT_LATEST_COSMOVISOR_VERSION}-linux-amd64.tar.gz"
 DEFAULT_USE_COSMOVISOR = "yes"
-DEFAULT_BUMP_COSMOVISOR = "yes"
+DEFAULT_BUMP_COSMOVISOR = "no"
 
 ###############################################################
 ###     				Systemd Config      				###
@@ -416,11 +416,7 @@ class Installer():
 
         if self.interviewer.is_cosmo_needed:
             self.log("Setting up Cosmovisor")
-            self.setup_cosmovisor()
-        
-        if self.interviewer.is_cosmovisor_bump_needed:
-            self.log(f"Bumping Cosmovisor to {DEFAULT_LATEST_COSMOVISOR_VERSION}")
-            self.bump_cosmovisor()
+            self.setup_cosmovisor(self.interviewer.is_cosmovisor_bump_needed)
 
         if not self.interviewer.is_cosmo_needed:
             self.log(f"Moving binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}")
@@ -537,7 +533,7 @@ class Installer():
         except:
             failure_exit(f"Failed to setup {self.cheqd_log_dir} directory")
 
-    def setup_cosmovisor(self):
+    def setup_cosmovisor(self, is_cosmovisor_bump_needed):
         try:
             fname= os.path.basename(COSMOVISOR_BINARY_URL)
             self.exec(f"wget -c {COSMOVISOR_BINARY_URL}")
@@ -548,10 +544,14 @@ class Installer():
             self.remove_safe("CHANGELOG.md")
             self.remove_safe("README.md")
             self.remove_safe("LICENSE")
-            self.mkdir_p(self.cosmovisor_root_dir)
-            self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis"))
-            self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis/bin"))
-            self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "upgrades"))
+            
+            if not is_cosmovisor_bump_needed:
+                self.mkdir_p(self.cosmovisor_root_dir)
+                self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis"))
+                self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis/bin"))
+                self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "upgrades"))
+            else:
+                self.log(f"Bumping Comsovisor binary to {DEFAULT_LATEST_COSMOVISOR_VERSION}")
             if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)):
                 self.log(f"Moving Cosmovisor binary to installation directory")
                 shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
@@ -584,52 +584,7 @@ class Installer():
             self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
         except:
             failure_exit(f"Failed to setup Cosmovisor")
-    # This method is exact same with setup_cosmovisor() except it doesn't create existing directories. We could do this inside same method but could lead to coupling.
-    def bump_cosmovisor(self):
-        try:
-            fname= os.path.basename(COSMOVISOR_BINARY_URL)
-            self.exec(f"wget -c {COSMOVISOR_BINARY_URL}")
-            self.exec(f"tar -xzf {fname}")
-            self.remove_safe(fname)
-            
-            # Remove cosmovisor artifacts...
-            self.remove_safe("CHANGELOG.md")
-            self.remove_safe("README.md")
-            self.remove_safe("LICENSE")
-
-            if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)):
-                self.log(f"Moving Cosmovisor binary to installation directory")
-                shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
-
-            if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
-                self.log(f"Creating symlink for current Cosmovisor version")
-                os.symlink(os.path.join(self.cosmovisor_root_dir, "genesis"),
-                        os.path.join(self.cosmovisor_root_dir, "current"))
-
-            self.log(f"Moving binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
-            self.exec("sudo mv {} {}".format(self.binary_path, self.cosmovisor_cheqd_bin_path))
-            self.exec("sudo chown {} {}".format(f'{DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}', f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
-            self.exec("sudo chmod +x {}".format(f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
-
-            if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
-                self.log(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
-                os.symlink(self.cosmovisor_cheqd_bin_path,
-                        os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
-
-            if self.interviewer.is_upgrade and \
-                os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
-
-                self.log(f"Copying upgrade-info.json file to cosmovisor/current/")
-                shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
-                            os.path.join(self.cosmovisor_root_dir, "current"))
-                self.log(f"Changing owner to {DEFAULT_CHEQD_USER} user")
-                self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
-        
-            self.log(f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
-            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
-        except:
-            failure_exit(f"Failed to setup Cosmovisor")
-
+    
     def compare_checksum(self, file_path):
         # Set URL for correct checksum file for snapshot
         checksum_url = os.path.join(os.path.dirname(self.interviewer.snapshot_url), "md5sum.txt")
@@ -716,7 +671,7 @@ class Interviewer:
         self._home_dir = home_dir
         self._is_upgrade = False
         self._is_cosmo_needed = True
-        self._is_cosmovisor_bump_needed = True
+        self._is_cosmovisor_bump_needed = False
         self._init_from_snapshot = False
         self._release = None
         self._chain = chain
