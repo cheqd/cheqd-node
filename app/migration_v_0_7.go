@@ -2,6 +2,7 @@ package app
 
 import (
 	"crypto/sha256"
+	"encoding/hex"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -17,7 +18,7 @@ func (app *App) FixResourceChecksums(ctx sdk.Context) {
 	all_resources := app.resourceKeeper.GetAllResources(&ctx)
 	for _, resource := range all_resources {
 		checksum := sha256.Sum256([]byte(resource.Resource.Data))
-		resource.Metadata.Checksum = checksum[:]
+		resource.Metadata.Checksum = hex.EncodeToString(checksum[:])
 		err := app.resourceKeeper.SetResource(&ctx, &resource)
 		if err != nil {
 			return

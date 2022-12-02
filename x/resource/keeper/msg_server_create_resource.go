@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 	"crypto/sha256"
+	"encoding/hex"
 	"time"
 
 	"github.com/cheqd/cheqd-node/x/resource/utils"
@@ -57,7 +58,7 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	// Build Resource
 	resource := msg.Payload.ToResource()
 	checksum := sha256.Sum256([]byte(resource.Resource.Data))
-	resource.Metadata.Checksum = checksum[:]
+	resource.Metadata.Checksum = hex.EncodeToString(checksum[:])
 	resource.Metadata.Created = ctx.BlockTime().Format(time.RFC3339)
 	resource.Metadata.MediaType = utils.DetectMediaType(resource.Resource.Data)
 

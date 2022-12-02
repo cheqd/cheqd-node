@@ -2,6 +2,7 @@ package tests
 
 import (
 	"crypto/sha256"
+	"encoding/hex"
 	"strings"
 
 	. "github.com/cheqd/cheqd-node/x/resource/tests/setup"
@@ -26,7 +27,8 @@ func ExpectPayloadToMatchResource(payload *resourcetypes.MsgCreateResourcePayloa
 
 	// Generated header
 	hash := sha256.Sum256(payload.Data)
-	Expect(resource.Metadata.Checksum).To(Equal(hash[:]))
+	hex := hex.EncodeToString(hash[:])
+	Expect(resource.Metadata.Checksum).To(Equal(hex))
 
 	// Provided data
 	Expect(payload.Data).To(Equal(resource.Resource.Data))
