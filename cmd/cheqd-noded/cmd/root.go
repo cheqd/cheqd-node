@@ -36,7 +36,7 @@ import (
 	dbm "github.com/tendermint/tm-db"
 )
 
-var ChainID = "cheqd"
+var ChainID = "cheqd-mainnet-1"
 
 // NewRootCmd creates a new root command for simd. It is called once in the
 // main function.
@@ -89,7 +89,6 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 
 	rootCmd.AddCommand(
 		extendInit(genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome)),
-		configureCmd(app.DefaultNodeHome),
 		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
 		genutilcli.MigrateGenesisCmd(),
 		genutilcli.GenTxCmd(app.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
@@ -135,7 +134,7 @@ func queryCommand() *cobra.Command {
 	)
 
 	app.ModuleBasics.AddQueryCommands(cmd)
-	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
+	cmd.PersistentFlags().String(flags.FlagChainID, "cheqd-mainnet-1", "The network chain ID")
 
 	return cmd
 }
@@ -163,7 +162,10 @@ func txCommand() *cobra.Command {
 	)
 
 	app.ModuleBasics.AddTxCommands(cmd)
-	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
+	cmd.PersistentFlags().String(flags.FlagChainID, "cheqd-mainnet-1", "The network chain ID")
+	cmd.PersistentFlags().String(flags.FlagGasPrices, "50ncheq", "Gas prices in decimal format")
+	cmd.PersistentFlags().Float64(flags.FlagGasAdjustment, 1.3, "Gas adjustment factor to be multiplied against estimated gas")
+	cmd.PersistentFlags().String(flags.FlagGas, flags.GasFlagAuto, "Gas limit to set per-transaction; set to 'auto' to calculate sufficient gas automatically")
 
 	return cmd
 }
