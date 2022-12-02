@@ -60,6 +60,8 @@ func SubmitParamChangeProposal(container string, pathToDir ...string) (sdk.TxRes
 
 	out, err := LocalnetExecExec(container, args...)
 	if err != nil {
+		fmt.Println("Error on submitting ParamChangeProposal", err)
+		fmt.Println("Output:", out)
 		return sdk.TxResponse{}, err
 	}
 
