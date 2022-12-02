@@ -97,7 +97,7 @@ jobs:
       - name: Show logs
         if: failure()
         working-directory: ./docker/localnet
-        run: docker compose --env-file docker-compose.env logs --tail --follow
+        run: docker compose --env-file build-latest.env logs --tail --follow
 
       - name: Upload integration tests result
         uses: actions/upload-artifact@v3
@@ -176,7 +176,7 @@ jobs:
       - name: Show logs on failure
         if: failure()
         working-directory: ./docker/localnet
-        run: docker compose --env-file docker-compose.env logs --tail --follow
+        run: docker compose --env-file build-latest.env logs --tail --follow
       - name: Submit governance fee parameter change proposal
         working-directory: ./tests/upgrade
         run: |
