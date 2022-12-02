@@ -32,13 +32,8 @@ func Tx(container string, binary string, module, tx, from string, txArgs ...stri
 		return sdk.TxResponse{}, err
 	}
 
-	// Skip 'gas estimate: xxx' string
-	perLineOutput := strings.Split(output, "\n")
-	if len(perLineOutput) > 3 {
-		output = TrimExtraLineOffset(output, 2)
-	} else {
-		output = TrimExtraLineOffset(output, 1)
-	}
+	// Skip 'gas estimate: xxx' string, trim 'Successfully migrated key' string
+	output = integrationhelpers.TrimImportedStdout(output)
 
 	var resp sdk.TxResponse
 
