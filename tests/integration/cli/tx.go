@@ -66,7 +66,6 @@ func RevokeFeeGrant(granter, grantee string, feeParams []string) (sdk.TxResponse
 }
 
 func CreateDidDoc(tmpDir string, payload types.MsgCreateDidDocPayload, signInputs []cli.SignInput, from string, feeParams []string) (sdk.TxResponse, error) {
-	// Payload
 	payloadJson, err := helpers.Codec.MarshalJSON(&payload)
 	if err != nil {
 		return sdk.TxResponse{}, err
@@ -88,7 +87,6 @@ func CreateDidDoc(tmpDir string, payload types.MsgCreateDidDocPayload, signInput
 }
 
 func UpdateDidDoc(tmpDir string, payload types.MsgUpdateDidDocPayload, signInputs []cli.SignInput, from string, feeParams []string) (sdk.TxResponse, error) {
-	// Payload
 	payloadJson, err := helpers.Codec.MarshalJSON(&payload)
 	if err != nil {
 		return sdk.TxResponse{}, err
@@ -110,7 +108,6 @@ func UpdateDidDoc(tmpDir string, payload types.MsgUpdateDidDocPayload, signInput
 }
 
 func DeactivateDidDoc(tmpDir string, payload types.MsgDeactivateDidDocPayload, signInputs []cli.SignInput, from string, feeParams []string) (sdk.TxResponse, error) {
-	// Payload
 	payloadJson, err := helpers.Codec.MarshalJSON(&payload)
 	if err != nil {
 		return sdk.TxResponse{}, err
@@ -132,7 +129,6 @@ func DeactivateDidDoc(tmpDir string, payload types.MsgDeactivateDidDocPayload, s
 }
 
 func CreateResource(tmpDir string, options resourcecli.CreateResourceOptions, signInputs []cli.SignInput, from string, feeParams []string) (sdk.TxResponse, error) {
-	// Payload
 	payloadJson, err := json.Marshal(&options)
 	if err != nil {
 		return sdk.TxResponse{}, err
