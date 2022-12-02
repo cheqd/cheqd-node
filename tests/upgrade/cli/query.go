@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	govtypesv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
@@ -106,6 +107,29 @@ func QueryProposalLegacy(container, id string) (govtypesv1beta1.Proposal, error)
 	err = MakeCodecWithExtendedRegistry().UnmarshalJSON([]byte(out), &resp)
 	if err != nil {
 		return govtypesv1beta1.Proposal{}, err
+	}
+	return resp, nil
+}
+
+func QueryProposal(container, id string) (govtypesv1.Proposal, error) {
+	fmt.Println("Querying proposal from", container)
+	args := append([]string{
+		CLI_BINARY_NAME,
+		"query", "gov", "proposal", id,
+	}, QUERY_PARAMS...)
+
+	out, err := LocalnetExecExec(container, args...)
+	if err != nil {
+		return govtypesv1.Proposal{}, err
+	}
+
+	fmt.Println("Proposal", out)
+
+	var resp govtypesv1.Proposal
+
+	err = MakeCodecWithExtendedRegistry().UnmarshalJSON([]byte(out), &resp)
+	if err != nil {
+		return govtypesv1.Proposal{}, err
 	}
 	return resp, nil
 }

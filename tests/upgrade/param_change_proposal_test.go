@@ -7,7 +7,7 @@ import (
 
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/cli"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
-	govtypesv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
+	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -58,13 +58,14 @@ var _ = Describe("Upgrade - Fee parameter change proposal", func() {
 
 		By("waiting for the proposal to pass")
 		err = cli.WaitForChainHeight(cli.VALIDATOR0, cli.CLI_BINARY_NAME, currentHeight+20, cli.VOTING_PERIOD*3)
+		Expect(err).To(BeNil())
 	})
 
 	It("should check the proposal status to ensure it has passed", func() {
 		By("sending a QueryProposal query from `validator0` container")
-		proposal, err := cli.QueryProposalLegacy(cli.VALIDATOR0, "2")
+		proposal, err := cli.QueryProposal(cli.VALIDATOR0, "2")
 		Expect(err).To(BeNil())
-		Expect(proposal.Status).To(BeEquivalentTo(govtypesv1beta1.StatusPassed))
+		Expect(proposal.Status).To(BeEquivalentTo(govtypesv1.StatusPassed))
 	})
 
 	It("should validate the param change result with the expected outcome", func() {
@@ -74,7 +75,7 @@ var _ = Describe("Upgrade - Fee parameter change proposal", func() {
 
 		By("checking against the expected fee params")
 		var expectedFeeParams didtypes.FeeParams
-		err = Loader(filepath.Join(GENERATED_JSON_DIR, "expected", "param_change_did.json"), &expectedFeeParams)
+		err = Loader(filepath.Join(GENERATED_JSON_DIR, "proposal", "expected", "param_change_did.json"), &expectedFeeParams)
 		Expect(err).To(BeNil())
 		Expect(feeParams).To(Equal(expectedFeeParams))
 	})
