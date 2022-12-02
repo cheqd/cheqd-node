@@ -27,28 +27,28 @@ var _ = Describe("Upgrade - Fee parameter change proposal", func() {
 		By("sending a SubmitParamChangeProposal transaction from `validator0` container")
 		res, err := cli.SubmitParamChangeProposal(cli.VALIDATOR0, "param_change_did.json")
 		Expect(err).To(BeNil())
-		Expect(res.Code).To(Equal(0))
+		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 
 	It("should vote for the parameter change proposal from `validator0` container", func() {
 		By("sending a VoteProposal transaction from `validator0` container")
 		res, err := cli.VoteProposal(cli.VALIDATOR0, "2", "yes")
 		Expect(err).To(BeNil())
-		Expect(res.Code).To(Equal(0))
+		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 
 	It("should vote for the parameter change proposal from `validator1` container", func() {
 		By("sending a VoteProposal transaction from `validator1` container")
 		res, err := cli.VoteProposal(cli.VALIDATOR1, "2", "yes")
 		Expect(err).To(BeNil())
-		Expect(res.Code).To(Equal(0))
+		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 
 	It("should vote for the parameter change proposal from `validator2` container", func() {
 		By("sending a VoteProposal transaction from `validator2` container")
 		res, err := cli.VoteProposal(cli.VALIDATOR2, "2", "yes")
 		Expect(err).To(BeNil())
-		Expect(res.Code).To(Equal(0))
+		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 
 	It("should wait for the proposal to pass", func() {

@@ -62,6 +62,8 @@ func SubmitParamChangeProposal(container string, pathToDir ...string) (sdk.TxRes
 	// Skip 'gas estimate: xxx' string, trim 'Successfully migrated key' string
 	out = integrationhelpers.TrimImportedStdout(out)
 
+	fmt.Println("Output:", out)
+
 	var resp sdk.TxResponse
 
 	err = integrationhelpers.Codec.UnmarshalJSON([]byte(out), &resp)
