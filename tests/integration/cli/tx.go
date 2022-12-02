@@ -49,7 +49,7 @@ func Tx(module, tx, from string, feeParams []string, txArgs ...string) (sdk.TxRe
 	perLineOutput := strings.Split(output, "\n")
 	output, perLineOutput = helpers.TrimImportedStdout(perLineOutput)
 	if len(perLineOutput) > 2 {
-		output = helpers.TrimExtraLineOffset(output, 1)
+		output = helpers.TrimExtraLineOffset(output, 2)
 	} else {
 		output = perLineOutput[0]
 	}
