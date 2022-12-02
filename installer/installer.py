@@ -862,7 +862,7 @@ class Interviewer:
             print(f"{PRINT_PREFIX} {msg}")
 
     def is_already_installed(self) -> bool:
-        if os.path.exists(self.home_dir) and os.path.exists(self.cheqd_root_dir):
+        if os.path.exists(self.home_dir) and os.path.exists(os.path.join(self.cheqd_config_dir, 'genesis.json')):
             return True
         elif not os.path.exists(self.home_dir) and not os.path.exists(self.cheqd_root_dir):
             return False
