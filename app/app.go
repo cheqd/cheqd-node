@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 
-	migrations "github.com/cheqd/cheqd-node/app/migrations"
 	appparams "github.com/cheqd/cheqd-node/app/params"
 	posthandler "github.com/cheqd/cheqd-node/post"
 	did "github.com/cheqd/cheqd-node/x/did"
@@ -643,27 +642,6 @@ func New(
 
 	app.configurator = module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
 	app.mm.RegisterServices(app.configurator)
-
-	// Init Migrators
-	didMigrator := migrations.NewMigrator(app.appCodec, app.didKeeper, app.resourceKeeper, migrations.MigrateDidV1)
-	resourceMigrator := migrations.NewMigrator(app.appCodec, app.didKeeper, app.resourceKeeper, migrations.MigrateResourceV1)
-
-	// Register upgrade store migrations per module
-	if err := app.configurator.RegisterMigration(
-		didtypes.ModuleName,
-		app.mm.GetVersionMap()[didtypes.ModuleName],
-		didMigrator.Migrate,
-	); err != nil {
-		panic(err)
-	}
-
-	if err := app.configurator.RegisterMigration(
-		resourcetypes.ModuleName,
-		app.mm.GetVersionMap()[resourcetypes.ModuleName],
-		resourceMigrator.Migrate,
-	); err != nil {
-		panic(err)
-	}
 
 	// initialize stores
 	app.MountKVStores(keys)
