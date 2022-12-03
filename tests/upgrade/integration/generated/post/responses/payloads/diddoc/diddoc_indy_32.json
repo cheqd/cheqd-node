@@ -1,0 +1,88 @@
+{
+    "payload": {
+        "context": [
+            "abc",
+            "def"
+        ],
+        "id": "did:cheqd:testnet:H95Vr7VxXKDXoAWPNgdLxeihLYibSp1Q",
+        "controller": [
+            "did:cheqd:testnet:H95Vr7VxXKDXoAWPNgdLxeihLYibSp1Q"
+        ],
+        "verification_method": [
+            {
+                "id": "did:cheqd:testnet:H95Vr7VxXKDXoAWPNgdLxeihLYibSp1Q#key-1",
+                "type": "Ed25519VerificationKey2020",
+                "controller": "did:cheqd:testnet:H95Vr7VxXKDXoAWPNgdLxeihLYibSp1Q",
+                "public_key_jwk": [],
+                "public_key_multibase": "zEZ673G4y1tzG7ceqH9frgj2hJj14EiDjho3BwC9hcuz8"
+            },
+            {
+                "id": "did:cheqd:testnet:H95Vr7VxXKDXoAWPNgdLxeihLYibSp1Q#key-2",
+                "type": "Ed25519VerificationKey2020",
+                "controller": "did:cheqd:testnet:H95Vr7VxXKDXoAWPNgdLxeihLYibSp1Q",
+                "public_key_jwk": [],
+                "public_key_multibase": "z9uXTvgTyWZjr79CVgkgdzRSzApn7x4asDDMqDDro8D3k"
+            },
+            {
+                "id": "did:cheqd:testnet:H95Vr7VxXKDXoAWPNgdLxeihLYibSp1Q#key-3",
+                "type": "Ed25519VerificationKey2020",
+                "controller": "did:cheqd:testnet:H95Vr7VxXKDXoAWPNgdLxeihLYibSp1Q",
+                "public_key_jwk": [],
+                "public_key_multibase": "zCnaC3GEjg3dmGPGo3svUw8Lytu3HWJGpTVsVXnBUQJca"
+            },
+            {
+                "id": "did:cheqd:testnet:H95Vr7VxXKDXoAWPNgdLxeihLYibSp1Q#key-4",
+                "type": "Ed25519VerificationKey2020",
+                "controller": "did:cheqd:testnet:H95Vr7VxXKDXoAWPNgdLxeihLYibSp1Q",
+                "public_key_jwk": [],
+                "public_key_multibase": "z6yL88rhPLU4nFAUGLv1VLiTTXnV4At64PPJwCrEHjTw"
+            }
+        ],
+        "authentication": [
+            "did:cheqd:testnet:H95Vr7VxXKDXoAWPNgdLxeihLYibSp1Q#key-1",
+            "did:cheqd:testnet:H95Vr7VxXKDXoAWPNgdLxeihLYibSp1Q#key-2"
+        ],
+        "assertion_method": [
+            "did:cheqd:testnet:H95Vr7VxXKDXoAWPNgdLxeihLYibSp1Q#key-3"
+        ],
+        "capability_invocation": [
+            "did:cheqd:testnet:H95Vr7VxXKDXoAWPNgdLxeihLYibSp1Q#key-4",
+            "did:cheqd:testnet:H95Vr7VxXKDXoAWPNgdLxeihLYibSp1Q#key-1"
+        ],
+        "capability_delegation": [
+            "did:cheqd:testnet:H95Vr7VxXKDXoAWPNgdLxeihLYibSp1Q#key-4",
+            "did:cheqd:testnet:H95Vr7VxXKDXoAWPNgdLxeihLYibSp1Q#key-2"
+        ],
+        "key_agreement": [
+            "did:cheqd:testnet:H95Vr7VxXKDXoAWPNgdLxeihLYibSp1Q#key-1",
+            "did:cheqd:testnet:H95Vr7VxXKDXoAWPNgdLxeihLYibSp1Q#key-2",
+            "did:cheqd:testnet:H95Vr7VxXKDXoAWPNgdLxeihLYibSp1Q#key-3",
+            "did:cheqd:testnet:H95Vr7VxXKDXoAWPNgdLxeihLYibSp1Q#key-4"
+        ],
+        "service": [
+            {
+                "id": "did:cheqd:testnet:H95Vr7VxXKDXoAWPNgdLxeihLYibSp1Q#service-1",
+                "type": "type-1",
+                "service_endpoint": "endpoint-1"
+            }
+        ],
+        "also_known_as": [
+            "alias-1",
+            "alias-2"
+        ]
+    },
+    "signInput": [
+        {
+            "verificationMethodId": "did:cheqd:testnet:H95Vr7VxXKDXoAWPNgdLxeihLYibSp1Q#key-1",
+            "privateKey": "V+DHGMMA9O4fvIBM1gnyivbKxLudXrG1bHwMjnF4Xi3JYEmEn03givjkKTnAdQ8/DG5qfPU6qVoRUaBgNiwU+Q=="
+        }
+    ],
+    "metadata" : {
+        "created": "2021-01-02T00:00:00Z",
+        "updated": "2021-01-02T00:00:00Z",
+        "deactivated": false,
+        "versionId": "",
+        "nextVersionId": "",
+        "previousVersionId": ""
+    }
+}

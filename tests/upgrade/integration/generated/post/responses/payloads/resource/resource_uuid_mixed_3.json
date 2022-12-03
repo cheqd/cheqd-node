@@ -1,0 +1,24 @@
+{
+    "payload": {
+        "resource": {
+            "data": "eyAibWVzc2FnZSI6ICJoZWxsbyB3b3JsZCJ9"
+        },
+        "metadata": {
+            "collectionId": "C8113F5E-E124-4400-a3c8-109b4f6722ad",
+            "id": "76ecedeb-225d-4164-90c2-a4857ac3c01a",
+            "name": "UUID mixed",
+            "version": "",
+            "resource_type": "TestResourceTypeMixed23",
+            "also_known_as": [],
+            "media_type": "",
+            "previous_version_id": "b67d9bdc-b8f4-45fd-b5f6-1af38c26d4c8",
+            "next_version_id": ""
+        }
+    },
+    "signInput": [
+        {
+            "verificationMethodId": "did:cheqd:testnet:C8113F5E-E124-4400-a3c8-109b4f6722ad#key-1",
+            "privateKey": "x95rNwt5epP3755Y6A/lP822rE+oUmEtt4gs445soA0SV3E+3H5rRscvibF+NU9GC0K0cLRVjP4Q27pwUSMBkQ=="
+        }
+    ]
+}

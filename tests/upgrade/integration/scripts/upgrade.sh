@@ -10,6 +10,6 @@ pushd "$DIR/../../../../docker/localnet"
 docker compose --env-file mainnet-latest.env down
 
 # Start network
-docker compose --env-file build-latest.env up --detach --no-build
+# docker compose --env-file build-latest.env up --detach --no-build
 
 popd

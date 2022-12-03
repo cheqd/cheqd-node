@@ -1,0 +1,15 @@
+{
+    "payload": {
+        "collectionId": "C8113F5E-E124-4400-a3c8-109b4f6722ad",
+        "id": "f2f985da-62b5-457b-8167-54a0a739bdc4",
+        "name": "UUID mixed",
+        "resourceType": "TestResourceTypeMixed1",
+        "data": "eyAibWVzc2FnZSI6ICJoZWxsbyB3b3JsZCJ9"
+    },
+    "signInput": [
+        {
+            "verificationMethodId": "did:cheqd:testnet:C8113F5E-E124-4400-a3c8-109b4f6722ad#key-1",
+            "privateKey": "x95rNwt5epP3755Y6A/lP822rE+oUmEtt4gs445soA0SV3E+3H5rRscvibF+NU9GC0K0cLRVjP4Q27pwUSMBkQ=="
+        }
+    ]
+}

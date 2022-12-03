@@ -1,0 +1,24 @@
+{
+    "payload": {
+        "resource": {
+            "data": "eyAibWVzc2FnZSI6ICJoZWxsbyB3b3JsZCJ9"
+        },
+        "metadata": {
+            "collection_id": "HWdKrn8vpY6nVZEz",
+            "id": "7f2589aa-1279-4bd7-b704-f868772b460a",
+            "name": "Indy 16 symbols resource",
+            "version": "",
+            "resource_type": "TestResourceType",
+            "also_known_as": [],
+            "media_type": "",
+            "previous_version_id": "",
+            "next_version_id": ""
+        }
+    },
+    "signInput": [
+        {
+            "verificationMethodId": "did:cheqd:testnet:HWdKrn8vpY6nVZEz#key-1",
+            "privateKey": "dTHxupAW0yqeeIgqZkjndoWSbZ2kRjK2FMwI6bgtZR6aNYVzr6sn2zzT5zOUYPMflJu17gBqNH0tjp62SlLg/w=="
+        }
+    ]
+}
