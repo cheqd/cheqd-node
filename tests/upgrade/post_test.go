@@ -34,7 +34,7 @@ var _ = Describe("Upgrade - Post", func() {
 			By("matching the expected module version map")
 			res, err := cli.QueryModuleVersionMap(cli.VALIDATOR0)
 			Expect(err).To(BeNil())
-			Expect(ModuleVersionMap).To(Equal(res.ModuleVersions))
+			Expect(ModuleVersionMap.ModuleVersions).To(Equal(res.ModuleVersions))
 		})
 
 		/* It("should load and run expected diddoc payloads - case: create", func() {
