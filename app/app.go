@@ -728,6 +728,8 @@ func New(
 			fromVM[minttypes.ModuleName] = versionMap[minttypes.ModuleName]
 			// Skip staking module
 			fromVM[stakingtypes.ModuleName] = versionMap[stakingtypes.ModuleName]
+			// Skip did module (InitGenesis would alter namespace)
+			fromVM[didtypes.ModuleName] = versionMap[didtypes.ModuleName]
 
 			// ibc v3 -> v4 migration
 			// transfer module consensus version has been bumped to 2
