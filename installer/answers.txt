@@ -1,5 +1,5 @@
 2
-/home/runner/cheqd
+/home/runner/work/cheqd-node/cheqd-node
 yes
 mainnet
 yes
