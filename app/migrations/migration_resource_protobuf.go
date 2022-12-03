@@ -1,6 +1,7 @@
 package migrations
 
 import (
+	"encoding/hex"
 	"strings"
 
 	"github.com/cheqd/cheqd-node/app/migrations/helpers"
@@ -35,7 +36,7 @@ func MigrateResourceProtobuf(sctx sdk.Context, mctx MigrationContext) error {
 			AlsoKnownAs:       []*resourcetypes.AlternativeUri{},
 			MediaType:         oldHeader.MediaType,
 			Created:           oldHeader.Created,
-			Checksum:          oldHeader.Checksum,
+			Checksum:          hex.EncodeToString(oldHeader.Checksum),
 			PreviousVersionId: oldHeader.PreviousVersionId,
 			NextVersionId:     oldHeader.NextVersionId,
 		}

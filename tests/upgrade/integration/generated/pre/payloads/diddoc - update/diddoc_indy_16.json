@@ -1,0 +1,83 @@
+{
+    "payload": {
+        "context": [
+            "abc",
+            "def"
+        ],
+        "id": "did:cheqd:testnet:HWdKrn8vpY6nVZEz",
+        "controller": [
+            "did:cheqd:testnet:HWdKrn8vpY6nVZEz"
+        ],
+        "verification_method": [
+            {
+                "id": "did:cheqd:testnet:HWdKrn8vpY6nVZEz#key-1",
+                "type": "Ed25519VerificationKey2020",
+                "controller": "did:cheqd:testnet:HWdKrn8vpY6nVZEz",
+                "public_key_jwk": [],
+                "public_key_multibase": "zBNy7xYrzNb25mbVFP5hVZXwJZ7RD16yJSoya82qe3Jra"
+            },
+            {
+                "id": "did:cheqd:testnet:HWdKrn8vpY6nVZEz#key-2",
+                "type": "Ed25519VerificationKey2020",
+                "controller": "did:cheqd:testnet:HWdKrn8vpY6nVZEz",
+                "public_key_jwk": [],
+                "public_key_multibase": "zC4mnpocVYbywi32srkHzRdy7LEXQG4TM8YtCTPXWnza1"
+            },
+            {
+                "id": "did:cheqd:testnet:HWdKrn8vpY6nVZEz#key-3",
+                "type": "Ed25519VerificationKey2020",
+                "controller": "did:cheqd:testnet:HWdKrn8vpY6nVZEz",
+                "public_key_jwk": [],
+                "public_key_multibase": "zC1CAqqp2tQooisYtTh1oULGzKyRNQbsUtyqoh2neWPta"
+            },
+            {
+                "id": "did:cheqd:testnet:HWdKrn8vpY6nVZEz#key-4",
+                "type": "Ed25519VerificationKey2020",
+                "controller": "did:cheqd:testnet:HWdKrn8vpY6nVZEz",
+                "public_key_jwk": [],
+                "public_key_multibase": "zDw21irq4wBfyTvxAG9L8PQj6b79iyTyzyV6XVj9SfyRR"
+            }
+        ],
+        "authentication": [
+            "did:cheqd:testnet:HWdKrn8vpY6nVZEz#key-1"
+        ],
+        "assertion_method": [
+            "did:cheqd:testnet:HWdKrn8vpY6nVZEz#key-2",
+            "did:cheqd:testnet:HWdKrn8vpY6nVZEz#key-3"
+        ],
+        "capability_invocation": [
+            "did:cheqd:testnet:HWdKrn8vpY6nVZEz#key-4",
+            "did:cheqd:testnet:HWdKrn8vpY6nVZEz#key-1"
+        ],
+        "capability_delegation": [
+            "did:cheqd:testnet:HWdKrn8vpY6nVZEz#key-4",
+            "did:cheqd:testnet:HWdKrn8vpY6nVZEz#key-2"
+        ],
+        "key_agreement": [
+            "did:cheqd:testnet:HWdKrn8vpY6nVZEz#key-4"
+        ],
+        "service": [
+            {
+                "id": "did:cheqd:testnet:HWdKrn8vpY6nVZEz#service-1",
+                "type": "type-1",
+                "service_endpoint": "endpoint-1"
+            },
+            {
+                "id": "did:cheqd:testnet:HWdKrn8vpY6nVZEz#service-2",
+                "type": "type-1",
+                "service_endpoint": "endpoint-2"
+            }
+        ],
+        "also_known_as": [
+            "alias-1",
+            "alias-2",
+            "alias-3"
+        ]
+    },
+    "signInput": [
+        {
+            "verificationMethodId": "did:cheqd:testnet:HWdKrn8vpY6nVZEz#key-1",
+            "privateKey": "dTHxupAW0yqeeIgqZkjndoWSbZ2kRjK2FMwI6bgtZR6aNYVzr6sn2zzT5zOUYPMflJu17gBqNH0tjp62SlLg/w=="
+        }
+    ]
+}

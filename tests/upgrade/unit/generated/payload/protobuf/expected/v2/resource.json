@@ -9,7 +9,7 @@
         "Resource_Type": "test-resource-type",
         "Media_Type": "application/json",
         "Created": "2022-11-01T10:54:01Z",
-        "Checksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855eyAibWVzc2FnZSI6ICJoZWxsbyB3b3JsZCJ9",
+        "Checksum": "7b76f4738e36f7c7dcd5cd78f5a7db7f873cf7de9f6fddb8dbb69ee357b8eb8f5bf77e1c6b8f79f7dd5befce766fce797b20226d657373616765223a202268656c6c6f20776f726c64227d",
         "Previous_Version_Id": null,
         "Next_Version_Id": null
     }
