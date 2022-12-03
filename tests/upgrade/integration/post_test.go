@@ -25,7 +25,7 @@ var _ = Describe("Upgrade - Post", func() {
 		It("should match the expected module version map", func() {
 			By("loading the expected module version map")
 			var expected upgradetypes.QueryModuleVersionsResponse
-			_, err := Loader(filepath.Join(GENERATED_JSON_DIR, "post", "responses","module_version_map", "v1.json"), &expected)
+			_, err := Loader(filepath.Join(GENERATED_JSON_DIR, "post", "responses", "module_version_map", "v1.json"), &expected)
 			Expect(err).To(BeNil())
 
 			By("matching the expected module version map")

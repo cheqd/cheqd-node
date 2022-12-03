@@ -11,7 +11,6 @@ import (
 	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
 	govtypesv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
-	// "github.com/lestrrat-go/jwx/internal/json"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -26,7 +25,7 @@ var _ = Describe("Upgrade - Pre", func() {
 
 		It("should load and run existing diddoc payloads - case: create", func() {
 			By("matching the glob pattern for existing diddoc payloads")
-			ExistingDidDocCreatePayloads, err := RelGlob(GENERATED_JSON_DIR, "pre", "payloads", "diddoc", "*.json")
+			ExistingDidDocCreatePayloads, err := RelGlob(GENERATED_JSON_DIR, "pre", "payloads", "diddoc - create", "*.json")
 			Expect(err).To(BeNil())
 
 			for _, payload := range ExistingDidDocCreatePayloads {
@@ -41,6 +40,34 @@ var _ = Describe("Upgrade - Pre", func() {
 				Expect(err).To(BeNil())
 
 				res, err := cli.CreateDidLegacy(DidDocCreatePayload, DidDocCreateSignInput, cli.VALIDATOR0)
+				Expect(err).To(BeNil())
+				Expect(res.Code).To(BeEquivalentTo(0))
+			}
+		})
+
+		It("should load and run existing diddoc payloads - case: update", func() {
+			By("matching the glob pattern for existing diddoc payloads")
+			ExistingDidDocUpdatePayloads, err := RelGlob(GENERATED_JSON_DIR, "pre", "payloads", "diddoc - update", "*.json")
+			Expect(err).To(BeNil())
+
+			for _, payload := range ExistingDidDocUpdatePayloads {
+				var DidDocUpdatePayload didtypesv1.MsgUpdateDidPayload
+				var DidDocUpdateSignInput []cli.SignInput
+
+				testCase := GetCaseName(payload)
+				By("Running: " + testCase)
+
+				By("reading ")
+				DidDocUpdateSignInput, err = Loader(payload, &DidDocUpdatePayload)
+				Expect(err).To(BeNil())
+
+				resp, err := cli.QueryDidLegacy(DidDocUpdatePayload.Id, cli.VALIDATOR0)
+				Expect(err).To(BeNil())
+				Expect(resp.Did.Id).To(BeEquivalentTo(DidDocUpdatePayload.Id))
+
+				DidDocUpdatePayload.VersionId = resp.Metadata.VersionId
+
+				res, err := cli.UpdateDidLegacy(DidDocUpdatePayload, DidDocUpdateSignInput, cli.VALIDATOR0)
 				Expect(err).To(BeNil())
 				Expect(res.Code).To(BeEquivalentTo(0))
 			}
@@ -68,50 +95,17 @@ var _ = Describe("Upgrade - Pre", func() {
 
 				// TODO: Add resource file. Right now, it is not possible to create a resource without a file. So we need to copy a file to the container home directory.
 				res, err := cli.CreateResourceLegacy(
-					ResourceCreatePayload.CollectionId, 
-					ResourceCreatePayload.Id, 
-					ResourceCreatePayload.Name, 
-					ResourceCreatePayload.ResourceType, 
-					filepath.Base(ResourceFile), 
-					ResourceCreateSignInput, 
+					ResourceCreatePayload.CollectionId,
+					ResourceCreatePayload.Id,
+					ResourceCreatePayload.Name,
+					ResourceCreatePayload.ResourceType,
+					filepath.Base(ResourceFile),
+					ResourceCreateSignInput,
 					cli.VALIDATOR0)
 				Expect(err).To(BeNil())
 				Expect(res.Code).To(BeEquivalentTo(0))
 			}
 		})
-
-		// It("should load and run existing diddoc payloads - case: update", func() {
-		// 	By("matching the glob pattern for existing diddoc payloads")
-		// 	ExistingDidDocUpdatePayloads, err := RelGlob(GENERATED_JSON_DIR, "existing", "diddoc", "update", "*.json")
-		// 	Expect(err).To(BeNil())
-
-		// 	By("matching the glob pattern for existing diddoc sign input")
-		// 	ExistingSignInputUpdatePayloads, err := RelGlob(GENERATED_JSON_DIR, "existing", "diddoc", "update", "signinput", "*.json")
-		// 	Expect(err).To(BeNil())
-
-		// 	for i, payload := range ExistingDidDocUpdatePayloads {
-		// 		var DidDocUpdatePayload didtypesv1.MsgUpdateDidPayload
-		// 		var DidDocUpdateSignInput []cli.SignInput
-
-		// 		testCase := GetCaseName(payload)
-		// 		By("Running: " + testCase)
-		// 		err = Loader(payload, &DidDocUpdatePayload)
-		// 		Expect(err).To(BeNil())
-
-		// 		err = Loader(ExistingSignInputUpdatePayloads[i], &DidDocUpdateSignInput)
-		// 		Expect(err).To(BeNil())
-
-		// 		q, err := cli.QueryDidLegacy(DidDocUpdatePayload.Id, cli.VALIDATOR0)
-		// 		Expect(err).To(BeNil())
-		// 		Expect(q.Did.Id).To(BeEquivalentTo(DidDocUpdatePayload.Id))
-
-		// 		DidDocUpdatePayload.VersionId = q.Metadata.VersionId
-
-		// 		res, err := cli.UpdateDidLegacy(DidDocUpdatePayload, DidDocUpdateSignInput, cli.VALIDATOR0)
-		// 		Expect(err).To(BeNil())
-		// 		Expect(res.Code).To(BeEquivalentTo(0))
-		// 	}
-		// })
 
 		var UPGRADE_HEIGHT int64
 		var VOTING_END_HEIGHT int64
