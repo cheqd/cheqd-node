@@ -78,3 +78,18 @@ jobs:
         with:
           name: cheqd-node-build.tar
           path: /tmp/cheqd-node-build.tar
+
+  interactive-installer:
+    name: "Interactive Installer"
+    runs-on: ubuntu-latest
+  
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Debugging with tmate
+        uses: mxschmitt/action-tmate@v3.13
+
+      - name: "Run interactive installer"
+        working-directory: ./installer
+        run: |
+          sudo bash -c "python3 installer.py < answers.txt"
