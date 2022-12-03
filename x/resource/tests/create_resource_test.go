@@ -23,7 +23,13 @@ func ExpectPayloadToMatchResource(payload *resourcetypes.MsgCreateResourcePayloa
 	Expect(payload.CollectionId).To(Equal(resource.Metadata.CollectionId))
 	Expect(payload.Name).To(Equal(resource.Metadata.Name))
 	Expect(payload.ResourceType).To(Equal(resource.Metadata.ResourceType))
-	Expect(payload.AlsoKnownAs).To(Equal(resource.Metadata.AlsoKnownAs))
+
+	defaultAlternativeUrl := resourcetypes.AlternativeUri{
+		Uri:         "did:cheqd:" + didsetup.DID_NAMESPACE + ":" + payload.CollectionId + "/resources/" + payload.Id,
+		Description: "did-url",
+	}
+
+	Expect(append(payload.AlsoKnownAs, &defaultAlternativeUrl)).To(Equal(resource.Metadata.AlsoKnownAs))
 
 	// Generated header
 	hash := sha256.Sum256(payload.Data)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"time"
 
 	"github.com/cheqd/cheqd-node/x/resource/utils"
@@ -13,6 +14,11 @@ import (
 	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+)
+
+const (
+	DefaultAlternativeUriTemplate    = "did:cheqd:%s:%s/resources/%s"
+	DefaultAlternaticeUriDescription = "did-url"
 )
 
 func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateResource) (*types.MsgCreateResourceResponse, error) {
@@ -62,22 +68,15 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	resource.Metadata.Created = ctx.BlockTime().Format(time.RFC3339)
 	resource.Metadata.MediaType = utils.DetectMediaType(resource.Resource.Data)
 
-	// Find previous version and upgrade backward and forward version links
-	previousResourceVersionHeader, found := k.GetLastResourceVersionMetadata(&ctx, resource.Metadata.CollectionId, resource.Metadata.Name, resource.Metadata.ResourceType)
-	if found {
-		// Set links
-		previousResourceVersionHeader.NextVersionId = resource.Metadata.Id
-		resource.Metadata.PreviousVersionId = previousResourceVersionHeader.Id
-
-		// Update previous version
-		err := k.UpdateResourceMetadata(&ctx, &previousResourceVersionHeader)
-		if err != nil {
-			return nil, err
-		}
+	// Add default resource alternative url
+	defaultAlternativeUrl := types.AlternativeUri{
+		Uri:         fmt.Sprintf(DefaultAlternativeUriTemplate, namespace, msg.Payload.CollectionId, msg.Payload.Id),
+		Description: DefaultAlternaticeUriDescription,
 	}
+	resource.Metadata.AlsoKnownAs = append(resource.Metadata.AlsoKnownAs, &defaultAlternativeUrl)
 
 	// Persist resource
-	err = k.SetResource(&ctx, &resource)
+	err = k.AddNewResourceVersion(&ctx, &resource)
 	if err != nil {
 		return nil, types.ErrInternal.Wrapf(err.Error())
 	}
