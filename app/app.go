@@ -694,7 +694,7 @@ func New(
 			stakingSubspace := app.GetSubspace(stakingtypes.ModuleName)
 			stakingSubspace.Set(ctx, stakingtypes.KeyMinCommissionRate, sdk.NewDec(0))
 
-			// Get version map from previous upgrade
+			// Get version map from current upgrade
 			versionMap := app.mm.GetVersionMap()
 			// Skip capability module
 			fromVM[capabilitytypes.ModuleName] = versionMap[capabilitytypes.ModuleName]
@@ -708,6 +708,8 @@ func New(
 			fromVM[stakingtypes.ModuleName] = versionMap[stakingtypes.ModuleName]
 			// Skip did module (InitGenesis would alter namespace)
 			fromVM[didtypes.ModuleName] = versionMap[didtypes.ModuleName]
+			// Skip resource module
+			fromVM[resourcetypes.ModuleName] = versionMap[resourcetypes.ModuleName]
 
 			// ibc v3 -> v4 migration
 			// transfer module consensus version has been bumped to 2
