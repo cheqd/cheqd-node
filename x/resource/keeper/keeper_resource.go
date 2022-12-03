@@ -40,6 +40,26 @@ func (k Keeper) SetResourceCount(ctx *sdk.Context, count uint64) {
 	store.Set(byteKey, bz)
 }
 
+func (k Keeper) AddNewResourceVersion(ctx *sdk.Context, resource *types.ResourceWithMetadata) error {
+	// Find previous version and upgrade backward and forward version links
+	previousResourceVersionHeader, found := k.GetLastResourceVersionMetadata(ctx, resource.Metadata.CollectionId, resource.Metadata.Name, resource.Metadata.ResourceType)
+	if found {
+		// Set links
+		previousResourceVersionHeader.NextVersionId = resource.Metadata.Id
+		resource.Metadata.PreviousVersionId = previousResourceVersionHeader.Id
+
+		// Update previous version
+		err := k.UpdateResourceMetadata(ctx, &previousResourceVersionHeader)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Set new version
+	err := k.SetResource(ctx, resource)
+	return err
+}
+
 // SetResource create or update a specific resource in the store
 func (k Keeper) SetResource(ctx *sdk.Context, resource *types.ResourceWithMetadata) error {
 	if !k.HasResource(ctx, resource.Metadata.CollectionId, resource.Metadata.Id) {
@@ -157,33 +177,35 @@ func (k Keeper) UpdateResourceMetadata(ctx *sdk.Context, metadata *types.Metadat
 	return nil
 }
 
-// GetAllResources returns all resources as a list
-// Loads everything in memory. Use only for genesis export!
-func (k Keeper) GetAllResources(ctx *sdk.Context) (list []types.ResourceWithMetadata) {
-	metadataIterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.storeKey), didutils.StrBytes(types.ResourceMetadataKey))
-	dataIterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.storeKey), didutils.StrBytes(types.ResourceDataKey))
+func (k Keeper) IterateAllResourceMetadatas(ctx *sdk.Context, callback func(metadata types.Metadata) (continue_ bool)) {
+	headerIterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.storeKey), didutils.StrBytes(types.ResourceMetadataKey))
+	defer closeIteratorOrPanic(headerIterator)
 
-	defer closeIteratorOrPanic(metadataIterator)
-	defer closeIteratorOrPanic(dataIterator)
+	for headerIterator.Valid() {
+		var val types.Metadata
+		k.cdc.MustUnmarshal(headerIterator.Value(), &val)
 
-	for metadataIterator.Valid() {
-		if !dataIterator.Valid() {
-			panic("number of headers and data don't match")
+		if !callback(val) {
+			break
 		}
 
-		var metadata types.Metadata
-		k.cdc.MustUnmarshal(metadataIterator.Value(), &metadata)
-
-		data := types.Resource{Data: dataIterator.Value()}
-
-		list = append(list, types.ResourceWithMetadata{
-			Metadata: &metadata,
-			Resource: &data,
-		})
-
-		metadataIterator.Next()
-		dataIterator.Next()
+		headerIterator.Next()
 	}
+}
+
+// GetAllResources returns all resources as a list
+// Loads everything in memory. Use only for genesis export!
+func (k Keeper) GetAllResources(ctx *sdk.Context) (list []types.ResourceWithMetadata, err_ error) {
+	k.IterateAllResourceMetadatas(ctx, func(metadata types.Metadata) bool {
+		resource, err := k.GetResource(ctx, metadata.CollectionId, metadata.Id)
+		if err != nil {
+			err_ = err
+			return false
+		}
+
+		list = append(list, resource)
+		return true
+	})
 
 	return
 }
