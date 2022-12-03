@@ -1,8 +1,6 @@
 package keeper_test
 
 import (
-	"testing"
-
 	"github.com/stretchr/testify/suite"
 
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
@@ -13,6 +11,9 @@ import (
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/params/types/proposal"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 type HandlerTestSuite struct {
@@ -23,36 +24,53 @@ type HandlerTestSuite struct {
 	govHandler govv1beta1.Handler
 }
 
-func (suite *HandlerTestSuite) SetupTest() {
-	suite.app = cheqdsimapp.Setup(suite.T(), false)
+func (suite *HandlerTestSuite) SetupTest() error {
+	var err error
+	suite.app, err = cheqdsimapp.Setup(false)
+	if err != nil {
+		return err
+	}
 	suite.ctx = suite.app.BaseApp.NewContext(false, tmproto.Header{})
 	suite.govHandler = params.NewParamChangeProposalHandler(suite.app.ParamsKeeper)
+	return nil
 }
 
-func TestHandlerTestSuite(t *testing.T) {
-	suite.Run(t, new(HandlerTestSuite))
-}
+// func TestHandlerTestSuite(t *testing.T) {
+// 	suite.Run(t, new(HandlerTestSuite))
+// }
 
 func testProposal(changes ...proposal.ParamChange) *proposal.ParameterChangeProposal {
 	return proposal.NewParameterChangeProposal("title", "description", changes)
 }
 
-func (suite *HandlerTestSuite) TestProposalHandler() {
-	testCases := []struct {
-		name     string
-		proposal *proposal.ParameterChangeProposal
-		onHandle func()
-		expErr   bool
-		errMsg   string
-	}{
-		{
-			"all fields",
+type TestCaseKeeperProposal struct {
+	proposal *proposal.ParameterChangeProposal
+	onHandle func(*HandlerTestSuite)
+	expErr   bool
+	errMsg   string
+}
+
+var _ = DescribeTable("Proposal Handler", func(testcase TestCaseKeeperProposal) {
+	handlerSuite := new(HandlerTestSuite)
+	err := handlerSuite.SetupTest()
+	Expect(err).To(BeNil())
+
+	err = handlerSuite.govHandler(handlerSuite.ctx, testcase.proposal)
+	if testcase.expErr {
+		Expect(err).NotTo(BeNil())
+	} else {
+		Expect(err).To(BeNil())
+		testcase.onHandle(handlerSuite)
+	}
+},
+	Entry("all fields",
+		TestCaseKeeperProposal{
 			testProposal(proposal.ParamChange{
 				Subspace: resourcetypes.ModuleName,
 				Key:      string(resourcetypes.ParamStoreKeyFeeParams),
 				Value:    `{"image": {"denom": "ncheq", "amount": "10000000000"}, "json": {"denom": "ncheq", "amount": "4000000000"}, "default": {"denom": "ncheq", "amount": "2000000000"}, "burn_factor": "0.600000000000000000"}`,
 			}),
-			func() {
+			func(handlerSuite *HandlerTestSuite) {
 				expectedFeeParams := resourcetypes.FeeParams{
 					Image:      sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdk.NewInt(10000000000)},
 					Json:       sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdk.NewInt(4000000000)},
@@ -60,102 +78,88 @@ func (suite *HandlerTestSuite) TestProposalHandler() {
 					BurnFactor: sdk.MustNewDecFromStr("0.600000000000000000"),
 				}
 
-				feeParams := suite.app.ResourceKeeper.GetParams(suite.ctx)
+				feeParams := handlerSuite.app.ResourceKeeper.GetParams(handlerSuite.ctx)
 
-				suite.Require().Equal(expectedFeeParams, feeParams)
+				Expect(expectedFeeParams).To(Equal(feeParams))
 			},
 			false,
 			"",
-		},
-		{
-			"empty value",
+		}),
+	Entry("empty value",
+		TestCaseKeeperProposal{
 			testProposal(proposal.ParamChange{
 				Subspace: resourcetypes.ModuleName,
 				Key:      string(resourcetypes.ParamStoreKeyFeeParams),
 				Value:    `{}`,
 			}),
-			func() {},
+			func(*HandlerTestSuite) {},
 			true,
 			"",
-		},
-		{
-			"omit fields",
+		}),
+	Entry("omit fields",
+		TestCaseKeeperProposal{
 			testProposal(proposal.ParamChange{
 				Subspace: resourcetypes.ModuleName,
 				Key:      string(resourcetypes.ParamStoreKeyFeeParams),
 				Value:    `{"image": {"denom": "ncheq", "amount": "10000000000"}, "json": {"denom": "ncheq", "amount": "4000000000"}, "burn_factor": "0.600000000000000000"}`,
 			}),
-			func() {},
+			func(*HandlerTestSuite) {},
 			true,
 			"",
-		},
-		{
-			"invalid value: case `image` amount 0",
+		}),
+	Entry("invalid value: case `image` amount 0",
+		TestCaseKeeperProposal{
 			testProposal(proposal.ParamChange{
 				Subspace: resourcetypes.ModuleName,
 				Key:      string(resourcetypes.ParamStoreKeyFeeParams),
 				Value:    `{"image": {"denom": "ncheq", "amount": "0"}, "json": {"denom": "ncheq", "amount": "4000000000"}, "default": {"denom": "ncheq", "amount": "2000000000"}, "burn_factor": "0.600000000000000000"}`,
 			}),
-			func() {},
+			func(*HandlerTestSuite) {},
 			true,
 			"",
-		},
-		{
-			"invalid value: case `json` amount 0",
+		}),
+	Entry("invalid value: case `json` amount 0",
+		TestCaseKeeperProposal{
 			testProposal(proposal.ParamChange{
 				Subspace: resourcetypes.ModuleName,
 				Key:      string(resourcetypes.ParamStoreKeyFeeParams),
 				Value:    `{"image": {"denom": "ncheq", "amount": "10000000000"}, "json": {"denom": "ncheq", "amount": "0"}, "default": {"denom": "ncheq", "amount": "2000000000"}, "burn_factor": "0.600000000000000000"}`,
 			}),
-			func() {},
+			func(*HandlerTestSuite) {},
 			true,
 			"",
-		},
-		{
-			"invalid value: case `default` amount 0",
+		}),
+	Entry("invalid value: case `default` amount 0",
+		TestCaseKeeperProposal{
 			testProposal(proposal.ParamChange{
 				Subspace: resourcetypes.ModuleName,
 				Key:      string(resourcetypes.ParamStoreKeyFeeParams),
 				Value:    `{"image": {"denom": "ncheq", "amount": "10000000000"}, "json": {"denom": "ncheq", "amount": "4000000000"}, "default": {"denom": "ncheq", "amount": "0"}, "burn_factor": "0.600000000000000000"}`,
 			}),
-			func() {},
+			func(*HandlerTestSuite) {},
 			true,
 			"",
-		},
-		{
-			"invalid value: case `burn_factor` -1",
+		}),
+	Entry("invalid value: case `burn_factor` -1",
+		TestCaseKeeperProposal{
 			testProposal(proposal.ParamChange{
 				Subspace: resourcetypes.ModuleName,
 				Key:      string(resourcetypes.ParamStoreKeyFeeParams),
 				Value:    `{"image": {"denom": "ncheq", "amount": "10000000000"}, "json": {"denom": "ncheq", "amount": "4000000000"}, "default": {"denom": "ncheq", "amount": "2000000000"}, "burn_factor": "-1"}`,
 			}),
-			func() {},
+			func(*HandlerTestSuite) {},
 			true,
 			"",
-		},
-		{
-			"invalid value: case `burn_factor` 1.1",
+		}),
+	Entry("invalid value: case `burn_factor` 1.1",
+		TestCaseKeeperProposal{
 			testProposal(proposal.ParamChange{
 				Subspace: resourcetypes.ModuleName,
 				Key:      string(resourcetypes.ParamStoreKeyFeeParams),
 				Value:    `{"image": {"denom": "ncheq", "amount": "10000000000"}, "json": {"denom": "ncheq", "amount": "4000000000"}, "default": {"denom": "ncheq", "amount": "2000000000"}, "burn_factor": "1.1"}`,
 			}),
-			func() {},
+			func(*HandlerTestSuite) {},
 			true,
 			"",
-		},
-	}
-
-	for _, tc := range testCases {
-		tc := tc
-		suite.Run(tc.name, func() {
-			err := suite.govHandler(suite.ctx, tc.proposal)
-			if tc.expErr {
-				suite.Require().Error(err)
-			} else {
-				suite.Require().NoError(err)
-				tc.onHandle()
-			}
-		})
-	}
-}
+		}),
+)

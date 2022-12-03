@@ -3,7 +3,6 @@ package ante_test
 import (
 	"errors"
 	"fmt"
-	"testing"
 
 	"github.com/stretchr/testify/suite"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
@@ -43,8 +42,11 @@ type AnteTestSuite struct {
 }
 
 // returns context and app with params set on account keeper
-func createTestApp(t *testing.T, isCheckTx bool) (*simapp.SimApp, sdk.Context) {
-	app := simapp.Setup(t, isCheckTx)
+func createTestApp(isCheckTx bool) (*simapp.SimApp, sdk.Context, error) {
+	app, err := simapp.Setup(isCheckTx)
+	if err != nil {
+		return nil, sdk.Context{}, err
+	}
 	ctx := app.BaseApp.NewContext(isCheckTx, tmproto.Header{})
 	app.AccountKeeper.SetParams(ctx, authtypes.DefaultParams())
 
@@ -54,18 +56,21 @@ func createTestApp(t *testing.T, isCheckTx bool) (*simapp.SimApp, sdk.Context) {
 	resourceFeeParams := resourcetypes.DefaultGenesis().FeeParams
 	app.ResourceKeeper.SetParams(ctx, *resourceFeeParams)
 
-	return app, ctx
+	return app, ctx, nil
 }
 
-func TestAnteTestSuite(t *testing.T) {
-	suite.Run(t, new(AnteTestSuite))
-}
+// func TestAnteTestSuite(t *testing.T) {
+// 	suite.Run(t, new(AnteTestSuite))
+// }
 
 // SetupTest setups a new test, with new app, context, and anteHandler.
-func (s *AnteTestSuite) SetupTest(isCheckTx bool) {
-	s.app, s.ctx = createTestApp(s.T(), isCheckTx)
+func (s *AnteTestSuite) SetupTest(isCheckTx bool) error {
+	var err error
+	s.app, s.ctx, err = createTestApp(isCheckTx)
+	if err != nil {
+		return err
+	}
 	s.ctx = s.ctx.WithBlockHeight(1)
-
 	// Set up TxConfig.
 	encodingConfig := cheqdapp.MakeTestEncodingConfig()
 	// We're using TestMsg encoding in some tests, so register it here.
@@ -86,35 +91,43 @@ func (s *AnteTestSuite) SetupTest(isCheckTx bool) {
 			SigGasConsumer:  sdkante.DefaultSigVerificationGasConsumer,
 		},
 	)
-
-	s.Require().NoError(err)
+	if err != nil {
+		return err
+	}
 	s.anteHandler = anteHandler
+	return nil
 }
 
 // CreateTestAccounts creates `numAccs` accounts, and return all relevant
 // information about them including their private keys.
-func (s *AnteTestSuite) CreateTestAccounts(numAccs int) []TestAccount {
+func (s *AnteTestSuite) CreateTestAccounts(numAccs int) ([]TestAccount, error) {
 	var accounts []TestAccount
 
 	for i := 0; i < numAccs; i++ {
 		priv, _, addr := testdata.KeyTestPubAddr()
 		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr)
 		err := acc.SetAccountNumber(uint64(i))
-		s.Require().NoError(err)
+		if err != nil {
+			return nil, err
+		}
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
 		someCoins := sdk.Coins{
 			sdk.NewInt64Coin("ncheq", 1000000*1e9), // 1mn CHEQ
 		}
 		err = s.app.BankKeeper.MintCoins(s.ctx, minttypes.ModuleName, someCoins)
-		s.Require().NoError(err)
+		if err != nil {
+			return nil, err
+		}
 
 		err = s.app.BankKeeper.SendCoinsFromModuleToAccount(s.ctx, minttypes.ModuleName, addr, someCoins)
-		s.Require().NoError(err)
+		if err != nil {
+			return nil, err
+		}
 
 		accounts = append(accounts, TestAccount{acc, priv})
 	}
 
-	return accounts
+	return accounts, nil
 }
 
 // CreateTestTx is a helper function to create a tx given multiple inputs.
