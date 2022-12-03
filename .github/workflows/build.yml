@@ -89,7 +89,7 @@ jobs:
       - name: "Test interactive installer"
         working-directory: ./installer
         run: |
-          sudo bash -c "python3 installer.py < answers.txt"
+          sudo bash -c "python3 installer.py 1 < answers.txt"
 
       - name: Debugging with tmate
         if: ${{ failure() }}
