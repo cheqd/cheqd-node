@@ -28,7 +28,7 @@ message Metadata {
 
   string media_type = 7;
   string created = 8;
-  bytes checksum = 9;
+  string checksum = 9;
   string previous_version_id = 10;
   string next_version_id = 11;
 }
