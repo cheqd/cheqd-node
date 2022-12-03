@@ -3,20 +3,20 @@
 package upgrade
 
 import (
-	// "path/filepath"
+	"path/filepath"
 
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/cli"
 	// didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	// resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
-	// upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Upgrade - Post", func() {
 	Context("After a software upgrade execution has concluded", func() {
-		/* var ModuleVersionMap upgradetypes.QueryModuleVersionsResponse
-		var DidDocCreateRecord didtypesv1.Did
+		var ModuleVersionMap upgradetypes.QueryModuleVersionsResponse
+		/* var DidDocCreateRecord didtypesv1.Did
 		var DidDocUpdateRecord didtypesv1.Did
 		var ResourceCreateRecord resourcetypesv1.ResourceHeader
 		var err error */
@@ -27,9 +27,9 @@ var _ = Describe("Upgrade - Post", func() {
 			Expect(err).To(BeNil())
 		})
 
-		/* It("should match the expected module version map", func() {
+		It("should match the expected module version map", func() {
 			By("loading the expected module version map")
-			err = Loader(filepath.Join(GENERATED_JSON_DIR, "expected", "module_version_map", "v1.json"), &ModuleVersionMap)
+			err := Loader(filepath.Join(GENERATED_JSON_DIR, "expected", "module_version_map", "v1.json"), &ModuleVersionMap)
 
 			By("matching the expected module version map")
 			res, err := cli.QueryModuleVersionMap(cli.VALIDATOR0)
@@ -37,7 +37,7 @@ var _ = Describe("Upgrade - Post", func() {
 			Expect(ModuleVersionMap).To(Equal(res.ModuleVersions))
 		})
 
-		It("should load and run expected diddoc payloads - case: create", func() {
+		/* It("should load and run expected diddoc payloads - case: create", func() {
 			By("matching the glob pattern for existing diddoc payloads")
 			ExpectedDidDocCreateRecords, err = Glob(filepath.Join(GENERATED_JSON_DIR, "expected", "diddoc", "create", "*.json"))
 			Expect(err).To(BeNil())
