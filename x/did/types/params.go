@@ -42,14 +42,6 @@ func (tfp *FeeParams) ValidateBasic() error {
 		return fmt.Errorf("invalid deactivate did tx fee: %s", tfp.DeactivateDid)
 	}
 
-	if !tfp.CreateDid.IsGTE(tfp.UpdateDid) {
-		return fmt.Errorf("create did tx fee must be greater than or equal to update did tx fee: %s >= %s", tfp.CreateDid, tfp.UpdateDid)
-	}
-
-	if tfp.UpdateDid.IsLTE(tfp.DeactivateDid) {
-		return fmt.Errorf("update did tx fee must be greater than deactivate did tx fee: %s > %s", tfp.UpdateDid, tfp.DeactivateDid)
-	}
-
 	if !tfp.BurnFactor.IsPositive() || tfp.BurnFactor.GTE(sdk.OneDec()) {
 		return fmt.Errorf("invalid burn factor: %s", tfp.BurnFactor)
 	}

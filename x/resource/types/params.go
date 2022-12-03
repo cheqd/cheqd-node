@@ -40,14 +40,6 @@ func (tfp *FeeParams) ValidateBasic() error {
 		return fmt.Errorf("invalid create resource default tx fee: %s", tfp.Json)
 	}
 
-	if !tfp.Image.IsGTE(tfp.Json) {
-		return fmt.Errorf("create resource image tx fee must be greater than or equal to create resource json tx fee: %s >= %s", tfp.Image, tfp.Json)
-	}
-
-	if tfp.Json.IsLTE(tfp.Default) {
-		return fmt.Errorf("create resource json tx fee must be greater than create resource default tx fee: %s > %s", tfp.Json, tfp.Default)
-	}
-
 	if !tfp.BurnFactor.IsPositive() || tfp.BurnFactor.GTE(sdk.OneDec()) {
 		return fmt.Errorf("invalid burn factor: %s", tfp.BurnFactor)
 	}
