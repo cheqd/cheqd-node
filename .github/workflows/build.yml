@@ -86,10 +86,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: "Run interactive installer"
+      - name: "Test interactive installer"
         working-directory: ./installer
         run: |
           sudo bash -c "python3 installer.py < answers.txt"
 
       - name: Debugging with tmate
+        if: ${{ failure() }}
         uses: mxschmitt/action-tmate@v3.13
