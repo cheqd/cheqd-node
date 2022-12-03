@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	govtypesv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
@@ -83,6 +84,22 @@ func QueryDidFeeParams(container, subspace, key string) (didtypes.FeeParams, err
 	err = MakeCodecWithExtendedRegistry().UnmarshalJSON([]byte(params.Value), &feeParams)
 	if err != nil {
 		return didtypes.FeeParams{}, err
+	}
+
+	return feeParams, nil
+}
+
+func QueryResourceFeeParams(container, subspace, key string) (resourcetypes.FeeParams, error) {
+	params, err := QueryParams(container, subspace, key)
+	if err != nil {
+		return resourcetypes.FeeParams{}, err
+	}
+
+	var feeParams resourcetypes.FeeParams
+
+	err = MakeCodecWithExtendedRegistry().UnmarshalJSON([]byte(params.Value), &feeParams)
+	if err != nil {
+		return resourcetypes.FeeParams{}, err
 	}
 
 	return feeParams, nil
