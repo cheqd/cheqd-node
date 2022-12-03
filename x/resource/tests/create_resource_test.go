@@ -2,6 +2,7 @@ package tests
 
 import (
 	"crypto/sha256"
+	"encoding/hex"
 	"strings"
 
 	. "github.com/cheqd/cheqd-node/x/resource/tests/setup"
@@ -22,11 +23,18 @@ func ExpectPayloadToMatchResource(payload *resourcetypes.MsgCreateResourcePayloa
 	Expect(payload.CollectionId).To(Equal(resource.Metadata.CollectionId))
 	Expect(payload.Name).To(Equal(resource.Metadata.Name))
 	Expect(payload.ResourceType).To(Equal(resource.Metadata.ResourceType))
-	Expect(payload.AlsoKnownAs).To(Equal(resource.Metadata.AlsoKnownAs))
+
+	defaultAlternativeUrl := resourcetypes.AlternativeUri{
+		Uri:         "did:cheqd:" + didsetup.DID_NAMESPACE + ":" + payload.CollectionId + "/resources/" + payload.Id,
+		Description: "did-url",
+	}
+
+	Expect(append(payload.AlsoKnownAs, &defaultAlternativeUrl)).To(Equal(resource.Metadata.AlsoKnownAs))
 
 	// Generated header
 	hash := sha256.Sum256(payload.Data)
-	Expect(resource.Metadata.Checksum).To(Equal(hash[:]))
+	hex := hex.EncodeToString(hash[:])
+	Expect(resource.Metadata.Checksum).To(Equal(hex))
 
 	// Provided data
 	Expect(payload.Data).To(Equal(resource.Resource.Data))
