@@ -1,5 +1,3 @@
-
-
 package integration
 
 import (
@@ -15,7 +13,6 @@ import (
 
 var _ = Describe("Upgrade - Post", func() {
 	Context("After a software upgrade execution has concluded", func() {
-
 		It("should wait for node catching up", func() {
 			By("pinging the node status until catching up is flagged as false")
 			err := cli.WaitForCaughtUp(cli.VALIDATOR0, cli.CLI_BINARY_NAME, cli.VOTING_PERIOD*6)
@@ -50,7 +47,7 @@ var _ = Describe("Upgrade - Post", func() {
 
 				res, err := cli.QueryDid(DidDocUpdateRecord.Id, cli.VALIDATOR0)
 				Expect(err).To(BeNil())
-				
+
 				if DidDocUpdateRecord.Context == nil {
 					DidDocUpdateRecord.Context = []string{}
 				}
@@ -98,7 +95,7 @@ var _ = Describe("Upgrade - Post", func() {
 				// Right now, this will fail.
 				// Specifically, the resource is written successfully, but the collectionId will report the resource as not found.
 				res, err := cli.QueryResource(ResourceCreateRecord.Metadata.CollectionId, ResourceCreateRecord.Metadata.Id, cli.VALIDATOR0)
-				
+
 				Expect(err).To(BeNil())
 				Expect(res.Resource.Metadata.Id).To(Equal(ResourceCreateRecord.Metadata.Id))
 				Expect(res.Resource.Metadata.CollectionId).To(Equal(ResourceCreateRecord.Metadata.CollectionId))
@@ -112,7 +109,6 @@ var _ = Describe("Upgrade - Post", func() {
 				Expect(res.Resource.Metadata.Checksum).To(Equal(ResourceCreateRecord.Metadata.Checksum))
 				Expect(res.Resource.Metadata.PreviousVersionId).To(Equal(ResourceCreateRecord.Metadata.PreviousVersionId))
 				Expect(res.Resource.Metadata.NextVersionId).To(Equal(ResourceCreateRecord.Metadata.NextVersionId))
-				
 
 				// TODO: Add v1 -> v2 deep comparison cases, after defining the migration handlers.
 				// e.g.: Migration to Indy format, uuid lowercasing, etc.

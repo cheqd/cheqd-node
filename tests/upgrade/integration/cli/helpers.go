@@ -50,7 +50,7 @@ type DefaultNodeInfoOther struct {
 }
 
 type TestGeneratedStructureV1 struct {
-	Payload any
+	Payload   any
 	SignInput []SignInput
 }
 

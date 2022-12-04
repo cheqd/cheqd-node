@@ -26,6 +26,9 @@ func Loader(path string, payload interface{}) ([]SignInput, error) {
 	}
 
 	payload_bytes, err := json.Marshal(tc.Payload)
+	if err != nil {
+		return []SignInput{}, err
+	}
 
 	switch payload := payload.(type) {
 	case *didtypesv1.MsgCreateDidPayload:
