@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
+
+	helpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 )
 
 func GetCaseName(path string) string {
@@ -17,4 +19,8 @@ func GetCaseName(path string) string {
 func GetFile(path string) string {
 	split := strings.Split(path, string(filepath.Separator))
 	return split[len(split)-1]
+}
+
+func CreateTestJson(dir string, content []byte) (string, error) {
+	return helpers.WriteTmpFile(dir, content)
 }

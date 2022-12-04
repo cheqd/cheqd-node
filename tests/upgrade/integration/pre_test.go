@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	integrationtestdata "github.com/cheqd/cheqd-node/tests/integration/testdata"
+	// integrationtestdata "github.com/cheqd/cheqd-node/tests/integration/testdata"
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/cli"
 	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
@@ -78,12 +78,6 @@ var _ = Describe("Upgrade - Pre", func() {
 			ExistingResourceCreatePayloads, err := RelGlob(GENERATED_JSON_DIR, "pre", "payloads", "resource", "*.json")
 			Expect(err).To(BeNil())
 
-			By("copying the existing resource file to the container")
-			ResourceFile, err := integrationtestdata.CreateTestJson(GinkgoT().TempDir())
-			Expect(err).To(BeNil())
-			_, err = cli.LocalnetExecCopyAbsoluteWithPermissions(ResourceFile, cli.DOCKER_HOME, cli.VALIDATOR0)
-			Expect(err).To(BeNil())
-
 			for _, payload := range ExistingResourceCreatePayloads {
 				var ResourceCreatePayload resourcetypesv1.MsgCreateResourcePayload
 				var ResourceCreateSignInput []cli.SignInput
@@ -91,6 +85,12 @@ var _ = Describe("Upgrade - Pre", func() {
 				testCase := GetCaseName(payload)
 				By("Running: " + testCase)
 				ResourceCreateSignInput, err = Loader(payload, &ResourceCreatePayload)
+				Expect(err).To(BeNil())
+
+				By("copying the existing resource file to the container")
+				ResourceFile, err := CreateTestJson(GinkgoT().TempDir(), ResourceCreatePayload.Data)
+				Expect(err).To(BeNil())
+				_, err = cli.LocalnetExecCopyAbsoluteWithPermissions(ResourceFile, cli.DOCKER_HOME, cli.VALIDATOR0)
 				Expect(err).To(BeNil())
 
 				// TODO: Add resource file. Right now, it is not possible to create a resource without a file. So we need to copy a file to the container home directory.

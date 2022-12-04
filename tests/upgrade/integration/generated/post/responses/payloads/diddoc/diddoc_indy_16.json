@@ -35,10 +35,10 @@
             }
         ],
         "authentication": [
-            "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-1",
-            "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-2"
+            "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-1"
         ],
         "assertion_method": [
+            "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-2",
             "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-3"
         ],
         "capability_invocation": [
@@ -50,9 +50,6 @@
             "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-2"
         ],
         "key_agreement": [
-            "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-1",
-            "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-2",
-            "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-3",
             "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-4"
         ],
         "service": [
@@ -62,11 +59,19 @@
                 "service_endpoint": [
                     "endpoint-1"
                 ]
+            },
+            {
+                "id": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#service-2",
+                "type": "type-1",
+                "service_endpoint": [
+                    "endpoint-2"
+                ]
             }
         ],
         "also_known_as": [
             "alias-1",
-            "alias-2"
+            "alias-2",
+            "alias-3"
         ]
     },
     "signInput": [

@@ -3,12 +3,12 @@
 package integration
 
 import (
-	// "path/filepath"
+	"path/filepath"
 
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/cli"
 	didtypesv2 "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypesv2 "github.com/cheqd/cheqd-node/x/resource/types"
-	// upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -16,24 +16,24 @@ import (
 var _ = Describe("Upgrade - Post", func() {
 	Context("After a software upgrade execution has concluded", func() {
 
-		// It("should wait for node catching up", func() {
-		// 	By("pinging the node status until catching up is flagged as false")
-		// 	err := cli.WaitForCaughtUp(cli.VALIDATOR0, cli.CLI_BINARY_NAME, cli.VOTING_PERIOD*6)
-		// 	Expect(err).To(BeNil())
-		// })
+		It("should wait for node catching up", func() {
+			By("pinging the node status until catching up is flagged as false")
+			err := cli.WaitForCaughtUp(cli.VALIDATOR0, cli.CLI_BINARY_NAME, cli.VOTING_PERIOD*6)
+			Expect(err).To(BeNil())
+		})
 
-		// It("should match the expected module version map", func() {
-		// 	By("loading the expected module version map")
-		// 	var expected upgradetypes.QueryModuleVersionsResponse
-		// 	_, err := Loader(filepath.Join(GENERATED_JSON_DIR, "post", "responses", "module_version_map", "v1.json"), &expected)
-		// 	Expect(err).To(BeNil())
+		It("should match the expected module version map", func() {
+			By("loading the expected module version map")
+			var expected upgradetypes.QueryModuleVersionsResponse
+			_, err := Loader(filepath.Join(GENERATED_JSON_DIR, "post", "responses", "module_version_map", "v1.json"), &expected)
+			Expect(err).To(BeNil())
 
-		// 	By("matching the expected module version map")
-		// 	actual, err := cli.QueryModuleVersionMap(cli.VALIDATOR0)
-		// 	Expect(err).To(BeNil())
+			By("matching the expected module version map")
+			actual, err := cli.QueryModuleVersionMap(cli.VALIDATOR0)
+			Expect(err).To(BeNil())
 
-		// 	Expect(actual.ModuleVersions).To(Equal(expected.ModuleVersions), "module version map mismatch")
-		// })
+			Expect(actual.ModuleVersions).To(Equal(expected.ModuleVersions), "module version map mismatch")
+		})
 
 		It("should load and run expected diddoc payloads", func() {
 			By("matching the glob pattern for existing diddoc payloads")
@@ -50,6 +50,32 @@ var _ = Describe("Upgrade - Post", func() {
 
 				res, err := cli.QueryDid(DidDocUpdateRecord.Id, cli.VALIDATOR0)
 				Expect(err).To(BeNil())
+				
+				if DidDocUpdateRecord.Context == nil {
+					DidDocUpdateRecord.Context = []string{}
+				}
+				if DidDocUpdateRecord.Authentication == nil {
+					DidDocUpdateRecord.Authentication = []string{}
+				}
+				if DidDocUpdateRecord.AssertionMethod == nil {
+					DidDocUpdateRecord.AssertionMethod = []string{}
+				}
+				if DidDocUpdateRecord.CapabilityInvocation == nil {
+					DidDocUpdateRecord.CapabilityInvocation = []string{}
+				}
+				if DidDocUpdateRecord.CapabilityDelegation == nil {
+					DidDocUpdateRecord.CapabilityDelegation = []string{}
+				}
+				if DidDocUpdateRecord.KeyAgreement == nil {
+					DidDocUpdateRecord.KeyAgreement = []string{}
+				}
+				if DidDocUpdateRecord.Service == nil {
+					DidDocUpdateRecord.Service = []*didtypesv2.Service{}
+				}
+				if DidDocUpdateRecord.AlsoKnownAs == nil {
+					DidDocUpdateRecord.AlsoKnownAs = []string{}
+				}
+
 				Expect(*res.Value.DidDoc).To(Equal(DidDocUpdateRecord))
 
 			}

@@ -34,25 +34,13 @@
                 "verification_material": "{\"publicKeyMultibase\":\"zYnoDoX5wcCKEq6ZRRkS42jigYTSEn8DNvDnWmQadtsJ\"}"
             }
         ],
-        "authentication": [
-            "did:cheqd:testnet:85d9e742-be4d-59e8-9b10-5449db2e2d04#key-1",
-            "did:cheqd:testnet:85d9e742-be4d-59e8-9b10-5449db2e2d04#key-2"
-        ],
         "assertion_method": [
             "did:cheqd:testnet:85d9e742-be4d-59e8-9b10-5449db2e2d04#key-3"
         ],
         "capability_invocation": [
-            "did:cheqd:testnet:85d9e742-be4d-59e8-9b10-5449db2e2d04#key-4",
             "did:cheqd:testnet:85d9e742-be4d-59e8-9b10-5449db2e2d04#key-1"
         ],
-        "capability_delegation": [
-            "did:cheqd:testnet:85d9e742-be4d-59e8-9b10-5449db2e2d04#key-4",
-            "did:cheqd:testnet:85d9e742-be4d-59e8-9b10-5449db2e2d04#key-2"
-        ],
         "key_agreement": [
-            "did:cheqd:testnet:85d9e742-be4d-59e8-9b10-5449db2e2d04#key-1",
-            "did:cheqd:testnet:85d9e742-be4d-59e8-9b10-5449db2e2d04#key-2",
-            "did:cheqd:testnet:85d9e742-be4d-59e8-9b10-5449db2e2d04#key-3",
             "did:cheqd:testnet:85d9e742-be4d-59e8-9b10-5449db2e2d04#key-4"
         ],
         "service": [
@@ -62,11 +50,27 @@
                 "service_endpoint": [
                     "endpoint-1"
                 ]
+            },
+            {
+                "id": "did:cheqd:testnet:85d9e742-be4d-59e8-9b10-5449db2e2d04#service-2",
+                "type": "type-2",
+                "service_endpoint": [
+                    "endpoint-2"
+                ]
+            },
+            {
+                "id": "did:cheqd:testnet:85d9e742-be4d-59e8-9b10-5449db2e2d04#service-3",
+                "type": "type-3",
+                "service_endpoint": [
+                    "endpoint-3"
+                ]
             }
         ],
         "also_known_as": [
             "alias-1",
-            "alias-2"
+            "alias-2",
+            "alias-3",
+            "alias-4"
         ]
     },
     "signInput": [

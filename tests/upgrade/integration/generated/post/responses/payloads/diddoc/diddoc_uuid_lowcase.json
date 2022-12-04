@@ -2,7 +2,8 @@
     "payload": {
         "context": [
             "abc",
-            "def"
+            "def",
+            "ghi"
         ],
         "id": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554",
         "controller": [
@@ -37,23 +38,6 @@
         "authentication": [
             "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-1",
             "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-2"
-        ],
-        "assertion_method": [
-            "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-3"
-        ],
-        "capability_invocation": [
-            "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-4",
-            "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-1"
-        ],
-        "capability_delegation": [
-            "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-4",
-            "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-2"
-        ],
-        "key_agreement": [
-            "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-1",
-            "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-2",
-            "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-3",
-            "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-4"
         ],
         "service": [
             {
