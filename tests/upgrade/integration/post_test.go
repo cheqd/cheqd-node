@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/cli"
+	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
 	didtypesv2 "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypesv2 "github.com/cheqd/cheqd-node/x/resource/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
@@ -35,34 +36,28 @@ var _ = Describe("Upgrade - Post", func() {
 			Expect(actual.ModuleVersions).To(Equal(expected.ModuleVersions), "module version map mismatch")
 		})
 
-		// It("should load and run existing diddoc payloads - case: update", func() {
-		// 	By("matching the glob pattern for existing diddoc payloads")
-		// 	DidDocUpdatePayloads, err := RelGlob(GENERATED_JSON_DIR, "post", "update - diddoc", "*.json")
-		// 	Expect(err).To(BeNil())
+		It("should load and run existing diddoc payloads - case: update", func() {
+			By("matching the glob pattern for existing diddoc payloads")
+			DidDocUpdatePayloads, err := RelGlob(GENERATED_JSON_DIR, "post", "update - diddoc", "*.json")
+			Expect(err).To(BeNil())
 
-		// 	for _, payload := range DidDocUpdatePayloads {
-		// 		var DidDocUpdatePayload didtypesv2.MsgUpdateDidDocPayload
-		// 		var DidDocUpdateSignInput []didcli.SignInput
+			for _, payload := range DidDocUpdatePayloads {
+				var DidDocUpdatePayload didtypesv2.MsgUpdateDidDocPayload
+				var DidDocUpdateSignInput []didcli.SignInput
 
-		// 		testCase := GetCaseName(payload)
-		// 		By("Running: " + testCase)
-		// 		fmt.Println("Running: " + testCase)
+				testCase := GetCaseName(payload)
+				By("Running: " + testCase)
+				fmt.Println("Running: " + testCase)
 
-		// 		By("reading ")
-		// 		DidDocUpdateSignInput, err = Loader(payload, &DidDocUpdatePayload)
-		// 		Expect(err).To(BeNil())
+				By("reading ")
+				DidDocUpdateSignInput, err = Loader(payload, &DidDocUpdatePayload)
+				Expect(err).To(BeNil())
 
-		// 		resp, err := cli.QueryDidLegacy(DidDocUpdatePayload.Id, cli.VALIDATOR0)
-		// 		Expect(err).To(BeNil())
-		// 		Expect(resp.Did.Id).To(BeEquivalentTo(DidDocUpdatePayload.Id))
-
-		// 		DidDocUpdatePayload.VersionId = resp.Metadata.VersionId
-
-		// 		res, err := cli.UpdateDid(DidDocUpdatePayload, DidDocUpdateSignInput, cli.VALIDATOR0)
-		// 		Expect(err).To(BeNil())
-		// 		Expect(res.Code).To(BeEquivalentTo(0))
-		// 	}
-		// })
+				res, err := cli.UpdateDid(DidDocUpdatePayload, DidDocUpdateSignInput, cli.VALIDATOR1)
+				Expect(err).To(BeNil())
+				Expect(res.Code).To(BeEquivalentTo(0))
+			}
+		})
 
 		It("should load and run expected diddoc payloads", func() {
 			By("matching the glob pattern for existing diddoc payloads")
