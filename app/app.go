@@ -682,34 +682,43 @@ func New(
 		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 			ctx.Logger().Info("Handler for upgrade plan: " + UpgradeName)
 
-			// Add defaults for did subspace
-			didSubspace := app.GetSubspace(didtypes.ModuleName)
-			didSubspace.Set(ctx, didtypes.ParamStoreKeyFeeParams, didtypes.DefaultFeeParams())
+			// Fix lack of version map initialization in InitChainer for new chains
+			if len(fromVM) == 0 {
+				println("Initializing version map")
 
-			// Add defaults for resource subspace
-			resourceSubspace := app.GetSubspace(resourcetypes.ModuleName)
-			resourceSubspace.Set(ctx, resourcetypes.ParamStoreKeyFeeParams, resourcetypes.DefaultFeeParams())
+				// Add defaults for did subspace
+				didSubspace := app.GetSubspace(didtypes.ModuleName)
+				didSubspace.Set(ctx, didtypes.ParamStoreKeyFeeParams, didtypes.DefaultFeeParams())
 
-			// Add defaults for staking subspace
-			stakingSubspace := app.GetSubspace(stakingtypes.ModuleName)
-			stakingSubspace.Set(ctx, stakingtypes.KeyMinCommissionRate, sdk.NewDec(0))
+				// Add defaults for resource subspace
+				resourceSubspace := app.GetSubspace(resourcetypes.ModuleName)
+				resourceSubspace.Set(ctx, resourcetypes.ParamStoreKeyFeeParams, resourcetypes.DefaultFeeParams())
 
-			// Get version map from current upgrade
-			versionMap := app.mm.GetVersionMap()
-			// Skip capability module
-			fromVM[capabilitytypes.ModuleName] = versionMap[capabilitytypes.ModuleName]
-			// Skip distribution module
-			fromVM[distrtypes.ModuleName] = versionMap[distrtypes.ModuleName]
-			// Skip gov module
-			fromVM[govtypes.ModuleName] = versionMap[govtypes.ModuleName]
-			// Skip mint module
-			fromVM[minttypes.ModuleName] = versionMap[minttypes.ModuleName]
-			// Skip staking module
-			fromVM[stakingtypes.ModuleName] = versionMap[stakingtypes.ModuleName]
-			// Skip did module (InitGenesis would alter namespace)
-			fromVM[didtypes.ModuleName] = versionMap[didtypes.ModuleName]
-			// Skip resource module
-			fromVM[resourcetypes.ModuleName] = versionMap[resourcetypes.ModuleName]
+				// Add defaults for staking subspace
+				stakingSubspace, _ := app.ParamsKeeper.GetSubspace(stakingtypes.ModuleName)
+				stakingSubspace.Set(ctx, stakingtypes.KeyMinCommissionRate, sdk.NewDec(0))
+
+				// Fix version map
+				versionMap := app.mm.GetVersionMap()
+
+				for moduleName := range versionMap {
+					if _, ok := fromVM[moduleName]; !ok {
+						fromVM[moduleName] = versionMap[moduleName]
+					}
+				}
+			} else {
+				println("Version map already initialized")
+				println("Initializing resource module")
+				// Add defaults for resource subspace
+				resourceSubspace := app.GetSubspace(resourcetypes.ModuleName)
+				resourceSubspace.Set(ctx, resourcetypes.ParamStoreKeyFeeParams, resourcetypes.DefaultFeeParams())
+
+				// Get the current version map
+				versionMap := app.mm.GetVersionMap()
+
+				// Skip resource module InitGenesis (was not present in v0.6.9)
+				fromVM[resourcetypes.ModuleName] = versionMap[resourcetypes.ModuleName]
+			}
 
 			// ibc v3 -> v4 migration
 			// transfer module consensus version has been bumped to 2
