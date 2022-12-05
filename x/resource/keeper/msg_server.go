@@ -1,20 +1,20 @@
 package keeper
 
 import (
-	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
+	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 )
 
 type msgServer struct {
 	Keeper
-	cheqdKeeper cheqdkeeper.Keeper
+	didKeeper didkeeper.Keeper
 }
 
 // NewMsgServer returns an implementation of the MsgServer interface for the provided Keeper.
-func NewMsgServer(keeper Keeper, cheqdKeeper cheqdkeeper.Keeper) types.MsgServer {
+func NewMsgServer(keeper Keeper, cheqdKeeper didkeeper.Keeper) types.MsgServer {
 	return &msgServer{
-		Keeper:      keeper,
-		cheqdKeeper: cheqdKeeper,
+		Keeper:    keeper,
+		didKeeper: cheqdKeeper,
 	}
 }
 

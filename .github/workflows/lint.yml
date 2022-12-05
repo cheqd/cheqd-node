@@ -51,6 +51,24 @@ jobs:
           version: v1.47
           args: --config .github/linters/.golangci.yaml
 
+  proto-lint:
+    name: "Protobuf"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      # Install the `buf` CLI
+      - uses: bufbuild/buf-setup-action@v1.8.0
+      
+      # Lint
+      - uses: bufbuild/buf-lint-action@v1
+      
+      # Breaking change detection
+      # - uses: bufbuild/buf-breaking-action@v1
+      #   with:
+      #     input: 'proto'
+      #     against: 'https://github.com/cheqd/cheqd-node.git#branch=develop,ref=HEAD~1,subdir=proto'
+
   super-lint:
     name: "Super Linter"
     runs-on: ubuntu-latest
@@ -59,7 +77,7 @@ jobs:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0 # Required to fetch version
-    
+
     - name: Run Super Linter
       uses: github/super-linter/slim@v4
       env:

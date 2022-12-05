@@ -2,7 +2,7 @@
 
 version: v1
 
-name: buf.build/cheqd/cheqd-proto
+name: buf.build/cheqd/proto
 
 deps:
   - buf.build/cosmos/cosmos-sdk
@@ -13,11 +13,17 @@ deps:
 breaking:
   use:
     - FILE
+  ignore:
+    - cheqd/v1
+    - resource/v1
 
 lint:
+  ignore:
+    - cheqd/did/v1
+    - cheqd/resource/v1
   use:
     - DEFAULT
-    - COMMENTS
   except:
     - SERVICE_SUFFIX
     - RPC_REQUEST_STANDARD_NAME
+    - RPC_RESPONSE_STANDARD_NAME
