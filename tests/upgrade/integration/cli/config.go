@@ -45,6 +45,7 @@ var (
 		"--gas-adjustment", GAS_ADJUSTMENT,
 		"--gas-prices", GAS_PRICES,
 		"--keyring-backend", KEYRING_BACKEND,
+		"--chain-id", integrationnetwork.CHAIN_ID,
 		"-y",
 	}
 	QUERY_PARAMS = []string{
