@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eo pipefail
+set -euox pipefail
 
 SWAGGER_DIR=./app/client/docs
 SWAGGER_UI_DIR=${SWAGGER_DIR}/swagger-ui
