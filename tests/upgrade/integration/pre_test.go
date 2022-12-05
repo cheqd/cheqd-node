@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"path/filepath"
 
-	// integrationtestdata "github.com/cheqd/cheqd-node/tests/integration/testdata"
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/cli"
 	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
@@ -25,7 +24,7 @@ var _ = Describe("Upgrade - Pre", func() {
 
 		It("should load and run existing diddoc payloads - case: create", func() {
 			By("matching the glob pattern for existing diddoc payloads")
-			ExistingDidDocCreatePayloads, err := RelGlob(GENERATED_JSON_DIR, "pre", "payloads", "diddoc - create", "*.json")
+			ExistingDidDocCreatePayloads, err := RelGlob(GENERATED_JSON_DIR, "pre", "create - diddoc", "*.json")
 			Expect(err).To(BeNil())
 
 			for _, payload := range ExistingDidDocCreatePayloads {
@@ -34,6 +33,7 @@ var _ = Describe("Upgrade - Pre", func() {
 
 				testCase := GetCaseName(payload)
 				By("Running: " + testCase)
+				fmt.Println("Running: " + testCase)
 
 				By("reading ")
 				DidDocCreateSignInput, err = Loader(payload, &DidDocCreatePayload)
@@ -47,7 +47,7 @@ var _ = Describe("Upgrade - Pre", func() {
 
 		It("should load and run existing diddoc payloads - case: update", func() {
 			By("matching the glob pattern for existing diddoc payloads")
-			ExistingDidDocUpdatePayloads, err := RelGlob(GENERATED_JSON_DIR, "pre", "payloads", "diddoc - update", "*.json")
+			ExistingDidDocUpdatePayloads, err := RelGlob(GENERATED_JSON_DIR, "pre", "update - diddoc", "*.json")
 			Expect(err).To(BeNil())
 
 			for _, payload := range ExistingDidDocUpdatePayloads {
@@ -56,6 +56,7 @@ var _ = Describe("Upgrade - Pre", func() {
 
 				testCase := GetCaseName(payload)
 				By("Running: " + testCase)
+				fmt.Println("Running: " + testCase)
 
 				By("reading ")
 				DidDocUpdateSignInput, err = Loader(payload, &DidDocUpdatePayload)
@@ -75,7 +76,7 @@ var _ = Describe("Upgrade - Pre", func() {
 
 		It("should load and run existing resource payloads - case: create", func() {
 			By("matching the glob pattern for existing resource payloads")
-			ExistingResourceCreatePayloads, err := RelGlob(GENERATED_JSON_DIR, "pre", "payloads", "resource", "*.json")
+			ExistingResourceCreatePayloads, err := RelGlob(GENERATED_JSON_DIR, "pre", "create - resource", "*.json")
 			Expect(err).To(BeNil())
 
 			for _, payload := range ExistingResourceCreatePayloads {
@@ -84,6 +85,8 @@ var _ = Describe("Upgrade - Pre", func() {
 
 				testCase := GetCaseName(payload)
 				By("Running: " + testCase)
+				fmt.Println("Running: " + testCase)
+
 				ResourceCreateSignInput, err = Loader(payload, &ResourceCreatePayload)
 				Expect(err).To(BeNil())
 

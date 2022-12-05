@@ -3,6 +3,7 @@
 package integration
 
 import (
+	"fmt"
 	"path/filepath"
 
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/cli"
@@ -24,7 +25,7 @@ var _ = Describe("Upgrade - Post", func() {
 		It("should match the expected module version map", func() {
 			By("loading the expected module version map")
 			var expected upgradetypes.QueryModuleVersionsResponse
-			_, err := Loader(filepath.Join(GENERATED_JSON_DIR, "post", "responses", "module_version_map", "v1.json"), &expected)
+			_, err := Loader(filepath.Join(GENERATED_JSON_DIR, "post", "query - module-version-map", "v1.json"), &expected)
 			Expect(err).To(BeNil())
 
 			By("matching the expected module version map")
@@ -36,7 +37,7 @@ var _ = Describe("Upgrade - Post", func() {
 
 		It("should load and run expected diddoc payloads", func() {
 			By("matching the glob pattern for existing diddoc payloads")
-			ExpectedDidDocUpdateRecords, err := RelGlob(GENERATED_JSON_DIR, "post", "responses", "payloads", "diddoc", "*.json")
+			ExpectedDidDocUpdateRecords, err := RelGlob(GENERATED_JSON_DIR, "post", "query - diddoc", "*.json")
 			Expect(err).To(BeNil())
 
 			for _, payload := range ExpectedDidDocUpdateRecords {
@@ -44,6 +45,8 @@ var _ = Describe("Upgrade - Post", func() {
 
 				testCase := GetCaseName(payload)
 				By("Running: query " + testCase)
+				fmt.Println("Running: " + testCase)
+
 				_, err = Loader(payload, &DidDocUpdateRecord)
 				Expect(err).To(BeNil())
 
@@ -76,13 +79,12 @@ var _ = Describe("Upgrade - Post", func() {
 				}
 
 				Expect(*res.Value.DidDoc).To(Equal(DidDocUpdateRecord))
-
 			}
 		})
 
 		It("should load and run expected resource payloads", func() {
 			By("matching the glob pattern for existing resource payloads")
-			ExpectedResourceCreateRecords, err := RelGlob(GENERATED_JSON_DIR, "post", "responses", "payloads", "resource", "*.json")
+			ExpectedResourceCreateRecords, err := RelGlob(GENERATED_JSON_DIR, "post", "query - resource", "*.json")
 			Expect(err).To(BeNil())
 
 			for _, payload := range ExpectedResourceCreateRecords {
@@ -90,12 +92,11 @@ var _ = Describe("Upgrade - Post", func() {
 
 				testCase := GetCaseName(payload)
 				By("Running: query " + testCase)
+				fmt.Println("Running: " + testCase)
+
 				_, err = Loader(payload, &ResourceCreateRecord)
 				Expect(err).To(BeNil())
 
-				// TODO: Implement v1 -> v2 protobuf migration handlers.
-				// Right now, this will fail.
-				// Specifically, the resource is written successfully, but the collectionId will report the resource as not found.
 				res, err := cli.QueryResource(ResourceCreateRecord.Metadata.CollectionId, ResourceCreateRecord.Metadata.Id, cli.VALIDATOR0)
 
 				Expect(err).To(BeNil())
@@ -111,10 +112,6 @@ var _ = Describe("Upgrade - Post", func() {
 				Expect(res.Resource.Metadata.Checksum).To(Equal(ResourceCreateRecord.Metadata.Checksum))
 				Expect(res.Resource.Metadata.PreviousVersionId).To(Equal(ResourceCreateRecord.Metadata.PreviousVersionId))
 				Expect(res.Resource.Metadata.NextVersionId).To(Equal(ResourceCreateRecord.Metadata.NextVersionId))
-
-				// TODO: Add v1 -> v2 deep comparison cases, after defining the migration handlers.
-				// e.g.: Migration to Indy format, uuid lowercasing, etc.
-				// Checksum migration is already defined as an e2e example.
 			}
 		})
 	})
