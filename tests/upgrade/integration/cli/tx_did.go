@@ -110,7 +110,7 @@ func DeactivateDidLegacy(payload didtypesv1.MsgDeactivateDidPayload, signInputs 
 	return Tx(container, CLI_BINARY_NAME, "cheqd", "deactivate-did", OperatorAccounts[container], args...)
 }
 
-func DeactivateDid(payload didtypesv1.MsgDeactivateDidPayload, signInputs []cli.SignInput, container string) (sdk.TxResponse, error) {
+func DeactivateDid(payload didtypesv2.MsgDeactivateDidDocPayload, signInputs []cli.SignInput, container string) (sdk.TxResponse, error) {
 	innerPayloadJson := integrationhelpers.Codec.MustMarshalJSON(&payload)
 
 	outerPayload := cli.PayloadWithSignInputs{

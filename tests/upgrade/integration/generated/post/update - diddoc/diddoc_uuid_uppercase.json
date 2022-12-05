@@ -35,7 +35,7 @@
             }
         ],
         "authentication": [
-            "did:cheqd:testnet:91e5f0cf-5f1e-5c19-97d3-d313e84033b4#key-1",
+            "did:cheqd:testnet:91e5f0cf-5f1e-5c19-97d3-d313e84033b4#key-1"
         ],
         "assertion_method": [
             "did:cheqd:testnet:91e5f0cf-5f1e-5c19-97d3-d313e84033b4#key-1",

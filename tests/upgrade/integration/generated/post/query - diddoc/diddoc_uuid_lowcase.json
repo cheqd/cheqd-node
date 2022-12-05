@@ -38,7 +38,7 @@
         "authentication": [
             "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-1",
             "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-2",
-            "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-3",
+            "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-3"
         ],
         "service": [
             {
