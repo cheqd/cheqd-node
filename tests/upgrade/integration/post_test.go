@@ -59,6 +59,29 @@ var _ = Describe("Upgrade - Post", func() {
 			}
 		})
 
+		It("should load and run existing diddoc payloads - case: deactivate", func() {
+			By("matching the glob pattern for existing diddoc payloads")
+			DidDocDeactivatePayloads, err := RelGlob(GENERATED_JSON_DIR, "post", "deactivate - diddoc", "*.json")
+			Expect(err).To(BeNil())
+
+			for _, payload := range DidDocDeactivatePayloads {
+				var DidDocDeacctivatePayload didtypesv2.MsgDeactivateDidDocPayload
+				var DidDocDeactivateSignInput []didcli.SignInput
+
+				testCase := GetCaseName(payload)
+				By("Running: " + testCase)
+				fmt.Println("Running: " + testCase)
+
+				By("reading ")
+				DidDocDeactivateSignInput, err = Loader(payload, &DidDocDeacctivatePayload)
+				Expect(err).To(BeNil())
+
+				res, err := cli.DeactivateDid(DidDocDeacctivatePayload, DidDocDeactivateSignInput, cli.VALIDATOR1)
+				Expect(err).To(BeNil())
+				Expect(res.Code).To(BeEquivalentTo(0))
+			}
+		})
+
 		It("should load and run expected diddoc payloads", func() {
 			By("matching the glob pattern for existing diddoc payloads")
 			ExpectedDidDocUpdateRecords, err := RelGlob(GENERATED_JSON_DIR, "post", "query - diddoc", "*.json")

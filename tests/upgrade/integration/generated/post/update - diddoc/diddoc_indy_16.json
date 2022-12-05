@@ -26,12 +26,6 @@
                 "type": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg",
                 "verification_material": "{\"publicKeyMultibase\":\"zC1CAqqp2tQooisYtTh1oULGzKyRNQbsUtyqoh2neWPta\"}"
-            },
-            {
-                "id": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-4",
-                "type": "Ed25519VerificationKey2020",
-                "controller": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg",
-                "verification_material": "{\"publicKeyMultibase\":\"zDw21irq4wBfyTvxAG9L8PQj6b79iyTyzyV6XVj9SfyRR\"}"
             }
         ],
         "authentication": [
@@ -40,10 +34,6 @@
         "assertion_method": [
             "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-2",
             "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-3"
-        ],
-        "capability_invocation": [
-            "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-4",
-            "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-1"
         ],
         "capability_delegation": [
             "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-4",
@@ -69,8 +59,6 @@
             }
         ],
         "also_known_as": [
-            "alias-1",
-            "alias-2",
             "alias-3"
         ]
     },

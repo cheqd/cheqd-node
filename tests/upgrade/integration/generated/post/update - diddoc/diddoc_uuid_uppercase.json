@@ -62,5 +62,11 @@
             }
         ],
         "also_known_as": []
-    }
+    },
+    "signInputs": [
+        {
+            "verificationMethodId": "did:cheqd:testnet:91e5f0cf-5f1e-5c19-97d3-d313e84033b4#key-1",
+            "privKey": "tBjxEJCqSkj7u+iTWRqAVZwtcl2XBZrlaMfhxYIRc4wj7epbmDkJ35sCin3MWnAxvHJNDY0yyPafVspsrgb1Ng=="
+        }
+    ]
 }

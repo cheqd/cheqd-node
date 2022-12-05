@@ -1,0 +1,11 @@
+{
+    "payload": {
+        "id": "did:cheqd:testnet:85d9e742-be4d-59e8-9b10-5449db2e2d04"
+    },
+    "signInputs": [
+        {
+            "verificationMethodId": "did:cheqd:testnet:85d9e742-be4d-59e8-9b10-5449db2e2d04#key-1",
+            "privKey": "x95rNwt5epP3755Y6A/lP822rE+oUmEtt4gs445soA0SV3E+3H5rRscvibF+NU9GC0K0cLRVjP4Q27pwUSMBkQ=="
+        }
+    ]
+}

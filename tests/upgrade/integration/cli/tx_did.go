@@ -29,22 +29,26 @@ func CreateDidLegacy(payload didtypesv1.MsgCreateDidPayload, signInputs []cli.Si
 }
 
 func CreateDid(payload didtypesv2.MsgCreateDidDocPayload, signInputs []cli.SignInput, container string) (sdk.TxResponse, error) {
-	payloadJson, err := integrationhelpers.Codec.MarshalJSON(&payload)
-	if err != nil {
-		return sdk.TxResponse{}, err
-	}
+	innerPayloadJson := integrationhelpers.Codec.MustMarshalJSON(&payload)
 
-	payloadWithSignInput := cli.PayloadWithSignInputs{
-		Payload:    payloadJson,
+	outerPayload := cli.PayloadWithSignInputs{
+		Payload:    innerPayloadJson,
 		SignInputs: signInputs,
 	}
 
-	payloadWithSignInputJson, err := json.Marshal(&payloadWithSignInput)
+	outerPayloadJson, err := json.Marshal(&outerPayload)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
 
-	args := []string{string(payloadWithSignInputJson)}
+	out, err := LocalnetExecExec(container, "/bin/bash", "-c", "echo '"+string(outerPayloadJson)+"' > payload.json")
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	fmt.Println(out)
+
+	args := []string{string("payload.json")}
 
 	return Tx(container, CLI_BINARY_NAME, "cheqd", "create-did", OperatorAccounts[container], args...)
 }
@@ -107,17 +111,26 @@ func DeactivateDidLegacy(payload didtypesv1.MsgDeactivateDidPayload, signInputs 
 }
 
 func DeactivateDid(payload didtypesv1.MsgDeactivateDidPayload, signInputs []cli.SignInput, container string) (sdk.TxResponse, error) {
-	payloadJson, err := integrationhelpers.Codec.MarshalJSON(&payload)
+	innerPayloadJson := integrationhelpers.Codec.MustMarshalJSON(&payload)
+
+	outerPayload := cli.PayloadWithSignInputs{
+		Payload:    innerPayloadJson,
+		SignInputs: signInputs,
+	}
+
+	outerPayloadJson, err := json.Marshal(&outerPayload)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
 
-	args := []string{string(payloadJson)}
-
-	for _, signInput := range signInputs {
-		args = append(args, signInput.VerificationMethodId)
-		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivKey))
+	out, err := LocalnetExecExec(container, "/bin/bash", "-c", "echo '"+string(outerPayloadJson)+"' > payload.json")
+	if err != nil {
+		return sdk.TxResponse{}, err
 	}
+
+	fmt.Println(out)
+
+	args := []string{string("payload.json")}
 
 	return Tx(container, CLI_BINARY_NAME, "cheqd", "deactivate-did", OperatorAccounts[container], args...)
 }
