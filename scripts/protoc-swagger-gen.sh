@@ -15,6 +15,6 @@ for dir in $proto_dirs; do
   # generate swagger files (filter query files)
   query_file=$(find "${dir}" -maxdepth 1 \( -name 'query.proto' \))
   if [[ ! -z "$query_file" ]]; then
-    buf generate --template buf.gen.swagger.yaml $query_file
+    buf generate --template buf.gen.swagger.yaml "$query_file"
   fi
 done
