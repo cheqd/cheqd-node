@@ -3,6 +3,7 @@ package cli
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 
 	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/x/did/client/cli"
@@ -77,7 +78,12 @@ func UpdateDid(payload didtypesv2.MsgUpdateDidDocPayload, signInputs []cli.SignI
 		return sdk.TxResponse{}, err
 	}
 
-	LocalnetExecExec(container, "cat", string(outerPayloadJson), ">", "payload.json")
+	out, err := LocalnetExecExec(container, "/bin/bash", "-c", "echo '"+string(outerPayloadJson)+"' > payload.json")
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	fmt.Println(out)
 
 	args := []string{string("payload.json")}
 
