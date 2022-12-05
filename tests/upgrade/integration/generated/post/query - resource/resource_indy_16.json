@@ -15,11 +15,5 @@
             "previous_version_id": "",
             "next_version_id": ""
         }
-    },
-    "signInput": [
-        {
-            "verificationMethodId": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-1",
-            "privateKey": "dTHxupAW0yqeeIgqZkjndoWSbZ2kRjK2FMwI6bgtZR6aNYVzr6sn2zzT5zOUYPMflJu17gBqNH0tjp62SlLg/w=="
-        }
-    ]
+    }
 }

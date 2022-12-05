@@ -49,11 +49,6 @@ type DefaultNodeInfoOther struct {
 	RPCAddress string `json:"rpc_address"`
 }
 
-type TestGeneratedStructureV1 struct {
-	Payload   any
-	SignInput []SignInput
-}
-
 type SyncInfo struct {
 	LatestBlockHash   tmbytes.HexBytes `json:"latest_block_hash"`
 	LatestAppHash     tmbytes.HexBytes `json:"latest_app_hash"`

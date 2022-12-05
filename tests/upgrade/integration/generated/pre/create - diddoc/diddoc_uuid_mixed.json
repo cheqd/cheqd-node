@@ -71,10 +71,10 @@
             "alias-2"
         ]
     },
-    "signInput": [
+    "signInputs": [
         {
             "verificationMethodId": "did:cheqd:testnet:C8113F5E-E124-4400-a3c8-109b4f6722ad#key-1",
-            "privateKey": "x95rNwt5epP3755Y6A/lP822rE+oUmEtt4gs445soA0SV3E+3H5rRscvibF+NU9GC0K0cLRVjP4Q27pwUSMBkQ=="
+            "privKey": "x95rNwt5epP3755Y6A/lP822rE+oUmEtt4gs445soA0SV3E+3H5rRscvibF+NU9GC0K0cLRVjP4Q27pwUSMBkQ=="
         }
     ]
 }

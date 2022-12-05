@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/cli"
+	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
 	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
 	govtypesv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
@@ -29,7 +30,7 @@ var _ = Describe("Upgrade - Pre", func() {
 
 			for _, payload := range ExistingDidDocCreatePayloads {
 				var DidDocCreatePayload didtypesv1.MsgCreateDidPayload
-				var DidDocCreateSignInput []cli.SignInput
+				var DidDocCreateSignInput []didcli.SignInput
 
 				testCase := GetCaseName(payload)
 				By("Running: " + testCase)
@@ -52,7 +53,7 @@ var _ = Describe("Upgrade - Pre", func() {
 
 			for _, payload := range ExistingDidDocUpdatePayloads {
 				var DidDocUpdatePayload didtypesv1.MsgUpdateDidPayload
-				var DidDocUpdateSignInput []cli.SignInput
+				var DidDocUpdateSignInput []didcli.SignInput
 
 				testCase := GetCaseName(payload)
 				By("Running: " + testCase)
@@ -81,7 +82,7 @@ var _ = Describe("Upgrade - Pre", func() {
 
 			for _, payload := range ExistingResourceCreatePayloads {
 				var ResourceCreatePayload resourcetypesv1.MsgCreateResourcePayload
-				var ResourceCreateSignInput []cli.SignInput
+				var ResourceCreateSignInput []didcli.SignInput
 
 				testCase := GetCaseName(payload)
 				By("Running: " + testCase)

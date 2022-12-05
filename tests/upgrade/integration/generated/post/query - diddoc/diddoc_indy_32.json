@@ -68,11 +68,5 @@
             "alias-1",
             "alias-2"
         ]
-    },
-    "signInput": [
-        {
-            "verificationMethodId": "did:cheqd:testnet:Nqoxg85PKyr9nPstjTpg5b#key-1",
-            "privateKey": "V+DHGMMA9O4fvIBM1gnyivbKxLudXrG1bHwMjnF4Xi3JYEmEn03givjkKTnAdQ8/DG5qfPU6qVoRUaBgNiwU+Q=="
-        }
-    ]
+    }
 }

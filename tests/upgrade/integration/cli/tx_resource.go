@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 
+	"github.com/cheqd/cheqd-node/x/did/client/cli"
 	types "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -18,7 +19,7 @@ type CreateResourceOptions struct {
 	AlsoKnownAs     []*types.AlternativeUri `json:"also_known_as"`
 }
 
-func CreateResourceLegacy(collectionId string, resourceId string, resourceName string, resourceType string, resourceFile string, signInputs []SignInput, container string) (sdk.TxResponse, error) {
+func CreateResourceLegacy(collectionId string, resourceId string, resourceName string, resourceType string, resourceFile string, signInputs []cli.SignInput, container string) (sdk.TxResponse, error) {
 	args := []string{
 		"--collection-id", collectionId,
 		"--resource-id", resourceId,
@@ -29,13 +30,13 @@ func CreateResourceLegacy(collectionId string, resourceId string, resourceName s
 
 	for _, signInput := range signInputs {
 		args = append(args, signInput.VerificationMethodId)
-		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivateKey))
+		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivKey))
 	}
 
 	return Tx(container, CLI_BINARY_NAME, "resource", "create-resource", OperatorAccounts[container], args...)
 }
 
-func CreateResource(collectionId string, resourceId string, resourceName string, resourceVersion string, resourceType string, resourceFile string, resourceAsKnownAs []*types.AlternativeUri, signInputs []SignInput, container string) (sdk.TxResponse, error) {
+func CreateResource(collectionId string, resourceId string, resourceName string, resourceVersion string, resourceType string, resourceFile string, resourceAsKnownAs []*types.AlternativeUri, signInputs []cli.SignInput, container string) (sdk.TxResponse, error) {
 	resourceOptions := CreateResourceOptions{
 		CollectionId:    collectionId,
 		ResourceId:      resourceId,
@@ -51,7 +52,7 @@ func CreateResource(collectionId string, resourceId string, resourceName string,
 		return sdk.TxResponse{}, err
 	}
 
-	payloadWithSignInputs := PayloadWithSignInputs{
+	payloadWithSignInputs := cli.PayloadWithSignInputs{
 		Payload:    payloadJson,
 		SignInputs: signInputs,
 	}
