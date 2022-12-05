@@ -10,7 +10,7 @@ containerProtoGen=cheqd-node-proto-gen-$(containerProtoVer)
 containerProtoFmt=cheqd-node-proto-fmt-$(containerProtoVer)
 containerProtoGenSwagger=cheqd-node-proto-gen-swagger-$(containerProtoVer)
 
-proto-all: proto-lint proto-format proto-gen proto-check-breaking
+proto-all: proto-lint proto-format proto-gen proto-check-breaking proto-swagger-deps proto-swagger-gen
 
 proto-gen:
 	@echo "Generating Protobuf files"
