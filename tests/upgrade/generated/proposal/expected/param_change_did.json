@@ -1,15 +1,15 @@
 {
     "create_did": {
         "denom": "ncheq",
-        "amount": "10000000000"
+        "amount": "100000000000"
     },
     "update_did": {
         "denom": "ncheq",
-        "amount": "4000000000"
+        "amount": "50000000000"
     },
     "deactivate_did": {
         "denom": "ncheq",
-        "amount": "2000000000"
+        "amount": "50000000000"
     },
     "burn_factor": "0.600000000000000000"
 }

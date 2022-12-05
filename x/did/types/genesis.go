@@ -6,9 +6,9 @@ import (
 
 const (
 	DefaultDidNamespace       = "testnet"
-	DefaultCreateDidTxFee     = 5e9
-	DefaultUpdateDidTxFee     = 2e9
-	DefaultDeactivateDidTxFee = 1e9
+	DefaultCreateDidTxFee     = 50e9
+	DefaultUpdateDidTxFee     = 25e9
+	DefaultDeactivateDidTxFee = 25e9
 	DefaultBurnFactor         = "0.500000000000000000" // 0.5 or 50%
 )
 
