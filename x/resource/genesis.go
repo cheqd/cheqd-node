@@ -23,7 +23,11 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis := types.GenesisState{}
 
 	// Get all resource
-	resourceList := k.GetAllResources(&ctx)
+	resourceList, err := k.GetAllResources(&ctx)
+	if err != nil {
+		panic(fmt.Sprintf("Cannot get all resource: %s", err.Error()))
+	}
+
 	for _, elem := range resourceList {
 		genesis.Resources = append(genesis.Resources, &elem)
 	}
