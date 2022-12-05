@@ -8,6 +8,7 @@ pushd "$DIR/../../../../docker/localnet"
 
 # Generate configs (make sure old binary is installed locally)
 bash gen-network-config.sh
+sudo chown -R 1000:1000 network-config
 
 # Start network
 docker compose --env-file mainnet-latest.env up --detach --no-build
