@@ -9,7 +9,12 @@
             "name": "UUID lowercase",
             "version": "",
             "resource_type": "TestResourceType",
-            "also_known_as": [],
+            "also_known_as": [
+                {
+                    "uri": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554/resources/9011d912-258e-4c76-93a8-200c2031685e",
+                    "description": "did-url"
+                }
+            ],
             "media_type": "application/json",
             "checksum": "4f479bba31f71859d9943651538c8df2119804eceb7f58a0de241789ff214af4",
             "previous_version_id": "b1c9406d-568c-4a41-9ed3-133fdf3e4974",

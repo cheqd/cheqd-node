@@ -33,7 +33,7 @@ func CreateResourceLegacy(collectionId string, resourceId string, resourceName s
 		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivKey))
 	}
 
-	return Tx(container, CLI_BINARY_NAME, "resource", "create", OperatorAccounts[container], args...)
+	return Tx(container, CLI_BINARY_NAME, "resource", "create-resource", OperatorAccounts[container], args...)
 }
 
 func CreateResource(collectionId string, resourceId string, resourceName string, resourceVersion string, resourceType string, resourceFile string, resourceAsKnownAs []*types.AlternativeUri, signInputs []cli.SignInput, container string) (sdk.TxResponse, error) {
