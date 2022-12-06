@@ -1,7 +1,7 @@
 {
     "payload": {
         "resource": {
-            "data": "eyJhdHRyIjpbIm5hbWUiLCJhZ2UiXX0="
+            "data": "eyJhdHRyIjpbIm5hbWUiLCJhZ2UiXX0K"
         },
         "metadata": {
             "collection_id": "5rjaLzcffhGUH4nt4fyfAg",
@@ -24,7 +24,7 @@
                 }
             ],
             "media_type": "application/json",
-            "checksum": "cf1c64bf03caa2ccd82b1b948fe8cf7d6efb5151cddeed45c9d00688359ec82d",
+            "checksum": "d9c6f336c5edfc5034bc66aab9277daac01e1e85b41e49e6bf1b7a8f2a81c04f",
             "previous_version_id": "",
             "next_version_id": ""
         }

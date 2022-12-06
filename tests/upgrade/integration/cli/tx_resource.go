@@ -73,7 +73,7 @@ func CreateResource(msg types.MsgCreateResourcePayload, resourceFile string, sig
 		return sdk.TxResponse{}, err
 	}
 
-	_, err = LocalnetExecExec(container, "/bin/bash", "-c", "echo '"+string(payloadWithSignInputsJson)+"' > "+resourceFileName)
+	_, err = LocalnetExecExec(container, "/bin/bash", "-c", "echo '"+string(msg.Data)+"' > "+resourceFileName)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
