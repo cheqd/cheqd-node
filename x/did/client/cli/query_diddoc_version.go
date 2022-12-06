@@ -11,8 +11,8 @@ import (
 
 func CmdGetDidDocVersion() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "diddoc-version [id] [version-id]",
-		Short: "Query a specific diddoc version",
+		Use:   "did-version [id] [version-id]",
+		Short: "Query specific version of a DID Document",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
