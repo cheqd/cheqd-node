@@ -31,7 +31,7 @@ jobs:
           go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
       - name: Run Ginkgo unit tests
-        run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --tags upgrade_unit --junit-report report-unit.xml
+        run: ginkgo -r --tags upgrade_unit --race --randomize-all --randomize-suites --keep-going --trace --junit-report report-unit.xml
 
       - name: Upload unit tests result
         uses: actions/upload-artifact@v3
@@ -177,7 +177,7 @@ jobs:
       - name: Submit governance fee parameter change proposals
         working-directory: ./tests/upgrade/integration
         run: |
-          ginkgo -r --tags upgrade --race --tags upgrade --focus-file param_change_proposal_test.go
+          ginkgo -r --tags upgrade --race --tags upgrade_integration --focus-file param_change_proposal_test.go
       - name: Run pricing integration tests after successful param change proposal
         working-directory: ./tests/integration
         run: |

@@ -30,7 +30,7 @@ func NewExistingDataset(setup TestSetup) *ExistingDataset {
 }
 
 func (d *ExistingDataset) AddDidDocV1(pathToDir, prefix string) error {
-	files, err := d.loader.GetLsitOfFiles(pathToDir, prefix)
+	files, err := d.loader.GetListOfFiles(pathToDir, prefix)
 	if err != nil {
 		return err
 	}
@@ -54,7 +54,7 @@ func (d *ExistingDataset) MustAddDidDocV1(pathToDir, prefix string) {
 }
 
 func (d *ExistingDataset) AddDidDocV2(pathToDir, prefix string) error {
-	files, err := d.loader.GetLsitOfFiles(pathToDir, prefix)
+	files, err := d.loader.GetListOfFiles(pathToDir, prefix)
 	if err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func (d *ExistingDataset) MustAddDidDocV2(pathToDir, prefix string) {
 }
 
 func (d *ExistingDataset) AddResourceV1(pathToDir, prefix string) error {
-	files, err := d.loader.GetLsitOfFiles(pathToDir, prefix)
+	files, err := d.loader.GetListOfFiles(pathToDir, prefix)
 	if err != nil {
 		return err
 	}
@@ -101,7 +101,7 @@ func (d *ExistingDataset) MustAddResourceV1(pathToDir, prefix string) {
 }
 
 func (d *ExistingDataset) AddResourceV2(pathToDir, prefix string) error {
-	files, err := d.loader.GetLsitOfFiles(pathToDir, prefix)
+	files, err := d.loader.GetListOfFiles(pathToDir, prefix)
 	if err != nil {
 		return err
 	}
@@ -171,7 +171,7 @@ func NewExpectedDataset(setup TestSetup) *ExpectedDataset {
 }
 
 func (d *ExpectedDataset) AddDidDocV2(pathToDir, prefix string) error {
-	files, err := d.loader.GetLsitOfFiles(pathToDir, prefix)
+	files, err := d.loader.GetListOfFiles(pathToDir, prefix)
 	if err != nil {
 		return err
 	}
@@ -195,7 +195,7 @@ func (d *ExpectedDataset) MustAddDidDocV2(pathToDir, prefix string) {
 }
 
 func (d *ExpectedDataset) AddResourceV2(pathToDir, prefix string) error {
-	files, err := d.loader.GetLsitOfFiles(pathToDir, prefix)
+	files, err := d.loader.GetListOfFiles(pathToDir, prefix)
 	if err != nil {
 		return err
 	}
