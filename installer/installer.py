@@ -1023,7 +1023,7 @@ class Interviewer:
     def ask_for_cosmovisor_bump(self):
         try:
             current_cosmovisor_version = str(self.exec("cosmovisor version 2> /dev/null || echo FALSE").stdout)
-            print("current V", current_cosmovisor_version)
+            print("current V\n", current_cosmovisor_version)
         except:
             print("handled error")
         
