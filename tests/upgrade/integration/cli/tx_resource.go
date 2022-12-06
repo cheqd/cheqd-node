@@ -3,10 +3,13 @@ package cli
 import (
 	"encoding/base64"
 	"encoding/json"
+	"path/filepath"
 
+	// integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/x/did/client/cli"
 	types "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	// . "github.com/onsi/ginkgo/v2"
 )
 
 type CreateResourceOptions struct {
@@ -33,18 +36,21 @@ func CreateResourceLegacy(collectionId string, resourceId string, resourceName s
 		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivKey))
 	}
 
-	return Tx(container, CLI_BINARY_NAME, "resource", "create", OperatorAccounts[container], args...)
+	return Tx(container, CLI_BINARY_NAME, "resource", "create-resource", OperatorAccounts[container], args...)
 }
 
-func CreateResource(collectionId string, resourceId string, resourceName string, resourceVersion string, resourceType string, resourceFile string, resourceAsKnownAs []*types.AlternativeUri, signInputs []cli.SignInput, container string) (sdk.TxResponse, error) {
+func CreateResource(msg types.MsgCreateResourcePayload, resourceFile string, signInputs []cli.SignInput, container string) (sdk.TxResponse, error) {
+	resourceFileName := filepath.Base(resourceFile)
+	payloadFileName := "payload.json"
+
 	resourceOptions := CreateResourceOptions{
-		CollectionId:    collectionId,
-		ResourceId:      resourceId,
-		ResourceName:    resourceName,
-		ResourceVersion: resourceVersion,
-		ResourceType:    resourceType,
-		ResourceFile:    resourceFile,
-		AlsoKnownAs:     resourceAsKnownAs,
+		CollectionId:    msg.CollectionId,
+		ResourceId:      msg.Id,
+		ResourceName:    msg.Name,
+		ResourceVersion: msg.Version,
+		ResourceType:    msg.ResourceType,
+		ResourceFile:    resourceFileName,
+		AlsoKnownAs:     msg.AlsoKnownAs,
 	}
 
 	payloadJson, err := json.Marshal(&resourceOptions)
@@ -62,7 +68,15 @@ func CreateResource(collectionId string, resourceId string, resourceName string,
 		return sdk.TxResponse{}, err
 	}
 
-	args := []string{string(payloadWithSignInputsJson)}
+	_, err = LocalnetExecExec(container, "/bin/bash", "-c", "echo '"+string(payloadWithSignInputsJson)+"' > "+payloadFileName)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
 
-	return Tx(container, CLI_BINARY_NAME, "resource", "create", OperatorAccounts[container], args...)
+	_, err = LocalnetExecExec(container, "/bin/bash", "-c", "echo '"+string(payloadWithSignInputsJson)+"' > "+resourceFileName)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	return Tx(container, CLI_BINARY_NAME, "resource", "create-resource", OperatorAccounts[container], payloadFileName)
 }
