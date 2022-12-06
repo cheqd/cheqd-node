@@ -715,6 +715,9 @@ func New(
 
 					// Resource version links
 					migrations.MigrateResourceVersionLinks,
+
+					// Resource default alternative url
+					migrations.MigrateResourceDefaultAlternativeUrl,
 				})
 
 			err = cheqdMigrator.Migrate(ctx)
