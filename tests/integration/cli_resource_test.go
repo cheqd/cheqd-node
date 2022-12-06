@@ -26,6 +26,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 	})
 
 	It("can create diddoc, create resource, query it, query all resource versions of the same resource name, query resource collection", func() {
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.GREEN, "can create diddoc"))
 		// Create a new DID Doc
 		collectionId := uuid.NewString()
 		did := "did:cheqd:" + network.DID_NAMESPACE + ":" + collectionId
@@ -59,27 +60,6 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		}
 
 		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
-		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(0))
-
-		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.GREEN, "can create diddoc"))
-
-		// Update DID Doc
-		payloadUpdate := types.MsgUpdateDidDocPayload{
-			Id: did,
-			VerificationMethod: []*types.VerificationMethod{
-				{
-					Id:                   keyId,
-					Type:                 "Ed25519VerificationKey2020",
-					Controller:           did,
-					VerificationMaterial: "{\"publicKeyMultibase\": \"" + string(pubKeyMultibase58) + "\"}",
-				},
-			},
-			Authentication: []string{keyId},
-			VersionId:      uuid.NewString(),
-		}
-
-		res, err = cli.UpdateDidDoc(tmpDir, payloadUpdate, signInputs, testdata.BASE_ACCOUNT_1)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
