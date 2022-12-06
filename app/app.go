@@ -729,7 +729,10 @@ func New(
 			migrationContext := migrations.NewMigrationContext(
 				app.appCodec,
 				keys[didtypes.StoreKey],
-				keys[resourcetypes.StoreKey])
+				app.GetSubspace(didtypes.ModuleName),
+				keys[resourcetypes.StoreKey],
+				app.GetSubspace(resourcetypes.ModuleName),
+			)
 
 			cheqdMigrator := migrations.NewMigrator(
 				migrationContext,

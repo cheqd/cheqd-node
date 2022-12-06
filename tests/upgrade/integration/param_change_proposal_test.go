@@ -1,11 +1,9 @@
-//go:build upgrade
-
-package upgrade
+package integration
 
 import (
 	"path/filepath"
 
-	cli "github.com/cheqd/cheqd-node/tests/upgrade/cli"
+	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/cli"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
@@ -83,7 +81,7 @@ var _ = Describe("Upgrade - Fee parameter change proposal", func() {
 
 		By("checking against the expected fee params")
 		var expectedFeeParams didtypes.FeeParams
-		err = Loader(filepath.Join(GENERATED_JSON_DIR, "proposal", "expected", "param_change_did.json"), &expectedFeeParams)
+		_, err = Loader(filepath.Join(GENERATED_JSON_DIR, "proposal", "expected", "param_change_did.json"), &expectedFeeParams)
 		Expect(err).To(BeNil())
 		Expect(feeParams).To(Equal(expectedFeeParams))
 	})
@@ -151,7 +149,7 @@ var _ = Describe("Upgrade - Fee parameter change proposal", func() {
 
 		By("checking against the expected fee params")
 		var expectedFeeParams resourcetypes.FeeParams
-		err = Loader(filepath.Join(GENERATED_JSON_DIR, "proposal", "expected", "param_change_resource.json"), &expectedFeeParams)
+		_, err = Loader(filepath.Join(GENERATED_JSON_DIR, "proposal", "expected", "param_change_resource.json"), &expectedFeeParams)
 		Expect(err).To(BeNil())
 		Expect(feeParams).To(Equal(expectedFeeParams))
 	})

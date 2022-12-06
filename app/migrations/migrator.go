@@ -3,8 +3,10 @@ package migrations
 import (
 	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 	didkeeperv1 "github.com/cheqd/cheqd-node/x/did/keeper/v1"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
 	resourcekeeperv1 "github.com/cheqd/cheqd-node/x/resource/keeper/v1"
+	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -53,17 +55,19 @@ type MigrationContext struct {
 func NewMigrationContext(
 	codec codec.Codec,
 	didStoreKey *storetypes.KVStoreKey,
+	didSubspace didtypes.ParamSubspace,
 	resourceStoreKey *storetypes.KVStoreKey,
+	resourceSubspace resourcetypes.ParamSubspace,
 ) MigrationContext {
 	return MigrationContext{
 		codec: codec,
 
 		didStoreKey:  didStoreKey,
 		didKeeperOld: didkeeperv1.NewKeeper(codec, didStoreKey),
-		didKeeperNew: didkeeper.NewKeeper(codec, didStoreKey),
+		didKeeperNew: didkeeper.NewKeeper(codec, didStoreKey, didSubspace),
 
 		resourceStoreKey:  resourceStoreKey,
 		resourceKeeperOld: resourcekeeperv1.NewKeeper(codec, resourceStoreKey),
-		resourceKeeperNew: resourcekeeper.NewKeeper(codec, resourceStoreKey),
+		resourceKeeperNew: resourcekeeper.NewKeeper(codec, resourceStoreKey, resourceSubspace),
 	}
 }
