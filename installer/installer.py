@@ -580,14 +580,6 @@ class Installer():
                 os.symlink(self.cosmovisor_cheqd_bin_path,
                         os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
             
-            # set ENV vars for cosmovisor
-            self.log(f"Setting up cosmovisor ENV vars")
-            write_new_line_to_file("export DAEMON_NAME=cheqd", "/home/.profile")
-            write_new_line_to_file("export DAEMON_HOME={}/.cheqdnode".format(self.interviewer.home_dir), "/home/.profile")
-            write_new_line_to_file("export DAEMON_DATA_BACKUP_DIR={}/.cheqdnode".format(self.interviewer.home_dir), "/home/.profile")
-            self.exec("source ~/.profile")
-            self.log("Echoing DAEMON_NAME")
-            self.exec("echo $DAEMON_NAME")
             
             if self.interviewer.is_upgrade and \
                 os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
@@ -1029,6 +1021,13 @@ class Interviewer:
             failure_exit(f"Invalid input provided during installation.")
     
     def ask_for_cosmovisor_bump(self):
+            self.exec("export DAEMON_NAME=cheqd")
+            self.exec("export DAEMON_HOME={}/.cheqdnode".format(self.home_dir))
+            self.exec("export DAEMON_DATA_BACKUP_DIR={}/.cheqdnode".format(self.home_dir))
+            current_cosmovisor_version = str(self.exec("cosmovisor version").stdout)
+            # todo: compare current_cosmovisor_version with  DEFAULT_VERSION and do accordingly
+            self.log("current cosmovisor version {}".format(current_cosmovisor_version))
+
             answer = self.ask(f"Install {DEFAULT_LATEST_COSMOVISOR_VERSION} cosmovisor? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
             if answer.lower().startswith("y"):
                 self.is_cosmovisor_bump_needed = True
@@ -1157,10 +1156,8 @@ if __name__ == '__main__':
     # Steps to execute if upgrading existing node
     def upgrade_steps():
         # if cosmovisor is not installed 
-        if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)):
-            interviewer.ask_for_cosmovisor()
-        else:
-            interviewer.ask_for_cosmovisor_bump()
+        if os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)):
+            interviewer.ask_for_cosmovisor_bump()     
         if interviewer.is_systemd_config_exists():
             interviewer.ask_for_rewrite_systemd()
         if os.path.exists(DEFAULT_RSYSLOG_FILE):
