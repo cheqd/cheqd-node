@@ -551,7 +551,7 @@ class Installer():
                 self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis/bin"))
                 self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "upgrades"))
             else:
-                self.log(f"Bumping Comsovisor binary to {DEFAULT_LATEST_COSMOVISOR_VERSION}")
+                self.log(f"Bumping Cosmvisor binary to {DEFAULT_LATEST_COSMOVISOR_VERSION}")
             if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)):
                 self.log(f"Moving Cosmovisor binary to installation directory")
                 shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
