@@ -44,9 +44,22 @@ func (didDoc *DidDoc) ReplaceDids(old, new string) {
 		didDoc.Id = new
 	}
 
+	// Verification methods
 	for _, vm := range didDoc.VerificationMethod {
 		vm.ReplaceDids(old, new)
 	}
+
+	// Services
+	for _, service := range didDoc.Service {
+		service.ReplaceDids(old, new)
+	}
+
+	// Verification relationships
+	didDoc.Authentication = utils.ReplaceDidInDidUrlList(didDoc.Authentication, old, new)
+	didDoc.AssertionMethod = utils.ReplaceDidInDidUrlList(didDoc.AssertionMethod, old, new)
+	didDoc.CapabilityInvocation = utils.ReplaceDidInDidUrlList(didDoc.CapabilityInvocation, old, new)
+	didDoc.CapabilityDelegation = utils.ReplaceDidInDidUrlList(didDoc.CapabilityDelegation, old, new)
+	didDoc.KeyAgreement = utils.ReplaceDidInDidUrlList(didDoc.KeyAgreement, old, new)
 }
 
 func (didDoc *DidDoc) GetControllersOrSubject() []string {

@@ -190,7 +190,7 @@ function send_resource_new () {
 
     # Post the message
     # shellcheck disable=SC2086
-    resource=$(local_client_tx tx resource create-resource \
+    resource=$(local_client_tx tx resource create \
     --collection-id ${collection_id_to_write} \
     --resource-id ${resource_to_write} \
     --resource-name "${RESOURCE_NAME}" \

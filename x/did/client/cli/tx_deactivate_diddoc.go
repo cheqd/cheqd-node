@@ -12,8 +12,8 @@ import (
 func CmdDeactivateDidDoc() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "deactivate-did [payload-file]",
-		Short: "Deactivates a DIDDoc.",
-		Long: "Deactivates a DIDDoc. " +
+		Short: "Deactivate a DID.",
+		Long: "Deactivates a DID and its associated DID Document." +
 			"[payload-file] is JSON encoded MsgCreateDidDocPayload alongside with sign inputs.",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {

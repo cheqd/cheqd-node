@@ -30,9 +30,14 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 
 // ExportGenesis returns the cheqd module's exported genesis.
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
+	didDocs, err := k.GetAllDidDocs(&ctx)
+	if err != nil {
+		panic(err)
+	}
+
 	genesis := types.GenesisState{
 		DidNamespace: k.GetDidNamespace(&ctx),
-		VersionSets:  k.GetAllDidDocs(&ctx),
+		VersionSets:  didDocs,
 	}
 
 	return &genesis

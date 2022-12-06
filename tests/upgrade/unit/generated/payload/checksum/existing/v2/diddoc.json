@@ -1,0 +1,34 @@
+{
+    "did_doc": {
+        "context": [],
+        "id": "did:cheqd:testnet:97096fb1-63ea-4f81-b296-8eb5da6ab6eb",
+        "controller": [
+            "did:cheqd:testnet:97096fb1-63ea-4f81-b296-8eb5da6ab6eb"
+        ],
+        "authentication": [
+            "did:cheqd:testnet:97096fb1-63ea-4f81-b296-8eb5da6ab6eb#key-1"
+        ],
+        "assertionMethod": [],
+        "capabilityInvocation": [],
+        "capabilityDelegation": [],
+        "keyAgreement": [],
+        "alsoKnownAs": [],
+        "verificationMethod": [
+            {
+                "id": "did:cheqd:testnet:97096fb1-63ea-4f81-b296-8eb5da6ab6eb#key-1",
+                "type": "Ed25519VerificationKey2020",
+                "controller": "did:cheqd:testnet:97096fb1-63ea-4f81-b296-8eb5da6ab6eb",
+                "verification_material": "{\"publicKeyMultibase\":\"z6LNquFfzPNhCQ8nbCWSMBQjosLT7ayEqGSYrN2Y1FdmS\"}"
+            }
+        ],
+        "service": []
+    },
+    "metadata": {
+        "created": "2021-09-14T13:00:00Z",
+        "updated": "2021-09-14T13:00:00Z",
+        "version_id": "75e0cf07-1729-40de-bd88-a4e091eff137",
+        "deactivated": false,
+        "next_version_id": "",
+        "previous_version_id": ""
+    }
+}

@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/cheqd/cheqd-node/app/ante"
+	"github.com/cheqd/cheqd-node/app/migrations"
 	appparams "github.com/cheqd/cheqd-node/app/params"
 	did "github.com/cheqd/cheqd-node/x/did"
 	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
@@ -683,6 +684,42 @@ func New(
 						fromVM[moduleName] = versionMap[moduleName]
 					}
 				}
+			}
+
+			// cheqd migrations
+			migrationContext := migrations.NewMigrationContext(
+				app.appCodec,
+				keys[didtypes.StoreKey],
+				keys[resourcetypes.StoreKey])
+
+			cheqdMigrator := migrations.NewMigrator(
+				migrationContext,
+				[]migrations.Migration{
+					// Protobufs
+					migrations.MigrateDidProtobuf,
+					migrations.MigrateResourceProtobuf,
+
+					// Indy style
+					migrations.MigrateDidIndyStyle,
+					migrations.MigrateResourceIndyStyle,
+
+					// UUID normalizatiion
+					migrations.MigrateDidUUID,
+					migrations.MigrateResourceUUID,
+
+					// Did version id
+					migrations.MigrateDidVersionId,
+
+					// Resource checksum
+					migrations.MigrateResourceChecksum,
+
+					// Resource version links
+					migrations.MigrateResourceVersionLinks,
+				})
+
+			err = cheqdMigrator.Migrate(ctx)
+			if err != nil {
+				panic(err)
 			}
 
 			// ibc v3 -> v4 migration

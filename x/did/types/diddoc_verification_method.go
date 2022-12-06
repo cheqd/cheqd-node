@@ -123,12 +123,7 @@ func (vm *VerificationMethod) ReplaceDids(old, new string) {
 	}
 
 	// Id
-	did, path, query, fragment := utils.MustSplitDIDUrl(vm.Id)
-	if did == old {
-		did = new
-	}
-
-	vm.Id = utils.JoinDIDUrl(did, path, query, fragment)
+	vm.Id = utils.ReplaceDidInDidUrl(vm.Id, old, new)
 }
 
 // Validation

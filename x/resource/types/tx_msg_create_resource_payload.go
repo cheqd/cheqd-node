@@ -61,5 +61,5 @@ func ValidMsgCreateResourcePayload() *didtypes.CustomErrorRule {
 
 func (msg *MsgCreateResourcePayload) Normalize() {
 	msg.CollectionId = didutils.NormalizeId(msg.CollectionId)
-	msg.Id = didutils.NormalizeId(msg.Id)
+	msg.Id = didutils.NormalizeUUID(msg.Id)
 }

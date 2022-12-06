@@ -1,0 +1,19 @@
+{
+    "payload": {
+        "resource": {
+            "data": "eyAibWVzc2FnZSI6ICJoZWxsbyB3b3JsZCJ9"
+        },
+        "metadata": {
+            "collectionId": "85d9e742-be4d-59e8-9b10-5449db2e2d04",
+            "id": "b67d9bdc-b8f4-45fd-b5f6-1af38c26d4c8",
+            "name": "UUID mixed",
+            "version": "",
+            "resource_type": "TestResourceTypeMixed23",
+            "also_known_as": [],
+            "media_type": "application/json",
+            "checksum": "4f479bba31f71859d9943651538c8df2119804eceb7f58a0de241789ff214af4",
+            "previous_version_id": "",
+            "next_version_id": "76ecedeb-225d-4164-90c2-a4857ac3c01a"
+        }
+    }
+}
