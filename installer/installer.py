@@ -1021,11 +1021,10 @@ class Interviewer:
             failure_exit(f"Invalid input provided during installation.")
     
     def ask_for_cosmovisor_bump(self):
-            self.exec("export DAEMON_NAME=cheqd")
-            self.exec("export DAEMON_HOME={}/.cheqdnode".format(self.home_dir))
-            self.exec("export DAEMON_DATA_BACKUP_DIR={}/.cheqdnode".format(self.home_dir))
-            self.exec("chmod +x source ~/.profile")
-            self.exec("echo $DAEMON_NAME")
+        try:
+            current_cosmovisor_version = str(self.exec("cosmovisor version").stdout)
+        except:
+            print("handled error")
             current_cosmovisor_version = str(self.exec("cosmovisor version").stdout)
             # todo: compare current_cosmovisor_version with  DEFAULT_VERSION and do accordingly
             self.log("current cosmovisor version {}".format(current_cosmovisor_version))
