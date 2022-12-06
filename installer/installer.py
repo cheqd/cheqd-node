@@ -576,12 +576,12 @@ class Installer():
             
             # set ENV vars for cosmovisor
             self.log(f"Setting up cosmovisor ENV vars")
-            self.exec("sudo export DAEMON_NAME=cheqd")
-            self.exec("sudo export DAEMON_HOME={}/.cheqdnode".format(self.interviewer.home_dir))
-            self.exec("sudo export DAEMON_DATA_BACKUP_DIR={}/.cheqdnode".format(self.interviewer.home_dir))
+            self.exec("export DAEMON_NAME=cheqd")
+            self.exec("export DAEMON_HOME={}/.cheqdnode".format(self.interviewer.home_dir))
+            self.exec("export DAEMON_DATA_BACKUP_DIR={}/.cheqdnode".format(self.interviewer.home_dir))
             self.exec("source ~/.profile")
             self.log("Echoing DAEMON_NAME")
-            self.exec("sudo echo $DAEMON_NAME")
+            self.exec("echo $DAEMON_NAME")
             
             if self.interviewer.is_upgrade and \
                 os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
