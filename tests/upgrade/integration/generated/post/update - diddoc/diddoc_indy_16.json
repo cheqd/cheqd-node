@@ -1,0 +1,71 @@
+{
+    "payload": {
+        "context": [
+            "abc",
+            "def"
+        ],
+        "id": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg",
+        "controller": [
+            "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg"
+        ],
+        "verification_method": [
+            {
+                "id": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-1",
+                "type": "Ed25519VerificationKey2020",
+                "controller": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg",
+                "verification_material": "{\"publicKeyMultibase\":\"zBNy7xYrzNb25mbVFP5hVZXwJZ7RD16yJSoya82qe3Jra\"}"
+            },
+            {
+                "id": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-2",
+                "type": "Ed25519VerificationKey2020",
+                "controller": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg",
+                "verification_material": "{\"publicKeyMultibase\":\"zC4mnpocVYbywi32srkHzRdy7LEXQG4TM8YtCTPXWnza1\"}"
+            },
+            {
+                "id": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-3",
+                "type": "Ed25519VerificationKey2020",
+                "controller": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg",
+                "verification_material": "{\"publicKeyMultibase\":\"zC1CAqqp2tQooisYtTh1oULGzKyRNQbsUtyqoh2neWPta\"}"
+            }
+        ],
+        "authentication": [
+            "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-1"
+        ],
+        "assertion_method": [
+            "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-2",
+            "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-3"
+        ],
+        "capability_delegation": [
+            "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-4",
+            "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-2"
+        ],
+        "key_agreement": [
+            "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-4"
+        ],
+        "service": [
+            {
+                "id": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#service-1",
+                "type": "type-1",
+                "service_endpoint": [
+                    "endpoint-1"
+                ]
+            },
+            {
+                "id": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#service-2",
+                "type": "type-1",
+                "service_endpoint": [
+                    "endpoint-2"
+                ]
+            }
+        ],
+        "also_known_as": [
+            "alias-3"
+        ]
+    },
+    "signInputs": [
+        {
+            "verificationMethodId": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-1",
+            "privKey": "dTHxupAW0yqeeIgqZkjndoWSbZ2kRjK2FMwI6bgtZR6aNYVzr6sn2zzT5zOUYPMflJu17gBqNH0tjp62SlLg/w=="
+        }
+    ]
+}

@@ -30,8 +30,8 @@ jobs:
         run: |
           go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
-      - name: Run Ginkgo tests
-        run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --skip-file migration_unit_test.go --skip-file pre_test.go --skip-file post_test.go --junit-report report-unit.xml
+      - name: Run Ginkgo unit tests
+        run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --tags upgrade_unit --junit-report report-unit.xml
 
       - name: Upload unit tests result
         uses: actions/upload-artifact@v3
@@ -89,7 +89,7 @@ jobs:
         working-directory: ./..
         run: go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
-      - name: Run integration tests
+      - name: Run Gingko integration tests
         working-directory: ./tests/integration
         run: |
           ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --junit-report ../../report-integration.xml
@@ -119,6 +119,7 @@ jobs:
           wget -c https://github.com/cheqd/cheqd-node/releases/download/0.6.9/cheqd-noded-0.6.9-Linux-x86_64.tar.gz
           tar -xvf cheqd-noded-0.6.9-Linux-x86_64.tar.gz -C ${{ env.RUNNER_BIN_DIR }} --strip-components=1
           sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
@@ -146,19 +147,15 @@ jobs:
       # Run tests
 
       - name: Setting up network with old binary inside (mainnet version)
-        working-directory: ./tests/upgrade
+        working-directory: ./tests/upgrade/integration
         run: |
           bash scripts/setup.sh
-      - name: Run pre-upgrade tests
-        working-directory: ./tests/upgrade
-        run: |
-          ginkgo -r --tags upgrade --race --tags upgrade --focus-file pre_test.go
       - name: Restart network using new node version (build-latest)
-        working-directory: ./tests/upgrade
+        working-directory: ./tests/upgrade/integration
         run: |
           bash scripts/upgrade.sh
       - name: Run post-upgrade tests
-        working-directory: ./tests/upgrade
+        working-directory: ./tests/upgrade/integration
         run: |
           ginkgo -r --tags upgrade --race --tags upgrade --focus-file post_test.go
       - name: Download binary artifact (build-latest)
@@ -177,8 +174,8 @@ jobs:
         if: failure()
         working-directory: ./docker/localnet
         run: docker compose --env-file build-latest.env logs --tail --follow
-      - name: Submit governance fee parameter change proposal
-        working-directory: ./tests/upgrade
+      - name: Submit governance fee parameter change proposals
+        working-directory: ./tests/upgrade/integration
         run: |
           ginkgo -r --tags upgrade --race --tags upgrade --focus-file param_change_proposal_test.go
       - name: Run pricing integration tests after successful param change proposal
@@ -186,7 +183,7 @@ jobs:
         run: |
           ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --skip-file cli_diddoc_test.go --skip-file cli_diddoc_negative_test.go --skip-file cli_resource_test.go --skip-file cli_resource_negative_test.go
       - name: Cleanup after tests
-        working-directory: ./tests/upgrade
+        working-directory: ./tests/upgrade/integration
         run: |
           bash scripts/cleanup.sh
 

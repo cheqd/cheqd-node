@@ -1,13 +1,6 @@
 version: '3.7'
 
 services:
-  
-  cli:
-    image: ${BUILD_IMAGE}
-    entrypoint: ["/bin/sh", "-c"]
-    profiles:
-      - tools
-
   validator-0:
     image: ${BUILD_IMAGE}
     ports:

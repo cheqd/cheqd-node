@@ -15,6 +15,12 @@ func NewService(id string, type_ string, serviceEndpoint []string) *Service {
 	}
 }
 
+// ReplaceDids replaces ids in all fields
+func (s *Service) ReplaceDids(old, new string) {
+	// Id
+	s.Id = utils.ReplaceDidInDidUrl(s.Id, old, new)
+}
+
 // Helpers
 
 func GetServiceIds(vms []*Service) []string {

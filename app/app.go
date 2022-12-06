@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/cheqd/cheqd-node/app/migrations"
 	appparams "github.com/cheqd/cheqd-node/app/params"
 	posthandler "github.com/cheqd/cheqd-node/post"
 	did "github.com/cheqd/cheqd-node/x/did"
@@ -708,7 +709,11 @@ func New(
 				}
 			} else {
 				println("Version map already initialized")
-				println("Initializing resource module")
+
+				// Add defaults for staking subspace
+				stakingSubspace, _ := app.ParamsKeeper.GetSubspace(stakingtypes.ModuleName)
+				stakingSubspace.Set(ctx, stakingtypes.KeyMinCommissionRate, sdk.NewDec(0))
+
 				// Add defaults for resource subspace
 				resourceSubspace := app.GetSubspace(resourcetypes.ModuleName)
 				resourceSubspace.Set(ctx, resourcetypes.ParamStoreKeyFeeParams, resourcetypes.DefaultFeeParams())
@@ -718,6 +723,45 @@ func New(
 
 				// Skip resource module InitGenesis (was not present in v0.6.9)
 				fromVM[resourcetypes.ModuleName] = versionMap[resourcetypes.ModuleName]
+			}
+
+			// cheqd migrations
+			migrationContext := migrations.NewMigrationContext(
+				app.appCodec,
+				keys[didtypes.StoreKey],
+				keys[resourcetypes.StoreKey])
+
+			cheqdMigrator := migrations.NewMigrator(
+				migrationContext,
+				[]migrations.Migration{
+					// Protobufs
+					migrations.MigrateDidProtobuf,
+					migrations.MigrateResourceProtobuf,
+
+					// Indy style
+					migrations.MigrateDidIndyStyle,
+					migrations.MigrateResourceIndyStyle,
+
+					// UUID normalizatiion
+					migrations.MigrateDidUUID,
+					migrations.MigrateResourceUUID,
+
+					// Did version id
+					migrations.MigrateDidVersionId,
+
+					// Resource checksum
+					migrations.MigrateResourceChecksum,
+
+					// Resource version links
+					migrations.MigrateResourceVersionLinks,
+
+					// Resource default alternative url
+					migrations.MigrateResourceDefaultAlternativeUrl,
+				})
+
+			err = cheqdMigrator.Migrate(ctx)
+			if err != nil {
+				panic(err)
 			}
 
 			// ibc v3 -> v4 migration

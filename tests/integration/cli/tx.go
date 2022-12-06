@@ -146,5 +146,5 @@ func CreateResource(tmpDir string, options resourcecli.CreateResourceOptions, si
 
 	payloadFile := helpers.MustWriteTmpFile("", []byte(payloadWithSignInputsJson))
 
-	return Tx("resource", "create-resource", from, feeParams, payloadFile)
+	return Tx("resource", "create", from, feeParams, payloadFile)
 }

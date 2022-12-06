@@ -58,7 +58,7 @@ func QueryParams(subspace, key string) (paramproposal.ParamChange, error) {
 }
 
 func QueryDidDoc(did string) (didtypes.QueryGetDidDocResponse, error) {
-	res, err := Query("cheqd", "diddoc", did)
+	res, err := Query("cheqd", "did-document", did)
 	if err != nil {
 		return didtypes.QueryGetDidDocResponse{}, err
 	}

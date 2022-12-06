@@ -1,0 +1,80 @@
+{
+    "did_doc": {
+        "context": [
+            "abc",
+            "def"
+        ],
+        "id": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5",
+        "controller": [
+            "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5"
+        ],
+        "verification_method": [
+            {
+                "id": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-1",
+                "type": "Ed25519VerificationKey2020",
+                "controller": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5",
+                "verification_material": "{\"publicKeyMultibase\":\"zHYqCstG3zdLyWGut3SCSSZiVdQttTiNG3u3cSSR1eDvz\"}"
+            },
+            {
+                "id": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-2",
+                "type": "Ed25519VerificationKey2020",
+                "controller": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5",
+                "verification_material": "{\"publicKeyMultibase\":\"zDcoCVPoUgMjRWmd4ZrfGAZ51L7oF35upoKCX77qRpqUT\"}"
+            },
+            {
+                "id": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-3",
+                "type": "Ed25519VerificationKey2020",
+                "controller": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5",
+                "verification_material": "{\"publicKeyMultibase\":\"z2RaG3VJ1YMgyDYyAmYcJeKcMsk89UxfoLnyg1peJbhdv\"}"
+            },
+            {
+                "id": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-4",
+                "type": "Ed25519VerificationKey2020",
+                "controller": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5",
+                "verification_material": "{\"publicKeyMultibase\":\"z9Wx6sWnw2ZGEB5m95K7tPr7SkqvfwBdXe5ZmUTyqmKmt\"}"
+            }
+        ],
+        "authentication": [
+            "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-1",
+            "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-2"
+        ],
+        "assertion_method": [
+            "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-3"
+        ],
+        "capability_invocation": [
+            "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-4",
+            "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-1"
+        ],
+        "capability_delegation": [
+            "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-4",
+            "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-2"
+        ],
+        "key_agreement": [
+            "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-1",
+            "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-2",
+            "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-3",
+            "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-4"
+        ],
+        "service": [
+            {
+                "id": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#service-1",
+                "type": "type-1",
+                "service_endpoint": [
+                    "endpoint-1"
+                ]
+            }
+        ],
+        "also_known_as": [
+            "alias-1",
+            "alias-2"
+        ]
+    },
+    "metadata": {
+        "created": "2021-01-01T00:00:00Z",
+        "updated": "2021-01-01T00:00:00Z",
+        "deactivated": false,
+        "version_id": "EDEAD35C83E20A72872ACD3C36B7BA42300712FC8E3EEE1340E47E2F1B216B2D",
+        "next_version_id": "",
+        "previous_version_id": ""
+    }
+}
