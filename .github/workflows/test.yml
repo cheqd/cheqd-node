@@ -150,6 +150,10 @@ jobs:
         working-directory: ./tests/upgrade/integration
         run: |
           bash scripts/setup.sh
+      - name: Run pre-upgrade tests
+        working-directory: ./tests/upgrade/integration
+        run: |
+          ginkgo -r --race --tags upgrade_integration --focus-file pre_test.go
       - name: Restart network using new node version (build-latest)
         working-directory: ./tests/upgrade/integration
         run: |
