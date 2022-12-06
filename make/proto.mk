@@ -10,7 +10,7 @@ containerProtoGen=cheqd-node-proto-gen-$(containerProtoVer)
 containerProtoFmt=cheqd-node-proto-fmt-$(containerProtoVer)
 containerProtoGenSwagger=cheqd-node-proto-gen-swagger-$(containerProtoVer)
 
-proto-all: proto-lint proto-format proto-gen proto-check-breaking proto-swagger-deps proto-swagger-gen
+proto-all: proto-lint proto-format proto-gen proto-swagger-deps proto-swagger-gen
 
 proto-gen:
 	@echo "Generating Protobuf files"
@@ -29,9 +29,6 @@ DOCKER_BUF := docker run -v $(shell pwd):/workspace --workdir /workspace bufbuil
 
 proto-lint:
 	@$(DOCKER_BUF) lint --error-format=json
-
-proto-check-breaking:
-	@$(DOCKER_BUF) breaking --against https://github.com/cheqd/cheqd-node.git#branch=main
 
 GOGO_PROTO_URL           = https://raw.githubusercontent.com/regen-network/protobuf/cosmos
 GOOGLE_PROTO_URL         = https://raw.githubusercontent.com/googleapis/googleapis/master
@@ -64,4 +61,4 @@ proto-swagger-gen: proto-swagger-deps
 	@if docker ps -a --format '{{.Names}}' | grep -Eq "^${containerProtoGenSwagger}$$"; then docker start -a $(containerProtoGenSwagger); else docker run --name $(containerProtoGenSwagger) -v $(CURDIR):/workspace --workdir /workspace $(containerProtoImage) \
 		sh ./scripts/protoc-swagger-gen.sh; fi
 
-.PHONY: proto-all proto-gen proto-format proto-lint proto-check-breaking proto-swagger-deps proto-swagger-gen
+.PHONY: proto-all proto-gen proto-format proto-lint proto-swagger-deps proto-swagger-gen
