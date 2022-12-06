@@ -78,5 +78,5 @@ func CreateResource(msg types.MsgCreateResourcePayload, resourceFile string, sig
 		return sdk.TxResponse{}, err
 	}
 
-	return Tx(container, CLI_BINARY_NAME, "resource", "create-resource", OperatorAccounts[container], payloadFileName)
+	return Tx(container, CLI_BINARY_NAME, "resource", "create", OperatorAccounts[container], payloadFileName)
 }
