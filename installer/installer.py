@@ -421,7 +421,7 @@ class Installer():
 
         if self.interviewer.is_cosmo_needed:
             self.log("Setting up Cosmovisor")
-            self.setup_cosmovisor(self.interviewer.is_cosmovisor_bump_needed)
+            self.setup_cosmovisor()
 
         if not self.interviewer.is_cosmo_needed:
             self.log(f"Moving binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}")
@@ -538,7 +538,7 @@ class Installer():
         except:
             failure_exit(f"Failed to setup {self.cheqd_log_dir} directory")
 
-    def setup_cosmovisor(self, is_cosmovisor_bump_needed):
+    def setup_cosmovisor(self):
         try:
             fname= os.path.basename(COSMOVISOR_BINARY_URL)
             self.exec(f"wget -c {COSMOVISOR_BINARY_URL}")
@@ -550,13 +550,11 @@ class Installer():
             self.remove_safe("README.md")
             self.remove_safe("LICENSE")
             
-            if not is_cosmovisor_bump_needed:
-                self.mkdir_p(self.cosmovisor_root_dir)
-                self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis"))
-                self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis/bin"))
-                self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "upgrades"))
-            else:
-                self.log(f"Bumping Cosmvisor binary to {DEFAULT_LATEST_COSMOVISOR_VERSION}")
+            self.mkdir_p(self.cosmovisor_root_dir)
+            self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis"))
+            self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis/bin"))
+            self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "upgrades"))
+            
             if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)):
                 self.log(f"Moving Cosmovisor binary to installation directory")
                 shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
