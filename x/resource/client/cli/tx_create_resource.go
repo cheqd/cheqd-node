@@ -25,9 +25,9 @@ type CreateResourceOptions struct {
 
 func CmdCreateResource() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-resource [payload-file]",
-		Short: "Creates a new Resource.",
-		Long: "Creates a new Resource. " +
+		Use:   "create [payload-file]",
+		Short: "Create a new Resource.",
+		Long: "Create a new Resource within a DID Resource Collection. " +
 			"[payload-file] is JSON encoded MsgCreateResourcePayload alongside with sign inputs.",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
