@@ -1022,12 +1022,13 @@ class Interviewer:
     
     def ask_for_cosmovisor_bump(self):
         try:
-            current_cosmovisor_version = str(self.exec("cosmovisor version").stdout)
+            current_cosmovisor_version = str(self.exec("cosmovisor version 2> /dev/null || echo FALSE").stdout)
+            print("current V", current_cosmovisor_version)
         except:
             print("handled error")
         
             # todo: compare current_cosmovisor_version with  DEFAULT_VERSION and do accordingly
-            self.log("current cosmovisor version {}".format(current_cosmovisor_version))
+            #self.log("current cosmovisor version {}".format(current_cosmovisor_version))
 
             answer = self.ask(f"Install {DEFAULT_LATEST_COSMOVISOR_VERSION} cosmovisor? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
             if answer.lower().startswith("y"):
