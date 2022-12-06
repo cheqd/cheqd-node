@@ -1,5 +1,3 @@
-//go:build upgrade_integration
-
 package integration
 
 import (
@@ -82,6 +80,36 @@ var _ = Describe("Upgrade - Post", func() {
 			}
 		})
 
+		It("should create resources after upgrade", func() {
+			By("matching the glob pattern for resource payloads to create")
+			ResourcePayloads, err := RelGlob(GENERATED_JSON_DIR, "post", "create - resource", "*.json")
+			Expect(err).To(BeNil())
+
+			for _, payload := range ResourcePayloads {
+				var ResourceCreatePayload resourcetypesv2.MsgCreateResourcePayload
+
+				testCase := GetCaseName(payload)
+				By("Running: create " + testCase)
+				fmt.Println("Running: " + testCase)
+
+				signInputs, err := Loader(payload, &ResourceCreatePayload)
+				Expect(err).To(BeNil())
+
+				ResourceFile, err := CreateTestJson(GinkgoT().TempDir(), ResourceCreatePayload.Data)
+				Expect(err).To(BeNil())
+
+				res, err := cli.CreateResource(
+					ResourceCreatePayload,
+					ResourceFile,
+					signInputs,
+					cli.VALIDATOR0,
+				)
+
+				Expect(err).To(BeNil())
+				Expect(res.Code).To(Equal(uint32(0)))
+			}
+		})
+
 		It("should load and run expected diddoc payloads", func() {
 			By("matching the glob pattern for existing diddoc payloads")
 			ExpectedDidDocUpdateRecords, err := RelGlob(GENERATED_JSON_DIR, "post", "query - diddoc", "*.json")
@@ -159,36 +187,6 @@ var _ = Describe("Upgrade - Post", func() {
 				Expect(res.Resource.Metadata.Checksum).To(Equal(ResourceCreateRecord.Metadata.Checksum))
 				Expect(res.Resource.Metadata.PreviousVersionId).To(Equal(ResourceCreateRecord.Metadata.PreviousVersionId))
 				Expect(res.Resource.Metadata.NextVersionId).To(Equal(ResourceCreateRecord.Metadata.NextVersionId))
-			}
-		})
-
-		It("should create resources after upgrade", func() {
-			By("matching the glob pattern for resource payloads to create")
-			ResourcePayloads, err := RelGlob(GENERATED_JSON_DIR, "post", "create - resource", "*.json")
-			Expect(err).To(BeNil())
-
-			for _, payload := range ResourcePayloads {
-				var ResourceCreatePayload resourcetypesv2.MsgCreateResourcePayload
-
-				testCase := GetCaseName(payload)
-				By("Running: create " + testCase)
-				fmt.Println("Running: " + testCase)
-
-				signInputs, err := Loader(payload, &ResourceCreatePayload)
-				Expect(err).To(BeNil())
-
-				ResourceFile, err := CreateTestJson(GinkgoT().TempDir(), ResourceCreatePayload.Data)
-				Expect(err).To(BeNil())
-
-				res, err := cli.CreateResource(
-					ResourceCreatePayload,
-					ResourceFile,
-					signInputs,
-					cli.VALIDATOR0,
-				)
-
-				Expect(err).To(BeNil())
-				Expect(res.Code).To(Equal(uint32(0)))
 			}
 		})
 	})
