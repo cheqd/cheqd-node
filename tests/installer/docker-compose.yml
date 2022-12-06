@@ -1,0 +1,20 @@
+version: '3.8'
+
+# SYNTAX: docker compose -f tests/installer/docker-compose.yml up --detach
+
+services:
+  installer_test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    entrypoint: [ "/bin/bash", "-c" ]
+    command:
+      - |
+        sudo python3 ./installer.py < answers.txt
+    restart: "no"
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
