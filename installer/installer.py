@@ -1024,7 +1024,7 @@ class Interviewer:
             self.exec("export DAEMON_NAME=cheqd")
             self.exec("export DAEMON_HOME={}/.cheqdnode".format(self.home_dir))
             self.exec("export DAEMON_DATA_BACKUP_DIR={}/.cheqdnode".format(self.home_dir))
-            self.exec("source ~/.profile",False)
+            self.exec("chmod +x source ~/.profile")
             self.exec("echo $DAEMON_NAME")
             current_cosmovisor_version = str(self.exec("cosmovisor version").stdout)
             # todo: compare current_cosmovisor_version with  DEFAULT_VERSION and do accordingly
