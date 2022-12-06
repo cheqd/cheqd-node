@@ -654,7 +654,7 @@ class Installer():
             failure_exit(f"Failed to extract snapshot")
 
     def print_success(self):
-        self.log("The cheqd-noded has been successfully installed")
+        self.log("The cheqd-noded binary has been successfully installed")
         
 
 class Interviewer:
