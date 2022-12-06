@@ -103,6 +103,12 @@ def search_and_replace(search_text, replace_text, file_path):
             
     file.close()
 
+def write_new_line_to_file(write_text, file_path):
+    f = open(file_path, "a")
+    f.write("\n{}".format(write_text))
+    f.close()
+
+
 class Release:
     def __init__(self, release_map):
         self.version = release_map['tag_name']
@@ -576,9 +582,9 @@ class Installer():
             
             # set ENV vars for cosmovisor
             self.log(f"Setting up cosmovisor ENV vars")
-            self.exec("export DAEMON_NAME=cheqd")
-            self.exec("export DAEMON_HOME={}/.cheqdnode".format(self.interviewer.home_dir))
-            self.exec("export DAEMON_DATA_BACKUP_DIR={}/.cheqdnode".format(self.interviewer.home_dir))
+            write_new_line_to_file("export DAEMON_NAME=cheqd", "~/.profile")
+            write_new_line_to_file("export DAEMON_HOME={}/.cheqdnode".format(self.interviewer.home_dir), "~/.profile")
+            write_new_line_to_file("export DAEMON_DATA_BACKUP_DIR={}/.cheqdnode".format(self.interviewer.home_dir), "~/.profile")
             self.exec("source ~/.profile")
             self.log("Echoing DAEMON_NAME")
             self.exec("echo $DAEMON_NAME")
