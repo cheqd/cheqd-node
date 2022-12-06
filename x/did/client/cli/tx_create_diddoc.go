@@ -22,6 +22,11 @@ func CmdCreateDidDoc() *cobra.Command {
 				return err
 			}
 
+			// 1. Add utility-fee as 2nd arg
+			// 2. Short
+			// 3. Long
+			// 4. Show example to query the actual params `cheqd-noded query params subspace cheqd`
+
 			payloadFile := args[0]
 
 			payloadJson, signInputs, err := ReadPayloadWithSignInputsFromFile(payloadFile)
