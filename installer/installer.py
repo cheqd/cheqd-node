@@ -1025,7 +1025,7 @@ class Interviewer:
             current_cosmovisor_version = str(self.exec("cosmovisor version").stdout)
         except:
             print("handled error")
-            current_cosmovisor_version = str(self.exec("cosmovisor version").stdout)
+        
             # todo: compare current_cosmovisor_version with  DEFAULT_VERSION and do accordingly
             self.log("current cosmovisor version {}".format(current_cosmovisor_version))
 
