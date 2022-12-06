@@ -703,9 +703,7 @@ func New(
 				versionMap := app.mm.GetVersionMap()
 
 				for moduleName := range versionMap {
-					if _, ok := fromVM[moduleName]; !ok {
-						fromVM[moduleName] = versionMap[moduleName]
-					}
+					fromVM[moduleName] = versionMap[moduleName]
 				}
 			} else {
 				println("Version map already initialized")
