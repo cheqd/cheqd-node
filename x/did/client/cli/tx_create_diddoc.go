@@ -12,8 +12,8 @@ import (
 func CmdCreateDidDoc() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-did [payload-file]",
-		Short: "Creates a new DID and associated DIDDoc.",
-		Long: "Creates a new DID and associated DIDDoc. " +
+		Short: "Create a new DID and associated DID Document.",
+		Long: "Creates a new DID and associated DID Document. " +
 			"[payload-file] is JSON encoded MsgCreateDidDocPayload alongside with sign inputs.",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {

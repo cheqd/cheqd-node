@@ -11,8 +11,8 @@ import (
 
 func CmdGetAllDidDocVersionsMetadata() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "all-diddoc-versions-metadata [id]",
-		Short: "Query diddoc version metadata by diddoc id",
+		Use:   "did-metadata [id]",
+		Short: "Query all versions metadata for a DID",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)

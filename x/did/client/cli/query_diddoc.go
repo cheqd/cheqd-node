@@ -11,8 +11,8 @@ import (
 
 func CmdGetDidDoc() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "diddoc [id]",
-		Short: "Query a diddoc by id",
+		Use:   "did-document [id]",
+		Short: "Query a DID Document by DID",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)

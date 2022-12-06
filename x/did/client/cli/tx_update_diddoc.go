@@ -12,8 +12,8 @@ import (
 func CmdUpdateDidDoc() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-did [payload-file]",
-		Short: "Updates a DIDDoc.",
-		Long: "Updates a DIDDoc. " +
+		Short: "Update DID Document associated with a DID.",
+		Long: "Update DID Document associated with a given DID. " +
 			"[payload-file] is JSON encoded MsgCreateDidDocPayload alongside with sign inputs.",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
