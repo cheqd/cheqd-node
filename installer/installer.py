@@ -38,6 +38,10 @@ PRINT_PREFIX = "********* "
 ###############################################################
 DEFAULT_LATEST_COSMOVISOR_VERSION = "v1.3.0"
 OS_ARCH = platform.machine()
+if OS_ARCH == 'x86_64':
+    OS_ARCH = 'amd64'
+else:
+    OS_ARCH = 'arm64'
 COSMOVISOR_BINARY_URL = f"https://github.com/cosmos/cosmos-sdk/releases/download/cosmovisor%2F{DEFAULT_LATEST_COSMOVISOR_VERSION}/cosmovisor-{DEFAULT_LATEST_COSMOVISOR_VERSION}-linux-{OS_ARCH}.tar.gz"
 DEFAULT_USE_COSMOVISOR = "yes"
 DEFAULT_BUMP_COSMOVISOR = "yes"
