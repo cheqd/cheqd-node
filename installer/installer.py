@@ -573,7 +573,16 @@ class Installer():
                 self.log(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
                 os.symlink(self.cosmovisor_cheqd_bin_path,
                         os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
-
+            
+            # set ENV vars for cosmovisor
+            self.log(f"Setting up cosmovisor ENV vars")
+            self.exec("sudo export DAEMON_NAME=cheqd")
+            self.exec("sudo export DAEMON_HOME={}/.cheqdnode".format(self.interviewer.home_dir))
+            self.exec("sudo export DAEMON_DATA_BACKUP_DIR={}/.cheqdnode".format(self.interviewer.home_dir))
+            self.exec("source ~/.profile")
+            self.log("Echoing DAEMON_NAME")
+            self.exec("sudo echo $DAEMON_NAME")
+            
             if self.interviewer.is_upgrade and \
                 os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
 
@@ -1014,13 +1023,13 @@ class Interviewer:
             failure_exit(f"Invalid input provided during installation.")
     
     def ask_for_cosmovisor_bump(self):
-        answer = self.ask(f"Install {DEFAULT_LATEST_COSMOVISOR_VERSION} cosmovisor? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
-        if answer.lower().startswith("y"):
-            self.is_cosmovisor_bump_needed = True
-        elif answer.lower().startswith("n"):
-            self.is_cosmovisor_bump_needed = False
-        else:
-            failure_exit(f"Invalid input provided during installation.")
+            answer = self.ask(f"Install {DEFAULT_LATEST_COSMOVISOR_VERSION} cosmovisor? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
+            if answer.lower().startswith("y"):
+                self.is_cosmovisor_bump_needed = True
+            elif answer.lower().startswith("n"):
+                self.is_cosmovisor_bump_needed = False
+            else:
+                failure_exit(f"Invalid input provided during installation.")
 
     def ask_for_init_from_snapshot(self):
         answer = self.ask(
