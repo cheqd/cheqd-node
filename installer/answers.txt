@@ -1,5 +1,5 @@
 2
-/home/runner/.local//cheqd
+/home/runner/.local/cheqd
 yes
 mainnet
 yes
