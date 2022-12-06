@@ -40,7 +40,7 @@ DEFAULT_LATEST_COSMOVISOR_VERSION = "v1.3.0"
 OS_ARCH = platform.machine()
 COSMOVISOR_BINARY_URL = f"https://github.com/cosmos/cosmos-sdk/releases/download/cosmovisor%2F{DEFAULT_LATEST_COSMOVISOR_VERSION}/cosmovisor-{DEFAULT_LATEST_COSMOVISOR_VERSION}-linux-{OS_ARCH}.tar.gz"
 DEFAULT_USE_COSMOVISOR = "yes"
-DEFAULT_BUMP_COSMOVISOR = "no"
+DEFAULT_BUMP_COSMOVISOR = "yes"
 
 ###############################################################
 ###     				Systemd Config      				###
@@ -672,7 +672,7 @@ class Interviewer:
         self._home_dir = home_dir
         self._is_upgrade = False
         self._is_cosmo_needed = True
-        self._is_cosmovisor_bump_needed = False
+        self._is_cosmovisor_bump_needed = True
         self._init_from_snapshot = False
         self._release = None
         self._chain = chain
