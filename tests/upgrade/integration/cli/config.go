@@ -24,10 +24,6 @@ const (
 	GAS_ADJUSTMENT  = integrationcli.GAS_ADJUSTMENT
 	GAS_PRICES      = integrationcli.GAS_PRICES
 
-	CHEQD_IMAGE_FROM             = "cheqd/cheqd-node:latest"
-	CHEQD_TAG_FROM               = "v0.6.9"
-	CHEQD_IMAGE_TO               = "cheqd/cheqd-node:production-latest"
-	CHEQD_TAG_TO                 = "v1.0.0"
 	BOOTSTRAP_PERIOD             = 20
 	BOOTSTRAP_HEIGHT             = 1
 	VOTING_PERIOD          int64 = 10
