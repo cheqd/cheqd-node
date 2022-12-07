@@ -1,0 +1,94 @@
+{
+    "payload": {
+        "module_versions": [
+            {
+                "name": "auth",
+                "version": 3
+            },
+            {
+                "name": "authz",
+                "version": 2
+            },
+            {
+                "name": "bank",
+                "version": 3
+            },
+            {
+                "name": "capability",
+                "version": 1
+            },
+            {
+                "name": "cheqd",
+                "version": 4
+            },
+            {
+                "name": "crisis",
+                "version": 1
+            },
+            {
+                "name": "distribution",
+                "version": 2
+            },
+            {
+                "name": "evidence",
+                "version": 1
+            },
+            {
+                "name": "feegrant",
+                "version": 2
+            },
+            {
+                "name": "genutil",
+                "version": 1
+            },
+            {
+                "name": "gov",
+                "version": 3
+            },
+            {
+                "name": "group",
+                "version": 1
+            },
+            {
+                "name": "ibc",
+                "version": 2
+            },
+            {
+                "name": "interchainaccounts",
+                "version": 1
+            },
+            {
+                "name": "mint",
+                "version": 1
+            },
+            {
+                "name": "params",
+                "version": 1
+            },
+            {
+                "name": "resource",
+                "version": 2
+            },
+            {
+                "name": "slashing",
+                "version": 2
+            },
+            {
+                "name": "staking",
+                "version": 3
+            },
+            {
+                "name": "transfer",
+                "version": 2
+            },
+            {
+                "name": "upgrade",
+                "version": 2
+            },
+            {
+                "name": "vesting",
+                "version": 1
+            }
+        ]
+    }
+}

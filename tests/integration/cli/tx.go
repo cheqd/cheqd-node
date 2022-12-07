@@ -22,7 +22,7 @@ var CLI_TX_PARAMS = []string{
 	"--yes",
 }
 
-func Tx(module, tx, from string, txArgs ...string) (sdk.TxResponse, error) {
+func Tx(module string, tx string, from string, txArgs ...string) (sdk.TxResponse, error) {
 	args := []string{"tx", module, tx}
 
 	// Common params
@@ -137,5 +137,5 @@ func CreateResource(tmpDir string, options resourcecli.CreateResourceOptions, si
 
 	payloadFile := helpers.MustWriteTmpFile("", []byte(payloadWithSignInputsJson))
 
-	return Tx("resource", "create-resource", from, payloadFile)
+	return Tx("resource", "create", from, payloadFile)
 }

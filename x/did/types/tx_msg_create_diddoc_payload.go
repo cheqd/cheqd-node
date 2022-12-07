@@ -1,6 +1,7 @@
 package types
 
 import (
+	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	"github.com/cheqd/cheqd-node/x/did/utils"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
@@ -75,4 +76,22 @@ func (msg *MsgCreateDidDocPayload) Normalize() {
 	msg.KeyAgreement = utils.NormalizeDIDUrlList(msg.KeyAgreement)
 
 	msg.VersionId = utils.NormalizeUUID(msg.VersionId)
+}
+
+// Creator
+
+func MsgCreateDidPayloadFromDid(did *didtypesv1.Did) didtypesv1.MsgCreateDidPayload {
+	return didtypesv1.MsgCreateDidPayload{
+		Context:              did.Context,
+		Id:                   did.Id,
+		Controller:           did.Controller,
+		VerificationMethod:   did.VerificationMethod,
+		Authentication:       did.Authentication,
+		AssertionMethod:      did.AssertionMethod,
+		CapabilityInvocation: did.CapabilityInvocation,
+		CapabilityDelegation: did.CapabilityDelegation,
+		KeyAgreement:         did.KeyAgreement,
+		AlsoKnownAs:          did.AlsoKnownAs,
+		Service:              did.Service,
+	}
 }
