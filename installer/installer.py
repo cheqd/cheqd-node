@@ -1023,7 +1023,8 @@ class Interviewer:
     def ask_for_cosmovisor_bump(self):
         self.exec("echo 'export DAEMON_NAME=cheqd-noded' >> ~/.bashrc")
         self.exec(f"echo 'export DAEMON_HOME={self.home_dir}/.cheqdnode' >> ~/.bashrc")
-        self.exec(f"echo 'export DAEMON_DATA_BACKUP_DIR={self.home_dir}/.cheqdnode' >> ~/.bashrc") 
+        self.exec(f"echo 'export DAEMON_DATA_BACKUP_DIR={self.home_dir}/.cheqdnode' >> ~/.bashrc")
+        os.environ["TEST_ENV"] = "value" 
         current_cosmovisor_version = str(self.exec("cosmovisor version 2> /dev/null || echo FALSE").stdout)
         print("current version ==> ", current_cosmovisor_version, "ends here")
 
