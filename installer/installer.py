@@ -438,7 +438,7 @@ class Installer():
         self.prepare_directory_tree()
         self.setup_system_configs()
 
-        if self.interviewer.is_cosmo_needed and self.interviewer.is_cosmovisor_bump_needed:
+        if self.interviewer.is_cosmo_needed:
             self.log("Setting up Cosmovisor")
             self.setup_cosmovisor()
         
