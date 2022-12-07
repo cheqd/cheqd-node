@@ -1107,27 +1107,14 @@ class Interviewer:
             failure_exit(f"Invalid input provided during installation.")
     
     def ask_for_cosmovisor_bump(self):
-        self.exec("echo 'export DAEMON_NAME=cheqd-noded' >> ~/.bashrc")
-        self.exec(f"echo 'export DAEMON_HOME={self.home_dir}/.cheqdnode' >> ~/.bashrc")
-        self.exec(f"echo 'export DAEMON_DATA_BACKUP_DIR={self.home_dir}/.cheqdnode' >> ~/.bashrc")
-        std_out = """{}""".format(self.exec("cosmovisor version 2> /dev/null || echo false").stdout)     
-        arr = std_out.split()
-        current_version = None
-        for i in range (0, len(arr)):
-            if arr[i].lower() == 'version:':
-                # set current version as well as replace if v prefix there
-                current_version = arr[i+1].split("\\")[0].replace('v','')
-                break
-        # if current version is lower than latest ask for upgrade
-        if current_version is not None and version_tuple(current_version) < version_tuple(DEFAULT_LATEST_COSMOVISOR_VERSION.replace('v','')):
-            self.log(f"Your current Cosmovisor version is v{current_version}")
-            answer = self.ask(f"Do you want to bump your Cosmovisor to {DEFAULT_LATEST_COSMOVISOR_VERSION} ? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
-            if answer.lower().startswith("y"):
-                self.is_cosmovisor_bump_needed = True
-            elif answer.lower().startswith("n"):
-                self.is_cosmovisor_bump_needed = False
-            else:
-                failure_exit(f"Invalid input provided during installation.")
+        self.log(f"Your current Cosmovisor version is v{current_version}")
+        answer = self.ask(f"Do you want to bump your Cosmovisor to {DEFAULT_LATEST_COSMOVISOR_VERSION} ? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
+        if answer.lower().startswith("y"):
+            self.is_cosmovisor_bump_needed = True
+        elif answer.lower().startswith("n"):
+            self.is_cosmovisor_bump_needed = False
+        else:
+            failure_exit(f"Invalid input provided during installation.")
 
     def ask_for_init_from_snapshot(self):
         answer = self.ask(
