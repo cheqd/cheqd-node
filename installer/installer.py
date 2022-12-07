@@ -671,23 +671,23 @@ class Installer():
         output = self.exec(f"echo ${env_var_name}").stdout
         self.log("check_if_env_var_already_set: ", output)
         # check_if_env_var_already_set(env_var_name)
-        # if not check_if_env_var_already_set(env_var_name):
-        #     self.log(f'Setting ENV var {env_var_name}')
-        #     self.exec(f"echo 'export {env_var_name}={env_var_value}' >> ~/.bashrc")
-        # else:
-        #     self.log(f"ENV var {env_var_name} already set")
+        if not check_if_env_var_already_set(env_var_name):
+            self.log(f'Setting ENV var {env_var_name}')
+            self.exec(f"echo 'export {env_var_name}={env_var_value}' >> ~/.bashrc")
+        else:
+            self.log(f"ENV var {env_var_name} already set")
 
     def check_if_env_var_already_set(self, env_var_name):
         try:
             self.log("check_if_env_var_already_set: ", env_var_name)
-            output = self.exec(f"echo ${env_var_name}").stdout
+            output = str(self.exec(f"echo ${env_var_name} | echo false").stdout)
             self.log("check_if_env_var_already_set: ", output)
-            if  env_var_name in str(output).strip():
+            if  'false' in output:
                 self.log("check_if_env_var_already_set: ENV SET", output)
-                return True
+                return False
             else:
                 self.log("check_if_env_var_already_set: ENV NOT SET ", output)
-                return False
+                return True
         except Error as e:
             self.log("error ", e)
      
