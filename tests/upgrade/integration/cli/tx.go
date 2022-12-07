@@ -2,8 +2,8 @@ package cli
 
 import (
 	"fmt"
+	"path/filepath"
 	"strconv"
-	"strings"
 
 	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -31,13 +31,8 @@ func Tx(container string, binary string, module, tx, from string, txArgs ...stri
 		return sdk.TxResponse{}, err
 	}
 
-	// Skip 'gas estimate: xxx' string
-	perLineOutput := strings.Split(output, "\n")
-	if len(perLineOutput) > 3 {
-		output = TrimExtraLineOffset(output, 2)
-	} else {
-		output = TrimExtraLineOffset(output, 1)
-	}
+	// Skip 'gas estimate: xxx' string, trim 'Successfully migrated key' string
+	output = integrationhelpers.TrimImportedStdout(output)
 
 	var resp sdk.TxResponse
 
@@ -46,6 +41,35 @@ func Tx(container string, binary string, module, tx, from string, txArgs ...stri
 		return sdk.TxResponse{}, err
 	}
 
+	return resp, nil
+}
+
+func SubmitParamChangeProposal(container string, pathToDir ...string) (sdk.TxResponse, error) {
+	fmt.Println("Submitting param change proposal from", container)
+	args := append([]string{
+		CLI_BINARY_NAME,
+		"tx", "gov", "submit-legacy-proposal", "param-change", filepath.Join(pathToDir...),
+		"--from", OperatorAccounts[container],
+	}, TX_PARAMS...)
+
+	out, err := LocalnetExecExec(container, args...)
+	if err != nil {
+		fmt.Println("Error on submitting ParamChangeProposal", err)
+		fmt.Println("Output:", out)
+		return sdk.TxResponse{}, err
+	}
+
+	// Skip 'gas estimate: xxx' string, trim 'Successfully migrated key' string
+	out = integrationhelpers.TrimImportedStdout(out)
+
+	fmt.Println("Output:", out)
+
+	var resp sdk.TxResponse
+
+	err = integrationhelpers.Codec.UnmarshalJSON([]byte(out), &resp)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
 	return resp, nil
 }
 
@@ -67,7 +91,8 @@ func SubmitUpgradeProposal(upgradeHeight int64, container string) (sdk.TxRespons
 		return sdk.TxResponse{}, err
 	}
 
-	out = TrimExtraLineOffset(out, 1)
+	// Skip 'gas estimate: xxx' string, trim 'Successfully migrated key' string
+	out = integrationhelpers.TrimImportedStdout(out)
 
 	var resp sdk.TxResponse
 
@@ -92,7 +117,8 @@ func DepositGov(container string) (sdk.TxResponse, error) {
 		return sdk.TxResponse{}, err
 	}
 
-	out = TrimExtraLineOffset(out, 1)
+	// Skip 'gas estimate: xxx' string, trim 'Successfully migrated key' string
+	out = integrationhelpers.TrimImportedStdout(out)
 
 	var resp sdk.TxResponse
 
@@ -103,11 +129,11 @@ func DepositGov(container string) (sdk.TxResponse, error) {
 	return resp, nil
 }
 
-func VoteUpgradeProposal(container string) (sdk.TxResponse, error) {
+func VoteProposal(container, id, option string) (sdk.TxResponse, error) {
 	fmt.Println("Voting from", container)
 	args := append([]string{
 		CLI_BINARY_NAME,
-		"tx", "gov", "vote", "1", "yes",
+		"tx", "gov", "vote", id, option,
 		"--from", OperatorAccounts[container],
 	}, TX_PARAMS...)
 
@@ -116,7 +142,8 @@ func VoteUpgradeProposal(container string) (sdk.TxResponse, error) {
 		return sdk.TxResponse{}, err
 	}
 
-	out = TrimExtraLineOffset(out, 1)
+	// Skip 'gas estimate: xxx' string, trim 'Successfully migrated key' string
+	out = integrationhelpers.TrimImportedStdout(out)
 
 	var resp sdk.TxResponse
 

@@ -1,0 +1,13 @@
+{
+    "title": "Resource Param Change",
+    "description": "This is a simple example of a param change - double the values",
+    "type": "ParameterChange",
+    "changes": [
+        {
+            "subspace": "resource",
+            "key": "feeparams",
+            "value": {"image": {"denom": "ncheq", "amount": "20000000000"}, "json": {"denom": "ncheq", "amount": "5000000000"}, "default": {"denom": "ncheq", "amount": "10000000000"}, "burn_factor": "0.600000000000000000"}
+        }
+    ],
+    "deposit": "10000000000ncheq"
+}
