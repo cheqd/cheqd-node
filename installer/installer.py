@@ -1026,7 +1026,7 @@ class Interviewer:
         arr = std_out.split()
         current_version = None
         for i in range (0, len(arr)):
-            if arr[i] == 'version:' or arr[i] == 'Version:':
+            if arr[i].lower() == 'version:':
                 # set current version as well as replace if v prefix there
                 current_version = arr[i+1].split("\\")[0].replace('v','')
                 break
