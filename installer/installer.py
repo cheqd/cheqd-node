@@ -1030,7 +1030,7 @@ class Interviewer:
             if arr[i] == 'version:':
                 print(arr[i+1])
                 # set current version as well as replace if v prefix there
-                current_version = arr[i+1].replace('v','')
+                current_version = arr[i+1].split("\\")[0].replace('v','')
                 break
         # if current version is lower than latest ask for upgrade
         if current_version is not None and version_tuple(current_version) < version_tuple(DEFAULT_LATEST_COSMOVISOR_VERSION.replace('v','')):
