@@ -594,6 +594,11 @@ class Installer():
         
             self.log(f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
             self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
+            
+            # set Cosmovisor vars
+            self.set_env_vars("DAEMON_NAME","cheqd-noded")
+            self.set_env_vars("DAEMON_HOME",f"{self.interviewer.home_dir}/.cheqdnode")
+            self.set_env_vars("DAEMON_DATA_BACKUP_DIR",f"{self.interviewer.home_dir}/.cheqdnode")
         except:
             failure_exit(f"Failed to setup Cosmovisor")
     
