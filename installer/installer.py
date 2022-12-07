@@ -103,7 +103,7 @@ def search_and_replace(search_text, replace_text, file_path):
             
     file.close()
 
-def versiontuple(v):
+def version_tuple(v):
     return tuple(map(int, (v.split("."))))
 
 
@@ -1032,7 +1032,7 @@ class Interviewer:
                 current_version = arr[i+1].replace('v','')
                 break
         # if current version is lower than latest ask for upgrade
-        if current_version is not None and versiontuple(current_version) < versiontuple(DEFAULT_LATEST_COSMOVISOR_VERSION.replace('v','')):
+        if current_version is not None and version_tuple(current_version) < version_tuple(DEFAULT_LATEST_COSMOVISOR_VERSION.replace('v','')):
             answer = self.ask(f"Do you want to bump Cosmovisor to {DEFAULT_LATEST_COSMOVISOR_VERSION} ? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
             if answer.lower().startswith("y"):
                 self.is_cosmovisor_bump_needed = True
