@@ -36,7 +36,7 @@ PRINT_PREFIX = "********* "
 ###############################################################
 ###     				Cosmovisor Config      				###
 ###############################################################
-DEFAULT_LATEST_COSMOVISOR_VERSION = "v1.3.0"
+DEFAULT_LATEST_COSMOVISOR_VERSION = "v1.2.0"
 OS_ARCH = platform.machine()
 if OS_ARCH == 'x86_64':
     OS_ARCH = 'amd64'
@@ -1022,21 +1022,21 @@ class Interviewer:
     
     def ask_for_cosmovisor_bump(self):
         try:
-            current_cosmovisor_version = str(self.exec("cosmovisor version 2> /dev/null || echo FALSE").stdout)
+        current_cosmovisor_version = str(self.exec("cosmovisor version 2> /dev/null || echo FALSE").stdout)
             print("current V\n", current_cosmovisor_version)
         except:
             print("handled error")
-        
-            # todo: compare current_cosmovisor_version with  DEFAULT_VERSION and do accordingly
-            #self.log("current cosmovisor version {}".format(current_cosmovisor_version))
+    
+        # todo: compare current_cosmovisor_version with  DEFAULT_VERSION and do accordingly
+        #self.log("current cosmovisor version {}".format(current_cosmovisor_version))
 
-            answer = self.ask(f"Install {DEFAULT_LATEST_COSMOVISOR_VERSION} cosmovisor? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
-            if answer.lower().startswith("y"):
-                self.is_cosmovisor_bump_needed = True
-            elif answer.lower().startswith("n"):
-                self.is_cosmovisor_bump_needed = False
-            else:
-                failure_exit(f"Invalid input provided during installation.")
+        answer = self.ask(f"Install {DEFAULT_LATEST_COSMOVISOR_VERSION} cosmovisor? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
+        if answer.lower().startswith("y"):
+            self.is_cosmovisor_bump_needed = True
+        elif answer.lower().startswith("n"):
+            self.is_cosmovisor_bump_needed = False
+        else:
+            failure_exit(f"Invalid input provided during installation.")
 
     def ask_for_init_from_snapshot(self):
         answer = self.ask(
