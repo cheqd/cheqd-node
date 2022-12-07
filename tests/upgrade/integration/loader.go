@@ -22,13 +22,15 @@ func Loader(path string, ptrPayload interface{}) ([]cli.SignInput, error) {
 
 	switch ptrPayload := ptrPayload.(type) {
 	case *didtypesv2.FeeParams:
-		err = integrationhelpers.Codec.UnmarshalJSON(file, ptrPayload)
+		if err := integrationhelpers.Codec.UnmarshalJSON(file, ptrPayload); err != nil {
+			return []cli.SignInput{}, err
+		}
+		return []cli.SignInput{}, nil
 	case *resourcetypesv2.FeeParams:
-		err = integrationhelpers.Codec.UnmarshalJSON(file, ptrPayload)
-	}
-
-	if err != nil {
-		return []cli.SignInput{}, err
+		if err := integrationhelpers.Codec.UnmarshalJSON(file, ptrPayload); err != nil {
+			return []cli.SignInput{}, err
+		}
+		return []cli.SignInput{}, nil
 	}
 
 	err = json.Unmarshal(file, &tc)
