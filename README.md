@@ -52,7 +52,7 @@ Once installed, `cheqd-node` can be controlled using the [cheqd Cosmos CLI guide
 
 ### 🔮 Upcoming functionality
 
-The [cheqd product roadmap](https://product.cheqd.io/updates/roadmap) describes in detail functionality that is being considered / in-development for future releases. A non-exhaustive list (not necessarily in order of priority) is:
+The [cheqd product roadmap](https://product.cheqd.io) describes in detail functionality that is being considered / in-development for future releases. A non-exhaustive list (not necessarily in order of priority) is:
 
 * Revocation registry/list support to revoke issued credentials
 * Support for [AnonCreds](https://anoncreds-wg.github.io/anoncreds-spec/)
