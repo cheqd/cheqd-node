@@ -668,9 +668,9 @@ class Installer():
 
     def set_env_vars(self, env_var_name, env_var_value):
         self.log("set_env_vars: ")
-        self.log("check_if_env_var_already_set: ", env_var_name)
+        self.log(f"check_if_env_var_already_set: {env_var_name}")
         output = str(self.exec(f"echo ${env_var_name} | echo false").stdout)
-        self.log("check_if_env_var_already_set: ", output)
+        self.log(f"check_if_env_var_already_set: {output}")
         if  'false' in output:
             self.log("check_if_env_var_already_set: ENV SET", output)
             return False
