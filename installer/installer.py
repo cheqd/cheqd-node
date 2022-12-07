@@ -1034,7 +1034,7 @@ class Interviewer:
                 break
         # if current version is lower than latest ask for upgrade
         if current_version is not None and version_tuple(current_version) < version_tuple(DEFAULT_LATEST_COSMOVISOR_VERSION.replace('v','')):
-            self.log(f"Your current Cosmovisor version is v{current_version}{os.new}")
+            self.log(f"Your current Cosmovisor version is v{current_version}")
             answer = self.ask(f"Do you want to bump your Cosmovisor to {DEFAULT_LATEST_COSMOVISOR_VERSION} ? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
             if answer.lower().startswith("y"):
                 self.is_cosmovisor_bump_needed = True
