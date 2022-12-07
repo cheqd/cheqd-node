@@ -103,10 +103,8 @@ def search_and_replace(search_text, replace_text, file_path):
             
     file.close()
 
-def write_new_line_to_file(write_text, file_path):
-    f = open(file_path, "a")
-    f.write("\n{}".format(write_text))
-    f.close()
+def versiontuple(v):
+    return tuple(map(int, (v.split("."))))
 
 
 class Release:
@@ -1024,20 +1022,24 @@ class Interviewer:
         self.exec("echo 'export DAEMON_NAME=cheqd-noded' >> ~/.bashrc")
         self.exec(f"echo 'export DAEMON_HOME={self.home_dir}/.cheqdnode' >> ~/.bashrc")
         self.exec(f"echo 'export DAEMON_DATA_BACKUP_DIR={self.home_dir}/.cheqdnode' >> ~/.bashrc")
-        os.environ["TEST_ENV"] = "value" 
-        current_cosmovisor_version = str(self.exec("cosmovisor version 2> /dev/null || echo FALSE").stdout)
-        print("current version ==> ", current_cosmovisor_version, "ends here")
-
-        # todo: compare current_cosmovisor_version with  DEFAULT_VERSION and do accordingly
-        #self.log("current cosmovisor version {}".format(current_cosmovisor_version))
-
-        answer = self.ask(f"Install {DEFAULT_LATEST_COSMOVISOR_VERSION} cosmovisor? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
-        if answer.lower().startswith("y"):
-            self.is_cosmovisor_bump_needed = True
-        elif answer.lower().startswith("n"):
-            self.is_cosmovisor_bump_needed = False
-        else:
-            failure_exit(f"Invalid input provided during installation.")
+        std_out = str(self.exec("cosmovisor version 2> /dev/null").stdout)      
+        arr = std_out.split()
+        current_version = None
+        for i in range (0, len(arr)):
+            if arr[i] == 'version:':
+                print(arr[i+1])
+                # set current version as well as replace if v prefix there
+                current_version = arr[i+1].replace('v','')
+                break
+        # if current version is lower than latest ask for upgrade
+        if current_version is not None and versiontuple(current_version) < versiontuple(DEFAULT_LATEST_COSMOVISOR_VERSION.replace('v','')):
+            answer = self.ask(f"Do you want to bump Cosmovisor to {DEFAULT_LATEST_COSMOVISOR_VERSION} ? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
+            if answer.lower().startswith("y"):
+                self.is_cosmovisor_bump_needed = True
+            elif answer.lower().startswith("n"):
+                self.is_cosmovisor_bump_needed = False
+            else:
+                failure_exit(f"Invalid input provided during installation.")
 
     def ask_for_init_from_snapshot(self):
         answer = self.ask(
