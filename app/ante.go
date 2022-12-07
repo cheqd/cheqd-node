@@ -14,7 +14,6 @@ import (
 
 // HandlerOptions are the options required for constructing a default SDK AnteHandler.
 // Here we add the cheqd ante decorators, which extend default SDK AnteHandler.
-// didKeeper and resourceKeeper are required for the cheqd ante decorators.
 type HandlerOptions struct {
 	AccountKeeper          ante.AccountKeeper
 	BankKeeper             cheqdante.BankKeeper

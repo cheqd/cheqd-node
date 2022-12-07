@@ -59,10 +59,6 @@ func createTestApp(isCheckTx bool) (*simapp.SimApp, sdk.Context, error) {
 	return app, ctx, nil
 }
 
-// func TestAnteTestSuite(t *testing.T) {
-// 	suite.Run(t, new(AnteTestSuite))
-// }
-
 // SetupTest setups a new test, with new app, context, and anteHandler.
 func (s *AnteTestSuite) SetupTest(isCheckTx bool) error {
 	var err error
