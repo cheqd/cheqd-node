@@ -1024,6 +1024,7 @@ class Interviewer:
         self.exec(f"echo 'export DAEMON_DATA_BACKUP_DIR={self.home_dir}/.cheqdnode' >> ~/.bashrc")
         std_out = """{}""".format(self.exec("cosmovisor version 2> /dev/null || echo false").stdout)     
         arr = std_out.split()
+        print('the array', arr)
         current_version = None
         for i in range (0, len(arr)):
             if arr[i] == 'version:':
