@@ -59,6 +59,13 @@ func (k MsgServer) DeactivateDidDoc(goCtx context.Context, msg *types.MsgDeactiv
 		return nil, types.ErrInternal.Wrapf(err.Error())
 	}
 
+	// Deactivate all previous versions
+	k.IterateDidDocVersions(&ctx, msg.Payload.Id, func(didDocWithMetadata types.DidDocWithMetadata) bool {
+		didDocWithMetadata.Metadata.Deactivated = true
+		k.SetDidDocVersion(&ctx, &didDocWithMetadata, true)
+		return true
+	})
+
 	// Build and return response
 	return &types.MsgDeactivateDidDocResponse{
 		Value: &didDoc,
