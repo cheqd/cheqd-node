@@ -12,10 +12,21 @@ import (
 	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
 )
 
-func Loader(path string, payload interface{}) ([]cli.SignInput, error) {
+func Loader(path string, ptrPayload interface{}) ([]cli.SignInput, error) {
 	var tc cli.PayloadWithSignInputs
 
 	file, err := os.ReadFile(path)
+	if err != nil {
+		return []cli.SignInput{}, err
+	}
+
+	switch ptrPayload := ptrPayload.(type) {
+	case *didtypesv2.FeeParams:
+		err = integrationhelpers.Codec.UnmarshalJSON(file, ptrPayload)
+	case *resourcetypesv2.FeeParams:
+		err = integrationhelpers.Codec.UnmarshalJSON(file, ptrPayload)
+	}
+
 	if err != nil {
 		return []cli.SignInput{}, err
 	}
@@ -25,35 +36,31 @@ func Loader(path string, payload interface{}) ([]cli.SignInput, error) {
 		return []cli.SignInput{}, err
 	}
 
-	switch payload := payload.(type) {
+	switch ptrPayload := ptrPayload.(type) {
 	case *didtypesv1.MsgCreateDidPayload:
-		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, payload)
+		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, ptrPayload)
 	case *didtypesv1.MsgUpdateDidPayload:
-		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, payload)
+		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, ptrPayload)
 	case *didtypesv1.Did:
-		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, payload)
+		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, ptrPayload)
 	case *didtypesv2.MsgCreateDidDocPayload:
-		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, payload)
+		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, ptrPayload)
 	case *didtypesv2.MsgUpdateDidDocPayload:
-		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, payload)
+		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, ptrPayload)
 	case *didtypesv2.DidDoc:
-		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, payload)
-	case *didtypesv2.FeeParams:
-		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, payload)
+		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, ptrPayload)
 	case *resourcetypesv2.MsgCreateResourcePayload:
-		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, payload)
+		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, ptrPayload)
 	case *resourcetypesv2.Metadata:
-		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, payload)
+		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, ptrPayload)
 	case *resourcetypesv2.ResourceWithMetadata:
-		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, payload)
-	case *resourcetypesv2.FeeParams:
-		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, payload)
+		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, ptrPayload)
 	case *resourcetypesv1.MsgCreateResourcePayload:
-		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, payload)
+		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, ptrPayload)
 	case *resourcetypesv1.ResourceHeader:
-		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, payload)
+		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, ptrPayload)
 	default:
-		err = json.Unmarshal(tc.Payload, payload)
+		err = json.Unmarshal(tc.Payload, ptrPayload)
 	}
 	if err != nil {
 		return []cli.SignInput{}, err
