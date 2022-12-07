@@ -25,11 +25,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # - name: Run Markdown link check
-      #   uses: gaurav-nelson/github-action-markdown-link-check@v1
-      #   with:
-      #     config-file: '.github/linters/mlc_config.json'
-      #     use-quiet-mode: 'yes'
+      - name: Run Markdown link check
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          config-file: '.github/linters/mlc_config.json'
+          use-quiet-mode: 'yes'
   
   go-lint:
     # We can't use VALIDATE_GO from super linter because of this issue:
