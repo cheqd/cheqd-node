@@ -1240,7 +1240,7 @@ if __name__ == '__main__':
         if interviewer.is_cosmovisor_already_installed():
             cosm_version = interviewer.what_cosmovisor_version()
             if cosm_version < DEFAULT_LATEST_COSMOVISOR_VERSION.replace("v",""):
-                self.log(f"Your current Cosmovisor version is v{cosm_version}")
+                print(f"Your current Cosmovisor version is v{cosm_version}")
                 interviewer.ask_for_cosmovisor_bump()
         else:
             interviewer.ask_for_cosmovisor()     
