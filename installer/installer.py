@@ -672,19 +672,17 @@ class Installer():
         if not self.check_if_env_var_already_set(env_var_name):
             self.log(f'Setting ENV var {env_var_name}')
             self.exec(f"echo 'export {env_var_name}={env_var_value}' >> ~/.bashrc")
+            self.exec(f"echo 'export {env_var_name}={env_var_value}' >> /home/cheqd/.bashrc")
         else:
             self.log(f"ENV var {env_var_name} already set")
 
     def check_if_env_var_already_set(self, env_var_name):
         self.log(f"check_if_env_var_already_set: {env_var_name}")
-        output = str(self.exec(f"echo ${env_var_name} | echo false").stdout)
-        self.log(f"check_if_env_var_already_set: {output}")
-        if  'false' in output:
-            self.log("check_if_env_var_already_set: ENV SET, {output}")
-            return False
-        else:
-            self.log("check_if_env_var_already_set: ENV NOT SET {output}")
+        try:
+            os.environ[env_var_name]
             return True
+        except KeyError:
+            return False
      
     def compare_checksum(self, file_path):
         # Set URL for correct checksum file for snapshot
@@ -1260,7 +1258,7 @@ if __name__ == '__main__':
 
     # Steps to execute if upgrading existing node
     def upgrade_steps():
-        # if cosmovisor is not installed 
+        # if cosmovisor is installed 
         if interviewer.is_cosmovisor_already_installed():
             cosm_version = interviewer.what_cosmovisor_version()
             if cosm_version < DEFAULT_LATEST_COSMOVISOR_VERSION.replace("v",""):
