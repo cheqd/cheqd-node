@@ -1003,8 +1003,10 @@ class Interviewer:
     def is_cosmovisor_already_installed(self) -> bool:
         install_path = self.exec("which cosmovisor").stdout
         if len(install_path.strip()) > 0:
+            print("is_cosmovisor_already_installed: Cosmovisor already installed -> ", install_path)
             return True
         else:
+            print("is_cosmovisor_already_installed: Cosmovisor NOT installed -> ", install_path)
             return False
 
     def what_cosmovisor_version(self) -> str:
@@ -1250,6 +1252,7 @@ if __name__ == '__main__':
         # if cosmovisor is not installed 
         if interviewer.is_cosmovisor_already_installed():
             cosm_version = interviewer.what_cosmovisor_version()
+            print("Installed cosmovisor version -> ", cosm_version)
             if cosm_version < DEFAULT_LATEST_COSMOVISOR_VERSION.replace("v",""):
                 interviewer.ask_for_cosmovisor_bump()
         else:
