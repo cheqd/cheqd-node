@@ -1022,7 +1022,7 @@ class Interviewer:
         self.exec("echo 'export DAEMON_NAME=cheqd-noded' >> ~/.bashrc")
         self.exec(f"echo 'export DAEMON_HOME={self.home_dir}/.cheqdnode' >> ~/.bashrc")
         self.exec(f"echo 'export DAEMON_DATA_BACKUP_DIR={self.home_dir}/.cheqdnode' >> ~/.bashrc")
-        std_out = str(self.exec("cosmovisor version 2> /dev/null").stdout)      
+        std_out = str(self.exec("cosmovisor version 2> /dev/null || echo false").stdout)      
         arr = std_out.split()
         current_version = None
         for i in range (0, len(arr)):
