@@ -1018,7 +1018,6 @@ class Interviewer:
                 return current_version
         return current_version
     
-    def 
     def ask_for_version(self):
         default = self.get_latest_release()
         all_releases = self.get_releases()
@@ -1249,8 +1248,12 @@ if __name__ == '__main__':
     # Steps to execute if upgrading existing node
     def upgrade_steps():
         # if cosmovisor is not installed 
-        if os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)):
-            interviewer.ask_for_cosmovisor_bump()     
+        if interviewer.is_cosmovisor_already_installed():
+            cosm_version = interviewer.what_cosmovisor_version()
+            if cosm_version < DEFAULT_LATEST_COSMOVISOR_VERSION.replace("v",""):
+                interviewer.ask_for_cosmovisor_bump()
+        else:
+            interviewer.ask_for_cosmovisor()     
         if interviewer.is_systemd_config_exists():
             interviewer.ask_for_rewrite_systemd()
         if os.path.exists(DEFAULT_RSYSLOG_FILE):
