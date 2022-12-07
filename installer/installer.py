@@ -609,42 +609,53 @@ class Installer():
             self.remove_safe("README.md")
             self.remove_safe("LICENSE")
 
-            self.exec("./comovisor init")
             # move the new binary to installation directory
-            # self.log(f"Moving Cosmovisor binary to installation directory")
-            # shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
+            self.log(f"Moving Cosmovisor binary to installation directory")
+            shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
 
-            # if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
-            #     self.log(f"Creating symlink for current Cosmovisor version")
-            #     os.symlink(os.path.join(self.cosmovisor_root_dir, "genesis"),
-            #             os.path.join(self.cosmovisor_root_dir, "current"))
+            if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
+                self.log(f"Creating symlink for current Cosmovisor version")
+                os.symlink(os.path.join(self.cosmovisor_root_dir, "genesis"),
+                        os.path.join(self.cosmovisor_root_dir, "current"))
 
-            # self.log(f"Moving binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
-            # self.exec("sudo mv {} {}".format(self.binary_path, self.cosmovisor_cheqd_bin_path))
-            # self.exec("sudo chown {} {}".format(f'{DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}', f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
-            # self.exec("sudo chmod +x {}".format(f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
+            self.log(f"Moving binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
+            self.exec("sudo mv {} {}".format(self.binary_path, self.cosmovisor_cheqd_bin_path))
+            self.exec("sudo chown {} {}".format(f'{DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}', f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
+            self.exec("sudo chmod +x {}".format(f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
 
-            # if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
-            #     self.log(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
-            #     os.symlink(self.cosmovisor_cheqd_bin_path,
-            #             os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+            if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
+                self.log(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
+                os.symlink(self.cosmovisor_cheqd_bin_path,
+                        os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
             
             
-            # if self.interviewer.is_upgrade and \
-            #     os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
+            if self.interviewer.is_upgrade and \
+                os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
 
-            #     self.log(f"Copying upgrade-info.json file to cosmovisor/current/")
-            #     shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
-            #                 os.path.join(self.cosmovisor_root_dir, "current"))
-            #     self.log(f"Changing owner to {DEFAULT_CHEQD_USER} user")
-            #     self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
+                self.log(f"Copying upgrade-info.json file to cosmovisor/current/")
+                shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
+                            os.path.join(self.cosmovisor_root_dir, "current"))
+                self.log(f"Changing owner to {DEFAULT_CHEQD_USER} user")
+                self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
         
-            # self.log(f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
-            # self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
+            self.log(f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
+            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
         except:
             failure_exit(f"Failed to setup Cosmovisor")
 
-    
+    def set_env_vars(self, env_var_name, env_var_value):
+        if not check_if_env_var_already_set(env_var_name):
+            self.log(f'Setting ENV var {env_var_name}')
+            self.exec(f"echo 'export {env_var_name}={env_var_value}' >> ~/.bashrc")
+        self.log(f"ENV var {env_var_name} already set")
+
+    def check_if_env_var_already_set(self, env_var_name):
+        output = self.exec(f"echo ${env_var_name}").stdout
+        if len(str(output).strip()) > 0:
+            return True
+        else:
+            return False
+     
     def compare_checksum(self, file_path):
         # Set URL for correct checksum file for snapshot
         checksum_url = os.path.join(os.path.dirname(self.interviewer.snapshot_url), "md5sum.txt")
@@ -984,6 +995,25 @@ class Interviewer:
                 copy_r_list.pop(i)
                 return copy_r_list
 
+    def is_cosmovisor_already_installed(self) -> bool:
+        install_path = self.exec("which cosmovisor").stdout
+        if len(install_path.strip()) > 0:
+            return True
+        else:
+            return False
+
+    def what_cosmovisor_version(self) -> str:
+        std_out = """{}""".format(self.exec("cosmovisor version 2> /dev/null || echo false").stdout)     
+        arr = std_out.split()
+        current_version = None
+        for i in range (0, len(arr)):
+            if arr[i].lower() == 'version:':
+                # set current version as well as replace if v prefix there
+                current_version = arr[i+1].split("\\")[0].replace('v','')
+                return current_version
+        return current_version
+    
+    def 
     def ask_for_version(self):
         default = self.get_latest_release()
         all_releases = self.get_releases()
@@ -1191,6 +1221,7 @@ class Interviewer:
             return True
         self.verbose = curr_verbose
         return False
+
 
 if __name__ == '__main__':
     
