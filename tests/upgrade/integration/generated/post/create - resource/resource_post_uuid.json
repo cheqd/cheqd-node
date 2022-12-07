@@ -1,0 +1,26 @@
+{
+    "payload": {
+        "data": "eyJhdHRyIjpbIm5hbWUiLCJhZ2UiXX0=",
+        "collection_id": "91e5f0cf-5f1e-5c19-97d3-d313e84033b4",
+        "id": "54cb8b4d-af33-4606-bc54-0f035ee30e0f",
+        "name": "Test Resource After Upgrade Name UUID Case",
+        "version": "",
+        "resource_type": "CL-Schema",
+        "also_known_as": [
+            {
+                "uri": "https://example.com/alternative-uri",
+                "description": ""
+            },
+            {
+                "uri": "https://example.com/alternative-uri",
+                "description": "Alternative URI description"
+            }
+        ]
+    },
+    "signInputs": [
+        {
+            "verificationMethodId": "did:cheqd:testnet:91e5f0cf-5f1e-5c19-97d3-d313e84033b4#key-1",
+            "privKey": "tBjxEJCqSkj7u+iTWRqAVZwtcl2XBZrlaMfhxYIRc4wj7epbmDkJ35sCin3MWnAxvHJNDY0yyPafVspsrgb1Ng=="
+        }
+    ]
+}

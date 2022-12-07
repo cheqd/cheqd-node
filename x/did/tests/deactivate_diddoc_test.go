@@ -33,6 +33,14 @@ var _ = Describe("Deactivate DID tests", func() {
 		res, err := setup.DeactivateDidDoc(msg, signatures)
 		Expect(err).To(BeNil())
 		Expect(res.Value.Metadata.Deactivated).To(BeTrue())
+
+		// Check that all versions are deactivated
+		versions, err := setup.QueryAllDidDocVersionsMetadata(alice.Did)
+		Expect(err).To(BeNil())
+
+		for _, version := range versions.Versions {
+			Expect(version.Deactivated).To(BeTrue())
+		}
 	})
 
 	When("DID is not found", func() {

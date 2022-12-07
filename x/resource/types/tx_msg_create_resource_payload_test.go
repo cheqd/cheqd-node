@@ -68,9 +68,9 @@ var _ = Describe("TxMsgCreateResourcePayload", func() {
 			"base58 identifier - not changed",
 			TestCaseUUIDDidStruct{
 				inputCollectionId:    "zABCDEFG123456789abcd",
-				inputId:              "zABCDEFG123456789abcd",
+				inputId:              "8c614475-ec20-4ff2-bcf3-e4f28b849dbc",
 				expectedCollectionId: "zABCDEFG123456789abcd",
-				expectedId:           "zABCDEFG123456789abcd",
+				expectedId:           "8c614475-ec20-4ff2-bcf3-e4f28b849dbc",
 			}),
 
 		Entry(

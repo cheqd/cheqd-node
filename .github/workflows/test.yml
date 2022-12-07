@@ -30,8 +30,8 @@ jobs:
         run: |
           go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
-      - name: Run Ginkgo tests
-        run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --junit-report report-unit.xml
+      - name: Run Ginkgo unit tests
+        run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --tags upgrade_unit --junit-report report-unit.xml
 
       - name: Upload unit tests result
         uses: actions/upload-artifact@v3
@@ -40,7 +40,7 @@ jobs:
           path: report-unit.xml
 
   integration-tests:
-    name: "Integration Test"
+    name: "Integration Tests"
     runs-on: ubuntu-latest
 
     steps:
@@ -73,7 +73,7 @@ jobs:
       - name: Set up Docker localnet
         working-directory: ./docker/localnet
         run: |
-          docker compose --env-file docker-compose.env up --detach --no-build
+          docker compose --env-file build-latest.env up --detach --no-build
 
       - name: Import keys
         working-directory: ./docker/localnet
@@ -89,15 +89,81 @@ jobs:
         working-directory: ./..
         run: go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
-      - name: Run tests
+      - name: Run Gingko integration tests
         working-directory: ./tests/integration
-        run: ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --junit-report ../../report-integration.xml
+        run: ginkgo -r --race --randomize-suites --tags integration --keep-going --trace --junit-report ../../report-integration.xml
       
       - name: Upload integration tests result
         uses: actions/upload-artifact@v3
         with:
           name: report-integration.xml
           path: report-integration.xml
+
+  upgrade-migration-tests:
+    name: "Upgrade Integration Tests"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      # Preparations
+
+      - name: Download old node binary (mainnet-latest)
+        run: |
+          mkdir -p ${{ env.RUNNER_BIN_DIR }}
+          wget -c https://github.com/cheqd/cheqd-node/releases/download/0.6.9/cheqd-noded-0.6.9-Linux-x86_64.tar.gz
+          tar -xvf cheqd-noded-0.6.9-Linux-x86_64.tar.gz -C ${{ env.RUNNER_BIN_DIR }} --strip-components=1
+          sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: ./go.mod
+          cache: true
+
+      - name: Install ginkgo
+        working-directory: ./..
+        run: go install github.com/onsi/ginkgo/v2/ginkgo@latest
+      
+      - name: Download new version of the Docker image (build-latest)
+        uses: actions/download-artifact@v3
+        with:
+          name: cheqd-node-build.tar
+
+      - name: Load node Docker image
+        run: docker load -i cheqd-node-build.tar
+
+      # Run tests
+
+      - name: Setting up network with old binary inside (mainnet version)
+        working-directory: ./tests/upgrade/integration
+        run: |
+          bash scripts/setup.sh
+      
+      - name: Run pre-upgrade tests
+        working-directory: ./tests/upgrade
+        run: |
+          ginkgo -r --tags upgrade --race --tags upgrade_integration --focus-file pre_test.go
+        
+      - name: Restart network using new node version (build-latest)
+        working-directory: ./tests/upgrade/integration
+        run: |
+          bash scripts/upgrade.sh
+
+      - name: Run post-upgrade tests
+        working-directory: ./tests/upgrade
+        run: |
+          ginkgo -r --tags upgrade --race --tags upgrade_integration --focus-file post_test.go
+
+      - name: Cleanup after tests
+        working-directory: ./tests/upgrade/integration
+        run: |
+          bash scripts/cleanup.sh
 
   report-results:
     name: "Report"
@@ -107,7 +173,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
       - name: Download unit tests report
         uses: actions/download-artifact@v3
         with:

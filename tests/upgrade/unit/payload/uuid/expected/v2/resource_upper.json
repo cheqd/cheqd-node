@@ -1,0 +1,27 @@
+{
+    "resource": {
+        "data": "eyJhdHRyIjpbIm5hbWUiLCJhZ2UiXX0="
+    },
+    "metadata": {
+        "collection_id": "d87f512c-cbfc-58d1-b995-f526589ad808",
+        "id": "031ce9bf-2960-4936-9aa4-6261a6c72a46",
+        "name": "Test Resource Name",
+        "version": "",
+        "resource_type": "CL-Schema",
+        "also_known_as": [
+            {
+                "uri": "https://example.com/alternative-uri",
+                "description": ""
+            },
+            {
+                "uri": "https://example.com/alternative-uri",
+                "description": "Alternative URI description"
+            }
+        ],
+        "media_type": "application/json",
+        "created": "2021-01-01T00:00:00Z",
+        "checksum": "AKAIW1uO3jl8+fhEMe2Q815vZ+rTztzJmi40yp5JPt8=",
+        "previous_version_id": "",
+        "next_version_id": ""
+    }
+}

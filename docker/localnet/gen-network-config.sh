@@ -62,6 +62,9 @@ function configure_genesis() {
   # Default denom
   sed -i $SED_EXT 's/"stake"/"ncheq"/' "${GENESIS}"
 
+  # Short voting period
+  sed -i $SED_EXT 's/"voting_period": "172800s"/"voting_period": "12s"/' "${GENESIS}"
+
   # Test accounts
   BASE_ACCOUNT_1="cheqd1rnr5jrt4exl0samwj0yegv99jeskl0hsxmcz96"
   # Mnemonic: sketch mountain erode window enact net enrich smoke claim kangaroo another visual write meat latin bacon pulp similar forum guilt father state erase bright

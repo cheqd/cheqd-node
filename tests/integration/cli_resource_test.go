@@ -62,8 +62,30 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
-		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.GREEN, "can create resource"))
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.GREEN, "can create diddoc"))
+
+		// Update DID Doc
+		payloadUpdate := types.MsgUpdateDidDocPayload{
+			Id: did,
+			VerificationMethod: []*types.VerificationMethod{
+				{
+					Id:                   keyId,
+					Type:                 "Ed25519VerificationKey2020",
+					Controller:           did,
+					VerificationMaterial: "{\"publicKeyMultibase\": \"" + string(pubKeyMultibase58) + "\"}",
+				},
+			},
+			Authentication: []string{keyId},
+			VersionId:      uuid.NewString(),
+		}
+
+		res, err = cli.UpdateDidDoc(tmpDir, payloadUpdate, signInputs, testdata.BASE_ACCOUNT_1)
+		Expect(err).To(BeNil())
+		Expect(res.Code).To(BeEquivalentTo(0))
+
 		// Create a new Resource
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.GREEN, "can create resource"))
+
 		resourceId := uuid.NewString()
 		resourceName := "TestResource"
 		resourceVersion := "1.0"
