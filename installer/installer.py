@@ -380,6 +380,21 @@ class Installer():
             self.log("Reload systemd config")
             self.exec('systemctl daemon-reload')
 
+    def stop_cosmovisor_systemd(self):
+        if self.check_systemd_service_on(DEFAULT_COSMOVISOR_SERVICE_NAME):
+            self.log(f"Stopping systemd service: {service_name}")
+            self.exec(f"systemctl stop {service_name}")
+
+            self.log(f"Disable systemd service: {service_name}")
+            self.exec(f"systemctl disable {service_name}")
+
+            self.log("Reset failed systemd services (if any)")
+            self.exec("systemctl reset-failed")
+
+    def reload_cosmovisor_systemd(self):
+        self.log("Reload systemd config")
+        self.exec('systemctl daemon-reload')
+    
     def setup_system_configs(self):
         if os.path.exists("/etc/rsyslog.d/"):
             if not os.path.exists(DEFAULT_RSYSLOG_FILE) or self.interviewer.rewrite_rsyslog:
@@ -604,6 +619,7 @@ class Installer():
     
     def bump_cosmovisor(self):
         try:
+            stop_cosmovisor_systemd()
             fname= os.path.basename(COSMOVISOR_BINARY_URL)
             self.exec(f"wget -c {COSMOVISOR_BINARY_URL}")
             self.exec(f"tar -xzf {fname}")
@@ -613,6 +629,7 @@ class Installer():
             self.remove_safe("CHANGELOG.md")
             self.remove_safe("README.md")
             self.remove_safe("LICENSE")
+
 
             # move the new binary to installation directory
             self.log(f"Moving Cosmovisor binary to installation directory")
@@ -645,11 +662,13 @@ class Installer():
         
             self.log(f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
             self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
+            reload_cosmovisor_systemd()
         except:
             failure_exit(f"Failed to setup Cosmovisor")
 
     def set_env_vars(self, env_var_name, env_var_value):
         if not check_if_env_var_already_set(env_var_name):
+
             self.log(f'Setting ENV var {env_var_name}')
             self.exec(f"echo 'export {env_var_name}={env_var_value}' >> ~/.bashrc")
             return
