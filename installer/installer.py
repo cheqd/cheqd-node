@@ -608,38 +608,39 @@ class Installer():
             self.remove_safe("CHANGELOG.md")
             self.remove_safe("README.md")
             self.remove_safe("LICENSE")
-            
+
+            self.exec("./comovisor init")
             # move the new binary to installation directory
-            self.log(f"Moving Cosmovisor binary to installation directory")
-            shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
+            # self.log(f"Moving Cosmovisor binary to installation directory")
+            # shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
 
-            if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
-                self.log(f"Creating symlink for current Cosmovisor version")
-                os.symlink(os.path.join(self.cosmovisor_root_dir, "genesis"),
-                        os.path.join(self.cosmovisor_root_dir, "current"))
+            # if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
+            #     self.log(f"Creating symlink for current Cosmovisor version")
+            #     os.symlink(os.path.join(self.cosmovisor_root_dir, "genesis"),
+            #             os.path.join(self.cosmovisor_root_dir, "current"))
 
-            self.log(f"Moving binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
-            self.exec("sudo mv {} {}".format(self.binary_path, self.cosmovisor_cheqd_bin_path))
-            self.exec("sudo chown {} {}".format(f'{DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}', f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
-            self.exec("sudo chmod +x {}".format(f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
+            # self.log(f"Moving binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
+            # self.exec("sudo mv {} {}".format(self.binary_path, self.cosmovisor_cheqd_bin_path))
+            # self.exec("sudo chown {} {}".format(f'{DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}', f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
+            # self.exec("sudo chmod +x {}".format(f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
 
-            if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
-                self.log(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
-                os.symlink(self.cosmovisor_cheqd_bin_path,
-                        os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+            # if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
+            #     self.log(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
+            #     os.symlink(self.cosmovisor_cheqd_bin_path,
+            #             os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
             
             
-            if self.interviewer.is_upgrade and \
-                os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
+            # if self.interviewer.is_upgrade and \
+            #     os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
 
-                self.log(f"Copying upgrade-info.json file to cosmovisor/current/")
-                shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
-                            os.path.join(self.cosmovisor_root_dir, "current"))
-                self.log(f"Changing owner to {DEFAULT_CHEQD_USER} user")
-                self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
+            #     self.log(f"Copying upgrade-info.json file to cosmovisor/current/")
+            #     shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
+            #                 os.path.join(self.cosmovisor_root_dir, "current"))
+            #     self.log(f"Changing owner to {DEFAULT_CHEQD_USER} user")
+            #     self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
         
-            self.log(f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
-            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
+            # self.log(f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
+            # self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
         except:
             failure_exit(f"Failed to setup Cosmovisor")
 
