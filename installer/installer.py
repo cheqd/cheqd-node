@@ -1108,7 +1108,6 @@ class Interviewer:
             failure_exit(f"Invalid input provided during installation.")
     
     def ask_for_cosmovisor_bump(self):
-        self.log(f"Your current Cosmovisor version is v{current_version}")
         answer = self.ask(f"Do you want to bump your Cosmovisor to {DEFAULT_LATEST_COSMOVISOR_VERSION} ? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
         if answer.lower().startswith("y"):
             self.is_cosmovisor_bump_needed = True
@@ -1240,8 +1239,8 @@ if __name__ == '__main__':
         # if cosmovisor is not installed 
         if interviewer.is_cosmovisor_already_installed():
             cosm_version = interviewer.what_cosmovisor_version()
-            print("Installed cosmovisor version -> ", cosm_version)
             if cosm_version < DEFAULT_LATEST_COSMOVISOR_VERSION.replace("v",""):
+                self.log(f"Your current Cosmovisor version is v{cosm_version}")
                 interviewer.ask_for_cosmovisor_bump()
         else:
             interviewer.ask_for_cosmovisor()     
