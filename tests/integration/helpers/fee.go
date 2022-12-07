@@ -7,6 +7,7 @@ import (
 func GenerateFees(amount string) []string {
 	return []string{
 		"--fees", amount,
+		"--gas", "400000",
 	}
 }
 
