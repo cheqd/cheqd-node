@@ -667,6 +667,7 @@ class Installer():
             failure_exit(f"Failed to setup Cosmovisor")
 
     def set_env_vars(self, env_var_name, env_var_value):
+        print("set_env_vars: ")
         if not check_if_env_var_already_set(env_var_name):
             self.log(f'Setting ENV var {env_var_name}')
             self.exec(f"echo 'export {env_var_name}={env_var_value}' >> ~/.bashrc")
