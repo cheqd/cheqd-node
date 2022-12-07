@@ -712,6 +712,10 @@ func New(
 				stakingSubspace, _ := app.ParamsKeeper.GetSubspace(stakingtypes.ModuleName)
 				stakingSubspace.Set(ctx, stakingtypes.KeyMinCommissionRate, sdk.NewDec(0))
 
+				// Add defaults for did subspace
+				didSubspace := app.GetSubspace(didtypes.ModuleName)
+				didSubspace.Set(ctx, didtypes.ParamStoreKeyFeeParams, didtypes.DefaultFeeParams())
+
 				// Add defaults for resource subspace
 				resourceSubspace := app.GetSubspace(resourcetypes.ModuleName)
 				resourceSubspace.Set(ctx, resourcetypes.ParamStoreKeyFeeParams, resourcetypes.DefaultFeeParams())
@@ -801,7 +805,6 @@ func (app *App) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.Res
 	// FIXME: This should have been done from the beginning.
 	// Now this would break consensus with existing networks.
 	// so ModuleVersionMap is initialized as part of upgrade xxx.
-	// app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
 	var genesisState GenesisState
 	if err := tmjson.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
 		panic(err)
