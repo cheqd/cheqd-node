@@ -5,9 +5,9 @@ import (
 )
 
 const (
-	DefaultCreateResourceImageFee   = 25e8
-	DefaultCreateResourceJsonFee    = 25e8
-	DefaultCreateResourceDefaultFee = 25e8
+	DefaultCreateResourceImageFee   = 10e9                   // 10 CHEQ or 10000000000 ncheq
+	DefaultCreateResourceJsonFee    = 25e8                   // 2.5 CHEQ or 2500000000 ncheq
+	DefaultCreateResourceDefaultFee = 5e9                    // 5 CHEQ or 5000000000 ncheq
 	DefaultBurnFactor               = "0.500000000000000000" // 0.5 or 50%
 )
 
