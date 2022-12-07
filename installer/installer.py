@@ -667,22 +667,22 @@ class Installer():
             failure_exit(f"Failed to setup Cosmovisor")
 
     def set_env_vars(self, env_var_name, env_var_value):
-        print("set_env_vars: ", check_if_env_var_already_set(env_var_name))
+        self.log("set_env_vars: ")
         if not check_if_env_var_already_set(env_var_name):
             self.log(f'Setting ENV var {env_var_name}')
             self.exec(f"echo 'export {env_var_name}={env_var_value}' >> ~/.bashrc")
-            return
-        self.log(f"ENV var {env_var_name} already set")
+        else:
+            self.log(f"ENV var {env_var_name} already set")
 
     def check_if_env_var_already_set(self, env_var_name):
-        print("check_if_env_var_already_set: ", env_var_name)
+        self.log("check_if_env_var_already_set: ", env_var_name)
         output = self.exec(f"echo ${env_var_name}").stdout
-        print("check_if_env_var_already_set: ", output)
+        self.log("check_if_env_var_already_set: ", output)
         if  env_var_name in str(output).strip():
-            print("check_if_env_var_already_set: ENV SET", output)
+            self.log("check_if_env_var_already_set: ENV SET", output)
             return True
         else:
-            print("check_if_env_var_already_set: ENV NOT SET ", output)
+            self.log("check_if_env_var_already_set: ENV NOT SET ", output)
             return False
      
     def compare_checksum(self, file_path):
