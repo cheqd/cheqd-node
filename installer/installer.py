@@ -423,7 +423,7 @@ class Installer():
         self.prepare_directory_tree()
         self.setup_system_configs()
 
-        if self.interviewer.is_cosmo_needed and not self.interviewer.is_cosmovisor_bump_needed:
+        if self.interviewer.is_cosmo_needed and self.interviewer.is_cosmovisor_bump_needed:
             self.log("Setting up Cosmovisor")
             self.setup_cosmovisor()
         
@@ -609,9 +609,9 @@ class Installer():
             self.remove_safe("README.md")
             self.remove_safe("LICENSE")
             
-            if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)):
-                self.log(f"Moving Cosmovisor binary to installation directory")
-                shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
+            # move the new binary to installation directory
+            self.log(f"Moving Cosmovisor binary to installation directory")
+            shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
 
             if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
                 self.log(f"Creating symlink for current Cosmovisor version")
