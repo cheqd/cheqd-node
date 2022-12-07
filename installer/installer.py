@@ -668,6 +668,7 @@ class Installer():
 
     def set_env_vars(self, env_var_name, env_var_value):
         self.log("set_env_vars: ")
+        check_if_env_var_already_set(env_var_name)
         if not check_if_env_var_already_set(env_var_name):
             self.log(f'Setting ENV var {env_var_name}')
             self.exec(f"echo 'export {env_var_name}={env_var_value}' >> ~/.bashrc")
@@ -675,15 +676,18 @@ class Installer():
             self.log(f"ENV var {env_var_name} already set")
 
     def check_if_env_var_already_set(self, env_var_name):
-        self.log("check_if_env_var_already_set: ", env_var_name)
-        output = self.exec(f"echo ${env_var_name}").stdout
-        self.log("check_if_env_var_already_set: ", output)
-        if  env_var_name in str(output).strip():
-            self.log("check_if_env_var_already_set: ENV SET", output)
-            return True
-        else:
-            self.log("check_if_env_var_already_set: ENV NOT SET ", output)
-            return False
+        try:
+            self.log("check_if_env_var_already_set: ", env_var_name)
+            output = self.exec(f"echo ${env_var_name}").stdout
+            self.log("check_if_env_var_already_set: ", output)
+            if  env_var_name in str(output).strip():
+                self.log("check_if_env_var_already_set: ENV SET", output)
+                return True
+            else:
+                self.log("check_if_env_var_already_set: ENV NOT SET ", output)
+                return False
+        except Error as e:
+            self.log("error ", e)
      
     def compare_checksum(self, file_path):
         # Set URL for correct checksum file for snapshot
