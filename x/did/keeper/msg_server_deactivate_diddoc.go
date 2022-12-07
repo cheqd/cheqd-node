@@ -60,11 +60,22 @@ func (k MsgServer) DeactivateDidDoc(goCtx context.Context, msg *types.MsgDeactiv
 	}
 
 	// Deactivate all previous versions
+	var iterationErr error
 	k.IterateDidDocVersions(&ctx, msg.Payload.Id, func(didDocWithMetadata types.DidDocWithMetadata) bool {
 		didDocWithMetadata.Metadata.Deactivated = true
-		k.SetDidDocVersion(&ctx, &didDocWithMetadata, true)
+
+		err := k.SetDidDocVersion(&ctx, &didDocWithMetadata, true)
+		if err != nil {
+			iterationErr = err
+			return false
+		}
+
 		return true
 	})
+
+	if iterationErr != nil {
+		return nil, types.ErrInternal.Wrapf(iterationErr.Error())
+	}
 
 	// Build and return response
 	return &types.MsgDeactivateDidDocResponse{
