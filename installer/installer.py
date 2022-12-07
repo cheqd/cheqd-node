@@ -668,12 +668,21 @@ class Installer():
 
     def set_env_vars(self, env_var_name, env_var_value):
         self.log("set_env_vars: ")
-        # check_if_env_var_already_set(env_var_name)
-        if not check_if_env_var_already_set(env_var_name):
-            self.log(f'Setting ENV var {env_var_name}')
-            self.exec(f"echo 'export {env_var_name}={env_var_value}' >> ~/.bashrc")
+        self.log("check_if_env_var_already_set: ", env_var_name)
+        output = str(self.exec(f"echo ${env_var_name} | echo false").stdout)
+        self.log("check_if_env_var_already_set: ", output)
+        if  'false' in output:
+            self.log("check_if_env_var_already_set: ENV SET", output)
+            return False
         else:
-            self.log(f"ENV var {env_var_name} already set")
+            self.log("check_if_env_var_already_set: ENV NOT SET ", output)
+            return True
+        # check_if_env_var_already_set(env_var_name)
+        # if not check_if_env_var_already_set(env_var_name):
+        #     self.log(f'Setting ENV var {env_var_name}')
+        #     self.exec(f"echo 'export {env_var_name}={env_var_value}' >> ~/.bashrc")
+        # else:
+        #     self.log(f"ENV var {env_var_name} already set")
 
     def check_if_env_var_already_set(self, env_var_name):
         try:
