@@ -725,6 +725,9 @@ func New(
 
 				// Skip resource module InitGenesis (was not present in v0.6.9)
 				fromVM[resourcetypes.ModuleName] = versionMap[resourcetypes.ModuleName]
+
+				// Set version explicitly for did module
+				fromVM[didtypes.ModuleName] = versionMap[didtypes.ModuleName]
 			}
 
 			// cheqd migrations
