@@ -23,6 +23,16 @@ var _ = Describe("Upgrade - Post", func() {
 			Expect(err).To(BeNil())
 		})
 
+		It("should wait for a certain number of blocks to be produced", func() {
+			By("fetching the current chain height")
+			currentHeight, err := cli.GetCurrentBlockHeight(cli.VALIDATOR0, cli.CLI_BINARY_NAME)
+			Expect(err).To(BeNil())
+
+			By("waiting for 10 blocks to be produced on top, after the upgrade")
+			err = cli.WaitForChainHeight(cli.VALIDATOR0, cli.CLI_BINARY_NAME, currentHeight+10, cli.VOTING_PERIOD*6)
+			Expect(err).To(BeNil())
+		})
+
 		It("should match the expected module version map", func() {
 			By("loading the expected module version map")
 			var expected upgradetypes.QueryModuleVersionsResponse
