@@ -53,7 +53,7 @@ var _ = Describe("Upgrade - Post", func() {
 				DidDocUpdateSignInput, err = Loader(payload, &DidDocUpdatePayload)
 				Expect(err).To(BeNil())
 
-				res, err := cli.UpdateDid(DidDocUpdatePayload, DidDocUpdateSignInput, cli.VALIDATOR1)
+				res, err := cli.UpdateDid(DidDocUpdatePayload, DidDocUpdateSignInput, cli.VALIDATOR0)
 				Expect(err).To(BeNil())
 				Expect(res.Code).To(BeEquivalentTo(0))
 			}
@@ -76,7 +76,7 @@ var _ = Describe("Upgrade - Post", func() {
 				DidDocDeactivateSignInput, err = Loader(payload, &DidDocDeacctivatePayload)
 				Expect(err).To(BeNil())
 
-				res, err := cli.DeactivateDid(DidDocDeacctivatePayload, DidDocDeactivateSignInput, cli.VALIDATOR1)
+				res, err := cli.DeactivateDid(DidDocDeacctivatePayload, DidDocDeactivateSignInput, cli.VALIDATOR0)
 				Expect(err).To(BeNil())
 				Expect(res.Code).To(BeEquivalentTo(0))
 			}
