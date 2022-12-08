@@ -37,7 +37,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: report-unit.xml
-          path: report-unit.xml
+          path: reports/report-unit.xml
 
   integration-tests:
     name: "Integration Tests"
@@ -103,7 +103,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: report-integration.xml
-          path: report-integration.xml
+          path: reports/report-integration.xml
 
   upgrade-tests:
     name: "Upgrade Tests"
@@ -159,7 +159,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: report-pre-upgrade.xml
-          path: report-pre-upgrade.xml
+          path: reports/report-pre-upgrade.xml
 
       - name: Restart network using new node version (build-latest)
         working-directory: ./tests/upgrade/integration
@@ -175,7 +175,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: report-post-upgrade.xml
-          path: report-post-upgrade.xml
+          path: reports/report-post-upgrade.xml
 
       - name: Download binary artifact (build-latest)
         uses: actions/download-artifact@v3
@@ -196,7 +196,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: report-upgraded-integration.xml
-          path: report-upgraded-integration.xml
+          path: reports/report-upgraded-integration.xml
 
       - name: Show logs on failure
         if: failure()
@@ -212,7 +212,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: report-pricing-proposal.xml
-          path: report-pricing-proposal.xml
+          path: reports/report-pricing-proposal.xml
 
       - name: Run pricing integration tests after successful param change proposal
         working-directory: ./tests/integration
@@ -223,7 +223,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: report-pricing-change.xml
-          path: report-pricing-change.xml
+          path: reports/report-pricing-change.xml
 
       - name: Cleanup after tests
         working-directory: ./tests/upgrade/integration
@@ -241,15 +241,16 @@ jobs:
       - name: Download all reports
         uses: actions/download-artifact@v3
         with:
-          name: report**
+          name: reports/**
 
       - name: Combine test results
+        working-directory: ./reports
         run: |
-          python ./.github/scripts/xml_combine.py report-unit.xml report-integration.xml report-pre-upgrade.xml report-post-upgrade.xml report-upgraded-integration.xml report-pricing-proposal.xml report-pricing-change.xml > report.xml
+          python ../.github/scripts/xml_combine.py reports/report-unit.xml report-integration.xml report-pre-upgrade.xml report-post-upgrade.xml report-upgraded-integration.xml report-pricing-proposal.xml report-pricing-change.xml > report.xml
 
       - uses: mikepenz/action-junit-report@v3
         with:
-          report_paths: 'report.xml'
+          report_paths: 'reports/report.xml'
           check_name: ""
           suite_regex: '*'
           include_passed: true
