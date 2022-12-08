@@ -1,4 +1,4 @@
-name: "Unit"
+name: "Tests"
 on:
   workflow_call:
 defaults:
