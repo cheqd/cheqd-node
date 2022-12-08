@@ -241,7 +241,7 @@ jobs:
       - name: Download all reports
         uses: actions/download-artifact@v3
         with:
-          name: reports/**
+          path: reports/**
 
       - name: Combine test results
         working-directory: ./reports
