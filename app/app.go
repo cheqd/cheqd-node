@@ -678,6 +678,15 @@ func New(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 
+	// nolint: errcheck
+	app.configurator.RegisterMigration(
+		didtypes.ModuleName,
+		3,
+		func(ctx sdk.Context) error {
+			return nil
+		},
+	)
+
 	// Upgrade handler for the next release
 	app.UpgradeKeeper.SetUpgradeHandler(UpgradeName,
 		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
@@ -725,9 +734,6 @@ func New(
 
 				// Skip resource module InitGenesis (was not present in v0.6.9)
 				fromVM[resourcetypes.ModuleName] = versionMap[resourcetypes.ModuleName]
-
-				// Set version explicitly for did module
-				fromVM[didtypes.ModuleName] = versionMap[didtypes.ModuleName]
 			}
 
 			// cheqd migrations
