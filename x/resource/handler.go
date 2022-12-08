@@ -3,7 +3,7 @@ package resource
 import (
 	"fmt"
 
-	cheqdkeeper "github.com/cheqd/cheqd-node/x/cheqd/keeper"
+	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 
 	"github.com/cheqd/cheqd-node/x/resource/keeper"
 	"github.com/cheqd/cheqd-node/x/resource/types"
@@ -11,7 +11,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func NewHandler(k keeper.Keeper, cheqdKeeper cheqdkeeper.Keeper) sdk.Handler {
+func NewHandler(k keeper.Keeper, cheqdKeeper didkeeper.Keeper) sdk.Handler {
 	msgServer := keeper.NewMsgServer(k, cheqdKeeper)
 
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {

@@ -1,32 +1,30 @@
-package utils
+package utils_test
 
 import (
 	"os"
-	"testing"
 
-	"github.com/stretchr/testify/require"
+	resourceutils "github.com/cheqd/cheqd-node/x/resource/utils"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
-func TestValidateMediaType(t *testing.T) {
-	cases := []struct {
-		path string
-		mt   string
-	}{
-		{"testdata/resource.txt", "text/plain; charset=utf-8"},
-		{"testdata/resource.csv", "text/csv"},
-		{"testdata/resource.dat", "application/octet-stream"},
-		{"testdata/resource.json", "application/json"},
-		{"testdata/resource.pdf", "application/pdf"},
-	}
+var _ = Describe("MediaType", func() {
+	Describe("GetMediaType", func() {
+		DescribeTable("Validate MIME type for different source files",
+			func(path string, mt string) {
+				data, err := os.ReadFile(path)
+				Expect(err).To(BeNil())
 
-	for _, tc := range cases {
-		t.Run(tc.mt, func(t *testing.T) {
-			data, err := os.ReadFile(tc.path)
-			require.NoError(t, err)
-
-			detected := DetectMediaType(data)
-
-			require.Equal(t, tc.mt, detected)
-		})
-	}
-}
+				detected := resourceutils.DetectMediaType(data)
+				Expect(detected).To(Equal(mt))
+			},
+			Entry("text file", "testdata/resource.txt", "text/plain; charset=utf-8"),
+			Entry("csv file", "testdata/resource.csv", "text/csv"),
+			Entry("dat file", "testdata/resource.dat", "application/octet-stream"),
+			Entry("json file", "testdata/resource.json", "application/json"),
+			Entry("pdf file", "testdata/resource.pdf", "application/pdf"),
+			Entry("png file", "testdata/resource.png", "image/png"),
+		)
+	})
+})

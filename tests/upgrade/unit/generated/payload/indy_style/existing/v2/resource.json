@@ -1,0 +1,16 @@
+{
+    "metadata": {
+        "collection_id": "xcWigjiDhDTaBGRX",
+        "id": "7f2589aa-1279-4bd7-b704-f868772b460a",
+        "name": "Test Resource",
+        "resource_type": "test-resource-type",
+        "media_type": "application/json",
+        "created": "2022-11-01T10:54:01Z",
+        "checksum": "T0ebujH3GFnZlDZRU4yN8hGYBOzrf1ig3iQXif8hSvQ=",
+        "previous_version_id": null,
+        "next_version_id": null
+    },
+    "resource": {
+        "data": "eyAibWVzc2FnZSI6ICJoZWxsbyB3b3JsZCJ9"
+    }
+}

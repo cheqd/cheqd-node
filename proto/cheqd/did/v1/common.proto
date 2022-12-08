@@ -1,0 +1,9 @@
+syntax = "proto3";
+package cheqdid.cheqdnode.cheqd.v1;
+
+option go_package = "github.com/cheqd/cheqd-node/x/did/types/v1";
+
+message KeyValuePair {
+  string key = 1;
+  string value = 2;
+}

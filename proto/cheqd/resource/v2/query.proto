@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package cheqd.resource.v2;
+
+import "cheqd/resource/v2/resource.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
+
+service Query {
+  rpc Resource(QueryGetResourceRequest) returns (QueryGetResourceResponse) {
+    option (google.api.http).get = "/cheqd/resource/v2/{collection_id}/resources/{id}";
+  }
+  rpc ResourceMetadata(QueryGetResourceMetadataRequest) returns (QueryGetResourceMetadataResponse) {
+    option (google.api.http).get = "/cheqd/resource/v2/{collection_id}/resources/{id}/metadata";
+  }
+  rpc CollectionResources(QueryGetCollectionResourcesRequest) returns (QueryGetCollectionResourcesResponse) {
+    option (google.api.http).get = "/cheqd/resource/v2/{collection_id}/metadata";
+  }
+}
+
+message QueryGetResourceRequest {
+  string collection_id = 1;
+  string id = 2;
+}
+
+message QueryGetResourceResponse {
+  ResourceWithMetadata resource = 1;
+}
+
+message QueryGetResourceMetadataRequest {
+  string collection_id = 1;
+  string id = 2;
+}
+
+message QueryGetResourceMetadataResponse {
+  Metadata resource = 1;
+}
+
+message QueryGetCollectionResourcesRequest {
+  string collection_id = 1;
+}
+
+message QueryGetCollectionResourcesResponse {
+  repeated Metadata resources = 1;
+}

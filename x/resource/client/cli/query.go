@@ -20,7 +20,7 @@ func GetQueryCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(CmdGetResource(),
-		CmdGetAllResourceVersions(),
+		CmdGetResourceMetadata(),
 		CmdGetCollectionResources())
 
 	return cmd

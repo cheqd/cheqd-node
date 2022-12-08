@@ -3,8 +3,8 @@ package keeper
 import (
 	"context"
 
-	cheqdtypes "github.com/cheqd/cheqd-node/x/cheqd/types"
-	cheqdutils "github.com/cheqd/cheqd-node/x/cheqd/utils"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -17,13 +17,15 @@ func (q queryServer) Resource(c context.Context, req *types.QueryGetResourceRequ
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
+	req.Normalize()
+
 	ctx := sdk.UnwrapSDKContext(c)
 
 	// Validate corresponding DIDDoc exists
-	namespace := q.cheqdKeeper.GetDidNamespace(&ctx)
-	did := cheqdutils.JoinDID(cheqdtypes.DidMethod, namespace, req.CollectionId)
-	if !q.cheqdKeeper.HasDid(&ctx, did) {
-		return nil, cheqdtypes.ErrDidDocNotFound.Wrap(did)
+	namespace := q.didKeeper.GetDidNamespace(&ctx)
+	did := didutils.JoinDID(didtypes.DidMethod, namespace, req.CollectionId)
+	if !q.didKeeper.HasDidDoc(&ctx, did) {
+		return nil, didtypes.ErrDidDocNotFound.Wrap(did)
 	}
 
 	resource, err := q.GetResource(&ctx, req.CollectionId, req.Id)
