@@ -35,10 +35,6 @@ func (suite *HandlerTestSuite) SetupTest() error {
 	return nil
 }
 
-// func TestHandlerTestSuite(t *testing.T) {
-// 	suite.Run(t, new(HandlerTestSuite))
-// }
-
 func testProposal(changes ...proposal.ParamChange) *proposal.ParameterChangeProposal {
 	return proposal.NewParameterChangeProposal("title", "description", changes)
 }
