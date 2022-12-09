@@ -8,6 +8,7 @@ import (
 
 // This migration should be run after protobuf that's why we use new DidDocWithMetadata
 func MigrateDidUUID(sctx sdk.Context, mctx MigrationContext) error {
+	println("UUID migration for dids")
 	return MigrateDidSimple(sctx, mctx, func(didDocWithMetadata *didtypes.DidDocWithMetadata) {
 		// Migrate uuid dids, make them normalized
 		newDid := helpers.MigrateUUIDDid(didDocWithMetadata.DidDoc.Id)

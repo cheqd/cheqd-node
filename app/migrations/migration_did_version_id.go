@@ -8,6 +8,7 @@ import (
 
 // This migration should be run after protobuf that's why we use new DidDocWithMetadata
 func MigrateDidVersionId(sctx sdk.Context, mctx MigrationContext) error {
+	println("Version id migration for dids")
 	return MigrateDidSimple(sctx, mctx, func(didDocWithMetadata *didtypes.DidDocWithMetadata) {
 		versionId := uuid.NewSHA1(uuid.Nil, []byte(didDocWithMetadata.DidDoc.Id))
 		didDocWithMetadata.Metadata.VersionId = versionId.String()
