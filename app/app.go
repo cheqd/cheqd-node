@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -732,6 +733,9 @@ func New(
 				// Get the current version map
 				versionMap := app.mm.GetVersionMap()
 
+				fmt.Println("Current version map: ", fromVM)
+				fmt.Println("Expected version map: ", versionMap)
+
 				// Skip resource module InitGenesis (was not present in v0.6.9)
 				fromVM[resourcetypes.ModuleName] = versionMap[resourcetypes.ModuleName]
 			}
@@ -782,6 +786,8 @@ func New(
 			// transfer module consensus version has been bumped to 2
 			return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 		})
+
+	fmt.Println("Loading latest version: ", loadLatest)
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
