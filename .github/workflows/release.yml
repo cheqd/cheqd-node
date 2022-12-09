@@ -13,7 +13,7 @@ jobs:
 
   release-binary:
     name: "Node binary"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     outputs:
       RELEASE_VERSION: ${{ steps.set-version.outputs.RELEASE_VERSION }}
     
@@ -78,7 +78,7 @@ jobs:
   release-docker:
     name: "Docker image"
     needs: release-binary
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       IMAGE_NAME: ${{ github.repository }}
 
