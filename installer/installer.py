@@ -676,8 +676,6 @@ class Installer():
             failure_exit(f"Failed to setup Cosmovisor")
 
     def set_env_vars(self, env_var_name, env_var_value):
-        self.log("set_env_vars: ")
-        # check_if_env_var_already_set(env_var_name)
         if not self.check_if_env_var_already_set(env_var_name):
             self.exec(f"echo 'export {env_var_name}={env_var_value}' >> ~/.bashrc")
             self.exec(f"echo 'export {env_var_name}={env_var_value}' >> /home/cheqd/.bashrc")
@@ -685,7 +683,6 @@ class Installer():
             self.log(f"ENV var {env_var_name} already set")
 
     def check_if_env_var_already_set(self, env_var_name):
-        self.log(f"check_if_env_var_already_set: {env_var_name}")
         try:
             os.environ[env_var_name]
             return True
@@ -1034,10 +1031,8 @@ class Interviewer:
     def is_cosmovisor_already_installed(self) -> bool:
         install_path = self.exec("which cosmovisor").stdout
         if len(install_path.strip()) > 0:
-            print("is_cosmovisor_already_installed: Cosmovisor already installed -> ", install_path)
             return True
         else:
-            print("is_cosmovisor_already_installed: Cosmovisor NOT installed -> ", install_path)
             return False
 
     def what_cosmovisor_version(self) -> str:
@@ -1048,9 +1043,7 @@ class Interviewer:
             cosmovisor_version = None
             for line in file:
                 first_line = str(line)
-                print("first line", first_line)
                 cosmovisor_version = re.search(r'(\d+)(\.\d+)?(\.\d+)?$', first_line).group()
-                print("cosmovisor_version", cosmovisor_version)
                 break
             return cosmovisor_version
         except:
@@ -1277,7 +1270,6 @@ if __name__ == '__main__':
         # if cosmovisor is installed 
         if interviewer.is_cosmovisor_already_installed():
             cosm_version = interviewer.what_cosmovisor_version()
-            print("returned version", cosm_version)
             if cosm_version < DEFAULT_LATEST_COSMOVISOR_VERSION.replace("v",""):
                 print(f"Your current Cosmovisor version is v{cosm_version}")
                 interviewer.ask_for_cosmovisor_bump()
