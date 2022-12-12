@@ -1055,7 +1055,7 @@ class Interviewer:
             failure_exit("Error when getting Cosmovisor version")
         finally:
             file.close()
-            self.remove_safe(file_path)
+            os.remove(file_path)
         
     def ask_for_version(self):
         default = self.get_latest_release()
