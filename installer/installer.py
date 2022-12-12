@@ -19,6 +19,7 @@ import shutil
 import signal
 import platform
 import copy
+import re
 
 ###############################################################
 ###     				Installer defaults    				###
@@ -1040,16 +1041,22 @@ class Interviewer:
             return False
 
     def what_cosmovisor_version(self) -> str:
-        std_out = """{}""".format(self.exec("cosmovisor version 2> /dev/null || echo false").stdout)     
-        arr = std_out.split()
-        current_version = None
-        for i in range (0, len(arr)):
-            if arr[i].lower() == 'version:':
-                # set current version as well as replace if v prefix there
-                current_version = arr[i+1].split("\\")[0].replace('v','')
-                return current_version
-        return current_version
-    
+        try:
+            file_path = './temp.txt'
+            std_out = self.exec(f"cosmovisor version | > {file_path}")
+            file = open(file_path, "r")
+            for line in file:
+                first_line = str(line)
+                print("first line", first_line)
+                cosmovisor_version = re.search(r'(\d+)(\.\d+)?(\.\d+)?$', first_line).group()
+                print("cosmovisor_version", cosmovisor_version)
+                return cosmovisor_version
+        except:
+            failure_exit("Error when getting Cosmovisor version")
+        finally:
+            file.close()
+            self.remove_safe(file_path)
+        
     def ask_for_version(self):
         default = self.get_latest_release()
         all_releases = self.get_releases()
