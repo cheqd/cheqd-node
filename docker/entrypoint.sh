@@ -63,6 +63,15 @@ else
     echo "No private validator state file passed. Skipping and retaining existing validator state."
 fi
 
+# Check if a validator account has been passed in config
+if [ -f "/validator-account" ]
+then
+    echo "Validator account key file passed. Replacing current validator account key file."
+    # TODO
+else
+    echo "No validator account key file passed. Skipping and retaining existing validator account."
+fi
+
 # Check if a upgrade_info file has been passed in config
 if [ -f "/upgrade-info" ]
 then
@@ -73,16 +82,16 @@ else
 fi
 
 # Check if an account key mnemonic file has been passed in config
-if [ -f "/account-keys" ]
+if [ -f "/import-accounts" ]
 then
-    echo "Account key mnemonic file passed. Importing key."
+    echo "Account import file passed. Importing key(s)."
     while IFS= read -r ACCOUNT MNEMONIC
     do
         echo "Importing key for account $ACCOUNT"
         cheqd-noded keys add "$ACCOUNT" --recover --keyring-backend "$CHEQD_NODED_KEYRING_BACKEND" <<< "$MNEMONIC"
-    done < <(tail -n +2 /account-keys)
+    done < <(tail -n +2 /import-accounts)
 else
-    echo "No account key mnemonic passed. No keys imported."
+    echo "No account import file passed. No keys imported."
 fi
 
 # Run node
