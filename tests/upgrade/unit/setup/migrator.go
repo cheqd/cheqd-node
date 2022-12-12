@@ -2,6 +2,8 @@ package setup
 
 import (
 	appmigrations "github.com/cheqd/cheqd-node/app/migrations"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 )
 
 type Migrator struct {
@@ -38,7 +40,10 @@ func (m Migrator) Run() error {
 	migrationCtx := appmigrations.NewMigrationContext(
 		m.setup.Cdc,
 		m.setup.DidStoreKey,
-		m.setup.ResourceStoreKey)
+		getSubspace(didtypes.ModuleName, m.setup.ParamsKeeper),
+		m.setup.ResourceStoreKey,
+		getSubspace(resourcetypes.ModuleName, m.setup.ParamsKeeper),
+	)
 
 	for _, migration := range m.migrations {
 		err := migration(m.setup.SdkCtx, migrationCtx)
