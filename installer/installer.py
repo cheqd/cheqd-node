@@ -680,7 +680,7 @@ class Installer():
         if not self.check_if_env_var_already_set(env_var_name):
             self.log(f'Setting ENV var {env_var_name}')
             self.log(f"Changing directory ownership for bashrc to {DEFAULT_CHEQD_USER} user")
-            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {os.path.expanduser("~/")}")
+            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {os.path.expanduser('~/')}")
             if self.is_file_writable(os.path.expanduser("~/.bashrc")):
                 self.exec(f"echo 'export {env_var_name}={env_var_value}' >> ~/.bashrc")
             else:
