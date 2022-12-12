@@ -115,9 +115,7 @@ jobs:
       - name: Generate localnet configs
         working-directory: ./docker/localnet
         run: |
-          wget -c -qO- ${{ env.RELEASE_URL }}
-          ls -al
-          tar -xzf cheqd-node*.tar.gz -C ${{ env.RUNNER_BIN_DIR }} --strip-components=${{ env.DIRECTORY_DEPTH }}
+          wget -qO- ${{ env.RELEASE_URL }} | tar -xzv -C -C ${{ env.RUNNER_BIN_DIR }} --strip-components=${{ env.DIRECTORY_DEPTH }}
           ls -al ${{ env.RUNNER_BIN_DIR }}
           chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
           ls -al ${{ env.RUNNER_BIN_DIR }}
