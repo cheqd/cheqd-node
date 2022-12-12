@@ -679,8 +679,15 @@ class Installer():
         # check_if_env_var_already_set(env_var_name)
         if not self.check_if_env_var_already_set(env_var_name):
             self.log(f'Setting ENV var {env_var_name}')
-            self.exec(f"echo 'export {env_var_name}={env_var_value}' >> ~/.bashrc")
-            self.exec(f"echo 'export {env_var_name}={env_var_value}' >> /home/cheqd/.bashrc")
+            if self.is_file_writable(os.path.expanduser("~/.bashrc")):
+                self.exec(f"echo 'export {env_var_name}={env_var_value}' >> ~/.bashrc")
+            else:
+                failure_exit(f"Unable to set Environment variable {env_var_name}: .bashrc is not writable")
+            if self.is_file_writable("/home/cheqd/.bashrc"):    
+                self.exec(f"echo 'export {env_var_name}={env_var_value}' >> /home/cheqd/.bashrc")
+            else:
+                failure_exit(f"Unable to set Environment variable {env_var_name}: .bashrc is not writable")
+            
         else:
             self.log(f"ENV var {env_var_name} already set")
 
@@ -691,7 +698,12 @@ class Installer():
             return True
         except KeyError:
             return False
-     
+    
+    def is_file_writable(self, path_to_file):
+        if os.path.exists(path_to_file) and os.path.isfile(path_to_file): 
+            return os.access(path_to_file, os.W_OK)
+        return False
+
     def compare_checksum(self, file_path):
         # Set URL for correct checksum file for snapshot
         checksum_url = os.path.join(os.path.dirname(self.interviewer.snapshot_url), "md5sum.txt")
