@@ -1043,7 +1043,7 @@ class Interviewer:
     def what_cosmovisor_version(self) -> str:
         try:
             file_path = './temp.txt'
-            std_out = self.exec(f"cosmovisor version | > {file_path}")
+            self.exec(f"cosmovisor version | > {file_path}")
             file = open(file_path, "r")
             for line in file:
                 first_line = str(line)
