@@ -822,7 +822,8 @@ func New(
 				resourceSubspace := app.GetSubspace(resourcetypes.ModuleName)
 				resourceSubspace.Set(ctx, resourcetypes.ParamStoreKeyFeeParams, resourcetypes.DefaultFeeParams())
 
-				// Re-register ICA module with correct ICA controller  store keys
+				// Re-register ICA module with correct ICA controller and host params & store keys
+				// This is required because the ICA module was registered with the wrong params & store keys in the previous release
 				// What's changed:
 				// Added: []string{
 				//    icahosttypes.StoreKey,
@@ -831,6 +832,44 @@ func New(
 
 				// set the ICS27 consensus version so InitGenesis is not run
 				fromVM[icatypes.ModuleName] = icaModule.ConsensusVersion()
+
+				// create ICS27 Controller submodule params
+				controllerParams := icacontrollertypes.Params{
+					ControllerEnabled: true,
+				}
+
+				// create ICS27 Host submodule params
+				hostParams := icahosttypes.Params{
+					HostEnabled: true,
+					AllowMessages: []string{
+						authzMsgExec,
+						authzMsgGrant,
+						authzMsgRevoke,
+						bankMsgSend,
+						bankMsgMultiSend,
+						distrMsgSetWithdrawAddr,
+						distrMsgWithdrawValidatorCommission,
+						distrMsgFundCommunityPool,
+						distrMsgWithdrawDelegatorReward,
+						feegrantMsgGrantAllowance,
+						feegrantMsgRevokeAllowance,
+						govMsgVoteWeighted,
+						govMsgSubmitProposal,
+						govMsgDeposit,
+						govMsgVote,
+						stakingMsgEditValidator,
+						stakingMsgDelegate,
+						stakingMsgUndelegate,
+						stakingMsgBeginRedelegate,
+						stakingMsgCreateValidator,
+						vestingMsgCreateVestingAccount,
+						ibcMsgTransfer,
+					},
+				}
+
+				// initialize ICS27 module
+				ctx.Logger().Info("start to init interchainaccount module...")
+				icaModule.InitModule(ctx, controllerParams, hostParams)
 
 				// Get the current version map
 				versionMap := app.mm.GetVersionMap()
@@ -1078,8 +1117,9 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(slashingtypes.ModuleName)
 	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govv1.ParamKeyTable())
 	paramsKeeper.Subspace(crisistypes.ModuleName)
-	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
+	paramsKeeper.Subspace(ibchost.ModuleName)
+	paramsKeeper.Subspace(icacontrollertypes.SubModuleName)
 	paramsKeeper.Subspace(icahosttypes.SubModuleName)
 	paramsKeeper.Subspace(didtypes.ModuleName).WithKeyTable(didtypes.ParamKeyTable())
 	paramsKeeper.Subspace(resourcetypes.ModuleName).WithKeyTable(resourcetypes.ParamKeyTable())
