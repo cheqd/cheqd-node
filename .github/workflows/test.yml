@@ -5,7 +5,7 @@ defaults:
   run:
     shell: bash
 env:
-  RUNNER_BIN_DIR: /usr/share/bin
+  RUNNER_BIN_DIR: /usr/bin/
 permissions:
   contents: write
   packages: read
@@ -108,27 +108,32 @@ jobs:
   upgrade-tests:
     name: "Upgrade Tests"
     runs-on: ubuntu-20.04
+    outputs:
+      LEGACY_VERSION: ${{ steps.legacy-binary.outputs.INSTALLED_VERSION }}
+    
     steps:
       - uses: actions/checkout@v3
 
       # Generate network configuration with v0.3.1
-      - name: Generate localnet configs
-        working-directory: ./docker/localnet
+      - name: Install legacy binary
+        id: legacy-binary
         run: |
-          echo $PATH
-          wget -qO- ${{ env.RELEASE_URL }} | tar xzv -C ${{ env.RUNNER_BIN_DIR }} --transform "s#^.+/##x"
-          ls -al ${{ env.RUNNER_BIN_DIR }}
-          chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
-          ls -al ${{ env.RUNNER_BIN_DIR }}
-          which cheqd-noded
-          cheqd-noded version
+          wget -qO- ${{ env.RELEASE_URL }} | sudo tar -xzv --directory ${{ env.RUNNER_BIN_DIR }} --transform "s#^.+/##x"
+          sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
+          echo ::set-output name=INSTALLED_VERSION::$(cheqd-noded version)
         env:
           RELEASE_URL: https://github.com/cheqd/cheqd-node/releases/download/v0.3.1/cheqd-node_0.3.1.tar.gz
-          DIRECTORY_DEPTH: 2
-      
-      - name: Debugging with tmate
-        if: failure()
-        uses: mxschmitt/action-tmate@v3.13
+
+      - name: Generate localnet config with legacy binary
+        if: ${{ steps.legacy-binary.outputs.INSTALLED_VERSION == '0.3.1' }}
+        working-directory: ./docker/localnet
+        run: |
+          bash gen-network-config.sh
+        env:
+          CHAIN_ID: "cheqd"
+          VALIDATORS_COUNT: 4
+          SEEDS_COUNT: 1
+          OBSERVERS_COUNT: 1
 
       # - name: Login to GitHub Container Registry
       #   uses: docker/login-action@v2
@@ -239,6 +244,10 @@ jobs:
       #   working-directory: ./tests/upgrade/integration
       #   run: |
       #     bash scripts/cleanup.sh
+
+      - name: Debugging with tmate
+        if: failure()
+        uses: mxschmitt/action-tmate@v3.13
 
   # report-results:
   #   name: "Report"
