@@ -1043,14 +1043,16 @@ class Interviewer:
     def what_cosmovisor_version(self) -> str:
         try:
             file_path = './temp.txt'
-            self.exec(f"cosmovisor version | > {file_path}")
+            self.exec(f"cosmovisor version | tee {file_path}")
             file = open(file_path, "r")
+            cosmovisor_version = None
             for line in file:
                 first_line = str(line)
                 print("first line", first_line)
                 cosmovisor_version = re.search(r'(\d+)(\.\d+)?(\.\d+)?$', first_line).group()
                 print("cosmovisor_version", cosmovisor_version)
-                return cosmovisor_version
+                break
+            return cosmovisor_version
         except:
             failure_exit("Error when getting Cosmovisor version")
         finally:
@@ -1275,6 +1277,7 @@ if __name__ == '__main__':
         # if cosmovisor is installed 
         if interviewer.is_cosmovisor_already_installed():
             cosm_version = interviewer.what_cosmovisor_version()
+            print("returned version", cosm_version)
             if cosm_version < DEFAULT_LATEST_COSMOVISOR_VERSION.replace("v",""):
                 print(f"Your current Cosmovisor version is v{cosm_version}")
                 interviewer.ask_for_cosmovisor_bump()
