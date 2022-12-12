@@ -103,10 +103,6 @@ def search_and_replace(search_text, replace_text, file_path):
             
     file.close()
 
-def version_tuple(v):
-    return tuple(map(int, (v.split("."))))
-
-
 class Release:
     def __init__(self, release_map):
         self.version = release_map['tag_name']
