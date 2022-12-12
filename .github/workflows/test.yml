@@ -120,21 +120,15 @@ jobs:
           RELEASE_URL: https://github.com/cheqd/cheqd-node/releases/download/v0.3.1/cheqd-node_0.3.1.tar.gz
 
       - name: Install legacy binary
+        id: legacy-binary
         run: |
           sudo tar -xzvf *.tar.gz --directory ${{ env.RUNNER_BIN_DIR }} --transform "s#^.+/##x"
           sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
-          echo "INSTALLED_VERSION=$(cheqd-noded version)" >> "$GITHUB_OUTPUT"
-
-      - name: Set legacy binary version
-        id: legacy-version
-        run: echo "INSTALLED_VERSION=$(cheqd-noded version)" >> $GITHUB_OUTPUT
+          echo "INSTALLED_VERSION=$(cheqd-noded version)" >> $GITHUB_OUTPUT
 
       - name: Generate localnet config with legacy binary
-        # if: ${{ steps.legacy-binary.outputs.INSTALLED_VERSION == '0.3.1' }}
         working-directory: ./docker/localnet
-        run: |
-          echo "${{ steps.legacy-version.outputs.INSTALLED_VERSION }}"
-          bash gen-network-config.sh
+        run: bash gen-network-config.sh
         env:
           CHAIN_ID: "cheqd"
           VALIDATORS_COUNT: 4
