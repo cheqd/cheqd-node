@@ -37,12 +37,7 @@ PRINT_PREFIX = "********* "
 ###     				Cosmovisor Config      				###
 ###############################################################
 DEFAULT_LATEST_COSMOVISOR_VERSION = "v1.2.0"
-OS_ARCH = platform.machine()
-if OS_ARCH == 'x86_64':
-    OS_ARCH = 'amd64'
-else:
-    OS_ARCH = 'arm64'
-COSMOVISOR_BINARY_URL = f"https://github.com/cosmos/cosmos-sdk/releases/download/cosmovisor%2F{DEFAULT_LATEST_COSMOVISOR_VERSION}/cosmovisor-{DEFAULT_LATEST_COSMOVISOR_VERSION}-linux-{OS_ARCH}.tar.gz"
+COSMOVISOR_BINARY_URL = "https://github.com/cosmos/cosmos-sdk/releases/download/cosmovisor%2F{}/cosmovisor-{}-linux-{}.tar.gz"
 DEFAULT_USE_COSMOVISOR = "yes"
 DEFAULT_BUMP_COSMOVISOR = "yes"
 
@@ -242,7 +237,23 @@ class Installer():
     @property
     def cosmovisor_cheqd_bin_path(self):
         return os.path.join(self.cosmovisor_root_dir, f"current/bin/{DEFAULT_BINARY_NAME}")
+    
+    @property
+    def cosmovisor_download_url(self):
+        return COSMOVISOR_BINARY_URL.format(DEFAULT_LATEST_COSMOVISOR_VERSION, DEFAULT_LATEST_COSMOVISOR_VERSION, self.os_arch)
 
+    @property
+    def os_arch(self):
+        return self.get_os_arch()
+
+    def get_os_arch(self):
+        OS_ARCH = platform.machine()
+        if OS_ARCH == 'x86_64':
+            OS_ARCH = 'amd64'
+        else:
+            OS_ARCH = 'arm64'
+        return OS_ARCH
+    
     def log(self, msg):
         if self.verbose:
             print(f"{PRINT_PREFIX} {msg}")
@@ -557,10 +568,11 @@ class Installer():
         except:
             failure_exit(f"Failed to setup {self.cheqd_log_dir} directory")
 
+    
     def setup_cosmovisor(self):
         try:
-            fname= os.path.basename(COSMOVISOR_BINARY_URL)
-            self.exec(f"wget -c {COSMOVISOR_BINARY_URL}")
+            fname= os.path.basename(self.cosmovisor_download_url)
+            self.exec(f"wget -c {self.cosmovisor_download_url}")
             self.exec(f"tar -xzf {fname}")
             self.remove_safe(fname)
             
@@ -616,8 +628,8 @@ class Installer():
     def bump_cosmovisor(self):
         try:
             stop_cosmovisor_systemd()
-            fname= os.path.basename(COSMOVISOR_BINARY_URL)
-            self.exec(f"wget -c {COSMOVISOR_BINARY_URL}")
+            fname= os.path.basename(self.cosmovisor_download_url)
+            self.exec(f"wget -c {self.cosmovisor_download_url}")
             self.exec(f"tar -xzf {fname}")
             self.remove_safe(fname)
             
