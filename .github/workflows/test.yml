@@ -122,7 +122,7 @@ jobs:
       - name: Install legacy binary
         id: legacy-binary
         run: |
-          sudo tar -xzvf "*.tar.gz" --directory ${{ env.RUNNER_BIN_DIR }} --transform "s#^.+/##x"
+          sudo tar -xzvf *.tar.gz --directory ${{ env.RUNNER_BIN_DIR }} --transform "s#^.+/##x"
           sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
           echo "INSTALLED_VERSION=$(cheqd-noded version)" >> "$GITHUB_OUTPUT"
 
