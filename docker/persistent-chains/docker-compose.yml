@@ -73,28 +73,28 @@ services:
         soft: 20000
         hard: 40000
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:26657/status"]
-      interval: 5m
+      test: curl -s http://localhost:26657/status | grep -c true
+      interval: 1m
       timeout: 10s
       retries: 3
-      start_period: 1m
+      start_period: 30s
     restart: unless-stopped
     volumes:
       - type: volume
-        source: ${CHEQD_DOCKER_VOLUME_SOURCE} # Defaults to cheqd_volume, defined below
-        target: ${CHEQD_HOME_DIR} # Do NOT change mount point inside the container unless rebuilding the image
+        source: ${DOCKER_VOLUME_SOURCE} # Defaults to cheqd_volume, defined below
+        target: ${HOME_DIR} # Do NOT change mount point inside the container unless rebuilding the image
 
 configs:
   genesis:
-    file: ../../networks/${CHEQD_NETWORK}/genesis.json
+    file: ../../networks/${NETWORK}/genesis.json
   seeds:
-    file: ../../networks/${CHEQD_NETWORK}/seeds.txt
+    file: ../../networks/${NETWORK}/seeds.txt
 
 volumes:
   cheqd_volume:
-    name: cheqd_volume_${CHEQD_NETWORK}
-    driver: ${CHEQD_DOCKER_VOLUME_DRIVER}
-    external: ${CHEQD_DOCKER_VOLUME_IS_EXTERNAL}
+    name: ${DOCKER_VOLUME_SOURCE}_${NETWORK}
+    driver: ${DOCKER_VOLUME_DRIVER}
+    external: ${DOCKER_VOLUME_IS_EXTERNAL}
 
 # secrets:
 #  node-key:
