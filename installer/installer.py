@@ -387,8 +387,8 @@ class Installer():
             self.log("Reload systemd config")
             self.exec('systemctl daemon-reload')
 
-    def stop_cosmovisor_systemd(self):
-        if self.check_systemd_service_on(DEFAULT_COSMOVISOR_SERVICE_NAME):
+    def stop_cosmovisor_systemd(self, service_name):
+        if self.check_systemd_service_on(service_name):
             self.log(f"Stopping systemd service: {service_name}")
             self.exec(f"systemctl stop {service_name}")
 
@@ -627,7 +627,7 @@ class Installer():
     
     def bump_cosmovisor(self):
         try:
-            stop_cosmovisor_systemd()
+            self.stop_cosmovisor_systemd(DEFAULT_COSMOVISOR_SERVICE_NAME)
             fname= os.path.basename(self.cosmovisor_download_url)
             self.exec(f"wget -c {self.cosmovisor_download_url}")
             self.exec(f"tar -xzf {fname}")
@@ -670,7 +670,7 @@ class Installer():
         
             self.log(f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
             self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
-            reload_cosmovisor_systemd()
+            self.reload_cosmovisor_systemd()
         except:
             failure_exit(f"Failed to setup Cosmovisor")
 
