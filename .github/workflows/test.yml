@@ -13,97 +13,97 @@ permissions:
 
 jobs:
 
-  unit-tests:
-    name: "Unit Tests"
-    runs-on: ubuntu-20.04
+  # unit-tests:
+  #   name: "Unit Tests"
+  #   runs-on: ubuntu-20.04
 
-    steps:
-      - uses: actions/checkout@v3
+  #   steps:
+  #     - uses: actions/checkout@v3
 
-      - uses: actions/setup-go@v3
-        with:
-          go-version-file: ./go.mod
-          cache: true
+  #     - uses: actions/setup-go@v3
+  #       with:
+  #         go-version-file: ./go.mod
+  #         cache: true
 
-      - name: Install ginkgo
-        working-directory: ./..
-        run: |
-          go install github.com/onsi/ginkgo/v2/ginkgo@latest
+  #     - name: Install ginkgo
+  #       working-directory: ./..
+  #       run: |
+  #         go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
-      - name: Run Ginkgo unit tests
-        run: ginkgo -r --tags upgrade_unit --race --randomize-all --randomize-suites --keep-going --trace --junit-report report-unit.xml
+  #     - name: Run Ginkgo unit tests
+  #       run: ginkgo -r --tags upgrade_unit --race --randomize-all --randomize-suites --keep-going --trace --junit-report report-unit.xml
 
-      - name: Upload unit tests result
-        uses: actions/upload-artifact@v3
-        with:
-          name: report-unit.xml
-          path: report-unit.xml
+  #     - name: Upload unit tests result
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: report-unit.xml
+  #         path: report-unit.xml
 
-  integration-tests:
-    name: "Integration Tests"
-    runs-on: ubuntu-20.04
+  # integration-tests:
+  #   name: "Integration Tests"
+  #   runs-on: ubuntu-20.04
 
-    steps:
-      - uses: actions/checkout@v3
+  #   steps:
+  #     - uses: actions/checkout@v3
 
-      - name: Download binary artifact
-        uses: actions/download-artifact@v3
-        id: download
-        with:
-          name: cheqd-noded
-          path: ${{ env.RUNNER_BIN_DIR }}
+  #     - name: Download binary artifact
+  #       uses: actions/download-artifact@v3
+  #       id: download
+  #       with:
+  #         name: cheqd-noded
+  #         path: ${{ env.RUNNER_BIN_DIR }}
 
-      - name: Restore binary permissions
-        run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
+  #     - name: Restore binary permissions
+  #       run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
 
-      - name: Download node Docker image
-        uses: actions/download-artifact@v3
-        with:
-          name: cheqd-node-build.tar
+  #     - name: Download node Docker image
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: cheqd-node-build.tar
 
-      - name: Load node Docker image
-        run: docker load -i cheqd-node-build.tar
+  #     - name: Load node Docker image
+  #       run: docker load -i cheqd-node-build.tar
 
-      - name: Generate localnet configs
-        working-directory: ./docker/localnet
-        run: |
-          bash gen-network-config.sh
-          sudo chown -R 1000:1000 network-config
+  #     - name: Generate localnet configs
+  #       working-directory: ./docker/localnet
+  #       run: |
+  #         bash gen-network-config.sh
+  #         sudo chown -R 1000:1000 network-config
 
-      - name: Set up Docker localnet
-        working-directory: ./docker/localnet
-        run: |
-          docker compose --env-file build-latest.env up --detach --no-build
+  #     - name: Set up Docker localnet
+  #       working-directory: ./docker/localnet
+  #       run: |
+  #         docker compose --env-file build-latest.env up --detach --no-build
 
-      - name: Import keys
-        working-directory: ./docker/localnet
-        run: |
-          bash import-keys.sh
+  #     - name: Import keys
+  #       working-directory: ./docker/localnet
+  #       run: |
+  #         bash import-keys.sh
 
-      - uses: actions/setup-go@v3
-        with:
-          go-version-file: ./go.mod
-          cache: true
+  #     - uses: actions/setup-go@v3
+  #       with:
+  #         go-version-file: ./go.mod
+  #         cache: true
 
-      - name: Install ginkgo
-        working-directory: ./..
-        run: go install github.com/onsi/ginkgo/v2/ginkgo@latest
+  #     - name: Install ginkgo
+  #       working-directory: ./..
+  #       run: go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
-      - name: Run Gingko integration tests
-        working-directory: ./tests/integration
-        run: |
-          ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --junit-report ../../report-integration.xml
+  #     - name: Run Gingko integration tests
+  #       working-directory: ./tests/integration
+  #       run: |
+  #         ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --junit-report ../../report-integration.xml
 
-      - name: Show logs
-        if: failure()
-        working-directory: ./docker/localnet
-        run: docker compose --env-file build-latest.env logs --tail --follow
+  #     - name: Show logs
+  #       if: failure()
+  #       working-directory: ./docker/localnet
+  #       run: docker compose --env-file build-latest.env logs --tail --follow
 
-      - name: Upload integration tests result
-        uses: actions/upload-artifact@v3
-        with:
-          name: report-integration.xml
-          path: report-integration.xml
+  #     - name: Upload integration tests result
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: report-integration.xml
+  #         path: report-integration.xml
 
   upgrade-tests:
     name: "Upgrade Tests"
@@ -115,11 +115,14 @@ jobs:
       - name: Generate localnet configs
         working-directory: ./docker/localnet
         run: |
-          wget -c https://github.com/cheqd/cheqd-node/releases/download/0.6.9/cheqd-noded-0.6.9-Linux-x86_64.tar.gz
-          tar -xvf cheqd-noded-0.6.9-Linux-x86_64.tar.gz -C ${{ env.RUNNER_BIN_DIR }} --strip-components=1
-          sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
+          wget -c -qO- ${{ env.RELEASE_URL }}
+          tar -xzf cheqd-node*.tar.gz -C ${{ env.RUNNER_BIN_DIR }} --strip-components=${{ env.DIRECTORY_DEPTH }}
+          chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
+          which cheqd-noded
+          cheqd-noded version
         env:
-          RELEASE_URL: 
+          RELEASE_URL: https://github.com/cheqd/cheqd-node/releases/download/v0.3.1/cheqd-node_0.3.1.tar.gz
+          DIRECTORY_DEPTH: 2
 
       # - name: Login to GitHub Container Registry
       #   uses: docker/login-action@v2
