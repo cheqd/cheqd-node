@@ -118,10 +118,10 @@ jobs:
       - name: Install legacy binary
         id: legacy-binary
         run: |
-          wget -qO- "$RELEASE_URL" | sudo tar -xzv --directory "${{ env.RUNNER_BIN_DIR }}" --transform "s#^.+/##x"
+          wget -qO- "$RELEASE_URL" | sudo tar -xzv --directory ${{ env.RUNNER_BIN_DIR }} --transform "s#^.+/##x"
           sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
           which cheqd-noded
-          echo "INSTALLED_VERSION=$(cheqd-noded version)" >> $GITHUB_OUTPUTS
+          echo "INSTALLED_VERSION=$(cheqd-noded version)" >> $GITHUB_OUTPUT
         env:
           RELEASE_URL: https://github.com/cheqd/cheqd-node/releases/download/v0.3.1/cheqd-node_0.3.1.tar.gz
 
