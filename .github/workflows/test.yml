@@ -5,7 +5,7 @@ defaults:
   run:
     shell: bash
 env:
-  RUNNER_BIN_DIR: /home/runner/.local/bin
+  RUNNER_BIN_DIR: /usr/bin
 permissions:
   contents: write
   packages: read
