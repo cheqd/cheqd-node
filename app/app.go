@@ -145,6 +145,7 @@ var (
 		slashing.AppModuleBasic{},
 		ibc.AppModuleBasic{},
 		transfer.AppModuleBasic{},
+		ica.AppModuleBasic{},
 		upgrade.AppModuleBasic{},
 		evidence.AppModuleBasic{},
 		vesting.AppModuleBasic{},
@@ -153,7 +154,7 @@ var (
 		groupmodule.AppModuleBasic{},
 		did.AppModuleBasic{},
 		resource.AppModuleBasic{},
-		ica.AppModuleBasic{},
+		ibcfee.AppModuleBasic{},
 	)
 
 	// module account permissions
