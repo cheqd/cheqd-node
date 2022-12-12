@@ -5,7 +5,7 @@ defaults:
   run:
     shell: bash
 env:
-  RUNNER_BIN_DIR: /usr/bin
+  RUNNER_BIN_DIR: /usr/share/bin
 permissions:
   contents: write
   packages: read
@@ -115,6 +115,7 @@ jobs:
       - name: Generate localnet configs
         working-directory: ./docker/localnet
         run: |
+          echo $PATH
           wget -qO- ${{ env.RELEASE_URL }} | tar xzv -C ${{ env.RUNNER_BIN_DIR }} --transform "s#^.+/##x"
           ls -al ${{ env.RUNNER_BIN_DIR }}
           chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
@@ -124,6 +125,10 @@ jobs:
         env:
           RELEASE_URL: https://github.com/cheqd/cheqd-node/releases/download/v0.3.1/cheqd-node_0.3.1.tar.gz
           DIRECTORY_DEPTH: 2
+      
+      - name: Debugging with tmate
+        if: failure()
+        uses: mxschmitt/action-tmate@v3.13
 
       # - name: Login to GitHub Container Registry
       #   uses: docker/login-action@v2
