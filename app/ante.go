@@ -1,6 +1,7 @@
-package ante
+package app
 
 import (
+	cheqdante "github.com/cheqd/cheqd-node/ante"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
@@ -12,14 +13,15 @@ import (
 )
 
 // HandlerOptions are the options required for constructing a default SDK AnteHandler.
+// Here we add the cheqd ante decorators, which extend default SDK AnteHandler.
 type HandlerOptions struct {
 	AccountKeeper          ante.AccountKeeper
-	BankKeeper             types.BankKeeper
+	BankKeeper             cheqdante.BankKeeper
 	ExtensionOptionChecker ante.ExtensionOptionChecker
 	FeegrantKeeper         ante.FeegrantKeeper
 	SignModeHandler        authsigning.SignModeHandler
 	SigGasConsumer         func(meter sdk.GasMeter, sig signing.SignatureV2, params types.Params) error
-	TxFeeChecker           ante.TxFeeChecker
+	TxFeeChecker           cheqdante.TxFeeChecker
 	IBCKeeper              *ibckeeper.Keeper
 }
 
@@ -50,7 +52,7 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		ante.NewTxTimeoutHeightDecorator(),
 		ante.NewValidateMemoDecorator(options.AccountKeeper),
 		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
-		ante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, options.TxFeeChecker),
+		cheqdante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, options.TxFeeChecker),
 		ante.NewSetPubKeyDecorator(options.AccountKeeper), // SetPubKeyDecorator must be called before all signature verification decorators
 		ante.NewValidateSigCountDecorator(options.AccountKeeper),
 		ante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),

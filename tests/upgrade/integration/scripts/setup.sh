@@ -10,6 +10,9 @@ pushd "$DIR/../../../../docker/localnet"
 bash gen-network-config.sh
 sudo chown -R 1000:1000 network-config
 
+# Import keys
+bash import-keys.sh
+
 # Start network
 docker compose --env-file mainnet-latest.env up --detach --no-build
 

@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.8'
 
 services:
   validator-0:
@@ -18,7 +18,7 @@ services:
         published: 26660    # Prometheus metrics port
     entrypoint: [ "node-start" ]
     healthcheck:
-      test: curl -s http://localhost:26657/status | grep -c false
+      test: curl -s http://localhost:26657/status | grep -c true
       interval: 10s
       timeout: 2s
       retries: 6
@@ -56,7 +56,7 @@ services:
         published: 26760    # Prometheus metrics port
     entrypoint: [ "node-start" ]
     healthcheck:
-      test: curl -s http://localhost:26757/status | grep -c false
+      test: curl -s http://localhost:26757/status | grep -c true
       interval: 10s
       timeout: 2s
       retries: 6
@@ -94,7 +94,7 @@ services:
         published: 26860    # Prometheus metrics port
     entrypoint: [ "node-start" ]
     healthcheck:
-      test: curl -s http://localhost:26857/status | grep -c false
+      test: curl -s http://localhost:26857/status | grep -c true
       interval: 10s
       timeout: 2s
       retries: 6
@@ -132,7 +132,7 @@ services:
         published: 26960    # Prometheus metrics port
     entrypoint: [ "node-start" ]
     healthcheck:
-      test: curl -s http://localhost:26957/status | grep -c false
+      test: curl -s http://localhost:26957/status | grep -c true
       interval: 10s
       timeout: 2s
       retries: 6
@@ -170,7 +170,7 @@ services:
         published: 27060    # Prometheus metrics port
     entrypoint: [ "node-start" ]
     healthcheck:
-      test: curl -s http://localhost:27057/status | grep -c false
+      test: curl -s http://localhost:27057/status | grep -c true
       interval: 10s
       timeout: 2s
       retries: 6
@@ -212,7 +212,7 @@ services:
         target: /home/cheqd
     entrypoint: [ "node-start" ]
     healthcheck:
-      test: curl -s http://localhost:27157/status | grep -c false
+      test: curl -s http://localhost:27157/status | grep -c true
       interval: 10s
       timeout: 2s
       retries: 6

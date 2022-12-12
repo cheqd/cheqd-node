@@ -30,12 +30,12 @@ type DidAndMetadata struct {
 
 type ILoader interface {
 	LoadFile(path string, dataChunk any, setup TestSetup) error
-	GetLsitOfFiles(path_to_dir, prefix string) ([]string, error)
+	GetListOfFiles(path_to_dir, prefix string) ([]string, error)
 }
 
 type Loader struct{}
 
-func (l Loader) GetLsitOfFiles(path_to_dir, prefix string) ([]string, error) {
+func (l Loader) GetListOfFiles(path_to_dir, prefix string) ([]string, error) {
 	files_to_load := []string{}
 	err := filepath.Walk(path_to_dir, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() && strings.HasPrefix(info.Name(), prefix) {
@@ -74,11 +74,9 @@ func (l Loader) LoadFile(
 		err = json.Unmarshal(file, dataChunk)
 
 	case *didtypes.DidDocWithMetadata:
-		// err = json.Unmarshal(file, dataChunk)
 		err = setup.Cdc.UnmarshalJSON(file, dataChunk)
 	case *resourcetypes.ResourceWithMetadata:
 		err = json.Unmarshal(file, dataChunk)
-		// err = integrationhelpers.Codec.UnmarshalJSON(file, dataChunk)
 	default:
 		err = json.Unmarshal(file, dataChunk)
 	}

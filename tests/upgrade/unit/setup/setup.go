@@ -19,6 +19,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/store"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
+	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/tendermint/tendermint/libs/log"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
@@ -43,6 +45,8 @@ type TestSetup struct {
 
 	DidStoreKey      *storetypes.KVStoreKey
 	ResourceStoreKey *storetypes.KVStoreKey
+
+	ParamsKeeper paramskeeper.Keeper
 }
 
 func Setup() TestSetup {
@@ -50,7 +54,8 @@ func Setup() TestSetup {
 	ir := codectypes.NewInterfaceRegistry()
 	didtypes.RegisterInterfaces(ir)
 	// didtypesv1.RegisterInterfaces(ir) // TODO: Is v1 needed?
-	cdc := codec.NewProtoCodec(ir)
+	Cdc := codec.NewProtoCodec(ir)
+	aminoCdc := codec.NewLegacyAmino()
 
 	// Init KVSore
 	db := dbm.NewMemDB()
@@ -65,13 +70,20 @@ func Setup() TestSetup {
 
 	_ = dbStore.LoadLatestVersion()
 
-	// Init previous keepers
-	didKeeperPrevious := didkeeperv1.NewKeeper(cdc, didStoreKey)
-	resourceKeeperPrevious := resourcekeeperv1.NewKeeper(cdc, resourceStoreKey)
+	// Init ParamsKeeper KVStore
+	paramsStoreKey := sdk.NewKVStoreKey(paramstypes.StoreKey)
+	paramsTStoreKey := sdk.NewTransientStoreKey(paramstypes.TStoreKey)
 
 	// Init Keepers
-	didKeeper := didkeeper.NewKeeper(cdc, didStoreKey)
-	resourceKeeper := resourcekeeper.NewKeeper(cdc, resourceStoreKey)
+	paramsKeeper := initParamsKeeper(Cdc, aminoCdc, paramsStoreKey, paramsTStoreKey)
+
+	// Init previous keepers
+	didKeeperPrevious := didkeeperv1.NewKeeper(Cdc, didStoreKey)
+	resourceKeeperPrevious := resourcekeeperv1.NewKeeper(Cdc, resourceStoreKey)
+
+	// Init Keepers
+	didKeeper := didkeeper.NewKeeper(Cdc, didStoreKey, getSubspace(didtypes.ModuleName, paramsKeeper))
+	resourceKeeper := resourcekeeper.NewKeeper(Cdc, resourceStoreKey, getSubspace(resourcetypes.ModuleName, paramsKeeper))
 
 	// Create Tx
 	txBytes := make([]byte, 28)
@@ -91,7 +103,7 @@ func Setup() TestSetup {
 	resourceQueryServer := resourcekeeper.NewQueryServer(*resourceKeeper, *didKeeper)
 
 	setup := TestSetup{
-		Cdc: cdc,
+		Cdc: Cdc,
 
 		SdkCtx: ctx,
 		StdCtx: sdk.WrapSDKContext(ctx),
@@ -109,8 +121,25 @@ func Setup() TestSetup {
 
 		DidStoreKey:      didStoreKey,
 		ResourceStoreKey: resourceStoreKey,
+
+		ParamsKeeper: paramsKeeper,
 	}
 
 	setup.DidKeeper.SetDidNamespace(&ctx, didsetup.DID_NAMESPACE) // TODO: Think about it
 	return setup
+}
+
+func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino, key storetypes.StoreKey, tkey storetypes.StoreKey) paramskeeper.Keeper {
+	// create keeper
+	paramsKeeper := paramskeeper.NewKeeper(appCodec, legacyAmino, key, tkey)
+
+	// set params subspaces
+	paramsKeeper.Subspace(didtypes.ModuleName)
+
+	return paramsKeeper
+}
+
+func getSubspace(moduleName string, paramsKeeper paramskeeper.Keeper) paramstypes.Subspace {
+	subspace, _ := paramsKeeper.GetSubspace(moduleName)
+	return subspace
 }

@@ -6,9 +6,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cheqd/cheqd-node/app/ante"
 	"github.com/cheqd/cheqd-node/app/migrations"
 	appparams "github.com/cheqd/cheqd-node/app/params"
+	posthandler "github.com/cheqd/cheqd-node/post"
 	did "github.com/cheqd/cheqd-node/x/did"
 	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
@@ -159,6 +159,7 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
+		didtypes.ModuleName:            {authtypes.Burner},
 	}
 )
 
@@ -484,10 +485,12 @@ func New(
 
 	app.didKeeper = *didkeeper.NewKeeper(
 		appCodec, keys[didtypes.StoreKey],
+		app.GetSubspace(didtypes.ModuleName),
 	)
 
 	app.resourceKeeper = *resourcekeeper.NewKeeper(
 		appCodec, keys[resourcetypes.StoreKey],
+		app.GetSubspace(resourcetypes.ModuleName),
 	)
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
@@ -646,7 +649,7 @@ func New(
 	app.MountTransientStores(tkeys)
 	app.MountMemoryStores(memKeys)
 
-	anteHandler, err := ante.NewAnteHandler(ante.HandlerOptions{
+	anteHandler, err := NewAnteHandler(HandlerOptions{
 		AccountKeeper:   app.AccountKeeper,
 		BankKeeper:      app.BankKeeper,
 		FeegrantKeeper:  app.FeeGrantKeeper,
@@ -658,7 +661,19 @@ func New(
 		tmos.Exit(err.Error())
 	}
 
+	postHandler, err := posthandler.NewPostHandler(posthandler.HandlerOptions{
+		AccountKeeper:  app.AccountKeeper,
+		BankKeeper:     app.BankKeeper,
+		FeegrantKeeper: app.FeeGrantKeeper,
+		DidKeeper:      app.didKeeper,
+		ResourceKeeper: app.resourceKeeper,
+	})
+	if err != nil {
+		tmos.Exit(err.Error())
+	}
+
 	app.SetAnteHandler(anteHandler)
+	app.SetPostHandler(postHandler)
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
@@ -672,6 +687,14 @@ func New(
 			if len(fromVM) == 0 {
 				println("Initializing version map")
 
+				// Add defaults for did subspace
+				didSubspace := app.GetSubspace(didtypes.ModuleName)
+				didSubspace.Set(ctx, didtypes.ParamStoreKeyFeeParams, didtypes.DefaultFeeParams())
+
+				// Add defaults for resource subspace
+				resourceSubspace := app.GetSubspace(resourcetypes.ModuleName)
+				resourceSubspace.Set(ctx, resourcetypes.ParamStoreKeyFeeParams, resourcetypes.DefaultFeeParams())
+
 				// Add defaults for staking subspace
 				stakingSubspace, _ := app.ParamsKeeper.GetSubspace(stakingtypes.ModuleName)
 				stakingSubspace.Set(ctx, stakingtypes.KeyMinCommissionRate, sdk.NewDec(0))
@@ -680,17 +703,38 @@ func New(
 				versionMap := app.mm.GetVersionMap()
 
 				for moduleName := range versionMap {
-					if _, ok := fromVM[moduleName]; !ok {
-						fromVM[moduleName] = versionMap[moduleName]
-					}
+					fromVM[moduleName] = versionMap[moduleName]
 				}
+			} else {
+				println("Version map already initialized")
+
+				// Add defaults for staking subspace
+				stakingSubspace, _ := app.ParamsKeeper.GetSubspace(stakingtypes.ModuleName)
+				stakingSubspace.Set(ctx, stakingtypes.KeyMinCommissionRate, sdk.NewDec(0))
+
+				// Add defaults for did subspace
+				didSubspace := app.GetSubspace(didtypes.ModuleName)
+				didSubspace.Set(ctx, didtypes.ParamStoreKeyFeeParams, didtypes.DefaultFeeParams())
+
+				// Add defaults for resource subspace
+				resourceSubspace := app.GetSubspace(resourcetypes.ModuleName)
+				resourceSubspace.Set(ctx, resourcetypes.ParamStoreKeyFeeParams, resourcetypes.DefaultFeeParams())
+
+				// Get the current version map
+				versionMap := app.mm.GetVersionMap()
+
+				// Skip resource module InitGenesis (was not present in v0.6.9)
+				fromVM[resourcetypes.ModuleName] = versionMap[resourcetypes.ModuleName]
 			}
 
 			// cheqd migrations
 			migrationContext := migrations.NewMigrationContext(
 				app.appCodec,
 				keys[didtypes.StoreKey],
-				keys[resourcetypes.StoreKey])
+				app.GetSubspace(didtypes.ModuleName),
+				keys[resourcetypes.StoreKey],
+				app.GetSubspace(resourcetypes.ModuleName),
+			)
 
 			cheqdMigrator := migrations.NewMigrator(
 				migrationContext,
@@ -761,12 +805,11 @@ func (app *App) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.Res
 	// FIXME: This should have been done from the beginning.
 	// Now this would break consensus with existing networks.
 	// so ModuleVersionMap is initialized as part of upgrade xxx.
-	// app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
-
 	var genesisState GenesisState
 	if err := tmjson.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
 		panic(err)
 	}
+	// app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
 	return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
 }
 
@@ -905,6 +948,8 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(icahosttypes.SubModuleName)
+	paramsKeeper.Subspace(didtypes.ModuleName).WithKeyTable(didtypes.ParamKeyTable())
+	paramsKeeper.Subspace(resourcetypes.ModuleName).WithKeyTable(resourcetypes.ParamKeyTable())
 
 	return paramsKeeper
 }
