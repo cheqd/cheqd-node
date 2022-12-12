@@ -881,23 +881,6 @@ func New(
 
 				// Skip resource module InitGenesis (was not present in v0.6.9)
 				fromVM[resourcetypes.ModuleName] = versionMap[resourcetypes.ModuleName]
-
-				// Store migration for the latest upgrade
-				upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
-				if err != nil {
-					panic(err)
-				}
-
-				if upgradeInfo.Name == UpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
-					storeUpgrades := storetypes.StoreUpgrades{
-						Added: []string{
-							icahosttypes.StoreKey,
-							icacontrollertypes.StoreKey, // <-- this is the new store key
-						},
-					}
-
-					app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
-				}
 			}
 
 			// cheqd migrations
@@ -946,6 +929,23 @@ func New(
 			// transfer module consensus version has been bumped to 2
 			return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 		})
+
+	// Store migration for the latest upgrade
+	// upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// if upgradeInfo.Name == UpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+	// 	storeUpgrades := storetypes.StoreUpgrades{
+	// 		Added: []string{
+	// 			icahosttypes.StoreKey,
+	// 			icacontrollertypes.StoreKey, // <-- this is the new store key
+	// 		},
+	// 	}
+
+	// 	app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
+	// }
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
