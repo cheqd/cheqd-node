@@ -133,7 +133,7 @@ jobs:
         # if: ${{ steps.legacy-binary.outputs.INSTALLED_VERSION == '0.3.1' }}
         working-directory: ./docker/localnet
         run: |
-          echo ${{ steps.legacy-binary.outputs.INSTALLED_VERSION }}
+          echo "${{ steps.legacy-version.outputs.INSTALLED_VERSION }}"
           bash gen-network-config.sh
         env:
           CHAIN_ID: "cheqd"
