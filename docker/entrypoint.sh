@@ -76,7 +76,11 @@ fi
 if [ -f "/account-keys" ]
 then
     echo "Account key mnemonic file passed. Importing key."
-    cheqd-noded keys add "${ACCOUNT_KEY_NAME}" --keyring-backend "${KEYRING_BACKEND}" --recover < /account-keys
+    while IFS= read -r ACCOUNT MNEMONIC
+    do
+        echo "Importing key for account $ACCOUNT"
+        cheqd-noded keys add "$ACCOUNT" --recover --keyring-backend "$CHEQD_NODED_KEYRING_BACKEND" <<< "$MNEMONIC"
+    done < <(tail -n +2 /account-keys)
 else
     echo "No account key mnemonic passed. No keys imported."
 fi
