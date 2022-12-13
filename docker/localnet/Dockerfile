@@ -2,8 +2,9 @@
 ###         	STAGE 1: Build localnet image         		###
 ###############################################################
 
-ARG BASE_IMAGE
-FROM ${BASE_IMAGE} AS localnet
+ARG BUILD_IMAGE="gchr.io/cheqd/cheqd-node"
+ARG BUILD_VERSION
+FROM ${BUILD_IMAGE}:${BUILD_VERSION} AS localnet
 
 # Set bash defaults
 SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
@@ -12,11 +13,15 @@ SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 WORKDIR /home/cheqd
 
 # Copy network configuration directory
-COPY --chown=cheqd:cheqd docker/localnet/generate-network/network-config /home/cheqd/network-config
+COPY --chown=cheqd:cheqd scripts/network-config /home/cheqd/network-config
 
-# Copy entrypoint script
-COPY --chown=cheqd:cheqd docker/entrypoint.sh /bin/node-start
-RUN chmod +rx /bin/node-start
+# Copy scripts
+COPY --chown=cheqd:cheqd docker/localnet/entrypoint.sh /bin/node-start
+COPY --chown=cheqd:cheqd scripts/import-keys.sh /bin/import-keys
+
+# Make scripts executable
+RUN chmod +rx /bin/node-start \
+	&& chmod +rx /bin/import-keys
 
 # Set user and group
 USER cheqd:cheqd
