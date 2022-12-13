@@ -31,7 +31,7 @@ If successfully configured, your node would become the latest validator on the c
 
 Our [testnet](https://learn.cheqd.io/#block-explorers) is the easiest place for developers and node operators to get started if you're not *quite* ready yet to dive into building apps on our mainnet. To get started...
 
-1. Install [the latest stable release](https://github.com/cheqd/cheqd-node/releases/latest) of `cheqd-node` software (currently `v0.6.x`) on a hosting platform of your choice by [following the setup guide](https://docs.cheqd.io/node/docs/setup-and-configure).
+1. Install [the latest stable release](https://github.com/cheqd/cheqd-node/releases/latest) of `cheqd-node` software (currently `v1.x.x`) on a hosting platform of your choice by [following the setup guide](https://docs.cheqd.io/node/docs/setup-and-configure).
 2. Acquire testnet CHEQ tokens through [our testnet faucet](https://testnet-faucet.cheqd.io).
 3. Once you have acquired CHEQ tokens, [promote your node to a validator](https://docs.cheqd.io/node/docs/validator-guide)
 
@@ -48,14 +48,14 @@ Once installed, `cheqd-node` can be controlled using the [cheqd Cosmos CLI guide
 * Creating [`did:cheqd` method DIDs](https://docs.cheqd.io/node/architecture/adr-list/adr-002-cheqd-did-method), DID Documents ("DIDDocs")
 * Querying DIDs/DIDDocs using our [Universal Resolver driver](https://github.com/cheqd/did-resolver)
 * Creating and managing Verifiable Credentials anchored to DIDs on cheqd mainnet
-* Creating [on-ledger "resources" (e.g., schemas, visual representations of credentials, etc)](https://blog.cheqd.io/our-approach-to-resources-on-ledger-25bf5690c975) that can be used in DIDDocs and Verifiable Credentials.
+* Creating [on-ledger "resources" (e.g., schemas, visual representations of credentials, etc)](https://blog.cheqd.io/our-approach-to-resources-on-ledger-25bf5690c975) that can be used in DIDDocs and Verifiable Credentials. This is used to support [AnonCreds](https://hyperledger.github.io/anoncreds-spec/)
+* Custom pricing for DID and Resources with burn to manage inflation.
 
 ### 🔮 Upcoming functionality
 
-The [cheqd product roadmap](https://product.cheqd.io/updates/roadmap) describes in detail functionality that is being considered / in-development for future releases. A non-exhaustive list (not necessarily in order of priority) is:
+The [cheqd product roadmap](https://product.cheqd.io/product-essentials/roadmap) describes in detail functionality that is being considered / in-development for future releases. A non-exhaustive list (not necessarily in order of priority) is:
 
 * Revocation registry/list support to revoke issued credentials
-* Support for [AnonCreds](https://anoncreds-wg.github.io/anoncreds-spec/)
 * Holder-pays-issuer and verifier-pays-issuer [payment rails for Verifiable Credential exchange](https://blog.cheqd.io/cheqds-product-vision-for-2022-6a92e8e4d296)
 
 We plan on adding new functionality rapidly and on a regular basis and welcome feedback on our [cheqd Community Slack](http://cheqd.link/join-cheqd-slack) workspace.

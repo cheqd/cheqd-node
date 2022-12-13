@@ -12,15 +12,17 @@ import (
 
 type (
 	Keeper struct {
-		cdc      codec.BinaryCodec
-		storeKey storetypes.StoreKey
+		cdc        codec.BinaryCodec
+		storeKey   storetypes.StoreKey
+		paramSpace types.ParamSubspace
 	}
 )
 
-func NewKeeper(cdc codec.BinaryCodec, storeKey storetypes.StoreKey) *Keeper {
+func NewKeeper(cdc codec.BinaryCodec, storeKey storetypes.StoreKey, paramSpace types.ParamSubspace) *Keeper {
 	return &Keeper{
-		cdc:      cdc,
-		storeKey: storeKey,
+		cdc:        cdc,
+		storeKey:   storeKey,
+		paramSpace: paramSpace,
 	}
 }
 
