@@ -4,8 +4,11 @@
 # e -> exit immediately, u -> treat unset variables as errors and immediately, o -> sets the exit code to the rightmost command 
 set -euo pipefail
 
-# within the container, $HOME=/home/cheqd
+## Parameters
+
+# Within the container, $HOME=/home/cheqd
 CHEQD_ROOT_DIR="$HOME/.cheqdnode"
+ENABLE_IMPORT="${ENABLE_IMPORT:-true}"
 
 # Initialise node config directory
 if [ ! -d "${CHEQD_ROOT_DIR}/config" ]
@@ -46,7 +49,7 @@ else
 fi
 
 # Check if a priv_validator_key file has been passed in config
-if [ -f "/private-validator-key" ]
+if [ -f "/private-validator-key" ] && [ "$ENABLE_IMPORT" = true ]
 then
     echo "priv_validator_key.json file passed. Replacing current validator key."
     cp /private-validator-key "${CHEQD_ROOT_DIR}/config/priv_validator_key.json"
@@ -55,7 +58,7 @@ else
 fi
 
 # Check if a priv_validator_state file has been passed in config
-if [ -f "/private-validator-state" ]
+if [ -f "/private-validator-state" ] && [ "$ENABLE_IMPORT" = true ]
 then
     echo "priv_validator_state.json file passed. Replacing current validator state."
     cp /private-validator-state "${CHEQD_ROOT_DIR}/data/priv_validator_state.json"
@@ -64,7 +67,7 @@ else
 fi
 
 # Check if a validator account has been passed in config
-if [ -f "/validator-account" ]
+if [ -f "/validator-account" ] && [ "$ENABLE_IMPORT" = true ]
 then
     echo "Validator account key file passed. Replacing current validator account key file."
     # TODO
@@ -73,7 +76,7 @@ else
 fi
 
 # Check if a upgrade_info file has been passed in config
-if [ -f "/upgrade-info" ]
+if [ -f "/upgrade-info" ] && [ "$ENABLE_IMPORT" = true ]
 then
     echo "upgrade_info.json file passed. Replacing current upgrade_info.json file."
     cp /upgrade-info "${CHEQD_ROOT_DIR}/data/upgrade-info.json"
@@ -82,41 +85,41 @@ else
 fi
 
 # Check if an account key mnemonic file has been passed in config
-# Proceed only if input file exists
-if [ -f "/import-accounts" ]
+# Proceed only if input file exists and import is enabled
+if [ -f "/import-accounts" ] && [ "$ENABLE_IMPORT" = true ]
 then
-  # Count number of accounts in input file minus header
-  EXPECTED_ACCOUNTS=$(tail -n +2 "/import-accounts" | wc -l)
+    echo "Account import file passed. Importing accounts."
 
-  # Read accounts from CSV file
-  while IFS="," read -r ACCOUNT MNEMONIC
-  do
-    if cheqd-noded keys show "$ACCOUNT" --keyring-backend "$CHEQD_NODED_KEYRING_BACKEND"
+    # Count number of accounts in input file minus header
+    EXPECTED_ACCOUNTS=$(tail -n +2 "/import-accounts" | wc -l)
+
+    # Read accounts from CSV file
+    while IFS="," read -r ACCOUNT MNEMONIC
+    do
+        if cheqd-noded keys show "$ACCOUNT" --keyring-backend "$CHEQD_NODED_KEYRING_BACKEND"
+        then
+            echo "Key ${ACCOUNT} already exists"
+        else
+            echo "Importing account: ${ACCOUNT}"
+            cheqd-noded keys add "$ACCOUNT" --recover --keyring-backend "$CHEQD_NODED_KEYRING_BACKEND" <<< "$MNEMONIC"
+        fi
+    done < <(tail -n +2 "/import-accounts")
+
+    # Count number of imported accounts
+    IMPORTED_ACCOUNTS=$(cheqd-noded keys list --keyring-backend "$CHEQD_NODED_KEYRING_BACKEND" | grep -c "cheqd1")  
+
+    if [ "$IMPORTED_ACCOUNTS" -eq "$EXPECTED_ACCOUNTS" ]
     then
-      echo "Key ${ACCOUNT} already exists"
+        echo "All accounts imported successfully"
+        echo "Imported accounts: ${IMPORTED_ACCOUNTS}"
     else
-      echo "Importing account: ${ACCOUNT}"
-      cheqd-noded keys add "$ACCOUNT" --recover --keyring-backend "$CHEQD_NODED_KEYRING_BACKEND" <<< "$MNEMONIC"
+        echo "Mismatch in number of imported accounts"
+        echo "Imported accounts: ${IMPORTED_ACCOUNTS}"
+        echo "Expected accounts: ${EXPECTED_ACCOUNTS}"
     fi
-  done < <(tail -n +2 "/import-accounts")
-
-  # Count number of imported accounts
-  IMPORTED_ACCOUNTS=$(cheqd-noded keys list --keyring-backend "$CHEQD_NODED_KEYRING_BACKEND" | grep -c "cheqd1")  
-
-  if [ "$IMPORTED_ACCOUNTS" -eq "$EXPECTED_ACCOUNTS" ]
-  then
-    echo "All accounts imported successfully"
-    echo "Imported accounts: ${IMPORTED_ACCOUNTS}"
-  else
-    echo "Mismatch in number of imported accounts"
-    echo "Imported accounts: ${IMPORTED_ACCOUNTS}"
-    echo "Expected accounts: ${EXPECTED_ACCOUNTS}"
-    exit 1
-  fi
 
 else
-  echo "Input file /import-accounts does not exist"
-  exit 1
+    echo "Account import file not passed. Skipping account import."
 fi
 
 # Run node
