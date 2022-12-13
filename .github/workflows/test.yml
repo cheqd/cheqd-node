@@ -136,8 +136,7 @@ jobs:
           OBSERVERS_COUNT: 1
       
       - name: Import accounts with legacy binary
-        working-directory: ./scripts
-        run: bash import-keys.sh "$INPUT_FILE" "$CHEQD_NODED_KEYRING_BACKEND"
+        run: bash scripts/import-keys.sh "$INPUT_FILE" "$CHEQD_NODED_KEYRING_BACKEND"
         env:
           INPUT_FILE: "./docker/localnet/config/accounts.csv"
           CHEQD_NODED_KEYRING_BACKEND: "test"
