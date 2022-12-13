@@ -686,8 +686,8 @@ class Installer():
         try:
             current_user_bashrc_path = os.path.expanduser("~/.bashrc")
             if is_user_cheqd:
-                current_user_bashrc_path = '/home/cheqd/.bashrc'
-            with open(, "a") as current_user_bashrc_file:
+                current_user_bashrc_path = f'{self.interviewer.home_dir}/.bashrc' # because user might change default home dir path which is /home/cheqd
+            with open(current_user_bashrc_path, "a") as current_user_bashrc_file:
                 current_user_bashrc_file.write(f"export {env_var_name}={env_var_value}\n")
         except:
             if is_user_cheqd:
