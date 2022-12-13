@@ -22,6 +22,8 @@ func MigrateDidSimple(sctx sdk.Context, mctx MigrationContext, apply func(didDoc
 	// Iterate and migrate did docs. We can use single loop for removing old values, migration
 	// and writing new values because there is only one version of each diddoc in the store
 	for _, version := range allDidDocVersions {
+		sctx.Logger().Debug("old version: %s", version)
+
 		// Remove last version pointer
 		latestVersionKey := didtypes.GetLatestDidDocVersionKey(version.DidDoc.Id)
 		store.Delete(latestVersionKey)
@@ -32,6 +34,8 @@ func MigrateDidSimple(sctx sdk.Context, mctx MigrationContext, apply func(didDoc
 
 		// Migrate
 		apply(&version)
+
+		sctx.Logger().Debug("new version: %s", version)
 
 		// Create as a new did doc
 		err := mctx.didKeeperNew.AddNewDidDocVersion(&sctx, &version)

@@ -7,6 +7,8 @@ import (
 )
 
 func MigrateResourceIndyStyle(sctx sdk.Context, mctx MigrationContext) error {
+	sctx.Logger().Debug("MigrateResourceIndyStyle function")
+
 	return MigrateResourceSimple(sctx, mctx, func(resource *resourcetypes.ResourceWithMetadata) {
 		resource.Metadata.CollectionId = helpers.MigrateIndyStyleId(resource.Metadata.CollectionId)
 	})

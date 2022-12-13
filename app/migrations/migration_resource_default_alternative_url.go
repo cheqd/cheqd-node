@@ -8,6 +8,8 @@ import (
 )
 
 func MigrateResourceDefaultAlternativeUrl(sctx sdk.Context, mctx MigrationContext) error {
+	sctx.Logger().Debug("MigrateResourceDefaultAlternativeUrl function")
+
 	namespace := mctx.didKeeperNew.GetDidNamespace(&sctx)
 
 	return MigrateResourceSimple(sctx, mctx, func(resource *resourcetypes.ResourceWithMetadata) {

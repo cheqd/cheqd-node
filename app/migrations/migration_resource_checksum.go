@@ -10,6 +10,8 @@ import (
 
 // Migration because we need to fix the algo for checksum calculation
 func MigrateResourceChecksum(sctx sdk.Context, mctx MigrationContext) error {
+	sctx.Logger().Debug("MigrateResourceChecksum function")
+
 	return MigrateResourceSimple(sctx, mctx, func(resource *resourcetypes.ResourceWithMetadata) {
 		checksum := sha256.Sum256(resource.Resource.Data)
 		resource.Metadata.Checksum = hex.EncodeToString(checksum[:])
