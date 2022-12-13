@@ -1,6 +1,6 @@
-//go:build upgrade_unit
+//go:build migrations_test
 
-package unit
+package migrations_test
 
 import (
 	"testing"
@@ -11,5 +11,5 @@ import (
 
 func TestMigration(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Upgrade Unit Suite")
+	RunSpecs(t, "Migrations Test Suite")
 }

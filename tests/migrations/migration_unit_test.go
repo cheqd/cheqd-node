@@ -1,9 +1,9 @@
-//go:build upgrade_unit
+//go:build migrations_test
 
-package unit
+package migrations_test
 
 import (
-	. "github.com/cheqd/cheqd-node/tests/upgrade/unit/setup"
+	. "github.com/cheqd/cheqd-node/tests/unit/setup"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
