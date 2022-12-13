@@ -678,10 +678,25 @@ class Installer():
 
     def set_env_vars(self, env_var_name, env_var_value):
         if not self.check_if_env_var_already_set(env_var_name):
-            self.exec(f"echo 'export {env_var_name}={env_var_value}' >> ~/.bashrc")
-            self.exec(f"echo 'export {env_var_name}={env_var_value}' >> /home/cheqd/.bashrc")
+            self.write_to_bashrc(env_var_name, env_var_value) # write to current user
+            self.write_to_bashrc(env_var_name, env_var_value, True) # write to cheqd user .bashrc
         else:
             self.log(f"ENV var {env_var_name} already set")
+
+    def write_to_bashrc(self, env_var_name, env_var_value, is_user_cheqd=False):
+        try:
+            current_user_bashrc_path = os.path.expanduser("~/.bashrc")
+            if is_user_cheqd:
+                current_user_bashrc_path = f'{self.interviewer.home_dir}/.bashrc' # because user might change default home dir path which is /home/cheqd
+            with open(current_user_bashrc_path, "a") as current_user_bashrc_file:
+                current_user_bashrc_file.write(f"export {env_var_name}={env_var_value}\n")
+        except:
+            if is_user_cheqd:
+                failure_exit("Unable to set ENV vars for cheqd user")
+            else:
+                failure_exit("Unable to set ENV vars for Current user")
+        finally:
+            current_user_bashrc_file.close()
 
     def check_if_env_var_already_set(self, env_var_name):
         try:
