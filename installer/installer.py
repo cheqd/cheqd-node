@@ -20,6 +20,7 @@ import signal
 import platform
 import copy
 import re
+import shutil
 
 ###############################################################
 ###     				Installer defaults    				###
@@ -282,7 +283,7 @@ class Installer():
         try:
             self.exec(f"wget -c {binary_url}")
             if fname.find(".tar.gz") != -1:
-                self.exec(f"tar -xzf {fname} -C . --strip-components=1")
+                self.exec(f"tar -xzf {fname} -C .")
                 self.remove_safe(fname)
             self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
         except:
@@ -1029,8 +1030,8 @@ class Interviewer:
                 return copy_r_list
 
     def is_cosmovisor_already_installed(self) -> bool:
-        install_path = self.exec("which cosmovisor").stdout
-        if len(install_path.strip()) > 0:
+        command = 'cosmovisor'
+        if shutil.which(command) is not None:
             return True
         else:
             return False
