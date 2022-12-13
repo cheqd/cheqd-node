@@ -28,19 +28,18 @@ then
   # Count number of imported accounts
   IMPORTED_ACCOUNTS=$(cheqd-noded keys list --keyring-backend "$CHEQD_NODED_KEYRING_BACKEND" | grep -c "cheqd1")  
 
+  if [ "$IMPORTED_ACCOUNTS" -eq "$EXPECTED_ACCOUNTS" ]
+  then
+    echo "All accounts imported successfully"
+    echo "Imported accounts: ${IMPORTED_ACCOUNTS}"
+  else
+    echo "Mismatch in number of imported accounts"
+    echo "Imported accounts: ${IMPORTED_ACCOUNTS}"
+    echo "Expected accounts: ${EXPECTED_ACCOUNTS}"
+    exit 1
+  fi
+
 else
   echo "Input file ${INPUT_FILE} does not exist"
-  exit 1
-fi
-
-if [ "$IMPORTED_ACCOUNTS" -eq "$EXPECTED_ACCOUNTS" ]
-then
-  echo "All accounts imported successfully"
-  echo "Imported accounts: ${IMPORTED_ACCOUNTS}"
-  exit 0
-else
-  echo "Mismatch in number of imported accounts"
-  echo "Imported accounts: ${IMPORTED_ACCOUNTS}"
-  echo "Expected accounts: ${EXPECTED_ACCOUNTS}"
   exit 1
 fi
