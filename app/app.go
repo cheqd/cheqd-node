@@ -866,6 +866,11 @@ func New(
 						stakingMsgCreateValidator,
 						vestingMsgCreateVestingAccount,
 						ibcMsgTransfer,
+						// cheqd namespace
+						didMsgCreateDidDoc,
+						didMsgUpdateDidDoc,
+						didMsgDeactivateDidDoc,
+						resourceMsgCreateResource,
 					},
 				}
 

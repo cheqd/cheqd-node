@@ -29,4 +29,10 @@ const (
 	stakingMsgCreateValidator           = "/cosmos.staking.v1beta1.MsgCreateValidator"
 	vestingMsgCreateVestingAccount      = "/cosmos.vesting.v1beta1.MsgCreateVestingAccount"
 	ibcMsgTransfer                      = "/ibc.applications.transfer.v1.MsgTransfer"
+
+	// cheqd namespace
+	didMsgCreateDidDoc        = "/cheqd.did.v2.MsgCreateDidDoc"
+	didMsgUpdateDidDoc        = "/cheqd.did.v2.MsgUpdateDidDoc"
+	didMsgDeactivateDidDoc    = "/cheqd.did.v2.MsgDeactivateDidDoc"
+	resourceMsgCreateResource = "/cheqd.resource.v2.MsgCreateResource"
 )

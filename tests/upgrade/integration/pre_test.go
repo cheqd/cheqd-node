@@ -11,6 +11,7 @@ import (
 	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
 	govtypesv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
+	// upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types" <-- TODO: uncomment when whole sequence of upgrade tests is ready
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -22,6 +23,20 @@ var _ = Describe("Upgrade - Pre", func() {
 			err := cli.WaitForChainHeight(cli.VALIDATOR0, cli.CLI_BINARY_NAME, cli.BOOTSTRAP_HEIGHT, cli.BOOTSTRAP_PERIOD)
 			Expect(err).To(BeNil())
 		})
+
+		// TODO: uncomment when whole sequence of upgrade tests is ready
+		// It("should match the expected module version map", func() {
+		// 	By("loading the expected module version map")
+		// 	var expected upgradetypes.QueryModuleVersionsResponse
+		// 	_, err := Loader(filepath.Join(GENERATED_JSON_DIR, "pre", "query - module-version-map", "v069.json"), &expected)
+		// 	Expect(err).To(BeNil())
+
+		// 	By("matching the expected module version map")
+		// 	actual, err := cli.QueryModuleVersionMap(cli.VALIDATOR0)
+		// 	Expect(err).To(BeNil())
+
+		// 	Expect(actual.ModuleVersions).To(Equal(expected.ModuleVersions), "module version map mismatch")
+		// })
 
 		It("should load and run existing diddoc payloads - case: create", func() {
 			By("matching the glob pattern for existing diddoc payloads")
