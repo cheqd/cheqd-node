@@ -14,14 +14,14 @@ then
   EXPECTED_ACCOUNTS=$(tail -n +2 "${INPUT_FILE}" | wc -l)
 
   # Read accounts from CSV file
-  while IFS= read -r ACCOUNT MNEMONIC
+  while IFS="," read -r ACCOUNT MNEMONIC
   do
     if cheqd-noded keys show "$ACCOUNT" --keyring-backend "$CHEQD_NODED_KEYRING_BACKEND"
     then
       echo "Key ${ACCOUNT} already exists"
     else
       echo "Importing account: ${ACCOUNT}"
-      cheqd-noded keys add "$ACCOUNT" --recover --keyring-backend "$CHEQD_NODED_KEYRING_BACKEND" <<< "$MNEMONIC"
+      cheqd-noded keys add "$ACCOUNT" --recover --keyring-backend "$CHEQD_NODED_KEYRING_BACKEND"
     fi
   done < <(tail -n +2 "${INPUT_FILE}")
 
