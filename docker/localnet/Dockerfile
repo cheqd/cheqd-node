@@ -2,7 +2,7 @@
 ###         	STAGE 1: Build localnet image         		###
 ###############################################################
 
-ARG BUILD_IMAGE="gchr.io/cheqd/cheqd-node"
+ARG BUILD_IMAGE="ghcr.io/cheqd/cheqd-node"
 ARG BUILD_VERSION
 FROM ${BUILD_IMAGE}:${BUILD_VERSION} AS localnet
 
