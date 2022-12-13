@@ -601,7 +601,6 @@ class Installer():
             self.exec("sudo mv {} {}".format(self.binary_path, self.cosmovisor_cheqd_bin_path))
             self.exec("sudo chown {} {}".format(f'{DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}', f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
             self.exec("sudo chmod +x {}".format(f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
-
             if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
                 self.log(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
                 os.symlink(self.cosmovisor_cheqd_bin_path,
@@ -677,9 +676,11 @@ class Installer():
             failure_exit(f"Failed to setup Cosmovisor")
 
     def set_env_vars(self, env_var_name, env_var_value):
-        if not self.check_if_env_var_already_set(env_var_name):
+        if not self.check_if_env_var_already_set(env_var_name) and not self.is_default_shell_fish():
             self.write_to_bashrc(env_var_name, env_var_value) # write to current user
             self.write_to_bashrc(env_var_name, env_var_value, True) # write to cheqd user .bashrc
+        elif not self.check_if_env_var_already_set(env_var_name) and self.is_default_shell_fish():
+            self.exec(f'set -Uxg {env_var_name} {env_var_value}')
         else:
             self.log(f"ENV var {env_var_name} already set")
 
@@ -704,7 +705,17 @@ class Installer():
             return True
         except KeyError:
             return False
-    
+
+    def is_default_shell_fish(self):
+        try: 
+            default_shell = os.getenv("SHELL")
+            if default_shell == "/usr/bin/fish":
+                return True
+            else:
+                return False
+        except KeyError:
+            failure_exit("Unable to get the default shell")
+
     def compare_checksum(self, file_path):
         # Set URL for correct checksum file for snapshot
         checksum_url = os.path.join(os.path.dirname(self.interviewer.snapshot_url), "md5sum.txt")
@@ -1331,3 +1342,4 @@ if __name__ == '__main__':
         installer.install()
     except:
         failure_exit("Unable to install cheqd-node.")
+
