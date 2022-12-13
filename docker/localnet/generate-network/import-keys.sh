@@ -21,7 +21,7 @@ then
       echo "Key ${ACCOUNT} already exists"
     else
       echo "Importing account: ${ACCOUNT}"
-      cheqd-noded keys add "$ACCOUNT" --recover --keyring-backend "$CHEQD_NODED_KEYRING_BACKEND"
+      cheqd-noded keys add "$ACCOUNT" --recover --keyring-backend "$CHEQD_NODED_KEYRING_BACKEND" <<< "$MNEMONIC"
     fi
   done < <(tail -n +2 "${INPUT_FILE}")
 
