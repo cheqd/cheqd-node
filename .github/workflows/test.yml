@@ -15,7 +15,7 @@ jobs:
 
   unit-tests:
     name: "Unit Tests"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v3
@@ -41,7 +41,7 @@ jobs:
 
   integration-tests:
     name: "Integration Tests"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v3
@@ -107,7 +107,7 @@ jobs:
 
   upgrade-tests:
     name: "Upgrade Tests"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
 
@@ -232,7 +232,7 @@ jobs:
 
   report-results:
     name: "Report"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: [unit-tests, integration-tests, upgrade-tests]
     if: always()
 
