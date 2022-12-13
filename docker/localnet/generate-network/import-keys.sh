@@ -10,8 +10,8 @@ CHEQD_NODED_KEYRING_BACKEND="${2:-test}"
 # Proceed only if input file exists
 if [ -f "${INPUT_FILE}" ]
 then
-  # Count number of accounts in input file
-  ACCOUNT_COUNT=$(wc -l < "${INPUT_FILE}" - 1)
+  # Count number of accounts in input file minus header
+  EXPECTED_ACCOUNTS=$(tail -n +2 "${INPUT_FILE}" | wc -l)
 
   # Read accounts from CSV file
   while IFS= read -r ACCOUNT MNEMONIC
@@ -33,7 +33,7 @@ else
   exit 1
 fi
 
-if [ "$IMPORTED_ACCOUNTS" -eq "$ACCOUNT_COUNT" ]
+if [ "$IMPORTED_ACCOUNTS" -eq "$EXPECTED_ACCOUNTS" ]
 then
   echo "All accounts imported successfully"
   echo "Imported accounts: ${IMPORTED_ACCOUNTS}"
@@ -41,6 +41,6 @@ then
 else
   echo "Mismatch in number of imported accounts"
   echo "Imported accounts: ${IMPORTED_ACCOUNTS}"
-  echo "Expected accounts: ${ACCOUNT_COUNT}"
+  echo "Expected accounts: ${EXPECTED_ACCOUNTS}"
   exit 1
 fi
