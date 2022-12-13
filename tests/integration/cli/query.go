@@ -6,6 +6,8 @@ import (
 
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 )
 
 var CLI_QUERY_PARAMS = []string{
@@ -25,8 +27,38 @@ func Query(module, query string, queryArgs ...string) (string, error) {
 	return Exec(args...)
 }
 
+func QueryBalance(address, denom string) (sdk.Coin, error) {
+	res, err := Query("bank", "balances", address, "--denom", denom)
+	if err != nil {
+		return sdk.Coin{}, err
+	}
+
+	var resp sdk.Coin
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return sdk.Coin{}, err
+	}
+
+	return resp, nil
+}
+
+func QueryParams(subspace, key string) (paramproposal.ParamChange, error) {
+	res, err := Query("params", "subspace", subspace, key)
+	if err != nil {
+		return paramproposal.ParamChange{}, err
+	}
+
+	var resp paramproposal.ParamChange
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return paramproposal.ParamChange{}, err
+	}
+
+	return resp, nil
+}
+
 func QueryDidDoc(did string) (didtypes.QueryGetDidDocResponse, error) {
-	res, err := Query("cheqd", "diddoc", did)
+	res, err := Query("cheqd", "did-document", did)
 	if err != nil {
 		return didtypes.QueryGetDidDocResponse{}, err
 	}

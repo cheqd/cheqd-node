@@ -60,11 +60,8 @@ archives:
         linux: Linux
         amd64: x86_64
     format: tar.gz
-    wrap_in_directory: true
+    wrap_in_directory: false
     name_template: "{{ .Binary }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}"
-    files:
-      - LICENSE
-      - README.md
 
 checksum:
   algorithm: sha256

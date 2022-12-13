@@ -120,7 +120,7 @@ func NewAppModule(cdc codec.Codec, keeper keeper.Keeper) AppModule {
 // introduced by the module. To avoid wrong/empty versions, the initial version
 // should be set to 1.
 func (am AppModule) ConsensusVersion() uint64 {
-	return 3
+	return 4
 }
 
 // Name returns the cheqd module's name.
@@ -156,9 +156,7 @@ func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, gs json.Ra
 	var genState types.GenesisState
 	// Initialize global index to index in genesis state
 	cdc.MustUnmarshalJSON(gs, &genState)
-
-	InitGenesis(ctx, am.keeper, genState)
-
+	InitGenesis(ctx, am.keeper, &genState)
 	return []abci.ValidatorUpdate{}
 }
 

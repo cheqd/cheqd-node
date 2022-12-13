@@ -26,6 +26,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 	})
 
 	It("can create diddoc, create resource, query it, query all resource versions of the same resource name, query resource collection", func() {
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.GREEN, "can create diddoc"))
 		// Create a new DID Doc
 		collectionId := uuid.NewString()
 		did := "did:cheqd:" + network.DID_NAMESPACE + ":" + collectionId
@@ -58,12 +59,13 @@ var _ = Describe("cheqd cli - positive resource", func() {
 			},
 		}
 
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_1)
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
-		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.GREEN, "can create resource"))
 		// Create a new Resource
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.GREEN, "can create resource"))
+
 		resourceId := uuid.NewString()
 		resourceName := "TestResource"
 		resourceVersion := "1.0"
@@ -78,7 +80,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1)
+		}, signInputs, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -120,7 +122,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 			ResourceVersion: nextResourceVersion,
 			ResourceType:    nextResourceType,
 			ResourceFile:    nextResourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1)
+		}, signInputs, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -156,7 +158,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 			},
 		}
 
-		res, err = cli.CreateDidDoc(tmpDir, secondPayload, secondSignInputs, testdata.BASE_ACCOUNT_2)
+		res, err = cli.CreateDidDoc(tmpDir, secondPayload, secondSignInputs, testdata.BASE_ACCOUNT_2, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -175,7 +177,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 			ResourceVersion: secondResourceVersion,
 			ResourceType:    secondResourceType,
 			ResourceFile:    secondResourceFile,
-		}, secondSignInputs, testdata.BASE_ACCOUNT_1)
+		}, secondSignInputs, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
