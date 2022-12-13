@@ -12,20 +12,16 @@ SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 WORKDIR /home/cheqd
 
 # Copy network configuration directory
-COPY generate-network/ 
+COPY --chown=cheqd:cheqd docker/localnet/generate-network/network-config /home/cheqd/network-config
 
-# Make scripts executable
-RUN chmod +x /bin/cheqd-noded /bin/generate-network
+# Copy entrypoint script
+COPY --chown=cheqd:cheqd docker/entrypoint.sh /bin/node-start
+RUN chmod +rx /bin/node-start
 
-# Set user directory and details
-# USER cheqd
-# WORKDIR /home/cheqd
+# Set user and group
+USER cheqd:cheqd
 
-# Set network generation environment variables
-ENV CHAIN_ID="cheqd"
-ENV VALIDATORS_COUNT=4
-ENV SEEDS_COUNT=1
-ENV OBSERVERS_COUNT=1
+EXPOSE 26656 26657 26660 1317 9090 9091
 
 # Set plain vanilla default entrypoint/command
-ENTRYPOINT [ "generate-network" ]
+CMD [ "cheqd-noded" ]
