@@ -279,16 +279,9 @@ class Installer():
     def get_binary(self):
         self.log("Downloading cheqd-noded binary...")
         binary_url = self.release.get_release_url()
-        fname = os.path.basename(binary_url)
-        try:
-            self.exec(f"wget -c {binary_url}")
-            if fname.find(".tar.gz") != -1:
-                self.exec(f"tar -xzf {fname} -C .")
-                self.remove_safe(fname)
-            self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
-        except:
-            failure_exit("Failed to download binary")
-
+        download_and_unzip(binary_url)
+        self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
+        
     def is_user_exists(self, username) -> bool:
         try:
             pwd.getpwnam(username)
@@ -573,9 +566,8 @@ class Installer():
     
     def setup_cosmovisor(self):
         try:
-            fname = self.download_and_unzip(self.cosmovisor_download_url)
-            self.remove_safe(fname)
-            
+            self.download_and_unzip(self.cosmovisor_download_url)
+
             # Remove cosmovisor artifacts...
             self.remove_safe("CHANGELOG.md")
             self.remove_safe("README.md")
@@ -628,8 +620,7 @@ class Installer():
         try:
             self.stop_cosmovisor_systemd(DEFAULT_COSMOVISOR_SERVICE_NAME)
 
-            fname = self.download_and_unzip(self.cosmovisor_download_url)
-            self.remove_safe(fname)
+            self.download_and_unzip(self.cosmovisor_download_url)
     
             # Remove cosmovisor artifacts...
             self.remove_safe("CHANGELOG.md")
@@ -713,11 +704,15 @@ class Installer():
             failure_exit("Unable to get the default shell")
 
     def download_and_unzip(self, download_url):
-        fname= os.path.basename(download_url)
-        self.exec(f"wget -c {download_url}")
-        self.exec(f"tar -xzf {fname}")
-        return fname
-        
+        fname = os.path.basename(download_url)
+        try:
+            self.exec(f"wget -c {download_url}")
+            if fname.find(".tar.gz") != -1:
+                self.exec(f"tar -xzf {fname} -C .")
+                self.remove_safe(fname)
+        except:
+            failure_exit("Failed to download binary")
+
     def compare_checksum(self, file_path):
         # Set URL for correct checksum file for snapshot
         checksum_url = os.path.join(os.path.dirname(self.interviewer.snapshot_url), "md5sum.txt")
