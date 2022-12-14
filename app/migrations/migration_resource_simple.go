@@ -30,7 +30,7 @@ func MigrateResourceSimple(sctx sdk.Context, mctx MigrationContext, apply func(r
 			return err
 		}
 
-		sctx.Logger().Debug("old resource with metadata: %s", resourceWithMetadata)
+		sctx.Logger().Debug("old resource with metadata: %s", string(mctx.codec.MustMarshalJSON(&resourceWithMetadata)))
 
 		// Remove old values
 		metadataKey := resourcetypes.GetResourceMetadataKey(metadata.CollectionId, metadata.Id)
@@ -42,7 +42,7 @@ func MigrateResourceSimple(sctx sdk.Context, mctx MigrationContext, apply func(r
 		// Migrate
 		apply(&resourceWithMetadata)
 
-		sctx.Logger().Debug("new resource with metadata: %s", resourceWithMetadata)
+		sctx.Logger().Debug("new resource with metadata: %s", string(mctx.codec.MustMarshalJSON(&resourceWithMetadata)))
 
 		// Write new value
 		err = mctx.resourceKeeperNew.SetResource(&sctx, &resourceWithMetadata)
