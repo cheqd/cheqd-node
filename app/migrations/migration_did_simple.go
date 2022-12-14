@@ -6,18 +6,18 @@ import (
 )
 
 func MigrateDidSimple(sctx sdk.Context, mctx MigrationContext, apply func(didDocWithMetadata *didtypes.DidDocWithMetadata)) error {
-	println("Migrate did simple. Start")
+	sctx.Logger().Debug("Migrate did simple. Start")
 
 	store := sctx.KVStore(mctx.didStoreKey)
 
-	println("Migrate did simple. Reset counter")
+	sctx.Logger().Debug("Migrate did simple. Reset counter")
 	// Reset counter
 	mctx.didKeeperNew.SetDidDocCount(&sctx, 0)
 
 	// Colect all did doc vsersions
 	var allDidDocVersions []didtypes.DidDocWithMetadata
 
-	println("Migrate did simple. Iterate all did docs")
+	sctx.Logger().Debug("Migrate did simple. Iterate all did docs")
 	mctx.didKeeperNew.IterateAllDidDocVersions(&sctx, func(metadata didtypes.DidDocWithMetadata) bool {
 		allDidDocVersions = append(allDidDocVersions, metadata)
 		return true
@@ -47,7 +47,7 @@ func MigrateDidSimple(sctx sdk.Context, mctx MigrationContext, apply func(didDoc
 			return err
 		}
 	}
-	println("Migrate did simple. Start")
+	sctx.Logger().Debug("Migrate did simple. End")
 
 	return nil
 }

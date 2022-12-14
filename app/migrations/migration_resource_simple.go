@@ -6,17 +6,17 @@ import (
 )
 
 func MigrateResourceSimple(sctx sdk.Context, mctx MigrationContext, apply func(resourceWithMetadata *resourcetypes.ResourceWithMetadata)) error {
-	println("Simple migration for resources. Start")
+	sctx.Logger().Debug("Simple migration for resources. Start")
 	store := sctx.KVStore(mctx.resourceStoreKey)
 
-	println("Simple migration for resources. Remove old counters")
+	sctx.Logger().Debug("Simple migration for resources. Remove old counters")
 	// Reset counter
 	mctx.didKeeperNew.SetDidDocCount(&sctx, 0)
 
 	// Cache resources
 	var metadatas []resourcetypes.Metadata
 
-	println("Simple migration for resources. Iterate over all resource metadatas")
+	sctx.Logger().Debug("Simple migration for resources. Iterate over all resource metadatas")
 	mctx.resourceKeeperNew.IterateAllResourceMetadatas(&sctx, func(metadata resourcetypes.Metadata) bool {
 		metadatas = append(metadatas, metadata)
 		return true
@@ -51,7 +51,7 @@ func MigrateResourceSimple(sctx sdk.Context, mctx MigrationContext, apply func(r
 		}
 	}
 
-	println("Simple migration for resources. End")
+	sctx.Logger().Debug("Simple migration for resources. End")
 
 	return nil
 }

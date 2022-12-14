@@ -9,10 +9,10 @@ import (
 )
 
 func MigrateResourceVersionLinks(sctx sdk.Context, mctx MigrationContext) error {
-	println("Resource version links migration. Start")
+	sctx.Logger().Debug("Resource version links migration. Start")
 	store := sctx.KVStore(mctx.resourceStoreKey)
 
-	println("Resource version links migration. Read all resources")
+	sctx.Logger().Debug("Resource version links migration. Read all resources")
 	// Read all resources. Yes, this is memory intensive, but it's the simplest way to do it.
 	// Resource size is limited to 200KB, so this should be fine.
 	resources, err := mctx.resourceKeeperNew.GetAllResources(&sctx)
@@ -20,7 +20,7 @@ func MigrateResourceVersionLinks(sctx sdk.Context, mctx MigrationContext) error 
 		return err
 	}
 
-	println("Resource version links migration. Read all keys and Clean store")
+	sctx.Logger().Debug("Resource version links migration. Read all keys and Clean store")
 	// Clean store
 	keys := helpers.ReadAllKeys(store, nil)
 	for _, key := range keys {
@@ -33,7 +33,7 @@ func MigrateResourceVersionLinks(sctx sdk.Context, mctx MigrationContext) error 
 		resource.Metadata.NextVersionId = ""
 	}
 
-	println("Resource version links migration. Sort resources by date created")
+	sctx.Logger().Debug("Resource version links migration. Sort resources by date created")
 	// Sort resources by date created
 	sort.Slice(resources[:], func(i, j int) bool {
 		iCreated, err := time.Parse(time.RFC3339, resources[i].Metadata.Created)
@@ -49,7 +49,7 @@ func MigrateResourceVersionLinks(sctx sdk.Context, mctx MigrationContext) error 
 		return iCreated.Before(jCreated)
 	})
 
-	println("Resource version links migration. Set version links")
+	sctx.Logger().Debug("Resource version links migration. Set version links")
 	// Add resources to store in the same order as they were created. This will create proper links.
 	for _, resource := range resources {
 		err = mctx.resourceKeeperNew.AddNewResourceVersion(&sctx, &resource)
@@ -57,7 +57,7 @@ func MigrateResourceVersionLinks(sctx sdk.Context, mctx MigrationContext) error 
 			return err
 		}
 	}
-	println("Resource version links migration. End")
+	sctx.Logger().Debug("Resource version links migration. End")
 
 	return nil
 }
