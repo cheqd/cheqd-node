@@ -1,6 +1,8 @@
 package migrations
 
 import (
+	"fmt"
+
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -30,7 +32,7 @@ func MigrateResourceSimple(sctx sdk.Context, mctx MigrationContext, apply func(r
 			return err
 		}
 
-		sctx.Logger().Debug("old resource with metadata: %s", string(mctx.codec.MustMarshalJSON(&resourceWithMetadata)))
+		sctx.Logger().Debug(fmt.Sprintf("old resource with metadata: %s", string(mctx.codec.MustMarshalJSON(&resourceWithMetadata))))
 
 		// Remove old values
 		metadataKey := resourcetypes.GetResourceMetadataKey(metadata.CollectionId, metadata.Id)
@@ -42,7 +44,7 @@ func MigrateResourceSimple(sctx sdk.Context, mctx MigrationContext, apply func(r
 		// Migrate
 		apply(&resourceWithMetadata)
 
-		sctx.Logger().Debug("new resource with metadata: %s", string(mctx.codec.MustMarshalJSON(&resourceWithMetadata)))
+		sctx.Logger().Debug(fmt.Sprintf("new resource with metadata: %s", string(mctx.codec.MustMarshalJSON(&resourceWithMetadata))))
 
 		// Write new value
 		err = mctx.resourceKeeperNew.SetResource(&sctx, &resourceWithMetadata)
