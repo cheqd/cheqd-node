@@ -38,6 +38,10 @@
                 "version": 2
             },
             {
+                "name": "feeibc",
+                "version": 1
+            },
+            {
                 "name": "genutil",
                 "version": 1
             },
