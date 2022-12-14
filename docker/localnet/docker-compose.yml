@@ -1,8 +1,17 @@
 version: '3.8'
 
+# CAUTION: Please ensure you edit values in ENV files before use
+# Environment variables used in Docker Compose: config/compose-env/**
+# Environment variables used in Docker Compose: config/compose-env/**
+
+# USAGE: docker compose -f docker/localnet/docker-compose.yml --env-file docker/localnet/config/compose-env/[ENV-FILE].env up --detach
+
 services:
   validator-0:
     image: ${BUILD_IMAGE}
+    container_name: validator-0
+    env_file:
+      - container-env/validator-0.env
     ports:
       - target: 26656
         published: 26656    # Tendermint peer-to-peer (P2P) port
@@ -27,19 +36,6 @@ services:
       - type: volume
         source: validator-0-data
         target: /home/cheqd
-    env_file:
-      - container-env/validator-0.env
-    configs:
-      - source: genesis
-        target: /genesis
-      - source: seeds
-        target: /seeds
-      - source: validator-0-node-key
-        target: /node_key
-      - source: validator-0-priv-val-key
-        target: /priv_validator_key
-      - source: validator-0-account-key
-        target: /validator-account
 
   validator-1:
     image: ${BUILD_IMAGE}
@@ -236,57 +232,6 @@ services:
         target: /node_key
       - source: observer-0-priv-val-key
         target: /priv_validator_key
-
-configs:
-  # Genesis and seeds
-  genesis:
-    file: network-config/genesis.json
-  seeds:
-    file: network-config/seeds.txt
-
-  # Validator 0
-  validator-0-node-key:
-    file: network-config/validator-0/config/node_key.json
-  validator-0-priv-val-key:
-    file: network-config/validator-0/config/priv_validator_key.json
-  validator-0-account-key:
-    file: network-config/validator-0/keyring-test/validator-0.json
-
-  # Validator 1
-  validator-1-node-key:
-    file: network-config/validator-1/config/node_key.json
-  validator-1-priv-val-key:
-    file: network-config/validator-1/config/priv_validator_key.json
-  validator-1-account-key:
-    file: network-config/validator-1/keyring-test/validator-1.json
-
-  # Validator 2
-  validator-2-node-key:
-    file: network-config/validator-2/config/node_key.json
-  validator-2-priv-val-key:
-    file: network-config/validator-2/config/priv_validator_key.json
-  validator-2-account-key:
-    file: network-config/validator-2/keyring-test/validator-2.json
-
-  # Validator 3
-  validator-3-node-key:
-    file: network-config/validator-3/config/node_key.json
-  validator-3-priv-val-key:
-    file: network-config/validator-3/config/priv_validator_key.json
-  validator-3-account-key:
-    file: network-config/validator-3/keyring-test/validator-3.json
-
-  # Seed 0
-  seed-0-node-key:
-    file: network-config/seed-0/config/node_key.json
-  seed-0-priv-val-key:
-    file: network-config/seed-0/config/priv_validator_key.json
-
-  # Observer 0
-  observer-0-node-key:
-    file: network-config/observer-0/config/node_key.json
-  observer-0-priv-val-key:
-    file: network-config/observer-0/config/priv_validator_key.json
 
 volumes:
   validator-0-data:
