@@ -8,18 +8,18 @@ import (
 )
 
 func MigrateDidSimple(sctx sdk.Context, mctx MigrationContext, apply func(didDocWithMetadata *didtypes.DidDocWithMetadata)) error {
-	sctx.Logger().Debug("Migrate did simple. Start")
+	sctx.Logger().Debug("MigrateDidSimple: Starting migration")
 
 	store := sctx.KVStore(mctx.didStoreKey)
 
-	sctx.Logger().Debug("Migrate did simple. Reset counter")
+	sctx.Logger().Debug("MigrateDidSimple: Reset counter")
 	// Reset counter
 	mctx.didKeeperNew.SetDidDocCount(&sctx, 0)
 
-	// Colect all did doc vsersions
+	// Collect all DIDDoc versions
 	var allDidDocVersions []didtypes.DidDocWithMetadata
 
-	sctx.Logger().Debug("Migrate did simple. Iterate all did docs")
+	sctx.Logger().Debug("MigrateDidSimple: Iterate through all DIDDocs")
 	mctx.didKeeperNew.IterateAllDidDocVersions(&sctx, func(metadata didtypes.DidDocWithMetadata) bool {
 		allDidDocVersions = append(allDidDocVersions, metadata)
 		return true
@@ -28,7 +28,7 @@ func MigrateDidSimple(sctx sdk.Context, mctx MigrationContext, apply func(didDoc
 	// Iterate and migrate did docs. We can use single loop for removing old values, migration
 	// and writing new values because there is only one version of each diddoc in the store
 	for _, version := range allDidDocVersions {
-		sctx.Logger().Debug(fmt.Sprintf("old version: %s", string(mctx.codec.MustMarshalJSON(&version))))
+		sctx.Logger().Debug(fmt.Sprintf("Old version of DIDDoc: %s", string(mctx.codec.MustMarshalJSON(&version))))
 
 		// Remove last version pointer
 		latestVersionKey := didtypes.GetLatestDidDocVersionKey(version.DidDoc.Id)
@@ -41,7 +41,7 @@ func MigrateDidSimple(sctx sdk.Context, mctx MigrationContext, apply func(didDoc
 		// Migrate
 		apply(&version)
 
-		sctx.Logger().Debug(fmt.Sprintf("new version: %s", string(mctx.codec.MustMarshalJSON(&version))))
+		sctx.Logger().Debug(fmt.Sprintf("New version of DIDDoc: %s", string(mctx.codec.MustMarshalJSON(&version))))
 
 		// Create as a new did doc
 		err := mctx.didKeeperNew.AddNewDidDocVersion(&sctx, &version)
@@ -49,7 +49,7 @@ func MigrateDidSimple(sctx sdk.Context, mctx MigrationContext, apply func(didDoc
 			return err
 		}
 	}
-	sctx.Logger().Debug("Migrate did simple. End")
+	sctx.Logger().Debug("MigrateDidSimple: Execution completed")
 
 	return nil
 }
