@@ -72,7 +72,15 @@ type ValidatorInfo struct {
 }
 
 func GetNodeStatus(container string, binary string) (NodeStatus, error) {
-	out, err := LocalnetExecExec(container, binary, "status")
+	var out string
+	var err error
+	
+	// ToDo: refactor
+	if RUN_INSIDE_DOCKER {
+		out, err = LocalnetExecExec(container, binary, "status")
+	} else {
+		out, err = ExecDirect(binary, "status")
+	}
 	if err != nil {
 		return NodeStatus{}, err
 	}

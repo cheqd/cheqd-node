@@ -48,4 +48,6 @@ var (
 		"--chain-id", integrationnetwork.CHAIN_ID,
 		"--output", OUTPUT_FORMAT,
 	}
+	// TODO: UGLY THING, needs to be refactored
+	RUN_INSIDE_DOCKER = true
 )
