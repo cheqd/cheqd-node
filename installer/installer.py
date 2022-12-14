@@ -573,9 +573,7 @@ class Installer():
     
     def setup_cosmovisor(self):
         try:
-            fname= os.path.basename(self.cosmovisor_download_url)
-            self.exec(f"wget -c {self.cosmovisor_download_url}")
-            self.exec(f"tar -xzf {fname}")
+            fname = self.download_and_unzip(self.cosmovisor_download_url)
             self.remove_safe(fname)
             
             # Remove cosmovisor artifacts...
@@ -629,16 +627,14 @@ class Installer():
     def bump_cosmovisor(self):
         try:
             self.stop_cosmovisor_systemd(DEFAULT_COSMOVISOR_SERVICE_NAME)
-            fname= os.path.basename(self.cosmovisor_download_url)
-            self.exec(f"wget -c {self.cosmovisor_download_url}")
-            self.exec(f"tar -xzf {fname}")
+
+            fname = self.download_and_unzip(self.cosmovisor_download_url)
             self.remove_safe(fname)
-            
+    
             # Remove cosmovisor artifacts...
             self.remove_safe("CHANGELOG.md")
             self.remove_safe("README.md")
             self.remove_safe("LICENSE")
-
 
             # move the new binary to installation directory
             self.log(f"Moving Cosmovisor binary to installation directory")
@@ -716,6 +712,12 @@ class Installer():
         except KeyError:
             failure_exit("Unable to get the default shell")
 
+    def download_and_unzip(self, download_url):
+        fname= os.path.basename(download_url)
+        self.exec(f"wget -c {download_url}")
+        self.exec(f"tar -xzf {fname}")
+        return fname
+        
     def compare_checksum(self, file_path):
         # Set URL for correct checksum file for snapshot
         checksum_url = os.path.join(os.path.dirname(self.interviewer.snapshot_url), "md5sum.txt")
