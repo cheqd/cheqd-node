@@ -279,7 +279,9 @@ class Installer():
     def get_binary(self):
         self.log("Downloading cheqd-noded binary...")
         binary_url = self.release.get_release_url()
+        print("cheqd-noded binary url: ", binary_url)
         download_and_unzip(binary_url)
+        print("successfully downloaded binary")
         self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
         
     def is_user_exists(self, username) -> bool:
