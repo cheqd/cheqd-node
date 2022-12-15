@@ -12,12 +12,15 @@ import (
 )
 
 func MigrateResourceProtobuf(sctx sdk.Context, mctx MigrationContext) error {
+	println("Protobuf migration for resources. Start")
 	// Storage for old headers and data
 	store := sctx.KVStore(mctx.resourceStoreKey)
 
+	println("Protobuf migration for resources. Reset counter")
 	// Reset counter
 	mctx.resourceKeeperNew.SetResourceCount(&sctx, 0)
 
+	println("Protobuf migration for resources. Read all keys")
 	headerKeys := helpers.ReadAllKeys(store, didutils.StrBytes(resourcetypesv1.ResourceHeaderKey))
 
 	for _, headerKey := range headerKeys {
@@ -58,6 +61,7 @@ func MigrateResourceProtobuf(sctx sdk.Context, mctx MigrationContext) error {
 			return err
 		}
 	}
+	println("Protobuf migration for resources. End")
 	return nil
 }
 

@@ -7,6 +7,7 @@ import (
 )
 
 func MigrateResourceIndyStyle(sctx sdk.Context, mctx MigrationContext) error {
+	println("Indy style migration for resources")
 	return MigrateResourceSimple(sctx, mctx, func(resource *resourcetypes.ResourceWithMetadata) {
 		resource.Metadata.CollectionId = helpers.MigrateIndyStyleId(resource.Metadata.CollectionId)
 	})
