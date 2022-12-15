@@ -115,9 +115,9 @@ class Release:
                 version_without_v_prefix = self.version.replace('v','',1)
                 if os.path.basename(_url) == f"cheqd-noded-{version_without_v_prefix}-{os_name}-{os_arch}.tar.gz" or \
                     os.path.basename(_url) == "cheqd-noded":
-                    return _url          
-            else:
-                failure_exit(f"No asset found to download for release: {self.version}")
+                    return _url      
+
+            failure_exit(f"No asset found to download for release: {self.version}")
         except:
             failure_exit(f"Failed to get cheqd-node binaries from Github")
 
@@ -1181,7 +1181,7 @@ class Interviewer:
     def ask_for_init_from_snapshot(self):
         answer = self.ask(
             f"CAUTION: Downloading a snapshot replaces your existing copy of chain data. Usually safe to use this option when doing a fresh installation. "
-            f"Do you want to download a snapshot of the existing chain to speed up node synchronisation? (yes/no)", default="yes")
+            f"Do you want to download a snapshot of the existing chain to speed up node synchronization? (yes/no)", default="yes")
         if answer.lower().startswith("y"):
             self.snapshot_url = self.prepare_url_for_latest()
             self.init_from_snapshot = True
@@ -1346,4 +1346,3 @@ if __name__ == '__main__':
         installer.install()
     except:
         failure_exit("Unable to install cheqd-node.")
-
