@@ -1,8 +1,6 @@
 package migrations
 
 import (
-	"fmt"
-
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -12,14 +10,14 @@ func MigrateDidSimple(sctx sdk.Context, mctx MigrationContext, apply func(didDoc
 
 	store := sctx.KVStore(mctx.didStoreKey)
 
-	sctx.Logger().Debug("MigrateDidSimple: Reset counter")
+	sctx.Logger().Debug("MigrateDidSimple: Reseting counter")
 	// Reset counter
 	mctx.didKeeperNew.SetDidDocCount(&sctx, 0)
 
 	// Collect all DIDDoc versions
 	var allDidDocVersions []didtypes.DidDocWithMetadata
 
-	sctx.Logger().Debug("MigrateDidSimple: Iterate through all DIDDocs")
+	sctx.Logger().Debug("MigrateDidSimple: Iterating through all DIDDocs")
 	mctx.didKeeperNew.IterateAllDidDocVersions(&sctx, func(metadata didtypes.DidDocWithMetadata) bool {
 		allDidDocVersions = append(allDidDocVersions, metadata)
 		return true
@@ -28,7 +26,8 @@ func MigrateDidSimple(sctx sdk.Context, mctx MigrationContext, apply func(didDoc
 	// Iterate and migrate did docs. We can use single loop for removing old values, migration
 	// and writing new values because there is only one version of each diddoc in the store
 	for _, version := range allDidDocVersions {
-		sctx.Logger().Debug(fmt.Sprintf("Old version of DIDDoc: %s", string(mctx.codec.MustMarshalJSON(&version))))
+
+		sctx.Logger().Debug("MigrateDidSimple: Starting migration for diddoc: " + version.DidDoc.Id)
 
 		// Remove last version pointer
 		latestVersionKey := didtypes.GetLatestDidDocVersionKey(version.DidDoc.Id)
@@ -41,15 +40,14 @@ func MigrateDidSimple(sctx sdk.Context, mctx MigrationContext, apply func(didDoc
 		// Migrate
 		apply(&version)
 
-		sctx.Logger().Debug(fmt.Sprintf("New version of DIDDoc: %s", string(mctx.codec.MustMarshalJSON(&version))))
-
 		// Create as a new did doc
 		err := mctx.didKeeperNew.AddNewDidDocVersion(&sctx, &version)
 		if err != nil {
 			return err
 		}
+		sctx.Logger().Debug("MigrateDidSimple: Migration finished for diddoc: " + version.DidDoc.Id)
 	}
-	sctx.Logger().Debug("MigrateDidSimple: Execution completed")
+	sctx.Logger().Debug("MigrateDidSimple: Migration finished")
 
 	return nil
 }

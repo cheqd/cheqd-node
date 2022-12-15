@@ -1,8 +1,6 @@
 package migrations
 
 import (
-	"fmt"
-
 	"github.com/cheqd/cheqd-node/app/migrations/helpers"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -13,9 +11,10 @@ func MigrateDidIndyStyle(sctx sdk.Context, mctx MigrationContext) error {
 	sctx.Logger().Debug("MigrateDidIndyStyle: Starting migration")
 
 	return MigrateDidSimple(sctx, mctx, func(didDocWithMetadata *didtypes.DidDocWithMetadata) {
+		sctx.Logger().Debug("MigrateDidIndyStyle: OldDID: " + didDocWithMetadata.DidDoc.Id)
 		// Migrate from old Indy style DIDs to new Indy DIDs
 		newDid := helpers.MigrateIndyStyleDid(didDocWithMetadata.DidDoc.Id)
-		sctx.Logger().Debug(fmt.Sprintf("New version of DIDDoc: %s", newDid))
 		didDocWithMetadata.ReplaceDids(didDocWithMetadata.DidDoc.Id, newDid)
+		sctx.Logger().Debug("MigrateDidIndyStyle: NewDID: " + didDocWithMetadata.DidDoc.Id)
 	})
 }
