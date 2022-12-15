@@ -458,7 +458,7 @@ class Installer():
             self.log("Bumping Cosmovisor")
             self.bump_cosmovisor()
 
-        if not self.interviewer.is_cosmo_needed:
+        if not self.interviewer.is_cosmo_needed and not self.interviewer.is_cosmovisor_bump_neded:
             self.log(f"Moving binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}")
             self.exec("sudo mv {} {}".format(self.binary_path, DEFAULT_INSTALL_PATH))
 
@@ -589,9 +589,8 @@ class Installer():
             self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis/bin"))
             self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "upgrades"))
             
-            if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)):
-                self.log(f"Moving Cosmovisor binary to installation directory")
-                shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
+            self.log(f"Moving Cosmovisor binary to installation directory")
+            shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
 
             if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
                 self.log(f"Creating symlink for current Cosmovisor version")
@@ -638,10 +637,13 @@ class Installer():
             self.remove_safe("CHANGELOG.md")
             self.remove_safe("README.md")
             self.remove_safe("LICENSE")
+            
+            # Get the current directory
+            pwd = os.getcwd()
 
             # move the new binary to installation directory
-            self.log(f"Moving Cosmovisor binary to installation directory")
-            shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
+            self.log(f"Copying Cosmovisor binary to installation directory")
+            shutil.copy(os.path.join(pwd, DEFAULT_COSMOVISOR_BINARY_NAME), os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
 
             if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
                 self.log(f"Creating symlink for current Cosmovisor version")
@@ -649,7 +651,7 @@ class Installer():
                         os.path.join(self.cosmovisor_root_dir, "current"))
 
             self.log(f"Moving binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
-            self.exec("sudo mv {} {}".format(self.binary_path, self.cosmovisor_cheqd_bin_path))
+            shutil.move(os.path.join(self.binary_path), os.path.join(self.cosmovisor_cheqd_bin_path))
             self.exec("sudo chown {} {}".format(f'{DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}', f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
             self.exec("sudo chmod +x {}".format(f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
 
@@ -672,7 +674,7 @@ class Installer():
             self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
             self.reload_cosmovisor_systemd()
         except:
-            failure_exit(f"Failed to setup Cosmovisor")
+            failure_exit(f"Failed to bump Cosmovisor")
 
     def set_env_vars(self, env_var_name, env_var_value):
         if not self.check_if_env_var_already_set(env_var_name) and not self.is_default_shell_fish():
@@ -806,7 +808,7 @@ class Interviewer:
                  chain=DEFAULT_CHAIN):
         self._home_dir = home_dir
         self._is_upgrade = False
-        self._is_cosmo_needed = True
+        self._is_cosmo_needed = False
         self._is_cosmovisor_bump_needed = False
         self._init_from_snapshot = False
         self._release = None
