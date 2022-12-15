@@ -60,7 +60,7 @@ cp ${SWAGGER_DIR}/swagger.yaml ${SWAGGER_DIR}/swagger-ui/
 sed -i.bak "s|https://petstore.swagger.io/v2/swagger.json|swagger.yaml|" ${SWAGGER_UI_DIR}/swagger-initializer.js
 
 # generate statik golang code using updated swagger-ui directory
-${BINDIR}/statik -src=${SWAGGER_DIR}/swagger-ui -dest=${SWAGGER_DIR} -f -m
+"${BINDIR}"/statik -src=${SWAGGER_DIR}/swagger-ui -dest=${SWAGGER_DIR} -f -m
 
 # log whether or not the swagger directory was updated
 if [ -n "$(git status ${SWAGGER_DIR} --porcelain)" ]; then
