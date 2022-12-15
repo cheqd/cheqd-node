@@ -656,9 +656,6 @@ class Installer():
                 self.log(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
                 os.symlink(self.cosmovisor_cheqd_bin_path,
                         os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
-                
-                self.exec("export PATH=\"/home/runner/.local/cheqd/.cheqdnode/cosmovisor/current/bin/:${PATH}\"")
-            
             
             if self.interviewer.is_upgrade and \
                 os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
