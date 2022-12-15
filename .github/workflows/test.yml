@@ -23,7 +23,12 @@ jobs:
       - name: "Fresh install"
         working-directory: ./installer
         run: |
-          sudo bash -c "python3 installer.py < answers.txt"
+          sudo bash -c "python3 installer.py < install-from-scratch.txt"
+
+      - name: "Upgrade existing installation"
+        working-directory: ./installer
+        run: |
+          sudo bash -c "python3 installer.py < upgrade-existing.txt"
 
       - name: Debugging with tmate
         if: ${{ failure() }}
