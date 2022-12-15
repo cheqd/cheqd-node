@@ -8,6 +8,7 @@ import datetime
 import os
 import subprocess
 import sys
+import urllib.error
 from pathlib import Path
 import urllib.request as request
 import json
@@ -236,6 +237,7 @@ class Installer():
     @property
     def cosmovisor_cheqd_bin_path(self):
         return os.path.join(self.cosmovisor_root_dir, f"current/bin/{DEFAULT_BINARY_NAME}")
+
     def log(self, msg):
         if self.verbose:
             print(f"{PRINT_PREFIX} {msg}")
@@ -366,21 +368,6 @@ class Installer():
 
             self.log("Reload systemd config")
             self.exec('systemctl daemon-reload')
-
-    def stop_cosmovisor_systemd(self, service_name):
-        if self.check_systemd_service_on(service_name):
-            self.log(f"Stopping systemd service: {service_name}")
-            self.exec(f"systemctl stop {service_name}")
-
-            self.log(f"Disable systemd service: {service_name}")
-            self.exec(f"systemctl disable {service_name}")
-
-            self.log("Reset failed systemd services (if any)")
-            self.exec("systemctl reset-failed")
-
-    def reload_cosmovisor_systemd(self):
-        self.log("Reload systemd config")
-        self.exec('systemctl daemon-reload')
 
     def setup_system_configs(self):
         if os.path.exists("/etc/rsyslog.d/"):
@@ -1076,11 +1063,11 @@ class Interviewer:
 
     def ask_for_log_level(self):
         self.log_level = self.ask(
-            f"Specify log level (error | info | debug)", default=DEFAULT_LOG_LEVEL)
+            f"Specify log level (trace|debug|info|warn|error|fatal|panic)", default=DEFAULT_LOG_LEVEL)
 
     def ask_for_log_format(self):
         self.log_format = self.ask(
-            f"Specify log format (plain | json)", default=DEFAULT_LOG_FORMAT)
+            f"Specify log format (json|plain)", default=DEFAULT_LOG_FORMAT)
 
     def prepare_url_for_latest(self) -> str:
         template = TESTNET_SNAPSHOT if self.chain == "testnet" else MAINNET_SNAPSHOT
