@@ -12,12 +12,9 @@ SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 # Set home directory
 WORKDIR /home/cheqd
 
-# Copy network configuration directory
-COPY --chown=cheqd:cheqd scripts/network-config /home/cheqd/network-config
-
 # Copy scripts
-COPY --chown=cheqd:cheqd docker/localnet/entrypoint.sh /bin/node-start
-COPY --chown=cheqd:cheqd scripts/import-keys.sh /bin/import-keys
+COPY docker/localnet/entrypoint.sh /bin/node-start
+COPY scripts/import-keys.sh /bin/import-keys
 
 # Make scripts executable
 RUN chmod +rx /bin/node-start \
@@ -25,6 +22,9 @@ RUN chmod +rx /bin/node-start \
 
 # Set user and group
 USER cheqd:cheqd
+
+# Copy network configuration directory
+COPY scripts/network-config /home/cheqd/network-config
 
 EXPOSE 26656 26657 26660 1317 9090 9091
 

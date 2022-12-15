@@ -11,7 +11,7 @@ services:
     image: ${BUILD_IMAGE}
     container_name: validator-0
     env_file:
-      - container-env/validator-0.env
+      - config/container-env/validator-0.env
     ports:
       - target: 26656
         published: 26656    # Tendermint peer-to-peer (P2P) port
@@ -32,6 +32,7 @@ services:
       timeout: 2s
       retries: 6
       start_period: 15s
+    restart: "no"
     volumes:
       - type: volume
         source: validator-0-data
@@ -64,7 +65,7 @@ services:
         source: validator-1-data
         target: /home/cheqd
     env_file:
-      - container-env/validator-1.env
+      - config/container-env/validator-1.env
     configs:
       - source: genesis
         target: /genesis
@@ -104,7 +105,7 @@ services:
         source: validator-2-data
         target: /home/cheqd
     env_file:
-      - container-env/validator-2.env
+      - config/container-env/validator-2.env
     configs:
       - source: genesis
         target: /genesis
@@ -144,7 +145,7 @@ services:
         source: validator-3-data
         target: /home/cheqd
     env_file:
-      - container-env/validator-3.env
+      - config/container-env/validator-3.env
     configs:
       - source: genesis
         target: /genesis
@@ -184,7 +185,7 @@ services:
         source: seed-0-data
         target: /home/cheqd
     env_file:
-      - container-env/seed-0.env
+      - config/container-env/seed-0.env
     configs:
       - source: genesis
         target: /genesis
@@ -222,7 +223,7 @@ services:
       retries: 6
       start_period: 15s
     env_file:
-      - container-env/observer-0.env
+      - config/container-env/observer-0.env
     configs:
       - source: genesis
         target: /genesis
@@ -232,6 +233,13 @@ services:
         target: /node_key
       - source: observer-0-priv-val-key
         target: /priv_validator_key
+
+
+configs:
+  # Accounts to import
+  import-accounts:
+    file: config/import-accounts.json
+
 
 volumes:
   validator-0-data:
