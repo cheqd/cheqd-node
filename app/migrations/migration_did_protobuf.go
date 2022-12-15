@@ -53,7 +53,7 @@ func MigrateDidProtobuf(sctx sdk.Context, mctx MigrationContext) error {
 	if didtypesv1.DidNamespaceKey != didtypes.DidNamespaceKey {
 		panic("DID namespace key is changed")
 	}
-	println("MigrateDidProtobuf: Migration finished")
+	sctx.Logger().Debug("MigrateDidProtobuf: Migration finished")
 
 	return nil
 }
