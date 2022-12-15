@@ -19,6 +19,9 @@ import shutil
 import signal
 import platform
 import copy
+import re
+import shutil
+
 
 ###############################################################
 ###     				Installer defaults    				###
@@ -93,8 +96,7 @@ def search_and_replace(search_text, replace_text, file_path):
                 data = file.read()
                 data = data.replace(line, replace_text)
             with open(file_path, 'w') as file:
-                file.write(data)    
-            
+                file.write(data)
     file.close()
 
 class Release:
@@ -184,7 +186,7 @@ class Installer():
                 f.read()
             )
         self.remove_safe(fname)
-        return s 
+        return s
 
     @property
     def logrotate_cfg(self):
@@ -265,7 +267,10 @@ class Installer():
         try:
             self.exec(f"wget -c {binary_url}")
             if fname.find(".tar.gz") != -1:
-                self.exec(f"tar -xzf {fname} -C . --strip-components=1")
+                if self.version.replace('v', '') >= '1.0.1':
+                    self.exec(f"tar -xzf {fname} -C .")
+                else:
+                    self.exec(f"tar -xzf {fname} -C . --strip-components=1")
                 self.remove_safe(fname)
             self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
         except:
@@ -542,10 +547,12 @@ class Installer():
             self.remove_safe("CHANGELOG.md")
             self.remove_safe("README.md")
             self.remove_safe("LICENSE")
+            
             self.mkdir_p(self.cosmovisor_root_dir)
             self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis"))
             self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis/bin"))
             self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "upgrades"))
+
             if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)):
                 self.log(f"Moving Cosmovisor binary to installation directory")
                 shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
@@ -1092,6 +1099,7 @@ class Interviewer:
             return True
         self.verbose = curr_verbose
         return False
+
 
 if __name__ == '__main__':
 
