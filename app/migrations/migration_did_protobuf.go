@@ -13,12 +13,14 @@ import (
 )
 
 func MigrateDidProtobuf(sctx sdk.Context, mctx MigrationContext) error {
+	println("Protobuf migration for dids. Start")
 	codec := NewLegacyProtoCodec()
 	store := sctx.KVStore(mctx.didStoreKey)
 
 	// Erase old broken count key
 	store.Delete([]byte(didtypesv1.DidCountKey + didtypesv1.DidCountKey))
 
+	println("Protobuf migration for dids. Read all keys")
 	didKeys := helpers.ReadAllKeys(store, didutils.StrBytes(didtypesv1.DidKey))
 
 	for _, didKey := range didKeys {
@@ -44,6 +46,7 @@ func MigrateDidProtobuf(sctx sdk.Context, mctx MigrationContext) error {
 	if didtypesv1.DidNamespaceKey != didtypes.DidNamespaceKey {
 		panic("DID namespace key is changed")
 	}
+	println("Protobuf migration for dids. End")
 
 	return nil
 }

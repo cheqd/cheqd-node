@@ -19,6 +19,8 @@ import shutil
 import signal
 import platform
 import copy
+import re
+import shutil
 
 ###############################################################
 ###     				Installer defaults    				###
@@ -36,8 +38,10 @@ PRINT_PREFIX = "********* "
 ###############################################################
 ###     				Cosmovisor Config      				###
 ###############################################################
-COSMOVISOR_BINARY_URL = "https://github.com/cosmos/cosmos-sdk/releases/download/cosmovisor%2Fv1.1.0/cosmovisor-v1.1.0-linux-amd64.tar.gz"
+DEFAULT_LATEST_COSMOVISOR_VERSION = "v1.2.0"
+COSMOVISOR_BINARY_URL = "https://github.com/cosmos/cosmos-sdk/releases/download/cosmovisor%2F{}/cosmovisor-{}-linux-{}.tar.gz"
 DEFAULT_USE_COSMOVISOR = "yes"
+DEFAULT_BUMP_COSMOVISOR = "yes"
 
 ###############################################################
 ###     				Systemd Config      				###
@@ -234,7 +238,23 @@ class Installer():
     @property
     def cosmovisor_cheqd_bin_path(self):
         return os.path.join(self.cosmovisor_root_dir, f"current/bin/{DEFAULT_BINARY_NAME}")
+    
+    @property
+    def cosmovisor_download_url(self):
+        return COSMOVISOR_BINARY_URL.format(DEFAULT_LATEST_COSMOVISOR_VERSION, DEFAULT_LATEST_COSMOVISOR_VERSION, self.os_arch)
 
+    @property
+    def os_arch(self):
+        return self.get_os_arch()
+
+    def get_os_arch(self):
+        OS_ARCH = platform.machine()
+        if OS_ARCH == 'x86_64':
+            OS_ARCH = 'amd64'
+        else:
+            OS_ARCH = 'arm64'
+        return OS_ARCH
+    
     def log(self, msg):
         if self.verbose:
             print(f"{PRINT_PREFIX} {msg}")
@@ -262,12 +282,15 @@ class Installer():
         try:
             self.exec(f"wget -c {binary_url}")
             if fname.find(".tar.gz") != -1:
-                self.exec(f"tar -xzf {fname} -C . --strip-components=1")
+                if self.version.replace('v', '') >= '1.0.1':
+                    self.exec(f"tar -xzf {fname} -C .")
+                else:
+                    self.exec(f"tar -xzf {fname} -C . --strip-components=1")
                 self.remove_safe(fname)
             self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
         except:
             failure_exit("Failed to download binary")
-
+        
     def is_user_exists(self, username) -> bool:
         try:
             pwd.getpwnam(username)
@@ -368,6 +391,21 @@ class Installer():
             self.log("Reload systemd config")
             self.exec('systemctl daemon-reload')
 
+    def stop_cosmovisor_systemd(self, service_name):
+        if self.check_systemd_service_on(service_name):
+            self.log(f"Stopping systemd service: {service_name}")
+            self.exec(f"systemctl stop {service_name}")
+
+            self.log(f"Disable systemd service: {service_name}")
+            self.exec(f"systemctl disable {service_name}")
+
+            self.log("Reset failed systemd services (if any)")
+            self.exec("systemctl reset-failed")
+
+    def reload_cosmovisor_systemd(self):
+        self.log("Reload systemd config")
+        self.exec('systemctl daemon-reload')
+    
     def setup_system_configs(self):
         if os.path.exists("/etc/rsyslog.d/"):
             if not os.path.exists(DEFAULT_RSYSLOG_FILE) or self.interviewer.rewrite_rsyslog:
@@ -414,6 +452,10 @@ class Installer():
         if self.interviewer.is_cosmo_needed:
             self.log("Setting up Cosmovisor")
             self.setup_cosmovisor()
+        
+        if self.interviewer.is_cosmovisor_bump_needed:
+            self.log("Bumping Cosmovisor")
+            self.bump_cosmovisor()
 
         if not self.interviewer.is_cosmo_needed:
             self.log(f"Moving binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}")
@@ -530,24 +572,75 @@ class Installer():
         except:
             failure_exit(f"Failed to setup {self.cheqd_log_dir} directory")
 
+    
     def setup_cosmovisor(self):
         try:
-            fname= os.path.basename(COSMOVISOR_BINARY_URL)
-            self.exec(f"wget -c {COSMOVISOR_BINARY_URL}")
-            self.exec(f"tar -xzf {fname}")
+            fname = self.download_and_unzip(self.cosmovisor_download_url)
             self.remove_safe(fname)
-            
+
             # Remove cosmovisor artifacts...
             self.remove_safe("CHANGELOG.md")
             self.remove_safe("README.md")
             self.remove_safe("LICENSE")
+            
             self.mkdir_p(self.cosmovisor_root_dir)
             self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis"))
             self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis/bin"))
             self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "upgrades"))
+            
             if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)):
                 self.log(f"Moving Cosmovisor binary to installation directory")
                 shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
+
+            if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
+                self.log(f"Creating symlink for current Cosmovisor version")
+                os.symlink(os.path.join(self.cosmovisor_root_dir, "genesis"),
+                        os.path.join(self.cosmovisor_root_dir, "current"))
+
+            self.log(f"Moving binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
+            self.exec("sudo mv {} {}".format(self.binary_path, self.cosmovisor_cheqd_bin_path))
+            self.exec("sudo chown {} {}".format(f'{DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}', f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
+            self.exec("sudo chmod +x {}".format(f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
+            if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
+                self.log(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
+                os.symlink(self.cosmovisor_cheqd_bin_path,
+                        os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+            
+            
+            if self.interviewer.is_upgrade and \
+                os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
+
+                self.log(f"Copying upgrade-info.json file to cosmovisor/current/")
+                shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
+                            os.path.join(self.cosmovisor_root_dir, "current"))
+                self.log(f"Changing owner to {DEFAULT_CHEQD_USER} user")
+                self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
+        
+            self.log(f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
+            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
+            
+            # set Cosmovisor vars
+            self.set_env_vars("DAEMON_NAME","cheqd-noded")
+            self.set_env_vars("DAEMON_HOME",f"{self.interviewer.home_dir}/.cheqdnode")
+            self.set_env_vars("DAEMON_DATA_BACKUP_DIR",f"{self.interviewer.home_dir}/.cheqdnode")
+        except:
+            failure_exit(f"Failed to setup Cosmovisor")
+    
+    def bump_cosmovisor(self):
+        try:
+            self.stop_cosmovisor_systemd(DEFAULT_COSMOVISOR_SERVICE_NAME)
+
+            fname = self.download_and_unzip(self.cosmovisor_download_url)
+            self.remove_safe(fname)
+    
+            # Remove cosmovisor artifacts...
+            self.remove_safe("CHANGELOG.md")
+            self.remove_safe("README.md")
+            self.remove_safe("LICENSE")
+
+            # move the new binary to installation directory
+            self.log(f"Moving Cosmovisor binary to installation directory")
+            shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
 
             if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
                 self.log(f"Creating symlink for current Cosmovisor version")
@@ -563,7 +656,8 @@ class Installer():
                 self.log(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
                 os.symlink(self.cosmovisor_cheqd_bin_path,
                         os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
-
+            
+            
             if self.interviewer.is_upgrade and \
                 os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
 
@@ -575,8 +669,56 @@ class Installer():
         
             self.log(f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
             self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
+            self.reload_cosmovisor_systemd()
         except:
             failure_exit(f"Failed to setup Cosmovisor")
+
+    def set_env_vars(self, env_var_name, env_var_value):
+        if not self.check_if_env_var_already_set(env_var_name) and not self.is_default_shell_fish():
+            self.write_to_bashrc(env_var_name, env_var_value) # write to current user
+            self.write_to_bashrc(env_var_name, env_var_value, True) # write to cheqd user .bashrc
+        elif not self.check_if_env_var_already_set(env_var_name) and self.is_default_shell_fish():
+            self.exec(f'set -Uxg {env_var_name} {env_var_value}')
+        else:
+            self.log(f"ENV var {env_var_name} already set")
+
+    def write_to_bashrc(self, env_var_name, env_var_value, is_user_cheqd=False):
+        try:
+            current_user_bashrc_path = os.path.expanduser("~/.bashrc")
+            if is_user_cheqd:
+                current_user_bashrc_path = f'{self.interviewer.home_dir}/.bashrc' # because user might change default home dir path which is /home/cheqd
+            with open(current_user_bashrc_path, "a") as current_user_bashrc_file:
+                current_user_bashrc_file.write(f"export {env_var_name}={env_var_value}\n")
+        except:
+            if is_user_cheqd:
+                failure_exit("Unable to set ENV vars for cheqd user")
+            else:
+                failure_exit("Unable to set ENV vars for Current user")
+        finally:
+            current_user_bashrc_file.close()
+
+    def check_if_env_var_already_set(self, env_var_name):
+        try:
+            os.environ[env_var_name]
+            return True
+        except KeyError:
+            return False
+
+    def is_default_shell_fish(self):
+        try: 
+            default_shell = os.getenv("SHELL")
+            if default_shell == "/usr/bin/fish":
+                return True
+            else:
+                return False
+        except KeyError:
+            failure_exit("Unable to get the default shell")
+
+    def download_and_unzip(self, download_url):
+        fname= os.path.basename(download_url)
+        self.exec(f"wget -c {download_url}")
+        self.exec(f"tar -xzf {fname}")
+        return fname
 
     def compare_checksum(self, file_path):
         # Set URL for correct checksum file for snapshot
@@ -664,6 +806,7 @@ class Interviewer:
         self._home_dir = home_dir
         self._is_upgrade = False
         self._is_cosmo_needed = True
+        self._is_cosmovisor_bump_needed = False
         self._init_from_snapshot = False
         self._release = None
         self._chain = chain
@@ -727,6 +870,10 @@ class Interviewer:
     @property
     def is_cosmo_needed(self) -> bool:
         return self._is_cosmo_needed
+    
+    @property
+    def is_cosmovisor_bump_needed(self) -> bool:
+        return self._is_cosmovisor_bump_needed
 
     @property
     def init_from_snapshot(self) -> bool:
@@ -807,6 +954,10 @@ class Interviewer:
     @is_cosmo_needed.setter
     def is_cosmo_needed(self, icn):
         self._is_cosmo_needed = icn
+    
+    @is_cosmovisor_bump_needed.setter
+    def is_cosmovisor_bump_needed(self, icn):
+        self._is_cosmovisor_bump_needed = icn
 
     @init_from_snapshot.setter
     def init_from_snapshot(self, ifs):
@@ -908,6 +1059,30 @@ class Interviewer:
                 copy_r_list.pop(i)
                 return copy_r_list
 
+    def is_cosmovisor_already_installed(self) -> bool:
+        command = 'cosmovisor'
+        if shutil.which(command) is not None:
+            return True
+        else:
+            return False
+
+    def what_cosmovisor_version(self) -> str:
+        try:
+            file_path = './temp.txt'
+            self.exec(f"cosmovisor version | tee {file_path}")
+            file = open(file_path, "r")
+            cosmovisor_version = None
+            for line in file:
+                first_line = str(line)
+                cosmovisor_version = re.search(r'(\d+)(\.\d+)?(\.\d+)?$', first_line).group()
+                break
+            return cosmovisor_version
+        except:
+            failure_exit("Error when getting Cosmovisor version")
+        finally:
+            file.close()
+            os.remove(file_path)
+        
     def ask_for_version(self):
         default = self.get_latest_release()
         all_releases = self.get_releases()
@@ -991,6 +1166,15 @@ class Interviewer:
             self.is_cosmo_needed = True
         elif answer.lower().startswith("n"):
             self.is_cosmo_needed = False
+        else:
+            failure_exit(f"Invalid input provided during installation.")
+    
+    def ask_for_cosmovisor_bump(self):
+        answer = self.ask(f"Do you want to bump your Cosmovisor to {DEFAULT_LATEST_COSMOVISOR_VERSION} ? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
+        if answer.lower().startswith("y"):
+            self.is_cosmovisor_bump_needed = True
+        elif answer.lower().startswith("n"):
+            self.is_cosmovisor_bump_needed = False
         else:
             failure_exit(f"Invalid input provided during installation.")
 
@@ -1093,6 +1277,7 @@ class Interviewer:
         self.verbose = curr_verbose
         return False
 
+
 if __name__ == '__main__':
     
     # Steps to execute if installing from scratch
@@ -1113,7 +1298,14 @@ if __name__ == '__main__':
 
     # Steps to execute if upgrading existing node
     def upgrade_steps():
-        interviewer.ask_for_cosmovisor()
+        # if cosmovisor is installed 
+        if interviewer.is_cosmovisor_already_installed():
+            cosm_version = interviewer.what_cosmovisor_version()
+            if cosm_version < DEFAULT_LATEST_COSMOVISOR_VERSION.replace("v",""):
+                print(f"Your current Cosmovisor version is v{cosm_version}")
+                interviewer.ask_for_cosmovisor_bump()
+        else:
+            interviewer.ask_for_cosmovisor()     
         if interviewer.is_systemd_config_exists():
             interviewer.ask_for_rewrite_systemd()
         if os.path.exists(DEFAULT_RSYSLOG_FILE):
@@ -1154,3 +1346,4 @@ if __name__ == '__main__':
         installer.install()
     except:
         failure_exit("Unable to install cheqd-node.")
+

@@ -8,6 +8,7 @@ import (
 
 // This migration should be run after protobuf that's why we use new DidDocWithMetadata
 func MigrateDidIndyStyle(sctx sdk.Context, mctx MigrationContext) error {
+	println("Indy style migration for dids")
 	return MigrateDidSimple(sctx, mctx, func(didDocWithMetadata *didtypes.DidDocWithMetadata) {
 		// Migrate all dids, make them indy style
 		newDid := helpers.MigrateIndyStyleDid(didDocWithMetadata.DidDoc.Id)
