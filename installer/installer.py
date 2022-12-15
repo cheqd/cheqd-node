@@ -116,8 +116,9 @@ class Release:
                 if os.path.basename(_url) == f"cheqd-noded-{version_without_v_prefix}-{os_name}-{os_arch}.tar.gz" or \
                     os.path.basename(_url) == "cheqd-noded":
                     return _url      
-
-            failure_exit(f"No asset found to download for release: {self.version}")
+         
+            else:
+                failure_exit(f"No asset found to download for release: {self.version}")
         except:
             failure_exit(f"Failed to get cheqd-node binaries from Github")
 
