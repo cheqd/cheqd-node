@@ -10,7 +10,7 @@ func MigrateDidSimple(sctx sdk.Context, mctx MigrationContext, apply func(didDoc
 
 	store := sctx.KVStore(mctx.didStoreKey)
 
-	sctx.Logger().Debug("MigrateDidSimple: Reseting counter")
+	sctx.Logger().Debug("MigrateDidSimple: Resetting counter")
 	// Reset counter
 	mctx.didKeeperNew.SetDidDocCount(&sctx, 0)
 
@@ -27,7 +27,7 @@ func MigrateDidSimple(sctx sdk.Context, mctx MigrationContext, apply func(didDoc
 	// and writing new values because there is only one version of each diddoc in the store
 	for _, version := range allDidDocVersions {
 
-		sctx.Logger().Debug("MigrateDidSimple: Starting migration for diddoc: " + version.DidDoc.Id)
+		sctx.Logger().Debug("MigrateDidSimple: Starting migration for DIDDoc: " + version.DidDoc.Id)
 
 		// Remove last version pointer
 		latestVersionKey := didtypes.GetLatestDidDocVersionKey(version.DidDoc.Id)
@@ -45,7 +45,7 @@ func MigrateDidSimple(sctx sdk.Context, mctx MigrationContext, apply func(didDoc
 		if err != nil {
 			return err
 		}
-		sctx.Logger().Debug("MigrateDidSimple: Migration finished for diddoc: " + version.DidDoc.Id)
+		sctx.Logger().Debug("MigrateDidSimple: Migration finished for DIDDoc: " + version.DidDoc.Id)
 	}
 	sctx.Logger().Debug("MigrateDidSimple: Migration finished")
 

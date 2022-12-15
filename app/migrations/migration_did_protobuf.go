@@ -18,20 +18,21 @@ func MigrateDidProtobuf(sctx sdk.Context, mctx MigrationContext) error {
 	codec := NewLegacyProtoCodec()
 	store := sctx.KVStore(mctx.didStoreKey)
 
-	sctx.Logger().Debug("MigrateDidProtobuf: Erasing old broken count key")
+	sctx.Logger().Debug("MigrateDidProtobuf: Erasing old count key")
 	// Erase old broken count key
 	store.Delete([]byte(didtypesv1.DidCountKey + didtypesv1.DidCountKey))
 
+	sctx.Logger().Debug("MigrateResourceProtobuf: Reading all keys")
 	didKeys := helpers.ReadAllKeys(store, didutils.StrBytes(didtypesv1.DidKey))
 
 	for _, didKey := range didKeys {
 		sctx.Logger().Debug("MigrateDidProtobuf: Starting migration for didKey: " + string(didKey))
 
 		var stateValue didtypesv1.StateValue
-		sctx.Logger().Debug("MigrateDidProtobuf: Reading Statevalue with did from store")
+		sctx.Logger().Debug("MigrateDidProtobuf: Reading StateValue of DID from store")
 		codec.MustUnmarshal(store.Get(didKey), &stateValue)
 
-		sctx.Logger().Debug("MigrateDidProtobuf: Migrating Statevalue with did to DidDocWithMetadata")
+		sctx.Logger().Debug("MigrateDidProtobuf: Migrating StateValue for DidDocWithMetadata")
 		newDidDocWithMetadata, err := MigrateStateValue(sctx, mctx, &stateValue)
 		if err != nil {
 			return err
