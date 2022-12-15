@@ -78,21 +78,3 @@ jobs:
         with:
           name: cheqd-node-build.tar
           path: /tmp/cheqd-node-build.tar
-
-  interactive-installer:
-    name: "Interactive Installer"
-    runs-on: ubuntu-20.04
-  
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: "Test interactive installer"
-        working-directory: ./installer
-        run: |
-          sudo bash -c "python3 installer.py < answers.txt"
-
-      - name: Debugging with tmate
-        if: ${{ failure() }}
-        uses: mxschmitt/action-tmate@v3.13
-        with:
-          timeout-minutes: 15
