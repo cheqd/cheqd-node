@@ -283,10 +283,10 @@ class Installer():
         try:
             self.exec(f"wget -c {binary_url}")
             if fname.find(".tar.gz") != -1:
-                if self.version.replace('v', '') >= '1.0.1':
-                    self.exec(f"tar -xzf {fname} -C .")
-                else:
+                if self.version.replace('v', '') == '0.6.9':
                     self.exec(f"tar -xzf {fname} -C . --strip-components=1")
+                else:
+                    self.exec(f"tar -xzf {fname} -C .")
                 self.remove_safe(fname)
             self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
         except:
@@ -331,7 +331,9 @@ class Installer():
                 self.mkdir_p(self.cheqd_root_dir)
 
                 self.log(f"Setting directory permissions to default cheqd user: {DEFAULT_CHEQD_USER}")
-                self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.interviewer.home_dir}")
+                shutil.chown(self.interviewer.home_dir,
+                DEFAULT_CHEQD_USER,
+                DEFAULT_CHEQD_USER)
             else:
                 self.log(f"Skipping main directory creation because {self.cheqd_root_dir} already exists")
 
@@ -458,9 +460,13 @@ class Installer():
             self.log("Bumping Cosmovisor")
             self.bump_cosmovisor()
 
-        if not self.interviewer.is_cosmo_needed and not self.interviewer.is_cosmovisor_bump_neded:
+        if not self.interviewer.is_cosmo_needed and not self.interviewer.is_cosmovisor_bump_needed:
             self.log(f"Moving binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}")
-            self.exec("sudo mv {} {}".format(self.binary_path, DEFAULT_INSTALL_PATH))
+            shutil.chown(self.binary_path,
+                DEFAULT_CHEQD_USER,
+                DEFAULT_CHEQD_USER)
+            shutil.move(self.binary_path, os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+            self.post_install()
 
         if self.interviewer.is_setup_needed:
             self.post_install()
@@ -569,7 +575,9 @@ class Installer():
             self.mkdir_p(self.cheqd_log_dir)
             Path(os.path.join(self.cheqd_log_dir, "stdout.log")).touch()
             self.log(f"Setting up ownership permissions for {self.cheqd_log_dir} directory")
-            self.exec(f"chown -R syslog:cheqd {self.cheqd_log_dir}")
+            shutil.chown(self.cheqd_log_dir,
+                'syslog',
+                DEFAULT_CHEQD_USER)
         except:
             failure_exit(f"Failed to setup {self.cheqd_log_dir} directory")
 
@@ -599,7 +607,9 @@ class Installer():
 
             self.log(f"Moving binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
             self.exec("sudo mv {} {}".format(self.binary_path, self.cosmovisor_cheqd_bin_path))
-            self.exec("sudo chown {} {}".format(f'{DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}', f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
+            shutil.chown(os.path.join(DEFAULT_INSTALL_PATH,DEFAULT_COSMOVISOR_BINARY_NAME),
+                DEFAULT_CHEQD_USER,
+                DEFAULT_CHEQD_USER)
             self.exec("sudo chmod +x {}".format(f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
             if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
                 self.log(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
@@ -614,10 +624,14 @@ class Installer():
                 shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
                             os.path.join(self.cosmovisor_root_dir, "current"))
                 self.log(f"Changing owner to {DEFAULT_CHEQD_USER} user")
-                self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
+                shutil.chown(self.cosmovisor_root_dir,
+                    DEFAULT_CHEQD_USER,
+                    DEFAULT_CHEQD_USER)
         
             self.log(f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
-            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
+            shutil.chown(self.cosmovisor_root_dir,
+                    DEFAULT_CHEQD_USER,
+                    DEFAULT_CHEQD_USER)
             
             # set Cosmovisor vars
             self.set_env_vars("DAEMON_NAME","cheqd-noded")
@@ -642,8 +656,8 @@ class Installer():
             pwd = os.getcwd()
 
             # move the new binary to installation directory
-            self.log(f"Copying Cosmovisor binary to installation directory")
-            shutil.copy(os.path.join(pwd, DEFAULT_COSMOVISOR_BINARY_NAME), os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
+            self.log(f"Moving Cosmovisor binary to installation directory")
+            shutil.move(os.path.join(pwd, DEFAULT_COSMOVISOR_BINARY_NAME), os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
 
             if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
                 self.log(f"Creating symlink for current Cosmovisor version")
@@ -651,15 +665,17 @@ class Installer():
                         os.path.join(self.cosmovisor_root_dir, "current"))
 
             self.log(f"Moving binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
-            shutil.move(os.path.join(self.binary_path), os.path.join(self.cosmovisor_cheqd_bin_path))
-            self.exec("sudo chown {} {}".format(f'{DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}', f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
+            shutil.move(os.path.join(pwd, self.binary_path), os.path.join(self.cosmovisor_cheqd_bin_path))
+            shutil.chown(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME),
+                    DEFAULT_CHEQD_USER,
+                    DEFAULT_CHEQD_USER)
             self.exec("sudo chmod +x {}".format(f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
 
             if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
                 self.log(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
                 os.symlink(self.cosmovisor_cheqd_bin_path,
                         os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
-            
+
             
             if self.interviewer.is_upgrade and \
                 os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
@@ -668,10 +684,14 @@ class Installer():
                 shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
                             os.path.join(self.cosmovisor_root_dir, "current"))
                 self.log(f"Changing owner to {DEFAULT_CHEQD_USER} user")
-                self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
+                shutil.chown(self.cosmovisor_root_dir,
+                    DEFAULT_CHEQD_USER,
+                    DEFAULT_CHEQD_USER)
         
             self.log(f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
-            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
+            shutil.chown(self.cosmovisor_root_dir,
+                    DEFAULT_CHEQD_USER,
+                    DEFAULT_CHEQD_USER)
             self.reload_cosmovisor_systemd()
         except:
             failure_exit(f"Failed to bump Cosmovisor")
@@ -752,7 +772,9 @@ class Installer():
         try:
             archive_name = os.path.basename(self.interviewer.snapshot_url)
             self.mkdir_p(self.cheqd_data_dir)
-            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_data_dir}")
+            shutil.chown(self.cheqd_data_dir,
+                    DEFAULT_CHEQD_USER,
+                    DEFAULT_CHEQD_USER)
             # Fetch size of snapshot archive. Uses curl to fetch headers and looks for Content-Length.
             archive_size = self.exec(f"curl -s --head {self.interviewer.snapshot_url} | awk '/content-length/ {{print $2}}'").stdout.strip()
             # Check how much free disk space is available wherever the cheqd root directory is mounted
@@ -793,8 +815,12 @@ class Installer():
                     shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
                                 os.path.join(self.cosmovisor_root_dir, "current"))
                 self.log(f"Changing owner to {DEFAULT_CHEQD_USER} user")
-                self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
-            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_data_dir}")
+                shutil.chown(self.cosmovisor_root_dir,
+                    DEFAULT_CHEQD_USER,
+                    DEFAULT_CHEQD_USER)
+            shutil.chown(self.cheqd_data_dir,
+                    DEFAULT_CHEQD_USER,
+                    DEFAULT_CHEQD_USER)
         except:
             failure_exit(f"Failed to extract snapshot")
 
