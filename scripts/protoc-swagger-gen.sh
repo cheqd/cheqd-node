@@ -3,7 +3,8 @@
 set -euox pipefail
 
 # export go bin path 
-export PATH=$PATH:$(go env GOPATH)/bin
+export PATH
+${PATH}=$PATH:$(go env GOPATH)/bin
 
 SWAGGER_DIR=./client/docs
 SWAGGER_UI_DIR=${SWAGGER_DIR}/swagger-ui
