@@ -13,21 +13,27 @@ import (
 )
 
 func MigrateDidProtobuf(sctx sdk.Context, mctx MigrationContext) error {
-	println("Protobuf migration for dids. Start")
+	sctx.Logger().Debug("MigrateDidProtobuf: Starting migration")
+
 	codec := NewLegacyProtoCodec()
 	store := sctx.KVStore(mctx.didStoreKey)
 
+	sctx.Logger().Debug("MigrateDidProtobuf: Erasing old count key")
 	// Erase old broken count key
 	store.Delete([]byte(didtypesv1.DidCountKey + didtypesv1.DidCountKey))
 
-	println("Protobuf migration for dids. Read all keys")
+	sctx.Logger().Debug("MigrateResourceProtobuf: Reading all keys")
 	didKeys := helpers.ReadAllKeys(store, didutils.StrBytes(didtypesv1.DidKey))
 
 	for _, didKey := range didKeys {
+		sctx.Logger().Debug("MigrateDidProtobuf: Starting migration for didKey: " + string(didKey))
+
 		var stateValue didtypesv1.StateValue
+		sctx.Logger().Debug("MigrateDidProtobuf: Reading StateValue of DID from store")
 		codec.MustUnmarshal(store.Get(didKey), &stateValue)
 
-		newDidDocWithMetadata, err := MigrateStateValue(&stateValue)
+		sctx.Logger().Debug("MigrateDidProtobuf: Migrating StateValue for DidDocWithMetadata")
+		newDidDocWithMetadata, err := MigrateStateValue(sctx, mctx, &stateValue)
 		if err != nil {
 			return err
 		}
@@ -35,18 +41,20 @@ func MigrateDidProtobuf(sctx sdk.Context, mctx MigrationContext) error {
 		// Remove old DID Doc
 		store.Delete(didKey)
 
+		sctx.Logger().Debug("MigrateDidProtobuf: Setting DidDocWithMetadata to store")
 		// Set new DID Doc
 		err = mctx.didKeeperNew.AddNewDidDocVersion(&sctx, &newDidDocWithMetadata)
 		if err != nil {
 			return err
 		}
+		sctx.Logger().Debug("MigrateDidProtobuf: Migration finished for didKey: " + string(didKey))
 	}
 
 	// Migrate DID namespace (at least make sure it's not changed)
 	if didtypesv1.DidNamespaceKey != didtypes.DidNamespaceKey {
 		panic("DID namespace key is changed")
 	}
-	println("Protobuf migration for dids. End")
+	sctx.Logger().Debug("MigrateDidProtobuf: Migration finished")
 
 	return nil
 }
@@ -60,7 +68,7 @@ func NewLegacyProtoCodec() *codec.ProtoCodec {
 	return codec.NewProtoCodec(ir)
 }
 
-func MigrateStateValue(stateValue *didtypesv1.StateValue) (didtypes.DidDocWithMetadata, error) {
+func MigrateStateValue(sctx sdk.Context, mctx MigrationContext, stateValue *didtypesv1.StateValue) (didtypes.DidDocWithMetadata, error) {
 	oldDidDoc, err := stateValue.UnpackDataAsDid()
 	if err != nil {
 		return didtypes.DidDocWithMetadata{}, err
@@ -68,8 +76,10 @@ func MigrateStateValue(stateValue *didtypesv1.StateValue) (didtypes.DidDocWithMe
 
 	oldMetadata := stateValue.Metadata
 
+	sctx.Logger().Debug("MigrateDidProtobuf: OldMetadata: " + string(mctx.codec.MustMarshalJSON(oldMetadata)))
 	newDidDoc := MigrateDidDoc(oldDidDoc)
 	newMetadata := MigrateMetadata(oldMetadata)
+	sctx.Logger().Debug("MigrateDidProtobuf: NewMetadata: " + string(mctx.codec.MustMarshalJSON(&newMetadata)))
 
 	return didtypes.DidDocWithMetadata{
 		DidDoc:   &newDidDoc,
