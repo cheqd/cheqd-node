@@ -34,7 +34,7 @@ npm list -g | grep swagger-combine > /dev/null || npm install -g swagger-combine
 # combine swagger files
 # uses nodejs package `swagger-combine`.
 # all the individual swagger files need to be configured in `config.json` for merging
-swagger-combine ${SWAGGER_DIR}/config.json -o ${SWAGGER_DIR}/swagger.yaml -f yaml --continueOnConflictingPaths true --includeDefinitions true
+swagger-combine ${SWAGGER_DIR}/config.json -o ${SWAGGER_DIR}/swagger.json -f json --continueOnConflictingPaths true --includeDefinitions true
 
 # clean swagger files
 rm -rf ./tmp-swagger-gen
