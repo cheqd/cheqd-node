@@ -648,13 +648,10 @@ class Installer():
             self.remove_safe("CHANGELOG.md")
             self.remove_safe("README.md")
             self.remove_safe("LICENSE")
-            
-            # Get the current directory
-            pwd = os.getcwd()
 
             # move the new binary to installation directory
             self.log(f"Moving Cosmovisor binary to installation directory")
-            shutil.move(os.path.join(pwd, DEFAULT_COSMOVISOR_BINARY_NAME), os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
+            shutil.move(os.path.join(os.path.realpath(os.path.curdir), DEFAULT_COSMOVISOR_BINARY_NAME), os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
 
             if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
                 self.log(f"Creating symlink for current Cosmovisor version")
@@ -662,7 +659,7 @@ class Installer():
                         os.path.join(self.cosmovisor_root_dir, "current"))
 
             self.log(f"Moving binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
-            shutil.move(os.path.join(pwd, self.binary_path), os.path.join(self.cosmovisor_cheqd_bin_path))
+            shutil.move(os.path.join(os.path.realpath(os.path.curdir), self.binary_path), os.path.join(self.cosmovisor_cheqd_bin_path))
             shutil.chown(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME),
                     DEFAULT_CHEQD_USER,
                     DEFAULT_CHEQD_USER)
