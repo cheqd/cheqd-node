@@ -20,6 +20,11 @@ jobs:
           go-version-file: ./go.mod
           cache: true
 
+      - name: Install statik
+        working-directory: ./..
+        run: |
+          go get github.com/rakyll/statik
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v3
         with:
