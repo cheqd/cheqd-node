@@ -2,6 +2,8 @@ package types
 
 import (
 	"fmt"
+
+	"github.com/cosmos/cosmos-sdk/codec/types"
 )
 
 const DefaultDidNamespace = "testnet"
@@ -12,6 +14,16 @@ func DefaultGenesis() *GenesisState {
 		DidList:      []*StateValue{},
 		DidNamespace: DefaultDidNamespace,
 	}
+}
+
+func (gs *GenesisState) UnpackInterfaces(unpacker types.AnyUnpacker) error {
+	for _, elem := range gs.DidList {
+		err := elem.UnpackInterfaces(unpacker)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // Validate performs basic genesis state validation returning an error upon any

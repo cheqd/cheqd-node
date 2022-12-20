@@ -11,16 +11,15 @@ import (
 // InitGenesis initializes the cheqd module's state from a provided genesis
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
+	// Set did namespace
+	ctx.Logger().Info("Setting did namespace to: " + genState.DidNamespace)
+	k.SetDidNamespace(&ctx, genState.DidNamespace)
+
 	for _, elem := range genState.DidList {
 		if err := k.SetDid(&ctx, elem); err != nil {
 			panic(fmt.Sprintf("Cannot set did case: %s", err.Error()))
 		}
 	}
-
-	// Set nym count
-	k.SetDidCount(&ctx, uint64(len(genState.DidList)))
-
-	k.SetDidNamespace(&ctx, genState.DidNamespace)
 }
 
 // ExportGenesis returns the cheqd module's exported genesis.
