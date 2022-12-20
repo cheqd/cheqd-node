@@ -54,7 +54,7 @@ if [ ! -d ${SWAGGER_UI_DIR} ]; then
 fi
 
 # move generated swagger yaml file to swagger-ui directory
-cp ${SWAGGER_DIR}/swagger.json ${SWAGGER_DIR}/swagger-ui/
+mv ${SWAGGER_DIR}/swagger.json ${SWAGGER_DIR}/swagger-ui/
 
 # update swagger initializer to default to swagger.json
 # Note: using -i.bak makes this compatible with both GNU and BSD/Mac
