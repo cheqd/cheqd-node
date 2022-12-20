@@ -5,6 +5,11 @@
     "description": "A REST interface for state queries",
     "version": "1.0.0"
   },
+  "host": "api.cheqd.net",
+  "basePath": "/",
+  "schemes": [
+    "https"
+  ],
   "paths": {
     "/cheqd/did/v2/{id}": {
       "get": {
