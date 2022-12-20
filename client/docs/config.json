@@ -7,10 +7,20 @@
     },
     "apis": [
       {
-        "url": "./tmp-swagger-gen/cheqd/did/v2/query.swagger.json"
+        "url": "./tmp-swagger-gen/cheqd/did/v2/query.swagger.json",
+        "tags": {
+          "rename": {
+            "Query": "DID"
+          }
+        }
       },
       {
-        "url": "./tmp-swagger-gen/cheqd/resource/v2/query.swagger.json"
+        "url": "./tmp-swagger-gen/cheqd/resource/v2/query.swagger.json",
+        "tags": {
+          "rename": {
+            "Query": "Resource"
+          }
+        }
       }
     ]
 
