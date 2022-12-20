@@ -8,18 +8,25 @@ import "google/api/annotations.proto";
 option go_package = "github.com/cheqd/cheqd-node/x/did/types";
 
 service Query {
+  
+  // returns DID Doc for a for a given DID
   rpc DidDoc(QueryGetDidDocRequest) returns (QueryGetDidDocResponse) {
     option (google.api.http).get = "/cheqd/did/v2/{id}";
   }
+
+  // returns specific version of DID Document 
   rpc DidDocVersion(QueryGetDidDocVersionRequest) returns (QueryGetDidDocVersionResponse) {
     option (google.api.http).get = "/cheqd/did/v2/{id}/version/{version}";
   }
+
+  // returns a metadata for all versions of a given DID Doc
   rpc AllDidDocVersionsMetadata(QueryGetAllDidDocVersionsMetadataRequest) returns (QueryGetAllDidDocVersionsMetadataResponse) {
     option (google.api.http).get = "/cheqd/did/v2/{id}/metadata";
   }
 }
 
 message QueryGetDidDocRequest {
+  // is a DID to be fetched
   string id = 1;
 }
 
@@ -28,7 +35,9 @@ message QueryGetDidDocResponse {
 }
 
 message QueryGetDidDocVersionRequest {
+  // is a DID
   string id = 1;
+  // is a unique value that maps DID Doc state at specific time
   string version = 2;
 }
 
@@ -37,6 +46,7 @@ message QueryGetDidDocVersionResponse {
 }
 
 message QueryGetAllDidDocVersionsMetadataRequest {
+  // is a DID
   string id = 1;
 }
 
