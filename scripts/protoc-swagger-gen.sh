@@ -57,6 +57,9 @@ mv ${SWAGGER_DIR}/swagger.json ${SWAGGER_DIR}/swagger-ui/
 # Note: using -i.bak makes this compatible with both GNU and BSD/Mac
 sed -i.bak "s|https://petstore.swagger.io/v2/swagger.json|swagger.json|" ${SWAGGER_UI_DIR}/swagger-initializer.js
 
+# install statik
+go install github.com/rakyll/statik@latest
+
 # generate statik golang code using updated swagger-ui directory
 statik -src=${SWAGGER_DIR}/swagger-ui -dest=${SWAGGER_DIR} -f -m
 
