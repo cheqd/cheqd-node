@@ -6,7 +6,7 @@ set -euox pipefail
 export PATH
 PATH=$PATH:$(go env GOPATH)/bin
 
-SWAGGER_DIR=./client/docs
+SWAGGER_DIR=./api/docs
 SWAGGER_UI_DIR=${SWAGGER_DIR}/swagger-ui
 
 SWAGGER_UI_VERSION=4.11.0
