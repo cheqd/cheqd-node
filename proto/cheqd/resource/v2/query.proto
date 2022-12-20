@@ -4,21 +4,37 @@ package cheqd.resource.v2;
 
 import "cheqd/resource/v2/resource.proto";
 import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
 
 service Query {
-  // returns a Resource
+
   rpc Resource(QueryGetResourceRequest) returns (QueryGetResourceResponse) {
     option (google.api.http).get = "/cheqd/resource/v2/{collection_id}/resources/{id}";
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "This endpoint takes collectionId and resource identifier as input and returns the Resource with Metadata";
+      summary: "Query a Resource";
+    };
   }
-  // returns Resource Metadata 
+
   rpc ResourceMetadata(QueryGetResourceMetadataRequest) returns (QueryGetResourceMetadataResponse) {
     option (google.api.http).get = "/cheqd/resource/v2/{collection_id}/resources/{id}/metadata";
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "This endpoint takes collectionId and resource identifier as input and returns the Resource Metadata";
+      summary: "Query Resource Metadata";
+    };
   }
-  // returns a collection resource metadata for given collection id
+  
   rpc CollectionResources(QueryGetCollectionResourcesRequest) returns (QueryGetCollectionResourcesResponse) {
     option (google.api.http).get = "/cheqd/resource/v2/{collection_id}/metadata";
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "This endpoint takes collectionId as input and returns collection resource metadata for the given collection id";
+      summary: "Query collection resource metadata";
+    };
   }
 }
 
