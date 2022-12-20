@@ -29,9 +29,6 @@ done
 
 cd ..
 
-# install swagger-combine if not already installed
-npm list -g | grep swagger-combine > /dev/null || npm install -g swagger-combine --no-shrinkwrap
-
 # combine swagger files
 # uses nodejs package `swagger-combine`.
 # all the individual swagger files need to be configured in `config.json` for merging
