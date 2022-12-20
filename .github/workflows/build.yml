@@ -10,7 +10,7 @@ jobs:
 
   build-binary:
     name: "Node binary"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v3
@@ -38,7 +38,7 @@ jobs:
 
   build-docker:
     name: "Docker image"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       IMAGE_NAME: ${{ github.repository }}
 
@@ -74,7 +74,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           outputs: type=docker,dest=/tmp/cheqd-node-build.tar
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to: type=gha,mode=min
 
       - name: Upload Docker build image
         uses: actions/upload-artifact@v3
