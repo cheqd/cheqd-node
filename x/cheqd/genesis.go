@@ -20,9 +20,6 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 			panic(fmt.Sprintf("Cannot set did case: %s", err.Error()))
 		}
 	}
-
-	// Set nym count
-	// k.SetDidCount(&ctx, uint64(len(genState.DidList)))
 }
 
 // ExportGenesis returns the cheqd module's exported genesis.
