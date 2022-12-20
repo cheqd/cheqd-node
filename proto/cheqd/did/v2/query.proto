@@ -4,24 +4,38 @@ package cheqd.did.v2;
 
 import "cheqd/did/v2/diddoc.proto";
 import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
 
 option go_package = "github.com/cheqd/cheqd-node/x/did/types";
 
 service Query {
   
-  // returns DID Doc for a for a given DID
   rpc DidDoc(QueryGetDidDocRequest) returns (QueryGetDidDocResponse) {
     option (google.api.http).get = "/cheqd/did/v2/{id}";
+  
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "This endpoint queries the DID Doc and Metadata for a given DID";
+      summary: "Query DID Document";
+    };
   }
 
-  // returns specific version of DID Document 
   rpc DidDocVersion(QueryGetDidDocVersionRequest) returns (QueryGetDidDocVersionResponse) {
     option (google.api.http).get = "/cheqd/did/v2/{id}/version/{version}";
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "This endpoint takes DID and the versionId as input and returns the specific version of the DID Document";
+      summary: "Query specific version of DID Document";
+    };
   }
 
-  // returns a metadata for all versions of a given DID Doc
   rpc AllDidDocVersionsMetadata(QueryGetAllDidDocVersionsMetadataRequest) returns (QueryGetAllDidDocVersionsMetadataResponse) {
     option (google.api.http).get = "/cheqd/did/v2/{id}/metadata";
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "This endpoint queries the Metadata for all the versions of a DID";
+      summary: "Query metadata for all versions of a DID";
+    };
   }
 }
 
@@ -37,7 +51,7 @@ message QueryGetDidDocResponse {
 message QueryGetDidDocVersionRequest {
   // is a DID
   string id = 1;
-  // is a unique value that maps DID Doc state at specific time
+  // is a unique value that maps DID Doc state at some point
   string version = 2;
 }
 
