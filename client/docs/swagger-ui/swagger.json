@@ -187,7 +187,7 @@
           }
         ],
         "tags": [
-          "Query"
+          "DID"
         ]
       }
     },
@@ -274,7 +274,7 @@
           }
         ],
         "tags": [
-          "Query"
+          "DID"
         ]
       }
     },
@@ -466,7 +466,7 @@
           }
         ],
         "tags": [
-          "Query"
+          "DID"
         ]
       }
     },
@@ -486,16 +486,13 @@
                     "type": "object",
                     "properties": {
                       "collection_id": {
-                        "type": "string",
-                        "title": "collection_id is value for collection id"
+                        "type": "string"
                       },
                       "id": {
-                        "type": "string",
-                        "title": "id is resource id"
+                        "type": "string"
                       },
                       "name": {
-                        "type": "string",
-                        "title": "name is re"
+                        "type": "string"
                       },
                       "version": {
                         "type": "string"
@@ -509,15 +506,12 @@
                           "type": "object",
                           "properties": {
                             "uri": {
-                              "type": "string",
-                              "title": "uri is uri for metadata"
+                              "type": "string"
                             },
                             "description": {
-                              "type": "string",
-                              "title": "ddescription for metadata"
+                              "type": "string"
                             }
-                          },
-                          "title": "AlternativeUri is an additional value for metadata"
+                          }
                         }
                       },
                       "media_type": {
@@ -585,7 +579,7 @@
           }
         ],
         "tags": [
-          "Query"
+          "Resource"
         ]
       }
     },
@@ -603,13 +597,11 @@
                   "type": "object",
                   "properties": {
                     "resource": {
-                      "title": "resource is Resource object",
                       "type": "object",
                       "properties": {
                         "data": {
                           "type": "string",
-                          "format": "byte",
-                          "title": "data is a resource data in bytes"
+                          "format": "byte"
                         }
                       }
                     },
@@ -617,16 +609,13 @@
                       "type": "object",
                       "properties": {
                         "collection_id": {
-                          "type": "string",
-                          "title": "collection_id is value for collection id"
+                          "type": "string"
                         },
                         "id": {
-                          "type": "string",
-                          "title": "id is resource id"
+                          "type": "string"
                         },
                         "name": {
-                          "type": "string",
-                          "title": "name is re"
+                          "type": "string"
                         },
                         "version": {
                           "type": "string"
@@ -640,15 +629,12 @@
                             "type": "object",
                             "properties": {
                               "uri": {
-                                "type": "string",
-                                "title": "uri is uri for metadata"
+                                "type": "string"
                               },
                               "description": {
-                                "type": "string",
-                                "title": "ddescription for metadata"
+                                "type": "string"
                               }
-                            },
-                            "title": "AlternativeUri is an additional value for metadata"
+                            }
                           }
                         },
                         "media_type": {
@@ -666,11 +652,9 @@
                         "next_version_id": {
                           "type": "string"
                         }
-                      },
-                      "title": "metadata is Metadata object"
+                      }
                     }
-                  },
-                  "title": "ResourceWithMetadata is a resource with a metadata"
+                  }
                 }
               }
             }
@@ -726,7 +710,7 @@
           }
         ],
         "tags": [
-          "Query"
+          "Resource"
         ]
       }
     },
@@ -744,16 +728,13 @@
                   "type": "object",
                   "properties": {
                     "collection_id": {
-                      "type": "string",
-                      "title": "collection_id is value for collection id"
+                      "type": "string"
                     },
                     "id": {
-                      "type": "string",
-                      "title": "id is resource id"
+                      "type": "string"
                     },
                     "name": {
-                      "type": "string",
-                      "title": "name is re"
+                      "type": "string"
                     },
                     "version": {
                       "type": "string"
@@ -767,15 +748,12 @@
                         "type": "object",
                         "properties": {
                           "uri": {
-                            "type": "string",
-                            "title": "uri is uri for metadata"
+                            "type": "string"
                           },
                           "description": {
-                            "type": "string",
-                            "title": "ddescription for metadata"
+                            "type": "string"
                           }
-                        },
-                        "title": "AlternativeUri is an additional value for metadata"
+                        }
                       }
                     },
                     "media_type": {
@@ -849,7 +827,7 @@
           }
         ],
         "tags": [
-          "Query"
+          "Resource"
         ]
       }
     }
@@ -1467,30 +1445,24 @@
       "type": "object",
       "properties": {
         "uri": {
-          "type": "string",
-          "title": "uri is uri for metadata"
+          "type": "string"
         },
         "description": {
-          "type": "string",
-          "title": "ddescription for metadata"
+          "type": "string"
         }
-      },
-      "title": "AlternativeUri is an additional value for metadata"
+      }
     },
     "cheqd.resource.v2.Metadata": {
       "type": "object",
       "properties": {
         "collection_id": {
-          "type": "string",
-          "title": "collection_id is value for collection id"
+          "type": "string"
         },
         "id": {
-          "type": "string",
-          "title": "id is resource id"
+          "type": "string"
         },
         "name": {
-          "type": "string",
-          "title": "name is re"
+          "type": "string"
         },
         "version": {
           "type": "string"
@@ -1504,15 +1476,12 @@
             "type": "object",
             "properties": {
               "uri": {
-                "type": "string",
-                "title": "uri is uri for metadata"
+                "type": "string"
               },
               "description": {
-                "type": "string",
-                "title": "ddescription for metadata"
+                "type": "string"
               }
-            },
-            "title": "AlternativeUri is an additional value for metadata"
+            }
           }
         },
         "media_type": {
@@ -1541,16 +1510,13 @@
             "type": "object",
             "properties": {
               "collection_id": {
-                "type": "string",
-                "title": "collection_id is value for collection id"
+                "type": "string"
               },
               "id": {
-                "type": "string",
-                "title": "id is resource id"
+                "type": "string"
               },
               "name": {
-                "type": "string",
-                "title": "name is re"
+                "type": "string"
               },
               "version": {
                 "type": "string"
@@ -1564,15 +1530,12 @@
                   "type": "object",
                   "properties": {
                     "uri": {
-                      "type": "string",
-                      "title": "uri is uri for metadata"
+                      "type": "string"
                     },
                     "description": {
-                      "type": "string",
-                      "title": "ddescription for metadata"
+                      "type": "string"
                     }
-                  },
-                  "title": "AlternativeUri is an additional value for metadata"
+                  }
                 }
               },
               "media_type": {
@@ -1602,16 +1565,13 @@
           "type": "object",
           "properties": {
             "collection_id": {
-              "type": "string",
-              "title": "collection_id is value for collection id"
+              "type": "string"
             },
             "id": {
-              "type": "string",
-              "title": "id is resource id"
+              "type": "string"
             },
             "name": {
-              "type": "string",
-              "title": "name is re"
+              "type": "string"
             },
             "version": {
               "type": "string"
@@ -1625,15 +1585,12 @@
                 "type": "object",
                 "properties": {
                   "uri": {
-                    "type": "string",
-                    "title": "uri is uri for metadata"
+                    "type": "string"
                   },
                   "description": {
-                    "type": "string",
-                    "title": "ddescription for metadata"
+                    "type": "string"
                   }
-                },
-                "title": "AlternativeUri is an additional value for metadata"
+                }
               }
             },
             "media_type": {
@@ -1662,13 +1619,11 @@
           "type": "object",
           "properties": {
             "resource": {
-              "title": "resource is Resource object",
               "type": "object",
               "properties": {
                 "data": {
                   "type": "string",
-                  "format": "byte",
-                  "title": "data is a resource data in bytes"
+                  "format": "byte"
                 }
               }
             },
@@ -1676,16 +1631,13 @@
               "type": "object",
               "properties": {
                 "collection_id": {
-                  "type": "string",
-                  "title": "collection_id is value for collection id"
+                  "type": "string"
                 },
                 "id": {
-                  "type": "string",
-                  "title": "id is resource id"
+                  "type": "string"
                 },
                 "name": {
-                  "type": "string",
-                  "title": "name is re"
+                  "type": "string"
                 },
                 "version": {
                   "type": "string"
@@ -1699,15 +1651,12 @@
                     "type": "object",
                     "properties": {
                       "uri": {
-                        "type": "string",
-                        "title": "uri is uri for metadata"
+                        "type": "string"
                       },
                       "description": {
-                        "type": "string",
-                        "title": "ddescription for metadata"
+                        "type": "string"
                       }
-                    },
-                    "title": "AlternativeUri is an additional value for metadata"
+                    }
                   }
                 },
                 "media_type": {
@@ -1725,11 +1674,9 @@
                 "next_version_id": {
                   "type": "string"
                 }
-              },
-              "title": "metadata is Metadata object"
+              }
             }
-          },
-          "title": "ResourceWithMetadata is a resource with a metadata"
+          }
         }
       }
     },
@@ -1738,23 +1685,19 @@
       "properties": {
         "data": {
           "type": "string",
-          "format": "byte",
-          "title": "data is a resource data in bytes"
+          "format": "byte"
         }
-      },
-      "title": "Resource is a Resource object"
+      }
     },
     "cheqd.resource.v2.ResourceWithMetadata": {
       "type": "object",
       "properties": {
         "resource": {
-          "title": "resource is Resource object",
           "type": "object",
           "properties": {
             "data": {
               "type": "string",
-              "format": "byte",
-              "title": "data is a resource data in bytes"
+              "format": "byte"
             }
           }
         },
@@ -1762,16 +1705,13 @@
           "type": "object",
           "properties": {
             "collection_id": {
-              "type": "string",
-              "title": "collection_id is value for collection id"
+              "type": "string"
             },
             "id": {
-              "type": "string",
-              "title": "id is resource id"
+              "type": "string"
             },
             "name": {
-              "type": "string",
-              "title": "name is re"
+              "type": "string"
             },
             "version": {
               "type": "string"
@@ -1785,15 +1725,12 @@
                 "type": "object",
                 "properties": {
                   "uri": {
-                    "type": "string",
-                    "title": "uri is uri for metadata"
+                    "type": "string"
                   },
                   "description": {
-                    "type": "string",
-                    "title": "ddescription for metadata"
+                    "type": "string"
                   }
-                },
-                "title": "AlternativeUri is an additional value for metadata"
+                }
               }
             },
             "media_type": {
@@ -1811,11 +1748,9 @@
             "next_version_id": {
               "type": "string"
             }
-          },
-          "title": "metadata is Metadata object"
+          }
         }
-      },
-      "title": "ResourceWithMetadata is a resource with a metadata"
+      }
     }
   }
 }
