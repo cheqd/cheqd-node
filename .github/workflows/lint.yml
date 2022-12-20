@@ -10,7 +10,7 @@ jobs:
 
   sh-euox-pipefail-check:
     name: "Shell pipefail check"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     
     steps:
       - uses: actions/checkout@v3
@@ -20,7 +20,7 @@ jobs:
   
   md-link-check:
     name: "Broken Markdown links"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     
     steps:
       - uses: actions/checkout@v3
@@ -35,7 +35,7 @@ jobs:
     # We can't use VALIDATE_GO from super linter because of this issue:
     # https://github.com/github/super-linter/issues/143
     name: "Golang"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     
     steps:
       - uses: actions/checkout@v3
@@ -51,15 +51,34 @@ jobs:
           version: v1.47
           args: --config .github/linters/.golangci.yaml
 
+  # proto-lint:
+  #   name: "Protobuf"
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3
+      
+  #     # Install the `buf` CLI
+  #     - uses: bufbuild/buf-setup-action@v1.10.0
+      
+  #     # Lint
+  #     - uses: bufbuild/buf-lint-action@v1
+      
+  #     # Breaking change detection
+  #     - uses: bufbuild/buf-breaking-action@v1
+  #       continue-on-error: true
+  #       with:
+  #         input: 'proto'
+  #         against: 'https://github.com/cheqd/cheqd-node.git#branch=release/0.6.x,ref=HEAD~1,subdir=proto'
+
   super-lint:
     name: "Super Linter"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     
     steps:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0 # Required to fetch version
-    
+
     - name: Run Super Linter
       uses: github/super-linter/slim@v4
       env:
