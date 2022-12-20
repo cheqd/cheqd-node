@@ -68,7 +68,7 @@ jobs:
         continue-on-error: true
         with:
           input: 'proto'
-          against: 'https://github.com/cheqd/cheqd-node.git#branch=main,ref=HEAD~1,subdir=proto'
+          against: 'https://github.com/cheqd/cheqd-node.git#branch=release/0.6.x,ref=HEAD~1,subdir=proto'
 
   super-lint:
     name: "Super Linter"
