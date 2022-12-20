@@ -23,7 +23,7 @@ jobs:
       - name: Install statik
         working-directory: ./..
         run: |
-          go install github.com/rakyll/statik
+          go install github.com/rakyll/statik@latest
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v3
