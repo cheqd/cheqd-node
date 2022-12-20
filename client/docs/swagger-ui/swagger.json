@@ -1,0 +1,1821 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Cheqd - gRPC Gateway docs",
+    "description": "A REST interface for state queries",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/cheqd/did/v2/{id}": {
+      "get": {
+        "summary": "returns DID Doc for a for a given DID",
+        "operationId": "DidDoc",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "object",
+                  "properties": {
+                    "did_doc": {
+                      "type": "object",
+                      "properties": {
+                        "context": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "controller": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "verification_method": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              },
+                              "controller": {
+                                "type": "string"
+                              },
+                              "verification_material": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "authentication": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "assertion_method": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "capability_invocation": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "capability_delegation": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "key_agreement": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "service": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              },
+                              "service_endpoint": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "also_known_as": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "created": {
+                          "type": "string"
+                        },
+                        "updated": {
+                          "type": "string"
+                        },
+                        "deactivated": {
+                          "type": "boolean"
+                        },
+                        "version_id": {
+                          "type": "string"
+                        },
+                        "next_version_id": {
+                          "type": "string"
+                        },
+                        "previous_version_id": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "details": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "type_url": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string",
+                        "format": "byte"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "is a DID to be fetched",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Query"
+        ]
+      }
+    },
+    "/cheqd/did/v2/{id}/metadata": {
+      "get": {
+        "summary": "returns a metadata for all versions of a given DID Doc",
+        "operationId": "AllDidDocVersionsMetadata",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "versions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "created": {
+                        "type": "string"
+                      },
+                      "updated": {
+                        "type": "string"
+                      },
+                      "deactivated": {
+                        "type": "boolean"
+                      },
+                      "version_id": {
+                        "type": "string"
+                      },
+                      "next_version_id": {
+                        "type": "string"
+                      },
+                      "previous_version_id": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "details": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "type_url": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string",
+                        "format": "byte"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "is a DID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Query"
+        ]
+      }
+    },
+    "/cheqd/did/v2/{id}/version/{version}": {
+      "get": {
+        "summary": "returns specific version of DID Document",
+        "operationId": "DidDocVersion",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "object",
+                  "properties": {
+                    "did_doc": {
+                      "type": "object",
+                      "properties": {
+                        "context": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "controller": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "verification_method": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              },
+                              "controller": {
+                                "type": "string"
+                              },
+                              "verification_material": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "authentication": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "assertion_method": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "capability_invocation": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "capability_delegation": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "key_agreement": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "service": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              },
+                              "service_endpoint": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "also_known_as": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "created": {
+                          "type": "string"
+                        },
+                        "updated": {
+                          "type": "string"
+                        },
+                        "deactivated": {
+                          "type": "boolean"
+                        },
+                        "version_id": {
+                          "type": "string"
+                        },
+                        "next_version_id": {
+                          "type": "string"
+                        },
+                        "previous_version_id": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "details": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "type_url": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string",
+                        "format": "byte"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "is a DID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "version",
+            "description": "is a unique value that maps DID Doc state at specific time",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Query"
+        ]
+      }
+    },
+    "/cheqd/resource/v2/{collection_id}/metadata": {
+      "get": {
+        "summary": "returns a collection resource metadata for given collection id",
+        "operationId": "CollectionResources",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "resources": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "collection_id": {
+                        "type": "string",
+                        "title": "collection_id is value for collection id"
+                      },
+                      "id": {
+                        "type": "string",
+                        "title": "id is resource id"
+                      },
+                      "name": {
+                        "type": "string",
+                        "title": "name is re"
+                      },
+                      "version": {
+                        "type": "string"
+                      },
+                      "resource_type": {
+                        "type": "string"
+                      },
+                      "also_known_as": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "uri": {
+                              "type": "string",
+                              "title": "uri is uri for metadata"
+                            },
+                            "description": {
+                              "type": "string",
+                              "title": "ddescription for metadata"
+                            }
+                          },
+                          "title": "AlternativeUri is an additional value for metadata"
+                        }
+                      },
+                      "media_type": {
+                        "type": "string"
+                      },
+                      "created": {
+                        "type": "string"
+                      },
+                      "checksum": {
+                        "type": "string"
+                      },
+                      "previous_version_id": {
+                        "type": "string"
+                      },
+                      "next_version_id": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "details": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "type_url": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string",
+                        "format": "byte"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "collection_id",
+            "description": "is unique identifier a for collection",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Query"
+        ]
+      }
+    },
+    "/cheqd/resource/v2/{collection_id}/resources/{id}": {
+      "get": {
+        "summary": "returns a Resource",
+        "operationId": "Resource",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "resource": {
+                  "type": "object",
+                  "properties": {
+                    "resource": {
+                      "title": "resource is Resource object",
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "string",
+                          "format": "byte",
+                          "title": "data is a resource data in bytes"
+                        }
+                      }
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "collection_id": {
+                          "type": "string",
+                          "title": "collection_id is value for collection id"
+                        },
+                        "id": {
+                          "type": "string",
+                          "title": "id is resource id"
+                        },
+                        "name": {
+                          "type": "string",
+                          "title": "name is re"
+                        },
+                        "version": {
+                          "type": "string"
+                        },
+                        "resource_type": {
+                          "type": "string"
+                        },
+                        "also_known_as": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "uri": {
+                                "type": "string",
+                                "title": "uri is uri for metadata"
+                              },
+                              "description": {
+                                "type": "string",
+                                "title": "ddescription for metadata"
+                              }
+                            },
+                            "title": "AlternativeUri is an additional value for metadata"
+                          }
+                        },
+                        "media_type": {
+                          "type": "string"
+                        },
+                        "created": {
+                          "type": "string"
+                        },
+                        "checksum": {
+                          "type": "string"
+                        },
+                        "previous_version_id": {
+                          "type": "string"
+                        },
+                        "next_version_id": {
+                          "type": "string"
+                        }
+                      },
+                      "title": "metadata is Metadata object"
+                    }
+                  },
+                  "title": "ResourceWithMetadata is a resource with a metadata"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "details": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "type_url": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string",
+                        "format": "byte"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "collection_id",
+            "description": "is unique identifier a for collection",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "description": "is unique identifier for a resource",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Query"
+        ]
+      }
+    },
+    "/cheqd/resource/v2/{collection_id}/resources/{id}/metadata": {
+      "get": {
+        "summary": "returns Resource Metadata",
+        "operationId": "ResourceMetadata",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "resource": {
+                  "type": "object",
+                  "properties": {
+                    "collection_id": {
+                      "type": "string",
+                      "title": "collection_id is value for collection id"
+                    },
+                    "id": {
+                      "type": "string",
+                      "title": "id is resource id"
+                    },
+                    "name": {
+                      "type": "string",
+                      "title": "name is re"
+                    },
+                    "version": {
+                      "type": "string"
+                    },
+                    "resource_type": {
+                      "type": "string"
+                    },
+                    "also_known_as": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "uri": {
+                            "type": "string",
+                            "title": "uri is uri for metadata"
+                          },
+                          "description": {
+                            "type": "string",
+                            "title": "ddescription for metadata"
+                          }
+                        },
+                        "title": "AlternativeUri is an additional value for metadata"
+                      }
+                    },
+                    "media_type": {
+                      "type": "string"
+                    },
+                    "created": {
+                      "type": "string"
+                    },
+                    "checksum": {
+                      "type": "string"
+                    },
+                    "previous_version_id": {
+                      "type": "string"
+                    },
+                    "next_version_id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "details": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "type_url": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string",
+                        "format": "byte"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "collection_id",
+            "description": "is unique identifier a for collection",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "description": "is unique identifier for a resource",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Query"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "cheqd.did.v2.DidDoc": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "id": {
+          "type": "string"
+        },
+        "controller": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "verification_method": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "controller": {
+                "type": "string"
+              },
+              "verification_material": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "authentication": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "assertion_method": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "capability_invocation": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "capability_delegation": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "key_agreement": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "service": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "service_endpoint": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "also_known_as": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "cheqd.did.v2.DidDocWithMetadata": {
+      "type": "object",
+      "properties": {
+        "did_doc": {
+          "type": "object",
+          "properties": {
+            "context": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "id": {
+              "type": "string"
+            },
+            "controller": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "verification_method": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "controller": {
+                    "type": "string"
+                  },
+                  "verification_material": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "authentication": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "assertion_method": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "capability_invocation": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "capability_delegation": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "key_agreement": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "service": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "service_endpoint": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "also_known_as": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "created": {
+              "type": "string"
+            },
+            "updated": {
+              "type": "string"
+            },
+            "deactivated": {
+              "type": "boolean"
+            },
+            "version_id": {
+              "type": "string"
+            },
+            "next_version_id": {
+              "type": "string"
+            },
+            "previous_version_id": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "cheqd.did.v2.Metadata": {
+      "type": "object",
+      "properties": {
+        "created": {
+          "type": "string"
+        },
+        "updated": {
+          "type": "string"
+        },
+        "deactivated": {
+          "type": "boolean"
+        },
+        "version_id": {
+          "type": "string"
+        },
+        "next_version_id": {
+          "type": "string"
+        },
+        "previous_version_id": {
+          "type": "string"
+        }
+      }
+    },
+    "cheqd.did.v2.QueryGetAllDidDocVersionsMetadataResponse": {
+      "type": "object",
+      "properties": {
+        "versions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "created": {
+                "type": "string"
+              },
+              "updated": {
+                "type": "string"
+              },
+              "deactivated": {
+                "type": "boolean"
+              },
+              "version_id": {
+                "type": "string"
+              },
+              "next_version_id": {
+                "type": "string"
+              },
+              "previous_version_id": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "cheqd.did.v2.QueryGetDidDocResponse": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "object",
+          "properties": {
+            "did_doc": {
+              "type": "object",
+              "properties": {
+                "context": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "id": {
+                  "type": "string"
+                },
+                "controller": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "verification_method": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string"
+                      },
+                      "controller": {
+                        "type": "string"
+                      },
+                      "verification_material": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "authentication": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "assertion_method": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "capability_invocation": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "capability_delegation": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "key_agreement": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "service": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string"
+                      },
+                      "service_endpoint": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "also_known_as": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "metadata": {
+              "type": "object",
+              "properties": {
+                "created": {
+                  "type": "string"
+                },
+                "updated": {
+                  "type": "string"
+                },
+                "deactivated": {
+                  "type": "boolean"
+                },
+                "version_id": {
+                  "type": "string"
+                },
+                "next_version_id": {
+                  "type": "string"
+                },
+                "previous_version_id": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "cheqd.did.v2.QueryGetDidDocVersionResponse": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "object",
+          "properties": {
+            "did_doc": {
+              "type": "object",
+              "properties": {
+                "context": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "id": {
+                  "type": "string"
+                },
+                "controller": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "verification_method": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string"
+                      },
+                      "controller": {
+                        "type": "string"
+                      },
+                      "verification_material": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "authentication": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "assertion_method": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "capability_invocation": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "capability_delegation": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "key_agreement": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "service": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string"
+                      },
+                      "service_endpoint": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "also_known_as": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "metadata": {
+              "type": "object",
+              "properties": {
+                "created": {
+                  "type": "string"
+                },
+                "updated": {
+                  "type": "string"
+                },
+                "deactivated": {
+                  "type": "boolean"
+                },
+                "version_id": {
+                  "type": "string"
+                },
+                "next_version_id": {
+                  "type": "string"
+                },
+                "previous_version_id": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "cheqd.did.v2.Service": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "service_endpoint": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "cheqd.did.v2.VerificationMethod": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "controller": {
+          "type": "string"
+        },
+        "verification_material": {
+          "type": "string"
+        }
+      }
+    },
+    "google.protobuf.Any": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "grpc.gateway.runtime.Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type_url": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string",
+                "format": "byte"
+              }
+            }
+          }
+        }
+      }
+    },
+    "cheqd.resource.v2.AlternativeUri": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "title": "uri is uri for metadata"
+        },
+        "description": {
+          "type": "string",
+          "title": "ddescription for metadata"
+        }
+      },
+      "title": "AlternativeUri is an additional value for metadata"
+    },
+    "cheqd.resource.v2.Metadata": {
+      "type": "object",
+      "properties": {
+        "collection_id": {
+          "type": "string",
+          "title": "collection_id is value for collection id"
+        },
+        "id": {
+          "type": "string",
+          "title": "id is resource id"
+        },
+        "name": {
+          "type": "string",
+          "title": "name is re"
+        },
+        "version": {
+          "type": "string"
+        },
+        "resource_type": {
+          "type": "string"
+        },
+        "also_known_as": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "uri": {
+                "type": "string",
+                "title": "uri is uri for metadata"
+              },
+              "description": {
+                "type": "string",
+                "title": "ddescription for metadata"
+              }
+            },
+            "title": "AlternativeUri is an additional value for metadata"
+          }
+        },
+        "media_type": {
+          "type": "string"
+        },
+        "created": {
+          "type": "string"
+        },
+        "checksum": {
+          "type": "string"
+        },
+        "previous_version_id": {
+          "type": "string"
+        },
+        "next_version_id": {
+          "type": "string"
+        }
+      }
+    },
+    "cheqd.resource.v2.QueryGetCollectionResourcesResponse": {
+      "type": "object",
+      "properties": {
+        "resources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "collection_id": {
+                "type": "string",
+                "title": "collection_id is value for collection id"
+              },
+              "id": {
+                "type": "string",
+                "title": "id is resource id"
+              },
+              "name": {
+                "type": "string",
+                "title": "name is re"
+              },
+              "version": {
+                "type": "string"
+              },
+              "resource_type": {
+                "type": "string"
+              },
+              "also_known_as": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "uri": {
+                      "type": "string",
+                      "title": "uri is uri for metadata"
+                    },
+                    "description": {
+                      "type": "string",
+                      "title": "ddescription for metadata"
+                    }
+                  },
+                  "title": "AlternativeUri is an additional value for metadata"
+                }
+              },
+              "media_type": {
+                "type": "string"
+              },
+              "created": {
+                "type": "string"
+              },
+              "checksum": {
+                "type": "string"
+              },
+              "previous_version_id": {
+                "type": "string"
+              },
+              "next_version_id": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "cheqd.resource.v2.QueryGetResourceMetadataResponse": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "type": "object",
+          "properties": {
+            "collection_id": {
+              "type": "string",
+              "title": "collection_id is value for collection id"
+            },
+            "id": {
+              "type": "string",
+              "title": "id is resource id"
+            },
+            "name": {
+              "type": "string",
+              "title": "name is re"
+            },
+            "version": {
+              "type": "string"
+            },
+            "resource_type": {
+              "type": "string"
+            },
+            "also_known_as": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "uri": {
+                    "type": "string",
+                    "title": "uri is uri for metadata"
+                  },
+                  "description": {
+                    "type": "string",
+                    "title": "ddescription for metadata"
+                  }
+                },
+                "title": "AlternativeUri is an additional value for metadata"
+              }
+            },
+            "media_type": {
+              "type": "string"
+            },
+            "created": {
+              "type": "string"
+            },
+            "checksum": {
+              "type": "string"
+            },
+            "previous_version_id": {
+              "type": "string"
+            },
+            "next_version_id": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "cheqd.resource.v2.QueryGetResourceResponse": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "type": "object",
+          "properties": {
+            "resource": {
+              "title": "resource is Resource object",
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "string",
+                  "format": "byte",
+                  "title": "data is a resource data in bytes"
+                }
+              }
+            },
+            "metadata": {
+              "type": "object",
+              "properties": {
+                "collection_id": {
+                  "type": "string",
+                  "title": "collection_id is value for collection id"
+                },
+                "id": {
+                  "type": "string",
+                  "title": "id is resource id"
+                },
+                "name": {
+                  "type": "string",
+                  "title": "name is re"
+                },
+                "version": {
+                  "type": "string"
+                },
+                "resource_type": {
+                  "type": "string"
+                },
+                "also_known_as": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "uri": {
+                        "type": "string",
+                        "title": "uri is uri for metadata"
+                      },
+                      "description": {
+                        "type": "string",
+                        "title": "ddescription for metadata"
+                      }
+                    },
+                    "title": "AlternativeUri is an additional value for metadata"
+                  }
+                },
+                "media_type": {
+                  "type": "string"
+                },
+                "created": {
+                  "type": "string"
+                },
+                "checksum": {
+                  "type": "string"
+                },
+                "previous_version_id": {
+                  "type": "string"
+                },
+                "next_version_id": {
+                  "type": "string"
+                }
+              },
+              "title": "metadata is Metadata object"
+            }
+          },
+          "title": "ResourceWithMetadata is a resource with a metadata"
+        }
+      }
+    },
+    "cheqd.resource.v2.Resource": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "string",
+          "format": "byte",
+          "title": "data is a resource data in bytes"
+        }
+      },
+      "title": "Resource is a Resource object"
+    },
+    "cheqd.resource.v2.ResourceWithMetadata": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "title": "resource is Resource object",
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "string",
+              "format": "byte",
+              "title": "data is a resource data in bytes"
+            }
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "collection_id": {
+              "type": "string",
+              "title": "collection_id is value for collection id"
+            },
+            "id": {
+              "type": "string",
+              "title": "id is resource id"
+            },
+            "name": {
+              "type": "string",
+              "title": "name is re"
+            },
+            "version": {
+              "type": "string"
+            },
+            "resource_type": {
+              "type": "string"
+            },
+            "also_known_as": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "uri": {
+                    "type": "string",
+                    "title": "uri is uri for metadata"
+                  },
+                  "description": {
+                    "type": "string",
+                    "title": "ddescription for metadata"
+                  }
+                },
+                "title": "AlternativeUri is an additional value for metadata"
+              }
+            },
+            "media_type": {
+              "type": "string"
+            },
+            "created": {
+              "type": "string"
+            },
+            "checksum": {
+              "type": "string"
+            },
+            "previous_version_id": {
+              "type": "string"
+            },
+            "next_version_id": {
+              "type": "string"
+            }
+          },
+          "title": "metadata is Metadata object"
+        }
+      },
+      "title": "ResourceWithMetadata is a resource with a metadata"
+    }
+  }
+}
