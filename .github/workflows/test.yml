@@ -24,15 +24,11 @@ jobs:
         working-directory: ./installer
         run: |
           sudo bash -c "python3 installer.py < install-from-scratch.txt"
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "Upgrade existing installation"
         working-directory: ./installer
         run: |
           sudo bash -c "python3 installer.py < upgrade-existing.txt"
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Debugging with tmate
         if: ${{ failure() }}
