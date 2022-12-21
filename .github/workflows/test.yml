@@ -13,6 +13,29 @@ permissions:
 
 jobs:
 
+  interactive-installer:
+    name: "Interactive Installer"
+    runs-on: ubuntu-20.04
+  
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: "Fresh install"
+        working-directory: ./installer
+        run: |
+          sudo bash -c "python3 installer.py < install-from-scratch.txt"
+
+      - name: "Upgrade existing installation"
+        working-directory: ./installer
+        run: |
+          sudo bash -c "python3 installer.py < upgrade-existing.txt"
+
+      - name: Debugging with tmate
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3.13
+        with:
+          timeout-minutes: 15
+
   unit-tests:
     name: "Unit Tests"
     runs-on: ubuntu-20.04
@@ -116,9 +139,11 @@ jobs:
       - name: Download old node binary (mainnet-latest)
         run: |
           mkdir -p ${{ env.RUNNER_BIN_DIR }}
-          wget -c https://github.com/cheqd/cheqd-node/releases/download/v0.6.9/cheqd-noded-0.6.9-Linux-x86_64.tar.gz
-          tar -xvf cheqd-noded-0.6.9-Linux-x86_64.tar.gz -C ${{ env.RUNNER_BIN_DIR }} --strip-components=1
+          wget -c https://github.com/cheqd/cheqd-node/releases/download/v"${LEGACY_VERSION}"/cheqd-noded-"${LEGACY_VERSION}"-Linux-x86_64.tar.gz
+          tar -xvf cheqd-noded-"${LEGACY_VERSION}"-Linux-x86_64.tar.gz -C ${{ env.RUNNER_BIN_DIR }}
           sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
+        env:
+          LEGACY_VERSION: 0.6.10
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
