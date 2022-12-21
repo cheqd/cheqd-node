@@ -267,10 +267,7 @@ class Installer():
         try:
             self.exec(f"wget -c {binary_url}")
             if fname.find(".tar.gz") != -1:
-                if self.version.replace('v', '') >= '1.0.1':
-                    self.exec(f"tar -xzf {fname} -C .")
-                else:
-                    self.exec(f"tar -xzf {fname} -C . --strip-components=1")
+                self.exec(f"tar -xzf {fname} -C .")
                 self.remove_safe(fname)
             self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
         except:

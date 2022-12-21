@@ -854,7 +854,7 @@ func New(
 				fmt.Println("Current version map: ", fromVM)
 				fmt.Println("Expected version map: ", versionMap)
 
-				// Skip resource module InitGenesis (was not present in v0.6.9)
+				// Skip resource module InitGenesis (was not present in v0.6.x)
 				fromVM[resourcetypes.ModuleName] = versionMap[resourcetypes.ModuleName]
 			}
 
