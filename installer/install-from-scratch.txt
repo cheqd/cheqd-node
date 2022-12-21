@@ -1,4 +1,4 @@
-2
+3
 /home/runner/.local/cheqd
 yes
 mainnet
