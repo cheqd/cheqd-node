@@ -13,6 +13,33 @@ permissions:
 
 jobs:
 
+  interactive-installer:
+    name: "Interactive Installer"
+    runs-on: ubuntu-20.04
+  
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: "Fresh install"
+        working-directory: ./installer
+        run: |
+          sudo bash -c "python3 installer.py < install-from-scratch.txt"
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Upgrade existing installation"
+        working-directory: ./installer
+        run: |
+          sudo bash -c "python3 installer.py < upgrade-existing.txt"
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Debugging with tmate
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3.13
+        with:
+          timeout-minutes: 15
+
   unit-tests:
     name: "Unit Tests"
     runs-on: ubuntu-20.04
