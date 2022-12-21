@@ -1,0 +1,75 @@
+@startuml
+!include <archimate/Archimate>
+title Installer
+
+
+' Classes
+class "What the version do you want to install?" as CheqdNodedVersion #DarkKhaki
+class "Set path for cheqd user home dir" as PathUserHome #DarkKhaki
+class "Cheqd is already installed, do you want to upgrade?" as CheqdUpgrade #DarkKhaki
+class "Do you want to do fresh installation of cheqd-node?" as FreshInstallationCheqdNode #DarkKhaki
+class "Aborting installation to prevent overwriting existing cheqd-node" as AbortOverwritingExistingCheqdNode #red;text:white
+
+component AllUpgradeSteps{
+class "Internal check cosmovisor" as CheckCosmovisor #orange
+class "Install cheqd-noded using Cosmovisor?" as InstallCosmovisor #orange
+class "Do you want to bump your Cosmovisor?" as BumpCosmovisor #orange
+class "Overwrite existing systemd configuration for cheqd-node?" as SystemdConfigExists #orange
+class "Overwrite existing configuration for cheqd-node logging?" as RSysLogExists #orange
+class "Overwrite existing configuration for logrotate?" as LogRotateExists #orange
+
+CheckCosmovisor --> [cosmovisor is installed, but not latest] BumpCosmovisor
+CheckCosmovisor --> [cosmovisor is not installed] InstallCosmovisor
+    BumpCosmovisor --> SystemdConfigExists
+    InstallCosmovisor --> SystemdConfigExists
+    SystemdConfigExists --> RSysLogExists
+    RSysLogExists --> LogRotateExists
+    CheqdUpgrade --> [no] FreshInstallationCheqdNode
+        FreshInstallationCheqdNode --> [yes] AllInstallSteps
+        FreshInstallationCheqdNode --> [no] AbortOverwritingExistingCheqdNode
+}
+
+
+component AllInstallSteps{
+class "Do you want to setup a new cheqd-node?" as SetupANewCheqdNode #palegreen
+class "Install additional steps" as AdditionalSteps #palegreen
+class "Skip install additional steps" as SkipAdditionalSteps #palegreen
+class "Select cheqd network to join" as CheqdNetwork #palegreen
+class "Install cheqd-noded using Cosmovisor?" as CheqdNodeUsingCosmovisor #palegreen
+class "Do you want to download a snapshot of the existing chain to speed up node synchronization?" as SnapshotExisting #palegreen
+class "Provide a moniker for your cheqd-node" as MonikerCheqdNode #palegreen
+class "What is the externally-reachable IP address or DNS name for your cheqd-node?" as ExternallyAddress #palegreen
+class "Specify port for Tendermint RPC" as TendermintRPCPort #palegreen
+class "Specify port for Tendermint P2P" as TendermintP2PPort #palegreen
+class "Specify minimum gas price for transactions" as MinGasPrice #palegreen
+class "Specify persistent peers" as PersistentPeers #palegreen
+class "Specify log level" as LogLevel #palegreen
+class "Specify log format" as LogFormat #palegreen
+
+SetupANewCheqdNode --> [yes] AdditionalSteps
+    AdditionalSteps --> MonikerCheqdNode
+    MonikerCheqdNode --> ExternallyAddress
+    ExternallyAddress --> TendermintRPCPort
+    TendermintRPCPort --> TendermintP2PPort
+    TendermintP2PPort --> MinGasPrice
+    MinGasPrice --> PersistentPeers
+    PersistentPeers --> LogLevel
+    LogLevel --> LogFormat
+    SetupANewCheqdNode --> [no] SkipAdditionalSteps
+LogFormat --> CheqdNetwork
+SkipAdditionalSteps --> CheqdNetwork
+CheqdNetwork --> CheqdNodeUsingCosmovisor
+CheqdNodeUsingCosmovisor --> SnapshotExisting
+}
+
+
+' Relationships
+CheqdNodedVersion --> PathUserHome
+
+PathUserHome --> [path already exists] CheqdUpgrade
+    CheqdUpgrade --> [yes] AllUpgradeSteps
+
+PathUserHome --> [path not exist] AllInstallSteps
+
+
+@enduml
