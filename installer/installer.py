@@ -548,7 +548,7 @@ class Installer():
             self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "upgrades"))
             
             self.log(f"Moving Cosmovisor binary to installation directory")
-            shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
+            shutil.move(os.path.join(os.path.realpath(os.path.curdir), DEFAULT_COSMOVISOR_BINARY_NAME), os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
 
             self.log(f"Creating symlink for current Cosmovisor version")
             os.symlink(os.path.join(self.cosmovisor_root_dir, "genesis"),
