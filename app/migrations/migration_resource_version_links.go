@@ -1,6 +1,7 @@
 package migrations
 
 import (
+	"fmt"
 	"sort"
 	"time"
 
@@ -9,10 +10,10 @@ import (
 )
 
 func MigrateResourceVersionLinks(sctx sdk.Context, mctx MigrationContext) error {
-	println("Resource version links migration. Start")
+	sctx.Logger().Debug("MigrateResourceVersionLinks: Starting migration")
 	store := sctx.KVStore(mctx.resourceStoreKey)
 
-	println("Resource version links migration. Read all resources")
+	sctx.Logger().Debug("MigrateResourceVersionLinks: Reading all resources")
 	// Read all resources. Yes, this is memory intensive, but it's the simplest way to do it.
 	// Resource size is limited to 200KB, so this should be fine.
 	resources, err := mctx.resourceKeeperNew.GetAllResources(&sctx)
@@ -20,7 +21,7 @@ func MigrateResourceVersionLinks(sctx sdk.Context, mctx MigrationContext) error 
 		return err
 	}
 
-	println("Resource version links migration. Read all keys and Clean store")
+	sctx.Logger().Debug("MigrateResourceVersionLinks: Reading all keys and Clean store")
 	// Clean store
 	keys := helpers.ReadAllKeys(store, nil)
 	for _, key := range keys {
@@ -29,11 +30,17 @@ func MigrateResourceVersionLinks(sctx sdk.Context, mctx MigrationContext) error 
 
 	// Reset version links
 	for _, resource := range resources {
+		sctx.Logger().Debug(fmt.Sprintf(
+			"MigrateResourceVersionLinks: Id: %s CollectionId: %s OldPreviousVersionId: %s OldNextVersionId: %s",
+			resource.Metadata.Id,
+			resource.Metadata.CollectionId,
+			resource.Metadata.PreviousVersionId,
+			resource.Metadata.NextVersionId))
 		resource.Metadata.PreviousVersionId = ""
 		resource.Metadata.NextVersionId = ""
 	}
 
-	println("Resource version links migration. Sort resources by date created")
+	sctx.Logger().Debug("MigrateResourceVersionLinks: Sorting resources by date created")
 	// Sort resources by date created
 	sort.Slice(resources[:], func(i, j int) bool {
 		iCreated, err := time.Parse(time.RFC3339, resources[i].Metadata.Created)
@@ -49,15 +56,21 @@ func MigrateResourceVersionLinks(sctx sdk.Context, mctx MigrationContext) error 
 		return iCreated.Before(jCreated)
 	})
 
-	println("Resource version links migration. Set version links")
+	sctx.Logger().Debug("MigrateResourceVersionLinks: Setting version links")
 	// Add resources to store in the same order as they were created. This will create proper links.
 	for _, resource := range resources {
 		err = mctx.resourceKeeperNew.AddNewResourceVersion(&sctx, &resource)
+		sctx.Logger().Debug(fmt.Sprintf(
+			"MigrateResourceVersionLinks: Id: %s CollectionId: %s NewPreviousVersionId: %s NewNextVersionId: %s",
+			resource.Metadata.Id,
+			resource.Metadata.CollectionId,
+			resource.Metadata.PreviousVersionId,
+			resource.Metadata.NextVersionId))
 		if err != nil {
 			return err
 		}
 	}
-	println("Resource version links migration. End")
+	sctx.Logger().Debug("MigrateResourceVersionLinks: Migration finished")
 
 	return nil
 }
