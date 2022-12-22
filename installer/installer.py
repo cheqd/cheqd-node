@@ -329,9 +329,7 @@ class Installer():
                 self.mkdir_p(self.cheqd_root_dir)
 
                 self.log(f"Setting directory permissions to default cheqd user: {DEFAULT_CHEQD_USER}")
-                shutil.chown(self.interviewer.home_dir,
-                DEFAULT_CHEQD_USER,
-                DEFAULT_CHEQD_USER)
+                self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.interviewer.home_dir}")
             else:
                 self.log(f"Skipping main directory creation because {self.cheqd_root_dir} already exists")
 
