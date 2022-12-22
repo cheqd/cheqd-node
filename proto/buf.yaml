@@ -18,6 +18,7 @@ breaking:
 
 lint:
   ignore:
+    - cosmos
     - cheqd/did/v1
     - cheqd/resource/v1
   use:
