@@ -59,6 +59,8 @@ jobs:
       
       # Install the `buf` CLI
       - uses: bufbuild/buf-setup-action@v1.10.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       
       # Lint
       - uses: bufbuild/buf-lint-action@v1
