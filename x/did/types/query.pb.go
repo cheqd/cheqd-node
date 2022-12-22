@@ -29,6 +29,7 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type QueryGetDidDocRequest struct {
+	// is a DID to be fetched
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 }
 
@@ -117,7 +118,9 @@ func (m *QueryGetDidDocResponse) GetValue() *DidDocWithMetadata {
 }
 
 type QueryGetDidDocVersionRequest struct {
-	Id      string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// is a DID
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// is a unique value that maps DID Doc state at some point
 	Version string `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
 }
 
@@ -213,6 +216,7 @@ func (m *QueryGetDidDocVersionResponse) GetValue() *DidDocWithMetadata {
 }
 
 type QueryGetAllDidDocVersionsMetadataRequest struct {
+	// is a DID
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 }
 

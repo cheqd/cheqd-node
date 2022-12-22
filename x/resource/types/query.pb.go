@@ -29,8 +29,10 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type QueryGetResourceRequest struct {
+	// is unique identifier a for collection
 	CollectionId string `protobuf:"bytes,1,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
-	Id           string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	// is unique identifier for a resource
+	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
 }
 
 func (m *QueryGetResourceRequest) Reset()         { *m = QueryGetResourceRequest{} }
@@ -125,8 +127,10 @@ func (m *QueryGetResourceResponse) GetResource() *ResourceWithMetadata {
 }
 
 type QueryGetResourceMetadataRequest struct {
+	// is unique identifier a for collection
 	CollectionId string `protobuf:"bytes,1,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
-	Id           string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	// is unique identifier for a resource
+	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
 }
 
 func (m *QueryGetResourceMetadataRequest) Reset()         { *m = QueryGetResourceMetadataRequest{} }
@@ -221,6 +225,7 @@ func (m *QueryGetResourceMetadataResponse) GetResource() *Metadata {
 }
 
 type QueryGetCollectionResourcesRequest struct {
+	// is unique identifier a for collection
 	CollectionId string `protobuf:"bytes,1,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
 }
 
