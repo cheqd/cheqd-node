@@ -25,16 +25,16 @@ jobs:
         run: |
           sudo bash -c "python3 installer.py < install-from-scratch.txt"
 
-      # - name: "Upgrade existing installation"
-      #   working-directory: ./installer
-      #   run: |
-      #     sudo bash -c "python3 installer.py < upgrade-existing.txt"
+      - name: "Upgrade existing installation"
+        working-directory: ./installer
+        run: |
+          sudo bash -c "python3 installer.py < upgrade-existing.txt"
 
-      # - name: Debugging with tmate
-      #   if: ${{ failure() }}
-      #   uses: mxschmitt/action-tmate@v3.13
-      #   with:
-      #     timeout-minutes: 15
+      - name: Debugging with tmate
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3.13
+        with:
+          timeout-minutes: 15
 
   unit-tests:
     name: "Unit Tests"
