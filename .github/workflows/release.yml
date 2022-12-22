@@ -37,6 +37,8 @@ jobs:
 
       # Setup for pushing to Buf.build later
       - uses: bufbuild/buf-setup-action@v1.10.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       # Required for short-lived token provided to Semantic Release
       - name: "Obtain Github App token"
@@ -55,7 +57,7 @@ jobs:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v3
+        uses: goreleaser/goreleaser-action@v4
         with:
           distribution: goreleaser
           version: latest

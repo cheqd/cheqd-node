@@ -7,9 +7,14 @@ import (
 )
 
 func MigrateResourceUUID(sctx sdk.Context, mctx MigrationContext) error {
-	println("UUID migration for resources")
+	sctx.Logger().Debug("MigrateResourceUUID: Starting migration")
+
 	return MigrateResourceSimple(sctx, mctx, func(resource *resourcetypes.ResourceWithMetadata) {
+		sctx.Logger().Debug("MigrateResourceUUID: OldId: " + resource.Metadata.Id)
+		sctx.Logger().Debug("MigrateResourceUUID: OldCollectionId: " + resource.Metadata.CollectionId)
 		resource.Metadata.CollectionId = helpers.MigrateUUIDId(resource.Metadata.CollectionId)
 		resource.Metadata.Id = helpers.MigrateUUIDId(resource.Metadata.Id)
+		sctx.Logger().Debug("MigrateResourceUUID: NewId: " + resource.Metadata.Id)
+		sctx.Logger().Debug("MigrateResourceUUID: NewCollectionId: " + resource.Metadata.CollectionId)
 	})
 }
