@@ -25,4 +25,4 @@ rm -rf github.com
 
 go mod tidy
 
-./scripts/protoc-pulsar-gen.sh
+bash ./scripts/protoc-pulsar-gen.sh
