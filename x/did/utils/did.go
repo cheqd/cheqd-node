@@ -85,7 +85,7 @@ func ValidateDID(did string, method string, allowedNamespaces []string) error {
 	}
 
 	if len(allowedNamespaces) > 0 && !Contains(allowedNamespaces, sNamespace) {
-		return fmt.Errorf("did namespace must be one of: %s", strings.Join(allowedNamespaces[:], ", "))
+		return fmt.Errorf("did namespace must be one of: %s", strings.Join(allowedNamespaces, ", "))
 	}
 
 	// check unique-id

@@ -42,7 +42,7 @@ func MigrateResourceVersionLinks(sctx sdk.Context, mctx MigrationContext) error 
 
 	sctx.Logger().Debug("MigrateResourceVersionLinks: Sorting resources by date created")
 	// Sort resources by date created
-	sort.Slice(resources[:], func(i, j int) bool {
+	sort.Slice(resources, func(i, j int) bool {
 		iCreated, err := time.Parse(time.RFC3339, resources[i].Metadata.Created)
 		if err != nil {
 			panic(err)
