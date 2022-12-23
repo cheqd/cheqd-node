@@ -5,9 +5,10 @@ version: v1
 name: buf.build/cheqd/proto
 
 deps:
-  - buf.build/cosmos/cosmos-sdk:a4d885fe2ad0a999c3486fd83bb998c416fe38c8 # Cosmos SDK v0.46.7
-  - buf.build/cosmos/cosmos-proto:1935555c206d4afb9e94615dfd0fad31 # Cosmos SDK v0.46.7
-  - buf.build/cosmos/gogo-proto:34d970b699f84aa382f3c29773a60836 # Cosmos SDK v0.46.7
+  # Update these dependencies when our chain goes to Cosmos SDK v0.47.x
+  - buf.build/cosmos/cosmos-sdk # Cosmos SDK v0.46.7
+  - buf.build/cosmos/cosmos-proto # 29th November 2022
+  - buf.build/cosmos/gogo-proto # 29th August 2022
   - buf.build/googleapis/googleapis
 breaking:
   use:
@@ -26,4 +27,3 @@ lint:
   except:
     - SERVICE_SUFFIX
     - RPC_REQUEST_STANDARD_NAME
-    - RPC_RESPONSE_STANDARD_NAME
