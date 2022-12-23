@@ -18,9 +18,9 @@ var _ = Describe("Create DID Payload Validation tests", func() {
 			Authentication: []string{testCase.inputId + "#key1"},
 			VerificationMethod: []*VerificationMethod{
 				{
-					Id:         testCase.inputId + "#key1",
-					Type:       Ed25519VerificationKey2020{}.Type(),
-					Controller: testCase.inputId,
+					Id:                     testCase.inputId + "#key1",
+					VerificationMethodType: Ed25519VerificationKey2020{}.Type(),
+					Controller:             testCase.inputId,
 				},
 			},
 		}
@@ -29,9 +29,9 @@ var _ = Describe("Create DID Payload Validation tests", func() {
 			Authentication: []string{testCase.expectedId + "#key1"},
 			VerificationMethod: []*VerificationMethod{
 				{
-					Id:         testCase.expectedId + "#key1",
-					Type:       Ed25519VerificationKey2020{}.Type(),
-					Controller: testCase.expectedId,
+					Id:                     testCase.expectedId + "#key1",
+					VerificationMethodType: Ed25519VerificationKey2020{}.Type(),
+					Controller:             testCase.expectedId,
 				},
 			},
 		}

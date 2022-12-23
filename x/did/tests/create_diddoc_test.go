@@ -30,10 +30,10 @@ var _ = Describe("Create DID tests", func() {
 			Authentication: []string{keyId},
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                   keyId,
-					Type:                 types.Ed25519VerificationKey2020{}.Type(),
-					Controller:           did,
-					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
+					Id:                     keyId,
+					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					Controller:             did,
+					VerificationMaterial:   BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
 			},
 			VersionId: uuid.NewString(),
@@ -65,10 +65,10 @@ var _ = Describe("Create DID tests", func() {
 			Authentication: []string{keyId},
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                   keyId,
-					Type:                 types.JsonWebKey2020{}.Type(),
-					Controller:           did,
-					VerificationMaterial: BuildJsonWebKey2020VerificationMaterial(keypair.Public),
+					Id:                     keyId,
+					VerificationMethodType: types.JsonWebKey2020{}.Type(),
+					Controller:             did,
+					VerificationMaterial:   BuildJsonWebKey2020VerificationMaterial(keypair.Public),
 				},
 			},
 			VersionId: uuid.NewString(),
@@ -106,10 +106,10 @@ var _ = Describe("Create DID tests", func() {
 			Authentication: []string{bobKeyId},
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                   bobKeyId,
-					Type:                 types.Ed25519VerificationKey2020{}.Type(),
-					Controller:           anna.Did,
-					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(bobKeypair.Public),
+					Id:                     bobKeyId,
+					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					Controller:             anna.Did,
+					VerificationMaterial:   BuildEd25519VerificationKey2020VerificationMaterial(bobKeypair.Public),
 				},
 			},
 			VersionId: uuid.NewString(),
@@ -147,28 +147,28 @@ var _ = Describe("Create DID tests", func() {
 			Controller: []string{did},
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                   keyId1,
-					Type:                 types.Ed25519VerificationKey2020{}.Type(),
-					Controller:           did,
-					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keypair1.Public),
+					Id:                     keyId1,
+					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					Controller:             did,
+					VerificationMaterial:   BuildEd25519VerificationKey2020VerificationMaterial(keypair1.Public),
 				},
 				{
-					Id:                   keyId2,
-					Type:                 types.Ed25519VerificationKey2020{}.Type(),
-					Controller:           did,
-					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keypair2.Public),
+					Id:                     keyId2,
+					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					Controller:             did,
+					VerificationMaterial:   BuildEd25519VerificationKey2020VerificationMaterial(keypair2.Public),
 				},
 				{
-					Id:                   keyId3,
-					Type:                 types.Ed25519VerificationKey2020{}.Type(),
-					Controller:           did,
-					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keypair3.Public),
+					Id:                     keyId3,
+					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					Controller:             did,
+					VerificationMaterial:   BuildEd25519VerificationKey2020VerificationMaterial(keypair3.Public),
 				},
 				{
-					Id:                   keyId4,
-					Type:                 types.Ed25519VerificationKey2020{}.Type(),
-					Controller:           did,
-					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keypair4.Public),
+					Id:                     keyId4,
+					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					Controller:             did,
+					VerificationMaterial:   BuildEd25519VerificationKey2020VerificationMaterial(keypair4.Public),
 				},
 			},
 			Authentication:       []string{keyId1, keyId2},
@@ -179,7 +179,7 @@ var _ = Describe("Create DID tests", func() {
 			Service: []*types.Service{
 				{
 					Id:              did + "#service-1",
-					Type:            "type-1",
+					ServiceType:     "type-1",
 					ServiceEndpoint: []string{"endpoint-1"},
 				},
 			},
@@ -222,10 +222,10 @@ var _ = Describe("Create DID tests", func() {
 			Authentication: []string{bobKeyId},
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                   bobKeyId,
-					Type:                 types.Ed25519VerificationKey2020{}.Type(),
-					Controller:           bobDid,
-					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(bobKeypair.Public),
+					Id:                     bobKeyId,
+					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					Controller:             bobDid,
+					VerificationMaterial:   BuildEd25519VerificationKey2020VerificationMaterial(bobKeypair.Public),
 				},
 			},
 			VersionId: uuid.NewString(),
@@ -253,10 +253,10 @@ var _ = Describe("Create DID tests", func() {
 			Authentication: []string{keyId},
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                   keyId,
-					Type:                 types.Ed25519VerificationKey2020{}.Type(),
-					Controller:           did,
-					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
+					Id:                     keyId,
+					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					Controller:             did,
+					VerificationMaterial:   BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
 			},
 			VersionId: uuid.NewString(),
@@ -281,10 +281,10 @@ var _ = Describe("Create DID tests", func() {
 			Authentication: []string{keyId},
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                   keyId,
-					Type:                 types.Ed25519VerificationKey2020{}.Type(),
-					Controller:           did,
-					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
+					Id:                     keyId,
+					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					Controller:             did,
+					VerificationMaterial:   BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
 			},
 			VersionId: uuid.NewString(),
@@ -307,10 +307,10 @@ var _ = Describe("Create DID tests", func() {
 			Authentication: []string{keyId},
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                   keyId,
-					Type:                 types.Ed25519VerificationKey2020{}.Type(),
-					Controller:           did,
-					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
+					Id:                     keyId,
+					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					Controller:             did,
+					VerificationMaterial:   BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
 			},
 			VersionId: uuid.NewString(),
@@ -344,10 +344,10 @@ var _ = Describe("Create DID tests", func() {
 			Authentication: []string{bobKeyId},
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                   bobKeyId,
-					Type:                 types.Ed25519VerificationKey2020{}.Type(),
-					Controller:           bobDid,
-					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(bobKeypair.Public),
+					Id:                     bobKeyId,
+					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					Controller:             bobDid,
+					VerificationMaterial:   BuildEd25519VerificationKey2020VerificationMaterial(bobKeypair.Public),
 				},
 			},
 			VersionId: uuid.NewString(),
@@ -370,10 +370,10 @@ var _ = Describe("Create DID tests", func() {
 			Authentication: []string{keyId},
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                   keyId,
-					Type:                 types.Ed25519VerificationKey2020{}.Type(),
-					Controller:           did,
-					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
+					Id:                     keyId,
+					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					Controller:             did,
+					VerificationMaterial:   BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
 			},
 			VersionId: uuid.NewString(),
@@ -401,10 +401,10 @@ var _ = Describe("Create DID tests", func() {
 			Authentication: []string{alice.KeyId},
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                   alice.KeyId,
-					Type:                 types.Ed25519VerificationKey2020{}.Type(),
-					Controller:           alice.Did,
-					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(alice.KeyPair.Public),
+					Id:                     alice.KeyId,
+					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					Controller:             alice.Did,
+					VerificationMaterial:   BuildEd25519VerificationKey2020VerificationMaterial(alice.KeyPair.Public),
 				},
 			},
 		}
@@ -436,10 +436,10 @@ var _ = Describe("Check upper/lower case for DID creation", func() {
 			Authentication: []string{keyId},
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                   keyId,
-					Type:                 types.Ed25519VerificationKey2020{}.Type(),
-					Controller:           did,
-					VerificationMaterial: BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
+					Id:                     keyId,
+					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					Controller:             did,
+					VerificationMaterial:   BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
 			},
 			VersionId: uuid.NewString(),

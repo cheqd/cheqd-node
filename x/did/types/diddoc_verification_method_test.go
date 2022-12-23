@@ -39,10 +39,10 @@ var _ = DescribeTable("Verification Method validation tests", func(testCase Veri
 		"Verification method with expected multibase key",
 		VerificationMethodTestCase{
 			vm: VerificationMethod{
-				Id:                   "did:cheqd:zABCDEFG123456789abcd#qwe",
-				Type:                 "Ed25519VerificationKey2020",
-				Controller:           "did:cheqd:zABCDEFG987654321abcd",
-				VerificationMaterial: ValidEd25519VerificationMaterial,
+				Id:                     "did:cheqd:zABCDEFG123456789abcd#qwe",
+				VerificationMethodType: "Ed25519VerificationKey2020",
+				Controller:             "did:cheqd:zABCDEFG987654321abcd",
+				VerificationMaterial:   ValidEd25519VerificationMaterial,
 			},
 			isValid:  true,
 			errorMsg: "",
@@ -52,10 +52,10 @@ var _ = DescribeTable("Verification Method validation tests", func(testCase Veri
 		"Verification method with expected jwk key",
 		VerificationMethodTestCase{
 			vm: VerificationMethod{
-				Id:                   "did:cheqd:zABCDEFG123456789abcd#rty",
-				Type:                 "JsonWebKey2020",
-				Controller:           "did:cheqd:zABCDEFG987654321abcd",
-				VerificationMaterial: ValidJWKKeyVerificationMaterial,
+				Id:                     "did:cheqd:zABCDEFG123456789abcd#rty",
+				VerificationMethodType: "JsonWebKey2020",
+				Controller:             "did:cheqd:zABCDEFG987654321abcd",
+				VerificationMaterial:   ValidJWKKeyVerificationMaterial,
 			},
 			isValid:  true,
 			errorMsg: "",
@@ -65,10 +65,10 @@ var _ = DescribeTable("Verification Method validation tests", func(testCase Veri
 		"Id has expected DID as a base",
 		VerificationMethodTestCase{
 			vm: VerificationMethod{
-				Id:                   "did:cheqd:zABCDEFG123456789abcd#rty",
-				Type:                 "JsonWebKey2020",
-				Controller:           "did:cheqd:zABCDEFG987654321abcd",
-				VerificationMaterial: ValidJWKKeyVerificationMaterial,
+				Id:                     "did:cheqd:zABCDEFG123456789abcd#rty",
+				VerificationMethodType: "JsonWebKey2020",
+				Controller:             "did:cheqd:zABCDEFG987654321abcd",
+				VerificationMaterial:   ValidJWKKeyVerificationMaterial,
 			},
 			baseDid:  "did:cheqd:zABCDEFG123456789abcd",
 			isValid:  true,
@@ -79,10 +79,10 @@ var _ = DescribeTable("Verification Method validation tests", func(testCase Veri
 		"Id does not have expected DID as a base",
 		VerificationMethodTestCase{
 			vm: VerificationMethod{
-				Id:                   "did:cheqd:zABCDEFG123456789abcd#rty",
-				Type:                 "JsonWebKey2020",
-				Controller:           "did:cheqd:zABCDEFG987654321abcd",
-				VerificationMaterial: ValidJWKKeyVerificationMaterial,
+				Id:                     "did:cheqd:zABCDEFG123456789abcd#rty",
+				VerificationMethodType: "JsonWebKey2020",
+				Controller:             "did:cheqd:zABCDEFG987654321abcd",
+				VerificationMaterial:   ValidJWKKeyVerificationMaterial,
 			},
 			baseDid:  "did:cheqd:zABCDEFG987654321abcd",
 			isValid:  false,
@@ -93,10 +93,10 @@ var _ = DescribeTable("Verification Method validation tests", func(testCase Veri
 		"Namespace is allowed",
 		VerificationMethodTestCase{
 			vm: VerificationMethod{
-				Id:                   "did:cheqd:mainnet:zABCDEFG123456789abcd#rty",
-				Type:                 "JsonWebKey2020",
-				Controller:           "did:cheqd:zABCDEFG987654321abcd",
-				VerificationMaterial: ValidJWKKeyVerificationMaterial,
+				Id:                     "did:cheqd:mainnet:zABCDEFG123456789abcd#rty",
+				VerificationMethodType: "JsonWebKey2020",
+				Controller:             "did:cheqd:zABCDEFG987654321abcd",
+				VerificationMaterial:   ValidJWKKeyVerificationMaterial,
 			},
 			allowedNamespaces: []string{"mainnet", ""},
 			isValid:           true,
@@ -106,10 +106,10 @@ var _ = DescribeTable("Verification Method validation tests", func(testCase Veri
 		"Namespace is not allowed",
 		VerificationMethodTestCase{
 			vm: VerificationMethod{
-				Id:                   "did:cheqd:mainnet:zABCDEFG123456789abcd#rty",
-				Type:                 "JsonWebKey2020",
-				Controller:           "did:cheqd:zABCDEFG987654321abcd",
-				VerificationMaterial: ValidJWKKeyVerificationMaterial,
+				Id:                     "did:cheqd:mainnet:zABCDEFG123456789abcd#rty",
+				VerificationMethodType: "JsonWebKey2020",
+				Controller:             "did:cheqd:zABCDEFG987654321abcd",
+				VerificationMaterial:   ValidJWKKeyVerificationMaterial,
 			},
 			allowedNamespaces: []string{"testnet"},
 			isValid:           false,
@@ -119,10 +119,10 @@ var _ = DescribeTable("Verification Method validation tests", func(testCase Veri
 		"JWK key has expected format",
 		VerificationMethodTestCase{
 			vm: VerificationMethod{
-				Id:                   "did:cheqd:zABCDEFG123456789abcd#qwe",
-				Type:                 "JsonWebKey2020",
-				Controller:           "did:cheqd:zABCDEFG987654321abcd",
-				VerificationMaterial: ValidJWKKeyVerificationMaterial,
+				Id:                     "did:cheqd:zABCDEFG123456789abcd#qwe",
+				VerificationMethodType: "JsonWebKey2020",
+				Controller:             "did:cheqd:zABCDEFG987654321abcd",
+				VerificationMaterial:   ValidJWKKeyVerificationMaterial,
 			},
 			isValid: true,
 		}),
@@ -130,10 +130,10 @@ var _ = DescribeTable("Verification Method validation tests", func(testCase Veri
 		"JWK key has unexpected format",
 		VerificationMethodTestCase{
 			vm: VerificationMethod{
-				Id:                   "did:cheqd:zABCDEFG123456789abcd#qwe",
-				Type:                 "JsonWebKey2020",
-				Controller:           "did:cheqd:zABCDEFG987654321abcd",
-				VerificationMaterial: InvalidJWKKeyVerificationMaterial,
+				Id:                     "did:cheqd:zABCDEFG123456789abcd#qwe",
+				VerificationMethodType: "JsonWebKey2020",
+				Controller:             "did:cheqd:zABCDEFG987654321abcd",
+				VerificationMaterial:   InvalidJWKKeyVerificationMaterial,
 			},
 			isValid:  false,
 			errorMsg: "verification_material: can't parse jwk: failed to parse key",
@@ -142,10 +142,10 @@ var _ = DescribeTable("Verification Method validation tests", func(testCase Veri
 		"Ed25519 key has unexpected format",
 		VerificationMethodTestCase{
 			vm: VerificationMethod{
-				Id:                   "did:cheqd:zABCDEFG123456789abcd#qwe",
-				Type:                 "Ed25519VerificationKey2020",
-				Controller:           "did:cheqd:zABCDEFG987654321abcd",
-				VerificationMaterial: InvalidEd25519VerificationMaterial,
+				Id:                     "did:cheqd:zABCDEFG123456789abcd#qwe",
+				VerificationMethodType: "Ed25519VerificationKey2020",
+				Controller:             "did:cheqd:zABCDEFG987654321abcd",
+				VerificationMaterial:   InvalidEd25519VerificationMaterial,
 			},
 			isValid:  false,
 			errorMsg: "verification_material: (publicKeyMultibase: ed25519: bad public key length: 18.)",
@@ -172,10 +172,10 @@ var _ = Describe("Validation ed25519 Signature in verification method", func() {
 			Expect(err).To(BeNil())
 
 			vm := VerificationMethod{
-				Id:                   "",
-				Type:                 "Ed25519VerificationKey2020",
-				Controller:           "",
-				VerificationMaterial: "{\"publicKeyMultibase\": \"" + pubKeyStr + "\"}",
+				Id:                     "",
+				VerificationMethodType: "Ed25519VerificationKey2020",
+				Controller:             "",
+				VerificationMaterial:   "{\"publicKeyMultibase\": \"" + pubKeyStr + "\"}",
 			}
 
 			err = VerifySignature(vm, msgBytes, signature)
@@ -192,10 +192,10 @@ var _ = Describe("Validation ed25519 Signature in verification method", func() {
 			Expect(err).To(BeNil())
 
 			vm2 := VerificationMethod{
-				Id:                   "",
-				Type:                 "JsonWebKey2020",
-				Controller:           "",
-				VerificationMaterial: "{\"publicKeyJwk\": " + string(json_) + "}",
+				Id:                     "",
+				VerificationMethodType: "JsonWebKey2020",
+				Controller:             "",
+				VerificationMaterial:   "{\"publicKeyJwk\": " + string(json_) + "}",
 			}
 
 			err = VerifySignature(vm2, msgBytes, signature)
@@ -231,10 +231,10 @@ var _ = Describe("Validation ECDSA Signature in verification method", func() {
 			Expect(err).To(BeNil())
 
 			vm := VerificationMethod{
-				Id:                   "",
-				Type:                 "JsonWebKey2020",
-				Controller:           "",
-				VerificationMaterial: "{\"publicKeyJwk\": " + string(json_) + "}",
+				Id:                     "",
+				VerificationMethodType: "JsonWebKey2020",
+				Controller:             "",
+				VerificationMaterial:   "{\"publicKeyJwk\": " + string(json_) + "}",
 			}
 
 			err = VerifySignature(vm, msgBytes, signature)
@@ -269,10 +269,10 @@ var _ = Describe("Validation RSA Signature in verification method", func() {
 			Expect(err).To(BeNil())
 
 			vm2 := VerificationMethod{
-				Id:                   "",
-				Type:                 "JsonWebKey2020",
-				Controller:           "",
-				VerificationMaterial: "{\"publicKeyJwk\": " + string(json_) + "}",
+				Id:                     "",
+				VerificationMethodType: "JsonWebKey2020",
+				Controller:             "",
+				VerificationMaterial:   "{\"publicKeyJwk\": " + string(json_) + "}",
 			}
 
 			err = VerifySignature(vm2, msgBytes, signature)

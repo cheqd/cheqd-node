@@ -104,10 +104,10 @@ func MigrateDidDoc(oldDid *didtypesv1.Did) didtypes.DidDoc {
 		vms = append(
 			vms,
 			&didtypes.VerificationMethod{
-				Id:                   vm.Id,
-				Type:                 MigrateType(vm.Type),
-				Controller:           vm.Controller,
-				VerificationMaterial: MigrateVerificationMaterial(vm),
+				Id:                     vm.Id,
+				VerificationMethodType: MigrateType(vm.Type),
+				Controller:             vm.Controller,
+				VerificationMaterial:   MigrateVerificationMaterial(vm),
 			})
 	}
 
@@ -117,7 +117,7 @@ func MigrateDidDoc(oldDid *didtypesv1.Did) didtypes.DidDoc {
 			srvs,
 			&didtypes.Service{
 				Id:              srv.Id,
-				Type:            srv.Type,
+				ServiceType:     srv.Type,
 				ServiceEndpoint: []string{srv.ServiceEndpoint},
 			})
 	}

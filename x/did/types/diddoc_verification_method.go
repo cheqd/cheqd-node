@@ -22,10 +22,10 @@ var SupportedMethodTypes = []string{
 
 func NewVerificationMethod(id string, type_ string, controller string, verificationMaterial string) *VerificationMethod {
 	return &VerificationMethod{
-		Id:                   id,
-		Type:                 type_,
-		Controller:           controller,
-		VerificationMaterial: verificationMaterial,
+		Id:                     id,
+		VerificationMethodType: type_,
+		Controller:             controller,
+		VerificationMaterial:   verificationMaterial,
 	}
 }
 
@@ -54,7 +54,7 @@ func GetVerificationMethodIds(vms []*VerificationMethod) []string {
 func VerifySignature(vm VerificationMethod, message []byte, signature []byte) error {
 	var verificationError error
 
-	switch vm.Type {
+	switch vm.VerificationMethodType {
 	case Ed25519VerificationKey2020{}.Type():
 		var ed25519VerificationKey2020 Ed25519VerificationKey2020
 		err := json.Unmarshal([]byte(vm.VerificationMaterial), &ed25519VerificationKey2020)
@@ -132,12 +132,12 @@ func (vm VerificationMethod) Validate(baseDid string, allowedNamespaces []string
 	return validation.ValidateStruct(&vm,
 		validation.Field(&vm.Id, validation.Required, IsDIDUrl(allowedNamespaces, Empty, Empty, Required), HasPrefix(baseDid)),
 		validation.Field(&vm.Controller, validation.Required, IsDID(allowedNamespaces)),
-		validation.Field(&vm.Type, validation.Required, validation.In(utils.ToInterfaces(SupportedMethodTypes)...)),
+		validation.Field(&vm.VerificationMethodType, validation.Required, validation.In(utils.ToInterfaces(SupportedMethodTypes)...)),
 		validation.Field(&vm.VerificationMaterial,
-			validation.When(vm.Type == Ed25519VerificationKey2020{}.Type(), validation.Required, ValidEd25519VerificationKey2020Rule()),
+			validation.When(vm.VerificationMethodType == Ed25519VerificationKey2020{}.Type(), validation.Required, ValidEd25519VerificationKey2020Rule()),
 		),
 		validation.Field(&vm.VerificationMaterial,
-			validation.When(vm.Type == JsonWebKey2020{}.Type(), validation.Required, ValidJsonWebKey2020Rule()),
+			validation.When(vm.VerificationMethodType == JsonWebKey2020{}.Type(), validation.Required, ValidJsonWebKey2020Rule()),
 		),
 	)
 }
