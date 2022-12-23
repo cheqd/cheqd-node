@@ -10,9 +10,8 @@ managed:
       - buf.build/googleapis/googleapis
       - buf.build/cosmos/gogo-proto
       - buf.build/cosmos/cosmos-proto
-    # Disable override until Cosmos SDK v0.47.x is released
-    # override:
-    #   buf.build/cosmos/cosmos-sdk: github.com/cosmos/cosmos-sdk/api
+    override:
+      buf.build/cosmos/cosmos-sdk: github.com/cosmos/cosmos-sdk/api
 
 plugins:
   - name: go-pulsar
