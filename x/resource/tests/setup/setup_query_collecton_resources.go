@@ -2,7 +2,7 @@ package setup
 
 import "github.com/cheqd/cheqd-node/x/resource/types"
 
-func (s *TestSetup) CollectionResources(collectionId string) (*types.QueryGetCollectionResourcesResponse, error) {
+func (s *TestSetup) CollectionResources(collectionId string) (*types.QueryCollectionResourcesResponse, error) {
 	req := &types.QueryGetCollectionResourcesRequest{
 		CollectionId: collectionId,
 	}

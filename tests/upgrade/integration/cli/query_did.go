@@ -21,16 +21,16 @@ func QueryDidLegacy(did string, container string) (didtypesv1.QueryGetDidRespons
 	return resp, nil
 }
 
-func QueryDid(did string, container string) (didtypesv2.QueryGetDidDocResponse, error) {
+func QueryDid(did string, container string) (didtypesv2.QueryDidDocResponse, error) {
 	res, err := Query(container, CLI_BINARY_NAME, "cheqd", "did-document", did)
 	if err != nil {
-		return didtypesv2.QueryGetDidDocResponse{}, err
+		return didtypesv2.QueryDidDocResponse{}, err
 	}
 
-	var resp didtypesv2.QueryGetDidDocResponse
+	var resp didtypesv2.QueryDidDocResponse
 	err = integrationhelpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
-		return didtypesv2.QueryGetDidDocResponse{}, err
+		return didtypesv2.QueryDidDocResponse{}, err
 	}
 
 	return resp, nil

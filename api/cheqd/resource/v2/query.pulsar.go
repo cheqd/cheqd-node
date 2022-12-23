@@ -498,25 +498,25 @@ func (x *fastReflection_QueryGetResourceRequest) ProtoMethods() *protoiface.Meth
 }
 
 var (
-	md_QueryGetResourceResponse          protoreflect.MessageDescriptor
-	fd_QueryGetResourceResponse_resource protoreflect.FieldDescriptor
+	md_QueryResourceResponse          protoreflect.MessageDescriptor
+	fd_QueryResourceResponse_resource protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_cheqd_resource_v2_query_proto_init()
-	md_QueryGetResourceResponse = File_cheqd_resource_v2_query_proto.Messages().ByName("QueryGetResourceResponse")
-	fd_QueryGetResourceResponse_resource = md_QueryGetResourceResponse.Fields().ByName("resource")
+	md_QueryResourceResponse = File_cheqd_resource_v2_query_proto.Messages().ByName("QueryResourceResponse")
+	fd_QueryResourceResponse_resource = md_QueryResourceResponse.Fields().ByName("resource")
 }
 
-var _ protoreflect.Message = (*fastReflection_QueryGetResourceResponse)(nil)
+var _ protoreflect.Message = (*fastReflection_QueryResourceResponse)(nil)
 
-type fastReflection_QueryGetResourceResponse QueryGetResourceResponse
+type fastReflection_QueryResourceResponse QueryResourceResponse
 
-func (x *QueryGetResourceResponse) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_QueryGetResourceResponse)(x)
+func (x *QueryResourceResponse) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_QueryResourceResponse)(x)
 }
 
-func (x *QueryGetResourceResponse) slowProtoReflect() protoreflect.Message {
+func (x *QueryResourceResponse) slowProtoReflect() protoreflect.Message {
 	mi := &file_cheqd_resource_v2_query_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -528,43 +528,43 @@ func (x *QueryGetResourceResponse) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_QueryGetResourceResponse_messageType fastReflection_QueryGetResourceResponse_messageType
-var _ protoreflect.MessageType = fastReflection_QueryGetResourceResponse_messageType{}
+var _fastReflection_QueryResourceResponse_messageType fastReflection_QueryResourceResponse_messageType
+var _ protoreflect.MessageType = fastReflection_QueryResourceResponse_messageType{}
 
-type fastReflection_QueryGetResourceResponse_messageType struct{}
+type fastReflection_QueryResourceResponse_messageType struct{}
 
-func (x fastReflection_QueryGetResourceResponse_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_QueryGetResourceResponse)(nil)
+func (x fastReflection_QueryResourceResponse_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_QueryResourceResponse)(nil)
 }
-func (x fastReflection_QueryGetResourceResponse_messageType) New() protoreflect.Message {
-	return new(fastReflection_QueryGetResourceResponse)
+func (x fastReflection_QueryResourceResponse_messageType) New() protoreflect.Message {
+	return new(fastReflection_QueryResourceResponse)
 }
-func (x fastReflection_QueryGetResourceResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_QueryGetResourceResponse
+func (x fastReflection_QueryResourceResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_QueryResourceResponse
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_QueryGetResourceResponse) Descriptor() protoreflect.MessageDescriptor {
-	return md_QueryGetResourceResponse
+func (x *fastReflection_QueryResourceResponse) Descriptor() protoreflect.MessageDescriptor {
+	return md_QueryResourceResponse
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_QueryGetResourceResponse) Type() protoreflect.MessageType {
-	return _fastReflection_QueryGetResourceResponse_messageType
+func (x *fastReflection_QueryResourceResponse) Type() protoreflect.MessageType {
+	return _fastReflection_QueryResourceResponse_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_QueryGetResourceResponse) New() protoreflect.Message {
-	return new(fastReflection_QueryGetResourceResponse)
+func (x *fastReflection_QueryResourceResponse) New() protoreflect.Message {
+	return new(fastReflection_QueryResourceResponse)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_QueryGetResourceResponse) Interface() protoreflect.ProtoMessage {
-	return (*QueryGetResourceResponse)(x)
+func (x *fastReflection_QueryResourceResponse) Interface() protoreflect.ProtoMessage {
+	return (*QueryResourceResponse)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -572,10 +572,10 @@ func (x *fastReflection_QueryGetResourceResponse) Interface() protoreflect.Proto
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_QueryGetResourceResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_QueryResourceResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 	if x.Resource != nil {
 		value := protoreflect.ValueOfMessage(x.Resource.ProtoReflect())
-		if !f(fd_QueryGetResourceResponse_resource, value) {
+		if !f(fd_QueryResourceResponse_resource, value) {
 			return
 		}
 	}
@@ -592,15 +592,15 @@ func (x *fastReflection_QueryGetResourceResponse) Range(f func(protoreflect.Fiel
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_QueryGetResourceResponse) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_QueryResourceResponse) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "cheqd.resource.v2.QueryGetResourceResponse.resource":
+	case "cheqd.resource.v2.QueryResourceResponse.resource":
 		return x.Resource != nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryGetResourceResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryResourceResponse"))
 		}
-		panic(fmt.Errorf("message cheqd.resource.v2.QueryGetResourceResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.resource.v2.QueryResourceResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -610,15 +610,15 @@ func (x *fastReflection_QueryGetResourceResponse) Has(fd protoreflect.FieldDescr
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_QueryGetResourceResponse) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_QueryResourceResponse) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "cheqd.resource.v2.QueryGetResourceResponse.resource":
+	case "cheqd.resource.v2.QueryResourceResponse.resource":
 		x.Resource = nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryGetResourceResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryResourceResponse"))
 		}
-		panic(fmt.Errorf("message cheqd.resource.v2.QueryGetResourceResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.resource.v2.QueryResourceResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -628,16 +628,16 @@ func (x *fastReflection_QueryGetResourceResponse) Clear(fd protoreflect.FieldDes
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_QueryGetResourceResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_QueryResourceResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "cheqd.resource.v2.QueryGetResourceResponse.resource":
+	case "cheqd.resource.v2.QueryResourceResponse.resource":
 		value := x.Resource
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryGetResourceResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryResourceResponse"))
 		}
-		panic(fmt.Errorf("message cheqd.resource.v2.QueryGetResourceResponse does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message cheqd.resource.v2.QueryResourceResponse does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -651,15 +651,15 @@ func (x *fastReflection_QueryGetResourceResponse) Get(descriptor protoreflect.Fi
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_QueryGetResourceResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_QueryResourceResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "cheqd.resource.v2.QueryGetResourceResponse.resource":
+	case "cheqd.resource.v2.QueryResourceResponse.resource":
 		x.Resource = value.Message().Interface().(*ResourceWithMetadata)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryGetResourceResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryResourceResponse"))
 		}
-		panic(fmt.Errorf("message cheqd.resource.v2.QueryGetResourceResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.resource.v2.QueryResourceResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -673,44 +673,44 @@ func (x *fastReflection_QueryGetResourceResponse) Set(fd protoreflect.FieldDescr
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_QueryGetResourceResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_QueryResourceResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "cheqd.resource.v2.QueryGetResourceResponse.resource":
+	case "cheqd.resource.v2.QueryResourceResponse.resource":
 		if x.Resource == nil {
 			x.Resource = new(ResourceWithMetadata)
 		}
 		return protoreflect.ValueOfMessage(x.Resource.ProtoReflect())
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryGetResourceResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryResourceResponse"))
 		}
-		panic(fmt.Errorf("message cheqd.resource.v2.QueryGetResourceResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.resource.v2.QueryResourceResponse does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_QueryGetResourceResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_QueryResourceResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "cheqd.resource.v2.QueryGetResourceResponse.resource":
+	case "cheqd.resource.v2.QueryResourceResponse.resource":
 		m := new(ResourceWithMetadata)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryGetResourceResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryResourceResponse"))
 		}
-		panic(fmt.Errorf("message cheqd.resource.v2.QueryGetResourceResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.resource.v2.QueryResourceResponse does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_QueryGetResourceResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_QueryResourceResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in cheqd.resource.v2.QueryGetResourceResponse", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in cheqd.resource.v2.QueryResourceResponse", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -718,7 +718,7 @@ func (x *fastReflection_QueryGetResourceResponse) WhichOneof(d protoreflect.Oneo
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_QueryGetResourceResponse) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_QueryResourceResponse) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -729,7 +729,7 @@ func (x *fastReflection_QueryGetResourceResponse) GetUnknown() protoreflect.RawF
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_QueryGetResourceResponse) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_QueryResourceResponse) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -741,7 +741,7 @@ func (x *fastReflection_QueryGetResourceResponse) SetUnknown(fields protoreflect
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_QueryGetResourceResponse) IsValid() bool {
+func (x *fastReflection_QueryResourceResponse) IsValid() bool {
 	return x != nil
 }
 
@@ -751,9 +751,9 @@ func (x *fastReflection_QueryGetResourceResponse) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_QueryGetResourceResponse) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_QueryResourceResponse) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*QueryGetResourceResponse)
+		x := input.Message.Interface().(*QueryResourceResponse)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -779,7 +779,7 @@ func (x *fastReflection_QueryGetResourceResponse) ProtoMethods() *protoiface.Met
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*QueryGetResourceResponse)
+		x := input.Message.Interface().(*QueryResourceResponse)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -823,7 +823,7 @@ func (x *fastReflection_QueryGetResourceResponse) ProtoMethods() *protoiface.Met
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*QueryGetResourceResponse)
+		x := input.Message.Interface().(*QueryResourceResponse)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -855,10 +855,10 @@ func (x *fastReflection_QueryGetResourceResponse) ProtoMethods() *protoiface.Met
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryGetResourceResponse: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryResourceResponse: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryGetResourceResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryResourceResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
@@ -1417,25 +1417,25 @@ func (x *fastReflection_QueryGetResourceMetadataRequest) ProtoMethods() *protoif
 }
 
 var (
-	md_QueryGetResourceMetadataResponse          protoreflect.MessageDescriptor
-	fd_QueryGetResourceMetadataResponse_resource protoreflect.FieldDescriptor
+	md_QueryResourceMetadataResponse          protoreflect.MessageDescriptor
+	fd_QueryResourceMetadataResponse_resource protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_cheqd_resource_v2_query_proto_init()
-	md_QueryGetResourceMetadataResponse = File_cheqd_resource_v2_query_proto.Messages().ByName("QueryGetResourceMetadataResponse")
-	fd_QueryGetResourceMetadataResponse_resource = md_QueryGetResourceMetadataResponse.Fields().ByName("resource")
+	md_QueryResourceMetadataResponse = File_cheqd_resource_v2_query_proto.Messages().ByName("QueryResourceMetadataResponse")
+	fd_QueryResourceMetadataResponse_resource = md_QueryResourceMetadataResponse.Fields().ByName("resource")
 }
 
-var _ protoreflect.Message = (*fastReflection_QueryGetResourceMetadataResponse)(nil)
+var _ protoreflect.Message = (*fastReflection_QueryResourceMetadataResponse)(nil)
 
-type fastReflection_QueryGetResourceMetadataResponse QueryGetResourceMetadataResponse
+type fastReflection_QueryResourceMetadataResponse QueryResourceMetadataResponse
 
-func (x *QueryGetResourceMetadataResponse) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_QueryGetResourceMetadataResponse)(x)
+func (x *QueryResourceMetadataResponse) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_QueryResourceMetadataResponse)(x)
 }
 
-func (x *QueryGetResourceMetadataResponse) slowProtoReflect() protoreflect.Message {
+func (x *QueryResourceMetadataResponse) slowProtoReflect() protoreflect.Message {
 	mi := &file_cheqd_resource_v2_query_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1447,43 +1447,43 @@ func (x *QueryGetResourceMetadataResponse) slowProtoReflect() protoreflect.Messa
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_QueryGetResourceMetadataResponse_messageType fastReflection_QueryGetResourceMetadataResponse_messageType
-var _ protoreflect.MessageType = fastReflection_QueryGetResourceMetadataResponse_messageType{}
+var _fastReflection_QueryResourceMetadataResponse_messageType fastReflection_QueryResourceMetadataResponse_messageType
+var _ protoreflect.MessageType = fastReflection_QueryResourceMetadataResponse_messageType{}
 
-type fastReflection_QueryGetResourceMetadataResponse_messageType struct{}
+type fastReflection_QueryResourceMetadataResponse_messageType struct{}
 
-func (x fastReflection_QueryGetResourceMetadataResponse_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_QueryGetResourceMetadataResponse)(nil)
+func (x fastReflection_QueryResourceMetadataResponse_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_QueryResourceMetadataResponse)(nil)
 }
-func (x fastReflection_QueryGetResourceMetadataResponse_messageType) New() protoreflect.Message {
-	return new(fastReflection_QueryGetResourceMetadataResponse)
+func (x fastReflection_QueryResourceMetadataResponse_messageType) New() protoreflect.Message {
+	return new(fastReflection_QueryResourceMetadataResponse)
 }
-func (x fastReflection_QueryGetResourceMetadataResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_QueryGetResourceMetadataResponse
+func (x fastReflection_QueryResourceMetadataResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_QueryResourceMetadataResponse
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_QueryGetResourceMetadataResponse) Descriptor() protoreflect.MessageDescriptor {
-	return md_QueryGetResourceMetadataResponse
+func (x *fastReflection_QueryResourceMetadataResponse) Descriptor() protoreflect.MessageDescriptor {
+	return md_QueryResourceMetadataResponse
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_QueryGetResourceMetadataResponse) Type() protoreflect.MessageType {
-	return _fastReflection_QueryGetResourceMetadataResponse_messageType
+func (x *fastReflection_QueryResourceMetadataResponse) Type() protoreflect.MessageType {
+	return _fastReflection_QueryResourceMetadataResponse_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_QueryGetResourceMetadataResponse) New() protoreflect.Message {
-	return new(fastReflection_QueryGetResourceMetadataResponse)
+func (x *fastReflection_QueryResourceMetadataResponse) New() protoreflect.Message {
+	return new(fastReflection_QueryResourceMetadataResponse)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_QueryGetResourceMetadataResponse) Interface() protoreflect.ProtoMessage {
-	return (*QueryGetResourceMetadataResponse)(x)
+func (x *fastReflection_QueryResourceMetadataResponse) Interface() protoreflect.ProtoMessage {
+	return (*QueryResourceMetadataResponse)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -1491,10 +1491,10 @@ func (x *fastReflection_QueryGetResourceMetadataResponse) Interface() protorefle
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_QueryGetResourceMetadataResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_QueryResourceMetadataResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 	if x.Resource != nil {
 		value := protoreflect.ValueOfMessage(x.Resource.ProtoReflect())
-		if !f(fd_QueryGetResourceMetadataResponse_resource, value) {
+		if !f(fd_QueryResourceMetadataResponse_resource, value) {
 			return
 		}
 	}
@@ -1511,15 +1511,15 @@ func (x *fastReflection_QueryGetResourceMetadataResponse) Range(f func(protorefl
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_QueryGetResourceMetadataResponse) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_QueryResourceMetadataResponse) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "cheqd.resource.v2.QueryGetResourceMetadataResponse.resource":
+	case "cheqd.resource.v2.QueryResourceMetadataResponse.resource":
 		return x.Resource != nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryGetResourceMetadataResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryResourceMetadataResponse"))
 		}
-		panic(fmt.Errorf("message cheqd.resource.v2.QueryGetResourceMetadataResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.resource.v2.QueryResourceMetadataResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1529,15 +1529,15 @@ func (x *fastReflection_QueryGetResourceMetadataResponse) Has(fd protoreflect.Fi
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_QueryGetResourceMetadataResponse) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_QueryResourceMetadataResponse) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "cheqd.resource.v2.QueryGetResourceMetadataResponse.resource":
+	case "cheqd.resource.v2.QueryResourceMetadataResponse.resource":
 		x.Resource = nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryGetResourceMetadataResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryResourceMetadataResponse"))
 		}
-		panic(fmt.Errorf("message cheqd.resource.v2.QueryGetResourceMetadataResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.resource.v2.QueryResourceMetadataResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1547,16 +1547,16 @@ func (x *fastReflection_QueryGetResourceMetadataResponse) Clear(fd protoreflect.
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_QueryGetResourceMetadataResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_QueryResourceMetadataResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "cheqd.resource.v2.QueryGetResourceMetadataResponse.resource":
+	case "cheqd.resource.v2.QueryResourceMetadataResponse.resource":
 		value := x.Resource
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryGetResourceMetadataResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryResourceMetadataResponse"))
 		}
-		panic(fmt.Errorf("message cheqd.resource.v2.QueryGetResourceMetadataResponse does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message cheqd.resource.v2.QueryResourceMetadataResponse does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -1570,15 +1570,15 @@ func (x *fastReflection_QueryGetResourceMetadataResponse) Get(descriptor protore
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_QueryGetResourceMetadataResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_QueryResourceMetadataResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "cheqd.resource.v2.QueryGetResourceMetadataResponse.resource":
+	case "cheqd.resource.v2.QueryResourceMetadataResponse.resource":
 		x.Resource = value.Message().Interface().(*Metadata)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryGetResourceMetadataResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryResourceMetadataResponse"))
 		}
-		panic(fmt.Errorf("message cheqd.resource.v2.QueryGetResourceMetadataResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.resource.v2.QueryResourceMetadataResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1592,44 +1592,44 @@ func (x *fastReflection_QueryGetResourceMetadataResponse) Set(fd protoreflect.Fi
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_QueryGetResourceMetadataResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_QueryResourceMetadataResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "cheqd.resource.v2.QueryGetResourceMetadataResponse.resource":
+	case "cheqd.resource.v2.QueryResourceMetadataResponse.resource":
 		if x.Resource == nil {
 			x.Resource = new(Metadata)
 		}
 		return protoreflect.ValueOfMessage(x.Resource.ProtoReflect())
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryGetResourceMetadataResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryResourceMetadataResponse"))
 		}
-		panic(fmt.Errorf("message cheqd.resource.v2.QueryGetResourceMetadataResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.resource.v2.QueryResourceMetadataResponse does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_QueryGetResourceMetadataResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_QueryResourceMetadataResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "cheqd.resource.v2.QueryGetResourceMetadataResponse.resource":
+	case "cheqd.resource.v2.QueryResourceMetadataResponse.resource":
 		m := new(Metadata)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryGetResourceMetadataResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryResourceMetadataResponse"))
 		}
-		panic(fmt.Errorf("message cheqd.resource.v2.QueryGetResourceMetadataResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.resource.v2.QueryResourceMetadataResponse does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_QueryGetResourceMetadataResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_QueryResourceMetadataResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in cheqd.resource.v2.QueryGetResourceMetadataResponse", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in cheqd.resource.v2.QueryResourceMetadataResponse", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -1637,7 +1637,7 @@ func (x *fastReflection_QueryGetResourceMetadataResponse) WhichOneof(d protorefl
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_QueryGetResourceMetadataResponse) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_QueryResourceMetadataResponse) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -1648,7 +1648,7 @@ func (x *fastReflection_QueryGetResourceMetadataResponse) GetUnknown() protorefl
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_QueryGetResourceMetadataResponse) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_QueryResourceMetadataResponse) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -1660,7 +1660,7 @@ func (x *fastReflection_QueryGetResourceMetadataResponse) SetUnknown(fields prot
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_QueryGetResourceMetadataResponse) IsValid() bool {
+func (x *fastReflection_QueryResourceMetadataResponse) IsValid() bool {
 	return x != nil
 }
 
@@ -1670,9 +1670,9 @@ func (x *fastReflection_QueryGetResourceMetadataResponse) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_QueryGetResourceMetadataResponse) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_QueryResourceMetadataResponse) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*QueryGetResourceMetadataResponse)
+		x := input.Message.Interface().(*QueryResourceMetadataResponse)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1698,7 +1698,7 @@ func (x *fastReflection_QueryGetResourceMetadataResponse) ProtoMethods() *protoi
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*QueryGetResourceMetadataResponse)
+		x := input.Message.Interface().(*QueryResourceMetadataResponse)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1742,7 +1742,7 @@ func (x *fastReflection_QueryGetResourceMetadataResponse) ProtoMethods() *protoi
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*QueryGetResourceMetadataResponse)
+		x := input.Message.Interface().(*QueryResourceMetadataResponse)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1774,10 +1774,10 @@ func (x *fastReflection_QueryGetResourceMetadataResponse) ProtoMethods() *protoi
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryGetResourceMetadataResponse: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryResourceMetadataResponse: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryGetResourceMetadataResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryResourceMetadataResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
@@ -2271,77 +2271,77 @@ func (x *fastReflection_QueryGetCollectionResourcesRequest) ProtoMethods() *prot
 	}
 }
 
-var _ protoreflect.List = (*_QueryGetCollectionResourcesResponse_1_list)(nil)
+var _ protoreflect.List = (*_QueryCollectionResourcesResponse_1_list)(nil)
 
-type _QueryGetCollectionResourcesResponse_1_list struct {
+type _QueryCollectionResourcesResponse_1_list struct {
 	list *[]*Metadata
 }
 
-func (x *_QueryGetCollectionResourcesResponse_1_list) Len() int {
+func (x *_QueryCollectionResourcesResponse_1_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_QueryGetCollectionResourcesResponse_1_list) Get(i int) protoreflect.Value {
+func (x *_QueryCollectionResourcesResponse_1_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_QueryGetCollectionResourcesResponse_1_list) Set(i int, value protoreflect.Value) {
+func (x *_QueryCollectionResourcesResponse_1_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*Metadata)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_QueryGetCollectionResourcesResponse_1_list) Append(value protoreflect.Value) {
+func (x *_QueryCollectionResourcesResponse_1_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
 	concreteValue := valueUnwrapped.Interface().(*Metadata)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_QueryGetCollectionResourcesResponse_1_list) AppendMutable() protoreflect.Value {
+func (x *_QueryCollectionResourcesResponse_1_list) AppendMutable() protoreflect.Value {
 	v := new(Metadata)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_QueryGetCollectionResourcesResponse_1_list) Truncate(n int) {
+func (x *_QueryCollectionResourcesResponse_1_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_QueryGetCollectionResourcesResponse_1_list) NewElement() protoreflect.Value {
+func (x *_QueryCollectionResourcesResponse_1_list) NewElement() protoreflect.Value {
 	v := new(Metadata)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_QueryGetCollectionResourcesResponse_1_list) IsValid() bool {
+func (x *_QueryCollectionResourcesResponse_1_list) IsValid() bool {
 	return x.list != nil
 }
 
 var (
-	md_QueryGetCollectionResourcesResponse           protoreflect.MessageDescriptor
-	fd_QueryGetCollectionResourcesResponse_resources protoreflect.FieldDescriptor
+	md_QueryCollectionResourcesResponse           protoreflect.MessageDescriptor
+	fd_QueryCollectionResourcesResponse_resources protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_cheqd_resource_v2_query_proto_init()
-	md_QueryGetCollectionResourcesResponse = File_cheqd_resource_v2_query_proto.Messages().ByName("QueryGetCollectionResourcesResponse")
-	fd_QueryGetCollectionResourcesResponse_resources = md_QueryGetCollectionResourcesResponse.Fields().ByName("resources")
+	md_QueryCollectionResourcesResponse = File_cheqd_resource_v2_query_proto.Messages().ByName("QueryCollectionResourcesResponse")
+	fd_QueryCollectionResourcesResponse_resources = md_QueryCollectionResourcesResponse.Fields().ByName("resources")
 }
 
-var _ protoreflect.Message = (*fastReflection_QueryGetCollectionResourcesResponse)(nil)
+var _ protoreflect.Message = (*fastReflection_QueryCollectionResourcesResponse)(nil)
 
-type fastReflection_QueryGetCollectionResourcesResponse QueryGetCollectionResourcesResponse
+type fastReflection_QueryCollectionResourcesResponse QueryCollectionResourcesResponse
 
-func (x *QueryGetCollectionResourcesResponse) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_QueryGetCollectionResourcesResponse)(x)
+func (x *QueryCollectionResourcesResponse) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_QueryCollectionResourcesResponse)(x)
 }
 
-func (x *QueryGetCollectionResourcesResponse) slowProtoReflect() protoreflect.Message {
+func (x *QueryCollectionResourcesResponse) slowProtoReflect() protoreflect.Message {
 	mi := &file_cheqd_resource_v2_query_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -2353,43 +2353,43 @@ func (x *QueryGetCollectionResourcesResponse) slowProtoReflect() protoreflect.Me
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_QueryGetCollectionResourcesResponse_messageType fastReflection_QueryGetCollectionResourcesResponse_messageType
-var _ protoreflect.MessageType = fastReflection_QueryGetCollectionResourcesResponse_messageType{}
+var _fastReflection_QueryCollectionResourcesResponse_messageType fastReflection_QueryCollectionResourcesResponse_messageType
+var _ protoreflect.MessageType = fastReflection_QueryCollectionResourcesResponse_messageType{}
 
-type fastReflection_QueryGetCollectionResourcesResponse_messageType struct{}
+type fastReflection_QueryCollectionResourcesResponse_messageType struct{}
 
-func (x fastReflection_QueryGetCollectionResourcesResponse_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_QueryGetCollectionResourcesResponse)(nil)
+func (x fastReflection_QueryCollectionResourcesResponse_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_QueryCollectionResourcesResponse)(nil)
 }
-func (x fastReflection_QueryGetCollectionResourcesResponse_messageType) New() protoreflect.Message {
-	return new(fastReflection_QueryGetCollectionResourcesResponse)
+func (x fastReflection_QueryCollectionResourcesResponse_messageType) New() protoreflect.Message {
+	return new(fastReflection_QueryCollectionResourcesResponse)
 }
-func (x fastReflection_QueryGetCollectionResourcesResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_QueryGetCollectionResourcesResponse
+func (x fastReflection_QueryCollectionResourcesResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_QueryCollectionResourcesResponse
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_QueryGetCollectionResourcesResponse) Descriptor() protoreflect.MessageDescriptor {
-	return md_QueryGetCollectionResourcesResponse
+func (x *fastReflection_QueryCollectionResourcesResponse) Descriptor() protoreflect.MessageDescriptor {
+	return md_QueryCollectionResourcesResponse
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_QueryGetCollectionResourcesResponse) Type() protoreflect.MessageType {
-	return _fastReflection_QueryGetCollectionResourcesResponse_messageType
+func (x *fastReflection_QueryCollectionResourcesResponse) Type() protoreflect.MessageType {
+	return _fastReflection_QueryCollectionResourcesResponse_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_QueryGetCollectionResourcesResponse) New() protoreflect.Message {
-	return new(fastReflection_QueryGetCollectionResourcesResponse)
+func (x *fastReflection_QueryCollectionResourcesResponse) New() protoreflect.Message {
+	return new(fastReflection_QueryCollectionResourcesResponse)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_QueryGetCollectionResourcesResponse) Interface() protoreflect.ProtoMessage {
-	return (*QueryGetCollectionResourcesResponse)(x)
+func (x *fastReflection_QueryCollectionResourcesResponse) Interface() protoreflect.ProtoMessage {
+	return (*QueryCollectionResourcesResponse)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -2397,10 +2397,10 @@ func (x *fastReflection_QueryGetCollectionResourcesResponse) Interface() protore
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_QueryGetCollectionResourcesResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_QueryCollectionResourcesResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 	if len(x.Resources) != 0 {
-		value := protoreflect.ValueOfList(&_QueryGetCollectionResourcesResponse_1_list{list: &x.Resources})
-		if !f(fd_QueryGetCollectionResourcesResponse_resources, value) {
+		value := protoreflect.ValueOfList(&_QueryCollectionResourcesResponse_1_list{list: &x.Resources})
+		if !f(fd_QueryCollectionResourcesResponse_resources, value) {
 			return
 		}
 	}
@@ -2417,15 +2417,15 @@ func (x *fastReflection_QueryGetCollectionResourcesResponse) Range(f func(protor
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_QueryGetCollectionResourcesResponse) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_QueryCollectionResourcesResponse) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "cheqd.resource.v2.QueryGetCollectionResourcesResponse.resources":
+	case "cheqd.resource.v2.QueryCollectionResourcesResponse.resources":
 		return len(x.Resources) != 0
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryGetCollectionResourcesResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryCollectionResourcesResponse"))
 		}
-		panic(fmt.Errorf("message cheqd.resource.v2.QueryGetCollectionResourcesResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.resource.v2.QueryCollectionResourcesResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2435,15 +2435,15 @@ func (x *fastReflection_QueryGetCollectionResourcesResponse) Has(fd protoreflect
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_QueryGetCollectionResourcesResponse) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_QueryCollectionResourcesResponse) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "cheqd.resource.v2.QueryGetCollectionResourcesResponse.resources":
+	case "cheqd.resource.v2.QueryCollectionResourcesResponse.resources":
 		x.Resources = nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryGetCollectionResourcesResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryCollectionResourcesResponse"))
 		}
-		panic(fmt.Errorf("message cheqd.resource.v2.QueryGetCollectionResourcesResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.resource.v2.QueryCollectionResourcesResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2453,19 +2453,19 @@ func (x *fastReflection_QueryGetCollectionResourcesResponse) Clear(fd protorefle
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_QueryGetCollectionResourcesResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_QueryCollectionResourcesResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "cheqd.resource.v2.QueryGetCollectionResourcesResponse.resources":
+	case "cheqd.resource.v2.QueryCollectionResourcesResponse.resources":
 		if len(x.Resources) == 0 {
-			return protoreflect.ValueOfList(&_QueryGetCollectionResourcesResponse_1_list{})
+			return protoreflect.ValueOfList(&_QueryCollectionResourcesResponse_1_list{})
 		}
-		listValue := &_QueryGetCollectionResourcesResponse_1_list{list: &x.Resources}
+		listValue := &_QueryCollectionResourcesResponse_1_list{list: &x.Resources}
 		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryGetCollectionResourcesResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryCollectionResourcesResponse"))
 		}
-		panic(fmt.Errorf("message cheqd.resource.v2.QueryGetCollectionResourcesResponse does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message cheqd.resource.v2.QueryCollectionResourcesResponse does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -2479,17 +2479,17 @@ func (x *fastReflection_QueryGetCollectionResourcesResponse) Get(descriptor prot
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_QueryGetCollectionResourcesResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_QueryCollectionResourcesResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "cheqd.resource.v2.QueryGetCollectionResourcesResponse.resources":
+	case "cheqd.resource.v2.QueryCollectionResourcesResponse.resources":
 		lv := value.List()
-		clv := lv.(*_QueryGetCollectionResourcesResponse_1_list)
+		clv := lv.(*_QueryCollectionResourcesResponse_1_list)
 		x.Resources = *clv.list
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryGetCollectionResourcesResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryCollectionResourcesResponse"))
 		}
-		panic(fmt.Errorf("message cheqd.resource.v2.QueryGetCollectionResourcesResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.resource.v2.QueryCollectionResourcesResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2503,45 +2503,45 @@ func (x *fastReflection_QueryGetCollectionResourcesResponse) Set(fd protoreflect
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_QueryGetCollectionResourcesResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_QueryCollectionResourcesResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "cheqd.resource.v2.QueryGetCollectionResourcesResponse.resources":
+	case "cheqd.resource.v2.QueryCollectionResourcesResponse.resources":
 		if x.Resources == nil {
 			x.Resources = []*Metadata{}
 		}
-		value := &_QueryGetCollectionResourcesResponse_1_list{list: &x.Resources}
+		value := &_QueryCollectionResourcesResponse_1_list{list: &x.Resources}
 		return protoreflect.ValueOfList(value)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryGetCollectionResourcesResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryCollectionResourcesResponse"))
 		}
-		panic(fmt.Errorf("message cheqd.resource.v2.QueryGetCollectionResourcesResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.resource.v2.QueryCollectionResourcesResponse does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_QueryGetCollectionResourcesResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_QueryCollectionResourcesResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "cheqd.resource.v2.QueryGetCollectionResourcesResponse.resources":
+	case "cheqd.resource.v2.QueryCollectionResourcesResponse.resources":
 		list := []*Metadata{}
-		return protoreflect.ValueOfList(&_QueryGetCollectionResourcesResponse_1_list{list: &list})
+		return protoreflect.ValueOfList(&_QueryCollectionResourcesResponse_1_list{list: &list})
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryGetCollectionResourcesResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryCollectionResourcesResponse"))
 		}
-		panic(fmt.Errorf("message cheqd.resource.v2.QueryGetCollectionResourcesResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.resource.v2.QueryCollectionResourcesResponse does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_QueryGetCollectionResourcesResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_QueryCollectionResourcesResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in cheqd.resource.v2.QueryGetCollectionResourcesResponse", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in cheqd.resource.v2.QueryCollectionResourcesResponse", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -2549,7 +2549,7 @@ func (x *fastReflection_QueryGetCollectionResourcesResponse) WhichOneof(d protor
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_QueryGetCollectionResourcesResponse) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_QueryCollectionResourcesResponse) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -2560,7 +2560,7 @@ func (x *fastReflection_QueryGetCollectionResourcesResponse) GetUnknown() protor
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_QueryGetCollectionResourcesResponse) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_QueryCollectionResourcesResponse) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -2572,7 +2572,7 @@ func (x *fastReflection_QueryGetCollectionResourcesResponse) SetUnknown(fields p
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_QueryGetCollectionResourcesResponse) IsValid() bool {
+func (x *fastReflection_QueryCollectionResourcesResponse) IsValid() bool {
 	return x != nil
 }
 
@@ -2582,9 +2582,9 @@ func (x *fastReflection_QueryGetCollectionResourcesResponse) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_QueryGetCollectionResourcesResponse) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_QueryCollectionResourcesResponse) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*QueryGetCollectionResourcesResponse)
+		x := input.Message.Interface().(*QueryCollectionResourcesResponse)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -2612,7 +2612,7 @@ func (x *fastReflection_QueryGetCollectionResourcesResponse) ProtoMethods() *pro
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*QueryGetCollectionResourcesResponse)
+		x := input.Message.Interface().(*QueryCollectionResourcesResponse)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -2658,7 +2658,7 @@ func (x *fastReflection_QueryGetCollectionResourcesResponse) ProtoMethods() *pro
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*QueryGetCollectionResourcesResponse)
+		x := input.Message.Interface().(*QueryCollectionResourcesResponse)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -2690,10 +2690,10 @@ func (x *fastReflection_QueryGetCollectionResourcesResponse) ProtoMethods() *pro
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryGetCollectionResourcesResponse: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryCollectionResourcesResponse: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryGetCollectionResourcesResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryCollectionResourcesResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
@@ -2823,7 +2823,7 @@ func (x *QueryGetResourceRequest) GetId() string {
 	return ""
 }
 
-type QueryGetResourceResponse struct {
+type QueryResourceResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -2831,8 +2831,8 @@ type QueryGetResourceResponse struct {
 	Resource *ResourceWithMetadata `protobuf:"bytes,1,opt,name=resource,proto3" json:"resource,omitempty"`
 }
 
-func (x *QueryGetResourceResponse) Reset() {
-	*x = QueryGetResourceResponse{}
+func (x *QueryResourceResponse) Reset() {
+	*x = QueryResourceResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_cheqd_resource_v2_query_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -2840,18 +2840,18 @@ func (x *QueryGetResourceResponse) Reset() {
 	}
 }
 
-func (x *QueryGetResourceResponse) String() string {
+func (x *QueryResourceResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*QueryGetResourceResponse) ProtoMessage() {}
+func (*QueryResourceResponse) ProtoMessage() {}
 
-// Deprecated: Use QueryGetResourceResponse.ProtoReflect.Descriptor instead.
-func (*QueryGetResourceResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use QueryResourceResponse.ProtoReflect.Descriptor instead.
+func (*QueryResourceResponse) Descriptor() ([]byte, []int) {
 	return file_cheqd_resource_v2_query_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *QueryGetResourceResponse) GetResource() *ResourceWithMetadata {
+func (x *QueryResourceResponse) GetResource() *ResourceWithMetadata {
 	if x != nil {
 		return x.Resource
 	}
@@ -2903,7 +2903,7 @@ func (x *QueryGetResourceMetadataRequest) GetId() string {
 	return ""
 }
 
-type QueryGetResourceMetadataResponse struct {
+type QueryResourceMetadataResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -2911,8 +2911,8 @@ type QueryGetResourceMetadataResponse struct {
 	Resource *Metadata `protobuf:"bytes,1,opt,name=resource,proto3" json:"resource,omitempty"`
 }
 
-func (x *QueryGetResourceMetadataResponse) Reset() {
-	*x = QueryGetResourceMetadataResponse{}
+func (x *QueryResourceMetadataResponse) Reset() {
+	*x = QueryResourceMetadataResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_cheqd_resource_v2_query_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -2920,18 +2920,18 @@ func (x *QueryGetResourceMetadataResponse) Reset() {
 	}
 }
 
-func (x *QueryGetResourceMetadataResponse) String() string {
+func (x *QueryResourceMetadataResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*QueryGetResourceMetadataResponse) ProtoMessage() {}
+func (*QueryResourceMetadataResponse) ProtoMessage() {}
 
-// Deprecated: Use QueryGetResourceMetadataResponse.ProtoReflect.Descriptor instead.
-func (*QueryGetResourceMetadataResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use QueryResourceMetadataResponse.ProtoReflect.Descriptor instead.
+func (*QueryResourceMetadataResponse) Descriptor() ([]byte, []int) {
 	return file_cheqd_resource_v2_query_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *QueryGetResourceMetadataResponse) GetResource() *Metadata {
+func (x *QueryResourceMetadataResponse) GetResource() *Metadata {
 	if x != nil {
 		return x.Resource
 	}
@@ -2974,7 +2974,7 @@ func (x *QueryGetCollectionResourcesRequest) GetCollectionId() string {
 	return ""
 }
 
-type QueryGetCollectionResourcesResponse struct {
+type QueryCollectionResourcesResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -2982,8 +2982,8 @@ type QueryGetCollectionResourcesResponse struct {
 	Resources []*Metadata `protobuf:"bytes,1,rep,name=resources,proto3" json:"resources,omitempty"`
 }
 
-func (x *QueryGetCollectionResourcesResponse) Reset() {
-	*x = QueryGetCollectionResourcesResponse{}
+func (x *QueryCollectionResourcesResponse) Reset() {
+	*x = QueryCollectionResourcesResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_cheqd_resource_v2_query_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -2991,18 +2991,18 @@ func (x *QueryGetCollectionResourcesResponse) Reset() {
 	}
 }
 
-func (x *QueryGetCollectionResourcesResponse) String() string {
+func (x *QueryCollectionResourcesResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*QueryGetCollectionResourcesResponse) ProtoMessage() {}
+func (*QueryCollectionResourcesResponse) ProtoMessage() {}
 
-// Deprecated: Use QueryGetCollectionResourcesResponse.ProtoReflect.Descriptor instead.
-func (*QueryGetCollectionResourcesResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use QueryCollectionResourcesResponse.ProtoReflect.Descriptor instead.
+func (*QueryCollectionResourcesResponse) Descriptor() ([]byte, []int) {
 	return file_cheqd_resource_v2_query_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *QueryGetCollectionResourcesResponse) GetResources() []*Metadata {
+func (x *QueryCollectionResourcesResponse) GetResources() []*Metadata {
 	if x != nil {
 		return x.Resources
 	}
@@ -3117,24 +3117,24 @@ func file_cheqd_resource_v2_query_proto_rawDescGZIP() []byte {
 var file_cheqd_resource_v2_query_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_cheqd_resource_v2_query_proto_goTypes = []interface{}{
 	(*QueryGetResourceRequest)(nil),             // 0: cheqd.resource.v2.QueryGetResourceRequest
-	(*QueryGetResourceResponse)(nil),            // 1: cheqd.resource.v2.QueryGetResourceResponse
+	(*QueryResourceResponse)(nil),            // 1: cheqd.resource.v2.QueryResourceResponse
 	(*QueryGetResourceMetadataRequest)(nil),     // 2: cheqd.resource.v2.QueryGetResourceMetadataRequest
-	(*QueryGetResourceMetadataResponse)(nil),    // 3: cheqd.resource.v2.QueryGetResourceMetadataResponse
+	(*QueryResourceMetadataResponse)(nil),    // 3: cheqd.resource.v2.QueryResourceMetadataResponse
 	(*QueryGetCollectionResourcesRequest)(nil),  // 4: cheqd.resource.v2.QueryGetCollectionResourcesRequest
-	(*QueryGetCollectionResourcesResponse)(nil), // 5: cheqd.resource.v2.QueryGetCollectionResourcesResponse
+	(*QueryCollectionResourcesResponse)(nil), // 5: cheqd.resource.v2.QueryCollectionResourcesResponse
 	(*ResourceWithMetadata)(nil),                // 6: cheqd.resource.v2.ResourceWithMetadata
 	(*Metadata)(nil),                            // 7: cheqd.resource.v2.Metadata
 }
 var file_cheqd_resource_v2_query_proto_depIdxs = []int32{
-	6, // 0: cheqd.resource.v2.QueryGetResourceResponse.resource:type_name -> cheqd.resource.v2.ResourceWithMetadata
-	7, // 1: cheqd.resource.v2.QueryGetResourceMetadataResponse.resource:type_name -> cheqd.resource.v2.Metadata
-	7, // 2: cheqd.resource.v2.QueryGetCollectionResourcesResponse.resources:type_name -> cheqd.resource.v2.Metadata
+	6, // 0: cheqd.resource.v2.QueryResourceResponse.resource:type_name -> cheqd.resource.v2.ResourceWithMetadata
+	7, // 1: cheqd.resource.v2.QueryResourceMetadataResponse.resource:type_name -> cheqd.resource.v2.Metadata
+	7, // 2: cheqd.resource.v2.QueryCollectionResourcesResponse.resources:type_name -> cheqd.resource.v2.Metadata
 	0, // 3: cheqd.resource.v2.Query.Resource:input_type -> cheqd.resource.v2.QueryGetResourceRequest
 	2, // 4: cheqd.resource.v2.Query.ResourceMetadata:input_type -> cheqd.resource.v2.QueryGetResourceMetadataRequest
 	4, // 5: cheqd.resource.v2.Query.CollectionResources:input_type -> cheqd.resource.v2.QueryGetCollectionResourcesRequest
-	1, // 6: cheqd.resource.v2.Query.Resource:output_type -> cheqd.resource.v2.QueryGetResourceResponse
-	3, // 7: cheqd.resource.v2.Query.ResourceMetadata:output_type -> cheqd.resource.v2.QueryGetResourceMetadataResponse
-	5, // 8: cheqd.resource.v2.Query.CollectionResources:output_type -> cheqd.resource.v2.QueryGetCollectionResourcesResponse
+	1, // 6: cheqd.resource.v2.Query.Resource:output_type -> cheqd.resource.v2.QueryResourceResponse
+	3, // 7: cheqd.resource.v2.Query.ResourceMetadata:output_type -> cheqd.resource.v2.QueryResourceMetadataResponse
+	5, // 8: cheqd.resource.v2.Query.CollectionResources:output_type -> cheqd.resource.v2.QueryCollectionResourcesResponse
 	6, // [6:9] is the sub-list for method output_type
 	3, // [3:6] is the sub-list for method input_type
 	3, // [3:3] is the sub-list for extension type_name
@@ -3162,7 +3162,7 @@ func file_cheqd_resource_v2_query_proto_init() {
 			}
 		}
 		file_cheqd_resource_v2_query_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*QueryGetResourceResponse); i {
+			switch v := v.(*QueryResourceResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3186,7 +3186,7 @@ func file_cheqd_resource_v2_query_proto_init() {
 			}
 		}
 		file_cheqd_resource_v2_query_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*QueryGetResourceMetadataResponse); i {
+			switch v := v.(*QueryResourceMetadataResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3210,7 +3210,7 @@ func file_cheqd_resource_v2_query_proto_init() {
 			}
 		}
 		file_cheqd_resource_v2_query_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*QueryGetCollectionResourcesResponse); i {
+			switch v := v.(*QueryCollectionResourcesResponse); i {
 			case 0:
 				return &v.state
 			case 1:

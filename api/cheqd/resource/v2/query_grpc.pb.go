@@ -22,9 +22,9 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type QueryClient interface {
-	Resource(ctx context.Context, in *QueryGetResourceRequest, opts ...grpc.CallOption) (*QueryGetResourceResponse, error)
-	ResourceMetadata(ctx context.Context, in *QueryGetResourceMetadataRequest, opts ...grpc.CallOption) (*QueryGetResourceMetadataResponse, error)
-	CollectionResources(ctx context.Context, in *QueryGetCollectionResourcesRequest, opts ...grpc.CallOption) (*QueryGetCollectionResourcesResponse, error)
+	Resource(ctx context.Context, in *QueryGetResourceRequest, opts ...grpc.CallOption) (*QueryResourceResponse, error)
+	ResourceMetadata(ctx context.Context, in *QueryGetResourceMetadataRequest, opts ...grpc.CallOption) (*QueryResourceMetadataResponse, error)
+	CollectionResources(ctx context.Context, in *QueryGetCollectionResourcesRequest, opts ...grpc.CallOption) (*QueryCollectionResourcesResponse, error)
 }
 
 type queryClient struct {
@@ -35,8 +35,8 @@ func NewQueryClient(cc grpc.ClientConnInterface) QueryClient {
 	return &queryClient{cc}
 }
 
-func (c *queryClient) Resource(ctx context.Context, in *QueryGetResourceRequest, opts ...grpc.CallOption) (*QueryGetResourceResponse, error) {
-	out := new(QueryGetResourceResponse)
+func (c *queryClient) Resource(ctx context.Context, in *QueryGetResourceRequest, opts ...grpc.CallOption) (*QueryResourceResponse, error) {
+	out := new(QueryResourceResponse)
 	err := c.cc.Invoke(ctx, "/cheqd.resource.v2.Query/Resource", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -44,8 +44,8 @@ func (c *queryClient) Resource(ctx context.Context, in *QueryGetResourceRequest,
 	return out, nil
 }
 
-func (c *queryClient) ResourceMetadata(ctx context.Context, in *QueryGetResourceMetadataRequest, opts ...grpc.CallOption) (*QueryGetResourceMetadataResponse, error) {
-	out := new(QueryGetResourceMetadataResponse)
+func (c *queryClient) ResourceMetadata(ctx context.Context, in *QueryGetResourceMetadataRequest, opts ...grpc.CallOption) (*QueryResourceMetadataResponse, error) {
+	out := new(QueryResourceMetadataResponse)
 	err := c.cc.Invoke(ctx, "/cheqd.resource.v2.Query/ResourceMetadata", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -53,8 +53,8 @@ func (c *queryClient) ResourceMetadata(ctx context.Context, in *QueryGetResource
 	return out, nil
 }
 
-func (c *queryClient) CollectionResources(ctx context.Context, in *QueryGetCollectionResourcesRequest, opts ...grpc.CallOption) (*QueryGetCollectionResourcesResponse, error) {
-	out := new(QueryGetCollectionResourcesResponse)
+func (c *queryClient) CollectionResources(ctx context.Context, in *QueryGetCollectionResourcesRequest, opts ...grpc.CallOption) (*QueryCollectionResourcesResponse, error) {
+	out := new(QueryCollectionResourcesResponse)
 	err := c.cc.Invoke(ctx, "/cheqd.resource.v2.Query/CollectionResources", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -66,9 +66,9 @@ func (c *queryClient) CollectionResources(ctx context.Context, in *QueryGetColle
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility
 type QueryServer interface {
-	Resource(context.Context, *QueryGetResourceRequest) (*QueryGetResourceResponse, error)
-	ResourceMetadata(context.Context, *QueryGetResourceMetadataRequest) (*QueryGetResourceMetadataResponse, error)
-	CollectionResources(context.Context, *QueryGetCollectionResourcesRequest) (*QueryGetCollectionResourcesResponse, error)
+	Resource(context.Context, *QueryGetResourceRequest) (*QueryResourceResponse, error)
+	ResourceMetadata(context.Context, *QueryGetResourceMetadataRequest) (*QueryResourceMetadataResponse, error)
+	CollectionResources(context.Context, *QueryGetCollectionResourcesRequest) (*QueryCollectionResourcesResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -76,13 +76,13 @@ type QueryServer interface {
 type UnimplementedQueryServer struct {
 }
 
-func (UnimplementedQueryServer) Resource(context.Context, *QueryGetResourceRequest) (*QueryGetResourceResponse, error) {
+func (UnimplementedQueryServer) Resource(context.Context, *QueryGetResourceRequest) (*QueryResourceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Resource not implemented")
 }
-func (UnimplementedQueryServer) ResourceMetadata(context.Context, *QueryGetResourceMetadataRequest) (*QueryGetResourceMetadataResponse, error) {
+func (UnimplementedQueryServer) ResourceMetadata(context.Context, *QueryGetResourceMetadataRequest) (*QueryResourceMetadataResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ResourceMetadata not implemented")
 }
-func (UnimplementedQueryServer) CollectionResources(context.Context, *QueryGetCollectionResourcesRequest) (*QueryGetCollectionResourcesResponse, error) {
+func (UnimplementedQueryServer) CollectionResources(context.Context, *QueryGetCollectionResourcesRequest) (*QueryCollectionResourcesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CollectionResources not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}

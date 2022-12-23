@@ -57,61 +57,61 @@ func QueryParams(subspace, key string) (paramproposal.ParamChange, error) {
 	return resp, nil
 }
 
-func QueryDidDoc(did string) (didtypes.QueryGetDidDocResponse, error) {
+func QueryDidDoc(did string) (didtypes.QueryDidDocResponse, error) {
 	res, err := Query("cheqd", "did-document", did)
 	if err != nil {
-		return didtypes.QueryGetDidDocResponse{}, err
+		return didtypes.QueryDidDocResponse{}, err
 	}
 
-	var resp didtypes.QueryGetDidDocResponse
+	var resp didtypes.QueryDidDocResponse
 	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
-		return didtypes.QueryGetDidDocResponse{}, err
+		return didtypes.QueryDidDocResponse{}, err
 	}
 
 	return resp, nil
 }
 
-func QueryResource(collectionId string, resourceId string) (resourcetypes.QueryGetResourceResponse, error) {
+func QueryResource(collectionId string, resourceId string) (resourcetypes.QueryResourceResponse, error) {
 	res, err := Query("resource", "resource", collectionId, resourceId)
 	if err != nil {
-		return resourcetypes.QueryGetResourceResponse{}, err
+		return resourcetypes.QueryResourceResponse{}, err
 	}
 
-	var resp resourcetypes.QueryGetResourceResponse
+	var resp resourcetypes.QueryResourceResponse
 	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
-		return resourcetypes.QueryGetResourceResponse{}, err
+		return resourcetypes.QueryResourceResponse{}, err
 	}
 
 	return resp, nil
 }
 
-func QueryResourceMetadata(collectionId string, resourceId string) (resourcetypes.QueryGetResourceMetadataResponse, error) {
+func QueryResourceMetadata(collectionId string, resourceId string) (resourcetypes.QueryResourceMetadataResponse, error) {
 	res, err := Query("resource", "resource-metadata", collectionId, resourceId)
 	if err != nil {
-		return resourcetypes.QueryGetResourceMetadataResponse{}, err
+		return resourcetypes.QueryResourceMetadataResponse{}, err
 	}
 
-	var resp resourcetypes.QueryGetResourceMetadataResponse
+	var resp resourcetypes.QueryResourceMetadataResponse
 	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
-		return resourcetypes.QueryGetResourceMetadataResponse{}, err
+		return resourcetypes.QueryResourceMetadataResponse{}, err
 	}
 
 	return resp, nil
 }
 
-func QueryResourceCollection(collectionId string) (resourcetypes.QueryGetCollectionResourcesResponse, error) {
+func QueryResourceCollection(collectionId string) (resourcetypes.QueryCollectionResourcesResponse, error) {
 	res, err := Query("resource", "collection-resources", collectionId)
 	if err != nil {
-		return resourcetypes.QueryGetCollectionResourcesResponse{}, err
+		return resourcetypes.QueryCollectionResourcesResponse{}, err
 	}
 
-	var resp resourcetypes.QueryGetCollectionResourcesResponse
+	var resp resourcetypes.QueryCollectionResourcesResponse
 	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
-		return resourcetypes.QueryGetCollectionResourcesResponse{}, err
+		return resourcetypes.QueryCollectionResourcesResponse{}, err
 	}
 
 	return resp, nil
