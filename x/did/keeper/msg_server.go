@@ -114,13 +114,13 @@ func VerifyAllSignersHaveAllValidSignatures(k *Keeper, ctx *sdk.Context, inMemor
 }
 
 // VerifyAllSignersHaveAtLeastOneValidSignature verifies that all signers have at least one valid signature.
-// Omit DIDtoBeUpdated and updatedDID if not updating a DID. Otherwise those values will be used to better format error messages.
+// Omit didToBeUpdated and updatedDID if not updating a DID. Otherwise those values will be used to better format error messages.
 func VerifyAllSignersHaveAtLeastOneValidSignature(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.DidDocWithMetadata,
-	message []byte, signers []string, signatures []*types.SignInfo, DIDToBeUpdated string, updatedDID string,
+	message []byte, signers []string, signatures []*types.SignInfo, didToBeUpdated string, updatedDID string,
 ) error {
 	for _, signer := range signers {
 		signaturesBySigner := types.FindSignInfosBySigner(signatures, signer)
-		signerForErrorMessage := GetSignerIdForErrorMessage(signer, DIDToBeUpdated, updatedDID)
+		signerForErrorMessage := GetSignerIdForErrorMessage(signer, didToBeUpdated, updatedDID)
 
 		if len(signaturesBySigner) == 0 {
 			return types.ErrSignatureNotFound.Wrapf("there should be at least one signature by %s", signerForErrorMessage)
