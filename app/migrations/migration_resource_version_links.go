@@ -59,7 +59,7 @@ func MigrateResourceVersionLinks(sctx sdk.Context, mctx MigrationContext) error 
 	sctx.Logger().Debug("MigrateResourceVersionLinks: Setting version links")
 	// Add resources to store in the same order as they were created. This will create proper links.
 	for _, resource := range resources {
-		err = mctx.resourceKeeperNew.AddNewResourceVersion(&sctx, &resource)
+		err = mctx.resourceKeeperNew.AddNewResourceVersion(&sctx, resource)
 		sctx.Logger().Debug(fmt.Sprintf(
 			"MigrateResourceVersionLinks: Id: %s CollectionId: %s NewPreviousVersionId: %s NewNextVersionId: %s",
 			resource.Metadata.Id,
