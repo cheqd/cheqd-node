@@ -5,7 +5,7 @@ go 1.18
 require (
 	cosmossdk.io/math v1.0.0-beta.3
 	filippo.io/edwards25519 v1.0.0-rc.1
-	github.com/cosmos/cosmos-proto v1.0.0-beta.1
+	github.com/cosmos/cosmos-proto v1.0.0-alpha7
 	github.com/cosmos/cosmos-sdk v0.46.7
 	github.com/cosmos/gogoproto v1.4.3
 	github.com/cosmos/ibc-go/v5 v5.1.0
@@ -77,7 +77,7 @@ require (
 	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
-	github.com/go-playground/universal-translator v0.18.0 // indirect
+	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/goccy/go-json v0.9.7 // indirect
 	github.com/godbus/dbus v0.0.0-20190726142602-4481cbc300e2 // indirect
 	github.com/gogo/gateway v1.1.0 // indirect
@@ -109,7 +109,6 @@ require (
 	github.com/jmhodges/levigo v1.0.0 // indirect
 	github.com/keybase/go-keychain v0.0.0-20190712205309-48d3d31d256d // indirect
 	github.com/klauspost/compress v1.15.11 // indirect
-	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/lestrrat-go/backoff/v2 v2.0.8 // indirect
 	github.com/lestrrat-go/blackmagic v1.0.0 // indirect
 	github.com/lestrrat-go/httpcc v1.0.1 // indirect
