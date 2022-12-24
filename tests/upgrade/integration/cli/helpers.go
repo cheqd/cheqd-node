@@ -206,7 +206,7 @@ func MakeCodecWithExtendedRegistry() codec.Codec {
 	// Register the interfaces from the cosmos-sdk codebase.
 	interfaceRegistry.RegisterImplementations(
 		(*govtypesv1beta1.Content)(nil),
-		// nolint: staticcheck
+		//nolint: staticcheck
 		&upgradetypes.SoftwareUpgradeProposal{},
 		&paramproposal.ParameterChangeProposal{},
 	)

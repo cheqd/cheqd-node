@@ -743,7 +743,7 @@ func New(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 
-	// nolint: errcheck
+	//nolint: errcheck
 	app.configurator.RegisterMigration(
 		didtypes.ModuleName,
 		3,
