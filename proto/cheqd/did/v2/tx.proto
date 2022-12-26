@@ -9,7 +9,8 @@ option go_package = "github.com/cheqd/cheqd-node/x/did/types";
 service Msg {
   rpc CreateDidDoc(MsgCreateDidDoc) returns (MsgCreateDidDocResponse);
   rpc UpdateDidDoc(MsgUpdateDidDoc) returns (MsgUpdateDidDocResponse);
-  rpc DeactivateDidDoc(MsgDeactivateDidDoc) returns (MsgDeactivateDidDocResponse);
+  rpc DeactivateDidDoc(MsgDeactivateDidDoc)
+      returns (MsgDeactivateDidDocResponse);
 }
 
 message MsgCreateDidDoc {
@@ -47,9 +48,7 @@ message MsgCreateDidDocPayload {
   string version_id = 12;
 }
 
-message MsgCreateDidDocResponse {
-  DidDocWithMetadata value = 1;
-}
+message MsgCreateDidDocResponse { DidDocWithMetadata value = 1; }
 
 message MsgUpdateDidDocPayload {
   repeated string context = 1;
@@ -66,15 +65,11 @@ message MsgUpdateDidDocPayload {
   string version_id = 12;
 }
 
-message MsgUpdateDidDocResponse {
-  DidDocWithMetadata value = 1;
-}
+message MsgUpdateDidDocResponse { DidDocWithMetadata value = 1; }
 
 message MsgDeactivateDidDocPayload {
   string id = 1;
   string version_id = 2;
 }
 
-message MsgDeactivateDidDocResponse {
-  DidDocWithMetadata value = 1;
-}
+message MsgDeactivateDidDocResponse { DidDocWithMetadata value = 1; }
