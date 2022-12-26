@@ -27,6 +27,4 @@ message MsgCreateResourcePayload {
   repeated cheqd.resource.v2.AlternativeUri also_known_as = 7;
 }
 
-message MsgCreateResourceResponse {
-  Metadata resource = 1;
-}
+message MsgCreateResourceResponse { Metadata resource = 1; }

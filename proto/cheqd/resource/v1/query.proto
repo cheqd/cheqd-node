@@ -9,13 +9,18 @@ option go_package = "github.com/cheqd/cheqd-node/x/resource/types/v1";
 // Query defines the gRPC querier service.
 service Query {
   rpc Resource(QueryGetResourceRequest) returns (QueryResourceResponse) {
-    option (google.api.http).get = "/1.0/identifiers/{collection_id}/resources/{id}";
+    option (google.api.http).get =
+        "/1.0/identifiers/{collection_id}/resources/{id}";
   }
-  rpc CollectionResources(QueryGetCollectionResourcesRequest) returns (QueryCollectionResourcesResponse) {
-    option (google.api.http).get = "/1.0/identifiers/{collection_id}/resources/all";
+  rpc CollectionResources(QueryGetCollectionResourcesRequest)
+      returns (QueryCollectionResourcesResponse) {
+    option (google.api.http).get =
+        "/1.0/identifiers/{collection_id}/resources/all";
   }
-  rpc AllResourceVersions(QueryGetAllResourceVersionsRequest) returns (QueryGetAllResourceVersionsResponse) {
-    option (google.api.http).get = "/1.0/identifiers/{collection_id}/resources/versions/{name}";
+  rpc AllResourceVersions(QueryGetAllResourceVersionsRequest)
+      returns (QueryGetAllResourceVersionsResponse) {
+    option (google.api.http).get =
+        "/1.0/identifiers/{collection_id}/resources/versions/{name}";
   }
 }
 
@@ -24,13 +29,9 @@ message QueryGetResourceRequest {
   string id = 2;
 }
 
-message QueryResourceResponse {
-  Resource resource = 1;
-}
+message QueryResourceResponse { Resource resource = 1; }
 
-message QueryGetCollectionResourcesRequest {
-  string collection_id = 1;
-}
+message QueryGetCollectionResourcesRequest { string collection_id = 1; }
 
 message QueryCollectionResourcesResponse {
   repeated ResourceHeader resources = 1;
