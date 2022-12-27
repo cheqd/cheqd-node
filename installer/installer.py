@@ -620,11 +620,6 @@ class Installer():
             shutil.chown(self.cosmovisor_root_dir,
                     DEFAULT_CHEQD_USER,
                     DEFAULT_CHEQD_USER)
-            
-            # set Cosmovisor vars
-            self.set_env_vars("DAEMON_NAME","cheqd-noded")
-            self.set_env_vars("DAEMON_HOME",f"{self.interviewer.home_dir}/.cheqdnode")
-            self.set_env_vars("DAEMON_DATA_BACKUP_DIR",f"{self.interviewer.home_dir}/.cheqdnode")
         except:
             failure_exit(f"Failed to setup Cosmovisor")
 
@@ -875,6 +870,7 @@ class Interviewer:
         self._log_format = DEFAULT_LOG_FORMAT
         self._daemon_allow_download_binaries = True
         self._daemon_restart_after_upgrade = True
+        self._continue_dirty_cosmovisor_state = False
         self._is_from_scratch = False
         self._rewrite_systemd = False
         self._rewrite_rsyslog = False
@@ -983,6 +979,11 @@ class Interviewer:
     @property
     def daemon_restart_after_upgrade(self) -> bool:
         return self._daemon_restart_after_upgrade
+
+    @property
+    def continue_dirty_cosmovisor_state(self) -> bool:
+        return self._continue_dirty_cosmovisor_state
+
     @release.setter
     def release(self, release):
         self._release = release
@@ -1074,6 +1075,11 @@ class Interviewer:
     @daemon_restart_after_upgrade.setter
     def daemon_restart_after_upgrade(self, daemon_restart_after_upgrade):
         self._daemon_restart_after_upgrade = daemon_restart_after_upgrade
+
+    @continue_dirty_cosmovisor_state.setter
+    def continue_dirty_cosmovisor_state(self, continue_dirty_cosmovisor_state):
+        self._continue_dirty_cosmovisor_state = continue_dirty_cosmovisor_state
+
     def log(self, msg):
         if self.verbose:
             print(f"{PRINT_PREFIX} {msg}")
@@ -1327,6 +1333,12 @@ class Interviewer:
     def ask_for_daemon_restart_after_upgrade(self):
         self.daemon_restart_after_upgrade = self.ask(
             f"Specify DAEMON_RESTART_AFTER_UPGRADE (True|False)", default=DEFAULT_DAEMON_RESTART_AFTER_UPGRADE)
+
+    def ask_for_continue_dirty_cosmovisor_state(self):
+        self.continue_dirty_cosmovisor_state = self.ask(
+            f"Specify Looks like cosmovisor is already installed and seems you have dirty state after previous installation. \
+            Do you want to proceed anyway? (True|False)", default=DEFAULT_CONTINUE_DIRTY_COSMOVISOR_STATE)
+
     def prepare_url_for_latest(self) -> str:
         template = TESTNET_SNAPSHOT if self.chain == "testnet" else MAINNET_SNAPSHOT
         _date = datetime.date.today()
@@ -1356,6 +1368,16 @@ if __name__ == '__main__':
 
     # Steps to execute if installing from scratch
     def install_steps():
+        if interviewer.is_cosmovisor_already_installed():
+            interviewer.ask_for_continue_dirty_cosmovisor_state()
+            if interviewer.continue_dirty_cosmovisor_state:
+                cosm_version = interviewer.what_cosmovisor_version()
+                if cosm_version < DEFAULT_LATEST_COSMOVISOR_VERSION.replace("v",""):
+                    print(f"Your current Cosmovisor version is v{cosm_version}")
+                    interviewer.ask_for_cosmovisor_bump()
+            else:
+                failure_exit("Aborting installation to prevent overwriting existing cheqd-node.")
+
         interviewer.ask_for_setup()
         interviewer.ask_for_chain()
         interviewer.ask_for_cosmovisor()
@@ -1369,6 +1391,10 @@ if __name__ == '__main__':
             interviewer.ask_for_persistent_peers()
             interviewer.ask_for_log_level()
             interviewer.ask_for_log_format()
+
+        if interviewer.is_cosmo_needed:
+            interviewer.ask_for_daemon_allow_download_binaries()
+            interviewer.ask_for_daemon_restart_after_upgrade()
 
     # Steps to execute if upgrading existing node
     def upgrade_steps():
