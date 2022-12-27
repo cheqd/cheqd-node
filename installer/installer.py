@@ -44,6 +44,7 @@ COSMOVISOR_BINARY_URL = "https://github.com/cosmos/cosmos-sdk/releases/download/
 DEFAULT_USE_COSMOVISOR = "yes"
 DEFAULT_BUMP_COSMOVISOR = "yes"
 DEFAULT_DAEMON_ALLOW_DOWNLOAD_BINARIES = True
+DEFAULT_DAEMON_RESTART_AFTER_UPGRADE = True
 
 ###############################################################
 ###     				Systemd Config      				###
@@ -842,6 +843,7 @@ class Interviewer:
         self._log_level = DEFAULT_LOG_LEVEL
         self._log_format = DEFAULT_LOG_FORMAT
         self._daemon_allow_download_binaries = True
+        self._daemon_restart_after_upgrade = True
         self._is_from_scratch = False
         self._rewrite_systemd = False
         self._rewrite_rsyslog = False
@@ -947,6 +949,9 @@ class Interviewer:
     def daemon_allow_download_binaries(self) -> bool:
         return self._daemon_allow_download_binaries
 
+    @property
+    def daemon_restart_after_upgrade(self) -> bool:
+        return self._daemon_restart_after_upgrade
     @release.setter
     def release(self, release):
         self._release = release
@@ -1034,6 +1039,10 @@ class Interviewer:
     @daemon_allow_download_binaries.setter
     def daemon_allow_download_binaries(self, daemon_allow_download_binaries):
         self._daemon_allow_download_binaries = daemon_allow_download_binaries
+
+    @daemon_restart_after_upgrade.setter
+    def daemon_restart_after_upgrade(self, daemon_restart_after_upgrade):
+        self._daemon_restart_after_upgrade = daemon_restart_after_upgrade
     def log(self, msg):
         if self.verbose:
             print(f"{PRINT_PREFIX} {msg}")
@@ -1284,6 +1293,9 @@ class Interviewer:
         self.daemon_allow_download_binaries = self.ask(
             f"Specify DAEMON_ALLOW_DOWNLOAD_BINARY (True|False)", default=DEFAULT_DAEMON_ALLOW_DOWNLOAD_BINARIES)
 
+    def ask_for_daemon_restart_after_upgrade(self):
+        self.daemon_restart_after_upgrade = self.ask(
+            f"Specify DAEMON_RESTART_AFTER_UPGRADE (True|False)", default=DEFAULT_DAEMON_RESTART_AFTER_UPGRADE)
     def prepare_url_for_latest(self) -> str:
         template = TESTNET_SNAPSHOT if self.chain == "testnet" else MAINNET_SNAPSHOT
         _date = datetime.date.today()
