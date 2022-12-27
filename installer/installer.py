@@ -43,6 +43,7 @@ DEFAULT_LATEST_COSMOVISOR_VERSION = "v1.2.0"
 COSMOVISOR_BINARY_URL = "https://github.com/cosmos/cosmos-sdk/releases/download/cosmovisor%2F{}/cosmovisor-{}-linux-{}.tar.gz"
 DEFAULT_USE_COSMOVISOR = "yes"
 DEFAULT_BUMP_COSMOVISOR = "yes"
+DEFAULT_DAEMON_ALLOW_DOWNLOAD_BINARIES = True
 
 ###############################################################
 ###     				Systemd Config      				###
@@ -840,6 +841,7 @@ class Interviewer:
         self._persistent_peers = ""
         self._log_level = DEFAULT_LOG_LEVEL
         self._log_format = DEFAULT_LOG_FORMAT
+        self._daemon_allow_download_binaries = True
         self._is_from_scratch = False
         self._rewrite_systemd = False
         self._rewrite_rsyslog = False
@@ -940,6 +942,10 @@ class Interviewer:
     @property
     def log_format(self) -> str:
         return self._log_format
+    
+    @property
+    def daemon_allow_download_binaries(self) -> bool:
+        return self._daemon_allow_download_binaries
 
     @release.setter
     def release(self, release):
@@ -1025,6 +1031,9 @@ class Interviewer:
     def log_format(self, log_format):
         self._log_format = log_format
 
+    @daemon_allow_download_binaries.setter
+    def daemon_allow_download_binaries(self, daemon_allow_download_binaries):
+        self._daemon_allow_download_binaries = daemon_allow_download_binaries
     def log(self, msg):
         if self.verbose:
             print(f"{PRINT_PREFIX} {msg}")
@@ -1270,6 +1279,10 @@ class Interviewer:
     def ask_for_log_format(self):
         self.log_format = self.ask(
             f"Specify log format (json|plain)", default=DEFAULT_LOG_FORMAT)
+    
+    def ask_for_daemon_allow_download_binaries(self):
+        self.daemon_allow_download_binaries = self.ask(
+            f"Specify DAEMON_ALLOW_DOWNLOAD_BINARY (True|False)", default=DEFAULT_DAEMON_ALLOW_DOWNLOAD_BINARIES)
 
     def prepare_url_for_latest(self) -> str:
         template = TESTNET_SNAPSHOT if self.chain == "testnet" else MAINNET_SNAPSHOT
