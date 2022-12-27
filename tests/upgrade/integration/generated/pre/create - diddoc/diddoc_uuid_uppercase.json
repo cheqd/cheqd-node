@@ -13,24 +13,28 @@
                 "id": "did:cheqd:testnet:45465F44-A45C-4B91-8C21-9AF6C0E33137#key-1",
                 "type": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:45465F44-A45C-4B91-8C21-9AF6C0E33137",
+                "public_key_jwk": [],
                 "public_key_multibase": "z3RFgcpLEM8oRi2DoK3B1FCSTAfCBKjZvBkzuxcBV4TNM"
             },
             {
                 "id": "did:cheqd:testnet:45465F44-A45C-4B91-8C21-9AF6C0E33137#key-2",
                 "type": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:45465F44-A45C-4B91-8C21-9AF6C0E33137",
+                "public_key_jwk": [],
                 "public_key_multibase": "z7JQKofgkaFFpjqJAKNWtFSKVv8kkLHhvErcNx7A6VL8p"
             },
             {
                 "id": "did:cheqd:testnet:45465F44-A45C-4B91-8C21-9AF6C0E33137#key-3",
                 "type": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:45465F44-A45C-4B91-8C21-9AF6C0E33137",
+                "public_key_jwk": [],
                 "public_key_multibase": "z9X6yXQoNcdZD1zvpuWpicviFnqMvwaziuGbcRnBAVY3y"
             },
             {
                 "id": "did:cheqd:testnet:45465F44-A45C-4B91-8C21-9AF6C0E33137#key-4",
                 "type": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:45465F44-A45C-4B91-8C21-9AF6C0E33137",
+                "public_key_jwk": [],
                 "public_key_multibase": "zHkQBWRFoUUizMNscNNGQhMhtt2zMK6UV4YFJ9aeBfZbj"
             }
         ],
