@@ -12,25 +12,25 @@
         "verification_method": [
             {
                 "id": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-1",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554",
                 "verification_material": "{\"publicKeyMultibase\":\"z6nExc7qoYEoDd2DRrMpBv5ShXHYZQL3LTi2twgTm79bL\"}"
             },
             {
                 "id": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-2",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554",
                 "verification_material": "{\"publicKeyMultibase\":\"z8GnprPBEuoBvYqJD4RbUhoFSrZMzH6rffRvCmNzEBxDT\"}"
             },
             {
                 "id": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-3",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554",
                 "verification_material": "{\"publicKeyMultibase\":\"z8iREaP6YKkK77MxojoyAgcnuJAC9reQq6mMJuxxCK523\"}"
             },
             {
                 "id": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-4",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554",
                 "verification_material": "{\"publicKeyMultibase\":\"z4GCBhVhbx2ZgF1hMT2Zt3f9x17LqeR4jb83QXehsMCvt\"}"
             }
@@ -43,14 +43,14 @@
         "service": [
             {
                 "id": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#service-1",
-                "type": "type-1",
+                "serviceType": "type-1",
                 "service_endpoint": [
                     "endpoint-1"
                 ]
             },
             {
                 "id": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#service-2",
-                "type": "type-2",
+                "serviceType": "type-2",
                 "service_endpoint": [
                     "endpoint-2"
                 ]

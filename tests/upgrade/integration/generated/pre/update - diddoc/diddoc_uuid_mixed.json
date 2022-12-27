@@ -55,12 +55,12 @@
             },
             {
                 "id": "did:cheqd:testnet:C8113F5E-E124-4400-a3c8-109b4f6722ad#service-2",
-                "type": "type-2",
+                "serviceType": "type-2",
                 "service_endpoint": "endpoint-2"
             },
             {
                 "id": "did:cheqd:testnet:C8113F5E-E124-4400-a3c8-109b4f6722ad#service-3",
-                "type": "type-3",
+                "serviceType": "type-3",
                 "service_endpoint": "endpoint-3"
             }
         ],

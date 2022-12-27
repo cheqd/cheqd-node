@@ -11,25 +11,25 @@
         "verification_method": [
             {
                 "id": "did:cheqd:testnet:xcWigjiDhDTaBGRX#key-1",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:xcWigjiDhDTaBGRX",
                 "verification_material": "{\"publicKeyMultibase\":\"z4xhmb8vKgCN24a3kRyai5F8eMSgkuqSA8ABPo8mYJSd\"}"
             },
             {
                 "id": "did:cheqd:testnet:xcWigjiDhDTaBGRX#key-2",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:xcWigjiDhDTaBGRX",
                 "verification_material": "{\"publicKeyMultibase\":\"z6L84sd16WVYPQYQ6XXwdPtg2SEkxyj2CrsGGQ3MzkFP5\"}"
             },
             {
                 "id": "did:cheqd:testnet:xcWigjiDhDTaBGRX#key-3",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:xcWigjiDhDTaBGRX",
                 "verification_material": "{\"publicKeyMultibase\":\"zADATkCngJDTbzxhzYtjC8ndzu5wWWbrH8UwQMowfcYDj\"}"
             },
             {
                 "id": "did:cheqd:testnet:xcWigjiDhDTaBGRX#key-4",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:xcWigjiDhDTaBGRX",
                 "verification_material": "{\"publicKeyMultibase\":\"z5PuPVaqjigujtzrwQMZQviJV15gFSTVYkGEifGEGb6Ei\"}"
             }
@@ -62,7 +62,7 @@
         "service": [
             {
                 "id": "did:cheqd:testnet:xcWigjiDhDTaBGRX#service-1",
-                "type": "type-1",
+                "serviceType": "type-1",
                 "service_endpoint": [
                     "endpoint-1"
                 ]
