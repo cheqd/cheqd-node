@@ -26,10 +26,10 @@ var _ = Describe("cheqd cli - positive resource", func() {
 	})
 
 	It("can create diddoc, create resource, query it, query all resource versions of the same resource name, query resource collection", func() {
-		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.GREEN, "can create diddoc"))
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "can create diddoc"))
 		// Create a new DID Doc
-		collectionId := uuid.NewString()
-		did := "did:cheqd:" + network.DID_NAMESPACE + ":" + collectionId
+		collectionID := uuid.NewString()
+		did := "did:cheqd:" + network.DidNamespace + ":" + collectionID
 		keyId := did + "#key1"
 
 		pubKey, privKey, err := ed25519.GenerateKey(nil)
@@ -42,10 +42,10 @@ var _ = Describe("cheqd cli - positive resource", func() {
 			Id: did,
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                   keyId,
-					Type:                 "Ed25519VerificationKey2020",
-					Controller:           did,
-					VerificationMaterial: "{\"publicKeyMultibase\": \"" + string(pubKeyMultibase58) + "\"}",
+					Id:                     keyId,
+					VerificationMethodType: "Ed25519VerificationKey2020",
+					Controller:             did,
+					VerificationMaterial:   "{\"publicKeyMultibase\": \"" + string(pubKeyMultibase58) + "\"}",
 				},
 			},
 			Authentication: []string{keyId},
@@ -54,19 +54,19 @@ var _ = Describe("cheqd cli - positive resource", func() {
 
 		signInputs := []clitypes.SignInput{
 			{
-				VerificationMethodId: keyId,
+				VerificationMethodID: keyId,
 				PrivKey:              privKey,
 			},
 		}
 
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_1, cli.CLIGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
 		// Create a new Resource
-		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.GREEN, "can create resource"))
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "can create resource"))
 
-		resourceId := uuid.NewString()
+		resourceID := uuid.NewString()
 		resourceName := "TestResource"
 		resourceVersion := "1.0"
 		resourceType := "TestType"
@@ -74,35 +74,35 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		Expect(err).To(BeNil())
 
 		res, err = cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionId:    collectionId,
-			ResourceId:      resourceId,
+			CollectionID:    collectionID,
+			ResourceID:      resourceID,
 			ResourceName:    resourceName,
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
+		}, signInputs, testdata.BASE_ACCOUNT_1, cli.CLIGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
-		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.GREEN, "can query resource"))
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "can query resource"))
 		// Query the Resource
-		res2, err := cli.QueryResource(collectionId, resourceId)
+		res2, err := cli.QueryResource(collectionID, resourceID)
 		Expect(err).To(BeNil())
 
-		Expect(res2.Resource.Metadata.CollectionId).To(BeEquivalentTo(collectionId))
-		Expect(res2.Resource.Metadata.Id).To(BeEquivalentTo(resourceId))
+		Expect(res2.Resource.Metadata.CollectionId).To(BeEquivalentTo(collectionID))
+		Expect(res2.Resource.Metadata.Id).To(BeEquivalentTo(resourceID))
 		Expect(res2.Resource.Metadata.Name).To(BeEquivalentTo(resourceName))
 		Expect(res2.Resource.Metadata.ResourceType).To(BeEquivalentTo(resourceType))
 		Expect(res2.Resource.Metadata.MediaType).To(Equal("application/json"))
 		Expect(res2.Resource.Resource.Data).To(BeEquivalentTo(testdata.JSON_FILE_CONTENT))
 
-		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.GREEN, "can query resource metadata"))
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "can query resource metadata"))
 		// Query the Resource Metadata
-		res3, err := cli.QueryResourceMetadata(collectionId, resourceId)
+		res3, err := cli.QueryResourceMetadata(collectionID, resourceID)
 		Expect(err).To(BeNil())
 
-		Expect(res3.Resource.CollectionId).To(BeEquivalentTo(collectionId))
-		Expect(res3.Resource.Id).To(BeEquivalentTo(resourceId))
+		Expect(res3.Resource.CollectionId).To(BeEquivalentTo(collectionID))
+		Expect(res3.Resource.Id).To(BeEquivalentTo(resourceID))
 		Expect(res3.Resource.Name).To(BeEquivalentTo(resourceName))
 		Expect(res3.Resource.ResourceType).To(BeEquivalentTo(resourceType))
 		Expect(res3.Resource.MediaType).To(Equal("application/json"))
@@ -116,19 +116,19 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		Expect(err).To(BeNil())
 
 		res, err = cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionId:    collectionId,
-			ResourceId:      nextResourceId,
+			CollectionID:    collectionID,
+			ResourceID:      nextResourceId,
 			ResourceName:    nextResourceName,
 			ResourceVersion: nextResourceVersion,
 			ResourceType:    nextResourceType,
 			ResourceFile:    nextResourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
+		}, signInputs, testdata.BASE_ACCOUNT_1, cli.CLIGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
 		// Create a second DID Doc
 		secondCollectionId := uuid.NewString()
-		secondDid := "did:cheqd:" + network.DID_NAMESPACE + ":" + secondCollectionId
+		secondDid := "did:cheqd:" + network.DidNamespace + ":" + secondCollectionId
 		secondKeyId := secondDid + "#key1"
 
 		secondPubKey, secondPrivKey, err := ed25519.GenerateKey(nil)
@@ -141,10 +141,10 @@ var _ = Describe("cheqd cli - positive resource", func() {
 			Id: secondDid,
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                   secondKeyId,
-					Type:                 "Ed25519VerificationKey2020",
-					Controller:           secondDid,
-					VerificationMaterial: "{\"publicKeyMultibase\": \"" + string(secondPubKeyMultibase58) + "\"}",
+					Id:                     secondKeyId,
+					VerificationMethodType: "Ed25519VerificationKey2020",
+					Controller:             secondDid,
+					VerificationMaterial:   "{\"publicKeyMultibase\": \"" + string(secondPubKeyMultibase58) + "\"}",
 				},
 			},
 			Authentication: []string{secondKeyId},
@@ -153,12 +153,12 @@ var _ = Describe("cheqd cli - positive resource", func() {
 
 		secondSignInputs := []clitypes.SignInput{
 			{
-				VerificationMethodId: secondKeyId,
+				VerificationMethodID: secondKeyId,
 				PrivKey:              secondPrivKey,
 			},
 		}
 
-		res, err = cli.CreateDidDoc(tmpDir, secondPayload, secondSignInputs, testdata.BASE_ACCOUNT_2, cli.CLI_GAS_PARAMS)
+		res, err = cli.CreateDidDoc(tmpDir, secondPayload, secondSignInputs, testdata.BASE_ACCOUNT_2, cli.CLIGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -171,24 +171,24 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		Expect(err).To(BeNil())
 
 		res, err = cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionId:    secondCollectionId,
-			ResourceId:      secondResourceId,
+			CollectionID:    secondCollectionId,
+			ResourceID:      secondResourceId,
 			ResourceName:    secondResourceName,
 			ResourceVersion: secondResourceVersion,
 			ResourceType:    secondResourceType,
 			ResourceFile:    secondResourceFile,
-		}, secondSignInputs, testdata.BASE_ACCOUNT_1, cli.CLI_GAS_PARAMS)
+		}, secondSignInputs, testdata.BASE_ACCOUNT_1, cli.CLIGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
-		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.GREEN, "can query resource collection"))
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "can query resource collection"))
 		// Query Resource Collection
-		res4, err := cli.QueryResourceCollection(collectionId)
+		res4, err := cli.QueryResourceCollection(collectionID)
 		Expect(err).To(BeNil())
 		Expect(len(res4.Resources)).To(Equal(2))
-		Expect(res4.Resources[0].CollectionId).To(Equal(collectionId))
-		Expect(res4.Resources[1].CollectionId).To(Equal(collectionId))
-		Expect([]string{res4.Resources[0].Id, res4.Resources[1].Id}).To(ContainElements(resourceId, nextResourceId))
+		Expect(res4.Resources[0].CollectionId).To(Equal(collectionID))
+		Expect(res4.Resources[1].CollectionId).To(Equal(collectionID))
+		Expect([]string{res4.Resources[0].Id, res4.Resources[1].Id}).To(ContainElements(resourceID, nextResourceId))
 
 		// Query second Resource Collection
 		res5, err := cli.QueryResourceCollection(secondCollectionId)
