@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/cheqd/cheqd-node/x/did/types"
-	. "github.com/cheqd/cheqd-node/x/did/utils"
+	"github.com/cheqd/cheqd-node/x/did/utils"
 	"github.com/google/uuid"
 	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/mr-tron/base58"
@@ -17,7 +17,7 @@ import (
 func randBase58Seq(bytes int) string {
 	b := make([]byte, bytes)
 
-	_, err := rand.Read(b)
+	_, err := mathrand.Read(b)
 	if err != nil {
 		panic(err)
 	}
@@ -44,7 +44,7 @@ func randSeq(n int) string {
 }
 
 func GenerateDID(idtype IDType) string {
-	prefix := "did:cheqd:" + DID_NAMESPACE + ":"
+	prefix := "did:cheqd:" + DidNamespace + ":"
 	mathrand.Seed(time.Now().UnixNano())
 
 	switch idtype {
@@ -65,23 +65,23 @@ func GenerateKeyPair() KeyPair {
 }
 
 func BuildEd25519VerificationKey2020VerificationMaterial(publicKey ed25519.PublicKey) string {
-	return MustEncodeJson(types.Ed25519VerificationKey2020{
-		PublicKeyMultibase: MustEncodeMultibaseBase58(publicKey),
+	return utils.MustEncodeJSON(types.Ed25519VerificationKey2020{
+		PublicKeyMultibase: utils.MustEncodeMultibaseBase58(publicKey),
 	})
 }
 
-func BuildJsonWebKey2020VerificationMaterial(publicKey ed25519.PublicKey) string {
+func BuildJSONWebKey2020VerificationMaterial(publicKey ed25519.PublicKey) string {
 	pubKeyJwk, err := jwk.New(publicKey)
 	if err != nil {
 		panic(err)
 	}
 
-	pubKeyJwkJson, err := json.Marshal(pubKeyJwk)
+	pubKeyJwkJSON, err := json.Marshal(pubKeyJwk)
 	if err != nil {
 		panic(err)
 	}
 
-	return MustEncodeJson(types.JsonWebKey2020{
-		PublicKeyJwk: json.RawMessage(pubKeyJwkJson),
+	return utils.MustEncodeJSON(types.JSONWebKey2020{
+		PublicKeyJwk: json.RawMessage(pubKeyJwkJSON),
 	})
 }

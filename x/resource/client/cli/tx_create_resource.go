@@ -14,8 +14,8 @@ import (
 )
 
 type CreateResourceOptions struct {
-	CollectionId    string                  `json:"collection_id"`
-	ResourceId      string                  `json:"resource_id"`
+	CollectionID    string                  `json:"collection_id"`
+	ResourceID      string                  `json:"resource_id"`
 	ResourceName    string                  `json:"resource_name"`
 	ResourceVersion string                  `json:"resource_version"`
 	ResourceType    string                  `json:"resource_type"`
@@ -38,13 +38,13 @@ func CmdCreateResource() *cobra.Command {
 
 			payloadFile := args[0]
 
-			payloadJson, signInputs, err := didcli.ReadPayloadWithSignInputsFromFile(payloadFile)
+			payloadJSON, signInputs, err := didcli.ReadPayloadWithSignInputsFromFile(payloadFile)
 			if err != nil {
 				return err
 			}
 
 			var options CreateResourceOptions
-			err = json.Unmarshal(payloadJson, &options)
+			err = json.Unmarshal(payloadJSON, &options)
 			if err != nil {
 				return err
 			}
@@ -56,8 +56,8 @@ func CmdCreateResource() *cobra.Command {
 
 			// Prepare payload
 			payload := types.MsgCreateResourcePayload{
-				CollectionId: options.CollectionId,
-				Id:           options.ResourceId,
+				CollectionId: options.CollectionID,
+				Id:           options.ResourceID,
 				Name:         options.ResourceName,
 				Version:      options.ResourceVersion,
 				ResourceType: options.ResourceType,

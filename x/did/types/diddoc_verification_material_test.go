@@ -36,7 +36,7 @@ var _ = DescribeTable("Verification Method material validation tests", func(test
 	Entry(
 		"Valid JsonWebKey2020 verification material",
 		VerificationMaterialTestCase{
-			vm: JsonWebKey2020{
+			vm: JSONWebKey2020{
 				PublicKeyJwk: ValidPublicKeyJWK,
 			},
 			isValid:  true,
@@ -56,7 +56,7 @@ var _ = DescribeTable("Verification Method material validation tests", func(test
 	Entry(
 		"Invalid JsonWebKey2020 verification material",
 		VerificationMaterialTestCase{
-			vm: JsonWebKey2020{
+			vm: JSONWebKey2020{
 				PublicKeyJwk: InvalidPublicKeyJWK,
 			},
 			isValid:  false,

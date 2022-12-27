@@ -19,11 +19,11 @@ var _ = Describe("Query Resource", func() {
 	BeforeEach(func() {
 		setup = Setup()
 		alice = setup.CreateSimpleDid()
-		resource = setup.CreateSimpleResource(alice.CollectionId, SchemaData, "Resource 1", CLSchemaType, []didsetup.SignInput{alice.SignInput})
+		resource = setup.CreateSimpleResource(alice.CollectionID, SchemaData, "Resource 1", CLSchemaType, []didsetup.SignInput{alice.SignInput})
 	})
 
 	It("Works", func() {
-		resp, err := setup.QueryResource(alice.CollectionId, resource.Resource.Id)
+		resp, err := setup.QueryResource(alice.CollectionID, resource.Resource.Id)
 		Expect(err).To(BeNil())
 		Expect(resp.Resource.Metadata.Id).To(Equal(resource.Resource.Id))
 	})
@@ -31,7 +31,7 @@ var _ = Describe("Query Resource", func() {
 	It("Returns error if resource does not exist", func() {
 		nonExistingResource := uuid.NewString()
 
-		_, err := setup.QueryResource(alice.CollectionId, nonExistingResource)
+		_, err := setup.QueryResource(alice.CollectionID, nonExistingResource)
 		Expect(err.Error()).To(ContainSubstring("not found"))
 	})
 

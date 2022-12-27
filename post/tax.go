@@ -11,8 +11,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
-// taxDecorator will handle tax for all taxable messages
-type taxDecorator struct {
+// TaxDecorator will handle tax for all taxable messages
+type TaxDecorator struct {
 	accountKeeper  ante.AccountKeeper
 	bankKeeper     cheqdante.BankKeeper
 	feegrantKeeper ante.FeegrantKeeper
@@ -21,8 +21,8 @@ type taxDecorator struct {
 }
 
 // NewTaxDecorator returns a new taxDecorator
-func NewTaxDecorator(ak ante.AccountKeeper, bk cheqdante.BankKeeper, fk ante.FeegrantKeeper, dk cheqdante.DidKeeper, rk cheqdante.ResourceKeeper) taxDecorator {
-	return taxDecorator{
+func NewTaxDecorator(ak ante.AccountKeeper, bk cheqdante.BankKeeper, fk ante.FeegrantKeeper, dk cheqdante.DidKeeper, rk cheqdante.ResourceKeeper) TaxDecorator {
+	return TaxDecorator{
 		accountKeeper:  ak,
 		bankKeeper:     bk,
 		feegrantKeeper: fk,
@@ -32,7 +32,7 @@ func NewTaxDecorator(ak ante.AccountKeeper, bk cheqdante.BankKeeper, fk ante.Fee
 }
 
 // AnteHandle handles tax for all taxable messages
-func (td taxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
+func (td TaxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
 	// must implement FeeTx
 	feeTx, ok := tx.(sdk.FeeTx)
 	if !ok {
@@ -79,7 +79,7 @@ func (td taxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, nex
 }
 
 // isTaxable returns true if the message is taxable and returns
-func (td taxDecorator) isTaxable(ctx sdk.Context, sdkTx sdk.Tx) (rewards sdk.Coins, burn sdk.Coins, taxable bool, err error) {
+func (td TaxDecorator) isTaxable(ctx sdk.Context, sdkTx sdk.Tx) (rewards sdk.Coins, burn sdk.Coins, taxable bool, err error) {
 	feeTx, ok := sdkTx.(sdk.FeeTx)
 	if !ok {
 		return sdk.Coins{}, sdk.Coins{}, false, sdkerrors.Wrapf(sdkerrors.ErrTxDecode, "invalid transaction type: %T, must implement FeeTx", sdkTx)
@@ -96,7 +96,7 @@ func (td taxDecorator) isTaxable(ctx sdk.Context, sdkTx sdk.Tx) (rewards sdk.Coi
 }
 
 // getFeePayer returns the fee payer and checks if a fee grant exists
-func (td taxDecorator) getFeePayer(ctx sdk.Context, feeTx sdk.FeeTx, tax sdk.Coins, msgs []sdk.Msg) (types.AccountI, error) {
+func (td TaxDecorator) getFeePayer(ctx sdk.Context, feeTx sdk.FeeTx, tax sdk.Coins, msgs []sdk.Msg) (types.AccountI, error) {
 	feePayer := feeTx.FeePayer()
 	feeGranter := feeTx.FeeGranter()
 	deductFrom := feePayer
@@ -122,7 +122,7 @@ func (td taxDecorator) getFeePayer(ctx sdk.Context, feeTx sdk.FeeTx, tax sdk.Coi
 	return deductFromAcc, nil
 }
 
-func (td taxDecorator) validateTax(tax sdk.Coins, simulate bool) error {
+func (td TaxDecorator) validateTax(tax sdk.Coins, simulate bool) error {
 	// no-op if simulate
 	if simulate {
 		return nil
@@ -139,7 +139,7 @@ func (td taxDecorator) validateTax(tax sdk.Coins, simulate bool) error {
 }
 
 // deductTaxFromFeePayer deducts fees from the account
-func (td taxDecorator) deductTaxFromFeePayer(ctx sdk.Context, acc types.AccountI, fees sdk.Coins) error {
+func (td TaxDecorator) deductTaxFromFeePayer(ctx sdk.Context, acc types.AccountI, fees sdk.Coins) error {
 	// ensure module account has been set
 	if addr := td.accountKeeper.GetModuleAddress(didtypes.ModuleName); addr == nil {
 		return fmt.Errorf("cheqd fee collector module account (%s) has not been set", didtypes.ModuleName)
@@ -162,7 +162,7 @@ func (td taxDecorator) deductTaxFromFeePayer(ctx sdk.Context, acc types.AccountI
 }
 
 // distributeRewards distributes rewards to the fee collector
-func (td taxDecorator) distributeRewards(ctx sdk.Context, rewards sdk.Coins) error {
+func (td TaxDecorator) distributeRewards(ctx sdk.Context, rewards sdk.Coins) error {
 	// move rewards to fee collector
 	err := td.bankKeeper.SendCoinsFromModuleToModule(ctx, didtypes.ModuleName, types.FeeCollectorName, rewards)
 	if err != nil {
@@ -172,7 +172,7 @@ func (td taxDecorator) distributeRewards(ctx sdk.Context, rewards sdk.Coins) err
 }
 
 // burnFees burns fees from the module account
-func (td taxDecorator) burnFees(ctx sdk.Context, fees sdk.Coins) error {
+func (td TaxDecorator) burnFees(ctx sdk.Context, fees sdk.Coins) error {
 	// burn fees
 	err := td.bankKeeper.BurnCoins(ctx, didtypes.ModuleName, fees)
 	if err != nil {

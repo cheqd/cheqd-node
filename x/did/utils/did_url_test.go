@@ -16,8 +16,8 @@ var _ = Describe("DID-URL tests", func() {
 
 		func(did_url string) {
 			did, path, query, fragment := MustSplitDIDUrl(did_url)
-			joined_did_url := JoinDIDUrl(did, path, query, fragment)
-			Expect(joined_did_url).To(Equal(did_url))
+			joinedDidURL := JoinDIDUrl(did, path, query, fragment)
+			Expect(joinedDidURL).To(Equal(did_url))
 		},
 		Entry("All symbols", "did:cheqd:testnet:zABCDEFG123456789abcd/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~!$&'()*+,;=:@%20%ff"),
 		Entry("All symbols for path", "did:cheqd:testnet:zABCDEFG123456789abcd/path/to/some/other/place/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~!$&'()*+,;=:@%20%ff/"),

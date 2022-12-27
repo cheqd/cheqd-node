@@ -185,17 +185,17 @@ var _ = Describe("Validation ed25519 Signature in verification method", func() {
 
 	Context("when with the same env but JWK is placed", func() {
 		It("is valid", func() {
-			jwk_, err := jwk.New(pubKey)
+			jwkKey, err := jwk.New(pubKey)
 			Expect(err).To(BeNil())
 
-			json_, err := json.MarshalIndent(jwk_, "", "  ")
+			jsonKey, err := json.MarshalIndent(jwkKey, "", "  ")
 			Expect(err).To(BeNil())
 
 			vm2 := VerificationMethod{
 				Id:                     "",
 				VerificationMethodType: "JsonWebKey2020",
 				Controller:             "",
-				VerificationMaterial:   "{\"publicKeyJwk\": " + string(json_) + "}",
+				VerificationMaterial:   "{\"publicKeyJwk\": " + string(jsonKey) + "}",
 			}
 
 			err = VerifySignature(vm2, msgBytes, signature)
@@ -224,17 +224,17 @@ var _ = Describe("Validation ECDSA Signature in verification method", func() {
 			signature, err := ecdsa.SignASN1(rand.Reader, privKey, msgDigest)
 			Expect(err).To(BeNil())
 
-			jwk_, err := jwk.New(pubKey)
+			jwkKey, err := jwk.New(pubKey)
 			Expect(err).To(BeNil())
 
-			json_, err := json.MarshalIndent(jwk_, "", "  ")
+			jsonKey, err := json.MarshalIndent(jwkKey, "", "  ")
 			Expect(err).To(BeNil())
 
 			vm := VerificationMethod{
 				Id:                     "",
 				VerificationMethodType: "JsonWebKey2020",
 				Controller:             "",
-				VerificationMaterial:   "{\"publicKeyJwk\": " + string(json_) + "}",
+				VerificationMaterial:   "{\"publicKeyJwk\": " + string(jsonKey) + "}",
 			}
 
 			err = VerifySignature(vm, msgBytes, signature)
@@ -262,17 +262,17 @@ var _ = Describe("Validation RSA Signature in verification method", func() {
 			signature, err := rsa.SignPSS(rand.Reader, privKey, crypto.SHA256, msgDigest, nil)
 			Expect(err).To(BeNil())
 
-			jwk_, err := jwk.New(pubKey)
+			jwkKey, err := jwk.New(pubKey)
 			Expect(err).To(BeNil())
 
-			json_, err := json.Marshal(jwk_)
+			jsonKey, err := json.Marshal(jwkKey)
 			Expect(err).To(BeNil())
 
 			vm2 := VerificationMethod{
 				Id:                     "",
 				VerificationMethodType: "JsonWebKey2020",
 				Controller:             "",
-				VerificationMaterial:   "{\"publicKeyJwk\": " + string(json_) + "}",
+				VerificationMaterial:   "{\"publicKeyJwk\": " + string(jsonKey) + "}",
 			}
 
 			err = VerifySignature(vm2, msgBytes, signature)

@@ -141,8 +141,8 @@ func MigrateType(t string) string {
 	switch t {
 	case didtypesv1.Ed25519VerificationKey2020:
 		return didtypes.Ed25519VerificationKey2020{}.Type()
-	case didtypesv1.JsonWebKey2020:
-		return didtypes.JsonWebKey2020{}.Type()
+	case didtypesv1.JSONWebKey2020:
+		return didtypes.JSONWebKey2020{}.Type()
 	default:
 		panic("Unknown type")
 	}
@@ -150,7 +150,7 @@ func MigrateType(t string) string {
 
 func MigrateVerificationMaterial(vm *didtypesv1.VerificationMethod) string {
 	switch vm.Type {
-	case didtypesv1.JsonWebKey2020:
+	case didtypesv1.JSONWebKey2020:
 		jwk := make(map[string]string)
 		for _, kv := range vm.PublicKeyJwk {
 			jwk[kv.Key] = kv.Value
@@ -160,7 +160,7 @@ func MigrateVerificationMaterial(vm *didtypesv1.VerificationMethod) string {
 			panic(err)
 		}
 
-		jwk2020 := didtypes.JsonWebKey2020{
+		jwk2020 := didtypes.JSONWebKey2020{
 			PublicKeyJwk: res,
 		}
 		res, err = json.Marshal(jwk2020)
@@ -171,11 +171,11 @@ func MigrateVerificationMaterial(vm *didtypesv1.VerificationMethod) string {
 		return string(res)
 
 	case didtypesv1.Ed25519VerificationKey2020:
-		pk_multi := didtypes.Ed25519VerificationKey2020{
+		pkMulti := didtypes.Ed25519VerificationKey2020{
 			PublicKeyMultibase: vm.PublicKeyMultibase,
 		}
 
-		res, err := json.Marshal(pk_multi)
+		res, err := json.Marshal(pkMulti)
 		if err != nil {
 			panic(err)
 		}

@@ -6,8 +6,8 @@ import (
 	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
 )
 
-func QueryResourceLegacy(collectionId string, resourceId string, container string) (resourcetypesv1.QueryResourceResponse, error) {
-	res, err := Query(container, CLI_BINARY_NAME, "resource", "resource", collectionId, resourceId)
+func QueryResourceLegacy(collectionID string, resourceID string, container string) (resourcetypesv1.QueryResourceResponse, error) {
+	res, err := Query(container, CLIBinaryName, "resource", "resource", collectionID, resourceID)
 	if err != nil {
 		return resourcetypesv1.QueryResourceResponse{}, err
 	}
@@ -21,8 +21,8 @@ func QueryResourceLegacy(collectionId string, resourceId string, container strin
 	return resp, nil
 }
 
-func QueryResource(collectionId string, resourceId string, container string) (resourcetypesv2.QueryResourceResponse, error) {
-	res, err := Query(container, CLI_BINARY_NAME, "resource", "resource", collectionId, resourceId)
+func QueryResource(collectionID string, resourceID string, container string) (resourcetypesv2.QueryResourceResponse, error) {
+	res, err := Query(container, CLIBinaryName, "resource", "resource", collectionID, resourceID)
 	if err != nil {
 		return resourcetypesv2.QueryResourceResponse{}, err
 	}

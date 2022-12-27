@@ -13,7 +13,7 @@ func (au AlternativeUri) Validate() error {
 	)
 }
 
-func ValidAlternativeUri() *didtypes.CustomErrorRule {
+func ValidAlternativeURI() *didtypes.CustomErrorRule {
 	return didtypes.NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.(AlternativeUri)
 		if !ok {

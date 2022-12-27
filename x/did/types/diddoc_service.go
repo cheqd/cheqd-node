@@ -7,10 +7,10 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
-func NewService(id string, type_ string, serviceEndpoint []string) *Service {
+func NewService(id string, serviceType string, serviceEndpoint []string) *Service {
 	return &Service{
 		Id:              id,
-		ServiceType:     type_,
+		ServiceType:     serviceType,
 		ServiceEndpoint: serviceEndpoint,
 	}
 }
@@ -18,7 +18,7 @@ func NewService(id string, type_ string, serviceEndpoint []string) *Service {
 // ReplaceDids replaces ids in all fields
 func (s *Service) ReplaceDids(old, new string) {
 	// Id
-	s.Id = utils.ReplaceDidInDidUrl(s.Id, old, new)
+	s.Id = utils.ReplaceDidInDidURL(s.Id, old, new)
 }
 
 // Helpers
@@ -54,7 +54,7 @@ func ValidServiceRule(baseDid string, allowedNamespaces []string) *CustomErrorRu
 	})
 }
 
-func IsUniqueServiceListByIdRule() *CustomErrorRule {
+func IsUniqueServiceListByIDRule() *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.([]*Service)
 		if !ok {

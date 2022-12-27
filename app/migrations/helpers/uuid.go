@@ -21,6 +21,6 @@ func MigrateUUIDId(id string) string {
 		return id
 	}
 
-	newId := uuid.NewSHA1(uuid.Nil, []byte(id))
-	return didutils.NormalizeUUID(newId.String())
+	newID := uuid.NewSHA1(uuid.Nil, []byte(id))
+	return didutils.NormalizeUUID(newID.String())
 }

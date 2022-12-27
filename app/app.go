@@ -743,7 +743,7 @@ func New(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 
-	// nolint: errcheck
+	//nolint: errcheck
 	app.configurator.RegisterMigration(
 		didtypes.ModuleName,
 		3,
@@ -883,7 +883,7 @@ func New(
 					migrations.MigrateResourceUUID,
 
 					// Did version id
-					migrations.MigrateDidVersionId,
+					migrations.MigrateDidVersionID,
 
 					// Resource checksum
 					migrations.MigrateResourceChecksum,
@@ -892,7 +892,7 @@ func New(
 					migrations.MigrateResourceVersionLinks,
 
 					// Resource default alternative url
-					migrations.MigrateResourceDefaultAlternativeUrl,
+					migrations.MigrateResourceDefaultAlternativeURL,
 				})
 
 			err = cheqdMigrator.Migrate(ctx)

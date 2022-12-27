@@ -10,13 +10,13 @@ import (
 
 func (s *TestSetup) CreateDid(payload *types.MsgCreateDidDocPayload, signInputs []SignInput) (*types.MsgCreateDidDocResponse, error) {
 	signBytes := payload.GetSignBytes()
-	var signatures []*types.SignInfo
+	signatures := make([]*types.SignInfo, 0, len(signInputs))
 
 	for _, input := range signInputs {
 		signature := ed25519.Sign(input.Key, signBytes)
 
 		signatures = append(signatures, &types.SignInfo{
-			VerificationMethodId: input.VerificationMethodId,
+			VerificationMethodId: input.VerificationMethodID,
 			Signature:            signature,
 		})
 	}
@@ -30,42 +30,42 @@ func (s *TestSetup) CreateDid(payload *types.MsgCreateDidDocPayload, signInputs 
 }
 
 func (s *TestSetup) BuildDidDocWithCustomDID(did string) DidDocInfo {
-	_, _, collectionId := utils.MustSplitDID(did)
+	_, _, collectionID := utils.MustSplitDID(did)
 
 	keyPair := GenerateKeyPair()
-	keyId := did + "#key-1"
+	keyID := did + "#key-1"
 
 	msg := &types.MsgCreateDidDocPayload{
 		Id: did,
 		VerificationMethod: []*types.VerificationMethod{
 			{
-				Id:                     keyId,
+				Id:                     keyID,
 				VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
 				Controller:             did,
 				VerificationMaterial:   BuildEd25519VerificationKey2020VerificationMaterial(keyPair.Public),
 			},
 		},
-		Authentication: []string{keyId},
+		Authentication: []string{keyID},
 		VersionId:      uuid.NewString(),
 	}
 
 	signInput := SignInput{
-		VerificationMethodId: keyId,
+		VerificationMethodID: keyID,
 		Key:                  keyPair.Private,
 	}
 
 	return DidDocInfo{
 		Did:          did,
-		CollectionId: collectionId,
+		CollectionID: collectionID,
 		KeyPair:      keyPair,
-		KeyId:        keyId,
+		KeyID:        keyID,
 		Msg:          msg,
 		SignInput:    signInput,
 	}
 }
 
-func (s *TestSetup) BuildDidDocWithCustomId(uuid string) DidDocInfo {
-	did := "did:cheqd:" + DID_NAMESPACE + ":" + uuid
+func (s *TestSetup) BuildDidDocWithCustomID(uuid string) DidDocInfo {
+	did := "did:cheqd:" + DidNamespace + ":" + uuid
 	return s.BuildDidDocWithCustomDID(did)
 }
 
@@ -82,7 +82,7 @@ func (s *TestSetup) CreateCustomDidDoc(info DidDocInfo) CreatedDidDocInfo {
 
 	return CreatedDidDocInfo{
 		DidDocInfo: info,
-		VersionId:  created.Value.Metadata.VersionId,
+		VersionID:  created.Value.Metadata.VersionId,
 	}
 }
 
@@ -102,6 +102,6 @@ func (s *TestSetup) CreateDidDocWithExternalControllers(controllers []string, si
 
 	return CreatedDidDocInfo{
 		DidDocInfo: did,
-		VersionId:  created.Value.Metadata.VersionId,
+		VersionID:  created.Value.Metadata.VersionId,
 	}
 }

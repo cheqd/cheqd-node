@@ -18,7 +18,7 @@ func Tx(container string, binary string, module, tx, from string, txArgs ...stri
 	}
 
 	// Common params
-	args = append(args, TX_PARAMS...)
+	args = append(args, TXParams...)
 
 	// Cosmos account
 	args = append(args, "--from", from)
@@ -47,10 +47,10 @@ func Tx(container string, binary string, module, tx, from string, txArgs ...stri
 func SubmitParamChangeProposal(container string, pathToDir ...string) (sdk.TxResponse, error) {
 	fmt.Println("Submitting param change proposal from", container)
 	args := append([]string{
-		CLI_BINARY_NAME,
+		CLIBinaryName,
 		"tx", "gov", "submit-legacy-proposal", "param-change", filepath.Join(pathToDir...),
 		"--from", OperatorAccounts[container],
-	}, TX_PARAMS...)
+	}, TXParams...)
 
 	out, err := LocalnetExecExec(container, args...)
 	if err != nil {
@@ -76,15 +76,15 @@ func SubmitParamChangeProposal(container string, pathToDir ...string) (sdk.TxRes
 func SubmitUpgradeProposal(upgradeHeight int64, container string) (sdk.TxResponse, error) {
 	fmt.Println("Submitting upgrade proposal from", container)
 	args := append([]string{
-		CLI_BINARY_NAME,
+		CLIBinaryName,
 		"tx", "gov", "submit-proposal", "software-upgrade",
-		UPGRADE_NAME,
+		UpgradeName,
 		"--title", "Upgrade Title",
 		"--description", "Upgrade Description",
 		"--upgrade-height", strconv.FormatInt(upgradeHeight, 10),
 		"--upgrade-info", "Upgrade Info",
 		"--from", OperatorAccounts[container],
-	}, TX_PARAMS...)
+	}, TXParams...)
 
 	out, err := LocalnetExecExec(container, args...)
 	if err != nil {
@@ -107,10 +107,10 @@ func SubmitUpgradeProposal(upgradeHeight int64, container string) (sdk.TxRespons
 func DepositGov(container string) (sdk.TxResponse, error) {
 	fmt.Println("Depositing from", container)
 	args := append([]string{
-		CLI_BINARY_NAME,
-		"tx", "gov", "deposit", "1", DEPOSIT_AMOUNT,
+		CLIBinaryName,
+		"tx", "gov", "deposit", "1", DepositAmount,
 		"--from", OperatorAccounts[container],
-	}, TX_PARAMS...)
+	}, TXParams...)
 
 	out, err := LocalnetExecExec(container, args...)
 	if err != nil {
@@ -132,10 +132,10 @@ func DepositGov(container string) (sdk.TxResponse, error) {
 func VoteProposal(container, id, option string) (sdk.TxResponse, error) {
 	fmt.Println("Voting from", container)
 	args := append([]string{
-		CLI_BINARY_NAME,
+		CLIBinaryName,
 		"tx", "gov", "vote", id, option,
 		"--from", OperatorAccounts[container],
-	}, TX_PARAMS...)
+	}, TXParams...)
 
 	out, err := LocalnetExecExec(container, args...)
 	if err != nil {

@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (m queryServer) CollectionResources(c context.Context, req *types.QueryGetCollectionResourcesRequest) (*types.QueryCollectionResourcesResponse, error) {
+func (m queryServer) CollectionResources(c context.Context, req *types.QueryGetCollectionResourcesRequest) (*types.QueryCollectionResourcesResponse, error) { //nolint:stylecheck
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}

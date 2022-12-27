@@ -89,20 +89,20 @@ func (k MsgServer) UpdateDidDoc(goCtx context.Context, msg *types.MsgUpdateDidDo
 	}, nil
 }
 
-func GetSignerIdForErrorMessage(signerId string, existingVersionId string, updatedVersionId string) interface{} {
-	if signerId == existingVersionId { // oldDid->id
-		return existingVersionId + " (old version)"
+func GetSignerIDForErrorMessage(signerID string, existingVersionID string, updatedVersionID string) interface{} {
+	if signerID == existingVersionID { // oldDid->id
+		return existingVersionID + " (old version)"
 	}
 
-	if signerId == updatedVersionId { // oldDid->id + UpdatedPrefix
-		return existingVersionId + " (new version)"
+	if signerID == updatedVersionID { // oldDid->id + UpdatedPrefix
+		return existingVersionID + " (new version)"
 	}
 
-	return signerId
+	return signerID
 }
 
 func DuplicateSignatures(signatures []*types.SignInfo, didToDuplicate string, newDid string) []*types.SignInfo {
-	var result []*types.SignInfo
+	result := make([]*types.SignInfo, 0, len(signatures))
 
 	for _, signature := range signatures {
 		result = append(result, signature)

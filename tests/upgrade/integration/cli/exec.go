@@ -13,7 +13,7 @@ func Exec(args ...string) (string, error) {
 }
 
 func ExecDirect(args ...string) (string, error) {
-	cmd := exec.Command(args[0], args[1:]...)
+	cmd := exec.Command(args[0], args[1:]...) //nolint:gosec
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return "", errors.Wrap(err, string(out))
@@ -23,7 +23,7 @@ func ExecDirect(args ...string) (string, error) {
 }
 
 func ExecWithEnv(env []string, args ...string) (string, error) {
-	cmd := exec.Command(args[0], args[1:]...)
+	cmd := exec.Command(args[0], args[1:]...) //nolint:gosec
 	cmd.Env = append(os.Environ(), env...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {

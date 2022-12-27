@@ -31,17 +31,17 @@ func (vm Ed25519VerificationKey2020) Validate() error {
 
 // JsonWebKey2020
 
-type JsonWebKey2020 struct {
+type JSONWebKey2020 struct {
 	PublicKeyJwk json.RawMessage `json:"publicKeyJwk"`
 }
 
-var _ VerificationMaterial = (*JsonWebKey2020)(nil)
+var _ VerificationMaterial = (*JSONWebKey2020)(nil)
 
-func (vm JsonWebKey2020) Type() string {
+func (vm JSONWebKey2020) Type() string {
 	return "JsonWebKey2020"
 }
 
-func (vm JsonWebKey2020) Validate() error {
+func (vm JSONWebKey2020) Validate() error {
 	return validation.Validate(string(vm.PublicKeyJwk), validation.Required, IsJWK())
 }
 
@@ -64,14 +64,14 @@ func ValidEd25519VerificationKey2020Rule() *CustomErrorRule {
 	})
 }
 
-func ValidJsonWebKey2020Rule() *CustomErrorRule {
+func ValidJSONWebKey2020Rule() *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.(string)
 		if !ok {
 			panic("ValidVerificationMethodRule must be only applied on verification methods")
 		}
 
-		var vm JsonWebKey2020
+		var vm JSONWebKey2020
 		err := json.Unmarshal([]byte(casted), &vm)
 		if err != nil {
 			return err

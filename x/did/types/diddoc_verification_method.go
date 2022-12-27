@@ -16,14 +16,14 @@ import (
 )
 
 var SupportedMethodTypes = []string{
-	JsonWebKey2020{}.Type(),
+	JSONWebKey2020{}.Type(),
 	Ed25519VerificationKey2020{}.Type(),
 }
 
-func NewVerificationMethod(id string, type_ string, controller string, verificationMaterial string) *VerificationMethod {
+func NewVerificationMethod(id string, vmType string, controller string, verificationMaterial string) *VerificationMethod {
 	return &VerificationMethod{
 		Id:                     id,
-		VerificationMethodType: type_,
+		VerificationMethodType: vmType,
 		Controller:             controller,
 		VerificationMaterial:   verificationMaterial,
 	}
@@ -69,8 +69,8 @@ func VerifySignature(vm VerificationMethod, message []byte, signature []byte) er
 
 		verificationError = utils.VerifyED25519Signature(keyBytes, message, signature)
 
-	case JsonWebKey2020{}.Type():
-		var jsonWebKey2020 JsonWebKey2020
+	case JSONWebKey2020{}.Type():
+		var jsonWebKey2020 JSONWebKey2020
 		err := json.Unmarshal([]byte(vm.VerificationMaterial), &jsonWebKey2020)
 		if err != nil {
 			return sdkerrors.Wrapf(err, "failed to unmarshal verification material for %s", vm.Id)
@@ -123,7 +123,7 @@ func (vm *VerificationMethod) ReplaceDids(old, new string) {
 	}
 
 	// Id
-	vm.Id = utils.ReplaceDidInDidUrl(vm.Id, old, new)
+	vm.Id = utils.ReplaceDidInDidURL(vm.Id, old, new)
 }
 
 // Validation
@@ -137,7 +137,7 @@ func (vm VerificationMethod) Validate(baseDid string, allowedNamespaces []string
 			validation.When(vm.VerificationMethodType == Ed25519VerificationKey2020{}.Type(), validation.Required, ValidEd25519VerificationKey2020Rule()),
 		),
 		validation.Field(&vm.VerificationMaterial,
-			validation.When(vm.VerificationMethodType == JsonWebKey2020{}.Type(), validation.Required, ValidJsonWebKey2020Rule()),
+			validation.When(vm.VerificationMethodType == JSONWebKey2020{}.Type(), validation.Required, ValidJSONWebKey2020Rule()),
 		),
 	)
 }
@@ -153,7 +153,7 @@ func ValidVerificationMethodRule(baseDid string, allowedNamespaces []string) *Cu
 	})
 }
 
-func IsUniqueVerificationMethodListByIdRule() *CustomErrorRule {
+func IsUniqueVerificationMethodListByIDRule() *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.([]*VerificationMethod)
 		if !ok {
