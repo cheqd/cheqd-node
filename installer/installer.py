@@ -45,6 +45,9 @@ DEFAULT_USE_COSMOVISOR = "yes"
 DEFAULT_BUMP_COSMOVISOR = "yes"
 DEFAULT_DAEMON_ALLOW_DOWNLOAD_BINARIES = True
 DEFAULT_DAEMON_RESTART_AFTER_UPGRADE = True
+DEFAULT_DAEMON_POLL_INTERVAL = "300s"
+DEFAULT_UNSAFE_SKIP_BACKUP = True
+DEFAULT_CONTINUE_DIRTY_COSMOVISOR_STATE = False
 
 ###############################################################
 ###     				Systemd Config      				###
@@ -588,31 +591,19 @@ class Installer():
             self.remove_safe("CHANGELOG.md")
             self.remove_safe("README.md")
             self.remove_safe("LICENSE")
-            
-            self.mkdir_p(self.cosmovisor_root_dir)
-            self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis"))
-            self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis/bin"))
-            self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "upgrades"))
+
+            self.set_cheqd_env_vars()
+            self.set_cosmovisor_env_vars()
 
             if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)):
                 self.log(f"Moving Cosmovisor binary to installation directory")
                 shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
 
-            if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
-                self.log(f"Creating symlink for current Cosmovisor version")
-                os.symlink(os.path.join(self.cosmovisor_root_dir, "genesis"),
-                        os.path.join(self.cosmovisor_root_dir, "current"))
-
-            self.log(f"Moving binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
-            self.exec("sudo mv {} {}".format(self.binary_path, self.cosmovisor_cheqd_bin_path))
-            shutil.chown(os.path.join(DEFAULT_INSTALL_PATH,DEFAULT_COSMOVISOR_BINARY_NAME),
-                DEFAULT_CHEQD_USER,
-                DEFAULT_CHEQD_USER)
-            self.exec("sudo chmod +x {}".format(f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
-            if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
-                self.log(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
-                os.symlink(self.cosmovisor_cheqd_bin_path,
-                        os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+            self.cosm_version = interviewer.what_cosmovisor_version()
+            if self.cosm_version == DEFAULT_LATEST_COSMOVISOR_VERSION.replace("v",""):
+                self.init_cosmovisor()
+            else:
+                self.init_cosmovisor_manually()
             
             if self.interviewer.is_upgrade and \
                 os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
@@ -636,7 +627,47 @@ class Installer():
             self.set_env_vars("DAEMON_DATA_BACKUP_DIR",f"{self.interviewer.home_dir}/.cheqdnode")
         except:
             failure_exit(f"Failed to setup Cosmovisor")
-    
+
+    def set_cheqd_env_vars(self):
+        self.set_env_vars("CHEQD_NODED_HOME", f"{self.interviewer.home_dir}")
+        self.set_env_vars("CHEQD_NODED_CHAIN_ID", f"{self.interviewer.chain}")
+
+    def set_cosmovisor_env_vars(self):
+        self.set_env_vars("DAEMON_NAME", DEFAULT_BINARY_NAME)
+        self.set_env_vars("DAEMON_HOME", self.interviewer.home_dir)
+        self.set_env_vars("DAEMON_ALLOW_DOWNLOAD_BINARIES", str(self.interviewer.daemon_allow_download_binaries).lower())
+        self.set_env_vars("DAEMON_RESTART_AFTER_UPGRADE", str(self.interviewer.daemon_restart_after_upgrade).lower())
+        self.set_env_vars("DAEMON_POLL_INTERVAL", DEFAULT_DAEMON_POLL_INTERVAL)
+        self.set_env_vars("UNSAFE_SKIP_BACKUP", str(DEFAULT_UNSAFE_SKIP_BACKUP).lower())
+
+    def init_cosmovisor(self):
+        self.log(f"Moving binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}")
+        self.exec(f"sudo mv {self.binary_path} {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}")
+
+        self.exec(f"""sudo -E su -c 'cosmovisor init {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}' {DEFAULT_CHEQD_USER}""")
+
+    def init_cosmovisor_manually(self):
+        self.mkdir_p(self.cosmovisor_root_dir)
+        self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis"))
+        self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis/bin"))
+        self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "upgrades"))
+
+        if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
+            self.log(f"Creating symlink for current Cosmovisor version")
+            os.symlink(os.path.join(self.cosmovisor_root_dir, "genesis"),
+                    os.path.join(self.cosmovisor_root_dir, "current"))
+        
+        self.log(f"Moving binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
+        self.exec("sudo mv {} {}".format(self.binary_path, self.cosmovisor_cheqd_bin_path))
+        shutil.chown(os.path.join(DEFAULT_INSTALL_PATH,DEFAULT_COSMOVISOR_BINARY_NAME),
+            DEFAULT_CHEQD_USER,
+            DEFAULT_CHEQD_USER)
+        self.exec("sudo chmod +x {}".format(f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
+        if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
+            self.log(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
+            os.symlink(self.cosmovisor_cheqd_bin_path,
+                    os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+
     def bump_cosmovisor(self):
         try:
             self.stop_cosmovisor_systemd(DEFAULT_COSMOVISOR_SERVICE_NAME)
