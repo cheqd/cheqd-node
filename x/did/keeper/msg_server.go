@@ -114,7 +114,7 @@ func VerifyAllSignersHaveAllValidSignatures(k *Keeper, ctx *sdk.Context, inMemor
 }
 
 // VerifyAllSignersHaveAtLeastOneValidSignature verifies that all signers have at least one valid signature.
-// Omit DIDtoBeUpdated and updatedDID if not updating a DID. Otherwise those values will be used to better format error messages.
+// Omit didToBeUpdated and updatedDID if not updating a DID. Otherwise those values will be used to better format error messages.
 func VerifyAllSignersHaveAtLeastOneValidSignature(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.DidDocWithMetadata,
 	message []byte, signers []string, signatures []*types.SignInfo, didToBeUpdated string, updatedDID string,
 ) error {

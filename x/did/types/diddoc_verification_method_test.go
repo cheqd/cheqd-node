@@ -188,14 +188,14 @@ var _ = Describe("Validation ed25519 Signature in verification method", func() {
 			jwkKey, err := jwk.New(pubKey)
 			Expect(err).To(BeNil())
 
-			jsonKey, err := json.MarshalIndent(jwkKey, "", "  ")
+			jsonPayload, err := json.MarshalIndent(jwkKey, "", "  ")
 			Expect(err).To(BeNil())
 
 			vm2 := VerificationMethod{
 				Id:                     "",
 				VerificationMethodType: "JsonWebKey2020",
 				Controller:             "",
-				VerificationMaterial:   "{\"publicKeyJwk\": " + string(jsonKey) + "}",
+				VerificationMaterial:   "{\"publicKeyJwk\": " + string(jsonPayload) + "}",
 			}
 
 			err = VerifySignature(vm2, msgBytes, signature)
@@ -227,14 +227,14 @@ var _ = Describe("Validation ECDSA Signature in verification method", func() {
 			jwkKey, err := jwk.New(pubKey)
 			Expect(err).To(BeNil())
 
-			jsonKey, err := json.MarshalIndent(jwkKey, "", "  ")
+			jsonPayload, err := json.MarshalIndent(jwkKey, "", "  ")
 			Expect(err).To(BeNil())
 
 			vm := VerificationMethod{
 				Id:                     "",
 				VerificationMethodType: "JsonWebKey2020",
 				Controller:             "",
-				VerificationMaterial:   "{\"publicKeyJwk\": " + string(jsonKey) + "}",
+				VerificationMaterial:   "{\"publicKeyJwk\": " + string(jsonPayload) + "}",
 			}
 
 			err = VerifySignature(vm, msgBytes, signature)
@@ -265,14 +265,14 @@ var _ = Describe("Validation RSA Signature in verification method", func() {
 			jwkKey, err := jwk.New(pubKey)
 			Expect(err).To(BeNil())
 
-			jsonKey, err := json.Marshal(jwkKey)
+			jsonPayload, err := json.Marshal(jwkKey)
 			Expect(err).To(BeNil())
 
 			vm2 := VerificationMethod{
 				Id:                     "",
 				VerificationMethodType: "JsonWebKey2020",
 				Controller:             "",
-				VerificationMaterial:   "{\"publicKeyJwk\": " + string(jsonKey) + "}",
+				VerificationMaterial:   "{\"publicKeyJwk\": " + string(jsonPayload) + "}",
 			}
 
 			err = VerifySignature(vm2, msgBytes, signature)

@@ -1,18 +1,21 @@
 run:
-  timeout: 5m
+  timeout: 10m
+  # skip-dirs:
+  #   - x/did/keeper/v1
+  #   - x/did/types/v1
+  #   - x/resource/keeper/v1
+  #   - x/resource/types/v1
 
 
 linters:
   enable:
     - bodyclose
-    - deadcode
     - depguard
     - dogsled
     - errcheck
     - exportloopref
     - goconst
     - gocritic
-    - gofmt
     - gofumpt
     - goimports
     - gosec
@@ -26,17 +29,14 @@ linters:
     - prealloc
     - revive
     - staticcheck
-    - structcheck
     - stylecheck
     - typecheck
     - unconvert
     - unparam
     - unused
-    - varcheck
 
 
 linters-settings:
-
   gofumpt:
     lang-version: "1.18"
     
