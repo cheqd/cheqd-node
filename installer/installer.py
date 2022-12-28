@@ -322,6 +322,12 @@ class Installer():
             self.remove_safe(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
             self.remove_safe(DEFAULT_RSYSLOG_FILE)
             self.remove_safe(DEFAULT_LOGROTATE_FILE)
+        
+        if self.interviewer.is_cosmo_needed:
+            if os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH):
+                self.remove_safe(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
+            if os.path.exists(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH):
+                self.remove_safe(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH)
 
     def prepare_directory_tree(self):
         """
@@ -1405,7 +1411,12 @@ if __name__ == '__main__':
                 print(f"Your current Cosmovisor version is v{cosm_version}")
                 interviewer.ask_for_cosmovisor_bump()
         else:
-            interviewer.ask_for_cosmovisor()     
+            interviewer.ask_for_cosmovisor()
+
+        if interviewer.is_cosmo_needed:
+            interviewer.ask_for_daemon_allow_download_binaries()
+            interviewer.ask_for_daemon_restart_after_upgrade()
+
         if interviewer.is_systemd_config_exists():
             interviewer.ask_for_rewrite_systemd()
         if os.path.exists(DEFAULT_RSYSLOG_FILE):
