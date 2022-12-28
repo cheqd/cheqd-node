@@ -88,11 +88,13 @@ DEFAULT_LOG_LEVEL = "error"
 DEFAULT_LOG_FORMAT = "json"
 
 
-def sigint_handler (signal, frame):
+def sigint_handler(signal, frame):
     print('Exiting from cheqd-node installer')
     sys.exit(0)
 
+
 signal.signal(signal.SIGINT, sigint_handler)
+
 
 def search_and_replace(search_text, replace_text, file_path):
     file = open(file_path, "r")
@@ -105,6 +107,7 @@ def search_and_replace(search_text, replace_text, file_path):
             with open(file_path, 'w') as file:
                 file.write(data)
     file.close()
+
 
 class Release:
     def __init__(self, release_map):
@@ -119,12 +122,13 @@ class Release:
             os_name = platform.system()
             for _url_item in self.assets:
                 _url = _url_item["browser_download_url"]
-                version_without_v_prefix = self.version.replace('v', '' ,1)
+                version_without_v_prefix = self.version.replace('v', '', 1)
                 if os.path.basename(_url) == f"cheqd-noded-{version_without_v_prefix}-{os_name}-{os_arch}.tar.gz" or \
-                    os.path.basename(_url) == "cheqd-noded":
+                        os.path.basename(_url) == "cheqd-noded":
                     return _url
             else:
-                failure_exit(f"No asset found to download for release: {self.version}")
+                failure_exit(
+                    f"No asset found to download for release: {self.version}")
         except:
             failure_exit(f"Failed to get cheqd-node binaries from Github")
 
@@ -186,8 +190,8 @@ class Installer():
         with open(fname) as f:
             s = re.sub(
                 r'({CHEQD_ROOT_DIR}|{CHEQD_BINARY_NAME})',
-                lambda m:{'{CHEQD_ROOT_DIR}': self.cheqd_root_dir,
-                        '{CHEQD_BINARY_NAME}': DEFAULT_BINARY_NAME}[m.group()],
+                lambda m: {'{CHEQD_ROOT_DIR}': self.cheqd_root_dir,
+                           '{CHEQD_BINARY_NAME}': DEFAULT_BINARY_NAME}[m.group()],
                 f.read()
             )
         self.remove_safe(fname)
@@ -200,7 +204,7 @@ class Installer():
         with open(fname) as f:
             s = re.sub(
                 r'({CHEQD_LOG_DIR})',
-                lambda m:{'{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()],
+                lambda m: {'{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()],
                 f.read()
             )
         self.remove_safe(fname)
@@ -215,7 +219,7 @@ class Installer():
             s = re.sub(
                 r'({BINARY_FOR_LOGGING}|{CHEQD_LOG_DIR})',
                 lambda m: {'{BINARY_FOR_LOGGING}': binary_name,
-                        '{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()],
+                           '{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()],
                 f.read()
             )
         self.remove_safe(fname)
@@ -244,7 +248,7 @@ class Installer():
     @property
     def cosmovisor_cheqd_bin_path(self):
         return os.path.join(self.cosmovisor_root_dir, f"current/bin/{DEFAULT_BINARY_NAME}")
-    
+
     @property
     def cosmovisor_download_url(self):
         return COSMOVISOR_BINARY_URL.format(DEFAULT_LATEST_COSMOVISOR_VERSION, DEFAULT_LATEST_COSMOVISOR_VERSION, self.os_arch)
@@ -260,7 +264,7 @@ class Installer():
         else:
             OS_ARCH = 'arm64'
         return OS_ARCH
-    
+
     def log(self, msg):
         if self.verbose:
             print(f"{PRINT_PREFIX} {msg}")
@@ -296,7 +300,7 @@ class Installer():
             self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
         except:
             failure_exit("Failed to download binary")
-        
+
     def is_user_exists(self, username) -> bool:
         try:
             pwd.getpwnam(username)
@@ -316,13 +320,15 @@ class Installer():
         if self.interviewer.is_from_scratch:
             self.log("Removing user's data and configs")
             self.remove_safe(self.cheqd_root_dir, is_dir=True)
-            self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
-            self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
+            self.remove_safe(os.path.join(
+                DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+            self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH,
+                             DEFAULT_COSMOVISOR_BINARY_NAME))
             self.remove_safe(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH)
             self.remove_safe(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
             self.remove_safe(DEFAULT_RSYSLOG_FILE)
             self.remove_safe(DEFAULT_LOGROTATE_FILE)
-        
+
         if self.interviewer.is_cosmo_needed:
             if os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH):
                 self.remove_safe(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
@@ -339,24 +345,32 @@ class Installer():
                 self.log("Creating main directory for cheqd-noded")
                 self.mkdir_p(self.cheqd_root_dir)
 
-                self.log(f"Setting directory permissions to default cheqd user: {DEFAULT_CHEQD_USER}")
-                self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.interviewer.home_dir}")
+                self.log(
+                    f"Setting directory permissions to default cheqd user: {DEFAULT_CHEQD_USER}")
+                self.exec(
+                    f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.interviewer.home_dir}")
             else:
-                self.log(f"Skipping main directory creation because {self.cheqd_root_dir} already exists")
+                self.log(
+                    f"Skipping main directory creation because {self.cheqd_root_dir} already exists")
 
             if not os.path.exists(self.cheqd_log_dir):
                 self.log("Creating log directory for cheqd-noded")
                 self.setup_log_dir()
             else:
-                self.log(f"Skipping log directory creation because {self.cheqd_log_dir} already exists")
+                self.log(
+                    f"Skipping log directory creation because {self.cheqd_log_dir} already exists")
 
             if not os.path.exists("/var/log/cheqd-node"):
-                self.log("Creating a symlink from cheqd-noded log folder to /var/log/cheqd-node")
-                os.symlink(self.cheqd_log_dir, "/var/log/cheqd-node", target_is_directory=True)
+                self.log(
+                    "Creating a symlink from cheqd-noded log folder to /var/log/cheqd-node")
+                os.symlink(self.cheqd_log_dir, "/var/log/cheqd-node",
+                           target_is_directory=True)
             else:
-                self.log("Skipping linking because /var/log/cheqd-node already exists")
+                self.log(
+                    "Skipping linking because /var/log/cheqd-node already exists")
         except:
-            failure_exit("Failed to prepare directory tree for {DEFAULT_CHEQD_USER}")
+            failure_exit(
+                "Failed to prepare directory tree for {DEFAULT_CHEQD_USER}")
 
     def is_service_file_exists(self) -> bool:
         return os.path.exists(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH) or \
@@ -374,17 +388,21 @@ class Installer():
                 with open(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH, mode="w") as fd:
                     fd.write(self.cosmovisor_service_cfg)
             else:
-                self.exec(f"curl -s {STANDALONE_SERVICE_FILE} > {DEFAULT_STANDALONE_SERVICE_FILE_PATH}")
+                self.exec(
+                    f"curl -s {STANDALONE_SERVICE_FILE} > {DEFAULT_STANDALONE_SERVICE_FILE_PATH}")
 
             self.log("Enabling systemd service for cheqd-noded")
-            self.exec(f"systemctl enable {DEFAULT_COSMOVISOR_SERVICE_NAME if self.interviewer.is_cosmo_needed else DEFAULT_STANDALONE_SERVICE_NAME}")
+            self.exec(
+                f"systemctl enable {DEFAULT_COSMOVISOR_SERVICE_NAME if self.interviewer.is_cosmo_needed else DEFAULT_STANDALONE_SERVICE_NAME}")
 
     def check_systemd_service_on(self, service_name) -> bool:
         # pylint: disable=E1123
-        stat = self.exec(f'systemctl is-active {service_name}', suppress_err=True, allow_error=True).returncode
+        stat = self.exec(
+            f'systemctl is-active {service_name}', suppress_err=True, allow_error=True).returncode
         if stat != 0:
             # pylint: disable=E1123
-            stat = self.exec(f'systemctl is-enabled {service_name}', suppress_err=True, allow_error=True).returncode
+            stat = self.exec(
+                f'systemctl is-enabled {service_name}', suppress_err=True, allow_error=True).returncode
         return stat == 0
 
     def remove_systemd_service(self, service_name):
@@ -415,11 +433,12 @@ class Installer():
     def reload_cosmovisor_systemd(self):
         self.log("Reload systemd config")
         self.exec('systemctl daemon-reload')
-    
+
     def setup_system_configs(self):
         if os.path.exists("/etc/rsyslog.d/"):
             if not os.path.exists(DEFAULT_RSYSLOG_FILE) or self.interviewer.rewrite_rsyslog:
-                self.log("Configuring syslog systemd service for cheqd-noded logging")
+                self.log(
+                    "Configuring syslog systemd service for cheqd-noded logging")
                 with open(DEFAULT_RSYSLOG_FILE, mode="w") as fd:
                     fd.write(self.rsyslog_cfg)
                 # Sometimes it can take a lot of time: https://github.com/rsyslog/rsyslog/issues/3133
@@ -428,7 +447,8 @@ class Installer():
 
         if os.path.exists("/etc/logrotate.d"):
             if not os.path.exists(DEFAULT_LOGROTATE_FILE) or self.interviewer.rewrite_logrotate:
-                self.log("Configuring log rotation systemd service for cheqd-noded logging")
+                self.log(
+                    "Configuring log rotation systemd service for cheqd-noded logging")
                 with open(DEFAULT_LOGROTATE_FILE, mode="w") as fd:
                     fd.write(self.logrotate_cfg)
 
@@ -436,7 +456,6 @@ class Installer():
         self.exec("systemctl restart logrotate.service")
         self.exec("systemctl restart logrotate.timer")
         self.setup_systemctl_services()
-
 
     def install(self):
         """
@@ -461,24 +480,27 @@ class Installer():
         if self.interviewer.is_cosmo_needed:
             self.log("Setting up Cosmovisor")
             self.setup_cosmovisor()
-        
+
         if self.interviewer.is_cosmovisor_bump_needed:
             self.log("Bumping Cosmovisor")
             self.bump_cosmovisor()
 
         if not self.interviewer.is_cosmo_needed and not self.interviewer.is_cosmovisor_bump_needed:
-            self.log(f"Moving binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}")
+            self.log(
+                f"Moving binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}")
             shutil.chown(self.binary_path,
-                DEFAULT_CHEQD_USER,
-                DEFAULT_CHEQD_USER)
-            shutil.move(self.binary_path, os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+                         DEFAULT_CHEQD_USER,
+                         DEFAULT_CHEQD_USER)
+            shutil.move(self.binary_path, os.path.join(
+                DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
             self.post_install()
 
         if self.interviewer.is_setup_needed:
             self.post_install()
 
         if self.interviewer.init_from_snapshot:
-            self.log("Downloading snapshot and extracting archive. This can take a *really* long time...")
+            self.log(
+                "Downloading snapshot and extracting archive. This can take a *really* long time...")
             self.download_snapshot()
             self.untar_from_snapshot()
         self.print_success()
@@ -486,85 +508,114 @@ class Installer():
     def post_install(self):
         # Init the node with provided moniker
         if not os.path.exists(os.path.join(self.cheqd_config_dir, 'genesis.json')):
-            self.exec(f"""sudo su -c 'cheqd-noded init {self.interviewer.moniker}' {DEFAULT_CHEQD_USER}""")
+            self.exec(
+                f"""sudo su -c 'cheqd-noded init {self.interviewer.moniker}' {DEFAULT_CHEQD_USER}""")
 
             # Downloading genesis file
-            self.exec(f"curl {GENESIS_FILE.format(self.interviewer.chain)} > {os.path.join(self.cheqd_config_dir, 'genesis.json')}")
+            self.exec(
+                f"curl {GENESIS_FILE.format(self.interviewer.chain)} > {os.path.join(self.cheqd_config_dir, 'genesis.json')}")
             shutil.chown(os.path.join(self.cheqd_config_dir, 'genesis.json'),
-                DEFAULT_CHEQD_USER,
-                DEFAULT_CHEQD_USER)
+                         DEFAULT_CHEQD_USER,
+                         DEFAULT_CHEQD_USER)
 
         # Replace the default RCP port to listen to anyone
-        rpc_default_value= 'laddr = "tcp://127.0.0.1:{}"'.format(DEFAULT_RPC_PORT)
-        new_rpc_default_value = 'laddr = "tcp://0.0.0.0:{}"'.format(DEFAULT_RPC_PORT)
-        search_and_replace(rpc_default_value, new_rpc_default_value, os.path.join(self.cheqd_config_dir, "config.toml"))
+        rpc_default_value = 'laddr = "tcp://127.0.0.1:{}"'.format(
+            DEFAULT_RPC_PORT)
+        new_rpc_default_value = 'laddr = "tcp://0.0.0.0:{}"'.format(
+            DEFAULT_RPC_PORT)
+        search_and_replace(rpc_default_value, new_rpc_default_value, os.path.join(
+            self.cheqd_config_dir, "config.toml"))
 
         # Set create empty blocks to false by default
         create_empty_blocks_search_text = 'create_empty_blocks = true'
         create_empty_blocks_replace_text = 'create_empty_blocks = false'
-        search_and_replace(create_empty_blocks_search_text, create_empty_blocks_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
+        search_and_replace(create_empty_blocks_search_text, create_empty_blocks_replace_text, os.path.join(
+            self.cheqd_config_dir, "config.toml"))
 
         # Setting up the external_address
         if self.interviewer.external_address:
-            external_address_search_text='external_address = ""'
-            external_address_replace_text='external_address = "{}:{}"'.format(self.interviewer.external_address, self.interviewer.p2p_port)
-            search_and_replace(external_address_search_text, external_address_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
+            external_address_search_text = 'external_address = ""'
+            external_address_replace_text = 'external_address = "{}:{}"'.format(
+                self.interviewer.external_address, self.interviewer.p2p_port)
+            search_and_replace(external_address_search_text, external_address_replace_text, os.path.join(
+                self.cheqd_config_dir, "config.toml"))
 
         # Setting up the seeds
-        seeds = self.exec(f"curl {SEEDS_FILE.format(self.interviewer.chain)}").stdout.decode("utf-8").strip()
+        seeds = self.exec(
+            f"curl {SEEDS_FILE.format(self.interviewer.chain)}").stdout.decode("utf-8").strip()
         seeds_search_text = 'seeds = ""'
-        seeds_replace_text= 'seeds = "{}"'.format(seeds)
-        search_and_replace(seeds_search_text, seeds_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
+        seeds_replace_text = 'seeds = "{}"'.format(seeds)
+        search_and_replace(seeds_search_text, seeds_replace_text, os.path.join(
+            self.cheqd_config_dir, "config.toml"))
 
         # Setting up the RPC port
         if self.interviewer.rpc_port:
-            rpc_laddr_search_text= 'laddr = "tcp://0.0.0.0:{}"'.format(DEFAULT_RPC_PORT)
-            rpc_laddr_replace_text= 'laddr = "tcp://0.0.0.0:{}"'.format(self.interviewer.rpc_port)
-            search_and_replace(rpc_laddr_search_text,rpc_laddr_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
+            rpc_laddr_search_text = 'laddr = "tcp://0.0.0.0:{}"'.format(
+                DEFAULT_RPC_PORT)
+            rpc_laddr_replace_text = 'laddr = "tcp://0.0.0.0:{}"'.format(
+                self.interviewer.rpc_port)
+            search_and_replace(rpc_laddr_search_text, rpc_laddr_replace_text, os.path.join(
+                self.cheqd_config_dir, "config.toml"))
         # Setting up the P2P port
         if self.interviewer.p2p_port:
-            p2p_laddr_search_text='laddr = "tcp://0.0.0.0:{}"'.format(DEFAULT_P2P_PORT)
-            p2p_laddr_replace_text='laddr = "tcp://0.0.0.0:{}"'.format(self.interviewer.p2p_port)
-            search_and_replace(p2p_laddr_search_text, p2p_laddr_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
+            p2p_laddr_search_text = 'laddr = "tcp://0.0.0.0:{}"'.format(
+                DEFAULT_P2P_PORT)
+            p2p_laddr_replace_text = 'laddr = "tcp://0.0.0.0:{}"'.format(
+                self.interviewer.p2p_port)
+            search_and_replace(p2p_laddr_search_text, p2p_laddr_replace_text, os.path.join(
+                self.cheqd_config_dir, "config.toml"))
 
         # Setting up min gas-price
         if self.interviewer.gas_price:
-            min_gas_price_search_text='minimum-gas-prices = '
-            min_gas_price_replace_text = 'minimum-gas-prices = "{}"'.format(self.interviewer.gas_price)
-            search_and_replace(min_gas_price_search_text, min_gas_price_replace_text, os.path.join(self.cheqd_config_dir, "app.toml"))
+            min_gas_price_search_text = 'minimum-gas-prices = '
+            min_gas_price_replace_text = 'minimum-gas-prices = "{}"'.format(
+                self.interviewer.gas_price)
+            search_and_replace(min_gas_price_search_text, min_gas_price_replace_text, os.path.join(
+                self.cheqd_config_dir, "app.toml"))
 
         # Setting up persistent peers
         if self.interviewer.persistent_peers:
-            persistent_peers_search_text='persistent_peers = ""'
-            persistent_peers_replace_text='persistent_peers = "{}"'.format(self.interviewer.persistent_peers)
-            search_and_replace(persistent_peers_search_text, persistent_peers_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
+            persistent_peers_search_text = 'persistent_peers = ""'
+            persistent_peers_replace_text = 'persistent_peers = "{}"'.format(
+                self.interviewer.persistent_peers)
+            search_and_replace(persistent_peers_search_text, persistent_peers_replace_text, os.path.join(
+                self.cheqd_config_dir, "config.toml"))
 
         # Setting up log level
         if self.interviewer.log_level:
             log_level_search_text = 'log_level'
-            log_level_replace_text = 'log_level = "{}"'.format(self.interviewer.log_level)
-            search_and_replace(log_level_search_text, log_level_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
+            log_level_replace_text = 'log_level = "{}"'.format(
+                self.interviewer.log_level)
+            search_and_replace(log_level_search_text, log_level_replace_text, os.path.join(
+                self.cheqd_config_dir, "config.toml"))
         else:
             log_level_search_text = 'log_level'
-            log_level_replace_text = 'log_level = "{}"'.format(DEFAULT_LOG_LEVEL)
-            search_and_replace(log_level_search_text, log_level_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
+            log_level_replace_text = 'log_level = "{}"'.format(
+                DEFAULT_LOG_LEVEL)
+            search_and_replace(log_level_search_text, log_level_replace_text, os.path.join(
+                self.cheqd_config_dir, "config.toml"))
 
         # Setting up log format
         if self.interviewer.log_format:
             log_format_search_text = 'log_format'
-            log_format_replace_text = 'log_format = "{}"'.format(self.interviewer.log_format)
-            search_and_replace(log_format_search_text, log_format_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
+            log_format_replace_text = 'log_format = "{}"'.format(
+                self.interviewer.log_format)
+            search_and_replace(log_format_search_text, log_format_replace_text, os.path.join(
+                self.cheqd_config_dir, "config.toml"))
         else:
             log_format_search_text = 'log_format'
-            log_format_replace_text = 'log_format = "{}"'.format(DEFAULT_LOG_FORMAT)
-            search_and_replace(log_format_search_text, log_format_replace_text, os.path.join(self.cheqd_config_dir, "config.toml"))
+            log_format_replace_text = 'log_format = "{}"'.format(
+                DEFAULT_LOG_FORMAT)
+            search_and_replace(log_format_search_text, log_format_replace_text, os.path.join(
+                self.cheqd_config_dir, "config.toml"))
 
     def prepare_cheqd_user(self):
         try:
             if not self.is_user_exists(DEFAULT_CHEQD_USER):
                 self.log(f"Creating {DEFAULT_CHEQD_USER} group")
                 self.exec(f"addgroup {DEFAULT_CHEQD_USER} --quiet --system")
-                self.log(f"Creating {DEFAULT_CHEQD_USER} user and adding to {DEFAULT_CHEQD_USER} group")
+                self.log(
+                    f"Creating {DEFAULT_CHEQD_USER} user and adding to {DEFAULT_CHEQD_USER} group")
                 self.exec(
                     f"adduser --system {DEFAULT_CHEQD_USER} --home {self.interviewer.home_dir} --shell /bin/bash --ingroup {DEFAULT_CHEQD_USER} --quiet")
         except:
@@ -580,14 +631,14 @@ class Installer():
         try:
             self.mkdir_p(self.cheqd_log_dir)
             Path(os.path.join(self.cheqd_log_dir, "stdout.log")).touch()
-            self.log(f"Setting up ownership permissions for {self.cheqd_log_dir} directory")
+            self.log(
+                f"Setting up ownership permissions for {self.cheqd_log_dir} directory")
             shutil.chown(self.cheqd_log_dir,
-                'syslog',
-                DEFAULT_CHEQD_USER)
+                         'syslog',
+                         DEFAULT_CHEQD_USER)
         except:
             failure_exit(f"Failed to setup {self.cheqd_log_dir} directory")
 
-    
     def setup_cosmovisor(self):
         try:
             fname = self.download_and_unzip(self.cosmovisor_download_url)
@@ -606,26 +657,27 @@ class Installer():
                 shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
 
             self.cosm_version = interviewer.what_cosmovisor_version()
-            if self.cosm_version == DEFAULT_LATEST_COSMOVISOR_VERSION.replace("v",""):
+            if self.cosm_version == DEFAULT_LATEST_COSMOVISOR_VERSION.replace("v", ""):
                 self.init_cosmovisor()
             else:
                 self.init_cosmovisor_manually()
-            
+
             if self.interviewer.is_upgrade and \
-                os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
+                    os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
 
                 self.log(f"Copying upgrade-info.json file to cosmovisor/current/")
                 shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
                             os.path.join(self.cosmovisor_root_dir, "current"))
                 self.log(f"Changing owner to {DEFAULT_CHEQD_USER} user")
                 shutil.chown(self.cosmovisor_root_dir,
-                    DEFAULT_CHEQD_USER,
-                    DEFAULT_CHEQD_USER)
-        
-            self.log(f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
+                             DEFAULT_CHEQD_USER,
+                             DEFAULT_CHEQD_USER)
+
+            self.log(
+                f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
             shutil.chown(self.cosmovisor_root_dir,
-                    DEFAULT_CHEQD_USER,
-                    DEFAULT_CHEQD_USER)
+                         DEFAULT_CHEQD_USER,
+                         DEFAULT_CHEQD_USER)
         except:
             failure_exit(f"Failed to setup Cosmovisor")
 
@@ -636,16 +688,22 @@ class Installer():
     def set_cosmovisor_env_vars(self):
         self.set_env_vars("DAEMON_NAME", DEFAULT_BINARY_NAME)
         self.set_env_vars("DAEMON_HOME", self.interviewer.home_dir)
-        self.set_env_vars("DAEMON_ALLOW_DOWNLOAD_BINARIES", str(self.interviewer.daemon_allow_download_binaries).lower())
-        self.set_env_vars("DAEMON_RESTART_AFTER_UPGRADE", str(self.interviewer.daemon_restart_after_upgrade).lower())
+        self.set_env_vars("DAEMON_ALLOW_DOWNLOAD_BINARIES", str(
+            self.interviewer.daemon_allow_download_binaries).lower())
+        self.set_env_vars("DAEMON_RESTART_AFTER_UPGRADE", str(
+            self.interviewer.daemon_restart_after_upgrade).lower())
         self.set_env_vars("DAEMON_POLL_INTERVAL", DEFAULT_DAEMON_POLL_INTERVAL)
-        self.set_env_vars("UNSAFE_SKIP_BACKUP", str(DEFAULT_UNSAFE_SKIP_BACKUP).lower())
+        self.set_env_vars("UNSAFE_SKIP_BACKUP", str(
+            DEFAULT_UNSAFE_SKIP_BACKUP).lower())
 
     def init_cosmovisor(self):
-        self.log(f"Moving binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}")
-        self.exec(f"sudo mv {self.binary_path} {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}")
+        self.log(
+            f"Moving binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}")
+        self.exec(
+            f"sudo mv {self.binary_path} {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}")
 
-        self.exec(f"""sudo -i su -c 'cosmovisor init {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}' {DEFAULT_CHEQD_USER}""")
+        self.exec(
+            f"""sudo -i su -c 'cosmovisor init {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}' {DEFAULT_CHEQD_USER}""")
 
     def init_cosmovisor_manually(self):
         self.mkdir_p(self.cosmovisor_root_dir)
@@ -656,18 +714,21 @@ class Installer():
         if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
             self.log(f"Creating symlink for current Cosmovisor version")
             os.symlink(os.path.join(self.cosmovisor_root_dir, "genesis"),
-                    os.path.join(self.cosmovisor_root_dir, "current"))
-        
-        self.log(f"Moving binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
-        self.exec("sudo mv {} {}".format(self.binary_path, self.cosmovisor_cheqd_bin_path))
-        shutil.chown(os.path.join(DEFAULT_INSTALL_PATH,DEFAULT_COSMOVISOR_BINARY_NAME),
-            DEFAULT_CHEQD_USER,
-            DEFAULT_CHEQD_USER)
-        self.exec("sudo chmod +x {}".format(f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
+                       os.path.join(self.cosmovisor_root_dir, "current"))
+
+        self.log(
+            f"Moving binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
+        self.exec("sudo mv {} {}".format(
+            self.binary_path, self.cosmovisor_cheqd_bin_path))
+        shutil.chown(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME),
+                     DEFAULT_CHEQD_USER,
+                     DEFAULT_CHEQD_USER)
+        self.exec(
+            "sudo chmod +x {}".format(f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
         if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
             self.log(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
             os.symlink(self.cosmovisor_cheqd_bin_path,
-                    os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+                       os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
 
     def bump_cosmovisor(self):
         try:
@@ -675,7 +736,7 @@ class Installer():
 
             fname = self.download_and_unzip(self.cosmovisor_download_url)
             self.remove_safe(fname)
-    
+
             # Remove cosmovisor artifacts...
             self.remove_safe("CHANGELOG.md")
             self.remove_safe("README.md")
@@ -683,47 +744,55 @@ class Installer():
 
             # move the new binary to installation directory
             self.log(f"Moving Cosmovisor binary to installation directory")
-            shutil.move(os.path.join(os.path.realpath(os.path.curdir), DEFAULT_COSMOVISOR_BINARY_NAME), os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
+            shutil.move(os.path.join(os.path.realpath(os.path.curdir), DEFAULT_COSMOVISOR_BINARY_NAME), os.path.join(
+                DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
 
             if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
                 self.log(f"Creating symlink for current Cosmovisor version")
                 os.symlink(os.path.join(self.cosmovisor_root_dir, "genesis"),
-                        os.path.join(self.cosmovisor_root_dir, "current"))
+                           os.path.join(self.cosmovisor_root_dir, "current"))
 
-            self.log(f"Moving binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
-            shutil.move(os.path.join(os.path.realpath(os.path.curdir), self.binary_path), os.path.join(self.cosmovisor_cheqd_bin_path))
+            self.log(
+                f"Moving binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
+            shutil.move(os.path.join(os.path.realpath(
+                os.path.curdir), self.binary_path), os.path.join(self.cosmovisor_cheqd_bin_path))
             shutil.chown(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME),
-                    DEFAULT_CHEQD_USER,
-                    DEFAULT_CHEQD_USER)
-            self.exec("sudo chmod +x {}".format(f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
+                         DEFAULT_CHEQD_USER,
+                         DEFAULT_CHEQD_USER)
+            self.exec(
+                "sudo chmod +x {}".format(f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
 
             if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
-                self.log(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
+                self.log(
+                    f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
                 os.symlink(self.cosmovisor_cheqd_bin_path,
-                        os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
-            
+                           os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+
             if self.interviewer.is_upgrade and \
-                os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
+                    os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
                 self.log(f"Copying upgrade-info.json file to cosmovisor/current/")
                 shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
                             os.path.join(self.cosmovisor_root_dir, "current"))
                 self.log(f"Changing owner to {DEFAULT_CHEQD_USER} user")
                 shutil.chown(self.cosmovisor_root_dir,
-                    DEFAULT_CHEQD_USER,
-                    DEFAULT_CHEQD_USER)
-        
-            self.log(f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
+                             DEFAULT_CHEQD_USER,
+                             DEFAULT_CHEQD_USER)
+
+            self.log(
+                f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
             shutil.chown(self.cosmovisor_root_dir,
-                    DEFAULT_CHEQD_USER,
-                    DEFAULT_CHEQD_USER)
+                         DEFAULT_CHEQD_USER,
+                         DEFAULT_CHEQD_USER)
             self.reload_cosmovisor_systemd()
         except:
             failure_exit(f"Failed to bump Cosmovisor")
 
     def set_env_vars(self, env_var_name, env_var_value):
         if not self.check_if_env_var_already_set(env_var_name) and not self.is_default_shell_fish():
-            self.write_to_bashrc(env_var_name, env_var_value) # write to current user
-            self.write_to_bashrc(env_var_name, env_var_value, True) # write to cheqd user .bashrc
+            # write to current user
+            self.write_to_bashrc(env_var_name, env_var_value)
+            # write to cheqd user .bashrc
+            self.write_to_bashrc(env_var_name, env_var_value, True)
         elif not self.check_if_env_var_already_set(env_var_name) and self.is_default_shell_fish():
             self.exec(f'set -Uxg {env_var_name} {env_var_value}')
         else:
@@ -733,9 +802,11 @@ class Installer():
         try:
             current_user_bashrc_path = os.path.expanduser("~/.bashrc")
             if is_user_cheqd:
-                current_user_bashrc_path = f'{self.interviewer.home_dir}/.bashrc' # because user might change default home dir path which is /home/cheqd
+                # because user might change default home dir path which is /home/cheqd
+                current_user_bashrc_path = f'{self.interviewer.home_dir}/.bashrc'
             with open(current_user_bashrc_path, "a") as current_user_bashrc_file:
-                current_user_bashrc_file.write(f"export {env_var_name}={env_var_value}\n")
+                current_user_bashrc_file.write(
+                    f"export {env_var_name}={env_var_value}\n")
         except:
             if is_user_cheqd:
                 failure_exit("Unable to set ENV vars for cheqd user")
@@ -752,7 +823,7 @@ class Installer():
             return False
 
     def is_default_shell_fish(self):
-        try: 
+        try:
             default_shell = os.getenv("SHELL")
             if default_shell == "/usr/bin/fish":
                 return True
@@ -762,18 +833,21 @@ class Installer():
             failure_exit("Unable to get the default shell")
 
     def download_and_unzip(self, download_url):
-        fname= os.path.basename(download_url)
+        fname = os.path.basename(download_url)
         self.exec(f"wget -c {download_url}")
         self.exec(f"tar -xzf {fname}")
         return fname
 
     def compare_checksum(self, file_path):
         # Set URL for correct checksum file for snapshot
-        checksum_url = os.path.join(os.path.dirname(self.interviewer.snapshot_url), "md5sum.txt")
+        checksum_url = os.path.join(os.path.dirname(
+            self.interviewer.snapshot_url), "md5sum.txt")
         # Get checksum file
-        published_checksum = self.exec(f"curl -s {checksum_url} | tail -1 | cut -d' ' -f 1").stdout.strip()
+        published_checksum = self.exec(
+            f"curl -s {checksum_url} | tail -1 | cut -d' ' -f 1").stdout.strip()
         self.log(f"Comparing published checksum with local checksum")
-        local_checksum = self.exec(f"md5sum {file_path} | tail -1 | cut -d' ' -f 1").stdout.strip()
+        local_checksum = self.exec(
+            f"md5sum {file_path} | tail -1 | cut -d' ' -f 1").stdout.strip()
         if published_checksum == local_checksum:
             self.log(f"Checksums match. Download is OK.")
             return True
@@ -797,54 +871,66 @@ class Installer():
             archive_name = os.path.basename(self.interviewer.snapshot_url)
             self.mkdir_p(self.cheqd_data_dir)
             shutil.chown(self.cheqd_data_dir,
-                    DEFAULT_CHEQD_USER,
-                    DEFAULT_CHEQD_USER)
+                         DEFAULT_CHEQD_USER,
+                         DEFAULT_CHEQD_USER)
             # Fetch size of snapshot archive. Uses curl to fetch headers and looks for Content-Length.
-            archive_size = self.exec(f"curl -s --head {self.interviewer.snapshot_url} | awk '/content-length/ {{print $2}}'").stdout.strip()
+            archive_size = self.exec(
+                f"curl -s --head {self.interviewer.snapshot_url} | awk '/content-length/ {{print $2}}'").stdout.strip()
             # Check how much free disk space is available wherever the cheqd root directory is mounted
-            free_disk_space = self.exec(f"df -P -B1 {self.cheqd_root_dir} | tail -1 | awk '{{print $4}}'").stdout.strip()
+            free_disk_space = self.exec(
+                f"df -P -B1 {self.cheqd_root_dir} | tail -1 | awk '{{print $4}}'").stdout.strip()
             if int(archive_size) < int(free_disk_space):
                 self.log(f"Downloading snapshot archive. This may take a while...")
-                self.exec(f"wget -c {self.interviewer.snapshot_url} -P {self.cheqd_root_dir}")
+                self.exec(
+                    f"wget -c {self.interviewer.snapshot_url} -P {self.cheqd_root_dir}")
                 archive_path = os.path.join(self.cheqd_root_dir, archive_name)
                 if self.compare_checksum(archive_path) is True:
-                    self.log(f"Snapshot download was successful and checksums match.")
+                    self.log(
+                        f"Snapshot download was successful and checksums match.")
                 else:
-                    self.log(f"Snapshot download was successful but checksums do not match.")
-                    failure_exit(f"Snapshot download was successful but checksums do not match.")
+                    self.log(
+                        f"Snapshot download was successful but checksums do not match.")
+                    failure_exit(
+                        f"Snapshot download was successful but checksums do not match.")
             elif int(archive_size) > int(free_disk_space):
-                failure_exit(f"Snapshot archive is too large to fit in free disk space. Please free up some space and try again.")
+                failure_exit(
+                    f"Snapshot archive is too large to fit in free disk space. Please free up some space and try again.")
             else:
-                failure_exit(f"Error encountered when downloading snapshot archive.")
+                failure_exit(
+                    f"Error encountered when downloading snapshot archive.")
         except:
             failure_exit(f"Failed to download snapshot")
 
     def untar_from_snapshot(self):
         try:
-            archive_path = os.path.join(self.cheqd_root_dir, os.path.basename(self.interviewer.snapshot_url))
+            archive_path = os.path.join(
+                self.cheqd_root_dir, os.path.basename(self.interviewer.snapshot_url))
             # Check if there is enough space to extract snapshot archive
             self.install_dependencies()
             self.log(f"Extracting snapshot archive. This may take a while...")
 
             # Extract to cheqd node data directory EXCEPT for validator state
-            self.exec(f"sudo su -c 'pv {archive_path} | tar --use-compress-program=lz4 -xf - -C {self.cheqd_root_dir} --exclude priv_validator_state.json' {DEFAULT_CHEQD_USER}")
+            self.exec(
+                f"sudo su -c 'pv {archive_path} | tar --use-compress-program=lz4 -xf - -C {self.cheqd_root_dir} --exclude priv_validator_state.json' {DEFAULT_CHEQD_USER}")
 
             # Delete snapshot archive file
-            self.log(f"Snapshot extraction was successful. Deleting snapshot archive.")
+            self.log(
+                f"Snapshot extraction was successful. Deleting snapshot archive.")
             self.remove_safe(archive_path)
             # Workaround to make this work with Cosmovisor since it expects upgrade-info.json file in cosmovisor/current directory
             if self.interviewer.is_cosmo_needed:
                 if os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
-                    self.log(f"Copying upgrade-info.json file to cosmovisor/current/")
+                    self.log(
+                        f"Copying upgrade-info.json file to cosmovisor/current/")
                     shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
                                 os.path.join(self.cosmovisor_root_dir, "current"))
                 self.log(f"Changing owner to {DEFAULT_CHEQD_USER} user")
                 shutil.chown(self.cosmovisor_root_dir,
-                    DEFAULT_CHEQD_USER,
-                    DEFAULT_CHEQD_USER)
+                             DEFAULT_CHEQD_USER,
+                             DEFAULT_CHEQD_USER)
             shutil.chown(self.cheqd_data_dir,
-                    DEFAULT_CHEQD_USER,
-                    DEFAULT_CHEQD_USER)
+                         DEFAULT_CHEQD_USER,
+                         DEFAULT_CHEQD_USER)
         except:
             failure_exit(f"Failed to extract snapshot")
 
@@ -925,7 +1011,7 @@ class Interviewer:
     @property
     def is_cosmo_needed(self) -> bool:
         return self._is_cosmo_needed
-    
+
     @property
     def is_cosmovisor_bump_needed(self) -> bool:
         return self._is_cosmovisor_bump_needed
@@ -977,7 +1063,7 @@ class Interviewer:
     @property
     def log_format(self) -> str:
         return self._log_format
-    
+
     @property
     def daemon_allow_download_binaries(self) -> bool:
         return self._daemon_allow_download_binaries
@@ -1021,7 +1107,7 @@ class Interviewer:
     @is_cosmo_needed.setter
     def is_cosmo_needed(self, icn):
         self._is_cosmo_needed = icn
-    
+
     @is_cosmovisor_bump_needed.setter
     def is_cosmovisor_bump_needed(self, icn):
         self._is_cosmovisor_bump_needed = icn
@@ -1096,7 +1182,8 @@ class Interviewer:
         elif not os.path.exists(self.home_dir) and not os.path.exists(self.cheqd_root_dir):
             return False
         else:
-            failure_exit(f"Could not check if cheqd-node is already installed.")
+            failure_exit(
+                f"Could not check if cheqd-node is already installed.")
 
     def is_systemd_config_exists(self) -> bool:
         return os.path.exists(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH) or \
@@ -1119,14 +1206,16 @@ class Interviewer:
         return subprocess.run(cmd, **kwargs)
 
     def get_releases(self):
-        req = request.Request("https://api.github.com/repos/cheqd/cheqd-node/releases")
+        req = request.Request(
+            "https://api.github.com/repos/cheqd/cheqd-node/releases")
         req.add_header("Accept", "application/vnd.github.v3+json")
         with request.urlopen(req) as response:
             r_list = json.loads(response.read().decode("utf-8").strip())
             return [Release(r) for r in r_list]
 
     def get_latest_release(self):
-        req = request.Request("https://api.github.com/repos/cheqd/cheqd-node/releases/latest")
+        req = request.Request(
+            "https://api.github.com/repos/cheqd/cheqd-node/releases/latest")
         req.add_header("Accept", "application/vnd.github.v3+json")
         with request.urlopen(req) as response:
             return Release(json.loads(response.read().decode("utf-8")))
@@ -1153,7 +1242,8 @@ class Interviewer:
             cosmovisor_version = None
             for line in file:
                 first_line = str(line)
-                cosmovisor_version = re.search(r'(\d+)(\.\d+)?(\.\d+)?$', first_line).group()
+                cosmovisor_version = re.search(
+                    r'(\d+)(\.\d+)?(\.\d+)?$', first_line).group()
                 break
             return cosmovisor_version
         except:
@@ -1161,7 +1251,7 @@ class Interviewer:
         finally:
             file.close()
             os.remove(file_path)
-        
+
     def ask_for_version(self):
         default = self.get_latest_release()
         all_releases = self.get_releases()
@@ -1172,11 +1262,12 @@ class Interviewer:
         for i, release in enumerate(all_releases[0: LAST_N_RELEASES]):
             print(f"{i + 1}) {release.version}")
         release_num = int(self.ask("Choose list option number above to select version of cheqd-node to install",
-            default=1))
+                                   default=1))
         if release_num >= 1 and release_num <= len(all_releases):
             self.release = all_releases[release_num - 1]
         else:
-            failure_exit(f"Invalid release number picked from list of releases: {release_num}")
+            failure_exit(
+                f"Invalid release number picked from list of releases: {release_num}")
 
     @default_answer
     def ask(self, question, **kwargs):
@@ -1240,16 +1331,18 @@ class Interviewer:
 
     def ask_for_cosmovisor(self):
         self.log(f"INFO: Installing cheqd-node with Cosmovisor allows for automatic unattended upgrades for valid software upgrade proposals.")
-        answer = self.ask(f"Install cheqd-noded using Cosmovisor? (yes/no)", default=DEFAULT_USE_COSMOVISOR)
+        answer = self.ask(
+            f"Install cheqd-noded using Cosmovisor? (yes/no)", default=DEFAULT_USE_COSMOVISOR)
         if answer.lower().startswith("y"):
             self.is_cosmo_needed = True
         elif answer.lower().startswith("n"):
             self.is_cosmo_needed = False
         else:
             failure_exit(f"Invalid input provided during installation.")
-    
+
     def ask_for_cosmovisor_bump(self):
-        answer = self.ask(f"Do you want to bump your Cosmovisor to {DEFAULT_LATEST_COSMOVISOR_VERSION} ? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
+        answer = self.ask(
+            f"Do you want to bump your Cosmovisor to {DEFAULT_LATEST_COSMOVISOR_VERSION} ? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
         if answer.lower().startswith("y"):
             self.is_cosmovisor_bump_needed = True
         elif answer.lower().startswith("n"):
@@ -1302,9 +1395,11 @@ class Interviewer:
             self.external_address = answer
         else:
             try:
-                self.external_address = str(self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout).strip("""b'"\\n""")
+                self.external_address = str(self.exec(
+                    "dig +short txt ch whoami.cloudflare @1.1.1.1").stdout).strip("""b'"\\n""")
             except:
-                failure_exit(f"Unable to fetch external IP address for your node.")
+                failure_exit(
+                    f"Unable to fetch external IP address for your node.")
 
     def ask_for_rpc_port(self):
         self.rpc_port = self.ask(
@@ -1331,7 +1426,7 @@ class Interviewer:
     def ask_for_log_format(self):
         self.log_format = self.ask(
             f"Specify log format (json|plain)", default=DEFAULT_LOG_FORMAT)
-    
+
     def ask_for_daemon_allow_download_binaries(self):
         self.daemon_allow_download_binaries = self.ask(
             f"Specify DAEMON_ALLOW_DOWNLOAD_BINARY (True|False)", default=DEFAULT_DAEMON_ALLOW_DOWNLOAD_BINARIES)
@@ -1352,13 +1447,15 @@ class Interviewer:
         _is_url_valid = False
 
         while not _is_url_valid and _days_counter <= MAX_SNAPSHOT_DAYS:
-            _url = template.format(_date.strftime("%Y-%m-%d"), _date.strftime("%Y-%m-%d"))
+            _url = template.format(_date.strftime(
+                "%Y-%m-%d"), _date.strftime("%Y-%m-%d"))
             _is_url_valid = self.is_url_exists(_url)
             _days_counter += 1
             _date -= datetime.timedelta(days=1)
 
         if not _is_url_valid:
-            failure_exit("Could not find the valid snapshot for the last {} days".format(MAX_SNAPSHOT_DAYS))
+            failure_exit("Could not find the valid snapshot for the last {} days".format(
+                MAX_SNAPSHOT_DAYS))
         return _url
 
     def is_url_exists(self, url):
@@ -1378,11 +1475,13 @@ if __name__ == '__main__':
             interviewer.ask_for_continue_dirty_cosmovisor_state()
             if interviewer.continue_dirty_cosmovisor_state:
                 cosm_version = interviewer.what_cosmovisor_version()
-                if cosm_version < DEFAULT_LATEST_COSMOVISOR_VERSION.replace("v",""):
-                    print(f"Your current Cosmovisor version is v{cosm_version}")
+                if cosm_version < DEFAULT_LATEST_COSMOVISOR_VERSION.replace("v", ""):
+                    print(
+                        f"Your current Cosmovisor version is v{cosm_version}")
                     interviewer.ask_for_cosmovisor_bump()
             else:
-                failure_exit("Aborting installation to prevent overwriting existing cheqd-node.")
+                failure_exit(
+                    "Aborting installation to prevent overwriting existing cheqd-node.")
 
         interviewer.ask_for_setup()
         interviewer.ask_for_chain()
@@ -1404,10 +1503,10 @@ if __name__ == '__main__':
 
     # Steps to execute if upgrading existing node
     def upgrade_steps():
-        # if cosmovisor is installed 
+        # if cosmovisor is installed
         if interviewer.is_cosmovisor_already_installed():
             cosm_version = interviewer.what_cosmovisor_version()
-            if cosm_version < DEFAULT_LATEST_COSMOVISOR_VERSION.replace("v",""):
+            if cosm_version < DEFAULT_LATEST_COSMOVISOR_VERSION.replace("v", ""):
                 print(f"Your current Cosmovisor version is v{cosm_version}")
                 interviewer.ask_for_cosmovisor_bump()
         else:
@@ -1445,7 +1544,8 @@ if __name__ == '__main__':
             if interviewer.is_from_scratch is True:
                 install_steps()
             else:
-                failure_exit("Aborting installation to prevent overwriting existing cheqd-node.")
+                failure_exit(
+                    "Aborting installation to prevent overwriting existing cheqd-node.")
         else:
             failure_exit("Unable to determine upgrade/installation mode.")
     else:
@@ -1457,4 +1557,3 @@ if __name__ == '__main__':
         installer.install()
     except:
         failure_exit("Unable to install cheqd-node.")
-
