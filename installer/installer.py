@@ -32,8 +32,8 @@ DEFAULT_INSTALL_PATH = "/usr/bin"
 DEFAULT_CHEQD_USER = "cheqd"
 DEFAULT_BINARY_NAME = "cheqd-noded"
 DEFAULT_COSMOVISOR_BINARY_NAME = "cosmovisor"
-DEFAULT_CHAINS = ['testnet', 'mainnet']
-DEFAULT_CHAIN = "mainnet"
+DEFAULT_CHAINS = ['cheqd-testnet-4', 'cheqd-mainnet-1']
+DEFAULT_CHAIN = "cheqd-mainnet-1"
 PRINT_PREFIX = "********* "
 
 ###############################################################
@@ -1271,7 +1271,7 @@ class Interviewer:
 
     def ask_for_chain(self):
         answer = self.ask(
-            f"Select cheqd network to join ({'/'.join(DEFAULT_CHAINS)})", default="mainnet")
+            f"Select cheqd network to join ({'/'.join(DEFAULT_CHAINS)})", default="cheqd-mainnet-1")
         if answer in DEFAULT_CHAINS:
             self.chain = answer
         else:
@@ -1346,7 +1346,7 @@ class Interviewer:
             Do you want to proceed anyway? (True|False)", default=DEFAULT_CONTINUE_DIRTY_COSMOVISOR_STATE)
 
     def prepare_url_for_latest(self) -> str:
-        template = TESTNET_SNAPSHOT if self.chain == "testnet" else MAINNET_SNAPSHOT
+        template = TESTNET_SNAPSHOT if self.chain == "cheqd-testnet-4" else MAINNET_SNAPSHOT
         _date = datetime.date.today()
         _days_counter = 0
         _is_url_valid = False
