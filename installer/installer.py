@@ -639,7 +639,7 @@ class Installer():
         self.log(f"Moving binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}")
         self.exec(f"sudo mv {self.binary_path} {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}")
 
-        self.exec(f"""sudo -E su -c 'cosmovisor init {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}' {DEFAULT_CHEQD_USER}""")
+        self.exec(f"""sudo -i su -c 'cosmovisor init {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}' {DEFAULT_CHEQD_USER}""")
 
     def init_cosmovisor_manually(self):
         self.mkdir_p(self.cosmovisor_root_dir)
