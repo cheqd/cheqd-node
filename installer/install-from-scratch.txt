@@ -12,5 +12,5 @@ test-install
 nodeid1@1.1.1.1:26656,nodeid2@8.8.8.8:26656
 debug
 plain
-True
-True
+true
+true

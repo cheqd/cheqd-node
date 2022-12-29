@@ -43,8 +43,8 @@ DEFAULT_LATEST_COSMOVISOR_VERSION = "v1.2.0"
 COSMOVISOR_BINARY_URL = "https://github.com/cosmos/cosmos-sdk/releases/download/cosmovisor%2F{}/cosmovisor-{}-linux-{}.tar.gz"
 DEFAULT_USE_COSMOVISOR = "yes"
 DEFAULT_BUMP_COSMOVISOR = "yes"
-DEFAULT_DAEMON_ALLOW_DOWNLOAD_BINARIES = True
-DEFAULT_DAEMON_RESTART_AFTER_UPGRADE = True
+DEFAULT_DAEMON_ALLOW_DOWNLOAD_BINARIES = "true"
+DEFAULT_DAEMON_RESTART_AFTER_UPGRADE = "true"
 DEFAULT_DAEMON_POLL_INTERVAL = "300s"
 DEFAULT_UNSAFE_SKIP_BACKUP = True
 DEFAULT_CONTINUE_DIRTY_COSMOVISOR_STATE = False
@@ -329,11 +329,8 @@ class Installer():
             self.remove_safe(DEFAULT_RSYSLOG_FILE)
             self.remove_safe(DEFAULT_LOGROTATE_FILE)
 
-        if self.interviewer.is_cosmo_needed:
-            if os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH):
-                self.remove_safe(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
-            if os.path.exists(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH):
-                self.remove_safe(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH)
+        if self.interviewer.is_cosmo_needed and os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH):
+            self.remove_safe(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
 
     def prepare_directory_tree(self):
         """
@@ -683,11 +680,11 @@ class Installer():
 
     def set_cosmovisor_env_vars(self):
         self.set_env_vars("DAEMON_NAME", DEFAULT_BINARY_NAME)
-        self.set_env_vars("DAEMON_HOME", self.interviewer.home_dir)
-        self.set_env_vars("DAEMON_ALLOW_DOWNLOAD_BINARIES", str(
-            self.interviewer.daemon_allow_download_binaries).lower())
-        self.set_env_vars("DAEMON_RESTART_AFTER_UPGRADE", str(
-            self.interviewer.daemon_restart_after_upgrade).lower())
+        self.set_env_vars("DAEMON_HOME", self.cheqd_root_dir)
+        self.set_env_vars("DAEMON_ALLOW_DOWNLOAD_BINARIES", 
+            self.interviewer.daemon_allow_download_binaries)
+        self.set_env_vars("DAEMON_RESTART_AFTER_UPGRADE",
+            self.interviewer.daemon_restart_after_upgrade)
         self.set_env_vars("DAEMON_POLL_INTERVAL", DEFAULT_DAEMON_POLL_INTERVAL)
         self.set_env_vars("UNSAFE_SKIP_BACKUP", str(
             DEFAULT_UNSAFE_SKIP_BACKUP).lower())
@@ -956,8 +953,8 @@ class Interviewer:
         self._persistent_peers = ""
         self._log_level = DEFAULT_LOG_LEVEL
         self._log_format = DEFAULT_LOG_FORMAT
-        self._daemon_allow_download_binaries = True
-        self._daemon_restart_after_upgrade = True
+        self._daemon_allow_download_binaries = "true"
+        self._daemon_restart_after_upgrade = "true"
         self._continue_dirty_cosmovisor_state = False
         self._is_from_scratch = False
         self._rewrite_systemd = False
@@ -1061,11 +1058,11 @@ class Interviewer:
         return self._log_format
 
     @property
-    def daemon_allow_download_binaries(self) -> bool:
+    def daemon_allow_download_binaries(self) -> str:
         return self._daemon_allow_download_binaries
 
     @property
-    def daemon_restart_after_upgrade(self) -> bool:
+    def daemon_restart_after_upgrade(self) -> str:
         return self._daemon_restart_after_upgrade
 
     @property
@@ -1425,16 +1422,23 @@ class Interviewer:
 
     def ask_for_daemon_allow_download_binaries(self):
         self.daemon_allow_download_binaries = self.ask(
-            f"Specify DAEMON_ALLOW_DOWNLOAD_BINARY (True|False)", default=DEFAULT_DAEMON_ALLOW_DOWNLOAD_BINARIES)
+            f"Specify DAEMON_ALLOW_DOWNLOAD_BINARY (true|false)", default=DEFAULT_DAEMON_ALLOW_DOWNLOAD_BINARIES)
 
     def ask_for_daemon_restart_after_upgrade(self):
         self.daemon_restart_after_upgrade = self.ask(
-            f"Specify DAEMON_RESTART_AFTER_UPGRADE (True|False)", default=DEFAULT_DAEMON_RESTART_AFTER_UPGRADE)
+            f"Specify DAEMON_RESTART_AFTER_UPGRADE (true|false)", default=DEFAULT_DAEMON_RESTART_AFTER_UPGRADE)
 
     def ask_for_continue_dirty_cosmovisor_state(self):
-        self.continue_dirty_cosmovisor_state = self.ask(
+        answer = self.ask(
             f"Specify Looks like cosmovisor is already installed and seems you have dirty state after previous installation. \
-            Do you want to proceed anyway? (True|False)", default=DEFAULT_CONTINUE_DIRTY_COSMOVISOR_STATE)
+            Do you want to proceed anyway? (yes|no)", default=DEFAULT_CONTINUE_DIRTY_COSMOVISOR_STATE)
+        
+        if answer.lower().startswith("y"):
+            self.continue_dirty_cosmovisor_state = True
+        elif answer.lower().startswith("n"):
+            self.continue_dirty_cosmovisor_state = False
+        else:
+            failure_exit(f"Invalid input provided during installation.")
 
     def prepare_url_for_latest(self) -> str:
         template = TESTNET_SNAPSHOT if self.chain == "cheqd-testnet-4" else MAINNET_SNAPSHOT
