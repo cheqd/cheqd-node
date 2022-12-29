@@ -672,12 +672,6 @@ class Installer():
                 shutil.chown(self.cosmovisor_root_dir,
                              DEFAULT_CHEQD_USER,
                              DEFAULT_CHEQD_USER)
-
-            self.log(
-                f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
-            shutil.chown(self.cosmovisor_root_dir,
-                         DEFAULT_CHEQD_USER,
-                         DEFAULT_CHEQD_USER)
         except:
             failure_exit(f"Failed to setup Cosmovisor")
 
