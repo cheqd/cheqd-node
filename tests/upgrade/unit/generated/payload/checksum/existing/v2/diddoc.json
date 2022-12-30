@@ -18,7 +18,7 @@
                 "id": "did:cheqd:testnet:97096fb1-63ea-4f81-b296-8eb5da6ab6eb#key-1",
                 "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:97096fb1-63ea-4f81-b296-8eb5da6ab6eb",
-                "verification_material": "z6LNquFfzPNhCQ8nbCWSMBQjosLT7ayEqGSYrN2Y1FdmS"
+                "verification_material": "z6MkjndtVVvRivBfWddHt5QC2WHoguixzrVBxTTnCJW2ArYp"
             }
         ],
         "service": []

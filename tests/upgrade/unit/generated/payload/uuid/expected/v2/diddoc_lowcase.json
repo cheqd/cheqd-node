@@ -13,25 +13,25 @@
                 "id": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-1",
                 "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5",
-                "verification_material": "zHYqCstG3zdLyWGut3SCSSZiVdQttTiNG3u3cSSR1eDvz"
+                "verification_material": "z6Mkw16FU8WVLAqScmkaj1AHHfGVSzAjsbccjuxYGiP2ZSiN"
             },
             {
                 "id": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-2",
                 "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5",
-                "verification_material": "zDcoCVPoUgMjRWmd4ZrfGAZ51L7oF35upoKCX77qRpqUT"
+                "verification_material": "z6Mks54F5e3v1uDtdGTmFRd71ed19h56SyABVL7SwPoSk4Fq"
             },
             {
                 "id": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-3",
                 "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5",
-                "verification_material": "z2RaG3VJ1YMgyDYyAmYcJeKcMsk89UxfoLnyg1peJbhdv"
+                "verification_material": "z6MkfsqJdjYSsuBSL3osT7a9VRAMhKPztqvA2otbr6cKWvRJ"
             },
             {
                 "id": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-4",
                 "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5",
-                "verification_material": "z9Wx6sWnw2ZGEB5m95K7tPr7SkqvfwBdXe5ZmUTyqmKmt"
+                "verification_material": "z6MknyD9Tm3NN6khHabqkt5jEwfSaRCXM4stL6UhJjwrgYZG"
             }
         ],
         "authentication": [
