@@ -30,7 +30,7 @@ var _ = Describe("Create DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:                     keyID,
-					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             did,
 					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
@@ -65,7 +65,7 @@ var _ = Describe("Create DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:                     keyID,
-					VerificationMethodType: types.JSONWebKey2020{}.Type(),
+					VerificationMethodType: types.JSONWebKey2020Type,
 					Controller:             did,
 					VerificationMaterial:   testsetup.BuildJSONWebKey2020VerificationMaterial(keypair.Public),
 				},
@@ -106,7 +106,7 @@ var _ = Describe("Create DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:                     bobKeyID,
-					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             anna.Did,
 					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(bobKeypair.Public),
 				},
@@ -147,25 +147,25 @@ var _ = Describe("Create DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:                     keyID1,
-					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             did,
 					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(keypair1.Public),
 				},
 				{
 					Id:                     keyID2,
-					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             did,
 					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(keypair2.Public),
 				},
 				{
 					Id:                     keyID3,
-					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             did,
 					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(keypair3.Public),
 				},
 				{
 					Id:                     keyID4,
-					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             did,
 					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(keypair4.Public),
 				},
@@ -222,7 +222,7 @@ var _ = Describe("Create DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:                     bobKeyID,
-					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             bobDid,
 					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(bobKeypair.Public),
 				},
@@ -253,7 +253,7 @@ var _ = Describe("Create DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:                     keyID,
-					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             did,
 					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
@@ -281,7 +281,7 @@ var _ = Describe("Create DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:                     keyID,
-					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             did,
 					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
@@ -307,7 +307,7 @@ var _ = Describe("Create DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:                     keyID,
-					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             did,
 					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
@@ -344,7 +344,7 @@ var _ = Describe("Create DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:                     bobKeyID,
-					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             bobDid,
 					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(bobKeypair.Public),
 				},
@@ -370,7 +370,7 @@ var _ = Describe("Create DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:                     keyID,
-					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             did,
 					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
@@ -401,7 +401,7 @@ var _ = Describe("Create DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:                     alice.KeyID,
-					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             alice.Did,
 					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(alice.KeyPair.Public),
 				},
@@ -436,7 +436,7 @@ var _ = Describe("Check upper/lower case for DID creation", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:                     keyID,
-					VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             did,
 					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},

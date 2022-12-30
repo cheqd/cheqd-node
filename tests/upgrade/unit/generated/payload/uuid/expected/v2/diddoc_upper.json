@@ -13,25 +13,25 @@
                 "id": "did:cheqd:testnet:d87f512c-cbfc-58d1-b995-f526589ad808#key-1",
                 "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:d87f512c-cbfc-58d1-b995-f526589ad808",
-                "verification_material": "{\"publicKeyMultibase\":\"z6hCYB6ZJfqvGrgfkgGdTZBtXUjz4bQ7qagksUNjJRBfF\"}"
+                "verification_material": "z6hCYB6ZJfqvGrgfkgGdTZBtXUjz4bQ7qagksUNjJRBfF"
             },
             {
                 "id": "did:cheqd:testnet:d87f512c-cbfc-58d1-b995-f526589ad808#key-2",
                 "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:d87f512c-cbfc-58d1-b995-f526589ad808",
-                "verification_material": "{\"publicKeyMultibase\":\"zDRCh14rhKcEbtjNnBivYyWZ6LSmqhpq8Mw6gdCdsWkHn\"}"
+                "verification_material": "zDRCh14rhKcEbtjNnBivYyWZ6LSmqhpq8Mw6gdCdsWkHn"
             },
             {
                 "id": "did:cheqd:testnet:d87f512c-cbfc-58d1-b995-f526589ad808#key-3",
                 "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:d87f512c-cbfc-58d1-b995-f526589ad808",
-                "verification_material": "{\"publicKeyMultibase\":\"zEQwmVajyBLpKAubk46o9xz9zD8JZd3YJhZFF5qw9oxYk\"}"
+                "verification_material": "zEQwmVajyBLpKAubk46o9xz9zD8JZd3YJhZFF5qw9oxYk"
             },
             {
                 "id": "did:cheqd:testnet:d87f512c-cbfc-58d1-b995-f526589ad808#key-4",
                 "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:d87f512c-cbfc-58d1-b995-f526589ad808",
-                "verification_material": "{\"publicKeyMultibase\":\"zGq9JEc6vdA6TVWNmC2YqN9fdRVyincfDHNNykRrLRzgr\"}"
+                "verification_material": "zGq9JEc6vdA6TVWNmC2YqN9fdRVyincfDHNNykRrLRzgr"
             }
         ],
         "authentication": [

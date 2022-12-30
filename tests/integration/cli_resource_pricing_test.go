@@ -13,8 +13,8 @@ import (
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcecli "github.com/cheqd/cheqd-node/x/resource/client/cli"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	"github.com/google/uuid"
-	"github.com/multiformats/go-multibase"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -42,8 +42,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		pubKey, privKey, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
 
-		pubKeyMultibase58, err := multibase.Encode(multibase.Base58BTC, pubKey)
-		Expect(err).To(BeNil())
+		pubKeyMultibase58 := testsetup.BuildEd25519VerificationKey2020VerificationMaterial(pubKey)
 
 		didPayload := didtypes.MsgCreateDidDocPayload{
 			Id: did,
@@ -52,7 +51,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 					Id:                   keyId,
 					VerificationMethodType:                 "Ed25519VerificationKey2020",
 					Controller:           did,
-					VerificationMaterial: "{\"publicKeyMultibase\": \"" + string(pubKeyMultibase58) + "\"}",
+					VerificationMaterial: pubKeyMultibase58,
 				},
 			},
 			Authentication: []string{keyId},

@@ -7,11 +7,10 @@ import (
 	mathrand "math/rand"
 	"time"
 
-	"github.com/cheqd/cheqd-node/x/did/types"
-	"github.com/cheqd/cheqd-node/x/did/utils"
 	"github.com/google/uuid"
 	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/mr-tron/base58"
+	"github.com/multiformats/go-multibase"
 )
 
 func randBase58Seq(bytes int) string {
@@ -65,9 +64,10 @@ func GenerateKeyPair() KeyPair {
 }
 
 func BuildEd25519VerificationKey2020VerificationMaterial(publicKey ed25519.PublicKey) string {
-	return utils.MustEncodeJSON(types.Ed25519VerificationKey2020{
-		PublicKeyMultibase: utils.MustEncodeMultibaseBase58(publicKey),
-	})
+	multicodec := []byte{0xed, 0x01}
+	multicodecAndKey := append(multicodec, publicKey...)
+	keyStr, _ := multibase.Encode(multibase.Base58BTC, multicodecAndKey)
+	return keyStr
 }
 
 func BuildJSONWebKey2020VerificationMaterial(publicKey ed25519.PublicKey) string {
@@ -81,7 +81,5 @@ func BuildJSONWebKey2020VerificationMaterial(publicKey ed25519.PublicKey) string
 		panic(err)
 	}
 
-	return utils.MustEncodeJSON(types.JSONWebKey2020{
-		PublicKeyJwk: json.RawMessage(pubKeyJwkJSON),
-	})
+	return string(pubKeyJwkJSON)
 }

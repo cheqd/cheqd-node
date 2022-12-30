@@ -10,8 +10,8 @@ import (
 	"encoding/json"
 
 	. "github.com/cheqd/cheqd-node/x/did/types"
+	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	"github.com/lestrrat-go/jwx/jwk"
-	"github.com/multiformats/go-multibase"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -145,10 +145,10 @@ var _ = DescribeTable("Verification Method validation tests", func(testCase Veri
 				Id:                     "did:cheqd:zABCDEFG123456789abcd#qwe",
 				VerificationMethodType: "Ed25519VerificationKey2020",
 				Controller:             "did:cheqd:zABCDEFG987654321abcd",
-				VerificationMaterial:   InvalidEd25519VerificationMaterial,
+				VerificationMaterial:   InvalidEd25519VerificationMaterialBadlength,
 			},
 			isValid:  false,
-			errorMsg: "verification_material: (publicKeyMultibase: ed25519: bad public key length: 18.)",
+			errorMsg: "verification_material: ed25519: bad public key length: 27",
 		}),
 )
 
@@ -168,14 +168,13 @@ var _ = Describe("Validation ed25519 Signature in verification method", func() {
 
 	Context("when ed25519 key is placed", func() {
 		It("is valid", func() {
-			pubKeyStr, err := multibase.Encode(multibase.Base58BTC, pubKey)
-			Expect(err).To(BeNil())
+			pubKeyStr := testsetup.BuildEd25519VerificationKey2020VerificationMaterial(pubKey)
 
 			vm := VerificationMethod{
 				Id:                     "",
 				VerificationMethodType: "Ed25519VerificationKey2020",
 				Controller:             "",
-				VerificationMaterial:   "{\"publicKeyMultibase\": \"" + pubKeyStr + "\"}",
+				VerificationMaterial:   pubKeyStr,
 			}
 
 			err = VerifySignature(vm, msgBytes, signature)
@@ -195,7 +194,7 @@ var _ = Describe("Validation ed25519 Signature in verification method", func() {
 				Id:                     "",
 				VerificationMethodType: "JsonWebKey2020",
 				Controller:             "",
-				VerificationMaterial:   "{\"publicKeyJwk\": " + string(jsonPayload) + "}",
+				VerificationMaterial:   string(jsonPayload),
 			}
 
 			err = VerifySignature(vm2, msgBytes, signature)
@@ -234,7 +233,7 @@ var _ = Describe("Validation ECDSA Signature in verification method", func() {
 				Id:                     "",
 				VerificationMethodType: "JsonWebKey2020",
 				Controller:             "",
-				VerificationMaterial:   "{\"publicKeyJwk\": " + string(jsonPayload) + "}",
+				VerificationMaterial:   string(jsonPayload),
 			}
 
 			err = VerifySignature(vm, msgBytes, signature)
@@ -272,7 +271,7 @@ var _ = Describe("Validation RSA Signature in verification method", func() {
 				Id:                     "",
 				VerificationMethodType: "JsonWebKey2020",
 				Controller:             "",
-				VerificationMaterial:   "{\"publicKeyJwk\": " + string(jsonPayload) + "}",
+				VerificationMaterial:   string(jsonPayload),
 			}
 
 			err = VerifySignature(vm2, msgBytes, signature)
@@ -280,3 +279,81 @@ var _ = Describe("Validation RSA Signature in verification method", func() {
 		})
 	})
 })
+
+var _ = DescribeTable("Verification Method material validation tests", func(testCase VerificationMethodTestCase) {
+
+	err := testCase.vm.Validate(testCase.baseDid, testCase.allowedNamespaces)
+
+	if testCase.isValid {
+		Expect(err).To(BeNil())
+	} else {
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring(testCase.errorMsg))
+	}
+},
+
+	Entry(
+		"Valid Ed25519VerificationKey2020 verification material",
+		VerificationMethodTestCase{
+			vm: VerificationMethod{
+				Id:                     "did:cheqd:zABCDEFG123456789abcd#qwe",
+				VerificationMethodType: "Ed25519VerificationKey2020",
+				Controller:             "did:cheqd:zABCDEFG987654321abcd",
+				VerificationMaterial:   ValidEd25519VerificationMaterial,
+			},
+			isValid:  true,
+			errorMsg: "",
+		}),
+
+	Entry(
+		"Valid JsonWebKey2020 verification material",
+		VerificationMethodTestCase{
+			vm: VerificationMethod{
+				Id:                     "did:cheqd:zABCDEFG123456789abcd#qwe",
+				VerificationMethodType: "JsonWebKey2020",
+				Controller:             "did:cheqd:zABCDEFG987654321abcd",
+				VerificationMaterial:   ValidJWKKeyVerificationMaterial,
+			},
+			isValid:  true,
+			errorMsg: "",
+		}),
+
+	Entry(
+		"Invalid Ed25519VerificationKey2020 verification material",
+		VerificationMethodTestCase{
+			vm: VerificationMethod{
+				Id:                     "did:cheqd:zABCDEFG123456789abcd#qwe",
+				VerificationMethodType: "Ed25519VerificationKey2020",
+				Controller:             "did:cheqd:zABCDEFG987654321abcd",
+				VerificationMaterial:   InvalidEd25519VerificationMaterialBadlength,
+			},
+			isValid:  false,
+			errorMsg: "",
+		}),
+
+	Entry(
+		"Invalid Ed25519VerificationKey2020 verification material",
+		VerificationMethodTestCase{
+			vm: VerificationMethod{
+				Id:                     "did:cheqd:zABCDEFG123456789abcd#qwe",
+				VerificationMethodType: "Ed25519VerificationKey2020",
+				Controller:             "did:cheqd:zABCDEFG987654321abcd",
+				VerificationMaterial:   InvalidEd25519VerificationMaterialBadMulticodec,
+			},
+			isValid:  false,
+			errorMsg: "verification_material: invalid multicodec for ED25519VerificationKey2020. expected: 0xed01 actual: 0x0200",
+		}),
+
+	Entry(
+		"Invalid JsonWebKey2020 verification material",
+		VerificationMethodTestCase{
+			vm: VerificationMethod{
+				Id:                     "did:cheqd:zABCDEFG123456789abcd#qwe",
+				VerificationMethodType: "JsonWebKey2020",
+				Controller:             "did:cheqd:zABCDEFG987654321abcd",
+				VerificationMaterial:   InvalidJWKKeyVerificationMaterial,
+			},
+			isValid:  false,
+			errorMsg: "can't parse jwk: failed to parse key",
+		}),
+)

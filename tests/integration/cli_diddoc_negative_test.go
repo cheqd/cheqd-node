@@ -11,9 +11,9 @@ import (
 	"github.com/cheqd/cheqd-node/tests/integration/network"
 	"github.com/cheqd/cheqd-node/tests/integration/testdata"
 	cli_types "github.com/cheqd/cheqd-node/x/did/client/cli"
+	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	"github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/google/uuid"
-	"github.com/multiformats/go-multibase"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -33,8 +33,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 		pubKey, privKey, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
 
-		pubKeyMultibase58, err := multibase.Encode(multibase.Base58BTC, pubKey)
-		Expect(err).To(BeNil())
+		pubKeyMultibase58 := testsetup.BuildEd25519VerificationKey2020VerificationMaterial(pubKey)
 
 		payload := types.MsgCreateDidDocPayload{
 			Id: did,
@@ -43,7 +42,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 					Id:                     keyId,
 					VerificationMethodType: "Ed25519VerificationKey2020",
 					Controller:             did,
-					VerificationMaterial:   "{\"publicKeyMultibase\":\"" + string(pubKeyMultibase58) + "\"}",
+					VerificationMaterial:   pubKeyMultibase58,
 				},
 			},
 			Authentication: []string{keyId},
@@ -68,8 +67,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 		pubKey2, privKey2, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
 
-		pubKeyMultibase582, err := multibase.Encode(multibase.Base58BTC, pubKey2)
-		Expect(err).To(BeNil())
+		pubKeyMultibase582 := testsetup.BuildEd25519VerificationKey2020VerificationMaterial(pubKey2)
 
 		payload2 := types.MsgCreateDidDocPayload{
 			Id: did2,
@@ -78,7 +76,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 					Id:                     keyId2,
 					VerificationMethodType: "Ed25519VerificationKey2020",
 					Controller:             did2,
-					VerificationMaterial:   "{\"publicKeyMultibase\":\"" + string(pubKeyMultibase582) + "\"}",
+					VerificationMaterial:   pubKeyMultibase582,
 				},
 			},
 			Authentication: []string{keyId2},
@@ -166,8 +164,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 		pubKey, privKey, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
 
-		pubKeyMultibase58, err := multibase.Encode(multibase.Base58BTC, pubKey)
-		Expect(err).To(BeNil())
+		pubKeyMultibase58 := testsetup.BuildEd25519VerificationKey2020VerificationMaterial(pubKey)
 
 		payload := types.MsgCreateDidDocPayload{
 			Id:         did,
@@ -177,7 +174,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 					Id:                     keyId,
 					VerificationMethodType: "Ed25519VerificationKey2020",
 					Controller:             did,
-					VerificationMaterial:   "{\"publicKeyMultibase\":\"" + string(pubKeyMultibase58) + "\"}",
+					VerificationMaterial:   pubKeyMultibase58,
 				},
 			},
 			Authentication: []string{keyId},
@@ -203,7 +200,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 					Id:                     keyId,
 					VerificationMethodType: "Ed25519VerificationKey2020",
 					Controller:             did,
-					VerificationMaterial:   "{\"publicKeyMultibase\":\"" + string(pubKeyMultibase58) + "\"}",
+					VerificationMaterial:   pubKeyMultibase58,
 				},
 			},
 			Authentication:  []string{keyId},
@@ -223,8 +220,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 		pubKey2, privKey2, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
 
-		pubKeyMultibase582, err := multibase.Encode(multibase.Base58BTC, pubKey2)
-		Expect(err).To(BeNil())
+		pubKeyMultibase582 := testsetup.BuildEd25519VerificationKey2020VerificationMaterial(pubKey2)
 
 		payload2 := types.MsgCreateDidDocPayload{
 			Id:         did2,
@@ -234,7 +230,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 					Id:                     keyId2,
 					VerificationMethodType: "Ed25519VerificationKey2020",
 					Controller:             did2,
-					VerificationMaterial:   "{\"publicKeyMultibase\":\"" + string(pubKeyMultibase582) + "\"}",
+					VerificationMaterial:   pubKeyMultibase582,
 				},
 			},
 			Authentication: []string{keyId2},
@@ -291,7 +287,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 			Id:                     keyId2AsExtraController,
 			VerificationMethodType: "Ed25519VerificationKey2020",
 			Controller:             did2,
-			VerificationMaterial:   "{\"publicKeyMultibase\":\"" + string(pubKeyMultibase582) + "\"}",
+			VerificationMaterial:   pubKeyMultibase582,
 		})
 		followingUpdatedPayload.Authentication = append(followingUpdatedPayload.Authentication, keyId2AsExtraController)
 		followingUpdatedPayload.CapabilityDelegation = []string{keyId}
@@ -388,7 +384,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 				Id:                     followingUpdatedPayload.VerificationMethod[1].Id,
 				VerificationMethodType: "NonSupportedVmType",
 				Controller:             followingUpdatedPayload.VerificationMethod[1].Controller,
-				VerificationMaterial:   "{\"publicKeyMultibase\":\"pretty-long-public-key-multibase\"}",
+				VerificationMaterial:   "pretty-long-public-key-multibase",
 			},
 		}
 		invalidVmTypePayload.VersionId = uuid.NewString()

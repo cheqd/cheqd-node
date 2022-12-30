@@ -84,3 +84,7 @@ func VerifyECDSASignature(pubKey ecdsa.PublicKey, message []byte, signature []by
 	}
 	return nil
 }
+
+func GetEd25519VerificationKey2020(keyBytes []byte) []byte {
+	return keyBytes[2:]
+}

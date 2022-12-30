@@ -12,7 +12,7 @@ import (
 	clitypes "github.com/cheqd/cheqd-node/x/did/client/cli"
 	"github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/google/uuid"
-	"github.com/multiformats/go-multibase"
+	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -59,8 +59,7 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		pubKey, privKey, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
 
-		pubKeyMultibase58, err := multibase.Encode(multibase.Base58BTC, pubKey)
-		Expect(err).To(BeNil())
+		pubKeyMultibase58 := testsetup.BuildEd25519VerificationKey2020VerificationMaterial(pubKey)
 
 		payload = types.MsgCreateDidDocPayload{
 			Id: did,
@@ -69,7 +68,7 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 					Id:                     keyId,
 					VerificationMethodType: "Ed25519VerificationKey2020",
 					Controller:             did,
-					VerificationMaterial:   "{\"publicKeyMultibase\": \"" + string(pubKeyMultibase58) + "\"}",
+					VerificationMaterial:   pubKeyMultibase58,
 				},
 			},
 			Authentication: []string{keyId},

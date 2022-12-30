@@ -13,6 +13,7 @@ import (
 	"github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/google/uuid"
 	"github.com/multiformats/go-multibase"
+	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -34,8 +35,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 		pubKey, privKey, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
 
-		pubKeyMultibase58, err := multibase.Encode(multibase.Base58BTC, pubKey)
-		Expect(err).To(BeNil())
+		pubKeyMultibase58 := testsetup.BuildEd25519VerificationKey2020VerificationMaterial(pubKey)
 
 		payload := types.MsgCreateDidDocPayload{
 			Id: did,
@@ -44,7 +44,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 					Id:                     keyID,
 					VerificationMethodType: "Ed25519VerificationKey2020",
 					Controller:             did,
-					VerificationMaterial:   "{\"publicKeyMultibase\": \"" + pubKeyMultibase58 + "\"}",
+					VerificationMaterial:   pubKeyMultibase58,
 				},
 			},
 			Authentication: []string{keyID},

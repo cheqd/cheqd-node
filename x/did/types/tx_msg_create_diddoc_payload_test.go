@@ -19,7 +19,7 @@ var _ = Describe("Create DID Payload Validation tests", func() {
 			VerificationMethod: []*VerificationMethod{
 				{
 					Id:                     testCase.inputID + "#key1",
-					VerificationMethodType: Ed25519VerificationKey2020{}.Type(),
+					VerificationMethodType: Ed25519VerificationKey2020Type,
 					Controller:             testCase.inputID,
 				},
 			},
@@ -30,7 +30,7 @@ var _ = Describe("Create DID Payload Validation tests", func() {
 			VerificationMethod: []*VerificationMethod{
 				{
 					Id:                     testCase.expectedID + "#key1",
-					VerificationMethodType: Ed25519VerificationKey2020{}.Type(),
+					VerificationMethodType: Ed25519VerificationKey2020Type,
 					Controller:             testCase.expectedID,
 				},
 			},
