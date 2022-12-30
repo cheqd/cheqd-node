@@ -21,6 +21,6 @@ func GetFile(path string) string {
 	return split[len(split)-1]
 }
 
-func CreateTestJson(dir string, content []byte) (string, error) {
+func CreateTestJSON(dir string, content []byte) (string, error) {
 	return helpers.WriteTmpFile(dir, content)
 }

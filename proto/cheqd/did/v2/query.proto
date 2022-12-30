@@ -8,38 +8,42 @@ import "google/api/annotations.proto";
 option go_package = "github.com/cheqd/cheqd-node/x/did/types";
 
 service Query {
-  rpc DidDoc(QueryGetDidDocRequest) returns (QueryGetDidDocResponse) {
+  rpc DidDoc(QueryGetDidDocRequest) returns (QueryDidDocResponse) {
     option (google.api.http).get = "/cheqd/did/v2/{id}";
   }
-  rpc DidDocVersion(QueryGetDidDocVersionRequest) returns (QueryGetDidDocVersionResponse) {
+
+  rpc DidDocVersion(QueryGetDidDocVersionRequest)
+      returns (QueryDidDocVersionResponse) {
     option (google.api.http).get = "/cheqd/did/v2/{id}/version/{version}";
   }
-  rpc AllDidDocVersionsMetadata(QueryGetAllDidDocVersionsMetadataRequest) returns (QueryGetAllDidDocVersionsMetadataResponse) {
+
+  rpc AllDidDocVersionsMetadata(QueryGetAllDidDocVersionsMetadataRequest)
+      returns (QueryAllDidDocVersionsMetadataResponse) {
     option (google.api.http).get = "/cheqd/did/v2/{id}/metadata";
   }
 }
 
 message QueryGetDidDocRequest {
+  // is a DID to be fetched
   string id = 1;
 }
 
-message QueryGetDidDocResponse {
-  DidDocWithMetadata value = 1;
-}
+message QueryDidDocResponse { DidDocWithMetadata value = 1; }
 
 message QueryGetDidDocVersionRequest {
+  // is a DID
   string id = 1;
+  // is a unique value that maps DID Doc state at some point
   string version = 2;
 }
 
-message QueryGetDidDocVersionResponse {
-  DidDocWithMetadata value = 1;
-}
+message QueryDidDocVersionResponse { DidDocWithMetadata value = 1; }
 
 message QueryGetAllDidDocVersionsMetadataRequest {
+  // is a DID
   string id = 1;
 }
 
-message QueryGetAllDidDocVersionsMetadataResponse {
+message QueryAllDidDocVersionsMetadataResponse {
   repeated Metadata versions = 1;
 }

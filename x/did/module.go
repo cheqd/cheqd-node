@@ -15,7 +15,7 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	//"github.com/cheqd/cheqd-node/x/did/client/rest"
+	// "github.com/cheqd/cheqd-node/x/did/client/rest"
 	"github.com/cheqd/cheqd-node/x/did/keeper"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"

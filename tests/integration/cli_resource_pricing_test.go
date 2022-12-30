@@ -22,7 +22,7 @@ import (
 var _ = Describe("cheqd cli - positive resource pricing", func() {
 	var tmpDir string
 	var feeParams resourcetypes.FeeParams
-	var collectionId string
+	var collectionID string
 	var signInputs []clitypes.SignInput
 
 	BeforeEach(func() {
@@ -35,8 +35,8 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		// Create a new DID Doc
-		collectionId = uuid.NewString()
-		did := "did:cheqd:" + network.DID_NAMESPACE + ":" + collectionId
+		collectionID = uuid.NewString()
+		did := "did:cheqd:" + network.DidNamespace + ":" + collectionID
 		keyId := did + "#key1"
 
 		pubKey, privKey, err := ed25519.GenerateKey(nil)
@@ -50,7 +50,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			VerificationMethod: []*didtypes.VerificationMethod{
 				{
 					Id:                   keyId,
-					Type:                 "Ed25519VerificationKey2020",
+					VerificationMethodType:                 "Ed25519VerificationKey2020",
 					Controller:           did,
 					VerificationMaterial: "{\"publicKeyMultibase\": \"" + string(pubKeyMultibase58) + "\"}",
 				},
@@ -61,20 +61,20 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		signInputs = []clitypes.SignInput{
 			{
-				VerificationMethodId: keyId,
+				VerificationMethodID: keyId,
 				PrivKey:              privKey,
 			},
 		}
 
 		// Submit the DID Doc
-		resp, err := cli.CreateDidDoc(tmpDir, didPayload, signInputs, testdata.BASE_ACCOUNT_4, cli.CLI_GAS_PARAMS)
+		resp, err := cli.CreateDidDoc(tmpDir, didPayload, signInputs, testdata.BASE_ACCOUNT_4, cli.CLIGasParams)
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 	})
 
 	It("should tax json resource message - case: fixed fee", func() {
 		By("preparing the json resource message")
-		resourceId := uuid.NewString()
+		resourceID := uuid.NewString()
 		resourceName := "TestResource"
 		resourceVersion := "1.0"
 		resourceType := "TestType"
@@ -89,8 +89,8 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		By("submitting the json resource message")
 		tax := feeParams.Json
 		res, err := cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionId:    collectionId,
-			ResourceId:      resourceId,
+			CollectionID:    collectionID,
+			ResourceID:      resourceID,
 			ResourceName:    resourceName,
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
@@ -150,7 +150,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 	It("should tax json resource message - case: gas auto", func() {
 		By("preparing the json resource message")
-		resourceId := uuid.NewString()
+		resourceID := uuid.NewString()
 		resourceName := "TestResource"
 		resourceVersion := "1.0"
 		resourceType := "TestType"
@@ -164,13 +164,13 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		By("submitting the json resource message")
 		res, err := cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionId:    collectionId,
-			ResourceId:      resourceId,
+			CollectionID:    collectionID,
+			ResourceID:      resourceID,
 			ResourceName:    resourceName,
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_4, cli.CLI_GAS_PARAMS)
+		}, signInputs, testdata.BASE_ACCOUNT_4, cli.CLIGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -226,7 +226,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 	It("should tax image resource message - case: fixed fee", func() {
 		By("preparing the image resource message")
-		resourceId := uuid.NewString()
+		resourceID := uuid.NewString()
 		resourceName := "TestResource"
 		resourceVersion := "1.0"
 		resourceType := "TestType"
@@ -241,8 +241,8 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		By("submitting the image resource message")
 		tax := feeParams.Image
 		res, err := cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionId:    collectionId,
-			ResourceId:      resourceId,
+			CollectionID:    collectionID,
+			ResourceID:      resourceID,
 			ResourceName:    resourceName,
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
@@ -302,7 +302,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 	It("should tax image resource message - case: gas auto", func() {
 		By("preparing the image resource message")
-		resourceId := uuid.NewString()
+		resourceID := uuid.NewString()
 		resourceName := "TestResource"
 		resourceVersion := "1.0"
 		resourceType := "TestType"
@@ -316,13 +316,13 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		By("submitting the image resource message")
 		res, err := cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionId:    collectionId,
-			ResourceId:      resourceId,
+			CollectionID:    collectionID,
+			ResourceID:      resourceID,
 			ResourceName:    resourceName,
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_4, cli.CLI_GAS_PARAMS)
+		}, signInputs, testdata.BASE_ACCOUNT_4, cli.CLIGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -378,7 +378,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 	It("should tax default resource message - case: fixed fee", func() {
 		By("preparing the default resource message")
-		resourceId := uuid.NewString()
+		resourceID := uuid.NewString()
 		resourceName := "TestResource"
 		resourceVersion := "1.0"
 		resourceType := "TestType"
@@ -393,8 +393,8 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		By("submitting the default resource message")
 		tax := feeParams.Default
 		res, err := cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionId:    collectionId,
-			ResourceId:      resourceId,
+			CollectionID:    collectionID,
+			ResourceID:      resourceID,
 			ResourceName:    resourceName,
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
@@ -454,7 +454,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 	It("should tax default resource message - case: gas auto", func() {
 		By("preparing the default resource message")
-		resourceId := uuid.NewString()
+		resourceID := uuid.NewString()
 		resourceName := "TestResource"
 		resourceVersion := "1.0"
 		resourceType := "TestType"
@@ -468,13 +468,13 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		By("submitting the default resource message")
 		res, err := cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionId:    collectionId,
-			ResourceId:      resourceId,
+			CollectionID:    collectionID,
+			ResourceID:      resourceID,
 			ResourceName:    resourceName,
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_4, cli.CLI_GAS_PARAMS)
+		}, signInputs, testdata.BASE_ACCOUNT_4, cli.CLIGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -530,7 +530,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 	It("should tax create resource json message with feegrant - case: fixed fee", func() {
 		By("preparing the create resource json message")
-		resourceId := uuid.NewString()
+		resourceID := uuid.NewString()
 		resourceName := "TestResource"
 		resourceVersion := "1.0"
 		resourceType := "TestType"
@@ -538,7 +538,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("creating a feegrant")
-		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
+		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLIGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -552,13 +552,13 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		By("submitting a create resource json message")
 		resp, err := cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionId:    collectionId,
-			ResourceId:      resourceId,
+			CollectionID:    collectionID,
+			ResourceID:      resourceID,
 			ResourceName:    resourceName,
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, cli.CLI_GAS_PARAMS))
+		}, signInputs, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, cli.CLIGasParams))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -580,13 +580,13 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(diff.IsZero()).To(BeTrue())
 
 		By("revoking the feegrant")
-		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
+		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLIGasParams)
 		Expect(err).To(BeNil())
 	})
 
 	It("should tax create resource image with feegrant - case: fixed fee", func() {
 		By("preparing the create resource image message")
-		resourceId := uuid.NewString()
+		resourceID := uuid.NewString()
 		resourceName := "TestResource"
 		resourceVersion := "1.0"
 		resourceType := "TestType"
@@ -594,7 +594,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("creating a feegrant")
-		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
+		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLIGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -608,13 +608,13 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		By("submitting a create resource image message")
 		resp, err := cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionId:    collectionId,
-			ResourceId:      resourceId,
+			CollectionID:    collectionID,
+			ResourceID:      resourceID,
 			ResourceName:    resourceName,
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, cli.CLI_GAS_PARAMS))
+		}, signInputs, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, cli.CLIGasParams))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -636,13 +636,13 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(diff.IsZero()).To(BeTrue())
 
 		By("revoking the feegrant")
-		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
+		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLIGasParams)
 		Expect(err).To(BeNil())
 	})
 
 	It("should tax create resource default with feegrant - case: fixed fee", func() {
 		By("preparing the create resource default message")
-		resourceId := uuid.NewString()
+		resourceID := uuid.NewString()
 		resourceName := "TestResource"
 		resourceVersion := "1.0"
 		resourceType := "TestType"
@@ -650,7 +650,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("creating a feegrant")
-		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
+		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLIGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -664,13 +664,13 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		By("submitting a create resource default message")
 		resp, err := cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionId:    collectionId,
-			ResourceId:      resourceId,
+			CollectionID:    collectionID,
+			ResourceID:      resourceID,
 			ResourceName:    resourceName,
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, cli.CLI_GAS_PARAMS))
+		}, signInputs, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, cli.CLIGasParams))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -692,7 +692,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(diff.IsZero()).To(BeTrue())
 
 		By("revoking the feegrant")
-		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLI_GAS_PARAMS)
+		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CLIGasParams)
 		Expect(err).To(BeNil())
 	})
 })

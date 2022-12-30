@@ -22,7 +22,7 @@ func SandboxDidDoc() *didtypes.MsgCreateDidDoc {
 	var signatures []*didtypes.SignInfo
 
 	signatures = append(signatures, &didtypes.SignInfo{
-		VerificationMethodId: didDocInfo.SignInput.VerificationMethodId,
+		VerificationMethodId: didDocInfo.SignInput.VerificationMethodID,
 		Signature:            ed25519.Sign(didDocInfo.SignInput.Key, signBytes),
 	})
 
@@ -41,7 +41,7 @@ func SandboxResource() *resourcetypes.MsgCreateResource {
 	var signatures []*didtypes.SignInfo
 
 	signatures = append(signatures, &didtypes.SignInfo{
-		VerificationMethodId: didDocInfo.SignInput.VerificationMethodId,
+		VerificationMethodId: didDocInfo.SignInput.VerificationMethodID,
 		Signature:            ed25519.Sign(didDocInfo.SignInput.Key, signBytes),
 	})
 

@@ -20,7 +20,7 @@ type PayloadWithSignInputs struct {
 }
 
 type SignInput struct {
-	VerificationMethodId string
+	VerificationMethodID string
 	PrivKey              ed25519.PrivateKey
 }
 
@@ -42,13 +42,13 @@ func GetTxCmd() *cobra.Command {
 }
 
 func SignWithSignInputs(signBytes []byte, signInputs []SignInput) []*types.SignInfo {
-	var signatures []*types.SignInfo
+	signatures := make([]*types.SignInfo, 0, len(signInputs))
 
 	for _, signInput := range signInputs {
 		signatureBytes := ed25519.Sign(signInput.PrivKey, signBytes)
 
 		signInfo := types.SignInfo{
-			VerificationMethodId: signInput.VerificationMethodId,
+			VerificationMethodId: signInput.VerificationMethodID,
 			Signature:            signatureBytes,
 		}
 

@@ -32,6 +32,8 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	}
 
 	for _, elem := range resourceList {
+		// Needs for getting rid of using the same address inside the loop
+		elem := elem
 		genesis.Resources = append(genesis.Resources, &elem)
 	}
 

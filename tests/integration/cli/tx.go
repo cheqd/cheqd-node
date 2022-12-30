@@ -11,24 +11,24 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-var CLI_TX_PARAMS = []string{
-	"--chain-id", network.CHAIN_ID,
-	"--keyring-backend", KEYRING_BACKEND,
-	"--output", OUTPUT_FORMAT,
+var CLITxParams = []string{
+	"--chain-id", network.ChainID,
+	"--keyring-backend", KeyringBackend,
+	"--output", OutputFormat,
 	"--yes",
 }
 
-var CLI_GAS_PARAMS = []string{
-	"--gas", GAS,
-	"--gas-adjustment", GAS_ADJUSTMENT,
-	"--gas-prices", GAS_PRICES,
+var CLIGasParams = []string{
+	"--gas", Gas,
+	"--gas-adjustment", GasAdjustment,
+	"--gas-prices", GasPrices,
 }
 
 func Tx(module, tx, from string, feeParams []string, txArgs ...string) (sdk.TxResponse, error) {
 	args := []string{"tx", module, tx}
 
 	// Common params
-	args = append(args, CLI_TX_PARAMS...)
+	args = append(args, CLITxParams...)
 
 	// Fee params
 	args = append(args, feeParams...)
@@ -66,85 +66,85 @@ func RevokeFeeGrant(granter, grantee string, feeParams []string) (sdk.TxResponse
 }
 
 func CreateDidDoc(tmpDir string, payload types.MsgCreateDidDocPayload, signInputs []cli.SignInput, from string, feeParams []string) (sdk.TxResponse, error) {
-	payloadJson, err := helpers.Codec.MarshalJSON(&payload)
+	payloadJSON, err := helpers.Codec.MarshalJSON(&payload)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
 
 	payloadWithSignInputs := cli.PayloadWithSignInputs{
-		Payload:    payloadJson,
+		Payload:    payloadJSON,
 		SignInputs: signInputs,
 	}
 
-	payloadWithSignInputsJson, err := json.Marshal(&payloadWithSignInputs)
+	payloadWithSignInputsJSON, err := json.Marshal(&payloadWithSignInputs)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
 
-	payloadFile := helpers.MustWriteTmpFile(tmpDir, []byte(payloadWithSignInputsJson))
+	payloadFile := helpers.MustWriteTmpFile(tmpDir, payloadWithSignInputsJSON)
 
 	return Tx("cheqd", "create-did", from, feeParams, payloadFile)
 }
 
 func UpdateDidDoc(tmpDir string, payload types.MsgUpdateDidDocPayload, signInputs []cli.SignInput, from string, feeParams []string) (sdk.TxResponse, error) {
-	payloadJson, err := helpers.Codec.MarshalJSON(&payload)
+	payloadJSON, err := helpers.Codec.MarshalJSON(&payload)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
 
 	payloadWithSignInputs := cli.PayloadWithSignInputs{
-		Payload:    payloadJson,
+		Payload:    payloadJSON,
 		SignInputs: signInputs,
 	}
 
-	payloadWithSignInputsJson, err := json.Marshal(&payloadWithSignInputs)
+	payloadWithSignInputsJSON, err := json.Marshal(&payloadWithSignInputs)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
 
-	payloadFile := helpers.MustWriteTmpFile(tmpDir, []byte(payloadWithSignInputsJson))
+	payloadFile := helpers.MustWriteTmpFile(tmpDir, payloadWithSignInputsJSON)
 
 	return Tx("cheqd", "update-did", from, feeParams, payloadFile)
 }
 
 func DeactivateDidDoc(tmpDir string, payload types.MsgDeactivateDidDocPayload, signInputs []cli.SignInput, from string, feeParams []string) (sdk.TxResponse, error) {
-	payloadJson, err := helpers.Codec.MarshalJSON(&payload)
+	payloadJSON, err := helpers.Codec.MarshalJSON(&payload)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
 
 	payloadWithSignInputs := cli.PayloadWithSignInputs{
-		Payload:    payloadJson,
+		Payload:    payloadJSON,
 		SignInputs: signInputs,
 	}
 
-	payloadWithSignInputsJson, err := json.Marshal(&payloadWithSignInputs)
+	payloadWithSignInputsJSON, err := json.Marshal(&payloadWithSignInputs)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
 
-	payloadFile := helpers.MustWriteTmpFile(tmpDir, []byte(payloadWithSignInputsJson))
+	payloadFile := helpers.MustWriteTmpFile(tmpDir, payloadWithSignInputsJSON)
 
 	return Tx("cheqd", "deactivate-did", from, feeParams, payloadFile)
 }
 
 func CreateResource(tmpDir string, options resourcecli.CreateResourceOptions, signInputs []cli.SignInput, from string, feeParams []string) (sdk.TxResponse, error) {
-	payloadJson, err := json.Marshal(&options)
+	payloadJSON, err := json.Marshal(&options)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
 
 	payloadWithSignInputs := cli.PayloadWithSignInputs{
-		Payload:    payloadJson,
+		Payload:    payloadJSON,
 		SignInputs: signInputs,
 	}
 
-	payloadWithSignInputsJson, err := json.Marshal(&payloadWithSignInputs)
+	payloadWithSignInputsJSON, err := json.Marshal(&payloadWithSignInputs)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
 
-	payloadFile := helpers.MustWriteTmpFile("", []byte(payloadWithSignInputsJson))
+	payloadFile := helpers.MustWriteTmpFile("", payloadWithSignInputsJSON)
 
 	return Tx("resource", "create", from, feeParams, payloadFile)
 }
