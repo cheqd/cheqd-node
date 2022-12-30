@@ -44,11 +44,11 @@ var (
 
 var (
 	// bytes: 										  ed01c92d1e8f9cfa03f63be3489accb0c2704bb7da3f2e4e94509d8ff9202d564c12
-	ValidEd25519VerificationMaterial                = "z6MkszZtxCmA2Ce4vUV132PCuLQmwnaDD5mw2L23fGNnsiX3"
+	ValidEd25519VerificationMaterial = "z6MkszZtxCmA2Ce4vUV132PCuLQmwnaDD5mw2L23fGNnsiX3"
 	// bytes: 										  020076a50fe5e0c3616c1b4d85a308c104a1c99d8d3d92c18c1f4e0179202d564c12
 	InvalidEd25519VerificationMaterialBadMulticodec = "z3dEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf"
 	// bytes: 										  ed01c92d1e8f9cfa03f63be3489accb0c2704bb7da3f2e4e94509d8ff9
-	InvalidEd25519VerificationMaterialBadlength     = "zBm3emgJHyjidq7HsZFTx3PCjYHayy7SxisBeVCa4"
+	InvalidEd25519VerificationMaterialBadlength = "zBm3emgJHyjidq7HsZFTx3PCjYHayy7SxisBeVCa4"
 
 	ValidJWKKeyVerificationMaterial   = string(ValidPublicKeyJWK)
 	InvalidJWKKeyVerificationMaterial = string(InvalidPublicKeyJWK)

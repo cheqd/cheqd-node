@@ -9,7 +9,6 @@ import (
 	"crypto/rsa"
 	"encoding/json"
 
-	. "github.com/cheqd/cheqd-node/x/did/types"
 	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	"github.com/lestrrat-go/jwx/jwk"
 	. "github.com/onsi/ginkgo/v2"
@@ -281,7 +280,6 @@ var _ = Describe("Validation RSA Signature in verification method", func() {
 })
 
 var _ = DescribeTable("Verification Method material validation tests", func(testCase VerificationMethodTestCase) {
-
 	err := testCase.vm.Validate(testCase.baseDid, testCase.allowedNamespaces)
 
 	if testCase.isValid {

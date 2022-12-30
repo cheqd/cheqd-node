@@ -12,8 +12,8 @@ func BuildEd25519VerificationKey2020VerificationMaterial(publicKey string) (stri
 	if err != nil {
 		return "", err
 	}
-	multicodec := []byte{0xed, 0x01}
-	multicodecAndKey := append(multicodec, publicKeyBytes...)
+	multicodecAndKey := []byte{0xed, 0x01}
+	multicodecAndKey = append(multicodecAndKey, publicKeyBytes...)
 	keyStr, err := multibase.Encode(multibase.Base58BTC, multicodecAndKey)
 	return keyStr, err
 }

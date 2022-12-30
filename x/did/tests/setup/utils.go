@@ -64,8 +64,8 @@ func GenerateKeyPair() KeyPair {
 }
 
 func BuildEd25519VerificationKey2020VerificationMaterial(publicKey ed25519.PublicKey) string {
-	multicodec := []byte{0xed, 0x01}
-	multicodecAndKey := append(multicodec, publicKey...)
+	multicodecAndKey := []byte{0xed, 0x01}
+	multicodecAndKey = append(multicodecAndKey, publicKey...)
 	keyStr, _ := multibase.Encode(multibase.Base58BTC, multicodecAndKey)
 	return keyStr
 }
