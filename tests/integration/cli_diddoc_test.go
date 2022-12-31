@@ -12,7 +12,6 @@ import (
 	cli_types "github.com/cheqd/cheqd-node/x/did/client/cli"
 	"github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/google/uuid"
-	"github.com/multiformats/go-multibase"
 	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 
 	. "github.com/onsi/ginkgo/v2"
