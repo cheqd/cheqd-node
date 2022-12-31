@@ -110,7 +110,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 		Expect(didDoc.VerificationMethod[0].Id).To(BeEquivalentTo(keyID))
 		Expect(didDoc.VerificationMethod[0].VerificationMethodType).To(BeEquivalentTo("Ed25519VerificationKey2020"))
 		Expect(didDoc.VerificationMethod[0].Controller).To(BeEquivalentTo(did))
-		Expect(didDoc.VerificationMethod[0].VerificationMaterial).To(BeEquivalentTo("{\"publicKeyMultibase\": \"" + newPubKeyMultibase58 + "\"}"))
+		Expect(didDoc.VerificationMethod[0].VerificationMaterial).To(BeEquivalentTo(newPubKeyMultibase58))
 
 		// Check that DIDDoc is not deactivated
 		Expect(resp.Value.Metadata.Deactivated).To(BeFalse())
