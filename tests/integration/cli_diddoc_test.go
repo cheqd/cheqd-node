@@ -67,8 +67,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 		newPubKey, newPrivKey, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
 
-		newPubKeyMultibase58, err := multibase.Encode(multibase.Base58BTC, newPubKey)
-		Expect(err).To(BeNil())
+		newPubKeyMultibase58 := testsetup.BuildEd25519VerificationKey2020VerificationMaterial(newPubKey)
 
 		payload2 := types.MsgUpdateDidDocPayload{
 			Id: did,
@@ -77,7 +76,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 					Id:                     keyID,
 					VerificationMethodType: "Ed25519VerificationKey2020",
 					Controller:             did,
-					VerificationMaterial:   "{\"publicKeyMultibase\": \"" + newPubKeyMultibase58 + "\"}",
+					VerificationMaterial:   newPubKeyMultibase58,
 				},
 			},
 			Authentication: []string{keyID},

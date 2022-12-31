@@ -44,7 +44,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 					Id:                     keyId,
 					VerificationMethodType: "Ed25519VerificationKey2020",
 					Controller:             did,
-					VerificationMaterial:   "{\"publicKeyMultibase\": \"" + string(pubKeyMultibase58) + "\"}",
+					VerificationMaterial:   pubKeyMultibase58,
 				},
 			},
 			Authentication: []string{keyId},
