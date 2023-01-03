@@ -195,11 +195,11 @@ func (k Keeper) IterateAllResourceMetadatas(ctx *sdk.Context, callback func(meta
 
 // GetAllResources returns all resources as a list
 // Loads everything in memory. Use only for genesis export!
-func (k Keeper) GetAllResources(ctx *sdk.Context) (list []*types.ResourceWithMetadata, err_ error) {
+func (k Keeper) GetAllResources(ctx *sdk.Context) (list []*types.ResourceWithMetadata, iterErr error) {
 	k.IterateAllResourceMetadatas(ctx, func(metadata types.Metadata) bool {
 		resource, err := k.GetResource(ctx, metadata.CollectionId, metadata.Id)
 		if err != nil {
-			err_ = err
+			iterErr = err
 			return false
 		}
 
