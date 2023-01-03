@@ -58,8 +58,8 @@ var _ = Describe("Full SignInfo duplicates tests", func() {
 	}
 
 	DescribeTable("SignInfo duplicates tests", func(testCase TestCaseSignInfosStruct) {
-		res_ := IsUniqueSignInfoList(testCase.signInfos)
-		Expect(res_).To(Equal(testCase.isValid))
+		res := IsUniqueSignInfoList(testCase.signInfos)
+		Expect(res).To(Equal(testCase.isValid))
 	},
 
 		Entry(

@@ -1,29 +1,47 @@
 run:
-  timeout: 5m
+  timeout: 10m
+  # skip-dirs:
+  #   - x/did/keeper/v1
+  #   - x/did/types/v1
+  #   - x/resource/keeper/v1
+  #   - x/resource/types/v1
 
 
 linters:
   enable:
-    - deadcode
+    - bodyclose
+    - depguard
+    - dogsled
     - errcheck
-    - gosimple
+    - exportloopref
+    - goconst
+    - gocritic
     - gofumpt
+    - goimports
+    - gosec
+    - gosimple
     - govet
     - ineffassign
     - misspell
+    - nakedret
     - nestif
+    - nolintlint
+    - prealloc
+    - revive
     - staticcheck
-    - structcheck
+    - stylecheck
     - typecheck
+    - unconvert
+    - unparam
     - unused
-    - varcheck
 
 
 linters-settings:
-
   gofumpt:
     lang-version: "1.18"
     
   misspell:
     ignore-words:
       - cheqd
+      - cheq
+      - ncheq

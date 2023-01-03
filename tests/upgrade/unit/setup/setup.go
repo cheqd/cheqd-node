@@ -125,7 +125,7 @@ func Setup() TestSetup {
 		ParamsKeeper: paramsKeeper,
 	}
 
-	setup.DidKeeper.SetDidNamespace(&ctx, didsetup.DID_NAMESPACE) // TODO: Think about it
+	setup.DidKeeper.SetDidNamespace(&ctx, didsetup.DidNamespace) // TODO: Think about it
 	return setup
 }
 

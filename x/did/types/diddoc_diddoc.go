@@ -55,11 +55,11 @@ func (didDoc *DidDoc) ReplaceDids(old, new string) {
 	}
 
 	// Verification relationships
-	didDoc.Authentication = utils.ReplaceDidInDidUrlList(didDoc.Authentication, old, new)
-	didDoc.AssertionMethod = utils.ReplaceDidInDidUrlList(didDoc.AssertionMethod, old, new)
-	didDoc.CapabilityInvocation = utils.ReplaceDidInDidUrlList(didDoc.CapabilityInvocation, old, new)
-	didDoc.CapabilityDelegation = utils.ReplaceDidInDidUrlList(didDoc.CapabilityDelegation, old, new)
-	didDoc.KeyAgreement = utils.ReplaceDidInDidUrlList(didDoc.KeyAgreement, old, new)
+	didDoc.Authentication = utils.ReplaceDidInDidURLList(didDoc.Authentication, old, new)
+	didDoc.AssertionMethod = utils.ReplaceDidInDidURLList(didDoc.AssertionMethod, old, new)
+	didDoc.CapabilityInvocation = utils.ReplaceDidInDidURLList(didDoc.CapabilityInvocation, old, new)
+	didDoc.CapabilityDelegation = utils.ReplaceDidInDidURLList(didDoc.CapabilityDelegation, old, new)
+	didDoc.KeyAgreement = utils.ReplaceDidInDidURLList(didDoc.KeyAgreement, old, new)
 }
 
 func (didDoc *DidDoc) GetControllersOrSubject() []string {
@@ -73,7 +73,7 @@ func (didDoc *DidDoc) GetControllersOrSubject() []string {
 }
 
 func (didDoc *DidDoc) GetVerificationMethodControllers() []string {
-	var result []string
+	result := make([]string, 0, len(didDoc.VerificationMethod))
 
 	for _, vm := range didDoc.VerificationMethod {
 		result = append(result, vm.Controller)
@@ -89,7 +89,7 @@ func (didDoc DidDoc) Validate(allowedNamespaces []string) error {
 		validation.Field(&didDoc.Id, validation.Required, IsDID(allowedNamespaces)),
 		validation.Field(&didDoc.Controller, IsUniqueStrList(), validation.Each(IsDID(allowedNamespaces))),
 		validation.Field(&didDoc.VerificationMethod,
-			IsUniqueVerificationMethodListByIdRule(), validation.Each(ValidVerificationMethodRule(didDoc.Id, allowedNamespaces)),
+			IsUniqueVerificationMethodListByIDRule(), validation.Each(ValidVerificationMethodRule(didDoc.Id, allowedNamespaces)),
 		),
 
 		validation.Field(&didDoc.Authentication,
@@ -108,7 +108,7 @@ func (didDoc DidDoc) Validate(allowedNamespaces []string) error {
 			IsUniqueStrList(), validation.Each(IsDIDUrl(allowedNamespaces, Empty, Empty, Required), HasPrefix(didDoc.Id)),
 		),
 
-		validation.Field(&didDoc.Service, IsUniqueServiceListByIdRule(), validation.Each(ValidServiceRule(didDoc.Id, allowedNamespaces))),
+		validation.Field(&didDoc.Service, IsUniqueServiceListByIDRule(), validation.Each(ValidServiceRule(didDoc.Id, allowedNamespaces))),
 		validation.Field(&didDoc.AlsoKnownAs, IsUniqueStrList(), validation.Each(IsURI())),
 	)
 }

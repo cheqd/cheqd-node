@@ -3,21 +3,20 @@ package tests
 import (
 	"fmt"
 
-	. "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	"github.com/google/uuid"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/cheqd/cheqd-node/x/did/tests/setup"
+	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	"github.com/cheqd/cheqd-node/x/did/types"
 )
 
 var _ = Describe("Deactivate DID tests", func() {
-	var setup setup.TestSetup
+	var setup testsetup.TestSetup
 
 	BeforeEach(func() {
-		setup = Setup()
+		setup = testsetup.Setup()
 	})
 
 	It("Valid: Deactivate DID", func() {
@@ -28,7 +27,7 @@ var _ = Describe("Deactivate DID tests", func() {
 			VersionId: uuid.NewString(),
 		}
 
-		signatures := []SignInput{alice.DidDocInfo.SignInput}
+		signatures := []testsetup.SignInput{alice.DidDocInfo.SignInput}
 
 		res, err := setup.DeactivateDidDoc(msg, signatures)
 		Expect(err).To(BeNil())
@@ -45,14 +44,14 @@ var _ = Describe("Deactivate DID tests", func() {
 
 	When("DID is not found", func() {
 		It("Should return error", func() {
-			NotFoundDID := GenerateDID(Base58_16bytes)
+			NotFoundDID := testsetup.GenerateDID(testsetup.Base58_16bytes)
 
 			msg := &types.MsgDeactivateDidDocPayload{
 				Id:        NotFoundDID,
 				VersionId: uuid.NewString(),
 			}
 
-			signatures := []SignInput{}
+			signatures := []testsetup.SignInput{}
 
 			_, err := setup.DeactivateDidDoc(msg, signatures)
 			Expect(err).ToNot(BeNil())
@@ -69,7 +68,7 @@ var _ = Describe("Deactivate DID tests", func() {
 				VersionId: uuid.NewString(),
 			}
 
-			signatures := []SignInput{alice.DidDocInfo.SignInput}
+			signatures := []testsetup.SignInput{alice.DidDocInfo.SignInput}
 
 			res, err := setup.DeactivateDidDoc(msg, signatures)
 			Expect(err).To(BeNil())
@@ -94,7 +93,7 @@ var _ = Describe("Deactivate DID tests", func() {
 				VersionId: uuid.NewString(),
 			}
 
-			signatures := []SignInput{bob.DidDocInfo.SignInput}
+			signatures := []testsetup.SignInput{bob.DidDocInfo.SignInput}
 
 			_, err := setup.DeactivateDidDoc(msg, signatures)
 			Expect(err).ToNot(BeNil())

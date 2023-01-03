@@ -93,7 +93,7 @@ func GetCurrentBlockHeight(container string, binary string) (int64, error) {
 }
 
 func GetVotingEndHeight(currentHeight int64) (int64, error) {
-	return currentHeight + VOTING_PERIOD/EXPECTED_BLOCK_SECONDS + EXTRA_BLOCKS, nil
+	return currentHeight + VotingPeriod/ExpectedBlockSeconds + ExtraBlocks, nil
 }
 
 func CalculateUpgradeHeight(container string, binary string) (int64, int64, error) {
@@ -105,7 +105,7 @@ func CalculateUpgradeHeight(container string, binary string) (int64, int64, erro
 	if err != nil {
 		return 0, 0, err
 	}
-	return currentHeight + VOTING_PERIOD/EXPECTED_BLOCK_SECONDS + EXTRA_BLOCKS*2, votingEndHeight, nil
+	return currentHeight + VotingPeriod/ExpectedBlockSeconds + ExtraBlocks*2, votingEndHeight, nil
 }
 
 // Added to wait for the upgrade to be applied.
@@ -206,7 +206,7 @@ func MakeCodecWithExtendedRegistry() codec.Codec {
 	// Register the interfaces from the cosmos-sdk codebase.
 	interfaceRegistry.RegisterImplementations(
 		(*govtypesv1beta1.Content)(nil),
-		// nolint: staticcheck
+		//nolint: staticcheck
 		&upgradetypes.SoftwareUpgradeProposal{},
 		&paramproposal.ParameterChangeProposal{},
 	)

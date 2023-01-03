@@ -17,8 +17,8 @@ import (
 )
 
 const (
-	DefaultAlternativeUriTemplate    = "did:cheqd:%s:%s/resources/%s"
-	DefaultAlternaticeUriDescription = "did-url"
+	DefaultAlternativeURITemplate    = "did:cheqd:%s:%s/resources/%s"
+	DefaultAlternaticeURIDescription = "did-url"
 )
 
 func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateResource) (*types.MsgCreateResourceResponse, error) {
@@ -63,17 +63,17 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 
 	// Build Resource
 	resource := msg.Payload.ToResource()
-	checksum := sha256.Sum256([]byte(resource.Resource.Data))
+	checksum := sha256.Sum256(resource.Resource.Data)
 	resource.Metadata.Checksum = hex.EncodeToString(checksum[:])
 	resource.Metadata.Created = ctx.BlockTime().Format(time.RFC3339)
 	resource.Metadata.MediaType = utils.DetectMediaType(resource.Resource.Data)
 
 	// Add default resource alternative url
-	defaultAlternativeUrl := types.AlternativeUri{
-		Uri:         fmt.Sprintf(DefaultAlternativeUriTemplate, namespace, msg.Payload.CollectionId, msg.Payload.Id),
-		Description: DefaultAlternaticeUriDescription,
+	defaultAlternativeURL := types.AlternativeUri{
+		Uri:         fmt.Sprintf(DefaultAlternativeURITemplate, namespace, msg.Payload.CollectionId, msg.Payload.Id),
+		Description: DefaultAlternaticeURIDescription,
 	}
-	resource.Metadata.AlsoKnownAs = append(resource.Metadata.AlsoKnownAs, &defaultAlternativeUrl)
+	resource.Metadata.AlsoKnownAs = append(resource.Metadata.AlsoKnownAs, &defaultAlternativeURL)
 
 	// Persist resource
 	err = k.AddNewResourceVersion(&ctx, &resource)

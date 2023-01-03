@@ -6,7 +6,7 @@ import (
 
 const (
 	DefaultCreateResourceImageFee   = 10e9                   // 10 CHEQ or 10000000000 ncheq
-	DefaultCreateResourceJsonFee    = 25e8                   // 2.5 CHEQ or 2500000000 ncheq
+	DefaultCreateResourceJSONFee    = 25e8                   // 2.5 CHEQ or 2500000000 ncheq
 	DefaultCreateResourceDefaultFee = 5e9                    // 5 CHEQ or 5000000000 ncheq
 	DefaultBurnFactor               = "0.500000000000000000" // 0.5 or 50%
 )
@@ -44,14 +44,14 @@ func (gs GenesisState) ValidateNoDuplicates() error {
 
 	// Check that there are no collisions within each collection
 	for _, resources := range resourcesByCollection {
-		resourceIdMap := make(map[string]bool)
+		resourceIDMap := make(map[string]bool)
 
 		for _, resource := range resources {
-			if _, ok := resourceIdMap[resource.Metadata.Id]; ok {
+			if _, ok := resourceIDMap[resource.Metadata.Id]; ok {
 				return fmt.Errorf("duplicated id for resource within the same collection. collection: %s, id: %s", resource.Metadata.CollectionId, resource.Metadata.Id)
 			}
 
-			resourceIdMap[resource.Metadata.Id] = true
+			resourceIDMap[resource.Metadata.Id] = true
 		}
 	}
 

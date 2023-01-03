@@ -43,7 +43,7 @@ func MustEncodeMultibaseBase58(data []byte) string {
 	return encoded
 }
 
-func MustEncodeJson(data interface{}) string {
+func MustEncodeJSON(data interface{}) string {
 	encoded, err := json.Marshal(data)
 	if err != nil {
 		panic(err)

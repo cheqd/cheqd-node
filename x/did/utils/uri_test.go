@@ -10,11 +10,11 @@ var _ = Describe("URI validation", func() {
 	DescribeTable("ValidateURI",
 
 		func(isValid bool, uri string) {
-			err_ := ValidateURI(uri)
+			err := ValidateURI(uri)
 			if isValid {
-				Expect(err_).To(BeNil())
+				Expect(err).To(BeNil())
 			} else {
-				Expect(err_).ToNot(BeNil())
+				Expect(err).ToNot(BeNil())
 			}
 		},
 
