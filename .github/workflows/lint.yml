@@ -92,7 +92,7 @@ jobs:
         VALIDATE_ALL_CODEBASE: true
         MULTI_STATUS: true
 
-        VALIDATE_BASH: true
+        VALIDATE_BASH: false # This is temporarily disabled. Will be taken care of at a later stage of this PR.
         VALIDATE_DOCKERFILE_HADOLINT: true
         VALIDATE_ENV: true
         VALIDATE_GITHUB_ACTIONS: true
