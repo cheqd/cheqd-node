@@ -142,7 +142,7 @@ func MigrateType(t string) string {
 	case didtypesv1.Ed25519VerificationKey2020:
 		return didtypes.Ed25519VerificationKey2020Type
 	case didtypesv1.JSONWebKey2020:
-		return didtypes.JSONWebKey2020Type
+		return didtypes.JsonWebKey2020Type
 	default:
 		panic("Unknown type")
 	}
@@ -162,7 +162,7 @@ func MigrateVerificationMaterial(vm *didtypesv1.VerificationMethod) string {
 		return string(res)
 
 	case didtypesv1.Ed25519VerificationKey2020:
-		pkMulti, err := helpers.BuildEd25519VerificationKey2020VerificationMaterial(vm.PublicKeyMultibase)
+		pkMulti, err := helpers.GenerateEd25519VerificationKey2020VerificationMaterial(vm.PublicKeyMultibase)
 		if err != nil {
 			panic(err)
 		}

@@ -63,14 +63,14 @@ func GenerateKeyPair() KeyPair {
 	return KeyPair{PrivateKey, PublicKey}
 }
 
-func BuildEd25519VerificationKey2020VerificationMaterial(publicKey ed25519.PublicKey) string {
-	multicodecAndKey := []byte{0xed, 0x01}
-	multicodecAndKey = append(multicodecAndKey, publicKey...)
-	keyStr, _ := multibase.Encode(multibase.Base58BTC, multicodecAndKey)
+func GenerateEd25519VerificationKey2020VerificationMaterial(publicKey ed25519.PublicKey) string {
+	publicKeyMultibaseBytes := []byte{0xed, 0x01}
+	publicKeyMultibaseBytes = append(publicKeyMultibaseBytes, publicKey...)
+	keyStr, _ := multibase.Encode(multibase.Base58BTC, publicKeyMultibaseBytes)
 	return keyStr
 }
 
-func BuildJSONWebKey2020VerificationMaterial(publicKey ed25519.PublicKey) string {
+func GenerateJsonWebKey2020VerificationMaterial(publicKey ed25519.PublicKey) string {
 	pubKeyJwk, err := jwk.New(publicKey)
 	if err != nil {
 		panic(err)
@@ -82,4 +82,8 @@ func BuildJSONWebKey2020VerificationMaterial(publicKey ed25519.PublicKey) string
 	}
 
 	return string(pubKeyJwkJSON)
+}
+
+func GenerateEd25519VerificationKey2018VerificationMaterial(publicKey ed25519.PublicKey) string {
+	return base58.Encode(publicKey)
 }

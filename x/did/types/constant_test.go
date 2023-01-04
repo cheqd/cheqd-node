@@ -43,13 +43,21 @@ var (
 )
 
 var (
-	// bytes: 										  ed01c92d1e8f9cfa03f63be3489accb0c2704bb7da3f2e4e94509d8ff9202d564c12
-	ValidEd25519VerificationMaterial = "z6MkszZtxCmA2Ce4vUV132PCuLQmwnaDD5mw2L23fGNnsiX3"
-	// bytes: 										  020076a50fe5e0c3616c1b4d85a308c104a1c99d8d3d92c18c1f4e0179202d564c12
-	InvalidEd25519VerificationMaterialBadMulticodec = "z3dEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf"
-	// bytes: 										  ed01c92d1e8f9cfa03f63be3489accb0c2704bb7da3f2e4e94509d8ff9
-	InvalidEd25519VerificationMaterialBadlength = "zBm3emgJHyjidq7HsZFTx3PCjYHayy7SxisBeVCa4"
+	// bytes in hex: ed01c92d1e8f9cfa03f63be3489accb0c2704bb7da3f2e4e94509d8ff9202d564c12
+	ValidEd25519VerificationKey2020VerificationMaterial = "z6MkszZtxCmA2Ce4vUV132PCuLQmwnaDD5mw2L23fGNnsiX3"
 
-	ValidJWKKeyVerificationMaterial   = string(ValidPublicKeyJWK)
-	InvalidJWKKeyVerificationMaterial = string(InvalidPublicKeyJWK)
+	// bytes in hex: 020076a50fe5e0c3616c1b4d85a308c104a1c99d8d3d92c18c1f4e0179202d564c12
+	InvalidEd25519VerificationKey2020VerificationMaterialBadPrefix = "z3dEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf"
+
+	// bytes in hex: ed01c92d1e8f9cfa03f63be3489accb0c2704bb7da3f2e4e94509d8ff9
+	InvalidEd25519VerificationKey2020VerificationMaterialBadlength = "zBm3emgJHyjidq7HsZFTx3PCjYHayy7SxisBeVCa4"
+
+	// bytes in hex: 0a04f18e1a12b6af626bde47be47a1800d211712af9e2c0fd43990c7073121ce
+	ValidEd25519VerificationKey2018VerificationMaterial = "g7T3moSG5mwFvazr5gi8AyUETXTkZ9E6PZxAZVhWN93"
+
+	// bytes in hex: 2c392158b9b3b3935a22ba9dc371211ab58939b39461dcf66aec6d5cd04b9e
+	InvalidEd25519VerificationKey2018VerificationMaterialBadLength = "g7T3moSG5mwFvazr5gi8AyUETXTkZ9E6PZxAZVhWN9"
+
+	ValidJWK2020VerificationMaterial   = string(ValidPublicKeyJWK)
+	InvalidJWK2020VerificationMaterial = string(InvalidPublicKeyJWK)
 )

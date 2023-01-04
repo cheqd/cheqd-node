@@ -138,6 +138,17 @@ func IsMultibaseEd25519VerificationKey2020() *CustomErrorRule {
 	})
 }
 
+func IsBase58Ed25519VerificationKey2018() *CustomErrorRule {
+	return NewCustomErrorRule(func(value interface{}) error {
+		casted, ok := value.(string)
+		if !ok {
+			panic("IsBase58Ed25519VerificationKey2018 must be only applied on string properties")
+		}
+
+		return utils.ValidateBase58Ed25519VerificationKey2018(casted)
+	})
+}
+
 func IsMultibaseEncodedEd25519PubKey() *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.(string)

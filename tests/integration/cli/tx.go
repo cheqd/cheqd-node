@@ -18,7 +18,7 @@ var CLITxParams = []string{
 	"--yes",
 }
 
-var CLIGasParams = []string{
+var CliGasParams = []string{
 	"--gas", Gas,
 	"--gas-adjustment", GasAdjustment,
 	"--gas-prices", GasPrices,

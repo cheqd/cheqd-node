@@ -6,9 +6,10 @@ import (
 )
 
 var _ = DescribeTable(
-	"Test BuildEd25519VerificationKey2020VerificationMaterial",
+	"Test GenerateEd25519VerificationKey2020VerificationMaterial",
 	func(v1PubKey string, v2PubKey string) {
-		key, _ := BuildEd25519VerificationKey2020VerificationMaterial(v1PubKey)
+		key, err := GenerateEd25519VerificationKey2020VerificationMaterial(v1PubKey)
+		Expect(err).To(BeNil())
 		Expect(key).To(Equal(v2PubKey))
 	},
 

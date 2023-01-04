@@ -32,7 +32,7 @@ var _ = Describe("Create DID tests", func() {
 					Id:                     keyID,
 					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             did,
-					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
+					VerificationMaterial:   testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
 			},
 			VersionId: uuid.NewString(),
@@ -65,9 +65,44 @@ var _ = Describe("Create DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:                     keyID,
-					VerificationMethodType: types.JSONWebKey2020Type,
+					VerificationMethodType: types.JsonWebKey2020Type,
 					Controller:             did,
-					VerificationMaterial:   testsetup.BuildJSONWebKey2020VerificationMaterial(keypair.Public),
+					VerificationMaterial:   testsetup.GenerateJsonWebKey2020VerificationMaterial(keypair.Public),
+				},
+			},
+			VersionId: uuid.NewString(),
+		}
+
+		signatures := []testsetup.SignInput{
+			{
+				VerificationMethodID: keyID,
+				Key:                  keypair.Private,
+			},
+		}
+
+		_, err := setup.CreateDid(msg, signatures)
+		Expect(err).To(BeNil())
+
+		// check
+		created, err := setup.QueryDidDoc(did)
+		Expect(err).To(BeNil())
+		Expect(msg.ToDidDoc()).To(Equal(*created.Value.DidDoc))
+	})
+
+	It("Valid: Works for simple DIDDoc (Ed25519VerificationKey2018)", func() {
+		did := testsetup.GenerateDID(testsetup.Base58_16bytes)
+		keypair := testsetup.GenerateKeyPair()
+		keyID := did + "#key-1"
+
+		msg := &types.MsgCreateDidDocPayload{
+			Id:             did,
+			Authentication: []string{keyID},
+			VerificationMethod: []*types.VerificationMethod{
+				{
+					Id:                     keyID,
+					VerificationMethodType: types.Ed25519VerificationKey2018Type,
+					Controller:             did,
+					VerificationMaterial:   testsetup.GenerateEd25519VerificationKey2018VerificationMaterial(keypair.Public),
 				},
 			},
 			VersionId: uuid.NewString(),
@@ -108,7 +143,7 @@ var _ = Describe("Create DID tests", func() {
 					Id:                     bobKeyID,
 					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             anna.Did,
-					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(bobKeypair.Public),
+					VerificationMaterial:   testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(bobKeypair.Public),
 				},
 			},
 			VersionId: uuid.NewString(),
@@ -149,25 +184,25 @@ var _ = Describe("Create DID tests", func() {
 					Id:                     keyID1,
 					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             did,
-					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(keypair1.Public),
+					VerificationMaterial:   testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(keypair1.Public),
 				},
 				{
 					Id:                     keyID2,
 					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             did,
-					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(keypair2.Public),
+					VerificationMaterial:   testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(keypair2.Public),
 				},
 				{
 					Id:                     keyID3,
 					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             did,
-					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(keypair3.Public),
+					VerificationMaterial:   testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(keypair3.Public),
 				},
 				{
 					Id:                     keyID4,
 					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             did,
-					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(keypair4.Public),
+					VerificationMaterial:   testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(keypair4.Public),
 				},
 			},
 			Authentication:       []string{keyID1, keyID2},
@@ -224,7 +259,7 @@ var _ = Describe("Create DID tests", func() {
 					Id:                     bobKeyID,
 					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             bobDid,
-					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(bobKeypair.Public),
+					VerificationMaterial:   testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(bobKeypair.Public),
 				},
 			},
 			VersionId: uuid.NewString(),
@@ -255,7 +290,7 @@ var _ = Describe("Create DID tests", func() {
 					Id:                     keyID,
 					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             did,
-					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
+					VerificationMaterial:   testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
 			},
 			VersionId: uuid.NewString(),
@@ -283,15 +318,21 @@ var _ = Describe("Create DID tests", func() {
 					Id:                     keyID,
 					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             did,
-					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
+					VerificationMaterial:   testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
 			},
 			VersionId: uuid.NewString(),
 		}
 
-		signatures := []testsetup.SignInput{}
+		signatures := []testsetup.SignInput{
+			{
+				VerificationMethodID: keyID,
+				Key:                  keypair.Private,
+			},
+		}
 
 		_, err := setup.CreateDid(msg, signatures)
+		Expect(err).ToNot(BeNil())
 		Expect(err.Error()).To(ContainSubstring(fmt.Sprintf("%s: DID Doc not found", nonExistingDid)))
 	})
 
@@ -309,7 +350,7 @@ var _ = Describe("Create DID tests", func() {
 					Id:                     keyID,
 					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             did,
-					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
+					VerificationMaterial:   testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
 			},
 			VersionId: uuid.NewString(),
@@ -346,7 +387,7 @@ var _ = Describe("Create DID tests", func() {
 					Id:                     bobKeyID,
 					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             bobDid,
-					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(bobKeypair.Public),
+					VerificationMaterial:   testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(bobKeypair.Public),
 				},
 			},
 			VersionId: uuid.NewString(),
@@ -372,7 +413,7 @@ var _ = Describe("Create DID tests", func() {
 					Id:                     keyID,
 					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             did,
-					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
+					VerificationMaterial:   testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
 			},
 			VersionId: uuid.NewString(),
@@ -403,7 +444,7 @@ var _ = Describe("Create DID tests", func() {
 					Id:                     alice.KeyID,
 					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             alice.Did,
-					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(alice.KeyPair.Public),
+					VerificationMaterial:   testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(alice.KeyPair.Public),
 				},
 			},
 		}
@@ -438,7 +479,7 @@ var _ = Describe("Check upper/lower case for DID creation", func() {
 					Id:                     keyID,
 					VerificationMethodType: types.Ed25519VerificationKey2020Type,
 					Controller:             did,
-					VerificationMaterial:   testsetup.BuildEd25519VerificationKey2020VerificationMaterial(keypair.Public),
+					VerificationMaterial:   testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(keypair.Public),
 				},
 			},
 			VersionId: uuid.NewString(),

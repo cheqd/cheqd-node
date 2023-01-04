@@ -10,17 +10,20 @@ import (
 	"github.com/cheqd/cheqd-node/x/did/utils"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/lestrrat-go/jwx/jwk"
+	"github.com/mr-tron/base58"
 	"github.com/multiformats/go-multibase"
 )
 
 const (
-	JSONWebKey2020Type             = "JsonWebKey2020"
+	JsonWebKey2020Type             = "JsonWebKey2020"
 	Ed25519VerificationKey2020Type = "Ed25519VerificationKey2020"
+	Ed25519VerificationKey2018Type = "Ed25519VerificationKey2018"
 )
 
 var SupportedMethodTypes = []string{
-	JSONWebKey2020Type,
+	JsonWebKey2020Type,
 	Ed25519VerificationKey2020Type,
+	Ed25519VerificationKey2018Type,
 }
 
 func NewVerificationMethod(id string, vmType string, controller string, verificationMaterial string) *VerificationMethod {
@@ -68,7 +71,7 @@ func VerifySignature(vm VerificationMethod, message []byte, signature []byte) er
 		keyBytes := utils.GetEd25519VerificationKey2020(multibaseBytes)
 		verificationError = utils.VerifyED25519Signature(keyBytes, message, signature)
 
-	case JSONWebKey2020Type:
+	case JsonWebKey2020Type:
 		var raw interface{}
 		err := jwk.ParseRawKey([]byte(vm.VerificationMaterial), &raw)
 		if err != nil {
@@ -85,6 +88,14 @@ func VerifySignature(vm VerificationMethod, message []byte, signature []byte) er
 		default:
 			panic("unsupported jwk key") // This should have been checked during basic validation
 		}
+
+	case Ed25519VerificationKey2018Type:
+		publicKeyBytes, err := base58.Decode(vm.VerificationMaterial)
+		if err != nil {
+			return err
+		}
+
+		verificationError = utils.VerifyED25519Signature(publicKeyBytes, message, signature)
 
 	default:
 		panic("unsupported verification method type") // This should have also been checked during basic validation
@@ -120,7 +131,6 @@ func (vm *VerificationMethod) ReplaceDids(old, new string) {
 }
 
 // Validation
-
 func (vm VerificationMethod) Validate(baseDid string, allowedNamespaces []string) error {
 	return validation.ValidateStruct(&vm,
 		validation.Field(&vm.Id, validation.Required, IsDIDUrl(allowedNamespaces, Empty, Empty, Required), HasPrefix(baseDid)),
@@ -130,7 +140,10 @@ func (vm VerificationMethod) Validate(baseDid string, allowedNamespaces []string
 			validation.When(vm.VerificationMethodType == Ed25519VerificationKey2020Type, validation.Required, IsMultibaseEd25519VerificationKey2020()),
 		),
 		validation.Field(&vm.VerificationMaterial,
-			validation.When(vm.VerificationMethodType == JSONWebKey2020Type, validation.Required, IsJWK()),
+			validation.When(vm.VerificationMethodType == Ed25519VerificationKey2018Type, validation.Required, IsBase58Ed25519VerificationKey2018()),
+		),
+		validation.Field(&vm.VerificationMaterial,
+			validation.When(vm.VerificationMethodType == JsonWebKey2020Type, validation.Required, IsJWK()),
 		),
 	)
 }

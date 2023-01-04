@@ -10,9 +10,9 @@ import (
 	"github.com/cheqd/cheqd-node/tests/integration/network"
 	"github.com/cheqd/cheqd-node/tests/integration/testdata"
 	clitypes "github.com/cheqd/cheqd-node/x/did/client/cli"
+	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	"github.com/cheqd/cheqd-node/x/did/types"
 	resourcecli "github.com/cheqd/cheqd-node/x/resource/client/cli"
-	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -35,7 +35,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		pubKey, privKey, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
 
-		pubKeyMultibase58 := testsetup.BuildEd25519VerificationKey2020VerificationMaterial(pubKey)
+		pubKeyMultibase58 := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(pubKey)
 
 		payload := types.MsgCreateDidDocPayload{
 			Id: did,
@@ -58,7 +58,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 			},
 		}
 
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_1, cli.CLIGasParams)
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -79,7 +79,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1, cli.CLIGasParams)
+		}, signInputs, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -121,7 +121,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 			ResourceVersion: nextResourceVersion,
 			ResourceType:    nextResourceType,
 			ResourceFile:    nextResourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1, cli.CLIGasParams)
+		}, signInputs, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -133,7 +133,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		secondPubKey, secondPrivKey, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
 
-		secondPubKeyMultibase58 := testsetup.BuildEd25519VerificationKey2020VerificationMaterial(secondPubKey)
+		secondPubKeyMultibase58 := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(secondPubKey)
 
 		secondPayload := types.MsgCreateDidDocPayload{
 			Id: secondDid,
@@ -156,7 +156,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 			},
 		}
 
-		res, err = cli.CreateDidDoc(tmpDir, secondPayload, secondSignInputs, testdata.BASE_ACCOUNT_2, cli.CLIGasParams)
+		res, err = cli.CreateDidDoc(tmpDir, secondPayload, secondSignInputs, testdata.BASE_ACCOUNT_2, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -175,7 +175,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 			ResourceVersion: secondResourceVersion,
 			ResourceType:    secondResourceType,
 			ResourceFile:    secondResourceFile,
-		}, secondSignInputs, testdata.BASE_ACCOUNT_1, cli.CLIGasParams)
+		}, secondSignInputs, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
