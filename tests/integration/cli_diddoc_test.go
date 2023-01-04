@@ -155,7 +155,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 		pubKey, privKey, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
 
-		pubKeyMultibase := testsetup.GenerateJsonWebKey2020VerificationMaterial(pubKey)
+		pubKeyMultibase := testsetup.GenerateJSONWebKey2020VerificationMaterial(pubKey)
 
 		payload := types.MsgCreateDidDocPayload{
 			Id: did,
@@ -187,7 +187,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 		newPubKey, newPrivKey, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
 
-		newPubKeyMultibase := testsetup.GenerateJsonWebKey2020VerificationMaterial(newPubKey)
+		newPubKeyMultibase := testsetup.GenerateJSONWebKey2020VerificationMaterial(newPubKey)
 
 		payload2 := types.MsgUpdateDidDocPayload{
 			Id: did,

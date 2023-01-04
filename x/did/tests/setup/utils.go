@@ -70,7 +70,7 @@ func GenerateEd25519VerificationKey2020VerificationMaterial(publicKey ed25519.Pu
 	return keyStr
 }
 
-func GenerateJsonWebKey2020VerificationMaterial(publicKey ed25519.PublicKey) string {
+func GenerateJSONWebKey2020VerificationMaterial(publicKey ed25519.PublicKey) string {
 	pubKeyJwk, err := jwk.New(publicKey)
 	if err != nil {
 		panic(err)

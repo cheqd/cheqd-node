@@ -15,13 +15,13 @@ import (
 )
 
 const (
-	JsonWebKey2020Type             = "JsonWebKey2020"
+	JSONWebKey2020Type             = "JsonWebKey2020"
 	Ed25519VerificationKey2020Type = "Ed25519VerificationKey2020"
 	Ed25519VerificationKey2018Type = "Ed25519VerificationKey2018"
 )
 
 var SupportedMethodTypes = []string{
-	JsonWebKey2020Type,
+	JSONWebKey2020Type,
 	Ed25519VerificationKey2020Type,
 	Ed25519VerificationKey2018Type,
 }
@@ -71,7 +71,7 @@ func VerifySignature(vm VerificationMethod, message []byte, signature []byte) er
 		keyBytes := utils.GetEd25519VerificationKey2020(multibaseBytes)
 		verificationError = utils.VerifyED25519Signature(keyBytes, message, signature)
 
-	case JsonWebKey2020Type:
+	case JSONWebKey2020Type:
 		var raw interface{}
 		err := jwk.ParseRawKey([]byte(vm.VerificationMaterial), &raw)
 		if err != nil {
@@ -143,7 +143,7 @@ func (vm VerificationMethod) Validate(baseDid string, allowedNamespaces []string
 			validation.When(vm.VerificationMethodType == Ed25519VerificationKey2018Type, validation.Required, IsBase58Ed25519VerificationKey2018()),
 		),
 		validation.Field(&vm.VerificationMaterial,
-			validation.When(vm.VerificationMethodType == JsonWebKey2020Type, validation.Required, IsJWK()),
+			validation.When(vm.VerificationMethodType == JSONWebKey2020Type, validation.Required, IsJWK()),
 		),
 	)
 }

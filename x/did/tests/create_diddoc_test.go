@@ -65,9 +65,9 @@ var _ = Describe("Create DID tests", func() {
 			VerificationMethod: []*types.VerificationMethod{
 				{
 					Id:                     keyID,
-					VerificationMethodType: types.JsonWebKey2020Type,
+					VerificationMethodType: types.JSONWebKey2020Type,
 					Controller:             did,
-					VerificationMaterial:   testsetup.GenerateJsonWebKey2020VerificationMaterial(keypair.Public),
+					VerificationMaterial:   testsetup.GenerateJSONWebKey2020VerificationMaterial(keypair.Public),
 				},
 			},
 			VersionId: uuid.NewString(),

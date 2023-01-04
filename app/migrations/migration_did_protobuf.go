@@ -142,7 +142,7 @@ func MigrateType(t string) string {
 	case didtypesv1.Ed25519VerificationKey2020:
 		return didtypes.Ed25519VerificationKey2020Type
 	case didtypesv1.JSONWebKey2020:
-		return didtypes.JsonWebKey2020Type
+		return didtypes.JSONWebKey2020Type
 	default:
 		panic("Unknown type")
 	}
