@@ -35,7 +35,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		pubKey, privKey, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
 
-		pubKeyMultibase58 := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(pubKey)
+		pubKeyMultibase := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(pubKey)
 
 		payload := types.MsgCreateDidDocPayload{
 			Id: did,
@@ -44,7 +44,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 					Id:                     keyId,
 					VerificationMethodType: "Ed25519VerificationKey2020",
 					Controller:             did,
-					VerificationMaterial:   pubKeyMultibase58,
+					VerificationMaterial:   pubKeyMultibase,
 				},
 			},
 			Authentication: []string{keyId},
@@ -133,7 +133,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		secondPubKey, secondPrivKey, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
 
-		secondPubKeyMultibase58 := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(secondPubKey)
+		secondpubKeyMultibase := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(secondPubKey)
 
 		secondPayload := types.MsgCreateDidDocPayload{
 			Id: secondDid,
@@ -142,7 +142,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 					Id:                     secondKeyId,
 					VerificationMethodType: "Ed25519VerificationKey2020",
 					Controller:             secondDid,
-					VerificationMaterial:   secondPubKeyMultibase58,
+					VerificationMaterial:   secondpubKeyMultibase,
 				},
 			},
 			Authentication: []string{secondKeyId},

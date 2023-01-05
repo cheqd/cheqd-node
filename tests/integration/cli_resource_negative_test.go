@@ -39,7 +39,7 @@ var _ = Describe("cheqd cli - negative resource", func() {
 		pubKey, privKey, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
 
-		pubKeyMultibase58 := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(pubKey)
+		pubKeyMultibase := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(pubKey)
 
 		payload := types.MsgCreateDidDocPayload{
 			Id: did,
@@ -48,7 +48,7 @@ var _ = Describe("cheqd cli - negative resource", func() {
 					Id:                     keyId,
 					VerificationMethodType: "Ed25519VerificationKey2020",
 					Controller:             did,
-					VerificationMaterial:   pubKeyMultibase58,
+					VerificationMaterial:   pubKeyMultibase,
 				},
 			},
 			Authentication: []string{keyId},
