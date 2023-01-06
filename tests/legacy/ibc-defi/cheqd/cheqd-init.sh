@@ -5,9 +5,9 @@ set -euox pipefail
 # sed in macos requires extra argument
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    sed_extension=''
+    SED_EXT=''
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-    sed_extension='.orig'
+    SED_EXT='.orig'
 fi
 
 CHAIN_ID="cheqd"
@@ -20,15 +20,12 @@ NODE_0_VAL_PUBKEY=$(cheqd-noded tendermint show-validator)
 cheqd-noded keys add cheqd-user --keyring-backend test
 
 # Config
-# shellcheck disable=SC2086
-sed -i $sed_extension 's|minimum-gas-prices = ""|minimum-gas-prices = "25ncheq"|g' "$HOME/.cheqdnode/config/app.toml"
-# shellcheck disable=SC2086
-sed -i $sed_extension 's|laddr = "tcp://127.0.0.1:26657"|laddr = "tcp://0.0.0.0:26657"|g' "$HOME/.cheqdnode/config/config.toml"
+sed -i "$SED_EXT" 's|minimum-gas-prices = ""|minimum-gas-prices = "50ncheq"|g' "$HOME/.cheqdnode/config/app.toml"
+sed -i "$SED_EXT" 's|laddr = "tcp://127.0.0.1:26657"|laddr = "tcp://0.0.0.0:26657"|g' "$HOME/.cheqdnode/config/config.toml"
 
 # Genesis
 GENESIS="$HOME/.cheqdnode/config/genesis.json"
-# shellcheck disable=SC2086
-sed -i $sed_extension 's/"stake"/"ncheq"/' "$GENESIS"
+sed -i "$SED_EXT" 's/"stake"/"ncheq"/' "$GENESIS"
 
 cheqd-noded add-genesis-account cheqd-user 1000000000000000000ncheq --keyring-backend test
 cheqd-noded gentx cheqd-user 10000000000000000ncheq --chain-id $CHAIN_ID --pubkey "$NODE_0_VAL_PUBKEY" --keyring-backend test
