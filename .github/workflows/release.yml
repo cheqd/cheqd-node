@@ -68,14 +68,14 @@ jobs:
           cache-dependency-path: '**/package-lock.json'
 
       # Setup for pushing to Buf.build later
-      - uses: bufbuild/buf-setup-action@v1.11.0
+      - uses: bufbuild/buf-setup-action@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       # Required for short-lived token provided to Semantic Release
       - name: "Obtain Github App token"
         id: app-token
-        uses: getsentry/action-github-app-token@v2.0.0
+        uses: getsentry/action-github-app-token@v2
         with:
           app_id: ${{ secrets.BOT_APP_ID }}
           private_key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
@@ -108,6 +108,7 @@ jobs:
         with:
           input: proto
           buf_token: ${{ secrets.BUF_TOKEN }}
+          draft: ${{ github.ref_name != 'main'}}
 
   release-docker:
     name: "Docker image"
