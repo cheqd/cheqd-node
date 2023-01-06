@@ -2,12 +2,11 @@
 
 set -euox pipefail
 
-# sed in macos requires extra argument
-
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    SED_EXT=''
-elif [[ "$OSTYPE" == "darwin"* ]]; then
-    SED_EXT='.orig'
+# sed in MacOS requires extra argument
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  SED_EXT='.orig'
+else 
+  SED_EXT=''
 fi
 
 CHAIN_ID="cheqd"
