@@ -743,6 +743,7 @@ func New(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 
+	// TODO: Remove this after cheqd-node release v1.x is successful
 	//nolint: errcheck
 	app.configurator.RegisterMigration(
 		didtypes.ModuleName,

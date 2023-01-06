@@ -203,6 +203,7 @@ func TrimExtraLineOffset(input string, offset int) string {
 func MakeCodecWithExtendedRegistry() codec.Codec {
 	interfaceRegistry := types.NewInterfaceRegistry()
 
+	// TODO: Remove nolint after cheqd-node release v1.x is successful
 	// Register the interfaces from the cosmos-sdk codebase.
 	interfaceRegistry.RegisterImplementations(
 		(*govtypesv1beta1.Content)(nil),
