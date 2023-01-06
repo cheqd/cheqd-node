@@ -140,9 +140,9 @@ func MigrateDidDoc(oldDid *didtypesv1.Did) didtypes.DidDoc {
 func MigrateType(t string) string {
 	switch t {
 	case didtypesv1.Ed25519VerificationKey2020:
-		return didtypes.Ed25519VerificationKey2020{}.Type()
+		return didtypes.Ed25519VerificationKey2020Type
 	case didtypesv1.JSONWebKey2020:
-		return didtypes.JSONWebKey2020{}.Type()
+		return didtypes.JSONWebKey2020Type
 	default:
 		panic("Unknown type")
 	}
@@ -159,28 +159,15 @@ func MigrateVerificationMaterial(vm *didtypesv1.VerificationMethod) string {
 		if err != nil {
 			panic(err)
 		}
-
-		jwk2020 := didtypes.JSONWebKey2020{
-			PublicKeyJwk: res,
-		}
-		res, err = json.Marshal(jwk2020)
-		if err != nil {
-			panic(err)
-		}
-
 		return string(res)
 
 	case didtypesv1.Ed25519VerificationKey2020:
-		pkMulti := didtypes.Ed25519VerificationKey2020{
-			PublicKeyMultibase: vm.PublicKeyMultibase,
-		}
-
-		res, err := json.Marshal(pkMulti)
+		pkMulti, err := helpers.GenerateEd25519VerificationKey2020VerificationMaterial(vm.PublicKeyMultibase)
 		if err != nil {
 			panic(err)
 		}
 
-		return string(res)
+		return pkMulti
 
 	default:
 		panic("Unknown type")

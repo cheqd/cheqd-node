@@ -10,10 +10,10 @@ import (
 	"github.com/cheqd/cheqd-node/tests/integration/network"
 	"github.com/cheqd/cheqd-node/tests/integration/testdata"
 	clitypes "github.com/cheqd/cheqd-node/x/did/client/cli"
+	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	"github.com/cheqd/cheqd-node/x/did/types"
 	resourcecli "github.com/cheqd/cheqd-node/x/resource/client/cli"
 	"github.com/google/uuid"
-	"github.com/multiformats/go-multibase"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -35,8 +35,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		pubKey, privKey, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
 
-		pubKeyMultibase58, err := multibase.Encode(multibase.Base58BTC, pubKey)
-		Expect(err).To(BeNil())
+		publicKeyMultibase := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(pubKey)
 
 		payload := types.MsgCreateDidDocPayload{
 			Id: did,
@@ -45,7 +44,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 					Id:                     keyId,
 					VerificationMethodType: "Ed25519VerificationKey2020",
 					Controller:             did,
-					VerificationMaterial:   "{\"publicKeyMultibase\": \"" + string(pubKeyMultibase58) + "\"}",
+					VerificationMaterial:   publicKeyMultibase,
 				},
 			},
 			Authentication: []string{keyId},
@@ -59,7 +58,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 			},
 		}
 
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_1, cli.CLIGasParams)
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -80,7 +79,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 			ResourceVersion: resourceVersion,
 			ResourceType:    resourceType,
 			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1, cli.CLIGasParams)
+		}, signInputs, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -122,7 +121,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 			ResourceVersion: nextResourceVersion,
 			ResourceType:    nextResourceType,
 			ResourceFile:    nextResourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1, cli.CLIGasParams)
+		}, signInputs, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -134,8 +133,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		secondPubKey, secondPrivKey, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
 
-		secondPubKeyMultibase58, err := multibase.Encode(multibase.Base58BTC, secondPubKey)
-		Expect(err).To(BeNil())
+		secondpubKeyMultibase := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(secondPubKey)
 
 		secondPayload := types.MsgCreateDidDocPayload{
 			Id: secondDid,
@@ -144,7 +142,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 					Id:                     secondKeyId,
 					VerificationMethodType: "Ed25519VerificationKey2020",
 					Controller:             secondDid,
-					VerificationMaterial:   "{\"publicKeyMultibase\": \"" + string(secondPubKeyMultibase58) + "\"}",
+					VerificationMaterial:   secondpubKeyMultibase,
 				},
 			},
 			Authentication: []string{secondKeyId},
@@ -158,7 +156,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 			},
 		}
 
-		res, err = cli.CreateDidDoc(tmpDir, secondPayload, secondSignInputs, testdata.BASE_ACCOUNT_2, cli.CLIGasParams)
+		res, err = cli.CreateDidDoc(tmpDir, secondPayload, secondSignInputs, testdata.BASE_ACCOUNT_2, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -177,7 +175,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 			ResourceVersion: secondResourceVersion,
 			ResourceType:    secondResourceType,
 			ResourceFile:    secondResourceFile,
-		}, secondSignInputs, testdata.BASE_ACCOUNT_1, cli.CLIGasParams)
+		}, secondSignInputs, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 

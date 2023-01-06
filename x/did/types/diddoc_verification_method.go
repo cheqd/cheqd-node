@@ -4,20 +4,26 @@ import (
 	"crypto/ecdsa"
 	"crypto/ed25519"
 	"crypto/rsa"
-	"encoding/json"
 	"errors"
 	"fmt"
 
 	"github.com/cheqd/cheqd-node/x/did/utils"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/lestrrat-go/jwx/jwk"
+	"github.com/mr-tron/base58"
 	"github.com/multiformats/go-multibase"
 )
 
+const (
+	JSONWebKey2020Type             = "JsonWebKey2020"
+	Ed25519VerificationKey2020Type = "Ed25519VerificationKey2020"
+	Ed25519VerificationKey2018Type = "Ed25519VerificationKey2018"
+)
+
 var SupportedMethodTypes = []string{
-	JSONWebKey2020{}.Type(),
-	Ed25519VerificationKey2020{}.Type(),
+	JSONWebKey2020Type,
+	Ed25519VerificationKey2020Type,
+	Ed25519VerificationKey2018Type,
 }
 
 func NewVerificationMethod(id string, vmType string, controller string, verificationMaterial string) *VerificationMethod {
@@ -55,29 +61,19 @@ func VerifySignature(vm VerificationMethod, message []byte, signature []byte) er
 	var verificationError error
 
 	switch vm.VerificationMethodType {
-	case Ed25519VerificationKey2020{}.Type():
-		var ed25519VerificationKey2020 Ed25519VerificationKey2020
-		err := json.Unmarshal([]byte(vm.VerificationMaterial), &ed25519VerificationKey2020)
-		if err != nil {
-			return sdkerrors.Wrapf(err, "failed to unmarshal verification material for %s", vm.Id)
-		}
+	case Ed25519VerificationKey2020Type:
 
-		_, keyBytes, err := multibase.Decode(ed25519VerificationKey2020.PublicKeyMultibase)
+		_, multibaseBytes, err := multibase.Decode(vm.VerificationMaterial)
 		if err != nil {
 			return err
 		}
 
+		keyBytes := utils.GetEd25519VerificationKey2020(multibaseBytes)
 		verificationError = utils.VerifyED25519Signature(keyBytes, message, signature)
 
-	case JSONWebKey2020{}.Type():
-		var jsonWebKey2020 JSONWebKey2020
-		err := json.Unmarshal([]byte(vm.VerificationMaterial), &jsonWebKey2020)
-		if err != nil {
-			return sdkerrors.Wrapf(err, "failed to unmarshal verification material for %s", vm.Id)
-		}
-
+	case JSONWebKey2020Type:
 		var raw interface{}
-		err = jwk.ParseRawKey([]byte(jsonWebKey2020.PublicKeyJwk), &raw)
+		err := jwk.ParseRawKey([]byte(vm.VerificationMaterial), &raw)
 		if err != nil {
 			return fmt.Errorf("can't parse jwk: %s", err.Error())
 		}
@@ -92,6 +88,14 @@ func VerifySignature(vm VerificationMethod, message []byte, signature []byte) er
 		default:
 			panic("unsupported jwk key") // This should have been checked during basic validation
 		}
+
+	case Ed25519VerificationKey2018Type:
+		publicKeyBytes, err := base58.Decode(vm.VerificationMaterial)
+		if err != nil {
+			return err
+		}
+
+		verificationError = utils.VerifyED25519Signature(publicKeyBytes, message, signature)
 
 	default:
 		panic("unsupported verification method type") // This should have also been checked during basic validation
@@ -127,17 +131,19 @@ func (vm *VerificationMethod) ReplaceDids(old, new string) {
 }
 
 // Validation
-
 func (vm VerificationMethod) Validate(baseDid string, allowedNamespaces []string) error {
 	return validation.ValidateStruct(&vm,
 		validation.Field(&vm.Id, validation.Required, IsDIDUrl(allowedNamespaces, Empty, Empty, Required), HasPrefix(baseDid)),
 		validation.Field(&vm.Controller, validation.Required, IsDID(allowedNamespaces)),
 		validation.Field(&vm.VerificationMethodType, validation.Required, validation.In(utils.ToInterfaces(SupportedMethodTypes)...)),
 		validation.Field(&vm.VerificationMaterial,
-			validation.When(vm.VerificationMethodType == Ed25519VerificationKey2020{}.Type(), validation.Required, ValidEd25519VerificationKey2020Rule()),
+			validation.When(vm.VerificationMethodType == Ed25519VerificationKey2020Type, validation.Required, IsMultibaseEd25519VerificationKey2020()),
 		),
 		validation.Field(&vm.VerificationMaterial,
-			validation.When(vm.VerificationMethodType == JSONWebKey2020{}.Type(), validation.Required, ValidJSONWebKey2020Rule()),
+			validation.When(vm.VerificationMethodType == Ed25519VerificationKey2018Type, validation.Required, IsBase58Ed25519VerificationKey2018()),
+		),
+		validation.Field(&vm.VerificationMaterial,
+			validation.When(vm.VerificationMethodType == JSONWebKey2020Type, validation.Required, IsJWK()),
 		),
 	)
 }

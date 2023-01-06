@@ -13,25 +13,25 @@
                 "id": "did:cheqd:testnet:C1594E93-dEd6-4244-9CC4-74af38dab09d#key-1",
                 "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:C1594E93-dEd6-4244-9CC4-74af38dab09d",
-                "verification_material": "{\"publicKeyMultibase\":\"z4SnGy1Nbodwk2FNfv9Z8gmyXjae7ix72ApgvvUX94qkq\"}"
+                "verification_material": "z6Mkhu3KZFd39BSD8kDNbiWyXsXXZ9uy8qMNrqbrkkV9z4YD"
             },
             {
                 "id": "did:cheqd:testnet:C1594E93-dEd6-4244-9CC4-74af38dab09d#key-2",
                 "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:C1594E93-dEd6-4244-9CC4-74af38dab09d",
-                "verification_material": "{\"publicKeyMultibase\":\"zJ26qXuZN7sro7MYpqSWos3Vp5fS3xwSFqsWekiG27zqZ\"}"
+                "verification_material": "z6MkwUMt89ooTRMGDrPXX1Uei93ouEhuNpgcXtRaazE33Dcw"
             },
             {
                 "id": "did:cheqd:testnet:C1594E93-dEd6-4244-9CC4-74af38dab09d#key-3",
                 "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:C1594E93-dEd6-4244-9CC4-74af38dab09d",
-                "verification_material": "{\"publicKeyMultibase\":\"zECXMsD8gGKZprAL2CLLkr1HxgaPpVjGj84ytZUgP9XzP\"}"
+                "verification_material": "z6MksenQTTP7bs4HxfAisuJbh6qxW9ffucX5p5tpPkeQ4kmm"
             },
             {
                 "id": "did:cheqd:testnet:C1594E93-dEd6-4244-9CC4-74af38dab09d#key-4",
                 "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:C1594E93-dEd6-4244-9CC4-74af38dab09d",
-                "verification_material": "{\"publicKeyMultibase\":\"zGtRwRLg1cMyMFHJdFiTJoXtrvjF8QvkUcfhQv9e2FUzh\"}"
+                "verification_material": "z6MkvLgz1avSwuTpMn9KwHR9edSrkJWypozqJgcLkRc3Ahn5"
             }
         ],
         "authentication": [

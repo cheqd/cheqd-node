@@ -40,9 +40,9 @@ func (s *TestSetup) BuildDidDocWithCustomDID(did string) DidDocInfo {
 		VerificationMethod: []*types.VerificationMethod{
 			{
 				Id:                     keyID,
-				VerificationMethodType: types.Ed25519VerificationKey2020{}.Type(),
+				VerificationMethodType: types.Ed25519VerificationKey2020Type,
 				Controller:             did,
-				VerificationMaterial:   BuildEd25519VerificationKey2020VerificationMaterial(keyPair.Public),
+				VerificationMaterial:   GenerateEd25519VerificationKey2020VerificationMaterial(keyPair.Public),
 			},
 		},
 		Authentication: []string{keyID},

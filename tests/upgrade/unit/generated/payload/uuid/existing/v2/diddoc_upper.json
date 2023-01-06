@@ -13,25 +13,25 @@
                 "id": "did:cheqd:testnet:FDFECBD2-A84A-4FB2-B634-E3FDB00F2ABC#key-1",
                 "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:FDFECBD2-A84A-4FB2-B634-E3FDB00F2ABC",
-                "verification_material": "{\"publicKeyMultibase\":\"z6hCYB6ZJfqvGrgfkgGdTZBtXUjz4bQ7qagksUNjJRBfF\"}"
+                "verification_material": "z6Mkk9TamLok1PQjyBWTMqbJQHSXJKFv1HNCGhfoJehKLQSd"
             },
             {
                 "id": "did:cheqd:testnet:FDFECBD2-A84A-4FB2-B634-E3FDB00F2ABC#key-2",
                 "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:FDFECBD2-A84A-4FB2-B634-E3FDB00F2ABC",
-                "verification_material": "{\"publicKeyMultibase\":\"zDRCh14rhKcEbtjNnBivYyWZ6LSmqhpq8Mw6gdCdsWkHn\"}"
+                "verification_material": "z6MkrsTjbK78f9j51EDUsHtPpc76A23h7i5V3x1cTUbtRy5A"
             },
             {
                 "id": "did:cheqd:testnet:FDFECBD2-A84A-4FB2-B634-E3FDB00F2ABC#key-3",
                 "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:FDFECBD2-A84A-4FB2-B634-E3FDB00F2ABC",
-                "verification_material": "{\"publicKeyMultibase\":\"zEQwmVajyBLpKAubk46o9xz9zD8JZd3YJhZFF5qw9oxYk\"}"
+                "verification_material": "z6MkssCp5pzQWtJnHQSSjfkzp5hz2haR2vnfPaAAv7uAjBL8"
             },
             {
                 "id": "did:cheqd:testnet:FDFECBD2-A84A-4FB2-B634-E3FDB00F2ABC#key-4",
                 "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:FDFECBD2-A84A-4FB2-B634-E3FDB00F2ABC",
-                "verification_material": "{\"publicKeyMultibase\":\"zGq9JEc6vdA6TVWNmC2YqN9fdRVyincfDHNNykRrLRzgr\"}"
+                "verification_material": "z6MkvHQLprMMxhavc1DTsbWgDFDdF5FaCVuZyPHuahpMMDUE"
             }
         ],
         "authentication": [

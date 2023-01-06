@@ -7,11 +7,10 @@ import (
 	mathrand "math/rand"
 	"time"
 
-	"github.com/cheqd/cheqd-node/x/did/types"
-	"github.com/cheqd/cheqd-node/x/did/utils"
 	"github.com/google/uuid"
 	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/mr-tron/base58"
+	"github.com/multiformats/go-multibase"
 )
 
 func randBase58Seq(bytes int) string {
@@ -64,13 +63,14 @@ func GenerateKeyPair() KeyPair {
 	return KeyPair{PrivateKey, PublicKey}
 }
 
-func BuildEd25519VerificationKey2020VerificationMaterial(publicKey ed25519.PublicKey) string {
-	return utils.MustEncodeJSON(types.Ed25519VerificationKey2020{
-		PublicKeyMultibase: utils.MustEncodeMultibaseBase58(publicKey),
-	})
+func GenerateEd25519VerificationKey2020VerificationMaterial(publicKey ed25519.PublicKey) string {
+	publicKeyMultibaseBytes := []byte{0xed, 0x01}
+	publicKeyMultibaseBytes = append(publicKeyMultibaseBytes, publicKey...)
+	keyStr, _ := multibase.Encode(multibase.Base58BTC, publicKeyMultibaseBytes)
+	return keyStr
 }
 
-func BuildJSONWebKey2020VerificationMaterial(publicKey ed25519.PublicKey) string {
+func GenerateJSONWebKey2020VerificationMaterial(publicKey ed25519.PublicKey) string {
 	pubKeyJwk, err := jwk.New(publicKey)
 	if err != nil {
 		panic(err)
@@ -81,7 +81,9 @@ func BuildJSONWebKey2020VerificationMaterial(publicKey ed25519.PublicKey) string
 		panic(err)
 	}
 
-	return utils.MustEncodeJSON(types.JSONWebKey2020{
-		PublicKeyJwk: json.RawMessage(pubKeyJwkJSON),
-	})
+	return string(pubKeyJwkJSON)
+}
+
+func GenerateEd25519VerificationKey2018VerificationMaterial(publicKey ed25519.PublicKey) string {
+	return base58.Encode(publicKey)
 }
