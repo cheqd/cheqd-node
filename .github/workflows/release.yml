@@ -10,7 +10,9 @@ permissions:
 
 
 jobs:
-  # Super Linter only runs on diffs in PRs, so we run it on VALIDATE_ALL_CODEBASE=true before release
+  # Super Linter only runs on diffs in PRs
+  # For release, we run it on VALIDATE_ALL_CODEBASE=true
+  # List of languages enabled is smaller than in lint workflow
   super-lint:
     name: "Super Linter"
     runs-on: ubuntu-20.04
