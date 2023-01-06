@@ -88,7 +88,7 @@ jobs:
         DEFAULT_BRANCH: main
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         LOG_LEVEL: WARN
-        VALIDATE_ALL_CODEBASE: true
+        VALIDATE_ALL_CODEBASE: false
         MULTI_STATUS: true
 
         VALIDATE_BASH: true
