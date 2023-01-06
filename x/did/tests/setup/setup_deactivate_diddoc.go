@@ -8,13 +8,13 @@ import (
 
 func (s *TestSetup) DeactivateDidDoc(payload *types.MsgDeactivateDidDocPayload, signInputs []SignInput) (*types.MsgDeactivateDidDocResponse, error) {
 	signBytes := payload.GetSignBytes()
-	var signatures []*types.SignInfo
+	signatures := make([]*types.SignInfo, 0, len(signInputs))
 
 	for _, input := range signInputs {
 		signature := ed25519.Sign(input.Key, signBytes)
 
 		signatures = append(signatures, &types.SignInfo{
-			VerificationMethodId: input.VerificationMethodId,
+			VerificationMethodId: input.VerificationMethodID,
 			Signature:            signature,
 		})
 	}

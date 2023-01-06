@@ -7,13 +7,13 @@ import (
 )
 
 const (
-	IndyIdLength = 16
+	IndyIDLength = 16
 )
 
 func ValidateID(id string) error {
-	isValidId := IsValidIndyId(id) || IsValidUUID(id)
+	isValidID := IsValidIndyID(id) || IsValidUUID(id)
 
-	if !isValidId {
+	if !isValidID {
 		return errors.New("unique id should be one of: 16 bytes of decoded base58 string or UUID")
 	}
 
@@ -25,30 +25,30 @@ func IsValidID(id string) bool {
 	return err == nil
 }
 
-func IsValidIndyId(data string) bool {
+func IsValidIndyID(data string) bool {
 	bytes, err := base58.Decode(data)
 	if err != nil {
 		return false
 	}
-	return len(bytes) == IndyIdLength
+	return len(bytes) == IndyIDLength
 }
 
 // Normalization
 
-func NormalizeId(id string) string {
+func NormalizeID(id string) string {
 	if IsValidUUID(id) {
 		return NormalizeUUID(id)
 	}
 	return id
 }
 
-func NormalizeIdList(keys []string) []string {
+func NormalizeIDList(keys []string) []string {
 	if keys == nil {
 		return nil
 	}
 	newKeys := []string{}
 	for _, id := range keys {
-		newKeys = append(newKeys, NormalizeId(id))
+		newKeys = append(newKeys, NormalizeID(id))
 	}
 	return newKeys
 }

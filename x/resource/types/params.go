@@ -20,7 +20,7 @@ func ParamKeyTable() paramstypes.KeyTable {
 func DefaultFeeParams() *FeeParams {
 	return &FeeParams{
 		Image:      sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceImageFee)),
-		Json:       sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceJsonFee)),
+		Json:       sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceJSONFee)),
 		Default:    sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceDefaultFee)),
 		BurnFactor: sdk.MustNewDecFromStr(DefaultBurnFactor),
 	}
@@ -64,7 +64,7 @@ func validateImage(i interface{}) error {
 	return nil
 }
 
-func validateJson(i interface{}) error {
+func validateJSON(i interface{}) error {
 	v, ok := i.(sdk.Coin)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
@@ -129,7 +129,7 @@ func validateFeeParams(i interface{}) error {
 		return err
 	}
 
-	if err := validateJson(v.Json); err != nil {
+	if err := validateJSON(v.Json); err != nil {
 		return err
 	}
 

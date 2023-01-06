@@ -11,7 +11,7 @@ import (
 func WriteTmpFile(tmpDir string, content []byte) (string, error) {
 	name := uuid.NewString()
 	file := path.Join(tmpDir, name)
-	err := os.WriteFile(file, []byte(content), fs.ModePerm)
+	err := os.WriteFile(file, content, fs.ModePerm)
 	if err != nil {
 		return "", err
 	}

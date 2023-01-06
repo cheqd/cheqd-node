@@ -13,8 +13,8 @@ import (
 )
 
 type CreateResourceOptions struct {
-	CollectionId    string                  `json:"collection_id"`
-	ResourceId      string                  `json:"resource_id"`
+	CollectionID    string                  `json:"collection_id"`
+	ResourceID      string                  `json:"resource_id"`
 	ResourceName    string                  `json:"resource_name"`
 	ResourceVersion string                  `json:"resource_version"`
 	ResourceType    string                  `json:"resource_type"`
@@ -22,21 +22,21 @@ type CreateResourceOptions struct {
 	AlsoKnownAs     []*types.AlternativeUri `json:"also_known_as"`
 }
 
-func CreateResourceLegacy(collectionId string, resourceId string, resourceName string, resourceType string, resourceFile string, signInputs []cli.SignInput, container string) (sdk.TxResponse, error) {
+func CreateResourceLegacy(collectionID string, resourceID string, resourceName string, resourceType string, resourceFile string, signInputs []cli.SignInput, container string) (sdk.TxResponse, error) {
 	args := []string{
-		"--collection-id", collectionId,
-		"--resource-id", resourceId,
+		"--collection-id", collectionID,
+		"--resource-id", resourceID,
 		"--resource-name", resourceName,
 		"--resource-type", resourceType,
 		"--resource-file", resourceFile,
 	}
 
 	for _, signInput := range signInputs {
-		args = append(args, signInput.VerificationMethodId)
+		args = append(args, signInput.VerificationMethodID)
 		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivKey))
 	}
 
-	return Tx(container, CLI_BINARY_NAME, "resource", "create-resource", OperatorAccounts[container], args...)
+	return Tx(container, CLIBinaryName, "resource", "create-resource", OperatorAccounts[container], args...)
 }
 
 func CreateResource(msg types.MsgCreateResourcePayload, resourceFile string, signInputs []cli.SignInput, container string) (sdk.TxResponse, error) {
@@ -44,8 +44,8 @@ func CreateResource(msg types.MsgCreateResourcePayload, resourceFile string, sig
 	payloadFileName := "payload.json"
 
 	resourceOptions := CreateResourceOptions{
-		CollectionId:    msg.CollectionId,
-		ResourceId:      msg.Id,
+		CollectionID:    msg.CollectionId,
+		ResourceID:      msg.Id,
 		ResourceName:    msg.Name,
 		ResourceVersion: msg.Version,
 		ResourceType:    msg.ResourceType,
@@ -53,22 +53,22 @@ func CreateResource(msg types.MsgCreateResourcePayload, resourceFile string, sig
 		AlsoKnownAs:     msg.AlsoKnownAs,
 	}
 
-	payloadJson, err := json.Marshal(&resourceOptions)
+	payloadJSON, err := json.Marshal(&resourceOptions)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
 
 	payloadWithSignInputs := cli.PayloadWithSignInputs{
-		Payload:    payloadJson,
+		Payload:    payloadJSON,
 		SignInputs: signInputs,
 	}
 
-	payloadWithSignInputsJson, err := json.Marshal(&payloadWithSignInputs)
+	payloadWithSignInputsJSON, err := json.Marshal(&payloadWithSignInputs)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
 
-	_, err = LocalnetExecExec(container, "/bin/bash", "-c", "echo '"+string(payloadWithSignInputsJson)+"' > "+payloadFileName)
+	_, err = LocalnetExecExec(container, "/bin/bash", "-c", "echo '"+string(payloadWithSignInputsJSON)+"' > "+payloadFileName)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
@@ -78,5 +78,5 @@ func CreateResource(msg types.MsgCreateResourcePayload, resourceFile string, sig
 		return sdk.TxResponse{}, err
 	}
 
-	return Tx(container, CLI_BINARY_NAME, "resource", "create", OperatorAccounts[container], payloadFileName)
+	return Tx(container, CLIBinaryName, "resource", "create", OperatorAccounts[container], payloadFileName)
 }

@@ -15,7 +15,7 @@ const (
 	MsgDeactivateDidDoc
 	MsgCreateResourceDefault
 	MsgCreateResourceImage
-	MsgCreateResourceJson
+	MsgCreateResourceJSON
 
 	TaxableMsgFeeCount
 )
@@ -37,7 +37,7 @@ var TaxableMsgFees = TaxableMsgFee{
 	MsgDeactivateDidDoc:      (sdk.Coins)(nil),
 	MsgCreateResourceDefault: (sdk.Coins)(nil),
 	MsgCreateResourceImage:   (sdk.Coins)(nil),
-	MsgCreateResourceJson:    (sdk.Coins)(nil),
+	MsgCreateResourceJSON:    (sdk.Coins)(nil),
 }
 
 var BurnFactors = BurnFactor{
@@ -97,8 +97,8 @@ func GetResourceTaxableMsgFee(ctx sdk.Context, msg *resourcetypes.MsgCreateResou
 
 	// Mime type json
 	if strings.HasPrefix(mediaType, "application/json") {
-		burnPortion := GetBurnFeePortion(BurnFactors[BurnFactorResource], TaxableMsgFees[MsgCreateResourceJson])
-		return GetRewardPortion(TaxableMsgFees[MsgCreateResourceJson], burnPortion), burnPortion, true
+		burnPortion := GetBurnFeePortion(BurnFactors[BurnFactorResource], TaxableMsgFees[MsgCreateResourceJSON])
+		return GetRewardPortion(TaxableMsgFees[MsgCreateResourceJSON], burnPortion), burnPortion, true
 	}
 
 	// Default mime type
@@ -114,7 +114,7 @@ func checkFeeParamsFromSubspace(ctx sdk.Context, didKeeper DidKeeper, resourceKe
 
 	resourceParams := resourceKeeper.GetParams(ctx)
 	TaxableMsgFees[MsgCreateResourceImage] = sdk.NewCoins(resourceParams.Image)
-	TaxableMsgFees[MsgCreateResourceJson] = sdk.NewCoins(resourceParams.Json)
+	TaxableMsgFees[MsgCreateResourceJSON] = sdk.NewCoins(resourceParams.Json)
 	TaxableMsgFees[MsgCreateResourceDefault] = sdk.NewCoins(resourceParams.Default)
 
 	BurnFactors[BurnFactorDid] = didParams.BurnFactor

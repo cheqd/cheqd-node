@@ -2,10 +2,10 @@ package setup
 
 import "github.com/cheqd/cheqd-node/x/resource/types"
 
-func (s *TestSetup) QueryResourceMetadata(collectionId, resourceId string) (*types.QueryGetResourceMetadataResponse, error) {
+func (s *TestSetup) QueryResourceMetadata(collectionID, resourceID string) (*types.QueryResourceMetadataResponse, error) {
 	req := &types.QueryGetResourceMetadataRequest{
-		CollectionId: collectionId,
-		Id:           resourceId,
+		CollectionId: collectionID,
+		Id:           resourceID,
 	}
 
 	return s.ResourceQueryServer.ResourceMetadata(s.StdCtx, req)

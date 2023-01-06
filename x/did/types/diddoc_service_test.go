@@ -32,7 +32,7 @@ var _ = Describe("Service tests", func() {
 			TestCaseServiceStruct{
 				service: &Service{
 					Id:              "did:cheqd:aABCDEFG123456789abcd#service1",
-					Type:            "DIDCommMessaging",
+					ServiceType:     "DIDCommMessaging",
 					ServiceEndpoint: []string{"endpoint1", "endpoint2"},
 				},
 				baseDid:           "did:cheqd:aABCDEFG123456789abcd",
@@ -46,7 +46,7 @@ var _ = Describe("Service tests", func() {
 			TestCaseServiceStruct{
 				service: &Service{
 					Id:              "did:cheqd:zABCDEFG123456789abcd#service1",
-					Type:            "DIDCommMessaging",
+					ServiceType:     "DIDCommMessaging",
 					ServiceEndpoint: []string{"endpoint"},
 				},
 				allowedNamespaces: []string{"mainnet"},
@@ -59,7 +59,7 @@ var _ = Describe("Service tests", func() {
 			TestCaseServiceStruct{
 				service: &Service{
 					Id:              "did:cheqd:zABCDEFG123456789abcd#service1",
-					Type:            "DIDCommMessaging",
+					ServiceType:     "DIDCommMessaging",
 					ServiceEndpoint: []string{"endpoint"},
 				},
 				baseDid:  "did:cheqd:zABCDEFG987654321abcd",

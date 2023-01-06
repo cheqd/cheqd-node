@@ -80,7 +80,7 @@ func Setup() TestSetup {
 		QueryServer: queryServer,
 	}
 
-	setup.Keeper.SetDidNamespace(&ctx, DID_NAMESPACE)
+	setup.Keeper.SetDidNamespace(&ctx, DidNamespace)
 	return setup
 }
 

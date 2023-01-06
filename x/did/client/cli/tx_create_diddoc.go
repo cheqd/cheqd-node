@@ -29,14 +29,14 @@ func CmdCreateDidDoc() *cobra.Command {
 
 			payloadFile := args[0]
 
-			payloadJson, signInputs, err := ReadPayloadWithSignInputsFromFile(payloadFile)
+			payloadJSON, signInputs, err := ReadPayloadWithSignInputsFromFile(payloadFile)
 			if err != nil {
 				return err
 			}
 
 			// Unmarshal payload
 			var payload types.MsgCreateDidDocPayload
-			err = clientCtx.Codec.UnmarshalJSON([]byte(payloadJson), &payload)
+			err = clientCtx.Codec.UnmarshalJSON([]byte(payloadJSON), &payload)
 			if err != nil {
 				return err
 			}

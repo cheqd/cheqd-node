@@ -245,6 +245,6 @@ include make/proto.mk
 ###############################################################################
 
 swagger: proto-swagger-gen
-	@./scripts/generate_swagger_docs.sh
+	@./scripts/protoc-swagger-gen.sh
 
 .PHONY: swagger

@@ -12,20 +12,20 @@ type KeyPair struct {
 }
 
 type SignInput struct {
-	VerificationMethodId string
+	VerificationMethodID string
 	Key                  ed25519.PrivateKey
 }
 
 type DidDocInfo struct {
 	Msg          *types.MsgCreateDidDocPayload
 	Did          string
-	CollectionId string
+	CollectionID string
 	KeyPair      KeyPair
-	KeyId        string
+	KeyID        string
 	SignInput    SignInput
 }
 
 type CreatedDidDocInfo struct {
 	DidDocInfo
-	VersionId string
+	VersionID string
 }

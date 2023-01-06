@@ -12,7 +12,7 @@ import (
 	"github.com/cheqd/cheqd-node/x/resource/types"
 )
 
-func (q queryServer) Resource(c context.Context, req *types.QueryGetResourceRequest) (*types.QueryGetResourceResponse, error) {
+func (q queryServer) Resource(c context.Context, req *types.QueryGetResourceRequest) (*types.QueryResourceResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -33,7 +33,7 @@ func (q queryServer) Resource(c context.Context, req *types.QueryGetResourceRequ
 		return nil, err
 	}
 
-	return &types.QueryGetResourceResponse{
+	return &types.QueryResourceResponse{
 		Resource: &resource,
 	}, nil
 }
