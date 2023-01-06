@@ -1,7 +1,7 @@
 #!/bin/bash
+# shellcheck disable=SC2086
 
 # Generates network configuration for an arbitrary amount of validators, observers, and seeds.
-
 set -euo pipefail
 
 # sed in MacOS requires extra argument
@@ -38,14 +38,14 @@ function configure_node() {
   APP_TOML="${NODE_HOME}/config/app.toml"
   CONFIG_TOML="${NODE_HOME}/config/config.toml"
 
-  sed -i "$SED_EXT" 's/minimum-gas-prices = ""/minimum-gas-prices = "50ncheq"/g' "${APP_TOML}"
-  sed -i "$SED_EXT" 's/enable = false/enable = true/g' "${APP_TOML}"
-  sed -i "$SED_EXT" 's|laddr = "tcp://127.0.0.1:26657"|laddr = "tcp://0.0.0.0:26657"|g' "${CONFIG_TOML}"
-  sed -i "$SED_EXT" 's|addr_book_strict = true|addr_book_strict = false|g' "${CONFIG_TOML}"
-  sed -i "$SED_EXT" 's/timeout_propose = "3s"/timeout_propose = "500ms"/g' "${CONFIG_TOML}"
-  sed -i "$SED_EXT" 's/timeout_prevote = "1s"/timeout_prevote = "500ms"/g' "${CONFIG_TOML}"
-  sed -i "$SED_EXT" 's/timeout_precommit = "1s"/timeout_precommit = "500ms"/g' "${CONFIG_TOML}"
-  sed -i "$SED_EXT" 's/timeout_commit = "5s"/timeout_commit = "500ms"/g' "${CONFIG_TOML}"
+  sed -i $SED_EXT 's/minimum-gas-prices = ""/minimum-gas-prices = "50ncheq"/g' "${APP_TOML}"
+  sed -i $SED_EXT 's/enable = false/enable = true/g' "${APP_TOML}"
+  sed -i $SED_EXT 's|laddr = "tcp://127.0.0.1:26657"|laddr = "tcp://0.0.0.0:26657"|g' "${CONFIG_TOML}"
+  sed -i $SED_EXT 's|addr_book_strict = true|addr_book_strict = false|g' "${CONFIG_TOML}"
+  sed -i $SED_EXT 's/timeout_propose = "3s"/timeout_propose = "500ms"/g' "${CONFIG_TOML}"
+  sed -i $SED_EXT 's/timeout_prevote = "1s"/timeout_prevote = "500ms"/g' "${CONFIG_TOML}"
+  sed -i $SED_EXT 's/timeout_precommit = "1s"/timeout_precommit = "500ms"/g' "${CONFIG_TOML}"
+  sed -i $SED_EXT 's/timeout_commit = "5s"/timeout_commit = "500ms"/g' "${CONFIG_TOML}"
 }
 
 function configure_genesis() {
@@ -58,10 +58,10 @@ function configure_genesis() {
   GENESIS_TMP="${NODE_HOME}/config/genesis_tmp.json"
 
   # Default denom
-  sed -i "$SED_EXT" 's/"stake"/"ncheq"/' "${GENESIS}"
+  sed -i $SED_EXT 's/"stake"/"ncheq"/' "${GENESIS}"
 
   # Short voting period
-  sed -i "$SED_EXT" 's/"voting_period": "172800s"/"voting_period": "12s"/' "${GENESIS}"
+  sed -i $SED_EXT 's/"voting_period": "172800s"/"voting_period": "12s"/' "${GENESIS}"
 
   # Test accounts
   BASE_ACCOUNT_1="cheqd1rnr5jrt4exl0samwj0yegv99jeskl0hsxmcz96"
