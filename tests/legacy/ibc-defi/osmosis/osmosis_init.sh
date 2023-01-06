@@ -1,13 +1,15 @@
 #!/bin/bash
+# shellcheck disable=SC2086
 
 set -euox pipefail
 
 # sed in macos requires extra argument
 
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    sed_extension=''
-elif [[ "$OSTYPE" == "darwin"* ]]; then
-    sed_extension='.orig'
+# sed in MacOS requires extra argument
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  SED_EXT='.orig'
+else 
+  SED_EXT=''
 fi
 
 CHAIN_ID="osmosis"
@@ -27,5 +29,4 @@ jq '.app_state["gov"]["voting_params"]["voting_period"]="10s"' "$HOME/.osmosisd/
   mv "$HOME/.osmosisd/config/tmp_genesis.json" "$HOME/.osmosisd/config/genesis.json"
 
 # Config
-# shellcheck disable=SC2086
-sed -i $sed_extension 's|laddr = "tcp://127.0.0.1:26657"|laddr = "tcp://0.0.0.0:26657"|g' "$HOME/.osmosisd/config/config.toml"
+sed -i $SED_EXT 's|laddr = "tcp://127.0.0.1:26657"|laddr = "tcp://0.0.0.0:26657"|g' "$HOME/.osmosisd/config/config.toml"

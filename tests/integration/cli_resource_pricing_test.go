@@ -42,7 +42,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		pubKey, privKey, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
 
-		pubKeyMultibase := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(pubKey)
+		publicKeyMultibase := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(pubKey)
 
 		didPayload := didtypes.MsgCreateDidDocPayload{
 			Id: did,
@@ -51,7 +51,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 					Id:                     keyId,
 					VerificationMethodType: "Ed25519VerificationKey2020",
 					Controller:             did,
-					VerificationMaterial:   pubKeyMultibase,
+					VerificationMaterial:   publicKeyMultibase,
 				},
 			},
 			Authentication: []string{keyId},

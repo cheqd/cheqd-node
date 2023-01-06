@@ -35,7 +35,9 @@ message SignInfo {
   string signature = 2;
 }
 
-message MsgDeactivateDidPayload { string id = 1; }
+message MsgDeactivateDidPayload {
+  string id = 1;
+}
 
 message MsgDeactivateDidResponse {
   Did did = 1;

@@ -34,7 +34,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 		pubKey, privKey, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
 
-		pubKeyMultibase := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(pubKey)
+		publicKeyMultibase := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(pubKey)
 
 		payload := types.MsgCreateDidDocPayload{
 			Id: did,
@@ -43,7 +43,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 					Id:                     keyID,
 					VerificationMethodType: "Ed25519VerificationKey2020",
 					Controller:             did,
-					VerificationMaterial:   pubKeyMultibase,
+					VerificationMaterial:   publicKeyMultibase,
 				},
 			},
 			Authentication: []string{keyID},
@@ -155,7 +155,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 		pubKey, privKey, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
 
-		pubKeyMultibase := testsetup.GenerateJSONWebKey2020VerificationMaterial(pubKey)
+		publicKeyMultibase := testsetup.GenerateJSONWebKey2020VerificationMaterial(pubKey)
 
 		payload := types.MsgCreateDidDocPayload{
 			Id: did,
@@ -164,7 +164,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 					Id:                     keyID,
 					VerificationMethodType: "JsonWebKey2020",
 					Controller:             did,
-					VerificationMaterial:   pubKeyMultibase,
+					VerificationMaterial:   publicKeyMultibase,
 				},
 			},
 			Authentication: []string{keyID},

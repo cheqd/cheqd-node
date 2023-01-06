@@ -85,11 +85,10 @@ jobs:
       uses: github/super-linter/slim@v4
       env:
         IGNORE_GITIGNORED_FILES: true
-        FILTER_REGEX_EXCLUDE: .*docs/config.json
         DEFAULT_BRANCH: main
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         LOG_LEVEL: WARN
-        VALIDATE_ALL_CODEBASE: true
+        VALIDATE_ALL_CODEBASE: false
         MULTI_STATUS: true
 
         VALIDATE_BASH: true
