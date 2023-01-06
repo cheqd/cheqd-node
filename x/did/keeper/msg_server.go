@@ -51,7 +51,7 @@ func MustFindDidDoc(k *Keeper, ctx *sdk.Context, inMemoryDIDDocs map[string]type
 }
 
 func FindVerificationMethod(k *Keeper, ctx *sdk.Context, inMemoryDIDs map[string]types.DidDocWithMetadata, didURL string) (res types.VerificationMethod, found bool, err error) {
-	did, _, _, _ := utils.MustSplitDIDUrl(didURL) //nolint:dogsled
+	did, _, _, _ := utils.MustSplitDIDUrl(didURL)
 
 	didDoc, found, err := FindDidDoc(k, ctx, inMemoryDIDs, did)
 	if err != nil || !found {

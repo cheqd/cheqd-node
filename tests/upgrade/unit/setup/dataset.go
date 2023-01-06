@@ -6,7 +6,7 @@ import (
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
 
-	. "github.com/onsi/gomega" //nolint: revive,stylecheck
+	. "github.com/onsi/gomega"
 )
 
 // Existing
