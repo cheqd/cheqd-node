@@ -59,7 +59,7 @@
             },
             {
                 "name": "interchainaccounts",
-                "version": 1
+                "version": 2
             },
             {
                 "name": "mint",
