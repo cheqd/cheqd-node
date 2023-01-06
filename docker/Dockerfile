@@ -15,13 +15,13 @@ WORKDIR /go/src/github.com/cheqd/cheqd-node
 COPY . .
 
 # Make node binary
-RUN make build
+RUN make install && make build
 
 ###############################################################
 ###             STAGE 2: Build cheqd-node image             ###
 ###############################################################
 
-FROM alpine:3.17 AS runner
+FROM alpine:3.18 AS runner
 
 # Install pre-requisites
 RUN apk update && apk add --no-cache bash ca-certificates
