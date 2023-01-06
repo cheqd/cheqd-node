@@ -12,13 +12,11 @@ service Query {
     option (google.api.http).get = "/cheqd/did/v2/{id}";
   }
 
-  rpc DidDocVersion(QueryGetDidDocVersionRequest)
-      returns (QueryDidDocVersionResponse) {
+  rpc DidDocVersion(QueryGetDidDocVersionRequest) returns (QueryDidDocVersionResponse) {
     option (google.api.http).get = "/cheqd/did/v2/{id}/version/{version}";
   }
 
-  rpc AllDidDocVersionsMetadata(QueryGetAllDidDocVersionsMetadataRequest)
-      returns (QueryAllDidDocVersionsMetadataResponse) {
+  rpc AllDidDocVersionsMetadata(QueryGetAllDidDocVersionsMetadataRequest) returns (QueryAllDidDocVersionsMetadataResponse) {
     option (google.api.http).get = "/cheqd/did/v2/{id}/metadata";
   }
 }
@@ -28,7 +26,9 @@ message QueryGetDidDocRequest {
   string id = 1;
 }
 
-message QueryDidDocResponse { DidDocWithMetadata value = 1; }
+message QueryDidDocResponse {
+  DidDocWithMetadata value = 1;
+}
 
 message QueryGetDidDocVersionRequest {
   // is a DID
@@ -37,7 +37,9 @@ message QueryGetDidDocVersionRequest {
   string version = 2;
 }
 
-message QueryDidDocVersionResponse { DidDocWithMetadata value = 1; }
+message QueryDidDocVersionResponse {
+  DidDocWithMetadata value = 1;
+}
 
 message QueryGetAllDidDocVersionsMetadataRequest {
   // is a DID

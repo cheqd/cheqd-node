@@ -14,7 +14,9 @@ service Query {
   }
 }
 
-message QueryGetDidRequest { string id = 1; }
+message QueryGetDidRequest {
+  string id = 1;
+}
 
 message QueryGetDidResponse {
   Did did = 1;
