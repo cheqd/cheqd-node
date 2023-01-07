@@ -649,7 +649,7 @@ class Installer():
             self.set_cheqd_env_vars()
             self.set_cosmovisor_env_vars()
 
-            self.exec(f"""sudo su -c '. {self.interviewer.home_dir}/.bashrc' {DEFAULT_CHEQD_USER}""")
+            self.exec(f""". {self.interviewer.home_dir}/.bashrc""")
 
             if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)):
                 self.log(f"Moving Cosmovisor binary to installation directory")
