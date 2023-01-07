@@ -46,7 +46,7 @@ DEFAULT_BUMP_COSMOVISOR = "yes"
 DEFAULT_DAEMON_ALLOW_DOWNLOAD_BINARIES = "true"
 DEFAULT_DAEMON_RESTART_AFTER_UPGRADE = "true"
 DEFAULT_DAEMON_POLL_INTERVAL = "300s"
-DEFAULT_UNSAFE_SKIP_BACKUP = True
+DEFAULT_UNSAFE_SKIP_BACKUP = "true"
 DEFAULT_CONTINUE_DIRTY_COSMOVISOR_STATE = False
 
 ###############################################################
@@ -686,8 +686,7 @@ class Installer():
         self.set_env_vars("DAEMON_RESTART_AFTER_UPGRADE",
             self.interviewer.daemon_restart_after_upgrade)
         self.set_env_vars("DAEMON_POLL_INTERVAL", DEFAULT_DAEMON_POLL_INTERVAL)
-        self.set_env_vars("UNSAFE_SKIP_BACKUP", str(
-            DEFAULT_UNSAFE_SKIP_BACKUP).lower())
+        self.set_env_vars("UNSAFE_SKIP_BACKUP", DEFAULT_UNSAFE_SKIP_BACKUP)
 
     def init_cosmovisor(self):
         self.log(
@@ -696,7 +695,7 @@ class Installer():
             f"sudo mv {self.binary_path} {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}")
 
         self.exec(
-            f"""sudo -i su -c 'cosmovisor init {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}' {DEFAULT_CHEQD_USER}""")
+            f"""su -c 'cosmovisor init {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}' {DEFAULT_CHEQD_USER}""")
 
     def init_cosmovisor_manually(self):
         self.mkdir_p(self.cosmovisor_root_dir)
