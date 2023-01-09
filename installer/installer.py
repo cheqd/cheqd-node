@@ -780,15 +780,15 @@ class Installer():
     def set_env_vars(self, env_var_name, env_var_value):
         if not self.check_if_env_var_already_set(env_var_name) and not self.is_default_shell_fish():
             # write to current user
-            self.write_to_bashrc(env_var_name, env_var_value)
-            # write to cheqd user .bashrc
-            self.write_to_bashrc(env_var_name, env_var_value, True)
+            self.write_to_profile(env_var_name, env_var_value)
+            # write to cheqd user profile
+            self.write_to_profile(env_var_name, env_var_value, True)
         elif not self.check_if_env_var_already_set(env_var_name) and self.is_default_shell_fish():
             self.exec(f'set -Uxg {env_var_name} {env_var_value}')
         else:
             self.log(f"ENV var {env_var_name} already set")
 
-    def write_to_bashrc(self, env_var_name, env_var_value, is_user_cheqd=False):
+    def write_to_profile(self, env_var_name, env_var_value, is_user_cheqd=False):
         try:
             current_user_bashrc_path = os.path.expanduser("~/.profile")
             if is_user_cheqd:
