@@ -92,9 +92,9 @@ func ReplaceInSlice(list []string, old, new string) {
 }
 
 func UniqueSorted(ls []string) []string {
-	tmp_ := Unique(ls)
-	sort.Strings(tmp_)
-	return tmp_
+	tmp := Unique(ls)
+	sort.Strings(tmp)
+	return tmp
 }
 
 func StrBytes(p string) []byte {

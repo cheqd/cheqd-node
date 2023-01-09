@@ -26,3 +26,7 @@ rm -rf github.com
 go mod tidy
 
 sh ./scripts/protoc-pulsar-gen.sh
+
+# go mod tidy in API folder
+cd api
+go mod tidy

@@ -14,9 +14,9 @@ import (
 	"github.com/lestrrat-go/jwx/jwk"
 )
 
-func ValidateJWK(jwk_string string) error {
+func ValidateJWK(jwkString string) error {
 	var raw interface{}
-	err := jwk.ParseRawKey([]byte(jwk_string), &raw)
+	err := jwk.ParseRawKey([]byte(jwkString), &raw)
 	if err != nil {
 		return fmt.Errorf("can't parse jwk: %s", err.Error())
 	}
@@ -83,4 +83,8 @@ func VerifyECDSASignature(pubKey ecdsa.PublicKey, message []byte, signature []by
 		return errors.New("invalid ecdsa signature")
 	}
 	return nil
+}
+
+func GetEd25519VerificationKey2020(keyBytes []byte) []byte {
+	return keyBytes[2:]
 }

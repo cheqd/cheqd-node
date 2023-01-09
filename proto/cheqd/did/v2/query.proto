@@ -8,15 +8,15 @@ import "google/api/annotations.proto";
 option go_package = "github.com/cheqd/cheqd-node/x/did/types";
 
 service Query {
-  rpc DidDoc(QueryGetDidDocRequest) returns (QueryGetDidDocResponse) {
+  rpc DidDoc(QueryGetDidDocRequest) returns (QueryDidDocResponse) {
     option (google.api.http).get = "/cheqd/did/v2/{id}";
   }
 
-  rpc DidDocVersion(QueryGetDidDocVersionRequest) returns (QueryGetDidDocVersionResponse) {
+  rpc DidDocVersion(QueryGetDidDocVersionRequest) returns (QueryDidDocVersionResponse) {
     option (google.api.http).get = "/cheqd/did/v2/{id}/version/{version}";
   }
 
-  rpc AllDidDocVersionsMetadata(QueryGetAllDidDocVersionsMetadataRequest) returns (QueryGetAllDidDocVersionsMetadataResponse) {
+  rpc AllDidDocVersionsMetadata(QueryGetAllDidDocVersionsMetadataRequest) returns (QueryAllDidDocVersionsMetadataResponse) {
     option (google.api.http).get = "/cheqd/did/v2/{id}/metadata";
   }
 }
@@ -26,7 +26,7 @@ message QueryGetDidDocRequest {
   string id = 1;
 }
 
-message QueryGetDidDocResponse {
+message QueryDidDocResponse {
   DidDocWithMetadata value = 1;
 }
 
@@ -37,7 +37,7 @@ message QueryGetDidDocVersionRequest {
   string version = 2;
 }
 
-message QueryGetDidDocVersionResponse {
+message QueryDidDocVersionResponse {
   DidDocWithMetadata value = 1;
 }
 
@@ -46,6 +46,6 @@ message QueryGetAllDidDocVersionsMetadataRequest {
   string id = 1;
 }
 
-message QueryGetAllDidDocVersionsMetadataResponse {
+message QueryAllDidDocVersionsMetadataResponse {
   repeated Metadata versions = 1;
 }

@@ -11,27 +11,27 @@
         "verification_method": [
             {
                 "id": "did:cheqd:testnet:d87f512c-cbfc-58d1-b995-f526589ad808#key-1",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:d87f512c-cbfc-58d1-b995-f526589ad808",
-                "verification_material": "{\"publicKeyMultibase\":\"z6hCYB6ZJfqvGrgfkgGdTZBtXUjz4bQ7qagksUNjJRBfF\"}"
+                "verification_material": "z6Mkk9TamLok1PQjyBWTMqbJQHSXJKFv1HNCGhfoJehKLQSd"
             },
             {
                 "id": "did:cheqd:testnet:d87f512c-cbfc-58d1-b995-f526589ad808#key-2",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:d87f512c-cbfc-58d1-b995-f526589ad808",
-                "verification_material": "{\"publicKeyMultibase\":\"zDRCh14rhKcEbtjNnBivYyWZ6LSmqhpq8Mw6gdCdsWkHn\"}"
+                "verification_material": "z6MkrsTjbK78f9j51EDUsHtPpc76A23h7i5V3x1cTUbtRy5A"
             },
             {
                 "id": "did:cheqd:testnet:d87f512c-cbfc-58d1-b995-f526589ad808#key-3",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:d87f512c-cbfc-58d1-b995-f526589ad808",
-                "verification_material": "{\"publicKeyMultibase\":\"zEQwmVajyBLpKAubk46o9xz9zD8JZd3YJhZFF5qw9oxYk\"}"
+                "verification_material": "z6MkssCp5pzQWtJnHQSSjfkzp5hz2haR2vnfPaAAv7uAjBL8"
             },
             {
                 "id": "did:cheqd:testnet:d87f512c-cbfc-58d1-b995-f526589ad808#key-4",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:d87f512c-cbfc-58d1-b995-f526589ad808",
-                "verification_material": "{\"publicKeyMultibase\":\"zGq9JEc6vdA6TVWNmC2YqN9fdRVyincfDHNNykRrLRzgr\"}"
+                "verification_material": "z6MkvHQLprMMxhavc1DTsbWgDFDdF5FaCVuZyPHuahpMMDUE"
             }
         ],
         "authentication": [
@@ -58,7 +58,7 @@
         "service": [
             {
                 "id": "did:cheqd:testnet:d87f512c-cbfc-58d1-b995-f526589ad808#service-1",
-                "type": "type-1",
+                "serviceType": "type-1",
                 "service_endpoint": [
                     "endpoint-1"
                 ]

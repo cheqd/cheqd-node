@@ -161,7 +161,7 @@ func IsSufficientFee(ctx sdk.Context, tax, reward, burn, feeProvided sdk.Coins, 
 
 			// Determine the required fees by multiplying each required minimum gas
 			// price by the gas limit, where fee = ceil(minGasPrice * gasLimit).
-			glDec := sdk.NewDec(int64(gasRequested))
+			glDec := sdk.NewDec(gasRequested)
 			for i, gp := range minGasPrices {
 				fee := gp.Amount.Mul(glDec)
 				requiredFees[i] = sdk.NewCoin(gp.Denom, fee.Ceil().RoundInt())

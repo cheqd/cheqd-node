@@ -2,10 +2,10 @@ package setup
 
 import "github.com/cheqd/cheqd-node/x/resource/types"
 
-func (s *TestSetup) QueryResource(collectionId, resourceId string) (*types.QueryGetResourceResponse, error) {
+func (s *TestSetup) QueryResource(collectionID, resourceID string) (*types.QueryResourceResponse, error) {
 	req := &types.QueryGetResourceRequest{
-		CollectionId: collectionId,
-		Id:           resourceId,
+		CollectionId: collectionID,
+		Id:           resourceID,
 	}
 
 	return s.ResourceQueryServer.Resource(s.StdCtx, req)

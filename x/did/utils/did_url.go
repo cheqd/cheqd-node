@@ -6,6 +6,7 @@ import (
 	"regexp"
 )
 
+// SplitDIDURLRegexp ...
 // That for groups:
 // Example: did:cheqd:testnet:fafdsffq11213343/path-to-s/ome-external-resource?query#key1???
 // 1 - [^/?#]* - all the symbols except / and ? and # . This is the DID part                      (did:cheqd:testnet:fafdsffq11213343)
@@ -15,18 +16,18 @@ import (
 // 5 - #([^#]+[\$]?) - group for fragment, starts with #, includes #                              (#key1???)
 // 6 - [^#]+[\$]?    - fragment only															  (key1???)
 // Number of queries is not limited.
-var SplitDIDURLRegexp, _ = regexp.Compile(`([^/?#]*)?([^?#]*)(\?([^#]*))?(#([^#]+$))?$`)
+var SplitDIDURLRegexp = regexp.MustCompile(`([^/?#]*)?([^?#]*)(\?([^#]*))?(#([^#]+$))?$`)
 
 var (
-	DIDPathAbemptyRegexp, _ = regexp.Compile(`^([/a-zA-Z0-9\-\.\_\~\!\$\&\'\(\)\*\+\,\;\=\:\@]*|(%[0-9A-Fa-f]{2})*)*$`)
-	DIDQueryRegexp, _       = regexp.Compile(`^([/a-zA-Z0-9\-\.\_\~\!\$\&\'\(\)\*\+\,\;\=\:\@\/\?]*|(%[0-9A-Fa-f]{2})*)*$`)
-	DIDFragmentRegexp, _    = regexp.Compile(`^([/a-zA-Z0-9\-\.\_\~\!\$\&\'\(\)\*\+\,\;\=\:\@\/\?]*|(%[0-9A-Fa-f]{2})*)*$`)
+	DIDPathAbemptyRegexp = regexp.MustCompile(`^([/a-zA-Z0-9\-\.\_\~\!\$\&\'\(\)\*\+\,\;\=\:\@]*|(%[0-9A-Fa-f]{2})*)*$`)
+	DIDQueryRegexp       = regexp.MustCompile(`^([/a-zA-Z0-9\-\.\_\~\!\$\&\'\(\)\*\+\,\;\=\:\@\/\?]*|(%[0-9A-Fa-f]{2})*)*$`)
+	DIDFragmentRegexp    = regexp.MustCompile(`^([/a-zA-Z0-9\-\.\_\~\!\$\&\'\(\)\*\+\,\;\=\:\@\/\?]*|(%[0-9A-Fa-f]{2})*)*$`)
 )
 
 // TrySplitDIDUrl Validates generic format of DIDUrl. It doesn't validate path, query and fragment content.
 // Call ValidateDIDUrl for further validation.
-func TrySplitDIDUrl(didUrl string) (did string, path string, query string, fragment string, err error) {
-	matches := SplitDIDURLRegexp.FindAllStringSubmatch(didUrl, -1)
+func TrySplitDIDUrl(didURL string) (did string, path string, query string, fragment string, err error) {
+	matches := SplitDIDURLRegexp.FindAllStringSubmatch(didURL, -1)
 
 	if len(matches) != 1 {
 		return "", "", "", "", errors.New("unable to split did url into did, path, query and fragment")
@@ -37,8 +38,8 @@ func TrySplitDIDUrl(didUrl string) (did string, path string, query string, fragm
 	return match[1], match[2], match[4], match[6], nil
 }
 
-func MustSplitDIDUrl(didUrl string) (did string, path string, query string, fragment string) {
-	did, path, query, fragment, err := TrySplitDIDUrl(didUrl)
+func MustSplitDIDUrl(didURL string) (did string, path string, query string, fragment string) {
+	did, path, query, fragment, err := TrySplitDIDUrl(didURL)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -60,8 +61,8 @@ func JoinDIDUrl(did string, path string, query string, fragment string) string {
 }
 
 // ValidateDIDUrl checks method and allowed namespaces only when the corresponding parameters are specified.
-func ValidateDIDUrl(didUrl string, method string, allowedNamespaces []string) error {
-	did, path, query, fragment, err := TrySplitDIDUrl(didUrl)
+func ValidateDIDUrl(didURL string, method string, allowedNamespaces []string) error {
+	did, path, query, fragment, err := TrySplitDIDUrl(didURL)
 	if err != nil {
 		return err
 	}
@@ -111,27 +112,27 @@ func ValidatePath(path string) error {
 	return nil
 }
 
-func IsValidDIDUrl(didUrl string, method string, allowedNamespaces []string) bool {
-	err := ValidateDIDUrl(didUrl, method, allowedNamespaces)
+func IsValidDIDUrl(didURL string, method string, allowedNamespaces []string) bool {
+	err := ValidateDIDUrl(didURL, method, allowedNamespaces)
 
 	return nil == err
 }
 
 // Normalization
 
-func NormalizeDIDUrl(didUrl string) string {
-	did, path, query, fragment := MustSplitDIDUrl(didUrl)
+func NormalizeDIDUrl(didURL string) string {
+	did, path, query, fragment := MustSplitDIDUrl(didURL)
 	did = NormalizeDID(did)
 	return JoinDIDUrl(did, path, query, fragment)
 }
 
-func NormalizeDIDUrlList(didUrls []string) []string {
-	if didUrls == nil {
+func NormalizeDIDUrlList(didURLs []string) []string {
+	if didURLs == nil {
 		return nil
 	}
-	newDIDUrls := []string{}
-	for _, id := range didUrls {
-		newDIDUrls = append(newDIDUrls, NormalizeDIDUrl(id))
+	newDIDURLs := []string{}
+	for _, id := range didURLs {
+		newDIDURLs = append(newDIDURLs, NormalizeDIDUrl(id))
 	}
-	return newDIDUrls
+	return newDIDURLs
 }

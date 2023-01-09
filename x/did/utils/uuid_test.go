@@ -10,11 +10,11 @@ var _ = Describe("UUID validation", func() {
 	DescribeTable("ValidateUUID",
 
 		func(uri string, isValid bool) {
-			err_ := ValidateUUID(uri)
+			err := ValidateUUID(uri)
 			if isValid {
-				Expect(err_).To(BeNil())
+				Expect(err).To(BeNil())
 			} else {
-				Expect(err_).ToNot(BeNil())
+				Expect(err).ToNot(BeNil())
 			}
 		},
 

@@ -11,27 +11,27 @@
         "verification_method": [
             {
                 "id": "did:cheqd:testnet:GR4bwyhJMubXbHvHTGiYnE#key-1",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:GR4bwyhJMubXbHvHTGiYnE",
-                "verification_material": "{\"publicKeyMultibase\":\"z9KXGLghdcmYmHv2tVs9P4GNt6jzGXMtuVWM2cDuUrLD7\"}"
+                "verification_material": "z6MknmnJvvx4xK3EQQsbBS7DuMvsvKG7wF9GBXFxSVsVmYzV"
             },
             {
                 "id": "did:cheqd:testnet:GR4bwyhJMubXbHvHTGiYnE#key-2",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:GR4bwyhJMubXbHvHTGiYnE",
-                "verification_material": "{\"publicKeyMultibase\":\"zARyYq78WYMC8dZAeKT1PLttgfsWMfqXe5PJCDexYM18U\"}"
+                "verification_material": "z6MkotEbRMNwstgbk41M11yEBzSgVSnD5imzmQD83vvZGDur"
             },
             {
                 "id": "did:cheqd:testnet:GR4bwyhJMubXbHvHTGiYnE#key-3",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:GR4bwyhJMubXbHvHTGiYnE",
-                "verification_material": "{\"publicKeyMultibase\":\"z8zy7xEuLkTt6sLivVg7FEdaYyxD9QJMaH3kvPEvMzVP8\"}"
+                "verification_material": "z6MknTEAYV9n61NZyqZdBF565j8YoXUzpBbvy4frDWtNuiAW"
             },
             {
                 "id": "did:cheqd:testnet:GR4bwyhJMubXbHvHTGiYnE#key-4",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:GR4bwyhJMubXbHvHTGiYnE",
-                "verification_material": "{\"publicKeyMultibase\":\"z6RoXXGz8X1y4urbdLD1QHW7fAXc9LBw5AGaLQ3mV1Sj5\"}"
+                "verification_material": "z6Mkjt4a7XEZrZTY2MSL1myF8bfez6szk5BRrHVGEKjVvfWT"
             }
         ],
         "authentication": [
@@ -58,7 +58,7 @@
         "service": [
             {
                 "id": "did:cheqd:testnet:GR4bwyhJMubXbHvHTGiYnE#service-1",
-                "type": "type-1",
+                "serviceType": "type-1",
                 "service_endpoint": [
                     "endpoint-1"
                 ]

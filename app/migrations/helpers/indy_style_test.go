@@ -8,7 +8,7 @@ import (
 var _ = DescribeTable(
 	"Positive/Negative entries for checking indy style identifier compiling",
 	func(id string, outputStr string) {
-		Expect(MigrateIndyStyleId(id)).To(Equal(outputStr))
+		Expect(MigrateIndyStyleID(id)).To(Equal(outputStr))
 	},
 
 	Entry("Valid: Real case: 16-symbol id", "zGqsJraNJCojDzG4", "QQHVWEaGae5Jts1quynR6M"),

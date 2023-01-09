@@ -20,14 +20,14 @@ message DidDoc {
 
 message VerificationMethod {
   string id = 1;
-  string type = 2;
+  string verification_method_type = 2;
   string controller = 3;
   string verification_material = 4;
 }
 
 message Service {
   string id = 1;
-  string type = 2;
+  string service_type = 2;
   repeated string service_endpoint = 3;
 }
 
