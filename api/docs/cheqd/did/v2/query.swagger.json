@@ -1,0 +1,313 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "cheqd/did/v2/query.proto",
+    "version": "version not set"
+  },
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/cheqd/did/v2/{id}": {
+      "get": {
+        "operationId": "DidDoc",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/cheqd.did.v2.QueryDidDocResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "is a DID to be fetched",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Query"
+        ]
+      }
+    },
+    "/cheqd/did/v2/{id}/metadata": {
+      "get": {
+        "operationId": "AllDidDocVersionsMetadata",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/cheqd.did.v2.QueryAllDidDocVersionsMetadataResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "is a DID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Query"
+        ]
+      }
+    },
+    "/cheqd/did/v2/{id}/version/{version}": {
+      "get": {
+        "operationId": "DidDocVersion",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/cheqd.did.v2.QueryDidDocVersionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "is a DID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "version",
+            "description": "is a unique value that maps DID Doc state at some point",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Query"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "cheqd.did.v2.DidDoc": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "id": {
+          "type": "string"
+        },
+        "controller": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "verification_method": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/cheqd.did.v2.VerificationMethod"
+          }
+        },
+        "authentication": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "assertion_method": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "capability_invocation": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "capability_delegation": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "key_agreement": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "service": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/cheqd.did.v2.Service"
+          }
+        },
+        "also_known_as": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "cheqd.did.v2.DidDocWithMetadata": {
+      "type": "object",
+      "properties": {
+        "did_doc": {
+          "$ref": "#/definitions/cheqd.did.v2.DidDoc"
+        },
+        "metadata": {
+          "$ref": "#/definitions/cheqd.did.v2.Metadata"
+        }
+      }
+    },
+    "cheqd.did.v2.Metadata": {
+      "type": "object",
+      "properties": {
+        "created": {
+          "type": "string"
+        },
+        "updated": {
+          "type": "string"
+        },
+        "deactivated": {
+          "type": "boolean"
+        },
+        "version_id": {
+          "type": "string"
+        },
+        "next_version_id": {
+          "type": "string"
+        },
+        "previous_version_id": {
+          "type": "string"
+        }
+      }
+    },
+    "cheqd.did.v2.QueryAllDidDocVersionsMetadataResponse": {
+      "type": "object",
+      "properties": {
+        "versions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/cheqd.did.v2.Metadata"
+          }
+        }
+      }
+    },
+    "cheqd.did.v2.QueryDidDocResponse": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/cheqd.did.v2.DidDocWithMetadata"
+        }
+      }
+    },
+    "cheqd.did.v2.QueryDidDocVersionResponse": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/cheqd.did.v2.DidDocWithMetadata"
+        }
+      }
+    },
+    "cheqd.did.v2.Service": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "service_type": {
+          "type": "string"
+        },
+        "service_endpoint": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "cheqd.did.v2.VerificationMethod": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "verification_method_type": {
+          "type": "string"
+        },
+        "controller": {
+          "type": "string"
+        },
+        "verification_material": {
+          "type": "string"
+        }
+      }
+    },
+    "google.protobuf.Any": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "grpc.gateway.runtime.Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
+        }
+      }
+    }
+  }
+}
