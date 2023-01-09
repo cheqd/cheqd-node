@@ -3,20 +3,24 @@
 set -euox pipefail
 
 # export go bin path 
-export PATH
-PATH=$PATH:$(go env GOPATH)/bin
+# PATH=$(go env GOPATH)/bin:$PATH
+# export PATH
+
+# Install protoc-gen-swagger
+# go get github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@v1.16.0 2>/dev/null
 
 SWAGGER_DIR=./api/docs
-SWAGGER_UI_DIR=${SWAGGER_DIR}/swagger-ui
+# SWAGGER_UI_DIR=${SWAGGER_DIR}/swagger-ui
 
-SWAGGER_UI_VERSION=4.11.0
-SWAGGER_UI_DOWNLOAD_URL=https://github.com/swagger-api/swagger-ui/archive/refs/tags/v${SWAGGER_UI_VERSION}.zip
-SWAGGER_UI_PACKAGE_NAME=${SWAGGER_DIR}/swagger-ui-${SWAGGER_UI_VERSION}
+# SWAGGER_UI_VERSION=4.11.0
+# SWAGGER_UI_DOWNLOAD_URL=https://github.com/swagger-api/swagger-ui/archive/refs/tags/v${SWAGGER_UI_VERSION}.zip
+# SWAGGER_UI_PACKAGE_NAME=${SWAGGER_DIR}/swagger-ui-${SWAGGER_UI_VERSION}
 
 cd ./proto
 
 # find all proto directories
-proto_dirs=$(find ./cheqd -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
+proto_dirs=$(find ./cheqd -type f -path '*/v1/*' -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
+echo "$proto_dirs"
 
 # loop through proto directories
 for dir in $proto_dirs; do
@@ -27,45 +31,45 @@ for dir in $proto_dirs; do
   fi
 done
 
-cd ..
+# cd ..
 
-# combine swagger files
-# uses nodejs package `swagger-combine`.
-# all the individual swagger files need to be configured in `config.json` for merging
-swagger-combine ${SWAGGER_DIR}/config.json -o ${SWAGGER_DIR}/swagger.json -f json --continueOnConflictingPaths true
+# # combine swagger files
+# # uses nodejs package `swagger-combine`.
+# # all the individual swagger files need to be configured in `config.json` for merging
+# swagger-combine ${SWAGGER_DIR}/config.json -o ${SWAGGER_DIR}/swagger.json -f json --continueOnConflictingPaths true
 
-# clean swagger files
-rm -rf ./tmp-swagger-gen
+# # clean swagger files
+# rm -rf ./tmp-swagger-gen
 
-# if swagger-ui does not exist locally, download swagger-ui and move dist directory to
-# swagger-ui directory, then remove zip file and unzipped swagger-ui directory
-if [ ! -d ${SWAGGER_UI_DIR} ]; then
-  # download swagger-ui
-  wget -O ${SWAGGER_UI_PACKAGE_NAME}.zip ${SWAGGER_UI_DOWNLOAD_URL}
-  # unzip swagger-ui package
-  unzip ${SWAGGER_UI_PACKAGE_NAME}.zip -d ${SWAGGER_DIR}
-  # move swagger-ui dist directory to swagger-ui directory
-  mv ${SWAGGER_UI_PACKAGE_NAME}/dist ${SWAGGER_UI_DIR}
-  # remove swagger-ui zip file and unzipped swagger-ui directory
-  rm -rf ${SWAGGER_UI_PACKAGE_NAME}.zip ${SWAGGER_UI_PACKAGE_NAME}
-fi
+# # if swagger-ui does not exist locally, download swagger-ui and move dist directory to
+# # swagger-ui directory, then remove zip file and unzipped swagger-ui directory
+# if [ ! -d ${SWAGGER_UI_DIR} ]; then
+#   # download swagger-ui
+#   wget -O ${SWAGGER_UI_PACKAGE_NAME}.zip ${SWAGGER_UI_DOWNLOAD_URL}
+#   # unzip swagger-ui package
+#   unzip ${SWAGGER_UI_PACKAGE_NAME}.zip -d ${SWAGGER_DIR}
+#   # move swagger-ui dist directory to swagger-ui directory
+#   mv ${SWAGGER_UI_PACKAGE_NAME}/dist ${SWAGGER_UI_DIR}
+#   # remove swagger-ui zip file and unzipped swagger-ui directory
+#   rm -rf ${SWAGGER_UI_PACKAGE_NAME}.zip ${SWAGGER_UI_PACKAGE_NAME}
+# fi
 
-# move generated swagger yaml file to swagger-ui directory
-mv ${SWAGGER_DIR}/swagger.json ${SWAGGER_DIR}/swagger-ui/
+# # move generated swagger yaml file to swagger-ui directory
+# mv ${SWAGGER_DIR}/swagger.json ${SWAGGER_DIR}/swagger-ui/
 
-# update swagger initializer to default to swagger.json
-# Note: using -i.bak makes this compatible with both GNU and BSD/Mac
-sed -i.bak "s|https://petstore.swagger.io/v2/swagger.json|swagger.json|" ${SWAGGER_UI_DIR}/swagger-initializer.js
+# # update swagger initializer to default to swagger.json
+# # Note: using -i.bak makes this compatible with both GNU and BSD/Mac
+# sed -i.bak "s|https://petstore.swagger.io/v2/swagger.json|swagger.json|" ${SWAGGER_UI_DIR}/swagger-initializer.js
 
-# install statik
-go install github.com/rakyll/statik@latest
+# # install statik
+# go install github.com/rakyll/statik@latest
 
-# generate statik golang code using updated swagger-ui directory
-statik -src=${SWAGGER_DIR}/swagger-ui -dest=${SWAGGER_DIR} -f -m
+# # generate statik golang code using updated swagger-ui directory
+# statik -src=${SWAGGER_DIR}/swagger-ui -dest=${SWAGGER_DIR} -f -m
 
-# log whether or not the swagger directory was updated
-if [ -n "$(git status ${SWAGGER_DIR} --porcelain)" ]; then
-  echo "Swagger statik file updated"
-else
-  echo "Swagger statik file already in sync"
-fi
+# # log whether or not the swagger directory was updated
+# if [ -n "$(git status ${SWAGGER_DIR} --porcelain)" ]; then
+#   echo "Swagger statik file updated"
+# else
+#   echo "Swagger statik file already in sync"
+# fi
