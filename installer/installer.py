@@ -649,9 +649,6 @@ class Installer():
             self.set_cheqd_env_vars()
             self.set_cosmovisor_env_vars()
 
-            self.exec(""". /home/runner/.local/cheqd/.bashrc""")
-            self.exec(""". ~/.bashrc""")
-
             if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)):
                 self.log(f"Moving Cosmovisor binary to installation directory")
                 shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
@@ -696,7 +693,7 @@ class Installer():
             f"sudo mv {self.binary_path} {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}")
 
         self.exec(
-            f"""sudo -i su -c 'cosmovisor init {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}' {DEFAULT_CHEQD_USER}""")
+            f"""su -l -c 'cosmovisor init {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}' {DEFAULT_CHEQD_USER}""")
 
     def init_cosmovisor_manually(self):
         self.mkdir_p(self.cosmovisor_root_dir)
@@ -793,10 +790,10 @@ class Installer():
 
     def write_to_bashrc(self, env_var_name, env_var_value, is_user_cheqd=False):
         try:
-            current_user_bashrc_path = os.path.expanduser("~/.bashrc")
+            current_user_bashrc_path = os.path.expanduser("~/.profile")
             if is_user_cheqd:
                 # because user might change default home dir path which is /home/cheqd
-                current_user_bashrc_path = f'{self.interviewer.home_dir}/.bashrc'
+                current_user_bashrc_path = f'{self.interviewer.home_dir}/.profile'
             with open(current_user_bashrc_path, "a") as current_user_bashrc_file:
                 current_user_bashrc_file.write(
                     f"export {env_var_name}={env_var_value}\n")
