@@ -649,7 +649,8 @@ class Installer():
             self.set_cheqd_env_vars()
             self.set_cosmovisor_env_vars()
 
-            self.exec(f"""sudo -E su -m -c '. ~/.bashrc' {DEFAULT_CHEQD_USER}""")
+            self.exec(""". /home/runner/.local/cheqd/.bashrc""")
+            self.exec(""". ~/.bashrc""")
 
             if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)):
                 self.log(f"Moving Cosmovisor binary to installation directory")
@@ -695,7 +696,7 @@ class Installer():
             f"sudo mv {self.binary_path} {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}")
 
         self.exec(
-            f"""sudo -E su -m -c 'cosmovisor init {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}' {DEFAULT_CHEQD_USER}""")
+            f"""sudo -i su -c 'cosmovisor init {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}' {DEFAULT_CHEQD_USER}""")
 
     def init_cosmovisor_manually(self):
         self.mkdir_p(self.cosmovisor_root_dir)
