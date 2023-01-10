@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -759,11 +760,12 @@ func New(
 			}
 
 			ctx.Logger().Info("Version map is populated. Running migrations.")
-			ctx.Logger().Debug("fromVM: ", fromVM)
+			ctx.Logger().Debug(fmt.Sprintf("fromVm: %v", fromVM))
 
 			// Get current version map
 			newVM := app.mm.GetVersionMap()
-			ctx.Logger().Debug("newVM: ", newVM)
+			ctx.Logger().Debug(fmt.Sprintf("newVM: %v", newVM))
+			
 
 			// Set cheqd/DID module to ConsensusVersion
 			fromVM[didtypes.ModuleName] = newVM[didtypes.ModuleName]
@@ -866,9 +868,9 @@ func New(
 			}
 
 			// Run all default migrations
-			ctx.Logger().Debug("fromVM (for default RunMigrations): ", fromVM)
+			ctx.Logger().Debug(fmt.Sprintf("fromVM (for default RunMigrations): %v", fromVM))
 			toVM, err := app.mm.RunMigrations(ctx, app.configurator, fromVM)
-			ctx.Logger().Debug("toVM (version map after RunMigrations): ", toVM)
+			ctx.Logger().Debug(fmt.Sprintf("toVM (version map after RunMigrations): %v", toVM))
 			return toVM, err
 		})
 
