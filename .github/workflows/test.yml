@@ -28,7 +28,7 @@ jobs:
       - name: "Check systemctl cheqd-cosmovisor.service"
         working-directory: ./installer
         run: |
-          systemctl daemon-reload && systemctl is-active --quiet cheqd-cosmovisor.service
+          sudo systemctl daemon-reload && sudo systemctl is-active --quiet cheqd-cosmovisor.service
 
       - name: "Upgrade existing installation"
         working-directory: ./installer
