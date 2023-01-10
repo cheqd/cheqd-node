@@ -524,6 +524,9 @@ func New(
 		AddRoute(icacontrollertypes.SubModuleName, icaControllerStack).
 		AddRoute(icahosttypes.SubModuleName, icaHostStack)
 
+	// Seal the IBC Router
+	app.IBCKeeper.SetRouter(ibcRouter)
+
 	// Create ICA module
 	icaModule := ica.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper)
 

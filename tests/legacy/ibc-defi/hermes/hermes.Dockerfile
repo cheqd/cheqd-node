@@ -12,10 +12,11 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 
 WORKDIR /app
 
-RUN git clone --depth 1 --branch v0.15.0 https://github.com/informalsystems/ibc-rs
+RUN git clone https://github.com/informalsystems/hermes
 
-WORKDIR /app/ibc-rs
+WORKDIR /app/hermes
 
+RUN git checkout v1.2.0
 RUN cargo build --release --bin hermes
 
 
@@ -32,7 +33,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     netcat
 
 # Node binary
-COPY --from=builder /app/ibc-rs/target/release/hermes /bin
+COPY --from=builder /app/hermes/target/release/hermes /bin
 
 ARG USER=hermes
 ARG GROUP=hermes

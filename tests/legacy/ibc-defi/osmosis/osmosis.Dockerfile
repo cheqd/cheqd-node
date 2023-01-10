@@ -8,7 +8,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     netcat
 
 # Node binary
-COPY --from=osmolabs/osmosis:10 /bin/osmosisd /bin/osmosisd
+COPY --from=osmolabs/osmosis:13.1.2 /bin/osmosisd /bin/osmosisd
 
 ARG USER=osmosis
 ARG GROUP=osmosis
