@@ -676,33 +676,6 @@ func New(
 		paramstypes.ModuleName,
 	)
 
-	// Uncomment if you want to set a custom migration order here.
-	app.mm.SetOrderMigrations(
-		upgradetypes.ModuleName,
-		capabilitytypes.ModuleName,
-		minttypes.ModuleName,
-		distrtypes.ModuleName,
-		slashingtypes.ModuleName,
-		evidencetypes.ModuleName,
-		stakingtypes.ModuleName,
-		authtypes.ModuleName,
-		banktypes.ModuleName,
-		govtypes.ModuleName,
-		crisistypes.ModuleName,
-		ibchost.ModuleName,
-		ibctransfertypes.ModuleName,
-		icatypes.ModuleName,
-		ibcfeetypes.ModuleName,
-		genutiltypes.ModuleName,
-		authz.ModuleName,
-		group.ModuleName,
-		feegrant.ModuleName,
-		paramstypes.ModuleName,
-		vestingtypes.ModuleName,
-		didtypes.ModuleName,
-		resourcetypes.ModuleName,
-	)
-
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter(), encodingConfig.Amino)
 
@@ -743,16 +716,6 @@ func New(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 
-	// TODO: Remove this after cheqd-node release v1.x is successful
-	//nolint: errcheck
-	app.configurator.RegisterMigration(
-		didtypes.ModuleName,
-		3,
-		func(ctx sdk.Context) error {
-			return nil
-		},
-	)
-
 	// Upgrade handler for the next release
 	app.UpgradeKeeper.SetUpgradeHandler(UpgradeName,
 		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
@@ -760,104 +723,98 @@ func New(
 
 			// Fix lack of version map initialization in InitChainer for new chains
 			if len(fromVM) == 0 {
-				println("Initializing version map")
+				ctx.Logger().Info("Version map is empty. Initialising to required values.")
 
-				// Add defaults for did subspace
-				didSubspace := app.GetSubspace(didtypes.ModuleName)
-				didSubspace.Set(ctx, didtypes.ParamStoreKeyFeeParams, didtypes.DefaultFeeParams())
-
-				// Add defaults for resource subspace
-				resourceSubspace := app.GetSubspace(resourcetypes.ModuleName)
-				resourceSubspace.Set(ctx, resourcetypes.ParamStoreKeyFeeParams, resourcetypes.DefaultFeeParams())
-
-				// Add defaults for staking subspace
-				stakingSubspace, _ := app.ParamsKeeper.GetSubspace(stakingtypes.ModuleName)
-				stakingSubspace.Set(ctx, stakingtypes.KeyMinCommissionRate, sdk.NewDec(0))
-
-				// Fix version map
-				versionMap := app.mm.GetVersionMap()
-
-				for moduleName := range versionMap {
-					fromVM[moduleName] = versionMap[moduleName]
+				// Set these explicitly to avoid calling InitGenesis on modules that don't need it.
+				// Explicitly skipping x/auth migrations.
+				fromVM = map[string]uint64{
+					"auth":               2,
+					"authz":              1,
+					"bank":               2,
+					"capability":         1,
+					"cheqd":              3,
+					"crisis":             1,
+					"distribution":       2,
+					"evidence":           1,
+					"feegrant":           1,
+					"genutil":            1,
+					"gov":                2,
+					"ibc":                2,
+					"interchainaccounts": 1,
+					"mint":               1,
+					"params":             1,
+					"resource":           1,
+					"slashing":           2,
+					"staking":            2,
+					"transfer":           1,
+					"upgrade":            1,
+					"vesting":            1,
 				}
-			} else {
-				println("Version map already initialized")
-
-				// Add defaults for staking subspace
-				stakingSubspace, _ := app.ParamsKeeper.GetSubspace(stakingtypes.ModuleName)
-				stakingSubspace.Set(ctx, stakingtypes.KeyMinCommissionRate, sdk.NewDec(0))
-
-				// Add defaults for did subspace
-				didSubspace := app.GetSubspace(didtypes.ModuleName)
-				didSubspace.Set(ctx, didtypes.ParamStoreKeyFeeParams, didtypes.DefaultFeeParams())
-
-				// Add defaults for resource subspace
-				resourceSubspace := app.GetSubspace(resourcetypes.ModuleName)
-				resourceSubspace.Set(ctx, resourcetypes.ParamStoreKeyFeeParams, resourcetypes.DefaultFeeParams())
-
-				// Re-register ICA module with correct ICA controller and host params & store keys
-				// This is required because the ICA module was registered with the wrong params & store keys in the previous release
-				// What's changed:
-				// Added: []string{
-				//    icahosttypes.StoreKey,
-				//    icacontrollertypes.StoreKey, // <-- this is the new store key ehich was missing in the previous release
-				// },
-
-				// set the ICS27 consensus version so InitGenesis is not run
-				fromVM[icatypes.ModuleName] = icaModule.ConsensusVersion()
-
-				// create ICS27 Controller submodule params
-				controllerParams := icacontrollertypes.Params{
-					ControllerEnabled: true,
-				}
-
-				// create ICS27 Host submodule params
-				hostParams := icahosttypes.Params{
-					HostEnabled: true,
-					AllowMessages: []string{
-						authzMsgExec,
-						authzMsgGrant,
-						authzMsgRevoke,
-						bankMsgSend,
-						bankMsgMultiSend,
-						distrMsgSetWithdrawAddr,
-						distrMsgWithdrawValidatorCommission,
-						distrMsgFundCommunityPool,
-						distrMsgWithdrawDelegatorReward,
-						feegrantMsgGrantAllowance,
-						feegrantMsgRevokeAllowance,
-						govMsgVoteWeighted,
-						govMsgSubmitProposal,
-						govMsgDeposit,
-						govMsgVote,
-						stakingMsgEditValidator,
-						stakingMsgDelegate,
-						stakingMsgUndelegate,
-						stakingMsgBeginRedelegate,
-						stakingMsgCreateValidator,
-						vestingMsgCreateVestingAccount,
-						ibcMsgTransfer,
-						// cheqd namespace
-						didMsgCreateDidDoc,
-						didMsgUpdateDidDoc,
-						didMsgDeactivateDidDoc,
-						resourceMsgCreateResource,
-					},
-				}
-
-				// initialize ICS27 module
-				ctx.Logger().Info("start to init interchainaccount module...")
-				icaModule.InitModule(ctx, controllerParams, hostParams)
-
-				// Get the current version map
-				versionMap := app.mm.GetVersionMap()
-
-				fmt.Println("Current version map: ", fromVM)
-				fmt.Println("Expected version map: ", versionMap)
-
-				// Skip resource module InitGenesis (was not present in v0.6.x)
-				fromVM[resourcetypes.ModuleName] = versionMap[resourcetypes.ModuleName]
 			}
+
+			ctx.Logger().Info("Version map is populated. Running migrations.")
+			ctx.Logger().Debug(fmt.Sprintf("fromVm: %v", fromVM))
+
+			// Get current version map
+			newVM := app.mm.GetVersionMap()
+			ctx.Logger().Debug(fmt.Sprintf("newVM: %v", newVM))
+
+			// Set cheqd/DID module to ConsensusVersion
+			fromVM[didtypes.ModuleName] = newVM[didtypes.ModuleName]
+
+			// Set resource module to ConsensusVersion
+			fromVM[resourcetypes.ModuleName] = newVM[resourcetypes.ModuleName]
+
+			// Add defaults for DID module subspace
+			didSubspace := app.GetSubspace(didtypes.ModuleName)
+			didSubspace.Set(ctx, didtypes.ParamStoreKeyFeeParams, didtypes.DefaultFeeParams())
+
+			// Add defaults for resource subspace
+			resourceSubspace := app.GetSubspace(resourcetypes.ModuleName)
+			resourceSubspace.Set(ctx, resourcetypes.ParamStoreKeyFeeParams, resourcetypes.DefaultFeeParams())
+
+			// create ICS27 Controller submodule params
+			controllerParams := icacontrollertypes.Params{
+				ControllerEnabled: true,
+			}
+
+			// create ICS27 Host submodule params
+			hostParams := icahosttypes.Params{
+				HostEnabled: true,
+				AllowMessages: []string{
+					authzMsgExec,
+					authzMsgGrant,
+					authzMsgRevoke,
+					bankMsgSend,
+					bankMsgMultiSend,
+					distrMsgSetWithdrawAddr,
+					distrMsgWithdrawValidatorCommission,
+					distrMsgFundCommunityPool,
+					distrMsgWithdrawDelegatorReward,
+					feegrantMsgGrantAllowance,
+					feegrantMsgRevokeAllowance,
+					govMsgVoteWeighted,
+					govMsgSubmitProposal,
+					govMsgDeposit,
+					govMsgVote,
+					stakingMsgEditValidator,
+					stakingMsgDelegate,
+					stakingMsgUndelegate,
+					stakingMsgBeginRedelegate,
+					stakingMsgCreateValidator,
+					vestingMsgCreateVestingAccount,
+					ibcMsgTransfer,
+					// cheqd namespace
+					didMsgCreateDidDoc,
+					didMsgUpdateDidDoc,
+					didMsgDeactivateDidDoc,
+					resourceMsgCreateResource,
+				},
+			}
+
+			// initialize ICS27 module
+			ctx.Logger().Debug("Initialise interchainaccount module...")
+			icaModule.InitModule(ctx, controllerParams, hostParams)
 
 			// cheqd migrations
 			migrationContext := migrations.NewMigrationContext(
@@ -868,6 +825,7 @@ func New(
 				app.GetSubspace(resourcetypes.ModuleName),
 			)
 
+			ctx.Logger().Debug("Initialise cheqd DID and Resource module migrations...")
 			cheqdMigrator := migrations.NewMigrator(
 				migrationContext,
 				[]migrations.Migration{
@@ -901,9 +859,11 @@ func New(
 				panic(err)
 			}
 
-			// ibc v3 -> v4 migration
-			// transfer module consensus version has been bumped to 2
-			return app.mm.RunMigrations(ctx, app.configurator, fromVM)
+			// Run all default migrations
+			ctx.Logger().Debug(fmt.Sprintf("fromVM (for default RunMigrations): %v", fromVM))
+			toVM, err := app.mm.RunMigrations(ctx, app.configurator, fromVM)
+			ctx.Logger().Debug(fmt.Sprintf("toVM (version map after RunMigrations): %v", toVM))
+			return toVM, err
 		})
 
 	if loadLatest {
@@ -935,14 +895,11 @@ func (app *App) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.Respo
 
 // InitChainer application update at chain initialization
 func (app *App) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
-	// FIXME: This should have been done from the beginning.
-	// Now this would break consensus with existing networks.
-	// so ModuleVersionMap is initialized as part of upgrade xxx.
 	var genesisState GenesisState
 	if err := tmjson.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
 		panic(err)
 	}
-	// app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
+	app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
 	return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
 }
 
