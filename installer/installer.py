@@ -33,7 +33,6 @@ DEFAULT_INSTALL_PATH = "/usr/bin"
 DEFAULT_CHEQD_USER = "cheqd"
 DEFAULT_BINARY_NAME = "cheqd-noded"
 DEFAULT_COSMOVISOR_BINARY_NAME = "cosmovisor"
-DEFAULT_CHAINS = ['cheqd-testnet-4', 'cheqd-mainnet-1']
 DEFAULT_CHAIN = "cheqd-mainnet-1"
 PRINT_PREFIX = "********* "
 
