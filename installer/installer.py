@@ -684,7 +684,7 @@ class Installer():
             failure_exit(f"Failed to setup Cosmovisor")
 
     def set_cheqd_env_vars(self):
-        self.set_env_vars("CHEQD_NODED_HOME", f"{self.interviewer.home_dir}")
+        self.set_env_vars("CHEQD_NODED_HOME", f"{self.interviewer.cheqd_root_dir}")
         self.set_env_vars("CHEQD_NODED_CHAIN_ID", f"{self.interviewer.chain}")
 
     def set_cosmovisor_env_vars(self):
