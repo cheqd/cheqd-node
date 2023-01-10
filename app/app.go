@@ -713,16 +713,6 @@ func New(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 
-	// TODO: Remove this after cheqd-node release v1.x is successful
-	//nolint: errcheck
-	app.configurator.RegisterMigration(
-		didtypes.ModuleName,
-		3,
-		func(ctx sdk.Context) error {
-			return nil
-		},
-	)
-
 	// Upgrade handler for the next release
 	app.UpgradeKeeper.SetUpgradeHandler(UpgradeName,
 		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
