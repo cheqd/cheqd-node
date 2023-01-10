@@ -755,7 +755,6 @@ func New(
 			// Get current version map
 			newVM := app.mm.GetVersionMap()
 			ctx.Logger().Debug(fmt.Sprintf("newVM: %v", newVM))
-			
 
 			// Set cheqd/DID module to ConsensusVersion
 			fromVM[didtypes.ModuleName] = newVM[didtypes.ModuleName]
