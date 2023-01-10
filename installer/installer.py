@@ -5,6 +5,7 @@
 ###     		    Python package imports      			###
 ###############################################################
 import datetime
+from enum import Enum
 import os
 import subprocess
 import sys
@@ -85,6 +86,11 @@ DEFAULT_P2P_PORT = "26656"
 DEFAULT_GAS_PRICE = "50ncheq"
 DEFAULT_LOG_LEVEL = "error"
 DEFAULT_LOG_FORMAT = "json"
+
+
+class NetworkType(str, Enum):
+    MAINNET = "cheqd-mainnet-1"
+    TESTNET = "cheqd-testnet-4"
 
 
 def sigint_handler(signal, frame):
@@ -675,10 +681,10 @@ class Installer():
     def set_cosmovisor_env_vars(self):
         self.set_env_vars("DAEMON_NAME", DEFAULT_BINARY_NAME)
         self.set_env_vars("DAEMON_HOME", self.cheqd_root_dir)
-        self.set_env_vars("DAEMON_ALLOW_DOWNLOAD_BINARIES", 
-            self.interviewer.daemon_allow_download_binaries)
+        self.set_env_vars("DAEMON_ALLOW_DOWNLOAD_BINARIES",
+                          self.interviewer.daemon_allow_download_binaries)
         self.set_env_vars("DAEMON_RESTART_AFTER_UPGRADE",
-            self.interviewer.daemon_restart_after_upgrade)
+                          self.interviewer.daemon_restart_after_upgrade)
         self.set_env_vars("DAEMON_POLL_INTERVAL", DEFAULT_DAEMON_POLL_INTERVAL)
         self.set_env_vars("UNSAFE_SKIP_BACKUP", DEFAULT_UNSAFE_SKIP_BACKUP)
 
@@ -1330,7 +1336,7 @@ class Interviewer:
     def ask_for_init_from_snapshot(self):
         answer = self.ask(
             f"CAUTION: Downloading a snapshot replaces your existing copy of chain data. Usually safe to use this option when doing a fresh installation. "
-            f"Do you want to download a snapshot of the existing chain to speed up node synchronisation? (yes/no)", default="yes")
+            f"Do you want to download a snapshot of the existing chain to speed up node synchronization? (yes/no)", default="yes")
         if answer.lower().startswith("y"):
             self.snapshot_url = self.prepare_url_for_latest()
             self.init_from_snapshot = True
@@ -1340,10 +1346,14 @@ class Interviewer:
             failure_exit(f"Invalid input provided during installation.")
 
     def ask_for_chain(self):
-        answer = self.ask(
-            f"Select cheqd network to join ({'/'.join(DEFAULT_CHAINS)})", default="cheqd-mainnet-1")
-        if answer in DEFAULT_CHAINS:
-            self.chain = answer
+        answer = int(self.ask(
+            "Select cheqd network to join:\n"
+            f"1 - Mainnet ({NetworkType.MAINNET})\n"
+            f"2 - Testnet ({NetworkType.TESTNET}) ", default=1))
+        if answer == 1:
+            self.chain = NetworkType.MAINNET
+        elif answer == 2:
+            self.chain = NetworkType.TESTNET
         else:
             failure_exit(f"Invalid network selected during installation.")
 
@@ -1413,7 +1423,7 @@ class Interviewer:
             f"Specify DAEMON_RESTART_AFTER_UPGRADE (true|false)", default=DEFAULT_DAEMON_RESTART_AFTER_UPGRADE)
 
     def prepare_url_for_latest(self) -> str:
-        template = TESTNET_SNAPSHOT if self.chain == "cheqd-testnet-4" else MAINNET_SNAPSHOT
+        template = TESTNET_SNAPSHOT if self.chain == NetworkType.TESTNET else MAINNET_SNAPSHOT
         _date = datetime.date.today()
         _days_counter = 0
         _is_url_valid = False
