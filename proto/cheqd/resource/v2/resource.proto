@@ -2,6 +2,9 @@ syntax = "proto3";
 
 package cheqd.resource.v2;
 
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+
 option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
 
 message Resource {
@@ -27,7 +30,10 @@ message Metadata {
   repeated AlternativeUri also_known_as = 6;
 
   string media_type = 7;
-  string created = 8;
+  google.protobuf.Timestamp created = 8 [
+    (gogoproto.nullable) = false,
+    (gogoproto.stdtime) = true
+  ];
   string checksum = 9;
   string previous_version_id = 10;
   string next_version_id = 11;

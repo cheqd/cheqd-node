@@ -2,6 +2,9 @@ syntax = "proto3";
 
 package cheqd.did.v2;
 
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+
 option go_package = "github.com/cheqd/cheqd-node/x/did/types";
 
 message DidDoc {
@@ -37,8 +40,14 @@ message DidDocWithMetadata {
 }
 
 message Metadata {
-  string created = 1;
-  string updated = 2;
+  google.protobuf.Timestamp created = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.stdtime) = true
+  ];
+  google.protobuf.Timestamp updated = 2 [
+    (gogoproto.nullable) = false,
+    (gogoproto.stdtime) = true
+  ];
   bool deactivated = 3;
   string version_id = 4;
   string next_version_id = 5;
