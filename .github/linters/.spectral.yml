@@ -1,0 +1,6 @@
+formats:
+ - oas2
+
+overrides:
+  files:
+    - "**/config.yaml"
