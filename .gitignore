@@ -1,7 +1,7 @@
 ### APP-SPECIFIC EXCLUSIONS ###
 
 # Ignored directories
-api/docs/cheqd/
+
 build/
 dist/
 **/network-config
