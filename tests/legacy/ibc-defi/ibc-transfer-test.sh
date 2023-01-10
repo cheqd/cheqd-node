@@ -181,6 +181,5 @@ else
   exit 1
 fi
 
-
 info "Tear down" # ---
-docker-compose down --timeout 20
+docker compose down --timeout 20
