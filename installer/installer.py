@@ -504,6 +504,8 @@ class Installer():
         self.print_success()
 
     def post_install(self):
+        network_type = self.get_network_type()
+
         # Init the node with provided moniker
         if not os.path.exists(os.path.join(self.cheqd_config_dir, 'genesis.json')):
             self.exec(
@@ -511,7 +513,7 @@ class Installer():
 
             # Downloading genesis file
             self.exec(
-                f"curl {GENESIS_FILE.format(self.interviewer.chain)} > {os.path.join(self.cheqd_config_dir, 'genesis.json')}")
+                f"curl {GENESIS_FILE.format(network_type)} > {os.path.join(self.cheqd_config_dir, 'genesis.json')}")
             shutil.chown(os.path.join(self.cheqd_config_dir, 'genesis.json'),
                          DEFAULT_CHEQD_USER,
                          DEFAULT_CHEQD_USER)
@@ -540,7 +542,7 @@ class Installer():
 
         # Setting up the seeds
         seeds = self.exec(
-            f"curl {SEEDS_FILE.format(self.interviewer.chain)}").stdout.decode("utf-8").strip()
+            f"curl {SEEDS_FILE.format(network_type)}").stdout.decode("utf-8").strip()
         seeds_search_text = 'seeds = ""'
         seeds_replace_text = 'seeds = "{}"'.format(seeds)
         search_and_replace(seeds_search_text, seeds_replace_text, os.path.join(
@@ -606,6 +608,14 @@ class Installer():
                 DEFAULT_LOG_FORMAT)
             search_and_replace(log_format_search_text, log_format_replace_text, os.path.join(
                 self.cheqd_config_dir, "config.toml"))
+
+    def get_network_type(self):
+        if self.interviewer.chain == NetworkType.MAINNET:
+            network_type = "mainnet"
+        elif self.interviewer.chain == NetworkType.TESTNET:
+            network_type = "testnet"
+        
+        return network_type 
 
     def prepare_cheqd_user(self):
         try:
