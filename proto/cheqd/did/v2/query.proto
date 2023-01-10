@@ -3,7 +3,6 @@ syntax = "proto3";
 package cheqd.did.v2;
 
 import "cheqd/did/v2/diddoc.proto";
-import "cosmos/base/query/v1beta1/pagination.proto";
 import "google/api/annotations.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/did/types";
@@ -45,14 +44,8 @@ message QueryDidDocVersionResponse {
 message QueryGetAllDidDocVersionsMetadataRequest {
   // is a DID
   string id = 1;
-
-  // pagination is the PageRequest to use for pagination.
-  cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
 message QueryAllDidDocVersionsMetadataResponse {
   repeated Metadata versions = 1;
-
-  // pagination is the pagination PageResponse.
-  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
