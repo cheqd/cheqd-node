@@ -3,6 +3,7 @@ syntax = "proto3";
 package cheqd.resource.v2;
 
 import "cheqd/resource/v2/resource.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
 import "google/api/annotations.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
@@ -46,8 +47,14 @@ message QueryResourceMetadataResponse {
 message QueryGetCollectionResourcesRequest {
   // is unique identifier a for collection
   string collection_id = 1;
+
+  // pagination is the PageRequest to use for pagination.
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
 message QueryCollectionResourcesResponse {
   repeated Metadata resources = 1;
+
+  // pagination is the pagination PageResponse.
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
