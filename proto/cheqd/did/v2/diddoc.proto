@@ -7,9 +7,9 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/did/types";
 
-// DidDocument defines a DID Document, as defined in the DID Core specification.
+// DidDoc defines a DID Document, as defined in the DID Core specification.
 // Documentation: https://www.w3.org/TR/did-core/
-message DidDocument {
+message DidDoc {
   // context is a list of URIs used to identify the context of the DID document.
   // Default context: https://www.w3.org/ns/did/v1
   repeated string context = 1;
@@ -92,17 +92,17 @@ message Service {
 
 // DidDocWithMetadata defines a DID Document with metadata, as defined in the DID Core specification.
 // Contains the DID Document, as well as DID Document metadata.
-message DidDocumentWithMetadata {
+message DidDocWithMetadata {
   // didDocument is the DID Document.
-  DidDocument did_document = 1;
+  DidDoc did_document = 1;
 
   // didDocumentMetadata is the DID Document metadata.
-  DidDocumentMetadata did_document_metadata = 2;
+  Metadata did_document_metadata = 2;
 }
 
 // Metadata defines DID Document metadata, as defined in the DID Core specification.
 // Documentation: https://www.w3.org/TR/did-core/#did-document-metadata-properties
-message DidDocumentMetadata {
+message Metadata {
   // created is the timestamp of the creation of the DID Document.
   // Format: RFC3339
   // Example: 2021-03-10T15:16:17Z

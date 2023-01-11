@@ -7,14 +7,14 @@ import "cheqd/did/v2/fee.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/did/types";
 
-// DidDocumentVersionSet contains all versions of DID Documents and their metadata for a given DID.
+// DidDocVersionSet contains all versions of DID Documents and their metadata for a given DID.
 // The latest version of the DID Document set is stored in the latest_version field.
-message DidDocumentVersionSet {
+message DidDocVersionSet {
   // Latest version of the DID Document set
   string latest_version = 1;
 
   // All versions of the DID Document set
-  repeated DidDocumentWithMetadata did_document_with_metadata = 2;
+  repeated DidDocWithMetadata did_doc_with_metadata = 2;
 }
 
 // GenesisState defines the cheqd DID module's genesis state.
@@ -24,7 +24,7 @@ message GenesisState {
   string did_namespace = 1;
 
   // All DID Document version sets (contains all versions of all DID Documents)
-  repeated DidDocumentVersionSet version_sets = 2;
+  repeated DidDocVersionSet version_sets = 2;
 
   // Fee parameters for the DID module
   FeeParams fee_params = 3;

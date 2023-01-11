@@ -80,7 +80,7 @@ message MsgCreateDidDocPayload {
 // MsgCreateDidDocResponse defines response type for Msg/CreateDidDoc.
 message MsgCreateDidDocResponse {
   // Return the created DID Document with metadata
-  DidDocumentWithMetadata did_document_with_metadata = 1;
+  DidDocWithMetadata did_document_with_metadata = 1;
 }
 
 // MsgUpdateDidDocPayload defines the structure of the payload for updating an existing DID document
@@ -106,7 +106,7 @@ message MsgUpdateDidDocPayload {
 
 message MsgUpdateDidDocResponse {
   // Return the updated DID Document with metadata
-  DidDocumentWithMetadata did_document_with_metadata = 1;
+  DidDocWithMetadata did_document_with_metadata = 1;
 }
 
 // MsgDeactivateDidDocPayload defines the structure of the payload for deactivating an existing DID document
@@ -122,5 +122,5 @@ message MsgDeactivateDidDocPayload {
 // MsgDeactivateDidDocResponse defines response type for Msg/DeactivateDidDoc.
 message MsgDeactivateDidDocResponse {
   // Return the deactivated DID Document with metadata
-  DidDocumentWithMetadata value = 1;
+  DidDocWithMetadata value = 1;
 }
