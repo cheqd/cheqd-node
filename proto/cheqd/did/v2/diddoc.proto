@@ -47,7 +47,7 @@ message DidDoc {
 
   // service is a list of services that can be used to interact with the DID
   // subject.
-  repeated Service service = 10 [(gogoproto.nullable) = true];
+  repeated Service service = 10;
 
   // alsoKnownAs is a list of DIDs that are known to refer to the same DID
   // subject.
