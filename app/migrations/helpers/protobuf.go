@@ -20,6 +20,12 @@ func GenerateEd25519VerificationKey2020VerificationMaterial(publicKey string) (s
 }
 
 func MustParseFromStringTimeToGoTime(timeString string) *time.Time {
+	// If timeString is empty return EPOCH time (1970-01-01 00:00:00 +0000 UTC)
+	if timeString == "" {
+		t := time.Unix(0, 0)
+		return &t
+	}
+
 	t, err := time.Parse(time.RFC3339, timeString)
 	if err != nil {
 		panic(err)
