@@ -27,9 +27,7 @@ externalDocs:
 paths:
   /cheqd/did/v2/{id}:
     get:
-      summary: >-
-        DidDoc fetches the latest version of the DID Document for a given DID
-        unique identifier
+      summary: Fetch latest version of a DID Document for a given DID
       operationId: DidDoc
       responses:
         '200':
@@ -37,7 +35,7 @@ paths:
           schema:
             type: object
             properties:
-              did_doc_with_metadata:
+              did_document_with_metadata:
                 title: >-
                   Successful resolution of the DID Document returns the
                   following:
@@ -48,7 +46,7 @@ paths:
                   version of the DID Document
                 type: object
                 properties:
-                  did_doc:
+                  did_document:
                     description: didDocument is the DID Document.
                     type: object
                     properties:
@@ -212,12 +210,13 @@ paths:
                       specification.
 
                       Documentation: https://www.w3.org/TR/did-core/
-                  metadata:
+                  did_document_metadata:
                     description: didDocumentMetadata is the DID Document metadata.
                     type: object
                     properties:
                       created:
                         type: string
+                        format: date-time
                         title: >-
                           created is the timestamp of the creation of the DID
                           Document.
@@ -227,6 +226,7 @@ paths:
                           Example: 2021-03-10T15:16:17Z
                       updated:
                         type: string
+                        format: date-time
                         title: >-
                           updated is the timestamp of the last update of the DID
                           Document.
@@ -322,9 +322,7 @@ paths:
         - Query
   /cheqd/did/v2/{id}/metadata:
     get:
-      summary: >-
-        AllDidDocVersionsMetadata fetches metadata for all versions of the DID
-        Document for a given DID unique identifier
+      summary: Fetch list of all versions of DID Documents for a given DID
       operationId: AllDidDocVersionsMetadata
       responses:
         '200':
@@ -339,6 +337,7 @@ paths:
                   properties:
                     created:
                       type: string
+                      format: date-time
                       title: >-
                         created is the timestamp of the creation of the DID
                         Document.
@@ -348,6 +347,7 @@ paths:
                         Example: 2021-03-10T15:16:17Z
                     updated:
                       type: string
+                      format: date-time
                       title: >-
                         updated is the timestamp of the last update of the DID
                         Document.
@@ -398,6 +398,25 @@ paths:
                 title: >-
                   versions is the list of all versions of the requested DID
                   Document
+              pagination:
+                description: pagination defines the pagination in the response.
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    description: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently. It will be empty if
+                      there are no more results.
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
             title: >-
               QueryAllDidDocVersionsMetadataResponse is the response type for
               the Query/AllDidDocVersionsMetadata method
@@ -437,13 +456,67 @@ paths:
           in: path
           required: true
           type: string
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   /cheqd/did/v2/{id}/version/{version}:
     get:
-      summary: >-
-        DidDocVersion fetches the specific version of the DID Document for a
-        given DID unique identifier
+      summary: Fetch specific version of a DID Document for a given DID
       operationId: DidDocVersion
       responses:
         '200':
@@ -451,7 +524,7 @@ paths:
           schema:
             type: object
             properties:
-              did_doc_with_metadata:
+              did_document_with_metadata:
                 title: >-
                   Successful resolution of the DID Document returns the
                   following:
@@ -462,7 +535,7 @@ paths:
                   requested version of the DID Document
                 type: object
                 properties:
-                  did_doc:
+                  did_document:
                     description: didDocument is the DID Document.
                     type: object
                     properties:
@@ -626,12 +699,13 @@ paths:
                       specification.
 
                       Documentation: https://www.w3.org/TR/did-core/
-                  metadata:
+                  did_document_metadata:
                     description: didDocumentMetadata is the DID Document metadata.
                     type: object
                     properties:
                       created:
                         type: string
+                        format: date-time
                         title: >-
                           created is the timestamp of the creation of the DID
                           Document.
@@ -641,6 +715,7 @@ paths:
                           Example: 2021-03-10T15:16:17Z
                       updated:
                         type: string
+                        format: date-time
                         title: >-
                           updated is the timestamp of the last update of the DID
                           Document.
