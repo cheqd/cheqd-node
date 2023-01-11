@@ -1,23 +1,29 @@
 swagger: '2.0'
 info:
   title: cheqd Network - REST and gRPC Gateway Documentation
-  description: Documentation describing REST and gRPC endpoints for cheqd network.
+  description: Documentation describing REST and gRPC Gateway endpoints for cheqd network.
   version: v1.x
-contact:
-  name: Cheqd Foundation Limited
-  url: https://cheqd.io
-license:
-  name: Apache 2.0
-  url: https://github.com/cheqd/cheqd-node/blob/main/LICENSE
-host: localhost:1317
+  contact:
+    name: Cheqd Foundation Limited
+    url: https://cheqd.io
+  license:
+    name: Apache 2.0
+    url: https://github.com/cheqd/cheqd-node/blob/main/LICENSE
 basePath: /swagger/
 schemes:
   - http
   - https
 consumes:
   - application/json
+  - application/json+ld
+  - '*/*'
 produces:
   - application/json
+  - application/json+ld
+  - '*/*'
+externalDocs:
+  description: cheqd Network Documentation
+  url: https://docs.cheqd.io/node
 paths:
   /cheqd/did/v2/{id}:
     get:
@@ -32,18 +38,30 @@ paths:
                 type: object
                 properties:
                   did_doc:
+                    description: didDocument is the DID Document.
                     type: object
                     properties:
                       context:
                         type: array
                         items:
                           type: string
+                        title: >-
+                          `context` is a list of URIs used to identify the
+                          context of the DID document.
+
+                          Default context: https://www.w3.org/ns/did/v1
                       id:
                         type: string
+                        title: |-
+                          id is the DID of the DID document.
+                          Format: did:cheqd:<namespace>:<unique-identifier>
                       controller:
                         type: array
                         items:
                           type: string
+                        description: >-
+                          controller is a list of DIDs that are allowed to
+                          control the DID document.
                       verification_method:
                         type: array
                         items:
@@ -51,32 +69,89 @@ paths:
                           properties:
                             id:
                               type: string
+                              title: >-
+                                id is the unique identifier of the verification
+                                method.
+
+                                Format:
+                                did:cheqd:<namespace>:<unique-identifier>#<key-id>
                             verification_method_type:
                               type: string
+                              title: |-
+                                type is the type of the verification method.
+                                Example: Ed25519VerificationKey2020
                             controller:
                               type: string
+                              title: >-
+                                controller is the DID of the controller of the
+                                verification method.
+
+                                Format:
+                                did:cheqd:<namespace>:<unique-identifier>
                             verification_material:
                               type: string
+                              title: >-
+                                verification_material is the public key of the
+                                verification method.
+
+                                Commonly used verification material types:
+                                publicJwk, publicKeyBase58, publicKeyMultibase
+                          title: >-
+                            `VerificationMethod` defines a verification method,
+                            as defined in the DID Core specification.
+
+                            Documentation:
+                            https://www.w3.org/TR/did-core/#verification-methods
+                        description: >-
+                          verificationMethod is a list of verification methods
+                          that can be used to
+
+                          verify a digital signature or cryptographic proof.
                       authentication:
                         type: array
                         items:
                           type: string
+                        description: >-
+                          authentication is a list of verification methods that
+                          can be used to
+
+                          authenticate as the DID subject.
                       assertion_method:
                         type: array
                         items:
                           type: string
+                        description: >-
+                          assertionMethod is a list of verification methods that
+                          can be used to
+
+                          assert statements as the DID subject.
                       capability_invocation:
                         type: array
                         items:
                           type: string
+                        description: >-
+                          capabilityInvocation is a list of verification methods
+                          that can be used to
+
+                          invoke capabilities as the DID subject.
                       capability_delegation:
                         type: array
                         items:
                           type: string
+                        description: >-
+                          capabilityDelegation is a list of verification methods
+                          that can be used to
+
+                          delegate capabilities as the DID subject.
                       key_agreement:
                         type: array
                         items:
                           type: string
+                        description: >-
+                          keyAgreement is a list of verification methods that
+                          can be used to perform
+
+                          key agreement as the DID subject.
                       service:
                         type: array
                         items:
@@ -84,31 +159,115 @@ paths:
                           properties:
                             id:
                               type: string
+                              title: >-
+                                id is the unique identifier of the service.
+
+                                Format:
+                                did:cheqd:<namespace>:<unique-identifier>#<service-id>
                             service_type:
                               type: string
+                              title: |-
+                                type is the type of the service.
+                                Example: LinkedResource
                             service_endpoint:
                               type: array
                               items:
                                 type: string
+                              title: |-
+                                serviceEndpoint is the endpoint of the service.
+                                Example: https://example.com/endpoint
+                          title: >-
+                            `Service` defines a service, as defined in the DID
+                            Core specification.
+
+                            Documentation:
+                            https://www.w3.org/TR/did-core/#services
+                        description: >-
+                          service is a list of services that can be used to
+                          interact with the DID
+
+                          subject.
                       also_known_as:
                         type: array
                         items:
                           type: string
+                        description: >-
+                          alsoKnownAs is a list of DIDs that are known to refer
+                          to the same DID
+
+                          subject.
+                    title: >-
+                      `DidDoc` defines a DID Document, as defined in the DID
+                      Core specification.
+
+                      Documentation: https://www.w3.org/TR/did-core/
                   metadata:
+                    description: didDocumentMetadata is the DID Document metadata.
                     type: object
                     properties:
                       created:
                         type: string
+                        title: >-
+                          created is the timestamp of the creation of the DID
+                          Document.
+
+                          Format: RFC3339
+
+                          Example: 2021-03-10T15:16:17Z
                       updated:
                         type: string
+                        title: >-
+                          updated is the timestamp of the last update of the DID
+                          Document.
+
+                          Format: RFC3339
+
+                          Example: 2021-03-10T15:16:17Z
                       deactivated:
                         type: boolean
+                        title: >-
+                          deactivated is a flag that indicates whether the DID
+                          Document is deactivated.
+
+                          Default: false
                       version_id:
                         type: string
+                        title: >-
+                          version_id is the version identifier of the DID
+                          Document.
+
+                          Format: UUID
+
+                          Example: 123e4567-e89b-12d3-a456-426655440000
                       next_version_id:
                         type: string
+                        title: >-
+                          next_version_id is the version identifier of the next
+                          version of the DID Document.
+
+                          Format: UUID
+
+                          Example: 123e4567-e89b-12d3-a456-426655440000
                       previous_version_id:
                         type: string
+                        title: >-
+                          previous_version_id is the version identifier of the
+                          previous version of the DID Document.
+
+                          Format: UUID
+
+                          Example: 123e4567-e89b-12d3-a456-426655440000
+                    title: >-
+                      `Metadata` defines DID Document metadata, as defined in
+                      the DID Core specification.
+
+                      Documentation:
+                      https://www.w3.org/TR/did-core/#did-document-metadata-properties
+                description: >-
+                  `DidDocWithMetadata` defines a DID Document with metadata, as
+                  defined in the DID Core specification.
+
+                  Contains the DID Document, as well as DID Document metadata.
         default:
           description: An unexpected error response.
           schema:
@@ -155,16 +314,62 @@ paths:
                   properties:
                     created:
                       type: string
+                      title: >-
+                        created is the timestamp of the creation of the DID
+                        Document.
+
+                        Format: RFC3339
+
+                        Example: 2021-03-10T15:16:17Z
                     updated:
                       type: string
+                      title: >-
+                        updated is the timestamp of the last update of the DID
+                        Document.
+
+                        Format: RFC3339
+
+                        Example: 2021-03-10T15:16:17Z
                     deactivated:
                       type: boolean
+                      title: >-
+                        deactivated is a flag that indicates whether the DID
+                        Document is deactivated.
+
+                        Default: false
                     version_id:
                       type: string
+                      title: >-
+                        version_id is the version identifier of the DID
+                        Document.
+
+                        Format: UUID
+
+                        Example: 123e4567-e89b-12d3-a456-426655440000
                     next_version_id:
                       type: string
+                      title: >-
+                        next_version_id is the version identifier of the next
+                        version of the DID Document.
+
+                        Format: UUID
+
+                        Example: 123e4567-e89b-12d3-a456-426655440000
                     previous_version_id:
                       type: string
+                      title: >-
+                        previous_version_id is the version identifier of the
+                        previous version of the DID Document.
+
+                        Format: UUID
+
+                        Example: 123e4567-e89b-12d3-a456-426655440000
+                  title: >-
+                    `Metadata` defines DID Document metadata, as defined in the
+                    DID Core specification.
+
+                    Documentation:
+                    https://www.w3.org/TR/did-core/#did-document-metadata-properties
         default:
           description: An unexpected error response.
           schema:
@@ -208,18 +413,30 @@ paths:
                 type: object
                 properties:
                   did_doc:
+                    description: didDocument is the DID Document.
                     type: object
                     properties:
                       context:
                         type: array
                         items:
                           type: string
+                        title: >-
+                          `context` is a list of URIs used to identify the
+                          context of the DID document.
+
+                          Default context: https://www.w3.org/ns/did/v1
                       id:
                         type: string
+                        title: |-
+                          id is the DID of the DID document.
+                          Format: did:cheqd:<namespace>:<unique-identifier>
                       controller:
                         type: array
                         items:
                           type: string
+                        description: >-
+                          controller is a list of DIDs that are allowed to
+                          control the DID document.
                       verification_method:
                         type: array
                         items:
@@ -227,32 +444,89 @@ paths:
                           properties:
                             id:
                               type: string
+                              title: >-
+                                id is the unique identifier of the verification
+                                method.
+
+                                Format:
+                                did:cheqd:<namespace>:<unique-identifier>#<key-id>
                             verification_method_type:
                               type: string
+                              title: |-
+                                type is the type of the verification method.
+                                Example: Ed25519VerificationKey2020
                             controller:
                               type: string
+                              title: >-
+                                controller is the DID of the controller of the
+                                verification method.
+
+                                Format:
+                                did:cheqd:<namespace>:<unique-identifier>
                             verification_material:
                               type: string
+                              title: >-
+                                verification_material is the public key of the
+                                verification method.
+
+                                Commonly used verification material types:
+                                publicJwk, publicKeyBase58, publicKeyMultibase
+                          title: >-
+                            `VerificationMethod` defines a verification method,
+                            as defined in the DID Core specification.
+
+                            Documentation:
+                            https://www.w3.org/TR/did-core/#verification-methods
+                        description: >-
+                          verificationMethod is a list of verification methods
+                          that can be used to
+
+                          verify a digital signature or cryptographic proof.
                       authentication:
                         type: array
                         items:
                           type: string
+                        description: >-
+                          authentication is a list of verification methods that
+                          can be used to
+
+                          authenticate as the DID subject.
                       assertion_method:
                         type: array
                         items:
                           type: string
+                        description: >-
+                          assertionMethod is a list of verification methods that
+                          can be used to
+
+                          assert statements as the DID subject.
                       capability_invocation:
                         type: array
                         items:
                           type: string
+                        description: >-
+                          capabilityInvocation is a list of verification methods
+                          that can be used to
+
+                          invoke capabilities as the DID subject.
                       capability_delegation:
                         type: array
                         items:
                           type: string
+                        description: >-
+                          capabilityDelegation is a list of verification methods
+                          that can be used to
+
+                          delegate capabilities as the DID subject.
                       key_agreement:
                         type: array
                         items:
                           type: string
+                        description: >-
+                          keyAgreement is a list of verification methods that
+                          can be used to perform
+
+                          key agreement as the DID subject.
                       service:
                         type: array
                         items:
@@ -260,31 +534,115 @@ paths:
                           properties:
                             id:
                               type: string
+                              title: >-
+                                id is the unique identifier of the service.
+
+                                Format:
+                                did:cheqd:<namespace>:<unique-identifier>#<service-id>
                             service_type:
                               type: string
+                              title: |-
+                                type is the type of the service.
+                                Example: LinkedResource
                             service_endpoint:
                               type: array
                               items:
                                 type: string
+                              title: |-
+                                serviceEndpoint is the endpoint of the service.
+                                Example: https://example.com/endpoint
+                          title: >-
+                            `Service` defines a service, as defined in the DID
+                            Core specification.
+
+                            Documentation:
+                            https://www.w3.org/TR/did-core/#services
+                        description: >-
+                          service is a list of services that can be used to
+                          interact with the DID
+
+                          subject.
                       also_known_as:
                         type: array
                         items:
                           type: string
+                        description: >-
+                          alsoKnownAs is a list of DIDs that are known to refer
+                          to the same DID
+
+                          subject.
+                    title: >-
+                      `DidDoc` defines a DID Document, as defined in the DID
+                      Core specification.
+
+                      Documentation: https://www.w3.org/TR/did-core/
                   metadata:
+                    description: didDocumentMetadata is the DID Document metadata.
                     type: object
                     properties:
                       created:
                         type: string
+                        title: >-
+                          created is the timestamp of the creation of the DID
+                          Document.
+
+                          Format: RFC3339
+
+                          Example: 2021-03-10T15:16:17Z
                       updated:
                         type: string
+                        title: >-
+                          updated is the timestamp of the last update of the DID
+                          Document.
+
+                          Format: RFC3339
+
+                          Example: 2021-03-10T15:16:17Z
                       deactivated:
                         type: boolean
+                        title: >-
+                          deactivated is a flag that indicates whether the DID
+                          Document is deactivated.
+
+                          Default: false
                       version_id:
                         type: string
+                        title: >-
+                          version_id is the version identifier of the DID
+                          Document.
+
+                          Format: UUID
+
+                          Example: 123e4567-e89b-12d3-a456-426655440000
                       next_version_id:
                         type: string
+                        title: >-
+                          next_version_id is the version identifier of the next
+                          version of the DID Document.
+
+                          Format: UUID
+
+                          Example: 123e4567-e89b-12d3-a456-426655440000
                       previous_version_id:
                         type: string
+                        title: >-
+                          previous_version_id is the version identifier of the
+                          previous version of the DID Document.
+
+                          Format: UUID
+
+                          Example: 123e4567-e89b-12d3-a456-426655440000
+                    title: >-
+                      `Metadata` defines DID Document metadata, as defined in
+                      the DID Core specification.
+
+                      Documentation:
+                      https://www.w3.org/TR/did-core/#did-document-metadata-properties
+                description: >-
+                  `DidDocWithMetadata` defines a DID Document with metadata, as
+                  defined in the DID Core specification.
+
+                  Contains the DID Document, as well as DID Document metadata.
         default:
           description: An unexpected error response.
           schema:
