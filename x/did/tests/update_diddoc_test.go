@@ -54,7 +54,7 @@ var _ = Describe("DIDDoc update", func() {
 			// check
 			created, err := setup.QueryDidDoc(bob.Did)
 			Expect(err).To(BeNil())
-			Expect(msg.ToDidDoc()).To(Equal(*created.Value.DidDoc))
+			Expect(msg.ToDidDoc()).To(Equal(*created.DidDocWithMetadata.DidDoc))
 		})
 
 		It("Creates a new DIDDoc version in case of success", func() {
@@ -66,28 +66,28 @@ var _ = Describe("DIDDoc update", func() {
 			// check latest version
 			created, err := setup.QueryDidDoc(bob.Did)
 			Expect(err).To(BeNil())
-			Expect(msg.ToDidDoc()).To(Equal(*created.Value.DidDoc))
+			Expect(msg.ToDidDoc()).To(Equal(*created.DidDocWithMetadata.DidDoc))
 
 			// query the first version
 			v1, err := setup.QueryDidDocVersion(bob.Did, bob.VersionID)
 			Expect(err).To(BeNil())
-			Expect(*v1.Value.DidDoc).To(Equal(bob.Msg.ToDidDoc()))
-			Expect(v1.Value.Metadata.VersionId).To(Equal(bob.VersionID))
-			Expect(v1.Value.Metadata.NextVersionId).To(Equal(msg.VersionId))
+			Expect(*v1.DidDocWithMetadata.DidDoc).To(Equal(bob.Msg.ToDidDoc()))
+			Expect(v1.DidDocWithMetadata.Metadata.VersionId).To(Equal(bob.VersionID))
+			Expect(v1.DidDocWithMetadata.Metadata.NextVersionId).To(Equal(msg.VersionId))
 
 			// query the second version
 			v2, err := setup.QueryDidDocVersion(bob.Did, msg.VersionId)
 			Expect(err).To(BeNil())
-			Expect(*v2.Value.DidDoc).To(Equal(msg.ToDidDoc()))
-			Expect(v2.Value.Metadata.VersionId).To(Equal(msg.VersionId))
-			Expect(v2.Value.Metadata.PreviousVersionId).To(Equal(bob.VersionID))
+			Expect(*v2.DidDocWithMetadata.DidDoc).To(Equal(msg.ToDidDoc()))
+			Expect(v2.DidDocWithMetadata.Metadata.VersionId).To(Equal(msg.VersionId))
+			Expect(v2.DidDocWithMetadata.Metadata.PreviousVersionId).To(Equal(bob.VersionID))
 
 			// query all versions
 			versions, err := setup.QueryAllDidDocVersionsMetadata(bob.Did)
 			Expect(err).To(BeNil())
 			Expect(versions.Versions).To(HaveLen(2))
-			Expect(versions.Versions).To(ContainElement(v1.Value.Metadata))
-			Expect(versions.Versions).To(ContainElement(v2.Value.Metadata))
+			Expect(versions.Versions).To(ContainElement(v1.DidDocWithMetadata.Metadata))
+			Expect(versions.Versions).To(ContainElement(v2.DidDocWithMetadata.Metadata))
 		})
 
 		It("Doesn't work without controller signatures", func() {
@@ -134,7 +134,7 @@ var _ = Describe("DIDDoc update", func() {
 			// check
 			updated, err := setup.QueryDidDoc(alice.Did)
 			Expect(err).To(BeNil())
-			Expect(*updated.Value.DidDoc).To(Equal(msg.ToDidDoc()))
+			Expect(*updated.DidDocWithMetadata.DidDoc).To(Equal(msg.ToDidDoc()))
 		})
 
 		It("Doesn't work with only new controller signature", func() {
@@ -192,7 +192,7 @@ var _ = Describe("DIDDoc update", func() {
 			// check
 			updated, err := setup.QueryDidDoc(alice.Did)
 			Expect(err).To(BeNil())
-			Expect(*updated.Value.DidDoc).To(Equal(msg.ToDidDoc()))
+			Expect(*updated.DidDocWithMetadata.DidDoc).To(Equal(msg.ToDidDoc()))
 		})
 
 		It("Doesn't work with only new controller signatures", func() {
@@ -292,7 +292,7 @@ var _ = Describe("DIDDoc update", func() {
 			// check
 			created, err := setup.QueryDidDoc(did.Did)
 			Expect(err).To(BeNil())
-			Expect(msg.ToDidDoc()).To(Equal(*created.Value.DidDoc))
+			Expect(msg.ToDidDoc()).To(Equal(*created.DidDocWithMetadata.DidDoc))
 		})
 
 		It("Doesn't work without new signature", func() {
@@ -346,7 +346,7 @@ var _ = Describe("DIDDoc update", func() {
 			// check
 			updated, err := setup.QueryDidDoc(alice.Did)
 			Expect(err).To(BeNil())
-			Expect(*updated.Value.DidDoc).To(Equal(msg.ToDidDoc()))
+			Expect(*updated.DidDocWithMetadata.DidDoc).To(Equal(msg.ToDidDoc()))
 		})
 
 		It("Doesn't work without old controller signature", func() {
@@ -422,7 +422,7 @@ var _ = Describe("DIDDoc update", func() {
 			// check
 			updated, err := setup.QueryDidDoc(alice.Did)
 			Expect(err).To(BeNil())
-			Expect(*updated.Value.DidDoc).To(Equal(msg.ToDidDoc()))
+			Expect(*updated.DidDocWithMetadata.DidDoc).To(Equal(msg.ToDidDoc()))
 		})
 	})
 

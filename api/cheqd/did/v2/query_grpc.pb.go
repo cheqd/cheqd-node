@@ -22,8 +22,11 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type QueryClient interface {
+	// DidDoc fetches the latest version of the DID Document for a given DID unique identifier
 	DidDoc(ctx context.Context, in *QueryDidDocRequest, opts ...grpc.CallOption) (*QueryDidDocResponse, error)
+	// DidDocVersion fetches the specific version of the DID Document for a given DID unique identifier
 	DidDocVersion(ctx context.Context, in *QueryDidDocVersionRequest, opts ...grpc.CallOption) (*QueryDidDocVersionResponse, error)
+	// AllDidDocVersionsMetadata fetches metadata for all versions of the DID Document for a given DID unique identifier
 	AllDidDocVersionsMetadata(ctx context.Context, in *QueryAllDidDocVersionsMetadataRequest, opts ...grpc.CallOption) (*QueryAllDidDocVersionsMetadataResponse, error)
 }
 
@@ -66,8 +69,11 @@ func (c *queryClient) AllDidDocVersionsMetadata(ctx context.Context, in *QueryAl
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility
 type QueryServer interface {
+	// DidDoc fetches the latest version of the DID Document for a given DID unique identifier
 	DidDoc(context.Context, *QueryDidDocRequest) (*QueryDidDocResponse, error)
+	// DidDocVersion fetches the specific version of the DID Document for a given DID unique identifier
 	DidDocVersion(context.Context, *QueryDidDocVersionRequest) (*QueryDidDocVersionResponse, error)
+	// AllDidDocVersionsMetadata fetches metadata for all versions of the DID Document for a given DID unique identifier
 	AllDidDocVersionsMetadata(context.Context, *QueryAllDidDocVersionsMetadataRequest) (*QueryAllDidDocVersionsMetadataResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }

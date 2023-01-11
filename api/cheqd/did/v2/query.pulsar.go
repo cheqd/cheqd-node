@@ -4,6 +4,7 @@ package didv2
 import (
 	fmt "fmt"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
+	_ "github.com/cosmos/gogoproto/gogoproto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoiface "google.golang.org/protobuf/runtime/protoiface"
@@ -14,22 +15,22 @@ import (
 )
 
 var (
-	md_QueryGetDidDocRequest    protoreflect.MessageDescriptor
-	fd_QueryGetDidDocRequest_id protoreflect.FieldDescriptor
+	md_QueryDidDocRequest    protoreflect.MessageDescriptor
+	fd_QueryDidDocRequest_id protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_cheqd_did_v2_query_proto_init()
-	md_QueryGetDidDocRequest = File_cheqd_did_v2_query_proto.Messages().ByName("QueryDidDocRequest")
-	fd_QueryGetDidDocRequest_id = md_QueryGetDidDocRequest.Fields().ByName("id")
+	md_QueryDidDocRequest = File_cheqd_did_v2_query_proto.Messages().ByName("QueryDidDocRequest")
+	fd_QueryDidDocRequest_id = md_QueryDidDocRequest.Fields().ByName("id")
 }
 
-var _ protoreflect.Message = (*fastReflection_QueryGetDidDocRequest)(nil)
+var _ protoreflect.Message = (*fastReflection_QueryDidDocRequest)(nil)
 
-type fastReflection_QueryGetDidDocRequest QueryDidDocRequest
+type fastReflection_QueryDidDocRequest QueryDidDocRequest
 
 func (x *QueryDidDocRequest) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_QueryGetDidDocRequest)(x)
+	return (*fastReflection_QueryDidDocRequest)(x)
 }
 
 func (x *QueryDidDocRequest) slowProtoReflect() protoreflect.Message {
@@ -44,42 +45,42 @@ func (x *QueryDidDocRequest) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_QueryGetDidDocRequest_messageType fastReflection_QueryGetDidDocRequest_messageType
-var _ protoreflect.MessageType = fastReflection_QueryGetDidDocRequest_messageType{}
+var _fastReflection_QueryDidDocRequest_messageType fastReflection_QueryDidDocRequest_messageType
+var _ protoreflect.MessageType = fastReflection_QueryDidDocRequest_messageType{}
 
-type fastReflection_QueryGetDidDocRequest_messageType struct{}
+type fastReflection_QueryDidDocRequest_messageType struct{}
 
-func (x fastReflection_QueryGetDidDocRequest_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_QueryGetDidDocRequest)(nil)
+func (x fastReflection_QueryDidDocRequest_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_QueryDidDocRequest)(nil)
 }
-func (x fastReflection_QueryGetDidDocRequest_messageType) New() protoreflect.Message {
-	return new(fastReflection_QueryGetDidDocRequest)
+func (x fastReflection_QueryDidDocRequest_messageType) New() protoreflect.Message {
+	return new(fastReflection_QueryDidDocRequest)
 }
-func (x fastReflection_QueryGetDidDocRequest_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_QueryGetDidDocRequest
+func (x fastReflection_QueryDidDocRequest_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_QueryDidDocRequest
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_QueryGetDidDocRequest) Descriptor() protoreflect.MessageDescriptor {
-	return md_QueryGetDidDocRequest
+func (x *fastReflection_QueryDidDocRequest) Descriptor() protoreflect.MessageDescriptor {
+	return md_QueryDidDocRequest
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_QueryGetDidDocRequest) Type() protoreflect.MessageType {
-	return _fastReflection_QueryGetDidDocRequest_messageType
+func (x *fastReflection_QueryDidDocRequest) Type() protoreflect.MessageType {
+	return _fastReflection_QueryDidDocRequest_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_QueryGetDidDocRequest) New() protoreflect.Message {
-	return new(fastReflection_QueryGetDidDocRequest)
+func (x *fastReflection_QueryDidDocRequest) New() protoreflect.Message {
+	return new(fastReflection_QueryDidDocRequest)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_QueryGetDidDocRequest) Interface() protoreflect.ProtoMessage {
+func (x *fastReflection_QueryDidDocRequest) Interface() protoreflect.ProtoMessage {
 	return (*QueryDidDocRequest)(x)
 }
 
@@ -88,10 +89,10 @@ func (x *fastReflection_QueryGetDidDocRequest) Interface() protoreflect.ProtoMes
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_QueryGetDidDocRequest) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_QueryDidDocRequest) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 	if x.Id != "" {
 		value := protoreflect.ValueOfString(x.Id)
-		if !f(fd_QueryGetDidDocRequest_id, value) {
+		if !f(fd_QueryDidDocRequest_id, value) {
 			return
 		}
 	}
@@ -108,7 +109,7 @@ func (x *fastReflection_QueryGetDidDocRequest) Range(f func(protoreflect.FieldDe
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_QueryGetDidDocRequest) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_QueryDidDocRequest) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
 	case "cheqd.did.v2.QueryDidDocRequest.id":
 		return x.Id != ""
@@ -126,7 +127,7 @@ func (x *fastReflection_QueryGetDidDocRequest) Has(fd protoreflect.FieldDescript
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_QueryGetDidDocRequest) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_QueryDidDocRequest) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
 	case "cheqd.did.v2.QueryDidDocRequest.id":
 		x.Id = ""
@@ -144,7 +145,7 @@ func (x *fastReflection_QueryGetDidDocRequest) Clear(fd protoreflect.FieldDescri
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_QueryGetDidDocRequest) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_QueryDidDocRequest) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
 	case "cheqd.did.v2.QueryDidDocRequest.id":
 		value := x.Id
@@ -167,7 +168,7 @@ func (x *fastReflection_QueryGetDidDocRequest) Get(descriptor protoreflect.Field
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_QueryGetDidDocRequest) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_QueryDidDocRequest) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
 	case "cheqd.did.v2.QueryDidDocRequest.id":
 		x.Id = value.Interface().(string)
@@ -189,7 +190,7 @@ func (x *fastReflection_QueryGetDidDocRequest) Set(fd protoreflect.FieldDescript
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_QueryGetDidDocRequest) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_QueryDidDocRequest) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	case "cheqd.did.v2.QueryDidDocRequest.id":
 		panic(fmt.Errorf("field id of message cheqd.did.v2.QueryDidDocRequest is not mutable"))
@@ -204,7 +205,7 @@ func (x *fastReflection_QueryGetDidDocRequest) Mutable(fd protoreflect.FieldDesc
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_QueryGetDidDocRequest) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_QueryDidDocRequest) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	case "cheqd.did.v2.QueryDidDocRequest.id":
 		return protoreflect.ValueOfString("")
@@ -219,7 +220,7 @@ func (x *fastReflection_QueryGetDidDocRequest) NewField(fd protoreflect.FieldDes
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_QueryGetDidDocRequest) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_QueryDidDocRequest) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in cheqd.did.v2.QueryDidDocRequest", d.FullName()))
@@ -230,7 +231,7 @@ func (x *fastReflection_QueryGetDidDocRequest) WhichOneof(d protoreflect.OneofDe
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_QueryGetDidDocRequest) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_QueryDidDocRequest) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -241,7 +242,7 @@ func (x *fastReflection_QueryGetDidDocRequest) GetUnknown() protoreflect.RawFiel
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_QueryGetDidDocRequest) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_QueryDidDocRequest) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -253,7 +254,7 @@ func (x *fastReflection_QueryGetDidDocRequest) SetUnknown(fields protoreflect.Ra
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_QueryGetDidDocRequest) IsValid() bool {
+func (x *fastReflection_QueryDidDocRequest) IsValid() bool {
 	return x != nil
 }
 
@@ -263,7 +264,7 @@ func (x *fastReflection_QueryGetDidDocRequest) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_QueryGetDidDocRequest) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_QueryDidDocRequest) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
 		x := input.Message.Interface().(*QueryDidDocRequest)
 		if x == nil {
@@ -434,14 +435,14 @@ func (x *fastReflection_QueryGetDidDocRequest) ProtoMethods() *protoiface.Method
 }
 
 var (
-	md_QueryDidDocResponse       protoreflect.MessageDescriptor
-	fd_QueryDidDocResponse_value protoreflect.FieldDescriptor
+	md_QueryDidDocResponse                       protoreflect.MessageDescriptor
+	fd_QueryDidDocResponse_did_doc_with_metadata protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_cheqd_did_v2_query_proto_init()
 	md_QueryDidDocResponse = File_cheqd_did_v2_query_proto.Messages().ByName("QueryDidDocResponse")
-	fd_QueryDidDocResponse_value = md_QueryDidDocResponse.Fields().ByName("value")
+	fd_QueryDidDocResponse_did_doc_with_metadata = md_QueryDidDocResponse.Fields().ByName("did_doc_with_metadata")
 }
 
 var _ protoreflect.Message = (*fastReflection_QueryDidDocResponse)(nil)
@@ -509,9 +510,9 @@ func (x *fastReflection_QueryDidDocResponse) Interface() protoreflect.ProtoMessa
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
 func (x *fastReflection_QueryDidDocResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
-	if x.Value != nil {
-		value := protoreflect.ValueOfMessage(x.Value.ProtoReflect())
-		if !f(fd_QueryDidDocResponse_value, value) {
+	if x.DidDocWithMetadata != nil {
+		value := protoreflect.ValueOfMessage(x.DidDocWithMetadata.ProtoReflect())
+		if !f(fd_QueryDidDocResponse_did_doc_with_metadata, value) {
 			return
 		}
 	}
@@ -530,8 +531,8 @@ func (x *fastReflection_QueryDidDocResponse) Range(f func(protoreflect.FieldDesc
 // a repeated field is populated if it is non-empty.
 func (x *fastReflection_QueryDidDocResponse) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "cheqd.did.v2.QueryDidDocResponse.value":
-		return x.Value != nil
+	case "cheqd.did.v2.QueryDidDocResponse.did_doc_with_metadata":
+		return x.DidDocWithMetadata != nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.QueryDidDocResponse"))
@@ -548,8 +549,8 @@ func (x *fastReflection_QueryDidDocResponse) Has(fd protoreflect.FieldDescriptor
 // Clear is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryDidDocResponse) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "cheqd.did.v2.QueryDidDocResponse.value":
-		x.Value = nil
+	case "cheqd.did.v2.QueryDidDocResponse.did_doc_with_metadata":
+		x.DidDocWithMetadata = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.QueryDidDocResponse"))
@@ -566,8 +567,8 @@ func (x *fastReflection_QueryDidDocResponse) Clear(fd protoreflect.FieldDescript
 // of the value; to obtain a mutable reference, use Mutable.
 func (x *fastReflection_QueryDidDocResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "cheqd.did.v2.QueryDidDocResponse.value":
-		value := x.Value
+	case "cheqd.did.v2.QueryDidDocResponse.did_doc_with_metadata":
+		value := x.DidDocWithMetadata
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	default:
 		if descriptor.IsExtension() {
@@ -589,8 +590,8 @@ func (x *fastReflection_QueryDidDocResponse) Get(descriptor protoreflect.FieldDe
 // Set is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryDidDocResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "cheqd.did.v2.QueryDidDocResponse.value":
-		x.Value = value.Message().Interface().(*DidDocWithMetadata)
+	case "cheqd.did.v2.QueryDidDocResponse.did_doc_with_metadata":
+		x.DidDocWithMetadata = value.Message().Interface().(*DidDocWithMetadata)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.QueryDidDocResponse"))
@@ -611,11 +612,11 @@ func (x *fastReflection_QueryDidDocResponse) Set(fd protoreflect.FieldDescriptor
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryDidDocResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "cheqd.did.v2.QueryDidDocResponse.value":
-		if x.Value == nil {
-			x.Value = new(DidDocWithMetadata)
+	case "cheqd.did.v2.QueryDidDocResponse.did_doc_with_metadata":
+		if x.DidDocWithMetadata == nil {
+			x.DidDocWithMetadata = new(DidDocWithMetadata)
 		}
-		return protoreflect.ValueOfMessage(x.Value.ProtoReflect())
+		return protoreflect.ValueOfMessage(x.DidDocWithMetadata.ProtoReflect())
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.QueryDidDocResponse"))
@@ -629,7 +630,7 @@ func (x *fastReflection_QueryDidDocResponse) Mutable(fd protoreflect.FieldDescri
 // For lists, maps, and messages, this returns a new, empty, mutable value.
 func (x *fastReflection_QueryDidDocResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "cheqd.did.v2.QueryDidDocResponse.value":
+	case "cheqd.did.v2.QueryDidDocResponse.did_doc_with_metadata":
 		m := new(DidDocWithMetadata)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
@@ -701,8 +702,8 @@ func (x *fastReflection_QueryDidDocResponse) ProtoMethods() *protoiface.Methods 
 		var n int
 		var l int
 		_ = l
-		if x.Value != nil {
-			l = options.Size(x.Value)
+		if x.DidDocWithMetadata != nil {
+			l = options.Size(x.DidDocWithMetadata)
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
 		if x.unknownFields != nil {
@@ -734,8 +735,8 @@ func (x *fastReflection_QueryDidDocResponse) ProtoMethods() *protoiface.Methods 
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if x.Value != nil {
-			encoded, err := options.Marshal(x.Value)
+		if x.DidDocWithMetadata != nil {
+			encoded, err := options.Marshal(x.DidDocWithMetadata)
 			if err != nil {
 				return protoiface.MarshalOutput{
 					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -799,7 +800,7 @@ func (x *fastReflection_QueryDidDocResponse) ProtoMethods() *protoiface.Methods 
 			switch fieldNum {
 			case 1:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field DidDocWithMetadata", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -826,10 +827,10 @@ func (x *fastReflection_QueryDidDocResponse) ProtoMethods() *protoiface.Methods 
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				if x.Value == nil {
-					x.Value = &DidDocWithMetadata{}
+				if x.DidDocWithMetadata == nil {
+					x.DidDocWithMetadata = &DidDocWithMetadata{}
 				}
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Value); err != nil {
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.DidDocWithMetadata); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -869,24 +870,24 @@ func (x *fastReflection_QueryDidDocResponse) ProtoMethods() *protoiface.Methods 
 }
 
 var (
-	md_QueryGetDidDocVersionRequest         protoreflect.MessageDescriptor
-	fd_QueryGetDidDocVersionRequest_id      protoreflect.FieldDescriptor
-	fd_QueryGetDidDocVersionRequest_version protoreflect.FieldDescriptor
+	md_QueryDidDocVersionRequest         protoreflect.MessageDescriptor
+	fd_QueryDidDocVersionRequest_id      protoreflect.FieldDescriptor
+	fd_QueryDidDocVersionRequest_version protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_cheqd_did_v2_query_proto_init()
-	md_QueryGetDidDocVersionRequest = File_cheqd_did_v2_query_proto.Messages().ByName("QueryDidDocVersionRequest")
-	fd_QueryGetDidDocVersionRequest_id = md_QueryGetDidDocVersionRequest.Fields().ByName("id")
-	fd_QueryGetDidDocVersionRequest_version = md_QueryGetDidDocVersionRequest.Fields().ByName("version")
+	md_QueryDidDocVersionRequest = File_cheqd_did_v2_query_proto.Messages().ByName("QueryDidDocVersionRequest")
+	fd_QueryDidDocVersionRequest_id = md_QueryDidDocVersionRequest.Fields().ByName("id")
+	fd_QueryDidDocVersionRequest_version = md_QueryDidDocVersionRequest.Fields().ByName("version")
 }
 
-var _ protoreflect.Message = (*fastReflection_QueryGetDidDocVersionRequest)(nil)
+var _ protoreflect.Message = (*fastReflection_QueryDidDocVersionRequest)(nil)
 
-type fastReflection_QueryGetDidDocVersionRequest QueryDidDocVersionRequest
+type fastReflection_QueryDidDocVersionRequest QueryDidDocVersionRequest
 
 func (x *QueryDidDocVersionRequest) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_QueryGetDidDocVersionRequest)(x)
+	return (*fastReflection_QueryDidDocVersionRequest)(x)
 }
 
 func (x *QueryDidDocVersionRequest) slowProtoReflect() protoreflect.Message {
@@ -901,42 +902,42 @@ func (x *QueryDidDocVersionRequest) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_QueryGetDidDocVersionRequest_messageType fastReflection_QueryGetDidDocVersionRequest_messageType
-var _ protoreflect.MessageType = fastReflection_QueryGetDidDocVersionRequest_messageType{}
+var _fastReflection_QueryDidDocVersionRequest_messageType fastReflection_QueryDidDocVersionRequest_messageType
+var _ protoreflect.MessageType = fastReflection_QueryDidDocVersionRequest_messageType{}
 
-type fastReflection_QueryGetDidDocVersionRequest_messageType struct{}
+type fastReflection_QueryDidDocVersionRequest_messageType struct{}
 
-func (x fastReflection_QueryGetDidDocVersionRequest_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_QueryGetDidDocVersionRequest)(nil)
+func (x fastReflection_QueryDidDocVersionRequest_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_QueryDidDocVersionRequest)(nil)
 }
-func (x fastReflection_QueryGetDidDocVersionRequest_messageType) New() protoreflect.Message {
-	return new(fastReflection_QueryGetDidDocVersionRequest)
+func (x fastReflection_QueryDidDocVersionRequest_messageType) New() protoreflect.Message {
+	return new(fastReflection_QueryDidDocVersionRequest)
 }
-func (x fastReflection_QueryGetDidDocVersionRequest_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_QueryGetDidDocVersionRequest
+func (x fastReflection_QueryDidDocVersionRequest_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_QueryDidDocVersionRequest
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_QueryGetDidDocVersionRequest) Descriptor() protoreflect.MessageDescriptor {
-	return md_QueryGetDidDocVersionRequest
+func (x *fastReflection_QueryDidDocVersionRequest) Descriptor() protoreflect.MessageDescriptor {
+	return md_QueryDidDocVersionRequest
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_QueryGetDidDocVersionRequest) Type() protoreflect.MessageType {
-	return _fastReflection_QueryGetDidDocVersionRequest_messageType
+func (x *fastReflection_QueryDidDocVersionRequest) Type() protoreflect.MessageType {
+	return _fastReflection_QueryDidDocVersionRequest_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_QueryGetDidDocVersionRequest) New() protoreflect.Message {
-	return new(fastReflection_QueryGetDidDocVersionRequest)
+func (x *fastReflection_QueryDidDocVersionRequest) New() protoreflect.Message {
+	return new(fastReflection_QueryDidDocVersionRequest)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_QueryGetDidDocVersionRequest) Interface() protoreflect.ProtoMessage {
+func (x *fastReflection_QueryDidDocVersionRequest) Interface() protoreflect.ProtoMessage {
 	return (*QueryDidDocVersionRequest)(x)
 }
 
@@ -945,16 +946,16 @@ func (x *fastReflection_QueryGetDidDocVersionRequest) Interface() protoreflect.P
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_QueryGetDidDocVersionRequest) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_QueryDidDocVersionRequest) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 	if x.Id != "" {
 		value := protoreflect.ValueOfString(x.Id)
-		if !f(fd_QueryGetDidDocVersionRequest_id, value) {
+		if !f(fd_QueryDidDocVersionRequest_id, value) {
 			return
 		}
 	}
 	if x.Version != "" {
 		value := protoreflect.ValueOfString(x.Version)
-		if !f(fd_QueryGetDidDocVersionRequest_version, value) {
+		if !f(fd_QueryDidDocVersionRequest_version, value) {
 			return
 		}
 	}
@@ -971,7 +972,7 @@ func (x *fastReflection_QueryGetDidDocVersionRequest) Range(f func(protoreflect.
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_QueryGetDidDocVersionRequest) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_QueryDidDocVersionRequest) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
 	case "cheqd.did.v2.QueryDidDocVersionRequest.id":
 		return x.Id != ""
@@ -991,7 +992,7 @@ func (x *fastReflection_QueryGetDidDocVersionRequest) Has(fd protoreflect.FieldD
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_QueryGetDidDocVersionRequest) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_QueryDidDocVersionRequest) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
 	case "cheqd.did.v2.QueryDidDocVersionRequest.id":
 		x.Id = ""
@@ -1011,7 +1012,7 @@ func (x *fastReflection_QueryGetDidDocVersionRequest) Clear(fd protoreflect.Fiel
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_QueryGetDidDocVersionRequest) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_QueryDidDocVersionRequest) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
 	case "cheqd.did.v2.QueryDidDocVersionRequest.id":
 		value := x.Id
@@ -1037,7 +1038,7 @@ func (x *fastReflection_QueryGetDidDocVersionRequest) Get(descriptor protoreflec
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_QueryGetDidDocVersionRequest) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_QueryDidDocVersionRequest) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
 	case "cheqd.did.v2.QueryDidDocVersionRequest.id":
 		x.Id = value.Interface().(string)
@@ -1061,7 +1062,7 @@ func (x *fastReflection_QueryGetDidDocVersionRequest) Set(fd protoreflect.FieldD
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_QueryGetDidDocVersionRequest) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_QueryDidDocVersionRequest) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	case "cheqd.did.v2.QueryDidDocVersionRequest.id":
 		panic(fmt.Errorf("field id of message cheqd.did.v2.QueryDidDocVersionRequest is not mutable"))
@@ -1078,7 +1079,7 @@ func (x *fastReflection_QueryGetDidDocVersionRequest) Mutable(fd protoreflect.Fi
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_QueryGetDidDocVersionRequest) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_QueryDidDocVersionRequest) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	case "cheqd.did.v2.QueryDidDocVersionRequest.id":
 		return protoreflect.ValueOfString("")
@@ -1095,7 +1096,7 @@ func (x *fastReflection_QueryGetDidDocVersionRequest) NewField(fd protoreflect.F
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_QueryGetDidDocVersionRequest) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_QueryDidDocVersionRequest) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in cheqd.did.v2.QueryDidDocVersionRequest", d.FullName()))
@@ -1106,7 +1107,7 @@ func (x *fastReflection_QueryGetDidDocVersionRequest) WhichOneof(d protoreflect.
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_QueryGetDidDocVersionRequest) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_QueryDidDocVersionRequest) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -1117,7 +1118,7 @@ func (x *fastReflection_QueryGetDidDocVersionRequest) GetUnknown() protoreflect.
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_QueryGetDidDocVersionRequest) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_QueryDidDocVersionRequest) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -1129,7 +1130,7 @@ func (x *fastReflection_QueryGetDidDocVersionRequest) SetUnknown(fields protoref
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_QueryGetDidDocVersionRequest) IsValid() bool {
+func (x *fastReflection_QueryDidDocVersionRequest) IsValid() bool {
 	return x != nil
 }
 
@@ -1139,7 +1140,7 @@ func (x *fastReflection_QueryGetDidDocVersionRequest) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_QueryGetDidDocVersionRequest) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_QueryDidDocVersionRequest) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
 		x := input.Message.Interface().(*QueryDidDocVersionRequest)
 		if x == nil {
@@ -1353,14 +1354,14 @@ func (x *fastReflection_QueryGetDidDocVersionRequest) ProtoMethods() *protoiface
 }
 
 var (
-	md_QueryDidDocVersionResponse       protoreflect.MessageDescriptor
-	fd_QueryDidDocVersionResponse_value protoreflect.FieldDescriptor
+	md_QueryDidDocVersionResponse                       protoreflect.MessageDescriptor
+	fd_QueryDidDocVersionResponse_did_doc_with_metadata protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_cheqd_did_v2_query_proto_init()
 	md_QueryDidDocVersionResponse = File_cheqd_did_v2_query_proto.Messages().ByName("QueryDidDocVersionResponse")
-	fd_QueryDidDocVersionResponse_value = md_QueryDidDocVersionResponse.Fields().ByName("value")
+	fd_QueryDidDocVersionResponse_did_doc_with_metadata = md_QueryDidDocVersionResponse.Fields().ByName("did_doc_with_metadata")
 }
 
 var _ protoreflect.Message = (*fastReflection_QueryDidDocVersionResponse)(nil)
@@ -1428,9 +1429,9 @@ func (x *fastReflection_QueryDidDocVersionResponse) Interface() protoreflect.Pro
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
 func (x *fastReflection_QueryDidDocVersionResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
-	if x.Value != nil {
-		value := protoreflect.ValueOfMessage(x.Value.ProtoReflect())
-		if !f(fd_QueryDidDocVersionResponse_value, value) {
+	if x.DidDocWithMetadata != nil {
+		value := protoreflect.ValueOfMessage(x.DidDocWithMetadata.ProtoReflect())
+		if !f(fd_QueryDidDocVersionResponse_did_doc_with_metadata, value) {
 			return
 		}
 	}
@@ -1449,8 +1450,8 @@ func (x *fastReflection_QueryDidDocVersionResponse) Range(f func(protoreflect.Fi
 // a repeated field is populated if it is non-empty.
 func (x *fastReflection_QueryDidDocVersionResponse) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "cheqd.did.v2.QueryDidDocVersionResponse.value":
-		return x.Value != nil
+	case "cheqd.did.v2.QueryDidDocVersionResponse.did_doc_with_metadata":
+		return x.DidDocWithMetadata != nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.QueryDidDocVersionResponse"))
@@ -1467,8 +1468,8 @@ func (x *fastReflection_QueryDidDocVersionResponse) Has(fd protoreflect.FieldDes
 // Clear is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryDidDocVersionResponse) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "cheqd.did.v2.QueryDidDocVersionResponse.value":
-		x.Value = nil
+	case "cheqd.did.v2.QueryDidDocVersionResponse.did_doc_with_metadata":
+		x.DidDocWithMetadata = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.QueryDidDocVersionResponse"))
@@ -1485,8 +1486,8 @@ func (x *fastReflection_QueryDidDocVersionResponse) Clear(fd protoreflect.FieldD
 // of the value; to obtain a mutable reference, use Mutable.
 func (x *fastReflection_QueryDidDocVersionResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "cheqd.did.v2.QueryDidDocVersionResponse.value":
-		value := x.Value
+	case "cheqd.did.v2.QueryDidDocVersionResponse.did_doc_with_metadata":
+		value := x.DidDocWithMetadata
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	default:
 		if descriptor.IsExtension() {
@@ -1508,8 +1509,8 @@ func (x *fastReflection_QueryDidDocVersionResponse) Get(descriptor protoreflect.
 // Set is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryDidDocVersionResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "cheqd.did.v2.QueryDidDocVersionResponse.value":
-		x.Value = value.Message().Interface().(*DidDocWithMetadata)
+	case "cheqd.did.v2.QueryDidDocVersionResponse.did_doc_with_metadata":
+		x.DidDocWithMetadata = value.Message().Interface().(*DidDocWithMetadata)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.QueryDidDocVersionResponse"))
@@ -1530,11 +1531,11 @@ func (x *fastReflection_QueryDidDocVersionResponse) Set(fd protoreflect.FieldDes
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryDidDocVersionResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "cheqd.did.v2.QueryDidDocVersionResponse.value":
-		if x.Value == nil {
-			x.Value = new(DidDocWithMetadata)
+	case "cheqd.did.v2.QueryDidDocVersionResponse.did_doc_with_metadata":
+		if x.DidDocWithMetadata == nil {
+			x.DidDocWithMetadata = new(DidDocWithMetadata)
 		}
-		return protoreflect.ValueOfMessage(x.Value.ProtoReflect())
+		return protoreflect.ValueOfMessage(x.DidDocWithMetadata.ProtoReflect())
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.QueryDidDocVersionResponse"))
@@ -1548,7 +1549,7 @@ func (x *fastReflection_QueryDidDocVersionResponse) Mutable(fd protoreflect.Fiel
 // For lists, maps, and messages, this returns a new, empty, mutable value.
 func (x *fastReflection_QueryDidDocVersionResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "cheqd.did.v2.QueryDidDocVersionResponse.value":
+	case "cheqd.did.v2.QueryDidDocVersionResponse.did_doc_with_metadata":
 		m := new(DidDocWithMetadata)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
@@ -1620,8 +1621,8 @@ func (x *fastReflection_QueryDidDocVersionResponse) ProtoMethods() *protoiface.M
 		var n int
 		var l int
 		_ = l
-		if x.Value != nil {
-			l = options.Size(x.Value)
+		if x.DidDocWithMetadata != nil {
+			l = options.Size(x.DidDocWithMetadata)
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
 		if x.unknownFields != nil {
@@ -1653,8 +1654,8 @@ func (x *fastReflection_QueryDidDocVersionResponse) ProtoMethods() *protoiface.M
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if x.Value != nil {
-			encoded, err := options.Marshal(x.Value)
+		if x.DidDocWithMetadata != nil {
+			encoded, err := options.Marshal(x.DidDocWithMetadata)
 			if err != nil {
 				return protoiface.MarshalOutput{
 					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1718,7 +1719,7 @@ func (x *fastReflection_QueryDidDocVersionResponse) ProtoMethods() *protoiface.M
 			switch fieldNum {
 			case 1:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field DidDocWithMetadata", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -1745,10 +1746,10 @@ func (x *fastReflection_QueryDidDocVersionResponse) ProtoMethods() *protoiface.M
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				if x.Value == nil {
-					x.Value = &DidDocWithMetadata{}
+				if x.DidDocWithMetadata == nil {
+					x.DidDocWithMetadata = &DidDocWithMetadata{}
 				}
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Value); err != nil {
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.DidDocWithMetadata); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -1788,22 +1789,22 @@ func (x *fastReflection_QueryDidDocVersionResponse) ProtoMethods() *protoiface.M
 }
 
 var (
-	md_QueryGetAllDidDocVersionsMetadataRequest    protoreflect.MessageDescriptor
-	fd_QueryGetAllDidDocVersionsMetadataRequest_id protoreflect.FieldDescriptor
+	md_QueryAllDidDocVersionsMetadataRequest    protoreflect.MessageDescriptor
+	fd_QueryAllDidDocVersionsMetadataRequest_id protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_cheqd_did_v2_query_proto_init()
-	md_QueryGetAllDidDocVersionsMetadataRequest = File_cheqd_did_v2_query_proto.Messages().ByName("QueryAllDidDocVersionsMetadataRequest")
-	fd_QueryGetAllDidDocVersionsMetadataRequest_id = md_QueryGetAllDidDocVersionsMetadataRequest.Fields().ByName("id")
+	md_QueryAllDidDocVersionsMetadataRequest = File_cheqd_did_v2_query_proto.Messages().ByName("QueryAllDidDocVersionsMetadataRequest")
+	fd_QueryAllDidDocVersionsMetadataRequest_id = md_QueryAllDidDocVersionsMetadataRequest.Fields().ByName("id")
 }
 
-var _ protoreflect.Message = (*fastReflection_QueryGetAllDidDocVersionsMetadataRequest)(nil)
+var _ protoreflect.Message = (*fastReflection_QueryAllDidDocVersionsMetadataRequest)(nil)
 
-type fastReflection_QueryGetAllDidDocVersionsMetadataRequest QueryAllDidDocVersionsMetadataRequest
+type fastReflection_QueryAllDidDocVersionsMetadataRequest QueryAllDidDocVersionsMetadataRequest
 
 func (x *QueryAllDidDocVersionsMetadataRequest) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_QueryGetAllDidDocVersionsMetadataRequest)(x)
+	return (*fastReflection_QueryAllDidDocVersionsMetadataRequest)(x)
 }
 
 func (x *QueryAllDidDocVersionsMetadataRequest) slowProtoReflect() protoreflect.Message {
@@ -1818,42 +1819,42 @@ func (x *QueryAllDidDocVersionsMetadataRequest) slowProtoReflect() protoreflect.
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_QueryGetAllDidDocVersionsMetadataRequest_messageType fastReflection_QueryGetAllDidDocVersionsMetadataRequest_messageType
-var _ protoreflect.MessageType = fastReflection_QueryGetAllDidDocVersionsMetadataRequest_messageType{}
+var _fastReflection_QueryAllDidDocVersionsMetadataRequest_messageType fastReflection_QueryAllDidDocVersionsMetadataRequest_messageType
+var _ protoreflect.MessageType = fastReflection_QueryAllDidDocVersionsMetadataRequest_messageType{}
 
-type fastReflection_QueryGetAllDidDocVersionsMetadataRequest_messageType struct{}
+type fastReflection_QueryAllDidDocVersionsMetadataRequest_messageType struct{}
 
-func (x fastReflection_QueryGetAllDidDocVersionsMetadataRequest_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_QueryGetAllDidDocVersionsMetadataRequest)(nil)
+func (x fastReflection_QueryAllDidDocVersionsMetadataRequest_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_QueryAllDidDocVersionsMetadataRequest)(nil)
 }
-func (x fastReflection_QueryGetAllDidDocVersionsMetadataRequest_messageType) New() protoreflect.Message {
-	return new(fastReflection_QueryGetAllDidDocVersionsMetadataRequest)
+func (x fastReflection_QueryAllDidDocVersionsMetadataRequest_messageType) New() protoreflect.Message {
+	return new(fastReflection_QueryAllDidDocVersionsMetadataRequest)
 }
-func (x fastReflection_QueryGetAllDidDocVersionsMetadataRequest_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_QueryGetAllDidDocVersionsMetadataRequest
+func (x fastReflection_QueryAllDidDocVersionsMetadataRequest_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_QueryAllDidDocVersionsMetadataRequest
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) Descriptor() protoreflect.MessageDescriptor {
-	return md_QueryGetAllDidDocVersionsMetadataRequest
+func (x *fastReflection_QueryAllDidDocVersionsMetadataRequest) Descriptor() protoreflect.MessageDescriptor {
+	return md_QueryAllDidDocVersionsMetadataRequest
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) Type() protoreflect.MessageType {
-	return _fastReflection_QueryGetAllDidDocVersionsMetadataRequest_messageType
+func (x *fastReflection_QueryAllDidDocVersionsMetadataRequest) Type() protoreflect.MessageType {
+	return _fastReflection_QueryAllDidDocVersionsMetadataRequest_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) New() protoreflect.Message {
-	return new(fastReflection_QueryGetAllDidDocVersionsMetadataRequest)
+func (x *fastReflection_QueryAllDidDocVersionsMetadataRequest) New() protoreflect.Message {
+	return new(fastReflection_QueryAllDidDocVersionsMetadataRequest)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) Interface() protoreflect.ProtoMessage {
+func (x *fastReflection_QueryAllDidDocVersionsMetadataRequest) Interface() protoreflect.ProtoMessage {
 	return (*QueryAllDidDocVersionsMetadataRequest)(x)
 }
 
@@ -1862,10 +1863,10 @@ func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) Interface() pr
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_QueryAllDidDocVersionsMetadataRequest) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 	if x.Id != "" {
 		value := protoreflect.ValueOfString(x.Id)
-		if !f(fd_QueryGetAllDidDocVersionsMetadataRequest_id, value) {
+		if !f(fd_QueryAllDidDocVersionsMetadataRequest_id, value) {
 			return
 		}
 	}
@@ -1882,7 +1883,7 @@ func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) Range(f func(p
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_QueryAllDidDocVersionsMetadataRequest) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
 	case "cheqd.did.v2.QueryAllDidDocVersionsMetadataRequest.id":
 		return x.Id != ""
@@ -1900,7 +1901,7 @@ func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) Has(fd protore
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_QueryAllDidDocVersionsMetadataRequest) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
 	case "cheqd.did.v2.QueryAllDidDocVersionsMetadataRequest.id":
 		x.Id = ""
@@ -1918,7 +1919,7 @@ func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) Clear(fd proto
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_QueryAllDidDocVersionsMetadataRequest) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
 	case "cheqd.did.v2.QueryAllDidDocVersionsMetadataRequest.id":
 		value := x.Id
@@ -1941,7 +1942,7 @@ func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) Get(descriptor
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_QueryAllDidDocVersionsMetadataRequest) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
 	case "cheqd.did.v2.QueryAllDidDocVersionsMetadataRequest.id":
 		x.Id = value.Interface().(string)
@@ -1963,7 +1964,7 @@ func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) Set(fd protore
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_QueryAllDidDocVersionsMetadataRequest) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	case "cheqd.did.v2.QueryAllDidDocVersionsMetadataRequest.id":
 		panic(fmt.Errorf("field id of message cheqd.did.v2.QueryAllDidDocVersionsMetadataRequest is not mutable"))
@@ -1978,7 +1979,7 @@ func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) Mutable(fd pro
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_QueryAllDidDocVersionsMetadataRequest) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	case "cheqd.did.v2.QueryAllDidDocVersionsMetadataRequest.id":
 		return protoreflect.ValueOfString("")
@@ -1993,7 +1994,7 @@ func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) NewField(fd pr
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_QueryAllDidDocVersionsMetadataRequest) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in cheqd.did.v2.QueryAllDidDocVersionsMetadataRequest", d.FullName()))
@@ -2004,7 +2005,7 @@ func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) WhichOneof(d p
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_QueryAllDidDocVersionsMetadataRequest) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -2015,7 +2016,7 @@ func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) GetUnknown() p
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_QueryAllDidDocVersionsMetadataRequest) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -2027,7 +2028,7 @@ func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) SetUnknown(fie
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) IsValid() bool {
+func (x *fastReflection_QueryAllDidDocVersionsMetadataRequest) IsValid() bool {
 	return x != nil
 }
 
@@ -2037,7 +2038,7 @@ func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) IsValid() bool
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_QueryGetAllDidDocVersionsMetadataRequest) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_QueryAllDidDocVersionsMetadataRequest) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
 		x := input.Message.Interface().(*QueryAllDidDocVersionsMetadataRequest)
 		if x == nil {
@@ -2714,12 +2715,20 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// QueryDidDocRequest is the request type for the Query/DidDoc method
 type QueryDidDocRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// is a DID to be fetched
+	// DID unique identifier of the DID Document to fetch.
+	// UUID-style DIDs as well as Indy-style DID are supported.
+	//
+	// Format: did:cheqd:<namespace>:<unique-identifier>
+	//
+	// Examples:
+	// - did:cheqd:mainnet:c82f2b02-bdab-4dd7-b833-3e143745d612
+	// - did:cheqd:testnet:wGHEXrZvJxR8vw5P3UWH1j
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 }
 
@@ -2750,12 +2759,16 @@ func (x *QueryDidDocRequest) GetId() string {
 	return ""
 }
 
+// QueryDidDocResponse is the response type for the Query/DidDoc method
 type QueryDidDocResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Value *DidDocWithMetadata `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
+	// Successful resolution of the DID Document returns the following:
+	// - didDocument is the latest version of the DID Document
+	// - didDocumentMetadata is metadata associated with the latest version of the DID Document
+	DidDocWithMetadata *DidDocWithMetadata `protobuf:"bytes,1,opt,name=did_doc_with_metadata,json=didDocWithMetadata,proto3" json:"did_doc_with_metadata,omitempty"`
 }
 
 func (x *QueryDidDocResponse) Reset() {
@@ -2778,21 +2791,34 @@ func (*QueryDidDocResponse) Descriptor() ([]byte, []int) {
 	return file_cheqd_did_v2_query_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *QueryDidDocResponse) GetValue() *DidDocWithMetadata {
+func (x *QueryDidDocResponse) GetDidDocWithMetadata() *DidDocWithMetadata {
 	if x != nil {
-		return x.Value
+		return x.DidDocWithMetadata
 	}
 	return nil
 }
 
+// QueryDidDocVersionRequest is the request type for the Query/DidDocVersion method
 type QueryDidDocVersionRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// is a DID
+	// DID unique identifier of the DID Document to fetch.
+	// UUID-style DIDs as well as Indy-style DID are supported.
+	//
+	// Format: did:cheqd:<namespace>:<unique-identifier>
+	//
+	// Examples:
+	// - did:cheqd:mainnet:c82f2b02-bdab-4dd7-b833-3e143745d612
+	// - did:cheqd:testnet:wGHEXrZvJxR8vw5P3UWH1j
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// is a unique value that maps DID Doc state at some point
+	// Unique version identifier of the DID Document to fetch.
+	// Returns the specified version of the DID Document.
+	//
+	// Format: <uuid>
+	//
+	// Example: 93f2573c-eca9-4098-96cb-a1ec676a29ed
 	Version string `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
 }
 
@@ -2830,12 +2856,16 @@ func (x *QueryDidDocVersionRequest) GetVersion() string {
 	return ""
 }
 
+// QueryDidDocVersionResponse is the response type for the Query/DidDocVersion method
 type QueryDidDocVersionResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Value *DidDocWithMetadata `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
+	// Successful resolution of the DID Document returns the following:
+	// - didDocument is the requested version of the DID Document
+	// - didDocumentMetadata is metadata associated with the requested version of the DID Document
+	DidDocWithMetadata *DidDocWithMetadata `protobuf:"bytes,1,opt,name=did_doc_with_metadata,json=didDocWithMetadata,proto3" json:"did_doc_with_metadata,omitempty"`
 }
 
 func (x *QueryDidDocVersionResponse) Reset() {
@@ -2858,19 +2888,27 @@ func (*QueryDidDocVersionResponse) Descriptor() ([]byte, []int) {
 	return file_cheqd_did_v2_query_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *QueryDidDocVersionResponse) GetValue() *DidDocWithMetadata {
+func (x *QueryDidDocVersionResponse) GetDidDocWithMetadata() *DidDocWithMetadata {
 	if x != nil {
-		return x.Value
+		return x.DidDocWithMetadata
 	}
 	return nil
 }
 
+// QueryAllDidDocVersionsMetadataRequest is the request type for the Query/AllDidDocVersionsMetadata method
 type QueryAllDidDocVersionsMetadataRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// is a DID
+	// DID unique identifier of the DID Document to fetch version metadata.
+	// UUID-style DIDs as well as Indy-style DID are supported.
+	//
+	// Format: did:cheqd:<namespace>:<unique-identifier>
+	//
+	// Examples:
+	// - did:cheqd:mainnet:c82f2b02-bdab-4dd7-b833-3e143745d612
+	// - did:cheqd:testnet:wGHEXrZvJxR8vw5P3UWH1j
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 }
 
@@ -2901,11 +2939,13 @@ func (x *QueryAllDidDocVersionsMetadataRequest) GetId() string {
 	return ""
 }
 
+// QueryAllDidDocVersionsMetadataResponse is the response type for the Query/AllDidDocVersionsMetadata method
 type QueryAllDidDocVersionsMetadataResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// versions is the list of all versions of the requested DID Document
 	Versions []*Metadata `protobuf:"bytes,1,rep,name=versions,proto3" json:"versions,omitempty"`
 }
 
@@ -2943,75 +2983,78 @@ var file_cheqd_did_v2_query_proto_rawDesc = []byte{
 	0x75, 0x65, 0x72, 0x79, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x0c, 0x63, 0x68, 0x65, 0x71,
 	0x64, 0x2e, 0x64, 0x69, 0x64, 0x2e, 0x76, 0x32, 0x1a, 0x19, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f,
 	0x64, 0x69, 0x64, 0x2f, 0x76, 0x32, 0x2f, 0x64, 0x69, 0x64, 0x64, 0x6f, 0x63, 0x2e, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x1a, 0x1c, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f,
-	0x61, 0x6e, 0x6e, 0x6f, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x22, 0x27, 0x0a, 0x15, 0x51, 0x75, 0x65, 0x72, 0x79, 0x47, 0x65, 0x74, 0x44, 0x69, 0x64,
-	0x44, 0x6f, 0x63, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0x4d, 0x0a, 0x13, 0x51, 0x75,
-	0x65, 0x72, 0x79, 0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x12, 0x36, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
-	0x32, 0x20, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x64, 0x69, 0x64, 0x2e, 0x76, 0x32, 0x2e,
-	0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x57, 0x69, 0x74, 0x68, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61,
-	0x74, 0x61, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x48, 0x0a, 0x1c, 0x51, 0x75, 0x65,
-	0x72, 0x79, 0x47, 0x65, 0x74, 0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x56, 0x65, 0x72, 0x73, 0x69,
-	0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x18, 0x0a, 0x07, 0x76, 0x65, 0x72,
-	0x73, 0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x76, 0x65, 0x72, 0x73,
-	0x69, 0x6f, 0x6e, 0x22, 0x54, 0x0a, 0x1a, 0x51, 0x75, 0x65, 0x72, 0x79, 0x44, 0x69, 0x64, 0x44,
-	0x6f, 0x63, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x12, 0x36, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
-	0x32, 0x20, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x64, 0x69, 0x64, 0x2e, 0x76, 0x32, 0x2e,
-	0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x57, 0x69, 0x74, 0x68, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61,
-	0x74, 0x61, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x3a, 0x0a, 0x28, 0x51, 0x75, 0x65,
-	0x72, 0x79, 0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x56, 0x65,
-	0x72, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0x5c, 0x0a, 0x26, 0x51, 0x75, 0x65, 0x72, 0x79, 0x41, 0x6c,
-	0x6c, 0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x4d,
-	0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
-	0x32, 0x0a, 0x08, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28,
-	0x0b, 0x32, 0x16, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x64, 0x69, 0x64, 0x2e, 0x76, 0x32,
-	0x2e, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x52, 0x08, 0x76, 0x65, 0x72, 0x73, 0x69,
-	0x6f, 0x6e, 0x73, 0x32, 0xbc, 0x03, 0x0a, 0x05, 0x51, 0x75, 0x65, 0x72, 0x79, 0x12, 0x6c, 0x0a,
-	0x06, 0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x12, 0x23, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e,
-	0x64, 0x69, 0x64, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x47, 0x65, 0x74, 0x44,
-	0x69, 0x64, 0x44, 0x6f, 0x63, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x21, 0x2e, 0x63,
-	0x68, 0x65, 0x71, 0x64, 0x2e, 0x64, 0x69, 0x64, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72,
-	0x79, 0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
-	0x1a, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x14, 0x12, 0x12, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f,
-	0x64, 0x69, 0x64, 0x2f, 0x76, 0x32, 0x2f, 0x7b, 0x69, 0x64, 0x7d, 0x12, 0x93, 0x01, 0x0a, 0x0d,
-	0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x2a, 0x2e,
-	0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x64, 0x69, 0x64, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65,
-	0x72, 0x79, 0x47, 0x65, 0x74, 0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x56, 0x65, 0x72, 0x73, 0x69,
-	0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x28, 0x2e, 0x63, 0x68, 0x65, 0x71,
-	0x64, 0x2e, 0x64, 0x69, 0x64, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x44, 0x69,
-	0x64, 0x44, 0x6f, 0x63, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x22, 0x2c, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x26, 0x12, 0x24, 0x2f, 0x63, 0x68,
-	0x65, 0x71, 0x64, 0x2f, 0x64, 0x69, 0x64, 0x2f, 0x76, 0x32, 0x2f, 0x7b, 0x69, 0x64, 0x7d, 0x2f,
-	0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x2f, 0x7b, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e,
-	0x7d, 0x12, 0xae, 0x01, 0x0a, 0x19, 0x41, 0x6c, 0x6c, 0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x56,
-	0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x12,
-	0x36, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x64, 0x69, 0x64, 0x2e, 0x76, 0x32, 0x2e, 0x51,
-	0x75, 0x65, 0x72, 0x79, 0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x44, 0x69, 0x64, 0x44, 0x6f, 0x63,
-	0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x34, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e,
-	0x64, 0x69, 0x64, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x41, 0x6c, 0x6c, 0x44,
+	0x6f, 0x74, 0x6f, 0x1a, 0x14, 0x67, 0x6f, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x67,
+	0x6f, 0x67, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1c, 0x67, 0x6f, 0x6f, 0x67, 0x6c,
+	0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x61, 0x6e, 0x6e, 0x6f, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e,
+	0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x24, 0x0a, 0x12, 0x51, 0x75, 0x65, 0x72, 0x79,
+	0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a,
+	0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0x6a, 0x0a,
+	0x13, 0x51, 0x75, 0x65, 0x72, 0x79, 0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x53, 0x0a, 0x15, 0x64, 0x69, 0x64, 0x5f, 0x64, 0x6f, 0x63, 0x5f,
+	0x77, 0x69, 0x74, 0x68, 0x5f, 0x6d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x20, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x64, 0x69, 0x64, 0x2e,
+	0x76, 0x32, 0x2e, 0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x57, 0x69, 0x74, 0x68, 0x4d, 0x65, 0x74,
+	0x61, 0x64, 0x61, 0x74, 0x61, 0x52, 0x12, 0x64, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x57, 0x69, 0x74,
+	0x68, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x22, 0x45, 0x0a, 0x19, 0x51, 0x75, 0x65,
+	0x72, 0x79, 0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x18, 0x0a, 0x07, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f,
+	0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e,
+	0x22, 0x71, 0x0a, 0x1a, 0x51, 0x75, 0x65, 0x72, 0x79, 0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x56,
+	0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x53,
+	0x0a, 0x15, 0x64, 0x69, 0x64, 0x5f, 0x64, 0x6f, 0x63, 0x5f, 0x77, 0x69, 0x74, 0x68, 0x5f, 0x6d,
+	0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x20, 0x2e,
+	0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x64, 0x69, 0x64, 0x2e, 0x76, 0x32, 0x2e, 0x44, 0x69, 0x64,
+	0x44, 0x6f, 0x63, 0x57, 0x69, 0x74, 0x68, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x52,
+	0x12, 0x64, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x57, 0x69, 0x74, 0x68, 0x4d, 0x65, 0x74, 0x61, 0x64,
+	0x61, 0x74, 0x61, 0x22, 0x37, 0x0a, 0x25, 0x51, 0x75, 0x65, 0x72, 0x79, 0x41, 0x6c, 0x6c, 0x44,
 	0x69, 0x64, 0x44, 0x6f, 0x63, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x4d, 0x65, 0x74,
-	0x61, 0x64, 0x61, 0x74, 0x61, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x23, 0x82,
-	0xd3, 0xe4, 0x93, 0x02, 0x1d, 0x12, 0x1b, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x64, 0x69,
-	0x64, 0x2f, 0x76, 0x32, 0x2f, 0x7b, 0x69, 0x64, 0x7d, 0x2f, 0x6d, 0x65, 0x74, 0x61, 0x64, 0x61,
-	0x74, 0x61, 0x42, 0xa4, 0x01, 0x0a, 0x10, 0x63, 0x6f, 0x6d, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64,
-	0x2e, 0x64, 0x69, 0x64, 0x2e, 0x76, 0x32, 0x42, 0x0a, 0x51, 0x75, 0x65, 0x72, 0x79, 0x50, 0x72,
-	0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x32, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f,
-	0x6d, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2d, 0x6e, 0x6f,
-	0x64, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x64, 0x69, 0x64,
-	0x2f, 0x76, 0x32, 0x3b, 0x64, 0x69, 0x64, 0x76, 0x32, 0xa2, 0x02, 0x03, 0x43, 0x44, 0x58, 0xaa,
-	0x02, 0x0c, 0x43, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x44, 0x69, 0x64, 0x2e, 0x56, 0x32, 0xca, 0x02,
-	0x0c, 0x43, 0x68, 0x65, 0x71, 0x64, 0x5c, 0x44, 0x69, 0x64, 0x5c, 0x56, 0x32, 0xe2, 0x02, 0x18,
-	0x43, 0x68, 0x65, 0x71, 0x64, 0x5c, 0x44, 0x69, 0x64, 0x5c, 0x56, 0x32, 0x5c, 0x47, 0x50, 0x42,
-	0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0e, 0x43, 0x68, 0x65, 0x71, 0x64,
-	0x3a, 0x3a, 0x44, 0x69, 0x64, 0x3a, 0x3a, 0x56, 0x32, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x33,
+	0x61, 0x64, 0x61, 0x74, 0x61, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02,
+	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0x5c, 0x0a, 0x26,
+	0x51, 0x75, 0x65, 0x72, 0x79, 0x41, 0x6c, 0x6c, 0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x56, 0x65,
+	0x72, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x32, 0x0a, 0x08, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f,
+	0x6e, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x16, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64,
+	0x2e, 0x64, 0x69, 0x64, 0x2e, 0x76, 0x32, 0x2e, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61,
+	0x52, 0x08, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x32, 0xb3, 0x03, 0x0a, 0x05, 0x51,
+	0x75, 0x65, 0x72, 0x79, 0x12, 0x69, 0x0a, 0x06, 0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x12, 0x20,
+	0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x64, 0x69, 0x64, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75,
+	0x65, 0x72, 0x79, 0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x1a, 0x21, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x64, 0x69, 0x64, 0x2e, 0x76, 0x32, 0x2e,
+	0x51, 0x75, 0x65, 0x72, 0x79, 0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x22, 0x1a, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x14, 0x12, 0x12, 0x2f, 0x63, 0x68,
+	0x65, 0x71, 0x64, 0x2f, 0x64, 0x69, 0x64, 0x2f, 0x76, 0x32, 0x2f, 0x7b, 0x69, 0x64, 0x7d, 0x12,
+	0x90, 0x01, 0x0a, 0x0d, 0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f,
+	0x6e, 0x12, 0x27, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x64, 0x69, 0x64, 0x2e, 0x76, 0x32,
+	0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x56, 0x65, 0x72, 0x73,
+	0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x28, 0x2e, 0x63, 0x68, 0x65,
+	0x71, 0x64, 0x2e, 0x64, 0x69, 0x64, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x44,
+	0x69, 0x64, 0x44, 0x6f, 0x63, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x2c, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x26, 0x12, 0x24, 0x2f, 0x63,
+	0x68, 0x65, 0x71, 0x64, 0x2f, 0x64, 0x69, 0x64, 0x2f, 0x76, 0x32, 0x2f, 0x7b, 0x69, 0x64, 0x7d,
+	0x2f, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x2f, 0x7b, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f,
+	0x6e, 0x7d, 0x12, 0xab, 0x01, 0x0a, 0x19, 0x41, 0x6c, 0x6c, 0x44, 0x69, 0x64, 0x44, 0x6f, 0x63,
+	0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61,
+	0x12, 0x33, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x64, 0x69, 0x64, 0x2e, 0x76, 0x32, 0x2e,
+	0x51, 0x75, 0x65, 0x72, 0x79, 0x41, 0x6c, 0x6c, 0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x56, 0x65,
+	0x72, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x34, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x64, 0x69,
+	0x64, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x41, 0x6c, 0x6c, 0x44, 0x69, 0x64,
+	0x44, 0x6f, 0x63, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x4d, 0x65, 0x74, 0x61, 0x64,
+	0x61, 0x74, 0x61, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x23, 0x82, 0xd3, 0xe4,
+	0x93, 0x02, 0x1d, 0x12, 0x1b, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x64, 0x69, 0x64, 0x2f,
+	0x76, 0x32, 0x2f, 0x7b, 0x69, 0x64, 0x7d, 0x2f, 0x6d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61,
+	0x42, 0xa4, 0x01, 0x0a, 0x10, 0x63, 0x6f, 0x6d, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x64,
+	0x69, 0x64, 0x2e, 0x76, 0x32, 0x42, 0x0a, 0x51, 0x75, 0x65, 0x72, 0x79, 0x50, 0x72, 0x6f, 0x74,
+	0x6f, 0x50, 0x01, 0x5a, 0x32, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f,
+	0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2d, 0x6e, 0x6f, 0x64, 0x65,
+	0x2f, 0x61, 0x70, 0x69, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x64, 0x69, 0x64, 0x2f, 0x76,
+	0x32, 0x3b, 0x64, 0x69, 0x64, 0x76, 0x32, 0xa2, 0x02, 0x03, 0x43, 0x44, 0x58, 0xaa, 0x02, 0x0c,
+	0x43, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x44, 0x69, 0x64, 0x2e, 0x56, 0x32, 0xca, 0x02, 0x0c, 0x43,
+	0x68, 0x65, 0x71, 0x64, 0x5c, 0x44, 0x69, 0x64, 0x5c, 0x56, 0x32, 0xe2, 0x02, 0x18, 0x43, 0x68,
+	0x65, 0x71, 0x64, 0x5c, 0x44, 0x69, 0x64, 0x5c, 0x56, 0x32, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65,
+	0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0e, 0x43, 0x68, 0x65, 0x71, 0x64, 0x3a, 0x3a,
+	0x44, 0x69, 0x64, 0x3a, 0x3a, 0x56, 0x32, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -3028,18 +3071,18 @@ func file_cheqd_did_v2_query_proto_rawDescGZIP() []byte {
 
 var file_cheqd_did_v2_query_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_cheqd_did_v2_query_proto_goTypes = []interface{}{
-	(*QueryDidDocRequest)(nil),                    // 0: cheqd.did.v2.QueryDidDocRequest
-	(*QueryDidDocResponse)(nil),                      // 1: cheqd.did.v2.QueryDidDocResponse
-	(*QueryDidDocVersionRequest)(nil),             // 2: cheqd.did.v2.QueryDidDocVersionRequest
-	(*QueryDidDocVersionResponse)(nil),               // 3: cheqd.did.v2.QueryDidDocVersionResponse
-	(*QueryAllDidDocVersionsMetadataRequest)(nil), // 4: cheqd.did.v2.QueryAllDidDocVersionsMetadataRequest
-	(*QueryAllDidDocVersionsMetadataResponse)(nil),   // 5: cheqd.did.v2.QueryAllDidDocVersionsMetadataResponse
-	(*DidDocWithMetadata)(nil),                       // 6: cheqd.did.v2.DidDocWithMetadata
-	(*Metadata)(nil),                                 // 7: cheqd.did.v2.Metadata
+	(*QueryDidDocRequest)(nil),                     // 0: cheqd.did.v2.QueryDidDocRequest
+	(*QueryDidDocResponse)(nil),                    // 1: cheqd.did.v2.QueryDidDocResponse
+	(*QueryDidDocVersionRequest)(nil),              // 2: cheqd.did.v2.QueryDidDocVersionRequest
+	(*QueryDidDocVersionResponse)(nil),             // 3: cheqd.did.v2.QueryDidDocVersionResponse
+	(*QueryAllDidDocVersionsMetadataRequest)(nil),  // 4: cheqd.did.v2.QueryAllDidDocVersionsMetadataRequest
+	(*QueryAllDidDocVersionsMetadataResponse)(nil), // 5: cheqd.did.v2.QueryAllDidDocVersionsMetadataResponse
+	(*DidDocWithMetadata)(nil),                     // 6: cheqd.did.v2.DidDocWithMetadata
+	(*Metadata)(nil),                               // 7: cheqd.did.v2.Metadata
 }
 var file_cheqd_did_v2_query_proto_depIdxs = []int32{
-	6, // 0: cheqd.did.v2.QueryDidDocResponse.value:type_name -> cheqd.did.v2.DidDocWithMetadata
-	6, // 1: cheqd.did.v2.QueryDidDocVersionResponse.value:type_name -> cheqd.did.v2.DidDocWithMetadata
+	6, // 0: cheqd.did.v2.QueryDidDocResponse.did_doc_with_metadata:type_name -> cheqd.did.v2.DidDocWithMetadata
+	6, // 1: cheqd.did.v2.QueryDidDocVersionResponse.did_doc_with_metadata:type_name -> cheqd.did.v2.DidDocWithMetadata
 	7, // 2: cheqd.did.v2.QueryAllDidDocVersionsMetadataResponse.versions:type_name -> cheqd.did.v2.Metadata
 	0, // 3: cheqd.did.v2.Query.DidDoc:input_type -> cheqd.did.v2.QueryDidDocRequest
 	2, // 4: cheqd.did.v2.Query.DidDocVersion:input_type -> cheqd.did.v2.QueryDidDocVersionRequest

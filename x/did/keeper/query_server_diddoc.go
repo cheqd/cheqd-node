@@ -23,5 +23,5 @@ func (k Keeper) DidDoc(c context.Context, req *types.QueryDidDocRequest) (*types
 		return nil, err
 	}
 
-	return &types.QueryDidDocResponse{Value: &didDoc}, nil
+	return &types.QueryDidDocResponse{DidDocWithMetadata: &didDoc}, nil
 }

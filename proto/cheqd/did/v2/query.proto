@@ -41,11 +41,10 @@ message QueryDidDocRequest {
 
 // QueryDidDocResponse is the response type for the Query/DidDoc method
 message QueryDidDocResponse {
-  // didDocument is the latest version of the requested DID Document
-  DidDoc did_doc = 1 [(gogoproto.jsontag) = "didDocument"];
-
-  // didDocumentMetadata is metadata associated with the latest version of the requested DID Document
-  Metadata metadata = 2 [(gogoproto.jsontag) = "didDocumentMetadata"];
+  // Successful resolution of the DID Document returns the following:
+  // - didDocument is the latest version of the DID Document
+  // - didDocumentMetadata is metadata associated with the latest version of the DID Document
+  DidDocWithMetadata did_doc_with_metadata = 1;
 }
 
 // QueryDidDocVersionRequest is the request type for the Query/DidDocVersion method
@@ -71,11 +70,10 @@ message QueryDidDocVersionRequest {
 
 // QueryDidDocVersionResponse is the response type for the Query/DidDocVersion method
 message QueryDidDocVersionResponse {
-  // didDocument is the specific version of the requested DID Document
-  DidDoc did_doc = 1 [(gogoproto.jsontag) = "didDocument"];
-
-  // didDocumentMetadata is metadata associated with the specific version of the requested DID Document
-  Metadata metadata = 2 [(gogoproto.jsontag) = "didDocumentMetadata"];
+  // Successful resolution of the DID Document returns the following:
+  // - didDocument is the requested version of the DID Document
+  // - didDocumentMetadata is metadata associated with the requested version of the DID Document
+  DidDocWithMetadata did_doc_with_metadata = 1;
 }
 
 // QueryAllDidDocVersionsMetadataRequest is the request type for the Query/AllDidDocVersionsMetadata method
