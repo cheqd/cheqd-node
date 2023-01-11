@@ -14,7 +14,7 @@ message DidDocVersionSet {
   string latest_version = 1;
 
   // All versions of the DID Document set
-  repeated DidDocWithMetadata did_doc_with_metadata = 2;
+  repeated DidDocWithMetadata did_docs = 2;
 }
 
 // GenesisState defines the cheqd DID module's genesis state.
@@ -27,5 +27,6 @@ message GenesisState {
   repeated DidDocVersionSet version_sets = 2;
 
   // Fee parameters for the DID module
+  // Defines fixed fees and burn percentage for each DID operation type (create, update, delete)
   FeeParams fee_params = 3;
 }
