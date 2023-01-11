@@ -36,7 +36,7 @@ jobs:
         with:
           timeout-minutes: 10
     
-  interactive-installer-without-cosmovisor:
+  interactive-installer-node-standalone:
     name: "Interactive Installer without cosmovisor"
     runs-on: ubuntu-20.04
   
@@ -46,12 +46,12 @@ jobs:
       - name: "Fresh install"
         working-directory: ./installer
         run: |
-          sudo bash -c "python3 installer.py < install-from-scratch-without-cosmovisor.txt"
+          sudo bash -c "python3 installer.py < install-from-scratch-node-standalone.txt"
 
       - name: "Upgrade existing installation"
         working-directory: ./installer
         run: |
-          sudo bash -c "python3 installer.py < upgrade-existing-without-cosmovisor.txt"
+          sudo bash -c "python3 installer.py < upgrade-existing-node-standalone.txt"
 
       - name: Debugging with tmate
         if: ${{ failure() }}
