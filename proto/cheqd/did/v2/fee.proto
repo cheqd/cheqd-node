@@ -11,15 +11,23 @@ option (gogoproto.equal_all) = true;
 // FeeParams defines the parameters for the cheqd DID module fixed fee
 message FeeParams {
   // Fixed fee for creating a DID
+  //
+  // Default: 50 CHEQ or 50000000000ncheq
   cosmos.base.v1beta1.Coin create_did = 1 [(gogoproto.nullable) = false];
 
   // Fixed fee for updating a DID
+  //
+  // Default: 25 CHEQ or 25000000000ncheq
   cosmos.base.v1beta1.Coin update_did = 2 [(gogoproto.nullable) = false];
 
   // Fixed fee for deactivating a DID
+  //
+  // Default: 10 CHEQ or 10000000000ncheq
   cosmos.base.v1beta1.Coin deactivate_did = 3 [(gogoproto.nullable) = false];
 
   // Percentage of the fixed fee that will be burned
+  //
+  // Default: 0.5 (50%)
   string burn_factor = 4 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
