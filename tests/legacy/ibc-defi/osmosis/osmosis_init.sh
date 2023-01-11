@@ -21,7 +21,7 @@ osmosisd init --chain-id "$CHAIN_ID" testing
 osmosisd keys add osmosis-user --keyring-backend=test
 
 # Genesis
-osmosisd add-genesis-account "$(osmosisd keys show osmosis-user -a --keyring-backend=test)" 1000000000uosmo,1000000000uosmo
+osmosisd add-genesis-account "$(osmosisd keys show osmosis-user -a --keyring-backend=test)" 2000000000uosmo
 osmosisd gentx osmosis-user 500000000uosmo --keyring-backend=test --chain-id "$CHAIN_ID"
 osmosisd collect-gentxs
 

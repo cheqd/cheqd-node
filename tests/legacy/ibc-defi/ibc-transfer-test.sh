@@ -90,7 +90,7 @@ OSMOSIS_RELAYER_MNEMONIC=$(echo "${OSMOSIS_RELAYER_ACCOUNT}" | jq --raw-output '
 echo "${OSMOSIS_RELAYER_MNEMONIC}" > osmo_relayer_mnemonic.txt
 
 info "Send some tokens to it" # ---
-RES=$(docker compose exec osmosis osmosisd tx bank send osmosis-user "${OSMOSIS_RELAYER_ADDRESS}" 1000stake --chain-id osmosis -y --keyring-backend test --output json)
+RES=$(docker compose exec osmosis osmosisd tx bank send osmosis-user "${OSMOSIS_RELAYER_ADDRESS}" 10000000uosmo --chain-id osmosis -y --keyring-backend test --output json)
 assert_tx_successful "${RES}"
 sleep 10 # Wait for state
 
