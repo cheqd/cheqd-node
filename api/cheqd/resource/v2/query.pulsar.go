@@ -940,20 +940,20 @@ var (
 
 func init() {
 	file_cheqd_resource_v2_query_proto_init()
-	md_QueryGetResourceMetadataRequest = File_cheqd_resource_v2_query_proto.Messages().ByName("QueryGetResourceMetadataRequest")
+	md_QueryGetResourceMetadataRequest = File_cheqd_resource_v2_query_proto.Messages().ByName("QueryResourceMetadataRequest")
 	fd_QueryGetResourceMetadataRequest_collection_id = md_QueryGetResourceMetadataRequest.Fields().ByName("collection_id")
 	fd_QueryGetResourceMetadataRequest_id = md_QueryGetResourceMetadataRequest.Fields().ByName("id")
 }
 
 var _ protoreflect.Message = (*fastReflection_QueryGetResourceMetadataRequest)(nil)
 
-type fastReflection_QueryGetResourceMetadataRequest QueryGetResourceMetadataRequest
+type fastReflection_QueryGetResourceMetadataRequest QueryResourceMetadataRequest
 
-func (x *QueryGetResourceMetadataRequest) ProtoReflect() protoreflect.Message {
+func (x *QueryResourceMetadataRequest) ProtoReflect() protoreflect.Message {
 	return (*fastReflection_QueryGetResourceMetadataRequest)(x)
 }
 
-func (x *QueryGetResourceMetadataRequest) slowProtoReflect() protoreflect.Message {
+func (x *QueryResourceMetadataRequest) slowProtoReflect() protoreflect.Message {
 	mi := &file_cheqd_resource_v2_query_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1001,7 +1001,7 @@ func (x *fastReflection_QueryGetResourceMetadataRequest) New() protoreflect.Mess
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
 func (x *fastReflection_QueryGetResourceMetadataRequest) Interface() protoreflect.ProtoMessage {
-	return (*QueryGetResourceMetadataRequest)(x)
+	return (*QueryResourceMetadataRequest)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -1037,15 +1037,15 @@ func (x *fastReflection_QueryGetResourceMetadataRequest) Range(f func(protorefle
 // a repeated field is populated if it is non-empty.
 func (x *fastReflection_QueryGetResourceMetadataRequest) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "cheqd.resource.v2.QueryGetResourceMetadataRequest.collection_id":
+	case "cheqd.resource.v2.QueryResourceMetadataRequest.collection_id":
 		return x.CollectionId != ""
-	case "cheqd.resource.v2.QueryGetResourceMetadataRequest.id":
+	case "cheqd.resource.v2.QueryResourceMetadataRequest.id":
 		return x.Id != ""
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryGetResourceMetadataRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryResourceMetadataRequest"))
 		}
-		panic(fmt.Errorf("message cheqd.resource.v2.QueryGetResourceMetadataRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.resource.v2.QueryResourceMetadataRequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1057,15 +1057,15 @@ func (x *fastReflection_QueryGetResourceMetadataRequest) Has(fd protoreflect.Fie
 // Clear is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryGetResourceMetadataRequest) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "cheqd.resource.v2.QueryGetResourceMetadataRequest.collection_id":
+	case "cheqd.resource.v2.QueryResourceMetadataRequest.collection_id":
 		x.CollectionId = ""
-	case "cheqd.resource.v2.QueryGetResourceMetadataRequest.id":
+	case "cheqd.resource.v2.QueryResourceMetadataRequest.id":
 		x.Id = ""
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryGetResourceMetadataRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryResourceMetadataRequest"))
 		}
-		panic(fmt.Errorf("message cheqd.resource.v2.QueryGetResourceMetadataRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.resource.v2.QueryResourceMetadataRequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1077,17 +1077,17 @@ func (x *fastReflection_QueryGetResourceMetadataRequest) Clear(fd protoreflect.F
 // of the value; to obtain a mutable reference, use Mutable.
 func (x *fastReflection_QueryGetResourceMetadataRequest) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "cheqd.resource.v2.QueryGetResourceMetadataRequest.collection_id":
+	case "cheqd.resource.v2.QueryResourceMetadataRequest.collection_id":
 		value := x.CollectionId
 		return protoreflect.ValueOfString(value)
-	case "cheqd.resource.v2.QueryGetResourceMetadataRequest.id":
+	case "cheqd.resource.v2.QueryResourceMetadataRequest.id":
 		value := x.Id
 		return protoreflect.ValueOfString(value)
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryGetResourceMetadataRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryResourceMetadataRequest"))
 		}
-		panic(fmt.Errorf("message cheqd.resource.v2.QueryGetResourceMetadataRequest does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message cheqd.resource.v2.QueryResourceMetadataRequest does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -1103,15 +1103,15 @@ func (x *fastReflection_QueryGetResourceMetadataRequest) Get(descriptor protoref
 // Set is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryGetResourceMetadataRequest) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "cheqd.resource.v2.QueryGetResourceMetadataRequest.collection_id":
+	case "cheqd.resource.v2.QueryResourceMetadataRequest.collection_id":
 		x.CollectionId = value.Interface().(string)
-	case "cheqd.resource.v2.QueryGetResourceMetadataRequest.id":
+	case "cheqd.resource.v2.QueryResourceMetadataRequest.id":
 		x.Id = value.Interface().(string)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryGetResourceMetadataRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryResourceMetadataRequest"))
 		}
-		panic(fmt.Errorf("message cheqd.resource.v2.QueryGetResourceMetadataRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.resource.v2.QueryResourceMetadataRequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1127,15 +1127,15 @@ func (x *fastReflection_QueryGetResourceMetadataRequest) Set(fd protoreflect.Fie
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryGetResourceMetadataRequest) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "cheqd.resource.v2.QueryGetResourceMetadataRequest.collection_id":
-		panic(fmt.Errorf("field collection_id of message cheqd.resource.v2.QueryGetResourceMetadataRequest is not mutable"))
-	case "cheqd.resource.v2.QueryGetResourceMetadataRequest.id":
-		panic(fmt.Errorf("field id of message cheqd.resource.v2.QueryGetResourceMetadataRequest is not mutable"))
+	case "cheqd.resource.v2.QueryResourceMetadataRequest.collection_id":
+		panic(fmt.Errorf("field collection_id of message cheqd.resource.v2.QueryResourceMetadataRequest is not mutable"))
+	case "cheqd.resource.v2.QueryResourceMetadataRequest.id":
+		panic(fmt.Errorf("field id of message cheqd.resource.v2.QueryResourceMetadataRequest is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryGetResourceMetadataRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryResourceMetadataRequest"))
 		}
-		panic(fmt.Errorf("message cheqd.resource.v2.QueryGetResourceMetadataRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.resource.v2.QueryResourceMetadataRequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1144,15 +1144,15 @@ func (x *fastReflection_QueryGetResourceMetadataRequest) Mutable(fd protoreflect
 // For lists, maps, and messages, this returns a new, empty, mutable value.
 func (x *fastReflection_QueryGetResourceMetadataRequest) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "cheqd.resource.v2.QueryGetResourceMetadataRequest.collection_id":
+	case "cheqd.resource.v2.QueryResourceMetadataRequest.collection_id":
 		return protoreflect.ValueOfString("")
-	case "cheqd.resource.v2.QueryGetResourceMetadataRequest.id":
+	case "cheqd.resource.v2.QueryResourceMetadataRequest.id":
 		return protoreflect.ValueOfString("")
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryGetResourceMetadataRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryResourceMetadataRequest"))
 		}
-		panic(fmt.Errorf("message cheqd.resource.v2.QueryGetResourceMetadataRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.resource.v2.QueryResourceMetadataRequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1162,7 +1162,7 @@ func (x *fastReflection_QueryGetResourceMetadataRequest) NewField(fd protoreflec
 func (x *fastReflection_QueryGetResourceMetadataRequest) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in cheqd.resource.v2.QueryGetResourceMetadataRequest", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in cheqd.resource.v2.QueryResourceMetadataRequest", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -1205,7 +1205,7 @@ func (x *fastReflection_QueryGetResourceMetadataRequest) IsValid() bool {
 // Consult the protoiface package documentation for details.
 func (x *fastReflection_QueryGetResourceMetadataRequest) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*QueryGetResourceMetadataRequest)
+		x := input.Message.Interface().(*QueryResourceMetadataRequest)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1235,7 +1235,7 @@ func (x *fastReflection_QueryGetResourceMetadataRequest) ProtoMethods() *protoif
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*QueryGetResourceMetadataRequest)
+		x := input.Message.Interface().(*QueryResourceMetadataRequest)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1279,7 +1279,7 @@ func (x *fastReflection_QueryGetResourceMetadataRequest) ProtoMethods() *protoif
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*QueryGetResourceMetadataRequest)
+		x := input.Message.Interface().(*QueryResourceMetadataRequest)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -1311,10 +1311,10 @@ func (x *fastReflection_QueryGetResourceMetadataRequest) ProtoMethods() *protoif
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryGetResourceMetadataRequest: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryResourceMetadataRequest: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryGetResourceMetadataRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryResourceMetadataRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
@@ -2858,7 +2858,7 @@ func (x *QueryResourceResponse) GetResource() *ResourceWithMetadata {
 	return nil
 }
 
-type QueryGetResourceMetadataRequest struct {
+type QueryResourceMetadataRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -2869,8 +2869,8 @@ type QueryGetResourceMetadataRequest struct {
 	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
 }
 
-func (x *QueryGetResourceMetadataRequest) Reset() {
-	*x = QueryGetResourceMetadataRequest{}
+func (x *QueryResourceMetadataRequest) Reset() {
+	*x = QueryResourceMetadataRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_cheqd_resource_v2_query_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -2878,25 +2878,25 @@ func (x *QueryGetResourceMetadataRequest) Reset() {
 	}
 }
 
-func (x *QueryGetResourceMetadataRequest) String() string {
+func (x *QueryResourceMetadataRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*QueryGetResourceMetadataRequest) ProtoMessage() {}
+func (*QueryResourceMetadataRequest) ProtoMessage() {}
 
-// Deprecated: Use QueryGetResourceMetadataRequest.ProtoReflect.Descriptor instead.
-func (*QueryGetResourceMetadataRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use QueryResourceMetadataRequest.ProtoReflect.Descriptor instead.
+func (*QueryResourceMetadataRequest) Descriptor() ([]byte, []int) {
 	return file_cheqd_resource_v2_query_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *QueryGetResourceMetadataRequest) GetCollectionId() string {
+func (x *QueryResourceMetadataRequest) GetCollectionId() string {
 	if x != nil {
 		return x.CollectionId
 	}
 	return ""
 }
 
-func (x *QueryGetResourceMetadataRequest) GetId() string {
+func (x *QueryResourceMetadataRequest) GetId() string {
 	if x != nil {
 		return x.Id
 	}
@@ -3117,7 +3117,7 @@ var file_cheqd_resource_v2_query_proto_msgTypes = make([]protoimpl.MessageInfo, 
 var file_cheqd_resource_v2_query_proto_goTypes = []interface{}{
 	(*QueryResourceRequest)(nil),            // 0: cheqd.resource.v2.QueryResourceRequest
 	(*QueryResourceResponse)(nil),              // 1: cheqd.resource.v2.QueryResourceResponse
-	(*QueryGetResourceMetadataRequest)(nil),    // 2: cheqd.resource.v2.QueryGetResourceMetadataRequest
+	(*QueryResourceMetadataRequest)(nil),    // 2: cheqd.resource.v2.QueryResourceMetadataRequest
 	(*QueryResourceMetadataResponse)(nil),      // 3: cheqd.resource.v2.QueryResourceMetadataResponse
 	(*QueryGetCollectionResourcesRequest)(nil), // 4: cheqd.resource.v2.QueryGetCollectionResourcesRequest
 	(*QueryCollectionResourcesResponse)(nil),   // 5: cheqd.resource.v2.QueryCollectionResourcesResponse
@@ -3129,7 +3129,7 @@ var file_cheqd_resource_v2_query_proto_depIdxs = []int32{
 	7, // 1: cheqd.resource.v2.QueryResourceMetadataResponse.resource:type_name -> cheqd.resource.v2.Metadata
 	7, // 2: cheqd.resource.v2.QueryCollectionResourcesResponse.resources:type_name -> cheqd.resource.v2.Metadata
 	0, // 3: cheqd.resource.v2.Query.Resource:input_type -> cheqd.resource.v2.QueryResourceRequest
-	2, // 4: cheqd.resource.v2.Query.ResourceMetadata:input_type -> cheqd.resource.v2.QueryGetResourceMetadataRequest
+	2, // 4: cheqd.resource.v2.Query.ResourceMetadata:input_type -> cheqd.resource.v2.QueryResourceMetadataRequest
 	4, // 5: cheqd.resource.v2.Query.CollectionResources:input_type -> cheqd.resource.v2.QueryGetCollectionResourcesRequest
 	1, // 6: cheqd.resource.v2.Query.Resource:output_type -> cheqd.resource.v2.QueryResourceResponse
 	3, // 7: cheqd.resource.v2.Query.ResourceMetadata:output_type -> cheqd.resource.v2.QueryResourceMetadataResponse
@@ -3173,7 +3173,7 @@ func file_cheqd_resource_v2_query_proto_init() {
 			}
 		}
 		file_cheqd_resource_v2_query_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*QueryGetResourceMetadataRequest); i {
+			switch v := v.(*QueryResourceMetadataRequest); i {
 			case 0:
 				return &v.state
 			case 1:
