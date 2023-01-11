@@ -26,13 +26,16 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// FeeParams defines the parameters for the `did` module fixed fee.
+// FeeParams defines the parameters for the cheqd DID module fixed fee
 type FeeParams struct {
-	// Tx types define the fixed fee each for the `did` module.
-	CreateDid     types.Coin                             `protobuf:"bytes,1,opt,name=create_did,json=createDid,proto3" json:"create_did"`
-	UpdateDid     types.Coin                             `protobuf:"bytes,2,opt,name=update_did,json=updateDid,proto3" json:"update_did"`
-	DeactivateDid types.Coin                             `protobuf:"bytes,3,opt,name=deactivate_did,json=deactivateDid,proto3" json:"deactivate_did"`
-	BurnFactor    github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,4,opt,name=burn_factor,json=burnFactor,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"burn_factor"`
+	// Fixed fee for creating a DID
+	CreateDid types.Coin `protobuf:"bytes,1,opt,name=create_did,json=createDid,proto3" json:"create_did"`
+	// Fixed fee for updating a DID
+	UpdateDid types.Coin `protobuf:"bytes,2,opt,name=update_did,json=updateDid,proto3" json:"update_did"`
+	// Fixed fee for deactivating a DID
+	DeactivateDid types.Coin `protobuf:"bytes,3,opt,name=deactivate_did,json=deactivateDid,proto3" json:"deactivate_did"`
+	// Percentage of the fixed fee that will be burned
+	BurnFactor github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,4,opt,name=burn_factor,json=burnFactor,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"burn_factor"`
 }
 
 func (m *FeeParams) Reset()         { *m = FeeParams{} }
