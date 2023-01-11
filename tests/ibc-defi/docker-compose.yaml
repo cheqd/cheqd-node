@@ -4,7 +4,7 @@ services:
   cheqd:
     image: cheqd/cheqd-node:build-latest
     build:
-      context: ../../../
+      context: ../../
       dockerfile: docker/Dockerfile
     ports:
       - "26656:26656" # p2p
