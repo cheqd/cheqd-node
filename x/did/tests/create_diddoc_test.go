@@ -51,7 +51,7 @@ var _ = Describe("Create DID tests", func() {
 		// check
 		created, err := setup.QueryDidDoc(did)
 		Expect(err).To(BeNil())
-		Expect(msg.ToDidDoc()).To(Equal(*created.DidDocWithMetadata.DidDoc))
+		Expect(msg.ToDidDoc()).To(Equal(*created.Value.DidDoc))
 	})
 
 	It("Valid: Works for simple DIDDoc (JsonWebKey2020)", func() {
@@ -86,7 +86,7 @@ var _ = Describe("Create DID tests", func() {
 		// check
 		created, err := setup.QueryDidDoc(did)
 		Expect(err).To(BeNil())
-		Expect(msg.ToDidDoc()).To(Equal(*created.DidDocWithMetadata.DidDoc))
+		Expect(msg.ToDidDoc()).To(Equal(*created.Value.DidDoc))
 	})
 
 	It("Valid: Works for simple DIDDoc (Ed25519VerificationKey2018)", func() {
@@ -121,7 +121,7 @@ var _ = Describe("Create DID tests", func() {
 		// check
 		created, err := setup.QueryDidDoc(did)
 		Expect(err).To(BeNil())
-		Expect(msg.ToDidDoc()).To(Equal(*created.DidDocWithMetadata.DidDoc))
+		Expect(msg.ToDidDoc()).To(Equal(*created.Value.DidDoc))
 	})
 
 	It("Valid: DID with external controllers", func() {
@@ -157,7 +157,7 @@ var _ = Describe("Create DID tests", func() {
 		// check
 		created, err := setup.QueryDidDoc(bobDid)
 		Expect(err).To(BeNil())
-		Expect(msg.ToDidDoc()).To(Equal(*created.DidDocWithMetadata.DidDoc))
+		Expect(msg.ToDidDoc()).To(Equal(*created.Value.DidDoc))
 	})
 
 	It("Valid: Works for DIDDoc with all properties", func() {
@@ -234,7 +234,7 @@ var _ = Describe("Create DID tests", func() {
 		// check
 		created, err := setup.QueryDidDoc(did)
 		Expect(err).To(BeNil())
-		Expect(msg.ToDidDoc()).To(Equal(*created.DidDocWithMetadata.DidDoc))
+		Expect(msg.ToDidDoc()).To(Equal(*created.Value.DidDoc))
 	})
 
 	// **************************
@@ -498,7 +498,7 @@ var _ = Describe("Check upper/lower case for DID creation", func() {
 		// check
 		created, err := setup.QueryDidDoc(did)
 		Expect(err).To(BeNil())
-		Expect(created.DidDocWithMetadata.DidDoc.Id).To(Equal(testCase.resultID))
+		Expect(created.Value.DidDoc.Id).To(Equal(testCase.resultID))
 	},
 
 		Entry("Lowercase UUIDs", TestCaseUUIDDidStruct{

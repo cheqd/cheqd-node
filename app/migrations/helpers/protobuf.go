@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"time"
 	"github.com/multiformats/go-multibase"
 )
 
@@ -16,4 +17,12 @@ func GenerateEd25519VerificationKey2020VerificationMaterial(publicKey string) (s
 	publicKeyMultibaseBytes = append(publicKeyMultibaseBytes, publicKeyBytes...)
 
 	return multibase.Encode(multibase.Base58BTC, publicKeyMultibaseBytes)
+}
+
+func MustParseFromStringTimeToGoTime(timeString string) *time.Time {
+	t, err := time.Parse(time.RFC3339, timeString)
+	if err != nil {
+		panic(err)
+	}
+	return &t
 }
