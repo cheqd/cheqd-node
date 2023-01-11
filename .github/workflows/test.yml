@@ -23,7 +23,7 @@ jobs:
       - name: "Fresh install"
         working-directory: ./installer
         run: |
-          sudo bash -c "python3 installer.py < install-from-scratch.txt"
+          sudo bash -c "python3 installer.py < install-from-scratch-with-cosmovisor.txt"
 
       - name: "Upgrade existing installation"
         working-directory: ./installer
@@ -37,7 +37,7 @@ jobs:
           timeout-minutes: 10
     
   interactive-installer-node-standalone:
-    name: "Interactive Installer without cosmovisor"
+    name: "Interactive Installer Node Standalone"
     runs-on: ubuntu-20.04
   
     steps:
