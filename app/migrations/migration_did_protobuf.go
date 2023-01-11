@@ -2,6 +2,7 @@ package migrations
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/cheqd/cheqd-node/app/migrations/helpers"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
@@ -88,9 +89,26 @@ func MigrateStateValue(sctx sdk.Context, mctx MigrationContext, stateValue *didt
 }
 
 func MigrateMetadata(metadata *didtypesv1.Metadata) didtypes.Metadata {
+	var created time.Time
+	var err error
+	if metadata.Created != "" {
+		created, err = time.Parse(time.RFC3339, metadata.Created)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	var updated time.Time
+	if metadata.Updated != "" {
+		updated, err = time.Parse(time.RFC3339, metadata.Updated)
+		if err != nil {
+			panic(err)
+		}
+	}
+
 	return didtypes.Metadata{
-		Created:           metadata.Created,
-		Updated:           metadata.Updated,
+		Created:           &created,
+		Updated:           &updated,
 		Deactivated:       metadata.Deactivated,
 		VersionId:         metadata.VersionId,
 		NextVersionId:     "",
