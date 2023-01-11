@@ -16,7 +16,7 @@ service Query {
     option (google.api.http).get = "/cheqd/resource/v2/{collection_id}/resources/{id}/metadata";
   }
 
-  rpc CollectionResources(QueryGetCollectionResourcesRequest) returns (QueryCollectionResourcesResponse) {
+  rpc CollectionResources(QueryCollectionResourcesRequest) returns (QueryCollectionResourcesResponse) {
     option (google.api.http).get = "/cheqd/resource/v2/{collection_id}/metadata";
   }
 }
@@ -43,7 +43,7 @@ message QueryResourceMetadataResponse {
   Metadata resource = 1;
 }
 
-message QueryGetCollectionResourcesRequest {
+message QueryCollectionResourcesRequest {
   // is unique identifier a for collection
   string collection_id = 1;
 }

@@ -224,21 +224,21 @@ func (m *QueryResourceMetadataResponse) GetResource() *Metadata {
 	return nil
 }
 
-type QueryGetCollectionResourcesRequest struct {
+type QueryCollectionResourcesRequest struct {
 	// is unique identifier a for collection
 	CollectionId string `protobuf:"bytes,1,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
 }
 
-func (m *QueryGetCollectionResourcesRequest) Reset()         { *m = QueryGetCollectionResourcesRequest{} }
-func (m *QueryGetCollectionResourcesRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryGetCollectionResourcesRequest) ProtoMessage()    {}
-func (*QueryGetCollectionResourcesRequest) Descriptor() ([]byte, []int) {
+func (m *QueryCollectionResourcesRequest) Reset()         { *m = QueryCollectionResourcesRequest{} }
+func (m *QueryCollectionResourcesRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryCollectionResourcesRequest) ProtoMessage()    {}
+func (*QueryCollectionResourcesRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_14284472e64722d9, []int{4}
 }
-func (m *QueryGetCollectionResourcesRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryCollectionResourcesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetCollectionResourcesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryCollectionResourcesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_QueryGetCollectionResourcesRequest.Marshal(b, m, deterministic)
 	} else {
@@ -250,19 +250,19 @@ func (m *QueryGetCollectionResourcesRequest) XXX_Marshal(b []byte, deterministic
 		return b[:n], nil
 	}
 }
-func (m *QueryGetCollectionResourcesRequest) XXX_Merge(src proto.Message) {
+func (m *QueryCollectionResourcesRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_QueryGetCollectionResourcesRequest.Merge(m, src)
 }
-func (m *QueryGetCollectionResourcesRequest) XXX_Size() int {
+func (m *QueryCollectionResourcesRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetCollectionResourcesRequest) XXX_DiscardUnknown() {
+func (m *QueryCollectionResourcesRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_QueryGetCollectionResourcesRequest.DiscardUnknown(m)
 }
 
 var xxx_messageInfo_QueryGetCollectionResourcesRequest proto.InternalMessageInfo
 
-func (m *QueryGetCollectionResourcesRequest) GetCollectionId() string {
+func (m *QueryCollectionResourcesRequest) GetCollectionId() string {
 	if m != nil {
 		return m.CollectionId
 	}
@@ -318,7 +318,7 @@ func init() {
 	proto.RegisterType((*QueryResourceResponse)(nil), "cheqd.resource.v2.QueryResourceResponse")
 	proto.RegisterType((*QueryResourceMetadataRequest)(nil), "cheqd.resource.v2.QueryResourceMetadataRequest")
 	proto.RegisterType((*QueryResourceMetadataResponse)(nil), "cheqd.resource.v2.QueryResourceMetadataResponse")
-	proto.RegisterType((*QueryGetCollectionResourcesRequest)(nil), "cheqd.resource.v2.QueryGetCollectionResourcesRequest")
+	proto.RegisterType((*QueryCollectionResourcesRequest)(nil), "cheqd.resource.v2.QueryCollectionResourcesRequest")
 	proto.RegisterType((*QueryCollectionResourcesResponse)(nil), "cheqd.resource.v2.QueryCollectionResourcesResponse")
 }
 
@@ -371,7 +371,7 @@ const _ = grpc.SupportPackageIsVersion4
 type QueryClient interface {
 	Resource(ctx context.Context, in *QueryResourceRequest, opts ...grpc.CallOption) (*QueryResourceResponse, error)
 	ResourceMetadata(ctx context.Context, in *QueryResourceMetadataRequest, opts ...grpc.CallOption) (*QueryResourceMetadataResponse, error)
-	CollectionResources(ctx context.Context, in *QueryGetCollectionResourcesRequest, opts ...grpc.CallOption) (*QueryCollectionResourcesResponse, error)
+	CollectionResources(ctx context.Context, in *QueryCollectionResourcesRequest, opts ...grpc.CallOption) (*QueryCollectionResourcesResponse, error)
 }
 
 type queryClient struct {
@@ -400,7 +400,7 @@ func (c *queryClient) ResourceMetadata(ctx context.Context, in *QueryResourceMet
 	return out, nil
 }
 
-func (c *queryClient) CollectionResources(ctx context.Context, in *QueryGetCollectionResourcesRequest, opts ...grpc.CallOption) (*QueryCollectionResourcesResponse, error) {
+func (c *queryClient) CollectionResources(ctx context.Context, in *QueryCollectionResourcesRequest, opts ...grpc.CallOption) (*QueryCollectionResourcesResponse, error) {
 	out := new(QueryCollectionResourcesResponse)
 	err := c.cc.Invoke(ctx, "/cheqd.resource.v2.Query/CollectionResources", in, out, opts...)
 	if err != nil {
@@ -413,7 +413,7 @@ func (c *queryClient) CollectionResources(ctx context.Context, in *QueryGetColle
 type QueryServer interface {
 	Resource(context.Context, *QueryResourceRequest) (*QueryResourceResponse, error)
 	ResourceMetadata(context.Context, *QueryResourceMetadataRequest) (*QueryResourceMetadataResponse, error)
-	CollectionResources(context.Context, *QueryGetCollectionResourcesRequest) (*QueryCollectionResourcesResponse, error)
+	CollectionResources(context.Context, *QueryCollectionResourcesRequest) (*QueryCollectionResourcesResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
@@ -426,7 +426,7 @@ func (*UnimplementedQueryServer) Resource(ctx context.Context, req *QueryResourc
 func (*UnimplementedQueryServer) ResourceMetadata(ctx context.Context, req *QueryResourceMetadataRequest) (*QueryResourceMetadataResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ResourceMetadata not implemented")
 }
-func (*UnimplementedQueryServer) CollectionResources(ctx context.Context, req *QueryGetCollectionResourcesRequest) (*QueryCollectionResourcesResponse, error) {
+func (*UnimplementedQueryServer) CollectionResources(ctx context.Context, req *QueryCollectionResourcesRequest) (*QueryCollectionResourcesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CollectionResources not implemented")
 }
 
@@ -471,7 +471,7 @@ func _Query_ResourceMetadata_Handler(srv interface{}, ctx context.Context, dec f
 }
 
 func _Query_CollectionResources_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetCollectionResourcesRequest)
+	in := new(QueryCollectionResourcesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -483,7 +483,7 @@ func _Query_CollectionResources_Handler(srv interface{}, ctx context.Context, de
 		FullMethod: "/cheqd.resource.v2.Query/CollectionResources",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).CollectionResources(ctx, req.(*QueryGetCollectionResourcesRequest))
+		return srv.(QueryServer).CollectionResources(ctx, req.(*QueryCollectionResourcesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -653,7 +653,7 @@ func (m *QueryResourceMetadataResponse) MarshalToSizedBuffer(dAtA []byte) (int, 
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetCollectionResourcesRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryCollectionResourcesRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -663,12 +663,12 @@ func (m *QueryGetCollectionResourcesRequest) Marshal() (dAtA []byte, err error) 
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetCollectionResourcesRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryCollectionResourcesRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetCollectionResourcesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryCollectionResourcesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -791,7 +791,7 @@ func (m *QueryResourceMetadataResponse) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetCollectionResourcesRequest) Size() (n int) {
+func (m *QueryCollectionResourcesRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1225,7 +1225,7 @@ func (m *QueryResourceMetadataResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetCollectionResourcesRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryCollectionResourcesRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1248,10 +1248,10 @@ func (m *QueryGetCollectionResourcesRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetCollectionResourcesRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryCollectionResourcesRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetCollectionResourcesRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryCollectionResourcesRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:

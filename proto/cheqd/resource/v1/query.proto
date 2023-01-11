@@ -11,7 +11,7 @@ service Query {
   rpc Resource(QueryResourceRequest) returns (QueryResourceResponse) {
     option (google.api.http).get = "/1.0/identifiers/{collection_id}/resources/{id}";
   }
-  rpc CollectionResources(QueryGetCollectionResourcesRequest) returns (QueryCollectionResourcesResponse) {
+  rpc CollectionResources(QueryCollectionResourcesRequest) returns (QueryCollectionResourcesResponse) {
     option (google.api.http).get = "/1.0/identifiers/{collection_id}/resources/all";
   }
   rpc AllResourceVersions(QueryGetAllResourceVersionsRequest) returns (QueryGetAllResourceVersionsResponse) {
@@ -28,7 +28,7 @@ message QueryResourceResponse {
   Resource resource = 1;
 }
 
-message QueryGetCollectionResourcesRequest {
+message QueryCollectionResourcesRequest {
   string collection_id = 1;
 }
 
