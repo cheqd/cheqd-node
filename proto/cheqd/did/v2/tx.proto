@@ -59,7 +59,10 @@ message SignInfo {
 
 // MsgCreateDidDocPayload defines the structure of the payload for creating a new DID document
 message MsgCreateDidDocPayload {
+  // context is a list of URIs used to identify the context of the DID document.
+  // Default: https://www.w3.org/ns/did/v1
   repeated string context = 1;
+
   string id = 2;
   repeated string controller = 3;
   repeated VerificationMethod verification_method = 4;
@@ -80,7 +83,7 @@ message MsgCreateDidDocPayload {
 // MsgCreateDidDocResponse defines response type for Msg/CreateDidDoc.
 message MsgCreateDidDocResponse {
   // Return the created DID Document with metadata
-  DidDocWithMetadata did_document_with_metadata = 1;
+  DidDocWithMetadata value = 1;
 }
 
 // MsgUpdateDidDocPayload defines the structure of the payload for updating an existing DID document
@@ -106,7 +109,7 @@ message MsgUpdateDidDocPayload {
 
 message MsgUpdateDidDocResponse {
   // Return the updated DID Document with metadata
-  DidDocWithMetadata did_document_with_metadata = 1;
+  DidDocWithMetadata value = 1;
 }
 
 // MsgDeactivateDidDocPayload defines the structure of the payload for deactivating an existing DID document
