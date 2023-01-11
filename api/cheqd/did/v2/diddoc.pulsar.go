@@ -4242,11 +4242,9 @@ type DidDoc struct {
 	// keyAgreement is a list of verification methods that can be used to perform
 	// key agreement as the DID subject.
 	KeyAgreement []string `protobuf:"bytes,9,rep,name=key_agreement,json=keyAgreement,proto3" json:"key_agreement,omitempty"`
-	// service is a list of services that can be used to interact with the DID
-	// subject.
+	// service is a list of services that can be used to interact with the DID subject.
 	Service []*Service `protobuf:"bytes,10,rep,name=service,proto3" json:"service,omitempty"`
-	// alsoKnownAs is a list of DIDs that are known to refer to the same DID
-	// subject.
+	// alsoKnownAs is a list of DIDs that are known to refer to the same DID subject.
 	AlsoKnownAs []string `protobuf:"bytes,11,rep,name=also_known_as,json=alsoKnownAs,proto3" json:"also_known_as,omitempty"`
 }
 
