@@ -3,7 +3,6 @@ syntax = "proto3";
 package cheqd.did.v2;
 
 import "cheqd/did/v2/diddoc.proto";
-import "gogoproto/gogo.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/did/types";
 
@@ -60,33 +59,43 @@ message SignInfo {
 
 // MsgCreateDidDocPayload defines the structure of the payload for creating a new DID document
 message MsgCreateDidDocPayload {
-  // Contents of the DID Document to be created
-  DidDoc did_doc = 1 [
-    (gogoproto.nullable) = false,
-    (gogoproto.embed) = true,
-    (gogoproto.jsontag) = "didDocument"
-  ];
+  repeated string context = 1;
+  string id = 2;
+  repeated string controller = 3;
+  repeated VerificationMethod verification_method = 4;
+  repeated string authentication = 5;
+  repeated string assertion_method = 6;
+  repeated string capability_invocation = 7;
+  repeated string capability_delegation = 8;
+  repeated string key_agreement = 9;
+  repeated string also_known_as = 10;
+  repeated Service service = 11;
 
   // Version ID of the DID Document to be created
   //
   // Format: <uuid>
-  string version_id = 2;
+  string version_id = 12;
 }
 
 // MsgCreateDidDocResponse defines response type for Msg/CreateDidDoc.
 message MsgCreateDidDocResponse {
   // Return the created DID Document with metadata
-  DidDocWithMetadata did_doc_with_metadata = 1;
+  DidDocumentWithMetadata did_document_with_metadata = 1;
 }
 
 // MsgUpdateDidDocPayload defines the structure of the payload for updating an existing DID document
 message MsgUpdateDidDocPayload {
-  // Contents of the DID Document to be updated
-  DidDoc did_doc = 1 [
-    (gogoproto.nullable) = false,
-    (gogoproto.embed) = true,
-    (gogoproto.jsontag) = "didDocument"
-  ];
+  repeated string context = 1;
+  string id = 2;
+  repeated string controller = 3;
+  repeated VerificationMethod verification_method = 4;
+  repeated string authentication = 5;
+  repeated string assertion_method = 6;
+  repeated string capability_invocation = 7;
+  repeated string capability_delegation = 8;
+  repeated string key_agreement = 9;
+  repeated string also_known_as = 10;
+  repeated Service service = 11;
 
   // Updated version ID of the DID Document.
   // Links to next/previous versions of the DID Document will be automatically updated.
@@ -97,7 +106,7 @@ message MsgUpdateDidDocPayload {
 
 message MsgUpdateDidDocResponse {
   // Return the updated DID Document with metadata
-  DidDocWithMetadata did_doc_with_metadata = 1;
+  DidDocumentWithMetadata did_document_with_metadata = 1;
 }
 
 // MsgDeactivateDidDocPayload defines the structure of the payload for deactivating an existing DID document
@@ -113,5 +122,5 @@ message MsgDeactivateDidDocPayload {
 // MsgDeactivateDidDocResponse defines response type for Msg/DeactivateDidDoc.
 message MsgDeactivateDidDocResponse {
   // Return the deactivated DID Document with metadata
-  DidDocWithMetadata value = 1;
+  DidDocumentWithMetadata value = 1;
 }

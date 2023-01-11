@@ -44,7 +44,7 @@ message QueryDidDocResponse {
   // Successful resolution of the DID Document returns the following:
   // - didDocument is the latest version of the DID Document
   // - didDocumentMetadata is metadata associated with the latest version of the DID Document
-  DidDocWithMetadata did_doc_with_metadata = 1;
+  DidDocumentWithMetadata did_document_with_metadata = 1;
 }
 
 // QueryDidDocVersionRequest is the request type for the Query/DidDocVersion method
@@ -73,7 +73,7 @@ message QueryDidDocVersionResponse {
   // Successful resolution of the DID Document returns the following:
   // - didDocument is the requested version of the DID Document
   // - didDocumentMetadata is metadata associated with the requested version of the DID Document
-  DidDocWithMetadata did_doc_with_metadata = 1;
+  DidDocumentWithMetadata did_document_with_metadata = 1;
 }
 
 // QueryAllDidDocVersionsMetadataRequest is the request type for the Query/AllDidDocVersionsMetadata method
@@ -95,7 +95,7 @@ message QueryAllDidDocVersionsMetadataRequest {
 // QueryAllDidDocVersionsMetadataResponse is the response type for the Query/AllDidDocVersionsMetadata method
 message QueryAllDidDocVersionsMetadataResponse {
   // versions is the list of all versions of the requested DID Document
-  repeated Metadata versions = 1;
+  repeated DidDocumentMetadata versions = 1;
 
   // pagination defines the pagination in the response.
   cosmos.base.query.v1beta1.PageResponse pagination = 2;

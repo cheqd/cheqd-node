@@ -6,16 +6,20 @@ package types
 import (
 	fmt "fmt"
 	_ "github.com/cosmos/gogoproto/gogoproto"
+	_ "github.com/cosmos/gogoproto/types"
 	proto "github.com/gogo/protobuf/proto"
+	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 	io "io"
 	math "math"
 	math_bits "math/bits"
+	time "time"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
+var _ = time.Kitchen
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
@@ -23,9 +27,9 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// DidDoc defines a DID Document, as defined in the DID Core specification.
+// DidDocument defines a DID Document, as defined in the DID Core specification.
 // Documentation: https://www.w3.org/TR/did-core/
-type DidDoc struct {
+type DidDocument struct {
 	// context is a list of URIs used to identify the context of the DID document.
 	// Default context: https://www.w3.org/ns/did/v1
 	Context []string `protobuf:"bytes,1,rep,name=context,proto3" json:"context,omitempty"`
@@ -60,18 +64,18 @@ type DidDoc struct {
 	AlsoKnownAs []string `protobuf:"bytes,11,rep,name=also_known_as,json=alsoKnownAs,proto3" json:"also_known_as,omitempty"`
 }
 
-func (m *DidDoc) Reset()         { *m = DidDoc{} }
-func (m *DidDoc) String() string { return proto.CompactTextString(m) }
-func (*DidDoc) ProtoMessage()    {}
-func (*DidDoc) Descriptor() ([]byte, []int) {
+func (m *DidDocument) Reset()         { *m = DidDocument{} }
+func (m *DidDocument) String() string { return proto.CompactTextString(m) }
+func (*DidDocument) ProtoMessage()    {}
+func (*DidDocument) Descriptor() ([]byte, []int) {
 	return fileDescriptor_b7b058eff1719454, []int{0}
 }
-func (m *DidDoc) XXX_Unmarshal(b []byte) error {
+func (m *DidDocument) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *DidDoc) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *DidDocument) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_DidDoc.Marshal(b, m, deterministic)
+		return xxx_messageInfo_DidDocument.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -81,89 +85,89 @@ func (m *DidDoc) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *DidDoc) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DidDoc.Merge(m, src)
+func (m *DidDocument) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DidDocument.Merge(m, src)
 }
-func (m *DidDoc) XXX_Size() int {
+func (m *DidDocument) XXX_Size() int {
 	return m.Size()
 }
-func (m *DidDoc) XXX_DiscardUnknown() {
-	xxx_messageInfo_DidDoc.DiscardUnknown(m)
+func (m *DidDocument) XXX_DiscardUnknown() {
+	xxx_messageInfo_DidDocument.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_DidDoc proto.InternalMessageInfo
+var xxx_messageInfo_DidDocument proto.InternalMessageInfo
 
-func (m *DidDoc) GetContext() []string {
+func (m *DidDocument) GetContext() []string {
 	if m != nil {
 		return m.Context
 	}
 	return nil
 }
 
-func (m *DidDoc) GetId() string {
+func (m *DidDocument) GetId() string {
 	if m != nil {
 		return m.Id
 	}
 	return ""
 }
 
-func (m *DidDoc) GetController() []string {
+func (m *DidDocument) GetController() []string {
 	if m != nil {
 		return m.Controller
 	}
 	return nil
 }
 
-func (m *DidDoc) GetVerificationMethod() []*VerificationMethod {
+func (m *DidDocument) GetVerificationMethod() []*VerificationMethod {
 	if m != nil {
 		return m.VerificationMethod
 	}
 	return nil
 }
 
-func (m *DidDoc) GetAuthentication() []string {
+func (m *DidDocument) GetAuthentication() []string {
 	if m != nil {
 		return m.Authentication
 	}
 	return nil
 }
 
-func (m *DidDoc) GetAssertionMethod() []string {
+func (m *DidDocument) GetAssertionMethod() []string {
 	if m != nil {
 		return m.AssertionMethod
 	}
 	return nil
 }
 
-func (m *DidDoc) GetCapabilityInvocation() []string {
+func (m *DidDocument) GetCapabilityInvocation() []string {
 	if m != nil {
 		return m.CapabilityInvocation
 	}
 	return nil
 }
 
-func (m *DidDoc) GetCapabilityDelegation() []string {
+func (m *DidDocument) GetCapabilityDelegation() []string {
 	if m != nil {
 		return m.CapabilityDelegation
 	}
 	return nil
 }
 
-func (m *DidDoc) GetKeyAgreement() []string {
+func (m *DidDocument) GetKeyAgreement() []string {
 	if m != nil {
 		return m.KeyAgreement
 	}
 	return nil
 }
 
-func (m *DidDoc) GetService() []*Service {
+func (m *DidDocument) GetService() []*Service {
 	if m != nil {
 		return m.Service
 	}
 	return nil
 }
 
-func (m *DidDoc) GetAlsoKnownAs() []string {
+func (m *DidDocument) GetAlsoKnownAs() []string {
 	if m != nil {
 		return m.AlsoKnownAs
 	}
@@ -318,25 +322,25 @@ func (m *Service) GetServiceEndpoint() []string {
 
 // DidDocWithMetadata defines a DID Document with metadata, as defined in the DID Core specification.
 // Contains the DID Document, as well as DID Document metadata.
-type DidDocWithMetadata struct {
+type DidDocumentWithMetadata struct {
 	// didDocument is the DID Document.
-	DidDoc *DidDoc `protobuf:"bytes,1,opt,name=did_doc,json=didDoc,proto3" json:"didDocument"`
+	DidDocument *DidDocument `protobuf:"bytes,1,opt,name=did_document,json=didDocument,proto3" json:"did_document,omitempty"`
 	// didDocumentMetadata is the DID Document metadata.
-	Metadata *Metadata `protobuf:"bytes,2,opt,name=metadata,proto3" json:"didDocumentMetadata"`
+	DidDocumentMetadata *DidDocumentMetadata `protobuf:"bytes,2,opt,name=did_document_metadata,json=didDocumentMetadata,proto3" json:"did_document_metadata,omitempty"`
 }
 
-func (m *DidDocWithMetadata) Reset()         { *m = DidDocWithMetadata{} }
-func (m *DidDocWithMetadata) String() string { return proto.CompactTextString(m) }
-func (*DidDocWithMetadata) ProtoMessage()    {}
-func (*DidDocWithMetadata) Descriptor() ([]byte, []int) {
+func (m *DidDocumentWithMetadata) Reset()         { *m = DidDocumentWithMetadata{} }
+func (m *DidDocumentWithMetadata) String() string { return proto.CompactTextString(m) }
+func (*DidDocumentWithMetadata) ProtoMessage()    {}
+func (*DidDocumentWithMetadata) Descriptor() ([]byte, []int) {
 	return fileDescriptor_b7b058eff1719454, []int{3}
 }
-func (m *DidDocWithMetadata) XXX_Unmarshal(b []byte) error {
+func (m *DidDocumentWithMetadata) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *DidDocWithMetadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *DidDocumentWithMetadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_DidDocWithMetadata.Marshal(b, m, deterministic)
+		return xxx_messageInfo_DidDocumentWithMetadata.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -346,43 +350,43 @@ func (m *DidDocWithMetadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return b[:n], nil
 	}
 }
-func (m *DidDocWithMetadata) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DidDocWithMetadata.Merge(m, src)
+func (m *DidDocumentWithMetadata) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DidDocumentWithMetadata.Merge(m, src)
 }
-func (m *DidDocWithMetadata) XXX_Size() int {
+func (m *DidDocumentWithMetadata) XXX_Size() int {
 	return m.Size()
 }
-func (m *DidDocWithMetadata) XXX_DiscardUnknown() {
-	xxx_messageInfo_DidDocWithMetadata.DiscardUnknown(m)
+func (m *DidDocumentWithMetadata) XXX_DiscardUnknown() {
+	xxx_messageInfo_DidDocumentWithMetadata.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_DidDocWithMetadata proto.InternalMessageInfo
+var xxx_messageInfo_DidDocumentWithMetadata proto.InternalMessageInfo
 
-func (m *DidDocWithMetadata) GetDidDoc() *DidDoc {
+func (m *DidDocumentWithMetadata) GetDidDocument() *DidDocument {
 	if m != nil {
-		return m.DidDoc
+		return m.DidDocument
 	}
 	return nil
 }
 
-func (m *DidDocWithMetadata) GetMetadata() *Metadata {
+func (m *DidDocumentWithMetadata) GetDidDocumentMetadata() *DidDocumentMetadata {
 	if m != nil {
-		return m.Metadata
+		return m.DidDocumentMetadata
 	}
 	return nil
 }
 
 // Metadata defines DID Document metadata, as defined in the DID Core specification.
 // Documentation: https://www.w3.org/TR/did-core/#did-document-metadata-properties
-type Metadata struct {
+type DidDocumentMetadata struct {
 	// created is the timestamp of the creation of the DID Document.
 	// Format: RFC3339
 	// Example: 2021-03-10T15:16:17Z
-	Created string `protobuf:"bytes,1,opt,name=created,proto3" json:"created,omitempty"`
+	Created time.Time `protobuf:"bytes,1,opt,name=created,proto3,stdtime" json:"created"`
 	// updated is the timestamp of the last update of the DID Document.
 	// Format: RFC3339
 	// Example: 2021-03-10T15:16:17Z
-	Updated string `protobuf:"bytes,2,opt,name=updated,proto3" json:"updated,omitempty"`
+	Updated *time.Time `protobuf:"bytes,2,opt,name=updated,proto3,stdtime" json:"updated,omitempty"`
 	// deactivated is a flag that indicates whether the DID Document is deactivated.
 	// Default: false
 	Deactivated bool `protobuf:"varint,3,opt,name=deactivated,proto3" json:"deactivated,omitempty"`
@@ -400,18 +404,18 @@ type Metadata struct {
 	PreviousVersionId string `protobuf:"bytes,6,opt,name=previous_version_id,json=previousVersionId,proto3" json:"previous_version_id,omitempty"`
 }
 
-func (m *Metadata) Reset()         { *m = Metadata{} }
-func (m *Metadata) String() string { return proto.CompactTextString(m) }
-func (*Metadata) ProtoMessage()    {}
-func (*Metadata) Descriptor() ([]byte, []int) {
+func (m *DidDocumentMetadata) Reset()         { *m = DidDocumentMetadata{} }
+func (m *DidDocumentMetadata) String() string { return proto.CompactTextString(m) }
+func (*DidDocumentMetadata) ProtoMessage()    {}
+func (*DidDocumentMetadata) Descriptor() ([]byte, []int) {
 	return fileDescriptor_b7b058eff1719454, []int{4}
 }
-func (m *Metadata) XXX_Unmarshal(b []byte) error {
+func (m *DidDocumentMetadata) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *Metadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *DidDocumentMetadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_Metadata.Marshal(b, m, deterministic)
+		return xxx_messageInfo_DidDocumentMetadata.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -421,54 +425,54 @@ func (m *Metadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *Metadata) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Metadata.Merge(m, src)
+func (m *DidDocumentMetadata) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DidDocumentMetadata.Merge(m, src)
 }
-func (m *Metadata) XXX_Size() int {
+func (m *DidDocumentMetadata) XXX_Size() int {
 	return m.Size()
 }
-func (m *Metadata) XXX_DiscardUnknown() {
-	xxx_messageInfo_Metadata.DiscardUnknown(m)
+func (m *DidDocumentMetadata) XXX_DiscardUnknown() {
+	xxx_messageInfo_DidDocumentMetadata.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_Metadata proto.InternalMessageInfo
+var xxx_messageInfo_DidDocumentMetadata proto.InternalMessageInfo
 
-func (m *Metadata) GetCreated() string {
+func (m *DidDocumentMetadata) GetCreated() time.Time {
 	if m != nil {
 		return m.Created
 	}
-	return ""
+	return time.Time{}
 }
 
-func (m *Metadata) GetUpdated() string {
+func (m *DidDocumentMetadata) GetUpdated() *time.Time {
 	if m != nil {
 		return m.Updated
 	}
-	return ""
+	return nil
 }
 
-func (m *Metadata) GetDeactivated() bool {
+func (m *DidDocumentMetadata) GetDeactivated() bool {
 	if m != nil {
 		return m.Deactivated
 	}
 	return false
 }
 
-func (m *Metadata) GetVersionId() string {
+func (m *DidDocumentMetadata) GetVersionId() string {
 	if m != nil {
 		return m.VersionId
 	}
 	return ""
 }
 
-func (m *Metadata) GetNextVersionId() string {
+func (m *DidDocumentMetadata) GetNextVersionId() string {
 	if m != nil {
 		return m.NextVersionId
 	}
 	return ""
 }
 
-func (m *Metadata) GetPreviousVersionId() string {
+func (m *DidDocumentMetadata) GetPreviousVersionId() string {
 	if m != nil {
 		return m.PreviousVersionId
 	}
@@ -476,61 +480,64 @@ func (m *Metadata) GetPreviousVersionId() string {
 }
 
 func init() {
-	proto.RegisterType((*DidDoc)(nil), "cheqd.did.v2.DidDoc")
+	proto.RegisterType((*DidDocument)(nil), "cheqd.did.v2.DidDocument")
 	proto.RegisterType((*VerificationMethod)(nil), "cheqd.did.v2.VerificationMethod")
 	proto.RegisterType((*Service)(nil), "cheqd.did.v2.Service")
-	proto.RegisterType((*DidDocWithMetadata)(nil), "cheqd.did.v2.DidDocWithMetadata")
-	proto.RegisterType((*Metadata)(nil), "cheqd.did.v2.Metadata")
+	proto.RegisterType((*DidDocumentWithMetadata)(nil), "cheqd.did.v2.DidDocumentWithMetadata")
+	proto.RegisterType((*DidDocumentMetadata)(nil), "cheqd.did.v2.DidDocumentMetadata")
 }
 
 func init() { proto.RegisterFile("cheqd/did/v2/diddoc.proto", fileDescriptor_b7b058eff1719454) }
 
 var fileDescriptor_b7b058eff1719454 = []byte{
-	// 650 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x6c, 0x54, 0xcb, 0x6e, 0xd3, 0x40,
-	0x14, 0xad, 0x9b, 0x36, 0x8f, 0xeb, 0xb6, 0x29, 0xd3, 0xb4, 0x18, 0x24, 0xd2, 0x10, 0x24, 0x68,
-	0x17, 0x38, 0x52, 0xba, 0x61, 0x85, 0xd4, 0xaa, 0x2c, 0xaa, 0xaa, 0x0b, 0x0c, 0x2a, 0x12, 0x1b,
-	0x6b, 0xea, 0xb9, 0x24, 0xa3, 0x26, 0x1e, 0x63, 0x4f, 0x4c, 0xf3, 0x17, 0xfc, 0x02, 0xdf, 0xc0,
-	0x4f, 0xb0, 0xec, 0x0e, 0x16, 0xa8, 0x42, 0xed, 0xae, 0x5f, 0x81, 0x66, 0x3c, 0x36, 0x4e, 0xc2,
-	0x26, 0xf1, 0x9c, 0x73, 0xe6, 0xcc, 0xf5, 0x3d, 0xd7, 0x03, 0x8f, 0x82, 0x21, 0x7e, 0x66, 0x3d,
-	0xc6, 0x59, 0x2f, 0xed, 0xab, 0x3f, 0x26, 0x02, 0x37, 0x8a, 0x85, 0x14, 0x64, 0x4d, 0x53, 0x2e,
-	0xe3, 0xcc, 0x4d, 0xfb, 0x8f, 0x5b, 0x03, 0x31, 0x10, 0x9a, 0xe8, 0xa9, 0xa7, 0x4c, 0xd3, 0xfd,
-	0x5d, 0x81, 0xea, 0x31, 0x67, 0xc7, 0x22, 0x20, 0x0e, 0xd4, 0x02, 0x11, 0x4a, 0xbc, 0x92, 0x8e,
-	0xd5, 0xa9, 0xec, 0x35, 0xbc, 0x7c, 0x49, 0x36, 0x60, 0x99, 0x33, 0x67, 0xb9, 0x63, 0xed, 0x35,
-	0xbc, 0x65, 0xce, 0x48, 0x1b, 0x40, 0x51, 0xb1, 0x18, 0x8d, 0x30, 0x76, 0x2a, 0x5a, 0x5c, 0x42,
-	0xc8, 0x5b, 0xd8, 0x4a, 0x31, 0xe6, 0x9f, 0x78, 0x40, 0x25, 0x17, 0xa1, 0x3f, 0x46, 0x39, 0x14,
-	0xcc, 0x59, 0xe9, 0x54, 0xf6, 0xec, 0x7e, 0xc7, 0x2d, 0x97, 0xe5, 0x9e, 0x97, 0x84, 0x67, 0x5a,
-	0xe7, 0x91, 0x74, 0x01, 0x23, 0xcf, 0x61, 0x83, 0x4e, 0xe4, 0x10, 0x43, 0x69, 0x70, 0x67, 0x55,
-	0x1f, 0x3b, 0x87, 0x92, 0x7d, 0xd8, 0xa4, 0x49, 0x82, 0x71, 0xf9, 0xdc, 0xaa, 0x56, 0x36, 0x0b,
-	0xdc, 0x58, 0x1e, 0xc0, 0x76, 0x40, 0x23, 0x7a, 0xc1, 0x47, 0x5c, 0x4e, 0x7d, 0x1e, 0xa6, 0xc2,
-	0x38, 0xd7, 0xb4, 0xbe, 0xf5, 0x8f, 0x3c, 0x29, 0xb8, 0xb9, 0x4d, 0x0c, 0x47, 0x38, 0xc8, 0x36,
-	0xd5, 0xe7, 0x37, 0x1d, 0x17, 0x1c, 0x79, 0x06, 0xeb, 0x97, 0x38, 0xf5, 0xe9, 0x20, 0x46, 0x1c,
-	0x63, 0x28, 0x9d, 0x86, 0x16, 0xaf, 0x5d, 0xe2, 0xf4, 0x30, 0xc7, 0x48, 0x0f, 0x6a, 0x09, 0xc6,
-	0x29, 0x0f, 0xd0, 0x01, 0xdd, 0xa8, 0xed, 0xd9, 0x46, 0xbd, 0xcb, 0x48, 0x2f, 0x57, 0x91, 0x2e,
-	0xac, 0xd3, 0x51, 0x22, 0xfc, 0xcb, 0x50, 0x7c, 0x09, 0x7d, 0x9a, 0x38, 0xb6, 0x76, 0xb5, 0x15,
-	0x78, 0xaa, 0xb0, 0xc3, 0xa4, 0xfb, 0xdd, 0x02, 0xb2, 0xd8, 0x61, 0x13, 0xa8, 0x55, 0x04, 0xfa,
-	0x0a, 0x9c, 0xff, 0x04, 0xe6, 0xcb, 0x69, 0x84, 0x26, 0xf6, 0x9d, 0xc5, 0x4c, 0xde, 0x4f, 0x23,
-	0x5c, 0x18, 0x05, 0x6b, 0x6e, 0x14, 0x0e, 0x60, 0x7b, 0xd6, 0x99, 0x4a, 0x8c, 0x39, 0x1d, 0x39,
-	0x2b, 0x5a, 0xda, 0x9a, 0xb1, 0x35, 0x5c, 0x77, 0x00, 0x35, 0xf3, 0xb6, 0x0b, 0x95, 0x3e, 0x85,
-	0x35, 0xf3, 0xfe, 0xe5, 0xea, 0x6c, 0x83, 0xe9, 0x92, 0xf6, 0x61, 0x33, 0x97, 0x60, 0xc8, 0x22,
-	0xc1, 0x43, 0x69, 0x66, 0xb4, 0x69, 0xf0, 0x37, 0x06, 0xee, 0x7e, 0xb3, 0x80, 0x64, 0xd3, 0xff,
-	0x81, 0xcb, 0xe1, 0x19, 0x4a, 0xca, 0xa8, 0xa4, 0xe4, 0x35, 0xd4, 0x18, 0x67, 0x3e, 0x13, 0x81,
-	0x3e, 0xd9, 0xee, 0xb7, 0x66, 0xa3, 0xc8, 0xb6, 0x1c, 0x35, 0xef, 0x6f, 0x76, 0x6d, 0xa6, 0x9f,
-	0x27, 0x2a, 0x42, 0xaf, 0x9a, 0x2d, 0xc8, 0x29, 0xd4, 0xc7, 0xc6, 0x4b, 0x17, 0x68, 0xf7, 0x77,
-	0x66, 0x0d, 0xf2, 0x93, 0x8e, 0x1e, 0xde, 0xdf, 0xec, 0x6e, 0x95, 0x2c, 0x72, 0xc2, 0x2b, 0x0c,
-	0xba, 0x3f, 0x2d, 0xa8, 0x17, 0x95, 0xa9, 0x6f, 0x34, 0x46, 0x2a, 0x31, 0xef, 0x49, 0xbe, 0x54,
-	0xcc, 0x24, 0x62, 0x9a, 0xc9, 0x7a, 0x92, 0x2f, 0x49, 0x07, 0x6c, 0x86, 0x34, 0x90, 0x3c, 0xd5,
-	0xac, 0xca, 0xa8, 0xee, 0x95, 0x21, 0xf2, 0x04, 0x20, 0xc5, 0x38, 0x51, 0xf9, 0x70, 0x66, 0x92,
-	0x69, 0x18, 0xe4, 0x44, 0x7d, 0x7b, 0xcd, 0x10, 0xaf, 0xa4, 0x5f, 0xd2, 0xac, 0x6a, 0xcd, 0xba,
-	0x82, 0xcf, 0x0b, 0x9d, 0x0b, 0x5b, 0x51, 0x8c, 0x29, 0x17, 0x93, 0xa4, 0xac, 0xad, 0x6a, 0xed,
-	0x83, 0x9c, 0x2a, 0xf4, 0x47, 0x87, 0x3f, 0x6e, 0xdb, 0xd6, 0xf5, 0x6d, 0xdb, 0xfa, 0x73, 0xdb,
-	0xb6, 0xbe, 0xde, 0xb5, 0x97, 0xae, 0xef, 0xda, 0x4b, 0xbf, 0xee, 0xda, 0x4b, 0x1f, 0x5f, 0x0c,
-	0xb8, 0x1c, 0x4e, 0x2e, 0xdc, 0x40, 0x8c, 0x7b, 0xd9, 0xfd, 0xa6, 0x7f, 0x5f, 0x86, 0x82, 0x61,
-	0xef, 0x4a, 0x5f, 0x76, 0x2a, 0xfd, 0xe4, 0xa2, 0xaa, 0x6f, 0xb1, 0x83, 0xbf, 0x01, 0x00, 0x00,
-	0xff, 0xff, 0xe6, 0xd0, 0xb1, 0xf0, 0x06, 0x05, 0x00, 0x00,
+	// 700 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x54, 0xcd, 0x6e, 0xd3, 0x40,
+	0x10, 0x8e, 0x93, 0xb6, 0x69, 0xc6, 0xe9, 0x0f, 0x9b, 0x06, 0xdc, 0x4a, 0xa4, 0x69, 0x90, 0xa0,
+	0x95, 0xc0, 0x91, 0x52, 0x90, 0x38, 0x20, 0xa4, 0x56, 0xe5, 0x50, 0xa1, 0x1e, 0x08, 0xa5, 0x48,
+	0x5c, 0xac, 0x8d, 0x77, 0xea, 0xac, 0x9a, 0x78, 0x8d, 0xbd, 0x31, 0xcd, 0x5b, 0xf4, 0x49, 0xb8,
+	0x70, 0xe3, 0x09, 0x7a, 0xec, 0x91, 0x53, 0x41, 0xed, 0x81, 0xd7, 0x40, 0xde, 0xac, 0x83, 0x93,
+	0x14, 0x89, 0x4b, 0x62, 0x7f, 0x3f, 0xb3, 0xe3, 0x99, 0xd9, 0x81, 0x75, 0xb7, 0x8b, 0x9f, 0x59,
+	0x93, 0x71, 0xd6, 0x8c, 0x5b, 0xc9, 0x1f, 0x13, 0xae, 0x1d, 0x84, 0x42, 0x0a, 0x52, 0x56, 0x94,
+	0xcd, 0x38, 0xb3, 0xe3, 0xd6, 0xc6, 0x9a, 0x27, 0x3c, 0xa1, 0x88, 0x66, 0xf2, 0x34, 0xd2, 0x6c,
+	0x6c, 0x7a, 0x42, 0x78, 0x3d, 0x6c, 0xaa, 0xb7, 0xce, 0xe0, 0xb4, 0x29, 0x79, 0x1f, 0x23, 0x49,
+	0xfb, 0xc1, 0x48, 0xd0, 0xf8, 0x5d, 0x00, 0xf3, 0x80, 0xb3, 0x03, 0xe1, 0x0e, 0xfa, 0xe8, 0x4b,
+	0x62, 0x41, 0xd1, 0x15, 0xbe, 0xc4, 0x73, 0x69, 0x19, 0xf5, 0xc2, 0x76, 0xa9, 0x9d, 0xbe, 0x92,
+	0x65, 0xc8, 0x73, 0x66, 0xe5, 0xeb, 0xc6, 0x76, 0xa9, 0x9d, 0xe7, 0x8c, 0xd4, 0x00, 0x12, 0x2a,
+	0x14, 0xbd, 0x1e, 0x86, 0x56, 0x41, 0x89, 0x33, 0x08, 0x79, 0x07, 0x95, 0x18, 0x43, 0x7e, 0xca,
+	0x5d, 0x2a, 0xb9, 0xf0, 0x9d, 0x3e, 0xca, 0xae, 0x60, 0xd6, 0x5c, 0xbd, 0xb0, 0x6d, 0xb6, 0xea,
+	0x76, 0x36, 0x79, 0xfb, 0x24, 0x23, 0x3c, 0x52, 0xba, 0x36, 0x89, 0x67, 0x30, 0xf2, 0x18, 0x96,
+	0xe9, 0x40, 0x76, 0xd1, 0x97, 0x1a, 0xb7, 0xe6, 0xd5, 0xb1, 0x53, 0x28, 0xd9, 0x81, 0x55, 0x1a,
+	0x45, 0x18, 0x66, 0xcf, 0x5d, 0x50, 0xca, 0x95, 0x31, 0xae, 0x43, 0xee, 0x42, 0xd5, 0xa5, 0x01,
+	0xed, 0xf0, 0x1e, 0x97, 0x43, 0x87, 0xfb, 0xb1, 0xd0, 0x91, 0x8b, 0x4a, 0xbf, 0xf6, 0x97, 0x3c,
+	0x1c, 0x73, 0x53, 0x26, 0x86, 0x3d, 0xf4, 0x46, 0xa6, 0xc5, 0x69, 0xd3, 0xc1, 0x98, 0x23, 0x8f,
+	0x60, 0xe9, 0x0c, 0x87, 0x0e, 0xf5, 0x42, 0xc4, 0xa4, 0xd4, 0x56, 0x49, 0x89, 0xcb, 0x67, 0x38,
+	0xdc, 0x4b, 0x31, 0xf2, 0x02, 0x8a, 0x11, 0x86, 0x31, 0x77, 0xd1, 0x02, 0x55, 0xa8, 0xea, 0x64,
+	0xa1, 0xde, 0x8f, 0xc8, 0xfd, 0xb9, 0xcb, 0xeb, 0x4d, 0xa3, 0x9d, 0x6a, 0x49, 0x03, 0x96, 0x68,
+	0x2f, 0x12, 0xce, 0x99, 0x2f, 0xbe, 0xf8, 0x0e, 0x8d, 0x2c, 0x53, 0xc5, 0x36, 0x13, 0xf0, 0x6d,
+	0x82, 0xed, 0x45, 0x8d, 0x6f, 0x06, 0x90, 0xd9, 0x3a, 0xeb, 0xb6, 0x1a, 0xe3, 0xb6, 0xbe, 0x04,
+	0xeb, 0x8e, 0xb6, 0x39, 0x72, 0x18, 0xa0, 0x6e, 0xfe, 0xfd, 0xd9, 0xce, 0x1c, 0x0f, 0x03, 0x9c,
+	0x19, 0x08, 0x63, 0x6a, 0x20, 0x76, 0xa1, 0x3a, 0x19, 0x99, 0x4a, 0x0c, 0x39, 0xed, 0x59, 0x73,
+	0x4a, 0xba, 0x36, 0x11, 0x56, 0x73, 0x0d, 0x0f, 0x8a, 0xfa, 0x9b, 0x67, 0x32, 0xdd, 0x82, 0xb2,
+	0xfe, 0xfe, 0x6c, 0x76, 0xa6, 0xc6, 0x54, 0x4a, 0x3b, 0xb0, 0x9a, 0x4a, 0xd0, 0x67, 0x81, 0xe0,
+	0xbe, 0xd4, 0x93, 0xba, 0xa2, 0xf1, 0x37, 0x1a, 0x6e, 0x7c, 0x35, 0xe0, 0x41, 0xe6, 0x22, 0x7c,
+	0xe4, 0xb2, 0x7b, 0x84, 0x92, 0x32, 0x2a, 0x29, 0x79, 0x05, 0x65, 0xc6, 0x99, 0xc3, 0x34, 0xa7,
+	0x72, 0x30, 0x5b, 0xeb, 0x93, 0xad, 0xc9, 0x98, 0xdb, 0x26, 0xcb, 0x5c, 0xa9, 0x0f, 0x50, 0xcd,
+	0xba, 0x93, 0x8a, 0xaa, 0xb0, 0x2a, 0x61, 0xb3, 0xb5, 0xf5, 0xcf, 0x30, 0xe9, 0xf9, 0xed, 0x0a,
+	0x9b, 0x05, 0x1b, 0xdf, 0xf3, 0x50, 0xb9, 0x43, 0x4c, 0x5e, 0x43, 0xd1, 0x0d, 0x91, 0x4a, 0x64,
+	0x3a, 0xcf, 0x0d, 0x7b, 0xb4, 0x04, 0xec, 0x74, 0x09, 0xd8, 0xc7, 0xe9, 0x12, 0xd8, 0x5f, 0xbc,
+	0xbc, 0xde, 0xcc, 0x5d, 0xfc, 0x4c, 0x66, 0x49, 0x9b, 0x12, 0xff, 0x20, 0x60, 0xca, 0x9f, 0xff,
+	0x2f, 0xbf, 0x31, 0xf2, 0x6b, 0x13, 0xa9, 0x83, 0xc9, 0x90, 0xba, 0x92, 0xc7, 0x2a, 0x46, 0x32,
+	0x07, 0x8b, 0xed, 0x2c, 0x44, 0x1e, 0x02, 0xc4, 0x18, 0x46, 0xc9, 0x0c, 0x70, 0xa6, 0xbb, 0x5f,
+	0xd2, 0xc8, 0x21, 0x23, 0x4f, 0x61, 0xc5, 0xc7, 0x73, 0xe9, 0x64, 0x34, 0xf3, 0x89, 0x46, 0x0f,
+	0xfd, 0x52, 0x42, 0x9e, 0x8c, 0xd5, 0xcf, 0xa1, 0x12, 0x84, 0x18, 0x73, 0x31, 0x88, 0xb2, 0x8e,
+	0x85, 0x8c, 0xe3, 0x5e, 0x2a, 0x18, 0xbb, 0xf6, 0xf7, 0x2e, 0x6f, 0x6a, 0xc6, 0xd5, 0x4d, 0xcd,
+	0xf8, 0x75, 0x53, 0x33, 0x2e, 0x6e, 0x6b, 0xb9, 0xab, 0xdb, 0x5a, 0xee, 0xc7, 0x6d, 0x2d, 0xf7,
+	0xe9, 0x89, 0xc7, 0x65, 0x77, 0xd0, 0xb1, 0x5d, 0xd1, 0x6f, 0x8e, 0x76, 0xaf, 0xfa, 0x7d, 0xe6,
+	0x0b, 0x86, 0xcd, 0x73, 0xb5, 0x88, 0x93, 0x69, 0x8b, 0x3a, 0x0b, 0xaa, 0x1c, 0xbb, 0x7f, 0x02,
+	0x00, 0x00, 0xff, 0xff, 0xc7, 0xa8, 0x07, 0x02, 0xa2, 0x05, 0x00, 0x00,
 }
 
-func (m *DidDoc) Marshal() (dAtA []byte, err error) {
+func (m *DidDocument) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -540,12 +547,12 @@ func (m *DidDoc) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *DidDoc) MarshalTo(dAtA []byte) (int, error) {
+func (m *DidDocument) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *DidDoc) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *DidDocument) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -757,7 +764,7 @@ func (m *Service) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *DidDocWithMetadata) Marshal() (dAtA []byte, err error) {
+func (m *DidDocumentWithMetadata) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -767,19 +774,19 @@ func (m *DidDocWithMetadata) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *DidDocWithMetadata) MarshalTo(dAtA []byte) (int, error) {
+func (m *DidDocumentWithMetadata) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *DidDocWithMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *DidDocumentWithMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Metadata != nil {
+	if m.DidDocumentMetadata != nil {
 		{
-			size, err := m.Metadata.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.DidDocumentMetadata.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -789,9 +796,9 @@ func (m *DidDocWithMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x12
 	}
-	if m.DidDoc != nil {
+	if m.DidDocument != nil {
 		{
-			size, err := m.DidDoc.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.DidDocument.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -804,7 +811,7 @@ func (m *DidDocWithMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *Metadata) Marshal() (dAtA []byte, err error) {
+func (m *DidDocumentMetadata) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -814,12 +821,12 @@ func (m *Metadata) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *Metadata) MarshalTo(dAtA []byte) (int, error) {
+func (m *DidDocumentMetadata) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *Metadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *DidDocumentMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -855,20 +862,24 @@ func (m *Metadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x18
 	}
-	if len(m.Updated) > 0 {
-		i -= len(m.Updated)
-		copy(dAtA[i:], m.Updated)
-		i = encodeVarintDiddoc(dAtA, i, uint64(len(m.Updated)))
+	if m.Updated != nil {
+		n3, err3 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.Updated, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.Updated):])
+		if err3 != nil {
+			return 0, err3
+		}
+		i -= n3
+		i = encodeVarintDiddoc(dAtA, i, uint64(n3))
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.Created) > 0 {
-		i -= len(m.Created)
-		copy(dAtA[i:], m.Created)
-		i = encodeVarintDiddoc(dAtA, i, uint64(len(m.Created)))
-		i--
-		dAtA[i] = 0xa
+	n4, err4 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.Created, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.Created):])
+	if err4 != nil {
+		return 0, err4
 	}
+	i -= n4
+	i = encodeVarintDiddoc(dAtA, i, uint64(n4))
+	i--
+	dAtA[i] = 0xa
 	return len(dAtA) - i, nil
 }
 
@@ -883,7 +894,7 @@ func encodeVarintDiddoc(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *DidDoc) Size() (n int) {
+func (m *DidDocument) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1004,35 +1015,33 @@ func (m *Service) Size() (n int) {
 	return n
 }
 
-func (m *DidDocWithMetadata) Size() (n int) {
+func (m *DidDocumentWithMetadata) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.DidDoc != nil {
-		l = m.DidDoc.Size()
+	if m.DidDocument != nil {
+		l = m.DidDocument.Size()
 		n += 1 + l + sovDiddoc(uint64(l))
 	}
-	if m.Metadata != nil {
-		l = m.Metadata.Size()
+	if m.DidDocumentMetadata != nil {
+		l = m.DidDocumentMetadata.Size()
 		n += 1 + l + sovDiddoc(uint64(l))
 	}
 	return n
 }
 
-func (m *Metadata) Size() (n int) {
+func (m *DidDocumentMetadata) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = len(m.Created)
-	if l > 0 {
-		n += 1 + l + sovDiddoc(uint64(l))
-	}
-	l = len(m.Updated)
-	if l > 0 {
+	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.Created)
+	n += 1 + l + sovDiddoc(uint64(l))
+	if m.Updated != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.Updated)
 		n += 1 + l + sovDiddoc(uint64(l))
 	}
 	if m.Deactivated {
@@ -1059,7 +1068,7 @@ func sovDiddoc(x uint64) (n int) {
 func sozDiddoc(x uint64) (n int) {
 	return sovDiddoc(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *DidDoc) Unmarshal(dAtA []byte) error {
+func (m *DidDocument) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1082,10 +1091,10 @@ func (m *DidDoc) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: DidDoc: wiretype end group for non-group")
+			return fmt.Errorf("proto: DidDocument: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: DidDoc: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: DidDocument: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1789,7 +1798,7 @@ func (m *Service) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *DidDocWithMetadata) Unmarshal(dAtA []byte) error {
+func (m *DidDocumentWithMetadata) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1812,15 +1821,15 @@ func (m *DidDocWithMetadata) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: DidDocWithMetadata: wiretype end group for non-group")
+			return fmt.Errorf("proto: DidDocumentWithMetadata: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: DidDocWithMetadata: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: DidDocumentWithMetadata: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DidDoc", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DidDocument", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1847,16 +1856,16 @@ func (m *DidDocWithMetadata) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.DidDoc == nil {
-				m.DidDoc = &DidDoc{}
+			if m.DidDocument == nil {
+				m.DidDocument = &DidDocument{}
 			}
-			if err := m.DidDoc.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.DidDocument.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Metadata", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DidDocumentMetadata", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1883,10 +1892,10 @@ func (m *DidDocWithMetadata) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Metadata == nil {
-				m.Metadata = &Metadata{}
+			if m.DidDocumentMetadata == nil {
+				m.DidDocumentMetadata = &DidDocumentMetadata{}
 			}
-			if err := m.Metadata.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.DidDocumentMetadata.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1911,7 +1920,7 @@ func (m *DidDocWithMetadata) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *Metadata) Unmarshal(dAtA []byte) error {
+func (m *DidDocumentMetadata) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1934,17 +1943,17 @@ func (m *Metadata) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: Metadata: wiretype end group for non-group")
+			return fmt.Errorf("proto: DidDocumentMetadata: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Metadata: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: DidDocumentMetadata: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Created", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowDiddoc
@@ -1954,29 +1963,30 @@ func (m *Metadata) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthDiddoc
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthDiddoc
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Created = string(dAtA[iNdEx:postIndex])
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.Created, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Updated", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowDiddoc
@@ -1986,23 +1996,27 @@ func (m *Metadata) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthDiddoc
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthDiddoc
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Updated = string(dAtA[iNdEx:postIndex])
+			if m.Updated == nil {
+				m.Updated = new(time.Time)
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.Updated, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		case 3:
 			if wireType != 0 {

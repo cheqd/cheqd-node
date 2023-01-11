@@ -3,12 +3,13 @@ syntax = "proto3";
 package cheqd.did.v2;
 
 import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/did/types";
 
-// DidDoc defines a DID Document, as defined in the DID Core specification.
+// DidDocument defines a DID Document, as defined in the DID Core specification.
 // Documentation: https://www.w3.org/TR/did-core/
-message DidDoc {
+message DidDocument {
   // context is a list of URIs used to identify the context of the DID document.
   // Default context: https://www.w3.org/ns/did/v1
   repeated string context = 1;
@@ -46,7 +47,7 @@ message DidDoc {
 
   // service is a list of services that can be used to interact with the DID
   // subject.
-  repeated Service service = 10;
+  repeated Service service = 10 [(gogoproto.nullable) = true];
 
   // alsoKnownAs is a list of DIDs that are known to refer to the same DID
   // subject.
@@ -91,26 +92,32 @@ message Service {
 
 // DidDocWithMetadata defines a DID Document with metadata, as defined in the DID Core specification.
 // Contains the DID Document, as well as DID Document metadata.
-message DidDocWithMetadata {
+message DidDocumentWithMetadata {
   // didDocument is the DID Document.
-  DidDoc did_doc = 1 [(gogoproto.jsontag) = "didDocument"];
+  DidDocument did_document = 1;
 
   // didDocumentMetadata is the DID Document metadata.
-  Metadata metadata = 2 [(gogoproto.jsontag) = "didDocumentMetadata"];
+  DidDocumentMetadata did_document_metadata = 2;
 }
 
 // Metadata defines DID Document metadata, as defined in the DID Core specification.
 // Documentation: https://www.w3.org/TR/did-core/#did-document-metadata-properties
-message Metadata {
+message DidDocumentMetadata {
   // created is the timestamp of the creation of the DID Document.
   // Format: RFC3339
   // Example: 2021-03-10T15:16:17Z
-  string created = 1;
+  google.protobuf.Timestamp created = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.stdtime) = true
+  ];
 
   // updated is the timestamp of the last update of the DID Document.
   // Format: RFC3339
   // Example: 2021-03-10T15:16:17Z
-  string updated = 2;
+  google.protobuf.Timestamp updated = 2 [
+    (gogoproto.nullable) = true,
+    (gogoproto.stdtime) = true
+  ];
 
   // deactivated is a flag that indicates whether the DID Document is deactivated.
   // Default: false
@@ -124,10 +131,10 @@ message Metadata {
   // next_version_id is the version identifier of the next version of the DID Document.
   // Format: UUID
   // Example: 123e4567-e89b-12d3-a456-426655440000
-  string next_version_id = 5;
+  string next_version_id = 5 [(gogoproto.nullable) = true];
 
   // previous_version_id is the version identifier of the previous version of the DID Document.
   // Format: UUID
   // Example: 123e4567-e89b-12d3-a456-426655440000
-  string previous_version_id = 6;
+  string previous_version_id = 6 [(gogoproto.nullable) = true];
 }
