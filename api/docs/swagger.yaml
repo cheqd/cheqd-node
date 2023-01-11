@@ -27,6 +27,9 @@ externalDocs:
 paths:
   /cheqd/did/v2/{id}:
     get:
+      summary: >-
+        DidDoc fetches the latest version of the DID Document for a given DID
+        unique identifier
       operationId: DidDoc
       responses:
         '200':
@@ -34,7 +37,15 @@ paths:
           schema:
             type: object
             properties:
-              value:
+              did_doc_with_metadata:
+                title: >-
+                  Successful resolution of the DID Document returns the
+                  following:
+
+                  - didDocument is the latest version of the DID Document
+
+                  - didDocumentMetadata is metadata associated with the latest
+                  version of the DID Document
                 type: object
                 properties:
                   did_doc:
@@ -46,8 +57,8 @@ paths:
                         items:
                           type: string
                         title: >-
-                          `context` is a list of URIs used to identify the
-                          context of the DID document.
+                          context is a list of URIs used to identify the context
+                          of the DID document.
 
                           Default context: https://www.w3.org/ns/did/v1
                       id:
@@ -97,8 +108,8 @@ paths:
                                 Commonly used verification material types:
                                 publicJwk, publicKeyBase58, publicKeyMultibase
                           title: >-
-                            `VerificationMethod` defines a verification method,
-                            as defined in the DID Core specification.
+                            VerificationMethod defines a verification method, as
+                            defined in the DID Core specification.
 
                             Documentation:
                             https://www.w3.org/TR/did-core/#verification-methods
@@ -177,7 +188,7 @@ paths:
                                 serviceEndpoint is the endpoint of the service.
                                 Example: https://example.com/endpoint
                           title: >-
-                            `Service` defines a service, as defined in the DID
+                            Service defines a service, as defined in the DID
                             Core specification.
 
                             Documentation:
@@ -197,8 +208,8 @@ paths:
 
                           subject.
                     title: >-
-                      `DidDoc` defines a DID Document, as defined in the DID
-                      Core specification.
+                      DidDoc defines a DID Document, as defined in the DID Core
+                      specification.
 
                       Documentation: https://www.w3.org/TR/did-core/
                   metadata:
@@ -258,16 +269,19 @@ paths:
 
                           Example: 123e4567-e89b-12d3-a456-426655440000
                     title: >-
-                      `Metadata` defines DID Document metadata, as defined in
-                      the DID Core specification.
+                      Metadata defines DID Document metadata, as defined in the
+                      DID Core specification.
 
                       Documentation:
                       https://www.w3.org/TR/did-core/#did-document-metadata-properties
                 description: >-
-                  `DidDocWithMetadata` defines a DID Document with metadata, as
+                  DidDocWithMetadata defines a DID Document with metadata, as
                   defined in the DID Core specification.
 
                   Contains the DID Document, as well as DID Document metadata.
+            title: >-
+              QueryDidDocResponse is the response type for the Query/DidDoc
+              method
         default:
           description: An unexpected error response.
           schema:
@@ -292,7 +306,15 @@ paths:
                       format: byte
       parameters:
         - name: id
-          description: is a DID to be fetched
+          description: |-
+            DID unique identifier of the DID Document to fetch.
+            UUID-style DIDs as well as Indy-style DID are supported.
+
+            Format: did:cheqd:<namespace>:<unique-identifier>
+
+            Examples:
+            - did:cheqd:mainnet:c82f2b02-bdab-4dd7-b833-3e143745d612
+            - did:cheqd:testnet:wGHEXrZvJxR8vw5P3UWH1j
           in: path
           required: true
           type: string
@@ -300,6 +322,9 @@ paths:
         - Query
   /cheqd/did/v2/{id}/metadata:
     get:
+      summary: >-
+        AllDidDocVersionsMetadata fetches metadata for all versions of the DID
+        Document for a given DID unique identifier
       operationId: AllDidDocVersionsMetadata
       responses:
         '200':
@@ -365,11 +390,17 @@ paths:
 
                         Example: 123e4567-e89b-12d3-a456-426655440000
                   title: >-
-                    `Metadata` defines DID Document metadata, as defined in the
+                    Metadata defines DID Document metadata, as defined in the
                     DID Core specification.
 
                     Documentation:
                     https://www.w3.org/TR/did-core/#did-document-metadata-properties
+                title: >-
+                  versions is the list of all versions of the requested DID
+                  Document
+            title: >-
+              QueryAllDidDocVersionsMetadataResponse is the response type for
+              the Query/AllDidDocVersionsMetadata method
         default:
           description: An unexpected error response.
           schema:
@@ -394,7 +425,15 @@ paths:
                       format: byte
       parameters:
         - name: id
-          description: is a DID
+          description: |-
+            DID unique identifier of the DID Document to fetch version metadata.
+            UUID-style DIDs as well as Indy-style DID are supported.
+
+            Format: did:cheqd:<namespace>:<unique-identifier>
+
+            Examples:
+            - did:cheqd:mainnet:c82f2b02-bdab-4dd7-b833-3e143745d612
+            - did:cheqd:testnet:wGHEXrZvJxR8vw5P3UWH1j
           in: path
           required: true
           type: string
@@ -402,6 +441,9 @@ paths:
         - Query
   /cheqd/did/v2/{id}/version/{version}:
     get:
+      summary: >-
+        DidDocVersion fetches the specific version of the DID Document for a
+        given DID unique identifier
       operationId: DidDocVersion
       responses:
         '200':
@@ -409,7 +451,15 @@ paths:
           schema:
             type: object
             properties:
-              value:
+              did_doc_with_metadata:
+                title: >-
+                  Successful resolution of the DID Document returns the
+                  following:
+
+                  - didDocument is the requested version of the DID Document
+
+                  - didDocumentMetadata is metadata associated with the
+                  requested version of the DID Document
                 type: object
                 properties:
                   did_doc:
@@ -421,8 +471,8 @@ paths:
                         items:
                           type: string
                         title: >-
-                          `context` is a list of URIs used to identify the
-                          context of the DID document.
+                          context is a list of URIs used to identify the context
+                          of the DID document.
 
                           Default context: https://www.w3.org/ns/did/v1
                       id:
@@ -472,8 +522,8 @@ paths:
                                 Commonly used verification material types:
                                 publicJwk, publicKeyBase58, publicKeyMultibase
                           title: >-
-                            `VerificationMethod` defines a verification method,
-                            as defined in the DID Core specification.
+                            VerificationMethod defines a verification method, as
+                            defined in the DID Core specification.
 
                             Documentation:
                             https://www.w3.org/TR/did-core/#verification-methods
@@ -552,7 +602,7 @@ paths:
                                 serviceEndpoint is the endpoint of the service.
                                 Example: https://example.com/endpoint
                           title: >-
-                            `Service` defines a service, as defined in the DID
+                            Service defines a service, as defined in the DID
                             Core specification.
 
                             Documentation:
@@ -572,8 +622,8 @@ paths:
 
                           subject.
                     title: >-
-                      `DidDoc` defines a DID Document, as defined in the DID
-                      Core specification.
+                      DidDoc defines a DID Document, as defined in the DID Core
+                      specification.
 
                       Documentation: https://www.w3.org/TR/did-core/
                   metadata:
@@ -633,16 +683,19 @@ paths:
 
                           Example: 123e4567-e89b-12d3-a456-426655440000
                     title: >-
-                      `Metadata` defines DID Document metadata, as defined in
-                      the DID Core specification.
+                      Metadata defines DID Document metadata, as defined in the
+                      DID Core specification.
 
                       Documentation:
                       https://www.w3.org/TR/did-core/#did-document-metadata-properties
                 description: >-
-                  `DidDocWithMetadata` defines a DID Document with metadata, as
+                  DidDocWithMetadata defines a DID Document with metadata, as
                   defined in the DID Core specification.
 
                   Contains the DID Document, as well as DID Document metadata.
+            title: >-
+              QueryDidDocVersionResponse is the response type for the
+              Query/DidDocVersion method
         default:
           description: An unexpected error response.
           schema:
@@ -667,12 +720,26 @@ paths:
                       format: byte
       parameters:
         - name: id
-          description: is a DID
+          description: |-
+            DID unique identifier of the DID Document to fetch.
+            UUID-style DIDs as well as Indy-style DID are supported.
+
+            Format: did:cheqd:<namespace>:<unique-identifier>
+
+            Examples:
+            - did:cheqd:mainnet:c82f2b02-bdab-4dd7-b833-3e143745d612
+            - did:cheqd:testnet:wGHEXrZvJxR8vw5P3UWH1j
           in: path
           required: true
           type: string
         - name: version
-          description: is a unique value that maps DID Doc state at some point
+          description: |-
+            Unique version identifier of the DID Document to fetch.
+            Returns the specified version of the DID Document.
+
+            Format: <uuid>
+
+            Example: 93f2573c-eca9-4098-96cb-a1ec676a29ed
           in: path
           required: true
           type: string
