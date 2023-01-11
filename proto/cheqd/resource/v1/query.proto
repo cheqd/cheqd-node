@@ -8,10 +8,10 @@ option go_package = "github.com/cheqd/cheqd-node/x/resource/types/v1";
 
 // Query defines the gRPC querier service.
 service Query {
-  rpc Resource(QueryResourceRequest) returns (QueryResourceResponse) {
+  rpc Resource(QueryGetResourceRequest) returns (QueryResourceResponse) {
     option (google.api.http).get = "/1.0/identifiers/{collection_id}/resources/{id}";
   }
-  rpc CollectionResources(QueryCollectionResourcesRequest) returns (QueryCollectionResourcesResponse) {
+  rpc CollectionResources(QueryGetCollectionResourcesRequest) returns (QueryCollectionResourcesResponse) {
     option (google.api.http).get = "/1.0/identifiers/{collection_id}/resources/all";
   }
   rpc AllResourceVersions(QueryGetAllResourceVersionsRequest) returns (QueryGetAllResourceVersionsResponse) {
@@ -19,7 +19,7 @@ service Query {
   }
 }
 
-message QueryResourceRequest {
+message QueryGetResourceRequest {
   string collection_id = 1;
   string id = 2;
 }
@@ -28,7 +28,7 @@ message QueryResourceResponse {
   Resource resource = 1;
 }
 
-message QueryCollectionResourcesRequest {
+message QueryGetCollectionResourcesRequest {
   string collection_id = 1;
 }
 
