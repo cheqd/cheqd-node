@@ -16,7 +16,7 @@ service Query {
     option (google.api.http).get = "/cheqd/did/v2/{id}/version/{version}";
   }
 
-  rpc AllDidDocVersionsMetadata(QueryGetAllDidDocVersionsMetadataRequest) returns (QueryAllDidDocVersionsMetadataResponse) {
+  rpc AllDidDocVersionsMetadata(QueryAllDidDocVersionsMetadataRequest) returns (QueryAllDidDocVersionsMetadataResponse) {
     option (google.api.http).get = "/cheqd/did/v2/{id}/metadata";
   }
 }
@@ -41,7 +41,7 @@ message QueryDidDocVersionResponse {
   DidDocWithMetadata value = 1;
 }
 
-message QueryGetAllDidDocVersionsMetadataRequest {
+message QueryAllDidDocVersionsMetadataRequest {
   // is a DID
   string id = 1;
 }

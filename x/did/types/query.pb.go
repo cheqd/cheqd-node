@@ -215,23 +215,23 @@ func (m *QueryDidDocVersionResponse) GetValue() *DidDocWithMetadata {
 	return nil
 }
 
-type QueryGetAllDidDocVersionsMetadataRequest struct {
+type QueryAllDidDocVersionsMetadataRequest struct {
 	// is a DID
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 }
 
-func (m *QueryGetAllDidDocVersionsMetadataRequest) Reset() {
-	*m = QueryGetAllDidDocVersionsMetadataRequest{}
+func (m *QueryAllDidDocVersionsMetadataRequest) Reset() {
+	*m = QueryAllDidDocVersionsMetadataRequest{}
 }
-func (m *QueryGetAllDidDocVersionsMetadataRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryGetAllDidDocVersionsMetadataRequest) ProtoMessage()    {}
-func (*QueryGetAllDidDocVersionsMetadataRequest) Descriptor() ([]byte, []int) {
+func (m *QueryAllDidDocVersionsMetadataRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryAllDidDocVersionsMetadataRequest) ProtoMessage()    {}
+func (*QueryAllDidDocVersionsMetadataRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_8d818263856d0dc9, []int{4}
 }
-func (m *QueryGetAllDidDocVersionsMetadataRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryAllDidDocVersionsMetadataRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetAllDidDocVersionsMetadataRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryAllDidDocVersionsMetadataRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_QueryGetAllDidDocVersionsMetadataRequest.Marshal(b, m, deterministic)
 	} else {
@@ -243,19 +243,19 @@ func (m *QueryGetAllDidDocVersionsMetadataRequest) XXX_Marshal(b []byte, determi
 		return b[:n], nil
 	}
 }
-func (m *QueryGetAllDidDocVersionsMetadataRequest) XXX_Merge(src proto.Message) {
+func (m *QueryAllDidDocVersionsMetadataRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_QueryGetAllDidDocVersionsMetadataRequest.Merge(m, src)
 }
-func (m *QueryGetAllDidDocVersionsMetadataRequest) XXX_Size() int {
+func (m *QueryAllDidDocVersionsMetadataRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetAllDidDocVersionsMetadataRequest) XXX_DiscardUnknown() {
+func (m *QueryAllDidDocVersionsMetadataRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_QueryGetAllDidDocVersionsMetadataRequest.DiscardUnknown(m)
 }
 
 var xxx_messageInfo_QueryGetAllDidDocVersionsMetadataRequest proto.InternalMessageInfo
 
-func (m *QueryGetAllDidDocVersionsMetadataRequest) GetId() string {
+func (m *QueryAllDidDocVersionsMetadataRequest) GetId() string {
 	if m != nil {
 		return m.Id
 	}
@@ -313,7 +313,7 @@ func init() {
 	proto.RegisterType((*QueryDidDocResponse)(nil), "cheqd.did.v2.QueryDidDocResponse")
 	proto.RegisterType((*QueryDidDocVersionRequest)(nil), "cheqd.did.v2.QueryDidDocVersionRequest")
 	proto.RegisterType((*QueryDidDocVersionResponse)(nil), "cheqd.did.v2.QueryDidDocVersionResponse")
-	proto.RegisterType((*QueryGetAllDidDocVersionsMetadataRequest)(nil), "cheqd.did.v2.QueryGetAllDidDocVersionsMetadataRequest")
+	proto.RegisterType((*QueryAllDidDocVersionsMetadataRequest)(nil), "cheqd.did.v2.QueryAllDidDocVersionsMetadataRequest")
 	proto.RegisterType((*QueryAllDidDocVersionsMetadataResponse)(nil), "cheqd.did.v2.QueryAllDidDocVersionsMetadataResponse")
 }
 
@@ -366,7 +366,7 @@ const _ = grpc.SupportPackageIsVersion4
 type QueryClient interface {
 	DidDoc(ctx context.Context, in *QueryDidDocRequest, opts ...grpc.CallOption) (*QueryDidDocResponse, error)
 	DidDocVersion(ctx context.Context, in *QueryDidDocVersionRequest, opts ...grpc.CallOption) (*QueryDidDocVersionResponse, error)
-	AllDidDocVersionsMetadata(ctx context.Context, in *QueryGetAllDidDocVersionsMetadataRequest, opts ...grpc.CallOption) (*QueryAllDidDocVersionsMetadataResponse, error)
+	AllDidDocVersionsMetadata(ctx context.Context, in *QueryAllDidDocVersionsMetadataRequest, opts ...grpc.CallOption) (*QueryAllDidDocVersionsMetadataResponse, error)
 }
 
 type queryClient struct {
@@ -395,7 +395,7 @@ func (c *queryClient) DidDocVersion(ctx context.Context, in *QueryDidDocVersionR
 	return out, nil
 }
 
-func (c *queryClient) AllDidDocVersionsMetadata(ctx context.Context, in *QueryGetAllDidDocVersionsMetadataRequest, opts ...grpc.CallOption) (*QueryAllDidDocVersionsMetadataResponse, error) {
+func (c *queryClient) AllDidDocVersionsMetadata(ctx context.Context, in *QueryAllDidDocVersionsMetadataRequest, opts ...grpc.CallOption) (*QueryAllDidDocVersionsMetadataResponse, error) {
 	out := new(QueryAllDidDocVersionsMetadataResponse)
 	err := c.cc.Invoke(ctx, "/cheqd.did.v2.Query/AllDidDocVersionsMetadata", in, out, opts...)
 	if err != nil {
@@ -408,7 +408,7 @@ func (c *queryClient) AllDidDocVersionsMetadata(ctx context.Context, in *QueryGe
 type QueryServer interface {
 	DidDoc(context.Context, *QueryDidDocRequest) (*QueryDidDocResponse, error)
 	DidDocVersion(context.Context, *QueryDidDocVersionRequest) (*QueryDidDocVersionResponse, error)
-	AllDidDocVersionsMetadata(context.Context, *QueryGetAllDidDocVersionsMetadataRequest) (*QueryAllDidDocVersionsMetadataResponse, error)
+	AllDidDocVersionsMetadata(context.Context, *QueryAllDidDocVersionsMetadataRequest) (*QueryAllDidDocVersionsMetadataResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
@@ -421,7 +421,7 @@ func (*UnimplementedQueryServer) DidDoc(ctx context.Context, req *QueryDidDocReq
 func (*UnimplementedQueryServer) DidDocVersion(ctx context.Context, req *QueryDidDocVersionRequest) (*QueryDidDocVersionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DidDocVersion not implemented")
 }
-func (*UnimplementedQueryServer) AllDidDocVersionsMetadata(ctx context.Context, req *QueryGetAllDidDocVersionsMetadataRequest) (*QueryAllDidDocVersionsMetadataResponse, error) {
+func (*UnimplementedQueryServer) AllDidDocVersionsMetadata(ctx context.Context, req *QueryAllDidDocVersionsMetadataRequest) (*QueryAllDidDocVersionsMetadataResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AllDidDocVersionsMetadata not implemented")
 }
 
@@ -466,7 +466,7 @@ func _Query_DidDocVersion_Handler(srv interface{}, ctx context.Context, dec func
 }
 
 func _Query_AllDidDocVersionsMetadata_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetAllDidDocVersionsMetadataRequest)
+	in := new(QueryAllDidDocVersionsMetadataRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -478,7 +478,7 @@ func _Query_AllDidDocVersionsMetadata_Handler(srv interface{}, ctx context.Conte
 		FullMethod: "/cheqd.did.v2.Query/AllDidDocVersionsMetadata",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).AllDidDocVersionsMetadata(ctx, req.(*QueryGetAllDidDocVersionsMetadataRequest))
+		return srv.(QueryServer).AllDidDocVersionsMetadata(ctx, req.(*QueryAllDidDocVersionsMetadataRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -641,7 +641,7 @@ func (m *QueryDidDocVersionResponse) MarshalToSizedBuffer(dAtA []byte) (int, err
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetAllDidDocVersionsMetadataRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryAllDidDocVersionsMetadataRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -651,12 +651,12 @@ func (m *QueryGetAllDidDocVersionsMetadataRequest) Marshal() (dAtA []byte, err e
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetAllDidDocVersionsMetadataRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryAllDidDocVersionsMetadataRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetAllDidDocVersionsMetadataRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryAllDidDocVersionsMetadataRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -775,7 +775,7 @@ func (m *QueryDidDocVersionResponse) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetAllDidDocVersionsMetadataRequest) Size() (n int) {
+func (m *QueryAllDidDocVersionsMetadataRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1177,7 +1177,7 @@ func (m *QueryDidDocVersionResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetAllDidDocVersionsMetadataRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryAllDidDocVersionsMetadataRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1200,10 +1200,10 @@ func (m *QueryGetAllDidDocVersionsMetadataRequest) Unmarshal(dAtA []byte) error 
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetAllDidDocVersionsMetadataRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryAllDidDocVersionsMetadataRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetAllDidDocVersionsMetadataRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryAllDidDocVersionsMetadataRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:

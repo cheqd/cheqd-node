@@ -24,7 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type QueryClient interface {
 	DidDoc(ctx context.Context, in *QueryDidDocRequest, opts ...grpc.CallOption) (*QueryDidDocResponse, error)
 	DidDocVersion(ctx context.Context, in *QueryDidDocVersionRequest, opts ...grpc.CallOption) (*QueryDidDocVersionResponse, error)
-	AllDidDocVersionsMetadata(ctx context.Context, in *QueryGetAllDidDocVersionsMetadataRequest, opts ...grpc.CallOption) (*QueryAllDidDocVersionsMetadataResponse, error)
+	AllDidDocVersionsMetadata(ctx context.Context, in *QueryAllDidDocVersionsMetadataRequest, opts ...grpc.CallOption) (*QueryAllDidDocVersionsMetadataResponse, error)
 }
 
 type queryClient struct {
@@ -53,7 +53,7 @@ func (c *queryClient) DidDocVersion(ctx context.Context, in *QueryDidDocVersionR
 	return out, nil
 }
 
-func (c *queryClient) AllDidDocVersionsMetadata(ctx context.Context, in *QueryGetAllDidDocVersionsMetadataRequest, opts ...grpc.CallOption) (*QueryAllDidDocVersionsMetadataResponse, error) {
+func (c *queryClient) AllDidDocVersionsMetadata(ctx context.Context, in *QueryAllDidDocVersionsMetadataRequest, opts ...grpc.CallOption) (*QueryAllDidDocVersionsMetadataResponse, error) {
 	out := new(QueryAllDidDocVersionsMetadataResponse)
 	err := c.cc.Invoke(ctx, "/cheqd.did.v2.Query/AllDidDocVersionsMetadata", in, out, opts...)
 	if err != nil {
@@ -68,7 +68,7 @@ func (c *queryClient) AllDidDocVersionsMetadata(ctx context.Context, in *QueryGe
 type QueryServer interface {
 	DidDoc(context.Context, *QueryDidDocRequest) (*QueryDidDocResponse, error)
 	DidDocVersion(context.Context, *QueryDidDocVersionRequest) (*QueryDidDocVersionResponse, error)
-	AllDidDocVersionsMetadata(context.Context, *QueryGetAllDidDocVersionsMetadataRequest) (*QueryAllDidDocVersionsMetadataResponse, error)
+	AllDidDocVersionsMetadata(context.Context, *QueryAllDidDocVersionsMetadataRequest) (*QueryAllDidDocVersionsMetadataResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -82,7 +82,7 @@ func (UnimplementedQueryServer) DidDoc(context.Context, *QueryDidDocRequest) (*Q
 func (UnimplementedQueryServer) DidDocVersion(context.Context, *QueryDidDocVersionRequest) (*QueryDidDocVersionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DidDocVersion not implemented")
 }
-func (UnimplementedQueryServer) AllDidDocVersionsMetadata(context.Context, *QueryGetAllDidDocVersionsMetadataRequest) (*QueryAllDidDocVersionsMetadataResponse, error) {
+func (UnimplementedQueryServer) AllDidDocVersionsMetadata(context.Context, *QueryAllDidDocVersionsMetadataRequest) (*QueryAllDidDocVersionsMetadataResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AllDidDocVersionsMetadata not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
@@ -135,7 +135,7 @@ func _Query_DidDocVersion_Handler(srv interface{}, ctx context.Context, dec func
 }
 
 func _Query_AllDidDocVersionsMetadata_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetAllDidDocVersionsMetadataRequest)
+	in := new(QueryAllDidDocVersionsMetadataRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -147,7 +147,7 @@ func _Query_AllDidDocVersionsMetadata_Handler(srv interface{}, ctx context.Conte
 		FullMethod: "/cheqd.did.v2.Query/AllDidDocVersionsMetadata",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).AllDidDocVersionsMetadata(ctx, req.(*QueryGetAllDidDocVersionsMetadataRequest))
+		return srv.(QueryServer).AllDidDocVersionsMetadata(ctx, req.(*QueryAllDidDocVersionsMetadataRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
