@@ -23,7 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type QueryClient interface {
 	DidDoc(ctx context.Context, in *QueryDidDocRequest, opts ...grpc.CallOption) (*QueryDidDocResponse, error)
-	DidDocVersion(ctx context.Context, in *QueryGetDidDocVersionRequest, opts ...grpc.CallOption) (*QueryDidDocVersionResponse, error)
+	DidDocVersion(ctx context.Context, in *QueryDidDocVersionRequest, opts ...grpc.CallOption) (*QueryDidDocVersionResponse, error)
 	AllDidDocVersionsMetadata(ctx context.Context, in *QueryGetAllDidDocVersionsMetadataRequest, opts ...grpc.CallOption) (*QueryAllDidDocVersionsMetadataResponse, error)
 }
 
@@ -44,7 +44,7 @@ func (c *queryClient) DidDoc(ctx context.Context, in *QueryDidDocRequest, opts .
 	return out, nil
 }
 
-func (c *queryClient) DidDocVersion(ctx context.Context, in *QueryGetDidDocVersionRequest, opts ...grpc.CallOption) (*QueryDidDocVersionResponse, error) {
+func (c *queryClient) DidDocVersion(ctx context.Context, in *QueryDidDocVersionRequest, opts ...grpc.CallOption) (*QueryDidDocVersionResponse, error) {
 	out := new(QueryDidDocVersionResponse)
 	err := c.cc.Invoke(ctx, "/cheqd.did.v2.Query/DidDocVersion", in, out, opts...)
 	if err != nil {
@@ -67,7 +67,7 @@ func (c *queryClient) AllDidDocVersionsMetadata(ctx context.Context, in *QueryGe
 // for forward compatibility
 type QueryServer interface {
 	DidDoc(context.Context, *QueryDidDocRequest) (*QueryDidDocResponse, error)
-	DidDocVersion(context.Context, *QueryGetDidDocVersionRequest) (*QueryDidDocVersionResponse, error)
+	DidDocVersion(context.Context, *QueryDidDocVersionRequest) (*QueryDidDocVersionResponse, error)
 	AllDidDocVersionsMetadata(context.Context, *QueryGetAllDidDocVersionsMetadataRequest) (*QueryAllDidDocVersionsMetadataResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
@@ -79,7 +79,7 @@ type UnimplementedQueryServer struct {
 func (UnimplementedQueryServer) DidDoc(context.Context, *QueryDidDocRequest) (*QueryDidDocResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DidDoc not implemented")
 }
-func (UnimplementedQueryServer) DidDocVersion(context.Context, *QueryGetDidDocVersionRequest) (*QueryDidDocVersionResponse, error) {
+func (UnimplementedQueryServer) DidDocVersion(context.Context, *QueryDidDocVersionRequest) (*QueryDidDocVersionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DidDocVersion not implemented")
 }
 func (UnimplementedQueryServer) AllDidDocVersionsMetadata(context.Context, *QueryGetAllDidDocVersionsMetadataRequest) (*QueryAllDidDocVersionsMetadataResponse, error) {
@@ -117,7 +117,7 @@ func _Query_DidDoc_Handler(srv interface{}, ctx context.Context, dec func(interf
 }
 
 func _Query_DidDocVersion_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetDidDocVersionRequest)
+	in := new(QueryDidDocVersionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -129,7 +129,7 @@ func _Query_DidDocVersion_Handler(srv interface{}, ctx context.Context, dec func
 		FullMethod: "/cheqd.did.v2.Query/DidDocVersion",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).DidDocVersion(ctx, req.(*QueryGetDidDocVersionRequest))
+		return srv.(QueryServer).DidDocVersion(ctx, req.(*QueryDidDocVersionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

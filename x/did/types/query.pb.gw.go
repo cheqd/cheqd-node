@@ -88,7 +88,7 @@ func local_request_Query_DidDoc_0(ctx context.Context, marshaler runtime.Marshal
 }
 
 func request_Query_DidDocVersion_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryGetDidDocVersionRequest
+	var protoReq QueryDidDocVersionRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -126,7 +126,7 @@ func request_Query_DidDocVersion_0(ctx context.Context, marshaler runtime.Marsha
 }
 
 func local_request_Query_DidDocVersion_0(ctx context.Context, marshaler runtime.Marshaler, server QueryServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryGetDidDocVersionRequest
+	var protoReq QueryDidDocVersionRequest
 	var metadata runtime.ServerMetadata
 
 	var (

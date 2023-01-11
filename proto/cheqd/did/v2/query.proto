@@ -12,7 +12,7 @@ service Query {
     option (google.api.http).get = "/cheqd/did/v2/{id}";
   }
 
-  rpc DidDocVersion(QueryGetDidDocVersionRequest) returns (QueryDidDocVersionResponse) {
+  rpc DidDocVersion(QueryDidDocVersionRequest) returns (QueryDidDocVersionResponse) {
     option (google.api.http).get = "/cheqd/did/v2/{id}/version/{version}";
   }
 
@@ -30,7 +30,7 @@ message QueryDidDocResponse {
   DidDocWithMetadata value = 1;
 }
 
-message QueryGetDidDocVersionRequest {
+message QueryDidDocVersionRequest {
   // is a DID
   string id = 1;
   // is a unique value that maps DID Doc state at some point
