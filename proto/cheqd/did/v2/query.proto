@@ -3,23 +3,24 @@ syntax = "proto3";
 package cheqd.did.v2;
 
 import "cheqd/did/v2/diddoc.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
 import "google/api/annotations.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/did/types";
 
 // Query defines the gRPC querier service for the DID module
 service Query {
-  // DidDoc fetches the latest version of the DID Document for a given DID unique identifier
+  // Fetch latest version of a DID Document for a given DID
   rpc DidDoc(QueryDidDocRequest) returns (QueryDidDocResponse) {
     option (google.api.http) = {get: "/cheqd/did/v2/{id}"};
   }
 
-  // DidDocVersion fetches the specific version of the DID Document for a given DID unique identifier
+  // Fetch specific version of a DID Document for a given DID
   rpc DidDocVersion(QueryDidDocVersionRequest) returns (QueryDidDocVersionResponse) {
     option (google.api.http) = {get: "/cheqd/did/v2/{id}/version/{version}"};
   }
 
-  // AllDidDocVersionsMetadata fetches metadata for all versions of the DID Document for a given DID unique identifier
+  // Fetch list of all versions of DID Documents for a given DID
   rpc AllDidDocVersionsMetadata(QueryAllDidDocVersionsMetadataRequest) returns (QueryAllDidDocVersionsMetadataResponse) {
     option (google.api.http) = {get: "/cheqd/did/v2/{id}/metadata"};
   }
@@ -86,10 +87,16 @@ message QueryAllDidDocVersionsMetadataRequest {
   // - did:cheqd:mainnet:c82f2b02-bdab-4dd7-b833-3e143745d612
   // - did:cheqd:testnet:wGHEXrZvJxR8vw5P3UWH1j
   string id = 1;
+
+  // pagination defines an optional pagination for the request.
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
 // QueryAllDidDocVersionsMetadataResponse is the response type for the Query/AllDidDocVersionsMetadata method
 message QueryAllDidDocVersionsMetadataResponse {
   // versions is the list of all versions of the requested DID Document
   repeated Metadata versions = 1;
+
+  // pagination defines the pagination in the response.
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
