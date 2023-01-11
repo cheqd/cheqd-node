@@ -12,79 +12,79 @@ import (
 	sync "sync"
 )
 
-var _ protoreflect.List = (*_DidDocumentVersionSet_2_list)(nil)
+var _ protoreflect.List = (*_DidDocVersionSet_2_list)(nil)
 
-type _DidDocumentVersionSet_2_list struct {
-	list *[]*DidDocumentWithMetadata
+type _DidDocVersionSet_2_list struct {
+	list *[]*DidDocWithMetadata
 }
 
-func (x *_DidDocumentVersionSet_2_list) Len() int {
+func (x *_DidDocVersionSet_2_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_DidDocumentVersionSet_2_list) Get(i int) protoreflect.Value {
+func (x *_DidDocVersionSet_2_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
 }
 
-func (x *_DidDocumentVersionSet_2_list) Set(i int, value protoreflect.Value) {
+func (x *_DidDocVersionSet_2_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*DidDocumentWithMetadata)
+	concreteValue := valueUnwrapped.Interface().(*DidDocWithMetadata)
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_DidDocumentVersionSet_2_list) Append(value protoreflect.Value) {
+func (x *_DidDocVersionSet_2_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*DidDocumentWithMetadata)
+	concreteValue := valueUnwrapped.Interface().(*DidDocWithMetadata)
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_DidDocumentVersionSet_2_list) AppendMutable() protoreflect.Value {
-	v := new(DidDocumentWithMetadata)
+func (x *_DidDocVersionSet_2_list) AppendMutable() protoreflect.Value {
+	v := new(DidDocWithMetadata)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_DidDocumentVersionSet_2_list) Truncate(n int) {
+func (x *_DidDocVersionSet_2_list) Truncate(n int) {
 	for i := n; i < len(*x.list); i++ {
 		(*x.list)[i] = nil
 	}
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_DidDocumentVersionSet_2_list) NewElement() protoreflect.Value {
-	v := new(DidDocumentWithMetadata)
+func (x *_DidDocVersionSet_2_list) NewElement() protoreflect.Value {
+	v := new(DidDocWithMetadata)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
-func (x *_DidDocumentVersionSet_2_list) IsValid() bool {
+func (x *_DidDocVersionSet_2_list) IsValid() bool {
 	return x.list != nil
 }
 
 var (
-	md_DidDocumentVersionSet                            protoreflect.MessageDescriptor
-	fd_DidDocumentVersionSet_latest_version             protoreflect.FieldDescriptor
-	fd_DidDocumentVersionSet_did_document_with_metadata protoreflect.FieldDescriptor
+	md_DidDocVersionSet                       protoreflect.MessageDescriptor
+	fd_DidDocVersionSet_latest_version        protoreflect.FieldDescriptor
+	fd_DidDocVersionSet_did_doc_with_metadata protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_cheqd_did_v2_genesis_proto_init()
-	md_DidDocumentVersionSet = File_cheqd_did_v2_genesis_proto.Messages().ByName("DidDocumentVersionSet")
-	fd_DidDocumentVersionSet_latest_version = md_DidDocumentVersionSet.Fields().ByName("latest_version")
-	fd_DidDocumentVersionSet_did_document_with_metadata = md_DidDocumentVersionSet.Fields().ByName("did_document_with_metadata")
+	md_DidDocVersionSet = File_cheqd_did_v2_genesis_proto.Messages().ByName("DidDocVersionSet")
+	fd_DidDocVersionSet_latest_version = md_DidDocVersionSet.Fields().ByName("latest_version")
+	fd_DidDocVersionSet_did_doc_with_metadata = md_DidDocVersionSet.Fields().ByName("did_doc_with_metadata")
 }
 
-var _ protoreflect.Message = (*fastReflection_DidDocumentVersionSet)(nil)
+var _ protoreflect.Message = (*fastReflection_DidDocVersionSet)(nil)
 
-type fastReflection_DidDocumentVersionSet DidDocumentVersionSet
+type fastReflection_DidDocVersionSet DidDocVersionSet
 
-func (x *DidDocumentVersionSet) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_DidDocumentVersionSet)(x)
+func (x *DidDocVersionSet) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_DidDocVersionSet)(x)
 }
 
-func (x *DidDocumentVersionSet) slowProtoReflect() protoreflect.Message {
+func (x *DidDocVersionSet) slowProtoReflect() protoreflect.Message {
 	mi := &file_cheqd_did_v2_genesis_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -96,43 +96,43 @@ func (x *DidDocumentVersionSet) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_DidDocumentVersionSet_messageType fastReflection_DidDocumentVersionSet_messageType
-var _ protoreflect.MessageType = fastReflection_DidDocumentVersionSet_messageType{}
+var _fastReflection_DidDocVersionSet_messageType fastReflection_DidDocVersionSet_messageType
+var _ protoreflect.MessageType = fastReflection_DidDocVersionSet_messageType{}
 
-type fastReflection_DidDocumentVersionSet_messageType struct{}
+type fastReflection_DidDocVersionSet_messageType struct{}
 
-func (x fastReflection_DidDocumentVersionSet_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_DidDocumentVersionSet)(nil)
+func (x fastReflection_DidDocVersionSet_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_DidDocVersionSet)(nil)
 }
-func (x fastReflection_DidDocumentVersionSet_messageType) New() protoreflect.Message {
-	return new(fastReflection_DidDocumentVersionSet)
+func (x fastReflection_DidDocVersionSet_messageType) New() protoreflect.Message {
+	return new(fastReflection_DidDocVersionSet)
 }
-func (x fastReflection_DidDocumentVersionSet_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_DidDocumentVersionSet
+func (x fastReflection_DidDocVersionSet_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_DidDocVersionSet
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_DidDocumentVersionSet) Descriptor() protoreflect.MessageDescriptor {
-	return md_DidDocumentVersionSet
+func (x *fastReflection_DidDocVersionSet) Descriptor() protoreflect.MessageDescriptor {
+	return md_DidDocVersionSet
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_DidDocumentVersionSet) Type() protoreflect.MessageType {
-	return _fastReflection_DidDocumentVersionSet_messageType
+func (x *fastReflection_DidDocVersionSet) Type() protoreflect.MessageType {
+	return _fastReflection_DidDocVersionSet_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_DidDocumentVersionSet) New() protoreflect.Message {
-	return new(fastReflection_DidDocumentVersionSet)
+func (x *fastReflection_DidDocVersionSet) New() protoreflect.Message {
+	return new(fastReflection_DidDocVersionSet)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_DidDocumentVersionSet) Interface() protoreflect.ProtoMessage {
-	return (*DidDocumentVersionSet)(x)
+func (x *fastReflection_DidDocVersionSet) Interface() protoreflect.ProtoMessage {
+	return (*DidDocVersionSet)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -140,16 +140,16 @@ func (x *fastReflection_DidDocumentVersionSet) Interface() protoreflect.ProtoMes
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_DidDocumentVersionSet) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_DidDocVersionSet) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 	if x.LatestVersion != "" {
 		value := protoreflect.ValueOfString(x.LatestVersion)
-		if !f(fd_DidDocumentVersionSet_latest_version, value) {
+		if !f(fd_DidDocVersionSet_latest_version, value) {
 			return
 		}
 	}
-	if len(x.DidDocumentWithMetadata) != 0 {
-		value := protoreflect.ValueOfList(&_DidDocumentVersionSet_2_list{list: &x.DidDocumentWithMetadata})
-		if !f(fd_DidDocumentVersionSet_did_document_with_metadata, value) {
+	if len(x.DidDocWithMetadata) != 0 {
+		value := protoreflect.ValueOfList(&_DidDocVersionSet_2_list{list: &x.DidDocWithMetadata})
+		if !f(fd_DidDocVersionSet_did_doc_with_metadata, value) {
 			return
 		}
 	}
@@ -166,17 +166,17 @@ func (x *fastReflection_DidDocumentVersionSet) Range(f func(protoreflect.FieldDe
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_DidDocumentVersionSet) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_DidDocVersionSet) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "cheqd.did.v2.DidDocumentVersionSet.latest_version":
+	case "cheqd.did.v2.DidDocVersionSet.latest_version":
 		return x.LatestVersion != ""
-	case "cheqd.did.v2.DidDocumentVersionSet.did_document_with_metadata":
-		return len(x.DidDocumentWithMetadata) != 0
+	case "cheqd.did.v2.DidDocVersionSet.did_doc_with_metadata":
+		return len(x.DidDocWithMetadata) != 0
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.DidDocumentVersionSet"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.DidDocVersionSet"))
 		}
-		panic(fmt.Errorf("message cheqd.did.v2.DidDocumentVersionSet does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.did.v2.DidDocVersionSet does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -186,17 +186,17 @@ func (x *fastReflection_DidDocumentVersionSet) Has(fd protoreflect.FieldDescript
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_DidDocumentVersionSet) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_DidDocVersionSet) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "cheqd.did.v2.DidDocumentVersionSet.latest_version":
+	case "cheqd.did.v2.DidDocVersionSet.latest_version":
 		x.LatestVersion = ""
-	case "cheqd.did.v2.DidDocumentVersionSet.did_document_with_metadata":
-		x.DidDocumentWithMetadata = nil
+	case "cheqd.did.v2.DidDocVersionSet.did_doc_with_metadata":
+		x.DidDocWithMetadata = nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.DidDocumentVersionSet"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.DidDocVersionSet"))
 		}
-		panic(fmt.Errorf("message cheqd.did.v2.DidDocumentVersionSet does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.did.v2.DidDocVersionSet does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -206,22 +206,22 @@ func (x *fastReflection_DidDocumentVersionSet) Clear(fd protoreflect.FieldDescri
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_DidDocumentVersionSet) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_DidDocVersionSet) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "cheqd.did.v2.DidDocumentVersionSet.latest_version":
+	case "cheqd.did.v2.DidDocVersionSet.latest_version":
 		value := x.LatestVersion
 		return protoreflect.ValueOfString(value)
-	case "cheqd.did.v2.DidDocumentVersionSet.did_document_with_metadata":
-		if len(x.DidDocumentWithMetadata) == 0 {
-			return protoreflect.ValueOfList(&_DidDocumentVersionSet_2_list{})
+	case "cheqd.did.v2.DidDocVersionSet.did_doc_with_metadata":
+		if len(x.DidDocWithMetadata) == 0 {
+			return protoreflect.ValueOfList(&_DidDocVersionSet_2_list{})
 		}
-		listValue := &_DidDocumentVersionSet_2_list{list: &x.DidDocumentWithMetadata}
+		listValue := &_DidDocVersionSet_2_list{list: &x.DidDocWithMetadata}
 		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.DidDocumentVersionSet"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.DidDocVersionSet"))
 		}
-		panic(fmt.Errorf("message cheqd.did.v2.DidDocumentVersionSet does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message cheqd.did.v2.DidDocVersionSet does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -235,19 +235,19 @@ func (x *fastReflection_DidDocumentVersionSet) Get(descriptor protoreflect.Field
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_DidDocumentVersionSet) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_DidDocVersionSet) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "cheqd.did.v2.DidDocumentVersionSet.latest_version":
+	case "cheqd.did.v2.DidDocVersionSet.latest_version":
 		x.LatestVersion = value.Interface().(string)
-	case "cheqd.did.v2.DidDocumentVersionSet.did_document_with_metadata":
+	case "cheqd.did.v2.DidDocVersionSet.did_doc_with_metadata":
 		lv := value.List()
-		clv := lv.(*_DidDocumentVersionSet_2_list)
-		x.DidDocumentWithMetadata = *clv.list
+		clv := lv.(*_DidDocVersionSet_2_list)
+		x.DidDocWithMetadata = *clv.list
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.DidDocumentVersionSet"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.DidDocVersionSet"))
 		}
-		panic(fmt.Errorf("message cheqd.did.v2.DidDocumentVersionSet does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.did.v2.DidDocVersionSet does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -261,49 +261,49 @@ func (x *fastReflection_DidDocumentVersionSet) Set(fd protoreflect.FieldDescript
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_DidDocumentVersionSet) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_DidDocVersionSet) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "cheqd.did.v2.DidDocumentVersionSet.did_document_with_metadata":
-		if x.DidDocumentWithMetadata == nil {
-			x.DidDocumentWithMetadata = []*DidDocumentWithMetadata{}
+	case "cheqd.did.v2.DidDocVersionSet.did_doc_with_metadata":
+		if x.DidDocWithMetadata == nil {
+			x.DidDocWithMetadata = []*DidDocWithMetadata{}
 		}
-		value := &_DidDocumentVersionSet_2_list{list: &x.DidDocumentWithMetadata}
+		value := &_DidDocVersionSet_2_list{list: &x.DidDocWithMetadata}
 		return protoreflect.ValueOfList(value)
-	case "cheqd.did.v2.DidDocumentVersionSet.latest_version":
-		panic(fmt.Errorf("field latest_version of message cheqd.did.v2.DidDocumentVersionSet is not mutable"))
+	case "cheqd.did.v2.DidDocVersionSet.latest_version":
+		panic(fmt.Errorf("field latest_version of message cheqd.did.v2.DidDocVersionSet is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.DidDocumentVersionSet"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.DidDocVersionSet"))
 		}
-		panic(fmt.Errorf("message cheqd.did.v2.DidDocumentVersionSet does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.did.v2.DidDocVersionSet does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_DidDocumentVersionSet) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_DidDocVersionSet) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "cheqd.did.v2.DidDocumentVersionSet.latest_version":
+	case "cheqd.did.v2.DidDocVersionSet.latest_version":
 		return protoreflect.ValueOfString("")
-	case "cheqd.did.v2.DidDocumentVersionSet.did_document_with_metadata":
-		list := []*DidDocumentWithMetadata{}
-		return protoreflect.ValueOfList(&_DidDocumentVersionSet_2_list{list: &list})
+	case "cheqd.did.v2.DidDocVersionSet.did_doc_with_metadata":
+		list := []*DidDocWithMetadata{}
+		return protoreflect.ValueOfList(&_DidDocVersionSet_2_list{list: &list})
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.DidDocumentVersionSet"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.DidDocVersionSet"))
 		}
-		panic(fmt.Errorf("message cheqd.did.v2.DidDocumentVersionSet does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.did.v2.DidDocVersionSet does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_DidDocumentVersionSet) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_DidDocVersionSet) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in cheqd.did.v2.DidDocumentVersionSet", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in cheqd.did.v2.DidDocVersionSet", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -311,7 +311,7 @@ func (x *fastReflection_DidDocumentVersionSet) WhichOneof(d protoreflect.OneofDe
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_DidDocumentVersionSet) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_DidDocVersionSet) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -322,7 +322,7 @@ func (x *fastReflection_DidDocumentVersionSet) GetUnknown() protoreflect.RawFiel
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_DidDocumentVersionSet) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_DidDocVersionSet) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -334,7 +334,7 @@ func (x *fastReflection_DidDocumentVersionSet) SetUnknown(fields protoreflect.Ra
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_DidDocumentVersionSet) IsValid() bool {
+func (x *fastReflection_DidDocVersionSet) IsValid() bool {
 	return x != nil
 }
 
@@ -344,9 +344,9 @@ func (x *fastReflection_DidDocumentVersionSet) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_DidDocumentVersionSet) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_DidDocVersionSet) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*DidDocumentVersionSet)
+		x := input.Message.Interface().(*DidDocVersionSet)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -362,8 +362,8 @@ func (x *fastReflection_DidDocumentVersionSet) ProtoMethods() *protoiface.Method
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		if len(x.DidDocumentWithMetadata) > 0 {
-			for _, e := range x.DidDocumentWithMetadata {
+		if len(x.DidDocWithMetadata) > 0 {
+			for _, e := range x.DidDocWithMetadata {
 				l = options.Size(e)
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
@@ -378,7 +378,7 @@ func (x *fastReflection_DidDocumentVersionSet) ProtoMethods() *protoiface.Method
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*DidDocumentVersionSet)
+		x := input.Message.Interface().(*DidDocVersionSet)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -397,9 +397,9 @@ func (x *fastReflection_DidDocumentVersionSet) ProtoMethods() *protoiface.Method
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if len(x.DidDocumentWithMetadata) > 0 {
-			for iNdEx := len(x.DidDocumentWithMetadata) - 1; iNdEx >= 0; iNdEx-- {
-				encoded, err := options.Marshal(x.DidDocumentWithMetadata[iNdEx])
+		if len(x.DidDocWithMetadata) > 0 {
+			for iNdEx := len(x.DidDocWithMetadata) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.DidDocWithMetadata[iNdEx])
 				if err != nil {
 					return protoiface.MarshalOutput{
 						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -431,7 +431,7 @@ func (x *fastReflection_DidDocumentVersionSet) ProtoMethods() *protoiface.Method
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*DidDocumentVersionSet)
+		x := input.Message.Interface().(*DidDocVersionSet)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -463,10 +463,10 @@ func (x *fastReflection_DidDocumentVersionSet) ProtoMethods() *protoiface.Method
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: DidDocumentVersionSet: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: DidDocVersionSet: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: DidDocumentVersionSet: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: DidDocVersionSet: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
@@ -503,7 +503,7 @@ func (x *fastReflection_DidDocumentVersionSet) ProtoMethods() *protoiface.Method
 				iNdEx = postIndex
 			case 2:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field DidDocumentWithMetadata", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field DidDocWithMetadata", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -530,8 +530,8 @@ func (x *fastReflection_DidDocumentVersionSet) ProtoMethods() *protoiface.Method
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.DidDocumentWithMetadata = append(x.DidDocumentWithMetadata, &DidDocumentWithMetadata{})
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.DidDocumentWithMetadata[len(x.DidDocumentWithMetadata)-1]); err != nil {
+				x.DidDocWithMetadata = append(x.DidDocWithMetadata, &DidDocWithMetadata{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.DidDocWithMetadata[len(x.DidDocWithMetadata)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -573,7 +573,7 @@ func (x *fastReflection_DidDocumentVersionSet) ProtoMethods() *protoiface.Method
 var _ protoreflect.List = (*_GenesisState_2_list)(nil)
 
 type _GenesisState_2_list struct {
-	list *[]*DidDocumentVersionSet
+	list *[]*DidDocVersionSet
 }
 
 func (x *_GenesisState_2_list) Len() int {
@@ -589,18 +589,18 @@ func (x *_GenesisState_2_list) Get(i int) protoreflect.Value {
 
 func (x *_GenesisState_2_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*DidDocumentVersionSet)
+	concreteValue := valueUnwrapped.Interface().(*DidDocVersionSet)
 	(*x.list)[i] = concreteValue
 }
 
 func (x *_GenesisState_2_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*DidDocumentVersionSet)
+	concreteValue := valueUnwrapped.Interface().(*DidDocVersionSet)
 	*x.list = append(*x.list, concreteValue)
 }
 
 func (x *_GenesisState_2_list) AppendMutable() protoreflect.Value {
-	v := new(DidDocumentVersionSet)
+	v := new(DidDocVersionSet)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
@@ -613,7 +613,7 @@ func (x *_GenesisState_2_list) Truncate(n int) {
 }
 
 func (x *_GenesisState_2_list) NewElement() protoreflect.Value {
-	v := new(DidDocumentVersionSet)
+	v := new(DidDocVersionSet)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
@@ -840,7 +840,7 @@ func (x *fastReflection_GenesisState) Mutable(fd protoreflect.FieldDescriptor) p
 	switch fd.FullName() {
 	case "cheqd.did.v2.GenesisState.version_sets":
 		if x.VersionSets == nil {
-			x.VersionSets = []*DidDocumentVersionSet{}
+			x.VersionSets = []*DidDocVersionSet{}
 		}
 		value := &_GenesisState_2_list{list: &x.VersionSets}
 		return protoreflect.ValueOfList(value)
@@ -867,7 +867,7 @@ func (x *fastReflection_GenesisState) NewField(fd protoreflect.FieldDescriptor) 
 	case "cheqd.did.v2.GenesisState.did_namespace":
 		return protoreflect.ValueOfString("")
 	case "cheqd.did.v2.GenesisState.version_sets":
-		list := []*DidDocumentVersionSet{}
+		list := []*DidDocVersionSet{}
 		return protoreflect.ValueOfList(&_GenesisState_2_list{list: &list})
 	case "cheqd.did.v2.GenesisState.fee_params":
 		m := new(FeeParams)
@@ -1131,7 +1131,7 @@ func (x *fastReflection_GenesisState) ProtoMethods() *protoiface.Methods {
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.VersionSets = append(x.VersionSets, &DidDocumentVersionSet{})
+				x.VersionSets = append(x.VersionSets, &DidDocVersionSet{})
 				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.VersionSets[len(x.VersionSets)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
@@ -1220,9 +1220,9 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// DidDocumentVersionSet contains all versions of DID Documents and their metadata for a given DID.
+// DidDocVersionSet contains all versions of DID Documents and their metadata for a given DID.
 // The latest version of the DID Document set is stored in the latest_version field.
-type DidDocumentVersionSet struct {
+type DidDocVersionSet struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -1230,11 +1230,11 @@ type DidDocumentVersionSet struct {
 	// Latest version of the DID Document set
 	LatestVersion string `protobuf:"bytes,1,opt,name=latest_version,json=latestVersion,proto3" json:"latest_version,omitempty"`
 	// All versions of the DID Document set
-	DidDocumentWithMetadata []*DidDocumentWithMetadata `protobuf:"bytes,2,rep,name=did_document_with_metadata,json=didDocumentWithMetadata,proto3" json:"did_document_with_metadata,omitempty"`
+	DidDocWithMetadata []*DidDocWithMetadata `protobuf:"bytes,2,rep,name=did_doc_with_metadata,json=didDocWithMetadata,proto3" json:"did_doc_with_metadata,omitempty"`
 }
 
-func (x *DidDocumentVersionSet) Reset() {
-	*x = DidDocumentVersionSet{}
+func (x *DidDocVersionSet) Reset() {
+	*x = DidDocVersionSet{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_cheqd_did_v2_genesis_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1242,27 +1242,27 @@ func (x *DidDocumentVersionSet) Reset() {
 	}
 }
 
-func (x *DidDocumentVersionSet) String() string {
+func (x *DidDocVersionSet) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*DidDocumentVersionSet) ProtoMessage() {}
+func (*DidDocVersionSet) ProtoMessage() {}
 
-// Deprecated: Use DidDocumentVersionSet.ProtoReflect.Descriptor instead.
-func (*DidDocumentVersionSet) Descriptor() ([]byte, []int) {
+// Deprecated: Use DidDocVersionSet.ProtoReflect.Descriptor instead.
+func (*DidDocVersionSet) Descriptor() ([]byte, []int) {
 	return file_cheqd_did_v2_genesis_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *DidDocumentVersionSet) GetLatestVersion() string {
+func (x *DidDocVersionSet) GetLatestVersion() string {
 	if x != nil {
 		return x.LatestVersion
 	}
 	return ""
 }
 
-func (x *DidDocumentVersionSet) GetDidDocumentWithMetadata() []*DidDocumentWithMetadata {
+func (x *DidDocVersionSet) GetDidDocWithMetadata() []*DidDocWithMetadata {
 	if x != nil {
-		return x.DidDocumentWithMetadata
+		return x.DidDocWithMetadata
 	}
 	return nil
 }
@@ -1277,7 +1277,7 @@ type GenesisState struct {
 	// Example: mainnet, testnet, local
 	DidNamespace string `protobuf:"bytes,1,opt,name=did_namespace,json=didNamespace,proto3" json:"did_namespace,omitempty"`
 	// All DID Document version sets (contains all versions of all DID Documents)
-	VersionSets []*DidDocumentVersionSet `protobuf:"bytes,2,rep,name=version_sets,json=versionSets,proto3" json:"version_sets,omitempty"`
+	VersionSets []*DidDocVersionSet `protobuf:"bytes,2,rep,name=version_sets,json=versionSets,proto3" json:"version_sets,omitempty"`
 	// Fee parameters for the DID module
 	FeeParams *FeeParams `protobuf:"bytes,3,opt,name=fee_params,json=feeParams,proto3" json:"fee_params,omitempty"`
 }
@@ -1309,7 +1309,7 @@ func (x *GenesisState) GetDidNamespace() string {
 	return ""
 }
 
-func (x *GenesisState) GetVersionSets() []*DidDocumentVersionSet {
+func (x *GenesisState) GetVersionSets() []*DidDocVersionSet {
 	if x != nil {
 		return x.VersionSets
 	}
@@ -1331,40 +1331,38 @@ var file_cheqd_did_v2_genesis_proto_rawDesc = []byte{
 	0x65, 0x71, 0x64, 0x2e, 0x64, 0x69, 0x64, 0x2e, 0x76, 0x32, 0x1a, 0x19, 0x63, 0x68, 0x65, 0x71,
 	0x64, 0x2f, 0x64, 0x69, 0x64, 0x2f, 0x76, 0x32, 0x2f, 0x64, 0x69, 0x64, 0x64, 0x6f, 0x63, 0x2e,
 	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x16, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x64, 0x69, 0x64,
-	0x2f, 0x76, 0x32, 0x2f, 0x66, 0x65, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xa2, 0x01,
-	0x0a, 0x15, 0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x56, 0x65, 0x72,
-	0x73, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x74, 0x12, 0x25, 0x0a, 0x0e, 0x6c, 0x61, 0x74, 0x65, 0x73,
-	0x74, 0x5f, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x0d, 0x6c, 0x61, 0x74, 0x65, 0x73, 0x74, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x62,
-	0x0a, 0x1a, 0x64, 0x69, 0x64, 0x5f, 0x64, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x5f, 0x77,
-	0x69, 0x74, 0x68, 0x5f, 0x6d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x18, 0x02, 0x20, 0x03,
-	0x28, 0x0b, 0x32, 0x25, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x64, 0x69, 0x64, 0x2e, 0x76,
-	0x32, 0x2e, 0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x57, 0x69, 0x74,
-	0x68, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x52, 0x17, 0x64, 0x69, 0x64, 0x44, 0x6f,
-	0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x57, 0x69, 0x74, 0x68, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61,
-	0x74, 0x61, 0x22, 0xb3, 0x01, 0x0a, 0x0c, 0x47, 0x65, 0x6e, 0x65, 0x73, 0x69, 0x73, 0x53, 0x74,
-	0x61, 0x74, 0x65, 0x12, 0x23, 0x0a, 0x0d, 0x64, 0x69, 0x64, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x73,
-	0x70, 0x61, 0x63, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x64, 0x69, 0x64, 0x4e,
-	0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x46, 0x0a, 0x0c, 0x76, 0x65, 0x72, 0x73,
-	0x69, 0x6f, 0x6e, 0x5f, 0x73, 0x65, 0x74, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x23,
-	0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x64, 0x69, 0x64, 0x2e, 0x76, 0x32, 0x2e, 0x44, 0x69,
-	0x64, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e,
-	0x53, 0x65, 0x74, 0x52, 0x0b, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x74, 0x73,
-	0x12, 0x36, 0x0a, 0x0a, 0x66, 0x65, 0x65, 0x5f, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x18, 0x03,
-	0x20, 0x01, 0x28, 0x0b, 0x32, 0x17, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x64, 0x69, 0x64,
-	0x2e, 0x76, 0x32, 0x2e, 0x46, 0x65, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x09, 0x66,
-	0x65, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x42, 0xa6, 0x01, 0x0a, 0x10, 0x63, 0x6f, 0x6d,
-	0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x64, 0x69, 0x64, 0x2e, 0x76, 0x32, 0x42, 0x0c, 0x47,
-	0x65, 0x6e, 0x65, 0x73, 0x69, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x32, 0x67,
-	0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f,
-	0x63, 0x68, 0x65, 0x71, 0x64, 0x2d, 0x6e, 0x6f, 0x64, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x63,
-	0x68, 0x65, 0x71, 0x64, 0x2f, 0x64, 0x69, 0x64, 0x2f, 0x76, 0x32, 0x3b, 0x64, 0x69, 0x64, 0x76,
-	0x32, 0xa2, 0x02, 0x03, 0x43, 0x44, 0x58, 0xaa, 0x02, 0x0c, 0x43, 0x68, 0x65, 0x71, 0x64, 0x2e,
-	0x44, 0x69, 0x64, 0x2e, 0x56, 0x32, 0xca, 0x02, 0x0c, 0x43, 0x68, 0x65, 0x71, 0x64, 0x5c, 0x44,
-	0x69, 0x64, 0x5c, 0x56, 0x32, 0xe2, 0x02, 0x18, 0x43, 0x68, 0x65, 0x71, 0x64, 0x5c, 0x44, 0x69,
-	0x64, 0x5c, 0x56, 0x32, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61,
-	0xea, 0x02, 0x0e, 0x43, 0x68, 0x65, 0x71, 0x64, 0x3a, 0x3a, 0x44, 0x69, 0x64, 0x3a, 0x3a, 0x56,
-	0x32, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x2f, 0x76, 0x32, 0x2f, 0x66, 0x65, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x8e, 0x01,
+	0x0a, 0x10, 0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x53,
+	0x65, 0x74, 0x12, 0x25, 0x0a, 0x0e, 0x6c, 0x61, 0x74, 0x65, 0x73, 0x74, 0x5f, 0x76, 0x65, 0x72,
+	0x73, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0d, 0x6c, 0x61, 0x74, 0x65,
+	0x73, 0x74, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x53, 0x0a, 0x15, 0x64, 0x69, 0x64,
+	0x5f, 0x64, 0x6f, 0x63, 0x5f, 0x77, 0x69, 0x74, 0x68, 0x5f, 0x6d, 0x65, 0x74, 0x61, 0x64, 0x61,
+	0x74, 0x61, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x20, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64,
+	0x2e, 0x64, 0x69, 0x64, 0x2e, 0x76, 0x32, 0x2e, 0x44, 0x69, 0x64, 0x44, 0x6f, 0x63, 0x57, 0x69,
+	0x74, 0x68, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x52, 0x12, 0x64, 0x69, 0x64, 0x44,
+	0x6f, 0x63, 0x57, 0x69, 0x74, 0x68, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x22, 0xae,
+	0x01, 0x0a, 0x0c, 0x47, 0x65, 0x6e, 0x65, 0x73, 0x69, 0x73, 0x53, 0x74, 0x61, 0x74, 0x65, 0x12,
+	0x23, 0x0a, 0x0d, 0x64, 0x69, 0x64, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x64, 0x69, 0x64, 0x4e, 0x61, 0x6d, 0x65, 0x73,
+	0x70, 0x61, 0x63, 0x65, 0x12, 0x41, 0x0a, 0x0c, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x5f,
+	0x73, 0x65, 0x74, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1e, 0x2e, 0x63, 0x68, 0x65,
+	0x71, 0x64, 0x2e, 0x64, 0x69, 0x64, 0x2e, 0x76, 0x32, 0x2e, 0x44, 0x69, 0x64, 0x44, 0x6f, 0x63,
+	0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x74, 0x52, 0x0b, 0x76, 0x65, 0x72, 0x73,
+	0x69, 0x6f, 0x6e, 0x53, 0x65, 0x74, 0x73, 0x12, 0x36, 0x0a, 0x0a, 0x66, 0x65, 0x65, 0x5f, 0x70,
+	0x61, 0x72, 0x61, 0x6d, 0x73, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x17, 0x2e, 0x63, 0x68,
+	0x65, 0x71, 0x64, 0x2e, 0x64, 0x69, 0x64, 0x2e, 0x76, 0x32, 0x2e, 0x46, 0x65, 0x65, 0x50, 0x61,
+	0x72, 0x61, 0x6d, 0x73, 0x52, 0x09, 0x66, 0x65, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x42,
+	0xa6, 0x01, 0x0a, 0x10, 0x63, 0x6f, 0x6d, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x64, 0x69,
+	0x64, 0x2e, 0x76, 0x32, 0x42, 0x0c, 0x47, 0x65, 0x6e, 0x65, 0x73, 0x69, 0x73, 0x50, 0x72, 0x6f,
+	0x74, 0x6f, 0x50, 0x01, 0x5a, 0x32, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
+	0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2d, 0x6e, 0x6f, 0x64,
+	0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x64, 0x69, 0x64, 0x2f,
+	0x76, 0x32, 0x3b, 0x64, 0x69, 0x64, 0x76, 0x32, 0xa2, 0x02, 0x03, 0x43, 0x44, 0x58, 0xaa, 0x02,
+	0x0c, 0x43, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x44, 0x69, 0x64, 0x2e, 0x56, 0x32, 0xca, 0x02, 0x0c,
+	0x43, 0x68, 0x65, 0x71, 0x64, 0x5c, 0x44, 0x69, 0x64, 0x5c, 0x56, 0x32, 0xe2, 0x02, 0x18, 0x43,
+	0x68, 0x65, 0x71, 0x64, 0x5c, 0x44, 0x69, 0x64, 0x5c, 0x56, 0x32, 0x5c, 0x47, 0x50, 0x42, 0x4d,
+	0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0e, 0x43, 0x68, 0x65, 0x71, 0x64, 0x3a,
+	0x3a, 0x44, 0x69, 0x64, 0x3a, 0x3a, 0x56, 0x32, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1381,14 +1379,14 @@ func file_cheqd_did_v2_genesis_proto_rawDescGZIP() []byte {
 
 var file_cheqd_did_v2_genesis_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_cheqd_did_v2_genesis_proto_goTypes = []interface{}{
-	(*DidDocumentVersionSet)(nil),   // 0: cheqd.did.v2.DidDocumentVersionSet
-	(*GenesisState)(nil),            // 1: cheqd.did.v2.GenesisState
-	(*DidDocumentWithMetadata)(nil), // 2: cheqd.did.v2.DidDocumentWithMetadata
-	(*FeeParams)(nil),               // 3: cheqd.did.v2.FeeParams
+	(*DidDocVersionSet)(nil),   // 0: cheqd.did.v2.DidDocVersionSet
+	(*GenesisState)(nil),       // 1: cheqd.did.v2.GenesisState
+	(*DidDocWithMetadata)(nil), // 2: cheqd.did.v2.DidDocWithMetadata
+	(*FeeParams)(nil),          // 3: cheqd.did.v2.FeeParams
 }
 var file_cheqd_did_v2_genesis_proto_depIdxs = []int32{
-	2, // 0: cheqd.did.v2.DidDocumentVersionSet.did_document_with_metadata:type_name -> cheqd.did.v2.DidDocumentWithMetadata
-	0, // 1: cheqd.did.v2.GenesisState.version_sets:type_name -> cheqd.did.v2.DidDocumentVersionSet
+	2, // 0: cheqd.did.v2.DidDocVersionSet.did_doc_with_metadata:type_name -> cheqd.did.v2.DidDocWithMetadata
+	0, // 1: cheqd.did.v2.GenesisState.version_sets:type_name -> cheqd.did.v2.DidDocVersionSet
 	3, // 2: cheqd.did.v2.GenesisState.fee_params:type_name -> cheqd.did.v2.FeeParams
 	3, // [3:3] is the sub-list for method output_type
 	3, // [3:3] is the sub-list for method input_type
@@ -1406,7 +1404,7 @@ func file_cheqd_did_v2_genesis_proto_init() {
 	file_cheqd_did_v2_fee_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_cheqd_did_v2_genesis_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DidDocumentVersionSet); i {
+			switch v := v.(*DidDocVersionSet); i {
 			case 0:
 				return &v.state
 			case 1:
