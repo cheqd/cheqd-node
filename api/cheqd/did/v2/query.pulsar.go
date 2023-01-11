@@ -20,19 +20,19 @@ var (
 
 func init() {
 	file_cheqd_did_v2_query_proto_init()
-	md_QueryGetDidDocRequest = File_cheqd_did_v2_query_proto.Messages().ByName("QueryGetDidDocRequest")
+	md_QueryGetDidDocRequest = File_cheqd_did_v2_query_proto.Messages().ByName("QueryDidDocRequest")
 	fd_QueryGetDidDocRequest_id = md_QueryGetDidDocRequest.Fields().ByName("id")
 }
 
 var _ protoreflect.Message = (*fastReflection_QueryGetDidDocRequest)(nil)
 
-type fastReflection_QueryGetDidDocRequest QueryGetDidDocRequest
+type fastReflection_QueryGetDidDocRequest QueryDidDocRequest
 
-func (x *QueryGetDidDocRequest) ProtoReflect() protoreflect.Message {
+func (x *QueryDidDocRequest) ProtoReflect() protoreflect.Message {
 	return (*fastReflection_QueryGetDidDocRequest)(x)
 }
 
-func (x *QueryGetDidDocRequest) slowProtoReflect() protoreflect.Message {
+func (x *QueryDidDocRequest) slowProtoReflect() protoreflect.Message {
 	mi := &file_cheqd_did_v2_query_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -80,7 +80,7 @@ func (x *fastReflection_QueryGetDidDocRequest) New() protoreflect.Message {
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
 func (x *fastReflection_QueryGetDidDocRequest) Interface() protoreflect.ProtoMessage {
-	return (*QueryGetDidDocRequest)(x)
+	return (*QueryDidDocRequest)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -110,13 +110,13 @@ func (x *fastReflection_QueryGetDidDocRequest) Range(f func(protoreflect.FieldDe
 // a repeated field is populated if it is non-empty.
 func (x *fastReflection_QueryGetDidDocRequest) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "cheqd.did.v2.QueryGetDidDocRequest.id":
+	case "cheqd.did.v2.QueryDidDocRequest.id":
 		return x.Id != ""
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.QueryGetDidDocRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.QueryDidDocRequest"))
 		}
-		panic(fmt.Errorf("message cheqd.did.v2.QueryGetDidDocRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.did.v2.QueryDidDocRequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -128,13 +128,13 @@ func (x *fastReflection_QueryGetDidDocRequest) Has(fd protoreflect.FieldDescript
 // Clear is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryGetDidDocRequest) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "cheqd.did.v2.QueryGetDidDocRequest.id":
+	case "cheqd.did.v2.QueryDidDocRequest.id":
 		x.Id = ""
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.QueryGetDidDocRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.QueryDidDocRequest"))
 		}
-		panic(fmt.Errorf("message cheqd.did.v2.QueryGetDidDocRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.did.v2.QueryDidDocRequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -146,14 +146,14 @@ func (x *fastReflection_QueryGetDidDocRequest) Clear(fd protoreflect.FieldDescri
 // of the value; to obtain a mutable reference, use Mutable.
 func (x *fastReflection_QueryGetDidDocRequest) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "cheqd.did.v2.QueryGetDidDocRequest.id":
+	case "cheqd.did.v2.QueryDidDocRequest.id":
 		value := x.Id
 		return protoreflect.ValueOfString(value)
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.QueryGetDidDocRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.QueryDidDocRequest"))
 		}
-		panic(fmt.Errorf("message cheqd.did.v2.QueryGetDidDocRequest does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message cheqd.did.v2.QueryDidDocRequest does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -169,13 +169,13 @@ func (x *fastReflection_QueryGetDidDocRequest) Get(descriptor protoreflect.Field
 // Set is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryGetDidDocRequest) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "cheqd.did.v2.QueryGetDidDocRequest.id":
+	case "cheqd.did.v2.QueryDidDocRequest.id":
 		x.Id = value.Interface().(string)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.QueryGetDidDocRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.QueryDidDocRequest"))
 		}
-		panic(fmt.Errorf("message cheqd.did.v2.QueryGetDidDocRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.did.v2.QueryDidDocRequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -191,13 +191,13 @@ func (x *fastReflection_QueryGetDidDocRequest) Set(fd protoreflect.FieldDescript
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryGetDidDocRequest) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "cheqd.did.v2.QueryGetDidDocRequest.id":
-		panic(fmt.Errorf("field id of message cheqd.did.v2.QueryGetDidDocRequest is not mutable"))
+	case "cheqd.did.v2.QueryDidDocRequest.id":
+		panic(fmt.Errorf("field id of message cheqd.did.v2.QueryDidDocRequest is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.QueryGetDidDocRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.QueryDidDocRequest"))
 		}
-		panic(fmt.Errorf("message cheqd.did.v2.QueryGetDidDocRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.did.v2.QueryDidDocRequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -206,13 +206,13 @@ func (x *fastReflection_QueryGetDidDocRequest) Mutable(fd protoreflect.FieldDesc
 // For lists, maps, and messages, this returns a new, empty, mutable value.
 func (x *fastReflection_QueryGetDidDocRequest) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "cheqd.did.v2.QueryGetDidDocRequest.id":
+	case "cheqd.did.v2.QueryDidDocRequest.id":
 		return protoreflect.ValueOfString("")
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.QueryGetDidDocRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.QueryDidDocRequest"))
 		}
-		panic(fmt.Errorf("message cheqd.did.v2.QueryGetDidDocRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.did.v2.QueryDidDocRequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -222,7 +222,7 @@ func (x *fastReflection_QueryGetDidDocRequest) NewField(fd protoreflect.FieldDes
 func (x *fastReflection_QueryGetDidDocRequest) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in cheqd.did.v2.QueryGetDidDocRequest", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in cheqd.did.v2.QueryDidDocRequest", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -265,7 +265,7 @@ func (x *fastReflection_QueryGetDidDocRequest) IsValid() bool {
 // Consult the protoiface package documentation for details.
 func (x *fastReflection_QueryGetDidDocRequest) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*QueryGetDidDocRequest)
+		x := input.Message.Interface().(*QueryDidDocRequest)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -291,7 +291,7 @@ func (x *fastReflection_QueryGetDidDocRequest) ProtoMethods() *protoiface.Method
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*QueryGetDidDocRequest)
+		x := input.Message.Interface().(*QueryDidDocRequest)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -328,7 +328,7 @@ func (x *fastReflection_QueryGetDidDocRequest) ProtoMethods() *protoiface.Method
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*QueryGetDidDocRequest)
+		x := input.Message.Interface().(*QueryDidDocRequest)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -360,10 +360,10 @@ func (x *fastReflection_QueryGetDidDocRequest) ProtoMethods() *protoiface.Method
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryGetDidDocRequest: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryDidDocRequest: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryGetDidDocRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryDidDocRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
@@ -2714,7 +2714,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type QueryGetDidDocRequest struct {
+type QueryDidDocRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -2723,8 +2723,8 @@ type QueryGetDidDocRequest struct {
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 }
 
-func (x *QueryGetDidDocRequest) Reset() {
-	*x = QueryGetDidDocRequest{}
+func (x *QueryDidDocRequest) Reset() {
+	*x = QueryDidDocRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_cheqd_did_v2_query_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -2732,18 +2732,18 @@ func (x *QueryGetDidDocRequest) Reset() {
 	}
 }
 
-func (x *QueryGetDidDocRequest) String() string {
+func (x *QueryDidDocRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*QueryGetDidDocRequest) ProtoMessage() {}
+func (*QueryDidDocRequest) ProtoMessage() {}
 
-// Deprecated: Use QueryGetDidDocRequest.ProtoReflect.Descriptor instead.
-func (*QueryGetDidDocRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use QueryDidDocRequest.ProtoReflect.Descriptor instead.
+func (*QueryDidDocRequest) Descriptor() ([]byte, []int) {
 	return file_cheqd_did_v2_query_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *QueryGetDidDocRequest) GetId() string {
+func (x *QueryDidDocRequest) GetId() string {
 	if x != nil {
 		return x.Id
 	}
@@ -3028,7 +3028,7 @@ func file_cheqd_did_v2_query_proto_rawDescGZIP() []byte {
 
 var file_cheqd_did_v2_query_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_cheqd_did_v2_query_proto_goTypes = []interface{}{
-	(*QueryGetDidDocRequest)(nil),                    // 0: cheqd.did.v2.QueryGetDidDocRequest
+	(*QueryDidDocRequest)(nil),                    // 0: cheqd.did.v2.QueryDidDocRequest
 	(*QueryDidDocResponse)(nil),                      // 1: cheqd.did.v2.QueryDidDocResponse
 	(*QueryGetDidDocVersionRequest)(nil),             // 2: cheqd.did.v2.QueryGetDidDocVersionRequest
 	(*QueryDidDocVersionResponse)(nil),               // 3: cheqd.did.v2.QueryDidDocVersionResponse
@@ -3041,7 +3041,7 @@ var file_cheqd_did_v2_query_proto_depIdxs = []int32{
 	6, // 0: cheqd.did.v2.QueryDidDocResponse.value:type_name -> cheqd.did.v2.DidDocWithMetadata
 	6, // 1: cheqd.did.v2.QueryDidDocVersionResponse.value:type_name -> cheqd.did.v2.DidDocWithMetadata
 	7, // 2: cheqd.did.v2.QueryAllDidDocVersionsMetadataResponse.versions:type_name -> cheqd.did.v2.Metadata
-	0, // 3: cheqd.did.v2.Query.DidDoc:input_type -> cheqd.did.v2.QueryGetDidDocRequest
+	0, // 3: cheqd.did.v2.Query.DidDoc:input_type -> cheqd.did.v2.QueryDidDocRequest
 	2, // 4: cheqd.did.v2.Query.DidDocVersion:input_type -> cheqd.did.v2.QueryGetDidDocVersionRequest
 	4, // 5: cheqd.did.v2.Query.AllDidDocVersionsMetadata:input_type -> cheqd.did.v2.QueryGetAllDidDocVersionsMetadataRequest
 	1, // 6: cheqd.did.v2.Query.DidDoc:output_type -> cheqd.did.v2.QueryDidDocResponse
@@ -3062,7 +3062,7 @@ func file_cheqd_did_v2_query_proto_init() {
 	file_cheqd_did_v2_diddoc_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_cheqd_did_v2_query_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*QueryGetDidDocRequest); i {
+			switch v := v.(*QueryDidDocRequest); i {
 			case 0:
 				return &v.state
 			case 1:

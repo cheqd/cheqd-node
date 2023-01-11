@@ -8,7 +8,7 @@ import "google/api/annotations.proto";
 option go_package = "github.com/cheqd/cheqd-node/x/did/types";
 
 service Query {
-  rpc DidDoc(QueryGetDidDocRequest) returns (QueryDidDocResponse) {
+  rpc DidDoc(QueryDidDocRequest) returns (QueryDidDocResponse) {
     option (google.api.http).get = "/cheqd/did/v2/{id}";
   }
 
@@ -21,7 +21,7 @@ service Query {
   }
 }
 
-message QueryGetDidDocRequest {
+message QueryDidDocRequest {
   // is a DID to be fetched
   string id = 1;
 }

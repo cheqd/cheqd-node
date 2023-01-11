@@ -28,21 +28,21 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-type QueryGetDidDocRequest struct {
+type QueryDidDocRequest struct {
 	// is a DID to be fetched
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 }
 
-func (m *QueryGetDidDocRequest) Reset()         { *m = QueryGetDidDocRequest{} }
-func (m *QueryGetDidDocRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryGetDidDocRequest) ProtoMessage()    {}
-func (*QueryGetDidDocRequest) Descriptor() ([]byte, []int) {
+func (m *QueryDidDocRequest) Reset()         { *m = QueryDidDocRequest{} }
+func (m *QueryDidDocRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryDidDocRequest) ProtoMessage()    {}
+func (*QueryDidDocRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_8d818263856d0dc9, []int{0}
 }
-func (m *QueryGetDidDocRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryDidDocRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetDidDocRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryDidDocRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_QueryGetDidDocRequest.Marshal(b, m, deterministic)
 	} else {
@@ -54,19 +54,19 @@ func (m *QueryGetDidDocRequest) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
-func (m *QueryGetDidDocRequest) XXX_Merge(src proto.Message) {
+func (m *QueryDidDocRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_QueryGetDidDocRequest.Merge(m, src)
 }
-func (m *QueryGetDidDocRequest) XXX_Size() int {
+func (m *QueryDidDocRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetDidDocRequest) XXX_DiscardUnknown() {
+func (m *QueryDidDocRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_QueryGetDidDocRequest.DiscardUnknown(m)
 }
 
 var xxx_messageInfo_QueryGetDidDocRequest proto.InternalMessageInfo
 
-func (m *QueryGetDidDocRequest) GetId() string {
+func (m *QueryDidDocRequest) GetId() string {
 	if m != nil {
 		return m.Id
 	}
@@ -309,7 +309,7 @@ func (m *QueryAllDidDocVersionsMetadataResponse) GetVersions() []*Metadata {
 }
 
 func init() {
-	proto.RegisterType((*QueryGetDidDocRequest)(nil), "cheqd.did.v2.QueryGetDidDocRequest")
+	proto.RegisterType((*QueryDidDocRequest)(nil), "cheqd.did.v2.QueryDidDocRequest")
 	proto.RegisterType((*QueryDidDocResponse)(nil), "cheqd.did.v2.QueryDidDocResponse")
 	proto.RegisterType((*QueryGetDidDocVersionRequest)(nil), "cheqd.did.v2.QueryGetDidDocVersionRequest")
 	proto.RegisterType((*QueryDidDocVersionResponse)(nil), "cheqd.did.v2.QueryDidDocVersionResponse")
@@ -364,7 +364,7 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type QueryClient interface {
-	DidDoc(ctx context.Context, in *QueryGetDidDocRequest, opts ...grpc.CallOption) (*QueryDidDocResponse, error)
+	DidDoc(ctx context.Context, in *QueryDidDocRequest, opts ...grpc.CallOption) (*QueryDidDocResponse, error)
 	DidDocVersion(ctx context.Context, in *QueryGetDidDocVersionRequest, opts ...grpc.CallOption) (*QueryDidDocVersionResponse, error)
 	AllDidDocVersionsMetadata(ctx context.Context, in *QueryGetAllDidDocVersionsMetadataRequest, opts ...grpc.CallOption) (*QueryAllDidDocVersionsMetadataResponse, error)
 }
@@ -377,7 +377,7 @@ func NewQueryClient(cc grpc1.ClientConn) QueryClient {
 	return &queryClient{cc}
 }
 
-func (c *queryClient) DidDoc(ctx context.Context, in *QueryGetDidDocRequest, opts ...grpc.CallOption) (*QueryDidDocResponse, error) {
+func (c *queryClient) DidDoc(ctx context.Context, in *QueryDidDocRequest, opts ...grpc.CallOption) (*QueryDidDocResponse, error) {
 	out := new(QueryDidDocResponse)
 	err := c.cc.Invoke(ctx, "/cheqd.did.v2.Query/DidDoc", in, out, opts...)
 	if err != nil {
@@ -406,7 +406,7 @@ func (c *queryClient) AllDidDocVersionsMetadata(ctx context.Context, in *QueryGe
 
 // QueryServer is the server API for Query service.
 type QueryServer interface {
-	DidDoc(context.Context, *QueryGetDidDocRequest) (*QueryDidDocResponse, error)
+	DidDoc(context.Context, *QueryDidDocRequest) (*QueryDidDocResponse, error)
 	DidDocVersion(context.Context, *QueryGetDidDocVersionRequest) (*QueryDidDocVersionResponse, error)
 	AllDidDocVersionsMetadata(context.Context, *QueryGetAllDidDocVersionsMetadataRequest) (*QueryAllDidDocVersionsMetadataResponse, error)
 }
@@ -415,7 +415,7 @@ type QueryServer interface {
 type UnimplementedQueryServer struct {
 }
 
-func (*UnimplementedQueryServer) DidDoc(ctx context.Context, req *QueryGetDidDocRequest) (*QueryDidDocResponse, error) {
+func (*UnimplementedQueryServer) DidDoc(ctx context.Context, req *QueryDidDocRequest) (*QueryDidDocResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DidDoc not implemented")
 }
 func (*UnimplementedQueryServer) DidDocVersion(ctx context.Context, req *QueryGetDidDocVersionRequest) (*QueryDidDocVersionResponse, error) {
@@ -430,7 +430,7 @@ func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
 }
 
 func _Query_DidDoc_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetDidDocRequest)
+	in := new(QueryDidDocRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -442,7 +442,7 @@ func _Query_DidDoc_Handler(srv interface{}, ctx context.Context, dec func(interf
 		FullMethod: "/cheqd.did.v2.Query/DidDoc",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).DidDoc(ctx, req.(*QueryGetDidDocRequest))
+		return srv.(QueryServer).DidDoc(ctx, req.(*QueryDidDocRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -504,7 +504,7 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 	Metadata: "cheqd/did/v2/query.proto",
 }
 
-func (m *QueryGetDidDocRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryDidDocRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -514,12 +514,12 @@ func (m *QueryGetDidDocRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetDidDocRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryDidDocRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetDidDocRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryDidDocRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -719,7 +719,7 @@ func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *QueryGetDidDocRequest) Size() (n int) {
+func (m *QueryDidDocRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -809,7 +809,7 @@ func sovQuery(x uint64) (n int) {
 func sozQuery(x uint64) (n int) {
 	return sovQuery(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *QueryGetDidDocRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryDidDocRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -832,10 +832,10 @@ func (m *QueryGetDidDocRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetDidDocRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryDidDocRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetDidDocRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryDidDocRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
