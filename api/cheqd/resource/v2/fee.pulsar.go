@@ -685,13 +685,14 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// FeeParams defines the parameters for the `resource` module fixed fee.
+// FeeParams defines the parameters for the cheqd Resource module fixed fee.
+// Creation requests for different IANA media types are charged different fees.
 type FeeParams struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Media types define the fixed fee each for the `resource` module.
+	// Media types define what the fixed fee is for each media type.
 	Image      *v1beta1.Coin `protobuf:"bytes,1,opt,name=image,proto3" json:"image,omitempty"`
 	Json       *v1beta1.Coin `protobuf:"bytes,2,opt,name=json,proto3" json:"json,omitempty"`
 	Default    *v1beta1.Coin `protobuf:"bytes,3,opt,name=default,proto3" json:"default,omitempty"`

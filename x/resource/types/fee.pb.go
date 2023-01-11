@@ -26,9 +26,10 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// FeeParams defines the parameters for the `resource` module fixed fee.
+// FeeParams defines the parameters for the cheqd Resource module fixed fee.
+// Creation requests for different IANA media types are charged different fees.
 type FeeParams struct {
-	// Media types define the fixed fee each for the `resource` module.
+	// Media types define what the fixed fee is for each media type.
 	Image      types.Coin                             `protobuf:"bytes,1,opt,name=image,proto3" json:"image"`
 	Json       types.Coin                             `protobuf:"bytes,2,opt,name=json,proto3" json:"json"`
 	Default    types.Coin                             `protobuf:"bytes,3,opt,name=default,proto3" json:"default"`

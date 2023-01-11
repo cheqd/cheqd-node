@@ -11,7 +11,7 @@ option go_package = "github.com/cheqd/cheqd-node/x/did/types";
 // Documentation: https://www.w3.org/TR/did-core/
 message DidDoc {
   // context is a list of URIs used to identify the context of the DID document.
-  // Default context: https://www.w3.org/ns/did/v1
+  // Default: https://www.w3.org/ns/did/v1
   repeated string context = 1;
 
   // id is the DID of the DID document.
@@ -106,18 +106,12 @@ message Metadata {
   // created is the timestamp of the creation of the DID Document.
   // Format: RFC3339
   // Example: 2021-03-10T15:16:17Z
-  google.protobuf.Timestamp created = 1 [
-    (gogoproto.nullable) = false,
-    (gogoproto.stdtime) = true
-  ];
+  google.protobuf.Timestamp created = 1 [(gogoproto.stdtime) = true];
 
   // updated is the timestamp of the last update of the DID Document.
   // Format: RFC3339
   // Example: 2021-03-10T15:16:17Z
-  google.protobuf.Timestamp updated = 2 [
-    (gogoproto.nullable) = true,
-    (gogoproto.stdtime) = true
-  ];
+  google.protobuf.Timestamp updated = 2 [(gogoproto.stdtime) = true];
 
   // deactivated is a flag that indicates whether the DID Document is deactivated.
   // Default: false

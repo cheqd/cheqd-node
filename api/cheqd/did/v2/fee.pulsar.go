@@ -692,12 +692,20 @@ type FeeParams struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Fixed fee for creating a DID
+	//
+	// Default: 50 CHEQ or 50000000000ncheq
 	CreateDid *v1beta1.Coin `protobuf:"bytes,1,opt,name=create_did,json=createDid,proto3" json:"create_did,omitempty"`
 	// Fixed fee for updating a DID
+	//
+	// Default: 25 CHEQ or 25000000000ncheq
 	UpdateDid *v1beta1.Coin `protobuf:"bytes,2,opt,name=update_did,json=updateDid,proto3" json:"update_did,omitempty"`
 	// Fixed fee for deactivating a DID
+	//
+	// Default: 10 CHEQ or 10000000000ncheq
 	DeactivateDid *v1beta1.Coin `protobuf:"bytes,3,opt,name=deactivate_did,json=deactivateDid,proto3" json:"deactivate_did,omitempty"`
 	// Percentage of the fixed fee that will be burned
+	//
+	// Default: 0.5 (50%)
 	BurnFactor string `protobuf:"bytes,4,opt,name=burn_factor,json=burnFactor,proto3" json:"burn_factor,omitempty"`
 }
 
