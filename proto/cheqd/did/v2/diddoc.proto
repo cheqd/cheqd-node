@@ -94,10 +94,10 @@ message Service {
 // Contains the DID Document, as well as DID Document metadata.
 message DidDocWithMetadata {
   // didDocument is the DID Document.
-  DidDoc did_document = 1;
+  DidDoc did_doc = 1 [(gogoproto.jsontag) = "didDocument"];
 
   // didDocumentMetadata is the DID Document metadata.
-  Metadata did_document_metadata = 2;
+  Metadata metadata = 2 [(gogoproto.jsontag) = "didDocumentMetadata"];
 }
 
 // Metadata defines DID Document metadata, as defined in the DID Core specification.
