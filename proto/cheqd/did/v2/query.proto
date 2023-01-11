@@ -22,7 +22,7 @@ service Query {
 
   // Fetch list of all versions of DID Documents for a given DID
   rpc AllDidDocVersionsMetadata(QueryAllDidDocVersionsMetadataRequest) returns (QueryAllDidDocVersionsMetadataResponse) {
-    option (google.api.http) = {get: "/cheqd/did/v2/{id}/metadata"};
+    option (google.api.http) = {get: "/cheqd/did/v2/{id}/versions"};
   }
 }
 
@@ -42,9 +42,9 @@ message QueryDidDocRequest {
 // QueryDidDocResponse is the response type for the Query/DidDoc method
 message QueryDidDocResponse {
   // Successful resolution of the DID Document returns the following:
-  // - didDocument is the latest version of the DID Document
-  // - didDocumentMetadata is metadata associated with the latest version of the DID Document
-  DidDocWithMetadata did_document_with_metadata = 1;
+  // - did_doc is the latest version of the DID Document
+  // - metadata is is the DID Document metadata associated with the latest version of the DID Document
+  DidDocWithMetadata value = 1;
 }
 
 // QueryDidDocVersionRequest is the request type for the Query/DidDocVersion method
@@ -71,9 +71,9 @@ message QueryDidDocVersionRequest {
 // QueryDidDocVersionResponse is the response type for the Query/DidDocVersion method
 message QueryDidDocVersionResponse {
   // Successful resolution of the DID Document returns the following:
-  // - didDocument is the requested version of the DID Document
-  // - didDocumentMetadata is metadata associated with the requested version of the DID Document
-  DidDocWithMetadata did_document_with_metadata = 1;
+  // - did_doc is the requested version of the DID Document
+  // - metadata is DID Document metadata associated with the requested version of the DID Document
+  DidDocWithMetadata value = 1;
 }
 
 // QueryAllDidDocVersionsMetadataRequest is the request type for the Query/AllDidDocVersionsMetadata method
