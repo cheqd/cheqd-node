@@ -23,10 +23,10 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// `DidDoc` defines a DID Document, as defined in the DID Core specification.
+// DidDoc defines a DID Document, as defined in the DID Core specification.
 // Documentation: https://www.w3.org/TR/did-core/
 type DidDoc struct {
-	// `context` is a list of URIs used to identify the context of the DID document.
+	// context is a list of URIs used to identify the context of the DID document.
 	// Default context: https://www.w3.org/ns/did/v1
 	Context []string `protobuf:"bytes,1,rep,name=context,proto3" json:"context,omitempty"`
 	// id is the DID of the DID document.
@@ -170,7 +170,7 @@ func (m *DidDoc) GetAlsoKnownAs() []string {
 	return nil
 }
 
-// `VerificationMethod` defines a verification method, as defined in the DID Core specification.
+// VerificationMethod defines a verification method, as defined in the DID Core specification.
 // Documentation: https://www.w3.org/TR/did-core/#verification-methods
 type VerificationMethod struct {
 	// id is the unique identifier of the verification method.
@@ -248,7 +248,7 @@ func (m *VerificationMethod) GetVerificationMaterial() string {
 	return ""
 }
 
-// `Service` defines a service, as defined in the DID Core specification.
+// Service defines a service, as defined in the DID Core specification.
 // Documentation: https://www.w3.org/TR/did-core/#services
 type Service struct {
 	// id is the unique identifier of the service.
@@ -316,7 +316,7 @@ func (m *Service) GetServiceEndpoint() []string {
 	return nil
 }
 
-// `DidDocWithMetadata` defines a DID Document with metadata, as defined in the DID Core specification.
+// DidDocWithMetadata defines a DID Document with metadata, as defined in the DID Core specification.
 // Contains the DID Document, as well as DID Document metadata.
 type DidDocWithMetadata struct {
 	// didDocument is the DID Document.
@@ -372,7 +372,7 @@ func (m *DidDocWithMetadata) GetMetadata() *Metadata {
 	return nil
 }
 
-// `Metadata` defines DID Document metadata, as defined in the DID Core specification.
+// Metadata defines DID Document metadata, as defined in the DID Core specification.
 // Documentation: https://www.w3.org/TR/did-core/#did-document-metadata-properties
 type Metadata struct {
 	// created is the timestamp of the creation of the DID Document.
