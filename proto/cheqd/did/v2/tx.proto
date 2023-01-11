@@ -3,78 +3,115 @@ syntax = "proto3";
 package cheqd.did.v2;
 
 import "cheqd/did/v2/diddoc.proto";
+import "gogoproto/gogo.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/did/types";
 
+// Msg defines the Cosmos SDK Msg service for the cheqd.did.v2 module.
 service Msg {
+  // CreateDidDoc defines a method for creating a new DID document
   rpc CreateDidDoc(MsgCreateDidDoc) returns (MsgCreateDidDocResponse);
+
+  // UpdateDidDoc defines a method for updating an existing DID document
   rpc UpdateDidDoc(MsgUpdateDidDoc) returns (MsgUpdateDidDocResponse);
+
+  // DeactivateDidDoc defines a method for deactivating an existing DID document
   rpc DeactivateDidDoc(MsgDeactivateDidDoc) returns (MsgDeactivateDidDocResponse);
 }
 
+// MsgCreateDidDoc defines the Msg/CreateDidDoc request type.
+// It describes the parameters of a request for creating a new DID document.
 message MsgCreateDidDoc {
+  // Payload containing the DID Document to be created
   MsgCreateDidDocPayload payload = 1;
+
+  // Signatures of the DID Document's controller(s)
   repeated SignInfo signatures = 2;
 }
 
+// MsgUpdateDidDoc defines the Msg/UpdateDidDoc request type.
+// It describes the parameters of a request for updating an existing DID document.
 message MsgUpdateDidDoc {
+  // Payload containing the DID Document to be updated. This should be updated the DID Document.
   MsgUpdateDidDocPayload payload = 1;
+
+  // Signatures of the DID Document's controller(s)
   repeated SignInfo signatures = 2;
 }
 
+// MsgDeactivateDidDoc defines the Msg/DeactivateDidDoc request type.
+// It describes the parameters of a request for deactivating an existing DID document.
 message MsgDeactivateDidDoc {
+  // Payload containing the DID Document to be deactivated
   MsgDeactivateDidDocPayload payload = 1;
+
+  // Signatures of the DID Document's controller(s)
   repeated SignInfo signatures = 2;
 }
 
+// SignInfo defines the structure of a DID Document controller's signature
 message SignInfo {
+  // Verification method ID of the DID Controller
   string verification_method_id = 1;
+
+  // Signature of the DID Document controller
   bytes signature = 2;
 }
 
+// MsgCreateDidDocPayload defines the structure of the payload for creating a new DID document
 message MsgCreateDidDocPayload {
-  repeated string context = 1;
-  string id = 2;
-  repeated string controller = 3;
-  repeated VerificationMethod verification_method = 4;
-  repeated string authentication = 5;
-  repeated string assertion_method = 6;
-  repeated string capability_invocation = 7;
-  repeated string capability_delegation = 8;
-  repeated string key_agreement = 9;
-  repeated string also_known_as = 10;
-  repeated Service service = 11;
-  string version_id = 12;
+  // Contents of the DID Document to be created
+  DidDoc did_doc = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.embed) = true,
+    (gogoproto.jsontag) = "didDocument"
+  ];
+
+  // Version ID of the DID Document to be created
+  //
+  // Format: <uuid>
+  string version_id = 2;
 }
 
+// MsgCreateDidDocResponse defines response type for Msg/CreateDidDoc.
 message MsgCreateDidDocResponse {
-  DidDocWithMetadata value = 1;
+  // Return the created DID Document with metadata
+  DidDocWithMetadata did_doc_with_metadata = 1;
 }
 
+// MsgUpdateDidDocPayload defines the structure of the payload for updating an existing DID document
 message MsgUpdateDidDocPayload {
-  repeated string context = 1;
-  string id = 2;
-  repeated string controller = 3;
-  repeated VerificationMethod verification_method = 4;
-  repeated string authentication = 5;
-  repeated string assertion_method = 6;
-  repeated string capability_invocation = 7;
-  repeated string capability_delegation = 8;
-  repeated string key_agreement = 9;
-  repeated string also_known_as = 10;
-  repeated Service service = 11;
+  // Contents of the DID Document to be updated
+  DidDoc did_doc = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.embed) = true,
+    (gogoproto.jsontag) = "didDocument"
+  ];
+
+  // Updated version ID of the DID Document.
+  // Links to next/previous versions of the DID Document will be automatically updated.
+  //
+  // Format: <uuid>
   string version_id = 12;
 }
 
 message MsgUpdateDidDocResponse {
-  DidDocWithMetadata value = 1;
+  // Return the updated DID Document with metadata
+  DidDocWithMetadata did_doc_with_metadata = 1;
 }
 
+// MsgDeactivateDidDocPayload defines the structure of the payload for deactivating an existing DID document
 message MsgDeactivateDidDocPayload {
+  // Unique identifier of the DID Document to be deactivated
   string id = 1;
+
+  // Version ID of the DID Document to be deactivated
+  // This is primarily used as a sanity check to ensure that the correct DID Document is being deactivated.
   string version_id = 2;
 }
 
+// MsgDeactivateDidDocResponse defines response type for Msg/DeactivateDidDoc.
 message MsgDeactivateDidDocResponse {
+  // Return the deactivated DID Document with metadata
   DidDocWithMetadata value = 1;
 }
