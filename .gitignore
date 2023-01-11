@@ -7,8 +7,8 @@ build/
 dist/
 **/network-config
 
-# Ignored files
-
+# Allowed files
+!api/docs/swagger-ui/**/swagger-initializer.js
 
 ### GENERAL EXCLUSIONS ###
 
