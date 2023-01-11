@@ -45,12 +45,10 @@ message DidDoc {
   // key agreement as the DID subject.
   repeated string key_agreement = 9;
 
-  // service is a list of services that can be used to interact with the DID
-  // subject.
+  // service is a list of services that can be used to interact with the DID subject.
   repeated Service service = 10;
 
-  // alsoKnownAs is a list of DIDs that are known to refer to the same DID
-  // subject.
+  // alsoKnownAs is a list of DIDs that are known to refer to the same DID subject.
   repeated string also_known_as = 11;
 }
 

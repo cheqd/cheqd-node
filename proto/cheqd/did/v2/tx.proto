@@ -63,16 +63,55 @@ message MsgCreateDidDocPayload {
   // Default: https://www.w3.org/ns/did/v1
   repeated string context = 1;
 
+  // id is the DID of the DID document.
+  // Format: did:cheqd:<namespace>:<unique-identifier>
   string id = 2;
+
+  // controller is a list of DIDs that are allowed to control the DID document.
   repeated string controller = 3;
+
+  // verificationMethod is a list of verification methods that can be used to
+  // verify a digital signature or cryptographic proof.
+  // Documentation: https://www.w3.org/TR/did-core/#verification-methods
+  //
+  // Required fields:
+  // - id: A unique identifier for the verification method
+  // - type: A supported verification method type (supported: Ed25519VerificationKey2018, Ed25519VerificationKey2020, JsonWebKey2020)
+  // - controller: DID of the controller of the verification method
+  // - verification_material: Public key of the verification method (supported: publicJwk, publicKeyBase58, publicKeyMultibase)
   repeated VerificationMethod verification_method = 4;
+
+  // authentication is a list of verification methods that can be used to
+  // authenticate as the DID subject.
   repeated string authentication = 5;
+
+  // assertionMethod is a list of verification methods that can be used to
+  // assert statements as the DID subject.
   repeated string assertion_method = 6;
+
+  // capabilityInvocation is a list of verification methods that can be used to
+  // invoke capabilities as the DID subject.
   repeated string capability_invocation = 7;
+
+  // capabilityDelegation is a list of verification methods that can be used to
+  // delegate capabilities as the DID subject.
   repeated string capability_delegation = 8;
+
+  // keyAgreement is a list of verification methods that can be used to perform
+  // key agreement as the DID subject.
   repeated string key_agreement = 9;
-  repeated string also_known_as = 10;
-  repeated Service service = 11;
+
+  // service is a list of services that can be used to interact with the DID subject.
+  // Documentation: https://www.w3.org/TR/did-core/#services
+  //
+  // Required fields:
+  // - id: A unique identifier for the service
+  // - type: A service type defined in DID Specification Registries
+  // - service_endpoint: Service endpoint(s), provided as a URI or set of URIs
+  repeated Service service = 10;
+
+  // alsoKnownAs is a list of DIDs that are known to refer to the same DID subject.
+  repeated string also_known_as = 11;
 
   // Version ID of the DID Document to be created
   //
@@ -88,17 +127,59 @@ message MsgCreateDidDocResponse {
 
 // MsgUpdateDidDocPayload defines the structure of the payload for updating an existing DID document
 message MsgUpdateDidDocPayload {
+  // context is a list of URIs used to identify the context of the DID document.
+  // Default: https://www.w3.org/ns/did/v1
   repeated string context = 1;
+
+  // id is the DID of the DID document.
+  // Format: did:cheqd:<namespace>:<unique-identifier>
   string id = 2;
+
+  // controller is a list of DIDs that are allowed to control the DID document.
   repeated string controller = 3;
+
+  // verificationMethod is a list of verification methods that can be used to
+  // verify a digital signature or cryptographic proof.
+  // Documentation: https://www.w3.org/TR/did-core/#verification-methods
+  //
+  // Required fields:
+  // - id: A unique identifier for the verification method
+  // - type: A supported verification method type (supported: Ed25519VerificationKey2018, Ed25519VerificationKey2020, JsonWebKey2020)
+  // - controller: DID of the controller of the verification method
+  // - verification_material: Public key of the verification method (supported: publicJwk, publicKeyBase58, publicKeyMultibase)
   repeated VerificationMethod verification_method = 4;
+
+  // authentication is a list of verification methods that can be used to
+  // authenticate as the DID subject.
   repeated string authentication = 5;
+
+  // assertionMethod is a list of verification methods that can be used to
+  // assert statements as the DID subject.
   repeated string assertion_method = 6;
+
+  // capabilityInvocation is a list of verification methods that can be used to
+  // invoke capabilities as the DID subject.
   repeated string capability_invocation = 7;
+
+  // capabilityDelegation is a list of verification methods that can be used to
+  // delegate capabilities as the DID subject.
   repeated string capability_delegation = 8;
+
+  // keyAgreement is a list of verification methods that can be used to perform
+  // key agreement as the DID subject.
   repeated string key_agreement = 9;
-  repeated string also_known_as = 10;
-  repeated Service service = 11;
+
+  // service is a list of services that can be used to interact with the DID subject.
+  // Documentation: https://www.w3.org/TR/did-core/#services
+  //
+  // Required fields:
+  // - id: A unique identifier for the service
+  // - type: A service type defined in DID Specification Registries
+  // - service_endpoint: Service endpoint(s), provided as a URI or set of URIs
+  repeated Service service = 10;
+
+  // alsoKnownAs is a list of DIDs that are known to refer to the same DID subject.
+  repeated string also_known_as = 11;
 
   // Updated version ID of the DID Document.
   // Links to next/previous versions of the DID Document will be automatically updated.
