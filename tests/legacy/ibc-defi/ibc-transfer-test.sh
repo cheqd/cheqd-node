@@ -53,8 +53,8 @@ docker compose exec -d cheqd cheqd-noded start
 
 info "Running osmosis network"
 docker compose up -d osmosis
-docker compose cp osmosis/osmosis_init.sh osmosis:/home/osmosis/osmosis_init.sh
-docker compose exec osmosis bash /home/osmosis/osmosis_init.sh
+docker compose cp osmosis/osmosis-init.sh osmosis:/home/osmosis/osmosis-init.sh
+docker compose exec osmosis bash /home/osmosis/osmosis-init.sh
 docker compose exec -d osmosis osmosisd start
 
 info "Waiting for chains"
