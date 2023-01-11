@@ -8,7 +8,7 @@ import "google/api/annotations.proto";
 option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
 
 service Query {
-  rpc Resource(QueryGetResourceRequest) returns (QueryResourceResponse) {
+  rpc Resource(QueryResourceRequest) returns (QueryResourceResponse) {
     option (google.api.http).get = "/cheqd/resource/v2/{collection_id}/resources/{id}";
   }
 
@@ -21,7 +21,7 @@ service Query {
   }
 }
 
-message QueryGetResourceRequest {
+message QueryResourceRequest {
   // is unique identifier a for collection
   string collection_id = 1;
   // is unique identifier for a resource

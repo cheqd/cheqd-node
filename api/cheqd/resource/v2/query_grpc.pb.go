@@ -22,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type QueryClient interface {
-	Resource(ctx context.Context, in *QueryGetResourceRequest, opts ...grpc.CallOption) (*QueryResourceResponse, error)
+	Resource(ctx context.Context, in *QueryResourceRequest, opts ...grpc.CallOption) (*QueryResourceResponse, error)
 	ResourceMetadata(ctx context.Context, in *QueryGetResourceMetadataRequest, opts ...grpc.CallOption) (*QueryResourceMetadataResponse, error)
 	CollectionResources(ctx context.Context, in *QueryGetCollectionResourcesRequest, opts ...grpc.CallOption) (*QueryCollectionResourcesResponse, error)
 }
@@ -35,7 +35,7 @@ func NewQueryClient(cc grpc.ClientConnInterface) QueryClient {
 	return &queryClient{cc}
 }
 
-func (c *queryClient) Resource(ctx context.Context, in *QueryGetResourceRequest, opts ...grpc.CallOption) (*QueryResourceResponse, error) {
+func (c *queryClient) Resource(ctx context.Context, in *QueryResourceRequest, opts ...grpc.CallOption) (*QueryResourceResponse, error) {
 	out := new(QueryResourceResponse)
 	err := c.cc.Invoke(ctx, "/cheqd.resource.v2.Query/Resource", in, out, opts...)
 	if err != nil {
@@ -66,7 +66,7 @@ func (c *queryClient) CollectionResources(ctx context.Context, in *QueryGetColle
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility
 type QueryServer interface {
-	Resource(context.Context, *QueryGetResourceRequest) (*QueryResourceResponse, error)
+	Resource(context.Context, *QueryResourceRequest) (*QueryResourceResponse, error)
 	ResourceMetadata(context.Context, *QueryGetResourceMetadataRequest) (*QueryResourceMetadataResponse, error)
 	CollectionResources(context.Context, *QueryGetCollectionResourcesRequest) (*QueryCollectionResourcesResponse, error)
 	mustEmbedUnimplementedQueryServer()
@@ -76,7 +76,7 @@ type QueryServer interface {
 type UnimplementedQueryServer struct {
 }
 
-func (UnimplementedQueryServer) Resource(context.Context, *QueryGetResourceRequest) (*QueryResourceResponse, error) {
+func (UnimplementedQueryServer) Resource(context.Context, *QueryResourceRequest) (*QueryResourceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Resource not implemented")
 }
 func (UnimplementedQueryServer) ResourceMetadata(context.Context, *QueryGetResourceMetadataRequest) (*QueryResourceMetadataResponse, error) {
@@ -99,7 +99,7 @@ func RegisterQueryServer(s grpc.ServiceRegistrar, srv QueryServer) {
 }
 
 func _Query_Resource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetResourceRequest)
+	in := new(QueryResourceRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func _Query_Resource_Handler(srv interface{}, ctx context.Context, dec func(inte
 		FullMethod: "/cheqd.resource.v2.Query/Resource",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).Resource(ctx, req.(*QueryGetResourceRequest))
+		return srv.(QueryServer).Resource(ctx, req.(*QueryResourceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
