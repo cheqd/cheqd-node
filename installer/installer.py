@@ -56,7 +56,7 @@ if "GITHUB_REF##*/" in os.environ:
     DEFAULT_BRANCH = os.environ["GITHUB_REF##*/"]
 
 STANDALONE_SERVICE_FILE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_BRANCH}/build-tools/node-standalone.service"
-COSMOVISOR_SERVICE_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_BRANCH}}/build-tools/node-cosmovisor.service"
+COSMOVISOR_SERVICE_FILE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_BRANCH}/build-tools/node-cosmovisor.service"
 LOGROTATE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_BRANCH}/build-tools/logrotate.conf"
 RSYSLOG_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_BRANCH}/build-tools/rsyslog.conf"
 DEFAULT_STANDALONE_SERVICE_NAME = 'cheqd-noded'
