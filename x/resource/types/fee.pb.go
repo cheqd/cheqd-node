@@ -29,10 +29,21 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 // FeeParams defines the parameters for the cheqd Resource module fixed fee.
 // Creation requests for different IANA media types are charged different fees.
 type FeeParams struct {
-	// Media types define what the fixed fee is for each media type.
-	Image      types.Coin                             `protobuf:"bytes,1,opt,name=image,proto3" json:"image"`
-	Json       types.Coin                             `protobuf:"bytes,2,opt,name=json,proto3" json:"json"`
-	Default    types.Coin                             `protobuf:"bytes,3,opt,name=default,proto3" json:"default"`
+	// Fixed fee for creating a resource with media type 'image/*'
+	//
+	// Default: 10 CHEQ or 10000000000ncheq
+	Image types.Coin `protobuf:"bytes,1,opt,name=image,proto3" json:"image"`
+	// Fixed fee for creating a resource with media type 'application/json'
+	//
+	// Default: 2.5 CHEQ or 2500000000ncheq
+	Json types.Coin `protobuf:"bytes,2,opt,name=json,proto3" json:"json"`
+	// Fixed fee for creating a resource with all other media types
+	//
+	// Default: 5 CHEQ or 5000000000ncheq
+	Default types.Coin `protobuf:"bytes,3,opt,name=default,proto3" json:"default"`
+	// Percentage of the fixed fee that will be burned
+	//
+	// Default: 0.5 (50%)
 	BurnFactor github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,4,opt,name=burn_factor,json=burnFactor,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"burn_factor"`
 }
 
