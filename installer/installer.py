@@ -51,7 +51,8 @@ DEFAULT_UNSAFE_SKIP_BACKUP = "true"
 ###############################################################
 ###     				Systemd Config      				###
 ###############################################################
-DEFAULT_BRANCH = os.getenv("GITHUB_REF").split('/')[-1] if os.getenv("GITHUB_REF") != None else "master"
+DEFAULT_BRANCH = os.getenv("GITHUB_REF").split(
+    '/')[-1] if os.getenv("GITHUB_REF") != None else "main"
 STANDALONE_SERVICE_FILE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_BRANCH}/build-tools/node-standalone.service"
 COSMOVISOR_SERVICE_FILE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_BRANCH}/build-tools/node-cosmovisor.service"
 LOGROTATE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_BRANCH}/build-tools/logrotate.conf"
@@ -712,6 +713,8 @@ class Installer():
         self.exec(
             f"""su -l -c 'cosmovisor init {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}' {DEFAULT_CHEQD_USER}""")
 
+        self.create_symlink_to_binary()
+
     def init_cosmovisor_manually(self):
         self.mkdir_p(self.cosmovisor_root_dir)
         self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis"))
@@ -732,6 +735,13 @@ class Installer():
                      DEFAULT_CHEQD_USER)
         self.exec(
             "sudo chmod +x {}".format(f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
+
+        self.create_symlink_to_binary()
+
+    def create_symlink_to_binary(self):
+        if not os.path.islink(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
+            os.remove(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+
         if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
             self.log(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
             os.symlink(self.cosmovisor_cheqd_bin_path,
