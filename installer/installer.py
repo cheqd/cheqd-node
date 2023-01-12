@@ -69,8 +69,10 @@ DEFAULT_RSYSLOG_FILE = "/etc/rsyslog.d/cheqd-node.conf"
 ###############################################################
 ###     		Network configuration files    				###
 ###############################################################
-GENESIS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/%s/networks/{}/genesis.json" % (DEFAULT_BRANCH)
-SEEDS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/%s/networks/{}/seeds.txt" % (DEFAULT_BRANCH)
+GENESIS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/%s/networks/{}/genesis.json" % (
+    DEFAULT_BRANCH)
+SEEDS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/%s/networks/{}/seeds.txt" % (
+    DEFAULT_BRANCH)
 
 ###############################################################
 ###     				Node snapshots      				###
@@ -93,7 +95,7 @@ DEFAULT_LOG_FORMAT = "json"
 
 class NetworkType(str, Enum):
     MAINNET = "cheqd-mainnet-1"
-    TESTNET = "cheqd-testnet-4"
+    TESTNET = "cheqd-testnet-5"
 
 
 def sigint_handler(signal, frame):
@@ -620,8 +622,8 @@ class Installer():
             network_type = "mainnet"
         elif self.interviewer.chain == NetworkType.TESTNET:
             network_type = "testnet"
-        
-        return network_type 
+
+        return network_type
 
     def prepare_cheqd_user(self):
         try:
@@ -690,7 +692,8 @@ class Installer():
             failure_exit(f"Failed to setup Cosmovisor")
 
     def set_cheqd_env_vars(self):
-        self.set_env_vars("CHEQD_NODED_HOME", f"{self.interviewer.cheqd_root_dir}")
+        self.set_env_vars("CHEQD_NODED_HOME",
+                          f"{self.interviewer.cheqd_root_dir}")
         self.set_env_vars("CHEQD_NODED_CHAIN_ID", f"{self.interviewer.chain}")
 
     def set_cosmovisor_env_vars(self):

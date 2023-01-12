@@ -14,7 +14,7 @@ permissions:
 jobs:
 
   interactive-installer-with-cosmovisor:
-    name: "Interactive Installer with cosmovisor"
+    name: "Interactive Installer With Cosmovisor"
     runs-on: ubuntu-20.04
   
     steps:
