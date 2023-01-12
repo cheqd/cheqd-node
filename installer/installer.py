@@ -51,10 +51,7 @@ DEFAULT_UNSAFE_SKIP_BACKUP = "true"
 ###############################################################
 ###     				Systemd Config      				###
 ###############################################################
-DEFAULT_BRANCH = "master"
-if "{GITHUB_REF##*/}" in os.environ:
-    DEFAULT_BRANCH = os.environ["GITHUB_REF##*/"]
-
+DEFAULT_BRANCH = os.environ["{GITHUB_REF##*/}"] if "{GITHUB_REF##*/}" in os.environ else "master"
 STANDALONE_SERVICE_FILE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_BRANCH}/build-tools/node-standalone.service"
 COSMOVISOR_SERVICE_FILE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_BRANCH}/build-tools/node-cosmovisor.service"
 LOGROTATE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_BRANCH}/build-tools/logrotate.conf"
