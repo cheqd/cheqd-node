@@ -7,6 +7,9 @@ build/
 dist/
 **/network-config
 
+# Ignored files
+api/docs/config.yaml
+
 # Allowed files
 !api/docs/swagger-ui/**/swagger-initializer.js
 
