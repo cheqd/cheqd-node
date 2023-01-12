@@ -193,9 +193,11 @@ class Installer():
         self.exec(f"wget -c {COSMOVISOR_SERVICE_FILE}")
         with open(fname) as f:
             s = re.sub(
-                r'({CHEQD_ROOT_DIR}|{CHEQD_BINARY_NAME})',
+                r'({CHEQD_ROOT_DIR}|{CHEQD_BINARY_NAME}|{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}|{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE})',
                 lambda m: {'{CHEQD_ROOT_DIR}': self.cheqd_root_dir,
-                           '{CHEQD_BINARY_NAME}': DEFAULT_BINARY_NAME}[m.group()],
+                           '{CHEQD_BINARY_NAME}': DEFAULT_BINARY_NAME,
+                           '{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}':  self.interviewer.daemon_allow_download_binaries,
+                           '{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}': self.interviewer.daemon_restart_after_upgrade}[m.group()],
                 f.read()
             )
         self.remove_safe(fname)
