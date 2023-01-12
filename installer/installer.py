@@ -53,7 +53,7 @@ DEFAULT_UNSAFE_SKIP_BACKUP = "true"
 ###############################################################
 DEFAULT_BRANCH = "master"
 if "{GITHUB_REF##*/}" in os.environ:
-    DEFAULT_BRANCH = os.environ["{GITHUB_REF##*/}"]
+    DEFAULT_BRANCH = os.environ["GITHUB_REF##*/"]
 
 STANDALONE_SERVICE_FILE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_BRANCH}/build-tools/node-standalone.service"
 COSMOVISOR_SERVICE_FILE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_BRANCH}/build-tools/node-cosmovisor.service"
