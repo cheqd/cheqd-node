@@ -13,7 +13,7 @@ fi
 CHAIN_ID="cheqd"
 
 # Node
-cheqd-noded init node0 --chain-id $CHAIN_ID
+cheqd-noded init node0 --chain-id "$CHAIN_ID"
 NODE_0_VAL_PUBKEY=$(cheqd-noded tendermint show-validator)
 
 # User
