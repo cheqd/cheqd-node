@@ -7,26 +7,37 @@ import "cheqd/resource/v2/resource.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
 
-// Msg defines the Msg service.
+// Msg defines the Cosmos SDK Msg service for the cheqd.resource.v2 module.
 service Msg {
+  // CreateResource defines a method for creating a resource.
   rpc CreateResource(MsgCreateResource) returns (MsgCreateResourceResponse);
 }
 
 message MsgCreateResource {
+  // Payload of the resource to be created
   MsgCreateResourcePayload payload = 1;
+  // Signatures of the corresponding DID Document's controller(s)
   repeated cheqd.did.v2.SignInfo signatures = 2;
 }
 
 message MsgCreateResourcePayload {
+  // data is a byte-representation of the actual Data the user wants to store
   bytes data = 1;
+  // collection_id is an identifier of the DidDocument the resource belongs to
   string collection_id = 2;
+  // id is an UUID of the resource
   string id = 3;
+  // name is a human-readable name of the resource
   string name = 4;
+  // version is a version of the resource
   string version = 5;
+  // resource_type is a type of the resource
   string resource_type = 6;
+  // also_known_as is a list of URIs that can be used to get the resource
   repeated cheqd.resource.v2.AlternativeUri also_known_as = 7;
 }
 
 message MsgCreateResourceResponse {
+  // Metadata which was creted after applying to the ledger
   Metadata resource = 1;
 }
