@@ -22,9 +22,13 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// GenesisState defines the chqed Resource module's genesis state
 type GenesisState struct {
+	// All Resources with metadata
 	Resources []*ResourceWithMetadata `protobuf:"bytes,1,rep,name=resources,proto3" json:"resources,omitempty"`
-	FeeParams *FeeParams              `protobuf:"bytes,2,opt,name=fee_params,json=feeParams,proto3" json:"fee_params,omitempty"`
+	// Fee parameters for the Resource module
+	// Defines fixed fees and burn percentage for resources
+	FeeParams *FeeParams `protobuf:"bytes,2,opt,name=fee_params,json=feeParams,proto3" json:"fee_params,omitempty"`
 }
 
 func (m *GenesisState) Reset()         { *m = GenesisState{} }

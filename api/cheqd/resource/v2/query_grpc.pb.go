@@ -22,9 +22,9 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type QueryClient interface {
-	Resource(ctx context.Context, in *QueryGetResourceRequest, opts ...grpc.CallOption) (*QueryResourceResponse, error)
-	ResourceMetadata(ctx context.Context, in *QueryGetResourceMetadataRequest, opts ...grpc.CallOption) (*QueryResourceMetadataResponse, error)
-	CollectionResources(ctx context.Context, in *QueryGetCollectionResourcesRequest, opts ...grpc.CallOption) (*QueryCollectionResourcesResponse, error)
+	Resource(ctx context.Context, in *QueryResourceRequest, opts ...grpc.CallOption) (*QueryResourceResponse, error)
+	ResourceMetadata(ctx context.Context, in *QueryResourceMetadataRequest, opts ...grpc.CallOption) (*QueryResourceMetadataResponse, error)
+	CollectionResources(ctx context.Context, in *QueryCollectionResourcesRequest, opts ...grpc.CallOption) (*QueryCollectionResourcesResponse, error)
 }
 
 type queryClient struct {
@@ -35,7 +35,7 @@ func NewQueryClient(cc grpc.ClientConnInterface) QueryClient {
 	return &queryClient{cc}
 }
 
-func (c *queryClient) Resource(ctx context.Context, in *QueryGetResourceRequest, opts ...grpc.CallOption) (*QueryResourceResponse, error) {
+func (c *queryClient) Resource(ctx context.Context, in *QueryResourceRequest, opts ...grpc.CallOption) (*QueryResourceResponse, error) {
 	out := new(QueryResourceResponse)
 	err := c.cc.Invoke(ctx, "/cheqd.resource.v2.Query/Resource", in, out, opts...)
 	if err != nil {
@@ -44,7 +44,7 @@ func (c *queryClient) Resource(ctx context.Context, in *QueryGetResourceRequest,
 	return out, nil
 }
 
-func (c *queryClient) ResourceMetadata(ctx context.Context, in *QueryGetResourceMetadataRequest, opts ...grpc.CallOption) (*QueryResourceMetadataResponse, error) {
+func (c *queryClient) ResourceMetadata(ctx context.Context, in *QueryResourceMetadataRequest, opts ...grpc.CallOption) (*QueryResourceMetadataResponse, error) {
 	out := new(QueryResourceMetadataResponse)
 	err := c.cc.Invoke(ctx, "/cheqd.resource.v2.Query/ResourceMetadata", in, out, opts...)
 	if err != nil {
@@ -53,7 +53,7 @@ func (c *queryClient) ResourceMetadata(ctx context.Context, in *QueryGetResource
 	return out, nil
 }
 
-func (c *queryClient) CollectionResources(ctx context.Context, in *QueryGetCollectionResourcesRequest, opts ...grpc.CallOption) (*QueryCollectionResourcesResponse, error) {
+func (c *queryClient) CollectionResources(ctx context.Context, in *QueryCollectionResourcesRequest, opts ...grpc.CallOption) (*QueryCollectionResourcesResponse, error) {
 	out := new(QueryCollectionResourcesResponse)
 	err := c.cc.Invoke(ctx, "/cheqd.resource.v2.Query/CollectionResources", in, out, opts...)
 	if err != nil {
@@ -66,9 +66,9 @@ func (c *queryClient) CollectionResources(ctx context.Context, in *QueryGetColle
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility
 type QueryServer interface {
-	Resource(context.Context, *QueryGetResourceRequest) (*QueryResourceResponse, error)
-	ResourceMetadata(context.Context, *QueryGetResourceMetadataRequest) (*QueryResourceMetadataResponse, error)
-	CollectionResources(context.Context, *QueryGetCollectionResourcesRequest) (*QueryCollectionResourcesResponse, error)
+	Resource(context.Context, *QueryResourceRequest) (*QueryResourceResponse, error)
+	ResourceMetadata(context.Context, *QueryResourceMetadataRequest) (*QueryResourceMetadataResponse, error)
+	CollectionResources(context.Context, *QueryCollectionResourcesRequest) (*QueryCollectionResourcesResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -76,13 +76,13 @@ type QueryServer interface {
 type UnimplementedQueryServer struct {
 }
 
-func (UnimplementedQueryServer) Resource(context.Context, *QueryGetResourceRequest) (*QueryResourceResponse, error) {
+func (UnimplementedQueryServer) Resource(context.Context, *QueryResourceRequest) (*QueryResourceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Resource not implemented")
 }
-func (UnimplementedQueryServer) ResourceMetadata(context.Context, *QueryGetResourceMetadataRequest) (*QueryResourceMetadataResponse, error) {
+func (UnimplementedQueryServer) ResourceMetadata(context.Context, *QueryResourceMetadataRequest) (*QueryResourceMetadataResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ResourceMetadata not implemented")
 }
-func (UnimplementedQueryServer) CollectionResources(context.Context, *QueryGetCollectionResourcesRequest) (*QueryCollectionResourcesResponse, error) {
+func (UnimplementedQueryServer) CollectionResources(context.Context, *QueryCollectionResourcesRequest) (*QueryCollectionResourcesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CollectionResources not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
@@ -99,7 +99,7 @@ func RegisterQueryServer(s grpc.ServiceRegistrar, srv QueryServer) {
 }
 
 func _Query_Resource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetResourceRequest)
+	in := new(QueryResourceRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -111,13 +111,13 @@ func _Query_Resource_Handler(srv interface{}, ctx context.Context, dec func(inte
 		FullMethod: "/cheqd.resource.v2.Query/Resource",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).Resource(ctx, req.(*QueryGetResourceRequest))
+		return srv.(QueryServer).Resource(ctx, req.(*QueryResourceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Query_ResourceMetadata_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetResourceMetadataRequest)
+	in := new(QueryResourceMetadataRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -129,13 +129,13 @@ func _Query_ResourceMetadata_Handler(srv interface{}, ctx context.Context, dec f
 		FullMethod: "/cheqd.resource.v2.Query/ResourceMetadata",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).ResourceMetadata(ctx, req.(*QueryGetResourceMetadataRequest))
+		return srv.(QueryServer).ResourceMetadata(ctx, req.(*QueryResourceMetadataRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Query_CollectionResources_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetCollectionResourcesRequest)
+	in := new(QueryCollectionResourcesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -147,7 +147,7 @@ func _Query_CollectionResources_Handler(srv interface{}, ctx context.Context, de
 		FullMethod: "/cheqd.resource.v2.Query/CollectionResources",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).CollectionResources(ctx, req.(*QueryGetCollectionResourcesRequest))
+		return srv.(QueryServer).CollectionResources(ctx, req.(*QueryCollectionResourcesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

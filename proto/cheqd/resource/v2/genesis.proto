@@ -7,7 +7,12 @@ import "cheqd/resource/v2/resource.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
 
+// GenesisState defines the chqed Resource module's genesis state
 message GenesisState {
+  // All Resources with metadata
   repeated ResourceWithMetadata resources = 1;
+
+  // Fee parameters for the Resource module
+  // Defines fixed fees and burn percentage for resources
   FeeParams fee_params = 2;
 }

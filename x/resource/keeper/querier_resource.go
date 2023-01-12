@@ -11,7 +11,7 @@ import (
 func resource(ctx sdk.Context, keeper Keeper, cheqdKeeper didkeeper.Keeper, legacyQuerierCdc *codec.LegacyAmino, collectionID, id string) ([]byte, error) {
 	queryServer := NewQueryServer(keeper, cheqdKeeper)
 
-	resp, err := queryServer.Resource(sdk.WrapSDKContext(ctx), &types.QueryGetResourceRequest{CollectionId: collectionID, Id: id})
+	resp, err := queryServer.Resource(sdk.WrapSDKContext(ctx), &types.QueryResourceRequest{CollectionId: collectionID, Id: id})
 	if err != nil {
 		return nil, err
 	}

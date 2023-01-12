@@ -88,9 +88,10 @@ func MigrateStateValue(sctx sdk.Context, mctx MigrationContext, stateValue *didt
 }
 
 func MigrateMetadata(metadata *didtypesv1.Metadata) didtypes.Metadata {
+	updated := helpers.MustParseFromStringTimeToGoTime(metadata.Updated)
 	return didtypes.Metadata{
-		Created:           metadata.Created,
-		Updated:           metadata.Updated,
+		Created:           helpers.MustParseFromStringTimeToGoTime(metadata.Created),
+		Updated:           &updated,
 		Deactivated:       metadata.Deactivated,
 		VersionId:         metadata.VersionId,
 		NextVersionId:     "",

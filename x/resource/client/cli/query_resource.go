@@ -22,7 +22,7 @@ func CmdGetResource() *cobra.Command {
 			collectionID := args[0]
 			id := args[1]
 
-			params := &types.QueryGetResourceRequest{
+			params := &types.QueryResourceRequest{
 				CollectionId: collectionID,
 				Id:           id,
 			}

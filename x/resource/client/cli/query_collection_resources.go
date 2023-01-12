@@ -21,7 +21,7 @@ func CmdGetCollectionResources() *cobra.Command {
 
 			collectionID := args[0]
 
-			params := &types.QueryGetCollectionResourcesRequest{
+			params := &types.QueryCollectionResourcesRequest{
 				CollectionId: collectionID,
 			}
 

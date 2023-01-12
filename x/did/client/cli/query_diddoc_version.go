@@ -21,7 +21,7 @@ func CmdGetDidDocVersion() *cobra.Command {
 
 			did := args[0]
 			versionID := args[1]
-			params := &types.QueryGetDidDocVersionRequest{
+			params := &types.QueryDidDocVersionRequest{
 				Id:      did,
 				Version: versionID,
 			}
