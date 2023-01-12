@@ -7,7 +7,7 @@ import (
 func NewMetadataFromContext(ctx sdk.Context, version string) Metadata {
 	created := ctx.BlockTime()
 
-	return Metadata{Created: &created, Deactivated: false, VersionId: version}
+	return Metadata{Created: created, Deactivated: false, VersionId: version}
 }
 
 func (m *Metadata) Update(ctx sdk.Context, version string) {
