@@ -1,0 +1,14 @@
+---
+
+##########################
+##########################
+## OpenAPI Linter rules ##
+##########################
+##########################
+
+extends: spectral:oas
+overrides:
+  - files:
+      - api/docs/config.json
+    rules:
+      oas2-schema: off
