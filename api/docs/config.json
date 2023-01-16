@@ -1,0 +1,44 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "cheqd Network - REST and gRPC Gateway Documentation",
+        "description": "Documentation describing REST and gRPC Gateway endpoints for cheqd network.",
+        "version": "v1.x",
+        "contact": {
+            "name": "Cheqd Foundation Limited",
+            "url": "https://cheqd.io"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://github.com/cheqd/cheqd-node/blob/main/LICENSE"
+        }
+    },
+    "paths": {},
+    "apis": [
+        {
+            "url": "./api/docs/cheqd/did/v2/query.swagger.json"
+        },
+        {
+            "url": "./api/docs/cheqd/resource/v2/query.swagger.json"
+        }
+    ],
+    "basePath": "/swagger/",
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "consumes": [
+        "application/json",
+        "application/json+ld",
+        "*/*"
+    ],
+    "produces": [
+        "application/json",
+        "application/json+ld",
+        "*/*"
+    ],
+    "externalDocs": {
+        "description": "cheqd Network Documentation",
+        "url": "https://docs.cheqd.io/node"
+    }
+}

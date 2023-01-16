@@ -19,11 +19,11 @@ func CmdGetResourceMetadata() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			collectionId := args[0]
+			collectionID := args[0]
 			id := args[1]
 
-			params := &types.QueryGetResourceMetadataRequest{
-				CollectionId: collectionId,
+			params := &types.QueryResourceMetadataRequest{
+				CollectionId: collectionID,
 				Id:           id,
 			}
 

@@ -9,51 +9,51 @@ import (
 )
 
 const (
-	DOCKER_LOCALNET_PATH  = "../../../docker/localnet"
-	DOCKER_COMPOSE_FILE   = "docker-compose.yml"
-	DOCKER_COMPOSE_ENV_ML = "mainnet-latest.env"
-	DOCKER_COMPOSE_ENV_BL = "build-latest.env"
-	DOCKER                = "docker"
-	DOCKER_COMPOSE        = "compose"
-	DOCKER_HOME           = "/home/cheqd"
-	DOCKER_USER           = "cheqd"
-	DOCKER_USER_GROUP     = "cheqd"
-	OPERATOR0             = "operator-0"
-	OPERATOR1             = "operator-1"
-	OPERATOR2             = "operator-2"
-	OPERATOR3             = "operator-3"
-	VALIDATOR0            = "validator-0"
-	VALIDATOR1            = "validator-1"
-	VALIDATOR2            = "validator-2"
-	VALIDATOR3            = "validator-3"
-	VALIDATORS            = 4
+	DockerLocalnetPath = "../../../docker/localnet"
+	DockerComposeFile  = "docker-compose.yml"
+	DockerComposeEnvML = "mainnet-latest.env"
+	DockerComposeEnvBL = "build-latest.env"
+	Docker             = "docker"
+	DockerCompose      = "compose"
+	DockerHome         = "/home/cheqd"
+	DockerUser         = "cheqd"
+	DockerUserGroup    = "cheqd"
+	Operator0          = "operator-0"
+	Operator1          = "operator-1"
+	Operator2          = "operator-2"
+	Operator3          = "operator-3"
+	Validator0         = "validator-0"
+	Validator1         = "validator-1"
+	Validator2         = "validator-2"
+	Validator3         = "validator-3"
+	ValidatorsCount    = 4
 )
 
-type OperatorAccount map[string]string
+type OperatorAccountType map[string]string
 
-var OperatorAccounts OperatorAccount = OperatorAccount{
-	VALIDATOR0: OPERATOR0,
-	VALIDATOR1: OPERATOR1,
-	VALIDATOR2: OPERATOR2,
-	VALIDATOR3: OPERATOR3,
+var OperatorAccounts = OperatorAccountType{
+	Validator0: Operator0,
+	Validator1: Operator1,
+	Validator2: Operator2,
+	Validator3: Operator3,
 }
 
-var ValidatorNodes = []string{VALIDATOR0, VALIDATOR1, VALIDATOR2, VALIDATOR3}
+var ValidatorNodes = []string{Validator0, Validator1, Validator2, Validator3}
 
 var (
-	DOCKER_COMPOSE_LATEST_ARGS = []string{
-		"-f", filepath.Join(DOCKER_LOCALNET_PATH, DOCKER_COMPOSE_FILE),
-		"--env-file", filepath.Join(DOCKER_LOCALNET_PATH, DOCKER_COMPOSE_ENV_ML),
+	DockerComposeLatestArgs = []string{
+		"-f", filepath.Join(DockerLocalnetPath, DockerComposeFile),
+		"--env-file", filepath.Join(DockerLocalnetPath, DockerComposeEnvML),
 	}
-	DOCKER_COMPOSE_BUILD_ARGS = []string{
-		"-f", filepath.Join(DOCKER_LOCALNET_PATH, DOCKER_COMPOSE_FILE),
-		"--env-file", filepath.Join(DOCKER_LOCALNET_PATH, DOCKER_COMPOSE_ENV_BL),
+	DockerComposeBuildArgs = []string{
+		"-f", filepath.Join(DockerLocalnetPath, DockerComposeFile),
+		"--env-file", filepath.Join(DockerLocalnetPath, DockerComposeEnvBL),
 	}
 )
 
 func LocalnetExec(envArgs []string, args ...string) (string, error) {
-	args = append(append([]string{DOCKER_COMPOSE}, envArgs...), args...)
-	cmd := exec.Command(DOCKER, args...)
+	args = append(append([]string{DockerCompose}, envArgs...), args...)
+	cmd := exec.Command(Docker, args...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return string(out), sdkerrors.Wrap(err, string(out))
@@ -63,19 +63,19 @@ func LocalnetExec(envArgs []string, args ...string) (string, error) {
 
 func LocalnetExecExec(container string, args ...string) (string, error) {
 	args = append([]string{"exec", container}, args...)
-	return LocalnetExec(DOCKER_COMPOSE_LATEST_ARGS, args...)
+	return LocalnetExec(DockerComposeLatestArgs, args...)
 }
 
 func LocalnetExecUp() (string, error) {
-	return LocalnetExec(DOCKER_COMPOSE_LATEST_ARGS, "up", "--detach", "--no-build")
+	return LocalnetExec(DockerComposeLatestArgs, "up", "--detach", "--no-build")
 }
 
 func LocalnetExecDown() (string, error) {
-	return LocalnetExec(DOCKER_COMPOSE_LATEST_ARGS, "down")
+	return LocalnetExec(DockerComposeLatestArgs, "down")
 }
 
 func LocalnetExecCopyAbsoluteWithPermissions(path string, destination string, container string) (string, error) {
-	_, err := LocalnetExec(DOCKER_COMPOSE_LATEST_ARGS, "cp", path, filepath.Join(container+":"+destination))
+	_, err := LocalnetExec(DockerComposeLatestArgs, "cp", path, container+":"+destination)
 	if err != nil {
 		fmt.Println("Error copying file to container: ", err)
 		return "", err
@@ -84,5 +84,5 @@ func LocalnetExecCopyAbsoluteWithPermissions(path string, destination string, co
 }
 
 func LocalnetExecRestorePermissions(path string, container string) (string, error) {
-	return LocalnetExec(DOCKER_COMPOSE_LATEST_ARGS, "exec", "-it", "--user", "root", container, "chown", "-R", DOCKER_USER+":"+DOCKER_USER_GROUP, path)
+	return LocalnetExec(DockerComposeLatestArgs, "exec", "-it", "--user", "root", container, "chown", "-R", DockerUser+":"+DockerUserGroup, path)
 }

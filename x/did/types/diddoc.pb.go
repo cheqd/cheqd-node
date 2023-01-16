@@ -5,16 +5,21 @@ package types
 
 import (
 	fmt "fmt"
+	_ "github.com/cosmos/gogoproto/gogoproto"
+	_ "github.com/cosmos/gogoproto/types"
 	proto "github.com/gogo/protobuf/proto"
+	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 	io "io"
 	math "math"
 	math_bits "math/bits"
+	time "time"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
+var _ = time.Kitchen
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
@@ -22,18 +27,39 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// DidDoc defines a DID Document, as defined in the DID Core specification.
+// Documentation: https://www.w3.org/TR/did-core/
 type DidDoc struct {
-	Context              []string              `protobuf:"bytes,1,rep,name=context,proto3" json:"context,omitempty"`
-	Id                   string                `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
-	Controller           []string              `protobuf:"bytes,3,rep,name=controller,proto3" json:"controller,omitempty"`
-	VerificationMethod   []*VerificationMethod `protobuf:"bytes,4,rep,name=verification_method,json=verificationMethod,proto3" json:"verification_method,omitempty"`
-	Authentication       []string              `protobuf:"bytes,5,rep,name=authentication,proto3" json:"authentication,omitempty"`
-	AssertionMethod      []string              `protobuf:"bytes,6,rep,name=assertion_method,json=assertionMethod,proto3" json:"assertion_method,omitempty"`
-	CapabilityInvocation []string              `protobuf:"bytes,7,rep,name=capability_invocation,json=capabilityInvocation,proto3" json:"capability_invocation,omitempty"`
-	CapabilityDelegation []string              `protobuf:"bytes,8,rep,name=capability_delegation,json=capabilityDelegation,proto3" json:"capability_delegation,omitempty"`
-	KeyAgreement         []string              `protobuf:"bytes,9,rep,name=key_agreement,json=keyAgreement,proto3" json:"key_agreement,omitempty"`
-	Service              []*Service            `protobuf:"bytes,10,rep,name=service,proto3" json:"service,omitempty"`
-	AlsoKnownAs          []string              `protobuf:"bytes,11,rep,name=also_known_as,json=alsoKnownAs,proto3" json:"also_known_as,omitempty"`
+	// context is a list of URIs used to identify the context of the DID document.
+	// Default: https://www.w3.org/ns/did/v1
+	Context []string `protobuf:"bytes,1,rep,name=context,proto3" json:"context,omitempty"`
+	// id is the DID of the DID document.
+	// Format: did:cheqd:<namespace>:<unique-identifier>
+	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	// controller is a list of DIDs that are allowed to control the DID document.
+	Controller []string `protobuf:"bytes,3,rep,name=controller,proto3" json:"controller,omitempty"`
+	// verificationMethod is a list of verification methods that can be used to
+	// verify a digital signature or cryptographic proof.
+	VerificationMethod []*VerificationMethod `protobuf:"bytes,4,rep,name=verification_method,json=verificationMethod,proto3" json:"verification_method,omitempty"`
+	// authentication is a list of verification methods that can be used to
+	// authenticate as the DID subject.
+	Authentication []string `protobuf:"bytes,5,rep,name=authentication,proto3" json:"authentication,omitempty"`
+	// assertionMethod is a list of verification methods that can be used to
+	// assert statements as the DID subject.
+	AssertionMethod []string `protobuf:"bytes,6,rep,name=assertion_method,json=assertionMethod,proto3" json:"assertion_method,omitempty"`
+	// capabilityInvocation is a list of verification methods that can be used to
+	// invoke capabilities as the DID subject.
+	CapabilityInvocation []string `protobuf:"bytes,7,rep,name=capability_invocation,json=capabilityInvocation,proto3" json:"capability_invocation,omitempty"`
+	// capabilityDelegation is a list of verification methods that can be used to
+	// delegate capabilities as the DID subject.
+	CapabilityDelegation []string `protobuf:"bytes,8,rep,name=capability_delegation,json=capabilityDelegation,proto3" json:"capability_delegation,omitempty"`
+	// keyAgreement is a list of verification methods that can be used to perform
+	// key agreement as the DID subject.
+	KeyAgreement []string `protobuf:"bytes,9,rep,name=key_agreement,json=keyAgreement,proto3" json:"key_agreement,omitempty"`
+	// service is a list of services that can be used to interact with the DID subject.
+	Service []*Service `protobuf:"bytes,10,rep,name=service,proto3" json:"service,omitempty"`
+	// alsoKnownAs is a list of DIDs that are known to refer to the same DID subject.
+	AlsoKnownAs []string `protobuf:"bytes,11,rep,name=also_known_as,json=alsoKnownAs,proto3" json:"also_known_as,omitempty"`
 }
 
 func (m *DidDoc) Reset()         { *m = DidDoc{} }
@@ -146,10 +172,20 @@ func (m *DidDoc) GetAlsoKnownAs() []string {
 	return nil
 }
 
+// VerificationMethod defines a verification method, as defined in the DID Core specification.
+// Documentation: https://www.w3.org/TR/did-core/#verification-methods
 type VerificationMethod struct {
-	Id                   string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Type                 string `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
-	Controller           string `protobuf:"bytes,3,opt,name=controller,proto3" json:"controller,omitempty"`
+	// id is the unique identifier of the verification method.
+	// Format: did:cheqd:<namespace>:<unique-identifier>#<key-id>
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// type is the type of the verification method.
+	// Example: Ed25519VerificationKey2020
+	VerificationMethodType string `protobuf:"bytes,2,opt,name=verification_method_type,json=verificationMethodType,proto3" json:"verification_method_type,omitempty"`
+	// controller is the DID of the controller of the verification method.
+	// Format: did:cheqd:<namespace>:<unique-identifier>
+	Controller string `protobuf:"bytes,3,opt,name=controller,proto3" json:"controller,omitempty"`
+	// verification_material is the public key of the verification method.
+	// Commonly used verification material types: publicJwk, publicKeyBase58, publicKeyMultibase
 	VerificationMaterial string `protobuf:"bytes,4,opt,name=verification_material,json=verificationMaterial,proto3" json:"verification_material,omitempty"`
 }
 
@@ -193,9 +229,9 @@ func (m *VerificationMethod) GetId() string {
 	return ""
 }
 
-func (m *VerificationMethod) GetType() string {
+func (m *VerificationMethod) GetVerificationMethodType() string {
 	if m != nil {
-		return m.Type
+		return m.VerificationMethodType
 	}
 	return ""
 }
@@ -214,9 +250,17 @@ func (m *VerificationMethod) GetVerificationMaterial() string {
 	return ""
 }
 
+// Service defines a service, as defined in the DID Core specification.
+// Documentation: https://www.w3.org/TR/did-core/#services
 type Service struct {
-	Id              string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Type            string   `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
+	// id is the unique identifier of the service.
+	// Format: did:cheqd:<namespace>:<unique-identifier>#<service-id>
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// type is the type of the service.
+	// Example: LinkedResource
+	ServiceType string `protobuf:"bytes,2,opt,name=service_type,json=serviceType,proto3" json:"service_type,omitempty"`
+	// serviceEndpoint is the endpoint of the service.
+	// Example: https://example.com/endpoint
 	ServiceEndpoint []string `protobuf:"bytes,3,rep,name=service_endpoint,json=serviceEndpoint,proto3" json:"service_endpoint,omitempty"`
 }
 
@@ -260,9 +304,9 @@ func (m *Service) GetId() string {
 	return ""
 }
 
-func (m *Service) GetType() string {
+func (m *Service) GetServiceType() string {
 	if m != nil {
-		return m.Type
+		return m.ServiceType
 	}
 	return ""
 }
@@ -274,9 +318,13 @@ func (m *Service) GetServiceEndpoint() []string {
 	return nil
 }
 
+// DidDocWithMetadata defines a DID Document with metadata, as defined in the DID Core specification.
+// Contains the DID Document, as well as DID Document metadata.
 type DidDocWithMetadata struct {
-	DidDoc   *DidDoc   `protobuf:"bytes,1,opt,name=did_doc,json=didDoc,proto3" json:"did_doc,omitempty"`
-	Metadata *Metadata `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	// didDocument is the DID Document.
+	DidDoc *DidDoc `protobuf:"bytes,1,opt,name=did_doc,json=didDoc,proto3" json:"didDocument"`
+	// didDocumentMetadata is the DID Document metadata.
+	Metadata *Metadata `protobuf:"bytes,2,opt,name=metadata,proto3" json:"didDocumentMetadata"`
 }
 
 func (m *DidDocWithMetadata) Reset()         { *m = DidDocWithMetadata{} }
@@ -326,12 +374,31 @@ func (m *DidDocWithMetadata) GetMetadata() *Metadata {
 	return nil
 }
 
+// Metadata defines DID Document metadata, as defined in the DID Core specification.
+// Documentation: https://www.w3.org/TR/did-core/#did-document-metadata-properties
 type Metadata struct {
-	Created           string `protobuf:"bytes,1,opt,name=created,proto3" json:"created,omitempty"`
-	Updated           string `protobuf:"bytes,2,opt,name=updated,proto3" json:"updated,omitempty"`
-	Deactivated       bool   `protobuf:"varint,3,opt,name=deactivated,proto3" json:"deactivated,omitempty"`
-	VersionId         string `protobuf:"bytes,4,opt,name=version_id,json=versionId,proto3" json:"version_id,omitempty"`
-	NextVersionId     string `protobuf:"bytes,5,opt,name=next_version_id,json=nextVersionId,proto3" json:"next_version_id,omitempty"`
+	// created is the timestamp of the creation of the DID Document.
+	// Format: RFC3339
+	// Example: 2021-03-10T15:16:17Z
+	Created time.Time `protobuf:"bytes,1,opt,name=created,proto3,stdtime" json:"created"`
+	// updated is the timestamp of the last update of the DID Document.
+	// Format: RFC3339
+	// Example: 2021-03-10T15:16:17Z
+	Updated *time.Time `protobuf:"bytes,2,opt,name=updated,proto3,stdtime" json:"updated,omitempty"`
+	// deactivated is a flag that indicates whether the DID Document is deactivated.
+	// Default: false
+	Deactivated bool `protobuf:"varint,3,opt,name=deactivated,proto3" json:"deactivated,omitempty"`
+	// version_id is the version identifier of the DID Document.
+	// Format: UUID
+	// Example: 123e4567-e89b-12d3-a456-426655440000
+	VersionId string `protobuf:"bytes,4,opt,name=version_id,json=versionId,proto3" json:"version_id,omitempty"`
+	// next_version_id is the version identifier of the next version of the DID Document.
+	// Format: UUID
+	// Example: 123e4567-e89b-12d3-a456-426655440000
+	NextVersionId string `protobuf:"bytes,5,opt,name=next_version_id,json=nextVersionId,proto3" json:"next_version_id,omitempty"`
+	// previous_version_id is the version identifier of the previous version of the DID Document.
+	// Format: UUID
+	// Example: 123e4567-e89b-12d3-a456-426655440000
 	PreviousVersionId string `protobuf:"bytes,6,opt,name=previous_version_id,json=previousVersionId,proto3" json:"previous_version_id,omitempty"`
 }
 
@@ -368,18 +435,18 @@ func (m *Metadata) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Metadata proto.InternalMessageInfo
 
-func (m *Metadata) GetCreated() string {
+func (m *Metadata) GetCreated() time.Time {
 	if m != nil {
 		return m.Created
 	}
-	return ""
+	return time.Time{}
 }
 
-func (m *Metadata) GetUpdated() string {
+func (m *Metadata) GetUpdated() *time.Time {
 	if m != nil {
 		return m.Updated
 	}
-	return ""
+	return nil
 }
 
 func (m *Metadata) GetDeactivated() bool {
@@ -421,45 +488,52 @@ func init() {
 func init() { proto.RegisterFile("cheqd/did/v2/diddoc.proto", fileDescriptor_b7b058eff1719454) }
 
 var fileDescriptor_b7b058eff1719454 = []byte{
-	// 595 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x94, 0xbd, 0x6e, 0xdb, 0x3c,
-	0x14, 0x86, 0xa3, 0x38, 0xf1, 0xcf, 0x51, 0xfe, 0x3e, 0x26, 0xf9, 0xa0, 0x0e, 0x15, 0x0c, 0x15,
-	0x68, 0x93, 0x21, 0x32, 0xa0, 0x5c, 0x41, 0x8a, 0x74, 0x08, 0x8a, 0x0c, 0x55, 0x81, 0xb4, 0xe8,
-	0x22, 0xd0, 0xe2, 0xa9, 0x4d, 0x58, 0x16, 0x55, 0x89, 0x56, 0xec, 0x8b, 0x28, 0xd0, 0xcb, 0xea,
-	0x98, 0xad, 0x1d, 0x3a, 0x14, 0xf6, 0x8d, 0x14, 0xa2, 0x28, 0x55, 0xb6, 0x97, 0x2e, 0xb6, 0xf8,
-	0xbe, 0xcf, 0x21, 0x79, 0xce, 0x21, 0x09, 0xcf, 0xc2, 0x31, 0x7e, 0x61, 0x03, 0xc6, 0xd9, 0x20,
-	0xf7, 0x8a, 0x3f, 0x26, 0x42, 0x37, 0x49, 0x85, 0x14, 0xe4, 0x40, 0x59, 0x2e, 0xe3, 0xcc, 0xcd,
-	0x3d, 0xe7, 0x57, 0x0b, 0xda, 0xb7, 0x9c, 0xdd, 0x8a, 0x90, 0x58, 0xd0, 0x09, 0x45, 0x2c, 0x71,
-	0x2e, 0x2d, 0xa3, 0xdf, 0xba, 0xe8, 0xf9, 0xd5, 0x90, 0x1c, 0xc1, 0x2e, 0x67, 0xd6, 0x6e, 0xdf,
-	0xb8, 0xe8, 0xf9, 0xbb, 0x9c, 0x11, 0x1b, 0xa0, 0xb0, 0x52, 0x11, 0x45, 0x98, 0x5a, 0x2d, 0x05,
-	0x37, 0x14, 0xf2, 0x0e, 0x4e, 0x73, 0x4c, 0xf9, 0x67, 0x1e, 0x52, 0xc9, 0x45, 0x1c, 0x4c, 0x51,
-	0x8e, 0x05, 0xb3, 0xf6, 0xfa, 0xad, 0x0b, 0xd3, 0xeb, 0xbb, 0xcd, 0x0d, 0xb8, 0x0f, 0x0d, 0xf0,
-	0x5e, 0x71, 0x3e, 0xc9, 0xb7, 0x34, 0xf2, 0x12, 0x8e, 0xe8, 0x4c, 0x8e, 0x31, 0x96, 0x5a, 0xb7,
-	0xf6, 0xd5, 0xb2, 0x1b, 0x2a, 0xb9, 0x84, 0x13, 0x9a, 0x65, 0x98, 0x36, 0xd7, 0x6d, 0x2b, 0xf2,
-	0xb8, 0xd6, 0xf5, 0x94, 0xd7, 0x70, 0x1e, 0xd2, 0x84, 0x0e, 0x79, 0xc4, 0xe5, 0x22, 0xe0, 0x71,
-	0x2e, 0xf4, 0xcc, 0x1d, 0xc5, 0x9f, 0xfd, 0x35, 0xef, 0x6a, 0x6f, 0x23, 0x88, 0x61, 0x84, 0xa3,
-	0x32, 0xa8, 0xbb, 0x19, 0x74, 0x5b, 0x7b, 0xe4, 0x05, 0x1c, 0x4e, 0x70, 0x11, 0xd0, 0x51, 0x8a,
-	0x38, 0xc5, 0x58, 0x5a, 0x3d, 0x05, 0x1f, 0x4c, 0x70, 0x71, 0x53, 0x69, 0x64, 0x00, 0x9d, 0x0c,
-	0xd3, 0x9c, 0x87, 0x68, 0x81, 0x2a, 0xd4, 0xf9, 0x7a, 0xa1, 0xde, 0x97, 0xa6, 0x5f, 0x51, 0xc4,
-	0x81, 0x43, 0x1a, 0x65, 0x22, 0x98, 0xc4, 0xe2, 0x31, 0x0e, 0x68, 0x66, 0x99, 0x6a, 0x56, 0xb3,
-	0x10, 0xdf, 0x16, 0xda, 0x4d, 0xe6, 0x7c, 0x35, 0x80, 0x6c, 0x57, 0x58, 0x37, 0xd4, 0xa8, 0x1b,
-	0x4a, 0x60, 0x4f, 0x2e, 0x12, 0xd4, 0x2d, 0x56, 0xdf, 0x5b, 0x4d, 0x36, 0x36, 0x9a, 0x7c, 0x0d,
-	0xe7, 0xeb, 0x4d, 0xa6, 0x12, 0x53, 0x4e, 0x23, 0x6b, 0x4f, 0xa1, 0x67, 0x6b, 0x4d, 0xd4, 0x9e,
-	0xf3, 0x11, 0x3a, 0x3a, 0x8f, 0x7f, 0xda, 0xc3, 0x25, 0x9c, 0xe8, 0x6c, 0x03, 0x8c, 0x59, 0x22,
-	0x78, 0x2c, 0xf5, 0x71, 0x3b, 0xd6, 0xfa, 0x1b, 0x2d, 0x3b, 0x8f, 0x40, 0xca, 0x73, 0xfc, 0x81,
-	0xcb, 0xf1, 0x3d, 0x4a, 0xca, 0xa8, 0xa4, 0xe4, 0x0a, 0x3a, 0x8c, 0xb3, 0x80, 0x89, 0x50, 0xad,
-	0x64, 0x7a, 0x67, 0xeb, 0x45, 0x2d, 0x43, 0xfc, 0x36, 0x2b, 0xaf, 0x80, 0x07, 0xdd, 0xa9, 0x0e,
-	0x55, 0xfb, 0x30, 0xbd, 0xff, 0xd7, 0xf9, 0x6a, 0x62, 0xbf, 0xe6, 0x9c, 0x1f, 0x06, 0x74, 0xeb,
-	0xf5, 0x8a, 0x3b, 0x94, 0x22, 0x95, 0x58, 0x65, 0x56, 0x0d, 0x0b, 0x67, 0x96, 0x30, 0xe5, 0x94,
-	0x19, 0x56, 0x43, 0xd2, 0x07, 0x93, 0x21, 0x0d, 0x25, 0xcf, 0x95, 0x5b, 0x54, 0xba, 0xeb, 0x37,
-	0x25, 0xf2, 0x1c, 0x20, 0xc7, 0x34, 0x2b, 0xaa, 0xcc, 0x99, 0xae, 0x6f, 0x4f, 0x2b, 0x77, 0xc5,
-	0xdd, 0x38, 0x8e, 0x71, 0x2e, 0x83, 0x06, 0xb3, 0xaf, 0x98, 0xc3, 0x42, 0x7e, 0xa8, 0x39, 0x17,
-	0x4e, 0x93, 0x14, 0x73, 0x2e, 0x66, 0x59, 0x93, 0x6d, 0x2b, 0xf6, 0xbf, 0xca, 0xaa, 0xf9, 0xd7,
-	0x37, 0xdf, 0x97, 0xb6, 0xf1, 0xb4, 0xb4, 0x8d, 0xdf, 0x4b, 0xdb, 0xf8, 0xb6, 0xb2, 0x77, 0x9e,
-	0x56, 0xf6, 0xce, 0xcf, 0x95, 0xbd, 0xf3, 0xe9, 0xd5, 0x88, 0xcb, 0xf1, 0x6c, 0xe8, 0x86, 0x62,
-	0x3a, 0x28, 0x5f, 0x1a, 0xf5, 0x7b, 0x15, 0x0b, 0x86, 0x83, 0xb9, 0x7a, 0x76, 0x8a, 0xfe, 0x65,
-	0xc3, 0xb6, 0x7a, 0x73, 0xae, 0xff, 0x04, 0x00, 0x00, 0xff, 0xff, 0x0f, 0xd7, 0x5c, 0x1b, 0x90,
-	0x04, 0x00, 0x00,
+	// 707 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x54, 0xcd, 0x4e, 0xdb, 0x4a,
+	0x18, 0x8d, 0x13, 0xc8, 0xcf, 0x18, 0x08, 0x77, 0x08, 0x5c, 0x5f, 0xa4, 0x9b, 0xe4, 0xe6, 0x4a,
+	0x2d, 0x48, 0xad, 0x2d, 0x85, 0x2e, 0xba, 0xaa, 0x44, 0x44, 0x17, 0x08, 0xb1, 0xa8, 0x8b, 0xa8,
+	0xd4, 0x8d, 0x35, 0xf1, 0x7c, 0x38, 0x23, 0x12, 0x8f, 0x6b, 0x4f, 0x5c, 0xf2, 0x16, 0xbc, 0x42,
+	0x9f, 0xa0, 0x8b, 0xbe, 0x04, 0x4b, 0x96, 0x5d, 0x54, 0xb4, 0x82, 0x1d, 0x4f, 0x51, 0x79, 0x3c,
+	0x76, 0x9d, 0xa4, 0x8b, 0x6e, 0x12, 0xcf, 0xf9, 0xce, 0x39, 0xf3, 0x79, 0xce, 0x37, 0x46, 0xff,
+	0xb8, 0x23, 0xf8, 0x40, 0x2d, 0xca, 0xa8, 0x15, 0xf7, 0x93, 0x3f, 0xca, 0x5d, 0x33, 0x08, 0xb9,
+	0xe0, 0x78, 0x4d, 0x96, 0x4c, 0xca, 0xa8, 0x19, 0xf7, 0x77, 0x5b, 0x1e, 0xf7, 0xb8, 0x2c, 0x58,
+	0xc9, 0x53, 0xca, 0xd9, 0xed, 0x78, 0x9c, 0x7b, 0x63, 0xb0, 0xe4, 0x6a, 0x38, 0xbd, 0xb0, 0x04,
+	0x9b, 0x40, 0x24, 0xc8, 0x24, 0x48, 0x09, 0xbd, 0x6f, 0x15, 0x54, 0x3d, 0x62, 0xf4, 0x88, 0xbb,
+	0xd8, 0x40, 0x35, 0x97, 0xfb, 0x02, 0xae, 0x84, 0xa1, 0x75, 0x2b, 0x7b, 0x0d, 0x3b, 0x5b, 0xe2,
+	0x0d, 0x54, 0x66, 0xd4, 0x28, 0x77, 0xb5, 0xbd, 0x86, 0x5d, 0x66, 0x14, 0xb7, 0x11, 0x4a, 0x4a,
+	0x21, 0x1f, 0x8f, 0x21, 0x34, 0x2a, 0x92, 0x5c, 0x40, 0xf0, 0x1b, 0xb4, 0x15, 0x43, 0xc8, 0x2e,
+	0x98, 0x4b, 0x04, 0xe3, 0xbe, 0x33, 0x01, 0x31, 0xe2, 0xd4, 0x58, 0xe9, 0x56, 0xf6, 0xf4, 0x7e,
+	0xd7, 0x2c, 0xf6, 0x6d, 0x9e, 0x17, 0x88, 0xa7, 0x92, 0x67, 0xe3, 0x78, 0x09, 0xc3, 0x4f, 0xd0,
+	0x06, 0x99, 0x8a, 0x11, 0xf8, 0x42, 0xe1, 0xc6, 0xaa, 0xdc, 0x76, 0x01, 0xc5, 0xfb, 0x68, 0x93,
+	0x44, 0x11, 0x84, 0xc5, 0x7d, 0xab, 0x92, 0xd9, 0xcc, 0x71, 0x65, 0x79, 0x80, 0xb6, 0x5d, 0x12,
+	0x90, 0x21, 0x1b, 0x33, 0x31, 0x73, 0x98, 0x1f, 0x73, 0xe5, 0x5c, 0x93, 0xfc, 0xd6, 0xaf, 0xe2,
+	0x71, 0x5e, 0x5b, 0x10, 0x51, 0x18, 0x83, 0x97, 0x8a, 0xea, 0x8b, 0xa2, 0xa3, 0xbc, 0x86, 0xff,
+	0x47, 0xeb, 0x97, 0x30, 0x73, 0x88, 0x17, 0x02, 0x4c, 0xc0, 0x17, 0x46, 0x43, 0x92, 0xd7, 0x2e,
+	0x61, 0x76, 0x98, 0x61, 0xd8, 0x42, 0xb5, 0x08, 0xc2, 0x98, 0xb9, 0x60, 0x20, 0x79, 0x50, 0xdb,
+	0xf3, 0x07, 0xf5, 0x36, 0x2d, 0xda, 0x19, 0x0b, 0xf7, 0xd0, 0x3a, 0x19, 0x47, 0xdc, 0xb9, 0xf4,
+	0xf9, 0x47, 0xdf, 0x21, 0x91, 0xa1, 0x4b, 0x57, 0x3d, 0x01, 0x4f, 0x12, 0xec, 0x30, 0xea, 0x7d,
+	0xd1, 0x10, 0x5e, 0x3e, 0x61, 0x15, 0xa8, 0x96, 0x07, 0xfa, 0x12, 0x19, 0xbf, 0x09, 0xcc, 0x11,
+	0xb3, 0x00, 0x54, 0xec, 0x3b, 0xcb, 0x99, 0x9c, 0xcd, 0x02, 0x58, 0x1a, 0x05, 0x6d, 0x61, 0x14,
+	0x0e, 0xd0, 0xf6, 0xbc, 0x33, 0x11, 0x10, 0x32, 0x32, 0x36, 0x56, 0x24, 0xb5, 0x35, 0x67, 0xab,
+	0x6a, 0x3d, 0x0f, 0xd5, 0xd4, 0xdb, 0x2e, 0x75, 0xfa, 0x1f, 0x5a, 0x53, 0xef, 0x5f, 0xec, 0x4e,
+	0x57, 0x98, 0x6c, 0x69, 0x1f, 0x6d, 0x66, 0x14, 0xf0, 0x69, 0xc0, 0x99, 0x2f, 0xd4, 0x8c, 0x36,
+	0x15, 0xfe, 0x5a, 0xc1, 0xbd, 0x4f, 0x1a, 0xc2, 0xe9, 0xf4, 0xbf, 0x63, 0x62, 0x74, 0x0a, 0x82,
+	0x50, 0x22, 0x08, 0x7e, 0x85, 0x6a, 0x94, 0x51, 0x87, 0x72, 0x57, 0xee, 0xac, 0xf7, 0x5b, 0xf3,
+	0x51, 0xa4, 0x92, 0x41, 0xf3, 0xf1, 0xae, 0xa3, 0x53, 0xf9, 0x3c, 0x4d, 0x22, 0xb4, 0xab, 0xe9,
+	0x02, 0x9f, 0xa0, 0xfa, 0x44, 0x79, 0xc9, 0x06, 0xf5, 0xfe, 0xce, 0xbc, 0x41, 0xb6, 0xd3, 0xe0,
+	0xef, 0xc7, 0xbb, 0xce, 0x56, 0xc1, 0x22, 0x2b, 0xd8, 0xb9, 0x41, 0xef, 0x73, 0x19, 0xd5, 0x8b,
+	0x9d, 0xb9, 0x21, 0x10, 0x01, 0x54, 0x75, 0xb6, 0x6b, 0xa6, 0x37, 0xdc, 0xcc, 0x6e, 0xb8, 0x79,
+	0x96, 0xdd, 0xf0, 0x41, 0xfd, 0xe6, 0xae, 0x53, 0xba, 0xfe, 0xde, 0xd1, 0xec, 0x4c, 0x94, 0xe8,
+	0xa7, 0x01, 0x95, 0xfa, 0xf2, 0x1f, 0xe9, 0xb5, 0x54, 0xaf, 0x44, 0xb8, 0x8b, 0x74, 0x0a, 0xc4,
+	0x15, 0x2c, 0x96, 0x1e, 0x49, 0xde, 0x75, 0xbb, 0x08, 0xe1, 0x7f, 0x11, 0x8a, 0x21, 0x8c, 0x92,
+	0xac, 0x19, 0x55, 0x29, 0x37, 0x14, 0x72, 0x4c, 0xf1, 0x33, 0xd4, 0xf4, 0xe1, 0x4a, 0x38, 0x05,
+	0xce, 0x6a, 0xc2, 0x19, 0xac, 0x24, 0x9b, 0xd9, 0xeb, 0x49, 0xf1, 0x3c, 0x67, 0xbf, 0x40, 0x5b,
+	0x41, 0x08, 0x31, 0xe3, 0xd3, 0xa8, 0xa8, 0xa8, 0x16, 0x14, 0x7f, 0x65, 0x84, 0x5c, 0x35, 0x38,
+	0xbc, 0xb9, 0x6f, 0x6b, 0xb7, 0xf7, 0x6d, 0xed, 0xc7, 0x7d, 0x5b, 0xbb, 0x7e, 0x68, 0x97, 0x6e,
+	0x1f, 0xda, 0xa5, 0xaf, 0x0f, 0xed, 0xd2, 0xfb, 0xa7, 0x1e, 0x13, 0xa3, 0xe9, 0xd0, 0x74, 0xf9,
+	0xc4, 0x4a, 0x3f, 0xac, 0xf2, 0xf7, 0xb9, 0xcf, 0x29, 0x58, 0x57, 0xf2, 0x2b, 0x9b, 0x4c, 0x55,
+	0x34, 0xac, 0xca, 0xe3, 0x38, 0xf8, 0x19, 0x00, 0x00, 0xff, 0xff, 0xe9, 0xa3, 0x36, 0x8d, 0x7f,
+	0x05, 0x00, 0x00,
 }
 
 func (m *DidDoc) Marshal() (dAtA []byte, err error) {
@@ -626,10 +700,10 @@ func (m *VerificationMethod) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x1a
 	}
-	if len(m.Type) > 0 {
-		i -= len(m.Type)
-		copy(dAtA[i:], m.Type)
-		i = encodeVarintDiddoc(dAtA, i, uint64(len(m.Type)))
+	if len(m.VerificationMethodType) > 0 {
+		i -= len(m.VerificationMethodType)
+		copy(dAtA[i:], m.VerificationMethodType)
+		i = encodeVarintDiddoc(dAtA, i, uint64(len(m.VerificationMethodType)))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -672,10 +746,10 @@ func (m *Service) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x1a
 		}
 	}
-	if len(m.Type) > 0 {
-		i -= len(m.Type)
-		copy(dAtA[i:], m.Type)
-		i = encodeVarintDiddoc(dAtA, i, uint64(len(m.Type)))
+	if len(m.ServiceType) > 0 {
+		i -= len(m.ServiceType)
+		copy(dAtA[i:], m.ServiceType)
+		i = encodeVarintDiddoc(dAtA, i, uint64(len(m.ServiceType)))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -787,20 +861,24 @@ func (m *Metadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x18
 	}
-	if len(m.Updated) > 0 {
-		i -= len(m.Updated)
-		copy(dAtA[i:], m.Updated)
-		i = encodeVarintDiddoc(dAtA, i, uint64(len(m.Updated)))
+	if m.Updated != nil {
+		n3, err3 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.Updated, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.Updated):])
+		if err3 != nil {
+			return 0, err3
+		}
+		i -= n3
+		i = encodeVarintDiddoc(dAtA, i, uint64(n3))
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.Created) > 0 {
-		i -= len(m.Created)
-		copy(dAtA[i:], m.Created)
-		i = encodeVarintDiddoc(dAtA, i, uint64(len(m.Created)))
-		i--
-		dAtA[i] = 0xa
+	n4, err4 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.Created, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.Created):])
+	if err4 != nil {
+		return 0, err4
 	}
+	i -= n4
+	i = encodeVarintDiddoc(dAtA, i, uint64(n4))
+	i--
+	dAtA[i] = 0xa
 	return len(dAtA) - i, nil
 }
 
@@ -898,7 +976,7 @@ func (m *VerificationMethod) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovDiddoc(uint64(l))
 	}
-	l = len(m.Type)
+	l = len(m.VerificationMethodType)
 	if l > 0 {
 		n += 1 + l + sovDiddoc(uint64(l))
 	}
@@ -923,7 +1001,7 @@ func (m *Service) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovDiddoc(uint64(l))
 	}
-	l = len(m.Type)
+	l = len(m.ServiceType)
 	if l > 0 {
 		n += 1 + l + sovDiddoc(uint64(l))
 	}
@@ -959,12 +1037,10 @@ func (m *Metadata) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Created)
-	if l > 0 {
-		n += 1 + l + sovDiddoc(uint64(l))
-	}
-	l = len(m.Updated)
-	if l > 0 {
+	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.Created)
+	n += 1 + l + sovDiddoc(uint64(l))
+	if m.Updated != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.Updated)
 		n += 1 + l + sovDiddoc(uint64(l))
 	}
 	if m.Deactivated {
@@ -1460,7 +1536,7 @@ func (m *VerificationMethod) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field VerificationMethodType", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1488,7 +1564,7 @@ func (m *VerificationMethod) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Type = string(dAtA[iNdEx:postIndex])
+			m.VerificationMethodType = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
@@ -1638,7 +1714,7 @@ func (m *Service) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ServiceType", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1666,7 +1742,7 @@ func (m *Service) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Type = string(dAtA[iNdEx:postIndex])
+			m.ServiceType = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
@@ -1876,7 +1952,7 @@ func (m *Metadata) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Created", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowDiddoc
@@ -1886,29 +1962,30 @@ func (m *Metadata) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthDiddoc
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthDiddoc
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Created = string(dAtA[iNdEx:postIndex])
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.Created, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Updated", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowDiddoc
@@ -1918,23 +1995,27 @@ func (m *Metadata) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthDiddoc
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthDiddoc
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Updated = string(dAtA[iNdEx:postIndex])
+			if m.Updated == nil {
+				m.Updated = new(time.Time)
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.Updated, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		case 3:
 			if wireType != 0 {

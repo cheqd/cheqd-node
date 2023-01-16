@@ -10,10 +10,41 @@ permissions:
 
 
 jobs:
+  # Super Linter only runs on diffs in PRs
+  # For release, we run it on VALIDATE_ALL_CODEBASE=true
+  # List of languages enabled is smaller than in lint workflow
+  super-lint:
+    name: "Super Linter"
+    runs-on: ubuntu-20.04
+    
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0 # Required to fetch version
+
+    - name: Run Super Linter
+      uses: github/super-linter/slim@v4
+      env:
+        IGNORE_GITIGNORED_FILES: true
+        DEFAULT_BRANCH: main
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        LOG_LEVEL: WARN
+        VALIDATE_ALL_CODEBASE: true
+        MULTI_STATUS: true
+
+        VALIDATE_BASH: true
+        VALIDATE_DOCKERFILE_HADOLINT: true
+        VALIDATE_JSON: true
+        VALIDATE_OPENAPI: true
+        VALIDATE_PYTHON_PYLINT: true
+        VALIDATE_XML: true
+        VALIDATE_YAML: true
+
 
   release-binary:
     name: "Node binary"
     runs-on: ubuntu-20.04
+    needs: super-lint
     outputs:
       RELEASE_VERSION: ${{ steps.set-version.outputs.RELEASE_VERSION }}
     
@@ -36,7 +67,7 @@ jobs:
           cache-dependency-path: '**/package-lock.json'
 
       # Setup for pushing to Buf.build later
-      - uses: bufbuild/buf-setup-action@v1.11.0
+      - uses: bufbuild/buf-setup-action@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -68,18 +99,19 @@ jobs:
       - name: Set release version number
         id: set-version
         run: |
-          RELEASE_VERSION=$( git describe --tags ${{ github.sha }})
-          echo ::set-output name=RELEASE_VERSION::"$RELEASE_VERSION"
+          RELEASE_VERSION=$( git describe --tags "${{ github.sha }}")
+          echo "RELEASE_VERSION=$RELEASE_VERSION" >> "$GITHUB_OUTPUT"
 
       # Push Protobufs to Buf.build registry
       - uses: bufbuild/buf-push-action@v1
         with:
           input: proto
           buf_token: ${{ secrets.BUF_TOKEN }}
+          draft: ${{ github.ref_name != 'main'}}
 
   release-docker:
     name: "Docker image"
-    needs: release-binary
+    needs: [ super-lint, release-binary ]
     runs-on: ubuntu-20.04
     env:
       IMAGE_NAME: ${{ github.repository }}

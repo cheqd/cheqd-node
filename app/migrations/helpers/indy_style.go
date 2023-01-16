@@ -9,10 +9,10 @@ import (
 
 func MigrateIndyStyleDid(did string) string {
 	method, namespace, id := didutils.MustSplitDID(did)
-	return didutils.JoinDID(method, namespace, MigrateIndyStyleId(id))
+	return didutils.JoinDID(method, namespace, MigrateIndyStyleID(id))
 }
 
-func MigrateIndyStyleId(id string) string {
+func MigrateIndyStyleID(id string) string {
 	// If id is UUID it should not be changed
 	if didutils.IsValidUUID(id) {
 		return id

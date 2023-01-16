@@ -35,9 +35,9 @@ func (d *ExistingDataset) AddDidDocV1(pathToDir, prefix string) error {
 		return err
 	}
 
-	for _, path_to_file := range files {
+	for _, pathToFile := range files {
 		var existingDidDoc didtypesv1.StateValue
-		err = d.loader.LoadFile(path_to_file, &existingDidDoc, d.setup)
+		err = d.loader.LoadFile(pathToFile, &existingDidDoc, d.setup)
 		if err != nil {
 			return err
 		}
@@ -59,9 +59,9 @@ func (d *ExistingDataset) AddDidDocV2(pathToDir, prefix string) error {
 		return err
 	}
 
-	for _, path_to_file := range files {
+	for _, pathToFile := range files {
 		var existingDidDoc didtypes.DidDocWithMetadata
-		err = d.loader.LoadFile(path_to_file, &existingDidDoc, d.setup)
+		err = d.loader.LoadFile(pathToFile, &existingDidDoc, d.setup)
 		if err != nil {
 			return err
 		}
@@ -83,9 +83,9 @@ func (d *ExistingDataset) AddResourceV1(pathToDir, prefix string) error {
 		return err
 	}
 
-	for _, path_to_file := range files {
+	for _, pathToFile := range files {
 		var existingResource resourcetypesv1.Resource
-		err = d.loader.LoadFile(path_to_file, &existingResource, d.setup)
+		err = d.loader.LoadFile(pathToFile, &existingResource, d.setup)
 		if err != nil {
 			return err
 		}
@@ -106,9 +106,9 @@ func (d *ExistingDataset) AddResourceV2(pathToDir, prefix string) error {
 		return err
 	}
 
-	for _, path_to_file := range files {
+	for _, pathToFile := range files {
 		var existingResource resourcetypes.ResourceWithMetadata
-		err = d.loader.LoadFile(path_to_file, &existingResource, d.setup)
+		err = d.loader.LoadFile(pathToFile, &existingResource, d.setup)
 		if err != nil {
 			return err
 		}
@@ -126,25 +126,33 @@ func (d *ExistingDataset) MustAddResourceV2(pathToDir, prefix string) {
 
 func (d *ExistingDataset) FillStore() error {
 	for _, didDoc := range d.DidDocsV1 {
+		// Needs for getting rid of using the same address inside the loop
+		didDoc := didDoc
 		err := d.setup.DidKeeperV1.SetDid(&d.setup.SdkCtx, &didDoc)
 		if err != nil {
 			return err
 		}
 	}
 	for _, resource := range d.ResourcesV1 {
+		// Needs for getting rid of using the same address inside the loop
+		resource := resource
 		err := d.setup.ResourceKeeperV1.SetResource(&d.setup.SdkCtx, &resource)
 		if err != nil {
 			return err
 		}
 	}
 
-	for _, did_doc := range d.DidDocsV2 {
-		err := d.setup.DidKeeper.AddNewDidDocVersion(&d.setup.SdkCtx, &did_doc)
+	for _, didDoc := range d.DidDocsV2 {
+		// Needs for getting rid of using the same address inside the loop
+		didDoc := didDoc
+		err := d.setup.DidKeeper.AddNewDidDocVersion(&d.setup.SdkCtx, &didDoc)
 		if err != nil {
 			return err
 		}
 	}
 	for _, resource := range d.ResourcesV2 {
+		// Needs for getting rid of using the same address inside the loop
+		resource := resource
 		err := d.setup.ResourceKeeper.SetResource(&d.setup.SdkCtx, &resource)
 		if err != nil {
 			return err
@@ -176,9 +184,9 @@ func (d *ExpectedDataset) AddDidDocV2(pathToDir, prefix string) error {
 		return err
 	}
 
-	for _, path_to_file := range files {
+	for _, pathToFile := range files {
 		var expectedDidDoc didtypes.DidDocWithMetadata
-		err := d.loader.LoadFile(path_to_file, &expectedDidDoc, d.setup)
+		err := d.loader.LoadFile(pathToFile, &expectedDidDoc, d.setup)
 		if err != nil {
 			return err
 		}
@@ -200,9 +208,9 @@ func (d *ExpectedDataset) AddResourceV2(pathToDir, prefix string) error {
 		return err
 	}
 
-	for _, path_to_file := range files {
+	for _, pathToFile := range files {
 		var expectedResource resourcetypes.ResourceWithMetadata
-		err = d.loader.LoadFile(path_to_file, &expectedResource, d.setup)
+		err = d.loader.LoadFile(pathToFile, &expectedResource, d.setup)
 		if err != nil {
 			return err
 		}

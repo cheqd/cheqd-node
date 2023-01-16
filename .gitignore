@@ -1,14 +1,17 @@
 ### APP-SPECIFIC EXCLUSIONS ###
+
+# Ignored directories
+api/docs/cheqd/**
+api/docs/swagger-ui/**
 build/
 dist/
-
-# Tests
 **/network-config
-**/node_configs
 
-# Python
-.pytest_cache
-**/__pycache__
+# Ignored files
+api/docs/config.yaml
+
+# Allowed files
+!api/docs/swagger-ui/**/swagger-initializer.js
 
 ### GENERAL EXCLUSIONS ###
 
@@ -92,10 +95,6 @@ Temporary Items
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
-
-# Go workspace file
-go.work
-
 
 ### Node/JavaScript ###
 # Logs

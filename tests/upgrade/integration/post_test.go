@@ -19,28 +19,28 @@ var _ = Describe("Upgrade - Post", func() {
 	Context("After a software upgrade execution has concluded", func() {
 		It("should wait for node catching up", func() {
 			By("pinging the node status until catching up is flagged as false")
-			err := cli.WaitForCaughtUp(cli.VALIDATOR0, cli.CLI_BINARY_NAME, cli.VOTING_PERIOD*6)
+			err := cli.WaitForCaughtUp(cli.Validator0, cli.CLIBinaryName, cli.VotingPeriod*6)
 			Expect(err).To(BeNil())
 		})
 
 		It("should wait for a certain number of blocks to be produced", func() {
 			By("fetching the current chain height")
-			currentHeight, err := cli.GetCurrentBlockHeight(cli.VALIDATOR0, cli.CLI_BINARY_NAME)
+			currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CLIBinaryName)
 			Expect(err).To(BeNil())
 
 			By("waiting for 10 blocks to be produced on top, after the upgrade")
-			err = cli.WaitForChainHeight(cli.VALIDATOR0, cli.CLI_BINARY_NAME, currentHeight+10, cli.VOTING_PERIOD*6)
+			err = cli.WaitForChainHeight(cli.Validator0, cli.CLIBinaryName, currentHeight+10, cli.VotingPeriod*6)
 			Expect(err).To(BeNil())
 		})
 
 		It("should match the expected module version map", func() {
 			By("loading the expected module version map")
 			var expected upgradetypes.QueryModuleVersionsResponse
-			_, err := Loader(filepath.Join(GENERATED_JSON_DIR, "post", "query - module-version-map", "v1.json"), &expected)
+			_, err := Loader(filepath.Join(GeneratedJSONDir, "post", "query - module-version-map", "v1.json"), &expected)
 			Expect(err).To(BeNil())
 
 			By("matching the expected module version map")
-			actual, err := cli.QueryModuleVersionMap(cli.VALIDATOR0)
+			actual, err := cli.QueryModuleVersionMap(cli.Validator0)
 			Expect(err).To(BeNil())
 
 			Expect(actual.ModuleVersions).To(Equal(expected.ModuleVersions), "module version map mismatch")
@@ -48,7 +48,7 @@ var _ = Describe("Upgrade - Post", func() {
 
 		It("should load and run existing diddoc payloads - case: update", func() {
 			By("matching the glob pattern for existing diddoc payloads")
-			DidDocUpdatePayloads, err := RelGlob(GENERATED_JSON_DIR, "post", "update - diddoc", "*.json")
+			DidDocUpdatePayloads, err := RelGlob(GeneratedJSONDir, "post", "update - diddoc", "*.json")
 			Expect(err).To(BeNil())
 
 			for _, payload := range DidDocUpdatePayloads {
@@ -63,7 +63,7 @@ var _ = Describe("Upgrade - Post", func() {
 				DidDocUpdateSignInput, err = Loader(payload, &DidDocUpdatePayload)
 				Expect(err).To(BeNil())
 
-				res, err := cli.UpdateDid(DidDocUpdatePayload, DidDocUpdateSignInput, cli.VALIDATOR0)
+				res, err := cli.UpdateDid(DidDocUpdatePayload, DidDocUpdateSignInput, cli.Validator0)
 				Expect(err).To(BeNil())
 				Expect(res.Code).To(BeEquivalentTo(0))
 			}
@@ -71,7 +71,7 @@ var _ = Describe("Upgrade - Post", func() {
 
 		It("should load and run existing diddoc payloads - case: deactivate", func() {
 			By("matching the glob pattern for existing diddoc payloads")
-			DidDocDeactivatePayloads, err := RelGlob(GENERATED_JSON_DIR, "post", "deactivate - diddoc", "*.json")
+			DidDocDeactivatePayloads, err := RelGlob(GeneratedJSONDir, "post", "deactivate - diddoc", "*.json")
 			Expect(err).To(BeNil())
 
 			for _, payload := range DidDocDeactivatePayloads {
@@ -86,7 +86,7 @@ var _ = Describe("Upgrade - Post", func() {
 				DidDocDeactivateSignInput, err = Loader(payload, &DidDocDeacctivatePayload)
 				Expect(err).To(BeNil())
 
-				res, err := cli.DeactivateDid(DidDocDeacctivatePayload, DidDocDeactivateSignInput, cli.VALIDATOR0)
+				res, err := cli.DeactivateDid(DidDocDeacctivatePayload, DidDocDeactivateSignInput, cli.Validator0)
 				Expect(err).To(BeNil())
 				Expect(res.Code).To(BeEquivalentTo(0))
 			}
@@ -94,7 +94,7 @@ var _ = Describe("Upgrade - Post", func() {
 
 		It("should create resources after upgrade", func() {
 			By("matching the glob pattern for resource payloads to create")
-			ResourcePayloads, err := RelGlob(GENERATED_JSON_DIR, "post", "create - resource", "*.json")
+			ResourcePayloads, err := RelGlob(GeneratedJSONDir, "post", "create - resource", "*.json")
 			Expect(err).To(BeNil())
 
 			for _, payload := range ResourcePayloads {
@@ -107,14 +107,14 @@ var _ = Describe("Upgrade - Post", func() {
 				signInputs, err := Loader(payload, &ResourceCreatePayload)
 				Expect(err).To(BeNil())
 
-				ResourceFile, err := CreateTestJson(GinkgoT().TempDir(), ResourceCreatePayload.Data)
+				ResourceFile, err := CreateTestJSON(GinkgoT().TempDir(), ResourceCreatePayload.Data)
 				Expect(err).To(BeNil())
 
 				res, err := cli.CreateResource(
 					ResourceCreatePayload,
 					ResourceFile,
 					signInputs,
-					cli.VALIDATOR0,
+					cli.Validator0,
 				)
 
 				Expect(err).To(BeNil())
@@ -124,7 +124,7 @@ var _ = Describe("Upgrade - Post", func() {
 
 		It("should load and run expected diddoc payloads", func() {
 			By("matching the glob pattern for existing diddoc payloads")
-			ExpectedDidDocUpdateRecords, err := RelGlob(GENERATED_JSON_DIR, "post", "query - diddoc", "*.json")
+			ExpectedDidDocUpdateRecords, err := RelGlob(GeneratedJSONDir, "post", "query - diddoc", "*.json")
 			Expect(err).To(BeNil())
 
 			for _, payload := range ExpectedDidDocUpdateRecords {
@@ -137,7 +137,7 @@ var _ = Describe("Upgrade - Post", func() {
 				_, err = Loader(payload, &DidDocUpdateRecord)
 				Expect(err).To(BeNil())
 
-				res, err := cli.QueryDid(DidDocUpdateRecord.Id, cli.VALIDATOR0)
+				res, err := cli.QueryDid(DidDocUpdateRecord.Id, cli.Validator0)
 				Expect(err).To(BeNil())
 
 				if DidDocUpdateRecord.Context == nil {
@@ -171,7 +171,7 @@ var _ = Describe("Upgrade - Post", func() {
 
 		It("should load and run expected resource payloads", func() {
 			By("matching the glob pattern for existing resource payloads")
-			ExpectedResourceCreateRecords, err := RelGlob(GENERATED_JSON_DIR, "post", "query - resource", "*.json")
+			ExpectedResourceCreateRecords, err := RelGlob(GeneratedJSONDir, "post", "query - resource", "*.json")
 			Expect(err).To(BeNil())
 
 			for _, payload := range ExpectedResourceCreateRecords {
@@ -184,7 +184,7 @@ var _ = Describe("Upgrade - Post", func() {
 				_, err = Loader(payload, &ResourceCreateRecord)
 				Expect(err).To(BeNil())
 
-				res, err := cli.QueryResource(ResourceCreateRecord.Metadata.CollectionId, ResourceCreateRecord.Metadata.Id, cli.VALIDATOR0)
+				res, err := cli.QueryResource(ResourceCreateRecord.Metadata.CollectionId, ResourceCreateRecord.Metadata.Id, cli.Validator0)
 
 				Expect(err).To(BeNil())
 				Expect(res.Resource.Metadata.Id).To(Equal(ResourceCreateRecord.Metadata.Id))

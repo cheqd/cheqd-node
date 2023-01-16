@@ -13,5 +13,16 @@ protoc_gen_install() {
 protoc_gen_install
 
 echo "Generating API module"
+
+# Remove old generated API/Pulsar files
 (cd api; find ./ -type f \( -iname \*.pulsar.go -o -iname \*.pb.go -o -iname \*.cosmos_orm.go -o -iname \*.pb.gw.go \) -delete; find . -empty -type d -delete; cd ..)
-(cd proto; buf generate --template buf.gen.pulsar.yaml)
+cd proto
+
+# Find all proto files but exclude "v1" paths
+proto_dirs=$(find ./ -type f -path '*/v1/*' -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
+for proto_dir in $proto_dirs; do
+  proto_files=$(find "${proto_dir}" -maxdepth 1 -name '*.proto')
+  for f in $proto_files; do
+    buf generate --template buf.gen.pulsar.yaml "$f"
+  done
+done

@@ -4,7 +4,7 @@ const (
 	Name = "cheqd-node"
 	Home = ".cheqdnode"
 
-	UpgradeName = "v1.0.0"
+	UpgradeName = "v1"
 
 	// allowed msg types of ica host
 	authzMsgExec                        = "/cosmos.authz.v1beta1.MsgExec"

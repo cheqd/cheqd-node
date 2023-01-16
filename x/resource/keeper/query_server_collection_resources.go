@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (m queryServer) CollectionResources(c context.Context, req *types.QueryGetCollectionResourcesRequest) (*types.QueryGetCollectionResourcesResponse, error) {
+func (q queryServer) CollectionResources(c context.Context, req *types.QueryCollectionResourcesRequest) (*types.QueryCollectionResourcesResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -21,16 +21,16 @@ func (m queryServer) CollectionResources(c context.Context, req *types.QueryGetC
 	req.Normalize()
 
 	// Validate corresponding DIDDoc exists
-	namespace := m.didKeeper.GetDidNamespace(&ctx)
+	namespace := q.didKeeper.GetDidNamespace(&ctx)
 	did := didutils.JoinDID(didtypes.DidMethod, namespace, req.CollectionId)
-	if !m.didKeeper.HasDidDoc(&ctx, did) {
+	if !q.didKeeper.HasDidDoc(&ctx, did) {
 		return nil, didtypes.ErrDidDocNotFound.Wrap(did)
 	}
 
 	// Get all resources
-	resources := m.GetResourceCollection(&ctx, req.CollectionId)
+	resources := q.GetResourceCollection(&ctx, req.CollectionId)
 
-	return &types.QueryGetCollectionResourcesResponse{
+	return &types.QueryCollectionResourcesResponse{
 		Resources: resources,
 	}, nil
 }
