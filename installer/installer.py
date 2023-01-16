@@ -51,11 +51,11 @@ DEFAULT_UNSAFE_SKIP_BACKUP = "true"
 ###############################################################
 ###     				Systemd Config      				###
 ###############################################################
-DEFAULT_BRANCH = os.getenv("DEFAULT_BRANCH") if os.getenv("DEFAULT_BRANCH") != None else "main"
-STANDALONE_SERVICE_FILE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_BRANCH}/build-tools/node-standalone.service"
-COSMOVISOR_SERVICE_FILE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_BRANCH}/build-tools/node-cosmovisor.service"
-LOGROTATE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_BRANCH}/build-tools/logrotate.conf"
-RSYSLOG_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_BRANCH}/build-tools/rsyslog.conf"
+DEFAULT_DEBUG_BRANCH = os.getenv("DEFAULT_DEBUG_BRANCH") if os.getenv("DEFAULT_DEBUG_BRANCH") != None else "main"
+STANDALONE_SERVICE_FILE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/build-tools/node-standalone.service"
+COSMOVISOR_SERVICE_FILE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/build-tools/node-cosmovisor.service"
+LOGROTATE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/build-tools/logrotate.conf"
+RSYSLOG_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/build-tools/rsyslog.conf"
 DEFAULT_STANDALONE_SERVICE_NAME = 'cheqd-noded'
 DEFAULT_COSMOVISOR_SERVICE_NAME = 'cheqd-cosmovisor'
 DEFAULT_STANDALONE_SERVICE_FILE_PATH = f"/lib/systemd/system/{DEFAULT_STANDALONE_SERVICE_NAME}.service"
@@ -67,9 +67,9 @@ DEFAULT_RSYSLOG_FILE = "/etc/rsyslog.d/cheqd-node.conf"
 ###     		Network configuration files    				###
 ###############################################################
 GENESIS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/%s/networks/{}/genesis.json" % (
-    DEFAULT_BRANCH)
+    DEFAULT_DEBUG_BRANCH)
 SEEDS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/%s/networks/{}/seeds.txt" % (
-    DEFAULT_BRANCH)
+    DEFAULT_DEBUG_BRANCH)
 
 ###############################################################
 ###     				Node snapshots      				###
