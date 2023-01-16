@@ -27,6 +27,14 @@ func MustParseFromStringTimeToGoTime(timeString string) time.Time {
 	}
 
 	t, err := time.Parse(time.RFC3339, timeString)
+	if err == nil {
+		return t
+	}
+	t, err = time.Parse(time.RFC3339Nano, timeString)
+	if err == nil {
+		return t
+	}
+	t, err = time.Parse(OldTimeFormat, timeString)
 	if err != nil {
 		panic(err)
 	}
