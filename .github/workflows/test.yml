@@ -46,7 +46,7 @@ jobs:
       - name: "Fresh install"
         working-directory: ./installer
         run: |
-          sudo bash -c "python3 installer.py < install-from-scratch-node-standalone.txt"
+          sudo bash -c "DEFAULT_BRANCH=bump-cosmovisor python3 installer.py < install-from-scratch-node-standalone.txt"
 
       - name: "Upgrade existing installation"
         working-directory: ./installer
