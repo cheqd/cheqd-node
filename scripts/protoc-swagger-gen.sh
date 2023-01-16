@@ -30,7 +30,7 @@ cd ..
 # combine swagger files
 # uses nodejs package `swagger-combine`.
 # all the individual swagger files need to be configured in `config.yaml` for merging
-swagger-combine ${SWAGGER_DIR}/config.yaml -o ${SWAGGER_DIR}/swagger.yaml -f yaml --continueOnConflictingPaths true
+swagger-combine ${SWAGGER_DIR}/config.json -o ${SWAGGER_DIR}/swagger.yaml -f yaml --continueOnConflictingPaths true
 
 # Remove individual swagger files
 rm -rf ${SWAGGER_DIR}/cheqd
