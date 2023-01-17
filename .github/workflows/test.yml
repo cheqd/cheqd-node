@@ -32,7 +32,7 @@ jobs:
 
       - name: Debugging with tmate
         if: ${{ failure() }}
-        uses: mxschmitt/action-tmate@v3.13
+        uses: mxschmitt/action-tmate@v3
         with:
           timeout-minutes: 10
 
