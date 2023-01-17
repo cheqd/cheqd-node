@@ -2778,14 +2778,21 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// QueryResourceRequest is the request type for the Query/Resource RPC method
 type QueryResourceRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// is unique identifier a for collection
+	// collection_id is an identifier of the DidDocument the resource belongs to.
+	// Format: <unique-identifier>
+	//
+	// Examples:
+	// - c82f2b02-bdab-4dd7-b833-3e143745d612
+	// - wGHEXrZvJxR8vw5P3UWH1j
 	CollectionId string `protobuf:"bytes,1,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
-	// is unique identifier for a resource
+	// id is a unique id of the resource.
+	// Format: <uuid>
 	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
 }
 
@@ -2823,11 +2830,15 @@ func (x *QueryResourceRequest) GetId() string {
 	return ""
 }
 
+// QueryResourceResponse is the response type for the Query/Resource RPC method
 type QueryResourceResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Successful resolution of the resource returns the following:
+	// - resource is the requested resource
+	// - metadata is the resource metadata associated with the requested resource
 	Resource *ResourceWithMetadata `protobuf:"bytes,1,opt,name=resource,proto3" json:"resource,omitempty"`
 }
 
@@ -2858,14 +2869,21 @@ func (x *QueryResourceResponse) GetResource() *ResourceWithMetadata {
 	return nil
 }
 
+// QueryResourceMetadataRequest is the request type for the Query/ResourceMetadata RPC method
 type QueryResourceMetadataRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// is unique identifier a for collection
+	// collection_id is an identifier of the DidDocument the resource belongs to.
+	// Format: <unique-identifier>
+	//
+	// Examples:
+	// - c82f2b02-bdab-4dd7-b833-3e143745d612
+	// - wGHEXrZvJxR8vw5P3UWH1j
 	CollectionId string `protobuf:"bytes,1,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
-	// is unique identifier for a resource
+	// id is a unique id of the resource.
+	// Format: <uuid>
 	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
 }
 
@@ -2903,11 +2921,13 @@ func (x *QueryResourceMetadataRequest) GetId() string {
 	return ""
 }
 
+// QueryResourceMetadataResponse is the response type for the Query/ResourceMetadata RPC method
 type QueryResourceMetadataResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// resource is the requested resource metadata
 	Resource *Metadata `protobuf:"bytes,1,opt,name=resource,proto3" json:"resource,omitempty"`
 }
 
@@ -2938,12 +2958,18 @@ func (x *QueryResourceMetadataResponse) GetResource() *Metadata {
 	return nil
 }
 
+// QueryCollectionResourcesRequest is the request type for the Query/CollectionResources RPC method
 type QueryCollectionResourcesRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// is unique identifier a for collection
+	// collection_id is an identifier of the DidDocument the resource belongs to.
+	// Format: <unique-identifier>
+	//
+	// Examples:
+	// - c82f2b02-bdab-4dd7-b833-3e143745d612
+	// - wGHEXrZvJxR8vw5P3UWH1j
 	CollectionId string `protobuf:"bytes,1,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
 }
 
@@ -2974,11 +3000,13 @@ func (x *QueryCollectionResourcesRequest) GetCollectionId() string {
 	return ""
 }
 
+// QueryCollectionResourcesResponse is the response type for the Query/CollectionResources RPC method
 type QueryCollectionResourcesResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// resources is the requested collection of resource metadata
 	Resources []*Metadata `protobuf:"bytes,1,rep,name=resources,proto3" json:"resources,omitempty"`
 }
 

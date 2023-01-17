@@ -23,30 +23,36 @@ message Resource {
 message Metadata {
   // collection_id is the ID of the collection that the Resource belongs to. Defined client-side.
   // This field is the unique identifier of the DID linked to this Resource
-  string collection_id = 1;
+  string collection_id = 1 [(gogoproto.jsontag) = "resourceCollectionId"];
 
   // id is the ID of the Resource. Defined client-side.
   // This field is a unique identifier for this specific version of the Resource.
   // Format: <uuid>
-  string id = 2;
+  string id = 2 [(gogoproto.jsontag) = "resourceId"];
 
   // name is a human-readable name for the Resource. Defined client-side.
   // Does not change between different versions.
   // Example: PassportSchema, EducationTrustRegistry
-  string name = 3;
+  string name = 3 [(gogoproto.jsontag) = "resourceName"];
 
   // version is a human-readable semantic version for the Resource. Defined client-side.
   // Stored as a string. OPTIONAL.
   // Example: 1.0.0, v2.1.0
-  string version = 4;
+  string version = 4 [
+    (gogoproto.jsontag) = "resourceVersion",
+    (gogoproto.nullable) = true
+  ];
 
   // resource_type is a Resource type that identifies what the Resource is. Defined client-side.
   // This is NOT the same as the resource's media type.
   // Example: AnonCredsSchema, StatusList2021
-  string resource_type = 5;
+  string resource_type = 5 [(gogoproto.jsontag) = "resourceType"];
 
   // List of alternative URIs for the SAME Resource.
-  repeated AlternativeUri also_known_as = 6 [(gogoproto.nullable) = true];
+  repeated AlternativeUri also_known_as = 6 [
+    (gogoproto.jsontag) = "resourceAlternativeUri",
+    (gogoproto.nullable) = true
+  ];
 
   // media_type is IANA media type of the Resource. Defined ledger-side.
   // Example: application/json, image/png

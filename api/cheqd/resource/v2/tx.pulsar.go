@@ -1914,14 +1914,16 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// MsgCreateResource defines the Msg/CreateResource request type.
+// It describes the parameters of a request for creating a resource.
 type MsgCreateResource struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Payload of the resource to be created
+	// Payload containing the resource to be created.
 	Payload *MsgCreateResourcePayload `protobuf:"bytes,1,opt,name=payload,proto3" json:"payload,omitempty"`
-	// Signatures of the corresponding DID Document's controller(s)
+	// Signatures of the corresponding DID Document's controller(s).
 	Signatures []*v2.SignInfo `protobuf:"bytes,2,rep,name=signatures,proto3" json:"signatures,omitempty"`
 }
 
@@ -1959,24 +1961,53 @@ func (x *MsgCreateResource) GetSignatures() []*v2.SignInfo {
 	return nil
 }
 
+// MsgCreateResourcePayload defines the structure of the payload for creating a resource.
+//
+// If a resource with the given id does not exist already,
+// it will be created. The resource will be created in the resource collection.
+//
+// If a resource with the given id, collection_id already exists, an error code 2200 will be returned.
+//
+// A new version of the resource in an existing collection will be created,
+// if a resource in that collection with the same name, resource_type and empty next_version_id exists.
+//
+// An update operation is not possible, because the resource is immutable by design.
 type MsgCreateResourcePayload struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// data is a byte-representation of the actual Data the user wants to store
+	// data is a byte-representation of the actual Data the user wants to store.
 	Data []byte `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
-	// collection_id is an identifier of the DidDocument the resource belongs to
+	// collection_id is an identifier of the DidDocument the resource belongs to.
+	// Format: <unique-identifier>
+	//
+	// Examples:
+	// - c82f2b02-bdab-4dd7-b833-3e143745d612
+	// - wGHEXrZvJxR8vw5P3UWH1j
 	CollectionId string `protobuf:"bytes,2,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
-	// id is an UUID of the resource
+	// id is a unique id of the resource.
+	// Format: <uuid>
 	Id string `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
-	// name is a human-readable name of the resource
+	// name is a human-readable name of the resource.
+	// Format: <string>
+	//
+	// Does not change between different versions.
+	// Example: PassportSchema, EducationTrustRegistry
 	Name string `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
-	// version is a version of the resource
+	// version is a version of the resource.
+	// Format: <string>
+	// Stored as a string. OPTIONAL.
+	//
+	// Example: 1.0.0, v2.1.0
 	Version string `protobuf:"bytes,5,opt,name=version,proto3" json:"version,omitempty"`
-	// resource_type is a type of the resource
+	// resource_type is a type of the resource.
+	// Format: <string>
+	//
+	// This is NOT the same as the resource's media type.
+	// Example: AnonCredsSchema, StatusList2021
 	ResourceType string `protobuf:"bytes,6,opt,name=resource_type,json=resourceType,proto3" json:"resource_type,omitempty"`
-	// also_known_as is a list of URIs that can be used to get the resource
+	// also_known_as is a list of URIs that can be used to get the resource.
 	AlsoKnownAs []*AlternativeUri `protobuf:"bytes,7,rep,name=also_known_as,json=alsoKnownAs,proto3" json:"also_known_as,omitempty"`
 }
 
@@ -2054,7 +2085,7 @@ type MsgCreateResourceResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Metadata which was creted after applying to the ledger
+	// Return the created resource metadata.
 	Resource *Metadata `protobuf:"bytes,1,opt,name=resource,proto3" json:"resource,omitempty"`
 }
 
