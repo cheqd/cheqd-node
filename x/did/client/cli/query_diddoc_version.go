@@ -20,10 +20,10 @@ func CmdGetDidDocVersion() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			did := args[0]
-			versionId := args[1]
-			params := &types.QueryGetDidDocVersionRequest{
+			versionID := args[1]
+			params := &types.QueryDidDocVersionRequest{
 				Id:      did,
-				Version: versionId,
+				Version: versionID,
 			}
 
 			resp, err := queryClient.DidDocVersion(context.Background(), params)

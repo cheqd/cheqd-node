@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/mr-tron/base58"
 	"github.com/multiformats/go-multibase"
 )
 
@@ -43,11 +44,47 @@ func MustEncodeMultibaseBase58(data []byte) string {
 	return encoded
 }
 
-func MustEncodeJson(data interface{}) string {
+func MustEncodeJSON(data interface{}) string {
 	encoded, err := json.Marshal(data)
 	if err != nil {
 		panic(err)
 	}
 
 	return string(encoded)
+}
+
+func ValidateMulticodecEd25519VerificationKey2020(keyBytes []byte) error {
+	if keyBytes[0] != 0xed && keyBytes[1] != 0x01 {
+		return fmt.Errorf("invalid two-byte prefix for Ed25519VerificationKey2020. expected: %s actual: %s",
+			"0xed01", fmt.Sprintf("0x%02x%02x", keyBytes[0], keyBytes[1]))
+	}
+	return nil
+}
+
+func ValidateMultibaseEd25519VerificationKey2020(data string) error {
+	encoding, keyBytes, err := multibase.Decode(data)
+	if err != nil {
+		return err
+	}
+
+	if encoding != multibase.Base58BTC {
+		return fmt.Errorf("invalid encoding for Ed25519VerificationKey2020. expected: %s actual: %s",
+			multibase.EncodingToStr[multibase.Base58BTC], multibase.EncodingToStr[encoding])
+	}
+
+	err = ValidateMulticodecEd25519VerificationKey2020(keyBytes)
+	if err != nil {
+		return err
+	}
+
+	pubKey := GetEd25519VerificationKey2020(keyBytes)
+	return ValidateEd25519PubKey(pubKey)
+}
+
+func ValidateBase58Ed25519VerificationKey2018(data string) error {
+	pubKey, err := base58.Decode(data)
+	if err != nil {
+		return err
+	}
+	return ValidateEd25519PubKey(pubKey)
 }

@@ -27,9 +27,13 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// MsgCreateDidDoc defines the Msg/CreateDidDoc request type.
+// It describes the parameters of a request for creating a new DID document.
 type MsgCreateDidDoc struct {
-	Payload    *MsgCreateDidDocPayload `protobuf:"bytes,1,opt,name=payload,proto3" json:"payload,omitempty"`
-	Signatures []*SignInfo             `protobuf:"bytes,2,rep,name=signatures,proto3" json:"signatures,omitempty"`
+	// Payload containing the DID Document to be created
+	Payload *MsgCreateDidDocPayload `protobuf:"bytes,1,opt,name=payload,proto3" json:"payload,omitempty"`
+	// Signatures of the DID Document's controller(s)
+	Signatures []*SignInfo `protobuf:"bytes,2,rep,name=signatures,proto3" json:"signatures,omitempty"`
 }
 
 func (m *MsgCreateDidDoc) Reset()         { *m = MsgCreateDidDoc{} }
@@ -79,9 +83,13 @@ func (m *MsgCreateDidDoc) GetSignatures() []*SignInfo {
 	return nil
 }
 
+// MsgUpdateDidDoc defines the Msg/UpdateDidDoc request type.
+// It describes the parameters of a request for updating an existing DID document.
 type MsgUpdateDidDoc struct {
-	Payload    *MsgUpdateDidDocPayload `protobuf:"bytes,1,opt,name=payload,proto3" json:"payload,omitempty"`
-	Signatures []*SignInfo             `protobuf:"bytes,2,rep,name=signatures,proto3" json:"signatures,omitempty"`
+	// Payload containing the DID Document to be updated. This should be updated the DID Document.
+	Payload *MsgUpdateDidDocPayload `protobuf:"bytes,1,opt,name=payload,proto3" json:"payload,omitempty"`
+	// Signatures of the DID Document's controller(s)
+	Signatures []*SignInfo `protobuf:"bytes,2,rep,name=signatures,proto3" json:"signatures,omitempty"`
 }
 
 func (m *MsgUpdateDidDoc) Reset()         { *m = MsgUpdateDidDoc{} }
@@ -131,9 +139,13 @@ func (m *MsgUpdateDidDoc) GetSignatures() []*SignInfo {
 	return nil
 }
 
+// MsgDeactivateDidDoc defines the Msg/DeactivateDidDoc request type.
+// It describes the parameters of a request for deactivating an existing DID document.
 type MsgDeactivateDidDoc struct {
-	Payload    *MsgDeactivateDidDocPayload `protobuf:"bytes,1,opt,name=payload,proto3" json:"payload,omitempty"`
-	Signatures []*SignInfo                 `protobuf:"bytes,2,rep,name=signatures,proto3" json:"signatures,omitempty"`
+	// Payload containing the DID Document to be deactivated
+	Payload *MsgDeactivateDidDocPayload `protobuf:"bytes,1,opt,name=payload,proto3" json:"payload,omitempty"`
+	// Signatures of the DID Document's controller(s)
+	Signatures []*SignInfo `protobuf:"bytes,2,rep,name=signatures,proto3" json:"signatures,omitempty"`
 }
 
 func (m *MsgDeactivateDidDoc) Reset()         { *m = MsgDeactivateDidDoc{} }
@@ -183,9 +195,12 @@ func (m *MsgDeactivateDidDoc) GetSignatures() []*SignInfo {
 	return nil
 }
 
+// SignInfo defines the structure of a DID Document controller's signature
 type SignInfo struct {
+	// Verification method ID of the DID Controller
 	VerificationMethodId string `protobuf:"bytes,1,opt,name=verification_method_id,json=verificationMethodId,proto3" json:"verification_method_id,omitempty"`
-	Signature            []byte `protobuf:"bytes,2,opt,name=signature,proto3" json:"signature,omitempty"`
+	// Signature of the DID Document controller
+	Signature []byte `protobuf:"bytes,2,opt,name=signature,proto3" json:"signature,omitempty"`
 }
 
 func (m *SignInfo) Reset()         { *m = SignInfo{} }
@@ -235,19 +250,55 @@ func (m *SignInfo) GetSignature() []byte {
 	return nil
 }
 
+// MsgCreateDidDocPayload defines the structure of the payload for creating a new DID document
 type MsgCreateDidDocPayload struct {
-	Context              []string              `protobuf:"bytes,1,rep,name=context,proto3" json:"context,omitempty"`
-	Id                   string                `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
-	Controller           []string              `protobuf:"bytes,3,rep,name=controller,proto3" json:"controller,omitempty"`
-	VerificationMethod   []*VerificationMethod `protobuf:"bytes,4,rep,name=verification_method,json=verificationMethod,proto3" json:"verification_method,omitempty"`
-	Authentication       []string              `protobuf:"bytes,5,rep,name=authentication,proto3" json:"authentication,omitempty"`
-	AssertionMethod      []string              `protobuf:"bytes,6,rep,name=assertion_method,json=assertionMethod,proto3" json:"assertion_method,omitempty"`
-	CapabilityInvocation []string              `protobuf:"bytes,7,rep,name=capability_invocation,json=capabilityInvocation,proto3" json:"capability_invocation,omitempty"`
-	CapabilityDelegation []string              `protobuf:"bytes,8,rep,name=capability_delegation,json=capabilityDelegation,proto3" json:"capability_delegation,omitempty"`
-	KeyAgreement         []string              `protobuf:"bytes,9,rep,name=key_agreement,json=keyAgreement,proto3" json:"key_agreement,omitempty"`
-	AlsoKnownAs          []string              `protobuf:"bytes,10,rep,name=also_known_as,json=alsoKnownAs,proto3" json:"also_known_as,omitempty"`
-	Service              []*Service            `protobuf:"bytes,11,rep,name=service,proto3" json:"service,omitempty"`
-	VersionId            string                `protobuf:"bytes,12,opt,name=version_id,json=versionId,proto3" json:"version_id,omitempty"`
+	// context is a list of URIs used to identify the context of the DID document.
+	// Default: https://www.w3.org/ns/did/v1
+	Context []string `protobuf:"bytes,1,rep,name=context,proto3" json:"context,omitempty"`
+	// id is the DID of the DID document.
+	// Format: did:cheqd:<namespace>:<unique-identifier>
+	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	// controller is a list of DIDs that are allowed to control the DID document.
+	Controller []string `protobuf:"bytes,3,rep,name=controller,proto3" json:"controller,omitempty"`
+	// verificationMethod is a list of verification methods that can be used to
+	// verify a digital signature or cryptographic proof.
+	// Documentation: https://www.w3.org/TR/did-core/#verification-methods
+	//
+	// Required fields:
+	// - id: A unique identifier for the verification method
+	// - type: A supported verification method type (supported: Ed25519VerificationKey2018, Ed25519VerificationKey2020, JsonWebKey2020)
+	// - controller: DID of the controller of the verification method
+	// - verification_material: Public key of the verification method (supported: publicJwk, publicKeyBase58, publicKeyMultibase)
+	VerificationMethod []*VerificationMethod `protobuf:"bytes,4,rep,name=verification_method,json=verificationMethod,proto3" json:"verification_method,omitempty"`
+	// authentication is a list of verification methods that can be used to
+	// authenticate as the DID subject.
+	Authentication []string `protobuf:"bytes,5,rep,name=authentication,proto3" json:"authentication,omitempty"`
+	// assertionMethod is a list of verification methods that can be used to
+	// assert statements as the DID subject.
+	AssertionMethod []string `protobuf:"bytes,6,rep,name=assertion_method,json=assertionMethod,proto3" json:"assertion_method,omitempty"`
+	// capabilityInvocation is a list of verification methods that can be used to
+	// invoke capabilities as the DID subject.
+	CapabilityInvocation []string `protobuf:"bytes,7,rep,name=capability_invocation,json=capabilityInvocation,proto3" json:"capability_invocation,omitempty"`
+	// capabilityDelegation is a list of verification methods that can be used to
+	// delegate capabilities as the DID subject.
+	CapabilityDelegation []string `protobuf:"bytes,8,rep,name=capability_delegation,json=capabilityDelegation,proto3" json:"capability_delegation,omitempty"`
+	// keyAgreement is a list of verification methods that can be used to perform
+	// key agreement as the DID subject.
+	KeyAgreement []string `protobuf:"bytes,9,rep,name=key_agreement,json=keyAgreement,proto3" json:"key_agreement,omitempty"`
+	// service is a list of services that can be used to interact with the DID subject.
+	// Documentation: https://www.w3.org/TR/did-core/#services
+	//
+	// Required fields:
+	// - id: A unique identifier for the service
+	// - type: A service type defined in DID Specification Registries
+	// - service_endpoint: Service endpoint(s), provided as a URI or set of URIs
+	Service []*Service `protobuf:"bytes,10,rep,name=service,proto3" json:"service,omitempty"`
+	// alsoKnownAs is a list of DIDs that are known to refer to the same DID subject.
+	AlsoKnownAs []string `protobuf:"bytes,11,rep,name=also_known_as,json=alsoKnownAs,proto3" json:"also_known_as,omitempty"`
+	// Version ID of the DID Document to be created
+	//
+	// Format: <uuid>
+	VersionId string `protobuf:"bytes,12,opt,name=version_id,json=versionId,proto3" json:"version_id,omitempty"`
 }
 
 func (m *MsgCreateDidDocPayload) Reset()         { *m = MsgCreateDidDocPayload{} }
@@ -346,16 +397,16 @@ func (m *MsgCreateDidDocPayload) GetKeyAgreement() []string {
 	return nil
 }
 
-func (m *MsgCreateDidDocPayload) GetAlsoKnownAs() []string {
+func (m *MsgCreateDidDocPayload) GetService() []*Service {
 	if m != nil {
-		return m.AlsoKnownAs
+		return m.Service
 	}
 	return nil
 }
 
-func (m *MsgCreateDidDocPayload) GetService() []*Service {
+func (m *MsgCreateDidDocPayload) GetAlsoKnownAs() []string {
 	if m != nil {
-		return m.Service
+		return m.AlsoKnownAs
 	}
 	return nil
 }
@@ -367,7 +418,9 @@ func (m *MsgCreateDidDocPayload) GetVersionId() string {
 	return ""
 }
 
+// MsgCreateDidDocResponse defines response type for Msg/CreateDidDoc.
 type MsgCreateDidDocResponse struct {
+	// Return the created DID Document with metadata
 	Value *DidDocWithMetadata `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
 }
 
@@ -411,19 +464,56 @@ func (m *MsgCreateDidDocResponse) GetValue() *DidDocWithMetadata {
 	return nil
 }
 
+// MsgUpdateDidDocPayload defines the structure of the payload for updating an existing DID document
 type MsgUpdateDidDocPayload struct {
-	Context              []string              `protobuf:"bytes,1,rep,name=context,proto3" json:"context,omitempty"`
-	Id                   string                `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
-	Controller           []string              `protobuf:"bytes,3,rep,name=controller,proto3" json:"controller,omitempty"`
-	VerificationMethod   []*VerificationMethod `protobuf:"bytes,4,rep,name=verification_method,json=verificationMethod,proto3" json:"verification_method,omitempty"`
-	Authentication       []string              `protobuf:"bytes,5,rep,name=authentication,proto3" json:"authentication,omitempty"`
-	AssertionMethod      []string              `protobuf:"bytes,6,rep,name=assertion_method,json=assertionMethod,proto3" json:"assertion_method,omitempty"`
-	CapabilityInvocation []string              `protobuf:"bytes,7,rep,name=capability_invocation,json=capabilityInvocation,proto3" json:"capability_invocation,omitempty"`
-	CapabilityDelegation []string              `protobuf:"bytes,8,rep,name=capability_delegation,json=capabilityDelegation,proto3" json:"capability_delegation,omitempty"`
-	KeyAgreement         []string              `protobuf:"bytes,9,rep,name=key_agreement,json=keyAgreement,proto3" json:"key_agreement,omitempty"`
-	AlsoKnownAs          []string              `protobuf:"bytes,10,rep,name=also_known_as,json=alsoKnownAs,proto3" json:"also_known_as,omitempty"`
-	Service              []*Service            `protobuf:"bytes,11,rep,name=service,proto3" json:"service,omitempty"`
-	VersionId            string                `protobuf:"bytes,12,opt,name=version_id,json=versionId,proto3" json:"version_id,omitempty"`
+	// context is a list of URIs used to identify the context of the DID document.
+	// Default: https://www.w3.org/ns/did/v1
+	Context []string `protobuf:"bytes,1,rep,name=context,proto3" json:"context,omitempty"`
+	// id is the DID of the DID document.
+	// Format: did:cheqd:<namespace>:<unique-identifier>
+	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	// controller is a list of DIDs that are allowed to control the DID document.
+	Controller []string `protobuf:"bytes,3,rep,name=controller,proto3" json:"controller,omitempty"`
+	// verificationMethod is a list of verification methods that can be used to
+	// verify a digital signature or cryptographic proof.
+	// Documentation: https://www.w3.org/TR/did-core/#verification-methods
+	//
+	// Required fields:
+	// - id: A unique identifier for the verification method
+	// - type: A supported verification method type (supported: Ed25519VerificationKey2018, Ed25519VerificationKey2020, JsonWebKey2020)
+	// - controller: DID of the controller of the verification method
+	// - verification_material: Public key of the verification method (supported: publicJwk, publicKeyBase58, publicKeyMultibase)
+	VerificationMethod []*VerificationMethod `protobuf:"bytes,4,rep,name=verification_method,json=verificationMethod,proto3" json:"verification_method,omitempty"`
+	// authentication is a list of verification methods that can be used to
+	// authenticate as the DID subject.
+	Authentication []string `protobuf:"bytes,5,rep,name=authentication,proto3" json:"authentication,omitempty"`
+	// assertionMethod is a list of verification methods that can be used to
+	// assert statements as the DID subject.
+	AssertionMethod []string `protobuf:"bytes,6,rep,name=assertion_method,json=assertionMethod,proto3" json:"assertion_method,omitempty"`
+	// capabilityInvocation is a list of verification methods that can be used to
+	// invoke capabilities as the DID subject.
+	CapabilityInvocation []string `protobuf:"bytes,7,rep,name=capability_invocation,json=capabilityInvocation,proto3" json:"capability_invocation,omitempty"`
+	// capabilityDelegation is a list of verification methods that can be used to
+	// delegate capabilities as the DID subject.
+	CapabilityDelegation []string `protobuf:"bytes,8,rep,name=capability_delegation,json=capabilityDelegation,proto3" json:"capability_delegation,omitempty"`
+	// keyAgreement is a list of verification methods that can be used to perform
+	// key agreement as the DID subject.
+	KeyAgreement []string `protobuf:"bytes,9,rep,name=key_agreement,json=keyAgreement,proto3" json:"key_agreement,omitempty"`
+	// service is a list of services that can be used to interact with the DID subject.
+	// Documentation: https://www.w3.org/TR/did-core/#services
+	//
+	// Required fields:
+	// - id: A unique identifier for the service
+	// - type: A service type defined in DID Specification Registries
+	// - service_endpoint: Service endpoint(s), provided as a URI or set of URIs
+	Service []*Service `protobuf:"bytes,10,rep,name=service,proto3" json:"service,omitempty"`
+	// alsoKnownAs is a list of DIDs that are known to refer to the same DID subject.
+	AlsoKnownAs []string `protobuf:"bytes,11,rep,name=also_known_as,json=alsoKnownAs,proto3" json:"also_known_as,omitempty"`
+	// Updated version ID of the DID Document.
+	// Links to next/previous versions of the DID Document will be automatically updated.
+	//
+	// Format: <uuid>
+	VersionId string `protobuf:"bytes,12,opt,name=version_id,json=versionId,proto3" json:"version_id,omitempty"`
 }
 
 func (m *MsgUpdateDidDocPayload) Reset()         { *m = MsgUpdateDidDocPayload{} }
@@ -522,16 +612,16 @@ func (m *MsgUpdateDidDocPayload) GetKeyAgreement() []string {
 	return nil
 }
 
-func (m *MsgUpdateDidDocPayload) GetAlsoKnownAs() []string {
+func (m *MsgUpdateDidDocPayload) GetService() []*Service {
 	if m != nil {
-		return m.AlsoKnownAs
+		return m.Service
 	}
 	return nil
 }
 
-func (m *MsgUpdateDidDocPayload) GetService() []*Service {
+func (m *MsgUpdateDidDocPayload) GetAlsoKnownAs() []string {
 	if m != nil {
-		return m.Service
+		return m.AlsoKnownAs
 	}
 	return nil
 }
@@ -544,6 +634,7 @@ func (m *MsgUpdateDidDocPayload) GetVersionId() string {
 }
 
 type MsgUpdateDidDocResponse struct {
+	// Return the updated DID Document with metadata
 	Value *DidDocWithMetadata `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
 }
 
@@ -587,8 +678,12 @@ func (m *MsgUpdateDidDocResponse) GetValue() *DidDocWithMetadata {
 	return nil
 }
 
+// MsgDeactivateDidDocPayload defines the structure of the payload for deactivating an existing DID document
 type MsgDeactivateDidDocPayload struct {
-	Id        string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Unique identifier of the DID Document to be deactivated
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Version ID of the DID Document to be deactivated
+	// This is primarily used as a sanity check to ensure that the correct DID Document is being deactivated.
 	VersionId string `protobuf:"bytes,2,opt,name=version_id,json=versionId,proto3" json:"version_id,omitempty"`
 }
 
@@ -639,7 +734,9 @@ func (m *MsgDeactivateDidDocPayload) GetVersionId() string {
 	return ""
 }
 
+// MsgDeactivateDidDocResponse defines response type for Msg/DeactivateDidDoc.
 type MsgDeactivateDidDocResponse struct {
+	// Return the deactivated DID Document with metadata
 	Value *DidDocWithMetadata `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
 }
 
@@ -726,23 +823,23 @@ var fileDescriptor_0e353aae8dd04717 = []byte{
 	0xb9, 0x09, 0xab, 0x36, 0xed, 0xd0, 0x43, 0xde, 0xe6, 0xaa, 0xd7, 0xe4, 0xae, 0x2f, 0x06, 0xca,
 	0x29, 0xcd, 0x5f, 0xb9, 0x2c, 0xd6, 0x87, 0xb5, 0x58, 0x13, 0xc3, 0x36, 0x3a, 0x41, 0xd3, 0x5c,
 	0xbc, 0xa9, 0x36, 0xac, 0x91, 0x87, 0x30, 0x7f, 0x8c, 0xbd, 0x26, 0x75, 0x3c, 0xc4, 0x13, 0x74,
-	0x95, 0x99, 0xd6, 0xe4, 0xec, 0x31, 0xf6, 0xb6, 0x43, 0x8c, 0x14, 0x61, 0x9e, 0xb6, 0xa5, 0x68,
-	0x1e, 0xbb, 0xe2, 0x93, 0xdb, 0xa4, 0xd2, 0x04, 0x4d, 0xca, 0xf4, 0xc1, 0xdd, 0x3e, 0xb6, 0x2d,
-	0x49, 0x05, 0x52, 0x12, 0x3d, 0x9f, 0xdb, 0x68, 0x66, 0xf4, 0x66, 0xae, 0xc6, 0x22, 0x15, 0x14,
-	0xad, 0x90, 0x45, 0xd6, 0x01, 0x7c, 0xf4, 0x64, 0x7f, 0x33, 0x38, 0x33, 0xb3, 0xfa, 0x04, 0xd3,
-	0x03, 0xa4, 0xce, 0x8a, 0x7b, 0x70, 0x27, 0x16, 0x06, 0x0b, 0x65, 0x47, 0xb8, 0x12, 0xc9, 0x16,
-	0xcc, 0xf8, 0xb4, 0xdd, 0xc5, 0xc1, 0x2b, 0x10, 0x3b, 0xb5, 0x80, 0xfc, 0x96, 0xab, 0x56, 0x03,
-	0x15, 0x65, 0x54, 0x51, 0x2b, 0xa0, 0x87, 0x01, 0x9b, 0xf0, 0xc2, 0xfe, 0x0f, 0xd8, 0xbf, 0x1a,
-	0xb0, 0x68, 0x18, 0x6e, 0x1c, 0xb0, 0x5d, 0xc8, 0xfd, 0xf9, 0x03, 0x3c, 0x48, 0x92, 0x31, 0x4c,
-	0xd2, 0xa8, 0xbf, 0x44, 0xdc, 0xdf, 0x01, 0xdc, 0x9b, 0x20, 0x76, 0x53, 0x8f, 0xd5, 0xef, 0x09,
-	0x48, 0x36, 0xa4, 0x43, 0xf6, 0x21, 0x3b, 0x32, 0x75, 0xd7, 0xaf, 0x1c, 0xb2, 0xb9, 0xc7, 0x57,
-	0x96, 0x87, 0xae, 0xf6, 0x21, 0x3b, 0x32, 0x3f, 0xd7, 0xaf, 0x1c, 0x97, 0x13, 0x54, 0x27, 0x9e,
-	0xc7, 0x07, 0x58, 0x1a, 0x9b, 0x84, 0x0f, 0xae, 0x1d, 0x7c, 0xb9, 0x8d, 0x6b, 0x29, 0xe1, 0x0a,
-	0x3b, 0xdb, 0x3f, 0xce, 0xf3, 0xc6, 0xd9, 0x79, 0xde, 0xf8, 0x75, 0x9e, 0x37, 0xbe, 0x5e, 0xe4,
-	0xa7, 0xce, 0x2e, 0xf2, 0x53, 0x3f, 0x2f, 0xf2, 0x53, 0xef, 0x9e, 0x3a, 0x5c, 0xb5, 0xba, 0x87,
-	0x65, 0x5b, 0x9c, 0x54, 0x82, 0x7b, 0x8c, 0xfe, 0x7d, 0xe6, 0x0a, 0x86, 0x95, 0x53, 0x7d, 0xa9,
-	0x51, 0xbd, 0x0e, 0xca, 0xc3, 0x59, 0x7d, 0xa3, 0xd9, 0xfc, 0x1d, 0x00, 0x00, 0xff, 0xff, 0xde,
-	0xf1, 0xc0, 0x25, 0x13, 0x09, 0x00, 0x00,
+	0x95, 0x99, 0xd6, 0xe4, 0xec, 0x31, 0xf6, 0xb6, 0x43, 0x8c, 0x54, 0x20, 0x25, 0xd1, 0xf3, 0xb9,
+	0x8d, 0x26, 0xe8, 0x8d, 0x5a, 0x8d, 0xc5, 0x25, 0x28, 0x5a, 0x21, 0x8b, 0x14, 0x61, 0x9e, 0xb6,
+	0xa5, 0x68, 0x1e, 0xbb, 0xe2, 0x93, 0xdb, 0xa4, 0xd2, 0xcc, 0x68, 0xd5, 0x4c, 0x1f, 0xdc, 0xed,
+	0x63, 0xdb, 0x92, 0xac, 0x03, 0xf8, 0xe8, 0xc9, 0xfe, 0x66, 0x70, 0x66, 0x66, 0xf5, 0x09, 0xa6,
+	0x07, 0x48, 0x9d, 0x15, 0xf7, 0xe0, 0x4e, 0x2c, 0x0c, 0x16, 0xca, 0x8e, 0x70, 0x25, 0x92, 0x2d,
+	0x98, 0xf1, 0x69, 0xbb, 0x8b, 0x83, 0x57, 0x20, 0x76, 0x6a, 0x01, 0xf9, 0x2d, 0x57, 0xad, 0x06,
+	0x2a, 0xca, 0xa8, 0xa2, 0x56, 0x40, 0x0f, 0x03, 0x36, 0xe1, 0x85, 0xfd, 0x1f, 0xb0, 0x7f, 0x35,
+	0x60, 0xd1, 0x30, 0xdc, 0x38, 0x60, 0xbb, 0x90, 0xfb, 0xf3, 0x07, 0x78, 0x90, 0x24, 0x63, 0x98,
+	0xa4, 0x51, 0x7f, 0x89, 0xb8, 0xbf, 0x03, 0xb8, 0x37, 0x41, 0xec, 0xa6, 0x1e, 0xab, 0xdf, 0x13,
+	0x90, 0x6c, 0x48, 0x87, 0xec, 0x43, 0x76, 0x64, 0xea, 0xae, 0x5f, 0x39, 0x64, 0x73, 0x8f, 0xaf,
+	0x2c, 0x0f, 0x5d, 0xed, 0x43, 0x76, 0x64, 0x7e, 0xae, 0x5f, 0x39, 0x2e, 0x27, 0xa8, 0x4e, 0x3c,
+	0x8f, 0x0f, 0xb0, 0x34, 0x36, 0x09, 0x1f, 0x5c, 0x3b, 0xf8, 0x72, 0x1b, 0xd7, 0x52, 0xc2, 0x15,
+	0x76, 0xb6, 0x7f, 0x9c, 0xe7, 0x8d, 0xb3, 0xf3, 0xbc, 0xf1, 0xeb, 0x3c, 0x6f, 0x7c, 0xbd, 0xc8,
+	0x4f, 0x9d, 0x5d, 0xe4, 0xa7, 0x7e, 0x5e, 0xe4, 0xa7, 0xde, 0x3d, 0x75, 0xb8, 0x6a, 0x75, 0x0f,
+	0xcb, 0xb6, 0x38, 0xa9, 0x04, 0xf7, 0x18, 0xfd, 0xfb, 0xcc, 0x15, 0x0c, 0x2b, 0xa7, 0xfa, 0x52,
+	0xa3, 0x7a, 0x1d, 0x94, 0x87, 0xb3, 0xfa, 0x46, 0xb3, 0xf9, 0x3b, 0x00, 0x00, 0xff, 0xff, 0x41,
+	0xe4, 0x38, 0xd8, 0x13, 0x09, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -757,8 +854,11 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
+	// CreateDidDoc defines a method for creating a new DID document
 	CreateDidDoc(ctx context.Context, in *MsgCreateDidDoc, opts ...grpc.CallOption) (*MsgCreateDidDocResponse, error)
+	// UpdateDidDoc defines a method for updating an existing DID document
 	UpdateDidDoc(ctx context.Context, in *MsgUpdateDidDoc, opts ...grpc.CallOption) (*MsgUpdateDidDocResponse, error)
+	// DeactivateDidDoc defines a method for deactivating an existing DID document
 	DeactivateDidDoc(ctx context.Context, in *MsgDeactivateDidDoc, opts ...grpc.CallOption) (*MsgDeactivateDidDocResponse, error)
 }
 
@@ -799,8 +899,11 @@ func (c *msgClient) DeactivateDidDoc(ctx context.Context, in *MsgDeactivateDidDo
 
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
+	// CreateDidDoc defines a method for creating a new DID document
 	CreateDidDoc(context.Context, *MsgCreateDidDoc) (*MsgCreateDidDocResponse, error)
+	// UpdateDidDoc defines a method for updating an existing DID document
 	UpdateDidDoc(context.Context, *MsgUpdateDidDoc) (*MsgUpdateDidDocResponse, error)
+	// DeactivateDidDoc defines a method for deactivating an existing DID document
 	DeactivateDidDoc(context.Context, *MsgDeactivateDidDoc) (*MsgDeactivateDidDocResponse, error)
 }
 
@@ -1108,6 +1211,15 @@ func (m *MsgCreateDidDocPayload) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 		i--
 		dAtA[i] = 0x62
 	}
+	if len(m.AlsoKnownAs) > 0 {
+		for iNdEx := len(m.AlsoKnownAs) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.AlsoKnownAs[iNdEx])
+			copy(dAtA[i:], m.AlsoKnownAs[iNdEx])
+			i = encodeVarintTx(dAtA, i, uint64(len(m.AlsoKnownAs[iNdEx])))
+			i--
+			dAtA[i] = 0x5a
+		}
+	}
 	if len(m.Service) > 0 {
 		for iNdEx := len(m.Service) - 1; iNdEx >= 0; iNdEx-- {
 			{
@@ -1118,15 +1230,6 @@ func (m *MsgCreateDidDocPayload) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 				i -= size
 				i = encodeVarintTx(dAtA, i, uint64(size))
 			}
-			i--
-			dAtA[i] = 0x5a
-		}
-	}
-	if len(m.AlsoKnownAs) > 0 {
-		for iNdEx := len(m.AlsoKnownAs) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.AlsoKnownAs[iNdEx])
-			copy(dAtA[i:], m.AlsoKnownAs[iNdEx])
-			i = encodeVarintTx(dAtA, i, uint64(len(m.AlsoKnownAs[iNdEx])))
 			i--
 			dAtA[i] = 0x52
 		}
@@ -1280,6 +1383,15 @@ func (m *MsgUpdateDidDocPayload) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 		i--
 		dAtA[i] = 0x62
 	}
+	if len(m.AlsoKnownAs) > 0 {
+		for iNdEx := len(m.AlsoKnownAs) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.AlsoKnownAs[iNdEx])
+			copy(dAtA[i:], m.AlsoKnownAs[iNdEx])
+			i = encodeVarintTx(dAtA, i, uint64(len(m.AlsoKnownAs[iNdEx])))
+			i--
+			dAtA[i] = 0x5a
+		}
+	}
 	if len(m.Service) > 0 {
 		for iNdEx := len(m.Service) - 1; iNdEx >= 0; iNdEx-- {
 			{
@@ -1290,15 +1402,6 @@ func (m *MsgUpdateDidDocPayload) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 				i -= size
 				i = encodeVarintTx(dAtA, i, uint64(size))
 			}
-			i--
-			dAtA[i] = 0x5a
-		}
-	}
-	if len(m.AlsoKnownAs) > 0 {
-		for iNdEx := len(m.AlsoKnownAs) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.AlsoKnownAs[iNdEx])
-			copy(dAtA[i:], m.AlsoKnownAs[iNdEx])
-			i = encodeVarintTx(dAtA, i, uint64(len(m.AlsoKnownAs[iNdEx])))
 			i--
 			dAtA[i] = 0x52
 		}
@@ -1640,15 +1743,15 @@ func (m *MsgCreateDidDocPayload) Size() (n int) {
 			n += 1 + l + sovTx(uint64(l))
 		}
 	}
-	if len(m.AlsoKnownAs) > 0 {
-		for _, s := range m.AlsoKnownAs {
-			l = len(s)
-			n += 1 + l + sovTx(uint64(l))
-		}
-	}
 	if len(m.Service) > 0 {
 		for _, e := range m.Service {
 			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if len(m.AlsoKnownAs) > 0 {
+		for _, s := range m.AlsoKnownAs {
+			l = len(s)
 			n += 1 + l + sovTx(uint64(l))
 		}
 	}
@@ -1730,15 +1833,15 @@ func (m *MsgUpdateDidDocPayload) Size() (n int) {
 			n += 1 + l + sovTx(uint64(l))
 		}
 	}
-	if len(m.AlsoKnownAs) > 0 {
-		for _, s := range m.AlsoKnownAs {
-			l = len(s)
-			n += 1 + l + sovTx(uint64(l))
-		}
-	}
 	if len(m.Service) > 0 {
 		for _, e := range m.Service {
 			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if len(m.AlsoKnownAs) > 0 {
+		for _, s := range m.AlsoKnownAs {
+			l = len(s)
 			n += 1 + l + sovTx(uint64(l))
 		}
 	}
@@ -2595,38 +2698,6 @@ func (m *MsgCreateDidDocPayload) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 10:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AlsoKnownAs", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.AlsoKnownAs = append(m.AlsoKnownAs, string(dAtA[iNdEx:postIndex]))
-			iNdEx = postIndex
-		case 11:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Service", wireType)
 			}
 			var msglen int
@@ -2658,6 +2729,38 @@ func (m *MsgCreateDidDocPayload) Unmarshal(dAtA []byte) error {
 			if err := m.Service[len(m.Service)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AlsoKnownAs", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.AlsoKnownAs = append(m.AlsoKnownAs, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 12:
 			if wireType != 2 {
@@ -3119,38 +3222,6 @@ func (m *MsgUpdateDidDocPayload) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 10:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AlsoKnownAs", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.AlsoKnownAs = append(m.AlsoKnownAs, string(dAtA[iNdEx:postIndex]))
-			iNdEx = postIndex
-		case 11:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Service", wireType)
 			}
 			var msglen int
@@ -3182,6 +3253,38 @@ func (m *MsgUpdateDidDocPayload) Unmarshal(dAtA []byte) error {
 			if err := m.Service[len(m.Service)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AlsoKnownAs", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.AlsoKnownAs = append(m.AlsoKnownAs, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 12:
 			if wireType != 2 {

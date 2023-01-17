@@ -61,20 +61,20 @@ func (k Keeper) SetResource(ctx *sdk.Context, resource *types.Resource) error {
 }
 
 // GetResource returns a resource from its id
-func (k Keeper) GetResource(ctx *sdk.Context, collectionId string, id string) (types.Resource, error) {
-	if !k.HasResource(ctx, collectionId, id) {
-		return types.Resource{}, sdkerrors.ErrNotFound.Wrap("resource " + collectionId + ":" + id)
+func (k Keeper) GetResource(ctx *sdk.Context, collectionID string, id string) (types.Resource, error) {
+	if !k.HasResource(ctx, collectionID, id) {
+		return types.Resource{}, sdkerrors.ErrNotFound.Wrap("resource " + collectionID + ":" + id)
 	}
 
 	store := ctx.KVStore(k.storeKey)
 
-	headerBytes := store.Get(GetResourceHeaderKeyBytes(collectionId, id))
+	headerBytes := store.Get(GetResourceHeaderKeyBytes(collectionID, id))
 	var header types.ResourceHeader
 	if err := k.cdc.Unmarshal(headerBytes, &header); err != nil {
 		return types.Resource{}, sdkerrors.ErrInvalidType.Wrap(err.Error())
 	}
 
-	dataBytes := store.Get(GetResourceDataKeyBytes(collectionId, id))
+	dataBytes := store.Get(GetResourceDataKeyBytes(collectionID, id))
 
 	return types.Resource{
 		Header: &header,
@@ -83,14 +83,14 @@ func (k Keeper) GetResource(ctx *sdk.Context, collectionId string, id string) (t
 }
 
 // HasResource checks if the resource exists in the store
-func (k Keeper) HasResource(ctx *sdk.Context, collectionId string, id string) bool {
+func (k Keeper) HasResource(ctx *sdk.Context, collectionID string, id string) bool {
 	store := ctx.KVStore(k.storeKey)
-	return store.Has(GetResourceHeaderKeyBytes(collectionId, id))
+	return store.Has(GetResourceHeaderKeyBytes(collectionID, id))
 }
 
-func (k Keeper) GetAllResourceVersions(ctx *sdk.Context, collectionId, name string) []*types.ResourceHeader {
+func (k Keeper) GetAllResourceVersions(ctx *sdk.Context, collectionID, name string) []*types.ResourceHeader {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, GetResourceHeaderCollectionPrefixBytes(collectionId))
+	iterator := sdk.KVStorePrefixIterator(store, GetResourceHeaderCollectionPrefixBytes(collectionID))
 
 	defer closeIteratorOrPanic(iterator)
 
@@ -108,9 +108,9 @@ func (k Keeper) GetAllResourceVersions(ctx *sdk.Context, collectionId, name stri
 	return result
 }
 
-func (k Keeper) GetResourceCollection(ctx *sdk.Context, collectionId string) []*types.ResourceHeader {
+func (k Keeper) GetResourceCollection(ctx *sdk.Context, collectionID string) []*types.ResourceHeader {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, GetResourceHeaderCollectionPrefixBytes(collectionId))
+	iterator := sdk.KVStorePrefixIterator(store, GetResourceHeaderCollectionPrefixBytes(collectionID))
 
 	var resources []*types.ResourceHeader
 
@@ -126,8 +126,8 @@ func (k Keeper) GetResourceCollection(ctx *sdk.Context, collectionId string) []*
 	return resources
 }
 
-func (k Keeper) GetLastResourceVersionHeader(ctx *sdk.Context, collectionId, name, resourceType, mediaType string) (types.ResourceHeader, bool) {
-	iterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.storeKey), GetResourceHeaderCollectionPrefixBytes(collectionId))
+func (k Keeper) GetLastResourceVersionHeader(ctx *sdk.Context, collectionID, name, resourceType, mediaType string) (types.ResourceHeader, bool) {
+	iterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.storeKey), GetResourceHeaderCollectionPrefixBytes(collectionID))
 
 	defer closeIteratorOrPanic(iterator)
 
@@ -189,18 +189,18 @@ func (k Keeper) GetAllResources(ctx *sdk.Context) (list []types.Resource) {
 }
 
 // GetResourceHeaderKeyBytes returns the byte representation of resource key
-func GetResourceHeaderKeyBytes(collectionId string, id string) []byte {
-	return []byte(types.ResourceHeaderKey + collectionId + ":" + id)
+func GetResourceHeaderKeyBytes(collectionID string, id string) []byte {
+	return []byte(types.ResourceHeaderKey + collectionID + ":" + id)
 }
 
 // GetResourceHeaderCollectionPrefixBytes used to iterate over all resource headers in a collection
-func GetResourceHeaderCollectionPrefixBytes(collectionId string) []byte {
-	return []byte(types.ResourceHeaderKey + collectionId + ":")
+func GetResourceHeaderCollectionPrefixBytes(collectionID string) []byte {
+	return []byte(types.ResourceHeaderKey + collectionID + ":")
 }
 
 // GetResourceDataKeyBytes returns the byte representation of resource key
-func GetResourceDataKeyBytes(collectionId string, id string) []byte {
-	return []byte(types.ResourceDataKey + collectionId + ":" + id)
+func GetResourceDataKeyBytes(collectionID string, id string) []byte {
+	return []byte(types.ResourceDataKey + collectionID + ":" + id)
 }
 
 func closeIteratorOrPanic(iterator sdk.Iterator) {

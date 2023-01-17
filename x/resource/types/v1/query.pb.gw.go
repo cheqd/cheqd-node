@@ -34,7 +34,7 @@ var _ = descriptor.ForMessage
 var _ = metadata.Join
 
 func request_Query_Resource_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryGetResourceRequest
+	var protoReq QueryResourceRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -72,7 +72,7 @@ func request_Query_Resource_0(ctx context.Context, marshaler runtime.Marshaler, 
 }
 
 func local_request_Query_Resource_0(ctx context.Context, marshaler runtime.Marshaler, server QueryServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryGetResourceRequest
+	var protoReq QueryResourceRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -110,7 +110,7 @@ func local_request_Query_Resource_0(ctx context.Context, marshaler runtime.Marsh
 }
 
 func request_Query_CollectionResources_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryGetCollectionResourcesRequest
+	var protoReq QueryCollectionResourcesRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -137,7 +137,7 @@ func request_Query_CollectionResources_0(ctx context.Context, marshaler runtime.
 }
 
 func local_request_Query_CollectionResources_0(ctx context.Context, marshaler runtime.Marshaler, server QueryServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryGetCollectionResourcesRequest
+	var protoReq QueryCollectionResourcesRequest
 	var metadata runtime.ServerMetadata
 
 	var (

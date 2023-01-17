@@ -13,21 +13,27 @@ import (
 )
 
 func MigrateDidProtobuf(sctx sdk.Context, mctx MigrationContext) error {
-	println("Protobuf migration for dids. Start")
+	sctx.Logger().Debug("MigrateDidProtobuf: Starting migration")
+
 	codec := NewLegacyProtoCodec()
 	store := sctx.KVStore(mctx.didStoreKey)
 
+	sctx.Logger().Debug("MigrateDidProtobuf: Erasing old count key")
 	// Erase old broken count key
 	store.Delete([]byte(didtypesv1.DidCountKey + didtypesv1.DidCountKey))
 
-	println("Protobuf migration for dids. Read all keys")
+	sctx.Logger().Debug("MigrateResourceProtobuf: Reading all keys")
 	didKeys := helpers.ReadAllKeys(store, didutils.StrBytes(didtypesv1.DidKey))
 
 	for _, didKey := range didKeys {
+		sctx.Logger().Debug("MigrateDidProtobuf: Starting migration for didKey: " + string(didKey))
+
 		var stateValue didtypesv1.StateValue
+		sctx.Logger().Debug("MigrateDidProtobuf: Reading StateValue of DID from store")
 		codec.MustUnmarshal(store.Get(didKey), &stateValue)
 
-		newDidDocWithMetadata, err := MigrateStateValue(&stateValue)
+		sctx.Logger().Debug("MigrateDidProtobuf: Migrating StateValue for DidDocWithMetadata")
+		newDidDocWithMetadata, err := MigrateStateValue(sctx, mctx, &stateValue)
 		if err != nil {
 			return err
 		}
@@ -35,18 +41,20 @@ func MigrateDidProtobuf(sctx sdk.Context, mctx MigrationContext) error {
 		// Remove old DID Doc
 		store.Delete(didKey)
 
+		sctx.Logger().Debug("MigrateDidProtobuf: Setting DidDocWithMetadata to store")
 		// Set new DID Doc
 		err = mctx.didKeeperNew.AddNewDidDocVersion(&sctx, &newDidDocWithMetadata)
 		if err != nil {
 			return err
 		}
+		sctx.Logger().Debug("MigrateDidProtobuf: Migration finished for didKey: " + string(didKey))
 	}
 
 	// Migrate DID namespace (at least make sure it's not changed)
 	if didtypesv1.DidNamespaceKey != didtypes.DidNamespaceKey {
 		panic("DID namespace key is changed")
 	}
-	println("Protobuf migration for dids. End")
+	sctx.Logger().Debug("MigrateDidProtobuf: Migration finished")
 
 	return nil
 }
@@ -60,7 +68,7 @@ func NewLegacyProtoCodec() *codec.ProtoCodec {
 	return codec.NewProtoCodec(ir)
 }
 
-func MigrateStateValue(stateValue *didtypesv1.StateValue) (didtypes.DidDocWithMetadata, error) {
+func MigrateStateValue(sctx sdk.Context, mctx MigrationContext, stateValue *didtypesv1.StateValue) (didtypes.DidDocWithMetadata, error) {
 	oldDidDoc, err := stateValue.UnpackDataAsDid()
 	if err != nil {
 		return didtypes.DidDocWithMetadata{}, err
@@ -68,8 +76,10 @@ func MigrateStateValue(stateValue *didtypesv1.StateValue) (didtypes.DidDocWithMe
 
 	oldMetadata := stateValue.Metadata
 
+	sctx.Logger().Debug("MigrateDidProtobuf: OldMetadata: " + string(mctx.codec.MustMarshalJSON(oldMetadata)))
 	newDidDoc := MigrateDidDoc(oldDidDoc)
 	newMetadata := MigrateMetadata(oldMetadata)
+	sctx.Logger().Debug("MigrateDidProtobuf: NewMetadata: " + string(mctx.codec.MustMarshalJSON(&newMetadata)))
 
 	return didtypes.DidDocWithMetadata{
 		DidDoc:   &newDidDoc,
@@ -78,9 +88,10 @@ func MigrateStateValue(stateValue *didtypesv1.StateValue) (didtypes.DidDocWithMe
 }
 
 func MigrateMetadata(metadata *didtypesv1.Metadata) didtypes.Metadata {
+	updated := helpers.MustParseFromStringTimeToGoTime(metadata.Updated)
 	return didtypes.Metadata{
-		Created:           metadata.Created,
-		Updated:           metadata.Updated,
+		Created:           helpers.MustParseFromStringTimeToGoTime(metadata.Created),
+		Updated:           &updated,
 		Deactivated:       metadata.Deactivated,
 		VersionId:         metadata.VersionId,
 		NextVersionId:     "",
@@ -94,10 +105,10 @@ func MigrateDidDoc(oldDid *didtypesv1.Did) didtypes.DidDoc {
 		vms = append(
 			vms,
 			&didtypes.VerificationMethod{
-				Id:                   vm.Id,
-				Type:                 MigrateType(vm.Type),
-				Controller:           vm.Controller,
-				VerificationMaterial: MigrateVerificationMaterial(vm),
+				Id:                     vm.Id,
+				VerificationMethodType: MigrateType(vm.Type),
+				Controller:             vm.Controller,
+				VerificationMaterial:   MigrateVerificationMaterial(vm),
 			})
 	}
 
@@ -107,7 +118,7 @@ func MigrateDidDoc(oldDid *didtypesv1.Did) didtypes.DidDoc {
 			srvs,
 			&didtypes.Service{
 				Id:              srv.Id,
-				Type:            srv.Type,
+				ServiceType:     srv.Type,
 				ServiceEndpoint: []string{srv.ServiceEndpoint},
 			})
 	}
@@ -130,9 +141,9 @@ func MigrateDidDoc(oldDid *didtypesv1.Did) didtypes.DidDoc {
 func MigrateType(t string) string {
 	switch t {
 	case didtypesv1.Ed25519VerificationKey2020:
-		return didtypes.Ed25519VerificationKey2020{}.Type()
-	case didtypesv1.JsonWebKey2020:
-		return didtypes.JsonWebKey2020{}.Type()
+		return didtypes.Ed25519VerificationKey2020Type
+	case didtypesv1.JSONWebKey2020:
+		return didtypes.JSONWebKey2020Type
 	default:
 		panic("Unknown type")
 	}
@@ -140,7 +151,7 @@ func MigrateType(t string) string {
 
 func MigrateVerificationMaterial(vm *didtypesv1.VerificationMethod) string {
 	switch vm.Type {
-	case didtypesv1.JsonWebKey2020:
+	case didtypesv1.JSONWebKey2020:
 		jwk := make(map[string]string)
 		for _, kv := range vm.PublicKeyJwk {
 			jwk[kv.Key] = kv.Value
@@ -149,28 +160,15 @@ func MigrateVerificationMaterial(vm *didtypesv1.VerificationMethod) string {
 		if err != nil {
 			panic(err)
 		}
-
-		jwk2020 := didtypes.JsonWebKey2020{
-			PublicKeyJwk: res,
-		}
-		res, err = json.Marshal(jwk2020)
-		if err != nil {
-			panic(err)
-		}
-
 		return string(res)
 
 	case didtypesv1.Ed25519VerificationKey2020:
-		pk_multi := didtypes.Ed25519VerificationKey2020{
-			PublicKeyMultibase: vm.PublicKeyMultibase,
-		}
-
-		res, err := json.Marshal(pk_multi)
+		pkMulti, err := helpers.GenerateEd25519VerificationKey2020VerificationMaterial(vm.PublicKeyMultibase)
 		if err != nil {
 			panic(err)
 		}
 
-		return string(res)
+		return pkMulti
 
 	default:
 		panic("Unknown type")

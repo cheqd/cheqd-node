@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) DidDoc(c context.Context, req *types.QueryGetDidDocRequest) (*types.QueryGetDidDocResponse, error) {
+func (k Keeper) DidDoc(c context.Context, req *types.QueryDidDocRequest) (*types.QueryDidDocResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -23,5 +23,5 @@ func (k Keeper) DidDoc(c context.Context, req *types.QueryGetDidDocRequest) (*ty
 		return nil, err
 	}
 
-	return &types.QueryGetDidDocResponse{Value: &didDoc}, nil
+	return &types.QueryDidDocResponse{Value: &didDoc}, nil
 }

@@ -10,7 +10,7 @@ import (
 func getDidDocVersion(ctx sdk.Context, id, version string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	queryServer := NewQueryServer(keeper)
 
-	resp, err := queryServer.DidDocVersion(sdk.WrapSDKContext(ctx), &types.QueryGetDidDocVersionRequest{Id: id, Version: version})
+	resp, err := queryServer.DidDocVersion(sdk.WrapSDKContext(ctx), &types.QueryDidDocVersionRequest{Id: id, Version: version})
 	if err != nil {
 		return nil, err
 	}

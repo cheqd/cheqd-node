@@ -10,7 +10,7 @@ import (
 func getAllDidDocVersionsMetadata(ctx sdk.Context, id string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	queryServer := NewQueryServer(keeper)
 
-	resp, err := queryServer.AllDidDocVersionsMetadata(sdk.WrapSDKContext(ctx), &types.QueryGetAllDidDocVersionsMetadataRequest{Id: id})
+	resp, err := queryServer.AllDidDocVersionsMetadata(sdk.WrapSDKContext(ctx), &types.QueryAllDidDocVersionsMetadataRequest{Id: id})
 	if err != nil {
 		return nil, err
 	}

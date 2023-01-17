@@ -11,21 +11,21 @@
         "verification_method": [
             {
                 "id": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-1",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg",
-                "verification_material": "{\"publicKeyMultibase\":\"zBNy7xYrzNb25mbVFP5hVZXwJZ7RD16yJSoya82qe3Jra\"}"
+                "verification_material": "z6MkpqEAYo7Ri8WYt6Kx4efLQdVJNgh4QzDf8ptVxJoexXdx"
             },
             {
                 "id": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-2",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg",
-                "verification_material": "{\"publicKeyMultibase\":\"zC4mnpocVYbywi32srkHzRdy7LEXQG4TM8YtCTPXWnza1\"}"
+                "verification_material": "z6MkqX2qR3rvt9UQpXsaYKFqGjX79ooFfwhhpZo8HfVXiDMP"
             },
             {
                 "id": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-3",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg",
-                "verification_material": "{\"publicKeyMultibase\":\"zC1CAqqp2tQooisYtTh1oULGzKyRNQbsUtyqoh2neWPta\"}"
+                "verification_material": "z6MkqTTDS64UDxJGqNPb9FyeKRpz9YhDpV7qazkjXJkfRcfx"
             }
         ],
         "authentication": [
@@ -45,14 +45,14 @@
         "service": [
             {
                 "id": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#service-1",
-                "type": "type-1",
+                "serviceType": "type-1",
                 "service_endpoint": [
                     "endpoint-1"
                 ]
             },
             {
                 "id": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#service-2",
-                "type": "type-1",
+                "serviceType": "type-1",
                 "service_endpoint": [
                     "endpoint-2"
                 ]

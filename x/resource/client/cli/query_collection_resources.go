@@ -19,10 +19,10 @@ func CmdGetCollectionResources() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			collectionId := args[0]
+			collectionID := args[0]
 
-			params := &types.QueryGetCollectionResourcesRequest{
-				CollectionId: collectionId,
+			params := &types.QueryCollectionResourcesRequest{
+				CollectionId: collectionID,
 			}
 
 			resp, err := queryClient.CollectionResources(context.Background(), params)

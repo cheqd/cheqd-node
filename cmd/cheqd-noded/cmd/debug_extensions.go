@@ -50,12 +50,12 @@ func ed25519RandomCmd() *cobra.Command {
 				PrivKeyBase64: base64.StdEncoding.EncodeToString(privKey),
 			}
 
-			keyInfoJson, err := json.Marshal(keyInfo)
+			keyInfoJSON, err := json.Marshal(keyInfo)
 			if err != nil {
 				return err
 			}
 
-			_, err = fmt.Fprintln(cmd.OutOrStdout(), string(keyInfoJson))
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), string(keyInfoJSON))
 			return err
 		},
 	}
@@ -83,12 +83,12 @@ func ed25519PubKeyBase64ToJwkCmd() *cobra.Command {
 				return err
 			}
 
-			pubKeyJwkJson, err := json.Marshal(pubKeyJwk)
+			pubKeyJwkJSON, err := json.Marshal(pubKeyJwk)
 			if err != nil {
 				return err
 			}
 
-			_, err = fmt.Fprintln(cmd.OutOrStdout(), string(pubKeyJwkJson))
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), string(pubKeyJwkJSON))
 			return err
 		},
 	}

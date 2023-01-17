@@ -10,9 +10,9 @@ import (
 	"github.com/cheqd/cheqd-node/tests/integration/network"
 	"github.com/cheqd/cheqd-node/tests/integration/testdata"
 	clitypes "github.com/cheqd/cheqd-node/x/did/client/cli"
+	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	"github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/google/uuid"
-	"github.com/multiformats/go-multibase"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -53,23 +53,22 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		Expect(err).To(BeNil())
 
 		// Create a new DID Doc
-		did := "did:cheqd:" + network.DID_NAMESPACE + ":" + uuid.NewString()
+		did := "did:cheqd:" + network.DidNamespace + ":" + uuid.NewString()
 		keyId := did + "#key1"
 
 		pubKey, privKey, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
 
-		pubKeyMultibase58, err := multibase.Encode(multibase.Base58BTC, pubKey)
-		Expect(err).To(BeNil())
+		publicKeyMultibase := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(pubKey)
 
 		payload = types.MsgCreateDidDocPayload{
 			Id: did,
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                   keyId,
-					Type:                 "Ed25519VerificationKey2020",
-					Controller:           did,
-					VerificationMaterial: "{\"publicKeyMultibase\": \"" + string(pubKeyMultibase58) + "\"}",
+					Id:                     keyId,
+					VerificationMethodType: "Ed25519VerificationKey2020",
+					Controller:             did,
+					VerificationMaterial:   publicKeyMultibase,
 				},
 			},
 			Authentication: []string{keyId},
@@ -78,7 +77,7 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 
 		signInputs = []clitypes.SignInput{
 			{
-				VerificationMethodId: keyId,
+				VerificationMethodID: keyId,
 				PrivKey:              privKey,
 			},
 		}
@@ -103,10 +102,10 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 			Id: payload.Id,
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                   payload.VerificationMethod[0].Id,
-					Controller:           payload.VerificationMethod[0].Controller,
-					Type:                 payload.VerificationMethod[0].Type,
-					VerificationMaterial: payload.VerificationMethod[0].VerificationMaterial,
+					Id:                     payload.VerificationMethod[0].Id,
+					Controller:             payload.VerificationMethod[0].Controller,
+					VerificationMethodType: payload.VerificationMethod[0].VerificationMethodType,
+					VerificationMaterial:   payload.VerificationMethod[0].VerificationMaterial,
 				},
 			},
 			Authentication:  payload.Authentication,
@@ -159,10 +158,10 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 			Id: payload.Id,
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                   payload.VerificationMethod[0].Id,
-					Controller:           payload.VerificationMethod[0].Controller,
-					Type:                 payload.VerificationMethod[0].Type,
-					VerificationMaterial: payload.VerificationMethod[0].VerificationMaterial,
+					Id:                     payload.VerificationMethod[0].Id,
+					Controller:             payload.VerificationMethod[0].Controller,
+					VerificationMethodType: payload.VerificationMethod[0].VerificationMethodType,
+					VerificationMaterial:   payload.VerificationMethod[0].VerificationMaterial,
 				},
 			},
 			Authentication:  payload.Authentication,
@@ -198,14 +197,14 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 
 	It("should not succeed in create diddoc message - case: gas auto, insufficient funds", func() {
 		By("submitting create diddoc message with insufficient funds")
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_6, cli.CLI_GAS_PARAMS)
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_6, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(5))
 	})
 
 	It("should not succeed in update diddoc message - case: gas auto, insufficient funds", func() {
 		By("submitting the create diddoc message")
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_4, cli.CLI_GAS_PARAMS)
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_4, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -214,10 +213,10 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 			Id: payload.Id,
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                   payload.VerificationMethod[0].Id,
-					Controller:           payload.VerificationMethod[0].Controller,
-					Type:                 payload.VerificationMethod[0].Type,
-					VerificationMaterial: payload.VerificationMethod[0].VerificationMaterial,
+					Id:                     payload.VerificationMethod[0].Id,
+					Controller:             payload.VerificationMethod[0].Controller,
+					VerificationMethodType: payload.VerificationMethod[0].VerificationMethodType,
+					VerificationMaterial:   payload.VerificationMethod[0].VerificationMaterial,
 				},
 			},
 			Authentication:  payload.Authentication,
@@ -226,14 +225,14 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		}
 
 		By("submitting update diddoc message with insufficient funds")
-		res, err = cli.UpdateDidDoc(tmpDir, payload2, signInputs, testdata.BASE_ACCOUNT_6, cli.CLI_GAS_PARAMS)
+		res, err = cli.UpdateDidDoc(tmpDir, payload2, signInputs, testdata.BASE_ACCOUNT_6, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(5))
 	})
 
 	It("should not succeed in deactivate diddoc message - case: gas auto, insufficient funds", func() {
 		By("submitting the create diddoc message")
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_4, cli.CLI_GAS_PARAMS)
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_4, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -244,7 +243,7 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		}
 
 		By("submitting deactivate diddoc message with insufficient funds")
-		res, err = cli.DeactivateDidDoc(tmpDir, payload2, signInputs, testdata.BASE_ACCOUNT_6, cli.CLI_GAS_PARAMS)
+		res, err = cli.DeactivateDidDoc(tmpDir, payload2, signInputs, testdata.BASE_ACCOUNT_6, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(5))
 	})
@@ -272,7 +271,7 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 
 	It("should not charge more than tax for update diddoc message - case: fixed fee", func() {
 		By("submitting the create diddoc message")
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_4, cli.CLI_GAS_PARAMS)
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_4, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -281,10 +280,10 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 			Id: payload.Id,
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                   payload.VerificationMethod[0].Id,
-					Controller:           payload.VerificationMethod[0].Controller,
-					Type:                 payload.VerificationMethod[0].Type,
-					VerificationMaterial: payload.VerificationMethod[0].VerificationMaterial,
+					Id:                     payload.VerificationMethod[0].Id,
+					Controller:             payload.VerificationMethod[0].Controller,
+					VerificationMethodType: payload.VerificationMethod[0].VerificationMethodType,
+					VerificationMaterial:   payload.VerificationMethod[0].VerificationMaterial,
 				},
 			},
 			Authentication:  payload.Authentication,
@@ -314,7 +313,7 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 
 	It("should not charge more than tax for deactivate diddoc message - case: fixed fee", func() {
 		By("submitting the create diddoc message")
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_4, cli.CLI_GAS_PARAMS)
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_4, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -363,10 +362,10 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 			Id: payload.Id,
 			VerificationMethod: []*types.VerificationMethod{
 				{
-					Id:                   payload.VerificationMethod[0].Id,
-					Controller:           payload.VerificationMethod[0].Controller,
-					Type:                 payload.VerificationMethod[0].Type,
-					VerificationMaterial: payload.VerificationMethod[0].VerificationMaterial,
+					Id:                     payload.VerificationMethod[0].Id,
+					Controller:             payload.VerificationMethod[0].Controller,
+					VerificationMethodType: payload.VerificationMethod[0].VerificationMethodType,
+					VerificationMaterial:   payload.VerificationMethod[0].VerificationMaterial,
 				},
 			},
 			Authentication:  payload.Authentication,

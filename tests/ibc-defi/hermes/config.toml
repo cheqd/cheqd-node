@@ -2,7 +2,7 @@
 # client_id, connection_id, channel_id and port_id
 
 [global]
-log_level = 'info'
+log_level = 'debug'
 
 [mode]
 
@@ -45,8 +45,8 @@ address_type = { derivation = 'cosmos' }
 store_prefix = 'ibc'
 default_gas = 100000
 max_gas = 2000000
-gas_price = { price = 25, denom = 'ncheq' }
-gas_adjustment = 0.1
+gas_price = { price = 50, denom = 'ncheq' }
+gas_multiplier = 1.3
 max_msg_num = 30
 max_tx_size = 2097152
 clock_drift = '5s'
@@ -65,8 +65,8 @@ key_name = 'osmosis-key'
 store_prefix = 'ibc'
 default_gas = 100000
 max_gas = 400000
-gas_price = { price = 0, denom = 'stake' }
-gas_adjustment = 0.1
+gas_price = { price = 0, denom = 'uosmo' }
+gas_multiplier = 1.3
 max_msg_num = 30
 max_tx_size = 2097152
 clock_drift = '5s'

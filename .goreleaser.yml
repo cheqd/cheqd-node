@@ -8,9 +8,10 @@ env:
 before:
   hooks:
     - make clean
-    - go mod tidy
-    - go mod download
+    - make tidy
+    - make install
     - make proto-gen
+    - make swagger
 
 builds:
   - id: ubuntu-latest-amd64
@@ -22,7 +23,7 @@ builds:
       - CGO_ENABLED=1
     flags:
       - -mod=readonly
-      - -tags="netgo ledger"
+      - -tags="netgo ledger goleveldb"
       - -trimpath
     ldflags:
       - -s -w
@@ -42,7 +43,7 @@ builds:
         - sudo apt update && sudo apt install clang gcc-multilib g++-multilib -y
     flags:
       - -mod=readonly
-      - -tags="netgo ledger"
+      - -tags="netgo ledger goleveldb"
       - -trimpath
     ldflags:
       - -s -w

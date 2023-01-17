@@ -152,7 +152,7 @@ var _ = Describe("Migration - Unit", func() {
 		migrator := NewMigrator(
 			setup,
 			[]appmigrations.Migration{
-				appmigrations.MigrateDidVersionId,
+				appmigrations.MigrateDidVersionID,
 			},
 			*existingDataset,
 			*expectedDataset)
