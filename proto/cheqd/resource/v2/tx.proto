@@ -4,6 +4,7 @@ package cheqd.resource.v2;
 
 import "cheqd/did/v2/tx.proto";
 import "cheqd/resource/v2/resource.proto";
+import "gogoproto/gogo.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
 
@@ -44,38 +45,44 @@ message MsgCreateResourcePayload {
   // Examples:
   // - c82f2b02-bdab-4dd7-b833-3e143745d612
   // - wGHEXrZvJxR8vw5P3UWH1j
-  string collection_id = 2;
+  string collection_id = 2 [(gogoproto.jsontag) = "resourceCollectionId"];
 
   // id is a unique id of the resource.
   // Format: <uuid>
-  string id = 3;
+  string id = 3 [(gogoproto.jsontag) = "resourceId"];
 
   // name is a human-readable name of the resource.
   // Format: <string>
   //
   // Does not change between different versions.
   // Example: PassportSchema, EducationTrustRegistry
-  string name = 4;
+  string name = 4 [(gogoproto.jsontag) = "resourceName"];
 
   // version is a version of the resource.
   // Format: <string>
   // Stored as a string. OPTIONAL.
   //
   // Example: 1.0.0, v2.1.0
-  string version = 5;
+  string version = 5 [
+    (gogoproto.jsontag) = "resourceVersion",
+    (gogoproto.nullable) = true
+  ];
 
   // resource_type is a type of the resource.
   // Format: <string>
   //
   // This is NOT the same as the resource's media type.
   // Example: AnonCredsSchema, StatusList2021
-  string resource_type = 6;
+  string resource_type = 6 [(gogoproto.jsontag) = "resourceType"];
 
   // also_known_as is a list of URIs that can be used to get the resource.
-  repeated cheqd.resource.v2.AlternativeUri also_known_as = 7;
+  repeated AlternativeUri also_known_as = 7 [
+    (gogoproto.jsontag) = "resourceAlternativeUri",
+    (gogoproto.nullable) = true
+  ];
 }
 
 message MsgCreateResourceResponse {
   // Return the created resource metadata.
-  Metadata resource = 1;
+  Metadata resource = 1 [(gogoproto.jsontag) = "linkedResourceMetadata"];
 }
