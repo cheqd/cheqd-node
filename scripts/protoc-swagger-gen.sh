@@ -33,7 +33,7 @@ cd ..
 swagger-combine ${SWAGGER_DIR}/config.yaml -o ${SWAGGER_DIR}/swagger.yaml -f yaml --continueOnConflictingPaths true
 
 # Remove individual swagger files
-rm -rf ${SWAGGER_DIR}/cheqd
+# rm -rf ${SWAGGER_DIR}/cheqd
 
 # if swagger-ui does not exist locally, download swagger-ui and move dist directory to
 # swagger-ui directory, then remove zip file and unzipped swagger-ui directory
