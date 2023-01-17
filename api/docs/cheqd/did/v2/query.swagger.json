@@ -1,0 +1,443 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "cheqd/did/v2/query.proto",
+    "version": "version not set"
+  },
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/cheqd/did/v2/{id}": {
+      "get": {
+        "summary": "Fetch latest version of a DID Document for a given DID",
+        "operationId": "DidDoc",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/cheqd.did.v2.QueryDidDocResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "DID unique identifier of the DID Document to fetch.\nUUID-style DIDs as well as Indy-style DID are supported.\n\nFormat: did:cheqd:\u003cnamespace\u003e:\u003cunique-identifier\u003e\n\nExamples:\n- did:cheqd:mainnet:c82f2b02-bdab-4dd7-b833-3e143745d612\n- did:cheqd:testnet:wGHEXrZvJxR8vw5P3UWH1j",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "cheqd.did.v2.Query"
+        ]
+      }
+    },
+    "/cheqd/did/v2/{id}/version/{version}": {
+      "get": {
+        "summary": "Fetch specific version of a DID Document for a given DID",
+        "operationId": "DidDocVersion",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/cheqd.did.v2.QueryDidDocVersionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "DID unique identifier of the DID Document to fetch.\nUUID-style DIDs as well as Indy-style DID are supported.\n\nFormat: did:cheqd:\u003cnamespace\u003e:\u003cunique-identifier\u003e\n\nExamples:\n- did:cheqd:mainnet:c82f2b02-bdab-4dd7-b833-3e143745d612\n- did:cheqd:testnet:wGHEXrZvJxR8vw5P3UWH1j",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "version",
+            "description": "Unique version identifier of the DID Document to fetch.\nReturns the specified version of the DID Document.\n\nFormat: \u003cuuid\u003e\n\nExample: 93f2573c-eca9-4098-96cb-a1ec676a29ed",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "cheqd.did.v2.Query"
+        ]
+      }
+    },
+    "/cheqd/did/v2/{id}/versions": {
+      "get": {
+        "summary": "Fetch list of all versions of DID Documents for a given DID",
+        "operationId": "AllDidDocVersionsMetadata",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/cheqd.did.v2.QueryAllDidDocVersionsMetadataResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "DID unique identifier of the DID Document to fetch version metadata.\nUUID-style DIDs as well as Indy-style DID are supported.\n\nFormat: did:cheqd:\u003cnamespace\u003e:\u003cunique-identifier\u003e\n\nExamples:\n- did:cheqd:mainnet:c82f2b02-bdab-4dd7-b833-3e143745d612\n- did:cheqd:testnet:wGHEXrZvJxR8vw5P3UWH1j",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "pagination.key",
+            "description": "key is a value returned in PageResponse.next_key to begin\nquerying the next page most efficiently. Only one of offset or key\nshould be set.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "pagination.offset",
+            "description": "offset is a numeric offset that can be used when key is unavailable.\nIt is less efficient than using key. Only one of offset or key should\nbe set.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "pagination.limit",
+            "description": "limit is the total number of results to be returned in the result page.\nIf left empty it will default to a value to be set by each app.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "pagination.countTotal",
+            "description": "count_total is set to true  to indicate that the result set should include\na count of the total number of items available for pagination in UIs.\ncount_total is only respected when offset is used. It is ignored when key\nis set.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "pagination.reverse",
+            "description": "reverse is set to true if results are to be returned in the descending order.\n\nSince: cosmos-sdk 0.43",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "cheqd.did.v2.Query"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "cheqd.did.v2.DidDoc": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "context is a list of URIs used to identify the context of the DID document.\nDefault: https://www.w3.org/ns/did/v1"
+        },
+        "id": {
+          "type": "string",
+          "title": "id is the DID of the DID document.\nFormat: did:cheqd:\u003cnamespace\u003e:\u003cunique-identifier\u003e"
+        },
+        "controller": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "controller is a list of DIDs that are allowed to control the DID document."
+        },
+        "verificationMethod": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/cheqd.did.v2.VerificationMethod"
+          },
+          "description": "verificationMethod is a list of verification methods that can be used to\nverify a digital signature or cryptographic proof."
+        },
+        "authentication": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "authentication is a list of verification methods that can be used to\nauthenticate as the DID subject."
+        },
+        "assertionMethod": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "assertionMethod is a list of verification methods that can be used to\nassert statements as the DID subject."
+        },
+        "capabilityInvocation": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "capabilityInvocation is a list of verification methods that can be used to\ninvoke capabilities as the DID subject."
+        },
+        "capabilityDelegation": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "capabilityDelegation is a list of verification methods that can be used to\ndelegate capabilities as the DID subject."
+        },
+        "keyAgreement": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "keyAgreement is a list of verification methods that can be used to perform\nkey agreement as the DID subject."
+        },
+        "service": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/cheqd.did.v2.Service"
+          },
+          "description": "service is a list of services that can be used to interact with the DID subject."
+        },
+        "alsoKnownAs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "alsoKnownAs is a list of DIDs that are known to refer to the same DID subject."
+        }
+      },
+      "title": "DidDoc defines a DID Document, as defined in the DID Core specification.\nDocumentation: https://www.w3.org/TR/did-core/"
+    },
+    "cheqd.did.v2.DidDocWithMetadata": {
+      "type": "object",
+      "properties": {
+        "didDoc": {
+          "$ref": "#/definitions/cheqd.did.v2.DidDoc",
+          "description": "didDocument is the DID Document."
+        },
+        "metadata": {
+          "$ref": "#/definitions/cheqd.did.v2.Metadata",
+          "description": "didDocumentMetadata is the DID Document metadata."
+        }
+      },
+      "description": "DidDocWithMetadata defines a DID Document with metadata, as defined in the DID Core specification.\nContains the DID Document, as well as DID Document metadata."
+    },
+    "cheqd.did.v2.Metadata": {
+      "type": "object",
+      "properties": {
+        "created": {
+          "type": "string",
+          "format": "date-time",
+          "title": "created is the timestamp of the creation of the DID Document.\nFormat: RFC3339\nExample: 2021-03-10T15:16:17Z"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date-time",
+          "title": "updated is the timestamp of the last update of the DID Document.\nFormat: RFC3339\nExample: 2021-03-10T15:16:17Z"
+        },
+        "deactivated": {
+          "type": "boolean",
+          "title": "deactivated is a flag that indicates whether the DID Document is deactivated.\nDefault: false"
+        },
+        "versionId": {
+          "type": "string",
+          "title": "version_id is the version identifier of the DID Document.\nFormat: UUID\nExample: 123e4567-e89b-12d3-a456-426655440000"
+        },
+        "nextVersionId": {
+          "type": "string",
+          "title": "next_version_id is the version identifier of the next version of the DID Document.\nFormat: UUID\nExample: 123e4567-e89b-12d3-a456-426655440000"
+        },
+        "previousVersionId": {
+          "type": "string",
+          "title": "previous_version_id is the version identifier of the previous version of the DID Document.\nFormat: UUID\nExample: 123e4567-e89b-12d3-a456-426655440000"
+        }
+      },
+      "title": "Metadata defines DID Document metadata, as defined in the DID Core specification.\nDocumentation: https://www.w3.org/TR/did-core/#did-document-metadata-properties"
+    },
+    "cheqd.did.v2.QueryAllDidDocVersionsMetadataResponse": {
+      "type": "object",
+      "properties": {
+        "versions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/cheqd.did.v2.Metadata"
+          },
+          "title": "versions is the list of all versions of the requested DID Document"
+        },
+        "pagination": {
+          "$ref": "#/definitions/cosmos.base.query.v1beta1.PageResponse",
+          "description": "pagination defines the pagination in the response."
+        }
+      },
+      "title": "QueryAllDidDocVersionsMetadataResponse is the response type for the Query/AllDidDocVersionsMetadata method"
+    },
+    "cheqd.did.v2.QueryDidDocResponse": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/cheqd.did.v2.DidDocWithMetadata",
+          "title": "Successful resolution of the DID Document returns the following:\n- did_doc is the latest version of the DID Document\n- metadata is is the DID Document metadata associated with the latest version of the DID Document"
+        }
+      },
+      "title": "QueryDidDocResponse is the response type for the Query/DidDoc method"
+    },
+    "cheqd.did.v2.QueryDidDocVersionResponse": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/cheqd.did.v2.DidDocWithMetadata",
+          "title": "Successful resolution of the DID Document returns the following:\n- did_doc is the requested version of the DID Document\n- metadata is DID Document metadata associated with the requested version of the DID Document"
+        }
+      },
+      "title": "QueryDidDocVersionResponse is the response type for the Query/DidDocVersion method"
+    },
+    "cheqd.did.v2.Service": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "id is the unique identifier of the service.\nFormat: did:cheqd:\u003cnamespace\u003e:\u003cunique-identifier\u003e#\u003cservice-id\u003e"
+        },
+        "serviceType": {
+          "type": "string",
+          "title": "type is the type of the service.\nExample: LinkedResource"
+        },
+        "serviceEndpoint": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "serviceEndpoint is the endpoint of the service.\nExample: https://example.com/endpoint"
+        }
+      },
+      "title": "Service defines a service, as defined in the DID Core specification.\nDocumentation: https://www.w3.org/TR/did-core/#services"
+    },
+    "cheqd.did.v2.VerificationMethod": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "id is the unique identifier of the verification method.\nFormat: did:cheqd:\u003cnamespace\u003e:\u003cunique-identifier\u003e#\u003ckey-id\u003e"
+        },
+        "verificationMethodType": {
+          "type": "string",
+          "title": "type is the type of the verification method.\nExample: Ed25519VerificationKey2020"
+        },
+        "controller": {
+          "type": "string",
+          "title": "controller is the DID of the controller of the verification method.\nFormat: did:cheqd:\u003cnamespace\u003e:\u003cunique-identifier\u003e"
+        },
+        "verificationMaterial": {
+          "type": "string",
+          "title": "verification_material is the public key of the verification method.\nCommonly used verification material types: publicJwk, publicKeyBase58, publicKeyMultibase"
+        }
+      },
+      "title": "VerificationMethod defines a verification method, as defined in the DID Core specification.\nDocumentation: https://www.w3.org/TR/did-core/#verification-methods"
+    },
+    "cosmos.base.query.v1beta1.PageRequest": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "format": "byte",
+          "description": "key is a value returned in PageResponse.next_key to begin\nquerying the next page most efficiently. Only one of offset or key\nshould be set."
+        },
+        "offset": {
+          "type": "string",
+          "format": "uint64",
+          "description": "offset is a numeric offset that can be used when key is unavailable.\nIt is less efficient than using key. Only one of offset or key should\nbe set."
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64",
+          "description": "limit is the total number of results to be returned in the result page.\nIf left empty it will default to a value to be set by each app."
+        },
+        "countTotal": {
+          "type": "boolean",
+          "description": "count_total is set to true  to indicate that the result set should include\na count of the total number of items available for pagination in UIs.\ncount_total is only respected when offset is used. It is ignored when key\nis set."
+        },
+        "reverse": {
+          "type": "boolean",
+          "description": "reverse is set to true if results are to be returned in the descending order.\n\nSince: cosmos-sdk 0.43"
+        }
+      },
+      "description": "message SomeRequest {\n         Foo some_parameter = 1;\n         PageRequest pagination = 2;\n }",
+      "title": "PageRequest is to be embedded in gRPC request messages for efficient\npagination. Ex:"
+    },
+    "cosmos.base.query.v1beta1.PageResponse": {
+      "type": "object",
+      "properties": {
+        "nextKey": {
+          "type": "string",
+          "format": "byte",
+          "description": "next_key is the key to be passed to PageRequest.key to\nquery the next page most efficiently. It will be empty if\nthere are no more results."
+        },
+        "total": {
+          "type": "string",
+          "format": "uint64",
+          "title": "total is total number of results available if PageRequest.count_total\nwas set, its value is undefined otherwise"
+        }
+      },
+      "description": "PageResponse is to be embedded in gRPC response messages where the\ncorresponding request message has used PageRequest.\n\n message SomeResponse {\n         repeated Bar results = 1;\n         PageResponse page = 2;\n }"
+    },
+    "google.protobuf.Any": {
+      "type": "object",
+      "properties": {
+        "typeUrl": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "grpc.gateway.runtime.Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,7 +1,7 @@
 ### APP-SPECIFIC EXCLUSIONS ###
 
 # Ignored directories
-api/docs/cheqd/**
+#api/docs/cheqd/**
 api/docs/swagger-ui/**
 build/
 dist/

@@ -32,9 +32,9 @@ apis:
   - url: ./api/docs/cheqd/did/v2/query.swagger.json
     tags:
       rename:
-        - "DID module queries"
+        - cheqd.did.v2.Query: DID module queries
 
   - url: ./api/docs/cheqd/resource/v2/query.swagger.json
     tags:
       rename:
-        - "Resource module queries"
+        - cheqd.resource.v2.Query: Resource module queries
