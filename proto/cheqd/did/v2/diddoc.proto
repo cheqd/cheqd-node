@@ -61,7 +61,7 @@ message VerificationMethod {
 
   // type is the type of the verification method.
   // Example: Ed25519VerificationKey2020
-  string verification_method_type = 2;
+  string verification_method_type = 2 [(gogoproto.jsontag) = "type,omitempty"];
 
   // controller is the DID of the controller of the verification method.
   // Format: did:cheqd:<namespace>:<unique-identifier>
@@ -81,7 +81,7 @@ message Service {
 
   // type is the type of the service.
   // Example: LinkedResource
-  string service_type = 2;
+  string service_type = 2 [(gogoproto.jsontag) = "type,omitempty"];
 
   // serviceEndpoint is the endpoint of the service.
   // Example: https://example.com/endpoint
