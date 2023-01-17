@@ -29,8 +29,10 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type MsgCreateResource struct {
-	Payload    *MsgCreateResourcePayload `protobuf:"bytes,1,opt,name=payload,proto3" json:"payload,omitempty"`
-	Signatures []*types.SignInfo         `protobuf:"bytes,2,rep,name=signatures,proto3" json:"signatures,omitempty"`
+	// Payload of the resource to be created
+	Payload *MsgCreateResourcePayload `protobuf:"bytes,1,opt,name=payload,proto3" json:"payload,omitempty"`
+	// Signatures of the corresponding DID Document's controller(s)
+	Signatures []*types.SignInfo `protobuf:"bytes,2,rep,name=signatures,proto3" json:"signatures,omitempty"`
 }
 
 func (m *MsgCreateResource) Reset()         { *m = MsgCreateResource{} }
@@ -81,13 +83,20 @@ func (m *MsgCreateResource) GetSignatures() []*types.SignInfo {
 }
 
 type MsgCreateResourcePayload struct {
-	Data         []byte            `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
-	CollectionId string            `protobuf:"bytes,2,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
-	Id           string            `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
-	Name         string            `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
-	Version      string            `protobuf:"bytes,5,opt,name=version,proto3" json:"version,omitempty"`
-	ResourceType string            `protobuf:"bytes,6,opt,name=resource_type,json=resourceType,proto3" json:"resource_type,omitempty"`
-	AlsoKnownAs  []*AlternativeUri `protobuf:"bytes,7,rep,name=also_known_as,json=alsoKnownAs,proto3" json:"also_known_as,omitempty"`
+	// data is a byte-representation of the actual Data the user wants to store
+	Data []byte `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	// collection_id is an identifier of the DidDocument the resource belongs to
+	CollectionId string `protobuf:"bytes,2,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
+	// id is an UUID of the resource
+	Id string `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
+	// name is a human-readable name of the resource
+	Name string `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	// version is a version of the resource
+	Version string `protobuf:"bytes,5,opt,name=version,proto3" json:"version,omitempty"`
+	// resource_type is a type of the resource
+	ResourceType string `protobuf:"bytes,6,opt,name=resource_type,json=resourceType,proto3" json:"resource_type,omitempty"`
+	// also_known_as is a list of URIs that can be used to get the resource
+	AlsoKnownAs []*AlternativeUri `protobuf:"bytes,7,rep,name=also_known_as,json=alsoKnownAs,proto3" json:"also_known_as,omitempty"`
 }
 
 func (m *MsgCreateResourcePayload) Reset()         { *m = MsgCreateResourcePayload{} }
@@ -173,6 +182,7 @@ func (m *MsgCreateResourcePayload) GetAlsoKnownAs() []*AlternativeUri {
 }
 
 type MsgCreateResourceResponse struct {
+	// Metadata which was creted after applying to the ledger
 	Resource *Metadata `protobuf:"bytes,1,opt,name=resource,proto3" json:"resource,omitempty"`
 }
 
@@ -267,6 +277,7 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
+	// CreateResource defines a method for creating a resource.
 	CreateResource(ctx context.Context, in *MsgCreateResource, opts ...grpc.CallOption) (*MsgCreateResourceResponse, error)
 }
 
@@ -289,6 +300,7 @@ func (c *msgClient) CreateResource(ctx context.Context, in *MsgCreateResource, o
 
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
+	// CreateResource defines a method for creating a resource.
 	CreateResource(context.Context, *MsgCreateResource) (*MsgCreateResourceResponse, error)
 }
 

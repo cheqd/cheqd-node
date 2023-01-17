@@ -22,9 +22,13 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// DidDocVersionSet contains all versions of DID Documents and their metadata for a given DID.
+// The latest version of the DID Document set is stored in the latest_version field.
 type DidDocVersionSet struct {
-	LatestVersion string                `protobuf:"bytes,1,opt,name=latest_version,json=latestVersion,proto3" json:"latest_version,omitempty"`
-	DidDocs       []*DidDocWithMetadata `protobuf:"bytes,2,rep,name=did_docs,json=didDocs,proto3" json:"did_docs,omitempty"`
+	// Latest version of the DID Document set
+	LatestVersion string `protobuf:"bytes,1,opt,name=latest_version,json=latestVersion,proto3" json:"latest_version,omitempty"`
+	// All versions of the DID Document set
+	DidDocs []*DidDocWithMetadata `protobuf:"bytes,2,rep,name=did_docs,json=didDocs,proto3" json:"did_docs,omitempty"`
 }
 
 func (m *DidDocVersionSet) Reset()         { *m = DidDocVersionSet{} }
@@ -74,10 +78,16 @@ func (m *DidDocVersionSet) GetDidDocs() []*DidDocWithMetadata {
 	return nil
 }
 
+// GenesisState defines the cheqd DID module's genesis state.
 type GenesisState struct {
-	DidNamespace string              `protobuf:"bytes,1,opt,name=did_namespace,json=didNamespace,proto3" json:"did_namespace,omitempty"`
-	VersionSets  []*DidDocVersionSet `protobuf:"bytes,2,rep,name=version_sets,json=versionSets,proto3" json:"version_sets,omitempty"`
-	FeeParams    *FeeParams          `protobuf:"bytes,3,opt,name=fee_params,json=feeParams,proto3" json:"fee_params,omitempty"`
+	// Namespace for the DID module
+	// Example: mainnet, testnet, local
+	DidNamespace string `protobuf:"bytes,1,opt,name=did_namespace,json=didNamespace,proto3" json:"did_namespace,omitempty"`
+	// All DID Document version sets (contains all versions of all DID Documents)
+	VersionSets []*DidDocVersionSet `protobuf:"bytes,2,rep,name=version_sets,json=versionSets,proto3" json:"version_sets,omitempty"`
+	// Fee parameters for the DID module
+	// Defines fixed fees and burn percentage for each DID operation type (create, update, delete)
+	FeeParams *FeeParams `protobuf:"bytes,3,opt,name=fee_params,json=feeParams,proto3" json:"fee_params,omitempty"`
 }
 
 func (m *GenesisState) Reset()         { *m = GenesisState{} }

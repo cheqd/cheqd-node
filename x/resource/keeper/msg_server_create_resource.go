@@ -5,7 +5,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"time"
 
 	"github.com/cheqd/cheqd-node/x/resource/utils"
 
@@ -65,7 +64,7 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	resource := msg.Payload.ToResource()
 	checksum := sha256.Sum256(resource.Resource.Data)
 	resource.Metadata.Checksum = hex.EncodeToString(checksum[:])
-	resource.Metadata.Created = ctx.BlockTime().Format(time.RFC3339)
+	resource.Metadata.Created = ctx.BlockTime()
 	resource.Metadata.MediaType = utils.DetectMediaType(resource.Resource.Data)
 
 	// Add default resource alternative url

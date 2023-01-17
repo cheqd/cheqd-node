@@ -22,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MsgClient interface {
+	// CreateResource defines a method for creating a resource.
 	CreateResource(ctx context.Context, in *MsgCreateResource, opts ...grpc.CallOption) (*MsgCreateResourceResponse, error)
 }
 
@@ -46,6 +47,7 @@ func (c *msgClient) CreateResource(ctx context.Context, in *MsgCreateResource, o
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility
 type MsgServer interface {
+	// CreateResource defines a method for creating a resource.
 	CreateResource(context.Context, *MsgCreateResource) (*MsgCreateResourceResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }

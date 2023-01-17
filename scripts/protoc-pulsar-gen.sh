@@ -18,7 +18,7 @@ echo "Generating API module"
 (cd api; find ./ -type f \( -iname \*.pulsar.go -o -iname \*.pb.go -o -iname \*.cosmos_orm.go -o -iname \*.pb.gw.go \) -delete; find . -empty -type d -delete; cd ..)
 cd proto
 
-# Exclude "v1" paths from API/Pulsar generation
+# Find all proto files but exclude "v1" paths
 proto_dirs=$(find ./ -type f -path '*/v1/*' -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
 for proto_dir in $proto_dirs; do
   proto_files=$(find "${proto_dir}" -maxdepth 1 -name '*.proto')

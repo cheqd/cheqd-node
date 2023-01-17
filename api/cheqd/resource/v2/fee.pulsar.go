@@ -685,17 +685,29 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// FeeParams defines the parameters for the `resource` module fixed fee.
+// FeeParams defines the parameters for the cheqd Resource module fixed fee.
+// Creation requests for different IANA media types are charged different fees.
 type FeeParams struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Media types define the fixed fee each for the `resource` module.
-	Image      *v1beta1.Coin `protobuf:"bytes,1,opt,name=image,proto3" json:"image,omitempty"`
-	Json       *v1beta1.Coin `protobuf:"bytes,2,opt,name=json,proto3" json:"json,omitempty"`
-	Default    *v1beta1.Coin `protobuf:"bytes,3,opt,name=default,proto3" json:"default,omitempty"`
-	BurnFactor string        `protobuf:"bytes,4,opt,name=burn_factor,json=burnFactor,proto3" json:"burn_factor,omitempty"`
+	// Fixed fee for creating a resource with media type 'image/*'
+	//
+	// Default: 10 CHEQ or 10000000000ncheq
+	Image *v1beta1.Coin `protobuf:"bytes,1,opt,name=image,proto3" json:"image,omitempty"`
+	// Fixed fee for creating a resource with media type 'application/json'
+	//
+	// Default: 2.5 CHEQ or 2500000000ncheq
+	Json *v1beta1.Coin `protobuf:"bytes,2,opt,name=json,proto3" json:"json,omitempty"`
+	// Fixed fee for creating a resource with all other media types
+	//
+	// Default: 5 CHEQ or 5000000000ncheq
+	Default *v1beta1.Coin `protobuf:"bytes,3,opt,name=default,proto3" json:"default,omitempty"`
+	// Percentage of the fixed fee that will be burned
+	//
+	// Default: 0.5 (50%)
+	BurnFactor string `protobuf:"bytes,4,opt,name=burn_factor,json=burnFactor,proto3" json:"burn_factor,omitempty"`
 }
 
 func (x *FeeParams) Reset() {

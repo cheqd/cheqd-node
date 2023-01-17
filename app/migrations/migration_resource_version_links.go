@@ -3,7 +3,6 @@ package migrations
 import (
 	"fmt"
 	"sort"
-	"time"
 
 	"github.com/cheqd/cheqd-node/app/migrations/helpers"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -43,16 +42,8 @@ func MigrateResourceVersionLinks(sctx sdk.Context, mctx MigrationContext) error 
 	sctx.Logger().Debug("MigrateResourceVersionLinks: Sorting resources by date created")
 	// Sort resources by date created
 	sort.Slice(resources, func(i, j int) bool {
-		iCreated, err := time.Parse(time.RFC3339, resources[i].Metadata.Created)
-		if err != nil {
-			panic(err)
-		}
-
-		jCreated, err := time.Parse(time.RFC3339, resources[j].Metadata.Created)
-		if err != nil {
-			panic(err)
-		}
-
+		iCreated := resources[i].Metadata.Created
+		jCreated := resources[j].Metadata.Created
 		return iCreated.Before(jCreated)
 	})
 

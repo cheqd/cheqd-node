@@ -40,7 +40,7 @@ func MigrateResourceProtobuf(sctx sdk.Context, mctx MigrationContext) error {
 			ResourceType:      oldHeader.ResourceType,
 			AlsoKnownAs:       []*resourcetypes.AlternativeUri{},
 			MediaType:         oldHeader.MediaType,
-			Created:           oldHeader.Created,
+			Created:           helpers.MustParseFromStringTimeToGoTime(oldHeader.Created),
 			Checksum:          hex.EncodeToString(oldHeader.Checksum),
 			PreviousVersionId: oldHeader.PreviousVersionId,
 			NextVersionId:     oldHeader.NextVersionId,

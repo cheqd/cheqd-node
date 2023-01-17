@@ -22,7 +22,7 @@ func CmdGetResourceMetadata() *cobra.Command {
 			collectionID := args[0]
 			id := args[1]
 
-			params := &types.QueryGetResourceMetadataRequest{
+			params := &types.QueryResourceMetadataRequest{
 				CollectionId: collectionID,
 				Id:           id,
 			}

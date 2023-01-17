@@ -22,8 +22,11 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MsgClient interface {
+	// CreateDidDoc defines a method for creating a new DID document
 	CreateDidDoc(ctx context.Context, in *MsgCreateDidDoc, opts ...grpc.CallOption) (*MsgCreateDidDocResponse, error)
+	// UpdateDidDoc defines a method for updating an existing DID document
 	UpdateDidDoc(ctx context.Context, in *MsgUpdateDidDoc, opts ...grpc.CallOption) (*MsgUpdateDidDocResponse, error)
+	// DeactivateDidDoc defines a method for deactivating an existing DID document
 	DeactivateDidDoc(ctx context.Context, in *MsgDeactivateDidDoc, opts ...grpc.CallOption) (*MsgDeactivateDidDocResponse, error)
 }
 
@@ -66,8 +69,11 @@ func (c *msgClient) DeactivateDidDoc(ctx context.Context, in *MsgDeactivateDidDo
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility
 type MsgServer interface {
+	// CreateDidDoc defines a method for creating a new DID document
 	CreateDidDoc(context.Context, *MsgCreateDidDoc) (*MsgCreateDidDocResponse, error)
+	// UpdateDidDoc defines a method for updating an existing DID document
 	UpdateDidDoc(context.Context, *MsgUpdateDidDoc) (*MsgUpdateDidDocResponse, error)
+	// DeactivateDidDoc defines a method for deactivating an existing DID document
 	DeactivateDidDoc(context.Context, *MsgDeactivateDidDoc) (*MsgDeactivateDidDocResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }

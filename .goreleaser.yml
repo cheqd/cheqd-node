@@ -11,8 +11,7 @@ before:
     - make tidy
     - make install
     - make proto-gen
-    # Uncomment this bit when our Swagger generation is ready
-    # - make swagger
+    - make swagger
 
 builds:
   - id: ubuntu-latest-amd64
