@@ -9,21 +9,6 @@ info:
   license:
     name: Apache 2.0
     url: https://github.com/cheqd/cheqd-node/blob/main/LICENSE
-basePath: /swagger/
-schemes:
-  - http
-  - https
-consumes:
-  - application/json
-  - application/json+ld
-  - '*/*'
-produces:
-  - application/json
-  - application/json+ld
-  - '*/*'
-externalDocs:
-  description: cheqd Network Documentation
-  url: https://docs.cheqd.io/node
 paths:
   /cheqd/did/v2/{id}:
     get:
@@ -814,7 +799,7 @@ paths:
         - Query
   /cheqd/resource/v2/{collection_id}/metadata:
     get:
-      summary: Fetch all resource metadata from a collection with a given collection_id
+      summary: Fetch metadata for all resources in a collection
       operationId: CollectionResources
       responses:
         '200':
@@ -963,6 +948,25 @@ paths:
                         Format: <uuid>
                   title: Metadata stores the metadata of a DID-Linked Resource
                 title: resources is the requested collection of resource metadata
+              pagination:
+                description: pagination defines the pagination in the response.
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    description: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently. It will be empty if
+                      there are no more results.
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
             title: >-
               QueryCollectionResourcesResponse is the response type for the
               Query/CollectionResources RPC method
@@ -1005,11 +1009,67 @@ paths:
           in: path
           required: true
           type: string
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   /cheqd/resource/v2/{collection_id}/resources/{id}:
     get:
-      summary: Fetch a resource from a collection with a given collection_id and id
+      summary: Fetch data/payload for a specific resource (without metadata)
       operationId: Resource
       responses:
         '200':
@@ -1226,9 +1286,7 @@ paths:
         - Query
   /cheqd/resource/v2/{collection_id}/resources/{id}/metadata:
     get:
-      summary: >-
-        Fetch a resource's metadata from a collection with a given collection_id
-        and id
+      summary: Fetch only metadata for a specific resource
       operationId: ResourceMetadata
       responses:
         '200':
@@ -1425,3 +1483,18 @@ paths:
           type: string
       tags:
         - Query
+basePath: /swagger/
+schemes:
+  - http
+  - https
+consumes:
+  - application/json
+  - application/json+ld
+  - '*/*'
+produces:
+  - application/json
+  - application/json+ld
+  - '*/*'
+externalDocs:
+  description: cheqd Network Documentation
+  url: https://docs.cheqd.io/node
