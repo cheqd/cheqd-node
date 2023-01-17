@@ -12,6 +12,7 @@ info:
     name: Apache 2.0
     url: https://github.com/cheqd/cheqd-node/blob/main/LICENSE
 basePath: /swagger/
+includeGlobalTags: false
 schemes:
   - http
   - https
@@ -30,4 +31,11 @@ externalDocs:
 
 apis:
   - url: ./api/docs/cheqd/did/v2/query.swagger.json
+    tags:
+      rename:
+        - "DID module queries"
+
   - url: ./api/docs/cheqd/resource/v2/query.swagger.json
+    tags:
+      rename:
+        - "Resource module queries"

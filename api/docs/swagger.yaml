@@ -9,6 +9,21 @@ info:
   license:
     name: Apache 2.0
     url: https://github.com/cheqd/cheqd-node/blob/main/LICENSE
+basePath: /swagger/
+schemes:
+  - http
+  - https
+consumes:
+  - application/json
+  - application/json+ld
+  - '*/*'
+produces:
+  - application/json
+  - application/json+ld
+  - '*/*'
+externalDocs:
+  description: cheqd Network Documentation
+  url: https://docs.cheqd.io/node
 paths:
   /cheqd/did/v2/{id}:
     get:
@@ -31,7 +46,7 @@ paths:
                   latest version of the DID Document
                 type: object
                 properties:
-                  did_doc:
+                  didDoc:
                     description: didDocument is the DID Document.
                     type: object
                     properties:
@@ -56,7 +71,7 @@ paths:
                         description: >-
                           controller is a list of DIDs that are allowed to
                           control the DID document.
-                      verification_method:
+                      verificationMethod:
                         type: array
                         items:
                           type: object
@@ -69,7 +84,7 @@ paths:
 
                                 Format:
                                 did:cheqd:<namespace>:<unique-identifier>#<key-id>
-                            verification_method_type:
+                            verificationMethodType:
                               type: string
                               title: |-
                                 type is the type of the verification method.
@@ -82,7 +97,7 @@ paths:
 
                                 Format:
                                 did:cheqd:<namespace>:<unique-identifier>
-                            verification_material:
+                            verificationMaterial:
                               type: string
                               title: >-
                                 verification_material is the public key of the
@@ -110,7 +125,7 @@ paths:
                           can be used to
 
                           authenticate as the DID subject.
-                      assertion_method:
+                      assertionMethod:
                         type: array
                         items:
                           type: string
@@ -119,7 +134,7 @@ paths:
                           can be used to
 
                           assert statements as the DID subject.
-                      capability_invocation:
+                      capabilityInvocation:
                         type: array
                         items:
                           type: string
@@ -128,7 +143,7 @@ paths:
                           that can be used to
 
                           invoke capabilities as the DID subject.
-                      capability_delegation:
+                      capabilityDelegation:
                         type: array
                         items:
                           type: string
@@ -137,7 +152,7 @@ paths:
                           that can be used to
 
                           delegate capabilities as the DID subject.
-                      key_agreement:
+                      keyAgreement:
                         type: array
                         items:
                           type: string
@@ -158,12 +173,12 @@ paths:
 
                                 Format:
                                 did:cheqd:<namespace>:<unique-identifier>#<service-id>
-                            service_type:
+                            serviceType:
                               type: string
                               title: |-
                                 type is the type of the service.
                                 Example: LinkedResource
-                            service_endpoint:
+                            serviceEndpoint:
                               type: array
                               items:
                                 type: string
@@ -179,7 +194,7 @@ paths:
                         description: >-
                           service is a list of services that can be used to
                           interact with the DID subject.
-                      also_known_as:
+                      alsoKnownAs:
                         type: array
                         items:
                           type: string
@@ -222,7 +237,7 @@ paths:
                           Document is deactivated.
 
                           Default: false
-                      version_id:
+                      versionId:
                         type: string
                         title: >-
                           version_id is the version identifier of the DID
@@ -231,7 +246,7 @@ paths:
                           Format: UUID
 
                           Example: 123e4567-e89b-12d3-a456-426655440000
-                      next_version_id:
+                      nextVersionId:
                         type: string
                         title: >-
                           next_version_id is the version identifier of the next
@@ -240,7 +255,7 @@ paths:
                           Format: UUID
 
                           Example: 123e4567-e89b-12d3-a456-426655440000
-                      previous_version_id:
+                      previousVersionId:
                         type: string
                         title: >-
                           previous_version_id is the version identifier of the
@@ -280,7 +295,7 @@ paths:
                 items:
                   type: object
                   properties:
-                    type_url:
+                    typeUrl:
                       type: string
                     value:
                       type: string
@@ -322,7 +337,7 @@ paths:
                   requested version of the DID Document
                 type: object
                 properties:
-                  did_doc:
+                  didDoc:
                     description: didDocument is the DID Document.
                     type: object
                     properties:
@@ -347,7 +362,7 @@ paths:
                         description: >-
                           controller is a list of DIDs that are allowed to
                           control the DID document.
-                      verification_method:
+                      verificationMethod:
                         type: array
                         items:
                           type: object
@@ -360,7 +375,7 @@ paths:
 
                                 Format:
                                 did:cheqd:<namespace>:<unique-identifier>#<key-id>
-                            verification_method_type:
+                            verificationMethodType:
                               type: string
                               title: |-
                                 type is the type of the verification method.
@@ -373,7 +388,7 @@ paths:
 
                                 Format:
                                 did:cheqd:<namespace>:<unique-identifier>
-                            verification_material:
+                            verificationMaterial:
                               type: string
                               title: >-
                                 verification_material is the public key of the
@@ -401,7 +416,7 @@ paths:
                           can be used to
 
                           authenticate as the DID subject.
-                      assertion_method:
+                      assertionMethod:
                         type: array
                         items:
                           type: string
@@ -410,7 +425,7 @@ paths:
                           can be used to
 
                           assert statements as the DID subject.
-                      capability_invocation:
+                      capabilityInvocation:
                         type: array
                         items:
                           type: string
@@ -419,7 +434,7 @@ paths:
                           that can be used to
 
                           invoke capabilities as the DID subject.
-                      capability_delegation:
+                      capabilityDelegation:
                         type: array
                         items:
                           type: string
@@ -428,7 +443,7 @@ paths:
                           that can be used to
 
                           delegate capabilities as the DID subject.
-                      key_agreement:
+                      keyAgreement:
                         type: array
                         items:
                           type: string
@@ -449,12 +464,12 @@ paths:
 
                                 Format:
                                 did:cheqd:<namespace>:<unique-identifier>#<service-id>
-                            service_type:
+                            serviceType:
                               type: string
                               title: |-
                                 type is the type of the service.
                                 Example: LinkedResource
-                            service_endpoint:
+                            serviceEndpoint:
                               type: array
                               items:
                                 type: string
@@ -470,7 +485,7 @@ paths:
                         description: >-
                           service is a list of services that can be used to
                           interact with the DID subject.
-                      also_known_as:
+                      alsoKnownAs:
                         type: array
                         items:
                           type: string
@@ -513,7 +528,7 @@ paths:
                           Document is deactivated.
 
                           Default: false
-                      version_id:
+                      versionId:
                         type: string
                         title: >-
                           version_id is the version identifier of the DID
@@ -522,7 +537,7 @@ paths:
                           Format: UUID
 
                           Example: 123e4567-e89b-12d3-a456-426655440000
-                      next_version_id:
+                      nextVersionId:
                         type: string
                         title: >-
                           next_version_id is the version identifier of the next
@@ -531,7 +546,7 @@ paths:
                           Format: UUID
 
                           Example: 123e4567-e89b-12d3-a456-426655440000
-                      previous_version_id:
+                      previousVersionId:
                         type: string
                         title: >-
                           previous_version_id is the version identifier of the
@@ -571,7 +586,7 @@ paths:
                 items:
                   type: object
                   properties:
-                    type_url:
+                    typeUrl:
                       type: string
                     value:
                       type: string
@@ -645,7 +660,7 @@ paths:
                         Document is deactivated.
 
                         Default: false
-                    version_id:
+                    versionId:
                       type: string
                       title: >-
                         version_id is the version identifier of the DID
@@ -654,7 +669,7 @@ paths:
                         Format: UUID
 
                         Example: 123e4567-e89b-12d3-a456-426655440000
-                    next_version_id:
+                    nextVersionId:
                       type: string
                       title: >-
                         next_version_id is the version identifier of the next
@@ -663,7 +678,7 @@ paths:
                         Format: UUID
 
                         Example: 123e4567-e89b-12d3-a456-426655440000
-                    previous_version_id:
+                    previousVersionId:
                       type: string
                       title: >-
                         previous_version_id is the version identifier of the
@@ -685,7 +700,7 @@ paths:
                 description: pagination defines the pagination in the response.
                 type: object
                 properties:
-                  next_key:
+                  nextKey:
                     type: string
                     format: byte
                     description: |-
@@ -720,7 +735,7 @@ paths:
                 items:
                   type: object
                   properties:
-                    type_url:
+                    typeUrl:
                       type: string
                     value:
                       type: string
@@ -770,7 +785,7 @@ paths:
           required: false
           type: string
           format: uint64
-        - name: pagination.count_total
+        - name: pagination.countTotal
           description: >-
             count_total is set to true  to indicate that the result set should
             include
@@ -797,7 +812,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /cheqd/resource/v2/{collection_id}/metadata:
+  /cheqd/resource/v2/{collectionId}/metadata:
     get:
       summary: Fetch metadata for all resources in a collection
       operationId: CollectionResources
@@ -812,7 +827,7 @@ paths:
                 items:
                   type: object
                   properties:
-                    collection_id:
+                    collectionId:
                       type: string
                       title: >-
                         collection_id is the ID of the collection that the
@@ -847,7 +862,7 @@ paths:
                         Stored as a string. OPTIONAL.
 
                         Example: 1.0.0, v2.1.0
-                    resource_type:
+                    resourceType:
                       type: string
                       title: >-
                         resource_type is a Resource type that identifies what
@@ -856,7 +871,7 @@ paths:
                         This is NOT the same as the resource's media type.
 
                         Example: AnonCredsSchema, StatusList2021
-                    also_known_as:
+                    alsoKnownAs:
                       type: array
                       items:
                         type: object
@@ -901,7 +916,7 @@ paths:
                           By default, at least the DID URI equivalent of the
                           Resource is populated.
                       description: List of alternative URIs for the SAME Resource.
-                    media_type:
+                    mediaType:
                       type: string
                       title: >-
                         media_type is IANA media type of the Resource. Defined
@@ -926,7 +941,7 @@ paths:
 
                         Example:
                         d14a028c2a3a2bc9476102bb288234c415a2b01f828ea62ac5b3e42f
-                    previous_version_id:
+                    previousVersionId:
                       type: string
                       title: >-
                         previous_version_id is the ID of the previous version of
@@ -936,7 +951,7 @@ paths:
                         to determine whether it's the same Resource.
 
                         Format: <uuid>
-                    next_version_id:
+                    nextVersionId:
                       type: string
                       title: >-
                         next_version_id is the ID of the next version of the
@@ -952,7 +967,7 @@ paths:
                 description: pagination defines the pagination in the response.
                 type: object
                 properties:
-                  next_key:
+                  nextKey:
                     type: string
                     format: byte
                     description: |-
@@ -987,13 +1002,13 @@ paths:
                 items:
                   type: object
                   properties:
-                    type_url:
+                    typeUrl:
                       type: string
                     value:
                       type: string
                       format: byte
       parameters:
-        - name: collection_id
+        - name: collectionId
           description: >-
             collection_id is an identifier of the DidDocument the resource
             belongs to.
@@ -1040,7 +1055,7 @@ paths:
           required: false
           type: string
           format: uint64
-        - name: pagination.count_total
+        - name: pagination.countTotal
           description: >-
             count_total is set to true  to indicate that the result set should
             include
@@ -1067,7 +1082,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /cheqd/resource/v2/{collection_id}/resources/{id}:
+  /cheqd/resource/v2/{collectionId}/resources/{id}:
     get:
       summary: Fetch data/payload for a specific resource (without metadata)
       operationId: Resource
@@ -1098,7 +1113,7 @@ paths:
                   metadata:
                     type: object
                     properties:
-                      collection_id:
+                      collectionId:
                         type: string
                         title: >-
                           collection_id is the ID of the collection that the
@@ -1133,7 +1148,7 @@ paths:
                           Stored as a string. OPTIONAL.
 
                           Example: 1.0.0, v2.1.0
-                      resource_type:
+                      resourceType:
                         type: string
                         title: >-
                           resource_type is a Resource type that identifies what
@@ -1142,7 +1157,7 @@ paths:
                           This is NOT the same as the resource's media type.
 
                           Example: AnonCredsSchema, StatusList2021
-                      also_known_as:
+                      alsoKnownAs:
                         type: array
                         items:
                           type: object
@@ -1187,7 +1202,7 @@ paths:
                             By default, at least the DID URI equivalent of the
                             Resource is populated.
                         description: List of alternative URIs for the SAME Resource.
-                      media_type:
+                      mediaType:
                         type: string
                         title: >-
                           media_type is IANA media type of the Resource. Defined
@@ -1212,7 +1227,7 @@ paths:
 
                           Example:
                           d14a028c2a3a2bc9476102bb288234c415a2b01f828ea62ac5b3e42f
-                      previous_version_id:
+                      previousVersionId:
                         type: string
                         title: >-
                           previous_version_id is the ID of the previous version
@@ -1222,7 +1237,7 @@ paths:
                           to determine whether it's the same Resource.
 
                           Format: <uuid>
-                      next_version_id:
+                      nextVersionId:
                         type: string
                         title: >-
                           next_version_id is the ID of the next version of the
@@ -1253,13 +1268,13 @@ paths:
                 items:
                   type: object
                   properties:
-                    type_url:
+                    typeUrl:
                       type: string
                     value:
                       type: string
                       format: byte
       parameters:
-        - name: collection_id
+        - name: collectionId
           description: >-
             collection_id is an identifier of the DidDocument the resource
             belongs to.
@@ -1284,7 +1299,7 @@ paths:
           type: string
       tags:
         - Query
-  /cheqd/resource/v2/{collection_id}/resources/{id}/metadata:
+  /cheqd/resource/v2/{collectionId}/resources/{id}/metadata:
     get:
       summary: Fetch only metadata for a specific resource
       operationId: ResourceMetadata
@@ -1297,7 +1312,7 @@ paths:
               resource:
                 type: object
                 properties:
-                  collection_id:
+                  collectionId:
                     type: string
                     title: >-
                       collection_id is the ID of the collection that the
@@ -1332,7 +1347,7 @@ paths:
                       Stored as a string. OPTIONAL.
 
                       Example: 1.0.0, v2.1.0
-                  resource_type:
+                  resourceType:
                     type: string
                     title: >-
                       resource_type is a Resource type that identifies what the
@@ -1341,7 +1356,7 @@ paths:
                       This is NOT the same as the resource's media type.
 
                       Example: AnonCredsSchema, StatusList2021
-                  also_known_as:
+                  alsoKnownAs:
                     type: array
                     items:
                       type: object
@@ -1386,7 +1401,7 @@ paths:
                         By default, at least the DID URI equivalent of the
                         Resource is populated.
                     description: List of alternative URIs for the SAME Resource.
-                  media_type:
+                  mediaType:
                     type: string
                     title: >-
                       media_type is IANA media type of the Resource. Defined
@@ -1411,7 +1426,7 @@ paths:
 
                       Example:
                       d14a028c2a3a2bc9476102bb288234c415a2b01f828ea62ac5b3e42f
-                  previous_version_id:
+                  previousVersionId:
                     type: string
                     title: >-
                       previous_version_id is the ID of the previous version of
@@ -1421,7 +1436,7 @@ paths:
                       determine whether it's the same Resource.
 
                       Format: <uuid>
-                  next_version_id:
+                  nextVersionId:
                     type: string
                     title: >-
                       next_version_id is the ID of the next version of the
@@ -1452,13 +1467,13 @@ paths:
                 items:
                   type: object
                   properties:
-                    type_url:
+                    typeUrl:
                       type: string
                     value:
                       type: string
                       format: byte
       parameters:
-        - name: collection_id
+        - name: collectionId
           description: >-
             collection_id is an identifier of the DidDocument the resource
             belongs to.
@@ -1483,18 +1498,3 @@ paths:
           type: string
       tags:
         - Query
-basePath: /swagger/
-schemes:
-  - http
-  - https
-consumes:
-  - application/json
-  - application/json+ld
-  - '*/*'
-produces:
-  - application/json
-  - application/json+ld
-  - '*/*'
-externalDocs:
-  description: cheqd Network Documentation
-  url: https://docs.cheqd.io/node
