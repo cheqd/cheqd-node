@@ -7,12 +7,6 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
 
-// ResourceWithMetadata describes the overall structure of a DID-Linked Resource
-message ResourceWithMetadata {
-  Resource resource = 1;
-  Metadata metadata = 2;
-}
-
 // Resource stores the contents of a DID-Linked Resource
 message Resource {
   // bytes is the raw data of the Resource
@@ -99,4 +93,10 @@ message AlternativeUri {
   // - http-uri
   // - ipfs-uri
   string description = 2;
+}
+
+// ResourceWithMetadata describes the overall structure of a DID-Linked Resource
+message ResourceWithMetadata {
+  Resource resource = 1 [(gogoproto.jsontag) = "linkedResource"];
+  Metadata metadata = 2 [(gogoproto.jsontag) = "linkedResourceMetadata"];
 }

@@ -15,520 +15,6 @@ import (
 )
 
 var (
-	md_ResourceWithMetadata          protoreflect.MessageDescriptor
-	fd_ResourceWithMetadata_resource protoreflect.FieldDescriptor
-	fd_ResourceWithMetadata_metadata protoreflect.FieldDescriptor
-)
-
-func init() {
-	file_cheqd_resource_v2_resource_proto_init()
-	md_ResourceWithMetadata = File_cheqd_resource_v2_resource_proto.Messages().ByName("ResourceWithMetadata")
-	fd_ResourceWithMetadata_resource = md_ResourceWithMetadata.Fields().ByName("resource")
-	fd_ResourceWithMetadata_metadata = md_ResourceWithMetadata.Fields().ByName("metadata")
-}
-
-var _ protoreflect.Message = (*fastReflection_ResourceWithMetadata)(nil)
-
-type fastReflection_ResourceWithMetadata ResourceWithMetadata
-
-func (x *ResourceWithMetadata) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_ResourceWithMetadata)(x)
-}
-
-func (x *ResourceWithMetadata) slowProtoReflect() protoreflect.Message {
-	mi := &file_cheqd_resource_v2_resource_proto_msgTypes[0]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-var _fastReflection_ResourceWithMetadata_messageType fastReflection_ResourceWithMetadata_messageType
-var _ protoreflect.MessageType = fastReflection_ResourceWithMetadata_messageType{}
-
-type fastReflection_ResourceWithMetadata_messageType struct{}
-
-func (x fastReflection_ResourceWithMetadata_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_ResourceWithMetadata)(nil)
-}
-func (x fastReflection_ResourceWithMetadata_messageType) New() protoreflect.Message {
-	return new(fastReflection_ResourceWithMetadata)
-}
-func (x fastReflection_ResourceWithMetadata_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_ResourceWithMetadata
-}
-
-// Descriptor returns message descriptor, which contains only the protobuf
-// type information for the message.
-func (x *fastReflection_ResourceWithMetadata) Descriptor() protoreflect.MessageDescriptor {
-	return md_ResourceWithMetadata
-}
-
-// Type returns the message type, which encapsulates both Go and protobuf
-// type information. If the Go type information is not needed,
-// it is recommended that the message descriptor be used instead.
-func (x *fastReflection_ResourceWithMetadata) Type() protoreflect.MessageType {
-	return _fastReflection_ResourceWithMetadata_messageType
-}
-
-// New returns a newly allocated and mutable empty message.
-func (x *fastReflection_ResourceWithMetadata) New() protoreflect.Message {
-	return new(fastReflection_ResourceWithMetadata)
-}
-
-// Interface unwraps the message reflection interface and
-// returns the underlying ProtoMessage interface.
-func (x *fastReflection_ResourceWithMetadata) Interface() protoreflect.ProtoMessage {
-	return (*ResourceWithMetadata)(x)
-}
-
-// Range iterates over every populated field in an undefined order,
-// calling f for each field descriptor and value encountered.
-// Range returns immediately if f returns false.
-// While iterating, mutating operations may only be performed
-// on the current field descriptor.
-func (x *fastReflection_ResourceWithMetadata) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
-	if x.Resource != nil {
-		value := protoreflect.ValueOfMessage(x.Resource.ProtoReflect())
-		if !f(fd_ResourceWithMetadata_resource, value) {
-			return
-		}
-	}
-	if x.Metadata != nil {
-		value := protoreflect.ValueOfMessage(x.Metadata.ProtoReflect())
-		if !f(fd_ResourceWithMetadata_metadata, value) {
-			return
-		}
-	}
-}
-
-// Has reports whether a field is populated.
-//
-// Some fields have the property of nullability where it is possible to
-// distinguish between the default value of a field and whether the field
-// was explicitly populated with the default value. Singular message fields,
-// member fields of a oneof, and proto2 scalar fields are nullable. Such
-// fields are populated only if explicitly set.
-//
-// In other cases (aside from the nullable cases above),
-// a proto3 scalar field is populated if it contains a non-zero value, and
-// a repeated field is populated if it is non-empty.
-func (x *fastReflection_ResourceWithMetadata) Has(fd protoreflect.FieldDescriptor) bool {
-	switch fd.FullName() {
-	case "cheqd.resource.v2.ResourceWithMetadata.resource":
-		return x.Resource != nil
-	case "cheqd.resource.v2.ResourceWithMetadata.metadata":
-		return x.Metadata != nil
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.ResourceWithMetadata"))
-		}
-		panic(fmt.Errorf("message cheqd.resource.v2.ResourceWithMetadata does not contain field %s", fd.FullName()))
-	}
-}
-
-// Clear clears the field such that a subsequent Has call reports false.
-//
-// Clearing an extension field clears both the extension type and value
-// associated with the given field number.
-//
-// Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_ResourceWithMetadata) Clear(fd protoreflect.FieldDescriptor) {
-	switch fd.FullName() {
-	case "cheqd.resource.v2.ResourceWithMetadata.resource":
-		x.Resource = nil
-	case "cheqd.resource.v2.ResourceWithMetadata.metadata":
-		x.Metadata = nil
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.ResourceWithMetadata"))
-		}
-		panic(fmt.Errorf("message cheqd.resource.v2.ResourceWithMetadata does not contain field %s", fd.FullName()))
-	}
-}
-
-// Get retrieves the value for a field.
-//
-// For unpopulated scalars, it returns the default value, where
-// the default value of a bytes scalar is guaranteed to be a copy.
-// For unpopulated composite types, it returns an empty, read-only view
-// of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_ResourceWithMetadata) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
-	switch descriptor.FullName() {
-	case "cheqd.resource.v2.ResourceWithMetadata.resource":
-		value := x.Resource
-		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "cheqd.resource.v2.ResourceWithMetadata.metadata":
-		value := x.Metadata
-		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	default:
-		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.ResourceWithMetadata"))
-		}
-		panic(fmt.Errorf("message cheqd.resource.v2.ResourceWithMetadata does not contain field %s", descriptor.FullName()))
-	}
-}
-
-// Set stores the value for a field.
-//
-// For a field belonging to a oneof, it implicitly clears any other field
-// that may be currently set within the same oneof.
-// For extension fields, it implicitly stores the provided ExtensionType.
-// When setting a composite type, it is unspecified whether the stored value
-// aliases the source's memory in any way. If the composite value is an
-// empty, read-only value, then it panics.
-//
-// Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_ResourceWithMetadata) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
-	switch fd.FullName() {
-	case "cheqd.resource.v2.ResourceWithMetadata.resource":
-		x.Resource = value.Message().Interface().(*Resource)
-	case "cheqd.resource.v2.ResourceWithMetadata.metadata":
-		x.Metadata = value.Message().Interface().(*Metadata)
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.ResourceWithMetadata"))
-		}
-		panic(fmt.Errorf("message cheqd.resource.v2.ResourceWithMetadata does not contain field %s", fd.FullName()))
-	}
-}
-
-// Mutable returns a mutable reference to a composite type.
-//
-// If the field is unpopulated, it may allocate a composite value.
-// For a field belonging to a oneof, it implicitly clears any other field
-// that may be currently set within the same oneof.
-// For extension fields, it implicitly stores the provided ExtensionType
-// if not already stored.
-// It panics if the field does not contain a composite type.
-//
-// Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_ResourceWithMetadata) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
-	switch fd.FullName() {
-	case "cheqd.resource.v2.ResourceWithMetadata.resource":
-		if x.Resource == nil {
-			x.Resource = new(Resource)
-		}
-		return protoreflect.ValueOfMessage(x.Resource.ProtoReflect())
-	case "cheqd.resource.v2.ResourceWithMetadata.metadata":
-		if x.Metadata == nil {
-			x.Metadata = new(Metadata)
-		}
-		return protoreflect.ValueOfMessage(x.Metadata.ProtoReflect())
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.ResourceWithMetadata"))
-		}
-		panic(fmt.Errorf("message cheqd.resource.v2.ResourceWithMetadata does not contain field %s", fd.FullName()))
-	}
-}
-
-// NewField returns a new value that is assignable to the field
-// for the given descriptor. For scalars, this returns the default value.
-// For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_ResourceWithMetadata) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
-	switch fd.FullName() {
-	case "cheqd.resource.v2.ResourceWithMetadata.resource":
-		m := new(Resource)
-		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	case "cheqd.resource.v2.ResourceWithMetadata.metadata":
-		m := new(Metadata)
-		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.ResourceWithMetadata"))
-		}
-		panic(fmt.Errorf("message cheqd.resource.v2.ResourceWithMetadata does not contain field %s", fd.FullName()))
-	}
-}
-
-// WhichOneof reports which field within the oneof is populated,
-// returning nil if none are populated.
-// It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_ResourceWithMetadata) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
-	switch d.FullName() {
-	default:
-		panic(fmt.Errorf("%s is not a oneof field in cheqd.resource.v2.ResourceWithMetadata", d.FullName()))
-	}
-	panic("unreachable")
-}
-
-// GetUnknown retrieves the entire list of unknown fields.
-// The caller may only mutate the contents of the RawFields
-// if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_ResourceWithMetadata) GetUnknown() protoreflect.RawFields {
-	return x.unknownFields
-}
-
-// SetUnknown stores an entire list of unknown fields.
-// The raw fields must be syntactically valid according to the wire format.
-// An implementation may panic if this is not the case.
-// Once stored, the caller must not mutate the content of the RawFields.
-// An empty RawFields may be passed to clear the fields.
-//
-// SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_ResourceWithMetadata) SetUnknown(fields protoreflect.RawFields) {
-	x.unknownFields = fields
-}
-
-// IsValid reports whether the message is valid.
-//
-// An invalid message is an empty, read-only value.
-//
-// An invalid message often corresponds to a nil pointer of the concrete
-// message type, but the details are implementation dependent.
-// Validity is not part of the protobuf data model, and may not
-// be preserved in marshaling or other operations.
-func (x *fastReflection_ResourceWithMetadata) IsValid() bool {
-	return x != nil
-}
-
-// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
-// This method may return nil.
-//
-// The returned methods type is identical to
-// "google.golang.org/protobuf/runtime/protoiface".Methods.
-// Consult the protoiface package documentation for details.
-func (x *fastReflection_ResourceWithMetadata) ProtoMethods() *protoiface.Methods {
-	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*ResourceWithMetadata)
-		if x == nil {
-			return protoiface.SizeOutput{
-				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-				Size:              0,
-			}
-		}
-		options := runtime.SizeInputToOptions(input)
-		_ = options
-		var n int
-		var l int
-		_ = l
-		if x.Resource != nil {
-			l = options.Size(x.Resource)
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
-		if x.Metadata != nil {
-			l = options.Size(x.Metadata)
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
-		if x.unknownFields != nil {
-			n += len(x.unknownFields)
-		}
-		return protoiface.SizeOutput{
-			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-			Size:              n,
-		}
-	}
-
-	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*ResourceWithMetadata)
-		if x == nil {
-			return protoiface.MarshalOutput{
-				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-				Buf:               input.Buf,
-			}, nil
-		}
-		options := runtime.MarshalInputToOptions(input)
-		_ = options
-		size := options.Size(x)
-		dAtA := make([]byte, size)
-		i := len(dAtA)
-		_ = i
-		var l int
-		_ = l
-		if x.unknownFields != nil {
-			i -= len(x.unknownFields)
-			copy(dAtA[i:], x.unknownFields)
-		}
-		if x.Metadata != nil {
-			encoded, err := options.Marshal(x.Metadata)
-			if err != nil {
-				return protoiface.MarshalOutput{
-					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-					Buf:               input.Buf,
-				}, err
-			}
-			i -= len(encoded)
-			copy(dAtA[i:], encoded)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
-			i--
-			dAtA[i] = 0x12
-		}
-		if x.Resource != nil {
-			encoded, err := options.Marshal(x.Resource)
-			if err != nil {
-				return protoiface.MarshalOutput{
-					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-					Buf:               input.Buf,
-				}, err
-			}
-			i -= len(encoded)
-			copy(dAtA[i:], encoded)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
-			i--
-			dAtA[i] = 0xa
-		}
-		if input.Buf != nil {
-			input.Buf = append(input.Buf, dAtA...)
-		} else {
-			input.Buf = dAtA
-		}
-		return protoiface.MarshalOutput{
-			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-			Buf:               input.Buf,
-		}, nil
-	}
-	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*ResourceWithMetadata)
-		if x == nil {
-			return protoiface.UnmarshalOutput{
-				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-				Flags:             input.Flags,
-			}, nil
-		}
-		options := runtime.UnmarshalInputToOptions(input)
-		_ = options
-		dAtA := input.Buf
-		l := len(dAtA)
-		iNdEx := 0
-		for iNdEx < l {
-			preIndex := iNdEx
-			var wire uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				wire |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			fieldNum := int32(wire >> 3)
-			wireType := int(wire & 0x7)
-			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: ResourceWithMetadata: wiretype end group for non-group")
-			}
-			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: ResourceWithMetadata: illegal tag %d (wire type %d)", fieldNum, wire)
-			}
-			switch fieldNum {
-			case 1:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Resource", wireType)
-				}
-				var msglen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					msglen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if msglen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + msglen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				if x.Resource == nil {
-					x.Resource = &Resource{}
-				}
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Resource); err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
-				iNdEx = postIndex
-			case 2:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Metadata", wireType)
-				}
-				var msglen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					msglen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if msglen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + msglen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				if x.Metadata == nil {
-					x.Metadata = &Metadata{}
-				}
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Metadata); err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
-				iNdEx = postIndex
-			default:
-				iNdEx = preIndex
-				skippy, err := runtime.Skip(dAtA[iNdEx:])
-				if err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
-				if (skippy < 0) || (iNdEx+skippy) < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if (iNdEx + skippy) > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				if !options.DiscardUnknown {
-					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
-				}
-				iNdEx += skippy
-			}
-		}
-
-		if iNdEx > l {
-			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-		}
-		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
-	}
-	return &protoiface.Methods{
-		NoUnkeyedLiterals: struct{}{},
-		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
-		Size:              size,
-		Marshal:           marshal,
-		Unmarshal:         unmarshal,
-		Merge:             nil,
-		CheckInitialized:  nil,
-	}
-}
-
-var (
 	md_Resource      protoreflect.MessageDescriptor
 	fd_Resource_data protoreflect.FieldDescriptor
 )
@@ -548,7 +34,7 @@ func (x *Resource) ProtoReflect() protoreflect.Message {
 }
 
 func (x *Resource) slowProtoReflect() protoreflect.Message {
-	mi := &file_cheqd_resource_v2_resource_proto_msgTypes[1]
+	mi := &file_cheqd_resource_v2_resource_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1041,7 +527,7 @@ func (x *Metadata) ProtoReflect() protoreflect.Message {
 }
 
 func (x *Metadata) slowProtoReflect() protoreflect.Message {
-	mi := &file_cheqd_resource_v2_resource_proto_msgTypes[2]
+	mi := &file_cheqd_resource_v2_resource_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2121,7 +1607,7 @@ func (x *AlternativeUri) ProtoReflect() protoreflect.Message {
 }
 
 func (x *AlternativeUri) slowProtoReflect() protoreflect.Message {
-	mi := &file_cheqd_resource_v2_resource_proto_msgTypes[3]
+	mi := &file_cheqd_resource_v2_resource_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2583,6 +2069,520 @@ func (x *fastReflection_AlternativeUri) ProtoMethods() *protoiface.Methods {
 	}
 }
 
+var (
+	md_ResourceWithMetadata          protoreflect.MessageDescriptor
+	fd_ResourceWithMetadata_resource protoreflect.FieldDescriptor
+	fd_ResourceWithMetadata_metadata protoreflect.FieldDescriptor
+)
+
+func init() {
+	file_cheqd_resource_v2_resource_proto_init()
+	md_ResourceWithMetadata = File_cheqd_resource_v2_resource_proto.Messages().ByName("ResourceWithMetadata")
+	fd_ResourceWithMetadata_resource = md_ResourceWithMetadata.Fields().ByName("resource")
+	fd_ResourceWithMetadata_metadata = md_ResourceWithMetadata.Fields().ByName("metadata")
+}
+
+var _ protoreflect.Message = (*fastReflection_ResourceWithMetadata)(nil)
+
+type fastReflection_ResourceWithMetadata ResourceWithMetadata
+
+func (x *ResourceWithMetadata) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_ResourceWithMetadata)(x)
+}
+
+func (x *ResourceWithMetadata) slowProtoReflect() protoreflect.Message {
+	mi := &file_cheqd_resource_v2_resource_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+var _fastReflection_ResourceWithMetadata_messageType fastReflection_ResourceWithMetadata_messageType
+var _ protoreflect.MessageType = fastReflection_ResourceWithMetadata_messageType{}
+
+type fastReflection_ResourceWithMetadata_messageType struct{}
+
+func (x fastReflection_ResourceWithMetadata_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_ResourceWithMetadata)(nil)
+}
+func (x fastReflection_ResourceWithMetadata_messageType) New() protoreflect.Message {
+	return new(fastReflection_ResourceWithMetadata)
+}
+func (x fastReflection_ResourceWithMetadata_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_ResourceWithMetadata
+}
+
+// Descriptor returns message descriptor, which contains only the protobuf
+// type information for the message.
+func (x *fastReflection_ResourceWithMetadata) Descriptor() protoreflect.MessageDescriptor {
+	return md_ResourceWithMetadata
+}
+
+// Type returns the message type, which encapsulates both Go and protobuf
+// type information. If the Go type information is not needed,
+// it is recommended that the message descriptor be used instead.
+func (x *fastReflection_ResourceWithMetadata) Type() protoreflect.MessageType {
+	return _fastReflection_ResourceWithMetadata_messageType
+}
+
+// New returns a newly allocated and mutable empty message.
+func (x *fastReflection_ResourceWithMetadata) New() protoreflect.Message {
+	return new(fastReflection_ResourceWithMetadata)
+}
+
+// Interface unwraps the message reflection interface and
+// returns the underlying ProtoMessage interface.
+func (x *fastReflection_ResourceWithMetadata) Interface() protoreflect.ProtoMessage {
+	return (*ResourceWithMetadata)(x)
+}
+
+// Range iterates over every populated field in an undefined order,
+// calling f for each field descriptor and value encountered.
+// Range returns immediately if f returns false.
+// While iterating, mutating operations may only be performed
+// on the current field descriptor.
+func (x *fastReflection_ResourceWithMetadata) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if x.Resource != nil {
+		value := protoreflect.ValueOfMessage(x.Resource.ProtoReflect())
+		if !f(fd_ResourceWithMetadata_resource, value) {
+			return
+		}
+	}
+	if x.Metadata != nil {
+		value := protoreflect.ValueOfMessage(x.Metadata.ProtoReflect())
+		if !f(fd_ResourceWithMetadata_metadata, value) {
+			return
+		}
+	}
+}
+
+// Has reports whether a field is populated.
+//
+// Some fields have the property of nullability where it is possible to
+// distinguish between the default value of a field and whether the field
+// was explicitly populated with the default value. Singular message fields,
+// member fields of a oneof, and proto2 scalar fields are nullable. Such
+// fields are populated only if explicitly set.
+//
+// In other cases (aside from the nullable cases above),
+// a proto3 scalar field is populated if it contains a non-zero value, and
+// a repeated field is populated if it is non-empty.
+func (x *fastReflection_ResourceWithMetadata) Has(fd protoreflect.FieldDescriptor) bool {
+	switch fd.FullName() {
+	case "cheqd.resource.v2.ResourceWithMetadata.resource":
+		return x.Resource != nil
+	case "cheqd.resource.v2.ResourceWithMetadata.metadata":
+		return x.Metadata != nil
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.ResourceWithMetadata"))
+		}
+		panic(fmt.Errorf("message cheqd.resource.v2.ResourceWithMetadata does not contain field %s", fd.FullName()))
+	}
+}
+
+// Clear clears the field such that a subsequent Has call reports false.
+//
+// Clearing an extension field clears both the extension type and value
+// associated with the given field number.
+//
+// Clear is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_ResourceWithMetadata) Clear(fd protoreflect.FieldDescriptor) {
+	switch fd.FullName() {
+	case "cheqd.resource.v2.ResourceWithMetadata.resource":
+		x.Resource = nil
+	case "cheqd.resource.v2.ResourceWithMetadata.metadata":
+		x.Metadata = nil
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.ResourceWithMetadata"))
+		}
+		panic(fmt.Errorf("message cheqd.resource.v2.ResourceWithMetadata does not contain field %s", fd.FullName()))
+	}
+}
+
+// Get retrieves the value for a field.
+//
+// For unpopulated scalars, it returns the default value, where
+// the default value of a bytes scalar is guaranteed to be a copy.
+// For unpopulated composite types, it returns an empty, read-only view
+// of the value; to obtain a mutable reference, use Mutable.
+func (x *fastReflection_ResourceWithMetadata) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+	switch descriptor.FullName() {
+	case "cheqd.resource.v2.ResourceWithMetadata.resource":
+		value := x.Resource
+		return protoreflect.ValueOfMessage(value.ProtoReflect())
+	case "cheqd.resource.v2.ResourceWithMetadata.metadata":
+		value := x.Metadata
+		return protoreflect.ValueOfMessage(value.ProtoReflect())
+	default:
+		if descriptor.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.ResourceWithMetadata"))
+		}
+		panic(fmt.Errorf("message cheqd.resource.v2.ResourceWithMetadata does not contain field %s", descriptor.FullName()))
+	}
+}
+
+// Set stores the value for a field.
+//
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType.
+// When setting a composite type, it is unspecified whether the stored value
+// aliases the source's memory in any way. If the composite value is an
+// empty, read-only value, then it panics.
+//
+// Set is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_ResourceWithMetadata) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+	switch fd.FullName() {
+	case "cheqd.resource.v2.ResourceWithMetadata.resource":
+		x.Resource = value.Message().Interface().(*Resource)
+	case "cheqd.resource.v2.ResourceWithMetadata.metadata":
+		x.Metadata = value.Message().Interface().(*Metadata)
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.ResourceWithMetadata"))
+		}
+		panic(fmt.Errorf("message cheqd.resource.v2.ResourceWithMetadata does not contain field %s", fd.FullName()))
+	}
+}
+
+// Mutable returns a mutable reference to a composite type.
+//
+// If the field is unpopulated, it may allocate a composite value.
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType
+// if not already stored.
+// It panics if the field does not contain a composite type.
+//
+// Mutable is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_ResourceWithMetadata) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "cheqd.resource.v2.ResourceWithMetadata.resource":
+		if x.Resource == nil {
+			x.Resource = new(Resource)
+		}
+		return protoreflect.ValueOfMessage(x.Resource.ProtoReflect())
+	case "cheqd.resource.v2.ResourceWithMetadata.metadata":
+		if x.Metadata == nil {
+			x.Metadata = new(Metadata)
+		}
+		return protoreflect.ValueOfMessage(x.Metadata.ProtoReflect())
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.ResourceWithMetadata"))
+		}
+		panic(fmt.Errorf("message cheqd.resource.v2.ResourceWithMetadata does not contain field %s", fd.FullName()))
+	}
+}
+
+// NewField returns a new value that is assignable to the field
+// for the given descriptor. For scalars, this returns the default value.
+// For lists, maps, and messages, this returns a new, empty, mutable value.
+func (x *fastReflection_ResourceWithMetadata) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "cheqd.resource.v2.ResourceWithMetadata.resource":
+		m := new(Resource)
+		return protoreflect.ValueOfMessage(m.ProtoReflect())
+	case "cheqd.resource.v2.ResourceWithMetadata.metadata":
+		m := new(Metadata)
+		return protoreflect.ValueOfMessage(m.ProtoReflect())
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.ResourceWithMetadata"))
+		}
+		panic(fmt.Errorf("message cheqd.resource.v2.ResourceWithMetadata does not contain field %s", fd.FullName()))
+	}
+}
+
+// WhichOneof reports which field within the oneof is populated,
+// returning nil if none are populated.
+// It panics if the oneof descriptor does not belong to this message.
+func (x *fastReflection_ResourceWithMetadata) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+	switch d.FullName() {
+	default:
+		panic(fmt.Errorf("%s is not a oneof field in cheqd.resource.v2.ResourceWithMetadata", d.FullName()))
+	}
+	panic("unreachable")
+}
+
+// GetUnknown retrieves the entire list of unknown fields.
+// The caller may only mutate the contents of the RawFields
+// if the mutated bytes are stored back into the message with SetUnknown.
+func (x *fastReflection_ResourceWithMetadata) GetUnknown() protoreflect.RawFields {
+	return x.unknownFields
+}
+
+// SetUnknown stores an entire list of unknown fields.
+// The raw fields must be syntactically valid according to the wire format.
+// An implementation may panic if this is not the case.
+// Once stored, the caller must not mutate the content of the RawFields.
+// An empty RawFields may be passed to clear the fields.
+//
+// SetUnknown is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_ResourceWithMetadata) SetUnknown(fields protoreflect.RawFields) {
+	x.unknownFields = fields
+}
+
+// IsValid reports whether the message is valid.
+//
+// An invalid message is an empty, read-only value.
+//
+// An invalid message often corresponds to a nil pointer of the concrete
+// message type, but the details are implementation dependent.
+// Validity is not part of the protobuf data model, and may not
+// be preserved in marshaling or other operations.
+func (x *fastReflection_ResourceWithMetadata) IsValid() bool {
+	return x != nil
+}
+
+// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
+// This method may return nil.
+//
+// The returned methods type is identical to
+// "google.golang.org/protobuf/runtime/protoiface".Methods.
+// Consult the protoiface package documentation for details.
+func (x *fastReflection_ResourceWithMetadata) ProtoMethods() *protoiface.Methods {
+	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
+		x := input.Message.Interface().(*ResourceWithMetadata)
+		if x == nil {
+			return protoiface.SizeOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Size:              0,
+			}
+		}
+		options := runtime.SizeInputToOptions(input)
+		_ = options
+		var n int
+		var l int
+		_ = l
+		if x.Resource != nil {
+			l = options.Size(x.Resource)
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.Metadata != nil {
+			l = options.Size(x.Metadata)
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.unknownFields != nil {
+			n += len(x.unknownFields)
+		}
+		return protoiface.SizeOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Size:              n,
+		}
+	}
+
+	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
+		x := input.Message.Interface().(*ResourceWithMetadata)
+		if x == nil {
+			return protoiface.MarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Buf:               input.Buf,
+			}, nil
+		}
+		options := runtime.MarshalInputToOptions(input)
+		_ = options
+		size := options.Size(x)
+		dAtA := make([]byte, size)
+		i := len(dAtA)
+		_ = i
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			i -= len(x.unknownFields)
+			copy(dAtA[i:], x.unknownFields)
+		}
+		if x.Metadata != nil {
+			encoded, err := options.Marshal(x.Metadata)
+			if err != nil {
+				return protoiface.MarshalOutput{
+					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+					Buf:               input.Buf,
+				}, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+			i--
+			dAtA[i] = 0x12
+		}
+		if x.Resource != nil {
+			encoded, err := options.Marshal(x.Resource)
+			if err != nil {
+				return protoiface.MarshalOutput{
+					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+					Buf:               input.Buf,
+				}, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+			i--
+			dAtA[i] = 0xa
+		}
+		if input.Buf != nil {
+			input.Buf = append(input.Buf, dAtA...)
+		} else {
+			input.Buf = dAtA
+		}
+		return protoiface.MarshalOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Buf:               input.Buf,
+		}, nil
+	}
+	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
+		x := input.Message.Interface().(*ResourceWithMetadata)
+		if x == nil {
+			return protoiface.UnmarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Flags:             input.Flags,
+			}, nil
+		}
+		options := runtime.UnmarshalInputToOptions(input)
+		_ = options
+		dAtA := input.Buf
+		l := len(dAtA)
+		iNdEx := 0
+		for iNdEx < l {
+			preIndex := iNdEx
+			var wire uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				wire |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			fieldNum := int32(wire >> 3)
+			wireType := int(wire & 0x7)
+			if wireType == 4 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: ResourceWithMetadata: wiretype end group for non-group")
+			}
+			if fieldNum <= 0 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: ResourceWithMetadata: illegal tag %d (wire type %d)", fieldNum, wire)
+			}
+			switch fieldNum {
+			case 1:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Resource", wireType)
+				}
+				var msglen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					msglen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if msglen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + msglen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if x.Resource == nil {
+					x.Resource = &Resource{}
+				}
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Resource); err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				iNdEx = postIndex
+			case 2:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Metadata", wireType)
+				}
+				var msglen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					msglen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if msglen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + msglen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if x.Metadata == nil {
+					x.Metadata = &Metadata{}
+				}
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Metadata); err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				iNdEx = postIndex
+			default:
+				iNdEx = preIndex
+				skippy, err := runtime.Skip(dAtA[iNdEx:])
+				if err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				if (skippy < 0) || (iNdEx+skippy) < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if (iNdEx + skippy) > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if !options.DiscardUnknown {
+					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+				}
+				iNdEx += skippy
+			}
+		}
+
+		if iNdEx > l {
+			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+		}
+		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
+	}
+	return &protoiface.Methods{
+		NoUnkeyedLiterals: struct{}{},
+		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
+		Size:              size,
+		Marshal:           marshal,
+		Unmarshal:         unmarshal,
+		Merge:             nil,
+		CheckInitialized:  nil,
+	}
+}
+
 // Code generated by protoc-gen-go. DO NOT EDIT.
 // versions:
 // 	protoc-gen-go v1.27.0
@@ -2595,50 +2595,6 @@ const (
 	// Verify that runtime/protoimpl is sufficiently up-to-date.
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
-
-// ResourceWithMetadata describes the overall structure of a DID-Linked Resource
-type ResourceWithMetadata struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Resource *Resource `protobuf:"bytes,1,opt,name=resource,proto3" json:"resource,omitempty"`
-	Metadata *Metadata `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
-}
-
-func (x *ResourceWithMetadata) Reset() {
-	*x = ResourceWithMetadata{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_cheqd_resource_v2_resource_proto_msgTypes[0]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *ResourceWithMetadata) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ResourceWithMetadata) ProtoMessage() {}
-
-// Deprecated: Use ResourceWithMetadata.ProtoReflect.Descriptor instead.
-func (*ResourceWithMetadata) Descriptor() ([]byte, []int) {
-	return file_cheqd_resource_v2_resource_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *ResourceWithMetadata) GetResource() *Resource {
-	if x != nil {
-		return x.Resource
-	}
-	return nil
-}
-
-func (x *ResourceWithMetadata) GetMetadata() *Metadata {
-	if x != nil {
-		return x.Metadata
-	}
-	return nil
-}
 
 // Resource stores the contents of a DID-Linked Resource
 type Resource struct {
@@ -2653,7 +2609,7 @@ type Resource struct {
 func (x *Resource) Reset() {
 	*x = Resource{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_cheqd_resource_v2_resource_proto_msgTypes[1]
+		mi := &file_cheqd_resource_v2_resource_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2667,7 +2623,7 @@ func (*Resource) ProtoMessage() {}
 
 // Deprecated: Use Resource.ProtoReflect.Descriptor instead.
 func (*Resource) Descriptor() ([]byte, []int) {
-	return file_cheqd_resource_v2_resource_proto_rawDescGZIP(), []int{1}
+	return file_cheqd_resource_v2_resource_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Resource) GetData() []byte {
@@ -2727,7 +2683,7 @@ type Metadata struct {
 func (x *Metadata) Reset() {
 	*x = Metadata{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_cheqd_resource_v2_resource_proto_msgTypes[2]
+		mi := &file_cheqd_resource_v2_resource_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2741,7 +2697,7 @@ func (*Metadata) ProtoMessage() {}
 
 // Deprecated: Use Metadata.ProtoReflect.Descriptor instead.
 func (*Metadata) Descriptor() ([]byte, []int) {
-	return file_cheqd_resource_v2_resource_proto_rawDescGZIP(), []int{2}
+	return file_cheqd_resource_v2_resource_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Metadata) GetCollectionId() string {
@@ -2847,7 +2803,7 @@ type AlternativeUri struct {
 func (x *AlternativeUri) Reset() {
 	*x = AlternativeUri{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_cheqd_resource_v2_resource_proto_msgTypes[3]
+		mi := &file_cheqd_resource_v2_resource_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2861,7 +2817,7 @@ func (*AlternativeUri) ProtoMessage() {}
 
 // Deprecated: Use AlternativeUri.ProtoReflect.Descriptor instead.
 func (*AlternativeUri) Descriptor() ([]byte, []int) {
-	return file_cheqd_resource_v2_resource_proto_rawDescGZIP(), []int{3}
+	return file_cheqd_resource_v2_resource_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *AlternativeUri) GetUri() string {
@@ -2878,6 +2834,50 @@ func (x *AlternativeUri) GetDescription() string {
 	return ""
 }
 
+// ResourceWithMetadata describes the overall structure of a DID-Linked Resource
+type ResourceWithMetadata struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Resource *Resource `protobuf:"bytes,1,opt,name=resource,proto3" json:"resource,omitempty"`
+	Metadata *Metadata `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
+}
+
+func (x *ResourceWithMetadata) Reset() {
+	*x = ResourceWithMetadata{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cheqd_resource_v2_resource_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ResourceWithMetadata) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResourceWithMetadata) ProtoMessage() {}
+
+// Deprecated: Use ResourceWithMetadata.ProtoReflect.Descriptor instead.
+func (*ResourceWithMetadata) Descriptor() ([]byte, []int) {
+	return file_cheqd_resource_v2_resource_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *ResourceWithMetadata) GetResource() *Resource {
+	if x != nil {
+		return x.Resource
+	}
+	return nil
+}
+
+func (x *ResourceWithMetadata) GetMetadata() *Metadata {
+	if x != nil {
+		return x.Metadata
+	}
+	return nil
+}
+
 var File_cheqd_resource_v2_resource_proto protoreflect.FileDescriptor
 
 var file_cheqd_resource_v2_resource_proto_rawDesc = []byte{
@@ -2887,58 +2887,61 @@ var file_cheqd_resource_v2_resource_proto_rawDesc = []byte{
 	0x63, 0x65, 0x2e, 0x76, 0x32, 0x1a, 0x14, 0x67, 0x6f, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x74, 0x6f,
 	0x2f, 0x67, 0x6f, 0x67, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1f, 0x67, 0x6f, 0x6f,
 	0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x74, 0x69, 0x6d,
-	0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x88, 0x01, 0x0a,
-	0x14, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x57, 0x69, 0x74, 0x68, 0x4d, 0x65, 0x74,
-	0x61, 0x64, 0x61, 0x74, 0x61, 0x12, 0x37, 0x0a, 0x08, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63,
-	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1b, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e,
-	0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x52, 0x65, 0x73, 0x6f,
-	0x75, 0x72, 0x63, 0x65, 0x52, 0x08, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x12, 0x37,
-	0x0a, 0x08, 0x6d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b,
-	0x32, 0x1b, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63,
-	0x65, 0x2e, 0x76, 0x32, 0x2e, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x52, 0x08, 0x6d,
-	0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x22, 0x1e, 0x0a, 0x08, 0x52, 0x65, 0x73, 0x6f, 0x75,
-	0x72, 0x63, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x0c, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x22, 0xbf, 0x04, 0x0a, 0x08, 0x4d, 0x65, 0x74, 0x61,
-	0x64, 0x61, 0x74, 0x61, 0x12, 0x3d, 0x0a, 0x0d, 0x63, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69,
-	0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xea, 0xde, 0x1f,
-	0x14, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x43, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74,
-	0x69, 0x6f, 0x6e, 0x49, 0x64, 0x52, 0x0c, 0x63, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f,
-	0x6e, 0x49, 0x64, 0x12, 0x1e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x42,
-	0x0e, 0xea, 0xde, 0x1f, 0x0a, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x49, 0x64, 0x52,
-	0x02, 0x69, 0x64, 0x12, 0x24, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28,
-	0x09, 0x42, 0x10, 0xea, 0xde, 0x1f, 0x0c, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x4e,
-	0x61, 0x6d, 0x65, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x31, 0x0a, 0x07, 0x76, 0x65, 0x72,
-	0x73, 0x69, 0x6f, 0x6e, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x42, 0x17, 0xc8, 0xde, 0x1f, 0x01,
-	0xea, 0xde, 0x1f, 0x0f, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x56, 0x65, 0x72, 0x73,
-	0x69, 0x6f, 0x6e, 0x52, 0x07, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x35, 0x0a, 0x0d,
-	0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x05, 0x20,
-	0x01, 0x28, 0x09, 0x42, 0x10, 0xea, 0xde, 0x1f, 0x0c, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63,
-	0x65, 0x54, 0x79, 0x70, 0x65, 0x52, 0x0c, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x54,
-	0x79, 0x70, 0x65, 0x12, 0x65, 0x0a, 0x0d, 0x61, 0x6c, 0x73, 0x6f, 0x5f, 0x6b, 0x6e, 0x6f, 0x77,
-	0x6e, 0x5f, 0x61, 0x73, 0x18, 0x06, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x21, 0x2e, 0x63, 0x68, 0x65,
-	0x71, 0x64, 0x2e, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x41,
-	0x6c, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x74, 0x69, 0x76, 0x65, 0x55, 0x72, 0x69, 0x42, 0x1e, 0xc8,
-	0xde, 0x1f, 0x01, 0xea, 0xde, 0x1f, 0x16, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x41,
-	0x6c, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x74, 0x69, 0x76, 0x65, 0x55, 0x72, 0x69, 0x52, 0x0b, 0x61,
-	0x6c, 0x73, 0x6f, 0x4b, 0x6e, 0x6f, 0x77, 0x6e, 0x41, 0x73, 0x12, 0x1d, 0x0a, 0x0a, 0x6d, 0x65,
-	0x64, 0x69, 0x61, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09,
-	0x6d, 0x65, 0x64, 0x69, 0x61, 0x54, 0x79, 0x70, 0x65, 0x12, 0x3e, 0x0a, 0x07, 0x63, 0x72, 0x65,
-	0x61, 0x74, 0x65, 0x64, 0x18, 0x08, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f,
-	0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d,
-	0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x42, 0x08, 0xc8, 0xde, 0x1f, 0x00, 0x90, 0xdf, 0x1f, 0x01,
-	0x52, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x12, 0x1a, 0x0a, 0x08, 0x63, 0x68, 0x65,
-	0x63, 0x6b, 0x73, 0x75, 0x6d, 0x18, 0x09, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x63, 0x68, 0x65,
-	0x63, 0x6b, 0x73, 0x75, 0x6d, 0x12, 0x34, 0x0a, 0x13, 0x70, 0x72, 0x65, 0x76, 0x69, 0x6f, 0x75,
-	0x73, 0x5f, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x0a, 0x20, 0x01,
-	0x28, 0x09, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x01, 0x52, 0x11, 0x70, 0x72, 0x65, 0x76, 0x69, 0x6f,
-	0x75, 0x73, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x12, 0x2c, 0x0a, 0x0f, 0x6e,
-	0x65, 0x78, 0x74, 0x5f, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x0b,
-	0x20, 0x01, 0x28, 0x09, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x01, 0x52, 0x0d, 0x6e, 0x65, 0x78, 0x74,
-	0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x22, 0x44, 0x0a, 0x0e, 0x41, 0x6c, 0x74,
-	0x65, 0x72, 0x6e, 0x61, 0x74, 0x69, 0x76, 0x65, 0x55, 0x72, 0x69, 0x12, 0x10, 0x0a, 0x03, 0x75,
-	0x72, 0x69, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x75, 0x72, 0x69, 0x12, 0x20, 0x0a,
-	0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x42,
+	0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x1e, 0x0a, 0x08,
+	0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x22, 0xbf, 0x04, 0x0a,
+	0x08, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x12, 0x3d, 0x0a, 0x0d, 0x63, 0x6f, 0x6c,
+	0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x42, 0x18, 0xea, 0xde, 0x1f, 0x14, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x43, 0x6f,
+	0x6c, 0x6c, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x52, 0x0c, 0x63, 0x6f, 0x6c, 0x6c,
+	0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x12, 0x1e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x09, 0x42, 0x0e, 0xea, 0xde, 0x1f, 0x0a, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72,
+	0x63, 0x65, 0x49, 0x64, 0x52, 0x02, 0x69, 0x64, 0x12, 0x24, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x42, 0x10, 0xea, 0xde, 0x1f, 0x0c, 0x72, 0x65, 0x73, 0x6f,
+	0x75, 0x72, 0x63, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x31,
+	0x0a, 0x07, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x42,
+	0x17, 0xc8, 0xde, 0x1f, 0x01, 0xea, 0xde, 0x1f, 0x0f, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63,
+	0x65, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x07, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f,
+	0x6e, 0x12, 0x35, 0x0a, 0x0d, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x5f, 0x74, 0x79,
+	0x70, 0x65, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x42, 0x10, 0xea, 0xde, 0x1f, 0x0c, 0x72, 0x65,
+	0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x54, 0x79, 0x70, 0x65, 0x52, 0x0c, 0x72, 0x65, 0x73, 0x6f,
+	0x75, 0x72, 0x63, 0x65, 0x54, 0x79, 0x70, 0x65, 0x12, 0x65, 0x0a, 0x0d, 0x61, 0x6c, 0x73, 0x6f,
+	0x5f, 0x6b, 0x6e, 0x6f, 0x77, 0x6e, 0x5f, 0x61, 0x73, 0x18, 0x06, 0x20, 0x03, 0x28, 0x0b, 0x32,
+	0x21, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65,
+	0x2e, 0x76, 0x32, 0x2e, 0x41, 0x6c, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x74, 0x69, 0x76, 0x65, 0x55,
+	0x72, 0x69, 0x42, 0x1e, 0xc8, 0xde, 0x1f, 0x01, 0xea, 0xde, 0x1f, 0x16, 0x72, 0x65, 0x73, 0x6f,
+	0x75, 0x72, 0x63, 0x65, 0x41, 0x6c, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x74, 0x69, 0x76, 0x65, 0x55,
+	0x72, 0x69, 0x52, 0x0b, 0x61, 0x6c, 0x73, 0x6f, 0x4b, 0x6e, 0x6f, 0x77, 0x6e, 0x41, 0x73, 0x12,
+	0x1d, 0x0a, 0x0a, 0x6d, 0x65, 0x64, 0x69, 0x61, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x07, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x09, 0x6d, 0x65, 0x64, 0x69, 0x61, 0x54, 0x79, 0x70, 0x65, 0x12, 0x3e,
+	0x0a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x18, 0x08, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
+	0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x42, 0x08, 0xc8, 0xde, 0x1f,
+	0x00, 0x90, 0xdf, 0x1f, 0x01, 0x52, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x12, 0x1a,
+	0x0a, 0x08, 0x63, 0x68, 0x65, 0x63, 0x6b, 0x73, 0x75, 0x6d, 0x18, 0x09, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x08, 0x63, 0x68, 0x65, 0x63, 0x6b, 0x73, 0x75, 0x6d, 0x12, 0x34, 0x0a, 0x13, 0x70, 0x72,
+	0x65, 0x76, 0x69, 0x6f, 0x75, 0x73, 0x5f, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x5f, 0x69,
+	0x64, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x09, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x01, 0x52, 0x11, 0x70,
+	0x72, 0x65, 0x76, 0x69, 0x6f, 0x75, 0x73, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x64,
+	0x12, 0x2c, 0x0a, 0x0f, 0x6e, 0x65, 0x78, 0x74, 0x5f, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e,
+	0x5f, 0x69, 0x64, 0x18, 0x0b, 0x20, 0x01, 0x28, 0x09, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x01, 0x52,
+	0x0d, 0x6e, 0x65, 0x78, 0x74, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x22, 0x44,
+	0x0a, 0x0e, 0x41, 0x6c, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x74, 0x69, 0x76, 0x65, 0x55, 0x72, 0x69,
+	0x12, 0x10, 0x0a, 0x03, 0x75, 0x72, 0x69, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x75,
+	0x72, 0x69, 0x12, 0x20, 0x0a, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f,
+	0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70,
+	0x74, 0x69, 0x6f, 0x6e, 0x22, 0xb8, 0x01, 0x0a, 0x14, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63,
+	0x65, 0x57, 0x69, 0x74, 0x68, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x12, 0x4b, 0x0a,
+	0x08, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x1b, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65,
+	0x2e, 0x76, 0x32, 0x2e, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x42, 0x12, 0xea, 0xde,
+	0x1f, 0x0e, 0x6c, 0x69, 0x6e, 0x6b, 0x65, 0x64, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65,
+	0x52, 0x08, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x12, 0x53, 0x0a, 0x08, 0x6d, 0x65,
+	0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1b, 0x2e, 0x63,
+	0x68, 0x65, 0x71, 0x64, 0x2e, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x2e, 0x76, 0x32,
+	0x2e, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x42, 0x1a, 0xea, 0xde, 0x1f, 0x16, 0x6c,
+	0x69, 0x6e, 0x6b, 0x65, 0x64, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x4d, 0x65, 0x74,
+	0x61, 0x64, 0x61, 0x74, 0x61, 0x52, 0x08, 0x6d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x42,
 	0xca, 0x01, 0x0a, 0x15, 0x63, 0x6f, 0x6d, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x72, 0x65,
 	0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x2e, 0x76, 0x32, 0x42, 0x0d, 0x52, 0x65, 0x73, 0x6f, 0x75,
 	0x72, 0x63, 0x65, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x3c, 0x67, 0x69, 0x74, 0x68,
@@ -2969,17 +2972,17 @@ func file_cheqd_resource_v2_resource_proto_rawDescGZIP() []byte {
 
 var file_cheqd_resource_v2_resource_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_cheqd_resource_v2_resource_proto_goTypes = []interface{}{
-	(*ResourceWithMetadata)(nil),  // 0: cheqd.resource.v2.ResourceWithMetadata
-	(*Resource)(nil),              // 1: cheqd.resource.v2.Resource
-	(*Metadata)(nil),              // 2: cheqd.resource.v2.Metadata
-	(*AlternativeUri)(nil),        // 3: cheqd.resource.v2.AlternativeUri
+	(*Resource)(nil),              // 0: cheqd.resource.v2.Resource
+	(*Metadata)(nil),              // 1: cheqd.resource.v2.Metadata
+	(*AlternativeUri)(nil),        // 2: cheqd.resource.v2.AlternativeUri
+	(*ResourceWithMetadata)(nil),  // 3: cheqd.resource.v2.ResourceWithMetadata
 	(*timestamppb.Timestamp)(nil), // 4: google.protobuf.Timestamp
 }
 var file_cheqd_resource_v2_resource_proto_depIdxs = []int32{
-	1, // 0: cheqd.resource.v2.ResourceWithMetadata.resource:type_name -> cheqd.resource.v2.Resource
-	2, // 1: cheqd.resource.v2.ResourceWithMetadata.metadata:type_name -> cheqd.resource.v2.Metadata
-	3, // 2: cheqd.resource.v2.Metadata.also_known_as:type_name -> cheqd.resource.v2.AlternativeUri
-	4, // 3: cheqd.resource.v2.Metadata.created:type_name -> google.protobuf.Timestamp
+	2, // 0: cheqd.resource.v2.Metadata.also_known_as:type_name -> cheqd.resource.v2.AlternativeUri
+	4, // 1: cheqd.resource.v2.Metadata.created:type_name -> google.protobuf.Timestamp
+	0, // 2: cheqd.resource.v2.ResourceWithMetadata.resource:type_name -> cheqd.resource.v2.Resource
+	1, // 3: cheqd.resource.v2.ResourceWithMetadata.metadata:type_name -> cheqd.resource.v2.Metadata
 	4, // [4:4] is the sub-list for method output_type
 	4, // [4:4] is the sub-list for method input_type
 	4, // [4:4] is the sub-list for extension type_name
@@ -2994,18 +2997,6 @@ func file_cheqd_resource_v2_resource_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_cheqd_resource_v2_resource_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ResourceWithMetadata); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_cheqd_resource_v2_resource_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Resource); i {
 			case 0:
 				return &v.state
@@ -3017,7 +3008,7 @@ func file_cheqd_resource_v2_resource_proto_init() {
 				return nil
 			}
 		}
-		file_cheqd_resource_v2_resource_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_cheqd_resource_v2_resource_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Metadata); i {
 			case 0:
 				return &v.state
@@ -3029,8 +3020,20 @@ func file_cheqd_resource_v2_resource_proto_init() {
 				return nil
 			}
 		}
-		file_cheqd_resource_v2_resource_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_cheqd_resource_v2_resource_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*AlternativeUri); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cheqd_resource_v2_resource_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ResourceWithMetadata); i {
 			case 0:
 				return &v.state
 			case 1:

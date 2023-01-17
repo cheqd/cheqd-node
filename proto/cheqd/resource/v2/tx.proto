@@ -29,7 +29,7 @@ message MsgCreateResource {
 // it will be created. The resource will be created in the resource collection.
 //
 // If a resource with the given id, collection_id already exists, an error code 2200 will be returned.
-// 
+//
 // A new version of the resource in an existing collection will be created,
 // if a resource in that collection with the same name, resource_type and empty next_version_id exists.
 //
