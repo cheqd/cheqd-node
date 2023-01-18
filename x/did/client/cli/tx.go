@@ -15,29 +15,29 @@ import (
 )
 
 const (
-	FlagVersionId = "version-id"
+	FlagVersionID = "version-id"
 )
 
 type DIDDocument struct {
-	Context              []string
-	Id                   string
-	Controller           []string
-	VerificationMethod   []VerificationMethod
-	Authentication       []string
-	AssertionMethod      []string
-	CapabilityInvocation []string
-	CapabilityDelegation []string
-	KeyAgreement         []string
-	Service              []Service
-	AlsoKnownAs          []string
+	Context              []string             `json:"context"`
+	ID                   string               `json:"id"`
+	Controller           []string             `json:"controller,omitempty"`
+	VerificationMethod   []VerificationMethod `json:"verificationMethod,omitempty"`
+	Authentication       []string             `json:"authentication,omitempty"`
+	AssertionMethod      []string             `json:"assertionMethod,omitempty"`
+	CapabilityInvocation []string             `json:"capabilityInvocation,omitempty"`
+	CapabilityDelegation []string             `json:"capabilityDelegation,omitempty"`
+	KeyAgreement         []string             `json:"keyAgreement,omitempty"`
+	Service              []Service            `json:"service,omitempty"`
+	AlsoKnownAs          []string             `json:"alsoKnownAs,omitempty"`
 }
 
 type VerificationMethod map[string]interface{}
 
 type Service struct {
-	Id              string
-	Type            string
-	ServiceEndpoint []string
+	ID              string   `json:"id"`
+	Type            string   `json:"type"`
+	ServiceEndpoint []string `json:"serviceEndpoint"`
 }
 
 type PayloadWithSignInputs struct {
@@ -190,7 +190,7 @@ func GetFromSpecCompliantPayload(specPayload DIDDocument) ([]*types.Verification
 	service := make([]*types.Service, 0, len(specPayload.Service))
 	for _, s := range specPayload.Service {
 		service = append(service, &types.Service{
-			Id:              s.Id,
+			Id:              s.ID,
 			ServiceType:     s.Type,
 			ServiceEndpoint: s.ServiceEndpoint,
 		})

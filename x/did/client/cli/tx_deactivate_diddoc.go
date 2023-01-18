@@ -29,18 +29,18 @@ If not provided, a random UUID will be used as version-id.`,
 			payloadFile := args[0]
 
 			// Read version-id flag
-			versionId, err := cmd.Flags().GetString(FlagVersionId)
+			versionID, err := cmd.Flags().GetString(FlagVersionID)
 			if err != nil {
 				return err
 			}
 
-			if versionId != "" {
-				err = utils.ValidateUUID(versionId)
+			if versionID != "" {
+				err = utils.ValidateUUID(versionID)
 				if err != nil {
 					return err
 				}
 			} else {
-				versionId = uuid.NewString()
+				versionID = uuid.NewString()
 			}
 
 			payloadJSON, signInputs, err := ReadPayloadWithSignInputsFromFile(payloadFile)
@@ -56,7 +56,7 @@ If not provided, a random UUID will be used as version-id.`,
 			}
 
 			// Set version id from flag or random
-			payload.VersionId = versionId
+			payload.VersionId = versionID
 
 			// Build identity message
 			signBytes := payload.GetSignBytes()
