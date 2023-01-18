@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"os"
 
 	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
@@ -97,10 +98,14 @@ func CmdCreateResource() *cobra.Command {
 		},
 	}
 
-	flags.AddTxFlagsToCmd(cmd)
+	// add standard tx flags
+	didcli.AddTxFlagsToCmd(cmd)
 
+	// add custom / override flags
 	cmd.Flags().String(FlagResourceID, "", "The Resource ID. If not set, a random UUID will be generated.")
 	cmd.Flags().String(flags.FlagFees, sdk.NewCoin(types.BaseMinimalDenom, sdk.NewInt(types.DefaultCreateResourceImageFee)).String(), "Fees to pay along with transaction; eg: 10000000000ncheq")
+	cmd.Flags().String(flags.FlagGas, flags.GasFlagAuto, fmt.Sprintf("gas limit to set per-transaction; set to %q to calculate sufficient gas automatically. Note: %q option doesn't always report accurate results. Set a valid coin value to adjust the result. Can be used instead of %q. (default %d)",
+		flags.GasFlagAuto, flags.GasFlagAuto, flags.FlagFees, flags.DefaultGasLimit))
 
 	_ = cmd.MarkFlagRequired(flags.FlagFees)
 	_ = cmd.MarkFlagRequired(flags.FlagGas)

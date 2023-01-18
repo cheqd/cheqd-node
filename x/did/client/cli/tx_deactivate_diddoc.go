@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"fmt"
+
 	"github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/cheqd/cheqd-node/x/did/utils"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -78,10 +80,14 @@ If not provided, a random UUID will be used as version-id.`,
 		},
 	}
 
-	flags.AddTxFlagsToCmd(cmd)
+	// add standard tx flags
+	AddTxFlagsToCmd(cmd)
 
+	// add custom / override flags
 	cmd.Flags().String(FlagVersionID, "", "Version ID of the DID Document")
 	cmd.Flags().String(flags.FlagFees, sdk.NewCoin(types.BaseMinimalDenom, sdk.NewInt(types.DefaultDeactivateDidTxFee)).String(), "Fees to pay along with transaction; eg: 10000000000ncheq")
+	cmd.Flags().String(flags.FlagGas, flags.GasFlagAuto, fmt.Sprintf("gas limit to set per-transaction; set to %q to calculate sufficient gas automatically. Note: %q option doesn't always report accurate results. Set a valid coin value to adjust the result. Can be used instead of %q. (default %d)",
+		flags.GasFlagAuto, flags.GasFlagAuto, flags.FlagFees, flags.DefaultGasLimit))
 
 	_ = cmd.MarkFlagRequired(flags.FlagFees)
 	_ = cmd.MarkFlagRequired(flags.FlagGas)
