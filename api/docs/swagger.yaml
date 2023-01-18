@@ -315,7 +315,7 @@ paths:
           required: true
           type: string
       tags:
-        - cheqd.did.v2.Query
+        - DID module queries
   /cheqd/did/v2/{id}/version/{version}:
     get:
       summary: Fetch specific version of a DID Document for a given DID
@@ -617,7 +617,7 @@ paths:
           required: true
           type: string
       tags:
-        - cheqd.did.v2.Query
+        - DID module queries
   /cheqd/did/v2/{id}/versions:
     get:
       summary: Fetch list of all versions of DID Documents for a given DID
@@ -811,7 +811,7 @@ paths:
           required: false
           type: boolean
       tags:
-        - cheqd.did.v2.Query
+        - DID module queries
   /cheqd/resource/v2/{collectionId}/metadata:
     get:
       summary: Fetch metadata for all resources in a collection
@@ -1081,7 +1081,7 @@ paths:
           required: false
           type: boolean
       tags:
-        - cheqd.resource.v2.Query
+        - Resource module queries
   /cheqd/resource/v2/{collectionId}/resources/{id}:
     get:
       summary: Fetch data/payload for a specific resource (without metadata)
@@ -1298,7 +1298,7 @@ paths:
           required: true
           type: string
       tags:
-        - cheqd.resource.v2.Query
+        - Resource module queries
   /cheqd/resource/v2/{collectionId}/resources/{id}/metadata:
     get:
       summary: Fetch only metadata for a specific resource
@@ -1497,4 +1497,4 @@ paths:
           required: true
           type: string
       tags:
-        - cheqd.resource.v2.Query
+        - Resource module queries

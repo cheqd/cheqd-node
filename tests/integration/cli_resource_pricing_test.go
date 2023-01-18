@@ -12,7 +12,6 @@ import (
 	clitypes "github.com/cheqd/cheqd-node/x/did/client/cli"
 	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
-	resourcecli "github.com/cheqd/cheqd-node/x/resource/client/cli"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
@@ -87,14 +86,13 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		By("submitting the json resource message")
 		tax := feeParams.Json
-		res, err := cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionID:    collectionID,
-			ResourceID:      resourceID,
-			ResourceName:    resourceName,
-			ResourceVersion: resourceVersion,
-			ResourceType:    resourceType,
-			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.String()))
+		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+			CollectionId: collectionID,
+			Id:           resourceID,
+			Name:         resourceName,
+			Version:      resourceVersion,
+			ResourceType: resourceType,
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.String()))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -162,14 +160,13 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(balanceBefore.Denom).To(BeEquivalentTo(resourcetypes.BaseMinimalDenom))
 
 		By("submitting the json resource message")
-		res, err := cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionID:    collectionID,
-			ResourceID:      resourceID,
-			ResourceName:    resourceName,
-			ResourceVersion: resourceVersion,
-			ResourceType:    resourceType,
-			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_4, cli.CliGasParams)
+		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+			CollectionId: collectionID,
+			Id:           resourceID,
+			Name:         resourceName,
+			Version:      resourceVersion,
+			ResourceType: resourceType,
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -239,14 +236,13 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		By("submitting the image resource message")
 		tax := feeParams.Image
-		res, err := cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionID:    collectionID,
-			ResourceID:      resourceID,
-			ResourceName:    resourceName,
-			ResourceVersion: resourceVersion,
-			ResourceType:    resourceType,
-			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.String()))
+		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+			CollectionId: collectionID,
+			Id:           resourceID,
+			Name:         resourceName,
+			Version:      resourceVersion,
+			ResourceType: resourceType,
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.String()))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -314,14 +310,13 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(balanceBefore.Denom).To(BeEquivalentTo(resourcetypes.BaseMinimalDenom))
 
 		By("submitting the image resource message")
-		res, err := cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionID:    collectionID,
-			ResourceID:      resourceID,
-			ResourceName:    resourceName,
-			ResourceVersion: resourceVersion,
-			ResourceType:    resourceType,
-			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_4, cli.CliGasParams)
+		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+			CollectionId: collectionID,
+			Id:           resourceID,
+			Name:         resourceName,
+			Version:      resourceVersion,
+			ResourceType: resourceType,
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -391,14 +386,13 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		By("submitting the default resource message")
 		tax := feeParams.Default
-		res, err := cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionID:    collectionID,
-			ResourceID:      resourceID,
-			ResourceName:    resourceName,
-			ResourceVersion: resourceVersion,
-			ResourceType:    resourceType,
-			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.String()))
+		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+			CollectionId: collectionID,
+			Id:           resourceID,
+			Name:         resourceName,
+			Version:      resourceVersion,
+			ResourceType: resourceType,
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.String()))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -466,14 +460,13 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(balanceBefore.Denom).To(BeEquivalentTo(resourcetypes.BaseMinimalDenom))
 
 		By("submitting the default resource message")
-		res, err := cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionID:    collectionID,
-			ResourceID:      resourceID,
-			ResourceName:    resourceName,
-			ResourceVersion: resourceVersion,
-			ResourceType:    resourceType,
-			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_4, cli.CliGasParams)
+		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+			CollectionId: collectionID,
+			Id:           resourceID,
+			Name:         resourceName,
+			Version:      resourceVersion,
+			ResourceType: resourceType,
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -550,14 +543,13 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting a create resource json message")
-		resp, err := cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionID:    collectionID,
-			ResourceID:      resourceID,
-			ResourceName:    resourceName,
-			ResourceVersion: resourceVersion,
-			ResourceType:    resourceType,
-			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, cli.CliGasParams))
+		resp, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+			CollectionId: collectionID,
+			Id:           resourceID,
+			Name:         resourceName,
+			Version:      resourceVersion,
+			ResourceType: resourceType,
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, cli.CliGasParams))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -606,14 +598,13 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting a create resource image message")
-		resp, err := cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionID:    collectionID,
-			ResourceID:      resourceID,
-			ResourceName:    resourceName,
-			ResourceVersion: resourceVersion,
-			ResourceType:    resourceType,
-			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, cli.CliGasParams))
+		resp, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+			CollectionId: collectionID,
+			Id:           resourceID,
+			Name:         resourceName,
+			Version:      resourceVersion,
+			ResourceType: resourceType,
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, cli.CliGasParams))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -662,14 +653,13 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting a create resource default message")
-		resp, err := cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionID:    collectionID,
-			ResourceID:      resourceID,
-			ResourceName:    resourceName,
-			ResourceVersion: resourceVersion,
-			ResourceType:    resourceType,
-			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, cli.CliGasParams))
+		resp, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+			CollectionId: collectionID,
+			Id:           resourceID,
+			Name:         resourceName,
+			Version:      resourceVersion,
+			ResourceType: resourceType,
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, cli.CliGasParams))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 

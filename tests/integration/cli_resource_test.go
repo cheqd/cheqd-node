@@ -12,7 +12,7 @@ import (
 	clitypes "github.com/cheqd/cheqd-node/x/did/client/cli"
 	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	"github.com/cheqd/cheqd-node/x/did/types"
-	resourcecli "github.com/cheqd/cheqd-node/x/resource/client/cli"
+	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -72,14 +72,13 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		resourceFile, err := testdata.CreateTestJson(GinkgoT().TempDir())
 		Expect(err).To(BeNil())
 
-		res, err = cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionID:    collectionID,
-			ResourceID:      resourceID,
-			ResourceName:    resourceName,
-			ResourceVersion: resourceVersion,
-			ResourceType:    resourceType,
-			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		res, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+			CollectionId: collectionID,
+			Id:           resourceID,
+			Name:         resourceName,
+			Version:      resourceVersion,
+			ResourceType: resourceType,
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -114,14 +113,13 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		nextResourceFile, err := testdata.CreateTestJson(GinkgoT().TempDir())
 		Expect(err).To(BeNil())
 
-		res, err = cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionID:    collectionID,
-			ResourceID:      nextResourceId,
-			ResourceName:    nextResourceName,
-			ResourceVersion: nextResourceVersion,
-			ResourceType:    nextResourceType,
-			ResourceFile:    nextResourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		res, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+			CollectionId: collectionID,
+			Id:           nextResourceId,
+			Name:         nextResourceName,
+			Version:      nextResourceVersion,
+			ResourceType: nextResourceType,
+		}, signInputs, nextResourceFile, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -168,14 +166,13 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		secondResourceFile, err := testdata.CreateTestJson(GinkgoT().TempDir())
 		Expect(err).To(BeNil())
 
-		res, err = cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionID:    secondCollectionId,
-			ResourceID:      secondResourceId,
-			ResourceName:    secondResourceName,
-			ResourceVersion: secondResourceVersion,
-			ResourceType:    secondResourceType,
-			ResourceFile:    secondResourceFile,
-		}, secondSignInputs, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		res, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+			CollectionId: secondCollectionId,
+			Id:           secondResourceId,
+			Name:         secondResourceName,
+			Version:      secondResourceVersion,
+			ResourceType: secondResourceType,
+		}, secondSignInputs, secondResourceFile, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 

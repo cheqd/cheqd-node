@@ -7,7 +7,7 @@ import (
 	"github.com/cheqd/cheqd-node/tests/integration/network"
 	"github.com/cheqd/cheqd-node/x/did/client/cli"
 	"github.com/cheqd/cheqd-node/x/did/types"
-	resourcecli "github.com/cheqd/cheqd-node/x/resource/client/cli"
+	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -128,8 +128,8 @@ func DeactivateDidDoc(tmpDir string, payload types.MsgDeactivateDidDocPayload, s
 	return Tx("cheqd", "deactivate-did", from, feeParams, payloadFile)
 }
 
-func CreateResource(tmpDir string, options resourcecli.CreateResourceOptions, signInputs []cli.SignInput, from string, feeParams []string) (sdk.TxResponse, error) {
-	payloadJSON, err := json.Marshal(&options)
+func CreateResource(tmpDir string, payload resourcetypes.MsgCreateResourcePayload, signInputs []cli.SignInput, dataFile, from string, feeParams []string) (sdk.TxResponse, error) {
+	payloadJSON, err := helpers.Codec.MarshalJSON(&payload)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
@@ -146,5 +146,5 @@ func CreateResource(tmpDir string, options resourcecli.CreateResourceOptions, si
 
 	payloadFile := helpers.MustWriteTmpFile("", payloadWithSignInputsJSON)
 
-	return Tx("resource", "create", from, feeParams, payloadFile)
+	return Tx("resource", "create", from, feeParams, payloadFile, dataFile)
 }
