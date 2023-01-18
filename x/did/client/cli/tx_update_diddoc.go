@@ -8,6 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )
@@ -17,7 +18,7 @@ func CmdUpdateDidDoc() *cobra.Command {
 		Use:   "update-did [payload-file]",
 		Short: "Updates a DID and its associated DID Document.",
 		Long: `Update DID Document associated with a given DID. 
-[payload-file] is JSON encoded MsgUpdateDidDocPayload alongside with sign inputs. 
+[payload-file] is JSON encoded DID Document alongside with sign inputs. 
 Version ID is optional and is determined by the '--version-id' flag. 
 If not provided, a random UUID will be used as version-id.`,
 		Args: cobra.ExactArgs(1),
@@ -97,6 +98,12 @@ If not provided, a random UUID will be used as version-id.`,
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
+
+	cmd.Flags().String(FlagVersionID, "", "Version ID of the DID Document")
+	cmd.Flags().String(flags.FlagFees, sdk.NewCoin(types.BaseMinimalDenom, sdk.NewInt(types.DefaultUpdateDidTxFee)).String(), "Fees to pay along with transaction; eg: 25000000000ncheq")
+
+	_ = cmd.MarkFlagRequired(flags.FlagFees)
+	_ = cmd.MarkFlagRequired(flags.FlagGas)
 
 	return cmd
 }

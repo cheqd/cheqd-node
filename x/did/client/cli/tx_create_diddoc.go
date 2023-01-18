@@ -8,6 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )
@@ -17,7 +18,7 @@ func CmdCreateDidDoc() *cobra.Command {
 		Use:   "create-did [payload-file]",
 		Short: "Create a new DID and associated DID Document.",
 		Long: `Creates a new DID and associated DID Document. 
-[payload-file] is JSON encoded MsgCreateDidDocPayload alongside with sign inputs.
+[payload-file] is JSON encoded DID Document alongside with sign inputs.
 Version ID is optional and is determined by the '--version-id' flag. 
 If not provided, a random UUID will be used as version-id.`,
 		Args: cobra.ExactArgs(1),
@@ -26,11 +27,6 @@ If not provided, a random UUID will be used as version-id.`,
 			if err != nil {
 				return err
 			}
-
-			// 1. Add utility-fee as 2nd arg
-			// 2. Short
-			// 3. Long
-			// 4. Show example to query the actual params `cheqd-noded query params subspace cheqd`
 
 			payloadFile := args[0]
 			versionID, err := cmd.Flags().GetString(FlagVersionID)
@@ -99,6 +95,12 @@ If not provided, a random UUID will be used as version-id.`,
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
+
+	cmd.Flags().String(FlagVersionID, "", "Version ID of the DID Document")
+	cmd.Flags().String(flags.FlagFees, sdk.NewCoin(types.BaseMinimalDenom, sdk.NewInt(types.DefaultCreateDidTxFee)).String(), "Fees to pay along with transaction; eg: 50000000000ncheq")
+
+	_ = cmd.MarkFlagRequired(flags.FlagFees)
+	_ = cmd.MarkFlagRequired(flags.FlagGas)
 
 	return cmd
 }

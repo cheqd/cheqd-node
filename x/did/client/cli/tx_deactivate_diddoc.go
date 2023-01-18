@@ -6,6 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )
@@ -15,7 +16,7 @@ func CmdDeactivateDidDoc() *cobra.Command {
 		Use:   "deactivate-did [payload-file]",
 		Short: "Deactivate a DID.",
 		Long: `Deactivates a DID and its associated DID Document. 
-[payload-file] is JSON encoded MsgCreateDidDocPayload alongside with sign inputs. 
+[payload-file] is JSON encoded MsgDeactivateDidDocPayload alongside with sign inputs. 
 Version ID is optional and is determined by the '--version-id' flag. 
 If not provided, a random UUID will be used as version-id.`,
 		Args: cobra.ExactArgs(1),
@@ -78,6 +79,12 @@ If not provided, a random UUID will be used as version-id.`,
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
+
+	cmd.Flags().String(FlagVersionID, "", "Version ID of the DID Document")
+	cmd.Flags().String(flags.FlagFees, sdk.NewCoin(types.BaseMinimalDenom, sdk.NewInt(types.DefaultDeactivateDidTxFee)).String(), "Fees to pay along with transaction; eg: 10000000000ncheq")
+
+	_ = cmd.MarkFlagRequired(flags.FlagFees)
+	_ = cmd.MarkFlagRequired(flags.FlagGas)
 
 	return cmd
 }
