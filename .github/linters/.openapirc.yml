@@ -10,4 +10,4 @@ extends: spectral:oas
 
 overrides:
   files:
-    - "**/config.yaml"
+    - "api/docs/config.yaml"
