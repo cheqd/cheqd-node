@@ -42,6 +42,16 @@ func randSeq(n int) string {
 	return string(b)
 }
 
+func ParseJSONToMap(jsonStr string) (map[string]any, error) {
+	var result map[string]any
+	err := json.Unmarshal([]byte(jsonStr), &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
 func GenerateDID(idtype IDType) string {
 	prefix := "did:cheqd:" + DidNamespace + ":"
 	mathrand.Seed(time.Now().UnixNano())

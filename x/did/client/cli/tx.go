@@ -34,7 +34,7 @@ type DIDDocument struct {
 	AlsoKnownAs          []string             `json:"alsoKnownAs,omitempty"`
 }
 
-type VerificationMethod map[string]interface{}
+type VerificationMethod map[string]any
 
 type Service struct {
 	ID              string   `json:"id"`

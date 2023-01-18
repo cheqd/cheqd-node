@@ -11,6 +11,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+const (
+	FlagVersionID  = "--version-id"
+	FlagResourceID = "--resource-id"
+)
+
 var CLITxParams = []string{
 	"--chain-id", network.ChainID,
 	"--keyring-backend", KeyringBackend,
@@ -65,8 +70,8 @@ func RevokeFeeGrant(granter, grantee string, feeParams []string) (sdk.TxResponse
 	return Tx("feegrant", "revoke", granter, feeParams, granter, grantee)
 }
 
-func CreateDidDoc(tmpDir string, payload types.MsgCreateDidDocPayload, signInputs []cli.SignInput, from string, feeParams []string) (sdk.TxResponse, error) {
-	payloadJSON, err := helpers.Codec.MarshalJSON(&payload)
+func CreateDidDoc(tmpDir string, payload cli.DIDDocument, signInputs []cli.SignInput, versionId, from string, feeParams []string) (sdk.TxResponse, error) {
+	payloadJSON, err := json.Marshal(&payload)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
@@ -82,12 +87,16 @@ func CreateDidDoc(tmpDir string, payload types.MsgCreateDidDocPayload, signInput
 	}
 
 	payloadFile := helpers.MustWriteTmpFile(tmpDir, payloadWithSignInputsJSON)
+
+	if versionId != "" {
+		return Tx("cheqd", "create-did", from, feeParams, payloadFile, FlagVersionID, versionId)
+	}
 
 	return Tx("cheqd", "create-did", from, feeParams, payloadFile)
 }
 
-func UpdateDidDoc(tmpDir string, payload types.MsgUpdateDidDocPayload, signInputs []cli.SignInput, from string, feeParams []string) (sdk.TxResponse, error) {
-	payloadJSON, err := helpers.Codec.MarshalJSON(&payload)
+func UpdateDidDoc(tmpDir string, payload cli.DIDDocument, signInputs []cli.SignInput, versionId, from string, feeParams []string) (sdk.TxResponse, error) {
+	payloadJSON, err := json.Marshal(&payload)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
@@ -103,11 +112,15 @@ func UpdateDidDoc(tmpDir string, payload types.MsgUpdateDidDocPayload, signInput
 	}
 
 	payloadFile := helpers.MustWriteTmpFile(tmpDir, payloadWithSignInputsJSON)
+
+	if versionId != "" {
+		return Tx("cheqd", "update-did", from, feeParams, payloadFile, FlagVersionID, versionId)
+	}
 
 	return Tx("cheqd", "update-did", from, feeParams, payloadFile)
 }
 
-func DeactivateDidDoc(tmpDir string, payload types.MsgDeactivateDidDocPayload, signInputs []cli.SignInput, from string, feeParams []string) (sdk.TxResponse, error) {
+func DeactivateDidDoc(tmpDir string, payload types.MsgDeactivateDidDocPayload, signInputs []cli.SignInput, versionId, from string, feeParams []string) (sdk.TxResponse, error) {
 	payloadJSON, err := helpers.Codec.MarshalJSON(&payload)
 	if err != nil {
 		return sdk.TxResponse{}, err
@@ -125,10 +138,14 @@ func DeactivateDidDoc(tmpDir string, payload types.MsgDeactivateDidDocPayload, s
 
 	payloadFile := helpers.MustWriteTmpFile(tmpDir, payloadWithSignInputsJSON)
 
+	if versionId != "" {
+		return Tx("cheqd", "deactivate-did", from, feeParams, payloadFile, FlagVersionID, versionId)
+	}
+
 	return Tx("cheqd", "deactivate-did", from, feeParams, payloadFile)
 }
 
-func CreateResource(tmpDir string, payload resourcetypes.MsgCreateResourcePayload, signInputs []cli.SignInput, dataFile, from string, feeParams []string) (sdk.TxResponse, error) {
+func CreateResource(tmpDir string, payload resourcetypes.MsgCreateResourcePayload, signInputs []cli.SignInput, dataFile, resourceId, from string, feeParams []string) (sdk.TxResponse, error) {
 	payloadJSON, err := helpers.Codec.MarshalJSON(&payload)
 	if err != nil {
 		return sdk.TxResponse{}, err
@@ -145,6 +162,10 @@ func CreateResource(tmpDir string, payload resourcetypes.MsgCreateResourcePayloa
 	}
 
 	payloadFile := helpers.MustWriteTmpFile("", payloadWithSignInputsJSON)
+
+	if resourceId != "" {
+		return Tx("resource", "create", from, feeParams, payloadFile, dataFile, FlagResourceID, resourceId)
+	}
 
 	return Tx("resource", "create", from, feeParams, payloadFile, dataFile)
 }

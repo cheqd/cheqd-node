@@ -7,11 +7,12 @@ import (
 	"fmt"
 
 	"github.com/cheqd/cheqd-node/tests/integration/cli"
+	"github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
 	"github.com/cheqd/cheqd-node/tests/integration/testdata"
-	clitypes "github.com/cheqd/cheqd-node/x/did/client/cli"
+	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
 	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
-	"github.com/cheqd/cheqd-node/x/did/types"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
@@ -21,11 +22,26 @@ import (
 var _ = Describe("cheqd cli - negative resource", func() {
 	var collectionID string
 	var did string
-	var signInputs []clitypes.SignInput
+	var signInputs []didcli.SignInput
 	var resourceID string
 	var resourceName string
-
+	var didFeeParams didtypes.FeeParams
+	var resourceFeeParams resourcetypes.FeeParams
 	var tmpDir string
+
+	BeforeAll(func() {
+		// Query did fee params
+		res, err := cli.QueryParams(didtypes.ModuleName, string(didtypes.ParamStoreKeyFeeParams))
+		Expect(err).To(BeNil())
+		err = helpers.Codec.UnmarshalJSON([]byte(res.Value), &didFeeParams)
+		Expect(err).To(BeNil())
+
+		// Query resource fee params
+		res, err = cli.QueryParams(resourcetypes.ModuleName, string(resourcetypes.ParamStoreKeyFeeParams))
+		Expect(err).To(BeNil())
+		err = helpers.Codec.UnmarshalJSON([]byte(res.Value), &resourceFeeParams)
+		Expect(err).To(BeNil())
+	})
 
 	BeforeEach(func() {
 		// Initialize tmpDir
@@ -36,37 +52,36 @@ var _ = Describe("cheqd cli - negative resource", func() {
 		did := "did:cheqd:" + network.DidNamespace + ":" + collectionID
 		keyId := did + "#key1"
 
-		pubKey, privKey, err := ed25519.GenerateKey(nil)
+		pubKey, privateKey, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
 
 		publicKeyMultibase := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(pubKey)
 
-		payload := types.MsgCreateDidDocPayload{
-			Id: did,
-			VerificationMethod: []*types.VerificationMethod{
-				{
-					Id:                     keyId,
-					VerificationMethodType: "Ed25519VerificationKey2020",
-					Controller:             did,
-					VerificationMaterial:   publicKeyMultibase,
+		payload := didcli.DIDDocument{
+			ID: did,
+			VerificationMethod: []didcli.VerificationMethod{
+				map[string]any{
+					"id":                 keyId,
+					"type":               "Ed25519VerificationKey2020",
+					"controller":         did,
+					"publicKeyMultibase": publicKeyMultibase,
 				},
 			},
 			Authentication: []string{keyId},
-			VersionId:      uuid.NewString(),
 		}
 
-		signInputs = []clitypes.SignInput{
+		signInputs = []didcli.SignInput{
 			{
 				VerificationMethodID: keyId,
-				PrivKey:              privKey,
+				PrivKey:              privateKey,
 			},
 		}
 
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(didFeeParams.CreateDid.String()))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
-		// Initialize shared resourceID
+		// Initialize shared values
 		resourceID = uuid.NewString()
 		resourceName = "TestName"
 	})
@@ -77,12 +92,12 @@ var _ = Describe("cheqd cli - negative resource", func() {
 
 		// Generate extra sign inputs
 		keyId2 := did + "#key2"
-		_, privKey2, err := ed25519.GenerateKey(nil)
+		_, privateKey2, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
-		signInputs2 := []clitypes.SignInput{
+		signInputs2 := []didcli.SignInput{
 			{
 				VerificationMethodID: keyId2,
-				PrivKey:              privKey2,
+				PrivKey:              privateKey2,
 			},
 		}
 
@@ -95,22 +110,20 @@ var _ = Describe("cheqd cli - negative resource", func() {
 
 		_, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionId2,
-			Id:           resourceID,
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		}, signInputs, resourceFile, resourceID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(HaveOccurred())
 
 		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.Purple, "cannot create resource with missing cli arguments"))
 		// Fail to create a resource with missing cli arguments
 		//   a. missing collection id
 		_, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
-			Id:           resourceID,
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		}, signInputs, resourceFile, resourceID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 
 		//  b. missing resource id - works because it is generated by the cli
 		_, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
@@ -118,7 +131,7 @@ var _ = Describe("cheqd cli - negative resource", func() {
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		}, signInputs, resourceFile, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(BeNil())
 
 		// c. missing resource name
@@ -127,10 +140,8 @@ var _ = Describe("cheqd cli - negative resource", func() {
 			Id:           resourceID,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		}, signInputs, resourceFile, resourceID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(HaveOccurred())
-
-		// c. missing resource version - ok
 
 		// d. missing resource type
 		_, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
@@ -138,7 +149,7 @@ var _ = Describe("cheqd cli - negative resource", func() {
 			Id:           resourceID,
 			Name:         resourceName,
 			Version:      resourceVersion,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		}, signInputs, resourceFile, resourceID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(HaveOccurred())
 
 		// e. missing resource file
@@ -148,7 +159,7 @@ var _ = Describe("cheqd cli - negative resource", func() {
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, "", testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		}, signInputs, "", resourceID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(HaveOccurred())
 
 		// f. missing sign inputs
@@ -158,7 +169,7 @@ var _ = Describe("cheqd cli - negative resource", func() {
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, []clitypes.SignInput{}, resourceFile, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		}, []didcli.SignInput{}, resourceFile, resourceID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(HaveOccurred())
 
 		// g. missing account
@@ -168,7 +179,7 @@ var _ = Describe("cheqd cli - negative resource", func() {
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, "", cli.CliGasParams)
+		}, signInputs, resourceFile, resourceID, "", helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(HaveOccurred())
 
 		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.Purple, "cannot create resource with sign inputs mismatch"))
@@ -180,7 +191,7 @@ var _ = Describe("cheqd cli - negative resource", func() {
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs2, resourceFile, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		}, signInputs2, resourceFile, resourceID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(HaveOccurred())
 
 		//   b. non-existing key id
@@ -190,12 +201,12 @@ var _ = Describe("cheqd cli - negative resource", func() {
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, []clitypes.SignInput{
+		}, []didcli.SignInput{
 			{
 				VerificationMethodID: "non-existing-key-id",
 				PrivKey:              signInputs[0].PrivKey,
 			},
-		}, resourceFile, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		}, resourceFile, resourceID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(HaveOccurred())
 
 		//   c. non-matching private key
@@ -205,12 +216,12 @@ var _ = Describe("cheqd cli - negative resource", func() {
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, []clitypes.SignInput{
+		}, []didcli.SignInput{
 			{
 				VerificationMethodID: signInputs[0].VerificationMethodID,
-				PrivKey:              privKey2,
+				PrivKey:              privateKey2,
 			},
-		}, resourceFile, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		}, resourceFile, resourceID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(HaveOccurred())
 
 		//   d. invalid private key
@@ -220,12 +231,12 @@ var _ = Describe("cheqd cli - negative resource", func() {
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, []clitypes.SignInput{
+		}, []didcli.SignInput{
 			{
 				VerificationMethodID: signInputs[0].VerificationMethodID,
 				PrivKey:              testdata.GenerateByteEntropy(),
 			},
-		}, resourceFile, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		}, resourceFile, resourceID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(HaveOccurred())
 
 		// Finally, create the resource
@@ -235,7 +246,7 @@ var _ = Describe("cheqd cli - negative resource", func() {
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		}, signInputs, resourceFile, resourceID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
