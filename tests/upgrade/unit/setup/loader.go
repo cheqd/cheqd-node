@@ -76,7 +76,7 @@ func (l Loader) LoadFile(
 	case *didtypes.DidDocWithMetadata:
 		err = setup.Cdc.UnmarshalJSON(file, dataChunk)
 	case *resourcetypes.ResourceWithMetadata:
-		err = json.Unmarshal(file, dataChunk)
+		err = setup.Cdc.UnmarshalJSON(file, dataChunk)
 	default:
 		err = json.Unmarshal(file, dataChunk)
 	}
