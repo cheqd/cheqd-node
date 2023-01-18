@@ -9,30 +9,30 @@
         "controller": [
             "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554"
         ],
-        "verification_method": [
+        "verificationMethod": [
             {
                 "id": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-1",
                 "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554",
-                "verification_material": "z6MkkEW1CN6EsnHgjX48Xvn2mAzhLrpQpDHh9iwpmxRn2NNi"
+                "verificationMaterial": "z6MkkEW1CN6EsnHgjX48Xvn2mAzhLrpQpDHh9iwpmxRn2NNi"
             },
             {
                 "id": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-2",
                 "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554",
-                "verification_material": "z6Mkmj3sSdRgFLgPfL8ujzZKYtoSg8dqgz72MSq8bexF7Azq"
+                "verificationMaterial": "z6Mkmj3sSdRgFLgPfL8ujzZKYtoSg8dqgz72MSq8bexF7Azq"
             },
             {
                 "id": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-3",
                 "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554",
-                "verification_material": "z6MknAgHAdLyfHoaDroWRNw1XiLu7jU1GXfBnnGEkEvDEHoR"
+                "verificationMaterial": "z6MknAgHAdLyfHoaDroWRNw1XiLu7jU1GXfBnnGEkEvDEHoR"
             },
             {
                 "id": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-4",
                 "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554",
-                "verification_material": "z6MkhiTEHjx3Ha49MWY48bXitkhwpgch4JK6H8xLMvftGRiG"
+                "verificationMaterial": "z6MkhiTEHjx3Ha49MWY48bXitkhwpgch4JK6H8xLMvftGRiG"
             }
         ],
         "authentication": [
@@ -44,19 +44,19 @@
             {
                 "id": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#service-1",
                 "serviceType": "type-1",
-                "service_endpoint": [
+                "serviceEndpoint": [
                     "endpoint-1"
                 ]
             },
             {
                 "id": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#service-2",
                 "serviceType": "type-2",
-                "service_endpoint": [
+                "serviceEndpoint": [
                     "endpoint-2"
                 ]
             }
         ],
-        "also_known_as": [
+        "alsoKnownAs": [
             "alias-1",
             "alias-2",
             "alias-3"
