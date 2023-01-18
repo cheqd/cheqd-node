@@ -25,7 +25,9 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 	var collectionID string
 	var signInputs []didcli.SignInput
 
-	BeforeAll(func() {
+	BeforeEach(func() {
+		tmpDir = GinkgoT().TempDir()
+
 		// Query did fee params
 		res, err := cli.QueryParams(didtypes.ModuleName, string(didtypes.ParamStoreKeyFeeParams))
 		Expect(err).To(BeNil())
@@ -37,10 +39,6 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 		err = helpers.Codec.UnmarshalJSON([]byte(res.Value), &resourceFeeParams)
 		Expect(err).To(BeNil())
-	})
-
-	BeforeEach(func() {
-		tmpDir = GinkgoT().TempDir()
 
 		// Create a new DID Doc
 		collectionID = uuid.NewString()

@@ -29,7 +29,10 @@ var _ = Describe("cheqd cli - negative resource", func() {
 	var resourceFeeParams resourcetypes.FeeParams
 	var tmpDir string
 
-	BeforeAll(func() {
+	BeforeEach(func() {
+		// Initialize tmpDir
+		tmpDir = GinkgoT().TempDir()
+
 		// Query did fee params
 		res, err := cli.QueryParams(didtypes.ModuleName, string(didtypes.ParamStoreKeyFeeParams))
 		Expect(err).To(BeNil())
@@ -41,21 +44,16 @@ var _ = Describe("cheqd cli - negative resource", func() {
 		Expect(err).To(BeNil())
 		err = helpers.Codec.UnmarshalJSON([]byte(res.Value), &resourceFeeParams)
 		Expect(err).To(BeNil())
-	})
-
-	BeforeEach(func() {
-		// Initialize tmpDir
-		tmpDir = GinkgoT().TempDir()
 
 		// Create a new DID Doc
 		collectionID = uuid.NewString()
 		did := "did:cheqd:" + network.DidNamespace + ":" + collectionID
 		keyId := did + "#key1"
 
-		pubKey, privateKey, err := ed25519.GenerateKey(nil)
+		publicKey, privateKey, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
 
-		publicKeyMultibase := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(pubKey)
+		publicKeyMultibase := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(publicKey)
 
 		payload := didcli.DIDDocument{
 			ID: did,
@@ -77,9 +75,9 @@ var _ = Describe("cheqd cli - negative resource", func() {
 			},
 		}
 
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(didFeeParams.CreateDid.String()))
+		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(didFeeParams.CreateDid.String()))
 		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(0))
+		Expect(resp.Code).To(BeEquivalentTo(0))
 
 		// Initialize shared values
 		resourceID = uuid.NewString()

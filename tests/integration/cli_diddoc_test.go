@@ -23,16 +23,14 @@ var _ = Describe("cheqd cli - positive did", func() {
 	var tmpDir string
 	var feeParams types.FeeParams
 
-	BeforeAll(func() {
+	BeforeEach(func() {
+		tmpDir = GinkgoT().TempDir()
+
 		// Query fee params
 		res, err := cli.QueryParams(types.ModuleName, string(types.ParamStoreKeyFeeParams))
 		Expect(err).To(BeNil())
 		err = helpers.Codec.UnmarshalJSON([]byte(res.Value), &feeParams)
 		Expect(err).To(BeNil())
-	})
-
-	BeforeEach(func() {
-		tmpDir = GinkgoT().TempDir()
 	})
 
 	It("can create diddoc, update it and query the result (Ed25519VerificationKey2020)", func() {

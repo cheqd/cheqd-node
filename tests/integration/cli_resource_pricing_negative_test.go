@@ -40,7 +40,9 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 	var collectionID string
 	var signInputs []didcli.SignInput
 
-	BeforeAll(func() {
+	BeforeEach(func() {
+		tmpDir = GinkgoT().TempDir()
+
 		// Query did fee params
 		res, err := cli.QueryParams(didtypes.ModuleName, string(didtypes.ParamStoreKeyFeeParams))
 		Expect(err).To(BeNil())
@@ -52,20 +54,16 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 		err = helpers.Codec.UnmarshalJSON([]byte(res.Value), &resourceFeeParams)
 		Expect(err).To(BeNil())
-	})
-
-	BeforeEach(func() {
-		tmpDir = GinkgoT().TempDir()
 
 		// Create a new DID Doc
 		collectionID = uuid.NewString()
 		did := "did:cheqd:" + network.DidNamespace + ":" + collectionID
 		keyId := did + "#key1"
 
-		pubKey, privKey, err := ed25519.GenerateKey(nil)
+		publicKey, privKey, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
 
-		publicKeyMultibase := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(pubKey)
+		publicKeyMultibase := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(publicKey)
 
 		didPayload := didcli.DIDDocument{
 			ID: did,

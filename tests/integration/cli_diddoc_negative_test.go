@@ -22,16 +22,14 @@ var _ = Describe("cheqd cli - negative did", func() {
 	var tmpDir string
 	var feeParams didtypes.FeeParams
 
-	BeforeAll(func() {
+	BeforeEach(func() {
+		tmpDir = GinkgoT().TempDir()
+
 		// Query fee params
 		res, err := cli.QueryParams(didtypes.ModuleName, string(didtypes.ParamStoreKeyFeeParams))
 		Expect(err).To(BeNil())
 		err = helpers.Codec.UnmarshalJSON([]byte(res.Value), &feeParams)
 		Expect(err).To(BeNil())
-	})
-
-	BeforeEach(func() {
-		tmpDir = GinkgoT().TempDir()
 	})
 
 	It("cannot create diddoc with missing cli arguments, sign inputs mismatch, non-supported VM type, already existing did", func() {
