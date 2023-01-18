@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"encoding/json"
 	"os"
 
 	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
@@ -13,23 +12,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type CreateResourceOptions struct {
-	CollectionID    string                  `json:"collection_id"`
-	ResourceID      string                  `json:"resource_id"`
-	ResourceName    string                  `json:"resource_name"`
-	ResourceVersion string                  `json:"resource_version"`
-	ResourceType    string                  `json:"resource_type"`
-	ResourceFile    string                  `json:"resource_file"`
-	AlsoKnownAs     []*types.AlternativeUri `json:"also_known_as"`
-}
-
 func CmdCreateResource() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create [payload-file]",
+		Use:   "create [resource-payload-file] [resource-data-file]",
 		Short: "Create a new Resource.",
-		Long: "Create a new Resource within a DID Resource Collection. " +
-			"[payload-file] is JSON encoded MsgCreateResourcePayload alongside with sign inputs.",
-		Args: cobra.ExactArgs(1),
+		Long: `Create a new Resource within a DID Resource Collection. 
+[resource-payload-file] is JSON encoded MsgCreateResourcePayload alongside with sign inputs. 
+[resource-data-file] is a path to the Resource data file.`,
+		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -37,31 +27,34 @@ func CmdCreateResource() *cobra.Command {
 			}
 
 			payloadFile := args[0]
+			dataFile := args[1]
 
 			payloadJSON, signInputs, err := didcli.ReadPayloadWithSignInputsFromFile(payloadFile)
 			if err != nil {
 				return err
 			}
 
-			var options CreateResourceOptions
-			err = json.Unmarshal(payloadJSON, &options)
+			// Unmarshal payload
+			var payload types.MsgCreateResourcePayload
+			err = clientCtx.Codec.Unmarshal(payloadJSON, &payload)
 			if err != nil {
 				return err
 			}
 
-			data, err := os.ReadFile(options.ResourceFile)
+			// Read data file
+			data, err := os.ReadFile(dataFile)
 			if err != nil {
 				return err
 			}
 
 			// Prepare payload
-			payload := types.MsgCreateResourcePayload{
-				CollectionId: options.CollectionID,
-				Id:           options.ResourceID,
-				Name:         options.ResourceName,
-				Version:      options.ResourceVersion,
-				ResourceType: options.ResourceType,
-				AlsoKnownAs:  options.AlsoKnownAs,
+			payload = types.MsgCreateResourcePayload{
+				CollectionId: payload.CollectionId,
+				Id:           payload.Id,
+				Name:         payload.Name,
+				Version:      payload.Version,
+				ResourceType: payload.ResourceType,
+				AlsoKnownAs:  payload.AlsoKnownAs,
 				Data:         data,
 			}
 

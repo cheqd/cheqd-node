@@ -14,6 +14,32 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	FlagVersionId = "version-id"
+)
+
+type DIDDocument struct {
+	Context              []string
+	Id                   string
+	Controller           []string
+	VerificationMethod   []VerificationMethod
+	Authentication       []string
+	AssertionMethod      []string
+	CapabilityInvocation []string
+	CapabilityDelegation []string
+	KeyAgreement         []string
+	Service              []Service
+	AlsoKnownAs          []string
+}
+
+type VerificationMethod map[string]interface{}
+
+type Service struct {
+	Id              string
+	Type            string
+	ServiceEndpoint []string
+}
+
 type PayloadWithSignInputs struct {
 	Payload    json.RawMessage
 	SignInputs []SignInput
@@ -102,4 +128,73 @@ func ReadPayloadWithSignInputsFromFile(filePath string) (json.RawMessage, []Sign
 	}
 
 	return payloadWithSignInputs.Payload, payloadWithSignInputs.SignInputs, nil
+}
+
+func GetFromSpecCompliantPayload(specPayload DIDDocument) ([]*types.VerificationMethod, []*types.Service, error) {
+	verificationMethod := make([]*types.VerificationMethod, 0, len(specPayload.VerificationMethod))
+	for i, vm := range specPayload.VerificationMethod {
+		var verificationMethodType string
+		if value, ok := vm["type"].(string); !ok {
+			return nil, nil, fmt.Errorf("%d: verification method type is not specified", i)
+		} else {
+			verificationMethodType = value
+		}
+
+		switch verificationMethodType {
+		case "Ed25519VerificationKey2020":
+			_, ok := vm["publicKeyMultibase"]
+			if !ok {
+				return nil, nil, fmt.Errorf("%d: publicKeyMultibase is not specified", i)
+			}
+
+			verificationMethod = append(verificationMethod, &types.VerificationMethod{
+				Id:                     vm["id"].(string),
+				VerificationMethodType: vm["type"].(string),
+				Controller:             vm["controller"].(string),
+				VerificationMaterial:   vm["publicKeyMultibase"].(string),
+			})
+		case "Ed25519VerificationKey2018":
+			_, ok := vm["publicKeyBase58"]
+			if !ok {
+				return nil, nil, fmt.Errorf("%d: publicKeyBase58 is not specified", i)
+			}
+
+			verificationMethod = append(verificationMethod, &types.VerificationMethod{
+				Id:                     vm["id"].(string),
+				VerificationMethodType: vm["type"].(string),
+				Controller:             vm["controller"].(string),
+				VerificationMaterial:   vm["publicKeyBase58"].(string),
+			})
+		case "JsonWebKey2020":
+			_, ok := vm["publicKeyJwk"]
+			if !ok {
+				return nil, nil, fmt.Errorf("%d: publicKeyJwk is not specified", i)
+			}
+
+			jwk, err := json.Marshal(vm["publicKeyJwk"])
+			if err != nil {
+				return nil, nil, err
+			}
+
+			verificationMethod = append(verificationMethod, &types.VerificationMethod{
+				Id:                     vm["id"].(string),
+				VerificationMethodType: vm["type"].(string),
+				Controller:             vm["controller"].(string),
+				VerificationMaterial:   string(jwk),
+			})
+		default:
+			return nil, nil, fmt.Errorf("%d: verification method type is not supported", i)
+		}
+	}
+
+	service := make([]*types.Service, 0, len(specPayload.Service))
+	for _, s := range specPayload.Service {
+		service = append(service, &types.Service{
+			Id:              s.Id,
+			ServiceType:     s.Type,
+			ServiceEndpoint: s.ServiceEndpoint,
+		})
+	}
+
+	return verificationMethod, service, nil
 }

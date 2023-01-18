@@ -2,6 +2,7 @@ package cli
 
 import (
 	"github.com/cheqd/cheqd-node/x/did/types"
+	"github.com/cheqd/cheqd-node/x/did/utils"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -13,8 +14,10 @@ func CmdDeactivateDidDoc() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "deactivate-did [payload-file]",
 		Short: "Deactivate a DID.",
-		Long: "Deactivates a DID and its associated DID Document." +
-			"[payload-file] is JSON encoded MsgCreateDidDocPayload alongside with sign inputs.",
+		Long: `Deactivates a DID and its associated DID Document. 
+[payload-file] is JSON encoded MsgCreateDidDocPayload alongside with sign inputs. 
+Version ID is optional and is determined by the '--version-id' flag. 
+If not provided, a random UUID will be used as version-id.`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -22,7 +25,23 @@ func CmdDeactivateDidDoc() *cobra.Command {
 				return err
 			}
 
+			// Read payload file arg
 			payloadFile := args[0]
+
+			// Read version-id flag
+			versionId, err := cmd.Flags().GetString(FlagVersionId)
+			if err != nil {
+				return err
+			}
+
+			if versionId != "" {
+				err = utils.ValidateUUID(versionId)
+				if err != nil {
+					return err
+				}
+			} else {
+				versionId = uuid.NewString()
+			}
 
 			payloadJSON, signInputs, err := ReadPayloadWithSignInputsFromFile(payloadFile)
 			if err != nil {
@@ -36,10 +55,8 @@ func CmdDeactivateDidDoc() *cobra.Command {
 				return err
 			}
 
-			// Check for versionId
-			if payload.VersionId == "" {
-				payload.VersionId = uuid.NewString()
-			}
+			// Set version id from flag or random
+			payload.VersionId = versionId
 
 			// Build identity message
 			signBytes := payload.GetSignBytes()
