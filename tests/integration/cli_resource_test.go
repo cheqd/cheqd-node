@@ -105,6 +105,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		Expect(res2.Resource.Metadata.CollectionId).To(BeEquivalentTo(collectionID))
 		Expect(res2.Resource.Metadata.Id).To(BeEquivalentTo(resourceID))
 		Expect(res2.Resource.Metadata.Name).To(BeEquivalentTo(resourceName))
+		Expect(res2.Resource.Metadata.Version).To(BeEquivalentTo(resourceVersion))
 		Expect(res2.Resource.Metadata.ResourceType).To(BeEquivalentTo(resourceType))
 		Expect(res2.Resource.Metadata.MediaType).To(Equal("application/json"))
 		Expect(res2.Resource.Resource.Data).To(BeEquivalentTo(testdata.JSON_FILE_CONTENT))
@@ -117,6 +118,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		Expect(res3.Resource.CollectionId).To(BeEquivalentTo(collectionID))
 		Expect(res3.Resource.Id).To(BeEquivalentTo(resourceID))
 		Expect(res3.Resource.Name).To(BeEquivalentTo(resourceName))
+		Expect(res3.Resource.Version).To(BeEquivalentTo(resourceVersion))
 		Expect(res3.Resource.ResourceType).To(BeEquivalentTo(resourceType))
 		Expect(res3.Resource.MediaType).To(Equal("application/json"))
 
@@ -136,6 +138,31 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		}, signInputs, nextResourceFile, nextResourceId, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
+
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "can query resource"))
+		// Query the Resource
+		res2, err = cli.QueryResource(collectionID, resourceID)
+		Expect(err).To(BeNil())
+
+		Expect(res2.Resource.Metadata.CollectionId).To(BeEquivalentTo(collectionID))
+		Expect(res2.Resource.Metadata.Id).To(BeEquivalentTo(resourceID))
+		Expect(res2.Resource.Metadata.Name).To(BeEquivalentTo(resourceName))
+		Expect(res2.Resource.Metadata.Version).To(BeEquivalentTo(resourceVersion))
+		Expect(res2.Resource.Metadata.ResourceType).To(BeEquivalentTo(resourceType))
+		Expect(res2.Resource.Metadata.MediaType).To(Equal("application/json"))
+		Expect(res2.Resource.Resource.Data).To(BeEquivalentTo(testdata.JSON_FILE_CONTENT))
+
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "can query resource metadata"))
+		// Query the Resource Metadata
+		res3, err = cli.QueryResourceMetadata(collectionID, resourceID)
+		Expect(err).To(BeNil())
+
+		Expect(res3.Resource.CollectionId).To(BeEquivalentTo(collectionID))
+		Expect(res3.Resource.Id).To(BeEquivalentTo(resourceID))
+		Expect(res3.Resource.Name).To(BeEquivalentTo(resourceName))
+		Expect(res3.Resource.Version).To(BeEquivalentTo(resourceVersion))
+		Expect(res3.Resource.ResourceType).To(BeEquivalentTo(resourceType))
+		Expect(res3.Resource.MediaType).To(Equal("application/json"))
 
 		// Create a second DID Doc
 		secondCollectionId := uuid.NewString()
@@ -189,6 +216,31 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		}, secondSignInputs, secondResourceFile, secondResourceId, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
+
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "can query resource"))
+		// Query the Resource
+		res2, err = cli.QueryResource(secondCollectionId, secondResourceId)
+		Expect(err).To(BeNil())
+
+		Expect(res2.Resource.Metadata.CollectionId).To(BeEquivalentTo(secondCollectionId))
+		Expect(res2.Resource.Metadata.Id).To(BeEquivalentTo(secondResourceId))
+		Expect(res2.Resource.Metadata.Name).To(BeEquivalentTo(secondResourceName))
+		Expect(res2.Resource.Metadata.Version).To(BeEquivalentTo(secondResourceVersion))
+		Expect(res2.Resource.Metadata.ResourceType).To(BeEquivalentTo(secondResourceType))
+		Expect(res2.Resource.Metadata.MediaType).To(Equal("application/json"))
+		Expect(res2.Resource.Resource.Data).To(BeEquivalentTo(testdata.JSON_FILE_CONTENT))
+
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "can query resource metadata"))
+		// Query the Resource Metadata
+		res3, err = cli.QueryResourceMetadata(secondCollectionId, secondResourceId)
+		Expect(err).To(BeNil())
+
+		Expect(res3.Resource.CollectionId).To(BeEquivalentTo(secondCollectionId))
+		Expect(res3.Resource.Id).To(BeEquivalentTo(secondResourceId))
+		Expect(res3.Resource.Name).To(BeEquivalentTo(secondResourceName))
+		Expect(res3.Resource.Version).To(BeEquivalentTo(secondResourceVersion))
+		Expect(res3.Resource.ResourceType).To(BeEquivalentTo(secondResourceType))
+		Expect(res3.Resource.MediaType).To(Equal("application/json"))
 
 		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "can query resource collection"))
 		// Query Resource Collection
