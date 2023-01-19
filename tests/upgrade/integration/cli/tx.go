@@ -25,8 +25,6 @@ func Tx(container string, binary string, module, tx, from string, txArgs ...stri
 
 	// Other args
 	args = append(args, txArgs...)
-	fmt.Println("------------------ TX ARGS ------------------")
-	fmt.Println(args)
 
 	output, err := LocalnetExecExec(container, args...)
 	if err != nil {
