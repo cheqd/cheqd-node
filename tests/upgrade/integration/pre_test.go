@@ -11,7 +11,6 @@ import (
 	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
 	govtypesv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
-	// upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types" <-- TODO: uncomment when whole sequence of upgrade tests is ready
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
