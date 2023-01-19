@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"path/filepath"
 
-	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/cli"
 	clihelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
+	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/cli"
 	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
 	didtypesv2 "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypesv2 "github.com/cheqd/cheqd-node/x/resource/types"
