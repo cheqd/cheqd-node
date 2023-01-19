@@ -1,4 +1,4 @@
-//go:build upgrade_integration
+// go:build upgrade_integration
 
 package integration
 
@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/cli"
+	clihelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
 	didtypesv2 "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypesv2 "github.com/cheqd/cheqd-node/x/resource/types"
@@ -16,6 +17,16 @@ import (
 )
 
 var _ = Describe("Upgrade - Post", func() {
+	var feeParams didtypesv2.FeeParams
+
+	BeforeEach(func() {
+		// Query fee params
+		res, err := cli.QueryParams(cli.Validator0, didtypesv2.ModuleName, string(didtypesv2.ParamStoreKeyFeeParams))
+		Expect(err).To(BeNil())
+		err = clihelpers.Codec.UnmarshalJSON([]byte(res.Value), &feeParams)
+		Expect(err).To(BeNil())
+	})
+
 	Context("After a software upgrade execution has concluded", func() {
 		It("should wait for node catching up", func() {
 			By("pinging the node status until catching up is flagged as false")
@@ -63,7 +74,8 @@ var _ = Describe("Upgrade - Post", func() {
 				DidDocUpdateSignInput, err = Loader(payload, &DidDocUpdatePayload)
 				Expect(err).To(BeNil())
 
-				res, err := cli.UpdateDid(DidDocUpdatePayload, DidDocUpdateSignInput, cli.Validator0)
+				tax := feeParams.UpdateDid.String()
+				res, err := cli.UpdateDid(DidDocUpdatePayload, DidDocUpdateSignInput, cli.Validator0, tax)
 				Expect(err).To(BeNil())
 				Expect(res.Code).To(BeEquivalentTo(0))
 			}
@@ -86,7 +98,8 @@ var _ = Describe("Upgrade - Post", func() {
 				DidDocDeactivateSignInput, err = Loader(payload, &DidDocDeacctivatePayload)
 				Expect(err).To(BeNil())
 
-				res, err := cli.DeactivateDid(DidDocDeacctivatePayload, DidDocDeactivateSignInput, cli.Validator0)
+				tax := feeParams.DeactivateDid.String()
+				res, err := cli.DeactivateDid(DidDocDeacctivatePayload, DidDocDeactivateSignInput, cli.Validator0, tax)
 				Expect(err).To(BeNil())
 				Expect(res.Code).To(BeEquivalentTo(0))
 			}

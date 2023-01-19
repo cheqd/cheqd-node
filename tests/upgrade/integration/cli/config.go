@@ -49,3 +49,7 @@ var (
 		"--output", OutputFormat,
 	}
 )
+
+func MakeFeeParams(fee string) []string {
+	return []string{"--fees", fee}
+}
