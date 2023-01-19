@@ -57,7 +57,7 @@ func CmdCreateResource() *cobra.Command {
 
 			// Unmarshal payload
 			var payload types.MsgCreateResourcePayload
-			err = clientCtx.Codec.Unmarshal(payloadJSON, &payload)
+			err = clientCtx.Codec.UnmarshalJSON(payloadJSON, &payload)
 			if err != nil {
 				return err
 			}
