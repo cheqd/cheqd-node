@@ -32,6 +32,9 @@ func CreateDidLegacy(payload didtypesv1.MsgCreateDidPayload, signInputs []cli.Si
 
 func CreateDid(payload cli.DIDDocument, signInputs []cli.SignInput, container, versionID, fee string) (sdk.TxResponse, error) {
 	innerPayloadJSON, err := json.Marshal(&payload)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
 
 	outerPayload := cli.PayloadWithSignInputs{
 		Payload:    innerPayloadJSON,
@@ -81,6 +84,9 @@ func UpdateDidLegacy(payload didtypesv1.MsgUpdateDidPayload, signInputs []cli.Si
 
 func UpdateDid(payload cli.DIDDocument, signInputs []cli.SignInput, container, versionID, fee string) (sdk.TxResponse, error) {
 	innerPayloadJSON, err := json.Marshal(&payload)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
 
 	outerPayload := cli.PayloadWithSignInputs{
 		Payload:    innerPayloadJSON,
