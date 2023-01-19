@@ -139,29 +139,29 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
-		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "can query resource"))
-		// Query the Resource
-		res2, err = cli.QueryResource(collectionID, resourceID)
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "can query resource next version"))
+		// Query the Resource's next version
+		res2, err = cli.QueryResource(collectionID, nextResourceId)
 		Expect(err).To(BeNil())
 
 		Expect(res2.Resource.Metadata.CollectionId).To(BeEquivalentTo(collectionID))
-		Expect(res2.Resource.Metadata.Id).To(BeEquivalentTo(resourceID))
-		Expect(res2.Resource.Metadata.Name).To(BeEquivalentTo(resourceName))
-		Expect(res2.Resource.Metadata.Version).To(BeEquivalentTo(resourceVersion))
-		Expect(res2.Resource.Metadata.ResourceType).To(BeEquivalentTo(resourceType))
+		Expect(res2.Resource.Metadata.Id).To(BeEquivalentTo(nextResourceId))
+		Expect(res2.Resource.Metadata.Name).To(BeEquivalentTo(nextResourceName))
+		Expect(res2.Resource.Metadata.Version).To(BeEquivalentTo(nextResourceVersion))
+		Expect(res2.Resource.Metadata.ResourceType).To(BeEquivalentTo(nextResourceType))
 		Expect(res2.Resource.Metadata.MediaType).To(Equal("application/json"))
 		Expect(res2.Resource.Resource.Data).To(BeEquivalentTo(testdata.JSON_FILE_CONTENT))
 
 		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "can query resource metadata"))
-		// Query the Resource Metadata
-		res3, err = cli.QueryResourceMetadata(collectionID, resourceID)
+		// Query the Resource's next version Metadata
+		res3, err = cli.QueryResourceMetadata(collectionID, nextResourceId)
 		Expect(err).To(BeNil())
 
 		Expect(res3.Resource.CollectionId).To(BeEquivalentTo(collectionID))
-		Expect(res3.Resource.Id).To(BeEquivalentTo(resourceID))
-		Expect(res3.Resource.Name).To(BeEquivalentTo(resourceName))
-		Expect(res3.Resource.Version).To(BeEquivalentTo(resourceVersion))
-		Expect(res3.Resource.ResourceType).To(BeEquivalentTo(resourceType))
+		Expect(res3.Resource.Id).To(BeEquivalentTo(nextResourceId))
+		Expect(res3.Resource.Name).To(BeEquivalentTo(nextResourceName))
+		Expect(res3.Resource.Version).To(BeEquivalentTo(nextResourceVersion))
+		Expect(res3.Resource.ResourceType).To(BeEquivalentTo(nextResourceType))
 		Expect(res3.Resource.MediaType).To(Equal("application/json"))
 
 		// Create a second DID Doc
