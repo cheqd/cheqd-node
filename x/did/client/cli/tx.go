@@ -63,7 +63,6 @@ func AddTxFlagsToCmd(cmd *cobra.Command) {
 	cmd.Flags().String(flags.FlagGasPrices, "", "Gas prices in decimal format to determine the transaction fee (e.g. 0.1ncheq)")
 	cmd.Flags().String(flags.FlagNode, "tcp://localhost:26657", "<host>:<port> to tendermint rpc interface for this chain")
 	cmd.Flags().Bool(flags.FlagUseLedger, false, "Use a connected Ledger device")
-	cmd.Flags().Float64(flags.FlagGasAdjustment, flags.DefaultGasAdjustment, "adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set manually this flag is ignored ")
 	cmd.Flags().StringP(flags.FlagBroadcastMode, "b", flags.BroadcastSync, "Transaction broadcasting mode (sync|async|block)")
 	cmd.Flags().Bool(flags.FlagDryRun, false, "ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it (when enabled, the local Keybase is not accessible)")
 	cmd.Flags().Bool(flags.FlagGenerateOnly, false, "Build an unsigned transaction and write it to STDOUT (when enabled, the local Keybase only accessed when providing a key name)")
@@ -77,7 +76,11 @@ func AddTxFlagsToCmd(cmd *cobra.Command) {
 	cmd.Flags().String(flags.FlagTip, "", "Tip is the amount that is going to be transferred to the fee payer on the target chain. This flag is only valid when used with --aux, and is ignored if the target chain didn't enable the TipDecorator")
 	cmd.Flags().Bool(flags.FlagAux, false, "Generate aux signer data instead of sending a tx")
 
-	// flags --fees and --gas are added by each module's tx command
+	// overrides
+	cmd.Flags().String(flags.FlagGas, flags.GasFlagAuto, fmt.Sprintf("Gas limit to set per-transaction; set to %q to calculate sufficient gas automatically", flags.GasFlagAuto))
+	cmd.Flags().Float64(flags.FlagGasAdjustment, 1.8, "adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set manually this flag is ignored ")
+
+	// flags --fees added by each module's tx command
 }
 
 // GetTxCmd returns the transaction commands for this module

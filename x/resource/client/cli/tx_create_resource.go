@@ -99,7 +99,7 @@ func CmdCreateResource() *cobra.Command {
 	}
 
 	// add standard tx flags
-	didcli.AddTxFlagsToCmd(cmd)
+	AddTxFlagsToCmd(cmd)
 
 	// add custom / override flags
 	cmd.Flags().String(FlagResourceID, "", "The Resource ID. If not set, a random UUID will be generated.")
