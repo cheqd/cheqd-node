@@ -47,7 +47,7 @@ func Tx(container string, binary string, module, tx, from string, txArgs ...stri
 func SubmitParamChangeProposal(container string, pathToDir ...string) (sdk.TxResponse, error) {
 	fmt.Println("Submitting param change proposal from", container)
 	args := append([]string{
-		CLIBinaryName,
+		CliBinaryName,
 		"tx", "gov", "submit-legacy-proposal", "param-change", filepath.Join(pathToDir...),
 		"--from", OperatorAccounts[container],
 	}, TXParams...)
@@ -78,7 +78,7 @@ func SubmitParamChangeProposal(container string, pathToDir ...string) (sdk.TxRes
 func SubmitUpgradeProposal(upgradeHeight int64, container string) (sdk.TxResponse, error) {
 	fmt.Println("Submitting upgrade proposal from", container)
 	args := append([]string{
-		CLIBinaryName,
+		CliBinaryName,
 		"tx", "gov", "submit-proposal", "software-upgrade",
 		UpgradeName,
 		"--title", "Upgrade Title",
@@ -111,7 +111,7 @@ func SubmitUpgradeProposal(upgradeHeight int64, container string) (sdk.TxRespons
 func DepositGov(container string) (sdk.TxResponse, error) {
 	fmt.Println("Depositing from", container)
 	args := append([]string{
-		CLIBinaryName,
+		CliBinaryName,
 		"tx", "gov", "deposit", "1", DepositAmount,
 		"--from", OperatorAccounts[container],
 	}, TXParams...)
@@ -138,7 +138,7 @@ func DepositGov(container string) (sdk.TxResponse, error) {
 func VoteProposal(container, id, option string) (sdk.TxResponse, error) {
 	fmt.Println("Voting from", container)
 	args := append([]string{
-		CLIBinaryName,
+		CliBinaryName,
 		"tx", "gov", "vote", id, option,
 		"--from", OperatorAccounts[container],
 	}, TXParams...)

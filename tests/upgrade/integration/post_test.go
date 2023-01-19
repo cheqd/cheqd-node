@@ -36,17 +36,17 @@ var _ = Describe("Upgrade - Post", func() {
 	Context("After a software upgrade execution has concluded", func() {
 		It("should wait for node catching up", func() {
 			By("pinging the node status until catching up is flagged as false")
-			err := cli.WaitForCaughtUp(cli.Validator0, cli.CLIBinaryName, cli.VotingPeriod*6)
+			err := cli.WaitForCaughtUp(cli.Validator0, cli.CliBinaryName, cli.VotingPeriod*6)
 			Expect(err).To(BeNil())
 		})
 
 		It("should wait for a certain number of blocks to be produced", func() {
 			By("fetching the current chain height")
-			currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CLIBinaryName)
+			currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
 			Expect(err).To(BeNil())
 
 			By("waiting for 10 blocks to be produced on top, after the upgrade")
-			err = cli.WaitForChainHeight(cli.Validator0, cli.CLIBinaryName, currentHeight+10, cli.VotingPeriod*6)
+			err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+10, cli.VotingPeriod*6)
 			Expect(err).To(BeNil())
 		})
 
@@ -214,7 +214,7 @@ var _ = Describe("Upgrade - Post", func() {
 				Expect(res.Resource.Metadata.ResourceType).To(Equal(ResourceCreateRecord.Metadata.ResourceType))
 				Expect(res.Resource.Metadata.AlsoKnownAs).To(Equal(ResourceCreateRecord.Metadata.AlsoKnownAs))
 				Expect(res.Resource.Metadata.MediaType).To(Equal(ResourceCreateRecord.Metadata.MediaType))
-				// Created fills while creating. We just ignoring it while checking.
+				// Created is populated on successful creation. We are ignoring it here.
 				// Expect(res.Resource.Metadata.Created).To(Equal(ResourceCreateRecord.Metadata.Created))
 				Expect(res.Resource.Metadata.Checksum).To(Equal(ResourceCreateRecord.Metadata.Checksum))
 				Expect(res.Resource.Metadata.PreviousVersionId).To(Equal(ResourceCreateRecord.Metadata.PreviousVersionId))

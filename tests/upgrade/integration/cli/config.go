@@ -7,14 +7,9 @@ import (
 )
 
 const (
-	CLIBinaryName = integrationcli.CliBinaryName
+	CliBinaryName = integrationcli.CliBinaryName
 	Green         = integrationcli.Green
 	Purple        = integrationcli.Purple
-)
-
-const (
-	CLIBinaryNamePrevious = CLIBinaryName + "-previous"
-	CLIBinaryNameNext     = CLIBinaryName + "-next"
 )
 
 const (

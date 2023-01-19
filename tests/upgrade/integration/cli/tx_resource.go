@@ -6,21 +6,11 @@ import (
 	"path/filepath"
 
 	integrationcli "github.com/cheqd/cheqd-node/tests/integration/cli"
-	"github.com/cheqd/cheqd-node/tests/integration/helpers"
+	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/x/did/client/cli"
 	types "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
-
-type CreateResourceOptions struct {
-	CollectionID    string                  `json:"collection_id"`
-	ResourceID      string                  `json:"resource_id"`
-	ResourceName    string                  `json:"resource_name"`
-	ResourceVersion string                  `json:"resource_version"`
-	ResourceType    string                  `json:"resource_type"`
-	ResourceFile    string                  `json:"resource_file"`
-	AlsoKnownAs     []*types.AlternativeUri `json:"also_known_as"`
-}
 
 func CreateResourceLegacy(collectionID string, resourceID string, resourceName string, resourceType string, resourceFile string, signInputs []cli.SignInput, container string) (sdk.TxResponse, error) {
 	args := []string{
@@ -38,14 +28,14 @@ func CreateResourceLegacy(collectionID string, resourceID string, resourceName s
 
 	args = append(args, GasParams...)
 
-	return Tx(container, CLIBinaryName, "resource", "create-resource", OperatorAccounts[container], args...)
+	return Tx(container, CliBinaryName, "resource", "create-resource", OperatorAccounts[container], args...)
 }
 
-func CreateResource(payload types.MsgCreateResourcePayload, resourceFile string, signInputs []cli.SignInput, container, fee string) (sdk.TxResponse, error) {
+func CreateResource(payload types.MsgCreateResourcePayload, resourceFile string, signInputs []cli.SignInput, container, fees string) (sdk.TxResponse, error) {
 	resourceFileName := filepath.Base(resourceFile)
 	payloadFileName := "payload.json"
 
-	payloadJSON, err := helpers.Codec.MarshalJSON(&payload)
+	payloadJSON, err := integrationhelpers.Codec.MarshalJSON(&payload)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
@@ -71,9 +61,8 @@ func CreateResource(payload types.MsgCreateResourcePayload, resourceFile string,
 	}
 	args := []string{payloadFileName}
 	args = append(args, resourceFileName)
-	// args = append(args, GasParams...)
 	args = append(args, integrationcli.FlagResourceID, payload.Id)
-	args = append(args, helpers.GenerateFees(fee)...)
+	args = append(args, integrationhelpers.GenerateFees(fees)...)
 
-	return Tx(container, CLIBinaryName, "resource", "create", OperatorAccounts[container], args...)
+	return Tx(container, CliBinaryName, "resource", "create", OperatorAccounts[container], args...)
 }
