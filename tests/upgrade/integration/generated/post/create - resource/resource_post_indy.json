@@ -4,7 +4,7 @@
         "collection_id": "5rjaLzcffhGUH4nt4fyfAg",
         "id": "9fbb1b86-91f8-4942-97b9-725b7714131c",
         "name": "Test Resource After Upgrade Name Indy Case",
-        "version": "",
+        "version": "1.0",
         "resource_type": "CL-Schema",
         "also_known_as": [
             {
