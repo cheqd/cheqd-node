@@ -18,12 +18,18 @@ import (
 
 var _ = Describe("Upgrade - Post", func() {
 	var feeParams didtypesv2.FeeParams
+	var resourceFeeParams resourcetypesv2.FeeParams
 
 	BeforeEach(func() {
 		// Query fee params
 		res, err := cli.QueryParams(cli.Validator0, didtypesv2.ModuleName, string(didtypesv2.ParamStoreKeyFeeParams))
 		Expect(err).To(BeNil())
 		err = clihelpers.Codec.UnmarshalJSON([]byte(res.Value), &feeParams)
+		Expect(err).To(BeNil())
+
+		res, err = cli.QueryParams(cli.Validator0, resourcetypesv2.ModuleName, string(resourcetypesv2.ParamStoreKeyFeeParams))
+		Expect(err).To(BeNil())
+		err = clihelpers.Codec.UnmarshalJSON([]byte(res.Value), &resourceFeeParams)
 		Expect(err).To(BeNil())
 	})
 
@@ -128,6 +134,7 @@ var _ = Describe("Upgrade - Post", func() {
 					ResourceFile,
 					signInputs,
 					cli.Validator0,
+					resourceFeeParams.Json.String(),
 				)
 
 				Expect(err).To(BeNil())

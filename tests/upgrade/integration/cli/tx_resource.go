@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"path/filepath"
 
+	integrationcli "github.com/cheqd/cheqd-node/tests/integration/cli"
+	"github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/x/did/client/cli"
 	types "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -39,21 +41,11 @@ func CreateResourceLegacy(collectionID string, resourceID string, resourceName s
 	return Tx(container, CLIBinaryName, "resource", "create-resource", OperatorAccounts[container], args...)
 }
 
-func CreateResource(msg types.MsgCreateResourcePayload, resourceFile string, signInputs []cli.SignInput, container string) (sdk.TxResponse, error) {
+func CreateResource(payload types.MsgCreateResourcePayload, resourceFile string, signInputs []cli.SignInput, container, fee string) (sdk.TxResponse, error) {
 	resourceFileName := filepath.Base(resourceFile)
 	payloadFileName := "payload.json"
 
-	resourceOptions := CreateResourceOptions{
-		CollectionID:    msg.CollectionId,
-		ResourceID:      msg.Id,
-		ResourceName:    msg.Name,
-		ResourceVersion: msg.Version,
-		ResourceType:    msg.ResourceType,
-		ResourceFile:    resourceFileName,
-		AlsoKnownAs:     msg.AlsoKnownAs,
-	}
-
-	payloadJSON, err := json.Marshal(&resourceOptions)
+	payloadJSON, err := helpers.Codec.MarshalJSON(&payload)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
@@ -73,12 +65,15 @@ func CreateResource(msg types.MsgCreateResourcePayload, resourceFile string, sig
 		return sdk.TxResponse{}, err
 	}
 
-	_, err = LocalnetExecExec(container, "/bin/bash", "-c", "echo '"+string(msg.Data)+"' > "+resourceFileName)
+	_, err = LocalnetExecExec(container, "/bin/bash", "-c", "echo '"+string(payload.Data)+"' > "+resourceFileName)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
 	args := []string{payloadFileName}
-	args = append(args, GasParams...)
+	args = append(args, resourceFileName)
+	// args = append(args, GasParams...)
+	args = append(args, integrationcli.FlagResourceID, payload.Id)
+	args = append(args, helpers.GenerateFees(fee)...)
 
 	return Tx(container, CLIBinaryName, "resource", "create", OperatorAccounts[container], args...)
 }

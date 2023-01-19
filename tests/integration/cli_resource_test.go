@@ -90,7 +90,6 @@ var _ = Describe("cheqd cli - positive resource", func() {
 
 		res, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
-			Id:           resourceID,
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
