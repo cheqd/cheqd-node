@@ -12,27 +12,27 @@
         "verificationMethod": [
             {
                 "id": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-1",
-                "verificationMethodType": "Ed25519VerificationKey2020",
+                "type": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554",
-                "verificationMaterial": "z6MkkEW1CN6EsnHgjX48Xvn2mAzhLrpQpDHh9iwpmxRn2NNi"
+                "publicKeyMultibase": "z6MkkEW1CN6EsnHgjX48Xvn2mAzhLrpQpDHh9iwpmxRn2NNi"
             },
             {
                 "id": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-2",
-                "verificationMethodType": "Ed25519VerificationKey2020",
+                "type": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554",
-                "verificationMaterial": "z6Mkmj3sSdRgFLgPfL8ujzZKYtoSg8dqgz72MSq8bexF7Azq"
+                "publicKeyMultibase": "z6Mkmj3sSdRgFLgPfL8ujzZKYtoSg8dqgz72MSq8bexF7Azq"
             },
             {
                 "id": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-3",
-                "verificationMethodType": "Ed25519VerificationKey2020",
+                "type": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554",
-                "verificationMaterial": "z6MknAgHAdLyfHoaDroWRNw1XiLu7jU1GXfBnnGEkEvDEHoR"
+                "publicKeyMultibase": "z6MknAgHAdLyfHoaDroWRNw1XiLu7jU1GXfBnnGEkEvDEHoR"
             },
             {
                 "id": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-4",
-                "verificationMethodType": "Ed25519VerificationKey2020",
+                "type": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554",
-                "verificationMaterial": "z6MkhiTEHjx3Ha49MWY48bXitkhwpgch4JK6H8xLMvftGRiG"
+                "publicKeyMultibase": "z6MkhiTEHjx3Ha49MWY48bXitkhwpgch4JK6H8xLMvftGRiG"
             }
         ],
         "authentication": [
@@ -43,14 +43,14 @@
         "service": [
             {
                 "id": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#service-1",
-                "serviceType": "type-1",
+                "type": "type-1",
                 "serviceEndpoint": [
                     "endpoint-1"
                 ]
             },
             {
                 "id": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#service-2",
-                "serviceType": "type-2",
+                "type": "type-2",
                 "serviceEndpoint": [
                     "endpoint-2"
                 ]

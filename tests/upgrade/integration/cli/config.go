@@ -37,19 +37,17 @@ const (
 
 var (
 	TXParams = []string{
-		"--gas", Gas,
-		"--gas-adjustment", GasAdjustment,
-		"--gas-prices", GasPrices,
 		"--keyring-backend", KeyringBackend,
 		"--chain-id", integrationnetwork.ChainID,
 		"-y",
+	}
+	GasParams = []string{
+		"--gas", Gas,
+		"--gas-adjustment", GasAdjustment,
+		"--gas-prices", GasPrices,
 	}
 	QueryParamsConst = []string{
 		"--chain-id", integrationnetwork.ChainID,
 		"--output", OutputFormat,
 	}
 )
-
-func MakeFeeParams(fee string) []string {
-	return []string{"--fees", fee}
-}

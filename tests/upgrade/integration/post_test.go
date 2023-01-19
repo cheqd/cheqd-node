@@ -63,7 +63,7 @@ var _ = Describe("Upgrade - Post", func() {
 			Expect(err).To(BeNil())
 
 			for _, payload := range DidDocUpdatePayloads {
-				var DidDocUpdatePayload didtypesv2.MsgUpdateDidDocPayload
+				var DidDocUpdatePayload didcli.DIDDocument
 				var DidDocUpdateSignInput []didcli.SignInput
 
 				testCase := GetCaseName(payload)
@@ -75,7 +75,7 @@ var _ = Describe("Upgrade - Post", func() {
 				Expect(err).To(BeNil())
 
 				tax := feeParams.UpdateDid.String()
-				res, err := cli.UpdateDid(DidDocUpdatePayload, DidDocUpdateSignInput, cli.Validator0, tax)
+				res, err := cli.UpdateDid(DidDocUpdatePayload, DidDocUpdateSignInput, cli.Validator0, "",tax)
 				Expect(err).To(BeNil())
 				Expect(res.Code).To(BeEquivalentTo(0))
 			}

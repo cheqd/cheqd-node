@@ -25,11 +25,13 @@ func CreateDidLegacy(payload didtypesv1.MsgCreateDidPayload, signInputs []cli.Si
 		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivKey))
 	}
 
+	args = append(args, GasParams...)
+
 	return Tx(container, CLIBinaryName, "cheqd", "create-did", OperatorAccounts[container], args...)
 }
 
-func CreateDid(payload didtypesv2.MsgCreateDidDocPayload, signInputs []cli.SignInput, container string, fee string) (sdk.TxResponse, error) {
-	innerPayloadJSON := integrationhelpers.Codec.MustMarshalJSON(&payload)
+func CreateDid(payload cli.DIDDocument, signInputs []cli.SignInput, container, versionID, fee string) (sdk.TxResponse, error) {
+	innerPayloadJSON, err := json.Marshal(&payload)
 
 	outerPayload := cli.PayloadWithSignInputs{
 		Payload:    innerPayloadJSON,
@@ -50,7 +52,11 @@ func CreateDid(payload didtypesv2.MsgCreateDidDocPayload, signInputs []cli.SignI
 
 	args := []string{string("payload.json")}
 
-	args = append(args, MakeFeeParams(fee)...)
+	args = append(args, integrationhelpers.GenerateFees(fee)...)
+
+	if versionID != "" {
+		args = append(args, versionID)
+	}
 
 	return Tx(container, CLIBinaryName, "cheqd", "create-did", OperatorAccounts[container], args...)
 }
@@ -68,11 +74,13 @@ func UpdateDidLegacy(payload didtypesv1.MsgUpdateDidPayload, signInputs []cli.Si
 		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivKey))
 	}
 
+	args = append(args, GasParams...)
+
 	return Tx(container, CLIBinaryName, "cheqd", "update-did", OperatorAccounts[container], args...)
 }
 
-func UpdateDid(payload didtypesv2.MsgUpdateDidDocPayload, signInputs []cli.SignInput, container string, fee string) (sdk.TxResponse, error) {
-	innerPayloadJSON := integrationhelpers.Codec.MustMarshalJSON(&payload)
+func UpdateDid(payload cli.DIDDocument, signInputs []cli.SignInput, container, versionID, fee string) (sdk.TxResponse, error) {
+	innerPayloadJSON, err := json.Marshal(&payload)
 
 	outerPayload := cli.PayloadWithSignInputs{
 		Payload:    innerPayloadJSON,
@@ -93,7 +101,11 @@ func UpdateDid(payload didtypesv2.MsgUpdateDidDocPayload, signInputs []cli.SignI
 
 	args := []string{string("payload.json")}
 
-	args = append(args, MakeFeeParams(fee)...)
+	args = append(args, integrationhelpers.GenerateFees(fee)...)
+
+	if versionID != "" {
+		args = append(args, versionID)
+	}
 
 	return Tx(container, CLIBinaryName, "cheqd", "update-did", OperatorAccounts[container], args...)
 }
@@ -110,6 +122,8 @@ func DeactivateDidLegacy(payload didtypesv1.MsgDeactivateDidPayload, signInputs 
 		args = append(args, signInput.VerificationMethodID)
 		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivKey))
 	}
+
+	args = append(args, GasParams...)
 
 	return Tx(container, CLIBinaryName, "cheqd", "deactivate-did", OperatorAccounts[container], args...)
 }
@@ -136,7 +150,7 @@ func DeactivateDid(payload didtypesv2.MsgDeactivateDidDocPayload, signInputs []c
 
 	args := []string{string("payload.json")}
 
-	args = append(args, MakeFeeParams(fee)...)
+	args = append(args, integrationhelpers.GenerateFees(fee)...)
 
 	return Tx(container, CLIBinaryName, "cheqd", "deactivate-did", OperatorAccounts[container], args...)
 }

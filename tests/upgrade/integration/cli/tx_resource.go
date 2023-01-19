@@ -34,6 +34,8 @@ func CreateResourceLegacy(collectionID string, resourceID string, resourceName s
 		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivKey))
 	}
 
+	args = append(args, GasParams...)
+
 	return Tx(container, CLIBinaryName, "resource", "create-resource", OperatorAccounts[container], args...)
 }
 
@@ -75,6 +77,8 @@ func CreateResource(msg types.MsgCreateResourcePayload, resourceFile string, sig
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
+	args := []string{payloadFileName}
+	args = append(args, GasParams...)
 
-	return Tx(container, CLIBinaryName, "resource", "create", OperatorAccounts[container], payloadFileName)
+	return Tx(container, CLIBinaryName, "resource", "create", OperatorAccounts[container], args...)
 }

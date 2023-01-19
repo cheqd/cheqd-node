@@ -25,6 +25,8 @@ func Tx(container string, binary string, module, tx, from string, txArgs ...stri
 
 	// Other args
 	args = append(args, txArgs...)
+	fmt.Println("------------------ TX ARGS ------------------")
+	fmt.Println(args)
 
 	output, err := LocalnetExecExec(container, args...)
 	if err != nil {
@@ -51,6 +53,8 @@ func SubmitParamChangeProposal(container string, pathToDir ...string) (sdk.TxRes
 		"tx", "gov", "submit-legacy-proposal", "param-change", filepath.Join(pathToDir...),
 		"--from", OperatorAccounts[container],
 	}, TXParams...)
+
+	args = append(args, GasParams...)
 
 	out, err := LocalnetExecExec(container, args...)
 	if err != nil {
@@ -86,6 +90,8 @@ func SubmitUpgradeProposal(upgradeHeight int64, container string) (sdk.TxRespons
 		"--from", OperatorAccounts[container],
 	}, TXParams...)
 
+	args = append(args, GasParams...)
+
 	out, err := LocalnetExecExec(container, args...)
 	if err != nil {
 		return sdk.TxResponse{}, err
@@ -112,6 +118,8 @@ func DepositGov(container string) (sdk.TxResponse, error) {
 		"--from", OperatorAccounts[container],
 	}, TXParams...)
 
+	args = append(args, GasParams...)
+
 	out, err := LocalnetExecExec(container, args...)
 	if err != nil {
 		return sdk.TxResponse{}, err
@@ -136,6 +144,8 @@ func VoteProposal(container, id, option string) (sdk.TxResponse, error) {
 		"tx", "gov", "vote", id, option,
 		"--from", OperatorAccounts[container],
 	}, TXParams...)
+
+	args = append(args, GasParams...)
 
 	out, err := LocalnetExecExec(container, args...)
 	if err != nil {
