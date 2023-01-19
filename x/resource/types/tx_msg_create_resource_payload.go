@@ -23,6 +23,7 @@ func (msg *MsgCreateResourcePayload) ToResource() ResourceWithMetadata {
 			CollectionId: msg.CollectionId,
 			Id:           msg.Id,
 			Name:         msg.Name,
+			Version:      msg.Version,
 			ResourceType: msg.ResourceType,
 			AlsoKnownAs:  msg.AlsoKnownAs,
 		},

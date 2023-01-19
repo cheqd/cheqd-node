@@ -74,6 +74,7 @@ If not provided, a random UUID will be used as version-id.`,
 				CapabilityDelegation: specPayload.CapabilityDelegation,
 				KeyAgreement:         specPayload.KeyAgreement,
 				Service:              service,
+				AlsoKnownAs:          specPayload.AlsoKnownAs,
 				VersionId:            versionID,
 			}
 
