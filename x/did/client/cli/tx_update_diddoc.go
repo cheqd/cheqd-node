@@ -66,11 +66,13 @@ If not provided, a random UUID will be used as version-id.`,
 
 			// Construct MsgUpdateDidDocPayload
 			payload := types.MsgUpdateDidDocPayload{
+				Context:              specPayload.Context,
 				Id:                   specPayload.ID,
 				Controller:           specPayload.Controller,
 				VerificationMethod:   verificationMethod,
 				Authentication:       specPayload.Authentication,
 				AssertionMethod:      specPayload.AssertionMethod,
+				AlsoKnownAs:		  specPayload.AlsoKnownAs,
 				CapabilityInvocation: specPayload.CapabilityInvocation,
 				CapabilityDelegation: specPayload.CapabilityDelegation,
 				KeyAgreement:         specPayload.KeyAgreement,
