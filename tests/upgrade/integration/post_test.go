@@ -1,4 +1,4 @@
-//go:build upgrade_integration
+// go:build upgrade_integration
 
 package integration
 
@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"path/filepath"
 
+	clihelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/cli"
 	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
 	didtypesv2 "github.com/cheqd/cheqd-node/x/did/types"
@@ -16,6 +17,22 @@ import (
 )
 
 var _ = Describe("Upgrade - Post", func() {
+	var feeParams didtypesv2.FeeParams
+	var resourceFeeParams resourcetypesv2.FeeParams
+
+	BeforeEach(func() {
+		// Query fee params
+		res, err := cli.QueryParams(cli.Validator0, didtypesv2.ModuleName, string(didtypesv2.ParamStoreKeyFeeParams))
+		Expect(err).To(BeNil())
+		err = clihelpers.Codec.UnmarshalJSON([]byte(res.Value), &feeParams)
+		Expect(err).To(BeNil())
+
+		res, err = cli.QueryParams(cli.Validator0, resourcetypesv2.ModuleName, string(resourcetypesv2.ParamStoreKeyFeeParams))
+		Expect(err).To(BeNil())
+		err = clihelpers.Codec.UnmarshalJSON([]byte(res.Value), &resourceFeeParams)
+		Expect(err).To(BeNil())
+	})
+
 	Context("After a software upgrade execution has concluded", func() {
 		It("should wait for node catching up", func() {
 			By("pinging the node status until catching up is flagged as false")
@@ -52,7 +69,7 @@ var _ = Describe("Upgrade - Post", func() {
 			Expect(err).To(BeNil())
 
 			for _, payload := range DidDocUpdatePayloads {
-				var DidDocUpdatePayload didtypesv2.MsgUpdateDidDocPayload
+				var DidDocUpdatePayload didcli.DIDDocument
 				var DidDocUpdateSignInput []didcli.SignInput
 
 				testCase := GetCaseName(payload)
@@ -63,7 +80,8 @@ var _ = Describe("Upgrade - Post", func() {
 				DidDocUpdateSignInput, err = Loader(payload, &DidDocUpdatePayload)
 				Expect(err).To(BeNil())
 
-				res, err := cli.UpdateDid(DidDocUpdatePayload, DidDocUpdateSignInput, cli.Validator0)
+				tax := feeParams.UpdateDid.String()
+				res, err := cli.UpdateDid(DidDocUpdatePayload, DidDocUpdateSignInput, cli.Validator0, "", tax)
 				Expect(err).To(BeNil())
 				Expect(res.Code).To(BeEquivalentTo(0))
 			}
@@ -86,7 +104,8 @@ var _ = Describe("Upgrade - Post", func() {
 				DidDocDeactivateSignInput, err = Loader(payload, &DidDocDeacctivatePayload)
 				Expect(err).To(BeNil())
 
-				res, err := cli.DeactivateDid(DidDocDeacctivatePayload, DidDocDeactivateSignInput, cli.Validator0)
+				tax := feeParams.DeactivateDid.String()
+				res, err := cli.DeactivateDid(DidDocDeacctivatePayload, DidDocDeactivateSignInput, cli.Validator0, tax)
 				Expect(err).To(BeNil())
 				Expect(res.Code).To(BeEquivalentTo(0))
 			}
@@ -115,6 +134,7 @@ var _ = Describe("Upgrade - Post", func() {
 					ResourceFile,
 					signInputs,
 					cli.Validator0,
+					resourceFeeParams.Json.String(),
 				)
 
 				Expect(err).To(BeNil())

@@ -3,6 +3,7 @@ package helpers
 import (
 	"reflect"
 
+	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 )
@@ -37,6 +38,14 @@ func (d *DeepCopyUpdateDid) DeepCopy(src didtypes.MsgUpdateDidDocPayload) didtyp
 	return deepCopy(src).(didtypes.MsgUpdateDidDocPayload)
 }
 
+type DeepCopyDIDDocument struct {
+	TDeepCopy
+}
+
+func (d *DeepCopyDIDDocument) DeepCopy(src didcli.DIDDocument) didcli.DIDDocument {
+	return deepCopy(src).(didcli.DIDDocument)
+}
+
 // DeepCopyCreateResource is a decorator for deep copy of type MsgCreateResource.
 type DeepCopyCreateResource struct {
 	TDeepCopy
@@ -46,7 +55,6 @@ func (d *DeepCopyCreateResource) DeepCopy(src resourcetypes.MsgCreateResource) r
 	return deepCopy(src).(resourcetypes.MsgCreateResource)
 }
 
-// TODO: Add generics after bumping to Go 1.18 and remove this workaround.
 func deepCopy(src interface{}) interface{} {
 	var reflection interface{}
 	var dst reflect.Value
@@ -85,6 +93,17 @@ func deepCopy(src interface{}) interface{} {
 		reflect.Copy(dst, reflect.ValueOf(slc))
 		// Return the destination value from the reflection slice
 		return dst.Index(0).Interface().(resourcetypes.MsgCreateResource)
+	case didcli.DIDDocument:
+		// Create a reflection slice of the same length as the source slice
+		reflection = reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(actualSrc)), 1, 1).Interface()
+		// Extract destination value as definition
+		dst = reflect.ValueOf(reflection)
+		// Define source value as slice
+		slc := []didcli.DIDDocument{actualSrc}
+		// Copy the source value into the destination
+		reflect.Copy(dst, reflect.ValueOf(slc))
+		// Return the destination value from the reflection slice
+		return dst.Index(0).Interface().(didcli.DIDDocument)
 	default:
 		panic("Unsupported type")
 	}

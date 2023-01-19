@@ -1,10 +1,14 @@
 package cli
 
 import (
+	"encoding/json"
+
 	"github.com/cheqd/cheqd-node/x/did/types"
+	"github.com/cheqd/cheqd-node/x/did/utils"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )
@@ -12,9 +16,11 @@ import (
 func CmdUpdateDidDoc() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-did [payload-file]",
-		Short: "Update DID Document associated with a DID.",
-		Long: "Update DID Document associated with a given DID. " +
-			"[payload-file] is JSON encoded MsgCreateDidDocPayload alongside with sign inputs.",
+		Short: "Updates a DID and its associated DID Document.",
+		Long: `Update DID Document associated with a given DID. 
+[payload-file] is JSON encoded DID Document alongside with sign inputs. 
+Version ID is optional and is determined by the '--version-id' flag. 
+If not provided, a random UUID will be used as version-id.`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -22,23 +28,54 @@ func CmdUpdateDidDoc() *cobra.Command {
 				return err
 			}
 
+			// Read payload file arg
 			payloadFile := args[0]
+
+			// Read version-id flag
+			versionID, err := cmd.Flags().GetString(FlagVersionID)
+			if err != nil {
+				return err
+			}
+
+			if versionID != "" {
+				err = utils.ValidateUUID(versionID)
+				if err != nil {
+					return err
+				}
+			} else {
+				versionID = uuid.NewString()
+			}
 
 			payloadJSON, signInputs, err := ReadPayloadWithSignInputsFromFile(payloadFile)
 			if err != nil {
 				return err
 			}
 
-			// Unmarshal payload
-			var payload types.MsgUpdateDidDocPayload
-			err = clientCtx.Codec.UnmarshalJSON([]byte(payloadJSON), &payload)
+			// Unmarshal spec-compliant payload
+			var specPayload DIDDocument
+			err = json.Unmarshal([]byte(payloadJSON), &specPayload)
 			if err != nil {
 				return err
 			}
 
-			// Check for versionId
-			if payload.VersionId == "" {
-				payload.VersionId = uuid.NewString()
+			// Validate spec-compliant payload & get verification methods
+			verificationMethod, service, err := GetFromSpecCompliantPayload(specPayload)
+			if err != nil {
+				return err
+			}
+
+			// Construct MsgUpdateDidDocPayload
+			payload := types.MsgUpdateDidDocPayload{
+				Id:                   specPayload.ID,
+				Controller:           specPayload.Controller,
+				VerificationMethod:   verificationMethod,
+				Authentication:       specPayload.Authentication,
+				AssertionMethod:      specPayload.AssertionMethod,
+				CapabilityInvocation: specPayload.CapabilityInvocation,
+				CapabilityDelegation: specPayload.CapabilityDelegation,
+				KeyAgreement:         specPayload.KeyAgreement,
+				Service:              service,
+				VersionId:            versionID, // Set version id, from flag or random
 			}
 
 			// Build identity message
@@ -60,7 +97,16 @@ func CmdUpdateDidDoc() *cobra.Command {
 		},
 	}
 
-	flags.AddTxFlagsToCmd(cmd)
+	// add standard tx flags
+	AddTxFlagsToCmd(cmd)
+
+	// add custom / override flags
+	cmd.Flags().String(FlagVersionID, "", "Version ID of the DID Document")
+	cmd.Flags().String(flags.FlagFees, sdk.NewCoin(types.BaseMinimalDenom, sdk.NewInt(types.DefaultUpdateDidTxFee)).String(), "Fees to pay along with transaction; eg: 25000000000ncheq")
+
+	_ = cmd.MarkFlagRequired(flags.FlagFees)
+	_ = cmd.MarkFlagRequired(flags.FlagGas)
+	_ = cmd.MarkFlagRequired(flags.FlagGasAdjustment)
 
 	return cmd
 }
