@@ -9,4 +9,4 @@
 extends: spectral:oas
 
 rules:
-  path-params: false
+  oas2-schema: warn
