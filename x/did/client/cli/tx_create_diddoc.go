@@ -15,12 +15,51 @@ import (
 
 func CmdCreateDidDoc() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-did [payload-file]",
+		Use:   "create-did [payload-file] --version-id",
 		Short: "Create a new DID and associated DID Document.",
 		Long: `Creates a new DID and associated DID Document. 
 [payload-file] is JSON encoded DID Document alongside with sign inputs.
 Version ID is optional and is determined by the '--version-id' flag. 
-If not provided, a random UUID will be used as version-id.`,
+If not provided, a random UUID will be used as version-id.
+
+Payload file should be a JSON file containing properties specified in the DID Core Specification. Rules from DID Core spec are followed on which properties are mandatory and which ones are optional.
+
+Example payload file:
+{
+    "didDoc": {
+        "context": [ "https://www.w3.org/ns/did/v1" ],
+        "id": "did:cheqd:<namespace>:<unique-identifier>",
+        "controller": [
+            "did:cheqd:<namespace>:<unique-identifier>"
+        ],
+        "authentication": [
+            "did:cheqd:<namespace>:<unique-identifier>#<key-id>"
+        ],
+        "assertionMethod": [],
+        "capabilityInvocation": [],
+        "capabilityDelegation": [],
+        "keyAgreement": [],
+        "alsoKnownAs": [],
+        "verificationMethod": [
+            {
+                "id": "did:cheqd:<namespace>:<unique-identifier>#<key-id>",
+                "verificationMethodType": "<verification-method-type>",
+                "controller": "did:cheqd:<namespace>:<unique-identifier>",
+                "publicKeyMultibase": "<public-key>"
+            }
+        ],
+        "service": [
+			{
+                "id": "did:cheqd:<namespace>:<unique-identifier>#<service-id>",
+                "serviceType": "<service-type>",
+                "serviceEndpoint": [
+                    "<service-endpoint>"
+                ]
+            }
+		]
+    }
+}
+`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -101,7 +140,7 @@ If not provided, a random UUID will be used as version-id.`,
 
 	// add custom / override flags
 	cmd.Flags().String(FlagVersionID, "", "Version ID of the DID Document")
-	cmd.Flags().String(flags.FlagFees, sdk.NewCoin(types.BaseMinimalDenom, sdk.NewInt(types.DefaultCreateDidTxFee)).String(), "Fees to pay along with transaction; eg: 50000000000ncheq")
+	cmd.Flags().String(flags.FlagFees, sdk.NewCoin(types.BaseMinimalDenom, sdk.NewInt(types.DefaultCreateDidTxFee)).String(), "Fixed fee for DID creation")
 
 	_ = cmd.MarkFlagRequired(flags.FlagFees)
 	_ = cmd.MarkFlagRequired(flags.FlagGas)
