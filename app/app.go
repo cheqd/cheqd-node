@@ -259,6 +259,7 @@ func New(
 	)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 	bApp.SetVersion(version.Version)
+	bApp.SetProtocolVersion(ProtocolVersion)
 	bApp.SetInterfaceRegistry(interfaceRegistry)
 
 	keys := sdk.NewKVStoreKeys(
