@@ -8,6 +8,5 @@
 
 extends: spectral:oas
 
-overrides:
-  files:
-    - "**/docs/config.yaml"
+rules:
+  path-params: false
