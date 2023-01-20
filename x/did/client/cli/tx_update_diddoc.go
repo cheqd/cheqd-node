@@ -22,11 +22,11 @@ func CmdUpdateDidDoc() *cobra.Command {
 Version ID is optional and is determined by the '--version-id' flag. 
 If not provided, a random UUID will be used as version-id.
 
-NOTE: DID update operations require the FULL new DID Document to be provided. Specifying just the changes is not supported.
-
-Payload file should be a JSON file containing properties specified in the DID Core Specification. Rules from DID Core spec are followed on which properties are mandatory and which ones are optional.
-
-Private key provided in sign inputs is ONLY used locally to generate signature(s) and not sent to the ledger.
+NOTES:
+1. Fee used for the transaction will ALWAYS take the fixed fee for DID Document update, REGARDLESS of what value is passed in '--fees' flag.
+2. DID update operations require the FULL new DID Document to be provided. Specifying just the changes/diff is not supported.
+3. Payload file should be a JSON file containing properties specified in the DID Core Specification. Rules from DID Core spec are followed on which properties are mandatory and which ones are optional.
+4. Private key provided in sign inputs is ONLY used locally to generate signature(s) and not sent to the ledger.
 
 Example payload file:
 {
@@ -152,7 +152,7 @@ Example payload file:
 
 	// add custom / override flags
 	cmd.Flags().String(FlagVersionID, "", "Version ID of the DID Document")
-	cmd.Flags().String(flags.FlagFees, sdk.NewCoin(types.BaseMinimalDenom, sdk.NewInt(types.DefaultUpdateDidTxFee)).String(), "Fixed fee for DID update, e.g., 25000000000ncheq. Please check what the current fees by running 'cheqd-noded query <insert query>")
+	cmd.Flags().String(flags.FlagFees, sdk.NewCoin(types.BaseMinimalDenom, sdk.NewInt(types.DefaultUpdateDidTxFee)).String(), "Fixed fee for DID update, e.g., 25000000000ncheq. Please check what the current fees by running 'cheqd-noded query params subspace cheqd feeparams'")
 
 	_ = cmd.MarkFlagRequired(flags.FlagFees)
 	_ = cmd.MarkFlagRequired(flags.FlagGas)
