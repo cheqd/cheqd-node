@@ -91,7 +91,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         LOG_LEVEL: WARN
         FILTER_REGEX_EXCLUDE: "/github/workspace/api/docs/config.yaml"
-        VALIDATE_ALL_CODEBASE: false
+        VALIDATE_ALL_CODEBASE: true
         MULTI_STATUS: true
 
         VALIDATE_BASH: true
