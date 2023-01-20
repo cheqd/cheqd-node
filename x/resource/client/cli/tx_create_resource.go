@@ -21,6 +21,12 @@ func CmdCreateResource() *cobra.Command {
 [payload-file] is JSON encoded MsgCreateResourcePayload alongside with sign inputs. 
 [resource-data-file] is a path to the Resource data file.
 
+NOTES:
+1. Fee used for the transaction will ALWAYS take the fixed fee for Resource creation, REGARDLESS of what value is passed in '--fees' flag.
+2. Fixed fees for Resource creation is defined based on the IANA media type of the Resource data file. These parameters can be updated using governance proposals. Currently, there are three categories of media types with different fees: 'image', 'json', and 'default' (for all other media types).
+2. Payload file should contain the properties given in example below.
+3. Private key provided in sign inputs is ONLY used locally to generate signature(s) and not sent to the ledger.
+
 Example payload file:
 {
     "payload": {
@@ -110,7 +116,7 @@ Example payload file:
 	AddTxFlagsToCmd(cmd)
 
 	// add custom / override flags
-	cmd.Flags().String(flags.FlagFees, sdk.NewCoin(types.BaseMinimalDenom, sdk.NewInt(types.DefaultCreateResourceImageFee)).String(), "Fixed fee for Resource creation, e.g., 10000000000ncheq. Please check what the current fees by running 'cheqd-noded query <insert query>")
+	cmd.Flags().String(flags.FlagFees, sdk.NewCoin(types.BaseMinimalDenom, sdk.NewInt(types.DefaultCreateResourceImageFee)).String(), "Fixed fee for Resource creation, e.g., 10000000000ncheq. Please check what the current fees by running 'cheqd-noded query params subspace resource feeparams'")
 
 	_ = cmd.MarkFlagRequired(flags.FlagFees)
 	_ = cmd.MarkFlagRequired(flags.FlagGas)

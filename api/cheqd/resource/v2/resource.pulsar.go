@@ -2641,6 +2641,11 @@ type Metadata struct {
 
 	// collection_id is the ID of the collection that the Resource belongs to. Defined client-side.
 	// This field is the unique identifier of the DID linked to this Resource
+	// Format: <unique-identifier>
+	//
+	// Examples:
+	// - c82f2b02-bdab-4dd7-b833-3e143745d612
+	// - wGHEXrZvJxR8vw5P3UWH1j
 	CollectionId string `protobuf:"bytes,1,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
 	// id is the ID of the Resource. Defined client-side.
 	// This field is a unique identifier for this specific version of the Resource.
