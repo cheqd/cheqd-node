@@ -15,7 +15,7 @@ import (
 
 func CmdCreateDidDoc() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-did [payload-file] --version-id",
+		Use:   "create-did [payload-file] --version-id [version-id]",
 		Short: "Create a new DID and associated DID Document.",
 		Long: `Creates a new DID and associated DID Document. 
 [payload-file] is JSON encoded DID Document alongside with sign inputs.
@@ -140,7 +140,7 @@ Example payload file:
 
 	// add custom / override flags
 	cmd.Flags().String(FlagVersionID, "", "Version ID of the DID Document")
-	cmd.Flags().String(flags.FlagFees, sdk.NewCoin(types.BaseMinimalDenom, sdk.NewInt(types.DefaultCreateDidTxFee)).String(), "Fixed fee for DID creation")
+	cmd.Flags().String(flags.FlagFees, sdk.NewCoin(types.BaseMinimalDenom, sdk.NewInt(types.DefaultCreateDidTxFee)).String(), "Fixed fee for DID creation, e.g,, 50000000000ncheq. Please check what the current fees by running 'cheqd-noded query <insert query>")
 
 	_ = cmd.MarkFlagRequired(flags.FlagFees)
 	_ = cmd.MarkFlagRequired(flags.FlagGas)
