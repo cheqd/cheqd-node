@@ -13,12 +13,28 @@ import (
 
 func CmdDeactivateDidDoc() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "deactivate-did [payload-file]",
+		Use:   "deactivate-did [payload-file] --version-id [version-id]",
 		Short: "Deactivate a DID.",
 		Long: `Deactivates a DID and its associated DID Document. 
 [payload-file] is JSON encoded MsgDeactivateDidDocPayload alongside with sign inputs. 
-Version ID is optional and is determined by the '--version-id' flag. 
-If not provided, a random UUID will be used as version-id.`,
+
+A new DID Document version is created when deactivating a DID Document so that the operation timestamp can be recorded. Version ID is optional and is determined by the '--version-id' flag. If not provided, a random UUID will be used as version-id.
+
+Payload file should be a JSON file containing the properties given in example below. Private key provided in sign inputs is ONLY used locally to generate signature(s) and not sent to the ledger.
+
+Example payload file:
+{
+    "payload": {
+        "id": "did:cheqd:<namespace>:<unique-identifier>"
+    },
+    "signInputs": [
+        {
+            "verificationMethodId": "did:cheqd:<namespace>:<unique-identifier>#<key-id>",
+            "privKey": "<private-key-bytes-encoded-to-base64>"
+        }
+    ]
+}
+`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)

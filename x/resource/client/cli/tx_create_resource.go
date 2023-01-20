@@ -44,7 +44,7 @@ Example payload file:
     "signInputs": [
         {
             "verificationMethodId": "did:cheqd:<namespace>:<unique-identifier>#<key-id>",
-            "privKey": ""
+            "privKey": "<private-key-bytes-encoded-to-base64>"
         }
     ]
 }

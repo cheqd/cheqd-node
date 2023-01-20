@@ -24,6 +24,8 @@ If not provided, a random UUID will be used as version-id.
 
 Payload file should be a JSON file containing properties specified in the DID Core Specification. Rules from DID Core spec are followed on which properties are mandatory and which ones are optional.
 
+Private key provided in sign inputs is ONLY used locally to generate signature(s) and not sent to the ledger.
+
 Example payload file:
 {
     "payload": {
@@ -43,7 +45,7 @@ Example payload file:
         "verificationMethod": [
             {
                 "id": "did:cheqd:<namespace>:<unique-identifier>#<key-id>",
-                "verificationMethodType": "<verification-method-type>",
+                "type": "<verification-method-type>",
                 "controller": "did:cheqd:<namespace>:<unique-identifier>",
                 "publicKeyMultibase": "<public-key>"
             }
@@ -51,7 +53,7 @@ Example payload file:
         "service": [
 			{
                 "id": "did:cheqd:<namespace>:<unique-identifier>#<service-id>",
-                "serviceType": "<service-type>",
+                "type": "<service-type>",
                 "serviceEndpoint": [
                     "<service-endpoint>"
                 ]
@@ -61,7 +63,7 @@ Example payload file:
 	"signInputs": [
         {
             "verificationMethodId": "did:cheqd:<namespace>:<unique-identifier>#<key-id>",
-            "privKey": "<key>"
+            "privKey": "<private-key-bytes-encoded-to-base64>"
         }
     ]
 }
