@@ -130,7 +130,7 @@ Example payload file:
 
 	// add custom / override flags
 	cmd.Flags().String(FlagResourceID, "", "The Resource ID. If not set, a random UUID will be generated.")
-	cmd.Flags().String(flags.FlagFees, sdk.NewCoin(types.BaseMinimalDenom, sdk.NewInt(types.DefaultCreateResourceImageFee)).String(), "Fees to pay along with transaction; eg: 10000000000ncheq")
+	cmd.Flags().String(flags.FlagFees, sdk.NewCoin(types.BaseMinimalDenom, sdk.NewInt(types.DefaultCreateResourceImageFee)).String(), "Fixed fee for Resource creation, e.g., 10000000000ncheq. Please check what the current fees by running 'cheqd-noded query <insert query>")
 
 	_ = cmd.MarkFlagRequired(flags.FlagFees)
 	_ = cmd.MarkFlagRequired(flags.FlagGas)

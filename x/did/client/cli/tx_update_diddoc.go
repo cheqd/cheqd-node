@@ -150,7 +150,7 @@ Example payload file:
 
 	// add custom / override flags
 	cmd.Flags().String(FlagVersionID, "", "Version ID of the DID Document")
-	cmd.Flags().String(flags.FlagFees, sdk.NewCoin(types.BaseMinimalDenom, sdk.NewInt(types.DefaultUpdateDidTxFee)).String(), "Fixed fee for DID update, e.g,, 25000000000ncheq. Please check what the current fees by running 'cheqd-noded query <insert query>")
+	cmd.Flags().String(flags.FlagFees, sdk.NewCoin(types.BaseMinimalDenom, sdk.NewInt(types.DefaultUpdateDidTxFee)).String(), "Fixed fee for DID update, e.g., 25000000000ncheq. Please check what the current fees by running 'cheqd-noded query <insert query>")
 
 	_ = cmd.MarkFlagRequired(flags.FlagFees)
 	_ = cmd.MarkFlagRequired(flags.FlagGas)
