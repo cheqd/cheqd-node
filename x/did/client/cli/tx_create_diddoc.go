@@ -26,7 +26,7 @@ Payload file should be a JSON file containing properties specified in the DID Co
 
 Example payload file:
 {
-    "didDoc": {
+    "payload": {
         "context": [ "https://www.w3.org/ns/did/v1" ],
         "id": "did:cheqd:<namespace>:<unique-identifier>",
         "controller": [
@@ -57,7 +57,13 @@ Example payload file:
                 ]
             }
 		]
-    }
+    },
+	"signInputs": [
+        {
+            "verificationMethodId": "did:cheqd:<namespace>:<unique-identifier>#<key-id>",
+            "privKey": "<key>"
+        }
+    ]
 }
 `,
 		Args: cobra.ExactArgs(1),
