@@ -9,6 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )
 
@@ -79,14 +80,11 @@ Example payload file:
 			}
 
 			// Prepare payload
-			payload = types.MsgCreateResourcePayload{
-				CollectionId: payload.CollectionId,
-				Id:           payload.Id,
-				Name:         payload.Name,
-				Version:      payload.Version,
-				ResourceType: payload.ResourceType,
-				AlsoKnownAs:  payload.AlsoKnownAs,
-				Data:         data,
+			payload.Data = data
+
+			// Populate resource id if not set
+			if payload.Id == "" {
+				payload.Id = uuid.NewString()
 			}
 
 			// Build identity message

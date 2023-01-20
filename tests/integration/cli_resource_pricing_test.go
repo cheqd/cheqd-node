@@ -78,6 +78,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 	It("should tax json resource message - case: fixed fee", func() {
 		By("preparing the json resource message")
+		resourceID := uuid.NewString()
 		resourceName := "TestResource"
 		resourceVersion := "1.0"
 		resourceType := "TestType"
@@ -93,10 +94,11 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		tax := resourceFeeParams.Json
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
+			Id:           resourceID,
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.String()))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.String()))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -151,6 +153,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 	It("should tax image resource message - case: fixed fee", func() {
 		By("preparing the image resource message")
+		resourceID := uuid.NewString()
 		resourceName := "TestResource"
 		resourceVersion := "1.0"
 		resourceType := "TestType"
@@ -166,10 +169,11 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		tax := resourceFeeParams.Image
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
+			Id:           resourceID,
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.String()))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.String()))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -244,7 +248,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.String()))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.String()))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -299,6 +303,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 	It("should tax create resource json message with feegrant - case: fixed fee", func() {
 		By("preparing the create resource json message")
+		resourceID := uuid.NewString()
 		resourceName := "TestResource"
 		resourceVersion := "1.0"
 		resourceType := "TestType"
@@ -322,10 +327,11 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		tax := resourceFeeParams.Json
 		resp, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
+			Id:           resourceID,
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.String())))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.String())))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -352,6 +358,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 	It("should tax create resource image with feegrant - case: fixed fee", func() {
 		By("preparing the create resource image message")
+		resourceID := uuid.NewString()
 		resourceName := "TestResource"
 		resourceVersion := "1.0"
 		resourceType := "TestType"
@@ -375,10 +382,11 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		tax := resourceFeeParams.Image
 		resp, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
+			Id:           resourceID,
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.String())))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.String())))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -405,6 +413,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 	It("should tax create resource default with feegrant - case: fixed fee", func() {
 		By("preparing the create resource default message")
+		resourceID := uuid.NewString()
 		resourceName := "TestResource"
 		resourceVersion := "1.0"
 		resourceType := "TestType"
@@ -428,10 +437,11 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		tax := resourceFeeParams.Default
 		resp, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
+			Id:           resourceID,
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.String())))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.String())))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
