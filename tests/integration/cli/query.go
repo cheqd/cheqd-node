@@ -88,7 +88,7 @@ func QueryResource(collectionID string, resourceID string) (resourcetypes.QueryR
 }
 
 func QueryResourceMetadata(collectionID string, resourceID string) (resourcetypes.QueryResourceMetadataResponse, error) {
-	res, err := Query("resource", "resource-metadata", collectionID, resourceID)
+	res, err := Query("resource", "metadata", collectionID, resourceID)
 	if err != nil {
 		return resourcetypes.QueryResourceMetadataResponse{}, err
 	}
