@@ -6,7 +6,7 @@ const (
 	KeyringBackend = "test"
 	OutputFormat   = "json"
 	Gas            = "auto"
-	GasAdjustment  = "1.3"
+	GasAdjustment  = "1.8"
 	GasPrices      = "50ncheq"
 )
 
