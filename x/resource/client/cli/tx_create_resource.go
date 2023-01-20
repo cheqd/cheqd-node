@@ -16,11 +16,39 @@ import (
 
 func CmdCreateResource() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create [resource-payload-file] [resource-data-file]",
+		Use:   "create [payload-file] [resource-data-file]",
 		Short: "Create a new Resource.",
 		Long: `Create a new Resource within a DID Resource Collection. 
-[resource-payload-file] is JSON encoded MsgCreateResourcePayload alongside with sign inputs. 
-[resource-data-file] is a path to the Resource data file.`,
+[payload-file] is JSON encoded MsgCreateResourcePayload alongside with sign inputs. 
+[resource-data-file] is a path to the Resource data file.
+
+Example payload file:
+{
+    "payload": {
+        "collectionId": "<did-unique-identifier>",
+        "id": "<uuid>",
+        "name": "<human-readable resource name>",
+        "version": "<human-readable version number>",
+        "resourceType": "<resource-type>",
+        "alsoKnownAs": [
+            {
+                "uri": "did:cheqd:<namespace>:<unique-identifier>/resource/<uuid>",
+                "description": "did-url"
+            },
+            {
+                "uri": "https://example.com/alternative-uri",
+                "description": "http-url"
+            }
+        ]
+    },
+    "signInputs": [
+        {
+            "verificationMethodId": "did:cheqd:<namespace>:<unique-identifier>#<key-id>",
+            "privKey": ""
+        }
+    ]
+}
+`,
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
