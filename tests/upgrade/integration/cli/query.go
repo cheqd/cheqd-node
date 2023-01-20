@@ -28,7 +28,7 @@ func Query(container string, binary string, module, query string, queryArgs ...s
 func QueryModuleVersionMap(container string) (upgradetypes.QueryModuleVersionsResponse, error) {
 	fmt.Println("Querying module version map from", container)
 	args := append([]string{
-		CLIBinaryName,
+		CliBinaryName,
 		"query", "upgrade", "module_versions",
 	}, QueryParamsConst...)
 
@@ -52,7 +52,7 @@ func QueryModuleVersionMap(container string) (upgradetypes.QueryModuleVersionsRe
 func QueryParams(container, subspace, key string) (paramproposal.ParamChange, error) {
 	fmt.Println("Querying params from", container)
 	args := append([]string{
-		CLIBinaryName,
+		CliBinaryName,
 		"query", "params", "subspace", subspace, key,
 	}, QueryParamsConst...)
 
@@ -108,7 +108,7 @@ func QueryResourceFeeParams(container, subspace, key string) (resourcetypes.FeeP
 func QueryProposalLegacy(container, id string) (govtypesv1beta1.Proposal, error) {
 	fmt.Println("Querying proposal from", container)
 	args := append([]string{
-		CLIBinaryName,
+		CliBinaryName,
 		"query", "gov", "proposal", id,
 	}, QueryParamsConst...)
 
@@ -131,7 +131,7 @@ func QueryProposalLegacy(container, id string) (govtypesv1beta1.Proposal, error)
 func QueryProposal(container, id string) (govtypesv1.Proposal, error) {
 	fmt.Println("Querying proposal from", container)
 	args := append([]string{
-		CLIBinaryName,
+		CliBinaryName,
 		"query", "gov", "proposal", id,
 	}, QueryParamsConst...)
 

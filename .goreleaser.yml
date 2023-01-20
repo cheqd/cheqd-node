@@ -95,7 +95,7 @@ release:
     name: cheqd-node
   
   draft: false
-  prerelease: true
+  prerelease: "true"
   mode: append
   header: |
     # Release Notes for {{.ProjectName}} v{{.Version}}

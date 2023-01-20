@@ -4,12 +4,12 @@
             "data": "eyJhdHRyIjpbIm5hbWUiLCJhZ2UiXX0K"
         },
         "metadata": {
-            "collection_id": "91e5f0cf-5f1e-5c19-97d3-d313e84033b4",
+            "collectionId": "91e5f0cf-5f1e-5c19-97d3-d313e84033b4",
             "id": "54cb8b4d-af33-4606-bc54-0f035ee30e0f",
             "name": "Test Resource After Upgrade Name UUID Case",
-            "version": "",
-            "resource_type": "CL-Schema",
-            "also_known_as": [
+            "version": "1.2-uuid",
+            "resourceType": "CL-Schema",
+            "alsoKnownAs": [
                 {
                     "uri": "https://example.com/alternative-uri",
                     "description": ""
@@ -23,10 +23,10 @@
                     "description": "did-url"
                 }
             ],
-            "media_type": "application/json",
+            "mediaType": "application/json",
             "checksum": "d9c6f336c5edfc5034bc66aab9277daac01e1e85b41e49e6bf1b7a8f2a81c04f",
-            "previous_version_id": "",
-            "next_version_id": ""
+            "previousVersionId": "",
+            "nextVersionId": ""
         }
     }
 }
