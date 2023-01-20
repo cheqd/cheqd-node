@@ -10,10 +10,6 @@ import (
 	tmcli "github.com/tendermint/tendermint/libs/cli"
 )
 
-const (
-	FlagResourceID = "resource-id"
-)
-
 // AddTxFlagsToCmd adds common flags to a module tx command.
 func AddTxFlagsToCmd(cmd *cobra.Command) {
 	cmd.Flags().StringP(tmcli.OutputFlag, "o", "json", "Output format (text|json)")

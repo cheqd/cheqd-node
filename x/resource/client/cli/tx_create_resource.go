@@ -4,13 +4,11 @@ import (
 	"os"
 
 	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
-	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )
 
@@ -62,21 +60,6 @@ Example payload file:
 			// Read data file arg
 			dataFile := args[1]
 
-			// Read resource-id flag
-			resourceID, err := cmd.Flags().GetString(FlagResourceID)
-			if err != nil {
-				return err
-			}
-
-			if resourceID != "" {
-				err = didutils.ValidateUUID(resourceID)
-				if err != nil {
-					return err
-				}
-			} else {
-				resourceID = uuid.NewString()
-			}
-
 			payloadJSON, signInputs, err := didcli.ReadPayloadWithSignInputsFromFile(payloadFile)
 			if err != nil {
 				return err
@@ -98,7 +81,7 @@ Example payload file:
 			// Prepare payload
 			payload = types.MsgCreateResourcePayload{
 				CollectionId: payload.CollectionId,
-				Id:           resourceID,
+				Id:           payload.Id,
 				Name:         payload.Name,
 				Version:      payload.Version,
 				ResourceType: payload.ResourceType,
@@ -129,7 +112,6 @@ Example payload file:
 	AddTxFlagsToCmd(cmd)
 
 	// add custom / override flags
-	cmd.Flags().String(FlagResourceID, "", "The Resource ID. If not set, a random UUID will be generated.")
 	cmd.Flags().String(flags.FlagFees, sdk.NewCoin(types.BaseMinimalDenom, sdk.NewInt(types.DefaultCreateResourceImageFee)).String(), "Fixed fee for Resource creation, e.g., 10000000000ncheq. Please check what the current fees by running 'cheqd-noded query <insert query>")
 
 	_ = cmd.MarkFlagRequired(flags.FlagFees)

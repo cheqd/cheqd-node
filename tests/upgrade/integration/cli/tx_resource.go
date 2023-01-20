@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"path/filepath"
 
-	integrationcli "github.com/cheqd/cheqd-node/tests/integration/cli"
 	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/x/did/client/cli"
 	types "github.com/cheqd/cheqd-node/x/resource/types"
@@ -61,7 +60,7 @@ func CreateResource(payload types.MsgCreateResourcePayload, resourceFile string,
 	}
 	args := []string{payloadFileName}
 	args = append(args, resourceFileName)
-	args = append(args, integrationcli.FlagResourceID, payload.Id)
+	args = append(args, payload.Id)
 	args = append(args, integrationhelpers.GenerateFees(fees)...)
 
 	return Tx(container, CliBinaryName, "resource", "create", OperatorAccounts[container], args...)

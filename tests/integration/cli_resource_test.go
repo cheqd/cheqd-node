@@ -90,10 +90,11 @@ var _ = Describe("cheqd cli - positive resource", func() {
 
 		res, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
+			Id:           resourceID,
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, resourceID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -132,10 +133,11 @@ var _ = Describe("cheqd cli - positive resource", func() {
 
 		res, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
+			Id:           nextResourceId,
 			Name:         nextResourceName,
 			Version:      nextResourceVersion,
 			ResourceType: nextResourceType,
-		}, signInputs, nextResourceFile, nextResourceId, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
+		}, signInputs, nextResourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -210,10 +212,11 @@ var _ = Describe("cheqd cli - positive resource", func() {
 
 		res, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: secondCollectionId,
+			Id:           secondResourceId,
 			Name:         secondResourceName,
 			Version:      secondResourceVersion,
 			ResourceType: secondResourceType,
-		}, secondSignInputs, secondResourceFile, secondResourceId, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
+		}, secondSignInputs, secondResourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 

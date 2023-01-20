@@ -12,8 +12,7 @@ import (
 )
 
 const (
-	FlagVersionID  = "--version-id"
-	FlagResourceID = "--resource-id"
+	FlagVersionID = "--version-id"
 )
 
 var CLITxParams = []string{
@@ -145,7 +144,7 @@ func DeactivateDidDoc(tmpDir string, payload types.MsgDeactivateDidDocPayload, s
 	return Tx("cheqd", "deactivate-did", from, feeParams, payloadFile)
 }
 
-func CreateResource(tmpDir string, payload resourcetypes.MsgCreateResourcePayload, signInputs []cli.SignInput, dataFile, resourceID, from string, feeParams []string) (sdk.TxResponse, error) {
+func CreateResource(tmpDir string, payload resourcetypes.MsgCreateResourcePayload, signInputs []cli.SignInput, dataFile, from string, feeParams []string) (sdk.TxResponse, error) {
 	payloadJSON, err := helpers.Codec.MarshalJSON(&payload)
 	if err != nil {
 		return sdk.TxResponse{}, err
@@ -162,10 +161,6 @@ func CreateResource(tmpDir string, payload resourcetypes.MsgCreateResourcePayloa
 	}
 
 	payloadFile := helpers.MustWriteTmpFile("", payloadWithSignInputsJSON)
-
-	if resourceID != "" {
-		return Tx("resource", "create", from, feeParams, payloadFile, dataFile, FlagResourceID, resourceID)
-	}
 
 	return Tx("resource", "create", from, feeParams, payloadFile, dataFile)
 }
