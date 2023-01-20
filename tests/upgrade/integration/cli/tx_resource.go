@@ -60,7 +60,6 @@ func CreateResource(payload types.MsgCreateResourcePayload, resourceFile string,
 	}
 	args := []string{payloadFileName}
 	args = append(args, resourceFileName)
-	args = append(args, payload.Id)
 	args = append(args, integrationhelpers.GenerateFees(fees)...)
 
 	return Tx(container, CliBinaryName, "resource", "create", OperatorAccounts[container], args...)
