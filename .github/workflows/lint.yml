@@ -90,6 +90,7 @@ jobs:
         DEFAULT_BRANCH: main
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         LOG_LEVEL: WARN
+        FILTER_REGEX_EXCLUDE: ".*api/docs/config.*"
         VALIDATE_ALL_CODEBASE: false
         MULTI_STATUS: true
 

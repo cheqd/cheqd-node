@@ -16,14 +16,14 @@ var _ = Describe("Str utils functionality", func() {
 			Expect(actual).To(Equal(expectedResult))
 		},
 
-		Entry("Emty array, Empty element, Expected: -1", []string{}, "", 0, -1),
+		Entry("Empty array, Empty element, Expected: -1", []string{}, "", 0, -1),
 		Entry("Nil as array, Empty element, Expected: -1", nil, "", 0, -1),
 		Entry("Desired element is the first. Expected: 0", []string{"1", "2"}, "1", 0, 0),
 		Entry("Desired element is the latest one. Expected: 2", []string{"1", "2", "3"}, "3", 0, 2),
 		Entry("Desired element is absent. Expected: -1", []string{"1", "2", "3"}, "4", 0, -1),
-		Entry("There are more then 1 such elements but search should be started from the beginning. Expected: 0", []string{"4", "1", "6", "2", "3", "4"}, "4", 0, 0),
-		Entry("There are more then 1 such elements but search should be started from the index 1. Expected: 5", []string{"4", "1", "6", "2", "3", "4"}, "4", 1, 5),
-		Entry("There are more then 1 such elements but search should be started from the index 3. Expected: 5", []string{"4", "1", "6", "2", "3", "4"}, "4", 3, 5),
+		Entry("There are more than 1 such elements but search should be started from the beginning. Expected: 0", []string{"4", "1", "6", "2", "3", "4"}, "4", 0, 0),
+		Entry("There are more than 1 such elements but search should be started from the index 1. Expected: 5", []string{"4", "1", "6", "2", "3", "4"}, "4", 1, 5),
+		Entry("There are more than 1 such elements but search should be started from the index 3. Expected: 5", []string{"4", "1", "6", "2", "3", "4"}, "4", 3, 5),
 	)
 
 	DescribeTable("Contains function",

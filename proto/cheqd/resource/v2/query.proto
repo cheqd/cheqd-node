@@ -3,23 +3,25 @@ syntax = "proto3";
 package cheqd.resource.v2;
 
 import "cheqd/resource/v2/resource.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
 
 // Query defines the gRPC querier service for the resource module
 service Query {
-  // Fetch a resource from a collection with a given collection_id and id
+  // Fetch data/payload for a specific resource (without metadata)
   rpc Resource(QueryResourceRequest) returns (QueryResourceResponse) {
     option (google.api.http).get = "/cheqd/resource/v2/{collection_id}/resources/{id}";
   }
 
-  // Fetch a resource's metadata from a collection with a given collection_id and id
+  // Fetch only metadata for a specific resource
   rpc ResourceMetadata(QueryResourceMetadataRequest) returns (QueryResourceMetadataResponse) {
     option (google.api.http).get = "/cheqd/resource/v2/{collection_id}/resources/{id}/metadata";
   }
 
-  // Fetch all resource metadata from a collection with a given collection_id
+  // Fetch metadata for all resources in a collection
   rpc CollectionResources(QueryCollectionResourcesRequest) returns (QueryCollectionResourcesResponse) {
     option (google.api.http).get = "/cheqd/resource/v2/{collection_id}/metadata";
   }
@@ -66,7 +68,7 @@ message QueryResourceMetadataRequest {
 // QueryResourceMetadataResponse is the response type for the Query/ResourceMetadata RPC method
 message QueryResourceMetadataResponse {
   // resource is the requested resource metadata
-  Metadata resource = 1;
+  Metadata resource = 1 [(gogoproto.jsontag) = "linkedResourceMetadata"];
 }
 
 // QueryCollectionResourcesRequest is the request type for the Query/CollectionResources RPC method
@@ -78,10 +80,16 @@ message QueryCollectionResourcesRequest {
   // - c82f2b02-bdab-4dd7-b833-3e143745d612
   // - wGHEXrZvJxR8vw5P3UWH1j
   string collection_id = 1;
+
+  // pagination defines an optional pagination for the request.
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
 // QueryCollectionResourcesResponse is the response type for the Query/CollectionResources RPC method
 message QueryCollectionResourcesResponse {
   // resources is the requested collection of resource metadata
-  repeated Metadata resources = 1;
+  repeated Metadata resources = 1 [(gogoproto.jsontag) = "linkedResourceMetadata"];
+
+  // pagination defines the pagination in the response.
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }

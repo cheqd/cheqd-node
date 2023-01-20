@@ -7,7 +7,7 @@ import (
 )
 
 func QueryResourceLegacy(collectionID string, resourceID string, container string) (resourcetypesv1.QueryResourceResponse, error) {
-	res, err := Query(container, CLIBinaryName, "resource", "resource", collectionID, resourceID)
+	res, err := Query(container, CliBinaryName, "resource", "resource", collectionID, resourceID)
 	if err != nil {
 		return resourcetypesv1.QueryResourceResponse{}, err
 	}
@@ -22,7 +22,7 @@ func QueryResourceLegacy(collectionID string, resourceID string, container strin
 }
 
 func QueryResource(collectionID string, resourceID string, container string) (resourcetypesv2.QueryResourceResponse, error) {
-	res, err := Query(container, CLIBinaryName, "resource", "resource", collectionID, resourceID)
+	res, err := Query(container, CliBinaryName, "resource", "specific-resource", collectionID, resourceID)
 	if err != nil {
 		return resourcetypesv2.QueryResourceResponse{}, err
 	}

@@ -7,12 +7,13 @@ import (
 	"fmt"
 
 	"github.com/cheqd/cheqd-node/tests/integration/cli"
+	"github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
 	"github.com/cheqd/cheqd-node/tests/integration/testdata"
-	clitypes "github.com/cheqd/cheqd-node/x/did/client/cli"
+	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
 	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
-	"github.com/cheqd/cheqd-node/x/did/types"
-	resourcecli "github.com/cheqd/cheqd-node/x/resource/client/cli"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -21,52 +22,64 @@ import (
 var _ = Describe("cheqd cli - negative resource", func() {
 	var collectionID string
 	var did string
-	var signInputs []clitypes.SignInput
+	var signInputs []didcli.SignInput
 	var resourceID string
 	var resourceName string
-
+	var didFeeParams didtypes.FeeParams
+	var resourceFeeParams resourcetypes.FeeParams
 	var tmpDir string
 
 	BeforeEach(func() {
 		// Initialize tmpDir
 		tmpDir = GinkgoT().TempDir()
 
+		// Query did fee params
+		res, err := cli.QueryParams(didtypes.ModuleName, string(didtypes.ParamStoreKeyFeeParams))
+		Expect(err).To(BeNil())
+		err = helpers.Codec.UnmarshalJSON([]byte(res.Value), &didFeeParams)
+		Expect(err).To(BeNil())
+
+		// Query resource fee params
+		res, err = cli.QueryParams(resourcetypes.ModuleName, string(resourcetypes.ParamStoreKeyFeeParams))
+		Expect(err).To(BeNil())
+		err = helpers.Codec.UnmarshalJSON([]byte(res.Value), &resourceFeeParams)
+		Expect(err).To(BeNil())
+
 		// Create a new DID Doc
 		collectionID = uuid.NewString()
 		did := "did:cheqd:" + network.DidNamespace + ":" + collectionID
 		keyId := did + "#key1"
 
-		pubKey, privKey, err := ed25519.GenerateKey(nil)
+		publicKey, privateKey, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
 
-		publicKeyMultibase := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(pubKey)
+		publicKeyMultibase := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(publicKey)
 
-		payload := types.MsgCreateDidDocPayload{
-			Id: did,
-			VerificationMethod: []*types.VerificationMethod{
-				{
-					Id:                     keyId,
-					VerificationMethodType: "Ed25519VerificationKey2020",
-					Controller:             did,
-					VerificationMaterial:   publicKeyMultibase,
+		payload := didcli.DIDDocument{
+			ID: did,
+			VerificationMethod: []didcli.VerificationMethod{
+				map[string]any{
+					"id":                 keyId,
+					"type":               "Ed25519VerificationKey2020",
+					"controller":         did,
+					"publicKeyMultibase": publicKeyMultibase,
 				},
 			},
 			Authentication: []string{keyId},
-			VersionId:      uuid.NewString(),
 		}
 
-		signInputs = []clitypes.SignInput{
+		signInputs = []didcli.SignInput{
 			{
 				VerificationMethodID: keyId,
-				PrivKey:              privKey,
+				PrivKey:              privateKey,
 			},
 		}
 
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(didFeeParams.CreateDid.String()))
 		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(0))
+		Expect(resp.Code).To(BeEquivalentTo(0))
 
-		// Initialize shared resourceID
+		// Initialize shared values
 		resourceID = uuid.NewString()
 		resourceName = "TestName"
 	})
@@ -77,12 +90,12 @@ var _ = Describe("cheqd cli - negative resource", func() {
 
 		// Generate extra sign inputs
 		keyId2 := did + "#key2"
-		_, privKey2, err := ed25519.GenerateKey(nil)
+		_, privateKey2, err := ed25519.GenerateKey(nil)
 		Expect(err).To(BeNil())
-		signInputs2 := []clitypes.SignInput{
+		signInputs2 := []didcli.SignInput{
 			{
 				VerificationMethodID: keyId2,
-				PrivKey:              privKey2,
+				PrivKey:              privateKey2,
 			},
 		}
 
@@ -93,161 +106,147 @@ var _ = Describe("cheqd cli - negative resource", func() {
 		resourceFile, err := testdata.CreateTestJson(GinkgoT().TempDir())
 		Expect(err).To(BeNil())
 
-		_, err = cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionID:    collectionId2,
-			ResourceID:      resourceID,
-			ResourceName:    resourceName,
-			ResourceVersion: resourceVersion,
-			ResourceType:    resourceType,
-			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		_, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+			CollectionId: collectionId2,
+			Id:           resourceID,
+			Name:         resourceName,
+			Version:      resourceVersion,
+			ResourceType: resourceType,
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(HaveOccurred())
 
 		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.Purple, "cannot create resource with missing cli arguments"))
 		// Fail to create a resource with missing cli arguments
 		//   a. missing collection id
-		_, err = cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			ResourceID:      resourceID,
-			ResourceName:    resourceName,
-			ResourceVersion: resourceVersion,
-			ResourceType:    resourceType,
-			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		_, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+			Id:           resourceID,
+			Name:         resourceName,
+			Version:      resourceVersion,
+			ResourceType: resourceType,
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 
 		//  b. missing resource id - works because it is generated by the cli
-		_, err = cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionID:    collectionID,
-			ResourceName:    resourceName,
-			ResourceVersion: resourceVersion,
-			ResourceType:    resourceType,
-			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		_, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+			CollectionId: collectionID,
+			Name:         resourceName,
+			Version:      resourceVersion,
+			ResourceType: resourceType,
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(BeNil())
 
 		// c. missing resource name
-		_, err = cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionID:    collectionID,
-			ResourceID:      resourceID,
-			ResourceVersion: resourceVersion,
-			ResourceType:    resourceType,
-			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		_, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+			CollectionId: collectionID,
+			Id:           resourceID,
+			Version:      resourceVersion,
+			ResourceType: resourceType,
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(HaveOccurred())
 
-		// c. missing resource version - ok
-
 		// d. missing resource type
-		_, err = cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionID:    collectionID,
-			ResourceID:      resourceID,
-			ResourceName:    resourceName,
-			ResourceVersion: resourceVersion,
-			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		_, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+			CollectionId: collectionID,
+			Id:           resourceID,
+			Name:         resourceName,
+			Version:      resourceVersion,
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(HaveOccurred())
 
 		// e. missing resource file
-		_, err = cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionID:    collectionID,
-			ResourceID:      resourceID,
-			ResourceName:    resourceName,
-			ResourceVersion: resourceVersion,
-			ResourceType:    resourceType,
-		}, signInputs, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		_, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+			CollectionId: collectionID,
+			Id:           resourceID,
+			Name:         resourceName,
+			Version:      resourceVersion,
+			ResourceType: resourceType,
+		}, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(HaveOccurred())
 
 		// f. missing sign inputs
-		_, err = cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionID:    collectionID,
-			ResourceID:      resourceID,
-			ResourceName:    resourceName,
-			ResourceVersion: resourceVersion,
-			ResourceType:    resourceType,
-			ResourceFile:    resourceFile,
-		}, []clitypes.SignInput{}, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		_, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+			CollectionId: collectionID,
+			Id:           resourceID,
+			Name:         resourceName,
+			Version:      resourceVersion,
+			ResourceType: resourceType,
+		}, []didcli.SignInput{}, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(HaveOccurred())
 
 		// g. missing account
-		_, err = cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionID:    collectionID,
-			ResourceID:      resourceID,
-			ResourceName:    resourceName,
-			ResourceVersion: resourceVersion,
-			ResourceType:    resourceType,
-			ResourceFile:    resourceFile,
-		}, signInputs, "", cli.CliGasParams)
+		_, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+			CollectionId: collectionID,
+			Id:           resourceID,
+			Name:         resourceName,
+			Version:      resourceVersion,
+			ResourceType: resourceType,
+		}, signInputs, resourceFile, "", helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(HaveOccurred())
 
 		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.Purple, "cannot create resource with sign inputs mismatch"))
 		// Fail to create a resource with sign inputs mismatch
 		//   a. sign inputs mismatch
-		_, err = cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionID:    collectionID,
-			ResourceID:      resourceID,
-			ResourceName:    resourceName,
-			ResourceVersion: resourceVersion,
-			ResourceType:    resourceType,
-			ResourceFile:    resourceFile,
-		}, signInputs2, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		_, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+			CollectionId: collectionID,
+			Id:           resourceID,
+			Name:         resourceName,
+			Version:      resourceVersion,
+			ResourceType: resourceType,
+		}, signInputs2, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(HaveOccurred())
 
 		//   b. non-existing key id
-		_, err = cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionID:    collectionID,
-			ResourceID:      resourceID,
-			ResourceName:    resourceName,
-			ResourceVersion: resourceVersion,
-			ResourceType:    resourceType,
-			ResourceFile:    resourceFile,
-		}, []clitypes.SignInput{
+		_, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+			CollectionId: collectionID,
+			Id:           resourceID,
+			Name:         resourceName,
+			Version:      resourceVersion,
+			ResourceType: resourceType,
+		}, []didcli.SignInput{
 			{
 				VerificationMethodID: "non-existing-key-id",
 				PrivKey:              signInputs[0].PrivKey,
 			},
-		}, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		}, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(HaveOccurred())
 
 		//   c. non-matching private key
-		_, err = cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionID:    collectionID,
-			ResourceID:      resourceID,
-			ResourceName:    resourceName,
-			ResourceVersion: resourceVersion,
-			ResourceType:    resourceType,
-			ResourceFile:    resourceFile,
-		}, []clitypes.SignInput{
+		_, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+			CollectionId: collectionID,
+			Id:           resourceID,
+			Name:         resourceName,
+			Version:      resourceVersion,
+			ResourceType: resourceType,
+		}, []didcli.SignInput{
 			{
 				VerificationMethodID: signInputs[0].VerificationMethodID,
-				PrivKey:              privKey2,
+				PrivKey:              privateKey2,
 			},
-		}, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		}, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(HaveOccurred())
 
 		//   d. invalid private key
-		_, err = cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionID:    collectionID,
-			ResourceID:      resourceID,
-			ResourceName:    resourceName,
-			ResourceVersion: resourceVersion,
-			ResourceType:    resourceType,
-			ResourceFile:    resourceFile,
-		}, []clitypes.SignInput{
+		_, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+			CollectionId: collectionID,
+			Id:           resourceID,
+			Name:         resourceName,
+			Version:      resourceVersion,
+			ResourceType: resourceType,
+		}, []didcli.SignInput{
 			{
 				VerificationMethodID: signInputs[0].VerificationMethodID,
 				PrivKey:              testdata.GenerateByteEntropy(),
 			},
-		}, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		}, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(HaveOccurred())
 
 		// Finally, create the resource
-		res, err := cli.CreateResource(tmpDir, resourcecli.CreateResourceOptions{
-			CollectionID:    collectionID,
-			ResourceID:      resourceID,
-			ResourceName:    resourceName,
-			ResourceVersion: resourceVersion,
-			ResourceType:    resourceType,
-			ResourceFile:    resourceFile,
-		}, signInputs, testdata.BASE_ACCOUNT_1, cli.CliGasParams)
+		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+			CollectionId: collectionID,
+			Id:           resourceID,
+			Name:         resourceName,
+			Version:      resourceVersion,
+			ResourceType: resourceType,
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
