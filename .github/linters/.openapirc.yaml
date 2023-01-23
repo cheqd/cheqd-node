@@ -7,5 +7,6 @@
 ##########################
 
 extends: spectral:oas
+
 rules:
   oas2-schema: warn

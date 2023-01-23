@@ -73,7 +73,7 @@ func QueryDidDoc(did string) (didtypes.QueryDidDocResponse, error) {
 }
 
 func QueryResource(collectionID string, resourceID string) (resourcetypes.QueryResourceResponse, error) {
-	res, err := Query("resource", "resource", collectionID, resourceID)
+	res, err := Query("resource", "specific-resource", collectionID, resourceID)
 	if err != nil {
 		return resourcetypes.QueryResourceResponse{}, err
 	}
@@ -88,7 +88,7 @@ func QueryResource(collectionID string, resourceID string) (resourcetypes.QueryR
 }
 
 func QueryResourceMetadata(collectionID string, resourceID string) (resourcetypes.QueryResourceMetadataResponse, error) {
-	res, err := Query("resource", "resource-metadata", collectionID, resourceID)
+	res, err := Query("resource", "metadata", collectionID, resourceID)
 	if err != nil {
 		return resourcetypes.QueryResourceMetadataResponse{}, err
 	}
@@ -103,7 +103,7 @@ func QueryResourceMetadata(collectionID string, resourceID string) (resourcetype
 }
 
 func QueryResourceCollection(collectionID string) (resourcetypes.QueryCollectionResourcesResponse, error) {
-	res, err := Query("resource", "collection-resources", collectionID)
+	res, err := Query("resource", "collection-metadata", collectionID)
 	if err != nil {
 		return resourcetypes.QueryCollectionResourcesResponse{}, err
 	}

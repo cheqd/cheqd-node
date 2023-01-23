@@ -7,7 +7,7 @@ import (
 )
 
 func QueryDidLegacy(did string, container string) (didtypesv1.QueryGetDidResponse, error) {
-	res, err := Query(container, CLIBinaryName, "cheqd", "did", did)
+	res, err := Query(container, CliBinaryName, "cheqd", "did", did)
 	if err != nil {
 		return didtypesv1.QueryGetDidResponse{}, err
 	}
@@ -22,7 +22,7 @@ func QueryDidLegacy(did string, container string) (didtypesv1.QueryGetDidRespons
 }
 
 func QueryDid(did string, container string) (didtypesv2.QueryDidDocResponse, error) {
-	res, err := Query(container, CLIBinaryName, "cheqd", "did-document", did)
+	res, err := Query(container, CliBinaryName, "cheqd", "did-document", did)
 	if err != nil {
 		return didtypesv2.QueryDidDocResponse{}, err
 	}

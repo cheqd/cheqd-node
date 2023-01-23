@@ -7,14 +7,9 @@ import (
 )
 
 const (
-	CLIBinaryName = integrationcli.CliBinaryName
+	CliBinaryName = integrationcli.CliBinaryName
 	Green         = integrationcli.Green
 	Purple        = integrationcli.Purple
-)
-
-const (
-	CLIBinaryNamePrevious = CLIBinaryName + "-previous"
-	CLIBinaryNameNext     = CLIBinaryName + "-next"
 )
 
 const (
@@ -37,12 +32,14 @@ const (
 
 var (
 	TXParams = []string{
-		"--gas", Gas,
-		"--gas-adjustment", GasAdjustment,
-		"--gas-prices", GasPrices,
 		"--keyring-backend", KeyringBackend,
 		"--chain-id", integrationnetwork.ChainID,
 		"-y",
+	}
+	GasParams = []string{
+		"--gas", Gas,
+		"--gas-adjustment", GasAdjustment,
+		"--gas-prices", GasPrices,
 	}
 	QueryParamsConst = []string{
 		"--chain-id", integrationnetwork.ChainID,

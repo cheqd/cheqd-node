@@ -259,6 +259,7 @@ func New(
 	)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 	bApp.SetVersion(version.Version)
+	bApp.SetProtocolVersion(ProtocolVersion)
 	bApp.SetInterfaceRegistry(interfaceRegistry)
 
 	keys := sdk.NewKVStoreKeys(
@@ -753,11 +754,11 @@ func New(
 			}
 
 			ctx.Logger().Info("Version map is populated. Running migrations.")
-			ctx.Logger().Debug(fmt.Sprintf("fromVm: %v", fromVM))
+			ctx.Logger().Debug(fmt.Sprintf("Previous version map: %v", fromVM))
 
 			// Get current version map
 			newVM := app.mm.GetVersionMap()
-			ctx.Logger().Debug(fmt.Sprintf("newVM: %v", newVM))
+			ctx.Logger().Debug(fmt.Sprintf("Target version map: %v", newVM))
 
 			// Set cheqd/DID module to ConsensusVersion
 			fromVM[didtypes.ModuleName] = newVM[didtypes.ModuleName]
@@ -860,9 +861,9 @@ func New(
 			}
 
 			// Run all default migrations
-			ctx.Logger().Debug(fmt.Sprintf("fromVM (for default RunMigrations): %v", fromVM))
+			ctx.Logger().Debug(fmt.Sprintf("Previous version map (for default RunMigrations): %v", fromVM))
 			toVM, err := app.mm.RunMigrations(ctx, app.configurator, fromVM)
-			ctx.Logger().Debug(fmt.Sprintf("toVM (version map after RunMigrations): %v", toVM))
+			ctx.Logger().Debug(fmt.Sprintf("New version map (after default RunMigrations): %v", toVM))
 			return toVM, err
 		})
 

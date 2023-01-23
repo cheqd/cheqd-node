@@ -40,7 +40,7 @@ var _ = Describe("TxMsgCreateResourcePayload", func() {
 					ResourceType: "",
 					Data:         []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 				}
-				Expect(msg.Validate().Error()).To(Equal("resource_type: cannot be blank."))
+				Expect(msg.Validate().Error()).To(Equal("resourceType: cannot be blank."))
 			})
 		})
 	})

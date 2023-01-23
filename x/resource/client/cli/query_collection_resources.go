@@ -11,9 +11,13 @@ import (
 
 func CmdGetCollectionResources() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "collection-resources [collectionId]",
-		Short: "Query all resource of a specific collection",
-		Args:  cobra.ExactArgs(1),
+		Use:   "collection-metadata [collection-id] [resource-id]",
+		Short: "Query metadata for an entire Collection",
+		Long: `Query metadata for an entire Collection by Collection ID. This will return the metadata for all Resources in the Collection.
+		
+		Collection ID is the UNIQUE IDENTIFIER part of the DID the resource is linked to.
+		Example: c82f2b02-bdab-4dd7-b833-3e143745d612, wGHEXrZvJxR8vw5P3UWH1j, etc.`,
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 

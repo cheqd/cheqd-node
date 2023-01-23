@@ -22,8 +22,11 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type QueryClient interface {
+	// Fetch data/payload for a specific resource (without metadata)
 	Resource(ctx context.Context, in *QueryResourceRequest, opts ...grpc.CallOption) (*QueryResourceResponse, error)
+	// Fetch only metadata for a specific resource
 	ResourceMetadata(ctx context.Context, in *QueryResourceMetadataRequest, opts ...grpc.CallOption) (*QueryResourceMetadataResponse, error)
+	// Fetch metadata for all resources in a collection
 	CollectionResources(ctx context.Context, in *QueryCollectionResourcesRequest, opts ...grpc.CallOption) (*QueryCollectionResourcesResponse, error)
 }
 
@@ -66,8 +69,11 @@ func (c *queryClient) CollectionResources(ctx context.Context, in *QueryCollecti
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility
 type QueryServer interface {
+	// Fetch data/payload for a specific resource (without metadata)
 	Resource(context.Context, *QueryResourceRequest) (*QueryResourceResponse, error)
+	// Fetch only metadata for a specific resource
 	ResourceMetadata(context.Context, *QueryResourceMetadataRequest) (*QueryResourceMetadataResponse, error)
+	// Fetch metadata for all resources in a collection
 	CollectionResources(context.Context, *QueryCollectionResourcesRequest) (*QueryCollectionResourcesResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }

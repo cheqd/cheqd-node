@@ -8,57 +8,57 @@
         "controller": [
             "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg"
         ],
-        "verification_method": [
+        "verificationMethod": [
             {
                 "id": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-1",
-                "verificationMethodType": "Ed25519VerificationKey2020",
+                "type": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg",
-                "verification_material": "z6MkpqEAYo7Ri8WYt6Kx4efLQdVJNgh4QzDf8ptVxJoexXdx"
+                "publicKeyMultibase": "z6MkpqEAYo7Ri8WYt6Kx4efLQdVJNgh4QzDf8ptVxJoexXdx"
             },
             {
                 "id": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-2",
-                "verificationMethodType": "Ed25519VerificationKey2020",
+                "type": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg",
-                "verification_material": "z6MkqX2qR3rvt9UQpXsaYKFqGjX79ooFfwhhpZo8HfVXiDMP"
+                "publicKeyMultibase": "z6MkqX2qR3rvt9UQpXsaYKFqGjX79ooFfwhhpZo8HfVXiDMP"
             },
             {
                 "id": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-3",
-                "verificationMethodType": "Ed25519VerificationKey2020",
+                "type": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg",
-                "verification_material": "z6MkqTTDS64UDxJGqNPb9FyeKRpz9YhDpV7qazkjXJkfRcfx"
+                "publicKeyMultibase": "z6MkqTTDS64UDxJGqNPb9FyeKRpz9YhDpV7qazkjXJkfRcfx"
             }
         ],
         "authentication": [
             "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-1"
         ],
-        "assertion_method": [
+        "assertionMethod": [
             "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-2",
             "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-3"
         ],
-        "capability_delegation": [
+        "capabilityDelegation": [
             "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-4",
             "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-2"
         ],
-        "key_agreement": [
+        "keyAgreement": [
             "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#key-4"
         ],
         "service": [
             {
                 "id": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#service-1",
-                "serviceType": "type-1",
-                "service_endpoint": [
+                "type": "type-1",
+                "serviceEndpoint": [
                     "endpoint-1"
                 ]
             },
             {
                 "id": "did:cheqd:testnet:5rjaLzcffhGUH4nt4fyfAg#service-2",
-                "serviceType": "type-1",
-                "service_endpoint": [
+                "type": "type-1",
+                "serviceEndpoint": [
                     "endpoint-2"
                 ]
             }
         ],
-        "also_known_as": [
+        "alsoKnownAs": [
             "alias-3"
         ]
     },
