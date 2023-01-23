@@ -10,7 +10,7 @@ containerProtoGen=cheqd-node-proto-gen-$(containerProtoVer)
 containerProtoFmt=cheqd-node-proto-fmt-$(containerProtoVer)
 containerProtoGenSwagger=cheqd-node-proto-gen-swagger-$(containerProtoVer)
 
-proto-all: proto-lint proto-format proto-gen proto-swagger-gen
+proto-all: proto-gen proto-swagger-gen
 
 proto-gen:
 	@echo "Generating Protobuf files"
@@ -22,7 +22,7 @@ proto-format:
 	@if docker ps -a --format '{{.Names}}' | grep -Eq "^${containerProtoFmt}$$"; then docker start -a $(containerProtoFmt); else docker run --name $(containerProtoFmt) -v $(CURDIR):/workspace --workdir /workspace tendermintdev/docker-build-proto \
 		find .  -name "*.proto" -not -path "./third_party/*" -exec clang-format -i {} \; ; fi
 
-DOCKER_BUF := docker run -v $(shell pwd):/workspace --workdir /workspace bufbuild/buf:1.11.0
+DOCKER_BUF := docker run -v $(shell pwd):/workspace --workdir /workspace bufbuild/buf:1.12.0
 
 proto-lint:
 	@$(DOCKER_BUF) lint --error-format=json
