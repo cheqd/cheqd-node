@@ -14,6 +14,11 @@ WORKDIR /go/src/github.com/cheqd/cheqd-node
 # Add source files
 COPY . .
 
+# Pass build ldflags
+# ARG VERSION
+# ARG COMMIT
+# ARG BUILD_TAGS=netgo,ledger,goleveldb
+
 # Make node binary
 RUN make install && make build
 
