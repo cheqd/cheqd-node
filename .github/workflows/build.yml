@@ -36,6 +36,7 @@ jobs:
   build-docker:
     name: "Docker image"
     runs-on: ubuntu-20.04
+    needs: build-binary
     env:
       IMAGE_NAME: ${{ github.repository }}
 
