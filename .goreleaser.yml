@@ -10,8 +10,7 @@ before:
     - make clean
     - make tidy
     - make install
-    - make proto-gen
-    - make swagger
+    - make proto-all
 
 builds:
   - id: ubuntu-latest-amd64
@@ -95,7 +94,7 @@ release:
     name: cheqd-node
   
   draft: false
-  prerelease: true
+  prerelease: "true"
   mode: append
   header: |
     # Release Notes for {{.ProjectName}} v{{.Version}}

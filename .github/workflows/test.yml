@@ -135,7 +135,7 @@ jobs:
         working-directory: ./..
         run: go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
-      - name: Run Gingko integration tests
+      - name: Run Ginkgo integration tests
         working-directory: ./tests/integration
         run: |
           ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --junit-report ../../report-integration.xml

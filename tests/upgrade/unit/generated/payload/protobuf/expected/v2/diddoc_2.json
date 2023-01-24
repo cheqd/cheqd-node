@@ -1,5 +1,5 @@
 {
-    "did_doc": {
+    "didDoc": {
         "context": [
             "abc",
             "def"
@@ -8,48 +8,48 @@
         "controller": [
             "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez"
         ],
-        "verification_method": [
+        "verificationMethod": [
             {
                 "id": "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-1",
                 "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez",
-                "verification_material": "z6Mkkc6v4z1jVWHBdaXR9TRSU9N9PSt1PK5czryfCCeYQ2pT"
+                "verificationMaterial": "z6Mkkc6v4z1jVWHBdaXR9TRSU9N9PSt1PK5czryfCCeYQ2pT"
             },
             {
                 "id": "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-2",
                 "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez",
-                "verification_material": "z6MkhvhXhLy9KbcVeXRoViiBMPUR6qUrPaz9yJCqLY4AjPe2"
+                "verificationMaterial": "z6MkhvhXhLy9KbcVeXRoViiBMPUR6qUrPaz9yJCqLY4AjPe2"
             },
             {
                 "id": "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-3",
                 "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez",
-                "verification_material": "z6Mkfd2VEesedDybq5UPhGfSqDQABcDTz1hraLbQcRHavP8v"
+                "verificationMaterial": "z6Mkfd2VEesedDybq5UPhGfSqDQABcDTz1hraLbQcRHavP8v"
             },
             {
                 "id": "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-4",
                 "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez",
-                "verification_material": "z6MkhpM45nn2SvgyUBrRoQop7rqSHH43n8c7tSBib7cCc1jK"
+                "verificationMaterial": "z6MkhpM45nn2SvgyUBrRoQop7rqSHH43n8c7tSBib7cCc1jK"
             }
         ],
         "authentication": [
             "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-1",
             "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-2"
         ],
-        "assertion_method": [
+        "assertionMethod": [
             "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-3"
         ],
-        "capability_invocation": [
+        "capabilityInvocation": [
             "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-4",
             "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-1"
         ],
-        "capability_delegation": [
+        "capabilityDelegation": [
             "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-4",
             "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-2"
         ],
-        "key_agreement": [
+        "keyAgreement": [
             "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-1",
             "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-2",
             "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-3",
@@ -59,12 +59,12 @@
             {
                 "id": "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#service-1",
                 "serviceType": "type-1",
-                "service_endpoint": [
+                "serviceEndpoint": [
                     "endpoint-1"
                 ]
             }
         ],
-        "also_known_as": [
+        "alsoKnownAs": [
             "alias-1",
             "alias-2"
         ]
@@ -73,8 +73,8 @@
         "created": "2021-01-01T00:00:00Z",
         "updated": "2021-01-01T00:00:00Z",
         "deactivated": false,
-        "version_id": "c57cb7a2-2b35-4d0d-b453-eda463ae58ef",
-        "next_version_id": "",
-        "previous_version_id": ""
+        "versionId": "c57cb7a2-2b35-4d0d-b453-eda463ae58ef",
+        "nextVersionId": "",
+        "previousVersionId": ""
     }
 }

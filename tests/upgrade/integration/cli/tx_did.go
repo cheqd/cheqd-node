@@ -25,11 +25,16 @@ func CreateDidLegacy(payload didtypesv1.MsgCreateDidPayload, signInputs []cli.Si
 		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivKey))
 	}
 
-	return Tx(container, CLIBinaryName, "cheqd", "create-did", OperatorAccounts[container], args...)
+	args = append(args, GasParams...)
+
+	return Tx(container, CliBinaryName, "cheqd", "create-did", OperatorAccounts[container], args...)
 }
 
-func CreateDid(payload didtypesv2.MsgCreateDidDocPayload, signInputs []cli.SignInput, container string) (sdk.TxResponse, error) {
-	innerPayloadJSON := integrationhelpers.Codec.MustMarshalJSON(&payload)
+func CreateDid(payload cli.DIDDocument, signInputs []cli.SignInput, container, versionID, fees string) (sdk.TxResponse, error) {
+	innerPayloadJSON, err := json.Marshal(&payload)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
 
 	outerPayload := cli.PayloadWithSignInputs{
 		Payload:    innerPayloadJSON,
@@ -50,7 +55,13 @@ func CreateDid(payload didtypesv2.MsgCreateDidDocPayload, signInputs []cli.SignI
 
 	args := []string{string("payload.json")}
 
-	return Tx(container, CLIBinaryName, "cheqd", "create-did", OperatorAccounts[container], args...)
+	args = append(args, integrationhelpers.GenerateFees(fees)...)
+
+	if versionID != "" {
+		args = append(args, versionID)
+	}
+
+	return Tx(container, CliBinaryName, "cheqd", "create-did", OperatorAccounts[container], args...)
 }
 
 func UpdateDidLegacy(payload didtypesv1.MsgUpdateDidPayload, signInputs []cli.SignInput, container string) (sdk.TxResponse, error) {
@@ -66,11 +77,16 @@ func UpdateDidLegacy(payload didtypesv1.MsgUpdateDidPayload, signInputs []cli.Si
 		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivKey))
 	}
 
-	return Tx(container, CLIBinaryName, "cheqd", "update-did", OperatorAccounts[container], args...)
+	args = append(args, GasParams...)
+
+	return Tx(container, CliBinaryName, "cheqd", "update-did", OperatorAccounts[container], args...)
 }
 
-func UpdateDid(payload didtypesv2.MsgUpdateDidDocPayload, signInputs []cli.SignInput, container string) (sdk.TxResponse, error) {
-	innerPayloadJSON := integrationhelpers.Codec.MustMarshalJSON(&payload)
+func UpdateDid(payload cli.DIDDocument, signInputs []cli.SignInput, container, versionID, fees string) (sdk.TxResponse, error) {
+	innerPayloadJSON, err := json.Marshal(&payload)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
 
 	outerPayload := cli.PayloadWithSignInputs{
 		Payload:    innerPayloadJSON,
@@ -91,7 +107,13 @@ func UpdateDid(payload didtypesv2.MsgUpdateDidDocPayload, signInputs []cli.SignI
 
 	args := []string{string("payload.json")}
 
-	return Tx(container, CLIBinaryName, "cheqd", "update-did", OperatorAccounts[container], args...)
+	args = append(args, integrationhelpers.GenerateFees(fees)...)
+
+	if versionID != "" {
+		args = append(args, versionID)
+	}
+
+	return Tx(container, CliBinaryName, "cheqd", "update-did", OperatorAccounts[container], args...)
 }
 
 func DeactivateDidLegacy(payload didtypesv1.MsgDeactivateDidPayload, signInputs []cli.SignInput, container string) (sdk.TxResponse, error) {
@@ -107,10 +129,12 @@ func DeactivateDidLegacy(payload didtypesv1.MsgDeactivateDidPayload, signInputs 
 		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivKey))
 	}
 
-	return Tx(container, CLIBinaryName, "cheqd", "deactivate-did", OperatorAccounts[container], args...)
+	args = append(args, GasParams...)
+
+	return Tx(container, CliBinaryName, "cheqd", "deactivate-did", OperatorAccounts[container], args...)
 }
 
-func DeactivateDid(payload didtypesv2.MsgDeactivateDidDocPayload, signInputs []cli.SignInput, container string) (sdk.TxResponse, error) {
+func DeactivateDid(payload didtypesv2.MsgDeactivateDidDocPayload, signInputs []cli.SignInput, container string, fees string) (sdk.TxResponse, error) {
 	innerPayloadJSON := integrationhelpers.Codec.MustMarshalJSON(&payload)
 
 	outerPayload := cli.PayloadWithSignInputs{
@@ -132,5 +156,7 @@ func DeactivateDid(payload didtypesv2.MsgDeactivateDidDocPayload, signInputs []c
 
 	args := []string{string("payload.json")}
 
-	return Tx(container, CLIBinaryName, "cheqd", "deactivate-did", OperatorAccounts[container], args...)
+	args = append(args, integrationhelpers.GenerateFees(fees)...)
+
+	return Tx(container, CliBinaryName, "cheqd", "deactivate-did", OperatorAccounts[container], args...)
 }

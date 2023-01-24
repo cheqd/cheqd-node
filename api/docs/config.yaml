@@ -1,0 +1,40 @@
+# Swagger config 
+
+swagger: '2.0'
+info:
+  title: cheqd Network - REST and gRPC Gateway Documentation
+  description: Documentation describing REST and gRPC Gateway endpoints for cheqd network
+  version: v1.x
+  contact:
+    name: Cheqd Foundation Limited
+    url: https://cheqd.io
+  license:
+    name: Apache 2.0
+    url: https://github.com/cheqd/cheqd-node/blob/main/LICENSE
+basePath: /swagger/
+schemes:
+  - http
+  - https
+consumes:
+  - application/json
+  - application/json+ld
+  - "*/*"
+produces:
+  - application/json
+  - application/json+ld
+  - "*/*"
+externalDocs:
+  description: cheqd Network Documentation
+  url: https://docs.cheqd.io/node
+
+
+apis:
+  - url: ./api/docs/cheqd/did/v2/query.swagger.json
+    tags:
+      rename:
+        cheqd.did.v2.Query: DID module queries
+
+  - url: ./api/docs/cheqd/resource/v2/query.swagger.json
+    tags:
+      rename:
+        cheqd.resource.v2.Query: Resource module queries
