@@ -9,7 +9,6 @@ info:
   license:
     name: Apache 2.0
     url: https://github.com/cheqd/cheqd-node/blob/main/LICENSE
-basePath: /swagger/
 schemes:
   - http
   - https
