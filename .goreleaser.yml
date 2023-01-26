@@ -10,7 +10,7 @@ before:
     - make clean
     - make tidy
     - make install
-    - make proto-all
+    - make proto-gen
 
 builds:
   - id: ubuntu-latest-amd64
