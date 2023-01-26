@@ -1,8 +1,9 @@
-module github.com/cheqd/cheqd-node/api
+module github.com/cheqd/cheqd-node/api/v2
 
 go 1.18
 
 require (
+	github.com/cheqd/cheqd-node/api v0.0.0-20230125173829-33d2b2d84fe8
 	github.com/cosmos/cosmos-proto v1.0.0-alpha7
 	github.com/cosmos/cosmos-sdk/api v0.1.0
 	github.com/cosmos/gogoproto v1.4.3
@@ -15,7 +16,6 @@ require (
 require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/google/go-cmp v0.5.7 // indirect
 	golang.org/x/net v0.0.0-20220722155237-a158d28d115b // indirect
 	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
 	golang.org/x/text v0.4.0 // indirect

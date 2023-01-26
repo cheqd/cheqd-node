@@ -5,6 +5,7 @@ go 1.18
 require (
 	cosmossdk.io/math v1.0.0-beta.3
 	filippo.io/edwards25519 v1.0.0-rc.1
+	github.com/cheqd/cheqd-node/api/v2 v2.0.0-00010101000000-000000000000
 	github.com/cosmos/cosmos-proto v1.0.0-alpha8
 	github.com/cosmos/cosmos-sdk v0.46.8
 	github.com/cosmos/gogoproto v1.4.3
@@ -173,13 +174,20 @@ require (
 )
 
 replace (
+	// Keyring replacement from Cosmos SDK v0.46.8
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.1.7-0.20210622111912-ef00f8ac3d76
+
+	// cheqd-node/api module replacement
+	github.com/cheqd/cheqd-node/api/v2 => ./api
 
 	// Fix upstream GHSA-h395-qcrw-5vmq vulnerability.
 	// TODO Remove it: https://github.com/cosmos/cosmos-sdk/issues/10409
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.7.0
 
+	// From Cosmos SDK v0.46.8 upstream
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
+
+	// From Cosmos SDK v0.46.8 upstream
 	github.com/jhump/protoreflect => github.com/jhump/protoreflect v1.9.0
 
 	// use informal system fork of tendermint
