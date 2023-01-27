@@ -301,19 +301,13 @@ class Installer():
 
     @property
     def cosmovisor_download_url(self):
-        return COSMOVISOR_BINARY_URL.format(DEFAULT_LATEST_COSMOVISOR_VERSION, DEFAULT_LATEST_COSMOVISOR_VERSION, self.os_arch)
-
-    @property
-    def os_arch(self):
-        return self.get_os_arch()
-
-    def get_os_arch(self):
-        OS_ARCH = platform.machine()
-        if OS_ARCH == 'x86_64':
-            OS_ARCH = 'amd64'
+        # Compute the download URL for cosmovisor binary based on the OS architecture and version number
+        os_arch = platform.machine()
+        if os_arch == 'x86_64':
+            os_arch = 'amd64'
         else:
-            OS_ARCH = 'arm64'
-        return OS_ARCH
+            os_arch = 'arm64'
+        return COSMOVISOR_BINARY_URL.format(DEFAULT_LATEST_COSMOVISOR_VERSION, DEFAULT_LATEST_COSMOVISOR_VERSION, os_arch)
 
     def log(self, msg):
         if self.verbose:
@@ -336,6 +330,8 @@ class Installer():
         return subprocess.run(cmd, **kwargs)
 
     def get_binary(self):
+        # Download cheqd-noded binary and extract it
+        # Also remove the downloaded archive file, if applicable
         self.log("Downloading cheqd-noded binary...")
         binary_url = self.release.get_release_url()
         fname = os.path.basename(binary_url)
@@ -346,9 +342,10 @@ class Installer():
                 self.remove_safe(fname)
             self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
         except:
-            failure_exit("Failed to download binary")
+            failure_exit("Failed to download cheqd-noded binary")
 
     def is_user_exists(self, username) -> bool:
+        # Check if "cheqd" user exists on the system
         try:
             pwd.getpwnam(username)
             self.log(f"User {username} already exists")
@@ -358,13 +355,19 @@ class Installer():
             return False
 
     def remove_safe(self, path, is_dir=False):
+        # Common function to remove a file or directory safely
         if is_dir and os.path.exists(path):
             shutil.rmtree(path)
         if os.path.exists(path):
             os.remove(path)
 
     def pre_install(self):
+        # Pre-installation checks
         if self.interviewer.is_from_scratch:
+            # Removes the following existing cheqd-noded data and configurations:
+            # 1. ~/.cheqdnode directory
+            # 2. cheqd-noded / cosmovisor binaries
+            # 3. systemd service files
             self.log("Removing user's data and configs")
             self.remove_safe(self.cheqd_root_dir, is_dir=True)
             self.remove_safe(os.path.join(
@@ -377,13 +380,11 @@ class Installer():
             self.remove_safe(DEFAULT_LOGROTATE_FILE)
 
         if self.interviewer.is_cosmo_needed and os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH):
+            # Scenario: User has installed cheqd-noded without cosmovisor, AND now wants to install cheqd-noded with cosmovisor
             self.remove_safe(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
 
     def prepare_directory_tree(self):
-        """
-        Needed only in case of clean installation
-
-        """
+        # Needed only in case of clean installation
         try:
             if not os.path.exists(self.cheqd_root_dir):
                 self.log("Creating main directory for cheqd-noded")
@@ -515,8 +516,8 @@ class Installer():
         - Restore and download snapshot (if selected by user)
         """
 
-        self.pre_install()
         self.get_binary()
+        self.pre_install()
         self.prepare_cheqd_user()
         self.prepare_directory_tree()
         self.setup_system_configs()
