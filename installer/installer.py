@@ -86,6 +86,8 @@ DEFAULT_P2P_PORT = "26656"
 CHEQD_NODED_MINIMUM_GAS_PRICES = "50ncheq"
 CHEQD_NODED_LOG_LEVEL = "error"
 CHEQD_NODED_LOG_FORMAT = "json"
+CHEQD_NODED_FASTSYNC_VERSION = "v0"
+CHEQD_NODED_P2P_MAX_PACKET_MSG_PAYLOAD_SIZE = 10240
 
 ###############################################################
 ###     	            Chain IDs     			            ###
