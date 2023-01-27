@@ -230,6 +230,9 @@ class Installer():
 
     @property
     def logrotate_cfg(self):
+        # Modify logrotate template file to replace values for environment variables
+        # The logrotate template file is fetched from the GitHub repo
+        # Logrotate is used to rotate the log files of the cheqd-node every day, and keep a maximum of 7 days of logs.
         fname = os.path.basename(LOGROTATE_TEMPLATE)
         self.exec(f"wget -c {LOGROTATE_TEMPLATE}")
         with open(fname) as f:
@@ -243,6 +246,9 @@ class Installer():
 
     @property
     def rsyslog_cfg(self):
+        # Modify rsyslog template file to replace values for environment variables
+        # The rsyslog template file is fetched from the GitHub repo
+        # rsyslog is used to define logging properties for cheqd-noded/cosmovisor binary, depending on installation type.
         binary_name = DEFAULT_COSMOVISOR_BINARY_NAME if self.interviewer.is_cosmo_needed else DEFAULT_BINARY_NAME
         fname = os.path.basename(RSYSLOG_TEMPLATE)
         self.exec(f"wget -c {RSYSLOG_TEMPLATE}")
@@ -258,26 +264,39 @@ class Installer():
 
     @property
     def cheqd_root_dir(self):
-        return os.path.join(self.interviewer.home_dir, ".cheqdnode")
+        # CHEQD_NODED_HOME variable can be picked up by cheqd-noded, so this should be set as an environment variable later
+        # Default: /home/cheqd/.cheqdnode
+        CHEQD_NODED_HOME = os.path.join(self.interviewer.home_dir, ".cheqdnode")
+        return CHEQD_NODED_HOME
 
     @property
     def cheqd_config_dir(self):
+        # cheqd-noded config directory
+        # Default: /home/cheqd/.cheqdnode/config
         return os.path.join(self.cheqd_root_dir, "config")
 
     @property
     def cheqd_data_dir(self):
+        # cheqd-noded data directory
+        # Default: /home/cheqd/.cheqdnode/data
         return os.path.join(self.cheqd_root_dir, "data")
 
     @property
     def cheqd_log_dir(self):
+        # cheqd-noded log directory
+        # Default: /home/cheqd/.cheqdnode/log
         return os.path.join(self.cheqd_root_dir, "log")
 
     @property
     def cosmovisor_root_dir(self):
+        # cosmovisor root directory
+        # Default: /home/cheqd/.cheqdnode/cosmovisor
         return os.path.join(self.cheqd_root_dir, "cosmovisor")
 
     @property
     def cosmovisor_cheqd_bin_path(self):
+        # cheqd-noded binary path if installed with cosmovisor
+        # Default: /home/cheqd/.cheqdnode/cosmovisor/current/bin/cheqd-noded
         return os.path.join(self.cosmovisor_root_dir, f"current/bin/{DEFAULT_BINARY_NAME}")
 
     @property
