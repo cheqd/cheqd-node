@@ -28,7 +28,7 @@ import shutil
 ###     				Installer defaults    				###
 ###############################################################
 LAST_N_RELEASES = 5
-DEFAULT_HOME = "/home/cheqd"
+CHEQD_NODED_HOME = "/home/cheqd"
 DEFAULT_INSTALL_PATH = "/usr/bin"
 DEFAULT_CHEQD_USER = "cheqd"
 DEFAULT_BINARY_NAME = "cheqd-noded"
@@ -957,7 +957,7 @@ class Installer():
 
 class Interviewer:
     def __init__(self,
-                 home_dir=DEFAULT_HOME,
+                 home_dir=CHEQD_NODED_HOME,
                  chain=NetworkType.MAINNET):
         self._home_dir = home_dir
         self._is_upgrade = False
@@ -1543,7 +1543,7 @@ if __name__ == '__main__':
     # Ask user for information
     interviewer = Interviewer()
     interviewer.ask_for_version()
-    interviewer.ask_for_home_directory(default=DEFAULT_HOME)
+    interviewer.ask_for_home_directory(default=CHEQD_NODED_HOME)
 
     # Check if cheqd configuration directory exists
     is_installed = interviewer.is_already_installed()
