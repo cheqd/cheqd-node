@@ -76,7 +76,7 @@ SEEDS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/%s/networks/{}/
 ###############################################################
 DEFAULT_SNAPSHOT_SERVER = "https://snapshots-cdn.cheqd.net"
 DEFAULT_INIT_FROM_SNAPSHOT = "yes"
-TESTNET_SNAPSHOT = "https://snapshots-cdn.cheqd.net/testnet/{}/cheqd-testnet-4_{}.tar.lz4"
+TESTNET_SNAPSHOT = "https://snapshots-cdn.cheqd.net/testnet/{}/cheqd-testnet-6_{}.tar.lz4"
 MAINNET_SNAPSHOT = "https://snapshots-cdn.cheqd.net/mainnet/{}/cheqd-mainnet-1_{}.tar.lz4"
 MAX_SNAPSHOT_DAYS = 7
 
@@ -92,7 +92,7 @@ DEFAULT_LOG_FORMAT = "json"
 
 class NetworkType(str, Enum):
     MAINNET = "cheqd-mainnet-1"
-    TESTNET = "cheqd-testnet-5"
+    TESTNET = "cheqd-testnet-6"
 
 
 def sigint_handler(signal, frame):
@@ -1440,11 +1440,11 @@ class Interviewer:
 
     def ask_for_daemon_allow_download_binaries(self):
         self.daemon_allow_download_binaries = self.ask(
-            f"Specify DAEMON_ALLOW_DOWNLOAD_BINARY (true|false)", default=DEFAULT_DAEMON_ALLOW_DOWNLOAD_BINARIES)
+            f"Do you want Cosmovisor to automatically download binaries for scheduled upgrades? (true|false)", default=DEFAULT_DAEMON_ALLOW_DOWNLOAD_BINARIES)
 
     def ask_for_daemon_restart_after_upgrade(self):
         self.daemon_restart_after_upgrade = self.ask(
-            f"Specify DAEMON_RESTART_AFTER_UPGRADE (true|false)", default=DEFAULT_DAEMON_RESTART_AFTER_UPGRADE)
+            f"Do you want Cosmovisor to automatically restart cheqd-noded service after an upgrade has been applied? (true|false)", default=DEFAULT_DAEMON_RESTART_AFTER_UPGRADE)
 
     def prepare_url_for_latest(self) -> str:
         template = TESTNET_SNAPSHOT if self.chain == NetworkType.TESTNET else MAINNET_SNAPSHOT
