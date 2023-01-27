@@ -36,7 +36,7 @@ DEFAULT_COSMOVISOR_BINARY_NAME = "cosmovisor"
 PRINT_PREFIX = "********* "
 
 ###############################################################
-###     				Cosmovisor Config      				###
+###     		Cosmovisor configuration      				###
 ###############################################################
 DEFAULT_LATEST_COSMOVISOR_VERSION = "v1.2.0"
 COSMOVISOR_BINARY_URL = "https://github.com/cosmos/cosmos-sdk/releases/download/cosmovisor%2F{}/cosmovisor-{}-linux-{}.tar.gz"
@@ -49,7 +49,7 @@ DEFAULT_UNSAFE_SKIP_BACKUP = "true"
 DEFAULT_DAEMON_RESTART_DELAY = "120s"
 
 ###############################################################
-###     				Systemd Config      				###
+###     			Systemd configuration      				###
 ###############################################################
 STANDALONE_SERVICE_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/build-tools/node-standalone.service"
 COSMOVISOR_SERVICE_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/build-tools/node-cosmovisor.service"
@@ -93,15 +93,15 @@ CHEQD_NODED_LOG_FORMAT = "json"
 CHEQD_NODED_FASTSYNC_VERSION = "v0"
 CHEQD_NODED_P2P_MAX_PACKET_MSG_PAYLOAD_SIZE = 10240
 
-###############################################################
-###     	            Chain IDs     			            ###
-###############################################################
+
 class NetworkType(str, Enum):
+    # Define the default chain IDs for cheqd networks
     MAINNET = "cheqd-mainnet-1"
     TESTNET = "cheqd-testnet-6"
 
 
 def sigint_handler(signal, frame):
+    # Handle Ctrl+C / SIGINT halts requests
     print('Exiting from cheqd-node installer')
     sys.exit(0)
 
@@ -110,6 +110,7 @@ signal.signal(signal.SIGINT, sigint_handler)
 
 
 def search_and_replace(search_text, replace_text, file_path):
+    # Common function to search and replace text in a file
     file = open(file_path, "r")
     for line in file:
         line = line.strip()
@@ -123,6 +124,7 @@ def search_and_replace(search_text, replace_text, file_path):
 
 
 class Release:
+    # Class to get cheqd-node releases from GitHub
     def __init__(self, release_map):
         self.version = release_map['tag_name']
         self.url = release_map['html_url']
@@ -130,6 +132,10 @@ class Release:
         self.is_prerelease = release_map['prerelease']
 
     def get_release_url(self):
+        # Construct the URL to download selected release from GitHub
+        # This fetches the release tagged "latest", plus any other releases or pre-releases.
+        # Release version numbers are in format "vX.Y.Z", but the release URL does not include the "v".
+        # We also determine the OS and architecture, and construct the URL to download the release.
         try:
             os_arch = platform.machine()
             os_name = platform.system()
@@ -150,12 +156,14 @@ class Release:
 
 
 def failure_exit(reason):
+    # Common function to exit the installer with a failure message
     print(f"Reason for failure: {reason}")
     print("Exiting...")
     sys.exit(1)
 
 
 def post_process(func):
+    # Common function to post-process commands
     @functools.wraps(func)
     def wrapper(*args, **kwds):
         _allow_error = kwds.pop('allow_error', False)
@@ -170,6 +178,7 @@ def post_process(func):
 
 
 def default_answer(func):
+    # Common function to add default answer to questions
     @functools.wraps(func)
     def wrapper(*args, **kwds):
         _default = kwds.get('default', "")
@@ -194,19 +203,26 @@ class Installer():
         return self.get_binary_path()
 
     def get_binary_path(self):
+        # Get the path to the cheqd-node binary on the local system
         return os.path.join(os.path.realpath(os.path.curdir), DEFAULT_BINARY_NAME)
 
     @property
     def cosmovisor_service_cfg(self):
+        # Modify node-cosmovisor.service template file to replace values for environment variables
+        # The template file is fetched from the GitHub repo
+        # Some of these variables are explicitly asked during the installer process. Others are set to default values.
         fname = os.path.basename(COSMOVISOR_SERVICE_FILE)
         self.exec(f"wget -c {COSMOVISOR_SERVICE_FILE}")
         with open(fname) as f:
             s = re.sub(
-                r'({CHEQD_ROOT_DIR}|{CHEQD_BINARY_NAME}|{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}|{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE})',
+                r'({CHEQD_ROOT_DIR}|{DEFAULT_BINARY_NAME}|{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}|{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}|{DEFAULT_DAEMON_POLL_INTERVAL}|{DEFAULT_UNSAFE_SKIP_BACKUP}|{DEFAULT_DAEMON_RESTART_DELAY})',
                 lambda m: {'{CHEQD_ROOT_DIR}': self.cheqd_root_dir,
-                           '{CHEQD_BINARY_NAME}': DEFAULT_BINARY_NAME,
+                           '{DEFAULT_BINARY_NAME}': DEFAULT_BINARY_NAME,
                            '{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}':  self.interviewer.daemon_allow_download_binaries,
-                           '{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}': self.interviewer.daemon_restart_after_upgrade}[m.group()],
+                           '{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}': self.interviewer.daemon_restart_after_upgrade,
+                           '{DEFAULT_DAEMON_POLL_INTERVAL}': DEFAULT_DAEMON_POLL_INTERVAL,
+                           '{DEFAULT_UNSAFE_SKIP_BACKUP}': DEFAULT_UNSAFE_SKIP_BACKUP,
+                           '{DEFAULT_DAEMON_RESTART_DELAY}': DEFAULT_DAEMON_RESTART_DELAY}[m.group()],
                 f.read()
             )
         self.remove_safe(fname)
