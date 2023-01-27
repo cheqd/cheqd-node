@@ -1,5 +1,5 @@
 [Unit]
-Description=Service for running cheqd-node daemon
+Description=Service for running cheqd-noded daemon
 After=network.target
 Documentation=https://docs.cheqd.io/node
 
