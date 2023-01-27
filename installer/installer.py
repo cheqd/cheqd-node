@@ -33,7 +33,10 @@ DEFAULT_INSTALL_PATH = "/usr/bin"
 DEFAULT_CHEQD_USER = "cheqd"
 DEFAULT_BINARY_NAME = "cheqd-noded"
 DEFAULT_COSMOVISOR_BINARY_NAME = "cosmovisor"
+MAINNET_CHAIN_ID = "cheqd-mainnet-1"
+TESTNET_CHAIN_ID = "cheqd-testnet-6"
 PRINT_PREFIX = "********* "
+
 
 ###############################################################
 ###     		Cosmovisor configuration      				###
@@ -48,11 +51,12 @@ DEFAULT_DAEMON_POLL_INTERVAL = "300s"
 DEFAULT_UNSAFE_SKIP_BACKUP = "true"
 DEFAULT_DAEMON_RESTART_DELAY = "120s"
 
+
 ###############################################################
 ###     			Systemd configuration      				###
 ###############################################################
-STANDALONE_SERVICE_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/build-tools/node-standalone.service"
-COSMOVISOR_SERVICE_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/build-tools/node-cosmovisor.service"
+STANDALONE_SERVICE_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/build-tools/node-standalone.service"
+COSMOVISOR_SERVICE_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/build-tools/node-cosmovisor.service"
 LOGROTATE_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/build-tools/logrotate.conf"
 RSYSLOG_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/build-tools/rsyslog.conf"
 DEFAULT_STANDALONE_SERVICE_NAME = 'cheqd-noded'
@@ -62,6 +66,7 @@ DEFAULT_COSMOVISOR_SERVICE_FILE_PATH = f"/lib/systemd/system/{DEFAULT_COSMOVISOR
 DEFAULT_LOGROTATE_FILE = "/etc/logrotate.d/cheqd-node"
 DEFAULT_RSYSLOG_FILE = "/etc/rsyslog.d/cheqd-node.conf"
 
+
 ###############################################################
 ###     		Network configuration files    				###
 ###############################################################
@@ -69,6 +74,7 @@ GENESIS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/%s/networks/{
     DEFAULT_DEBUG_BRANCH)
 SEEDS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/%s/networks/{}/seeds.txt" % (
     DEFAULT_DEBUG_BRANCH)
+
 
 ###############################################################
 ###     				Node snapshots      				###
@@ -78,6 +84,7 @@ TESTNET_SNAPSHOT = "https://snapshots-cdn.cheqd.net/testnet/{}/cheqd-testnet-6_{
 MAINNET_SNAPSHOT = "https://snapshots-cdn.cheqd.net/mainnet/{}/cheqd-mainnet-1_{}.tar.lz4"
 MAX_SNAPSHOT_DAYS = 7
 
+
 ###############################################################
 ###     	Default node environment variables      	    ###
 ###############################################################
@@ -86,7 +93,7 @@ DEFAULT_P2P_PORT = "26656"
 CHEQD_NODED_HOME = "/home/cheqd/.cheqdnode"
 CHEQD_NODED_NODE = "tcp://localhost:26657"
 CHEQD_NODED_MONIKER = platform.node()
-CHEQD_NODED_CHAIN_ID = "cheqd-mainnet-1"
+CHEQD_NODED_CHAIN_ID = MAINNET_CHAIN_ID
 CHEQD_NODED_MINIMUM_GAS_PRICES = "50ncheq"
 CHEQD_NODED_LOG_LEVEL = "error"
 CHEQD_NODED_LOG_FORMAT = "json"
@@ -94,23 +101,18 @@ CHEQD_NODED_FASTSYNC_VERSION = "v0"
 CHEQD_NODED_P2P_MAX_PACKET_MSG_PAYLOAD_SIZE = 10240
 
 
-class NetworkType(str, Enum):
-    # Define the default chain IDs for cheqd networks
-    MAINNET = "cheqd-mainnet-1"
-    TESTNET = "cheqd-testnet-6"
+###############################################################
+###     	    Common, reusable functions    	            ###
+###############################################################
 
-
+# Handle Ctrl+C / SIGINT halts requests
 def sigint_handler(signal, frame):
-    # Handle Ctrl+C / SIGINT halts requests
     print('Exiting from cheqd-node installer')
     sys.exit(0)
-
-
 signal.signal(signal.SIGINT, sigint_handler)
 
-
+# Common function to search and replace text in a file
 def search_and_replace(search_text, replace_text, file_path):
-    # Common function to search and replace text in a file
     file = open(file_path, "r")
     for line in file:
         line = line.strip()
@@ -122,9 +124,43 @@ def search_and_replace(search_text, replace_text, file_path):
                 file.write(data)
     file.close()
 
+# Common function to exit the installer with a failure message
+def failure_exit(reason):
+    print(f"Reason for failure: {reason}")
+    print("Exiting...")
+    sys.exit(1)
 
+# Common function to post-process commands
+def post_process(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwds):
+        _allow_error = kwds.pop('allow_error', False)
+        try:
+            value = func(*args, **kwds)
+        except subprocess.CalledProcessError as err:
+            if err.returncode and _allow_error:
+                return err
+            failure_exit(err)
+        return value
+    return wrapper
+
+# Common function to add default answer to questions
+def default_answer(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwds):
+        _default = kwds.get('default', "")
+        if _default:
+            args = list(args)
+            args[-1] += f" [default: {_default}]:{os.linesep}"
+        value = func(*args)
+        return value if value != "" else _default
+    return wrapper
+
+
+###############################################################
+###         Release class: Get cheqd-node releases   	    ###
+###############################################################
 class Release:
-    # Class to get cheqd-node releases from GitHub
     def __init__(self, release_map):
         self.version = release_map['tag_name']
         self.url = release_map['html_url']
@@ -155,42 +191,9 @@ class Release:
         return f"Name: {self.version}"
 
 
-def failure_exit(reason):
-    # Common function to exit the installer with a failure message
-    print(f"Reason for failure: {reason}")
-    print("Exiting...")
-    sys.exit(1)
-
-
-def post_process(func):
-    # Common function to post-process commands
-    @functools.wraps(func)
-    def wrapper(*args, **kwds):
-        _allow_error = kwds.pop('allow_error', False)
-        try:
-            value = func(*args, **kwds)
-        except subprocess.CalledProcessError as err:
-            if err.returncode and _allow_error:
-                return err
-            failure_exit(err)
-        return value
-    return wrapper
-
-
-def default_answer(func):
-    # Common function to add default answer to questions
-    @functools.wraps(func)
-    def wrapper(*args, **kwds):
-        _default = kwds.get('default', "")
-        if _default:
-            args = list(args)
-            args[-1] += f" [default: {_default}]:{os.linesep}"
-        value = func(*args)
-        return value if value != "" else _default
-
-    return wrapper
-
-
+###############################################################
+###         Installer class: Configure installation  	    ###
+###############################################################
 class Installer():
     def __init__(self, interviewer):
         self.version = interviewer.release.version
@@ -208,8 +211,8 @@ class Installer():
         # Modify node-cosmovisor.service template file to replace values for environment variables
         # The template file is fetched from the GitHub repo
         # Some of these variables are explicitly asked during the installer process. Others are set to default values.
-        fname = os.path.basename(COSMOVISOR_SERVICE_FILE)
-        self.exec(f"wget -c {COSMOVISOR_SERVICE_FILE}")
+        fname = os.path.basename(COSMOVISOR_SERVICE_TEMPLATE)
+        self.exec(f"curl -s {COSMOVISOR_SERVICE_TEMPLATE}")
         with open(fname) as f:
             s = re.sub(
                 r'({CHEQD_ROOT_DIR}|{DEFAULT_BINARY_NAME}|{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}|{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}|{DEFAULT_DAEMON_POLL_INTERVAL}|{DEFAULT_UNSAFE_SKIP_BACKUP}|{DEFAULT_DAEMON_RESTART_DELAY})',
@@ -417,7 +420,7 @@ class Installer():
             failure_exit(
                 "Failed to prepare directory tree for {DEFAULT_CHEQD_USER}")
 
-    def setup_systemctl_services(self):
+    def setup_node_systemd(self):
         # Setup the following systemd services:
         # 1. cheqd-noded.service or cheqd-cosmovisor.service
         
@@ -433,13 +436,37 @@ class Installer():
             self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME)
 
             if self.interviewer.is_cosmo_needed:
-                with open(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH, mode="w") as fd:
-                    fd.write(self.cosmovisor_service_cfg)
-            else:
-                self.exec(
-                    f"curl -s {STANDALONE_SERVICE_FILE} > {DEFAULT_STANDALONE_SERVICE_FILE_PATH}")
+                try:
+                    # Setup cheqd-cosmovisor.service if requested
+                    self.log("Enabling cheqd-cosmovisor.service in systemd")
+                    
+                    # Get the cosmovisor service file template from GitHub
+                    self.exec(f"curl -s {COSMOVISOR_SERVICE_TEMPLATE} > {DEFAULT_COSMOVISOR_SERVICE_FILE_PATH}")
 
-            self.log("Enabling systemd service for cheqd-noded")
+                    fname = os.path.basename(COSMOVISOR_SERVICE_TEMPLATE)
+                    
+
+                    with open(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH, mode="w") as fd:
+                        fd.write(self.cosmovisor_service_cfg)
+                        with open(fname) as f:
+                            s = re.sub(
+                                r'({CHEQD_ROOT_DIR}|{DEFAULT_BINARY_NAME}|{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}|{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}|{DEFAULT_DAEMON_POLL_INTERVAL}|{DEFAULT_UNSAFE_SKIP_BACKUP}|{DEFAULT_DAEMON_RESTART_DELAY})',
+                                lambda m: {'{CHEQD_ROOT_DIR}': self.cheqd_root_dir,
+                                        '{DEFAULT_BINARY_NAME}': DEFAULT_BINARY_NAME,
+                                        '{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}':  self.interviewer.daemon_allow_download_binaries,
+                                        '{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}': self.interviewer.daemon_restart_after_upgrade,
+                                        '{DEFAULT_DAEMON_POLL_INTERVAL}': DEFAULT_DAEMON_POLL_INTERVAL,
+                                        '{DEFAULT_UNSAFE_SKIP_BACKUP}': DEFAULT_UNSAFE_SKIP_BACKUP,
+                                        '{DEFAULT_DAEMON_RESTART_DELAY}': DEFAULT_DAEMON_RESTART_DELAY}[m.group()],
+                                f.read()
+                            )
+                except:
+                    failure_exit("Failed to setup cheqd-cosmovisor systemd service")
+            else:
+                self.log("Enabling systemd service for cheqd-noded")
+                self.exec(f"curl -s {STANDALONE_SERVICE_TEMPLATE} > {DEFAULT_STANDALONE_SERVICE_FILE_PATH}")
+
+            
             self.exec(
                 f"systemctl enable {DEFAULT_COSMOVISOR_SERVICE_NAME if self.interviewer.is_cosmo_needed else DEFAULT_STANDALONE_SERVICE_NAME}")
 
@@ -503,7 +530,7 @@ class Installer():
         self.log("Restarting logrotate services")
         self.exec("systemctl restart logrotate.service")
         self.exec("systemctl restart logrotate.timer")
-        self.setup_systemctl_services()
+        self.setup_node_systemd()
 
     def install(self):
         """
@@ -551,19 +578,17 @@ class Installer():
                 "Downloading snapshot and extracting archive. This can take a *really* long time...")
             self.download_snapshot()
             self.untar_from_snapshot()
-        self.print_success()
+        
+        self.log("The cheqd-noded binary has been successfully installed")
 
     def post_install(self):
-        network_type = self.get_network_type()
-
         # Init the node with provided moniker
         if not os.path.exists(os.path.join(self.cheqd_config_dir, 'genesis.json')):
             self.exec(
                 f"""sudo su -c 'cheqd-noded init {self.interviewer.moniker}' {DEFAULT_CHEQD_USER}""")
 
             # Downloading genesis file
-            self.exec(
-                f"curl {GENESIS_FILE.format(network_type)} > {os.path.join(self.cheqd_config_dir, 'genesis.json')}")
+            self.exec(f"curl {GENESIS_FILE.format(self.interviewer.chain)} > {os.path.join(self.cheqd_config_dir, 'genesis.json')}")
             shutil.chown(os.path.join(self.cheqd_config_dir, 'genesis.json'),
                          DEFAULT_CHEQD_USER,
                          DEFAULT_CHEQD_USER)
@@ -591,8 +616,7 @@ class Installer():
                 self.cheqd_config_dir, "config.toml"))
 
         # Setting up the seeds
-        seeds = self.exec(
-            f"curl {SEEDS_FILE.format(network_type)}").stdout.decode("utf-8").strip()
+        seeds = self.exec(f"curl {SEEDS_FILE.format(self.interviewer.chain)}").stdout.decode("utf-8").strip()
         seeds_search_text = 'seeds = ""'
         seeds_replace_text = 'seeds = "{}"'.format(seeds)
         search_and_replace(seeds_search_text, seeds_replace_text, os.path.join(
@@ -658,14 +682,6 @@ class Installer():
                 CHEQD_NODED_LOG_FORMAT)
             search_and_replace(log_format_search_text, log_format_replace_text, os.path.join(
                 self.cheqd_config_dir, "config.toml"))
-
-    def get_network_type(self):
-        if self.interviewer.chain == NetworkType.MAINNET:
-            network_type = "mainnet"
-        elif self.interviewer.chain == NetworkType.TESTNET:
-            network_type = "testnet"
-
-        return network_type
 
     def prepare_cheqd_user(self):
         try:
@@ -995,14 +1011,11 @@ class Installer():
         except:
             failure_exit(f"Failed to extract snapshot")
 
-    def print_success(self):
-        self.log("The cheqd-noded binary has been successfully installed")
-
 
 class Interviewer:
     def __init__(self,
                  home_dir=DEFAULT_CHEQD_HOME_DIR,
-                 chain=NetworkType.MAINNET):
+                 chain=CHEQD_NODED_CHAIN_ID):
         self._home_dir = home_dir
         self._is_upgrade = False
         self._is_cosmo_needed = False
@@ -1417,12 +1430,12 @@ class Interviewer:
     def ask_for_chain(self):
         answer = int(self.ask(
             "Select cheqd network to join:\n"
-            f"1. Mainnet ({NetworkType.MAINNET})\n"
-            f"2. Testnet ({NetworkType.TESTNET}) ", default=1))
+            f"1. Mainnet ({MAINNET_CHAIN_ID})\n"
+            f"2. Testnet ({TESTNET_CHAIN_ID}) ", default=1))
         if answer == 1:
-            self.chain = NetworkType.MAINNET
+            self.chain = "mainnet"
         elif answer == 2:
-            self.chain = NetworkType.TESTNET
+            self.chain = "testnet"
         else:
             failure_exit(f"Invalid network selected during installation.")
 
