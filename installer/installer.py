@@ -79,10 +79,14 @@ MAINNET_SNAPSHOT = "https://snapshots-cdn.cheqd.net/mainnet/{}/cheqd-mainnet-1_{
 MAX_SNAPSHOT_DAYS = 7
 
 ###############################################################
-###     	    Default node configuration      			###
+###     	Default node environment variables      	    ###
 ###############################################################
 DEFAULT_RPC_PORT = "26657"
 DEFAULT_P2P_PORT = "26656"
+CHEQD_NODED_HOME = "/home/cheqd/.cheqdnode"
+CHEQD_NODED_NODE = "tcp://localhost:26657"
+CHEQD_NODED_MONIKER = platform.node()
+CHEQD_NODED_CHAIN_ID = "cheqd-mainnet-1"
 CHEQD_NODED_MINIMUM_GAS_PRICES = "50ncheq"
 CHEQD_NODED_LOG_LEVEL = "error"
 CHEQD_NODED_LOG_FORMAT = "json"
@@ -1395,7 +1399,7 @@ class Interviewer:
 
     def ask_for_moniker(self):
         answer = self.ask(
-            f"Provide a moniker for your cheqd-node", default=platform.node())
+            f"Provide a moniker for your cheqd-node", default=CHEQD_NODED_MONIKER)
         if answer is not None:
             self.moniker = answer
         else:
