@@ -13,14 +13,14 @@ permissions:
 
 jobs:
 
-  interactive-installer-with-cosmovisor:
+  test-installer-cosmovisor:
     name: "Interactive Installer With Cosmovisor"
     runs-on: ubuntu-20.04
   
     steps:
       - uses: actions/checkout@v3
 
-      - name: "Fresh install"
+      - name: "Fresh install with Cosmovisor"
         working-directory: ./installer
         run: |
           sudo bash -c "DEFAULT_DEBUG_BRANCH='${GITHUB_REF##*/}' python3 installer.py < install-from-scratch-with-cosmovisor.txt"
