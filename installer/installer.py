@@ -83,7 +83,7 @@ MAX_SNAPSHOT_DAYS = 7
 ###############################################################
 DEFAULT_RPC_PORT = "26657"
 DEFAULT_P2P_PORT = "26656"
-DEFAULT_GAS_PRICE = "50ncheq"
+CHEQD_NODED_MINIMUM_GAS_PRICES = "50ncheq"
 DEFAULT_LOG_LEVEL = "error"
 DEFAULT_LOG_FORMAT = "json"
 
@@ -972,7 +972,7 @@ class Interviewer:
         self._external_address = ""
         self._rpc_port = DEFAULT_RPC_PORT
         self._p2p_port = DEFAULT_P2P_PORT
-        self._gas_price = DEFAULT_GAS_PRICE
+        self._gas_price = CHEQD_NODED_MINIMUM_GAS_PRICES
         self._persistent_peers = ""
         self._log_level = DEFAULT_LOG_LEVEL
         self._log_format = DEFAULT_LOG_FORMAT
@@ -1360,7 +1360,7 @@ class Interviewer:
     def ask_for_init_from_snapshot(self):
         answer = self.ask(
             f"CAUTION: Downloading a snapshot replaces your existing copy of chain data. Usually safe to use this option when doing a fresh installation. "
-            f"Do you want to download a snapshot of the existing chain to speed up node synchronization? (yes/no)", default="yes")
+            f"Do you want to download a snapshot of the existing chain to speed up node synchronization? (yes/no)", default=DEFAULT_INIT_FROM_SNAPSHOT)
         if answer.lower().startswith("y"):
             self.snapshot_url = self.prepare_url_for_latest()
             self.init_from_snapshot = True
@@ -1422,7 +1422,7 @@ class Interviewer:
 
     def ask_for_gas_price(self):
         self.gas_price = self.ask(
-            f"Specify minimum gas price for transactions", default=DEFAULT_GAS_PRICE)
+            f"Specify minimum gas price for transactions", default=CHEQD_NODED_MINIMUM_GAS_PRICES)
 
     def ask_for_persistent_peers(self):
         self.persistent_peers = self.ask(
