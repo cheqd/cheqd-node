@@ -200,9 +200,6 @@ class Installer():
 
     @property
     def binary_path(self):
-        return self.get_binary_path()
-
-    def get_binary_path(self):
         # Get the path to the cheqd-node binary on the local system
         return os.path.join(os.path.realpath(os.path.curdir), DEFAULT_BINARY_NAME)
 
@@ -385,6 +382,9 @@ class Installer():
 
     def prepare_directory_tree(self):
         # Needed only in case of clean installation
+        # 1. Create ~/.cheqdnode directory
+        # 2. Set directory permissions to default cheqd user
+        # 3. Create ~/.cheqdnode/log directory
         try:
             if not os.path.exists(self.cheqd_root_dir):
                 self.log("Creating main directory for cheqd-noded")
@@ -417,15 +417,18 @@ class Installer():
             failure_exit(
                 "Failed to prepare directory tree for {DEFAULT_CHEQD_USER}")
 
-    def is_service_file_exists(self) -> bool:
-        return os.path.exists(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH) or \
-            os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
-
     def setup_systemctl_services(self):
+        # Setup the following systemd services:
+        # 1. cheqd-noded.service or cheqd-cosmovisor.service
+        
         self.log("Setting up systemd config")
+
+        # Check if systemd service files already exist for cheqd-node
+        service_file_exists = os.path.exists(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH) or os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
+
         if not self.interviewer.is_upgrade or \
                 self.interviewer.rewrite_systemd or \
-                not self.is_service_file_exists():
+                not service_file_exists:
             self.remove_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME)
             self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME)
 
