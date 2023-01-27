@@ -33,7 +33,6 @@ DEFAULT_INSTALL_PATH = "/usr/bin"
 DEFAULT_CHEQD_USER = "cheqd"
 DEFAULT_BINARY_NAME = "cheqd-noded"
 DEFAULT_COSMOVISOR_BINARY_NAME = "cosmovisor"
-DEFAULT_CHAIN = "cheqd-mainnet-1"
 PRINT_PREFIX = "********* "
 
 ###############################################################
@@ -47,6 +46,7 @@ DEFAULT_DAEMON_ALLOW_DOWNLOAD_BINARIES = "true"
 DEFAULT_DAEMON_RESTART_AFTER_UPGRADE = "true"
 DEFAULT_DAEMON_POLL_INTERVAL = "300s"
 DEFAULT_UNSAFE_SKIP_BACKUP = "true"
+DEFAULT_DAEMON_RESTART_DELAY = "120s"
 
 ###############################################################
 ###     				Systemd Config      				###
@@ -89,7 +89,9 @@ DEFAULT_GAS_PRICE = "50ncheq"
 DEFAULT_LOG_LEVEL = "error"
 DEFAULT_LOG_FORMAT = "json"
 
-
+###############################################################
+###     	            Chain IDs     			            ###
+###############################################################
 class NetworkType(str, Enum):
     MAINNET = "cheqd-mainnet-1"
     TESTNET = "cheqd-testnet-6"
@@ -957,7 +959,7 @@ class Installer():
 class Interviewer:
     def __init__(self,
                  home_dir=DEFAULT_HOME,
-                 chain=DEFAULT_CHAIN):
+                 chain=NetworkType.MAINNET):
         self._home_dir = home_dir
         self._is_upgrade = False
         self._is_cosmo_needed = False
@@ -976,8 +978,8 @@ class Interviewer:
         self._persistent_peers = ""
         self._log_level = DEFAULT_LOG_LEVEL
         self._log_format = DEFAULT_LOG_FORMAT
-        self._daemon_allow_download_binaries = "true"
-        self._daemon_restart_after_upgrade = "true"
+        self._daemon_allow_download_binaries = DEFAULT_DAEMON_ALLOW_DOWNLOAD_BINARIES
+        self._daemon_restart_after_upgrade = DEFAULT_DAEMON_RESTART_AFTER_UPGRADE
         self._is_from_scratch = False
         self._rewrite_systemd = False
         self._rewrite_rsyslog = False
@@ -1267,7 +1269,7 @@ class Interviewer:
         all_releases = self.remove_release_from_list(all_releases, default)
         all_releases.insert(0, default)
         for i, release in enumerate(all_releases[0: LAST_N_RELEASES]):
-            print(f"{i + 1}) {release.version}")
+            print(f"{i + 1}. {release.version}")
         release_num = int(self.ask("Choose list option number above to select version of cheqd-node to install",
                                    default=1))
         if release_num >= 1 and release_num <= len(all_releases):
@@ -1372,8 +1374,8 @@ class Interviewer:
     def ask_for_chain(self):
         answer = int(self.ask(
             "Select cheqd network to join:\n"
-            f"1 - Mainnet ({NetworkType.MAINNET})\n"
-            f"2 - Testnet ({NetworkType.TESTNET}) ", default=1))
+            f"1. Mainnet ({NetworkType.MAINNET})\n"
+            f"2. Testnet ({NetworkType.TESTNET}) ", default=1))
         if answer == 1:
             self.chain = NetworkType.MAINNET
         elif answer == 2:
@@ -1439,12 +1441,24 @@ class Interviewer:
             f"Specify log format (json|plain)", default=DEFAULT_LOG_FORMAT)
 
     def ask_for_daemon_allow_download_binaries(self):
-        self.daemon_allow_download_binaries = self.ask(
-            f"Do you want Cosmovisor to automatically download binaries for scheduled upgrades? (true|false)", default=DEFAULT_DAEMON_ALLOW_DOWNLOAD_BINARIES)
+        answer = self.ask(
+            f"Do you want Cosmovisor to automatically download binaries for scheduled upgrades? (yes/no)", default="yes")
+        if answer.lower().startswith("y"):
+            self.daemon_allow_download_binaries = "true"
+        elif answer.lower().startswith("n"):
+            self.daemon_allow_download_binaries = "false"
+        else:
+            failure_exit(f"Invalid input provided during installation.")
 
     def ask_for_daemon_restart_after_upgrade(self):
-        self.daemon_restart_after_upgrade = self.ask(
-            f"Do you want Cosmovisor to automatically restart cheqd-noded service after an upgrade has been applied? (true|false)", default=DEFAULT_DAEMON_RESTART_AFTER_UPGRADE)
+        answer = self.ask(
+            f"Do you want Cosmovisor to automatically restart cheqd-noded service after an upgrade has been applied? (yes/no)", default="yes")
+        if answer.lower().startswith("y"):
+            self.daemon_restart_after_upgrade = "true"
+        elif answer.lower().startswith("n"):
+            self.daemon_restart_after_upgrade = "false"
+        else:
+            failure_exit(f"Invalid input provided during installation.")
 
     def prepare_url_for_latest(self) -> str:
         template = TESTNET_SNAPSHOT if self.chain == NetworkType.TESTNET else MAINNET_SNAPSHOT
