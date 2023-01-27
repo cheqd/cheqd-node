@@ -73,7 +73,6 @@ SEEDS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/%s/networks/{}/
 ###############################################################
 ###     				Node snapshots      				###
 ###############################################################
-DEFAULT_SNAPSHOT_SERVER = "https://snapshots-cdn.cheqd.net"
 DEFAULT_INIT_FROM_SNAPSHOT = "yes"
 TESTNET_SNAPSHOT = "https://snapshots-cdn.cheqd.net/testnet/{}/cheqd-testnet-6_{}.tar.lz4"
 MAINNET_SNAPSHOT = "https://snapshots-cdn.cheqd.net/mainnet/{}/cheqd-mainnet-1_{}.tar.lz4"
