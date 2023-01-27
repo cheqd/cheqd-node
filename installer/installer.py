@@ -84,8 +84,8 @@ MAX_SNAPSHOT_DAYS = 7
 DEFAULT_RPC_PORT = "26657"
 DEFAULT_P2P_PORT = "26656"
 CHEQD_NODED_MINIMUM_GAS_PRICES = "50ncheq"
-DEFAULT_LOG_LEVEL = "error"
-DEFAULT_LOG_FORMAT = "json"
+CHEQD_NODED_LOG_LEVEL = "error"
+CHEQD_NODED_LOG_FORMAT = "json"
 
 ###############################################################
 ###     	            Chain IDs     			            ###
@@ -596,7 +596,7 @@ class Installer():
         else:
             log_level_search_text = 'log_level'
             log_level_replace_text = 'log_level = "{}"'.format(
-                DEFAULT_LOG_LEVEL)
+                CHEQD_NODED_LOG_LEVEL)
             search_and_replace(log_level_search_text, log_level_replace_text, os.path.join(
                 self.cheqd_config_dir, "config.toml"))
 
@@ -610,7 +610,7 @@ class Installer():
         else:
             log_format_search_text = 'log_format'
             log_format_replace_text = 'log_format = "{}"'.format(
-                DEFAULT_LOG_FORMAT)
+                CHEQD_NODED_LOG_FORMAT)
             search_and_replace(log_format_search_text, log_format_replace_text, os.path.join(
                 self.cheqd_config_dir, "config.toml"))
 
@@ -974,8 +974,8 @@ class Interviewer:
         self._p2p_port = DEFAULT_P2P_PORT
         self._gas_price = CHEQD_NODED_MINIMUM_GAS_PRICES
         self._persistent_peers = ""
-        self._log_level = DEFAULT_LOG_LEVEL
-        self._log_format = DEFAULT_LOG_FORMAT
+        self._log_level = CHEQD_NODED_LOG_LEVEL
+        self._log_format = CHEQD_NODED_LOG_FORMAT
         self._daemon_allow_download_binaries = DEFAULT_DAEMON_ALLOW_DOWNLOAD_BINARIES
         self._daemon_restart_after_upgrade = DEFAULT_DAEMON_RESTART_AFTER_UPGRADE
         self._is_from_scratch = False
@@ -1432,11 +1432,11 @@ class Interviewer:
 
     def ask_for_log_level(self):
         self.log_level = self.ask(
-            f"Specify log level (trace|debug|info|warn|error|fatal|panic)", default=DEFAULT_LOG_LEVEL)
+            f"Specify log level (trace|debug|info|warn|error|fatal|panic)", default=CHEQD_NODED_LOG_LEVEL)
 
     def ask_for_log_format(self):
         self.log_format = self.ask(
-            f"Specify log format (json|plain)", default=DEFAULT_LOG_FORMAT)
+            f"Specify log format (json|plain)", default=CHEQD_NODED_LOG_FORMAT)
 
     def ask_for_daemon_allow_download_binaries(self):
         answer = self.ask(
