@@ -28,7 +28,7 @@ import shutil
 ###     				Installer defaults    				###
 ###############################################################
 LAST_N_RELEASES = 5
-CHEQD_NODED_HOME = "/home/cheqd"
+DEFAULT_CHEQD_HOME_DIR = "/home/cheqd"
 DEFAULT_INSTALL_PATH = "/usr/bin"
 DEFAULT_CHEQD_USER = "cheqd"
 DEFAULT_BINARY_NAME = "cheqd-noded"
@@ -691,7 +691,7 @@ class Installer():
             failure_exit(f"Failed to setup Cosmovisor")
 
     def set_cheqd_env_vars(self):
-        self.set_env_vars("CHEQD_NODED_HOME",
+        self.set_env_vars("DEFAULT_CHEQD_HOME_DIR",
                           f"{self.interviewer.cheqd_root_dir}")
         self.set_env_vars("CHEQD_NODED_CHAIN_ID", f"{self.interviewer.chain}")
 
@@ -958,7 +958,7 @@ class Installer():
 
 class Interviewer:
     def __init__(self,
-                 home_dir=CHEQD_NODED_HOME,
+                 home_dir=DEFAULT_CHEQD_HOME_DIR,
                  chain=NetworkType.MAINNET):
         self._home_dir = home_dir
         self._is_upgrade = False
@@ -1544,7 +1544,7 @@ if __name__ == '__main__':
     # Ask user for information
     interviewer = Interviewer()
     interviewer.ask_for_version()
-    interviewer.ask_for_home_directory(default=CHEQD_NODED_HOME)
+    interviewer.ask_for_home_directory(default=DEFAULT_CHEQD_HOME_DIR)
 
     # Check if cheqd configuration directory exists
     is_installed = interviewer.is_already_installed()
