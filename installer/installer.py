@@ -1074,6 +1074,9 @@ class Installer():
             logging.exception(f"Failed to extract snapshot")
 
 
+###############################################################
+###         Interviewer class: Ask user for settings  	    ###
+###############################################################
 class Interviewer:
     def __init__(self, home_dir=DEFAULT_CHEQD_HOME_DIR, chain=CHEQD_NODED_CHAIN_ID):
         self._home_dir = home_dir
@@ -1082,7 +1085,7 @@ class Interviewer:
         self._is_cosmovisor_bump_needed = False
         self._init_from_snapshot = False
         self._release = None
-        self._chain = CHEQD_NODED_CHAIN_ID
+        self._chain = chain
         self._is_setup_needed = False
         self._moniker = CHEQD_NODED_MONIKER
         self._external_address = ""
@@ -1099,6 +1102,7 @@ class Interviewer:
         self._rewrite_rsyslog = False
         self._rewrite_logrotate = False
 
+    # This section sets @property decorators for each variable
     @property
     def cheqd_root_dir(self):
         return os.path.join(self.home_dir, ".cheqdnode")
@@ -1199,6 +1203,8 @@ class Interviewer:
     def daemon_restart_after_upgrade(self) -> str:
         return self._daemon_restart_after_upgrade
 
+
+    # This section defines the setters for each variable
     @release.setter
     def release(self, release):
         self._release = release
@@ -1216,8 +1222,8 @@ class Interviewer:
         self._is_from_scratch = ifs
 
     @rewrite_node_systemd.setter
-    def rewrite_node_systemd(self, rs):
-        self._rewrite_node_systemd = rs
+    def rewrite_node_systemd(self, rns):
+        self._rewrite_node_systemd = rns
 
     @rewrite_rsyslog.setter
     def rewrite_rsyslog(self, rr):
@@ -1232,8 +1238,8 @@ class Interviewer:
         self._is_cosmo_needed = icn
 
     @is_cosmovisor_bump_needed.setter
-    def is_cosmovisor_bump_needed(self, icn):
-        self._is_cosmovisor_bump_needed = icn
+    def is_cosmovisor_bump_needed(self, icbn):
+        self._is_cosmovisor_bump_needed = icbn
 
     @init_from_snapshot.setter
     def init_from_snapshot(self, ifs):
