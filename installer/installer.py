@@ -1082,6 +1082,7 @@ class Interviewer:
         self._home_dir = home_dir
         self._is_upgrade = False
         self._is_cosmo_needed = False
+        self._systemd_service_file = ""
         self._is_cosmovisor_bump_needed = False
         self._init_from_snapshot = False
         self._release = None
@@ -1131,6 +1132,10 @@ class Interviewer:
     @property
     def is_from_scratch(self) -> bool:
         return self._is_from_scratch
+
+    @property
+    def systemd_service_file(self) -> str:
+        return self._systemd_service_file
 
     @property
     def rewrite_node_systemd(self) -> bool:
@@ -1222,6 +1227,10 @@ class Interviewer:
     def is_from_scratch(self, ifs):
         self._is_from_scratch = ifs
 
+    @systemd_service_file.setter
+    def systemd_service_file(self, ssf):
+        self._systemd_service_file = ssf
+
     @rewrite_node_systemd.setter
     def rewrite_node_systemd(self, rns):
         self._rewrite_node_systemd = rns
@@ -1312,6 +1321,7 @@ class Interviewer:
             kwargs["stderr"] = subprocess.DEVNULL
         return subprocess.run(cmd, **kwargs)
 
+
     # Check if cheqd-noded is installed
     def is_node_installed(self) -> bool:
         try:
@@ -1320,11 +1330,30 @@ class Interviewer:
             else:
                 return False
         except Exception as e:
-            logging.exception(f"Could not check if cheqd-noded is already installed.")
+            logging.exception(f"Could not check if cheqd-noded is already installed. Reason: {e}")
 
-    def is_systemd_config_exists(self) -> bool:
-        return os.path.exists(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH) or \
-            os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
+
+    # Check if Cosmovisor is installed
+    def is_cosmovisor_installed(self) -> bool:
+        try:
+            if shutil.which("cosmovisor") is not None:
+                self.is_cosmovisor_bump_needed = True
+                return True
+            else:
+                self.is_cosmovisor_bump_needed = False
+                return False
+        except Exception as e:
+            logging.exception(f"Could not check if Cosmovisor is already installed. Reason: {e}")
+
+    # Check if a systemd config is installed for a given service file
+    def is_systemd_config_installed(self, systemd_service_file) -> bool:
+        try:
+            if os.path.exists(systemd_service_file):
+                return True
+            else:
+                return False
+        except Exception as e:
+            logging.exception(f"Could not check if {systemd_service_file} already exists. Reason: {e}")
 
     def get_releases(self):
         req = request.Request(
@@ -1347,13 +1376,6 @@ class Interviewer:
             if release.version == elem.version:
                 copy_r_list.pop(i)
                 return copy_r_list
-
-    def is_cosmovisor_already_installed(self) -> bool:
-        command = 'cosmovisor'
-        if shutil.which(command) is not None:
-            return True
-        else:
-            return False
 
     def what_cosmovisor_version(self) -> str:
         try:
@@ -1573,67 +1595,92 @@ class Interviewer:
 
 
 if __name__ == '__main__':
-    # Steps to execute if installing from scratch
+    # Order of questions to ask the user if installing:
+    # 1. Version of cheqd-noded to install
+    # 2. Home directory for cheqd user
+    # 3. Install new version of cheqd-noded
+    # 4. Chain ID to join
+    # 5. Install Cosmovisor if not installed, or bump Cosmovisor version
+    # 6. (if applicable) Cosmovisor settings
+    # 7. Node configuration settings
+    # 8. Download snapshot to bootsrap node
     def install_steps():
-        if interviewer.is_cosmovisor_already_installed():
-            cosm_version = interviewer.what_cosmovisor_version()
-            if cosm_version < DEFAULT_LATEST_COSMOVISOR_VERSION.replace("v", ""):
-                print(
-                    f"Your current Cosmovisor version is v{cosm_version}")
-                interviewer.ask_for_cosmovisor_bump()
+        try:
+            interviewer.ask_for_version()
+            interviewer.ask_for_home_directory()
+            interviewer.ask_for_setup()
+            interviewer.ask_for_chain()
+
+            if interviewer.is_cosmovisor_installed() is False:
+                interviewer.ask_for_cosmovisor()
             else:
-                logging.exception(
-                    "Aborting installation to prevent overwriting existing cheqd-node.")
-        
-        interviewer.ask_for_version()
-        interviewer.ask_for_home_directory(default=DEFAULT_CHEQD_HOME_DIR)
-        interviewer.ask_for_setup()
-        interviewer.ask_for_chain()
-        interviewer.ask_for_cosmovisor()
-        interviewer.ask_for_init_from_snapshot()
-        if interviewer.is_setup_needed:
-            interviewer.ask_for_moniker()
-            interviewer.ask_for_external_address()
-            interviewer.ask_for_rpc_port()
-            interviewer.ask_for_p2p_port()
-            interviewer.ask_for_gas_price()
-            interviewer.ask_for_persistent_peers()
-            interviewer.ask_for_log_level()
-            interviewer.ask_for_log_format()
-
-        if interviewer.is_cosmo_needed:
-            interviewer.ask_for_daemon_allow_download_binaries()
-            interviewer.ask_for_daemon_restart_after_upgrade()
-
-    # Steps to execute if upgrading existing node
-    def upgrade_steps():
-        # if cosmovisor is installed
-        if interviewer.is_cosmovisor_already_installed():
-            cosm_version = interviewer.what_cosmovisor_version()
-            if cosm_version < DEFAULT_LATEST_COSMOVISOR_VERSION.replace("v", ""):
-                print(f"Your current Cosmovisor version is v{cosm_version}")
                 interviewer.ask_for_cosmovisor_bump()
-        else:
-            interviewer.ask_for_cosmovisor()
+            
+            if interviewer.is_cosmo_needed is True:
+                interviewer.ask_for_daemon_allow_download_binaries()
+                interviewer.ask_for_daemon_restart_after_upgrade()
 
-        if interviewer.is_cosmo_needed:
-            interviewer.ask_for_daemon_allow_download_binaries()
-            interviewer.ask_for_daemon_restart_after_upgrade()
+            if interviewer.is_setup_needed is True:
+                interviewer.ask_for_moniker()
+                interviewer.ask_for_external_address()
+                interviewer.ask_for_rpc_port()
+                interviewer.ask_for_p2p_port()
+                interviewer.ask_for_gas_price()
+                interviewer.ask_for_persistent_peers()
+                interviewer.ask_for_log_level()
+                interviewer.ask_for_log_format()
+            
+            interviewer.ask_for_init_from_snapshot()
+        
+        except Exception as e:
+            logging.exception(f"Unable to complete user interview process for installation. Reason for exiting: {e}")
 
-        if interviewer.is_systemd_config_exists():
-            interviewer.ask_for_rewrite_node_systemd()
-        if os.path.exists(DEFAULT_RSYSLOG_FILE):
-            interviewer.ask_for_rewrite_rsyslog()
-        if os.path.exists(DEFAULT_LOGROTATE_FILE):
-            interviewer.ask_for_rewrite_logrotate()
+
+    # Order of questions to ask the user if installing:
+    # 1. Version of cheqd-noded to install
+    # 2. Home directory for cheqd user
+    # 3. Install Cosmovisor if not installed, or bump Cosmovisor version
+    # 4. (if applicable) Cosmovisor settings
+    # 6. Rewrite node systemd config
+    # 7. Rewrite rsyslog config
+    # 8. Rewrite logrotate config
+    def upgrade_steps():
+        try:
+            interviewer.ask_for_version()
+            interviewer.ask_for_home_directory()
+            
+            if interviewer.is_cosmovisor_installed() is False:
+                interviewer.ask_for_cosmovisor()
+            else:
+                interviewer.ask_for_cosmovisor_bump()
+
+            if interviewer.is_cosmo_needed is True:
+                interviewer.ask_for_daemon_allow_download_binaries()
+                interviewer.ask_for_daemon_restart_after_upgrade()
+
+            if interviewer.is_systemd_config_installed(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH) is True or interviewer.is_systemd_config_installed(DEFAULT_STANDALONE_SERVICE_FILE_PATH) is True:
+                interviewer.ask_for_rewrite_node_systemd()
+
+            if interviewer.is_systemd_config_installed(DEFAULT_RSYSLOG_FILE) is True:
+                interviewer.ask_for_rewrite_rsyslog()
+
+            if interviewer.is_systemd_config_installed(DEFAULT_LOGROTATE_FILE) is True:
+                interviewer.ask_for_rewrite_logrotate()
+        
+        except Exception as e:
+            logging.exception(f"Unable to complete user interview process for upgrade. Reason for exiting: {e}")
+
 
     ### This section is where the Interviewer class is invoked ###
-    interviewer = Interviewer()
-
-    # Check if cheqd-noded is already installed
-    is_installed = interviewer.is_node_installed()
-
     try:
+        interviewer = Interviewer()
+
+        # Check if cheqd-noded is already installed
+        is_installed = interviewer.is_node_installed()
+
+        # Check if Cosmovisor is already installed
+        is_cosmovisor_installed = interviewer.is_cosmovisor_installed()
+
         # If no cheqd-noded binary is found, install from scratch
         if is_installed is False:
             install_steps()
@@ -1657,12 +1704,12 @@ if __name__ == '__main__':
                     sys.exit(1)
 
     except Exception as e:
-        logging.exception(f"Unable to execute installation steps: {e}")
+        logging.exception(f"Unable to complete user interview process. Reason for exiting: {e}")
 
 
-    ### This section if where the Installer class is invoked
-    installer = Installer(interviewer)
+    ### This section where the Installer class is invoked ###
     try:
+        installer = Installer(interviewer)
         installer.install()
-    except:
-        logging.exception("Unable to install cheqd-node.")
+    except Exception as e:
+        logging.exception(f"Unable to execute installation process. Reason for exiting: {e}")
