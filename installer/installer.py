@@ -107,7 +107,10 @@ CHEQD_NODED_P2P_MAX_PACKET_MSG_PAYLOAD_SIZE = 10240
 ###############################################################
 
 # Set logging configuration
-logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', datefmt='%d-%b-%Y %H:%M:%S', level=logging.INFO)
+logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', 
+    datefmt='%d-%b-%Y %H:%M:%S', 
+    raiseExceptions=True,
+    level=logging.INFO)
 
 # Handle Ctrl+C / SIGINT halts requests
 def sigint_handler(signal, frame):
@@ -1304,7 +1307,13 @@ class Interviewer:
         self._daemon_restart_after_upgrade = daemon_restart_after_upgrade
 
 
-    ### This section contains helper functions to assess current state of local system ###
+    ### This section contains helper functions for the interviewer ###
+
+    # Set value to default answer for a question
+    @default_answer
+    def ask(self, question, **kwargs):
+        return str(input(question)).strip()
+
     @post_process
     def exec(self, cmd, use_stdout=True, suppress_err=False, check=True):
         logging.info(f"Executing command: {cmd}")
@@ -1397,30 +1406,52 @@ class Interviewer:
         try:
             default = self.get_latest_release()
             all_releases = self.get_releases()
-            logging.info(f"Latest stable cheqd-noded release version is {default}")
-            logging.info(f"List of cheqd-noded releases: ")
             all_releases = self.remove_release_from_list(all_releases, default)
             all_releases.insert(0, default)
+
+            print(f"Latest stable cheqd-noded release version is {default}")
+            print(f"List of cheqd-noded releases: ")
+
+            # Print list of releases
             for i, release in enumerate(all_releases[0: LAST_N_RELEASES]):
                 print(f"{i + 1}. {release.version}")
-            release_num = int(self.ask("Choose list option number above to select version of cheqd-node to install",
-                                    default=1))
+            
+            release_num = int(self.ask("Choose list option number above to select version of cheqd-node to install", default=1))
+            
+            # Check if user input is valid
             if release_num >= 1 and release_num <= len(all_releases):
                 self.release = all_releases[release_num - 1]
             else:
-                logging.exception(
-                    f"Invalid release number picked from list of releases: {release_num}")
+                raise ValueError(f"Invalid release number picked from list of releases: {release_num}")
+
         except Exception as e:
             logging.exception(f"Could not determine version of cheqd-node to install. Reason: {e}")
 
-    @default_answer
-    def ask(self, question, **kwargs):
-        return str(input(question)).strip()
 
+    # Set cheqd user's home directory
     def ask_for_home_directory(self, default) -> str:
-        self.home_dir = self.ask(
-            f"Set path for cheqd user's home directory", default=default)
+        try:
+            self.home_dir = self.ask(f"Set path for cheqd user's home directory", default=DEFAULT_CHEQD_HOME_DIR)
+        except Exception as e:
+            logging.exception(f"Could not set cheqd user's home directory. Reason: {e}")
 
+
+    # Ask whether user wants to do a install from scratch
+    def ask_for_setup(self):
+        try:
+            answer = self.ask(f"Do you want to setup a new cheqd-node? (yes/no)", default="yes")
+            if answer.lower().startswith("y"):
+                self.is_setup_needed = True
+            elif answer.lower().startswith("n"):
+                self.is_setup_needed = False
+            else:
+                logging.error(f"Please choose either 'yes' or 'no'")
+                self.ask_for_setup()
+        except Exception as e:
+            logging.exception(f"Could not determine if a fresh installation is needed. Reason: {e}")
+
+
+    
     def ask_for_upgrade(self):
         answer = self.ask(
             f"Existing cheqd-node configuration folder detected. Do you want to upgrade an existing cheqd-node installation? (yes/no)", default="no")
@@ -1517,15 +1548,6 @@ class Interviewer:
         else:
             logging.exception(f"Invalid network selected during installation.")
 
-    def ask_for_setup(self):
-        answer = self.ask(
-            f"Do you want to setup a new cheqd-node? (yes/no)", default="yes")
-        if answer.lower().startswith("y"):
-            self.is_setup_needed = True
-        elif answer.lower().startswith("n"):
-            self.is_setup_needed = False
-        else:
-            logging.exception(f"Invalid input provided during installation.")
 
     def ask_for_moniker(self):
         answer = self.ask(
