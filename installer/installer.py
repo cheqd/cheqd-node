@@ -1356,44 +1356,62 @@ class Interviewer:
         except Exception as e:
             logging.exception(f"Could not check if {systemd_service_file} already exists. Reason: {e}")
 
+
+    # Get list of last N releases for cheqd-node from GitHub
     def get_releases(self):
-        req = request.Request(
-            "https://api.github.com/repos/cheqd/cheqd-node/releases")
-        req.add_header("Accept", "application/vnd.github.v3+json")
-        with request.urlopen(req) as response:
-            r_list = json.loads(response.read().decode("utf-8").strip())
-            return [Release(r) for r in r_list]
+        try:
+            req = request.Request("https://api.github.com/repos/cheqd/cheqd-node/releases")
+            req.add_header("Accept", "application/vnd.github.v3+json")
+            with request.urlopen(req) as response:
+                r_list = json.loads(response.read().decode("utf-8").strip())
+                return [Release(r) for r in r_list]
+        except Exception as e:
+            logging.exception(f"Could not get releases from GitHub. Reason: {e}")
 
+
+    # The "latest" stable release may not be in last N releases, so we need to get it separately
     def get_latest_release(self):
-        req = request.Request(
-            "https://api.github.com/repos/cheqd/cheqd-node/releases/latest")
-        req.add_header("Accept", "application/vnd.github.v3+json")
-        with request.urlopen(req) as response:
-            return Release(json.loads(response.read().decode("utf-8")))
+        try:
+            req = request.Request("https://api.github.com/repos/cheqd/cheqd-node/releases/latest")
+            req.add_header("Accept", "application/vnd.github.v3+json")
+            with request.urlopen(req) as response:
+                return Release(json.loads(response.read().decode("utf-8")))
+        except Exception as e:
+            logging.exception(f"Could not get latest release from GitHub. Reason: {e}")
 
+
+    # Compile a list of releases to be displayed to the user
+    # The "latest" stable release is always displayed first
     def remove_release_from_list(self, r_list, elem):
-        copy_r_list = copy.deepcopy(r_list)
-        for i, release in enumerate(r_list):
-            if release.version == elem.version:
-                copy_r_list.pop(i)
-                return copy_r_list
+        try:
+            copy_r_list = copy.deepcopy(r_list)
+            for i, release in enumerate(r_list):
+                if release.version == elem.version:
+                    copy_r_list.pop(i)
+                    return copy_r_list
+        except Exception as e:
+            logging.exception(f"Could not assemble list of releases to show to the user. Reason: {e}")
 
+    # Ask user to select a version of cheqd-node to install
     def ask_for_version(self):
-        default = self.get_latest_release()
-        all_releases = self.get_releases()
-        logging.info(f"Latest stable cheqd-noded release version is {default}")
-        logging.info(f"List of cheqd-noded releases: ")
-        all_releases = self.remove_release_from_list(all_releases, default)
-        all_releases.insert(0, default)
-        for i, release in enumerate(all_releases[0: LAST_N_RELEASES]):
-            print(f"{i + 1}. {release.version}")
-        release_num = int(self.ask("Choose list option number above to select version of cheqd-node to install",
-                                   default=1))
-        if release_num >= 1 and release_num <= len(all_releases):
-            self.release = all_releases[release_num - 1]
-        else:
-            logging.exception(
-                f"Invalid release number picked from list of releases: {release_num}")
+        try:
+            default = self.get_latest_release()
+            all_releases = self.get_releases()
+            logging.info(f"Latest stable cheqd-noded release version is {default}")
+            logging.info(f"List of cheqd-noded releases: ")
+            all_releases = self.remove_release_from_list(all_releases, default)
+            all_releases.insert(0, default)
+            for i, release in enumerate(all_releases[0: LAST_N_RELEASES]):
+                print(f"{i + 1}. {release.version}")
+            release_num = int(self.ask("Choose list option number above to select version of cheqd-node to install",
+                                    default=1))
+            if release_num >= 1 and release_num <= len(all_releases):
+                self.release = all_releases[release_num - 1]
+            else:
+                logging.exception(
+                    f"Invalid release number picked from list of releases: {release_num}")
+        except Exception as e:
+            logging.exception(f"Could not determine version of cheqd-node to install. Reason: {e}")
 
     @default_answer
     def ask(self, question, **kwargs):
