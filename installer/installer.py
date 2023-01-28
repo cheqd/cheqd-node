@@ -243,24 +243,6 @@ class Installer():
         return s
 
     @property
-    def rsyslog_cfg(self):
-        # Modify rsyslog template file to replace values for environment variables
-        # The rsyslog template file is fetched from the GitHub repo
-        # rsyslog is used to define logging properties for cheqd-noded/cosmovisor binary, depending on installation type.
-        binary_name = DEFAULT_COSMOVISOR_BINARY_NAME if self.interviewer.is_cosmo_needed else DEFAULT_BINARY_NAME
-        fname = os.path.basename(RSYSLOG_TEMPLATE)
-        self.exec(f"wget -c {RSYSLOG_TEMPLATE}")
-        with open(fname) as f:
-            s = re.sub(
-                r'({BINARY_FOR_LOGGING}|{CHEQD_LOG_DIR})',
-                lambda m: {'{BINARY_FOR_LOGGING}': binary_name,
-                           '{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()],
-                f.read()
-            )
-        self.remove_safe(fname)
-        return s
-
-    @property
     def cheqd_root_dir(self):
         # CHEQD_NODED_HOME variable can be picked up by cheqd-noded, so this should be set as an environment variable later
         # Default: /home/cheqd/.cheqdnode
@@ -523,21 +505,11 @@ class Installer():
     # Helper function to reload specified systemd service
     def restart_systemd_service(self, service_name):
         try:
-            logging.info(f"Reload systemd service: {service_name}")
             self.exec(f"systemctl daemon-reload")
+            logging.info(f"Trying to restart systemd service: {service_name}")
             self.exec(f"systemctl restart {service_name}")
         except Exception as e:
-            logging.exception(f"Failed to reload systemd service: {service_name}")
-        
-        if self.check_systemd_service_on(service_name):
-            logging.info(f"Stopping systemd service: {service_name}")
-            self.exec(f"systemctl stop {service_name}")
-
-            logging.info(f"Disable systemd service: {service_name}")
-            self.exec(f"systemctl disable {service_name}")
-
-            logging.info("Reset failed systemd services (if any)")
-            self.exec("systemctl reset-failed")
+            logging.exception(f"Failed to restart systemd service: {service_name}")
 
     # Setup logging related systemd services
     def setup_logging_systemd(self):
@@ -546,13 +518,13 @@ class Installer():
         # 2. user wants to rewrite rsyslog service file
         if not os.path.exists(DEFAULT_RSYSLOG_FILE) or self.interviewer.rewrite_rsyslog:
             try:
-                logging.info("Configuring rsyslog systemd service for cheqd-noded logging")
-                
                 # Fetch rsyslog template file from GitHub and save it to the default location
                 self.exec(f"curl --progress-bar {RSYSLOG_TEMPLATE} > {DEFAULT_RSYSLOG_FILE}")
                 
                 # Determine the binary name for logging based on installation type
                 binary_name = DEFAULT_COSMOVISOR_BINARY_NAME if self.interviewer.is_cosmo_needed else DEFAULT_BINARY_NAME
+
+                logging.info(f"Configuring rsyslog systemd service for {binary_name} logging")
 
                 # Modify rsyslog template file to replace values for environment variables
                 with open(DEFAULT_RSYSLOG_FILE, mode="w") as fname:
@@ -562,11 +534,10 @@ class Installer():
                             '{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()]
                     )
                 
-                # Sometimes it can take a lot of time: https://github.com/rsyslog/rsyslog/issues/3133
-                logging.info("Restarting rsyslog service")
-                self.exec("systemctl restart rsyslog")
+                # Restarting rsyslog can take a lot of time: https://github.com/rsyslog/rsyslog/issues/3133
+                self.restart_systemd_service("rsyslog.service")
             except:
-                logging.exception("Failed to setup rsyslog service")
+                logging.exception(f"Failed to setup rsyslog service for {binary_name} logging")
 
         # Install cheqd-node configuration for logrotate if either of the following conditions are met:
         # 1. logrotate service file is not present
