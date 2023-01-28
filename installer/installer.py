@@ -4,24 +4,25 @@
 ###############################################################
 ###     		    Python package imports      			###
 ###############################################################
-import datetime
 from enum import Enum
+from pathlib import Path
+import copy
+import datetime
+import functools
+import json
+import logging
 import os
+import platform
+import pwd
+import re
+import re
+import shutil
+import shutil
+import signal
 import subprocess
 import sys
 import urllib.error
-from pathlib import Path
 import urllib.request as request
-import json
-import re
-import functools
-import pwd
-import shutil
-import signal
-import platform
-import copy
-import re
-import shutil
 
 
 ###############################################################
@@ -509,18 +510,66 @@ class Installer():
         self.log("Reload systemd config")
         self.exec('systemctl daemon-reload')
 
+    def activate_systemd_service(self, service_name):
+        if self.check_systemd_service_on(service_name):
+            self.log(f"Stopping systemd service: {service_name}")
+            self.exec(f"systemctl stop {service_name}")
+
+            self.log(f"Disable systemd service: {service_name}")
+            self.exec(f"systemctl disable {service_name}")
+
+            self.log("Reset failed systemd services (if any)")
+            self.exec("systemctl reset-failed")
+
+    # Helper function to reload specified systemd service
+    def restart_systemd_service(self, service_name):
+        try:
+            self.log(f"Reload systemd service: {service_name}")
+            self.exec(f"systemctl daemon-reload")
+            self.exec(f"systemctl restart {service_name}")
+        except Exception as e:
+            failure_exit(f"Failed to reload systemd service: {service_name}")
+        
+        if self.check_systemd_service_on(service_name):
+            self.log(f"Stopping systemd service: {service_name}")
+            self.exec(f"systemctl stop {service_name}")
+
+            self.log(f"Disable systemd service: {service_name}")
+            self.exec(f"systemctl disable {service_name}")
+
+            self.log("Reset failed systemd services (if any)")
+            self.exec("systemctl reset-failed")
+
+    # Setup logging related systemd services
     def setup_logging_systemd(self):
-        if os.path.exists("/etc/rsyslog.d/"):
-            if not os.path.exists(DEFAULT_RSYSLOG_FILE) or self.interviewer.rewrite_rsyslog:
-                self.log(
-                    "Configuring syslog systemd service for cheqd-noded logging")
-                with open(DEFAULT_RSYSLOG_FILE, mode="w") as fd:
-                    fd.write(self.rsyslog_cfg)
+        # Install cheqd-node configuration for rsyslog if either of the following conditions are met:
+        # 1. rsyslog service file is not present
+        # 2. user wants to rewrite rsyslog service file
+        if not os.path.exists(DEFAULT_RSYSLOG_FILE) or self.interviewer.rewrite_rsyslog:
+            try:
+                self.log("Configuring rsyslog systemd service for cheqd-noded logging")
+                
+                # Fetch rsyslog template file from GitHub and save it to the default location
+                self.exec(f"curl --progress-bar {RSYSLOG_TEMPLATE} > {DEFAULT_RSYSLOG_FILE}")
+                
+                # Determine the binary name for logging based on installation type
+                binary_name = DEFAULT_COSMOVISOR_BINARY_NAME if self.interviewer.is_cosmo_needed else DEFAULT_BINARY_NAME
+
+                # Modify rsyslog template file to replace values for environment variables
+                with open(DEFAULT_RSYSLOG_FILE, mode="w") as fname:
+                    fname.write = re.sub(
+                        r'({BINARY_FOR_LOGGING}|{CHEQD_LOG_DIR})',
+                        lambda m: {'{BINARY_FOR_LOGGING}': binary_name,
+                            '{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()]
+                    )
+                
                 # Sometimes it can take a lot of time: https://github.com/rsyslog/rsyslog/issues/3133
                 self.log("Restarting rsyslog service")
                 self.exec("systemctl restart rsyslog")
+            except:
+                failure_exit("Failed to setup rsyslog service")
 
-        # Install logrotate if either of the following conditions are met:
+        # Install cheqd-node configuration for logrotate if either of the following conditions are met:
         # 1. logrotate service file is not present
         # 2. user wants to rewrite logrotate service file
         if not os.path.exists(DEFAULT_LOGROTATE_FILE) or self.interviewer.rewrite_logrotate:
