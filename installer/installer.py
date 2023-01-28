@@ -1439,7 +1439,7 @@ class Interviewer:
     # Ask whether user wants to do a install from scratch
     def ask_for_setup(self):
         try:
-            answer = self.ask(f"Do you want to setup a new cheqd-node? (yes/no)", default="yes")
+            answer = self.ask(f"Do you want to setup a new cheqd-node installation? (yes/no)", default="yes")
             if answer.lower().startswith("y"):
                 self.is_setup_needed = True
             elif answer.lower().startswith("n"):
@@ -1451,7 +1451,7 @@ class Interviewer:
             logging.exception(f"Could not determine if a fresh installation is needed. Reason: {e}")
 
 
-    
+
     def ask_for_upgrade(self):
         answer = self.ask(
             f"Existing cheqd-node configuration folder detected. Do you want to upgrade an existing cheqd-node installation? (yes/no)", default="no")
