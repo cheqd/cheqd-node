@@ -1345,6 +1345,7 @@ class Interviewer:
         except Exception as e:
             logging.exception(f"Could not check if Cosmovisor is already installed. Reason: {e}")
 
+
     # Check if a systemd config is installed for a given service file
     def is_systemd_config_installed(self, systemd_service_file) -> bool:
         try:
@@ -1376,24 +1377,6 @@ class Interviewer:
             if release.version == elem.version:
                 copy_r_list.pop(i)
                 return copy_r_list
-
-    def what_cosmovisor_version(self) -> str:
-        try:
-            file_path = './temp.txt'
-            self.exec(f"cosmovisor version | tee {file_path}")
-            file = open(file_path, "r")
-            cosmovisor_version = None
-            for line in file:
-                first_line = str(line)
-                cosmovisor_version = re.search(
-                    r'(\d+)(\.\d+)?(\.\d+)?$', first_line).group()
-                break
-            return cosmovisor_version
-        except:
-            logging.exception("Error when getting Cosmovisor version")
-        finally:
-            file.close()
-            os.remove(file_path)
 
     def ask_for_version(self):
         default = self.get_latest_release()
