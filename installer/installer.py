@@ -1102,7 +1102,8 @@ class Interviewer:
         self._rewrite_rsyslog = False
         self._rewrite_logrotate = False
 
-    # This section sets @property decorators for each variable
+
+    ### This section sets @property variables ###
     @property
     def cheqd_root_dir(self):
         return os.path.join(self.home_dir, ".cheqdnode")
@@ -1204,7 +1205,7 @@ class Interviewer:
         return self._daemon_restart_after_upgrade
 
 
-    # This section defines the setters for each variable
+    ### This section sets @property variables ###
     @release.setter
     def release(self, release):
         self._release = release
@@ -1293,19 +1294,8 @@ class Interviewer:
     def daemon_restart_after_upgrade(self, daemon_restart_after_upgrade):
         self._daemon_restart_after_upgrade = daemon_restart_after_upgrade
 
-    def is_already_installed(self) -> bool:
-        if os.path.exists(self.home_dir) and os.path.exists(self.cheqd_root_dir):
-            return True
-        elif not os.path.exists(self.home_dir) and not os.path.exists(self.cheqd_root_dir):
-            return False
-        else:
-            logging.exception(
-                f"Could not check if cheqd-node is already installed.")
 
-    def is_systemd_config_exists(self) -> bool:
-        return os.path.exists(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH) or \
-            os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
-
+    ### This section contains helper functions to assess current state of local system ###
     @post_process
     def exec(self, cmd, use_stdout=True, suppress_err=False, check=True):
         logging.info(f"Executing command: {cmd}")
@@ -1321,6 +1311,20 @@ class Interviewer:
         if suppress_err:
             kwargs["stderr"] = subprocess.DEVNULL
         return subprocess.run(cmd, **kwargs)
+
+    # Check if cheqd-noded is installed
+    def is_node_installed(self) -> bool:
+        try:
+            if shutil.which("cheqd-noded") is not None:
+                return True
+            else:
+                return False
+        except Exception as e:
+            logging.exception(f"Could not check if cheqd-noded is already installed.")
+
+    def is_systemd_config_exists(self) -> bool:
+        return os.path.exists(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH) or \
+            os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
 
     def get_releases(self):
         req = request.Request(
@@ -1569,7 +1573,6 @@ class Interviewer:
 
 
 if __name__ == '__main__':
-
     # Steps to execute if installing from scratch
     def install_steps():
         if interviewer.is_cosmovisor_already_installed():
@@ -1581,7 +1584,9 @@ if __name__ == '__main__':
             else:
                 logging.exception(
                     "Aborting installation to prevent overwriting existing cheqd-node.")
-
+        
+        interviewer.ask_for_version()
+        interviewer.ask_for_home_directory(default=DEFAULT_CHEQD_HOME_DIR)
         interviewer.ask_for_setup()
         interviewer.ask_for_chain()
         interviewer.ask_for_cosmovisor()
@@ -1622,35 +1627,40 @@ if __name__ == '__main__':
         if os.path.exists(DEFAULT_LOGROTATE_FILE):
             interviewer.ask_for_rewrite_logrotate()
 
-    # Ask user for information
+    ### This section is where the Interviewer class is invoked ###
     interviewer = Interviewer()
-    interviewer.ask_for_version()
-    interviewer.ask_for_home_directory(default=DEFAULT_CHEQD_HOME_DIR)
 
-    # Check if cheqd configuration directory exists
-    is_installed = interviewer.is_already_installed()
+    # Check if cheqd-noded is already installed
+    is_installed = interviewer.is_node_installed()
 
-    # First-time new node setup
-    if is_installed is False:
-        install_steps()
-    elif is_installed is True:
-        # Check if user wants to upgrade existing cheqd-node installation
-        interviewer.ask_for_upgrade()
-        if interviewer.is_upgrade is True:
-            upgrade_steps()
-        elif interviewer.is_upgrade is False:
-            interviewer.ask_for_install_from_scratch()
-            if interviewer.is_from_scratch is True:
-                install_steps()
-            else:
-                logging.exception(
-                    "Aborting installation to prevent overwriting existing cheqd-node.")
+    try:
+        # If no cheqd-noded binary is found, install from scratch
+        if is_installed is False:
+            install_steps()
+        
         else:
-            logging.exception("Unable to determine upgrade/installation mode.")
-    else:
-        logging.exception("Could not execute either install or upgrade steps.")
+            # If cheqd-noded binary is found, ask user if they want to upgrade or install from scratch
+            interviewer.ask_for_upgrade()
 
-    # Install
+            # If user wants to upgrade, execute upgrade steps
+            if interviewer.is_upgrade is True:
+                upgrade_steps()
+
+            else:
+                # If user declines upgrade, ask if they want to install from scratch
+                interviewer.ask_for_install_from_scratch()
+
+                if interviewer.is_from_scratch is True:
+                    install_steps()
+                else:
+                    logging.error("Aborting installation to prevent overwriting existing node installation. Exiting...")
+                    sys.exit(1)
+
+    except Exception as e:
+        logging.exception(f"Unable to execute installation steps: {e}")
+
+
+    ### This section if where the Installer class is invoked
     installer = Installer(interviewer)
     try:
         installer.install()
