@@ -115,6 +115,15 @@ def sigint_handler(signal, frame):
     sys.exit(0)
 signal.signal(signal.SIGINT, sigint_handler)
 
+# Helper function to check if the URL is valid
+def is_valid_url(self, url):
+    try:
+        r = requests.head(url)
+        if r.status_code == 200:
+            return True
+    except requests.ConnectionError:
+        return False
+
 # Common function to search and replace text in a file
 def search_and_replace(search_text, replace_text, file_path):
     file = open(file_path, "r")
@@ -196,7 +205,6 @@ class Installer():
     def __init__(self, interviewer):
         self.version = interviewer.release.version
         self.release = interviewer.release
-        self.verbose = True
         self.interviewer = interviewer
 
     @property
@@ -288,12 +296,7 @@ class Installer():
         else:
             os_arch = 'arm64'
         return COSMOVISOR_BINARY_URL.format(DEFAULT_LATEST_COSMOVISOR_VERSION, DEFAULT_LATEST_COSMOVISOR_VERSION, os_arch)
-    
-    
-    def log(self, msg):
-        # todo: Remove once logging is replaced
-        if self.verbose:
-            print(f"{PRINT_PREFIX} {msg}")
+
 
     @post_process
     def exec(self, cmd, use_stdout=True, suppress_err=False):
@@ -342,6 +345,24 @@ class Installer():
             shutil.rmtree(path)
         if os.path.exists(path):
             os.remove(path)
+    
+    def prepare_url_for_latest(self) -> str:
+            template = TESTNET_SNAPSHOT if self.chain == NetworkType.TESTNET else MAINNET_SNAPSHOT
+            _date = datetime.date.today()
+            _days_counter = 0
+            _is_url_valid = False
+
+            while not _is_url_valid and _days_counter <= MAX_SNAPSHOT_DAYS:
+                _url = template.format(_date.strftime(
+                    "%Y-%m-%d"), _date.strftime("%Y-%m-%d"))
+                _is_url_valid = self.is_valid_url(_url)
+                _days_counter += 1
+                _date -= datetime.timedelta(days=1)
+
+            if not _is_url_valid:
+                logging.exception("Could not find the valid snapshot for the last {} days".format(
+                    MAX_SNAPSHOT_DAYS))
+            return _url
 
     def pre_install(self):
         # Pre-installation checks
@@ -412,7 +433,7 @@ class Installer():
         service_file_exists = os.path.exists(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH) or os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
 
         if not self.interviewer.is_upgrade or \
-                self.interviewer.rewrite_systemd or \
+                self.interviewer.rewrite_node_systemd or \
                 not service_file_exists:
             self.remove_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME)
             self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME)
@@ -530,7 +551,7 @@ class Installer():
 
                 logging.info(f"Configuring rsyslog systemd service for {binary_name} logging")
 
-                # Modify rsyslog template file to replace values for environment variables
+                # Modify rsyslog template file with values specific to the installation
                 with open(DEFAULT_RSYSLOG_FILE, mode="w") as fname:
                     fname.write = re.sub(
                         r'({BINARY_FOR_LOGGING}|{CHEQD_LOG_DIR})',
@@ -558,7 +579,7 @@ class Installer():
 
                 logging.info(f"Configuring logrotate systemd service for cheqd-node logging")
 
-                # Modify logrotate template file to replace values for environment variables
+                # Modify logrotate template file with values specific to the installation
                 with open(DEFAULT_LOGROTATE_FILE, mode="w") as fname:
                     fname.write = re.sub(
                         r'({CHEQD_LOG_DIR})',
@@ -571,7 +592,6 @@ class Installer():
             except:
                 logging.exception("Failed to setup logrotate service")
 
-        self.setup_node_systemd()
 
     def install(self):
         """
@@ -619,6 +639,7 @@ class Installer():
             self.download_snapshot()
             self.untar_from_snapshot()
         
+        self.setup_node_systemd()
         self.setup_logging_systemd()
         logging.info("The cheqd-noded binary has been successfully installed")
 
@@ -1054,20 +1075,16 @@ class Installer():
 
 
 class Interviewer:
-    def __init__(self,
-                 home_dir=DEFAULT_CHEQD_HOME_DIR,
-                 chain=CHEQD_NODED_CHAIN_ID):
+    def __init__(self, home_dir=DEFAULT_CHEQD_HOME_DIR, chain=CHEQD_NODED_CHAIN_ID):
         self._home_dir = home_dir
         self._is_upgrade = False
         self._is_cosmo_needed = False
         self._is_cosmovisor_bump_needed = False
         self._init_from_snapshot = False
         self._release = None
-        self._chain = chain
-        self.verbose = True
-        self._snapshot_url = ""
+        self._chain = CHEQD_NODED_CHAIN_ID
         self._is_setup_needed = False
-        self._moniker = ""
+        self._moniker = CHEQD_NODED_MONIKER
         self._external_address = ""
         self._rpc_port = DEFAULT_RPC_PORT
         self._p2p_port = DEFAULT_P2P_PORT
@@ -1078,7 +1095,7 @@ class Interviewer:
         self._daemon_allow_download_binaries = DEFAULT_DAEMON_ALLOW_DOWNLOAD_BINARIES
         self._daemon_restart_after_upgrade = DEFAULT_DAEMON_RESTART_AFTER_UPGRADE
         self._is_from_scratch = False
-        self._rewrite_systemd = False
+        self._rewrite_node_systemd = False
         self._rewrite_rsyslog = False
         self._rewrite_logrotate = False
 
@@ -1111,8 +1128,8 @@ class Interviewer:
         return self._is_from_scratch
 
     @property
-    def rewrite_systemd(self) -> bool:
-        return self._rewrite_systemd
+    def rewrite_node_systemd(self) -> bool:
+        return self._rewrite_node_systemd
 
     @property
     def rewrite_rsyslog(self) -> bool:
@@ -1137,10 +1154,6 @@ class Interviewer:
     @property
     def chain(self) -> str:
         return self._chain
-
-    @property
-    def snapshot_url(self) -> str:
-        return self._snapshot_url
 
     @property
     def is_setup_needed(self) -> bool:
@@ -1202,9 +1215,9 @@ class Interviewer:
     def is_from_scratch(self, ifs):
         self._is_from_scratch = ifs
 
-    @rewrite_systemd.setter
-    def rewrite_systemd(self, rs):
-        self._rewrite_systemd = rs
+    @rewrite_node_systemd.setter
+    def rewrite_node_systemd(self, rs):
+        self._rewrite_node_systemd = rs
 
     @rewrite_rsyslog.setter
     def rewrite_rsyslog(self, rr):
@@ -1229,10 +1242,6 @@ class Interviewer:
     @chain.setter
     def chain(self, chain):
         self._chain = chain
-
-    @snapshot_url.setter
-    def snapshot_url(self, su):
-        self._snapshot_url = su
 
     @is_setup_needed.setter
     def is_setup_needed(self, is_setup_needed):
@@ -1277,10 +1286,6 @@ class Interviewer:
     @daemon_restart_after_upgrade.setter
     def daemon_restart_after_upgrade(self, daemon_restart_after_upgrade):
         self._daemon_restart_after_upgrade = daemon_restart_after_upgrade
-
-    def log(self, msg):
-        if self.verbose:
-            print(f"{PRINT_PREFIX} {msg}")
 
     def is_already_installed(self) -> bool:
         if os.path.exists(self.home_dir) and os.path.exists(self.cheqd_root_dir):
@@ -1405,13 +1410,13 @@ class Interviewer:
         else:
             logging.exception(f"Invalid input provided during installation.")
 
-    def ask_for_rewrite_systemd(self):
+    def ask_for_rewrite_node_systemd(self):
         answer = self.ask(
             f"Overwrite existing systemd configuration for cheqd-node? (yes/no)", default="yes")
         if answer.lower().startswith("y"):
-            self.rewrite_systemd = True
+            self.rewrite_node_systemd = True
         elif answer.lower().startswith("n"):
-            self.rewrite_systemd = False
+            self.rewrite_node_systemd = False
         else:
             logging.exception(f"Invalid input provided during installation.")
 
@@ -1461,7 +1466,6 @@ class Interviewer:
             f"CAUTION: Downloading a snapshot replaces your existing copy of chain data. Usually safe to use this option when doing a fresh installation. "
             f"Do you want to download a snapshot of the existing chain to speed up node synchronization? (yes/no)", default=DEFAULT_INIT_FROM_SNAPSHOT)
         if answer.lower().startswith("y"):
-            self.snapshot_url = self.prepare_url_for_latest()
             self.init_from_snapshot = True
         elif answer.lower().startswith("n"):
             self.init_from_snapshot = False
@@ -1557,32 +1561,6 @@ class Interviewer:
         else:
             logging.exception(f"Invalid input provided during installation.")
 
-    def prepare_url_for_latest(self) -> str:
-        template = TESTNET_SNAPSHOT if self.chain == NetworkType.TESTNET else MAINNET_SNAPSHOT
-        _date = datetime.date.today()
-        _days_counter = 0
-        _is_url_valid = False
-
-        while not _is_url_valid and _days_counter <= MAX_SNAPSHOT_DAYS:
-            _url = template.format(_date.strftime(
-                "%Y-%m-%d"), _date.strftime("%Y-%m-%d"))
-            _is_url_valid = self.is_url_exists(_url)
-            _days_counter += 1
-            _date -= datetime.timedelta(days=1)
-
-        if not _is_url_valid:
-            logging.exception("Could not find the valid snapshot for the last {} days".format(
-                MAX_SNAPSHOT_DAYS))
-        return _url
-
-    def is_url_exists(self, url):
-        curr_verbose = self.verbose
-        self.verbose = False
-        if self.exec("curl --output /dev/null --silent --head --fail {url}".format(url=url), check=False).returncode == 0:
-            return True
-        self.verbose = curr_verbose
-        return False
-
 
 if __name__ == '__main__':
 
@@ -1632,7 +1610,7 @@ if __name__ == '__main__':
             interviewer.ask_for_daemon_restart_after_upgrade()
 
         if interviewer.is_systemd_config_exists():
-            interviewer.ask_for_rewrite_systemd()
+            interviewer.ask_for_rewrite_node_systemd()
         if os.path.exists(DEFAULT_RSYSLOG_FILE):
             interviewer.ask_for_rewrite_rsyslog()
         if os.path.exists(DEFAULT_LOGROTATE_FILE):
