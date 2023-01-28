@@ -509,7 +509,7 @@ class Installer():
         self.log("Reload systemd config")
         self.exec('systemctl daemon-reload')
 
-    def setup_system_configs(self):
+    def setup_logging_systemd(self):
         if os.path.exists("/etc/rsyslog.d/"):
             if not os.path.exists(DEFAULT_RSYSLOG_FILE) or self.interviewer.rewrite_rsyslog:
                 self.log(
@@ -520,12 +520,17 @@ class Installer():
                 self.log("Restarting rsyslog service")
                 self.exec("systemctl restart rsyslog")
 
-        if os.path.exists("/etc/logrotate.d"):
-            if not os.path.exists(DEFAULT_LOGROTATE_FILE) or self.interviewer.rewrite_logrotate:
+        # Install logrotate if either of the following conditions are met:
+        # 1. logrotate service file is not present
+        # 2. user wants to rewrite logrotate service file
+        if not os.path.exists(DEFAULT_LOGROTATE_FILE) or self.interviewer.rewrite_logrotate:
+            try:
                 self.log(
-                    "Configuring log rotation systemd service for cheqd-noded logging")
+                    "Configuring logrotate systemd service for cheqd-noded logging")
                 with open(DEFAULT_LOGROTATE_FILE, mode="w") as fd:
                     fd.write(self.logrotate_cfg)
+            except:
+                failure_exit("Failed to setup logrotate service")
 
         self.log("Restarting logrotate services")
         self.exec("systemctl restart logrotate.service")
@@ -550,7 +555,6 @@ class Installer():
         self.pre_install()
         self.prepare_cheqd_user()
         self.prepare_directory_tree()
-        self.setup_system_configs()
 
         if self.interviewer.is_cosmo_needed:
             self.log("Setting up Cosmovisor")
@@ -579,6 +583,7 @@ class Installer():
             self.download_snapshot()
             self.untar_from_snapshot()
         
+        self.setup_logging_systemd()
         self.log("The cheqd-noded binary has been successfully installed")
 
     def post_install(self):
