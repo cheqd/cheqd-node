@@ -106,6 +106,9 @@ CHEQD_NODED_P2P_MAX_PACKET_MSG_PAYLOAD_SIZE = 10240
 ###     	    Common, reusable functions    	            ###
 ###############################################################
 
+# Set logging configuration
+logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', datefmt='%d-%b-%Y %H:%M:%S', level=logging.INFO)
+
 # Handle Ctrl+C / SIGINT halts requests
 def sigint_handler(signal, frame):
     print('Exiting from cheqd-node installer')
@@ -309,14 +312,16 @@ class Installer():
         else:
             os_arch = 'arm64'
         return COSMOVISOR_BINARY_URL.format(DEFAULT_LATEST_COSMOVISOR_VERSION, DEFAULT_LATEST_COSMOVISOR_VERSION, os_arch)
-
+    
+    
     def log(self, msg):
+        # todo: Remove once logging is replaced
         if self.verbose:
             print(f"{PRINT_PREFIX} {msg}")
 
     @post_process
     def exec(self, cmd, use_stdout=True, suppress_err=False):
-        self.log(f"Executing command: {cmd}")
+        logging.info(f"Executing command: {cmd}")
         kwargs = {
             "shell": True,
             "check": True,
@@ -333,7 +338,7 @@ class Installer():
     def get_binary(self):
         # Download cheqd-noded binary and extract it
         # Also remove the downloaded archive file, if applicable
-        self.log("Downloading cheqd-noded binary...")
+        logging.info("Downloading cheqd-noded binary...")
         binary_url = self.release.get_release_url()
         fname = os.path.basename(binary_url)
         try:
@@ -349,10 +354,10 @@ class Installer():
         # Check if "cheqd" user exists on the system
         try:
             pwd.getpwnam(username)
-            self.log(f"User {username} already exists")
+            logging.info(f"User {username} already exists")
             return True
         except KeyError:
-            self.log(f"User {username} does not exist")
+            logging.info(f"User {username} does not exist")
             return False
 
     def remove_safe(self, path, is_dir=False):
@@ -369,7 +374,7 @@ class Installer():
             # 1. ~/.cheqdnode directory
             # 2. cheqd-noded / cosmovisor binaries
             # 3. systemd service files
-            self.log("Removing user's data and configs")
+            logging.info("Removing user's data and configs")
             self.remove_safe(self.cheqd_root_dir, is_dir=True)
             self.remove_safe(os.path.join(
                 DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
@@ -391,31 +396,31 @@ class Installer():
         # 3. Create ~/.cheqdnode/log directory
         try:
             if not os.path.exists(self.cheqd_root_dir):
-                self.log("Creating main directory for cheqd-noded")
+                logging.info("Creating main directory for cheqd-noded")
                 self.mkdir_p(self.cheqd_root_dir)
 
-                self.log(
+                logging.info(
                     f"Setting directory permissions to default cheqd user: {DEFAULT_CHEQD_USER}")
                 self.exec(
                     f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.interviewer.home_dir}")
             else:
-                self.log(
+                logging.info(
                     f"Skipping main directory creation because {self.cheqd_root_dir} already exists")
 
             if not os.path.exists(self.cheqd_log_dir):
-                self.log("Creating log directory for cheqd-noded")
+                logging.info("Creating log directory for cheqd-noded")
                 self.setup_log_dir()
             else:
-                self.log(
+                logging.info(
                     f"Skipping log directory creation because {self.cheqd_log_dir} already exists")
 
             if not os.path.exists("/var/log/cheqd-node"):
-                self.log(
+                logging.info(
                     "Creating a symlink from cheqd-noded log folder to /var/log/cheqd-node")
                 os.symlink(self.cheqd_log_dir, "/var/log/cheqd-node",
                            target_is_directory=True)
             else:
-                self.log(
+                logging.info(
                     "Skipping linking because /var/log/cheqd-node already exists")
         except:
             failure_exit(
@@ -425,7 +430,7 @@ class Installer():
         # Setup the following systemd services:
         # 1. cheqd-noded.service or cheqd-cosmovisor.service
         
-        self.log("Setting up systemd config")
+        logging.info("Setting up systemd config")
 
         # Check if systemd service files already exist for cheqd-node
         service_file_exists = os.path.exists(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH) or os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
@@ -439,7 +444,7 @@ class Installer():
             if self.interviewer.is_cosmo_needed:
                 try:
                     # Setup cheqd-cosmovisor.service if requested
-                    self.log("Enabling cheqd-cosmovisor.service in systemd")
+                    logging.info("Enabling cheqd-cosmovisor.service in systemd")
                     
                     # Get the cosmovisor service file template from GitHub
                     self.exec(f"curl -s {COSMOVISOR_SERVICE_TEMPLATE} > {DEFAULT_COSMOVISOR_SERVICE_FILE_PATH}")
@@ -464,7 +469,7 @@ class Installer():
                 except:
                     failure_exit("Failed to setup cheqd-cosmovisor systemd service")
             else:
-                self.log("Enabling systemd service for cheqd-noded")
+                logging.info("Enabling systemd service for cheqd-noded")
                 self.exec(f"curl -s {STANDALONE_SERVICE_TEMPLATE} > {DEFAULT_STANDALONE_SERVICE_FILE_PATH}")
 
             
@@ -483,61 +488,61 @@ class Installer():
 
     def remove_systemd_service(self, service_name):
         if self.check_systemd_service_on(service_name):
-            self.log(f"Stopping systemd service: {service_name}")
+            logging.info(f"Stopping systemd service: {service_name}")
             self.exec(f"systemctl stop {service_name}")
 
-            self.log(f"Disable systemd service: {service_name}")
+            logging.info(f"Disable systemd service: {service_name}")
             self.exec(f"systemctl disable {service_name}")
 
-            self.log("Reset failed systemd services (if any)")
+            logging.info("Reset failed systemd services (if any)")
             self.exec("systemctl reset-failed")
 
-            self.log("Reload systemd config")
+            logging.info("Reload systemd config")
             self.exec('systemctl daemon-reload')
 
     def stop_cosmovisor_systemd(self, service_name):
         if self.check_systemd_service_on(service_name):
-            self.log(f"Stopping systemd service: {service_name}")
+            logging.info(f"Stopping systemd service: {service_name}")
             self.exec(f"systemctl stop {service_name}")
 
-            self.log(f"Disable systemd service: {service_name}")
+            logging.info(f"Disable systemd service: {service_name}")
             self.exec(f"systemctl disable {service_name}")
 
-            self.log("Reset failed systemd services (if any)")
+            logging.info("Reset failed systemd services (if any)")
             self.exec("systemctl reset-failed")
 
     def reload_cosmovisor_systemd(self):
-        self.log("Reload systemd config")
+        logging.info("Reload systemd config")
         self.exec('systemctl daemon-reload')
 
     def activate_systemd_service(self, service_name):
         if self.check_systemd_service_on(service_name):
-            self.log(f"Stopping systemd service: {service_name}")
+            logging.info(f"Stopping systemd service: {service_name}")
             self.exec(f"systemctl stop {service_name}")
 
-            self.log(f"Disable systemd service: {service_name}")
+            logging.info(f"Disable systemd service: {service_name}")
             self.exec(f"systemctl disable {service_name}")
 
-            self.log("Reset failed systemd services (if any)")
+            logging.info("Reset failed systemd services (if any)")
             self.exec("systemctl reset-failed")
 
     # Helper function to reload specified systemd service
     def restart_systemd_service(self, service_name):
         try:
-            self.log(f"Reload systemd service: {service_name}")
+            logging.info(f"Reload systemd service: {service_name}")
             self.exec(f"systemctl daemon-reload")
             self.exec(f"systemctl restart {service_name}")
         except Exception as e:
             failure_exit(f"Failed to reload systemd service: {service_name}")
         
         if self.check_systemd_service_on(service_name):
-            self.log(f"Stopping systemd service: {service_name}")
+            logging.info(f"Stopping systemd service: {service_name}")
             self.exec(f"systemctl stop {service_name}")
 
-            self.log(f"Disable systemd service: {service_name}")
+            logging.info(f"Disable systemd service: {service_name}")
             self.exec(f"systemctl disable {service_name}")
 
-            self.log("Reset failed systemd services (if any)")
+            logging.info("Reset failed systemd services (if any)")
             self.exec("systemctl reset-failed")
 
     # Setup logging related systemd services
@@ -547,7 +552,7 @@ class Installer():
         # 2. user wants to rewrite rsyslog service file
         if not os.path.exists(DEFAULT_RSYSLOG_FILE) or self.interviewer.rewrite_rsyslog:
             try:
-                self.log("Configuring rsyslog systemd service for cheqd-noded logging")
+                logging.info("Configuring rsyslog systemd service for cheqd-noded logging")
                 
                 # Fetch rsyslog template file from GitHub and save it to the default location
                 self.exec(f"curl --progress-bar {RSYSLOG_TEMPLATE} > {DEFAULT_RSYSLOG_FILE}")
@@ -564,7 +569,7 @@ class Installer():
                     )
                 
                 # Sometimes it can take a lot of time: https://github.com/rsyslog/rsyslog/issues/3133
-                self.log("Restarting rsyslog service")
+                logging.info("Restarting rsyslog service")
                 self.exec("systemctl restart rsyslog")
             except:
                 failure_exit("Failed to setup rsyslog service")
@@ -574,14 +579,14 @@ class Installer():
         # 2. user wants to rewrite logrotate service file
         if not os.path.exists(DEFAULT_LOGROTATE_FILE) or self.interviewer.rewrite_logrotate:
             try:
-                self.log(
+                logging.info(
                     "Configuring logrotate systemd service for cheqd-noded logging")
                 with open(DEFAULT_LOGROTATE_FILE, mode="w") as fd:
                     fd.write(self.logrotate_cfg)
             except:
                 failure_exit("Failed to setup logrotate service")
 
-        self.log("Restarting logrotate services")
+        logging.info("Restarting logrotate services")
         self.exec("systemctl restart logrotate.service")
         self.exec("systemctl restart logrotate.timer")
         self.setup_node_systemd()
@@ -606,15 +611,15 @@ class Installer():
         self.prepare_directory_tree()
 
         if self.interviewer.is_cosmo_needed:
-            self.log("Setting up Cosmovisor")
+            logging.info("Setting up Cosmovisor")
             self.setup_cosmovisor()
 
         if self.interviewer.is_cosmovisor_bump_needed:
-            self.log("Bumping Cosmovisor")
+            logging.info("Bumping Cosmovisor")
             self.bump_cosmovisor()
 
         if not self.interviewer.is_cosmo_needed and not self.interviewer.is_cosmovisor_bump_needed:
-            self.log(
+            logging.info(
                 f"Moving binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}")
             shutil.chown(self.binary_path,
                          DEFAULT_CHEQD_USER,
@@ -627,13 +632,13 @@ class Installer():
             self.post_install()
 
         if self.interviewer.init_from_snapshot:
-            self.log(
+            logging.info(
                 "Downloading snapshot and extracting archive. This can take a *really* long time...")
             self.download_snapshot()
             self.untar_from_snapshot()
         
         self.setup_logging_systemd()
-        self.log("The cheqd-noded binary has been successfully installed")
+        logging.info("The cheqd-noded binary has been successfully installed")
 
     def post_install(self):
         # Init the node with provided moniker
@@ -740,9 +745,9 @@ class Installer():
     def prepare_cheqd_user(self):
         try:
             if not self.is_user_exists(DEFAULT_CHEQD_USER):
-                self.log(f"Creating {DEFAULT_CHEQD_USER} group")
+                logging.info(f"Creating {DEFAULT_CHEQD_USER} group")
                 self.exec(f"addgroup {DEFAULT_CHEQD_USER} --quiet --system")
-                self.log(
+                logging.info(
                     f"Creating {DEFAULT_CHEQD_USER} user and adding to {DEFAULT_CHEQD_USER} group")
                 self.exec(
                     f"adduser --system {DEFAULT_CHEQD_USER} --home {self.interviewer.home_dir} --shell /bin/bash --ingroup {DEFAULT_CHEQD_USER} --quiet")
@@ -753,13 +758,13 @@ class Installer():
         try:
             os.mkdir(dir_name)
         except FileExistsError as err:
-            self.log(f"Directory {dir_name} already exists")
+            logging.info(f"Directory {dir_name} already exists")
 
     def setup_log_dir(self):
         try:
             self.mkdir_p(self.cheqd_log_dir)
             Path(os.path.join(self.cheqd_log_dir, "stdout.log")).touch()
-            self.log(
+            logging.info(
                 f"Setting up ownership permissions for {self.cheqd_log_dir} directory")
             shutil.chown(self.cheqd_log_dir,
                          'syslog',
@@ -781,7 +786,7 @@ class Installer():
             self.set_cosmovisor_env_vars()
 
             if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)):
-                self.log(f"Moving Cosmovisor binary to installation directory")
+                logging.info(f"Moving Cosmovisor binary to installation directory")
                 shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
 
             self.cosm_version = interviewer.what_cosmovisor_version()
@@ -793,10 +798,10 @@ class Installer():
             if self.interviewer.is_upgrade and \
                     os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
 
-                self.log(f"Copying upgrade-info.json file to cosmovisor/current/")
+                logging.info(f"Copying upgrade-info.json file to cosmovisor/current/")
                 shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
                             os.path.join(self.cosmovisor_root_dir, "current"))
-                self.log(f"Changing owner to {DEFAULT_CHEQD_USER} user")
+                logging.info(f"Changing owner to {DEFAULT_CHEQD_USER} user")
                 shutil.chown(self.cosmovisor_root_dir,
                              DEFAULT_CHEQD_USER,
                              DEFAULT_CHEQD_USER)
@@ -819,7 +824,7 @@ class Installer():
         self.set_env_vars("UNSAFE_SKIP_BACKUP", DEFAULT_UNSAFE_SKIP_BACKUP)
 
     def init_cosmovisor(self):
-        self.log(
+        logging.info(
             f"Moving binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}")
         self.exec(
             f"sudo mv {self.binary_path} {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}")
@@ -836,11 +841,11 @@ class Installer():
         self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "upgrades"))
 
         if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
-            self.log(f"Creating symlink for current Cosmovisor version")
+            logging.info(f"Creating symlink for current Cosmovisor version")
             os.symlink(os.path.join(self.cosmovisor_root_dir, "genesis"),
                        os.path.join(self.cosmovisor_root_dir, "current"))
 
-        self.log(
+        logging.info(
             f"Moving binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
         self.exec("sudo mv {} {}".format(
             self.binary_path, self.cosmovisor_cheqd_bin_path))
@@ -857,7 +862,7 @@ class Installer():
             os.remove(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
 
         if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
-            self.log(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
+            logging.info(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
             os.symlink(self.cosmovisor_cheqd_bin_path,
                        os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
 
@@ -874,16 +879,16 @@ class Installer():
             self.remove_safe("LICENSE")
 
             # move the new binary to installation directory
-            self.log(f"Moving Cosmovisor binary to installation directory")
+            logging.info(f"Moving Cosmovisor binary to installation directory")
             shutil.move(os.path.join(os.path.realpath(os.path.curdir), DEFAULT_COSMOVISOR_BINARY_NAME), os.path.join(
                 DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
 
             if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
-                self.log(f"Creating symlink for current Cosmovisor version")
+                logging.info(f"Creating symlink for current Cosmovisor version")
                 os.symlink(os.path.join(self.cosmovisor_root_dir, "genesis"),
                            os.path.join(self.cosmovisor_root_dir, "current"))
 
-            self.log(
+            logging.info(
                 f"Moving binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
             shutil.move(os.path.join(os.path.realpath(
                 os.path.curdir), self.binary_path), os.path.join(self.cosmovisor_cheqd_bin_path))
@@ -894,22 +899,22 @@ class Installer():
                 "sudo chmod +x {}".format(f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
 
             if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
-                self.log(
+                logging.info(
                     f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
                 os.symlink(self.cosmovisor_cheqd_bin_path,
                            os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
 
             if self.interviewer.is_upgrade and \
                     os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
-                self.log(f"Copying upgrade-info.json file to cosmovisor/current/")
+                logging.info(f"Copying upgrade-info.json file to cosmovisor/current/")
                 shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
                             os.path.join(self.cosmovisor_root_dir, "current"))
-                self.log(f"Changing owner to {DEFAULT_CHEQD_USER} user")
+                logging.info(f"Changing owner to {DEFAULT_CHEQD_USER} user")
                 shutil.chown(self.cosmovisor_root_dir,
                              DEFAULT_CHEQD_USER,
                              DEFAULT_CHEQD_USER)
 
-            self.log(
+            logging.info(
                 f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
             shutil.chown(self.cosmovisor_root_dir,
                          DEFAULT_CHEQD_USER,
@@ -927,7 +932,7 @@ class Installer():
         elif not self.check_if_env_var_already_set(env_var_name) and self.is_default_shell_fish():
             self.exec(f'set -Uxg {env_var_name} {env_var_value}')
         else:
-            self.log(f"ENV var {env_var_name} already set")
+            logging.info(f"ENV var {env_var_name} already set")
 
     def write_to_profile(self, env_var_name, env_var_value, is_user_cheqd=False):
         try:
@@ -976,23 +981,23 @@ class Installer():
         # Get checksum file
         published_checksum = self.exec(
             f"curl -s {checksum_url} | tail -1 | cut -d' ' -f 1").stdout.strip()
-        self.log(f"Comparing published checksum with local checksum")
+        logging.info(f"Comparing published checksum with local checksum")
         local_checksum = self.exec(
             f"md5sum {file_path} | tail -1 | cut -d' ' -f 1").stdout.strip()
         if published_checksum == local_checksum:
-            self.log(f"Checksums match. Download is OK.")
+            logging.info(f"Checksums match. Download is OK.")
             return True
         elif published_checksum != local_checksum:
-            self.log(f"Checksums do not match. Download got corrupted.")
+            logging.info(f"Checksums do not match. Download got corrupted.")
             return False
         else:
             failure_exit(f"Error encountered when comparing checksums.")
 
     def install_dependencies(self):
         try:
-            self.log("Installing dependencies")
+            logging.info("Installing dependencies")
             self.exec("sudo apt-get update")
-            self.log(f"Install pv to show progress of extraction")
+            logging.info(f"Install pv to show progress of extraction")
             self.exec("sudo apt-get install -y pv")
         except:
             failure_exit(f"Failed to install dependencies")
@@ -1011,15 +1016,15 @@ class Installer():
             free_disk_space = self.exec(
                 f"df -P -B1 {self.cheqd_root_dir} | tail -1 | awk '{{print $4}}'").stdout.strip()
             if int(archive_size) < int(free_disk_space):
-                self.log(f"Downloading snapshot archive. This may take a while...")
+                logging.info(f"Downloading snapshot archive. This may take a while...")
                 self.exec(
                     f"wget -c {self.interviewer.snapshot_url} -P {self.cheqd_root_dir}")
                 archive_path = os.path.join(self.cheqd_root_dir, archive_name)
                 if self.compare_checksum(archive_path) is True:
-                    self.log(
+                    logging.info(
                         f"Snapshot download was successful and checksums match.")
                 else:
-                    self.log(
+                    logging.info(
                         f"Snapshot download was successful but checksums do not match.")
                     failure_exit(
                         f"Snapshot download was successful but checksums do not match.")
@@ -1038,24 +1043,24 @@ class Installer():
                 self.cheqd_root_dir, os.path.basename(self.interviewer.snapshot_url))
             # Check if there is enough space to extract snapshot archive
             self.install_dependencies()
-            self.log(f"Extracting snapshot archive. This may take a while...")
+            logging.info(f"Extracting snapshot archive. This may take a while...")
 
             # Extract to cheqd node data directory EXCEPT for validator state
             self.exec(
                 f"sudo su -c 'pv {archive_path} | tar --use-compress-program=lz4 -xf - -C {self.cheqd_root_dir} --exclude priv_validator_state.json' {DEFAULT_CHEQD_USER}")
 
             # Delete snapshot archive file
-            self.log(
+            logging.info(
                 f"Snapshot extraction was successful. Deleting snapshot archive.")
             self.remove_safe(archive_path)
             # Workaround to make this work with Cosmovisor since it expects upgrade-info.json file in cosmovisor/current directory
             if self.interviewer.is_cosmo_needed:
                 if os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
-                    self.log(
+                    logging.info(
                         f"Copying upgrade-info.json file to cosmovisor/current/")
                     shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
                                 os.path.join(self.cosmovisor_root_dir, "current"))
-                self.log(f"Changing owner to {DEFAULT_CHEQD_USER} user")
+                logging.info(f"Changing owner to {DEFAULT_CHEQD_USER} user")
                 shutil.chown(self.cosmovisor_root_dir,
                              DEFAULT_CHEQD_USER,
                              DEFAULT_CHEQD_USER)
@@ -1310,7 +1315,7 @@ class Interviewer:
 
     @post_process
     def exec(self, cmd, use_stdout=True, suppress_err=False, check=True):
-        self.log(f"Executing command: {cmd}")
+        logging.info(f"Executing command: {cmd}")
         kwargs = {
             "shell": True,
             "check": check,
@@ -1374,8 +1379,8 @@ class Interviewer:
     def ask_for_version(self):
         default = self.get_latest_release()
         all_releases = self.get_releases()
-        self.log(f"Latest stable cheqd-noded release version is {default}")
-        self.log(f"List of cheqd-noded releases: ")
+        logging.info(f"Latest stable cheqd-noded release version is {default}")
+        logging.info(f"List of cheqd-noded releases: ")
         all_releases = self.remove_release_from_list(all_releases, default)
         all_releases.insert(0, default)
         for i, release in enumerate(all_releases[0: LAST_N_RELEASES]):
@@ -1449,7 +1454,7 @@ class Interviewer:
             failure_exit(f"Invalid input provided during installation.")
 
     def ask_for_cosmovisor(self):
-        self.log(f"INFO: Installing cheqd-node with Cosmovisor allows for automatic unattended upgrades for valid software upgrade proposals.")
+        logging.info(f"INFO: Installing cheqd-node with Cosmovisor allows for automatic unattended upgrades for valid software upgrade proposals.")
         answer = self.ask(
             f"Install cheqd-noded using Cosmovisor? (yes/no)", default=DEFAULT_USE_COSMOVISOR)
         if answer.lower().startswith("y"):
