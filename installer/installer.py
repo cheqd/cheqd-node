@@ -1578,7 +1578,19 @@ class Interviewer:
                 self.rpc_port = DEFAULT_RPC_PORT
         except Exception as e:
             logging.exception(f"Failed to set RPC port. Reason: {e}")
-    
+
+
+    # (Optional) Ask for node's persistent peers
+    def ask_for_persistent_peers(self):
+        try:
+            logging.info(f"Persistent peers are nodes that you want to always keep connected to. Values for persistent peers should be specified in format: <nodeID>@<IP>:<port>,<nodeID>@<IP>:<port>... \n")
+            answer = self.ask(f"Specify persistent peers [default: none]: {os.linesep}")
+            if answer is not None:
+                self.persistent_peers = answer
+            else:
+                self.persistent_peers = ""
+        except Exception as e:
+            logging.exception(f"Failed to set persistent peers. Reason: {e}") 
 
     def ask_for_upgrade(self):
         answer = self.ask(
@@ -1651,11 +1663,7 @@ class Interviewer:
         self.gas_price = self.ask(
             f"Specify minimum gas price for transactions", default=CHEQD_NODED_MINIMUM_GAS_PRICES)
 
-    def ask_for_persistent_peers(self):
-        self.persistent_peers = self.ask(
-            f"INFO: Persistent peers are nodes that you want to always keep connected to. "
-            f"Values for persistent peers should be specified in format: <nodeID>@<IP>:<port>,<nodeID>@<IP>:<port>... "
-            f"Specify persistent peers [default: none]: {os.linesep}")
+
 
     def ask_for_log_level(self):
         self.log_level = self.ask(
