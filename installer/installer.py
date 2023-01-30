@@ -1468,6 +1468,22 @@ class Interviewer:
         except Exception as e:
             logging.exception(f"Could not determine which network to join. Reason: {e}")
 
+
+    # Ask user whether to install with Cosmovisor
+    def ask_for_cosmovisor(self):
+        try:
+            logging.info(f"Installing cheqd-node with Cosmovisor allows for automatic unattended upgrades for valid software upgrade proposals. See https://docs.cosmos.network/main/tooling/cosmovisor for more information.\n")
+            answer = self.ask(f"Install cheqd-noded using Cosmovisor? (yes/no)", default=DEFAULT_USE_COSMOVISOR)
+            if answer.lower().startswith("y"):
+                self.is_cosmo_needed = True
+            elif answer.lower().startswith("n"):
+                self.is_cosmo_needed = False
+            else:
+                logging.error(f"Invalid input provided during installation. Please choose either 'yes' or 'no'.")
+                self.ask_for_cosmovisor()
+        except Exception as e:
+            logging.exception(f"Could not determine if cheqd-node should be installed with Cosmovisor. Reason: {e}")
+
     def ask_for_upgrade(self):
         answer = self.ask(
             f"Existing cheqd-node configuration folder detected. Do you want to upgrade an existing cheqd-node installation? (yes/no)", default="no")
@@ -1520,16 +1536,6 @@ class Interviewer:
         else:
             logging.exception(f"Invalid input provided during installation.")
 
-    def ask_for_cosmovisor(self):
-        logging.info(f"INFO: Installing cheqd-node with Cosmovisor allows for automatic unattended upgrades for valid software upgrade proposals.")
-        answer = self.ask(
-            f"Install cheqd-noded using Cosmovisor? (yes/no)", default=DEFAULT_USE_COSMOVISOR)
-        if answer.lower().startswith("y"):
-            self.is_cosmo_needed = True
-        elif answer.lower().startswith("n"):
-            self.is_cosmo_needed = False
-        else:
-            logging.exception(f"Invalid input provided during installation.")
 
     def ask_for_cosmovisor_bump(self):
         answer = self.ask(
