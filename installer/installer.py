@@ -1540,7 +1540,7 @@ class Interviewer:
             else:
                 logging.error(f"Invalid moniker provided during cheqd-noded setup.")
         except Exception as e:
-            logging.exception(f"Failed to set moniker for cheqd-noded. Reason: {e}")
+            logging.exception(f"Failed to set moniker. Reason: {e}")
 
 
     # Ask for node's external IP address or DNS name
@@ -1553,9 +1553,33 @@ class Interviewer:
             else:
                 self.external_address = str(self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout).strip("""b'"\\n""")
         except Exception as e:
-            logging.exception(f"Failed to set external address for cheqd-noded. Reason: {e}")
+            logging.exception(f"Failed to set external address. Reason: {e}")
+
+
+    # Ask for node's P2P port
+    def ask_for_p2p_port(self):
+        try:
+            answer = self.ask(f"Specify your node's P2P port", default=DEFAULT_P2P_PORT)
+            if answer is not None:
+                self.p2p_port = answer
+            else:
+                self.p2p_port = DEFAULT_P2P_PORT
+        except Exception as e:
+            logging.exception(f"Failed to set P2P port. Reason: {e}")
+
+
+    # Ask for node's RPC port
+    def ask_for_rpc_port(self):
+        try:
+            answer = self.ask(f"Specify your node's RPC port", default=DEFAULT_RPC_PORT)
+            if answer is not None:
+                self.rpc_port = answer
+            else:
+                self.rpc_port = DEFAULT_RPC_PORT
+        except Exception as e:
+            logging.exception(f"Failed to set RPC port. Reason: {e}")
     
-    
+
     def ask_for_upgrade(self):
         answer = self.ask(
             f"Existing cheqd-node configuration folder detected. Do you want to upgrade an existing cheqd-node installation? (yes/no)", default="no")
@@ -1621,13 +1645,7 @@ class Interviewer:
             logging.exception(f"Invalid input provided during installation.")
 
 
-    def ask_for_rpc_port(self):
-        self.rpc_port = self.ask(
-            f"Specify port for Tendermint RPC", default=DEFAULT_RPC_PORT)
 
-    def ask_for_p2p_port(self):
-        self.p2p_port = self.ask(
-            f"Specify port for Tendermint P2P", default=DEFAULT_P2P_PORT)
 
     def ask_for_gas_price(self):
         self.gas_price = self.ask(
@@ -1680,8 +1698,8 @@ if __name__ == '__main__':
             if interviewer.is_setup_needed is True:
                 interviewer.ask_for_moniker()
                 interviewer.ask_for_external_address()
-                interviewer.ask_for_rpc_port()
                 interviewer.ask_for_p2p_port()
+                interviewer.ask_for_rpc_port()
                 interviewer.ask_for_gas_price()
                 interviewer.ask_for_persistent_peers()
                 interviewer.ask_for_log_level()
