@@ -1592,6 +1592,19 @@ class Interviewer:
         except Exception as e:
             logging.exception(f"Failed to set persistent peers. Reason: {e}") 
 
+
+    # (Optional) Ask for minimum gas prices
+    def ask_for_gas_price(self):
+        try:
+            logging.info(f"Minimum gas prices are the minimum amount of CHEQ tokens you are willing to accept as a validator to process a transaction.\n")
+            answer = self.ask(f"Specify minimum gas price", default=CHEQD_NODED_MINIMUM_GAS_PRICES)
+            if answer is not None:
+                self.gas_price = answer
+            else:
+                self.gas_price = default=CHEQD_NODED_MINIMUM_GAS_PRICES
+        except Exception as e:
+            logging.exception(f"Failed to set minimum gas prices. Reason: {e}")
+
     def ask_for_upgrade(self):
         answer = self.ask(
             f"Existing cheqd-node configuration folder detected. Do you want to upgrade an existing cheqd-node installation? (yes/no)", default="no")
@@ -1657,14 +1670,6 @@ class Interviewer:
             logging.exception(f"Invalid input provided during installation.")
 
 
-
-
-    def ask_for_gas_price(self):
-        self.gas_price = self.ask(
-            f"Specify minimum gas price for transactions", default=CHEQD_NODED_MINIMUM_GAS_PRICES)
-
-
-
     def ask_for_log_level(self):
         self.log_level = self.ask(
             f"Specify log level (trace|debug|info|warn|error|fatal|panic)", default=CHEQD_NODED_LOG_LEVEL)
@@ -1708,8 +1713,8 @@ if __name__ == '__main__':
                 interviewer.ask_for_external_address()
                 interviewer.ask_for_p2p_port()
                 interviewer.ask_for_rpc_port()
-                interviewer.ask_for_gas_price()
                 interviewer.ask_for_persistent_peers()
+                interviewer.ask_for_gas_price()
                 interviewer.ask_for_log_level()
                 interviewer.ask_for_log_format()
             
