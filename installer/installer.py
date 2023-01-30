@@ -1451,6 +1451,22 @@ class Interviewer:
             logging.exception(f"Could not determine if a fresh installation is needed. Reason: {e}")
 
 
+    # Ask user which network to join
+    def ask_for_chain(self):
+        try:
+            answer = int(self.ask(
+                "Select cheqd network to join:\n"
+                f"1. Mainnet ({MAINNET_CHAIN_ID})\n"
+                f"2. Testnet ({TESTNET_CHAIN_ID}) ", default=1))
+            if answer == 1:
+                self.chain = "mainnet"
+            elif answer == 2:
+                self.chain = "testnet"
+            else:
+                logging.error(f"Invalid network selected during installation. Please choose either 1 or 2.")
+                self.ask_for_chain()
+        except Exception as e:
+            logging.exception(f"Could not determine which network to join. Reason: {e}")
 
     def ask_for_upgrade(self):
         answer = self.ask(
@@ -1535,18 +1551,6 @@ class Interviewer:
             self.init_from_snapshot = False
         else:
             logging.exception(f"Invalid input provided during installation.")
-
-    def ask_for_chain(self):
-        answer = int(self.ask(
-            "Select cheqd network to join:\n"
-            f"1. Mainnet ({MAINNET_CHAIN_ID})\n"
-            f"2. Testnet ({TESTNET_CHAIN_ID}) ", default=1))
-        if answer == 1:
-            self.chain = "mainnet"
-        elif answer == 2:
-            self.chain = "testnet"
-        else:
-            logging.exception(f"Invalid network selected during installation.")
 
 
     def ask_for_moniker(self):
