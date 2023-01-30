@@ -1499,6 +1499,21 @@ class Interviewer:
         except Exception as e:
             logging.exception(f"Failed to set whether Cosmovisor should be bumped to latest version. Reason: {e}")
 
+
+    # Ask user whether to allow Cosmovisor to automatically download binaries for scheduled upgrades
+    def ask_for_daemon_allow_download_binaries(self):
+        try:
+            answer = self.ask(f"Do you want Cosmovisor to automatically download binaries for scheduled upgrades? (yes/no)", default="yes")
+            if answer.lower().startswith("y"):
+                self.daemon_allow_download_binaries = "true"
+            elif answer.lower().startswith("n"):
+                self.daemon_allow_download_binaries = "false"
+            else:
+                logging.error(f"Invalid input provided during installation. Please choose either 'yes' or 'no'.")
+                self.ask_for_daemon_allow_download_binaries()
+        except Exception as e:
+            logging.exception(f"Failed to set whether Cosmovisor should automatically download binaries for scheduled upgrades. Reason: {e}")
+
     def ask_for_upgrade(self):
         answer = self.ask(
             f"Existing cheqd-node configuration folder detected. Do you want to upgrade an existing cheqd-node installation? (yes/no)", default="no")
@@ -1611,15 +1626,6 @@ class Interviewer:
         self.log_format = self.ask(
             f"Specify log format (json|plain)", default=CHEQD_NODED_LOG_FORMAT)
 
-    def ask_for_daemon_allow_download_binaries(self):
-        answer = self.ask(
-            f"Do you want Cosmovisor to automatically download binaries for scheduled upgrades? (yes/no)", default="yes")
-        if answer.lower().startswith("y"):
-            self.daemon_allow_download_binaries = "true"
-        elif answer.lower().startswith("n"):
-            self.daemon_allow_download_binaries = "false"
-        else:
-            logging.exception(f"Invalid input provided during installation.")
 
     def ask_for_daemon_restart_after_upgrade(self):
         answer = self.ask(
