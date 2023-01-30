@@ -1541,6 +1541,20 @@ class Interviewer:
                 logging.error(f"Invalid moniker provided during cheqd-noded setup.")
         except Exception as e:
             logging.exception(f"Failed to set moniker for cheqd-noded. Reason: {e}")
+
+
+    # Ask for node's external IP address or DNS name
+    def ask_for_external_address(self):
+        try:
+            logging.info(f"External address is the publicly accessible IP address or DNS name of your cheqd-node. This is used to advertise your node's P2P address to other nodes in the network. If you are running your node behind a NAT, you should set this to your public IP address or DNS name. If you are running your node on a public IP address, you can leave this blank to automatically fetch your IP address via DNS resolver lookup. This sends a `dig` request to whoami.cloudflare.com\n\n")
+            answer = self.ask(f"What is the externally-reachable IP address or DNS name for your cheqd-node? [default: Fetch automatically via DNS resolver lookup]: {os.linesep}")
+            if answer:
+                self.external_address = answer
+            else:
+                self.external_address = str(self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout).strip("""b'"\\n""")
+        except Exception as e:
+            logging.exception(f"Failed to set external address for cheqd-noded. Reason: {e}")
+    
     
     def ask_for_upgrade(self):
         answer = self.ask(
@@ -1606,19 +1620,6 @@ class Interviewer:
         else:
             logging.exception(f"Invalid input provided during installation.")
 
-
-    def ask_for_external_address(self):
-        answer = self.ask(
-            f"What is the externally-reachable IP address or DNS name for your cheqd-node? [default: Fetch automatically via DNS resolver lookup]: {os.linesep}")
-        if answer:
-            self.external_address = answer
-        else:
-            try:
-                self.external_address = str(self.exec(
-                    "dig +short txt ch whoami.cloudflare @1.1.1.1").stdout).strip("""b'"\\n""")
-            except:
-                logging.exception(
-                    f"Unable to fetch external IP address for your node.")
 
     def ask_for_rpc_port(self):
         self.rpc_port = self.ask(
