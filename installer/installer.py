@@ -1425,7 +1425,7 @@ class Interviewer:
                 raise ValueError(f"Invalid release number picked from list of releases: {release_num}")
 
         except Exception as e:
-            logging.exception(f"Could not determine version of cheqd-node to install. Reason: {e}")
+            logging.exception(f"Failed to selected version of cheqd-noded. Reason: {e}")
 
 
     # Set cheqd user's home directory
@@ -1433,7 +1433,7 @@ class Interviewer:
         try:
             self.home_dir = self.ask(f"Set path for cheqd user's home directory", default=DEFAULT_CHEQD_HOME_DIR)
         except Exception as e:
-            logging.exception(f"Could not set cheqd user's home directory. Reason: {e}")
+            logging.exception(f"Failed to set cheqd user's home directory. Reason: {e}")
 
 
     # Ask whether user wants to do a install from scratch
@@ -1448,7 +1448,7 @@ class Interviewer:
                 logging.error(f"Please choose either 'yes' or 'no'")
                 self.ask_for_setup()
         except Exception as e:
-            logging.exception(f"Could not determine if a fresh installation is needed. Reason: {e}")
+            logging.exception(f"Failed to set fresh installation parameters. Reason: {e}")
 
 
     # Ask user which network to join
@@ -1466,7 +1466,7 @@ class Interviewer:
                 logging.error(f"Invalid network selected during installation. Please choose either 1 or 2.")
                 self.ask_for_chain()
         except Exception as e:
-            logging.exception(f"Could not determine which network to join. Reason: {e}")
+            logging.exception(f"Failed to set network/chain to join. Reason: {e}")
 
 
     # Ask user whether to install with Cosmovisor
@@ -1482,7 +1482,22 @@ class Interviewer:
                 logging.error(f"Invalid input provided during installation. Please choose either 'yes' or 'no'.")
                 self.ask_for_cosmovisor()
         except Exception as e:
-            logging.exception(f"Could not determine if cheqd-node should be installed with Cosmovisor. Reason: {e}")
+            logging.exception(f"Failed to set whether installation should be done with Cosmovisor. Reason: {e}")
+
+
+    # Ask user whether to bump Cosmovisor to latest version
+    def ask_for_cosmovisor_bump(self):
+        try:
+            answer = self.ask(f"Do you want to bump your Cosmovisor to {DEFAULT_LATEST_COSMOVISOR_VERSION} ? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
+            if answer.lower().startswith("y"):
+                self.is_cosmovisor_bump_needed = True
+            elif answer.lower().startswith("n"):
+                self.is_cosmovisor_bump_needed = False
+            else:
+                logging.error(f"Invalid input provided during installation. Please choose either 'yes' or 'no'.")
+                self.ask_for_cosmovisor_bump()
+        except Exception as e:
+            logging.exception(f"Failed to set whether Cosmovisor should be bumped to latest version. Reason: {e}")
 
     def ask_for_upgrade(self):
         answer = self.ask(
@@ -1536,16 +1551,6 @@ class Interviewer:
         else:
             logging.exception(f"Invalid input provided during installation.")
 
-
-    def ask_for_cosmovisor_bump(self):
-        answer = self.ask(
-            f"Do you want to bump your Cosmovisor to {DEFAULT_LATEST_COSMOVISOR_VERSION} ? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
-        if answer.lower().startswith("y"):
-            self.is_cosmovisor_bump_needed = True
-        elif answer.lower().startswith("n"):
-            self.is_cosmovisor_bump_needed = False
-        else:
-            logging.exception(f"Invalid input provided during installation.")
 
     def ask_for_init_from_snapshot(self):
         answer = self.ask(
