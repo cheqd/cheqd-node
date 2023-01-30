@@ -1528,7 +1528,19 @@ class Interviewer:
                 self.ask_for_daemon_restart_after_upgrade()
         except Exception as e:
             logging.exception(f"Failed to set whether Cosmovisor should automatically restart cheqd-noded service after an upgrade has been applied. Reason: {e}")
-    
+
+
+    # Ask user for node moniker
+    def ask_for_moniker(self):
+        try:
+            logging.info(f"Moniker is a human-readable name for your cheqd-node. This is NOT the same as your validator name, and is only used to uniquely identify your node for Tendermint P2P address book. It can be edited later in your ~.cheqdnode/config/config.toml file.\n")
+            answer = self.ask(f"Provide a moniker for your cheqd-node", default=CHEQD_NODED_MONIKER)
+            if answer is not None:
+                self.moniker = answer
+            else:
+                logging.error(f"Invalid moniker provided during cheqd-noded setup.")
+        except Exception as e:
+            logging.exception(f"Failed to set moniker for cheqd-noded. Reason: {e}")
     
     def ask_for_upgrade(self):
         answer = self.ask(
@@ -1594,14 +1606,6 @@ class Interviewer:
         else:
             logging.exception(f"Invalid input provided during installation.")
 
-
-    def ask_for_moniker(self):
-        answer = self.ask(
-            f"Provide a moniker for your cheqd-node", default=CHEQD_NODED_MONIKER)
-        if answer is not None:
-            self.moniker = answer
-        else:
-            logging.exception(f"Invalid moniker provided during cheqd-noded setup.")
 
     def ask_for_external_address(self):
         answer = self.ask(
