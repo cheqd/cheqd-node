@@ -1605,6 +1605,14 @@ class Interviewer:
         except Exception as e:
             logging.exception(f"Failed to set minimum gas prices. Reason: {e}")
 
+    def ask_for_log_level(self):
+        self.log_level = self.ask(
+            f"Specify log level (trace|debug|info|warn|error|fatal|panic)", default=CHEQD_NODED_LOG_LEVEL)
+
+    def ask_for_log_format(self):
+        self.log_format = self.ask(
+            f"Specify log format (json|plain)", default=CHEQD_NODED_LOG_FORMAT)
+
     def ask_for_upgrade(self):
         answer = self.ask(
             f"Existing cheqd-node configuration folder detected. Do you want to upgrade an existing cheqd-node installation? (yes/no)", default="no")
@@ -1668,18 +1676,6 @@ class Interviewer:
             self.init_from_snapshot = False
         else:
             logging.exception(f"Invalid input provided during installation.")
-
-
-    def ask_for_log_level(self):
-        self.log_level = self.ask(
-            f"Specify log level (trace|debug|info|warn|error|fatal|panic)", default=CHEQD_NODED_LOG_LEVEL)
-
-    def ask_for_log_format(self):
-        self.log_format = self.ask(
-            f"Specify log format (json|plain)", default=CHEQD_NODED_LOG_FORMAT)
-
-
-
 
 
 if __name__ == '__main__':
