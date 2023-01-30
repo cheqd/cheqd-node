@@ -1513,7 +1513,23 @@ class Interviewer:
                 self.ask_for_daemon_allow_download_binaries()
         except Exception as e:
             logging.exception(f"Failed to set whether Cosmovisor should automatically download binaries for scheduled upgrades. Reason: {e}")
-
+    
+    
+    # Ask whether Cosmovisor should restart daemon after upgrade
+    def ask_for_daemon_restart_after_upgrade(self):
+        try:
+            answer = self.ask(f"Do you want Cosmovisor to automatically restart cheqd-noded service after an upgrade has been applied? (yes/no)", default="yes")
+            if answer.lower().startswith("y"):
+                self.daemon_restart_after_upgrade = "true"
+            elif answer.lower().startswith("n"):
+                self.daemon_restart_after_upgrade = "false"
+            else:
+                logging.error(f"Invalid input provided during installation. Please choose either 'yes' or 'no'.")
+                self.ask_for_daemon_restart_after_upgrade()
+        except Exception as e:
+            logging.exception(f"Failed to set whether Cosmovisor should automatically restart cheqd-noded service after an upgrade has been applied. Reason: {e}")
+    
+    
     def ask_for_upgrade(self):
         answer = self.ask(
             f"Existing cheqd-node configuration folder detected. Do you want to upgrade an existing cheqd-node installation? (yes/no)", default="no")
@@ -1627,15 +1643,7 @@ class Interviewer:
             f"Specify log format (json|plain)", default=CHEQD_NODED_LOG_FORMAT)
 
 
-    def ask_for_daemon_restart_after_upgrade(self):
-        answer = self.ask(
-            f"Do you want Cosmovisor to automatically restart cheqd-noded service after an upgrade has been applied? (yes/no)", default="yes")
-        if answer.lower().startswith("y"):
-            self.daemon_restart_after_upgrade = "true"
-        elif answer.lower().startswith("n"):
-            self.daemon_restart_after_upgrade = "false"
-        else:
-            logging.exception(f"Invalid input provided during installation.")
+
 
 
 if __name__ == '__main__':
