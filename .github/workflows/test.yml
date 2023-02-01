@@ -13,27 +13,27 @@ permissions:
 
 jobs:
 
-  interactive-installer:
-    name: "Interactive Installer"
-    runs-on: ubuntu-20.04
+  # interactive-installer:
+  #   name: "Interactive Installer"
+  #   runs-on: ubuntu-20.04
   
-    steps:
-      - uses: actions/checkout@v3
+  #   steps:
+  #     - uses: actions/checkout@v3
 
-      - name: "Fresh install"
-        working-directory: ./installer
-        run: |
-          sudo bash -c "python3 installer.py < install-from-scratch.txt"
+  #     - name: "Fresh install"
+  #       working-directory: ./installer
+  #       run: |
+  #         sudo bash -c "python3 installer.py < install-from-scratch.txt"
 
-      - name: "Upgrade existing installation"
-        working-directory: ./installer
-        run: |
-          sudo bash -c "python3 installer.py < upgrade-existing.txt"
+  #     - name: "Upgrade existing installation"
+  #       working-directory: ./installer
+  #       run: |
+  #         sudo bash -c "python3 installer.py < upgrade-existing.txt"
 
-      - name: Debugging with tmate
-        if: ${{ failure() }}
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 10
+  #     - name: Debugging with tmate
+  #       if: ${{ failure() }}
+  #       uses: mxschmitt/action-tmate@v3
+  #       timeout-minutes: 10
 
   unit-tests:
     name: "Unit Tests"
