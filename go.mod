@@ -8,7 +8,7 @@ require (
 	github.com/cheqd/cheqd-node/api/v2 v2.0.0-00010101000000-000000000000
 	github.com/cosmos/cosmos-proto v1.0.0-alpha8
 	github.com/cosmos/cosmos-sdk v0.46.8
-	github.com/cosmos/gogoproto v1.4.3
+	github.com/cosmos/gogoproto v1.4.4
 	github.com/cosmos/ibc-go/v6 v6.1.0
 	github.com/gabriel-vasile/mimetype v1.4.1
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
@@ -31,7 +31,7 @@ require (
 	github.com/tendermint/tendermint v0.34.24
 	github.com/tendermint/tm-db v0.6.7
 	google.golang.org/genproto v0.0.0-20221207170731-23e4bf6bdc37
-	google.golang.org/grpc v1.51.0
+	google.golang.org/grpc v1.52.3
 )
 
 require (
