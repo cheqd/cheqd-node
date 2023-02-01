@@ -33,8 +33,7 @@ jobs:
       - name: Debugging with tmate
         if: ${{ failure() }}
         uses: mxschmitt/action-tmate@v3
-        with:
-          timeout-minutes: 10
+        timeout-minutes: 10
 
   unit-tests:
     name: "Unit Tests"
