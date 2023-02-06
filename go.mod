@@ -180,6 +180,9 @@ replace (
 	// cheqd-node/api module replacement
 	github.com/cheqd/cheqd-node/api/v2 => ./api
 
+	// cosmos-sdk state sync allow fast forward to latest height version
+	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.46.8-cheqd-state-sync
+
 	// iavl allow pruning of uneven heights
 	github.com/cosmos/iavl => github.com/cheqd/iavl v0.19.4-blunt.3
 
@@ -193,6 +196,6 @@ replace (
 	// From Cosmos SDK v0.46.8 upstream
 	github.com/jhump/protoreflect => github.com/jhump/protoreflect v1.9.0
 
-	// use informal system fork of tendermint
+	// use informal systems fork of tendermint
 	github.com/tendermint/tendermint => github.com/informalsystems/tendermint v0.34.24
 )
