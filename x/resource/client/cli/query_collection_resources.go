@@ -11,7 +11,7 @@ import (
 
 func CmdGetCollectionResources() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "collection-metadata [collection-id] [resource-id]",
+		Use:   "collection-metadata [collection-id]",
 		Short: "Query metadata for an entire Collection",
 		Long: `Query metadata for an entire Collection by Collection ID. This will return the metadata for all Resources in the Collection.
 		
