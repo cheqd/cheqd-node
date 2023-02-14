@@ -23,7 +23,10 @@ jobs:
       - name: "Fresh install with Cosmovisor"
         working-directory: ./installer
         run: |
-          sudo bash -c "DEFAULT_DEBUG_BRANCH='${GITHUB_REF##*/}' python3 installer.py < install-from-scratch-with-cosmovisor.txt"
+          sudo bash -c "python3 installer.py < install-from-scratch-with-cosmovisor.txt"
+        env:
+          PYTHONDEVMODE: 1
+          DEFAULT_DEBUG_BRANCH: "${GITHUB_REF##*/}"
 
       - name: "Upgrade existing installation"
         working-directory: ./installer
@@ -52,6 +55,7 @@ jobs:
         working-directory: ./installer
         run: |
           sudo bash -c "DEFAULT_DEBUG_BRANCH='${GITHUB_REF##*/}' python3 installer.py < upgrade-existing-node-standalone.txt"
+        
 
   #     - name: Debugging with tmate
   #       if: ${{ failure() }}
