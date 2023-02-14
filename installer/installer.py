@@ -21,9 +21,7 @@ import shutil
 import signal
 import subprocess
 import sys
-import urllib.error
 import urllib.request as request
-
 
 ###############################################################
 ###     				Installer defaults    				###
@@ -37,7 +35,7 @@ DEFAULT_COSMOVISOR_BINARY_NAME = "cosmovisor"
 MAINNET_CHAIN_ID = "cheqd-mainnet-1"
 TESTNET_CHAIN_ID = "cheqd-testnet-6"
 PRINT_PREFIX = "********* "
-
+DEFAULT_DEBUG_BRANCH = os.getenv("DEFAULT_DEBUG_BRANCH") if sys.flags.dev_mode and os.getenv("DEFAULT_DEBUG_BRANCH") != None else "main"
 
 ###############################################################
 ###     		Cosmovisor configuration      				###
@@ -56,10 +54,10 @@ DEFAULT_DAEMON_RESTART_DELAY = "120s"
 ###############################################################
 ###     			Systemd configuration      				###
 ###############################################################
-STANDALONE_SERVICE_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/build-tools/node-standalone.service"
-COSMOVISOR_SERVICE_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/build-tools/node-cosmovisor.service"
-LOGROTATE_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/build-tools/logrotate.conf"
-RSYSLOG_TEMPLATE = "https://raw.githubusercontent.com/cheqd/cheqd-node/main/build-tools/rsyslog.conf"
+STANDALONE_SERVICE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/build-tools/node-standalone.service"
+COSMOVISOR_SERVICE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/build-tools/node-cosmovisor.service"
+LOGROTATE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/build-tools/logrotate.conf"
+RSYSLOG_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/build-tools/rsyslog.conf"
 DEFAULT_STANDALONE_SERVICE_NAME = 'cheqd-noded'
 DEFAULT_COSMOVISOR_SERVICE_NAME = 'cheqd-cosmovisor'
 DEFAULT_STANDALONE_SERVICE_FILE_PATH = f"/lib/systemd/system/{DEFAULT_STANDALONE_SERVICE_NAME}.service"
@@ -119,12 +117,12 @@ def sigint_handler(signal, frame):
 signal.signal(signal.SIGINT, sigint_handler)
 
 # Helper function to check if the URL is valid
-def is_valid_url(self, url):
+def is_valid_url(url):
     try:
-        r = requests.head(url)
+        r = request.head(url)
         if r.status_code == 200:
             return True
-    except requests.ConnectionError:
+    except request.ConnectionError:
         return False
 
 # Common function to search and replace text in a file
@@ -358,7 +356,7 @@ class Installer():
             while not _is_url_valid and _days_counter <= MAX_SNAPSHOT_DAYS:
                 _url = template.format(_date.strftime(
                     "%Y-%m-%d"), _date.strftime("%Y-%m-%d"))
-                _is_url_valid = self.is_valid_url(_url)
+                _is_url_valid = is_valid_url(_url)
                 _days_counter += 1
                 _date -= datetime.timedelta(days=1)
 
