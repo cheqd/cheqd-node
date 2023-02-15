@@ -1,16 +1,16 @@
 package cli
 
-const CLI_BINARY_NAME = "cheqd-noded"
+const CliBinaryName = "cheqd-noded"
 
 const (
-	KEYRING_BACKEND = "test"
-	OUTPUT_FORMAT   = "json"
-	GAS             = "auto"
-	GAS_ADJUSTMENT  = "1.8"
-	GAS_PRICES      = "25ncheq"
+	KeyringBackend = "test"
+	OutputFormat   = "json"
+	Gas            = "auto"
+	GasAdjustment  = "1.8"
+	GasPrices      = "50ncheq"
 )
 
 const (
-	GREEN  = "\033[32m"
-	PURPLE = "\033[35m"
+	Green  = "\033[32m"
+	Purple = "\033[35m"
 )

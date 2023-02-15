@@ -19,7 +19,7 @@ type KeyPairBase64 struct {
 }
 
 type SignInput struct {
-	VerificationMethodId string `json:"verificationMethodId"`
+	VerificationMethodID string `json:"verificationMethodId"`
 	PrivateKey           []byte `json:"privateKey"`
 }
 
@@ -30,20 +30,20 @@ type DidAndMetadata struct {
 
 type ILoader interface {
 	LoadFile(path string, dataChunk any, setup TestSetup) error
-	GetListOfFiles(path_to_dir, prefix string) ([]string, error)
+	GetListOfFiles(pathToDir, prefix string) ([]string, error)
 }
 
 type Loader struct{}
 
-func (l Loader) GetListOfFiles(path_to_dir, prefix string) ([]string, error) {
-	files_to_load := []string{}
-	err := filepath.Walk(path_to_dir, func(path string, info os.FileInfo, err error) error {
+func (l Loader) GetListOfFiles(pathToDir, prefix string) ([]string, error) {
+	filesToLoad := []string{}
+	err := filepath.Walk(pathToDir, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() && strings.HasPrefix(info.Name(), prefix) {
-			files_to_load = append(files_to_load, path)
+			filesToLoad = append(filesToLoad, path)
 		}
 		return nil
 	})
-	return files_to_load, err
+	return filesToLoad, err
 }
 
 func (l Loader) LoadFile(
@@ -57,14 +57,14 @@ func (l Loader) LoadFile(
 	}
 	switch dataChunk := dataChunk.(type) {
 	case *didtypesv1.StateValue:
-		var temp_s DidAndMetadata
+		var tempS DidAndMetadata
 		var stateValue didtypesv1.StateValue
-		err = json.Unmarshal(file, &temp_s)
+		err = json.Unmarshal(file, &tempS)
 		if err != nil {
 			return err
 		}
 
-		stateValue, err = didtypesv1.NewStateValue(&temp_s.Data, &temp_s.Metadata)
+		stateValue, err = didtypesv1.NewStateValue(&tempS.Data, &tempS.Metadata)
 		if err != nil {
 			return err
 		}
@@ -76,7 +76,7 @@ func (l Loader) LoadFile(
 	case *didtypes.DidDocWithMetadata:
 		err = setup.Cdc.UnmarshalJSON(file, dataChunk)
 	case *resourcetypes.ResourceWithMetadata:
-		err = json.Unmarshal(file, dataChunk)
+		err = setup.Cdc.UnmarshalJSON(file, dataChunk)
 	default:
 		err = json.Unmarshal(file, dataChunk)
 	}

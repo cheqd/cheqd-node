@@ -20,7 +20,7 @@ func CmdGetDidDoc() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			did := args[0]
-			params := &types.QueryGetDidDocRequest{
+			params := &types.QueryDidDocRequest{
 				Id: did,
 			}
 

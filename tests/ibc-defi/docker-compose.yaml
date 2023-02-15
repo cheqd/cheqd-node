@@ -1,0 +1,37 @@
+version: '3.7'
+
+services:
+  cheqd:
+    image: cheqd/cheqd-node:build-latest
+    build:
+      context: ../../
+      dockerfile: docker/Dockerfile
+    ports:
+      - "26656:26656" # p2p
+      - "26657:26657" # rpc
+      - "9090:9090" # grpc
+      - "9091:9091" # grpc-web
+    entrypoint: tail -f /dev/null
+
+  osmosis:
+    image: osmolabs/osmosis:13-alpine
+    ports:
+      - "26666:26656" # p2p
+      - "26667:26657" # rpc
+      - "9190:9090" # grpc
+      - "9191:9091" # grpc-web
+    entrypoint: tail -f /dev/null
+
+  hermes:
+    image: informalsystems/hermes:1.2.0
+    configs:
+      - source: hermes-config
+        target: /home/hermes/.hermes/config.toml
+    ports:
+      - "3000:3000" # rest
+      - "3001:3001" # telemetry
+    entrypoint: tail -f /dev/null
+
+configs:
+  hermes-config:
+    file: ./hermes/config.toml

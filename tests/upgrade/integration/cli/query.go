@@ -20,7 +20,7 @@ func Query(container string, binary string, module, query string, queryArgs ...s
 	}
 
 	args = append(args, queryArgs...)
-	args = append(args, QUERY_PARAMS...)
+	args = append(args, QueryParamsConst...)
 
 	return LocalnetExecExec(container, args...)
 }
@@ -28,9 +28,9 @@ func Query(container string, binary string, module, query string, queryArgs ...s
 func QueryModuleVersionMap(container string) (upgradetypes.QueryModuleVersionsResponse, error) {
 	fmt.Println("Querying module version map from", container)
 	args := append([]string{
-		CLI_BINARY_NAME,
+		CliBinaryName,
 		"query", "upgrade", "module_versions",
-	}, QUERY_PARAMS...)
+	}, QueryParamsConst...)
 
 	out, err := LocalnetExecExec(container, args...)
 	if err != nil {
@@ -52,9 +52,9 @@ func QueryModuleVersionMap(container string) (upgradetypes.QueryModuleVersionsRe
 func QueryParams(container, subspace, key string) (paramproposal.ParamChange, error) {
 	fmt.Println("Querying params from", container)
 	args := append([]string{
-		CLI_BINARY_NAME,
+		CliBinaryName,
 		"query", "params", "subspace", subspace, key,
-	}, QUERY_PARAMS...)
+	}, QueryParamsConst...)
 
 	out, err := LocalnetExecExec(container, args...)
 	if err != nil {
@@ -108,9 +108,9 @@ func QueryResourceFeeParams(container, subspace, key string) (resourcetypes.FeeP
 func QueryProposalLegacy(container, id string) (govtypesv1beta1.Proposal, error) {
 	fmt.Println("Querying proposal from", container)
 	args := append([]string{
-		CLI_BINARY_NAME,
+		CliBinaryName,
 		"query", "gov", "proposal", id,
-	}, QUERY_PARAMS...)
+	}, QueryParamsConst...)
 
 	out, err := LocalnetExecExec(container, args...)
 	if err != nil {
@@ -131,9 +131,9 @@ func QueryProposalLegacy(container, id string) (govtypesv1beta1.Proposal, error)
 func QueryProposal(container, id string) (govtypesv1.Proposal, error) {
 	fmt.Println("Querying proposal from", container)
 	args := append([]string{
-		CLI_BINARY_NAME,
+		CliBinaryName,
 		"query", "gov", "proposal", id,
-	}, QUERY_PARAMS...)
+	}, QueryParamsConst...)
 
 	out, err := LocalnetExecExec(container, args...)
 	if err != nil {

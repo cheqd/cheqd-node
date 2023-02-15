@@ -10,7 +10,7 @@ import (
 func getDidDoc(ctx sdk.Context, id string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	queryServer := NewQueryServer(keeper)
 
-	resp, err := queryServer.DidDoc(sdk.WrapSDKContext(ctx), &types.QueryGetDidDocRequest{Id: id})
+	resp, err := queryServer.DidDoc(sdk.WrapSDKContext(ctx), &types.QueryDidDocRequest{Id: id})
 	if err != nil {
 		return nil, err
 	}

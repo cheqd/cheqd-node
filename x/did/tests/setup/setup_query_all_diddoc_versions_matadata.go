@@ -2,8 +2,8 @@ package setup
 
 import "github.com/cheqd/cheqd-node/x/did/types"
 
-func (s *TestSetup) QueryAllDidDocVersionsMetadata(did string) (*types.QueryGetAllDidDocVersionsMetadataResponse, error) {
-	req := &types.QueryGetAllDidDocVersionsMetadataRequest{
+func (s *TestSetup) QueryAllDidDocVersionsMetadata(did string) (*types.QueryAllDidDocVersionsMetadataResponse, error) {
+	req := &types.QueryAllDidDocVersionsMetadataRequest{
 		Id: did,
 	}
 

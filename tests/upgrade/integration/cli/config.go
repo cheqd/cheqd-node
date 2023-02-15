@@ -7,45 +7,42 @@ import (
 )
 
 const (
-	CLI_BINARY_NAME = integrationcli.CLI_BINARY_NAME
-	GREEN           = integrationcli.GREEN
-	PURPLE          = integrationcli.PURPLE
+	CliBinaryName = integrationcli.CliBinaryName
+	Green         = integrationcli.Green
+	Purple        = integrationcli.Purple
 )
 
 const (
-	CLI_BINARY_NAME_PREVIOUS = CLI_BINARY_NAME + "-previous"
-	CLI_BINARY_NAME_NEXT     = CLI_BINARY_NAME + "-next"
-)
+	KeyringBackend = integrationcli.KeyringBackend
+	OutputFormat   = integrationcli.OutputFormat
+	Gas            = integrationcli.Gas
+	GasAdjustment  = integrationcli.GasAdjustment
+	GasPrices      = integrationcli.GasPrices
 
-const (
-	KEYRING_BACKEND = integrationcli.KEYRING_BACKEND
-	OUTPUT_FORMAT   = integrationcli.OUTPUT_FORMAT
-	GAS             = integrationcli.GAS
-	GAS_ADJUSTMENT  = integrationcli.GAS_ADJUSTMENT
-	GAS_PRICES      = integrationcli.GAS_PRICES
-
-	BOOTSTRAP_PERIOD             = 20
-	BOOTSTRAP_HEIGHT             = 1
-	VOTING_PERIOD          int64 = 10
-	EXPECTED_BLOCK_SECONDS int64 = 1
-	EXTRA_BLOCKS           int64 = 5
-	UPGRADE_NAME                 = cheqdapp.UpgradeName
-	DEPOSIT_AMOUNT               = "10000000ncheq"
-	NETWORK_CONFIG_DIR           = "network-config"
-	KEYRING_DIR                  = "keyring-test"
+	BootstrapPeriod            = 20
+	BootstrapHeight            = 1
+	VotingPeriod         int64 = 10
+	ExpectedBlockSeconds int64 = 1
+	ExtraBlocks          int64 = 5
+	UpgradeName                = cheqdapp.UpgradeName
+	DepositAmount              = "10000000ncheq"
+	NetworkConfigDir           = "network-config"
+	KeyringDir                 = "keyring-test"
 )
 
 var (
-	TX_PARAMS = []string{
-		"--gas", GAS,
-		"--gas-adjustment", GAS_ADJUSTMENT,
-		"--gas-prices", GAS_PRICES,
-		"--keyring-backend", KEYRING_BACKEND,
-		"--chain-id", integrationnetwork.CHAIN_ID,
+	TXParams = []string{
+		"--keyring-backend", KeyringBackend,
+		"--chain-id", integrationnetwork.ChainID,
 		"-y",
 	}
-	QUERY_PARAMS = []string{
-		"--chain-id", integrationnetwork.CHAIN_ID,
-		"--output", OUTPUT_FORMAT,
+	GasParams = []string{
+		"--gas", Gas,
+		"--gas-adjustment", GasAdjustment,
+		"--gas-prices", GasPrices,
+	}
+	QueryParamsConst = []string{
+		"--chain-id", integrationnetwork.ChainID,
+		"--output", OutputFormat,
 	}
 )

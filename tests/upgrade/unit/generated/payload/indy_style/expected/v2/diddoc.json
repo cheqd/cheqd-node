@@ -1,5 +1,5 @@
 {
-    "did_doc": {
+    "didDoc": {
         "context": [
             "abc",
             "def"
@@ -8,48 +8,48 @@
         "controller": [
             "did:cheqd:testnet:7Hty8uGafcEsU7EpJEAPUC"
         ],
-        "verification_method": [
+        "verificationMethod": [
             {
                 "id": "did:cheqd:testnet:7Hty8uGafcEsU7EpJEAPUC#key-1",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:7Hty8uGafcEsU7EpJEAPUC",
-                "verification_material": "{\"publicKeyMultibase\":\"z4xhmb8vKgCN24a3kRyai5F8eMSgkuqSA8ABPo8mYJSd\"}"
+                "verificationMaterial": "z6MkeXDkMqPMfDgq8ZQkRzwRZAo8TviYAo5nr957E56nTXE1"
             },
             {
                 "id": "did:cheqd:testnet:7Hty8uGafcEsU7EpJEAPUC#key-2",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:7Hty8uGafcEsU7EpJEAPUC",
-                "verification_material": "{\"publicKeyMultibase\":\"z6L84sd16WVYPQYQ6XXwdPtg2SEkxyj2CrsGGQ3MzkFP5\"}"
+                "verificationMaterial": "z6MkjnP7TsFXr32rX3EoD6uUEzE2Fp2pPcGZYtBCEKL1fUAT"
             },
             {
                 "id": "did:cheqd:testnet:7Hty8uGafcEsU7EpJEAPUC#key-3",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:7Hty8uGafcEsU7EpJEAPUC",
-                "verification_material": "{\"publicKeyMultibase\":\"zADATkCngJDTbzxhzYtjC8ndzu5wWWbrH8UwQMowfcYDj\"}"
+                "verificationMaterial": "z6MkofRWLT37dkx57TYhETh2ytBzifDMvV6dpVrLC5ugXm17"
             },
             {
                 "id": "did:cheqd:testnet:7Hty8uGafcEsU7EpJEAPUC#key-4",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:7Hty8uGafcEsU7EpJEAPUC",
-                "verification_material": "{\"publicKeyMultibase\":\"z5PuPVaqjigujtzrwQMZQviJV15gFSTVYkGEifGEGb6Ei\"}"
+                "verificationMaterial": "z6MkirAS5q6B4EQD1Vhe5vXFmorUpex6rLjuSH9eVYCHWK26"
             }
         ],
         "authentication": [
             "did:cheqd:testnet:7Hty8uGafcEsU7EpJEAPUC#key-1",
             "did:cheqd:testnet:7Hty8uGafcEsU7EpJEAPUC#key-2"
         ],
-        "assertion_method": [
+        "assertionMethod": [
             "did:cheqd:testnet:7Hty8uGafcEsU7EpJEAPUC#key-3"
         ],
-        "capability_invocation": [
+        "capabilityInvocation": [
             "did:cheqd:testnet:7Hty8uGafcEsU7EpJEAPUC#key-4",
             "did:cheqd:testnet:7Hty8uGafcEsU7EpJEAPUC#key-1"
         ],
-        "capability_delegation": [
+        "capabilityDelegation": [
             "did:cheqd:testnet:7Hty8uGafcEsU7EpJEAPUC#key-4",
             "did:cheqd:testnet:7Hty8uGafcEsU7EpJEAPUC#key-2"
         ],
-        "key_agreement": [
+        "keyAgreement": [
             "did:cheqd:testnet:7Hty8uGafcEsU7EpJEAPUC#key-1",
             "did:cheqd:testnet:7Hty8uGafcEsU7EpJEAPUC#key-2",
             "did:cheqd:testnet:7Hty8uGafcEsU7EpJEAPUC#key-3",
@@ -58,13 +58,13 @@
         "service": [
             {
                 "id": "did:cheqd:testnet:7Hty8uGafcEsU7EpJEAPUC#service-1",
-                "type": "type-1",
-                "service_endpoint": [
+                "serviceType": "type-1",
+                "serviceEndpoint": [
                     "endpoint-1"
                 ]
             }
         ],
-        "also_known_as": [
+        "alsoKnownAs": [
             "alias-1",
             "alias-2"
         ]
@@ -73,8 +73,8 @@
         "created": "2021-01-01T00:00:00Z",
         "updated": "2021-01-01T00:00:00Z",
         "deactivated": false,
-        "version_id": "e604fc38-a7b3-4bf7-b0b0-053ad9b15957",
-        "next_version_id": "",
-        "previous_version_id": ""
+        "versionId": "e604fc38-a7b3-4bf7-b0b0-053ad9b15957",
+        "nextVersionId": "",
+        "previousVersionId": ""
     }
 }

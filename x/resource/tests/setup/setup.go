@@ -95,7 +95,7 @@ func Setup() TestSetup {
 		ResourceQueryServer: queryServer,
 	}
 
-	setup.Keeper.SetDidNamespace(&ctx, didsetup.DID_NAMESPACE)
+	setup.Keeper.SetDidNamespace(&ctx, didsetup.DidNamespace)
 	return setup
 }
 

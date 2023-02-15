@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"encoding/json"
 	"os"
 
 	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
@@ -9,62 +8,87 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )
 
-type CreateResourceOptions struct {
-	CollectionId    string                  `json:"collection_id"`
-	ResourceId      string                  `json:"resource_id"`
-	ResourceName    string                  `json:"resource_name"`
-	ResourceVersion string                  `json:"resource_version"`
-	ResourceType    string                  `json:"resource_type"`
-	ResourceFile    string                  `json:"resource_file"`
-	AlsoKnownAs     []*types.AlternativeUri `json:"also_known_as"`
-}
-
 func CmdCreateResource() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create [payload-file]",
+		Use:   "create [payload-file] [resource-data-file]",
 		Short: "Create a new Resource.",
-		Long: "Create a new Resource within a DID Resource Collection. " +
-			"[payload-file] is JSON encoded MsgCreateResourcePayload alongside with sign inputs.",
-		Args: cobra.ExactArgs(1),
+		Long: `Create a new Resource within a DID Resource Collection. 
+[payload-file] is JSON encoded MsgCreateResourcePayload alongside with sign inputs. 
+[resource-data-file] is a path to the Resource data file.
+
+NOTES:
+1. Fee used for the transaction will ALWAYS take the fixed fee for Resource creation, REGARDLESS of what value is passed in '--fees' flag.
+2. Fixed fees for Resource creation is defined based on the IANA media type of the Resource data file. These parameters can be updated using governance proposals. Currently, there are three categories of media types with different fees: 'image', 'json', and 'default' (for all other media types).
+2. Payload file should contain the properties given in example below.
+3. Private key provided in sign inputs is ONLY used locally to generate signature(s) and not sent to the ledger.
+
+Example payload file:
+{
+    "payload": {
+        "collectionId": "<did-unique-identifier>",
+        "id": "<uuid>",
+        "name": "<human-readable resource name>",
+        "version": "<human-readable version number>",
+        "resourceType": "<resource-type>",
+        "alsoKnownAs": [
+            {
+                "uri": "did:cheqd:<namespace>:<unique-identifier>/resource/<uuid>",
+                "description": "did-url"
+            },
+            {
+                "uri": "https://example.com/alternative-uri",
+                "description": "http-url"
+            }
+        ]
+    },
+    "signInputs": [
+        {
+            "verificationMethodId": "did:cheqd:<namespace>:<unique-identifier>#<key-id>",
+            "privKey": "<private-key-bytes-encoded-to-base64>"
+        }
+    ]
+}
+`,
+		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
+			// Read payload file arg
 			payloadFile := args[0]
 
-			payloadJson, signInputs, err := didcli.ReadPayloadWithSignInputsFromFile(payloadFile)
+			// Read data file arg
+			dataFile := args[1]
+
+			payloadJSON, signInputs, err := didcli.ReadPayloadWithSignInputsFromFile(payloadFile)
 			if err != nil {
 				return err
 			}
 
-			var options CreateResourceOptions
-			err = json.Unmarshal(payloadJson, &options)
+			// Unmarshal payload
+			var payload types.MsgCreateResourcePayload
+			err = clientCtx.Codec.UnmarshalJSON(payloadJSON, &payload)
 			if err != nil {
 				return err
 			}
 
-			data, err := os.ReadFile(options.ResourceFile)
+			// Read data file
+			data, err := os.ReadFile(dataFile)
 			if err != nil {
 				return err
 			}
 
 			// Prepare payload
-			payload := types.MsgCreateResourcePayload{
-				CollectionId: options.CollectionId,
-				Id:           options.ResourceId,
-				Name:         options.ResourceName,
-				Version:      options.ResourceVersion,
-				ResourceType: options.ResourceType,
-				AlsoKnownAs:  options.AlsoKnownAs,
-				Data:         data,
-			}
+			payload.Data = data
 
+			// Populate resource id if not set
 			if payload.Id == "" {
 				payload.Id = uuid.NewString()
 			}
@@ -88,7 +112,15 @@ func CmdCreateResource() *cobra.Command {
 		},
 	}
 
-	flags.AddTxFlagsToCmd(cmd)
+	// add standard tx flags
+	AddTxFlagsToCmd(cmd)
+
+	// add custom / override flags
+	cmd.Flags().String(flags.FlagFees, sdk.NewCoin(types.BaseMinimalDenom, sdk.NewInt(types.DefaultCreateResourceImageFee)).String(), "Fixed fee for Resource creation, e.g., 10000000000ncheq. Please check what the current fees by running 'cheqd-noded query params subspace resource feeparams'")
+
+	_ = cmd.MarkFlagRequired(flags.FlagFees)
+	_ = cmd.MarkFlagRequired(flags.FlagGas)
+	_ = cmd.MarkFlagRequired(flags.FlagGasAdjustment)
 
 	return cmd
 }

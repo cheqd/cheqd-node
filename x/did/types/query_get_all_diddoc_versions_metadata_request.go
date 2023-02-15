@@ -4,6 +4,6 @@ import (
 	"github.com/cheqd/cheqd-node/x/did/utils"
 )
 
-func (query *QueryGetAllDidDocVersionsMetadataRequest) Normalize() {
+func (query *QueryAllDidDocVersionsMetadataRequest) Normalize() {
 	query.Id = utils.NormalizeDID(query.Id)
 }

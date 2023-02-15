@@ -33,10 +33,10 @@ var _ = Describe("Message for DID updating", func() {
 						Id: "did:cheqd:testnet:zABCDEFG123456789abcd",
 						VerificationMethod: []*VerificationMethod{
 							{
-								Id:                   "did:cheqd:testnet:zABCDEFG123456789abcd#key1",
-								Type:                 "Ed25519VerificationKey2020",
-								Controller:           "did:cheqd:testnet:zABCDEFG123456789abcd",
-								VerificationMaterial: ValidEd25519VerificationMaterial,
+								Id:                     "did:cheqd:testnet:zABCDEFG123456789abcd#key1",
+								VerificationMethodType: "Ed25519VerificationKey2020",
+								Controller:             "did:cheqd:testnet:zABCDEFG123456789abcd",
+								VerificationMaterial:   ValidEd25519VerificationKey2020VerificationMaterial,
 							},
 						},
 						Authentication: []string{"did:cheqd:testnet:zABCDEFG123456789abcd#key1", "did:cheqd:testnet:zABCDEFG123456789abcd#aaa"},
@@ -55,10 +55,10 @@ var _ = Describe("Message for DID updating", func() {
 						Id: "did:cheqd:testnet:zABCDEFG123456789abcd",
 						VerificationMethod: []*VerificationMethod{
 							{
-								Id:                   "did:cheqd:testnet:zABCDEFG123456789abcd#key1",
-								Type:                 "Ed25519VerificationKey2020",
-								Controller:           "did:cheqd:testnet:zABCDEFG123456789abcd",
-								VerificationMaterial: ValidEd25519VerificationMaterial,
+								Id:                     "did:cheqd:testnet:zABCDEFG123456789abcd#key1",
+								VerificationMethodType: "Ed25519VerificationKey2020",
+								Controller:             "did:cheqd:testnet:zABCDEFG123456789abcd",
+								VerificationMaterial:   ValidEd25519VerificationKey2020VerificationMaterial,
 							},
 						},
 						Authentication: []string{"did:cheqd:testnet:zABCDEFG123456789abcd#key1", "did:cheqd:testnet:zABCDEFG123456789abcd#key1"},
@@ -77,10 +77,10 @@ var _ = Describe("Message for DID updating", func() {
 						Id: "did:cheqd:testnet:zABCDEFG123456789abcd",
 						VerificationMethod: []*VerificationMethod{
 							{
-								Id:                   "did:cheqd:testnet:zABCDEFG123456789abcd#key1",
-								Type:                 "Ed25519VerificationKey2020",
-								Controller:           "did:cheqd:testnet:zABCDEFG123456789abcd",
-								VerificationMaterial: ValidEd25519VerificationMaterial,
+								Id:                     "did:cheqd:testnet:zABCDEFG123456789abcd#key1",
+								VerificationMethodType: "Ed25519VerificationKey2020",
+								Controller:             "did:cheqd:testnet:zABCDEFG123456789abcd",
+								VerificationMaterial:   ValidEd25519VerificationKey2020VerificationMaterial,
 							},
 						},
 						Authentication: []string{"did:cheqd:testnet:zABCDEFG123456789abcd#key1", "did:cheqd:testnet:zABCDEFG123456789abcd#aaa"},

@@ -5,78 +5,62 @@ import (
 	"encoding/json"
 	"path/filepath"
 
-	// integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
+	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/x/did/client/cli"
 	types "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	// . "github.com/onsi/ginkgo/v2"
 )
 
-type CreateResourceOptions struct {
-	CollectionId    string                  `json:"collection_id"`
-	ResourceId      string                  `json:"resource_id"`
-	ResourceName    string                  `json:"resource_name"`
-	ResourceVersion string                  `json:"resource_version"`
-	ResourceType    string                  `json:"resource_type"`
-	ResourceFile    string                  `json:"resource_file"`
-	AlsoKnownAs     []*types.AlternativeUri `json:"also_known_as"`
-}
-
-func CreateResourceLegacy(collectionId string, resourceId string, resourceName string, resourceType string, resourceFile string, signInputs []cli.SignInput, container string) (sdk.TxResponse, error) {
+func CreateResourceLegacy(collectionID string, resourceID string, resourceName string, resourceType string, resourceFile string, signInputs []cli.SignInput, container string) (sdk.TxResponse, error) {
 	args := []string{
-		"--collection-id", collectionId,
-		"--resource-id", resourceId,
+		"--collection-id", collectionID,
+		"--resource-id", resourceID,
 		"--resource-name", resourceName,
 		"--resource-type", resourceType,
 		"--resource-file", resourceFile,
 	}
 
 	for _, signInput := range signInputs {
-		args = append(args, signInput.VerificationMethodId)
+		args = append(args, signInput.VerificationMethodID)
 		args = append(args, base64.StdEncoding.EncodeToString(signInput.PrivKey))
 	}
 
-	return Tx(container, CLI_BINARY_NAME, "resource", "create-resource", OperatorAccounts[container], args...)
+	args = append(args, GasParams...)
+
+	return Tx(container, CliBinaryName, "resource", "create-resource", OperatorAccounts[container], args...)
 }
 
-func CreateResource(msg types.MsgCreateResourcePayload, resourceFile string, signInputs []cli.SignInput, container string) (sdk.TxResponse, error) {
+func CreateResource(payload types.MsgCreateResourcePayload, resourceFile string, signInputs []cli.SignInput, container, fees string) (sdk.TxResponse, error) {
 	resourceFileName := filepath.Base(resourceFile)
 	payloadFileName := "payload.json"
 
-	resourceOptions := CreateResourceOptions{
-		CollectionId:    msg.CollectionId,
-		ResourceId:      msg.Id,
-		ResourceName:    msg.Name,
-		ResourceVersion: msg.Version,
-		ResourceType:    msg.ResourceType,
-		ResourceFile:    resourceFileName,
-		AlsoKnownAs:     msg.AlsoKnownAs,
-	}
-
-	payloadJson, err := json.Marshal(&resourceOptions)
+	payloadJSON, err := integrationhelpers.Codec.MarshalJSON(&payload)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
 
 	payloadWithSignInputs := cli.PayloadWithSignInputs{
-		Payload:    payloadJson,
+		Payload:    payloadJSON,
 		SignInputs: signInputs,
 	}
 
-	payloadWithSignInputsJson, err := json.Marshal(&payloadWithSignInputs)
+	payloadWithSignInputsJSON, err := json.Marshal(&payloadWithSignInputs)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
 
-	_, err = LocalnetExecExec(container, "/bin/bash", "-c", "echo '"+string(payloadWithSignInputsJson)+"' > "+payloadFileName)
+	_, err = LocalnetExecExec(container, "/bin/bash", "-c", "echo '"+string(payloadWithSignInputsJSON)+"' > "+payloadFileName)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
 
-	_, err = LocalnetExecExec(container, "/bin/bash", "-c", "echo '"+string(msg.Data)+"' > "+resourceFileName)
+	_, err = LocalnetExecExec(container, "/bin/bash", "-c", "echo '"+string(payload.Data)+"' > "+resourceFileName)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
+	args := []string{payloadFileName}
+	args = append(args, resourceFileName)
+	args = append(args, integrationhelpers.GenerateFees(fees)...)
 
-	return Tx(container, CLI_BINARY_NAME, "resource", "create", OperatorAccounts[container], payloadFileName)
+	return Tx(container, CliBinaryName, "resource", "create", OperatorAccounts[container], args...)
 }

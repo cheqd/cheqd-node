@@ -1,5 +1,5 @@
 {
-    "did_doc": {
+    "didDoc": {
         "context": [
             "abc",
             "def"
@@ -8,48 +8,48 @@
         "controller": [
             "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5"
         ],
-        "verification_method": [
+        "verificationMethod": [
             {
                 "id": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-1",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5",
-                "verification_material": "{\"publicKeyMultibase\":\"zHYqCstG3zdLyWGut3SCSSZiVdQttTiNG3u3cSSR1eDvz\"}"
+                "verificationMaterial": "z6Mkw16FU8WVLAqScmkaj1AHHfGVSzAjsbccjuxYGiP2ZSiN"
             },
             {
                 "id": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-2",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5",
-                "verification_material": "{\"publicKeyMultibase\":\"zDcoCVPoUgMjRWmd4ZrfGAZ51L7oF35upoKCX77qRpqUT\"}"
+                "verificationMaterial": "z6Mks54F5e3v1uDtdGTmFRd71ed19h56SyABVL7SwPoSk4Fq"
             },
             {
                 "id": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-3",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5",
-                "verification_material": "{\"publicKeyMultibase\":\"z2RaG3VJ1YMgyDYyAmYcJeKcMsk89UxfoLnyg1peJbhdv\"}"
+                "verificationMaterial": "z6MkfsqJdjYSsuBSL3osT7a9VRAMhKPztqvA2otbr6cKWvRJ"
             },
             {
                 "id": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-4",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5",
-                "verification_material": "{\"publicKeyMultibase\":\"z9Wx6sWnw2ZGEB5m95K7tPr7SkqvfwBdXe5ZmUTyqmKmt\"}"
+                "verificationMaterial": "z6MknyD9Tm3NN6khHabqkt5jEwfSaRCXM4stL6UhJjwrgYZG"
             }
         ],
         "authentication": [
             "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-1",
             "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-2"
         ],
-        "assertion_method": [
+        "assertionMethod": [
             "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-3"
         ],
-        "capability_invocation": [
+        "capabilityInvocation": [
             "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-4",
             "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-1"
         ],
-        "capability_delegation": [
+        "capabilityDelegation": [
             "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-4",
             "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-2"
         ],
-        "key_agreement": [
+        "keyAgreement": [
             "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-1",
             "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-2",
             "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#key-3",
@@ -58,13 +58,13 @@
         "service": [
             {
                 "id": "did:cheqd:testnet:e77cc679-ada0-4a71-8738-918f388fcbb5#service-1",
-                "type": "type-1",
-                "service_endpoint": [
+                "serviceType": "type-1",
+                "serviceEndpoint": [
                     "endpoint-1"
                 ]
             }
         ],
-        "also_known_as": [
+        "alsoKnownAs": [
             "alias-1",
             "alias-2"
         ]
@@ -73,8 +73,8 @@
         "created": "2021-01-01T00:00:00Z",
         "updated": "2021-01-01T00:00:00Z",
         "deactivated": false,
-        "version_id": "0e7a0369-e789-4381-96a4-c1bb9cbb8a09",
-        "next_version_id": "",
-        "previous_version_id": ""
+        "versionId": "0e7a0369-e789-4381-96a4-c1bb9cbb8a09",
+        "nextVersionId": "",
+        "previousVersionId": ""
     }
 }

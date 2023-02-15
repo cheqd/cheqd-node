@@ -1,0 +1,1517 @@
+swagger: '2.0'
+info:
+  title: cheqd Network - REST and gRPC Gateway Documentation
+  description: Documentation describing REST and gRPC Gateway endpoints for cheqd network
+  version: v1.x
+  contact:
+    name: Cheqd Foundation Limited
+    url: https://cheqd.io
+  license:
+    name: Apache 2.0
+    url: https://github.com/cheqd/cheqd-node/blob/main/LICENSE
+schemes:
+  - http
+  - https
+consumes:
+  - application/json
+  - application/json+ld
+  - '*/*'
+produces:
+  - application/json
+  - application/json+ld
+  - '*/*'
+externalDocs:
+  description: cheqd Network Documentation
+  url: https://docs.cheqd.io/node
+paths:
+  /cheqd/did/v2/{id}:
+    get:
+      summary: Fetch latest version of a DID Document for a given DID
+      operationId: DidDoc
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              value:
+                title: >-
+                  Successful resolution of the DID Document returns the
+                  following:
+
+                  - did_doc is the latest version of the DID Document
+
+                  - metadata is is the DID Document metadata associated with the
+                  latest version of the DID Document
+                type: object
+                properties:
+                  didDoc:
+                    description: didDocument is the DID Document.
+                    type: object
+                    properties:
+                      context:
+                        type: array
+                        items:
+                          type: string
+                        title: >-
+                          context is a list of URIs used to identify the context
+                          of the DID document.
+
+                          Default: https://www.w3.org/ns/did/v1
+                      id:
+                        type: string
+                        title: |-
+                          id is the DID of the DID document.
+                          Format: did:cheqd:<namespace>:<unique-identifier>
+                      controller:
+                        type: array
+                        items:
+                          type: string
+                        description: >-
+                          controller is a list of DIDs that are allowed to
+                          control the DID document.
+                      verificationMethod:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              title: >-
+                                id is the unique identifier of the verification
+                                method.
+
+                                Format:
+                                did:cheqd:<namespace>:<unique-identifier>#<key-id>
+                            verificationMethodType:
+                              type: string
+                              title: |-
+                                type is the type of the verification method.
+                                Example: Ed25519VerificationKey2020
+                            controller:
+                              type: string
+                              title: >-
+                                controller is the DID of the controller of the
+                                verification method.
+
+                                Format:
+                                did:cheqd:<namespace>:<unique-identifier>
+                            verificationMaterial:
+                              type: string
+                              title: >-
+                                verification_material is the public key of the
+                                verification method.
+
+                                Commonly used verification material types:
+                                publicJwk, publicKeyBase58, publicKeyMultibase
+                          title: >-
+                            VerificationMethod defines a verification method, as
+                            defined in the DID Core specification.
+
+                            Documentation:
+                            https://www.w3.org/TR/did-core/#verification-methods
+                        description: >-
+                          verificationMethod is a list of verification methods
+                          that can be used to
+
+                          verify a digital signature or cryptographic proof.
+                      authentication:
+                        type: array
+                        items:
+                          type: string
+                        description: >-
+                          authentication is a list of verification methods that
+                          can be used to
+
+                          authenticate as the DID subject.
+                      assertionMethod:
+                        type: array
+                        items:
+                          type: string
+                        description: >-
+                          assertionMethod is a list of verification methods that
+                          can be used to
+
+                          assert statements as the DID subject.
+                      capabilityInvocation:
+                        type: array
+                        items:
+                          type: string
+                        description: >-
+                          capabilityInvocation is a list of verification methods
+                          that can be used to
+
+                          invoke capabilities as the DID subject.
+                      capabilityDelegation:
+                        type: array
+                        items:
+                          type: string
+                        description: >-
+                          capabilityDelegation is a list of verification methods
+                          that can be used to
+
+                          delegate capabilities as the DID subject.
+                      keyAgreement:
+                        type: array
+                        items:
+                          type: string
+                        description: >-
+                          keyAgreement is a list of verification methods that
+                          can be used to perform
+
+                          key agreement as the DID subject.
+                      service:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              title: >-
+                                id is the unique identifier of the service.
+
+                                Format:
+                                did:cheqd:<namespace>:<unique-identifier>#<service-id>
+                            serviceType:
+                              type: string
+                              title: |-
+                                type is the type of the service.
+                                Example: LinkedResource
+                            serviceEndpoint:
+                              type: array
+                              items:
+                                type: string
+                              title: |-
+                                serviceEndpoint is the endpoint of the service.
+                                Example: https://example.com/endpoint
+                          title: >-
+                            Service defines a service, as defined in the DID
+                            Core specification.
+
+                            Documentation:
+                            https://www.w3.org/TR/did-core/#services
+                        description: >-
+                          service is a list of services that can be used to
+                          interact with the DID subject.
+                      alsoKnownAs:
+                        type: array
+                        items:
+                          type: string
+                        description: >-
+                          alsoKnownAs is a list of DIDs that are known to refer
+                          to the same DID subject.
+                    title: >-
+                      DidDoc defines a DID Document, as defined in the DID Core
+                      specification.
+
+                      Documentation: https://www.w3.org/TR/did-core/
+                  metadata:
+                    description: didDocumentMetadata is the DID Document metadata.
+                    type: object
+                    properties:
+                      created:
+                        type: string
+                        format: date-time
+                        title: >-
+                          created is the timestamp of the creation of the DID
+                          Document.
+
+                          Format: RFC3339
+
+                          Example: 2021-03-10T15:16:17Z
+                      updated:
+                        type: string
+                        format: date-time
+                        title: >-
+                          updated is the timestamp of the last update of the DID
+                          Document.
+
+                          Format: RFC3339
+
+                          Example: 2021-03-10T15:16:17Z
+                      deactivated:
+                        type: boolean
+                        title: >-
+                          deactivated is a flag that indicates whether the DID
+                          Document is deactivated.
+
+                          Default: false
+                      versionId:
+                        type: string
+                        title: >-
+                          version_id is the version identifier of the DID
+                          Document.
+
+                          Format: UUID
+
+                          Example: 123e4567-e89b-12d3-a456-426655440000
+                      nextVersionId:
+                        type: string
+                        title: >-
+                          next_version_id is the version identifier of the next
+                          version of the DID Document.
+
+                          Format: UUID
+
+                          Example: 123e4567-e89b-12d3-a456-426655440000
+                      previousVersionId:
+                        type: string
+                        title: >-
+                          previous_version_id is the version identifier of the
+                          previous version of the DID Document.
+
+                          Format: UUID
+
+                          Example: 123e4567-e89b-12d3-a456-426655440000
+                    title: >-
+                      Metadata defines DID Document metadata, as defined in the
+                      DID Core specification.
+
+                      Documentation:
+                      https://www.w3.org/TR/did-core/#did-document-metadata-properties
+                description: >-
+                  DidDocWithMetadata defines a DID Document with metadata, as
+                  defined in the DID Core specification.
+
+                  Contains the DID Document, as well as DID Document metadata.
+            title: >-
+              QueryDidDocResponse is the response type for the Query/DidDoc
+              method
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    typeUrl:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: id
+          description: |-
+            DID unique identifier of the DID Document to fetch.
+            UUID-style DIDs as well as Indy-style DID are supported.
+
+            Format: did:cheqd:<namespace>:<unique-identifier>
+
+            Examples:
+            - did:cheqd:mainnet:c82f2b02-bdab-4dd7-b833-3e143745d612
+            - did:cheqd:testnet:wGHEXrZvJxR8vw5P3UWH1j
+          in: path
+          required: true
+          type: string
+      tags:
+        - DID module queries
+  /cheqd/did/v2/{id}/version/{version}:
+    get:
+      summary: Fetch specific version of a DID Document for a given DID
+      operationId: DidDocVersion
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              value:
+                title: >-
+                  Successful resolution of the DID Document returns the
+                  following:
+
+                  - did_doc is the requested version of the DID Document
+
+                  - metadata is DID Document metadata associated with the
+                  requested version of the DID Document
+                type: object
+                properties:
+                  didDoc:
+                    description: didDocument is the DID Document.
+                    type: object
+                    properties:
+                      context:
+                        type: array
+                        items:
+                          type: string
+                        title: >-
+                          context is a list of URIs used to identify the context
+                          of the DID document.
+
+                          Default: https://www.w3.org/ns/did/v1
+                      id:
+                        type: string
+                        title: |-
+                          id is the DID of the DID document.
+                          Format: did:cheqd:<namespace>:<unique-identifier>
+                      controller:
+                        type: array
+                        items:
+                          type: string
+                        description: >-
+                          controller is a list of DIDs that are allowed to
+                          control the DID document.
+                      verificationMethod:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              title: >-
+                                id is the unique identifier of the verification
+                                method.
+
+                                Format:
+                                did:cheqd:<namespace>:<unique-identifier>#<key-id>
+                            verificationMethodType:
+                              type: string
+                              title: |-
+                                type is the type of the verification method.
+                                Example: Ed25519VerificationKey2020
+                            controller:
+                              type: string
+                              title: >-
+                                controller is the DID of the controller of the
+                                verification method.
+
+                                Format:
+                                did:cheqd:<namespace>:<unique-identifier>
+                            verificationMaterial:
+                              type: string
+                              title: >-
+                                verification_material is the public key of the
+                                verification method.
+
+                                Commonly used verification material types:
+                                publicJwk, publicKeyBase58, publicKeyMultibase
+                          title: >-
+                            VerificationMethod defines a verification method, as
+                            defined in the DID Core specification.
+
+                            Documentation:
+                            https://www.w3.org/TR/did-core/#verification-methods
+                        description: >-
+                          verificationMethod is a list of verification methods
+                          that can be used to
+
+                          verify a digital signature or cryptographic proof.
+                      authentication:
+                        type: array
+                        items:
+                          type: string
+                        description: >-
+                          authentication is a list of verification methods that
+                          can be used to
+
+                          authenticate as the DID subject.
+                      assertionMethod:
+                        type: array
+                        items:
+                          type: string
+                        description: >-
+                          assertionMethod is a list of verification methods that
+                          can be used to
+
+                          assert statements as the DID subject.
+                      capabilityInvocation:
+                        type: array
+                        items:
+                          type: string
+                        description: >-
+                          capabilityInvocation is a list of verification methods
+                          that can be used to
+
+                          invoke capabilities as the DID subject.
+                      capabilityDelegation:
+                        type: array
+                        items:
+                          type: string
+                        description: >-
+                          capabilityDelegation is a list of verification methods
+                          that can be used to
+
+                          delegate capabilities as the DID subject.
+                      keyAgreement:
+                        type: array
+                        items:
+                          type: string
+                        description: >-
+                          keyAgreement is a list of verification methods that
+                          can be used to perform
+
+                          key agreement as the DID subject.
+                      service:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              title: >-
+                                id is the unique identifier of the service.
+
+                                Format:
+                                did:cheqd:<namespace>:<unique-identifier>#<service-id>
+                            serviceType:
+                              type: string
+                              title: |-
+                                type is the type of the service.
+                                Example: LinkedResource
+                            serviceEndpoint:
+                              type: array
+                              items:
+                                type: string
+                              title: |-
+                                serviceEndpoint is the endpoint of the service.
+                                Example: https://example.com/endpoint
+                          title: >-
+                            Service defines a service, as defined in the DID
+                            Core specification.
+
+                            Documentation:
+                            https://www.w3.org/TR/did-core/#services
+                        description: >-
+                          service is a list of services that can be used to
+                          interact with the DID subject.
+                      alsoKnownAs:
+                        type: array
+                        items:
+                          type: string
+                        description: >-
+                          alsoKnownAs is a list of DIDs that are known to refer
+                          to the same DID subject.
+                    title: >-
+                      DidDoc defines a DID Document, as defined in the DID Core
+                      specification.
+
+                      Documentation: https://www.w3.org/TR/did-core/
+                  metadata:
+                    description: didDocumentMetadata is the DID Document metadata.
+                    type: object
+                    properties:
+                      created:
+                        type: string
+                        format: date-time
+                        title: >-
+                          created is the timestamp of the creation of the DID
+                          Document.
+
+                          Format: RFC3339
+
+                          Example: 2021-03-10T15:16:17Z
+                      updated:
+                        type: string
+                        format: date-time
+                        title: >-
+                          updated is the timestamp of the last update of the DID
+                          Document.
+
+                          Format: RFC3339
+
+                          Example: 2021-03-10T15:16:17Z
+                      deactivated:
+                        type: boolean
+                        title: >-
+                          deactivated is a flag that indicates whether the DID
+                          Document is deactivated.
+
+                          Default: false
+                      versionId:
+                        type: string
+                        title: >-
+                          version_id is the version identifier of the DID
+                          Document.
+
+                          Format: UUID
+
+                          Example: 123e4567-e89b-12d3-a456-426655440000
+                      nextVersionId:
+                        type: string
+                        title: >-
+                          next_version_id is the version identifier of the next
+                          version of the DID Document.
+
+                          Format: UUID
+
+                          Example: 123e4567-e89b-12d3-a456-426655440000
+                      previousVersionId:
+                        type: string
+                        title: >-
+                          previous_version_id is the version identifier of the
+                          previous version of the DID Document.
+
+                          Format: UUID
+
+                          Example: 123e4567-e89b-12d3-a456-426655440000
+                    title: >-
+                      Metadata defines DID Document metadata, as defined in the
+                      DID Core specification.
+
+                      Documentation:
+                      https://www.w3.org/TR/did-core/#did-document-metadata-properties
+                description: >-
+                  DidDocWithMetadata defines a DID Document with metadata, as
+                  defined in the DID Core specification.
+
+                  Contains the DID Document, as well as DID Document metadata.
+            title: >-
+              QueryDidDocVersionResponse is the response type for the
+              Query/DidDocVersion method
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    typeUrl:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: id
+          description: |-
+            DID unique identifier of the DID Document to fetch.
+            UUID-style DIDs as well as Indy-style DID are supported.
+
+            Format: did:cheqd:<namespace>:<unique-identifier>
+
+            Examples:
+            - did:cheqd:mainnet:c82f2b02-bdab-4dd7-b833-3e143745d612
+            - did:cheqd:testnet:wGHEXrZvJxR8vw5P3UWH1j
+          in: path
+          required: true
+          type: string
+        - name: version
+          description: |-
+            Unique version identifier of the DID Document to fetch.
+            Returns the specified version of the DID Document.
+
+            Format: <uuid>
+
+            Example: 93f2573c-eca9-4098-96cb-a1ec676a29ed
+          in: path
+          required: true
+          type: string
+      tags:
+        - DID module queries
+  /cheqd/did/v2/{id}/versions:
+    get:
+      summary: Fetch list of all versions of DID Documents for a given DID
+      operationId: AllDidDocVersionsMetadata
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              versions:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    created:
+                      type: string
+                      format: date-time
+                      title: >-
+                        created is the timestamp of the creation of the DID
+                        Document.
+
+                        Format: RFC3339
+
+                        Example: 2021-03-10T15:16:17Z
+                    updated:
+                      type: string
+                      format: date-time
+                      title: >-
+                        updated is the timestamp of the last update of the DID
+                        Document.
+
+                        Format: RFC3339
+
+                        Example: 2021-03-10T15:16:17Z
+                    deactivated:
+                      type: boolean
+                      title: >-
+                        deactivated is a flag that indicates whether the DID
+                        Document is deactivated.
+
+                        Default: false
+                    versionId:
+                      type: string
+                      title: >-
+                        version_id is the version identifier of the DID
+                        Document.
+
+                        Format: UUID
+
+                        Example: 123e4567-e89b-12d3-a456-426655440000
+                    nextVersionId:
+                      type: string
+                      title: >-
+                        next_version_id is the version identifier of the next
+                        version of the DID Document.
+
+                        Format: UUID
+
+                        Example: 123e4567-e89b-12d3-a456-426655440000
+                    previousVersionId:
+                      type: string
+                      title: >-
+                        previous_version_id is the version identifier of the
+                        previous version of the DID Document.
+
+                        Format: UUID
+
+                        Example: 123e4567-e89b-12d3-a456-426655440000
+                  title: >-
+                    Metadata defines DID Document metadata, as defined in the
+                    DID Core specification.
+
+                    Documentation:
+                    https://www.w3.org/TR/did-core/#did-document-metadata-properties
+                title: >-
+                  versions is the list of all versions of the requested DID
+                  Document
+              pagination:
+                description: pagination defines the pagination in the response.
+                type: object
+                properties:
+                  nextKey:
+                    type: string
+                    format: byte
+                    description: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently. It will be empty if
+                      there are no more results.
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+            title: >-
+              QueryAllDidDocVersionsMetadataResponse is the response type for
+              the Query/AllDidDocVersionsMetadata method
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    typeUrl:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: id
+          description: |-
+            DID unique identifier of the DID Document to fetch version metadata.
+            UUID-style DIDs as well as Indy-style DID are supported.
+
+            Format: did:cheqd:<namespace>:<unique-identifier>
+
+            Examples:
+            - did:cheqd:mainnet:c82f2b02-bdab-4dd7-b833-3e143745d612
+            - did:cheqd:testnet:wGHEXrZvJxR8vw5P3UWH1j
+          in: path
+          required: true
+          type: string
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.countTotal
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - DID module queries
+  /cheqd/resource/v2/{collectionId}/metadata:
+    get:
+      summary: Fetch metadata for all resources in a collection
+      operationId: CollectionResources
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              resources:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    collectionId:
+                      type: string
+                      description: |-
+                        Examples:
+                        - c82f2b02-bdab-4dd7-b833-3e143745d612
+                        - wGHEXrZvJxR8vw5P3UWH1j
+                      title: >-
+                        collection_id is the ID of the collection that the
+                        Resource belongs to. Defined client-side.
+
+                        This field is the unique identifier of the DID linked to
+                        this Resource
+
+                        Format: <unique-identifier>
+                    id:
+                      type: string
+                      title: >-
+                        id is the ID of the Resource. Defined client-side.
+
+                        This field is a unique identifier for this specific
+                        version of the Resource.
+
+                        Format: <uuid>
+                    name:
+                      type: string
+                      title: >-
+                        name is a human-readable name for the Resource. Defined
+                        client-side.
+
+                        Does not change between different versions.
+
+                        Example: PassportSchema, EducationTrustRegistry
+                    version:
+                      type: string
+                      title: >-
+                        version is a human-readable semantic version for the
+                        Resource. Defined client-side.
+
+                        Stored as a string. OPTIONAL.
+
+                        Example: 1.0.0, v2.1.0
+                    resourceType:
+                      type: string
+                      title: >-
+                        resource_type is a Resource type that identifies what
+                        the Resource is. Defined client-side.
+
+                        This is NOT the same as the resource's media type.
+
+                        Example: AnonCredsSchema, StatusList2021
+                    alsoKnownAs:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          uri:
+                            type: string
+                            title: >-
+                              uri is the URI of the Resource.
+
+                              Examples:
+
+                              -
+                              did:cheqd:testnet:MjYxNzYKMjYxNzYK/resources/4600ea35-8916-4ac4-b412-55b8f49dd94e
+
+                              -
+                              https://resolver..cheqd.net/1.0/identifiers/did:cheqd:testnet:MjYxNzYKMjYxNzYK/resources/4600ea35-8916-4ac4-b412-55b8f49dd94e
+
+                              - https://example.com/example.json
+
+                              -
+                              https://gateway.ipfs.io/ipfs/bafybeihetj2ng3d74k7t754atv2s5dk76pcqtvxls6dntef3xa6rax25xe
+
+                              -
+                              ipfs://bafybeihetj2ng3d74k7t754atv2s5dk76pcqtvxls6dntef3xa6rax25xe
+                          description:
+                            type: string
+                            title: >-
+                              description is a human-readable description of the
+                              URI. Defined client-side.
+
+                              Examples:
+
+                              - did-uri
+
+                              - http-uri
+
+                              - ipfs-uri
+                        description: >-
+                          AlternativeUri are alternative URIs that can be used
+                          to access the Resource.
+
+                          By default, at least the DID URI equivalent of the
+                          Resource is populated.
+                      description: List of alternative URIs for the SAME Resource.
+                    mediaType:
+                      type: string
+                      title: >-
+                        media_type is IANA media type of the Resource. Defined
+                        ledger-side.
+
+                        Example: application/json, image/png
+                    created:
+                      type: string
+                      format: date-time
+                      title: >-
+                        created is the time at which the Resource was created.
+                        Defined ledger-side.
+
+                        Format: RFC3339
+
+                        Example: 2021-01-01T00:00:00Z
+                    checksum:
+                      type: string
+                      title: >-
+                        checksum is a SHA-256 checksum hash of the Resource.
+                        Defined ledger-side.
+
+                        Example:
+                        d14a028c2a3a2bc9476102bb288234c415a2b01f828ea62ac5b3e42f
+                    previousVersionId:
+                      type: string
+                      title: >-
+                        previous_version_id is the ID of the previous version of
+                        the Resource. Defined ledger-side.
+
+                        This is based on the Resource's name and Resource type
+                        to determine whether it's the same Resource.
+
+                        Format: <uuid>
+                    nextVersionId:
+                      type: string
+                      title: >-
+                        next_version_id is the ID of the next version of the
+                        Resource. Defined ledger-side.
+
+                        This is based on the Resource's name and Resource type
+                        to determine whether it's the same Resource.
+
+                        Format: <uuid>
+                  title: Metadata stores the metadata of a DID-Linked Resource
+                title: resources is the requested collection of resource metadata
+              pagination:
+                description: pagination defines the pagination in the response.
+                type: object
+                properties:
+                  nextKey:
+                    type: string
+                    format: byte
+                    description: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently. It will be empty if
+                      there are no more results.
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+            title: >-
+              QueryCollectionResourcesResponse is the response type for the
+              Query/CollectionResources RPC method
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    typeUrl:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: collectionId
+          description: >-
+            collection_id is an identifier of the DidDocument the resource
+            belongs to.
+
+            Format: <unique-identifier>
+
+
+            Examples:
+
+            - c82f2b02-bdab-4dd7-b833-3e143745d612
+
+            - wGHEXrZvJxR8vw5P3UWH1j
+          in: path
+          required: true
+          type: string
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.countTotal
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Resource module queries
+  /cheqd/resource/v2/{collectionId}/resources/{id}:
+    get:
+      summary: Fetch data/payload for a specific resource (without metadata)
+      operationId: Resource
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              resource:
+                title: >-
+                  Successful resolution of the resource returns the following:
+
+                  - resource is the requested resource
+
+                  - metadata is the resource metadata associated with the
+                  requested resource
+                type: object
+                properties:
+                  resource:
+                    type: object
+                    properties:
+                      data:
+                        type: string
+                        format: byte
+                        title: bytes is the raw data of the Resource
+                    title: Resource stores the contents of a DID-Linked Resource
+                  metadata:
+                    type: object
+                    properties:
+                      collectionId:
+                        type: string
+                        description: |-
+                          Examples:
+                          - c82f2b02-bdab-4dd7-b833-3e143745d612
+                          - wGHEXrZvJxR8vw5P3UWH1j
+                        title: >-
+                          collection_id is the ID of the collection that the
+                          Resource belongs to. Defined client-side.
+
+                          This field is the unique identifier of the DID linked
+                          to this Resource
+
+                          Format: <unique-identifier>
+                      id:
+                        type: string
+                        title: >-
+                          id is the ID of the Resource. Defined client-side.
+
+                          This field is a unique identifier for this specific
+                          version of the Resource.
+
+                          Format: <uuid>
+                      name:
+                        type: string
+                        title: >-
+                          name is a human-readable name for the Resource.
+                          Defined client-side.
+
+                          Does not change between different versions.
+
+                          Example: PassportSchema, EducationTrustRegistry
+                      version:
+                        type: string
+                        title: >-
+                          version is a human-readable semantic version for the
+                          Resource. Defined client-side.
+
+                          Stored as a string. OPTIONAL.
+
+                          Example: 1.0.0, v2.1.0
+                      resourceType:
+                        type: string
+                        title: >-
+                          resource_type is a Resource type that identifies what
+                          the Resource is. Defined client-side.
+
+                          This is NOT the same as the resource's media type.
+
+                          Example: AnonCredsSchema, StatusList2021
+                      alsoKnownAs:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            uri:
+                              type: string
+                              title: >-
+                                uri is the URI of the Resource.
+
+                                Examples:
+
+                                -
+                                did:cheqd:testnet:MjYxNzYKMjYxNzYK/resources/4600ea35-8916-4ac4-b412-55b8f49dd94e
+
+                                -
+                                https://resolver..cheqd.net/1.0/identifiers/did:cheqd:testnet:MjYxNzYKMjYxNzYK/resources/4600ea35-8916-4ac4-b412-55b8f49dd94e
+
+                                - https://example.com/example.json
+
+                                -
+                                https://gateway.ipfs.io/ipfs/bafybeihetj2ng3d74k7t754atv2s5dk76pcqtvxls6dntef3xa6rax25xe
+
+                                -
+                                ipfs://bafybeihetj2ng3d74k7t754atv2s5dk76pcqtvxls6dntef3xa6rax25xe
+                            description:
+                              type: string
+                              title: >-
+                                description is a human-readable description of
+                                the URI. Defined client-side.
+
+                                Examples:
+
+                                - did-uri
+
+                                - http-uri
+
+                                - ipfs-uri
+                          description: >-
+                            AlternativeUri are alternative URIs that can be used
+                            to access the Resource.
+
+                            By default, at least the DID URI equivalent of the
+                            Resource is populated.
+                        description: List of alternative URIs for the SAME Resource.
+                      mediaType:
+                        type: string
+                        title: >-
+                          media_type is IANA media type of the Resource. Defined
+                          ledger-side.
+
+                          Example: application/json, image/png
+                      created:
+                        type: string
+                        format: date-time
+                        title: >-
+                          created is the time at which the Resource was created.
+                          Defined ledger-side.
+
+                          Format: RFC3339
+
+                          Example: 2021-01-01T00:00:00Z
+                      checksum:
+                        type: string
+                        title: >-
+                          checksum is a SHA-256 checksum hash of the Resource.
+                          Defined ledger-side.
+
+                          Example:
+                          d14a028c2a3a2bc9476102bb288234c415a2b01f828ea62ac5b3e42f
+                      previousVersionId:
+                        type: string
+                        title: >-
+                          previous_version_id is the ID of the previous version
+                          of the Resource. Defined ledger-side.
+
+                          This is based on the Resource's name and Resource type
+                          to determine whether it's the same Resource.
+
+                          Format: <uuid>
+                      nextVersionId:
+                        type: string
+                        title: >-
+                          next_version_id is the ID of the next version of the
+                          Resource. Defined ledger-side.
+
+                          This is based on the Resource's name and Resource type
+                          to determine whether it's the same Resource.
+
+                          Format: <uuid>
+                    title: Metadata stores the metadata of a DID-Linked Resource
+            title: >-
+              QueryResourceResponse is the response type for the Query/Resource
+              RPC method
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    typeUrl:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: collectionId
+          description: >-
+            collection_id is an identifier of the DidDocument the resource
+            belongs to.
+
+            Format: <unique-identifier>
+
+
+            Examples:
+
+            - c82f2b02-bdab-4dd7-b833-3e143745d612
+
+            - wGHEXrZvJxR8vw5P3UWH1j
+          in: path
+          required: true
+          type: string
+        - name: id
+          description: |-
+            id is a unique id of the resource.
+            Format: <uuid>
+          in: path
+          required: true
+          type: string
+      tags:
+        - Resource module queries
+  /cheqd/resource/v2/{collectionId}/resources/{id}/metadata:
+    get:
+      summary: Fetch only metadata for a specific resource
+      operationId: ResourceMetadata
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              resource:
+                type: object
+                properties:
+                  collectionId:
+                    type: string
+                    description: |-
+                      Examples:
+                      - c82f2b02-bdab-4dd7-b833-3e143745d612
+                      - wGHEXrZvJxR8vw5P3UWH1j
+                    title: >-
+                      collection_id is the ID of the collection that the
+                      Resource belongs to. Defined client-side.
+
+                      This field is the unique identifier of the DID linked to
+                      this Resource
+
+                      Format: <unique-identifier>
+                  id:
+                    type: string
+                    title: >-
+                      id is the ID of the Resource. Defined client-side.
+
+                      This field is a unique identifier for this specific
+                      version of the Resource.
+
+                      Format: <uuid>
+                  name:
+                    type: string
+                    title: >-
+                      name is a human-readable name for the Resource. Defined
+                      client-side.
+
+                      Does not change between different versions.
+
+                      Example: PassportSchema, EducationTrustRegistry
+                  version:
+                    type: string
+                    title: >-
+                      version is a human-readable semantic version for the
+                      Resource. Defined client-side.
+
+                      Stored as a string. OPTIONAL.
+
+                      Example: 1.0.0, v2.1.0
+                  resourceType:
+                    type: string
+                    title: >-
+                      resource_type is a Resource type that identifies what the
+                      Resource is. Defined client-side.
+
+                      This is NOT the same as the resource's media type.
+
+                      Example: AnonCredsSchema, StatusList2021
+                  alsoKnownAs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        uri:
+                          type: string
+                          title: >-
+                            uri is the URI of the Resource.
+
+                            Examples:
+
+                            -
+                            did:cheqd:testnet:MjYxNzYKMjYxNzYK/resources/4600ea35-8916-4ac4-b412-55b8f49dd94e
+
+                            -
+                            https://resolver..cheqd.net/1.0/identifiers/did:cheqd:testnet:MjYxNzYKMjYxNzYK/resources/4600ea35-8916-4ac4-b412-55b8f49dd94e
+
+                            - https://example.com/example.json
+
+                            -
+                            https://gateway.ipfs.io/ipfs/bafybeihetj2ng3d74k7t754atv2s5dk76pcqtvxls6dntef3xa6rax25xe
+
+                            -
+                            ipfs://bafybeihetj2ng3d74k7t754atv2s5dk76pcqtvxls6dntef3xa6rax25xe
+                        description:
+                          type: string
+                          title: >-
+                            description is a human-readable description of the
+                            URI. Defined client-side.
+
+                            Examples:
+
+                            - did-uri
+
+                            - http-uri
+
+                            - ipfs-uri
+                      description: >-
+                        AlternativeUri are alternative URIs that can be used to
+                        access the Resource.
+
+                        By default, at least the DID URI equivalent of the
+                        Resource is populated.
+                    description: List of alternative URIs for the SAME Resource.
+                  mediaType:
+                    type: string
+                    title: >-
+                      media_type is IANA media type of the Resource. Defined
+                      ledger-side.
+
+                      Example: application/json, image/png
+                  created:
+                    type: string
+                    format: date-time
+                    title: >-
+                      created is the time at which the Resource was created.
+                      Defined ledger-side.
+
+                      Format: RFC3339
+
+                      Example: 2021-01-01T00:00:00Z
+                  checksum:
+                    type: string
+                    title: >-
+                      checksum is a SHA-256 checksum hash of the Resource.
+                      Defined ledger-side.
+
+                      Example:
+                      d14a028c2a3a2bc9476102bb288234c415a2b01f828ea62ac5b3e42f
+                  previousVersionId:
+                    type: string
+                    title: >-
+                      previous_version_id is the ID of the previous version of
+                      the Resource. Defined ledger-side.
+
+                      This is based on the Resource's name and Resource type to
+                      determine whether it's the same Resource.
+
+                      Format: <uuid>
+                  nextVersionId:
+                    type: string
+                    title: >-
+                      next_version_id is the ID of the next version of the
+                      Resource. Defined ledger-side.
+
+                      This is based on the Resource's name and Resource type to
+                      determine whether it's the same Resource.
+
+                      Format: <uuid>
+                title: Metadata stores the metadata of a DID-Linked Resource
+            title: >-
+              QueryResourceMetadataResponse is the response type for the
+              Query/ResourceMetadata RPC method
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    typeUrl:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: collectionId
+          description: >-
+            collection_id is an identifier of the DidDocument the resource
+            belongs to.
+
+            Format: <unique-identifier>
+
+
+            Examples:
+
+            - c82f2b02-bdab-4dd7-b833-3e143745d612
+
+            - wGHEXrZvJxR8vw5P3UWH1j
+          in: path
+          required: true
+          type: string
+        - name: id
+          description: |-
+            id is a unique id of the resource.
+            Format: <uuid>
+          in: path
+          required: true
+          type: string
+      tags:
+        - Resource module queries

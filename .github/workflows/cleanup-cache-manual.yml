@@ -16,6 +16,6 @@ jobs:
     
     steps:
       - name: "Wipe Github Actions cache"
-        uses: easimon/wipe-cache@v1
+        uses: easimon/wipe-cache@v2
         with:
           dry-run: ${{ github.event.inputs.dry-run }}

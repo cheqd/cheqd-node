@@ -9,7 +9,7 @@ option go_package = "github.com/cheqd/cheqd-node/x/did/types/v1";
 message Did {
   repeated string context = 1; // optional
   string id = 2;
-  repeated string controller = 3; //optional
+  repeated string controller = 3; // optional
   repeated VerificationMethod verification_method = 4; // optional
   repeated string authentication = 5; // optional
   repeated string assertion_method = 6; // optional
