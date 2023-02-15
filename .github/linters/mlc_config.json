@@ -1,5 +1,5 @@
 {
-    "aliveStatusCodes": [0, 200, 206, 403, 501, 999],
+    "aliveStatusCodes": [0, 200, 206, 403, 500, 501, 999],
     "replacementPatterns": [
         {
             "pattern": "\" %}",
