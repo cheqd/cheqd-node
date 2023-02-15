@@ -348,7 +348,7 @@ class Installer():
             os.remove(path)
     
     def prepare_url_for_latest(self) -> str:
-            template = TESTNET_SNAPSHOT if self.chain == NetworkType.TESTNET else MAINNET_SNAPSHOT
+            template = TESTNET_SNAPSHOT if self.chain == TESTNET_CHAIN_ID else MAINNET_SNAPSHOT
             _date = datetime.date.today()
             _days_counter = 0
             _is_url_valid = False
@@ -498,7 +498,7 @@ class Installer():
             logging.info("Reload systemd config")
             self.exec('systemctl daemon-reload')
 
-    def stop_cosmovisor_systemd(self, service_name):
+    def stop_systemd_service(self, service_name):
         if self.check_systemd_service_on(service_name):
             logging.info(f"Stopping systemd service: {service_name}")
             self.exec(f"systemctl stop {service_name}")
@@ -509,7 +509,7 @@ class Installer():
             logging.info("Reset failed systemd services (if any)")
             self.exec("systemctl reset-failed")
 
-    def reload_cosmovisor_systemd(self):
+    def reload_systemd(self):
         logging.info("Reload systemd config")
         self.exec('systemctl daemon-reload')
 
@@ -793,11 +793,7 @@ class Installer():
                 logging.info(f"Moving Cosmovisor binary to installation directory")
                 shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
 
-            self.cosm_version = interviewer.what_cosmovisor_version()
-            if self.cosm_version == DEFAULT_LATEST_COSMOVISOR_VERSION.replace("v", ""):
-                self.init_cosmovisor()
-            else:
-                self.init_cosmovisor_manually()
+            self.init_cosmovisor()
 
             if self.interviewer.is_upgrade and \
                     os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
@@ -838,29 +834,6 @@ class Installer():
 
         self.create_symlink_to_binary()
 
-    def init_cosmovisor_manually(self):
-        self.mkdir_p(self.cosmovisor_root_dir)
-        self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis"))
-        self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "genesis/bin"))
-        self.mkdir_p(os.path.join(self.cosmovisor_root_dir, "upgrades"))
-
-        if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
-            logging.info(f"Creating symlink for current Cosmovisor version")
-            os.symlink(os.path.join(self.cosmovisor_root_dir, "genesis"),
-                       os.path.join(self.cosmovisor_root_dir, "current"))
-
-        logging.info(
-            f"Moving binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
-        self.exec("sudo mv {} {}".format(
-            self.binary_path, self.cosmovisor_cheqd_bin_path))
-        shutil.chown(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME),
-                     DEFAULT_CHEQD_USER,
-                     DEFAULT_CHEQD_USER)
-        self.exec(
-            "sudo chmod +x {}".format(f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
-
-        self.create_symlink_to_binary()
-
     def create_symlink_to_binary(self):
         if not os.path.islink(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
             os.remove(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
@@ -872,7 +845,7 @@ class Installer():
 
     def bump_cosmovisor(self):
         try:
-            self.stop_cosmovisor_systemd(DEFAULT_COSMOVISOR_SERVICE_NAME)
+            self.stop_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME)
 
             fname = self.download_and_unzip(self.cosmovisor_download_url)
             self.remove_safe(fname)
@@ -923,7 +896,7 @@ class Installer():
             shutil.chown(self.cosmovisor_root_dir,
                          DEFAULT_CHEQD_USER,
                          DEFAULT_CHEQD_USER)
-            self.reload_cosmovisor_systemd()
+            self.reload_systemd()
         except:
             logging.exception(f"Failed to bump Cosmovisor")
 
