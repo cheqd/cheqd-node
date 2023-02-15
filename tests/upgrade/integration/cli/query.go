@@ -26,13 +26,23 @@ func Query(container string, binary string, module, query string, queryArgs ...s
 }
 
 func QueryModuleVersionMap(container string) (upgradetypes.QueryModuleVersionsResponse, error) {
+	var out string
+	var err error
+	
 	fmt.Println("Querying module version map from", container)
 	args := append([]string{
 		CliBinaryName,
 		"query", "upgrade", "module_versions",
 	}, QueryParamsConst...)
 
-	out, err := LocalnetExecExec(container, args...)
+	// ToDo: refactor
+	if RUN_INSIDE_DOCKER {
+		println("Inside the container")
+		out, err = LocalnetExecExec(container, args...)
+	} else {
+		println("just local run")
+		out, err = ExecDirectWithHome(container, args...)
+	}
 	if err != nil {
 		return upgradetypes.QueryModuleVersionsResponse{}, err
 	}
@@ -50,13 +60,24 @@ func QueryModuleVersionMap(container string) (upgradetypes.QueryModuleVersionsRe
 }
 
 func QueryParams(container, subspace, key string) (paramproposal.ParamChange, error) {
+	var out string
+	var err error
+
 	fmt.Println("Querying params from", container)
 	args := append([]string{
 		CliBinaryName,
 		"query", "params", "subspace", subspace, key,
 	}, QueryParamsConst...)
 
-	out, err := LocalnetExecExec(container, args...)
+	// ToDo: refactor
+	if RUN_INSIDE_DOCKER {
+		println("Inside the container")
+		out, err = LocalnetExecExec(container, args...)
+	} else {
+		println("just local run")
+		out, err = ExecDirectWithHome(container, args...)
+	}
+
 	if err != nil {
 		return paramproposal.ParamChange{}, err
 	}
@@ -106,13 +127,24 @@ func QueryResourceFeeParams(container, subspace, key string) (resourcetypes.FeeP
 }
 
 func QueryProposalLegacy(container, id string) (govtypesv1beta1.Proposal, error) {
+	var out string
+	var err error
+
 	fmt.Println("Querying proposal from", container)
 	args := append([]string{
 		CliBinaryName,
 		"query", "gov", "proposal", id,
 	}, QueryParamsConst...)
 
-	out, err := LocalnetExecExec(container, args...)
+	// ToDo: refactor
+	if RUN_INSIDE_DOCKER {
+		println("Inside the container")
+		out, err = LocalnetExecExec(container, args...)
+	} else {
+		println("just local run")
+		out, err = ExecDirectWithHome(container, args...)
+	}
+
 	if err != nil {
 		return govtypesv1beta1.Proposal{}, err
 	}
@@ -129,13 +161,24 @@ func QueryProposalLegacy(container, id string) (govtypesv1beta1.Proposal, error)
 }
 
 func QueryProposal(container, id string) (govtypesv1.Proposal, error) {
+	var out string
+	var err error
+
 	fmt.Println("Querying proposal from", container)
 	args := append([]string{
 		CliBinaryName,
 		"query", "gov", "proposal", id,
 	}, QueryParamsConst...)
 
-	out, err := LocalnetExecExec(container, args...)
+	// ToDo: refactor
+	if RUN_INSIDE_DOCKER {
+		println("Inside the container")
+		out, err = LocalnetExecExec(container, args...)
+	} else {
+		println("just local run")
+		out, err = ExecDirectWithHome(container, args...)
+	}
+
 	if err != nil {
 		return govtypesv1.Proposal{}, err
 	}

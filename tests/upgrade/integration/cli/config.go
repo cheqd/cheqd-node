@@ -45,4 +45,6 @@ var (
 		"--chain-id", integrationnetwork.ChainID,
 		"--output", OutputFormat,
 	}
+	// TODO: UGLY THING, needs to be refactored
+	RUN_INSIDE_DOCKER = true
 )

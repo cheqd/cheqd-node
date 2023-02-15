@@ -2,8 +2,10 @@ package cli
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -52,8 +54,11 @@ var (
 )
 
 func LocalnetExec(envArgs []string, args ...string) (string, error) {
-	args = append(append([]string{DockerCompose}, envArgs...), args...)
-	cmd := exec.Command(Docker, args...)
+	args = append(append([]string{DOCKER_COMPOSE}, envArgs...), args...)
+	cmd := exec.Command(DOCKER, args...)
+	if os.Getenv("DEBUG") != "true" {
+		fmt.Println("DEBUG: Command for run: ", strings.Join(cmd.Args, " "))
+	}
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return string(out), sdkerrors.Wrap(err, string(out))

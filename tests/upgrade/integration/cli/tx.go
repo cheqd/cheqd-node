@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"strconv"
 
@@ -10,6 +11,9 @@ import (
 )
 
 func Tx(container string, binary string, module, tx, from string, txArgs ...string) (sdk.TxResponse, error) {
+	var output string
+	var err error
+
 	args := []string{
 		binary,
 		"tx",
@@ -18,7 +22,7 @@ func Tx(container string, binary string, module, tx, from string, txArgs ...stri
 	}
 
 	// Common params
-	args = append(args, TXParams...)
+	args = append(args, TX_PARAMS...)
 
 	// Cosmos account
 	args = append(args, "--from", from)
@@ -26,7 +30,12 @@ func Tx(container string, binary string, module, tx, from string, txArgs ...stri
 	// Other args
 	args = append(args, txArgs...)
 
-	output, err := LocalnetExecExec(container, args...)
+	// ToDo: refactor
+	if RUN_INSIDE_DOCKER {
+		output, err = LocalnetExecExec(container, args...)
+	} else {
+		output, err = ExecDirectWithHome(container, args...)
+	}
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
@@ -45,16 +54,23 @@ func Tx(container string, binary string, module, tx, from string, txArgs ...stri
 }
 
 func SubmitParamChangeProposal(container string, pathToDir ...string) (sdk.TxResponse, error) {
+	var err error
+	var out string
+
 	fmt.Println("Submitting param change proposal from", container)
 	args := append([]string{
-		CliBinaryName,
+		CLI_BINARY_NAME,
 		"tx", "gov", "submit-legacy-proposal", "param-change", filepath.Join(pathToDir...),
 		"--from", OperatorAccounts[container],
-	}, TXParams...)
+	}, TX_PARAMS...)
 
-	args = append(args, GasParams...)
+	// ToDo: refactor
+	if RUN_INSIDE_DOCKER {
+		out, err = LocalnetExecExec(container, args...)
+	} else {
+		out, err = ExecDirectWithHome(container, args...)
+	}
 
-	out, err := LocalnetExecExec(container, args...)
 	if err != nil {
 		fmt.Println("Error on submitting ParamChangeProposal", err)
 		fmt.Println("Output:", out)
@@ -76,21 +92,34 @@ func SubmitParamChangeProposal(container string, pathToDir ...string) (sdk.TxRes
 }
 
 func SubmitUpgradeProposal(upgradeHeight int64, container string) (sdk.TxResponse, error) {
+	var err error
+	var out string
+	
 	fmt.Println("Submitting upgrade proposal from", container)
+	var upgrade_name = os.Getenv("UPGRADE_NAME")
+	if upgrade_name == "" {
+		upgrade_name = UPGRADE_NAME
+	}
+	fmt.Println("Upgrade name:", upgrade_name)
+
 	args := append([]string{
-		CliBinaryName,
+		CLI_BINARY_NAME,
 		"tx", "gov", "submit-proposal", "software-upgrade",
-		UpgradeName,
+		upgrade_name,
 		"--title", "Upgrade Title",
 		"--description", "Upgrade Description",
 		"--upgrade-height", strconv.FormatInt(upgradeHeight, 10),
 		"--upgrade-info", "Upgrade Info",
 		"--from", OperatorAccounts[container],
-	}, TXParams...)
+	}, TX_PARAMS...)
 
-	args = append(args, GasParams...)
+	// ToDo: refactor
+	if RUN_INSIDE_DOCKER {
+		out, err = LocalnetExecExec(container, args...)
+	} else {
+		out, err = ExecDirectWithHome(container, args...)
+	}
 
-	out, err := LocalnetExecExec(container, args...)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
@@ -108,17 +137,24 @@ func SubmitUpgradeProposal(upgradeHeight int64, container string) (sdk.TxRespons
 	return resp, nil
 }
 
-func DepositGov(container string) (sdk.TxResponse, error) {
+func DepositGov(container string, proposal_id string) (sdk.TxResponse, error) {
+	var err error
+	var out string
+
 	fmt.Println("Depositing from", container)
 	args := append([]string{
-		CliBinaryName,
-		"tx", "gov", "deposit", "1", DepositAmount,
+		CLI_BINARY_NAME,
+		"tx", "gov", "deposit", proposal_id, DEPOSIT_AMOUNT,
 		"--from", OperatorAccounts[container],
-	}, TXParams...)
+	}, TX_PARAMS...)
 
-	args = append(args, GasParams...)
+	// ToDo: refactor
+	if RUN_INSIDE_DOCKER {
+		out, err = LocalnetExecExec(container, args...)
+	} else {
+		out, err = ExecDirectWithHome(container, args...)
+	}
 
-	out, err := LocalnetExecExec(container, args...)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
@@ -136,16 +172,23 @@ func DepositGov(container string) (sdk.TxResponse, error) {
 }
 
 func VoteProposal(container, id, option string) (sdk.TxResponse, error) {
+	var err error
+	var out string
+
 	fmt.Println("Voting from", container)
 	args := append([]string{
-		CliBinaryName,
+		CLI_BINARY_NAME,
 		"tx", "gov", "vote", id, option,
 		"--from", OperatorAccounts[container],
-	}, TXParams...)
+	}, TX_PARAMS...)
 
-	args = append(args, GasParams...)
+	// ToDo: refactor
+	if RUN_INSIDE_DOCKER {
+		out, err = LocalnetExecExec(container, args...)
+	} else {
+		out, err = ExecDirectWithHome(container, args...)
+	}
 
-	out, err := LocalnetExecExec(container, args...)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
