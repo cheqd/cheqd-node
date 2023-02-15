@@ -2,8 +2,8 @@ package setup
 
 import "github.com/cheqd/cheqd-node/x/did/types"
 
-func (s *TestSetup) QueryDidDoc(did string) (*types.QueryGetDidDocResponse, error) {
-	req := &types.QueryGetDidDocRequest{
+func (s *TestSetup) QueryDidDoc(did string) (*types.QueryDidDocResponse, error) {
+	req := &types.QueryDidDocRequest{
 		Id: did,
 	}
 

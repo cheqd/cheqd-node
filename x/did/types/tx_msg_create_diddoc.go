@@ -45,7 +45,7 @@ func (msg *MsgCreateDidDoc) ValidateBasic() error {
 func (msg MsgCreateDidDoc) Validate(allowedNamespaces []string) error {
 	return validation.ValidateStruct(&msg,
 		validation.Field(&msg.Payload, validation.Required, ValidMsgCreateDidPayloadRule(allowedNamespaces)),
-		validation.Field(&msg.Signatures, IsUniqueSignInfoListByIdRule(), validation.Each(ValidSignInfoRule(allowedNamespaces))),
+		validation.Field(&msg.Signatures, IsUniqueSignInfoListByIDRule(), validation.Each(ValidSignInfoRule(allowedNamespaces))),
 	)
 }
 

@@ -4,5 +4,10 @@ version: v1
 
 plugins:
   - name: swagger
-    out: ../tmp-swagger-gen
-    opt: logtostderr=true,fqn_for_swagger_name=true,simple_operation_ids=true
+    out: ../api/docs
+    opt:
+    - fqn_for_swagger_name=true
+    - include_package_in_tags=true
+    - json_names_for_fields=true
+    - logtostderr=true
+    - simple_operation_ids=true

@@ -8,48 +8,48 @@
         "controller": [
             "did:cheqd:testnet:Nqoxg85PKyr9nPstjTpg5b"
         ],
-        "verification_method": [
+        "verificationMethod": [
             {
                 "id": "did:cheqd:testnet:Nqoxg85PKyr9nPstjTpg5b#key-1",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:Nqoxg85PKyr9nPstjTpg5b",
-                "verification_material": "{\"publicKeyMultibase\":\"zEZ673G4y1tzG7ceqH9frgj2hJj14EiDjho3BwC9hcuz8\"}"
+                "verificationMaterial": "z6Mkt1M9dWKQMSUjE7VXxidhXpah8JGuebU6Pox7mU7iY8mW"
             },
             {
                 "id": "did:cheqd:testnet:Nqoxg85PKyr9nPstjTpg5b#key-2",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:Nqoxg85PKyr9nPstjTpg5b",
-                "verification_material": "{\"publicKeyMultibase\":\"z9uXTvgTyWZjr79CVgkgdzRSzApn7x4asDDMqDDro8D3k\"}"
+                "verificationMaterial": "z6MkoMnWWviQr7EKDe3CNKeUqWzyzQ3yMwqDuEGm3Vpp3Rq8"
             },
             {
                 "id": "did:cheqd:testnet:Nqoxg85PKyr9nPstjTpg5b#key-3",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:Nqoxg85PKyr9nPstjTpg5b",
-                "verification_material": "{\"publicKeyMultibase\":\"zCnaC3GEjg3dmGPGo3svUw8Lytu3HWJGpTVsVXnBUQJca\"}"
+                "verificationMaterial": "z6MkrEqEdWVB1b8ENt7VjStKnDtyiUK8vBXB9WnRN49VKXPx"
             },
             {
                 "id": "did:cheqd:testnet:Nqoxg85PKyr9nPstjTpg5b#key-4",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:Nqoxg85PKyr9nPstjTpg5b",
-                "verification_material": "{\"publicKeyMultibase\":\"z6yL88rhPLU4nFAUGLv1VLiTTXnV4At64PPJwCrEHjTw\"}"
+                "verificationMaterial": "z6MkeZENiP78isxXtk1AwusrLSGTH74LU48SkQJEmUpFCxFK"
             }
         ],
         "authentication": [
             "did:cheqd:testnet:Nqoxg85PKyr9nPstjTpg5b#key-1",
             "did:cheqd:testnet:Nqoxg85PKyr9nPstjTpg5b#key-2"
         ],
-        "assertion_method": [
+        "assertionMethod": [
             "did:cheqd:testnet:Nqoxg85PKyr9nPstjTpg5b#key-3"
         ],
         "capability_invocation": [
             "did:cheqd:testnet:Nqoxg85PKyr9nPstjTpg5b#key-4",
             "did:cheqd:testnet:Nqoxg85PKyr9nPstjTpg5b#key-1"
         ],
-        "capability_delegation": [
+        "capabilityDelegation": [
             "did:cheqd:testnet:Nqoxg85PKyr9nPstjTpg5b#key-4",
             "did:cheqd:testnet:Nqoxg85PKyr9nPstjTpg5b#key-2"
         ],
-        "key_agreement": [
+        "keyAgreement": [
             "did:cheqd:testnet:Nqoxg85PKyr9nPstjTpg5b#key-1",
             "did:cheqd:testnet:Nqoxg85PKyr9nPstjTpg5b#key-2",
             "did:cheqd:testnet:Nqoxg85PKyr9nPstjTpg5b#key-3",
@@ -58,13 +58,13 @@
         "service": [
             {
                 "id": "did:cheqd:testnet:Nqoxg85PKyr9nPstjTpg5b#service-1",
-                "type": "type-1",
-                "service_endpoint": [
+                "serviceType": "type-1",
+                "serviceEndpoint": [
                     "endpoint-1"
                 ]
             }
         ],
-        "also_known_as": [
+        "alsoKnownAs": [
             "alias-1",
             "alias-2"
         ]

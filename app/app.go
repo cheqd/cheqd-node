@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -85,21 +86,27 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	ica "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts"
-	icahost "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts/host"
-	icahostkeeper "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts/host/keeper"
-	icahosttypes "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts/host/types"
-	icatypes "github.com/cosmos/ibc-go/v5/modules/apps/27-interchain-accounts/types"
-	transfer "github.com/cosmos/ibc-go/v5/modules/apps/transfer"
-	ibctransferkeeper "github.com/cosmos/ibc-go/v5/modules/apps/transfer/keeper"
-	ibctransfertypes "github.com/cosmos/ibc-go/v5/modules/apps/transfer/types"
-	ibc "github.com/cosmos/ibc-go/v5/modules/core"
-	ibcclient "github.com/cosmos/ibc-go/v5/modules/core/02-client"
-	ibcclientclient "github.com/cosmos/ibc-go/v5/modules/core/02-client/client"
-	ibcclienttypes "github.com/cosmos/ibc-go/v5/modules/core/02-client/types"
-	porttypes "github.com/cosmos/ibc-go/v5/modules/core/05-port/types"
-	ibchost "github.com/cosmos/ibc-go/v5/modules/core/24-host"
-	ibckeeper "github.com/cosmos/ibc-go/v5/modules/core/keeper"
+	ica "github.com/cosmos/ibc-go/v6/modules/apps/27-interchain-accounts"
+	icacontroller "github.com/cosmos/ibc-go/v6/modules/apps/27-interchain-accounts/controller"
+	icacontrollerkeeper "github.com/cosmos/ibc-go/v6/modules/apps/27-interchain-accounts/controller/keeper"
+	icacontrollertypes "github.com/cosmos/ibc-go/v6/modules/apps/27-interchain-accounts/controller/types"
+	icahost "github.com/cosmos/ibc-go/v6/modules/apps/27-interchain-accounts/host"
+	icahostkeeper "github.com/cosmos/ibc-go/v6/modules/apps/27-interchain-accounts/host/keeper"
+	icahosttypes "github.com/cosmos/ibc-go/v6/modules/apps/27-interchain-accounts/host/types"
+	icatypes "github.com/cosmos/ibc-go/v6/modules/apps/27-interchain-accounts/types"
+	ibcfee "github.com/cosmos/ibc-go/v6/modules/apps/29-fee"
+	ibcfeekeeper "github.com/cosmos/ibc-go/v6/modules/apps/29-fee/keeper"
+	ibcfeetypes "github.com/cosmos/ibc-go/v6/modules/apps/29-fee/types"
+	transfer "github.com/cosmos/ibc-go/v6/modules/apps/transfer"
+	ibctransferkeeper "github.com/cosmos/ibc-go/v6/modules/apps/transfer/keeper"
+	ibctransfertypes "github.com/cosmos/ibc-go/v6/modules/apps/transfer/types"
+	ibc "github.com/cosmos/ibc-go/v6/modules/core"
+	ibcclient "github.com/cosmos/ibc-go/v6/modules/core/02-client"
+	ibcclientclient "github.com/cosmos/ibc-go/v6/modules/core/02-client/client"
+	ibcclienttypes "github.com/cosmos/ibc-go/v6/modules/core/02-client/types"
+	porttypes "github.com/cosmos/ibc-go/v6/modules/core/05-port/types"
+	ibchost "github.com/cosmos/ibc-go/v6/modules/core/24-host"
+	ibckeeper "github.com/cosmos/ibc-go/v6/modules/core/keeper"
 	"github.com/gorilla/mux"
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
@@ -108,6 +115,9 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
+
+	// unnamed import of statik for swagger UI support
+	_ "github.com/cheqd/cheqd-node/api/v2/docs/statik"
 )
 
 var (
@@ -138,6 +148,7 @@ var (
 		slashing.AppModuleBasic{},
 		ibc.AppModuleBasic{},
 		transfer.AppModuleBasic{},
+		ica.AppModuleBasic{},
 		upgrade.AppModuleBasic{},
 		evidence.AppModuleBasic{},
 		vesting.AppModuleBasic{},
@@ -146,7 +157,7 @@ var (
 		groupmodule.AppModuleBasic{},
 		did.AppModuleBasic{},
 		resource.AppModuleBasic{},
-		ica.AppModuleBasic{},
+		ibcfee.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -185,29 +196,33 @@ type App struct {
 	memKeys map[string]*storetypes.MemoryStoreKey
 
 	// keepers
-	AccountKeeper    authkeeper.AccountKeeper
-	BankKeeper       bankkeeper.Keeper
-	CapabilityKeeper *capabilitykeeper.Keeper
-	StakingKeeper    stakingkeeper.Keeper
-	SlashingKeeper   slashingkeeper.Keeper
-	MintKeeper       mintkeeper.Keeper
-	DistrKeeper      distrkeeper.Keeper
-	GovKeeper        govkeeper.Keeper
-	CrisisKeeper     crisiskeeper.Keeper
-	UpgradeKeeper    upgradekeeper.Keeper
-	ParamsKeeper     paramskeeper.Keeper
-	IBCKeeper        *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	ICAHostKeeper    icahostkeeper.Keeper
-	EvidenceKeeper   evidencekeeper.Keeper
-	TransferKeeper   ibctransferkeeper.Keeper
-	FeeGrantKeeper   feegrantkeeper.Keeper
-	AuthzKeeper      authzkeeper.Keeper
-	GroupKeeper      groupkeeper.Keeper
+	AccountKeeper       authkeeper.AccountKeeper
+	BankKeeper          bankkeeper.Keeper
+	CapabilityKeeper    *capabilitykeeper.Keeper
+	StakingKeeper       stakingkeeper.Keeper
+	SlashingKeeper      slashingkeeper.Keeper
+	MintKeeper          mintkeeper.Keeper
+	DistrKeeper         distrkeeper.Keeper
+	GovKeeper           govkeeper.Keeper
+	CrisisKeeper        crisiskeeper.Keeper
+	UpgradeKeeper       upgradekeeper.Keeper
+	ParamsKeeper        paramskeeper.Keeper
+	IBCKeeper           *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+	IBCFeeKeeper        ibcfeekeeper.Keeper
+	ICAControllerKeeper icacontrollerkeeper.Keeper
+	ICAHostKeeper       icahostkeeper.Keeper
+	EvidenceKeeper      evidencekeeper.Keeper
+	TransferKeeper      ibctransferkeeper.Keeper
+	FeeGrantKeeper      feegrantkeeper.Keeper
+	AuthzKeeper         authzkeeper.Keeper
+	GroupKeeper         groupkeeper.Keeper
 
 	// make scoped keepers public for test purposes
-	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
-	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
-	ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
+	ScopedIBCKeeper           capabilitykeeper.ScopedKeeper
+	ScopedTransferKeeper      capabilitykeeper.ScopedKeeper
+	ScopedIBCFeeKeeper        capabilitykeeper.ScopedKeeper
+	ScopedICAControllerKeeper capabilitykeeper.ScopedKeeper
+	ScopedICAHostKeeper       capabilitykeeper.ScopedKeeper
 
 	didKeeper      didkeeper.Keeper
 	resourceKeeper resourcekeeper.Keeper
@@ -247,6 +262,7 @@ func New(
 	)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 	bApp.SetVersion(version.Version)
+	bApp.SetProtocolVersion(ProtocolVersion)
 	bApp.SetInterfaceRegistry(interfaceRegistry)
 
 	keys := sdk.NewKVStoreKeys(
@@ -260,13 +276,15 @@ func New(
 		paramstypes.StoreKey,
 		ibchost.StoreKey,
 		upgradetypes.StoreKey,
+		feegrant.StoreKey,
 		evidencetypes.StoreKey,
 		ibctransfertypes.StoreKey,
+		icacontrollertypes.StoreKey,
+		icahosttypes.StoreKey,
 		capabilitytypes.StoreKey,
-		feegrant.StoreKey,
 		authzkeeper.StoreKey,
 		group.StoreKey,
-		icahosttypes.StoreKey,
+		ibcfeetypes.StoreKey,
 		didtypes.StoreKey,
 		resourcetypes.StoreKey,
 	)
@@ -297,6 +315,7 @@ func New(
 	// grant capabilities for the ibc and ibc-transfer modules
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
+	scopedICAControllerKeeper := app.CapabilityKeeper.ScopeToModule(icacontrollertypes.SubModuleName)
 	scopedICAHostKeeper := app.CapabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
 
 	// Applications that wish to enforce statically created ScopedKeepers should call `Seal` after creating
@@ -435,20 +454,26 @@ func New(
 		govConfig,
 	)
 
-	// Create Transfer Keepers
-	app.TransferKeeper = ibctransferkeeper.NewKeeper(
+	// IBC Fee Module keeper
+	app.IBCFeeKeeper = ibcfeekeeper.NewKeeper(
 		appCodec,
-		keys[ibctransfertypes.StoreKey],
-		app.GetSubspace(ibctransfertypes.ModuleName),
+		keys[ibcfeetypes.StoreKey],
+		app.IBCKeeper.ChannelKeeper, // may be replaced with IBC middleware
 		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper, app.AccountKeeper, app.BankKeeper,
+	)
+
+	// ICA Controller keeper
+	app.ICAControllerKeeper = icacontrollerkeeper.NewKeeper(
+		appCodec,
+		keys[icacontrollertypes.StoreKey],
+		app.GetSubspace(icacontrollertypes.SubModuleName),
+		app.IBCFeeKeeper, // use ics29 fee as ics4Wrapper in middleware stack
 		app.IBCKeeper.ChannelKeeper,
 		&app.IBCKeeper.PortKeeper,
-		app.AccountKeeper,
-		app.BankKeeper,
-		scopedTransferKeeper,
+		scopedICAControllerKeeper,
+		app.MsgServiceRouter(),
 	)
-	transferModule := transfer.NewAppModule(app.TransferKeeper)
-	transferIBCModule := transfer.NewIBCModule(app.TransferKeeper)
 
 	// Create IBC Host Keepers
 	app.ICAHostKeeper = icahostkeeper.NewKeeper(
@@ -462,15 +487,52 @@ func New(
 		scopedICAHostKeeper,
 		app.MsgServiceRouter(),
 	)
-	icaModule := ica.NewAppModule(nil, &app.ICAHostKeeper)
-	icaHostIBCModule := icahost.NewIBCModule(app.ICAHostKeeper)
 
-	// Create static IBC router, add transfer route, then set and seal it
+	// Create IBC Router
 	ibcRouter := porttypes.NewRouter()
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule).
-		AddRoute(icahosttypes.SubModuleName, icaHostIBCModule)
 
+	// Middleware Stacks
+
+	// Create Transfer Keeper and pass IBCFeeKeeper as expected Channel and PortKeeper
+	// since fee middleware will wrap the IBCKeeper for underlying application.
+	app.TransferKeeper = ibctransferkeeper.NewKeeper(
+		appCodec, keys[ibctransfertypes.StoreKey],
+		app.GetSubspace(ibctransfertypes.ModuleName),
+		app.IBCFeeKeeper, // ISC4 Wrapper: fee IBC middleware
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		app.AccountKeeper,
+		app.BankKeeper,
+		scopedTransferKeeper,
+	)
+
+	// create IBC module from bottom to top of stack
+	var transferStack porttypes.IBCModule
+	transferStack = transfer.NewIBCModule(app.TransferKeeper)
+	transferStack = ibcfee.NewIBCMiddleware(transferStack, app.IBCFeeKeeper)
+
+	// Add transfer stack to IBC Router
+	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferStack)
+
+	// Create Interchain Accounts Stack
+	var icaControllerStack porttypes.IBCModule
+	icaControllerStack = icacontroller.NewIBCMiddleware(icaControllerStack, app.ICAControllerKeeper)
+	icaControllerStack = ibcfee.NewIBCMiddleware(icaControllerStack, app.IBCFeeKeeper)
+
+	var icaHostStack porttypes.IBCModule
+	icaHostStack = icahost.NewIBCModule(app.ICAHostKeeper)
+	icaHostStack = ibcfee.NewIBCMiddleware(icaHostStack, app.IBCFeeKeeper)
+
+	// Add host, controller & ica auth modules to IBC router
+	ibcRouter.
+		AddRoute(icacontrollertypes.SubModuleName, icaControllerStack).
+		AddRoute(icahosttypes.SubModuleName, icaHostStack)
+
+	// Seal the IBC Router
 	app.IBCKeeper.SetRouter(ibcRouter)
+
+	// Create ICA module
+	icaModule := ica.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper)
 
 	// Create evidence Keeper for to register the IBC light client misbehaviour evidence route
 	evidenceKeeper := evidencekeeper.NewKeeper(
@@ -521,8 +583,11 @@ func New(
 		groupmodule.NewAppModule(appCodec, app.GroupKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
-		transferModule,
+		// IBC modules
+		transfer.NewAppModule(app.TransferKeeper),
+		ibcfee.NewAppModule(app.IBCFeeKeeper),
 		icaModule,
+		// cheqd modules
 		did.NewAppModule(appCodec, app.didKeeper),
 		resource.NewAppModule(appCodec, app.resourceKeeper, app.didKeeper),
 	)
@@ -546,13 +611,14 @@ func New(
 		crisistypes.ModuleName,
 		ibchost.ModuleName,
 		ibctransfertypes.ModuleName,
-		icatypes.ModuleName,
 		genutiltypes.ModuleName,
 		authz.ModuleName,
 		group.ModuleName,
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
+		icatypes.ModuleName,
+		ibcfeetypes.ModuleName,
 		didtypes.ModuleName,
 		resourcetypes.ModuleName,
 	)
@@ -561,25 +627,26 @@ func New(
 		crisistypes.ModuleName,
 		govtypes.ModuleName,
 		stakingtypes.ModuleName,
-		upgradetypes.ModuleName,
+		ibchost.ModuleName,
+		ibctransfertypes.ModuleName,
 		capabilitytypes.ModuleName,
+		authtypes.ModuleName,
+		banktypes.ModuleName,
 		minttypes.ModuleName,
 		distrtypes.ModuleName,
 		slashingtypes.ModuleName,
-		evidencetypes.ModuleName,
-		ibchost.ModuleName,
 		didtypes.ModuleName,
 		resourcetypes.ModuleName,
 		genutiltypes.ModuleName,
-		banktypes.ModuleName,
-		ibctransfertypes.ModuleName,
-		icatypes.ModuleName,
-		feegrant.ModuleName,
+		evidencetypes.ModuleName,
 		authz.ModuleName,
+		feegrant.ModuleName,
 		group.ModuleName,
 		paramstypes.ModuleName,
-		authtypes.ModuleName,
+		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
+		icatypes.ModuleName,
+		ibcfeetypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -600,42 +667,17 @@ func New(
 		ibchost.ModuleName,
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
+		authz.ModuleName,
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
+		ibcfeetypes.ModuleName,
 		feegrant.ModuleName,
-		authz.ModuleName,
 		group.ModuleName,
 		didtypes.ModuleName,
 		resourcetypes.ModuleName,
 		vestingtypes.ModuleName,
 		upgradetypes.ModuleName,
 		paramstypes.ModuleName,
-	)
-
-	// Uncomment if you want to set a custom migration order here.
-	app.mm.SetOrderMigrations(
-		upgradetypes.ModuleName,
-		capabilitytypes.ModuleName,
-		minttypes.ModuleName,
-		distrtypes.ModuleName,
-		slashingtypes.ModuleName,
-		evidencetypes.ModuleName,
-		stakingtypes.ModuleName,
-		authtypes.ModuleName,
-		banktypes.ModuleName,
-		govtypes.ModuleName,
-		crisistypes.ModuleName,
-		ibchost.ModuleName,
-		ibctransfertypes.ModuleName,
-		icatypes.ModuleName,
-		genutiltypes.ModuleName,
-		authz.ModuleName,
-		group.ModuleName,
-		feegrant.ModuleName,
-		paramstypes.ModuleName,
-		vestingtypes.ModuleName,
-		didtypes.ModuleName,
-		resourcetypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -678,15 +720,6 @@ func New(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 
-	// nolint: errcheck
-	app.configurator.RegisterMigration(
-		didtypes.ModuleName,
-		3,
-		func(ctx sdk.Context) error {
-			return nil
-		},
-	)
-
 	// Upgrade handler for the next release
 	app.UpgradeKeeper.SetUpgradeHandler(UpgradeName,
 		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
@@ -694,47 +727,98 @@ func New(
 
 			// Fix lack of version map initialization in InitChainer for new chains
 			if len(fromVM) == 0 {
-				println("Initializing version map")
+				ctx.Logger().Info("Version map is empty. Initialising to required values.")
 
-				// Add defaults for did subspace
-				didSubspace := app.GetSubspace(didtypes.ModuleName)
-				didSubspace.Set(ctx, didtypes.ParamStoreKeyFeeParams, didtypes.DefaultFeeParams())
-
-				// Add defaults for resource subspace
-				resourceSubspace := app.GetSubspace(resourcetypes.ModuleName)
-				resourceSubspace.Set(ctx, resourcetypes.ParamStoreKeyFeeParams, resourcetypes.DefaultFeeParams())
-
-				// Add defaults for staking subspace
-				stakingSubspace, _ := app.ParamsKeeper.GetSubspace(stakingtypes.ModuleName)
-				stakingSubspace.Set(ctx, stakingtypes.KeyMinCommissionRate, sdk.NewDec(0))
-
-				// Fix version map
-				versionMap := app.mm.GetVersionMap()
-
-				for moduleName := range versionMap {
-					fromVM[moduleName] = versionMap[moduleName]
+				// Set these explicitly to avoid calling InitGenesis on modules that don't need it.
+				// Explicitly skipping x/auth migrations.
+				fromVM = map[string]uint64{
+					"auth":               2,
+					"authz":              1,
+					"bank":               2,
+					"capability":         1,
+					"cheqd":              3,
+					"crisis":             1,
+					"distribution":       2,
+					"evidence":           1,
+					"feegrant":           1,
+					"genutil":            1,
+					"gov":                2,
+					"ibc":                2,
+					"interchainaccounts": 1,
+					"mint":               1,
+					"params":             1,
+					"resource":           1,
+					"slashing":           2,
+					"staking":            2,
+					"transfer":           1,
+					"upgrade":            1,
+					"vesting":            1,
 				}
-			} else {
-				println("Version map already initialized")
-
-				// Add defaults for staking subspace
-				stakingSubspace, _ := app.ParamsKeeper.GetSubspace(stakingtypes.ModuleName)
-				stakingSubspace.Set(ctx, stakingtypes.KeyMinCommissionRate, sdk.NewDec(0))
-
-				// Add defaults for did subspace
-				didSubspace := app.GetSubspace(didtypes.ModuleName)
-				didSubspace.Set(ctx, didtypes.ParamStoreKeyFeeParams, didtypes.DefaultFeeParams())
-
-				// Add defaults for resource subspace
-				resourceSubspace := app.GetSubspace(resourcetypes.ModuleName)
-				resourceSubspace.Set(ctx, resourcetypes.ParamStoreKeyFeeParams, resourcetypes.DefaultFeeParams())
-
-				// Get the current version map
-				versionMap := app.mm.GetVersionMap()
-
-				// Skip resource module InitGenesis (was not present in v0.6.9)
-				fromVM[resourcetypes.ModuleName] = versionMap[resourcetypes.ModuleName]
 			}
+
+			ctx.Logger().Info("Version map is populated. Running migrations.")
+			ctx.Logger().Debug(fmt.Sprintf("Previous version map: %v", fromVM))
+
+			// Get current version map
+			newVM := app.mm.GetVersionMap()
+			ctx.Logger().Debug(fmt.Sprintf("Target version map: %v", newVM))
+
+			// Set cheqd/DID module to ConsensusVersion
+			fromVM[didtypes.ModuleName] = newVM[didtypes.ModuleName]
+
+			// Set resource module to ConsensusVersion
+			fromVM[resourcetypes.ModuleName] = newVM[resourcetypes.ModuleName]
+
+			// Add defaults for DID module subspace
+			didSubspace := app.GetSubspace(didtypes.ModuleName)
+			didSubspace.Set(ctx, didtypes.ParamStoreKeyFeeParams, didtypes.DefaultFeeParams())
+
+			// Add defaults for resource subspace
+			resourceSubspace := app.GetSubspace(resourcetypes.ModuleName)
+			resourceSubspace.Set(ctx, resourcetypes.ParamStoreKeyFeeParams, resourcetypes.DefaultFeeParams())
+
+			// create ICS27 Controller submodule params
+			controllerParams := icacontrollertypes.Params{
+				ControllerEnabled: true,
+			}
+
+			// create ICS27 Host submodule params
+			hostParams := icahosttypes.Params{
+				HostEnabled: true,
+				AllowMessages: []string{
+					authzMsgExec,
+					authzMsgGrant,
+					authzMsgRevoke,
+					bankMsgSend,
+					bankMsgMultiSend,
+					distrMsgSetWithdrawAddr,
+					distrMsgWithdrawValidatorCommission,
+					distrMsgFundCommunityPool,
+					distrMsgWithdrawDelegatorReward,
+					feegrantMsgGrantAllowance,
+					feegrantMsgRevokeAllowance,
+					govMsgVoteWeighted,
+					govMsgSubmitProposal,
+					govMsgDeposit,
+					govMsgVote,
+					stakingMsgEditValidator,
+					stakingMsgDelegate,
+					stakingMsgUndelegate,
+					stakingMsgBeginRedelegate,
+					stakingMsgCreateValidator,
+					vestingMsgCreateVestingAccount,
+					ibcMsgTransfer,
+					// cheqd namespace
+					didMsgCreateDidDoc,
+					didMsgUpdateDidDoc,
+					didMsgDeactivateDidDoc,
+					resourceMsgCreateResource,
+				},
+			}
+
+			// initialize ICS27 module
+			ctx.Logger().Debug("Initialise interchainaccount module...")
+			icaModule.InitModule(ctx, controllerParams, hostParams)
 
 			// cheqd migrations
 			migrationContext := migrations.NewMigrationContext(
@@ -745,6 +829,7 @@ func New(
 				app.GetSubspace(resourcetypes.ModuleName),
 			)
 
+			ctx.Logger().Debug("Initialise cheqd DID and Resource module migrations...")
 			cheqdMigrator := migrations.NewMigrator(
 				migrationContext,
 				[]migrations.Migration{
@@ -761,7 +846,7 @@ func New(
 					migrations.MigrateResourceUUID,
 
 					// Did version id
-					migrations.MigrateDidVersionId,
+					migrations.MigrateDidVersionID,
 
 					// Resource checksum
 					migrations.MigrateResourceChecksum,
@@ -770,7 +855,7 @@ func New(
 					migrations.MigrateResourceVersionLinks,
 
 					// Resource default alternative url
-					migrations.MigrateResourceDefaultAlternativeUrl,
+					migrations.MigrateResourceDefaultAlternativeURL,
 				})
 
 			err = cheqdMigrator.Migrate(ctx)
@@ -778,9 +863,11 @@ func New(
 				panic(err)
 			}
 
-			// ibc v3 -> v4 migration
-			// transfer module consensus version has been bumped to 2
-			return app.mm.RunMigrations(ctx, app.configurator, fromVM)
+			// Run all default migrations
+			ctx.Logger().Debug(fmt.Sprintf("Previous version map (for default RunMigrations): %v", fromVM))
+			toVM, err := app.mm.RunMigrations(ctx, app.configurator, fromVM)
+			ctx.Logger().Debug(fmt.Sprintf("New version map (after default RunMigrations): %v", toVM))
+			return toVM, err
 		})
 
 	if loadLatest {
@@ -790,8 +877,9 @@ func New(
 	}
 
 	app.ScopedIBCKeeper = scopedIBCKeeper
-	app.ScopedICAHostKeeper = scopedICAHostKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
+	app.ScopedICAControllerKeeper = scopedICAControllerKeeper
+	app.ScopedICAHostKeeper = scopedICAHostKeeper
 
 	return app
 }
@@ -811,14 +899,11 @@ func (app *App) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.Respo
 
 // InitChainer application update at chain initialization
 func (app *App) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
-	// FIXME: This should have been done from the beginning.
-	// Now this would break consensus with existing networks.
-	// so ModuleVersionMap is initialized as part of upgrade xxx.
 	var genesisState GenesisState
 	if err := tmjson.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
 		panic(err)
 	}
-	// app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
+	app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
 	return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
 }
 
@@ -954,8 +1039,9 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(slashingtypes.ModuleName)
 	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govv1.ParamKeyTable())
 	paramsKeeper.Subspace(crisistypes.ModuleName)
-	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
+	paramsKeeper.Subspace(ibchost.ModuleName)
+	paramsKeeper.Subspace(icacontrollertypes.SubModuleName)
 	paramsKeeper.Subspace(icahosttypes.SubModuleName)
 	paramsKeeper.Subspace(didtypes.ModuleName).WithKeyTable(didtypes.ParamKeyTable())
 	paramsKeeper.Subspace(resourcetypes.ModuleName).WithKeyTable(resourcetypes.ParamKeyTable())

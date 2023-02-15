@@ -20,7 +20,7 @@ func Query(container string, binary string, module, query string, queryArgs ...s
 	}
 
 	args = append(args, queryArgs...)
-	args = append(args, QUERY_PARAMS...)
+	args = append(args, QueryParamsConst...)
 
 	return LocalnetExecExec(container, args...)
 }
@@ -31,9 +31,9 @@ func QueryModuleVersionMap(container string) (upgradetypes.QueryModuleVersionsRe
 	
 	fmt.Println("Querying module version map from", container)
 	args := append([]string{
-		CLI_BINARY_NAME,
+		CliBinaryName,
 		"query", "upgrade", "module_versions",
-	}, QUERY_PARAMS...)
+	}, QueryParamsConst...)
 
 	// ToDo: refactor
 	if RUN_INSIDE_DOCKER {
@@ -65,9 +65,9 @@ func QueryParams(container, subspace, key string) (paramproposal.ParamChange, er
 
 	fmt.Println("Querying params from", container)
 	args := append([]string{
-		CLI_BINARY_NAME,
+		CliBinaryName,
 		"query", "params", "subspace", subspace, key,
-	}, QUERY_PARAMS...)
+	}, QueryParamsConst...)
 
 	// ToDo: refactor
 	if RUN_INSIDE_DOCKER {
@@ -132,9 +132,9 @@ func QueryProposalLegacy(container, id string) (govtypesv1beta1.Proposal, error)
 
 	fmt.Println("Querying proposal from", container)
 	args := append([]string{
-		CLI_BINARY_NAME,
+		CliBinaryName,
 		"query", "gov", "proposal", id,
-	}, QUERY_PARAMS...)
+	}, QueryParamsConst...)
 
 	// ToDo: refactor
 	if RUN_INSIDE_DOCKER {
@@ -166,9 +166,9 @@ func QueryProposal(container, id string) (govtypesv1.Proposal, error) {
 
 	fmt.Println("Querying proposal from", container)
 	args := append([]string{
-		CLI_BINARY_NAME,
+		CliBinaryName,
 		"query", "gov", "proposal", id,
-	}, QUERY_PARAMS...)
+	}, QueryParamsConst...)
 
 	// ToDo: refactor
 	if RUN_INSIDE_DOCKER {

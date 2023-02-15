@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/cheqd/cheqd-node/x/did/types"
-	. "github.com/cheqd/cheqd-node/x/did/utils"
+	"github.com/cheqd/cheqd-node/x/did/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -14,7 +14,7 @@ import (
 func (k Keeper) GetDidDocCount(ctx *sdk.Context) uint64 {
 	store := ctx.KVStore(k.storeKey)
 
-	key := StrBytes(types.DidDocCountKey)
+	key := utils.StrBytes(types.DidDocCountKey)
 	valueBytes := store.Get(key)
 
 	// Count doesn't exist: no element
@@ -36,7 +36,7 @@ func (k Keeper) GetDidDocCount(ctx *sdk.Context) uint64 {
 func (k Keeper) SetDidDocCount(ctx *sdk.Context, count uint64) {
 	store := ctx.KVStore(k.storeKey)
 
-	key := StrBytes(types.DidDocCountKey)
+	key := utils.StrBytes(types.DidDocCountKey)
 	valueBytes := []byte(strconv.FormatUint(count, 10))
 
 	store.Set(key, valueBytes)
@@ -50,12 +50,12 @@ func (k Keeper) AddNewDidDocVersion(ctx *sdk.Context, didDoc *types.DidDocWithMe
 
 	// Link to the previous version if it exists
 	if k.HasDidDoc(ctx, didDoc.DidDoc.Id) {
-		latestVersionId, err := k.GetLatestDidDocVersion(ctx, didDoc.DidDoc.Id)
+		latestVersionID, err := k.GetLatestDidDocVersion(ctx, didDoc.DidDoc.Id)
 		if err != nil {
 			return err
 		}
 
-		latestVersion, err := k.GetDidDocVersion(ctx, didDoc.DidDoc.Id, latestVersionId)
+		latestVersion, err := k.GetDidDocVersion(ctx, didDoc.DidDoc.Id, latestVersionID)
 		if err != nil {
 			return err
 		}
@@ -82,12 +82,12 @@ func (k Keeper) AddNewDidDocVersion(ctx *sdk.Context, didDoc *types.DidDocWithMe
 }
 
 func (k Keeper) GetLatestDidDoc(ctx *sdk.Context, did string) (types.DidDocWithMetadata, error) {
-	latestVersionId, err := k.GetLatestDidDocVersion(ctx, did)
+	latestVersionID, err := k.GetLatestDidDocVersion(ctx, did)
 	if err != nil {
 		return types.DidDocWithMetadata{}, err
 	}
 
-	latestVersion, err := k.GetDidDocVersion(ctx, did, latestVersionId)
+	latestVersion, err := k.GetDidDocVersion(ctx, did, latestVersionID)
 	if err != nil {
 		return types.DidDocWithMetadata{}, err
 	}
@@ -156,7 +156,7 @@ func (k Keeper) SetLatestDidDocVersion(ctx *sdk.Context, did, version string) er
 	store := ctx.KVStore(k.storeKey)
 
 	key := types.GetLatestDidDocVersionKey(did)
-	valueBytes := StrBytes(version)
+	valueBytes := utils.StrBytes(version)
 	store.Set(key, valueBytes)
 
 	return nil

@@ -8,10 +8,10 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func resource(ctx sdk.Context, keeper Keeper, cheqdKeeper didkeeper.Keeper, legacyQuerierCdc *codec.LegacyAmino, collectionId, id string) ([]byte, error) {
+func resource(ctx sdk.Context, keeper Keeper, cheqdKeeper didkeeper.Keeper, legacyQuerierCdc *codec.LegacyAmino, collectionID, id string) ([]byte, error) {
 	queryServer := NewQueryServer(keeper, cheqdKeeper)
 
-	resp, err := queryServer.Resource(sdk.WrapSDKContext(ctx), &types.QueryGetResourceRequest{CollectionId: collectionId, Id: id})
+	resp, err := queryServer.Resource(sdk.WrapSDKContext(ctx), &types.QueryResourceRequest{CollectionId: collectionID, Id: id})
 	if err != nil {
 		return nil, err
 	}

@@ -8,8 +8,8 @@ env:
 before:
   hooks:
     - make clean
-    - go mod tidy
-    - go mod download
+    - make tidy
+    - make install
     - make proto-gen
 
 builds:
@@ -22,7 +22,7 @@ builds:
       - CGO_ENABLED=1
     flags:
       - -mod=readonly
-      - -tags="netgo ledger"
+      - -tags="netgo ledger goleveldb"
       - -trimpath
     ldflags:
       - -s -w
@@ -42,7 +42,7 @@ builds:
         - sudo apt update && sudo apt install clang gcc-multilib g++-multilib -y
     flags:
       - -mod=readonly
-      - -tags="netgo ledger"
+      - -tags="netgo ledger goleveldb"
       - -trimpath
     ldflags:
       - -s -w
@@ -55,13 +55,15 @@ builds:
 
 archives:
   - id: release-archives
-    replacements:
-        darwin: Darwin
-        linux: Linux
-        amd64: x86_64
     format: tar.gz
     wrap_in_directory: false
-    name_template: "{{ .Binary }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}"
+    name_template: >-
+      {{ .Binary }}-
+      {{ .Version }}-
+      {{ .Os }}-
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else }}{{ .Arch }}
+      {{ end }}
 
 checksum:
   algorithm: sha256
@@ -94,7 +96,7 @@ release:
     name: cheqd-node
   
   draft: false
-  prerelease: true
+  prerelease: "true"
   mode: append
   header: |
     # Release Notes for {{.ProjectName}} v{{.Version}}

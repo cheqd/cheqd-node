@@ -2,7 +2,7 @@ package keeper
 
 import (
 	"github.com/cheqd/cheqd-node/x/did/types"
-	. "github.com/cheqd/cheqd-node/x/did/utils"
+	"github.com/cheqd/cheqd-node/x/did/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -10,7 +10,7 @@ import (
 func (k Keeper) GetDidNamespace(ctx *sdk.Context) string {
 	store := ctx.KVStore(k.storeKey)
 
-	key := StrBytes(types.DidNamespaceKey)
+	key := utils.StrBytes(types.DidNamespaceKey)
 	value := store.Get(key)
 
 	return string(value)
@@ -20,7 +20,7 @@ func (k Keeper) GetDidNamespace(ctx *sdk.Context) string {
 func (k Keeper) SetDidNamespace(ctx *sdk.Context, namespace string) {
 	store := ctx.KVStore(k.storeKey)
 
-	key := StrBytes(types.DidNamespaceKey)
+	key := utils.StrBytes(types.DidNamespaceKey)
 	value := []byte(namespace)
 
 	store.Set(key, value)

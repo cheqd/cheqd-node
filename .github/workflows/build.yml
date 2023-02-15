@@ -21,7 +21,7 @@ jobs:
           cache: true
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v3
+        uses: goreleaser/goreleaser-action@v4
         with:
           distribution: goreleaser
           version: latest
@@ -36,6 +36,7 @@ jobs:
   build-docker:
     name: "Docker image"
     runs-on: ubuntu-20.04
+    needs: build-binary
     env:
       IMAGE_NAME: ${{ github.repository }}
 
@@ -61,7 +62,7 @@ jobs:
             type=sha,format=long
 
       - name: Build image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: .
           file: docker/Dockerfile

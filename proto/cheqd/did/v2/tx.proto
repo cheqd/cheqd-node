@@ -6,75 +6,205 @@ import "cheqd/did/v2/diddoc.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/did/types";
 
+// Msg defines the Cosmos SDK Msg service for the cheqd.did.v2 module.
 service Msg {
+  // CreateDidDoc defines a method for creating a new DID document
   rpc CreateDidDoc(MsgCreateDidDoc) returns (MsgCreateDidDocResponse);
+
+  // UpdateDidDoc defines a method for updating an existing DID document
   rpc UpdateDidDoc(MsgUpdateDidDoc) returns (MsgUpdateDidDocResponse);
+
+  // DeactivateDidDoc defines a method for deactivating an existing DID document
   rpc DeactivateDidDoc(MsgDeactivateDidDoc) returns (MsgDeactivateDidDocResponse);
 }
 
+// MsgCreateDidDoc defines the Msg/CreateDidDoc request type.
+// It describes the parameters of a request for creating a new DID document.
 message MsgCreateDidDoc {
+  // Payload containing the DID Document to be created
   MsgCreateDidDocPayload payload = 1;
+
+  // Signatures of the DID Document's controller(s)
   repeated SignInfo signatures = 2;
 }
 
+// MsgUpdateDidDoc defines the Msg/UpdateDidDoc request type.
+// It describes the parameters of a request for updating an existing DID document.
 message MsgUpdateDidDoc {
+  // Payload containing the DID Document to be updated. This should be updated the DID Document.
   MsgUpdateDidDocPayload payload = 1;
+
+  // Signatures of the DID Document's controller(s)
   repeated SignInfo signatures = 2;
 }
 
+// MsgDeactivateDidDoc defines the Msg/DeactivateDidDoc request type.
+// It describes the parameters of a request for deactivating an existing DID document.
 message MsgDeactivateDidDoc {
+  // Payload containing the DID Document to be deactivated
   MsgDeactivateDidDocPayload payload = 1;
+
+  // Signatures of the DID Document's controller(s)
   repeated SignInfo signatures = 2;
 }
 
+// SignInfo defines the structure of a DID Document controller's signature
 message SignInfo {
+  // Verification method ID of the DID Controller
   string verification_method_id = 1;
+
+  // Signature of the DID Document controller
   bytes signature = 2;
 }
 
+// MsgCreateDidDocPayload defines the structure of the payload for creating a new DID document
 message MsgCreateDidDocPayload {
+  // context is a list of URIs used to identify the context of the DID document.
+  // Default: https://www.w3.org/ns/did/v1
   repeated string context = 1;
+
+  // id is the DID of the DID document.
+  // Format: did:cheqd:<namespace>:<unique-identifier>
   string id = 2;
+
+  // controller is a list of DIDs that are allowed to control the DID document.
   repeated string controller = 3;
+
+  // verificationMethod is a list of verification methods that can be used to
+  // verify a digital signature or cryptographic proof.
+  // Documentation: https://www.w3.org/TR/did-core/#verification-methods
+  //
+  // Required fields:
+  // - id: A unique identifier for the verification method
+  // - type: A supported verification method type (supported: Ed25519VerificationKey2018, Ed25519VerificationKey2020, JsonWebKey2020)
+  // - controller: DID of the controller of the verification method
+  // - verification_material: Public key of the verification method (supported: publicJwk, publicKeyBase58, publicKeyMultibase)
   repeated VerificationMethod verification_method = 4;
+
+  // authentication is a list of verification methods that can be used to
+  // authenticate as the DID subject.
   repeated string authentication = 5;
+
+  // assertionMethod is a list of verification methods that can be used to
+  // assert statements as the DID subject.
   repeated string assertion_method = 6;
+
+  // capabilityInvocation is a list of verification methods that can be used to
+  // invoke capabilities as the DID subject.
   repeated string capability_invocation = 7;
+
+  // capabilityDelegation is a list of verification methods that can be used to
+  // delegate capabilities as the DID subject.
   repeated string capability_delegation = 8;
+
+  // keyAgreement is a list of verification methods that can be used to perform
+  // key agreement as the DID subject.
   repeated string key_agreement = 9;
-  repeated string also_known_as = 10;
-  repeated Service service = 11;
+
+  // service is a list of services that can be used to interact with the DID subject.
+  // Documentation: https://www.w3.org/TR/did-core/#services
+  //
+  // Required fields:
+  // - id: A unique identifier for the service
+  // - type: A service type defined in DID Specification Registries
+  // - service_endpoint: Service endpoint(s), provided as a URI or set of URIs
+  repeated Service service = 10;
+
+  // alsoKnownAs is a list of DIDs that are known to refer to the same DID subject.
+  repeated string also_known_as = 11;
+
+  // Version ID of the DID Document to be created
+  //
+  // Format: <uuid>
   string version_id = 12;
 }
 
+// MsgCreateDidDocResponse defines response type for Msg/CreateDidDoc.
 message MsgCreateDidDocResponse {
+  // Return the created DID Document with metadata
   DidDocWithMetadata value = 1;
 }
 
+// MsgUpdateDidDocPayload defines the structure of the payload for updating an existing DID document
 message MsgUpdateDidDocPayload {
+  // context is a list of URIs used to identify the context of the DID document.
+  // Default: https://www.w3.org/ns/did/v1
   repeated string context = 1;
+
+  // id is the DID of the DID document.
+  // Format: did:cheqd:<namespace>:<unique-identifier>
   string id = 2;
+
+  // controller is a list of DIDs that are allowed to control the DID document.
   repeated string controller = 3;
+
+  // verificationMethod is a list of verification methods that can be used to
+  // verify a digital signature or cryptographic proof.
+  // Documentation: https://www.w3.org/TR/did-core/#verification-methods
+  //
+  // Required fields:
+  // - id: A unique identifier for the verification method
+  // - type: A supported verification method type (supported: Ed25519VerificationKey2018, Ed25519VerificationKey2020, JsonWebKey2020)
+  // - controller: DID of the controller of the verification method
+  // - verification_material: Public key of the verification method (supported: publicJwk, publicKeyBase58, publicKeyMultibase)
   repeated VerificationMethod verification_method = 4;
+
+  // authentication is a list of verification methods that can be used to
+  // authenticate as the DID subject.
   repeated string authentication = 5;
+
+  // assertionMethod is a list of verification methods that can be used to
+  // assert statements as the DID subject.
   repeated string assertion_method = 6;
+
+  // capabilityInvocation is a list of verification methods that can be used to
+  // invoke capabilities as the DID subject.
   repeated string capability_invocation = 7;
+
+  // capabilityDelegation is a list of verification methods that can be used to
+  // delegate capabilities as the DID subject.
   repeated string capability_delegation = 8;
+
+  // keyAgreement is a list of verification methods that can be used to perform
+  // key agreement as the DID subject.
   repeated string key_agreement = 9;
-  repeated string also_known_as = 10;
-  repeated Service service = 11;
+
+  // service is a list of services that can be used to interact with the DID subject.
+  // Documentation: https://www.w3.org/TR/did-core/#services
+  //
+  // Required fields:
+  // - id: A unique identifier for the service
+  // - type: A service type defined in DID Specification Registries
+  // - service_endpoint: Service endpoint(s), provided as a URI or set of URIs
+  repeated Service service = 10;
+
+  // alsoKnownAs is a list of DIDs that are known to refer to the same DID subject.
+  repeated string also_known_as = 11;
+
+  // Updated version ID of the DID Document.
+  // Links to next/previous versions of the DID Document will be automatically updated.
+  //
+  // Format: <uuid>
   string version_id = 12;
 }
 
 message MsgUpdateDidDocResponse {
+  // Return the updated DID Document with metadata
   DidDocWithMetadata value = 1;
 }
 
+// MsgDeactivateDidDocPayload defines the structure of the payload for deactivating an existing DID document
 message MsgDeactivateDidDocPayload {
+  // Unique identifier of the DID Document to be deactivated
   string id = 1;
+
+  // Version ID of the DID Document to be deactivated
+  // This is primarily used as a sanity check to ensure that the correct DID Document is being deactivated.
   string version_id = 2;
 }
 
+// MsgDeactivateDidDocResponse defines response type for Msg/DeactivateDidDoc.
 message MsgDeactivateDidDocResponse {
+  // Return the deactivated DID Document with metadata
   DidDocWithMetadata value = 1;
 }

@@ -1,25 +1,45 @@
 run:
-  timeout: 5m
+  timeout: 10m
 
 
 linters:
   enable:
-    - deadcode
+    - bodyclose
+    - depguard
+    - dogsled
     - errcheck
-    - gosimple
+    - exportloopref
+    - goconst
+    - gocritic
     - gofumpt
+    - goimports
+    - gosimple
     - govet
     - ineffassign
     - misspell
+    - nakedret
     - nestif
+    - nolintlint
     - staticcheck
-    - structcheck
+    - stylecheck
     - typecheck
+    - unconvert
     - unused
-    - varcheck
 
 
 linters-settings:
+  dogsled:
+    # Checks assignments with too many blank identifiers.
+    # Default: 2
+    max-blank-identifiers: 3
+
+  gocritic:
+    # Which checks should be disabled; can't be combined with 'enabled-checks'.
+    # See https://go-critic.github.io/overview#checks-overview.
+    # Default: []
+    disabled-checks:
+      - regexpMust
+      - badCall # Remove this after CI workflow PR
 
   gofumpt:
     lang-version: "1.18"
@@ -27,3 +47,18 @@ linters-settings:
   misspell:
     ignore-words:
       - cheqd
+      - cheq
+      - ncheq
+
+  stylecheck:
+    # Select the Go version to target.
+    go: "1.18"
+    # STxxxx checks in https://staticcheck.io/docs/configuration/options/#checks
+    # Default: ["*"]
+    checks: ["all"]
+    # https://staticcheck.io/docs/configuration/options/#dot_import_whitelist
+    dot-import-whitelist:
+      - "github.com/cheqd/cheqd-node/x/did/utils"
+      - "github.com/onsi/gomega"
+    # https://staticcheck.io/docs/configuration/options/#initialisms
+    initialisms: ["ACL", "API", "ASCII", "CPU", "CSS", "DNS", "EOF", "GUID", "HTML", "HTTP", "HTTPS", "ID", "IP", "JSON", "QPS", "RAM", "RPC", "SLA", "SMTP", "SQL", "SSH", "TCP", "TLS", "TTL", "UDP", "UI", "GID", "UID", "UUID", "URI", "URL", "UTF8", "VM", "XML", "XMPP", "XSRF", "XSS", "SIP", "RTP", "AMQP", "DB", "TS"]

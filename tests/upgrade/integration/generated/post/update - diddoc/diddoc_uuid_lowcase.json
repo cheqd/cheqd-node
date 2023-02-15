@@ -9,30 +9,30 @@
         "controller": [
             "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554"
         ],
-        "verification_method": [
+        "verificationMethod": [
             {
                 "id": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-1",
                 "type": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554",
-                "verification_material": "{\"publicKeyMultibase\":\"z6nExc7qoYEoDd2DRrMpBv5ShXHYZQL3LTi2twgTm79bL\"}"
+                "publicKeyMultibase": "z6MkkEW1CN6EsnHgjX48Xvn2mAzhLrpQpDHh9iwpmxRn2NNi"
             },
             {
                 "id": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-2",
                 "type": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554",
-                "verification_material": "{\"publicKeyMultibase\":\"z8GnprPBEuoBvYqJD4RbUhoFSrZMzH6rffRvCmNzEBxDT\"}"
+                "publicKeyMultibase": "z6Mkmj3sSdRgFLgPfL8ujzZKYtoSg8dqgz72MSq8bexF7Azq"
             },
             {
                 "id": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-3",
                 "type": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554",
-                "verification_material": "{\"publicKeyMultibase\":\"z8iREaP6YKkK77MxojoyAgcnuJAC9reQq6mMJuxxCK523\"}"
+                "publicKeyMultibase": "z6MknAgHAdLyfHoaDroWRNw1XiLu7jU1GXfBnnGEkEvDEHoR"
             },
             {
                 "id": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#key-4",
                 "type": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554",
-                "verification_material": "{\"publicKeyMultibase\":\"z4GCBhVhbx2ZgF1hMT2Zt3f9x17LqeR4jb83QXehsMCvt\"}"
+                "publicKeyMultibase": "z6MkhiTEHjx3Ha49MWY48bXitkhwpgch4JK6H8xLMvftGRiG"
             }
         ],
         "authentication": [
@@ -44,19 +44,19 @@
             {
                 "id": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#service-1",
                 "type": "type-1",
-                "service_endpoint": [
+                "serviceEndpoint": [
                     "endpoint-1"
                 ]
             },
             {
                 "id": "did:cheqd:testnet:2e5ca092-8264-47c7-9216-8b36e01e5554#service-2",
                 "type": "type-2",
-                "service_endpoint": [
+                "serviceEndpoint": [
                     "endpoint-2"
                 ]
             }
         ],
-        "also_known_as": [
+        "alsoKnownAs": [
             "alias-1",
             "alias-2",
             "alias-3"

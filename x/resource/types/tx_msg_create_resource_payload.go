@@ -23,6 +23,7 @@ func (msg *MsgCreateResourcePayload) ToResource() ResourceWithMetadata {
 			CollectionId: msg.CollectionId,
 			Id:           msg.Id,
 			Name:         msg.Name,
+			Version:      msg.Version,
 			ResourceType: msg.ResourceType,
 			AlsoKnownAs:  msg.AlsoKnownAs,
 		},
@@ -41,7 +42,7 @@ func (msg MsgCreateResourcePayload) Validate() error {
 		validation.Field(&msg.Name, validation.Required, validation.Length(1, 64)),
 		validation.Field(&msg.Version, validation.Length(1, 64)),
 		validation.Field(&msg.ResourceType, validation.Required, validation.Length(1, 64)),
-		validation.Field(&msg.AlsoKnownAs, validation.Each(ValidAlternativeUri())),
+		validation.Field(&msg.AlsoKnownAs, validation.Each(ValidAlternativeURI())),
 		validation.Field(&msg.Data, validation.Required, validation.Length(1, 200*1024)), // 200KB
 	)
 }
@@ -60,6 +61,6 @@ func ValidMsgCreateResourcePayload() *didtypes.CustomErrorRule {
 // Normalize
 
 func (msg *MsgCreateResourcePayload) Normalize() {
-	msg.CollectionId = didutils.NormalizeId(msg.CollectionId)
+	msg.CollectionId = didutils.NormalizeID(msg.CollectionId)
 	msg.Id = didutils.NormalizeUUID(msg.Id)
 }

@@ -8,8 +8,8 @@ import (
 	"github.com/mr-tron/base58"
 )
 
-func NewSignInfo(verificationMethodId string, signature []byte) *SignInfo {
-	return &SignInfo{VerificationMethodId: verificationMethodId, Signature: signature}
+func NewSignInfo(verificationMethodID string, signature []byte) *SignInfo {
+	return &SignInfo{VerificationMethodId: verificationMethodID, Signature: signature}
 }
 
 // Helpers
@@ -29,16 +29,16 @@ func IsUniqueSignInfoList(infos []*SignInfo) bool {
 		return si.VerificationMethodId + ":" + base58.Encode(si.Signature)
 	}
 
-	tmp_ := map[string]bool{}
+	tmp := map[string]bool{}
 	for _, si := range infos {
 		h := hash(si)
 
-		_, found := tmp_[h]
+		_, found := tmp[h]
 		if found {
 			return false
 		}
 
-		tmp_[h] = true
+		tmp[h] = true
 	}
 	return true
 }
@@ -60,13 +60,13 @@ func FindSignInfosBySigner(infos []*SignInfo, signer string) []SignInfo {
 
 // FindSignInfoBySigner returns the first sign info that corresponds to the provided signer's did
 func FindSignInfoBySigner(infos []*SignInfo, signer string) (info SignInfo, found bool) {
-	infos_ := FindSignInfosBySigner(infos, signer)
+	infosBS := FindSignInfosBySigner(infos, signer)
 
-	if len(infos_) == 0 {
+	if len(infosBS) == 0 {
 		return SignInfo{}, false
 	}
 
-	return infos_[0], true
+	return infosBS[0], true
 }
 
 // Validate
@@ -89,7 +89,7 @@ func ValidSignInfoRule(allowedNamespaces []string) *CustomErrorRule {
 	})
 }
 
-func IsUniqueSignInfoListByIdRule() *CustomErrorRule {
+func IsUniqueSignInfoListByIDRule() *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.([]*SignInfo)
 		if !ok {

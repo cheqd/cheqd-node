@@ -21,16 +21,16 @@ const (
 )
 
 // GetResourceDataKey returns the byte representation of resource key
-func GetResourceDataKey(collectionId string, id string) []byte {
-	return []byte(ResourceDataKey + collectionId + ":" + id)
+func GetResourceDataKey(collectionID string, id string) []byte {
+	return []byte(ResourceDataKey + collectionID + ":" + id)
 }
 
 // GetResourceMetadataKey returns the byte representation of resource key
-func GetResourceMetadataKey(collectionId string, id string) []byte {
-	return []byte(ResourceMetadataKey + collectionId + ":" + id)
+func GetResourceMetadataKey(collectionID string, id string) []byte {
+	return []byte(ResourceMetadataKey + collectionID + ":" + id)
 }
 
 // GetResourceMetadataCollectionPrefix used to iterate over all resource metadatas in a collection
-func GetResourceMetadataCollectionPrefix(collectionId string) []byte {
-	return []byte(ResourceMetadataKey + collectionId + ":")
+func GetResourceMetadataCollectionPrefix(collectionID string) []byte {
+	return []byte(ResourceMetadataKey + collectionID + ":")
 }

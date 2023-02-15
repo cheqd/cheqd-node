@@ -20,7 +20,7 @@ func CmdGetAllDidDocVersionsMetadata() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			did := args[0]
-			params := &types.QueryGetAllDidDocVersionsMetadataRequest{
+			params := &types.QueryAllDidDocVersionsMetadataRequest{
 				Id: did,
 			}
 

@@ -1,5 +1,5 @@
 {
-    "did_doc": {
+    "didDoc": {
         "context": [
             "abc",
             "def"
@@ -8,48 +8,48 @@
         "controller": [
             "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez"
         ],
-        "verification_method": [
+        "verificationMethod": [
             {
                 "id": "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-1",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez",
-                "verification_material": "{\"publicKeyMultibase\":\"z79qsUjmJ9xniX5giTtTbd3p9Zsc9yRqGJr4jMvgXUp35\"}"
+                "verificationMaterial": "z6Mkkc6v4z1jVWHBdaXR9TRSU9N9PSt1PK5czryfCCeYQ2pT"
             },
             {
                 "id": "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-2",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez",
-                "verification_material": "{\"publicKeyMultibase\":\"z4USV76ihz482Y2b6p9kLWHvRHGCzyhjoHHHuWG69pAre\"}"
+                "verificationMaterial": "z6MkhvhXhLy9KbcVeXRoViiBMPUR6qUrPaz9yJCqLY4AjPe2"
             },
             {
                 "id": "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-3",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez",
-                "verification_material": "{\"publicKeyMultibase\":\"z2AmSeQdDHgV8iadh1hhbz7rAN2wca8TVtKgUn9Ka1AMY\"}"
+                "verificationMaterial": "z6Mkfd2VEesedDybq5UPhGfSqDQABcDTz1hraLbQcRHavP8v"
             },
             {
                 "id": "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-4",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez",
-                "verification_material": "{\"publicKeyMultibase\":\"z4N61VYXb7PCWMh1j7qqyGmHSThnCNFMmCRGnkqeBgnww\"}"
+                "verificationMaterial": "z6MkhpM45nn2SvgyUBrRoQop7rqSHH43n8c7tSBib7cCc1jK"
             }
         ],
         "authentication": [
             "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-1",
             "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-2"
         ],
-        "assertion_method": [
+        "assertionMethod": [
             "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-3"
         ],
-        "capability_invocation": [
+        "capabilityInvocation": [
             "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-4",
             "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-1"
         ],
-        "capability_delegation": [
+        "capabilityDelegation": [
             "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-4",
             "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-2"
         ],
-        "key_agreement": [
+        "keyAgreement": [
             "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-1",
             "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-2",
             "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#key-3",
@@ -58,13 +58,13 @@
         "service": [
             {
                 "id": "did:cheqd:testnet:7RPNZSCSaQXTdYwFmQy6ez#service-1",
-                "type": "type-1",
-                "service_endpoint": [
+                "serviceType": "type-1",
+                "serviceEndpoint": [
                     "endpoint-1"
                 ]
             }
         ],
-        "also_known_as": [
+        "alsoKnownAs": [
             "alias-1",
             "alias-2"
         ]
@@ -73,8 +73,8 @@
         "created": "2021-01-01T00:00:00Z",
         "updated": "2021-01-01T00:00:00Z",
         "deactivated": false,
-        "version_id": "c57cb7a2-2b35-4d0d-b453-eda463ae58ef",
-        "next_version_id": "",
-        "previous_version_id": ""
+        "versionId": "c57cb7a2-2b35-4d0d-b453-eda463ae58ef",
+        "nextVersionId": "",
+        "previousVersionId": ""
     }
 }
