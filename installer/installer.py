@@ -122,10 +122,10 @@ signal.signal(signal.SIGINT, sigint_handler)
 # Helper function to check if the URL is valid
 def is_valid_url(url):
     try:
-        r = request.head(url)
-        if r.status_code == 200:
+        status_code = request.urlopen(url).getcode()
+        if status_code == 200:
             return True
-    except request.ConnectionError:
+    except request.HTTPError:
         return False
 
 # Common function to search and replace text in a file
@@ -1425,7 +1425,7 @@ class Interviewer:
                 f"Failed to selected version of cheqd-noded. Reason: {e}")
 
     # Set cheqd user's home directory
-    def ask_for_home_directory(self, default) -> str:
+    def ask_for_home_directory(self) -> str:
         try:
             self.home_dir = self.ask(
                 f"Set path for cheqd user's home directory", default=DEFAULT_CHEQD_HOME_DIR)
