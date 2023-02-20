@@ -350,24 +350,6 @@ class Installer():
         if os.path.exists(path):
             os.remove(path)
 
-    def prepare_url_for_latest(self) -> str:
-        template = TESTNET_SNAPSHOT if self.chain == TESTNET_CHAIN_ID else MAINNET_SNAPSHOT
-        _date = datetime.date.today()
-        _days_counter = 0
-        _is_url_valid = False
-
-        while not _is_url_valid and _days_counter <= MAX_SNAPSHOT_DAYS:
-            _url = template.format(_date.strftime(
-                "%Y-%m-%d"), _date.strftime("%Y-%m-%d"))
-            _is_url_valid = is_valid_url(_url)
-            _days_counter += 1
-            _date -= datetime.timedelta(days=1)
-
-        if not _is_url_valid:
-            logging.exception("Could not find the valid snapshot for the last {} days".format(
-                MAX_SNAPSHOT_DAYS))
-        return _url
-
     def pre_install(self):
         # Pre-installation checks
         if self.interviewer.is_from_scratch:
@@ -1085,6 +1067,7 @@ class Interviewer:
         self._init_from_snapshot = False
         self._release = None
         self._chain = chain
+        self._snapshot_url = ""
         self._is_setup_needed = False
         self._moniker = CHEQD_NODED_MONIKER
         self._external_address = ""
@@ -1161,6 +1144,10 @@ class Interviewer:
     @property
     def chain(self) -> str:
         return self._chain
+    
+    @property
+    def snapshot_url(self) -> str:
+        return self._snapshot_url
 
     @property
     def is_setup_needed(self) -> bool:
@@ -1254,6 +1241,10 @@ class Interviewer:
     @chain.setter
     def chain(self, chain):
         self._chain = chain
+    
+    @snapshot_url.setter
+    def snapshot_url(self, su):
+        self._snapshot_url = su
 
     @is_setup_needed.setter
     def is_setup_needed(self, is_setup_needed):
@@ -1623,6 +1614,24 @@ class Interviewer:
     def ask_for_log_format(self):
         self.log_format = self.ask(
             f"Specify log format (json|plain)", default=CHEQD_NODED_LOG_FORMAT)
+    
+    def prepare_url_for_latest(self) -> str:
+        template = TESTNET_SNAPSHOT if self.chain == TESTNET_CHAIN_ID else MAINNET_SNAPSHOT
+        _date = datetime.date.today()
+        _days_counter = 0
+        _is_url_valid = False
+
+        while not _is_url_valid and _days_counter <= MAX_SNAPSHOT_DAYS:
+            _url = template.format(_date.strftime(
+                "%Y-%m-%d"), _date.strftime("%Y-%m-%d"))
+            _is_url_valid = is_valid_url(_url)
+            _days_counter += 1
+            _date -= datetime.timedelta(days=1)
+
+        if not _is_url_valid:
+            logging.exception("Could not find the valid snapshot for the last {} days".format(
+                MAX_SNAPSHOT_DAYS))
+        return _url
 
     def ask_for_upgrade(self):
         answer = self.ask(
@@ -1681,6 +1690,7 @@ class Interviewer:
             f"CAUTION: Downloading a snapshot replaces your existing copy of chain data. Usually safe to use this option when doing a fresh installation. "
             f"Do you want to download a snapshot of the existing chain to speed up node synchronization? (yes/no)", default=DEFAULT_INIT_FROM_SNAPSHOT)
         if answer.lower().startswith("y"):
+            self.snapshot_url = self.prepare_url_for_latest()
             self.init_from_snapshot = True
         elif answer.lower().startswith("n"):
             self.init_from_snapshot = False
