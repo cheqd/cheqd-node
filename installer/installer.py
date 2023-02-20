@@ -183,12 +183,12 @@ class Release:
         # Release version numbers are in format "vX.Y.Z", but the release URL does not include the "v".
         # We also determine the OS and architecture, and construct the URL to download the release.
         try:
-            os_arch = platform.machine()
-            os_name = platform.system()
+            os_arch = str.lower(platform.machine())
+            os_name = str.lower(platform.system())
             for _url_item in self.assets:
                 _url = _url_item["browser_download_url"]
                 version_without_v_prefix = self.version.replace('v', '', 1)
-                if os.path.basename(_url) == f"cheqd-noded-{version_without_v_prefix}-{os_name}-{os_arch}.tar.gz" or \
+                if os.path.basename(_url) == f"cheqd-noded-.{version_without_v_prefix}-.{os_name}-{os_arch}.tar.gz" or \
                         os.path.basename(_url) == "cheqd-noded":
                     return _url
             else:
