@@ -57,13 +57,10 @@ archives:
   - id: release-archives
     format: tar.gz
     wrap_in_directory: false
-    name_template: >-
-      {{ .Binary }}-
-      {{ .Version }}-
-      {{ .Os }}-
-      {{- if eq .Arch "amd64" }}x86_64
-      {{- else }}{{ .Arch }}
-      {{ end }}
+    name_template: "{{ .Binary }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    files:
+      - LICENSE
+      - README.md
 
 checksum:
   algorithm: sha256
