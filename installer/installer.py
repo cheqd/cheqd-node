@@ -107,8 +107,7 @@ CHEQD_NODED_P2P_MAX_PACKET_MSG_PAYLOAD_SIZE = 10240
 
 # Set logging configuration
 logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
-                    datefmt='%d-%b-%Y %H:%M:%S',
-                    raiseExceptions=True,
+                    datefmt='%d-%b-%Y %H:%M:%S', 
                     level=logging.INFO)
 
 # Handle Ctrl+C / SIGINT halts requests
