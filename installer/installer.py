@@ -195,8 +195,9 @@ class Release:
             else:
                 logging.exception(
                     f"No asset found to download for release: {self.version}")
-        except:
-            logging.exception(f"Failed to get cheqd-node binaries from Github")
+        except Exception as e:
+            logging.exception(
+                f"Failed to get cheqd-node binaries from GitHub. Reason: {e}")
 
     def __str__(self):
         return f"Name: {self.version}"
@@ -330,8 +331,9 @@ class Installer():
                 self.exec(f"tar -xzf {fname} -C .")
                 self.remove_safe(fname)
             self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
-        except:
-            logging.exception("Failed to download cheqd-noded binary")
+        except Exception as e:
+            logging.exception(
+                "Failed to download cheqd-noded binary. Reason: {e}")
 
     def is_user_exists(self, username) -> bool:
         # Check if "cheqd" user exists on the system
@@ -405,9 +407,9 @@ class Installer():
             else:
                 logging.info(
                     "Skipping linking because /var/log/cheqd-node already exists")
-        except:
+        except Exception as e:
             logging.exception(
-                "Failed to prepare directory tree for {DEFAULT_CHEQD_USER}")
+                f"Failed to prepare directory tree for {DEFAULT_CHEQD_USER}. Reason: {e}")
 
     def setup_node_systemd(self):
         # Setup the following systemd services:
@@ -451,9 +453,9 @@ class Installer():
                                            '{DEFAULT_DAEMON_RESTART_DELAY}': DEFAULT_DAEMON_RESTART_DELAY}[m.group()],
                                 f.read()
                             )
-                except:
+                except Exception as e:
                     logging.exception(
-                        "Failed to setup cheqd-cosmovisor systemd service")
+                        f"Failed to setup cheqd-cosmovisor systemd service. Reason: {e}")
             else:
                 logging.info("Enabling systemd service for cheqd-noded")
                 self.exec(
@@ -473,44 +475,56 @@ class Installer():
         return stat == 0
 
     def remove_systemd_service(self, service_name):
-        if self.check_systemd_service_on(service_name):
-            logging.info(f"Stopping systemd service: {service_name}")
-            self.exec(f"systemctl stop {service_name}")
+        try:
+            if self.check_systemd_service_on(service_name):
+                logging.info(f"Stopping systemd service: {service_name}")
+                self.exec(f"systemctl stop {service_name}")
 
-            logging.info(f"Disable systemd service: {service_name}")
-            self.exec(f"systemctl disable {service_name}")
+                logging.info(f"Disable systemd service: {service_name}")
+                self.exec(f"systemctl disable {service_name}")
 
-            logging.info("Reset failed systemd services (if any)")
-            self.exec("systemctl reset-failed")
+                logging.info("Reset failed systemd services (if any)")
+                self.exec("systemctl reset-failed")
 
-            logging.info("Reload systemd config")
-            self.exec('systemctl daemon-reload')
+                logging.info("Reload systemd config")
+                self.exec('systemctl daemon-reload')
+        except Exception as e:
+            logging.exception(f"Failed to remove systemd. Reason: {e}")
 
     def stop_systemd_service(self, service_name):
-        if self.check_systemd_service_on(service_name):
-            logging.info(f"Stopping systemd service: {service_name}")
-            self.exec(f"systemctl stop {service_name}")
+        try:
+            if self.check_systemd_service_on(service_name):
+                logging.info(f"Stopping systemd service: {service_name}")
+                self.exec(f"systemctl stop {service_name}")
 
-            logging.info(f"Disable systemd service: {service_name}")
-            self.exec(f"systemctl disable {service_name}")
+                logging.info(f"Disable systemd service: {service_name}")
+                self.exec(f"systemctl disable {service_name}")
 
-            logging.info("Reset failed systemd services (if any)")
-            self.exec("systemctl reset-failed")
+                logging.info("Reset failed systemd services (if any)")
+                self.exec("systemctl reset-failed")
+        except Exception as e:
+            logging.exception(f"Failed stop systemd service. Reason: {e}")
 
     def reload_systemd(self):
-        logging.info("Reload systemd config")
-        self.exec('systemctl daemon-reload')
+        try:
+            logging.info("Reload systemd config")
+            self.exec('systemctl daemon-reload')
+        except Exception as e:
+            logging.exception(f"Failed to reload systemd. Reason: {e}")
 
     def activate_systemd_service(self, service_name):
-        if self.check_systemd_service_on(service_name):
-            logging.info(f"Stopping systemd service: {service_name}")
-            self.exec(f"systemctl stop {service_name}")
+        try:
+            if self.check_systemd_service_on(service_name):
+                logging.info(f"Stopping systemd service: {service_name}")
+                self.exec(f"systemctl stop {service_name}")
 
-            logging.info(f"Disable systemd service: {service_name}")
-            self.exec(f"systemctl disable {service_name}")
+                logging.info(f"Disable systemd service: {service_name}")
+                self.exec(f"systemctl disable {service_name}")
 
-            logging.info("Reset failed systemd services (if any)")
-            self.exec("systemctl reset-failed")
+                logging.info("Reset failed systemd services (if any)")
+                self.exec("systemctl reset-failed")
+        except Exception as e:
+            logging.exception(f"Failed activate systemd service. Reason: {e}")
 
     # Helper function to reload specified systemd service
     def restart_systemd_service(self, service_name):
@@ -520,7 +534,7 @@ class Installer():
             self.exec(f"systemctl restart {service_name}")
         except Exception as e:
             logging.exception(
-                f"Failed to restart systemd service: {service_name}")
+                f"Failed to restart systemd service: {service_name}. Reason: {e}")
 
     # Setup logging related systemd services
     def setup_logging_systemd(self):
@@ -555,9 +569,9 @@ class Installer():
 
                 # Restarting rsyslog can take a lot of time: https://github.com/rsyslog/rsyslog/issues/3133
                 self.restart_systemd_service("rsyslog.service")
-            except:
+            except Exception as e:
                 logging.exception(
-                    f"Failed to setup rsyslog service for {binary_name} logging")
+                    f"Failed to setup rsyslog service for {binary_name} logging. Reason: {e}")
 
         # Install cheqd-node configuration for logrotate if either of the following conditions are met:
         # 1. logrotate service file is not present
@@ -587,8 +601,9 @@ class Installer():
 
                 self.restart_systemd_service("logrotate.service")
                 self.restart_systemd_service("logrotate.timer")
-            except:
-                logging.exception("Failed to setup logrotate service")
+            except Exception as e:
+                logging.exception(
+                    f"Failed to setup logrotate service. Reason: {e}")
 
     def install(self):
         """
@@ -753,8 +768,9 @@ class Installer():
                     f"Creating {DEFAULT_CHEQD_USER} user and adding to {DEFAULT_CHEQD_USER} group")
                 self.exec(
                     f"adduser --system {DEFAULT_CHEQD_USER} --home {self.interviewer.home_dir} --shell /bin/bash --ingroup {DEFAULT_CHEQD_USER} --quiet")
-        except:
-            logging.exception(f"Failed to create {DEFAULT_CHEQD_USER} user")
+        except Exception as e:
+            logging.exception(
+                f"Failed to create {DEFAULT_CHEQD_USER} user. Reason: {e}")
 
     def mkdir_p(self, dir_name):
         try:
@@ -771,9 +787,9 @@ class Installer():
             shutil.chown(self.cheqd_log_dir,
                          'syslog',
                          DEFAULT_CHEQD_USER)
-        except:
+        except Exception as e:
             logging.exception(
-                f"Failed to setup {self.cheqd_log_dir} directory")
+                f"Failed to setup {self.cheqd_log_dir} directory. Reason: {e}")
 
     def setup_cosmovisor(self):
         try:
@@ -806,8 +822,8 @@ class Installer():
                 shutil.chown(self.cosmovisor_root_dir,
                              DEFAULT_CHEQD_USER,
                              DEFAULT_CHEQD_USER)
-        except:
-            logging.exception(f"Failed to setup Cosmovisor")
+        except Exception as e:
+            logging.exception(f"Failed to setup Cosmovisor. Reason: {e}")
 
     def set_cheqd_env_vars(self):
         self.set_env_vars("DEFAULT_CHEQD_HOME_DIR",
@@ -901,8 +917,8 @@ class Installer():
                          DEFAULT_CHEQD_USER,
                          DEFAULT_CHEQD_USER)
             self.reload_systemd()
-        except:
-            logging.exception(f"Failed to bump Cosmovisor")
+        except Exception as e:
+            logging.exception(f"Failed to bump Cosmovisor. Reason: {e}")
 
     def set_env_vars(self, env_var_name, env_var_value):
         if not self.check_if_env_var_already_set(env_var_name) and not self.is_default_shell_fish():
@@ -924,7 +940,7 @@ class Installer():
             with open(current_user_bashrc_path, "a") as current_user_bashrc_file:
                 current_user_bashrc_file.write(
                     f"export {env_var_name}={env_var_value}\n")
-        except:
+        except Exception:
             if is_user_cheqd:
                 logging.exception("Unable to set ENV vars for cheqd user")
             else:
@@ -980,8 +996,8 @@ class Installer():
             self.exec("sudo apt-get update")
             logging.info(f"Install pv to show progress of extraction")
             self.exec("sudo apt-get install -y pv")
-        except:
-            logging.exception(f"Failed to install dependencies")
+        except Exception as e:
+            logging.exception(f"Failed to install dependencies. Reason: {e}")
 
     def download_snapshot(self):
         try:
@@ -1016,8 +1032,8 @@ class Installer():
             else:
                 logging.exception(
                     f"Error encountered when downloading snapshot archive.")
-        except:
-            logging.exception(f"Failed to download snapshot")
+        except Exception as e:
+            logging.exception(f"Failed to download snapshot. Reason: {e}")
 
     def untar_from_snapshot(self):
         try:
@@ -1050,8 +1066,8 @@ class Installer():
             shutil.chown(self.cheqd_data_dir,
                          DEFAULT_CHEQD_USER,
                          DEFAULT_CHEQD_USER)
-        except:
-            logging.exception(f"Failed to extract snapshot")
+        except Exception as e:
+            logging.exception(f"Failed to extract snapshot. Reason: {e}")
 
 
 ###############################################################
@@ -1608,12 +1624,18 @@ class Interviewer:
             logging.exception(f"Failed to set minimum gas prices. Reason: {e}")
 
     def ask_for_log_level(self):
-        self.log_level = self.ask(
-            f"Specify log level (trace|debug|info|warn|error|fatal|panic)", default=CHEQD_NODED_LOG_LEVEL)
+        try:
+            self.log_level = self.ask(
+                f"Specify log level (trace|debug|info|warn|error|fatal|panic)", default=CHEQD_NODED_LOG_LEVEL)
+        except Exception as e:
+            logging.exception(f"Failed to set log level. Reason: {e}")
 
     def ask_for_log_format(self):
-        self.log_format = self.ask(
-            f"Specify log format (json|plain)", default=CHEQD_NODED_LOG_FORMAT)
+        try:
+            self.log_format = self.ask(
+                f"Specify log format (json|plain)", default=CHEQD_NODED_LOG_FORMAT)
+        except Exception as e:
+            logging.exception(f"Failed to set log format. Reason: {e}")
     
     def prepare_url_for_latest(self) -> str:
         template = TESTNET_SNAPSHOT if self.chain == TESTNET_CHAIN_ID else MAINNET_SNAPSHOT
@@ -1634,68 +1656,96 @@ class Interviewer:
         return _url
 
     def ask_for_upgrade(self):
-        answer = self.ask(
-            f"Existing cheqd-node configuration folder detected. Do you want to upgrade an existing cheqd-node installation? (yes/no)", default="no")
-        if answer.lower().startswith("y"):
-            self.is_upgrade = True
-        elif answer.lower().startswith("n"):
-            self.is_upgrade = False
-        else:
-            logging.exception(f"Invalid input provided during installation.")
+        try:
+            answer = self.ask(
+                f"Existing cheqd-node configuration folder detected. Do you want to upgrade an existing cheqd-node installation? (yes/no)", default="no")
+            if answer.lower().startswith("y"):
+                self.is_upgrade = True
+            elif answer.lower().startswith("n"):
+                self.is_upgrade = False
+            else:
+                logging.exception(
+                    f"Invalid input provided during installation.")
+        except Exception as e:
+            logging.exception(f"Failed to upgrade cheqd-node. Reason: {e}")
 
     def ask_for_install_from_scratch(self):
-        answer = self.ask(
-            f"WARNING: Doing a fresh installation of cheqd-node will remove ALL existing configuration and data. "
-            f"CAUTION: Please ensure you have a backup of your existing configuration and data before proceeding. "
-            f"Do you want to do fresh installation of cheqd-node? (yes/no)", default="no")
-        if answer.lower().startswith("y"):
-            self.is_from_scratch = True
-        elif answer.lower().startswith("n"):
-            self.is_from_scratch = False
-        else:
-            logging.exception(f"Invalid input provided during installation.")
+        try:
+            answer = self.ask(
+                f"WARNING: Doing a fresh installation of cheqd-node will remove ALL existing configuration and data. "
+                f"CAUTION: Please ensure you have a backup of your existing configuration and data before proceeding. "
+                f"Do you want to do fresh installation of cheqd-node? (yes/no)", default="no")
+            if answer.lower().startswith("y"):
+                self.is_from_scratch = True
+            elif answer.lower().startswith("n"):
+                self.is_from_scratch = False
+            else:
+                logging.exception(
+                    f"Invalid input provided during installation.")
+        except Exception as e:
+            logging.exception(
+                f"Failed to set whether cheqd-node should install from scratch. Reason: {e}")
 
     def ask_for_rewrite_node_systemd(self):
-        answer = self.ask(
-            f"Overwrite existing systemd configuration for cheqd-node? (yes/no)", default="yes")
-        if answer.lower().startswith("y"):
-            self.rewrite_node_systemd = True
-        elif answer.lower().startswith("n"):
-            self.rewrite_node_systemd = False
-        else:
-            logging.exception(f"Invalid input provided during installation.")
+        try:
+            answer = self.ask(
+                f"Overwrite existing systemd configuration for cheqd-node? (yes/no)", default="yes")
+            if answer.lower().startswith("y"):
+                self.rewrite_node_systemd = True
+            elif answer.lower().startswith("n"):
+                self.rewrite_node_systemd = False
+            else:
+                logging.exception(
+                    f"Invalid input provided during installation.")
+        except Exception as e:
+            logging.exception(
+                f"Failed to set whether overwrite existing systemd configuration for cheqd-node. Reason: {e}")
 
     def ask_for_rewrite_logrotate(self):
-        answer = self.ask(
-            f"Overwrite existing configuration for logrotate? (yes/no)", default="yes")
-        if answer.lower().startswith("y"):
-            self.rewrite_logrotate = True
-        elif answer.lower().startswith("n"):
-            self.rewrite_logrotate = False
-        else:
-            logging.exception(f"Invalid input provided during installation.")
+        try:
+            answer = self.ask(
+                f"Overwrite existing configuration for logrotate? (yes/no)", default="yes")
+            if answer.lower().startswith("y"):
+                self.rewrite_logrotate = True
+            elif answer.lower().startswith("n"):
+                self.rewrite_logrotate = False
+            else:
+                logging.exception(
+                    f"Invalid input provided during installation.")
+        except Exception as e:
+            logging.exception(
+                f"Failed to set whether overwrite existing configuration for logrotate. Reason: {e}")
 
     def ask_for_rewrite_rsyslog(self):
-        answer = self.ask(
-            f"Overwrite existing configuration for cheqd-node logging? (yes/no)", default="yes")
-        if answer.lower().startswith("y"):
-            self.rewrite_rsyslog = True
-        elif answer.lower().startswith("n"):
-            self.rewrite_rsyslog = False
-        else:
-            logging.exception(f"Invalid input provided during installation.")
+        try:
+            answer = self.ask(
+                f"Overwrite existing configuration for cheqd-node logging? (yes/no)", default="yes")
+            if answer.lower().startswith("y"):
+                self.rewrite_rsyslog = True
+            elif answer.lower().startswith("n"):
+                self.rewrite_rsyslog = False
+            else:
+                logging.exception(
+                    f"Invalid input provided during installation.")
+        except Exception as e:
+            logging.exception(
+                f"Failed to set whether overwrite existing rsyslog configuration for cheqd-node. Reason: {e}")
 
     def ask_for_init_from_snapshot(self):
-        answer = self.ask(
-            f"CAUTION: Downloading a snapshot replaces your existing copy of chain data. Usually safe to use this option when doing a fresh installation. "
-            f"Do you want to download a snapshot of the existing chain to speed up node synchronization? (yes/no)", default=DEFAULT_INIT_FROM_SNAPSHOT)
-        if answer.lower().startswith("y"):
-            self.snapshot_url = self.prepare_url_for_latest()
-            self.init_from_snapshot = True
-        elif answer.lower().startswith("n"):
-            self.init_from_snapshot = False
-        else:
-            logging.exception(f"Invalid input provided during installation.")
+        try:
+            answer = self.ask(
+                f"CAUTION: Downloading a snapshot replaces your existing copy of chain data. Usually safe to use this option when doing a fresh installation. "
+                f"Do you want to download a snapshot of the existing chain to speed up node synchronization? (yes/no)", default=DEFAULT_INIT_FROM_SNAPSHOT)
+            if answer.lower().startswith("y"):
+                self.init_from_snapshot = True
+            elif answer.lower().startswith("n"):
+                self.init_from_snapshot = False
+            else:
+                logging.exception(
+                    f"Invalid input provided during installation.")
+        except Exception as e:
+            logging.exception(
+                f"Failed to set whether init snapshot. Reason: {e}")
 
 
 if __name__ == '__main__':
