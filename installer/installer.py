@@ -35,7 +35,8 @@ DEFAULT_COSMOVISOR_BINARY_NAME = "cosmovisor"
 MAINNET_CHAIN_ID = "cheqd-mainnet-1"
 TESTNET_CHAIN_ID = "cheqd-testnet-6"
 PRINT_PREFIX = "********* "
-DEFAULT_DEBUG_BRANCH = os.getenv("DEFAULT_DEBUG_BRANCH") if sys.flags.dev_mode and os.getenv("DEFAULT_DEBUG_BRANCH") != None else "main"
+DEFAULT_DEBUG_BRANCH = os.getenv("DEFAULT_DEBUG_BRANCH") if sys.flags.dev_mode and os.getenv(
+    "DEFAULT_DEBUG_BRANCH") != None else "main"
 
 ###############################################################
 ###     		Cosmovisor configuration      				###
@@ -105,15 +106,17 @@ CHEQD_NODED_P2P_MAX_PACKET_MSG_PAYLOAD_SIZE = 10240
 ###############################################################
 
 # Set logging configuration
-logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', 
-    datefmt='%d-%b-%Y %H:%M:%S', 
-    raiseExceptions=True,
-    level=logging.INFO)
+logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
+                    datefmt='%d-%b-%Y %H:%M:%S',
+                    raiseExceptions=True,
+                    level=logging.INFO)
 
 # Handle Ctrl+C / SIGINT halts requests
 def sigint_handler(signal, frame):
     print('Exiting from cheqd-node installer')
     sys.exit(0)
+
+
 signal.signal(signal.SIGINT, sigint_handler)
 
 # Helper function to check if the URL is valid
@@ -255,7 +258,8 @@ class Installer():
     def cheqd_root_dir(self):
         # CHEQD_NODED_HOME variable can be picked up by cheqd-noded, so this should be set as an environment variable later
         # Default: /home/cheqd/.cheqdnode
-        CHEQD_NODED_HOME = os.path.join(self.interviewer.home_dir, ".cheqdnode")
+        CHEQD_NODED_HOME = os.path.join(
+            self.interviewer.home_dir, ".cheqdnode")
         return CHEQD_NODED_HOME
 
     @property
@@ -297,7 +301,6 @@ class Installer():
         else:
             os_arch = 'arm64'
         return COSMOVISOR_BINARY_URL.format(DEFAULT_LATEST_COSMOVISOR_VERSION, DEFAULT_LATEST_COSMOVISOR_VERSION, os_arch)
-
 
     @post_process
     def exec(self, cmd, use_stdout=True, suppress_err=False):
@@ -346,24 +349,24 @@ class Installer():
             shutil.rmtree(path)
         if os.path.exists(path):
             os.remove(path)
-    
+
     def prepare_url_for_latest(self) -> str:
-            template = TESTNET_SNAPSHOT if self.chain == TESTNET_CHAIN_ID else MAINNET_SNAPSHOT
-            _date = datetime.date.today()
-            _days_counter = 0
-            _is_url_valid = False
+        template = TESTNET_SNAPSHOT if self.chain == TESTNET_CHAIN_ID else MAINNET_SNAPSHOT
+        _date = datetime.date.today()
+        _days_counter = 0
+        _is_url_valid = False
 
-            while not _is_url_valid and _days_counter <= MAX_SNAPSHOT_DAYS:
-                _url = template.format(_date.strftime(
-                    "%Y-%m-%d"), _date.strftime("%Y-%m-%d"))
-                _is_url_valid = is_valid_url(_url)
-                _days_counter += 1
-                _date -= datetime.timedelta(days=1)
+        while not _is_url_valid and _days_counter <= MAX_SNAPSHOT_DAYS:
+            _url = template.format(_date.strftime(
+                "%Y-%m-%d"), _date.strftime("%Y-%m-%d"))
+            _is_url_valid = is_valid_url(_url)
+            _days_counter += 1
+            _date -= datetime.timedelta(days=1)
 
-            if not _is_url_valid:
-                logging.exception("Could not find the valid snapshot for the last {} days".format(
-                    MAX_SNAPSHOT_DAYS))
-            return _url
+        if not _is_url_valid:
+            logging.exception("Could not find the valid snapshot for the last {} days".format(
+                MAX_SNAPSHOT_DAYS))
+        return _url
 
     def pre_install(self):
         # Pre-installation checks
@@ -427,11 +430,12 @@ class Installer():
     def setup_node_systemd(self):
         # Setup the following systemd services:
         # 1. cheqd-noded.service or cheqd-cosmovisor.service
-        
+
         logging.info("Setting up systemd config")
 
         # Check if systemd service files already exist for cheqd-node
-        service_file_exists = os.path.exists(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH) or os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
+        service_file_exists = os.path.exists(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH) or os.path.exists(
+            DEFAULT_STANDALONE_SERVICE_FILE_PATH)
 
         if not self.interviewer.is_upgrade or \
                 self.interviewer.rewrite_node_systemd or \
@@ -442,13 +446,14 @@ class Installer():
             if self.interviewer.is_cosmo_needed:
                 try:
                     # Setup cheqd-cosmovisor.service if requested
-                    logging.info("Enabling cheqd-cosmovisor.service in systemd")
-                    
+                    logging.info(
+                        "Enabling cheqd-cosmovisor.service in systemd")
+
                     # Get the cosmovisor service file template from GitHub
-                    self.exec(f"curl -s {COSMOVISOR_SERVICE_TEMPLATE} > {DEFAULT_COSMOVISOR_SERVICE_FILE_PATH}")
+                    self.exec(
+                        f"curl -s {COSMOVISOR_SERVICE_TEMPLATE} > {DEFAULT_COSMOVISOR_SERVICE_FILE_PATH}")
 
                     fname = os.path.basename(COSMOVISOR_SERVICE_TEMPLATE)
-                    
 
                     with open(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH, mode="w") as fd:
                         fd.write(self.cosmovisor_service_cfg)
@@ -456,21 +461,22 @@ class Installer():
                             s = re.sub(
                                 r'({CHEQD_ROOT_DIR}|{DEFAULT_BINARY_NAME}|{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}|{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}|{DEFAULT_DAEMON_POLL_INTERVAL}|{DEFAULT_UNSAFE_SKIP_BACKUP}|{DEFAULT_DAEMON_RESTART_DELAY})',
                                 lambda m: {'{CHEQD_ROOT_DIR}': self.cheqd_root_dir,
-                                        '{DEFAULT_BINARY_NAME}': DEFAULT_BINARY_NAME,
-                                        '{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}':  self.interviewer.daemon_allow_download_binaries,
-                                        '{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}': self.interviewer.daemon_restart_after_upgrade,
-                                        '{DEFAULT_DAEMON_POLL_INTERVAL}': DEFAULT_DAEMON_POLL_INTERVAL,
-                                        '{DEFAULT_UNSAFE_SKIP_BACKUP}': DEFAULT_UNSAFE_SKIP_BACKUP,
-                                        '{DEFAULT_DAEMON_RESTART_DELAY}': DEFAULT_DAEMON_RESTART_DELAY}[m.group()],
+                                           '{DEFAULT_BINARY_NAME}': DEFAULT_BINARY_NAME,
+                                           '{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}':  self.interviewer.daemon_allow_download_binaries,
+                                           '{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}': self.interviewer.daemon_restart_after_upgrade,
+                                           '{DEFAULT_DAEMON_POLL_INTERVAL}': DEFAULT_DAEMON_POLL_INTERVAL,
+                                           '{DEFAULT_UNSAFE_SKIP_BACKUP}': DEFAULT_UNSAFE_SKIP_BACKUP,
+                                           '{DEFAULT_DAEMON_RESTART_DELAY}': DEFAULT_DAEMON_RESTART_DELAY}[m.group()],
                                 f.read()
                             )
                 except:
-                    logging.exception("Failed to setup cheqd-cosmovisor systemd service")
+                    logging.exception(
+                        "Failed to setup cheqd-cosmovisor systemd service")
             else:
                 logging.info("Enabling systemd service for cheqd-noded")
-                self.exec(f"curl -s {STANDALONE_SERVICE_TEMPLATE} > {DEFAULT_STANDALONE_SERVICE_FILE_PATH}")
+                self.exec(
+                    f"curl -s {STANDALONE_SERVICE_TEMPLATE} > {DEFAULT_STANDALONE_SERVICE_FILE_PATH}")
 
-            
             self.exec(
                 f"systemctl enable {DEFAULT_COSMOVISOR_SERVICE_NAME if self.interviewer.is_cosmo_needed else DEFAULT_STANDALONE_SERVICE_NAME}")
 
@@ -531,7 +537,8 @@ class Installer():
             logging.info(f"Trying to restart systemd service: {service_name}")
             self.exec(f"systemctl restart {service_name}")
         except Exception as e:
-            logging.exception(f"Failed to restart systemd service: {service_name}")
+            logging.exception(
+                f"Failed to restart systemd service: {service_name}")
 
     # Setup logging related systemd services
     def setup_logging_systemd(self):
@@ -542,29 +549,33 @@ class Installer():
             try:
                 # Warn user if rsyslog service file already exists
                 if os.path.exists(DEFAULT_RSYSLOG_FILE):
-                    logging.warn(f"Existing rsyslog configuration at {DEFAULT_RSYSLOG_FILE} will be overwritten")
-                
+                    logging.warn(
+                        f"Existing rsyslog configuration at {DEFAULT_RSYSLOG_FILE} will be overwritten")
+
                 # Fetch rsyslog template file from GitHub and save it to the default location
-                self.exec(f"curl --progress-bar {RSYSLOG_TEMPLATE} > {DEFAULT_RSYSLOG_FILE}")
-                
+                self.exec(
+                    f"curl --progress-bar {RSYSLOG_TEMPLATE} > {DEFAULT_RSYSLOG_FILE}")
+
                 # Determine the binary name for logging based on installation type
                 binary_name = DEFAULT_COSMOVISOR_BINARY_NAME if self.interviewer.is_cosmo_needed else DEFAULT_BINARY_NAME
 
-                logging.info(f"Configuring rsyslog systemd service for {binary_name} logging")
+                logging.info(
+                    f"Configuring rsyslog systemd service for {binary_name} logging")
 
                 # Modify rsyslog template file with values specific to the installation
                 with open(DEFAULT_RSYSLOG_FILE, mode="w") as fname:
                     fname.write = re.sub(
                         r'({BINARY_FOR_LOGGING}|{CHEQD_LOG_DIR})',
                         lambda m: {'{BINARY_FOR_LOGGING}': binary_name,
-                            '{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()],
+                                   '{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()],
                         fname.read()
                     )
-                
+
                 # Restarting rsyslog can take a lot of time: https://github.com/rsyslog/rsyslog/issues/3133
                 self.restart_systemd_service("rsyslog.service")
             except:
-                logging.exception(f"Failed to setup rsyslog service for {binary_name} logging")
+                logging.exception(
+                    f"Failed to setup rsyslog service for {binary_name} logging")
 
         # Install cheqd-node configuration for logrotate if either of the following conditions are met:
         # 1. logrotate service file is not present
@@ -573,26 +584,29 @@ class Installer():
             try:
                 # Warn user if logrotate service file already exists
                 if os.path.exists(DEFAULT_LOGROTATE_FILE):
-                    logging.warn(f"Existing logrotate configuration at {DEFAULT_LOGROTATE_FILE} will be overwritten")
+                    logging.warn(
+                        f"Existing logrotate configuration at {DEFAULT_LOGROTATE_FILE} will be overwritten")
 
                 # Fetch logrotate template file from GitHub and save it to the default location
-                self.exec(f"curl --progress-bar {LOGROTATE_TEMPLATE} > {DEFAULT_LOGROTATE_FILE}")
+                self.exec(
+                    f"curl --progress-bar {LOGROTATE_TEMPLATE} > {DEFAULT_LOGROTATE_FILE}")
 
-                logging.info(f"Configuring logrotate systemd service for cheqd-node logging")
+                logging.info(
+                    f"Configuring logrotate systemd service for cheqd-node logging")
 
                 # Modify logrotate template file with values specific to the installation
                 with open(DEFAULT_LOGROTATE_FILE, mode="w") as fname:
                     fname.write = re.sub(
                         r'({CHEQD_LOG_DIR})',
-                        lambda m: {'{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()],
+                        lambda m: {'{CHEQD_LOG_DIR}': self.cheqd_log_dir}[
+                            m.group()],
                         fname.read()
                     )
-                
+
                 self.restart_systemd_service("logrotate.service")
                 self.restart_systemd_service("logrotate.timer")
             except:
                 logging.exception("Failed to setup logrotate service")
-
 
     def install(self):
         """
@@ -639,7 +653,7 @@ class Installer():
                 "Downloading snapshot and extracting archive. This can take a *really* long time...")
             self.download_snapshot()
             self.untar_from_snapshot()
-        
+
         self.setup_node_systemd()
         self.setup_logging_systemd()
         logging.info("The cheqd-noded binary has been successfully installed")
@@ -651,7 +665,8 @@ class Installer():
                 f"""sudo su -c 'cheqd-noded init {self.interviewer.moniker}' {DEFAULT_CHEQD_USER}""")
 
             # Downloading genesis file
-            self.exec(f"curl {GENESIS_FILE.format(self.interviewer.chain)} > {os.path.join(self.cheqd_config_dir, 'genesis.json')}")
+            self.exec(
+                f"curl {GENESIS_FILE.format(self.interviewer.chain)} > {os.path.join(self.cheqd_config_dir, 'genesis.json')}")
             shutil.chown(os.path.join(self.cheqd_config_dir, 'genesis.json'),
                          DEFAULT_CHEQD_USER,
                          DEFAULT_CHEQD_USER)
@@ -679,7 +694,8 @@ class Installer():
                 self.cheqd_config_dir, "config.toml"))
 
         # Setting up the seeds
-        seeds = self.exec(f"curl {SEEDS_FILE.format(self.interviewer.chain)}").stdout.decode("utf-8").strip()
+        seeds = self.exec(
+            f"curl {SEEDS_FILE.format(self.interviewer.chain)}").stdout.decode("utf-8").strip()
         seeds_search_text = 'seeds = ""'
         seeds_replace_text = 'seeds = "{}"'.format(seeds)
         search_and_replace(seeds_search_text, seeds_replace_text, os.path.join(
@@ -774,7 +790,8 @@ class Installer():
                          'syslog',
                          DEFAULT_CHEQD_USER)
         except:
-            logging.exception(f"Failed to setup {self.cheqd_log_dir} directory")
+            logging.exception(
+                f"Failed to setup {self.cheqd_log_dir} directory")
 
     def setup_cosmovisor(self):
         try:
@@ -790,7 +807,8 @@ class Installer():
             self.set_cosmovisor_env_vars()
 
             if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)):
-                logging.info(f"Moving Cosmovisor binary to installation directory")
+                logging.info(
+                    f"Moving Cosmovisor binary to installation directory")
                 shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
 
             self.init_cosmovisor()
@@ -798,7 +816,8 @@ class Installer():
             if self.interviewer.is_upgrade and \
                     os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
 
-                logging.info(f"Copying upgrade-info.json file to cosmovisor/current/")
+                logging.info(
+                    f"Copying upgrade-info.json file to cosmovisor/current/")
                 shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
                             os.path.join(self.cosmovisor_root_dir, "current"))
                 logging.info(f"Changing owner to {DEFAULT_CHEQD_USER} user")
@@ -839,7 +858,8 @@ class Installer():
             os.remove(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
 
         if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
-            logging.info(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
+            logging.info(
+                f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
             os.symlink(self.cosmovisor_cheqd_bin_path,
                        os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
 
@@ -861,7 +881,8 @@ class Installer():
                 DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
 
             if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
-                logging.info(f"Creating symlink for current Cosmovisor version")
+                logging.info(
+                    f"Creating symlink for current Cosmovisor version")
                 os.symlink(os.path.join(self.cosmovisor_root_dir, "genesis"),
                            os.path.join(self.cosmovisor_root_dir, "current"))
 
@@ -883,7 +904,8 @@ class Installer():
 
             if self.interviewer.is_upgrade and \
                     os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
-                logging.info(f"Copying upgrade-info.json file to cosmovisor/current/")
+                logging.info(
+                    f"Copying upgrade-info.json file to cosmovisor/current/")
                 shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
                             os.path.join(self.cosmovisor_root_dir, "current"))
                 logging.info(f"Changing owner to {DEFAULT_CHEQD_USER} user")
@@ -993,7 +1015,8 @@ class Installer():
             free_disk_space = self.exec(
                 f"df -P -B1 {self.cheqd_root_dir} | tail -1 | awk '{{print $4}}'").stdout.strip()
             if int(archive_size) < int(free_disk_space):
-                logging.info(f"Downloading snapshot archive. This may take a while...")
+                logging.info(
+                    f"Downloading snapshot archive. This may take a while...")
                 self.exec(
                     f"wget -c {self.interviewer.snapshot_url} -P {self.cheqd_root_dir}")
                 archive_path = os.path.join(self.cheqd_root_dir, archive_name)
@@ -1020,7 +1043,8 @@ class Installer():
                 self.cheqd_root_dir, os.path.basename(self.interviewer.snapshot_url))
             # Check if there is enough space to extract snapshot archive
             self.install_dependencies()
-            logging.info(f"Extracting snapshot archive. This may take a while...")
+            logging.info(
+                f"Extracting snapshot archive. This may take a while...")
 
             # Extract to cheqd node data directory EXCEPT for validator state
             self.exec(
@@ -1076,7 +1100,6 @@ class Interviewer:
         self._rewrite_node_systemd = False
         self._rewrite_rsyslog = False
         self._rewrite_logrotate = False
-
 
     ### This section sets @property variables ###
     @property
@@ -1183,7 +1206,6 @@ class Interviewer:
     def daemon_restart_after_upgrade(self) -> str:
         return self._daemon_restart_after_upgrade
 
-
     ### This section sets @property variables ###
     @release.setter
     def release(self, release):
@@ -1277,7 +1299,6 @@ class Interviewer:
     def daemon_restart_after_upgrade(self, daemon_restart_after_upgrade):
         self._daemon_restart_after_upgrade = daemon_restart_after_upgrade
 
-
     ### This section contains helper functions for the interviewer ###
 
     # Set value to default answer for a question
@@ -1301,7 +1322,6 @@ class Interviewer:
             kwargs["stderr"] = subprocess.DEVNULL
         return subprocess.run(cmd, **kwargs)
 
-
     # Check if cheqd-noded is installed
     def is_node_installed(self) -> bool:
         try:
@@ -1310,8 +1330,8 @@ class Interviewer:
             else:
                 return False
         except Exception as e:
-            logging.exception(f"Could not check if cheqd-noded is already installed. Reason: {e}")
-
+            logging.exception(
+                f"Could not check if cheqd-noded is already installed. Reason: {e}")
 
     # Check if Cosmovisor is installed
     def is_cosmovisor_installed(self) -> bool:
@@ -1323,8 +1343,8 @@ class Interviewer:
                 self.is_cosmovisor_bump_needed = False
                 return False
         except Exception as e:
-            logging.exception(f"Could not check if Cosmovisor is already installed. Reason: {e}")
-
+            logging.exception(
+                f"Could not check if Cosmovisor is already installed. Reason: {e}")
 
     # Check if a systemd config is installed for a given service file
     def is_systemd_config_installed(self, systemd_service_file) -> bool:
@@ -1334,31 +1354,33 @@ class Interviewer:
             else:
                 return False
         except Exception as e:
-            logging.exception(f"Could not check if {systemd_service_file} already exists. Reason: {e}")
-
+            logging.exception(
+                f"Could not check if {systemd_service_file} already exists. Reason: {e}")
 
     # Get list of last N releases for cheqd-node from GitHub
     def get_releases(self):
         try:
-            req = request.Request("https://api.github.com/repos/cheqd/cheqd-node/releases")
+            req = request.Request(
+                "https://api.github.com/repos/cheqd/cheqd-node/releases")
             req.add_header("Accept", "application/vnd.github.v3+json")
             with request.urlopen(req) as response:
                 r_list = json.loads(response.read().decode("utf-8").strip())
                 return [Release(r) for r in r_list]
         except Exception as e:
-            logging.exception(f"Could not get releases from GitHub. Reason: {e}")
-
+            logging.exception(
+                f"Could not get releases from GitHub. Reason: {e}")
 
     # The "latest" stable release may not be in last N releases, so we need to get it separately
     def get_latest_release(self):
         try:
-            req = request.Request("https://api.github.com/repos/cheqd/cheqd-node/releases/latest")
+            req = request.Request(
+                "https://api.github.com/repos/cheqd/cheqd-node/releases/latest")
             req.add_header("Accept", "application/vnd.github.v3+json")
             with request.urlopen(req) as response:
                 return Release(json.loads(response.read().decode("utf-8")))
         except Exception as e:
-            logging.exception(f"Could not get latest release from GitHub. Reason: {e}")
-
+            logging.exception(
+                f"Could not get latest release from GitHub. Reason: {e}")
 
     # Compile a list of releases to be displayed to the user
     # The "latest" stable release is always displayed first
@@ -1370,7 +1392,8 @@ class Interviewer:
                     copy_r_list.pop(i)
                     return copy_r_list
         except Exception as e:
-            logging.exception(f"Could not assemble list of releases to show to the user. Reason: {e}")
+            logging.exception(
+                f"Could not assemble list of releases to show to the user. Reason: {e}")
 
     # Ask user to select a version of cheqd-node to install
     def ask_for_version(self):
@@ -1386,31 +1409,35 @@ class Interviewer:
             # Print list of releases
             for i, release in enumerate(all_releases[0: LAST_N_RELEASES]):
                 print(f"{i + 1}. {release.version}")
-            
-            release_num = int(self.ask("Choose list option number above to select version of cheqd-node to install", default=1))
-            
+
+            release_num = int(self.ask(
+                "Choose list option number above to select version of cheqd-node to install", default=1))
+
             # Check if user input is valid
             if release_num >= 1 and release_num <= len(all_releases):
                 self.release = all_releases[release_num - 1]
             else:
-                raise ValueError(f"Invalid release number picked from list of releases: {release_num}")
+                raise ValueError(
+                    f"Invalid release number picked from list of releases: {release_num}")
 
         except Exception as e:
-            logging.exception(f"Failed to selected version of cheqd-noded. Reason: {e}")
-
+            logging.exception(
+                f"Failed to selected version of cheqd-noded. Reason: {e}")
 
     # Set cheqd user's home directory
     def ask_for_home_directory(self, default) -> str:
         try:
-            self.home_dir = self.ask(f"Set path for cheqd user's home directory", default=DEFAULT_CHEQD_HOME_DIR)
+            self.home_dir = self.ask(
+                f"Set path for cheqd user's home directory", default=DEFAULT_CHEQD_HOME_DIR)
         except Exception as e:
-            logging.exception(f"Failed to set cheqd user's home directory. Reason: {e}")
-
+            logging.exception(
+                f"Failed to set cheqd user's home directory. Reason: {e}")
 
     # Ask whether user wants to do a install from scratch
     def ask_for_setup(self):
         try:
-            answer = self.ask(f"Do you want to setup a new cheqd-node installation? (yes/no)", default="yes")
+            answer = self.ask(
+                f"Do you want to setup a new cheqd-node installation? (yes/no)", default="yes")
             if answer.lower().startswith("y"):
                 self.is_setup_needed = True
             elif answer.lower().startswith("n"):
@@ -1419,8 +1446,8 @@ class Interviewer:
                 logging.error(f"Please choose either 'yes' or 'no'")
                 self.ask_for_setup()
         except Exception as e:
-            logging.exception(f"Failed to set fresh installation parameters. Reason: {e}")
-
+            logging.exception(
+                f"Failed to set fresh installation parameters. Reason: {e}")
 
     # Ask user which network to join
     def ask_for_chain(self):
@@ -1434,103 +1461,115 @@ class Interviewer:
             elif answer == 2:
                 self.chain = "testnet"
             else:
-                logging.error(f"Invalid network selected during installation. Please choose either 1 or 2.")
+                logging.error(
+                    f"Invalid network selected during installation. Please choose either 1 or 2.")
                 self.ask_for_chain()
         except Exception as e:
-            logging.exception(f"Failed to set network/chain to join. Reason: {e}")
-
+            logging.exception(
+                f"Failed to set network/chain to join. Reason: {e}")
 
     # Ask user whether to install with Cosmovisor
     def ask_for_cosmovisor(self):
         try:
             logging.info(f"Installing cheqd-node with Cosmovisor allows for automatic unattended upgrades for valid software upgrade proposals. See https://docs.cosmos.network/main/tooling/cosmovisor for more information.\n")
-            answer = self.ask(f"Install cheqd-noded using Cosmovisor? (yes/no)", default=DEFAULT_USE_COSMOVISOR)
+            answer = self.ask(
+                f"Install cheqd-noded using Cosmovisor? (yes/no)", default=DEFAULT_USE_COSMOVISOR)
             if answer.lower().startswith("y"):
                 self.is_cosmo_needed = True
             elif answer.lower().startswith("n"):
                 self.is_cosmo_needed = False
             else:
-                logging.error(f"Invalid input provided during installation. Please choose either 'yes' or 'no'.")
+                logging.error(
+                    f"Invalid input provided during installation. Please choose either 'yes' or 'no'.")
                 self.ask_for_cosmovisor()
         except Exception as e:
-            logging.exception(f"Failed to set whether installation should be done with Cosmovisor. Reason: {e}")
-
+            logging.exception(
+                f"Failed to set whether installation should be done with Cosmovisor. Reason: {e}")
 
     # Ask user whether to bump Cosmovisor to latest version
     def ask_for_cosmovisor_bump(self):
         try:
-            answer = self.ask(f"Do you want to bump your Cosmovisor to {DEFAULT_LATEST_COSMOVISOR_VERSION} ? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
+            answer = self.ask(
+                f"Do you want to bump your Cosmovisor to {DEFAULT_LATEST_COSMOVISOR_VERSION} ? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
             if answer.lower().startswith("y"):
                 self.is_cosmovisor_bump_needed = True
             elif answer.lower().startswith("n"):
                 self.is_cosmovisor_bump_needed = False
             else:
-                logging.error(f"Invalid input provided during installation. Please choose either 'yes' or 'no'.")
+                logging.error(
+                    f"Invalid input provided during installation. Please choose either 'yes' or 'no'.")
                 self.ask_for_cosmovisor_bump()
         except Exception as e:
-            logging.exception(f"Failed to set whether Cosmovisor should be bumped to latest version. Reason: {e}")
-
+            logging.exception(
+                f"Failed to set whether Cosmovisor should be bumped to latest version. Reason: {e}")
 
     # Ask user whether to allow Cosmovisor to automatically download binaries for scheduled upgrades
     def ask_for_daemon_allow_download_binaries(self):
         try:
-            answer = self.ask(f"Do you want Cosmovisor to automatically download binaries for scheduled upgrades? (yes/no)", default="yes")
+            answer = self.ask(
+                f"Do you want Cosmovisor to automatically download binaries for scheduled upgrades? (yes/no)", default="yes")
             if answer.lower().startswith("y"):
                 self.daemon_allow_download_binaries = "true"
             elif answer.lower().startswith("n"):
                 self.daemon_allow_download_binaries = "false"
             else:
-                logging.error(f"Invalid input provided during installation. Please choose either 'yes' or 'no'.")
+                logging.error(
+                    f"Invalid input provided during installation. Please choose either 'yes' or 'no'.")
                 self.ask_for_daemon_allow_download_binaries()
         except Exception as e:
-            logging.exception(f"Failed to set whether Cosmovisor should automatically download binaries for scheduled upgrades. Reason: {e}")
-    
-    
+            logging.exception(
+                f"Failed to set whether Cosmovisor should automatically download binaries for scheduled upgrades. Reason: {e}")
+
     # Ask whether Cosmovisor should restart daemon after upgrade
     def ask_for_daemon_restart_after_upgrade(self):
         try:
-            answer = self.ask(f"Do you want Cosmovisor to automatically restart cheqd-noded service after an upgrade has been applied? (yes/no)", default="yes")
+            answer = self.ask(
+                f"Do you want Cosmovisor to automatically restart cheqd-noded service after an upgrade has been applied? (yes/no)", default="yes")
             if answer.lower().startswith("y"):
                 self.daemon_restart_after_upgrade = "true"
             elif answer.lower().startswith("n"):
                 self.daemon_restart_after_upgrade = "false"
             else:
-                logging.error(f"Invalid input provided during installation. Please choose either 'yes' or 'no'.")
+                logging.error(
+                    f"Invalid input provided during installation. Please choose either 'yes' or 'no'.")
                 self.ask_for_daemon_restart_after_upgrade()
         except Exception as e:
-            logging.exception(f"Failed to set whether Cosmovisor should automatically restart cheqd-noded service after an upgrade has been applied. Reason: {e}")
-
+            logging.exception(
+                f"Failed to set whether Cosmovisor should automatically restart cheqd-noded service after an upgrade has been applied. Reason: {e}")
 
     # Ask user for node moniker
     def ask_for_moniker(self):
         try:
             logging.info(f"Moniker is a human-readable name for your cheqd-node. This is NOT the same as your validator name, and is only used to uniquely identify your node for Tendermint P2P address book. It can be edited later in your ~.cheqdnode/config/config.toml file.\n")
-            answer = self.ask(f"Provide a moniker for your cheqd-node", default=CHEQD_NODED_MONIKER)
+            answer = self.ask(
+                f"Provide a moniker for your cheqd-node", default=CHEQD_NODED_MONIKER)
             if answer is not None:
                 self.moniker = answer
             else:
-                logging.error(f"Invalid moniker provided during cheqd-noded setup.")
+                logging.error(
+                    f"Invalid moniker provided during cheqd-noded setup.")
         except Exception as e:
             logging.exception(f"Failed to set moniker. Reason: {e}")
-
 
     # Ask for node's external IP address or DNS name
     def ask_for_external_address(self):
         try:
             logging.info(f"External address is the publicly accessible IP address or DNS name of your cheqd-node. This is used to advertise your node's P2P address to other nodes in the network. If you are running your node behind a NAT, you should set this to your public IP address or DNS name. If you are running your node on a public IP address, you can leave this blank to automatically fetch your IP address via DNS resolver lookup. This sends a `dig` request to whoami.cloudflare.com\n\n")
-            answer = self.ask(f"What is the externally-reachable IP address or DNS name for your cheqd-node? [default: Fetch automatically via DNS resolver lookup]: {os.linesep}")
+            answer = self.ask(
+                f"What is the externally-reachable IP address or DNS name for your cheqd-node? [default: Fetch automatically via DNS resolver lookup]: {os.linesep}")
             if answer:
                 self.external_address = answer
             else:
-                self.external_address = str(self.exec("dig +short txt ch whoami.cloudflare @1.1.1.1").stdout).strip("""b'"\\n""")
+                self.external_address = str(self.exec(
+                    "dig +short txt ch whoami.cloudflare @1.1.1.1").stdout).strip("""b'"\\n""")
         except Exception as e:
             logging.exception(f"Failed to set external address. Reason: {e}")
-
 
     # Ask for node's P2P port
     def ask_for_p2p_port(self):
         try:
-            answer = self.ask(f"Specify your node's P2P port", default=DEFAULT_P2P_PORT)
+            answer = self.ask(f"Specify your node's P2P port",
+                              default=DEFAULT_P2P_PORT)
             if answer is not None:
                 self.p2p_port = answer
             else:
@@ -1538,11 +1577,11 @@ class Interviewer:
         except Exception as e:
             logging.exception(f"Failed to set P2P port. Reason: {e}")
 
-
     # Ask for node's RPC port
     def ask_for_rpc_port(self):
         try:
-            answer = self.ask(f"Specify your node's RPC port", default=DEFAULT_RPC_PORT)
+            answer = self.ask(f"Specify your node's RPC port",
+                              default=DEFAULT_RPC_PORT)
             if answer is not None:
                 self.rpc_port = answer
             else:
@@ -1550,29 +1589,30 @@ class Interviewer:
         except Exception as e:
             logging.exception(f"Failed to set RPC port. Reason: {e}")
 
-
     # (Optional) Ask for node's persistent peers
     def ask_for_persistent_peers(self):
         try:
             logging.info(f"Persistent peers are nodes that you want to always keep connected to. Values for persistent peers should be specified in format: <nodeID>@<IP>:<port>,<nodeID>@<IP>:<port>... \n")
-            answer = self.ask(f"Specify persistent peers [default: none]: {os.linesep}")
+            answer = self.ask(
+                f"Specify persistent peers [default: none]: {os.linesep}")
             if answer is not None:
                 self.persistent_peers = answer
             else:
                 self.persistent_peers = ""
         except Exception as e:
-            logging.exception(f"Failed to set persistent peers. Reason: {e}") 
-
+            logging.exception(f"Failed to set persistent peers. Reason: {e}")
 
     # (Optional) Ask for minimum gas prices
     def ask_for_gas_price(self):
         try:
-            logging.info(f"Minimum gas prices are the minimum amount of CHEQ tokens you are willing to accept as a validator to process a transaction.\n")
-            answer = self.ask(f"Specify minimum gas price", default=CHEQD_NODED_MINIMUM_GAS_PRICES)
+            logging.info(
+                f"Minimum gas prices are the minimum amount of CHEQ tokens you are willing to accept as a validator to process a transaction.\n")
+            answer = self.ask(f"Specify minimum gas price",
+                              default=CHEQD_NODED_MINIMUM_GAS_PRICES)
             if answer is not None:
                 self.gas_price = answer
             else:
-                self.gas_price = default=CHEQD_NODED_MINIMUM_GAS_PRICES
+                self.gas_price = default = CHEQD_NODED_MINIMUM_GAS_PRICES
         except Exception as e:
             logging.exception(f"Failed to set minimum gas prices. Reason: {e}")
 
@@ -1636,7 +1676,6 @@ class Interviewer:
         else:
             logging.exception(f"Invalid input provided during installation.")
 
-
     def ask_for_init_from_snapshot(self):
         answer = self.ask(
             f"CAUTION: Downloading a snapshot replaces your existing copy of chain data. Usually safe to use this option when doing a fresh installation. "
@@ -1670,7 +1709,7 @@ if __name__ == '__main__':
                 interviewer.ask_for_cosmovisor()
             else:
                 interviewer.ask_for_cosmovisor_bump()
-            
+
             if interviewer.is_cosmo_needed is True:
                 interviewer.ask_for_daemon_allow_download_binaries()
                 interviewer.ask_for_daemon_restart_after_upgrade()
@@ -1684,12 +1723,12 @@ if __name__ == '__main__':
                 interviewer.ask_for_gas_price()
                 interviewer.ask_for_log_level()
                 interviewer.ask_for_log_format()
-            
-            interviewer.ask_for_init_from_snapshot()
-        
-        except Exception as e:
-            logging.exception(f"Unable to complete user interview process for installation. Reason for exiting: {e}")
 
+            interviewer.ask_for_init_from_snapshot()
+
+        except Exception as e:
+            logging.exception(
+                f"Unable to complete user interview process for installation. Reason for exiting: {e}")
 
     # Order of questions to ask the user if installing:
     # 1. Version of cheqd-noded to install
@@ -1703,7 +1742,7 @@ if __name__ == '__main__':
         try:
             interviewer.ask_for_version()
             interviewer.ask_for_home_directory()
-            
+
             if interviewer.is_cosmovisor_installed() is False:
                 interviewer.ask_for_cosmovisor()
             else:
@@ -1721,10 +1760,10 @@ if __name__ == '__main__':
 
             if interviewer.is_systemd_config_installed(DEFAULT_LOGROTATE_FILE) is True:
                 interviewer.ask_for_rewrite_logrotate()
-        
-        except Exception as e:
-            logging.exception(f"Unable to complete user interview process for upgrade. Reason for exiting: {e}")
 
+        except Exception as e:
+            logging.exception(
+                f"Unable to complete user interview process for upgrade. Reason for exiting: {e}")
 
     ### This section is where the Interviewer class is invoked ###
     try:
@@ -1739,7 +1778,7 @@ if __name__ == '__main__':
         # If no cheqd-noded binary is found, install from scratch
         if is_installed is False:
             install_steps()
-        
+
         else:
             # If cheqd-noded binary is found, ask user if they want to upgrade or install from scratch
             interviewer.ask_for_upgrade()
@@ -1755,16 +1794,18 @@ if __name__ == '__main__':
                 if interviewer.is_from_scratch is True:
                     install_steps()
                 else:
-                    logging.error("Aborting installation to prevent overwriting existing node installation. Exiting...")
+                    logging.error(
+                        "Aborting installation to prevent overwriting existing node installation. Exiting...")
                     sys.exit(1)
 
     except Exception as e:
-        logging.exception(f"Unable to complete user interview process. Reason for exiting: {e}")
-
+        logging.exception(
+            f"Unable to complete user interview process. Reason for exiting: {e}")
 
     ### This section where the Installer class is invoked ###
     try:
         installer = Installer(interviewer)
         installer.install()
     except Exception as e:
-        logging.exception(f"Unable to execute installation process. Reason for exiting: {e}")
+        logging.exception(
+            f"Unable to execute installation process. Reason for exiting: {e}")
