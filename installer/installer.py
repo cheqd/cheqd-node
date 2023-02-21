@@ -239,6 +239,28 @@ class Installer():
         return s
 
     @property
+    def rsyslog_cfg(self):
+        # Modify rsyslog template file to replace values for environment variables
+        # The template file is fetched from GitHub repo
+        # Some of these variables are explicitly asked during the installer process. Others are set to default values.
+        
+        # Determine the binary name for logging based on installation type
+        binary_name = DEFAULT_COSMOVISOR_BINARY_NAME if self.interviewer.is_cosmo_needed else DEFAULT_BINARY_NAME
+
+        fname = os.path.basename(RSYSLOG_TEMPLATE)
+        self.exec(f"wget -c {RSYSLOG_TEMPLATE}")
+        with open(fname) as f:
+            s = re.sub(
+                r'({BINARY_FOR_LOGGING}|{CHEQD_LOG_DIR})',
+                lambda m: {'{BINARY_FOR_LOGGING}': binary_name,
+                            '{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()],
+                f.read()
+            )
+        self.remove_safe(fname)
+        return s
+        
+
+    @property
     def logrotate_cfg(self):
         # Modify logrotate template file to replace values for environment variables
         # The logrotate template file is fetched from the GitHub repo
@@ -432,8 +454,6 @@ class Installer():
                     logging.info(
                         "Enabling cheqd-cosmovisor.service in systemd")
 
-                    fname = os.path.basename(COSMOVISOR_SERVICE_TEMPLATE)
-
                     with open(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH, mode="w") as fd:
                         fd.write(self.cosmovisor_service_cfg)
 
@@ -532,10 +552,6 @@ class Installer():
                     logging.warn(
                         f"Existing rsyslog configuration at {DEFAULT_RSYSLOG_FILE} will be overwritten")
 
-                # Fetch rsyslog template file from GitHub and save it to the default location
-                self.exec(
-                    f"curl --progress-bar {RSYSLOG_TEMPLATE} > {DEFAULT_RSYSLOG_FILE}")
-
                 # Determine the binary name for logging based on installation type
                 binary_name = DEFAULT_COSMOVISOR_BINARY_NAME if self.interviewer.is_cosmo_needed else DEFAULT_BINARY_NAME
 
@@ -544,12 +560,7 @@ class Installer():
 
                 # Modify rsyslog template file with values specific to the installation
                 with open(DEFAULT_RSYSLOG_FILE, mode="w") as fname:
-                    fname.write = re.sub(
-                        r'({BINARY_FOR_LOGGING}|{CHEQD_LOG_DIR})',
-                        lambda m: {'{BINARY_FOR_LOGGING}': binary_name,
-                                   '{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()],
-                        fname.read()
-                    )
+                    fname.write(self.rsyslog_cfg)
 
                 # Restarting rsyslog can take a lot of time: https://github.com/rsyslog/rsyslog/issues/3133
                 self.restart_systemd_service("rsyslog.service")
@@ -567,21 +578,12 @@ class Installer():
                     logging.warn(
                         f"Existing logrotate configuration at {DEFAULT_LOGROTATE_FILE} will be overwritten")
 
-                # Fetch logrotate template file from GitHub and save it to the default location
-                self.exec(
-                    f"curl --progress-bar {LOGROTATE_TEMPLATE} > {DEFAULT_LOGROTATE_FILE}")
-
                 logging.info(
                     f"Configuring logrotate systemd service for cheqd-node logging")
 
                 # Modify logrotate template file with values specific to the installation
                 with open(DEFAULT_LOGROTATE_FILE, mode="w") as fname:
-                    fname.write = re.sub(
-                        r'({CHEQD_LOG_DIR})',
-                        lambda m: {'{CHEQD_LOG_DIR}': self.cheqd_log_dir}[
-                            m.group()],
-                        fname.read()
-                    )
+                    fname.write(self.logrotate_cfg)
 
                 self.restart_systemd_service("logrotate.service")
                 self.restart_systemd_service("logrotate.timer")
