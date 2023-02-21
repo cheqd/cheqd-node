@@ -222,7 +222,7 @@ class Installer():
         # The template file is fetched from the GitHub repo
         # Some of these variables are explicitly asked during the installer process. Others are set to default values.
         fname = os.path.basename(COSMOVISOR_SERVICE_TEMPLATE)
-        self.exec(f"curl -s {COSMOVISOR_SERVICE_TEMPLATE}")
+        self.exec(f"wget -c {COSMOVISOR_SERVICE_TEMPLATE}")
         with open(fname) as f:
             s = re.sub(
                 r'({CHEQD_ROOT_DIR}|{DEFAULT_BINARY_NAME}|{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}|{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}|{DEFAULT_DAEMON_POLL_INTERVAL}|{DEFAULT_UNSAFE_SKIP_BACKUP}|{DEFAULT_DAEMON_RESTART_DELAY})',
@@ -432,26 +432,11 @@ class Installer():
                     logging.info(
                         "Enabling cheqd-cosmovisor.service in systemd")
 
-                    # Get the cosmovisor service file template from GitHub
-                    self.exec(
-                        f"curl -s {COSMOVISOR_SERVICE_TEMPLATE} > {DEFAULT_COSMOVISOR_SERVICE_FILE_PATH}")
-
                     fname = os.path.basename(COSMOVISOR_SERVICE_TEMPLATE)
 
                     with open(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH, mode="w") as fd:
                         fd.write(self.cosmovisor_service_cfg)
-                        with open(fname) as f:
-                            s = re.sub(
-                                r'({CHEQD_ROOT_DIR}|{DEFAULT_BINARY_NAME}|{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}|{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}|{DEFAULT_DAEMON_POLL_INTERVAL}|{DEFAULT_UNSAFE_SKIP_BACKUP}|{DEFAULT_DAEMON_RESTART_DELAY})',
-                                lambda m: {'{CHEQD_ROOT_DIR}': self.cheqd_root_dir,
-                                           '{DEFAULT_BINARY_NAME}': DEFAULT_BINARY_NAME,
-                                           '{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}':  self.interviewer.daemon_allow_download_binaries,
-                                           '{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}': self.interviewer.daemon_restart_after_upgrade,
-                                           '{DEFAULT_DAEMON_POLL_INTERVAL}': DEFAULT_DAEMON_POLL_INTERVAL,
-                                           '{DEFAULT_UNSAFE_SKIP_BACKUP}': DEFAULT_UNSAFE_SKIP_BACKUP,
-                                           '{DEFAULT_DAEMON_RESTART_DELAY}': DEFAULT_DAEMON_RESTART_DELAY}[m.group()],
-                                f.read()
-                            )
+
                 except Exception as e:
                     logging.exception(
                         f"Failed to setup cheqd-cosmovisor systemd service. Reason: {e}")
