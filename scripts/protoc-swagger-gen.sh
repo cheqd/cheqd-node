@@ -27,6 +27,9 @@ done
 
 cd ..
 
+# Remove individual swagger files
+rm -rf ${SWAGGER_DIR}/swagger-ui/
+
 # combine swagger files
 # uses nodejs package `swagger-combine`.
 # all the individual swagger files need to be configured in `config.yaml` for merging

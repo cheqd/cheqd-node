@@ -304,7 +304,7 @@ jobs:
 
       - uses: mikepenz/action-junit-report@v3
         with:
-          report_paths: 'reports/report.xml'
+          report_paths: 'report.xml'
           check_name: ""
           suite_regex: '*'
           include_passed: true
