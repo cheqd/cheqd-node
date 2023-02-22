@@ -25,7 +25,7 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: build --rm-dist --snapshot --id ubuntu-latest-amd64
+          args: build --clean --snapshot --id ubuntu-latest-amd64
 
       - name: Store artifact
         uses: actions/upload-artifact@v3
