@@ -140,6 +140,7 @@ def search_and_replace(search_text, replace_text, file_path):
                 file.write(data)
     file.close()
 
+
 # Common function to post-process commands
 def post_process(func):
     @functools.wraps(func)
