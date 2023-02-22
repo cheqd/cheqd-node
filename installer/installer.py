@@ -188,7 +188,7 @@ class Release:
             for _url_item in self.assets:
                 _url = _url_item["browser_download_url"]
                 version_without_v_prefix = self.version.replace('v', '', 1)
-                if os.path.basename(_url) == f"cheqd-noded-.{version_without_v_prefix}-.{os_name}-{os_arch}.tar.gz" or \
+                if os.path.basename(_url) == f"cheqd-noded-{version_without_v_prefix}-{os_name}-{os_arch}.tar.gz" or \
                         os.path.basename(_url) == "cheqd-noded":
                     return _url
             else:
@@ -790,6 +790,8 @@ class Installer():
             self.set_cheqd_env_vars()
             self.set_cosmovisor_env_vars()
 
+            os.system("source /etc/environment")
+
             if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)):
                 logging.info(
                     f"Moving Cosmovisor binary to installation directory")
@@ -907,32 +909,23 @@ class Installer():
             logging.exception(f"Failed to bump Cosmovisor. Reason: {e}")
 
     def set_env_vars(self, env_var_name, env_var_value):
-        if not self.check_if_env_var_already_set(env_var_name) and not self.is_default_shell_fish():
-            # write to current user
-            self.write_to_profile(env_var_name, env_var_value)
-            # write to cheqd user profile
-            self.write_to_profile(env_var_name, env_var_value, True)
-        elif not self.check_if_env_var_already_set(env_var_name) and self.is_default_shell_fish():
-            self.exec(f'set -Uxg {env_var_name} {env_var_value}')
+        if not self.check_if_env_var_already_set(env_var_name):
+            # write to etc/environment
+            self.write_to_etc_environment(env_var_name, env_var_value)
         else:
             logging.info(f"ENV var {env_var_name} already set")
 
-    def write_to_profile(self, env_var_name, env_var_value, is_user_cheqd=False):
+    def write_to_etc_environment(self, env_var_name, env_var_value):
         try:
-            current_user_bashrc_path = os.path.expanduser("~/.profile")
-            if is_user_cheqd:
-                # because user might change default home dir path which is /home/cheqd
-                current_user_bashrc_path = f'{self.interviewer.home_dir}/.profile'
-            with open(current_user_bashrc_path, "a") as current_user_bashrc_file:
-                current_user_bashrc_file.write(
-                    f"export {env_var_name}={env_var_value}\n")
+            etc_environment_path = "/etc/environment"
+            with open(etc_environment_path, "a") as f:
+                f.write(f"{env_var_name}={env_var_value}\n")
+
         except Exception:
-            if is_user_cheqd:
-                logging.exception("Unable to set ENV vars for cheqd user")
-            else:
-                logging.exception("Unable to set ENV vars for current user")
+            logging.exception("Unable to set ENC vars")
+
         finally:
-            current_user_bashrc_file.close()
+            f.close() 
 
     def check_if_env_var_already_set(self, env_var_name):
         try:
