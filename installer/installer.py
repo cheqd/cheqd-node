@@ -108,8 +108,8 @@ class Release:
 
     def get_release_url(self):
         try:
-            os_arch = platform.machine()
-            os_name = platform.system()
+            os_arch = platform.machine().lower()
+            os_name = platform.system().lower()
             for _url_item in self.assets:
                 _url = _url_item["browser_download_url"]
                 version_without_v_prefix = self.version.replace('v', '' ,1)
