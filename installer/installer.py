@@ -4,7 +4,6 @@
 ###############################################################
 ###     		    Python package imports      			###
 ###############################################################
-from enum import Enum
 from pathlib import Path
 import copy
 import datetime
@@ -115,7 +114,6 @@ def sigint_handler(signal, frame):
     print('Exiting from cheqd-node installer')
     sys.exit(0)
 
-
 signal.signal(signal.SIGINT, sigint_handler)
 
 # Helper function to check if the URL is valid
@@ -139,7 +137,6 @@ def search_and_replace(search_text, replace_text, file_path):
             with open(file_path, 'w') as file:
                 file.write(data)
     file.close()
-
 
 # Common function to post-process commands
 def post_process(func):
@@ -260,7 +257,6 @@ class Installer():
         self.remove_safe(fname)
         return s
         
-
     @property
     def logrotate_cfg(self):
         # Modify logrotate template file to replace values for environment variables
@@ -281,9 +277,9 @@ class Installer():
     def cheqd_root_dir(self):
         # CHEQD_NODED_HOME variable can be picked up by cheqd-noded, so this should be set as an environment variable later
         # Default: /home/cheqd/.cheqdnode
-        CHEQD_NODED_HOME = os.path.join(
+        cheqd_noded_home = os.path.join(
             self.interviewer.home_dir, ".cheqdnode")
-        return CHEQD_NODED_HOME
+        return cheqd_noded_home
 
     @property
     def cheqd_config_dir(self):
@@ -595,15 +591,16 @@ class Installer():
     def install(self):
         """
         Steps:
-        - Remove all data and configurations (if needed)
         - Download cheqd-noded binary
+        - Make preps before installing. Remove all in case of installing from scratch
         - Prepare cheqd user
         - Prepare directory tree
-        - Setup systemctl configs
         - Setup Cosmovisor (if selected by user)
-        - Install cheqd-noded binary at system bin or Cosmovisor bin path
+        - Bump cosmovisor (if selected by user)
         - Carry out post-install actions
         - Restore and download snapshot (if selected by user)
+        - Setup systemctl configs
+        - Setup logging
         """
 
         self.get_binary()
