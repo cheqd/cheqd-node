@@ -182,12 +182,17 @@ class Release:
         # We also determine the OS and architecture, and construct the URL to download the release.
         try:
             os_arch = str.lower(platform.machine())
+            # Previous version of goreleaser made arch as x86_64 instead of amd64
+            os_alt_arch = "amd64"
             os_name = str.lower(platform.system())
             for _url_item in self.assets:
                 _url = _url_item["browser_download_url"]
                 version_without_v_prefix = self.version.replace('v', '', 1)
-                if os.path.basename(_url) == f"cheqd-noded-{version_without_v_prefix}-{os_name}-{os_arch}.tar.gz" or \
-                        os.path.basename(_url) == "cheqd-noded":
+                if os.path.basename(_url) == f"cheqd-noded-{version_without_v_prefix}-{os_name}-{os_arch}.tar.gz":
+                    return _url
+                elif os_arch == "x86_64" and os.path.basename(_url) == f"cheqd-noded-{version_without_v_prefix}-{os_name}-{os_alt_arch}.tar.gz":
+                    return _url
+                elif os.path.basename(_url) == "cheqd-noded":
                     return _url
             else:
                 logging.exception(
@@ -208,6 +213,15 @@ class Installer():
         self.version = interviewer.release.version
         self.release = interviewer.release
         self.interviewer = interviewer
+        self._snapshot_url = ""
+        
+    @property
+    def snapshot_url(self):
+        return self._snapshot_url
+    
+    @snapshot_url.setter
+    def snapshot_url(self, value):
+        self._snapshot_url = value
 
     @property
     def binary_path(self):
@@ -630,10 +644,12 @@ class Installer():
             self.post_install()
 
         if self.interviewer.init_from_snapshot:
-            logging.info(
-                "Downloading snapshot and extracting archive. This can take a *really* long time...")
-            self.download_snapshot()
-            self.untar_from_snapshot()
+            self.snapshot_url = self.prepare_url_for_latest()
+            if self.snapshot_url:
+                logging.info(
+                    "Downloading snapshot and extracting archive. This can take a *really* long time...")
+                self.download_snapshot()
+                self.untar_from_snapshot()
 
         self.setup_node_systemd()
         self.setup_logging_systemd()
@@ -951,7 +967,7 @@ class Installer():
     def compare_checksum(self, file_path):
         # Set URL for correct checksum file for snapshot
         checksum_url = os.path.join(os.path.dirname(
-            self.interviewer.snapshot_url), "md5sum.txt")
+            self.snapshot_url), "md5sum.txt")
         # Get checksum file
         published_checksum = self.exec(
             f"curl -s {checksum_url} | tail -1 | cut -d' ' -f 1").stdout.strip()
@@ -975,17 +991,35 @@ class Installer():
             self.exec("sudo apt-get install -y pv")
         except Exception as e:
             logging.exception(f"Failed to install dependencies. Reason: {e}")
+            
+    def prepare_url_for_latest(self) -> str:
+        template = TESTNET_SNAPSHOT if self.interviewer.chain in TESTNET_CHAIN_ID else MAINNET_SNAPSHOT
+        _date = datetime.date.today()
+        _days_counter = 0
+        _is_url_valid = False
+
+        while not _is_url_valid and _days_counter <= MAX_SNAPSHOT_DAYS:
+            _url = template.format(_date.strftime(
+                "%Y-%m-%d"), _date.strftime("%Y-%m-%d"))
+            _is_url_valid = is_valid_url(_url)
+            _days_counter += 1
+            _date -= datetime.timedelta(days=1)
+
+        if not _is_url_valid:
+            logging.exception("Could not find the valid snapshot for the last {} days".format(
+                MAX_SNAPSHOT_DAYS))
+        return _url
 
     def download_snapshot(self):
         try:
-            archive_name = os.path.basename(self.interviewer.snapshot_url)
+            archive_name = os.path.basename(self.snapshot_url)
             self.mkdir_p(self.cheqd_data_dir)
             shutil.chown(self.cheqd_data_dir,
                          DEFAULT_CHEQD_USER,
                          DEFAULT_CHEQD_USER)
             # Fetch size of snapshot archive. Uses curl to fetch headers and looks for Content-Length.
             archive_size = self.exec(
-                f"curl -s --head {self.interviewer.snapshot_url} | awk '/content-length/ {{print $2}}'").stdout.strip()
+                f"curl -s --head {self.snapshot_url} | awk '/content-length/ {{print $2}}'").stdout.strip()
             # Check how much free disk space is available wherever the cheqd root directory is mounted
             free_disk_space = self.exec(
                 f"df -P -B1 {self.cheqd_root_dir} | tail -1 | awk '{{print $4}}'").stdout.strip()
@@ -993,7 +1027,7 @@ class Installer():
                 logging.info(
                     f"Downloading snapshot archive. This may take a while...")
                 self.exec(
-                    f"wget -c {self.interviewer.snapshot_url} -P {self.cheqd_root_dir}")
+                    f"wget -c {self.snapshot_url} -P {self.cheqd_root_dir}")
                 archive_path = os.path.join(self.cheqd_root_dir, archive_name)
                 if self.compare_checksum(archive_path) is True:
                     logging.info(
@@ -1015,7 +1049,7 @@ class Installer():
     def untar_from_snapshot(self):
         try:
             archive_path = os.path.join(
-                self.cheqd_root_dir, os.path.basename(self.interviewer.snapshot_url))
+                self.cheqd_root_dir, os.path.basename(self.snapshot_url))
             # Check if there is enough space to extract snapshot archive
             self.install_dependencies()
             logging.info(
@@ -1060,7 +1094,6 @@ class Interviewer:
         self._init_from_snapshot = False
         self._release = None
         self._chain = chain
-        self._snapshot_url = ""
         self._is_setup_needed = False
         self._moniker = CHEQD_NODED_MONIKER
         self._external_address = ""
@@ -1137,10 +1170,6 @@ class Interviewer:
     @property
     def chain(self) -> str:
         return self._chain
-    
-    @property
-    def snapshot_url(self) -> str:
-        return self._snapshot_url
 
     @property
     def is_setup_needed(self) -> bool:
@@ -1234,10 +1263,6 @@ class Interviewer:
     @chain.setter
     def chain(self, chain):
         self._chain = chain
-    
-    @snapshot_url.setter
-    def snapshot_url(self, su):
-        self._snapshot_url = su
 
     @is_setup_needed.setter
     def is_setup_needed(self, is_setup_needed):
@@ -1613,24 +1638,6 @@ class Interviewer:
                 f"Specify log format (json|plain)", default=CHEQD_NODED_LOG_FORMAT)
         except Exception as e:
             logging.exception(f"Failed to set log format. Reason: {e}")
-    
-    def prepare_url_for_latest(self) -> str:
-        template = TESTNET_SNAPSHOT if self.chain == TESTNET_CHAIN_ID else MAINNET_SNAPSHOT
-        _date = datetime.date.today()
-        _days_counter = 0
-        _is_url_valid = False
-
-        while not _is_url_valid and _days_counter <= MAX_SNAPSHOT_DAYS:
-            _url = template.format(_date.strftime(
-                "%Y-%m-%d"), _date.strftime("%Y-%m-%d"))
-            _is_url_valid = is_valid_url(_url)
-            _days_counter += 1
-            _date -= datetime.timedelta(days=1)
-
-        if not _is_url_valid:
-            logging.exception("Could not find the valid snapshot for the last {} days".format(
-                MAX_SNAPSHOT_DAYS))
-        return _url
 
     def ask_for_upgrade(self):
         try:
