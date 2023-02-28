@@ -9,7 +9,6 @@ before:
   hooks:
     - make clean
     - make tidy
-    - make install
     - make proto-gen
 
 builds:
@@ -55,6 +54,7 @@ builds:
 
 archives:
   - id: release-archives
+    rlcp: true
     format: tar.gz
     wrap_in_directory: false
     name_template: "{{ .Binary }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
