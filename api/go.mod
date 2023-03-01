@@ -20,31 +20,3 @@ require (
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
 )
-
-replace (
-	// Keyring replacement from Cosmos SDK v0.46.8
-	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
-
-	// cosmos-sdk state sync allow fast forward to latest height version
-	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.46.10-state-sync
-
-	// iavl allow pruning of uneven heights
-	github.com/cosmos/iavl => github.com/cheqd/iavl v0.19.5-cheqd
-
-	// dgrijalva/jwt-go is deprecated and doesn't receive security updates.
-	// TODO: remove it: https://github.com/cosmos/cosmos-sdk/issues/13134
-	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.4.2
-
-	// Fix upstream GHSA-h395-qcrw-5vmq vulnerability.
-	// TODO Remove it: https://github.com/cosmos/cosmos-sdk/issues/10409
-	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.7.0
-
-	// From Cosmos SDK v0.46.8 upstream
-	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
-
-	// From Cosmos SDK v0.46.8 upstream
-	github.com/jhump/protoreflect => github.com/jhump/protoreflect v1.9.0
-
-	// use informal systems fork of tendermint
-	github.com/tendermint/tendermint => github.com/informalsystems/tendermint v0.34.26
-)
