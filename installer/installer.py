@@ -192,8 +192,6 @@ class Release:
                     return _url
                 elif os_arch == "x86_64" and os.path.basename(_url) == f"cheqd-noded-{version_without_v_prefix}-{os_name}-{os_alt_arch}.tar.gz":
                     return _url
-                elif os.path.basename(_url) == "cheqd-noded":
-                    return _url
             else:
                 logging.exception(
                     f"No asset found to download for release: {self.version}")
