@@ -3,7 +3,7 @@
 set -euox pipefail
 
 # Define directories
-SWAGGER_DIR=./api/docs
+SWAGGER_DIR=./app/client/docs
 SWAGGER_UI_DIR=${SWAGGER_DIR}/swagger-ui
 
 # Define URLs
