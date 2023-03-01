@@ -4,7 +4,7 @@ version: v1
 
 plugins:
   - name: swagger
-    out: ../api/docs
+    out: ../app/client/docs
     opt:
     - fqn_for_swagger_name=true
     - include_package_in_tags=true

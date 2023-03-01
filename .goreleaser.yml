@@ -9,11 +9,11 @@ before:
   hooks:
     - make clean
     - make tidy
-    - make install
     - make proto-gen
+    - make swagger
 
 builds:
-  - id: ubuntu-latest-amd64
+  - id: linux-amd64
     main: ./cmd/cheqd-noded
     binary: cheqd-noded
     targets:
@@ -32,14 +32,13 @@ builds:
       - -X github.com/cosmos/cosmos-sdk/version.Commit={{ .Commit }}
       - -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger,goleveldb
 
-  - id: ubuntu-latest-arm64
+  - id: linux-arm64
     main: ./cmd/cheqd-noded
     binary: cheqd-noded
     targets:
       - "linux_arm64"
-    hooks:
-      pre:
-        - sudo apt update && sudo apt install clang gcc-multilib g++-multilib -y
+    env:
+      - CGO_ENABLED=0
     flags:
       - -mod=readonly
       - -tags="netgo ledger goleveldb"
@@ -52,9 +51,31 @@ builds:
       - -X github.com/cosmos/cosmos-sdk/version.Commit={{ .Commit }}
       - -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger,goleveldb
 
+  - id: darwin
+    env:
+      - CGO_ENABLED=0
+    main: ./cmd/cheqd-noded
+    binary: cheqd-noded
+    goos:
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    flags:
+      - -mod=readonly
+      - -tags="netgo ledger goleveldb"
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X github.com/cosmos/cosmos-sdk/version.Name=cheqd-noded 
+      - -X github.com/cosmos/cosmos-sdk/version.AppName=cheqd-noded 
+      - -X github.com/cosmos/cosmos-sdk/version.Version={{ .Version }}
+      - -X github.com/cosmos/cosmos-sdk/version.Commit={{ .Commit }}
+      - -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger,goleveldb
 
 archives:
   - id: release-archives
+    rlcp: true
     format: tar.gz
     wrap_in_directory: false
     name_template: "{{ .Binary }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
