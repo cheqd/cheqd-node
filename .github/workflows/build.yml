@@ -25,8 +25,7 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: build --clean --snapshot
-          #args: build --clean --snapshot --single-target
+          args: build --clean --snapshot --single-target
 
       - name: Store artifact
         uses: actions/upload-artifact@v3
