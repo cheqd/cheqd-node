@@ -13,13 +13,50 @@ before:
     - make swagger
 
 builds:
-  - 
+  - id: linux-amd64
+    main: ./cmd/cheqd-noded
+    binary: cheqd-noded
+    targets:
+      - "linux_amd64"
+    env:
+      - CGO_ENABLED=1
+    flags:
+      - -mod=readonly
+      - -tags="netgo ledger goleveldb"
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X github.com/cosmos/cosmos-sdk/version.Name=cheqd-noded 
+      - -X github.com/cosmos/cosmos-sdk/version.AppName=cheqd-noded 
+      - -X github.com/cosmos/cosmos-sdk/version.Version={{ .Version }}
+      - -X github.com/cosmos/cosmos-sdk/version.Commit={{ .Commit }}
+      - -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger,goleveldb
+
+  - id: linux-arm64
+    main: ./cmd/cheqd-noded
+    binary: cheqd-noded
+    targets:
+      - "linux_arm64"
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -mod=readonly
+      - -tags="netgo ledger goleveldb"
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X github.com/cosmos/cosmos-sdk/version.Name=cheqd-noded 
+      - -X github.com/cosmos/cosmos-sdk/version.AppName=cheqd-noded 
+      - -X github.com/cosmos/cosmos-sdk/version.Version={{ .Version }}
+      - -X github.com/cosmos/cosmos-sdk/version.Commit={{ .Commit }}
+      - -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger,goleveldb
+
+  - id: darwin
     env:
       - CGO_ENABLED=0
     main: ./cmd/cheqd-noded
     binary: cheqd-noded
     goos:
-      - linux
       - darwin
     goarch:
       - amd64
