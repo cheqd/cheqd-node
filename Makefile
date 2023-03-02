@@ -70,13 +70,12 @@ endif
 
 build_tags += $(BUILD_TAGS)
 build_tags := $(strip $(build_tags))
-
-# process linker flags
-
 empty :=
 whitespace := $(empty) $(empty)
 comma := ,
 build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
+
+# process linker flags
 
 ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=cheqd-noded \
 	-X github.com/cosmos/cosmos-sdk/version.AppName=cheqd-noded \

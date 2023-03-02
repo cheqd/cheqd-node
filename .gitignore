@@ -1,16 +1,13 @@
 ### APP-SPECIFIC EXCLUSIONS ###
 
 # Ignored directories
-api/docs/cheqd/
-api/docs/swagger-ui/
+app/client/docs/cheqd/
+app/client/docs/swagger-ui/
 build/
 dist/
 **/network-config
 
 # Ignored files
-
-# Allowed files
-
 
 ### GENERAL EXCLUSIONS ###
 
