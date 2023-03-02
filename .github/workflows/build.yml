@@ -25,13 +25,13 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: build --clean --snapshot --id ubuntu-latest-amd64
+          args: build --clean --snapshot --single-target
 
       - name: Store artifact
         uses: actions/upload-artifact@v3
         with:
           name: cheqd-noded
-          path: dist/ubuntu-latest-amd64_linux_amd64_v1/cheqd-noded
+          path: dist/linux-amd64_linux_amd64_v1/cheqd-noded
 
   build-docker:
     name: "Docker image"

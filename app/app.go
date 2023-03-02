@@ -117,7 +117,7 @@ import (
 	dbm "github.com/tendermint/tm-db"
 
 	// unnamed import of statik for swagger UI support
-	_ "github.com/cheqd/cheqd-node/api/v2/docs/statik"
+	_ "github.com/cheqd/cheqd-node/app/client/docs/statik"
 )
 
 var (

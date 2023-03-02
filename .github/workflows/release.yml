@@ -90,7 +90,7 @@ jobs:
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v4
         # Only run GoReleaser if the commit is tagged with a version
-        if: startsWith( git tag --contains ${{ github.sha }} , 'v') == true
+        if: startsWith((git tag --contains ${{ github.sha }}), 'v')
         with:
           distribution: goreleaser
           version: latest
