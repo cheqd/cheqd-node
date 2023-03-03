@@ -78,7 +78,7 @@ jobs:
         run: npm ci
 
       - name: "Execute Semantic Release"
-        run: npx semantic-release
+        run: npx semantic-release --dry-run --debug
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 
