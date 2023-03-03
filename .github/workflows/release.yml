@@ -66,11 +66,6 @@ jobs:
           cache: 'npm'
           cache-dependency-path: '**/package-lock.json'
 
-      # Setup for pushing to Buf.build later
-      - uses: bufbuild/buf-setup-action@v1.14.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
       # Required for short-lived token provided to Semantic Release
       - name: "Obtain Github App token"
         id: app-token
@@ -103,6 +98,23 @@ jobs:
         run: |
           RELEASE_VERSION=$( git describe --tags "${{ github.sha }}")
           echo "RELEASE_VERSION=$RELEASE_VERSION" >> "$GITHUB_OUTPUT"
+  
+  release-api-and-protobuf:
+    name: "API package and Protobufs"
+    runs-on: ubuntu-20.04
+    needs: release-binary
+    if: ${{ github.ref_protected != true }}
+    
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Required to fetch version
+          persist-credentials: false
+
+      # Setup for pushing to Buf.build later
+      - uses: bufbuild/buf-setup-action@v1.14.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       # Push Protobufs to Buf.build registry
       - uses: bufbuild/buf-push-action@v1
@@ -110,10 +122,19 @@ jobs:
           input: proto
           buf_token: ${{ secrets.BUF_TOKEN }}
           draft: ${{ github.ref_name != 'main'}}
+      
+      # Check if there's a release tag for cheqd-node
+      - name: "Set API package version tag"
+        id: set-api-version
+        # if: startsWith((git tag --contains ${{ github.sha }}), 'v')
+        if: startsWith((git tag --contains 03089249874ed22139ec50ce564273c18a353835), 'v1')
+        run: |
+          API_VERSION=$((git tag --contains 03089249874ed22139ec50ce564273c18a353835)/v1/v2)
+          echo "API_VERSION=$API_VERSION" >> "$GITHUB_OUTPUT"
 
   release-docker:
     name: "Docker image"
-    needs: [ super-lint, release-binary ]
+    needs: release-binary
     runs-on: ubuntu-20.04
     env:
       IMAGE_NAME: ${{ github.repository }}
