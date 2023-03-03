@@ -47,7 +47,6 @@ jobs:
     runs-on: ubuntu-20.04
     outputs:
       RELEASE_VERSION: ${{ steps.set-version.outputs.RELEASE_VERSION }}
-      API_VERSION: ${{ steps.set-api-version.outputs.API_VERSION }}
     
     steps:
       - uses: actions/checkout@v3
@@ -74,33 +73,26 @@ jobs:
         run: npm ci
 
       - name: "Execute Semantic Release"
-        run: npx semantic-release --dry-run --debug
+        run: npx semantic-release --dry-run
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 
       - name: Set release version number
         id: set-version
         run: |
-          RELEASE_VERSION=$( git describe --tags "${{ github.sha }}")
+          RELEASE_VERSION=$( git tag --list 'v*' --contains "${{ github.sha }}")
           echo "RELEASE_VERSION=$RELEASE_VERSION" >> "$GITHUB_OUTPUT"
-      
-      # Check if there's a release tag for cheqd-node and set API version tag
-      - name: "Set API package version tag"
-        id: set-api-version
-        if: startsWith(${{ steps.set-version.outputs.RELEASE_VERSION }}, v1)
-        run: |
-          API_VERSION=sed sed 's/v1/api\/v2/g' <<< "${{ steps.set-version.outputs.RELEASE_VERSION }}"
-          echo "API_VERSION=$API_VERSION" >> "$GITHUB_OUTPUT"
 
 
   release-binary:
     name: "Node binary"
     runs-on: ubuntu-20.04
     needs: calculate-version
-    if: startsWith(needs.calculate-version.outputs.RELEASE_VERSION, 'v')
+    if: ${{ needs.calculate-version.outputs.RELEASE_VERSION != '' }}
     env:
       RELEASE_VERSION: ${{ needs.calculate-version.outputs.RELEASE_VERSION }}
-      API_VERSION: ${{ needs.calculate-version.outputs.API_VERSION }}
+    output:
+      API_VERSION: ${{ steps.set-api-version.outputs.API_VERSION }}
     
     steps:
       - uses: actions/checkout@v3
@@ -144,13 +136,21 @@ jobs:
           draft: ${{ github.ref_name != 'main'}}
       
       # Check if there's a release tag for cheqd-node and set API version tag
+      - name: "Set API package version tag"
+        id: set-api-version
+        if: startsWith(env.RELEASE_VERSION, v1)
+        run: |
+          API_VERSION=sed sed 's/v1/api\/v2/g' <<< "${{ steps.set-version.outputs.RELEASE_VERSION }}"
+          echo "API_VERSION=$API_VERSION" >> "$GITHUB_OUTPUT"
+
+      # Check if there's a release tag for cheqd-node and set API version tag
       - name: "Push API package version tag"
         id: push-api-version
         run: |
           git tag -a "${{ env.API_VERSION }}" -m "API package version ${{ env.API_VERSION }} [skip ci]"
           git push origin "${{ env.API_VERSION }}" --dry-run
-        env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+        # env:
+        #   GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 
 
   release-docker:
