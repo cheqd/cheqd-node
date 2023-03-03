@@ -105,7 +105,7 @@ jobs:
           git push origin "${{ env.API_VERSION }}" --dry-run
         env:
           API_VERSION: ${{ steps.set-api-version.outputs.API_VERSION }}
-          # GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 
 
   release-binary:
