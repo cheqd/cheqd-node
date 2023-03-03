@@ -7,8 +7,6 @@ defaults:
 permissions:
   contents: write
   packages: write
-env:
-  ACTIONS_STEP_DEBUG: true
 
 
 jobs:
@@ -31,7 +29,7 @@ jobs:
         DEFAULT_BRANCH: main
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         LOG_LEVEL: WARN
-        VALIDATE_ALL_CODEBASE: false
+        VALIDATE_ALL_CODEBASE: true
         MULTI_STATUS: true
 
         VALIDATE_BASH: true
@@ -74,23 +72,26 @@ jobs:
         run: npm ci
 
       - name: "Execute Semantic Release"
-        run: npx semantic-release --dry-run
+        run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 
+      # Check if there's a release tag inserted by Semantic Release starting with 'v'
+      # "--points-at" is more precise than "--contains" because it checks if specific commit is tagged without check if the commit also appears elsewhere in git history
+      # "--list 'v*'" omits tags beginning with "api/v" to avoid false positives
       - name: Set release version number
         id: set-version
-        # run: |
-        #   RELEASE_VERSION=$( git tag --list 'v*' --contains "${{ github.sha }}")
-        #   echo "RELEASE_VERSION=$RELEASE_VERSION" >> "$GITHUB_OUTPUT"
         run: |
-          RELEASE_VERSION=$( git tag --list 'v*' --points-at "03089249874ed22139ec50ce564273c18a353835")
+          RELEASE_VERSION=$( git tag --list 'v*' --points-at "${{ github.sha }}")
           echo "RELEASE_VERSION=$RELEASE_VERSION" >> "$GITHUB_OUTPUT"
       
       # Check if there's a release tag for cheqd-node and set API version tag
       - name: "Set API package version tag"
         id: set-api-version
-        if: startsWith(env.RELEASE_VERSION, 'v1')
+        # Only run this step if release tag starts with 'v'
+        if: startsWith(env.RELEASE_VERSION, 'v')
+        # Replace 'v1' with 'api/v2' to get API package version tag
+        # WARNING: This will need to be updated if cheqd-node package version goes beyond v1.x.x
         run: |
           API_VERSION=$(echo "{{ env.$RELEASE_VERSION }}" | sed 's/v1/api\/v2/g')
           echo "API_VERSION=$API_VERSION" >> "$GITHUB_OUTPUT"
@@ -102,7 +103,8 @@ jobs:
     name: "Node binary"
     runs-on: ubuntu-20.04
     needs: calculate-version
-    if: ${{ needs.calculate-version.outputs.RELEASE_VERSION != '' }}
+    # Only proceed with binary release if there's a release tag
+    if: startsWith(env.RELEASE_VERSION, 'v')
     env:
       RELEASE_VERSION: ${{ needs.calculate-version.outputs.RELEASE_VERSION }}
       API_VERSION: ${{ needs.calculate-version.outputs.API_VERSION }}
@@ -144,6 +146,8 @@ jobs:
       - name: "Push API package version tag"
         id: push-api-version
         uses: actions-ecosystem/action-push-tag@v1
+        # Only run this step if API package version tag exists
+        if: startsWith(env.API_VERSION, 'api')
         with:
           tag: ${{ env.API_VERSION }}
           message: "chore: API package version ${{ env.API_VERSION }} [skip ci]"
