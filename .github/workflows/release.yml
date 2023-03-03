@@ -92,20 +92,20 @@ jobs:
         id: set-api-version
         if: startsWith(env.RELEASE_VERSION, 'v1')
         run: |
-          API_VERSION=sed sed 's/v1/api\/v2/g' <<< "${{ env.RELEASE_VERSION }}"
+          API_VERSION=sed 's/v1/api\/v2/g' <<< "${{ env.RELEASE_VERSION }}"
           echo "API_VERSION=$API_VERSION" >> "$GITHUB_OUTPUT"
         env:
           RELEASE_VERSION: ${{ steps.set-version.outputs.RELEASE_VERSION }}
 
-      # # Check if there's a release tag for cheqd-node and set API version tag
-      # - name: "Push API package version tag"
-      #   id: push-api-version
-      #   run: |
-      #     git tag -a "${{ env.API_VERSION }}" -m "API package version ${{ env.API_VERSION }} [skip ci]"
-      #     git push origin "${{ env.API_VERSION }}" --dry-run
-      #   env:
-      #     API_VERSION: ${{ steps.set-api-version.outputs.API_VERSION }}
-      #     # GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+      # Check if there's a release tag for cheqd-node and set API version tag
+      - name: "Push API package version tag"
+        id: push-api-version
+        run: |
+          git tag -a "${{ env.API_VERSION }}" -m "API package version ${{ env.API_VERSION }} [skip ci]"
+          git push origin "${{ env.API_VERSION }}" --dry-run
+        env:
+          API_VERSION: ${{ steps.set-api-version.outputs.API_VERSION }}
+          # GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 
 
   release-binary:
