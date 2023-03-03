@@ -92,7 +92,7 @@ jobs:
         id: set-api-version
         if: startsWith(env.RELEASE_VERSION, 'v1')
         run: |
-          API_VERSION=sed 's/v1/api\/v2/g' <<< "${{ env.RELEASE_VERSION }}"
+          API_VERSION=$(echo "$RELEASE_VERSION" | sed 's/v1/api\/v2/g')
           echo "API_VERSION=$API_VERSION" >> "$GITHUB_OUTPUT"
         env:
           RELEASE_VERSION: ${{ steps.set-version.outputs.RELEASE_VERSION }}
