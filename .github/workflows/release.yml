@@ -45,6 +45,8 @@ jobs:
     name: "Node binary"
     runs-on: ubuntu-20.04
     needs: super-lint
+    env:
+      COMMIT_TAG: git describe --tags ${{ github.sha }}
     outputs:
       RELEASE_VERSION: ${{ steps.set-version.outputs.RELEASE_VERSION }}
       API_VERSION: ${{ steps.set-api-version.outputs.API_VERSION }}
@@ -91,7 +93,7 @@ jobs:
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v4
         # Only run GoReleaser if the commit is tagged with a version
-        if: startsWith((git describe --tags ${{ github.sha }}), 'v')
+        if: startsWith(${{ env.COMMIT_TAG }}, 'v')
         with:
           distribution: goreleaser
           version: latest
@@ -102,7 +104,7 @@ jobs:
       - name: Set release version number
         id: set-version
         run: |
-          RELEASE_VERSION=$( git describe --tags "${{ github.sha }}")
+          RELEASE_VERSION=${{ env.COMMIT_TAG }}
           echo "RELEASE_VERSION=$RELEASE_VERSION" >> "$GITHUB_OUTPUT"
       
       # Push Protobufs to Buf.build registry
