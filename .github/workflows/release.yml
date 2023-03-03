@@ -127,9 +127,9 @@ jobs:
       - name: "Set API package version tag"
         id: set-api-version
         # if: startsWith((git tag --contains ${{ github.sha }}), 'v')
-        if: startsWith((git tag --contains 03089249874ed22139ec50ce564273c18a353835), 'v1')
+        if: startsWith(git tag --contains 03089249874ed22139ec50ce564273c18a353835, 'v1')
         run: |
-          API_VERSION=$((git tag --contains 03089249874ed22139ec50ce564273c18a353835)/v1/v2)
+          API_VERSION=$(git tag --contains 03089249874ed22139ec50ce564273c18a353835/v1/v2)
           echo "API_VERSION=$API_VERSION" >> "$GITHUB_OUTPUT"
 
   release-docker:
