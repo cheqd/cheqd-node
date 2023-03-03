@@ -154,7 +154,7 @@ jobs:
 
   release-docker:
     name: "Docker image"
-    needs: release-binary
+    needs: [calculate-version, release-binary]
     runs-on: ubuntu-20.04
     env:
       IMAGE_NAME: ${{ github.repository }}
