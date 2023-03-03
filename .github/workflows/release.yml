@@ -104,7 +104,7 @@ jobs:
     runs-on: ubuntu-20.04
     needs: calculate-version
     # Only proceed with binary release if there's a release tag
-    if: startsWith(env.RELEASE_VERSION, 'v')
+    if: startsWith(needs.calculate-version.outputs.RELEASE_VERSION, 'v')
     env:
       RELEASE_VERSION: ${{ needs.calculate-version.outputs.RELEASE_VERSION }}
       API_VERSION: ${{ needs.calculate-version.outputs.API_VERSION }}
