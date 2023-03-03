@@ -116,7 +116,7 @@ jobs:
       - name: "Set API package version tag"
         id: set-api-version
         # if: startsWith((git describe --tags ${{ github.sha }}), 'v1')
-        if: startsWith((git describe --tags 03089249874ed22139ec50ce564273c18a353835), 'v1')
+        if: startsWith((git describe --tags ${{ env.TEST_TAG }}), 'v1')
         run: |
           RELEASE_TAG=$( git describe --tags 03089249874ed22139ec50ce564273c18a353835)
           API_VERSION=sed sed 's/v1/api\/v2/g' <<< "$RELEASE_TAG"
@@ -125,6 +125,7 @@ jobs:
           git push origin "$API_VERSION" --dry-run
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          TEST_TAG: 03089249874ed22139ec50ce564273c18a353835
   
   release-docker:
     name: "Docker image"
