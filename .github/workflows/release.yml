@@ -93,7 +93,7 @@ jobs:
         # Replace 'v1' with 'api/v2' to get API package version tag
         # WARNING: This will need to be updated if cheqd-node package version goes beyond v1.x.x
         run: |
-          API_VERSION=$(echo "{{ env.$RELEASE_VERSION }}" | sed 's/v1/api\/v2/g')
+          API_VERSION=$(echo "$RELEASE_VERSION" | sed 's/v1/api\/v2/g')
           echo "API_VERSION=$API_VERSION" >> "$GITHUB_OUTPUT"
         env:
           RELEASE_VERSION: ${{ steps.set-version.outputs.RELEASE_VERSION }}
