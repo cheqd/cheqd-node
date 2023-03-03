@@ -115,6 +115,7 @@ jobs:
     if: ${{ needs.calculate-version.outputs.RELEASE_VERSION != '' }}
     env:
       RELEASE_VERSION: ${{ needs.calculate-version.outputs.RELEASE_VERSION }}
+      API_VERSION: ${{ needs.calculate-version.outputs.API_VERSION }}
     
     steps:
       - uses: actions/checkout@v3
@@ -132,14 +133,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
-      # Required for short-lived token provided to Semantic Release
-      - name: "Obtain Github App token"
-        id: app-token
-        uses: getsentry/action-github-app-token@v2.0.0
-        with:
-          app_id: ${{ secrets.BOT_APP_ID }}
-          private_key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
-
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v4
         # Only run GoReleaser if the commit is tagged with a version
@@ -156,7 +149,14 @@ jobs:
           input: proto
           buf_token: ${{ secrets.BUF_TOKEN }}
           draft: ${{ github.ref_name != 'main'}}
-
+      
+      # Push API package version tag if it exists
+      - name: "Push API package version tag"
+        id: push-api-version
+        uses: actions-ecosystem/action-push-tag@v1
+        with:
+          tag: ${{ env.API_VERSION }}
+          message: "chore: API package version ${{ env.API_VERSION }} [skip ci]"
 
   release-docker:
     name: "Docker image"
