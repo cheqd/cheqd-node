@@ -116,7 +116,7 @@ jobs:
       - name: "Set API package version tag"
         id: set-api-version
         # if: startsWith((git describe --tags ${{ github.sha }}), 'v1')
-        if: startsWith((git tag --contains 03089249874ed22139ec50ce564273c18a353835), 'v1')
+        if: startsWith((git describe --tags 03089249874ed22139ec50ce564273c18a353835), 'v1')
         run: |
           RELEASE_TAG=$( git describe --tags 03089249874ed22139ec50ce564273c18a353835)
           API_VERSION=sed sed 's/v1/api\/v2/g' <<< "$RELEASE_TAG"
