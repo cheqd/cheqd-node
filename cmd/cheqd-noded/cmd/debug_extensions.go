@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/lestrrat-go/jwx/jwk"
+	"github.com/mr-tron/base58"
 	"github.com/multiformats/go-multibase"
 	"github.com/spf13/cobra"
 )
@@ -104,7 +105,7 @@ func encodingCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(base64toMultibase58Cmd())
-
+	cmd.AddCommand(base64toBase58Cmd())
 	return cmd
 }
 
@@ -121,12 +122,36 @@ func base64toMultibase58Cmd() *cobra.Command {
 				return err
 			}
 
-			multibase58Str, err := multibase.Encode(multibase.Base58BTC, bytes)
+			publicKeyMultibaseBytes := []byte{0xed, 0x01}
+			publicKeyMultibaseBytes = append(publicKeyMultibaseBytes, bytes...)
+
+			multibase58Str, err := multibase.Encode(multibase.Base58BTC, publicKeyMultibaseBytes)
 			if err != nil {
 				return err
 			}
 
 			_, err = fmt.Fprintln(cmd.OutOrStdout(), multibase58Str)
+			return err
+		},
+	}
+
+	return cmd
+}
+
+// base64toBase58Cmd returns cobra Command.
+func base64toBase58Cmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "base64-base58 [input]",
+		Short: "Convert base64 string to base58 string",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			base64Str := args[0]
+			bytes, err := base64.StdEncoding.DecodeString(base64Str)
+			if err != nil {
+				return err
+			}
+
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), base58.Encode(bytes))
 			return err
 		},
 	}
