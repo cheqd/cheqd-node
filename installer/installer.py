@@ -197,8 +197,7 @@ class Release:
                 logging.exception(
                     f"No asset found to download for release: {self.version}")
         except Exception as e:
-            logging.exception(
-                f"Failed to get cheqd-node binaries from GitHub. Reason: {e}")
+            logging.exception(f"Failed to get cheqd-node binaries from GitHub. Reason: {e}")
 
     def __str__(self):
         return f"Name: {self.version}"
@@ -233,29 +232,32 @@ class Installer():
         # The template file is fetched from the GitHub repo
         # Some of these variables are explicitly asked during the installer process. Others are set to default values.
 
-        # Set service file path
-        fname = os.path.basename(COSMOVISOR_SERVICE_TEMPLATE)
+        try:
+            # Set service file path
+            fname = os.path.basename(COSMOVISOR_SERVICE_TEMPLATE)
 
-        # Fetch the template file from GitHub
-        self.exec(f"wget -c {COSMOVISOR_SERVICE_TEMPLATE}")
+            # Fetch the template file from GitHub
+            self.exec(f"wget -c {COSMOVISOR_SERVICE_TEMPLATE}")
 
-        # Replace the values for environment variables in the template file
-        with open(fname) as f:
-            s = re.sub(
-                r'({CHEQD_ROOT_DIR}|{DEFAULT_BINARY_NAME}|{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}|{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}|{DEFAULT_DAEMON_POLL_INTERVAL}|{DEFAULT_UNSAFE_SKIP_BACKUP}|{DEFAULT_DAEMON_RESTART_DELAY})',
-                lambda m: {'{CHEQD_ROOT_DIR}': self.cheqd_root_dir,
-                           '{DEFAULT_BINARY_NAME}': DEFAULT_BINARY_NAME,
-                           '{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}':  self.interviewer.daemon_allow_download_binaries,
-                           '{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}': self.interviewer.daemon_restart_after_upgrade,
-                           '{DEFAULT_DAEMON_POLL_INTERVAL}': DEFAULT_DAEMON_POLL_INTERVAL,
-                           '{DEFAULT_UNSAFE_SKIP_BACKUP}': DEFAULT_UNSAFE_SKIP_BACKUP,
-                           '{DEFAULT_DAEMON_RESTART_DELAY}': DEFAULT_DAEMON_RESTART_DELAY}[m.group()],
-                f.read()
-            )
-        
-        # Remove the template file
-        self.remove_safe(fname)
-        return s
+            # Replace the values for environment variables in the template file
+            with open(fname) as f:
+                s = re.sub(
+                    r'({CHEQD_ROOT_DIR}|{DEFAULT_BINARY_NAME}|{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}|{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}|{DEFAULT_DAEMON_POLL_INTERVAL}|{DEFAULT_UNSAFE_SKIP_BACKUP}|{DEFAULT_DAEMON_RESTART_DELAY})',
+                    lambda m: {'{CHEQD_ROOT_DIR}': self.cheqd_root_dir,
+                            '{DEFAULT_BINARY_NAME}': DEFAULT_BINARY_NAME,
+                            '{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}':  self.interviewer.daemon_allow_download_binaries,
+                            '{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}': self.interviewer.daemon_restart_after_upgrade,
+                            '{DEFAULT_DAEMON_POLL_INTERVAL}': DEFAULT_DAEMON_POLL_INTERVAL,
+                            '{DEFAULT_UNSAFE_SKIP_BACKUP}': DEFAULT_UNSAFE_SKIP_BACKUP,
+                            '{DEFAULT_DAEMON_RESTART_DELAY}': DEFAULT_DAEMON_RESTART_DELAY}[m.group()],
+                    f.read()
+                )
+            
+            # Remove the template file
+            self.remove_safe(fname)
+            return s
+        except Exception as e:
+            logging.exception(f"Failed to set up service file from template. Reason: {e}")
 
     @property
     def rsyslog_cfg(self):
@@ -263,30 +265,33 @@ class Installer():
         # The template file is fetched from GitHub repo
         # Some of these variables are explicitly asked during the installer process. Others are set to default values.
         
-        # Determine the binary name for logging based on installation type
-        if self.interviewer.is_cosmo_needed:
-            binary_name = DEFAULT_COSMOVISOR_BINARY_NAME
-        else:
-            binary_name = DEFAULT_BINARY_NAME
+        try:
+            # Determine the binary name for logging based on installation type
+            if self.interviewer.is_cosmo_needed:
+                binary_name = DEFAULT_COSMOVISOR_BINARY_NAME
+            else:
+                binary_name = DEFAULT_BINARY_NAME
 
-        # Set template file path
-        fname = os.path.basename(RSYSLOG_TEMPLATE)
+            # Set template file path
+            fname = os.path.basename(RSYSLOG_TEMPLATE)
 
-        # Fetch the template file from GitHub
-        self.exec(f"wget -c {RSYSLOG_TEMPLATE}")
+            # Fetch the template file from GitHub
+            self.exec(f"wget -c {RSYSLOG_TEMPLATE}")
 
-        # Replace the values for environment variables in the template file
-        with open(fname) as f:
-            s = re.sub(
-                r'({BINARY_FOR_LOGGING}|{CHEQD_LOG_DIR})',
-                lambda m: {'{BINARY_FOR_LOGGING}': binary_name,
-                            '{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()],
-                f.read()
-            )
-        
-        # Remove the template file
-        self.remove_safe(fname)
-        return s
+            # Replace the values for environment variables in the template file
+            with open(fname) as f:
+                s = re.sub(
+                    r'({BINARY_FOR_LOGGING}|{CHEQD_LOG_DIR})',
+                    lambda m: {'{BINARY_FOR_LOGGING}': binary_name,
+                                '{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()],
+                    f.read()
+                )
+            
+            # Remove the template file
+            self.remove_safe(fname)
+            return s
+        except Exception as e:
+            logging.exception(f"Failed to set up rsyslog from template. Reason: {e}")
         
     @property
     def logrotate_cfg(self):
@@ -294,23 +299,26 @@ class Installer():
         # The logrotate template file is fetched from the GitHub repo
         # Logrotate is used to rotate the log files of the cheqd-node every day, and keep a maximum of 7 days of logs.
 
-        # Set template file path
-        fname = os.path.basename(LOGROTATE_TEMPLATE)
+        try:
+            # Set template file path
+            fname = os.path.basename(LOGROTATE_TEMPLATE)
 
-        # Fetch the template file from GitHub
-        self.exec(f"wget -c {LOGROTATE_TEMPLATE}")
+            # Fetch the template file from GitHub
+            self.exec(f"wget -c {LOGROTATE_TEMPLATE}")
 
-        # Replace the values for environment variables in the template file
-        with open(fname) as f:
-            s = re.sub(
-                r'({CHEQD_LOG_DIR})',
-                lambda m: {'{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()],
-                f.read()
-            )
-        
-        # Remove the template file
-        self.remove_safe(fname)
-        return s
+            # Replace the values for environment variables in the template file
+            with open(fname) as f:
+                s = re.sub(
+                    r'({CHEQD_LOG_DIR})',
+                    lambda m: {'{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()],
+                    f.read()
+                )
+            
+            # Remove the template file
+            self.remove_safe(fname)
+            return s
+        except Exception as e:
+            logging.exception(f"Failed to set up logrotate from template. Reason: {e}")
 
     @property
     def cheqd_root_dir(self):
@@ -392,10 +400,10 @@ class Installer():
                 self.exec(f"tar -xzf {fname} -C .")
                 self.remove_safe(fname)
             
+            # Make the binary executable
             self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
         except Exception as e:
-            logging.exception(
-                "Failed to download cheqd-noded binary. Reason: {e}")
+            logging.exception("Failed to download cheqd-noded binary. Reason: {e}")
 
     def is_user_exists(self, username) -> bool:
         # Check if "cheqd" user exists on the system
@@ -409,32 +417,38 @@ class Installer():
 
     def remove_safe(self, path, is_dir=False):
         # Common function to remove a file or directory safely
-        if is_dir and os.path.exists(path):
-            shutil.rmtree(path)
-        if os.path.exists(path):
-            os.remove(path)
+        try:
+            if is_dir and os.path.exists(path):
+                shutil.rmtree(path)
+                logging.info(f"Removed {path}")
+            if os.path.exists(path):
+                os.remove(path)
+                logging.info(f"Removed {path}")
+        except Exception as e:
+            logging.exception(f"Failed to remove {path}. Reason: {e}")
 
     def pre_install(self):
         # Pre-installation checks
-        if self.interviewer.is_from_scratch:
-            # Removes the following existing cheqd-noded data and configurations:
-            # 1. ~/.cheqdnode directory
-            # 2. cheqd-noded / cosmovisor binaries
-            # 3. systemd service files
-            logging.info("Removing user's data and configs")
-            self.remove_safe(self.cheqd_root_dir, is_dir=True)
-            self.remove_safe(os.path.join(
-                DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
-            self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH,
-                             DEFAULT_COSMOVISOR_BINARY_NAME))
-            self.remove_safe(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH)
-            self.remove_safe(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
-            self.remove_safe(DEFAULT_RSYSLOG_FILE)
-            self.remove_safe(DEFAULT_LOGROTATE_FILE)
+        # Removes the following existing cheqd-noded data and configurations:
+        # 1. ~/.cheqdnode directory
+        # 2. cheqd-noded / cosmovisor binaries
+        # 3. systemd service files
+        try:
+            if self.interviewer.is_from_scratch:
+                logging.warning("Removing user's data and configs")
+                self.remove_safe(self.cheqd_root_dir, is_dir=True)
+                self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+                self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
+                self.remove_safe(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH)
+                self.remove_safe(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
+                self.remove_safe(DEFAULT_RSYSLOG_FILE)
+                self.remove_safe(DEFAULT_LOGROTATE_FILE)
 
-        if self.interviewer.is_cosmo_needed and os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH):
-            # Scenario: User has installed cheqd-noded without cosmovisor, AND now wants to install cheqd-noded with cosmovisor
-            self.remove_safe(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
+            if self.interviewer.is_cosmo_needed and os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH):
+                # Scenario: User has installed cheqd-noded without cosmovisor, AND now wants to install cheqd-noded with cosmovisor
+                self.remove_safe(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
+        except Exception as e:
+            logging.exception("Failed to perform pre-installation checks. Reason: {e}")
 
     def prepare_directory_tree(self):
         # Needed only in case of clean installation
@@ -445,7 +459,6 @@ class Installer():
             if not os.path.exists(self.cheqd_root_dir):
                 logging.info("Creating main directory for cheqd-noded")
                 self.mkdir_p(self.cheqd_root_dir)
-
                 logging.info(
                     f"Setting directory permissions to default cheqd user: {DEFAULT_CHEQD_USER}")
                 self.exec(
@@ -467,47 +480,43 @@ class Installer():
                 os.symlink(self.cheqd_log_dir, "/var/log/cheqd-node",
                            target_is_directory=True)
             else:
-                logging.info(
-                    "Skipping linking because /var/log/cheqd-node already exists")
+                logging.info("Skipping linking because /var/log/cheqd-node already exists")
         except Exception as e:
-            logging.exception(
-                f"Failed to prepare directory tree for {DEFAULT_CHEQD_USER}. Reason: {e}")
+            logging.exception(f"Failed to prepare directory tree for {DEFAULT_CHEQD_USER}. Reason: {e}")
 
     def setup_node_systemd(self):
-        # Setup the following systemd services:
-        # 1. cheqd-noded.service or cheqd-cosmovisor.service
+        # Setup cheqd-noded.service or cheqd-cosmovisor.service
+        try:
+            logging.info("Setting up systemd config")
 
-        logging.info("Setting up systemd config")
+            # Check if systemd service files already exist for cheqd-node
+            service_file_exists = os.path.exists(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH) or os.path.exists(
+                DEFAULT_STANDALONE_SERVICE_FILE_PATH)
 
-        # Check if systemd service files already exist for cheqd-node
-        service_file_exists = os.path.exists(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH) or os.path.exists(
-            DEFAULT_STANDALONE_SERVICE_FILE_PATH)
+            if not self.interviewer.is_upgrade or \
+                    self.interviewer.rewrite_node_systemd or \
+                    not service_file_exists:
+                self.remove_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME)
+                self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME)
 
-        if not self.interviewer.is_upgrade or \
-                self.interviewer.rewrite_node_systemd or \
-                not service_file_exists:
-            self.remove_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME)
-            self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME)
+                if self.interviewer.is_cosmo_needed:
+                    try:
+                        # Setup cheqd-cosmovisor.service if requested
+                        logging.info("Enabling cheqd-cosmovisor.service in systemd")
+                        with open(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH, mode="w") as fd:
+                            fd.write(self.cosmovisor_service_cfg)
+                    except Exception as e:
+                        logging.exception(
+                            f"Failed to setup cheqd-cosmovisor systemd service. Reason: {e}")
+                else:
+                    logging.info("Enabling systemd service for cheqd-noded")
+                    self.exec(
+                        f"curl -s {STANDALONE_SERVICE_TEMPLATE} > {DEFAULT_STANDALONE_SERVICE_FILE_PATH}")
 
-            if self.interviewer.is_cosmo_needed:
-                try:
-                    # Setup cheqd-cosmovisor.service if requested
-                    logging.info(
-                        "Enabling cheqd-cosmovisor.service in systemd")
-
-                    with open(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH, mode="w") as fd:
-                        fd.write(self.cosmovisor_service_cfg)
-
-                except Exception as e:
-                    logging.exception(
-                        f"Failed to setup cheqd-cosmovisor systemd service. Reason: {e}")
-            else:
-                logging.info("Enabling systemd service for cheqd-noded")
                 self.exec(
-                    f"curl -s {STANDALONE_SERVICE_TEMPLATE} > {DEFAULT_STANDALONE_SERVICE_FILE_PATH}")
-
-            self.exec(
-                f"systemctl enable {DEFAULT_COSMOVISOR_SERVICE_NAME if self.interviewer.is_cosmo_needed else DEFAULT_STANDALONE_SERVICE_NAME}")
+                    f"systemctl enable {DEFAULT_COSMOVISOR_SERVICE_NAME if self.interviewer.is_cosmo_needed else DEFAULT_STANDALONE_SERVICE_NAME}")
+        except Exception as e:
+            logging.exception(f"Failed to setup cheqd-noded systemd service. Reason: {e}")
 
     def check_systemd_service_on(self, service_name) -> bool:
         # pylint: disable=E1123
@@ -590,7 +599,7 @@ class Installer():
             try:
                 # Warn user if rsyslog service file already exists
                 if os.path.exists(DEFAULT_RSYSLOG_FILE):
-                    logging.warn(
+                    logging.warning(
                         f"Existing rsyslog configuration at {DEFAULT_RSYSLOG_FILE} will be overwritten")
 
                 # Determine the binary name for logging based on installation type
@@ -616,7 +625,7 @@ class Installer():
             try:
                 # Warn user if logrotate service file already exists
                 if os.path.exists(DEFAULT_LOGROTATE_FILE):
-                    logging.warn(
+                    logging.warning(
                         f"Existing logrotate configuration at {DEFAULT_LOGROTATE_FILE} will be overwritten")
 
                 logging.info(
@@ -1674,7 +1683,7 @@ class Interviewer:
     # If an existing installation is detected, ask user if they want to upgrade
     def ask_for_upgrade(self):
         try:
-            logging.warn(
+            logging.warning(
                 f"Existing cheqd-node configuration folder detected.\n")
             answer = self.ask(
                 f"Do you want to upgrade an existing cheqd-node installation? (yes/no)", default="no")
@@ -1691,7 +1700,7 @@ class Interviewer:
     # If an install from scratch is requested, warn the user and check if they want to proceed
     def ask_for_install_from_scratch(self):
         try:
-            logging.warn(
+            logging.warning(
                 f"Doing a fresh installation of cheqd-node will remove ALL existing configuration and data.\nCAUTION: Please ensure you have a backup of your existing configuration and data before proceeding!\n")
             answer = self.ask(
                 f"Do you want to do fresh installation of cheqd-node? (yes/no)", default="no")
@@ -1759,7 +1768,7 @@ class Interviewer:
     # This question is asked last because it is the most time consuming.
     def ask_for_init_from_snapshot(self):
         try:
-            logging.warn(
+            logging.warning(
                 f"CAUTION: Downloading a snapshot replaces your existing copy of chain data! Usually safe to use this option when doing a fresh installation.\n")
             answer = self.ask(
                 f"Do you want to download a snapshot of the existing chain to speed up node synchronization? (yes/no)", default=DEFAULT_INIT_FROM_SNAPSHOT)
