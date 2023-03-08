@@ -32,6 +32,8 @@ DEFAULT_COSMOVISOR_BINARY_NAME = "cosmovisor"
 MAINNET_CHAIN_ID = "cheqd-mainnet-1"
 TESTNET_CHAIN_ID = "cheqd-testnet-6"
 PRINT_PREFIX = "********* "
+# Set branch dynamically in CI workflow for testing if Python dev mode is enabled and DEFAULT_DEBUG_BRANCH is set
+# Otherwise, use the main branch
 DEFAULT_DEBUG_BRANCH = os.getenv("DEFAULT_DEBUG_BRANCH") if sys.flags.dev_mode and os.getenv(
     "DEFAULT_DEBUG_BRANCH") != None else "main"
 
@@ -180,15 +182,16 @@ class Release:
         # We also determine the OS and architecture, and construct the URL to download the release.
         try:
             os_arch = str.lower(platform.machine())
-            # Previous version of goreleaser made arch as x86_64 instead of amd64
-            os_alt_arch = "amd64"
+            # Python returns "x86_64" for 64-bit OS, but the release URL uses "amd64" since that's the Go convention.
+            if os_arch == 'x86_64':
+                os_arch = 'amd64'
+            else:
+                os_arch = 'arm64'
             os_name = str.lower(platform.system())
             for _url_item in self.assets:
                 _url = _url_item["browser_download_url"]
                 version_without_v_prefix = self.version.replace('v', '', 1)
                 if os.path.basename(_url) == f"cheqd-noded-{version_without_v_prefix}-{os_name}-{os_arch}.tar.gz":
-                    return _url
-                elif os_arch == "x86_64" and os.path.basename(_url) == f"cheqd-noded-{version_without_v_prefix}-{os_name}-{os_alt_arch}.tar.gz":
                     return _url
             else:
                 logging.exception(
@@ -226,11 +229,17 @@ class Installer():
 
     @property
     def cosmovisor_service_cfg(self):
-        # Modify node-cosmovisor.service template file to replace values for environment variables
+        # Modify cheqd-cosmovisor.service template file to replace values for environment variables
         # The template file is fetched from the GitHub repo
         # Some of these variables are explicitly asked during the installer process. Others are set to default values.
+
+        # Set service file path
         fname = os.path.basename(COSMOVISOR_SERVICE_TEMPLATE)
+
+        # Fetch the template file from GitHub
         self.exec(f"wget -c {COSMOVISOR_SERVICE_TEMPLATE}")
+
+        # Replace the values for environment variables in the template file
         with open(fname) as f:
             s = re.sub(
                 r'({CHEQD_ROOT_DIR}|{DEFAULT_BINARY_NAME}|{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}|{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}|{DEFAULT_DAEMON_POLL_INTERVAL}|{DEFAULT_UNSAFE_SKIP_BACKUP}|{DEFAULT_DAEMON_RESTART_DELAY})',
@@ -243,6 +252,8 @@ class Installer():
                            '{DEFAULT_DAEMON_RESTART_DELAY}': DEFAULT_DAEMON_RESTART_DELAY}[m.group()],
                 f.read()
             )
+        
+        # Remove the template file
         self.remove_safe(fname)
         return s
 
@@ -253,10 +264,18 @@ class Installer():
         # Some of these variables are explicitly asked during the installer process. Others are set to default values.
         
         # Determine the binary name for logging based on installation type
-        binary_name = DEFAULT_COSMOVISOR_BINARY_NAME if self.interviewer.is_cosmo_needed else DEFAULT_BINARY_NAME
+        if self.interviewer.is_cosmo_needed:
+            binary_name = DEFAULT_COSMOVISOR_BINARY_NAME
+        else:
+            binary_name = DEFAULT_BINARY_NAME
 
+        # Set template file path
         fname = os.path.basename(RSYSLOG_TEMPLATE)
+
+        # Fetch the template file from GitHub
         self.exec(f"wget -c {RSYSLOG_TEMPLATE}")
+
+        # Replace the values for environment variables in the template file
         with open(fname) as f:
             s = re.sub(
                 r'({BINARY_FOR_LOGGING}|{CHEQD_LOG_DIR})',
@@ -264,6 +283,8 @@ class Installer():
                             '{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()],
                 f.read()
             )
+        
+        # Remove the template file
         self.remove_safe(fname)
         return s
         
@@ -272,14 +293,22 @@ class Installer():
         # Modify logrotate template file to replace values for environment variables
         # The logrotate template file is fetched from the GitHub repo
         # Logrotate is used to rotate the log files of the cheqd-node every day, and keep a maximum of 7 days of logs.
+
+        # Set template file path
         fname = os.path.basename(LOGROTATE_TEMPLATE)
+
+        # Fetch the template file from GitHub
         self.exec(f"wget -c {LOGROTATE_TEMPLATE}")
+
+        # Replace the values for environment variables in the template file
         with open(fname) as f:
             s = re.sub(
                 r'({CHEQD_LOG_DIR})',
                 lambda m: {'{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()],
                 f.read()
             )
+        
+        # Remove the template file
         self.remove_safe(fname)
         return s
 
@@ -350,14 +379,19 @@ class Installer():
     def get_binary(self):
         # Download cheqd-noded binary and extract it
         # Also remove the downloaded archive file, if applicable
-        logging.info("Downloading cheqd-noded binary...")
-        binary_url = self.release.get_release_url()
-        fname = os.path.basename(binary_url)
         try:
+            logging.info("Downloading cheqd-noded binary...")
+            binary_url = self.release.get_release_url()
+            fname = os.path.basename(binary_url)
+
+            # Download the binary from GitHub
             self.exec(f"wget -c {binary_url}")
+
+            # Extract the binary from the archive file
             if fname.find(".tar.gz") != -1:
                 self.exec(f"tar -xzf {fname} -C .")
                 self.remove_safe(fname)
+            
             self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
         except Exception as e:
             logging.exception(
@@ -1419,7 +1453,7 @@ class Interviewer:
                 "Choose list option number above to select version of cheqd-node to install", default=1))
 
             # Check if user input is valid
-            if release_num >= 1 and release_num <= len(all_releases):
+            if release_num >= 1 and release_num <= LAST_N_RELEASES:
                 self.release = all_releases[release_num - 1]
             else:
                 raise ValueError(
