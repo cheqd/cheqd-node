@@ -562,20 +562,17 @@ class Installer():
     def remove_systemd_service(self, service_name):
         # Remove a given systemd service
         try:
-            if self.check_systemd_service_on(service_name):
-                logging.info(f"Stopping systemd service: {service_name}")
-                os.system(f"systemctl stop {service_name}")
+            manager = systemd.manager.Manager()
+            unit_file_path = manager.get_unit_file_path(service_name)
 
-                logging.info(f"Disable systemd service: {service_name}")
-                os.system(f"systemctl disable {service_name}")
-
-                logging.info("Reset failed systemd services (if any)")
-                os.system("systemctl reset-failed")
-
-                logging.info("Reload systemd config")
-                os.system('systemctl daemon-reload')
-        except Exception as e:
-            logging.exception(f"Failed to remove systemd. Reason: {e}")
+            if unit_file_path:
+                manager.disable_unit(service_name)
+                manager.remove_unit(service_name)
+                logging.info(f"{service_name} has been disabled and removed")
+            else:
+                logging.error(f"{service_name} does not exist")
+        except systemd.exceptions.ManagerError as e:
+            logging.exception(f"Error disabling or removing {service_name}: Reason: {e}")
 
     def stop_systemd_service(self, service_name):
         # Stop and disable a given systemd service
