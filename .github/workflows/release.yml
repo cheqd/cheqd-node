@@ -40,12 +40,13 @@ jobs:
         VALIDATE_XML: true
         VALIDATE_YAML: true
 
-  calculate-version:
-    name: "Calculate release version"
+
+  release-binary:
+    name: "Node binary"
     runs-on: ubuntu-20.04
+    needs: super-lint
     outputs:
       RELEASE_VERSION: ${{ steps.set-version.outputs.RELEASE_VERSION }}
-      API_VERSION: ${{ steps.set-api-version.outputs.API_VERSION }}
     
     steps:
       - uses: actions/checkout@v3
@@ -53,12 +54,22 @@ jobs:
           fetch-depth: 0 # Required to fetch version
           persist-credentials: false
 
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: ./go.mod
+          cache: true
+
       # Node.js setup is needed to run Semantic Release
       - uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: 'npm'
           cache-dependency-path: '**/package-lock.json'
+
+      # Setup for pushing to Buf.build later
+      - uses: bufbuild/buf-setup-action@v1.15.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       # Required for short-lived token provided to Semantic Release
       - name: "Obtain Github App token"
@@ -76,89 +87,36 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 
-      # Check if there's a release tag inserted by Semantic Release starting with 'v'
-      # "--points-at" is more precise than "--contains" because it checks if specific commit is tagged without check if the commit also appears elsewhere in git history
-      # "--list 'v*'" omits tags beginning with "api/v" to avoid false positives
-      - name: Set release version number
-        id: set-version
-        run: |
-          RELEASE_VERSION=$( git tag --list 'v*' --points-at "${{ github.sha }}")
-          echo "RELEASE_VERSION=$RELEASE_VERSION" >> "$GITHUB_OUTPUT"
-      
-      # Check if there's a release tag for cheqd-node and set API version tag
-      - name: "Set API package version tag"
-        id: set-api-version
-        # Only run this step if release tag starts with 'v'
-        if: startsWith(env.RELEASE_VERSION, 'v')
-        # Replace 'v1' with 'api/v2' to get API package version tag
-        # WARNING: This will need to be updated if cheqd-node package version goes beyond v1.x.x
-        run: |
-          API_VERSION=$(echo "$RELEASE_VERSION" | sed 's/v1/api\/v2/g')
-          echo "API_VERSION=$API_VERSION" >> "$GITHUB_OUTPUT"
-        env:
-          RELEASE_VERSION: ${{ steps.set-version.outputs.RELEASE_VERSION }}
-
-
-  release-binary:
-    name: "Node binary"
-    runs-on: ubuntu-20.04
-    needs: calculate-version
-    # Only proceed with binary release if there's a release tag
-    if: startsWith(needs.calculate-version.outputs.RELEASE_VERSION, 'v')
-    env:
-      RELEASE_VERSION: ${{ needs.calculate-version.outputs.RELEASE_VERSION }}
-      API_VERSION: ${{ needs.calculate-version.outputs.API_VERSION }}
-    
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0 # Required to fetch version
-          persist-credentials: false
-
-      - uses: actions/setup-go@v3
-        with:
-          go-version-file: ./go.mod
-          cache: true
-      
-      # Setup for pushing to Buf.build later
-      - uses: bufbuild/buf-setup-action@v1.14.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v4
         # Only run GoReleaser if the commit is tagged with a version
+        if: startsWith((git tag --contains ${{ github.sha }}), 'v')
         with:
           distribution: goreleaser
           version: latest
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
+
+      - name: Set release version number
+        id: set-version
+        run: |
+          RELEASE_VERSION=$( git describe --tags "${{ github.sha }}")
+          echo "RELEASE_VERSION=$RELEASE_VERSION" >> "$GITHUB_OUTPUT"
+
       # Push Protobufs to Buf.build registry
       - uses: bufbuild/buf-push-action@v1
         with:
           input: proto
           buf_token: ${{ secrets.BUF_TOKEN }}
           draft: ${{ github.ref_name != 'main'}}
-      
-      # Push API package version tag if it exists
-      - name: "Push API package version tag"
-        id: push-api-version
-        uses: actions-ecosystem/action-push-tag@v1
-        # Only run this step if API package version tag exists
-        if: startsWith(env.API_VERSION, 'api')
-        with:
-          tag: ${{ env.API_VERSION }}
-          message: "chore: API package version ${{ env.API_VERSION }} [skip ci]"
 
   release-docker:
     name: "Docker image"
-    needs: [calculate-version, release-binary]
+    needs: [ super-lint, release-binary ]
     runs-on: ubuntu-20.04
     env:
       IMAGE_NAME: ${{ github.repository }}
-      RELEASE_VERSION: ${{ needs.calculate-version.outputs.RELEASE_VERSION }}
 
     steps:
       - uses: actions/checkout@v3
@@ -186,7 +144,7 @@ jobs:
           flavor: |
             latest=auto
           tags: |
-            type=semver,pattern={{version}},value=${{ env.RELEASE_VERSION }}
+            type=semver,pattern={{version}},value=${{ needs.release-binary.outputs.RELEASE_VERSION }}
             type=raw,value=production-latest
             type=sha,format=long
           labels: |
