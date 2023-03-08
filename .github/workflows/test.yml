@@ -13,8 +13,8 @@ permissions:
 
 jobs:
 
-  test-installer-cosmovisor:
-    name: "Installer with Cosmovisor"
+  installer-cosmovisor:
+    name: "Installer - Cosmovisor mode"
     runs-on: ubuntu-20.04
   
     steps:
@@ -41,8 +41,8 @@ jobs:
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 10
     
-  interactive-installer-node-standalone:
-    name: "Installer with standalone node"
+  installer-standalone:
+    name: "Installer - Standalone mode"
     runs-on: ubuntu-20.04
   
     steps:
