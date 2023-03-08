@@ -14,8 +14,6 @@ import os
 import platform
 import pwd
 import re
-import re
-import shutil
 import shutil
 import signal
 import subprocess
@@ -1623,6 +1621,7 @@ class Interviewer:
         except Exception as e:
             logging.exception(f"Failed to set minimum gas prices. Reason: {e}")
 
+    # (Optional) Ask for node's log level
     def ask_for_log_level(self):
         try:
             self.log_level = self.ask(
@@ -1630,17 +1629,21 @@ class Interviewer:
         except Exception as e:
             logging.exception(f"Failed to set log level. Reason: {e}")
 
+    # (Optional) Ask for node's log format
     def ask_for_log_format(self):
         try:
             self.log_format = self.ask(
                 f"Specify log format (json|plain)", default=CHEQD_NODED_LOG_FORMAT)
         except Exception as e:
             logging.exception(f"Failed to set log format. Reason: {e}")
-
+    
+    # If an existing installation is detected, ask user if they want to upgrade
     def ask_for_upgrade(self):
         try:
+            logging.warn(
+                f"Existing cheqd-node configuration folder detected.\n")
             answer = self.ask(
-                f"Existing cheqd-node configuration folder detected. Do you want to upgrade an existing cheqd-node installation? (yes/no)", default="no")
+                f"Do you want to upgrade an existing cheqd-node installation? (yes/no)", default="no")
             if answer.lower().startswith("y"):
                 self.is_upgrade = True
             elif answer.lower().startswith("n"):
@@ -1651,11 +1654,12 @@ class Interviewer:
         except Exception as e:
             logging.exception(f"Failed to upgrade cheqd-node. Reason: {e}")
 
+    # If an install from scratch is requested, warn the user and check if they want to proceed
     def ask_for_install_from_scratch(self):
         try:
+            logging.warn(
+                f"Doing a fresh installation of cheqd-node will remove ALL existing configuration and data.\nCAUTION: Please ensure you have a backup of your existing configuration and data before proceeding!\n")
             answer = self.ask(
-                f"WARNING: Doing a fresh installation of cheqd-node will remove ALL existing configuration and data. "
-                f"CAUTION: Please ensure you have a backup of your existing configuration and data before proceeding. "
                 f"Do you want to do fresh installation of cheqd-node? (yes/no)", default="no")
             if answer.lower().startswith("y"):
                 self.is_from_scratch = True
@@ -1668,6 +1672,7 @@ class Interviewer:
             logging.exception(
                 f"Failed to set whether cheqd-node should install from scratch. Reason: {e}")
 
+    # If an existing installation is detected, ask user if they want to overwrite existing systemd configuration
     def ask_for_rewrite_node_systemd(self):
         try:
             answer = self.ask(
@@ -1683,6 +1688,7 @@ class Interviewer:
             logging.exception(
                 f"Failed to set whether overwrite existing systemd configuration for cheqd-node. Reason: {e}")
 
+    # If an existing installation is detected, ask user if they want to overwrite existing logrotate configuration
     def ask_for_rewrite_logrotate(self):
         try:
             answer = self.ask(
@@ -1698,6 +1704,7 @@ class Interviewer:
             logging.exception(
                 f"Failed to set whether overwrite existing configuration for logrotate. Reason: {e}")
 
+    # If an existing installation is detected, ask user if they want to overwrite existing rsyslog configuration
     def ask_for_rewrite_rsyslog(self):
         try:
             answer = self.ask(
@@ -1713,10 +1720,14 @@ class Interviewer:
             logging.exception(
                 f"Failed to set whether overwrite existing rsyslog configuration for cheqd-node. Reason: {e}")
 
+    # Ask user if they want to download a snapshot of the existing chain to speed up node synchronization.
+    # This is only applicable if installing from scratch.
+    # This question is asked last because it is the most time consuming.
     def ask_for_init_from_snapshot(self):
         try:
+            logging.warn(
+                f"CAUTION: Downloading a snapshot replaces your existing copy of chain data! Usually safe to use this option when doing a fresh installation.\n")
             answer = self.ask(
-                f"CAUTION: Downloading a snapshot replaces your existing copy of chain data. Usually safe to use this option when doing a fresh installation. "
                 f"Do you want to download a snapshot of the existing chain to speed up node synchronization? (yes/no)", default=DEFAULT_INIT_FROM_SNAPSHOT)
             if answer.lower().startswith("y"):
                 self.init_from_snapshot = True
