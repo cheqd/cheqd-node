@@ -52,12 +52,12 @@ DEFAULT_DAEMON_RESTART_DELAY = "120s"
 ###############################################################
 ###     			Systemd configuration      				###
 ###############################################################
-STANDALONE_SERVICE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/build-tools/node-standalone.service"
-COSMOVISOR_SERVICE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/build-tools/node-cosmovisor.service"
+STANDALONE_SERVICE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/build-tools/cheqd-noded.service"
+COSMOVISOR_SERVICE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/build-tools/cheqd-cosmovisor.service"
 LOGROTATE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/build-tools/logrotate.conf"
 RSYSLOG_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/build-tools/rsyslog.conf"
-DEFAULT_STANDALONE_SERVICE_NAME = 'node-standalone'
-DEFAULT_COSMOVISOR_SERVICE_NAME = 'node-cosmovisor'
+DEFAULT_STANDALONE_SERVICE_NAME = 'cheqd-noded'
+DEFAULT_COSMOVISOR_SERVICE_NAME = 'cheqd-cosmovisor'
 DEFAULT_STANDALONE_SERVICE_FILE_PATH = f"/lib/systemd/system/{DEFAULT_STANDALONE_SERVICE_NAME}.service"
 DEFAULT_COSMOVISOR_SERVICE_FILE_PATH = f"/lib/systemd/system/{DEFAULT_COSMOVISOR_SERVICE_NAME}.service"
 DEFAULT_LOGROTATE_FILE = "/etc/logrotate.d/cheqd-node"
@@ -1460,7 +1460,7 @@ class Interviewer:
             answer = int(self.ask(
                 "Select cheqd network to join:\n"
                 f"1. Mainnet ({MAINNET_CHAIN_ID})\n"
-                f"2. Testnet ({TESTNET_CHAIN_ID}) ", default=1))
+                f"2. Testnet ({TESTNET_CHAIN_ID})\n", default=1))
             if answer == 1:
                 self.chain = "mainnet"
             elif answer == 2:
