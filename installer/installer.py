@@ -537,11 +537,10 @@ class Installer():
                     logging.debug(f"Service {service_name} is not active")
                     return False
             else:
-                logging.warning(f"Service {service_name} is not installed")
-                return False
+                logging.error(f"Service {service_name} is not installed")
+                raise
         except Exception as e:
             logging.exception(f"Failed to check whether {service_name} service is active. Reason: {e}")
-            return False
 
     def check_systemd_service_enabled(self, service_name) -> bool:
         # Check if a given systemd service is enabled
@@ -561,81 +560,100 @@ class Installer():
                     logging.debug(f"Service {service_name} is not enabled")
                     return False
             else:
-                logging.warning(f"Service {service_name} is not installed")
-                return False
+                logging.error(f"Service {service_name} is not installed")
+                raise
         except Exception as e:
             logging.exception(f"Failed to check whether {service_name} service is enabled. Reason: {e}")
-            return False
-
-    def remove_systemd_service(self, service_name):
-        # Remove a given systemd service
-        try:
-            manager = systemd.manager.Manager()
-            unit_file_path = manager.get_unit_file_path(service_name)
-
-            if unit_file_path:
-                manager.disable_unit(service_name)
-                manager.remove_unit(service_name)
-                logging.info(f"{service_name} has been disabled and removed")
-            else:
-                logging.error(f"{service_name} does not exist")
-        except systemd.exceptions.ManagerError as e:
-            logging.exception(f"Error disabling or removing {service_name}: Reason: {e}")
-
-    def stop_systemd_service(self, service_name):
-        # Stop and disable a given systemd service
-        try:
-            manager = systemd.manager.Manager()
-            unit = manager.get_unit(service_name)
-
-            # If unit exists and is active, stop it
-            if unit and unit.properties.ActiveState.lower() == "active":
-                unit.stop()
-                logging.info(f"{service_name} has been stopped")
-            else:
-                logging.warning(f"{service_name} is not active")
-        except systemd.exceptions.NoSuchUnitError:
-            logging.error(f"{service_name} does not exist")
-        except systemd.exceptions.ManagerError as e:
-            logging.exception(f"Error stopping {service_name}: {e}")
-
-    def reload_systemd(self):
+    
+    def reload_systemd(self) -> bool:
         # Reload systemd config
         try:
-            logging.info("Reload systemd config")
-            os.system('systemctl daemon-reload')
+            logging.info("Reload systemd config and reset failed services")
+
+            # Reload systemd config
+            reload = os.system(f'systemctl daemon-reload --quiet')
+
+            # Reset failed services
+            reset = os.system(f'systemctl reset-failed --quiet')
+
+            if reload == 0 and reset == 0:
+                logging.debug("Reloaded systemd config and reset failed services")
+                return True
+            else:
+                logging.error("Failed to reload systemd config and reset failed services")
+                return False
+                raise
         except Exception as e:
-            logging.exception(f"Failed to reload systemd. Reason: {e}")
-
-    def enable_systemd_service(self, service_name):
-        # Activate and enable a given systemd service
+            logging.exception(f"Error disabling {service_name}: Reason: {e}")
+    
+    def disable_systemd_service(self, service_name) -> bool:
+        # Disable a given systemd service
         try:
-            # Connect to the systemd manager
-            manager = systemd.manager.Manager()
+            if self.check_systemd_service_enabled(service_name):
+                disabled = os.system(f"systemctl disable --quiet {service_name}.service")
+                if disabled == 0:
+                    logging.info(f"{service_name} has been disabled")
+                    return True
+                else:
+                    logging.error(f"{service_name} could not be disabled")
+                    return False
+                    raise
+            else:
+                logging.warning(f"{service_name} is already disabled")
+                return True
+        except Exception as e:
+            logging.exception(f"Error disabling {service_name}: Reason: {e}")
 
-            # Activate and enable the service
-            manager.reload()
-            service = manager.get_unit(service_name)
-            service.enable()
-            logging.info(f"{service_name} has been installed and enabled")
-        except systemd.exceptions.ManagerError as e:
-            logging.exception(f"Error installing and enabling {service_name}. Reason: {e}")
+    def enable_systemd_service(self, service_name) -> bool:
+        # Enable a given systemd service
+        try:
+            if self.reload_systemd():
+                if not self.check_systemd_service_enabled(service_name):
+                    enabled = os.system(f"systemctl enable --quiet {service_name}.service")
+                    if enabled == 0:
+                        logging.info(f"{service_name} has been enable")
+                        return True
+                    else:
+                        logging.error(f"{service_name} could not be enabled")
+                        return False
+                        raise
+                else:
+                    logging.warning(f"{service_name} is already enabled")
+                    return False
+            else:
+                logging.error(f"Failed to reload systemd config and reset failed services")
+                return False
+                raise
+        except Exception as e:
+            logging.exception(f"Error disabling {service_name}: Reason: {e}")
 
-    def restart_systemd_service(self, service_name):
+    def stop_systemd_service(self, service_name) -> bool:
+        # Stop and disable a given systemd service
+        try:
+            if self.check_systemd_service_active(service_name):
+                stopped = os.system(f"systemctl stop --quiet {service_name}.service")
+                if stopped == 0:
+                    logging.info(f"{service_name} has been stopped")
+                    return True
+                else:
+                    logging.error(f"{service_name} could not be stopped")
+                    return False
+                    raise
+            else:
+                logging.warning(f"{service_name} is not active")
+                return False
+        except Exception as e:
+            logging.exception(f"Error stopping {service_name}: Reason: {e}")
+
+    def restart_systemd_service(self, service_name) -> bool:
         # Restart a given systemd service
         try:
-            # Connect to the systemd manager
-            manager = systemd.manager.Manager()
+            if not self.check_systemd_service_enabled(service_name):
+                self.enable_systemd_service(service_name)
 
-            # Reload and restart the service
-            manager.reload()
-            service = manager.get_unit(service_name)
-            service.reset_failed()
-            service.restart()
-            logging.info(f"{service_name} has been restarted")
-        except systemd.exceptions.ManagerError as e:
-            logging.exception(f"Error restarting {service_name}. Reason: {e}")
-
+        except Exception as e:
+            logging.exception(f"Error stopping {service_name}: Reason: {e}")
+    
     # Setup logging related systemd services
     def setup_logging_systemd(self):
         # Install cheqd-node configuration for rsyslog if either of the following conditions are met:
