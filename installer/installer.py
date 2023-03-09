@@ -201,13 +201,9 @@ class Release:
                 _url = _url_item["browser_download_url"]
                 version_without_v_prefix = self.version.replace('v', '', 1)
                 if os.path.basename(_url) == f"cheqd-noded-{version_without_v_prefix}-{os_name}-{os_arch}.tar.gz":
-                    if is_valid_url(_url):
-                        return _url
-                    else:
-                        logging.exception(f"Could not find valid release at Github URL: {_url}")
+                    return _url
             else:
-                logging.exception(
-                    f"No asset found to download for release: {self.version}")
+                logging.exception(f"No asset found to download for release: {self.version}")
         except Exception as e:
             logging.exception(f"Failed to get cheqd-node binaries from GitHub. Reason: {e}")
 
@@ -249,7 +245,10 @@ class Installer():
             fname = os.path.basename(COSMOVISOR_SERVICE_TEMPLATE)
 
             # Fetch the template file from GitHub
-            self.exec(f"wget -c {COSMOVISOR_SERVICE_TEMPLATE}")
+            if is_valid_url(COSMOVISOR_SERVICE_TEMPLATE):
+                self.exec(f"wget -c {COSMOVISOR_SERVICE_TEMPLATE}")
+            else:
+                logging.exception(f"URL is not valid: {COSMOVISOR_SERVICE_TEMPLATE}")
 
             # Replace the values for environment variables in the template file
             with open(fname) as f:
@@ -288,7 +287,10 @@ class Installer():
             fname = os.path.basename(RSYSLOG_TEMPLATE)
 
             # Fetch the template file from GitHub
-            self.exec(f"wget -c {RSYSLOG_TEMPLATE}")
+            if is_valid_url(RSYSLOG_TEMPLATE):
+                self.exec(f"wget -c {RSYSLOG_TEMPLATE}")
+            else:
+                logging.exception(f"URL is not valid: {RSYSLOG_TEMPLATE}")
 
             # Replace the values for environment variables in the template file
             with open(fname) as f:
@@ -316,7 +318,10 @@ class Installer():
             fname = os.path.basename(LOGROTATE_TEMPLATE)
 
             # Fetch the template file from GitHub
-            self.exec(f"wget -c {LOGROTATE_TEMPLATE}")
+            if is_valid_url(LOGROTATE_TEMPLATE):
+                self.exec(f"wget -c {LOGROTATE_TEMPLATE}")
+            else:
+                logging.exception(f"URL is not valid: {LOGROTATE_TEMPLATE}")
 
             # Replace the values for environment variables in the template file
             with open(fname) as f:
@@ -336,8 +341,7 @@ class Installer():
     def cheqd_root_dir(self):
         # CHEQD_NODED_HOME variable can be picked up by cheqd-noded, so this should be set as an environment variable later
         # Default: /home/cheqd/.cheqdnode
-        cheqd_noded_home = os.path.join(
-            self.interviewer.home_dir, ".cheqdnode")
+        cheqd_noded_home = os.path.join(self.interviewer.home_dir, ".cheqdnode")
         return cheqd_noded_home
 
     @property
@@ -373,12 +377,16 @@ class Installer():
     @property
     def cosmovisor_download_url(self):
         # Compute the download URL for cosmovisor binary based on the OS architecture and version number
-        os_arch = platform.machine()
-        if os_arch == 'x86_64':
-            os_arch = 'amd64'
-        else:
-            os_arch = 'arm64'
-        return COSMOVISOR_BINARY_URL.format(DEFAULT_LATEST_COSMOVISOR_VERSION, DEFAULT_LATEST_COSMOVISOR_VERSION, os_arch)
+        try:
+            os_arch = platform.machine()
+            if os_arch == 'x86_64':
+                os_arch = 'amd64'
+            else:
+                os_arch = 'arm64'
+            cosmovisor_download_url = COSMOVISOR_BINARY_URL.format(DEFAULT_LATEST_COSMOVISOR_VERSION, DEFAULT_LATEST_COSMOVISOR_VERSION, os_arch)
+            return cosmovisor_download_url
+        except Exception as e:
+            logging.exception(f"Failed to compute cosmovisor download URL. Reason: {e}")
 
     @post_process
     def exec(self, cmd, use_stdout=True, suppress_err=False):
@@ -405,15 +413,20 @@ class Installer():
             fname = os.path.basename(binary_url)
 
             # Download the binary from GitHub
-            self.exec(f"wget -c {binary_url}")
+            if is_valid_url(binary_url):
+                self.exec(f"wget -c {binary_url}")
+            else:
+                logging.exception(f"Release URL is invalid: {binary_url}")
 
-            # Extract the binary from the archive file
+            # 1. Extract the binary from the archive file
+            # 2. Remove the archive file
+            # 3. Make the binary executable
             if fname.find(".tar.gz") != -1:
                 self.exec(f"tar -xzf {fname} -C .")
                 self.remove_safe(fname)
-            
-            # Make the binary executable
-            self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
+                self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
+            else:
+                logging.exception(f"Unable to extract binary from archive file: {fname}")
         except Exception as e:
             logging.exception("Failed to download cheqd-noded binary. Reason: {e}")
 
@@ -421,10 +434,10 @@ class Installer():
         # Check if "cheqd" user exists on the system
         try:
             pwd.getpwnam(username)
-            logging.info(f"User {username} already exists")
+            logging.debug(f"User {username} already exists")
             return True
-        except KeyError:
-            logging.info(f"User {username} does not exist")
+        except Exception as e:
+            logging.debug(f"User {username} does not exist")
             return False
 
     def remove_safe(self, path, is_dir=False):
