@@ -452,100 +452,6 @@ class Installer():
         except Exception as e:
             logging.exception(f"Failed to remove {path}. Reason: {e}")
 
-    def pre_install(self):
-        # Pre-installation checks
-        # Removes the following existing cheqd-noded data and configurations:
-        # 1. ~/.cheqdnode directory
-        # 2. cheqd-noded / cosmovisor binaries
-        # 3. systemd service files
-        try:
-            if self.interviewer.is_from_scratch:
-                logging.warning("Removing user's data and configs")
-
-                self.remove_safe(self.cheqd_root_dir, is_dir=True)
-                self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
-                self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
-                self.remove_safe(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH)
-                self.remove_safe(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
-                self.remove_safe(DEFAULT_RSYSLOG_FILE)
-                self.remove_safe(DEFAULT_LOGROTATE_FILE)
-
-            # Scenario: User has installed cheqd-noded without cosmovisor, AND now wants to install cheqd-noded with Cosmovisor
-            if self.interviewer.is_cosmo_needed and os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH):
-                
-
-                self.remove_safe(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
-        except Exception as e:
-            logging.exception("Failed to perform pre-installation checks. Reason: {e}")
-
-    def prepare_directory_tree(self):
-        # Needed only in case of clean installation
-        # 1. Create ~/.cheqdnode directory
-        # 2. Set directory permissions to default cheqd user
-        # 3. Create ~/.cheqdnode/log directory
-        try:
-            if not os.path.exists(self.cheqd_root_dir):
-                logging.info("Creating main directory for cheqd-noded")
-                self.mkdir_p(self.cheqd_root_dir)
-                logging.info(
-                    f"Setting directory permissions to default cheqd user: {DEFAULT_CHEQD_USER}")
-                self.exec(
-                    f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.interviewer.home_dir}")
-            else:
-                logging.info(
-                    f"Skipping main directory creation because {self.cheqd_root_dir} already exists")
-
-            if not os.path.exists(self.cheqd_log_dir):
-                logging.info("Creating log directory for cheqd-noded")
-                self.setup_log_dir()
-            else:
-                logging.info(
-                    f"Skipping log directory creation because {self.cheqd_log_dir} already exists")
-
-            if not os.path.exists("/var/log/cheqd-node"):
-                logging.info(
-                    "Creating a symlink from cheqd-noded log folder to /var/log/cheqd-node")
-                os.symlink(self.cheqd_log_dir, "/var/log/cheqd-node",
-                           target_is_directory=True)
-            else:
-                logging.info("Skipping linking because /var/log/cheqd-node already exists")
-        except Exception as e:
-            logging.exception(f"Failed to prepare directory tree for {DEFAULT_CHEQD_USER}. Reason: {e}")
-
-    def setup_node_systemd(self):
-        # Setup cheqd-noded.service or cheqd-cosmovisor.service
-        try:
-            logging.info("Setting up systemd config")
-
-            # Check if systemd service files already exist for cheqd-node
-            service_file_exists = os.path.exists(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH) or os.path.exists(
-                DEFAULT_STANDALONE_SERVICE_FILE_PATH)
-
-            if not self.interviewer.is_upgrade or \
-                    self.interviewer.rewrite_node_systemd or \
-                    not service_file_exists:
-                self.remove_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME)
-                self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME)
-
-                if self.interviewer.is_cosmo_needed:
-                    try:
-                        # Setup cheqd-cosmovisor.service if requested
-                        logging.info("Enabling cheqd-cosmovisor.service in systemd")
-                        with open(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH, mode="w") as fd:
-                            fd.write(self.cosmovisor_service_cfg)
-                    except Exception as e:
-                        logging.exception(
-                            f"Failed to setup cheqd-cosmovisor systemd service. Reason: {e}")
-                else:
-                    logging.info("Enabling systemd service for cheqd-noded")
-                    self.exec(
-                        f"curl -s {STANDALONE_SERVICE_TEMPLATE} > {DEFAULT_STANDALONE_SERVICE_FILE_PATH}")
-
-                self.exec(
-                    f"systemctl enable {DEFAULT_COSMOVISOR_SERVICE_NAME if self.interviewer.is_cosmo_needed else DEFAULT_STANDALONE_SERVICE_NAME}")
-        except Exception as e:
-            logging.exception(f"Failed to setup cheqd-noded systemd service. Reason: {e}")
-
     def check_systemd_service_active(self, service_name) -> bool:
         # Check if a given systemd service is active
         try:
@@ -693,7 +599,101 @@ class Installer():
         except Exception as e:
             logging.exception(f"Error restarting {service_name}: Reason: {e}")
             raise
-    
+
+    def pre_install(self):
+        # Pre-installation checks
+        # Removes the following existing cheqd-noded data and configurations:
+        # 1. ~/.cheqdnode directory
+        # 2. cheqd-noded / cosmovisor binaries
+        # 3. systemd service files
+        try:
+            if self.interviewer.is_from_scratch:
+                logging.warning("Removing user's data and configs")
+
+                self.remove_safe(self.cheqd_root_dir, is_dir=True)
+                self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+                self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
+                self.remove_safe(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH)
+                self.remove_safe(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
+                self.remove_safe(DEFAULT_RSYSLOG_FILE)
+                self.remove_safe(DEFAULT_LOGROTATE_FILE)
+
+            # Scenario: User has installed cheqd-noded without cosmovisor, AND now wants to install cheqd-noded with Cosmovisor
+            if self.interviewer.is_cosmo_needed and os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH):
+                
+
+                self.remove_safe(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
+        except Exception as e:
+            logging.exception("Failed to perform pre-installation checks. Reason: {e}")
+
+    def prepare_directory_tree(self):
+        # Needed only in case of clean installation
+        # 1. Create ~/.cheqdnode directory
+        # 2. Set directory permissions to default cheqd user
+        # 3. Create ~/.cheqdnode/log directory
+        try:
+            if not os.path.exists(self.cheqd_root_dir):
+                logging.info("Creating main directory for cheqd-noded")
+                self.mkdir_p(self.cheqd_root_dir)
+                logging.info(
+                    f"Setting directory permissions to default cheqd user: {DEFAULT_CHEQD_USER}")
+                self.exec(
+                    f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.interviewer.home_dir}")
+            else:
+                logging.info(
+                    f"Skipping main directory creation because {self.cheqd_root_dir} already exists")
+
+            if not os.path.exists(self.cheqd_log_dir):
+                logging.info("Creating log directory for cheqd-noded")
+                self.setup_log_dir()
+            else:
+                logging.info(
+                    f"Skipping log directory creation because {self.cheqd_log_dir} already exists")
+
+            if not os.path.exists("/var/log/cheqd-node"):
+                logging.info(
+                    "Creating a symlink from cheqd-noded log folder to /var/log/cheqd-node")
+                os.symlink(self.cheqd_log_dir, "/var/log/cheqd-node",
+                           target_is_directory=True)
+            else:
+                logging.info("Skipping linking because /var/log/cheqd-node already exists")
+        except Exception as e:
+            logging.exception(f"Failed to prepare directory tree for {DEFAULT_CHEQD_USER}. Reason: {e}")
+
+    def setup_node_systemd(self):
+        # Setup cheqd-noded.service or cheqd-cosmovisor.service
+        try:
+            logging.info("Setting up systemd config")
+
+            # Check if systemd service files already exist for cheqd-node
+            service_file_exists = os.path.exists(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH) or os.path.exists(
+                DEFAULT_STANDALONE_SERVICE_FILE_PATH)
+
+            if not self.interviewer.is_upgrade or \
+                    self.interviewer.rewrite_node_systemd or \
+                    not service_file_exists:
+                self.remove_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME)
+                self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME)
+
+                if self.interviewer.is_cosmo_needed:
+                    try:
+                        # Setup cheqd-cosmovisor.service if requested
+                        logging.info("Enabling cheqd-cosmovisor.service in systemd")
+                        with open(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH, mode="w") as fd:
+                            fd.write(self.cosmovisor_service_cfg)
+                    except Exception as e:
+                        logging.exception(
+                            f"Failed to setup cheqd-cosmovisor systemd service. Reason: {e}")
+                else:
+                    logging.info("Enabling systemd service for cheqd-noded")
+                    self.exec(
+                        f"curl -s {STANDALONE_SERVICE_TEMPLATE} > {DEFAULT_STANDALONE_SERVICE_FILE_PATH}")
+
+                self.exec(
+                    f"systemctl enable {DEFAULT_COSMOVISOR_SERVICE_NAME if self.interviewer.is_cosmo_needed else DEFAULT_STANDALONE_SERVICE_NAME}")
+        except Exception as e:
+            logging.exception(f"Failed to setup cheqd-noded systemd service. Reason: {e}")
+
     # Setup logging related systemd services
     def setup_logging_systemd(self):
         # Install cheqd-node configuration for rsyslog if either of the following conditions are met:
