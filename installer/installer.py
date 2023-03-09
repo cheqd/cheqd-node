@@ -34,8 +34,7 @@ TESTNET_CHAIN_ID = "cheqd-testnet-6"
 PRINT_PREFIX = "********* "
 # Set branch dynamically in CI workflow for testing if Python dev mode is enabled and DEFAULT_DEBUG_BRANCH is set
 # Otherwise, use the main branch
-DEFAULT_DEBUG_BRANCH = os.getenv("DEFAULT_DEBUG_BRANCH") if sys.flags.dev_mode and os.getenv(
-    "DEFAULT_DEBUG_BRANCH") != None else "main"
+DEFAULT_DEBUG_BRANCH = os.getenv("DEFAULT_DEBUG_BRANCH") if os.getenv("DEFAULT_DEBUG_BRANCH") != None else "main"
 
 ###############################################################
 ###     		Cosmovisor configuration      				###
@@ -105,9 +104,16 @@ CHEQD_NODED_P2P_MAX_PACKET_MSG_PAYLOAD_SIZE = 10240
 ###############################################################
 
 # Set logging configuration
-logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
+if sys.flags.dev_mode:
+    logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
                     datefmt='%d-%b-%Y %H:%M:%S', 
-                    level=logging.INFO)
+                    level=logging.DEBUG,
+                    raiseExceptions=True)
+else:
+    logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
+                        datefmt='%d-%b-%Y %H:%M:%S', 
+                        level=logging.INFO,
+                        raiseExceptions=True)
 
 # Handle Ctrl+C / SIGINT halts requests
 def sigint_handler(signal, frame):
@@ -648,11 +654,22 @@ class Installer():
     def restart_systemd_service(self, service_name) -> bool:
         # Restart a given systemd service
         try:
+            # If the service is not enabled, enable it before restarting
             if not self.check_systemd_service_enabled(service_name):
                 self.enable_systemd_service(service_name)
 
+            # Reload systemd services before restarting
+            if self.reload_systemd():
+                restarted = os.system(f"systemctl restart --quiet {service_name}.service")
+                if restarted == 0:
+                    logging.info(f"{service_name} has been restarted")
+                    return True
+                else:
+                    logging.error(f"{service_name} could not be restarted")
+                    return False
+                    raise
         except Exception as e:
-            logging.exception(f"Error stopping {service_name}: Reason: {e}")
+            logging.exception(f"Error restarting {service_name}: Reason: {e}")
     
     # Setup logging related systemd services
     def setup_logging_systemd(self):
@@ -660,10 +677,6 @@ class Installer():
         # 1. rsyslog service file is not present
         # 2. user wants to rewrite rsyslog service file
         try:
-            # Connect to the systemd manager
-            manager = systemd.daemon.respawn_failed()
-            unit = manager.get_unit("rsyslog.service")
-
             if not os.path.exists(DEFAULT_RSYSLOG_FILE) or self.interviewer.rewrite_rsyslog:
                 # Warn user if rsyslog service file already exists
                 if os.path.exists(DEFAULT_RSYSLOG_FILE):
@@ -678,7 +691,8 @@ class Installer():
                     fname.write(self.rsyslog_cfg)
 
                 # Restarting rsyslog can take a lot of time: https://github.com/rsyslog/rsyslog/issues/3133
-                self.restart_systemd_service("rsyslog.service")
+                if self.restart_systemd_service("rsyslog.service"):
+                    logging.info("Successfully configured rsyslog service")
         except Exception as e:
             logging.exception(
                 f"Failed to setup rsyslog service for {binary_name} logging. Reason: {e}")
