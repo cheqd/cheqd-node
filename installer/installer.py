@@ -148,7 +148,7 @@ def post_process(func):
         except subprocess.CalledProcessError as err:
             if err.returncode and _allow_error:
                 return err
-            logging.exception(err)
+            exit_with_error(err)
         return value
     return wrapper
 
@@ -163,6 +163,11 @@ def default_answer(func):
         value = func(*args)
         return value if value != "" else _default
     return wrapper
+
+# Log the message and exit with error
+def exit_with_error(error_message):
+    logging.error(error_message)
+    sys.exit(1)
 
 
 ###############################################################
@@ -194,10 +199,10 @@ class Release:
                 if os.path.basename(_url) == f"cheqd-noded-{version_without_v_prefix}-{os_name}-{os_arch}.tar.gz":
                     return _url
             else:
-                logging.exception(
+                exit_with_error(
                     f"No asset found to download for release: {self.version}")
         except Exception as e:
-            logging.exception(f"Failed to get cheqd-node binaries from GitHub. Reason: {e}")
+            exit_with_error(f"Failed to get cheqd-node binaries from GitHub. Reason: {e}")
 
     def __str__(self):
         return f"Name: {self.version}"
@@ -257,7 +262,7 @@ class Installer():
             self.remove_safe(fname)
             return s
         except Exception as e:
-            logging.exception(f"Failed to set up service file from template. Reason: {e}")
+            exit_with_error(f"Failed to set up service file from template. Reason: {e}")
 
     @property
     def rsyslog_cfg(self):
@@ -291,7 +296,7 @@ class Installer():
             self.remove_safe(fname)
             return s
         except Exception as e:
-            logging.exception(f"Failed to set up rsyslog from template. Reason: {e}")
+            exit_with_error(f"Failed to set up rsyslog from template. Reason: {e}")
         
     @property
     def logrotate_cfg(self):
@@ -318,7 +323,7 @@ class Installer():
             self.remove_safe(fname)
             return s
         except Exception as e:
-            logging.exception(f"Failed to set up logrotate from template. Reason: {e}")
+            exit_with_error(f"Failed to set up logrotate from template. Reason: {e}")
 
     @property
     def cheqd_root_dir(self):
@@ -403,7 +408,7 @@ class Installer():
             # Make the binary executable
             self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
         except Exception as e:
-            logging.exception("Failed to download cheqd-noded binary. Reason: {e}")
+            exit_with_error("Failed to download cheqd-noded binary. Reason: {e}")
 
     def is_user_exists(self, username) -> bool:
         # Check if "cheqd" user exists on the system
@@ -425,7 +430,7 @@ class Installer():
                 os.remove(path)
                 logging.info(f"Removed {path}")
         except Exception as e:
-            logging.exception(f"Failed to remove {path}. Reason: {e}")
+            exit_with_error(f"Failed to remove {path}. Reason: {e}")
 
     def pre_install(self):
         # Pre-installation checks
@@ -448,7 +453,7 @@ class Installer():
                 # Scenario: User has installed cheqd-noded without cosmovisor, AND now wants to install cheqd-noded with cosmovisor
                 self.remove_safe(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
         except Exception as e:
-            logging.exception("Failed to perform pre-installation checks. Reason: {e}")
+            exit_with_error("Failed to perform pre-installation checks. Reason: {e}")
 
     def prepare_directory_tree(self):
         # Needed only in case of clean installation
@@ -482,7 +487,7 @@ class Installer():
             else:
                 logging.info("Skipping linking because /var/log/cheqd-node already exists")
         except Exception as e:
-            logging.exception(f"Failed to prepare directory tree for {DEFAULT_CHEQD_USER}. Reason: {e}")
+            exit_with_error(f"Failed to prepare directory tree for {DEFAULT_CHEQD_USER}. Reason: {e}")
 
     def setup_node_systemd(self):
         # Setup cheqd-noded.service or cheqd-cosmovisor.service
@@ -506,7 +511,7 @@ class Installer():
                         with open(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH, mode="w") as fd:
                             fd.write(self.cosmovisor_service_cfg)
                     except Exception as e:
-                        logging.exception(
+                        exit_with_error(
                             f"Failed to setup cheqd-cosmovisor systemd service. Reason: {e}")
                 else:
                     logging.info("Enabling systemd service for cheqd-noded")
@@ -516,7 +521,7 @@ class Installer():
                 self.exec(
                     f"systemctl enable {DEFAULT_COSMOVISOR_SERVICE_NAME if self.interviewer.is_cosmo_needed else DEFAULT_STANDALONE_SERVICE_NAME}")
         except Exception as e:
-            logging.exception(f"Failed to setup cheqd-noded systemd service. Reason: {e}")
+            exit_with_error(f"Failed to setup cheqd-noded systemd service. Reason: {e}")
 
     def check_systemd_service_active(self, service_name) -> bool:
         # Check if a given systemd service is active
@@ -540,7 +545,7 @@ class Installer():
                 logging.error(f"Service {service_name} is not installed")
                 raise
         except Exception as e:
-            logging.exception(f"Failed to check whether {service_name} service is active. Reason: {e}")
+            exit_with_error(f"Failed to check whether {service_name} service is active. Reason: {e}")
 
     def check_systemd_service_enabled(self, service_name) -> bool:
         # Check if a given systemd service is enabled
@@ -563,7 +568,7 @@ class Installer():
                 logging.error(f"Service {service_name} is not installed")
                 raise
         except Exception as e:
-            logging.exception(f"Failed to check whether {service_name} service is enabled. Reason: {e}")
+            exit_with_error(f"Failed to check whether {service_name} service is enabled. Reason: {e}")
     
     def reload_systemd(self) -> bool:
         # Reload systemd config
@@ -584,7 +589,7 @@ class Installer():
                 return False
                 raise
         except Exception as e:
-            logging.exception(f"Error disabling {service_name}: Reason: {e}")
+            exit_with_error(f"Error disabling {service_name}: Reason: {e}")
     
     def disable_systemd_service(self, service_name) -> bool:
         # Disable a given systemd service
@@ -602,7 +607,7 @@ class Installer():
                 logging.warning(f"{service_name} is already disabled")
                 return True
         except Exception as e:
-            logging.exception(f"Error disabling {service_name}: Reason: {e}")
+            exit_with_error(f"Error disabling {service_name}: Reason: {e}")
 
     def enable_systemd_service(self, service_name) -> bool:
         # Enable a given systemd service
@@ -625,7 +630,7 @@ class Installer():
                 return False
                 raise
         except Exception as e:
-            logging.exception(f"Error disabling {service_name}: Reason: {e}")
+            exit_with_error(f"Error disabling {service_name}: Reason: {e}")
 
     def stop_systemd_service(self, service_name) -> bool:
         # Stop and disable a given systemd service
@@ -643,7 +648,7 @@ class Installer():
                 logging.warning(f"{service_name} is not active")
                 return False
         except Exception as e:
-            logging.exception(f"Error stopping {service_name}: Reason: {e}")
+            exit_with_error(f"Error stopping {service_name}: Reason: {e}")
 
     def restart_systemd_service(self, service_name) -> bool:
         # Restart a given systemd service
@@ -652,7 +657,7 @@ class Installer():
                 self.enable_systemd_service(service_name)
 
         except Exception as e:
-            logging.exception(f"Error stopping {service_name}: Reason: {e}")
+            exit_with_error(f"Error stopping {service_name}: Reason: {e}")
     
     # Setup logging related systemd services
     def setup_logging_systemd(self):
@@ -680,7 +685,7 @@ class Installer():
                 # Restarting rsyslog can take a lot of time: https://github.com/rsyslog/rsyslog/issues/3133
                 self.restart_systemd_service("rsyslog.service")
         except Exception as e:
-            logging.exception(
+            exit_with_error(
                 f"Failed to setup rsyslog service for {binary_name} logging. Reason: {e}")
 
         # Install cheqd-node configuration for logrotate if either of the following conditions are met:
@@ -703,7 +708,7 @@ class Installer():
                 self.restart_systemd_service("logrotate.service")
                 self.restart_systemd_service("logrotate.timer")
             except Exception as e:
-                logging.exception(
+                exit_with_error(
                     f"Failed to setup logrotate service. Reason: {e}")
 
     def install(self):
@@ -873,7 +878,7 @@ class Installer():
                 self.exec(
                     f"adduser --system {DEFAULT_CHEQD_USER} --home {self.interviewer.home_dir} --shell /bin/bash --ingroup {DEFAULT_CHEQD_USER} --quiet")
         except Exception as e:
-            logging.exception(
+            exit_with_error(
                 f"Failed to create {DEFAULT_CHEQD_USER} user. Reason: {e}")
 
     def mkdir_p(self, dir_name):
@@ -892,7 +897,7 @@ class Installer():
                          'syslog',
                          DEFAULT_CHEQD_USER)
         except Exception as e:
-            logging.exception(
+            exit_with_error(
                 f"Failed to setup {self.cheqd_log_dir} directory. Reason: {e}")
 
     def setup_cosmovisor(self):
@@ -929,7 +934,7 @@ class Installer():
                              DEFAULT_CHEQD_USER,
                              DEFAULT_CHEQD_USER)
         except Exception as e:
-            logging.exception(f"Failed to setup Cosmovisor. Reason: {e}")
+            exit_with_error(f"Failed to setup Cosmovisor. Reason: {e}")
 
     def set_cheqd_env_vars(self):
         self.set_env_vars("DEFAULT_CHEQD_HOME_DIR",
@@ -1024,7 +1029,7 @@ class Installer():
                          DEFAULT_CHEQD_USER)
             self.reload_systemd()
         except Exception as e:
-            logging.exception(f"Failed to bump Cosmovisor. Reason: {e}")
+            exit_with_error(f"Failed to bump Cosmovisor. Reason: {e}")
 
     def set_env_vars(self, env_var_name, env_var_value):
         if not self.check_if_env_var_already_set(env_var_name):
@@ -1040,7 +1045,7 @@ class Installer():
                 f.write(f"{env_var_name}={env_var_value}\n")
 
         except Exception:
-            logging.exception("Unable to set ENC vars")
+            exit_with_error("Unable to set ENC vars")
 
         finally:
             f.close() 
@@ -1060,7 +1065,7 @@ class Installer():
             else:
                 return False
         except KeyError:
-            logging.exception("Unable to get the default shell")
+            exit_with_error("Unable to get the default shell")
 
     def download_and_unzip(self, download_url):
         fname = os.path.basename(download_url)
@@ -1085,7 +1090,7 @@ class Installer():
             logging.info(f"Checksums do not match. Download got corrupted.")
             return False
         else:
-            logging.exception(f"Error encountered when comparing checksums.")
+            exit_with_error(f"Error encountered when comparing checksums.")
 
     def install_dependencies(self):
         try:
@@ -1094,7 +1099,7 @@ class Installer():
             logging.info(f"Install pv to show progress of extraction")
             self.exec("sudo apt-get install -y pv")
         except Exception as e:
-            logging.exception(f"Failed to install dependencies. Reason: {e}")
+            exit_with_error(f"Failed to install dependencies. Reason: {e}")
             
     def prepare_url_for_latest(self) -> str:
         template = TESTNET_SNAPSHOT if self.interviewer.chain in TESTNET_CHAIN_ID else MAINNET_SNAPSHOT
@@ -1110,7 +1115,7 @@ class Installer():
             _date -= datetime.timedelta(days=1)
 
         if not _is_url_valid:
-            logging.exception("Could not find the valid snapshot for the last {} days".format(
+            exit_with_error("Could not find the valid snapshot for the last {} days".format(
                 MAX_SNAPSHOT_DAYS))
         return _url
 
@@ -1139,16 +1144,16 @@ class Installer():
                 else:
                     logging.info(
                         f"Snapshot download was successful but checksums do not match.")
-                    logging.exception(
+                    exit_with_error(
                         f"Snapshot download was successful but checksums do not match.")
             elif int(archive_size) > int(free_disk_space):
-                logging.exception(
+                exit_with_error(
                     f"Snapshot archive is too large to fit in free disk space. Please free up some space and try again.")
             else:
-                logging.exception(
+                exit_with_error(
                     f"Error encountered when downloading snapshot archive.")
         except Exception as e:
-            logging.exception(f"Failed to download snapshot. Reason: {e}")
+            exit_with_error(f"Failed to download snapshot. Reason: {e}")
 
     def untar_from_snapshot(self):
         try:
@@ -1182,7 +1187,7 @@ class Installer():
                          DEFAULT_CHEQD_USER,
                          DEFAULT_CHEQD_USER)
         except Exception as e:
-            logging.exception(f"Failed to extract snapshot. Reason: {e}")
+            exit_with_error(f"Failed to extract snapshot. Reason: {e}")
 
 
 ###############################################################
@@ -1443,7 +1448,7 @@ class Interviewer:
             else:
                 return False
         except Exception as e:
-            logging.exception(
+            exit_with_error(
                 f"Could not check if cheqd-noded is already installed. Reason: {e}")
 
     # Check if Cosmovisor is installed
@@ -1456,7 +1461,7 @@ class Interviewer:
                 self.is_cosmovisor_bump_needed = False
                 return False
         except Exception as e:
-            logging.exception(
+            exit_with_error(
                 f"Could not check if Cosmovisor is already installed. Reason: {e}")
 
     # Check if a systemd config is installed for a given service file
@@ -1467,7 +1472,7 @@ class Interviewer:
             else:
                 return False
         except Exception as e:
-            logging.exception(
+            exit_with_error(
                 f"Could not check if {systemd_service_file} already exists. Reason: {e}")
 
     # Get list of last N releases for cheqd-node from GitHub
@@ -1480,7 +1485,7 @@ class Interviewer:
                 r_list = json.loads(response.read().decode("utf-8").strip())
                 return [Release(r) for r in r_list]
         except Exception as e:
-            logging.exception(
+            exit_with_error(
                 f"Could not get releases from GitHub. Reason: {e}")
 
     # The "latest" stable release may not be in last N releases, so we need to get it separately
@@ -1492,7 +1497,7 @@ class Interviewer:
             with request.urlopen(req) as response:
                 return Release(json.loads(response.read().decode("utf-8")))
         except Exception as e:
-            logging.exception(
+            exit_with_error(
                 f"Could not get latest release from GitHub. Reason: {e}")
 
     # Compile a list of releases to be displayed to the user
@@ -1505,7 +1510,7 @@ class Interviewer:
                     copy_r_list.pop(i)
                     return copy_r_list
         except Exception as e:
-            logging.exception(
+            exit_with_error(
                 f"Could not assemble list of releases to show to the user. Reason: {e}")
 
     # Ask user to select a version of cheqd-node to install
@@ -1534,7 +1539,7 @@ class Interviewer:
                     f"Invalid release number picked from list of releases: {release_num}")
 
         except Exception as e:
-            logging.exception(
+            exit_with_error(
                 f"Failed to selected version of cheqd-noded. Reason: {e}")
 
     # Set cheqd user's home directory
@@ -1543,7 +1548,7 @@ class Interviewer:
             self.home_dir = self.ask(
                 f"Set path for cheqd user's home directory", default=DEFAULT_CHEQD_HOME_DIR)
         except Exception as e:
-            logging.exception(
+            exit_with_error(
                 f"Failed to set cheqd user's home directory. Reason: {e}")
 
     # Ask whether user wants to do a install from scratch
@@ -1559,7 +1564,7 @@ class Interviewer:
                 logging.error(f"Please choose either 'yes' or 'no'")
                 self.ask_for_setup()
         except Exception as e:
-            logging.exception(
+            exit_with_error(
                 f"Failed to set fresh installation parameters. Reason: {e}")
 
     # Ask user which network to join
@@ -1578,7 +1583,7 @@ class Interviewer:
                     f"Invalid network selected during installation. Please choose either 1 or 2.")
                 self.ask_for_chain()
         except Exception as e:
-            logging.exception(
+            exit_with_error(
                 f"Failed to set network/chain to join. Reason: {e}")
 
     # Ask user whether to install with Cosmovisor
@@ -1596,7 +1601,7 @@ class Interviewer:
                     f"Invalid input provided during installation. Please choose either 'yes' or 'no'.")
                 self.ask_for_cosmovisor()
         except Exception as e:
-            logging.exception(
+            exit_with_error(
                 f"Failed to set whether installation should be done with Cosmovisor. Reason: {e}")
 
     # Ask user whether to bump Cosmovisor to latest version
@@ -1613,7 +1618,7 @@ class Interviewer:
                     f"Invalid input provided during installation. Please choose either 'yes' or 'no'.")
                 self.ask_for_cosmovisor_bump()
         except Exception as e:
-            logging.exception(
+            exit_with_error(
                 f"Failed to set whether Cosmovisor should be bumped to latest version. Reason: {e}")
 
     # Ask user whether to allow Cosmovisor to automatically download binaries for scheduled upgrades
@@ -1630,7 +1635,7 @@ class Interviewer:
                     f"Invalid input provided during installation. Please choose either 'yes' or 'no'.")
                 self.ask_for_daemon_allow_download_binaries()
         except Exception as e:
-            logging.exception(
+            exit_with_error(
                 f"Failed to set whether Cosmovisor should automatically download binaries for scheduled upgrades. Reason: {e}")
 
     # Ask whether Cosmovisor should restart daemon after upgrade
@@ -1647,7 +1652,7 @@ class Interviewer:
                     f"Invalid input provided during installation. Please choose either 'yes' or 'no'.")
                 self.ask_for_daemon_restart_after_upgrade()
         except Exception as e:
-            logging.exception(
+            exit_with_error(
                 f"Failed to set whether Cosmovisor should automatically restart cheqd-noded service after an upgrade has been applied. Reason: {e}")
 
     # Ask user for node moniker
@@ -1662,7 +1667,7 @@ class Interviewer:
                 logging.error(
                     f"Invalid moniker provided during cheqd-noded setup.")
         except Exception as e:
-            logging.exception(f"Failed to set moniker. Reason: {e}")
+            exit_with_error(f"Failed to set moniker. Reason: {e}")
 
     # Ask for node's external IP address or DNS name
     def ask_for_external_address(self):
@@ -1676,7 +1681,7 @@ class Interviewer:
                 self.external_address = str(self.exec(
                     "dig +short txt ch whoami.cloudflare @1.1.1.1").stdout).strip("""b'"\\n""")
         except Exception as e:
-            logging.exception(f"Failed to set external address. Reason: {e}")
+            exit_with_error(f"Failed to set external address. Reason: {e}")
 
     # Ask for node's P2P port
     def ask_for_p2p_port(self):
@@ -1688,7 +1693,7 @@ class Interviewer:
             else:
                 self.p2p_port = DEFAULT_P2P_PORT
         except Exception as e:
-            logging.exception(f"Failed to set P2P port. Reason: {e}")
+            exit_with_error(f"Failed to set P2P port. Reason: {e}")
 
     # Ask for node's RPC port
     def ask_for_rpc_port(self):
@@ -1700,7 +1705,7 @@ class Interviewer:
             else:
                 self.rpc_port = DEFAULT_RPC_PORT
         except Exception as e:
-            logging.exception(f"Failed to set RPC port. Reason: {e}")
+            exit_with_error(f"Failed to set RPC port. Reason: {e}")
 
     # (Optional) Ask for node's persistent peers
     def ask_for_persistent_peers(self):
@@ -1713,7 +1718,7 @@ class Interviewer:
             else:
                 self.persistent_peers = ""
         except Exception as e:
-            logging.exception(f"Failed to set persistent peers. Reason: {e}")
+            exit_with_error(f"Failed to set persistent peers. Reason: {e}")
 
     # (Optional) Ask for minimum gas prices
     def ask_for_gas_price(self):
@@ -1727,7 +1732,7 @@ class Interviewer:
             else:
                 self.gas_price = default = CHEQD_NODED_MINIMUM_GAS_PRICES
         except Exception as e:
-            logging.exception(f"Failed to set minimum gas prices. Reason: {e}")
+            exit_with_error(f"Failed to set minimum gas prices. Reason: {e}")
 
     # (Optional) Ask for node's log level
     def ask_for_log_level(self):
@@ -1735,7 +1740,7 @@ class Interviewer:
             self.log_level = self.ask(
                 f"Specify log level (trace|debug|info|warn|error|fatal|panic)", default=CHEQD_NODED_LOG_LEVEL)
         except Exception as e:
-            logging.exception(f"Failed to set log level. Reason: {e}")
+            exit_with_error(f"Failed to set log level. Reason: {e}")
 
     # (Optional) Ask for node's log format
     def ask_for_log_format(self):
@@ -1743,7 +1748,7 @@ class Interviewer:
             self.log_format = self.ask(
                 f"Specify log format (json|plain)", default=CHEQD_NODED_LOG_FORMAT)
         except Exception as e:
-            logging.exception(f"Failed to set log format. Reason: {e}")
+            exit_with_error(f"Failed to set log format. Reason: {e}")
     
     # If an existing installation is detected, ask user if they want to upgrade
     def ask_for_upgrade(self):
@@ -1757,10 +1762,10 @@ class Interviewer:
             elif answer.lower().startswith("n"):
                 self.is_upgrade = False
             else:
-                logging.exception(
+                exit_with_error(
                     f"Invalid input provided during installation.")
         except Exception as e:
-            logging.exception(f"Failed to upgrade cheqd-node. Reason: {e}")
+            exit_with_error(f"Failed to upgrade cheqd-node. Reason: {e}")
 
     # If an install from scratch is requested, warn the user and check if they want to proceed
     def ask_for_install_from_scratch(self):
@@ -1774,10 +1779,10 @@ class Interviewer:
             elif answer.lower().startswith("n"):
                 self.is_from_scratch = False
             else:
-                logging.exception(
+                exit_with_error(
                     f"Invalid input provided during installation.")
         except Exception as e:
-            logging.exception(
+            exit_with_error(
                 f"Failed to set whether cheqd-node should install from scratch. Reason: {e}")
 
     # If an existing installation is detected, ask user if they want to overwrite existing systemd configuration
@@ -1790,10 +1795,10 @@ class Interviewer:
             elif answer.lower().startswith("n"):
                 self.rewrite_node_systemd = False
             else:
-                logging.exception(
+                exit_with_error(
                     f"Invalid input provided during installation.")
         except Exception as e:
-            logging.exception(
+            exit_with_error(
                 f"Failed to set whether overwrite existing systemd configuration for cheqd-node. Reason: {e}")
 
     # If an existing installation is detected, ask user if they want to overwrite existing logrotate configuration
@@ -1806,10 +1811,10 @@ class Interviewer:
             elif answer.lower().startswith("n"):
                 self.rewrite_logrotate = False
             else:
-                logging.exception(
+                exit_with_error(
                     f"Invalid input provided during installation.")
         except Exception as e:
-            logging.exception(
+            exit_with_error(
                 f"Failed to set whether overwrite existing configuration for logrotate. Reason: {e}")
 
     # If an existing installation is detected, ask user if they want to overwrite existing rsyslog configuration
@@ -1822,10 +1827,10 @@ class Interviewer:
             elif answer.lower().startswith("n"):
                 self.rewrite_rsyslog = False
             else:
-                logging.exception(
+                exit_with_error(
                     f"Invalid input provided during installation.")
         except Exception as e:
-            logging.exception(
+            exit_with_error(
                 f"Failed to set whether overwrite existing rsyslog configuration for cheqd-node. Reason: {e}")
 
     # Ask user if they want to download a snapshot of the existing chain to speed up node synchronization.
@@ -1842,10 +1847,10 @@ class Interviewer:
             elif answer.lower().startswith("n"):
                 self.init_from_snapshot = False
             else:
-                logging.exception(
+                exit_with_error(
                     f"Invalid input provided during installation.")
         except Exception as e:
-            logging.exception(
+            exit_with_error(
                 f"Failed to set whether init snapshot. Reason: {e}")
 
 
@@ -1888,7 +1893,7 @@ if __name__ == '__main__':
             interviewer.ask_for_init_from_snapshot()
 
         except Exception as e:
-            logging.exception(
+            exit_with_error(
                 f"Unable to complete user interview process for installation. Reason for exiting: {e}")
 
     # Order of questions to ask the user if installing:
@@ -1923,7 +1928,7 @@ if __name__ == '__main__':
                 interviewer.ask_for_rewrite_logrotate()
 
         except Exception as e:
-            logging.exception(
+            exit_with_error(
                 f"Unable to complete user interview process for upgrade. Reason for exiting: {e}")
 
     ### This section is where the Interviewer class is invoked ###
@@ -1960,7 +1965,7 @@ if __name__ == '__main__':
                     sys.exit(1)
 
     except Exception as e:
-        logging.exception(
+        exit_with_error(
             f"Unable to complete user interview process. Reason for exiting: {e}")
 
     ### This section where the Installer class is invoked ###
@@ -1968,5 +1973,5 @@ if __name__ == '__main__':
         installer = Installer(interviewer)
         installer.install()
     except Exception as e:
-        logging.exception(
+        exit_with_error(
             f"Unable to execute installation process. Reason for exiting: {e}")
