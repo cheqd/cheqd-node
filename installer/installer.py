@@ -125,12 +125,13 @@ def sigint_handler(signal, frame):
 signal.signal(signal.SIGINT, sigint_handler)
 
 # Helper function to check if the URL is valid
-def is_valid_url(url):
+def is_valid_url(url) -> bool:
     try:
         status_code = request.urlopen(url).getcode()
         if status_code == 200:
             return True
     except request.HTTPError:
+        logging.exception(f"URL is not valid: {url}")
         return False
 
 # Common function to search and replace text in a file
@@ -200,7 +201,10 @@ class Release:
                 _url = _url_item["browser_download_url"]
                 version_without_v_prefix = self.version.replace('v', '', 1)
                 if os.path.basename(_url) == f"cheqd-noded-{version_without_v_prefix}-{os_name}-{os_arch}.tar.gz":
-                    return _url
+                    if is_valid_url(_url):
+                        return _url
+                    else:
+                        logging.exception(f"Could not find valid release at Github URL: {_url}")
             else:
                 logging.exception(
                     f"No asset found to download for release: {self.version}")
@@ -692,8 +696,7 @@ class Installer():
                 else:
                     binary_name = DEFAULT_BINARY_NAME
 
-                logging.info(
-                    f"Configuring rsyslog systemd service for {binary_name} logging")
+                logging.info(f"Configuring rsyslog systemd service for {binary_name} logging")
 
                 # Modify rsyslog template file with values specific to the installation
                 with open(DEFAULT_RSYSLOG_FILE, mode="w") as fname:
