@@ -119,7 +119,7 @@ else:
 
 # Handle Ctrl+C / SIGINT halts requests
 def sigint_handler(signal, frame):
-    print('Exiting from cheqd-node installer')
+    logging.info(f'Exiting installer')
     sys.exit(0)
 
 signal.signal(signal.SIGINT, sigint_handler)
@@ -132,7 +132,7 @@ def is_valid_url(url) -> bool:
             return True
     except request.HTTPError:
         logging.exception(f"URL is not valid: {url}")
-        return False
+        raise
 
 # Common function to search and replace text in a file
 def search_and_replace(search_text, replace_text, file_path):
@@ -384,6 +384,7 @@ class Installer():
             else:
                 os_arch = 'arm64'
             cosmovisor_download_url = COSMOVISOR_BINARY_URL.format(DEFAULT_LATEST_COSMOVISOR_VERSION, DEFAULT_LATEST_COSMOVISOR_VERSION, os_arch)
+            logging.debug(f"Cosmovisor download URL: {cosmovisor_download_url}")
             return cosmovisor_download_url
         except Exception as e:
             logging.exception(f"Failed to compute Cosmovisor download URL. Reason: {e}")
@@ -461,7 +462,7 @@ class Installer():
     def check_systemd_service_active(self, service_name) -> bool:
         # Check if a given systemd service is active
         try:
-            logging.info(f"Checking whether {service_name} service is active")
+            logging.debug(f"Checking whether {service_name} service is active")
             # Check if the service exists
             cmd_exists = f'systemctl status {service_name}.service'
             exists = os.system(cmd_exists)
@@ -477,15 +478,16 @@ class Installer():
                     logging.debug(f"Service {service_name} is not active")
                     return False
             else:
-                logging.error(f"Service {service_name} is not installed")
-                raise
+                logging.debug(f"Service {service_name} is not installed")
+                return False
         except Exception as e:
             logging.exception(f"Failed to check whether {service_name} service is active. Reason: {e}")
+            return False
 
     def check_systemd_service_enabled(self, service_name) -> bool:
         # Check if a given systemd service is enabled
         try:
-            logging.info(f"Checking whether {service_name} service is enabled")
+            logging.debug(f"Checking whether {service_name} service is enabled")
             # Check if the service exists
             cmd_exists = f'systemctl status {service_name}.service'
             exists = os.system(cmd_exists)
@@ -500,15 +502,15 @@ class Installer():
                     logging.debug(f"Service {service_name} is not enabled")
                     return False
             else:
-                logging.error(f"Service {service_name} is not installed")
-                raise
+                logging.debug(f"Service {service_name} is not installed")
+                return False
         except Exception as e:
             logging.exception(f"Failed to check whether {service_name} service is enabled. Reason: {e}")
     
     def reload_systemd(self) -> bool:
         # Reload systemd config
         try:
-            logging.info("Reload systemd config and reset failed services")
+            logging.debug("Reload systemd config and reset failed services")
 
             # Reload systemd config
             reload = os.system(f'systemctl daemon-reload --quiet')
@@ -517,7 +519,7 @@ class Installer():
             reset = os.system(f'systemctl reset-failed --quiet')
 
             if reload == 0 and reset == 0:
-                logging.debug("Reloaded systemd config and reset failed services")
+                logging.info("Reloaded systemd config and reset failed services")
                 return True
             else:
                 logging.error("Failed to reload systemd config and reset failed services")
@@ -539,7 +541,7 @@ class Installer():
                     return False
                     raise
             else:
-                logging.warning(f"{service_name} is already disabled")
+                logging.debug(f"{service_name} is already disabled")
                 return True
         except Exception as e:
             logging.exception(f"Error disabling {service_name}: Reason: {e}")
@@ -551,15 +553,15 @@ class Installer():
                 if not self.check_systemd_service_enabled(service_name):
                     enabled = os.system(f"systemctl enable --quiet {service_name}.service")
                     if enabled == 0:
-                        logging.info(f"{service_name} has been enable")
+                        logging.info(f"{service_name} has been enabled")
                         return True
                     else:
                         logging.error(f"{service_name} could not be enabled")
                         return False
                         raise
                 else:
-                    logging.warning(f"{service_name} is already enabled")
-                    return False
+                    logging.debug(f"{service_name} is already enabled")
+                    return True
             else:
                 logging.error(f"Failed to reload systemd config and reset failed services")
                 return False
@@ -580,10 +582,11 @@ class Installer():
                     return False
                     raise
             else:
-                logging.warning(f"{service_name} is not active")
-                return False
+                logging.debug(f"{service_name} is not active")
+                return True
         except Exception as e:
             logging.exception(f"Error stopping {service_name}: Reason: {e}")
+            return False
 
     def restart_systemd_service(self, service_name) -> bool:
         # Restart a given systemd service
@@ -602,6 +605,10 @@ class Installer():
                     logging.error(f"{service_name} could not be restarted")
                     return False
                     raise
+            else:
+                logging.error(f"Failed to restart {service_name}")
+                return False
+                raise
         except Exception as e:
             logging.exception(f"Error restarting {service_name}: Reason: {e}")
             raise
@@ -609,17 +616,18 @@ class Installer():
     def remove_systemd_service(self, service_name, service_file) -> bool:
         # Remove a given systemd service
         try:
-            # Stop the service if it is active
-            if self.stop_systemd_service(service_name):
-                # Disable the service
-                if self.disable_systemd_service(service_name):
-                    # Remove the service file
-                    self.remove_safe(service_file)
-                    logging.warning(f"{service_name} has been removed")
-                    return True
-                else:
-                    logging.error(f"{service_name} could not be removed")
-                    return False
+            if os.path.exists(service_file):
+                # Stop the service if it is active
+                if self.stop_systemd_service(service_name):
+                    # Disable the service
+                    if self.disable_systemd_service(service_name):
+                        # Remove the service file
+                        self.remove_safe(service_file)
+                        logging.warning(f"{service_name} has been removed")
+                        return True
+                    else:
+                        logging.error(f"{service_name} could not be removed")
+                        return False
         except Exception as e:
             logging.exception(f"Error removing {service_name}: Reason: {e}")
 
@@ -640,16 +648,19 @@ class Installer():
                 # Remove logging service files safely
                 self.remove_safe(DEFAULT_RSYSLOG_FILE)
                 self.remove_safe(DEFAULT_LOGROTATE_FILE)
+                self.reload_systemd()
 
-                self.remove_safe(self.cheqd_root_dir, is_dir=True)
-                self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+                # Remove cheqd-node data and binaries
                 self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
+                self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+                self.remove_safe(self.cheqd_root_dir, is_dir=True)
 
             # Scenario: User has installed cheqd-noded without cosmovisor, AND now wants to install cheqd-noded with Cosmovisor
             if self.interviewer.is_cosmo_needed and os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH):
-                
-
-                self.remove_safe(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
+                self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME, DEFAULT_STANDALONE_SERVICE_FILE_PATH)
+                self.remove_safe(DEFAULT_RSYSLOG_FILE)
+                self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+                self.reload_systemd()
         except Exception as e:
             logging.exception("Failed to perform pre-installation checks. Reason: {e}")
 
