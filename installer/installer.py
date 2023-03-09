@@ -386,7 +386,7 @@ class Installer():
             cosmovisor_download_url = COSMOVISOR_BINARY_URL.format(DEFAULT_LATEST_COSMOVISOR_VERSION, DEFAULT_LATEST_COSMOVISOR_VERSION, os_arch)
             return cosmovisor_download_url
         except Exception as e:
-            logging.exception(f"Failed to compute cosmovisor download URL. Reason: {e}")
+            logging.exception(f"Failed to compute Cosmovisor download URL. Reason: {e}")
 
     @post_process
     def exec(self, cmd, use_stdout=True, suppress_err=False):
@@ -445,10 +445,10 @@ class Installer():
         try:
             if is_dir and os.path.exists(path):
                 shutil.rmtree(path)
-                logging.info(f"Removed {path}")
+                logging.warning(f"Removed {path}")
             if os.path.exists(path):
                 os.remove(path)
-                logging.info(f"Removed {path}")
+                logging.warning(f"Removed {path}")
         except Exception as e:
             logging.exception(f"Failed to remove {path}. Reason: {e}")
 
@@ -461,6 +461,7 @@ class Installer():
         try:
             if self.interviewer.is_from_scratch:
                 logging.warning("Removing user's data and configs")
+
                 self.remove_safe(self.cheqd_root_dir, is_dir=True)
                 self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
                 self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
@@ -469,8 +470,10 @@ class Installer():
                 self.remove_safe(DEFAULT_RSYSLOG_FILE)
                 self.remove_safe(DEFAULT_LOGROTATE_FILE)
 
+            # Scenario: User has installed cheqd-noded without cosmovisor, AND now wants to install cheqd-noded with Cosmovisor
             if self.interviewer.is_cosmo_needed and os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH):
-                # Scenario: User has installed cheqd-noded without cosmovisor, AND now wants to install cheqd-noded with cosmovisor
+                
+
                 self.remove_safe(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
         except Exception as e:
             logging.exception("Failed to perform pre-installation checks. Reason: {e}")
