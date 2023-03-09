@@ -18,7 +18,6 @@ import shutil
 import signal
 import subprocess
 import sys
-import systemd
 import urllib.request as request
 
 ###############################################################
@@ -523,19 +522,24 @@ class Installer():
         # Check if a given systemd service is active
         try:
             logging.info(f"Checking whether {service_name} service is active")
-            manager = systemd.manager.Manager()
+            # Check if the service exists
+            cmd_exists = f'systemctl status {service_name}.service'
+            exists = os.system(cmd_exists)
 
-            # Get unit and unit file state
-            unit = manager.get_unit(service_name)
-            unit_file_state = manager.get_unit_file_state(service_name)
-
-            # If unit exists and is active, return True
-            if unit and unit.properties.ActiveState.lower() == 'active':
-                return True
-        except systemd.exceptions.NoSuchUnitError:
-            logging.warning(f"Service {service_name} is not installed")
-            return False
-        except systemd.exceptions.ManagerError as e:
+            if exists == 0:
+                # Check if the service is active
+                cmd_active = f'systemctl is-active --quiet {service_name}.service'
+                active = os.system(cmd_active)
+                if active == 0:
+                    logging.debug(f"Service {service_name} is active")
+                    return True
+                else:
+                    logging.debug(f"Service {service_name} is not active")
+                    return False
+            else:
+                logging.warning(f"Service {service_name} is not installed")
+                return False
+        except Exception as e:
             logging.exception(f"Failed to check whether {service_name} service is active. Reason: {e}")
             return False
 
@@ -543,19 +547,23 @@ class Installer():
         # Check if a given systemd service is enabled
         try:
             logging.info(f"Checking whether {service_name} service is enabled")
-            manager = systemd.manager.Manager()
-
-            # Get unit and unit file state
-            unit = manager.get_unit(service_name)
-            unit_file_state = manager.get_unit_file_state(service_name)
-
-            # If unit exists and is active, return True
-            if unit and unit_file_state == 'enabled':
-                return True
-        except systemd.exceptions.NoSuchUnitError:
-            logging.warning(f"Service {service_name} is not enabled")
-            return False
-        except systemd.exceptions.ManagerError as e:
+            # Check if the service exists
+            cmd_exists = f'systemctl status {service_name}.service'
+            exists = os.system(cmd_exists)
+            if exists == 0:
+                # Check if the service is enabled
+                cmd_enabled = f'systemctl is-enabled --quiet {service_name}.service'
+                enabled = os.system(cmd_enabled)
+                if enabled == 0:
+                    logging.debug(f"Service {service_name} is enabled")
+                    return True
+                else:
+                    logging.debug(f"Service {service_name} is not enabled")
+                    return False
+            else:
+                logging.warning(f"Service {service_name} is not installed")
+                return False
+        except Exception as e:
             logging.exception(f"Failed to check whether {service_name} service is enabled. Reason: {e}")
             return False
 
