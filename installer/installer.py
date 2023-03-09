@@ -107,13 +107,13 @@ CHEQD_NODED_P2P_MAX_PACKET_MSG_PAYLOAD_SIZE = 10240
 if sys.flags.dev_mode:
     logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
                     datefmt='%d-%b-%Y %H:%M:%S', 
-                    level=logging.DEBUG,
-                    raiseExceptions=True)
+                    level=logging.DEBUG)
+    logging.raiseExceptions = True
 else:
     logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
                         datefmt='%d-%b-%Y %H:%M:%S', 
-                        level=logging.INFO,
-                        raiseExceptions=True)
+                        level=logging.INFO)
+    logging.raiseExceptions = True
 
 # Handle Ctrl+C / SIGINT halts requests
 def sigint_handler(signal, frame):
