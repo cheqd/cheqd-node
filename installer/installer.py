@@ -685,6 +685,12 @@ class Installer():
                 if os.path.exists(DEFAULT_RSYSLOG_FILE):
                     logging.warning(
                         f"Existing rsyslog configuration at {DEFAULT_RSYSLOG_FILE} will be overwritten")
+                
+                # Determine the binary name for logging based on installation type
+                if self.interviewer.is_cosmo_needed:
+                    binary_name = DEFAULT_COSMOVISOR_BINARY_NAME
+                else:
+                    binary_name = DEFAULT_BINARY_NAME
 
                 logging.info(
                     f"Configuring rsyslog systemd service for {binary_name} logging")
