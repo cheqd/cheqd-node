@@ -109,11 +109,13 @@ if sys.flags.dev_mode:
                     datefmt='%d-%b-%Y %H:%M:%S', 
                     level=logging.DEBUG)
     logging.raiseExceptions = True
+    logging.propagate = True
 else:
     logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
                         datefmt='%d-%b-%Y %H:%M:%S', 
                         level=logging.INFO)
     logging.raiseExceptions = True
+    logging.propagate = True
 
 # Handle Ctrl+C / SIGINT halts requests
 def sigint_handler(signal, frame):
@@ -670,6 +672,7 @@ class Installer():
                     raise
         except Exception as e:
             logging.exception(f"Error restarting {service_name}: Reason: {e}")
+            raise
     
     # Setup logging related systemd services
     def setup_logging_systemd(self):
@@ -1976,6 +1979,7 @@ if __name__ == '__main__':
     except Exception as e:
         logging.exception(
             f"Unable to complete user interview process. Reason for exiting: {e}")
+        sys.exit(1)
 
     ### This section where the Installer class is invoked ###
     try:
