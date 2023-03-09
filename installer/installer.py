@@ -404,6 +404,34 @@ class Installer():
             kwargs["stderr"] = subprocess.DEVNULL
         return subprocess.run(cmd, **kwargs)
 
+    def is_user_exists(self, username) -> bool:
+        # Check if "cheqd" user exists on the system
+        try:
+            pwd.getpwnam(username)
+            logging.debug(f"User {username} already exists")
+            return True
+        except Exception as e:
+            logging.debug(f"User {username} does not exist")
+            return False
+
+    def remove_safe(self, path, is_dir=False) -> bool:
+        # Common function to remove a file or directory safely
+        try:
+            if is_dir and os.path.exists(path):
+                shutil.rmtree(path)
+                logging.warning(f"Removed {path}")
+                return True
+            elif os.path.exists(path):
+                os.remove(path)
+                logging.warning(f"Removed {path}")
+                return True
+            else:
+                logging.exception(f"{path} does not exist")
+                return False
+        except Exception as e:
+            logging.exception(f"Failed to remove {path}. Reason: {e}")
+            return False
+
     def get_binary(self):
         # Download cheqd-noded binary and extract it
         # Also remove the downloaded archive file, if applicable
@@ -429,28 +457,6 @@ class Installer():
                 logging.exception(f"Unable to extract binary from archive file: {fname}")
         except Exception as e:
             logging.exception("Failed to download cheqd-noded binary. Reason: {e}")
-
-    def is_user_exists(self, username) -> bool:
-        # Check if "cheqd" user exists on the system
-        try:
-            pwd.getpwnam(username)
-            logging.debug(f"User {username} already exists")
-            return True
-        except Exception as e:
-            logging.debug(f"User {username} does not exist")
-            return False
-
-    def remove_safe(self, path, is_dir=False):
-        # Common function to remove a file or directory safely
-        try:
-            if is_dir and os.path.exists(path):
-                shutil.rmtree(path)
-                logging.warning(f"Removed {path}")
-            if os.path.exists(path):
-                os.remove(path)
-                logging.warning(f"Removed {path}")
-        except Exception as e:
-            logging.exception(f"Failed to remove {path}. Reason: {e}")
 
     def check_systemd_service_active(self, service_name) -> bool:
         # Check if a given systemd service is active
@@ -600,6 +606,23 @@ class Installer():
             logging.exception(f"Error restarting {service_name}: Reason: {e}")
             raise
 
+    def remove_systemd_service(self, service_name, service_file) -> bool:
+        # Remove a given systemd service
+        try:
+            # Stop the service if it is active
+            if self.stop_systemd_service(service_name):
+                # Disable the service
+                if self.disable_systemd_service(service_name):
+                    # Remove the service file
+                    self.remove_safe(service_file)
+                    logging.warning(f"{service_name} has been removed")
+                    return True
+                else:
+                    logging.error(f"{service_name} could not be removed")
+                    return False
+        except Exception as e:
+            logging.exception(f"Error removing {service_name}: Reason: {e}")
+
     def pre_install(self):
         # Pre-installation checks
         # Removes the following existing cheqd-noded data and configurations:
@@ -610,13 +633,17 @@ class Installer():
             if self.interviewer.is_from_scratch:
                 logging.warning("Removing user's data and configs")
 
+                # Remove cheqd-node service files safely first
+                self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME, DEFAULT_STANDALONE_SERVICE_FILE_PATH)
+                self.remove_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME, DEFAULT_COSMOVISOR_SERVICE_FILE_PATH)
+                
+                # Remove logging service files safely
+                self.remove_safe(DEFAULT_RSYSLOG_FILE)
+                self.remove_safe(DEFAULT_LOGROTATE_FILE)
+
                 self.remove_safe(self.cheqd_root_dir, is_dir=True)
                 self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
                 self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
-                self.remove_safe(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH)
-                self.remove_safe(DEFAULT_STANDALONE_SERVICE_FILE_PATH)
-                self.remove_safe(DEFAULT_RSYSLOG_FILE)
-                self.remove_safe(DEFAULT_LOGROTATE_FILE)
 
             # Scenario: User has installed cheqd-noded without cosmovisor, AND now wants to install cheqd-noded with Cosmovisor
             if self.interviewer.is_cosmo_needed and os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH):
