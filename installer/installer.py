@@ -577,17 +577,19 @@ class Installer():
     def stop_systemd_service(self, service_name):
         # Stop and disable a given systemd service
         try:
-            if self.check_systemd_service_on(service_name):
-                logging.info(f"Stopping systemd service: {service_name}")
-                os.system(f"systemctl stop {service_name}")
+            manager = systemd.manager.Manager()
+            unit = manager.get_unit(service_name)
 
-                logging.info(f"Disable systemd service: {service_name}")
-                os.system(f"systemctl disable {service_name}")
-
-                logging.info("Reset failed systemd services (if any)")
-                os.system("systemctl reset-failed")
-        except Exception as e:
-            logging.exception(f"Failed stop systemd service. Reason: {e}")
+            # If unit exists and is active, stop it
+            if unit and unit.properties.ActiveState.lower() == "active":
+                unit.stop()
+                logging.info(f"{service_name} has been stopped")
+            else:
+                logging.warning(f"{service_name} is not active")
+        except systemd.exceptions.NoSuchUnitError:
+            logging.error(f"{service_name} does not exist")
+        except systemd.exceptions.ManagerError as e:
+            logging.exception(f"Error stopping {service_name}: {e}")
 
     def reload_systemd(self):
         # Reload systemd config
@@ -597,45 +599,50 @@ class Installer():
         except Exception as e:
             logging.exception(f"Failed to reload systemd. Reason: {e}")
 
-    def activate_systemd_service(self, service_name):
-        # Activate a given systemd service
+    def enable_systemd_service(self, service_name):
+        # Activate and enable a given systemd service
         try:
-            if self.check_systemd_service_on(service_name):
-                logging.info(f"Stopping systemd service: {service_name}")
-                os.system(f"systemctl stop {service_name}")
+            # Connect to the systemd manager
+            manager = systemd.manager.Manager()
 
-                logging.info(f"Disable systemd service: {service_name}")
-                os.system(f"systemctl disable {service_name}")
+            # Activate and enable the service
+            manager.reload()
+            service = manager.get_unit(service_name)
+            service.enable()
+            logging.info(f"{service_name} has been installed and enabled")
+        except systemd.exceptions.ManagerError as e:
+            logging.exception(f"Error installing and enabling {service_name}. Reason: {e}")
 
-                logging.info("Reset failed systemd services (if any)")
-                os.system("systemctl reset-failed")
-        except Exception as e:
-            logging.exception(f"Failed activate systemd service. Reason: {e}")
-
-    # Helper function to reload specified systemd service
     def restart_systemd_service(self, service_name):
+        # Restart a given systemd service
         try:
-            self.exec(f"systemctl daemon-reload")
-            logging.info(f"Trying to restart systemd service: {service_name}")
-            self.exec(f"systemctl restart {service_name}")
-        except Exception as e:
-            logging.exception(
-                f"Failed to restart systemd service: {service_name}. Reason: {e}")
+            # Connect to the systemd manager
+            manager = systemd.manager.Manager()
+
+            # Reload and restart the service
+            manager.reload()
+            service = manager.get_unit(service_name)
+            service.reset_failed()
+            service.restart()
+            logging.info(f"{service_name} has been restarted")
+        except systemd.exceptions.ManagerError as e:
+            logging.exception(f"Error restarting {service_name}. Reason: {e}")
 
     # Setup logging related systemd services
     def setup_logging_systemd(self):
         # Install cheqd-node configuration for rsyslog if either of the following conditions are met:
         # 1. rsyslog service file is not present
         # 2. user wants to rewrite rsyslog service file
-        if not os.path.exists(DEFAULT_RSYSLOG_FILE) or self.interviewer.rewrite_rsyslog:
-            try:
+        try:
+            # Connect to the systemd manager
+            manager = systemd.daemon.respawn_failed()
+            unit = manager.get_unit("rsyslog.service")
+
+            if not os.path.exists(DEFAULT_RSYSLOG_FILE) or self.interviewer.rewrite_rsyslog:
                 # Warn user if rsyslog service file already exists
                 if os.path.exists(DEFAULT_RSYSLOG_FILE):
                     logging.warning(
                         f"Existing rsyslog configuration at {DEFAULT_RSYSLOG_FILE} will be overwritten")
-
-                # Determine the binary name for logging based on installation type
-                binary_name = DEFAULT_COSMOVISOR_BINARY_NAME if self.interviewer.is_cosmo_needed else DEFAULT_BINARY_NAME
 
                 logging.info(
                     f"Configuring rsyslog systemd service for {binary_name} logging")
@@ -646,9 +653,9 @@ class Installer():
 
                 # Restarting rsyslog can take a lot of time: https://github.com/rsyslog/rsyslog/issues/3133
                 self.restart_systemd_service("rsyslog.service")
-            except Exception as e:
-                logging.exception(
-                    f"Failed to setup rsyslog service for {binary_name} logging. Reason: {e}")
+        except Exception as e:
+            logging.exception(
+                f"Failed to setup rsyslog service for {binary_name} logging. Reason: {e}")
 
         # Install cheqd-node configuration for logrotate if either of the following conditions are met:
         # 1. logrotate service file is not present
