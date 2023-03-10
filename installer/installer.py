@@ -496,6 +496,43 @@ class Installer():
                 return False
         except Exception as e:
             logging.exception("Failed to download cheqd-noded binary. Reason: {e}")
+    
+    def pre_install(self) -> bool:
+        # Pre-installation steps
+        # Removes the following existing cheqd-noded data and configurations:
+        # 1. ~/.cheqdnode directory
+        # 2. cheqd-noded / cosmovisor binaries
+        # 3. systemd service files
+        try:
+            if self.interviewer.is_from_scratch:
+                logging.warning("Removing user's data and configs")
+
+                # Remove cheqd-node service files safely first
+                self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME, DEFAULT_STANDALONE_SERVICE_FILE_PATH)
+                self.remove_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME, DEFAULT_COSMOVISOR_SERVICE_FILE_PATH)
+                
+                # Remove logging service files safely
+                self.remove_safe(DEFAULT_RSYSLOG_FILE)
+                self.remove_safe(DEFAULT_LOGROTATE_FILE)
+                self.reload_systemd()
+
+                # Remove cheqd-node data and binaries
+                self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
+                self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+                self.remove_safe(self.cheqd_root_dir, is_dir=True)
+                return True
+
+            # Scenario: User has installed cheqd-noded without cosmovisor, AND now wants to install cheqd-noded with Cosmovisor
+            if self.interviewer.is_cosmo_needed and os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH):
+                self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME, DEFAULT_STANDALONE_SERVICE_FILE_PATH)
+                self.remove_safe(DEFAULT_RSYSLOG_FILE)
+                self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+                self.reload_systemd()
+                return True
+        except Exception as e:
+            logging.exception("Could not complete pre-installation steps. Reason: {e}")
+            raise
+            return False
 
     # Helper function to see if a given user exists on the system
     def is_user_exists(self, username) -> bool:
@@ -696,42 +733,6 @@ class Installer():
                         return False
         except Exception as e:
             logging.exception(f"Error removing {service_name}: Reason: {e}")
-
-    def pre_install(self) -> bool:
-        # Pre-installation checks
-        # Removes the following existing cheqd-noded data and configurations:
-        # 1. ~/.cheqdnode directory
-        # 2. cheqd-noded / cosmovisor binaries
-        # 3. systemd service files
-        try:
-            if self.interviewer.is_from_scratch:
-                logging.warning("Removing user's data and configs")
-
-                # Remove cheqd-node service files safely first
-                self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME, DEFAULT_STANDALONE_SERVICE_FILE_PATH)
-                self.remove_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME, DEFAULT_COSMOVISOR_SERVICE_FILE_PATH)
-                
-                # Remove logging service files safely
-                self.remove_safe(DEFAULT_RSYSLOG_FILE)
-                self.remove_safe(DEFAULT_LOGROTATE_FILE)
-                self.reload_systemd()
-
-                # Remove cheqd-node data and binaries
-                self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
-                self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
-                self.remove_safe(self.cheqd_root_dir, is_dir=True)
-                return True
-
-            # Scenario: User has installed cheqd-noded without cosmovisor, AND now wants to install cheqd-noded with Cosmovisor
-            if self.interviewer.is_cosmo_needed and os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH):
-                self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME, DEFAULT_STANDALONE_SERVICE_FILE_PATH)
-                self.remove_safe(DEFAULT_RSYSLOG_FILE)
-                self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
-                self.reload_systemd()
-                return True
-        except Exception as e:
-            logging.exception("Could not complete pre-installation steps. Reason: {e}")
-            raise
 
     def prepare_directory_tree(self):
         # Needed only in case of clean installation
