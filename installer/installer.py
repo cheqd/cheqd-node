@@ -670,6 +670,7 @@ class Installer():
         # 2. Set directory permissions to default cheqd user
         # 3. Create ~/.cheqdnode/log directory
         try:
+            # Create root directory for cheqd-noded
             if not os.path.exists(self.cheqd_root_dir):
                 logging.info("Creating main directory for cheqd-noded")
                 os.makedirs(self.cheqd_root_dir)
@@ -679,12 +680,14 @@ class Installer():
             else:
                 logging.info(f"Skipping main directory creation because {self.cheqd_root_dir} already exists")
 
+            # Create log directory for cheqd-noded
             if not os.path.exists(self.cheqd_log_dir):
-                logging.info("Creating log directory for cheqd-noded")
                 self.setup_log_dir()
             else:
                 logging.info(f"Skipping log directory creation because {self.cheqd_log_dir} already exists")
 
+            # Create symlink from cheqd-noded log folder from /var/log/cheqd-node
+            # This step is necessary since many logging tools look for logs in /var/log
             if not os.path.exists("/var/log/cheqd-node"):
                 logging.info("Creating a symlink from cheqd-noded log folder to /var/log/cheqd-node")
                 os.symlink(self.cheqd_log_dir, "/var/log/cheqd-node", target_is_directory=True)
@@ -958,17 +961,22 @@ class Installer():
             logging.info(f"Directory {dir_name} already exists")
 
     def setup_log_dir(self):
+        # Setup logging related directories
+        # 1. Create log directory if it doesn't exist
+        # 2. Create default stdout.log file in log directory
+        # 3. Set ownership of log directory to syslog:cheqd
         try:
-            self.mkdir_p(self.cheqd_log_dir)
-            Path(os.path.join(self.cheqd_log_dir, "stdout.log")).touch()
-            logging.info(
-                f"Setting up ownership permissions for {self.cheqd_log_dir} directory")
-            shutil.chown(self.cheqd_log_dir,
-                         'syslog',
-                         DEFAULT_CHEQD_USER)
+            # Create ~/.cheqdnode/log directory
+            logging.info("Creating log directory for cheqd-noded")
+            os.makedirs(self.cheqd_log_dir)
+
+            # Create blank ~/.cheqdnode/log/stdout.log file
+            Path(os.path.join(self.cheqd_log_dir, "stdout.log")).touch(exist_ok=True)
+
+            logging.info(f"Setting up ownership permissions for {self.cheqd_log_dir} directory")
+            shutil.chown(self.cheqd_log_dir, 'syslog', DEFAULT_CHEQD_USER)
         except Exception as e:
-            logging.exception(
-                f"Failed to setup {self.cheqd_log_dir} directory. Reason: {e}")
+            logging.exception(f"Failed to setup {self.cheqd_log_dir} directory. Reason: {e}")
 
     def setup_cosmovisor(self):
         try:
