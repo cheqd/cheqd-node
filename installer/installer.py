@@ -409,8 +409,72 @@ class Installer():
             kwargs["stderr"] = subprocess.DEVNULL
         return subprocess.run(cmd, **kwargs)
 
+    # Main function that controls calls to installation process functions
+    # 1. Call get_binary() to download the binary
+    # 2. Call pre_install() to perform pre-installation checks
+    # 3. Call prepare_cheqd_user() to create cheqd user
+    # 4. Call prepare_directory_tree() to create directory tree
+    # 5. Call setup_cosmovisor() to setup cosmovisor (if selected by user)
+    # - Bump cosmovisor (if selected by user)
+    # - Carry out post-install actions
+    # - Restore and download snapshot (if selected by user)
+    # - Setup systemctl configs
+    # - Setup logging
+    def install(self) -> bool:
+        try:
+            if self.get_binary():
+                logging.info("Successfully downloaded and extracted cheqd-noded binary")
+            else:
+                logging.error("Failed to download and extract binary")
+                raise
+            
+            if self.pre_install():
+                logging.info("Pre-installation steps completed successfully")
+            else:
+                logging.error("Failed to complete pre-installation steps")
+                raise
+
+            self.prepare_cheqd_user()
+            self.prepare_directory_tree()
+
+            if self.interviewer.is_cosmo_needed:
+                logging.info("Setting up Cosmovisor")
+                self.setup_cosmovisor()
+
+            if self.interviewer.is_cosmovisor_bump_needed:
+                logging.info("Bumping Cosmovisor")
+                self.bump_cosmovisor()
+
+            if not self.interviewer.is_cosmo_needed and not self.interviewer.is_cosmovisor_bump_needed:
+                logging.info(
+                    f"Moving binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}")
+                shutil.chown(self.binary_path,
+                            DEFAULT_CHEQD_USER,
+                            DEFAULT_CHEQD_USER)
+                shutil.move(self.binary_path, os.path.join(
+                    DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+                self.post_install()
+
+            if self.interviewer.is_setup_needed:
+                self.post_install()
+
+            if self.interviewer.init_from_snapshot:
+                self.snapshot_url = self.prepare_url_for_latest()
+                if self.snapshot_url:
+                    logging.info(
+                        "Downloading snapshot and extracting archive. This can take a *really* long time...")
+                    self.download_snapshot()
+                    self.untar_from_snapshot()
+
+            self.setup_node_systemd()
+            self.setup_logging_systemd()
+            logging.info("The cheqd-noded binary has been successfully installed")
+            return True
+        except Exception as e:
+            logging.exception(f"Failed to install cheqd-noded. Reason: {e}")
+
+    # Helper function to see if a given user exists on the system
     def is_user_exists(self, username) -> bool:
-        # Check if "cheqd" user exists on the system
         try:
             pwd.getpwnam(username)
             logging.debug(f"User {username} already exists")
@@ -419,8 +483,8 @@ class Installer():
             logging.debug(f"User {username} does not exist")
             return False
 
+    # Helper function to remove a file or directory
     def remove_safe(self, path, is_dir=False) -> bool:
-        # Common function to remove a file or directory safely
         try:
             if is_dir and os.path.exists(path):
                 shutil.rmtree(path)
@@ -437,7 +501,7 @@ class Installer():
             logging.exception(f"Failed to remove {path}. Reason: {e}")
             return False
 
-    def get_binary(self):
+    def get_binary(self) -> bool:
         # Download cheqd-noded binary and extract it
         # Also remove the downloaded archive file, if applicable
         try:
@@ -455,10 +519,13 @@ class Installer():
                 self.exec(f"tar -xzf {fname} -C .")
                 self.remove_safe(fname)
                 self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
+                return True
             else:
                 logging.exception(f"Unable to extract binary from archive file: {fname}")
+                return False
         except Exception as e:
             logging.exception("Failed to download cheqd-noded binary. Reason: {e}")
+            return False
 
     def check_systemd_service_active(self, service_name) -> bool:
         # Check if a given systemd service is active
@@ -632,7 +699,7 @@ class Installer():
         except Exception as e:
             logging.exception(f"Error removing {service_name}: Reason: {e}")
 
-    def pre_install(self):
+    def pre_install(self) -> bool:
         # Pre-installation checks
         # Removes the following existing cheqd-noded data and configurations:
         # 1. ~/.cheqdnode directory
@@ -655,6 +722,7 @@ class Installer():
                 self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
                 self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
                 self.remove_safe(self.cheqd_root_dir, is_dir=True)
+                return True
 
             # Scenario: User has installed cheqd-noded without cosmovisor, AND now wants to install cheqd-noded with Cosmovisor
             if self.interviewer.is_cosmo_needed and os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH):
@@ -662,8 +730,10 @@ class Installer():
                 self.remove_safe(DEFAULT_RSYSLOG_FILE)
                 self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
                 self.reload_systemd()
+                return True
         except Exception as e:
             logging.exception("Could not complete pre-installation steps. Reason: {e}")
+            raise
 
     def prepare_directory_tree(self):
         # Needed only in case of clean installation
@@ -787,56 +857,6 @@ class Installer():
                 logging.exception(
                     f"Failed to setup logrotate service. Reason: {e}")
 
-    # Steps:
-    # - Download cheqd-noded binary
-    # - Make preps before installing. Remove all in case of installing from scratch
-    # - Prepare cheqd user
-    # - Prepare directory tree
-    # - Setup Cosmovisor (if selected by user)
-    # - Bump cosmovisor (if selected by user)
-    # - Carry out post-install actions
-    # - Restore and download snapshot (if selected by user)
-    # - Setup systemctl configs
-    # - Setup logging
-    def install(self):
-        self.get_binary()
-        self.pre_install()
-        self.prepare_cheqd_user()
-        self.prepare_directory_tree()
-
-        if self.interviewer.is_cosmo_needed:
-            logging.info("Setting up Cosmovisor")
-            self.setup_cosmovisor()
-
-        if self.interviewer.is_cosmovisor_bump_needed:
-            logging.info("Bumping Cosmovisor")
-            self.bump_cosmovisor()
-
-        if not self.interviewer.is_cosmo_needed and not self.interviewer.is_cosmovisor_bump_needed:
-            logging.info(
-                f"Moving binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}")
-            shutil.chown(self.binary_path,
-                         DEFAULT_CHEQD_USER,
-                         DEFAULT_CHEQD_USER)
-            shutil.move(self.binary_path, os.path.join(
-                DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
-            self.post_install()
-
-        if self.interviewer.is_setup_needed:
-            self.post_install()
-
-        if self.interviewer.init_from_snapshot:
-            self.snapshot_url = self.prepare_url_for_latest()
-            if self.snapshot_url:
-                logging.info(
-                    "Downloading snapshot and extracting archive. This can take a *really* long time...")
-                self.download_snapshot()
-                self.untar_from_snapshot()
-
-        self.setup_node_systemd()
-        self.setup_logging_systemd()
-        logging.info("The cheqd-noded binary has been successfully installed")
-
     def post_install(self):
         # Init the node with provided moniker
         if not os.path.exists(os.path.join(self.cheqd_config_dir, 'genesis.json')):
@@ -941,7 +961,7 @@ class Installer():
             search_and_replace(log_format_search_text, log_format_replace_text, os.path.join(
                 self.cheqd_config_dir, "config.toml"))
 
-    def prepare_cheqd_user(self):
+    def prepare_cheqd_user(self) -> bool:
         try:
             if not self.is_user_exists(DEFAULT_CHEQD_USER):
                 logging.info(f"Creating {DEFAULT_CHEQD_USER} group")
@@ -950,6 +970,7 @@ class Installer():
                     f"Creating {DEFAULT_CHEQD_USER} user and adding to {DEFAULT_CHEQD_USER} group")
                 self.exec(
                     f"adduser --system {DEFAULT_CHEQD_USER} --home {self.interviewer.home_dir} --shell /bin/bash --ingroup {DEFAULT_CHEQD_USER} --quiet")
+                return True
         except Exception as e:
             logging.exception(
                 f"Failed to create {DEFAULT_CHEQD_USER} user. Reason: {e}")
@@ -2050,7 +2071,8 @@ if __name__ == '__main__':
     ### This section where the Installer class is invoked ###
     try:
         installer = Installer(interviewer)
-        installer.install()
+        if installer.install():
+            logging.info(
+                f"Installation of cheqd-noded {interviewer.version} complete!")
     except Exception as e:
-        logging.exception(
-            f"Unable to execute installation process. Reason for exiting: {e}")
+        logging.exception(f"Unable to execute installation process. Reason for exiting: {e}")
