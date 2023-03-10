@@ -431,7 +431,8 @@ class Installer():
             else:
                 logging.error("Failed to setup user/group cheqd")
                 raise
-
+            
+            # Setup directories needed for installation
             self.prepare_directory_tree()
 
             if self.interviewer.is_cosmo_needed:
@@ -559,8 +560,40 @@ class Installer():
             logging.debug(f"User {username} does not exist")
             return False
 
-    # Helper function to remove a file or directory
+    def prepare_directory_tree(self):
+        # Needed only in case of clean installation
+        # 1. Create ~/.cheqdnode directory
+        # 2. Set directory permissions to default cheqd user
+        # 3. Create ~/.cheqdnode/log directory
+        try:
+            # Create root directory for cheqd-noded
+            if not os.path.exists(self.cheqd_root_dir):
+                logging.info("Creating main directory for cheqd-noded")
+                os.makedirs(self.cheqd_root_dir)
+
+                logging.info(f"Setting directory permissions to default cheqd user: {DEFAULT_CHEQD_USER}")
+                shutil.chown(self.interviewer.home_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
+            else:
+                logging.info(f"Skipping main directory creation because {self.cheqd_root_dir} already exists")
+
+            # Create log directory for cheqd-noded
+            if not os.path.exists(self.cheqd_log_dir):
+                self.setup_log_dir()
+            else:
+                logging.info(f"Skipping log directory creation because {self.cheqd_log_dir} already exists")
+
+            # Create symlink from cheqd-noded log folder from /var/log/cheqd-node
+            # This step is necessary since many logging tools look for logs in /var/log
+            if not os.path.exists("/var/log/cheqd-node"):
+                logging.info("Creating a symlink from cheqd-noded log folder to /var/log/cheqd-node")
+                os.symlink(self.cheqd_log_dir, "/var/log/cheqd-node", target_is_directory=True)
+            else:
+                logging.info("Skipping linking because /var/log/cheqd-node already exists")
+        except Exception as e:
+            logging.exception(f"Failed to prepare directory tree for {DEFAULT_CHEQD_USER}. Reason: {e}")
+
     def remove_safe(self, path, is_dir=False) -> bool:
+        # Helper function to remove a file or directory safely
         try:
             if is_dir and os.path.exists(path):
                 shutil.rmtree(path)
@@ -748,38 +781,6 @@ class Installer():
                         return False
         except Exception as e:
             logging.exception(f"Error removing {service_name}: Reason: {e}")
-
-    def prepare_directory_tree(self):
-        # Needed only in case of clean installation
-        # 1. Create ~/.cheqdnode directory
-        # 2. Set directory permissions to default cheqd user
-        # 3. Create ~/.cheqdnode/log directory
-        try:
-            # Create root directory for cheqd-noded
-            if not os.path.exists(self.cheqd_root_dir):
-                logging.info("Creating main directory for cheqd-noded")
-                os.makedirs(self.cheqd_root_dir)
-
-                logging.info(f"Setting directory permissions to default cheqd user: {DEFAULT_CHEQD_USER}")
-                shutil.chown(self.interviewer.home_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
-            else:
-                logging.info(f"Skipping main directory creation because {self.cheqd_root_dir} already exists")
-
-            # Create log directory for cheqd-noded
-            if not os.path.exists(self.cheqd_log_dir):
-                self.setup_log_dir()
-            else:
-                logging.info(f"Skipping log directory creation because {self.cheqd_log_dir} already exists")
-
-            # Create symlink from cheqd-noded log folder from /var/log/cheqd-node
-            # This step is necessary since many logging tools look for logs in /var/log
-            if not os.path.exists("/var/log/cheqd-node"):
-                logging.info("Creating a symlink from cheqd-noded log folder to /var/log/cheqd-node")
-                os.symlink(self.cheqd_log_dir, "/var/log/cheqd-node", target_is_directory=True)
-            else:
-                logging.info("Skipping linking because /var/log/cheqd-node already exists")
-        except Exception as e:
-            logging.exception(f"Failed to prepare directory tree for {DEFAULT_CHEQD_USER}. Reason: {e}")
 
     def setup_node_systemd(self):
         # Setup cheqd-noded related systemd services
