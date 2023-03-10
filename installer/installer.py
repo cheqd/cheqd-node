@@ -124,8 +124,8 @@ def sigint_handler(signal, frame):
 
 signal.signal(signal.SIGINT, sigint_handler)
 
-# Helper function to check if the URL is valid
 def is_valid_url(url) -> bool:
+    # Helper function to check if the URL is valid
     try:
         status_code = request.urlopen(url).getcode()
         if status_code == 200:
@@ -134,8 +134,8 @@ def is_valid_url(url) -> bool:
         logging.exception(f"URL is not valid: {url}")
         raise
 
-# Common function to search and replace text in a file
 def search_and_replace(search_text, replace_text, file_path):
+    # Common function to search and replace text in a file
     file = open(file_path, "r")
     for line in file:
         line = line.strip()
@@ -147,8 +147,8 @@ def search_and_replace(search_text, replace_text, file_path):
                 file.write(data)
     file.close()
 
-# Common function to post-process commands
 def post_process(func):
+    # Common function to post-process commands
     @functools.wraps(func)
     def wrapper(*args, **kwds):
         _allow_error = kwds.pop('allow_error', False)
@@ -161,8 +161,8 @@ def post_process(func):
         return value
     return wrapper
 
-# Common function to add default answer to questions
 def default_answer(func):
+    # Common function to add default answer to questions
     @functools.wraps(func)
     def wrapper(*args, **kwds):
         _default = kwds.get('default', "")
@@ -392,6 +392,7 @@ class Installer():
 
     @post_process
     def exec(self, cmd, use_stdout=True, suppress_err=False):
+        # Helper function to safely execute shell commands
         logging.info(f"Executing command: {cmd}")
         kwargs = {
             "shell": True,
@@ -406,17 +407,16 @@ class Installer():
             kwargs["stderr"] = subprocess.DEVNULL
         return subprocess.run(cmd, **kwargs)
 
-    # Main function that controls calls to installation process functions
-    # 2. Call pre_install() to perform pre-installation checks
-    # 3. Call prepare_cheqd_user() to create cheqd user
-    # 4. Call prepare_directory_tree() to create directory tree
-    # 5. Call setup_cosmovisor() to setup cosmovisor (if selected by user)
-    # - Bump cosmovisor (if selected by user)
-    # - Carry out post-install actions
-    # - Restore and download snapshot (if selected by user)
-    # - Setup systemctl configs
-    # - Setup logging
     def install(self) -> bool:
+        # Main function that controls calls to installation process functions
+        # 3. Call prepare_cheqd_user() to create cheqd user
+        # 4. Call prepare_directory_tree() to create directory tree
+        # 5. Call setup_cosmovisor() to setup cosmovisor (if selected by user)
+        # - Bump cosmovisor (if selected by user)
+        # - Carry out post-install actions
+        # - Restore and download snapshot (if selected by user)
+        # - Setup systemctl configs
+        # - Setup logging
         try:
             # Download and extract cheqd-node binary
             if self.get_binary():
@@ -432,7 +432,8 @@ class Installer():
             else:
                 logging.error("Failed to complete pre-installation steps")
                 raise
-
+            
+            # Create cheqd user if it doesn't exist
             self.prepare_cheqd_user()
             self.prepare_directory_tree()
 
