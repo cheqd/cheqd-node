@@ -656,14 +656,11 @@ class Installer():
                 self.remove_safe(self.cheqd_root_dir, is_dir=True)
 
             # Scenario: User has installed cheqd-noded without cosmovisor, AND now wants to install cheqd-noded with Cosmovisor
-            elif self.interviewer.is_cosmo_needed and os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH):
+            if self.interviewer.is_cosmo_needed and os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH):
                 self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME, DEFAULT_STANDALONE_SERVICE_FILE_PATH)
                 self.remove_safe(DEFAULT_RSYSLOG_FILE)
                 self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
                 self.reload_systemd()
-            
-            else:
-                logging.exception("Could not complete pre-installation steps. Reason: {e}")
         except Exception as e:
             logging.exception("Could not complete pre-installation steps. Reason: {e}")
 
@@ -675,27 +672,22 @@ class Installer():
         try:
             if not os.path.exists(self.cheqd_root_dir):
                 logging.info("Creating main directory for cheqd-noded")
-                self.mkdir_p(self.cheqd_root_dir)
-                logging.info(
-                    f"Setting directory permissions to default cheqd user: {DEFAULT_CHEQD_USER}")
-                self.exec(
-                    f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.interviewer.home_dir}")
+                os.makedirs(self.cheqd_root_dir)
+
+                logging.info(f"Setting directory permissions to default cheqd user: {DEFAULT_CHEQD_USER}")
+                shutil.chown(self.interviewer.home_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
             else:
-                logging.info(
-                    f"Skipping main directory creation because {self.cheqd_root_dir} already exists")
+                logging.info(f"Skipping main directory creation because {self.cheqd_root_dir} already exists")
 
             if not os.path.exists(self.cheqd_log_dir):
                 logging.info("Creating log directory for cheqd-noded")
                 self.setup_log_dir()
             else:
-                logging.info(
-                    f"Skipping log directory creation because {self.cheqd_log_dir} already exists")
+                logging.info(f"Skipping log directory creation because {self.cheqd_log_dir} already exists")
 
             if not os.path.exists("/var/log/cheqd-node"):
-                logging.info(
-                    "Creating a symlink from cheqd-noded log folder to /var/log/cheqd-node")
-                os.symlink(self.cheqd_log_dir, "/var/log/cheqd-node",
-                           target_is_directory=True)
+                logging.info("Creating a symlink from cheqd-noded log folder to /var/log/cheqd-node")
+                os.symlink(self.cheqd_log_dir, "/var/log/cheqd-node", target_is_directory=True)
             else:
                 logging.info("Skipping linking because /var/log/cheqd-node already exists")
         except Exception as e:
