@@ -201,7 +201,11 @@ class Release:
                 _url = _url_item["browser_download_url"]
                 version_without_v_prefix = self.version.replace('v', '', 1)
                 if os.path.basename(_url) == f"cheqd-noded-{version_without_v_prefix}-{os_name}-{os_arch}.tar.gz":
-                    return _url
+                    logging.debug(f"Release URL for binary download: {_url}")
+                    if is_valid_url(_url):
+                        return _url
+                    else:
+                        logging.exception(f"Release URL is not valid: {_url}")
             else:
                 logging.exception(f"No asset found to download for release: {self.version}")
         except Exception as e:
@@ -245,10 +249,7 @@ class Installer():
             fname = os.path.basename(COSMOVISOR_SERVICE_TEMPLATE)
 
             # Fetch the template file from GitHub
-            if is_valid_url(COSMOVISOR_SERVICE_TEMPLATE):
-                self.exec(f"wget -c {COSMOVISOR_SERVICE_TEMPLATE}")
-            else:
-                logging.exception(f"URL is not valid: {COSMOVISOR_SERVICE_TEMPLATE}")
+            self.exec(f"wget -c {COSMOVISOR_SERVICE_TEMPLATE}")
 
             # Replace the values for environment variables in the template file
             with open(fname) as f:
@@ -384,8 +385,11 @@ class Installer():
             else:
                 os_arch = 'arm64'
             cosmovisor_download_url = COSMOVISOR_BINARY_URL.format(DEFAULT_LATEST_COSMOVISOR_VERSION, DEFAULT_LATEST_COSMOVISOR_VERSION, os_arch)
-            logging.debug(f"Cosmovisor download URL: {cosmovisor_download_url}")
-            return cosmovisor_download_url
+            if is_valid_url(cosmovisor_download_url):
+                logging.debug(f"Cosmovisor download URL: {cosmovisor_download_url}")
+                return cosmovisor_download_url
+            else:
+                logging.exception(f"Cosmovisor download URL is not valid: {cosmovisor_download_url}")
         except Exception as e:
             logging.exception(f"Failed to compute Cosmovisor download URL. Reason: {e}")
 
@@ -442,10 +446,7 @@ class Installer():
             fname = os.path.basename(binary_url)
 
             # Download the binary from GitHub
-            if is_valid_url(binary_url):
-                self.exec(f"wget -c {binary_url}")
-            else:
-                logging.exception(f"Release URL is invalid: {binary_url}")
+            self.exec(f"wget -c {binary_url}")
 
             # 1. Extract the binary from the archive file
             # 2. Remove the archive file
@@ -697,7 +698,9 @@ class Installer():
             logging.exception(f"Failed to prepare directory tree for {DEFAULT_CHEQD_USER}. Reason: {e}")
 
     def setup_node_systemd(self):
-        # Setup cheqd-noded.service or cheqd-cosmovisor.service
+        # Setup cheqd-noded related systemd services
+        # If user selected Cosmovisor install, then cheqd-cosmovisor.service will be setup
+        # If user selected Standalone install, then cheqd-noded.service will be setup
         try:
             logging.info("Setting up systemd config")
 
@@ -705,11 +708,12 @@ class Installer():
             service_file_exists = os.path.exists(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH) or os.path.exists(
                 DEFAULT_STANDALONE_SERVICE_FILE_PATH)
 
+            # WARNING: Revisit this logic and check the condition
             if not self.interviewer.is_upgrade or \
                     self.interviewer.rewrite_node_systemd or \
                     not service_file_exists:
-                self.remove_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME)
-                self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME)
+                self.remove_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME, DEFAULT_COSMOVISOR_SERVICE_FILE_PATH)
+                self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME, DEFAULT_STANDALONE_SERVICE_FILE_PATH)
 
                 if self.interviewer.is_cosmo_needed:
                     try:
@@ -718,8 +722,7 @@ class Installer():
                         with open(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH, mode="w") as fd:
                             fd.write(self.cosmovisor_service_cfg)
                     except Exception as e:
-                        logging.exception(
-                            f"Failed to setup cheqd-cosmovisor systemd service. Reason: {e}")
+                        logging.exception(f"Failed to setup cheqd-cosmovisor systemd service. Reason: {e}")
                 else:
                     logging.info("Enabling systemd service for cheqd-noded")
                     self.exec(
