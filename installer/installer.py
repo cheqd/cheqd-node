@@ -716,22 +716,17 @@ class Installer():
                 self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME, DEFAULT_STANDALONE_SERVICE_FILE_PATH)
 
                 if self.interviewer.is_cosmo_needed:
-                    try:
-                        # Setup cheqd-cosmovisor.service if requested
-                        logging.info("Enabling cheqd-cosmovisor.service in systemd")
-                        with open(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH, mode="w") as fd:
-                            fd.write(self.cosmovisor_service_cfg)
-                    except Exception as e:
-                        logging.exception(f"Failed to setup cheqd-cosmovisor systemd service. Reason: {e}")
+                    # Setup cheqd-cosmovisor.service if requested
+                    logging.info("Enabling cheqd-cosmovisor.service in systemd")
+                    with open(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH, mode="w") as fd:
+                        fd.write(self.cosmovisor_service_cfg)
+                    self.enable_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME)
                 else:
-                    logging.info("Enabling systemd service for cheqd-noded")
-                    self.exec(
-                        f"curl -s {STANDALONE_SERVICE_TEMPLATE} > {DEFAULT_STANDALONE_SERVICE_FILE_PATH}")
-
-                self.exec(
-                    f"systemctl enable {DEFAULT_COSMOVISOR_SERVICE_NAME if self.interviewer.is_cosmo_needed else DEFAULT_STANDALONE_SERVICE_NAME}")
+                    logging.info("Enabling cheqd-noded.service in systemd")
+                    self.exec(f"curl -s {STANDALONE_SERVICE_TEMPLATE} > {DEFAULT_STANDALONE_SERVICE_FILE_PATH}")
+                    self.enable_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME)
         except Exception as e:
-            logging.exception(f"Failed to setup cheqd-noded systemd service. Reason: {e}")
+            logging.exception(f"Failed to setup systemd service for cheqd-node. Reason: {e}")
 
     # Setup logging related systemd services
     def setup_logging_systemd(self):
