@@ -737,8 +737,7 @@ class Installer():
             if not os.path.exists(DEFAULT_RSYSLOG_FILE) or self.interviewer.rewrite_rsyslog:
                 # Warn user if rsyslog service file already exists
                 if os.path.exists(DEFAULT_RSYSLOG_FILE):
-                    logging.warning(
-                        f"Existing rsyslog configuration at {DEFAULT_RSYSLOG_FILE} will be overwritten")
+                    logging.warning(f"Existing rsyslog configuration at {DEFAULT_RSYSLOG_FILE} will be overwritten")
                 
                 # Determine the binary name for logging based on installation type
                 if self.interviewer.is_cosmo_needed:
@@ -755,9 +754,11 @@ class Installer():
                 # Restarting rsyslog can take a lot of time: https://github.com/rsyslog/rsyslog/issues/3133
                 if self.restart_systemd_service("rsyslog.service"):
                     logging.info("Successfully configured rsyslog service")
+                else:
+                    logging.error("Failed to configure rsyslog service")
+                    raise
         except Exception as e:
-            logging.exception(
-                f"Failed to setup rsyslog service for {binary_name} logging. Reason: {e}")
+            logging.exception(f"Failed to setup rsyslog service for {binary_name} logging. Reason: {e}")
 
         # Install cheqd-node configuration for logrotate if either of the following conditions are met:
         # 1. logrotate service file is not present
@@ -766,37 +767,38 @@ class Installer():
             try:
                 # Warn user if logrotate service file already exists
                 if os.path.exists(DEFAULT_LOGROTATE_FILE):
-                    logging.warning(
-                        f"Existing logrotate configuration at {DEFAULT_LOGROTATE_FILE} will be overwritten")
+                    logging.warning(f"Existing logrotate configuration at {DEFAULT_LOGROTATE_FILE} will be overwritten")
 
-                logging.info(
-                    f"Configuring logrotate systemd service for cheqd-node logging")
+                logging.info(f"Configuring logrotate systemd service for cheqd-node logging")
 
                 # Modify logrotate template file with values specific to the installation
                 with open(DEFAULT_LOGROTATE_FILE, mode="w") as fname:
                     fname.write(self.logrotate_cfg)
 
-                self.restart_systemd_service("logrotate.service")
-                self.restart_systemd_service("logrotate.timer")
+                if self.restart_systemd_service("logrotate.service"):
+                    logging.info("Successfully configured logrotate service")
+                    if self.restart_systemd_service("logrotate.timer"):
+                        logging.info("Successfully configured logrotate timer")
+                    else:
+                        logging.exception("Failed to configure logrotate timer")
+                else:
+                    logging.exception("Failed to configure logrotate service")
             except Exception as e:
                 logging.exception(
                     f"Failed to setup logrotate service. Reason: {e}")
 
+    # Steps:
+    # - Download cheqd-noded binary
+    # - Make preps before installing. Remove all in case of installing from scratch
+    # - Prepare cheqd user
+    # - Prepare directory tree
+    # - Setup Cosmovisor (if selected by user)
+    # - Bump cosmovisor (if selected by user)
+    # - Carry out post-install actions
+    # - Restore and download snapshot (if selected by user)
+    # - Setup systemctl configs
+    # - Setup logging
     def install(self):
-        """
-        Steps:
-        - Download cheqd-noded binary
-        - Make preps before installing. Remove all in case of installing from scratch
-        - Prepare cheqd user
-        - Prepare directory tree
-        - Setup Cosmovisor (if selected by user)
-        - Bump cosmovisor (if selected by user)
-        - Carry out post-install actions
-        - Restore and download snapshot (if selected by user)
-        - Setup systemctl configs
-        - Setup logging
-        """
-
         self.get_binary()
         self.pre_install()
         self.prepare_cheqd_user()
