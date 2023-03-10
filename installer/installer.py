@@ -1297,9 +1297,9 @@ class Interviewer:
     def __init__(self, home_dir=DEFAULT_CHEQD_HOME_DIR, chain=CHEQD_NODED_CHAIN_ID):
         self._home_dir = home_dir
         self._is_upgrade = False
-        self._is_cosmo_needed = False
+        self._is_cosmo_needed = True
         self._systemd_service_file = ""
-        self._is_cosmovisor_bump_needed = False
+        self._is_cosmovisor_bump_needed = True
         self._init_from_snapshot = False
         self._release = None
         self._chain = chain
