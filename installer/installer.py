@@ -656,13 +656,16 @@ class Installer():
                 self.remove_safe(self.cheqd_root_dir, is_dir=True)
 
             # Scenario: User has installed cheqd-noded without cosmovisor, AND now wants to install cheqd-noded with Cosmovisor
-            if self.interviewer.is_cosmo_needed and os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH):
+            elif self.interviewer.is_cosmo_needed and os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH):
                 self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME, DEFAULT_STANDALONE_SERVICE_FILE_PATH)
                 self.remove_safe(DEFAULT_RSYSLOG_FILE)
                 self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
                 self.reload_systemd()
+            
+            else:
+                logging.exception("Could not complete pre-installation steps. Reason: {e}")
         except Exception as e:
-            logging.exception("Failed to perform pre-installation checks. Reason: {e}")
+            logging.exception("Could not complete pre-installation steps. Reason: {e}")
 
     def prepare_directory_tree(self):
         # Needed only in case of clean installation
