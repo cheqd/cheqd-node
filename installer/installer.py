@@ -409,14 +409,6 @@ class Installer():
 
     def install(self) -> bool:
         # Main function that controls calls to installation process functions
-        # 3. Call prepare_cheqd_user() to create cheqd user
-        # 4. Call prepare_directory_tree() to create directory tree
-        # 5. Call setup_cosmovisor() to setup cosmovisor (if selected by user)
-        # - Bump cosmovisor (if selected by user)
-        # - Carry out post-install actions
-        # - Restore and download snapshot (if selected by user)
-        # - Setup systemctl configs
-        # - Setup logging
         try:
             # Download and extract cheqd-node binary
             if self.get_binary():
@@ -434,7 +426,12 @@ class Installer():
                 raise
             
             # Create cheqd user if it doesn't exist
-            self.prepare_cheqd_user()
+            if self.prepare_cheqd_user():
+                logging.info("User/group cheqd setup successfully")
+            else:
+                logging.error("Failed to setup user/group cheqd")
+                raise
+
             self.prepare_directory_tree()
 
             if self.interviewer.is_cosmo_needed:
@@ -535,13 +532,30 @@ class Installer():
             raise
             return False
 
-    # Helper function to see if a given user exists on the system
-    def is_user_exists(self, username) -> bool:
+    def prepare_cheqd_user(self) -> bool:
+        # Create "cheqd" user/group if it doesn't exist
+        try:
+            if not self.does_user_exist(DEFAULT_CHEQD_USER):
+                logging.info(f"Creating {DEFAULT_CHEQD_USER} group")
+                self.exec(f"addgroup {DEFAULT_CHEQD_USER} --quiet --system")
+                logging.info(f"Creating {DEFAULT_CHEQD_USER} user and adding to {DEFAULT_CHEQD_USER} group")
+                self.exec(
+                    f"adduser --system {DEFAULT_CHEQD_USER} --home {self.interviewer.home_dir} --shell /bin/bash --ingroup {DEFAULT_CHEQD_USER} --quiet")
+                return True
+            else:
+                logging.info(f"User {DEFAULT_CHEQD_USER} already exists. Skipping creation...")
+                return True
+        except Exception as e:
+            logging.exception(f"Failed to create {DEFAULT_CHEQD_USER} user. Reason: {e}")
+            return False
+
+    def does_user_exist(self, username) -> bool:
+        # Helper function to see if a given user exists on the system
         try:
             pwd.getpwnam(username)
             logging.debug(f"User {username} already exists")
             return True
-        except Exception as e:
+        except KeyError:
             logging.debug(f"User {username} does not exist")
             return False
 
@@ -960,20 +974,6 @@ class Installer():
                 CHEQD_NODED_LOG_FORMAT)
             search_and_replace(log_format_search_text, log_format_replace_text, os.path.join(
                 self.cheqd_config_dir, "config.toml"))
-
-    def prepare_cheqd_user(self) -> bool:
-        try:
-            if not self.is_user_exists(DEFAULT_CHEQD_USER):
-                logging.info(f"Creating {DEFAULT_CHEQD_USER} group")
-                self.exec(f"addgroup {DEFAULT_CHEQD_USER} --quiet --system")
-                logging.info(
-                    f"Creating {DEFAULT_CHEQD_USER} user and adding to {DEFAULT_CHEQD_USER} group")
-                self.exec(
-                    f"adduser --system {DEFAULT_CHEQD_USER} --home {self.interviewer.home_dir} --shell /bin/bash --ingroup {DEFAULT_CHEQD_USER} --quiet")
-                return True
-        except Exception as e:
-            logging.exception(
-                f"Failed to create {DEFAULT_CHEQD_USER} user. Reason: {e}")
 
     def mkdir_p(self, dir_name):
         try:
