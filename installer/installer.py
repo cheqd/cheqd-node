@@ -201,8 +201,8 @@ class Release:
                 _url = _url_item["browser_download_url"]
                 version_without_v_prefix = self.version.replace('v', '', 1)
                 if os.path.basename(_url) == f"cheqd-noded-{version_without_v_prefix}-{os_name}-{os_arch}.tar.gz":
-                    logging.debug(f"Release URL for binary download: {_url}")
                     if is_valid_url(_url):
+                        logging.debug(f"Release URL for binary download: {_url}")
                         return _url
                     else:
                         logging.exception(f"Release URL is not valid: {_url}")
@@ -243,7 +243,6 @@ class Installer():
         # Modify cheqd-cosmovisor.service template file to replace values for environment variables
         # The template file is fetched from the GitHub repo
         # Some of these variables are explicitly asked during the installer process. Others are set to default values.
-
         try:
             # Set service file path
             fname = os.path.basename(COSMOVISOR_SERVICE_TEMPLATE)
@@ -276,7 +275,6 @@ class Installer():
         # Modify rsyslog template file to replace values for environment variables
         # The template file is fetched from GitHub repo
         # Some of these variables are explicitly asked during the installer process. Others are set to default values.
-        
         try:
             # Determine the binary name for logging based on installation type
             if self.interviewer.is_cosmo_needed:
@@ -313,7 +311,6 @@ class Installer():
         # Modify logrotate template file to replace values for environment variables
         # The logrotate template file is fetched from the GitHub repo
         # Logrotate is used to rotate the log files of the cheqd-node every day, and keep a maximum of 7 days of logs.
-
         try:
             # Set template file path
             fname = os.path.basename(LOGROTATE_TEMPLATE)
@@ -410,7 +407,6 @@ class Installer():
         return subprocess.run(cmd, **kwargs)
 
     # Main function that controls calls to installation process functions
-    # 1. Call get_binary() to download the binary
     # 2. Call pre_install() to perform pre-installation checks
     # 3. Call prepare_cheqd_user() to create cheqd user
     # 4. Call prepare_directory_tree() to create directory tree
@@ -422,12 +418,15 @@ class Installer():
     # - Setup logging
     def install(self) -> bool:
         try:
+            # Download and extract cheqd-node binary
             if self.get_binary():
                 logging.info("Successfully downloaded and extracted cheqd-noded binary")
             else:
                 logging.error("Failed to download and extract binary")
                 raise
             
+            # Carry out pre-installation steps
+            # Mostly relevant if installing from scratch or re-installing
             if self.pre_install():
                 logging.info("Pre-installation steps completed successfully")
             else:
@@ -472,6 +471,31 @@ class Installer():
             return True
         except Exception as e:
             logging.exception(f"Failed to install cheqd-noded. Reason: {e}")
+    
+    def get_binary(self) -> bool:
+        # Download cheqd-noded binary and extract it
+        # Also remove the downloaded archive file, if applicable
+        try:
+            logging.info("Downloading cheqd-noded binary...")
+            binary_url = self.release.get_release_url()
+            fname = os.path.basename(binary_url)
+
+            # Download the binary from GitHub
+            self.exec(f"wget -c {binary_url}")
+
+            # 1. Extract the binary from the archive file
+            # 2. Remove the archive file
+            # 3. Make the binary executable
+            if fname.find(".tar.gz") != -1:
+                self.exec(f"tar -xzf {fname} -C .")
+                self.remove_safe(fname)
+                self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
+                return True
+            else:
+                logging.error(f"Unable to extract binary from archive file: {fname}")
+                return False
+        except Exception as e:
+            logging.exception("Failed to download cheqd-noded binary. Reason: {e}")
 
     # Helper function to see if a given user exists on the system
     def is_user_exists(self, username) -> bool:
@@ -499,32 +523,6 @@ class Installer():
                 return False
         except Exception as e:
             logging.exception(f"Failed to remove {path}. Reason: {e}")
-            return False
-
-    def get_binary(self) -> bool:
-        # Download cheqd-noded binary and extract it
-        # Also remove the downloaded archive file, if applicable
-        try:
-            logging.info("Downloading cheqd-noded binary...")
-            binary_url = self.release.get_release_url()
-            fname = os.path.basename(binary_url)
-
-            # Download the binary from GitHub
-            self.exec(f"wget -c {binary_url}")
-
-            # 1. Extract the binary from the archive file
-            # 2. Remove the archive file
-            # 3. Make the binary executable
-            if fname.find(".tar.gz") != -1:
-                self.exec(f"tar -xzf {fname} -C .")
-                self.remove_safe(fname)
-                self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
-                return True
-            else:
-                logging.exception(f"Unable to extract binary from archive file: {fname}")
-                return False
-        except Exception as e:
-            logging.exception("Failed to download cheqd-noded binary. Reason: {e}")
             return False
 
     def check_systemd_service_active(self, service_name) -> bool:
