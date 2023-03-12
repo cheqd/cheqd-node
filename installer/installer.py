@@ -439,9 +439,9 @@ class Installer():
                 logging.info("Setting up Cosmovisor")
                 self.setup_cosmovisor()
 
-            if self.interviewer.is_cosmovisor_bump_needed:
-                logging.info("Bumping Cosmovisor")
-                self.bump_cosmovisor()
+            # if self.interviewer.is_cosmovisor_bump_needed:
+            #     logging.info("Bumping Cosmovisor")
+            #     self.bump_cosmovisor()
 
             if not self.interviewer.is_cosmo_needed and not self.interviewer.is_cosmovisor_bump_needed:
                 logging.info(
@@ -451,13 +451,13 @@ class Installer():
                             DEFAULT_CHEQD_USER)
                 shutil.move(self.binary_path, os.path.join(
                     DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
-                self.post_install()
+                self.configure_node_settings()
 
             if self.interviewer.is_setup_needed:
-                self.post_install()
+                self.configure_node_settings()
 
             if self.interviewer.init_from_snapshot:
-                self.snapshot_url = self.prepare_url_for_latest()
+                self.snapshot_url = self.get_snapshot_url()
                 if self.snapshot_url:
                     logging.info(
                         "Downloading snapshot and extracting archive. This can take a *really* long time...")
@@ -872,7 +872,7 @@ class Installer():
                 logging.exception(
                     f"Failed to setup logrotate service. Reason: {e}")
 
-    def post_install(self):
+    def configure_node_settings(self):
         # Init the node with provided moniker
         if not os.path.exists(os.path.join(self.cheqd_config_dir, 'genesis.json')):
             self.exec(
@@ -1201,7 +1201,7 @@ class Installer():
         except Exception as e:
             logging.exception(f"Failed to install dependencies. Reason: {e}")
             
-    def prepare_url_for_latest(self) -> str:
+    def get_snapshot_url(self) -> str:
         template = TESTNET_SNAPSHOT if self.interviewer.chain in TESTNET_CHAIN_ID else MAINNET_SNAPSHOT
         _date = datetime.date.today()
         _days_counter = 0
