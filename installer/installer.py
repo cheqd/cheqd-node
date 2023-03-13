@@ -514,36 +514,6 @@ class Installer():
         except Exception as e:
             logging.exception("Failed to download cheqd-noded binary. Reason: {e}")
 
-    def get_cosmovisor(self) -> bool:
-        # Download Cosmovisor binary and extract it
-        # Also remove the downloaded archive file, if applicable
-        try:
-            logging.info("Downloading Cosmovisor binary...")
-            cosmovisor_download_url = self.download_and_unzip(self.cosmovisor_download_url)
-            fname = os.path.basename(cosmovisor_download_url)
-
-            # Download Cosmovisor binary from GitHub
-            self.exec(f"wget -c {cosmovisor_download_url}")
-
-            # Remove cosmovisor artifacts...
-            self.remove_safe("CHANGELOG.md")
-            self.remove_safe("README.md")
-            self.remove_safe("LICENSE")
-
-            # 1. Extract the Cosmovisor binary from the archive file
-            # 2. Remove the archive file
-            # 3. Make the binary executable
-            if fname.find(".tar.gz") != -1:
-                self.exec(f"tar -xzf {fname} -C .")
-                self.remove_safe(fname)
-                self.exec(f"chmod +x {DEFAULT_COSMOVISOR_BINARY_NAME}")
-                return True
-            else:
-                logging.error(f"Unable to extract Cosmovisor binary from archive file: {fname}")
-                return False
-        except Exception as e:
-            logging.exception("Failed to download Cosmovisor binary. Reason: {e}")
-
     def pre_install(self) -> bool:
         # Pre-installation steps
         # Removes the following existing cheqd-noded data and configurations:
@@ -639,6 +609,74 @@ class Installer():
                 logging.info("Skipping linking because /var/log/cheqd-node already exists")
         except Exception as e:
             logging.exception(f"Failed to prepare directory tree for {DEFAULT_CHEQD_USER}. Reason: {e}")
+
+    def install_cosmovisor(self):
+        # Install binaries for cheqd-noded and Cosmovisor
+        # Cosmovisor is only installed if requested by the user
+        # cheqd-noded binary is always installed, but the installation location depends whether user
+        # chose to install with Cosmovisor or standalone
+        try:
+            if self.get_cosmovisor():
+                logging.info("Successfully downloaded Cosmovisor")
+            else:
+                logging.error("Failed to download Cosmovisor")
+                raise
+            self.set_cheqd_env_vars()
+            self.set_cosmovisor_env_vars()
+
+            os.system("source /etc/environment")
+
+            if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)):
+                logging.info(
+                    f"Moving Cosmovisor binary to installation directory")
+                shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
+
+            self.init_cosmovisor()
+
+            if self.interviewer.is_upgrade and \
+                    os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
+
+                logging.info(
+                    f"Copying upgrade-info.json file to cosmovisor/current/")
+                shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
+                            os.path.join(self.cosmovisor_root_dir, "current"))
+                logging.info(f"Changing owner to {DEFAULT_CHEQD_USER} user")
+                shutil.chown(self.cosmovisor_root_dir,
+                             DEFAULT_CHEQD_USER,
+                             DEFAULT_CHEQD_USER)
+        except Exception as e:
+            logging.exception(f"Failed to setup Cosmovisor. Reason: {e}")
+
+    def get_cosmovisor(self) -> bool:
+        # Download Cosmovisor binary and extract it
+        # Also remove the downloaded archive file, if applicable
+        try:
+            logging.info("Downloading Cosmovisor binary...")
+            cosmovisor_download_url = self.download_and_unzip(self.cosmovisor_download_url)
+            fname = os.path.basename(cosmovisor_download_url)
+
+            # Download Cosmovisor binary from GitHub
+            self.exec(f"wget -c {cosmovisor_download_url}")
+
+            # 1. Extract the Cosmovisor binary from the archive file
+            # 2. Remove the archive file and Cosmovisor artifacts
+            # 3. Make the binary executable
+            if fname.find(".tar.gz") != -1:
+                self.exec(f"tar -xzf {fname} -C .")
+
+                # Remove Cosmovisor artifacts...
+                self.remove_safe("CHANGELOG.md")
+                self.remove_safe("README.md")
+                self.remove_safe("LICENSE")
+                self.remove_safe(fname)
+
+                self.exec(f"chmod +x {DEFAULT_COSMOVISOR_BINARY_NAME}")
+                return True
+            else:
+                logging.error(f"Unable to extract Cosmovisor binary from archive file: {fname}")
+                return False
+        except Exception as e:
+            logging.exception("Failed to download Cosmovisor binary. Reason: {e}")
 
     def check_systemd_service_active(self, service_name) -> bool:
         # Check if a given systemd service is active
@@ -1029,38 +1067,6 @@ class Installer():
             shutil.chown(self.cheqd_log_dir, 'syslog', DEFAULT_CHEQD_USER)
         except Exception as e:
             logging.exception(f"Failed to setup {self.cheqd_log_dir} directory. Reason: {e}")
-
-    def install_cosmovisor(self):
-        # Install binaries for cheqd-noded and Cosmovisor
-        # Cosmovisor is only installed if requested by the user
-        # cheqd-noded binary is always installed, but the installation location depends whether user
-        # chose to install with Cosmovisor or standalone
-        try:
-            self.set_cheqd_env_vars()
-            self.set_cosmovisor_env_vars()
-
-            os.system("source /etc/environment")
-
-            if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)):
-                logging.info(
-                    f"Moving Cosmovisor binary to installation directory")
-                shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
-
-            self.init_cosmovisor()
-
-            if self.interviewer.is_upgrade and \
-                    os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
-
-                logging.info(
-                    f"Copying upgrade-info.json file to cosmovisor/current/")
-                shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
-                            os.path.join(self.cosmovisor_root_dir, "current"))
-                logging.info(f"Changing owner to {DEFAULT_CHEQD_USER} user")
-                shutil.chown(self.cosmovisor_root_dir,
-                             DEFAULT_CHEQD_USER,
-                             DEFAULT_CHEQD_USER)
-        except Exception as e:
-            logging.exception(f"Failed to setup Cosmovisor. Reason: {e}")
 
     def set_cheqd_env_vars(self):
         self.set_env_vars("DEFAULT_CHEQD_HOME_DIR",
