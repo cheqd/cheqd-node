@@ -654,24 +654,25 @@ class Installer():
                     if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
                         logging.info(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
                         os.symlink(self.cosmovisor_cheqd_bin_path, os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+
+                    # Change owner of Cosmovisor directory to default cheqd user
+                    logging.info(f"Changing ownership of {self.cosmovisor_root_dir} to {DEFAULT_CHEQD_USER} user")
+                    shutil.chown(self.cosmovisor_root_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
                 else:
                     logging.error("Failed to install Cosmovisor")
                     raise
             else:
                 logging.error("Failed to download Cosmovisor")
                 raise
-
-            if self.interviewer.is_upgrade and \
-                    os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
-
-                logging.info(
-                    f"Copying upgrade-info.json file to cosmovisor/current/")
+            
+            # Steps to execute only if this is an upgrade
+            # The upgrade-info.json file is required for Cosmovisor to function correctly
+            if self.interviewer.is_upgrade and os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
+                logging.info(f"Copying ~/.cheqdnode/data/upgrade-info.json file to ~/.cheqdnode/cosmovisor/current/")
                 shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
-                            os.path.join(self.cosmovisor_root_dir, "current"))
-                logging.info(f"Changing owner to {DEFAULT_CHEQD_USER} user")
-                shutil.chown(self.cosmovisor_root_dir,
-                             DEFAULT_CHEQD_USER,
-                             DEFAULT_CHEQD_USER)
+                    os.path.join(self.cosmovisor_root_dir, "current"))
+            else:
+                logging.debug("Skipping copying of upgrade-info.json file because it doesn't exist")
         except Exception as e:
             logging.exception(f"Failed to setup Cosmovisor. Reason: {e}")
 
