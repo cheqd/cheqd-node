@@ -596,9 +596,20 @@ class Installer():
             else:
                 logging.info(f"Skipping main directory creation because {self.cheqd_root_dir} already exists")
 
-            # Create log directory for cheqd-noded
+            # Setup logging related directories
+            # 1. Create log directory if it doesn't exist
+            # 2. Create default stdout.log file in log directory
+            # 3. Set ownership of log directory to syslog:cheqd
             if not os.path.exists(self.cheqd_log_dir):
-                self.setup_log_dir()
+                # Create ~/.cheqdnode/log directory
+                logging.info("Creating log directory for cheqd-noded")
+                os.makedirs(self.cheqd_log_dir)
+
+                # Create blank ~/.cheqdnode/log/stdout.log file
+                Path(os.path.join(self.cheqd_log_dir, "stdout.log")).touch(exist_ok=True)
+
+                logging.info(f"Setting up ownership permissions for {self.cheqd_log_dir} directory")
+                shutil.chown(self.cheqd_log_dir, 'syslog', DEFAULT_CHEQD_USER)
             else:
                 logging.info(f"Skipping log directory creation because {self.cheqd_log_dir} already exists")
 
@@ -1120,24 +1131,6 @@ class Installer():
             os.mkdir(dir_name)
         except FileExistsError as err:
             logging.info(f"Directory {dir_name} already exists")
-
-    def setup_log_dir(self):
-        # Setup logging related directories
-        # 1. Create log directory if it doesn't exist
-        # 2. Create default stdout.log file in log directory
-        # 3. Set ownership of log directory to syslog:cheqd
-        try:
-            # Create ~/.cheqdnode/log directory
-            logging.info("Creating log directory for cheqd-noded")
-            os.makedirs(self.cheqd_log_dir)
-
-            # Create blank ~/.cheqdnode/log/stdout.log file
-            Path(os.path.join(self.cheqd_log_dir, "stdout.log")).touch(exist_ok=True)
-
-            logging.info(f"Setting up ownership permissions for {self.cheqd_log_dir} directory")
-            shutil.chown(self.cheqd_log_dir, 'syslog', DEFAULT_CHEQD_USER)
-        except Exception as e:
-            logging.exception(f"Failed to setup {self.cheqd_log_dir} directory. Reason: {e}")
 
     def set_cheqd_env_vars(self):
         self.set_environment_variable("DEFAULT_CHEQD_HOME_DIR",
