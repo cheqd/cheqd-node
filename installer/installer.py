@@ -453,8 +453,8 @@ class Installer():
             # Setup directories needed for installation
             self.prepare_directory_tree()
 
+            # Setup Cosmovisor binary if needed
             if self.interviewer.is_cosmovisor_needed or self.interviewer.is_cosmovisor_bump_needed:
-                logging.info("Setting up Cosmovisor")
                 self.install_cosmovisor()
 
             # if self.interviewer.is_cosmovisor_bump_needed:
@@ -618,6 +618,8 @@ class Installer():
         # cheqd-noded binary is always installed, but the installation location depends whether user
         # chose to install with Cosmovisor or standalone
         try:
+            logging.info("Setting up Cosmovisor")
+            
             if self.get_cosmovisor():
                 logging.info("Successfully downloaded Cosmovisor")
 
@@ -627,17 +629,18 @@ class Installer():
                 # Move Cosmovisor binary to installation directory if it doesn't exist or bump needed
                 # This is executed is there is no Cosmovisor binary in the installation directory
                 # or if the user has requested a bump for Cosmovisor
-                if self.interviewer.is_cosmovisor_needed or self.interviewer.is_cosmovisor_bump_needed:
-                    logging.info(f"Moving Cosmovisor binary to installation directory")
-                    shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
+                logging.info(f"Moving Cosmovisor binary to installation directory")
+                shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
+
+                # Check if Cosmovisor was successfully installed
+                if self.interviewer.is_cosmovisor_installed():
+                    logging.info("Cosmovisor successfully installed")
+                else:
+                    logging.error("Failed to install Cosmovisor")
+                    raise
             else:
                 logging.error("Failed to download Cosmovisor")
                 raise
-
-            if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)):
-                logging.info(
-                    f"Moving Cosmovisor binary to installation directory")
-                shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
 
             self.init_cosmovisor()
 
