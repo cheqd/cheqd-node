@@ -277,7 +277,7 @@ class Installer():
         # Some of these variables are explicitly asked during the installer process. Others are set to default values.
         try:
             # Determine the binary name for logging based on installation type
-            if self.interviewer.is_cosmo_needed:
+            if self.interviewer.is_cosmovisor_needed:
                 binary_name = DEFAULT_COSMOVISOR_BINARY_NAME
             else:
                 binary_name = DEFAULT_BINARY_NAME
@@ -453,7 +453,7 @@ class Installer():
             # Setup directories needed for installation
             self.prepare_directory_tree()
 
-            if self.interviewer.is_cosmo_needed or self.interviewer.is_cosmovisor_bump_needed:
+            if self.interviewer.is_cosmovisor_needed or self.interviewer.is_cosmovisor_bump_needed:
                 logging.info("Setting up Cosmovisor")
                 self.install_cosmovisor()
 
@@ -461,7 +461,7 @@ class Installer():
             #     logging.info("Bumping Cosmovisor")
             #     self.bump_cosmovisor()
 
-            if not self.interviewer.is_cosmo_needed and not self.interviewer.is_cosmovisor_bump_needed:
+            if not self.interviewer.is_cosmovisor_needed and not self.interviewer.is_cosmovisor_bump_needed:
                 logging.info(
                     f"Moving binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}")
                 shutil.chown(self.binary_path,
@@ -542,7 +542,7 @@ class Installer():
                 return True
 
             # Scenario: User has installed cheqd-noded without cosmovisor, AND now wants to install cheqd-noded with Cosmovisor
-            if self.interviewer.is_cosmo_needed and os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH):
+            if self.interviewer.is_cosmovisor_needed and os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH):
                 self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME, DEFAULT_STANDALONE_SERVICE_FILE_PATH)
                 self.remove_safe(DEFAULT_RSYSLOG_FILE)
                 self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
@@ -623,6 +623,13 @@ class Installer():
 
                 # Set environment variables for Cosmovisor
                 self.set_cosmovisor_env_vars()
+
+                # Move Cosmovisor binary to installation directory if it doesn't exist or bump needed
+                # This is executed is there is no Cosmovisor binary in the installation directory
+                # or if the user has requested a bump for Cosmovisor
+                if self.interviewer.is_cosmovisor_needed or self.interviewer.is_cosmovisor_bump_needed:
+                    logging.info(f"Moving Cosmovisor binary to installation directory")
+                    shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
             else:
                 logging.error("Failed to download Cosmovisor")
                 raise
@@ -911,7 +918,7 @@ class Installer():
                 self.remove_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME, DEFAULT_COSMOVISOR_SERVICE_FILE_PATH)
                 self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME, DEFAULT_STANDALONE_SERVICE_FILE_PATH)
 
-                if self.interviewer.is_cosmo_needed:
+                if self.interviewer.is_cosmovisor_needed:
                     # Setup cheqd-cosmovisor.service if requested
                     logging.info("Enabling cheqd-cosmovisor.service in systemd")
                     with open(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH, mode="w") as fd:
@@ -936,7 +943,7 @@ class Installer():
                     logging.warning(f"Existing rsyslog configuration at {DEFAULT_RSYSLOG_FILE} will be overwritten")
                 
                 # Determine the binary name for logging based on installation type
-                if self.interviewer.is_cosmo_needed:
+                if self.interviewer.is_cosmovisor_needed:
                     binary_name = DEFAULT_COSMOVISOR_BINARY_NAME
                 else:
                     binary_name = DEFAULT_BINARY_NAME
@@ -1294,7 +1301,7 @@ class Installer():
                 f"Snapshot extraction was successful. Deleting snapshot archive.")
             self.remove_safe(archive_path)
             # Workaround to make this work with Cosmovisor since it expects upgrade-info.json file in cosmovisor/current directory
-            if self.interviewer.is_cosmo_needed:
+            if self.interviewer.is_cosmovisor_needed:
                 if os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
                     logging.info(
                         f"Copying upgrade-info.json file to cosmovisor/current/")
@@ -1318,7 +1325,7 @@ class Interviewer:
     def __init__(self, home_dir=DEFAULT_CHEQD_HOME_DIR, chain=CHEQD_NODED_CHAIN_ID):
         self._home_dir = home_dir
         self._is_upgrade = False
-        self._is_cosmo_needed = True
+        self._is_cosmovisor_needed = True
         self._systemd_service_file = ""
         self._is_cosmovisor_bump_needed = True
         self._init_from_snapshot = False
@@ -1386,8 +1393,8 @@ class Interviewer:
         return self._rewrite_logrotate
 
     @property
-    def is_cosmo_needed(self) -> bool:
-        return self._is_cosmo_needed
+    def is_cosmovisor_needed(self) -> bool:
+        return self._is_cosmovisor_needed
 
     @property
     def is_cosmovisor_bump_needed(self) -> bool:
@@ -1478,9 +1485,9 @@ class Interviewer:
     def rewrite_logrotate(self, rl):
         self._rewrite_logrotate = rl
 
-    @is_cosmo_needed.setter
-    def is_cosmo_needed(self, icn):
-        self._is_cosmo_needed = icn
+    @is_cosmovisor_needed.setter
+    def is_cosmovisor_needed(self, icn):
+        self._is_cosmovisor_needed = icn
 
     @is_cosmovisor_bump_needed.setter
     def is_cosmovisor_bump_needed(self, icbn):
@@ -1582,8 +1589,7 @@ class Interviewer:
                 self.is_cosmovisor_bump_needed = False
                 return False
         except Exception as e:
-            logging.exception(
-                f"Could not check if Cosmovisor is already installed. Reason: {e}")
+            logging.exception(f"Could not check if Cosmovisor is already installed. Reason: {e}")
 
     # Check if a systemd config is installed for a given service file
     def is_systemd_config_installed(self, systemd_service_file) -> bool:
@@ -1714,9 +1720,9 @@ class Interviewer:
             answer = self.ask(
                 f"Install cheqd-noded using Cosmovisor? (yes/no)", default=DEFAULT_USE_COSMOVISOR)
             if answer.lower().startswith("y"):
-                self.is_cosmo_needed = True
+                self.is_cosmovisor_needed = True
             elif answer.lower().startswith("n"):
-                self.is_cosmo_needed = False
+                self.is_cosmovisor_needed = False
             else:
                 logging.error(
                     f"Invalid input provided during installation. Please choose either 'yes' or 'no'.")
@@ -1997,7 +2003,7 @@ if __name__ == '__main__':
             else:
                 interviewer.ask_for_cosmovisor_bump()
 
-            if interviewer.is_cosmo_needed is True:
+            if interviewer.is_cosmovisor_needed is True:
                 interviewer.ask_for_daemon_allow_download_binaries()
                 interviewer.ask_for_daemon_restart_after_upgrade()
 
@@ -2035,7 +2041,7 @@ if __name__ == '__main__':
             else:
                 interviewer.ask_for_cosmovisor_bump()
 
-            if interviewer.is_cosmo_needed is True:
+            if interviewer.is_cosmovisor_needed is True:
                 interviewer.ask_for_daemon_allow_download_binaries()
                 interviewer.ask_for_daemon_restart_after_upgrade()
 
