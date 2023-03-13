@@ -407,6 +407,24 @@ class Installer():
             kwargs["stderr"] = subprocess.DEVNULL
         return subprocess.run(cmd, **kwargs)
 
+    def remove_safe(self, path, is_dir=False) -> bool:
+        # Helper function to remove a file or directory safely
+        try:
+            if is_dir and os.path.exists(path):
+                shutil.rmtree(path)
+                logging.warning(f"Removed {path}")
+                return True
+            elif os.path.exists(path):
+                os.remove(path)
+                logging.warning(f"Removed {path}")
+                return True
+            else:
+                logging.exception(f"{path} does not exist")
+                return False
+        except Exception as e:
+            logging.exception(f"Failed to remove {path}. Reason: {e}")
+            return False
+
     def install(self) -> bool:
         # Main function that controls calls to installation process functions
         try:
@@ -435,9 +453,9 @@ class Installer():
             # Setup directories needed for installation
             self.prepare_directory_tree()
 
-            if self.interviewer.is_cosmo_needed:
+            if self.interviewer.is_cosmo_needed or self.interviewer.is_cosmovisor_bump_needed:
                 logging.info("Setting up Cosmovisor")
-                self.setup_cosmovisor()
+                self.install_cosmovisor()
 
             # if self.interviewer.is_cosmovisor_bump_needed:
             #     logging.info("Bumping Cosmovisor")
@@ -491,11 +509,41 @@ class Installer():
                 self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
                 return True
             else:
-                logging.error(f"Unable to extract binary from archive file: {fname}")
+                logging.error(f"Unable to extract cheqd-noded binary from archive file: {fname}")
                 return False
         except Exception as e:
             logging.exception("Failed to download cheqd-noded binary. Reason: {e}")
-    
+
+    def get_cosmovisor(self) -> bool:
+        # Download Cosmovisor binary and extract it
+        # Also remove the downloaded archive file, if applicable
+        try:
+            logging.info("Downloading Cosmovisor binary...")
+            cosmovisor_download_url = self.download_and_unzip(self.cosmovisor_download_url)
+            fname = os.path.basename(cosmovisor_download_url)
+
+            # Download Cosmovisor binary from GitHub
+            self.exec(f"wget -c {cosmovisor_download_url}")
+
+            # Remove cosmovisor artifacts...
+            self.remove_safe("CHANGELOG.md")
+            self.remove_safe("README.md")
+            self.remove_safe("LICENSE")
+
+            # 1. Extract the Cosmovisor binary from the archive file
+            # 2. Remove the archive file
+            # 3. Make the binary executable
+            if fname.find(".tar.gz") != -1:
+                self.exec(f"tar -xzf {fname} -C .")
+                self.remove_safe(fname)
+                self.exec(f"chmod +x {DEFAULT_COSMOVISOR_BINARY_NAME}")
+                return True
+            else:
+                logging.error(f"Unable to extract Cosmovisor binary from archive file: {fname}")
+                return False
+        except Exception as e:
+            logging.exception("Failed to download Cosmovisor binary. Reason: {e}")
+
     def pre_install(self) -> bool:
         # Pre-installation steps
         # Removes the following existing cheqd-noded data and configurations:
@@ -591,24 +639,6 @@ class Installer():
                 logging.info("Skipping linking because /var/log/cheqd-node already exists")
         except Exception as e:
             logging.exception(f"Failed to prepare directory tree for {DEFAULT_CHEQD_USER}. Reason: {e}")
-
-    def remove_safe(self, path, is_dir=False) -> bool:
-        # Helper function to remove a file or directory safely
-        try:
-            if is_dir and os.path.exists(path):
-                shutil.rmtree(path)
-                logging.warning(f"Removed {path}")
-                return True
-            elif os.path.exists(path):
-                os.remove(path)
-                logging.warning(f"Removed {path}")
-                return True
-            else:
-                logging.exception(f"{path} does not exist")
-                return False
-        except Exception as e:
-            logging.exception(f"Failed to remove {path}. Reason: {e}")
-            return False
 
     def check_systemd_service_active(self, service_name) -> bool:
         # Check if a given systemd service is active
@@ -1000,16 +1030,12 @@ class Installer():
         except Exception as e:
             logging.exception(f"Failed to setup {self.cheqd_log_dir} directory. Reason: {e}")
 
-    def setup_cosmovisor(self):
+    def install_cosmovisor(self):
+        # Install binaries for cheqd-noded and Cosmovisor
+        # Cosmovisor is only installed if requested by the user
+        # cheqd-noded binary is always installed, but the installation location depends whether user
+        # chose to install with Cosmovisor or standalone
         try:
-            fname = self.download_and_unzip(self.cosmovisor_download_url)
-            self.remove_safe(fname)
-
-            # Remove cosmovisor artifacts...
-            self.remove_safe("CHANGELOG.md")
-            self.remove_safe("README.md")
-            self.remove_safe("LICENSE")
-
             self.set_cheqd_env_vars()
             self.set_cosmovisor_env_vars()
 
@@ -1075,8 +1101,6 @@ class Installer():
     def bump_cosmovisor(self):
         try:
             self.stop_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME)
-
-            fname = self.download_and_unzip(self.cosmovisor_download_url)
             self.remove_safe(fname)
 
             # Remove cosmovisor artifacts...
@@ -1166,12 +1190,6 @@ class Installer():
                 return False
         except KeyError:
             logging.exception("Unable to get the default shell")
-
-    def download_and_unzip(self, download_url):
-        fname = os.path.basename(download_url)
-        self.exec(f"wget -c {download_url}")
-        self.exec(f"tar -xzf {fname}")
-        return fname
 
     def compare_checksum(self, file_path):
         # Set URL for correct checksum file for snapshot
