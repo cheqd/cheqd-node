@@ -338,7 +338,7 @@ class Installer():
 
     @property
     def cheqd_root_dir(self):
-        # CHEQD_NODED_HOME variable can be picked up by cheqd-noded, so this should be set as an environment variable later
+        # Root directory for cheqd-noded
         # Default: /home/cheqd/.cheqdnode
         cheqd_noded_home = os.path.join(self.interviewer.home_dir, ".cheqdnode")
         return cheqd_noded_home
@@ -473,10 +473,17 @@ class Installer():
                     logging.error("Failed to setup cheqd-noded as a standalone binary")
                     raise
             
+            # Setup cheqd-noded environment variables
+            # These are independent of Cosmovisor environment variables
+            # Set them regardless of whether Cosmovisor is used or not
             self.set_cheqd_env_vars()
             
-            if self.interviewer.is_setup_needed:
-                self.configure_node_settings()
+            
+            if self.configure_node_settings():
+                logging.info("Successfully configured cheqd-noded settings")
+            else:
+                logging.error("Failed to configure cheqd-noded settings")
+                raise
 
             if self.interviewer.init_from_snapshot:
                 self.snapshot_url = self.get_snapshot_url()
@@ -760,20 +767,6 @@ class Installer():
         except Exception as e:
             logging.exception("Failed to download Cosmovisor binary. Reason: {e}")
 
-    def set_cosmovisor_env_vars(self) -> bool:
-        # Set environment variables for Cosmovisor
-        try:
-            self.set_environment_variable("DAEMON_NAME", DEFAULT_BINARY_NAME, overwrite=True)
-            self.set_environment_variable("DAEMON_HOME", self.cheqd_root_dir, overwrite=False)
-            self.set_environment_variable("DAEMON_ALLOW_DOWNLOAD_BINARIES", 
-                self.interviewer.daemon_allow_download_binaries, overwrite=True)
-            self.set_environment_variable("DAEMON_RESTART_AFTER_UPGRADE",
-                self.interviewer.daemon_restart_after_upgrade, overwrite=True)
-            self.set_environment_variable("DAEMON_POLL_INTERVAL", DEFAULT_DAEMON_POLL_INTERVAL, overwrite=False)
-            self.set_environment_variable("UNSAFE_SKIP_BACKUP", DEFAULT_UNSAFE_SKIP_BACKUP, overwrite=False)
-        except Exception as e:
-            logging.exception(f"Failed to set environment variables for Cosmovisor. Reason: {e}")
-
     def install_standalone(self) -> bool:
         # Install cheqd-noded as a standalone binary
         # cheqd-noded binary is installed in /usr/bin under this scenario
@@ -810,6 +803,39 @@ class Installer():
         except Exception as e:
             logging.exception(f"Failed to setup Cosmovisor. Reason: {e}")
             return False
+    
+    def set_cosmovisor_env_vars(self):
+        # Set environment variables for Cosmovisor
+        try:
+            self.set_environment_variable("DAEMON_NAME", DEFAULT_BINARY_NAME)
+            self.set_environment_variable("DAEMON_HOME", self.cheqd_root_dir, overwrite=False)
+            self.set_environment_variable("DAEMON_ALLOW_DOWNLOAD_BINARIES", 
+                self.interviewer.daemon_allow_download_binaries)
+            self.set_environment_variable("DAEMON_RESTART_AFTER_UPGRADE",
+                self.interviewer.daemon_restart_after_upgrade)
+            self.set_environment_variable("DAEMON_POLL_INTERVAL", 
+                DEFAULT_DAEMON_POLL_INTERVAL, overwrite=False)
+            self.set_environment_variable("UNSAFE_SKIP_BACKUP", 
+                DEFAULT_UNSAFE_SKIP_BACKUP, overwrite=False)
+        except Exception as e:
+            logging.exception(f"Failed to set environment variables for Cosmovisor. Reason: {e}")
+            raise
+    
+    def set_cheqd_env_vars(self):
+        # Set environment variables for cheqd-noded binary
+        # Applicable for both standalone and Cosmovisor installations
+        # Only environment variables that are required required for transactions are set here
+        try:
+            self.set_environment_variable("CHEQD_NODED_HOME", f"{self.interviewer.cheqd_root_dir}")
+            self.set_environment_variable("CHEQD_NODED_NODE", 
+                f"tcp://localhost:{self.interviewer.rpc_port}", overwrite=False)
+            if self.interviewer.chain == "testnet":
+                self.set_environment_variable("CHEQD_NODED_CHAIN_ID", TESTNET_CHAIN_ID)
+            else:
+                self.set_environment_variable("CHEQD_NODED_CHAIN_ID", MAINNET_CHAIN_ID)
+        except Exception as e:
+            logging.exception(f"Failed to set environment variables for cheqd-noded. Reason: {e}")
+            raise
 
     def set_environment_variable(self, env_var_name, env_var_value, overwrite=True):
         # Set an environment variable
@@ -838,6 +864,115 @@ class Installer():
             logging.exception(f"Failed to set environment variable {env_var_name}. Reason: {e}")
         finally:
             env_file.close()
+
+    def configure_node_settings(self) -> bool:
+        # Init the node with provided moniker
+        try:
+            if self.interviewer.is_setup_needed:
+                if not os.path.exists(os.path.join(self.cheqd_config_dir, 'genesis.json')):
+                    self.exec(
+                        f"""sudo su -c 'cheqd-noded init {self.interviewer.moniker}' {DEFAULT_CHEQD_USER}""")
+
+                    # Downloading genesis file
+                    self.exec(
+                        f"curl {GENESIS_FILE.format(self.interviewer.chain)} > {os.path.join(self.cheqd_config_dir, 'genesis.json')}")
+                    shutil.chown(os.path.join(self.cheqd_config_dir, 'genesis.json'),
+                                DEFAULT_CHEQD_USER,
+                                DEFAULT_CHEQD_USER)
+
+            # Replace the default RCP port to listen to anyone
+            rpc_default_value = 'laddr = "tcp://127.0.0.1:{}"'.format(
+                DEFAULT_RPC_PORT)
+            new_rpc_default_value = 'laddr = "tcp://0.0.0.0:{}"'.format(
+                DEFAULT_RPC_PORT)
+            search_and_replace(rpc_default_value, new_rpc_default_value, os.path.join(
+                self.cheqd_config_dir, "config.toml"))
+
+            # Set create empty blocks to false by default
+            create_empty_blocks_search_text = 'create_empty_blocks = true'
+            create_empty_blocks_replace_text = 'create_empty_blocks = false'
+            search_and_replace(create_empty_blocks_search_text, create_empty_blocks_replace_text, os.path.join(
+                self.cheqd_config_dir, "config.toml"))
+
+            # Setting up the external_address
+            if self.interviewer.external_address:
+                external_address_search_text = 'external_address = ""'
+                external_address_replace_text = 'external_address = "{}:{}"'.format(
+                    self.interviewer.external_address, self.interviewer.p2p_port)
+                search_and_replace(external_address_search_text, external_address_replace_text, os.path.join(
+                    self.cheqd_config_dir, "config.toml"))
+
+            # Setting up the seeds
+            seeds = self.exec(
+                f"curl {SEEDS_FILE.format(self.interviewer.chain)}").stdout.decode("utf-8").strip()
+            seeds_search_text = 'seeds = ""'
+            seeds_replace_text = 'seeds = "{}"'.format(seeds)
+            search_and_replace(seeds_search_text, seeds_replace_text, os.path.join(
+                self.cheqd_config_dir, "config.toml"))
+
+            # Setting up the RPC port
+            if self.interviewer.rpc_port:
+                rpc_laddr_search_text = 'laddr = "tcp://0.0.0.0:{}"'.format(
+                    DEFAULT_RPC_PORT)
+                rpc_laddr_replace_text = 'laddr = "tcp://0.0.0.0:{}"'.format(
+                    self.interviewer.rpc_port)
+                search_and_replace(rpc_laddr_search_text, rpc_laddr_replace_text, os.path.join(
+                    self.cheqd_config_dir, "config.toml"))
+            # Setting up the P2P port
+            if self.interviewer.p2p_port:
+                p2p_laddr_search_text = 'laddr = "tcp://0.0.0.0:{}"'.format(
+                    DEFAULT_P2P_PORT)
+                p2p_laddr_replace_text = 'laddr = "tcp://0.0.0.0:{}"'.format(
+                    self.interviewer.p2p_port)
+                search_and_replace(p2p_laddr_search_text, p2p_laddr_replace_text, os.path.join(
+                    self.cheqd_config_dir, "config.toml"))
+
+            # Setting up min gas-price
+            if self.interviewer.gas_price:
+                min_gas_price_search_text = 'minimum-gas-prices = '
+                min_gas_price_replace_text = 'minimum-gas-prices = "{}"'.format(
+                    self.interviewer.gas_price)
+                search_and_replace(min_gas_price_search_text, min_gas_price_replace_text, os.path.join(
+                    self.cheqd_config_dir, "app.toml"))
+
+            # Setting up persistent peers
+            if self.interviewer.persistent_peers:
+                persistent_peers_search_text = 'persistent_peers = ""'
+                persistent_peers_replace_text = 'persistent_peers = "{}"'.format(
+                    self.interviewer.persistent_peers)
+                search_and_replace(persistent_peers_search_text, persistent_peers_replace_text, os.path.join(
+                    self.cheqd_config_dir, "config.toml"))
+
+            # Setting up log level
+            if self.interviewer.log_level:
+                log_level_search_text = 'log_level'
+                log_level_replace_text = 'log_level = "{}"'.format(
+                    self.interviewer.log_level)
+                search_and_replace(log_level_search_text, log_level_replace_text, os.path.join(
+                    self.cheqd_config_dir, "config.toml"))
+            else:
+                log_level_search_text = 'log_level'
+                log_level_replace_text = 'log_level = "{}"'.format(
+                    CHEQD_NODED_LOG_LEVEL)
+                search_and_replace(log_level_search_text, log_level_replace_text, os.path.join(
+                    self.cheqd_config_dir, "config.toml"))
+
+            # Setting up log format
+            if self.interviewer.log_format:
+                log_format_search_text = 'log_format'
+                log_format_replace_text = 'log_format = "{}"'.format(
+                    self.interviewer.log_format)
+                search_and_replace(log_format_search_text, log_format_replace_text, os.path.join(
+                    self.cheqd_config_dir, "config.toml"))
+            else:
+                log_format_search_text = 'log_format'
+                log_format_replace_text = 'log_format = "{}"'.format(
+                    CHEQD_NODED_LOG_FORMAT)
+                search_and_replace(log_format_search_text, log_format_replace_text, os.path.join(
+                    self.cheqd_config_dir, "config.toml"))
+        except Exception as e:
+            logging.exception(f"Failed to configure cheqd-noded settings. Reason: {e}")
+            return False
 
     def check_systemd_service_active(self, service_name) -> bool:
         # Check if a given systemd service is active
@@ -1101,120 +1236,11 @@ class Installer():
                 logging.exception(
                     f"Failed to setup logrotate service. Reason: {e}")
 
-    def configure_node_settings(self):
-        # Init the node with provided moniker
-        if not os.path.exists(os.path.join(self.cheqd_config_dir, 'genesis.json')):
-            self.exec(
-                f"""sudo su -c 'cheqd-noded init {self.interviewer.moniker}' {DEFAULT_CHEQD_USER}""")
-
-            # Downloading genesis file
-            self.exec(
-                f"curl {GENESIS_FILE.format(self.interviewer.chain)} > {os.path.join(self.cheqd_config_dir, 'genesis.json')}")
-            shutil.chown(os.path.join(self.cheqd_config_dir, 'genesis.json'),
-                         DEFAULT_CHEQD_USER,
-                         DEFAULT_CHEQD_USER)
-
-        # Replace the default RCP port to listen to anyone
-        rpc_default_value = 'laddr = "tcp://127.0.0.1:{}"'.format(
-            DEFAULT_RPC_PORT)
-        new_rpc_default_value = 'laddr = "tcp://0.0.0.0:{}"'.format(
-            DEFAULT_RPC_PORT)
-        search_and_replace(rpc_default_value, new_rpc_default_value, os.path.join(
-            self.cheqd_config_dir, "config.toml"))
-
-        # Set create empty blocks to false by default
-        create_empty_blocks_search_text = 'create_empty_blocks = true'
-        create_empty_blocks_replace_text = 'create_empty_blocks = false'
-        search_and_replace(create_empty_blocks_search_text, create_empty_blocks_replace_text, os.path.join(
-            self.cheqd_config_dir, "config.toml"))
-
-        # Setting up the external_address
-        if self.interviewer.external_address:
-            external_address_search_text = 'external_address = ""'
-            external_address_replace_text = 'external_address = "{}:{}"'.format(
-                self.interviewer.external_address, self.interviewer.p2p_port)
-            search_and_replace(external_address_search_text, external_address_replace_text, os.path.join(
-                self.cheqd_config_dir, "config.toml"))
-
-        # Setting up the seeds
-        seeds = self.exec(
-            f"curl {SEEDS_FILE.format(self.interviewer.chain)}").stdout.decode("utf-8").strip()
-        seeds_search_text = 'seeds = ""'
-        seeds_replace_text = 'seeds = "{}"'.format(seeds)
-        search_and_replace(seeds_search_text, seeds_replace_text, os.path.join(
-            self.cheqd_config_dir, "config.toml"))
-
-        # Setting up the RPC port
-        if self.interviewer.rpc_port:
-            rpc_laddr_search_text = 'laddr = "tcp://0.0.0.0:{}"'.format(
-                DEFAULT_RPC_PORT)
-            rpc_laddr_replace_text = 'laddr = "tcp://0.0.0.0:{}"'.format(
-                self.interviewer.rpc_port)
-            search_and_replace(rpc_laddr_search_text, rpc_laddr_replace_text, os.path.join(
-                self.cheqd_config_dir, "config.toml"))
-        # Setting up the P2P port
-        if self.interviewer.p2p_port:
-            p2p_laddr_search_text = 'laddr = "tcp://0.0.0.0:{}"'.format(
-                DEFAULT_P2P_PORT)
-            p2p_laddr_replace_text = 'laddr = "tcp://0.0.0.0:{}"'.format(
-                self.interviewer.p2p_port)
-            search_and_replace(p2p_laddr_search_text, p2p_laddr_replace_text, os.path.join(
-                self.cheqd_config_dir, "config.toml"))
-
-        # Setting up min gas-price
-        if self.interviewer.gas_price:
-            min_gas_price_search_text = 'minimum-gas-prices = '
-            min_gas_price_replace_text = 'minimum-gas-prices = "{}"'.format(
-                self.interviewer.gas_price)
-            search_and_replace(min_gas_price_search_text, min_gas_price_replace_text, os.path.join(
-                self.cheqd_config_dir, "app.toml"))
-
-        # Setting up persistent peers
-        if self.interviewer.persistent_peers:
-            persistent_peers_search_text = 'persistent_peers = ""'
-            persistent_peers_replace_text = 'persistent_peers = "{}"'.format(
-                self.interviewer.persistent_peers)
-            search_and_replace(persistent_peers_search_text, persistent_peers_replace_text, os.path.join(
-                self.cheqd_config_dir, "config.toml"))
-
-        # Setting up log level
-        if self.interviewer.log_level:
-            log_level_search_text = 'log_level'
-            log_level_replace_text = 'log_level = "{}"'.format(
-                self.interviewer.log_level)
-            search_and_replace(log_level_search_text, log_level_replace_text, os.path.join(
-                self.cheqd_config_dir, "config.toml"))
-        else:
-            log_level_search_text = 'log_level'
-            log_level_replace_text = 'log_level = "{}"'.format(
-                CHEQD_NODED_LOG_LEVEL)
-            search_and_replace(log_level_search_text, log_level_replace_text, os.path.join(
-                self.cheqd_config_dir, "config.toml"))
-
-        # Setting up log format
-        if self.interviewer.log_format:
-            log_format_search_text = 'log_format'
-            log_format_replace_text = 'log_format = "{}"'.format(
-                self.interviewer.log_format)
-            search_and_replace(log_format_search_text, log_format_replace_text, os.path.join(
-                self.cheqd_config_dir, "config.toml"))
-        else:
-            log_format_search_text = 'log_format'
-            log_format_replace_text = 'log_format = "{}"'.format(
-                CHEQD_NODED_LOG_FORMAT)
-            search_and_replace(log_format_search_text, log_format_replace_text, os.path.join(
-                self.cheqd_config_dir, "config.toml"))
-
     def mkdir_p(self, dir_name):
         try:
             os.mkdir(dir_name)
         except FileExistsError as err:
             logging.info(f"Directory {dir_name} already exists")
-
-    def set_cheqd_env_vars(self):
-        self.set_environment_variable("DEFAULT_CHEQD_HOME_DIR",
-                          f"{self.interviewer.cheqd_root_dir}")
-        self.set_environment_variable("CHEQD_NODED_CHAIN_ID", f"{self.interviewer.chain}")
 
     def compare_checksum(self, file_path):
         # Set URL for correct checksum file for snapshot
