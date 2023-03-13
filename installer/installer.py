@@ -470,7 +470,9 @@ class Installer():
                 shutil.move(self.binary_path, os.path.join(
                     DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
                 self.configure_node_settings()
-
+            
+            self.set_cheqd_env_vars()
+            
             if self.interviewer.is_setup_needed:
                 self.configure_node_settings()
 
@@ -618,13 +620,12 @@ class Installer():
         try:
             if self.get_cosmovisor():
                 logging.info("Successfully downloaded Cosmovisor")
+
+                # Set environment variables for Cosmovisor
+                self.set_cosmovisor_env_vars()
             else:
                 logging.error("Failed to download Cosmovisor")
                 raise
-            self.set_cheqd_env_vars()
-            self.set_cosmovisor_env_vars()
-
-            os.system("source /etc/environment")
 
             if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)):
                 logging.info(
@@ -677,6 +678,48 @@ class Installer():
                 return False
         except Exception as e:
             logging.exception("Failed to download Cosmovisor binary. Reason: {e}")
+
+    def set_cosmovisor_env_vars(self) -> bool:
+        # Set environment variables for Cosmovisor
+        try:
+            self.set_environment_variable("DAEMON_NAME", DEFAULT_BINARY_NAME, overwrite=True)
+            self.set_environment_variable("DAEMON_HOME", self.cheqd_root_dir, overwrite=False)
+            self.set_environment_variable("DAEMON_ALLOW_DOWNLOAD_BINARIES", 
+                self.interviewer.daemon_allow_download_binaries, overwrite=True)
+            self.set_environment_variable("DAEMON_RESTART_AFTER_UPGRADE",
+                self.interviewer.daemon_restart_after_upgrade, overwrite=True)
+            self.set_environment_variable("DAEMON_POLL_INTERVAL", DEFAULT_DAEMON_POLL_INTERVAL, overwrite=False)
+            self.set_environment_variable("UNSAFE_SKIP_BACKUP", DEFAULT_UNSAFE_SKIP_BACKUP, overwrite=False)
+        except Exception as e:
+            logging.exception(f"Failed to set environment variables for Cosmovisor. Reason: {e}")
+
+    def set_environment_variable(self, env_var_name, env_var_value, overwrite=True):
+        # Set an environment variable
+        # By default, existing environment variables are overwritten
+        # This can be changed by setting the overwrite parameter to False
+        # Environment variables are set for the current session as well as for all users
+        try:
+            logging.debug(f"Checking whether {env_var_name} is set")
+
+            if not os.environ(env_var_name) or overwrite:
+                logging.debug(f"Setting {env_var_name} to {env_var_value}")
+                
+                # Set the environment variable for the current session
+                os.environ[env_var_name] = env_var_value
+
+                # Modify the system's environment variables
+                # This will set the variable permanently for all users
+                with open("/etc/environment", "a") as env_file:
+                    env_file.write(f"\n{env_var_name}={env_var_value}")
+                
+                # Reload the environment variables
+                os.system("source /etc/environment")
+            else:
+                logging.debug(f"Environment variable {env_var_name} already set or overwrite is disabled")
+        except Exception as e:
+            logging.exception(f"Failed to set environment variable {env_var_name}. Reason: {e}")
+        finally:
+            env_file.close()
 
     def check_systemd_service_active(self, service_name) -> bool:
         # Check if a given systemd service is active
@@ -1073,16 +1116,6 @@ class Installer():
                           f"{self.interviewer.cheqd_root_dir}")
         self.set_environment_variable("CHEQD_NODED_CHAIN_ID", f"{self.interviewer.chain}")
 
-    def set_cosmovisor_env_vars(self):
-        self.set_environment_variable("DAEMON_NAME", DEFAULT_BINARY_NAME)
-        self.set_environment_variable("DAEMON_HOME", self.cheqd_root_dir)
-        self.set_environment_variable("DAEMON_ALLOW_DOWNLOAD_BINARIES",
-                          self.interviewer.daemon_allow_download_binaries)
-        self.set_environment_variable("DAEMON_RESTART_AFTER_UPGRADE",
-                          self.interviewer.daemon_restart_after_upgrade)
-        self.set_environment_variable("DAEMON_POLL_INTERVAL", DEFAULT_DAEMON_POLL_INTERVAL)
-        self.set_environment_variable("UNSAFE_SKIP_BACKUP", DEFAULT_UNSAFE_SKIP_BACKUP)
-
     def init_cosmovisor(self):
         logging.info(
             f"Moving binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}")
@@ -1160,42 +1193,6 @@ class Installer():
             self.reload_systemd()
         except Exception as e:
             logging.exception(f"Failed to bump Cosmovisor. Reason: {e}")
-
-    def set_environment_variable(self, env_var_name, env_var_value):
-        if not self.check_if_env_var_already_set(env_var_name):
-            # write to etc/environment
-            self.write_to_etc_environment(env_var_name, env_var_value)
-        else:
-            logging.info(f"ENV var {env_var_name} already set")
-
-    def write_to_etc_environment(self, env_var_name, env_var_value):
-        try:
-            etc_environment_path = "/etc/environment"
-            with open(etc_environment_path, "a") as f:
-                f.write(f"{env_var_name}={env_var_value}\n")
-
-        except Exception:
-            logging.exception("Unable to set ENC vars")
-
-        finally:
-            f.close() 
-
-    def check_if_env_var_already_set(self, env_var_name):
-        try:
-            os.environ[env_var_name]
-            return True
-        except KeyError:
-            return False
-
-    def is_default_shell_fish(self):
-        try:
-            default_shell = os.getenv("SHELL")
-            if default_shell == "/usr/bin/fish":
-                return True
-            else:
-                return False
-        except KeyError:
-            logging.exception("Unable to get the default shell")
 
     def compare_checksum(self, file_path):
         # Set URL for correct checksum file for snapshot
