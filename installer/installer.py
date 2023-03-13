@@ -636,13 +636,24 @@ class Installer():
                 if self.interviewer.check_cosmovisor_installed():
                     logging.info("Cosmovisor successfully installed")
 
-                    # Temporarily move cheqd-noded binary to installation directory
-                    logging.info(f"Moving cheqd-noded binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}")
-                    shutil.move(DEFAULT_BINARY_NAME, DEFAULT_INSTALL_PATH)
-
                     # Initialize Cosmovisor
-                    self.exec(f"""su -l -c 'cosmovisor init {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}' {DEFAULT_CHEQD_USER}""")
-                    self.create_symlink_to_binary()
+                    self.exec(f"""su -l -c 'cosmovisor init ./{DEFAULT_BINARY_NAME}' {DEFAULT_CHEQD_USER}""")
+                    
+                    # Remove cheqd-noded binary from /usr/bin if it's not a symlink
+                    if not os.path.islink(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
+                        logging.warn(f"Removing {DEFAULT_BINARY_NAME} from {DEFAULT_INSTALL_PATH} because it is not a symlink")
+                        os.remove(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+
+                        # Move cheqd-noded binary to Cosmovisor bin path
+                        logging.info(f"Moving cheqd-noded binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
+                        shutil.move(DEFAULT_BINARY_NAME, self.cosmovisor_cheqd_bin_path)
+                    else:
+                        logging.debug(f"{DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME} is already symlink. Skipping removal...")
+
+                    # Create symlink to cheqd-noded binary in Cosmovisor bin path
+                    if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
+                        logging.info(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
+                        os.symlink(self.cosmovisor_cheqd_bin_path, os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
                 else:
                     logging.error("Failed to install Cosmovisor")
                     raise
@@ -1131,16 +1142,6 @@ class Installer():
         self.set_environment_variable("DEFAULT_CHEQD_HOME_DIR",
                           f"{self.interviewer.cheqd_root_dir}")
         self.set_environment_variable("CHEQD_NODED_CHAIN_ID", f"{self.interviewer.chain}")
-
-    def create_symlink_to_binary(self):
-        if not os.path.islink(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
-            os.remove(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
-
-        if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
-            logging.info(
-                f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
-            os.symlink(self.cosmovisor_cheqd_bin_path,
-                       os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
 
     def bump_cosmovisor(self):
         try:
