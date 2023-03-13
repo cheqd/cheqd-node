@@ -1069,19 +1069,19 @@ class Installer():
             logging.exception(f"Failed to setup {self.cheqd_log_dir} directory. Reason: {e}")
 
     def set_cheqd_env_vars(self):
-        self.set_env_vars("DEFAULT_CHEQD_HOME_DIR",
+        self.set_environment_variable("DEFAULT_CHEQD_HOME_DIR",
                           f"{self.interviewer.cheqd_root_dir}")
-        self.set_env_vars("CHEQD_NODED_CHAIN_ID", f"{self.interviewer.chain}")
+        self.set_environment_variable("CHEQD_NODED_CHAIN_ID", f"{self.interviewer.chain}")
 
     def set_cosmovisor_env_vars(self):
-        self.set_env_vars("DAEMON_NAME", DEFAULT_BINARY_NAME)
-        self.set_env_vars("DAEMON_HOME", self.cheqd_root_dir)
-        self.set_env_vars("DAEMON_ALLOW_DOWNLOAD_BINARIES",
+        self.set_environment_variable("DAEMON_NAME", DEFAULT_BINARY_NAME)
+        self.set_environment_variable("DAEMON_HOME", self.cheqd_root_dir)
+        self.set_environment_variable("DAEMON_ALLOW_DOWNLOAD_BINARIES",
                           self.interviewer.daemon_allow_download_binaries)
-        self.set_env_vars("DAEMON_RESTART_AFTER_UPGRADE",
+        self.set_environment_variable("DAEMON_RESTART_AFTER_UPGRADE",
                           self.interviewer.daemon_restart_after_upgrade)
-        self.set_env_vars("DAEMON_POLL_INTERVAL", DEFAULT_DAEMON_POLL_INTERVAL)
-        self.set_env_vars("UNSAFE_SKIP_BACKUP", DEFAULT_UNSAFE_SKIP_BACKUP)
+        self.set_environment_variable("DAEMON_POLL_INTERVAL", DEFAULT_DAEMON_POLL_INTERVAL)
+        self.set_environment_variable("UNSAFE_SKIP_BACKUP", DEFAULT_UNSAFE_SKIP_BACKUP)
 
     def init_cosmovisor(self):
         logging.info(
@@ -1161,7 +1161,7 @@ class Installer():
         except Exception as e:
             logging.exception(f"Failed to bump Cosmovisor. Reason: {e}")
 
-    def set_env_vars(self, env_var_name, env_var_value):
+    def set_environment_variable(self, env_var_name, env_var_value):
         if not self.check_if_env_var_already_set(env_var_name):
             # write to etc/environment
             self.write_to_etc_environment(env_var_name, env_var_value)
