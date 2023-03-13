@@ -629,20 +629,26 @@ class Installer():
                 # Move Cosmovisor binary to installation directory if it doesn't exist or bump needed
                 # This is executed is there is no Cosmovisor binary in the installation directory
                 # or if the user has requested a bump for Cosmovisor
-                logging.info(f"Moving Cosmovisor binary to installation directory")
-                shutil.move("./cosmovisor", DEFAULT_INSTALL_PATH)
+                logging.info(f"Moving Cosmovisor binary to {DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}")
+                shutil.move(DEFAULT_COSMOVISOR_BINARY_NAME, DEFAULT_INSTALL_PATH)
 
                 # Check if Cosmovisor was successfully installed
-                if self.interviewer.is_cosmovisor_installed():
+                if self.interviewer.check_cosmovisor_installed():
                     logging.info("Cosmovisor successfully installed")
+
+                    # Temporarily move cheqd-noded binary to installation directory
+                    logging.info(f"Moving cheqd-noded binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}")
+                    shutil.move(DEFAULT_BINARY_NAME, DEFAULT_INSTALL_PATH)
+
+                    # Initialize Cosmovisor
+                    self.exec(f"""su -l -c 'cosmovisor init {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}' {DEFAULT_CHEQD_USER}""")
+                    self.create_symlink_to_binary()
                 else:
                     logging.error("Failed to install Cosmovisor")
                     raise
             else:
                 logging.error("Failed to download Cosmovisor")
                 raise
-
-            self.init_cosmovisor()
 
             if self.interviewer.is_upgrade and \
                     os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
@@ -1126,17 +1132,6 @@ class Installer():
                           f"{self.interviewer.cheqd_root_dir}")
         self.set_environment_variable("CHEQD_NODED_CHAIN_ID", f"{self.interviewer.chain}")
 
-    def init_cosmovisor(self):
-        logging.info(
-            f"Moving binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}")
-        self.exec(
-            f"sudo mv {self.binary_path} {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}")
-
-        self.exec(
-            f"""su -l -c 'cosmovisor init {DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME}' {DEFAULT_CHEQD_USER}""")
-
-        self.create_symlink_to_binary()
-
     def create_symlink_to_binary(self):
         if not os.path.islink(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
             os.remove(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
@@ -1329,8 +1324,9 @@ class Interviewer:
         self._home_dir = home_dir
         self._is_upgrade = False
         self._is_cosmovisor_needed = True
-        self._systemd_service_file = ""
         self._is_cosmovisor_bump_needed = True
+        self._is_cosmovisor_installed = False
+        self._systemd_service_file = ""
         self._init_from_snapshot = False
         self._release = None
         self._chain = chain
@@ -1402,6 +1398,10 @@ class Interviewer:
     @property
     def is_cosmovisor_bump_needed(self) -> bool:
         return self._is_cosmovisor_bump_needed
+
+    @property
+    def is_cosmovisor_installed(self) -> bool:
+        return self._is_cosmovisor_installed
 
     @property
     def init_from_snapshot(self) -> bool:
@@ -1496,6 +1496,10 @@ class Interviewer:
     def is_cosmovisor_bump_needed(self, icbn):
         self._is_cosmovisor_bump_needed = icbn
 
+    @is_cosmovisor_installed.setter
+    def is_cosmovisor_installed(self, icbn):
+        self._is_cosmovisor_installed = ici
+
     @init_from_snapshot.setter
     def init_from_snapshot(self, ifs):
         self._init_from_snapshot = ifs
@@ -1583,13 +1587,13 @@ class Interviewer:
                 f"Could not check if cheqd-noded is already installed. Reason: {e}")
 
     # Check if Cosmovisor is installed
-    def is_cosmovisor_installed(self) -> bool:
+    def check_cosmovisor_installed(self) -> bool:
         try:
             if shutil.which("cosmovisor") is not None:
-                self.is_cosmovisor_bump_needed = True
+                self.is_cosmovisor_installed = True
                 return True
             else:
-                self.is_cosmovisor_bump_needed = False
+                self.is_cosmovisor_installed = False
                 return False
         except Exception as e:
             logging.exception(f"Could not check if Cosmovisor is already installed. Reason: {e}")
@@ -2001,7 +2005,7 @@ if __name__ == '__main__':
             interviewer.ask_for_setup()
             interviewer.ask_for_chain()
 
-            if interviewer.is_cosmovisor_installed() is False:
+            if interviewer.is_cosmovisor_installed is False:
                 interviewer.ask_for_cosmovisor()
             else:
                 interviewer.ask_for_cosmovisor_bump()
@@ -2039,7 +2043,7 @@ if __name__ == '__main__':
             interviewer.ask_for_version()
             interviewer.ask_for_home_directory()
 
-            if interviewer.is_cosmovisor_installed() is False:
+            if interviewer.is_cosmovisor_installed is False:
                 interviewer.ask_for_cosmovisor()
             else:
                 interviewer.ask_for_cosmovisor_bump()
@@ -2066,13 +2070,13 @@ if __name__ == '__main__':
         interviewer = Interviewer()
 
         # Check if cheqd-noded is already installed
-        is_installed = interviewer.is_node_installed()
+        installed = interviewer.is_node_installed()
 
         # Check if Cosmovisor is already installed
-        is_cosmovisor_installed = interviewer.is_cosmovisor_installed()
+        cosmovisor_installed = interviewer.check_cosmovisor_installed()
 
         # If no cheqd-noded binary is found, install from scratch
-        if is_installed is False:
+        if installed is False:
             install_steps()
 
         else:
@@ -2090,20 +2094,22 @@ if __name__ == '__main__':
                 if interviewer.is_from_scratch is True:
                     install_steps()
                 else:
-                    logging.error(
-                        "Aborting installation to prevent overwriting existing node installation. Exiting...")
-                    sys.exit(1)
+                    logging.error("Aborting installation to prevent overwriting existing node installation. Exiting...")
+                    raise
 
     except Exception as e:
-        logging.exception(
-            f"Unable to complete user interview process. Reason for exiting: {e}")
-        sys.exit(1)
+        logging.exception(f"Unable to complete user interview process. Reason for exiting: {e}")
+        raise
 
     ### This section where the Installer class is invoked ###
     try:
         installer = Installer(interviewer)
         if installer.install():
-            logging.info(
-                f"Installation of cheqd-noded {interviewer.version} complete!")
+            logging.info(f"Installation of cheqd-noded {interviewer.version} completed successfully!")
+            sys.exit(0)
+        else:
+            logging.error(f"Installation of cheqd-noded {interviewer.version} failed. Exiting...")
+            raise
     except Exception as e:
         logging.exception(f"Unable to execute installation process. Reason for exiting: {e}")
+        sys.exit(1)
