@@ -18,6 +18,7 @@ import shutil
 import signal
 import subprocess
 import sys
+import tarfile
 import urllib.request as request
 
 ###############################################################
@@ -501,14 +502,20 @@ class Installer():
 
             # Download the binary from GitHub
             self.exec(f"wget -c {binary_url}")
-
-            # 1. Extract the binary from the archive file
-            # 2. Remove the archive file
-            # 3. Make the binary executable
+            
+            # Check tar archive exists before extracting
             if fname.find(".tar.gz") != -1:
-                self.exec(f"tar -xzf {fname} -C .")
+                # Extract the binary from the archive file
+                # Using tarfile to extract is a safer option than just executing a command
+                tar = tarfile.open(fname)
+                tar.extractall()
+
+                # Remove the archive file
                 self.remove_safe(fname)
-                self.exec(f"chmod +x {DEFAULT_BINARY_NAME}")
+
+                # Make the binary executable
+                # 0755 is equivalent to chmod +x
+                os.chmod(DEFAULT_BINARY_NAME, 0o755)
                 return True
             else:
                 logging.error(f"Unable to extract cheqd-noded binary from archive file: {fname}")
@@ -687,6 +694,63 @@ class Installer():
         except Exception as e:
             logging.exception(f"Failed to setup Cosmovisor. Reason: {e}")
 
+    def bump_cosmovisor(self):
+        try:
+            self.stop_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME)
+            self.remove_safe(fname)
+
+            # Remove cosmovisor artifacts...
+            self.remove_safe("CHANGELOG.md")
+            self.remove_safe("README.md")
+            self.remove_safe("LICENSE")
+
+            # move the new binary to installation directory
+            logging.info(f"Moving Cosmovisor binary to installation directory")
+            shutil.move(os.path.join(os.path.realpath(os.path.curdir), DEFAULT_COSMOVISOR_BINARY_NAME), os.path.join(
+                DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
+
+            if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
+                logging.info(
+                    f"Creating symlink for current Cosmovisor version")
+                os.symlink(os.path.join(self.cosmovisor_root_dir, "genesis"),
+                           os.path.join(self.cosmovisor_root_dir, "current"))
+
+            logging.info(
+                f"Moving binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
+            shutil.move(os.path.join(os.path.realpath(
+                os.path.curdir), self.binary_path), os.path.join(self.cosmovisor_cheqd_bin_path))
+            shutil.chown(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME),
+                         DEFAULT_CHEQD_USER,
+                         DEFAULT_CHEQD_USER)
+            self.exec(
+                "sudo chmod +x {}".format(f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
+
+            if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
+                logging.info(
+                    f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
+                os.symlink(self.cosmovisor_cheqd_bin_path,
+                           os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+
+            if self.interviewer.is_upgrade and \
+                    os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
+                logging.info(
+                    f"Copying upgrade-info.json file to cosmovisor/current/")
+                shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
+                            os.path.join(self.cosmovisor_root_dir, "current"))
+                logging.info(f"Changing owner to {DEFAULT_CHEQD_USER} user")
+                shutil.chown(self.cosmovisor_root_dir,
+                             DEFAULT_CHEQD_USER,
+                             DEFAULT_CHEQD_USER)
+
+            logging.info(
+                f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
+            shutil.chown(self.cosmovisor_root_dir,
+                         DEFAULT_CHEQD_USER,
+                         DEFAULT_CHEQD_USER)
+            self.reload_systemd()
+        except Exception as e:
+            logging.exception(f"Failed to bump Cosmovisor. Reason: {e}")
+
     def get_cosmovisor(self) -> bool:
         # Download Cosmovisor binary and extract it
         # Also remove the downloaded archive file, if applicable
@@ -698,11 +762,12 @@ class Installer():
             # Download Cosmovisor binary from GitHub
             self.exec(f"wget -c {cosmovisor_download_url}")
 
-            # 1. Extract the Cosmovisor binary from the archive file
-            # 2. Remove the archive file and Cosmovisor artifacts
-            # 3. Make the binary executable
+            # Check tar archive exists before extracting
             if fname.find(".tar.gz") != -1:
-                self.exec(f"tar -xzf {fname} -C .")
+                # Extract Cosmovisor binary from the archive file
+                # Using tarfile to extract is a safer option than just executing a command
+                tar = tarfile.open(fname)
+                tar.extractall()
 
                 # Remove Cosmovisor artifacts...
                 self.remove_safe("CHANGELOG.md")
@@ -710,7 +775,9 @@ class Installer():
                 self.remove_safe("LICENSE")
                 self.remove_safe(fname)
 
-                self.exec(f"chmod +x {DEFAULT_COSMOVISOR_BINARY_NAME}")
+                # Make the binary executable
+                # 0755 is equivalent to chmod +x
+                os.chmod(DEFAULT_COSMOVISOR_BINARY_NAME, 0o755)
                 return True
             else:
                 logging.error(f"Unable to extract Cosmovisor binary from archive file: {fname}")
@@ -1136,63 +1203,6 @@ class Installer():
         self.set_environment_variable("DEFAULT_CHEQD_HOME_DIR",
                           f"{self.interviewer.cheqd_root_dir}")
         self.set_environment_variable("CHEQD_NODED_CHAIN_ID", f"{self.interviewer.chain}")
-
-    def bump_cosmovisor(self):
-        try:
-            self.stop_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME)
-            self.remove_safe(fname)
-
-            # Remove cosmovisor artifacts...
-            self.remove_safe("CHANGELOG.md")
-            self.remove_safe("README.md")
-            self.remove_safe("LICENSE")
-
-            # move the new binary to installation directory
-            logging.info(f"Moving Cosmovisor binary to installation directory")
-            shutil.move(os.path.join(os.path.realpath(os.path.curdir), DEFAULT_COSMOVISOR_BINARY_NAME), os.path.join(
-                DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
-
-            if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
-                logging.info(
-                    f"Creating symlink for current Cosmovisor version")
-                os.symlink(os.path.join(self.cosmovisor_root_dir, "genesis"),
-                           os.path.join(self.cosmovisor_root_dir, "current"))
-
-            logging.info(
-                f"Moving binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
-            shutil.move(os.path.join(os.path.realpath(
-                os.path.curdir), self.binary_path), os.path.join(self.cosmovisor_cheqd_bin_path))
-            shutil.chown(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME),
-                         DEFAULT_CHEQD_USER,
-                         DEFAULT_CHEQD_USER)
-            self.exec(
-                "sudo chmod +x {}".format(f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
-
-            if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
-                logging.info(
-                    f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
-                os.symlink(self.cosmovisor_cheqd_bin_path,
-                           os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
-
-            if self.interviewer.is_upgrade and \
-                    os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
-                logging.info(
-                    f"Copying upgrade-info.json file to cosmovisor/current/")
-                shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
-                            os.path.join(self.cosmovisor_root_dir, "current"))
-                logging.info(f"Changing owner to {DEFAULT_CHEQD_USER} user")
-                shutil.chown(self.cosmovisor_root_dir,
-                             DEFAULT_CHEQD_USER,
-                             DEFAULT_CHEQD_USER)
-
-            logging.info(
-                f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
-            shutil.chown(self.cosmovisor_root_dir,
-                         DEFAULT_CHEQD_USER,
-                         DEFAULT_CHEQD_USER)
-            self.reload_systemd()
-        except Exception as e:
-            logging.exception(f"Failed to bump Cosmovisor. Reason: {e}")
 
     def compare_checksum(self, file_path):
         # Set URL for correct checksum file for snapshot
