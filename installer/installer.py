@@ -452,11 +452,19 @@ class Installer():
                 raise
             
             # Setup directories needed for installation
-            self.prepare_directory_tree()
+            if self.prepare_directory_tree():
+                logging.info("Directory tree setup successfully")
+            else:
+                logging.error("Failed to setup directory tree")
+                raise
 
             # Setup Cosmovisor binary if needed
             if self.interviewer.is_cosmovisor_needed or self.interviewer.is_cosmovisor_bump_needed:
-                self.install_cosmovisor()
+                if self.install_cosmovisor():
+                    logging.info("Cosmovisor setup successfully")
+                else:
+                    logging.error("Failed to setup Cosmovisor")
+                    raise
 
             # if self.interviewer.is_cosmovisor_bump_needed:
             #     logging.info("Bumping Cosmovisor")
@@ -530,6 +538,11 @@ class Installer():
         # 2. cheqd-noded / cosmovisor binaries
         # 3. systemd service files
         try:
+            # Stop existing systemd services first if running
+            # stop_systemd_service() should check if the service is running before stopping it
+            self.stop_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME)
+            self.stop_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME)
+
             if self.interviewer.is_from_scratch:
                 logging.warning("Removing user's data and configs")
 
@@ -548,12 +561,26 @@ class Installer():
                 self.remove_safe(self.cheqd_root_dir, is_dir=True)
                 return True
 
-            # Scenario: User has installed cheqd-noded without cosmovisor, AND now wants to install cheqd-noded with Cosmovisor
-            if self.interviewer.is_cosmovisor_needed and os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH):
+            # Scenario:
+            # 1. User asked for Cosmovisor install
+            # 2. ...AND has systemd service installed for standalone service
+            elif self.interviewer.is_cosmovisor_needed and os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH):
                 self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME, DEFAULT_STANDALONE_SERVICE_FILE_PATH)
                 self.remove_safe(DEFAULT_RSYSLOG_FILE)
-                self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
                 self.reload_systemd()
+                return True
+            
+            # Scenario:
+            # 1. User has asked to install WITHOUT Cosmovisor
+            # 2. ...AND has systemd service installed for Cosmovisor service
+            elif not self.interviewer.is_cosmovisor_needed and os.path.exists(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH):
+                self.remove_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME, DEFAULT_COSMOVISOR_SERVICE_FILE_PATH)
+                self.remove_safe(DEFAULT_RSYSLOG_FILE)
+                self.reload_systemd()
+                return True
+            
+            else:
+                logging.debug("No pre-installation steps needed")
                 return True
         except Exception as e:
             logging.exception("Could not complete pre-installation steps. Reason: {e}")
@@ -587,7 +614,7 @@ class Installer():
             logging.debug(f"User {username} does not exist")
             return False
 
-    def prepare_directory_tree(self):
+    def prepare_directory_tree(self) -> bool:
         # Needed only in case of clean installation
         # 1. Create ~/.cheqdnode directory
         # 2. Set directory permissions to default cheqd user
@@ -627,10 +654,14 @@ class Installer():
                 os.symlink(self.cheqd_log_dir, "/var/log/cheqd-node", target_is_directory=True)
             else:
                 logging.info("Skipping linking because /var/log/cheqd-node already exists")
+            
+            return True
         except Exception as e:
             logging.exception(f"Failed to prepare directory tree for {DEFAULT_CHEQD_USER}. Reason: {e}")
+            raise
+            return False
 
-    def install_cosmovisor(self):
+    def install_cosmovisor(self) -> bool:
         # Install binaries for cheqd-noded and Cosmovisor
         # Cosmovisor is only installed if requested by the user
         # cheqd-noded binary is always installed, but the installation location depends whether user
@@ -638,51 +669,45 @@ class Installer():
         try:
             logging.info("Setting up Cosmovisor")
             
+            # Download Cosmovisor binary and set environment variables
             if self.get_cosmovisor():
                 logging.info("Successfully downloaded Cosmovisor")
 
                 # Set environment variables for Cosmovisor
                 self.set_cosmovisor_env_vars()
-
-                # Move Cosmovisor binary to installation directory if it doesn't exist or bump needed
-                # This is executed is there is no Cosmovisor binary in the installation directory
-                # or if the user has requested a bump for Cosmovisor
-                logging.info(f"Moving Cosmovisor binary to {DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}")
-                shutil.move(DEFAULT_COSMOVISOR_BINARY_NAME, DEFAULT_INSTALL_PATH)
-
-                # Check if Cosmovisor was successfully installed
-                if self.interviewer.check_cosmovisor_installed():
-                    logging.info("Cosmovisor successfully installed")
-
-                    # Initialize Cosmovisor
-                    self.exec(f"""su -l -c 'cosmovisor init ./{DEFAULT_BINARY_NAME}' {DEFAULT_CHEQD_USER}""")
-                    
-                    # Remove cheqd-noded binary from /usr/bin if it's not a symlink
-                    if not os.path.islink(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
-                        logging.warn(f"Removing {DEFAULT_BINARY_NAME} from {DEFAULT_INSTALL_PATH} because it is not a symlink")
-                        os.remove(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
-
-                        # Move cheqd-noded binary to Cosmovisor bin path
-                        logging.info(f"Moving cheqd-noded binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
-                        shutil.move(DEFAULT_BINARY_NAME, self.cosmovisor_cheqd_bin_path)
-                    else:
-                        logging.debug(f"{DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME} is already symlink. Skipping removal...")
-
-                    # Create symlink to cheqd-noded binary in Cosmovisor bin path
-                    if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
-                        logging.info(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
-                        os.symlink(self.cosmovisor_cheqd_bin_path, os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
-
-                    # Change owner of Cosmovisor directory to default cheqd user
-                    logging.info(f"Changing ownership of {self.cosmovisor_root_dir} to {DEFAULT_CHEQD_USER} user")
-                    shutil.chown(self.cosmovisor_root_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
-                else:
-                    logging.error("Failed to install Cosmovisor")
-                    raise
+                logging.info("Successfully set Cosmovisor environment variables")
             else:
                 logging.error("Failed to download Cosmovisor")
-                raise
+                return False
+
+            # Move Cosmovisor binary to installation directory if it doesn't exist or bump needed
+            # This is executed is there is no Cosmovisor binary in the installation directory
+            # or if the user has requested a bump for Cosmovisor
+            logging.info(f"Moving Cosmovisor binary to {DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}")
+            shutil.move(DEFAULT_COSMOVISOR_BINARY_NAME, DEFAULT_INSTALL_PATH)
+
+            # Initialize Cosmovisor if it's not already initialized
+            # This is done by checking whether the Cosmovisor root directory exists
+            if not os.path.exists(self.cosmovisor_root_dir):
+                self.exec(f"""su -l -c 'cosmovisor init ./{DEFAULT_BINARY_NAME}' {DEFAULT_CHEQD_USER}""")
+            else:
+                logging.info("Cosmovisor directory already exists. Skipping initialisation...")
             
+            # Remove cheqd-noded binary from /usr/bin if it's not a symlink
+            if not os.path.islink(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
+                logging.warn(f"Removing {DEFAULT_BINARY_NAME} from {DEFAULT_INSTALL_PATH} because it is not a symlink")
+                os.remove(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+
+                # Move cheqd-noded binary to Cosmovisor bin path
+                logging.info(f"Moving cheqd-noded binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
+                shutil.move(DEFAULT_BINARY_NAME, self.cosmovisor_cheqd_bin_path)
+
+                # Create symlink to cheqd-noded binary in Cosmovisor bin path
+                logging.info(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
+                os.symlink(self.cosmovisor_cheqd_bin_path, os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
+            else:
+                logging.info(f"{DEFAULT_INSTALL_PATH}/{DEFAULT_BINARY_NAME} is already symlink. Skipping removal...")
+
             # Steps to execute only if this is an upgrade
             # The upgrade-info.json file is required for Cosmovisor to function correctly
             if self.interviewer.is_upgrade and os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
@@ -690,66 +715,17 @@ class Installer():
                 shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
                     os.path.join(self.cosmovisor_root_dir, "current"))
             else:
-                logging.debug("Skipping copying of upgrade-info.json file because it doesn't exist")
+                logging.debug("Skipped copying upgrade-info.json file because it doesn't exist")
+            
+            # Change owner of Cosmovisor directory to default cheqd user
+            logging.info(f"Changing ownership of {self.cosmovisor_root_dir} to {DEFAULT_CHEQD_USER} user")
+            shutil.chown(self.cosmovisor_root_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
+
+            logging.info("Successfully installed Cosmovisor")
+            return True
         except Exception as e:
             logging.exception(f"Failed to setup Cosmovisor. Reason: {e}")
-
-    def bump_cosmovisor(self):
-        try:
-            self.stop_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME)
-            self.remove_safe(fname)
-
-            # Remove cosmovisor artifacts...
-            self.remove_safe("CHANGELOG.md")
-            self.remove_safe("README.md")
-            self.remove_safe("LICENSE")
-
-            # move the new binary to installation directory
-            logging.info(f"Moving Cosmovisor binary to installation directory")
-            shutil.move(os.path.join(os.path.realpath(os.path.curdir), DEFAULT_COSMOVISOR_BINARY_NAME), os.path.join(
-                DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
-
-            if not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current")):
-                logging.info(
-                    f"Creating symlink for current Cosmovisor version")
-                os.symlink(os.path.join(self.cosmovisor_root_dir, "genesis"),
-                           os.path.join(self.cosmovisor_root_dir, "current"))
-
-            logging.info(
-                f"Moving binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
-            shutil.move(os.path.join(os.path.realpath(
-                os.path.curdir), self.binary_path), os.path.join(self.cosmovisor_cheqd_bin_path))
-            shutil.chown(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME),
-                         DEFAULT_CHEQD_USER,
-                         DEFAULT_CHEQD_USER)
-            self.exec(
-                "sudo chmod +x {}".format(f'{DEFAULT_INSTALL_PATH}/{DEFAULT_COSMOVISOR_BINARY_NAME}'))
-
-            if not os.path.exists(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)):
-                logging.info(
-                    f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
-                os.symlink(self.cosmovisor_cheqd_bin_path,
-                           os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
-
-            if self.interviewer.is_upgrade and \
-                    os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
-                logging.info(
-                    f"Copying upgrade-info.json file to cosmovisor/current/")
-                shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
-                            os.path.join(self.cosmovisor_root_dir, "current"))
-                logging.info(f"Changing owner to {DEFAULT_CHEQD_USER} user")
-                shutil.chown(self.cosmovisor_root_dir,
-                             DEFAULT_CHEQD_USER,
-                             DEFAULT_CHEQD_USER)
-
-            logging.info(
-                f"Changing directory ownership for Cosmovisor to {DEFAULT_CHEQD_USER} user")
-            shutil.chown(self.cosmovisor_root_dir,
-                         DEFAULT_CHEQD_USER,
-                         DEFAULT_CHEQD_USER)
-            self.reload_systemd()
-        except Exception as e:
-            logging.exception(f"Failed to bump Cosmovisor. Reason: {e}")
+            return False
 
     def get_cosmovisor(self) -> bool:
         # Download Cosmovisor binary and extract it
@@ -1005,7 +981,7 @@ class Installer():
         # If user selected Standalone install, then cheqd-noded.service will be setup
         try:
             logging.info("Setting up systemd config")
-
+            
             # Check if systemd service files already exist for cheqd-node
             service_file_exists = os.path.exists(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH) or os.path.exists(
                 DEFAULT_STANDALONE_SERVICE_FILE_PATH)
