@@ -44,7 +44,7 @@ func ed25519RandomCmd() *cobra.Command {
 			}
 
 			keyInfo := struct {
-				PublicKeyBase64 string `json:"public_key_base_64"`
+				PublicKeyBase64  string `json:"public_key_base_64"`
 				PrivateKeyBase64 string `json:"private_key_base_64"`
 			}{
 				PublicKeyBase64:  base64.StdEncoding.EncodeToString(publicKey),
