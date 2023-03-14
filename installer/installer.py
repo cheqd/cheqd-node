@@ -79,7 +79,6 @@ SEEDS_FILE = "https://raw.githubusercontent.com/cheqd/cheqd-node/%s/networks/{}/
 ###############################################################
 ###     				Node snapshots      				###
 ###############################################################
-DEFAULT_INIT_FROM_SNAPSHOT = "yes"
 TESTNET_SNAPSHOT = "https://snapshots-cdn.cheqd.net/testnet/{}/cheqd-testnet-6_{}.tar.lz4"
 MAINNET_SNAPSHOT = "https://snapshots-cdn.cheqd.net/mainnet/{}/cheqd-mainnet-1_{}.tar.lz4"
 MAX_SNAPSHOT_DAYS = 7
@@ -1910,7 +1909,9 @@ class Interviewer:
     # Ask user for node moniker
     def ask_for_moniker(self):
         try:
-            logging.info(f"Moniker is a human-readable name for your cheqd-node. This is NOT the same as your validator name, and is only used to uniquely identify your node for Tendermint P2P address book. It can be edited later in your ~.cheqdnode/config/config.toml file.\n")
+            logging.info(f"Moniker is a human-readable name for your cheqd-node.\n")
+            logging.info(f"This is NOT the same as your validator name, and is only used to uniquely identify your node for Tendermint P2P address book.\n")
+            logging.info(f"It can be edited later in your ~/.cheqdnode/config/config.toml file.\n")
             answer = self.ask(
                 f"Provide a moniker for your cheqd-node", default=CHEQD_NODED_MONIKER)
             if answer is not None and isinstance(answer, str):
@@ -1924,7 +1925,9 @@ class Interviewer:
     # Ask for node's external IP address or DNS name
     def ask_for_external_address(self):
         try:
-            logging.info(f"External address is the publicly accessible IP address or DNS name of your cheqd-node. This is used to advertise your node's P2P address to other nodes in the network. If you are running your node behind a NAT, you should set this to your public IP address or DNS name. If you are running your node on a public IP address, you can leave this blank to automatically fetch your IP address via DNS resolver lookup. This sends a `dig` request to whoami.cloudflare.com\n\n")
+            logging.info(f"External address is the publicly accessible IP address or DNS name of your cheqd-node. This is used to advertise your node's P2P address to other nodes in the network.\n")
+            logging.info(f"If you are running your node behind a NAT, you should set this to your public IP address or DNS name\n")
+            logging.info(f"If you are running your node on a public IP address, you can leave this blank to automatically fetch your IP address via DNS resolver lookup. This sends a `dig` request to whoami.cloudflare.com\n\n")
             answer = self.ask(
                 f"What is the externally-reachable IP address or DNS name for your cheqd-node? [default: Fetch automatically via DNS resolver lookup]: {os.linesep}")
             if self.check_ip_address(answer) or self.check_dns_name(answer):
@@ -1980,7 +1983,9 @@ class Interviewer:
     def ask_for_gas_price(self):
         try:
             logging.info(
-                f"Minimum gas prices is minimum ncheq tokens you are willing to accept as a validator to process a transaction.\n")
+                f"Minimum gas prices is the price you are willing to accept as a validator to process a transaction.\n")
+            logging.info(
+                f"Values should be entered in format <number>ncheq (e.g., 50ncheq)\n")
             answer = self.ask(f"Specify minimum gas price", default=CHEQD_NODED_MINIMUM_GAS_PRICES)
             if answer.endswith("ncheq"):
                 self.gas_price = answer
@@ -2033,7 +2038,7 @@ class Interviewer:
                 self.is_upgrade = False
             else:
                 logging.error(f"Please choose either 'yes' or 'no'")
-                self.ask_for_setup()
+                self.ask_for_upgrade()
         except Exception as e:
             logging.exception(f"Failed to set whether installation should be upgraded. Reason: {e}")
 
@@ -2041,7 +2046,9 @@ class Interviewer:
     def ask_for_install_from_scratch(self):
         try:
             logging.warning(
-                f"Doing a fresh installation of cheqd-node will remove ALL existing configuration and data.\nCAUTION: Please ensure you have a backup of your existing configuration and data before proceeding!\n")
+                f"Doing a fresh installation of cheqd-node will remove ALL existing configuration and data.\n")
+            logging.warning(
+                f"Please ensure you have a backup of your existing configuration and data before proceeding!\n")
             answer = self.ask(
                 f"Do you want to do fresh installation of cheqd-node? (yes/no)", default="no")
             if answer.lower().startswith("y"):
@@ -2050,7 +2057,7 @@ class Interviewer:
                 self.is_from_scratch = False
             else:
                 logging.error(f"Please choose either 'yes' or 'no'")
-                self.ask_for_setup()
+                self.ask_for_install_from_scratch()
         except Exception as e:
             logging.exception(f"Failed to set whether to install from scratch. Reason: {e}")
 
@@ -2058,44 +2065,42 @@ class Interviewer:
     def ask_for_rewrite_node_systemd(self):
         try:
             answer = self.ask(
-                f"Overwrite existing systemd configuration for cheqd-node? (yes/no)", default="yes")
+                f"Overwrite existing systemd configuration for node-related services? (yes/no)", default="yes")
             if answer.lower().startswith("y"):
                 self.rewrite_node_systemd = True
             elif answer.lower().startswith("n"):
                 self.rewrite_node_systemd = False
             else:
                 logging.error(f"Please choose either 'yes' or 'no'")
-                self.ask_for_setup()
+                self.ask_for_rewrite_node_systemd()
         except Exception as e:
             logging.exception(f"Failed to set whether overwrite existing systemd configuration. Reason: {e}")
 
     # If an existing installation is detected, ask user if they want to overwrite existing logrotate configuration
     def ask_for_rewrite_logrotate(self):
         try:
-            answer = self.ask(
-                f"Overwrite existing configuration for logrotate? (yes/no)", default="yes")
+            answer = self.ask(f"Overwrite existing configuration for logrotate? (yes/no)", default="yes")
             if answer.lower().startswith("y"):
                 self.rewrite_logrotate = True
             elif answer.lower().startswith("n"):
                 self.rewrite_logrotate = False
             else:
                 logging.error(f"Please choose either 'yes' or 'no'")
-                self.ask_for_setup()
+                self.ask_for_rewrite_logrotate()
         except Exception as e:
             logging.exception(f"Failed to set whether overwrite existing configuration for logrotate. Reason: {e}")
 
     # If an existing installation is detected, ask user if they want to overwrite existing rsyslog configuration
     def ask_for_rewrite_rsyslog(self):
         try:
-            answer = self.ask(
-                f"Overwrite existing configuration for cheqd-node logging? (yes/no)", default="yes")
+            answer = self.ask(f"Overwrite existing configuration for cheqd-node logging? (yes/no)", default="yes")
             if answer.lower().startswith("y"):
                 self.rewrite_rsyslog = True
             elif answer.lower().startswith("n"):
                 self.rewrite_rsyslog = False
             else:
                 logging.error(f"Please choose either 'yes' or 'no'")
-                self.ask_for_setup()
+                self.ask_for_rewrite_rsyslog()
         except Exception as e:
             logging.exception(f"Failed to set whether overwrite existing rsyslog configuration. Reason: {e}")
 
@@ -2104,20 +2109,23 @@ class Interviewer:
     # This question is asked last because it is the most time consuming.
     def ask_for_init_from_snapshot(self):
         try:
+            logging.info(
+                f"Downloading a snapshot allows you to get a copy of the blockchain data to speed up node bootstrapping\n")
+            logging.info(
+                f"Snapshots can be 100 GBs so downloading can take a really long time!\n")
             logging.warning(
-                f"CAUTION: Downloading a snapshot replaces your existing copy of chain data! Usually safe to use this option when doing a fresh installation.\n")
+                f"Existing chain data folder will be replaced! Usually safe to use this option when doing a fresh installation.\n")
             answer = self.ask(
-                f"Do you want to download a snapshot of the existing chain to speed up node synchronization? (yes/no)", default=DEFAULT_INIT_FROM_SNAPSHOT)
+                f"Do you want to download a snapshot of the existing chain to speed up node synchronization? (yes/no)", default="yes")
             if answer.lower().startswith("y"):
                 self.init_from_snapshot = True
             elif answer.lower().startswith("n"):
                 self.init_from_snapshot = False
             else:
                 logging.error(f"Please choose either 'yes' or 'no'")
-                self.ask_for_setup()
+                self.ask_for_init_from_snapshot()
         except Exception as e:
-            logging.exception(
-                f"Failed to set whether init snapshot. Reason: {e}")
+            logging.exception(f"Failed to set whether init snapshot. Reason: {e}")
 
 
 if __name__ == '__main__':
