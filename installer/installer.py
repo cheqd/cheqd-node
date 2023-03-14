@@ -545,14 +545,18 @@ class Installer():
                     logging.error("Failed to download snapshot")
                     raise
                     return False
-                
-                if self.snapshot_url:
-                    logging.info(
-                        "Downloading snapshot and extracting archive. This can take a *really* long time...")
-                
-                    self.untar_from_snapshot()
+                                
+                if self.untar_from_snapshot():
+                    logging.info("Successfully extracted snapshot")
+                else:
+                    logging.error("Failed to extract snapshot")
+                    raise
+                    return False
+            else:
+                logging.debug("Skipping snapshot download and extraction as it was not requested")
 
-            logging.info("The cheqd-noded binary has been successfully installed")
+            # Return True if all steps were successful
+            logging.info("Installation steps completed successfully")
             return True
         except Exception as e:
             logging.exception(f"Failed to install cheqd-noded. Reason: {e}")
