@@ -934,85 +934,70 @@ class Installer():
                 logging.debug("Skipping cheqd-noded init as setup is not needed")
 
             ### This next section changes values in configuration files only if the user has provided input ###
-            # interviewer.ask_for_moniker()
-            # interviewer.ask_for_external_address()
-            # interviewer.ask_for_p2p_port()
-            # interviewer.ask_for_rpc_port()
-            # interviewer.ask_for_persistent_peers()
-            # interviewer.ask_for_gas_price()
+
             # interviewer.ask_for_log_level()
             # interviewer.ask_for_log_format()
 
             # Set external address
             if self.interviewer.external_address:
-                external_address_search_text = 'external_address = ""'
+                external_address_search_text = 'external_address'
                 external_address_replace_text = 'external_address = "{}:{}"'.format(
                     self.interviewer.external_address, self.interviewer.p2p_port)
                 logging.debug(f"Setting external address to {external_address_replace_text}")
                 search_and_replace(external_address_search_text, external_address_replace_text, config_toml_path)
             else:
-                logging.debug("External address not set by user")
+                logging.debug("External address not set by user. Skipping...")
 
             # Set P2P port
             if self.interviewer.p2p_port:
                 p2p_laddr_search_text = 'laddr = "tcp://0.0.0.0:{}"'.format(DEFAULT_P2P_PORT)
-                p2p_laddr_replace_text = 'laddr = "tcp://0.0.0.0:{}"'.format(
-                    self.interviewer.p2p_port)
-                search_and_replace(p2p_laddr_search_text, p2p_laddr_replace_text, os.path.join(
-                    self.cheqd_config_dir, "config.toml"))
+                p2p_laddr_replace_text = 'laddr = "tcp://0.0.0.0:{}"'.format(self.interviewer.p2p_port)
+                search_and_replace(p2p_laddr_search_text, p2p_laddr_replace_text, config_toml_path)
+            else:
+                logging.debug("P2P port not set by user. Skipping...")
 
             # Setting up the RPC port
             if self.interviewer.rpc_port:
-                rpc_laddr_search_text = 'laddr = "tcp://0.0.0.0:{}"'.format(
-                    DEFAULT_RPC_PORT)
-                rpc_laddr_replace_text = 'laddr = "tcp://0.0.0.0:{}"'.format(
-                    self.interviewer.rpc_port)
-                search_and_replace(rpc_laddr_search_text, rpc_laddr_replace_text, os.path.join(
-                    self.cheqd_config_dir, "config.toml"))
+                rpc_laddr_search_text = 'laddr = "tcp://0.0.0.0:{}"'.format(DEFAULT_RPC_PORT)
+                rpc_laddr_replace_text = 'laddr = "tcp://0.0.0.0:{}"'.format(self.interviewer.rpc_port)
+                search_and_replace(rpc_laddr_search_text, rpc_laddr_replace_text, config_toml_path)
+            else:
+                logging.debug("RPC port not set by user. Skipping...")
 
             # Setting up min gas-price
             if self.interviewer.gas_price:
-                min_gas_price_search_text = 'minimum-gas-prices = '
-                min_gas_price_replace_text = 'minimum-gas-prices = "{}"'.format(
-                    self.interviewer.gas_price)
-                search_and_replace(min_gas_price_search_text, min_gas_price_replace_text, os.path.join(
-                    self.cheqd_config_dir, "app.toml"))
+                min_gas_price_search_text = 'minimum-gas-prices'
+                min_gas_price_replace_text = 'minimum-gas-prices = "{}"'.format(self.interviewer.gas_price)
+                search_and_replace(min_gas_price_search_text, min_gas_price_replace_text, app_toml_path)
+            else:
+                logging.debug("Minimum gas price not set by user. Skipping...")
 
             # Setting up persistent peers
             if self.interviewer.persistent_peers:
-                persistent_peers_search_text = 'persistent_peers = ""'
-                persistent_peers_replace_text = 'persistent_peers = "{}"'.format(
-                    self.interviewer.persistent_peers)
-                search_and_replace(persistent_peers_search_text, persistent_peers_replace_text, os.path.join(
-                    self.cheqd_config_dir, "config.toml"))
+                persistent_peers_search_text = 'persistent_peers'
+                persistent_peers_replace_text = 'persistent_peers = "{}"'.format(self.interviewer.persistent_peers)
+                search_and_replace(persistent_peers_search_text, persistent_peers_replace_text, config_toml_path)
+            else:
+                logging.debug("Persistent peers not set by user. Skipping...")
 
             # Setting up log level
             if self.interviewer.log_level:
                 log_level_search_text = 'log_level'
-                log_level_replace_text = 'log_level = "{}"'.format(
-                    self.interviewer.log_level)
-                search_and_replace(log_level_search_text, log_level_replace_text, os.path.join(
-                    self.cheqd_config_dir, "config.toml"))
+                log_level_replace_text = 'log_level = "{}"'.format(self.interviewer.log_level)
+                search_and_replace(log_level_search_text, log_level_replace_text, config_toml_path)
             else:
-                log_level_search_text = 'log_level'
-                log_level_replace_text = 'log_level = "{}"'.format(
-                    CHEQD_NODED_LOG_LEVEL)
-                search_and_replace(log_level_search_text, log_level_replace_text, os.path.join(
-                    self.cheqd_config_dir, "config.toml"))
+                logging.debug("Log level not set by user. Skipping...")
 
             # Setting up log format
             if self.interviewer.log_format:
                 log_format_search_text = 'log_format'
-                log_format_replace_text = 'log_format = "{}"'.format(
-                    self.interviewer.log_format)
-                search_and_replace(log_format_search_text, log_format_replace_text, os.path.join(
-                    self.cheqd_config_dir, "config.toml"))
+                log_format_replace_text = 'log_format = "{}"'.format(self.interviewer.log_format)
+                search_and_replace(log_format_search_text, log_format_replace_text, config_toml_path)
             else:
-                log_format_search_text = 'log_format'
-                log_format_replace_text = 'log_format = "{}"'.format(
-                    CHEQD_NODED_LOG_FORMAT)
-                search_and_replace(log_format_search_text, log_format_replace_text, os.path.join(
-                    self.cheqd_config_dir, "config.toml"))
+                logging.debug("Log format not set by user. Skipping...")
+            
+            # Return True if all the above steps were successful
+            return True
         except Exception as e:
             logging.exception(f"Failed to configure cheqd-noded settings. Reason: {e}")
             return False
