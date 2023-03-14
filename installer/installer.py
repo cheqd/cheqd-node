@@ -450,6 +450,7 @@ class Installer():
             else:
                 logging.error("Failed to download and extract binary")
                 raise
+                return False
             
             # Carry out pre-installation steps
             # Mostly relevant if installing from scratch or re-installing
@@ -458,6 +459,7 @@ class Installer():
             else:
                 logging.error("Failed to complete pre-installation steps")
                 raise
+                return False
             
             # Create cheqd user if it doesn't exist
             if self.prepare_cheqd_user():
@@ -465,6 +467,7 @@ class Installer():
             else:
                 logging.error("Failed to setup user/group cheqd")
                 raise
+                return False
             
             # Setup directories needed for installation
             if self.prepare_directory_tree():
@@ -472,6 +475,7 @@ class Installer():
             else:
                 logging.error("Failed to setup directory tree")
                 raise
+                return False
 
             # Setup Cosmovisor binary if needed
             if self.interviewer.is_cosmovisor_needed or self.interviewer.is_cosmovisor_bump_needed:
@@ -480,6 +484,7 @@ class Installer():
                 else:
                     logging.error("Failed to setup Cosmovisor")
                     raise
+                    return False
             # If Cosmovisor is not needed, treat it as a standalone installation
             else:
                 if self.install_standalone():
@@ -487,18 +492,21 @@ class Installer():
                 else:
                     logging.error("Failed to setup cheqd-noded as a standalone binary")
                     raise
+                    return False
             
             # Setup cheqd-noded environment variables
             # These are independent of Cosmovisor environment variables
             # Set them regardless of whether Cosmovisor is used or not
             self.set_cheqd_env_vars()
             
-            
+            # Configure cheqd-noded settings
+            # This edits the config.toml and app.toml files
             if self.configure_node_settings():
                 logging.info("Successfully configured cheqd-noded settings")
             else:
                 logging.error("Failed to configure cheqd-noded settings")
                 raise
+                return False
 
             if self.interviewer.init_from_snapshot:
                 self.snapshot_url = self.get_snapshot_url()
@@ -935,9 +943,6 @@ class Installer():
 
             ### This next section changes values in configuration files only if the user has provided input ###
 
-            # interviewer.ask_for_log_level()
-            # interviewer.ask_for_log_format()
-
             # Set external address
             if self.interviewer.external_address:
                 external_address_search_text = 'external_address'
@@ -1272,12 +1277,6 @@ class Installer():
                 logging.exception(
                     f"Failed to setup logrotate service. Reason: {e}")
 
-    def mkdir_p(self, dir_name):
-        try:
-            os.mkdir(dir_name)
-        except FileExistsError as err:
-            logging.info(f"Directory {dir_name} already exists")
-
     def compare_checksum(self, file_path):
         # Set URL for correct checksum file for snapshot
         checksum_url = os.path.join(os.path.dirname(
@@ -1328,7 +1327,7 @@ class Installer():
         try:
             fname = os.path.basename(self.snapshot_url)
             file_path = os.path.join(self.cheqd_root_dir, fname)
-            self.mkdir_p(self.cheqd_data_dir)
+            
             shutil.chown(self.cheqd_data_dir,
                          DEFAULT_CHEQD_USER,
                          DEFAULT_CHEQD_USER)
