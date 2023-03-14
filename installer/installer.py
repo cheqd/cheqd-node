@@ -523,6 +523,14 @@ class Installer():
                 raise
                 return False
 
+            # Configure systemd services for rsyslog and logrotate
+            if self.setup_logging_systemd():
+                logging.info("Successfully configured systemd service for logging")
+            else:
+                logging.error("Failed to configure systemd service for logging")
+                raise
+                return False
+
             if self.interviewer.init_from_snapshot:
                 self.snapshot_url = self.get_snapshot_url()
                 if self.snapshot_url:
@@ -531,7 +539,6 @@ class Installer():
                     self.download_snapshot()
                     self.untar_from_snapshot()
 
-            self.setup_logging_systemd()
             logging.info("The cheqd-noded binary has been successfully installed")
             return True
         except Exception as e:
@@ -1016,55 +1023,121 @@ class Installer():
             logging.exception(f"Failed to configure cheqd-noded settings. Reason: {e}")
             return False
 
-    def setup_node_systemd(self):
+    def setup_node_systemd(self) -> bool:
         # Setup cheqd-noded related systemd services
         # If user selected Cosmovisor install, then cheqd-cosmovisor.service will be setup
         # If user selected Standalone install, then cheqd-noded.service will be setup
         # WARNING: Services should already have been stopped in pre_install() but if it's removed from there,
         # then it should be added here
         try:
-            logging.info("Setting up node-related systemd configurations")
-
-            # Remove node-related systemd services if requested by the user
+            # Remove cheqd-noded.service and cheqd-cosmovisor.service if they exist
             # Also run if setup is from scratch/first-time install
-            if self.interviewer.rewrite_node_systemd \
-                or self.interviewer.is_from_scratch or self.interviewer.is_setup_needed:
-                
-                # Remove cheqd-noded.service and cheqd-cosmovisor.service if they exist
+            if self.interviewer.rewrite_node_systemd:
+                logging.warning("Removing existing node-related systemd configuration as requested")
                 self.remove_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME, DEFAULT_COSMOVISOR_SERVICE_FILE_PATH)
                 self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME, DEFAULT_STANDALONE_SERVICE_FILE_PATH)
-
-                # Setup cheqd-cosmovisor.service if requested
-                if self.interviewer.is_cosmovisor_needed:
-                    # Write cheqd-cosmovisor.service file
-                    # Replace placeholder values with actuals
-                    with open(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH, "w") as fname:
-                        fname.write(self.cosmovisor_service_cfg)
-                    fname.close()
-
-                    # Enable cheqd-cosmovisor.service
-                    self.enable_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME)
-                    return True
-                
-                # Otherwise, setup cheqd-noded.service for standalone install
-                else:
-                    # Fetch the template file from GitHub
-                    if is_valid_url(STANDALONE_SERVICE_TEMPLATE):
-                        with request.urlopen(STANDALONE_SERVICE_TEMPLATE) as response, open(DEFAULT_STANDALONE_SERVICE_FILE_PATH, "w") as file:
-                            file.write(response.read())
-                        file.close()
-                        
-                        # Enable cheqd-noded.service
-                        self.enable_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME)
-                        return True
-                    else:
-                        logging.error(f"Invalid URL provided for standalone service template: {STANDALONE_SERVICE_TEMPLATE}")
-                        return False
             else:
                 logging.debug("Node-related systemd configurations don't need to be removed. Skipping...")
+            
+            # Setup cheqd-cosmovisor.service if requested
+            if self.interviewer.is_cosmovisor_needed:
+                # Write cheqd-cosmovisor.service file
+                # Replace placeholder values with actuals
+                with open(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH, "w") as fname:
+                    fname.write(self.cosmovisor_service_cfg)
+                fname.close()
+
+                # Enable cheqd-cosmovisor.service
+                self.enable_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME)
                 return True
+            
+            # Otherwise, setup cheqd-noded.service for standalone install
+            else:
+                # Fetch the template file from GitHub
+                if is_valid_url(STANDALONE_SERVICE_TEMPLATE):
+                    with request.urlopen(STANDALONE_SERVICE_TEMPLATE) as response, open(DEFAULT_STANDALONE_SERVICE_FILE_PATH, "w") as file:
+                        file.write(response.read())
+                    file.close()
+                    
+                    # Enable cheqd-noded.service
+                    self.enable_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME)
+                    return True
+                else:
+                    logging.error(f"Invalid URL provided for standalone service template: {STANDALONE_SERVICE_TEMPLATE}")
+                    return False
         except Exception as e:
             logging.exception(f"Failed to setup systemd service for cheqd-node. Reason: {e}")
+            return False
+
+    # Setup logging related systemd services
+    def setup_logging_systemd(self):
+        # Install cheqd-node configuration for rsyslog if user wants to rewrite rsyslog service file
+        # Also run if setup is from scratch/first-time install
+        try:
+            if self.interviewer.rewrite_rsyslog:
+                # Remove existing rsyslog service file if it exists
+                if os.path.exists(DEFAULT_RSYSLOG_FILE):
+                    logging.warning("Removing existing rsyslog configuration as requested")
+                    self.remove_safe(DEFAULT_RSYSLOG_FILE)
+                else:
+                    logging.debug("Rsyslog configuration doesn't need to be removed. Skipping...")
+                
+                # Determine the binary name for logging based on installation type
+                if self.interviewer.is_cosmovisor_needed:
+                    binary_name = DEFAULT_COSMOVISOR_BINARY_NAME
+                else:
+                    binary_name = DEFAULT_BINARY_NAME
+
+                logging.info(f"Configuring rsyslog systemd service for {binary_name} logging")
+
+                # Modify rsyslog template file with values specific to the installation
+                with open(DEFAULT_RSYSLOG_FILE, "w") as fname:
+                    fname.write(self.rsyslog_cfg)
+                fname.close()
+
+                # Restarting rsyslog can take a lot of time: https://github.com/rsyslog/rsyslog/issues/3133
+                if self.restart_systemd_service("rsyslog.service"):
+                    logging.info("Successfully configured rsyslog service")
+                else:
+                    logging.exception("Failed to configure rsyslog service")
+                    return False
+
+            # Install cheqd-node configuration for logrotate if user wants to rewrite logrotate service file
+            # Also run if setup is from scratch/first-time install
+            if self.interviewer.rewrite_logrotate:
+                # Remove existing logrotate service file if it exists
+                if os.path.exists(DEFAULT_LOGROTATE_FILE):
+                    logging.warning("Removing existing logrotate configuration as requested")
+                    self.remove_safe(DEFAULT_LOGROTATE_FILE)
+                else:
+                    logging.debug("Logrotate configuration doesn't need to be removed. Skipping...")
+
+                logging.info(f"Configuring logrotate systemd service for cheqd-node logging")
+
+                # Modify logrotate template file with values specific to the installation
+                with open(DEFAULT_LOGROTATE_FILE, "w") as fname:
+                    fname.write(self.logrotate_cfg)
+                fname.close()
+
+                # Restart logrotate.service
+                if self.restart_systemd_service("logrotate.service"):
+                    logging.info("Successfully configured logrotate service")
+                else:
+                    logging.exception("Failed to configure logrotate service")
+                    return False
+                
+                # Restart logrotate.timer
+                if self.restart_systemd_service("logrotate.timer"):
+                    logging.info("Successfully configured logrotate timer")
+                else:
+                    logging.exception("Failed to configure logrotate timer")
+                    return False
+            
+            # Return True if both rsyslog and logrotate services are configured
+            return True
+        except Exception as e:
+            logging.exception(f"Failed to setup logging systemd services. Reason: {e}")
+            return False
 
     def check_systemd_service_active(self, service_name) -> bool:
         # Check if a given systemd service is active
@@ -1237,67 +1310,6 @@ class Installer():
                         return False
         except Exception as e:
             logging.exception(f"Error removing {service_name}: Reason: {e}")
-
-    # Setup logging related systemd services
-    def setup_logging_systemd(self):
-        # Install cheqd-node configuration for rsyslog if either of the following conditions are met:
-        # 1. rsyslog service file is not present
-        # 2. user wants to rewrite rsyslog service file
-        try:
-            if not os.path.exists(DEFAULT_RSYSLOG_FILE) or self.interviewer.rewrite_rsyslog:
-                # Warn user if rsyslog service file already exists
-                if os.path.exists(DEFAULT_RSYSLOG_FILE):
-                    logging.warning(f"Existing rsyslog configuration at {DEFAULT_RSYSLOG_FILE} will be overwritten")
-                
-                # Determine the binary name for logging based on installation type
-                if self.interviewer.is_cosmovisor_needed:
-                    binary_name = DEFAULT_COSMOVISOR_BINARY_NAME
-                else:
-                    binary_name = DEFAULT_BINARY_NAME
-
-                logging.info(f"Configuring rsyslog systemd service for {binary_name} logging")
-
-                # Modify rsyslog template file with values specific to the installation
-                with open(DEFAULT_RSYSLOG_FILE, "w") as fname:
-                    fname.write(self.rsyslog_cfg)
-                fname.close()
-
-                # Restarting rsyslog can take a lot of time: https://github.com/rsyslog/rsyslog/issues/3133
-                if self.restart_systemd_service("rsyslog.service"):
-                    logging.info("Successfully configured rsyslog service")
-                else:
-                    logging.error("Failed to configure rsyslog service")
-                    raise
-        except Exception as e:
-            logging.exception(f"Failed to setup rsyslog service for {binary_name} logging. Reason: {e}")
-
-        # Install cheqd-node configuration for logrotate if either of the following conditions are met:
-        # 1. logrotate service file is not present
-        # 2. user wants to rewrite logrotate service file
-        if not os.path.exists(DEFAULT_LOGROTATE_FILE) or self.interviewer.rewrite_logrotate:
-            try:
-                # Warn user if logrotate service file already exists
-                if os.path.exists(DEFAULT_LOGROTATE_FILE):
-                    logging.warning(f"Existing logrotate configuration at {DEFAULT_LOGROTATE_FILE} will be overwritten")
-
-                logging.info(f"Configuring logrotate systemd service for cheqd-node logging")
-
-                # Modify logrotate template file with values specific to the installation
-                with open(DEFAULT_LOGROTATE_FILE, "w") as fname:
-                    fname.write(self.logrotate_cfg)
-                fname.close()
-
-                if self.restart_systemd_service("logrotate.service"):
-                    logging.info("Successfully configured logrotate service")
-                    if self.restart_systemd_service("logrotate.timer"):
-                        logging.info("Successfully configured logrotate timer")
-                    else:
-                        logging.exception("Failed to configure logrotate timer")
-                else:
-                    logging.exception("Failed to configure logrotate service")
-            except Exception as e:
-                logging.exception(
-                    f"Failed to setup logrotate service. Reason: {e}")
 
     def compare_checksum(self, file_path):
         # Set URL for correct checksum file for snapshot
