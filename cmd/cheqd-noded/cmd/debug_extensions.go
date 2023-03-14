@@ -125,12 +125,12 @@ func base64toMultibaseCmd() *cobra.Command {
 			publicKeyMultibaseBytes := []byte{0xed, 0x01}
 			publicKeyMultibaseBytes = append(publicKeyMultibaseBytes, bytes...)
 
-			multibase58Str, err := multibase.Encode(multibase.Base58BTC, publicKeyMultibaseBytes)
+			multibaseStr, err := multibase.Encode(multibase.Base58BTC, publicKeyMultibaseBytes)
 			if err != nil {
 				return err
 			}
 
-			_, err = fmt.Fprintln(cmd.OutOrStdout(), multibase58Str)
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), multibaseStr)
 			return err
 		},
 	}
