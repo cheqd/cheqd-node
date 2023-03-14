@@ -352,11 +352,16 @@ class Installer():
             file.close()
 
     @property
+    def cheqd_home_dir(self):
+        # Root directory for cheqd-noded
+        # Default: /home/cheqd
+        return self.interviewer.home_dir
+
+    @property
     def cheqd_root_dir(self):
         # Root directory for cheqd-noded
         # Default: /home/cheqd/.cheqdnode
-        cheqd_noded_home = os.path.join(self.interviewer.home_dir, ".cheqdnode")
-        return cheqd_noded_home
+        return os.path.join(self.cheqd_home_dir, ".cheqdnode")
 
     @property
     def cheqd_config_dir(self):
@@ -508,7 +513,15 @@ class Installer():
                 raise
                 return False
 
-            self.setup_node_systemd()
+            # Configure systemd service for cheqd-noded
+            # Sets up either a standalone service or a Cosmovisor service
+            # ONLY enables it without activating it
+            if self.setup_node_systemd():
+                logging.info("Successfully configured systemd service for node operations")
+            else:
+                logging.error("Failed to configure systemd service for node operations")
+                raise
+                return False
 
             if self.interviewer.init_from_snapshot:
                 self.snapshot_url = self.get_snapshot_url()
@@ -561,44 +574,32 @@ class Installer():
         # 3. systemd service files
         try:
             # Stop existing systemd services first if running
-            # stop_systemd_service() should check if the service is running before stopping it
+            # Check if the service is running before stopping it
             self.stop_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME)
             self.stop_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME)
 
-            if self.interviewer.is_from_scratch:
-                logging.warning("Removing user's data and configs")
+            # Set backup directory
+            backup_dir = os.path.join(self.cheqd_home_dir, "backup")
+            if os.path.exists(backup_dir):
+                logging.warning("Removing existing backup directory")
+                self.remove_safe(backup_dir, is_dir=True)
+                os.makedirs(backup_dir)
+            else:
+                logging.debug("Creating backup directory")
+                os.makedirs(backup_dir)
 
-                # Remove cheqd-node service files safely first
-                self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME, DEFAULT_STANDALONE_SERVICE_FILE_PATH)
-                self.remove_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME, DEFAULT_COSMOVISOR_SERVICE_FILE_PATH)
-                
-                # Remove logging service files safely
-                self.remove_safe(DEFAULT_RSYSLOG_FILE)
-                self.remove_safe(DEFAULT_LOGROTATE_FILE)
-                self.reload_systemd()
+            if self.interviewer.is_from_scratch or self.interviewer.is_setup_needed:
+                logging.warning("Removing user's data and configs")
 
                 # Remove cheqd-node data and binaries
                 self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
                 self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
-                self.remove_safe(self.cheqd_root_dir, is_dir=True)
-                return True
 
-            # Scenario:
-            # 1. User asked for Cosmovisor install
-            # 2. ...AND has systemd service installed for standalone service
-            elif self.interviewer.is_cosmovisor_needed and os.path.exists(DEFAULT_STANDALONE_SERVICE_FILE_PATH):
-                self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME, DEFAULT_STANDALONE_SERVICE_FILE_PATH)
-                self.remove_safe(DEFAULT_RSYSLOG_FILE)
-                self.reload_systemd()
-                return True
-            
-            # Scenario:
-            # 1. User has asked to install WITHOUT Cosmovisor
-            # 2. ...AND has systemd service installed for Cosmovisor service
-            elif not self.interviewer.is_cosmovisor_needed and os.path.exists(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH):
-                self.remove_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME, DEFAULT_COSMOVISOR_SERVICE_FILE_PATH)
-                self.remove_safe(DEFAULT_RSYSLOG_FILE)
-                self.reload_systemd()
+                # Make a copy of validator key and state before removing user data
+                shutil.copytree(self.cheqd_config_dir, backup_dir)
+                shutil.copyfile(os.path.join(self.cheqd_data_dir, "priv_validator_state.json"), 
+                    os.path.join(backup_dir, "priv_validator_state.json"))
+                self.remove_safe(self.cheqd_root_dir, is_dir=True)
                 return True
             
             else:
@@ -617,7 +618,7 @@ class Installer():
                 self.exec(f"addgroup {DEFAULT_CHEQD_USER} --quiet --system")
                 logging.info(f"Creating {DEFAULT_CHEQD_USER} user and adding to {DEFAULT_CHEQD_USER} group")
                 self.exec(
-                    f"adduser --system {DEFAULT_CHEQD_USER} --home {self.interviewer.home_dir} --shell /bin/bash --ingroup {DEFAULT_CHEQD_USER} --quiet")
+                    f"adduser --system {DEFAULT_CHEQD_USER} --home {self.cheqd_home_dir} --shell /bin/bash --ingroup {DEFAULT_CHEQD_USER} --quiet")
                 return True
             else:
                 logging.info(f"User {DEFAULT_CHEQD_USER} already exists. Skipping creation...")
@@ -648,7 +649,7 @@ class Installer():
                 os.makedirs(self.cheqd_root_dir)
 
                 logging.info(f"Setting directory permissions to default cheqd user: {DEFAULT_CHEQD_USER}")
-                shutil.chown(self.interviewer.home_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
+                shutil.chown(self.cheqd_home_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
             else:
                 logging.info(f"Skipping main directory creation because {self.cheqd_root_dir} already exists")
 
@@ -1007,13 +1008,63 @@ class Installer():
             
             # Set directory/file ownership to cheqd user
             logging.info("Setting ownership of cheqd-noded files to cheqd user")
-            shutil.chown(self.interviewer.home_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
+            shutil.chown(self.cheqd_home_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
 
             # Return True if all the above steps were successful
             return True
         except Exception as e:
             logging.exception(f"Failed to configure cheqd-noded settings. Reason: {e}")
             return False
+
+    def setup_node_systemd(self):
+        # Setup cheqd-noded related systemd services
+        # If user selected Cosmovisor install, then cheqd-cosmovisor.service will be setup
+        # If user selected Standalone install, then cheqd-noded.service will be setup
+        # WARNING: Services should already have been stopped in pre_install() but if it's removed from there,
+        # then it should be added here
+        try:
+            logging.info("Setting up node-related systemd configurations")
+
+            # Remove node-related systemd services if requested by the user
+            # Also run if setup is from scratch/first-time install
+            if self.interviewer.rewrite_node_systemd \
+                or self.interviewer.is_from_scratch or self.interviewer.is_setup_needed:
+                
+                # Remove cheqd-noded.service and cheqd-cosmovisor.service if they exist
+                self.remove_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME, DEFAULT_COSMOVISOR_SERVICE_FILE_PATH)
+                self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME, DEFAULT_STANDALONE_SERVICE_FILE_PATH)
+
+                # Setup cheqd-cosmovisor.service if requested
+                if self.interviewer.is_cosmovisor_needed:
+                    # Write cheqd-cosmovisor.service file
+                    # Replace placeholder values with actuals
+                    with open(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH, "w") as fname:
+                        fname.write(self.cosmovisor_service_cfg)
+                    fname.close()
+
+                    # Enable cheqd-cosmovisor.service
+                    self.enable_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME)
+                    return True
+                
+                # Otherwise, setup cheqd-noded.service for standalone install
+                else:
+                    # Fetch the template file from GitHub
+                    if is_valid_url(STANDALONE_SERVICE_TEMPLATE):
+                        with request.urlopen(STANDALONE_SERVICE_TEMPLATE) as response, open(DEFAULT_STANDALONE_SERVICE_FILE_PATH, "w") as file:
+                            file.write(response.read())
+                        file.close()
+                        
+                        # Enable cheqd-noded.service
+                        self.enable_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME)
+                        return True
+                    else:
+                        logging.error(f"Invalid URL provided for standalone service template: {STANDALONE_SERVICE_TEMPLATE}")
+                        return False
+            else:
+                logging.debug("Node-related systemd configurations don't need to be removed. Skipping...")
+                return True
+        except Exception as e:
+            logging.exception(f"Failed to setup systemd service for cheqd-node. Reason: {e}")
 
     def check_systemd_service_active(self, service_name) -> bool:
         # Check if a given systemd service is active
@@ -1186,43 +1237,6 @@ class Installer():
                         return False
         except Exception as e:
             logging.exception(f"Error removing {service_name}: Reason: {e}")
-
-    def setup_node_systemd(self):
-        # Setup cheqd-noded related systemd services
-        # If user selected Cosmovisor install, then cheqd-cosmovisor.service will be setup
-        # If user selected Standalone install, then cheqd-noded.service will be setup
-        try:
-            logging.info("Setting up systemd config")
-            
-            # Check if systemd service files already exist for cheqd-node
-            service_file_exists = os.path.exists(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH) or os.path.exists(
-                DEFAULT_STANDALONE_SERVICE_FILE_PATH)
-
-            # WARNING: Revisit this logic and check the condition
-            if not self.interviewer.is_upgrade or \
-                    self.interviewer.rewrite_node_systemd or \
-                    not service_file_exists:
-                self.remove_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME, DEFAULT_COSMOVISOR_SERVICE_FILE_PATH)
-                self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME, DEFAULT_STANDALONE_SERVICE_FILE_PATH)
-
-                # Setup cheqd-cosmovisor.service if requested
-                if self.interviewer.is_cosmovisor_needed:
-                    logging.info("Enabling cheqd-cosmovisor.service in systemd")
-
-                    # Write cheqd-cosmovisor.service file
-                    # Replace placeholder values with actuals
-                    with open(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH, "w") as fname:
-                        fname.write(self.cosmovisor_service_cfg)
-                    fname.close()
-
-                    # Enable cheqd-cosmovisor.service
-                    self.enable_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME)
-                else:
-                    logging.info("Enabling cheqd-noded.service in systemd")
-                    self.exec(f"curl -s {STANDALONE_SERVICE_TEMPLATE} > {DEFAULT_STANDALONE_SERVICE_FILE_PATH}")
-                    self.enable_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME)
-        except Exception as e:
-            logging.exception(f"Failed to setup systemd service for cheqd-node. Reason: {e}")
 
     # Setup logging related systemd services
     def setup_logging_systemd(self):
@@ -1430,9 +1444,9 @@ class Interviewer:
         self._daemon_allow_download_binaries = DEFAULT_DAEMON_ALLOW_DOWNLOAD_BINARIES
         self._daemon_restart_after_upgrade = DEFAULT_DAEMON_RESTART_AFTER_UPGRADE
         self._is_from_scratch = False
-        self._rewrite_node_systemd = False
-        self._rewrite_rsyslog = False
-        self._rewrite_logrotate = False
+        self._rewrite_node_systemd = True
+        self._rewrite_rsyslog = True
+        self._rewrite_logrotate = True
 
     ### This section sets @property variables ###
     @property
