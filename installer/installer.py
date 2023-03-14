@@ -137,16 +137,21 @@ def is_valid_url(url) -> bool:
 
 def search_and_replace(search_text, replace_text, file_path):
     # Common function to search and replace text in a file
-    file = open(file_path, "r")
-    for line in file:
-        line = line.strip()
-        if search_text in line:
-            with open(file_path, 'r') as file:
-                data = file.read()
-                data = data.replace(line, replace_text)
-            with open(file_path, 'w') as file:
-                file.write(data)
-    file.close()
+    try:
+        file = open(file_path, "r")
+        for line in file:
+            line = line.strip()
+            if search_text in line:
+                with open(file_path, "r") as file:
+                    data = file.read()
+                    data = data.replace(line, replace_text)
+                with open(file_path, "w") as file:
+                    file.write(data)
+    except Exception as e:
+        logging.exception(f"Failed to search and replace text in {file_path}. Reason: {e}")
+        raise
+    finally:
+        file.close()
 
 def post_process(func):
     # Common function to post-process commands
@@ -249,27 +254,32 @@ class Installer():
             fname = os.path.basename(COSMOVISOR_SERVICE_TEMPLATE)
 
             # Fetch the template file from GitHub
-            self.exec(f"wget -c {COSMOVISOR_SERVICE_TEMPLATE}")
+            if is_valid_url(COSMOVISOR_SERVICE_TEMPLATE):
+                with request.urlopen(COSMOVISOR_SERVICE_TEMPLATE) as response, open(fname, "w") as file:
+                    file.write(response.read())
 
-            # Replace the values for environment variables in the template file
-            with open(fname) as f:
-                s = re.sub(
-                    r'({CHEQD_ROOT_DIR}|{DEFAULT_BINARY_NAME}|{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}|{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}|{DEFAULT_DAEMON_POLL_INTERVAL}|{DEFAULT_UNSAFE_SKIP_BACKUP}|{DEFAULT_DAEMON_RESTART_DELAY})',
-                    lambda m: {'{CHEQD_ROOT_DIR}': self.cheqd_root_dir,
-                            '{DEFAULT_BINARY_NAME}': DEFAULT_BINARY_NAME,
-                            '{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}':  self.interviewer.daemon_allow_download_binaries,
-                            '{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}': self.interviewer.daemon_restart_after_upgrade,
-                            '{DEFAULT_DAEMON_POLL_INTERVAL}': DEFAULT_DAEMON_POLL_INTERVAL,
-                            '{DEFAULT_UNSAFE_SKIP_BACKUP}': DEFAULT_UNSAFE_SKIP_BACKUP,
-                            '{DEFAULT_DAEMON_RESTART_DELAY}': DEFAULT_DAEMON_RESTART_DELAY}[m.group()],
-                    f.read()
-                )
-            
-            # Remove the template file
-            self.remove_safe(fname)
-            return s
+                    # Replace the values for environment variables in the template file
+                    s = re.sub(
+                        r'({CHEQD_ROOT_DIR}|{DEFAULT_BINARY_NAME}|{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}|{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}|{DEFAULT_DAEMON_POLL_INTERVAL}|{DEFAULT_UNSAFE_SKIP_BACKUP}|{DEFAULT_DAEMON_RESTART_DELAY})',
+                        lambda m: {'{CHEQD_ROOT_DIR}': self.cheqd_root_dir,
+                                '{DEFAULT_BINARY_NAME}': DEFAULT_BINARY_NAME,
+                                '{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}':  self.interviewer.daemon_allow_download_binaries,
+                                '{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}': self.interviewer.daemon_restart_after_upgrade,
+                                '{DEFAULT_DAEMON_POLL_INTERVAL}': DEFAULT_DAEMON_POLL_INTERVAL,
+                                '{DEFAULT_UNSAFE_SKIP_BACKUP}': DEFAULT_UNSAFE_SKIP_BACKUP,
+                                '{DEFAULT_DAEMON_RESTART_DELAY}': DEFAULT_DAEMON_RESTART_DELAY}[m.group()],
+                        file.read()
+                    )
+                
+                # Remove the template file
+                self.remove_safe(fname)
+                return s
+            else:
+                logging.exception(f"URL is not valid: {RSYSLOG_TEMPLATE}")
         except Exception as e:
             logging.exception(f"Failed to set up service file from template. Reason: {e}")
+        finally:
+            file.close()
 
     @property
     def rsyslog_cfg(self):
@@ -288,24 +298,26 @@ class Installer():
 
             # Fetch the template file from GitHub
             if is_valid_url(RSYSLOG_TEMPLATE):
-                self.exec(f"wget -c {RSYSLOG_TEMPLATE}")
+                with request.urlopen(RSYSLOG_TEMPLATE) as response, open(fname, "w") as file:
+                    file.write(response.read())
+                
+                    # Replace the values for environment variables in the template file
+                    s = re.sub(
+                        r'({BINARY_FOR_LOGGING}|{CHEQD_LOG_DIR})',
+                        lambda m: {'{BINARY_FOR_LOGGING}': binary_name,
+                                    '{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()],
+                        file.read()
+                    )
+
+                    # Remove the template file
+                    self.remove_safe(fname)
+                    return s
             else:
                 logging.exception(f"URL is not valid: {RSYSLOG_TEMPLATE}")
-
-            # Replace the values for environment variables in the template file
-            with open(fname) as f:
-                s = re.sub(
-                    r'({BINARY_FOR_LOGGING}|{CHEQD_LOG_DIR})',
-                    lambda m: {'{BINARY_FOR_LOGGING}': binary_name,
-                                '{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()],
-                    f.read()
-                )
-            
-            # Remove the template file
-            self.remove_safe(fname)
-            return s
         except Exception as e:
             logging.exception(f"Failed to set up rsyslog from template. Reason: {e}")
+        finally:
+            file.close()
         
     @property
     def logrotate_cfg(self):
@@ -318,23 +330,25 @@ class Installer():
 
             # Fetch the template file from GitHub
             if is_valid_url(LOGROTATE_TEMPLATE):
-                self.exec(f"wget -c {LOGROTATE_TEMPLATE}")
+                with request.urlopen(LOGROTATE_TEMPLATE) as response, open(fname, "w") as file:
+                    file.write(response.read())
+
+                    # Replace the values for environment variables in the template file
+                    s = re.sub(
+                        r'({CHEQD_LOG_DIR})',
+                        lambda m: {'{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()],
+                        f.read()
+                    )
+
+                    # Remove the template file
+                    self.remove_safe(fname)
+                    return s
             else:
                 logging.exception(f"URL is not valid: {LOGROTATE_TEMPLATE}")
-
-            # Replace the values for environment variables in the template file
-            with open(fname) as f:
-                s = re.sub(
-                    r'({CHEQD_LOG_DIR})',
-                    lambda m: {'{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()],
-                    f.read()
-                )
-            
-            # Remove the template file
-            self.remove_safe(fname)
-            return s
         except Exception as e:
             logging.exception(f"Failed to set up logrotate from template. Reason: {e}")
+        finally:
+            file.close()
 
     @property
     def cheqd_root_dir(self):
@@ -509,27 +523,25 @@ class Installer():
             fname = os.path.basename(binary_url)
 
             # Download the binary from GitHub
-            self.exec(f"wget -c {binary_url}")
+            with request.urlopen(binary_url) as response, open(fname, "wb") as file:
+                file.write(response.read())
+            file.close()
             
-            # Check tar archive exists before extracting
-            if fname.find(".tar.gz") != -1:
-                # Extract the binary from the archive file
-                # Using tarfile to extract is a safer option than just executing a command
-                tar = tarfile.open(fname)
-                tar.extractall()
+            # Extract the binary from the archive file
+            # Using tarfile to extract is a safer option than just executing a command
+            tar = tarfile.open(fname)
+            tar.extractall()
 
-                # Remove the archive file
-                self.remove_safe(fname)
+            # Remove the archive file
+            self.remove_safe(fname)
 
-                # Make the binary executable
-                # 0755 is equivalent to chmod +x
-                os.chmod(DEFAULT_BINARY_NAME, 0o755)
-                return True
-            else:
-                logging.error(f"Unable to extract cheqd-noded binary from archive file: {fname}")
-                return False
+            # Make the binary executable
+            # 0755 is equivalent to chmod +x
+            os.chmod(DEFAULT_BINARY_NAME, 0o755)
+            return True
         except Exception as e:
             logging.exception("Failed to download cheqd-noded binary. Reason: {e}")
+            return False
 
     def pre_install(self) -> bool:
         # Pre-installation steps
@@ -695,7 +707,7 @@ class Installer():
             # Initialize Cosmovisor if it's not already initialized
             # This is done by checking whether the Cosmovisor root directory exists
             if not os.path.exists(self.cosmovisor_root_dir):
-                self.exec(f"""su -l -c 'cosmovisor init ./{DEFAULT_BINARY_NAME}' {DEFAULT_CHEQD_USER}""")
+                self.exec(f"""sudo su -c 'cosmovisor init ./{DEFAULT_BINARY_NAME}' {DEFAULT_CHEQD_USER}""")
             else:
                 logging.info("Cosmovisor directory already exists. Skipping initialisation...")
             
@@ -738,11 +750,13 @@ class Installer():
         # Also remove the downloaded archive file, if applicable
         try:
             logging.info("Downloading Cosmovisor binary...")
-            cosmovisor_download_url = self.download_and_unzip(self.cosmovisor_download_url)
+            cosmovisor_download_url = self.cosmovisor_download_url()
             fname = os.path.basename(cosmovisor_download_url)
 
             # Download Cosmovisor binary from GitHub
-            self.exec(f"wget -c {cosmovisor_download_url}")
+            with request.urlopen(cosmovisor_download_url) as response, open(fname, "wb") as file:
+                file.write(response.read())
+            file.close()
 
             # Check tar archive exists before extracting
             if fname.find(".tar.gz") != -1:
@@ -826,7 +840,7 @@ class Installer():
         # Applicable for both standalone and Cosmovisor installations
         # Only environment variables that are required required for transactions are set here
         try:
-            self.set_environment_variable("CHEQD_NODED_HOME", f"{self.interviewer.cheqd_root_dir}")
+            self.set_environment_variable("CHEQD_NODED_HOME", f"{self.cheqd_root_dir}")
             self.set_environment_variable("CHEQD_NODED_NODE", 
                 f"tcp://localhost:{self.interviewer.rpc_port}", overwrite=False)
             if self.interviewer.chain == "testnet":
@@ -866,16 +880,20 @@ class Installer():
             env_file.close()
 
     def configure_node_settings(self) -> bool:
-        # Init the node with provided moniker
+        # Configure cheqd-noded settings in app.toml and config.toml
+        # Some of these need to be set based on user input for setup needed from scratch only
+        # Others are needed regardless of whether the node is being setup from scratch or an upgrade path
         try:
+            # These settings are only necessary when setting up a node from scratch
             if self.interviewer.is_setup_needed:
-                if not os.path.exists(os.path.join(self.cheqd_config_dir, 'genesis.json')):
-                    self.exec(
-                        f"""sudo su -c 'cheqd-noded init {self.interviewer.moniker}' {DEFAULT_CHEQD_USER}""")
-
-                    # Downloading genesis file
-                    self.exec(
-                        f"curl {GENESIS_FILE.format(self.interviewer.chain)} > {os.path.join(self.cheqd_config_dir, 'genesis.json')}")
+                # Don't execute an init in case a validator key already exists
+                if not os.path.exists(os.path.join(self.cheqd_config_dir, 'priv_validator_key.json')):
+                    # Initialize the node
+                    logging.info(f"Initialising {self.ch} directory")
+                    self.exec(f"""sudo su -c 'cheqd-noded init {self.interviewer.moniker}' {DEFAULT_CHEQD_USER}""")
+                
+                    # Download genesis file
+                    self.exec(f"curl {GENESIS_FILE.format(self.interviewer.chain)} > {os.path.join(self.cheqd_config_dir, 'genesis.json')}")
                     shutil.chown(os.path.join(self.cheqd_config_dir, 'genesis.json'),
                                 DEFAULT_CHEQD_USER,
                                 DEFAULT_CHEQD_USER)
@@ -1164,11 +1182,17 @@ class Installer():
                 self.remove_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME, DEFAULT_COSMOVISOR_SERVICE_FILE_PATH)
                 self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME, DEFAULT_STANDALONE_SERVICE_FILE_PATH)
 
+                # Setup cheqd-cosmovisor.service if requested
                 if self.interviewer.is_cosmovisor_needed:
-                    # Setup cheqd-cosmovisor.service if requested
                     logging.info("Enabling cheqd-cosmovisor.service in systemd")
-                    with open(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH, mode="w") as fd:
-                        fd.write(self.cosmovisor_service_cfg)
+
+                    # Write cheqd-cosmovisor.service file
+                    # Replace placeholder values with actuals
+                    with open(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH, "w") as fname:
+                        fname.write(self.cosmovisor_service_cfg)
+                    fname.close()
+
+                    # Enable cheqd-cosmovisor.service
                     self.enable_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME)
                 else:
                     logging.info("Enabling cheqd-noded.service in systemd")
@@ -1197,8 +1221,9 @@ class Installer():
                 logging.info(f"Configuring rsyslog systemd service for {binary_name} logging")
 
                 # Modify rsyslog template file with values specific to the installation
-                with open(DEFAULT_RSYSLOG_FILE, mode="w") as fname:
+                with open(DEFAULT_RSYSLOG_FILE, "w") as fname:
                     fname.write(self.rsyslog_cfg)
+                fname.close()
 
                 # Restarting rsyslog can take a lot of time: https://github.com/rsyslog/rsyslog/issues/3133
                 if self.restart_systemd_service("rsyslog.service"):
@@ -1221,8 +1246,9 @@ class Installer():
                 logging.info(f"Configuring logrotate systemd service for cheqd-node logging")
 
                 # Modify logrotate template file with values specific to the installation
-                with open(DEFAULT_LOGROTATE_FILE, mode="w") as fname:
+                with open(DEFAULT_LOGROTATE_FILE, "w") as fname:
                     fname.write(self.logrotate_cfg)
+                fname.close()
 
                 if self.restart_systemd_service("logrotate.service"):
                     logging.info("Successfully configured logrotate service")
@@ -1290,7 +1316,8 @@ class Installer():
 
     def download_snapshot(self):
         try:
-            archive_name = os.path.basename(self.snapshot_url)
+            fname = os.path.basename(self.snapshot_url)
+            file_path = os.path.join(self.cheqd_root_dir, fname)
             self.mkdir_p(self.cheqd_data_dir)
             shutil.chown(self.cheqd_data_dir,
                          DEFAULT_CHEQD_USER,
@@ -1302,12 +1329,13 @@ class Installer():
             free_disk_space = self.exec(
                 f"df -P -B1 {self.cheqd_root_dir} | tail -1 | awk '{{print $4}}'").stdout.strip()
             if int(archive_size) < int(free_disk_space):
-                logging.info(
-                    f"Downloading snapshot archive. This may take a while...")
-                self.exec(
-                    f"wget -c {self.snapshot_url} -P {self.cheqd_root_dir}")
-                archive_path = os.path.join(self.cheqd_root_dir, archive_name)
-                if self.compare_checksum(archive_path) is True:
+                logging.info(f"Downloading snapshot archive. This may take a while...")
+                
+                with request.urlopen(self.snapshot_url) as response, open(file_path, "wb") as file:
+                    file.write(response.read())
+                file.close()
+                file_path = os.path.join(self.cheqd_root_dir, fname)
+                if self.compare_checksum(file_path) is True:
                     logging.info(
                         f"Snapshot download was successful and checksums match.")
                 else:
@@ -1326,7 +1354,7 @@ class Installer():
 
     def untar_from_snapshot(self):
         try:
-            archive_path = os.path.join(
+            file_path = os.path.join(
                 self.cheqd_root_dir, os.path.basename(self.snapshot_url))
             # Check if there is enough space to extract snapshot archive
             self.install_dependencies()
@@ -1335,12 +1363,12 @@ class Installer():
 
             # Extract to cheqd node data directory EXCEPT for validator state
             self.exec(
-                f"sudo su -c 'pv {archive_path} | tar --use-compress-program=lz4 -xf - -C {self.cheqd_root_dir} --exclude priv_validator_state.json' {DEFAULT_CHEQD_USER}")
+                f"sudo su -c 'pv {file_path} | tar --use-compress-program=lz4 -xf - -C {self.cheqd_root_dir} --exclude priv_validator_state.json' {DEFAULT_CHEQD_USER}")
 
             # Delete snapshot archive file
             logging.info(
                 f"Snapshot extraction was successful. Deleting snapshot archive.")
-            self.remove_safe(archive_path)
+            self.remove_safe(file_path)
             # Workaround to make this work with Cosmovisor since it expects upgrade-info.json file in cosmovisor/current directory
             if self.interviewer.is_cosmovisor_needed:
                 if os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
@@ -1662,8 +1690,7 @@ class Interviewer:
                 r_list = json.loads(response.read().decode("utf-8").strip())
                 return [Release(r) for r in r_list]
         except Exception as e:
-            logging.exception(
-                f"Could not get releases from GitHub. Reason: {e}")
+            logging.exception(f"Could not get releases from GitHub. Reason: {e}")
 
     # The "latest" stable release may not be in last N releases, so we need to get it separately
     def get_latest_release(self):
@@ -1674,8 +1701,7 @@ class Interviewer:
             with request.urlopen(req) as response:
                 return Release(json.loads(response.read().decode("utf-8")))
         except Exception as e:
-            logging.exception(
-                f"Could not get latest release from GitHub. Reason: {e}")
+            logging.exception(f"Could not get latest release from GitHub. Reason: {e}")
 
     # Compile a list of releases to be displayed to the user
     # The "latest" stable release is always displayed first
@@ -1687,8 +1713,7 @@ class Interviewer:
                     copy_r_list.pop(i)
                     return copy_r_list
         except Exception as e:
-            logging.exception(
-                f"Could not assemble list of releases to show to the user. Reason: {e}")
+            logging.exception(f"Could not assemble list of releases to show to the user. Reason: {e}")
 
     # Ask user to select a version of cheqd-node to install
     def ask_for_version(self):
