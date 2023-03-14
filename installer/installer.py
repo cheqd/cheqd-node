@@ -357,6 +357,12 @@ class Installer():
         return self.interviewer.home_dir
 
     @property
+    def cheqd_backup_dir(self):
+        # Root directory for cheqd-noded
+        # Default: /home/cheqd/backup
+        return os.path.join(self.cheqd_home_dir, "backup")
+
+    @property
     def cheqd_root_dir(self):
         # Root directory for cheqd-noded
         # Default: /home/cheqd/.cheqdnode
@@ -530,12 +536,20 @@ class Installer():
                 raise
                 return False
 
+            # Download and extract snapshot if needed
             if self.interviewer.init_from_snapshot:
-                self.snapshot_url = self.get_snapshot_url()
+                # Check if snapshot download was successful
+                if self.download_snapshot():
+                    logging.info("Successfully downloaded snapshot")
+                else:
+                    logging.error("Failed to download snapshot")
+                    raise
+                    return False
+                
                 if self.snapshot_url:
                     logging.info(
                         "Downloading snapshot and extracting archive. This can take a *really* long time...")
-                    self.download_snapshot()
+                
                     self.untar_from_snapshot()
 
             logging.info("The cheqd-noded binary has been successfully installed")
@@ -584,30 +598,26 @@ class Installer():
             self.stop_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME)
             self.stop_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME)
 
-            # Set backup directory
-            backup_dir = os.path.join(self.cheqd_home_dir, "backup")
-            if os.path.exists(backup_dir):
-                logging.warning("Removing existing backup directory")
-                self.remove_safe(backup_dir, is_dir=True)
-                os.makedirs(backup_dir)
-            else:
-                logging.debug("Creating backup directory")
-                os.makedirs(backup_dir)
+            # Create backup directory if it doesn't exist
+            # os.makedirs() will not raise an error if the directory already exists
+            os.makedirs(self.cheqd_backup_dir)
+
+            # Make a copy of validator key and state before removing user data
+            logging.info("Backing up user's config folder and selected validator secrets from data folder")
+            shutil.copytree(self.cheqd_config_dir, self.cheqd_backup_dir)
+            shutil.copyfile(os.path.join(self.cheqd_data_dir, "priv_validator_state.json"), 
+                os.path.join(self.cheqd_backup_dir, "priv_validator_state.json"))
+            if os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
+                shutil.copyfile(os.path.join(self.cheqd_data_dir, "upgrade-info.json"), 
+                    os.path.join(self.cheqd_backup_dir, "priv_validator_state.json"))
 
             if self.interviewer.is_from_scratch or self.interviewer.is_setup_needed:
-                logging.warning("Removing user's data and configs")
-
                 # Remove cheqd-node data and binaries
+                logging.warning("Removing user's data and configs")
                 self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
                 self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
-
-                # Make a copy of validator key and state before removing user data
-                shutil.copytree(self.cheqd_config_dir, backup_dir)
-                shutil.copyfile(os.path.join(self.cheqd_data_dir, "priv_validator_state.json"), 
-                    os.path.join(backup_dir, "priv_validator_state.json"))
                 self.remove_safe(self.cheqd_root_dir, is_dir=True)
                 return True
-            
             else:
                 logging.debug("No pre-installation steps needed")
                 return True
@@ -860,7 +870,6 @@ class Installer():
         # Applicable for both standalone and Cosmovisor installations
         # Only environment variables that are required required for transactions are set here
         try:
-            self.set_environment_variable("CHEQD_NODED_HOME", f"{self.cheqd_root_dir}")
             self.set_environment_variable("CHEQD_NODED_NODE", 
                 f"tcp://localhost:{self.interviewer.rpc_port}", overwrite=False)
             if self.interviewer.chain == "testnet":
@@ -1069,7 +1078,7 @@ class Installer():
             return False
 
     # Setup logging related systemd services
-    def setup_logging_systemd(self):
+    def setup_logging_systemd(self) -> bool:
         # Install cheqd-node configuration for rsyslog if user wants to rewrite rsyslog service file
         # Also run if setup is from scratch/first-time install
         try:
@@ -1329,77 +1338,135 @@ class Installer():
         else:
             logging.exception(f"Error encountered when comparing checksums.")
 
-    def install_dependencies(self):
+    def download_snapshot(self) -> bool:
+        # Download snapshot archive if requested by the user
+        # This is a blocking operation that will take a while
         try:
-            logging.info("Installing dependencies")
-            self.exec("sudo apt-get update")
-            logging.info(f"Install pv to show progress of extraction")
-            self.exec("sudo apt-get install -y pv")
-        except Exception as e:
-            logging.exception(f"Failed to install dependencies. Reason: {e}")
-            
-    def get_snapshot_url(self) -> str:
-        template = TESTNET_SNAPSHOT if self.interviewer.chain in TESTNET_CHAIN_ID else MAINNET_SNAPSHOT
-        _date = datetime.date.today()
-        _days_counter = 0
-        _is_url_valid = False
-
-        while not _is_url_valid and _days_counter <= MAX_SNAPSHOT_DAYS:
-            _url = template.format(_date.strftime(
-                "%Y-%m-%d"), _date.strftime("%Y-%m-%d"))
-            _is_url_valid = is_valid_url(_url)
-            _days_counter += 1
-            _date -= datetime.timedelta(days=1)
-
-        if not _is_url_valid:
-            logging.exception("Could not find the valid snapshot for the last {} days".format(
-                MAX_SNAPSHOT_DAYS))
-        return _url
-
-    def download_snapshot(self):
-        try:
-            fname = os.path.basename(self.snapshot_url)
-            file_path = os.path.join(self.cheqd_root_dir, fname)
-            
-            shutil.chown(self.cheqd_data_dir,
-                         DEFAULT_CHEQD_USER,
-                         DEFAULT_CHEQD_USER)
-            # Fetch size of snapshot archive. Uses curl to fetch headers and looks for Content-Length.
-            archive_size = self.exec(
-                f"curl -s --head {self.snapshot_url} | awk '/content-length/ {{print $2}}'").stdout.strip()
-            # Check how much free disk space is available wherever the cheqd root directory is mounted
-            free_disk_space = self.exec(
-                f"df -P -B1 {self.cheqd_root_dir} | tail -1 | awk '{{print $4}}'").stdout.strip()
-            if int(archive_size) < int(free_disk_space):
-                logging.info(f"Downloading snapshot archive. This may take a while...")
-                
-                with request.urlopen(self.snapshot_url) as response, open(file_path, "wb") as file:
-                    file.write(response.read())
-                file.close()
+            # Only proceed if a valid snapshot URL has been set
+            if self.set_snapshot_url():
+                logging.info(f"Valid snapshot URL found: {self.snapshot_url}")
+                fname = os.path.basename(self.snapshot_url)
                 file_path = os.path.join(self.cheqd_root_dir, fname)
-                if self.compare_checksum(file_path) is True:
-                    logging.info(
-                        f"Snapshot download was successful and checksums match.")
-                else:
-                    logging.info(
-                        f"Snapshot download was successful but checksums do not match.")
-                    logging.exception(
-                        f"Snapshot download was successful but checksums do not match.")
-            elif int(archive_size) > int(free_disk_space):
-                logging.exception(
-                    f"Snapshot archive is too large to fit in free disk space. Please free up some space and try again.")
             else:
-                logging.exception(
-                    f"Error encountered when downloading snapshot archive.")
+                logging.error(f"No valid snapshot URL found in last {MAX_SNAPSHOT_DAYS} days!")
+                raise
+                return False
+            
+            # Install dependencies needed to show progress bar
+            if self.install_dependencies():
+                logging.info("Dependencies required for snapshot restore installed successfully")
+            else:
+                logging.error("Failed to install dependencies required for snapshot restore")
+                raise
+                return False
+
+            # Fetch size of snapshot archive WITHOUT downloading it
+            req = request.Request(self.snapshot_url, method='HEAD')
+            response = request.urlopen(req)
+            content_length = response.getheader("Content-Length")
+            if content_length is not None:
+                archive_size = content_length
+                logging.debug(f"Snapshot archive size: {content_length} bytes")
+            else:
+                logging.error(f"Could not determine snapshot archive size")
+                raise
+                return False
+
+            # Free up some disk space by deleting contents of the data folder
+            # Otherwise, there may not be enough space to download AND extract the snapshot
+            # WARNING: Backup the priv_validator_state.json and upgrade-info.json before doing this!
+            # Check that backup of validator keys, state, and upgrade info exists before proceeding
+            if os.path.exists(self.cheqd_backup_dir):
+                logging.info(f"Backup directory exists: {self.cheqd_backup_dir}")
+
+                # Remove contents of data directory
+                logging.warning(f"Contents of {self.cheqd_data_dir} will be deleted to make room for snapshot")
+                self.remove_safe(self.cheqd_data_dir, is_dir=True)
+
+                # Recreate data directory
+                os.makedirs(self.cheqd_data_dir)
+            else:
+                logging.warning(f"Backup directory does not exist. Will not delete data directory.")
+
+            # Check how much free disk space is available wherever the cheqd home directory is located
+            # First, determine where the home directory is mounted
+            fs_stats = os.statvfs(self.cheqd_home_dir)
+
+            # Calculate the free space in bytes
+            free_space = fs_stats.f_frsize * fs_stats.f_bavail
+
+            # ONLY download the snapshot if there is enough free disk space
+            if int(archive_size) < int(free_space):
+                logging.info(f"Downloading snapshot and extracting archive. This can take a *really* long time...")
+                
+                # Use wget to download since it can show a progress bar while downloading natively
+                # This is a blocking operation that will take a while
+                # "wget -c" will resume a download if it gets interrupted
+                self.exec(f"wget -c {self.snapshot_url} -P {self.cheqd_home_dir}")
+
+                if self.compare_checksum(file_path):
+                    logging.info(f"Snapshot download was successful AND checksums match.")
+                    return True
+                else:
+                    logging.error(f"Snapshot download was successful BUT checksums do not match.")
+                    return False
+            else:
+                logging.error(f"Snapshot is larger than free disk space. Please free up disk space and try again.")
+                return False
         except Exception as e:
             logging.exception(f"Failed to download snapshot. Reason: {e}")
+            return False
+
+    def set_snapshot_url(self) -> bool:
+        # Get latest available snapshot URL from snapshots.cheqd.net for the given chain
+        # This checks whether there are any snapshots in past MAX_SNAPSHOT_DAYS (default: 7 days)
+        try:
+            template = TESTNET_SNAPSHOT if self.interviewer.chain in TESTNET_CHAIN_ID else MAINNET_SNAPSHOT
+            snapshot_date = datetime.date.today()
+            counter = 0
+            valid_url_found = False
+
+            # Iterate over past MAX_SNAPSHOT_DAYS days to find the latest snapshot
+            while not valid_url_found and counter <= MAX_SNAPSHOT_DAYS:
+                _url = template.format(snapshot_date.strftime(
+                    "%Y-%m-%d"), snapshot_date.strftime("%Y-%m-%d"))
+                valid_url_found = is_valid_url(_url)
+                counter += 1
+                snapshot_date -= datetime.timedelta(days=1)
+
+            # Set snapshot URL if found
+            if valid_url_found:
+                self.snapshot_url = _url
+                logging.debug(f"Snapshot URL: {self.snapshot_url}")
+                return True
+            else:
+                logging.debug("Could not find a valid snapshot in last {} days".format(MAX_SNAPSHOT_DAYS))
+                return False
+        except Exception as e:
+            logging.exception(f"Failed to get snapshot URL. Reason: {e}")
+            return False
+
+    def install_dependencies(self) -> bool:
+        # Install dependencies required for snapshot extraction
+        try:
+            # Update apt lists before installing dependencies
+            logging.info("Updating apt lists")
+            self.exec("sudo apt-get update")
+
+            # Use apt-get to install dependencies
+            logging.info(f"Install pv to show progress of extraction")
+            self.exec("sudo apt-get install -y pv")
+            return True
+        except Exception as e:
+            logging.exception(f"Failed to install dependencies. Reason: {e}")
+            return False
 
     def untar_from_snapshot(self):
         try:
             file_path = os.path.join(
                 self.cheqd_root_dir, os.path.basename(self.snapshot_url))
             # Check if there is enough space to extract snapshot archive
-            self.install_dependencies()
+
             logging.info(
                 f"Extracting snapshot archive. This may take a while...")
 
