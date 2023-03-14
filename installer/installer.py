@@ -508,6 +508,8 @@ class Installer():
                 raise
                 return False
 
+            self.setup_node_systemd()
+
             if self.interviewer.init_from_snapshot:
                 self.snapshot_url = self.get_snapshot_url()
                 if self.snapshot_url:
@@ -516,7 +518,6 @@ class Installer():
                     self.download_snapshot()
                     self.untar_from_snapshot()
 
-            self.setup_node_systemd()
             self.setup_logging_systemd()
             logging.info("The cheqd-noded binary has been successfully installed")
             return True
@@ -676,6 +677,7 @@ class Installer():
             else:
                 logging.info("Skipping linking because /var/log/cheqd-node already exists")
             
+            # Return True if all steps were successful
             return True
         except Exception as e:
             logging.exception(f"Failed to prepare directory tree for {DEFAULT_CHEQD_USER}. Reason: {e}")
@@ -748,7 +750,7 @@ class Installer():
             logging.info(f"Changing ownership of {self.cosmovisor_root_dir} to {DEFAULT_CHEQD_USER} user")
             shutil.chown(self.cosmovisor_root_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
 
-            logging.info("Successfully installed Cosmovisor")
+            # Return True if all steps were successful
             return True
         except Exception as e:
             logging.exception(f"Failed to setup Cosmovisor. Reason: {e}")
@@ -783,6 +785,8 @@ class Installer():
                 # Make the binary executable
                 # 0755 is equivalent to chmod +x
                 os.chmod(DEFAULT_COSMOVISOR_BINARY_NAME, 0o755)
+
+                # Return True if all steps were successful
                 return True
             else:
                 logging.error(f"Unable to extract Cosmovisor binary from archive file: {fname}")
@@ -821,7 +825,7 @@ class Installer():
             else:
                 logging.debug(f"{self.cosmovisor_root_dir} doesn't exist. Skipping removal...")
 
-            # Return to calling function
+            # Return True if all steps were successful
             return True
         except Exception as e:
             logging.exception(f"Failed to setup Cosmovisor. Reason: {e}")
@@ -1001,6 +1005,10 @@ class Installer():
             else:
                 logging.debug("Log format not set by user. Skipping...")
             
+            # Set directory/file ownership to cheqd user
+            logging.info("Setting ownership of cheqd-noded files to cheqd user")
+            shutil.chown(self.interviewer.home_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
+
             # Return True if all the above steps were successful
             return True
         except Exception as e:
