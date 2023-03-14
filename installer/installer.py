@@ -1323,25 +1323,6 @@ class Installer():
         except Exception as e:
             logging.exception(f"Error removing {service_name}: Reason: {e}")
 
-    def compare_checksum(self, file_path):
-        # Set URL for correct checksum file for snapshot
-        checksum_url = os.path.join(os.path.dirname(
-            self.snapshot_url), "md5sum.txt")
-        # Get checksum file
-        published_checksum = self.exec(
-            f"curl -s {checksum_url} | tail -1 | cut -d' ' -f 1").stdout.strip()
-        logging.info(f"Comparing published checksum with local checksum")
-        local_checksum = self.exec(
-            f"md5sum {file_path} | tail -1 | cut -d' ' -f 1").stdout.strip()
-        if published_checksum == local_checksum:
-            logging.info(f"Checksums match. Download is OK.")
-            return True
-        elif published_checksum != local_checksum:
-            logging.info(f"Checksums do not match. Download got corrupted.")
-            return False
-        else:
-            logging.exception(f"Error encountered when comparing checksums.")
-
     def download_snapshot(self) -> bool:
         # Download snapshot archive if requested by the user
         # This is a blocking operation that will take a while
@@ -1390,7 +1371,8 @@ class Installer():
                 # Recreate data directory
                 os.makedirs(self.cheqd_data_dir)
             else:
-                logging.warning(f"Backup directory does not exist. Will not delete data directory.")
+                logging.warning(f"Backup directory does not exist. Will not delete data directory.\n")
+                logging.warning(f"Free disk space will be calculated without freeing up space.\n")
 
             # Check how much free disk space is available wherever the cheqd home directory is located
             # First, determine where the home directory is mounted
@@ -1463,6 +1445,48 @@ class Installer():
             return True
         except Exception as e:
             logging.exception(f"Failed to install dependencies. Reason: {e}")
+            return False
+
+    def compare_checksum(self, file_path) -> bool:
+        # Compare checksum of downloaded snapshot with published checksum
+        # This is to ensure that the snapshot was downloaded correctly
+        try:
+            # Split snapshot URL into its components
+            url_parts = list(os.path.split(self.snapshot_url))
+
+            # Replace archive filename with checksum filename
+            url_parts[-1] = "md5sum.txt"
+
+            # Construct checksum file URL
+            checksum_url = os.path.join(*url_parts)
+
+            # Fetch published checksum from checksum URL if it exists
+            if is_valid_url(checksum_url):
+                with request.urlopen(checksum_url) as response:
+                    published_checksum = response.read().decode("utf-8").strip()
+                
+                # Calculate checksum of downloaded snapshot
+                # This is a blocking operation that will take a while
+                # Python's hashlib.md5() is not used because making it work with large files is a pain
+                local_checksum = self.exec(f"md5sum {file_path} | tail -1 | cut -d' ' -f 1").stdout.strip()
+                
+                # Print checksums for debugging
+                logging.debug(f"Published checksum: {published_checksum}")
+                logging.debug(f"Local checksum: {local_checksum}")
+
+                # Compare checksums
+                if published_checksum == local_checksum:
+                    logging.debug(f"Checksums match. Download is OK.")
+                    return True
+                else:
+                    logging.debug(f"Checksums do not match. Download got corrupted.")
+                    return False
+            else:
+                logging.exception(f"Checksum URL is invalid. File integrity couldn't be tested.")
+                raise
+                return False
+        except Exception as e:
+            logging.exception(f"Failed to compare checksums. Reason: {e}")
             return False
 
     def untar_from_snapshot(self):
