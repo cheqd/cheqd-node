@@ -150,8 +150,6 @@ def search_and_replace(search_text, replace_text, file_path):
     except Exception as e:
         logging.exception(f"Failed to search and replace text in {file_path}. Reason: {e}")
         raise
-    finally:
-        file.close()
 
 def post_process(func):
     # Common function to post-process commands
@@ -278,8 +276,6 @@ class Installer():
                 logging.exception(f"URL is not valid: {RSYSLOG_TEMPLATE}")
         except Exception as e:
             logging.exception(f"Failed to set up service file from template. Reason: {e}")
-        finally:
-            file.close()
 
     @property
     def rsyslog_cfg(self):
@@ -316,8 +312,6 @@ class Installer():
                 logging.exception(f"URL is not valid: {RSYSLOG_TEMPLATE}")
         except Exception as e:
             logging.exception(f"Failed to set up rsyslog from template. Reason: {e}")
-        finally:
-            file.close()
         
     @property
     def logrotate_cfg(self):
@@ -347,8 +341,6 @@ class Installer():
                 logging.exception(f"URL is not valid: {LOGROTATE_TEMPLATE}")
         except Exception as e:
             logging.exception(f"Failed to set up logrotate from template. Reason: {e}")
-        finally:
-            file.close()
 
     @property
     def cheqd_home_dir(self):
@@ -546,7 +538,7 @@ class Installer():
                     raise
                     return False
                                 
-                if self.untar_from_snapshot():
+                if self.extract_snapshot():
                     logging.info("Successfully extracted snapshot")
                 else:
                     logging.error("Failed to extract snapshot")
@@ -572,7 +564,6 @@ class Installer():
             # Download the binary from GitHub
             with request.urlopen(binary_url) as response, open(fname, "wb") as file:
                 file.write(response.read())
-            file.close()
             
             # Extract the binary from the archive file
             # Using tarfile to extract is a safer option than just executing a command
@@ -636,9 +627,14 @@ class Installer():
             if not self.does_user_exist(DEFAULT_CHEQD_USER):
                 logging.info(f"Creating {DEFAULT_CHEQD_USER} group")
                 self.exec(f"addgroup {DEFAULT_CHEQD_USER} --quiet --system")
+
                 logging.info(f"Creating {DEFAULT_CHEQD_USER} user and adding to {DEFAULT_CHEQD_USER} group")
                 self.exec(
                     f"adduser --system {DEFAULT_CHEQD_USER} --home {self.cheqd_home_dir} --shell /bin/bash --ingroup {DEFAULT_CHEQD_USER} --quiet")
+                
+                # Set permissions for cheqd home directory to cheqd:cheqd
+                logging.info(f"Setting permissions for {self.cheqd_home_dir} to {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}")
+                shutil.chown(self.cheqd_home_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
                 return True
             else:
                 logging.info(f"User {DEFAULT_CHEQD_USER} already exists. Skipping creation...")
@@ -667,9 +663,6 @@ class Installer():
             if not os.path.exists(self.cheqd_root_dir):
                 logging.info("Creating main directory for cheqd-noded")
                 os.makedirs(self.cheqd_root_dir)
-
-                logging.info(f"Setting directory permissions to default cheqd user: {DEFAULT_CHEQD_USER}")
-                shutil.chown(self.cheqd_home_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
             else:
                 logging.info(f"Skipping main directory creation because {self.cheqd_root_dir} already exists")
 
@@ -686,7 +679,7 @@ class Installer():
                 Path(os.path.join(self.cheqd_log_dir, "stdout.log")).touch(exist_ok=True)
 
                 logging.info(f"Setting up ownership permissions for {self.cheqd_log_dir} directory")
-                shutil.chown(self.cheqd_log_dir, 'syslog', DEFAULT_CHEQD_USER)
+                shutil.chown(self.cheqd_log_dir, "syslog", DEFAULT_CHEQD_USER)
             else:
                 logging.info(f"Skipping log directory creation because {self.cheqd_log_dir} already exists")
 
@@ -767,7 +760,7 @@ class Installer():
             else:
                 logging.debug("Skipped copying upgrade-info.json file because it doesn't exist")
             
-            # Change owner of Cosmovisor directory to default cheqd user
+            # Change owner of Cosmovisor directory to cheqd:cheqd
             logging.info(f"Changing ownership of {self.cosmovisor_root_dir} to {DEFAULT_CHEQD_USER} user")
             shutil.chown(self.cosmovisor_root_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
 
@@ -788,7 +781,6 @@ class Installer():
             # Download Cosmovisor binary from GitHub
             with request.urlopen(cosmovisor_download_url) as response, open(fname, "wb") as file:
                 file.write(response.read())
-            file.close()
 
             # Check tar archive exists before extracting
             if fname.find(".tar.gz") != -1:
@@ -909,8 +901,6 @@ class Installer():
                 logging.debug(f"Environment variable {env_var_name} already set or overwrite is disabled")
         except Exception as e:
             logging.exception(f"Failed to set environment variable {env_var_name}. Reason: {e}")
-        finally:
-            env_file.close()
 
     def configure_node_settings(self) -> bool:
         # Configure cheqd-noded settings in app.toml and config.toml
@@ -940,9 +930,9 @@ class Installer():
                 # If not, download it from the GitHub repo
                 if is_valid_url(genesis_url) and not os.path.exists(genesis_file_path):
                     logging.debug(f"Downloading genesis file for {self.interviewer.chain}")
+                    
                     with request.urlopen(genesis_url) as response, open(genesis_file_path, "w") as file:
                         file.write(response.read())
-                    file.close()
                 else:
                     logging.debug(f"Genesis file already exists in {genesis_file_path}")
 
@@ -1025,9 +1015,9 @@ class Installer():
             else:
                 logging.debug("Log format not set by user. Skipping...")
             
-            # Set directory/file ownership to cheqd user
-            logging.info("Setting ownership of cheqd-noded files to cheqd user")
-            shutil.chown(self.cheqd_home_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
+            # Set ownership of configuration directory to cheqd:cheqd
+            logging.info(f"Setting ownership of {self.cheqd_config_dir} to {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}")
+            shutil.chown(self.cheqd_config_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
 
             # Return True if all the above steps were successful
             return True
@@ -1057,7 +1047,6 @@ class Installer():
                 # Replace placeholder values with actuals
                 with open(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH, "w") as fname:
                     fname.write(self.cosmovisor_service_cfg)
-                fname.close()
 
                 # Enable cheqd-cosmovisor.service
                 self.enable_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME)
@@ -1069,7 +1058,6 @@ class Installer():
                 if is_valid_url(STANDALONE_SERVICE_TEMPLATE):
                     with request.urlopen(STANDALONE_SERVICE_TEMPLATE) as response, open(DEFAULT_STANDALONE_SERVICE_FILE_PATH, "w") as file:
                         file.write(response.read())
-                    file.close()
                     
                     # Enable cheqd-noded.service
                     self.enable_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME)
@@ -1105,7 +1093,6 @@ class Installer():
                 # Modify rsyslog template file with values specific to the installation
                 with open(DEFAULT_RSYSLOG_FILE, "w") as fname:
                     fname.write(self.rsyslog_cfg)
-                fname.close()
 
                 # Restarting rsyslog can take a lot of time: https://github.com/rsyslog/rsyslog/issues/3133
                 if self.restart_systemd_service("rsyslog.service"):
@@ -1129,7 +1116,6 @@ class Installer():
                 # Modify logrotate template file with values specific to the installation
                 with open(DEFAULT_LOGROTATE_FILE, "w") as fname:
                     fname.write(self.logrotate_cfg)
-                fname.close()
 
                 # Restart logrotate.service
                 if self.restart_systemd_service("logrotate.service"):
@@ -1370,6 +1356,7 @@ class Installer():
 
                 # Recreate data directory
                 os.makedirs(self.cheqd_data_dir)
+                shutil.chown(self.cheqd_data_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
             else:
                 logging.warning(f"Backup directory does not exist. Will not delete data directory.\n")
                 logging.warning(f"Free disk space will be calculated without freeing up space.\n")
@@ -1395,6 +1382,8 @@ class Installer():
                     return True
                 else:
                     logging.error(f"Snapshot download was successful BUT checksums do not match.")
+                    logging.warning(f"Removing corrupted snapshot archive: {file_path}")
+                    self.remove_safe(file_path)
                     return False
             else:
                 logging.error(f"Snapshot is larger than free disk space. Please free up disk space and try again.")
@@ -1489,7 +1478,10 @@ class Installer():
             logging.exception(f"Failed to compare checksums. Reason: {e}")
             return False
 
-    def untar_from_snapshot(self):
+    def extract_snapshot(self):
+        # Extract snapshot archive to cheqd node data directory
+        # This is a blocking operation that will take a while
+        # Once extracted, restore files from backup folder
         try:
             file_path = os.path.join(
                 self.cheqd_root_dir, os.path.basename(self.snapshot_url))
