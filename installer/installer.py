@@ -1347,9 +1347,14 @@ class Installer():
         # This is a blocking operation that will take a while
         try:
             # Only proceed if a valid snapshot URL has been set
-            snapshot_url = self.set_snapshot_url()
-            fname = os.path.basename(snapshot_url)
-            file_path = os.path.join(self.cheqd_root_dir, fname)
+            if self.set_snapshot_url():
+                logging.info(f"Valid snapshot URL found: {self.snapshot_url}")
+                fname = os.path.basename(self.snapshot_url)
+                file_path = os.path.join(self.cheqd_root_dir, fname)
+            else:
+                logging.error(f"No valid snapshot URL found in last {MAX_SNAPSHOT_DAYS} days!")
+                raise
+                return False
             
             # Install dependencies needed to show progress bar
             if self.install_dependencies():
@@ -1360,7 +1365,7 @@ class Installer():
                 return False
 
             # Fetch size of snapshot archive WITHOUT downloading it
-            req = request.Request(snapshot_url, method='HEAD')
+            req = request.Request(self.snapshot_url, method='HEAD')
             response = request.urlopen(req)
             content_length = response.getheader("Content-Length")
             if content_length is not None:
@@ -1401,7 +1406,7 @@ class Installer():
                 # Use wget to download since it can show a progress bar while downloading natively
                 # This is a blocking operation that will take a while
                 # "wget -c" will resume a download if it gets interrupted
-                self.exec(f"wget -c {snapshot_url} -P {self.cheqd_home_dir}")
+                self.exec(f"wget -c {self.snapshot_url} -P {self.cheqd_home_dir}")
 
                 if self.compare_checksum(file_path):
                     logging.info(f"Snapshot download was successful AND checksums match.")
@@ -1416,7 +1421,7 @@ class Installer():
             logging.exception(f"Failed to download snapshot. Reason: {e}")
             return False
 
-    def set_snapshot_url(self) -> str:
+    def set_snapshot_url(self) -> bool:
         # Get latest available snapshot URL from snapshots.cheqd.net for the given chain
         # This checks whether there are any snapshots in past MAX_SNAPSHOT_DAYS (default: 7 days)
         try:
@@ -1435,13 +1440,15 @@ class Installer():
 
             # Set snapshot URL if found
             if valid_url_found:
-                logging.info(f"Snapshot URL found: {_url}")
-                return _url
+                self.snapshot_url = _url
+                logging.debug(f"Snapshot URL: {self.snapshot_url}")
+                return True
             else:
-                logging.error("Could not find a valid snapshot in last {} days".format(MAX_SNAPSHOT_DAYS))
-                raise
+                logging.debug("Could not find a valid snapshot in last {} days".format(MAX_SNAPSHOT_DAYS))
+                return False
         except Exception as e:
             logging.exception(f"Failed to get snapshot URL. Reason: {e}")
+            return False
 
     def install_dependencies(self) -> bool:
         # Install dependencies required for snapshot extraction
