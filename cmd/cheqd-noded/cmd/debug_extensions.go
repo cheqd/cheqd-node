@@ -142,7 +142,7 @@ func base64toMultibaseCmd() *cobra.Command {
 func base64toBase58Cmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "base64-base58 [input]",
-		Short: "Convert public key from base64 to base58, according to Ed25519VerificationKey2018 spec.",
+		Short: `Convert public key from base64 to base58, according to Ed25519VerificationKey2018 spec.`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			base64Str := args[0]
