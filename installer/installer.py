@@ -1210,7 +1210,7 @@ class Installer():
                 # "wget -c" will resume a download if it gets interrupted
                 self.exec(f"wget -c {self.snapshot_url} -P {self.cheqd_home_dir}")
 
-                if self.compare_checksum(file_path):
+                if self.compare_checksum(file_path, self.snapshot_url):
                     logging.info(f"Snapshot download was successful AND checksums match.")
                     return True
                 else:
@@ -1269,12 +1269,12 @@ class Installer():
             logging.exception(f"Failed to install dependencies. Reason: {e}")
             return False
 
-    def compare_checksum(self, file_path) -> bool:
+    def compare_checksum(self, file_path, snapshot_url) -> bool:
         # Compare checksum of downloaded snapshot with published checksum
         # This is to ensure that the snapshot was downloaded correctly
         try:
             # Split snapshot URL into its components
-            url_parts = list(os.path.split(self.snapshot_url))
+            url_parts = list(os.path.split(snapshot_url))
 
             # Replace archive filename with checksum filename
             url_parts[-1] = "md5sum.txt"
