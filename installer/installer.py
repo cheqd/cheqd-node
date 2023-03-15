@@ -241,6 +241,72 @@ class Installer():
         return os.path.join(os.path.realpath(os.path.curdir), DEFAULT_BINARY_NAME)
 
     @property
+    def cheqd_home_dir(self):
+        # Root directory for cheqd-noded
+        # Default: /home/cheqd
+        return self.interviewer.home_dir
+
+    @property
+    def cheqd_backup_dir(self):
+        # Root directory for cheqd-noded
+        # Default: /home/cheqd/backup
+        return os.path.join(self.cheqd_home_dir, "backup")
+
+    @property
+    def cheqd_root_dir(self):
+        # Root directory for cheqd-noded
+        # Default: /home/cheqd/.cheqdnode
+        return os.path.join(self.cheqd_home_dir, ".cheqdnode")
+
+    @property
+    def cheqd_config_dir(self):
+        # cheqd-noded config directory
+        # Default: /home/cheqd/.cheqdnode/config
+        return os.path.join(self.cheqd_root_dir, "config")
+
+    @property
+    def cheqd_data_dir(self):
+        # cheqd-noded data directory
+        # Default: /home/cheqd/.cheqdnode/data
+        return os.path.join(self.cheqd_root_dir, "data")
+
+    @property
+    def cheqd_log_dir(self):
+        # cheqd-noded log directory
+        # Default: /home/cheqd/.cheqdnode/log
+        return os.path.join(self.cheqd_root_dir, "log")
+
+    @property
+    def cosmovisor_root_dir(self):
+        # cosmovisor root directory
+        # Default: /home/cheqd/.cheqdnode/cosmovisor
+        return os.path.join(self.cheqd_root_dir, "cosmovisor")
+
+    @property
+    def cosmovisor_cheqd_bin_path(self):
+        # cheqd-noded binary path if installed with cosmovisor
+        # Default: /home/cheqd/.cheqdnode/cosmovisor/current/bin/cheqd-noded
+        return os.path.join(self.cosmovisor_root_dir, f"current/bin/{DEFAULT_BINARY_NAME}")
+
+    @property
+    def cosmovisor_download_url(self):
+        # Compute the download URL for cosmovisor binary based on the OS architecture and version number
+        try:
+            os_arch = platform.machine()
+            if os_arch == 'x86_64':
+                os_arch = 'amd64'
+            else:
+                os_arch = 'arm64'
+            _url = COSMOVISOR_BINARY_URL.format(DEFAULT_LATEST_COSMOVISOR_VERSION, DEFAULT_LATEST_COSMOVISOR_VERSION, os_arch)
+            if is_valid_url(_url):
+                logging.debug(f"Cosmovisor download URL: {_url}")
+                return _url
+            else:
+                logging.exception(f"Cosmovisor download URL is not valid: {_url}")
+        except Exception as e:
+            logging.exception(f"Failed to compute Cosmovisor download URL. Reason: {e}")
+
+    @property
     def cosmovisor_service_cfg(self):
         # Modify cheqd-cosmovisor.service template file to replace values for environment variables
         # The template file is fetched from the GitHub repo
@@ -339,72 +405,6 @@ class Installer():
                 logging.exception(f"URL is not valid: {LOGROTATE_TEMPLATE}")
         except Exception as e:
             logging.exception(f"Failed to set up logrotate from template. Reason: {e}")
-
-    @property
-    def cheqd_home_dir(self):
-        # Root directory for cheqd-noded
-        # Default: /home/cheqd
-        return self.interviewer.home_dir
-
-    @property
-    def cheqd_backup_dir(self):
-        # Root directory for cheqd-noded
-        # Default: /home/cheqd/backup
-        return os.path.join(self.cheqd_home_dir, "backup")
-
-    @property
-    def cheqd_root_dir(self):
-        # Root directory for cheqd-noded
-        # Default: /home/cheqd/.cheqdnode
-        return os.path.join(self.cheqd_home_dir, ".cheqdnode")
-
-    @property
-    def cheqd_config_dir(self):
-        # cheqd-noded config directory
-        # Default: /home/cheqd/.cheqdnode/config
-        return os.path.join(self.cheqd_root_dir, "config")
-
-    @property
-    def cheqd_data_dir(self):
-        # cheqd-noded data directory
-        # Default: /home/cheqd/.cheqdnode/data
-        return os.path.join(self.cheqd_root_dir, "data")
-
-    @property
-    def cheqd_log_dir(self):
-        # cheqd-noded log directory
-        # Default: /home/cheqd/.cheqdnode/log
-        return os.path.join(self.cheqd_root_dir, "log")
-
-    @property
-    def cosmovisor_root_dir(self):
-        # cosmovisor root directory
-        # Default: /home/cheqd/.cheqdnode/cosmovisor
-        return os.path.join(self.cheqd_root_dir, "cosmovisor")
-
-    @property
-    def cosmovisor_cheqd_bin_path(self):
-        # cheqd-noded binary path if installed with cosmovisor
-        # Default: /home/cheqd/.cheqdnode/cosmovisor/current/bin/cheqd-noded
-        return os.path.join(self.cosmovisor_root_dir, f"current/bin/{DEFAULT_BINARY_NAME}")
-
-    @property
-    def cosmovisor_download_url(self):
-        # Compute the download URL for cosmovisor binary based on the OS architecture and version number
-        try:
-            os_arch = platform.machine()
-            if os_arch == 'x86_64':
-                os_arch = 'amd64'
-            else:
-                os_arch = 'arm64'
-            cosmovisor_download_url = COSMOVISOR_BINARY_URL.format(DEFAULT_LATEST_COSMOVISOR_VERSION, DEFAULT_LATEST_COSMOVISOR_VERSION, os_arch)
-            if is_valid_url(cosmovisor_download_url):
-                logging.debug(f"Cosmovisor download URL: {cosmovisor_download_url}")
-                return cosmovisor_download_url
-            else:
-                logging.exception(f"Cosmovisor download URL is not valid: {cosmovisor_download_url}")
-        except Exception as e:
-            logging.exception(f"Failed to compute Cosmovisor download URL. Reason: {e}")
 
     @post_process
     def exec(self, cmd, use_stdout=True, suppress_err=False):
@@ -787,11 +787,11 @@ class Installer():
         # Also remove the downloaded archive file, if applicable
         try:
             logging.info("Downloading Cosmovisor binary...")
-            cosmovisor_download_url = self.cosmovisor_download_url()
-            fname = os.path.basename(cosmovisor_download_url)
+            binary_url = self.cosmovisor_download_url
+            fname = os.path.basename(binary_url)
 
             # Download Cosmovisor binary from GitHub
-            with request.urlopen(cosmovisor_download_url) as response, open(fname, "wb") as file:
+            with request.urlopen(binary_url) as response, open(fname, "wb") as file:
                 file.write(response.read())
 
             # Check tar archive exists before extracting
@@ -2040,7 +2040,7 @@ class Interviewer:
     # Ask for node's external IP address or DNS name
     def ask_for_external_address(self):
         try:
-            logging.info(f"External address is the publicly accessible IP address or DNS name of your cheqd-node. This is used to advertise your node's P2P address to other nodes in the network.\nIf you are running your node behind a NAT, you should set this to your public IP address or DNS name\nIf you are running your node on a public IP address, you can leave this blank to automatically fetch your IP address via DNS resolver lookup. This sends a `dig` request to whoami.cloudflare.com\n")
+            logging.info(f"External address is the publicly accessible IP address or DNS name of your cheqd-node.\nThis is used to advertise your node's P2P address to other nodes in the network.\n- If you are running your node behind a NAT, you should set this to your public IP address or DNS name\n- If you are running your node on a public IP address, you can leave this blank to automatically fetch your IP address via DNS resolver lookup. This sends a `dig` request to whoami.cloudflare.com\n")
             
             answer = self.ask(
                 f"What is the externally-reachable IP address or DNS name for your cheqd-node? [default: Fetch automatically via DNS resolver lookup]: {os.linesep}")
@@ -2346,12 +2346,12 @@ if __name__ == '__main__':
     try:
         installer = Installer(interviewer)
         if installer.install():
-            logging.info(f"Installation of cheqd-noded {interviewer.version} completed successfully!\n")
+            logging.info(f"Installation of cheqd-noded {self.version} completed successfully!\n")
             logging.info(f"Please review the configuration files manually and use systemctl to start the node.\n")
             logging.info(f"Documentation: https://docs.cheqd.io/node\n")
             sys.exit(0)
         else:
-            logging.error(f"Installation of cheqd-noded {interviewer.version} failed. Exiting...")
+            logging.error(f"Installation of cheqd-noded {self.version} failed. Exiting...")
             logging.info(f"Documentation: https://docs.cheqd.io/node\n")
             sys.exit(1)
 
