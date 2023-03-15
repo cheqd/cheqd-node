@@ -738,7 +738,7 @@ class Installer():
             # Initialize Cosmovisor if it's not already initialized
             # This is done by checking whether the Cosmovisor root directory exists
             if not os.path.exists(self.cosmovisor_root_dir):
-                self.exec(f"""sudo su -l -c 'cosmovisor init ./{DEFAULT_BINARY_NAME}' {DEFAULT_CHEQD_USER}""")
+                self.exec(f"sudo -u {DEFAULT_CHEQD_USER} -c 'cosmovisor init ./{DEFAULT_BINARY_NAME}'")
             else:
                 logging.info("Cosmovisor directory already exists. Skipping initialisation...")
             
@@ -934,7 +934,7 @@ class Installer():
                 if not os.path.exists(os.path.join(self.cheqd_config_dir, 'priv_validator_key.json')):
                     # Initialize the node
                     logging.info(f"Initialising {self.cheqd_root_dir} directory")
-                    self.exec(f"""sudo su -l -c 'cheqd-noded init {self.interviewer.moniker}' {DEFAULT_CHEQD_USER}""")
+                    self.exec(f"""sudo -u {DEFAULT_CHEQD_USER} -c 'cheqd-noded init {self.interviewer.moniker}'""")
                 else:
                     logging.debug(f"Validator key already exists in {self.cheqd_config_dir}. Skipping cheqd-noded init...")
                 
@@ -1332,9 +1332,9 @@ class Installer():
                 # Bash command is used since the Python libraries for lz4 are not installed out-of-the-box
                 # Showing a progress bar or an estimate of time remaining is also not easy-to-achieve
                 # "pv" is used to show a progress bar while extracting
-                self.exec(f"sudo su -l -c 'pv {file_path} \
+                self.exec(f"sudo -u {DEFAULT_CHEQD_USER} -c 'pv {file_path} \
                     | tar --use-compress-program=lz4 -xf - -C {self.cheqd_root_dir} \
-                    --exclude priv_validator_state.json' {DEFAULT_CHEQD_USER}")
+                    --exclude priv_validator_state.json'")
 
                 # Delete snapshot archive file
                 logging.info(f"Snapshot extraction was successful. Deleting snapshot archive.")
@@ -1984,7 +1984,7 @@ class Interviewer:
     def ask_for_cosmovisor_bump(self):
         try:
             answer = self.ask(
-                f"Do you want to bump your Cosmovisor to {DEFAULT_LATEST_COSMOVISOR_VERSION} ? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
+                f"Do you want to bump your Cosmovisor to {DEFAULT_LATEST_COSMOVISOR_VERSION}? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
             if answer.lower().startswith("y"):
                 self.is_cosmovisor_bump_needed = True
             elif answer.lower().startswith("n"):
