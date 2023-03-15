@@ -106,15 +106,13 @@ CHEQD_NODED_P2P_MAX_PACKET_MSG_PAYLOAD_SIZE = 10240
 
 # Set logging configuration
 if sys.flags.dev_mode:
-    logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
-                    datefmt='%d-%b-%Y %H:%M:%S', 
-                    level=logging.DEBUG)
+    # If PYTHONDEVMODE = 1, show more detailed logging messages
+    logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
     logging.raiseExceptions = True
     logging.propagate = True
 else:
-    logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
-                        datefmt='%d-%b-%Y %H:%M:%S', 
-                        level=logging.INFO)
+    # Else show logging messages INFO level and above
+    logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
     logging.raiseExceptions = True
     logging.propagate = True
 
@@ -2020,13 +2018,11 @@ class Interviewer:
     # Ask user for node moniker
     def ask_for_moniker(self):
         try:
-            logging.info(f"Moniker is a human-readable name for your cheqd-node.\n")
-            logging.info(f"This is NOT the same as your validator name, and is only used to uniquely identify your node for Tendermint P2P address book.\n")
-            logging.info(f"It can be edited later in your ~/.cheqdnode/config/config.toml file.\n")
-            answer = self.ask(
+            logging.info(f"Moniker is a human-readable name for your cheqd-node.\nThis is NOT the same as your validator name, and is only used to uniquely identify your node for Tendermint P2P address book.\nIt can be edited later in your ~/.cheqdnode/config/config.toml file.\n")
+            self.moniker = self.ask(
                 f"Provide a moniker for your cheqd-node", default=CHEQD_NODED_MONIKER)
-            if answer is not None and isinstance(answer, str):
-                self.moniker = answer
+            if self.moniker is not None and isinstance(self.moniker, str):
+                logging.debug(f"Moniker set to {self.moniker}")
             else:
                 logging.error(f"Invalid moniker provided during cheqd-noded setup.")
                 self.ask_for_moniker()
@@ -2036,27 +2032,34 @@ class Interviewer:
     # Ask for node's external IP address or DNS name
     def ask_for_external_address(self):
         try:
-            logging.info(f"External address is the publicly accessible IP address or DNS name of your cheqd-node. This is used to advertise your node's P2P address to other nodes in the network.\n")
-            logging.info(f"If you are running your node behind a NAT, you should set this to your public IP address or DNS name\n")
-            logging.info(f"If you are running your node on a public IP address, you can leave this blank to automatically fetch your IP address via DNS resolver lookup. This sends a `dig` request to whoami.cloudflare.com\n\n")
+            logging.info(f"External address is the publicly accessible IP address or DNS name of your cheqd-node. This is used to advertise your node's P2P address to other nodes in the network.\nIf you are running your node behind a NAT, you should set this to your public IP address or DNS name\nIf you are running your node on a public IP address, you can leave this blank to automatically fetch your IP address via DNS resolver lookup. This sends a `dig` request to whoami.cloudflare.com\n")
+            
             answer = self.ask(
                 f"What is the externally-reachable IP address or DNS name for your cheqd-node? [default: Fetch automatically via DNS resolver lookup]: {os.linesep}")
-            if self.check_ip_address(answer) or self.check_dns_name(answer):
-                self.external_address = answer
+            
+            # If user provided an answer, check if it's a valid IP address or DNS name
+            if answer:
+                if self.check_ip_address(answer) or self.check_dns_name(answer):
+                    self.external_address = answer
+                else:
+                    logging.error(f"Invalid IP address or DNS name provided. Please enter a valid IP address or DNS name.")
+                    self.ask_for_external_address()
+            
+            # If user didn't provide an answer, fetch IP address via DNS resolver lookup
             else:
                 self.external_address = str(self.exec(
                     "dig +short txt ch whoami.cloudflare @1.1.1.1").stdout).strip("""b'"\\n""")
+
+            logging.debug(f"External address set to {self.external_address}")
         except Exception as e:
             logging.exception(f"Failed to set external address. Reason: {e}")
 
     # Ask for node's P2P port
     def ask_for_p2p_port(self):
         try:
-            answer = int(self.ask(f"Specify your node's P2P port", default=DEFAULT_P2P_PORT))
-            if answer is isinstance(answer, int):
-                self.p2p_port = answer
-            elif answer is None:
-                self.p2p_port = DEFAULT_P2P_PORT
+            self.p2p_port = int(self.ask(f"Specify your node's P2P port", default=DEFAULT_P2P_PORT))
+            if isinstance(self.p2p_port, int):
+                logging.debug(f"P2P port set to {self.p2p_port}")
             else:
                 logging.error(f"Invalid P2P port provided. Please enter a valid port number.")
                 self.ask_for_p2p_port()
@@ -2066,11 +2069,9 @@ class Interviewer:
     # Ask for node's RPC port
     def ask_for_rpc_port(self):
         try:
-            answer = int(self.ask(f"Specify your node's RPC port", default=DEFAULT_RPC_PORT))
-            if answer is isinstance(answer, int):
-                self.rpc_port = answer
-            elif answer is None:
-                self.rpc_port = DEFAULT_RPC_PORT
+            self.rpc_port = int(self.ask(f"Specify your node's RPC port", default=DEFAULT_RPC_PORT))
+            if isinstance(self.rpc_port, int):
+                logging.debug(f"RPC port set to {self.rpc_port}")
             else:
                 logging.error(f"Invalid RPC port provided. Please enter a valid port number.")
                 self.ask_for_rpc_port()
@@ -2080,13 +2081,17 @@ class Interviewer:
     # (Optional) Ask for node's persistent peers
     def ask_for_persistent_peers(self):
         try:
-            logging.info(f"Persistent peers are nodes that you want to always keep connected to. Values for persistent peers should be specified in format: <nodeID>@<IP>:<port>,<nodeID>@<IP>:<port>... \n")
+            logging.info(f"Persistent peers are nodes that you want to always keep connected to. Values for persistent peers should be specified in format: <nodeID>@<IP>:<port>,<nodeID>@<IP>:<port>...\n")
+            
             answer = self.ask(
                 f"Specify persistent peers [default: none]: {os.linesep}")
+            
             if answer is not None:
                 self.persistent_peers = answer
             else:
                 self.persistent_peers = ""
+            
+            logging.debug(f"Persistent peers set to {self.persistent_peers}")
         except Exception as e:
             logging.exception(f"Failed to set persistent peers. Reason: {e}")
 
@@ -2094,14 +2099,10 @@ class Interviewer:
     def ask_for_gas_price(self):
         try:
             logging.info(
-                f"Minimum gas prices is the price you are willing to accept as a validator to process a transaction.\n")
-            logging.info(
-                f"Values should be entered in format <number>ncheq (e.g., 50ncheq)\n")
-            answer = self.ask(f"Specify minimum gas price", default=CHEQD_NODED_MINIMUM_GAS_PRICES)
-            if answer.endswith("ncheq"):
-                self.gas_price = answer
-            elif answer is None:
-                self.gas_price = CHEQD_NODED_MINIMUM_GAS_PRICES
+                f"Minimum gas prices is the price you are willing to accept as a validator to process a transaction.\nValues should be entered in format <number>ncheq (e.g., 50ncheq)\n")
+            self.gas_price = self.ask(f"Specify minimum gas price", default=CHEQD_NODED_MINIMUM_GAS_PRICES)
+            if self.gas_price.endswith("ncheq"):
+                logging.debug(f"Minimum gas price set to {self.gas_price}")
             else:
                 logging.error(f"Invalid minimum gas price provided. Valid format is <number>ncheq.")
                 self.ask_for_gas_price()
@@ -2111,12 +2112,10 @@ class Interviewer:
     # (Optional) Ask for node's log level
     def ask_for_log_level(self):
         try:
-            answer = self.ask(
+            self.log_level = self.ask(
                 f"Specify log level (trace|debug|info|warn|error|fatal|panic)", default=CHEQD_NODED_LOG_LEVEL)
-            if answer in ["trace", "debug", "info", "warn", "error", "fatal", "panic"]:
-                self.log_level = answer
-            elif answer is None:
-                self.log_level = CHEQD_NODED_LOG_LEVEL
+            if self.log_level in ["trace", "debug", "info", "warn", "error", "fatal", "panic"]:
+                logging.debug(f"Log level set to {self.log_level}")
             else:
                 logging.error(f"Invalid log level provided. Please enter a valid log level.")
                 self.ask_for_log_level()
@@ -2126,11 +2125,9 @@ class Interviewer:
     # (Optional) Ask for node's log format
     def ask_for_log_format(self):
         try:
-            answer = self.ask(f"Specify log format (json|plain)", default=CHEQD_NODED_LOG_FORMAT)
-            if answer in ["json", "plain"]:
-                self.log_format = answer
-            elif answer is None:
-                self.log_format = CHEQD_NODED_LOG_FORMAT
+            self.log_format = self.ask(f"Specify log format (json|plain)", default=CHEQD_NODED_LOG_FORMAT)
+            if self.log_format in ["json", "plain"]:
+                logging.debug(f"Log format set to {self.log_format}")
             else:
                 logging.error(f"Invalid log format provided. Please enter a valid log format.")
                 self.ask_for_log_format()
@@ -2141,8 +2138,7 @@ class Interviewer:
     def ask_for_upgrade(self):
         try:
             logging.warning(f"Existing cheqd-node configuration folder detected.\n")
-            answer = self.ask(
-                f"Do you want to upgrade an existing cheqd-node installation? (yes/no)", default="no")
+            answer = self.ask(f"Do you want to upgrade an existing cheqd-node installation? (yes/no)", default="no")
             if answer.lower().startswith("y"):
                 self.is_upgrade = True
             elif answer.lower().startswith("n"):
@@ -2156,10 +2152,7 @@ class Interviewer:
     # If an install from scratch is requested, warn the user and check if they want to proceed
     def ask_for_install_from_scratch(self):
         try:
-            logging.warning(
-                f"Doing a fresh installation of cheqd-node will remove ALL existing configuration and data.\n")
-            logging.warning(
-                f"Please ensure you have a backup of your existing configuration and data before proceeding!\n")
+            logging.warning(f"Doing a fresh installation of cheqd-node will remove ALL existing configuration and data.\nPlease ensure you have a backup of your existing configuration and data before proceeding!\n")
             answer = self.ask(
                 f"Do you want to do fresh installation of cheqd-node? (yes/no)", default="no")
             if answer.lower().startswith("y"):
@@ -2220,12 +2213,7 @@ class Interviewer:
     # This question is asked last because it is the most time consuming.
     def ask_for_init_from_snapshot(self):
         try:
-            logging.info(
-                f"Downloading a snapshot allows you to get a copy of the blockchain data to speed up node bootstrapping\n")
-            logging.info(
-                f"Snapshots can be 100 GBs so downloading can take a really long time!\n")
-            logging.warning(
-                f"Existing chain data folder will be replaced! Usually safe to use this option when doing a fresh installation.\n")
+            logging.info(f"Downloading a snapshot allows you to get a copy of the blockchain data to speed up node bootstrapping\nSnapshots can be 100 GBs so downloading can take a really long time!\nExisting chain data folder will be replaced! Usually safe to use this option when doing a fresh installation.\n")
             answer = self.ask(
                 f"Do you want to download a snapshot of the existing chain to speed up node synchronization? (yes/no)", default="yes")
             if answer.lower().startswith("y"):
