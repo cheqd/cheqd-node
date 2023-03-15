@@ -20,7 +20,7 @@ import subprocess
 import sys
 import tarfile
 import urllib.request as request
-from urllib.parse import urlsplit, urlunsplit
+
 
 ###############################################################
 ###     				Installer defaults    				###
@@ -236,11 +236,6 @@ class Installer():
         self._snapshot_url = value
 
     @property
-    def binary_path(self):
-        # Get the path to the cheqd-node binary on the local system
-        return os.path.join(os.path.realpath(os.path.curdir), DEFAULT_BINARY_NAME)
-
-    @property
     def cheqd_home_dir(self):
         # Root directory for cheqd-noded
         # Default: /home/cheqd
@@ -283,7 +278,32 @@ class Installer():
         return os.path.join(self.cheqd_root_dir, "cosmovisor")
 
     @property
-    def cosmovisor_cheqd_bin_path(self):
+    def cosmovisor_binary_path(self):
+        # Path where Cosmovisor binary will be installed
+        # Default: /usr/bin/cosmovisor
+        return os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)
+
+    @property
+    def temporary_cosmovisor_binary_path(self):
+        # Temporary path for Cosmovisor binary just after it's downloaded
+        # This is NOT the final install path
+        return os.path.join(os.path.realpath(os.path.curdir), DEFAULT_COSMOVISOR_BINARY_NAME)
+
+    @property
+    def standalone_node_binary_path(self):
+        # Path where cheqd-noded binary will be installed
+        # Default: /usr/bin/cheqd-noded
+        # When installing with Cosmovisor, this will be a symlink to Cosmovisor directory
+        return os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)
+
+    @property
+    def temporary_node_binary_path(self):
+        # Temporary path for cheqd-node binary just after it's downloaded
+        # This is NOT the final install path
+        return os.path.join(os.path.realpath(os.path.curdir), DEFAULT_BINARY_NAME)
+
+    @property
+    def cosmovisor_current_bin_path(self):
         # cheqd-noded binary path if installed with cosmovisor
         # Default: /home/cheqd/.cheqdnode/cosmovisor/current/bin/cheqd-noded
         return os.path.join(self.cosmovisor_root_dir, f"current/bin/{DEFAULT_BINARY_NAME}")
@@ -721,42 +741,54 @@ class Installer():
                 logging.error("Failed to download Cosmovisor")
                 return False
 
-            # Set binary paths
-            cosmosvisor_binary_path = os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME)
-            cheqd_binary_path = os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)
-
             # Move Cosmovisor binary to installation directory if it doesn't exist or bump needed
             # This is executed is there is no Cosmovisor binary in the installation directory
             # or if the user has requested a bump for Cosmovisor
             # shutil.move() will overwrite the file if it already exists
-            logging.info(f"Moving Cosmovisor binary to {cosmosvisor_binary_path}")
-            shutil.move(DEFAULT_COSMOVISOR_BINARY_NAME, DEFAULT_INSTALL_PATH)
+            logging.info(f"Moving Cosmovisor {self.temporary_cosmovisor_binary_path} to {self.cosmovisor_binary_path}")
+            shutil.move(self.temporary_cosmovisor_binary_path, self.cosmovisor_binary_path)
 
             # Set ownership of Cosmovisor binary to root:root
-            shutil.chown(cosmosvisor_binary_path, "root", "root")
+            shutil.chown(self.cosmovisor_binary_path, "root", "root")
+
+            # Move cheqd-noded binary to /usr/bin
+            logging.info(f"Copying cheqd-noded binary from {self.temporary_node_binary_path} to {self.standalone_node_binary_path}")
+            shutil.copy(self.temporary_node_binary_path, self.standalone_node_binary_path)
+
+            # Set ownership of cheqd-noded binary to root:root
+            shutil.chown(self.standalone_node_binary_path, "root", "root")
 
             # Initialize Cosmovisor if it's not already initialized
             # This is done by checking whether the Cosmovisor root directory exists
             if not os.path.exists(self.cosmovisor_root_dir):
-                self.exec(f"sudo -u {DEFAULT_CHEQD_USER} -c 'cosmovisor init ./{DEFAULT_BINARY_NAME}'")
+                self.exec(f"sudo -u {DEFAULT_CHEQD_HOME_DIR} bash -c 'cosmovisor init {self.standalone_node_binary_path}'")
+
+                # Set ownership of cheqd root directory to cheqd:cheqd
+                # This is necessary because the command above may site ownership of the directory to root:root
+                shutil.chown(self.cheqd_root_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
             else:
                 logging.info("Cosmovisor directory already exists. Skipping initialisation...")
             
             # Remove cheqd-noded binary from /usr/bin if it's not a symlink
-            if not os.path.islink(cheqd_binary_path):
+            if not os.path.islink(self.standalone_node_binary_path):
                 logging.warn(f"Removing {DEFAULT_BINARY_NAME} from {DEFAULT_INSTALL_PATH} because it is not a symlink")
-                os.remove(cheqd_binary_path)
+                os.remove(self.standalone_node_binary_path)
 
                 # Move cheqd-noded binary to Cosmovisor bin path
                 # shutil.move() will overwrite the file if it already exists
-                logging.info(f"Moving cheqd-noded binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
-                shutil.move(DEFAULT_BINARY_NAME, self.cosmovisor_cheqd_bin_path)
+                logging.info(f"Moving cheqd-noded binary from {self.temporary_node_binary_path} to {self.cosmovisor_current_bin_path}")
+                shutil.move(self.temporary_node_binary_path, self.cosmovisor_current_bin_path)
+
+                # Set ownership of cheqd-noded binary to cheqd:cheqd
+                # This is ONLY done when the binary is moved to Cosmovisor bin path
+                shutil.chown(self.cosmovisor_current_bin_path, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
 
                 # Create symlink to cheqd-noded binary in Cosmovisor bin path
-                logging.info(f"Creating symlink to {self.cosmovisor_cheqd_bin_path}")
-                os.symlink(self.cosmovisor_cheqd_bin_path, cheqd_binary_path)
+                # Target comes first, then the location of the symlink
+                logging.info(f"Creating symlink to {self.cosmovisor_current_bin_path}")
+                os.symlink(self.cosmovisor_current_bin_path, self.standalone_node_binary_path)
             else:
-                logging.info(f"{cheqd_binary_path} is already symlink. Skipping removal...")
+                logging.info(f"{self.cosmovisor_current_bin_path} is already symlink. Skipping removal...")
 
             # Steps to execute only if this is an upgrade
             # The upgrade-info.json file is required for Cosmovisor to track upgrades
@@ -823,25 +855,22 @@ class Installer():
         # cheqd-noded binary is installed in /usr/bin under this scenario
         try:
             logging.info("Setting up standalone cheqd-noded binary...")
-
-            # Set binary path
-            cheqd_binary_path = os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME)
             
             # Remove symlink for cheqd-noded if it exists
-            if os.path.islink(cheqd_binary_path):
-                logging.warn(f"Removing symlink for {DEFAULT_BINARY_NAME} from {DEFAULT_INSTALL_PATH}")
-                os.remove(cheqd_binary_path)
+            if os.path.islink(self.standalone_node_binary_path):
+                logging.warn(f"Removing symlink {self.standalone_node_binary_path}")
+                os.remove(self.standalone_node_binary_path)
             else:
-                logging.info(f"{cheqd_binary_path} is not a symlink. Skipping removal...")
+                logging.info(f"{self.standalone_node_binary_path} is not a symlink. Skipping removal...")
 
             # Move cheqd-noded binary to /usr/bin
             # shutil.move() will overwrite the file if it already exists
-            logging.info(f"Moving cheqd-noded binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}")
-            shutil.move(DEFAULT_BINARY_NAME, DEFAULT_INSTALL_PATH)
+            logging.info(f"Moving cheqd-noded binary from {self.temporary_node_binary_path} to {self.standalone_node_binary_path}")
+            shutil.move(self.temporary_node_binary_path, self.standalone_node_binary_path)
             
             # Set ownership of cheqd-noded binary to root:root
-            logging.info(f"Changing ownership of {cheqd_binary_path} to root:root")
-            shutil.chown(cheqd_binary_path, "root", "root")
+            logging.info(f"Changing ownership of {self.standalone_node_binary_path} to root:root")
+            shutil.chown(self.standalone_node_binary_path, "root", "root")
 
             # Remove Cosmovisor directory if it exists
             if os.path.exists(self.cosmovisor_root_dir):
