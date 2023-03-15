@@ -930,7 +930,7 @@ class Installer():
                 # Modify the system's environment variables
                 # This will set the variable permanently for all users
                 with open("/etc/environment", "a") as env_file:
-                    env_file.write(f"export {env_var_name}={env_var_value}\n")
+                    env_file.write(f'export {env_var_name}="{env_var_value}"\n')
                 
                 # Reload the environment variables
                 self.exec("source /etc/environment")
