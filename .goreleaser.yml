@@ -115,6 +115,6 @@ release:
   
   draft: false
   prerelease: "true"
-  mode: append
+  mode: keep-existing
   header: |
     # Release Notes for {{.ProjectName}} v{{.Version}}
