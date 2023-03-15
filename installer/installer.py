@@ -1845,7 +1845,7 @@ class Interviewer:
     # Check if cheqd-noded is installed
     def is_node_installed(self) -> bool:
         try:
-            if shutil.which("cheqd-noded") is not None:
+            if shutil.which("cheqd-noded") is not None and os.path.exists(f"{self.home_dir}/.cheqdnode/config/genesis.json"):
                 return True
             else:
                 return False
