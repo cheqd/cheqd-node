@@ -897,7 +897,7 @@ class Installer():
         try:
             logging.debug(f"Checking whether {env_var_name} is set")
 
-            if not os.environ(env_var_name) or overwrite:
+            if os.environ(env_var_name) is None or overwrite:
                 logging.debug(f"Setting {env_var_name} to {env_var_value}")
                 
                 # Set the environment variable for the current session
@@ -2040,7 +2040,7 @@ class Interviewer:
     # Ask for node's external IP address or DNS name
     def ask_for_external_address(self):
         try:
-            logging.info(f"External address is the publicly accessible IP address or DNS name of your cheqd-node.\nThis is used to advertise your node's P2P address to other nodes in the network.\n- If you are running your node behind a NAT, you should set this to your public IP address or DNS name\n- If you are running your node on a public IP address, you can leave this blank to automatically fetch your IP address via DNS resolver lookup. This sends a `dig` request to whoami.cloudflare.com\n")
+            logging.info(f"External address is the publicly accessible IP address or DNS name of your cheqd-node.\nThis is used to advertise your node's P2P address to other nodes in the network.\n- If you are running your node behind a NAT, you should set this to your public IP address or DNS name\n- If you are running your node on a public IP address, you can leave this blank to automatically fetch your IP address via DNS resolver lookup.\n- Automatic fetching sends a `dig` request to whoami.cloudflare.com\n")
             
             answer = self.ask(
                 f"What is the externally-reachable IP address or DNS name for your cheqd-node? [default: Fetch automatically via DNS resolver lookup]: {os.linesep}")
@@ -2346,12 +2346,12 @@ if __name__ == '__main__':
     try:
         installer = Installer(interviewer)
         if installer.install():
-            logging.info(f"Installation of cheqd-noded {self.version} completed successfully!\n")
+            logging.info(f"Installation of cheqd-noded {installer.version} completed successfully!\n")
             logging.info(f"Please review the configuration files manually and use systemctl to start the node.\n")
             logging.info(f"Documentation: https://docs.cheqd.io/node\n")
             sys.exit(0)
         else:
-            logging.error(f"Installation of cheqd-noded {self.version} failed. Exiting...")
+            logging.error(f"Installation of cheqd-noded {installer.version} failed. Exiting...")
             logging.info(f"Documentation: https://docs.cheqd.io/node\n")
             sys.exit(1)
 
