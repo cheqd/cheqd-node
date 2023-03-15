@@ -913,6 +913,7 @@ class Installer():
                 logging.debug(f"Environment variable {env_var_name} already set or overwrite is disabled")
         except Exception as e:
             logging.exception(f"Failed to set environment variable {env_var_name}. Reason: {e}")
+            raise
 
     def configure_node_settings(self) -> bool:
         # Configure cheqd-noded settings in app.toml and config.toml
