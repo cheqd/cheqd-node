@@ -470,15 +470,7 @@ class Installer():
             else:
                 logging.error("Failed to download and extract binary")
                 return False
-            
-            # Carry out pre-installation steps
-            # Mostly relevant if installing from scratch or re-installing
-            if self.pre_install():
-                logging.info("Pre-installation steps completed successfully")
-            else:
-                logging.error("Failed to complete pre-installation steps")
-                return False
-            
+
             # Create cheqd user if it doesn't exist
             if self.prepare_cheqd_user():
                 logging.info("User/group cheqd setup successfully")
@@ -491,6 +483,14 @@ class Installer():
                 logging.info("Directory tree setup successfully")
             else:
                 logging.error("Failed to setup directory tree")
+                return False
+
+            # Carry out pre-installation steps
+            # Mostly relevant if installing from scratch or re-installing
+            if self.pre_install():
+                logging.info("Pre-installation steps completed successfully")
+            else:
+                logging.error("Failed to complete pre-installation steps")
                 return False
 
             # Setup Cosmovisor binary if needed
@@ -629,6 +629,9 @@ class Installer():
                     os.path.join(self.cheqd_backup_dir, "upgrade-info.json"))
             else:
                 logging.debug("No upgrade-info.json file found to backup. Skipping...")
+
+            # Change ownership of backup directory to cheqd user
+            shutil.chown(self.cheqd_backup_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
 
             if self.interviewer.is_from_scratch or self.interviewer.is_setup_needed:
                 # Remove cheqd-node data and binaries
@@ -934,7 +937,7 @@ class Installer():
                 # Modify the system's environment variables
                 # This will set the variable permanently for all users
                 with open("/etc/environment", "a") as env_file:
-                    env_file.write(f"\n{env_var_name}={env_var_value}")
+                    env_file.write(f"export {env_var_name}={env_var_value}")
                 
                 # Reload the environment variables
                 os.system("source /etc/environment")
