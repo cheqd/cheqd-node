@@ -20,6 +20,7 @@ import subprocess
 import sys
 import tarfile
 import urllib.request as request
+from urllib.parse import urlsplit, urlunsplit
 
 ###############################################################
 ###     				Installer defaults    				###
@@ -1280,7 +1281,7 @@ class Installer():
             url_parts[-1] = "md5sum.txt"
 
             # Construct checksum file URL
-            checksum_url = os.path.join(*url_parts)
+            checksum_url = os.path.join("", *url_parts)
 
             # Fetch published checksum from checksum URL if it exists
             if is_valid_url(checksum_url):
@@ -1439,7 +1440,7 @@ class Installer():
                 logging.error("Failed to reload systemd config and reset failed services")
                 return False    
         except Exception as e:
-            logging.exception(f"Error disabling {service_name}: Reason: {e}")
+            logging.exception(f"Error daemon reloading: Reason: {e}")
     
     def disable_systemd_service(self, service_name) -> bool:
         # Disable a given systemd service
