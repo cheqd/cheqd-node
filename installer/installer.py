@@ -1912,6 +1912,7 @@ class Interviewer:
             # Check that user selected a valid release number
             if release_num >= 1 and release_num <= LAST_N_RELEASES and isinstance(release_num, int):
                 self.release = all_releases[release_num - 1]
+                logging.debug(f"Release version selection: {self.release.version}")
             else:
                 logging.error(f"Invalid release number picked from list of releases: {release_num}")
                 logging.error(f"Please choose a number between 1 and {LAST_N_RELEASES}\n")
@@ -1924,6 +1925,7 @@ class Interviewer:
         try:
             self.home_dir = self.ask(
                 f"Set path for cheqd user's home directory", default=DEFAULT_CHEQD_HOME_DIR)
+            logging.debug(f"Setting home directory to {self.home_dir}")
         except Exception as e:
             logging.exception(f"Failed to set cheqd user's home directory. Reason: {e}")
 
@@ -1956,6 +1958,9 @@ class Interviewer:
             else:
                 logging.error(f"Invalid network selected during installation. Please choose either 1 or 2.\n")
                 self.ask_for_chain()
+            
+            # Set debug message
+            logging.debug(f"Setting network to join as {self.chain}")
         except Exception as e:
             logging.exception(f"Failed to set network/chain to join. Reason: {e}")
 
