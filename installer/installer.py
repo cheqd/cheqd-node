@@ -597,13 +597,23 @@ class Installer():
             os.makedirs(self.cheqd_backup_dir)
 
             # Make a copy of validator key and state before removing user data
+            # Use shutil.copytree() when copying directories
+            # Use shutil.copy() when copying files instead of shutil.copyfile() since it preserves file metadata
             logging.info("Backing up user's config folder and selected validator secrets from data folder")
+
+            # Backup ~/.cheqdnode/config/ folder
             shutil.copytree(self.cheqd_config_dir, self.cheqd_backup_dir)
-            shutil.copyfile(os.path.join(self.cheqd_data_dir, "priv_validator_state.json"), 
+
+            # Backup ~/.cheqdnode/data/priv_validator_key.json
+            # Without this file, a validator node will get jailed!
+            shutil.copy(os.path.join(self.cheqd_data_dir, "priv_validator_state.json"), 
                 os.path.join(self.cheqd_backup_dir, "priv_validator_state.json"))
+            
+            # Backup ~/.cheqdnode/data/upgrade-info.json
+            # This file is required for Cosmovisor to track and understand where upgrade is needed
             if os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
                 shutil.copyfile(os.path.join(self.cheqd_data_dir, "upgrade-info.json"), 
-                    os.path.join(self.cheqd_backup_dir, "priv_validator_state.json"))
+                    os.path.join(self.cheqd_backup_dir, "upgrade-info.json"))
 
             if self.interviewer.is_from_scratch or self.interviewer.is_setup_needed:
                 # Remove cheqd-node data and binaries
@@ -725,6 +735,7 @@ class Installer():
             # Move Cosmovisor binary to installation directory if it doesn't exist or bump needed
             # This is executed is there is no Cosmovisor binary in the installation directory
             # or if the user has requested a bump for Cosmovisor
+            # shutil.move() will overwrite the file if it already exists
             logging.info(f"Moving Cosmovisor binary to {cosmosvisor_binary_path}")
             shutil.move(DEFAULT_COSMOVISOR_BINARY_NAME, DEFAULT_INSTALL_PATH)
 
@@ -744,6 +755,7 @@ class Installer():
                 os.remove(cheqd_binary_path)
 
                 # Move cheqd-noded binary to Cosmovisor bin path
+                # shutil.move() will overwrite the file if it already exists
                 logging.info(f"Moving cheqd-noded binary from {self.binary_path} to {self.cosmovisor_cheqd_bin_path}")
                 shutil.move(DEFAULT_BINARY_NAME, self.cosmovisor_cheqd_bin_path)
 
@@ -754,11 +766,15 @@ class Installer():
                 logging.info(f"{cheqd_binary_path} is already symlink. Skipping removal...")
 
             # Steps to execute only if this is an upgrade
-            # The upgrade-info.json file is required for Cosmovisor to function correctly
-            if self.interviewer.is_upgrade and os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
+            # The upgrade-info.json file is required for Cosmovisor to track upgrades
+            if self.interviewer.is_upgrade \
+                and os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")) \
+                and not os.path.exists(os.path.join(self.cosmovisor_root_dir, "current/upgrade-info.json")):
                 logging.info(f"Copying ~/.cheqdnode/data/upgrade-info.json file to ~/.cheqdnode/cosmovisor/current/")
+
+                # shutil.copy() preserves the file metadata
                 shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
-                    os.path.join(self.cosmovisor_root_dir, "current"))
+                    os.path.join(self.cosmovisor_root_dir, "current/upgrade-info.json"), follow_symlinks=True)
             else:
                 logging.debug("Skipped copying upgrade-info.json file because it doesn't exist")
             
@@ -826,6 +842,7 @@ class Installer():
                 logging.info(f"{cheqd_binary_path} is not a symlink. Skipping removal...")
 
             # Move cheqd-noded binary to /usr/bin
+            # shutil.move() will overwrite the file if it already exists
             logging.info(f"Moving cheqd-noded binary from {self.binary_path} to {DEFAULT_INSTALL_PATH}")
             shutil.move(DEFAULT_BINARY_NAME, DEFAULT_INSTALL_PATH)
             
@@ -1348,8 +1365,8 @@ class Installer():
             # Free up some disk space by deleting contents of the data folder
             # Otherwise, there may not be enough space to download AND extract the snapshot
             # WARNING: Backup the priv_validator_state.json and upgrade-info.json before doing this!
-            # Check that backup of validator keys, state, and upgrade info exists before proceeding
             if os.path.exists(self.cheqd_backup_dir):
+                # Check that backup of validator keys, state, and upgrade info exists before proceeding
                 logging.info(f"Backup directory exists: {self.cheqd_backup_dir}")
 
                 # Remove contents of data directory
@@ -1487,35 +1504,61 @@ class Installer():
         try:
             # Set file path of snapshot archive
             file_path = os.path.join(self.cheqd_root_dir, os.path.basename(self.snapshot_url))
-            # Check if there is enough space to extract snapshot archive
-
-            logging.info(
-                f"Extracting snapshot archive. This may take a while...")
 
             # Extract to cheqd node data directory EXCEPT for validator state
-            self.exec(
-                f"sudo su -c 'pv {file_path} | tar --use-compress-program=lz4 -xf - -C {self.cheqd_root_dir} --exclude priv_validator_state.json' {DEFAULT_CHEQD_USER}")
+            # Snapshot archives are created using lz4 compression since it's more efficient than gzip
+            if os.path.exists(file_path):
+                logging.info(f"Extracting snapshot archive. This may take a while...")
 
-            # Delete snapshot archive file
-            logging.info(
-                f"Snapshot extraction was successful. Deleting snapshot archive.")
-            self.remove_safe(file_path)
-            # Workaround to make this work with Cosmovisor since it expects upgrade-info.json file in cosmovisor/current directory
-            if self.interviewer.is_cosmovisor_needed:
-                if os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
-                    logging.info(
-                        f"Copying upgrade-info.json file to cosmovisor/current/")
+                # Bash command is used since the Python libraries for lz4 are not installed out-of-the-box
+                # Showing a progress bar or an estimate of time remaining is also not easy-to-achieve
+                # "pv" is used to show a progress bar while extracting
+                self.exec(f"sudo su -c 'pv {file_path} \
+                    | tar --use-compress-program=lz4 -xf - -C {self.cheqd_root_dir} \
+                    --exclude priv_validator_state.json' {DEFAULT_CHEQD_USER}")
+
+                # Delete snapshot archive file
+                logging.info(f"Snapshot extraction was successful. Deleting snapshot archive.")
+                self.remove_safe(file_path)
+            else:
+                logging.error(f"Snapshot archive file not found. Could not extract snapshot.")
+                return False
+            
+            # Restore files from backup folder
+            # Use shutil.copy() instead of shutil.copyfile() to preserve file metadata
+            if os.path.exists(self.cheqd_backup_dir):
+                logging.info(f"Restoring files from backup folder.")
+                
+                # Restore priv_validator_state.json
+                logging.info(f"Restoring priv_validator_state.json to {self.cheqd_data_dir}")
+                shutil.copy(os.path.join(self.cheqd_backup_dir, "priv_validator_state.json"),
+                            os.path.join(self.cheqd_data_dir, "priv_validator_state.json"))
+                
+                # Restore upgrade-info.json
+                logging.info(f"Restoring upgrade-info.json to {self.cheqd_data_dir}")
+                shutil.copy(os.path.join(self.cheqd_backup_dir, "upgrade-info.json"),
+                            os.path.join(self.cheqd_data_dir, "upgrade-info.json"))
+                
+                # If Cosmovisor is needed, copy upgrade-info.json to ~/.cheqdnode/cosmovisor/current/ directory
+                # Otherwise, Cosmovisor will throw an error
+                if self.interviewer.is_cosmovisor_needed:
+                    logging.info(f"Restoring upgrade-info.json to {self.cosmovisor_root_dir}/current/")
                     shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
-                                os.path.join(self.cosmovisor_root_dir, "current"))
-                logging.info(f"Changing owner to {DEFAULT_CHEQD_USER} user")
-                shutil.chown(self.cosmovisor_root_dir,
-                             DEFAULT_CHEQD_USER,
-                             DEFAULT_CHEQD_USER)
-            shutil.chown(self.cheqd_data_dir,
-                         DEFAULT_CHEQD_USER,
-                         DEFAULT_CHEQD_USER)
+                                os.path.join(self.cosmovisor_root_dir, "current/upgrade-info.json"))
+
+                    # Change ownership of Cosmovisor directory to cheqd user
+                    shutil.chown(self.cosmovisor_root_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
+            else:
+                logging.warning(f"Backup folder not found. Please check and restore the following folders/files from your own backup:\n~/.cheqdnode/data/priv_validator_state.json, ~/.cheqdnode/data/upgrade-info.json, ~/.cheqdnode/config/")
+
+            # Change ownership of cheqd node data directory to cheqd user
+            shutil.chown(self.cheqd_data_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
+
+            # Return True if snapshot extraction was successful
+            return True
         except Exception as e:
             logging.exception(f"Failed to extract snapshot. Reason: {e}")
+            return False
 
 
 ###############################################################
