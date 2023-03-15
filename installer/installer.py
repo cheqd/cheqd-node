@@ -581,8 +581,7 @@ class Installer():
             self.stop_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME)
 
             # Create backup directory if it doesn't exist
-            # os.makedirs() will not raise an error if the directory already exists
-            os.makedirs(self.cheqd_backup_dir)
+            os.makedirs(self.cheqd_backup_dir, exist_ok=True)
 
             # Make a copy of validator key and state before removing user data
             # Use shutil.copytree() when copying directories
@@ -666,7 +665,7 @@ class Installer():
             # Create root directory for cheqd-noded
             if not os.path.exists(self.cheqd_root_dir):
                 logging.info("Creating main directory for cheqd-noded")
-                os.makedirs(self.cheqd_root_dir)
+                os.makedirs(self.cheqd_root_dir, exist_ok=True)
             else:
                 logging.info(f"Skipping main directory creation because {self.cheqd_root_dir} already exists")
 
@@ -677,7 +676,7 @@ class Installer():
             if not os.path.exists(self.cheqd_log_dir):
                 # Create ~/.cheqdnode/log directory
                 logging.info("Creating log directory for cheqd-noded")
-                os.makedirs(self.cheqd_log_dir)
+                os.makedirs(self.cheqd_log_dir, exist_ok=True)
 
                 # Create blank ~/.cheqdnode/log/stdout.log file. Overwrite if it already exists.
                 # Using the .open() method without doing anything in it will create the file
@@ -1195,7 +1194,7 @@ class Installer():
                 self.remove_safe(self.cheqd_data_dir, is_dir=True)
 
                 # Recreate data directory
-                os.makedirs(self.cheqd_data_dir)
+                os.makedirs(self.cheqd_data_dir, exist_ok=True)
                 shutil.chown(self.cheqd_data_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
             else:
                 logging.warning(f"Backup directory does not exist. Will not delete data directory.\n")
@@ -2093,9 +2092,10 @@ class Interviewer:
                 f"Specify persistent peers [default: none]: {os.linesep}")
             if answer is not None:
                 self.persistent_peers = answer
+                logging.debug(f"Persistent peers set to {self.persistent_peers}")
             else:
                 self.persistent_peers = ""
-            logging.debug(f"Persistent peers set to {self.persistent_peers}")
+                logging.debug(f"No persistent peers set.")
         except Exception as e:
             logging.exception(f"Failed to set persistent peers. Reason: {e}")
 
