@@ -941,6 +941,11 @@ class Installer():
                 
                 # Reload the environment variables
                 self.exec("source /etc/environment")
+
+                # Check if the environment variable was set successfully
+                check_env_var = os.getenv(env_var_name)
+                if os.getenv(env_var_name) is not None:
+                    logging.debug(f"Successfully set {env_var_name} to {check_env_var}")
             else:
                 logging.debug(f"Environment variable {env_var_name} already set or overwrite is disabled")
         except Exception as e:
