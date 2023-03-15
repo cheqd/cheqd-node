@@ -4,7 +4,6 @@
 ###############################################################
 ###     		    Python package imports      			###
 ###############################################################
-from pathlib import Path
 import copy
 import datetime
 import functools
@@ -675,8 +674,11 @@ class Installer():
                 logging.info("Creating log directory for cheqd-noded")
                 os.makedirs(self.cheqd_log_dir)
 
-                # Create blank ~/.cheqdnode/log/stdout.log file
-                Path(os.path.join(self.cheqd_log_dir, "stdout.log")).touch(exist_ok=True)
+                # Create blank ~/.cheqdnode/log/stdout.log file. Overwrite if it already exists.
+                # Using the .open() method without doing anything in it will create the file
+                # "w" mode is used to overwrite the file if it already exists
+                with open(os.path.join(self.cheqd_log_dir, "stdout.log"), "w") as file:
+                    logging.debug("Created blank stdout.log file")
 
                 logging.info(f"Setting up ownership permissions for {self.cheqd_log_dir} directory")
                 shutil.chown(self.cheqd_log_dir, "syslog", DEFAULT_CHEQD_USER)
@@ -1483,8 +1485,8 @@ class Installer():
         # This is a blocking operation that will take a while
         # Once extracted, restore files from backup folder
         try:
-            file_path = os.path.join(
-                self.cheqd_root_dir, os.path.basename(self.snapshot_url))
+            # Set file path of snapshot archive
+            file_path = os.path.join(self.cheqd_root_dir, os.path.basename(self.snapshot_url))
             # Check if there is enough space to extract snapshot archive
 
             logging.info(
