@@ -1845,7 +1845,7 @@ class Interviewer:
     # Check if cheqd-noded is installed
     def is_node_installed(self) -> bool:
         try:
-            if shutil.which("cheqd-noded") is not None and os.path.exists(f"{self.home_dir}/.cheqdnode/config/genesis.json"):
+            if shutil.which("cheqd-noded") is not None:
                 return True
             else:
                 return False
@@ -2184,7 +2184,7 @@ class Interviewer:
     # If an existing installation is detected, ask user if they want to upgrade
     def ask_for_upgrade(self):
         try:
-            logging.warning(f"Existing cheqd-node configuration folder detected.\n")
+            logging.warning(f"Existing cheqd-node binary detected.\n")
             answer = self.ask(f"Do you want to upgrade an existing cheqd-node installation? (yes/no)", default="no")
             if answer.lower().startswith("y"):
                 self.is_upgrade = True
