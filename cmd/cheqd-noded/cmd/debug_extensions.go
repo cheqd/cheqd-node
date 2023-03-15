@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/lestrrat-go/jwx/jwk"
+	"github.com/mr-tron/base58"
 	"github.com/multiformats/go-multibase"
 	"github.com/spf13/cobra"
 )
@@ -26,7 +27,7 @@ func ed25519Cmd() *cobra.Command {
 		Short: "ed25519 tools",
 	}
 
-	cmd.AddCommand(ed25519RandomCmd(), ed25519PubKeyBase64ToJwkCmd())
+	cmd.AddCommand(ed25519RandomCmd(), ed25519publicKeyBase64ToJwkCmd())
 
 	return cmd
 }
@@ -35,19 +36,19 @@ func ed25519Cmd() *cobra.Command {
 func ed25519RandomCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "random",
-		Short: "Generate random ed25519 keypair",
+		Short: "Generate random ed25519 keypair. Output is in JSON format, with base64 encoded public and private keys.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			pubKey, privKey, err := ed25519.GenerateKey(rand.Reader)
+			publicKey, privateKey, err := ed25519.GenerateKey(rand.Reader)
 			if err != nil {
 				return err
 			}
 
 			keyInfo := struct {
-				PubKeyBase64  string `json:"pub_key_base_64"`
-				PrivKeyBase64 string `json:"priv_key_base_64"`
+				PublicKeyBase64  string `json:"public_key_base_64"`
+				PrivateKeyBase64 string `json:"private_key_base_64"`
 			}{
-				PubKeyBase64:  base64.StdEncoding.EncodeToString(pubKey),
-				PrivKeyBase64: base64.StdEncoding.EncodeToString(privKey),
+				PublicKeyBase64:  base64.StdEncoding.EncodeToString(publicKey),
+				PrivateKeyBase64: base64.StdEncoding.EncodeToString(privateKey),
 			}
 
 			keyInfoJSON, err := json.Marshal(keyInfo)
@@ -63,32 +64,32 @@ func ed25519RandomCmd() *cobra.Command {
 	return cmd
 }
 
-// ed25519PubKeyBase64ToJwk returns cobra Command.
-func ed25519PubKeyBase64ToJwkCmd() *cobra.Command {
+// ed25519publicKeyBase64ToJwk returns cobra Command.
+func ed25519publicKeyBase64ToJwkCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "pubkey-base64-to-jwk",
-		Short: "Convert ed25519 pubkey base64 to jwk",
+		Use:   "base64-jwk",
+		Short: `Convert ed25519 public key from base64 to Json Web Key, according to JsonWebKey2020 spec.`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			pubKeyBase64 := args[0]
-			pubKeyBytes, err := base64.StdEncoding.DecodeString(pubKeyBase64)
+			publicKeyBase64 := args[0]
+			publicKeyBytes, err := base64.StdEncoding.DecodeString(publicKeyBase64)
 			if err != nil {
 				return err
 			}
 
-			pubKey := ed25519.PublicKey(pubKeyBytes)
+			publicKey := ed25519.PublicKey(publicKeyBytes)
 
-			pubKeyJwk, err := jwk.New(pubKey)
+			publicKeyJwk, err := jwk.New(publicKey)
 			if err != nil {
 				return err
 			}
 
-			pubKeyJwkJSON, err := json.Marshal(pubKeyJwk)
+			publicKeyJwkJSON, err := json.Marshal(publicKeyJwk)
 			if err != nil {
 				return err
 			}
 
-			_, err = fmt.Fprintln(cmd.OutOrStdout(), string(pubKeyJwkJSON))
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), string(publicKeyJwkJSON))
 			return err
 		},
 	}
@@ -103,16 +104,16 @@ func encodingCmd() *cobra.Command {
 		Short: "Encoding tools",
 	}
 
-	cmd.AddCommand(base64toMultibase58Cmd())
-
+	cmd.AddCommand(base64toMultibaseCmd())
+	cmd.AddCommand(base64toBase58Cmd())
 	return cmd
 }
 
-// base64toMultibase58Cmd returns cobra Command.
-func base64toMultibase58Cmd() *cobra.Command {
+// base64toMultibaseCmd returns cobra Command.
+func base64toMultibaseCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "base64-multibase58 [input]",
-		Short: "Convert base64 string to multibase58 string",
+		Use:   "base64-multibase [input]",
+		Short: `Convert public key from base64 to multibase, according to Ed25519Signature2020 spec.`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			base64Str := args[0]
@@ -121,12 +122,36 @@ func base64toMultibase58Cmd() *cobra.Command {
 				return err
 			}
 
-			multibase58Str, err := multibase.Encode(multibase.Base58BTC, bytes)
+			publicKeyMultibaseBytes := []byte{0xed, 0x01}
+			publicKeyMultibaseBytes = append(publicKeyMultibaseBytes, bytes...)
+
+			multibaseStr, err := multibase.Encode(multibase.Base58BTC, publicKeyMultibaseBytes)
 			if err != nil {
 				return err
 			}
 
-			_, err = fmt.Fprintln(cmd.OutOrStdout(), multibase58Str)
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), multibaseStr)
+			return err
+		},
+	}
+
+	return cmd
+}
+
+// base64toBase58Cmd returns cobra Command.
+func base64toBase58Cmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "base64-base58 [input]",
+		Short: `Convert public key from base64 to base58, according to Ed25519VerificationKey2018 spec.`,
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			base64Str := args[0]
+			bytes, err := base64.StdEncoding.DecodeString(base64Str)
+			if err != nil {
+				return err
+			}
+
+			_, err = fmt.Fprintln(cmd.OutOrStdout(), base58.Encode(bytes))
 			return err
 		},
 	}
