@@ -930,7 +930,7 @@ class Installer():
                     logging.info(f"Initialising {self.cheqd_root_dir} directory")
                     self.exec(f"""sudo su -c 'cheqd-noded init {self.interviewer.moniker}' {DEFAULT_CHEQD_USER}""")
                 else:
-                    logging.warning(f"Validator key already exists in {self.cheqd_config_dir}. Skipping cheqd-noded init...")
+                    logging.debug(f"Validator key already exists in {self.cheqd_config_dir}. Skipping cheqd-noded init...")
                 
                 # Check if genesis file exists
                 # If not, download it from the GitHub repo
@@ -945,14 +945,16 @@ class Installer():
                 # Set seeds from the seeds file on GitHub
                 if is_valid_url(seeds_url):
                     logging.debug(f"Setting seeds from {seeds_url}")
+                    
                     with request.urlopen(seeds_url) as response:
                         seeds = response.read().decode("utf-8").strip()
+                    
                     seeds_search_text = 'seeds = ""'
                     seeds_replace_text = 'seeds = "{}"'.format(seeds)
                     search_and_replace(seeds_search_text, seeds_replace_text, config_toml_path)
                 else:
                     logging.exception(f"Invalid URL for seeds file: {seeds_url}")
-                    raise
+                    return False
 
                 # Set RPC port to listen to for all origins by default
                 rpc_default_value = 'laddr = "tcp://127.0.0.1:{}"'.format(DEFAULT_RPC_PORT)
@@ -1718,7 +1720,7 @@ class Interviewer:
         self._is_cosmovisor_bump_needed = icbn
 
     @is_cosmovisor_installed.setter
-    def is_cosmovisor_installed(self, icbn):
+    def is_cosmovisor_installed(self, ici):
         self._is_cosmovisor_installed = ici
 
     @init_from_snapshot.setter
