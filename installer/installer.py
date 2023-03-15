@@ -330,12 +330,12 @@ class Installer():
                     s = re.sub(
                         r'({CHEQD_LOG_DIR})',
                         lambda m: {'{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()],
-                        f.read()
+                        file.read()
                     )
 
-                    # Remove the template file
-                    self.remove_safe(fname)
-                    return s
+                # Remove the template file
+                self.remove_safe(fname)
+                return s
             else:
                 logging.exception(f"URL is not valid: {LOGROTATE_TEMPLATE}")
         except Exception as e:
@@ -450,7 +450,6 @@ class Installer():
                 logging.info("Successfully downloaded and extracted cheqd-noded binary")
             else:
                 logging.error("Failed to download and extract binary")
-                raise
                 return False
             
             # Carry out pre-installation steps
@@ -459,7 +458,6 @@ class Installer():
                 logging.info("Pre-installation steps completed successfully")
             else:
                 logging.error("Failed to complete pre-installation steps")
-                raise
                 return False
             
             # Create cheqd user if it doesn't exist
@@ -467,7 +465,6 @@ class Installer():
                 logging.info("User/group cheqd setup successfully")
             else:
                 logging.error("Failed to setup user/group cheqd")
-                raise
                 return False
             
             # Setup directories needed for installation
@@ -475,7 +472,6 @@ class Installer():
                 logging.info("Directory tree setup successfully")
             else:
                 logging.error("Failed to setup directory tree")
-                raise
                 return False
 
             # Setup Cosmovisor binary if needed
@@ -484,7 +480,6 @@ class Installer():
                     logging.info("Successfully installed Cosmovisor")
                 else:
                     logging.error("Failed to setup Cosmovisor")
-                    raise
                     return False
             # If Cosmovisor is not needed, treat it as a standalone installation
             else:
@@ -492,7 +487,6 @@ class Installer():
                     logging.info("Successfully installed cheqd-noded as a standalone binary")
                 else:
                     logging.error("Failed to setup cheqd-noded as a standalone binary")
-                    raise
                     return False
             
             # Setup cheqd-noded environment variables
@@ -506,7 +500,6 @@ class Installer():
                 logging.info("Successfully configured cheqd-noded settings")
             else:
                 logging.error("Failed to configure cheqd-noded settings")
-                raise
                 return False
 
             # Configure systemd service for cheqd-noded
@@ -516,7 +509,6 @@ class Installer():
                 logging.info("Successfully configured systemd service for node operations")
             else:
                 logging.error("Failed to configure systemd service for node operations")
-                raise
                 return False
 
             # Configure systemd services for rsyslog and logrotate
@@ -524,7 +516,6 @@ class Installer():
                 logging.info("Successfully configured systemd service for logging")
             else:
                 logging.error("Failed to configure systemd service for logging")
-                raise
                 return False
 
             # Download and extract snapshot if needed
@@ -534,14 +525,12 @@ class Installer():
                     logging.info("Successfully downloaded snapshot")
                 else:
                     logging.error("Failed to download snapshot")
-                    raise
                     return False
                                 
                 if self.extract_snapshot():
                     logging.info("Successfully extracted snapshot")
                 else:
                     logging.error("Failed to extract snapshot")
-                    raise
                     return False
             else:
                 logging.debug("Skipping snapshot download and extraction as it was not requested")
@@ -626,8 +615,7 @@ class Installer():
                 logging.debug("No pre-installation steps needed")
                 return True
         except Exception as e:
-            logging.exception("Could not complete pre-installation steps. Reason: {e}")
-            raise
+            logging.exception(f"Could not complete pre-installation steps. Reason: {e}")
             return False
 
     def prepare_cheqd_user(self) -> bool:
@@ -707,7 +695,6 @@ class Installer():
             return True
         except Exception as e:
             logging.exception(f"Failed to prepare directory tree for {DEFAULT_CHEQD_USER}. Reason: {e}")
-            raise
             return False
 
     def install_cosmovisor(self) -> bool:
@@ -1167,7 +1154,6 @@ class Installer():
                 file_path = os.path.join(self.cheqd_root_dir, fname)
             else:
                 logging.error(f"No valid snapshot URL found in last {MAX_SNAPSHOT_DAYS} days!")
-                raise
                 return False
             
             # Install dependencies needed to show progress bar
@@ -1175,7 +1161,6 @@ class Installer():
                 logging.info("Dependencies required for snapshot restore installed successfully")
             else:
                 logging.error("Failed to install dependencies required for snapshot restore")
-                raise
                 return False
 
             # Fetch size of snapshot archive WITHOUT downloading it
@@ -1187,7 +1172,6 @@ class Installer():
                 logging.debug(f"Snapshot archive size: {content_length} bytes")
             else:
                 logging.error(f"Could not determine snapshot archive size")
-                raise
                 return False
 
             # Free up some disk space by deleting contents of the data folder
@@ -1318,8 +1302,7 @@ class Installer():
                     logging.debug(f"Checksums do not match. Download got corrupted.")
                     return False
             else:
-                logging.exception(f"Checksum URL is invalid. File integrity couldn't be tested.")
-                raise
+                logging.error(f"Checksum URL is invalid. File integrity couldn't be tested.")
                 return False
         except Exception as e:
             logging.exception(f"Failed to compare checksums. Reason: {e}")
@@ -1452,8 +1435,7 @@ class Installer():
                 return True
             else:
                 logging.error("Failed to reload systemd config and reset failed services")
-                return False
-                raise
+                return False    
         except Exception as e:
             logging.exception(f"Error disabling {service_name}: Reason: {e}")
     
@@ -1468,7 +1450,6 @@ class Installer():
                 else:
                     logging.error(f"{service_name} could not be disabled")
                     return False
-                    raise
             else:
                 logging.debug(f"{service_name} is already disabled")
                 return True
@@ -1487,14 +1468,12 @@ class Installer():
                     else:
                         logging.error(f"{service_name} could not be enabled")
                         return False
-                        raise
                 else:
                     logging.debug(f"{service_name} is already enabled")
                     return True
             else:
                 logging.error(f"Failed to reload systemd config and reset failed services")
                 return False
-                raise
         except Exception as e:
             logging.exception(f"Error disabling {service_name}: Reason: {e}")
 
@@ -1509,7 +1488,6 @@ class Installer():
                 else:
                     logging.error(f"{service_name} could not be stopped")
                     return False
-                    raise
             else:
                 logging.debug(f"{service_name} is not active")
                 return True
@@ -1533,11 +1511,9 @@ class Installer():
                 else:
                     logging.error(f"{service_name} could not be restarted")
                     return False
-                    raise
             else:
                 logging.error(f"Failed to restart {service_name}")
                 return False
-                raise
         except Exception as e:
             logging.exception(f"Error restarting {service_name}: Reason: {e}")
             raise
@@ -2365,7 +2341,7 @@ if __name__ == '__main__':
                     install_steps()
                 else:
                     logging.error("Aborting installation to prevent overwriting existing node installation. Exiting...")
-                    raise
+                    sys.exit(1)
 
     except Exception as e:
         logging.exception(f"Unable to complete user interview process. Reason for exiting: {e}")
@@ -2382,7 +2358,8 @@ if __name__ == '__main__':
         else:
             logging.error(f"Installation of cheqd-noded {interviewer.version} failed. Exiting...")
             logging.info(f"Documentation: https://docs.cheqd.io/node\n")
-            raise
+            sys.exit(1)
+
     except Exception as e:
         logging.exception(f"Unable to execute installation process. Reason for exiting: {e}")
         sys.exit(1)
