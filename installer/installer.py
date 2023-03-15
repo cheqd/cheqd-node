@@ -2260,7 +2260,8 @@ class Interviewer:
     # This question is asked last because it is the most time consuming.
     def ask_for_init_from_snapshot(self):
         try:
-            logging.info(f"Downloading a snapshot allows you to get a copy of the blockchain data to speed up node bootstrapping\nSnapshots can be 100 GBs so downloading can take a really long time!\nExisting chain data folder will be replaced! Usually safe to use this option when doing a fresh installation.\n")
+            logging.info(f"You have the option of downloading a snapshot to get a copy of the blockchain data to speed up node bootstrapping.\n")
+            logging.warning(f"Snapshots can be 100 GBs so downloading can take a really long time!\n- Existing chain data folder will be removed to make space for the downloaded file! Please ensure you take any backups.\n- The download will happen in the background once all configuration settings have set in this installer.\n- Usually safe to use this option when doing a fresh installation.\n")
             answer = self.ask(
                 f"Do you want to download a snapshot of the existing chain to speed up node synchronization? (yes/no)", default="yes")
             if answer.lower().startswith("y"):
