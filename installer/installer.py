@@ -107,12 +107,12 @@ CHEQD_NODED_P2P_MAX_PACKET_MSG_PAYLOAD_SIZE = 10240
 # Set logging configuration
 if sys.flags.dev_mode:
     # If PYTHONDEVMODE = 1, show more detailed logging messages
-    logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
+    logging.basicConfig(format='[%(levelname)s]: %(message)s', level=logging.DEBUG)
     logging.raiseExceptions = True
     logging.propagate = True
 else:
     # Else show logging messages INFO level and above
-    logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+    logging.basicConfig(format='[%(levelname)s]: %(message)s', level=logging.INFO)
     logging.raiseExceptions = True
     logging.propagate = True
 
