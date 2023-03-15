@@ -589,19 +589,27 @@ class Installer():
             # Use shutil.copy() when copying files instead of shutil.copyfile() since it preserves file metadata
             logging.info("Backing up user's config folder and selected validator secrets from data folder")
 
-            # Backup ~/.cheqdnode/config/ folder
-            shutil.copytree(self.cheqd_config_dir, self.cheqd_backup_dir)
+            if os.path.exists(self.cheqd_config_dir):
+                # Backup ~/.cheqdnode/config/ folder
+                shutil.copytree(self.cheqd_config_dir, self.cheqd_backup_dir)
+            else:
+                logging.debug("No config folder found to backup. Skipping...")
 
             # Backup ~/.cheqdnode/data/priv_validator_key.json
             # Without this file, a validator node will get jailed!
-            shutil.copy(os.path.join(self.cheqd_data_dir, "priv_validator_state.json"), 
-                os.path.join(self.cheqd_backup_dir, "priv_validator_state.json"))
+            if os.path.exists(os.path.join(self.cheqd_data_dir, "priv_validator_key.json")):
+                shutil.copy(os.path.join(self.cheqd_data_dir, "priv_validator_state.json"), 
+                    os.path.join(self.cheqd_backup_dir, "priv_validator_state.json"))
+            else:
+                logging.debug("No validator state file found to backup. Skipping...")
             
             # Backup ~/.cheqdnode/data/upgrade-info.json
             # This file is required for Cosmovisor to track and understand where upgrade is needed
             if os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
                 shutil.copyfile(os.path.join(self.cheqd_data_dir, "upgrade-info.json"), 
                     os.path.join(self.cheqd_backup_dir, "upgrade-info.json"))
+            else:
+                logging.debug("No upgrade-info.json file found to backup. Skipping...")
 
             if self.interviewer.is_from_scratch or self.interviewer.is_setup_needed:
                 # Remove cheqd-node data and binaries
@@ -1907,7 +1915,7 @@ class Interviewer:
                 self.release = all_releases[release_num - 1]
             else:
                 logging.error(f"Invalid release number picked from list of releases: {release_num}")
-                logging.warning(f"Please choose a number between 1 and {LAST_N_RELEASES}")
+                logging.error(f"Please choose a number between 1 and {LAST_N_RELEASES}\n")
                 self.ask_for_version()
         except Exception as e:
             logging.exception(f"Failed to selected version of cheqd-noded. Reason: {e}")
@@ -1927,10 +1935,10 @@ class Interviewer:
                 f"Do you want to setup a new cheqd-node installation? (yes/no)", default="yes")
             if answer.lower().startswith("y"):
                 self.is_setup_needed = True
-            elif answer.lower().startswith("n"):
+            elif answer.lower().startswith("n") and self.is_node_installed():
                 self.is_setup_needed = False
             else:
-                logging.error(f"Please choose either 'yes' or 'no'")
+                logging.error(f"Please choose either 'yes' or 'no'\n")
                 self.ask_for_setup()
         except Exception as e:
             logging.exception(f"Failed to set fresh installation parameters. Reason: {e}")
@@ -1947,7 +1955,7 @@ class Interviewer:
             elif answer == 2:
                 self.chain = "testnet"
             else:
-                logging.error(f"Invalid network selected during installation. Please choose either 1 or 2.")
+                logging.error(f"Invalid network selected during installation. Please choose either 1 or 2.\n")
                 self.ask_for_chain()
         except Exception as e:
             logging.exception(f"Failed to set network/chain to join. Reason: {e}")
@@ -1963,7 +1971,7 @@ class Interviewer:
             elif answer.lower().startswith("n"):
                 self.is_cosmovisor_needed = False
             else:
-                logging.error(f"Invalid input provided during installation. Please choose either 'yes' or 'no'.")
+                logging.error(f"Invalid input provided during installation. Please choose either 'yes' or 'no'.\n")
                 self.ask_for_cosmovisor()
         except Exception as e:
             logging.exception(f"Failed to set whether installation should be done with Cosmovisor. Reason: {e}")
@@ -1978,7 +1986,7 @@ class Interviewer:
             elif answer.lower().startswith("n"):
                 self.is_cosmovisor_bump_needed = False
             else:
-                logging.error(f"Invalid input provided during installation. Please choose either 'yes' or 'no'.")
+                logging.error(f"Invalid input provided during installation. Please choose either 'yes' or 'no'.\n")
                 self.ask_for_cosmovisor_bump()
         except Exception as e:
             logging.exception(f"Failed to set whether Cosmovisor should be bumped to latest version. Reason: {e}")
@@ -1994,7 +2002,7 @@ class Interviewer:
             elif answer.lower().startswith("n"):
                 self.daemon_allow_download_binaries = "false"
             else:
-                logging.error(f"Invalid input provided during installation. Please choose either 'yes' or 'no'.")
+                logging.error(f"Invalid input provided during installation. Please choose either 'yes' or 'no'.\n")
                 self.ask_for_daemon_allow_download_binaries()
         except Exception as e:
             logging.exception(
@@ -2010,7 +2018,7 @@ class Interviewer:
             elif answer.lower().startswith("n"):
                 self.daemon_restart_after_upgrade = "false"
             else:
-                logging.error(f"Invalid input provided during installation. Please choose either 'yes' or 'no'.")
+                logging.error(f"Invalid input provided during installation. Please choose either 'yes' or 'no'.\n")
                 self.ask_for_daemon_restart_after_upgrade()
         except Exception as e:
             logging.exception(f"Failed to set whether Cosmovisor should automatically restart after an upgrade. Reason: {e}")
@@ -2024,7 +2032,7 @@ class Interviewer:
             if self.moniker is not None and isinstance(self.moniker, str):
                 logging.debug(f"Moniker set to {self.moniker}")
             else:
-                logging.error(f"Invalid moniker provided during cheqd-noded setup.")
+                logging.error(f"Invalid moniker provided during cheqd-noded setup.\n")
                 self.ask_for_moniker()
         except Exception as e:
             logging.exception(f"Failed to set moniker. Reason: {e}")
@@ -2042,9 +2050,8 @@ class Interviewer:
                 if self.check_ip_address(answer) or self.check_dns_name(answer):
                     self.external_address = answer
                 else:
-                    logging.error(f"Invalid IP address or DNS name provided. Please enter a valid IP address or DNS name.")
+                    logging.error(f"Invalid IP address or DNS name provided. Please enter a valid IP address or DNS name.\n")
                     self.ask_for_external_address()
-            
             # If user didn't provide an answer, fetch IP address via DNS resolver lookup
             else:
                 self.external_address = str(self.exec(
@@ -2061,7 +2068,7 @@ class Interviewer:
             if isinstance(self.p2p_port, int):
                 logging.debug(f"P2P port set to {self.p2p_port}")
             else:
-                logging.error(f"Invalid P2P port provided. Please enter a valid port number.")
+                logging.error(f"Invalid P2P port provided. Please enter a valid port number.\n")
                 self.ask_for_p2p_port()
         except Exception as e:
             logging.exception(f"Failed to set P2P port. Reason: {e}")
@@ -2073,7 +2080,7 @@ class Interviewer:
             if isinstance(self.rpc_port, int):
                 logging.debug(f"RPC port set to {self.rpc_port}")
             else:
-                logging.error(f"Invalid RPC port provided. Please enter a valid port number.")
+                logging.error(f"Invalid RPC port provided. Please enter a valid port number.\n")
                 self.ask_for_rpc_port()
         except Exception as e:
             logging.exception(f"Failed to set RPC port. Reason: {e}")
@@ -2082,15 +2089,12 @@ class Interviewer:
     def ask_for_persistent_peers(self):
         try:
             logging.info(f"Persistent peers are nodes that you want to always keep connected to. Values for persistent peers should be specified in format: <nodeID>@<IP>:<port>,<nodeID>@<IP>:<port>...\n")
-            
             answer = self.ask(
                 f"Specify persistent peers [default: none]: {os.linesep}")
-            
             if answer is not None:
                 self.persistent_peers = answer
             else:
                 self.persistent_peers = ""
-            
             logging.debug(f"Persistent peers set to {self.persistent_peers}")
         except Exception as e:
             logging.exception(f"Failed to set persistent peers. Reason: {e}")
@@ -2104,7 +2108,7 @@ class Interviewer:
             if self.gas_price.endswith("ncheq"):
                 logging.debug(f"Minimum gas price set to {self.gas_price}")
             else:
-                logging.error(f"Invalid minimum gas price provided. Valid format is <number>ncheq.")
+                logging.error(f"Invalid minimum gas price provided. Valid format is <number>ncheq.\n")
                 self.ask_for_gas_price()
         except Exception as e:
             logging.exception(f"Failed to set minimum gas prices. Reason: {e}")
@@ -2117,7 +2121,7 @@ class Interviewer:
             if self.log_level in ["trace", "debug", "info", "warn", "error", "fatal", "panic"]:
                 logging.debug(f"Log level set to {self.log_level}")
             else:
-                logging.error(f"Invalid log level provided. Please enter a valid log level.")
+                logging.error(f"Invalid log level provided. Please enter a valid log level.\n")
                 self.ask_for_log_level()
         except Exception as e:
             logging.exception(f"Failed to set log level. Reason: {e}")
@@ -2129,7 +2133,7 @@ class Interviewer:
             if self.log_format in ["json", "plain"]:
                 logging.debug(f"Log format set to {self.log_format}")
             else:
-                logging.error(f"Invalid log format provided. Please enter a valid log format.")
+                logging.error(f"Invalid log format provided. Please enter a valid log format.\n")
                 self.ask_for_log_format()
         except Exception as e:
             logging.exception(f"Failed to set log format. Reason: {e}")
@@ -2144,7 +2148,7 @@ class Interviewer:
             elif answer.lower().startswith("n"):
                 self.is_upgrade = False
             else:
-                logging.error(f"Please choose either 'yes' or 'no'")
+                logging.error(f"Please choose either 'yes' or 'no'\n")
                 self.ask_for_upgrade()
         except Exception as e:
             logging.exception(f"Failed to set whether installation should be upgraded. Reason: {e}")
@@ -2160,7 +2164,7 @@ class Interviewer:
             elif answer.lower().startswith("n"):
                 self.is_from_scratch = False
             else:
-                logging.error(f"Please choose either 'yes' or 'no'")
+                logging.error(f"Please choose either 'yes' or 'no'\n")
                 self.ask_for_install_from_scratch()
         except Exception as e:
             logging.exception(f"Failed to set whether to install from scratch. Reason: {e}")
@@ -2175,7 +2179,7 @@ class Interviewer:
             elif answer.lower().startswith("n"):
                 self.rewrite_node_systemd = False
             else:
-                logging.error(f"Please choose either 'yes' or 'no'")
+                logging.error(f"Please choose either 'yes' or 'no'\n")
                 self.ask_for_rewrite_node_systemd()
         except Exception as e:
             logging.exception(f"Failed to set whether overwrite existing systemd configuration. Reason: {e}")
@@ -2189,7 +2193,7 @@ class Interviewer:
             elif answer.lower().startswith("n"):
                 self.rewrite_logrotate = False
             else:
-                logging.error(f"Please choose either 'yes' or 'no'")
+                logging.error(f"Please choose either 'yes' or 'no'\n")
                 self.ask_for_rewrite_logrotate()
         except Exception as e:
             logging.exception(f"Failed to set whether overwrite existing configuration for logrotate. Reason: {e}")
@@ -2203,7 +2207,7 @@ class Interviewer:
             elif answer.lower().startswith("n"):
                 self.rewrite_rsyslog = False
             else:
-                logging.error(f"Please choose either 'yes' or 'no'")
+                logging.error(f"Please choose either 'yes' or 'no'\n")
                 self.ask_for_rewrite_rsyslog()
         except Exception as e:
             logging.exception(f"Failed to set whether overwrite existing rsyslog configuration. Reason: {e}")
@@ -2221,7 +2225,7 @@ class Interviewer:
             elif answer.lower().startswith("n"):
                 self.init_from_snapshot = False
             else:
-                logging.error(f"Please choose either 'yes' or 'no'")
+                logging.error(f"Please choose either 'yes' or 'no'\n")
                 self.ask_for_init_from_snapshot()
         except Exception as e:
             logging.exception(f"Failed to set whether init snapshot. Reason: {e}")
