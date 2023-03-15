@@ -2299,8 +2299,7 @@ if __name__ == '__main__':
             interviewer.ask_for_init_from_snapshot()
 
         except Exception as e:
-            logging.exception(
-                f"Unable to complete user interview process for installation. Reason for exiting: {e}")
+            logging.exception(f"Unable to complete user interview process for installation. Reason for exiting: {e}")
 
     # Order of questions to ask the user if installing:
     # 1. Version of cheqd-noded to install
@@ -2334,8 +2333,7 @@ if __name__ == '__main__':
                 interviewer.ask_for_rewrite_logrotate()
 
         except Exception as e:
-            logging.exception(
-                f"Unable to complete user interview process for upgrade. Reason for exiting: {e}")
+            logging.exception(f"Unable to complete user interview process for upgrade. Reason for exiting: {e}")
 
     ### This section is where the Interviewer class is invoked ###
     try:
@@ -2377,10 +2375,13 @@ if __name__ == '__main__':
     try:
         installer = Installer(interviewer)
         if installer.install():
-            logging.info(f"Installation of cheqd-noded {interviewer.version} completed successfully!")
+            logging.info(f"Installation of cheqd-noded {interviewer.version} completed successfully!\n")
+            logging.info(f"Please review the configuration files manually and use systemctl to start the node.\n")
+            logging.info(f"Documentation: https://docs.cheqd.io/node\n")
             sys.exit(0)
         else:
             logging.error(f"Installation of cheqd-noded {interviewer.version} failed. Exiting...")
+            logging.info(f"Documentation: https://docs.cheqd.io/node\n")
             raise
     except Exception as e:
         logging.exception(f"Unable to execute installation process. Reason for exiting: {e}")
