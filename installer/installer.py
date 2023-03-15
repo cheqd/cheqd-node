@@ -896,7 +896,7 @@ class Installer():
         try:
             logging.debug(f"Checking whether {env_var_name} is set")
 
-            if os.environ(env_var_name) is None or overwrite:
+            if os.getenv(env_var_name) is None or overwrite:
                 logging.debug(f"Setting {env_var_name} to {env_var_value}")
                 
                 # Set the environment variable for the current session
