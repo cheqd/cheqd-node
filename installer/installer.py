@@ -892,15 +892,15 @@ class Installer():
         # Set environment variables for Cosmovisor
         try:
             self.set_environment_variable("DAEMON_NAME", DEFAULT_BINARY_NAME)
-            self.set_environment_variable("DAEMON_HOME", self.cheqd_root_dir, overwrite=False)
+            self.set_environment_variable("DAEMON_HOME", self.cheqd_root_dir)
             self.set_environment_variable("DAEMON_ALLOW_DOWNLOAD_BINARIES", 
                 self.interviewer.daemon_allow_download_binaries)
             self.set_environment_variable("DAEMON_RESTART_AFTER_UPGRADE",
                 self.interviewer.daemon_restart_after_upgrade)
             self.set_environment_variable("DAEMON_POLL_INTERVAL", 
-                DEFAULT_DAEMON_POLL_INTERVAL, overwrite=False)
+                DEFAULT_DAEMON_POLL_INTERVAL)
             self.set_environment_variable("UNSAFE_SKIP_BACKUP", 
-                DEFAULT_UNSAFE_SKIP_BACKUP, overwrite=False)
+                DEFAULT_UNSAFE_SKIP_BACKUP)
         except Exception as e:
             logging.exception(f"Failed to set environment variables for Cosmovisor. Reason: {e}")
             raise
@@ -911,7 +911,7 @@ class Installer():
         # Only environment variables that are required required for transactions are set here
         try:
             self.set_environment_variable("CHEQD_NODED_NODE", 
-                f"tcp://localhost:{self.interviewer.rpc_port}", overwrite=False)
+                f"tcp://localhost:{self.interviewer.rpc_port}")
             if self.interviewer.chain == "testnet":
                 self.set_environment_variable("CHEQD_NODED_CHAIN_ID", TESTNET_CHAIN_ID)
             else:
@@ -920,20 +920,23 @@ class Installer():
             logging.exception(f"Failed to set environment variables for cheqd-noded. Reason: {e}")
             raise
 
-    def set_environment_variable(self, env_var_name, env_var_value, overwrite=True):
+    def set_environment_variable(self, env_var_name, env_var_value):
         # Set an environment variable by modifying /etc/environment
         try:
             logging.debug(f"Checking whether {env_var_name} is set")
-            if os.getenv(env_var_name) is None or overwrite:
+            if os.getenv(env_var_name) is None:
                 logging.debug(f"Setting {env_var_name} to {env_var_value}")
+
+                # Set the environment variable for the current user/session
+                # Note that this will not set the variable permanently
+                # os.environ() is not used since it's not going to available for bash commands
+                self.exec(f'export {env_var_name}="{env_var_value}"')
 
                 # Modify the system's environment variables
                 # This will set the variable permanently for all users
+                # Don't use export since this is an environment file, not a bash script
                 with open("/etc/environment", "a") as env_file:
-                    env_file.write(f'export {env_var_name}="{env_var_value}"\n')
-                
-                # Reload the environment variables
-                self.exec("source /etc/environment")
+                    env_file.write(f'{env_var_name}="{env_var_value}"\n')
 
                 # Check if the environment variable was set successfully
                 check_env_var = os.getenv(env_var_name)
