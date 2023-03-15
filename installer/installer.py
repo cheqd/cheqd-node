@@ -921,18 +921,11 @@ class Installer():
             raise
 
     def set_environment_variable(self, env_var_name, env_var_value, overwrite=True):
-        # Set an environment variable
-        # By default, existing environment variables are overwritten
-        # This can be changed by setting the overwrite parameter to False
-        # Environment variables are set for the current session as well as for all users
+        # Set an environment variable by modifying /etc/environment
         try:
             logging.debug(f"Checking whether {env_var_name} is set")
-
             if os.getenv(env_var_name) is None or overwrite:
                 logging.debug(f"Setting {env_var_name} to {env_var_value}")
-                
-                # Set the environment variable for the current session
-                os.environ[env_var_name] = env_var_value
 
                 # Modify the system's environment variables
                 # This will set the variable permanently for all users
@@ -946,6 +939,9 @@ class Installer():
                 check_env_var = os.getenv(env_var_name)
                 if os.getenv(env_var_name) is not None:
                     logging.debug(f"Successfully set {env_var_name} to {check_env_var}")
+                else:
+                    logging.exception(f"Failed to set {env_var_name} to {env_var_value}")
+                    raise
             else:
                 logging.debug(f"Environment variable {env_var_name} already set or overwrite is disabled")
         except Exception as e:
