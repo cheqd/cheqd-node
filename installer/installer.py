@@ -40,7 +40,7 @@ DEFAULT_DEBUG_BRANCH = os.getenv("DEFAULT_DEBUG_BRANCH") if os.getenv("DEFAULT_D
 ###############################################################
 ###     		Cosmovisor configuration      				###
 ###############################################################
-DEFAULT_LATEST_COSMOVISOR_VERSION = "v1.2.0"
+DEFAULT_LATEST_COSMOVISOR_VERSION = "v1.3.0"
 COSMOVISOR_BINARY_URL = "https://github.com/cosmos/cosmos-sdk/releases/download/cosmovisor%2F{}/cosmovisor-{}-linux-{}.tar.gz"
 DEFAULT_USE_COSMOVISOR = "yes"
 DEFAULT_BUMP_COSMOVISOR = "yes"
