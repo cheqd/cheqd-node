@@ -1426,14 +1426,13 @@ class Installer():
         # Check if a given systemd service is active
         try:
             logging.debug(f"Checking whether {service_name} service is active")
+
             # Check if the service exists
-            cmd_exists = f'systemctl status {service_name}.service'
-            exists = os.system(cmd_exists)
+            exists = os.system(f"systemctl status {service_name}")
 
             if exists == 0:
                 # Check if the service is active
-                cmd_active = f'systemctl is-active --quiet {service_name}.service'
-                active = os.system(cmd_active)
+                active = os.system(f"systemctl is-active --quiet {service_name}")
                 if active == 0:
                     logging.debug(f"Service {service_name} is active")
                     return True
@@ -1451,13 +1450,12 @@ class Installer():
         # Check if a given systemd service is enabled
         try:
             logging.debug(f"Checking whether {service_name} service is enabled")
+            
             # Check if the service exists
-            cmd_exists = f'systemctl status {service_name}.service'
-            exists = os.system(cmd_exists)
+            exists = os.system(f"systemctl status {service_name}")
             if exists == 0:
                 # Check if the service is enabled
-                cmd_enabled = f'systemctl is-enabled --quiet {service_name}.service'
-                enabled = os.system(cmd_enabled)
+                enabled = os.system(f"systemctl is-enabled --quiet {service_name}")
                 if enabled == 0:
                     logging.debug(f"Service {service_name} is enabled")
                     return True
@@ -1494,7 +1492,7 @@ class Installer():
         # Disable a given systemd service
         try:
             if self.check_systemd_service_enabled(service_name):
-                disabled = os.system(f"systemctl disable --quiet {service_name}.service")
+                disabled = os.system(f"systemctl disable --quiet {service_name}")
                 if disabled == 0:
                     logging.info(f"{service_name} has been disabled")
                     return True
@@ -1512,7 +1510,7 @@ class Installer():
         try:
             if self.reload_systemd():
                 if not self.check_systemd_service_enabled(service_name):
-                    enabled = os.system(f"systemctl enable --quiet {service_name}.service")
+                    enabled = os.system(f"systemctl enable --quiet {service_name}")
                     if enabled == 0:
                         logging.info(f"{service_name} has been enabled")
                         return True
@@ -1532,7 +1530,7 @@ class Installer():
         # Stop and disable a given systemd service
         try:
             if self.check_systemd_service_active(service_name):
-                stopped = os.system(f"systemctl stop --quiet {service_name}.service")
+                stopped = os.system(f"systemctl stop --quiet {service_name}")
                 if stopped == 0:
                     logging.info(f"{service_name} has been stopped")
                     return True
@@ -1555,7 +1553,7 @@ class Installer():
 
             # Reload systemd services before restarting
             if self.reload_systemd():
-                restarted = os.system(f"systemctl restart --quiet {service_name}.service")
+                restarted = os.system(f"systemctl restart --quiet {service_name}")
                 if restarted == 0:
                     logging.info(f"{service_name} has been restarted")
                     return True
@@ -1997,7 +1995,7 @@ class Interviewer:
             answer = int(self.ask(
                 "Select cheqd network to join:\n"
                 f"1. Mainnet ({MAINNET_CHAIN_ID})\n"
-                f"2. Testnet ({TESTNET_CHAIN_ID})\n", default=1))
+                f"2. Testnet ({TESTNET_CHAIN_ID})", default=1))
             if answer == 1:
                 self.chain = "mainnet"
             elif answer == 2:
