@@ -923,33 +923,37 @@ class Installer():
     def set_environment_variable(self, env_var_name, env_var_value):
         # Set an environment variable by modifying /etc/environment
         try:
-            logging.debug(f"Checking whether {env_var_name} is set")
-            if os.getenv(env_var_name) is None:
+            if not self.check_environment_variable(env_var_name):
                 logging.debug(f"Setting {env_var_name} to {env_var_value}")
 
                 # Set the environment variable for the current user/session
                 # Note that this will not set the variable permanently
                 # os.environ() is not used since it's not going to available for bash commands
-                self.exec(f'export {env_var_name}="{env_var_value}"')
+                # self.exec(f'export {env_var_name}="{env_var_value}"')
 
                 # Modify the system's environment variables
                 # This will set the variable permanently for all users
                 # Don't use export since this is an environment file, not a bash script
                 with open("/etc/environment", "a") as env_file:
                     env_file.write(f'{env_var_name}="{env_var_value}"\n')
-
-                # Check if the environment variable was set successfully
-                check_env_var = os.getenv(env_var_name)
-                if os.getenv(env_var_name) is not None:
-                    logging.debug(f"Successfully set {env_var_name} to {check_env_var}")
-                else:
-                    logging.exception(f"Failed to set {env_var_name} to {env_var_value}")
-                    raise
+                
+                # Read the environment file to make the changes available for the current user/session
+                self.exec(f"bash -c 'source /etc/environment'")
             else:
-                logging.debug(f"Environment variable {env_var_name} already set or overwrite is disabled")
+                logging.debug(f"Skipped setting {env_var_name}... already set")
         except Exception as e:
             logging.exception(f"Failed to set environment variable {env_var_name}. Reason: {e}")
             raise
+
+    def check_environment_variable(self, env_var_name):
+        # Check if an environment variable is set
+        try:
+            os.environ[env_var_name]
+            logging.debug(f"Environment variable {env_var_name} is set")
+            return True
+        except KeyError:
+            logging.debug(f"Environment variable {env_var_name} is NOT set")
+            return False
 
     def configure_node_settings(self) -> bool:
         # Configure cheqd-noded settings in app.toml and config.toml
@@ -971,7 +975,7 @@ class Installer():
                 if not os.path.exists(os.path.join(self.cheqd_config_dir, 'priv_validator_key.json')):
                     # Initialize the node
                     logging.info(f"Initialising {self.cheqd_root_dir} directory")
-                    self.exec(f"""sudo -u {DEFAULT_CHEQD_USER} -c 'cheqd-noded init {self.interviewer.moniker}'""")
+                    self.exec(f"sudo -u {DEFAULT_CHEQD_USER} bash -c 'cheqd-noded init {self.interviewer.moniker}'")
                 else:
                     logging.debug(f"Validator key already exists in {self.cheqd_config_dir}. Skipping cheqd-noded init...")
                 
@@ -1369,7 +1373,7 @@ class Installer():
                 # Bash command is used since the Python libraries for lz4 are not installed out-of-the-box
                 # Showing a progress bar or an estimate of time remaining is also not easy-to-achieve
                 # "pv" is used to show a progress bar while extracting
-                self.exec(f"sudo -u {DEFAULT_CHEQD_USER} -c 'pv {file_path} \
+                self.exec(f"sudo -u {DEFAULT_CHEQD_USER} bash -c 'pv {file_path} \
                     | tar --use-compress-program=lz4 -xf - -C {self.cheqd_root_dir} \
                     --exclude priv_validator_state.json'")
 
