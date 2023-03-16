@@ -148,6 +148,8 @@ def search_and_replace(search_text, replace_text, file_path):
     except Exception as e:
         logging.exception(f"Failed to search and replace text in {file_path}. Reason: {e}")
         raise
+    finally:
+        file.close()
 
 def post_process(func):
     # Common function to post-process commands
@@ -332,14 +334,9 @@ class Installer():
         # The template file is fetched from the GitHub repo
         # Some of these variables are explicitly asked during the installer process. Others are set to default values.
         try:
-            # Set service file path
-            fname = os.path.basename(COSMOVISOR_SERVICE_TEMPLATE)
-
             # Fetch the template file from GitHub
             if is_valid_url(COSMOVISOR_SERVICE_TEMPLATE):
-                with request.urlopen(COSMOVISOR_SERVICE_TEMPLATE) as response, open(fname, "w") as file:
-                    file.write(response.read())
-
+                with request.urlopen(COSMOVISOR_SERVICE_TEMPLATE) as response:
                     # Replace the values for environment variables in the template file
                     s = re.sub(
                         r'({CHEQD_ROOT_DIR}|{DEFAULT_BINARY_NAME}|{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}|{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}|{DEFAULT_DAEMON_POLL_INTERVAL}|{DEFAULT_UNSAFE_SKIP_BACKUP}|{DEFAULT_DAEMON_RESTART_DELAY})',
@@ -350,11 +347,10 @@ class Installer():
                                 '{DEFAULT_DAEMON_POLL_INTERVAL}': DEFAULT_DAEMON_POLL_INTERVAL,
                                 '{DEFAULT_UNSAFE_SKIP_BACKUP}': DEFAULT_UNSAFE_SKIP_BACKUP,
                                 '{DEFAULT_DAEMON_RESTART_DELAY}': DEFAULT_DAEMON_RESTART_DELAY}[m.group()],
-                        file.read()
+                        response.read().decode("utf-8").strip()
                     )
                 
-                # Remove the template file
-                self.remove_safe(fname)
+                # If the service file is successfully created, return the string
                 return s
             else:
                 logging.exception(f"URL is not valid: {RSYSLOG_TEMPLATE}")
@@ -373,24 +369,18 @@ class Installer():
             else:
                 binary_name = DEFAULT_BINARY_NAME
 
-            # Set template file path
-            fname = os.path.basename(RSYSLOG_TEMPLATE)
-
             # Fetch the template file from GitHub
             if is_valid_url(RSYSLOG_TEMPLATE):
-                with request.urlopen(RSYSLOG_TEMPLATE) as response, open(fname, "w") as file:
-                    file.write(response.read())
-                
+                with request.urlopen(RSYSLOG_TEMPLATE) as response:                
                     # Replace the values for environment variables in the template file
                     s = re.sub(
                         r'({BINARY_FOR_LOGGING}|{CHEQD_LOG_DIR})',
                         lambda m: {'{BINARY_FOR_LOGGING}': binary_name,
                                     '{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()],
-                        file.read()
+                        response.read().decode("utf-8").strip()
                     )
 
-                    # Remove the template file
-                    self.remove_safe(fname)
+                    # If the rsyslog file is successfully created, return the string
                     return s
             else:
                 logging.exception(f"URL is not valid: {RSYSLOG_TEMPLATE}")
@@ -403,23 +393,17 @@ class Installer():
         # The logrotate template file is fetched from the GitHub repo
         # Logrotate is used to rotate the log files of the cheqd-node every day, and keep a maximum of 7 days of logs.
         try:
-            # Set template file path
-            fname = os.path.basename(LOGROTATE_TEMPLATE)
-
             # Fetch the template file from GitHub
             if is_valid_url(LOGROTATE_TEMPLATE):
-                with request.urlopen(LOGROTATE_TEMPLATE) as response, open(fname, "w") as file:
-                    file.write(response.read())
-
+                with request.urlopen(LOGROTATE_TEMPLATE) as response:
                     # Replace the values for environment variables in the template file
                     s = re.sub(
                         r'({CHEQD_LOG_DIR})',
                         lambda m: {'{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()],
-                        file.read()
+                        response.read().decode("utf-8").strip()
                     )
 
-                # Remove the template file
-                self.remove_safe(fname)
+                # If the logrotate file is successfully created, return the string
                 return s
             else:
                 logging.exception(f"URL is not valid: {LOGROTATE_TEMPLATE}")
@@ -764,7 +748,7 @@ class Installer():
             # Initialize Cosmovisor if it's not already initialized
             # This is done by checking whether the Cosmovisor root directory exists
             if not os.path.exists(self.cosmovisor_root_dir):
-                self.exec(f"sudo -u {DEFAULT_CHEQD_HOME_DIR} bash -c 'cosmovisor init {self.standalone_node_binary_path}'")
+                self.exec(f"sudo -u {DEFAULT_CHEQD_USER} bash -c 'cosmovisor init {self.standalone_node_binary_path}'")
 
                 # Set ownership of cheqd root directory to cheqd:cheqd
                 # This is necessary because the command above may site ownership of the directory to root:root
@@ -774,7 +758,7 @@ class Installer():
             
             # Remove cheqd-noded binary from /usr/bin if it's not a symlink
             if not os.path.islink(self.standalone_node_binary_path):
-                logging.warn(f"Removing {DEFAULT_BINARY_NAME} from {DEFAULT_INSTALL_PATH} because it is not a symlink")
+                logging.warning(f"Removing {DEFAULT_BINARY_NAME} from {DEFAULT_INSTALL_PATH} because it is not a symlink")
                 os.remove(self.standalone_node_binary_path)
 
                 # Move cheqd-noded binary to Cosmovisor bin path
@@ -930,6 +914,7 @@ class Installer():
                 # Note that this will not set the variable permanently
                 # os.environ() is not used since it's not going to available for bash commands
                 # self.exec(f'export {env_var_name}="{env_var_value}"')
+                os.environ[env_var_name] = env_var_value
 
                 # Modify the system's environment variables
                 # This will set the variable permanently for all users
@@ -948,7 +933,12 @@ class Installer():
     def check_environment_variable(self, env_var_name):
         # Check if an environment variable is set
         try:
+            # Read the environment file to make the changes available for the current user/session
+            self.exec(f"bash -c 'source /etc/environment'")
+
+            # Read current environment variable if it exists
             os.environ[env_var_name]
+
             logging.debug(f"Environment variable {env_var_name} is set")
             return True
         except KeyError:
@@ -1571,12 +1561,16 @@ class Installer():
         # Remove a given systemd service
         try:
             if os.path.exists(service_file):
+                logging.debug(f"Service file {service_file} exists")
+
                 # Stop the service if it is active
                 if self.stop_systemd_service(service_name):
+
                     # Disable the service
                     if self.disable_systemd_service(service_name):
                         # Remove the service file
                         self.remove_safe(service_file)
+                        
                         logging.warning(f"{service_name} has been removed")
                         return True
                     else:
