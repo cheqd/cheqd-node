@@ -128,6 +128,7 @@ def is_valid_url(url) -> bool:
     try:
         status_code = request.urlopen(url).getcode()
         if status_code == 200:
+            logging.debug(f"URL is valid: {url}")
             return True
     except request.HTTPError:
         logging.exception(f"URL is not valid: {url}")
@@ -1196,7 +1197,7 @@ class Installer():
             if self.set_snapshot_url():
                 logging.info(f"Valid snapshot URL found: {self.snapshot_url}")
                 fname = os.path.basename(self.snapshot_url)
-                file_path = os.path.join(self.cheqd_root_dir, fname)
+                file_path = os.path.join(self.cheqd_home_dir, fname)
             else:
                 logging.error(f"No valid snapshot URL found in last {MAX_SNAPSHOT_DAYS} days!")
                 return False
@@ -1253,14 +1254,17 @@ class Installer():
                 # "wget -c" will resume a download if it gets interrupted
                 self.exec(f"wget -c {self.snapshot_url} -P {self.cheqd_home_dir}")
 
-                if self.compare_checksum(file_path, self.snapshot_url):
-                    logging.info(f"Snapshot download was successful AND checksums match.")
-                    return True
+                if os.path.exists(file_path):
+                    if self.compare_checksum(file_path, self.snapshot_url):
+                        logging.info(f"Snapshot download was successful AND checksums match.")
+                        return True
+                    else:
+                        logging.error(f"Snapshot download was successful BUT checksums do not match.")
+                        logging.warning(f"Removing corrupted snapshot archive: {file_path}")
+                        # self.remove_safe(file_path)
+                        return False
                 else:
-                    logging.error(f"Snapshot download was successful BUT checksums do not match.")
-                    logging.warning(f"Removing corrupted snapshot archive: {file_path}")
-                    self.remove_safe(file_path)
-                    return False
+                    logging.error(f"Snapshot download failed. File not found: {file_path}")
             else:
                 logging.error(f"Snapshot is larger than free disk space. Please free up disk space and try again.")
                 return False
@@ -1429,20 +1433,13 @@ class Installer():
         try:
             logging.debug(f"Checking whether {service_name} service is active")
 
-            # Check if the service exists
-            exists = os.system(f"systemctl status {service_name}")
-
-            if exists == 0:
-                # Check if the service is active
-                active = os.system(f"systemctl is-active --quiet {service_name}")
-                if active == 0:
-                    logging.debug(f"Service {service_name} is active")
-                    return True
-                else:
-                    logging.debug(f"Service {service_name} is not active")
-                    return False
+            # Active services will return 0
+            active = os.system(f"systemctl is-active --quiet {service_name}")
+            if active == 0:
+                logging.debug(f"Service {service_name} is active")
+                return True
             else:
-                logging.debug(f"Service {service_name} is not installed")
+                logging.debug(f"Service {service_name} is not active")
                 return False
         except Exception as e:
             logging.exception(f"Failed to check whether {service_name} service is active. Reason: {e}")
@@ -1453,22 +1450,17 @@ class Installer():
         try:
             logging.debug(f"Checking whether {service_name} service is enabled")
             
-            # Check if the service exists
-            exists = os.system(f"systemctl status {service_name}")
-            if exists == 0:
-                # Check if the service is enabled
-                enabled = os.system(f"systemctl is-enabled --quiet {service_name}")
-                if enabled == 0:
-                    logging.debug(f"Service {service_name} is enabled")
-                    return True
-                else:
-                    logging.debug(f"Service {service_name} is not enabled")
-                    return False
+            # Enabled services will return 0
+            enabled = os.system(f"systemctl is-enabled --quiet {service_name}")
+            if enabled == 0:
+                logging.debug(f"Service {service_name} is enabled")
+                return True
             else:
-                logging.debug(f"Service {service_name} is not installed")
+                logging.debug(f"Service {service_name} is not enabled")
                 return False
         except Exception as e:
             logging.exception(f"Failed to check whether {service_name} service is enabled. Reason: {e}")
+            return False
     
     def reload_systemd(self) -> bool:
         # Reload systemd config
@@ -1489,6 +1481,7 @@ class Installer():
                 return False    
         except Exception as e:
             logging.exception(f"Error daemon reloading: Reason: {e}")
+            return False
     
     def disable_systemd_service(self, service_name) -> bool:
         # Disable a given systemd service
@@ -1506,6 +1499,7 @@ class Installer():
                 return True
         except Exception as e:
             logging.exception(f"Error disabling {service_name}: Reason: {e}")
+            return False
 
     def enable_systemd_service(self, service_name) -> bool:
         # Enable a given systemd service
@@ -1527,6 +1521,7 @@ class Installer():
                 return False
         except Exception as e:
             logging.exception(f"Error disabling {service_name}: Reason: {e}")
+            return False
 
     def stop_systemd_service(self, service_name) -> bool:
         # Stop and disable a given systemd service
@@ -1567,7 +1562,7 @@ class Installer():
                 return False
         except Exception as e:
             logging.exception(f"Error restarting {service_name}: Reason: {e}")
-            raise
+            return False
 
     def remove_systemd_service(self, service_name, service_file) -> bool:
         # Remove a given systemd service
@@ -1582,14 +1577,17 @@ class Installer():
                     if self.disable_systemd_service(service_name):
                         # Remove the service file
                         self.remove_safe(service_file)
-                        
                         logging.warning(f"{service_name} has been removed")
                         return True
                     else:
                         logging.error(f"{service_name} could not be removed")
                         return False
+            else:
+                logging.error(f"Service file {service_file} does not exist")
+                return False
         except Exception as e:
             logging.exception(f"Error removing {service_name}: Reason: {e}")
+            return False
 
 
 ###############################################################
