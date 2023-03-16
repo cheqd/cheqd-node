@@ -440,8 +440,8 @@ class Installer():
                 logging.warning(f"Removed {path}")
                 return True
             else:
-                logging.exception(f"{path} does not exist")
-                return False
+                logging.debug(f"{path} does not exist")
+                return True
         except Exception as e:
             logging.exception(f"Failed to remove {path}. Reason: {e}")
             return False
