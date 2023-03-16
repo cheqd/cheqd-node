@@ -626,7 +626,9 @@ class Installer():
                 logging.warning("Removing user's data and configs")
                 self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
                 self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
-                self.remove_safe(self.cheqd_root_dir, is_dir=True)
+                self.remove_safe(self.cheqd_config_dir, is_dir=True)
+                self.remove_safe(self.cheqd_data_dir, is_dir=True)
+                self.remove_safe(self.cosmovisor_root_dir, is_dir=True)
                 return True
             else:
                 logging.debug("No pre-installation steps needed")
