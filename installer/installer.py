@@ -594,28 +594,32 @@ class Installer():
 
             if os.path.exists(self.cheqd_config_dir):
                 # Backup ~/.cheqdnode/config/ folder
-                shutil.copytree(self.cheqd_config_dir, self.cheqd_backup_dir)
+                shutil.copytree(self.cheqd_config_dir, os.path.join(self.cheqd_backup_dir, "config"), dirs_exist_ok=True)
+                logging.info(f"Successfully backed up {self.cheqd_config_dir} directory")
             else:
                 logging.debug("No config folder found to backup. Skipping...")
 
             # Backup ~/.cheqdnode/data/priv_validator_key.json
             # Without this file, a validator node will get jailed!
-            if os.path.exists(os.path.join(self.cheqd_data_dir, "priv_validator_key.json")):
+            if os.path.exists(os.path.join(self.cheqd_data_dir, "priv_validator_state.json")):
                 shutil.copy(os.path.join(self.cheqd_data_dir, "priv_validator_state.json"), 
                     os.path.join(self.cheqd_backup_dir, "priv_validator_state.json"))
+                logging.info(f"Successfully backed up {self.cheqd_data_dir}/priv_validator_state.json")
             else:
                 logging.debug("No validator state file found to backup. Skipping...")
             
             # Backup ~/.cheqdnode/data/upgrade-info.json
             # This file is required for Cosmovisor to track and understand where upgrade is needed
             if os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
-                shutil.copyfile(os.path.join(self.cheqd_data_dir, "upgrade-info.json"), 
+                shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"), 
                     os.path.join(self.cheqd_backup_dir, "upgrade-info.json"))
+                logging.info(f"Successfully backed up {self.cheqd_data_dir}/upgrade-info.json")
             else:
                 logging.debug("No upgrade-info.json file found to backup. Skipping...")
 
             # Change ownership of backup directory to cheqd user
             shutil.chown(self.cheqd_backup_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
+            logging.debug(f"Successfully changed ownership of {self.cheqd_backup_dir}")
 
             if self.interviewer.is_from_scratch or self.interviewer.is_setup_needed:
                 # Remove cheqd-node data and binaries
@@ -1218,7 +1222,7 @@ class Installer():
             # WARNING: Backup the priv_validator_state.json and upgrade-info.json before doing this!
             if os.path.exists(self.cheqd_backup_dir):
                 # Check that backup of validator keys, state, and upgrade info exists before proceeding
-                logging.info(f"Backup directory exists: {self.cheqd_backup_dir}")
+                logging.info(f"Backup directory exists: {self.cheqd_backup_dir}.")
 
                 # Remove contents of data directory
                 logging.warning(f"Contents of {self.cheqd_data_dir} will be deleted to make room for snapshot")
@@ -1377,29 +1381,37 @@ class Installer():
             # Restore files from backup folder
             # Use shutil.copy() instead of shutil.copyfile() to preserve file metadata
             if os.path.exists(self.cheqd_backup_dir):
-                logging.info(f"Restoring files from backup folder.")
+                logging.info(f"Backup directory found. Restoring files from backup...")
                 
                 # Restore priv_validator_state.json
-                logging.info(f"Restoring priv_validator_state.json to {self.cheqd_data_dir}")
-                shutil.copy(os.path.join(self.cheqd_backup_dir, "priv_validator_state.json"),
-                            os.path.join(self.cheqd_data_dir, "priv_validator_state.json"))
+                if os.path.exists(os.path.join(self.cheqd_backup_dir, "priv_validator_state.json")):
+                    shutil.copy(os.path.join(self.cheqd_backup_dir, "priv_validator_state.json"),
+                        os.path.join(self.cheqd_data_dir, "priv_validator_state.json"))
+                    logging.info(f"Restored priv_validator_state.json to {self.cheqd_data_dir}")
+                else:
+                    logging.warning(f"priv_validator_state.json not found in {self.cheqd_backup_dir}! Please restore it manually to {self.cheqd_data_dir}.")
                 
                 # Restore upgrade-info.json
-                logging.info(f"Restoring upgrade-info.json to {self.cheqd_data_dir}")
-                shutil.copy(os.path.join(self.cheqd_backup_dir, "upgrade-info.json"),
-                            os.path.join(self.cheqd_data_dir, "upgrade-info.json"))
+                if os.path.exists(os.path.join(self.cheqd_backup_dir, "upgrade-info.json")):
+                    shutil.copy(os.path.join(self.cheqd_backup_dir, "upgrade-info.json"),
+                        os.path.join(self.cheqd_data_dir, "upgrade-info.json"))
+                    logging.info(f"Restored upgrade-info.json to {self.cheqd_data_dir}")
+                else:
+                    logging.warning(f"upgrade-info.json not found in {self.cheqd_backup_dir}! Please restore it manually to {self.cheqd_data_dir}.")
                 
                 # If Cosmovisor is needed, copy upgrade-info.json to ~/.cheqdnode/cosmovisor/current/ directory
                 # Otherwise, Cosmovisor will throw an error
-                if self.interviewer.is_cosmovisor_needed:
-                    logging.info(f"Restoring upgrade-info.json to {self.cosmovisor_root_dir}/current/")
+                if self.interviewer.is_cosmovisor_needed and os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
                     shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
-                                os.path.join(self.cosmovisor_root_dir, "current/upgrade-info.json"))
+                        os.path.join(self.cosmovisor_root_dir, "current/upgrade-info.json"))
+                    logging.info(f"Restored upgrade-info.json to {self.cosmovisor_root_dir}/current/")
 
                     # Change ownership of Cosmovisor directory to cheqd user
                     shutil.chown(self.cosmovisor_root_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
+                else:
+                    logging.warning(f"upgrade-info.json not found in {self.cheqd_data_dir}! Please restore it manually to {self.cosmovisor_root_dir}/current/")
             else:
-                logging.warning(f"Backup folder not found. Please check and restore the following folders/files from your own backup:\n~/.cheqdnode/data/priv_validator_state.json, ~/.cheqdnode/data/upgrade-info.json, ~/.cheqdnode/config/")
+                logging.warning(f"Backup folder not found. Please manually restore required files to {self.cheqd_data_dir} and {self.cheqd_config_dir}")
 
             # Change ownership of cheqd node data directory to cheqd user
             shutil.chown(self.cheqd_data_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
