@@ -285,8 +285,8 @@ class Installer():
 
     @property
     def cheqd_user_bash_profile_path(self):
-        # Path where .bashrc file for cheqd user will be created
-        # Default: /home/cheqd/.bashrc
+        # Path where .bash_profile file for cheqd user will be created
+        # Default: /home/cheqd/.bash_profile
         return os.path.join(self.cheqd_home_dir, ".bash_profile")
 
     @property
@@ -723,12 +723,12 @@ class Installer():
             if not os.path.exists(self.cheqd_user_bash_profile_path):
                 logging.info(f"Creating {self.cheqd_user_bash_profile_path} file")
 
-                # Download the template file from GitHub and write it to ~/.bashrc
+                # Download the template file from GitHub and write it to ~/.bash_profile
                 if is_valid_url(BASH_PROFILE_TEMPLATE):
                     with request.urlopen(BASH_PROFILE_TEMPLATE) as response, open(self.cheqd_user_bashrc_path, "w") as file:
                         # Add a shebang line
                         file.write("#!/bin/bash\n")
-                        file.write(response.read())
+                        file.write(response.read().decode("utf-8").strip())
 
                 # Change ownership to cheqd:cheqd
                 shutil.chown(self.cheqd_user_bash_profile_path, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
