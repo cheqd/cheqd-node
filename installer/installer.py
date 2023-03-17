@@ -428,10 +428,10 @@ class Installer():
             kwargs["stderr"] = subprocess.DEVNULL
         return subprocess.run(cmd, **kwargs)
 
-    def remove_safe(self, path, is_dir=False) -> bool:
+    def remove_safe(self, path) -> bool:
         # Helper function to remove a file or directory safely
         try:
-            if is_dir and os.path.exists(path):
+            if os.path.isdir(path) and os.path.exists(path):
                 shutil.rmtree(path)
                 logging.warning(f"Removed {path}")
                 return True
@@ -461,13 +461,6 @@ class Installer():
                 logging.info("User/group cheqd setup successfully")
             else:
                 logging.error("Failed to setup user/group cheqd")
-                return False
-            
-            # Setup directories needed for installation
-            if self.prepare_directory_tree():
-                logging.info("Directory tree setup successfully")
-            else:
-                logging.error("Failed to setup directory tree")
                 return False
 
             # Carry out pre-installation steps
@@ -573,12 +566,52 @@ class Installer():
             logging.exception("Failed to download cheqd-noded binary. Reason: {e}")
             return False
 
+    def prepare_cheqd_user(self) -> bool:
+        # Create "cheqd" user/group if it doesn't exist
+        try:
+            if not self.does_user_exist(DEFAULT_CHEQD_USER):
+                logging.info(f"Creating {DEFAULT_CHEQD_USER} group")
+                self.exec(f"addgroup {DEFAULT_CHEQD_USER} --quiet --system")
+
+                logging.info(f"Creating {DEFAULT_CHEQD_USER} user and adding to {DEFAULT_CHEQD_USER} group")
+                self.exec(
+                    f"adduser --system {DEFAULT_CHEQD_USER} --home {self.cheqd_home_dir} --shell /bin/bash --ingroup {DEFAULT_CHEQD_USER} --quiet")
+                
+                # Set permissions for cheqd home directory to cheqd:cheqd
+                logging.info(f"Setting permissions for {self.cheqd_home_dir} to {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}")
+                shutil.chown(self.cheqd_home_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
+            else:
+                logging.debug(f"User {DEFAULT_CHEQD_USER} already exists. Skipping creation...")
+
+            # Create ~/.cheqdnode root directory
+            if not os.path.exists(self.cheqd_root_dir):
+                logging.info(f"Creating root directory: {self.cheqd_root_dir}")
+                os.makedirs(self.cheqd_root_dir, exist_ok=True)
+            else:
+                logging.info(f"Root directory {self.cheqd_root_dir} already exists. Skipping creation...")
+            
+            # Return True if all steps were successful
+            return True
+        except Exception as e:
+            logging.exception(f"Failed to create {DEFAULT_CHEQD_USER} user. Reason: {e}")
+            return False
+
+    def does_user_exist(self, username) -> bool:
+        # Helper function to see if a given user exists on the system
+        try:
+            pwd.getpwnam(username)
+            logging.debug(f"User {username} already exists")
+            return True
+        except KeyError:
+            logging.debug(f"User {username} does not exist")
+            return False
+
     def pre_install(self) -> bool:
         # Pre-installation steps
-        # Removes the following existing cheqd-noded data and configurations:
-        # 1. ~/.cheqdnode directory
-        # 2. cheqd-noded / cosmovisor binaries
-        # 3. systemd service files
+        # 1. Stop systemd services if running
+        # 2. Backup existing data and configurations
+        # 3. Remove existing cheqd-noded data and configurations
+        # 4. Create logging directories
         try:
             # Stop existing systemd services first if running
             # Check if the service is running before stopping it
@@ -627,79 +660,23 @@ class Installer():
                 logging.warning("Removing user's data and configs")
                 self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
                 self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
-                self.remove_safe(self.cheqd_config_dir, is_dir=True)
-                self.remove_safe(self.cheqd_data_dir, is_dir=True)
-                self.remove_safe(self.cosmovisor_root_dir, is_dir=True)
-                return True
+                self.remove_safe(self.cheqd_config_dir)
+                self.remove_safe(self.cheqd_data_dir)
+                self.remove_safe(self.cosmovisor_root_dir)
             else:
-                logging.debug("No pre-installation steps needed")
-                return True
-        except Exception as e:
-            logging.exception(f"Could not complete pre-installation steps. Reason: {e}")
-            return False
-
-    def prepare_cheqd_user(self) -> bool:
-        # Create "cheqd" user/group if it doesn't exist
-        try:
-            if not self.does_user_exist(DEFAULT_CHEQD_USER):
-                logging.info(f"Creating {DEFAULT_CHEQD_USER} group")
-                self.exec(f"addgroup {DEFAULT_CHEQD_USER} --quiet --system")
-
-                logging.info(f"Creating {DEFAULT_CHEQD_USER} user and adding to {DEFAULT_CHEQD_USER} group")
-                self.exec(
-                    f"adduser --system {DEFAULT_CHEQD_USER} --home {self.cheqd_home_dir} --shell /bin/bash --ingroup {DEFAULT_CHEQD_USER} --quiet")
-                
-                # Set permissions for cheqd home directory to cheqd:cheqd
-                logging.info(f"Setting permissions for {self.cheqd_home_dir} to {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}")
-                shutil.chown(self.cheqd_home_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
-                return True
-            else:
-                logging.info(f"User {DEFAULT_CHEQD_USER} already exists. Skipping creation...")
-                return True
-        except Exception as e:
-            logging.exception(f"Failed to create {DEFAULT_CHEQD_USER} user. Reason: {e}")
-            return False
-
-    def does_user_exist(self, username) -> bool:
-        # Helper function to see if a given user exists on the system
-        try:
-            pwd.getpwnam(username)
-            logging.debug(f"User {username} already exists")
-            return True
-        except KeyError:
-            logging.debug(f"User {username} does not exist")
-            return False
-
-    def prepare_directory_tree(self) -> bool:
-        # Needed only in case of clean installation
-        # 1. Create ~/.cheqdnode directory
-        # 2. Set directory permissions to default cheqd user
-        # 3. Create ~/.cheqdnode/log directory
-        try:
-            # Create root directory for cheqd-noded
-            if not os.path.exists(self.cheqd_root_dir):
-                logging.info("Creating main directory for cheqd-noded")
-                os.makedirs(self.cheqd_root_dir, exist_ok=True)
-            else:
-                logging.info(f"Skipping main directory creation because {self.cheqd_root_dir} already exists")
-
+                logging.debug("No user data or configs to remove. Skipping...")
+            
             # Setup logging related directories
-            # 1. Create log directory if it doesn't exist
-            # 2. Create default stdout.log file in log directory
-            # 3. Set ownership of log directory to syslog:cheqd
             if not os.path.exists(self.cheqd_log_dir):
                 # Create ~/.cheqdnode/log directory
-                logging.info("Creating log directory for cheqd-noded")
+                logging.info(f"Creating log directory: {self.cheqd_log_dir}")
                 os.makedirs(self.cheqd_log_dir, exist_ok=True)
 
                 # Create blank ~/.cheqdnode/log/stdout.log file. Overwrite if it already exists.
                 # Using the .open() method without doing anything in it will create the file
                 # "w" mode is used to overwrite the file if it already exists
                 with open(os.path.join(self.cheqd_log_dir, "stdout.log"), "w") as file:
-                    logging.debug("Created blank stdout.log file")
-
-                logging.info(f"Setting up ownership permissions for {self.cheqd_log_dir} directory")
-                shutil.chown(self.cheqd_log_dir, "syslog", DEFAULT_CHEQD_USER)
+                    logging.debug(f"Created blank stdout.log file in {self.cheqd_log_dir}")
             else:
                 logging.info(f"Skipping log directory creation because {self.cheqd_log_dir} already exists")
 
@@ -709,12 +686,20 @@ class Installer():
                 logging.info("Creating a symlink from cheqd-noded log folder to /var/log/cheqd-node")
                 os.symlink(self.cheqd_log_dir, "/var/log/cheqd-node", target_is_directory=True)
             else:
-                logging.info("Skipping linking because /var/log/cheqd-node already exists")
+                logging.debug("Skipping linking because /var/log/cheqd-node already exists")
             
-            # Return True if all steps were successful
+            # Change ownership of directories
+            # Always execute these since they might be lost if directories are removed and recreated
+            logging.info(f"Setting ownership of {self.cheqd_home_dir} to {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}")
+            shutil.chown(self.cheqd_home_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
+
+            logging.info(f"Setting ownership of {self.cheqd_log_dir} to syslog:{DEFAULT_CHEQD_USER}")
+            shutil.chown(self.cheqd_log_dir, "syslog", DEFAULT_CHEQD_USER)
+
+            # Return True if all steps are successful
             return True
         except Exception as e:
-            logging.exception(f"Failed to prepare directory tree for {DEFAULT_CHEQD_USER}. Reason: {e}")
+            logging.exception(f"Could not complete pre-installation steps. Reason: {e}")
             return False
 
     def install_cosmovisor(self) -> bool:
@@ -756,10 +741,6 @@ class Installer():
             # This is done by checking whether the Cosmovisor root directory exists
             if not os.path.exists(self.cosmovisor_root_dir):
                 self.exec(f"sudo -u {DEFAULT_CHEQD_USER} bash -c 'cosmovisor init {self.standalone_node_binary_path}'")
-
-                # Set ownership of cheqd root directory to cheqd:cheqd
-                # This is necessary because the command above may site ownership of the directory to root:root
-                shutil.chown(self.cheqd_root_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
             else:
                 logging.info("Cosmovisor directory already exists. Skipping initialisation...")
             
@@ -869,7 +850,7 @@ class Installer():
             # Remove Cosmovisor directory if it exists
             if os.path.exists(self.cosmovisor_root_dir):
                 logging.warn(f"Removing Cosmovisor directory from {self.cosmovisor_root_dir} because it is not required for a standalone installation")
-                self.remove_safe(self.cosmovisor_root_dir, is_dir=True)
+                self.remove_safe(self.cosmovisor_root_dir)
             else:
                 logging.debug(f"{self.cosmovisor_root_dir} doesn't exist. Skipping removal...")
 
@@ -1253,7 +1234,7 @@ class Installer():
 
                 # Remove contents of data directory
                 logging.warning(f"Contents of {self.cheqd_data_dir} will be deleted to make room for snapshot")
-                self.remove_safe(self.cheqd_data_dir, is_dir=True)
+                self.remove_safe(self.cheqd_data_dir)
 
                 # Recreate data directory
                 os.makedirs(self.cheqd_data_dir, exist_ok=True)
