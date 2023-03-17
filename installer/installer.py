@@ -66,6 +66,7 @@ DEFAULT_STANDALONE_SERVICE_FILE_PATH = f"/lib/systemd/system/{DEFAULT_STANDALONE
 DEFAULT_COSMOVISOR_SERVICE_FILE_PATH = f"/lib/systemd/system/{DEFAULT_COSMOVISOR_SERVICE_NAME}.service"
 DEFAULT_LOGROTATE_FILE = "/etc/logrotate.d/cheqd-node"
 DEFAULT_RSYSLOG_FILE = "/etc/rsyslog.d/cheqd-node.conf"
+DEFAULT_ENVIRONMENT_FILE = "/etc/profile.d/cheqd-node.sh"
 
 
 ###############################################################
@@ -588,17 +589,20 @@ class Installer():
                 logging.debug(f"User {DEFAULT_CHEQD_USER} already exists. Skipping creation...")
 
             # Create an ~/. file if it doesn't exist
-            if not os.path.exists(self.cheqd_user_profile_path):
-                logging.info(f"Creating {self.cheqd_user_profile_path} file")
+            if not os.path.exists(DEFAULT_ENVIRONMENT_FILE):
+                logging.info(f"Creating {DEFAULT_ENVIRONMENT_FILE} file")
 
-                with open(self.cheqd_user_profile_path, "w") as file:
+                with open(DEFAULT_ENVIRONMENT_FILE, "w") as file:
                     # Add a shebang line
                     file.write("#!/bin/bash\n")
+
+                # Change ownership to root:root
+                self.exec(f"chown root:root {DEFAULT_ENVIRONMENT_FILE}")    
                 
                 # Make the file executable
-                os.chmod(self.cheqd_user_profile_path, 0o755)
+                os.chmod(DEFAULT_ENVIRONMENT_FILE, 0o755)
             else:
-                logging.debug(f"{self.cheqd_user_profile_path} already exists. Skipping creation...")
+                logging.debug(f"{DEFAULT_ENVIRONMENT_FILE} already exists. Skipping creation...")
 
             # Create ~/.cheqdnode root directory
             if not os.path.exists(self.cheqd_root_dir):
@@ -761,7 +765,7 @@ class Installer():
             # Initialize Cosmovisor if it's not already initialized
             # This is done by checking whether the Cosmovisor root directory exists
             if not os.path.exists(self.cosmovisor_root_dir):
-                self.exec(f"sudo -u {DEFAULT_CHEQD_USER} bash -c 'DAEMON_NAME={DEFAULT_BINARY_NAME} DAEMON_HOME={self.cheqd_root_dir} cosmovisor init {self.standalone_node_binary_path}'")
+                self.exec(f"sudo -u {DEFAULT_CHEQD_USER} bash -c 'cosmovisor init {self.standalone_node_binary_path}'")
             else:
                 logging.info("Cosmovisor directory already exists. Skipping initialisation...")
             
@@ -914,44 +918,45 @@ class Installer():
     def set_environment_variable(self, env_var_name, env_var_value):
         # Set an environment variable by exporting values using ~/.profile
         try:
-            if not self.check_environment_variable(env_var_name):
-                logging.debug(f"Setting {env_var_name} to {env_var_value}")
+            # if not self.check_environment_variable(env_var_name):
+            #     logging.debug(f"Setting {env_var_name} to {env_var_value}")
 
-                # Set the environment variable for the current user/session
-                # Note that this will not set the variable permanently
-                # os.environ() is not used since it's not going to available for bash commands
-                # self.exec(f'export {env_var_name}="{env_var_value}"')
-                os.environ[env_var_name] = env_var_value
+            #     # Set the environment variable for the current user/session
+            #     # Note that this will not set the variable permanently
+            #     # os.environ() is not used since it's not going to available for bash commands
+            #     # self.exec(f'export {env_var_name}="{env_var_value}"')
+            #     os.environ[env_var_name] = env_var_value
 
-                # Modify the system's environment variables
-                # This will set the variable permanently for all users
-                # Don't use export since this is an environment file, not a bash script
-                with open(self.cheqd_user_profile_path, "a") as env_file:
+            #     # Modify the system's environment variables
+            #     # This will set the variable permanently for all users
+            #     # Don't use export since this is an environment file, not a bash script
+            if os.path.exists(DEFAULT_ENVIRONMENT_FILE):
+                with open(DEFAULT_ENVIRONMENT_FILE, "a") as env_file:
                     env_file.write(f'export {env_var_name}="{env_var_value}"\n')
             else:
                 logging.debug(f"Skipped setting {env_var_name}... already set")
             
-            # Read the environment file to make the changes available for the current user/session
-            self.exec(f"bash -c 'source {self.cheqd_user_profile_path}'")
-            self.exec(f"sudo -u {DEFAULT_CHEQD_USER} bash -c 'source {self.cheqd_user_profile_path}'")
+            # # Read the environment file to make the changes available for the current user/session
+            # self.exec(f"bash -c 'source {self.cheqd_user_profile_path}'")
+            # self.exec(f"sudo -u {DEFAULT_CHEQD_USER} bash -c 'source {self.cheqd_user_profile_path}'")
         except Exception as e:
             logging.exception(f"Failed to set environment variable {env_var_name}. Reason: {e}")
             raise
 
-    def check_environment_variable(self, env_var_name):
-        # Check if an environment variable is set
-        try:
-            # Export the environment variables in the file
-            self.exec(f"bash -c 'source {self.cheqd_user_profile_path}'")
+    # def check_environment_variable(self, env_var_name):
+    #     # Check if an environment variable is set
+    #     try:
+    #         # Export the environment variables in the file
+    #         self.exec(f"bash -c 'source {self.cheqd_user_profile_path}'")
 
-            # Read current environment variable if it exists
-            os.environ[env_var_name]
+    #         # Read current environment variable if it exists
+    #         os.environ[env_var_name]
 
-            logging.debug(f"Environment variable {env_var_name} is set")
-            return True
-        except KeyError:
-            logging.debug(f"Environment variable {env_var_name} is NOT set")
-            return False
+    #         logging.debug(f"Environment variable {env_var_name} is set")
+    #         return True
+    #     except KeyError:
+    #         logging.debug(f"Environment variable {env_var_name} is NOT set")
+    #         return False
 
     def configure_node_settings(self) -> bool:
         # Configure cheqd-noded settings in app.toml and config.toml
