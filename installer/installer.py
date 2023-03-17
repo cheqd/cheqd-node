@@ -609,7 +609,7 @@ class Installer():
             
             # Set permissions for cheqd home directory to cheqd:cheqd
             logging.info(f"Setting permissions for {self.cheqd_home_dir} to {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}")
-            shutil.chown(self.cheqd_home_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
+            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_home_dir}")
 
             # Return True if all steps were successful
             return True
@@ -673,7 +673,7 @@ class Installer():
                 logging.debug("No upgrade-info.json file found to backup. Skipping...")
 
             # Change ownership of backup directory to cheqd user
-            shutil.chown(self.cheqd_backup_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
+            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_backup_dir}")
             logging.debug(f"Successfully changed ownership of {self.cheqd_backup_dir}")
 
             if self.interviewer.is_from_scratch or self.interviewer.is_setup_needed:
@@ -712,10 +712,10 @@ class Installer():
             # Change ownership of directories
             # Always execute these since they might be lost if directories are removed and recreated
             logging.info(f"Setting ownership of {self.cheqd_home_dir} to {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}")
-            shutil.chown(self.cheqd_home_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
+            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_home_dir}")
 
             logging.info(f"Setting ownership of {self.cheqd_log_dir} to syslog:{DEFAULT_CHEQD_USER}")
-            shutil.chown(self.cheqd_log_dir, "syslog", DEFAULT_CHEQD_USER)
+            self.exec(f"chown -R syslog:{DEFAULT_CHEQD_USER} {self.cheqd_log_dir}")
 
             # Return True if all steps are successful
             return True
@@ -749,14 +749,14 @@ class Installer():
             shutil.move(self.temporary_cosmovisor_binary_path, self.cosmovisor_binary_path)
 
             # Set ownership of Cosmovisor binary to root:root
-            shutil.chown(self.cosmovisor_binary_path, "root", "root")
+            self.exec(f"chown root:root {self.cosmovisor_binary_path}")
 
             # Move cheqd-noded binary to /usr/bin
             logging.info(f"Copying cheqd-noded binary from {self.temporary_node_binary_path} to {self.standalone_node_binary_path}")
             shutil.copy(self.temporary_node_binary_path, self.standalone_node_binary_path)
 
             # Set ownership of cheqd-noded binary to root:root
-            shutil.chown(self.standalone_node_binary_path, "root", "root")
+            self.exec(f"chown root:root {self.standalone_node_binary_path}")
 
             # Initialize Cosmovisor if it's not already initialized
             # This is done by checking whether the Cosmovisor root directory exists
@@ -777,7 +777,7 @@ class Installer():
 
                 # Set ownership of cheqd-noded binary to cheqd:cheqd
                 # This is ONLY done when the binary is moved to Cosmovisor bin path
-                shutil.chown(self.cosmovisor_current_bin_path, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
+                self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_current_bin_path}")
 
                 # Create symlink to cheqd-noded binary in Cosmovisor bin path
                 # Target comes first, then the location of the symlink
@@ -801,7 +801,7 @@ class Installer():
             
             # Change owner of Cosmovisor directory to cheqd:cheqd
             logging.info(f"Changing ownership of {self.cosmovisor_root_dir} to {DEFAULT_CHEQD_USER} user")
-            shutil.chown(self.cosmovisor_root_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
+            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
 
             # Return True if all steps were successful
             return True
@@ -866,7 +866,7 @@ class Installer():
             
             # Set ownership of cheqd-noded binary to root:root
             logging.info(f"Changing ownership of {self.standalone_node_binary_path} to root:root")
-            shutil.chown(self.standalone_node_binary_path, "root", "root")
+            self.exec(f"chown root:root {self.standalone_node_binary_path}")
 
             # Remove Cosmovisor directory if it exists
             if os.path.exists(self.cosmovisor_root_dir):
@@ -1070,7 +1070,7 @@ class Installer():
             
             # Set ownership of configuration directory to cheqd:cheqd
             logging.info(f"Setting ownership of {self.cheqd_config_dir} to {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}")
-            shutil.chown(self.cheqd_config_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
+            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_config_dir}")
 
             # Return True if all the above steps were successful
             return True
@@ -1258,7 +1258,7 @@ class Installer():
 
                 # Recreate data directory
                 os.makedirs(self.cheqd_data_dir, exist_ok=True)
-                shutil.chown(self.cheqd_data_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
+                self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_data_dir}")
             else:
                 logging.warning(f"Backup directory does not exist. Will not delete data directory.\n")
                 logging.warning(f"Free disk space will be calculated without freeing up space.\n")
@@ -1410,14 +1410,14 @@ class Installer():
                     logging.info(f"Restored upgrade-info.json to {self.cosmovisor_root_dir}/current/")
 
                     # Change ownership of Cosmovisor directory to cheqd user
-                    shutil.chown(self.cosmovisor_root_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
+                    self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
                 else:
                     logging.warning(f"upgrade-info.json not found in {self.cheqd_data_dir}! Please restore it manually to {self.cosmovisor_root_dir}/current/")
             else:
                 logging.warning(f"Backup folder not found. Please manually restore required files to {self.cheqd_data_dir} and {self.cheqd_config_dir}")
 
             # Change ownership of cheqd node data directory to cheqd user
-            shutil.chown(self.cheqd_data_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
+            self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_data_dir}")
 
             # Return True if snapshot extraction was successful
             return True
