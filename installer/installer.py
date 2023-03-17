@@ -588,17 +588,17 @@ class Installer():
                 logging.debug(f"User {DEFAULT_CHEQD_USER} already exists. Skipping creation...")
 
             # Create an ~/. file if it doesn't exist
-            if not os.path.exists(self.cheqd_user_profile_file):
-                logging.info(f"Creating {self.cheqd_user_profile_file} file")
+            if not os.path.exists(self.cheqd_user_profile_path):
+                logging.info(f"Creating {self.cheqd_user_profile_path} file")
 
-                with open(self.cheqd_user_profile_file, "w") as file:
+                with open(self.cheqd_user_profile_path, "w") as file:
                     # Add a shebang line
                     file.write("#!/bin/bash\n")
                 
                 # Make the file executable
-                os.chmod(self.cheqd_user_profile_file, 0o755)
+                os.chmod(self.cheqd_user_profile_path, 0o755)
             else:
-                logging.debug(f"{self.cheqd_user_profile_file} already exists. Skipping creation...")
+                logging.debug(f"{self.cheqd_user_profile_path} already exists. Skipping creation...")
 
             # Create ~/.cheqdnode root directory
             if not os.path.exists(self.cheqd_root_dir):
@@ -926,14 +926,14 @@ class Installer():
                 # Modify the system's environment variables
                 # This will set the variable permanently for all users
                 # Don't use export since this is an environment file, not a bash script
-                with open(self.cheqd_user_profile_file, "a") as env_file:
+                with open(self.cheqd_user_profile_path, "a") as env_file:
                     env_file.write(f'export {env_var_name}="{env_var_value}"\n')
             else:
                 logging.debug(f"Skipped setting {env_var_name}... already set")
             
             # Read the environment file to make the changes available for the current user/session
-            self.exec(f"bash -c 'source {self.cheqd_user_profile_file}'")
-            self.exec(f"sudo -u {DEFAULT_CHEQD_USER} bash -c 'source {self.cheqd_user_profile_file}'")
+            self.exec(f"bash -c 'source {self.cheqd_user_profile_path}'")
+            self.exec(f"sudo -u {DEFAULT_CHEQD_USER} bash -c 'source {self.cheqd_user_profile_path}'")
         except Exception as e:
             logging.exception(f"Failed to set environment variable {env_var_name}. Reason: {e}")
             raise
@@ -942,7 +942,7 @@ class Installer():
         # Check if an environment variable is set
         try:
             # Export the environment variables in the file
-            self.exec(f"bash -c 'source {self.cheqd_user_profile_file}'")
+            self.exec(f"bash -c 'source {self.cheqd_user_profile_path}'")
 
             # Read current environment variable if it exists
             os.environ[env_var_name]
