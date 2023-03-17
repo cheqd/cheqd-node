@@ -66,7 +66,8 @@ DEFAULT_STANDALONE_SERVICE_FILE_PATH = f"/lib/systemd/system/{DEFAULT_STANDALONE
 DEFAULT_COSMOVISOR_SERVICE_FILE_PATH = f"/lib/systemd/system/{DEFAULT_COSMOVISOR_SERVICE_NAME}.service"
 DEFAULT_LOGROTATE_FILE = "/etc/logrotate.d/cheqd-node"
 DEFAULT_RSYSLOG_FILE = "/etc/rsyslog.d/cheqd-node.conf"
-DEFAULT_ENVIRONMENT_FILE = "/etc/profile.d/cheqd-node.sh"
+DEFAULT_LOGIN_SHELL_ENV_FILE_PATH = "/etc/profile.d/cheqd-node.sh"
+BASH_PROFILE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/build-tools/bash-profile.txt"
 
 
 ###############################################################
@@ -277,16 +278,22 @@ class Installer():
         return os.path.join(self.cheqd_root_dir, "log")
 
     @property
+    def cheqd_user_bashrc_path(self):
+        # Path where .bashrc file for cheqd user will be created
+        # Default: /home/cheqd/.bashrc
+        return os.path.join(self.cheqd_home_dir, ".bashrc")
+
+    @property
+    def cheqd_user_bash_profile_path(self):
+        # Path where .bashrc file for cheqd user will be created
+        # Default: /home/cheqd/.bashrc
+        return os.path.join(self.cheqd_home_dir, ".bash_profile")
+
+    @property
     def cosmovisor_root_dir(self):
         # cosmovisor root directory
         # Default: /home/cheqd/.cheqdnode/cosmovisor
         return os.path.join(self.cheqd_root_dir, "cosmovisor")
-
-    @property
-    def cheqd_user_profile_path(self):
-        # Path where .profile file for cheqd user will be created
-        # Default: /home/cheqd/.profile
-        return os.path.join(self.cheqd_home_dir, ".profile")
 
     @property
     def cosmovisor_binary_path(self):
@@ -588,22 +595,6 @@ class Installer():
             else:
                 logging.debug(f"User {DEFAULT_CHEQD_USER} already exists. Skipping creation...")
 
-            # Create an ~/. file if it doesn't exist
-            if not os.path.exists(DEFAULT_ENVIRONMENT_FILE):
-                logging.info(f"Creating {DEFAULT_ENVIRONMENT_FILE} file")
-
-                with open(DEFAULT_ENVIRONMENT_FILE, "w") as file:
-                    # Add a shebang line
-                    file.write("#!/bin/bash\n")
-
-                # Change ownership to root:root
-                self.exec(f"chown root:root {DEFAULT_ENVIRONMENT_FILE}")    
-                
-                # Make the file executable
-                os.chmod(DEFAULT_ENVIRONMENT_FILE, 0o755)
-            else:
-                logging.debug(f"{DEFAULT_ENVIRONMENT_FILE} already exists. Skipping creation...")
-
             # Create ~/.cheqdnode root directory
             if not os.path.exists(self.cheqd_root_dir):
                 logging.info(f"Creating root directory: {self.cheqd_root_dir}")
@@ -685,9 +676,8 @@ class Installer():
                 logging.warning("Removing user's data and configs")
                 self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
                 self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_BINARY_NAME))
-                self.remove_safe(self.cheqd_config_dir)
-                self.remove_safe(self.cheqd_data_dir)
-                self.remove_safe(self.cosmovisor_root_dir)
+                self.remove_safe(DEFAULT_LOGIN_SHELL_ENV_FILE_PATH)
+                self.remove_safe(self.cheqd_root_dir)
             else:
                 logging.debug("No user data or configs to remove. Skipping...")
             
@@ -713,6 +703,53 @@ class Installer():
             else:
                 logging.debug("Skipping linking because /var/log/cheqd-node already exists")
             
+            # Create a bash file in /etc/profile.d/ to set environment variables
+            # This file will be sourced by all users for their LOGIN shells
+            if not os.path.exists(DEFAULT_LOGIN_SHELL_ENV_FILE_PATH):
+                logging.info(f"Creating {DEFAULT_LOGIN_SHELL_ENV_FILE_PATH} file")
+
+                # Create the file, overwrite if it already exists
+                with open(DEFAULT_LOGIN_SHELL_ENV_FILE_PATH, "w") as file:
+                    # Add a shebang line
+                    file.write("#!/bin/bash\n")
+
+                # Change ownership to root:root
+                shutil.chown(DEFAULT_LOGIN_SHELL_ENV_FILE_PATH, "root", "root")
+            else:
+                logging.debug(f"{DEFAULT_LOGIN_SHELL_ENV_FILE_PATH} already exists. Skipping creation...")
+            
+            # Create a ~/.bash_profile file to execute ~/.bashrc
+            # This file will be sourced by during the cheqd user's LOGIN shells
+            if not os.path.exists(self.cheqd_user_bash_profile_path):
+                logging.info(f"Creating {self.cheqd_user_bash_profile_path} file")
+
+                # Download the template file from GitHub and write it to ~/.bashrc
+                if is_valid_url(BASH_PROFILE_TEMPLATE):
+                    with request.urlopen(BASH_PROFILE_TEMPLATE) as response, open(self.cheqd_user_bashrc_path, "w") as file:
+                        # Add a shebang line
+                        file.write("#!/bin/bash\n")
+                        file.write(response.read())
+
+                # Change ownership to cheqd:cheqd
+                shutil.chown(self.cheqd_user_bash_profile_path, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
+            else:
+                logging.debug(f"{self.cheqd_user_bash_profile_path} already exists. Skipping creation...")
+
+            # Create a ~/.bashrc file to set environment variables
+            # This file will be sourced by the cheqd user's NON-LOGIN shells
+            if not os.path.exists(self.cheqd_user_bashrc_path):
+                logging.info(f"Creating {self.cheqd_user_bashrc_path} file")
+
+                # Create the file, overwrite if it already exists
+                with open(self.cheqd_user_bashrc_path, "w") as file:
+                    # Add a shebang line
+                    file.write("#!/bin/bash\n")
+
+                # Change ownership to root:root
+                shutil.chown(self.cheqd_user_bashrc_path, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
+            else:
+                logging.debug(f"{self.cheqd_user_bashrc_path} already exists. Skipping creation...")
+
             # Change ownership of directories
             # Always execute these since they might be lost if directories are removed and recreated
             logging.info(f"Setting ownership of {self.cheqd_home_dir} to {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}")
@@ -930,15 +967,15 @@ class Installer():
             #     # Modify the system's environment variables
             #     # This will set the variable permanently for all users
             #     # Don't use export since this is an environment file, not a bash script
-            if os.path.exists(DEFAULT_ENVIRONMENT_FILE):
-                with open(DEFAULT_ENVIRONMENT_FILE, "a") as env_file:
+            if os.path.exists(DEFAULT_LOGIN_SHELL_ENV_FILE_PATH):
+                with open(DEFAULT_LOGIN_SHELL_ENV_FILE_PATH, "a") as env_file:
                     env_file.write(f'export {env_var_name}="{env_var_value}"\n')
             else:
                 logging.debug(f"Skipped setting {env_var_name}... already set")
             
             # # Read the environment file to make the changes available for the current user/session
-            # self.exec(f"bash -c 'source {self.cheqd_user_profile_path}'")
-            # self.exec(f"sudo -u {DEFAULT_CHEQD_USER} bash -c 'source {self.cheqd_user_profile_path}'")
+            # self.exec(f"bash -c 'source {self.cheqd_user_bashrc_path}'")
+            # self.exec(f"sudo -u {DEFAULT_CHEQD_USER} bash -c 'source {self.cheqd_user_bashrc_path}'")
         except Exception as e:
             logging.exception(f"Failed to set environment variable {env_var_name}. Reason: {e}")
             raise
@@ -947,7 +984,7 @@ class Installer():
     #     # Check if an environment variable is set
     #     try:
     #         # Export the environment variables in the file
-    #         self.exec(f"bash -c 'source {self.cheqd_user_profile_path}'")
+    #         self.exec(f"bash -c 'source {self.cheqd_user_bashrc_path}'")
 
     #         # Read current environment variable if it exists
     #         os.environ[env_var_name]
