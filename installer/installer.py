@@ -953,47 +953,32 @@ class Installer():
             raise
 
     def set_environment_variable(self, env_var_name, env_var_value):
-        # Set an environment variable by exporting values using ~/.profile
+        # Set an environment variable by exporting values to the following locations:
+        # 1. /etc/profile.d/cheqd-noded.sh (for all users, LOGIN shell)
+        # 2. ~/.bashrc (for current user, LOGIN shell)
+        # 3. ~/.bash_profile (for current user, LOGIN shell)
         try:
-            # if not self.check_environment_variable(env_var_name):
-            #     logging.debug(f"Setting {env_var_name} to {env_var_value}")
-
-            #     # Set the environment variable for the current user/session
-            #     # Note that this will not set the variable permanently
-            #     # os.environ() is not used since it's not going to available for bash commands
-            #     # self.exec(f'export {env_var_name}="{env_var_value}"')
-            #     os.environ[env_var_name] = env_var_value
-
-            #     # Modify the system's environment variables
-            #     # This will set the variable permanently for all users
-            #     # Don't use export since this is an environment file, not a bash script
+            # Set environment variable in /etc/profile.d/cheqd-noded.sh
             if os.path.exists(DEFAULT_LOGIN_SHELL_ENV_FILE_PATH):
-                with open(DEFAULT_LOGIN_SHELL_ENV_FILE_PATH, "a") as env_file:
-                    env_file.write(f'export {env_var_name}="{env_var_value}"\n')
+                # Open file in append mode
+                with open(DEFAULT_LOGIN_SHELL_ENV_FILE_PATH, "a") as file:
+                    # Add "export" to make it set the environment variable
+                    file.write(f'export {env_var_name}="{env_var_value}"\n')
             else:
-                logging.debug(f"Skipped setting {env_var_name}... already set")
+                logging.debug(f"{DEFAULT_LOGIN_SHELL_ENV_FILE_PATH} doesn't exist. Skipped adding {env_var_name} to the file...")
             
-            # # Read the environment file to make the changes available for the current user/session
-            # self.exec(f"bash -c 'source {self.cheqd_user_bashrc_path}'")
-            # self.exec(f"sudo -u {DEFAULT_CHEQD_USER} bash -c 'source {self.cheqd_user_bashrc_path}'")
+            # Set environment variable in ~/.bashrc
+            if os.path.exists(self.cheqd_user_bashrc_path):
+                # Open file in append mode
+                with open(self.cheqd_user_bashrc_path, "a") as file:
+                    # Add "export" to make it set the environment variable
+                    file.write(f'export {env_var_name}="{env_var_value}"\n')
+            else:
+                logging.debug(f"{self.cheqd_user_bashrc_path} doesn't exist. Skipped adding {env_var_name} to the file...")
+                            
         except Exception as e:
             logging.exception(f"Failed to set environment variable {env_var_name}. Reason: {e}")
             raise
-
-    # def check_environment_variable(self, env_var_name):
-    #     # Check if an environment variable is set
-    #     try:
-    #         # Export the environment variables in the file
-    #         self.exec(f"bash -c 'source {self.cheqd_user_bashrc_path}'")
-
-    #         # Read current environment variable if it exists
-    #         os.environ[env_var_name]
-
-    #         logging.debug(f"Environment variable {env_var_name} is set")
-    #         return True
-    #     except KeyError:
-    #         logging.debug(f"Environment variable {env_var_name} is NOT set")
-    #         return False
 
     def configure_node_settings(self) -> bool:
         # Configure cheqd-noded settings in app.toml and config.toml
