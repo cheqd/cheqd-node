@@ -1313,7 +1313,7 @@ class Installer():
                     # Calculate checksum of downloaded snapshot
                     # This is a blocking operation that will take a while
                     # Python's hashlib.md5() is not used because making it work with large files is a pain
-                    local_checksum = self.exec(f"md5sum {file_path} | tail -1 | cut -d' ' -f 1").stdout.strip()
+                    local_checksum = subprocess.check_output(["md5sum", file_path]).split()[0].decode()
                 
                     # Print local checksum for debugging
                     logging.debug(f"Local checksum: {local_checksum}")
@@ -1582,7 +1582,7 @@ class Installer():
                     logging.error(f"{service_name} could not be restarted")
                     return False
             else:
-                logging.error(f"Failed to restart {service_name}")
+                logging.error(f"Failed to reload systemd config and reset failed services")
                 return False
         except Exception as e:
             logging.exception(f"Error restarting {service_name}: Reason: {e}")
@@ -1607,8 +1607,8 @@ class Installer():
                         logging.error(f"{service_name} could not be removed")
                         return False
             else:
-                logging.error(f"Service file {service_file} does not exist")
-                return False
+                logging.debug(f"Service file {service_file} does not exist. Skipping removal...")
+                return True
         except Exception as e:
             logging.exception(f"Error removing {service_name}: Reason: {e}")
             return False
