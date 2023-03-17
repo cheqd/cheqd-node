@@ -38,6 +38,7 @@ PRINT_PREFIX = "********* "
 # Otherwise, use the main branch
 DEFAULT_DEBUG_BRANCH = os.getenv("DEFAULT_DEBUG_BRANCH") if os.getenv("DEFAULT_DEBUG_BRANCH") != None else "main"
 
+
 ###############################################################
 ###     		Cosmovisor configuration      				###
 ###############################################################
@@ -279,6 +280,12 @@ class Installer():
         # cosmovisor root directory
         # Default: /home/cheqd/.cheqdnode/cosmovisor
         return os.path.join(self.cheqd_root_dir, "cosmovisor")
+
+    @property
+    def cheqd_user_profile_path(self):
+        # Path where .profile file for cheqd user will be created
+        # Default: /home/cheqd/.profile
+        return os.path.join(self.cheqd_home_dir, ".profile")
 
     @property
     def cosmovisor_binary_path(self):
@@ -567,8 +574,9 @@ class Installer():
             return False
 
     def prepare_cheqd_user(self) -> bool:
-        # Create "cheqd" user/group if it doesn't exist
+        # Set cheqd user/group along with required permissions
         try:
+            # Create cheqd user and group if they don't exist
             if not self.does_user_exist(DEFAULT_CHEQD_USER):
                 logging.info(f"Creating {DEFAULT_CHEQD_USER} group")
                 self.exec(f"addgroup {DEFAULT_CHEQD_USER} --quiet --system")
@@ -576,12 +584,21 @@ class Installer():
                 logging.info(f"Creating {DEFAULT_CHEQD_USER} user and adding to {DEFAULT_CHEQD_USER} group")
                 self.exec(
                     f"adduser --system {DEFAULT_CHEQD_USER} --home {self.cheqd_home_dir} --shell /bin/bash --ingroup {DEFAULT_CHEQD_USER} --quiet")
-                
-                # Set permissions for cheqd home directory to cheqd:cheqd
-                logging.info(f"Setting permissions for {self.cheqd_home_dir} to {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}")
-                shutil.chown(self.cheqd_home_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
             else:
                 logging.debug(f"User {DEFAULT_CHEQD_USER} already exists. Skipping creation...")
+
+            # Create an ~/. file if it doesn't exist
+            if not os.path.exists(self.cheqd_user_profile_file):
+                logging.info(f"Creating {self.cheqd_user_profile_file} file")
+
+                with open(self.cheqd_user_profile_file, "w") as file:
+                    # Add a shebang line
+                    file.write("#!/bin/bash\n")
+                
+                # Make the file executable
+                os.chmod(self.cheqd_user_profile_file, 0o755)
+            else:
+                logging.debug(f"{self.cheqd_user_profile_file} already exists. Skipping creation...")
 
             # Create ~/.cheqdnode root directory
             if not os.path.exists(self.cheqd_root_dir):
@@ -590,6 +607,10 @@ class Installer():
             else:
                 logging.info(f"Root directory {self.cheqd_root_dir} already exists. Skipping creation...")
             
+            # Set permissions for cheqd home directory to cheqd:cheqd
+            logging.info(f"Setting permissions for {self.cheqd_home_dir} to {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}")
+            shutil.chown(self.cheqd_home_dir, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
+
             # Return True if all steps were successful
             return True
         except Exception as e:
@@ -869,10 +890,8 @@ class Installer():
                 self.interviewer.daemon_allow_download_binaries)
             self.set_environment_variable("DAEMON_RESTART_AFTER_UPGRADE",
                 self.interviewer.daemon_restart_after_upgrade)
-            self.set_environment_variable("DAEMON_POLL_INTERVAL", 
-                DEFAULT_DAEMON_POLL_INTERVAL)
-            self.set_environment_variable("UNSAFE_SKIP_BACKUP", 
-                DEFAULT_UNSAFE_SKIP_BACKUP)
+            self.set_environment_variable("DAEMON_POLL_INTERVAL", DEFAULT_DAEMON_POLL_INTERVAL)
+            self.set_environment_variable("UNSAFE_SKIP_BACKUP", DEFAULT_UNSAFE_SKIP_BACKUP)
         except Exception as e:
             logging.exception(f"Failed to set environment variables for Cosmovisor. Reason: {e}")
             raise
@@ -893,7 +912,7 @@ class Installer():
             raise
 
     def set_environment_variable(self, env_var_name, env_var_value):
-        # Set an environment variable by modifying /etc/environment
+        # Set an environment variable by exporting values using ~/.profile
         try:
             if not self.check_environment_variable(env_var_name):
                 logging.debug(f"Setting {env_var_name} to {env_var_value}")
@@ -907,13 +926,14 @@ class Installer():
                 # Modify the system's environment variables
                 # This will set the variable permanently for all users
                 # Don't use export since this is an environment file, not a bash script
-                with open("/etc/environment", "a") as env_file:
-                    env_file.write(f'{env_var_name}="{env_var_value}"\n')
-                
-                # Read the environment file to make the changes available for the current user/session
-                self.exec(f"bash -c 'source /etc/environment'")
+                with open(self.cheqd_user_profile_file, "a") as env_file:
+                    env_file.write(f'export {env_var_name}="{env_var_value}"\n')
             else:
                 logging.debug(f"Skipped setting {env_var_name}... already set")
+            
+            # Read the environment file to make the changes available for the current user/session
+            self.exec(f"bash -c 'source {self.cheqd_user_profile_file}'")
+            self.exec(f"sudo -u {DEFAULT_CHEQD_USER} bash -c 'source {self.cheqd_user_profile_file}'")
         except Exception as e:
             logging.exception(f"Failed to set environment variable {env_var_name}. Reason: {e}")
             raise
@@ -921,8 +941,8 @@ class Installer():
     def check_environment_variable(self, env_var_name):
         # Check if an environment variable is set
         try:
-            # Read the environment file to make the changes available for the current user/session
-            self.exec(f"bash -c 'source /etc/environment'")
+            # Export the environment variables in the file
+            self.exec(f"bash -c 'source {self.cheqd_user_profile_file}'")
 
             # Read current environment variable if it exists
             os.environ[env_var_name]
