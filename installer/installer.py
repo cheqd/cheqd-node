@@ -711,7 +711,7 @@ class Installer():
                 # Create the file, overwrite if it already exists
                 with open(DEFAULT_LOGIN_SHELL_ENV_FILE_PATH, "w") as file:
                     # Add a shebang line
-                    file.write("#!/bin/bash\n")
+                    file.write("#!/bin/bash\n\n")
 
                 # Change ownership to root:root
                 shutil.chown(DEFAULT_LOGIN_SHELL_ENV_FILE_PATH, "root", "root")
@@ -725,9 +725,9 @@ class Installer():
 
                 # Download the template file from GitHub and write it to ~/.bash_profile
                 if is_valid_url(BASH_PROFILE_TEMPLATE):
-                    with request.urlopen(BASH_PROFILE_TEMPLATE) as response, open(self.cheqd_user_bashrc_path, "w") as file:
+                    with request.urlopen(BASH_PROFILE_TEMPLATE) as response, open(self.cheqd_user_bash_profile_path, "w") as file:
                         # Add a shebang line
-                        file.write("#!/bin/bash\n")
+                        file.write("#!/bin/bash\n\n")
                         file.write(response.read().decode("utf-8").strip())
 
                 # Change ownership to cheqd:cheqd
@@ -743,7 +743,7 @@ class Installer():
                 # Create the file, overwrite if it already exists
                 with open(self.cheqd_user_bashrc_path, "w") as file:
                     # Add a shebang line
-                    file.write("#!/bin/bash\n")
+                    file.write("#!/bin/bash\n\n")
 
                 # Change ownership to root:root
                 shutil.chown(self.cheqd_user_bashrc_path, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
@@ -802,7 +802,7 @@ class Installer():
             # Initialize Cosmovisor if it's not already initialized
             # This is done by checking whether the Cosmovisor root directory exists
             if not os.path.exists(self.cosmovisor_root_dir):
-                self.exec(f"sudo -u {DEFAULT_CHEQD_USER} bash -c 'cosmovisor init {self.standalone_node_binary_path}'")
+                self.exec(f"sudo -u {DEFAULT_CHEQD_USER} bash -c 'DAEMON_NAME={DEFAULT_BINARY_NAME} DAEMON_HOME={self.cheqd_root_dir} cosmovisor init {self.standalone_node_binary_path}'")
             else:
                 logging.info("Cosmovisor directory already exists. Skipping initialisation...")
             

@@ -3,4 +3,5 @@ then
     .  ~/.bashrc; 
 fi 
 
-PATH=$PATH:$HOME/bin export PATH
+PATH=$PATH:$HOME/bin
+export PATH
