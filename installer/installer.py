@@ -140,15 +140,15 @@ def is_valid_url(url) -> bool:
 def search_and_replace(search_text, replace_text, file_path):
     # Common function to search and replace text in a file
     try:
-        file = open(file_path, "r")
-        for line in file:
-            line = line.strip()
-            if search_text in line:
-                with open(file_path, "r") as file:
-                    data = file.read()
-                    data = data.replace(line, replace_text)
-                with open(file_path, "w") as file:
-                    file.write(data)
+        with open(file_path, "r") as file:
+            for line in file:
+                line = line.strip()
+                if search_text in line:
+                    with open(file_path, "r") as file:
+                        data = file.read()
+                        data = data.replace(line, replace_text)
+                    with open(file_path, "w") as file:
+                        file.write(data)
     except Exception as e:
         logging.exception(f"Failed to search and replace text in {file_path}. Reason: {e}")
         raise
