@@ -726,7 +726,12 @@ class Installer():
                     with request.urlopen(BASH_PROFILE_TEMPLATE) as response, open(self.cheqd_user_bash_profile_path, "w") as file:
                         # Add a shebang line
                         file.write("#!/bin/bash\n\n")
+
+                        # Insert the contents of the template file
                         file.write(response.read().decode("utf-8").strip())
+
+                        # Add a newline at the end of the file
+                        file.write("\n")
 
                 # Change ownership to cheqd:cheqd
                 shutil.chown(self.cheqd_user_bash_profile_path, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
@@ -944,7 +949,7 @@ class Installer():
                 f"tcp://localhost:{self.interviewer.rpc_port}")
             if self.interviewer.chain == "testnet":
                 self.set_environment_variable("CHEQD_NODED_CHAIN_ID", TESTNET_CHAIN_ID)
-            else:
+            elif self.interviewer.chain == "mainnet":
                 self.set_environment_variable("CHEQD_NODED_CHAIN_ID", MAINNET_CHAIN_ID)
         except Exception as e:
             logging.exception(f"Failed to set environment variables for cheqd-noded. Reason: {e}")
@@ -958,19 +963,47 @@ class Installer():
         try:
             # Set environment variable in /etc/profile.d/cheqd-noded.sh
             if os.path.exists(DEFAULT_LOGIN_SHELL_ENV_FILE_PATH):
-                # Open file in append mode
-                with open(DEFAULT_LOGIN_SHELL_ENV_FILE_PATH, "a") as file:
-                    # Add "export" to make it set the environment variable
-                    file.write(f'export {env_var_name}="{env_var_value}"\n')
+                with open(DEFAULT_LOGIN_SHELL_ENV_FILE_PATH, "r") as file:
+                    lines = file.readlines()
+
+                # Track whether the environment variable has been updated
+                updated = False
+
+                with open(DEFAULT_LOGIN_SHELL_ENV_FILE_PATH, "w") as file:
+                    for line in lines:
+                        # Update existing value (if it exists)
+                        if line.startswith(f"export {env_var_name}="):
+                            file.write(f"export {env_var_name}={env_var_value}\n")
+                            updated = True
+                        else:
+                            file.write(line)
+                    
+                    # Add new value (if it doesn't exist in the file already)
+                    if not updated:
+                        file.write(f'export {env_var_name}={env_var_value}\n')
             else:
                 logging.debug(f"{DEFAULT_LOGIN_SHELL_ENV_FILE_PATH} doesn't exist. Skipped adding {env_var_name} to the file...")
             
             # Set environment variable in ~/.bashrc
             if os.path.exists(self.cheqd_user_bashrc_path):
-                # Open file in append mode
-                with open(self.cheqd_user_bashrc_path, "a") as file:
-                    # Add "export" to make it set the environment variable
-                    file.write(f'export {env_var_name}="{env_var_value}"\n')
+                with open(self.cheqd_user_bashrc_path, "r") as file:
+                    lines = file.readlines()
+
+                # Track whether the environment variable has been updated
+                updated = False
+
+                with open(self.cheqd_user_bashrc_path, "w") as file:
+                    for line in lines:
+                        # Update existing value (if it exists)
+                        if line.startswith(f"export {env_var_name}="):
+                            file.write(f"export {env_var_name}={env_var_value}\n")
+                            updated = True
+                        else:
+                            file.write(line)
+                    
+                    # Add new value (if it doesn't exist in the file already)
+                    if not updated:
+                        file.write(f'export {env_var_name}={env_var_value}\n')
             else:
                 logging.debug(f"{self.cheqd_user_bashrc_path} doesn't exist. Skipped adding {env_var_name} to the file...")
                             
@@ -1616,7 +1649,7 @@ class Installer():
 ###         Interviewer class: Ask user for settings  	    ###
 ###############################################################
 class Interviewer:
-    def __init__(self, home_dir=DEFAULT_CHEQD_HOME_DIR, chain=CHEQD_NODED_CHAIN_ID):
+    def __init__(self, home_dir=DEFAULT_CHEQD_HOME_DIR):
         self._home_dir = home_dir
         self._is_upgrade = False
         self._is_cosmovisor_needed = True
@@ -1625,7 +1658,7 @@ class Interviewer:
         self._systemd_service_file = ""
         self._init_from_snapshot = False
         self._release = None
-        self._chain = chain
+        self._chain = ""
         self._is_setup_needed = False
         self._moniker = CHEQD_NODED_MONIKER
         self._external_address = ""
