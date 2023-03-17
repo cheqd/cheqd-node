@@ -152,8 +152,6 @@ def search_and_replace(search_text, replace_text, file_path):
     except Exception as e:
         logging.exception(f"Failed to search and replace text in {file_path}. Reason: {e}")
         raise
-    finally:
-        file.close()
 
 def post_process(func):
     # Common function to post-process commands
@@ -1225,7 +1223,7 @@ class Installer():
             if self.set_snapshot_url():
                 logging.info(f"Valid snapshot URL found: {self.snapshot_url}")
                 fname = os.path.basename(self.snapshot_url)
-                file_path = os.path.join(self.cheqd_home_dir, fname)
+                file_path = os.path.join(self.cheqd_root_dir, fname)
             else:
                 logging.error(f"No valid snapshot URL found in last {MAX_SNAPSHOT_DAYS} days!")
                 return False
@@ -1305,7 +1303,7 @@ class Installer():
                 # Use wget to download since it can show a progress bar while downloading natively
                 # This is a blocking operation that will take a while
                 # "wget -c" will resume a download if it gets interrupted
-                self.exec(f"wget -c {self.snapshot_url} -P {self.cheqd_home_dir}")
+                self.exec(f"wget -c {self.snapshot_url} -P {self.cheqd_root_dir}")
 
                 # Compare published checksum with downloaded file
                 # If checksums match, return success
