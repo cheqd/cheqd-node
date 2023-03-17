@@ -790,14 +790,14 @@ class Installer():
             shutil.move(self.temporary_cosmovisor_binary_path, self.cosmovisor_binary_path)
 
             # Set ownership of Cosmovisor binary to root:root
-            self.exec(f"chown root:root {self.cosmovisor_binary_path}")
+            shutil.chown(self.cosmovisor_binary_path, "root", "root")
 
             # Move cheqd-noded binary to /usr/bin
             logging.info(f"Copying cheqd-noded binary from {self.temporary_node_binary_path} to {self.standalone_node_binary_path}")
             shutil.copy(self.temporary_node_binary_path, self.standalone_node_binary_path)
 
             # Set ownership of cheqd-noded binary to root:root
-            self.exec(f"chown root:root {self.standalone_node_binary_path}")
+            shutil.chown(self.standalone_node_binary_path, "root", "root")
 
             # Initialize Cosmovisor if it's not already initialized
             # This is done by checking whether the Cosmovisor root directory exists
@@ -818,7 +818,7 @@ class Installer():
 
                 # Set ownership of cheqd-noded binary to cheqd:cheqd
                 # This is ONLY done when the binary is moved to Cosmovisor bin path
-                self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_current_bin_path}")
+                shutil.chown(self.cosmovisor_current_bin_path, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
 
                 # Create symlink to cheqd-noded binary in Cosmovisor bin path
                 # Target comes first, then the location of the symlink
@@ -907,7 +907,7 @@ class Installer():
             
             # Set ownership of cheqd-noded binary to root:root
             logging.info(f"Changing ownership of {self.standalone_node_binary_path} to root:root")
-            self.exec(f"chown root:root {self.standalone_node_binary_path}")
+            shutil.chown(self.standalone_node_binary_path, "root", "root")
 
             # Remove Cosmovisor directory if it exists
             if os.path.exists(self.cosmovisor_root_dir):
