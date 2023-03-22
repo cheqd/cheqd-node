@@ -23,7 +23,7 @@ jobs:
       - name: "Fresh install with Cosmovisor"
         working-directory: ./installer
         run: |
-          sudo bash -c "python3 installer.py < install-from-scratch-cosmovisor.txt"
+          sudo -E bash -c "python3 installer.py < install-from-scratch-cosmovisor.txt"
         env:
           PYTHONDEVMODE: 1
           DEFAULT_DEBUG_BRANCH: "${GITHUB_REF##*/}"
@@ -31,7 +31,7 @@ jobs:
       - name: "Upgrade existing installation"
         working-directory: ./installer
         run: |
-          sudo bash -c "python3 installer.py < upgrade-existing-cosmovisor.txt"
+          sudo -E bash -c "python3 installer.py < upgrade-existing-cosmovisor.txt"
         env:
           PYTHONDEVMODE: 1
           DEFAULT_DEBUG_BRANCH: "${GITHUB_REF##*/}"
@@ -51,7 +51,7 @@ jobs:
       - name: "Fresh install"
         working-directory: ./installer
         run: |
-          sudo bash -c "python3 installer.py < install-from-scratch-standalone.txt"
+          sudo -E bash -c "python3 installer.py < install-from-scratch-standalone.txt"
         env:
           PYTHONDEVMODE: 1
           DEFAULT_DEBUG_BRANCH: "${GITHUB_REF##*/}"
@@ -59,7 +59,7 @@ jobs:
       - name: "Upgrade existing installation"
         working-directory: ./installer
         run: |
-          sudo bash -c "python3 installer.py < upgrade-existing-standalone.txt"
+          sudo -E bash -c "python3 installer.py < upgrade-existing-standalone.txt"
         env:
           PYTHONDEVMODE: 1
           DEFAULT_DEBUG_BRANCH: "${GITHUB_REF##*/}"
@@ -67,7 +67,7 @@ jobs:
       - name: "Upgrade with moving to cosmovisor"
         working-directory: ./installer
         run: |
-          sudo bash -c "python3 installer.py < upgrade-to-cosmovisor.txt"
+          sudo -E bash -c "python3 installer.py < upgrade-to-cosmovisor.txt"
         env:
           PYTHONDEVMODE: 1
           DEFAULT_DEBUG_BRANCH: "${GITHUB_REF##*/}"
