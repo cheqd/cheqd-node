@@ -725,13 +725,13 @@ class Installer():
                 if is_valid_url(BASH_PROFILE_TEMPLATE):
                     with request.urlopen(BASH_PROFILE_TEMPLATE) as response, open(self.cheqd_user_bash_profile_path, "w") as file:
                         # Add a shebang line
-                        file.write("#!/bin/bash\n\n")
+                        file.write(f"#!/bin/bash{os.linesep}{os.linesep}")
 
                         # Insert the contents of the template file
                         file.write(response.read().decode("utf-8").strip())
 
                         # Add a newline at the end of the file
-                        file.write("\n")
+                        file.write(os.linesep)
 
                 # Change ownership to cheqd:cheqd
                 shutil.chown(self.cheqd_user_bash_profile_path, DEFAULT_CHEQD_USER, DEFAULT_CHEQD_USER)
@@ -1030,7 +1030,7 @@ class Installer():
                 # Don't execute an init in case a validator key already exists
                 if not os.path.exists(os.path.join(self.cheqd_config_dir, 'priv_validator_key.json')):
                     # Initialize the node
-                    logging.info(f"Initialising {self.cheqd_root_dir} directory")
+                    logging.info(f"Initializing {self.cheqd_root_dir} directory")
                     self.exec(f"sudo -u {DEFAULT_CHEQD_USER} bash -c 'cheqd-noded init {self.interviewer.moniker}'")
                 else:
                     logging.debug(f"Validator key already exists in {self.cheqd_config_dir}. Skipping cheqd-noded init...")
@@ -1041,7 +1041,7 @@ class Installer():
                     logging.debug(f"Downloading genesis file for {self.interviewer.chain}")
                     
                     with request.urlopen(genesis_url) as response, open(genesis_file_path, "w") as file:
-                        file.write(response.read())
+                        file.write(response.read().decode("utf-8").strip())
                 else:
                     logging.debug(f"Genesis file already exists in {genesis_file_path}")
 
@@ -1168,7 +1168,7 @@ class Installer():
                 # Fetch the template file from GitHub
                 if is_valid_url(STANDALONE_SERVICE_TEMPLATE):
                     with request.urlopen(STANDALONE_SERVICE_TEMPLATE) as response, open(DEFAULT_STANDALONE_SERVICE_FILE_PATH, "w") as file:
-                        file.write(response.read())
+                        file.write(response.read().decode("utf-8").strip())
                     
                     # Enable cheqd-noded.service
                     self.enable_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME)
