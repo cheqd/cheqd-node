@@ -26,7 +26,7 @@ jobs:
           sudo -E bash -c "python3 installer.py < install-from-scratch-cosmovisor.txt"
         env:
           PYTHONDEVMODE: 1
-          DEFAULT_DEBUG_BRANCH: "${GITHUB_REF##*/}"
+          DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
 
       - name: "Upgrade existing installation"
         working-directory: ./installer
@@ -34,7 +34,7 @@ jobs:
           sudo -E bash -c "python3 installer.py < upgrade-existing-cosmovisor.txt"
         env:
           PYTHONDEVMODE: 1
-          DEFAULT_DEBUG_BRANCH: "${GITHUB_REF##*/}"
+          DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
 
       - name: Debugging with tmate
         if: ${{ failure() }}
@@ -54,7 +54,7 @@ jobs:
           sudo -E bash -c "python3 installer.py < install-from-scratch-standalone.txt"
         env:
           PYTHONDEVMODE: 1
-          DEFAULT_DEBUG_BRANCH: "${GITHUB_REF##*/}"
+          DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
 
       - name: "Upgrade existing installation"
         working-directory: ./installer
@@ -62,7 +62,7 @@ jobs:
           sudo -E bash -c "python3 installer.py < upgrade-existing-standalone.txt"
         env:
           PYTHONDEVMODE: 1
-          DEFAULT_DEBUG_BRANCH: "${GITHUB_REF##*/}"
+          DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
       
       - name: "Upgrade with moving to cosmovisor"
         working-directory: ./installer
@@ -70,7 +70,7 @@ jobs:
           sudo -E bash -c "python3 installer.py < upgrade-to-cosmovisor.txt"
         env:
           PYTHONDEVMODE: 1
-          DEFAULT_DEBUG_BRANCH: "${GITHUB_REF##*/}"
+          DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
       
       - name: Debugging with tmate
         if: ${{ failure() }}
