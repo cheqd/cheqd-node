@@ -807,7 +807,7 @@ class Installer():
             if not os.path.exists(self.cosmovisor_root_dir):
                 self.exec(f"sudo -u {DEFAULT_CHEQD_USER} bash -c 'DAEMON_NAME={DEFAULT_BINARY_NAME} DAEMON_HOME={self.cheqd_root_dir} cosmovisor init {self.standalone_node_binary_path}'")
             else:
-                logging.info("Cosmovisor directory already exists. Skipping initialisation...")
+                logging.info("Cosmovisor directory already exists. Skipping initialization...")
             
             # Remove cheqd-noded binary from /usr/bin if it's not a symlink
             if not os.path.islink(self.standalone_node_binary_path):
