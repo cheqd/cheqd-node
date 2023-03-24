@@ -2247,7 +2247,7 @@ class Interviewer:
     def ask_for_upgrade(self):
         try:
             logging.warning(f"Existing cheqd-node binary detected.\n")
-            answer = self.ask(f"Do you want to upgrade an existing cheqd-node installation? (yes/no)", default="no")
+            answer = self.ask(f"Do you want to upgrade an existing cheqd-node installation? (yes/no)", default="yes")
             if answer.lower().startswith("y"):
                 self.is_upgrade = True
             elif answer.lower().startswith("n"):
