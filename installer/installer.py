@@ -56,10 +56,10 @@ DEFAULT_DAEMON_RESTART_DELAY = "120s"
 ###############################################################
 ###     			Systemd configuration      				###
 ###############################################################
-STANDALONE_SERVICE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/build-tools/cheqd-noded.service"
-COSMOVISOR_SERVICE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/build-tools/cheqd-cosmovisor.service"
-LOGROTATE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/build-tools/logrotate.conf"
-RSYSLOG_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/build-tools/rsyslog.conf"
+STANDALONE_SERVICE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/installer/templates/cheqd-noded.service"
+COSMOVISOR_SERVICE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/installer/templates/cheqd-cosmovisor.service"
+LOGROTATE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/installer/templates/logrotate.conf"
+RSYSLOG_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/installer/templates/rsyslog.conf"
 DEFAULT_STANDALONE_SERVICE_NAME = 'cheqd-noded'
 DEFAULT_COSMOVISOR_SERVICE_NAME = 'cheqd-cosmovisor'
 DEFAULT_STANDALONE_SERVICE_FILE_PATH = f"/lib/systemd/system/{DEFAULT_STANDALONE_SERVICE_NAME}.service"
@@ -67,7 +67,7 @@ DEFAULT_COSMOVISOR_SERVICE_FILE_PATH = f"/lib/systemd/system/{DEFAULT_COSMOVISOR
 DEFAULT_LOGROTATE_FILE = "/etc/logrotate.d/cheqd-node"
 DEFAULT_RSYSLOG_FILE = "/etc/rsyslog.d/cheqd-node.conf"
 DEFAULT_LOGIN_SHELL_ENV_FILE_PATH = "/etc/profile.d/cheqd-node.sh"
-BASH_PROFILE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/build-tools/bash-profile.txt"
+BASH_PROFILE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/installer/templates/bash-profile.txt"
 
 
 ###############################################################
