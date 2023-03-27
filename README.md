@@ -14,7 +14,7 @@
 
 ## ▶️ Quick start for joining cheqd networks
 
-Join our [**cheqd Community Slack**](http://cheqd.link/join-cheqd-slack) for help, questions, and support if you are looking to join our [mainnet](https://explorer.cheqd.io) or [testnet](https://learn.cheqd.io/#block-explorers).
+Join our [**cheqd Community Slack**](http://cheqd.link/join-cheqd-slack) for help, questions, and support if you are looking to join our [mainnet](https://explorer.cheqd.io) or [testnet](https://testnet-explorer.cheqd.io).
 
 Either the cheqd team, or one of your fellow node operators will be happy to offer some guidance.
 
@@ -29,7 +29,7 @@ If successfully configured, your node would become the latest validator on the c
 
 ### 🚧 Testnet
 
-Our [testnet](https://learn.cheqd.io/#block-explorers) is the easiest place for developers and node operators to get started if you're not *quite* ready yet to dive into building apps on our mainnet. To get started...
+Our [testnet](https://testnet-explorer.cheqd.io) is the easiest place for developers and node operators to get started if you're not *quite* ready yet to dive into building apps on our mainnet. To get started...
 
 1. Install [the latest stable release](https://github.com/cheqd/cheqd-node/releases/latest) of `cheqd-node` software (currently `v1.x.x`) on a hosting platform of your choice by [following the setup guide](https://docs.cheqd.io/node/getting-started/setup-and-configure).
 2. Acquire testnet CHEQ tokens through [our testnet faucet](https://testnet-faucet.cheqd.io).
@@ -46,10 +46,10 @@ Once installed, `cheqd-node` can be controlled using the [cheqd Cosmos CLI guide
 * Staking and participating in public-permissionless governance
 * Governance framework for public-permissionless self-sovereign identity networks
 * Creating [`did:cheqd` method DIDs](https://docs.cheqd.io/identity/architecture/adr-list/adr-001-cheqd-did-method), DID Documents ("DIDDocs")
-* Querying DIDs/DIDDocs using our [Universal Resolver driver](https://github.com/cheqd/did-resolver)
+* Querying DIDs/DIDDocs using our [Universal Resolver driver](https://docs.cheqd.io/identity/guides/did-resolver)
 * Creating and managing Verifiable Credentials anchored to DIDs on cheqd mainnet
-* Creating [on-ledger "resources" (e.g., schemas, visual representations of credentials, etc)](https://blog.cheqd.io/our-approach-to-resources-on-ledger-25bf5690c975) that can be used in DIDDocs and Verifiable Credentials. This is used to support [AnonCreds](https://hyperledger.github.io/anoncreds-spec/)
-* Custom pricing for DID and Resources with burn to manage inflation.
+* Creating [on-ledger DID-Linked "resources" (e.g., schemas, visual representations of credentials, etc)](https://docs.cheqd.io/identity/guides/did-linked-resources) that can be used in DIDDocs and Verifiable Credentials. This is used to support [AnonCreds on cheqd](https://docs.cheqd.io/identity/guides/using-on-ledger-resources-to-support-anoncreds)
+* Custom [pricing for DID and Resources](https://product.cheqd.io/product-essentials/why-cheqd/pricing) with burn to manage inflation.
 
 ### 🔮 Upcoming functionality
 
