@@ -22,8 +22,8 @@ Either the cheqd team, or one of your fellow node operators will be happy to off
 
 Getting started as a node operator on the cheqd network [mainnet](https://explorer.cheqd.io) is as simple as...
 
-1. Install [the latest stable release](https://github.com/cheqd/cheqd-node/releases/latest) of `cheqd-node` software (currently `v1.x.x`) on a hosting platform of your choice by [following the setup guide](https://docs.cheqd.io/node/docs/setup-and-configure).
-2. Once you have acquired CHEQ tokens, [promote your node to a validator](https://docs.cheqd.io/node/docs/validator-guide)
+1. Install [the latest stable release](https://github.com/cheqd/cheqd-node/releases/latest) of `cheqd-node` software (currently `v1.x.x`) on a hosting platform of your choice by [following the setup guide](https://docs.cheqd.io/node/getting-started/setup-and-configure).
+2. Once you have acquired CHEQ tokens, [promote your node to a validator](https://docs.cheqd.io/node/validator-guides/validator-guide)
 
 If successfully configured, your node would become the latest validator on the cheqd mainnet. Welcome to the new digital ID revolution!
 
@@ -31,13 +31,13 @@ If successfully configured, your node would become the latest validator on the c
 
 Our [testnet](https://learn.cheqd.io/#block-explorers) is the easiest place for developers and node operators to get started if you're not *quite* ready yet to dive into building apps on our mainnet. To get started...
 
-1. Install [the latest stable release](https://github.com/cheqd/cheqd-node/releases/latest) of `cheqd-node` software (currently `v1.x.x`) on a hosting platform of your choice by [following the setup guide](https://docs.cheqd.io/node/docs/setup-and-configure).
+1. Install [the latest stable release](https://github.com/cheqd/cheqd-node/releases/latest) of `cheqd-node` software (currently `v1.x.x`) on a hosting platform of your choice by [following the setup guide](https://docs.cheqd.io/node/getting-started/setup-and-configure).
 2. Acquire testnet CHEQ tokens through [our testnet faucet](https://testnet-faucet.cheqd.io).
-3. Once you have acquired CHEQ tokens, [promote your node to a validator](https://docs.cheqd.io/node/docs/validator-guide)
+3. Once you have acquired CHEQ tokens, [promote your node to a validator](https://docs.cheqd.io/node/validator-guides/validator-guide)
 
 ## 🧑‍💻 Using cheqd
 
-Once installed, `cheqd-node` can be controlled using the [cheqd Cosmos CLI guide](https://docs.cheqd.io/node/docs/cheqd-cli).
+Once installed, `cheqd-node` can be controlled using the [cheqd Cosmos CLI guide](https://docs.cheqd.io/node/getting-started/cheqd-cli).
 
 ### 📌 Currently supported functionality
 
@@ -45,10 +45,10 @@ Once installed, `cheqd-node` can be controlled using the [cheqd Cosmos CLI guide
 * Creating, managing, and configuring accounts and keys on a cheqd node
 * Staking and participating in public-permissionless governance
 * Governance framework for public-permissionless self-sovereign identity networks
-* Creating [`did:cheqd` method DIDs](https://docs.cheqd.io/node/architecture/adr-list/adr-002-cheqd-did-method), DID Documents ("DIDDocs")
-* Querying DIDs/DIDDocs using our [Universal Resolver driver](https://github.com/cheqd/did-resolver)
+* Creating [`did:cheqd` method DIDs](https://docs.cheqd.io/identity/architecture/adr-list/adr-001-cheqd-did-method), DID Documents ("DIDDocs")
+* Querying DIDs/DIDDocs using our [Universal Resolver driver](https://docs.cheqd.io/identity/tutorials/did-resolver)
 * Creating and managing Verifiable Credentials anchored to DIDs on cheqd mainnet
-* Creating [on-ledger "resources" (e.g., schemas, visual representations of credentials, etc)](https://blog.cheqd.io/our-approach-to-resources-on-ledger-25bf5690c975) that can be used in DIDDocs and Verifiable Credentials. This is used to support [AnonCreds](https://hyperledger.github.io/anoncreds-spec/)
+* Creating [on-ledger "resources" (e.g., schemas, visual representations of credentials, etc)](https://docs.cheqd.io/identity/guides/did-linked-resources) that can be used in DIDDocs and Verifiable Credentials. This is used to support [AnonCreds](https://hyperledger.github.io/anoncreds-spec/)
 * Custom pricing for DID and Resources with burn to manage inflation.
 
 ### 🔮 Upcoming functionality
@@ -64,11 +64,11 @@ We plan on adding new functionality rapidly and on a regular basis and welcome f
 
 `cheqd-node` is written in Go and built using Cosmos SDK. The [Cosmos SDK Developer Guide](https://docs.cosmos.network/) explains a lot of the [basic concepts](https://docs.cosmos.network/v0.45/basics/app-anatomy.html) of how the cheqd network functions.
 
-If you want to build a node from source or contribute to the code, please read our guide to [building and testing](https://docs.cheqd.io/node/docs/build-and-networks).
+If you want to build a node from source or contribute to the code, please read our guide to [building and testing](https://docs.cheqd.io/node/developing-on-cheqd/build-and-networks).
 
 ### Creating a local network
 
-If you are building from source, or otherwise interested in running a local network, we have [instructions on how to set up a new network](https://docs.cheqd.io/node/docs/build-and-networks) for development purposes.
+If you are building from source, or otherwise interested in running a local network, we have [instructions on how to set up a new network](https://docs.cheqd.io/node/developing-on-cheqd/build-and-networks) for development purposes.
 
 ## 🐞 Bug reports & 🤔 feature requests
 
