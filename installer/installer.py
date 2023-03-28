@@ -669,7 +669,7 @@ class Installer():
             self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_backup_dir}")
             logging.debug(f"Successfully changed ownership of {self.cheqd_backup_dir}")
 
-            if self.interviewer.is_from_scratch or self.interviewer.is_setup_needed:
+            if self.interviewer.is_from_scratch:
                 # Remove cheqd-node data and binaries
                 logging.warning("Removing user's data and configs")
                 self.remove_safe(os.path.join(DEFAULT_INSTALL_PATH, DEFAULT_COSMOVISOR_BINARY_NAME))
@@ -1038,7 +1038,7 @@ class Installer():
             seeds_url = SEEDS_FILE.format(self.interviewer.chain)
 
             # These changes are required only when NEW node setup is needed
-            if self.interviewer.is_setup_needed:
+            if self.interviewer.is_from_scratch:
                 # Don't execute an init in case a validator key already exists
                 if not os.path.exists(os.path.join(self.cheqd_config_dir, 'priv_validator_key.json')):
                     # Initialize the node
@@ -1671,7 +1671,7 @@ class Interviewer:
         self._init_from_snapshot = False
         self._release = None
         self._chain = ""
-        self._is_setup_needed = False
+        self._is_configuration_needed = False
         self._moniker = CHEQD_NODED_MONIKER
         self._external_address = ""
         self._rpc_port = ""
@@ -1682,7 +1682,7 @@ class Interviewer:
         self._log_format = ""
         self._daemon_allow_download_binaries = DEFAULT_DAEMON_ALLOW_DOWNLOAD_BINARIES
         self._daemon_restart_after_upgrade = DEFAULT_DAEMON_RESTART_AFTER_UPGRADE
-        self._is_from_scratch = False
+        self._is_from_scratch = True
         self._rewrite_node_systemd = True
         self._rewrite_rsyslog = True
         self._rewrite_logrotate = True
@@ -1753,8 +1753,8 @@ class Interviewer:
         return self._chain
 
     @property
-    def is_setup_needed(self) -> bool:
-        return self._is_setup_needed
+    def is_configuration_needed(self) -> bool:
+        return self._is_configuration_needed
 
     @property
     def moniker(self) -> str:
@@ -1849,9 +1849,9 @@ class Interviewer:
     def chain(self, chain):
         self._chain = chain
 
-    @is_setup_needed.setter
-    def is_setup_needed(self, is_setup_needed):
-        self._is_setup_needed = is_setup_needed
+    @is_configuration_needed.setter
+    def is_configuration_needed(self, is_configuration_needed):
+        self._is_configuration_needed = is_configuration_needed
 
     @moniker.setter
     def moniker(self, moniker):
@@ -2041,20 +2041,20 @@ class Interviewer:
         except Exception as e:
             logging.exception(f"Failed to set cheqd user's home directory. Reason: {e}")
 
-    # Ask whether user wants to do a install from scratch
-    def ask_for_setup(self):
+    # Ask whether user wants configure node configuration parameters from scratch
+    def ask_for_config(self):
         try:
             answer = self.ask(
-                f"Do you want to setup a new cheqd-node installation? (yes/no)", default="yes")
+                f"Do you want to define node configuration parameters? (yes/no)", default="yes")
             if answer.lower().startswith("y"):
-                self.is_setup_needed = True
-            elif answer.lower().startswith("n") and self.is_node_installed():
-                self.is_setup_needed = False
+                self.is_configuration_needed = True
+            elif answer.lower().startswith("n"):
+                self.is_configuration_needed = False
             else:
                 logging.error(f"Please choose either 'yes' or 'no'\n")
-                self.ask_for_setup()
+                self.ask_for_config()
         except Exception as e:
-            logging.exception(f"Failed to set fresh installation parameters. Reason: {e}")
+            logging.exception(f"Failed to define node configuration parameters. Reason: {e}")
 
     # Ask user which network to join
     def ask_for_chain(self):
@@ -2259,23 +2259,32 @@ class Interviewer:
     def ask_for_upgrade(self):
         try:
             logging.warning(f"Existing cheqd-node binary detected.\n")
-            answer = self.ask(f"Do you want to upgrade an existing cheqd-node installation? (yes/no)", default="yes")
-            if answer.lower().startswith("y"):
+            logging.info(f"Choosing UPGRADE will preserve your existing configuration and data.\nChoosing FRESH INSTALL will remove ALL existing configuration and data.\n")
+            logging.info(f"Please ensure you have a backup of your existing configuration and data before proceeding!\n")
+
+            answer = int(self.ask(
+                "Do you want to UPGRADE an existing installation or do a FRESH INSTALL?\n"
+                "1. UPGRADE existing installation\n"
+                "2. Overwrite existing configuration with a FRESH INSTALL", default=1))
+
+            if answer == 1:
                 self.is_upgrade = True
-            elif answer.lower().startswith("n"):
+            elif answer == 2:
                 self.is_upgrade = False
             else:
-                logging.error(f"Please choose either 'yes' or 'no'\n")
+                logging.error(f"Invalid option selected. Please choose either 1 or 2.\n")
                 self.ask_for_upgrade()
+            
+            # Set debug message
+            logging.debug(f"Setting network to join as {self.chain}")
         except Exception as e:
             logging.exception(f"Failed to set whether installation should be upgraded. Reason: {e}")
 
     # If an install from scratch is requested, warn the user and check if they want to proceed
     def ask_for_install_from_scratch(self):
         try:
-            logging.warning(f"Doing a fresh installation of cheqd-node will remove ALL existing configuration and data.\nPlease ensure you have a backup of your existing configuration and data before proceeding!\n")
             answer = self.ask(
-                f"Do you want to do fresh installation of cheqd-node? (yes/no)", default="no")
+                f"Are you SURE you want to overwrite existing with a FRESH INSTALL? (yes/no)", default="no")
             if answer.lower().startswith("y"):
                 self.is_from_scratch = True
             elif answer.lower().startswith("n"):
@@ -2363,7 +2372,6 @@ if __name__ == '__main__':
         try:
             interviewer.ask_for_version()
             interviewer.ask_for_home_directory()
-            interviewer.ask_for_setup()
             interviewer.ask_for_chain()
 
             if interviewer.is_cosmovisor_installed is False:
@@ -2375,7 +2383,9 @@ if __name__ == '__main__':
                 interviewer.ask_for_daemon_allow_download_binaries()
                 interviewer.ask_for_daemon_restart_after_upgrade()
 
-            if interviewer.is_setup_needed is True:
+            interviewer.ask_for_config()
+
+            if interviewer.is_configuration_needed is True:
                 interviewer.ask_for_moniker()
                 interviewer.ask_for_external_address()
                 interviewer.ask_for_p2p_port()
