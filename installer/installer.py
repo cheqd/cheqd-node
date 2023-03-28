@@ -945,8 +945,14 @@ class Installer():
         # Applicable for both standalone and Cosmovisor installations
         # Only environment variables that are required required for transactions are set here
         try:
-            self.set_environment_variable("CHEQD_NODED_NODE", 
-                f"tcp://localhost:{self.interviewer.rpc_port}")
+            # If RPC port is set, set to user-specified value
+            if self.interviewer.rpc_port:
+                self.set_environment_variable("CHEQD_NODED_NODE", f"tcp://localhost:{self.interviewer.rpc_port}")
+            else:
+                # Otherwise, set to default value
+                self.set_environment_variable("CHEQD_NODED_NODE", f"tcp://localhost:{DEFAULT_RPC_PORT}")
+
+            # If chain ID is set, set to user-specified value
             if self.interviewer.chain == "testnet":
                 self.set_environment_variable("CHEQD_NODED_CHAIN_ID", TESTNET_CHAIN_ID)
             elif self.interviewer.chain == "mainnet":
