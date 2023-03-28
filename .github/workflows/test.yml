@@ -31,7 +31,7 @@ jobs:
       - name: "Upgrade existing installation"
         working-directory: ./installer
         run: |
-          sudo -E bash -c "python3 installer.py < test/supgrade-existing-cosmovisor.txt"
+          sudo -E bash -c "python3 installer.py < tests/upgrade-existing-cosmovisor.txt"
         env:
           PYTHONDEVMODE: 1
           DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
