@@ -1,0 +1,13 @@
+1
+/home/runner/.local/cheqd
+2
+yes
+test-install
+rpc.cheqd.network
+27657
+27656
+nodeid1@1.1.1.1:26656,nodeid2@8.8.8.8:26656
+100ncheq
+debug
+plain
+no

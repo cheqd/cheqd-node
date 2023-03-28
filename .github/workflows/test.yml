@@ -13,27 +13,65 @@ permissions:
 
 jobs:
 
-  # interactive-installer:
-  #   name: "Interactive Installer"
-  #   runs-on: ubuntu-20.04
+  installer-cosmovisor:
+    name: "Installer - Cosmovisor mode"
+    runs-on: ubuntu-20.04
+    env:
+      PYTHONDEVMODE: 1
+      DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
   
-  #   steps:
-  #     - uses: actions/checkout@v3
+    steps:
+      - uses: actions/checkout@v3
 
-  #     - name: "Fresh install"
-  #       working-directory: ./installer
-  #       run: |
-  #         sudo bash -c "python3 installer.py < install-from-scratch.txt"
+      - name: "Fresh install with Cosmovisor"
+        working-directory: ./installer
+        run: |
+          sudo -E bash -c "python3 installer.py < tests/install-from-scratch-cosmovisor.txt"
 
-  #     - name: "Upgrade existing installation"
-  #       working-directory: ./installer
-  #       run: |
-  #         sudo bash -c "python3 installer.py < upgrade-existing.txt"
+      - name: "Upgrade - Keep existing"
+        working-directory: ./installer
+        run: |
+          sudo -E bash -c "python3 installer.py < tests/upgrade-existing-cosmovisor.txt"
 
-  #     - name: Debugging with tmate
-  #       if: ${{ failure() }}
-  #       uses: mxschmitt/action-tmate@v3
-  #       timeout-minutes: 10
+      - name: "Upgrade - Fresh install"
+        working-directory: ./installer
+        run: |
+          sudo -E bash -c "python3 installer.py < tests/upgrade-fresh-install.txt"
+
+      - name: Debugging with tmate
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 10
+    
+  installer-standalone:
+    name: "Installer - Standalone mode"
+    runs-on: ubuntu-20.04
+    env:
+      PYTHONDEVMODE: 1
+      DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }} 
+    
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: "Fresh install"
+        working-directory: ./installer
+        run: |
+          sudo -E bash -c "python3 installer.py < tests/install-from-scratch-standalone.txt"
+
+      - name: "Upgrade existing installation"
+        working-directory: ./installer
+        run: |
+          sudo -E bash -c "python3 installer.py < tests/upgrade-existing-standalone.txt"
+      
+      - name: "Upgrade with moving to cosmovisor"
+        working-directory: ./installer
+        run: |
+          sudo -E bash -c "python3 installer.py < tests/upgrade-to-cosmovisor.txt"
+      
+      - name: Debugging with tmate
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 10
 
   unit-tests:
     name: "Unit Tests"
