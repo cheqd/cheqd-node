@@ -2269,8 +2269,10 @@ class Interviewer:
 
             if answer == 1:
                 self.is_upgrade = True
+                self.is_from_scratch = False
             elif answer == 2:
                 self.is_upgrade = False
+                self.is_from_scratch = False
             else:
                 logging.error(f"Invalid option selected. Please choose either 1 or 2.\n")
                 self.ask_for_upgrade()
@@ -2281,7 +2283,7 @@ class Interviewer:
             logging.exception(f"Failed to set whether installation should be upgraded. Reason: {e}")
 
     # If an install from scratch is requested, warn the user and check if they want to proceed
-    def ask_for_install_from_scratch(self):
+    def ask_for_confirm_upgrade(self):
         try:
             answer = self.ask(
                 f"Are you SURE you want to overwrite existing with a FRESH INSTALL? (yes/no)", default="no")
@@ -2291,7 +2293,7 @@ class Interviewer:
                 self.is_from_scratch = False
             else:
                 logging.error(f"Please choose either 'yes' or 'no'\n")
-                self.ask_for_install_from_scratch()
+                self.ask_for_confirm_upgrade()
         except Exception as e:
             logging.exception(f"Failed to set whether to install from scratch. Reason: {e}")
 
@@ -2458,7 +2460,7 @@ if __name__ == '__main__':
 
             else:
                 # If user declines upgrade, ask if they want to install from scratch
-                interviewer.ask_for_install_from_scratch()
+                interviewer.ask_for_confirm_upgrade()
 
                 if interviewer.is_from_scratch is True:
                     install_steps()
