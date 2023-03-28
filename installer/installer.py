@@ -2261,12 +2261,10 @@ class Interviewer:
             logging.warning(f"Existing cheqd-node binary detected.\n")
             logging.info(f"Choosing UPGRADE will preserve your existing configuration and data.\nChoosing FRESH INSTALL will remove ALL existing configuration and data.\n")
             logging.info(f"Please ensure you have a backup of your existing configuration and data before proceeding!\n")
-
             answer = int(self.ask(
                 "Do you want to UPGRADE an existing installation or do a FRESH INSTALL?\n"
                 "1. UPGRADE existing installation\n"
                 "2. Overwrite existing configuration with a FRESH INSTALL", default=1))
-
             if answer == 1:
                 self.is_upgrade = True
                 self.is_from_scratch = False
@@ -2276,9 +2274,6 @@ class Interviewer:
             else:
                 logging.error(f"Invalid option selected. Please choose either 1 or 2.\n")
                 self.ask_for_upgrade()
-            
-            # Set debug message
-            logging.debug(f"Setting network to join as {self.chain}")
         except Exception as e:
             logging.exception(f"Failed to set whether installation should be upgraded. Reason: {e}")
 

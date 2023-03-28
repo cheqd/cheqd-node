@@ -1,4 +1,4 @@
-yes
+1
 2
 /home/runner/.local/cheqd
 no
