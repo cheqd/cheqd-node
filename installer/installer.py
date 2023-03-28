@@ -980,15 +980,14 @@ class Installer():
                     for line in lines:
                         # Update existing value (if it exists)
                         if line.startswith(f"export {env_var_name}="):
-                            logging.debug(f"Overwriting existing line in {DEFAULT_LOGIN_SHELL_ENV_FILE_PATH}: {line}")
                             file.write(f"export {env_var_name}={env_var_value}\n")
                             updated = True
                         else:
-                            logging.debug(f"Retaining existing line in {DEFAULT_LOGIN_SHELL_ENV_FILE_PATH}: {line}")
                             file.write(line)
                     
                     # Add new value (if it doesn't exist in the file already)
                     if not updated:
+                        logging.debug(f"Adding {env_var_name}={env_var_value} to {DEFAULT_LOGIN_SHELL_ENV_FILE_PATH}")
                         file.write(f'export {env_var_name}={env_var_value}\n')
             else:
                 logging.debug(f"{DEFAULT_LOGIN_SHELL_ENV_FILE_PATH} doesn't exist. Skipped adding {env_var_name} to the file...")
@@ -1006,15 +1005,14 @@ class Installer():
                     for line in lines:
                         # Update existing value (if it exists)
                         if line.startswith(f"export {env_var_name}="):
-                            logging.debug(f"Overwriting existing line in {self.cheqd_user_bashrc_path}: {line}")
                             file.write(f"export {env_var_name}={env_var_value}\n")
                             updated = True
                         else:
-                            logging.debug(f"Retaining existing line in {self.cheqd_user_bashrc_path}: {line}")
                             file.write(line)
                     
                     # Add new value (if it doesn't exist in the file already)
                     if not updated:
+                        logging.debug(f"Adding {env_var_name}={env_var_value} to {self.cheqd_user_bashrc_path}")
                         file.write(f'export {env_var_name}={env_var_value}\n')
             else:
                 logging.debug(f"{self.cheqd_user_bashrc_path} doesn't exist. Skipped adding {env_var_name} to the file...")
