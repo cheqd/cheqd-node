@@ -963,13 +963,14 @@ class Installer():
         try:
             # Set environment variable in /etc/profile.d/cheqd-noded.sh
             if os.path.exists(DEFAULT_LOGIN_SHELL_ENV_FILE_PATH):
-                with open(DEFAULT_LOGIN_SHELL_ENV_FILE_PATH, "w+") as file:
+                with open(DEFAULT_LOGIN_SHELL_ENV_FILE_PATH, "r") as file:
                     lines = file.readlines()
 
-                    # Track whether the environment variable has been updated
-                    updated = False
+                # Track whether the environment variable has been updated
+                updated = False
 
-                    # Read /etc/profile.d/cheqd-noded.sh line by line
+                # Read /etc/profile.d/cheqd-noded.sh line by line
+                with open(DEFAULT_LOGIN_SHELL_ENV_FILE_PATH, "w") as file:
                     for line in lines:
                         # Update existing value (if it exists)
                         if line.startswith(f"export {env_var_name}="):
@@ -980,21 +981,22 @@ class Installer():
                             logging.debug(f"Retaining existing line in {DEFAULT_LOGIN_SHELL_ENV_FILE_PATH}: {line}")
                             file.write(line)
                     
-                        # Add new value (if it doesn't exist in the file already)
-                        if not updated:
-                            file.write(f'export {env_var_name}={env_var_value}\n')
+                    # Add new value (if it doesn't exist in the file already)
+                    if not updated:
+                        file.write(f'export {env_var_name}={env_var_value}\n')
             else:
                 logging.debug(f"{DEFAULT_LOGIN_SHELL_ENV_FILE_PATH} doesn't exist. Skipped adding {env_var_name} to the file...")
             
             # Set environment variable in ~/.bashrc
             if os.path.exists(self.cheqd_user_bashrc_path):
-                with open(self.cheqd_user_bashrc_path, "w+") as file:
+                with open(self.cheqd_user_bashrc_path, "r") as file:
                     lines = file.readlines()
 
-                    # Track whether the environment variable has been updated
-                    updated = False
+                # Track whether the environment variable has been updated
+                updated = False
 
-                    # Read ~/.bashrc line by line
+                # Read ~/.bashrc line by line
+                with open(self.cheqd_user_bashrc_path, "w") as file:
                     for line in lines:
                         # Update existing value (if it exists)
                         if line.startswith(f"export {env_var_name}="):
@@ -1005,9 +1007,9 @@ class Installer():
                             logging.debug(f"Retaining existing line in {self.cheqd_user_bashrc_path}: {line}")
                             file.write(line)
                     
-                        # Add new value (if it doesn't exist in the file already)
-                        if not updated:
-                            file.write(f'export {env_var_name}={env_var_value}\n')
+                    # Add new value (if it doesn't exist in the file already)
+                    if not updated:
+                        file.write(f'export {env_var_name}={env_var_value}\n')
             else:
                 logging.debug(f"{self.cheqd_user_bashrc_path} doesn't exist. Skipped adding {env_var_name} to the file...")
                             
