@@ -16,6 +16,9 @@ jobs:
   installer-cosmovisor:
     name: "Installer - Cosmovisor mode"
     runs-on: ubuntu-20.04
+    env:
+      PYTHONDEVMODE: 1
+      DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
   
     steps:
       - uses: actions/checkout@v3
@@ -24,17 +27,16 @@ jobs:
         working-directory: ./installer
         run: |
           sudo -E bash -c "python3 installer.py < tests/install-from-scratch-cosmovisor.txt"
-        env:
-          PYTHONDEVMODE: 1
-          DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
 
-      - name: "Upgrade existing installation"
+      - name: "Upgrade - Keep existing"
         working-directory: ./installer
         run: |
           sudo -E bash -c "python3 installer.py < tests/upgrade-existing-cosmovisor.txt"
-        env:
-          PYTHONDEVMODE: 1
-          DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
+
+      - name: "Upgrade - Fresh install"
+        working-directory: ./installer
+        run: |
+          sudo -E bash -c "python3 installer.py < tests/upgrade-fresh-install.txt"
 
       - name: Debugging with tmate
         if: ${{ failure() }}
@@ -44,7 +46,10 @@ jobs:
   installer-standalone:
     name: "Installer - Standalone mode"
     runs-on: ubuntu-20.04
-  
+    env:
+      PYTHONDEVMODE: 1
+      DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }} 
+    
     steps:
       - uses: actions/checkout@v3
 
@@ -52,25 +57,16 @@ jobs:
         working-directory: ./installer
         run: |
           sudo -E bash -c "python3 installer.py < tests/install-from-scratch-standalone.txt"
-        env:
-          PYTHONDEVMODE: 1
-          DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
 
       - name: "Upgrade existing installation"
         working-directory: ./installer
         run: |
           sudo -E bash -c "python3 installer.py < tests/upgrade-existing-standalone.txt"
-        env:
-          PYTHONDEVMODE: 1
-          DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
       
       - name: "Upgrade with moving to cosmovisor"
         working-directory: ./installer
         run: |
           sudo -E bash -c "python3 installer.py < tests/upgrade-to-cosmovisor.txt"
-        env:
-          PYTHONDEVMODE: 1
-          DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
       
       - name: Debugging with tmate
         if: ${{ failure() }}

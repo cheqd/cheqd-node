@@ -1,9 +1,14 @@
-1
-/home/runner/.local/cheqd
 2
 yes
+1
+/home/runner/.local/cheqd
+1
+yes
+yes
+yes
+yes
 test-install
-rpc.cheqd.network
+1.1.1.1
 27657
 27656
 nodeid1@1.1.1.1:26656,nodeid2@8.8.8.8:26656
