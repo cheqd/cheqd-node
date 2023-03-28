@@ -963,7 +963,7 @@ class Installer():
         try:
             # Set environment variable in /etc/profile.d/cheqd-noded.sh
             if os.path.exists(DEFAULT_LOGIN_SHELL_ENV_FILE_PATH):
-                with open(DEFAULT_LOGIN_SHELL_ENV_FILE_PATH, "w") as file:
+                with open(DEFAULT_LOGIN_SHELL_ENV_FILE_PATH, "w+") as file:
                     lines = file.readlines()
 
                     # Track whether the environment variable has been updated
@@ -988,7 +988,7 @@ class Installer():
             
             # Set environment variable in ~/.bashrc
             if os.path.exists(self.cheqd_user_bashrc_path):
-                with open(self.cheqd_user_bashrc_path, "w") as file:
+                with open(self.cheqd_user_bashrc_path, "w+") as file:
                     lines = file.readlines()
 
                     # Track whether the environment variable has been updated
