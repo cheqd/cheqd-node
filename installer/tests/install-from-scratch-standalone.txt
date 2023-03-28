@@ -1,8 +1,7 @@
 1
 /home/runner/.local/cheqd
-yes
 1
-no
+yes
 test-install
 rpc.cheqd.network
 27657
