@@ -1,0 +1,15 @@
+name: "Cleanup - Cache"
+on:
+  schedule:
+    - cron: "0 0 * * 0"
+  workflow_dispatch:
+
+jobs:
+
+  delete-caches:
+    name: "Delete Actions caches"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: "Wipe Github Actions cache"
+        uses: easimon/wipe-cache@v2
