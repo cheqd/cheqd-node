@@ -3,6 +3,7 @@ FROM ghcr.io/cheqd/cheqd-node:latest
 ARG HOME_DIR="/home/cheqd"
 ARG CHEQD_ROOT_DIR="${HOME_DIR}/.cheqdnode/"
 ARG USER="cheqd"
+ARG GROUP=${USER}
 
 ARG UID=1000
 ARG GID=${UID}
@@ -13,7 +14,7 @@ RUN apk update && apk add --no-cache jq
 COPY --chown=${USER}:${GROUP} ../localnet/gen-network-config.sh /bin/gen-network
 COPY --chown=${USER}:${GROUP} ../localnet/import-keys.sh /bin/import-keys
 COPY --chown=${USER}:${GROUP} ../localnet/container-env/validator-0.env ${HOME_DIR}
-COPY --chown=${USER}:${GROUP} ./testnet.sh /bin/run-testnet
+COPY --chown=${USER}:${GROUP} ../test-image/testnet.sh /bin/run-testnet
 RUN chmod +rx /bin/run-testnet
 
 USER ${USER}
