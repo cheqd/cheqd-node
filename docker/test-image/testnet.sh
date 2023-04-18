@@ -1,13 +1,13 @@
 #!/bin/bash
 set -euo pipefail
 
-# Enable config parameters as environment variables
-source validator-0.env
-
 HOME_DIR="/home/cheqd"
 CHEQD_ROOT_DIR="${HOME_DIR}/.cheqdnode/"
 TESTNET_NAME="cheqd"
 NODE_MONIKER="node0"
+
+# Enable config parameters as environment variables
+source ${HOME_DIR}/validator-0.env
 
 mkdir -p ${CHEQD_ROOT_DIR}
 
