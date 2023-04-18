@@ -11,10 +11,10 @@ ARG GID=${UID}
 USER root
 RUN apk update && apk add --no-cache jq
 
-COPY --chown=${USER}:${GROUP} ../localnet/gen-network-config.sh /bin/gen-network
-COPY --chown=${USER}:${GROUP} ../localnet/import-keys.sh /bin/import-keys
-COPY --chown=${USER}:${GROUP} ../localnet/container-env/validator-0.env ${HOME_DIR}
-COPY --chown=${USER}:${GROUP} ../test-image/testnet.sh /bin/run-testnet
+COPY --chown=${USER}:${GROUP} docker/localnet/gen-network-config.sh /bin/gen-network
+COPY --chown=${USER}:${GROUP} docker/localnet/import-keys.sh /bin/import-keys
+COPY --chown=${USER}:${GROUP} docker/localnet/container-env/validator-0.env ${HOME_DIR}
+COPY --chown=${USER}:${GROUP} docker/test-image/testnet.sh /bin/run-testnet
 RUN chmod +rx /bin/run-testnet
 
 USER ${USER}
