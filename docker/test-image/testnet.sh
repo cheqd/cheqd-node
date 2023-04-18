@@ -7,7 +7,7 @@ TESTNET_NAME="cheqd"
 NODE_MONIKER="node0"
 
 # Enable config parameters as environment variables
-# shellcheck source=validator-0.env
+# shellcheck disable=SC1091
 source "$HOME_DIR/validator-0.env"
 
 mkdir -p ${CHEQD_ROOT_DIR}
