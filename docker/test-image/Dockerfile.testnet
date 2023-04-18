@@ -1,4 +1,4 @@
-FROM ghcr.io/cheqd/cheqd-node:latest
+FROM ghcr.io/cheqd/cheqd-node:1.4.0
 
 ARG HOME_DIR="/home/cheqd"
 ARG CHEQD_ROOT_DIR="${HOME_DIR}/.cheqdnode/"
