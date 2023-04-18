@@ -17,7 +17,13 @@ jobs:
     needs: call-lint
     uses: ./.github/workflows/build.yml
     secrets: inherit
-  
+
+  call-build-test-image:
+    name: "Build test image"
+    needs: call-build
+    uses: ./.github/workflows/build-test-image.yml
+    secrets: inherit
+
   call-test:
     name: "Tests"
     needs: call-build
@@ -30,3 +36,10 @@ jobs:
     if: ${{ github.ref_protected == true }}
     uses: ./.github/workflows/release.yml
     secrets: inherit
+
+  # this one will be called after release issuing. Let's uncomment it after successfull review   
+  # call-build-test-image:
+  #   name: "Build test image"
+  #   needs: call-release
+  #   uses: ./.github/workflows/build-test-image.yml
+  #   secrets: inherit
