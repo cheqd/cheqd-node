@@ -9,7 +9,7 @@ ARG UID=1000
 ARG GID=${UID}
 
 USER root
-RUN apk update && apk add --no-cache jq
+RUN apk update && apk add --no-cache jq=1.6-r2
 
 COPY --chown=${USER}:${GROUP} docker/localnet/gen-network-config.sh /bin/gen-network
 COPY --chown=${USER}:${GROUP} docker/localnet/import-keys.sh /bin/import-keys
