@@ -44,5 +44,6 @@ jobs:
             revert
             style
             test
+            security
           # Configure that a scope must always be provided.
           requireScope: false
