@@ -46,7 +46,7 @@ jobs:
     needs: super-lint
     outputs:
       RELEASE_VERSION: ${{ steps.set-version.outputs.RELEASE_VERSION }}
-      EXECUTE_RELEASE: ${{ steps.set-version.outputs.EXECUTE_RELEASE }}
+      EXECUTE_RELEASE: ${{ steps.execute-release.outputs.EXECUTE_RELEASE }}
     
     steps:
       - uses: actions/checkout@v3
@@ -76,14 +76,23 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 
-      # If there is no release version, release-binary & release-docker will not run
+      # If there is tag inserting starting with 'v', prevent release-binary & release-docker from running
+      - name: Check whether to execute release
+        id: execute-release
+        run: |
+          if [[ git tag --points-at ${{ github.sha }} --list 'v*' ]]; then
+            echo "EXECUTE_RELEASE=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "EXECUTE_RELEASE=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Set release version number
       - name: Set release version number
         id: set-version
-        if: contains(github.event.head_commit.message, 'v')
+        if: steps.execute-release.outputs.EXECUTE_RELEASE == 'true'
         run: |
           RELEASE_VERSION=$( git describe --tags "${{ github.sha }}")
           echo "RELEASE_VERSION=$RELEASE_VERSION" >> "$GITHUB_OUTPUT"
-          echo "EXECUTE_RELEASE=true" >> "$GITHUB_OUTPUT"
 
   release-binary:
     name: "Node binary"
@@ -128,6 +137,8 @@ jobs:
     name: "Docker image"
     needs: [ super-lint, release-guard ]
     runs-on: ubuntu-20.04
+    # Only run if release-guard outputs EXECUTE_RELEASE=true
+    if: needs.release-guard.outputs.EXECUTE_RELEASE == 'true'
     env:
       IMAGE_NAME: ${{ github.repository }}
 
