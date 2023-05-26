@@ -80,7 +80,8 @@ jobs:
       - name: Check whether to execute release
         id: execute-release
         run: |
-          if [[ git tag --points-at ${{ github.sha }} --list 'v*' ]]; then
+          tag=$(git describe --tags --exact-match)
+          if [[ $tag =~ ^v ]]; then
             echo "EXECUTE_RELEASE=true" >> "$GITHUB_OUTPUT"
           else
             echo "EXECUTE_RELEASE=false" >> "$GITHUB_OUTPUT"
