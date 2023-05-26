@@ -64,7 +64,6 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
 
       # Setup for pushing to Buf.build later
       - uses: bufbuild/buf-setup-action@v1.19.0
@@ -90,7 +89,7 @@ jobs:
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v4
         # Only run GoReleaser if the commit is tagged with a version
-        if: startsWith((git tag --contains ${{ github.sha }}), 'v')
+        if: contains(github.event.head_commit.message, 'v')
         with:
           distribution: goreleaser
           version: latest
