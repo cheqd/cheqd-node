@@ -40,13 +40,13 @@ jobs:
         VALIDATE_XML: true
         VALIDATE_YAML: true
 
-
-  release-binary:
-    name: "Node binary"
+  release-guard:
+    name: "Check release condition"
     runs-on: ubuntu-20.04
     needs: super-lint
     outputs:
       RELEASE_VERSION: ${{ steps.set-version.outputs.RELEASE_VERSION }}
+      EXECUTE_RELEASE: ${{ steps.set-version.outputs.EXECUTE_RELEASE }}
     
     steps:
       - uses: actions/checkout@v3
@@ -54,21 +54,11 @@ jobs:
           fetch-depth: 0 # Required to fetch version
           persist-credentials: false
 
-      - uses: actions/setup-go@v4
-        with:
-          go-version-file: ./go.mod
-          cache: true
-
       # Node.js setup is needed to run Semantic Release
       - uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: 'npm'
-
-      # Setup for pushing to Buf.build later
-      - uses: bufbuild/buf-setup-action@v1.19.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       # Required for short-lived token provided to Semantic Release
       - name: "Obtain Github App token"
@@ -86,22 +76,46 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 
+      # If there is no release version, release-binary & release-docker will not run
+      - name: Set release version number
+        id: set-version
+        if: contains(github.event.head_commit.message, 'v')
+        run: |
+          RELEASE_VERSION=$( git describe --tags "${{ github.sha }}")
+          echo "RELEASE_VERSION=$RELEASE_VERSION" >> "$GITHUB_OUTPUT"
+          echo "EXECUTE_RELEASE=true" >> "$GITHUB_OUTPUT"
+
+  release-binary:
+    name: "Node binary"
+    runs-on: ubuntu-20.04
+    needs: [ super-lint, release-guard ]
+    # Only run if release-guard outputs EXECUTE_RELEASE=true
+    if: needs.release-guard.outputs.EXECUTE_RELEASE == 'true'
+    
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Required to fetch version
+          persist-credentials: false
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version-file: ./go.mod
+          cache: true
+
+      # Setup for pushing to Buf.build later
+      - uses: bufbuild/buf-setup-action@v1.19.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v4
-        # Only run GoReleaser if the commit is tagged with a version
-        if: contains(github.event.head_commit.message, 'v')
         with:
           distribution: goreleaser
           version: latest
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set release version number
-        id: set-version
-        run: |
-          RELEASE_VERSION=$( git describe --tags "${{ github.sha }}")
-          echo "RELEASE_VERSION=$RELEASE_VERSION" >> "$GITHUB_OUTPUT"
 
       # Push Protobufs to Buf.build registry
       - uses: bufbuild/buf-push-action@v1
@@ -112,7 +126,7 @@ jobs:
 
   release-docker:
     name: "Docker image"
-    needs: [ super-lint, release-binary ]
+    needs: [ super-lint, release-guard ]
     runs-on: ubuntu-20.04
     env:
       IMAGE_NAME: ${{ github.repository }}
@@ -143,7 +157,7 @@ jobs:
           flavor: |
             latest=auto
           tags: |
-            type=semver,pattern={{version}},value=${{ needs.release-binary.outputs.RELEASE_VERSION }}
+            type=semver,pattern={{version}},value=${{ needs.release-guard.outputs.RELEASE_VERSION }}
             type=raw,value=production-latest
             type=sha,format=long
           labels: |
