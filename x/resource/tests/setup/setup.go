@@ -34,8 +34,6 @@ type TestSetup struct {
 func Setup() TestSetup {
 	// Init Codec
 	ir := codectypes.NewInterfaceRegistry()
-	/* types.RegisterInterfaces(ir)
-	didtypes.RegisterInterfaces(ir) */
 	cdc := codec.NewProtoCodec(ir)
 	aminoCdc := codec.NewLegacyAmino()
 
