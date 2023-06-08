@@ -29,11 +29,11 @@ type HandlerOptions struct {
 // numbers, checks signatures & account numbers, and deducts fees from the first
 // signer.
 func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
-	if options.AccountKeeper == nil {
+	if options.AccountKeeper == (ante.AccountKeeper)(nil) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "account keeper is required for ante builder")
 	}
 
-	if options.BankKeeper == nil {
+	if options.BankKeeper == (cheqdante.BankKeeper)(nil) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "bank keeper is required for ante builder")
 	}
 

@@ -102,7 +102,7 @@ func (td TaxDecorator) getFeePayer(ctx sdk.Context, feeTx sdk.FeeTx, tax sdk.Coi
 	deductFrom := feePayer
 	if feeGranter != nil {
 		// check if fee grant is supported
-		if td.feegrantKeeper == nil {
+		if td.feegrantKeeper == (ante.FeegrantKeeper)(nil) {
 			return nil, sdkerrors.ErrInvalidRequest.Wrap("fee grants are not enabled")
 		} else if !feeGranter.Equals(feePayer) {
 			// check if fee grant exists
