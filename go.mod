@@ -6,9 +6,9 @@ require (
 	cosmossdk.io/math v1.0.0-beta.3
 	filippo.io/edwards25519 v1.0.0-rc.1
 	github.com/cosmos/cosmos-proto v1.0.0-alpha8
-	github.com/cosmos/cosmos-sdk v0.46.10
+	github.com/cosmos/cosmos-sdk v0.46.12
 	github.com/cosmos/gogoproto v1.4.10
-	github.com/cosmos/ibc-go/v6 v6.1.1
+	github.com/cosmos/ibc-go/v6 v6.2.0
 	github.com/gabriel-vasile/mimetype v1.4.2
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/gogo/protobuf v1.3.3
@@ -27,7 +27,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.14.0
 	github.com/stretchr/testify v1.8.4
-	github.com/tendermint/tendermint v0.34.26
+	github.com/tendermint/tendermint v0.34.27
 	github.com/tendermint/tm-db v0.6.7
 	google.golang.org/genproto v0.0.0-20230306155012-7f2fa6fef1f4
 	google.golang.org/grpc v1.55.0
