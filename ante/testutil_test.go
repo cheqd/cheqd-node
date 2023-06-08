@@ -68,7 +68,7 @@ func (s *AnteTestSuite) SetupTest(isCheckTx bool) error {
 	}
 	s.ctx = s.ctx.WithBlockHeight(1)
 	// Set up TxConfig.
-	encodingConfig := cheqdapp.MakeTestEncodingConfig()
+	encodingConfig := cheqdapp.MakeTestUtilsEncodingConfig()
 	// We're using TestMsg encoding in some tests, so register it here.
 	encodingConfig.Amino.RegisterConcrete(&testdata.TestMsg{}, "testdata.TestMsg", nil)
 	testdata.RegisterInterfaces(encodingConfig.InterfaceRegistry)

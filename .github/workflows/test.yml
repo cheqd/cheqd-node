@@ -127,6 +127,7 @@ jobs:
       - name: Generate localnet configs
         working-directory: ./docker/localnet
         run: |
+          sleep 5
           bash gen-network-config.sh
           sudo chown -R 1000:1000 network-config
 
