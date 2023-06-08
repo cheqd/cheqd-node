@@ -7,10 +7,10 @@ concurrency:
 
 jobs:
 
-  # call-lint:
-  #   name: "Lint"
-  #   uses: ./.github/workflows/lint.yml
-  #   secrets: inherit
+  call-lint:
+    name: "Lint"
+    uses: ./.github/workflows/lint.yml
+    secrets: inherit
 
   call-build:
     name: "Build"
