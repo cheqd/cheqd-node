@@ -3,11 +3,10 @@ package keeper
 import (
 	"strconv"
 
-	errorsmod "cosmossdk.io/errors"
+	sdkerrors "cosmossdk.io/errors"
 	types "github.com/cheqd/cheqd-node/x/did/types/v1"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 // GetDidCount get the total number of did
@@ -71,7 +70,7 @@ func (k Keeper) GetDid(ctx *sdk.Context, id string) (types.StateValue, error) {
 	var value types.StateValue
 	bytes := store.Get(GetDidIDBytes(id))
 	if err := k.cdc.Unmarshal(bytes, &value); err != nil {
-		return types.StateValue{}, errorsmod.Wrap(sdkerrors.ErrInvalidType, err.Error())
+		return types.StateValue{}, sdkerrors.Wrap(sdkerrors.ErrInvalidType, err.Error())
 	}
 
 	return value, nil
