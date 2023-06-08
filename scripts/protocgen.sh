@@ -25,6 +25,7 @@ cd ..
 cp -r github.com/cheqd/cheqd-node/* ./
 rm -rf github.com
 
+go env
 go mod tidy
 
 sh ./scripts/protoc-pulsar-gen.sh
