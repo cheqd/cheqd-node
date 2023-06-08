@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -26,7 +27,7 @@ func NewQuerier(k Keeper, cheqdKeeper didkeeper.Keeper, legacyQuerierCdc *codec.
 			return collectionResources(ctx, k, cheqdKeeper, legacyQuerierCdc, path[1])
 
 		default:
-			err = sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown %s query endpoint: %s", types.ModuleName, path[0])
+			err = errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "unknown %s query endpoint: %s", types.ModuleName, path[0])
 		}
 
 		return res, err

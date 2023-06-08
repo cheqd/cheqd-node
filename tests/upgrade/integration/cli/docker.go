@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"os/exec"
 	"path/filepath"
-
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const (
@@ -56,7 +54,7 @@ func LocalnetExec(envArgs []string, args ...string) (string, error) {
 	cmd := exec.Command(Docker, args...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return string(out), sdkerrors.Wrap(err, string(out))
+		return string(out), errorsmod.Wrap(err, string(out))
 	}
 	return string(out), err
 }
