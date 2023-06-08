@@ -4,8 +4,8 @@
 ###                                Protobuf                                 ###
 ###############################################################################
 
-containerProtoVer=v0.7
-containerProtoImage=tendermintdev/sdk-proto-gen:$(containerProtoVer)
+containerProtoVer=0.13.2
+containerProtoImage=ghcr.io/cosmos/proto-builder:$(containerProtoVer)
 containerProtoGen=cheqd-node-proto-gen-$(containerProtoVer)
 containerProtoFmt=cheqd-node-proto-fmt-$(containerProtoVer)
 containerProtoGenSwagger=cheqd-node-proto-gen-swagger-$(containerProtoVer)
