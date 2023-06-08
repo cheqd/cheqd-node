@@ -5,7 +5,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	errorsmod "cosmossdk.io/errors"
+	sdkerrors "cosmossdk.io/errors"
 )
 
 const (
@@ -56,7 +56,7 @@ func LocalnetExec(envArgs []string, args ...string) (string, error) {
 	cmd := exec.Command(Docker, args...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return string(out), errorsmod.Wrap(err, string(out))
+		return string(out), sdkerrors.Wrap(err, string(out))
 	}
 	return string(out), err
 }

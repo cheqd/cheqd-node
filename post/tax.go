@@ -3,7 +3,7 @@ package posthandler
 import (
 	"fmt"
 
-	errorsmod "cosmossdk.io/errors"
+	sdkerrors "cosmossdk.io/errors"
 	cheqdante "github.com/cheqd/cheqd-node/ante"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -37,7 +37,7 @@ func (td TaxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, nex
 	// must implement FeeTx
 	feeTx, ok := tx.(sdk.FeeTx)
 	if !ok {
-		return ctx, errorsmod.Wrapf(sdkerrors.ErrTxDecode, "invalid transaction type: %T, must implement FeeTx", tx)
+		return ctx, sdkerrors.Wrapf(sdkerrors.ErrTxDecode, "invalid transaction type: %T, must implement FeeTx", tx)
 	}
 	// if simulate, perform no-op
 	if simulate {
@@ -83,7 +83,7 @@ func (td TaxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, nex
 func (td TaxDecorator) isTaxable(ctx sdk.Context, sdkTx sdk.Tx) (rewards sdk.Coins, burn sdk.Coins, taxable bool, err error) {
 	feeTx, ok := sdkTx.(sdk.FeeTx)
 	if !ok {
-		return sdk.Coins{}, sdk.Coins{}, false, errorsmod.Wrapf(sdkerrors.ErrTxDecode, "invalid transaction type: %T, must implement FeeTx", sdkTx)
+		return sdk.Coins{}, sdk.Coins{}, false, sdkerrors.Wrapf(sdkerrors.ErrTxDecode, "invalid transaction type: %T, must implement FeeTx", sdkTx)
 	}
 	// run lite validation
 	taxable = cheqdante.IsTaxableTxLite(feeTx)
@@ -109,7 +109,7 @@ func (td TaxDecorator) getFeePayer(ctx sdk.Context, feeTx sdk.FeeTx, tax sdk.Coi
 			// check if fee grant exists
 			err := td.feegrantKeeper.UseGrantedFees(ctx, feeGranter, feePayer, tax, msgs)
 			if err != nil {
-				return nil, errorsmod.Wrapf(err, "%s does not not allow to pay fees for %s", feeGranter, feePayer)
+				return nil, sdkerrors.Wrapf(err, "%s does not not allow to pay fees for %s", feeGranter, feePayer)
 			}
 		}
 		deductFrom = feeGranter
@@ -130,11 +130,11 @@ func (td TaxDecorator) validateTax(tax sdk.Coins, simulate bool) error {
 	}
 	// check if denom is accepted
 	if !tax.DenomsSubsetOf(sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(1)))) {
-		return errorsmod.Wrapf(sdkerrors.ErrInvalidCoins, "invalid denom: %s", tax)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid denom: %s", tax)
 	}
 	// check if tax is positive
 	if !tax.IsAllPositive() {
-		return errorsmod.Wrapf(sdkerrors.ErrInvalidCoins, "invalid tax: %s", tax)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid tax: %s", tax)
 	}
 	return nil
 }
@@ -148,7 +148,7 @@ func (td TaxDecorator) deductTaxFromFeePayer(ctx sdk.Context, acc types.AccountI
 	// deduct fees to did module account
 	err := td.bankKeeper.SendCoinsFromAccountToModule(ctx, acc.GetAddress(), didtypes.ModuleName, fees)
 	if err != nil {
-		return errorsmod.Wrapf(sdkerrors.ErrInsufficientFunds, "failed to deduct fees from %s: %s", acc.GetAddress(), err)
+		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "failed to deduct fees from %s: %s", acc.GetAddress(), err)
 	}
 	ctx.EventManager().EmitEvents(
 		sdk.Events{

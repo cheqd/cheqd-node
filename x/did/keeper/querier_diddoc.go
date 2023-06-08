@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	errorsmod "cosmossdk.io/errors"
+	sdkerrors "cosmossdk.io/errors"
 	"github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -18,7 +18,7 @@ func getDidDoc(ctx sdk.Context, id string, keeper Keeper, legacyQuerierCdc *code
 
 	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, resp)
 	if err != nil {
-		return nil, errorsmod.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
 
 	return bz, nil

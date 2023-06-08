@@ -3,7 +3,7 @@ package keeper
 import (
 	"fmt"
 
-	errorsmod "cosmossdk.io/errors"
+	sdkerrors "cosmossdk.io/errors"
 	"github.com/cheqd/cheqd-node/x/did/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -31,7 +31,7 @@ func NewHandler(k Keeper) sdk.Handler {
 
 		default:
 			errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName, msg)
-			return nil, errorsmod.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
+			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 		}
 	}
 }
