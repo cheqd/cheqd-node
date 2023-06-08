@@ -5,7 +5,7 @@ import (
 
 	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 
-	sdkerrors "cosmossdk.io/errors"
+	errorsmod "cosmossdk.io/errors"
 	"github.com/cheqd/cheqd-node/x/resource/keeper"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -24,7 +24,7 @@ func NewHandler(k keeper.Keeper, cheqdKeeper didkeeper.Keeper) sdk.Handler {
 
 		default:
 			errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName, msg)
-			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
+			return nil, errorsmod.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 		}
 	}
 }
