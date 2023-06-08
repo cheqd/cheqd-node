@@ -3,7 +3,7 @@ module github.com/cheqd/cheqd-node
 go 1.19
 
 require (
-	cosmossdk.io/math v1.0.0-beta.7
+	cosmossdk.io/math v1.0.0-rc.0
 	filippo.io/edwards25519 v1.0.0-rc.1
 	github.com/cosmos/cosmos-proto v1.0.0-alpha8
 	github.com/cosmos/cosmos-sdk v0.46.12
