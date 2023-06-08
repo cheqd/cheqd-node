@@ -12,15 +12,6 @@ import (
 func MakeTestEncodingConfig() params.EncodingConfig {
 	encodingConfig := params.MakeEncodingConfig()
 	std.RegisterLegacyAminoCodec(encodingConfig.Amino)
-	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
-	ModuleBasics.RegisterLegacyAminoCodec(encodingConfig.Amino)
-	ModuleBasics.RegisterInterfaces(encodingConfig.InterfaceRegistry)
-	return encodingConfig
-}
-
-func MakeTestUtilsEncodingConfig() params.EncodingConfig {
-	encodingConfig := params.MakeEncodingConfig()
-	std.RegisterLegacyAminoCodec(encodingConfig.Amino)
 	ModuleBasics.RegisterLegacyAminoCodec(encodingConfig.Amino)
 	return encodingConfig
 }
