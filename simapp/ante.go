@@ -4,7 +4,7 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	cheqdante "github.com/cheqd/cheqd-node/ante"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
