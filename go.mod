@@ -6,7 +6,7 @@ require (
 	cosmossdk.io/math v1.0.0-rc.0
 	filippo.io/edwards25519 v1.0.0-rc.1
 	github.com/cosmos/cosmos-proto v1.0.0-alpha8
-	github.com/cosmos/cosmos-sdk v0.46.13-0.20230608093636-d4b7164de5d8
+	github.com/cosmos/cosmos-sdk v0.46.13
 	github.com/cosmos/gogoproto v1.4.10
 	github.com/cosmos/ibc-go/v6 v6.1.1
 	github.com/gabriel-vasile/mimetype v1.4.2
