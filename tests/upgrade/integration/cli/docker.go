@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os/exec"
 	"path/filepath"
+
+	errorsmod "cosmossdk.io/errors"
 )
 
 const (
