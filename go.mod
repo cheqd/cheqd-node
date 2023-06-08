@@ -197,6 +197,9 @@ replace (
 	// From Cosmos SDK v0.46.x upstream
 	github.com/jhump/protoreflect => github.com/jhump/protoreflect v1.9.0
 
+	// Replace broken Goleveldb; from upstream Cosmos SDK v0.46.x
+	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
+
 	// Use CometBFT fork; from upstream Cosmos SDK v0.46.x
 	github.com/tendermint/tendermint => github.com/cometbft/cometbft v0.34.28
 )
