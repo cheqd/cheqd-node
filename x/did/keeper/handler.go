@@ -7,7 +7,6 @@ import (
 	"github.com/cheqd/cheqd-node/x/did/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 func NewHandler(k Keeper) sdk.Handler {
