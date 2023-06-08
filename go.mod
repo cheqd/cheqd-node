@@ -1,12 +1,12 @@
 module github.com/cheqd/cheqd-node
 
-go 1.18
+go 1.19
 
 require (
-	cosmossdk.io/math v1.0.0-beta.3
+	cosmossdk.io/math v1.0.0-beta.7
 	filippo.io/edwards25519 v1.0.0-rc.1
 	github.com/cosmos/cosmos-proto v1.0.0-alpha8
-	github.com/cosmos/cosmos-sdk v0.46.10
+	github.com/cosmos/cosmos-sdk v0.46.12
 	github.com/cosmos/gogoproto v1.4.10
 	github.com/cosmos/ibc-go/v6 v6.1.1
 	github.com/gabriel-vasile/mimetype v1.4.2
@@ -27,7 +27,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.14.0
 	github.com/stretchr/testify v1.8.4
-	github.com/tendermint/tendermint v0.34.26
+	github.com/tendermint/tendermint v0.34.27
 	github.com/tendermint/tm-db v0.6.7
 	google.golang.org/genproto v0.0.0-20230306155012-7f2fa6fef1f4
 	google.golang.org/grpc v1.55.0
@@ -176,17 +176,17 @@ require (
 )
 
 replace (
-	// Keyring replacement from Cosmos SDK v0.46.8
+	// Keyring replacement from Cosmos SDK v0.46.x
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
 
 	// cheqd-node/api module replacement
 	github.com/cheqd/cheqd-node/api/v2 => ./api
 
 	// cosmos-sdk state sync allow fast forward to latest height version
-	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.46.10-state-sync
+	// github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.46.10-state-sync
 
 	// iavl allow pruning of uneven heights
-	github.com/cosmos/iavl => github.com/cheqd/iavl v0.19.5-cheqd
+	// github.com/cosmos/iavl => github.com/cheqd/iavl v0.19.5-cheqd
 
 	// dgrijalva/jwt-go is deprecated and doesn't receive security updates.
 	// TODO: remove it: https://github.com/cosmos/cosmos-sdk/issues/13134
@@ -196,12 +196,12 @@ replace (
 	// TODO Remove it: https://github.com/cosmos/cosmos-sdk/issues/10409
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.7.0
 
-	// From Cosmos SDK v0.46.8 upstream
+	// From Cosmos SDK v0.46.x upstream
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 
-	// From Cosmos SDK v0.46.8 upstream
+	// From Cosmos SDK v0.46.x upstream
 	github.com/jhump/protoreflect => github.com/jhump/protoreflect v1.9.0
 
-	// use informal systems fork of tendermint
-	github.com/tendermint/tendermint => github.com/informalsystems/tendermint v0.34.26
+	// Use CometBFT fork; from upstream Cosmos SDK v0.46.x
+	github.com/tendermint/tendermint => github.com/cometbft/cometbft v0.34.27
 )
