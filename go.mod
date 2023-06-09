@@ -183,7 +183,7 @@ replace (
 	github.com/cheqd/cheqd-node/api/v2 => ./api
 
 	// cosmos-sdk state sync allow fast forward to latest height version
-	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.46.10-state-sync
+	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.46.10-barberry
 
 	// iavl allow pruning of uneven heights
 	github.com/cosmos/iavl => github.com/cheqd/iavl v0.19.5-cheqd
