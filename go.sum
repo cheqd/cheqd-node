@@ -318,8 +318,8 @@ github.com/cespare/xxhash/v2 v2.1.2/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XL
 github.com/cespare/xxhash/v2 v2.2.0 h1:DC2CZ1Ep5Y4k3ZQ899DldepgrayRUGE6BBZ/cd9Cj44=
 github.com/cespare/xxhash/v2 v2.2.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/cheggaaa/pb v1.0.27/go.mod h1:pQciLPpbU0oxA0h+VJYYLxO+XeDQb5pZijXscXHm81s=
-github.com/cheqd/cosmos-sdk v0.46.10-state-sync h1:4JWHwmEvDRw0ppU8RAeJluwW1hPtFYyP5dZMKFOipHE=
-github.com/cheqd/cosmos-sdk v0.46.10-state-sync/go.mod h1:ZFL/yjcIZq67H8FiWoLCnnaChkXnbRRYEEhGrFq8fzE=
+github.com/cheqd/cosmos-sdk v0.46.10-barberry h1:ZTp4EvHZw0CLAhvb8nYXIJAo9/Bcq/2KcMt9aDv2eUY=
+github.com/cheqd/cosmos-sdk v0.46.10-barberry/go.mod h1:ZFL/yjcIZq67H8FiWoLCnnaChkXnbRRYEEhGrFq8fzE=
 github.com/cheqd/iavl v0.19.5-cheqd h1:GRiKnoDKMnuTRUuEZmSihY2MtBtbVz87Edzny0o4TL8=
 github.com/cheqd/iavl v0.19.5-cheqd/go.mod h1:X9PKD3J0iFxdmgNLa7b2LYWdsGd90ToV5cAONApkEPw=
 github.com/chzyer/logex v1.1.10 h1:Swpa1K6QvQznwJRcfTfQJmTE72DqScAa40E+fbHEXEE=
