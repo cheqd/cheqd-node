@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/cheqd/cheqd-node/app"
-	"github.com/cheqd/cheqd-node/app/params"
+	appparams "github.com/cheqd/cheqd-node/app/params"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/debug"
@@ -40,12 +40,11 @@ var ChainID = "cheqd-mainnet-1"
 
 // NewRootCmd creates a new root command for simd. It is called once in the
 // main function.
-func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
+func NewRootCmd() (*cobra.Command, appparams.EncodingConfig) {
 	// Set config for prefixes
 	app.SetConfig()
 
-	// TODO: Why test config?
-	encodingConfig := app.MakeTestEncodingConfig()
+	encodingConfig := appparams.MakeEncodingConfig()
 	initClientCtx := client.Context{}.
 		WithCodec(encodingConfig.Codec).
 		WithInterfaceRegistry(encodingConfig.InterfaceRegistry).
@@ -83,7 +82,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	return rootCmd, encodingConfig
 }
 
-func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
+func initRootCmd(rootCmd *cobra.Command, encodingConfig appparams.EncodingConfig) {
 	cfg := sdk.GetConfig()
 	cfg.Seal()
 
@@ -171,7 +170,7 @@ func txCommand() *cobra.Command {
 }
 
 type appCreator struct {
-	encCfg params.EncodingConfig
+	encCfg appparams.EncodingConfig
 }
 
 // newApp is an AppCreator
