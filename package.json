@@ -19,8 +19,8 @@
   "devDependencies": {
     "@semantic-release/commit-analyzer": "^10.0.1",
     "@semantic-release/git": "^10.0.1",
-    "conventional-changelog-conventionalcommits": "^5.0.0",
-    "semantic-release": "^21.0.3",
+    "conventional-changelog-conventionalcommits": "^6.1.0",
+    "semantic-release": "^21.0.7",
     "swagger-combine": "^1.4.0"
   }
 }
