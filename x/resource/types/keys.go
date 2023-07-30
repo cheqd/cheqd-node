@@ -12,12 +12,19 @@ const (
 
 	// QuerierRoute defines the module's query routing key
 	QuerierRoute = ModuleName
+
+	// Version support via IBC
+	IBCVersion = "cheqd-resource-v1"
+
+	// Port id that this module binds to
+	ResourcePortId = "cheqd-resource"
 )
 
 const (
 	ResourceMetadataKey = "resource-metadata:"
 	ResourceDataKey     = "resource-data:"
 	ResourceCountKey    = "resource-count:"
+	ResourcePortIdKey   = "resource-port-id:"
 )
 
 // GetResourceDataKey returns the byte representation of resource key

@@ -1,0 +1,39 @@
+syntax = "proto3";
+package cheqd.resource.v3;
+
+// This is exactly the same as v2, only the genesis has changed
+
+import "cosmos/base/v1beta1/coin.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
+option (gogoproto.equal_all) = true;
+
+// FeeParams defines the parameters for the cheqd Resource module fixed fee.
+// Creation requests for different IANA media types are charged different fees.
+message FeeParams {
+  // Fixed fee for creating a resource with media type 'image/*'
+  //
+  // Default: 10 CHEQ or 10000000000ncheq
+  cosmos.base.v1beta1.Coin image = 1 [(gogoproto.nullable) = false];
+
+  // Fixed fee for creating a resource with media type 'application/json'
+  //
+  // Default: 2.5 CHEQ or 2500000000ncheq
+  cosmos.base.v1beta1.Coin json = 2 [(gogoproto.nullable) = false];
+
+  // Fixed fee for creating a resource with all other media types
+  //
+  // Default: 5 CHEQ or 5000000000ncheq
+  cosmos.base.v1beta1.Coin default = 3 [(gogoproto.nullable) = false];
+
+  // Percentage of the fixed fee that will be burned
+  //
+  // Default: 0.5 (50%)
+  string burn_factor = 4 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+}

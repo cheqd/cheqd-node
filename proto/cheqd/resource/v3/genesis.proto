@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package cheqd.resource.v3;
+
+import "cheqd/resource/v2/fee.proto";
+import "cheqd/resource/v2/resource.proto";
+
+option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
+
+// GenesisState defines the chqed Resource module's genesis state
+message GenesisState {
+  // All Resources with metadata
+  repeated cheqd.resource.v2.ResourceWithMetadata resources = 1;
+
+  // Fee parameters for the Resource module
+  // Defines fixed fees and burn percentage for resources
+  cheqd.resource.v2.FeeParams fee_params = 2;
+
+  // IBC port id of resource module 
+  string resource_port_id = 3;
+}

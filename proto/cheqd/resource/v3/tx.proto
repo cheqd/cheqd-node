@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package cheqd.resource.v3;
+
+// This is exactly the same as v2, only the genesis has changed
+
+import "cheqd/did/v2/tx.proto";
+import "cheqd/resource/v3/resource.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
+
+// Msg defines the Cosmos SDK Msg service for the cheqd.resource.v2 module.
+service Msg {
+  // CreateResource defines a method for creating a resource.
+  rpc CreateResource(MsgCreateResource) returns (MsgCreateResourceResponse);
+}
+
+// MsgCreateResource defines the Msg/CreateResource request type.
+// It describes the parameters of a request for creating a resource.
+message MsgCreateResource {
+  // Payload containing the resource to be created.
+  MsgCreateResourcePayload payload = 1;
+
+  // Signatures of the corresponding DID Document's controller(s).
+  repeated cheqd.did.v2.SignInfo signatures = 2;
+}
+
+// MsgCreateResourcePayload defines the structure of the payload for creating a resource.
+//
+// If a resource with the given id does not exist already,
+// it will be created. The resource will be created in the resource collection.
+//
+// If a resource with the given id, collection_id already exists, an error code 2200 will be returned.
+//
+// A new version of the resource in an existing collection will be created,
+// if a resource in that collection with the same name, resource_type and empty next_version_id exists.
+//
+// An update operation is not possible, because the resource is immutable by design.
+message MsgCreateResourcePayload {
+  // data is a byte-representation of the actual Data the user wants to store.
+  bytes data = 1;
+
+  // collection_id is an identifier of the DidDocument the resource belongs to.
+  // Format: <unique-identifier>
+  //
+  // Examples:
+  // - c82f2b02-bdab-4dd7-b833-3e143745d612
+  // - wGHEXrZvJxR8vw5P3UWH1j
+  string collection_id = 2 [(gogoproto.jsontag) = "resourceCollectionId"];
+
+  // id is a unique id of the resource.
+  // Format: <uuid>
+  string id = 3 [(gogoproto.jsontag) = "resourceId"];
+
+  // name is a human-readable name of the resource.
+  // Format: <string>
+  //
+  // Does not change between different versions.
+  // Example: PassportSchema, EducationTrustRegistry
+  string name = 4 [(gogoproto.jsontag) = "resourceName"];
+
+  // version is a version of the resource.
+  // Format: <string>
+  // Stored as a string. OPTIONAL.
+  //
+  // Example: 1.0.0, v2.1.0
+  string version = 5 [
+    (gogoproto.jsontag) = "resourceVersion",
+    (gogoproto.nullable) = true
+  ];
+
+  // resource_type is a type of the resource.
+  // Format: <string>
+  //
+  // This is NOT the same as the resource's media type.
+  // Example: AnonCredsSchema, StatusList2021
+  string resource_type = 6 [(gogoproto.jsontag) = "resourceType"];
+
+  // also_known_as is a list of URIs that can be used to get the resource.
+  repeated AlternativeUri also_known_as = 7 [
+    (gogoproto.jsontag) = "resourceAlternativeUri",
+    (gogoproto.nullable) = true
+  ];
+}
+
+message MsgCreateResourceResponse {
+  // Return the created resource metadata.
+  Metadata resource = 1 [(gogoproto.jsontag) = "linkedResourceMetadata"];
+}

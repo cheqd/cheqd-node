@@ -223,6 +223,7 @@ type App struct {
 	ScopedIBCFeeKeeper        capabilitykeeper.ScopedKeeper
 	ScopedICAControllerKeeper capabilitykeeper.ScopedKeeper
 	ScopedICAHostKeeper       capabilitykeeper.ScopedKeeper
+	ScopedResourceKeeper      capabilitykeeper.ScopedKeeper // Todo: needed?
 
 	didKeeper      didkeeper.Keeper
 	resourceKeeper resourcekeeper.Keeper
@@ -317,6 +318,7 @@ func New(
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
 	scopedICAControllerKeeper := app.CapabilityKeeper.ScopeToModule(icacontrollertypes.SubModuleName)
 	scopedICAHostKeeper := app.CapabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
+	scopedResourceKeeper := app.CapabilityKeeper.ScopeToModule(resourcetypes.ModuleName)
 
 	// Applications that wish to enforce statically created ScopedKeepers should call `Seal` after creating
 	// their scoped modules in `NewApp` with `ScopeToModule`
@@ -553,6 +555,8 @@ func New(
 	app.resourceKeeper = *resourcekeeper.NewKeeper(
 		appCodec, keys[resourcetypes.StoreKey],
 		app.GetSubspace(resourcetypes.ModuleName),
+		&app.IBCKeeper.PortKeeper,
+		scopedResourceKeeper,
 	)
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
@@ -880,6 +884,7 @@ func New(
 	app.ScopedTransferKeeper = scopedTransferKeeper
 	app.ScopedICAControllerKeeper = scopedICAControllerKeeper
 	app.ScopedICAHostKeeper = scopedICAHostKeeper
+	app.ScopedResourceKeeper = scopedResourceKeeper
 
 	return app
 }

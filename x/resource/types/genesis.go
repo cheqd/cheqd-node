@@ -14,8 +14,9 @@ const (
 // DefaultGenesis returns the default `resource` genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		Resources: []*ResourceWithMetadata{},
-		FeeParams: DefaultFeeParams(),
+		Resources:      []*ResourceWithMetadata{},
+		FeeParams:      DefaultFeeParams(),
+		ResourcePortId: ResourcePortId,
 	}
 }
 
@@ -28,6 +29,10 @@ func (gs GenesisState) Validate() error {
 
 	if err := gs.FeeParams.ValidateBasic(); err != nil {
 		return err
+	}
+
+	if len(gs.ResourcePortId) == 0 {
+		return fmt.Errorf("Resource Port Id is empty")
 	}
 
 	return nil

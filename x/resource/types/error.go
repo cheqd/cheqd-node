@@ -12,4 +12,6 @@ var (
 	ErrResourceExists  = sdkerrors.Register(ModuleName, 2200, "Resource exists")
 	ErrBasicValidation = sdkerrors.Register(ModuleName, 2205, "basic validation failed")
 	ErrInternal        = sdkerrors.Register(ModuleName, 2500, "internal error")
+	ErrInvalidVersion  = sdkerrors.Register(ModuleName, 2505, "invalid ibc version")
+	ErrUnexpectedAck   = sdkerrors.Register(ModuleName, 2510, "resource module never sends packets")
 )
