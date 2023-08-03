@@ -10,6 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
+	clienttypes "github.com/cosmos/ibc-go/v6/modules/core/02-client/types"
 	channeltypes "github.com/cosmos/ibc-go/v6/modules/core/04-channel/types"
 	// porttypes "github.com/cosmos/ibc-go/v6/modules/core/05-port/types"
 	// host "github.com/cosmos/ibc-go/v6/modules/core/24-host"
@@ -39,15 +40,55 @@ func DefaultParams() Params {
 	return params
 }
 
+func DefaultPacket(collectionId: string, resourceId: string ) channeltypes.Packet {
+
+		packet := types.ResourceReqPacket{
+				resourceId: "resourceId",
+				collectionId: "collectionId",
+		}
+
+	return channeltypes.Packet{
+		// number corresponds to the order of sends and receives, where a Packet
+		// with an earlier sequence number must be sent and received before a Packet
+		// with a later sequence number.
+		Sequence: 1,
+		// identifies the port on the sending chain.
+		SourcePort: "source-port",
+		// identifies the channel end on the sending chain.
+		SourceChannel: "source-channel",
+		// identifies the port on the receiving chain.
+		DestinationPort: types.ResourcePortId,
+		// identifies the channel end on the receiving chain.
+		DestinationChannel: "dest-channel",
+		// actual opaque bytes transferred directly to the application module
+		Data: []byte{},
+		// block height after which the packet times out
+		TimeoutHeight: clienttypes.Height{
+			RevisionNumber: 1,
+			RevisionHeight: 10,
+		},
+		// block timestamp (in nanoseconds) after which the packet times out
+		TimeoutTimestamp: 123,
+	}
+}
+
 var _ = Describe("Resource-IBC", func() {
 	var setup TestSetup
 	var alice didsetup.CreatedDidDocInfo
-	//var resource *types.MsgCreateResourceResponse
+	var resource *types.MsgCreateResourceResponse
 
 	BeforeEach(func() {
 		setup = Setup()
 		alice = setup.CreateSimpleDid()
-		_ = setup.CreateSimpleResource(alice.CollectionID, SchemaData, "Resource 1", CLSchemaType, []didsetup.SignInput{alice.SignInput})
+		resource = setup.CreateSimpleResource(alice.CollectionID, SchemaData, "Resource 1", CLSchemaType, []didsetup.SignInput{alice.SignInput})
+	})
+
+	It("OnRecvPacket returns resource", func() {
+		setup.StorePortWithGenesis()
+		//ctx sdk.Context,
+		//packet channeltypes.Packet,
+		//relayer sdk.AccAddress,
+		ack := setup.IBCModule.OnRecvPacket(setup.SdkCtx)
 	})
 
 	It("OnChanOpenInit (Genesis setup) with params returns correct version", func() {
@@ -91,6 +132,21 @@ var _ = Describe("Resource-IBC", func() {
 		version, err := setup.IBCModule.OnChanOpenTry(setup.SdkCtx, p.Order, p.ConnectionHops, p.PortID, p.ChannelID, &p.ChanCap, p.CounterpartyType, p.CounterpartyVersion)
 		Expect(err.Error()).To(ContainSubstring("invalid port"))
 		Expect(version).To(Equal(""))
+	})
+
+	It("OnChanOpenAck (Genesis setup) returns no error ", func() {
+		setup.StorePortWithGenesis()
+		p := DefaultParams()
+		err := setup.IBCModule.OnChanOpenAck(setup.SdkCtx, p.PortID, p.ChannelID, p.CounterpartyType.ChannelId, p.CounterpartyVersion)
+		Expect(err).To(BeNil())
+	})
+
+	It("OnChanOpenAck (Genesis setup) with wrong version returns error ", func() {
+		setup.StorePortWithGenesis()
+		p := DefaultParams()
+		p.CounterpartyVersion = "invalid-version"
+		err := setup.IBCModule.OnChanOpenAck(setup.SdkCtx, p.PortID, p.ChannelID, p.CounterpartyType.ChannelId, p.CounterpartyVersion)
+		Expect(err.Error()).To(ContainSubstring("invalid counterparty version"))
 	})
 
 })
