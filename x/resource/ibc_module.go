@@ -156,16 +156,16 @@ func (im IBCModule) OnRecvPacket(
 
 	var reqPacket resourcetypes.ResourceReqPacket
 
-	err := json.Unmarshal(packet.GetData(), reqPacket)
+	err := json.Unmarshal(packet.GetData(), &reqPacket)
 	if err != nil {
 		return channeltypes.NewErrorAcknowledgement(
-			resourcetypes.ErrInternal.Wrapf("Error unmarshal packet data: %s", err),
+			resourcetypes.ErrUnexpectedPacket.Wrapf("Error unmarshal packet data: %s", err),
 		)
 	}
 	resource, err := im.keeper.GetResource(&ctx, reqPacket.CollectionId, reqPacket.ResourceId)
 	if err != nil {
 		return channeltypes.NewErrorAcknowledgement(
-			resourcetypes.ErrInternal.Wrapf("Error get resource: %s", err),
+			resourcetypes.ErrResourceNotAvail.Wrapf("Error get resource: %s", err),
 		)
 	}
 
