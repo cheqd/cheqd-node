@@ -1,6 +1,8 @@
 package tests
 
 import (
+	"encoding/json"
+	"fmt"
 	. "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 
 	didsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
@@ -40,12 +42,17 @@ func DefaultParams() Params {
 	return params
 }
 
-func DefaultPacket(collectionId: string, resourceId: string ) channeltypes.Packet {
+func DefaultPacket(collectionId string, resourceId string) channeltypes.Packet {
 
-		packet := types.ResourceReqPacket{
-				resourceId: "resourceId",
-				collectionId: "collectionId",
-		}
+	packet := types.ResourceReqPacket{
+		ResourceId:   resourceId,
+		CollectionId: collectionId,
+	}
+
+	jsonPacket, err := json.Marshal(packet)
+	if err != nil {
+		panic(err)
+	}
 
 	return channeltypes.Packet{
 		// number corresponds to the order of sends and receives, where a Packet
@@ -61,7 +68,7 @@ func DefaultPacket(collectionId: string, resourceId: string ) channeltypes.Packe
 		// identifies the channel end on the receiving chain.
 		DestinationChannel: "dest-channel",
 		// actual opaque bytes transferred directly to the application module
-		Data: []byte{},
+		Data: jsonPacket,
 		// block height after which the packet times out
 		TimeoutHeight: clienttypes.Height{
 			RevisionNumber: 1,
@@ -83,12 +90,48 @@ var _ = Describe("Resource-IBC", func() {
 		resource = setup.CreateSimpleResource(alice.CollectionID, SchemaData, "Resource 1", CLSchemaType, []didsetup.SignInput{alice.SignInput})
 	})
 
-	It("OnRecvPacket returns resource", func() {
+	It("OnRecvPacket with existing resource returns resource", func() {
 		setup.StorePortWithGenesis()
-		//ctx sdk.Context,
-		//packet channeltypes.Packet,
-		//relayer sdk.AccAddress,
-		ack := setup.IBCModule.OnRecvPacket(setup.SdkCtx)
+		packet := DefaultPacket(alice.CollectionID, resource.Resource.Id)
+		ack := setup.IBCModule.OnRecvPacket(setup.SdkCtx, packet, []byte{0})
+		Expect(ack.Success()).To(Equal(true))
+
+		var ackResult channeltypes.Acknowledgement_Result
+		var ackData types.ResourceWithMetadata
+		err := json.Unmarshal(ack.Acknowledgement(), &ackResult)
+		err = json.Unmarshal(ackResult.Result, &ackData)
+
+		Expect(err).To(BeNil())
+		Expect(ackData.Metadata.CollectionId).To(Equal(resource.Resource.CollectionId))
+		Expect(ackData.Metadata.Name).To(Equal(resource.Resource.Name))
+		Expect(ackData.Resource.GetData()).To(Equal([]byte(SchemaData)))
+	})
+
+	It("OnRecvPacket without existing resource returns ack error", func() {
+		setup.StorePortWithGenesis()
+		packet := DefaultPacket(alice.CollectionID, "not-a-resource-id")
+		ack := setup.IBCModule.OnRecvPacket(setup.SdkCtx, packet, []byte{0})
+		Expect(ack.Success()).To(Equal(false))
+
+		var ackResult channeltypes.Acknowledgement_Error
+		err := json.Unmarshal(ack.Acknowledgement(), &ackResult)
+
+		Expect(err).To(BeNil())
+		Expect(ackResult.Error).To(ContainSubstring(fmt.Sprint(types.ErrResourceNotAvail.ABCICode())))
+	})
+
+	It("OnRecvPacket incorrect packet returns ack error", func() {
+		setup.StorePortWithGenesis()
+		packet := DefaultPacket(alice.CollectionID, "not-a-resource-id")
+		packet.Data = []byte{1, 2, 3}
+		ack := setup.IBCModule.OnRecvPacket(setup.SdkCtx, packet, []byte{0})
+		Expect(ack.Success()).To(Equal(false))
+
+		var ackResult channeltypes.Acknowledgement_Error
+		err := json.Unmarshal(ack.Acknowledgement(), &ackResult)
+
+		Expect(err).To(BeNil())
+		Expect(ackResult.Error).To(ContainSubstring(fmt.Sprint(types.ErrUnexpectedPacket.ABCICode())))
 	})
 
 	It("OnChanOpenInit (Genesis setup) with params returns correct version", func() {
