@@ -1,0 +1,21 @@
+chains:
+  - name: gaia-4
+    type: cosmos
+    numValidators: 1
+    ports:
+      rpc: 26653
+      rest: 1313
+  - name: cheqd
+    type: cosmos
+    numValidators: 3
+    ports:
+      rpc: 26657
+      rest: 1317
+
+relayers:
+  - name: cheqd-gaia
+    type: hermes
+    replicas: 1
+    chains:
+      - gaia-4
+      - cheqd
