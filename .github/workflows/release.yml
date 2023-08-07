@@ -115,7 +115,7 @@ jobs:
           cache: true
 
       # Setup for pushing to Buf.build later
-      - uses: bufbuild/buf-setup-action@v1.23.1
+      - uses: bufbuild/buf-setup-action@v1.25.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
