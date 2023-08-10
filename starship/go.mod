@@ -6,11 +6,11 @@ replace github.com/strangelove-ventures/lens => github.com/Anmol1696/lens v0.1.1
 
 require (
 	github.com/cosmology-tech/starship/clients/go/client v0.0.0-20230801080938-222b42996013
-	github.com/cosmos/cosmos-sdk v0.47.0-rc2.0.20230220103612-f094a0c33410
-	github.com/cosmos/ibc-go/v7 v7.0.0-rc0
 	github.com/stretchr/testify v1.8.4
-	github.com/tendermint/tendermint v0.37.0-rc2
 	go.uber.org/zap v1.25.0
+	github.com/cosmos/cosmos-sdk v0.46.10
+	github.com/cosmos/ibc-go/v6 v6.1.1
+	github.com/tendermint/tendermint v0.34.26
 	gopkg.in/yaml.v3 v3.0.1
 )
 
