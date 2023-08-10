@@ -10,6 +10,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	portkeeper "github.com/cosmos/ibc-go/v6/modules/core/05-port/keeper"
+	"github.com/cosmos/ibc-go/v6/modules/core/exported"
 )
 
 type Migrator struct {
@@ -58,6 +60,8 @@ func NewMigrationContext(
 	didSubspace didtypes.ParamSubspace,
 	resourceStoreKey *storetypes.KVStoreKey,
 	resourceSubspace resourcetypes.ParamSubspace,
+	portKeeper *portkeeper.Keeper,
+	scopedKeeper exported.ScopedKeeper,
 ) MigrationContext {
 	return MigrationContext{
 		codec: codec,
@@ -68,6 +72,6 @@ func NewMigrationContext(
 
 		resourceStoreKey:  resourceStoreKey,
 		resourceKeeperOld: resourcekeeperv1.NewKeeper(codec, resourceStoreKey),
-		resourceKeeperNew: resourcekeeper.NewKeeper(codec, resourceStoreKey, resourceSubspace),
+		resourceKeeperNew: resourcekeeper.NewKeeper(codec, resourceStoreKey, resourceSubspace, portKeeper, scopedKeeper),
 	}
 }

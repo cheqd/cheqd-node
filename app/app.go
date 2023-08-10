@@ -1026,6 +1026,8 @@ func (app *App) upgradeHandlerV1(icaModule ica.AppModule, didStoreKey *storetype
 			app.GetSubspace(didtypes.ModuleName),
 			resourceStoreKey,
 			app.GetSubspace(resourcetypes.ModuleName),
+			&app.IBCKeeper.PortKeeper,
+			app.ScopedResourceKeeper,
 		)
 
 		ctx.Logger().Debug("Initialise cheqd DID and Resource module migrations...")
