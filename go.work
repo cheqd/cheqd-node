@@ -3,5 +3,4 @@ go 1.18
 use (
 	.
 	./api
-	./starship
 )
