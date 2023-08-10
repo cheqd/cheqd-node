@@ -1,14 +1,16 @@
 package app
 
 import (
-	// "fmt"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 
-	//"github.com/cheqd/cheqd-node/app/migrations"
+	"github.com/cheqd/cheqd-node/app/migrations"
 	appparams "github.com/cheqd/cheqd-node/app/params"
+	upgradeV1 "github.com/cheqd/cheqd-node/app/upgrades/v1"
+	upgradeV2 "github.com/cheqd/cheqd-node/app/upgrades/v2"
 	posthandler "github.com/cheqd/cheqd-node/post"
 	did "github.com/cheqd/cheqd-node/x/did"
 	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
@@ -732,156 +734,11 @@ func New(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 
-	// Commented for now
-	// // Upgrade handler for the next release
-	//app.UpgradeKeeper.SetUpgradeHandler(UpgradeName,
-	//	func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-	//		ctx.Logger().Info("Handler for upgrade plan: " + UpgradeName)
-
-	//		// Fix lack of version map initialization in InitChainer for new chains
-	//		if len(fromVM) == 0 {
-	//			ctx.Logger().Info("Version map is empty. Initialising to required values.")
-
-	//			// Set these explicitly to avoid calling InitGenesis on modules that don't need it.
-	//			// Explicitly skipping x/auth migrations.
-	//			fromVM = map[string]uint64{
-	//				"auth":               2,
-	//				"authz":              1,
-	//				"bank":               2,
-	//				"capability":         1,
-	//				"cheqd":              3,
-	//				"crisis":             1,
-	//				"distribution":       2,
-	//				"evidence":           1,
-	//				"feegrant":           1,
-	//				"genutil":            1,
-	//				"gov":                2,
-	//				"ibc":                2,
-	//				"interchainaccounts": 1,
-	//				"mint":               1,
-	//				"params":             1,
-	//				"resource":           1,
-	//				"slashing":           2,
-	//				"staking":            2,
-	//				"transfer":           1,
-	//				"upgrade":            1,
-	//				"vesting":            1,
-	//			}
-	//		}
-
-	//		ctx.Logger().Info("Version map is populated. Running migrations.")
-	//		ctx.Logger().Debug(fmt.Sprintf("Previous version map: %v", fromVM))
-
-	//		// Get current version map
-	//		newVM := app.mm.GetVersionMap()
-	//		ctx.Logger().Debug(fmt.Sprintf("Target version map: %v", newVM))
-
-	//		// Set cheqd/DID module to ConsensusVersion
-	//		fromVM[didtypes.ModuleName] = newVM[didtypes.ModuleName]
-
-	//		// Set resource module to ConsensusVersion
-	//		fromVM[resourcetypes.ModuleName] = newVM[resourcetypes.ModuleName]
-
-	//		// Add defaults for DID module subspace
-	//		didSubspace := app.GetSubspace(didtypes.ModuleName)
-	//		didSubspace.Set(ctx, didtypes.ParamStoreKeyFeeParams, didtypes.DefaultFeeParams())
-
-	//		// Add defaults for resource subspace
-	//		resourceSubspace := app.GetSubspace(resourcetypes.ModuleName)
-	//		resourceSubspace.Set(ctx, resourcetypes.ParamStoreKeyFeeParams, resourcetypes.DefaultFeeParams())
-
-	//		// create ICS27 Controller submodule params
-	//		controllerParams := icacontrollertypes.Params{
-	//			ControllerEnabled: true,
-	//		}
-
-	//		// create ICS27 Host submodule params
-	//		hostParams := icahosttypes.Params{
-	//			HostEnabled: true,
-	//			AllowMessages: []string{
-	//				authzMsgExec,
-	//				authzMsgGrant,
-	//				authzMsgRevoke,
-	//				bankMsgSend,
-	//				bankMsgMultiSend,
-	//				distrMsgSetWithdrawAddr,
-	//				distrMsgWithdrawValidatorCommission,
-	//				distrMsgFundCommunityPool,
-	//				distrMsgWithdrawDelegatorReward,
-	//				feegrantMsgGrantAllowance,
-	//				feegrantMsgRevokeAllowance,
-	//				govMsgVoteWeighted,
-	//				govMsgSubmitProposal,
-	//				govMsgDeposit,
-	//				govMsgVote,
-	//				stakingMsgEditValidator,
-	//				stakingMsgDelegate,
-	//				stakingMsgUndelegate,
-	//				stakingMsgBeginRedelegate,
-	//				stakingMsgCreateValidator,
-	//				vestingMsgCreateVestingAccount,
-	//				ibcMsgTransfer,
-	//				// cheqd namespace
-	//				didMsgCreateDidDoc,
-	//				didMsgUpdateDidDoc,
-	//				didMsgDeactivateDidDoc,
-	//				resourceMsgCreateResource,
-	//			},
-	//		}
-
-	//		// initialize ICS27 module
-	//		ctx.Logger().Debug("Initialise interchainaccount module...")
-	//		icaModule.InitModule(ctx, controllerParams, hostParams)
-
-	//		// cheqd migrations
-	//		migrationContext := migrations.NewMigrationContext(
-	//			app.appCodec,
-	//			keys[didtypes.StoreKey],
-	//			app.GetSubspace(didtypes.ModuleName),
-	//			keys[resourcetypes.StoreKey],
-	//			app.GetSubspace(resourcetypes.ModuleName),
-	//		)
-
-	//		ctx.Logger().Debug("Initialise cheqd DID and Resource module migrations...")
-	//		cheqdMigrator := migrations.NewMigrator(
-	//			migrationContext,
-	//			[]migrations.Migration{
-	//				// Protobufs
-	//				migrations.MigrateDidProtobuf,
-	//				migrations.MigrateResourceProtobuf,
-
-	//				// Indy style
-	//				migrations.MigrateDidIndyStyle,
-	//				migrations.MigrateResourceIndyStyle,
-
-	//				// UUID normalizatiion
-	//				migrations.MigrateDidUUID,
-	//				migrations.MigrateResourceUUID,
-
-	//				// Did version id
-	//				migrations.MigrateDidVersionID,
-
-	//				// Resource checksum
-	//				migrations.MigrateResourceChecksum,
-
-	//				// Resource version links
-	//				migrations.MigrateResourceVersionLinks,
-
-	//				// Resource default alternative url
-	//				migrations.MigrateResourceDefaultAlternativeURL,
-	//			})
-
-	//		err = cheqdMigrator.Migrate(ctx)
-	//		if err != nil {
-	//			panic(err)
-	//		}
-
-	//		// Run all default migrations
-	//		ctx.Logger().Debug(fmt.Sprintf("Previous version map (for default RunMigrations): %v", fromVM))
-	//		toVM, err := app.mm.RunMigrations(ctx, app.configurator, fromVM)
-	//		ctx.Logger().Debug(fmt.Sprintf("New version map (after default RunMigrations): %v", toVM))
-	//		return toVM, err
-	//	})
+	// Upgrade handler for v1
+	v1UpgradeHandler := app.upgradeHandlerV1(icaModule, keys[didtypes.StoreKey], keys[resourcetypes.StoreKey])
+	app.UpgradeKeeper.SetUpgradeHandler(upgradeV1.UpgradeName, v1UpgradeHandler)
+	// Upgrade handler for v2
+	app.UpgradeKeeper.SetUpgradeHandler(upgradeV2.UpgradeName, upgradeV2.CreateUpgradeHandler(app.mm, app.configurator))
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
@@ -1061,4 +918,154 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(resourcetypes.ModuleName).WithKeyTable(resourcetypes.ParamKeyTable())
 
 	return paramsKeeper
+}
+
+func (app *App) upgradeHandlerV1(icaModule ica.AppModule, didStoreKey *storetypes.KVStoreKey, resourceStoreKey *storetypes.KVStoreKey) upgradetypes.UpgradeHandler {
+	return func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx.Logger().Info("Handler for upgrade plan: " + upgradeV1.UpgradeName)
+
+		// Fix lack of version map initialization in InitChainer for new chains
+		if len(fromVM) == 0 {
+			ctx.Logger().Info("Version map is empty. Initialising to required values.")
+
+			// Set these explicitly to avoid calling InitGenesis on modules that don't need it.
+			// Explicitly skipping x/auth migrations.
+			fromVM = map[string]uint64{
+				"auth":               2,
+				"authz":              1,
+				"bank":               2,
+				"capability":         1,
+				"cheqd":              3,
+				"crisis":             1,
+				"distribution":       2,
+				"evidence":           1,
+				"feegrant":           1,
+				"genutil":            1,
+				"gov":                2,
+				"ibc":                2,
+				"interchainaccounts": 1,
+				"mint":               1,
+				"params":             1,
+				"resource":           1,
+				"slashing":           2,
+				"staking":            2,
+				"transfer":           1,
+				"upgrade":            1,
+				"vesting":            1,
+			}
+		}
+
+		ctx.Logger().Info("Version map is populated. Running migrations.")
+		ctx.Logger().Debug(fmt.Sprintf("Previous version map: %v", fromVM))
+
+		// Get current version map
+		newVM := app.mm.GetVersionMap()
+		ctx.Logger().Debug(fmt.Sprintf("Target version map: %v", newVM))
+
+		// Set cheqd/DID module to ConsensusVersion
+		fromVM[didtypes.ModuleName] = newVM[didtypes.ModuleName]
+
+		// Set resource module to ConsensusVersion
+		fromVM[resourcetypes.ModuleName] = newVM[resourcetypes.ModuleName]
+
+		// Add defaults for DID module subspace
+		didSubspace := app.GetSubspace(didtypes.ModuleName)
+		didSubspace.Set(ctx, didtypes.ParamStoreKeyFeeParams, didtypes.DefaultFeeParams())
+
+		// Add defaults for resource subspace
+		resourceSubspace := app.GetSubspace(resourcetypes.ModuleName)
+		resourceSubspace.Set(ctx, resourcetypes.ParamStoreKeyFeeParams, resourcetypes.DefaultFeeParams())
+
+		// create ICS27 Controller submodule params
+		controllerParams := icacontrollertypes.Params{
+			ControllerEnabled: true,
+		}
+
+		// create ICS27 Host submodule params
+		hostParams := icahosttypes.Params{
+			HostEnabled: true,
+			AllowMessages: []string{
+				authzMsgExec,
+				authzMsgGrant,
+				authzMsgRevoke,
+				bankMsgSend,
+				bankMsgMultiSend,
+				distrMsgSetWithdrawAddr,
+				distrMsgWithdrawValidatorCommission,
+				distrMsgFundCommunityPool,
+				distrMsgWithdrawDelegatorReward,
+				feegrantMsgGrantAllowance,
+				feegrantMsgRevokeAllowance,
+				govMsgVoteWeighted,
+				govMsgSubmitProposal,
+				govMsgDeposit,
+				govMsgVote,
+				stakingMsgEditValidator,
+				stakingMsgDelegate,
+				stakingMsgUndelegate,
+				stakingMsgBeginRedelegate,
+				stakingMsgCreateValidator,
+				vestingMsgCreateVestingAccount,
+				ibcMsgTransfer,
+				// cheqd namespace
+				didMsgCreateDidDoc,
+				didMsgUpdateDidDoc,
+				didMsgDeactivateDidDoc,
+				resourceMsgCreateResource,
+			},
+		}
+
+		// initialize ICS27 module
+		ctx.Logger().Debug("Initialise interchainaccount module...")
+		icaModule.InitModule(ctx, controllerParams, hostParams)
+
+		// cheqd migrations
+		migrationContext := migrations.NewMigrationContext(
+			app.appCodec,
+			didStoreKey,
+			app.GetSubspace(didtypes.ModuleName),
+			resourceStoreKey,
+			app.GetSubspace(resourcetypes.ModuleName),
+		)
+
+		ctx.Logger().Debug("Initialise cheqd DID and Resource module migrations...")
+		cheqdMigrator := migrations.NewMigrator(
+			migrationContext,
+			[]migrations.Migration{
+				// Protobufs
+				migrations.MigrateDidProtobuf,
+				migrations.MigrateResourceProtobuf,
+
+				// Indy style
+				migrations.MigrateDidIndyStyle,
+				migrations.MigrateResourceIndyStyle,
+
+				// UUID normalizatiion
+				migrations.MigrateDidUUID,
+				migrations.MigrateResourceUUID,
+
+				// Did version id
+				migrations.MigrateDidVersionID,
+
+				// Resource checksum
+				migrations.MigrateResourceChecksum,
+
+				// Resource version links
+				migrations.MigrateResourceVersionLinks,
+
+				// Resource default alternative url
+				migrations.MigrateResourceDefaultAlternativeURL,
+			})
+
+		err := cheqdMigrator.Migrate(ctx)
+		if err != nil {
+			panic(err)
+		}
+
+		// Run all default migrations
+		ctx.Logger().Debug(fmt.Sprintf("Previous version map (for default RunMigrations): %v", fromVM))
+		toVM, err := app.mm.RunMigrations(ctx, app.configurator, fromVM)
+		ctx.Logger().Debug(fmt.Sprintf("New version map (after default RunMigrations): %v", toVM))
+		return toVM, err
+	}
 }
