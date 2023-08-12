@@ -14,7 +14,7 @@ const (
 	QuerierRoute = ModuleName
 
 	// Version support via IBC
-	IBCVersion = "cheqd-resource-v1"
+	IBCVersion = "cheqd-resource-v3"
 
 	// Port id that this module binds to
 	ResourcePortId = "cheqd-resource"
