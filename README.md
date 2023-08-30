@@ -46,7 +46,7 @@ Once installed, `cheqd-node` can be controlled using the [cheqd Cosmos CLI guide
 * Staking and participating in public-permissionless governance
 * Governance framework for public-permissionless self-sovereign identity networks
 * Creating [`did:cheqd` method DIDs](https://docs.cheqd.io/identity/architecture/adr-list/adr-001-cheqd-did-method), DID Documents ("DIDDocs")
-* Querying DIDs/DIDDocs using our [Universal Resolver driver](https://docs.cheqd.io/identity/guides/did-resolver)
+* Querying DIDs/DIDDocs using our [Universal Resolver driver](https://docs.cheqd.io/identity/advanced/did-resolver)
 * Creating and managing Verifiable Credentials anchored to DIDs on cheqd mainnet
 * Creating [on-ledger DID-Linked "resources" (e.g., schemas, visual representations of credentials, etc)](https://docs.cheqd.io/identity/guides/did-linked-resources) that can be used in DIDDocs and Verifiable Credentials. This is used to support [AnonCreds on cheqd](https://docs.cheqd.io/identity/guides/anoncreds)
 * Custom [pricing for DID and Resources](https://product.cheqd.io/essentials/why-cheqd/pricing) with burn to manage inflation.
