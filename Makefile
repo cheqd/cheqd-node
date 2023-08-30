@@ -109,7 +109,7 @@ ifeq ($(NO_STRIP),false)
   ldflags += -w -s
 endif
 
-ldflags += $(LD_FLAGS)
+ldflags += $(LDFLAGS)
 ldflags := $(strip $(ldflags))
 
 # set build flags
