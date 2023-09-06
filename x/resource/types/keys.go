@@ -17,7 +17,7 @@ const (
 	IBCVersion = "cheqd-resource-v3"
 
 	// Port id that this module binds to
-	ResourcePortId = "cheqd-resource"
+	ResourcePortId = "cheqdresource"
 )
 
 const (

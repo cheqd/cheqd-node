@@ -225,7 +225,7 @@ type App struct {
 	ScopedIBCFeeKeeper        capabilitykeeper.ScopedKeeper
 	ScopedICAControllerKeeper capabilitykeeper.ScopedKeeper
 	ScopedICAHostKeeper       capabilitykeeper.ScopedKeeper
-	ScopedResourceKeeper      capabilitykeeper.ScopedKeeper // Todo: needed?
+	ScopedResourceKeeper      capabilitykeeper.ScopedKeeper
 
 	didKeeper      didkeeper.Keeper
 	resourceKeeper resourcekeeper.Keeper
@@ -532,12 +532,20 @@ func New(
 		AddRoute(icacontrollertypes.SubModuleName, icaControllerStack).
 		AddRoute(icahosttypes.SubModuleName, icaHostStack)
 
+	// x/resource
+	app.resourceKeeper = *resourcekeeper.NewKeeper(
+		appCodec, keys[resourcetypes.StoreKey],
+		app.GetSubspace(resourcetypes.ModuleName),
+		&app.IBCKeeper.PortKeeper,
+		scopedResourceKeeper,
+	)
+
 	// create the resource IBC stack
 	var resourceIbcStack porttypes.IBCModule
 	resourceIbcStack = resource.NewIBCModule(app.resourceKeeper)
 	resourceIbcStack = ibcfee.NewIBCMiddleware(resourceIbcStack, app.IBCFeeKeeper)
 
-	// Add transfer stack to IBC Router
+	// Add resource stack to IBC Router
 	ibcRouter.AddRoute(resourcetypes.ModuleName, resourceIbcStack)
 
 	// Seal the IBC Router
@@ -560,13 +568,6 @@ func New(
 	app.didKeeper = *didkeeper.NewKeeper(
 		appCodec, keys[didtypes.StoreKey],
 		app.GetSubspace(didtypes.ModuleName),
-	)
-
-	app.resourceKeeper = *resourcekeeper.NewKeeper(
-		appCodec, keys[resourcetypes.StoreKey],
-		app.GetSubspace(resourcetypes.ModuleName),
-		&app.IBCKeeper.PortKeeper,
-		scopedResourceKeeper,
 	)
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment

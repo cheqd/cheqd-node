@@ -28,7 +28,6 @@ func NewIBCModule(k resourceKeeper.Keeper) IBCModule {
 
 func validateChannelParams(
 	ctx sdk.Context,
-	keeper resourceKeeper.Keeper,
 	order channeltypes.Order,
 	version string,
 ) error {
@@ -54,7 +53,7 @@ func (im IBCModule) OnChanOpenInit(
 	counterparty channeltypes.Counterparty,
 	counterpartyVersion string,
 ) (string, error) {
-	if err := validateChannelParams(ctx, im.keeper, order, counterpartyVersion); err != nil {
+	if err := validateChannelParams(ctx, order, counterpartyVersion); err != nil {
 		return "", err
 	}
 
@@ -84,7 +83,7 @@ func (im IBCModule) OnChanOpenTry(
 		return "", sdkerrors.Wrapf(porttypes.ErrInvalidPort, "invalid port: %s, expected %s", portID, boundPort)
 	}
 
-	if err := validateChannelParams(ctx, im.keeper, order, counterpartyVersion); err != nil {
+	if err := validateChannelParams(ctx, order, counterpartyVersion); err != nil {
 		return "", err
 	}
 
