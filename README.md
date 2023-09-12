@@ -49,16 +49,7 @@ Once installed, `cheqd-node` can be controlled using the [cheqd Cosmos CLI guide
 * Querying DIDs/DIDDocs using our [Universal Resolver driver](https://docs.cheqd.io/identity/advanced/did-resolver)
 * Creating and managing Verifiable Credentials anchored to DIDs on cheqd mainnet
 * Creating [on-ledger DID-Linked "resources" (e.g., schemas, visual representations of credentials, etc)](https://docs.cheqd.io/identity/guides/did-linked-resources) that can be used in DIDDocs and Verifiable Credentials. This is used to support [AnonCreds on cheqd](https://docs.cheqd.io/identity/guides/anoncreds)
-* Custom [pricing for DID and Resources](https://product.cheqd.io/essentials/why-cheqd/pricing) with burn to manage inflation.
-
-### 🔮 Upcoming functionality
-
-The [cheqd product roadmap](https://product.cheqd.io/essentials/roadmap) describes in detail functionality that is being considered / in-development for future releases. A non-exhaustive list (not necessarily in order of priority) is:
-
-* Revocation registry/list support to revoke issued credentials
-* Holder-pays-issuer and verifier-pays-issuer [payment rails for Verifiable Credential exchange](https://blog.cheqd.io/cheqds-product-vision-for-2022-6a92e8e4d296)
-
-We plan on adding new functionality rapidly and on a regular basis and welcome feedback on our [cheqd Community Slack](http://cheqd.link/join-cheqd-slack) workspace.
+* Custom [pricing for DID and Resources](https://cheqd.io/developers/) with burn to manage inflation.
 
 ## 🛠 Developing & contributing to cheqd
 
