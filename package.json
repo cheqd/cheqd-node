@@ -20,7 +20,7 @@
     "@semantic-release/commit-analyzer": "^10.0.4",
     "@semantic-release/git": "^10.0.1",
     "conventional-changelog-conventionalcommits": "^6.1.0",
-    "semantic-release": "^21.1.1",
+    "semantic-release": "^22.0.0",
     "swagger-combine": "^1.4.0"
   }
 }
