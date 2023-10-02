@@ -86,6 +86,7 @@ jobs:
             echo "EXECUTE_RELEASE=true" >> "$GITHUB_OUTPUT"
           else
             echo "EXECUTE_RELEASE=false" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
       # Set release version number
