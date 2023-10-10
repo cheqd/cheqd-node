@@ -19,7 +19,7 @@ require (
 	github.com/lestrrat-go/jwx v1.2.26
 	github.com/mr-tron/base58 v1.2.0
 	github.com/multiformats/go-multibase v0.2.0
-	github.com/onsi/ginkgo/v2 v2.12.1
+	github.com/onsi/ginkgo/v2 v2.13.0
 	github.com/onsi/gomega v1.28.0
 	github.com/rakyll/statik v0.1.7
 	github.com/spf13/cast v1.5.1
