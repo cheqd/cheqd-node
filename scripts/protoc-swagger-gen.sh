@@ -7,7 +7,7 @@ SWAGGER_DIR=./app/client/docs
 SWAGGER_UI_DIR=${SWAGGER_DIR}/swagger-ui
 
 # Define URLs
-SWAGGER_UI_VERSION=4.15.5
+SWAGGER_UI_VERSION=4.19.1
 SWAGGER_UI_DOWNLOAD_URL=https://github.com/swagger-api/swagger-ui/archive/refs/tags/v${SWAGGER_UI_VERSION}.zip
 SWAGGER_UI_PACKAGE_NAME=${SWAGGER_DIR}/swagger-ui-${SWAGGER_UI_VERSION}
 
