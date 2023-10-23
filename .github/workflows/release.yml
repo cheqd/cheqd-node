@@ -56,7 +56,7 @@ jobs:
           persist-credentials: false
 
       # Node.js setup is needed to run Semantic Release
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: 'npm'
