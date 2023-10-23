@@ -372,8 +372,8 @@ github.com/cosmos/gogoproto v1.4.11 h1:LZcMHrx4FjUgrqQSWeaGC1v/TeuVFqSLa43CC6aWR
 github.com/cosmos/gogoproto v1.4.11/go.mod h1:/g39Mh8m17X8Q/GDEs5zYTSNaNnInBSohtaxzQnYq1Y=
 github.com/cosmos/gorocksdb v1.2.0 h1:d0l3jJG8M4hBouIZq0mDUHZ+zjOx044J3nGRskwTb4Y=
 github.com/cosmos/gorocksdb v1.2.0/go.mod h1:aaKvKItm514hKfNJpUJXnnOWeBnk2GL4+Qw9NHizILw=
-github.com/cosmos/ibc-go/v6 v6.1.1 h1:oqqMNyjj6SLQF8rvgCaDGwfdITEIsbhs8F77/8xvRIo=
-github.com/cosmos/ibc-go/v6 v6.1.1/go.mod h1:NL17FpFAaWjRFVb1T7LUKuOoMSsATPpu+Icc4zL5/Ik=
+github.com/cosmos/ibc-go/v6 v6.1.2 h1:eph/Ey5NXgQcX+oWS2meJ1S5GuVOdkwHk9Yd24OTgUg=
+github.com/cosmos/ibc-go/v6 v6.1.2/go.mod h1:NL17FpFAaWjRFVb1T7LUKuOoMSsATPpu+Icc4zL5/Ik=
 github.com/cosmos/keyring v1.2.0 h1:8C1lBP9xhImmIabyXW4c3vFjjLiBdGCmfLUfeZlV1Yo=
 github.com/cosmos/keyring v1.2.0/go.mod h1:fc+wB5KTk9wQ9sDx0kFXB3A0MaeGHM9AwRStKOQ5vOA=
 github.com/cosmos/ledger-cosmos-go v0.12.2 h1:/XYaBlE2BJxtvpkHiBm97gFGSGmYGKunKyF3nNqAXZA=
