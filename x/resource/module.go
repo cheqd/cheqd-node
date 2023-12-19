@@ -9,6 +9,7 @@ import (
 	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 
 	"github.com/cheqd/cheqd-node/x/resource/client/cli"
+	migrationV3 "github.com/cheqd/cheqd-node/x/resource/migration/v3"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 
 	"github.com/gorilla/mux"
@@ -23,11 +24,13 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	porttypes "github.com/cosmos/ibc-go/v6/modules/core/05-port/types"
 )
 
 var (
 	_ module.AppModule      = AppModule{}
 	_ module.AppModuleBasic = AppModuleBasic{}
+	_ porttypes.IBCModule   = IBCModule{}
 )
 
 // ----------------------------------------------------------------------------
@@ -123,7 +126,7 @@ func NewAppModule(cdc codec.Codec, keeper keeper.Keeper, cheqdKeeper didkeeper.K
 // introduced by the module. To avoid wrong/empty versions, the initial version
 // should be set to 1.
 func (am AppModule) ConsensusVersion() uint64 {
-	return 2
+	return 3
 }
 
 // Name returns the resource module's name.
@@ -148,6 +151,12 @@ func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sd
 // module-specific GRPC queries.
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterQueryServer(cfg.QueryServer(), keeper.NewQueryServer(am.keeper, am.didKeeper))
+
+	// Register for migration from consensus version 2 -> 3
+	migratorV3 := migrationV3.NewMigrator(am.keeper)
+	if err := cfg.RegisterMigration(types.ModuleName, 2, migratorV3.Migrate2to3); err != nil {
+		panic(err)
+	}
 }
 
 // RegisterInvariants registers the resource module's invariants.
