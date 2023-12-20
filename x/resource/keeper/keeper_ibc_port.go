@@ -11,14 +11,14 @@ import (
 // GetPort returns the portID for the resource module. Used in ExportGenesis
 func (k Keeper) GetPort(ctx sdk.Context) string {
 	store := ctx.KVStore(k.storeKey)
-	byteKey := didutils.StrBytes(types.ResourcePortIdKey)
+	byteKey := didutils.StrBytes(types.ResourcePortIDKey)
 	return string(store.Get(byteKey))
 }
 
 // SetPort sets the portID for the resource module. Used in InitGenesis
 func (k Keeper) SetPort(ctx sdk.Context, portID string) {
 	store := ctx.KVStore(k.storeKey)
-	byteKey := didutils.StrBytes(types.ResourcePortIdKey)
+	byteKey := didutils.StrBytes(types.ResourcePortIDKey)
 	store.Set(byteKey, []byte(portID))
 }
 

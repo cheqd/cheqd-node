@@ -17,14 +17,14 @@ const (
 	IBCVersion = "cheqd-resource-v3"
 
 	// Port id that this module binds to
-	ResourcePortId = "cheqdresource"
+	ResourcePortID = "cheqdresource"
 )
 
 const (
 	ResourceMetadataKey = "resource-metadata:"
 	ResourceDataKey     = "resource-data:"
 	ResourceCountKey    = "resource-count:"
-	ResourcePortIdKey   = "resource-port-id:"
+	ResourcePortIDKey   = "resource-port-id:"
 )
 
 // GetResourceDataKey returns the byte representation of resource key

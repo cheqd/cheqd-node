@@ -21,11 +21,11 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState *types.GenesisState)
 	k.SetParams(ctx, *genState.FeeParams)
 
 	// set ibc port binding
-	k.SetPort(ctx, types.ResourcePortId)
+	k.SetPort(ctx, types.ResourcePortID)
 
-	// Bind Port claims the capability over the ResourcePortId
-	if !k.IsBound(ctx, types.ResourcePortId) {
-		err := k.BindPort(ctx, types.ResourcePortId)
+	// Bind Port claims the capability over the ResourcePortID
+	if !k.IsBound(ctx, types.ResourcePortID) {
+		err := k.BindPort(ctx, types.ResourcePortID)
 		if err != nil {
 			panic(fmt.Sprintf("could not claim port capability: %v", err))
 		}

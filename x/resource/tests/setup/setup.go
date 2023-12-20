@@ -18,7 +18,6 @@ import (
 
 	"github.com/cheqd/cheqd-node/x/resource"
 	"github.com/cheqd/cheqd-node/x/resource/keeper"
-	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	capabilitykeeper "github.com/cosmos/cosmos-sdk/x/capability/keeper"
@@ -81,7 +80,7 @@ func Setup() TestSetup {
 	scopedIBCKeeper := capabilityKeeper.ScopeToModule(ibchost.ModuleName)
 	portKeeper := portkeeper.NewKeeper(scopedIBCKeeper)
 
-	scopedResourceKeeper := capabilityKeeper.ScopeToModule(resourcetypes.ModuleName)
+	scopedResourceKeeper := capabilityKeeper.ScopeToModule(types.ModuleName)
 	resourceKeeper := keeper.NewKeeper(cdc, resourceStoreKey, getSubspace(types.ModuleName, paramsKeeper), &portKeeper, scopedResourceKeeper)
 
 	ibcModule := resource.NewIBCModule(*resourceKeeper)
@@ -132,7 +131,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 
 	// set params subspaces
 	paramsKeeper.Subspace(didtypes.ModuleName)
-	paramsKeeper.Subspace(types.ModuleName).WithKeyTable(resourcetypes.ParamKeyTable())
+	paramsKeeper.Subspace(types.ModuleName).WithKeyTable(types.ParamKeyTable())
 
 	return paramsKeeper
 }

@@ -31,7 +31,7 @@ func DefaultParams() Params {
 	params := Params{
 		Order:               channeltypes.UNORDERED,
 		ConnectionHops:      []string{},
-		PortID:              types.ResourcePortId,
+		PortID:              types.ResourcePortID,
 		ChannelID:           "some-channel",
 		ChanCap:             capabilitytypes.Capability{Index: 1},
 		CounterpartyType:    channeltypes.Counterparty{PortId: "counterparty-port-id", ChannelId: "counterparty-channel-id"},
@@ -40,10 +40,10 @@ func DefaultParams() Params {
 	return params
 }
 
-func DefaultPacket(collectionId string, resourceId string) channeltypes.Packet {
+func DefaultPacket(collectionID string, resourceID string) channeltypes.Packet {
 	packet := types.ResourceReqPacket{
-		ResourceId:   resourceId,
-		CollectionId: collectionId,
+		ResourceId:   resourceID,
+		CollectionId: collectionID,
 	}
 
 	jsonPacket, err := json.Marshal(packet)
@@ -61,7 +61,7 @@ func DefaultPacket(collectionId string, resourceId string) channeltypes.Packet {
 		// identifies the channel end on the sending chain.
 		SourceChannel: "source-channel",
 		// identifies the port on the receiving chain.
-		DestinationPort: types.ResourcePortId,
+		DestinationPort: types.ResourcePortID,
 		// identifies the channel end on the receiving chain.
 		DestinationChannel: "dest-channel",
 		// actual opaque bytes transferred directly to the application module
@@ -95,10 +95,13 @@ var _ = Describe("Resource-IBC", func() {
 
 		var ackResult channeltypes.Acknowledgement_Result
 		var ackData types.ResourceWithMetadata
-		err := json.Unmarshal(ack.Acknowledgement(), &ackResult)
-		err = json.Unmarshal(ackResult.Result, &ackData)
 
+		err := json.Unmarshal(ack.Acknowledgement(), &ackResult)
 		Expect(err).To(BeNil())
+
+		err = json.Unmarshal(ackResult.Result, &ackData)
+		Expect(err).To(BeNil())
+
 		Expect(ackData.Metadata.CollectionId).To(Equal(resource.Resource.CollectionId))
 		Expect(ackData.Metadata.Name).To(Equal(resource.Resource.Name))
 		Expect(ackData.Resource.GetData()).To(Equal([]byte(SchemaData)))
