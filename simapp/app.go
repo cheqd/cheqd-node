@@ -94,6 +94,8 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	// ibc
+	portkeeper "github.com/cosmos/ibc-go/v6/modules/core/05-port/keeper"
+	ibchost "github.com/cosmos/ibc-go/v6/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v6/modules/core/keeper"
 
 	// cheqd specific imports
@@ -195,11 +197,13 @@ type SimApp struct {
 	NFTKeeper        nftkeeper.Keeper
 	DidKeeper        didkeeper.Keeper
 	ResourceKeeper   resourcekeeper.Keeper
+	PortKeeper       portkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 	ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
+	ScopedResourceKeeper capabilitykeeper.ScopedKeeper
 
 	// the module manager
 	mm *module.Manager
@@ -272,6 +276,9 @@ func NewSimApp(
 	bApp.SetParamStore(app.ParamsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramstypes.ConsensusParamsKeyTable()))
 
 	app.CapabilityKeeper = capabilitykeeper.NewKeeper(appCodec, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
+	scopedResourceKeeper := app.CapabilityKeeper.ScopeToModule(resourcetypes.ModuleName) // "resource"
+	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)            // "ibc"
+	app.PortKeeper = portkeeper.NewKeeper(scopedIBCKeeper)
 
 	// Applications that wish to enforce statically created ScopedKeepers should call `Seal` after creating
 	// their scoped modules in `NewApp` with `ScopeToModule`
@@ -369,6 +376,8 @@ func NewSimApp(
 		appCodec,
 		keys[resourcetypes.StoreKey],
 		app.GetSubspace(resourcetypes.ModuleName),
+		&app.PortKeeper,
+		scopedResourceKeeper,
 	)
 
 	/****  Module Options ****/
