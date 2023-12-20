@@ -173,7 +173,7 @@ go-version:
 
 go.sum: go.mod
 	@echo "Ensuring app dependencies have not been modified..."
-	# go mod verify
+	go mod verify
 	go mod tidy
 
 verify:

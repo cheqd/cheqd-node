@@ -1043,7 +1043,7 @@ func (app *App) upgradeHandlerV1(icaModule ica.AppModule, didStoreKey *storetype
 				migrations.MigrateDidIndyStyle,
 				migrations.MigrateResourceIndyStyle,
 
-				// UUID normalizatiion
+				// UUID normalization
 				migrations.MigrateDidUUID,
 				migrations.MigrateResourceUUID,
 

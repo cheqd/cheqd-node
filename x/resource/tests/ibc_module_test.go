@@ -3,6 +3,7 @@ package tests
 import (
 	"encoding/json"
 	"fmt"
+
 	. "github.com/cheqd/cheqd-node/x/resource/tests/setup"
 
 	didsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
@@ -14,9 +15,6 @@ import (
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	clienttypes "github.com/cosmos/ibc-go/v6/modules/core/02-client/types"
 	channeltypes "github.com/cosmos/ibc-go/v6/modules/core/04-channel/types"
-	// porttypes "github.com/cosmos/ibc-go/v6/modules/core/05-port/types"
-	// host "github.com/cosmos/ibc-go/v6/modules/core/24-host"
-	// ibcexported "github.com/cosmos/ibc-go/v6/modules/core/exported"
 )
 
 type Params struct {
@@ -43,7 +41,6 @@ func DefaultParams() Params {
 }
 
 func DefaultPacket(collectionId string, resourceId string) channeltypes.Packet {
-
 	packet := types.ResourceReqPacket{
 		ResourceId:   resourceId,
 		CollectionId: collectionId,
@@ -191,5 +188,4 @@ var _ = Describe("Resource-IBC", func() {
 		err := setup.IBCModule.OnChanOpenAck(setup.SdkCtx, p.PortID, p.ChannelID, p.CounterpartyType.ChannelId, p.CounterpartyVersion)
 		Expect(err.Error()).To(ContainSubstring("invalid counterparty version"))
 	})
-
 })

@@ -9,8 +9,10 @@ import (
 	didkeeperv1 "github.com/cheqd/cheqd-node/x/did/keeper/v1"
 	didsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	capabilitykeeper "github.com/cosmos/cosmos-sdk/x/capability/keeper"
+	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 
-	// didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
+	"github.com/cheqd/cheqd-node/x/resource"
 	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
 	resourcekeeperv1 "github.com/cheqd/cheqd-node/x/resource/keeper/v1"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
@@ -21,6 +23,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	portkeeper "github.com/cosmos/ibc-go/v6/modules/core/05-port/keeper"
+	ibchost "github.com/cosmos/ibc-go/v6/modules/core/24-host"
 	"github.com/tendermint/tendermint/libs/log"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
@@ -39,9 +43,12 @@ type TestSetup struct {
 	DidMsgServer   didtypes.MsgServer
 	DidQueryServer didtypes.QueryServer
 
-	ResourceKeeper      resourcekeeper.Keeper
-	ResourceMsgServer   resourcetypes.MsgServer
-	ResourceQueryServer resourcetypes.QueryServer
+	ResourceKeeper       resourcekeeper.Keeper
+	ResourceMsgServer    resourcetypes.MsgServer
+	ResourceQueryServer  resourcetypes.QueryServer
+	IBCModule            resource.IBCModule
+	PortKeeper           portkeeper.Keeper
+	ScopedResourceKeeper capabilitykeeper.ScopedKeeper
 
 	DidStoreKey      *storetypes.KVStoreKey
 	ResourceStoreKey *storetypes.KVStoreKey
@@ -62,28 +69,43 @@ func Setup() TestSetup {
 
 	dbStore := store.NewCommitMultiStore(db)
 
+	// mount did store
 	didStoreKey := sdk.NewKVStoreKey(didtypes.StoreKey)
-	resourceStoreKey := sdk.NewKVStoreKey(resourcetypes.StoreKey)
-
 	dbStore.MountStoreWithDB(didStoreKey, storetypes.StoreTypeIAVL, nil)
+
+	// mount resource store
+	resourceStoreKey := sdk.NewKVStoreKey(resourcetypes.StoreKey)
 	dbStore.MountStoreWithDB(resourceStoreKey, storetypes.StoreTypeIAVL, nil)
+
+	// mount capability store - required for ibc port tests
+	capabilityStoreKey := sdk.NewKVStoreKey(capabilitytypes.StoreKey)
+	dbStore.MountStoreWithDB(capabilityStoreKey, storetypes.StoreTypeIAVL, nil)
+	memStoreKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
+	dbStore.MountStoreWithDB(memStoreKeys[capabilitytypes.MemStoreKey], storetypes.StoreTypeMemory, nil)
+
+	// mount param store - required for ibc port tests with default genesis
+	paramsStoreKey := sdk.NewKVStoreKey(paramstypes.StoreKey)
+	dbStore.MountStoreWithDB(paramsStoreKey, storetypes.StoreTypeIAVL, nil)
+	paramsTStoreKey := sdk.NewTransientStoreKey(paramstypes.TStoreKey)
+	dbStore.MountStoreWithDB(paramsTStoreKey, storetypes.StoreTypeTransient, nil)
 
 	_ = dbStore.LoadLatestVersion()
 
-	// Init ParamsKeeper KVStore
-	paramsStoreKey := sdk.NewKVStoreKey(paramstypes.StoreKey)
-	paramsTStoreKey := sdk.NewTransientStoreKey(paramstypes.TStoreKey)
-
-	// Init Keepers
-	paramsKeeper := initParamsKeeper(Cdc, aminoCdc, paramsStoreKey, paramsTStoreKey)
-
-	// Init previous keepers
+	// init previous keepers
 	didKeeperPrevious := didkeeperv1.NewKeeper(Cdc, didStoreKey)
 	resourceKeeperPrevious := resourcekeeperv1.NewKeeper(Cdc, resourceStoreKey)
 
-	// Init Keepers
+	// init Keepers
+	paramsKeeper := initParamsKeeper(Cdc, aminoCdc, paramsStoreKey, paramsTStoreKey)
 	didKeeper := didkeeper.NewKeeper(Cdc, didStoreKey, getSubspace(didtypes.ModuleName, paramsKeeper))
-	resourceKeeper := resourcekeeper.NewKeeper(Cdc, resourceStoreKey, getSubspace(resourcetypes.ModuleName, paramsKeeper))
+	capabilityKeeper := capabilitykeeper.NewKeeper(Cdc, capabilityStoreKey, memStoreKeys[capabilitytypes.MemStoreKey])
+	scopedIBCKeeper := capabilityKeeper.ScopeToModule(ibchost.ModuleName)
+	portKeeper := portkeeper.NewKeeper(scopedIBCKeeper)
+	scopedResourceKeeper := capabilityKeeper.ScopeToModule(resourcetypes.ModuleName)
+	resourceKeeper := resourcekeeper.NewKeeper(Cdc, resourceStoreKey, getSubspace(resourcetypes.ModuleName, paramsKeeper), &portKeeper, scopedResourceKeeper)
+
+	// init IBC Module
+	ibcModule := resource.NewIBCModule(*resourceKeeper)
 
 	// Create Tx
 	txBytes := make([]byte, 28)
@@ -115,9 +137,12 @@ func Setup() TestSetup {
 		DidMsgServer:   didMsgServer,
 		DidQueryServer: didQueryServer,
 
-		ResourceKeeper:      *resourceKeeper,
-		ResourceMsgServer:   resourceMsgServer,
-		ResourceQueryServer: resourceQueryServer,
+		ResourceKeeper:       *resourceKeeper,
+		ResourceMsgServer:    resourceMsgServer,
+		ResourceQueryServer:  resourceQueryServer,
+		IBCModule:            ibcModule,
+		PortKeeper:           portKeeper,
+		ScopedResourceKeeper: scopedResourceKeeper,
 
 		DidStoreKey:      didStoreKey,
 		ResourceStoreKey: resourceStoreKey,

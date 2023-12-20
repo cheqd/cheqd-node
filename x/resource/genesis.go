@@ -30,7 +30,6 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState *types.GenesisState)
 			panic(fmt.Sprintf("could not claim port capability: %v", err))
 		}
 	}
-
 }
 
 // ExportGenesis returns the cheqd module's exported genesis.

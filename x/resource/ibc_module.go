@@ -76,7 +76,6 @@ func (im IBCModule) OnChanOpenTry(
 	counterparty channeltypes.Counterparty,
 	counterpartyVersion string,
 ) (string, error) {
-
 	// Require portID is the portID module is bound to
 	boundPort := im.keeper.GetPort(ctx)
 	if boundPort != portID {
@@ -99,7 +98,6 @@ func (im IBCModule) OnChanOpenTry(
 	}
 
 	return counterpartyVersion, nil
-
 }
 
 func (im IBCModule) OnChanOpenAck(
@@ -152,7 +150,6 @@ func (im IBCModule) OnRecvPacket(
 	packet channeltypes.Packet,
 	relayer sdk.AccAddress,
 ) ibcexported.Acknowledgement {
-
 	var reqPacket resourcetypes.ResourceReqPacket
 
 	err := json.Unmarshal(packet.GetData(), &reqPacket)
@@ -187,7 +184,6 @@ func (im IBCModule) OnAcknowledgementPacket(
 	acknowledgement []byte,
 	relayer sdk.AccAddress,
 ) error {
-
 	return sdkerrors.Wrap(resourcetypes.ErrUnexpectedAck, "unexpected acknowledgement")
 }
 

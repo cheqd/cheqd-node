@@ -1,5 +1,12 @@
 {
-    "aliveStatusCodes": [0, 200, 206, 403, 501, 999],
+    "aliveStatusCodes": [
+        0,
+        200,
+        206,
+        403,
+        501,
+        999
+    ],
     "replacementPatterns": [
         {
             "pattern": "\" %}",
@@ -12,7 +19,10 @@
     ],
     "ignorePatterns": [
         {
-          "pattern": "^https://resolver.cheqd.net/"
+            "pattern": "^https://resolver.cheqd.net/"
+        },
+        {
+            "pattern": "^https://twitter.com/"
         }
     ],
     "retryOn429": true

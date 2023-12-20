@@ -43,6 +43,8 @@ func (m Migrator) Run() error {
 		getSubspace(didtypes.ModuleName, m.setup.ParamsKeeper),
 		m.setup.ResourceStoreKey,
 		getSubspace(resourcetypes.ModuleName, m.setup.ParamsKeeper),
+		&m.setup.PortKeeper,
+		m.setup.ScopedResourceKeeper,
 	)
 
 	for _, migration := range m.migrations {

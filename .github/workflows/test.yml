@@ -19,7 +19,7 @@ jobs:
     env:
       PYTHONDEVMODE: 1
       DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
-  
+
     steps:
       - uses: actions/checkout@v4
 
@@ -42,14 +42,13 @@ jobs:
         if: ${{ failure() }}
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 10
-    
+
   installer-standalone:
     name: "Installer - Standalone mode"
     runs-on: ubuntu-20.04
     env:
       PYTHONDEVMODE: 1
-      DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }} 
-    
+      DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
     steps:
       - uses: actions/checkout@v4
 
@@ -62,12 +61,12 @@ jobs:
         working-directory: ./installer
         run: |
           sudo -E bash -c "python3 installer.py < tests/upgrade-existing-standalone.txt"
-      
+
       - name: "Upgrade with moving to cosmovisor"
         working-directory: ./installer
         run: |
           sudo -E bash -c "python3 installer.py < tests/upgrade-to-cosmovisor.txt"
-      
+
       - name: Debugging with tmate
         if: ${{ failure() }}
         uses: mxschmitt/action-tmate@v3

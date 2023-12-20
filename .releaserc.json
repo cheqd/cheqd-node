@@ -7,6 +7,11 @@
             "channel": "0.6.x"
         },
         {
+            "name": "release/1.x.x",
+            "range": "1.x.x",
+            "channel": "1.x.x"
+        },
+        {
             "name": "develop",
             "channel": "beta",
             "prerelease": true
