@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-20.04
     
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Run 'set -euox pipefail' check
         run: bash ./.github/scripts/ensure_set_euox_pipefail.sh
@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-20.04
     
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Run Markdown link check
         uses: gaurav-nelson/github-action-markdown-link-check@v1
@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-20.04
     
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: actions/setup-go@v4
         with:
@@ -55,10 +55,10 @@ jobs:
     name: "Protobuf"
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       # Install the `buf` CLI
-      - uses: bufbuild/buf-setup-action@v1.23.1
+      - uses: bufbuild/buf-setup-action@v1.27.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
       
@@ -79,7 +79,7 @@ jobs:
     runs-on: ubuntu-20.04
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0 # Required to fetch version
 

@@ -33,14 +33,9 @@ updates:
     schedule:
       interval: "weekly"
 
-  # Maintain dependencies for Terraform
-  - package-ecosystem: "terraform"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-
   # Maintain dependencies for Python
   - package-ecosystem: "pip"
+    target-branch: "develop"
     directory: "/"
     schedule:
       interval: "weekly"

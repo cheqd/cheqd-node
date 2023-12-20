@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-20.04
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0 # Required to fetch version
 
@@ -50,7 +50,7 @@ jobs:
       EXECUTE_RELEASE: ${{ steps.execute-release.outputs.EXECUTE_RELEASE }}
     
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Required to fetch version
           persist-credentials: false
@@ -86,6 +86,7 @@ jobs:
             echo "EXECUTE_RELEASE=true" >> "$GITHUB_OUTPUT"
           else
             echo "EXECUTE_RELEASE=false" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
       # Set release version number
@@ -104,7 +105,7 @@ jobs:
     if: needs.release-guard.outputs.EXECUTE_RELEASE == 'true'
     
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Required to fetch version
           persist-credentials: false
@@ -115,12 +116,12 @@ jobs:
           cache: true
 
       # Setup for pushing to Buf.build later
-      - uses: bufbuild/buf-setup-action@v1.23.1
+      - uses: bufbuild/buf-setup-action@v1.27.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v4
+        uses: goreleaser/goreleaser-action@v5
         with:
           distribution: goreleaser
           version: latest
@@ -145,18 +146,18 @@ jobs:
       IMAGE_NAME: ${{ github.repository }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
         id: buildx
         with:
           version: latest
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -164,7 +165,7 @@ jobs:
       
       - name: Configure Docker image metadata
         id: meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository}}
           flavor: |
@@ -179,7 +180,7 @@ jobs:
             org.opencontainers.image.documentation="https://docs.cheqd.io/node"
 
       - name: Build and push image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: docker/Dockerfile

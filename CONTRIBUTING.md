@@ -16,7 +16,6 @@ You can get help for any questions or problems that you have on through the foll
   - [Node / cheqd network](https://docs.cheqd.io/node)
   - [Identity features / SDKs](https://docs.cheqd.io/identity)
   - [Governance Framework](https://gov.cheqd.io)
-  - [Product Suite & Updates](https://product.cheqd.io)
   - [Learn about cheqd](https://learn.cheqd.io) (basics for general audience)
 - Raise a bug report or feature request using the "Issue" tab on Github
 - Ask the question on our [Community Slack](http://cheqd.link/join-cheqd-slack) or [Discord](http://cheqd.link/discord-github)
@@ -31,8 +30,8 @@ Even better, you can [submit a Pull Request](#submit-pr) with a fix.
 You can *request* a new feature by [submitting an issue](#submit-issue) to our GitHub Repository.
 If you would like to *implement* a new feature, please consider the size of the change in order to determine the right steps to proceed:
 
-* For a **Major Feature**, first open an issue and outline your proposal so that it can be discussed. This process allows us to better coordinate our efforts, prevent duplication of work, and help you to craft the change so that it is successfully accepted into the project.
-* **Small Features** can be crafted and directly [submitted as a Pull Request](#submit-pr).
+- For a **Major Feature**, first open an issue and outline your proposal so that it can be discussed. This process allows us to better coordinate our efforts, prevent duplication of work, and help you to craft the change so that it is successfully accepted into the project.
+- **Small Features** can be crafted and directly [submitted as a Pull Request](#submit-pr).
 
 ## Submission Guidelines
 

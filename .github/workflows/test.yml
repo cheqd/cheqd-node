@@ -21,7 +21,7 @@ jobs:
       DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
   
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: "Fresh install with Cosmovisor"
         working-directory: ./installer
@@ -51,7 +51,7 @@ jobs:
       DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }} 
     
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: "Fresh install"
         working-directory: ./installer
@@ -78,7 +78,7 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: actions/setup-go@v4
         with:
@@ -104,7 +104,7 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Download binary artifact
         uses: actions/download-artifact@v3
@@ -170,7 +170,7 @@ jobs:
   #   name: "Upgrade Tests"
   #   runs-on: ubuntu-20.04
   #   steps:
-  #     - uses: actions/checkout@v3
+  #     - uses: actions/checkout@v4
 
   #     # Preparations
 
@@ -184,7 +184,7 @@ jobs:
   #         LEGACY_VERSION: 0.6.10
 
   #     - name: Login to GitHub Container Registry
-  #       uses: docker/login-action@v2
+  #       uses: docker/login-action@v3
   #       with:
   #         registry: ghcr.io
   #         username: ${{ github.actor }}
@@ -302,7 +302,7 @@ jobs:
     if: always()
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - name: Download unit test
         uses: actions/download-artifact@v3
@@ -345,7 +345,7 @@ jobs:
         run: |
           python ./.github/scripts/xml_combine.py report-unit.xml report-integration.xml > report.xml
 
-      - uses: mikepenz/action-junit-report@v3
+      - uses: mikepenz/action-junit-report@v4
         with:
           report_paths: 'report.xml'
           check_name: ""
