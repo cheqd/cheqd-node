@@ -1,0 +1,25 @@
+{
+    "payload": {
+        "id": "did:cheqd:testnet:RU3FadVEJ1mtCFL2LsBkwZ",
+        "controller": [
+            "did:cheqd:testnet:RU3FadVEJ1mtCFL2LsBkwZ"
+        ],
+        "verificationMethod": [
+            {
+                "id": "did:cheqd:testnet:RU3FadVEJ1mtCFL2LsBkwZ#key-1",
+                "type": "Ed25519VerificationKey2020",
+                "controller": "did:cheqd:testnet:RU3FadVEJ1mtCFL2LsBkwZ",
+                "publicKeyMultibase": "z6Mkhays26VbQiLKDnLVtZtCcj8J5qSc6FUd3xp2yxpe5YnU"
+            }
+        ],
+        "authentication": [
+            "did:cheqd:testnet:RU3FadVEJ1mtCFL2LsBkwZ#key-1"
+        ]
+    },
+    "signInputs": [
+        {
+            "verificationMethodId": "did:cheqd:testnet:RU3FadVEJ1mtCFL2LsBkwZ#key-1",
+            "privKey": "vyWNyNE9rbkmmlzBStQeNEHBbaqQp5E8mw9K2dqJBmgujWjvXXpC9xIBOod8FrHRsd4YCvPJyzEu3byviT+cuQ=="
+        }
+    ]
+}

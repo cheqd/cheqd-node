@@ -1,0 +1,19 @@
+{
+    "payload": {
+        "id": "did:cheqd:testnet:RU3FadVEJ1mtCFL2LsBkwZ",
+        "controller": [
+            "did:cheqd:testnet:RU3FadVEJ1mtCFL2LsBkwZ"
+        ],
+        "verificationMethod": [
+            {
+                "id": "did:cheqd:testnet:RU3FadVEJ1mtCFL2LsBkwZ#key-1",
+                "verificationMethodType": "Ed25519VerificationKey2020",
+                "controller": "did:cheqd:testnet:RU3FadVEJ1mtCFL2LsBkwZ",
+                "verificationMaterial": "z6Mkhays26VbQiLKDnLVtZtCcj8J5qSc6FUd3xp2yxpe5YnU"
+            }
+        ],
+        "authentication": [
+            "did:cheqd:testnet:RU3FadVEJ1mtCFL2LsBkwZ#key-1"
+        ]
+    }
+}
