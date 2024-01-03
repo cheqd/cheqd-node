@@ -7,9 +7,9 @@
         "verificationMethod": [
             {
                 "id": "did:cheqd:testnet:RU3FadVEJ1mtCFL2LsBkwZ#key-1",
-                "type": "Ed25519VerificationKey2020",
+                "verificationMethodType": "Ed25519VerificationKey2020",
                 "controller": "did:cheqd:testnet:RU3FadVEJ1mtCFL2LsBkwZ",
-                "publicKeyMultibase": "z6Mkhays26VbQiLKDnLVtZtCcj8J5qSc6FUd3xp2yxpe5YnU"
+                "verificationMaterial": "z6Mkhays26VbQiLKDnLVtZtCcj8J5qSc6FUd3xp2yxpe5YnU"
             }
         ],
         "authentication": [

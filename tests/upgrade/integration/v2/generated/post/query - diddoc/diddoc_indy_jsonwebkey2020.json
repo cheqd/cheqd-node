@@ -7,13 +7,9 @@
         "verificationMethod": [
             {
                 "id": "did:cheqd:testnet:3mfFCU1qMJE6WrWeJp3xhF#key-1",
-                "type": "JsonWebKey2020",
+                "verificationMethodType": "JsonWebKey2020",
                 "controller": "did:cheqd:testnet:3mfFCU1qMJE6WrWeJp3xhF",
-                "publicKeyJwk": {
-                    "crv": "Ed25519",
-                    "kty": "OKP",
-                    "x": "jlSzKzZ0loKqd3qrYYyo75GwMXpfA5rwEYEB8sad-hI"
-                }
+                "verificationMaterial": "{\"crv\":\"Ed25519\",\"kty\":\"OKP\",\"x\":\"jlSzKzZ0loKqd3qrYYyo75GwMXpfA5rwEYEB8sad-hI\"}"
             }
         ],
         "authentication": [

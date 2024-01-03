@@ -81,7 +81,7 @@ var _ = Describe("Upgrade - Post", func() {
 				res, err := cli.QueryDid(DidDocExistingRecord.Id, cli.Validator0)
 				Expect(err).To(BeNil())
 
-				/* if DidDocExistingRecord.Context == nil {
+				if DidDocExistingRecord.Context == nil {
 					DidDocExistingRecord.Context = []string{}
 				}
 				if DidDocExistingRecord.Authentication == nil {
@@ -104,7 +104,7 @@ var _ = Describe("Upgrade - Post", func() {
 				}
 				if DidDocExistingRecord.AlsoKnownAs == nil {
 					DidDocExistingRecord.AlsoKnownAs = []string{}
-				} */
+				}
 
 				Expect(*res.Value.DidDoc).To(Equal(DidDocExistingRecord))
 			}
