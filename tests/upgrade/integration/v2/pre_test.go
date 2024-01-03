@@ -20,7 +20,7 @@ var _ = Describe("Upgrade - Pre", func() {
 	var didFeeParams didtypes.FeeParams
 	var resourceFeeParams resourcetypes.FeeParams
 
-	BeforeAll(func() {
+	BeforeEach(func() {
 		// query fee params - case: did
 		res, err := cli.QueryParams(cli.Validator0, didtypes.ModuleName, string(didtypes.ParamStoreKeyFeeParams))
 		Expect(err).To(BeNil())
