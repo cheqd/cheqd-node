@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"path/filepath"
 
-	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/v2/cli"
 	clihelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
+	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/v2/cli"
 	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
@@ -98,21 +98,21 @@ var _ = Describe("Upgrade - Pre", func() {
 			}
 		})
 
-		var UPGRADE_HEIGHT int64
-		var VOTING_END_HEIGHT int64
+		var UpgradeHeight int64
+		var VotingEndHeight int64
 
 		It("should calculate the upgrade height", func() {
 			By("getting the current block height and calculating the voting end height")
 			var err error
-			UPGRADE_HEIGHT, VOTING_END_HEIGHT, err = cli.CalculateUpgradeHeight(cli.Validator0, cli.CliBinaryName)
+			UpgradeHeight, VotingEndHeight, err = cli.CalculateUpgradeHeight(cli.Validator0, cli.CliBinaryName)
 			Expect(err).To(BeNil())
-			fmt.Printf("Upgrade height: %d\n", UPGRADE_HEIGHT)
-			fmt.Printf("Voting end height: %d\n", VOTING_END_HEIGHT)
+			fmt.Printf("Upgrade height: %d\n", UpgradeHeight)
+			fmt.Printf("Voting end height: %d\n", VotingEndHeight)
 		})
 
 		It("should submit a software upgrade proposal", func() {
 			By("sending a SubmitUpgradeProposal transaction from `validator0` container")
-			res, err := cli.SubmitUpgradeProposal(UPGRADE_HEIGHT, cli.Validator0)
+			res, err := cli.SubmitUpgradeProposal(UpgradeHeight, cli.Validator0)
 			Expect(err).To(BeNil())
 			Expect(res.Code).To(BeEquivalentTo(0))
 		})
@@ -154,7 +154,7 @@ var _ = Describe("Upgrade - Pre", func() {
 
 		It("should wait for the voting end height to be reached", func() {
 			By("pinging the node status until the voting end height is reached")
-			err := cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, VOTING_END_HEIGHT, cli.VotingPeriod)
+			err := cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, VotingEndHeight, cli.VotingPeriod)
 			Expect(err).To(BeNil())
 		})
 
@@ -167,7 +167,7 @@ var _ = Describe("Upgrade - Pre", func() {
 
 		It("should wait for the upgrade height to be reached", func() {
 			By("pinging the node status until the upgrade height is reached")
-			err := cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, UPGRADE_HEIGHT, cli.VotingPeriod)
+			err := cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, UpgradeHeight, cli.VotingPeriod)
 			Expect(err).To(BeNil())
 		})
 	})
