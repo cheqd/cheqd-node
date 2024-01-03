@@ -5,7 +5,7 @@ package integration
 import (
 	"path/filepath"
 
-	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/cli"
+	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/v1/cli"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"

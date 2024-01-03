@@ -1,0 +1,25 @@
+{
+    "payload": {
+        "id": "did:cheqd:testnet:L7d4i5DiFkBMUfKgAav5tC",
+        "controller": [
+            "did:cheqd:testnet:L7d4i5DiFkBMUfKgAav5tC"
+        ],
+        "verificationMethod": [
+            {
+                "id": "did:cheqd:testnet:L7d4i5DiFkBMUfKgAav5tC#key-1",
+                "type": "Ed25519VerificationKey2018",
+                "controller": "did:cheqd:testnet:L7d4i5DiFkBMUfKgAav5tC",
+                "publicKeyBase58": "51QsDgZZx4Vb7TifNLdkzpMdYFPjA54cMu34KfvWijsg"
+            }
+        ],
+        "authentication": [
+            "did:cheqd:testnet:L7d4i5DiFkBMUfKgAav5tC#key-1"
+        ]
+    },
+    "signInputs": [
+        {
+            "verificationMethodId": "did:cheqd:testnet:L7d4i5DiFkBMUfKgAav5tC#key-1",
+            "privKey": "tlzCpWJE+U1C+R1xddH8RMwzhIlGJI4qkbmJatHuJk07ibufCgot0M+/jPA90gLw5L+EbV/Zls4hL2Uyu6J6Ow"
+        }
+    ]
+}

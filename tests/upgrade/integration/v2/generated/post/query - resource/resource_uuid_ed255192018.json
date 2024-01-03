@@ -1,0 +1,24 @@
+{
+    "payload": {
+        "resource": {
+            "data": "eyAibWVzc2FnZSI6ICJoZWxsbyB3b3JsZCJ9"
+        },
+        "metadata": {
+            "collectionId": "5a9b0701-c9b9-4a31-b53f-9a5d3b0d12c3",
+            "id": "b67d9bdc-b8f4-45fd-b5f6-1af38c26d4c8",
+            "name": "UUID JsonWebKey2020",
+            "version": "",
+            "resourceType": "TestResourceType",
+            "alsoKnownAs": [
+                {
+                    "uri": "did:cheqd:testnet:5a9b0701-c9b9-4a31-b53f-9a5d3b0d12c3/resources/b67d9bdc-b8f4-45fd-b5f6-1af38c26d4c8",
+                    "description": "did-url"
+                }
+            ],
+            "mediaType": "application/json",
+            "checksum": "4f479bba31f71859d9943651538c8df2119804eceb7f58a0de241789ff214af4",
+            "previousVersionId": "",
+            "nextVersionId": ""
+        }
+    }
+}

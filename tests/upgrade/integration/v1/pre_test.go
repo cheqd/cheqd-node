@@ -1,4 +1,4 @@
-//go:build upgrade_integration
+// go:build upgrade_integration_v1
 
 package integration
 
@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/cli"
+	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/v1/cli"
 	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
 	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
 	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
@@ -18,7 +18,7 @@ import (
 var _ = Describe("Upgrade - Pre", func() {
 	Context("Before a softare upgrade execution is initiated", func() {
 		It("should wait for chain to bootstrap", func() {
-			By("pinging the node status until the dvoting end height is reached")
+			By("pinging the node status until the voting end height is reached")
 			err := cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, cli.BootstrapHeight, cli.BootstrapPeriod)
 			Expect(err).To(BeNil())
 		})

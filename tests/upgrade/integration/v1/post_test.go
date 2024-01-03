@@ -1,4 +1,4 @@
-// go:build upgrade_integration
+// go:build upgrade_integration_v1
 
 package integration
 
@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	clihelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
-	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/cli"
+	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/v1/cli"
 	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
 	didtypesv2 "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypesv2 "github.com/cheqd/cheqd-node/x/resource/types"

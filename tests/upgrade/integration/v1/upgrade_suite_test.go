@@ -1,4 +1,4 @@
-//go:build upgrade_integration
+// go:build upgrade_integration_v1
 
 package integration
 
@@ -11,5 +11,5 @@ import (
 
 func TestUpgrade(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Upgrade Integration Suite")
+	RunSpecs(t, "Upgrade v1 Integration Suite")
 }
