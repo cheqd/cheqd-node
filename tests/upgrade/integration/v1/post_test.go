@@ -1,4 +1,4 @@
-// go:build upgrade_integration_v1
+//go:build upgrade_integration_v1
 
 package integration
 
