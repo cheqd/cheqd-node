@@ -127,6 +127,8 @@ var _ = Describe("Upgrade - Post", func() {
 
 				res, err := cli.QueryResource(ResourceCreateRecord.Metadata.CollectionId, ResourceCreateRecord.Metadata.Id, cli.Validator0)
 
+				fmt.Println("res: ", res)
+
 				Expect(err).To(BeNil())
 				Expect(res.Resource.Metadata.Id).To(Equal(ResourceCreateRecord.Metadata.Id))
 				Expect(res.Resource.Metadata.CollectionId).To(Equal(ResourceCreateRecord.Metadata.CollectionId))
