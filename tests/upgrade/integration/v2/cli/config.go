@@ -23,7 +23,7 @@ const (
 	BootstrapHeight            = 1
 	VotingPeriod         int64 = 10
 	ExpectedBlockSeconds int64 = 1
-	ExtraBlocks          int64 = 5
+	ExtraBlocks          int64 = 10
 	UpgradeName                = upgradeV2.UpgradeName
 	DepositAmount              = "10000000ncheq"
 	NetworkConfigDir           = "network-config"
