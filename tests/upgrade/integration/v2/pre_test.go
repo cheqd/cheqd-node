@@ -112,7 +112,7 @@ var _ = Describe("Upgrade - Pre", func() {
 
 		It("should submit a software upgrade proposal", func() {
 			By("sending a SubmitUpgradeProposal transaction from `validator0` container")
-			res, err := cli.SubmitUpgradeProposal(UpgradeHeight, cli.Validator0)
+			res, err := cli.SubmitUpgradeProposalLegacy(UpgradeHeight, cli.Validator0)
 			Expect(err).To(BeNil())
 			Expect(res.Code).To(BeEquivalentTo(0))
 		})

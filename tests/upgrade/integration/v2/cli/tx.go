@@ -75,11 +75,11 @@ func SubmitParamChangeProposal(container string, pathToDir ...string) (sdk.TxRes
 	return resp, nil
 }
 
-func SubmitUpgradeProposal(upgradeHeight int64, container string) (sdk.TxResponse, error) {
+func SubmitUpgradeProposalLegacy(upgradeHeight int64, container string) (sdk.TxResponse, error) {
 	fmt.Println("Submitting upgrade proposal from", container)
 	args := append([]string{
 		CliBinaryName,
-		"tx", "gov", "submit-proposal", "software-upgrade",
+		"tx", "gov", "submit-legacy-proposal", "software-upgrade",
 		UpgradeName,
 		"--title", "Upgrade Title",
 		"--description", "Upgrade Description",
