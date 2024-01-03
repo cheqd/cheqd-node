@@ -84,6 +84,7 @@ func SubmitUpgradeProposalLegacy(upgradeHeight int64, container string) (sdk.TxR
 		"--title", "Upgrade Title",
 		"--description", "Upgrade Description",
 		"--upgrade-height", strconv.FormatInt(upgradeHeight, 10),
+		"--upgrade-info", "https://raw.githubusercontent.com/cheqd/cheqd-node/main/networks/mainnet/upgrades/upgrade-v1.json",
 		"--from", OperatorAccounts[container],
 	}, TXParams...)
 
