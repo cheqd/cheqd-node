@@ -11,7 +11,7 @@ import (
 	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
-	govtypesv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
+	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -160,9 +160,9 @@ var _ = Describe("Upgrade - Pre", func() {
 
 		It("should query the proposal status to ensure it has passed", func() {
 			By("sending a QueryProposal Msg from `validator0` container")
-			proposal, err := cli.QueryProposalLegacy(cli.Validator0, "1")
+			proposal, err := cli.QueryProposal(cli.Validator0, "1")
 			Expect(err).To(BeNil())
-			Expect(proposal.Status).To(BeEquivalentTo(govtypesv1beta1.StatusPassed))
+			Expect(proposal.Status).To(BeEquivalentTo(govtypesv1.StatusPassed))
 		})
 
 		It("should wait for the upgrade height to be reached", func() {

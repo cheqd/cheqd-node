@@ -6,7 +6,6 @@ import (
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
-	govtypesv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 )
@@ -103,29 +102,6 @@ func QueryResourceFeeParams(container, subspace, key string) (resourcetypes.FeeP
 	}
 
 	return feeParams, nil
-}
-
-func QueryProposalLegacy(container, id string) (govtypesv1beta1.Proposal, error) {
-	fmt.Println("Querying proposal from", container)
-	args := append([]string{
-		CliBinaryName,
-		"query", "gov", "proposal", id,
-	}, QueryParamsConst...)
-
-	out, err := LocalnetExecExec(container, args...)
-	if err != nil {
-		return govtypesv1beta1.Proposal{}, err
-	}
-
-	fmt.Println("Proposal", out)
-
-	var resp govtypesv1beta1.Proposal
-
-	err = MakeCodecWithExtendedRegistry().UnmarshalJSON([]byte(out), &resp)
-	if err != nil {
-		return govtypesv1beta1.Proposal{}, err
-	}
-	return resp, nil
 }
 
 func QueryProposal(container, id string) (govtypesv1.Proposal, error) {
