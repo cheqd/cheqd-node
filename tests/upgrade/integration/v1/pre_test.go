@@ -16,7 +16,7 @@ import (
 )
 
 var _ = Describe("Upgrade - Pre", func() {
-	Context("Before a softare upgrade execution is initiated", func() {
+	Context("Before a software upgrade execution is initiated", func() {
 		It("should wait for chain to bootstrap", func() {
 			By("pinging the node status until the voting end height is reached")
 			err := cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, cli.BootstrapHeight, cli.BootstrapPeriod)

@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	DockerLocalnetPath = "../../../docker/localnet"
+	DockerLocalnetPath = "../../../../docker/localnet"
 	DockerComposeFile  = "docker-compose.yml"
 	DockerComposeEnvML = "mainnet-latest.env"
 	DockerComposeEnvBL = "build-latest.env"
