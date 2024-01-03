@@ -84,7 +84,6 @@ func SubmitUpgradeProposalLegacy(upgradeHeight int64, container string) (sdk.TxR
 		"--title", "Upgrade Title",
 		"--description", "Upgrade Description",
 		"--upgrade-height", strconv.FormatInt(upgradeHeight, 10),
-		"--upgrade-info", "Upgrade Info",
 		"--from", OperatorAccounts[container],
 	}, TXParams...)
 
