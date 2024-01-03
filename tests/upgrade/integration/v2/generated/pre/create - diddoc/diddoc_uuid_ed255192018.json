@@ -19,7 +19,7 @@
     "signInputs": [
         {
             "verificationMethodId": "did:cheqd:testnet:aed908f0-ddd5-47ac-8e2e-afe10cc90f53#key-1",
-            "privKey": "0iiREkBpyNqS29XQGGgJEwjbxu4Eg7M_QHH6lnjO97eMVA_c0tvl6TlktBETptIUuGFUwFmhHkK_aM6yAVumvA"
+            "privKey": "0iiREkBpyNqS29XQGGgJEwjbxu4Eg7M/QHH6lnjO97eMVA/c0tvl6TlktBETptIUuGFUwFmhHkK/aM6yAVumvA=="
         }
     ]
 }
