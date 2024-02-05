@@ -24,7 +24,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v5
         with:
           distribution: goreleaser
-          version: 1.23.0
+          version: 1.22.1
           args: build --clean --snapshot --single-target
 
       - name: Store artifact
