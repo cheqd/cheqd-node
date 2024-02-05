@@ -53,4 +53,5 @@ func (msg MsgDeactivateDidDoc) Validate(allowedNamespaces []string) error {
 
 func (msg *MsgDeactivateDidDoc) Normalize() {
 	msg.Payload.Normalize()
+	NormalizeSignInfoList(msg.Signatures)
 }
