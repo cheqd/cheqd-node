@@ -5,8 +5,7 @@ const (
 	Home = ".cheqdnode"
 
 	// Set ProtocolVersion to app's major version number
-	ProtocolVersion = 1
-	UpgradeName     = "v1"
+	ProtocolVersion = 2
 
 	// allowed msg types of ica host
 	authzMsgExec                        = "/cosmos.authz.v1beta1.MsgExec"

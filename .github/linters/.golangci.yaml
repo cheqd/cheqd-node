@@ -43,7 +43,7 @@ linters-settings:
 
   gofumpt:
     lang-version: "1.18"
-    
+
   misspell:
     ignore-words:
       - cheqd

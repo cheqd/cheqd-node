@@ -11,17 +11,16 @@ jobs:
   sh-euox-pipefail-check:
     name: "Shell pipefail check"
     runs-on: ubuntu-20.04
-    
     steps:
       - uses: actions/checkout@v4
 
       - name: Run 'set -euox pipefail' check
         run: bash ./.github/scripts/ensure_set_euox_pipefail.sh
-  
+
   md-link-check:
     name: "Broken Markdown links"
     runs-on: ubuntu-20.04
-    
+
     steps:
       - uses: actions/checkout@v4
 
@@ -30,21 +29,21 @@ jobs:
         with:
           config-file: '.github/linters/mlc_config.json'
           use-quiet-mode: 'yes'
-  
+
   go-lint:
     # We can't use VALIDATE_GO from super linter because of this issue:
     # https://github.com/github/super-linter/issues/143
     name: "Golang"
     runs-on: ubuntu-20.04
-    
+
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-go@v4
         with:
           go-version-file: ./go.mod
-          cache: true
-      
+          cache: false # temporarily off, as golangci-lint doesn't align 100% with cached setup-go@v4, see: https://github.com/golangci/golangci-lint-action/issues/807
+
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
@@ -56,17 +55,17 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
-      
+
       # Install the `buf` CLI
       - uses: bufbuild/buf-setup-action@v1.27.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-      
+
       # Lint
       - uses: bufbuild/buf-lint-action@v1
         with:
           input: proto
-      
+
       # Breaking change detection
       - uses: bufbuild/buf-breaking-action@v1
         continue-on-error: true
@@ -77,7 +76,7 @@ jobs:
   super-lint:
     name: "Super Linter"
     runs-on: ubuntu-20.04
-    
+
     steps:
     - uses: actions/checkout@v4
       with:
