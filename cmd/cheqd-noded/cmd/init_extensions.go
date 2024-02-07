@@ -1,10 +1,10 @@
 package cmd
 
 import (
+	tmcfg "github.com/cometbft/cometbft/config"
 	"github.com/cosmos/cosmos-sdk/client"
 	cosmcfg "github.com/cosmos/cosmos-sdk/server/config"
 	"github.com/spf13/cobra"
-	tmcfg "github.com/tendermint/tendermint/config"
 )
 
 func extendInit(initCmd *cobra.Command) *cobra.Command {

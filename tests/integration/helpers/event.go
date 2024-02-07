@@ -1,7 +1,7 @@
 package helpers
 
 import (
-	"github.com/tendermint/tendermint/abci/types"
+	"github.com/cometbft/cometbft/abci/types"
 )
 
 type HumanReadableEventAttribute struct {

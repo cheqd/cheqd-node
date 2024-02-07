@@ -3,7 +3,7 @@ package keeper_test
 import (
 	"github.com/stretchr/testify/suite"
 
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	cheqdsimapp "github.com/cheqd/cheqd-node/simapp"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"

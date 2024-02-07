@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"path/filepath"
 
+	tmcfg "github.com/cometbft/cometbft/config"
 	cosmcfg "github.com/cosmos/cosmos-sdk/server/config"
 	"github.com/spf13/viper"
-	tmcfg "github.com/tendermint/tendermint/config"
 )
 
 func updateCosmConfig(homeDir string, updateFn func(config *cosmcfg.Config)) error {

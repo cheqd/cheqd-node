@@ -10,8 +10,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	portkeeper "github.com/cosmos/ibc-go/v6/modules/core/05-port/keeper"
-	"github.com/cosmos/ibc-go/v6/modules/core/exported"
+	portkeeper "github.com/cosmos/ibc-go/v7/modules/core/05-port/keeper"
+	"github.com/cosmos/ibc-go/v7/modules/core/exported"
 )
 
 type Migrator struct {

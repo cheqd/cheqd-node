@@ -10,11 +10,11 @@ import (
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 
+	dbm "github.com/cometbft/cometbft-db"
+	"github.com/cometbft/cometbft/libs/log"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store"
-	"github.com/tendermint/tendermint/libs/log"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
-	dbm "github.com/tendermint/tm-db"
 
 	"github.com/cheqd/cheqd-node/x/resource"
 	"github.com/cheqd/cheqd-node/x/resource/keeper"
@@ -24,8 +24,8 @@ import (
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	portkeeper "github.com/cosmos/ibc-go/v6/modules/core/05-port/keeper"
-	ibchost "github.com/cosmos/ibc-go/v6/modules/core/24-host"
+	portkeeper "github.com/cosmos/ibc-go/v7/modules/core/05-port/keeper"
+	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
 )
 
 type TestSetup struct {
@@ -77,7 +77,7 @@ func Setup() TestSetup {
 	didKeeper := didkeeper.NewKeeper(cdc, didStoreKey, getSubspace(didtypes.ModuleName, paramsKeeper))
 	capabilityKeeper := capabilitykeeper.NewKeeper(cdc, capabilityStoreKey, memStoreKeys[capabilitytypes.MemStoreKey])
 
-	scopedIBCKeeper := capabilityKeeper.ScopeToModule(ibchost.ModuleName)
+	scopedIBCKeeper := capabilityKeeper.ScopeToModule(ibcexported.ModuleName)
 	portKeeper := portkeeper.NewKeeper(scopedIBCKeeper)
 
 	scopedResourceKeeper := capabilityKeeper.ScopeToModule(types.ModuleName)
