@@ -7,13 +7,13 @@ import (
 	"os"
 
 	"github.com/cheqd/cheqd-node/x/did/types"
-	tmcli "github.com/cometbft/cometbft/libs/cli"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/spf13/cobra"
+	tmcli "github.com/cometbft/cometbft/libs/cli"
 )
 
 const (

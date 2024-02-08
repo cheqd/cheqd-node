@@ -1,11 +1,16 @@
 package keeper_test
 
 import (
+	cheqdparams "github.com/cheqd/cheqd-node/app/params"
+	dbm "github.com/cometbft/cometbft-db"
+	"github.com/cometbft/cometbft/libs/log"
+	"github.com/cosmos/cosmos-sdk/server"
+	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	"github.com/cosmos/cosmos-sdk/testutil"
+	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/stretchr/testify/suite"
 
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-
-	cheqdsimapp "github.com/cheqd/cheqd-node/simapp"
+	cheqdapp "github.com/cheqd/cheqd-node/app"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
@@ -19,18 +24,28 @@ import (
 type HandlerTestSuite struct {
 	suite.Suite
 
-	app        *cheqdsimapp.SimApp
+	app        *cheqdapp.App
 	ctx        sdk.Context
 	govHandler govv1beta1.Handler
 }
 
+type appCreator struct {
+	encCfg cheqdparams.EncodingConfig
+}
+
 func (suite *HandlerTestSuite) SetupTest() error {
 	var err error
-	suite.app, err = cheqdsimapp.Setup(false)
+	var appOpts servertypes.AppOptions
+	baseappOptions := server.DefaultBaseappOptions(appOpts)
+	suite.app = cheqdapp.New(log.NewNopLogger(), dbm.NewMemDB(), nil, true, nil, baseappOptions...)
+
+	key := sdk.NewKVStoreKey(paramtypes.StoreKey)
+	tkey := sdk.NewTransientStoreKey("params_transient_test")
+	ctx := testutil.DefaultContext(key, tkey)
 	if err != nil {
 		return err
 	}
-	suite.ctx = suite.app.BaseApp.NewContext(false, tmproto.Header{})
+	suite.ctx = ctx //suite.app.BaseApp.NewContext(false, tmproto.Header{})
 	suite.govHandler = params.NewParamChangeProposalHandler(suite.app.ParamsKeeper)
 	return nil
 }
