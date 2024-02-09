@@ -19,6 +19,9 @@ proto-gen:
 	@echo "Generating Protobuf files"
 	@echo $(protoImage) sh ./scripts/protocgen.sh;
 	@$(protoImage) sh ./scripts/protocgen.sh;
+	go mod tidy
+	cd api
+	go mod tidy
 
 proto-format:
 	@echo "Formatting Protobuf files"

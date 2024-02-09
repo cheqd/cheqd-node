@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euox pipefail
+set -e
 
 # Get protoc-gen-gocosmos
 go get github.com/cosmos/gogoproto 2>/dev/null
@@ -25,10 +25,4 @@ cd ..
 cp -r github.com/cheqd/cheqd-node/* ./
 rm -rf github.com
 
-go mod tidy
-
-sh ./scripts/protoc-pulsar-gen.sh
-
-# go mod tidy in API folder
-cd api
-go mod tidy
+./scripts/protoc-pulsar-gen.sh
