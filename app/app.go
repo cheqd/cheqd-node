@@ -1150,3 +1150,6 @@ func BlockedAddresses() map[string]bool {
 
 	return modAccAddrs
 }
+
+func (app *App) RegisterUpgradeHandlers() {
+}
