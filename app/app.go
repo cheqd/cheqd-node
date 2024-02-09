@@ -24,6 +24,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	nodeservice "github.com/cosmos/cosmos-sdk/client/grpc/node"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
@@ -231,13 +232,15 @@ type App struct {
 	ScopedICAHostKeeper       capabilitykeeper.ScopedKeeper
 	ScopedResourceKeeper      capabilitykeeper.ScopedKeeper
 
-	didKeeper      didkeeper.Keeper
-	resourceKeeper resourcekeeper.Keeper
+	DidKeeper      didkeeper.Keeper
+	ResourceKeeper resourcekeeper.Keeper
 
 	// the module manager
 	ModuleManager *module.Manager
 
 	configurator module.Configurator
+
+	sm *module.SimulationManager
 }
 
 func init() {
@@ -556,7 +559,7 @@ func New(
 		AddRoute(icahosttypes.SubModuleName, icaHostStack)
 
 	// x/resource
-	app.resourceKeeper = *resourcekeeper.NewKeeper(
+	app.ResourceKeeper = *resourcekeeper.NewKeeper(
 		appCodec, keys[resourcetypes.StoreKey],
 		app.GetSubspace(resourcetypes.ModuleName),
 		&app.IBCKeeper.PortKeeper,
@@ -565,7 +568,7 @@ func New(
 
 	// create the resource IBC stack
 	var resourceIbcStack porttypes.IBCModule
-	resourceIbcStack = resource.NewIBCModule(app.resourceKeeper)
+	resourceIbcStack = resource.NewIBCModule(app.ResourceKeeper)
 	resourceIbcStack = ibcfee.NewIBCMiddleware(resourceIbcStack, app.IBCFeeKeeper)
 
 	// Add resource stack to IBC Router
@@ -588,7 +591,7 @@ func New(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
-	app.didKeeper = *didkeeper.NewKeeper(
+	app.DidKeeper = *didkeeper.NewKeeper(
 		appCodec, keys[didtypes.StoreKey],
 		app.GetSubspace(didtypes.ModuleName),
 	)
@@ -626,8 +629,8 @@ func New(
 		ibcfee.NewAppModule(app.IBCFeeKeeper),
 		icaModule,
 		// cheqd modules
-		did.NewAppModule(appCodec, app.didKeeper),
-		resource.NewAppModule(appCodec, app.resourceKeeper, app.didKeeper),
+		did.NewAppModule(appCodec, app.DidKeeper),
+		resource.NewAppModule(appCodec, app.ResourceKeeper, app.DidKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -748,12 +751,22 @@ func New(
 		tmos.Exit(err.Error())
 	}
 
+	// create the simulation manager and define the order of the modules for deterministic simulations
+	//
+	// NOTE: this is not required apps that don't use the simulator for fuzz testing
+	// transactions
+	overrideModules := map[string]module.AppModuleSimulation{
+		authtypes.ModuleName: auth.NewAppModule(app.appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts, app.GetSubspace(authtypes.ModuleName)),
+	}
+	app.sm = module.NewSimulationManagerFromAppModules(app.ModuleManager.Modules, overrideModules)
+	app.sm.RegisterStoreDecoders()
+
 	// postHandler, err := posthandler.NewPostHandler(posthandler.HandlerOptions{
 	// 	AccountKeeper:  app.AccountKeeper,
 	// 	BankKeeper:     app.BankKeeper,
 	// 	FeegrantKeeper: app.FeeGrantKeeper,
-	// 	DidKeeper:      app.didKeeper,
-	// 	ResourceKeeper: app.resourceKeeper,
+	// 	DidKeeper:      app.DidKeeper,
+	// 	ResourceKeeper: app.ResourceKeeper,
 	// })
 	// if err != nil {
 	// 	tmos.Exit(err.Error())
@@ -807,6 +820,16 @@ func (app *App) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.Res
 	}
 	app.UpgradeKeeper.SetModuleVersionMap(ctx, app.ModuleManager.GetVersionMap())
 	return app.ModuleManager.InitGenesis(ctx, app.appCodec, genesisState)
+}
+
+// RegisterNodeService registers the node gRPC service on the app gRPC router.
+func (a *App) RegisterNodeService(clientCtx client.Context) {
+	nodeservice.RegisterNodeService(clientCtx, a.GRPCQueryRouter())
+}
+
+// SimulationManager implements the SimulationApp interface.
+func (app *App) SimulationManager() *module.SimulationManager {
+	return app.sm
 }
 
 // LoadHeight loads a particular height
@@ -1066,8 +1089,8 @@ func (app *App) upgradeHandlerV1(icaModule ica.AppModule, didStoreKey *storetype
 			migrationContext,
 			[]migrations.Migration{
 				// Protobufs
-				migrations.MigrateDidProtobuf,
-				migrations.MigrateResourceProtobuf,
+				// migrations.MigrateDidProtobuf,
+				// migrations.MigrateResourceProtobuf,
 
 				// Indy style
 				migrations.MigrateDidIndyStyle,

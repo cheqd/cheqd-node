@@ -1,33 +1,24 @@
 package keeper
 
-import (
-	"github.com/cheqd/cheqd-node/x/did/types"
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+// func NewQuerier(k Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
+// 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, error) {
+// 		var (
+// 			res []byte
+// 			err error
+// 		)
 
-	abci "github.com/cometbft/cometbft/abci/types"
-)
+// 		switch path[0] {
+// 		case types.QueryGetDidDoc:
+// 			return getDidDoc(ctx, path[1], k, legacyQuerierCdc)
+// 		case types.QueryGetAllDidDocVersions:
+// 			return getAllDidDocVersionsMetadata(ctx, path[1], k, legacyQuerierCdc)
+// 		case types.QueryGetDidDocVersion:
+// 			return getDidDocVersion(ctx, path[1], path[2], k, legacyQuerierCdc)
 
-func NewQuerier(k Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
-	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, error) {
-		var (
-			res []byte
-			err error
-		)
+// 		default:
+// 			err = sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown %s query endpoint: %s", types.ModuleName, path[0])
+// 		}
 
-		switch path[0] {
-		case types.QueryGetDidDoc:
-			return getDidDoc(ctx, path[1], k, legacyQuerierCdc)
-		case types.QueryGetAllDidDocVersions:
-			return getAllDidDocVersionsMetadata(ctx, path[1], k, legacyQuerierCdc)
-		case types.QueryGetDidDocVersion:
-			return getDidDocVersion(ctx, path[1], path[2], k, legacyQuerierCdc)
-
-		default:
-			err = sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown %s query endpoint: %s", types.ModuleName, path[0])
-		}
-
-		return res, err
-	}
-}
+// 		return res, err
+// 	}
+// }

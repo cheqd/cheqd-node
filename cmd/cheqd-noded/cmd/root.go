@@ -206,10 +206,11 @@ func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, a
 	snapshotOptions := snapshotstypes.NewSnapshotOptions(snapshotInterval, snapshotKeepRecent)
 
 	return app.New(
-		logger, db, traceStore, true, skipUpgradeHeights,
-		cast.ToString(appOpts.Get(flags.FlagHome)),
-		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
-		a.encCfg,
+		logger, db, traceStore, true,
+		// skipUpgradeHeights,
+		// cast.ToString(appOpts.Get(flags.FlagHome)),
+		// cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
+		// a.encCfg,
 		appOpts,
 		baseapp.SetPruning(pruningOpts),
 		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),
@@ -241,10 +242,10 @@ func (a appCreator) appExport(
 			db,
 			traceStore,
 			false,
-			map[int64]bool{},
-			homePath,
-			uint(1),
-			a.encCfg,
+			// map[int64]bool{},
+			// homePath,
+			// uint(1),
+			// a.encCfg,
 			// this line is used by starport scaffolding # stargate/root/exportArgument
 			appOpts,
 		)
@@ -258,10 +259,10 @@ func (a appCreator) appExport(
 			db,
 			traceStore,
 			true,
-			map[int64]bool{},
-			homePath,
-			uint(1),
-			a.encCfg,
+			// map[int64]bool{},
+			// homePath,
+			// uint(1),
+			// a.encCfg,
 			// this line is used by starport scaffolding # stargate/root/noHeightExportArgument
 			appOpts,
 		)
