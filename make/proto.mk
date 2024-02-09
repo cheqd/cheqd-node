@@ -5,7 +5,7 @@
 ###############################################################################
 
 DOCKER := $(shell which docker)
-containerProtoVer=0.13.0
+containerProtoVer=0.14.0
 containerProtoImage=ghcr.io/cosmos/proto-builder:$(containerProtoVer)
 protoImage=$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace $(containerProtoImage)
 # containerProtoGen=cheqd-node-proto-gen-$(containerProtoVer)
@@ -19,7 +19,6 @@ proto-gen:
 	@echo "Generating Protobuf files"
 	@echo $(protoImage) sh ./scripts/protocgen.sh;
 	@$(protoImage) sh ./scripts/protocgen.sh;
-	# go mod tidy
 
 proto-format:
 	@echo "Formatting Protobuf files"
@@ -31,7 +30,6 @@ proto-lint:
 proto-swagger-gen:
 	@echo "Generating Protobuf Swagger"
 	@$(protoImage) sh ./scripts/protoc-swagger-gen.sh;
-	# go mod tidy
 
 proto-pulsar-gen:
 	@echo "Generating Pulsar"

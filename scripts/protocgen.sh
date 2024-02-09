@@ -1,15 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -euox pipefail
 
 # Get protoc-gen-gocosmos
-go get github.com/cosmos/gogoproto 
-# 2>/dev/null
+go get github.com/cosmos/gogoproto 2>/dev/null
 
 echo "Generating gogo proto code"
 cd proto
 
-echo "coming here"
 # Find all proto files but exclude "v1" paths
 proto_dirs=$(find ./ -type f -path '*/v1/*' -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
 for proto_dir in $proto_dirs; do
