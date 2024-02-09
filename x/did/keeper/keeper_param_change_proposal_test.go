@@ -1,13 +1,6 @@
 package keeper_test
 
 import (
-	cheqdparams "github.com/cheqd/cheqd-node/app/params"
-	dbm "github.com/cometbft/cometbft-db"
-	"github.com/cometbft/cometbft/libs/log"
-	"github.com/cosmos/cosmos-sdk/server"
-	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	"github.com/cosmos/cosmos-sdk/testutil"
-	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/stretchr/testify/suite"
 
 	cheqdapp "github.com/cheqd/cheqd-node/app"
@@ -24,7 +17,7 @@ import (
 type HandlerTestSuite struct {
 	suite.Suite
 
-	app        *cheqdapp.App
+	app        *cheqdapp.TestApp
 	ctx        sdk.Context
 	govHandler govv1beta1.Handler
 }
@@ -35,13 +28,7 @@ type appCreator struct {
 
 func (suite *HandlerTestSuite) SetupTest() error {
 	var err error
-	var appOpts servertypes.AppOptions
-	baseappOptions := server.DefaultBaseappOptions(appOpts)
-	suite.app = cheqdapp.New(log.NewNopLogger(), dbm.NewMemDB(), nil, true, nil, baseappOptions...)
-
-	key := sdk.NewKVStoreKey(paramtypes.StoreKey)
-	tkey := sdk.NewTransientStoreKey("params_transient_test")
-	ctx := testutil.DefaultContext(key, tkey)
+	suite.app, err = cheqdapp.Setup(false)
 	if err != nil {
 		return err
 	}

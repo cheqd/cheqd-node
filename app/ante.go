@@ -23,6 +23,8 @@ type HandlerOptions struct {
 	SigGasConsumer         func(meter sdk.GasMeter, sig signing.SignatureV2, params types.Params) error
 	TxFeeChecker           cheqdante.TxFeeChecker
 	IBCKeeper              *ibckeeper.Keeper
+	DidKeeper              cheqdante.DidKeeper
+	ResourceKeeper         cheqdante.ResourceKeeper
 }
 
 // NewAnteHandler returns an AnteHandler that checks and increments sequence

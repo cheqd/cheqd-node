@@ -5,7 +5,8 @@ import (
 
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
-	cheqdsimapp "github.com/cheqd/cheqd-node/simapp"
+	"github.com/cheqd/cheqd-node/app"
+	cheqdapp "github.com/cheqd/cheqd-node/app"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
@@ -19,14 +20,14 @@ import (
 type HandlerTestSuite struct {
 	suite.Suite
 
-	app        *cheqdsimapp.SimApp
+	app        *app.TestApp
 	ctx        sdk.Context
 	govHandler govv1beta1.Handler
 }
 
 func (suite *HandlerTestSuite) SetupTest() error {
 	var err error
-	suite.app, err = cheqdsimapp.Setup(false)
+	suite.app, err = cheqdapp.Setup(false)
 	if err != nil {
 		return err
 	}
