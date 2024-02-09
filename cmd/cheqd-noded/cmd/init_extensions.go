@@ -32,7 +32,6 @@ func applyConfigDefaults(cmd *cobra.Command) error {
 
 	err := updateTmConfig(clientCtx.HomeDir, func(config *tmcfg.Config) {
 		config.Consensus.CreateEmptyBlocks = false
-		config.FastSync.Version = "v0"
 		config.LogFormat = "json"
 		config.LogLevel = "error"
 		config.P2P.SendRate = 20000000
