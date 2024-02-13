@@ -2,9 +2,6 @@
 
 set -euox pipefail
 
-# Get protoc-gen-gocosmos
-go get github.com/cosmos/gogoproto 2>/dev/null
-
 echo "Generating gogo proto code"
 cd proto
 

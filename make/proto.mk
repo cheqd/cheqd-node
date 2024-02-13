@@ -17,7 +17,6 @@ proto-all: proto-gen proto-swagger-gen
 
 proto-gen:
 	@echo "Generating Protobuf files"
-	@echo $(protoImage) sh ./scripts/protocgen.sh;
 	@$(protoImage) sh ./scripts/protocgen.sh;
 	go mod tidy
 	cd api
