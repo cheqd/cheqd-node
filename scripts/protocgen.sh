@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
-
-# Get protoc-gen-gocosmos
-go get github.com/cosmos/gogoproto 2>/dev/null
+set -euox pipefail
 
 echo "Generating gogo proto code"
 cd proto

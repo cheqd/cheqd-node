@@ -8,11 +8,11 @@ import (
 	"github.com/cheqd/cheqd-node/x/did/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/store"
+	dbm "github.com/cometbft/cometbft-db"
 	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-	dbm "github.com/cometbft/cometbft-db"
+	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/store"
 
 	"github.com/cheqd/cheqd-node/x/did/keeper"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"

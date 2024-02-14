@@ -4,8 +4,8 @@ import (
 	"os"
 	"os/exec"
 
+	"cosmossdk.io/errors"
 	integrationcli "github.com/cheqd/cheqd-node/tests/integration/cli"
-	"github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 func Exec(args ...string) (string, error) {

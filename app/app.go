@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
+	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
+	reflectionv1 "cosmossdk.io/api/cosmos/reflection/v1"
 	"github.com/cheqd/cheqd-node/app/migrations"
 	upgradeV1 "github.com/cheqd/cheqd-node/app/upgrades/v1"
 	upgradeV2 "github.com/cheqd/cheqd-node/app/upgrades/v2"
@@ -29,6 +31,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
+	runtimeservices "github.com/cosmos/cosmos-sdk/runtime/services"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/server/config"
@@ -135,7 +138,7 @@ var (
 	// and genesis verification.
 	ModuleBasics = module.NewBasicManager(
 		auth.AppModuleBasic{},
-		genutil.AppModuleBasic{},
+		genutil.NewAppModuleBasic(genutiltypes.DefaultMessageValidator),
 		bank.AppModuleBasic{},
 		capability.AppModuleBasic{},
 		staking.AppModuleBasic{},
@@ -256,7 +259,6 @@ func init() {
 // NewSimApp returns a reference to an initialized SimApp.
 func New(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool,
-	// skipUpgradeHeights map[int64]bool, homePath string, invCheckPeriod uint,
 	appOpts servertypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),
 ) *App {
 	encodingConfig := MakeTestEncodingConfig()
@@ -377,7 +379,7 @@ func New(
 		app.AccountKeeper,
 	)
 
-	stakingKeeper := stakingkeeper.NewKeeper(
+	app.StakingKeeper = stakingkeeper.NewKeeper(
 		appCodec,
 		keys[stakingtypes.StoreKey],
 		app.AccountKeeper,
@@ -388,7 +390,7 @@ func New(
 	app.MintKeeper = mintkeeper.NewKeeper(
 		appCodec,
 		keys[minttypes.StoreKey],
-		stakingKeeper,
+		app.StakingKeeper,
 		app.AccountKeeper,
 		app.BankKeeper,
 		authtypes.FeeCollectorName,
@@ -400,7 +402,7 @@ func New(
 		keys[distrtypes.StoreKey],
 		app.AccountKeeper,
 		app.BankKeeper,
-		stakingKeeper,
+		app.StakingKeeper,
 		authtypes.FeeCollectorName,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
@@ -409,7 +411,7 @@ func New(
 		appCodec,
 		legacyAmino,
 		keys[slashingtypes.StoreKey],
-		stakingKeeper,
+		app.StakingKeeper,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
@@ -734,6 +736,14 @@ func New(
 	// Make sure it's called after `app.ModuleManager` and `app.configurator` are set.
 	app.RegisterUpgradeHandlers()
 
+	autocliv1.RegisterQueryServer(app.GRPCQueryRouter(), runtimeservices.NewAutoCLIQueryService(app.ModuleManager.Modules))
+
+	reflectionSvc, err := runtimeservices.NewReflectionService()
+	if err != nil {
+		panic(err)
+	}
+	reflectionv1.RegisterReflectionServiceServer(app.GRPCQueryRouter(), reflectionSvc)
+
 	// initialize stores
 	app.MountKVStores(keys)
 	app.MountTransientStores(tkeys)
@@ -778,11 +788,10 @@ func New(
 	app.SetEndBlocker(app.EndBlocker)
 	// app.SetPostHandler(postHandler)
 
+	// Note: This migration is completed, we can remove these lines.
 	// Upgrade handler for v1
 	v1UpgradeHandler := app.upgradeHandlerV1(icaModule, keys[didtypes.StoreKey], keys[resourcetypes.StoreKey])
 	app.UpgradeKeeper.SetUpgradeHandler(upgradeV1.UpgradeName, v1UpgradeHandler)
-	// Upgrade handler for v2
-	app.UpgradeKeeper.SetUpgradeHandler(upgradeV2.UpgradeName, upgradeV2.CreateUpgradeHandler(app.ModuleManager, app.configurator))
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
@@ -1152,4 +1161,21 @@ func BlockedAddresses() map[string]bool {
 }
 
 func (app *App) RegisterUpgradeHandlers() {
+	baseAppLegacySS := app.ParamsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramstypes.ConsensusParamsKeyTable())
+
+	// Upgrade handler for v2
+	app.UpgradeKeeper.SetUpgradeHandler(
+		upgradeV2.UpgradeName,
+		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			ctx.Logger().Info("Handler for upgrade plan: " + upgradeV2.UpgradeName)
+			// Migrate Tendermint consensus parameters from x/params module to a
+			// dedicated x/consensus module.
+			baseapp.MigrateParams(ctx, baseAppLegacySS, &app.ConsensusParamsKeeper)
+			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
+		},
+	)
+}
+
+func (a *App) Configurator() module.Configurator {
+	return a.configurator
 }

@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/stretchr/testify/suite"
 
 	cheqdapp "github.com/cheqd/cheqd-node/app"
@@ -22,17 +23,13 @@ type HandlerTestSuite struct {
 	govHandler govv1beta1.Handler
 }
 
-type appCreator struct {
-	encCfg cheqdparams.EncodingConfig
-}
-
 func (suite *HandlerTestSuite) SetupTest() error {
 	var err error
 	suite.app, err = cheqdapp.Setup(false)
 	if err != nil {
 		return err
 	}
-	suite.ctx = ctx //suite.app.BaseApp.NewContext(false, tmproto.Header{})
+	suite.ctx = suite.app.BaseApp.NewContext(false, tmproto.Header{})
 	suite.govHandler = params.NewParamChangeProposalHandler(suite.app.ParamsKeeper)
 	return nil
 }

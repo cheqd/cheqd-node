@@ -48,7 +48,10 @@ func createTestApp(isCheckTx bool) (*app.TestApp, sdk.Context, error) {
 		return nil, sdk.Context{}, err
 	}
 	ctx := app.BaseApp.NewContext(isCheckTx, tmproto.Header{})
-	app.AccountKeeper.SetParams(ctx, authtypes.DefaultParams())
+	err = app.AccountKeeper.SetParams(ctx, authtypes.DefaultParams())
+	if err != nil {
+		return nil, sdk.Context{}, err
+	}
 
 	// cheqd specific params
 	didFeeParams := didtypes.DefaultGenesis().FeeParams
