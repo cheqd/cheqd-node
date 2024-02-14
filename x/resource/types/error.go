@@ -3,7 +3,7 @@ package types
 // DONTCOVER
 
 import (
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	sdkerrors "cosmossdk.io/errors"
 )
 
 // x/resource module sentinel errors
@@ -15,5 +15,5 @@ var (
 	ErrInvalidVersion   = sdkerrors.Register(ModuleName, 2505, "invalid ibc version")
 	ErrUnexpectedAck    = sdkerrors.Register(ModuleName, 2510, "resource module never sends packets")
 	ErrUnexpectedPacket = sdkerrors.Register(ModuleName, 2515, "IBC packet is incorrect")
-	ErrResourceNotAvail = sdkerrors.Register(ModuleName, 2525, "IBC packet is incorrect")
+	ErrResourceNotAvail = sdkerrors.Register(ModuleName, 2525, "resource not available")
 )
