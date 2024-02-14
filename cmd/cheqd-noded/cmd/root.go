@@ -82,7 +82,6 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 
 	rootCmd.AddCommand(
 		extendInit(genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome)),
-		AddGenesisAccountCmd(app.DefaultNodeHome),
 		tmcli.NewCompletionCmd(rootCmd, true),
 		extendDebug(debug.Cmd()),
 	)
