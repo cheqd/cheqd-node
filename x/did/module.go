@@ -128,19 +128,6 @@ func (am AppModule) Name() string {
 	return am.AppModuleBasic.Name()
 }
 
-// Route returns the cheqd module's message routing key.
-// func (am AppModule) Route() sdk.Route {
-// 	return sdk.NewRoute(types.RouterKey, keeper.NewHandler(am.keeper))
-// }
-
-// QuerierRoute returns the cheqd module's query routing key.
-func (AppModule) QuerierRoute() string { return types.QuerierRoute }
-
-// LegacyQuerierHandler returns the cheqd module's Querier.
-// func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
-// 	return keeper.NewQuerier(am.keeper, legacyQuerierCdc)
-// }
-
 // RegisterServices registers a GRPC query service to respond to the
 // module-specific GRPC queries.
 func (am AppModule) RegisterServices(cfg module.Configurator) {
