@@ -5,24 +5,22 @@ run:
 linters:
   disable-all: true
   enable:
-    - bodyclose
     - depguard
     - dogsled
-    - errcheck
     - exportloopref
     - goconst
     - gocritic
+    - gci
     - gofumpt
-    - gofmt
-    - goimports
+    - gosec
     - gosimple
     - govet
     - ineffassign
     - misspell
     - nakedret
-    - nestif
     - nolintlint
     - staticcheck
+    - revive
     - stylecheck
     - typecheck
     - unconvert
@@ -64,6 +62,3 @@ linters-settings:
       - "github.com/onsi/gomega"
     # https://staticcheck.io/docs/configuration/options/#initialisms
     initialisms: ["ACL", "API", "ASCII", "CPU", "CSS", "DNS", "EOF", "GUID", "HTML", "HTTP", "HTTPS", "ID", "IP", "JSON", "QPS", "RAM", "RPC", "SLA", "SMTP", "SQL", "SSH", "TCP", "TLS", "TTL", "UDP", "UI", "GID", "UID", "UUID", "URI", "URL", "UTF8", "VM", "XML", "XMPP", "XSRF", "XSS", "SIP", "RTP", "AMQP", "DB", "TS"]
-
-  depgaurd:
-    allow-all: true
