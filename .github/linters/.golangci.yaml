@@ -66,4 +66,28 @@ linters-settings:
     initialisms: ["ACL", "API", "ASCII", "CPU", "CSS", "DNS", "EOF", "GUID", "HTML", "HTTP", "HTTPS", "ID", "IP", "JSON", "QPS", "RAM", "RPC", "SLA", "SMTP", "SQL", "SSH", "TCP", "TLS", "TTL", "UDP", "UI", "GID", "UID", "UUID", "URI", "URL", "UTF8", "VM", "XML", "XMPP", "XSRF", "XSS", "SIP", "RTP", "AMQP", "DB", "TS"]
 
   depgaurd:
-    allow-all: true
+    Main:
+    - Disallowed:
+      - filippo.io/edwards25519
+      - github.com/lestrrat-go/jwx/jwk
+      - github.com/mr-tron/base58
+      - github.com/multiformats/go-multibase
+      - github.com/cometbft/cometbft/types
+      - github.com/google/uuid
+      - github.com/cosmos/cosmos-sdk/codec
+      - github.com/cosmos/cosmos-sdk/codec/types
+      - github.com/cosmos/cosmos-sdk/types
+      - github.com/cosmos/cosmos-sdk/types/msgservice
+      - github.com/cheqd/cheqd-node/x/did/utils
+      - github.com/go-ozzo/ozzo-validation/v4
+      - cosmossdk.io/errors
+      - github.com/cosmos/cosmos-sdk/x/params/types
+      - github.com/cosmos/ibc-go/v7/modules/core/03-connection/types
+      - github.com/cosmos/ibc-go/v7/modules/core/04-channel/types
+      - github.com/cosmos/cosmos-sdk/x/capability/types
+      - github.com/cheqd/cheqd-node/x/did/types
+      - github.com/gabriel-vasile/mimetype
+      - github.com/cheqd/cheqd-node/x/resource/types
+      - github.com/cheqd/cheqd-node/x/resource/utils
+      - github.com/cometbft/cometbft/libs/log
+      - github.com/cosmos/cosmos-sdk/store/types
