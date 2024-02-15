@@ -17,7 +17,9 @@ for proto_dir in $proto_dirs; do
 done
 
 cd ..
-ls -l
+ll
+# find . -type d -exec chmod 777 {} +
+
 
 # move proto files to the right places
 cp -r github.com/cheqd/cheqd-node/* ./
