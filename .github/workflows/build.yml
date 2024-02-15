@@ -9,10 +9,6 @@ defaults:
 jobs:
 
   build-binary:
-    permissions:
-      contents: write
-      packages: read
-      checks: write
     name: "Node binary"
     runs-on: ubuntu-20.04
 
@@ -83,3 +79,4 @@ jobs:
         with:
           name: cheqd-node-build.tar
           path: /tmp/cheqd-node-build.tar
+
