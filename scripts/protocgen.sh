@@ -16,10 +16,7 @@ for proto_dir in $proto_dirs; do
   done
 done
 
-cd ..
-
-# to resolve permission issues
-find . -type d -exec chmod 777 {} + 
+cd .. 
 
 
 # move proto files to the right places
