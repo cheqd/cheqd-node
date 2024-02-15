@@ -17,7 +17,7 @@ for proto_dir in $proto_dirs; do
 done
 
 cd ..
-ll
+ls -l ../
 # find . -type d -exec chmod 777 {} +
 
 
