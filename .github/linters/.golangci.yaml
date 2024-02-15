@@ -13,6 +13,7 @@ linters:
     - goconst
     - gocritic
     - gofumpt
+    - gofmt
     - goimports
     - gosimple
     - govet
