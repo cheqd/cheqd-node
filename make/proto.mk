@@ -17,6 +17,8 @@ proto-all: proto-gen proto-swagger-gen
 
 proto-gen:
 	@echo "Generating Protobuf files"
+	# to resolve permission issues
+	find . -type d -exec chmod 777 {} +
 	@$(protoImage) sh ./scripts/protocgen.sh;
 	go mod tidy
 	cd api
