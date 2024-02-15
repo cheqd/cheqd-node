@@ -4,15 +4,15 @@ on:
 defaults:
   run:
     shell: bash
-permissions:
-  contents: write
-  packages: read
-  checks: write
 
 
 jobs:
 
   build-binary:
+    permissions:
+      contents: write
+      packages: read
+      checks: write
     name: "Node binary"
     runs-on: ubuntu-20.04
 
