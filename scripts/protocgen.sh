@@ -22,4 +22,4 @@ cd ..
 cp -r github.com/cheqd/cheqd-node/* ./
 rm -rf github.com
 
-./scripts/protoc-pulsar-gen.sh
+sh ./scripts/protoc-pulsar-gen.sh
