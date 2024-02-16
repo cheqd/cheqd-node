@@ -831,8 +831,8 @@ func (app *App) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.Res
 }
 
 // RegisterNodeService registers the node gRPC service on the app gRPC router.
-func (a *App) RegisterNodeService(clientCtx client.Context) {
-	nodeservice.RegisterNodeService(clientCtx, a.GRPCQueryRouter())
+func (app *App) RegisterNodeService(clientCtx client.Context) {
+	nodeservice.RegisterNodeService(clientCtx, app.GRPCQueryRouter())
 }
 
 // SimulationManager implements the SimulationApp interface.
@@ -1175,6 +1175,6 @@ func (app *App) RegisterUpgradeHandlers() {
 	)
 }
 
-func (a *App) Configurator() module.Configurator {
-	return a.configurator
+func (app *App) Configurator() module.Configurator {
+	return app.configurator
 }

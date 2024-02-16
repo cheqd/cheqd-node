@@ -7,7 +7,7 @@ linters:
   enable:
     - bodyclose
     - depguard
-    - depguard:
+    - depguard
     - dogsled
     - errcheck
     - exportloopref
@@ -67,8 +67,14 @@ linters-settings:
     initialisms: ["ACL", "API", "ASCII", "CPU", "CSS", "DNS", "EOF", "GUID", "HTML", "HTTP", "HTTPS", "ID", "IP", "JSON", "QPS", "RAM", "RPC", "SLA", "SMTP", "SQL", "SSH", "TCP", "TLS", "TTL", "UDP", "UI", "GID", "UID", "UUID", "URI", "URL", "UTF8", "VM", "XML", "XMPP", "XSRF", "XSS", "SIP", "RTP", "AMQP", "DB", "TS"]
 
   depguard:
-    list-type: whitelist
-      packages:
-        - cosmossdk.io/errors
-        - filippo.io/edwards25519
-      include-go-root: false
+    rules:
+      main:
+        files:
+          - $all
+        list-mode: lax
+        allow: "*"
+  
+  goconst:
+    min-occurrences: 5
+    ignore-tests: true
+    ignore-strings: "echo '"

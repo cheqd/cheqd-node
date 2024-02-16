@@ -7,7 +7,6 @@ import (
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/cheqd/cheqd-node/app"
 	cheqdapp "github.com/cheqd/cheqd-node/app"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
@@ -34,7 +33,7 @@ type TestAccount struct {
 type AnteTestSuite struct {
 	suite.Suite
 
-	app         *app.TestApp
+	app         *cheqdapp.TestApp
 	anteHandler sdk.AnteHandler
 	ctx         sdk.Context
 	clientCtx   client.Context
@@ -42,8 +41,8 @@ type AnteTestSuite struct {
 }
 
 // returns context and app with params set on account keeper
-func createTestApp(isCheckTx bool) (*app.TestApp, sdk.Context, error) {
-	app, err := app.Setup(isCheckTx)
+func createTestApp(isCheckTx bool) (*cheqdapp.TestApp, sdk.Context, error) {
+	app, err := cheqdapp.Setup(isCheckTx)
 	if err != nil {
 		return nil, sdk.Context{}, err
 	}
@@ -79,8 +78,8 @@ func (s *AnteTestSuite) SetupTest(isCheckTx bool) error {
 	s.clientCtx = client.Context{}.
 		WithTxConfig(encodingConfig.TxConfig)
 
-	anteHandler, err := app.NewAnteHandler(
-		app.HandlerOptions{
+	anteHandler, err := cheqdapp.NewAnteHandler(
+		cheqdapp.HandlerOptions{
 			AccountKeeper:   s.app.AccountKeeper,
 			BankKeeper:      s.app.BankKeeper,
 			FeegrantKeeper:  s.app.FeeGrantKeeper,
