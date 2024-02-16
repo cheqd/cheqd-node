@@ -9,20 +9,8 @@ defaults:
 jobs:
 
   build-binary:
-    permissions:
-      actions: write
-      checks: write
-      contents: write
-      deployments: write
-      issues: write
-      packages: write
-      pull-requests: write
-      repository-projects: write
-      security-events: write
-      statuses: write
     name: "Node binary"
     runs-on: ubuntu-20.04
-   
 
     steps:
       - uses: actions/checkout@v4
@@ -91,4 +79,3 @@ jobs:
         with:
           name: cheqd-node-build.tar
           path: /tmp/cheqd-node-build.tar
-
