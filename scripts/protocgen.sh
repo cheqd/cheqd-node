@@ -5,7 +5,6 @@ set -euox pipefail
 echo "Generating gogo proto code"
 cd proto
 
-# Find all proto files but exclude "v1" paths
 proto_dirs=$(find ./ -type f -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
 for proto_dir in $proto_dirs; do
   proto_files=$(find "${proto_dir}" -maxdepth 1 -name '*.proto')
