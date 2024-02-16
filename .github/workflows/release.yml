@@ -2,12 +2,12 @@ name: "Release"
 on:
   workflow_call:
   workflow_dispatch:
-# defaults:
-#   run:
-#     shell: bash
-# permissions:
-#   contents: write
-#   packages: write
+defaults:
+  run:
+    shell: bash
+permissions:
+  contents: write
+  packages: write
 
 
 jobs:
@@ -119,9 +119,6 @@ jobs:
       - uses: bufbuild/buf-setup-action@v1.27.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Change file permissions
-        run: sudo find ../ -type d -exec chmod 777 {} +
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v5
