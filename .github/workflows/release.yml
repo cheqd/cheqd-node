@@ -2,12 +2,12 @@ name: "Release"
 on:
   workflow_call:
   workflow_dispatch:
-defaults:
-  run:
-    shell: bash
-permissions:
-  contents: write
-  packages: write
+# defaults:
+#   run:
+#     shell: bash
+# permissions:
+#   contents: write
+#   packages: write
 
 
 jobs:
