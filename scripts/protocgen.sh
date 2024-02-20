@@ -16,6 +16,8 @@ for proto_dir in $proto_dirs; do
 done
 
 cd ..
+touch test.txt
+ls -l
 
 
 # move proto files to the right places
