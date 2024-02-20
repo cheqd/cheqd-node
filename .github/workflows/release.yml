@@ -106,6 +106,9 @@ jobs:
     if: needs.release-guard.outputs.EXECUTE_RELEASE == 'true'
 
     steps:
+      - name: change permissions
+        run: sudo find ../ -type d -exec chmod 777 {} +
+        
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Required to fetch version
