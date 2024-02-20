@@ -4,8 +4,8 @@ import (
 	"os"
 	"os/exec"
 
+	errorsmod "cosmossdk.io/errors"
 	integrationcli "github.com/cheqd/cheqd-node/tests/integration/cli"
-	"github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 func Exec(args ...string) (string, error) {
@@ -16,7 +16,7 @@ func ExecDirect(args ...string) (string, error) {
 	cmd := exec.Command(args[0], args[1:]...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return "", errors.Wrap(err, string(out))
+		return "", errorsmod.Wrap(err, string(out))
 	}
 
 	return string(out), err
@@ -27,7 +27,7 @@ func ExecWithEnv(env []string, args ...string) (string, error) {
 	cmd.Env = append(os.Environ(), env...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return "", errors.Wrap(err, string(out))
+		return "", errorsmod.Wrap(err, string(out))
 	}
 
 	return string(out), err

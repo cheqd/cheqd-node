@@ -200,11 +200,17 @@ generate:
 ###                             Lint / Format                               ###
 ###############################################################################
 
+
+golangci_version=v1.56.2
+
 lint:
-	golangci-lint run --out-format=tab
+	@echo "--> Running linter"
+	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(golangci_version)
+	golangci-lint run --out-format=tab --config .github/linters/.golangci.yaml
 
 lint-fix:
-	golangci-lint run --fix --out-format=tab --issues-exit-code=0
+	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(golangci_version)
+	golangci-lint run --config .github/linters/.golangci.yaml --fix --out-format=tab --issues-exit-code=0
 
 format_filter = -name '*.go' -type f \
 	-not -path '*.git*' \

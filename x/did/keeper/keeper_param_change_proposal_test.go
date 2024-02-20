@@ -1,9 +1,8 @@
 package keeper_test
 
 import (
-	"github.com/stretchr/testify/suite"
-
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	"github.com/stretchr/testify/suite"
 
 	cheqdapp "github.com/cheqd/cheqd-node/app"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
