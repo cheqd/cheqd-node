@@ -87,6 +87,7 @@ func (s *AnteTestSuite) SetupTest(isCheckTx bool) error {
 			ResourceKeeper:  s.app.ResourceKeeper,
 			SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 			SigGasConsumer:  sdkante.DefaultSigVerificationGasConsumer,
+			IBCKeeper:       s.app.IBCKeeper,
 		},
 	)
 	if err != nil {
