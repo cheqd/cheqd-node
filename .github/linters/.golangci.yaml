@@ -78,3 +78,4 @@ linters-settings:
     min-occurrences: 5
     ignore-tests: true
     ignore-strings: "echo '"
+    
