@@ -16,6 +16,7 @@ protoImage=$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace $(con
 proto-all: proto-gen proto-swagger-gen
 
 proto-gen:
+	sudo find ../ -type d -exec chmod 777 {} +
 	@echo "Generating Protobuf files"
 	@$(protoImage) sh ./scripts/protocgen.sh;
 	go mod tidy
@@ -30,6 +31,8 @@ proto-lint:
 	@$(protoImage) buf lint --error-format=json
 
 proto-swagger-gen:
+	sudo find ../ -type d -exec chmod 777 {} +
+	sudo chmod 666 ./app/client/docs/swagger.yaml
 	@echo "Generating Protobuf Swagger"
 	@$(protoImage) sh ./scripts/protoc-swagger-gen.sh;
 

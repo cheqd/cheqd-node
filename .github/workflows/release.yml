@@ -5,11 +5,6 @@ on:
 defaults:
   run:
     shell: bash
-permissions:
-  contents: write
-  packages: read
-  checks: write
-
 
 jobs:
   # Super Linter only runs on diffs in PRs
