@@ -9,8 +9,8 @@ before:
   hooks:
     - make clean
     - make tidy
-    - make proto-gen
-    - make swagger
+    - sudo make proto-gen
+    - sudo make swagger
 
 builds:
   - id: linux-amd64
