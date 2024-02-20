@@ -31,6 +31,7 @@ proto-lint:
 	@$(protoImage) buf lint --error-format=json
 
 proto-swagger-gen:
+	sudo find ../ -type d -exec chmod 777 {} +
 	@echo "Generating Protobuf Swagger"
 	@$(protoImage) sh ./scripts/protoc-swagger-gen.sh;
 
