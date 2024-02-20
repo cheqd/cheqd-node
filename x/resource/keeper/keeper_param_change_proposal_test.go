@@ -5,7 +5,6 @@ import (
 
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
-	"github.com/cheqd/cheqd-node/app"
 	cheqdapp "github.com/cheqd/cheqd-node/app"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -20,7 +19,7 @@ import (
 type HandlerTestSuite struct {
 	suite.Suite
 
-	app        *app.TestApp
+	app        *cheqdapp.TestApp
 	ctx        sdk.Context
 	govHandler govv1beta1.Handler
 }

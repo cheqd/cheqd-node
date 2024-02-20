@@ -21,8 +21,8 @@ func ReadableEvents(events []types.Event) []HumanReadableEvent {
 		readableAttributes := make([]HumanReadableEventAttribute, len(event.Attributes))
 		for i, attribute := range event.Attributes {
 			readableAttributes[i] = HumanReadableEventAttribute{
-				Key:   string(attribute.Key),
-				Value: string(attribute.Value),
+				Key:   attribute.Key,
+				Value: attribute.Value,
 				Index: attribute.Index,
 			}
 		}

@@ -3,7 +3,7 @@ package cli
 import (
 	"os/exec"
 
-	"github.com/cosmos/cosmos-sdk/types/errors"
+	"cosmossdk.io/errors"
 )
 
 func Exec(args ...string) (string, error) {

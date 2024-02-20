@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/cheqd/cheqd-node/app"
-	"github.com/cheqd/cheqd-node/app/params"
+	appparams "github.com/cheqd/cheqd-node/app/params"
 	dbm "github.com/cometbft/cometbft-db"
 	tmconfig "github.com/cometbft/cometbft/config"
 	tmcli "github.com/cometbft/cometbft/libs/cli"
@@ -15,7 +15,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/debug"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/keys"
+	"github.com/cosmos/cosmos-sdk/client/pruning"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
+	"github.com/cosmos/cosmos-sdk/client/snapshot"
 	"github.com/cosmos/cosmos-sdk/server"
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
@@ -33,7 +35,7 @@ var ChainID = "cheqd-mainnet-1"
 
 // NewRootCmd creates a new root command for simd. It is called once in the
 // main function.
-func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
+func NewRootCmd() (*cobra.Command, appparams.EncodingConfig) {
 	// Set config for prefixes
 	app.SetConfig()
 
@@ -76,7 +78,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	return rootCmd, encodingConfig
 }
 
-func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
+func initRootCmd(rootCmd *cobra.Command, encodingConfig appparams.EncodingConfig) {
 	cfg := sdk.GetConfig()
 	cfg.Seal()
 
@@ -86,8 +88,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		extendDebug(debug.Cmd()),
 	)
 
-	a := appCreator{encodingConfig}
-	server.AddCommands(rootCmd, app.DefaultNodeHome, a.newApp, appExport, addModuleInitFlags)
+	server.AddCommands(rootCmd, app.DefaultNodeHome, newApp, appExport, addModuleInitFlags)
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
@@ -96,16 +97,18 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		queryCommand(),
 		txCommand(),
 		keys.Commands(app.DefaultNodeHome),
+		pruning.Cmd(newApp, app.DefaultNodeHome),
+		snapshot.Cmd(newApp),
 	)
 }
 
 // genesisCommand builds genesis-related `universus genesis` command.
 // Users may provide application specific commands as a parameter
-func genesisCommand(encodingConfig params.EncodingConfig, cmds ...*cobra.Command) *cobra.Command {
+func genesisCommand(encodingConfig appparams.EncodingConfig, cmds ...*cobra.Command) *cobra.Command {
 	cmd := genutilcli.GenesisCoreCommand(encodingConfig.TxConfig, app.ModuleBasics, app.DefaultNodeHome)
 
-	for _, sub_cmd := range cmds {
-		cmd.AddCommand(sub_cmd)
+	for _, subCmd := range cmds {
+		cmd.AddCommand(subCmd)
 	}
 	return cmd
 }
@@ -170,12 +173,8 @@ func txCommand() *cobra.Command {
 	return cmd
 }
 
-type appCreator struct {
-	encCfg params.EncodingConfig
-}
-
 // newApp is an AppCreator
-func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts servertypes.AppOptions) servertypes.Application {
+func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts servertypes.AppOptions) servertypes.Application {
 	return app.New(
 		logger, db, traceStore, true,
 		appOpts,

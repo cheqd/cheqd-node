@@ -3,8 +3,10 @@ run:
 
 
 linters:
+  disable-all: true
   enable:
     - bodyclose
+    - depguard
     - depguard
     - dogsled
     - errcheck
@@ -12,6 +14,7 @@ linters:
     - goconst
     - gocritic
     - gofumpt
+    - gofmt
     - goimports
     - gosimple
     - govet
@@ -42,7 +45,7 @@ linters-settings:
       - badCall # Remove this after CI workflow PR
 
   gofumpt:
-    lang-version: "1.18"
+    lang-version: "1.21"
 
   misspell:
     ignore-words:
@@ -52,7 +55,7 @@ linters-settings:
 
   stylecheck:
     # Select the Go version to target.
-    go: "1.18"
+    go: "1.21"
     # STxxxx checks in https://staticcheck.io/docs/configuration/options/#checks
     # Default: ["*"]
     checks: ["all"]
@@ -62,3 +65,17 @@ linters-settings:
       - "github.com/onsi/gomega"
     # https://staticcheck.io/docs/configuration/options/#initialisms
     initialisms: ["ACL", "API", "ASCII", "CPU", "CSS", "DNS", "EOF", "GUID", "HTML", "HTTP", "HTTPS", "ID", "IP", "JSON", "QPS", "RAM", "RPC", "SLA", "SMTP", "SQL", "SSH", "TCP", "TLS", "TTL", "UDP", "UI", "GID", "UID", "UUID", "URI", "URL", "UTF8", "VM", "XML", "XMPP", "XSRF", "XSS", "SIP", "RTP", "AMQP", "DB", "TS"]
+
+  depguard:
+    rules:
+      main:
+        files:
+          - $all
+        list-mode: lax
+        allow: "*"
+  
+  goconst:
+    min-occurrences: 5
+    ignore-tests: true
+    ignore-strings: "echo '"
+    
