@@ -17,6 +17,7 @@ done
 
 cd ..
 touch test.txt
+ls -l
 
 
 # move proto files to the right places
