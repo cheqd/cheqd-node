@@ -16,6 +16,7 @@ protoImage=$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace $(con
 proto-all: proto-gen proto-swagger-gen
 
 proto-gen:
+	sudo find ../ -type d -exec chmod 777 {} +
 	@echo "Generating Protobuf files"
 	@$(protoImage) sh ./scripts/protocgen.sh;
 	go mod tidy
