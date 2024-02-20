@@ -6,6 +6,7 @@ import (
 	resourceKeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -32,11 +33,11 @@ func validateChannelParams(
 	version string,
 ) error {
 	if order != channeltypes.UNORDERED {
-		return sdkerrors.Wrapf(channeltypes.ErrInvalidChannelOrdering, "expected %s channel, got %s ", channeltypes.UNORDERED, order)
+		return errorsmod.Wrapf(channeltypes.ErrInvalidChannelOrdering, "expected %s channel, got %s ", channeltypes.UNORDERED, order)
 	}
 
 	if version != resourcetypes.IBCVersion {
-		return sdkerrors.Wrapf(resourcetypes.ErrInvalidVersion, "expected version %s , got %s ", resourcetypes.IBCVersion, version)
+		return errorsmod.Wrapf(resourcetypes.ErrInvalidVersion, "expected version %s , got %s ", resourcetypes.IBCVersion, version)
 	}
 
 	return nil
@@ -79,7 +80,7 @@ func (im IBCModule) OnChanOpenTry(
 	// Require portID is the portID module is bound to
 	boundPort := im.keeper.GetPort(ctx)
 	if boundPort != portID {
-		return "", sdkerrors.Wrapf(porttypes.ErrInvalidPort, "invalid port: %s, expected %s", portID, boundPort)
+		return "", errorsmod.Wrapf(porttypes.ErrInvalidPort, "invalid port: %s, expected %s", portID, boundPort)
 	}
 
 	if err := validateChannelParams(ctx, order, counterpartyVersion); err != nil {
@@ -108,7 +109,7 @@ func (im IBCModule) OnChanOpenAck(
 	counterpartyVersion string,
 ) error {
 	if counterpartyVersion != resourcetypes.IBCVersion {
-		return sdkerrors.Wrapf(resourcetypes.ErrInvalidVersion, "invalid counterparty version: %s, expected %s", counterpartyVersion, resourcetypes.IBCVersion)
+		return errorsmod.Wrapf(resourcetypes.ErrInvalidVersion, "invalid counterparty version: %s, expected %s", counterpartyVersion, resourcetypes.IBCVersion)
 	}
 	return nil
 }
@@ -130,7 +131,7 @@ func (im IBCModule) OnChanCloseInit(
 ) error {
 	// Disallow user-initiated channel closing for transfer channels
 	// Todo: what should the appropriate action be?
-	return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "user cannot close channel")
+	return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "user cannot close channel")
 }
 
 // OnChanCloseConfirm implements the IBCModule interface
@@ -184,7 +185,7 @@ func (im IBCModule) OnAcknowledgementPacket(
 	acknowledgement []byte,
 	relayer sdk.AccAddress,
 ) error {
-	return sdkerrors.Wrap(resourcetypes.ErrUnexpectedAck, "unexpected acknowledgement")
+	return errorsmod.Wrap(resourcetypes.ErrUnexpectedAck, "unexpected acknowledgement")
 }
 
 // OnTimeoutPacket implements the IBCModule interface
@@ -193,5 +194,5 @@ func (im IBCModule) OnTimeoutPacket(
 	packet channeltypes.Packet,
 	relayer sdk.AccAddress,
 ) error {
-	return sdkerrors.Wrap(resourcetypes.ErrUnexpectedAck, "unexpected acknowledgement")
+	return errorsmod.Wrap(resourcetypes.ErrUnexpectedAck, "unexpected acknowledgement")
 }

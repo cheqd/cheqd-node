@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 
+	errorsmod "cosmossdk.io/errors"
 	"github.com/cheqd/cheqd-node/x/did/types"
 	tmcli "github.com/cometbft/cometbft/libs/cli"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -140,7 +141,7 @@ func AccAddrByKeyRef(keyring keyring.Keyring, keyRef string) (sdk.AccAddress, er
 		return info.GetAddress()
 	}
 
-	if !sdkerrors.IsOf(err, sdkerrors.ErrIO, sdkerrors.ErrKeyNotFound) {
+	if !errorsmod.IsOf(err, sdkerrors.ErrIO, sdkerrors.ErrKeyNotFound) {
 		return nil, err
 	}
 
