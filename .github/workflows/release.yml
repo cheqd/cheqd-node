@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 defaults:
   run:
-    shell: bash
+    shell: sudo bash
 permissions:
   contents: write
   packages: read
