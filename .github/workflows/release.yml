@@ -7,8 +7,7 @@ defaults:
     shell: bash
 permissions:
   contents: write
-  packages: read
-  checks: write
+  packages: write
 
 
 jobs:
