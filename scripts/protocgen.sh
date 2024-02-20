@@ -15,9 +15,7 @@ for proto_dir in $proto_dirs; do
   done
 done
 
-ls -l
 cd ..
-ls -l
 
 
 # move proto files to the right places
