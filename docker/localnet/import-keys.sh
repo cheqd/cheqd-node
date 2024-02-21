@@ -3,20 +3,21 @@
 set -euox pipefail
 
 KEYRING_BACKEND="test"
+CHEQD_NODE_HOME="test/.cheqdnode"
 
 function import_key() {
     ALIAS=${1}
     MNEMONIC=${2}
 
     echo "Importing key: ${ALIAS}"
-    cheqd-noded keys list --keyring-backend ${KEYRING_BACKEND}
-    if cheqd-noded keys show "${ALIAS}" --keyring-backend ${KEYRING_BACKEND}
+    cheqd-noded keys list --keyring-backend ${KEYRING_BACKEND} --home=$CHEQD_NODE_HOME
+    if cheqd-noded keys show "${ALIAS}" --keyring-backend ${KEYRING_BACKEND} --home=$CHEQD_NODE_HOME
     then
       echo "Key ${ALIAS} already exists"
       return 0
     fi
 
-    echo "${MNEMONIC}" | cheqd-noded keys add "${ALIAS}" --keyring-backend ${KEYRING_BACKEND} --recover
+    echo "${MNEMONIC}" | cheqd-noded keys add "${ALIAS}" --keyring-backend ${KEYRING_BACKEND} --home=$CHEQD_NODE_HOME --recover
 }
 
 import_key "base_account_1" "sketch mountain erode window enact net enrich smoke claim kangaroo another visual write meat latin bacon pulp similar forum guilt father state erase bright"
