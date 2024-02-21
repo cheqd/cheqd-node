@@ -56,6 +56,7 @@ function configure_genesis() {
   echo "[${NODE_MONIKER}] Configuring genesis"
 
   GENESIS="${NODE_HOME}/config/genesis.json"
+  echo $GENESIS
   GENESIS_TMP="${NODE_HOME}/config/genesis_tmp.json"
 
   # Default denom
@@ -136,6 +137,9 @@ function configure_genesis() {
     mv "${GENESIS_TMP}" "${GENESIS}"
   jq '.app_state.auth.accounts += [{"@type": "/cosmos.vesting.v1beta1.PeriodicVestingAccount", "base_vesting_account": { "base_account": {"address": "'${PERIODIC_VESTING_ACCOUNT}'","pub_key": null,"account_number": "0","sequence": "0"}, "original_vesting": ['"${BASE_VESTING_COIN}"'], "delegated_free": [], "delegated_vesting": [], "end_time": "1672531199"}, "start_time": "1672531179", "vesting_periods": [{"length": "20", "amount": ['"${BASE_VESTING_COIN}"']}]}]' "$GENESIS" > "$GENESIS_TMP" && \
     mv "${GENESIS_TMP}" "${GENESIS}"
+
+  # supplied added tokens
+  jq '.app_state.bank.supply += [{"denom": "ncheq", "amount": "420004000000000200"}]'
 }
 
 
