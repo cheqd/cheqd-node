@@ -9,7 +9,7 @@ function import_key() {
     MNEMONIC=${2}
 
     echo "Importing key: ${ALIAS}"
-
+    cheqd-noded keys list --keyring-backend ${KEYRING_BACKEND}
     if cheqd-noded keys show "${ALIAS}" --keyring-backend ${KEYRING_BACKEND}
     then
       echo "Key ${ALIAS} already exists"
