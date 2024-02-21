@@ -11,9 +11,10 @@ type msgServer struct {
 }
 
 // NewMsgServerImpl returns an implementation of the x/auth MsgServer interface.
-func NewMsgServerImpl(keeper Keeper) types.MsgServer {
+func NewMsgServerImpl(keeper Keeper, didKeeper didkeeper.Keeper) types.MsgServer {
 	return &msgServer{
-		Keeper: keeper,
+		Keeper:    keeper,
+		didKeeper: didKeeper,
 	}
 }
 
