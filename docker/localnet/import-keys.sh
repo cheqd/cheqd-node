@@ -3,7 +3,6 @@
 set -euox pipefail
 
 KEYRING_BACKEND="test"
-CHEQD_NODE_HOME="test/.cheqdnode"
 
 function import_key() {
     ALIAS=${1}
