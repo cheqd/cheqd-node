@@ -12,6 +12,7 @@ import (
 	"github.com/cheqd/cheqd-node/app/migrations"
 	upgradeV1 "github.com/cheqd/cheqd-node/app/upgrades/v1"
 	upgradeV2 "github.com/cheqd/cheqd-node/app/upgrades/v2"
+	posthandler "github.com/cheqd/cheqd-node/post"
 	did "github.com/cheqd/cheqd-node/x/did"
 	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
@@ -770,21 +771,22 @@ func New(
 	app.sm = module.NewSimulationManagerFromAppModules(app.ModuleManager.Modules, overrideModules)
 	app.sm.RegisterStoreDecoders()
 
-	// postHandler, err := posthandler.NewPostHandler(posthandler.HandlerOptions{
-	// 	AccountKeeper:  app.AccountKeeper,
-	// 	BankKeeper:     app.BankKeeper,
-	// 	FeegrantKeeper: app.FeeGrantKeeper,
-	// 	DidKeeper:      app.DidKeeper,
-	// 	ResourceKeeper: app.ResourceKeeper,
-	// })
-	// if err != nil {
-	// 	tmos.Exit(err.Error())
-	// }
+	postHandler, err := posthandler.NewPostHandler(posthandler.HandlerOptions{
+		AccountKeeper:  app.AccountKeeper,
+		BankKeeper:     app.BankKeeper,
+		FeegrantKeeper: app.FeeGrantKeeper,
+		DidKeeper:      app.DidKeeper,
+		ResourceKeeper: app.ResourceKeeper,
+	})
+	if err != nil {
+		tmos.Exit(err.Error())
+	}
 
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetAnteHandler(anteHandler)
 	app.SetEndBlocker(app.EndBlocker)
+	_ = postHandler
 	// app.SetPostHandler(postHandler)
 
 	// Note: This migration is completed, we can remove these lines.

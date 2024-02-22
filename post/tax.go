@@ -33,7 +33,7 @@ func NewTaxDecorator(ak ante.AccountKeeper, bk cheqdante.BankKeeper, fk ante.Fee
 }
 
 // AnteHandle handles tax for all taxable messages
-func (td TaxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
+func (td TaxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, success bool, next sdk.PostHandler) (sdk.Context, error) {
 	// must implement FeeTx
 	feeTx, ok := tx.(sdk.FeeTx)
 	if !ok {
@@ -41,7 +41,7 @@ func (td TaxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, nex
 	}
 	// if simulate, perform no-op
 	if simulate {
-		return next(ctx, tx, simulate)
+		return next(ctx, tx, simulate, success)
 	}
 	// get metrics for tax
 	rewards, burn, taxable, err := td.isTaxable(ctx, feeTx)
@@ -50,7 +50,7 @@ func (td TaxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, nex
 	}
 	// if not taxable, skip
 	if !taxable {
-		return next(ctx, tx, simulate)
+		return next(ctx, tx, simulate, success)
 	}
 	// validate tax
 	err = td.validateTax(feeTx.GetFee(), simulate)
@@ -76,7 +76,7 @@ func (td TaxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, nex
 		return ctx, err
 	}
 
-	return next(ctx, tx, simulate)
+	return next(ctx, tx, simulate, success)
 }
 
 // isTaxable returns true if the message is taxable and returns
