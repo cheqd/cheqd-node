@@ -2,6 +2,7 @@ package cli
 
 import (
 	"os/exec"
+	"time"
 
 	"cosmossdk.io/errors"
 )
