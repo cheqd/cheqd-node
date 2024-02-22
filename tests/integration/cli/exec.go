@@ -14,7 +14,7 @@ func Exec(args ...string) (string, error) {
 		return "", errors.Wrap(err, string(out))
 	}
 
-	time.Sleep(2 * time.Second)
+	time.Sleep(10 * time.Millisecond)
 
 	return string(out), err
 }
