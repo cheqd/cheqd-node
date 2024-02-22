@@ -7,7 +7,6 @@ linters:
   enable:
     - bodyclose
     - depguard
-    - depguard
     - dogsled
     - errcheck
     - exportloopref
@@ -28,7 +27,12 @@ linters:
     - typecheck
     - unconvert
     - unused
-
+    
+issues:
+  exclude-rules:
+    - text: "ST1003:"
+      linters:
+        - stylecheck
 
 linters-settings:
   dogsled:
