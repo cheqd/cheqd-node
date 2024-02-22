@@ -228,7 +228,7 @@ jobs:
         run: |
           bash scripts/upgrade.sh
 
-       - name: Verifying docker processes
+      - name: Verifying docker processes
         working-directory: ./tests/upgrade/integration
         run: |
           docker ps -a
