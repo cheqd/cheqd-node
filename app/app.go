@@ -787,7 +787,7 @@ func New(
 	app.SetAnteHandler(anteHandler)
 	app.SetEndBlocker(app.EndBlocker)
 	_ = postHandler
-	// app.SetPostHandler(postHandler)
+
 
 	// Note: This migration is completed, we can remove these lines.
 	// Upgrade handler for v1
