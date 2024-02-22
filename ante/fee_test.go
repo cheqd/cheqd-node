@@ -233,7 +233,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
 		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper)
-		posthandler := sdk.ChainAnteDecorators(taxDecorator)
+		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
 		supplyBeforeDeflation, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
@@ -243,7 +243,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		_, err = antehandler(s.ctx, tx, false)
 		Expect(err).To(BeNil(), "Tx errored when taxable on deliverTx")
 
-		_, err = posthandler(s.ctx, tx, false)
+		_, err = posthandler(s.ctx, tx, false, true)
 		Expect(err).To(BeNil(), "Tx errored when fee payer had sufficient funds and provided sufficient fee while subtracting tax on deliverTx")
 
 		// get fee params
@@ -297,7 +297,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
 		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper)
-		posthandler := sdk.ChainAnteDecorators(taxDecorator)
+		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
 		supplyBefore, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
@@ -307,7 +307,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		_, err = antehandler(s.ctx, tx, false)
 		Expect(err).To(BeNil(), "Tx errored when non-taxable on deliverTx")
 
-		_, err = posthandler(s.ctx, tx, false)
+		_, err = posthandler(s.ctx, tx, false, true)
 		Expect(err).To(BeNil(), "Tx errored when non-taxable on deliverTx from posthandler")
 
 		// check balance of fee payer
@@ -354,7 +354,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
 		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper)
-		posthandler := sdk.ChainAnteDecorators(taxDecorator)
+		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
 		supplyBefore, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
@@ -364,7 +364,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		_, err = antehandler(s.ctx, tx, true)
 		Expect(err).To(BeNil(), "Tx errored when taxable on deliverTx simulation mode")
 
-		_, err = posthandler(s.ctx, tx, true)
+		_, err = posthandler(s.ctx, tx, true, true)
 		Expect(err).To(BeNil(), "Tx errored when fee payer had sufficient funds and provided sufficient fee while skipping tax simulation mode")
 
 		// check balance of fee payer
