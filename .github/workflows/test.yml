@@ -210,7 +210,7 @@ jobs:
       - name: Setting up network with old binary inside (mainnet version)
         working-directory: ./tests/upgrade/integration
         run: |
-          bash scripts/setup.sh
+          bash scripts/old_binary_setup.sh
 
       - name: Run pre-upgrade tests
         working-directory: ./tests/upgrade/integration/v2
