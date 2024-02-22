@@ -139,7 +139,7 @@ function configure_genesis() {
     mv "${GENESIS_TMP}" "${GENESIS}"
 
   # supplied added tokens
-  jq '.app_state.bank.supply += [{"denom": "ncheq", "amount": "420004000000000200"}]' "$GENESIS" > "$GENESIS_TMP" && mv "${GENESIS_TMP}" "${GENESIS}"
+  # jq '.app_state.bank.supply += [{"denom": "ncheq", "amount": "420004000000000200"}]' "$GENESIS" > "$GENESIS_TMP" && mv "${GENESIS_TMP}" "${GENESIS}"
 }
 
 
