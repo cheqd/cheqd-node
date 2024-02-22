@@ -116,3 +116,19 @@ func QueryResourceCollection(collectionID string) (resourcetypes.QueryCollection
 
 	return resp, nil
 }
+
+func QueryTxn(hash string) (sdk.TxResponse, error) {
+	res, err := Query("tx", hash)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	var resp sdk.TxResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	return resp, nil
+}
