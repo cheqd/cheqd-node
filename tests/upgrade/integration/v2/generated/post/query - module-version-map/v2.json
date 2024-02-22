@@ -3,7 +3,7 @@
         "module_versions": [
             {
                 "name": "auth",
-                "version": 3
+                "version": 4
             },
             {
                 "name": "authz",
@@ -11,7 +11,7 @@
             },
             {
                 "name": "bank",
-                "version": 3
+                "version": 4
             },
             {
                 "name": "capability",
@@ -23,11 +23,11 @@
             },
             {
                 "name": "crisis",
-                "version": 1
+                "version": 2
             },
             {
                 "name": "distribution",
-                "version": 2
+                "version": 3
             },
             {
                 "name": "evidence",
@@ -47,15 +47,15 @@
             },
             {
                 "name": "gov",
-                "version": 3
+                "version": 4
             },
             {
                 "name": "group",
-                "version": 1
+                "version": 2
             },
             {
                 "name": "ibc",
-                "version": 2
+                "version": 4
             },
             {
                 "name": "interchainaccounts",
@@ -63,7 +63,7 @@
             },
             {
                 "name": "mint",
-                "version": 1
+                "version": 2
             },
             {
                 "name": "params",
@@ -75,15 +75,15 @@
             },
             {
                 "name": "slashing",
-                "version": 2
-            },
-            {
-                "name": "staking",
                 "version": 3
             },
             {
+                "name": "staking",
+                "version": 4
+            },
+            {
                 "name": "transfer",
-                "version": 2
+                "version": 3
             },
             {
                 "name": "upgrade",
