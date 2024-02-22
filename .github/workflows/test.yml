@@ -211,11 +211,6 @@ jobs:
         working-directory: ./tests/upgrade/integration
         run: |
           bash scripts/old_binary_setup.sh
-      
-      - name: Verifying docker processes
-        working-directory: ./tests/upgrade/integration
-        run: |
-          docker ps -a
 
       - name: Run pre-upgrade tests
         working-directory: ./tests/upgrade/integration/v2
@@ -232,6 +227,11 @@ jobs:
         working-directory: ./tests/upgrade/integration
         run: |
           bash scripts/upgrade.sh
+
+       - name: Verifying docker processes
+        working-directory: ./tests/upgrade/integration
+        run: |
+          docker ps -a
 
       - name: Run post-upgrade tests
         working-directory: ./tests/upgrade/integration/v2
