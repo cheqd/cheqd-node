@@ -125,7 +125,6 @@ func QueryTxn(hash string) (sdk.TxResponse, error) {
 
 	var resp sdk.TxResponse
 	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
-
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
