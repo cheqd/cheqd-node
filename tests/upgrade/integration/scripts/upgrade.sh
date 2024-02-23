@@ -11,5 +11,6 @@ docker compose --env-file mainnet-latest.env down
 
 # Start network
 docker compose --env-file build-latest.env up --detach --no-build
-
+sleep 5
+docker ps
 popd
