@@ -54,5 +54,9 @@ else
     echo "No private validator key file passed. Skipping and retaining existing key."
 fi
 
+cheqd-noded keys list
+cheqd-noded keys list --keyring-backend test
+cheqd-noded validate-genesis
+
 # Run node
 cheqd-noded start
