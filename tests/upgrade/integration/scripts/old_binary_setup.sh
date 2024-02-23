@@ -19,7 +19,7 @@ docker compose --env-file mainnet-latest.env up --detach --no-build
 # TODO: Get rid of this sleep.
 sleep 5
 
-docker ps
+docker ps -a
 # Copy keys
 sudo docker compose --env-file mainnet-latest.env cp network-config/validator-0/keyring-test validator-0:/home/cheqd/.cheqdnode
 sudo docker compose --env-file mainnet-latest.env cp network-config/validator-1/keyring-test validator-1:/home/cheqd/.cheqdnode
@@ -27,9 +27,9 @@ sudo docker compose --env-file mainnet-latest.env cp network-config/validator-2/
 sudo docker compose --env-file mainnet-latest.env cp network-config/validator-3/keyring-test validator-3:/home/cheqd/.cheqdnode
 
 # Restore permissions
-sudo docker compose --env-file mainnet-latest.env exec --user root validator-0 chown -R cheqd:cheqd /home/cheqd
-sudo docker compose --env-file mainnet-latest.env exec --user root validator-1 chown -R cheqd:cheqd /home/cheqd
-sudo docker compose --env-file mainnet-latest.env exec --user root validator-2 chown -R cheqd:cheqd /home/cheqd
-sudo docker compose --env-file mainnet-latest.env exec --user root validator-3 chown -R cheqd:cheqd /home/cheqd
+# sudo docker compose --env-file mainnet-latest.env exec --user root validator-0 chown -R cheqd:cheqd /home/cheqd
+# sudo docker compose --env-file mainnet-latest.env exec --user root validator-1 chown -R cheqd:cheqd /home/cheqd
+# sudo docker compose --env-file mainnet-latest.env exec --user root validator-2 chown -R cheqd:cheqd /home/cheqd
+# sudo docker compose --env-file mainnet-latest.env exec --user root validator-3 chown -R cheqd:cheqd /home/cheqd
 
 popd
