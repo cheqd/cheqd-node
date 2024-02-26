@@ -5,6 +5,10 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"math/rand"
 	"reflect"
 	"strconv"
@@ -184,81 +188,81 @@ func SetupTest(isCheckTx bool) (*TestApp, error) {
 	return app, nil
 }
 
-// func genesisStateWithValSet(
-// 	app *TestApp, genesisState GenesisState,
-// 	valSet *tmtypes.ValidatorSet, genAccs []authtypes.GenesisAccount,
-// 	balances ...banktypes.Balance,
-// ) (GenesisState, error) {
-// 	// set genesis accounts
-// 	authGenesis := authtypes.NewGenesisState(authtypes.DefaultParams(), genAccs)
-// 	genesisState[authtypes.ModuleName] = app.AppCodec().MustMarshalJSON(authGenesis)
+func genesisStateWithValSet(
+	app *TestApp, genesisState GenesisState,
+	valSet *tmtypes.ValidatorSet, genAccs []authtypes.GenesisAccount,
+	balances ...banktypes.Balance,
+) (GenesisState, error) {
+	// set genesis accounts
+	authGenesis := authtypes.NewGenesisState(authtypes.DefaultParams(), genAccs)
+	genesisState[authtypes.ModuleName] = app.AppCodec().MustMarshalJSON(authGenesis)
 
-// 	validators := make([]stakingtypes.Validator, 0, len(valSet.Validators))
-// 	delegations := make([]stakingtypes.Delegation, 0, len(valSet.Validators))
+	validators := make([]stakingtypes.Validator, 0, len(valSet.Validators))
+	delegations := make([]stakingtypes.Delegation, 0, len(valSet.Validators))
 
-// 	bondAmt := sdk.DefaultPowerReduction
+	bondAmt := sdk.DefaultPowerReduction
 
-// 	for _, val := range valSet.Validators {
-// 		pk, err := cryptocodec.FromTmPubKeyInterface(val.PubKey)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		pkAny, err := codectypes.NewAnyWithValue(pk)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		validator := stakingtypes.Validator{
-// 			OperatorAddress:   sdk.ValAddress(val.Address).String(),
-// 			ConsensusPubkey:   pkAny,
-// 			Jailed:            false,
-// 			Status:            stakingtypes.Bonded,
-// 			Tokens:            bondAmt,
-// 			DelegatorShares:   sdk.OneDec(),
-// 			Description:       stakingtypes.Description{},
-// 			UnbondingHeight:   int64(0),
-// 			UnbondingTime:     time.Unix(0, 0).UTC(),
-// 			Commission:        stakingtypes.NewCommission(sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec()),
-// 			MinSelfDelegation: sdk.ZeroInt(),
-// 		}
-// 		validators = append(validators, validator)
-// 		delegations = append(delegations, stakingtypes.NewDelegation(genAccs[0].GetAddress(), val.Address.Bytes(), sdk.OneDec()))
+	for _, val := range valSet.Validators {
+		pk, err := cryptocodec.FromTmPubKeyInterface(val.PubKey)
+		if err != nil {
+			return nil, err
+		}
+		pkAny, err := codectypes.NewAnyWithValue(pk)
+		if err != nil {
+			return nil, err
+		}
+		validator := stakingtypes.Validator{
+			OperatorAddress:   sdk.ValAddress(val.Address).String(),
+			ConsensusPubkey:   pkAny,
+			Jailed:            false,
+			Status:            stakingtypes.Bonded,
+			Tokens:            bondAmt,
+			DelegatorShares:   sdk.OneDec(),
+			Description:       stakingtypes.Description{},
+			UnbondingHeight:   int64(0),
+			UnbondingTime:     time.Unix(0, 0).UTC(),
+			Commission:        stakingtypes.NewCommission(sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec()),
+			MinSelfDelegation: sdk.ZeroInt(),
+		}
+		validators = append(validators, validator)
+		delegations = append(delegations, stakingtypes.NewDelegation(genAccs[0].GetAddress(), val.Address.Bytes(), sdk.OneDec()))
 
-// 	}
-// 	// set validators and delegations
-// 	stakingGenesis := stakingtypes.NewGenesisState(stakingtypes.DefaultParams(), validators, delegations)
-// 	genesisState[stakingtypes.ModuleName] = app.AppCodec().MustMarshalJSON(stakingGenesis)
+	}
+	// set validators and delegations
+	stakingGenesis := stakingtypes.NewGenesisState(stakingtypes.DefaultParams(), validators, delegations)
+	genesisState[stakingtypes.ModuleName] = app.AppCodec().MustMarshalJSON(stakingGenesis)
 
-// 	totalSupply := sdk.NewCoins()
-// 	for _, b := range balances {
-// 		// add genesis acc tokens to total supply
-// 		totalSupply = totalSupply.Add(b.Coins...)
-// 	}
+	totalSupply := sdk.NewCoins()
+	for _, b := range balances {
+		// add genesis acc tokens to total supply
+		totalSupply = totalSupply.Add(b.Coins...)
+	}
 
-// 	for range delegations {
-// 		// add delegated tokens to total supply
-// 		totalSupply = totalSupply.Add(sdk.NewCoin(sdk.DefaultBondDenom, bondAmt))
-// 	}
+	for range delegations {
+		// add delegated tokens to total supply
+		totalSupply = totalSupply.Add(sdk.NewCoin(sdk.DefaultBondDenom, bondAmt))
+	}
 
-// 	// add bonded amount to bonded pool module account
-// 	balances = append(balances, banktypes.Balance{
-// 		Address: authtypes.NewModuleAddress(stakingtypes.BondedPoolName).String(),
-// 		Coins:   sdk.Coins{sdk.NewCoin(sdk.DefaultBondDenom, bondAmt)},
-// 	})
+	// add bonded amount to bonded pool module account
+	balances = append(balances, banktypes.Balance{
+		Address: authtypes.NewModuleAddress(stakingtypes.BondedPoolName).String(),
+		Coins:   sdk.Coins{sdk.NewCoin(sdk.DefaultBondDenom, bondAmt)},
+	})
 
-// 	// update total supply
-// 	bankGenesis := banktypes.NewGenesisState(banktypes.DefaultGenesisState().Params, balances, totalSupply, []banktypes.Metadata{}, []banktypes.SendEnabled{})
-// 	genesisState[banktypes.ModuleName] = app.AppCodec().MustMarshalJSON(bankGenesis)
+	// update total supply
+	bankGenesis := banktypes.NewGenesisState(banktypes.DefaultGenesisState().Params, balances, totalSupply, []banktypes.Metadata{}, []banktypes.SendEnabled{})
+	genesisState[banktypes.ModuleName] = app.AppCodec().MustMarshalJSON(bankGenesis)
 
-// 	// set did module genesis state
-// 	didGenesis := didtypes.DefaultGenesis()
-// 	genesisState[didtypes.ModuleName] = app.AppCodec().MustMarshalJSON(didGenesis)
+	// set did module genesis state
+	didGenesis := didtypes.DefaultGenesis()
+	genesisState[didtypes.ModuleName] = app.AppCodec().MustMarshalJSON(didGenesis)
 
-// 	// set resource module genesis state
-// 	resourceGenesis := resourcetypes.DefaultGenesis()
-// 	genesisState[resourcetypes.ModuleName] = app.AppCodec().MustMarshalJSON(resourceGenesis)
+	// set resource module genesis state
+	resourceGenesis := resourcetypes.DefaultGenesis()
+	genesisState[resourcetypes.ModuleName] = app.AppCodec().MustMarshalJSON(resourceGenesis)
 
-// 	return genesisState, nil
-// }
+	return genesisState, nil
+}
 
 // SetupWithGenesisValSet initializes a new SimApp with a validator set and genesis accounts
 // that also act as delegators. For simplicity, each validator is bonded with a delegation
@@ -266,7 +270,7 @@ func SetupTest(isCheckTx bool) (*TestApp, error) {
 // account. A Nop logger is set in SimApp.
 func SetupWithGenesisValSet(valSet *tmtypes.ValidatorSet, genAccs []authtypes.GenesisAccount, balances ...banktypes.Balance) (*TestApp, error) {
 	app, genesisState := setup(true, 5)
-	genesisState, err := simtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, genAccs, balances...)
+	genesisState, err := genesisStateWithValSet(app, genesisState, valSet, genAccs, balances...)
 	if err != nil {
 		return nil, err
 	}
