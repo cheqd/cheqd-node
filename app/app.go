@@ -319,7 +319,6 @@ func New(
 		memKeys:           memKeys,
 		// invCheckPeriod:    invCheckPeriod,
 	}
-
 	app.ParamsKeeper = initParamsKeeper(appCodec, legacyAmino, keys[paramstypes.StoreKey], tkeys[paramstypes.TStoreKey])
 
 	// set the BaseApp's parameter store
@@ -447,7 +446,7 @@ func New(
 		app.BaseApp,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
-
+	app.setupUpgradeStoreLoaders()
 	// Create IBC Keeper
 	app.IBCKeeper = ibckeeper.NewKeeper(
 		appCodec,
@@ -1158,6 +1157,26 @@ func BlockedAddresses() map[string]bool {
 	delete(modAccAddrs, authtypes.NewModuleAddress(govtypes.ModuleName).String())
 
 	return modAccAddrs
+}
+
+// configure store loader that checks if version == upgradeHeight and applies store upgrades
+func (app *App) setupUpgradeStoreLoaders() {
+	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
+	if err != nil {
+		panic(fmt.Sprintf("failed to read upgrade info from disk %s", err))
+	}
+
+	if app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		return
+	}
+
+	storeUpgrades := storetypes.StoreUpgrades{
+		Added: []string{
+			consensusparamtypes.ModuleName,
+			crisistypes.ModuleName,
+		},
+	}
+	app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
 }
 
 func (app *App) RegisterUpgradeHandlers() {
