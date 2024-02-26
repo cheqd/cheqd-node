@@ -5,22 +5,22 @@
 version: 2
 updates:
   # Maintain dependencies for GitHub Actions
-  - package-ecosystem: 'github-actions'
-    target-branch: 'develop'
-    directory: '/'
+  - package-ecosystem: "github-actions"
+    target-branch: "develop"
+    directory: "/"
     schedule:
-        interval: 'weekly'
+        interval: "weekly"
     ignore:
       - dependency-name: "*"
         update-types:
           - version-update:semver-patch
 
   # Maintain dependencies for NPM
-  - package-ecosystem: 'npm'
-    target-branch: 'develop'
-    directory: '/'
+  - package-ecosystem: "npm"
+    target-branch: "develop"
+    directory: "/"
     schedule:
-        interval: 'weekly'
+        interval: "weekly"
     ignore:
       - dependency-name: "*"
         update-types:
