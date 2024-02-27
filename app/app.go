@@ -1047,6 +1047,14 @@ func (app *App) RegisterUpgradeHandlers() {
 			ctx.Logger().Info("Handler for upgrade plan: " + upgradeV2.UpgradeName)
 			bankSubspace := app.GetSubspace(banktypes.ModuleName)
 			bankSubspace.Set(ctx, didtypes.ParamStoreKeyFeeParams, banktypes.DefaultParams())
+
+			// Add defaults for DID module subspace
+			didSubspace := app.GetSubspace(didtypes.ModuleName)
+			didSubspace.Set(ctx, didtypes.ParamStoreKeyFeeParams, didtypes.DefaultFeeParams())
+
+			// Add defaults for resource subspace
+			resourceSubspace := app.GetSubspace(resourcetypes.ModuleName)
+			resourceSubspace.Set(ctx, resourcetypes.ParamStoreKeyFeeParams, resourcetypes.DefaultFeeParams())
 			// Migrate Tendermint consensus parameters from x/params module to a
 			// dedicated x/consensus module.
 			baseapp.MigrateParams(ctx, baseAppLegacySS, &app.ConsensusParamsKeeper)
