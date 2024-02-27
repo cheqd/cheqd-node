@@ -31,13 +31,6 @@ var _ = Describe("Upgrade - Fee parameter change proposal", func() {
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 
-	It("should vote for the parameter change proposal from `validator0` container", func() {
-		By("sending a VoteProposal transaction from `validator0` container")
-		res, err := cli.VoteProposal(cli.Validator0, "2", "yes")
-		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(0))
-	})
-
 	It("should vote for the parameter change proposal from `validator1` container", func() {
 		By("sending a VoteProposal transaction from `validator1` container")
 		res, err := cli.VoteProposal(cli.Validator1, "2", "yes")
@@ -55,6 +48,13 @@ var _ = Describe("Upgrade - Fee parameter change proposal", func() {
 	It("should vote for the parameter change proposal from `validator3` container", func() {
 		By("sending a VoteProposal transaction from `validator3` container")
 		res, err := cli.VoteProposal(cli.Validator3, "2", "yes")
+		Expect(err).To(BeNil())
+		Expect(res.Code).To(BeEquivalentTo(0))
+	})
+
+	It("should vote for the parameter change proposal from `validator0` container", func() {
+		By("sending a VoteProposal transaction from `validator0` container")
+		res, err := cli.VoteProposal(cli.Validator0, "2", "yes")
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
