@@ -22,6 +22,10 @@
                 "version": 4
             },
             {
+                "name": "consensus",
+                "version": 1
+            },
+            {
                 "name": "crisis",
                 "version": 2
             },
