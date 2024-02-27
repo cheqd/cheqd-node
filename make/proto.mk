@@ -8,10 +8,6 @@ DOCKER := $(shell which docker)
 containerProtoVer=0.14.0
 containerProtoImage=ghcr.io/cosmos/proto-builder:$(containerProtoVer)
 protoImage=$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace $(containerProtoImage)
-# containerProtoGen=cheqd-node-proto-gen-$(containerProtoVer)
-# containerProtoFmt=cheqd-node-proto-fmt-$(containerProtoVer)
-# containerProtoGenSwagger=cheqd-node-proto-gen-swagger-$(containerProtoVer)
-# containerPulsar=cheqd-node-pulsar-gen-$(containerProtoVer)
 
 proto-all: proto-gen proto-swagger-gen
 
