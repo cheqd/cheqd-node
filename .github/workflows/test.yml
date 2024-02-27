@@ -168,7 +168,6 @@ jobs:
   upgrade-tests:
     name: "Upgrade Tests"
     runs-on: ubuntu-20.04
-    needs: [integration-tests]
     steps:
       - uses: actions/checkout@v4
 
