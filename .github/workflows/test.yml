@@ -273,6 +273,7 @@ jobs:
       - name: Submit governance fee parameter change proposals
         working-directory: ./tests/upgrade/integration/v2
         run: |
+          sleep 10
           ginkgo -r --race --tags upgrade_integration --focus-file param_change_proposal_test.go --keep-going --trace --junit-report ../../../../report-pricing-proposal.xml
 
       - name: Upload pricing proposal tests result
