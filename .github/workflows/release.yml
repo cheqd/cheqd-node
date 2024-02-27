@@ -52,15 +52,15 @@ jobs:
           persist-credentials: false
 
       # Node.js setup is needed to run Semantic Release
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: 'npm'
 
       # Required for short-lived token provided to Semantic Release
       - name: "Obtain Github App token"
         id: app-token
-        uses: getsentry/action-github-app-token@v2.0.0
+        uses: getsentry/action-github-app-token@v3.0.0
         with:
           app_id: ${{ secrets.BOT_APP_ID }}
           private_key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
@@ -106,7 +106,7 @@ jobs:
           fetch-depth: 0 # Required to fetch version
           persist-credentials: false
 
-      - uses: actions/setup-go@v4
+      - uses: actions/setup-go@v5
         with:
           go-version-file: ./go.mod
           cache: true
