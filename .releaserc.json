@@ -2,19 +2,19 @@
     "branches": [
         "main",
         {
-            "name": "release/0.6.x",
-            "range": "0.6.x",
-            "channel": "0.6.x"
-        },
-        {
-            "name": "release/1.x.x",
-            "range": "1.x.x",
-            "channel": "1.x.x"
-        },
-        {
             "name": "develop",
             "channel": "beta",
             "prerelease": true
+        },
+        {
+            "name": "release/1.x",
+            "range": "1.x",
+            "channel": "1.x"
+        },
+        {
+            "name": "release/0.6.x",
+            "range": "0.6.x",
+            "channel": "0.6.x"
         }
     ],
     "tagFormat": "v${version}",
