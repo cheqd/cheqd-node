@@ -1046,7 +1046,7 @@ func (app *App) RegisterUpgradeHandlers() {
 			}
 			ctx.Logger().Info("Handler for upgrade plan: " + upgradeV2.UpgradeName)
 			bankSubspace := app.GetSubspace(banktypes.ModuleName)
-			bankSubspace.Set(ctx, didtypes.ParamStoreKeyFeeParams, banktypes.DefaultParams())
+			bankSubspace.Set(ctx, banktypes.ParamsKey, banktypes.DefaultParams())
 
 			// Add defaults for DID module subspace
 			didSubspace := app.GetSubspace(didtypes.ModuleName)
