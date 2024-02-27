@@ -316,6 +316,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("querying the fee payer account balance after the transaction")
 		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
+		Expect(err).To(BeNil())
 
 		By("checking that the fee payer account balance has been decreased by the tax")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
@@ -349,6 +350,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("querying the fee payer account balance after the transaction")
 		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
+		Expect(err).To(BeNil())
 
 		By("checking that the fee payer account balance has been decreased by the tax")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
@@ -382,6 +384,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("querying the fee payer account balance after the transaction")
 		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
+		Expect(err).To(BeNil())
 
 		By("checking that the fee payer account balance has been decreased by the tax")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)

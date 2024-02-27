@@ -139,7 +139,7 @@ func (am AppModule) Name() string {
 // module-specific GRPC queries.
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterQueryServer(cfg.QueryServer(), keeper.NewQueryServer(am.keeper, am.didKeeper))
-
+	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper, am.didKeeper))
 	// Register for migration from consensus version 2 -> 3
 	migratorV3 := migrationV3.NewMigrator(am.keeper)
 	if err := cfg.RegisterMigration(types.ModuleName, 2, migratorV3.Migrate2to3); err != nil {

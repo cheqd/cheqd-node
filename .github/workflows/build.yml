@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - uses: actions/setup-go@v4
+      - uses: actions/setup-go@v5
         with:
           go-version-file: ./go.mod
           cache: true
@@ -32,7 +32,7 @@ jobs:
           args: build --clean --snapshot --single-target
 
       - name: Store artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cheqd-noded
           path: dist/linux-amd64_linux_amd64_v1/cheqd-noded
@@ -79,7 +79,7 @@ jobs:
           cache-to: type=gha,mode=min
 
       - name: Upload Docker build image
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cheqd-node-build.tar
           path: /tmp/cheqd-node-build.tar

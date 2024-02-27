@@ -29,8 +29,8 @@ sed -i $SED_EXT 's|laddr = "tcp://127.0.0.1:26657"|laddr = "tcp://0.0.0.0:26657"
 GENESIS="$HOME/.cheqdnode/config/genesis.json"
 sed -i $SED_EXT 's/"stake"/"ncheq"/' "$GENESIS"
 
-cheqd-noded add-genesis-account cheqd-user 1000000000000000000ncheq --keyring-backend test
-cheqd-noded gentx cheqd-user 10000000000000000ncheq --chain-id $CHAIN_ID --pubkey "$NODE_0_VAL_PUBKEY" --keyring-backend test
+cheqd-noded genesis add-genesis-account cheqd-user 1000000000000000000ncheq --keyring-backend test
+cheqd-noded genesis gentx cheqd-user 10000000000000000ncheq --chain-id $CHAIN_ID --pubkey "$NODE_0_VAL_PUBKEY" --keyring-backend test
 
-cheqd-noded collect-gentxs
-cheqd-noded validate-genesis
+cheqd-noded genesis collect-gentxs
+cheqd-noded genesis validate-genesis

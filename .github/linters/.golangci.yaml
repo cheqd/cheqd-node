@@ -3,10 +3,8 @@ run:
 
 
 linters:
-  disable-all: true
   enable:
     - bodyclose
-    - depguard
     - depguard
     - dogsled
     - errcheck
@@ -28,7 +26,12 @@ linters:
     - typecheck
     - unconvert
     - unused
-
+    
+issues:
+  exclude-rules:
+    - text: "ST1003:"
+      linters:
+        - stylecheck
 
 linters-settings:
   dogsled:

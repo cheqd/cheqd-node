@@ -85,7 +85,10 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(diff).To(Equal(tax.Amount))
 
 		By("exporting a readable tx event log")
-		events := helpers.ReadableEvents(res.Events)
+		txResp, err := cli.QueryTxn(res.TxHash)
+		Expect(err).To(BeNil())
+
+		events := helpers.ReadableEvents(txResp.Events)
 
 		By("ensuring the events contain the expected tax event")
 		Expect(events).To(ContainElement(
@@ -166,7 +169,10 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(diff).To(Equal(tax.Amount))
 
 		By("exporting a readable tx event log")
-		events := helpers.ReadableEvents(res.Events)
+		txResp, err := cli.QueryTxn(res.TxHash)
+		Expect(err).To(BeNil())
+
+		events := helpers.ReadableEvents(txResp.Events)
 
 		By("ensuring the events contain the expected tax event")
 		Expect(events).To(ContainElement(
@@ -237,7 +243,10 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(diff).To(Equal(tax.Amount))
 
 		By("exporting a readable tx event log")
-		events := helpers.ReadableEvents(res.Events)
+		txResp, err := cli.QueryTxn(res.TxHash)
+		Expect(err).To(BeNil())
+
+		events := helpers.ReadableEvents(txResp.Events)
 
 		By("ensuring the events contain the expected tax event")
 		Expect(events).To(ContainElement(
