@@ -20,7 +20,7 @@ var _ = Describe("Upgrade - Fee parameter change proposal", func() {
 		Expect(err).To(BeNil())
 	})
 
-	It("should submit a parameter change proposal for did module", func() {
+	It("should submit a parameter change proposal for did module (optimistic)", func() {
 		By("passing the proposal file to the container")
 		_, err := cli.LocalnetExecCopyAbsoluteWithPermissions(filepath.Join(GeneratedJSONDir, ProposalJSONDir, "existing", "param_change_did.json"), cli.DockerHome, cli.Validator0)
 		Expect(err).To(BeNil())
@@ -29,6 +29,16 @@ var _ = Describe("Upgrade - Fee parameter change proposal", func() {
 		res, err := cli.SubmitParamChangeProposal(cli.Validator0, "param_change_did.json")
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
+	})
+
+	It("should wait for the proposal submission to be included in a block", func() {
+		By("getting the current block height")
+		currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
+		Expect(err).To(BeNil())
+
+		By("waiting for the proposal to be included in a block")
+		err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+10, cli.VotingPeriod*3)
+		Expect(err).To(BeNil())
 	})
 
 	It("should vote for the parameter change proposal from `validator0` container", func() {
@@ -88,7 +98,7 @@ var _ = Describe("Upgrade - Fee parameter change proposal", func() {
 		Expect(feeParams).To(Equal(expectedFeeParams))
 	})
 
-	It("should submit a parameter change proposal for resource module", func() {
+	It("should submit a parameter change proposal for resource module (optimistic)", func() {
 		By("passing the proposal file to the container")
 		_, err := cli.LocalnetExecCopyAbsoluteWithPermissions(filepath.Join(GeneratedJSONDir, ProposalJSONDir, "existing", "param_change_resource.json"), cli.DockerHome, cli.Validator0)
 		Expect(err).To(BeNil())
@@ -97,6 +107,16 @@ var _ = Describe("Upgrade - Fee parameter change proposal", func() {
 		res, err := cli.SubmitParamChangeProposal(cli.Validator0, "param_change_resource.json")
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
+	})
+
+	It("should wait for the proposal submission to be included in a block", func() {
+		By("getting the current block height")
+		currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
+		Expect(err).To(BeNil())
+
+		By("waiting for the proposal to be included in a block")
+		err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+10, cli.VotingPeriod*3)
+		Expect(err).To(BeNil())
 	})
 
 	It("should vote for the parameter change proposal from `validator0` container", func() {
