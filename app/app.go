@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/cosmos/cosmos-sdk/x/consensus"
+
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 	reflectionv1 "cosmossdk.io/api/cosmos/reflection/v1"
 	"github.com/cheqd/cheqd-node/app/migrations"
@@ -121,6 +123,7 @@ import (
 	porttypes "github.com/cosmos/ibc-go/v7/modules/core/05-port/types"
 	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
 	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
+	ibctmmigrations "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint/migrations"
 	"github.com/gorilla/mux"
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
@@ -166,6 +169,7 @@ var (
 		did.AppModuleBasic{},
 		resource.AppModuleBasic{},
 		ibcfee.AppModuleBasic{},
+		consensus.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -627,6 +631,7 @@ func New(
 		params.NewAppModule(app.ParamsKeeper),
 		// IBC modules
 		transfer.NewAppModule(app.TransferKeeper),
+		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 		ibcfee.NewAppModule(app.IBCFeeKeeper),
 		icaModule,
 		// cheqd modules
@@ -663,6 +668,7 @@ func New(
 		ibcfeetypes.ModuleName,
 		didtypes.ModuleName,
 		resourcetypes.ModuleName,
+		consensusparamtypes.ModuleName,
 	)
 
 	app.ModuleManager.SetOrderEndBlockers(
@@ -689,6 +695,7 @@ func New(
 		vestingtypes.ModuleName,
 		icatypes.ModuleName,
 		ibcfeetypes.ModuleName,
+		consensusparamtypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -720,6 +727,7 @@ func New(
 		vestingtypes.ModuleName,
 		upgradetypes.ModuleName,
 		paramstypes.ModuleName,
+		consensusparamtypes.ModuleName,
 	}
 	app.ModuleManager.SetOrderInitGenesis(genesisModuleOrder...)
 	app.ModuleManager.SetOrderExportGenesis(genesisModuleOrder...)
@@ -1186,6 +1194,10 @@ func (app *App) RegisterUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(
 		upgradeV2.UpgradeName,
 		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			_, err := ibctmmigrations.PruneExpiredConsensusStates(ctx, app.appCodec, app.IBCKeeper.ClientKeeper)
+			if err != nil {
+				return nil, err
+			}
 			ctx.Logger().Info("Handler for upgrade plan: " + upgradeV2.UpgradeName)
 			// Migrate Tendermint consensus parameters from x/params module to a
 			// dedicated x/consensus module.
