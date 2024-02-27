@@ -6,8 +6,6 @@ DIR_="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 
 bash "$DIR_/cleanup.sh"
 
-
-
 bash "$DIR_/setup.sh"
 
 ginkgo -r --race --tags upgrade_integration --focus-file pre_test.go

@@ -19,7 +19,7 @@ jobs:
     env:
       PYTHONDEVMODE: 1
       DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
-  
+
     steps:
       - uses: actions/checkout@v4
 
@@ -42,14 +42,13 @@ jobs:
         if: ${{ failure() }}
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 10
-    
+
   installer-standalone:
     name: "Installer - Standalone mode"
     runs-on: ubuntu-20.04
     env:
       PYTHONDEVMODE: 1
-      DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }} 
-    
+      DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
     steps:
       - uses: actions/checkout@v4
 
@@ -62,12 +61,12 @@ jobs:
         working-directory: ./installer
         run: |
           sudo -E bash -c "python3 installer.py < tests/upgrade-existing-standalone.txt"
-      
+
       - name: "Upgrade with moving to cosmovisor"
         working-directory: ./installer
         run: |
           sudo -E bash -c "python3 installer.py < tests/upgrade-to-cosmovisor.txt"
-      
+
       - name: Debugging with tmate
         if: ${{ failure() }}
         uses: mxschmitt/action-tmate@v3
@@ -91,7 +90,7 @@ jobs:
           go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
       - name: Run Ginkgo unit tests
-        run: ginkgo -r --tags upgrade_unit --race --randomize-all --randomize-suites --keep-going --trace --junit-report report-unit.xml
+        run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --junit-report report-unit.xml
 
       - name: Upload unit tests result
         uses: actions/upload-artifact@v4
@@ -164,146 +163,151 @@ jobs:
         with:
           name: report-integration.xml
           path: report-integration.xml
-  
+
   # NOTE: This job is disabled since upgrade tests from v0.6.x to v1.x.x are not needed until next major release.
-  # upgrade-tests:
-  #   name: "Upgrade Tests"
-  #   runs-on: ubuntu-20.04
-  #   steps:
-  #     - uses: actions/checkout@v4
+  upgrade-tests:
+    name: "Upgrade Tests"
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
 
-  #     # Preparations
+      # Preparations
 
-  #     - name: Download old node binary (mainnet-latest)
-  #       run: |
-  #         mkdir -p ${{ env.RUNNER_BIN_DIR }}
-  #         wget -c https://github.com/cheqd/cheqd-node/releases/download/v"${LEGACY_VERSION}"/cheqd-noded-"${LEGACY_VERSION}"-Linux-x86_64.tar.gz
-  #         tar -xvf cheqd-noded-"${LEGACY_VERSION}"-Linux-x86_64.tar.gz -C ${{ env.RUNNER_BIN_DIR }}
-  #         sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
-  #       env:
-  #         LEGACY_VERSION: 0.6.10
+      - name: Download old node binary (mainnet-latest)
+        run: |
+          mkdir -p ${{ env.RUNNER_BIN_DIR }}
+          wget -c https://github.com/cheqd/cheqd-node/releases/download/v"${LEGACY_VERSION}"/cheqd-noded-"${LEGACY_VERSION}"-linux-amd64.tar.gz
+          tar -xvf cheqd-noded-"${LEGACY_VERSION}"-linux-amd64.tar.gz -C ${{ env.RUNNER_BIN_DIR }}
+          sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
+        env:
+          LEGACY_VERSION: 1.4.4
 
-  #     - name: Login to GitHub Container Registry
-  #       uses: docker/login-action@v3
-  #       with:
-  #         registry: ghcr.io
-  #         username: ${{ github.actor }}
-  #         password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-  #     - uses: actions/setup-go@v5
-  #       with:
-  #         go-version-file: ./go.mod
-  #         cache: true
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: ./go.mod
+          cache: true
 
-  #     - name: Install ginkgo
-  #       working-directory: ./..
-  #       run: go install github.com/onsi/ginkgo/v2/ginkgo@latest
-      
-  #     - name: Download new version of the Docker image (build-latest)
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: cheqd-node-build.tar
+      - name: Install ginkgo
+        working-directory: ./..
+        run: go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
-  #     - name: Load node Docker image
-  #       run: docker load -i cheqd-node-build.tar
+      - name: Download new version of the Docker image (build-latest)
+        uses: actions/download-artifact@v4
+        with:
+          name: cheqd-node-build.tar
 
-  #     # Run tests
-  #     - name: Setting up network with old binary inside (mainnet version)
-  #       working-directory: ./tests/upgrade/integration
-  #       run: |
-  #         bash scripts/setup.sh
+      - name: Load node Docker image
+        run: docker load -i cheqd-node-build.tar
 
-  #     - name: Run pre-upgrade tests
-  #       working-directory: ./tests/upgrade/integration
-  #       run: |
-  #         ginkgo -r --race --tags upgrade_integration --focus-file pre_test.go --keep-going --trace --junit-report ../../../report-pre-upgrade.xml
+      # Run tests
+      - name: Setting up network with old binary inside (mainnet version)
+        working-directory: ./tests/upgrade/integration
+        run: |
+          bash scripts/old_binary_setup.sh
 
-  #     - name: Upload pre-upgrade tests result
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: report-pre-upgrade.xml
-  #         path: report-pre-upgrade.xml
+      - name: Run pre-upgrade tests
+        working-directory: ./tests/upgrade/integration/v2
+        run: |
+          ginkgo -r --race --tags upgrade_integration --focus-file pre_test.go --keep-going --trace --junit-report ../../../../report-pre-upgrade.xml
 
-  #     - name: Restart network using new node version (build-latest)
-  #       working-directory: ./tests/upgrade/integration
-  #       run: |
-  #         bash scripts/upgrade.sh
+      - name: Upload pre-upgrade tests result
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-pre-upgrade.xml
+          path: report-pre-upgrade.xml
 
-  #     - name: Run post-upgrade tests
-  #       working-directory: ./tests/upgrade/integration
-  #       run: |
-  #         ginkgo -r --race --tags upgrade_integration --focus-file post_test.go --keep-going --trace --junit-report ../../../report-post-upgrade.xml
+      - name: Restart network using new node version (build-latest)
+        working-directory: ./tests/upgrade/integration
+        run: |
+          bash scripts/upgrade.sh
 
-  #     - name: Upload post-upgrade tests result
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: report-post-upgrade.xml
-  #         path: report-post-upgrade.xml
+      - name: Verifying docker processes
+        working-directory: ./tests/upgrade/integration
+        run: |
+          docker ps -a
 
-  #     - name: Download binary artifact (build-latest)
-  #       uses: actions/download-artifact@v4
-  #       id: download
-  #       with:
-  #         name: cheqd-noded
-  #         path: ${{ env.RUNNER_BIN_DIR }}
+      - name: Run post-upgrade tests
+        working-directory: ./tests/upgrade/integration/v2
+        run: |
+          ginkgo -r --race --tags upgrade_integration --focus-file post_test.go --keep-going --trace --junit-report ../../../../report-post-upgrade.xml
 
-  #     - name: Restore binary permissions
-  #       run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
+      - name: Upload post-upgrade tests result
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-post-upgrade.xml
+          path: report-post-upgrade.xml
 
-  #     - name: Run integration tests on upgraded network
-  #       working-directory: ./tests/integration
-  #       run: |
-  #         ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --junit-report ../../report-upgraded-integration.xml
+      - name: Download binary artifact (build-latest)
+        uses: actions/download-artifact@v4
+        id: download
+        with:
+          name: cheqd-noded
+          path: ${{ env.RUNNER_BIN_DIR }}
 
-  #     - name: Upload post-upgrade integration tests result
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: report-upgraded-integration.xml
-  #         path: report-upgraded-integration.xml
+      - name: Restore binary permissions
+        run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
 
-  #     - name: Show logs on failure
-  #       if: failure()
-  #       working-directory: ./docker/localnet
-  #       run: docker compose --env-file build-latest.env logs --tail --follow
+      - name: Run integration tests on upgraded network
+        working-directory: ./tests/integration
+        run: |
+          ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --junit-report ../../report-upgraded-integration.xml
 
-  #     - name: Submit governance fee parameter change proposals
-  #       working-directory: ./tests/upgrade/integration
-  #       run: |
-  #         ginkgo -r --race --tags upgrade_integration --focus-file param_change_proposal_test.go --keep-going --trace --junit-report ../../../report-pricing-proposal.xml
+      - name: Upload post-upgrade integration tests result
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-upgraded-integration.xml
+          path: report-upgraded-integration.xml
 
-  #     - name: Upload pricing proposal tests result
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: report-pricing-proposal.xml
-  #         path: report-pricing-proposal.xml
+      - name: Show logs on failure
+        if: failure()
+        working-directory: ./docker/localnet
+        run: docker compose --env-file build-latest.env logs --tail --follow
 
-  #     - name: Run pricing integration tests after successful param change proposal
-  #       working-directory: ./tests/integration
-  #       run: |
-  #         ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --skip-file cli_diddoc_test.go --skip-file cli_diddoc_negative_test.go --skip-file cli_resource_test.go --skip-file cli_resource_negative_test.go --junit-report ../../report-pricing-change.xml
+      - name: Submit governance fee parameter change proposals
+        working-directory: ./tests/upgrade/integration/v2
+        run: |
+          ginkgo -r --race --tags upgrade_integration --focus-file param_change_proposal_test.go --keep-going --trace --junit-report ../../../../report-pricing-proposal.xml
 
-  #     - name: Upload pricing change tests result
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: report-pricing-change.xml
-  #         path: report-pricing-change.xml
+      - name: Upload pricing proposal tests result
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-pricing-proposal.xml
+          path: report-pricing-proposal.xml
 
-  #     - name: Cleanup after tests
-  #       working-directory: ./tests/upgrade/integration
-  #       run: |
-  #         bash scripts/cleanup.sh
+      - name: Run pricing integration tests after successful param change proposal
+        working-directory: ./tests/integration
+        run: |
+          ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --skip-file cli_diddoc_test.go --skip-file cli_diddoc_negative_test.go --skip-file cli_resource_test.go --skip-file cli_resource_negative_test.go --junit-report ../../report-pricing-change.xml
+
+      - name: Upload pricing change tests result
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-pricing-change.xml
+          path: report-pricing-change.xml
+
+      - name: Cleanup after tests
+        working-directory: ./tests/upgrade/integration
+        run: |
+          bash scripts/cleanup.sh
 
   report-results:
     name: "Report"
     runs-on: ubuntu-20.04
-    # NOTE: Until next major release, only unit and integration tests are necessary
-    needs: [unit-tests, integration-tests]
-    # needs: [unit-tests, integration-tests, upgrade-tests]
+    # NOTE: If not next major release, only unit and integration tests are necessary, otherwise all tests are needed.
+    # needs: [unit-tests, integration-tests]
+    needs: [unit-tests, integration-tests, upgrade-tests]
     if: always()
 
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Download unit test
         uses: actions/download-artifact@v4
         with:
@@ -313,37 +317,37 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: report-integration.xml
-      
-      # - name: Download pre-upgrade test Report
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: report-pre-upgrade.xml
 
-      # - name: Download post-upgrade test Report
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: report-post-upgrade.xml
-      
-      # - name: Download upgraded integration test Report
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: report-upgraded-integration.xml
+      - name: Download pre-upgrade test Report
+        uses: actions/download-artifact@v4
+        with:
+          name: report-pre-upgrade.xml
 
-      # - name: Download pricing proposal test Report
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: report-pricing-proposal.xml
-      
-      # - name: Download pricing change test Report
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: report-pricing-change.xml
+      - name: Download post-upgrade test Report
+        uses: actions/download-artifact@v4
+        with:
+          name: report-post-upgrade.xml
+
+      - name: Download upgraded integration test Report
+        uses: actions/download-artifact@v4
+        with:
+          name: report-upgraded-integration.xml
+
+      - name: Download pricing proposal test Report
+        uses: actions/download-artifact@v4
+        with:
+          name: report-pricing-proposal.xml
+
+      - name: Download pricing change test Report
+        uses: actions/download-artifact@v4
+        with:
+          name: report-pricing-change.xml
 
       - name: Combine test results
-        # run: |
-        #   python ./.github/scripts/xml_combine.py report-unit.xml report-integration.xml report-pre-upgrade.xml report-post-upgrade.xml report-upgraded-integration.xml report-pricing-proposal.xml report-pricing-change.xml > report.xml
         run: |
-          python ./.github/scripts/xml_combine.py report-unit.xml report-integration.xml > report.xml
+          python ./.github/scripts/xml_combine.py report-unit.xml report-integration.xml report-pre-upgrade.xml report-post-upgrade.xml report-upgraded-integration.xml report-pricing-proposal.xml report-pricing-change.xml > report.xml
+        # run: |
+        #   python ./.github/scripts/xml_combine.py report-unit.xml report-integration.xml > report.xml
 
       - uses: mikepenz/action-junit-report@v4
         with:

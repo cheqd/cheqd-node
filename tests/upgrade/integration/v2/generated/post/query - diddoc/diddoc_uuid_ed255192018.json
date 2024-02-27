@@ -1,0 +1,19 @@
+{
+    "payload": {
+        "id": "did:cheqd:testnet:aed908f0-ddd5-47ac-8e2e-afe10cc90f53",
+        "controller": [
+            "did:cheqd:testnet:aed908f0-ddd5-47ac-8e2e-afe10cc90f53"
+        ],
+        "verificationMethod": [
+            {
+                "id": "did:cheqd:testnet:aed908f0-ddd5-47ac-8e2e-afe10cc90f53#key-1",
+                "verificationMethodType": "Ed25519VerificationKey2018",
+                "controller": "did:cheqd:testnet:aed908f0-ddd5-47ac-8e2e-afe10cc90f53",
+                "verificationMaterial": "ASnRWLMs3Me3VKjF42vedHVaK25ZETBypjWJj7ciRFzj"
+            }
+        ],
+        "authentication": [
+            "did:cheqd:testnet:aed908f0-ddd5-47ac-8e2e-afe10cc90f53#key-1"
+        ]
+    }
+}

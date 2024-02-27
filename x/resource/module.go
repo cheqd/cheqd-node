@@ -6,16 +6,17 @@ import (
 	"fmt"
 	"log"
 
+	"cosmossdk.io/core/appmodule"
 	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 
 	"github.com/cheqd/cheqd-node/x/resource/client/cli"
+	migrationV3 "github.com/cheqd/cheqd-node/x/resource/migration/v3"
 	"github.com/cheqd/cheqd-node/x/resource/types"
+	gwruntime "github.com/grpc-ecosystem/grpc-gateway/runtime"
 
-	"github.com/gorilla/mux"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
-	abci "github.com/tendermint/tendermint/abci/types"
+	abci "github.com/cometbft/cometbft/abci/types"
 
 	"github.com/cheqd/cheqd-node/x/resource/keeper"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -23,12 +24,24 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	porttypes "github.com/cosmos/ibc-go/v7/modules/core/05-port/types"
 )
 
+const ConsensusVersion = 3
+
 var (
-	_ module.AppModule      = AppModule{}
-	_ module.AppModuleBasic = AppModuleBasic{}
+	_ module.BeginBlockAppModule = AppModule{}
+	_ module.EndBlockAppModule   = AppModule{}
+	_ module.AppModuleBasic      = AppModuleBasic{}
+	_ porttypes.IBCModule        = IBCModule{}
+	_ appmodule.AppModule        = AppModule{}
 )
+
+// IsOnePerModuleType implements the depinject.OnePerModuleType interface.
+func (am AppModule) IsOnePerModuleType() {}
+
+// IsAppModule implements the appmodule.AppModule interface.
+func (am AppModule) IsAppModule() {}
 
 // ----------------------------------------------------------------------------
 // AppModuleBasic
@@ -46,10 +59,6 @@ func NewAppModuleBasic(cdc codec.Codec) AppModuleBasic {
 // Name returns the resource module's name.
 func (AppModuleBasic) Name() string {
 	return types.ModuleName
-}
-
-func (AppModuleBasic) RegisterCodec(cdc *codec.LegacyAmino) {
-	types.RegisterCodec(cdc)
 }
 
 func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
@@ -75,14 +84,9 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, config client.TxEncod
 	return genState.Validate()
 }
 
-// RegisterRESTRoutes registers the resource module's REST service handlers.
-func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Router) {
-	// rest.RegisterRoutes(clientCtx, rtr)
-}
-
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the module.
-func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *runtime.ServeMux) {
-	err := types.RegisterQueryHandlerClient(context.Background(), mux, types.NewQueryClient(clientCtx))
+func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, m *gwruntime.ServeMux) {
+	err := types.RegisterQueryHandlerClient(context.Background(), m, types.NewQueryClient(clientCtx))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -123,7 +127,7 @@ func NewAppModule(cdc codec.Codec, keeper keeper.Keeper, cheqdKeeper didkeeper.K
 // introduced by the module. To avoid wrong/empty versions, the initial version
 // should be set to 1.
 func (am AppModule) ConsensusVersion() uint64 {
-	return 2
+	return ConsensusVersion
 }
 
 // Name returns the resource module's name.
@@ -131,23 +135,16 @@ func (am AppModule) Name() string {
 	return am.AppModuleBasic.Name()
 }
 
-// Route returns the resource module's message routing key.
-func (am AppModule) Route() sdk.Route {
-	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper, am.didKeeper))
-}
-
-// QuerierRoute returns the resource module's query routing key.
-func (AppModule) QuerierRoute() string { return types.QuerierRoute }
-
-// LegacyQuerierHandler returns the resource module's Querier.
-func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
-	return keeper.NewQuerier(am.keeper, am.didKeeper, legacyQuerierCdc)
-}
-
 // RegisterServices registers a GRPC query service to respond to the
 // module-specific GRPC queries.
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterQueryServer(cfg.QueryServer(), keeper.NewQueryServer(am.keeper, am.didKeeper))
+	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper, am.didKeeper))
+	// Register for migration from consensus version 2 -> 3
+	migratorV3 := migrationV3.NewMigrator(am.keeper)
+	if err := cfg.RegisterMigration(types.ModuleName, 2, migratorV3.Migrate2to3); err != nil {
+		panic(err)
+	}
 }
 
 // RegisterInvariants registers the resource module's invariants.

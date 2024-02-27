@@ -16,7 +16,7 @@ ifeq (,$(VERSION))
 endif
 
 SDK_VERSION := $(shell go list -m github.com/cosmos/cosmos-sdk | sed 's:.* ::')
-TM_VERSION := $(shell go list -m github.com/tendermint/tendermint | sed 's:.* ::')
+TM_VERSION := $(shell go list -m github.com/cometbft/cometbft | sed 's:.* ::')
 
 LEDGER_ENABLED ?= true
 DB_BACKEND ?= goleveldb
@@ -103,7 +103,7 @@ ifeq ($(DB_BACKEND), badgerdb)
   ldflags += -X github.com/cosmos/cosmos-sdk/types.DBBackend=badgerdb
 endif
 
-ldflags += -X github.com/tendermint/tendermint/version.TMCoreSemVer=$(TM_VERSION)
+ldflags += -X github.com/cometbft/cometbft/version.TMCoreSemVer=$(TM_VERSION)
 
 ifeq ($(NO_STRIP),false)
   ldflags += -w -s
@@ -173,7 +173,7 @@ go-version:
 
 go.sum: go.mod
 	@echo "Ensuring app dependencies have not been modified..."
-	go mod verify
+	go mod verify 
 	go mod tidy
 
 verify:
@@ -200,11 +200,17 @@ generate:
 ###                             Lint / Format                               ###
 ###############################################################################
 
+
+golangci_version=v1.56.2
+
 lint:
-	golangci-lint run --out-format=tab
+	@echo "--> Running linter"
+	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(golangci_version)
+	golangci-lint run --out-format=tab --config .github/linters/.golangci.yaml
 
 lint-fix:
-	golangci-lint run --fix --out-format=tab --issues-exit-code=0
+	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(golangci_version)
+	golangci-lint run --config .github/linters/.golangci.yaml --fix --out-format=tab --issues-exit-code=0
 
 format_filter = -name '*.go' -type f \
 	-not -path '*.git*' \

@@ -7,6 +7,8 @@ import (
 	mathrand "math/rand"
 	"time"
 
+	"cosmossdk.io/math/unsafe"
+
 	"github.com/google/uuid"
 	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/mr-tron/base58"
@@ -16,7 +18,7 @@ import (
 func randBase58Seq(bytes int) string {
 	b := make([]byte, bytes)
 
-	_, err := mathrand.Read(b)
+	_, err := rand.Read(b)
 	if err != nil {
 		panic(err)
 	}
@@ -54,7 +56,7 @@ func ParseJSONToMap(jsonStr string) (map[string]any, error) {
 
 func GenerateDID(idtype IDType) string {
 	prefix := "did:cheqd:" + DidNamespace + ":"
-	mathrand.Seed(time.Now().UnixNano())
+	unsafe.Seed(time.Now().UnixNano())
 
 	switch idtype {
 	case Base58_16bytes:

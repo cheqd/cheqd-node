@@ -2,8 +2,9 @@ package cli
 
 import (
 	"os/exec"
+	"time"
 
-	"github.com/cosmos/cosmos-sdk/types/errors"
+	"cosmossdk.io/errors"
 )
 
 func Exec(args ...string) (string, error) {
@@ -12,6 +13,8 @@ func Exec(args ...string) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, string(out))
 	}
+
+	time.Sleep(2000 * time.Millisecond)
 
 	return string(out), err
 }

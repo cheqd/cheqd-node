@@ -4,6 +4,10 @@ on:
 defaults:
   run:
     shell: bash
+permissions:
+  contents: write
+  packages: read
+  checks: write
 
 
 jobs:

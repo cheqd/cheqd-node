@@ -19,6 +19,17 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState *types.GenesisState)
 
 	// set fee params
 	k.SetParams(ctx, *genState.FeeParams)
+
+	// set ibc port binding
+	k.SetPort(ctx, types.ResourcePortID)
+
+	// Bind Port claims the capability over the ResourcePortID
+	if !k.IsBound(ctx, types.ResourcePortID) {
+		err := k.BindPort(ctx, types.ResourcePortID)
+		if err != nil {
+			panic(fmt.Sprintf("could not claim port capability: %v", err))
+		}
+	}
 }
 
 // ExportGenesis returns the cheqd module's exported genesis.

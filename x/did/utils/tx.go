@@ -3,7 +3,7 @@ package utils
 import (
 	"fmt"
 
-	"github.com/tendermint/tendermint/types"
+	"github.com/cometbft/cometbft/types"
 )
 
 func GetTxHash(txBytes []byte) string {
