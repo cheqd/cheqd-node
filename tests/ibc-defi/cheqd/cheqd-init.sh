@@ -24,6 +24,7 @@ sed -i $SED_EXT 's|minimum-gas-prices = ""|minimum-gas-prices = "50ncheq"|g' "$H
 
 # shellcheck disable=SC2086
 sed -i $SED_EXT 's|laddr = "tcp://127.0.0.1:26657"|laddr = "tcp://0.0.0.0:26657"|g' "$HOME/.cheqdnode/config/config.toml"
+sed -i $SED_EXT 's|address = "localhost:9090"|address = "0.0.0.0:9090"|g' "$HOME/.cheqdnode/config/app.toml"
 
 # Genesis
 GENESIS="$HOME/.cheqdnode/config/genesis.json"

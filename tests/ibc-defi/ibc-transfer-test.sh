@@ -118,7 +118,7 @@ docker compose exec hermes hermes keys add --chain osmosis --mnemonic-file osmo_
 # docker compose exec hermes keys list --chain osmosis
 
 info "Open channel" # ---
-docker compose exec hermes hermes create channel --a-chain cheqd --b-chain osmosis --a-port transfer --b-port transfer --new-client-connection
+docker compose exec hermes hermes create channel --a-chain cheqd --b-chain osmosis --a-port transfer --b-port transfer --new-client-connection --yes
 
 info "Start hermes" # ---
 docker compose exec -d hermes hermes start
@@ -149,7 +149,7 @@ docker compose exec osmosis osmosisd query ibc-transfer denom-trace "$DENOM_CUT"
 info "Transfer osmosis -> cheqd" # ---
 PORT="transfer"
 CHANNEL="channel-0"
-docker compose exec osmosis osmosisd tx ibc-transfer transfer $PORT $CHANNEL "$CHEQD_USER_ADDRESS" 10000000000"${DENOM}" --from osmosis-user --chain-id osmosis --keyring-backend test -y
+docker compose exec osmosis osmosisd tx ibc-transfer transfer $PORT $CHANNEL "$CHEQD_USER_ADDRESS" 10000000000"${DENOM}" --from osmosis-user --chain-id osmosis --fees 500uosmo --keyring-backend test -y
 sleep 30 # Wait for relayer
 
 info "Get balances" # ---

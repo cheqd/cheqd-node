@@ -20,6 +20,7 @@ osmosisd init --chain-id "$CHAIN_ID" testing
 # Config
 sed -i $SED_EXT 's/"stake"/"uosmo"/' "$HOME/.osmosisd/config/genesis.json"
 sed -i $SED_EXT 's|laddr = "tcp://127.0.0.1:26657"|laddr = "tcp://0.0.0.0:26657"|g' "$HOME/.osmosisd/config/config.toml"
+sed -i $SED_EXT 's|address = "localhost:9090"|address = "0.0.0.0:9090"|g' "$HOME/.osmosisd/config/app.toml"
 
 osmosisd keys add osmosis-user --keyring-backend=test
 
