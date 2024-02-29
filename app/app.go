@@ -1054,6 +1054,12 @@ func (app *App) RegisterUpgradeHandlers() {
 		upgradeV2.UpgradeName,
 		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 			_, err := ibctmmigrations.PruneExpiredConsensusStates(ctx, app.appCodec, app.IBCKeeper.ClientKeeper)
+
+			// explicitly update the IBC 02-client params, adding the localhost client type
+			params := app.IBCKeeper.ClientKeeper.GetParams(ctx)
+			params.AllowedClients = append(params.AllowedClients, ibcexported.Localhost)
+			app.IBCKeeper.ClientKeeper.SetParams(ctx, params)
+
 			if err != nil {
 				return nil, err
 			}
