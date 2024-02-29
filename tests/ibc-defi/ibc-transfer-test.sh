@@ -114,9 +114,6 @@ docker compose cp osmo_relayer_mnemonic.txt hermes:/home/hermes
 docker compose exec hermes hermes keys add --chain cheqd --mnemonic-file cheqd_relayer_mnemonic.txt --key-name cheqd-key
 docker compose exec hermes hermes keys add --chain osmosis --mnemonic-file osmo_relayer_mnemonic.txt --key-name osmosis-key
 
-# docker compose exec hermes keys list --chain cheqd
-# docker compose exec hermes keys list --chain osmosis
-
 info "Open channel" # ---
 docker compose exec hermes hermes create channel --a-chain cheqd --b-chain osmosis --a-port transfer --b-port transfer --new-client-connection --yes
 
