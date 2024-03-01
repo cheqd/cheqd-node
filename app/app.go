@@ -1053,8 +1053,10 @@ func (app *App) RegisterUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(
 		upgradeV2.UpgradeName,
 		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			// IBC v6 - v7 upgrade
 			_, err := ibctmmigrations.PruneExpiredConsensusStates(ctx, app.appCodec, app.IBCKeeper.ClientKeeper)
 
+			// IBC v7 - v7.3 upgrade
 			// explicitly update the IBC 02-client params, adding the localhost client type
 			params := app.IBCKeeper.ClientKeeper.GetParams(ctx)
 			params.AllowedClients = append(params.AllowedClients, ibcexported.Localhost)
