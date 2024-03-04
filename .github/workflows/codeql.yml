@@ -24,7 +24,7 @@ jobs:
 
     steps:             
       - name: Setup CodeQL
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v3
         with:
           languages: 'go'
           queries: security-and-quality
@@ -41,4 +41,4 @@ jobs:
         run: make proto-gen build
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v3
