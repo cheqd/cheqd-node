@@ -24,6 +24,7 @@ import (
 	tmjson "github.com/cometbft/cometbft/libs/json"
 	"github.com/cometbft/cometbft/libs/log"
 	tmos "github.com/cometbft/cometbft/libs/os"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -1062,6 +1063,17 @@ func (app *App) RegisterUpgradeHandlers() {
 			params.AllowedClients = append(params.AllowedClients, ibcexported.Localhost)
 			app.IBCKeeper.ClientKeeper.SetParams(ctx, params)
 
+			consensusParams, err := app.ConsensusParamsKeeper.Get(ctx)
+			if err != nil {
+				return nil, err
+			}
+
+			// Hack to fix state-sync issue
+			consensusParams.Version = &tmproto.VersionParams{App: 2}
+
+			app.ConsensusParamsKeeper.Set(ctx, consensusParams)
+			updatedVersion, err := app.ConsensusParamsKeeper.Get(ctx)
+			fmt.Println(">>>>>>>>>>>>>>>>>>> new version ", updatedVersion, err)
 			if err != nil {
 				return nil, err
 			}
@@ -1069,7 +1081,9 @@ func (app *App) RegisterUpgradeHandlers() {
 			// Migrate Tendermint consensus parameters from x/params module to a
 			// dedicated x/consensus module.
 			baseapp.MigrateParams(ctx, baseAppLegacySS, &app.ConsensusParamsKeeper)
-			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
+			migrations, err := app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
+
+			return migrations, err
 		},
 	)
 }
