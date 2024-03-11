@@ -24,6 +24,7 @@ import (
 	tmjson "github.com/cometbft/cometbft/libs/json"
 	"github.com/cometbft/cometbft/libs/log"
 	tmos "github.com/cometbft/cometbft/libs/os"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -1055,12 +1056,24 @@ func (app *App) RegisterUpgradeHandlers() {
 		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 			// IBC v6 - v7 upgrade
 			_, err := ibctmmigrations.PruneExpiredConsensusStates(ctx, app.appCodec, app.IBCKeeper.ClientKeeper)
-
+			if err != nil {
+				return nil, err
+			}
 			// IBC v7 - v7.3 upgrade
 			// explicitly update the IBC 02-client params, adding the localhost client type
 			params := app.IBCKeeper.ClientKeeper.GetParams(ctx)
 			params.AllowedClients = append(params.AllowedClients, ibcexported.Localhost)
 			app.IBCKeeper.ClientKeeper.SetParams(ctx, params)
+
+			// this should be before updating the version in consensus params
+			baseapp.MigrateParams(ctx, baseAppLegacySS, &app.ConsensusParamsKeeper)
+			consensusParams, err := app.ConsensusParamsKeeper.Get(ctx)
+			if err != nil {
+				return nil, err
+			}
+
+			// Hack to fix state-sync issue
+			consensusParams.Version = &tmproto.VersionParams{App: 2}
 
 			if err != nil {
 				return nil, err
@@ -1068,8 +1081,10 @@ func (app *App) RegisterUpgradeHandlers() {
 			ctx.Logger().Info("Handler for upgrade plan: " + upgradeV2.UpgradeName)
 			// Migrate Tendermint consensus parameters from x/params module to a
 			// dedicated x/consensus module.
-			baseapp.MigrateParams(ctx, baseAppLegacySS, &app.ConsensusParamsKeeper)
-			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
+
+			migrations, err := app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
+			app.ConsensusParamsKeeper.Set(ctx, consensusParams)
+			return migrations, err
 		},
 	)
 }
