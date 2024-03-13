@@ -1,0 +1,24 @@
+{
+    "payload": {
+        "resource": {
+            "data": "eyAibWVzc2FnZSI6ICJoZWxsbyB3b3JsZCJ9"
+        },
+        "metadata": {
+            "collectionId": "L7d4i5DiFkBMUfKgAav5tC",
+            "id": "b1c9406d-568c-4a41-9ed3-133fdf3e4974",
+            "name": "Indy Ed25519VerificationKey2018",
+            "version": "",
+            "resourceType": "TestResourceType",
+            "alsoKnownAs": [
+                {
+                    "uri": "did:cheqd:testnet:L7d4i5DiFkBMUfKgAav5tC/resources/b1c9406d-568c-4a41-9ed3-133fdf3e4974",
+                    "description": "did-url"
+                }
+            ],
+            "mediaType": "application/json",
+            "checksum": "c841412ff85f5ab522efb9251d3c9a9975769a8f1c439d45bdc5d32a71b73f9c",
+            "previousVersionId": "",
+            "nextVersionId": ""
+        }
+    }
+}

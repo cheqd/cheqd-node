@@ -107,9 +107,11 @@ var _ = Describe("cheqd cli - negative did", func() {
 
 		//   c. missing payload, account
 		_, err = cli.CreateDidDoc(tmpDir, didcli.DIDDocument{}, signInputs2, "", "", helpers.GenerateFees(feeParams.CreateDid.String()))
+		Expect(err).ToNot(BeNil())
 
 		//   d. missing sign inputs, account
 		_, err = cli.CreateDidDoc(tmpDir, payload2, []didcli.SignInput{}, "", "", helpers.GenerateFees(feeParams.CreateDid.String()))
+		Expect(err).ToNot(BeNil())
 
 		//   e. missing payload
 		_, err = cli.CreateDidDoc(tmpDir, didcli.DIDDocument{}, signInputs2, "", testdata.BASE_ACCOUNT_2, helpers.GenerateFees(feeParams.CreateDid.String()))
@@ -145,6 +147,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 				PrivKey:              privKey,
 			},
 		}, "", testdata.BASE_ACCOUNT_2, helpers.GenerateFees(feeParams.CreateDid.String()))
+		Expect(err).ToNot(BeNil())
 
 		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.Purple, "cannot create diddoc with non-supported VM type"))
 		// Fail to create a new DID Doc with non-supported VM type

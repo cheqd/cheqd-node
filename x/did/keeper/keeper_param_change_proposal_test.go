@@ -1,11 +1,10 @@
 package keeper_test
 
 import (
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/stretchr/testify/suite"
 
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
-
-	cheqdsimapp "github.com/cheqd/cheqd-node/simapp"
+	cheqdapp "github.com/cheqd/cheqd-node/app"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
@@ -19,14 +18,14 @@ import (
 type HandlerTestSuite struct {
 	suite.Suite
 
-	app        *cheqdsimapp.SimApp
+	app        *cheqdapp.TestApp
 	ctx        sdk.Context
 	govHandler govv1beta1.Handler
 }
 
 func (suite *HandlerTestSuite) SetupTest() error {
 	var err error
-	suite.app, err = cheqdsimapp.Setup(false)
+	suite.app, err = cheqdapp.Setup(false)
 	if err != nil {
 		return err
 	}

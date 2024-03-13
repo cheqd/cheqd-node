@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/cheqd/cheqd-node/x/resource/types"
+	tmcli "github.com/cometbft/cometbft/libs/cli"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/spf13/cobra"
-	tmcli "github.com/tendermint/tendermint/libs/cli"
 )
 
 // AddTxFlagsToCmd adds common flags to a module tx command.

@@ -8,7 +8,7 @@ func GenerateFees(amount string) []string {
 	return []string{
 		"--fees", amount,
 		"--gas", "auto",
-		"--gas-adjustment", "1.8",
+		"--gas-adjustment", "2.5",
 	}
 }
 

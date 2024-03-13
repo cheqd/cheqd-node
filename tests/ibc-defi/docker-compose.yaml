@@ -14,7 +14,7 @@ services:
     entrypoint: tail -f /dev/null
 
   osmosis:
-    image: osmolabs/osmosis:13-alpine
+    image: osmolabs/osmosis:23.0.1-alpine
     ports:
       - "26666:26656" # p2p
       - "26667:26657" # rpc
@@ -23,7 +23,7 @@ services:
     entrypoint: tail -f /dev/null
 
   hermes:
-    image: informalsystems/hermes:1.2.0
+    image: informalsystems/hermes:v1.8.0
     configs:
       - source: hermes-config
         target: /home/hermes/.hermes/config.toml

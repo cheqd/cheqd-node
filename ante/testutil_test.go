@@ -4,11 +4,10 @@ import (
 	"errors"
 	"fmt"
 
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/stretchr/testify/suite"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	cheqdapp "github.com/cheqd/cheqd-node/app"
-	"github.com/cheqd/cheqd-node/simapp"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 
@@ -34,7 +33,7 @@ type TestAccount struct {
 type AnteTestSuite struct {
 	suite.Suite
 
-	app         *simapp.SimApp
+	app         *cheqdapp.TestApp
 	anteHandler sdk.AnteHandler
 	ctx         sdk.Context
 	clientCtx   client.Context
@@ -42,13 +41,16 @@ type AnteTestSuite struct {
 }
 
 // returns context and app with params set on account keeper
-func createTestApp(isCheckTx bool) (*simapp.SimApp, sdk.Context, error) {
-	app, err := simapp.Setup(isCheckTx)
+func createTestApp(isCheckTx bool) (*cheqdapp.TestApp, sdk.Context, error) {
+	app, err := cheqdapp.Setup(isCheckTx)
 	if err != nil {
 		return nil, sdk.Context{}, err
 	}
 	ctx := app.BaseApp.NewContext(isCheckTx, tmproto.Header{})
-	app.AccountKeeper.SetParams(ctx, authtypes.DefaultParams())
+	err = app.AccountKeeper.SetParams(ctx, authtypes.DefaultParams())
+	if err != nil {
+		return nil, sdk.Context{}, err
+	}
 
 	// cheqd specific params
 	didFeeParams := didtypes.DefaultGenesis().FeeParams
@@ -76,8 +78,8 @@ func (s *AnteTestSuite) SetupTest(isCheckTx bool) error {
 	s.clientCtx = client.Context{}.
 		WithTxConfig(encodingConfig.TxConfig)
 
-	anteHandler, err := simapp.NewAnteHandler(
-		simapp.HandlerOptions{
+	anteHandler, err := cheqdapp.NewAnteHandler(
+		cheqdapp.HandlerOptions{
 			AccountKeeper:   s.app.AccountKeeper,
 			BankKeeper:      s.app.BankKeeper,
 			FeegrantKeeper:  s.app.FeeGrantKeeper,
@@ -85,6 +87,7 @@ func (s *AnteTestSuite) SetupTest(isCheckTx bool) error {
 			ResourceKeeper:  s.app.ResourceKeeper,
 			SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 			SigGasConsumer:  sdkante.DefaultSigVerificationGasConsumer,
+			IBCKeeper:       s.app.IBCKeeper,
 		},
 	)
 	if err != nil {

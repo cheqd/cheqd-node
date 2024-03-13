@@ -37,7 +37,7 @@ port = 3001
 id = 'cheqd'
 rpc_addr = 'http://cheqd:26657'
 grpc_addr = 'http://cheqd:9090'
-websocket_addr = 'ws://cheqd:26657/websocket'
+event_source = { mode = 'push', url = 'ws://cheqd:26657/websocket', batch_delay = '500ms' }
 rpc_timeout = '10s'
 account_prefix = 'cheqd'
 key_name = 'cheqd-key'
@@ -58,14 +58,14 @@ trust_threshold = { numerator = '1', denominator = '3' }
 id = 'osmosis'
 rpc_addr = 'http://osmosis:26657'
 grpc_addr = 'http://osmosis:9090'
-websocket_addr = 'ws://osmosis:26657/websocket'
+event_source = { mode = 'push', url = 'ws://osmosis:26657/websocket', batch_delay = '500ms' }
 rpc_timeout = '10s'
 account_prefix = 'osmo'
 key_name = 'osmosis-key'
 store_prefix = 'ibc'
 default_gas = 100000
 max_gas = 400000
-gas_price = { price = 0, denom = 'uosmo' }
+gas_price = { price = 1, denom = 'uosmo' }
 gas_multiplier = 1.3
 max_msg_num = 30
 max_tx_size = 2097152
