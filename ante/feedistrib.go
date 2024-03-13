@@ -1,6 +1,7 @@
 package ante
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -22,7 +23,7 @@ func GetDistributionFee(ctx sdk.Context, fee sdk.Coins, burnFeePortion sdk.Coins
 	}
 
 	if ValidateDistributionFee(fee, distrFeeAlloc) != nil {
-		return distrFeeAlloc, sdkerrors.Wrap(sdkerrors.ErrLogic, "fee distribution is invalid")
+		return distrFeeAlloc, errorsmod.Wrap(sdkerrors.ErrLogic, "fee distribution is invalid")
 	}
 
 	return distrFeeAlloc, nil
@@ -40,11 +41,11 @@ func SumDistributionFee(distrFeeAlloc DistributionFeeAllocation) sdk.Coins {
 
 func ValidateDistributionFee(fee sdk.Coins, distrFeeAlloc DistributionFeeAllocation) error {
 	if fee.IsZero() {
-		return sdkerrors.Wrap(sdkerrors.ErrInsufficientFee, "fee cannot be zero")
+		return errorsmod.Wrap(sdkerrors.ErrInsufficientFee, "fee cannot be zero")
 	}
 
 	if !fee.IsEqual(SumDistributionFee(distrFeeAlloc)) {
-		return sdkerrors.Wrap(sdkerrors.ErrLogic, "fee distribution is invalid")
+		return errorsmod.Wrap(sdkerrors.ErrLogic, "fee distribution is invalid")
 	}
 
 	return nil

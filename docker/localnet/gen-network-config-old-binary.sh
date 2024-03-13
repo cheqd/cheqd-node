@@ -7,7 +7,7 @@ set -euo pipefail
 # sed in MacOS requires extra argument
 if [[ "$OSTYPE" == "darwin"* ]]; then
   SED_EXT='.orig'
-else 
+else
   SED_EXT=''
 fi
 
@@ -139,7 +139,7 @@ function configure_genesis() {
     mv "${GENESIS_TMP}" "${GENESIS}"
 
   # supplied added tokens
-  jq '.app_state.bank.supply += [{"denom": "ncheq", "amount": "420004000000000200"}]' "$GENESIS" > "$GENESIS_TMP" && mv "${GENESIS_TMP}" "${GENESIS}"
+  # jq '.app_state.bank.supply += [{"denom": "ncheq", "amount": "420004000000000200"}]' "$GENESIS" > "$GENESIS_TMP" && mv "${GENESIS_TMP}" "${GENESIS}"
 }
 
 
@@ -196,11 +196,11 @@ do
 
   cheqd-noded keys add "operator-$i" --keyring-backend "test" --home "${NODE_HOME}"
   cheqd-noded keys list --keyring-backend "test" --home "${NODE_HOME}"
-  cheqd-noded genesis add-genesis-account "operator-$i" 20000000000000000ncheq --keyring-backend "test" --home "${NODE_HOME}"
+  cheqd-noded add-genesis-account "operator-$i" 20000000000000000ncheq --keyring-backend "test" --home "${NODE_HOME}"
 
   NODE_ID=$(cheqd-noded tendermint show-node-id --home "${NODE_HOME}")
   NODE_VAL_PUBKEY=$(cheqd-noded tendermint show-validator --home "${NODE_HOME}")
-  cheqd-noded genesis gentx "operator-$i" 1000000000000000ncheq --chain-id "${CHAIN_ID}" --node-id "${NODE_ID}" \
+  cheqd-noded gentx "operator-$i" 1000000000000000ncheq --chain-id "${CHAIN_ID}" --node-id "${NODE_ID}" \
     --pubkey "${NODE_VAL_PUBKEY}" --keyring-backend "test"  --home "${NODE_HOME}"
 
   cp "${NODE_HOME}/config/genesis.json" "${TMP_NODE_HOME}/config/genesis.json"
@@ -209,8 +209,8 @@ done
 
 
 echo "Collecting gentxs"
-cheqd-noded genesis collect-gentxs --home "${TMP_NODE_HOME}"
-cheqd-noded genesis validate-genesis --home "${TMP_NODE_HOME}"
+cheqd-noded collect-gentxs --home "${TMP_NODE_HOME}"
+cheqd-noded validate-genesis --home "${TMP_NODE_HOME}"
 
 # Distribute final genesis
 for ((i=0 ; i<VALIDATORS_COUNT ; i++))

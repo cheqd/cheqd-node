@@ -1,4 +1,4 @@
-package simapp
+package app
 
 import (
 	"bytes"
@@ -10,43 +10,43 @@ import (
 	"strconv"
 	"time"
 
-	abci "github.com/tendermint/tendermint/abci/types"
-	tmjson "github.com/tendermint/tendermint/libs/json"
-	"github.com/tendermint/tendermint/libs/log"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
-	tmtypes "github.com/tendermint/tendermint/types"
-	dbm "github.com/tendermint/tm-db"
+	dbm "github.com/cometbft/cometbft-db"
+	abci "github.com/cometbft/cometbft/abci/types"
+	tmjson "github.com/cometbft/cometbft/libs/json"
+	"github.com/cometbft/cometbft/libs/log"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	tmtypes "github.com/cometbft/cometbft/types"
 
+	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
-	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
-	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/server/types"
-	sdksimapp "github.com/cosmos/cosmos-sdk/simapp"
-	"github.com/cosmos/cosmos-sdk/simapp/helpers"
-	"github.com/cosmos/cosmos-sdk/simapp/params"
 	"github.com/cosmos/cosmos-sdk/testutil/mock"
+	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/errors"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
+	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	// cheqd specific imports
-	cheqdapp "github.com/cheqd/cheqd-node/app"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
-	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 )
+
+type TestApp struct {
+	App
+}
 
 // DefaultConsensusParams defines the default Tendermint consensus params used in
 // SimApp testing.
-var DefaultConsensusParams = &abci.ConsensusParams{
-	Block: &abci.BlockParams{
+var DefaultConsensusParams = &tmproto.ConsensusParams{
+	Block: &tmproto.BlockParams{
 		MaxBytes: 200000,
 		MaxGas:   2000000,
 	},
@@ -69,22 +69,22 @@ type SetupOptions struct {
 	InvCheckPeriod     uint
 	HomePath           string
 	SkipUpgradeHeights map[int64]bool
-	EncConfig          params.EncodingConfig
+	EncConfig          moduletestutil.TestEncodingConfig
 	AppOpts            types.AppOptions
 }
 
-func setup(withGenesis bool, invCheckPeriod uint) (*SimApp, cheqdapp.GenesisState) {
+func setup(withGenesis bool, invCheckPeriod uint) (*TestApp, GenesisState) {
 	db := dbm.NewMemDB()
-	encCdc := sdksimapp.MakeTestEncodingConfig()
-	app := NewSimApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, invCheckPeriod, encCdc, EmptyAppOptions{})
+	encCdc := moduletestutil.MakeTestEncodingConfig()
+	app := New(log.NewNopLogger(), db, nil, true, EmptyAppOptions{})
 	if withGenesis {
-		return app, cheqdapp.NewDefaultGenesisState(encCdc.Codec)
+		return &TestApp{App: *app}, NewDefaultGenesisState(encCdc.Codec)
 	}
-	return app, cheqdapp.GenesisState{}
+	return &TestApp{*app}, GenesisState{}
 }
 
 // NewSimappWithCustomOptions initializes a new SimApp with custom options.
-func NewSimappWithCustomOptions(isCheckTx bool, options SetupOptions) (*SimApp, error) {
+func NewSimappWithCustomOptions(isCheckTx bool, options SetupOptions) (*TestApp, error) {
 	privVal := mock.NewPV()
 	pubKey, err := privVal.GetPubKey()
 	if err != nil {
@@ -102,9 +102,9 @@ func NewSimappWithCustomOptions(isCheckTx bool, options SetupOptions) (*SimApp, 
 		Coins:   sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100000000000000))),
 	}
 
-	app := NewSimApp(options.Logger, options.DB, nil, true, options.SkipUpgradeHeights, options.HomePath, options.InvCheckPeriod, options.EncConfig, options.AppOpts)
-	genesisState := cheqdapp.NewDefaultGenesisState(app.appCodec)
-	genesisState, err = genesisStateWithValSet(app, genesisState, valSet, []authtypes.GenesisAccount{acc}, balance)
+	app := New(options.Logger, options.DB, nil, true, options.AppOpts)
+	genesisState := NewDefaultGenesisState(app.appCodec)
+	genesisState, err = simtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, []authtypes.GenesisAccount{acc}, balance)
 	if err != nil {
 		return nil, err
 	}
@@ -126,11 +126,11 @@ func NewSimappWithCustomOptions(isCheckTx bool, options SetupOptions) (*SimApp, 
 		)
 	}
 
-	return app, nil
+	return &TestApp{*app}, nil
 }
 
 // Setup initializes a new SimApp. A Nop logger is set in SimApp.
-func Setup(isCheckTx bool) (*SimApp, error) {
+func Setup(isCheckTx bool) (*TestApp, error) {
 	privVal := mock.NewPV()
 	pubKey, err := privVal.GetPubKey()
 	if err != nil {
@@ -158,7 +158,7 @@ func Setup(isCheckTx bool) (*SimApp, error) {
 }
 
 // Setup initializes a new SimApp. A Nop logger is set in SimApp.
-func SetupTest(isCheckTx bool) (*SimApp, error) {
+func SetupTest(isCheckTx bool) (*TestApp, error) {
 	privVal := mock.NewPV()
 	pubKey, err := privVal.GetPubKey()
 	if err != nil {
@@ -184,89 +184,89 @@ func SetupTest(isCheckTx bool) (*SimApp, error) {
 	return app, nil
 }
 
-func genesisStateWithValSet(
-	app *SimApp, genesisState cheqdapp.GenesisState,
-	valSet *tmtypes.ValidatorSet, genAccs []authtypes.GenesisAccount,
-	balances ...banktypes.Balance,
-) (cheqdapp.GenesisState, error) {
-	// set genesis accounts
-	authGenesis := authtypes.NewGenesisState(authtypes.DefaultParams(), genAccs)
-	genesisState[authtypes.ModuleName] = app.AppCodec().MustMarshalJSON(authGenesis)
+// func genesisStateWithValSet(
+// 	app *TestApp, genesisState GenesisState,
+// 	valSet *tmtypes.ValidatorSet, genAccs []authtypes.GenesisAccount,
+// 	balances ...banktypes.Balance,
+// ) (GenesisState, error) {
+// 	// set genesis accounts
+// 	authGenesis := authtypes.NewGenesisState(authtypes.DefaultParams(), genAccs)
+// 	genesisState[authtypes.ModuleName] = app.AppCodec().MustMarshalJSON(authGenesis)
 
-	validators := make([]stakingtypes.Validator, 0, len(valSet.Validators))
-	delegations := make([]stakingtypes.Delegation, 0, len(valSet.Validators))
+// 	validators := make([]stakingtypes.Validator, 0, len(valSet.Validators))
+// 	delegations := make([]stakingtypes.Delegation, 0, len(valSet.Validators))
 
-	bondAmt := sdk.DefaultPowerReduction
+// 	bondAmt := sdk.DefaultPowerReduction
 
-	for _, val := range valSet.Validators {
-		pk, err := cryptocodec.FromTmPubKeyInterface(val.PubKey)
-		if err != nil {
-			return nil, err
-		}
-		pkAny, err := codectypes.NewAnyWithValue(pk)
-		if err != nil {
-			return nil, err
-		}
-		validator := stakingtypes.Validator{
-			OperatorAddress:   sdk.ValAddress(val.Address).String(),
-			ConsensusPubkey:   pkAny,
-			Jailed:            false,
-			Status:            stakingtypes.Bonded,
-			Tokens:            bondAmt,
-			DelegatorShares:   sdk.OneDec(),
-			Description:       stakingtypes.Description{},
-			UnbondingHeight:   int64(0),
-			UnbondingTime:     time.Unix(0, 0).UTC(),
-			Commission:        stakingtypes.NewCommission(sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec()),
-			MinSelfDelegation: sdk.ZeroInt(),
-		}
-		validators = append(validators, validator)
-		delegations = append(delegations, stakingtypes.NewDelegation(genAccs[0].GetAddress(), val.Address.Bytes(), sdk.OneDec()))
+// 	for _, val := range valSet.Validators {
+// 		pk, err := cryptocodec.FromTmPubKeyInterface(val.PubKey)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		pkAny, err := codectypes.NewAnyWithValue(pk)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		validator := stakingtypes.Validator{
+// 			OperatorAddress:   sdk.ValAddress(val.Address).String(),
+// 			ConsensusPubkey:   pkAny,
+// 			Jailed:            false,
+// 			Status:            stakingtypes.Bonded,
+// 			Tokens:            bondAmt,
+// 			DelegatorShares:   sdk.OneDec(),
+// 			Description:       stakingtypes.Description{},
+// 			UnbondingHeight:   int64(0),
+// 			UnbondingTime:     time.Unix(0, 0).UTC(),
+// 			Commission:        stakingtypes.NewCommission(sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec()),
+// 			MinSelfDelegation: sdk.ZeroInt(),
+// 		}
+// 		validators = append(validators, validator)
+// 		delegations = append(delegations, stakingtypes.NewDelegation(genAccs[0].GetAddress(), val.Address.Bytes(), sdk.OneDec()))
 
-	}
-	// set validators and delegations
-	stakingGenesis := stakingtypes.NewGenesisState(stakingtypes.DefaultParams(), validators, delegations)
-	genesisState[stakingtypes.ModuleName] = app.AppCodec().MustMarshalJSON(stakingGenesis)
+// 	}
+// 	// set validators and delegations
+// 	stakingGenesis := stakingtypes.NewGenesisState(stakingtypes.DefaultParams(), validators, delegations)
+// 	genesisState[stakingtypes.ModuleName] = app.AppCodec().MustMarshalJSON(stakingGenesis)
 
-	totalSupply := sdk.NewCoins()
-	for _, b := range balances {
-		// add genesis acc tokens to total supply
-		totalSupply = totalSupply.Add(b.Coins...)
-	}
+// 	totalSupply := sdk.NewCoins()
+// 	for _, b := range balances {
+// 		// add genesis acc tokens to total supply
+// 		totalSupply = totalSupply.Add(b.Coins...)
+// 	}
 
-	for range delegations {
-		// add delegated tokens to total supply
-		totalSupply = totalSupply.Add(sdk.NewCoin(sdk.DefaultBondDenom, bondAmt))
-	}
+// 	for range delegations {
+// 		// add delegated tokens to total supply
+// 		totalSupply = totalSupply.Add(sdk.NewCoin(sdk.DefaultBondDenom, bondAmt))
+// 	}
 
-	// add bonded amount to bonded pool module account
-	balances = append(balances, banktypes.Balance{
-		Address: authtypes.NewModuleAddress(stakingtypes.BondedPoolName).String(),
-		Coins:   sdk.Coins{sdk.NewCoin(sdk.DefaultBondDenom, bondAmt)},
-	})
+// 	// add bonded amount to bonded pool module account
+// 	balances = append(balances, banktypes.Balance{
+// 		Address: authtypes.NewModuleAddress(stakingtypes.BondedPoolName).String(),
+// 		Coins:   sdk.Coins{sdk.NewCoin(sdk.DefaultBondDenom, bondAmt)},
+// 	})
 
-	// update total supply
-	bankGenesis := banktypes.NewGenesisState(banktypes.DefaultGenesisState().Params, balances, totalSupply, []banktypes.Metadata{})
-	genesisState[banktypes.ModuleName] = app.AppCodec().MustMarshalJSON(bankGenesis)
+// 	// update total supply
+// 	bankGenesis := banktypes.NewGenesisState(banktypes.DefaultGenesisState().Params, balances, totalSupply, []banktypes.Metadata{}, []banktypes.SendEnabled{})
+// 	genesisState[banktypes.ModuleName] = app.AppCodec().MustMarshalJSON(bankGenesis)
 
-	// set did module genesis state
-	didGenesis := didtypes.DefaultGenesis()
-	genesisState[didtypes.ModuleName] = app.AppCodec().MustMarshalJSON(didGenesis)
+// 	// set did module genesis state
+// 	didGenesis := didtypes.DefaultGenesis()
+// 	genesisState[didtypes.ModuleName] = app.AppCodec().MustMarshalJSON(didGenesis)
 
-	// set resource module genesis state
-	resourceGenesis := resourcetypes.DefaultGenesis()
-	genesisState[resourcetypes.ModuleName] = app.AppCodec().MustMarshalJSON(resourceGenesis)
+// 	// set resource module genesis state
+// 	resourceGenesis := resourcetypes.DefaultGenesis()
+// 	genesisState[resourcetypes.ModuleName] = app.AppCodec().MustMarshalJSON(resourceGenesis)
 
-	return genesisState, nil
-}
+// 	return genesisState, nil
+// }
 
 // SetupWithGenesisValSet initializes a new SimApp with a validator set and genesis accounts
 // that also act as delegators. For simplicity, each validator is bonded with a delegation
 // of one consensus engine unit in the default token of the simapp from first genesis
 // account. A Nop logger is set in SimApp.
-func SetupWithGenesisValSet(valSet *tmtypes.ValidatorSet, genAccs []authtypes.GenesisAccount, balances ...banktypes.Balance) (*SimApp, error) {
+func SetupWithGenesisValSet(valSet *tmtypes.ValidatorSet, genAccs []authtypes.GenesisAccount, balances ...banktypes.Balance) (*TestApp, error) {
 	app, genesisState := setup(true, 5)
-	genesisState, err := genesisStateWithValSet(app, genesisState, valSet, genAccs, balances...)
+	genesisState, err := simtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, genAccs, balances...)
 	if err != nil {
 		return nil, err
 	}
@@ -299,7 +299,7 @@ func SetupWithGenesisValSet(valSet *tmtypes.ValidatorSet, genAccs []authtypes.Ge
 
 // SetupWithGenesisAccounts initializes a new SimApp with the provided genesis
 // accounts and possible balances.
-func SetupWithGenesisAccounts(genAccs []authtypes.GenesisAccount, balances ...banktypes.Balance) (*SimApp, error) {
+func SetupWithGenesisAccounts(genAccs []authtypes.GenesisAccount, balances ...banktypes.Balance) (*TestApp, error) {
 	privVal := mock.NewPV()
 	pubKey, err := privVal.GetPubKey()
 	if err != nil {
@@ -315,7 +315,7 @@ func SetupWithGenesisAccounts(genAccs []authtypes.GenesisAccount, balances ...ba
 
 // GenesisStateWithSingleValidator initializes GenesisState with a single validator and genesis accounts
 // that also act as delegators.
-func GenesisStateWithSingleValidator(app *SimApp) (cheqdapp.GenesisState, error) {
+func GenesisStateWithSingleValidator(app *TestApp) (GenesisState, error) {
 	privVal := mock.NewPV()
 	pubKey, err := privVal.GetPubKey()
 	if err != nil {
@@ -336,8 +336,8 @@ func GenesisStateWithSingleValidator(app *SimApp) (cheqdapp.GenesisState, error)
 		},
 	}
 
-	genesisState := cheqdapp.NewDefaultGenesisState(app.appCodec)
-	genesisState, err = genesisStateWithValSet(app, genesisState, valSet, []authtypes.GenesisAccount{acc}, balances...)
+	genesisState := NewDefaultGenesisState(app.appCodec)
+	genesisState, err = simtestutil.GenesisStateWithValSet(app.AppCodec(), genesisState, valSet, []authtypes.GenesisAccount{acc}, balances...)
 	if err != nil {
 		return nil, err
 	}
@@ -346,7 +346,7 @@ func GenesisStateWithSingleValidator(app *SimApp) (cheqdapp.GenesisState, error)
 }
 
 // CheckBalance checks the balance of an account.
-func CheckBalance(app *SimApp, addr sdk.AccAddress, balances sdk.Coins) {
+func CheckBalance(app *TestApp, addr sdk.AccAddress, balances sdk.Coins) {
 	ctxCheck := app.BaseApp.NewContext(true, tmproto.Header{})
 	if reflect.DeepEqual(balances, app.BankKeeper.GetAllBalances(ctxCheck, addr)) {
 		panic("Invalid balance of account")
@@ -361,12 +361,12 @@ func SignCheckDeliver(
 	txCfg client.TxConfig, app *bam.BaseApp, header tmproto.Header, msgs []sdk.Msg,
 	chainID string, accNums, accSeqs []uint64, expSimPass, expPass bool, priv ...cryptotypes.PrivKey,
 ) (sdk.GasInfo, *sdk.Result, error) {
-	tx, err := helpers.GenSignedMockTx(
+	tx, err := simtestutil.GenSignedMockTx(
 		rand.New(rand.NewSource(time.Now().UnixNano())),
 		txCfg,
 		msgs,
 		sdk.Coins{sdk.NewInt64Coin(sdk.DefaultBondDenom, 0)},
-		helpers.DefaultGenTxGas,
+		simtestutil.DefaultGenTxGas,
 		chainID,
 		accNums,
 		accSeqs,
@@ -449,7 +449,7 @@ func createIncrementalAccounts(accNum int) []sdk.AccAddress {
 }
 
 // AddTestAddrsFromPubKeys adds the addresses into the SimApp providing only the public keys.
-func AddTestAddrsFromPubKeys(app *SimApp, ctx sdk.Context, pubKeys []cryptotypes.PubKey, accAmt sdkmath.Int) {
+func AddTestAddrsFromPubKeys(app *TestApp, ctx sdk.Context, pubKeys []cryptotypes.PubKey, accAmt sdkmath.Int) {
 	initCoins := sdk.NewCoins(sdk.NewCoin(app.StakingKeeper.BondDenom(ctx), accAmt))
 
 	for _, pk := range pubKeys {
@@ -459,17 +459,17 @@ func AddTestAddrsFromPubKeys(app *SimApp, ctx sdk.Context, pubKeys []cryptotypes
 
 // AddTestAddrs constructs and returns accNum amount of accounts with an
 // initial balance of accAmt in random order
-func AddTestAddrs(app *SimApp, ctx sdk.Context, accNum int, accAmt sdkmath.Int) []sdk.AccAddress {
+func AddTestAddrs(app *TestApp, ctx sdk.Context, accNum int, accAmt sdkmath.Int) []sdk.AccAddress {
 	return addTestAddrs(app, ctx, accNum, accAmt, createRandomAccounts)
 }
 
 // AddTestAddrsIncremental constructs and returns accNum amount of accounts with an
 // initial balance of accAmt in random order
-func AddTestAddrsIncremental(app *SimApp, ctx sdk.Context, accNum int, accAmt sdkmath.Int) []sdk.AccAddress {
+func AddTestAddrsIncremental(app *TestApp, ctx sdk.Context, accNum int, accAmt sdkmath.Int) []sdk.AccAddress {
 	return addTestAddrs(app, ctx, accNum, accAmt, createIncrementalAccounts)
 }
 
-func addTestAddrs(app *SimApp, ctx sdk.Context, accNum int, accAmt sdkmath.Int, strategy GenerateAccountStrategy) []sdk.AccAddress {
+func addTestAddrs(app *TestApp, ctx sdk.Context, accNum int, accAmt sdkmath.Int, strategy GenerateAccountStrategy) []sdk.AccAddress {
 	testAddrs := strategy(accNum)
 
 	initCoins := sdk.NewCoins(sdk.NewCoin(app.StakingKeeper.BondDenom(ctx), accAmt))
@@ -481,7 +481,7 @@ func addTestAddrs(app *SimApp, ctx sdk.Context, accNum int, accAmt sdkmath.Int, 
 	return testAddrs
 }
 
-func initAccountWithCoins(app *SimApp, ctx sdk.Context, addr sdk.AccAddress, coins sdk.Coins) {
+func initAccountWithCoins(app *TestApp, ctx sdk.Context, addr sdk.AccAddress, coins sdk.Coins) {
 	err := app.BankKeeper.MintCoins(ctx, minttypes.ModuleName, coins)
 	if err != nil {
 		panic(err)
@@ -532,12 +532,12 @@ func GenSequenceOfTxs(txGen client.TxConfig, msgs []sdk.Msg, accNums []uint64, i
 	txs := make([]sdk.Tx, numToGenerate)
 	var err error
 	for i := 0; i < numToGenerate; i++ {
-		txs[i], err = helpers.GenSignedMockTx(
+		txs[i], err = simtestutil.GenSignedMockTx(
 			rand.New(rand.NewSource(time.Now().UnixNano())),
 			txGen,
 			msgs,
 			sdk.Coins{sdk.NewInt64Coin(sdk.DefaultBondDenom, 0)},
-			helpers.DefaultGenTxGas,
+			simtestutil.DefaultGenTxGas,
 			"",
 			accNums,
 			initSeqNums,
@@ -582,7 +582,7 @@ func NewPubKeyFromHex(pk string) (res cryptotypes.PubKey) {
 		panic(err)
 	}
 	if len(pkBytes) != ed25519.PubKeySize {
-		panic(errors.Wrap(errors.ErrInvalidPubKey, "invalid pubkey size"))
+		panic(errorsmod.Wrap(sdkerrors.ErrInvalidPubKey, "invalid pubkey size"))
 	}
 	return &ed25519.PubKey{Key: pkBytes}
 }

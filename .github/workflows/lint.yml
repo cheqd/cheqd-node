@@ -39,7 +39,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-go@v4
+      - uses: actions/setup-go@v5
         with:
           go-version-file: ./go.mod
           cache: false # temporarily off, as golangci-lint doesn't align 100% with cached setup-go@v4, see: https://github.com/golangci/golangci-lint-action/issues/807
@@ -47,7 +47,7 @@ jobs:
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
-          version: v1.49.0
+          version: v1.56.2
           args: --config .github/linters/.golangci.yaml
 
   proto-lint:
@@ -57,7 +57,7 @@ jobs:
       - uses: actions/checkout@v4
 
       # Install the `buf` CLI
-      - uses: bufbuild/buf-setup-action@v1.27.0
+      - uses: bufbuild/buf-setup-action@v1.28.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 

@@ -7,9 +7,8 @@ import (
 	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/x/did/client/cli"
 	didtypesv2 "github.com/cheqd/cheqd-node/x/did/types"
-	didtypesv1 "github.com/cheqd/cheqd-node/x/did/types/v1"
+
 	resourcetypesv2 "github.com/cheqd/cheqd-node/x/resource/types"
-	resourcetypesv1 "github.com/cheqd/cheqd-node/x/resource/types/v1"
 )
 
 func Loader(path string, ptrPayload interface{}) ([]cli.SignInput, error) {
@@ -39,12 +38,6 @@ func Loader(path string, ptrPayload interface{}) ([]cli.SignInput, error) {
 	}
 
 	switch ptrPayload := ptrPayload.(type) {
-	case *didtypesv1.MsgCreateDidPayload:
-		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, ptrPayload)
-	case *didtypesv1.MsgUpdateDidPayload:
-		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, ptrPayload)
-	case *didtypesv1.Did:
-		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, ptrPayload)
 	case *didtypesv2.MsgCreateDidDocPayload:
 		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, ptrPayload)
 	case *didtypesv2.MsgUpdateDidDocPayload:
@@ -56,10 +49,6 @@ func Loader(path string, ptrPayload interface{}) ([]cli.SignInput, error) {
 	case *resourcetypesv2.Metadata:
 		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, ptrPayload)
 	case *resourcetypesv2.ResourceWithMetadata:
-		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, ptrPayload)
-	case *resourcetypesv1.MsgCreateResourcePayload:
-		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, ptrPayload)
-	case *resourcetypesv1.ResourceHeader:
 		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, ptrPayload)
 	default:
 		err = json.Unmarshal(tc.Payload, ptrPayload)

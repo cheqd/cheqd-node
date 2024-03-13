@@ -16,9 +16,9 @@ type HandlerOptions struct {
 }
 
 // NewPostHandler returns a default post handler
-func NewPostHandler(options HandlerOptions) (sdk.AnteHandler, error) {
-	postDecorators := []sdk.AnteDecorator{
+func NewPostHandler(options HandlerOptions) (sdk.PostHandler, error) {
+	postDecorators := []sdk.PostDecorator{
 		NewTaxDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, options.DidKeeper, options.ResourceKeeper),
 	}
-	return sdk.ChainAnteDecorators(postDecorators...), nil
+	return sdk.ChainPostDecorators(postDecorators...), nil
 }

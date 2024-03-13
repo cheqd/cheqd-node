@@ -53,8 +53,9 @@ docker compose exec -d cheqd cheqd-noded start
 
 info "Running osmosis network"
 docker compose up -d osmosis
-docker compose cp osmosis/osmosis-init.sh osmosis:/home/osmosis/osmosis-init.sh
-docker compose exec osmosis bash /home/osmosis/osmosis-init.sh
+docker compose cp osmosis/osmosis-init.sh osmosis:/osmosis/osmosis-init.sh
+docker compose exec osmosis apk add bash
+docker compose exec osmosis bash /osmosis/osmosis-init.sh
 docker compose exec -d osmosis osmosisd start
 
 info "Waiting for chains"
@@ -78,7 +79,7 @@ CHEQD_RELAYER_MNEMONIC=$(echo "${CHEQD_RELAYER_ACCOUNT}" | jq --raw-output '.mne
 echo "${CHEQD_RELAYER_MNEMONIC}" > cheqd_relayer_mnemonic.txt
 
 info "Send some tokens to it" # ---
-RES=$(docker compose exec cheqd cheqd-noded tx bank send cheqd-user "${CHEQD_RELAYER_ADDRESS}" 1000000000000ncheq --gas-prices 50ncheq --chain-id cheqd -y --keyring-backend test)
+RES=$(docker compose exec cheqd cheqd-noded tx bank send cheqd-user "${CHEQD_RELAYER_ADDRESS}" 500000000000000000ncheq --gas-prices 50ncheq --chain-id cheqd -y --keyring-backend test)
 assert_tx_successful "${RES}"
 
 info "Create relayer user on osmosis" # ---
@@ -90,7 +91,7 @@ OSMOSIS_RELAYER_MNEMONIC=$(echo "${OSMOSIS_RELAYER_ACCOUNT}" | jq --raw-output '
 echo "${OSMOSIS_RELAYER_MNEMONIC}" > osmo_relayer_mnemonic.txt
 
 info "Send some tokens to it" # ---
-RES=$(docker compose exec osmosis osmosisd tx bank send osmosis-user "${OSMOSIS_RELAYER_ADDRESS}" 10000000uosmo --chain-id osmosis -y --keyring-backend test --output json)
+RES=$(docker compose exec osmosis osmosisd tx bank send osmosis-user "${OSMOSIS_RELAYER_ADDRESS}" 1000000000uosmo --fees 500uosmo --chain-id osmosis -y --keyring-backend test --output json)
 assert_tx_successful "${RES}"
 sleep 10 # Wait for state
 
@@ -114,7 +115,7 @@ docker compose exec hermes hermes keys add --chain cheqd --mnemonic-file cheqd_r
 docker compose exec hermes hermes keys add --chain osmosis --mnemonic-file osmo_relayer_mnemonic.txt --key-name osmosis-key
 
 info "Open channel" # ---
-docker compose exec hermes hermes create channel --a-chain cheqd --b-chain osmosis --a-port transfer --b-port transfer --new-client-connection
+docker compose exec hermes hermes create channel --a-chain cheqd --b-chain osmosis --a-port transfer --b-port transfer --new-client-connection --yes
 
 info "Start hermes" # ---
 docker compose exec -d hermes hermes start
@@ -145,7 +146,7 @@ docker compose exec osmosis osmosisd query ibc-transfer denom-trace "$DENOM_CUT"
 info "Transfer osmosis -> cheqd" # ---
 PORT="transfer"
 CHANNEL="channel-0"
-docker compose exec osmosis osmosisd tx ibc-transfer transfer $PORT $CHANNEL "$CHEQD_USER_ADDRESS" 10000000000"${DENOM}" --from osmosis-user --chain-id osmosis --keyring-backend test -y
+docker compose exec osmosis osmosisd tx ibc-transfer transfer $PORT $CHANNEL "$CHEQD_USER_ADDRESS" 10000000000"${DENOM}" --from osmosis-user --chain-id osmosis --fees 500uosmo --keyring-backend test -y
 sleep 30 # Wait for relayer
 
 info "Get balances" # ---

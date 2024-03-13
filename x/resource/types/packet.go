@@ -5,9 +5,7 @@ package types
 // This is in the `Binary` format, which is a Rust Vec<u8> type of a base64 encoded string of a JSON obj
 type ResourceReqPacket struct {
 	// Id of the resource
-	//nolint:stylecheck
 	ResourceId string `json:"resourceId,omitempty"`
 	// Id of the collection
-	//nolint:stylecheck
 	CollectionId string `json:"collectionId,omitempty"`
 }
