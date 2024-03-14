@@ -8,7 +8,7 @@ set -euox pipefail
 # sed in MacOS requires extra argument
 if [[ "$OSTYPE" == "darwin"* ]]; then
   SED_EXT='.orig'
-else 
+else
   SED_EXT=''
 fi
 
