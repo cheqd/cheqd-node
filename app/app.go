@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -803,9 +804,13 @@ func New(
 	// v1UpgradeHandler := app.upgradeHandlerV1(icaModule, keys[didtypes.StoreKey], keys[resourcetypes.StoreKey])
 	// app.UpgradeKeeper.SetUpgradeHandler(upgradeV1.UpgradeName, v1UpgradeHandler)
 
+	app.setupUpgradeStoreLoaders()
+
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
-			panic(err)
+			fmt.Printf("Error loading latest version: %v\n", err)
+			// CONTRACT: baseapp default store loader will be used to load latest version
+			// panic(err)
 		}
 	}
 
@@ -1062,6 +1067,27 @@ func (app *App) RegisterUpgradeHandlers() {
 			return migrations, err
 		},
 	)
+}
+
+// configure store loader that checks if version == upgradeHeight and applies store upgrades
+func (app *App) setupUpgradeStoreLoaders() {
+	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
+	if err != nil {
+		panic(fmt.Sprintf("failed to read upgrade info from disk %s", err))
+	}
+
+	if upgradeInfo.Name == upgradeV2.UpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		storeUpgrades := storetypes.StoreUpgrades{
+			Added: []string{
+				consensusparamtypes.StoreKey,
+				crisistypes.StoreKey,
+				ibcfeetypes.StoreKey,
+			},
+		}
+
+		// configure store loader that checks if version == upgradeHeight and applies store upgrades
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
+	}
 }
 
 func (app *App) Configurator() module.Configurator {
