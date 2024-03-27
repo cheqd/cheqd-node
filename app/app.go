@@ -1038,14 +1038,17 @@ func (app *App) setupUpgradeStoreLoaders() {
 		return
 	}
 
-	storeUpgrades := storetypes.StoreUpgrades{
-		Added: []string{
-			consensusparamtypes.ModuleName,
-			crisistypes.ModuleName,
-			ibcfeetypes.ModuleName,
-		},
+	if upgradeInfo.Name == upgradeV2.UpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		storeUpgrades := storetypes.StoreUpgrades{
+			Added: []string{
+				consensusparamtypes.StoreKey,
+				crisistypes.StoreKey,
+			},
+		}
+
+		// configure store loader that checks if version == upgradeHeight and applies store upgrades
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
 	}
-	app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
 }
 
 func (app *App) RegisterUpgradeHandlers() {
