@@ -1042,6 +1042,7 @@ func (app *App) setupUpgradeStoreLoaders() {
 		Added: []string{
 			consensusparamtypes.ModuleName,
 			crisistypes.ModuleName,
+			ibcfeetypes.ModuleName,
 		},
 	}
 	app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
@@ -1075,9 +1076,6 @@ func (app *App) RegisterUpgradeHandlers() {
 			// Hack to fix state-sync issue
 			consensusParams.Version = &tmproto.VersionParams{App: 2}
 
-			if err != nil {
-				return nil, err
-			}
 			ctx.Logger().Info("Handler for upgrade plan: " + upgradeV2.UpgradeName)
 			// Migrate Tendermint consensus parameters from x/params module to a
 			// dedicated x/consensus module.
