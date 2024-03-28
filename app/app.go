@@ -799,18 +799,11 @@ func New(
 	app.SetEndBlocker(app.EndBlocker)
 	app.SetPostHandler(postHandler)
 
-	// Note: This migration is completed, we can remove these lines.
-	// Upgrade handler for v1
-	// v1UpgradeHandler := app.upgradeHandlerV1(icaModule, keys[didtypes.StoreKey], keys[resourcetypes.StoreKey])
-	// app.UpgradeKeeper.SetUpgradeHandler(upgradeV1.UpgradeName, v1UpgradeHandler)
-
 	app.setupUpgradeStoreLoaders()
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
-			fmt.Printf("Error loading latest version: %v\n", err)
-			// CONTRACT: baseapp default store loader will be used to load latest version
-			// panic(err)
+			panic(err)
 		}
 	}
 
@@ -1081,7 +1074,6 @@ func (app *App) setupUpgradeStoreLoaders() {
 			Added: []string{
 				consensusparamtypes.StoreKey,
 				crisistypes.StoreKey,
-				ibcfeetypes.StoreKey,
 			},
 		}
 
