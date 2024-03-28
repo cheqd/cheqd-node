@@ -286,8 +286,8 @@ github.com/cheggaaa/pb v1.0.27/go.mod h1:pQciLPpbU0oxA0h+VJYYLxO+XeDQb5pZijXscXH
 github.com/chenzhuoyu/base64x v0.0.0-20211019084208-fb5309c8db06/go.mod h1:DH46F32mSOjUmXrMHnKwZdA8wcEefY7UVqBKYGjpdQY=
 github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 h1:qSGYFH7+jGhDF8vLC+iwCD4WpbV1EBDSzWkJODFLams=
 github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311/go.mod h1:b583jCggY9gE99b6G5LEC39OIiVsWj+R97kbl5odCEk=
-github.com/cheqd/cosmos-sdk v0.47.10-version-mismatch-guard h1:VQpV545ZHihjXdIaaVYGWU1nzvBqWRMIQk85IJHNBmo=
-github.com/cheqd/cosmos-sdk v0.47.10-version-mismatch-guard/go.mod h1:UWpgWkhcsBIATS68uUC0del7IiBN4hPv/vqg8Zz23uw=
+github.com/cheqd/cosmos-sdk v0.47.10-height-mismatch h1:zxljvq+y6HwGkx1Pa2sSd3AF5gr03xf0Jz6GYI4JjqM=
+github.com/cheqd/cosmos-sdk v0.47.10-height-mismatch/go.mod h1:UWpgWkhcsBIATS68uUC0del7IiBN4hPv/vqg8Zz23uw=
 github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWRnGsAI=
 github.com/chzyer/logex v1.2.1 h1:XHDu3E6q+gdHgsdTPH6ImJMIp436vR6MPtH8gP05QzM=
 github.com/chzyer/logex v1.2.1/go.mod h1:JLbx6lG2kDbNRFnfkgvh4eRJRPX1QCoOIWomwysCBrQ=

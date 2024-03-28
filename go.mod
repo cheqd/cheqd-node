@@ -206,7 +206,7 @@ replace (
 	github.com/cheqd/cheqd-node/api/v2 => ./api
 
 	// replace cosmos-sdk v0.47.10
-	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.47.10-version-mismatch-guard
+	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.47.10-height-mismatch
 
 	// dgrijalva/jwt-go is deprecated and doesn't receive security updates.
 	// TODO: remove it: https://github.com/cosmos/cosmos-sdk/issues/13134
