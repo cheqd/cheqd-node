@@ -10,7 +10,7 @@
 
 [**cheqd**](https://www.cheqd.io) is a public self-sovereign identity (SSI) network for building secure 🔐 and private 🤫 self-sovereign identity systems on [Cosmos](https://cosmos.network) 💫. Our core vision is to add viable commercial models to decentralised digital 🆔
 
-`cheqd-node` is the ledger/node component of the cheqd network tech stack, built using [Cosmos SDK](https://github.com/cosmos/cosmos-sdk) and [Tendermint](https://github.com/tendermint/tendermint).
+`cheqd-node` is the ledger/node component of the cheqd network tech stack, built using [Cosmos SDK](https://github.com/cosmos/cosmos-sdk) and [CometBFT](https://cometbft.com/).
 
 ## ▶️ Quick start for joining cheqd networks
 
@@ -31,7 +31,7 @@ If successfully configured, your node would become the latest validator on the c
 
 Our [testnet](https://testnet-explorer.cheqd.io) is the easiest place for developers and node operators to get started if you're not *quite* ready yet to dive into building apps on our mainnet. To get started...
 
-1. Install [the latest stable release](https://github.com/cheqd/cheqd-node/releases/latest) of `cheqd-node` software (currently `v1.x.x`) on a hosting platform of your choice by [following the setup guide](https://docs.cheqd.io/node/getting-started/setup-and-configure).
+1. Install [the latest stable release](https://github.com/cheqd/cheqd-node/releases/latest) of `cheqd-node` software (currently `v2.x.x`) on a hosting platform of your choice by [following the setup guide](https://docs.cheqd.io/node/getting-started/setup-and-configure).
 2. Acquire testnet CHEQ tokens through [our testnet faucet](https://testnet-faucet.cheqd.io).
 3. Once you have acquired CHEQ tokens, [promote your node to a validator](https://docs.cheqd.io/node/validator-guides/validator-guide)
 
