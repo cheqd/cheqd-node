@@ -3,7 +3,7 @@ module github.com/cheqd/cheqd-node/api/v2
 go 1.21
 
 require (
-	github.com/cosmos/cosmos-proto v1.0.0-beta.2
+	github.com/cosmos/cosmos-proto v1.0.0-beta.4
 	github.com/cosmos/cosmos-sdk/api v0.1.0
 	github.com/cosmos/gogoproto v1.4.10
 	google.golang.org/genproto/googleapis/api v0.0.0-20231212172506-995d672761c0
