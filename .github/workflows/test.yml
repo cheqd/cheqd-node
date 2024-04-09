@@ -181,7 +181,7 @@ jobs:
           tar -xvf cheqd-noded-"${LEGACY_VERSION}"-linux-amd64.tar.gz -C ${{ env.RUNNER_BIN_DIR }}
           sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
         env:
-          LEGACY_VERSION: 1.4.4
+          LEGACY_VERSION: 1.4.5
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
