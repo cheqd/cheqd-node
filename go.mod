@@ -5,7 +5,7 @@ go 1.21
 toolchain go1.21.0
 
 require (
-	cosmossdk.io/api v0.3.1
+	cosmossdk.io/api v0.7.3
 	cosmossdk.io/core v0.5.1
 	cosmossdk.io/errors v1.0.1
 	cosmossdk.io/math v1.3.0
@@ -14,7 +14,7 @@ require (
 	github.com/cometbft/cometbft-db v0.8.0
 	github.com/cosmos/cosmos-proto v1.0.0-beta.4
 	github.com/cosmos/cosmos-sdk v0.47.10
-	github.com/cosmos/gogoproto v1.4.10
+	github.com/cosmos/gogoproto v1.4.11
 	github.com/cosmos/ibc-go/v7 v7.3.2
 	github.com/gabriel-vasile/mimetype v1.4.3
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
@@ -177,7 +177,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.19.0 // indirect
 	go.opentelemetry.io/otel/trace v1.19.0 // indirect
 	golang.org/x/crypto v0.21.0 // indirect
-	golang.org/x/exp v0.0.0-20230711153332-06a737ee72cb // indirect
+	golang.org/x/exp v0.0.0-20230811145659-89c5cff77bcb // indirect
 	golang.org/x/net v0.21.0 // indirect
 	golang.org/x/oauth2 v0.13.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect
