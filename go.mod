@@ -5,7 +5,7 @@ go 1.21
 toolchain go1.21.0
 
 require (
-	cosmossdk.io/api v0.3.1
+	cosmossdk.io/api v0.6.1
 	cosmossdk.io/core v0.5.1
 	cosmossdk.io/errors v1.0.1
 	cosmossdk.io/math v1.3.0
