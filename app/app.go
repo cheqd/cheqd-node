@@ -127,6 +127,8 @@ import (
 	ibctmmigrations "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint/migrations"
 	"github.com/gorilla/mux"
 	"github.com/rakyll/statik/fs"
+	feemarketkeeper "github.com/skip-mev/feemarket/x/feemarket/keeper"
+	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 	"github.com/spf13/cast"
 
 	// unnamed import of statik for swagger UI support
@@ -229,6 +231,7 @@ type App struct {
 	EvidenceKeeper        evidencekeeper.Keeper
 	TransferKeeper        ibctransferkeeper.Keeper
 	FeeGrantKeeper        feegrantkeeper.Keeper
+	FeeMarketKeeper		  feemarketkeeper.Keeper
 	AuthzKeeper           authzkeeper.Keeper
 	GroupKeeper           groupkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
@@ -300,6 +303,7 @@ func New(
 		consensusparamtypes.StoreKey,
 		upgradetypes.StoreKey,
 		feegrant.StoreKey,
+		feemarkettypes.StoreKey,
 		evidencetypes.StoreKey,
 		ibctransfertypes.StoreKey,
 		icacontrollertypes.StoreKey,
@@ -383,6 +387,8 @@ func New(
 		keys[feegrant.StoreKey],
 		app.AccountKeeper,
 	)
+
+	app.FeeMarketKeeper = *feemarketkeeper.NewKeeper(appCodec, keys[feemarkettypes.StoreKey], app.AccountKeeper, &feemarkettypes.ErrorDenomResolver{}, authtypes.NewModuleAddress((govtypes.ModuleName)).String())
 
 	app.StakingKeeper = stakingkeeper.NewKeeper(
 		appCodec,
@@ -786,6 +792,7 @@ func New(
 		AccountKeeper:  app.AccountKeeper,
 		BankKeeper:     app.BankKeeper,
 		FeegrantKeeper: app.FeeGrantKeeper,
+		// FeeMarketKeeper: app.FeeMarketKeeper,
 		DidKeeper:      app.DidKeeper,
 		ResourceKeeper: app.ResourceKeeper,
 	})
