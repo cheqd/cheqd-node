@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sort"
 
 	"github.com/cosmos/cosmos-sdk/x/consensus"
 
@@ -126,6 +127,9 @@ import (
 	ibctm "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint"
 	ibctmmigrations "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint/migrations"
 	"github.com/gorilla/mux"
+	feeabsmodule "github.com/osmosis-labs/fee-abstraction/v7/x/feeabs"
+	feeabskeeper "github.com/osmosis-labs/fee-abstraction/v7/x/feeabs/keeper"
+	feeabstypes "github.com/osmosis-labs/fee-abstraction/v7/x/feeabs/types"
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
 
@@ -154,6 +158,9 @@ var (
 			upgradeclient.LegacyCancelProposalHandler,
 			ibcclientclient.UpdateClientProposalHandler,
 			ibcclientclient.UpgradeProposalHandler,
+			feeabsmodule.UpdateAddHostZoneClientProposalHandler,
+			feeabsmodule.UpdateDeleteHostZoneClientProposalHandler,
+			feeabsmodule.UpdateSetHostZoneClientProposalHandler,
 		}),
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
@@ -172,10 +179,12 @@ var (
 		resource.AppModuleBasic{},
 		ibcfee.AppModuleBasic{},
 		consensus.AppModuleBasic{},
+		feeabsmodule.AppModuleBasic{},
 	)
 
 	// module account permissions
 	maccPerms = map[string][]string{
+		feeabstypes.ModuleName:         nil,
 		authtypes.FeeCollectorName:     nil,
 		distrtypes.ModuleName:          nil,
 		icatypes.ModuleName:            nil,
@@ -185,6 +194,11 @@ var (
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		didtypes.ModuleName:            {authtypes.Burner},
+	}
+
+	// module accounts that are allowed to receive tokens
+	allowedReceivingModAcc = map[string]bool{
+		feeabstypes.ModuleName: true,
 	}
 )
 
@@ -240,6 +254,7 @@ type App struct {
 	ScopedICAControllerKeeper capabilitykeeper.ScopedKeeper
 	ScopedICAHostKeeper       capabilitykeeper.ScopedKeeper
 	ScopedResourceKeeper      capabilitykeeper.ScopedKeeper
+	FeeabsKeeper              feeabskeeper.Keeper
 
 	DidKeeper      didkeeper.Keeper
 	ResourceKeeper resourcekeeper.Keeper
@@ -340,6 +355,7 @@ func New(
 	scopedICAControllerKeeper := app.CapabilityKeeper.ScopeToModule(icacontrollertypes.SubModuleName)
 	scopedICAHostKeeper := app.CapabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
 	scopedResourceKeeper := app.CapabilityKeeper.ScopeToModule(resourcetypes.ModuleName)
+	scopedFeeabsKeeper := app.CapabilityKeeper.ScopeToModule(feeabstypes.ModuleName)
 
 	// Applications that wish to enforce statically created ScopedKeepers should call `Seal` after creating
 	// their scoped modules in `NewApp` with `ScopeToModule`
@@ -545,6 +561,19 @@ func New(
 		scopedTransferKeeper,
 	)
 
+	app.FeeabsKeeper = feeabskeeper.NewKeeper(
+		appCodec,
+		keys[feeabstypes.StoreKey],
+		app.GetSubspace(feeabstypes.ModuleName),
+		app.StakingKeeper,
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.TransferKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		scopedFeeabsKeeper,
+	)
+
 	// create IBC module from bottom to top of stack
 	var transferStack porttypes.IBCModule
 	transferStack = transfer.NewIBCModule(app.TransferKeeper)
@@ -668,6 +697,7 @@ func New(
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
+		feeabstypes.ModuleName,
 		icatypes.ModuleName,
 		ibcfeetypes.ModuleName,
 		didtypes.ModuleName,
@@ -697,6 +727,7 @@ func New(
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
+		feeabstypes.ModuleName,
 		icatypes.ModuleName,
 		ibcfeetypes.ModuleName,
 		consensusparamtypes.ModuleName,
@@ -722,6 +753,7 @@ func New(
 		evidencetypes.ModuleName,
 		authz.ModuleName,
 		ibctransfertypes.ModuleName,
+		feeabstypes.ModuleName,
 		icatypes.ModuleName,
 		ibcfeetypes.ModuleName,
 		feegrant.ModuleName,
@@ -856,12 +888,19 @@ func (app *App) LoadHeight(height int64) error {
 
 // ModuleAccountAddrs returns all the app's module account addresses.
 func (app *App) ModuleAccountAddrs() map[string]bool {
-	modAccAddrs := make(map[string]bool)
-	for acc := range maccPerms {
-		modAccAddrs[authtypes.NewModuleAddress(acc).String()] = true
+	blockedAddrs := make(map[string]bool)
+
+	accs := make([]string, 0, len(maccPerms))
+	for k := range maccPerms {
+		accs = append(accs, k)
+	}
+	sort.Strings(accs)
+
+	for _, acc := range accs {
+		blockedAddrs[authtypes.NewModuleAddress(acc).String()] = !allowedReceivingModAcc[acc]
 	}
 
-	return modAccAddrs
+	return blockedAddrs
 }
 
 // BlockedModuleAccountAddrs returns all the app's blocked module account
