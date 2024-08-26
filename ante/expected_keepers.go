@@ -4,7 +4,17 @@ import (
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
+
+type AccountKeeper interface {
+		GetParams(ctx sdk.Context) (params authtypes.Params)
+		GetAccount(ctx sdk.Context, addr sdk.AccAddress) authtypes.AccountI
+		SetAccount(ctx sdk.Context, acc authtypes.AccountI)
+		GetModuleAddress(moduleName string) sdk.AccAddress
+		GetModuleAccount(ctx sdk.Context, name string) authtypes.ModuleAccountI
+		NewAccountWithAddress(ctx sdk.Context, addr sdk.AccAddress) authtypes.AccountI
+}
 
 type BankKeeper interface {
 	SendCoins(ctx sdk.Context, from, to sdk.AccAddress, amt sdk.Coins) error

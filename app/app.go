@@ -235,7 +235,7 @@ type App struct {
 	EvidenceKeeper        evidencekeeper.Keeper
 	TransferKeeper        ibctransferkeeper.Keeper
 	FeeGrantKeeper        feegrantkeeper.Keeper
-	FeeMarketKeeper		  feemarketkeeper.Keeper
+	FeeMarketKeeper		  *feemarketkeeper.Keeper
 	AuthzKeeper           authzkeeper.Keeper
 	GroupKeeper           groupkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
@@ -392,7 +392,7 @@ func New(
 		app.AccountKeeper,
 	)
 
-	app.FeeMarketKeeper = *feemarketkeeper.NewKeeper(appCodec, keys[feemarkettypes.StoreKey], app.AccountKeeper, &feemarkettypes.ErrorDenomResolver{}, authtypes.NewModuleAddress((govtypes.ModuleName)).String())
+	app.FeeMarketKeeper = feemarketkeeper.NewKeeper(appCodec, keys[feemarkettypes.StoreKey], app.AccountKeeper, &feemarkettypes.ErrorDenomResolver{}, authtypes.NewModuleAddress((govtypes.ModuleName)).String())
 
 	app.StakingKeeper = stakingkeeper.NewKeeper(
 		appCodec,
@@ -639,7 +639,7 @@ func New(
 		upgrade.NewAppModule(app.UpgradeKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
-		feemarket.NewAppModule(appCodec, *&app.FeeMarketKeeper),
+		feemarket.NewAppModule(appCodec, *app.FeeMarketKeeper),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		groupmodule.NewAppModule(appCodec, app.GroupKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		ibc.NewAppModule(app.IBCKeeper),
@@ -800,7 +800,7 @@ func New(
 		AccountKeeper:  app.AccountKeeper,
 		BankKeeper:     app.BankKeeper,
 		FeegrantKeeper: app.FeeGrantKeeper,
-		// FeeMarketKeeper: app.FeeMarketKeeper,
+		FeeMarketKeeper: app.FeeMarketKeeper,
 		DidKeeper:      app.DidKeeper,
 		ResourceKeeper: app.ResourceKeeper,
 	})
