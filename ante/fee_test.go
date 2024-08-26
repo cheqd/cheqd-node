@@ -232,7 +232,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		dfd := cheqdante.NewDeductFeeDecorator(s.app.AccountKeeper, s.app.BankKeeper, nil, nil)
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
@@ -296,7 +296,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		dfd := cheqdante.NewDeductFeeDecorator(s.app.AccountKeeper, s.app.BankKeeper, nil, nil)
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
@@ -353,7 +353,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		dfd := cheqdante.NewDeductFeeDecorator(s.app.AccountKeeper, s.app.BankKeeper, nil, nil)
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx

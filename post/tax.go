@@ -14,21 +14,23 @@ import (
 
 // TaxDecorator will handle tax for all taxable messages
 type TaxDecorator struct {
-	accountKeeper  ante.AccountKeeper
-	bankKeeper     cheqdante.BankKeeper
-	feegrantKeeper ante.FeegrantKeeper
-	didKeeper      cheqdante.DidKeeper
-	resourceKeeper cheqdante.ResourceKeeper
+	accountKeeper   ante.AccountKeeper
+	bankKeeper      cheqdante.BankKeeper
+	feegrantKeeper  ante.FeegrantKeeper
+	didKeeper       cheqdante.DidKeeper
+	resourceKeeper  cheqdante.ResourceKeeper
+	feemarketKeeper cheqdante.FeeMarketKeeper
 }
 
 // NewTaxDecorator returns a new taxDecorator
-func NewTaxDecorator(ak ante.AccountKeeper, bk cheqdante.BankKeeper, fk ante.FeegrantKeeper, dk cheqdante.DidKeeper, rk cheqdante.ResourceKeeper) TaxDecorator {
+func NewTaxDecorator(ak ante.AccountKeeper, bk cheqdante.BankKeeper, fk ante.FeegrantKeeper, dk cheqdante.DidKeeper, rk cheqdante.ResourceKeeper, fmk cheqdante.FeeMarketKeeper) TaxDecorator {
 	return TaxDecorator{
-		accountKeeper:  ak,
-		bankKeeper:     bk,
-		feegrantKeeper: fk,
-		didKeeper:      dk,
-		resourceKeeper: rk,
+		accountKeeper:   ak,
+		bankKeeper:      bk,
+		feegrantKeeper:  fk,
+		didKeeper:       dk,
+		resourceKeeper:  rk,
+		feemarketKeeper: fmk,
 	}
 }
 
