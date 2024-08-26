@@ -23,7 +23,6 @@ type ResourceKeeper interface {
 	GetParams(ctx sdk.Context) (params resourcetypes.FeeParams)
 }
 
-//go:generate mockery --name FeeMarketKeeper --filename mock_feemarket_keeper.go
 type FeeMarketKeeper interface {
 	GetState(ctx sdk.Context) (feemarkettypes.State, error)
 	GetMinGasPrice(ctx sdk.Context, denom string) (sdk.DecCoin, error)

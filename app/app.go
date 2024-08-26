@@ -800,11 +800,12 @@ func New(
 	app.sm.RegisterStoreDecoders()
 
 	postHandler, err := posthandler.NewPostHandler(posthandler.HandlerOptions{
-		AccountKeeper:  app.AccountKeeper,
-		BankKeeper:     app.BankKeeper,
-		FeegrantKeeper: app.FeeGrantKeeper,
-		DidKeeper:      app.DidKeeper,
-		ResourceKeeper: app.ResourceKeeper,
+		AccountKeeper:   app.AccountKeeper,
+		BankKeeper:      app.BankKeeper,
+		FeegrantKeeper:  app.FeeGrantKeeper,
+		DidKeeper:       app.DidKeeper,
+		ResourceKeeper:  app.ResourceKeeper,
+		FeeMarketKeeper: app.FeeMarketKeeper,
 	})
 	if err != nil {
 		tmos.Exit(err.Error())
