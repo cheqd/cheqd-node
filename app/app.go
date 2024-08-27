@@ -800,6 +800,7 @@ func New(
 		SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 		SigGasConsumer:  authante.DefaultSigVerificationGasConsumer,
 		IBCKeeper:       app.IBCKeeper,
+		FeeAbskeeper:    app.FeeabsKeeper,
 	})
 	if err != nil {
 		tmos.Exit(err.Error())
