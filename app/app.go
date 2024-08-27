@@ -129,6 +129,10 @@ import (
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
 
+	feemarketmodule "github.com/skip-mev/feemarket/x/feemarket"
+	feemarketkeeper "github.com/skip-mev/feemarket/x/feemarket/keeper"
+	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
+
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cheqd/cheqd-node/app/client/docs/statik"
 )
@@ -172,19 +176,22 @@ var (
 		resource.AppModuleBasic{},
 		ibcfee.AppModuleBasic{},
 		consensus.AppModuleBasic{},
+		feemarketmodule.AppModuleBasic{},
 	)
 
 	// module account permissions
 	maccPerms = map[string][]string{
-		authtypes.FeeCollectorName:     nil,
-		distrtypes.ModuleName:          nil,
-		icatypes.ModuleName:            nil,
-		minttypes.ModuleName:           {authtypes.Minter},
-		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
-		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
-		govtypes.ModuleName:            {authtypes.Burner},
-		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
-		didtypes.ModuleName:            {authtypes.Burner},
+		authtypes.FeeCollectorName:      nil,
+		distrtypes.ModuleName:           nil,
+		icatypes.ModuleName:             nil,
+		minttypes.ModuleName:            {authtypes.Minter},
+		stakingtypes.BondedPoolName:     {authtypes.Burner, authtypes.Staking},
+		stakingtypes.NotBondedPoolName:  {authtypes.Burner, authtypes.Staking},
+		govtypes.ModuleName:             {authtypes.Burner},
+		ibctransfertypes.ModuleName:     {authtypes.Minter, authtypes.Burner},
+		didtypes.ModuleName:             {authtypes.Burner},
+		feemarkettypes.ModuleName:       {authtypes.Burner},
+		feemarkettypes.FeeCollectorName: {authtypes.Burner},
 	}
 )
 
@@ -229,6 +236,7 @@ type App struct {
 	EvidenceKeeper        evidencekeeper.Keeper
 	TransferKeeper        ibctransferkeeper.Keeper
 	FeeGrantKeeper        feegrantkeeper.Keeper
+	FeeMarketKeeper       *feemarketkeeper.Keeper
 	AuthzKeeper           authzkeeper.Keeper
 	GroupKeeper           groupkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
@@ -310,6 +318,7 @@ func New(
 		ibcfeetypes.StoreKey,
 		didtypes.StoreKey,
 		resourcetypes.StoreKey,
+		feemarkettypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -493,6 +502,9 @@ func New(
 		),
 	)
 
+	app.FeeMarketKeeper = feemarketkeeper.NewKeeper(appCodec, keys[feemarkettypes.StoreKey], app.AccountKeeper, &feemarkettypes.TestDenomResolver{}, authtypes.NewModuleAddress(govtypes.ModuleName).String())
+	app.FeeMarketKeeper.SetDenomResolver(&feemarkettypes.TestDenomResolver{})
+
 	// IBC Fee Module keeper
 	app.IBCFeeKeeper = ibcfeekeeper.NewKeeper(
 		appCodec,
@@ -638,6 +650,7 @@ func New(
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 		ibcfee.NewAppModule(app.IBCFeeKeeper),
 		icaModule,
+		feemarketmodule.NewAppModule(appCodec, *app.FeeMarketKeeper),
 		// cheqd modules
 		did.NewAppModule(appCodec, app.DidKeeper),
 		resource.NewAppModule(appCodec, app.ResourceKeeper, app.DidKeeper),
@@ -673,6 +686,7 @@ func New(
 		didtypes.ModuleName,
 		resourcetypes.ModuleName,
 		consensusparamtypes.ModuleName,
+		feemarkettypes.ModuleName,
 	)
 
 	app.ModuleManager.SetOrderEndBlockers(
@@ -700,6 +714,7 @@ func New(
 		icatypes.ModuleName,
 		ibcfeetypes.ModuleName,
 		consensusparamtypes.ModuleName,
+		feemarkettypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -732,6 +747,7 @@ func New(
 		upgradetypes.ModuleName,
 		paramstypes.ModuleName,
 		consensusparamtypes.ModuleName,
+		feemarkettypes.ModuleName,
 	}
 	app.ModuleManager.SetOrderInitGenesis(genesisModuleOrder...)
 	app.ModuleManager.SetOrderExportGenesis(genesisModuleOrder...)
