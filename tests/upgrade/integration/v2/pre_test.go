@@ -1,5 +1,3 @@
-//go:build upgrade_integration
-
 package integration
 
 import (
@@ -23,6 +21,7 @@ var _ = Describe("Upgrade - Pre", func() {
 	BeforeEach(func() {
 		// query fee params - case: did
 		res, err := cli.QueryParams(cli.Validator0, didtypes.ModuleName, string(didtypes.ParamStoreKeyFeeParams))
+		fmt.Println("res>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", res, err)
 		Expect(err).To(BeNil())
 		err = clihelpers.Codec.UnmarshalJSON([]byte(res.Value), &didFeeParams)
 		Expect(err).To(BeNil())
