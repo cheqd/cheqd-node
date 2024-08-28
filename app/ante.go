@@ -11,21 +11,23 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	ibcante "github.com/cosmos/ibc-go/v7/modules/core/ante"
 	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
+	feemarketkeeper "github.com/skip-mev/feemarket/x/feemarket/keeper"
 )
 
 // HandlerOptions are the options required for constructing a default SDK AnteHandler.
 // Here we add the cheqd ante decorators, which extend default SDK AnteHandler.
 type HandlerOptions struct {
-	AccountKeeper          ante.AccountKeeper
+	AccountKeeper          cheqdante.AccountKeeper
 	BankKeeper             cheqdante.BankKeeper
 	ExtensionOptionChecker ante.ExtensionOptionChecker
 	FeegrantKeeper         ante.FeegrantKeeper
 	SignModeHandler        authsigning.SignModeHandler
 	SigGasConsumer         func(meter sdk.GasMeter, sig signing.SignatureV2, params types.Params) error
-	TxFeeChecker           cheqdante.TxFeeChecker
+	TxFeeChecker           ante.TxFeeChecker
 	IBCKeeper              *ibckeeper.Keeper
 	DidKeeper              cheqdante.DidKeeper
 	ResourceKeeper         cheqdante.ResourceKeeper
+	FeeMarketKeeper        *feemarketkeeper.Keeper
 }
 
 // NewAnteHandler returns an AnteHandler that checks and increments sequence
@@ -55,7 +57,6 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		ante.NewTxTimeoutHeightDecorator(),
 		ante.NewValidateMemoDecorator(options.AccountKeeper),
 		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
-		cheqdante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, options.TxFeeChecker),
 		ante.NewSetPubKeyDecorator(options.AccountKeeper), // SetPubKeyDecorator must be called before all signature verification decorators
 		ante.NewValidateSigCountDecorator(options.AccountKeeper),
 		ante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),
@@ -63,6 +64,18 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
 		// v4 -> v5 ibc-go migration, v6 does not need migration
 		ibcante.NewRedundantRelayDecorator(options.IBCKeeper),
+		cheqdante.NewFeeMarketCheckDecorator( // fee market check replaces fee deduct decorator
+			options.AccountKeeper,
+			options.BankKeeper,
+			options.FeegrantKeeper,
+			options.FeeMarketKeeper,
+			ante.NewDeductFeeDecorator(
+				options.AccountKeeper,
+				options.BankKeeper,
+				options.FeegrantKeeper,
+				options.TxFeeChecker,
+			),
+		),
 	}
 
 	return sdk.ChainAnteDecorators(anteDecorators...), nil
