@@ -15,13 +15,15 @@ import (
 	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 )
 
-type TxFeeChecker func(ctx sdk.Context, tx sdk.Tx) (sdk.Coins, int64, error)
-type feeMarketCheckDecorator struct {
-	feemarketKeeper FeeMarketKeeper
-	bankKeeper      BankKeeper
-	feegrantKeeper  FeeGrantKeeper
-	accountKeeper   AccountKeeper
-}
+type (
+	TxFeeChecker            func(ctx sdk.Context, tx sdk.Tx) (sdk.Coins, int64, error)
+	feeMarketCheckDecorator struct {
+		feemarketKeeper FeeMarketKeeper
+		bankKeeper      BankKeeper
+		feegrantKeeper  FeeGrantKeeper
+		accountKeeper   AccountKeeper
+	}
+)
 
 func newFeeMarketCheckDecorator(ak AccountKeeper, bk BankKeeper, fk FeeGrantKeeper, fmk FeeMarketKeeper) feeMarketCheckDecorator {
 	return feeMarketCheckDecorator{

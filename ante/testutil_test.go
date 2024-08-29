@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	"github.com/skip-mev/feemarket/x/feemarket/types"
 	"github.com/stretchr/testify/suite"
 
 	cheqdapp "github.com/cheqd/cheqd-node/app"
@@ -88,12 +89,14 @@ func (s *AnteTestSuite) SetupTest(isCheckTx bool) error {
 			SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 			SigGasConsumer:  sdkante.DefaultSigVerificationGasConsumer,
 			IBCKeeper:       s.app.IBCKeeper,
+			FeeMarketKeeper: s.app.FeeMarketKeeper,
 		},
 	)
 	if err != nil {
 		return err
 	}
 	s.anteHandler = anteHandler
+	s.SetFeeMarketFeeDenom()
 	return nil
 }
 
@@ -172,7 +175,6 @@ func (s *AnteTestSuite) CreateTestTx(privs []cryptotypes.PrivKey, accNums []uint
 	if err != nil {
 		return nil, err
 	}
-
 	return s.txBuilder.GetTx(), nil
 }
 
@@ -184,6 +186,9 @@ func (s *AnteTestSuite) SetDidFeeParams(feeParams didtypes.FeeParams) {
 // SetResourceFeeParams is a helper function to set resource fee params.
 func (s *AnteTestSuite) SetResourceFeeParams(feeParams resourcetypes.FeeParams) {
 	s.app.ResourceKeeper.SetParams(s.ctx, feeParams)
+}
+func (s *AnteTestSuite) SetFeeMarketFeeDenom() {
+	s.app.FeeMarketKeeper.SetParams(s.ctx, types.Params{FeeDenom: didtypes.BaseMinimalDenom})
 }
 
 // TestCase represents a test case used in test tables.
