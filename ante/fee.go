@@ -7,6 +7,7 @@ import (
 	sdkmath "cosmossdk.io/math"
 
 	"github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	errorsmod "cosmossdk.io/errors"
@@ -14,52 +15,31 @@ import (
 	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 )
 
-type (
-	TxFeeChecker            func(ctx sdk.Context, tx sdk.Tx) (sdk.Coins, int64, error)
-	feeMarketCheckDecorator struct {
-		feemarketKeeper FeeMarketKeeper
-		bankKeeper      BankKeeper
-		feegrantKeeper  FeeGrantKeeper
-		accountKeeper   AccountKeeper
-	}
-)
+type TxFeeChecker func(ctx sdk.Context, tx sdk.Tx) (sdk.Coins, int64, error)
 
-func newFeeMarketCheckDecorator(ak AccountKeeper, bk BankKeeper, fk FeeGrantKeeper, fmk FeeMarketKeeper) feeMarketCheckDecorator {
-	return feeMarketCheckDecorator{
-		feemarketKeeper: fmk,
+type DeductFeeDecorator struct {
+	accountKeeper   AccountKeeper
+	bankKeeper      BankKeeper
+	feegrantKeeper  ante.FeegrantKeeper
+	txFeeChecker    TxFeeChecker
+	feeMarketKeeper FeeMarketKeeper
+}
+
+func NewDeductFeeDecorator(ak AccountKeeper, bk BankKeeper, fk ante.FeegrantKeeper, tfc TxFeeChecker, fmk FeeMarketKeeper) DeductFeeDecorator {
+	if tfc == nil {
+		tfc = checkTxFeeWithValidatorMinGasPrices
+	}
+
+	return DeductFeeDecorator{
+		accountKeeper:   ak,
 		bankKeeper:      bk,
 		feegrantKeeper:  fk,
-		accountKeeper:   ak,
+		txFeeChecker:    tfc,
+		feeMarketKeeper: fmk,
 	}
 }
 
-// FeeMarketCheckDecorator checks sufficient fees from the fee payer based off of the current
-// state of the feemarket.
-// If the fee payer does not have the funds to pay for the fees, return an InsufficientFunds error.
-// Call next AnteHandler if fees successfully checked.
-//
-// If x/feemarket is disabled (params.Enabled == false), the handler will fall back to the default
-// Cosmos SDK fee deduction antehandler.
-//
-// CONTRACT: Tx must implement FeeTx interface
-type FeeMarketCheckDecorator struct {
-	feemarketKeeper FeeMarketKeeper
-
-	feemarketDecorator feeMarketCheckDecorator
-	fallbackDecorator  sdk.AnteDecorator
-}
-
-func NewFeeMarketCheckDecorator(ak AccountKeeper, bk BankKeeper, fk FeeGrantKeeper, fmk FeeMarketKeeper, fallbackDecorator sdk.AnteDecorator) FeeMarketCheckDecorator {
-	return FeeMarketCheckDecorator{
-		feemarketKeeper: fmk,
-		feemarketDecorator: newFeeMarketCheckDecorator(
-			ak, bk, fk, fmk,
-		),
-		fallbackDecorator: fallbackDecorator,
-	}
-}
-
-func (dfd FeeMarketCheckDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
+func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
 	feeTx, ok := tx.(sdk.FeeTx)
 	if !ok {
 		return ctx, errorsmod.Wrap(errors.ErrTxDecode, "Tx must be a FeeTx")
@@ -86,110 +66,100 @@ func (dfd FeeMarketCheckDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simula
 		// posthandler will deduct the fee from the fee payer
 		return next(newCtx, tx, simulate)
 	}
-	params, err := dfd.feemarketKeeper.GetParams(ctx)
+	params, err := dfd.feeMarketKeeper.GetParams(ctx)
 	if err != nil {
 		return ctx, err
 	}
 	if params.Enabled {
-		return dfd.feemarketDecorator.anteHandle(ctx, tx, simulate, next)
-	}
 
-	// only use fallback if not nil
-	if dfd.fallbackDecorator != nil {
-		return dfd.fallbackDecorator.AnteHandle(ctx, tx, simulate, next)
-	}
-
-	return next(ctx, tx, simulate)
-}
-
-// anteHandle checks if the tx provides sufficient fee to cover the required fee from the fee market.
-func (dfd feeMarketCheckDecorator) anteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
-	// GenTx consume no fee
-	if ctx.BlockHeight() == 0 {
-		return next(ctx, tx, simulate)
-	}
-
-	feeTx, ok := tx.(sdk.FeeTx)
-	if !ok {
-		return ctx, errorsmod.Wrap(errors.ErrTxDecode, "Tx must be a FeeTx")
-	}
-
-	if !simulate && ctx.BlockHeight() > 0 && feeTx.GetGas() == 0 {
-		return ctx, errors.ErrInvalidGasLimit.Wrapf("must provide positive gas")
-	}
-
-	params, err := dfd.feemarketKeeper.GetParams(ctx)
-	if err != nil {
-		return ctx, errorsmod.Wrapf(err, "unable to get fee market params")
-	}
-
-	// return if disabled
-	if !params.Enabled {
-		return next(ctx, tx, simulate)
-	}
-
-	feeCoins := feeTx.GetFee()
-	gas := feeTx.GetGas() // use provided gas limit
-
-	if len(feeCoins) == 0 && !simulate {
-		return ctx, errorsmod.Wrapf(feemarkettypes.ErrNoFeeCoins, "got length %d", len(feeCoins))
-	}
-	if len(feeCoins) > 1 {
-		return ctx, errorsmod.Wrapf(feemarkettypes.ErrTooManyFeeCoins, "got length %d", len(feeCoins))
-	}
-
-	var feeCoin sdk.Coin
-	if simulate && len(feeCoins) == 0 {
-		// if simulating and user did not provider a fee - create a dummy value for them
-		feeCoin = sdk.NewCoin(params.FeeDenom, sdkmath.OneInt())
-	} else {
-		feeCoin = feeCoins[0]
-	}
-	feeGas := int64(feeTx.GetGas())
-
-	minGasPrice, err := dfd.feemarketKeeper.GetMinGasPrice(ctx, feeCoin.GetDenom())
-	if err != nil {
-		return ctx, errorsmod.Wrapf(err, "unable to get min gas price for denom %s", feeCoin.GetDenom())
-	}
-
-	ctx.Logger().Info("fee deduct ante handle",
-		"min gas prices", minGasPrice,
-		"fee", feeCoins,
-		"gas limit", gas,
-	)
-
-	ctx = ctx.WithMinGasPrices(sdk.NewDecCoins(minGasPrice))
-
-	if !simulate {
-		_, _, err := CheckTxFee(ctx, minGasPrice, feeCoin, feeGas, true)
-		if err != nil {
-			return ctx, errorsmod.Wrapf(err, "error checking fee")
+		if ctx.BlockHeight() == 0 {
+			return next(ctx, tx, simulate)
 		}
-	}
 
-	// escrow the entire amount that the account provided as fee (feeCoin)
-	err = dfd.EscrowFunds(ctx, tx, feeCoin)
-	if err != nil {
-		return ctx, errorsmod.Wrapf(err, "error escrowing funds")
-	}
+		feeTx, ok := tx.(sdk.FeeTx)
+		if !ok {
+			return ctx, errorsmod.Wrap(errors.ErrTxDecode, "Tx must be a FeeTx")
+		}
 
-	priorityFee, err := dfd.resolveTxPriorityCoins(ctx, feeCoin, params.FeeDenom)
-	if err != nil {
-		return ctx, errorsmod.Wrapf(err, "error resolving fee priority")
-	}
+		if !simulate && ctx.BlockHeight() > 0 && feeTx.GetGas() == 0 {
+			return ctx, errors.ErrInvalidGasLimit.Wrapf("must provide positive gas")
+		}
 
-	baseGasPrice, err := dfd.feemarketKeeper.GetMinGasPrice(ctx, params.FeeDenom)
-	if err != nil {
-		return ctx, err
-	}
+		params, err := dfd.feeMarketKeeper.GetParams(ctx)
+		if err != nil {
+			return ctx, errorsmod.Wrapf(err, "unable to get fee market params")
+		}
 
-	ctx = ctx.WithPriority(GetTxPriority(priorityFee, int64(gas), baseGasPrice))
+		// return if disabled
+		if !params.Enabled {
+			return next(ctx, tx, simulate)
+		}
+
+		feeCoins := feeTx.GetFee()
+		gas := feeTx.GetGas() // use provided gas limit
+
+		if len(feeCoins) == 0 && !simulate {
+			return ctx, errorsmod.Wrapf(feemarkettypes.ErrNoFeeCoins, "got length %d", len(feeCoins))
+		}
+		if len(feeCoins) > 1 {
+			return ctx, errorsmod.Wrapf(feemarkettypes.ErrTooManyFeeCoins, "got length %d", len(feeCoins))
+		}
+
+		var feeCoin sdk.Coin
+		if simulate && len(feeCoins) == 0 {
+			// if simulating and user did not provider a fee - create a dummy value for them
+			feeCoin = sdk.NewCoin(params.FeeDenom, sdkmath.OneInt())
+		} else {
+			feeCoin = feeCoins[0]
+		}
+		feeGas := int64(feeTx.GetGas())
+
+		minGasPrice, err := dfd.feeMarketKeeper.GetMinGasPrice(ctx, feeCoin.GetDenom())
+		if err != nil {
+			return ctx, errorsmod.Wrapf(err, "unable to get min gas price for denom %s", feeCoin.GetDenom())
+		}
+
+		ctx.Logger().Info("fee deduct ante handle",
+			"min gas prices", minGasPrice,
+			"fee", feeCoins,
+			"gas limit", gas,
+		)
+
+		ctx = ctx.WithMinGasPrices(sdk.NewDecCoins(minGasPrice))
+
+		if !simulate {
+			_, _, err := CheckTxFee(ctx, minGasPrice, feeCoin, feeGas, true)
+			if err != nil {
+				return ctx, errorsmod.Wrapf(err, "error checking fee")
+			}
+		}
+
+		// escrow the entire amount that the account provided as fee (feeCoin)
+		err = dfd.EscrowFunds(ctx, tx, feeCoin)
+		if err != nil {
+			return ctx, errorsmod.Wrapf(err, "error escrowing funds")
+		}
+
+		priorityFee, err := dfd.resolveTxPriorityCoins(ctx, feeCoin, params.FeeDenom)
+		if err != nil {
+			return ctx, errorsmod.Wrapf(err, "error resolving fee priority")
+		}
+
+		baseGasPrice, err := dfd.feeMarketKeeper.GetMinGasPrice(ctx, params.FeeDenom)
+		if err != nil {
+			return ctx, err
+		}
+
+		ctx = ctx.WithPriority(GetTxPriority(priorityFee, int64(gas), baseGasPrice))
+
+		return next(ctx, tx, simulate)
+	}
 
 	return next(ctx, tx, simulate)
 }
 
 // The actual fee is deducted in the post handler along with the tip.
-func (dfd feeMarketCheckDecorator) EscrowFunds(ctx sdk.Context, sdkTx sdk.Tx, providedFee sdk.Coin) error {
+func (dfd DeductFeeDecorator) EscrowFunds(ctx sdk.Context, sdkTx sdk.Tx, providedFee sdk.Coin) error {
 	feeTx, ok := sdkTx.(sdk.FeeTx)
 	if !ok {
 		return errorsmod.Wrap(errors.ErrTxDecode, "Tx must be a FeeTx")
@@ -235,13 +205,13 @@ func escrow(bankKeeper BankKeeper, ctx sdk.Context, acc authtypes.AccountI, coin
 }
 
 // resolveTxPriorityCoins converts the coins to the proper denom used for tx prioritization calculation.
-func (dfd feeMarketCheckDecorator) resolveTxPriorityCoins(ctx sdk.Context, fee sdk.Coin, baseDenom string) (sdk.Coin, error) {
+func (dfd DeductFeeDecorator) resolveTxPriorityCoins(ctx sdk.Context, fee sdk.Coin, baseDenom string) (sdk.Coin, error) {
 	if fee.Denom == baseDenom {
 		return fee, nil
 	}
 
 	feeDec := sdk.NewDecCoinFromCoin(fee)
-	convertedDec, err := dfd.feemarketKeeper.ResolveToDenom(ctx, feeDec, baseDenom)
+	convertedDec, err := dfd.feeMarketKeeper.ResolveToDenom(ctx, feeDec, baseDenom)
 	if err != nil {
 		return sdk.Coin{}, err
 	}

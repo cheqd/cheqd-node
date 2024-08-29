@@ -23,7 +23,7 @@ type HandlerOptions struct {
 	FeegrantKeeper         ante.FeegrantKeeper
 	SignModeHandler        authsigning.SignModeHandler
 	SigGasConsumer         func(meter sdk.GasMeter, sig signing.SignatureV2, params types.Params) error
-	TxFeeChecker           ante.TxFeeChecker
+	TxFeeChecker           cheqdante.TxFeeChecker
 	IBCKeeper              *ibckeeper.Keeper
 	DidKeeper              cheqdante.DidKeeper
 	ResourceKeeper         cheqdante.ResourceKeeper
@@ -64,17 +64,12 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
 		// v4 -> v5 ibc-go migration, v6 does not need migration
 		ibcante.NewRedundantRelayDecorator(options.IBCKeeper),
-		cheqdante.NewFeeMarketCheckDecorator( // fee market check replaces fee deduct decorator
+		cheqdante.NewDeductFeeDecorator( // fee market check replaces fee deduct decorator
 			options.AccountKeeper,
 			options.BankKeeper,
 			options.FeegrantKeeper,
+			options.TxFeeChecker,
 			options.FeeMarketKeeper,
-			ante.NewDeductFeeDecorator(
-				options.AccountKeeper,
-				options.BankKeeper,
-				options.FeegrantKeeper,
-				options.TxFeeChecker,
-			),
 		),
 	}
 

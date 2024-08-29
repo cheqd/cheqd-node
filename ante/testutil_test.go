@@ -190,6 +190,7 @@ func (s *AnteTestSuite) SetDidFeeParams(feeParams didtypes.FeeParams) {
 func (s *AnteTestSuite) SetResourceFeeParams(feeParams resourcetypes.FeeParams) {
 	s.app.ResourceKeeper.SetParams(s.ctx, feeParams)
 }
+
 func (s *AnteTestSuite) SetFeeMarketFeeDenom() error {
 	err := s.app.FeeMarketKeeper.SetParams(s.ctx, types.Params{FeeDenom: didtypes.BaseMinimalDenom})
 	if err != nil {

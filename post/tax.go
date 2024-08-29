@@ -168,8 +168,8 @@ func (td TaxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, suc
 
 // PayOutFeeAndTip deducts the provided fee and tip from the fee payer.
 // If the tx uses a feegranter, the fee granter address will pay the fee instead of the tx signer.
-func (dfd TaxDecorator) PayOutFeeAndTip(ctx sdk.Context, fee, tip sdk.Coin) error {
-	params, err := dfd.feemarketKeeper.GetParams(ctx)
+func (td TaxDecorator) PayOutFeeAndTip(ctx sdk.Context, fee, tip sdk.Coin) error {
+	params, err := td.feemarketKeeper.GetParams(ctx)
 	if err != nil {
 		return fmt.Errorf("error getting feemarket params: %v", err)
 	}
@@ -190,7 +190,7 @@ func (dfd TaxDecorator) PayOutFeeAndTip(ctx sdk.Context, fee, tip sdk.Coin) erro
 
 	proposer := sdk.AccAddress(ctx.BlockHeader().ProposerAddress)
 	if !tip.IsNil() {
-		err := SendTip(dfd.bankKeeper, ctx, proposer, sdk.NewCoins(tip))
+		err := SendTip(td.bankKeeper, ctx, proposer, sdk.NewCoins(tip))
 		if err != nil {
 			return err
 		}
