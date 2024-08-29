@@ -177,7 +177,7 @@ func (td TaxDecorator) PayOutFeeAndTip(ctx sdk.Context, fee, tip sdk.Coin) error
 	var events sdk.Events
 	// deduct the fees and tip
 	if !fee.IsNil() {
-		err := DeductCoins(dfd.bankKeeper, ctx, sdk.NewCoins(fee), params.DistributeFees)
+		err := DeductCoins(td.bankKeeper, ctx, sdk.NewCoins(fee), params.DistributeFees)
 		if err != nil {
 			return err
 		}
