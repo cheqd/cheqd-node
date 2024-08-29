@@ -96,7 +96,10 @@ func (s *AnteTestSuite) SetupTest(isCheckTx bool) error {
 		return err
 	}
 	s.anteHandler = anteHandler
-	s.SetFeeMarketFeeDenom()
+	err = s.SetFeeMarketFeeDenom()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -187,8 +190,12 @@ func (s *AnteTestSuite) SetDidFeeParams(feeParams didtypes.FeeParams) {
 func (s *AnteTestSuite) SetResourceFeeParams(feeParams resourcetypes.FeeParams) {
 	s.app.ResourceKeeper.SetParams(s.ctx, feeParams)
 }
-func (s *AnteTestSuite) SetFeeMarketFeeDenom() {
-	s.app.FeeMarketKeeper.SetParams(s.ctx, types.Params{FeeDenom: didtypes.BaseMinimalDenom})
+func (s *AnteTestSuite) SetFeeMarketFeeDenom() error {
+	err := s.app.FeeMarketKeeper.SetParams(s.ctx, types.Params{FeeDenom: didtypes.BaseMinimalDenom})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // TestCase represents a test case used in test tables.
