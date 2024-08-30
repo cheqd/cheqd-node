@@ -53,31 +53,12 @@ func (td TaxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, suc
 		return ctx, err
 	}
 	if taxable {
-		err = td.validateTax(feeTx.GetFee(), simulate)
+		err := td.handleTaxableTransaction(ctx, feeTx, simulate, rewards, burn, tx)
 		if err != nil {
-			return ctx, err
-		}
-		// get fee payer and check if fee grant exists
-		tax := rewards.Add(burn...)
-		feePayer, err := td.getFeePayer(ctx, feeTx, tax, tx.GetMsgs())
-		if err != nil {
-			return ctx, err
-		}
-		// deduct tax (rewards + burn) from fee payer to did module account
-		if err := td.deductTaxFromFeePayer(ctx, feePayer, tax); err != nil {
-			return ctx, err
-		}
-		// move rewards to fee collector to follow the default proposer logic
-		if err := td.distributeRewards(ctx, rewards); err != nil {
-			return ctx, err
-		}
-		// finally, burn tax portion from did module account
-		if err := td.burnFees(ctx, burn); err != nil {
 			return ctx, err
 		}
 		return next(ctx, tx, simulate, success)
 	}
-
 	params, err := td.feemarketKeeper.GetParams(ctx)
 	if err != nil {
 		return ctx, errorsmod.Wrapf(err, "unable to get fee market params")
@@ -328,5 +309,42 @@ func (td TaxDecorator) burnFees(ctx sdk.Context, fees sdk.Coins) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (td *TaxDecorator) handleTaxableTransaction(
+	ctx sdk.Context,
+	feeTx sdk.FeeTx,
+	simulate bool,
+	rewards, burn sdk.Coins,
+	tx sdk.Tx,
+) error {
+	// Validate the tax
+	if err := td.validateTax(feeTx.GetFee(), simulate); err != nil {
+		return err
+	}
+
+	// Get fee payer and check if fee grant exists
+	tax := rewards.Add(burn...)
+	feePayer, err := td.getFeePayer(ctx, feeTx, tax, tx.GetMsgs())
+	if err != nil {
+		return err
+	}
+
+	// Deduct tax from fee payer
+	if err := td.deductTaxFromFeePayer(ctx, feePayer, tax); err != nil {
+		return err
+	}
+
+	// Distribute rewards to fee collector
+	if err := td.distributeRewards(ctx, rewards); err != nil {
+		return err
+	}
+
+	// Burn the tax portion
+	if err := td.burnFees(ctx, burn); err != nil {
+		return err
+	}
+
 	return nil
 }
