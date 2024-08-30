@@ -41,7 +41,6 @@ var _ = Describe("Fee tests on CheckTx", func() {
 	})
 
 	It("Ensure Zero Mempool Fees On Simulation", func() {
-
 		mfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(mfd)
 

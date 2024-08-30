@@ -2,21 +2,12 @@ package ante
 
 import (
 	"github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 
 	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-type TxFeeChecker func(ctx sdk.Context, tx sdk.Tx) (sdk.Coins, int64, error)
-
-type DeductFeeDecorator struct {
-	accountKeeper  AccountKeeper
-	bankKeeper     BankKeeper
-	feegrantKeeper ante.FeegrantKeeper
-	txFeeChecker   TxFeeChecker
-}
 type OverAllDecorator struct {
 	decorators []sdk.AnteDecorator
 }
@@ -25,18 +16,7 @@ func NewOverAllDecorator(decorators ...sdk.AnteDecorator) OverAllDecorator {
 	return OverAllDecorator{
 		decorators: decorators,
 	}
-
 }
-
-// func newDeductFeeDecorator(ak AccountKeeper, bk BankKeeper, fk ante.FeegrantKeeper, tfc TxFeeChecker, fmk FeeMarketKeeper) DeductFeeDecorator {
-
-// 	return DeductFeeDecorator{
-// 		accountKeeper:  ak,
-// 		bankKeeper:     bk,
-// 		feegrantKeeper: fk,
-// 		txFeeChecker:   tfc,
-// 	}
-// }
 
 func (dfd OverAllDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
 	feeTx, ok := tx.(sdk.FeeTx)
