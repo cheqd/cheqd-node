@@ -8,23 +8,41 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
+	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/bank/testutil"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	feemarketante "github.com/skip-mev/feemarket/x/feemarket/ante"
 )
 
 var _ = Describe("Fee tests on CheckTx", func() {
 	s := new(AnteTestSuite)
 
+	var decorators []sdk.AnteDecorator
 	BeforeEach(func() {
 		err := s.SetupTest(true) // setup
 		Expect(err).To(BeNil(), "Error on creating test app")
 		s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
+		decorators = []sdk.AnteDecorator{
+			feemarketante.NewFeeMarketCheckDecorator( // fee market check replaces fee deduct decorator
+				s.app.AccountKeeper,
+				s.app.BankKeeper,
+				s.app.FeeGrantKeeper,
+				s.app.FeeMarketKeeper,
+				ante.NewDeductFeeDecorator(
+					s.app.AccountKeeper,
+					s.app.BankKeeper,
+					s.app.FeeGrantKeeper,
+					nil,
+				),
+			),
+		}
 	})
 
 	It("Ensure Zero Mempool Fees On Simulation", func() {
-		mfd := cheqdante.NewDeductFeeDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, nil, s.app.FeeMarketKeeper)
+
+		mfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(mfd)
 
 		// keys and addresses
@@ -56,65 +74,65 @@ var _ = Describe("Fee tests on CheckTx", func() {
 		Expect(err).To(BeNil())
 	})
 
-	// It("Ensure Mempool Fees", func() {
-	// 	mfd := cheqdante.NewFeeMarketCheckDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.FeeMarketKeeper, nil)
-	// 	antehandler := sdk.ChainAnteDecorators(mfd)
+	It("Ensure Mempool Fees", func() {
+		mfd := cheqdante.NewOverAllDecorator(decorators...)
+		antehandler := sdk.ChainAnteDecorators(mfd)
 
-	// 	// keys and addresses
-	// 	priv1, _, addr1 := testdata.KeyTestPubAddr()
-	// 	coins := sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(300_000_000_000)))
-	// 	err := testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
-	// 	Expect(err).To(BeNil())
+		// keys and addresses
+		priv1, _, addr1 := testdata.KeyTestPubAddr()
+		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(300_000_000_000)))
+		err := testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
+		Expect(err).To(BeNil())
 
-	// 	// msg and signatures
-	// 	msg := testdata.NewTestMsg(addr1)
-	// 	feeAmount := sdk.NewCoins(sdk.NewInt64Coin("stake", 20000))
-	// 	gasLimit := uint64(15)
-	// 	Expect(s.txBuilder.SetMsgs(msg)).To(BeNil())
-	// 	s.txBuilder.SetFeeAmount(feeAmount)
-	// 	s.txBuilder.SetGasLimit(gasLimit)
+		// msg and signatures
+		msg := testdata.NewTestMsg(addr1)
+		feeAmount := NewTestFeeAmount()
+		gasLimit := uint64(15)
+		Expect(s.txBuilder.SetMsgs(msg)).To(BeNil())
+		s.txBuilder.SetFeeAmount(feeAmount)
+		s.txBuilder.SetGasLimit(gasLimit)
 
-	// 	privs, accNums, accSeqs := []cryptotypes.PrivKey{priv1}, []uint64{0}, []uint64{0}
-	// 	tx, err := s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
-	// 	Expect(err).To(BeNil())
+		privs, accNums, accSeqs := []cryptotypes.PrivKey{priv1}, []uint64{0}, []uint64{0}
+		tx, err := s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
+		Expect(err).To(BeNil())
 
-	// 	// Set high gas price so standard test fee fails
-	// 	ncheqPrice := sdk.NewDecCoinFromDec("stake", sdk.NewDec(20_000_000_000))
-	// 	highGasPrice := []sdk.DecCoin{ncheqPrice}
-	// 	s.ctx = s.ctx.WithMinGasPrices(highGasPrice)
+		// Set high gas price so standard test fee fails
+		ncheqPrice := sdk.NewDecCoinFromDec(didtypes.BaseMinimalDenom, sdk.NewDec(20_000_000_000))
+		highGasPrice := []sdk.DecCoin{ncheqPrice}
+		s.ctx = s.ctx.WithMinGasPrices(highGasPrice)
 
-	// 	// Set IsCheckTx to true
-	// 	s.ctx = s.ctx.WithIsCheckTx(true)
+		// Set IsCheckTx to true
+		s.ctx = s.ctx.WithIsCheckTx(true)
 
-	// 	_, err = antehandler(s.ctx, tx, false)
-	// 	Expect(err).To(BeNil(), "Decorator should have errored on too low fee for local gasPrice")
+		// antehandler errors with insufficient fees
+		_, err = antehandler(s.ctx, tx, false)
+		Expect(err).NotTo(BeNil(), "Decorator should have errored on too low fee for local gasPrice")
 
-	// 	// antehandler should not error since we do not check minGasPrice in simulation mode
-	// 	cacheCtx, _ := s.ctx.CacheContext()
-	// 	_, err = antehandler(cacheCtx, tx, true)
-	// 	Expect(err).To(BeNil(), "Decorator should not have errored in simulation mode")
+		// antehandler should not error since we do not check minGasPrice in simulation mode
+		cacheCtx, _ := s.ctx.CacheContext()
+		_, err = antehandler(cacheCtx, tx, true)
+		Expect(err).To(BeNil(), "Decorator should not have errored in simulation mode")
 
-	// 	// // Set IsCheckTx to false
-	// 	s.ctx = s.ctx.WithIsCheckTx(false)
+		// Set IsCheckTx to false
+		s.ctx = s.ctx.WithIsCheckTx(false)
 
-	// 	// // antehandler should not error since we do not check minGasPrice in DeliverTx
-	// 	_, err = antehandler(s.ctx, tx, false)
-	// 	Expect(err).To(BeNil(), "MempoolFeeDecorator returned error in DeliverTx")
+		// antehandler should not error since we do not check minGasPrice in DeliverTx
+		_, err = antehandler(s.ctx, tx, false)
+		Expect(err).To(BeNil(), "MempoolFeeDecorator returned error in DeliverTx")
 
-	// 	// Set IsCheckTx back to true for testing sufficient mempool fee
-	// 	s.ctx = s.ctx.WithIsCheckTx(true)
+		// Set IsCheckTx back to true for testing sufficient mempool fee
+		s.ctx = s.ctx.WithIsCheckTx(true)
 
-	// 	ncheqPrice = sdk.NewDecCoinFromDec("stake", sdk.NewDec(0).Quo(sdk.NewDec(didtypes.BaseFactor)))
-	// 	lowGasPrice := []sdk.DecCoin{ncheqPrice}
-	// 	s.ctx = s.ctx.WithMinGasPrices(lowGasPrice) // 1 ncheq
+		ncheqPrice = sdk.NewDecCoinFromDec(didtypes.BaseMinimalDenom, sdk.NewDec(0).Quo(sdk.NewDec(didtypes.BaseFactor)))
+		lowGasPrice := []sdk.DecCoin{ncheqPrice}
+		s.ctx = s.ctx.WithMinGasPrices(lowGasPrice) // 1 ncheq
 
-	// 	newCtx, err := antehandler(s.ctx, tx, false)
-	// 	fmt.Println("newCtx>>>>>>...", newCtx.Priority())
-	// 	Expect(err).To(BeNil(), "Decorator should not have errored on fee higher than local gasPrice")
-	// 	// Priority is the smallest gas price amount in any denom. Since we have only 1 gas price
-	// 	// of 10000000000ncheq, the priority here is 10*10^9.
-	// 	Expect(int64(10) * didtypes.BaseFactor).To(Equal(newCtx.Priority()))
-	// })
+		newCtx, err := antehandler(s.ctx, tx, false)
+		Expect(err).To(BeNil(), "Decorator should not have errored on fee higher than local gasPrice")
+		// Priority is the smallest gas price amount in any denom. Since we have only 1 gas price
+		// of 10000000000ncheq, the priority here is 10*10^9.
+		Expect(int64(10) * didtypes.BaseFactor).To(Equal(newCtx.Priority()))
+	})
 
 	It("TaxableTx Mempool Inclusion", func() {
 		// keys and addresses
@@ -138,7 +156,7 @@ var _ = Describe("Fee tests on CheckTx", func() {
 		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(100_000_000_000))))
 		Expect(err).To(BeNil())
 
-		dfd := cheqdante.NewDeductFeeDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, nil, s.app.FeeMarketKeeper)
+		dfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
 		_, err = antehandler(s.ctx, tx, false)
@@ -157,53 +175,68 @@ var _ = Describe("Fee tests on CheckTx", func() {
 
 var _ = Describe("Fee tests on DeliverTx", func() {
 	s := new(AnteTestSuite)
+	var decorators []sdk.AnteDecorator
 
 	BeforeEach(func() {
 		err := s.SetupTest(false) // setup
 		Expect(err).To(BeNil(), "Error on creating test app")
 		s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
+		decorators = []sdk.AnteDecorator{
+			feemarketante.NewFeeMarketCheckDecorator( // fee market check replaces fee deduct decorator
+				s.app.AccountKeeper,
+				s.app.BankKeeper,
+				s.app.FeeGrantKeeper,
+				s.app.FeeMarketKeeper,
+				ante.NewDeductFeeDecorator(
+					s.app.AccountKeeper,
+					s.app.BankKeeper,
+					s.app.FeeGrantKeeper,
+					nil,
+				),
+			),
+		}
 	})
 
-	// It("Deduct Fees", func() {
-	// 	// keys and addresses
-	// 	priv1, _, addr1 := testdata.KeyTestPubAddr()
+	It("Deduct Fees", func() {
+		// keys and addresses
+		priv1, _, addr1 := testdata.KeyTestPubAddr()
 
-	// 	// msg and signatures
-	// 	msg := testdata.NewTestMsg(addr1)
-	// 	feeAmount := NewTestFeeAmount()
-	// 	gasLimit := testdata.NewTestGasLimit()
-	// 	Expect(s.txBuilder.SetMsgs(msg)).To(BeNil())
-	// 	s.txBuilder.SetFeeAmount(feeAmount)
-	// 	s.txBuilder.SetGasLimit(gasLimit)
+		// msg and signatures
+		msg := testdata.NewTestMsg(addr1)
+		feeAmount := NewTestFeeAmount()
+		gasLimit := testdata.NewTestGasLimit()
+		Expect(s.txBuilder.SetMsgs(msg)).To(BeNil())
+		s.txBuilder.SetFeeAmount(feeAmount)
+		s.txBuilder.SetGasLimit(gasLimit)
 
-	// 	privs, accNums, accSeqs := []cryptotypes.PrivKey{priv1}, []uint64{0}, []uint64{0}
-	// 	tx, err := s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
-	// 	Expect(err).To(BeNil())
+		privs, accNums, accSeqs := []cryptotypes.PrivKey{priv1}, []uint64{0}, []uint64{0}
+		tx, err := s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
+		Expect(err).To(BeNil())
 
-	// 	// Set account with insufficient funds
-	// 	acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
-	// 	s.app.AccountKeeper.SetAccount(s.ctx, acc)
-	// 	coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(10_000_000_000)))
-	// 	//nocheck:errcheck
-	// 	err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
-	// 	Expect(err).To(BeNil())
+		// Set account with insufficient funds
+		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
+		s.app.AccountKeeper.SetAccount(s.ctx, acc)
+		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(10_000_000_000)))
+		//nocheck:errcheck
+		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
+		Expect(err).To(BeNil())
 
-	// 	dfd := cheqdante.NewDeductFeeDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, nil, s.app.FeeMarketKeeper)
-	// 	antehandler := sdk.ChainAnteDecorators(dfd)
+		dfd := cheqdante.NewOverAllDecorator(decorators...)
+		antehandler := sdk.ChainAnteDecorators(dfd)
 
-	// 	_, err = antehandler(s.ctx, tx, false)
+		_, err = antehandler(s.ctx, tx, false)
 
-	// 	Expect(err).NotTo(BeNil(), "Tx did not error when fee payer had insufficient funds")
+		Expect(err).NotTo(BeNil(), "Tx did not error when fee payer had insufficient funds")
 
-	// 	// Set account with sufficient funds
-	// 	s.app.AccountKeeper.SetAccount(s.ctx, acc)
-	// 	err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(200_000_000_000))))
-	// 	Expect(err).To(BeNil())
+		// Set account with sufficient funds
+		s.app.AccountKeeper.SetAccount(s.ctx, acc)
+		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(200_000_000_000))))
+		Expect(err).To(BeNil())
 
-	// 	_, err = antehandler(s.ctx, tx, false)
+		_, err = antehandler(s.ctx, tx, false)
 
-	// 	Expect(err).To(BeNil(), "Tx errored after account has been set with sufficient funds")
-	// })
+		Expect(err).To(BeNil(), "Tx errored after account has been set with sufficient funds")
+	})
 
 	It("TaxableTx Lifecycle", func() {
 		// keys and addresses
@@ -229,7 +262,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
 		Expect(err).To(BeNil())
 
-		dfd := cheqdante.NewDeductFeeDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, nil, s.app.FeeMarketKeeper)
+		dfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
 		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
@@ -269,65 +302,64 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		Expect(feeCollectorBalance.Amount).To(Equal(reward.AmountOf(didtypes.BaseMinimalDenom)), "Reward was not sent to the fee collector")
 	})
 
-	// It("Non TaxableTx Lifecycle", func() {
-	// 	// keys and addresses
-	// 	priv1, _, addr1 := testdata.KeyTestPubAddr()
+	It("Non TaxableTx Lifecycle", func() {
+		// keys and addresses
+		priv1, _, addr1 := testdata.KeyTestPubAddr()
 
-	// 	// msg and signatures
-	// 	msg := testdata.NewTestMsg(addr1)
-	// 	feeAmount := sdk.NewCoins(sdk.NewInt64Coin("stake", 200000))
-	// 	gasLimit := testdata.NewTestGasLimit()
-	// 	Expect(s.txBuilder.SetMsgs(msg)).To(BeNil())
-	// 	s.txBuilder.SetFeeAmount(feeAmount)
-	// 	s.txBuilder.SetGasLimit(gasLimit)
-	// 	s.txBuilder.SetFeePayer(addr1)
+		// msg and signatures
+		msg := testdata.NewTestMsg(addr1)
+		feeAmount := NewTestFeeAmount()
+		gasLimit := testdata.NewTestGasLimit()
+		Expect(s.txBuilder.SetMsgs(msg)).To(BeNil())
+		s.txBuilder.SetFeeAmount(feeAmount)
+		s.txBuilder.SetGasLimit(gasLimit)
+		s.txBuilder.SetFeePayer(addr1)
 
-	// 	fmt.Println("gasLimit>>>>>>>>>", gasLimit)
-	// 	privs, accNums, accSeqs := []cryptotypes.PrivKey{priv1}, []uint64{0}, []uint64{0}
-	// 	tx, err := s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
-	// 	Expect(err).To(BeNil())
+		privs, accNums, accSeqs := []cryptotypes.PrivKey{priv1}, []uint64{0}, []uint64{0}
+		tx, err := s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
+		Expect(err).To(BeNil())
 
-	// 	// set account with sufficient funds
-	// 	acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
-	// 	s.app.AccountKeeper.SetAccount(s.ctx, acc)
-	// 	amount := sdk.NewInt(300_000_000_000)
-	// 	err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin("stake", amount)))
-	// 	Expect(err).To(BeNil())
+		// set account with sufficient funds
+		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
+		s.app.AccountKeeper.SetAccount(s.ctx, acc)
+		amount := sdk.NewInt(300_000_000_000)
+		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
+		Expect(err).To(BeNil())
 
-	// 	dfd := cheqdante.NewFeeMarketCheckDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.FeeMarketKeeper, nil)
-	// 	antehandler := sdk.ChainAnteDecorators(dfd)
+		dfd := cheqdante.NewOverAllDecorator(decorators...)
+		antehandler := sdk.ChainAnteDecorators(dfd)
 
-	// 	taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
-	// 	posthandler := sdk.ChainPostDecorators(taxDecorator)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
+		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
-	// 	// get supply before tx
-	// 	supplyBefore, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
-	// 	Expect(err).To(BeNil())
+		// get supply before tx
+		supplyBefore, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
+		Expect(err).To(BeNil())
 
-	// 	// antehandler should not error since we make sure that the fee is sufficient in DeliverTx (simulate=false only, Posthandler will check it otherwise)
-	// 	_, err = antehandler(s.ctx, tx, false)
-	// 	Expect(err).To(BeNil(), "Tx errored when non-taxable on deliverTx")
+		// antehandler should not error since we make sure that the fee is sufficient in DeliverTx (simulate=false only, Posthandler will check it otherwise)
+		_, err = antehandler(s.ctx, tx, false)
+		Expect(err).To(BeNil(), "Tx errored when non-taxable on deliverTx")
 
-	// 	_, err = posthandler(s.ctx, tx, false, true)
-	// 	Expect(err).To(BeNil(), "Tx errored when non-taxable on deliverTx from posthandler")
+		_, err = posthandler(s.ctx, tx, false, true)
+		Expect(err).To(BeNil(), "Tx errored when non-taxable on deliverTx from posthandler")
 
-	// 	// check balance of fee payer
-	// 	balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, "stake")
-	// 	Expect(amount.Sub(sdk.NewInt(feeAmount.AmountOf("stake").Int64()))).To(Equal(balance.Amount), "Fee amount subtracted was not equal to fee amount required for non-taxable tx")
+		// check balance of fee payer
+		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
+		Expect(amount.Sub(sdk.NewInt(feeAmount.AmountOf(didtypes.BaseMinimalDenom).Int64()))).To(Equal(balance.Amount), "Fee amount subtracted was not equal to fee amount required for non-taxable tx")
 
-	// 	// get supply after tx
-	// 	supplyAfter, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
-	// 	Expect(err).To(BeNil())
+		// get supply after tx
+		supplyAfter, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
+		Expect(err).To(BeNil())
 
-	// 	// check that supply was not deflated
-	// 	Expect(supplyBefore).To(Equal(supplyAfter), "Supply was deflated")
+		// check that supply was not deflated
+		Expect(supplyBefore).To(Equal(supplyAfter), "Supply was deflated")
 
-	// 	// check that reward has been sent to the fee collector
-	// 	feeCollector := s.app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName)
-	// 	feeCollectorBalance := s.app.BankKeeper.GetBalance(s.ctx, feeCollector, didtypes.BaseMinimalDenom)
+		// check that reward has been sent to the fee collector
+		feeCollector := s.app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName)
+		feeCollectorBalance := s.app.BankKeeper.GetBalance(s.ctx, feeCollector, didtypes.BaseMinimalDenom)
 
-	// 	Expect(feeCollectorBalance.Amount).To(Equal(feeAmount.AmountOf("stake")), "Fee was not sent to the fee collector")
-	// })
+		Expect(feeCollectorBalance.Amount).To(Equal(feeAmount.AmountOf(didtypes.BaseMinimalDenom)), "Fee was not sent to the fee collector")
+	})
 
 	It("TaxableTx Lifecycle on Simulation", func() {
 		// keys and addresses
@@ -350,7 +382,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
 		Expect(err).To(BeNil())
 
-		dfd := cheqdante.NewDeductFeeDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, nil, s.app.FeeMarketKeeper)
+		dfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
 		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
