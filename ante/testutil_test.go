@@ -23,9 +23,6 @@ import (
 	xauthsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
-
-	// mock "github.com/cheqd/cheqd-node/post/mocks"
-	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 )
 
 var (
