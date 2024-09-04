@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"cosmossdk.io/math"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/skip-mev/feemarket/x/feemarket/types"
 	"github.com/stretchr/testify/suite"
@@ -22,6 +23,44 @@ import (
 	xauthsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
+
+	// mock "github.com/cheqd/cheqd-node/post/mocks"
+	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
+)
+
+var (
+	// DefaultWindow is the default window size for the sliding window
+	// used to calculate the base fee. In the base EIP-1559 implementation,
+	// only the previous block is considered.
+	DefaultWindow uint64 = 1
+
+	// DefaultAlpha is not used in the base EIP-1559 implementation.
+	DefaultAlpha = math.LegacyMustNewDecFromStr("0.0")
+
+	// DefaultBeta is not used in the base EIP-1559 implementation.
+	DefaultBeta = math.LegacyMustNewDecFromStr("1.0")
+
+	// DefaultGamma is not used in the base EIP-1559 implementation.
+	DefaultGamma = math.LegacyMustNewDecFromStr("0.0")
+
+	// DefaultDelta is not used in the base EIP-1559 implementation.
+	DefaultDelta = math.LegacyMustNewDecFromStr("0.0")
+
+	// DefaultMaxBlockUtilization is the default maximum block utilization. This is the default
+	// on Ethereum. This denominated in units of gas consumed in a block.
+	DefaultMaxBlockUtilization uint64 = 30_000_000
+
+	// DefaultMinBaseGasPrice is the default minimum base fee.
+	DefaultMinBaseGasPrice = math.LegacyOneDec()
+
+	// DefaultMinLearningRate is not used in the base EIP-1559 implementation.
+	DefaultMinLearningRate = math.LegacyMustNewDecFromStr("0.125")
+
+	// DefaultMaxLearningRate is not used in the base EIP-1559 implementation.
+	DefaultMaxLearningRate = math.LegacyMustNewDecFromStr("0.125")
+
+	// DefaultFeeDenom is the Cosmos SDK default bond denom.
+	DefaultFeeDenom = didtypes.BaseMinimalDenom
 )
 
 // TestAccount represents an account used in the tests in x/auth/ante.
@@ -58,7 +97,9 @@ func createTestApp(isCheckTx bool) (*cheqdapp.TestApp, sdk.Context, error) {
 	app.DidKeeper.SetParams(ctx, *didFeeParams)
 	resourceFeeParams := resourcetypes.DefaultGenesis().FeeParams
 	app.ResourceKeeper.SetParams(ctx, *resourceFeeParams)
-
+	app.FeeMarketKeeper.SetParams(ctx, types.NewParams(DefaultWindow, DefaultAlpha, DefaultBeta, DefaultGamma, DefaultDelta,
+		DefaultMaxBlockUtilization, DefaultMinBaseGasPrice, DefaultMinLearningRate, DefaultMaxLearningRate, DefaultFeeDenom, true,
+	))
 	return app, ctx, nil
 }
 
@@ -96,10 +137,7 @@ func (s *AnteTestSuite) SetupTest(isCheckTx bool) error {
 		return err
 	}
 	s.anteHandler = anteHandler
-	err = s.SetFeeMarketFeeDenom()
-	if err != nil {
-		return err
-	}
+
 	return nil
 }
 
