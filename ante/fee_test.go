@@ -526,6 +526,7 @@ var _ = Describe("Test Deduct coins and distribute fees", func() {
 		Expect(feeCollectorBalance.Amount).To(Equal(deductFee.AmountOf(didtypes.BaseMinimalDenom)))
 	})
 })
+
 var _ = Describe("Test Send tip", func() {
 	s := new(AnteTestSuite)
 	BeforeEach(func() {
@@ -561,7 +562,6 @@ var _ = Describe("Test Send tip", func() {
 		balance := s.app.BankKeeper.GetBalance(s.ctx, proposer, didtypes.BaseMinimalDenom)
 
 		Expect(balance.Amount).To(Equal(tip.AmountOf(didtypes.BaseMinimalDenom)))
-
 	})
 
 	It("valid zero coin and distribute to feeCollector", func() {
@@ -674,7 +674,6 @@ var _ = Describe("Test PostHandle", func() {
 
 		_, err = antehandler(s.ctx, tx, true)
 		Expect(err).NotTo(BeNil(), "signer has no funds")
-
 	})
 	It("0 gas given should fail", func() {
 		// keys and addresses
@@ -704,7 +703,6 @@ var _ = Describe("Test PostHandle", func() {
 
 		_, err = antehandler(s.ctx, tx, false)
 		Expect(err).NotTo(BeNil(), "must provide a postive gas")
-
 	})
 	It("0 gas given should pass in simulation", func() {
 		// keys and addresses
