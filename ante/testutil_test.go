@@ -94,9 +94,12 @@ func createTestApp(isCheckTx bool) (*cheqdapp.TestApp, sdk.Context, error) {
 	app.DidKeeper.SetParams(ctx, *didFeeParams)
 	resourceFeeParams := resourcetypes.DefaultGenesis().FeeParams
 	app.ResourceKeeper.SetParams(ctx, *resourceFeeParams)
-	app.FeeMarketKeeper.SetParams(ctx, types.NewParams(DefaultWindow, DefaultAlpha, DefaultBeta, DefaultGamma, DefaultDelta,
+	err = app.FeeMarketKeeper.SetParams(ctx, types.NewParams(DefaultWindow, DefaultAlpha, DefaultBeta, DefaultGamma, DefaultDelta,
 		DefaultMaxBlockUtilization, DefaultMinBaseGasPrice, DefaultMinLearningRate, DefaultMaxLearningRate, DefaultFeeDenom, true,
 	))
+	if err != nil {
+		return nil, ctx, err
+	}
 	return app, ctx, nil
 }
 

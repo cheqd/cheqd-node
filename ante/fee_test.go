@@ -702,7 +702,7 @@ var _ = Describe("Test PostHandle", func() {
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
 		_, err = antehandler(s.ctx, tx, false)
-		Expect(err).NotTo(BeNil(), "must provide a postive gas")
+		Expect(err).NotTo(BeNil(), "must provide a positive gas")
 	})
 	It("0 gas given should pass in simulation", func() {
 		// keys and addresses
