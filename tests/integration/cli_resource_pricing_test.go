@@ -1,5 +1,3 @@
-//go:build integration
-
 package integration
 
 import (
@@ -363,6 +361,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		By("revoking the feegrant")
 		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CliGasParams)
 		Expect(err).To(BeNil())
+		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 
 	It("should tax create resource image with feegrant - case: fixed fee", func() {
@@ -418,6 +417,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		By("revoking the feegrant")
 		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CliGasParams)
 		Expect(err).To(BeNil())
+		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 
 	It("should tax create resource default with feegrant - case: fixed fee", func() {
@@ -473,5 +473,6 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		By("revoking the feegrant")
 		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CliGasParams)
 		Expect(err).To(BeNil())
+		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 })
