@@ -298,62 +298,62 @@ jobs:
   #       run: |
   #         bash scripts/cleanup.sh
 
-  report-results:
-    name: "Report"
-    runs-on: ubuntu-20.04
-    # NOTE: If not next major release, only unit and integration tests are necessary, otherwise all tests are needed.
-    # needs: [unit-tests, integration-tests]
-    needs: [unit-tests, integration-tests, upgrade-tests]
-    if: always()
+  # report-results:
+  #   name: "Report"
+  #   runs-on: ubuntu-20.04
+  #   # NOTE: If not next major release, only unit and integration tests are necessary, otherwise all tests are needed.
+  #   # needs: [unit-tests, integration-tests]
+  #   needs: [unit-tests, integration-tests, upgrade-tests]
+  #   if: always()
 
-    steps:
-      - uses: actions/checkout@v4
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Download unit test
-        uses: actions/download-artifact@v4
-        with:
-          name: report-unit.xml
+  #     - name: Download unit test
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: report-unit.xml
 
-      - name: Download integration test report
-        uses: actions/download-artifact@v4
-        with:
-          name: report-integration.xml
+  #     - name: Download integration test report
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: report-integration.xml
 
-      - name: Download pre-upgrade test Report
-        uses: actions/download-artifact@v4
-        with:
-          name: report-pre-upgrade.xml
+  #     - name: Download pre-upgrade test Report
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: report-pre-upgrade.xml
 
-      - name: Download post-upgrade test Report
-        uses: actions/download-artifact@v4
-        with:
-          name: report-post-upgrade.xml
+  #     - name: Download post-upgrade test Report
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: report-post-upgrade.xml
 
-      - name: Download upgraded integration test Report
-        uses: actions/download-artifact@v4
-        with:
-          name: report-upgraded-integration.xml
+  #     - name: Download upgraded integration test Report
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: report-upgraded-integration.xml
 
-      - name: Download pricing proposal test Report
-        uses: actions/download-artifact@v4
-        with:
-          name: report-pricing-proposal.xml
+  #     - name: Download pricing proposal test Report
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: report-pricing-proposal.xml
 
-      - name: Download pricing change test Report
-        uses: actions/download-artifact@v4
-        with:
-          name: report-pricing-change.xml
+  #     - name: Download pricing change test Report
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: report-pricing-change.xml
 
-      - name: Combine test results
-        run: |
-          python ./.github/scripts/xml_combine.py report-unit.xml report-integration.xml report-pre-upgrade.xml report-post-upgrade.xml report-upgraded-integration.xml report-pricing-proposal.xml report-pricing-change.xml > report.xml
-        # run: |
-        #   python ./.github/scripts/xml_combine.py report-unit.xml report-integration.xml > report.xml
+  #     - name: Combine test results
+  #       run: |
+  #         python ./.github/scripts/xml_combine.py report-unit.xml report-integration.xml report-pre-upgrade.xml report-post-upgrade.xml report-upgraded-integration.xml report-pricing-proposal.xml report-pricing-change.xml > report.xml
+  #       # run: |
+  #       #   python ./.github/scripts/xml_combine.py report-unit.xml report-integration.xml > report.xml
 
-      - uses: mikepenz/action-junit-report@v4
-        with:
-          report_paths: 'report.xml'
-          check_name: ""
-          suite_regex: '*'
-          include_passed: true
-          detailed_summary: true
+  #     - uses: mikepenz/action-junit-report@v4
+  #       with:
+  #         report_paths: 'report.xml'
+  #         check_name: ""
+  #         suite_regex: '*'
+  #         include_passed: true
+  #         detailed_summary: true
