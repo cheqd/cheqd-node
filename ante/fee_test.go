@@ -76,65 +76,87 @@ var _ = Describe("Fee tests on CheckTx", func() {
 		Expect(err).To(BeNil())
 	})
 
-	// It("Ensure Mempool Fees", func() {
-	// 	mfd := cheqdante.NewOverAllDecorator(decorators...)
-	// 	antehandler := sdk.ChainAnteDecorators(mfd)
+	It("Ensure Mempool Fees", func() {
+		mfd := cheqdante.NewOverAllDecorator(decorators...)
+		antehandler := sdk.ChainAnteDecorators(mfd)
 
-	// 	// keys and addresses
-	// 	priv1, _, addr1 := testdata.KeyTestPubAddr()
-	// 	coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(300_000_000_000)))
-	// 	err := testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
-	// 	Expect(err).To(BeNil())
+		// keys and addresses
+		priv1, _, addr1 := testdata.KeyTestPubAddr()
+		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(300_000_000_000)))
+		err := testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
+		Expect(err).To(BeNil())
 
-	// 	// msg and signatures
-	// 	msg := testdata.NewTestMsg(addr1)
-	// 	feeAmount := NewTestFeeAmount()
-	// 	gasLimit := uint64(15)
-	// 	Expect(s.txBuilder.SetMsgs(msg)).To(BeNil())
-	// 	s.txBuilder.SetFeeAmount(feeAmount)
-	// 	s.txBuilder.SetGasLimit(gasLimit)
+		// msg and signatures
+		msg := testdata.NewTestMsg(addr1)
+		feeAmount := NewTestFeeAmount()
+		gasLimit := uint64(15)
+		Expect(s.txBuilder.SetMsgs(msg)).To(BeNil())
+		s.txBuilder.SetFeeAmount(feeAmount)
+		s.txBuilder.SetGasLimit(gasLimit)
 
-	// 	privs, accNums, accSeqs := []cryptotypes.PrivKey{priv1}, []uint64{0}, []uint64{0}
-	// 	tx, err := s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
-	// 	Expect(err).To(BeNil())
+		privs, accNums, accSeqs := []cryptotypes.PrivKey{priv1}, []uint64{0}, []uint64{0}
+		tx, err := s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
+		Expect(err).To(BeNil())
 
-	// 	// Set high gas price so standard test fee fails
-	// 	ncheqPrice := sdk.NewDecCoinFromDec(didtypes.BaseMinimalDenom, sdk.NewDec(200_000_000_000))
-	// 	highGasPrice := []sdk.DecCoin{ncheqPrice}
-	// 	s.ctx = s.ctx.WithMinGasPrices(highGasPrice)
+		// Set high gas price so standard test fee fails
+		ncheqPrice := sdk.NewDecCoinFromDec(didtypes.BaseMinimalDenom, sdk.NewDec(200_000_000_000))
 
-	// 	// Set IsCheckTx to true
-	// 	s.ctx = s.ctx.WithIsCheckTx(true)
+		params, err := s.app.FeeMarketKeeper.GetParams(s.ctx)
+		Expect(err).To(BeNil())
 
-	// 	// antehandler errors with insufficient fees
-	// 	_, err = antehandler(s.ctx, tx, false)
-	// 	Expect(err).To(BeNil(), "Decorator should have errored on too low fee for local gasPrice")
+		// Since we use the BaseGasPrice set by the feemarket
+		// Set high gas price in feemarket
+		params.MinBaseGasPrice = ncheqPrice.Amount
+		s.app.FeeMarketKeeper.SetParams(s.ctx, params)
+		state := feemarkettypes.DefaultState()
+		state.BaseGasPrice = ncheqPrice.Amount
+		s.app.FeeMarketKeeper.SetState(s.ctx, feemarkettypes.NewState(
+			state.Index,
+			state.BaseGasPrice,
+			state.LearningRate,
+		))
+		params, err = s.app.FeeMarketKeeper.GetParams(s.ctx)
+		Expect(err).To(BeNil())
 
-	// 	// antehandler should not error since we do not check minGasPrice in simulation mode
-	// 	cacheCtx, _ := s.ctx.CacheContext()
-	// 	_, err = antehandler(cacheCtx, tx, true)
-	// 	Expect(err).To(BeNil(), "Decorator should not have errored in simulation mode")
+		// Set IsCheckTx to true
+		s.ctx = s.ctx.WithIsCheckTx(true)
 
-	// 	// Set IsCheckTx to false
-	// 	s.ctx = s.ctx.WithIsCheckTx(false)
+		// antehandler errors with insufficient fees
+		_, err = antehandler(s.ctx, tx, false)
+		Expect(err).NotTo(BeNil(), "Decorator should have errored on too low fee for local gasPrice")
 
-	// 	// antehandler should not error since we do not check minGasPrice in DeliverTx
-	// 	_, err = antehandler(s.ctx, tx, false)
-	// 	Expect(err).To(BeNil(), "MempoolFeeDecorator returned error in DeliverTx")
+		// antehandler should not error since we do not check minGasPrice in simulation mode
+		params, err = s.app.FeeMarketKeeper.GetParams(s.ctx)
+		Expect(err).To(BeNil())
 
-	// 	// Set IsCheckTx back to true for testing sufficient mempool fee
-	// 	s.ctx = s.ctx.WithIsCheckTx(true)
+		// Set high gas price in feemarket
+		params.Enabled = false
+		s.app.FeeMarketKeeper.SetParams(s.ctx, params)
 
-	// 	ncheqPrice = sdk.NewDecCoinFromDec(didtypes.BaseMinimalDenom, sdk.NewDec(0).Quo(sdk.NewDec(didtypes.BaseFactor)))
-	// 	lowGasPrice := []sdk.DecCoin{ncheqPrice}
-	// 	s.ctx = s.ctx.WithMinGasPrices(lowGasPrice) // 1 ncheq
+		cacheCtx, _ := s.ctx.CacheContext()
+		_, err = antehandler(cacheCtx, tx, true)
+		Expect(err).To(BeNil(), "Decorator should not have errored in simulation mode")
 
-	// 	newCtx, err := antehandler(s.ctx, tx, false)
-	// 	Expect(err).To(BeNil(), "Decorator should not have errored on fee higher than local gasPrice")
-	// 	// Priority is the smallest gas price amount in any denom. Since we have only 1 gas price
-	// 	// of 10000000000ncheq, the priority here is 10*10^9.
-	// 	Expect(int64(10) * didtypes.BaseFactor).To(Equal(newCtx.Priority()))
-	// })
+		// Set IsCheckTx to false
+		s.ctx = s.ctx.WithIsCheckTx(false)
+
+		// antehandler should not error since we do not check minGasPrice in DeliverTx
+		_, err = antehandler(s.ctx, tx, false)
+		Expect(err).To(BeNil(), "MempoolFeeDecorator returned error in DeliverTx")
+
+		// Set IsCheckTx back to true for testing sufficient mempool fee
+		s.ctx = s.ctx.WithIsCheckTx(true)
+
+		ncheqPrice = sdk.NewDecCoinFromDec(didtypes.BaseMinimalDenom, sdk.NewDec(0).Quo(sdk.NewDec(didtypes.BaseFactor)))
+		lowGasPrice := []sdk.DecCoin{ncheqPrice}
+		s.ctx = s.ctx.WithMinGasPrices(lowGasPrice) // 1 ncheq
+
+		newCtx, err := antehandler(s.ctx, tx, false)
+		Expect(err).To(BeNil(), "Decorator should not have errored on fee higher than local gasPrice")
+		// Priority is the smallest gas price amount in any denom. Since we have only 1 gas price
+		// of 10000000000ncheq, the priority here is 10*10^9.
+		Expect(int64(10) * didtypes.BaseFactor).To(Equal(newCtx.Priority()))
+	})
 
 	It("TaxableTx Mempool Inclusion", func() {
 		// keys and addresses
