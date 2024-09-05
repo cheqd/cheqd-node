@@ -107,14 +107,18 @@ var _ = Describe("Fee tests on CheckTx", func() {
 		// Since we use the BaseGasPrice set by the feemarket
 		// Set high gas price in feemarket
 		params.MinBaseGasPrice = ncheqPrice.Amount
-		s.app.FeeMarketKeeper.SetParams(s.ctx, params)
+		err = s.app.FeeMarketKeeper.SetParams(s.ctx, params)
+		Expect(err).To(BeNil())
+
 		state := feemarkettypes.DefaultState()
 		state.BaseGasPrice = ncheqPrice.Amount
-		s.app.FeeMarketKeeper.SetState(s.ctx, feemarkettypes.NewState(
+		err = s.app.FeeMarketKeeper.SetState(s.ctx, feemarkettypes.NewState(
 			state.Index,
 			state.BaseGasPrice,
 			state.LearningRate,
 		))
+		Expect(err).To(BeNil())
+
 		params, err = s.app.FeeMarketKeeper.GetParams(s.ctx)
 		Expect(err).To(BeNil())
 
@@ -131,7 +135,8 @@ var _ = Describe("Fee tests on CheckTx", func() {
 
 		// Set high gas price in feemarket
 		params.Enabled = false
-		s.app.FeeMarketKeeper.SetParams(s.ctx, params)
+		err = s.app.FeeMarketKeeper.SetParams(s.ctx, params)
+		Expect(err).To(BeNil())
 
 		cacheCtx, _ := s.ctx.CacheContext()
 		_, err = antehandler(cacheCtx, tx, true)
