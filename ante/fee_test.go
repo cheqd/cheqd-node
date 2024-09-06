@@ -1,15 +1,21 @@
 package ante_test
 
 import (
+	"strings"
+
 	cheqdante "github.com/cheqd/cheqd-node/ante"
 	cheqdpost "github.com/cheqd/cheqd-node/post"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/bank/testutil"
+	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
+	"github.com/osmosis-labs/fee-abstraction/v7/x/feeabs/ante"
+	"github.com/osmosis-labs/fee-abstraction/v7/x/feeabs/types"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -385,3 +391,279 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		Expect(feeCollectorBalance.Amount).To(Equal(sdk.NewInt(0)), "Reward was sent to the fee collector when taxable tx simulation mode")
 	})
 })
+
+var _ = Describe("Fee abstraction", func() {
+	var gasLimit uint64
+	var mockHostZoneConfig types.HostChainFeeAbsConfig
+
+	// mockHostZoneConfig is used to mock the host zone config, with ibcfee as the ibc fee denom to be used as alternative fee
+	BeforeEach(func() {
+		gasLimit = 200000
+		mockHostZoneConfig = types.HostChainFeeAbsConfig{
+			IbcDenom:                "ibcfee",
+			OsmosisPoolTokenDenomIn: "osmosis",
+			PoolId:                  1,
+			Status:                  types.HostChainFeeAbsStatus_UPDATED,
+			MinSwapAmount:           0,
+		}
+	})
+
+	// Define test cases inside a context
+	Context("Testing MempoolDecorator with different fee amounts", func() {
+		var suite *AnteTestSuite
+
+		BeforeEach(func() {
+			// Set up the test suite for each test case
+			suite = new(AnteTestSuite)
+			err := suite.SetupTest(true) // setup
+			Expect(err).To(BeNil(), "Error on creating test app")
+			suite.txBuilder = suite.clientCtx.TxConfig.NewTxBuilder()
+		})
+
+		It("should fail with empty fee", func() {
+			feeAmount := sdk.Coins{}
+			minGasPrice := sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin("ncheq", 100))...)
+			suite.txBuilder.SetGasLimit(gasLimit)
+			suite.txBuilder.SetFeeAmount(feeAmount)
+			suite.ctx = suite.ctx.WithMinGasPrices(minGasPrice)
+
+			// Construct and run the ante handler
+			tx := suite.txBuilder.GetTx()
+			mempoolDecorator := ante.NewFeeAbstrationMempoolFeeDecorator(suite.app.FeeabsKeeper)
+			anteHandler := sdk.ChainAnteDecorators(mempoolDecorator)
+
+			_, err := anteHandler(suite.ctx, tx, false)
+
+			// Expect error due to insufficient fee
+			Expect(err).To(HaveOccurred())
+			Expect(strings.Contains(err.Error(), errors.ErrInsufficientFee.Error())).To(BeTrue())
+		})
+
+		It("should fail with insufficient native fee", func() {
+			feeAmount := sdk.NewCoins(sdk.NewInt64Coin("ncheq", 100))
+			minGasPrice := sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin("ncheq", 1000))...)
+			suite.txBuilder.SetGasLimit(gasLimit)
+			suite.txBuilder.SetFeeAmount(feeAmount)
+			suite.ctx = suite.ctx.WithMinGasPrices(minGasPrice)
+
+			// Construct and run the ante handler
+			tx := suite.txBuilder.GetTx()
+			mempoolDecorator := ante.NewFeeAbstrationMempoolFeeDecorator(suite.app.FeeabsKeeper)
+			anteHandler := sdk.ChainAnteDecorators(mempoolDecorator)
+
+			_, err := anteHandler(suite.ctx, tx, false)
+
+			// Expect error due to insufficient fee
+			Expect(err).To(HaveOccurred())
+			Expect(strings.Contains(err.Error(), errors.ErrInsufficientFee.Error())).To(BeTrue())
+		})
+
+		It("should pass with sufficient native fee", func() {
+			feeAmount := sdk.NewCoins(sdk.NewInt64Coin("ncheq", 1000*int64(gasLimit)))
+			minGasPrice := sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin("ncheq", 1000))...)
+			suite.txBuilder.SetGasLimit(gasLimit)
+			suite.txBuilder.SetFeeAmount(feeAmount)
+			suite.ctx = suite.ctx.WithMinGasPrices(minGasPrice)
+
+			// Construct and run the ante handler
+			tx := suite.txBuilder.GetTx()
+			mempoolDecorator := ante.NewFeeAbstrationMempoolFeeDecorator(suite.app.FeeabsKeeper)
+			anteHandler := sdk.ChainAnteDecorators(mempoolDecorator)
+
+			_, err := anteHandler(suite.ctx, tx, false)
+
+			// No error is expected
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("should fail with unknown ibc fee denom", func() {
+			feeAmount := sdk.NewCoins(sdk.NewInt64Coin("ibcfee", 1000*int64(gasLimit)))
+			minGasPrice := sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin("ncheq", 1000))...)
+			suite.txBuilder.SetGasLimit(gasLimit)
+			suite.txBuilder.SetFeeAmount(feeAmount)
+			suite.ctx = suite.ctx.WithMinGasPrices(minGasPrice)
+
+			// Construct and run the ante handler
+			tx := suite.txBuilder.GetTx()
+			mempoolDecorator := ante.NewFeeAbstrationMempoolFeeDecorator(suite.app.FeeabsKeeper)
+			anteHandler := sdk.ChainAnteDecorators(mempoolDecorator)
+
+			_, err := anteHandler(suite.ctx, tx, false)
+
+			// Expect error due to unknown ibc fee denom
+			Expect(err).To(HaveOccurred())
+			Expect(strings.Contains(err.Error(), errors.ErrInvalidCoins.Error())).To(BeTrue())
+		})
+
+		It("should pass with sufficient ibc fee", func() {
+			feeAmount := sdk.NewCoins(sdk.NewInt64Coin("ibcfee", 1000*int64(gasLimit)))
+			minGasPrice := sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin("stake", 1000))...)
+			suite.txBuilder.SetGasLimit(gasLimit)
+			suite.txBuilder.SetFeeAmount(feeAmount)
+			suite.ctx = suite.ctx.WithMinGasPrices(minGasPrice)
+
+			// Configure the HostZoneConfig
+			err := suite.app.FeeabsKeeper.SetHostZoneConfig(suite.ctx, mockHostZoneConfig)
+			Expect(err).ToNot(HaveOccurred())
+			suite.app.FeeabsKeeper.SetTwapRate(suite.ctx, "ibcfee", sdk.NewDec(1))
+
+			// Construct and run the ante handler
+			tx := suite.txBuilder.GetTx()
+			mempoolDecorator := ante.NewFeeAbstrationMempoolFeeDecorator(suite.app.FeeabsKeeper)
+			anteHandler := sdk.ChainAnteDecorators(mempoolDecorator)
+
+			_, err = anteHandler(suite.ctx, tx, false)
+
+			// No error is expected
+			Expect(err).ToNot(HaveOccurred())
+		})
+	})
+})
+
+var _ = Describe("DeductFeeDecorator", func() {
+	var gasLimit uint64
+	var minGasPrice sdk.DecCoins
+	var feeAmount sdk.Coins
+	var ibcFeeAmount sdk.Coins
+	var mockHostZoneConfig types.HostChainFeeAbsConfig
+	var suite *AnteTestSuite
+	var testAcc TestAccount
+
+	// Setup the common test data
+	BeforeEach(func() {
+		gasLimit = 200000
+		minGasPrice = sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin("ncheq", 1000))...)
+		feeAmount = sdk.NewCoins(sdk.NewInt64Coin("ncheq", 1000*int64(gasLimit)))
+		ibcFeeAmount = sdk.NewCoins(sdk.NewInt64Coin("ibcfee", 1000*int64(gasLimit)))
+
+		mockHostZoneConfig = types.HostChainFeeAbsConfig{
+			IbcDenom:                "ibcfee",
+			OsmosisPoolTokenDenomIn: "osmosis",
+			PoolId:                  1,
+			Status:                  types.HostChainFeeAbsStatus_UPDATED,
+			MinSwapAmount:           0,
+		}
+
+		// Initialize suite for each test case
+		suite = new(AnteTestSuite)
+		err := suite.SetupTest(true) // setup
+		Expect(err).To(BeNil(), "Error on creating test app")
+		suite.txBuilder = suite.clientCtx.TxConfig.NewTxBuilder()
+		acc, err := suite.CreateTestAccounts(1)
+		testAcc = acc[0]
+		Expect(err).To(BeNil())
+		Expect(len(acc)).To(Equal(1))
+		suite.txBuilder.SetGasLimit(gasLimit)
+		suite.txBuilder.SetFeeAmount(feeAmount)
+		suite.txBuilder.SetFeePayer(acc[0].acc.GetAddress())
+		suite.ctx = suite.ctx.WithMinGasPrices(minGasPrice)
+
+		params := suite.app.StakingKeeper.GetParams(suite.ctx)
+		params.BondDenom = "ncheq"
+		suite.app.StakingKeeper.SetParams(suite.ctx, params)
+
+		// this line will create the module account
+		_ = suite.app.AccountKeeper.GetModuleAccount(suite.ctx, types.ModuleName)
+
+	})
+
+	Describe("Handling Deduct Fee Decorator", func() {
+		When("native fee is insufficient", func() {
+			It("should fail due to insufficient native fee", func() {
+				suite.app.FeeabsKeeper.SetTwapRate(suite.ctx, "ibcfee", sdk.NewDec(1))
+				_, _, addr := testdata.KeyTestPubAddr()
+				acc := suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addr)
+				err := acc.SetAccountNumber(1)
+				Expect(err).ToNot(HaveOccurred())
+
+				suite.app.AccountKeeper.SetAccount(suite.ctx, acc)
+
+				suite.txBuilder.SetFeePayer(acc.GetAddress())
+				// Construct and run the ante handler
+				tx := suite.txBuilder.GetTx()
+				deductFeeDecorator := ante.NewFeeAbstractionDeductFeeDecorate(suite.app.AccountKeeper, suite.app.BankKeeper, suite.app.FeeabsKeeper, suite.app.FeeGrantKeeper)
+				anteHandler := sdk.ChainAnteDecorators(deductFeeDecorator)
+
+				_, err = anteHandler(suite.ctx, tx, false)
+
+				Expect(err).To(HaveOccurred())
+				Expect(strings.Contains(err.Error(), errors.ErrInsufficientFunds.Error())).To(BeTrue())
+			})
+		})
+	})
+
+	When("native fee is sufficient", func() {
+		It("should pass with sufficient native fee", func() {
+			suite.app.FeeabsKeeper.SetTwapRate(suite.ctx, "ibcfee", sdk.NewDec(1))
+
+			// Construct and run the ante handler
+			tx := suite.txBuilder.GetTx()
+			deductFeeDecorator := ante.NewFeeAbstractionDeductFeeDecorate(suite.app.AccountKeeper, suite.app.BankKeeper, suite.app.FeeabsKeeper, suite.app.FeeGrantKeeper)
+			anteHandler := sdk.ChainAnteDecorators(deductFeeDecorator)
+
+			_, err := anteHandler(suite.ctx, tx, false)
+
+			Expect(err).ToNot(HaveOccurred())
+		})
+	})
+
+	When("ibc fee is insufficient", func() {
+		It("should fail due to insufficient ibc fee", func() {
+			err := suite.app.FeeabsKeeper.SetHostZoneConfig(suite.ctx, mockHostZoneConfig)
+			Expect(err).ToNot(HaveOccurred())
+			suite.app.FeeabsKeeper.SetTwapRate(suite.ctx, "ibcfee", sdk.NewDec(1))
+
+			suite.txBuilder.SetFeeAmount(ibcFeeAmount)
+
+			// Construct and run the ante handler
+			tx := suite.txBuilder.GetTx()
+			deductFeeDecorator := ante.NewFeeAbstractionDeductFeeDecorate(suite.app.AccountKeeper, suite.app.BankKeeper, suite.app.FeeabsKeeper, suite.app.FeeGrantKeeper)
+			anteHandler := sdk.ChainAnteDecorators(deductFeeDecorator)
+
+			_, err = anteHandler(suite.ctx, tx, false)
+
+			Expect(err).To(HaveOccurred())
+			Expect(strings.Contains(err.Error(), errors.ErrInsufficientFunds.Error())).To(BeTrue())
+		})
+	})
+
+	When("ibc fee is sufficient", func() {
+		It("should pass with sufficient ibc fee", func() {
+			err := suite.app.FeeabsKeeper.SetHostZoneConfig(suite.ctx, mockHostZoneConfig)
+			Expect(err).ToNot(HaveOccurred())
+			suite.app.FeeabsKeeper.SetTwapRate(suite.ctx, "ibcfee", sdk.NewDec(1))
+			suite.txBuilder.SetFeeAmount(ibcFeeAmount)
+
+			feeabsAddr := suite.app.FeeabsKeeper.GetFeeAbsModuleAddress()
+
+			err = suite.mintCoins(feeabsAddr, sdk.NewCoins(feeAmount...))
+			Expect(err).ToNot(HaveOccurred())
+
+			err = suite.mintCoins(testAcc.acc.GetAddress(), sdk.NewCoins(ibcFeeAmount...))
+			Expect(err).ToNot(HaveOccurred())
+
+			// Construct and run the ante handler
+			tx := suite.txBuilder.GetTx()
+			deductFeeDecorator := ante.NewFeeAbstractionDeductFeeDecorate(suite.app.AccountKeeper, suite.app.BankKeeper, suite.app.FeeabsKeeper, suite.app.FeeGrantKeeper)
+			anteHandler := sdk.ChainAnteDecorators(deductFeeDecorator)
+
+			_, err = anteHandler(suite.ctx, tx, false)
+
+			Expect(err).ToNot(HaveOccurred())
+		})
+	})
+})
+
+func (s *AnteTestSuite) mintCoins(addr sdk.AccAddress, someCoins sdk.Coins) error {
+	err := s.app.BankKeeper.MintCoins(s.ctx, minttypes.ModuleName, someCoins)
+	if err != nil {
+		return err
+	}
+
+	err = s.app.BankKeeper.SendCoinsFromModuleToAccount(s.ctx, minttypes.ModuleName, addr, someCoins)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
