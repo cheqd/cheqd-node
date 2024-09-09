@@ -565,7 +565,6 @@ var _ = Describe("DeductFeeDecorator", func() {
 
 		// this line will create the module account
 		_ = suite.app.AccountKeeper.GetModuleAccount(suite.ctx, types.ModuleName)
-
 	})
 
 	Describe("Handling Deduct Fee Decorator", func() {
