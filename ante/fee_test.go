@@ -560,7 +560,8 @@ var _ = Describe("DeductFeeDecorator", func() {
 
 		params := suite.app.StakingKeeper.GetParams(suite.ctx)
 		params.BondDenom = "ncheq"
-		suite.app.StakingKeeper.SetParams(suite.ctx, params)
+		err = suite.app.StakingKeeper.SetParams(suite.ctx, params)
+		Expect(err).To(BeNil(), "Error setting the params")
 
 		// this line will create the module account
 		_ = suite.app.AccountKeeper.GetModuleAccount(suite.ctx, types.ModuleName)
