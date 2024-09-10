@@ -1,9 +1,12 @@
 package keeper
 
 import (
+	"context"
+
 	"github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/cheqd/cheqd-node/x/did/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
 type MsgServer struct {
@@ -148,4 +151,27 @@ func VerifyAllSignersHaveAtLeastOneValidSignature(k *Keeper, ctx *sdk.Context, i
 	}
 
 	return nil
+}
+
+func (m MsgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBurnResponse, error) {
+	sdkCtx := sdk.UnwrapSDKContext(goCtx)
+	accountI := m.Keeper.accountKeeper.GetAccount(sdkCtx, sdk.AccAddress(msg.FromAddress))
+	_, ok := accountI.(authtypes.ModuleAccountI)
+	if ok {
+		return nil, types.ErrBurnFromModuleAccount
+	}
+
+	err := m.Keeper.burnFrom(sdkCtx, msg.Amount, msg.FromAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	sdkCtx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			"burn",
+			sdk.NewAttribute("burn_from_address", msg.FromAddress),
+			sdk.NewAttribute("amount", msg.Amount.String()),
+		),
+	})
+	return &types.MsgBurnResponse{}, nil
 }
