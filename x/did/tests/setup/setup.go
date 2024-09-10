@@ -17,6 +17,11 @@ import (
 	"github.com/cheqd/cheqd-node/x/did/keeper"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
@@ -42,6 +47,10 @@ func Setup() TestSetup {
 	// Init KVStore
 	db := dbm.NewMemDB()
 
+	keys := sdk.NewKVStoreKeys(
+		authtypes.StoreKey,
+		banktypes.StoreKey,
+	)
 	dbStore := store.NewCommitMultiStore(db)
 	storeKey := sdk.NewKVStoreKey(types.StoreKey)
 	dbStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, nil)
@@ -54,7 +63,15 @@ func Setup() TestSetup {
 
 	// Init Keepers
 	paramsKeeper := initParamsKeeper(Cdc, aminoCdc, paramsStoreKey, paramsTStoreKey)
-	newKeeper := keeper.NewKeeper(Cdc, storeKey, getSubspace(types.ModuleName, paramsKeeper))
+	accountKeeper := authkeeper.NewAccountKeeper(Cdc, keys[authtypes.StoreKey], authtypes.ProtoBaseAccount, map[string][]string{}, "cheqd", string(authtypes.NewModuleAddress(govtypes.ModuleName)))
+	bankKeeper := bankkeeper.NewBaseKeeper(
+		Cdc,
+		keys[banktypes.StoreKey],
+		accountKeeper,
+		nil,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
+	newKeeper := keeper.NewKeeper(Cdc, storeKey, getSubspace(types.ModuleName, paramsKeeper), accountKeeper, bankKeeper)
 
 	// Create Tx
 	txBytes := make([]byte, 28)

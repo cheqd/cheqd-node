@@ -20,8 +20,13 @@ import (
 	"github.com/cheqd/cheqd-node/x/resource/keeper"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	capabilitykeeper "github.com/cosmos/cosmos-sdk/x/capability/keeper"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	portkeeper "github.com/cosmos/ibc-go/v7/modules/core/05-port/keeper"
@@ -50,6 +55,11 @@ func Setup() TestSetup {
 
 	dbStore := store.NewCommitMultiStore(db)
 
+	keys := sdk.NewKVStoreKeys(
+		capabilitytypes.StoreKey,
+		authtypes.StoreKey,
+		banktypes.StoreKey,
+	)
 	// Mount did store
 	didStoreKey := sdk.NewKVStoreKey(didtypes.StoreKey)
 	dbStore.MountStoreWithDB(didStoreKey, storetypes.StoreTypeIAVL, nil)
@@ -73,8 +83,16 @@ func Setup() TestSetup {
 	_ = dbStore.LoadLatestVersion()
 
 	// Init Keepers
+	accountKeeper := authkeeper.NewAccountKeeper(cdc, keys[authtypes.StoreKey], authtypes.ProtoBaseAccount, map[string][]string{}, "cheqd", string(authtypes.NewModuleAddress(govtypes.ModuleName)))
+	bankKeeper := bankkeeper.NewBaseKeeper(
+		cdc,
+		keys[banktypes.StoreKey],
+		accountKeeper,
+		nil,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
 	paramsKeeper := initParamsKeeper(cdc, aminoCdc, paramsStoreKey, paramsTStoreKey)
-	didKeeper := didkeeper.NewKeeper(cdc, didStoreKey, getSubspace(didtypes.ModuleName, paramsKeeper))
+	didKeeper := didkeeper.NewKeeper(cdc, didStoreKey, getSubspace(didtypes.ModuleName, paramsKeeper), accountKeeper, bankKeeper)
 	capabilityKeeper := capabilitykeeper.NewKeeper(cdc, capabilityStoreKey, memStoreKeys[capabilitytypes.MemStoreKey])
 
 	scopedIBCKeeper := capabilityKeeper.ScopeToModule(ibcexported.ModuleName)
