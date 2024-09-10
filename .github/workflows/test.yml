@@ -165,7 +165,7 @@ jobs:
           name: report-integration.xml
           path: report-integration.xml
 
-  NOTE: This job is disabled since upgrade tests from v0.6.x to v1.x.x are not needed until next major release.
+  # NOTE: This job is disabled since upgrade tests from v0.6.x to v1.x.x are not needed until next major release.
   # upgrade-tests:
   #   name: "Upgrade Tests"
   #   runs-on: ubuntu-20.04
