@@ -3,6 +3,13 @@ syntax = "proto3";
 package cheqd.did.v2;
 
 import "cheqd/did/v2/diddoc.proto";
+import "cosmos/msg/v1/msg.proto";
+import "amino/amino.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "cosmos_proto/cosmos.proto";
+import "google/protobuf/any.proto";
+import "gogoproto/gogo.proto";
+
 
 option go_package = "github.com/cheqd/cheqd-node/x/did/types";
 
@@ -16,6 +23,9 @@ service Msg {
 
   // DeactivateDidDoc defines a method for deactivating an existing DID document
   rpc DeactivateDidDoc(MsgDeactivateDidDoc) returns (MsgDeactivateDidDocResponse);
+
+  rpc Burn(MsgBurn) returns (MsgBurnResponse);
+
 }
 
 // MsgCreateDidDoc defines the Msg/CreateDidDoc request type.
@@ -208,3 +218,18 @@ message MsgDeactivateDidDocResponse {
   // Return the deactivated DID Document with metadata
   DidDocWithMetadata value = 1;
 }
+
+// MsgBurn represents a message to burn coins from the message signer account
+message MsgBurn {
+  option (cosmos.msg.v1.signer) = "from_address";
+  
+  option (gogoproto.equal)           = false;
+  option (gogoproto.goproto_getters) = false;
+  string   from_address              = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  repeated cosmos.base.v1beta1.Coin amount = 2 [
+    (gogoproto.nullable)     = false,
+    (amino.dont_omitempty)   = true,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+}
+message MsgBurnResponse {}
