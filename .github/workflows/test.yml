@@ -296,7 +296,7 @@ jobs:
       - name: Cleanup after tests
         working-directory: ./tests/upgrade/integration
         run: |
-  #         bash scripts/cleanup.sh
+          bash scripts/cleanup.sh
 
   report-results:
     name: "Report"
