@@ -346,7 +346,7 @@ jobs:
 
       - name: Combine test results
         run: |
-          python ./.github/scripts/xml_combine.py report-unit.xml report-integration.xml report-pre-upgrade.xml report-post-upgrade.xml report-upgraded-integration.xml report-pricing-proposal.xml report-pricing-change.xml > report.xml
+          # python ./.github/scripts/xml_combine.py report-unit.xml report-integration.xml
         # run: |
         #   python ./.github/scripts/xml_combine.py report-unit.xml report-integration.xml > report.xml
 
