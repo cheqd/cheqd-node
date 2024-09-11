@@ -184,7 +184,7 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
-		didtypes.ModuleName:            {authtypes.Burner},
+		didtypes.ModuleName:            {authtypes.Minter, authtypes.Burner},
 	}
 )
 
@@ -603,6 +603,8 @@ func New(
 	app.DidKeeper = *didkeeper.NewKeeper(
 		appCodec, keys[didtypes.StoreKey],
 		app.GetSubspace(didtypes.ModuleName),
+		app.BankKeeper,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment

@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"time"
 
+	"github.com/cheqd/cheqd-node/app"
 	"github.com/cheqd/cheqd-node/x/did/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 
@@ -17,6 +18,11 @@ import (
 	"github.com/cheqd/cheqd-node/x/did/keeper"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
@@ -37,6 +43,8 @@ func Setup() TestSetup {
 	ir := codectypes.NewInterfaceRegistry()
 	types.RegisterInterfaces(ir)
 	Cdc := codec.NewProtoCodec(ir)
+	banktypes.RegisterInterfaces(ir)
+	authtypes.RegisterInterfaces(ir)
 	aminoCdc := codec.NewLegacyAmino()
 
 	// Init KVStore
@@ -52,9 +60,39 @@ func Setup() TestSetup {
 	paramsStoreKey := sdk.NewKVStoreKey(paramstypes.StoreKey)
 	paramsTStoreKey := sdk.NewTransientStoreKey(paramstypes.TStoreKey)
 
-	// Init Keepers
+	// Mount account and bank stores
+	authStoreKey := sdk.NewKVStoreKey(authtypes.StoreKey)
+	bankStoreKey := sdk.NewKVStoreKey(banktypes.StoreKey)
+	dbStore.MountStoreWithDB(authStoreKey, storetypes.StoreTypeIAVL, nil)
+	dbStore.MountStoreWithDB(bankStoreKey, storetypes.StoreTypeIAVL, nil)
+
 	paramsKeeper := initParamsKeeper(Cdc, aminoCdc, paramsStoreKey, paramsTStoreKey)
-	newKeeper := keeper.NewKeeper(Cdc, storeKey, getSubspace(types.ModuleName, paramsKeeper))
+
+	// Initialize accountKeeper
+	maccPerms := map[string][]string{
+		authtypes.FeeCollectorName: nil,
+		types.ModuleName:           {authtypes.Minter, authtypes.Burner},
+	}
+
+	accountKeeper := authkeeper.NewAccountKeeper(
+		Cdc,
+		authStoreKey,
+		authtypes.ProtoBaseAccount,
+		maccPerms,
+		app.AccountAddressPrefix,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
+
+	bankKeeper := bankkeeper.NewBaseKeeper(
+		Cdc,
+		bankStoreKey,
+		accountKeeper,
+		nil,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
+
+	// Init Keepers
+	newKeeper := keeper.NewKeeper(Cdc, storeKey, getSubspace(types.ModuleName, paramsKeeper), bankKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
 
 	// Create Tx
 	txBytes := make([]byte, 28)

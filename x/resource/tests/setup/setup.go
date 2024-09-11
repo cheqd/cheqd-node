@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"time"
 
+	"github.com/cheqd/cheqd-node/app"
 	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 	didsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
@@ -20,8 +21,13 @@ import (
 	"github.com/cheqd/cheqd-node/x/resource/keeper"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	capabilitykeeper "github.com/cosmos/cosmos-sdk/x/capability/keeper"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	portkeeper "github.com/cosmos/ibc-go/v7/modules/core/05-port/keeper"
@@ -42,6 +48,8 @@ func Setup() TestSetup {
 	ir := codectypes.NewInterfaceRegistry()
 	types.RegisterInterfaces(ir)
 	didtypes.RegisterInterfaces(ir)
+	banktypes.RegisterInterfaces(ir)
+	authtypes.RegisterInterfaces(ir)
 	cdc := codec.NewProtoCodec(ir)
 	aminoCdc := codec.NewLegacyAmino()
 
@@ -72,9 +80,39 @@ func Setup() TestSetup {
 
 	_ = dbStore.LoadLatestVersion()
 
+	// Mount account and bank stores
+	authStoreKey := sdk.NewKVStoreKey(authtypes.StoreKey)
+	bankStoreKey := sdk.NewKVStoreKey(banktypes.StoreKey)
+	dbStore.MountStoreWithDB(authStoreKey, storetypes.StoreTypeIAVL, nil)
+	dbStore.MountStoreWithDB(bankStoreKey, storetypes.StoreTypeIAVL, nil)
+
+	// Initialize accountKeeper
+	maccPerms := map[string][]string{
+		authtypes.FeeCollectorName: nil,
+		types.ModuleName:           {authtypes.Minter, authtypes.Burner},
+	}
+
+	accountKeeper := authkeeper.NewAccountKeeper(
+		cdc,
+		authStoreKey,
+		authtypes.ProtoBaseAccount,
+		maccPerms,
+		app.AccountAddressPrefix,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
+
+	bankKeeper := bankkeeper.NewBaseKeeper(
+		cdc,
+		bankStoreKey,
+		accountKeeper,
+		nil,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
+
 	// Init Keepers
 	paramsKeeper := initParamsKeeper(cdc, aminoCdc, paramsStoreKey, paramsTStoreKey)
-	didKeeper := didkeeper.NewKeeper(cdc, didStoreKey, getSubspace(didtypes.ModuleName, paramsKeeper))
+
+	didKeeper := didkeeper.NewKeeper(cdc, didStoreKey, getSubspace(didtypes.ModuleName, paramsKeeper), bankKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
 	capabilityKeeper := capabilitykeeper.NewKeeper(cdc, capabilityStoreKey, memStoreKeys[capabilitytypes.MemStoreKey])
 
 	scopedIBCKeeper := capabilityKeeper.ScopeToModule(ibcexported.ModuleName)
