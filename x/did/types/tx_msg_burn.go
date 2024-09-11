@@ -17,10 +17,10 @@ func NewMsgBurn(sender string, amount sdk.Coins) *MsgBurn {
 }
 
 // NewMsgBurn creates a message to burn tokens
-func NewMsgBurnFrom(amount sdk.Coins, FromAddress string) *MsgBurn {
+func NewMsgBurnFrom(amount sdk.Coins, fromAddress string) *MsgBurn {
 	return &MsgBurn{
 		Amount:      amount,
-		FromAddress: FromAddress,
+		FromAddress: fromAddress,
 	}
 }
 

@@ -153,15 +153,15 @@ func VerifyAllSignersHaveAtLeastOneValidSignature(k *Keeper, ctx *sdk.Context, i
 	return nil
 }
 
-func (m MsgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBurnResponse, error) {
+func (k MsgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBurnResponse, error) {
 	sdkCtx := sdk.UnwrapSDKContext(goCtx)
-	accountI := m.Keeper.accountKeeper.GetAccount(sdkCtx, sdk.AccAddress(msg.FromAddress))
+	accountI := k.Keeper.accountKeeper.GetAccount(sdkCtx, sdk.AccAddress(msg.FromAddress))
 	_, ok := accountI.(authtypes.ModuleAccountI)
 	if ok {
 		return nil, types.ErrBurnFromModuleAccount
 	}
 
-	err := m.Keeper.burnFrom(sdkCtx, msg.Amount, msg.FromAddress)
+	err := k.Keeper.burnFrom(sdkCtx, msg.Amount, msg.FromAddress)
 	if err != nil {
 		return nil, err
 	}
