@@ -27,6 +27,7 @@ require (
 	github.com/multiformats/go-multibase v0.2.0
 	github.com/onsi/ginkgo/v2 v2.17.1
 	github.com/onsi/gomega v1.31.1
+	github.com/osmosis-labs/fee-abstraction/v7 v7.0.2
 	github.com/rakyll/statik v0.1.7
 	github.com/spf13/cast v1.6.0
 	github.com/spf13/cobra v1.8.0
@@ -149,7 +150,6 @@ require (
 	github.com/mtibben/percent v0.2.1 // indirect
 	github.com/multiformats/go-base32 v0.0.3 // indirect
 	github.com/multiformats/go-base36 v0.1.0 // indirect
-	github.com/osmosis-labs/fee-abstraction/v7 v7.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/petermattis/goid v0.0.0-20230317030725-371a4b8eda08 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
@@ -224,6 +224,8 @@ replace (
 	// Fix upstream GHSA-h395-qcrw-5vmq vulnerability.
 	// TODO Remove it: https://github.com/cosmos/cosmos-sdk/issues/10409
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.9.0
+
+	github.com/osmosis-labs/fee-abstraction/v7 => /home/vitwit/go/src/github.com/osmosis-labs/fee-abstraction
 
 	// replace broken goleveldb
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
