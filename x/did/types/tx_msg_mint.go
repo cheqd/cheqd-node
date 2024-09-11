@@ -1,6 +1,7 @@
 package types
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -34,18 +35,18 @@ func (msg *MsgMint) GetSignBytes() []byte {
 
 func (msg *MsgMint) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Authority); err != nil {
-		return sdkerrors.Wrap(err, "invalid authority address")
+		return errorsmod.Wrap(err, "invalid authority address")
 	}
 
 	// Check if the 'toAddress' is a valid Bech32 address
 	_, err := sdk.AccAddressFromBech32(msg.ToAddress)
 	if err != nil {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "invalid recipient address")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "invalid recipient address")
 	}
 
 	// Validate that the 'amount' is a valid coin denomination and positive value
 	if !msg.Amount.IsValid() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "invalid coin denomination or amount")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidCoins, "invalid coin denomination or amount")
 	}
 
 	return nil
