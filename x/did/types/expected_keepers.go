@@ -32,3 +32,7 @@ type BankKeeper interface {
 	SendCoins(ctx sdk.Context, fromAddr sdk.AccAddress, toAddr sdk.AccAddress, amt sdk.Coins) error
 	HasBalance(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coin) bool
 }
+
+type StakingKeeper interface {
+	BondDenom(ctx sdk.Context) string
+}

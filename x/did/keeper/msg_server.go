@@ -2,7 +2,9 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 
+	errorsmod "cosmossdk.io/errors"
 	"github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/cheqd/cheqd-node/x/did/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -161,7 +163,20 @@ func (k MsgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBu
 		return nil, types.ErrBurnFromModuleAccount
 	}
 
-	err := k.Keeper.burnFrom(sdkCtx, msg.Amount, msg.FromAddress)
+	bondDenom := k.stakingKeeper.BondDenom(sdkCtx)
+	denoms := msg.Amount.Denoms()
+	fmt.Println("Denoms>>>>>>>>>>>>>>>>>>????????????????", denoms, bondDenom)
+	if len(denoms) != 0 {
+		err := ValidateDenom(denoms[0], bondDenom)
+		if err != nil {
+			return nil, err
+		}
+	}
+	err := msg.ValidateBasic()
+	if err != nil {
+		return nil, err
+	}
+	err = k.Keeper.burnFrom(sdkCtx, msg.Amount, msg.FromAddress)
 	if err != nil {
 		return nil, err
 	}
@@ -174,4 +189,11 @@ func (k MsgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBu
 		),
 	})
 	return &types.MsgBurnResponse{}, nil
+}
+
+func ValidateDenom(denom, bondDenom string) error {
+	if denom != bondDenom {
+		return errorsmod.Wrap(types.ErrInvalidDenom, denom)
+	}
+	return nil
 }

@@ -502,8 +502,7 @@ func New(
 		),
 	)
 
-	app.FeeMarketKeeper = feemarketkeeper.NewKeeper(appCodec, keys[feemarkettypes.StoreKey], app.AccountKeeper, &feemarkettypes.TestDenomResolver{}, authtypes.NewModuleAddress(govtypes.ModuleName).String())
-	app.FeeMarketKeeper.SetDenomResolver(&feemarkettypes.TestDenomResolver{})
+	app.FeeMarketKeeper = feemarketkeeper.NewKeeper(appCodec, keys[feemarkettypes.StoreKey], app.AccountKeeper, &DefaultFeemarketDenomResolver{}, authtypes.NewModuleAddress(govtypes.ModuleName).String())
 
 	// IBC Fee Module keeper
 	app.IBCFeeKeeper = ibcfeekeeper.NewKeeper(
@@ -616,6 +615,7 @@ func New(
 		appCodec, keys[didtypes.StoreKey],
 		app.GetSubspace(didtypes.ModuleName),
 		app.AccountKeeper, app.BankKeeper,
+		app.StakingKeeper,
 	)
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
@@ -1103,4 +1103,18 @@ func (app *App) setupUpgradeStoreLoaders() {
 
 func (app *App) Configurator() module.Configurator {
 	return app.configurator
+}
+
+type DefaultFeemarketDenomResolver struct{}
+
+func (r *DefaultFeemarketDenomResolver) ConvertToDenom(_ sdk.Context, coin sdk.DecCoin, denom string) (sdk.DecCoin, error) {
+	if coin.Denom == denom {
+		return coin, nil
+	}
+
+	return sdk.DecCoin{}, fmt.Errorf("error resolving denom")
+}
+
+func (r *DefaultFeemarketDenomResolver) ExtraDenoms(_ sdk.Context) ([]string, error) {
+	return []string{}, nil
 }

@@ -26,7 +26,6 @@ func NewMsgBurnFrom(amount sdk.Coins, fromAddress string) *MsgBurn {
 
 func (m MsgBurn) Route() string { return RouterKey }
 
-// func (m MsgBurn) Type() string  { return TypeMsgBurn }
 func (m MsgBurn) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(m.FromAddress)
 	if err != nil {

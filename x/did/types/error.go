@@ -22,4 +22,5 @@ var (
 	ErrInternal                   = errorsmod.Register(ModuleName, 1500, "internal error")
 	ErrUnauthorized               = errorsmod.Register(ModuleName, 1, "unauthorized account")
 	ErrBurnFromModuleAccount      = errorsmod.Register(ModuleName, 2, "burning from Module Account is not allowed")
+	ErrInvalidDenom               = errorsmod.Register(ModuleName, 3, "Invalid Denom")
 )
