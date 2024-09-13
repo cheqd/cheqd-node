@@ -10,9 +10,6 @@ func (k Keeper) burnFrom(ctx sdk.Context, amount sdk.Coins, burnFrom string) err
 	if err != nil {
 		return err
 	}
-
-	// denom := k.stakingKeeper.BondDenom(ctx)
-
 	err = k.bankkeeper.SendCoinsFromAccountToModule(ctx,
 		addr,
 		types.ModuleName,

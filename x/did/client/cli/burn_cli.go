@@ -12,7 +12,7 @@ import (
 func NewBurnCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "burn [amount] [flags]",
-		Short: "Burn tokens from an address. Must have admin authority to do so.",
+		Short: "Burn tokens from an address",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)

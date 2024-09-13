@@ -192,6 +192,7 @@ func (k MsgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBu
 }
 
 func ValidateDenom(denom, bondDenom string) error {
+	fmt.Println("Here>>>>>>>>>>>>>>>>>>>>>>>>>ValidateDenom")
 	if denom != bondDenom {
 		return errorsmod.Wrap(types.ErrInvalidDenom, denom)
 	}

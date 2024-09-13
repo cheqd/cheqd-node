@@ -502,7 +502,8 @@ func New(
 		),
 	)
 
-	app.FeeMarketKeeper = feemarketkeeper.NewKeeper(appCodec, keys[feemarkettypes.StoreKey], app.AccountKeeper, &DefaultFeemarketDenomResolver{}, authtypes.NewModuleAddress(govtypes.ModuleName).String())
+	app.FeeMarketKeeper = feemarketkeeper.NewKeeper(appCodec, keys[feemarkettypes.StoreKey], app.AccountKeeper, &feemarkettypes.TestDenomResolver{}, authtypes.NewModuleAddress(govtypes.ModuleName).String())
+	app.FeeMarketKeeper.SetDenomResolver(&feemarkettypes.TestDenomResolver{}) // TODO
 
 	// IBC Fee Module keeper
 	app.IBCFeeKeeper = ibcfeekeeper.NewKeeper(
@@ -1103,18 +1104,4 @@ func (app *App) setupUpgradeStoreLoaders() {
 
 func (app *App) Configurator() module.Configurator {
 	return app.configurator
-}
-
-type DefaultFeemarketDenomResolver struct{}
-
-func (r *DefaultFeemarketDenomResolver) ConvertToDenom(_ sdk.Context, coin sdk.DecCoin, denom string) (sdk.DecCoin, error) {
-	if coin.Denom == denom {
-		return coin, nil
-	}
-
-	return sdk.DecCoin{}, fmt.Errorf("error resolving denom")
-}
-
-func (r *DefaultFeemarketDenomResolver) ExtraDenoms(_ sdk.Context) ([]string, error) {
-	return []string{}, nil
 }
