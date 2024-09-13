@@ -108,7 +108,7 @@ func Setup() TestSetup {
 		nil,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
-	stakingKeeper := stakingkeeper.NewKeeper(cdc, keys[stakingtypes.StoreKey], accountKeeper, bankKeeper, string(authtypes.NewModuleAddress(govtypes.ModuleName)))
+	stakingKeeper := stakingkeeper.NewKeeper(cdc, keys[stakingtypes.StoreKey], accountKeeper, bankKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
 
 	paramsKeeper := initParamsKeeper(cdc, aminoCdc, paramsStoreKey, paramsTStoreKey)
 	didKeeper := didkeeper.NewKeeper(cdc, didStoreKey, getSubspace(didtypes.ModuleName, paramsKeeper), accountKeeper, bankKeeper, stakingKeeper)

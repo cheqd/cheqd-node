@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 
 	errorsmod "cosmossdk.io/errors"
 	"github.com/cheqd/cheqd-node/x/did/types"
@@ -165,7 +164,6 @@ func (k MsgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBu
 
 	bondDenom := k.stakingKeeper.BondDenom(sdkCtx)
 	denoms := msg.Amount.Denoms()
-	fmt.Println("Denoms>>>>>>>>>>>>>>>>>>????????????????", denoms, bondDenom)
 	if len(denoms) != 0 {
 		err := ValidateDenom(denoms[0], bondDenom)
 		if err != nil {
@@ -192,7 +190,6 @@ func (k MsgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBu
 }
 
 func ValidateDenom(denom, bondDenom string) error {
-	fmt.Println("Here>>>>>>>>>>>>>>>>>>>>>>>>>ValidateDenom")
 	if denom != bondDenom {
 		return errorsmod.Wrap(types.ErrInvalidDenom, denom)
 	}
