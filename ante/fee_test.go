@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"cosmossdk.io/math"
-	"github.com/cosmos/cosmos-sdk/types/query"
 
 	cheqdante "github.com/cheqd/cheqd-node/ante"
 	cheqdpost "github.com/cheqd/cheqd-node/post"
@@ -20,7 +19,7 @@ import (
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/osmosis-labs/fee-abstraction/v7/x/feeabs/ante"
+	feeabsante "github.com/osmosis-labs/fee-abstraction/v7/x/feeabs/ante"
 	"github.com/osmosis-labs/fee-abstraction/v7/x/feeabs/types"
 	feemarketante "github.com/skip-mev/feemarket/x/feemarket/ante"
 	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
@@ -496,7 +495,7 @@ var _ = Describe("Fee abstraction", func() {
 
 			// Construct and run the ante handler
 			tx := suite.txBuilder.GetTx()
-			mempoolDecorator := ante.NewFeeAbstrationMempoolFeeDecorator(suite.app.FeeabsKeeper)
+			mempoolDecorator := feeabsante.NewFeeAbstrationMempoolFeeDecorator(suite.app.FeeabsKeeper)
 			anteHandler := sdk.ChainAnteDecorators(mempoolDecorator)
 
 			_, err := anteHandler(suite.ctx, tx, false)
@@ -515,7 +514,7 @@ var _ = Describe("Fee abstraction", func() {
 
 			// Construct and run the ante handler
 			tx := suite.txBuilder.GetTx()
-			mempoolDecorator := ante.NewFeeAbstrationMempoolFeeDecorator(suite.app.FeeabsKeeper)
+			mempoolDecorator := feeabsante.NewFeeAbstrationMempoolFeeDecorator(suite.app.FeeabsKeeper)
 			anteHandler := sdk.ChainAnteDecorators(mempoolDecorator)
 
 			_, err := anteHandler(suite.ctx, tx, false)
@@ -534,7 +533,7 @@ var _ = Describe("Fee abstraction", func() {
 
 			// Construct and run the ante handler
 			tx := suite.txBuilder.GetTx()
-			mempoolDecorator := ante.NewFeeAbstrationMempoolFeeDecorator(suite.app.FeeabsKeeper)
+			mempoolDecorator := feeabsante.NewFeeAbstrationMempoolFeeDecorator(suite.app.FeeabsKeeper)
 			anteHandler := sdk.ChainAnteDecorators(mempoolDecorator)
 
 			_, err := anteHandler(suite.ctx, tx, false)
@@ -552,7 +551,7 @@ var _ = Describe("Fee abstraction", func() {
 
 			// Construct and run the ante handler
 			tx := suite.txBuilder.GetTx()
-			mempoolDecorator := ante.NewFeeAbstrationMempoolFeeDecorator(suite.app.FeeabsKeeper)
+			mempoolDecorator := feeabsante.NewFeeAbstrationMempoolFeeDecorator(suite.app.FeeabsKeeper)
 			anteHandler := sdk.ChainAnteDecorators(mempoolDecorator)
 
 			_, err := anteHandler(suite.ctx, tx, false)
@@ -576,7 +575,7 @@ var _ = Describe("Fee abstraction", func() {
 
 			// Construct and run the ante handler
 			tx := suite.txBuilder.GetTx()
-			mempoolDecorator := ante.NewFeeAbstrationMempoolFeeDecorator(suite.app.FeeabsKeeper)
+			mempoolDecorator := feeabsante.NewFeeAbstrationMempoolFeeDecorator(suite.app.FeeabsKeeper)
 			anteHandler := sdk.ChainAnteDecorators(mempoolDecorator)
 
 			_, err = anteHandler(suite.ctx, tx, false)
@@ -648,7 +647,7 @@ var _ = Describe("DeductFeeDecorator", func() {
 				suite.txBuilder.SetFeePayer(acc.GetAddress())
 				// Construct and run the ante handler
 				tx := suite.txBuilder.GetTx()
-				deductFeeDecorator := ante.NewFeeAbstractionDeductFeeDecorate(suite.app.AccountKeeper, suite.app.BankKeeper, suite.app.FeeabsKeeper, suite.app.FeeGrantKeeper)
+				deductFeeDecorator := feeabsante.NewFeeAbstractionDeductFeeDecorate(suite.app.AccountKeeper, suite.app.BankKeeper, suite.app.FeeabsKeeper, suite.app.FeeGrantKeeper)
 				anteHandler := sdk.ChainAnteDecorators(deductFeeDecorator)
 
 				_, err = anteHandler(suite.ctx, tx, false)
@@ -665,7 +664,7 @@ var _ = Describe("DeductFeeDecorator", func() {
 
 			// Construct and run the ante handler
 			tx := suite.txBuilder.GetTx()
-			deductFeeDecorator := ante.NewFeeAbstractionDeductFeeDecorate(suite.app.AccountKeeper, suite.app.BankKeeper, suite.app.FeeabsKeeper, suite.app.FeeGrantKeeper)
+			deductFeeDecorator := feeabsante.NewFeeAbstractionDeductFeeDecorate(suite.app.AccountKeeper, suite.app.BankKeeper, suite.app.FeeabsKeeper, suite.app.FeeGrantKeeper)
 			anteHandler := sdk.ChainAnteDecorators(deductFeeDecorator)
 
 			_, err := anteHandler(suite.ctx, tx, false)
@@ -684,7 +683,7 @@ var _ = Describe("DeductFeeDecorator", func() {
 
 			// Construct and run the ante handler
 			tx := suite.txBuilder.GetTx()
-			deductFeeDecorator := ante.NewFeeAbstractionDeductFeeDecorate(suite.app.AccountKeeper, suite.app.BankKeeper, suite.app.FeeabsKeeper, suite.app.FeeGrantKeeper)
+			deductFeeDecorator := feeabsante.NewFeeAbstractionDeductFeeDecorate(suite.app.AccountKeeper, suite.app.BankKeeper, suite.app.FeeabsKeeper, suite.app.FeeGrantKeeper)
 			anteHandler := sdk.ChainAnteDecorators(deductFeeDecorator)
 
 			_, err = anteHandler(suite.ctx, tx, false)
@@ -711,7 +710,7 @@ var _ = Describe("DeductFeeDecorator", func() {
 
 			// Construct and run the ante handler
 			tx := suite.txBuilder.GetTx()
-			deductFeeDecorator := ante.NewFeeAbstractionDeductFeeDecorate(suite.app.AccountKeeper, suite.app.BankKeeper, suite.app.FeeabsKeeper, suite.app.FeeGrantKeeper)
+			deductFeeDecorator := feeabsante.NewFeeAbstractionDeductFeeDecorate(suite.app.AccountKeeper, suite.app.BankKeeper, suite.app.FeeabsKeeper, suite.app.FeeGrantKeeper)
 			anteHandler := sdk.ChainAnteDecorators(deductFeeDecorator)
 
 			_, err = anteHandler(suite.ctx, tx, false)

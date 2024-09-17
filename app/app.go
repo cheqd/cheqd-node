@@ -482,8 +482,8 @@ func New(
 		scopedIBCKeeper,
 	)
 
-	app.FeeMarketKeeper.SetDenomResolver(&feemarkettypes.TestDenomResolver{}) // TODO
 	app.FeeMarketKeeper = feemarketkeeper.NewKeeper(appCodec, keys[feemarkettypes.StoreKey], app.AccountKeeper, &feemarkettypes.TestDenomResolver{}, authtypes.NewModuleAddress(govtypes.ModuleName).String())
+	app.FeeMarketKeeper.SetDenomResolver(&feemarkettypes.TestDenomResolver{}) // TODO
 	// IBC Fee Module keeper
 	app.IBCFeeKeeper = ibcfeekeeper.NewKeeper(
 		appCodec,
