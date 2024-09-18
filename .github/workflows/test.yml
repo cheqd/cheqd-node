@@ -166,7 +166,7 @@ jobs:
           path: report-integration.xml
 
   # NOTE: This job is disabled since upgrade tests from v0.6.x to v1.x.x are not needed until next major release.
-  upgrade-tests:
+  # upgrade-tests:
     name: "Upgrade Tests"
     runs-on: ubuntu-20.04
     steps:
@@ -302,8 +302,8 @@ jobs:
     name: "Report"
     runs-on: ubuntu-20.04
     # NOTE: If not next major release, only unit and integration tests are necessary, otherwise all tests are needed.
-    # needs: [unit-tests, integration-tests]
-    needs: [unit-tests, integration-tests, upgrade-tests]
+    needs: [unit-tests, integration-tests]
+    # needs: [unit-tests, integration-tests, upgrade-tests]
     if: always()
 
     steps:
@@ -319,30 +319,30 @@ jobs:
         with:
           name: report-integration.xml
 
-      - name: Download pre-upgrade test Report
-        uses: actions/download-artifact@v4
-        with:
-          name: report-pre-upgrade.xml
+      # - name: Download pre-upgrade test Report
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: report-pre-upgrade.xml
 
-      - name: Download post-upgrade test Report
-        uses: actions/download-artifact@v4
-        with:
-          name: report-post-upgrade.xml
+      # - name: Download post-upgrade test Report
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: report-post-upgrade.xml
 
-      - name: Download upgraded integration test Report
-        uses: actions/download-artifact@v4
-        with:
-          name: report-upgraded-integration.xml
+      # - name: Download upgraded integration test Report
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: report-upgraded-integration.xml
 
-      - name: Download pricing proposal test Report
-        uses: actions/download-artifact@v4
-        with:
-          name: report-pricing-proposal.xml
+      # - name: Download pricing proposal test Report
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: report-pricing-proposal.xml
 
-      - name: Download pricing change test Report
-        uses: actions/download-artifact@v4
-        with:
-          name: report-pricing-change.xml
+      # - name: Download pricing change test Report
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: report-pricing-change.xml
 
       - name: Combine test results
         run: |
