@@ -37,6 +37,7 @@ type MsgClient interface {
 	UpdateDidDoc(ctx context.Context, in *MsgUpdateDidDoc, opts ...grpc.CallOption) (*MsgUpdateDidDocResponse, error)
 	// DeactivateDidDoc defines a method for deactivating an existing DID document
 	DeactivateDidDoc(ctx context.Context, in *MsgDeactivateDidDoc, opts ...grpc.CallOption) (*MsgDeactivateDidDocResponse, error)
+	// Mint defines a method to mint tokens to the given address.
 	Mint(ctx context.Context, in *MsgMint, opts ...grpc.CallOption) (*MsgMintResponse, error)
 }
 
@@ -100,6 +101,7 @@ type MsgServer interface {
 	UpdateDidDoc(context.Context, *MsgUpdateDidDoc) (*MsgUpdateDidDocResponse, error)
 	// DeactivateDidDoc defines a method for deactivating an existing DID document
 	DeactivateDidDoc(context.Context, *MsgDeactivateDidDoc) (*MsgDeactivateDidDocResponse, error)
+	// Mint defines a method to mint tokens to the given address.
 	Mint(context.Context, *MsgMint) (*MsgMintResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }

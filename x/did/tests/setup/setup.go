@@ -23,8 +23,10 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
 type TestSetup struct {
@@ -36,15 +38,18 @@ type TestSetup struct {
 	Keeper      keeper.Keeper
 	MsgServer   types.MsgServer
 	QueryServer types.QueryServer
+	AuthKeeper  authkeeper.AccountKeeper
+	BankKeeper  bankkeeper.BaseKeeper
 }
 
 func Setup() TestSetup {
 	// Init Codec
 	ir := codectypes.NewInterfaceRegistry()
 	types.RegisterInterfaces(ir)
-	Cdc := codec.NewProtoCodec(ir)
 	banktypes.RegisterInterfaces(ir)
 	authtypes.RegisterInterfaces(ir)
+
+	Cdc := codec.NewProtoCodec(ir)
 	aminoCdc := codec.NewLegacyAmino()
 
 	// Init KVStore
@@ -53,6 +58,12 @@ func Setup() TestSetup {
 	dbStore := store.NewCommitMultiStore(db)
 	storeKey := sdk.NewKVStoreKey(types.StoreKey)
 	dbStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, nil)
+	// Mount account and bank stores
+	authStoreKey := sdk.NewKVStoreKey(authtypes.StoreKey)
+	bankStoreKey := sdk.NewKVStoreKey(banktypes.StoreKey)
+
+	dbStore.MountStoreWithDB(authStoreKey, storetypes.StoreTypeIAVL, nil)
+	dbStore.MountStoreWithDB(bankStoreKey, storetypes.StoreTypeIAVL, nil)
 
 	_ = dbStore.LoadLatestVersion()
 
@@ -60,18 +71,16 @@ func Setup() TestSetup {
 	paramsStoreKey := sdk.NewKVStoreKey(paramstypes.StoreKey)
 	paramsTStoreKey := sdk.NewTransientStoreKey(paramstypes.TStoreKey)
 
-	// Mount account and bank stores
-	authStoreKey := sdk.NewKVStoreKey(authtypes.StoreKey)
-	bankStoreKey := sdk.NewKVStoreKey(banktypes.StoreKey)
-	dbStore.MountStoreWithDB(authStoreKey, storetypes.StoreTypeIAVL, nil)
-	dbStore.MountStoreWithDB(bankStoreKey, storetypes.StoreTypeIAVL, nil)
-
 	paramsKeeper := initParamsKeeper(Cdc, aminoCdc, paramsStoreKey, paramsTStoreKey)
 
 	// Initialize accountKeeper
 	maccPerms := map[string][]string{
-		authtypes.FeeCollectorName: nil,
-		types.ModuleName:           {authtypes.Minter, authtypes.Burner},
+		authtypes.FeeCollectorName:     nil,
+		types.ModuleName:               {authtypes.Minter, authtypes.Burner},
+		govtypes.ModuleName:            {authtypes.Burner, authtypes.Minter},
+		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
+		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
+		minttypes.ModuleName:           {authtypes.Minter},
 	}
 
 	accountKeeper := authkeeper.NewAccountKeeper(
@@ -116,6 +125,8 @@ func Setup() TestSetup {
 		Keeper:      *newKeeper,
 		MsgServer:   msgServer,
 		QueryServer: queryServer,
+		AuthKeeper:  accountKeeper,
+		BankKeeper:  bankKeeper,
 	}
 
 	setup.Keeper.SetDidNamespace(&ctx, DidNamespace)
