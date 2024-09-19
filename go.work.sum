@@ -1996,6 +1996,9 @@ github.com/checkpoint-restore/go-criu/v5 v5.0.0/go.mod h1:cfwC0EG7HMUenopBsUf9d8
 github.com/checkpoint-restore/go-criu/v5 v5.3.0/go.mod h1:E/eQpaFtUKGOOSEBZgmKAcn+zUUwWxqcaKZlF54wK8E=
 github.com/cheekybits/is v0.0.0-20150225183255-68e9c0620927/go.mod h1:h/aW8ynjgkuj+NQRlZcDbAbM1ORAbXjXX77sX7T289U=
 github.com/cheggaaa/pb v1.0.27 h1:wIkZHkNfC7R6GI5w7l/PdAdzXzlrbcI3p8OAlnkTsnc=
+github.com/cheqd/fee-abstraction/v7 v7.0.3-0.20240919093501-645e58a8252d h1:HEfYvzR6dO1ucjYz+5A5mSpGXQa3kcfql31U5eh4YeU=
+github.com/cheqd/fee-abstraction/v7 v7.0.3-0.20240919093501-645e58a8252d/go.mod h1:3ETAhKDNNgXFbLWqzQLbupK8k0yGQJeITiKZ7C3BQw8=
+github.com/cheqd/feemarket v1.0.4-sdk47.0.20240919093317-104ec7d7b634/go.mod h1:4y+Z0lf8SffiLdKnRFvWpLDyiFLvcEGhJgou5SAI8yE=
 github.com/cheqd/feemarket v1.0.5-0.20240826165017-f1f216e15aa6/go.mod h1:DUa6djUsTeMOrbrcIZqWSVxU9IZNCXp96ruaojyBNpc=
 github.com/chigopher/pathlib v0.12.0/go.mod h1:EJ5UtJ/sK8Nt6q3VWN+EwZLZ3g0afJiG8NegYiQQ/gQ=
 github.com/chigopher/pathlib v0.19.1/go.mod h1:tzC1dZLW8o33UQpWkNkhvPwL5n4yyFRFm/jL1YGWFvY=

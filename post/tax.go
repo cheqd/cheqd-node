@@ -319,24 +319,12 @@ func (td *TaxDecorator) handleTaxableTransaction(
 	rewards, burn sdk.Coins,
 	tx sdk.Tx,
 ) error {
-	// Validate the tax
-	if err := td.validateTax(feeTx.GetFee(), simulate); err != nil {
-		return err
-	}
-
 	params, err := td.feemarketKeeper.GetParams(ctx)
 	if err != nil {
 		return err
 	}
 
 	nativeDenom := params.FeeDenom
-
-	// Get fee payer and check if fee grant exists
-	tax := rewards.Add(burn...)
-	feePayer, err := td.getFeePayer(ctx, feeTx, tax, tx.GetMsgs())
-	if err != nil {
-		return err
-	}
 
 	// Check if fees contain only the native denom, if it is IBC denom fee abs logic applies.
 	// The fees will be deducted from the fee payer and the tokens already sent to did module account.
@@ -351,6 +339,17 @@ func (td *TaxDecorator) handleTaxableTransaction(
 
 	// if the fees are only in native denom then fee-abs logic won't be applied and deduct the fees from fee payer.
 	if onlyNativeDenom {
+		// Validate the tax
+		if err := td.validateTax(feeTx.GetFee(), simulate); err != nil {
+			return err
+		}
+
+		// Get fee payer and check if fee grant exists
+		tax := rewards.Add(burn...)
+		feePayer, err := td.getFeePayer(ctx, feeTx, tax, tx.GetMsgs())
+		if err != nil {
+			return err
+		}
 		// Deduct tax from fee payer
 		if err := td.deductTaxFromFeePayer(ctx, feePayer, tax); err != nil {
 			return err

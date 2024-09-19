@@ -232,13 +232,11 @@ replace (
 	// TODO Remove it: https://github.com/cosmos/cosmos-sdk/issues/10409
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.9.0
 
-	// github.com/osmosis-labs/fee-abstraction/v7 => /home/vitwit/go/src/github.com/osmosis-labs/fee-abstraction
-	github.com/osmosis-labs/fee-abstraction/v7 => github.com/cheqd/fee-abstraction/v7 v7.0.3-0.20240917093525-2db348cf3387
+	// github.com/osmosis-labs/fee-abstraction/v7 => /home/vitwit/go/src/github.com/cheqd/fee-abstraction
+	github.com/osmosis-labs/fee-abstraction/v7 => github.com/cheqd/fee-abstraction/v7 v7.0.3-0.20240919093501-645e58a8252d
 
-	// github.com/skip-mev/feemarket => github.com/cheqd/feemarket v1.0.4-sdk47.0.20240822213759-ad21c7e69228
-
+	github.com/skip-mev/feemarket => github.com/cheqd/feemarket v1.0.4-sdk47.0.20240919093317-104ec7d7b634
 	// github.com/skip-mev/feemarket => /home/vitwit/go/src/github.com/cheqd/feemarket
-	github.com/skip-mev/feemarket => github.com/cheqd/feemarket v1.0.4-sdk47.0.20240917100921-9853a31e1947
 
 	// replace broken goleveldb
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
