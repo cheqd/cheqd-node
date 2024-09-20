@@ -137,6 +137,7 @@ import (
 	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 
 	// unnamed import of statik for swagger UI support
+	cheqdante "github.com/cheqd/cheqd-node/ante"
 	_ "github.com/cheqd/cheqd-node/app/client/docs/statik"
 	upgradeV3 "github.com/cheqd/cheqd-node/app/upgrades/v3"
 )
@@ -483,8 +484,7 @@ func New(
 		scopedIBCKeeper,
 	)
 
-	app.FeeMarketKeeper = feemarketkeeper.NewKeeper(appCodec, keys[feemarkettypes.StoreKey], app.AccountKeeper, &feemarkettypes.TestDenomResolver{}, authtypes.NewModuleAddress(govtypes.ModuleName).String())
-	app.FeeMarketKeeper.SetDenomResolver(&feemarkettypes.TestDenomResolver{}) // TODO
+	app.FeeMarketKeeper = feemarketkeeper.NewKeeper(appCodec, keys[feemarkettypes.StoreKey], app.AccountKeeper, &cheqdante.DenomResolverImpl{}, authtypes.NewModuleAddress(govtypes.ModuleName).String())
 	// IBC Fee Module keeper
 	app.IBCFeeKeeper = ibcfeekeeper.NewKeeper(
 		appCodec,
@@ -549,6 +549,11 @@ func New(
 		&app.IBCKeeper.PortKeeper,
 		scopedFeeabsKeeper,
 	)
+
+	app.FeeMarketKeeper.SetDenomResolver(&cheqdante.DenomResolverImpl{
+		StakingKeeper: app.StakingKeeper,
+		FeeabsKeeper:  app.FeeabsKeeper,
+	})
 
 	// register the proposal types
 	govRouter := govv1beta1.NewRouter()
