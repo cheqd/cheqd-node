@@ -190,9 +190,9 @@ var (
 		stakingtypes.NotBondedPoolName:  {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:             {authtypes.Burner},
 		ibctransfertypes.ModuleName:     {authtypes.Minter, authtypes.Burner},
-		didtypes.ModuleName:             {authtypes.Minter, authtypes.Burner},
+		didtypes.ModuleName:             {authtypes.Burner},
 		feemarkettypes.ModuleName:       {authtypes.Burner},
-		feemarkettypes.FeeCollectorName: {authtypes.Minter, authtypes.Burner},
+		feemarkettypes.FeeCollectorName: {authtypes.Burner},
 	}
 )
 

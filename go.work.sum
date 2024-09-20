@@ -1989,8 +1989,8 @@ github.com/checkpoint-restore/go-criu/v5 v5.0.0/go.mod h1:cfwC0EG7HMUenopBsUf9d8
 github.com/checkpoint-restore/go-criu/v5 v5.3.0/go.mod h1:E/eQpaFtUKGOOSEBZgmKAcn+zUUwWxqcaKZlF54wK8E=
 github.com/cheekybits/is v0.0.0-20150225183255-68e9c0620927/go.mod h1:h/aW8ynjgkuj+NQRlZcDbAbM1ORAbXjXX77sX7T289U=
 github.com/cheggaaa/pb v1.0.27 h1:wIkZHkNfC7R6GI5w7l/PdAdzXzlrbcI3p8OAlnkTsnc=
-github.com/cheqd/cosmos-sdk v0.47.10-height-mismatch h1:zxljvq+y6HwGkx1Pa2sSd3AF5gr03xf0Jz6GYI4JjqM=
-github.com/cheqd/cosmos-sdk v0.47.10-height-mismatch/go.mod h1:UWpgWkhcsBIATS68uUC0del7IiBN4hPv/vqg8Zz23uw=
+github.com/cheqd/feemarket v1.0.4-sdk47.0.20240822213759-ad21c7e69228 h1:FzVQHthWg60/pwyV5jo8tDLEby1fx4oJjVTE/swtpqY=
+github.com/cheqd/feemarket v1.0.4-sdk47.0.20240822213759-ad21c7e69228/go.mod h1:BBEQhAfJQtphzT6qG1emUO9h9AfKC52eKy3o9GcPNoc=
 github.com/cheqd/feemarket v1.0.5-0.20240826165017-f1f216e15aa6/go.mod h1:DUa6djUsTeMOrbrcIZqWSVxU9IZNCXp96ruaojyBNpc=
 github.com/chigopher/pathlib v0.12.0/go.mod h1:EJ5UtJ/sK8Nt6q3VWN+EwZLZ3g0afJiG8NegYiQQ/gQ=
 github.com/chigopher/pathlib v0.19.1/go.mod h1:tzC1dZLW8o33UQpWkNkhvPwL5n4yyFRFm/jL1YGWFvY=
@@ -2219,8 +2219,6 @@ github.com/cosmos/cosmos-proto v1.0.0-alpha8/go.mod h1:6/p+Bc4O8JKeZqe0VqUGTX31e
 github.com/cosmos/cosmos-proto v1.0.0-beta.1/go.mod h1:8k2GNZghi5sDRFw/scPL8gMSowT1vDA+5ouxL8GjaUE=
 github.com/cosmos/cosmos-proto v1.0.0-beta.2/go.mod h1:+XRCLJ14pr5HFEHIUcn51IKXD1Fy3rkEQqt4WqmN4V0=
 github.com/cosmos/cosmos-proto v1.0.0-beta.3/go.mod h1:t8IASdLaAq+bbHbjq4p960BvcTqtwuAxid3b/2rOD6I=
-github.com/cosmos/cosmos-sdk v0.47.13 h1:9d57rl2ilSgc8a6u1JAulqNX/E5w8lbqbRe3NON3Jb4=
-github.com/cosmos/cosmos-sdk v0.47.13/go.mod h1:pYMzhTfKFn9AJB5X64Epwe9NgYk0y3v7XN8Ks5xqWoo=
 github.com/cosmos/cosmos-sdk/db v1.0.0-beta.1 h1:6YvzjQtc+cDwCe9XwYPPa8zFCxNG79N7vmCjpK+vGOg=
 github.com/cosmos/cosmos-sdk/db v1.0.0-beta.1/go.mod h1:JUMM2MxF9wuwzRWZJjb8BjXsn1BmPmdBd3a75pIct4I=
 github.com/cosmos/cosmos-sdk/db v1.0.0-beta.1.0.20220726092710-f848e4300a8a h1:2humuGPw3O5riJVFq/E2FRjF57UrO97W1qJcGVmK+6k=
