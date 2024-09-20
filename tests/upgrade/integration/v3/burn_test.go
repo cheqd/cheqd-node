@@ -15,7 +15,6 @@ var _ = Describe("Upgrade - Fee parameter change proposal", func() {
 		Expect(err).To(BeNil())
 	})
 	It("should burn the coins from the given address (here container/validator)", func() {
-
 		coins := sdk.NewCoins(sdk.Coin{Denom: "ncheq", Amount: sdk.NewInt(1000)})
 		res, err := cli.BurnMsg(cli.Validator0, coins.String())
 		Expect(err).To(BeNil())
