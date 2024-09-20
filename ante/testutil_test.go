@@ -4,9 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"cosmossdk.io/math"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-	"github.com/skip-mev/feemarket/x/feemarket/types"
 	"github.com/stretchr/testify/suite"
 
 	cheqdapp "github.com/cheqd/cheqd-node/app"
@@ -23,41 +21,6 @@ import (
 	xauthsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
-)
-
-var (
-	// DefaultWindow is the default window size for the sliding window
-	// used to calculate the base fee. In the base EIP-1559 implementation,
-	// only the previous block is considered.
-	DefaultWindow uint64 = 1
-
-	// DefaultAlpha is not used in the base EIP-1559 implementation.
-	DefaultAlpha = math.LegacyMustNewDecFromStr("0.0")
-
-	// DefaultBeta is not used in the base EIP-1559 implementation.
-	DefaultBeta = math.LegacyMustNewDecFromStr("1.0")
-
-	// DefaultGamma is not used in the base EIP-1559 implementation.
-	DefaultGamma = math.LegacyMustNewDecFromStr("0.0")
-
-	// DefaultDelta is not used in the base EIP-1559 implementation.
-	DefaultDelta = math.LegacyMustNewDecFromStr("0.0")
-
-	// DefaultMaxBlockUtilization is the default maximum block utilization. This is the default
-	// on Ethereum. This denominated in units of gas consumed in a block.
-	DefaultMaxBlockUtilization uint64 = 30_000_000
-
-	// DefaultMinBaseGasPrice is the default minimum base fee.
-	DefaultMinBaseGasPrice = math.LegacyOneDec()
-
-	// DefaultMinLearningRate is not used in the base EIP-1559 implementation.
-	DefaultMinLearningRate = math.LegacyMustNewDecFromStr("0.125")
-
-	// DefaultMaxLearningRate is not used in the base EIP-1559 implementation.
-	DefaultMaxLearningRate = math.LegacyMustNewDecFromStr("0.125")
-
-	// DefaultFeeDenom is the Cosmos SDK default bond denom.
-	DefaultFeeDenom = didtypes.BaseMinimalDenom
 )
 
 // TestAccount represents an account used in the tests in x/auth/ante.
@@ -94,12 +57,7 @@ func createTestApp(isCheckTx bool) (*cheqdapp.TestApp, sdk.Context, error) {
 	app.DidKeeper.SetParams(ctx, *didFeeParams)
 	resourceFeeParams := resourcetypes.DefaultGenesis().FeeParams
 	app.ResourceKeeper.SetParams(ctx, *resourceFeeParams)
-	err = app.FeeMarketKeeper.SetParams(ctx, types.NewParams(DefaultWindow, DefaultAlpha, DefaultBeta, DefaultGamma, DefaultDelta,
-		DefaultMaxBlockUtilization, DefaultMinBaseGasPrice, DefaultMinLearningRate, DefaultMaxLearningRate, DefaultFeeDenom, true,
-	))
-	if err != nil {
-		return nil, ctx, err
-	}
+
 	return app, ctx, nil
 }
 
@@ -130,14 +88,12 @@ func (s *AnteTestSuite) SetupTest(isCheckTx bool) error {
 			SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 			SigGasConsumer:  sdkante.DefaultSigVerificationGasConsumer,
 			IBCKeeper:       s.app.IBCKeeper,
-			FeeMarketKeeper: s.app.FeeMarketKeeper,
 		},
 	)
 	if err != nil {
 		return err
 	}
 	s.anteHandler = anteHandler
-
 	return nil
 }
 
@@ -216,6 +172,7 @@ func (s *AnteTestSuite) CreateTestTx(privs []cryptotypes.PrivKey, accNums []uint
 	if err != nil {
 		return nil, err
 	}
+
 	return s.txBuilder.GetTx(), nil
 }
 
@@ -227,14 +184,6 @@ func (s *AnteTestSuite) SetDidFeeParams(feeParams didtypes.FeeParams) {
 // SetResourceFeeParams is a helper function to set resource fee params.
 func (s *AnteTestSuite) SetResourceFeeParams(feeParams resourcetypes.FeeParams) {
 	s.app.ResourceKeeper.SetParams(s.ctx, feeParams)
-}
-
-func (s *AnteTestSuite) SetFeeMarketFeeDenom() error {
-	err := s.app.FeeMarketKeeper.SetParams(s.ctx, types.Params{FeeDenom: didtypes.BaseMinimalDenom})
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 // TestCase represents a test case used in test tables.

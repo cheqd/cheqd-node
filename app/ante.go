@@ -11,24 +11,21 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	ibcante "github.com/cosmos/ibc-go/v7/modules/core/ante"
 	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
-	feemarketante "github.com/skip-mev/feemarket/x/feemarket/ante"
-	feemarketkeeper "github.com/skip-mev/feemarket/x/feemarket/keeper"
 )
 
 // HandlerOptions are the options required for constructing a default SDK AnteHandler.
 // Here we add the cheqd ante decorators, which extend default SDK AnteHandler.
 type HandlerOptions struct {
-	AccountKeeper          cheqdante.AccountKeeper
+	AccountKeeper          ante.AccountKeeper
 	BankKeeper             cheqdante.BankKeeper
 	ExtensionOptionChecker ante.ExtensionOptionChecker
 	FeegrantKeeper         ante.FeegrantKeeper
 	SignModeHandler        authsigning.SignModeHandler
 	SigGasConsumer         func(meter sdk.GasMeter, sig signing.SignatureV2, params types.Params) error
-	TxFeeChecker           ante.TxFeeChecker
+	TxFeeChecker           cheqdante.TxFeeChecker
 	IBCKeeper              *ibckeeper.Keeper
 	DidKeeper              cheqdante.DidKeeper
 	ResourceKeeper         cheqdante.ResourceKeeper
-	FeeMarketKeeper        *feemarketkeeper.Keeper
 }
 
 // NewAnteHandler returns an AnteHandler that checks and increments sequence
@@ -58,9 +55,7 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		ante.NewTxTimeoutHeightDecorator(),
 		ante.NewValidateMemoDecorator(options.AccountKeeper),
 		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
-		cheqdante.NewOverAllDecorator( // fee market check replaces fee deduct decorator
-			feeDecorators(options)...,
-		),
+		cheqdante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, options.TxFeeChecker),
 		ante.NewSetPubKeyDecorator(options.AccountKeeper), // SetPubKeyDecorator must be called before all signature verification decorators
 		ante.NewValidateSigCountDecorator(options.AccountKeeper),
 		ante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),
@@ -71,21 +66,4 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 	}
 
 	return sdk.ChainAnteDecorators(anteDecorators...), nil
-}
-
-func feeDecorators(options HandlerOptions) []sdk.AnteDecorator {
-	return []sdk.AnteDecorator{
-		feemarketante.NewFeeMarketCheckDecorator( // fee market check replaces fee deduct decorator
-			options.AccountKeeper,
-			options.BankKeeper,
-			options.FeegrantKeeper,
-			options.FeeMarketKeeper,
-			ante.NewDeductFeeDecorator(
-				options.AccountKeeper,
-				options.BankKeeper,
-				options.FeegrantKeeper,
-				options.TxFeeChecker,
-			),
-		),
-	}
 }
