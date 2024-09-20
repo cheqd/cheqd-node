@@ -21,11 +21,13 @@ import (
 // Here we add the cheqd ante decorators, which extend default SDK AnteHandler.
 type HandlerOptions struct {
 	AccountKeeper          cheqdante.AccountKeeper
+	AccountKeeper          cheqdante.AccountKeeper
 	BankKeeper             cheqdante.BankKeeper
 	ExtensionOptionChecker ante.ExtensionOptionChecker
 	FeegrantKeeper         ante.FeegrantKeeper
 	SignModeHandler        authsigning.SignModeHandler
 	SigGasConsumer         func(meter sdk.GasMeter, sig signing.SignatureV2, params types.Params) error
+	TxFeeChecker           ante.TxFeeChecker
 	TxFeeChecker           ante.TxFeeChecker
 	IBCKeeper              *ibckeeper.Keeper
 	DidKeeper              cheqdante.DidKeeper
@@ -76,6 +78,23 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 	}
 
 	return sdk.ChainAnteDecorators(anteDecorators...), nil
+}
+
+func feeDecorators(options HandlerOptions) []sdk.AnteDecorator {
+	return []sdk.AnteDecorator{
+		feemarketante.NewFeeMarketCheckDecorator( // fee market check replaces fee deduct decorator
+			options.AccountKeeper,
+			options.BankKeeper,
+			options.FeegrantKeeper,
+			options.FeeMarketKeeper,
+			ante.NewDeductFeeDecorator(
+				options.AccountKeeper,
+				options.BankKeeper,
+				options.FeegrantKeeper,
+				options.TxFeeChecker,
+			),
+		),
+	}
 }
 
 func feeDecorators(options HandlerOptions) []sdk.AnteDecorator {
