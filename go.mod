@@ -216,6 +216,7 @@ replace (
 
 	// replace cosmos-sdk v0.47.10
 	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.47.10-height-mismatch
+	// github.com/cosmos/cosmos-sdk => /home/vishal/cheqdWork/cosmos-sdk
 
 	github.com/cosmos/gogoproto v1.5.0 => github.com/cosmos/gogoproto v1.4.10
 
@@ -230,7 +231,6 @@ replace (
 	// Fix upstream GHSA-h395-qcrw-5vmq vulnerability.
 	// TODO Remove it: https://github.com/cosmos/cosmos-sdk/issues/10409
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.9.0
-	github.com/skip-mev/feemarket => github.com/cheqd/feemarket v1.0.4-sdk47.0.20240822213759-ad21c7e69228
 
 	github.com/skip-mev/feemarket => github.com/cheqd/feemarket v1.0.4-sdk47.0.20240822213759-ad21c7e69228
 

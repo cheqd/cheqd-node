@@ -5,7 +5,7 @@ import (
 	fmt "fmt"
 	_ "github.com/cosmos/cosmos-proto"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
-	_ "github.com/cosmos/cosmos-sdk/api/amino"
+	// _ "github.com/cosmos/cosmos-sdk/api/amino"
 	v1beta1 "github.com/cosmos/cosmos-sdk/api/cosmos/base/v1beta1"
 	_ "github.com/cosmos/cosmos-sdk/api/cosmos/msg/v1"
 	_ "github.com/cosmos/gogoproto/gogoproto"
