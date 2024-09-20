@@ -15,15 +15,6 @@ func NewMsgBurn(sender string, amount sdk.Coins) *MsgBurn {
 		Amount:      amount,
 	}
 }
-
-// NewMsgBurn creates a message to burn tokens
-func NewMsgBurnFrom(amount sdk.Coins, fromAddress string) *MsgBurn {
-	return &MsgBurn{
-		Amount:      amount,
-		FromAddress: fromAddress,
-	}
-}
-
 func (m MsgBurn) Route() string { return RouterKey }
 
 func (m MsgBurn) ValidateBasic() error {

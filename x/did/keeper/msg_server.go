@@ -165,7 +165,7 @@ func (k MsgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBu
 	bondDenom := k.stakingKeeper.BondDenom(sdkCtx)
 	denoms := msg.Amount.Denoms()
 	if len(denoms) != 0 {
-		err := ValidateDenom(denoms[0], bondDenom)
+		err := ValidateDenom(denoms, bondDenom)
 		if err != nil {
 			return nil, err
 		}
@@ -189,9 +189,11 @@ func (k MsgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBu
 	return &types.MsgBurnResponse{}, nil
 }
 
-func ValidateDenom(denom, bondDenom string) error {
-	if denom != bondDenom {
-		return errorsmod.Wrap(types.ErrInvalidDenom, denom)
+func ValidateDenom(denom []string, bondDenom string) error {
+	for _, denom := range denom {
+		if denom != bondDenom {
+			return errorsmod.Wrap(types.ErrInvalidDenom, denom)
+		}
 	}
 	return nil
 }

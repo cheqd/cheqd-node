@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"strings"
+
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -13,7 +15,7 @@ func NewBurnCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "burn [amount] [flags]",
 		Short: "Burn tokens from an address",
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -25,14 +27,14 @@ func NewBurnCmd() *cobra.Command {
 				return err
 			}
 
-			amount, err := sdk.ParseCoinNormalized(args[0])
+			coins, err := sdk.ParseCoinsNormalized(strings.Join(args, ","))
 			if err != nil {
 				return err
 			}
 
 			msg := didtypes.NewMsgBurn(
 				clientCtx.GetFromAddress().String(),
-				sdk.NewCoins(amount),
+				coins,
 			)
 
 			return tx.GenerateOrBroadcastTxWithFactory(clientCtx, txf, msg)
