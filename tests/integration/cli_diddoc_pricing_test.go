@@ -324,6 +324,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		By("revoking the feegrant")
 		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CliGasParams)
 		Expect(err).To(BeNil())
+		Expect(resp.Code).To(BeEquivalentTo(0))
 	})
 
 	It("should tax update diddoc message with feegrant - case: fixed fee", func() {
@@ -385,6 +386,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		By("revoking the feegrant")
 		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CliGasParams)
 		Expect(err).To(BeNil())
+		Expect(resp.Code).To(BeEquivalentTo(0))
 	})
 
 	It("should tax deactivate diddoc message with feegrant - case: fixed fee", func() {
@@ -436,5 +438,6 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		By("revoking the feegrant")
 		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CliGasParams)
 		Expect(err).To(BeNil())
+		Expect(resp.Code).To(BeEquivalentTo(0))
 	})
 })

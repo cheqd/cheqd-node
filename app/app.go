@@ -129,8 +129,13 @@ import (
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
 
+	feemarketmodule "github.com/skip-mev/feemarket/x/feemarket"
+	feemarketkeeper "github.com/skip-mev/feemarket/x/feemarket/keeper"
+	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
+
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cheqd/cheqd-node/app/client/docs/statik"
+	upgradeV3 "github.com/cheqd/cheqd-node/app/upgrades/v3"
 )
 
 var (
@@ -172,19 +177,22 @@ var (
 		resource.AppModuleBasic{},
 		ibcfee.AppModuleBasic{},
 		consensus.AppModuleBasic{},
+		feemarketmodule.AppModuleBasic{},
 	)
 
 	// module account permissions
 	maccPerms = map[string][]string{
-		authtypes.FeeCollectorName:     nil,
-		distrtypes.ModuleName:          nil,
-		icatypes.ModuleName:            nil,
-		minttypes.ModuleName:           {authtypes.Minter},
-		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
-		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
-		govtypes.ModuleName:            {authtypes.Burner},
-		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
-		didtypes.ModuleName:            {authtypes.Burner},
+		authtypes.FeeCollectorName:      nil,
+		distrtypes.ModuleName:           nil,
+		icatypes.ModuleName:             nil,
+		minttypes.ModuleName:            {authtypes.Minter},
+		stakingtypes.BondedPoolName:     {authtypes.Burner, authtypes.Staking},
+		stakingtypes.NotBondedPoolName:  {authtypes.Burner, authtypes.Staking},
+		govtypes.ModuleName:             {authtypes.Burner},
+		ibctransfertypes.ModuleName:     {authtypes.Minter, authtypes.Burner},
+		didtypes.ModuleName:             {authtypes.Burner},
+		feemarkettypes.ModuleName:       {authtypes.Burner},
+		feemarkettypes.FeeCollectorName: {authtypes.Burner},
 	}
 )
 
@@ -229,6 +237,7 @@ type App struct {
 	EvidenceKeeper        evidencekeeper.Keeper
 	TransferKeeper        ibctransferkeeper.Keeper
 	FeeGrantKeeper        feegrantkeeper.Keeper
+	FeeMarketKeeper       *feemarketkeeper.Keeper
 	AuthzKeeper           authzkeeper.Keeper
 	GroupKeeper           groupkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
@@ -310,6 +319,7 @@ func New(
 		ibcfeetypes.StoreKey,
 		didtypes.StoreKey,
 		resourcetypes.StoreKey,
+		feemarkettypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -493,6 +503,9 @@ func New(
 		),
 	)
 
+	app.FeeMarketKeeper = feemarketkeeper.NewKeeper(appCodec, keys[feemarkettypes.StoreKey], app.AccountKeeper, &feemarkettypes.TestDenomResolver{}, authtypes.NewModuleAddress(govtypes.ModuleName).String())
+	app.FeeMarketKeeper.SetDenomResolver(&feemarkettypes.TestDenomResolver{}) // TODO
+
 	// IBC Fee Module keeper
 	app.IBCFeeKeeper = ibcfeekeeper.NewKeeper(
 		appCodec,
@@ -638,6 +651,7 @@ func New(
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 		ibcfee.NewAppModule(app.IBCFeeKeeper),
 		icaModule,
+		feemarketmodule.NewAppModule(appCodec, *app.FeeMarketKeeper),
 		// cheqd modules
 		did.NewAppModule(appCodec, app.DidKeeper),
 		resource.NewAppModule(appCodec, app.ResourceKeeper, app.DidKeeper),
@@ -673,6 +687,7 @@ func New(
 		didtypes.ModuleName,
 		resourcetypes.ModuleName,
 		consensusparamtypes.ModuleName,
+		feemarkettypes.ModuleName,
 	)
 
 	app.ModuleManager.SetOrderEndBlockers(
@@ -700,6 +715,7 @@ func New(
 		icatypes.ModuleName,
 		ibcfeetypes.ModuleName,
 		consensusparamtypes.ModuleName,
+		feemarkettypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -732,6 +748,7 @@ func New(
 		upgradetypes.ModuleName,
 		paramstypes.ModuleName,
 		consensusparamtypes.ModuleName,
+		feemarkettypes.ModuleName,
 	}
 	app.ModuleManager.SetOrderInitGenesis(genesisModuleOrder...)
 	app.ModuleManager.SetOrderExportGenesis(genesisModuleOrder...)
@@ -767,6 +784,7 @@ func New(
 		SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 		SigGasConsumer:  authante.DefaultSigVerificationGasConsumer,
 		IBCKeeper:       app.IBCKeeper,
+		FeeMarketKeeper: app.FeeMarketKeeper,
 	})
 	if err != nil {
 		tmos.Exit(err.Error())
@@ -783,11 +801,12 @@ func New(
 	app.sm.RegisterStoreDecoders()
 
 	postHandler, err := posthandler.NewPostHandler(posthandler.HandlerOptions{
-		AccountKeeper:  app.AccountKeeper,
-		BankKeeper:     app.BankKeeper,
-		FeegrantKeeper: app.FeeGrantKeeper,
-		DidKeeper:      app.DidKeeper,
-		ResourceKeeper: app.ResourceKeeper,
+		AccountKeeper:   app.AccountKeeper,
+		BankKeeper:      app.BankKeeper,
+		FeegrantKeeper:  app.FeeGrantKeeper,
+		DidKeeper:       app.DidKeeper,
+		ResourceKeeper:  app.ResourceKeeper,
+		FeeMarketKeeper: app.FeeMarketKeeper,
 	})
 	if err != nil {
 		tmos.Exit(err.Error())
@@ -994,6 +1013,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(icahosttypes.SubModuleName)
 	paramsKeeper.Subspace(didtypes.ModuleName).WithKeyTable(didtypes.ParamKeyTable())
 	paramsKeeper.Subspace(resourcetypes.ModuleName).WithKeyTable(resourcetypes.ParamKeyTable())
+	paramsKeeper.Subspace(feemarkettypes.ModuleName)
 
 	return paramsKeeper
 }
@@ -1060,6 +1080,20 @@ func (app *App) RegisterUpgradeHandlers() {
 			return migrations, err
 		},
 	)
+	app.UpgradeKeeper.SetUpgradeHandler(
+		upgradeV3.UpgradeName,
+		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			migrations, err := app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
+			if err != nil {
+				return migrations, err
+			}
+			err = ConfigureFeeMarketModule(ctx, app.FeeMarketKeeper)
+			if err != nil {
+				return migrations, err
+			}
+			return migrations, nil
+		},
+	)
 }
 
 // configure store loader that checks if version == upgradeHeight and applies store upgrades
@@ -1069,17 +1103,40 @@ func (app *App) setupUpgradeStoreLoaders() {
 		panic(fmt.Sprintf("failed to read upgrade info from disk %s", err))
 	}
 
-	if upgradeInfo.Name == upgradeV2.UpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+	if upgradeInfo.Name == upgradeV3.UpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		storeUpgrades := storetypes.StoreUpgrades{
 			Added: []string{
-				consensusparamtypes.StoreKey,
-				crisistypes.StoreKey,
+				feemarkettypes.StoreKey,
 			},
 		}
-
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
 	}
+}
+
+func ConfigureFeeMarketModule(ctx sdk.Context, keeper *feemarketkeeper.Keeper) error {
+	params, err := keeper.GetParams(ctx)
+	if err != nil {
+		return err
+	}
+
+	params.Enabled = true
+	params.FeeDenom = resourcetypes.BaseMinimalDenom
+	params.DistributeFees = false // burn fees
+	params.MinBaseGasPrice = sdk.MustNewDecFromStr("0.005")
+	params.MaxBlockUtilization = feemarkettypes.DefaultMaxBlockUtilization
+	if err := keeper.SetParams(ctx, params); err != nil {
+		return err
+	}
+
+	state, err := keeper.GetState(ctx)
+	if err != nil {
+		return err
+	}
+
+	state.BaseGasPrice = sdk.MustNewDecFromStr("0.005")
+
+	return keeper.SetState(ctx, state)
 }
 
 func (app *App) Configurator() module.Configurator {
