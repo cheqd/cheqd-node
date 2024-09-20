@@ -79,5 +79,4 @@ var _ = Describe("Upgrade - Fee parameter change proposal", func() {
 		Expect(err).To(BeNil())
 		Expect(proposal.Status).To(BeEquivalentTo(govtypesv1.StatusPassed))
 	})
-
 })
