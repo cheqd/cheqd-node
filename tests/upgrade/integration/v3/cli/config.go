@@ -1,7 +1,7 @@
 package cli
 
 import (
-	upgradeV2 "github.com/cheqd/cheqd-node/app/upgrades/v2"
+	upgradeV3 "github.com/cheqd/cheqd-node/app/upgrades/v3"
 	integrationcli "github.com/cheqd/cheqd-node/tests/integration/cli"
 	integrationnetwork "github.com/cheqd/cheqd-node/tests/integration/network"
 )
@@ -24,7 +24,7 @@ const (
 	VotingPeriod         int64 = 10
 	ExpectedBlockSeconds int64 = 1
 	ExtraBlocks          int64 = 10
-	UpgradeName                = upgradeV2.UpgradeName
+	UpgradeName                = upgradeV3.UpgradeName
 	DepositAmount              = "10000000ncheq"
 	NetworkConfigDir           = "network-config"
 	KeyringDir                 = "keyring-test"
