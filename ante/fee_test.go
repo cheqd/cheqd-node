@@ -1388,5 +1388,4 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 
 		Expect(feeCollectorBalance.Amount).To(Equal(reward.AmountOf(didtypes.BaseMinimalDenom)), "Reward was not sent to the fee collector")
 	})
-
 })
