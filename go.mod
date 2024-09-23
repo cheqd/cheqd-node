@@ -13,6 +13,7 @@ require (
 	github.com/cosmos/cosmos-proto v1.0.0-beta.5
 	github.com/cosmos/cosmos-sdk v0.47.13
 	github.com/cosmos/gogoproto v1.5.0
+	github.com/cosmos/ibc-apps/modules/async-icq/v7 v7.1.1
 	github.com/cosmos/ibc-go/v7 v7.4.0
 	github.com/gabriel-vasile/mimetype v1.4.3
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
@@ -232,8 +233,8 @@ replace (
 	// TODO Remove it: https://github.com/cosmos/cosmos-sdk/issues/10409
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.9.0
 
-	// github.com/osmosis-labs/fee-abstraction/v7 => /home/vitwit/go/src/github.com/cheqd/fee-abstraction
-	github.com/osmosis-labs/fee-abstraction/v7 => github.com/cheqd/fee-abstraction/v7 v7.0.3-0.20240919093501-645e58a8252d
+	github.com/osmosis-labs/fee-abstraction/v7 => /home/vitwit/go/src/github.com/cheqd/fee-abstraction
+	// github.com/osmosis-labs/fee-abstraction/v7 => github.com/cheqd/fee-abstraction/v7 v7.0.3-0.20240919093501-645e58a8252d
 
 	github.com/skip-mev/feemarket => github.com/cheqd/feemarket v1.0.4-sdk47.0.20240919093317-104ec7d7b634
 	// github.com/skip-mev/feemarket => /home/vitwit/go/src/github.com/cheqd/feemarket
