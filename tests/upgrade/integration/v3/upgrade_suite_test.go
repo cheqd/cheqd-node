@@ -11,5 +11,5 @@ import (
 
 func TestUpgrade(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Upgrade v3 Integration Suite")
+	RunSpecs(t, "Upgrade v2 Integration Suite")
 }
