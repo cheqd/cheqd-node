@@ -9,7 +9,7 @@ require (
 	cosmossdk.io/math v1.3.0
 	filippo.io/edwards25519 v1.1.0
 	github.com/cometbft/cometbft v0.37.5
-	github.com/cometbft/cometbft-db v0.8.0
+	github.com/cometbft/cometbft-db v0.9.1
 	github.com/cosmos/cosmos-proto v1.0.0-beta.5
 	github.com/cosmos/cosmos-sdk v0.47.13
 	github.com/cosmos/gogoproto v1.5.0
@@ -25,6 +25,7 @@ require (
 	github.com/multiformats/go-multibase v0.2.0
 	github.com/onsi/ginkgo/v2 v2.17.3
 	github.com/onsi/gomega v1.33.1
+	github.com/osmosis-labs/fee-abstraction/v7 v7.0.2
 	github.com/rakyll/statik v0.1.7
 	github.com/skip-mev/feemarket v1.0.0-sdk47.0.20240822213759-ad21c7e69228
 	github.com/spf13/cast v1.6.0
@@ -230,9 +231,12 @@ replace (
 	// Fix upstream GHSA-h395-qcrw-5vmq vulnerability.
 	// TODO Remove it: https://github.com/cosmos/cosmos-sdk/issues/10409
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.9.0
-	github.com/skip-mev/feemarket => github.com/cheqd/feemarket v1.0.4-sdk47.0.20240822213759-ad21c7e69228
 
-	github.com/skip-mev/feemarket => github.com/cheqd/feemarket v1.0.4-sdk47.0.20240822213759-ad21c7e69228
+	// github.com/osmosis-labs/fee-abstraction/v7 => /home/vitwit/go/src/github.com/cheqd/fee-abstraction
+	github.com/osmosis-labs/fee-abstraction/v7 => github.com/cheqd/fee-abstraction/v7 v7.0.3-0.20240919093501-645e58a8252d
+
+	github.com/skip-mev/feemarket => github.com/cheqd/feemarket v1.0.4-sdk47.0.20240919093317-104ec7d7b634
+	// github.com/skip-mev/feemarket => /home/vitwit/go/src/github.com/cheqd/feemarket
 
 	// replace broken goleveldb
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
