@@ -136,14 +136,9 @@ import (
 	feemarketkeeper "github.com/skip-mev/feemarket/x/feemarket/keeper"
 	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 
-	feemarketmodule "github.com/skip-mev/feemarket/x/feemarket"
-	feemarketkeeper "github.com/skip-mev/feemarket/x/feemarket/keeper"
-	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
-
 	// unnamed import of statik for swagger UI support
 	cheqdante "github.com/cheqd/cheqd-node/ante"
 	_ "github.com/cheqd/cheqd-node/app/client/docs/statik"
-	upgradeV3 "github.com/cheqd/cheqd-node/app/upgrades/v3"
 	upgradeV3 "github.com/cheqd/cheqd-node/app/upgrades/v3"
 )
 
@@ -251,7 +246,6 @@ type App struct {
 	EvidenceKeeper        evidencekeeper.Keeper
 	TransferKeeper        ibctransferkeeper.Keeper
 	FeeGrantKeeper        feegrantkeeper.Keeper
-	FeeMarketKeeper       *feemarketkeeper.Keeper
 	FeeMarketKeeper       *feemarketkeeper.Keeper
 	AuthzKeeper           authzkeeper.Keeper
 	GroupKeeper           groupkeeper.Keeper
@@ -687,7 +681,6 @@ func New(
 		ibcfee.NewAppModule(app.IBCFeeKeeper),
 		icaModule,
 		feemarketmodule.NewAppModule(appCodec, *app.FeeMarketKeeper),
-		feemarketmodule.NewAppModule(appCodec, *app.FeeMarketKeeper),
 		// cheqd modules
 		did.NewAppModule(appCodec, app.DidKeeper),
 		resource.NewAppModule(appCodec, app.ResourceKeeper, app.DidKeeper),
@@ -725,7 +718,6 @@ func New(
 		resourcetypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		feemarkettypes.ModuleName,
-		feemarkettypes.ModuleName,
 	)
 
 	app.ModuleManager.SetOrderEndBlockers(
@@ -754,7 +746,6 @@ func New(
 		icatypes.ModuleName,
 		ibcfeetypes.ModuleName,
 		consensusparamtypes.ModuleName,
-		feemarkettypes.ModuleName,
 		feemarkettypes.ModuleName,
 	)
 
@@ -789,7 +780,6 @@ func New(
 		upgradetypes.ModuleName,
 		paramstypes.ModuleName,
 		consensusparamtypes.ModuleName,
-		feemarkettypes.ModuleName,
 		feemarkettypes.ModuleName,
 	}
 	app.ModuleManager.SetOrderInitGenesis(genesisModuleOrder...)
@@ -844,12 +834,6 @@ func New(
 	app.sm.RegisterStoreDecoders()
 
 	postHandler, err := posthandler.NewPostHandler(posthandler.HandlerOptions{
-		AccountKeeper:   app.AccountKeeper,
-		BankKeeper:      app.BankKeeper,
-		FeegrantKeeper:  app.FeeGrantKeeper,
-		DidKeeper:       app.DidKeeper,
-		ResourceKeeper:  app.ResourceKeeper,
-		FeeMarketKeeper: app.FeeMarketKeeper,
 		AccountKeeper:   app.AccountKeeper,
 		BankKeeper:      app.BankKeeper,
 		FeegrantKeeper:  app.FeeGrantKeeper,
@@ -1145,20 +1129,6 @@ func (app *App) RegisterUpgradeHandlers() {
 			return migrations, nil
 		},
 	)
-	app.UpgradeKeeper.SetUpgradeHandler(
-		upgradeV3.UpgradeName,
-		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-			migrations, err := app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
-			if err != nil {
-				return migrations, err
-			}
-			err = ConfigureFeeMarketModule(ctx, app.FeeMarketKeeper)
-			if err != nil {
-				return migrations, err
-			}
-			return migrations, nil
-		},
-	)
 }
 
 // configure store loader that checks if version == upgradeHeight and applies store upgrades
@@ -1169,41 +1139,14 @@ func (app *App) setupUpgradeStoreLoaders() {
 	}
 
 	if upgradeInfo.Name == upgradeV3.UpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
-	if upgradeInfo.Name == upgradeV3.UpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		storeUpgrades := storetypes.StoreUpgrades{
 			Added: []string{
-				feemarkettypes.StoreKey,
 				feemarkettypes.StoreKey,
 			},
 		}
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
 	}
-}
-
-func ConfigureFeeMarketModule(ctx sdk.Context, keeper *feemarketkeeper.Keeper) error {
-	params, err := keeper.GetParams(ctx)
-	if err != nil {
-		return err
-	}
-
-	params.Enabled = true
-	params.FeeDenom = resourcetypes.BaseMinimalDenom
-	params.DistributeFees = false // burn fees
-	params.MinBaseGasPrice = sdk.MustNewDecFromStr("0.005")
-	params.MaxBlockUtilization = feemarkettypes.DefaultMaxBlockUtilization
-	if err := keeper.SetParams(ctx, params); err != nil {
-		return err
-	}
-
-	state, err := keeper.GetState(ctx)
-	if err != nil {
-		return err
-	}
-
-	state.BaseGasPrice = sdk.MustNewDecFromStr("0.005")
-
-	return keeper.SetState(ctx, state)
 }
 
 func ConfigureFeeMarketModule(ctx sdk.Context, keeper *feemarketkeeper.Keeper) error {

@@ -5,14 +5,12 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/math"
-	"cosmossdk.io/math"
 	cheqdante "github.com/cheqd/cheqd-node/ante"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
-	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 )
 
@@ -24,24 +22,11 @@ type TaxDecorator struct {
 	didKeeper       cheqdante.DidKeeper
 	resourceKeeper  cheqdante.ResourceKeeper
 	feemarketKeeper FeeMarketKeeper
-	accountKeeper   ante.AccountKeeper
-	bankKeeper      BankKeeper
-	feegrantKeeper  ante.FeegrantKeeper
-	didKeeper       cheqdante.DidKeeper
-	resourceKeeper  cheqdante.ResourceKeeper
-	feemarketKeeper FeeMarketKeeper
 }
 
 // NewTaxDecorator returns a new taxDecorator
 func NewTaxDecorator(ak ante.AccountKeeper, bk BankKeeper, fk ante.FeegrantKeeper, dk cheqdante.DidKeeper, rk cheqdante.ResourceKeeper, fmk FeeMarketKeeper) TaxDecorator {
-func NewTaxDecorator(ak ante.AccountKeeper, bk BankKeeper, fk ante.FeegrantKeeper, dk cheqdante.DidKeeper, rk cheqdante.ResourceKeeper, fmk FeeMarketKeeper) TaxDecorator {
 	return TaxDecorator{
-		accountKeeper:   ak,
-		bankKeeper:      bk,
-		feegrantKeeper:  fk,
-		didKeeper:       dk,
-		resourceKeeper:  rk,
-		feemarketKeeper: fmk,
 		accountKeeper:   ak,
 		bankKeeper:      bk,
 		feegrantKeeper:  fk,
@@ -90,88 +75,12 @@ func (td TaxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, suc
 
 	// if the current height is that which enabled the feemarket or lower, skip deduction
 	if ctx.BlockHeight() <= enabledHeight {
-	if taxable {
-		err := td.handleTaxableTransaction(ctx, feeTx, simulate, rewards, burn, tx)
-		if err != nil {
-			return ctx, err
-		}
-		return next(ctx, tx, simulate, success)
-	}
-	params, err := td.feemarketKeeper.GetParams(ctx)
-	if err != nil {
-		return ctx, errorsmod.Wrapf(err, "unable to get fee market params")
-	}
-	// return if disabled
-	if !params.Enabled {
-		return next(ctx, tx, simulate, success)
-	}
-
-	enabledHeight, err := td.feemarketKeeper.GetEnabledHeight(ctx)
-	if err != nil {
-		return ctx, errorsmod.Wrapf(err, "unable to get fee market enabled height")
-	}
-
-	// if the current height is that which enabled the feemarket or lower, skip deduction
-	if ctx.BlockHeight() <= enabledHeight {
 		return next(ctx, tx, simulate, success)
 	}
 
 	// update fee market state
 	state, err := td.feemarketKeeper.GetState(ctx)
-
-	// update fee market state
-	state, err := td.feemarketKeeper.GetState(ctx)
 	if err != nil {
-		return ctx, errorsmod.Wrapf(err, "unable to get fee market state")
-	}
-
-	feeCoins := feeTx.GetFee()
-	gas := ctx.GasMeter().GasConsumed() // use context gas consumed
-
-	if len(feeCoins) == 0 && !simulate {
-		return ctx, errorsmod.Wrapf(feemarkettypes.ErrNoFeeCoins, "got length %d", len(feeCoins))
-	}
-	if len(feeCoins) > 1 {
-		return ctx, errorsmod.Wrapf(feemarkettypes.ErrTooManyFeeCoins, "got length %d", len(feeCoins))
-	}
-
-	var feeCoin sdk.Coin
-	if simulate && len(feeCoins) == 0 {
-		// if simulating and user did not provider a fee - create a dummy value for them
-		feeCoin = sdk.NewCoin(params.FeeDenom, math.OneInt())
-	} else {
-		feeCoin = feeCoins[0]
-	}
-
-	feeGas := int64(feeTx.GetGas())
-
-	var (
-		tip     = sdk.NewCoin(feeCoin.Denom, math.ZeroInt())
-		payCoin = feeCoin
-	)
-
-	minGasPrice, err := td.feemarketKeeper.GetMinGasPrice(ctx, feeCoin.GetDenom())
-	if err != nil {
-		return ctx, errorsmod.Wrapf(err, "unable to get min gas price for denom %s", feeCoins[0].GetDenom())
-	}
-
-	ctx.Logger().Info("fee deduct post handle",
-		"min gas prices", minGasPrice,
-		"gas consumed", gas,
-	)
-
-	if !simulate {
-		payCoin, tip, err = cheqdante.CheckTxFee(ctx, minGasPrice, feeCoin, feeGas, false)
-		if err != nil {
-			return ctx, err
-		}
-	}
-
-	ctx.Logger().Info("fee deduct post handle",
-		"fee", payCoin,
-		"tip", tip,
-	)
-	if err := td.PayOutFeeAndTip(ctx, payCoin, tip); err != nil {
 		return ctx, errorsmod.Wrapf(err, "unable to get fee market state")
 	}
 
@@ -232,80 +141,9 @@ func (td TaxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, suc
 	err = td.feemarketKeeper.SetState(ctx, state)
 	if err != nil {
 		return ctx, errorsmod.Wrapf(err, "unable to set fee market state")
-	err = state.Update(gas, params)
-	if err != nil {
-		return ctx, errorsmod.Wrapf(err, "unable to update fee market state")
-	}
-
-	err = td.feemarketKeeper.SetState(ctx, state)
-	if err != nil {
-		return ctx, errorsmod.Wrapf(err, "unable to set fee market state")
 	}
 
 	return next(ctx, tx, simulate, success)
-}
-
-// PayOutFeeAndTip deducts the provided fee and tip from the fee payer.
-// If the tx uses a feegranter, the fee granter address will pay the fee instead of the tx signer.
-func (td TaxDecorator) PayOutFeeAndTip(ctx sdk.Context, fee, tip sdk.Coin) error {
-	params, err := td.feemarketKeeper.GetParams(ctx)
-	if err != nil {
-		return fmt.Errorf("error getting feemarket params: %v", err)
-	}
-
-	var events sdk.Events
-	// deduct the fees and tip
-	if !fee.IsNil() {
-		err := DeductCoins(td.bankKeeper, ctx, sdk.NewCoins(fee), params.DistributeFees)
-		if err != nil {
-			return err
-		}
-
-		events = append(events, sdk.NewEvent(
-			feemarkettypes.EventTypeFeePay,
-			sdk.NewAttribute(sdk.AttributeKeyFee, fee.String()),
-		))
-	}
-
-	proposer := sdk.AccAddress(ctx.BlockHeader().ProposerAddress)
-	if !tip.IsNil() {
-		err := SendTip(td.bankKeeper, ctx, proposer, sdk.NewCoins(tip))
-		if err != nil {
-			return err
-		}
-
-		events = append(events, sdk.NewEvent(
-			feemarkettypes.EventTypeTipPay,
-			sdk.NewAttribute(feemarkettypes.AttributeKeyTip, tip.String()),
-			sdk.NewAttribute(feemarkettypes.AttributeKeyTipPayee, proposer.String()),
-		))
-	}
-
-	ctx.EventManager().EmitEvents(events)
-	return nil
-}
-
-// DeductCoins deducts coins from the given account.
-// Coins can be sent to the default fee collector (
-// causes coins to be distributed to stakers) or kept in the fee collector account (soft burn).
-func DeductCoins(bankKeeper BankKeeper, ctx sdk.Context, coins sdk.Coins, distributeFees bool) error {
-	if distributeFees {
-		err := bankKeeper.SendCoinsFromModuleToModule(ctx, feemarkettypes.FeeCollectorName, types.FeeCollectorName, coins)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// SendTip sends a tip to the current block proposer.
-func SendTip(bankKeeper BankKeeper, ctx sdk.Context, proposer sdk.AccAddress, coins sdk.Coins) error {
-	err := bankKeeper.SendCoinsFromModuleToAccount(ctx, feemarkettypes.FeeCollectorName, proposer, coins)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 // PayOutFeeAndTip deducts the provided fee and tip from the fee payer.

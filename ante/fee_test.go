@@ -27,7 +27,6 @@ var _ = Describe("Fee tests on CheckTx", func() {
 	s := new(AnteTestSuite)
 
 	var decorators []sdk.AnteDecorator
-	var decorators []sdk.AnteDecorator
 	BeforeEach(func() {
 		err := s.SetupTest(true) // setup
 		Expect(err).To(BeNil(), "Error on creating test app")
@@ -46,24 +45,9 @@ var _ = Describe("Fee tests on CheckTx", func() {
 				),
 			),
 		}
-		decorators = []sdk.AnteDecorator{
-			feemarketante.NewFeeMarketCheckDecorator( // fee market check replaces fee deduct decorator
-				s.app.AccountKeeper,
-				s.app.BankKeeper,
-				s.app.FeeGrantKeeper,
-				s.app.FeeMarketKeeper,
-				ante.NewDeductFeeDecorator(
-					s.app.AccountKeeper,
-					s.app.BankKeeper,
-					s.app.FeeGrantKeeper,
-					nil,
-				),
-			),
-		}
 	})
 
 	It("Ensure Zero Mempool Fees On Simulation", func() {
-		mfd := cheqdante.NewOverAllDecorator(decorators...)
 		mfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(mfd)
 
@@ -71,7 +55,6 @@ var _ = Describe("Fee tests on CheckTx", func() {
 		priv1, _, addr1 := testdata.KeyTestPubAddr()
 		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(300000000000)))
 		err := testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
-
 
 		Expect(err).To(BeNil())
 
@@ -98,7 +81,6 @@ var _ = Describe("Fee tests on CheckTx", func() {
 	})
 
 	It("Ensure Mempool Fees", func() {
-		mfd := cheqdante.NewOverAllDecorator(decorators...)
 		mfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(mfd)
 
@@ -143,28 +125,6 @@ var _ = Describe("Fee tests on CheckTx", func() {
 
 		params, err = s.app.FeeMarketKeeper.GetParams(s.ctx)
 		Expect(err).To(BeNil())
-		ncheqPrice := sdk.NewDecCoinFromDec(didtypes.BaseMinimalDenom, sdk.NewDec(200_000_000_000))
-
-		params, err := s.app.FeeMarketKeeper.GetParams(s.ctx)
-		Expect(err).To(BeNil())
-
-		// Since we use the BaseGasPrice set by the feemarket
-		// Set high gas price in feemarket
-		params.MinBaseGasPrice = ncheqPrice.Amount
-		err = s.app.FeeMarketKeeper.SetParams(s.ctx, params)
-		Expect(err).To(BeNil())
-
-		state := feemarkettypes.DefaultState()
-		state.BaseGasPrice = ncheqPrice.Amount
-		err = s.app.FeeMarketKeeper.SetState(s.ctx, feemarkettypes.NewState(
-			state.Index,
-			state.BaseGasPrice,
-			state.LearningRate,
-		))
-		Expect(err).To(BeNil())
-
-		params, err = s.app.FeeMarketKeeper.GetParams(s.ctx)
-		Expect(err).To(BeNil())
 
 		// Set IsCheckTx to true
 		s.ctx = s.ctx.WithIsCheckTx(true)
@@ -174,14 +134,6 @@ var _ = Describe("Fee tests on CheckTx", func() {
 		Expect(err).NotTo(BeNil(), "Decorator should have errored on too low fee for local gasPrice")
 
 		// antehandler should not error since we do not check minGasPrice in simulation mode
-		params, err = s.app.FeeMarketKeeper.GetParams(s.ctx)
-		Expect(err).To(BeNil())
-
-		// Set high gas price in feemarket
-		params.Enabled = false
-		err = s.app.FeeMarketKeeper.SetParams(s.ctx, params)
-		Expect(err).To(BeNil())
-
 		params, err = s.app.FeeMarketKeeper.GetParams(s.ctx)
 		Expect(err).To(BeNil())
 
@@ -238,7 +190,6 @@ var _ = Describe("Fee tests on CheckTx", func() {
 		Expect(err).To(BeNil())
 
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
-		dfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
 		_, err = antehandler(s.ctx, tx, false)
@@ -258,26 +209,11 @@ var _ = Describe("Fee tests on CheckTx", func() {
 var _ = Describe("Fee tests on DeliverTx", func() {
 	s := new(AnteTestSuite)
 	var decorators []sdk.AnteDecorator
-	var decorators []sdk.AnteDecorator
 
 	BeforeEach(func() {
 		err := s.SetupTest(false) // setup
 		Expect(err).To(BeNil(), "Error on creating test app")
 		s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
-		decorators = []sdk.AnteDecorator{
-			feemarketante.NewFeeMarketCheckDecorator( // fee market check replaces fee deduct decorator
-				s.app.AccountKeeper,
-				s.app.BankKeeper,
-				s.app.FeeGrantKeeper,
-				s.app.FeeMarketKeeper,
-				ante.NewDeductFeeDecorator(
-					s.app.AccountKeeper,
-					s.app.BankKeeper,
-					s.app.FeeGrantKeeper,
-					nil,
-				),
-			),
-		}
 		decorators = []sdk.AnteDecorator{
 			feemarketante.NewFeeMarketCheckDecorator( // fee market check replaces fee deduct decorator
 				s.app.AccountKeeper,
@@ -318,7 +254,6 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
 		Expect(err).To(BeNil())
 
-		dfd := cheqdante.NewOverAllDecorator(decorators...)
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
@@ -361,10 +296,8 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		Expect(err).To(BeNil())
 
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
-		dfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
 		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
@@ -427,10 +360,8 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		Expect(err).To(BeNil())
 
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
-		dfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
 		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
@@ -440,14 +371,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 
 		// antehandler should not error since we make sure that the fee is sufficient in DeliverTx (simulate=false only, Posthandler will check it otherwise)
 		newCtx, err := antehandler(s.ctx, tx, false)
-		newCtx, err := antehandler(s.ctx, tx, false)
 		Expect(err).To(BeNil(), "Tx errored when non-taxable on deliverTx")
-		_, _, proposer := testdata.KeyTestPubAddr()
-		s.ctx = newCtx
-		a := s.ctx.BlockHeader()
-		a.ProposerAddress = proposer
-		newCtx = s.ctx.WithBlockHeader(a)
-		s.ctx = newCtx
 		_, _, proposer := testdata.KeyTestPubAddr()
 		s.ctx = newCtx
 		a := s.ctx.BlockHeader()
@@ -470,10 +394,8 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 
 		// check that reward has been sent to the fee collector
 		feeCollector := s.app.AccountKeeper.GetModuleAddress(feemarkettypes.FeeCollectorName)
-		feeCollector := s.app.AccountKeeper.GetModuleAddress(feemarkettypes.FeeCollectorName)
 		feeCollectorBalance := s.app.BankKeeper.GetBalance(s.ctx, feeCollector, didtypes.BaseMinimalDenom)
 
-		Expect((feeCollectorBalance.Amount).GT(math.NewInt(0)))
 		Expect((feeCollectorBalance.Amount).GT(math.NewInt(0)))
 	})
 
@@ -481,7 +403,6 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		// keys and addresses
 		priv1, _, addr1 := testdata.KeyTestPubAddr()
 
-		msg := SandboxDidDoc()
 		msg := SandboxDidDoc()
 		Expect(s.txBuilder.SetMsgs(msg)).To(BeNil())
 
@@ -500,10 +421,8 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		Expect(err).To(BeNil())
 
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
-		dfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
 		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
