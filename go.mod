@@ -239,9 +239,6 @@ replace (
 	github.com/osmosis-labs/fee-abstraction/v7 => github.com/cheqd/fee-abstraction/v7 v7.0.3-0.20240919093501-645e58a8252d
 
 	github.com/skip-mev/feemarket => github.com/cheqd/feemarket v1.0.4-sdk47.0.20240919093317-104ec7d7b634
-	// github.com/skip-mev/feemarket => /home/vitwit/go/src/github.com/cheqd/feemarket
-
-	github.com/skip-mev/feemarket => github.com/cheqd/feemarket v1.0.4-sdk47.0.20240822213759-ad21c7e69228
 
 	// replace broken goleveldb
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
