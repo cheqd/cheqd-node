@@ -645,6 +645,8 @@ func New(
 	app.DidKeeper = *didkeeper.NewKeeper(
 		appCodec, keys[didtypes.StoreKey],
 		app.GetSubspace(didtypes.ModuleName),
+		app.AccountKeeper, app.BankKeeper,
+		app.StakingKeeper,
 	)
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
