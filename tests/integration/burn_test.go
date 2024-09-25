@@ -1,3 +1,5 @@
+//go:build upgrade_integration
+
 package integration
 
 import (
@@ -13,7 +15,6 @@ import (
 )
 
 var _ = Describe("Upgrade - Burn coins from relevant message signer", func() {
-
 	It("should burn the coins from the given address", func() {
 		coins := sdk.NewCoin("ncheq", sdk.NewInt(10000000))
 
