@@ -16,7 +16,7 @@ jobs:
 
   codeql-analysis:
     name: "CodeQL Analysis"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     permissions:
       actions: read
       contents: read
