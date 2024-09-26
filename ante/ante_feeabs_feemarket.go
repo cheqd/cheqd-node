@@ -1,8 +1,6 @@
 package ante
 
 import (
-	"fmt"
-
 	feeabskeeper "github.com/osmosis-labs/fee-abstraction/v7/x/feeabs/keeper"
 	feeabstypes "github.com/osmosis-labs/fee-abstraction/v7/x/feeabs/types"
 	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
@@ -24,7 +22,6 @@ var _ feemarkettypes.DenomResolver = &DenomResolverImpl{}
 // If the denom is not the bond denom, convert the `coin` to the given denom. return error if denom is not in the allowed list
 func (r *DenomResolverImpl) ConvertToDenom(ctx sdk.Context, coin sdk.DecCoin, denom string) (sdk.DecCoin, error) {
 	bondDenom := r.StakingKeeper.BondDenom(ctx)
-	fmt.Println("Here>>>>>>>>>>>>>>>> ConvertToDenom and bondDenom and denom", bondDenom, denom, coin)
 	if denom != bondDenom && coin.Denom != bondDenom {
 		return sdk.DecCoin{}, ErrNeitherNativeDenom(coin.Denom, denom)
 	}
@@ -34,8 +31,6 @@ func (r *DenomResolverImpl) ConvertToDenom(ctx sdk.Context, coin sdk.DecCoin, de
 	var err error
 
 	if denom == bondDenom {
-
-		fmt.Println("Here<<<<<<<<<<<<<<<<<<< in if statement")
 		hostZoneConfig, found = r.FeeabsKeeper.GetHostZoneConfig(ctx, coin.Denom)
 		if !found {
 			return sdk.DecCoin{}, ErrDenomNotRegistered(coin.Denom)
@@ -43,7 +38,6 @@ func (r *DenomResolverImpl) ConvertToDenom(ctx sdk.Context, coin sdk.DecCoin, de
 		amount, err = r.getIBCCoinFromNative(ctx, sdk.NewCoins(sdk.NewCoin(coin.
 			Denom, coin.Amount.TruncateInt())), hostZoneConfig)
 	} else if coin.Denom == bondDenom {
-		fmt.Println("here in elseif>>>>>>>>>>", coin.Denom, bondDenom)
 		hostZoneConfig, found := r.FeeabsKeeper.GetHostZoneConfig(ctx, denom)
 		if !found {
 			return sdk.DecCoin{}, ErrDenomNotRegistered(denom)
@@ -54,7 +48,6 @@ func (r *DenomResolverImpl) ConvertToDenom(ctx sdk.Context, coin sdk.DecCoin, de
 	if err != nil {
 		return sdk.DecCoin{}, err
 	}
-	fmt.Println(">>>>>>>>>>>>>>>>>>>", sdk.NewDecCoinFromDec(denom, amount[0].Amount.ToLegacyDec()))
 	return sdk.NewDecCoinFromDec(denom, amount[0].Amount.ToLegacyDec()), nil
 }
 
