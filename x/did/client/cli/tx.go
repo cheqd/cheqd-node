@@ -97,6 +97,7 @@ func GetTxCmd() *cobra.Command {
 	cmd.AddCommand(CmdCreateDidDoc())
 	cmd.AddCommand(CmdUpdateDidDoc())
 	cmd.AddCommand(CmdDeactivateDidDoc())
+	cmd.AddCommand(NewBurnCmd())
 
 	return cmd
 }

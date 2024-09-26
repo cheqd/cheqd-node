@@ -140,7 +140,9 @@ import (
 	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 
 	// unnamed import of statik for swagger UI support
+	cheqdante "github.com/cheqd/cheqd-node/ante"
 	_ "github.com/cheqd/cheqd-node/app/client/docs/statik"
+	upgradeV3 "github.com/cheqd/cheqd-node/app/upgrades/v3"
 )
 
 var (
@@ -579,6 +581,10 @@ func New(
 
 	feeabsModule := feeabsmodule.NewAppModule(appCodec, app.FeeabsKeeper)
 	feeabsIBCModule := feeabsmodule.NewIBCModule(appCodec, app.FeeabsKeeper)
+	app.FeeMarketKeeper.SetDenomResolver(&cheqdante.DenomResolverImpl{
+		StakingKeeper: app.StakingKeeper,
+		FeeabsKeeper:  app.FeeabsKeeper,
+	})
 
 	// register the proposal types
 	govRouter := govv1beta1.NewRouter()
@@ -671,6 +677,8 @@ func New(
 	app.DidKeeper = *didkeeper.NewKeeper(
 		appCodec, keys[didtypes.StoreKey],
 		app.GetSubspace(didtypes.ModuleName),
+		app.AccountKeeper, app.BankKeeper,
+		app.StakingKeeper,
 	)
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
@@ -1148,6 +1156,20 @@ func (app *App) RegisterUpgradeHandlers() {
 			return migrations, err
 		},
 	)
+	app.UpgradeKeeper.SetUpgradeHandler(
+		upgradeV3.UpgradeName,
+		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			migrations, err := app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
+			if err != nil {
+				return migrations, err
+			}
+			err = ConfigureFeeMarketModule(ctx, app.FeeMarketKeeper)
+			if err != nil {
+				return migrations, err
+			}
+			return migrations, nil
+		},
+	)
 }
 
 // configure store loader that checks if version == upgradeHeight and applies store upgrades
@@ -1157,17 +1179,40 @@ func (app *App) setupUpgradeStoreLoaders() {
 		panic(fmt.Sprintf("failed to read upgrade info from disk %s", err))
 	}
 
-	if upgradeInfo.Name == upgradeV2.UpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+	if upgradeInfo.Name == upgradeV3.UpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		storeUpgrades := storetypes.StoreUpgrades{
 			Added: []string{
-				consensusparamtypes.StoreKey,
-				crisistypes.StoreKey,
+				feemarkettypes.StoreKey,
 			},
 		}
-
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
 	}
+}
+
+func ConfigureFeeMarketModule(ctx sdk.Context, keeper *feemarketkeeper.Keeper) error {
+	params, err := keeper.GetParams(ctx)
+	if err != nil {
+		return err
+	}
+
+	params.Enabled = true
+	params.FeeDenom = resourcetypes.BaseMinimalDenom
+	params.DistributeFees = false // burn fees
+	params.MinBaseGasPrice = sdk.MustNewDecFromStr("0.005")
+	params.MaxBlockUtilization = feemarkettypes.DefaultMaxBlockUtilization
+	if err := keeper.SetParams(ctx, params); err != nil {
+		return err
+	}
+
+	state, err := keeper.GetState(ctx)
+	if err != nil {
+		return err
+	}
+
+	state.BaseGasPrice = sdk.MustNewDecFromStr("0.005")
+
+	return keeper.SetState(ctx, state)
 }
 
 func (app *App) Configurator() module.Configurator {
