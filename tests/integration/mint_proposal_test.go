@@ -1,3 +1,5 @@
+//go:build integration
+
 package integration
 
 import (
@@ -44,7 +46,6 @@ var _ = Describe("Upgrade - Fee parameter change proposal", func() {
 		Expect(err).To(BeNil())
 		fmt.Println("res>>>>>>>>>>>>", res)
 		Expect(res.Code).To(BeEquivalentTo(0))
-
 	})
 
 	It("should vote for the parameter change proposal from `validator2` container", func() {
@@ -81,5 +82,4 @@ var _ = Describe("Upgrade - Fee parameter change proposal", func() {
 	})
 
 	// It("should check the proposal status to ensure it has passed", func() {
-
 })
