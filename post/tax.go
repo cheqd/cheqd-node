@@ -4,31 +4,35 @@ import (
 	"fmt"
 
 	errorsmod "cosmossdk.io/errors"
+	"cosmossdk.io/math"
 	cheqdante "github.com/cheqd/cheqd-node/ante"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
+	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 )
 
 // TaxDecorator will handle tax for all taxable messages
 type TaxDecorator struct {
-	accountKeeper  ante.AccountKeeper
-	bankKeeper     cheqdante.BankKeeper
-	feegrantKeeper ante.FeegrantKeeper
-	didKeeper      cheqdante.DidKeeper
-	resourceKeeper cheqdante.ResourceKeeper
+	accountKeeper   ante.AccountKeeper
+	bankKeeper      BankKeeper
+	feegrantKeeper  ante.FeegrantKeeper
+	didKeeper       cheqdante.DidKeeper
+	resourceKeeper  cheqdante.ResourceKeeper
+	feemarketKeeper FeeMarketKeeper
 }
 
 // NewTaxDecorator returns a new taxDecorator
-func NewTaxDecorator(ak ante.AccountKeeper, bk cheqdante.BankKeeper, fk ante.FeegrantKeeper, dk cheqdante.DidKeeper, rk cheqdante.ResourceKeeper) TaxDecorator {
+func NewTaxDecorator(ak ante.AccountKeeper, bk BankKeeper, fk ante.FeegrantKeeper, dk cheqdante.DidKeeper, rk cheqdante.ResourceKeeper, fmk FeeMarketKeeper) TaxDecorator {
 	return TaxDecorator{
-		accountKeeper:  ak,
-		bankKeeper:     bk,
-		feegrantKeeper: fk,
-		didKeeper:      dk,
-		resourceKeeper: rk,
+		accountKeeper:   ak,
+		bankKeeper:      bk,
+		feegrantKeeper:  fk,
+		didKeeper:       dk,
+		resourceKeeper:  rk,
+		feemarketKeeper: fmk,
 	}
 }
 
@@ -48,35 +52,161 @@ func (td TaxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, suc
 	if err != nil {
 		return ctx, err
 	}
-	// if not taxable, skip
-	if !taxable {
+	if taxable {
+		err := td.handleTaxableTransaction(ctx, feeTx, simulate, rewards, burn, tx)
+		if err != nil {
+			return ctx, err
+		}
 		return next(ctx, tx, simulate, success)
 	}
-	// validate tax
-	err = td.validateTax(feeTx.GetFee(), simulate)
+	params, err := td.feemarketKeeper.GetParams(ctx)
 	if err != nil {
-		return ctx, err
+		return ctx, errorsmod.Wrapf(err, "unable to get fee market params")
 	}
-	// get fee payer and check if fee grant exists
-	tax := rewards.Add(burn...)
-	feePayer, err := td.getFeePayer(ctx, feeTx, tax, tx.GetMsgs())
+	// return if disabled
+	if !params.Enabled {
+		return next(ctx, tx, simulate, success)
+	}
+
+	enabledHeight, err := td.feemarketKeeper.GetEnabledHeight(ctx)
 	if err != nil {
+		return ctx, errorsmod.Wrapf(err, "unable to get fee market enabled height")
+	}
+
+	// if the current height is that which enabled the feemarket or lower, skip deduction
+	if ctx.BlockHeight() <= enabledHeight {
+		return next(ctx, tx, simulate, success)
+	}
+
+	// update fee market state
+	state, err := td.feemarketKeeper.GetState(ctx)
+	if err != nil {
+		return ctx, errorsmod.Wrapf(err, "unable to get fee market state")
+	}
+
+	feeCoins := feeTx.GetFee()
+	gas := ctx.GasMeter().GasConsumed() // use context gas consumed
+
+	if len(feeCoins) == 0 && !simulate {
+		return ctx, errorsmod.Wrapf(feemarkettypes.ErrNoFeeCoins, "got length %d", len(feeCoins))
+	}
+	if len(feeCoins) > 1 {
+		return ctx, errorsmod.Wrapf(feemarkettypes.ErrTooManyFeeCoins, "got length %d", len(feeCoins))
+	}
+
+	var feeCoin sdk.Coin
+	if simulate && len(feeCoins) == 0 {
+		// if simulating and user did not provider a fee - create a dummy value for them
+		feeCoin = sdk.NewCoin(params.FeeDenom, math.OneInt())
+	} else {
+		feeCoin = feeCoins[0]
+	}
+
+	feeGas := int64(feeTx.GetGas())
+
+	var (
+		tip     = sdk.NewCoin(feeCoin.Denom, math.ZeroInt())
+		payCoin = feeCoin
+	)
+
+	minGasPrice, err := td.feemarketKeeper.GetMinGasPrice(ctx, feeCoin.GetDenom())
+	if err != nil {
+		return ctx, errorsmod.Wrapf(err, "unable to get min gas price for denom %s", feeCoins[0].GetDenom())
+	}
+
+	ctx.Logger().Info("fee deduct post handle",
+		"min gas prices", minGasPrice,
+		"gas consumed", gas,
+	)
+
+	if !simulate {
+		payCoin, tip, err = cheqdante.CheckTxFee(ctx, minGasPrice, feeCoin, feeGas, false)
+		if err != nil {
+			return ctx, err
+		}
+	}
+
+	ctx.Logger().Info("fee deduct post handle",
+		"fee", payCoin,
+		"tip", tip,
+	)
+	if err := td.PayOutFeeAndTip(ctx, payCoin, tip); err != nil {
 		return ctx, err
 	}
-	// deduct tax (rewards + burn) from fee payer to did module account
-	if err := td.deductTaxFromFeePayer(ctx, feePayer, tax); err != nil {
-		return ctx, err
+	err = state.Update(gas, params)
+	if err != nil {
+		return ctx, errorsmod.Wrapf(err, "unable to update fee market state")
 	}
-	// move rewards to fee collector to follow the default proposer logic
-	if err := td.distributeRewards(ctx, rewards); err != nil {
-		return ctx, err
-	}
-	// finally, burn tax portion from did module account
-	if err := td.burnFees(ctx, burn); err != nil {
-		return ctx, err
+
+	err = td.feemarketKeeper.SetState(ctx, state)
+	if err != nil {
+		return ctx, errorsmod.Wrapf(err, "unable to set fee market state")
 	}
 
 	return next(ctx, tx, simulate, success)
+}
+
+// PayOutFeeAndTip deducts the provided fee and tip from the fee payer.
+// If the tx uses a feegranter, the fee granter address will pay the fee instead of the tx signer.
+func (td TaxDecorator) PayOutFeeAndTip(ctx sdk.Context, fee, tip sdk.Coin) error {
+	params, err := td.feemarketKeeper.GetParams(ctx)
+	if err != nil {
+		return fmt.Errorf("error getting feemarket params: %v", err)
+	}
+
+	var events sdk.Events
+	// deduct the fees and tip
+	if !fee.IsNil() {
+		err := DeductCoins(td.bankKeeper, ctx, sdk.NewCoins(fee), params.DistributeFees)
+		if err != nil {
+			return err
+		}
+
+		events = append(events, sdk.NewEvent(
+			feemarkettypes.EventTypeFeePay,
+			sdk.NewAttribute(sdk.AttributeKeyFee, fee.String()),
+		))
+	}
+
+	proposer := sdk.AccAddress(ctx.BlockHeader().ProposerAddress)
+	if !tip.IsNil() {
+		err := SendTip(td.bankKeeper, ctx, proposer, sdk.NewCoins(tip))
+		if err != nil {
+			return err
+		}
+
+		events = append(events, sdk.NewEvent(
+			feemarkettypes.EventTypeTipPay,
+			sdk.NewAttribute(feemarkettypes.AttributeKeyTip, tip.String()),
+			sdk.NewAttribute(feemarkettypes.AttributeKeyTipPayee, proposer.String()),
+		))
+	}
+
+	ctx.EventManager().EmitEvents(events)
+	return nil
+}
+
+// DeductCoins deducts coins from the given account.
+// Coins can be sent to the default fee collector (
+// causes coins to be distributed to stakers) or kept in the fee collector account (soft burn).
+func DeductCoins(bankKeeper BankKeeper, ctx sdk.Context, coins sdk.Coins, distributeFees bool) error {
+	if distributeFees {
+		err := bankKeeper.SendCoinsFromModuleToModule(ctx, feemarkettypes.FeeCollectorName, types.FeeCollectorName, coins)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// SendTip sends a tip to the current block proposer.
+func SendTip(bankKeeper BankKeeper, ctx sdk.Context, proposer sdk.AccAddress, coins sdk.Coins) error {
+	err := bankKeeper.SendCoinsFromModuleToAccount(ctx, feemarkettypes.FeeCollectorName, proposer, coins)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // isTaxable returns true if the message is taxable and returns
@@ -179,5 +309,62 @@ func (td TaxDecorator) burnFees(ctx sdk.Context, fees sdk.Coins) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (td *TaxDecorator) handleTaxableTransaction(
+	ctx sdk.Context,
+	feeTx sdk.FeeTx,
+	simulate bool,
+	rewards, burn sdk.Coins,
+	tx sdk.Tx,
+) error {
+	params, err := td.feemarketKeeper.GetParams(ctx)
+	if err != nil {
+		return err
+	}
+
+	nativeDenom := params.FeeDenom
+
+	// Check if fees contain only the native denom, if it is IBC denom fee abs logic applies.
+	// The fees will be deducted from the fee payer and the tokens already sent to did module account.
+	onlyNativeDenom := true
+	for _, fee := range feeTx.GetFee() {
+		if fee.Denom != nativeDenom {
+			// If any other token besides the native denom is present, set the flag to false
+			onlyNativeDenom = false
+			break
+		}
+	}
+
+	// if the fees are only in native denom then fee-abs logic won't be applied and deduct the fees from fee payer.
+	if onlyNativeDenom {
+		// Validate the tax
+		if err := td.validateTax(feeTx.GetFee(), simulate); err != nil {
+			return err
+		}
+
+		// Get fee payer and check if fee grant exists
+		tax := rewards.Add(burn...)
+		feePayer, err := td.getFeePayer(ctx, feeTx, tax, tx.GetMsgs())
+		if err != nil {
+			return err
+		}
+		// Deduct tax from fee payer
+		if err := td.deductTaxFromFeePayer(ctx, feePayer, tax); err != nil {
+			return err
+		}
+	}
+
+	// Distribute rewards to fee collector
+	if err := td.distributeRewards(ctx, rewards); err != nil {
+		return err
+	}
+
+	// Burn the tax portion
+	if err := td.burnFees(ctx, burn); err != nil {
+		return err
+	}
+
 	return nil
 }
