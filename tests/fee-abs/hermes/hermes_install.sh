@@ -1,4 +1,7 @@
 #!/bin/bash
+# shellcheck disable=SC2086
+
+set -euox pipefail
 
 # Check if the version is provided as an argument
 # if [ -z "$1" ]; then
