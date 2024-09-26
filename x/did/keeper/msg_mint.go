@@ -15,7 +15,7 @@ func (k MsgServer) Mint(goCtx context.Context, req *types.MsgMint) (res *types.M
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	err = k.bankKeeper.MintCoins(ctx, types.ModuleName, req.Amount)
+	err = k.bankkeeper.MintCoins(ctx, types.ModuleName, req.Amount)
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +25,7 @@ func (k MsgServer) Mint(goCtx context.Context, req *types.MsgMint) (res *types.M
 		return nil, err
 	}
 
-	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, req.Amount)
+	err = k.bankkeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, req.Amount)
 	if err != nil {
 		return nil, err
 	}

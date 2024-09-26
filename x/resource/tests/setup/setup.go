@@ -72,7 +72,7 @@ func Setup() TestSetup {
 
 	maccPerms := map[string][]string{
 		minttypes.ModuleName:           {authtypes.Minter},
-		types.ModuleName:               {authtypes.Burner},
+		types.ModuleName:               {authtypes.Minter, authtypes.Burner},
 		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 	}
@@ -102,37 +102,15 @@ func Setup() TestSetup {
 
 	_ = dbStore.LoadLatestVersion()
 
-	// Mount account and bank stores
-	authStoreKey := sdk.NewKVStoreKey(authtypes.StoreKey)
-	bankStoreKey := sdk.NewKVStoreKey(banktypes.StoreKey)
-	dbStore.MountStoreWithDB(authStoreKey, storetypes.StoreTypeIAVL, nil)
-	dbStore.MountStoreWithDB(bankStoreKey, storetypes.StoreTypeIAVL, nil)
-
-	// Initialize accountKeeper
-	maccPerms := map[string][]string{
-		authtypes.FeeCollectorName: nil,
-		types.ModuleName:           {authtypes.Minter, authtypes.Burner},
-	}
-
 	accountKeeper := authkeeper.NewAccountKeeper(
 		cdc,
-		authStoreKey,
+		keys[authtypes.StoreKey],
 		authtypes.ProtoBaseAccount,
 		maccPerms,
 		app.AccountAddressPrefix,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
-	bankKeeper := bankkeeper.NewBaseKeeper(
-		cdc,
-		bankStoreKey,
-		accountKeeper,
-		nil,
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
-	)
-
-	// Init Keepers
-	accountKeeper := authkeeper.NewAccountKeeper(cdc, keys[authtypes.StoreKey], authtypes.ProtoBaseAccount, maccPerms, "cheqd", string(authtypes.NewModuleAddress(govtypes.ModuleName)))
 	bankKeeper := bankkeeper.NewBaseKeeper(
 		cdc,
 		keys[banktypes.StoreKey],

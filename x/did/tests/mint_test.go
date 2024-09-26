@@ -19,7 +19,7 @@ var _ = Describe("MsgBurn tests", func() {
 		pk1 := ed25519.GenPrivKey().PubKey()
 		addr1 := sdk.AccAddress(pk1.Address())
 		mintAmount := sdk.NewCoins(sdk.NewCoin("ncheq", sdk.NewInt(100000)))
-		governanceAddress := setup.AuthKeeper.GetModuleAccount(setup.SdkCtx, "gov").GetAddress().String()
+		governanceAddress := setup.AccountKeeper.GetModuleAccount(setup.SdkCtx, "gov").GetAddress().String()
 
 		baseMsg := types.NewMsgMint(
 			governanceAddress,

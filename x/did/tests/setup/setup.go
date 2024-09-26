@@ -5,7 +5,6 @@ import (
 	"crypto/rand"
 	"time"
 
-	"github.com/cheqd/cheqd-node/app"
 	"github.com/cheqd/cheqd-node/x/did/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 
@@ -93,7 +92,7 @@ func Setup() TestSetup {
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 	stakingKeeper := stakingkeeper.NewKeeper(Cdc, keys[stakingtypes.StoreKey], accountKeeper, bankKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
-	newKeeper := keeper.NewKeeper(Cdc, keys[types.StoreKey], getSubspace(types.ModuleName, paramsKeeper), accountKeeper, bankKeeper, stakingKeeper)
+	newKeeper := keeper.NewKeeper(Cdc, keys[types.StoreKey], getSubspace(types.ModuleName, paramsKeeper), accountKeeper, bankKeeper, stakingKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
 
 	// Create Tx
 	txBytes := make([]byte, 28)
