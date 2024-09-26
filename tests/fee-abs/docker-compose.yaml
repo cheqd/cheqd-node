@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   cheqd:
-    image: cheqd-node:build-local
+    image: cheqd/cheqd-node:build-latest
     build:
       context: ../../
       dockerfile: docker/Dockerfile
