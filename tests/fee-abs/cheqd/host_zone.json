@@ -1,0 +1,12 @@
+{
+	"title": "Add Fee Abstraction Host Zone Proposal",
+	"description": "Add Fee Abstraction Host Zone",
+	"host_chain_fee_abs_config": 
+		{
+			"ibc_denom": "ibc/ED07A3391A112B175915CD8FAF43A2DA8E4790EDE12566649D0C2F97716B8518",
+			"osmosis_pool_token_denom_in": "uosmo",
+			"pool_id": "1",
+			"status": 0
+		},
+	"deposit": "100000000ncheq"
+}
