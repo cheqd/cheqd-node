@@ -56,7 +56,6 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		res, err := cli.VoteProposal(cli.Validator3, "1", "yes", cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
-
 	})
 	It("should vote for the mint proposal from `validator0` container", func() {
 		By("sending a VoteProposal transaction from `validator0` container")

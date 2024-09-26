@@ -172,7 +172,6 @@ func BurnMsg(from string, coins string, feeParams []string) (sdk.TxResponse, err
 }
 
 func SubmitProposal(container string, feeParams []string, pathToDir ...string) (sdk.TxResponse, error) {
-
 	args := append([]string{
 		CliBinaryName,
 		"tx", "gov", "submit-proposal", filepath.Join(pathToDir...),
