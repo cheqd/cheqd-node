@@ -31,9 +31,6 @@ function assert_tx_successful() {
 CHEQD_USER_ADDRESS=$(cheqd-noded keys show --address cheqd-user --keyring-backend test | tr -d '\r')
 OSMOSIS_USER_ADDRESS=$(osmosisd keys show --address osmosis-user --keyring-backend test | tr -d '\r')
 
-CHEQD_RELAYER_ADDRESS=$(cheqd-noded keys show --address cheqd-relayer --keyring-backend test | tr -d '\r')
-OSMOSIS_RELAYER_ADDRESS=$(osmosisd keys show --address osmosis-relayer --keyring-backend test | tr -d '\r')
-
 info "Transfer cheqd -> osmosis" # ---
 PORT="transfer"
 CHANNEL="channel-0"
