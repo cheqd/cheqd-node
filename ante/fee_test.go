@@ -1192,10 +1192,6 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 	})
 
 	It("Ensure native tx fee txns are working", func() {
-		err := s.app.FeeabsKeeper.SetHostZoneConfig(s.ctx, mockHostZoneConfig)
-		Expect(err).ToNot(HaveOccurred())
-		s.app.FeeabsKeeper.SetTwapRate(s.ctx, "ibcfee", sdk.NewDec(1))
-
 		anteHandler := sdk.ChainAnteDecorators(decorators...)
 
 		priv1, _, addr1 := testdata.KeyTestPubAddr()
@@ -1324,11 +1320,78 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		Expect(feeCollectorBalance.Amount).To(Equal(reward.AmountOf(didtypes.BaseMinimalDenom)), "Reward was not sent to the fee collector")
 	})
 
-	It("Ensure taxable txn working fine after integrating the fee-abs", func() {
-		// err := s.app.FeeabsKeeper.SetHostZoneConfig(s.ctx, mockHostZoneConfig)
-		// Expect(err).ToNot(HaveOccurred())
-		// s.app.FeeabsKeeper.SetTwapRate(s.ctx, "ibcfee", sdk.NewDec(1))
+	It("Ensure to convert the IBC Denom to native fee for non taxable txn", func() {
+		err := s.app.FeeabsKeeper.SetHostZoneConfig(s.ctx, mockHostZoneConfig)
+		Expect(err).ToNot(HaveOccurred())
+		ibcDenom := "ibcfee"
+		s.app.FeeabsKeeper.SetTwapRate(s.ctx, ibcDenom, sdk.NewDec(1))
 
+		anteHandler := sdk.ChainAnteDecorators(decorators...)
+
+		priv1, _, addr1 := testdata.KeyTestPubAddr()
+
+		// msg and signatures
+		msg := testdata.NewTestMsg(addr1)
+		feeAmount := sdk.NewCoins(sdk.NewCoin(ibcDenom, sdk.NewInt(50_000_000_000)))
+		gasLimit := testdata.NewTestGasLimit()
+		Expect(s.txBuilder.SetMsgs(msg)).To(BeNil())
+		s.txBuilder.SetFeeAmount(feeAmount)
+		s.txBuilder.SetGasLimit(gasLimit)
+		s.txBuilder.SetFeePayer(addr1)
+
+		privs, accNums, accSeqs := []cryptotypes.PrivKey{priv1}, []uint64{0}, []uint64{0}
+		tx, err := s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
+		Expect(err).To(BeNil())
+
+		// set account with sufficient funds
+		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
+		s.app.AccountKeeper.SetAccount(s.ctx, acc)
+		amount := sdk.NewInt(50_000_000_000)
+		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(ibcDenom, amount)))
+		Expect(err).To(BeNil())
+
+		err = testutil.FundModuleAccount(s.app.BankKeeper, s.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin("ncheq", amount)))
+		Expect(err).To(BeNil())
+
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
+		posthandler := sdk.ChainPostDecorators(taxDecorator)
+
+		// get supply before tx
+		supplyBefore, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
+		Expect(err).To(BeNil())
+
+		newCtx, err := anteHandler(s.ctx, tx, true)
+		Expect(err).To(BeNil())
+
+		_, _, proposer := testdata.KeyTestPubAddr()
+		s.ctx = newCtx
+		a := s.ctx.BlockHeader()
+		a.ProposerAddress = proposer
+		newCtx = s.ctx.WithBlockHeader(a)
+		s.ctx = newCtx
+
+		_, err = posthandler(s.ctx, tx, false, true)
+		Expect(err).To(BeNil(), "Tx errored when fee payer had sufficient funds and provided sufficient fee while subtracting tax on deliverTx")
+
+		// check balance of fee payer
+		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, ibcDenom)
+		Expect(amount.Sub(sdk.NewInt(feeAmount.AmountOf(ibcDenom).Int64())).Equal(balance.Amount)).To(BeTrue(), "Fee amount subtracted was not equal to fee amount required for non-taxable tx")
+
+		// get supply after tx
+		supplyAfter, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
+		Expect(err).To(BeNil())
+
+		// check that supply was not deflated
+		Expect(supplyBefore).To(Equal(supplyAfter), "Supply was deflated")
+
+		// check that reward has been sent to the fee collector
+		feeCollector := s.app.AccountKeeper.GetModuleAddress(feemarkettypes.FeeCollectorName)
+		feeCollectorBalance := s.app.BankKeeper.GetBalance(s.ctx, feeCollector, didtypes.BaseMinimalDenom)
+
+		Expect((feeCollectorBalance.Amount).GT(math.NewInt(0)))
+	})
+
+	It("Ensure taxable txn working fine after integrating the fee-abs", func() {
 		anteHandler := sdk.ChainAnteDecorators(decorators...)
 
 		priv1, _, addr1 := testdata.KeyTestPubAddr()
