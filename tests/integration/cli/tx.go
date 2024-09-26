@@ -168,3 +168,10 @@ func CreateResource(tmpDir string, payload resourcetypes.MsgCreateResourcePayloa
 func BurnMsg(from string, coins string, feeParams []string) (sdk.TxResponse, error) {
 	return Tx("cheqd", "burn", from, feeParams, coins)
 }
+func SubmitProposal(container string, from string, feeParams []string, pathToDir ...string) (sdk.TxResponse, error) {
+	return Tx("gov", "submit-proposal", from, feeParams, pathToDir...)
+}
+
+func VoteProposal(container, id, option string, from string, feeParams []string) (sdk.TxResponse, error) {
+	return Tx("gov", "vote", from, feeParams, id, option)
+}
