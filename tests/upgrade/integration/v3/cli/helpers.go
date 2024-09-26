@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	cheqdtypes "github.com/cheqd/cheqd-node/x/did/types"
 	didv2 "github.com/cheqd/cheqd-node/x/did/types"
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -217,6 +218,7 @@ func MakeCodecWithExtendedRegistry() codec.Codec {
 		(*sdk.Msg)(nil),
 		&upgradetypes.MsgSoftwareUpgrade{},
 		&govtypesv1.MsgExecLegacyContent{},
+		&cheqdtypes.MsgBurn{},
 		&didv2.MsgMint{},
 	)
 

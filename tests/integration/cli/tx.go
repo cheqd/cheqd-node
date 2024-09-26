@@ -164,3 +164,7 @@ func CreateResource(tmpDir string, payload resourcetypes.MsgCreateResourcePayloa
 
 	return Tx("resource", "create", from, feeParams, payloadFile, dataFile)
 }
+
+func BurnMsg(from string, coins string, feeParams []string) (sdk.TxResponse, error) {
+	return Tx("cheqd", "burn", from, feeParams, coins)
+}

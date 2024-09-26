@@ -217,9 +217,6 @@ replace (
 
 	// replace cosmos-sdk v0.47.10
 	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.47.10-height-mismatch
-	// github.com/cosmos/cosmos-sdk => /home/vishal/cheqdWork/cosmos-sdk
-
-	github.com/cosmos/gogoproto v1.5.0 => github.com/cosmos/gogoproto v1.4.10
 
 	github.com/cosmos/gogoproto v1.5.0 => github.com/cosmos/gogoproto v1.4.10
 

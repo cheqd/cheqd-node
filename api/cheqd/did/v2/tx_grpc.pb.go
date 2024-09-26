@@ -22,6 +22,7 @@ const (
 	Msg_CreateDidDoc_FullMethodName     = "/cheqd.did.v2.Msg/CreateDidDoc"
 	Msg_UpdateDidDoc_FullMethodName     = "/cheqd.did.v2.Msg/UpdateDidDoc"
 	Msg_DeactivateDidDoc_FullMethodName = "/cheqd.did.v2.Msg/DeactivateDidDoc"
+	Msg_Burn_FullMethodName             = "/cheqd.did.v2.Msg/Burn"
 	Msg_Mint_FullMethodName             = "/cheqd.did.v2.Msg/Mint"
 )
 
@@ -37,6 +38,7 @@ type MsgClient interface {
 	UpdateDidDoc(ctx context.Context, in *MsgUpdateDidDoc, opts ...grpc.CallOption) (*MsgUpdateDidDocResponse, error)
 	// DeactivateDidDoc defines a method for deactivating an existing DID document
 	DeactivateDidDoc(ctx context.Context, in *MsgDeactivateDidDoc, opts ...grpc.CallOption) (*MsgDeactivateDidDocResponse, error)
+	Burn(ctx context.Context, in *MsgBurn, opts ...grpc.CallOption) (*MsgBurnResponse, error)
 	// Mint defines a method to mint tokens to the given address.
 	Mint(ctx context.Context, in *MsgMint, opts ...grpc.CallOption) (*MsgMintResponse, error)
 }
@@ -79,6 +81,16 @@ func (c *msgClient) DeactivateDidDoc(ctx context.Context, in *MsgDeactivateDidDo
 	return out, nil
 }
 
+func (c *msgClient) Burn(ctx context.Context, in *MsgBurn, opts ...grpc.CallOption) (*MsgBurnResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgBurnResponse)
+	err := c.cc.Invoke(ctx, Msg_Burn_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *msgClient) Mint(ctx context.Context, in *MsgMint, opts ...grpc.CallOption) (*MsgMintResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(MsgMintResponse)
@@ -101,6 +113,7 @@ type MsgServer interface {
 	UpdateDidDoc(context.Context, *MsgUpdateDidDoc) (*MsgUpdateDidDocResponse, error)
 	// DeactivateDidDoc defines a method for deactivating an existing DID document
 	DeactivateDidDoc(context.Context, *MsgDeactivateDidDoc) (*MsgDeactivateDidDocResponse, error)
+	Burn(context.Context, *MsgBurn) (*MsgBurnResponse, error)
 	// Mint defines a method to mint tokens to the given address.
 	Mint(context.Context, *MsgMint) (*MsgMintResponse, error)
 	mustEmbedUnimplementedMsgServer()
@@ -121,6 +134,9 @@ func (UnimplementedMsgServer) UpdateDidDoc(context.Context, *MsgUpdateDidDoc) (*
 }
 func (UnimplementedMsgServer) DeactivateDidDoc(context.Context, *MsgDeactivateDidDoc) (*MsgDeactivateDidDocResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeactivateDidDoc not implemented")
+}
+func (UnimplementedMsgServer) Burn(context.Context, *MsgBurn) (*MsgBurnResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Burn not implemented")
 }
 func (UnimplementedMsgServer) Mint(context.Context, *MsgMint) (*MsgMintResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Mint not implemented")
@@ -200,6 +216,24 @@ func _Msg_DeactivateDidDoc_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_Burn_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgBurn)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).Burn(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_Burn_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).Burn(ctx, req.(*MsgBurn))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Msg_Mint_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(MsgMint)
 	if err := dec(in); err != nil {
@@ -236,6 +270,10 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeactivateDidDoc",
 			Handler:    _Msg_DeactivateDidDoc_Handler,
+		},
+		{
+			MethodName: "Burn",
+			Handler:    _Msg_Burn_Handler,
 		},
 		{
 			MethodName: "Mint",

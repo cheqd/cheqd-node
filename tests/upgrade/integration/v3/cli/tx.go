@@ -162,6 +162,28 @@ func VoteProposal(container, id, option string) (sdk.TxResponse, error) {
 	return resp, nil
 }
 
+func BurnMsg(container string, coins string) (sdk.TxResponse, error) {
+	fmt.Println("Burning from ", container)
+
+	args := append([]string{
+		CliBinaryName, "tx", "cheqd", "burn", coins,
+		"--from", OperatorAccounts[container],
+	}, TXParams...)
+	args = append(args, GasParams...)
+	out, err := LocalnetExecExec(container, args...)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+	out = integrationhelpers.TrimImportedStdout(out)
+	var resp sdk.TxResponse
+
+	err = integrationhelpers.Codec.UnmarshalJSON([]byte(out), &resp)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+	return resp, nil
+}
+
 func SubmitProposal(container string, pathToDir ...string) (sdk.TxResponse, error) {
 	fmt.Println("Submitting param change proposal from", container)
 	args := append([]string{
