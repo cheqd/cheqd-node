@@ -354,8 +354,6 @@ github.com/cosmos/gogoproto v1.4.10 h1:QH/yT8X+c0F4ZDacDv3z+xE3WU1P1Z3wQoLMBRJoK
 github.com/cosmos/gogoproto v1.4.10/go.mod h1:3aAZzeRWpAwr+SS/LLkICX2/kDFyaYVzckBDzygIxek=
 github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7 v7.1.2 h1:6zjj+yIpMbCTRI2eJ2fXuflElENs3mrUSLH/TSWL8fk=
 github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7 v7.1.2/go.mod h1:UvDmcGIWJPIytq+Q78/ff5NTOsuX/7IrNgEugTW5i0s=
-github.com/cosmos/ibc-apps/modules/async-icq/v7 v7.1.1 h1:02RCbih5lQ8aGdDMSvxhTnk5JDLEDitn17ytEE1Qhko=
-github.com/cosmos/ibc-apps/modules/async-icq/v7 v7.1.1/go.mod h1:LvVkEXTORVgd87W2Yu7ZY3acKKeTMq/txdTworn8EZI=
 github.com/cosmos/ibc-go/v7 v7.4.0 h1:8FqYMptvksgMvlbN4UW9jFxTXzsPyfAzEZurujXac8M=
 github.com/cosmos/ibc-go/v7 v7.4.0/go.mod h1:L/KaEhzV5TGUCTfGysVgMBQtl5Dm7hHitfpk+GIeoAo=
 github.com/cosmos/ics23/go v0.10.0 h1:iXqLLgp2Lp+EdpIuwXTYIQU+AiHj9mOC2X9ab++bZDM=
