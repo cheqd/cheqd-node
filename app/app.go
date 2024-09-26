@@ -493,7 +493,7 @@ func New(
 		scopedIBCKeeper,
 	)
 
-	app.FeeMarketKeeper = feemarketkeeper.NewKeeper(appCodec, keys[feemarkettypes.StoreKey], app.AccountKeeper, &feemarkettypes.TestDenomResolver{}, authtypes.NewModuleAddress(govtypes.ModuleName).String())
+	app.FeeMarketKeeper = feemarketkeeper.NewKeeper(appCodec, keys[feemarkettypes.StoreKey], app.AccountKeeper, &cheqdante.DenomResolverImpl{}, authtypes.NewModuleAddress(govtypes.ModuleName).String())
 	// IBC Fee Module keeper
 	app.IBCFeeKeeper = ibcfeekeeper.NewKeeper(
 		appCodec,

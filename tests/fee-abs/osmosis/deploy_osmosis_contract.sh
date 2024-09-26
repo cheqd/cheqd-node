@@ -28,10 +28,7 @@ function assert_tx_successful() {
   fi
 }
 
-CHANNEL_ID="channel-0"
-
-export OWNER=$(osmosisd keys show osmosis-user -a --keyring-backend test )
-echo $OWNER=$(osmosisd keys show osmosis-user -a --keyring-backend test )
+OWNER=$(osmosisd keys show osmosis-user -a --keyring-backend test)
 
 
 info "store crosschain_registry wasm"
@@ -108,5 +105,3 @@ INIT_CROSSCHAIN_SWAPS='{"swap_contract":"'$SWAPROUTER_ADDRESS'","governor": "'$O
 RES=$(osmosisd tx wasm instantiate 3 "$INIT_CROSSCHAIN_SWAPS" --keyring-backend=test --home=$HOME/.osmosisd --from osmosis-user --chain-id osmosis --label "test" --no-admin --yes --fees 5000uosmo)
 assert_tx_successful $RES
 sleep 5
-CROSSCHAIN_SWAPS_ADDRESS=osmo17p9rzwnnfxcjp32un9ug7yhhzgtkhvl9jfksztgw5uh69wac2pgs5yczr8
-# 1
