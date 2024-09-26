@@ -286,6 +286,8 @@ github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 h1:qSGYFH7+jGhD
 github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311/go.mod h1:b583jCggY9gE99b6G5LEC39OIiVsWj+R97kbl5odCEk=
 github.com/cheqd/cosmos-sdk v0.47.10-height-mismatch h1:zxljvq+y6HwGkx1Pa2sSd3AF5gr03xf0Jz6GYI4JjqM=
 github.com/cheqd/cosmos-sdk v0.47.10-height-mismatch/go.mod h1:UWpgWkhcsBIATS68uUC0del7IiBN4hPv/vqg8Zz23uw=
+github.com/cheqd/fee-abstraction/v7 v7.0.3-0.20240919093501-645e58a8252d h1:HEfYvzR6dO1ucjYz+5A5mSpGXQa3kcfql31U5eh4YeU=
+github.com/cheqd/fee-abstraction/v7 v7.0.3-0.20240919093501-645e58a8252d/go.mod h1:3ETAhKDNNgXFbLWqzQLbupK8k0yGQJeITiKZ7C3BQw8=
 github.com/cheqd/feemarket v1.0.4-sdk47.0.20240919093317-104ec7d7b634 h1:MlaUdJBL7kbeHu9QbcnZKctozWrup5OMgM4jfJhjQcA=
 github.com/cheqd/feemarket v1.0.4-sdk47.0.20240919093317-104ec7d7b634/go.mod h1:4y+Z0lf8SffiLdKnRFvWpLDyiFLvcEGhJgou5SAI8yE=
 github.com/cheqd/iavl v0.20.1-uneven-heights h1:9gN2bFd15Z7X0lYu/RfQCxVBpmbV38GxuaeA7QTjH/o=
