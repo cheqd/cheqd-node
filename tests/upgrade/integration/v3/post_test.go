@@ -11,7 +11,6 @@ import (
 )
 
 var _ = Describe("Upgrade - Post", func() {
-
 	Context("After a software upgrade execution has concluded", func() {
 		It("should wait for node catching up", func() {
 			By("pinging the node status until catching up is flagged as false")
@@ -87,6 +86,5 @@ var _ = Describe("Upgrade - Post", func() {
 			Expect(err).To(BeNil())
 			Expect(proposal.Status).To(BeEquivalentTo(govtypesv1.StatusPassed))
 		})
-
 	})
 })
