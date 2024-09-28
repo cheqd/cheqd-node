@@ -15,7 +15,7 @@ const (
 	DockerComposeEnvBL = "build-latest.env"
 	Docker             = "docker"
 	DockerCompose      = "compose"
-	DockerHome         = "cheqd"
+	DockerHome         = "/home/cheqd"
 	DockerUser         = "cheqd"
 	DockerUserGroup    = "cheqd"
 	Operator0          = "operator-0"
