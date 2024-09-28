@@ -1144,6 +1144,7 @@ func (app *App) setupUpgradeStoreLoaders() {
 		storeUpgrades := storetypes.StoreUpgrades{
 			Added: []string{
 				feemarkettypes.StoreKey,
+				feeabstypes.StoreKey,
 			},
 		}
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
