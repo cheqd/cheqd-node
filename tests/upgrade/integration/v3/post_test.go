@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/v3/cli"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -85,6 +86,18 @@ var _ = Describe("Upgrade - Post", func() {
 			proposal, err := cli.QueryProposal(cli.Validator0, "2")
 			Expect(err).To(BeNil())
 			Expect(proposal.Status).To(BeEquivalentTo(govtypesv1.StatusPassed))
+		})
+
+		It("should wait for node catching up", func() {
+			By("pinging the node status until catching up is flagged as false")
+			err := cli.WaitForCaughtUp(cli.Validator0, cli.CliBinaryName, cli.VotingPeriod*6)
+			Expect(err).To(BeNil())
+		})
+		It("should burn the coins from the given address (here container/validator)", func() {
+			coins := sdk.NewCoins(sdk.Coin{Denom: "ncheq", Amount: sdk.NewInt(1000)})
+			res, err := cli.BurnMsg(cli.Validator0, coins.String())
+			Expect(err).To(BeNil())
+			Expect(res.Code).To(BeEquivalentTo(0))
 		})
 	})
 })
