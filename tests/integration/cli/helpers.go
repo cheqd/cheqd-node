@@ -8,7 +8,6 @@ import (
 	"time"
 
 	didv2 "github.com/cheqd/cheqd-node/x/did/types"
-	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -36,7 +35,7 @@ type DefaultNodeInfo struct {
 	ListenAddr      string               `json:"listen_addr"`
 	Network         string               `json:"network"`
 	Version         string               `json:"version"`
-	Channels        tmbytes.HexBytes     `json:"channels"`
+	Channels        string               `json:"channels"`
 	Moniker         string               `json:"moniker"`
 	Other           DefaultNodeInfoOther `json:"other"`
 }
@@ -53,15 +52,15 @@ type DefaultNodeInfoOther struct {
 }
 
 type SyncInfo struct {
-	LatestBlockHash   tmbytes.HexBytes `json:"latest_block_hash"`
-	LatestAppHash     tmbytes.HexBytes `json:"latest_app_hash"`
-	LatestBlockHeight int64            `json:"latest_block_height,string"`
-	LatestBlockTime   time.Time        `json:"latest_block_time"`
+	LatestBlockHash   string    `json:"latest_block_hash"`
+	LatestAppHash     string    `json:"latest_app_hash"`
+	LatestBlockHeight int64     `json:"latest_block_height,string"`
+	LatestBlockTime   time.Time `json:"latest_block_time"`
 
-	EarliestBlockHash   tmbytes.HexBytes `json:"earliest_block_hash"`
-	EarliestAppHash     tmbytes.HexBytes `json:"earliest_app_hash"`
-	EarliestBlockHeight int64            `json:"earliest_block_height,string"`
-	EarliestBlockTime   time.Time        `json:"earliest_block_time"`
+	EarliestBlockHash   string    `json:"earliest_block_hash"`
+	EarliestAppHash     string    `json:"earliest_app_hash"`
+	EarliestBlockHeight int64     `json:"earliest_block_height,string"`
+	EarliestBlockTime   time.Time `json:"earliest_block_time"`
 
 	CatchingUp bool `json:"catching_up"`
 }
@@ -72,9 +71,9 @@ type PubKey struct {
 }
 
 type ValidatorInfo struct {
-	Address     tmbytes.HexBytes `json:"Address"`
-	PubKey      PubKey           `json:"PubKey"`
-	VotingPower int64            `json:"VotingPower,string"`
+	Address     string `json:"Address"`
+	PubKey      PubKey `json:"PubKey"`
+	VotingPower int64  `json:"VotingPower,string"`
 }
 
 func GetNodeStatus(container string, binary string) (NodeStatus, error) {
