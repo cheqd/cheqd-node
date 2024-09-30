@@ -170,9 +170,9 @@ func BurnMsg(from string, coins string, feeParams []string) (sdk.TxResponse, err
 }
 
 func SubmitProposal(container string, feeParams []string, pathToDir ...string) (sdk.TxResponse, error) {
-	return Tx("gov", "submit-proposal", container, feeParams, pathToDir...)
+	return Tx("gov", "submit-proposal", OperatorAccounts[container], feeParams, pathToDir...)
 }
 
 func VoteProposal(container, id, option string, feeParams []string) (sdk.TxResponse, error) {
-	return Tx("gov", "vote", container, feeParams, id, option)
+	return Tx("gov", "vote", OperatorAccounts[container], feeParams, id, option)
 }
