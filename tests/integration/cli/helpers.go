@@ -77,11 +77,15 @@ func GetNodeStatus(container string, binary string) (NodeStatus, error) {
 
 	fmt.Println("out, err>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.", out, err)
 	if err != nil {
+		fmt.Printf("\"returning error while fetching\": %v\n", "returning error while fetching")
+		fmt.Printf("err: %v\n", err)
 		return NodeStatus{}, err
 	}
 	var result NodeStatus
 	err = json.Unmarshal([]byte(out), &result)
 	if err != nil {
+		fmt.Printf("\"returning error while unmarshalling\": %v\n", "returning error while unmarshalling")
+		fmt.Printf("err: %v\n", err)
 		return NodeStatus{}, err
 	}
 	return result, nil
