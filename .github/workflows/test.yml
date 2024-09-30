@@ -41,7 +41,7 @@ jobs:
       - name: Debugging with tmate
         if: ${{ failure() }}
         uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 10
+        timeout-minutes: 20
 
   installer-standalone:
     name: "Installer - Standalone mode"
@@ -70,7 +70,7 @@ jobs:
       - name: Debugging with tmate
         if: ${{ failure() }}
         uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 10
+        timeout-minutes: 20
 
   unit-tests:
     name: "Unit Tests"
