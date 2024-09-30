@@ -66,9 +66,14 @@ type SyncInfo struct {
 	CatchingUp bool `json:"catching_up"`
 }
 
+type PubKey struct {
+	Type  string `json:"type"`
+	Value string `json:"value"`
+}
+
 type ValidatorInfo struct {
 	Address     tmbytes.HexBytes `json:"Address"`
-	PubKey      interface{}      `json:"PubKey"`
+	PubKey      PubKey           `json:"PubKey"`
 	VotingPower int64            `json:"VotingPower,string"`
 }
 
