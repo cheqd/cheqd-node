@@ -44,6 +44,28 @@ docker compose --env-file mainnet-latest.env exec validator-0 bash -c 'mv -n /ho
 docker compose --env-file mainnet-latest.env exec validator-0 bash -c 'mv -n /home/cheqd/temp-keyring-test3/* /home/cheqd/.cheqdnode/keyring-test/'
 
 
+docker compose --env-file mainnet-latest.env cp network-config/validator-0/keyring-test validator-1:/home/cheqd/temp-keyring-test
+docker compose --env-file mainnet-latest.env cp network-config/validator-2/keyring-test validator-1:/home/cheqd/temp-keyring-test2
+docker compose --env-file mainnet-latest.env cp network-config/validator-3/keyring-test validator-1:/home/cheqd/temp-keyring-test3
+docker compose --env-file mainnet-latest.env exec validator-1 bash -c 'mv -n /home/cheqd/temp-keyring-test/* /home/cheqd/.cheqdnode/keyring-test/'
+docker compose --env-file mainnet-latest.env exec validator-1 bash -c 'mv -n /home/cheqd/temp-keyring-test2/* /home/cheqd/.cheqdnode/keyring-test/'
+docker compose --env-file mainnet-latest.env exec validator-1 bash -c 'mv -n /home/cheqd/temp-keyring-test3/* /home/cheqd/.cheqdnode/keyring-test/'
+
+
+docker compose --env-file mainnet-latest.env cp network-config/validator-0/keyring-test validator-2:/home/cheqd/temp-keyring-test
+docker compose --env-file mainnet-latest.env cp network-config/validator-1/keyring-test validator-2:/home/cheqd/temp-keyring-test2
+docker compose --env-file mainnet-latest.env cp network-config/validator-3/keyring-test validator-2:/home/cheqd/temp-keyring-test3
+docker compose --env-file mainnet-latest.env exec validator-2 bash -c 'mv -n /home/cheqd/temp-keyring-test/* /home/cheqd/.cheqdnode/keyring-test/'
+docker compose --env-file mainnet-latest.env exec validator-2 bash -c 'mv -n /home/cheqd/temp-keyring-test2/* /home/cheqd/.cheqdnode/keyring-test/'
+docker compose --env-file mainnet-latest.env exec validator-2 bash -c 'mv -n /home/cheqd/temp-keyring-test3/* /home/cheqd/.cheqdnode/keyring-test/'
+
+docker compose --env-file mainnet-latest.env cp network-config/validator-0/keyring-test validator-3:/home/cheqd/temp-keyring-test
+docker compose --env-file mainnet-latest.env cp network-config/validator-1/keyring-test validator-3:/home/cheqd/temp-keyring-test2
+docker compose --env-file mainnet-latest.env cp network-config/validator-2/keyring-test validator-3:/home/cheqd/temp-keyring-test3
+docker compose --env-file mainnet-latest.env exec validator-3 bash -c 'mv -n /home/cheqd/temp-keyring-test/* /home/cheqd/.cheqdnode/keyring-test/'
+docker compose --env-file mainnet-latest.env exec validator-3 bash -c 'mv -n /home/cheqd/temp-keyring-test2/* /home/cheqd/.cheqdnode/keyring-test/'
+docker compose --env-file mainnet-latest.env exec validator-3 bash -c 'mv -n /home/cheqd/temp-keyring-test3/* /home/cheqd/.cheqdnode/keyring-test/'
+
 
 # docker compose --env-file mainnet-latest.env cp validator-1:/home/cheqd/.cheqdnode/keyring-test /tmp/validator-1-keyring
 # docker compose --env-file mainnet-latest.env cp validator-2:/home/cheqd/.cheqdnode/keyring-test /tmp/validator-2-keyring
