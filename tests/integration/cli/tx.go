@@ -2,8 +2,6 @@ package cli
 
 import (
 	"encoding/json"
-	"fmt"
-	"path/filepath"
 
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
@@ -172,65 +170,9 @@ func BurnMsg(from string, coins string, feeParams []string) (sdk.TxResponse, err
 }
 
 func SubmitProposal(container string, feeParams []string, pathToDir ...string) (sdk.TxResponse, error) {
-	args := append([]string{
-		CliBinaryName,
-		"tx", "gov", "submit-proposal", filepath.Join(pathToDir...),
-		"--from", OperatorAccounts[container],
-	}, TXParams...)
-
-	args = append(args, GasParams...)
-
-	out, err := LocalnetExecExec(container, args...)
-	if err != nil {
-		fmt.Println("Error on submitting ParamChangeProposal", err)
-		fmt.Println("Output:", out)
-		return sdk.TxResponse{}, err
-	}
-	// Skip 'gas estimate: xxx' string, trim 'Successfully migrated key' string
-	out = helpers.TrimImportedStdout(out)
-
-	fmt.Println("Output:", out)
-
-	out = helpers.TrimImportedStdout(out)
-
-	var resp sdk.TxResponse
-
-	err = helpers.Codec.UnmarshalJSON([]byte(out), &resp)
-	if err != nil {
-		fmt.Println("JSON unmarshal error: output:", out)
-		return sdk.TxResponse{}, err
-	}
-	return resp, nil
+	return Tx("gov", "submit-proposal", OperatorAccounts[container], feeParams, pathToDir...)
 }
 
 func VoteProposal(container, id, option string, feeParams []string) (sdk.TxResponse, error) {
-	args := append([]string{
-		CliBinaryName,
-		"tx", "gov", "vote", id, option,
-		"--from", OperatorAccounts[container],
-	}, TXParams...)
-
-	args = append(args, GasParams...)
-
-	out, err := LocalnetExecExec(container, args...)
-	if err != nil {
-		fmt.Println("Error on submitting ParamChangeProposal", err)
-		fmt.Println("Output:", out)
-		return sdk.TxResponse{}, err
-	}
-	// Skip 'gas estimate: xxx' string, trim 'Successfully migrated key' string
-	out = helpers.TrimImportedStdout(out)
-
-	fmt.Println("Output:", out)
-
-	out = helpers.TrimImportedStdout(out)
-
-	var resp sdk.TxResponse
-
-	err = helpers.Codec.UnmarshalJSON([]byte(out), &resp)
-	if err != nil {
-		fmt.Println("JSON unmarshal error: output:", out)
-		return sdk.TxResponse{}, err
-	}
-	return resp, nil
+	return Tx("gov", "vote", OperatorAccounts[container], feeParams, id, option)
 }
