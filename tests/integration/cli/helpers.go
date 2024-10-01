@@ -123,7 +123,9 @@ func waitHeightCallback(container string, binary string, height int64, period in
 
 	status, err := GetNodeStatus(container, binary)
 	if err != nil {
-		panic(err)
+		// panic(err)
+		fmt.Printf("err>>>>>>>>>>>>>>>>>>>>>>>>>>>>>...: %v\n", err)
+		return
 	}
 
 	if status.SyncInfo.LatestBlockHeight >= height {
