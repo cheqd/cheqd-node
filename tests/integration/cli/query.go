@@ -165,5 +165,5 @@ func KeysList(container string) (string, error) {
 	}, KeysParams...)
 
 	out, err := LocalnetExecExec(container, args...)
-	return string(out), err
+	return out, err
 }
