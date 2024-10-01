@@ -24,12 +24,54 @@ import (
 // Also, ValidatorInfo.PubKey is replaced with cosmos-sdk crypto.PubKey, hence it needs
 // to be parsed accordingly.
 type NodeStatus struct {
-	SyncInfo SyncInfo `json:"SyncInfo"`
+	NodeInfo      NodeInfo      `json:"NodeInfo"`
+	SyncInfo      SyncInfo      `json:"SyncInfo"`
+	ValidatorInfo ValidatorInfo `json:"ValidatorInfo"`
+}
+
+type NodeInfo struct {
+	ProtocolVersion ProtocolVersion `json:"protocol_version"`
+	ID              string          `json:"id"`
+	ListenAddr      string          `json:"listen_addr"`
+	Network         string          `json:"network"`
+	Version         string          `json:"version"`
+	Channels        string          `json:"channels"`
+	Moniker         string          `json:"moniker"`
+	Other           Other           `json:"other"`
+}
+
+type ProtocolVersion struct {
+	P2P   string `json:"p2p"`
+	Block string `json:"block"`
+	App   string `json:"app"`
+}
+
+type Other struct {
+	TxIndex    string `json:"tx_index"`
+	RPCAddress string `json:"rpc_address"`
 }
 
 type SyncInfo struct {
-	LatestBlockHeight int64 `json:"latest_block_height,string"`
-	CatchingUp        bool  `json:"catching_up"`
+	LatestBlockHash     string `json:"latest_block_hash"`
+	LatestAppHash       string `json:"latest_app_hash"`
+	LatestBlockHeight   int64  `json:"latest_block_height,string"`
+	LatestBlockTime     string `json:"latest_block_time"`
+	EarliestBlockHash   string `json:"earliest_block_hash"`
+	EarliestAppHash     string `json:"earliest_app_hash"`
+	EarliestBlockHeight string `json:"earliest_block_height"`
+	EarliestBlockTime   string `json:"earliest_block_time"`
+	CatchingUp          bool   `json:"catching_up"`
+}
+
+type ValidatorInfo struct {
+	Address     string `json:"Address"`
+	PubKey      PubKey `json:"PubKey"`
+	VotingPower string `json:"VotingPower"`
+}
+
+type PubKey struct {
+	Type  string `json:"type"`
+	Value string `json:"value"`
 }
 
 func GetNodeStatus(container string, binary string) (NodeStatus, error) {
