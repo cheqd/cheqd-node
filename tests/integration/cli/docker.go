@@ -70,7 +70,6 @@ func LocalnetExec(envArgs []string, args ...string) (string, error) {
 	cmd := exec.Command(Docker, args...)
 	fmt.Println("cmd>>>>>>>>>>>>>>>", cmd)
 	out, err := cmd.CombinedOutput()
-	
 
 	// If "--output json" is present, attempt to extract JSON
 	if containsJSONOutput {
