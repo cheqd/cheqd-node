@@ -259,7 +259,7 @@ type App struct {
 	ScopedICAHostKeeper       capabilitykeeper.ScopedKeeper
 	ScopedResourceKeeper      capabilitykeeper.ScopedKeeper
 	ScopedICQKeeper           capabilitykeeper.ScopedKeeper
-	SCopedFeeabsKeeper        capabilitykeeper.ScopedKeeper
+	ScopedFeeAbsKeeper        capabilitykeeper.ScopedKeeper
 	FeeabsKeeper              feeabskeeper.Keeper
 
 	DidKeeper      didkeeper.Keeper
@@ -872,7 +872,7 @@ func New(
 	app.ScopedICAControllerKeeper = scopedICAControllerKeeper
 	app.ScopedICAHostKeeper = scopedICAHostKeeper
 	app.ScopedResourceKeeper = scopedResourceKeeper
-	app.SCopedFeeabsKeeper = scopedFeeabsKeeper
+	app.ScopedFeeAbsKeeper = scopedFeeabsKeeper
 
 	return app
 }
