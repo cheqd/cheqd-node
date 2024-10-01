@@ -451,3 +451,6 @@ cython_debug/
 # ignore mnemonics
 tests/ibc-defi/cheqd_relayer_mnemonic.txt
 tests/ibc-defi/osmo_relayer_mnemonic.txt
+
+tests/fee-abs/cheqd_relayer_mnemonic.txt
+tests/fee-abs/osmo_relayer_mnemonic.txt
