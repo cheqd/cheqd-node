@@ -75,7 +75,7 @@ type PubKey struct {
 }
 
 func GetNodeStatus(container string, binary string) (NodeStatus, error) {
-	out, err := LocalnetExecExec(container, binary, "status", "--output", OutputFormat)
+	out, err := LocalnetExecExec(container, binary, "status")
 
 	fmt.Println("out, err>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.", out, err)
 	if err != nil {

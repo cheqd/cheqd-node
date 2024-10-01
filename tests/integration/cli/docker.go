@@ -54,6 +54,7 @@ var (
 
 func LocalnetExec(envArgs []string, args ...string) (string, error) {
 	// Check if args contain "--output json"
+	fmt.Println("args>>>>>>>>>>>>", args)
 	containsJSONOutput := false
 	for i := 0; i < len(args)-1; i++ {
 		fmt.Printf("args[i]: %v, args[i+1]: %v, bool: %v\n", args[i], args[i+1], args[i] == "--output" && args[i+1] == "json")
@@ -67,13 +68,17 @@ func LocalnetExec(envArgs []string, args ...string) (string, error) {
 	// Combine Docker command with envArgs and args
 	args = append(append([]string{DockerCompose}, envArgs...), args...)
 	cmd := exec.Command(Docker, args...)
+	fmt.Println("cmd>>>>>>>>>>>>>>>", cmd)
 	out, err := cmd.CombinedOutput()
+	
 
 	// If "--output json" is present, attempt to extract JSON
 	if containsJSONOutput {
 		fmt.Printf("\"extracting json\": %v\n", "extracting json")
 		extractedJSON, err := extractOnlyJSON(string(out))
+		fmt.Println("extracedJson>>>>>>>", extractedJSON)
 		if err != nil {
+			fmt.Println("here<<<<<<<<<<", err)
 			return "", errorsmod.Wrap(err, string(out))
 		}
 		return extractedJSON, nil
