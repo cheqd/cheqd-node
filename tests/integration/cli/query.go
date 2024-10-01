@@ -157,3 +157,13 @@ func QueryProposal(container, id string) (govtypesv1.Proposal, error) {
 	}
 	return resp, nil
 }
+
+func KeysList(container string) (string, error) {
+	args := append([]string{
+		CliBinaryName,
+		"", "keys", "list",
+	}, KeysParams...)
+
+	out, err := LocalnetExecExec(container, args...)
+	return string(out), err
+}

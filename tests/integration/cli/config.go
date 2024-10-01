@@ -47,4 +47,7 @@ var (
 		"--chain-id", integrationnetwork.ChainID,
 		"--output", OutputFormat,
 	}
+	KeysParams = []string{
+		"--keyring-backend", KeyringBackend,
+	}
 )
