@@ -167,5 +167,5 @@ func QueryKeys(container string) (string, error) {
 
 	out, err := LocalnetExecExec(container, args...)
 
-	return string(out), err
+	return out, err
 }
