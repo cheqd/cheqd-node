@@ -42,7 +42,7 @@ func GetNodeStatus(container string, binary string) (NodeStatus, error) {
 		return NodeStatus{}, err
 	}
 
-	extractedJSON, err := extractOnlyJSON(string(out))
+	extractedJSON, err := extractOnlyJSON(out)
 	if err != nil {
 		return NodeStatus{}, err
 	}
