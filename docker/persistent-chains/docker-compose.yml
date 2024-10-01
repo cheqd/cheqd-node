@@ -1,4 +1,4 @@
-version: '3.8'
+# version: '3.8'
 
 # CAUTION: Please ensure you edit necessary values in container.env and docker-compose.env before using this Docker Compose file.
 
