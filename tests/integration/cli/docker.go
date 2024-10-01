@@ -56,7 +56,6 @@ func LocalnetExec(envArgs []string, args ...string) (string, error) {
 	// Check if args contain "--output json"
 	containsJSONOutput := false
 	for i := 0; i < len(args)-1; i++ {
-		fmt.Printf("args[i]: %v, args[i+1]: %v, bool: %v\n", args[i], args[i+1], args[i] == "--output" && args[i+1] == "json")
 		if args[i] == "--output" && args[i+1] == "json" {
 			containsJSONOutput = true
 			break

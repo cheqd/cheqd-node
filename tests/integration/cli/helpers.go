@@ -42,6 +42,12 @@ func GetNodeStatus(container string, binary string) (NodeStatus, error) {
 		return NodeStatus{}, err
 	}
 
+	extractedJSON, err := extractOnlyJSON(string(out))
+	if err != nil {
+		return NodeStatus{}, err
+	}
+	out = extractedJSON
+
 	var result NodeStatus
 	err = json.Unmarshal([]byte(out), &result)
 	if err != nil {
