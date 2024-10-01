@@ -41,22 +41,11 @@ func GetNodeStatus(container string, binary string) (NodeStatus, error) {
 		fmt.Printf("err: %v\n", err)
 		return NodeStatus{}, err
 	}
-	// Find the first '{' and last '}' to extract the JSON portion
-	jsonStart := strings.Index(out, "{")
-	jsonEnd := strings.LastIndex(out, "}")
-	if jsonStart == -1 || jsonEnd == -1 {
-		return NodeStatus{}, fmt.Errorf("no valid JSON found in output")
-	}
-
-	jsonData := out[jsonStart : jsonEnd+1] // Extract the JSON portion
 
 	var result NodeStatus
-	err = json.Unmarshal([]byte(jsonData), &result)
-	fmt.Printf("result: %v\n", result)
-	fmt.Printf("err: %v\n", err)
+	err = json.Unmarshal([]byte(out), &result)
 	if err != nil {
 		fmt.Printf("\"returning error while unmarshalling\": %v\n", "returning error while unmarshalling")
-		fmt.Printf("err: %v\n", err)
 		return NodeStatus{}, err
 	}
 	return result, nil

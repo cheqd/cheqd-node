@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	errorsmod "cosmossdk.io/errors"
 )
@@ -58,7 +59,22 @@ func LocalnetExec(envArgs []string, args ...string) (string, error) {
 	if err != nil {
 		return string(out), errorsmod.Wrap(err, string(out))
 	}
-	return string(out), err
+	extractedJSON, err := extractOnlyJSON(string(out))
+	if err != nil {
+		return "", errorsmod.Wrap(err, string(out))
+	}
+	return extractedJSON, err
+}
+
+func extractOnlyJSON(out string) (string, error) {
+	// Find the first '{' and last '}' to extract the JSON portion
+	jsonStart := strings.Index(out, "{")
+	jsonEnd := strings.LastIndex(out, "}")
+	if jsonStart == -1 || jsonEnd == -1 {
+		return "", fmt.Errorf("no valid JSON found in output")
+	}
+
+	return out[jsonStart : jsonEnd+1], nil
 }
 
 func LocalnetExecExec(container string, args ...string) (string, error) {
