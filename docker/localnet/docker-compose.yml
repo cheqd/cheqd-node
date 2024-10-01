@@ -27,6 +27,9 @@ services:
       - type: volume
         source: validator-0-data
         target: /home/cheqd
+      - type: bind
+        source: network-config/keyring-test
+        target: /home/cheqd/.cheqdnode/keyring-test  
     env_file:
       - container-env/validator-0.env
     configs:
