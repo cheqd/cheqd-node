@@ -59,14 +59,28 @@ func LocalnetExec(envArgs []string, args ...string) (string, error) {
 	if err != nil {
 		return string(out), errorsmod.Wrap(err, string(out))
 	}
-	extractedJSON, err := extractOnlyJSON(string(out))
-	if err != nil {
-		return "", errorsmod.Wrap(err, string(out))
+
+	containsJSONOutput := false
+	for i := 0; i < len(args)-1; i++ {
+		if args[i] == "--output" && args[i+1] == "json" {
+			containsJSONOutput = true
+			break
+		}
 	}
-	return extractedJSON, err
+
+	if containsJSONOutput {
+		extractedJSON, err := extractOnlyJSON(string(out))
+		if err != nil {
+			return "", errorsmod.Wrap(err, string(out))
+		}
+		return extractedJSON, nil
+	}
+
+	return string(out), err
 }
 
 func extractOnlyJSON(out string) (string, error) {
+	fmt.Printf("out: %v\n", out)
 	// Find the first '{' and last '}' to extract the JSON portion
 	jsonStart := strings.Index(out, "{")
 	jsonEnd := strings.LastIndex(out, "}")
