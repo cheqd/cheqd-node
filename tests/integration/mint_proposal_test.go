@@ -3,6 +3,7 @@
 package integration
 
 import (
+	"fmt"
 	"path/filepath"
 
 	cli "github.com/cheqd/cheqd-node/tests/integration/cli"
@@ -79,5 +80,30 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		proposal, err := cli.QueryProposal(cli.Validator0, "1")
 		Expect(err).To(BeNil())
 		Expect(proposal.Status).To(BeEquivalentTo(govtypesv1.StatusPassed))
+	})
+	It("fetch the keys", func() {
+		By("sending a QueryKeys query from `validator0` container")
+		keys, err := cli.QueryKeys(cli.Validator0)
+		fmt.Printf("keys>>>>>>>>>>>>>>>>>>>>>: %v\n", keys)
+		Expect(err).To(BeNil())
+	})
+
+	It("fetch the keys", func() {
+		By("sending a QueryKeys query from `validator0` container")
+		keys, err := cli.QueryKeys(cli.Validator1)
+		fmt.Printf("keys>>>>>>>>>>>>>>>>>>>>>: %v\n", keys)
+		Expect(err).To(BeNil())
+	})
+	It("fetch the keys", func() {
+		By("sending a QueryKeys query from `validator0` container")
+		keys, err := cli.QueryKeys(cli.Validator2)
+		fmt.Printf("keys>>>>>>>>>>>>>>>>>>>>>: %v\n", keys)
+		Expect(err).To(BeNil())
+	})
+	It("fetch the keys", func() {
+		By("sending a QueryKeys query from `validator0` container")
+		keys, err := cli.QueryKeys(cli.Validator3)
+		fmt.Printf("keys>>>>>>>>>>>>>>>>>>>>>: %v\n", keys)
+		Expect(err).To(BeNil())
 	})
 })
