@@ -157,3 +157,15 @@ func QueryProposal(container, id string) (govtypesv1.Proposal, error) {
 	}
 	return resp, nil
 }
+
+func QueryKeys(container string) (string, error) {
+	fmt.Println("Querying proposal from", container)
+	args := append([]string{
+		CliBinaryName,
+		"", "keys", "list",
+	}, KeyringParams...)
+
+	out, err := LocalnetExecExec(container, args...)
+
+	return string(out), err
+}

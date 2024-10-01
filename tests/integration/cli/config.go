@@ -39,6 +39,9 @@ var (
 		"--chain-id", integrationnetwork.ChainID,
 		"-y",
 	}
+	KeyringParams = []string{
+		"--keyring-backend", KeyringBackend,
+	}
 	GasParams = []string{
 		"--gas", Gas,
 		"--gas-adjustment", GasAdjustment,
