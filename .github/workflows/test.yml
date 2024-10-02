@@ -139,6 +139,12 @@ jobs:
         run: |
           bash import-keys.sh
 
+      - name: Find the keyring keys
+        working-directory: ./docker/localnet
+        run: |
+          pwd
+          find / -name operator-*.info
+
       - uses: actions/setup-go@v5
         with:
           go-version-file: ./go.mod
