@@ -163,6 +163,7 @@ func KeysList(container string) (string, error) {
 		CliBinaryName,
 		"", "keys", "list",
 	}, KeysParams...)
+	args = append(args, HomePath1...)
 
 	out, err := LocalnetExecExec(container, args...)
 	return out, err
