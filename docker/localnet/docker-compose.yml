@@ -26,11 +26,10 @@ services:
     volumes:
       - type: volume
         source: validator-0-data
-        target: /home/cheqd/.cheqdnode
+        target: /home/cheqd
       # - type: volume
       #   source: validator-0-keyring
       #   target: /home/cheqd/.cheqdnode/keyring-test
-
     env_file:
       - container-env/validator-0.env
     configs:
@@ -75,7 +74,7 @@ services:
       - source: genesis
         target: /genesis
       - source: seeds
-        target: /seeds
+        target: /seeds                                                                                                      
       - source: validator-1-node-key
         target: /node_key
       - source: validator-1-priv-val-key
