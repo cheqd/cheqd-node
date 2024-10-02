@@ -19,8 +19,15 @@ docker compose --env-file mainnet-latest.env up --detach --no-build
 # TODO: Get rid of this sleep.
 sleep 5
 
-# Copy keys
+sudo docker compose --env-file build-latest.env cp network-config/validator-0/keyring-test validator-0:/tmp/keyring-test
+sudo docker compose --env-file build-latest.env cp network-config/validator-1/keyring-test validator-1:/tmp/keyring-test
+sudo docker compose --env-file build-latest.env cp network-config/validator-2/keyring-test validator-2:/tmp/keyring-test
+sudo docker compose --env-file build-latest.env cp network-config/validator-3/keyring-test validator-3:/tmp/keyring-test
 
+sudo docker compose exec validator-0 mv /tmp/keyring-test ~/.cheqdnode/
+sudo docker compose exec validator-1 mv /tmp/keyring-test ~/.cheqdnode/
+sudo docker compose exec validator-2 mv /tmp/keyring-test ~/.cheqdnode/
+sudo docker compose exec validator-3 mv /tmp/keyring-test ~/.cheqdnode/
 
 sudo docker compose --env-file mainnet-latest.env cp network-config/validator-0/config/config.toml validator-0:/home/cheqd/.cheqdnode/config/config.toml
 sudo docker compose --env-file mainnet-latest.env cp network-config/validator-1/config/config.toml validator-1:/home/cheqd/.cheqdnode/config/config.toml
