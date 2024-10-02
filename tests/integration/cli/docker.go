@@ -98,6 +98,7 @@ func extractOnlyJSON(out string) (string, error) {
 }
 
 func LocalnetExecExec(container string, args ...string) (string, error) {
+	fmt.Printf("args: %v\n", args)
 	args = append([]string{"exec", container}, args...)
 	return LocalnetExec(DockerComposeLatestArgs, args...)
 }
