@@ -30,6 +30,7 @@ const (
 	DepositAmount              = "10000000ncheq"
 	NetworkConfigDir           = "network-config"
 	KeyringDir                 = "keyring-test"
+	HomePath                   = "/home/cheqd/.cheqdnode"
 )
 
 var (
@@ -49,5 +50,8 @@ var (
 	}
 	KeysParams = []string{
 		"--keyring-backend", KeyringBackend,
+	}
+	HomePath1 = []string{
+		"--home", HomePath,
 	}
 )

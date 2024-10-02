@@ -179,6 +179,7 @@ func SubmitProposal(container string, feeParams []string, pathToDir ...string) (
 	}, TXParams...)
 
 	args = append(args, GasParams...)
+	args = append(args, HomePath1...)
 
 	out, err := LocalnetExecExec(container, args...)
 	if err != nil {
