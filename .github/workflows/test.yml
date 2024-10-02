@@ -143,7 +143,7 @@ jobs:
         working-directory: ./docker/localnet
         run: |
           pwd
-          find / -name operator-*.info
+          find . -name operator-*.info
 
       - uses: actions/setup-go@v5
         with:
