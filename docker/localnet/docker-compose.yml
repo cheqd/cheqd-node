@@ -283,3 +283,4 @@ volumes:
   validator-3-data:
   seed-0-data:
   observer-0-data:
+  validator-0-keyring:
