@@ -138,10 +138,6 @@ jobs:
       - name: Import keys
         working-directory: ./docker/localnet
         run: |
-          pwd
-          echo "$HOME"
-          export HOME=/home/runner
-          echo "$HOME"
           bash import-keys.sh
 
       - uses: actions/setup-go@v5
