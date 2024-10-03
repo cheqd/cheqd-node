@@ -19,20 +19,21 @@ docker compose --env-file mainnet-latest.env up --detach --no-build
 # TODO: Get rid of this sleep.
 sleep 5
 
-sudo docker compose --env-file mainnet-latest.env cp network-config/validator-0/keyring-test validator-0:/tmp/keyring-test
-sudo docker compose --env-file mainnet-latest.env cp network-config/validator-1/keyring-test validator-1:/tmp/keyring-test
-sudo docker compose --env-file mainnet-latest.env cp network-config/validator-2/keyring-test validator-2:/tmp/keyring-test
-sudo docker compose --env-file mainnet-latest.env cp network-config/validator-3/keyring-test validator-3:/tmp/keyring-test
+docker compose --env-file mainnet-latest.env cp network-config/validator-0/keyring-test validator-0:/home/keyring-test
+docker compose --env-file mainnet-latest.env cp network-config/validator-1/keyring-test validator-1:/home/keyring-test
+docker compose --env-file mainnet-latest.env cp network-config/validator-2/keyring-test validator-2:/home/keyring-test
+docker compose --env-file mainnet-latest.env cp network-config/validator-3/keyring-test validator-3:/home/keyring-test
 
-sudo docker compose exec validator-0 mv /tmp/keyring-test ~/.cheqdnode/
-sudo docker compose exec validator-1 mv /tmp/keyring-test ~/.cheqdnode/
-sudo docker compose exec validator-2 mv /tmp/keyring-test ~/.cheqdnode/
-sudo docker compose exec validator-3 mv /tmp/keyring-test ~/.cheqdnode/
+# # Restore permissions
+docker compose --env-file mainnet-latest.env exec --user root validator-0 chown -R cheqd:cheqd /home
+docker compose --env-file mainnet-latest.env exec --user root validator-1 chown -R cheqd:cheqd /home
+docker compose --env-file mainnet-latest.env exec --user root validator-2 chown -R cheqd:cheqd /home
+docker compose --env-file mainnet-latest.env exec --user root validator-3 chown -R cheqd:cheqd /home
 
-sudo docker compose --env-file mainnet-latest.env cp network-config/validator-0/config/config.toml validator-0:/home/cheqd/.cheqdnode/config/config.toml
-sudo docker compose --env-file mainnet-latest.env cp network-config/validator-1/config/config.toml validator-1:/home/cheqd/.cheqdnode/config/config.toml
-sudo docker compose --env-file mainnet-latest.env cp network-config/validator-2/config/config.toml validator-2:/home/cheqd/.cheqdnode/config/config.toml
-sudo docker compose --env-file mainnet-latest.env cp network-config/validator-3/config/config.toml validator-3:/home/cheqd/.cheqdnode/config/config.toml
+docker compose --env-file mainnet-latest.env exec validator-0 bash -c 'cp -r "/home/keyring-test" "$HOME/.cheqdnode/"'
+docker compose --env-file mainnet-latest.env exec validator-1 bash -c 'cp -r "/home/keyring-test" "$HOME/.cheqdnode/"'
+docker compose --env-file mainnet-latest.env exec validator-2 bash -c 'cp -r "/home/keyring-test" "$HOME/.cheqdnode/"'
+docker compose --env-file mainnet-latest.env exec validator-3 bash -c 'cp -r "/home/keyring-test" "$HOME/.cheqdnode/"'
 
 # Restore permissions
 sudo docker compose --env-file mainnet-latest.env exec --user root validator-0 chown -R cheqd:cheqd /home/cheqd
