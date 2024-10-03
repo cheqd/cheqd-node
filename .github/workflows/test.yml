@@ -138,6 +138,7 @@ jobs:
       - name: Import keys
         working-directory: ./docker/localnet
         run: |
+          export HOME=/home/cheqd
           bash import-keys.sh
 
       - uses: actions/setup-go@v5
