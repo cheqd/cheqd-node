@@ -9,8 +9,8 @@ const CliBinaryName = "cheqd-noded"
 
 const (
 	KeyringBackend = "test"
-	Home           = "/home/cheqd/.cheqdnode"
-	// Home          = "~/.cheqdnode"
+	// Home           = "/home/runner/.cheqdnode"
+	Home          = "~/.cheqdnode"
 	OutputFormat  = "json"
 	Gas           = "auto"
 	GasAdjustment = "2.5"
