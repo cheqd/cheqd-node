@@ -5,8 +5,7 @@ defaults:
   run:
     shell: bash
 env:
-  HOME: /home/runner # Set the custom home directory
-  RUNNER_BIN_DIR: /home/runner/.local/bin
+  RUNNER_BIN_DIR: /home/cheqd/.local/bin
 permissions:
   contents: write
   packages: read
