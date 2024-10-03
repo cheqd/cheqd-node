@@ -8,7 +8,7 @@ pushd "$DIR/../../../../docker/localnet"
 
 # Generate configs (make sure old binary is installed locally)
 bash gen-network-config.sh
-sudo chown -R 1000:1000 network-config
+# sudo chown -R 1000:1000 network-config
 
 # Import keys
 bash import-keys.sh
@@ -34,18 +34,5 @@ sudo docker compose --env-file mainnet-latest.env exec validator-0 bash -c 'cp -
 sudo docker compose --env-file mainnet-latest.env exec validator-1 bash -c 'cp -r "/home/keyring-test" "$HOME/.cheqdnode/"'
 sudo docker compose --env-file mainnet-latest.env exec validator-2 bash -c 'cp -r "/home/keyring-test" "$HOME/.cheqdnode/"'
 sudo docker compose --env-file mainnet-latest.env exec validator-3 bash -c 'cp -r "/home/keyring-test" "$HOME/.cheqdnode/"'
-
-
-
-docker compose --env-file mainnet-latest.env exec validator-0 bash -c 'cp -r "/home/keyring-test" "$HOME/.cheqdnode/"'
-docker compose --env-file mainnet-latest.env exec validator-1 bash -c 'cp -r "/home/keyring-test" "$HOME/.cheqdnode/"'
-docker compose --env-file mainnet-latest.env exec validator-2 bash -c 'cp -r "/home/keyring-test" "$HOME/.cheqdnode/"'
-docker compose --env-file mainnet-latest.env exec validator-3 bash -c 'cp -r "/home/keyring-test" "$HOME/.cheqdnode/"'
-
-# Restore permissions
-sudo docker compose --env-file mainnet-latest.env exec --user root validator-0 chown -R cheqd:cheqd /home/cheqd
-sudo docker compose --env-file mainnet-latest.env exec --user root validator-1 chown -R cheqd:cheqd /home/cheqd
-sudo docker compose --env-file mainnet-latest.env exec --user root validator-2 chown -R cheqd:cheqd /home/cheqd
-sudo docker compose --env-file mainnet-latest.env exec --user root validator-3 chown -R cheqd:cheqd /home/cheqd
 
 popd
