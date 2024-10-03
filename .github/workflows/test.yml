@@ -5,7 +5,8 @@ defaults:
   run:
     shell: bash
 env:
-  RUNNER_BIN_DIR: /home/cheqd/.local/bin
+  HOME: /home/runner # Set the custom home directory
+  RUNNER_BIN_DIR: /home/runner/.local/bin
 permissions:
   contents: write
   packages: read
@@ -137,7 +138,7 @@ jobs:
       - name: Import keys
         working-directory: ./docker/localnet
         run: |
-          export HOME=/home/cheqd
+          export HOME=/home/runner
           bash import-keys.sh
 
       - uses: actions/setup-go@v5
