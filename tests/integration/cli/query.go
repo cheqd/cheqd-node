@@ -163,7 +163,7 @@ func QueryKeys(container string) (string, error) {
 	args := append([]string{
 		CliBinaryName,
 		"keys", "list",
-	}, append(CheqdHome, KeyringParams...)...)
+	}, KeyringParams...)
 
 	out, err := LocalnetExecExec(container, args...)
 
