@@ -139,9 +139,9 @@ jobs:
         working-directory: ./docker/localnet
         run: |
           pwd
-          echo $HOME
+          echo "$HOME"
           export HOME=/home/runner
-          echo $HOME
+          echo "$HOME"
           bash import-keys.sh
 
       - uses: actions/setup-go@v5
