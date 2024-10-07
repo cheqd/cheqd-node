@@ -5,7 +5,6 @@ defaults:
   run:
     shell: bash
 env:
-  HOME: /home/runner # Set the custom home directory
   RUNNER_BIN_DIR: /home/runner/.local/bin
 permissions:
   contents: write
