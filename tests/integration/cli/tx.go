@@ -179,8 +179,6 @@ func SubmitProposal(container string, feeParams []string, pathToDir ...string) (
 	}, TXParams...)
 
 	args = append(args, GasParams...)
-	args = append(args, HomePath1...)
-
 	out, err := LocalnetExecExec(container, args...)
 	if err != nil {
 		fmt.Println("Error on submitting ParamChangeProposal", err)
@@ -202,14 +200,6 @@ func SubmitProposal(container string, feeParams []string, pathToDir ...string) (
 		return sdk.TxResponse{}, err
 	}
 	return resp, nil
-}
-
-func SubmitProposalTx(from, pathToDir string, feeParams []string) (sdk.TxResponse, error) {
-	return Tx("gov", "submit-proposal", from, feeParams, pathToDir)
-}
-
-func VoteProposalTx(from, option, id string, feeParams []string) (sdk.TxResponse, error) {
-	return Tx("gov", "vote", from, feeParams, option, id)
 }
 
 func VoteProposal(container, id, option string, feeParams []string) (sdk.TxResponse, error) {

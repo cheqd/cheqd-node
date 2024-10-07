@@ -53,7 +53,6 @@ var (
 
 func LocalnetExec(envArgs []string, args ...string) (string, error) {
 	args = append(append([]string{DockerCompose}, envArgs...), args...)
-	fmt.Printf("args: >>>>>>>>>>>>%v\n", args)
 	cmd := exec.Command(Docker, args...)
 
 	out, err := cmd.CombinedOutput()
@@ -77,7 +76,6 @@ func LocalnetExecDown() (string, error) {
 }
 
 func LocalnetExecCopyAbsoluteWithPermissions(path string, destination string, container string) (string, error) {
-	fmt.Println("path>>>>>>>>>", path)
 	_, err := LocalnetExec(DockerComposeLatestArgs, "cp", path, container+":"+destination)
 	if err != nil {
 		fmt.Println("Error copying file to container: ", err)
