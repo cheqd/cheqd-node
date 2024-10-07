@@ -77,6 +77,6 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		By("querying the balance of the given address")
 		bal, err := cli.QueryBalance("cheqd1lhl9g4rgldadgtz7v6rt50u45uhhj8hhv8d8uf", "ncheq")
 		Expect(err).To(BeNil())
-		Expect(bal.Amount).To(Equal(9000))
+		Expect(bal.Amount.Int64()).To(Equal(int64(9000)))
 	})
 })
