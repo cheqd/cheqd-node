@@ -3,7 +3,6 @@
 package integration
 
 import (
-	"fmt"
 	"path/filepath"
 
 	cli "github.com/cheqd/cheqd-node/tests/integration/cli"
@@ -26,8 +25,6 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 
 		By("sending a SubmitParamChangeProposal transaction from `validator0` container")
 		res, err := cli.SubmitProposalTx(cli.Operator0, "proposal.json", cli.CliGasParams)
-		fmt.Printf("err: %v\n", err)
-		fmt.Printf("res>>>>>>>>>>>>>>>>>>>>>>>>: %v\n", res)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
