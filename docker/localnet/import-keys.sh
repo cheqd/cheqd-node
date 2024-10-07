@@ -1,36 +1,242 @@
-#!/bin/bash
+package cli
 
-set -euox pipefail
+import (
+	"encoding/json"
+	"fmt"
+	"path/filepath"
 
-KEYRING_BACKEND="test"
+	"github.com/cheqd/cheqd-node/tests/integration/helpers"
+	"github.com/cheqd/cheqd-node/tests/integration/network"
+	"github.com/cheqd/cheqd-node/x/did/client/cli"
+	"github.com/cheqd/cheqd-node/x/did/types"
+	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
 
-function import_key() {
-    ALIAS=${1}
-    MNEMONIC=${2}
+const (
+	FlagVersionID = "--version-id"
+)
 
-    echo "Importing key: ${ALIAS}"
-    if cheqd-noded keys show "${ALIAS}" --keyring-backend ${KEYRING_BACKEND}
-    then
-      echo "Key ${ALIAS} already exists"
-      return 0
-    fi
-
-    echo "${MNEMONIC}" | cheqd-noded keys add "${ALIAS}" --keyring-backend ${KEYRING_BACKEND} --recover
+var CLITxParams = []string{
+	"--chain-id", network.ChainID,
+	"--keyring-backend", KeyringBackend,
+	"--output", OutputFormat,
+	"--yes",
 }
 
-import_key "base_account_1" "sketch mountain erode window enact net enrich smoke claim kangaroo another visual write meat latin bacon pulp similar forum guilt father state erase bright"
-import_key "base_account_2" "ugly dirt sorry girl prepare argue door man that manual glow scout bomb pigeon matter library transfer flower clown cat miss pluck drama dizzy"
-import_key "base_account_3" "fix wheel picnic about army scan table fence device trust alter erupt wear donkey wood slender gold reunion grant quiz absurd tragic reform attitude"
-import_key "base_account_4" "horn slim pigeon winner capable piano soul find ignore crawl arrow genuine magnet nasty basic lamp scissors treat stick arm dress elbow trash naive"
-import_key "base_account_5" "blue town hobby lens hawk deputy father tissue state choose another liquid license start push iron limb visa taste mother cause history tackle fiber"
-import_key "base_account_6" "gallery hospital vicious demand orient piano melody vanish remind pistol elephant bracket olive kitten caution apart capital protect junior endorse run drama tiny patrol"
-import_key "base_vesting_account" "coach index fence broken very cricket someone casino dial truth fitness stay habit such three jump exotic spawn planet fragile walk enact angry great"
-import_key "continuous_vesting_account" "phone worry flame safe panther dirt picture pepper purchase tiny search theme issue genre orange merit stove spoil surface color garment mind chuckle image"
-import_key "delayed_vesting_account" "pilot text keen deal economy donkey use artist divide foster walk pink breeze proud dish brown icon shaft infant level labor lift will tomorrow"
-import_key "periodic_vesting_account" "want merge flame plate trouble moral submit wing whale sick meat lonely yellow lens enable oyster slight health vast weird radar mesh grab olive"
+var CliGasParams = []string{
+	"--gas", Gas,
+	"--gas-adjustment", GasAdjustment,
+	"--gas-prices", GasPrices,
+}
 
-# import validator keys
-import_key "operator-0" "mix around destroy web fever address comfort vendor tank sudden abstract cabin acoustic attitude peasant hospital vendor harsh void current shield couple barrel suspect"
-import_key "operator-1" "useful case library girl narrow plate knee side supreme base horror fence tent glass leaf okay budget chalk patch forum coil crunch employ need"
-import_key "operator-2" "slight oblige answer vault project symbol dismiss match match honey forum wood resist exotic inner close foil notice onion acquire sausage boost acquire produce"
-import_key "operator-3" "page animal note negative rain talk banana cupboard master chef help female adjust tool question mercy leaf uniform slush image bulb wage bicycle black"
+func Tx(module, tx, from string, feeParams []string, txArgs ...string) (sdk.TxResponse, error) {
+	args := []string{"tx", module, tx}
+
+	// Common params
+}
+
+func Tx(module, tx, from string, feeParams []string, txArgs ...string) (sdk.TxResponse, error) {
+	args := []string{"tx", module, tx}
+
+	// Common params
+	args = append(args, CLITxParams...)
+
+	// Fee params
+	args = append(args, feeParams...)
+
+	// Cosmos account
+	args = append(args, "--from", from)
+
+	// Other args
+	args = append(args, txArgs...)
+
+	output, err := Exec(args...)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	// Skip 'gas estimate: xxx' string, trim 'Successfully migrated key' string
+	output = helpers.TrimImportedStdout(output)
+
+	var resp sdk.TxResponse
+
+	err = helpers.Codec.UnmarshalJSON([]byte(output), &resp)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	return resp, nil
+}
+
+func GrantFees(granter, grantee string, feeParams []string) (sdk.TxResponse, error) {
+	return Tx("feegrant", "grant", granter, feeParams, granter, grantee)
+}
+
+func RevokeFeeGrant(granter, grantee string, feeParams []string) (sdk.TxResponse, error) {
+	return Tx("feegrant", "revoke", granter, feeParams, granter, grantee)
+}
+
+func CreateDidDoc(tmpDir string, payload cli.DIDDocument, signInputs []cli.SignInput, versionID, from string, feeParams []string) (sdk.TxResponse, error) {
+	payloadJSON, err := json.Marshal(&payload)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	payloadWithSignInputs := cli.PayloadWithSignInputs{
+		Payload:    payloadJSON,
+		SignInputs: signInputs,
+	}
+
+	payloadWithSignInputsJSON, err := json.Marshal(&payloadWithSignInputs)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	payloadFile := helpers.MustWriteTmpFile(tmpDir, payloadWithSignInputsJSON)
+
+	if versionID != "" {
+		return Tx("cheqd", "create-did", from, feeParams, payloadFile, FlagVersionID, versionID)
+	}
+
+	return Tx("cheqd", "create-did", from, feeParams, payloadFile)
+}
+
+func UpdateDidDoc(tmpDir string, payload cli.DIDDocument, signInputs []cli.SignInput, versionID, from string, feeParams []string) (sdk.TxResponse, error) {
+	payloadJSON, err := json.Marshal(&payload)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	payloadWithSignInputs := cli.PayloadWithSignInputs{
+		Payload:    payloadJSON,
+		SignInputs: signInputs,
+	}
+
+	payloadWithSignInputsJSON, err := json.Marshal(&payloadWithSignInputs)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	payloadFile := helpers.MustWriteTmpFile(tmpDir, payloadWithSignInputsJSON)
+
+	if versionID != "" {
+		return Tx("cheqd", "update-did", from, feeParams, payloadFile, FlagVersionID, versionID)
+	}
+
+	return Tx("cheqd", "update-did", from, feeParams, payloadFile)
+}
+
+func DeactivateDidDoc(tmpDir string, payload types.MsgDeactivateDidDocPayload, signInputs []cli.SignInput, versionID, from string, feeParams []string) (sdk.TxResponse, error) {
+	payloadJSON, err := helpers.Codec.MarshalJSON(&payload)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	payloadWithSignInputs := cli.PayloadWithSignInputs{
+		Payload:    payloadJSON,
+		SignInputs: signInputs,
+	}
+
+	payloadWithSignInputsJSON, err := json.Marshal(&payloadWithSignInputs)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	payloadFile := helpers.MustWriteTmpFile(tmpDir, payloadWithSignInputsJSON)
+
+	if versionID != "" {
+		return Tx("cheqd", "deactivate-did", from, feeParams, payloadFile, FlagVersionID, versionID)
+	}
+
+	return Tx("cheqd", "deactivate-did", from, feeParams, payloadFile)
+}
+
+func CreateResource(tmpDir string, payload resourcetypes.MsgCreateResourcePayload, signInputs []cli.SignInput, dataFile, from string, feeParams []string) (sdk.TxResponse, error) {
+	payloadJSON, err := helpers.Codec.MarshalJSON(&payload)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	payloadWithSignInputs := cli.PayloadWithSignInputs{
+		Payload:    payloadJSON,
+		SignInputs: signInputs,
+	}
+
+	payloadWithSignInputsJSON, err := json.Marshal(&payloadWithSignInputs)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	payloadFile := helpers.MustWriteTmpFile("", payloadWithSignInputsJSON)
+
+	return Tx("resource", "create", from, feeParams, payloadFile, dataFile)
+}
+
+func BurnMsg(from string, coins string, feeParams []string) (sdk.TxResponse, error) {
+	return Tx("cheqd", "burn", from, feeParams, coins)
+}
+
+func SubmitProposal(container string, feeParams []string, pathToDir ...string) (sdk.TxResponse, error) {
+	args := append([]string{
+		CliBinaryName,
+		"tx", "gov", "submit-proposal", filepath.Join(pathToDir...),
+		"--from", OperatorAccounts[container],
+	}, TXParams...)
+
+	args = append(args, GasParams...)
+
+	out, err := LocalnetExecExec(container, args...)
+	if err != nil {
+		fmt.Println("Error on submitting ParamChangeProposal", err)
+		fmt.Println("Output:", out)
+		return sdk.TxResponse{}, err
+	}
+	// Skip 'gas estimate: xxx' string, trim 'Successfully migrated key' string
+	out = helpers.TrimImportedStdout(out)
+
+	fmt.Println("Output:", out)
+
+	out = helpers.TrimImportedStdout(out)
+
+	var resp sdk.TxResponse
+
+	err = helpers.Codec.UnmarshalJSON([]byte(out), &resp)
+	if err != nil {
+		fmt.Println("JSON unmarshal error: output:", out)
+		return sdk.TxResponse{}, err
+	}
+	return resp, nil
+}
+
+func VoteProposal(container, id, option string, feeParams []string) (sdk.TxResponse, error) {
+	args := append([]string{
+		CliBinaryName,
+		"tx", "gov", "vote", id, option,
+		"--from", OperatorAccounts[container],
+	}, TXParams...)
+
+	args = append(args, GasParams...)
+
+	out, err := LocalnetExecExec(container, args...)
+	if err != nil {
+		fmt.Println("Error on submitting ParamChangeProposal", err)
+		fmt.Println("Output:", out)
+		return sdk.TxResponse{}, err
+	}
+	// Skip 'gas estimate: xxx' string, trim 'Successfully migrated key' string
+	out = helpers.TrimImportedStdout(out)
+
+	fmt.Println("Output:", out)
+
+	out = helpers.TrimImportedStdout(out)
+
+	var resp sdk.TxResponse
+
+	err = helpers.Codec.UnmarshalJSON([]byte(out), &resp)
+	if err != nil {
+		fmt.Println("JSON unmarshal error: output:", out)
+		return sdk.TxResponse{}, err
+	}
+	return resp, nil
+}

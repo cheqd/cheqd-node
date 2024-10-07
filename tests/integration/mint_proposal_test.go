@@ -59,7 +59,10 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		Expect(err).To(BeNil())
 
 		By("sending a SubmitParamChangeProposal transaction from `validator0` container")
-		res, err := cli.SubmitProposal(cli.Validator0, cli.GasParams, "proposal.json")
+		res, err := cli.SubmitProposalTx(cli.Operator0, "proposal.json", cli.CliGasParams)
+		fmt.Printf("err: %v\n", err)
+		fmt.Printf("res>>>>>>>>>>>>>>>>>>>>>>>>: %v\n", res)
+		// res, err := cli.SubmitProposal(cli.Validator0, cli.GasParams, "proposal.json")
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
