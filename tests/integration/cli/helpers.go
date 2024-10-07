@@ -33,7 +33,7 @@ type SyncInfo struct {
 }
 
 func GetNodeStatus(container string, binary string) (NodeStatus, error) {
-	out, err := LocalnetExecExec(container, binary, "status", "--log_format", OutputFormat)
+	out, err := LocalnetExecExec(container, binary, "status")
 	if err != nil {
 		return NodeStatus{}, err
 	}
