@@ -8,7 +8,6 @@ import (
 	"time"
 
 	didv2 "github.com/cheqd/cheqd-node/x/did/types"
-	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -25,51 +24,12 @@ import (
 // Also, ValidatorInfo.PubKey is replaced with cosmos-sdk crypto.PubKey, hence it needs
 // to be parsed accordingly.
 type NodeStatus struct {
-	NodeInfo      DefaultNodeInfo `json:"NodeInfo"`
-	SyncInfo      SyncInfo        `json:"SyncInfo"`
-	ValidatorInfo ValidatorInfo   `json:"ValidatorInfo"`
-}
-
-type DefaultNodeInfo struct {
-	ProtocolVersion ProtocolVersion      `json:"protocol_version"`
-	ID              string               `json:"id"`
-	ListenAddr      string               `json:"listen_addr"`
-	Network         string               `json:"network"`
-	Version         string               `json:"version"`
-	Channels        tmbytes.HexBytes     `json:"channels"`
-	Moniker         string               `json:"moniker"`
-	Other           DefaultNodeInfoOther `json:"other"`
-}
-
-type ProtocolVersion struct {
-	P2P   uint64 `json:"p2p,string"`
-	Block uint64 `json:"block,string"`
-	App   uint64 `json:"app,string"`
-}
-
-type DefaultNodeInfoOther struct {
-	TxIndex    string `json:"tx_index"`
-	RPCAddress string `json:"rpc_address"`
+	SyncInfo SyncInfo `json:"SyncInfo"`
 }
 
 type SyncInfo struct {
-	LatestBlockHash   tmbytes.HexBytes `json:"latest_block_hash"`
-	LatestAppHash     tmbytes.HexBytes `json:"latest_app_hash"`
-	LatestBlockHeight int64            `json:"latest_block_height,string"`
-	LatestBlockTime   time.Time        `json:"latest_block_time"`
-
-	EarliestBlockHash   tmbytes.HexBytes `json:"earliest_block_hash"`
-	EarliestAppHash     tmbytes.HexBytes `json:"earliest_app_hash"`
-	EarliestBlockHeight int64            `json:"earliest_block_height,string"`
-	EarliestBlockTime   time.Time        `json:"earliest_block_time"`
-
-	CatchingUp bool `json:"catching_up"`
-}
-
-type ValidatorInfo struct {
-	Address     tmbytes.HexBytes `json:"Address"`
-	PubKey      interface{}      `json:"PubKey"`
-	VotingPower int64            `json:"VotingPower,string"`
+	LatestBlockHeight int64 `json:"latest_block_height,string"`
+	CatchingUp        bool  `json:"catching_up"`
 }
 
 func GetNodeStatus(container string, binary string) (NodeStatus, error) {

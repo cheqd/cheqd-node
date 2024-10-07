@@ -204,6 +204,14 @@ func SubmitProposal(container string, feeParams []string, pathToDir ...string) (
 	return resp, nil
 }
 
+func SubmitProposalTx(from, pathToDir string, feeParams []string) (sdk.TxResponse, error) {
+	return Tx("gov", "submit-proposal", from, feeParams, pathToDir)
+}
+
+func VoteProposalTx(from, option, id string, feeParams []string) (sdk.TxResponse, error) {
+	return Tx("gov", "vote", from, feeParams, option, id)
+}
+
 func VoteProposal(container, id, option string, feeParams []string) (sdk.TxResponse, error) {
 	args := append([]string{
 		CliBinaryName,

@@ -35,6 +35,7 @@ const (
 
 var (
 	TXParams = []string{
+		"--output", OutputFormat,
 		"--keyring-backend", KeyringBackend,
 		"--chain-id", integrationnetwork.ChainID,
 		"-y",

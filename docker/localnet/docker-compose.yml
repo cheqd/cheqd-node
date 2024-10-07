@@ -1,5 +1,3 @@
-# version: '3.8'
-
 services:
   validator-0:
     image: ${BUILD_IMAGE}
