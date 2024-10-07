@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os/exec"
 	"path/filepath"
-	"strings"
 
 	errorsmod "cosmossdk.io/errors"
 )
@@ -53,50 +52,14 @@ var (
 )
 
 func LocalnetExec(envArgs []string, args ...string) (string, error) {
-	// Check if args contain "--output json"
-	containsJSONOutput := false
-	for i := 0; i < len(args)-1; i++ {
-		if args[i] == "--output" && args[i+1] == "json" {
-			containsJSONOutput = true
-			break
-		}
-	}
-	fmt.Printf("containsJSONOutput: %v\n", containsJSONOutput)
-
-	// Combine Docker command with envArgs and args
 	args = append(append([]string{DockerCompose}, envArgs...), args...)
 	cmd := exec.Command(Docker, args...)
 	out, err := cmd.CombinedOutput()
-
-	// If "--output json" is present, attempt to extract JSON
-	if containsJSONOutput {
-		fmt.Printf("\"extracting json\": %v\n", "extracting json")
-		extractedJSON, err := extractOnlyJSON(string(out))
-		if err != nil {
-			return "", errorsmod.Wrap(err, string(out))
-		}
-		return extractedJSON, nil
-	}
-
-	// If no "--output json", return the raw output
 	if err != nil {
 		return string(out), errorsmod.Wrap(err, string(out))
 	}
-	return string(out), nil
+	return string(out), err
 }
-
-func extractOnlyJSON(out string) (string, error) {
-	fmt.Printf("out: %v\n", out)
-	// Find the first '{' and last '}' to extract the JSON portion
-	jsonStart := strings.Index(out, "{")
-	jsonEnd := strings.LastIndex(out, "}")
-	if jsonStart == -1 || jsonEnd == -1 {
-		return "", fmt.Errorf("no valid JSON found in output")
-	}
-
-	return out[jsonStart : jsonEnd+1], nil
-}
-
 func LocalnetExecExec(container string, args ...string) (string, error) {
 	fmt.Printf("args: %v\n", args)
 	args = append([]string{"exec", container}, args...)

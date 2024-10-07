@@ -34,24 +34,12 @@ type SyncInfo struct {
 
 func GetNodeStatus(container string, binary string) (NodeStatus, error) {
 	out, err := LocalnetExecExec(container, binary, "status", "--log_format", OutputFormat)
-
-	fmt.Println("out, err>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.", out, err)
-	if err != nil {
-		fmt.Printf("\"returning error while fetching\": %v\n", "returning error while fetching")
-		fmt.Printf("err: %v\n", err)
-		return NodeStatus{}, err
-	}
-
-	extractedJSON, err := extractOnlyJSON(out)
 	if err != nil {
 		return NodeStatus{}, err
 	}
-	out = extractedJSON
-
 	var result NodeStatus
 	err = json.Unmarshal([]byte(out), &result)
 	if err != nil {
-		fmt.Printf("\"returning error while unmarshalling\": %v\n", "returning error while unmarshalling")
 		return NodeStatus{}, err
 	}
 	return result, nil
@@ -127,9 +115,7 @@ func waitHeightCallback(container string, binary string, height int64, period in
 
 	status, err := GetNodeStatus(container, binary)
 	if err != nil {
-		// panic(err)
-		fmt.Printf("err>>>>>>>>>>>>>>>>>>>>>>>>>>>>>...: %v\n", err)
-		return
+		panic(err)
 	}
 
 	if status.SyncInfo.LatestBlockHeight >= height {

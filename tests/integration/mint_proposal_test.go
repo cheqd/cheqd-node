@@ -1,5 +1,3 @@
-//go:build integration
-
 package integration
 
 import (
@@ -19,40 +17,6 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		err := cli.WaitForCaughtUp(cli.Validator0, cli.CliBinaryName, cli.VotingPeriod*6)
 		Expect(err).To(BeNil())
 	})
-
-	It("fetch the keys", func() {
-		By("sending a QueryKeys query from `validator0` container")
-		keys, err := cli.QueryKeys(cli.Validator0)
-		fmt.Printf("keys>>>>>>>>>>>>>>>>>>>>>: %v\n", keys)
-		Expect(err).To(BeNil())
-	})
-
-	It("fetch the keys", func() {
-		By("sending a QueryKeys query from `validator0` container")
-		keys, err := cli.QueryKeys(cli.Validator1)
-		fmt.Printf("keys>>>>>>>>>>>>>>>>>>>>>: %v\n", keys)
-		Expect(err).To(BeNil())
-	})
-	It("fetch the keys", func() {
-		By("sending a QueryKeys query from `validator0` container")
-		keys, err := cli.QueryKeys(cli.Validator2)
-		fmt.Printf("keys>>>>>>>>>>>>>>>>>>>>>: %v\n", keys)
-		Expect(err).To(BeNil())
-	})
-	It("fetch the keys", func() {
-		By("sending a QueryKeys query from `validator0` container")
-		keys, err := cli.QueryKeys(cli.Validator3)
-		fmt.Printf("keys>>>>>>>>>>>>>>>>>>>>>: %v\n", keys)
-		Expect(err).To(BeNil())
-	})
-
-	It("find file", func() {
-		By("fiding the in the home path")
-		out, err := cli.FindFile(cli.Validator0, cli.Operator0+".info")
-		fmt.Printf("path>>>>>>>>>>>>>>>>>>>>>: %v\n", out)
-		Expect(err).To(BeNil())
-	})
-
 	It("should submit a mint  proposal ", func() {
 		By("passing the proposal file to the container")
 		_, err := cli.LocalnetExecCopyAbsoluteWithPermissions(filepath.Join("proposal.json"), cli.DockerHome, cli.Validator0)
@@ -62,7 +26,6 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		res, err := cli.SubmitProposalTx(cli.Operator0, "proposal.json", cli.CliGasParams)
 		fmt.Printf("err: %v\n", err)
 		fmt.Printf("res>>>>>>>>>>>>>>>>>>>>>>>>: %v\n", res)
-		// res, err := cli.SubmitProposal(cli.Validator0, cli.GasParams, "proposal.json")
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
@@ -79,14 +42,14 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 
 	It("should vote for the mint proposal from `validator1` container", func() {
 		By("sending a VoteProposal transaction from `validator1` container")
-		res, err := cli.VoteProposalTx(cli.Operator0, "1", "yes", cli.CliGasParams)
+		res, err := cli.VoteProposalTx(cli.Operator1, "1", "yes", cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 
 	It("should vote for the mint proposal from `validator2` container", func() {
 		By("sending a VoteProposal transaction from `validator2` container")
-		res, err := cli.VoteProposalTx(cli.Operator1, "1", "yes", cli.CliGasParams)
+		res, err := cli.VoteProposalTx(cli.Operator2, "1", "yes", cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
@@ -99,7 +62,7 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 	})
 	It("should vote for the mint proposal from `validator0` container", func() {
 		By("sending a VoteProposal transaction from `validator0` container")
-		res, err := cli.VoteProposalTx(cli.Operator2, "1", "yes", cli.CliGasParams)
+		res, err := cli.VoteProposalTx(cli.Operator0, "1", "yes", cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
