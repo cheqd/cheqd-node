@@ -60,6 +60,7 @@ func LocalnetExec(envArgs []string, args ...string) (string, error) {
 	}
 	return string(out), err
 }
+
 func LocalnetExecExec(container string, args ...string) (string, error) {
 	fmt.Printf("args: %v\n", args)
 	args = append([]string{"exec", container}, args...)
