@@ -1,5 +1,3 @@
-//go:build integration
-
 package integration
 
 import (
@@ -72,5 +70,11 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		proposal, err := cli.QueryProposal(cli.Validator0, "1")
 		Expect(err).To(BeNil())
 		Expect(proposal.Status).To(BeEquivalentTo(govtypesv1.StatusPassed))
+	})
+	It("should have the correct balance after minting", func() {
+		By("querying the balance of the given address")
+		bal, err := cli.QueryBalance("cheqd1lhl9g4rgldadgtz7v6rt50u45uhhj8hhv8d8uf", "ncheq")
+		Expect(err).To(BeNil())
+		Expect(bal.Amount).To(Equal(9000))
 	})
 })
