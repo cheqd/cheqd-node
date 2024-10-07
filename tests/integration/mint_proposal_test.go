@@ -3,7 +3,6 @@
 package integration
 
 import (
-	"fmt"
 	"path/filepath"
 
 	cli "github.com/cheqd/cheqd-node/tests/integration/cli"
@@ -16,9 +15,7 @@ import (
 var _ = Describe("Integration - Mint coins to given address", func() {
 	It("should wait for node catching up", func() {
 		By("pinging the node status until catching up is flagged as false ")
-		keys, err := cli.KeysList(cli.Validator0)
-		fmt.Println("keys list>>>>>>>>>>>>>.", keys, err)
-		err = cli.WaitForCaughtUp(cli.Validator0, cli.CliBinaryName, cli.VotingPeriod*6)
+		err := cli.WaitForCaughtUp(cli.Validator0, cli.CliBinaryName, cli.VotingPeriod*6)
 		Expect(err).To(BeNil())
 	})
 	It("should submit a mint  proposal ", func() {

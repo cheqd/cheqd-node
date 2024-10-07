@@ -54,7 +54,6 @@ var (
 func LocalnetExec(envArgs []string, args ...string) (string, error) {
 	args = append(append([]string{DockerCompose}, envArgs...), args...)
 	cmd := exec.Command(Docker, args...)
-
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return string(out), errorsmod.Wrap(err, string(out))
