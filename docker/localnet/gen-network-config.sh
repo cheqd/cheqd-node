@@ -189,7 +189,7 @@ mnemonics=(
   "mix around destroy web fever address comfort vendor tank sudden abstract cabin acoustic attitude peasant hospital vendor harsh void current shield couple barrel suspect"
   "useful case library girl narrow plate knee side supreme base horror fence tent glass leaf okay budget chalk patch forum coil crunch employ need"
   "slight oblige answer vault project symbol dismiss match match honey forum wood resist exotic inner close foil notice onion acquire sausage boost acquire produce"
-  "page animal note negative rain talk banana cupboard master chef help female adjust tool question mercy leaf uniform slush image bulb wage bicycle black"
+  "prefer spring subject mimic shadow biology connect option east dirt security surge thrive kiwi nothing pulse holiday license hub pitch motion sunny pelican birth"
 )
 
 # Adding genesis validators
@@ -201,7 +201,6 @@ do
   cp "${TMP_NODE_HOME}/config/genesis.json" "${NODE_HOME}/config/genesis.json"
 
   echo "${mnemonics[$i]}" | cheqd-noded keys add "operator-$i" --keyring-backend "test" --home "${NODE_HOME}" --recover
-  # cheqd-noded keys add "operator-$i" --keyring-backend "test" --home "${NODE_HOME}"
   cheqd-noded keys list --keyring-backend "test" --home "${NODE_HOME}"
   cheqd-noded genesis add-genesis-account "operator-$i" 20000000000000000ncheq --keyring-backend "test" --home "${NODE_HOME}"
 

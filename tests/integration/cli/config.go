@@ -9,12 +9,10 @@ const CliBinaryName = "cheqd-noded"
 
 const (
 	KeyringBackend = "test"
-	// Home           = "/home/runner/.cheqdnode"
-	Home          = "~/.cheqdnode"
-	OutputFormat  = "json"
-	Gas           = "auto"
-	GasAdjustment = "2.5"
-	GasPrices     = "60ncheq"
+	OutputFormat   = "json"
+	Gas            = "auto"
+	GasAdjustment  = "2.5"
+	GasPrices      = "60ncheq"
 )
 
 const (
@@ -40,12 +38,6 @@ var (
 		"--keyring-backend", KeyringBackend,
 		"--chain-id", integrationnetwork.ChainID,
 		"-y",
-	}
-	KeyringParams = []string{
-		"--keyring-backend", KeyringBackend,
-	}
-	CheqdHome = []string{
-		"--home", Home,
 	}
 	GasParams = []string{
 		"--gas", Gas,
