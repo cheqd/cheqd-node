@@ -38,6 +38,12 @@ func NewTaxDecorator(ak ante.AccountKeeper, bk BankKeeper, fk ante.FeegrantKeepe
 
 // AnteHandle handles tax for all taxable messages
 func (td TaxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, success bool, next sdk.PostHandler) (sdk.Context, error) {
+	params, err := td.feemarketKeeper.GetParams(ctx)
+	if err != nil {
+		return ctx, err
+	}
+
+	nativeDenom := params.FeeDenom
 	// must implement FeeTx
 	feeTx, ok := tx.(sdk.FeeTx)
 	if !ok {
@@ -59,7 +65,7 @@ func (td TaxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, suc
 		}
 		return next(ctx, tx, simulate, success)
 	}
-	params, err := td.feemarketKeeper.GetParams(ctx)
+	params, err = td.feemarketKeeper.GetParams(ctx)
 	if err != nil {
 		return ctx, errorsmod.Wrapf(err, "unable to get fee market params")
 	}
@@ -84,7 +90,26 @@ func (td TaxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, suc
 		return ctx, errorsmod.Wrapf(err, "unable to get fee market state")
 	}
 
-	feeCoins := feeTx.GetFee()
+	onlyNativeDenom := true
+	for _, fee := range feeTx.GetFee() {
+		if fee.Denom != nativeDenom {
+			// If any other token besides the native denom is present, set the flag to false
+			onlyNativeDenom = false
+			break
+		}
+	}
+
+	var feeCoins sdk.Coins
+
+	// if IBC Denom fetch the balance of did module.
+	if onlyNativeDenom {
+		feeCoins = feeTx.GetFee()
+	} else {
+		addr := td.accountKeeper.GetModuleAddress(feemarkettypes.FeeCollectorName)
+		feeBal := td.bankKeeper.GetBalance(ctx, addr, nativeDenom)
+		feeCoins = sdk.NewCoins(feeBal)
+	}
+
 	gas := ctx.GasMeter().GasConsumed() // use context gas consumed
 
 	if len(feeCoins) == 0 && !simulate {
