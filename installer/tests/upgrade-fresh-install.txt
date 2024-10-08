@@ -1,7 +1,7 @@
 2
 yes
 1
-/home/runner/cheqd
+/home/runner/.local/cheqd
 1
 yes
 yes

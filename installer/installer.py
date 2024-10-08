@@ -590,6 +590,8 @@ class Installer():
                 logging.info(f"Creating {DEFAULT_CHEQD_USER} user and adding to {DEFAULT_CHEQD_USER} group")
                 self.exec(
                     f"adduser --system {DEFAULT_CHEQD_USER} --home {self.cheqd_home_dir} --shell /bin/bash --ingroup {DEFAULT_CHEQD_USER} --quiet")
+                logging.info(f"Add current user to {DEFAULT_CHEQD_USER} group")
+                self.exec(f"sudo usermod -aG ${DEFAULT_CHEQD_USER} ${os.getlogin()}")
             else:
                 logging.debug(f"User {DEFAULT_CHEQD_USER} already exists. Skipping creation...")
 

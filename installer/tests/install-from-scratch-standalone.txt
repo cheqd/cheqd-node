@@ -1,5 +1,5 @@
 1
-/home/runner/cheqd
+/home/runner/.local/cheqd
 2
 yes
 test-install
