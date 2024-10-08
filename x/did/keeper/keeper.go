@@ -18,10 +18,11 @@ type (
 		accountKeeper types.AccountKeeper
 		bankkeeper    types.BankKeeper
 		stakingKeeper types.StakingKeeper
+		authority     string
 	}
 )
 
-func NewKeeper(cdc codec.BinaryCodec, storeKey storetypes.StoreKey, paramSpace types.ParamSubspace, ak types.AccountKeeper, bk types.BankKeeper, sk types.StakingKeeper) *Keeper {
+func NewKeeper(cdc codec.BinaryCodec, storeKey storetypes.StoreKey, paramSpace types.ParamSubspace, ak types.AccountKeeper, bk types.BankKeeper, sk types.StakingKeeper, authority string) *Keeper {
 	return &Keeper{
 		cdc:           cdc,
 		storeKey:      storeKey,
@@ -29,6 +30,7 @@ func NewKeeper(cdc codec.BinaryCodec, storeKey storetypes.StoreKey, paramSpace t
 		accountKeeper: ak,
 		bankkeeper:    bk,
 		stakingKeeper: sk,
+		authority:     authority,
 	}
 }
 

@@ -71,16 +71,17 @@ func Setup() TestSetup {
 
 	maccPerms := map[string][]string{
 		minttypes.ModuleName:           {authtypes.Minter},
-		types.ModuleName:               {authtypes.Burner},
 		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
+		authtypes.FeeCollectorName:     nil,
+		types.ModuleName:               {authtypes.Minter, authtypes.Burner},
+		govtypes.ModuleName:            {authtypes.Burner, authtypes.Minter},
 	}
 
 	// Init ParamsKeeper KVStore
 	paramsStoreKey := sdk.NewKVStoreKey(paramstypes.StoreKey)
 	paramsTStoreKey := sdk.NewTransientStoreKey(paramstypes.TStoreKey)
 
-	// Init Keepers
 	paramsKeeper := initParamsKeeper(Cdc, aminoCdc, paramsStoreKey, paramsTStoreKey)
 	accountKeeper := authkeeper.NewAccountKeeper(Cdc, keys[authtypes.StoreKey], authtypes.ProtoBaseAccount, maccPerms, "cheqd", authtypes.NewModuleAddress(govtypes.ModuleName).String())
 	bankKeeper := bankkeeper.NewBaseKeeper(
@@ -91,7 +92,7 @@ func Setup() TestSetup {
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 	stakingKeeper := stakingkeeper.NewKeeper(Cdc, keys[stakingtypes.StoreKey], accountKeeper, bankKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
-	newKeeper := keeper.NewKeeper(Cdc, keys[types.StoreKey], getSubspace(types.ModuleName, paramsKeeper), accountKeeper, bankKeeper, stakingKeeper)
+	newKeeper := keeper.NewKeeper(Cdc, keys[types.StoreKey], getSubspace(types.ModuleName, paramsKeeper), accountKeeper, bankKeeper, stakingKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
 
 	// Create Tx
 	txBytes := make([]byte, 28)
