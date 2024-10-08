@@ -90,6 +90,11 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 
 	It("should not succeed in update diddoc message - case: fixed fee, invalid denom", func() {
 		By("submitting the create diddoc message")
+
+		bal1, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, "ncheq")
+		Expect(err).To(BeNil())
+
+		fmt.Println("balance is>>>>>>>>>>>", bal1)
 		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid.String()))
 		Expect(err).To(BeNil())
 
