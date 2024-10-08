@@ -1,5 +1,3 @@
-//go:build integration
-
 package integration
 
 import (
@@ -92,6 +90,12 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		By("submitting the create diddoc message")
 		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid.String()))
 		Expect(err).To(BeNil())
+
+		bal, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, "ncheq")
+		Expect(err).To(BeNil())
+
+		fmt.Println("balance is>>>>>>>>>>>", bal)
+		fmt.Println("fees>>>>>>>>>>>>>>", helpers.GenerateFees(feeParams.CreateDid.String()))
 		fmt.Println("response>>>>>>>>>>>>>>>>>>>>>>", res)
 		Expect(res.Code).To(BeEquivalentTo(0))
 
