@@ -1,4 +1,5 @@
 # Goreleaser configuration file
+version: 2
 
 project_name: cheqd-node
 
