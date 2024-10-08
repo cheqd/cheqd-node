@@ -3,6 +3,8 @@
 package integration
 
 import (
+	"fmt"
+
 	cli "github.com/cheqd/cheqd-node/tests/integration/cli"
 	helpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 
@@ -24,6 +26,10 @@ var _ = Describe("Upgrade - Burn coins from relevant message signer", func() {
 		// assert no error
 		Expect(err).To(BeNil())
 
+		feemarketParam, err := cli.QueryFeemarketParams()
+		Expect(err).To(BeNil())
+
+		fmt.Println("feemarket Params>>>>>>>>>>.", feemarketParam)
 		// generate fixed fees, in which case 500,000,000 ncheq or 0.5 cheq
 		fees := helpers.GenerateFees("500000000ncheq")
 

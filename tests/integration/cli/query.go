@@ -12,6 +12,7 @@ import (
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 )
 
 var CLIQueryParams = []string{
@@ -169,6 +170,21 @@ func QueryStakingParams() (stakingtypes.Params, error) {
 	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
 		return stakingtypes.Params{}, err
+	}
+
+	return resp, nil
+}
+
+func QueryFeemarketParams() (feemarkettypes.Params, error) {
+	res, err := Query("feemarket", "params")
+	if err != nil {
+		return feemarkettypes.Params{}, err
+	}
+
+	var resp feemarkettypes.Params
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return feemarkettypes.Params{}, err
 	}
 
 	return resp, nil
