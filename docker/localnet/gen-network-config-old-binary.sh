@@ -68,14 +68,14 @@ function configure_genesis() {
   # Test accounts
   BASE_ACCOUNT_1="cheqd1rnr5jrt4exl0samwj0yegv99jeskl0hsxmcz96"
   # Mnemonic: sketch mountain erode window enact net enrich smoke claim kangaroo another visual write meat latin bacon pulp similar forum guilt father state erase bright
-  jq '.app_state.bank.balances += [{"address": "'${BASE_ACCOUNT_1}'", "coins": [{"denom": "ncheq", "amount": "900001000000000000"}] }]' "$GENESIS" > "$GENESIS_TMP" && \
+  jq '.app_state.bank.balances += [{"address": "'${BASE_ACCOUNT_1}'", "coins": [{"denom": "ncheq", "amount": "100001000000000000"}] }]' "$GENESIS" > "$GENESIS_TMP" && \
     mv "${GENESIS_TMP}" "${GENESIS}"
   jq '.app_state.auth.accounts += [{"@type": "/cosmos.auth.v1beta1.BaseAccount","address": "'${BASE_ACCOUNT_1}'", "pub_key": null,"account_number": "0","sequence": "0"}]' "$GENESIS" > "$GENESIS_TMP" && \
     mv "${GENESIS_TMP}" "${GENESIS}"
 
   BASE_ACCOUNT_2="cheqd1l9sq0se0jd3vklyrrtjchx4ua47awug5vsyeeh"
   # Mnemonic: ugly dirt sorry girl prepare argue door man that manual glow scout bomb pigeon matter library transfer flower clown cat miss pluck drama dizzy
-  jq '.app_state.bank.balances += [{"address": "'${BASE_ACCOUNT_2}'", "coins": [{"denom": "ncheq", "amount": "900001000000000000"}] }]' "$GENESIS" > "$GENESIS_TMP"  && \
+  jq '.app_state.bank.balances += [{"address": "'${BASE_ACCOUNT_2}'", "coins": [{"denom": "ncheq", "amount": "100001000000000000"}] }]' "$GENESIS" > "$GENESIS_TMP"  && \
     mv "${GENESIS_TMP}" "${GENESIS}"
   jq '.app_state.auth.accounts += [{"@type": "/cosmos.auth.v1beta1.BaseAccount","address": "'${BASE_ACCOUNT_2}'", "pub_key": null,"account_number": "0","sequence": "0"}]' "$GENESIS" > "$GENESIS_TMP" && \
     mv "${GENESIS_TMP}" "${GENESIS}"
@@ -89,14 +89,14 @@ function configure_genesis() {
 
   BASE_ACCOUNT_4="cheqd1c8tq9wcfwtunkunng5pe442jlmwns9sgve42mf"
   # Mnemonic: horn slim pigeon winner capable piano soul find ignore crawl arrow genuine magnet nasty basic lamp scissors treat stick arm dress elbow trash naive
-  jq '.app_state.bank.balances += [{"address": "'${BASE_ACCOUNT_4}'", "coins": [{"denom": "ncheq", "amount": "900001000000000000"}] }]' "$GENESIS" > "$GENESIS_TMP"  && \
+  jq '.app_state.bank.balances += [{"address": "'${BASE_ACCOUNT_4}'", "coins": [{"denom": "ncheq", "amount": "100001000000000000"}] }]' "$GENESIS" > "$GENESIS_TMP"  && \
     mv "${GENESIS_TMP}" "${GENESIS}"
   jq '.app_state.auth.accounts += [{"@type": "/cosmos.auth.v1beta1.BaseAccount","address": "'${BASE_ACCOUNT_4}'", "pub_key": null,"account_number": "0","sequence": "0"}]' "$GENESIS" > "$GENESIS_TMP" && \
     mv "${GENESIS_TMP}" "${GENESIS}"
 
   BASE_ACCOUNT_5="cheqd1xnx6fe4fg4etlaxm0ty25j3ae5thhadraskplv"
   # Mnemonic: blue town hobby lens hawk deputy father tissue state choose another liquid license start push iron limb visa taste mother cause history tackle fiber
-  jq '.app_state.bank.balances += [{"address": "'${BASE_ACCOUNT_5}'", "coins": [{"denom": "ncheq", "amount": "900001000000000000"}] }]' "$GENESIS" > "$GENESIS_TMP"  && \
+  jq '.app_state.bank.balances += [{"address": "'${BASE_ACCOUNT_5}'", "coins": [{"denom": "ncheq", "amount": "100001000000000000"}] }]' "$GENESIS" > "$GENESIS_TMP"  && \
     mv "${GENESIS_TMP}" "${GENESIS}"
   jq '.app_state.auth.accounts += [{"@type": "/cosmos.auth.v1beta1.BaseAccount","address": "'${BASE_ACCOUNT_5}'", "pub_key": null,"account_number": "0","sequence": "0"}]' "$GENESIS" > "$GENESIS_TMP" && \
     mv "${GENESIS_TMP}" "${GENESIS}"
