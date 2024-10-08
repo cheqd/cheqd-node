@@ -1,102 +1,110 @@
 {
-    "payload": {
-        "module_versions": [
-            {
-                "name": "auth",
-                "version": 4
-            },
-            {
-                "name": "authz",
-                "version": 2
-            },
-            {
-                "name": "bank",
-                "version": 4
-            },
-            {
-                "name": "capability",
-                "version": 1
-            },
-            {
-                "name": "cheqd",
-                "version": 4
-            },
-            {
-                "name": "consensus",
-                "version": 1
-            },
-            {
-                "name": "crisis",
-                "version": 2
-            },
-            {
-                "name": "distribution",
-                "version": 3
-            },
-            {
-                "name": "evidence",
-                "version": 1
-            },
-            {
-                "name": "feegrant",
-                "version": 2
-            },
-            {
-                "name": "feeibc",
-                "version": 1
-            },
-            {
-                "name": "genutil",
-                "version": 1
-            },
-            {
-                "name": "gov",
-                "version": 4
-            },
-            {
-                "name": "group",
-                "version": 2
-            },
-            {
-                "name": "ibc",
-                "version": 4
-            },
-            {
-                "name": "interchainaccounts",
-                "version": 2
-            },
-            {
-                "name": "mint",
-                "version": 2
-            },
-            {
-                "name": "params",
-                "version": 1
-            },
-            {
-                "name": "resource",
-                "version": 3
-            },
-            {
-                "name": "slashing",
-                "version": 3
-            },
-            {
-                "name": "staking",
-                "version": 4
-            },
-            {
-                "name": "transfer",
-                "version": 3
-            },
-            {
-                "name": "upgrade",
-                "version": 2
-            },
-            {
-                "name": "vesting",
-                "version": 1
-            }
-        ]
-    }
+  "payload": {
+    "module_versions": [
+      {
+        "name": "auth",
+        "version": 4
+      },
+      {
+        "name": "authz",
+        "version": 2
+      },
+      {
+        "name": "bank",
+        "version": 4
+      },
+      {
+        "name": "capability",
+        "version": 1
+      },
+      {
+        "name": "cheqd",
+        "version": 4
+      },
+      {
+        "name": "consensus",
+        "version": 1
+      },
+      {
+        "name": "crisis",
+        "version": 2
+      },
+      {
+        "name": "distribution",
+        "version": 3
+      },
+      {
+        "name": "evidence",
+        "version": 1
+      },
+      {
+        "name": "feegrant",
+        "version": 2
+      },
+      {
+        "name": "feeibc",
+        "version": 1
+      },
+      {
+        "name": "genutil",
+        "version": 1
+      },
+      {
+        "name": "gov",
+        "version": 4
+      },
+      {
+        "name": "group",
+        "version": 2
+      },
+      {
+        "name": "ibc",
+        "version": 4
+      },
+      {
+        "name": "interchainaccounts",
+        "version": 2
+      },
+      {
+        "name": "mint",
+        "version": 2
+      },
+      {
+        "name": "params",
+        "version": 1
+      },
+      {
+        "name": "resource",
+        "version": 3
+      },
+      {
+        "name": "slashing",
+        "version": 3
+      },
+      {
+        "name": "staking",
+        "version": 4
+      },
+      {
+        "name": "transfer",
+        "version": 3
+      },
+      {
+        "name": "upgrade",
+        "version": 2
+      },
+      {
+        "name": "vesting",
+        "version": 1
+      },
+      {
+        "name": "feemarket",
+        "version": 1
+      },
+      {
+        "name": "feeabs",
+        "version": 1
+      }
+    ]
+  }
 }
