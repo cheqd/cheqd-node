@@ -185,7 +185,7 @@ func BurnMsg(container string, coins string) (sdk.TxResponse, error) {
 }
 
 func SubmitProposal(container string, pathToDir ...string) (sdk.TxResponse, error) {
-	fmt.Println("Submitting param change proposal from", container)
+	fmt.Println("Submitting proposal from", container)
 	args := append([]string{
 		CliBinaryName,
 		"tx", "gov", "submit-proposal", filepath.Join(pathToDir...),
@@ -196,7 +196,7 @@ func SubmitProposal(container string, pathToDir ...string) (sdk.TxResponse, erro
 
 	out, err := LocalnetExecExec(container, args...)
 	if err != nil {
-		fmt.Println("Error on submitting ParamChangeProposal", err)
+		fmt.Println("Error on submitting proposal", err)
 		fmt.Println("Output:", out)
 		return sdk.TxResponse{}, err
 	}

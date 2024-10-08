@@ -21,7 +21,7 @@ var _ = Describe("MsgBurn tests", func() {
 		pk1 := ed25519.GenPrivKey().PubKey()
 		addr1 := sdk.AccAddress(pk1.Address())
 		someCoins := sdk.Coins{
-			sdk.NewInt64Coin("ncheq", 1000000*1e9), // 1mn CHEQ
+			sdk.NewInt64Coin(types.BaseMinimalDenom, 1000000*1e9), // 1mn CHEQ
 		}
 
 		// mint coins to the moduleAccount
@@ -34,7 +34,7 @@ var _ = Describe("MsgBurn tests", func() {
 
 		balanceBefore := setup.BankKeeper.GetAllBalances(setup.SdkCtx, addr1)
 		// make a proper burn message
-		burnAmount := sdk.NewCoins(sdk.NewCoin("ncheq", sdk.NewInt(100000)))
+		burnAmount := sdk.NewCoins(sdk.NewCoin(types.BaseMinimalDenom, sdk.NewInt(100000)))
 		baseMsg := types.NewMsgBurn(
 			addr1.String(),
 			burnAmount,
@@ -52,7 +52,7 @@ var _ = Describe("MsgBurn tests", func() {
 		pk1 := ed25519.GenPrivKey().PubKey()
 		addr1 := sdk.AccAddress(pk1.Address())
 		someCoins := sdk.Coins{
-			sdk.NewInt64Coin("ncheq", 1000000*1e9), // 1mn CHEQ
+			sdk.NewInt64Coin(types.BaseMinimalDenom, 1000000*1e9), // 1mn CHEQ
 		}
 
 		// mint coins to the moduleAccount
@@ -77,7 +77,7 @@ var _ = Describe("MsgBurn tests", func() {
 		pk1 := ed25519.GenPrivKey().PubKey()
 		addr1 := sdk.AccAddress(pk1.Address())
 		someCoins := sdk.Coins{
-			sdk.NewInt64Coin("ncheq", 1000000*1e9), // 1mn CHEQ
+			sdk.NewInt64Coin(types.BaseMinimalDenom, 1000000*1e9), // 1mn CHEQ
 		}
 
 		// mint coins to the moduleAccount
@@ -91,7 +91,7 @@ var _ = Describe("MsgBurn tests", func() {
 		// make a proper burn message
 		baseMsg := types.NewMsgBurn(
 			addr1.String(),
-			sdk.NewCoins(sdk.NewCoin("ncheq", sdk.ZeroInt())),
+			sdk.NewCoins(sdk.NewCoin(types.BaseMinimalDenom, sdk.ZeroInt())),
 		)
 
 		// burn the coins
@@ -102,7 +102,7 @@ var _ = Describe("MsgBurn tests", func() {
 		pk1 := ed25519.GenPrivKey().PubKey()
 		addr1 := sdk.AccAddress(pk1.Address())
 		someCoins := sdk.Coins{
-			sdk.NewInt64Coin("ncheq", 1000000*1e9), // 1mn CHEQ
+			sdk.NewInt64Coin(types.BaseMinimalDenom, 1000000*1e9), // 1mn CHEQ
 		}
 
 		// mint coins to the moduleAccount
