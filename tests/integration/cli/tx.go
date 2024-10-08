@@ -222,7 +222,7 @@ func VoteProposal(container, id, option string, feeParams []string) (sdk.TxRespo
 
 	out, err := LocalnetExecExec(container, args...)
 	if err != nil {
-		fmt.Println("Error on submitting ParamChangeProposal", err)
+		fmt.Println("Error on submitting proposal", err)
 		fmt.Println("Output:", out)
 		return sdk.TxResponse{}, err
 	}

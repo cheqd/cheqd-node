@@ -23,7 +23,7 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		_, err := cli.LocalnetExecCopyAbsoluteWithPermissions(filepath.Join("proposal.json"), cli.DockerHome, cli.Validator0)
 		Expect(err).To(BeNil())
 
-		By("sending a SubmitParamChangeProposal transaction from `validator0` container")
+		By("sending a SubmitProposal transaction from `validator0` container")
 		res, err := cli.SubmitProposalTx(cli.Operator0, "proposal.json", cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
@@ -52,12 +52,14 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
+
 	It("should vote for the mint proposal from `validator0` container", func() {
 		By("sending a VoteProposal transaction from `validator0` container")
 		res, err := cli.VoteProposalTx(cli.Operator0, "1", "yes", cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
+
 	It("should wait for the proposal to pass", func() {
 		By("getting the current block height")
 		currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
@@ -67,12 +69,14 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+20, 25)
 		Expect(err).To(BeNil())
 	})
+
 	It("should check the proposal status to ensure it has passed", func() {
 		By("sending a QueryProposal query from `validator0` container")
 		proposal, err := cli.QueryProposal(cli.Validator0, "1")
 		Expect(err).To(BeNil())
 		Expect(proposal.Status).To(BeEquivalentTo(govtypesv1.StatusPassed))
 	})
+
 	It("should have the correct balance after minting", func() {
 		By("querying the balance of the given address")
 		bal, err := cli.QueryBalance("cheqd1lhl9g4rgldadgtz7v6rt50u45uhhj8hhv8d8uf", "ncheq")
