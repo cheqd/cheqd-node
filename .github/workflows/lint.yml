@@ -91,7 +91,7 @@ jobs:
         LOG_LEVEL: WARN
         VALIDATE_ALL_CODEBASE: false
         MULTI_STATUS: true
-        PYTHON_PYLINT_CONFIG_FILE: './.github/linters/.pylintrc'
+        PYTHON_PYLINT_CONFIG_FILE: '${GITHUB.WORKSPACE}/.github/linters/.pylintrc'
 
         VALIDATE_BASH: true
         VALIDATE_DOCKERFILE_HADOLINT: true
