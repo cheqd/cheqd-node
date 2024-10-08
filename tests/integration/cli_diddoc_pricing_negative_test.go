@@ -91,6 +91,11 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 	It("should not succeed in update diddoc message - case: fixed fee, invalid denom", func() {
 		By("submitting the create diddoc message")
 
+		fmt.Printf("\"Staking Params>>>>>>\": %v\n", "Staking Params>>>>>>")
+		stakingParams, err := cli.QueryStakingParams()
+		Expect(err).To(BeNil())
+		fmt.Println("stakingParams>>>>>>>>>>>>>>>>>>>", stakingParams)
+
 		bal1, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, "ncheq")
 		Expect(err).To(BeNil())
 

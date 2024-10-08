@@ -11,6 +11,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
 var CLIQueryParams = []string{
@@ -155,5 +156,20 @@ func QueryProposal(container, id string) (govtypesv1.Proposal, error) {
 	if err != nil {
 		return govtypesv1.Proposal{}, err
 	}
+	return resp, nil
+}
+
+func QueryStakingParams() (stakingtypes.Params, error) {
+	res, err := Query("staking", "params")
+	if err != nil {
+		return stakingtypes.Params{}, err
+	}
+
+	var resp stakingtypes.Params
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return stakingtypes.Params{}, err
+	}
+
 	return resp, nil
 }
