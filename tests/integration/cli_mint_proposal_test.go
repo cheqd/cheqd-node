@@ -18,7 +18,7 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		err := cli.WaitForCaughtUp(cli.Validator0, cli.CliBinaryName, cli.VotingPeriod*6)
 		Expect(err).To(BeNil())
 	})
-	It("should submit a mint  proposal ", func() {
+	It("should submit a mint proposal ", func() {
 		By("passing the proposal file to the container")
 		_, err := cli.LocalnetExecCopyAbsoluteWithPermissions(filepath.Join("proposal.json"), cli.DockerHome, cli.Validator0)
 		Expect(err).To(BeNil())
