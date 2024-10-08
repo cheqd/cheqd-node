@@ -38,11 +38,19 @@
         "version": 1
       },
       {
+        "name": "feeabs",
+        "version": 1
+      },
+      {
         "name": "feegrant",
         "version": 2
       },
       {
         "name": "feeibc",
+        "version": 1
+      },
+      {
+        "name": "feemarket",
         "version": 1
       },
       {
@@ -95,14 +103,6 @@
       },
       {
         "name": "vesting",
-        "version": 1
-      },
-      {
-        "name": "feemarket",
-        "version": 1
-      },
-      {
-        "name": "feeabs",
         "version": 1
       }
     ]
