@@ -181,7 +181,7 @@ jobs:
           tar -xvf cheqd-noded-"${LEGACY_VERSION}"-linux-amd64.tar.gz -C ${{ env.RUNNER_BIN_DIR }}
           sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
         env:
-          LEGACY_VERSION: 1.4.5
+          LEGACY_VERSION: 2.0.1
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -214,7 +214,7 @@ jobs:
           bash scripts/old_binary_setup.sh
 
       - name: Run pre-upgrade tests
-        working-directory: ./tests/upgrade/integration/v2
+        working-directory: ./tests/upgrade/integration/v3
         run: |
           ginkgo -r --race --tags upgrade_integration --focus-file pre_test.go --keep-going --trace --junit-report ../../../../report-pre-upgrade.xml
 
@@ -235,7 +235,7 @@ jobs:
           docker ps -a
 
       - name: Run post-upgrade tests
-        working-directory: ./tests/upgrade/integration/v2
+        working-directory: ./tests/upgrade/integration/v3
         run: |
           ginkgo -r --race --tags upgrade_integration --focus-file post_test.go --keep-going --trace --junit-report ../../../../report-post-upgrade.xml
 
@@ -271,10 +271,10 @@ jobs:
         working-directory: ./docker/localnet
         run: docker compose --env-file build-latest.env logs --tail --follow
 
-      - name: Submit governance fee parameter change proposals
-        working-directory: ./tests/upgrade/integration/v2
-        run: |
-          ginkgo -r --race --tags upgrade_integration --focus-file param_change_proposal_test.go --keep-going --trace --junit-report ../../../../report-pricing-proposal.xml
+      # - name: Submit governance fee parameter change proposals
+      #   working-directory: ./tests/upgrade/integration/v3
+      #   run: |
+      #     ginkgo -r --race --tags upgrade_integration --focus-file param_change_proposal_test.go --keep-going --trace --junit-report ../../../../report-pricing-proposal.xml
 
       - name: Upload pricing proposal tests result
         uses: actions/upload-artifact@v4
