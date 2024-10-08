@@ -25,6 +25,9 @@ service Msg {
 
   rpc Burn(MsgBurn) returns (MsgBurnResponse);
 
+
+  // Mint defines a method to mint tokens to the given address.
+  rpc Mint(MsgMint) returns (MsgMintResponse);
 }
 
 // MsgCreateDidDoc defines the Msg/CreateDidDoc request type.
@@ -232,3 +235,21 @@ message MsgBurn {
   ];
 }
 message MsgBurnResponse {}
+
+// MsgMint is the sdk.Msg type for allowing an admin account to mint
+// more of a token.
+// Only the admin of the token factory denom has permission to mint unless
+// the denom does not have any admin.
+message MsgMint {
+  option (cosmos.msg.v1.signer) = "authority";
+
+  string   authority = 1 [ (gogoproto.moretags) = "yaml:\"authority\"" ];
+  string   to_address              = 2 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  repeated cosmos.base.v1beta1.Coin amount = 3 [
+    (gogoproto.nullable)     = false,
+    (amino.dont_omitempty)   = true,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+}
+
+message MsgMintResponse {}

@@ -486,7 +486,7 @@ var _ = Describe("Fee abstraction", func() {
 
 		It("should fail with empty fee", func() {
 			feeAmount := sdk.Coins{}
-			minGasPrice := sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin("ncheq", 100))...)
+			minGasPrice := sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin(didtypes.BaseMinimalDenom, 100))...)
 			suite.txBuilder.SetGasLimit(gasLimit)
 			suite.txBuilder.SetFeeAmount(feeAmount)
 			suite.ctx = suite.ctx.WithMinGasPrices(minGasPrice)
@@ -504,8 +504,8 @@ var _ = Describe("Fee abstraction", func() {
 		})
 
 		It("should fail with insufficient native fee", func() {
-			feeAmount := sdk.NewCoins(sdk.NewInt64Coin("ncheq", 100))
-			minGasPrice := sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin("ncheq", 1000))...)
+			feeAmount := sdk.NewCoins(sdk.NewInt64Coin(didtypes.BaseMinimalDenom, 100))
+			minGasPrice := sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin(didtypes.BaseMinimalDenom, 1000))...)
 			suite.txBuilder.SetGasLimit(gasLimit)
 			suite.txBuilder.SetFeeAmount(feeAmount)
 			suite.ctx = suite.ctx.WithMinGasPrices(minGasPrice)
@@ -523,8 +523,8 @@ var _ = Describe("Fee abstraction", func() {
 		})
 
 		It("should pass with sufficient native fee", func() {
-			feeAmount := sdk.NewCoins(sdk.NewInt64Coin("ncheq", 1000*int64(gasLimit)))
-			minGasPrice := sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin("ncheq", 1000))...)
+			feeAmount := sdk.NewCoins(sdk.NewInt64Coin(didtypes.BaseMinimalDenom, 1000*int64(gasLimit)))
+			minGasPrice := sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin(didtypes.BaseMinimalDenom, 1000))...)
 			suite.txBuilder.SetGasLimit(gasLimit)
 			suite.txBuilder.SetFeeAmount(feeAmount)
 			suite.ctx = suite.ctx.WithMinGasPrices(minGasPrice)
@@ -542,7 +542,7 @@ var _ = Describe("Fee abstraction", func() {
 
 		It("should fail with unknown ibc fee denom", func() {
 			feeAmount := sdk.NewCoins(sdk.NewInt64Coin("ibcfee", 1000*int64(gasLimit)))
-			minGasPrice := sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin("ncheq", 1000))...)
+			minGasPrice := sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin(didtypes.BaseMinimalDenom, 1000))...)
 			suite.txBuilder.SetGasLimit(gasLimit)
 			suite.txBuilder.SetFeeAmount(feeAmount)
 			suite.ctx = suite.ctx.WithMinGasPrices(minGasPrice)
@@ -596,8 +596,8 @@ var _ = Describe("DeductFeeDecorator", func() {
 	// Setup the common test data
 	BeforeEach(func() {
 		gasLimit = 200000
-		minGasPrice = sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin("ncheq", 1000))...)
-		feeAmount = sdk.NewCoins(sdk.NewInt64Coin("ncheq", 1000*int64(gasLimit)))
+		minGasPrice = sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin(didtypes.BaseMinimalDenom, 1000))...)
+		feeAmount = sdk.NewCoins(sdk.NewInt64Coin(didtypes.BaseMinimalDenom, 1000*int64(gasLimit)))
 		ibcFeeAmount = sdk.NewCoins(sdk.NewInt64Coin("ibcfee", 1000*int64(gasLimit)))
 
 		mockHostZoneConfig = types.HostChainFeeAbsConfig{
@@ -624,7 +624,7 @@ var _ = Describe("DeductFeeDecorator", func() {
 		// minFee, _ := minGasPrice.TruncateDecimal()
 
 		params := suite.app.StakingKeeper.GetParams(suite.ctx)
-		params.BondDenom = "ncheq"
+		params.BondDenom = didtypes.BaseMinimalDenom
 		err = suite.app.StakingKeeper.SetParams(suite.ctx, params)
 		Expect(err).To(BeNil(), "Error setting the params")
 
@@ -1144,7 +1144,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 	s := new(AnteTestSuite)
 	gasLimit := 200000
 	ibcFeeAmount := sdk.NewCoins(sdk.NewInt64Coin("ibcfee", 1000*int64(gasLimit)))
-	feeAmount := sdk.NewCoins(sdk.NewInt64Coin("ncheq", 1000*int64(gasLimit)))
+	feeAmount := sdk.NewCoins(sdk.NewInt64Coin(didtypes.BaseMinimalDenom, 1000*int64(gasLimit)))
 
 	mockHostZoneConfig := types.HostChainFeeAbsConfig{
 		IbcDenom:                "ibcfee",
@@ -1186,16 +1186,12 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		s.app.AccountKeeper.SetModuleAccount(s.ctx, feeabsModAcc)
 
 		params := s.app.StakingKeeper.GetParams(s.ctx)
-		params.BondDenom = "ncheq"
+		params.BondDenom = didtypes.BaseMinimalDenom
 		err = s.app.StakingKeeper.SetParams(s.ctx, params)
 		Expect(err).To(BeNil(), "Error setting the params")
 	})
 
 	It("Ensure native tx fee txns are working", func() {
-		err := s.app.FeeabsKeeper.SetHostZoneConfig(s.ctx, mockHostZoneConfig)
-		Expect(err).ToNot(HaveOccurred())
-		s.app.FeeabsKeeper.SetTwapRate(s.ctx, "ibcfee", sdk.NewDec(1))
-
 		anteHandler := sdk.ChainAnteDecorators(decorators...)
 
 		priv1, _, addr1 := testdata.KeyTestPubAddr()
@@ -1225,7 +1221,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		err := s.app.FeeabsKeeper.SetHostZoneConfig(s.ctx, mockHostZoneConfig)
 		Expect(err).ToNot(HaveOccurred())
 		s.app.FeeabsKeeper.SetTwapRate(s.ctx, "ibcfee", sdk.NewDec(1))
-		minGasPrice := sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin("ncheq", 100))...)
+		minGasPrice := sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin(didtypes.BaseMinimalDenom, 100))...)
 		s.ctx = s.ctx.WithMinGasPrices(minGasPrice)
 
 		anteHandler := sdk.ChainAnteDecorators(decorators...)
@@ -1285,7 +1281,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(ibcDenom, amount)))
 		Expect(err).To(BeNil())
 
-		err = testutil.FundModuleAccount(s.app.BankKeeper, s.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin("ncheq", amount)))
+		err = testutil.FundModuleAccount(s.app.BankKeeper, s.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
 		Expect(err).To(BeNil())
 
 		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
@@ -1324,11 +1320,78 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		Expect(feeCollectorBalance.Amount).To(Equal(reward.AmountOf(didtypes.BaseMinimalDenom)), "Reward was not sent to the fee collector")
 	})
 
-	It("Ensure taxable txn working fine after integrating the fee-abs", func() {
-		// err := s.app.FeeabsKeeper.SetHostZoneConfig(s.ctx, mockHostZoneConfig)
-		// Expect(err).ToNot(HaveOccurred())
-		// s.app.FeeabsKeeper.SetTwapRate(s.ctx, "ibcfee", sdk.NewDec(1))
+	It("Ensure to convert the IBC Denom to native fee for non taxable txn", func() {
+		err := s.app.FeeabsKeeper.SetHostZoneConfig(s.ctx, mockHostZoneConfig)
+		Expect(err).ToNot(HaveOccurred())
+		ibcDenom := "ibcfee"
+		s.app.FeeabsKeeper.SetTwapRate(s.ctx, ibcDenom, sdk.NewDec(1))
 
+		anteHandler := sdk.ChainAnteDecorators(decorators...)
+
+		priv1, _, addr1 := testdata.KeyTestPubAddr()
+
+		// msg and signatures
+		msg := testdata.NewTestMsg(addr1)
+		feeAmount := sdk.NewCoins(sdk.NewCoin(ibcDenom, sdk.NewInt(50_000_000_000)))
+		gasLimit := testdata.NewTestGasLimit()
+		Expect(s.txBuilder.SetMsgs(msg)).To(BeNil())
+		s.txBuilder.SetFeeAmount(feeAmount)
+		s.txBuilder.SetGasLimit(gasLimit)
+		s.txBuilder.SetFeePayer(addr1)
+
+		privs, accNums, accSeqs := []cryptotypes.PrivKey{priv1}, []uint64{0}, []uint64{0}
+		tx, err := s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
+		Expect(err).To(BeNil())
+
+		// set account with sufficient funds
+		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
+		s.app.AccountKeeper.SetAccount(s.ctx, acc)
+		amount := sdk.NewInt(50_000_000_000)
+		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(ibcDenom, amount)))
+		Expect(err).To(BeNil())
+
+		err = testutil.FundModuleAccount(s.app.BankKeeper, s.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
+		Expect(err).To(BeNil())
+
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
+		posthandler := sdk.ChainPostDecorators(taxDecorator)
+
+		// get supply before tx
+		supplyBefore, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
+		Expect(err).To(BeNil())
+
+		newCtx, err := anteHandler(s.ctx, tx, true)
+		Expect(err).To(BeNil())
+
+		_, _, proposer := testdata.KeyTestPubAddr()
+		s.ctx = newCtx
+		a := s.ctx.BlockHeader()
+		a.ProposerAddress = proposer
+		newCtx = s.ctx.WithBlockHeader(a)
+		s.ctx = newCtx
+
+		_, err = posthandler(s.ctx, tx, false, true)
+		Expect(err).To(BeNil(), "Tx errored when fee payer had sufficient funds and provided sufficient fee while subtracting tax on deliverTx")
+
+		// check balance of fee payer
+		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, ibcDenom)
+		Expect(amount.Sub(sdk.NewInt(feeAmount.AmountOf(ibcDenom).Int64())).Equal(balance.Amount)).To(BeTrue(), "Fee amount subtracted was not equal to fee amount required for non-taxable tx")
+
+		// get supply after tx
+		supplyAfter, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
+		Expect(err).To(BeNil())
+
+		// check that supply was not deflated
+		Expect(supplyBefore).To(Equal(supplyAfter), "Supply was deflated")
+
+		// check that reward has been sent to the fee collector
+		feeCollector := s.app.AccountKeeper.GetModuleAddress(feemarkettypes.FeeCollectorName)
+		feeCollectorBalance := s.app.BankKeeper.GetBalance(s.ctx, feeCollector, didtypes.BaseMinimalDenom)
+
+		Expect((feeCollectorBalance.Amount).GT(math.NewInt(0)))
+	})
+
+	It("Ensure taxable txn working fine after integrating the fee-abs", func() {
 		anteHandler := sdk.ChainAnteDecorators(decorators...)
 
 		priv1, _, addr1 := testdata.KeyTestPubAddr()

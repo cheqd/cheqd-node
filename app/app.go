@@ -198,7 +198,7 @@ var (
 		stakingtypes.NotBondedPoolName:  {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:             {authtypes.Burner},
 		ibctransfertypes.ModuleName:     {authtypes.Minter, authtypes.Burner},
-		didtypes.ModuleName:             {authtypes.Burner},
+		didtypes.ModuleName:             {authtypes.Minter, authtypes.Burner},
 		feemarkettypes.ModuleName:       {authtypes.Burner},
 		feemarkettypes.FeeCollectorName: {authtypes.Burner},
 		feeabstypes.ModuleName:          nil,
@@ -258,6 +258,8 @@ type App struct {
 	ScopedICAControllerKeeper capabilitykeeper.ScopedKeeper
 	ScopedICAHostKeeper       capabilitykeeper.ScopedKeeper
 	ScopedResourceKeeper      capabilitykeeper.ScopedKeeper
+	ScopedICQKeeper           capabilitykeeper.ScopedKeeper
+	ScopedFeeAbsKeeper        capabilitykeeper.ScopedKeeper
 	FeeabsKeeper              feeabskeeper.Keeper
 
 	DidKeeper      didkeeper.Keeper
@@ -550,6 +552,8 @@ func New(
 		scopedFeeabsKeeper,
 	)
 
+	feeabsModule := feeabsmodule.NewAppModule(appCodec, app.FeeabsKeeper)
+	feeabsIBCModule := feeabsmodule.NewIBCModule(appCodec, app.FeeabsKeeper)
 	app.FeeMarketKeeper.SetDenomResolver(&cheqdante.DenomResolverImpl{
 		StakingKeeper: app.StakingKeeper,
 		FeeabsKeeper:  app.FeeabsKeeper,
@@ -607,7 +611,8 @@ func New(
 	// Add host, controller & ica auth modules to IBC router
 	ibcRouter.
 		AddRoute(icacontrollertypes.SubModuleName, icaControllerStack).
-		AddRoute(icahosttypes.SubModuleName, icaHostStack)
+		AddRoute(icahosttypes.SubModuleName, icaHostStack).
+		AddRoute(feeabstypes.ModuleName, feeabsIBCModule)
 
 	// x/resource
 	app.ResourceKeeper = *resourcekeeper.NewKeeper(
@@ -646,7 +651,7 @@ func New(
 		appCodec, keys[didtypes.StoreKey],
 		app.GetSubspace(didtypes.ModuleName),
 		app.AccountKeeper, app.BankKeeper,
-		app.StakingKeeper,
+		app.StakingKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
@@ -686,6 +691,7 @@ func New(
 		// cheqd modules
 		did.NewAppModule(appCodec, app.DidKeeper),
 		resource.NewAppModule(appCodec, app.ResourceKeeper, app.DidKeeper),
+		feeabsModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -866,6 +872,7 @@ func New(
 	app.ScopedICAControllerKeeper = scopedICAControllerKeeper
 	app.ScopedICAHostKeeper = scopedICAHostKeeper
 	app.ScopedResourceKeeper = scopedResourceKeeper
+	app.ScopedFeeAbsKeeper = scopedFeeabsKeeper
 
 	return app
 }

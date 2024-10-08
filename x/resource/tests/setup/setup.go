@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"time"
 
+	"github.com/cheqd/cheqd-node/app"
 	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 	didsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
@@ -52,6 +53,8 @@ func Setup() TestSetup {
 	authtypes.RegisterInterfaces(ir)
 	banktypes.RegisterInterfaces(ir)
 	didtypes.RegisterInterfaces(ir)
+	banktypes.RegisterInterfaces(ir)
+	authtypes.RegisterInterfaces(ir)
 	cdc := codec.NewProtoCodec(ir)
 	aminoCdc := codec.NewLegacyAmino()
 
@@ -69,7 +72,7 @@ func Setup() TestSetup {
 
 	maccPerms := map[string][]string{
 		minttypes.ModuleName:           {authtypes.Minter},
-		types.ModuleName:               {authtypes.Burner},
+		types.ModuleName:               {authtypes.Minter, authtypes.Burner},
 		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 	}
@@ -99,8 +102,15 @@ func Setup() TestSetup {
 
 	_ = dbStore.LoadLatestVersion()
 
-	// Init Keepers
-	accountKeeper := authkeeper.NewAccountKeeper(cdc, keys[authtypes.StoreKey], authtypes.ProtoBaseAccount, maccPerms, "cheqd", string(authtypes.NewModuleAddress(govtypes.ModuleName)))
+	accountKeeper := authkeeper.NewAccountKeeper(
+		cdc,
+		keys[authtypes.StoreKey],
+		authtypes.ProtoBaseAccount,
+		maccPerms,
+		app.AccountAddressPrefix,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
+
 	bankKeeper := bankkeeper.NewBaseKeeper(
 		cdc,
 		keys[banktypes.StoreKey],
@@ -111,7 +121,8 @@ func Setup() TestSetup {
 	stakingKeeper := stakingkeeper.NewKeeper(cdc, keys[stakingtypes.StoreKey], accountKeeper, bankKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
 
 	paramsKeeper := initParamsKeeper(cdc, aminoCdc, paramsStoreKey, paramsTStoreKey)
-	didKeeper := didkeeper.NewKeeper(cdc, didStoreKey, getSubspace(didtypes.ModuleName, paramsKeeper), accountKeeper, bankKeeper, stakingKeeper)
+
+	didKeeper := didkeeper.NewKeeper(cdc, didStoreKey, getSubspace(didtypes.ModuleName, paramsKeeper), accountKeeper, bankKeeper, stakingKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
 	capabilityKeeper := capabilitykeeper.NewKeeper(cdc, capabilityStoreKey, memStoreKeys[capabilitytypes.MemStoreKey])
 
 	scopedIBCKeeper := capabilityKeeper.ScopeToModule(ibcexported.ModuleName)
@@ -140,7 +151,7 @@ func Setup() TestSetup {
 	queryServer := keeper.NewQueryServer(*resourceKeeper, *didKeeper)
 
 	params := stakingtypes.DefaultParams()
-	params.BondDenom = "ncheq"
+	params.BondDenom = didtypes.BaseMinimalDenom
 	err := stakingKeeper.SetParams(ctx, params)
 	if err != nil {
 		panic("error while setting up the params")
