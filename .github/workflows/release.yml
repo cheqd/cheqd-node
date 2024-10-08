@@ -12,7 +12,7 @@ jobs:
   # List of languages enabled is smaller than in lint workflow
   super-lint:
     name: "Super Linter"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
     - uses: actions/checkout@v4
@@ -39,7 +39,7 @@ jobs:
 
   release-guard:
     name: "Check release condition"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: super-lint
     outputs:
       RELEASE_VERSION: ${{ steps.set-version.outputs.RELEASE_VERSION }}
@@ -95,7 +95,7 @@ jobs:
 
   release-binary:
     name: "Node binary"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: [ super-lint, release-guard ]
     # Only run if release-guard outputs EXECUTE_RELEASE=true
     if: needs.release-guard.outputs.EXECUTE_RELEASE == 'true'
@@ -135,7 +135,7 @@ jobs:
   release-docker:
     name: "Docker image"
     needs: [ super-lint, release-guard ]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     # Only run if release-guard outputs EXECUTE_RELEASE=true
     if: needs.release-guard.outputs.EXECUTE_RELEASE == 'true'
     env:
