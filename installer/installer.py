@@ -36,7 +36,7 @@ TESTNET_CHAIN_ID = "cheqd-testnet-6"
 PRINT_PREFIX = "********* "
 # Set branch dynamically in CI workflow for testing if Python dev mode is enabled and DEFAULT_DEBUG_BRANCH is set
 # Otherwise, use the main branch
-DEFAULT_DEBUG_BRANCH = os.getenv("DEFAULT_DEBUG_BRANCH") if os.getenv("DEFAULT_DEBUG_BRANCH") != None else "main"
+DEFAULT_DEBUG_BRANCH = os.getenv("DEFAULT_DEBUG_BRANCH") if os.getenv("DEFAULT_DEBUG_BRANCH") is not None else "main"
 
 
 ###############################################################
@@ -230,11 +230,11 @@ class Installer():
         self.release = interviewer.release
         self.interviewer = interviewer
         self._snapshot_url = ""
-        
+
     @property
     def snapshot_url(self):
         return self._snapshot_url
-    
+
     @snapshot_url.setter
     def snapshot_url(self, value):
         self._snapshot_url = value
@@ -363,7 +363,7 @@ class Installer():
                                 '{DEFAULT_DAEMON_RESTART_DELAY}': DEFAULT_DAEMON_RESTART_DELAY}[m.group()],
                         response.read().decode("utf-8").strip()
                     )
-                
+
                 # If the service file is successfully created, return the string
                 return s
             else:
@@ -385,7 +385,7 @@ class Installer():
 
             # Fetch the template file from GitHub
             if is_valid_url(RSYSLOG_TEMPLATE):
-                with request.urlopen(RSYSLOG_TEMPLATE) as response:                
+                with request.urlopen(RSYSLOG_TEMPLATE) as response:
                     # Replace the values for environment variables in the template file
                     s = re.sub(
                         r'({BINARY_FOR_LOGGING}|{CHEQD_LOG_DIR})',
@@ -400,7 +400,7 @@ class Installer():
                 logging.exception(f"URL is not valid: {RSYSLOG_TEMPLATE}")
         except Exception as e:
             logging.exception(f"Failed to set up rsyslog from template. Reason: {e}")
-        
+
     @property
     def logrotate_cfg(self):
         # Modify logrotate template file to replace values for environment variables
@@ -498,12 +498,12 @@ class Installer():
                 else:
                     logging.error("Failed to setup cheqd-noded as a standalone binary")
                     return False
-            
+
             # Setup cheqd-noded environment variables
             # These are independent of Cosmovisor environment variables
             # Set them regardless of whether Cosmovisor is used or not
             self.set_cheqd_env_vars()
-            
+
             # Configure cheqd-noded settings
             # This edits the config.toml and app.toml files
             if self.configure_node_settings():
@@ -536,7 +536,7 @@ class Installer():
                 else:
                     logging.error("Failed to download snapshot")
                     return False
-                                
+
                 if self.extract_snapshot():
                     logging.info("Successfully extracted snapshot")
                 else:
@@ -550,7 +550,7 @@ class Installer():
             return True
         except Exception as e:
             logging.exception(f"Failed to install cheqd-noded. Reason: {e}")
-    
+
     def get_binary(self) -> bool:
         # Download cheqd-noded binary and extract it
         # Also remove the downloaded archive file, if applicable
@@ -562,7 +562,7 @@ class Installer():
             # Download the binary from GitHub
             with request.urlopen(binary_url) as response, open(fname, "wb") as file:
                 file.write(response.read())
-            
+
             # Extract the binary from the archive file
             # Using tarfile to extract is a safer option than just executing a command
             tar = tarfile.open(fname)
@@ -590,8 +590,6 @@ class Installer():
                 logging.info(f"Creating {DEFAULT_CHEQD_USER} user and adding to {DEFAULT_CHEQD_USER} group")
                 self.exec(
                     f"adduser --system {DEFAULT_CHEQD_USER} --home {self.cheqd_home_dir} --shell /bin/bash --ingroup {DEFAULT_CHEQD_USER} --quiet")
-                logging.info(f"Add current user to {DEFAULT_CHEQD_USER} group")
-                self.exec(f"sudo usermod -aG {DEFAULT_CHEQD_USER} {os.getlogin()}")
             else:
                 logging.debug(f"User {DEFAULT_CHEQD_USER} already exists. Skipping creation...")
 
@@ -601,7 +599,7 @@ class Installer():
                 os.makedirs(self.cheqd_root_dir, exist_ok=True)
             else:
                 logging.info(f"Root directory {self.cheqd_root_dir} already exists. Skipping creation...")
-            
+
             # Set permissions for cheqd home directory to cheqd:cheqd
             logging.info(f"Setting permissions for {self.cheqd_home_dir} to {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}")
             self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_home_dir}")
@@ -652,16 +650,16 @@ class Installer():
             # Backup ~/.cheqdnode/data/priv_validator_key.json
             # Without this file, a validator node will get jailed!
             if os.path.exists(os.path.join(self.cheqd_data_dir, "priv_validator_state.json")):
-                shutil.copy(os.path.join(self.cheqd_data_dir, "priv_validator_state.json"), 
+                shutil.copy(os.path.join(self.cheqd_data_dir, "priv_validator_state.json"),
                     os.path.join(self.cheqd_backup_dir, "priv_validator_state.json"))
                 logging.info(f"Successfully backed up {self.cheqd_data_dir}/priv_validator_state.json")
             else:
                 logging.debug("No validator state file found to backup. Skipping...")
-            
+
             # Backup ~/.cheqdnode/data/upgrade-info.json
             # This file is required for Cosmovisor to track and understand where upgrade is needed
             if os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
-                shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"), 
+                shutil.copy(os.path.join(self.cheqd_data_dir, "upgrade-info.json"),
                     os.path.join(self.cheqd_backup_dir, "upgrade-info.json"))
                 logging.info(f"Successfully backed up {self.cheqd_data_dir}/upgrade-info.json")
             else:
@@ -680,7 +678,7 @@ class Installer():
                 self.remove_safe(self.cheqd_root_dir)
             else:
                 logging.debug("No user data or configs to remove. Skipping...")
-            
+
             # Setup logging related directories
             if not os.path.exists(self.cheqd_log_dir):
                 # Create ~/.cheqdnode/log directory
@@ -702,7 +700,7 @@ class Installer():
                 os.symlink(self.cheqd_log_dir, "/var/log/cheqd-node", target_is_directory=True)
             else:
                 logging.debug("Skipping linking because /var/log/cheqd-node already exists")
-            
+
             # Create a bash file in /etc/profile.d/ to set environment variables
             # This file will be sourced by all users for their LOGIN shells
             if not os.path.exists(DEFAULT_LOGIN_SHELL_ENV_FILE_PATH):
@@ -717,7 +715,7 @@ class Installer():
                 shutil.chown(DEFAULT_LOGIN_SHELL_ENV_FILE_PATH, "root", "root")
             else:
                 logging.debug(f"{DEFAULT_LOGIN_SHELL_ENV_FILE_PATH} already exists. Skipping creation...")
-            
+
             # Create a ~/.bash_profile file to execute ~/.bashrc
             # This file will be sourced by during the cheqd user's LOGIN shells
             if not os.path.exists(self.cheqd_user_bash_profile_path):
@@ -775,7 +773,7 @@ class Installer():
         # cheqd-noded binary is installed in Cosmovisor bin path under this scenario
         try:
             logging.info("Setting up Cosmovisor...")
-            
+
             # Download Cosmovisor binary and set environment variables
             if self.get_cosmovisor():
                 logging.info("Successfully downloaded Cosmovisor")
@@ -810,7 +808,7 @@ class Installer():
                 self.exec(f"sudo -u {DEFAULT_CHEQD_USER} bash -c 'DAEMON_NAME={DEFAULT_BINARY_NAME} DAEMON_HOME={self.cheqd_root_dir} cosmovisor init {self.standalone_node_binary_path}'")
             else:
                 logging.info("Cosmovisor directory already exists. Skipping initialization...")
-            
+
             # Remove cheqd-noded binary from /usr/bin if it's not a symlink
             if not os.path.islink(self.standalone_node_binary_path):
                 logging.warning(f"Removing {DEFAULT_BINARY_NAME} from {DEFAULT_INSTALL_PATH} because it is not a symlink")
@@ -844,7 +842,7 @@ class Installer():
                     os.path.join(self.cosmovisor_root_dir, "current/upgrade-info.json"), follow_symlinks=True)
             else:
                 logging.debug("Skipped copying upgrade-info.json file because it doesn't exist")
-            
+
             # Change owner of Cosmovisor directory to cheqd:cheqd
             logging.info(f"Changing ownership of {self.cosmovisor_root_dir} to {DEFAULT_CHEQD_USER} user")
             self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cosmovisor_root_dir}")
@@ -897,7 +895,7 @@ class Installer():
         # cheqd-noded binary is installed in /usr/bin under this scenario
         try:
             logging.info("Setting up standalone cheqd-noded binary...")
-            
+
             # Remove symlink for cheqd-noded if it exists
             if os.path.islink(self.standalone_node_binary_path):
                 logging.warn(f"Removing symlink {self.standalone_node_binary_path}")
@@ -909,7 +907,7 @@ class Installer():
             # shutil.move() will overwrite the file if it already exists
             logging.info(f"Moving cheqd-noded binary from {self.temporary_node_binary_path} to {self.standalone_node_binary_path}")
             shutil.move(self.temporary_node_binary_path, self.standalone_node_binary_path)
-            
+
             # Set ownership of cheqd-noded binary to root:root
             logging.info(f"Changing ownership of {self.standalone_node_binary_path} to root:root")
             shutil.chown(self.standalone_node_binary_path, "root", "root")
@@ -926,13 +924,13 @@ class Installer():
         except Exception as e:
             logging.exception(f"Failed to setup Cosmovisor. Reason: {e}")
             return False
-    
+
     def set_cosmovisor_env_vars(self):
         # Set environment variables for Cosmovisor
         try:
             self.set_environment_variable("DAEMON_NAME", DEFAULT_BINARY_NAME)
             self.set_environment_variable("DAEMON_HOME", self.cheqd_root_dir)
-            self.set_environment_variable("DAEMON_ALLOW_DOWNLOAD_BINARIES", 
+            self.set_environment_variable("DAEMON_ALLOW_DOWNLOAD_BINARIES",
                 self.interviewer.daemon_allow_download_binaries)
             self.set_environment_variable("DAEMON_RESTART_AFTER_UPGRADE",
                 self.interviewer.daemon_restart_after_upgrade)
@@ -941,7 +939,7 @@ class Installer():
         except Exception as e:
             logging.exception(f"Failed to set environment variables for Cosmovisor. Reason: {e}")
             raise
-    
+
     def set_cheqd_env_vars(self):
         # Set environment variables for cheqd-noded binary
         # Applicable for both standalone and Cosmovisor installations
@@ -986,14 +984,14 @@ class Installer():
                             updated = True
                         else:
                             file.write(line)
-                    
+
                     # Add new value (if it doesn't exist in the file already)
                     if not updated:
                         logging.debug(f"Adding {env_var_name}={env_var_value} to {DEFAULT_LOGIN_SHELL_ENV_FILE_PATH}")
                         file.write(f'export {env_var_name}={env_var_value}\n')
             else:
                 logging.debug(f"{DEFAULT_LOGIN_SHELL_ENV_FILE_PATH} doesn't exist. Skipped adding {env_var_name} to the file...")
-            
+
             # Set environment variable in ~/.bashrc
             if os.path.exists(self.cheqd_user_bashrc_path):
                 with open(self.cheqd_user_bashrc_path, "r") as file:
@@ -1011,14 +1009,14 @@ class Installer():
                             updated = True
                         else:
                             file.write(line)
-                    
+
                     # Add new value (if it doesn't exist in the file already)
                     if not updated:
                         logging.debug(f"Adding {env_var_name}={env_var_value} to {self.cheqd_user_bashrc_path}")
                         file.write(f'export {env_var_name}={env_var_value}\n')
             else:
                 logging.debug(f"{self.cheqd_user_bashrc_path} doesn't exist. Skipped adding {env_var_name} to the file...")
-                            
+
         except Exception as e:
             logging.exception(f"Failed to set environment variable {env_var_name}. Reason: {e}")
             raise
@@ -1046,12 +1044,12 @@ class Installer():
                     self.exec(f"sudo -u {DEFAULT_CHEQD_USER} bash -c 'cheqd-noded init {self.interviewer.moniker}'")
                 else:
                     logging.debug(f"Validator key already exists in {self.cheqd_config_dir}. Skipping cheqd-noded init...")
-                
+
                 # Check if genesis file exists
                 # If not, download it from the GitHub repo
                 if is_valid_url(genesis_url) and not os.path.exists(genesis_file_path):
                     logging.debug(f"Downloading genesis file for {self.interviewer.chain}")
-                    
+
                     with request.urlopen(genesis_url) as response, open(genesis_file_path, "w") as file:
                         file.write(response.read().decode("utf-8").strip())
                 else:
@@ -1060,10 +1058,10 @@ class Installer():
                 # Set seeds from the seeds file on GitHub
                 if is_valid_url(seeds_url):
                     logging.debug(f"Setting seeds from {seeds_url}")
-                    
+
                     with request.urlopen(seeds_url) as response:
                         seeds = response.read().decode("utf-8").strip()
-                    
+
                     seeds_search_text = 'seeds = ""'
                     seeds_replace_text = 'seeds = "{}"'.format(seeds)
                     search_and_replace(seeds_search_text, seeds_replace_text, config_toml_path)
@@ -1137,7 +1135,7 @@ class Installer():
                 search_and_replace(log_format_search_text, log_format_replace_text, config_toml_path)
             else:
                 logging.debug("Log format not set by user. Skipping...")
-            
+
             # Set ownership of configuration directory to cheqd:cheqd
             logging.info(f"Setting ownership of {self.cheqd_config_dir} to {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}")
             self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_config_dir}")
@@ -1163,7 +1161,7 @@ class Installer():
                 self.remove_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME, DEFAULT_STANDALONE_SERVICE_FILE_PATH)
             else:
                 logging.debug("Node-related systemd configurations don't need to be removed. Skipping...")
-            
+
             # Setup cheqd-cosmovisor.service if requested
             if self.interviewer.is_cosmovisor_needed:
                 # Write cheqd-cosmovisor.service file
@@ -1174,14 +1172,14 @@ class Installer():
                 # Enable cheqd-cosmovisor.service
                 self.enable_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME)
                 return True
-            
+
             # Otherwise, setup cheqd-noded.service for standalone install
             else:
                 # Fetch the template file from GitHub
                 if is_valid_url(STANDALONE_SERVICE_TEMPLATE):
                     with request.urlopen(STANDALONE_SERVICE_TEMPLATE) as response, open(DEFAULT_STANDALONE_SERVICE_FILE_PATH, "w") as file:
                         file.write(response.read().decode("utf-8").strip())
-                    
+
                     # Enable cheqd-noded.service
                     self.enable_systemd_service(DEFAULT_STANDALONE_SERVICE_NAME)
                     return True
@@ -1204,7 +1202,7 @@ class Installer():
                     self.remove_safe(DEFAULT_RSYSLOG_FILE)
                 else:
                     logging.debug("Rsyslog configuration doesn't need to be removed. Skipping...")
-                
+
                 # Determine the binary name for logging based on installation type
                 if self.interviewer.is_cosmovisor_needed:
                     binary_name = DEFAULT_COSMOVISOR_BINARY_NAME
@@ -1246,14 +1244,14 @@ class Installer():
                 else:
                     logging.exception("Failed to configure logrotate service")
                     return False
-                
+
                 # Restart logrotate.timer
                 if self.restart_systemd_service("logrotate.timer"):
                     logging.info("Successfully configured logrotate timer")
                 else:
                     logging.exception("Failed to configure logrotate timer")
                     return False
-            
+
             # Return True if both rsyslog and logrotate services are configured
             return True
         except Exception as e:
@@ -1272,7 +1270,7 @@ class Installer():
             else:
                 logging.error(f"No valid snapshot URL found in last {MAX_SNAPSHOT_DAYS} days!")
                 return False
-            
+
             # Install dependencies needed to show progress bar
             if self.install_dependencies():
                 logging.info("Dependencies required for snapshot restore installed successfully")
@@ -1344,7 +1342,7 @@ class Installer():
             # Also check if a match was found for the MD5 checksum to prevent downloading a corrupted file
             if (int(archive_size) < int(free_space)) and match:
                 logging.info(f"Downloading snapshot and extracting archive. This can take a *really* long time...")
-                
+
                 # Use wget to download since it can show a progress bar while downloading natively
                 # This is a blocking operation that will take a while
                 # "wget -c" will resume a download if it gets interrupted
@@ -1357,7 +1355,7 @@ class Installer():
                     # This is a blocking operation that will take a while
                     # Python's hashlib.md5() is not used because making it work with large files is a pain
                     local_checksum = subprocess.check_output(["md5sum", file_path]).split()[0].decode()
-                
+
                     # Print local checksum for debugging
                     logging.debug(f"Local checksum: {local_checksum}")
                 else:
@@ -1450,12 +1448,12 @@ class Installer():
             else:
                 logging.error(f"Snapshot archive file not found. Could not extract snapshot.")
                 return False
-            
+
             # Restore files from backup folder
             # Use shutil.copy() instead of shutil.copyfile() to preserve file metadata
             if os.path.exists(self.cheqd_backup_dir):
                 logging.info(f"Backup directory found. Restoring files from backup...")
-                
+
                 # Restore priv_validator_state.json
                 if os.path.exists(os.path.join(self.cheqd_backup_dir, "priv_validator_state.json")):
                     shutil.copy(os.path.join(self.cheqd_backup_dir, "priv_validator_state.json"),
@@ -1463,7 +1461,7 @@ class Installer():
                     logging.info(f"Restored priv_validator_state.json to {self.cheqd_data_dir}")
                 else:
                     logging.warning(f"priv_validator_state.json not found in {self.cheqd_backup_dir}! Please restore it manually to {self.cheqd_data_dir}.")
-                
+
                 # Restore upgrade-info.json
                 if os.path.exists(os.path.join(self.cheqd_backup_dir, "upgrade-info.json")):
                     shutil.copy(os.path.join(self.cheqd_backup_dir, "upgrade-info.json"),
@@ -1471,7 +1469,7 @@ class Installer():
                     logging.info(f"Restored upgrade-info.json to {self.cheqd_data_dir}")
                 else:
                     logging.warning(f"upgrade-info.json not found in {self.cheqd_backup_dir}! Please restore it manually to {self.cheqd_data_dir}.")
-                
+
                 # If Cosmovisor is needed, copy upgrade-info.json to ~/.cheqdnode/cosmovisor/current/ directory
                 # Otherwise, Cosmovisor will throw an error
                 if self.interviewer.is_cosmovisor_needed and os.path.exists(os.path.join(self.cheqd_data_dir, "upgrade-info.json")):
@@ -1516,7 +1514,7 @@ class Installer():
         # Check if a given systemd service is enabled
         try:
             logging.debug(f"Checking whether {service_name} service is enabled")
-            
+
             # Enabled services will return 0
             enabled = os.system(f"systemctl is-enabled --quiet {service_name}")
             if enabled == 0:
@@ -1528,7 +1526,7 @@ class Installer():
         except Exception as e:
             logging.exception(f"Failed to check whether {service_name} service is enabled. Reason: {e}")
             return False
-    
+
     def reload_systemd(self) -> bool:
         # Reload systemd config
         try:
@@ -1545,11 +1543,11 @@ class Installer():
                 return True
             else:
                 logging.error("Failed to reload systemd config and reset failed services")
-                return False    
+                return False
         except Exception as e:
             logging.exception(f"Error daemon reloading: Reason: {e}")
             return False
-    
+
     def disable_systemd_service(self, service_name) -> bool:
         # Disable a given systemd service
         try:
@@ -2070,7 +2068,7 @@ class Interviewer:
             else:
                 logging.error(f"Invalid network selected during installation. Please choose either 1 or 2.\n")
                 self.ask_for_chain()
-            
+
             # Set debug message
             logging.debug(f"Setting network to join as {self.chain}")
         except Exception as e:
@@ -2111,7 +2109,7 @@ class Interviewer:
     def ask_for_daemon_allow_download_binaries(self):
         try:
             answer = self.ask(
-                f"Do you want Cosmovisor to automatically download binaries for scheduled upgrades? (yes/no)", 
+                f"Do you want Cosmovisor to automatically download binaries for scheduled upgrades? (yes/no)",
                 default="yes")
             if answer.lower().startswith("y"):
                 self.daemon_allow_download_binaries = "true"
@@ -2157,10 +2155,10 @@ class Interviewer:
     def ask_for_external_address(self):
         try:
             logging.info(f"External address is the publicly accessible IP address or DNS name of your cheqd-node.\nThis is used to advertise your node's P2P address to other nodes in the network.\n- If you are running your node behind a NAT, you should set this to your public IP address or DNS name\n- If you are running your node on a public IP address, you can leave this blank to automatically fetch your IP address via DNS resolver lookup.\n- Automatic fetching sends a `dig` request to whoami.cloudflare.com\n")
-            
+
             answer = self.ask(
                 f"What is the externally-reachable IP address or DNS name for your cheqd-node? [default: Fetch automatically via DNS resolver lookup]: {os.linesep}")
-            
+
             # If user provided an answer, check if it's a valid IP address or DNS name
             if answer:
                 if self.check_ip_address(answer) or self.check_dns_name(answer):
@@ -2254,7 +2252,7 @@ class Interviewer:
                 self.ask_for_log_format()
         except Exception as e:
             logging.exception(f"Failed to set log format. Reason: {e}")
-    
+
     # If an existing installation is detected, ask user if they want to upgrade
     def ask_for_upgrade(self):
         try:
