@@ -19,7 +19,7 @@ import socket
 import subprocess
 import sys
 import tarfile
-import urllib.request as request
+from urllib import request as request
 
 
 ###############################################################
