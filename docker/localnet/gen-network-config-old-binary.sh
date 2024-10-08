@@ -196,7 +196,7 @@ do
 
   cheqd-noded keys add "operator-$i" --keyring-backend "test" --home "${NODE_HOME}"
   cheqd-noded keys list --keyring-backend "test" --home "${NODE_HOME}"
-  cheqd-noded add-genesis-account "operator-$i" 20000000000000000ncheq --keyring-backend "test" --home "${NODE_HOME}"
+  cheqd-noded genesis add-genesis-account "operator-$i" 20000000000000000ncheq --keyring-backend "test" --home "${NODE_HOME}"
 
   NODE_ID=$(cheqd-noded tendermint show-node-id --home "${NODE_HOME}")
   NODE_VAL_PUBKEY=$(cheqd-noded tendermint show-validator --home "${NODE_HOME}")
