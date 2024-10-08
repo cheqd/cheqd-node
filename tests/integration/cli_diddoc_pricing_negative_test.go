@@ -4,6 +4,7 @@ package integration
 
 import (
 	"crypto/ed25519"
+	"fmt"
 
 	"github.com/cheqd/cheqd-node/tests/integration/cli"
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
@@ -91,6 +92,7 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		By("submitting the create diddoc message")
 		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid.String()))
 		Expect(err).To(BeNil())
+		fmt.Println("response>>>>>>>>>>>>>>>>>>>>>>", res)
 		Expect(res.Code).To(BeEquivalentTo(0))
 
 		By("preparing the update diddoc message")
