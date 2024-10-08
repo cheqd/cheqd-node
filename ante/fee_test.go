@@ -486,7 +486,7 @@ var _ = Describe("Fee abstraction", func() {
 
 		It("should fail with empty fee", func() {
 			feeAmount := sdk.Coins{}
-			minGasPrice := sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin("ncheq", 100))...)
+			minGasPrice := sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin(didtypes.BaseMinimalDenom, 100))...)
 			suite.txBuilder.SetGasLimit(gasLimit)
 			suite.txBuilder.SetFeeAmount(feeAmount)
 			suite.ctx = suite.ctx.WithMinGasPrices(minGasPrice)
@@ -504,8 +504,8 @@ var _ = Describe("Fee abstraction", func() {
 		})
 
 		It("should fail with insufficient native fee", func() {
-			feeAmount := sdk.NewCoins(sdk.NewInt64Coin("ncheq", 100))
-			minGasPrice := sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin("ncheq", 1000))...)
+			feeAmount := sdk.NewCoins(sdk.NewInt64Coin(didtypes.BaseMinimalDenom, 100))
+			minGasPrice := sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin(didtypes.BaseMinimalDenom, 1000))...)
 			suite.txBuilder.SetGasLimit(gasLimit)
 			suite.txBuilder.SetFeeAmount(feeAmount)
 			suite.ctx = suite.ctx.WithMinGasPrices(minGasPrice)
@@ -523,8 +523,8 @@ var _ = Describe("Fee abstraction", func() {
 		})
 
 		It("should pass with sufficient native fee", func() {
-			feeAmount := sdk.NewCoins(sdk.NewInt64Coin("ncheq", 1000*int64(gasLimit)))
-			minGasPrice := sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin("ncheq", 1000))...)
+			feeAmount := sdk.NewCoins(sdk.NewInt64Coin(didtypes.BaseMinimalDenom, 1000*int64(gasLimit)))
+			minGasPrice := sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin(didtypes.BaseMinimalDenom, 1000))...)
 			suite.txBuilder.SetGasLimit(gasLimit)
 			suite.txBuilder.SetFeeAmount(feeAmount)
 			suite.ctx = suite.ctx.WithMinGasPrices(minGasPrice)
@@ -542,7 +542,7 @@ var _ = Describe("Fee abstraction", func() {
 
 		It("should fail with unknown ibc fee denom", func() {
 			feeAmount := sdk.NewCoins(sdk.NewInt64Coin("ibcfee", 1000*int64(gasLimit)))
-			minGasPrice := sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin("ncheq", 1000))...)
+			minGasPrice := sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin(didtypes.BaseMinimalDenom, 1000))...)
 			suite.txBuilder.SetGasLimit(gasLimit)
 			suite.txBuilder.SetFeeAmount(feeAmount)
 			suite.ctx = suite.ctx.WithMinGasPrices(minGasPrice)
@@ -596,8 +596,8 @@ var _ = Describe("DeductFeeDecorator", func() {
 	// Setup the common test data
 	BeforeEach(func() {
 		gasLimit = 200000
-		minGasPrice = sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin("ncheq", 1000))...)
-		feeAmount = sdk.NewCoins(sdk.NewInt64Coin("ncheq", 1000*int64(gasLimit)))
+		minGasPrice = sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin(didtypes.BaseMinimalDenom, 1000))...)
+		feeAmount = sdk.NewCoins(sdk.NewInt64Coin(didtypes.BaseMinimalDenom, 1000*int64(gasLimit)))
 		ibcFeeAmount = sdk.NewCoins(sdk.NewInt64Coin("ibcfee", 1000*int64(gasLimit)))
 
 		mockHostZoneConfig = types.HostChainFeeAbsConfig{
@@ -624,7 +624,7 @@ var _ = Describe("DeductFeeDecorator", func() {
 		// minFee, _ := minGasPrice.TruncateDecimal()
 
 		params := suite.app.StakingKeeper.GetParams(suite.ctx)
-		params.BondDenom = "ncheq"
+		params.BondDenom = didtypes.BaseMinimalDenom
 		err = suite.app.StakingKeeper.SetParams(suite.ctx, params)
 		Expect(err).To(BeNil(), "Error setting the params")
 
@@ -1144,7 +1144,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 	s := new(AnteTestSuite)
 	gasLimit := 200000
 	ibcFeeAmount := sdk.NewCoins(sdk.NewInt64Coin("ibcfee", 1000*int64(gasLimit)))
-	feeAmount := sdk.NewCoins(sdk.NewInt64Coin("ncheq", 1000*int64(gasLimit)))
+	feeAmount := sdk.NewCoins(sdk.NewInt64Coin(didtypes.BaseMinimalDenom, 1000*int64(gasLimit)))
 
 	mockHostZoneConfig := types.HostChainFeeAbsConfig{
 		IbcDenom:                "ibcfee",
@@ -1186,7 +1186,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		s.app.AccountKeeper.SetModuleAccount(s.ctx, feeabsModAcc)
 
 		params := s.app.StakingKeeper.GetParams(s.ctx)
-		params.BondDenom = "ncheq"
+		params.BondDenom = didtypes.BaseMinimalDenom
 		err = s.app.StakingKeeper.SetParams(s.ctx, params)
 		Expect(err).To(BeNil(), "Error setting the params")
 	})
@@ -1221,7 +1221,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		err := s.app.FeeabsKeeper.SetHostZoneConfig(s.ctx, mockHostZoneConfig)
 		Expect(err).ToNot(HaveOccurred())
 		s.app.FeeabsKeeper.SetTwapRate(s.ctx, "ibcfee", sdk.NewDec(1))
-		minGasPrice := sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin("ncheq", 100))...)
+		minGasPrice := sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin(didtypes.BaseMinimalDenom, 100))...)
 		s.ctx = s.ctx.WithMinGasPrices(minGasPrice)
 
 		anteHandler := sdk.ChainAnteDecorators(decorators...)
@@ -1281,7 +1281,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(ibcDenom, amount)))
 		Expect(err).To(BeNil())
 
-		err = testutil.FundModuleAccount(s.app.BankKeeper, s.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin("ncheq", amount)))
+		err = testutil.FundModuleAccount(s.app.BankKeeper, s.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
 		Expect(err).To(BeNil())
 
 		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
@@ -1350,7 +1350,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(ibcDenom, amount)))
 		Expect(err).To(BeNil())
 
-		err = testutil.FundModuleAccount(s.app.BankKeeper, s.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin("ncheq", amount)))
+		err = testutil.FundModuleAccount(s.app.BankKeeper, s.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
 		Expect(err).To(BeNil())
 
 		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)

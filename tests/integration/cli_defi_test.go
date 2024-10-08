@@ -7,6 +7,7 @@ import (
 	helpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 
 	"github.com/cheqd/cheqd-node/tests/integration/testdata"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -15,10 +16,10 @@ import (
 var _ = Describe("Upgrade - Burn coins from relevant message signer", func() {
 	It("should burn the coins from the given address", func() {
 		// define the coins to burn, in which case 1,000,000 ncheq or 0.01 cheq
-		burnCoins := sdk.NewCoin("ncheq", sdk.NewInt(1_000_000))
+		burnCoins := sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(1_000_000))
 
 		// get the balance of the account before burning the coins
-		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_1_ADDR, "ncheq")
+		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_1_ADDR, didtypes.BaseMinimalDenom)
 
 		// assert no error
 		Expect(err).To(BeNil())
@@ -36,7 +37,7 @@ var _ = Describe("Upgrade - Burn coins from relevant message signer", func() {
 		Expect(res.Code).To(BeEquivalentTo(0))
 
 		// get the balance of the account after burning the coins
-		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_1_ADDR, "ncheq")
+		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_1_ADDR, didtypes.BaseMinimalDenom)
 
 		// assert no error
 		Expect(err).To(BeNil())
@@ -45,7 +46,7 @@ var _ = Describe("Upgrade - Burn coins from relevant message signer", func() {
 		diff := balanceBefore.Sub(balanceAfter)
 
 		// assert the difference is equal to the coins burnt
-		total := burnCoins.Add(sdk.NewCoin("ncheq", sdk.NewInt(500_000_000)))
+		total := burnCoins.Add(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(500_000_000)))
 
 		// assert the difference is equal to the coins burnt
 		Expect(diff).To(Equal(total))
@@ -53,10 +54,10 @@ var _ = Describe("Upgrade - Burn coins from relevant message signer", func() {
 
 	It("shouldn't burn as their are insufficient funds in the sender", func() {
 		// define the coins to burn, in which case 1,000,000 ncheq or 0.01 cheq
-		coins := sdk.NewCoin("ncheq", sdk.NewInt(1_000_000))
+		coins := sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(1_000_000))
 
 		// get the balance of the account before burning the coins
-		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_3_ADDR, "ncheq")
+		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_3_ADDR, didtypes.BaseMinimalDenom)
 
 		// assert no error
 		Expect(err).To(BeNil())
@@ -74,7 +75,7 @@ var _ = Describe("Upgrade - Burn coins from relevant message signer", func() {
 		Expect(res.Code).To(BeEquivalentTo(0))
 
 		// get the balance of the account after burning the coins
-		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_3_ADDR, "ncheq")
+		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_3_ADDR, didtypes.BaseMinimalDenom)
 
 		// assert no error
 		Expect(err).To(BeNil())

@@ -151,7 +151,7 @@ func Setup() TestSetup {
 	queryServer := keeper.NewQueryServer(*resourceKeeper, *didKeeper)
 
 	params := stakingtypes.DefaultParams()
-	params.BondDenom = "ncheq"
+	params.BondDenom = didtypes.BaseMinimalDenom
 	err := stakingKeeper.SetParams(ctx, params)
 	if err != nil {
 		panic("error while setting up the params")
