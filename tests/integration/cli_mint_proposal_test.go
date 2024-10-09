@@ -3,6 +3,7 @@
 package integration
 
 import (
+	"fmt"
 	"path/filepath"
 
 	cli "github.com/cheqd/cheqd-node/tests/integration/cli"
@@ -28,6 +29,12 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		res, err := cli.SubmitProposalTx(cli.Operator0, "proposal.json", cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
+	})
+	It("keys list", func() {
+		By("keys list in validator 0")
+		keys, err := cli.QueryKeysList()
+		Expect(err).To(BeNil())
+		fmt.Println("keys arE>>>>>>>>>>>>>>>>>", keys)
 	})
 
 	It("should wait for the proposal submission to be included in a block", func() {

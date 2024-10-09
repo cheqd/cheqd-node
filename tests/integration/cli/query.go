@@ -189,3 +189,15 @@ func QueryFeemarketParams() (feemarkettypes.Params, error) {
 
 	return resp, nil
 }
+
+func QueryKeysList() (string, error) {
+	res, err := Query1("", "keys", "list", "--keyring-backend", "test")
+	return res, err
+}
+
+func Query1(module, query string, queryArgs ...string) (string, error) {
+	args := []string{"", module, query}
+	args = append(args, queryArgs...)
+	fmt.Println("args>>>>>>>>>>>", args)
+	return Exec(args...)
+}
