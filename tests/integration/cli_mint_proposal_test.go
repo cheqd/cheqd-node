@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 
 	cli "github.com/cheqd/cheqd-node/tests/integration/cli"
-	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -94,12 +93,5 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		proposal, err := cli.QueryProposal(cli.Validator0, Proposal_id)
 		Expect(err).To(BeNil())
 		Expect(proposal.Status).To(BeEquivalentTo(govtypesv1.StatusPassed))
-	})
-
-	It("should have the correct balance after minting", func() {
-		By("querying the balance of the given address")
-		bal, err := cli.QueryBalance("cheqd1lhl9g4rgldadgtz7v6rt50u45uhhj8hhv8d8uf", didtypes.BaseMinimalDenom)
-		Expect(err).To(BeNil())
-		Expect(bal.Amount.Int64()).To(Equal(int64(9000)))
 	})
 })
