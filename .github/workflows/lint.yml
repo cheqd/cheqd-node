@@ -10,7 +10,7 @@ jobs:
 
   sh-euox-pipefail-check:
     name: "Shell pipefail check"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -19,7 +19,7 @@ jobs:
 
   md-link-check:
     name: "Broken Markdown links"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -34,7 +34,7 @@ jobs:
     # We can't use VALIDATE_GO from super linter because of this issue:
     # https://github.com/github/super-linter/issues/143
     name: "Golang"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -45,19 +45,19 @@ jobs:
           cache: false # temporarily off, as golangci-lint doesn't align 100% with cached setup-go@v4, see: https://github.com/golangci/golangci-lint-action/issues/807
 
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v6
         with:
           version: v1.56.2
           args: --config .github/linters/.golangci.yaml
 
   proto-lint:
     name: "Protobuf"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       # Install the `buf` CLI
-      - uses: bufbuild/buf-setup-action@v1.30.1
+      - uses: bufbuild/buf-setup-action@v1.44.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -75,7 +75,7 @@ jobs:
 
   super-lint:
     name: "Super Linter"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
@@ -83,7 +83,7 @@ jobs:
         fetch-depth: 0 # Required to fetch version
 
     - name: Run Super Linter
-      uses: github/super-linter/slim@v5
+      uses: github/super-linter/slim@v7
       env:
         IGNORE_GITIGNORED_FILES: true
         DEFAULT_BRANCH: main
