@@ -10,7 +10,7 @@ jobs:
 
   sh-euox-pipefail-check:
     name: "Shell pipefail check"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -19,7 +19,7 @@ jobs:
 
   md-link-check:
     name: "Broken Markdown links"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v4
@@ -34,7 +34,7 @@ jobs:
     # We can't use VALIDATE_GO from super linter because of this issue:
     # https://github.com/github/super-linter/issues/143
     name: "Golang"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v4
@@ -52,7 +52,7 @@ jobs:
 
   proto-lint:
     name: "Protobuf"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -75,7 +75,7 @@ jobs:
 
   super-lint:
     name: "Super Linter"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
     - uses: actions/checkout@v4
