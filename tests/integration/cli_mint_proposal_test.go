@@ -28,6 +28,7 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		By("sending a SubmitProposal transaction from `validator0` container")
 		res, err := cli.SubmitProposalTx(cli.Operator0, "proposal.json", cli.CliGasParams)
 		Expect(err).To(BeNil())
+		fmt.Println("response >>>>>>>>>>>>>>>>>>>>", res)
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 	It("keys list", func() {
