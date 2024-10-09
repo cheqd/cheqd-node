@@ -29,6 +29,10 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		res, err := cli.SubmitProposalTx(cli.Operator0, "proposal.json", cli.CliGasParams)
 		Expect(err).To(BeNil())
 		fmt.Println("response >>>>>>>>>>>>>>>>>>>>", res)
+		res, err = cli.QueryTxn(res.TxHash)
+		fmt.Println("response >>>>>>>>>>>>>>>>>>>>", res)
+		Expect(err).To(BeNil())
+
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 	It("keys list", func() {
