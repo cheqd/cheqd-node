@@ -1,3 +1,5 @@
+//go:build upgrade_integration
+
 package integration
 
 import (
