@@ -19,20 +19,34 @@ docker compose --env-file mainnet-latest.env up --detach --no-build
 # TODO: Get rid of this sleep.
 sleep 5
 
-sudo docker compose --env-file mainnet-latest.env cp network-config/validator-0/keyring-test validator-0:/home/keyring-test
-sudo docker compose --env-file mainnet-latest.env cp network-config/validator-1/keyring-test validator-1:/home/keyring-test
-sudo docker compose --env-file mainnet-latest.env cp network-config/validator-2/keyring-test validator-2:/home/keyring-test
-sudo docker compose --env-file mainnet-latest.env cp network-config/validator-3/keyring-test validator-3:/home/keyring-test
+ sudo docker compose --env-file mainnet-latest.env cp network-config/validator-0/keyring-test validator-0:/home/keyring-test
+ sudo docker compose --env-file mainnet-latest.env cp network-config/validator-1/keyring-test validator-1:/home/keyring-test
+ sudo docker compose --env-file mainnet-latest.env cp network-config/validator-2/keyring-test validator-2:/home/keyring-test
+ sudo docker compose --env-file mainnet-latest.env cp network-config/validator-3/keyring-test validator-3:/home/keyring-test
+
+
+# copy config
+ sudo docker compose --env-file mainnet-latest.env cp network-config/validator-0/config validator-0:/home/config
+ sudo docker compose --env-file mainnet-latest.env cp network-config/validator-1/config validator-1:/home/config
+ sudo docker compose --env-file mainnet-latest.env cp network-config/validator-2/config validator-2:/home/config
+ sudo docker compose --env-file mainnet-latest.env cp network-config/validator-3/config validator-3:/home/config
 
 # # Restore permissions
-sudo docker compose --env-file mainnet-latest.env exec --user root validator-0 chown -R cheqd:cheqd /home
-sudo docker compose --env-file mainnet-latest.env exec --user root validator-1 chown -R cheqd:cheqd /home
-sudo docker compose --env-file mainnet-latest.env exec --user root validator-2 chown -R cheqd:cheqd /home
-sudo docker compose --env-file mainnet-latest.env exec --user root validator-3 chown -R cheqd:cheqd /home
+ sudo docker compose --env-file mainnet-latest.env exec --user root validator-0 chown -R cheqd:cheqd /home
+ sudo docker compose --env-file mainnet-latest.env exec --user root validator-1 chown -R cheqd:cheqd /home
+ sudo docker compose --env-file mainnet-latest.env exec --user root validator-2 chown -R cheqd:cheqd /home
+ sudo docker compose --env-file mainnet-latest.env exec --user root validator-3 chown -R cheqd:cheqd /home
 
-sudo docker compose --env-file mainnet-latest.env exec validator-0 bash -c 'cp -r "/home/keyring-test" "$HOME/.cheqdnode/"'
-sudo docker compose --env-file mainnet-latest.env exec validator-1 bash -c 'cp -r "/home/keyring-test" "$HOME/.cheqdnode/"'
-sudo docker compose --env-file mainnet-latest.env exec validator-2 bash -c 'cp -r "/home/keyring-test" "$HOME/.cheqdnode/"'
-sudo docker compose --env-file mainnet-latest.env exec validator-3 bash -c 'cp -r "/home/keyring-test" "$HOME/.cheqdnode/"'
+ sudo docker compose --env-file mainnet-latest.env exec validator-0 bash -c 'cp -r "/home/keyring-test" "$HOME/.cheqdnode/"'
+ sudo docker compose --env-file mainnet-latest.env exec validator-1 bash -c 'cp -r "/home/keyring-test" "$HOME/.cheqdnode/"'
+ sudo docker compose --env-file mainnet-latest.env exec validator-2 bash -c 'cp -r "/home/keyring-test" "$HOME/.cheqdnode/"'
+ sudo docker compose --env-file mainnet-latest.env exec validator-3 bash -c 'cp -r "/home/keyring-test" "$HOME/.cheqdnode/"'
+
+
+ sudo docker compose --env-file mainnet-latest.env exec validator-0 bash -c 'cp -r "/home/config" "$HOME/.cheqdnode/config"'
+ sudo docker compose --env-file mainnet-latest.env exec validator-1 bash -c 'cp -r "/home/config" "$HOME/.cheqdnode/config"'
+ sudo docker compose --env-file mainnet-latest.env exec validator-2 bash -c 'cp -r "/home/config" "$HOME/.cheqdnode/config"'
+ sudo docker compose --env-file mainnet-latest.env exec validator-3 bash -c 'cp -r "/home/config" "$HOME/.cheqdnode/config"'
+
 
 popd
