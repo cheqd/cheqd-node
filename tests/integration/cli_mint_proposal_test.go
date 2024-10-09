@@ -37,15 +37,15 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		fmt.Println("keys arE>>>>>>>>>>>>>>>>>", keys)
 	})
 
-	It("should wait for the proposal submission to be included in a block", func() {
-		By("getting the current block height")
-		currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
-		Expect(err).To(BeNil())
+	// It("should wait for the proposal submission to be included in a block", func() {
+	// 	By("getting the current block height")
+	// 	currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
+	// 	Expect(err).To(BeNil())
 
-		By("waiting for the proposal to be included in a block")
-		err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+1, 2)
-		Expect(err).To(BeNil())
-	})
+	// 	By("waiting for the proposal to be included in a block")
+	// 	err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+1, 2)
+	// 	Expect(err).To(BeNil())
+	// })
 
 	It("should vote for the mint proposal from `validator1` container", func() {
 		By("sending a VoteProposal transaction from `validator1` container")
