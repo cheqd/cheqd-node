@@ -271,17 +271,6 @@ jobs:
         working-directory: ./docker/localnet
         run: docker compose --env-file build-latest.env logs --tail --follow
 
-      # - name: Submit governance fee parameter change proposals
-      #   working-directory: ./tests/upgrade/integration/v3
-      #   run: |
-      #     ginkgo -r --race --tags upgrade_integration --focus-file param_change_proposal_test.go --keep-going --trace --junit-report ../../../../report-pricing-proposal.xml
-
-      - name: Upload pricing proposal tests result
-        uses: actions/upload-artifact@v4
-        with:
-          name: report-pricing-proposal.xml
-          path: report-pricing-proposal.xml
-
       - name: Run pricing integration tests after successful param change proposal
         working-directory: ./tests/integration
         run: |
@@ -334,15 +323,15 @@ jobs:
         with:
           name: report-upgraded-integration.xml
 
-      - name: Download pricing proposal test Report
-        uses: actions/download-artifact@v4
-        with:
-          name: report-pricing-proposal.xml
+      # - name: Download pricing proposal test Report
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: report-pricing-proposal.xml
 
-      - name: Download pricing change test Report
-        uses: actions/download-artifact@v4
-        with:
-          name: report-pricing-change.xml
+      # - name: Download pricing change test Report
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: report-pricing-change.xml
 
       - name: Combine test results
         run: |
