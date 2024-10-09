@@ -15,6 +15,7 @@ import (
 )
 
 var _ = Describe("Integration - Mint coins to given address", func() {
+	var Proposal_id string
 	It("should wait for node catching up", func() {
 		By("pinging the node status until catching up is flagged as false ")
 		err := cli.WaitForCaughtUp(cli.Validator0, cli.CliBinaryName, cli.VotingPeriod*6)
@@ -28,9 +29,13 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		By("sending a SubmitProposal transaction from `validator0` container")
 		res, err := cli.SubmitProposalTx(cli.Operator0, "proposal.json", cli.CliGasParams)
 		Expect(err).To(BeNil())
-		fmt.Println("response >>>>>>>>>>>>>>>>>>>>", res)
 		res, err = cli.QueryTxn(res.TxHash)
-		fmt.Println("response >>>>>>>>>>>>>>>>>>>>", res)
+		Expect(err).To(BeNil())
+
+		proposal_id, err := cli.GetProposalID(res.RawLog)
+
+		fmt.Println("The proposal id>>>>>>>>>>>>>>>>>>>>>>>>>>>.", proposal_id)
+		Proposal_id = proposal_id
 		Expect(err).To(BeNil())
 
 		Expect(res.Code).To(BeEquivalentTo(0))
@@ -54,21 +59,22 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 
 	It("should vote for the mint proposal from `validator1` container", func() {
 		By("sending a VoteProposal transaction from `validator1` container")
-		res, err := cli.VoteProposalTx(cli.Operator1, "1", "yes", cli.CliGasParams)
+		res, err := cli.VoteProposalTx(cli.Operator1, Proposal_id, "yes", cli.CliGasParams)
 		Expect(err).To(BeNil())
+		fmt.Println("proposal_id>>>>>>>>>>Here>>>>>", Proposal_id)
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 
 	It("should vote for the mint proposal from `validator2` container", func() {
 		By("sending a VoteProposal transaction from `validator2` container")
-		res, err := cli.VoteProposalTx(cli.Operator2, "1", "yes", cli.CliGasParams)
+		res, err := cli.VoteProposalTx(cli.Operator2, Proposal_id, "yes", cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 
 	It("should vote for the mint proposal from `validator0` container", func() {
 		By("sending a VoteProposal transaction from `validator0` container")
-		res, err := cli.VoteProposalTx(cli.Operator0, "1", "yes", cli.CliGasParams)
+		res, err := cli.VoteProposalTx(cli.Operator0, Proposal_id, "yes", cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
@@ -85,7 +91,7 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 
 	It("should check the proposal status to ensure it has passed", func() {
 		By("sending a QueryProposal query from `validator0` container")
-		proposal, err := cli.QueryProposal(cli.Validator0, "1")
+		proposal, err := cli.QueryProposal(cli.Validator0, Proposal_id)
 		Expect(err).To(BeNil())
 		Expect(proposal.Status).To(BeEquivalentTo(govtypesv1.StatusPassed))
 	})

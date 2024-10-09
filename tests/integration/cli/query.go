@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
@@ -200,4 +201,29 @@ func Query1(module, query string, queryArgs ...string) (string, error) {
 	args = append(args, queryArgs...)
 	fmt.Println("args>>>>>>>>>>>", args)
 	return Exec(args...)
+}
+
+func GetProposalID(rawLog string) (string, error) {
+	var logs []sdk.ABCIMessageLog
+	err := json.Unmarshal([]byte(rawLog), &logs)
+	if err != nil {
+		return "", err
+	}
+
+	// Iterate over logs and their events
+	for _, log := range logs {
+		for _, event := range log.Events {
+			// Look for the "submit_proposal" event type
+			if event.Type == "submit_proposal" {
+				for _, attr := range event.Attributes {
+					// Look for the "proposal_id" attribute
+					if attr.Key == "proposal_id" {
+						return attr.Value, nil
+					}
+				}
+			}
+		}
+	}
+
+	return "", fmt.Errorf("proposal_id not found")
 }
