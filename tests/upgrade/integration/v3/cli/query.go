@@ -3,11 +3,13 @@ package cli
 import (
 	"fmt"
 
+	"github.com/cheqd/cheqd-node/tests/integration/helpers"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 )
 
 func Query(container string, binary string, module, query string, queryArgs ...string) (string, error) {
@@ -124,5 +126,20 @@ func QueryProposal(container, id string) (govtypesv1.Proposal, error) {
 	if err != nil {
 		return govtypesv1.Proposal{}, err
 	}
+	return resp, nil
+}
+
+func QueryFeemarketParams(container string) (feemarkettypes.Params, error) {
+	res, err := Query(container, CliBinaryName, "feemarket", "params")
+	if err != nil {
+		return feemarkettypes.Params{}, err
+	}
+
+	var resp feemarkettypes.Params
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return feemarkettypes.Params{}, err
+	}
+
 	return resp, nil
 }
