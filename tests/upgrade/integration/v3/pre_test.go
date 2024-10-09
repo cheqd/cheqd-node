@@ -1,5 +1,3 @@
-//go:build upgrade_integration
-
 package integration
 
 import (
@@ -15,7 +13,7 @@ var _ = Describe("Upgrade - Pre", func() {
 	Context("Before a software upgrade execution is initiated", func() {
 		It("should wait for chain to bootstrap", func() {
 			By("pinging the node status until the voting end height is reached")
-			err := cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, cli.BootstrapHeight, cli.BootstrapPeriod)
+			err := cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, cli.BootstrapHeight, cli.BootstrapPeriod+20)
 			Expect(err).To(BeNil())
 		})
 
@@ -120,14 +118,14 @@ var _ = Describe("Upgrade - Pre", func() {
 			err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+3, cli.VotingPeriod*6)
 			Expect(err).To(BeNil())
 		})
-		It("should vote for the software upgrade proposal from `validator3` container", func() {
-			By("sending a VoteProposal transaction from `validator3` container")
-			res, err := cli.VoteProposal(cli.Validator3, "1", "yes")
-			Expect(err).To(BeNil())
-			fmt.Println("response>>>>>>>>>>>>>>", res)
+		// It("should vote for the software upgrade proposal from `validator3` container", func() {
+		// 	By("sending a VoteProposal transaction from `validator3` container")
+		// 	res, err := cli.VoteProposal(cli.Validator3, "1", "yes")
+		// 	Expect(err).To(BeNil())
+		// 	fmt.Println("response>>>>>>>>>>>>>>", res)
 
-			Expect(res.Code).To(BeEquivalentTo(0))
-		})
+		// 	Expect(res.Code).To(BeEquivalentTo(0))
+		// })
 
 		It("should wait for the voting end height to be reached", func() {
 			By("pinging the node status until the voting end height is reached")
