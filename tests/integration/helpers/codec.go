@@ -8,7 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/std"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
-	govtypesv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
+	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 )
 
 var (
@@ -23,7 +23,7 @@ func init() {
 	resourcetypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	didtypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	govtypesv1.RegisterInterfaces(encodingConfig.InterfaceRegistry)
-	govtypesv1beta1.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+	paramtypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	Codec = encodingConfig.Codec
 	Registry = encodingConfig.InterfaceRegistry
 }
