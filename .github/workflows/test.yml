@@ -12,7 +12,6 @@ permissions:
   checks: write
 
 jobs:
-
   installer-cosmovisor:
     name: "Installer - Cosmovisor mode"
     runs-on: ubuntu-20.04
@@ -271,6 +270,17 @@ jobs:
         working-directory: ./docker/localnet
         run: docker compose --env-file build-latest.env logs --tail --follow
 
+      - name: Submit governance fee parameter change proposals
+        working-directory: ./tests/upgrade/integration/v2
+        run: |
+          ginkgo -r --race --tags upgrade_integration --focus-file param_change_proposal_test.go --keep-going --trace --junit-report ../../../../report-pricing-proposal.xml
+
+      - name: Upload pricing proposal tests result
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-pricing-proposal.xml
+          path: report-pricing-proposal.xml
+
       - name: Run pricing integration tests after successful param change proposal
         working-directory: ./tests/integration
         run: |
@@ -327,12 +337,10 @@ jobs:
       #   uses: actions/download-artifact@v4
       #   with:
       #     name: report-pricing-proposal.xml
-
       # - name: Download pricing change test Report
       #   uses: actions/download-artifact@v4
       #   with:
       #     name: report-pricing-change.xml
-
       - name: Combine test results
         run: |
           # python ./.github/scripts/xml_combine.py report-unit.xml report-integration.xml
@@ -341,8 +349,8 @@ jobs:
 
       - uses: mikepenz/action-junit-report@v4
         with:
-          report_paths: 'report.xml'
+          report_paths: "report.xml"
           check_name: ""
-          suite_regex: '*'
+          suite_regex: "*"
           include_passed: true
           detailed_summary: true
