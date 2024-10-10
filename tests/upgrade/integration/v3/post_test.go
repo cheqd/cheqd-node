@@ -3,7 +3,6 @@
 package integration
 
 import (
-	"fmt"
 	"path/filepath"
 
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/v3/cli"
@@ -31,9 +30,6 @@ var _ = Describe("Upgrade - Post", func() {
 			By("passing the proposal file to the container")
 			_, err := cli.LocalnetExecCopyAbsoluteWithPermissions(filepath.Join("proposal.json"), cli.DockerHome, cli.Validator0)
 			Expect(err).To(BeNil())
-
-			params, err := cli.QueryFeemarketParams(cli.Validator0)
-			fmt.Println("Params of feeMarket after upgrade are>>>>>>>>>>>>", params)
 			By("sending a SubmitParamChangeProposal transaction from `validator0` container")
 			res, err := cli.SubmitProposal(cli.Validator0, "proposal.json")
 			Expect(err).To(BeNil())
