@@ -159,6 +159,7 @@ func QueryProposal(container, id string) (govtypesv1.Proposal, error) {
 	}
 	return resp, nil
 }
+
 func QueryFeemarketParams() (feemarkettypes.Params, error) {
 	res, err := Query("feemarket", "params")
 	if err != nil {
@@ -173,6 +174,7 @@ func QueryFeemarketParams() (feemarkettypes.Params, error) {
 
 	return resp, nil
 }
+
 func GetProposalID(rawLog string) (string, error) {
 	var logs []sdk.ABCIMessageLog
 	err := json.Unmarshal([]byte(rawLog), &logs)
