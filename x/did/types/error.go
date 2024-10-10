@@ -20,4 +20,7 @@ var (
 	ErrDIDDocDeactivated          = errorsmod.Register(ModuleName, 1207, "DID Doc already deactivated")
 	ErrUnpackStateValue           = errorsmod.Register(ModuleName, 1300, "invalid did state value")
 	ErrInternal                   = errorsmod.Register(ModuleName, 1500, "internal error")
+	ErrUnauthorized               = errorsmod.Register(ModuleName, 1, "unauthorized account")
+	ErrBurnFromModuleAccount      = errorsmod.Register(ModuleName, 2, "burning from Module Account is not allowed")
+	ErrInvalidDenom               = errorsmod.Register(ModuleName, 3, "Invalid Denom")
 )

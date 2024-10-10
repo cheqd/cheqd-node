@@ -126,11 +126,20 @@ import (
 	ibctm "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint"
 	ibctmmigrations "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint/migrations"
 	"github.com/gorilla/mux"
+	feeabsmodule "github.com/osmosis-labs/fee-abstraction/v7/x/feeabs"
+	feeabskeeper "github.com/osmosis-labs/fee-abstraction/v7/x/feeabs/keeper"
+	feeabstypes "github.com/osmosis-labs/fee-abstraction/v7/x/feeabs/types"
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
 
+	feemarketmodule "github.com/skip-mev/feemarket/x/feemarket"
+	feemarketkeeper "github.com/skip-mev/feemarket/x/feemarket/keeper"
+	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
+
 	// unnamed import of statik for swagger UI support
+	cheqdante "github.com/cheqd/cheqd-node/ante"
 	_ "github.com/cheqd/cheqd-node/app/client/docs/statik"
+	upgradeV3 "github.com/cheqd/cheqd-node/app/upgrades/v3"
 )
 
 var (
@@ -154,6 +163,9 @@ var (
 			upgradeclient.LegacyCancelProposalHandler,
 			ibcclientclient.UpdateClientProposalHandler,
 			ibcclientclient.UpgradeProposalHandler,
+			feeabsmodule.UpdateAddHostZoneClientProposalHandler,
+			feeabsmodule.UpdateDeleteHostZoneClientProposalHandler,
+			feeabsmodule.UpdateSetHostZoneClientProposalHandler,
 		}),
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
@@ -172,19 +184,24 @@ var (
 		resource.AppModuleBasic{},
 		ibcfee.AppModuleBasic{},
 		consensus.AppModuleBasic{},
+		feeabsmodule.AppModuleBasic{},
+		feemarketmodule.AppModuleBasic{},
 	)
 
 	// module account permissions
 	maccPerms = map[string][]string{
-		authtypes.FeeCollectorName:     nil,
-		distrtypes.ModuleName:          nil,
-		icatypes.ModuleName:            nil,
-		minttypes.ModuleName:           {authtypes.Minter},
-		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
-		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
-		govtypes.ModuleName:            {authtypes.Burner},
-		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
-		didtypes.ModuleName:            {authtypes.Burner},
+		authtypes.FeeCollectorName:      nil,
+		distrtypes.ModuleName:           nil,
+		icatypes.ModuleName:             nil,
+		minttypes.ModuleName:            {authtypes.Minter},
+		stakingtypes.BondedPoolName:     {authtypes.Burner, authtypes.Staking},
+		stakingtypes.NotBondedPoolName:  {authtypes.Burner, authtypes.Staking},
+		govtypes.ModuleName:             {authtypes.Burner},
+		ibctransfertypes.ModuleName:     {authtypes.Minter, authtypes.Burner},
+		didtypes.ModuleName:             {authtypes.Minter, authtypes.Burner},
+		feemarkettypes.ModuleName:       {authtypes.Burner},
+		feemarkettypes.FeeCollectorName: {authtypes.Burner},
+		feeabstypes.ModuleName:          nil,
 	}
 )
 
@@ -229,6 +246,7 @@ type App struct {
 	EvidenceKeeper        evidencekeeper.Keeper
 	TransferKeeper        ibctransferkeeper.Keeper
 	FeeGrantKeeper        feegrantkeeper.Keeper
+	FeeMarketKeeper       *feemarketkeeper.Keeper
 	AuthzKeeper           authzkeeper.Keeper
 	GroupKeeper           groupkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
@@ -240,6 +258,9 @@ type App struct {
 	ScopedICAControllerKeeper capabilitykeeper.ScopedKeeper
 	ScopedICAHostKeeper       capabilitykeeper.ScopedKeeper
 	ScopedResourceKeeper      capabilitykeeper.ScopedKeeper
+	ScopedICQKeeper           capabilitykeeper.ScopedKeeper
+	ScopedFeeAbsKeeper        capabilitykeeper.ScopedKeeper
+	FeeabsKeeper              feeabskeeper.Keeper
 
 	DidKeeper      didkeeper.Keeper
 	ResourceKeeper resourcekeeper.Keeper
@@ -310,6 +331,8 @@ func New(
 		ibcfeetypes.StoreKey,
 		didtypes.StoreKey,
 		resourcetypes.StoreKey,
+		feeabstypes.StoreKey,
+		feemarkettypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -340,6 +363,7 @@ func New(
 	scopedICAControllerKeeper := app.CapabilityKeeper.ScopeToModule(icacontrollertypes.SubModuleName)
 	scopedICAHostKeeper := app.CapabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
 	scopedResourceKeeper := app.CapabilityKeeper.ScopeToModule(resourcetypes.ModuleName)
+	scopedFeeabsKeeper := app.CapabilityKeeper.ScopeToModule(feeabstypes.ModuleName)
 
 	// Applications that wish to enforce statically created ScopedKeepers should call `Seal` after creating
 	// their scoped modules in `NewApp` with `ScopeToModule`
@@ -462,37 +486,7 @@ func New(
 		scopedIBCKeeper,
 	)
 
-	// register the proposal types
-	govRouter := govv1beta1.NewRouter()
-	govRouter.AddRoute(govtypes.RouterKey, govv1beta1.ProposalHandler).
-		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
-		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
-		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper))
-	govConfig := govtypes.DefaultConfig()
-	/*
-		Example of setting gov params:
-		govConfig.MaxMetadataLen = 10000
-	*/
-	govKeeper := govkeeper.NewKeeper(
-		appCodec,
-		keys[govtypes.StoreKey],
-		app.AccountKeeper,
-		app.BankKeeper,
-		app.StakingKeeper,
-		app.MsgServiceRouter(),
-		govConfig,
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
-	)
-
-	// Set legacy router for backwards compatibility with gov v1beta1
-	govKeeper.SetLegacyRouter(govRouter)
-
-	app.GovKeeper = *govKeeper.SetHooks(
-		govtypes.NewMultiGovHooks(
-		// register the governance hooks
-		),
-	)
-
+	app.FeeMarketKeeper = feemarketkeeper.NewKeeper(appCodec, keys[feemarkettypes.StoreKey], app.AccountKeeper, &cheqdante.DenomResolverImpl{}, authtypes.NewModuleAddress(govtypes.ModuleName).String())
 	// IBC Fee Module keeper
 	app.IBCFeeKeeper = ibcfeekeeper.NewKeeper(
 		appCodec,
@@ -545,6 +539,58 @@ func New(
 		scopedTransferKeeper,
 	)
 
+	app.FeeabsKeeper = feeabskeeper.NewKeeper(
+		appCodec,
+		keys[feeabstypes.StoreKey],
+		app.GetSubspace(feeabstypes.ModuleName),
+		app.StakingKeeper,
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.TransferKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		scopedFeeabsKeeper,
+	)
+
+	feeabsModule := feeabsmodule.NewAppModule(appCodec, app.FeeabsKeeper)
+	feeabsIBCModule := feeabsmodule.NewIBCModule(appCodec, app.FeeabsKeeper)
+	app.FeeMarketKeeper.SetDenomResolver(&cheqdante.DenomResolverImpl{
+		StakingKeeper: app.StakingKeeper,
+		FeeabsKeeper:  app.FeeabsKeeper,
+	})
+
+	// register the proposal types
+	govRouter := govv1beta1.NewRouter()
+	govRouter.AddRoute(govtypes.RouterKey, govv1beta1.ProposalHandler).
+		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
+		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
+		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper)).
+		AddRoute(feeabstypes.RouterKey, feeabsmodule.NewHostZoneProposal(app.FeeabsKeeper))
+	govConfig := govtypes.DefaultConfig()
+	/*
+		Example of setting gov params:
+		govConfig.MaxMetadataLen = 10000
+	*/
+	govKeeper := govkeeper.NewKeeper(
+		appCodec,
+		keys[govtypes.StoreKey],
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.StakingKeeper,
+		app.MsgServiceRouter(),
+		govConfig,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
+
+	// Set legacy router for backwards compatibility with gov v1beta1
+	govKeeper.SetLegacyRouter(govRouter)
+
+	app.GovKeeper = *govKeeper.SetHooks(
+		govtypes.NewMultiGovHooks(
+		// register the governance hooks
+		),
+	)
+
 	// create IBC module from bottom to top of stack
 	var transferStack porttypes.IBCModule
 	transferStack = transfer.NewIBCModule(app.TransferKeeper)
@@ -565,7 +611,8 @@ func New(
 	// Add host, controller & ica auth modules to IBC router
 	ibcRouter.
 		AddRoute(icacontrollertypes.SubModuleName, icaControllerStack).
-		AddRoute(icahosttypes.SubModuleName, icaHostStack)
+		AddRoute(icahosttypes.SubModuleName, icaHostStack).
+		AddRoute(feeabstypes.ModuleName, feeabsIBCModule)
 
 	// x/resource
 	app.ResourceKeeper = *resourcekeeper.NewKeeper(
@@ -603,6 +650,8 @@ func New(
 	app.DidKeeper = *didkeeper.NewKeeper(
 		appCodec, keys[didtypes.StoreKey],
 		app.GetSubspace(didtypes.ModuleName),
+		app.AccountKeeper, app.BankKeeper,
+		app.StakingKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
@@ -638,9 +687,11 @@ func New(
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 		ibcfee.NewAppModule(app.IBCFeeKeeper),
 		icaModule,
+		feemarketmodule.NewAppModule(appCodec, *app.FeeMarketKeeper),
 		// cheqd modules
 		did.NewAppModule(appCodec, app.DidKeeper),
 		resource.NewAppModule(appCodec, app.ResourceKeeper, app.DidKeeper),
+		feeabsModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -668,11 +719,13 @@ func New(
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
+		feeabstypes.ModuleName,
 		icatypes.ModuleName,
 		ibcfeetypes.ModuleName,
 		didtypes.ModuleName,
 		resourcetypes.ModuleName,
 		consensusparamtypes.ModuleName,
+		feemarkettypes.ModuleName,
 	)
 
 	app.ModuleManager.SetOrderEndBlockers(
@@ -697,9 +750,11 @@ func New(
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
+		feeabstypes.ModuleName,
 		icatypes.ModuleName,
 		ibcfeetypes.ModuleName,
 		consensusparamtypes.ModuleName,
+		feemarkettypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -722,6 +777,7 @@ func New(
 		evidencetypes.ModuleName,
 		authz.ModuleName,
 		ibctransfertypes.ModuleName,
+		feeabstypes.ModuleName,
 		icatypes.ModuleName,
 		ibcfeetypes.ModuleName,
 		feegrant.ModuleName,
@@ -732,6 +788,7 @@ func New(
 		upgradetypes.ModuleName,
 		paramstypes.ModuleName,
 		consensusparamtypes.ModuleName,
+		feemarkettypes.ModuleName,
 	}
 	app.ModuleManager.SetOrderInitGenesis(genesisModuleOrder...)
 	app.ModuleManager.SetOrderExportGenesis(genesisModuleOrder...)
@@ -767,6 +824,8 @@ func New(
 		SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 		SigGasConsumer:  authante.DefaultSigVerificationGasConsumer,
 		IBCKeeper:       app.IBCKeeper,
+		FeeAbskeeper:    app.FeeabsKeeper,
+		FeeMarketKeeper: app.FeeMarketKeeper,
 	})
 	if err != nil {
 		tmos.Exit(err.Error())
@@ -783,11 +842,12 @@ func New(
 	app.sm.RegisterStoreDecoders()
 
 	postHandler, err := posthandler.NewPostHandler(posthandler.HandlerOptions{
-		AccountKeeper:  app.AccountKeeper,
-		BankKeeper:     app.BankKeeper,
-		FeegrantKeeper: app.FeeGrantKeeper,
-		DidKeeper:      app.DidKeeper,
-		ResourceKeeper: app.ResourceKeeper,
+		AccountKeeper:   app.AccountKeeper,
+		BankKeeper:      app.BankKeeper,
+		FeegrantKeeper:  app.FeeGrantKeeper,
+		DidKeeper:       app.DidKeeper,
+		ResourceKeeper:  app.ResourceKeeper,
+		FeeMarketKeeper: app.FeeMarketKeeper,
 	})
 	if err != nil {
 		tmos.Exit(err.Error())
@@ -812,6 +872,7 @@ func New(
 	app.ScopedICAControllerKeeper = scopedICAControllerKeeper
 	app.ScopedICAHostKeeper = scopedICAHostKeeper
 	app.ScopedResourceKeeper = scopedResourceKeeper
+	app.ScopedFeeAbsKeeper = scopedFeeabsKeeper
 
 	return app
 }
@@ -994,6 +1055,8 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(icahosttypes.SubModuleName)
 	paramsKeeper.Subspace(didtypes.ModuleName).WithKeyTable(didtypes.ParamKeyTable())
 	paramsKeeper.Subspace(resourcetypes.ModuleName).WithKeyTable(resourcetypes.ParamKeyTable())
+	paramsKeeper.Subspace(feeabstypes.ModuleName).WithKeyTable(feeabstypes.ParamKeyTable())
+	paramsKeeper.Subspace(feemarkettypes.ModuleName)
 
 	return paramsKeeper
 }
@@ -1019,6 +1082,7 @@ func BlockedAddresses() map[string]bool {
 
 	// allow the following addresses to receive funds
 	delete(modAccAddrs, authtypes.NewModuleAddress(govtypes.ModuleName).String())
+	delete(modAccAddrs, authtypes.NewModuleAddress(feeabstypes.ModuleName).String())
 
 	return modAccAddrs
 }
@@ -1060,6 +1124,20 @@ func (app *App) RegisterUpgradeHandlers() {
 			return migrations, err
 		},
 	)
+	app.UpgradeKeeper.SetUpgradeHandler(
+		upgradeV3.UpgradeName,
+		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			migrations, err := app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
+			if err != nil {
+				return migrations, err
+			}
+			err = ConfigureFeeMarketModule(ctx, app.FeeMarketKeeper)
+			if err != nil {
+				return migrations, err
+			}
+			return migrations, nil
+		},
+	)
 }
 
 // configure store loader that checks if version == upgradeHeight and applies store upgrades
@@ -1069,17 +1147,40 @@ func (app *App) setupUpgradeStoreLoaders() {
 		panic(fmt.Sprintf("failed to read upgrade info from disk %s", err))
 	}
 
-	if upgradeInfo.Name == upgradeV2.UpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+	if upgradeInfo.Name == upgradeV3.UpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		storeUpgrades := storetypes.StoreUpgrades{
 			Added: []string{
-				consensusparamtypes.StoreKey,
-				crisistypes.StoreKey,
+				feemarkettypes.StoreKey,
 			},
 		}
-
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
 	}
+}
+
+func ConfigureFeeMarketModule(ctx sdk.Context, keeper *feemarketkeeper.Keeper) error {
+	params, err := keeper.GetParams(ctx)
+	if err != nil {
+		return err
+	}
+
+	params.Enabled = true
+	params.FeeDenom = resourcetypes.BaseMinimalDenom
+	params.DistributeFees = false // burn fees
+	params.MinBaseGasPrice = sdk.MustNewDecFromStr("0.005")
+	params.MaxBlockUtilization = feemarkettypes.DefaultMaxBlockUtilization
+	if err := keeper.SetParams(ctx, params); err != nil {
+		return err
+	}
+
+	state, err := keeper.GetState(ctx)
+	if err != nil {
+		return err
+	}
+
+	state.BaseGasPrice = sdk.MustNewDecFromStr("0.005")
+
+	return keeper.SetState(ctx, state)
 }
 
 func (app *App) Configurator() module.Configurator {

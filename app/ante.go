@@ -11,21 +11,27 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	ibcante "github.com/cosmos/ibc-go/v7/modules/core/ante"
 	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
+	feeabsante "github.com/osmosis-labs/fee-abstraction/v7/x/feeabs/ante"
+	feeabskeeper "github.com/osmosis-labs/fee-abstraction/v7/x/feeabs/keeper"
+	feemarketante "github.com/skip-mev/feemarket/x/feemarket/ante"
+	feemarketkeeper "github.com/skip-mev/feemarket/x/feemarket/keeper"
 )
 
 // HandlerOptions are the options required for constructing a default SDK AnteHandler.
 // Here we add the cheqd ante decorators, which extend default SDK AnteHandler.
 type HandlerOptions struct {
-	AccountKeeper          ante.AccountKeeper
+	AccountKeeper          cheqdante.AccountKeeper
 	BankKeeper             cheqdante.BankKeeper
 	ExtensionOptionChecker ante.ExtensionOptionChecker
 	FeegrantKeeper         ante.FeegrantKeeper
 	SignModeHandler        authsigning.SignModeHandler
 	SigGasConsumer         func(meter sdk.GasMeter, sig signing.SignatureV2, params types.Params) error
-	TxFeeChecker           cheqdante.TxFeeChecker
+	TxFeeChecker           ante.TxFeeChecker
 	IBCKeeper              *ibckeeper.Keeper
 	DidKeeper              cheqdante.DidKeeper
 	ResourceKeeper         cheqdante.ResourceKeeper
+	FeeAbskeeper           feeabskeeper.Keeper
+	FeeMarketKeeper        *feemarketkeeper.Keeper
 }
 
 // NewAnteHandler returns an AnteHandler that checks and increments sequence
@@ -51,11 +57,15 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 	anteDecorators := []sdk.AnteDecorator{
 		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
 		ante.NewExtensionOptionsDecorator(options.ExtensionOptionChecker),
+		feeabsante.NewFeeAbstrationMempoolFeeDecorator(options.FeeAbskeeper),
 		ante.NewValidateBasicDecorator(),
 		ante.NewTxTimeoutHeightDecorator(),
 		ante.NewValidateMemoDecorator(options.AccountKeeper),
 		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
-		cheqdante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, options.TxFeeChecker),
+		feeabsante.NewFeeAbstractionDeductFeeDecorate(options.AccountKeeper, options.BankKeeper, options.FeeAbskeeper, options.FeegrantKeeper),
+		cheqdante.NewOverAllDecorator( // fee market check replaces fee deduct decorator
+			feeDecorators(options)...,
+		),
 		ante.NewSetPubKeyDecorator(options.AccountKeeper), // SetPubKeyDecorator must be called before all signature verification decorators
 		ante.NewValidateSigCountDecorator(options.AccountKeeper),
 		ante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),
@@ -66,4 +76,21 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 	}
 
 	return sdk.ChainAnteDecorators(anteDecorators...), nil
+}
+
+func feeDecorators(options HandlerOptions) []sdk.AnteDecorator {
+	return []sdk.AnteDecorator{
+		feemarketante.NewFeeMarketCheckDecorator( // fee market check replaces fee deduct decorator
+			options.AccountKeeper,
+			options.BankKeeper,
+			options.FeegrantKeeper,
+			options.FeeMarketKeeper,
+			ante.NewDeductFeeDecorator(
+				options.AccountKeeper,
+				options.BankKeeper,
+				options.FeegrantKeeper,
+				options.TxFeeChecker,
+			),
+		),
+	}
 }
