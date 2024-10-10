@@ -28,6 +28,7 @@ jobs:
         LOG_LEVEL: WARN
         VALIDATE_ALL_CODEBASE: true
         MULTI_STATUS: true
+        PYTHON_PYLINT_CONFIG_FILE: .pylintrc
 
         VALIDATE_BASH: true
         VALIDATE_DOCKERFILE_HADOLINT: true
