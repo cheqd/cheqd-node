@@ -59,7 +59,6 @@ func (td TaxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, suc
 		return ctx, err
 	}
 	if taxable {
-		fmt.Println("Taxable check 2>>>>>>>>>>")
 		err := td.handleTaxableTransaction(ctx, feeTx, simulate, rewards, burn, tx)
 		if err != nil {
 			return ctx, err
@@ -366,7 +365,6 @@ func (td *TaxDecorator) handleTaxableTransaction(
 	// if the fees are only in native denom then fee-abs logic won't be applied and deduct the fees from fee payer.
 	if onlyNativeDenom {
 		// Validate the tax
-		fmt.Println("here native denom>>>>>>>>>.")
 		if err := td.validateTax(feeTx.GetFee(), simulate); err != nil {
 			return err
 		}
@@ -377,7 +375,6 @@ func (td *TaxDecorator) handleTaxableTransaction(
 		if err != nil {
 			return err
 		}
-		fmt.Println("fee payerr>>>>>>>>>>>>>>..", feePayer)
 		// Deduct tax from fee payer
 		if err := td.deductTaxFromFeePayer(ctx, feePayer, tax); err != nil {
 			return err

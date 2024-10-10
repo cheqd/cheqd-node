@@ -2,7 +2,6 @@ package cli
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
@@ -44,7 +43,6 @@ func Tx(module, tx, from string, feeParams []string, txArgs ...string) (sdk.TxRe
 	// Other args
 	args = append(args, txArgs...)
 
-	fmt.Println("args>>>>>>>>>>>>>>>>>>>>>>>>", args)
 	output, err := Exec(args...)
 	if err != nil {
 		return sdk.TxResponse{}, err
@@ -53,7 +51,6 @@ func Tx(module, tx, from string, feeParams []string, txArgs ...string) (sdk.TxRe
 	// Skip 'gas estimate: xxx' string, trim 'Successfully migrated key' string
 	output = helpers.TrimImportedStdout(output)
 
-	fmt.Println("response>>>>>>>>>>>>>>>>>>>", output)
 	var resp sdk.TxResponse
 
 	err = helpers.Codec.UnmarshalJSON([]byte(output), &resp)
@@ -78,7 +75,6 @@ func CreateDidDoc(tmpDir string, payload cli.DIDDocument, signInputs []cli.SignI
 		return sdk.TxResponse{}, err
 	}
 
-	fmt.Println("here>>>>>>>>>>>>>>>>")
 	payloadWithSignInputs := cli.PayloadWithSignInputs{
 		Payload:    payloadJSON,
 		SignInputs: signInputs,
@@ -91,7 +87,6 @@ func CreateDidDoc(tmpDir string, payload cli.DIDDocument, signInputs []cli.SignI
 
 	payloadFile := helpers.MustWriteTmpFile(tmpDir, payloadWithSignInputsJSON)
 
-	fmt.Println("here>>>>>>>>>>>>>>>>>>>1")
 	if versionID != "" {
 		return Tx("cheqd", "create-did", from, feeParams, payloadFile, FlagVersionID, versionID)
 	}

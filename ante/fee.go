@@ -1,8 +1,6 @@
 package ante
 
 import (
-	"fmt"
-
 	"github.com/cosmos/cosmos-sdk/types/errors"
 
 	errorsmod "cosmossdk.io/errors"
@@ -39,8 +37,6 @@ func (dfd OverAllDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool
 	taxable := IsTaxableTxLite(tx)
 	// if taxable, include in the mempool
 	if taxable {
-
-		fmt.Println("check taxable>>>>>>>>>>")
 		// default priority of tx
 		newCtx := ctx.WithPriority(priority)
 		// posthandler will deduct the fee from the fee payer

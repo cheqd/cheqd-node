@@ -199,7 +199,6 @@ func QueryKeysList() (string, error) {
 func Query1(module, query string, queryArgs ...string) (string, error) {
 	args := []string{"", module, query}
 	args = append(args, queryArgs...)
-	fmt.Println("args>>>>>>>>>>>", args)
 	return Exec(args...)
 }
 

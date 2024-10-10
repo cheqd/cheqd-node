@@ -4,7 +4,6 @@ package integration
 
 import (
 	"crypto/ed25519"
-	"fmt"
 
 	"github.com/cheqd/cheqd-node/tests/integration/cli"
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
@@ -90,27 +89,9 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 
 	It("should not succeed in update diddoc message - case: fixed fee, invalid denom", func() {
 		By("submitting the create diddoc message")
-
-		fmt.Printf("\"Staking Params>>>>>>\": %v\n", "Staking Params>>>>>>")
-		stakingParams, err := cli.QueryStakingParams()
-		Expect(err).To(BeNil())
-		fmt.Println("stakingParams>>>>>>>>>>>>>>>>>>>", stakingParams)
-
-		bal1, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, "ncheq")
-		Expect(err).To(BeNil())
-
-		fmt.Println("balance is>>>>>>>>>>>", bal1)
 		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid.String()))
 		Expect(err).To(BeNil())
-
-		bal, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, "ncheq")
-		Expect(err).To(BeNil())
-
-		fmt.Println("balance is>>>>>>>>>>>", bal)
-		fmt.Println("fees>>>>>>>>>>>>>>", helpers.GenerateFees(feeParams.CreateDid.String()))
-		fmt.Println("response>>>>>>>>>>>>>>>>>>>>>>", res)
 		Expect(res.Code).To(BeEquivalentTo(0))
-
 		By("preparing the update diddoc message")
 		payload2 := didcli.DIDDocument{
 			ID: payload.ID,

@@ -104,6 +104,5 @@ var _ = Describe("Upgrade - Post", func() {
 			Expect(err).To(BeNil())
 			Expect(res.Code).To(BeEquivalentTo(0))
 		})
-
 	})
 })
