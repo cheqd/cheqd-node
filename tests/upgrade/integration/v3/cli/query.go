@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cheqd/cheqd-node/tests/integration/helpers"
+	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
+	"github.com/cheqd/cheqd-node/x/did/types"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -164,9 +165,37 @@ func QueryTxn(container, hash string) (sdk.TxResponse, error) {
 	}
 
 	var resp sdk.TxResponse
-	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	err = integrationhelpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
 		return sdk.TxResponse{}, err
+	}
+
+	return resp, nil
+}
+func QueryResource(collectionID string, resourceID string, container string) (resourcetypes.QueryResourceResponse, error) {
+	res, err := Query(container, CliBinaryName, "resource", "specific-resource", collectionID, resourceID)
+	if err != nil {
+		return resourcetypes.QueryResourceResponse{}, err
+	}
+
+	var resp resourcetypes.QueryResourceResponse
+	err = integrationhelpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return resourcetypes.QueryResourceResponse{}, err
+	}
+
+	return resp, nil
+}
+func QueryDid(did string, container string) (types.QueryDidDocResponse, error) {
+	res, err := Query(container, CliBinaryName, "cheqd", "did-document", did)
+	if err != nil {
+		return types.QueryDidDocResponse{}, err
+	}
+
+	var resp types.QueryDidDocResponse
+	err = integrationhelpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return types.QueryDidDocResponse{}, err
 	}
 
 	return resp, nil

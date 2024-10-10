@@ -1,7 +1,8 @@
+//go:build upgrade_integration
+
 package integration
 
 import (
-	"fmt"
 	"path/filepath"
 
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/v2/cli"
@@ -31,11 +32,8 @@ var _ = Describe("Upgrade - Fee parameter change proposal", func() {
 		Expect(res.Code).To(BeEquivalentTo(0))
 		res, err = cli.QueryTxn(cli.Validator0, res.TxHash)
 		Expect(err).To(BeNil())
-		fmt.Println("response>>>>>>>>>>>>>>", res)
 		proposal_id, err := cli.GetProposalID(res.RawLog)
 		Expect(err).To(BeNil())
-		fmt.Println("proposalId is>>>>>>>>>>>>>>>>", proposal_id)
-
 		Proposal_id = proposal_id
 	})
 
