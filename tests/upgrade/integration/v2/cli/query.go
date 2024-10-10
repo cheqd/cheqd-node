@@ -1,10 +1,14 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
+	"time"
 
+	"github.com/cheqd/cheqd-node/tests/integration/helpers"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
@@ -125,4 +129,43 @@ func QueryProposal(container, id string) (govtypesv1.Proposal, error) {
 		return govtypesv1.Proposal{}, err
 	}
 	return resp, nil
+}
+func QueryTxn(container, hash string) (sdk.TxResponse, error) {
+	time.Sleep(2000 * time.Millisecond)
+	res, err := Query(container, CliBinaryName, "tx", hash)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	var resp sdk.TxResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	return resp, nil
+}
+func GetProposalID(rawLog string) (string, error) {
+	var logs []sdk.ABCIMessageLog
+	err := json.Unmarshal([]byte(rawLog), &logs)
+	if err != nil {
+		return "", err
+	}
+
+	// Iterate over logs and their events
+	for _, log := range logs {
+		for _, event := range log.Events {
+			// Look for the "submit_proposal" event type
+			if event.Type == "submit_proposal" {
+				for _, attr := range event.Attributes {
+					// Look for the "proposal_id" attribute
+					if attr.Key == "proposal_id" {
+						return attr.Value, nil
+					}
+				}
+			}
+		}
+	}
+
+	return "", fmt.Errorf("proposal_id not found")
 }
