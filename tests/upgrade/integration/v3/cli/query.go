@@ -154,6 +154,7 @@ func GetProposalID(rawLog string) (string, error) {
 
 	return "", fmt.Errorf("proposal_id not found")
 }
+
 func QueryTxn(container, hash string) (sdk.TxResponse, error) {
 	res, err := Query(container, CliBinaryName, "tx", hash)
 	if err != nil {
