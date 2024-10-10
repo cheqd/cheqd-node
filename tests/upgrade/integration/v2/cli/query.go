@@ -132,7 +132,7 @@ func QueryProposal(container, id string) (govtypesv1.Proposal, error) {
 }
 
 func QueryTxn(container, hash string) (sdk.TxResponse, error) {
-	time.Sleep(2000 * time.Millisecond)
+	time.Sleep(2500 * time.Millisecond)
 	res, err := Query(container, CliBinaryName, "tx", hash)
 	if err != nil {
 		return sdk.TxResponse{}, err
