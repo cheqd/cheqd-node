@@ -14,6 +14,7 @@ import (
 )
 
 var _ = Describe("Upgrade - Post", func() {
+	var Proposal_id string
 	Context("After a software upgrade execution has concluded", func() {
 		It("should wait for node catching up", func() {
 			By("pinging the node status until catching up is flagged as false")
@@ -34,30 +35,37 @@ var _ = Describe("Upgrade - Post", func() {
 			res, err := cli.SubmitProposal(cli.Validator0, "proposal.json")
 			Expect(err).To(BeNil())
 			Expect(res.Code).To(BeEquivalentTo(0))
+			res, err = cli.QueryTxn(cli.Validator0, res.TxHash)
+			Expect(err).To(BeNil())
+
+			proposal_id, err := cli.GetProposalID(res.RawLog)
+			Proposal_id = proposal_id
+			Expect(err).To(BeNil())
+
 		})
 		It("should vote for the parameter change proposal from `validator1` container", func() {
 			By("sending a VoteProposal transaction from `validator1` container")
-			res, err := cli.VoteProposal(cli.Validator1, "2", "yes")
+			res, err := cli.VoteProposal(cli.Validator1, Proposal_id, "yes")
 			Expect(err).To(BeNil())
 			Expect(res.Code).To(BeEquivalentTo(0))
 		})
 
 		It("should vote for the parameter change proposal from `validator2` container", func() {
 			By("sending a VoteProposal transaction from `validator2` container")
-			res, err := cli.VoteProposal(cli.Validator2, "2", "yes")
+			res, err := cli.VoteProposal(cli.Validator2, Proposal_id, "yes")
 			Expect(err).To(BeNil())
 			Expect(res.Code).To(BeEquivalentTo(0))
 		})
 
 		It("should vote for the parameter change proposal from `validator3` container", func() {
 			By("sending a VoteProposal transaction from `validator3` container")
-			res, err := cli.VoteProposal(cli.Validator3, "2", "yes")
+			res, err := cli.VoteProposal(cli.Validator3, Proposal_id, "yes")
 			Expect(err).To(BeNil())
 			Expect(res.Code).To(BeEquivalentTo(0))
 		})
 		It("should vote for the parameter change proposal from `validator3` container", func() {
 			By("sending a VoteProposal transaction from `validator3` container")
-			res, err := cli.VoteProposal(cli.Validator0, "2", "yes")
+			res, err := cli.VoteProposal(cli.Validator0, Proposal_id, "yes")
 			Expect(err).To(BeNil())
 			Expect(res.Code).To(BeEquivalentTo(0))
 		})
@@ -73,7 +81,7 @@ var _ = Describe("Upgrade - Post", func() {
 
 		It("should check the proposal status to ensure it has passed", func() {
 			By("sending a QueryProposal query from `validator0` container")
-			proposal, err := cli.QueryProposal(cli.Validator0, "2")
+			proposal, err := cli.QueryProposal(cli.Validator0, Proposal_id)
 			Expect(err).To(BeNil())
 			Expect(proposal.Status).To(BeEquivalentTo(govtypesv1.StatusPassed))
 		})
