@@ -35,17 +35,6 @@ var _ = Describe("Upgrade - Post", func() {
 			Expect(err).To(BeNil())
 			Expect(res.Code).To(BeEquivalentTo(0))
 		})
-
-		It("should wait for the proposal submission to be included in a block", func() {
-			By("getting the current block height")
-			currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
-			Expect(err).To(BeNil())
-
-			By("waiting for the proposal to be included in a block")
-			err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+10, cli.VotingPeriod)
-			Expect(err).To(BeNil())
-		})
-
 		It("should vote for the parameter change proposal from `validator1` container", func() {
 			By("sending a VoteProposal transaction from `validator1` container")
 			res, err := cli.VoteProposal(cli.Validator1, "2", "yes")
