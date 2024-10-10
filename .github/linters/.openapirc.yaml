@@ -10,3 +10,7 @@ extends: spectral:oas
 
 rules:
   oas2-schema: warn
+
+overrides:
+  - files:
+      - "app/client/docs/config.yaml"

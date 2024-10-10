@@ -89,7 +89,7 @@ jobs:
         DEFAULT_BRANCH: main
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         LOG_LEVEL: WARN
-        VALIDATE_ALL_CODEBASE: false
+        VALIDATE_ALL_CODEBASE: true
         MULTI_STATUS: true
         PYTHON_PYLINT_CONFIG_FILE: .pylintrc
 
