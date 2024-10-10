@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
@@ -12,8 +11,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 )
 
 var CLIQueryParams = []string{
@@ -159,70 +156,4 @@ func QueryProposal(container, id string) (govtypesv1.Proposal, error) {
 		return govtypesv1.Proposal{}, err
 	}
 	return resp, nil
-}
-
-func QueryStakingParams() (stakingtypes.Params, error) {
-	res, err := Query("staking", "params")
-	if err != nil {
-		return stakingtypes.Params{}, err
-	}
-
-	var resp stakingtypes.Params
-	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
-	if err != nil {
-		return stakingtypes.Params{}, err
-	}
-
-	return resp, nil
-}
-
-func QueryFeemarketParams() (feemarkettypes.Params, error) {
-	res, err := Query("feemarket", "params")
-	if err != nil {
-		return feemarkettypes.Params{}, err
-	}
-
-	var resp feemarkettypes.Params
-	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
-	if err != nil {
-		return feemarkettypes.Params{}, err
-	}
-
-	return resp, nil
-}
-
-func QueryKeysList() (string, error) {
-	res, err := Query1("", "keys", "list", "--keyring-backend", "test")
-	return res, err
-}
-
-func Query1(module, query string, queryArgs ...string) (string, error) {
-	args := []string{"", module, query}
-	args = append(args, queryArgs...)
-	return Exec(args...)
-}
-
-func GetProposalID(rawLog string) (string, error) {
-	var logs []sdk.ABCIMessageLog
-	err := json.Unmarshal([]byte(rawLog), &logs)
-	if err != nil {
-		return "", err
-	}
-
-	// Iterate over logs and their events
-	for _, log := range logs {
-		for _, event := range log.Events {
-			// Look for the "submit_proposal" event type
-			if event.Type == "submit_proposal" {
-				for _, attr := range event.Attributes {
-					// Look for the "proposal_id" attribute
-					if attr.Key == "proposal_id" {
-						return attr.Value, nil
-					}
-				}
-			}
-		}
-	}
-
-	return "", fmt.Errorf("proposal_id not found")
 }

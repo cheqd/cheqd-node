@@ -32,30 +32,20 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		Expect(err).To(BeNil())
 
 		proposal_id, err := cli.GetProposalID(res.RawLog)
-
-		fmt.Println("The proposal id>>>>>>>>>>>>>>>>>>>>>>>>>>>.", proposal_id)
 		Proposal_id = proposal_id
 		Expect(err).To(BeNil())
 
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
-	It("keys list", func() {
-		By("keys list in validator 0")
-		keys, err := cli.QueryKeysList()
+	It("should wait for the proposal submission to be included in a block", func() {
+		By("getting the current block height")
+		currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
 		Expect(err).To(BeNil())
-		fmt.Println("keys arE>>>>>>>>>>>>>>>>>", keys)
+
+		By("waiting for the proposal to be included in a block")
+		err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+1, 2)
+		Expect(err).To(BeNil())
 	})
-
-	// It("should wait for the proposal submission to be included in a block", func() {
-	// 	By("getting the current block height")
-	// 	currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
-	// 	Expect(err).To(BeNil())
-
-	// 	By("waiting for the proposal to be included in a block")
-	// 	err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+1, 2)
-	// 	Expect(err).To(BeNil())
-	// })
-
 	It("should vote for the mint proposal from `validator1` container", func() {
 		By("sending a VoteProposal transaction from `validator1` container")
 		res, err := cli.VoteProposalTx(cli.Operator1, Proposal_id, "yes", cli.CliGasParams)
