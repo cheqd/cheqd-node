@@ -25,6 +25,11 @@ sudo docker compose --env-file mainnet-latest.env cp network-config/validator-1/
 sudo docker compose --env-file mainnet-latest.env cp network-config/validator-2/keyring-test validator-2:/home/cheqd/.cheqdnode
 sudo docker compose --env-file mainnet-latest.env cp network-config/validator-3/keyring-test validator-3:/home/cheqd/.cheqdnode
 
+sudo docker compose --env-file mainnet-latest.env cp network-config/validator-0/config/config.toml validator-0:/home/cheqd/.cheqdnode/config
+sudo docker compose --env-file mainnet-latest.env cp network-config/validator-1/config/config.toml validator-1:/home/cheqd/.cheqdnode/config
+sudo docker compose --env-file mainnet-latest.env cp network-config/validator-2/config/config.toml validator-2:/home/cheqd/.cheqdnode/config
+sudo docker compose --env-file mainnet-latest.env cp network-config/validator-3/config/config.toml validator-3:/home/cheqd/.cheqdnode/config
+
 # Restore permissions
 sudo docker compose --env-file mainnet-latest.env exec --user root validator-0 chown -R cheqd:cheqd /home/cheqd
 sudo docker compose --env-file mainnet-latest.env exec --user root validator-1 chown -R cheqd:cheqd /home/cheqd
