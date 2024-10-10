@@ -1,8 +1,10 @@
 package types
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -99,6 +101,43 @@ func IsDIDUrl(allowedNamespaces []string, pathRule, queryRule, fragmentRule Vali
 
 		if fragmentRule == Empty && fragment != "" {
 			return errors.New("fragment must be empty")
+		}
+
+		return nil
+	})
+}
+
+type AssertionMethod struct {
+	Id         string
+	Type       string
+	Controller []string
+}
+
+func IsAssertionMethod(allowedNamespaces []string) *CustomErrorRule {
+	return NewCustomErrorRule(func(value interface{}) error {
+		err := IsDIDUrl(allowedNamespaces, Empty, Empty, Required).Validate(value)
+		if err != nil {
+			casted, ok := value.(string)
+			if !ok {
+				panic("IsAssertionMethod must be only applied on string properties")
+			}
+
+			unescapedJSON, err := strconv.Unquote(casted)
+			if err != nil {
+				return errors.New("assertionMethod should be a DIDUrl or an Escaped JSON string")
+			}
+
+			var result AssertionMethod
+			err = json.Unmarshal([]byte(unescapedJSON), &result)
+			if err != nil {
+				return errors.New("assertionMethod should be a DIDUrl or an Escaped JSON string")
+			}
+
+			return validation.ValidateStruct(&result,
+				validation.Field(&result.Id, validation.Required, IsDIDUrl(allowedNamespaces, Empty, Empty, Required)),
+				validation.Field(&result.Controller, validation.Required, IsUniqueStrList(), validation.Each(IsDID(allowedNamespaces))),
+				validation.Field(&result.Type, IsURI()),
+			)
 		}
 
 		return nil
