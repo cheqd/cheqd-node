@@ -157,7 +157,7 @@ func GetProposalID(rawLog string) (string, error) {
 }
 
 func QueryTxn(container, hash string) (sdk.TxResponse, error) {
-	time.Sleep(10 * time.Millisecond)
+	time.Sleep(1 * time.Second)
 	res, err := Query(container, CliBinaryName, "tx", hash)
 	if err != nil {
 		return sdk.TxResponse{}, err
