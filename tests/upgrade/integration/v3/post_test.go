@@ -42,7 +42,7 @@ var _ = Describe("Upgrade - Post", func() {
 			Expect(err).To(BeNil())
 
 			By("waiting for the proposal to be included in a block")
-			err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+10, cli.VotingPeriod*3)
+			err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+10, cli.VotingPeriod)
 			Expect(err).To(BeNil())
 		})
 
