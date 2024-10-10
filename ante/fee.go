@@ -1,43 +1,24 @@
 package ante
 
 import (
-	"fmt"
-
 	"github.com/cosmos/cosmos-sdk/types/errors"
 
 	errorsmod "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-	"github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
-type TxFeeChecker func(ctx sdk.Context, tx sdk.Tx) (sdk.Coins, int64, error)
-
-// DeductFeeDecorator deducts fees from the first signer of the tx
-// If the first signer does not have the funds to pay for the fees, return with InsufficientFunds error
-// Call next AnteHandler if fees successfully deducted
-// CONTRACT: Tx must implement FeeTx interface to use DeductFeeDecorator
-type DeductFeeDecorator struct {
-	accountKeeper  ante.AccountKeeper
-	bankKeeper     BankKeeper
-	feegrantKeeper ante.FeegrantKeeper
-	txFeeChecker   TxFeeChecker
+type OverAllDecorator struct {
+	decorators []sdk.AnteDecorator
 }
 
-func NewDeductFeeDecorator(ak ante.AccountKeeper, bk BankKeeper, fk ante.FeegrantKeeper, tfc TxFeeChecker) DeductFeeDecorator {
-	if tfc == nil {
-		tfc = checkTxFeeWithValidatorMinGasPrices
-	}
-
-	return DeductFeeDecorator{
-		accountKeeper:  ak,
-		bankKeeper:     bk,
-		feegrantKeeper: fk,
-		txFeeChecker:   tfc,
+func NewOverAllDecorator(decorators ...sdk.AnteDecorator) OverAllDecorator {
+	return OverAllDecorator{
+		decorators: decorators,
 	}
 }
 
-func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
+func (dfd OverAllDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
 	feeTx, ok := tx.(sdk.FeeTx)
 	if !ok {
 		return ctx, errorsmod.Wrap(errors.ErrTxDecode, "Tx must be a FeeTx")
@@ -51,9 +32,6 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 		priority int64
 		err      error
 	)
-
-	fee := feeTx.GetFee()
-
 	// check if the tx is a taxable tx
 	// CONTRACT: Taxable tx is a tx that has at least 1 taxable related Msg.
 	taxable := IsTaxableTxLite(tx)
@@ -65,118 +43,55 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 		return next(newCtx, tx, simulate)
 	}
 
-	// if not taxable, follow default
-	if !simulate {
-		fee, priority, err = dfd.txFeeChecker(ctx, tx)
-		if err != nil {
-			return ctx, err
-		}
+	handler := sdk.ChainAnteDecorators(dfd.decorators...)
+	newCtx, err := handler(ctx, tx, simulate)
+	if err != nil {
+		return newCtx, err
 	}
-	if err := dfd.checkDeductFee(ctx, tx, fee); err != nil {
-		return ctx, err
-	}
-
-	newCtx := ctx.WithPriority(priority)
-
 	return next(newCtx, tx, simulate)
 }
 
-func (dfd DeductFeeDecorator) checkDeductFee(ctx sdk.Context, sdkTx sdk.Tx, fee sdk.Coins) error {
-	feeTx, ok := sdkTx.(sdk.FeeTx)
-	if !ok {
-		return errorsmod.Wrap(errors.ErrTxDecode, "Tx must be a FeeTx")
-	}
+// CheckTxFee implements the logic for the fee market to check if a Tx has provided sufficient
+// fees given the current state of the fee market. Returns an error if insufficient fees.
+func CheckTxFee(ctx sdk.Context, gasPrice sdk.DecCoin, feeCoin sdk.Coin, feeGas int64, isAnte bool) (payCoin sdk.Coin, tip sdk.Coin, err error) {
+	payCoin = feeCoin
+	// Ensure that the provided fees meet the minimum
+	if !gasPrice.IsZero() {
+		var (
+			requiredFee sdk.Coin
+			consumedFee sdk.Coin
+		)
 
-	if addr := dfd.accountKeeper.GetModuleAddress(types.FeeCollectorName); addr == nil {
-		return fmt.Errorf("fee collector module account (%s) has not been set", types.FeeCollectorName)
-	}
+		// Determine the required fees by multiplying each required minimum gas
+		// price by the gas, where fee = ceil(minGasPrice * gas).
+		gasConsumed := int64(ctx.GasMeter().GasConsumed())
+		gcDec := sdkmath.LegacyNewDec(gasConsumed)
+		glDec := sdkmath.LegacyNewDec(feeGas)
 
-	feePayer := feeTx.FeePayer()
-	feeGranter := feeTx.FeeGranter()
-	deductFeesFrom := feePayer
+		consumedFeeAmount := gasPrice.Amount.Mul(gcDec)
+		limitFee := gasPrice.Amount.Mul(glDec)
 
-	// if feegranter set deduct fee from feegranter account.
-	// this works with only when feegrant enabled.
-	if feeGranter != nil {
-		if dfd.feegrantKeeper == nil {
-			return errors.ErrInvalidRequest.Wrap("fee grants are not enabled")
-		} else if !feeGranter.Equals(feePayer) {
-			err := dfd.feegrantKeeper.UseGrantedFees(ctx, feeGranter, feePayer, fee, sdkTx.GetMsgs())
-			if err != nil {
-				return errorsmod.Wrapf(err, "%s does not not allow to pay fees for %s", feeGranter, feePayer)
-			}
+		consumedFee = sdk.NewCoin(gasPrice.Denom, consumedFeeAmount.Ceil().RoundInt())
+		requiredFee = sdk.NewCoin(gasPrice.Denom, limitFee.Ceil().RoundInt())
+
+		if !payCoin.IsGTE(requiredFee) {
+			return sdk.Coin{}, sdk.Coin{}, errors.ErrInsufficientFee.Wrapf(
+				"got: %s required: %s, minGasPrice: %s, gas: %d",
+				payCoin,
+				requiredFee,
+				gasPrice,
+				gasConsumed,
+			)
 		}
 
-		deductFeesFrom = feeGranter
-	}
-
-	deductFeesFromAcc := dfd.accountKeeper.GetAccount(ctx, deductFeesFrom)
-	if deductFeesFromAcc == nil {
-		return errors.ErrUnknownAddress.Wrapf("fee payer address: %s does not exist", deductFeesFrom)
-	}
-
-	// deduct the fees
-	if !fee.IsZero() {
-		err := DeductFees(dfd.bankKeeper, ctx, deductFeesFromAcc, fee)
-		if err != nil {
-			return err
-		}
-	}
-
-	events := sdk.Events{
-		sdk.NewEvent(
-			sdk.EventTypeTx,
-			sdk.NewAttribute(sdk.AttributeKeyFee, fee.String()),
-			sdk.NewAttribute(sdk.AttributeKeyFeePayer, deductFeesFrom.String()),
-		),
-	}
-	ctx.EventManager().EmitEvents(events)
-
-	return nil
-}
-
-// DeductFees deducts fees from the given account.
-func DeductFees(bankKeeper types.BankKeeper, ctx sdk.Context, acc types.AccountI, fees sdk.Coins) error {
-	if !fees.IsValid() {
-		return errorsmod.Wrapf(errors.ErrInsufficientFee, "invalid fee amount: %s", fees)
-	}
-
-	err := bankKeeper.SendCoinsFromAccountToModule(ctx, acc.GetAddress(), types.FeeCollectorName, fees)
-	if err != nil {
-		return errorsmod.Wrapf(errors.ErrInsufficientFunds, err.Error())
-	}
-
-	return nil
-}
-
-func IsSufficientFee(ctx sdk.Context, tax, reward, burn, feeProvided sdk.Coins, gasRequested int64) (bool, int64, error) {
-	// check if the provided fee is enough for `did`, `resource` module specific Msg
-	if !feeProvided.IsAnyGTE(tax) {
-		return false, 0, errorsmod.Wrapf(errors.ErrInsufficientFee, "insufficient fees; got: %s required: %s", feeProvided, tax)
-	}
-
-	// check with the default validator min gas prices based on rewards distribution
-	if ctx.IsCheckTx() {
-		minGasPrices := ctx.MinGasPrices()
-		if !minGasPrices.IsZero() {
-			requiredFees := make(sdk.Coins, len(minGasPrices))
-
-			// Determine the required fees by multiplying each required minimum gas
-			// price by the gas limit, where fee = ceil(minGasPrice * gasLimit).
-			glDec := sdk.NewDec(gasRequested)
-			for i, gp := range minGasPrices {
-				fee := gp.Amount.Mul(glDec)
-				requiredFees[i] = sdk.NewCoin(gp.Denom, fee.Ceil().RoundInt())
-			}
-
-			// check if the fee is sufficient
-			if !reward.IsAnyGTE(requiredFees) {
-				return false, 0, errorsmod.Wrapf(errors.ErrInsufficientFee, "insufficient fees; got: %s required: %s", reward, requiredFees)
-			}
+		if isAnte {
+			tip = payCoin.Sub(requiredFee)
+			payCoin = requiredFee
+		} else {
+			tip = payCoin.Sub(consumedFee)
+			payCoin = consumedFee
 		}
 	}
 
-	priority := getTxPriority(tax, gasRequested)
-
-	return true, priority, nil
+	return payCoin, tip, nil
 }

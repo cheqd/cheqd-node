@@ -20,7 +20,7 @@ jobs:
         fetch-depth: 0 # Required to fetch version
 
     - name: Run Super Linter
-      uses: github/super-linter/slim@v5
+      uses: github/super-linter/slim@v7
       env:
         IGNORE_GITIGNORED_FILES: true
         DEFAULT_BRANCH: main
@@ -60,7 +60,7 @@ jobs:
       # Required for short-lived token provided to Semantic Release
       - name: "Obtain Github App token"
         id: app-token
-        uses: getsentry/action-github-app-token@v3.0.0
+        uses: getsentry/action-github-app-token@v3.1
         with:
           app_id: ${{ secrets.BOT_APP_ID }}
           private_key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
@@ -112,12 +112,12 @@ jobs:
           cache: true
 
       # Setup for pushing to Buf.build later
-      - uses: bufbuild/buf-setup-action@v1.30.1
+      - uses: bufbuild/buf-setup-action@v1.44.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v5
+        uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
           version: latest
@@ -176,7 +176,7 @@ jobs:
             org.opencontainers.image.documentation="https://docs.cheqd.io/node"
 
       - name: Build and push image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: docker/Dockerfile
