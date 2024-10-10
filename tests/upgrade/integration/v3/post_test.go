@@ -19,7 +19,6 @@ import (
 )
 
 var _ = Describe("Upgrade - Post", func() {
-
 	var feeParams didtypes.FeeParams
 	var resourceFeeParams resourcetypes.FeeParams
 

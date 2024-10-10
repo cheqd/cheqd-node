@@ -6,7 +6,6 @@ import (
 	"time"
 
 	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
-	"github.com/cheqd/cheqd-node/x/did/types"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -172,6 +171,7 @@ func QueryTxn(container, hash string) (sdk.TxResponse, error) {
 
 	return resp, nil
 }
+
 func QueryResource(collectionID string, resourceID string, container string) (resourcetypes.QueryResourceResponse, error) {
 	res, err := Query(container, CliBinaryName, "resource", "specific-resource", collectionID, resourceID)
 	if err != nil {
@@ -186,16 +186,17 @@ func QueryResource(collectionID string, resourceID string, container string) (re
 
 	return resp, nil
 }
-func QueryDid(did string, container string) (types.QueryDidDocResponse, error) {
+
+func QueryDid(did string, container string) (didtypes.QueryDidDocResponse, error) {
 	res, err := Query(container, CliBinaryName, "cheqd", "did-document", did)
 	if err != nil {
-		return types.QueryDidDocResponse{}, err
+		return didtypes.QueryDidDocResponse{}, err
 	}
 
-	var resp types.QueryDidDocResponse
+	var resp didtypes.QueryDidDocResponse
 	err = integrationhelpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
-		return types.QueryDidDocResponse{}, err
+		return didtypes.QueryDidDocResponse{}, err
 	}
 
 	return resp, nil
