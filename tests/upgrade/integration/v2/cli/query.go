@@ -130,6 +130,7 @@ func QueryProposal(container, id string) (govtypesv1.Proposal, error) {
 	}
 	return resp, nil
 }
+
 func QueryTxn(container, hash string) (sdk.TxResponse, error) {
 	time.Sleep(2000 * time.Millisecond)
 	res, err := Query(container, CliBinaryName, "tx", hash)
@@ -145,6 +146,7 @@ func QueryTxn(container, hash string) (sdk.TxResponse, error) {
 
 	return resp, nil
 }
+
 func GetProposalID(rawLog string) (string, error) {
 	var logs []sdk.ABCIMessageLog
 	err := json.Unmarshal([]byte(rawLog), &logs)

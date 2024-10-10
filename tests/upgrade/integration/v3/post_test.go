@@ -33,7 +33,6 @@ var _ = Describe("Upgrade - Post", func() {
 			proposal_id, err := cli.GetProposalID(res.RawLog)
 			Proposal_id = proposal_id
 			Expect(err).To(BeNil())
-
 		})
 		It("should vote for the parameter change proposal from `validator1` container", func() {
 			By("sending a VoteProposal transaction from `validator1` container")
