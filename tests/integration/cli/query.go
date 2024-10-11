@@ -1,12 +1,15 @@
 package cli
 
 import (
+	"fmt"
+
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
 
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 )
 
@@ -129,5 +132,28 @@ func QueryTxn(hash string) (sdk.TxResponse, error) {
 		return sdk.TxResponse{}, err
 	}
 
+	return resp, nil
+}
+
+func QueryProposal(container, id string) (govtypesv1.Proposal, error) {
+	fmt.Println("Querying proposal from", container)
+	args := append([]string{
+		CliBinaryName,
+		"query", "gov", "proposal", id,
+	}, QueryParamsConst...)
+
+	out, err := LocalnetExecExec(container, args...)
+	if err != nil {
+		return govtypesv1.Proposal{}, err
+	}
+
+	fmt.Println("Proposal", out)
+
+	var resp govtypesv1.Proposal
+
+	err = MakeCodecWithExtendedRegistry().UnmarshalJSON([]byte(out), &resp)
+	if err != nil {
+		return govtypesv1.Proposal{}, err
+	}
 	return resp, nil
 }

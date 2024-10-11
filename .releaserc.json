@@ -7,6 +7,11 @@
             "prerelease": true
         },
         {
+            "name": "release/2.x",
+            "range": "2.x",
+            "channel": "2.x"
+        },
+        {
             "name": "release/1.x",
             "range": "1.x",
             "channel": "1.x"

@@ -12,6 +12,8 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgCreateDidDoc{}, "did/CreateDidDoc", nil)
 	cdc.RegisterConcrete(&MsgUpdateDidDoc{}, "did/UpdateDidDoc", nil)
 	cdc.RegisterConcrete(&MsgDeactivateDidDoc{}, "did/DeleteDidDoc", nil)
+	cdc.RegisterConcrete(&MsgBurn{}, "did/MsgBurn", nil)
+	cdc.RegisterConcrete(&MsgMint{}, "did/MsgMint", nil)
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
@@ -20,6 +22,8 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgCreateDidDoc{},
 		&MsgUpdateDidDoc{},
 		&MsgDeactivateDidDoc{},
+		&MsgBurn{},
+		&MsgMint{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
