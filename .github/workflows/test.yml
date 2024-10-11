@@ -334,19 +334,19 @@ jobs:
       #   with:
       #     name: report-upgraded-integration.xml
 
-      - name: Download pricing proposal test Report
-        uses: actions/download-artifact@v4
-        with:
-          name: report-pricing-proposal.xml
+      # - name: Download pricing proposal test Report
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: report-pricing-proposal.xml
 
-      - name: Download pricing change test Report
-        uses: actions/download-artifact@v4
-        with:
-          name: report-pricing-change.xml
+      # - name: Download pricing change test Report
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: report-pricing-change.xml
 
       - name: Combine test results
         run: |
-          python ./.github/scripts/xml_combine.py report-unit.xml report-integration.xml report-pricing-proposal.xml report-pricing-change.xml > report.xml
+          python ./.github/scripts/xml_combine.py report-unit.xml report-integration.xml > report.xml
         # run: |
         #   python ./.github/scripts/xml_combine.py report-unit.xml report-integration.xml > report.xml
 
