@@ -1,7 +1,9 @@
 package types_test
 
 import (
+	"encoding/json"
 	"fmt"
+	"strconv"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -228,5 +230,37 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 			},
 			isValid:  false,
 			errorMsg: "verification_method: there are verification method duplicates.",
+		}),
+	Entry(
+		"Assertion method is valid",
+		DIDDocTestCase{
+			didDoc: &DidDoc{
+				Id:         ValidTestDID,
+				Controller: []string{ValidTestDID},
+				VerificationMethod: []*VerificationMethod{
+					{
+						Id:                     fmt.Sprintf("%s#fragment", ValidTestDID),
+						VerificationMethodType: "Ed25519VerificationKey2020",
+						Controller:             ValidTestDID,
+						VerificationMaterial:   ValidEd25519VerificationKey2020VerificationMaterial,
+					},
+				},
+				AssertionMethod: []string{fmt.Sprintf("%s#fragment", ValidTestDID), func() string {
+					b, _ := json.Marshal(struct {
+						Id              string
+						Type            string
+						Controller      string
+						PublicKeyBase58 string
+					}{
+						Id:              fmt.Sprintf("%s#fragment", ValidTestDID),
+						Type:            "Ed25519VerificationKey2020",
+						Controller:      ValidTestDID,
+						PublicKeyBase58: "base58",
+					})
+					return strconv.Quote(string(b))
+				}()},
+			},
+			isValid:  true,
+			errorMsg: "",
 		}),
 )

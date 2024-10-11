@@ -110,12 +110,12 @@ func IsDIDUrl(allowedNamespaces []string, pathRule, queryRule, fragmentRule Vali
 type AssertionMethod struct {
 	Id         string
 	Type       string
-	Controller []string
+	Controller string
 }
 
-func IsAssertionMethod(allowedNamespaces []string) *CustomErrorRule {
+func IsAssertionMethod(allowedNamespaces []string, prefix string) *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
-		err := IsDIDUrl(allowedNamespaces, Empty, Empty, Required).Validate(value)
+		err := validation.Validate(value, IsDIDUrl(allowedNamespaces, Empty, Empty, Required), HasPrefix(prefix))
 		if err != nil {
 			casted, ok := value.(string)
 			if !ok {
@@ -134,8 +134,8 @@ func IsAssertionMethod(allowedNamespaces []string) *CustomErrorRule {
 			}
 
 			return validation.ValidateStruct(&result,
-				validation.Field(&result.Id, validation.Required, IsDIDUrl(allowedNamespaces, Empty, Empty, Required)),
-				validation.Field(&result.Controller, validation.Required, IsUniqueStrList(), validation.Each(IsDID(allowedNamespaces))),
+				validation.Field(&result.Id, validation.Required, IsDIDUrl(allowedNamespaces, Empty, Empty, Required), HasPrefix(prefix)),
+				validation.Field(&result.Controller, validation.Required, IsDID(allowedNamespaces)),
 				validation.Field(&result.Type, IsURI()),
 			)
 		}
