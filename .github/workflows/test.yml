@@ -306,7 +306,7 @@ jobs:
 
   report-results:
     name: "Report"
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     # NOTE: If not next major release, only unit and integration tests are necessary, otherwise all tests are needed.
     # needs: [unit-tests, integration-tests]
     needs: [unit-tests, integration-tests]

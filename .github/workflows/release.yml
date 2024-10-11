@@ -12,7 +12,7 @@ jobs:
   # List of languages enabled is smaller than in lint workflow
   super-lint:
     name: "Super Linter"
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
@@ -43,7 +43,7 @@ jobs:
 
   release-guard:
     name: "Check release condition"
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     needs: super-lint
     outputs:
       RELEASE_VERSION: ${{ steps.set-version.outputs.RELEASE_VERSION }}
