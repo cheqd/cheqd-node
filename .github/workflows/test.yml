@@ -297,8 +297,8 @@ jobs:
     name: "Report"
     runs-on: ubuntu-20.04
     # NOTE: If not next major release, only unit and integration tests are necessary, otherwise all tests are needed.
-    needs: [unit-tests, integration-tests]
-    # needs: [unit-tests, integration-tests, upgrade-tests]
+    # needs: [unit-tests, integration-tests]
+    needs: [unit-tests, integration-tests, upgrade-tests]
     if: always()
 
     steps:
