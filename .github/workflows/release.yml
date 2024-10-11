@@ -12,7 +12,7 @@ jobs:
   # List of languages enabled is smaller than in lint workflow
   super-lint:
     name: "Super Linter"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
@@ -20,7 +20,7 @@ jobs:
         fetch-depth: 0 # Required to fetch version
 
     - name: Run Super Linter
-      uses: github/super-linter/slim@v5
+      uses: github/super-linter/slim@v7
       env:
         IGNORE_GITIGNORED_FILES: true
         DEFAULT_BRANCH: main
@@ -28,18 +28,22 @@ jobs:
         LOG_LEVEL: WARN
         VALIDATE_ALL_CODEBASE: true
         MULTI_STATUS: true
+        PYTHON_PYLINT_CONFIG_FILE: .pylintrc
 
         VALIDATE_BASH: true
         VALIDATE_DOCKERFILE_HADOLINT: true
+        VALIDATE_ENV: true
+        VALIDATE_GITHUB_ACTIONS: true
         VALIDATE_JSON: true
-        VALIDATE_OPENAPI: true
+        VALIDATE_MARKDOWN: true
+        # VALIDATE_OPENAPI: true
         VALIDATE_PYTHON_PYLINT: true
         VALIDATE_XML: true
         VALIDATE_YAML: true
 
   release-guard:
     name: "Check release condition"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     needs: super-lint
     outputs:
       RELEASE_VERSION: ${{ steps.set-version.outputs.RELEASE_VERSION }}
@@ -60,7 +64,7 @@ jobs:
       # Required for short-lived token provided to Semantic Release
       - name: "Obtain Github App token"
         id: app-token
-        uses: getsentry/action-github-app-token@v3.0.0
+        uses: getsentry/action-github-app-token@v3
         with:
           app_id: ${{ secrets.BOT_APP_ID }}
           private_key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
@@ -95,7 +99,7 @@ jobs:
 
   release-binary:
     name: "Node binary"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     needs: [ super-lint, release-guard ]
     # Only run if release-guard outputs EXECUTE_RELEASE=true
     if: needs.release-guard.outputs.EXECUTE_RELEASE == 'true'
@@ -112,12 +116,12 @@ jobs:
           cache: true
 
       # Setup for pushing to Buf.build later
-      - uses: bufbuild/buf-setup-action@v1.30.1
+      - uses: bufbuild/buf-setup-action@v1.44.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v5
+        uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
           version: latest
@@ -135,7 +139,7 @@ jobs:
   release-docker:
     name: "Docker image"
     needs: [ super-lint, release-guard ]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     # Only run if release-guard outputs EXECUTE_RELEASE=true
     if: needs.release-guard.outputs.EXECUTE_RELEASE == 'true'
     env:
@@ -176,7 +180,7 @@ jobs:
             org.opencontainers.image.documentation="https://docs.cheqd.io/node"
 
       - name: Build and push image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: docker/Dockerfile
