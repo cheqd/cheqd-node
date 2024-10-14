@@ -167,6 +167,7 @@ func QueryTxn(container, hash string) (sdk.TxResponse, error) {
 	var resp sdk.TxResponse
 	err = integrationhelpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
+		fmt.Println("Error unmarshalling tx", res)
 		return sdk.TxResponse{}, err
 	}
 
