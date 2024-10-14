@@ -160,6 +160,7 @@ func QueryTxn(container, hash string) (sdk.TxResponse, error) {
 	time.Sleep(2000 * time.Millisecond)
 	res, err := Query(container, CliBinaryName, "tx", hash)
 	if err != nil {
+		fmt.Println("Error querying tx", res)
 		return sdk.TxResponse{}, err
 	}
 
