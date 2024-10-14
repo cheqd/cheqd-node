@@ -62,6 +62,10 @@ var _ = Describe("Upgrade - Pre", func() {
 				res, err := cliv2.CreateDid(DidDocCreatePayload, DidDocCreateSignInput, cli.Validator0, "", didFeeParams.CreateDid.String())
 				Expect(err).To(BeNil())
 				Expect(res.Code).To(BeEquivalentTo(0))
+
+				By("waiting for an additional set of blocks to be produced")
+				err = cli.WaitForCaughtUp(cli.Validator0, cli.CliBinaryName, 5)
+				Expect(err).To(BeNil())
 			}
 		})
 
@@ -96,6 +100,10 @@ var _ = Describe("Upgrade - Pre", func() {
 				)
 				Expect(err).To(BeNil())
 				Expect(res.Code).To(BeEquivalentTo(0))
+
+				By("waiting for an additional set of blocks to be produced")
+				err = cli.WaitForCaughtUp(cli.Validator0, cli.CliBinaryName, 5)
+				Expect(err).To(BeNil())
 			}
 		})
 
