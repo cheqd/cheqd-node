@@ -20,6 +20,7 @@ import (
 var _ = Describe("Upgrade - Pre", func() {
 	var didFeeParams didtypes.FeeParams
 	var resourceFeeParams resourcetypes.FeeParams
+	var ProposalID string
 
 	BeforeEach(func() {
 		// query fee params - case: did
@@ -129,6 +130,13 @@ var _ = Describe("Upgrade - Pre", func() {
 			Expect(err).To(BeNil())
 			fmt.Println("response is>>>>>>.", res)
 			Expect(res.Code).To(BeEquivalentTo(0))
+			res, err = cli.QueryTxn(cli.Validator0, res.TxHash)
+			Expect(err).To(BeNil())
+
+			proposal_id, err := cli.GetProposalID(res.RawLog)
+			Expect(err).To(BeNil())
+
+			ProposalID = proposal_id
 		})
 
 		It("should wait for a certain number of blocks to be produced", func() {
@@ -161,7 +169,7 @@ var _ = Describe("Upgrade - Pre", func() {
 
 		It("should vote for the software upgrade proposal from `validator0` container", func() {
 			By("sending a VoteProposal transaction from `validator0` container")
-			res, err := cli.VoteProposal(cli.Validator0, "1", "yes")
+			res, err := cli.VoteProposal(cli.Validator0, ProposalID, "yes")
 			Expect(err).To(BeNil())
 			fmt.Println("response>>>>>>>>>>>>>>", res)
 
@@ -180,7 +188,7 @@ var _ = Describe("Upgrade - Pre", func() {
 
 		It("should vote for the software upgrade proposal from `validator1` container", func() {
 			By("sending a VoteProposal transaction from `validator1` container")
-			res, err := cli.VoteProposal(cli.Validator1, "1", "yes")
+			res, err := cli.VoteProposal(cli.Validator1, ProposalID, "yes")
 			Expect(err).To(BeNil())
 			fmt.Println("response>>>>>>>>>>>>>>", res)
 
@@ -199,7 +207,7 @@ var _ = Describe("Upgrade - Pre", func() {
 
 		It("should vote for the software upgrade proposal from `validator2` container", func() {
 			By("sending a VoteProposal transaction from `validator2` container")
-			res, err := cli.VoteProposal(cli.Validator2, "1", "yes")
+			res, err := cli.VoteProposal(cli.Validator2, ProposalID, "yes")
 			Expect(err).To(BeNil())
 			fmt.Println("response>>>>>>>>>>>>>>", res)
 			Expect(res.Code).To(BeEquivalentTo(0))
@@ -223,7 +231,7 @@ var _ = Describe("Upgrade - Pre", func() {
 
 		It("should query the proposal status to ensure it has passed", func() {
 			By("sending a QueryProposal Msg from `validator0` container")
-			proposal, err := cli.QueryProposal(cli.Validator0, "1")
+			proposal, err := cli.QueryProposal(cli.Validator0, ProposalID)
 			Expect(err).To(BeNil())
 			Expect(proposal.Status).To(BeEquivalentTo(govtypesv1.StatusPassed))
 		})

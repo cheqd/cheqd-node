@@ -19,7 +19,7 @@ import (
 var _ = Describe("Upgrade - Pre", func() {
 	var didFeeParams didtypes.FeeParams
 	var resourceFeeParams resourcetypes.FeeParams
-	var Proposal_id string
+	var ProposalID string
 	BeforeEach(func() {
 		// query fee params - case: did
 		res, err := cli.QueryParams(cli.Validator0, didtypes.ModuleName, string(didtypes.ParamStoreKeyFeeParams))
@@ -118,10 +118,10 @@ var _ = Describe("Upgrade - Pre", func() {
 			res, err = cli.QueryTxn(cli.Validator0, res.TxHash)
 			Expect(err).To(BeNil())
 
-			proposal_id, err := cli.GetProposalID(res.RawLog)
+			ProposalID, err := cli.GetProposalID(res.RawLog)
 			Expect(err).To(BeNil())
 
-			Proposal_id = proposal_id
+			ProposalID = ProposalID
 		})
 
 		It("should deposit tokens for the software upgrade proposal", func() {
@@ -133,28 +133,28 @@ var _ = Describe("Upgrade - Pre", func() {
 
 		It("should vote for the software upgrade proposal from `validator0` container", func() {
 			By("sending a VoteProposal transaction from `validator0` container")
-			res, err := cli.VoteProposal(cli.Validator0, Proposal_id, "yes")
+			res, err := cli.VoteProposal(cli.Validator0, ProposalID, "yes")
 			Expect(err).To(BeNil())
 			Expect(res.Code).To(BeEquivalentTo(0))
 		})
 
 		It("should vote for the software upgrade proposal from `validator1` container", func() {
 			By("sending a VoteProposal transaction from `validator1` container")
-			res, err := cli.VoteProposal(cli.Validator1, Proposal_id, "yes")
+			res, err := cli.VoteProposal(cli.Validator1, ProposalID, "yes")
 			Expect(err).To(BeNil())
 			Expect(res.Code).To(BeEquivalentTo(0))
 		})
 
 		It("should vote for the software upgrade proposal from `validator2` container", func() {
 			By("sending a VoteProposal transaction from `validator2` container")
-			res, err := cli.VoteProposal(cli.Validator2, Proposal_id, "yes")
+			res, err := cli.VoteProposal(cli.Validator2, ProposalID, "yes")
 			Expect(err).To(BeNil())
 			Expect(res.Code).To(BeEquivalentTo(0))
 		})
 
 		It("should vote for the software upgrade proposal from `validator3` container", func() {
 			By("sending a VoteProposal transaction from `validator3` container")
-			res, err := cli.VoteProposal(cli.Validator3, Proposal_id, "yes")
+			res, err := cli.VoteProposal(cli.Validator3, ProposalID, "yes")
 			Expect(err).To(BeNil())
 			Expect(res.Code).To(BeEquivalentTo(0))
 		})
@@ -167,7 +167,7 @@ var _ = Describe("Upgrade - Pre", func() {
 
 		It("should query the proposal status to ensure it has passed", func() {
 			By("sending a QueryProposal Msg from `validator0` container")
-			proposal, err := cli.QueryProposal(cli.Validator0, Proposal_id)
+			proposal, err := cli.QueryProposal(cli.Validator0, ProposalID)
 			Expect(err).To(BeNil())
 			Expect(proposal.Status).To(BeEquivalentTo(govtypesv1.StatusPassed))
 		})
