@@ -118,6 +118,8 @@ var _ = Describe("Upgrade - Pre", func() {
 			res, err = cli.QueryTxn(cli.Validator0, res.TxHash)
 			Expect(err).To(BeNil())
 
+			fmt.Println("response is>>>>>>.", res.RawLog)
+
 			proposalId, err := cli.GetProposalID(res.RawLog)
 			Expect(err).To(BeNil())
 
