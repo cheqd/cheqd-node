@@ -295,4 +295,92 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 			isValid:  false,
 			errorMsg: "assertionMethod should be a valid key reference within the DID document's verification method",
 		}),
+	Entry(
+		"Assertion method has invalid protobuf value",
+		DIDDocTestCase{
+			didDoc: &DidDoc{
+				Id:         ValidTestDID,
+				Controller: []string{ValidTestDID},
+				VerificationMethod: []*VerificationMethod{
+					{
+						Id:                     fmt.Sprintf("%s#fragment", ValidTestDID),
+						VerificationMethodType: "Ed25519VerificationKey2020",
+						Controller:             ValidTestDID,
+						VerificationMaterial:   ValidEd25519VerificationKey2020VerificationMaterial,
+					},
+				},
+				AssertionMethod: []string{func() string {
+					b, _ := json.Marshal(struct {
+						Id           string
+						Type         string
+						Controller   string
+						InvalidField map[string]interface{}
+					}{
+						Id:           fmt.Sprintf("%s#fragment", ValidTestDID),
+						Type:         "Ed25519VerificationKey2020",
+						Controller:   ValidTestDID,
+						InvalidField: map[string]interface{}{"unsupported": []int{1, 2, 3}},
+					})
+					return strconv.Quote(string(b))
+				}()},
+			},
+			isValid:  false,
+			errorMsg: "field InvalidField is not protobuf-supported",
+		}),
+	Entry(
+		"Assertion method is missing controller value in JSON",
+		DIDDocTestCase{
+			didDoc: &DidDoc{
+				Id:         ValidTestDID,
+				Controller: []string{ValidTestDID},
+				VerificationMethod: []*VerificationMethod{
+					{
+						Id:                     fmt.Sprintf("%s#fragment", ValidTestDID),
+						VerificationMethodType: "Ed25519VerificationKey2020",
+						Controller:             ValidTestDID,
+						VerificationMaterial:   ValidEd25519VerificationKey2020VerificationMaterial,
+					},
+				},
+				AssertionMethod: []string{func() string {
+					b, _ := json.Marshal(struct {
+						Id   string
+						Type string
+					}{
+						Id:   fmt.Sprintf("%s#fragment", ValidTestDID),
+						Type: "Ed25519VerificationKey2020",
+					})
+					return strconv.Quote(string(b))
+				}()},
+			},
+			isValid:  false,
+			errorMsg: "assertion_method: (0: (Controller: cannot be blank.).).",
+		}),
+	Entry(
+		"Assertion method is contains unescaped JSON string",
+		DIDDocTestCase{
+			didDoc: &DidDoc{
+				Id:         ValidTestDID,
+				Controller: []string{ValidTestDID},
+				VerificationMethod: []*VerificationMethod{
+					{
+						Id:                     fmt.Sprintf("%s#fragment", ValidTestDID),
+						VerificationMethodType: "Ed25519VerificationKey2020",
+						Controller:             ValidTestDID,
+						VerificationMaterial:   ValidEd25519VerificationKey2020VerificationMaterial,
+					},
+				},
+				AssertionMethod: []string{func() string {
+					b, _ := json.Marshal(struct {
+						Id   string
+						Type string
+					}{
+						Id:   fmt.Sprintf("%s#fragment", ValidTestDID),
+						Type: "Ed25519VerificationKey2020",
+					})
+					return string(b)
+				}()},
+			},
+			isValid:  false,
+			errorMsg: "assertionMethod should be a DIDUrl or an Escaped JSON string",
+		}),
 )
