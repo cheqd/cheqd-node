@@ -28,11 +28,15 @@ jobs:
         LOG_LEVEL: WARN
         VALIDATE_ALL_CODEBASE: true
         MULTI_STATUS: true
+        PYTHON_PYLINT_CONFIG_FILE: .pylintrc
 
         VALIDATE_BASH: true
         VALIDATE_DOCKERFILE_HADOLINT: true
+        VALIDATE_ENV: true
+        VALIDATE_GITHUB_ACTIONS: true
         VALIDATE_JSON: true
-        VALIDATE_OPENAPI: true
+        VALIDATE_MARKDOWN: true
+        # VALIDATE_OPENAPI: true
         VALIDATE_PYTHON_PYLINT: true
         VALIDATE_XML: true
         VALIDATE_YAML: true
@@ -60,7 +64,7 @@ jobs:
       # Required for short-lived token provided to Semantic Release
       - name: "Obtain Github App token"
         id: app-token
-        uses: getsentry/action-github-app-token@v3.1
+        uses: getsentry/action-github-app-token@v3
         with:
           app_id: ${{ secrets.BOT_APP_ID }}
           private_key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
