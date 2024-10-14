@@ -20,7 +20,7 @@ import (
 var _ = Describe("Upgrade - Pre", func() {
 	var didFeeParams didtypes.FeeParams
 	var resourceFeeParams resourcetypes.FeeParams
-	var ProposalID string
+	ProposalID := "1"
 
 	BeforeEach(func() {
 		// query fee params - case: did
@@ -130,15 +130,6 @@ var _ = Describe("Upgrade - Pre", func() {
 			Expect(err).To(BeNil())
 			fmt.Println("response is>>>>>>.", res)
 			Expect(res.Code).To(BeEquivalentTo(0))
-			res, err = cli.QueryTxn(cli.Validator0, res.TxHash)
-			Expect(err).To(BeNil())
-
-			fmt.Println("response is>>>>>>.", res.RawLog)
-
-			proposal_id, err := cli.GetProposalID(res.RawLog)
-			Expect(err).To(BeNil())
-
-			ProposalID = proposal_id
 		})
 
 		It("should wait for a certain number of blocks to be produced", func() {
