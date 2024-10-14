@@ -64,7 +64,9 @@ var _ = Describe("Upgrade - Pre", func() {
 				Expect(res.Code).To(BeEquivalentTo(0))
 
 				By("waiting for an additional set of blocks to be produced")
-				err = cli.WaitForCaughtUp(cli.Validator0, cli.CliBinaryName, 5)
+				height, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
+				Expect(err).To(BeNil())
+				err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, height+5, cli.VotingPeriod*6)
 				Expect(err).To(BeNil())
 			}
 		})
@@ -102,7 +104,9 @@ var _ = Describe("Upgrade - Pre", func() {
 				Expect(res.Code).To(BeEquivalentTo(0))
 
 				By("waiting for an additional set of blocks to be produced")
-				err = cli.WaitForCaughtUp(cli.Validator0, cli.CliBinaryName, 5)
+				height, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
+				Expect(err).To(BeNil())
+				err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, height+5, cli.VotingPeriod*6)
 				Expect(err).To(BeNil())
 			}
 		})
