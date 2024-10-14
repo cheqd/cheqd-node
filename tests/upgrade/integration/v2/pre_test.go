@@ -118,10 +118,10 @@ var _ = Describe("Upgrade - Pre", func() {
 			res, err = cli.QueryTxn(cli.Validator0, res.TxHash)
 			Expect(err).To(BeNil())
 
-			ProposalID, err := cli.GetProposalID(res.RawLog)
+			proposalId, err := cli.GetProposalID(res.RawLog)
 			Expect(err).To(BeNil())
 
-			ProposalID = ProposalID
+			ProposalID = proposalId
 		})
 
 		It("should deposit tokens for the software upgrade proposal", func() {
