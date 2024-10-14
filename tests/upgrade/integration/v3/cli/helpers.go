@@ -216,6 +216,7 @@ func MakeCodecWithExtendedRegistry() codec.Codec {
 	interfaceRegistry.RegisterImplementations(
 		(*sdk.Msg)(nil),
 		&upgradetypes.MsgSoftwareUpgrade{},
+		//nolint: staticcheck
 		&upgradetypes.SoftwareUpgradeProposal{},
 		&govtypesv1.MsgExecLegacyContent{},
 		&didv2.MsgBurn{},
