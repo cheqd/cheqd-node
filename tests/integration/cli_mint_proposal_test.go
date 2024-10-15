@@ -80,6 +80,14 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 
+	It("should vote for the mint proposal from `validator0` container", func() {
+		By("sending a VoteProposal transaction from `validator0` container")
+		res, err := cli.VoteProposalTx(cli.Operator3, Proposal_id, "yes", cli.CliGasParams)
+		fmt.Println("response >>>>>>>>>>>>>>>>>", res)
+		Expect(err).To(BeNil())
+		Expect(res.Code).To(BeEquivalentTo(0))
+	})
+
 	It("should wait for the proposal to pass", func() {
 		By("getting the current block height")
 		currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
