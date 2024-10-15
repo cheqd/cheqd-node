@@ -9,7 +9,12 @@
         {
             "name": "release/2.x",
             "range": "2.x",
-            "channel": "2.x",
+            "channel": "2.x"
+        },
+        {
+            "name": "rc-v2",
+            "range": "2.x",
+            "channel": "rc-v2",
             "prerelease": true
         },
         {
