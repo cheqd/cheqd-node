@@ -175,7 +175,7 @@ var _ = Describe("Upgrade - Pre", func() {
 			Expect(err).To(BeNil())
 
 			By("waiting for 10 blocks to be produced on top, after the upgrade")
-			err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+3, cli.VotingPeriod*6)
+			err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+1, cli.VotingPeriod*2)
 			Expect(err).To(BeNil())
 		})
 
@@ -194,7 +194,7 @@ var _ = Describe("Upgrade - Pre", func() {
 			Expect(err).To(BeNil())
 
 			By("waiting for 10 blocks to be produced on top, after the upgrade")
-			err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+3, cli.VotingPeriod*3)
+			err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+1, cli.VotingPeriod*2)
 			Expect(err).To(BeNil())
 		})
 
@@ -212,7 +212,7 @@ var _ = Describe("Upgrade - Pre", func() {
 			Expect(err).To(BeNil())
 
 			By("waiting for 10 blocks to be produced on top, after the upgrade")
-			err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+3, cli.VotingPeriod*6)
+			err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+1, cli.VotingPeriod*2)
 			Expect(err).To(BeNil())
 		})
 
