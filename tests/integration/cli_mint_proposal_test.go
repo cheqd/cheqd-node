@@ -104,6 +104,7 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 	It("should check the proposal status to ensure it has passed", func() {
 		By("sending a QueryProposal query from `validator0` container")
 		proposal, err := cli.QueryProposal(cli.Validator0, Proposal_id)
+		fmt.Println("proposal>>>>>>>>>>>>>>>>>>", proposal)
 		Expect(err).To(BeNil())
 		Expect(proposal.Status).To(BeEquivalentTo(govtypesv1.StatusPassed))
 	})
