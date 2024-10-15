@@ -146,7 +146,9 @@ var _ = Describe("Upgrade - Post", func() {
 
 		It("should burn the coins from the given address (here container/validator)", func() {
 			By("querying the account balance")
-			balanceBefore, err := integrationcli.QueryBalance(integrationcli.Operator0, didtypes.BaseMinimalDenom)
+			Operator0_address, err := integrationcli.QueryKeys(integrationcli.Operator0)
+			Expect(err).To(BeNil())
+			balanceBefore, err := integrationcli.QueryBalance(Operator0_address, didtypes.BaseMinimalDenom)
 			Expect(err).To(BeNil())
 			Expect(balanceBefore.Denom).To(Equal(didtypes.BaseMinimalDenom))
 
@@ -157,7 +159,7 @@ var _ = Describe("Upgrade - Post", func() {
 			Expect(res.Code).To(BeEquivalentTo(0))
 
 			By("querying the account balance again")
-			balanceAfter, err := integrationcli.QueryBalance(integrationcli.Operator0, didtypes.BaseMinimalDenom)
+			balanceAfter, err := integrationcli.QueryBalance(Operator0_address, didtypes.BaseMinimalDenom)
 			Expect(err).To(BeNil())
 			Expect(balanceAfter.Denom).To(Equal(didtypes.BaseMinimalDenom))
 
