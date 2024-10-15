@@ -3,6 +3,7 @@
 package integration
 
 import (
+	"fmt"
 	"path/filepath"
 
 	cli "github.com/cheqd/cheqd-node/tests/integration/cli"
@@ -59,6 +60,7 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		By("sending a VoteProposal transaction from `validator1` container")
 		res, err := cli.VoteProposalTx(cli.Operator1, Proposal_id, "yes", cli.CliGasParams)
 		Expect(err).To(BeNil())
+		fmt.Println("response >>>>>>>>>>>>>>>>>", res)
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 
@@ -66,12 +68,14 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		By("sending a VoteProposal transaction from `validator2` container")
 		res, err := cli.VoteProposalTx(cli.Operator2, Proposal_id, "yes", cli.CliGasParams)
 		Expect(err).To(BeNil())
+		fmt.Println("response >>>>>>>>>>>>>>>>>", res)
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 
 	It("should vote for the mint proposal from `validator0` container", func() {
 		By("sending a VoteProposal transaction from `validator0` container")
 		res, err := cli.VoteProposalTx(cli.Operator0, Proposal_id, "yes", cli.CliGasParams)
+		fmt.Println("response >>>>>>>>>>>>>>>>>", res)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
