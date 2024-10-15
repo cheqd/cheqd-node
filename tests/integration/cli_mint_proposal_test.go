@@ -24,6 +24,10 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		// Query balances
 		balanceBefore, err = cli.QueryBalance("cheqd1lhl9g4rgldadgtz7v6rt50u45uhhj8hhv8d8uf", didtypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
+
+		perms, err := cli.QueryModulePerms("cheqd")
+		fmt.Println("perms<<<<<<<<<<<<<<<", perms)
+		Expect(err).To(BeNil())
 	})
 	It("should wait for node catching up", func() {
 		By("pinging the node status until catching up is flagged as false ")
