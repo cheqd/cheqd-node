@@ -1131,7 +1131,7 @@ func (app *App) RegisterUpgradeHandlers() {
 			if err != nil {
 				return migrations, err
 			}
-			UpgradeHandler(ctx, app.AccountKeeper)
+			SetExplicitModuleAccountPermissions(ctx, app.AccountKeeper)
 			err = ConfigureFeeMarketModule(ctx, app.FeeMarketKeeper)
 			if err != nil {
 				return migrations, err
@@ -1189,9 +1189,9 @@ func (app *App) Configurator() module.Configurator {
 	return app.configurator
 }
 
-func UpgradeHandler(ctx sdk.Context, accountKeeper authkeeper.AccountKeeper) {
+func SetExplicitModuleAccountPermissions(ctx sdk.Context, accountKeeper authkeeper.AccountKeeper) {
 	// Get the module account using the account name
-	moduleAcc := accountKeeper.GetModuleAccount(ctx, "cheqd")
+	moduleAcc := accountKeeper.GetModuleAccount(ctx, didtypes.ModuleName)
 	// Ensure the account exists
 	if moduleAcc == nil {
 		panic("module account not found")
