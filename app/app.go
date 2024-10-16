@@ -1131,6 +1131,7 @@ func (app *App) RegisterUpgradeHandlers() {
 			if err != nil {
 				return migrations, err
 			}
+			UpgradeHandler(ctx, app.AccountKeeper)
 			err = ConfigureFeeMarketModule(ctx, app.FeeMarketKeeper)
 			if err != nil {
 				return migrations, err
@@ -1186,4 +1187,22 @@ func ConfigureFeeMarketModule(ctx sdk.Context, keeper *feemarketkeeper.Keeper) e
 
 func (app *App) Configurator() module.Configurator {
 	return app.configurator
+}
+
+func UpgradeHandler(ctx sdk.Context, accountKeeper authkeeper.AccountKeeper) {
+	// Get the module account using the account name
+	moduleAcc := accountKeeper.GetModuleAccount(ctx, "cheqd")
+	// Ensure the account exists
+	if moduleAcc == nil {
+		panic("module account not found")
+	}
+	// Update the permissions (replace with the actual permissions)
+	newPermissions := []string{authtypes.Minter, authtypes.Burner} // Example permissions
+	// Cast the account to the concrete type that has permissions
+	if macc, ok := moduleAcc.(*authtypes.ModuleAccount); ok {
+		macc.Permissions = newPermissions
+		accountKeeper.SetModuleAccount(ctx, macc) // Update the account in the keeper
+	} else {
+		panic("failed to cast module account to *ModuleAccount")
+	}
 }
