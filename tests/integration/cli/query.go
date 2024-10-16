@@ -228,12 +228,3 @@ func QueryKeys(name string) (string, error) {
 
 	return result.Address, nil
 }
-
-func QueryModulePerms(module string) (string, error) {
-	args := []string{"query", "auth", "module-account", module}
-
-	// Common params
-	args = append(args, CLIQueryParams...)
-
-	return Exec(args...)
-}

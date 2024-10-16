@@ -3,7 +3,6 @@
 package integration
 
 import (
-	"fmt"
 	"path/filepath"
 
 	cli "github.com/cheqd/cheqd-node/tests/integration/cli"
@@ -24,16 +23,14 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		// Query balances
 		balanceBefore, err = cli.QueryBalance("cheqd1lhl9g4rgldadgtz7v6rt50u45uhhj8hhv8d8uf", didtypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
-
-		perms, err := cli.QueryModulePerms("cheqd")
-		fmt.Println("perms<<<<<<<<<<<<<<<", perms)
-		Expect(err).To(BeNil())
 	})
+
 	It("should wait for node catching up", func() {
 		By("pinging the node status until catching up is flagged as false ")
 		err := cli.WaitForCaughtUp(cli.Validator0, cli.CliBinaryName, cli.VotingPeriod*6)
 		Expect(err).To(BeNil())
 	})
+
 	It("should submit a mint proposal ", func() {
 		By("passing the proposal file to the container")
 		_, err := cli.LocalnetExecCopyAbsoluteWithPermissions(filepath.Join("proposal.json"), cli.DockerHome, cli.Validator0)
@@ -51,6 +48,7 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
+
 	It("should wait for the proposal submission to be included in a block", func() {
 		By("getting the current block height")
 		currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
@@ -60,11 +58,11 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+1, 2)
 		Expect(err).To(BeNil())
 	})
+
 	It("should vote for the mint proposal from `validator1` container", func() {
 		By("sending a VoteProposal transaction from `validator1` container")
 		res, err := cli.VoteProposalTx(cli.Operator1, Proposal_id, "yes", cli.CliGasParams)
 		Expect(err).To(BeNil())
-		fmt.Println("response >>>>>>>>>>>>>>>>>", res)
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 
@@ -72,14 +70,12 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		By("sending a VoteProposal transaction from `validator2` container")
 		res, err := cli.VoteProposalTx(cli.Operator2, Proposal_id, "yes", cli.CliGasParams)
 		Expect(err).To(BeNil())
-		fmt.Println("response >>>>>>>>>>>>>>>>>", res)
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 
 	It("should vote for the mint proposal from `validator0` container", func() {
 		By("sending a VoteProposal transaction from `validator0` container")
 		res, err := cli.VoteProposalTx(cli.Operator0, Proposal_id, "yes", cli.CliGasParams)
-		fmt.Println("response >>>>>>>>>>>>>>>>>", res)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
@@ -87,10 +83,8 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 	It("should vote for the mint proposal from `validator0` container", func() {
 		By("sending a VoteProposal transaction from `validator0` container")
 		res, err := cli.VoteProposalTx(cli.Operator3, Proposal_id, "yes", cli.CliGasParams)
-		fmt.Println("response >>>>>>>>>>>>>>>>>", res)
 		Expect(err).To(BeNil())
 		res, err = cli.QueryTxn(res.TxHash)
-		fmt.Println("response >>>>>>>>>>>>>>>>>", res)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
@@ -108,10 +102,10 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 	It("should check the proposal status to ensure it has passed", func() {
 		By("sending a QueryProposal query from `validator0` container")
 		proposal, err := cli.QueryProposal(cli.Validator0, Proposal_id)
-		fmt.Println("proposal>>>>>>>>>>>>>>>>>>", proposal)
 		Expect(err).To(BeNil())
 		Expect(proposal.Status).To(BeEquivalentTo(govtypesv1.StatusPassed))
 	})
+
 	It("should have the correct balance after minting", func() {
 		By("querying the balance of the given address after minting")
 		balanceAfter, err := cli.QueryBalance("cheqd1lhl9g4rgldadgtz7v6rt50u45uhhj8hhv8d8uf", didtypes.BaseMinimalDenom)

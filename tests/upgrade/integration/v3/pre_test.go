@@ -128,7 +128,6 @@ var _ = Describe("Upgrade - Pre", func() {
 			By("sending a SubmitUpgradeProposal transaction from `validator0` container")
 			res, err := cli.SubmitUpgradeProposalLegacy(VotingEndHeight, cli.Validator0)
 			Expect(err).To(BeNil())
-			fmt.Println("response is>>>>>>.", res)
 			Expect(res.Code).To(BeEquivalentTo(0))
 		})
 
@@ -147,7 +146,6 @@ var _ = Describe("Upgrade - Pre", func() {
 			res, err := cli.DepositGov(cli.Validator0)
 			Expect(err).To(BeNil())
 			Expect(res.Code).To(BeEquivalentTo(0))
-			fmt.Println("response>>>>>>>>>>>>", res)
 		})
 
 		It("should wait for the proposal submission to be included in a block", func() {
@@ -164,8 +162,6 @@ var _ = Describe("Upgrade - Pre", func() {
 			By("sending a VoteProposal transaction from `validator0` container")
 			res, err := cli.VoteProposal(cli.Validator0, ProposalID, "yes")
 			Expect(err).To(BeNil())
-			fmt.Println("response>>>>>>>>>>>>>>", res)
-
 			Expect(res.Code).To(BeEquivalentTo(0))
 		})
 
@@ -183,8 +179,6 @@ var _ = Describe("Upgrade - Pre", func() {
 			By("sending a VoteProposal transaction from `validator1` container")
 			res, err := cli.VoteProposal(cli.Validator1, ProposalID, "yes")
 			Expect(err).To(BeNil())
-			fmt.Println("response>>>>>>>>>>>>>>", res)
-
 			Expect(res.Code).To(BeEquivalentTo(0))
 		})
 
@@ -202,7 +196,6 @@ var _ = Describe("Upgrade - Pre", func() {
 			By("sending a VoteProposal transaction from `validator2` container")
 			res, err := cli.VoteProposal(cli.Validator2, ProposalID, "yes")
 			Expect(err).To(BeNil())
-			fmt.Println("response>>>>>>>>>>>>>>", res)
 			Expect(res.Code).To(BeEquivalentTo(0))
 		})
 
