@@ -148,7 +148,6 @@ func IsAssertionMethod(allowedNamespaces []string, didDoc DidDoc) *CustomErrorRu
 		return validation.ValidateStruct(&result,
 			validation.Field(&result.Id, validation.Required, IsAssertionMethod(allowedNamespaces, didDoc)),
 			validation.Field(&result.Controller, validation.Required, IsDID(allowedNamespaces)),
-			validation.Field(&result.Type, IsURI()),
 		)
 	})
 }

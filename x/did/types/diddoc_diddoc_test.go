@@ -253,9 +253,9 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 						PublicKeyBase58 string
 					}{
 						Id:              fmt.Sprintf("%s#fragment", ValidTestDID),
-						Type:            "Ed25519VerificationKey2020",
+						Type:            "Ed25519VerificationKey2018",
 						Controller:      ValidTestDID,
-						PublicKeyBase58: "base58",
+						PublicKeyBase58: "base58", // arbitrarily chosen
 					})
 					return strconv.Quote(string(b))
 				}()},
@@ -264,7 +264,7 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 			errorMsg: "",
 		}),
 	Entry(
-		"Assertion method is has wrong fragment",
+		"Assertion method has wrong fragment",
 		DIDDocTestCase{
 			didDoc: &DidDoc{
 				Id:         ValidTestDID,
@@ -285,9 +285,9 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 						PublicKeyBase58 string
 					}{
 						Id:              fmt.Sprintf("%s#fragment-1", ValidTestDID),
-						Type:            "Ed25519VerificationKey2020",
+						Type:            "Ed25519VerificationKey2018",
 						Controller:      ValidTestDID,
-						PublicKeyBase58: "base58",
+						PublicKeyBase58: "base58", // arbitrarily chosen
 					})
 					return strconv.Quote(string(b))
 				}()},
@@ -317,7 +317,7 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 						InvalidField map[string]interface{}
 					}{
 						Id:           fmt.Sprintf("%s#fragment", ValidTestDID),
-						Type:         "Ed25519VerificationKey2020",
+						Type:         "Ed25519VerificationKey2018",
 						Controller:   ValidTestDID,
 						InvalidField: map[string]interface{}{"unsupported": []int{1, 2, 3}},
 					})
@@ -347,7 +347,7 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 						Type string
 					}{
 						Id:   fmt.Sprintf("%s#fragment", ValidTestDID),
-						Type: "Ed25519VerificationKey2020",
+						Type: "Ed25519VerificationKey2018",
 					})
 					return strconv.Quote(string(b))
 				}()},
@@ -356,7 +356,7 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 			errorMsg: "assertion_method: (0: (Controller: cannot be blank.).).",
 		}),
 	Entry(
-		"Assertion method is contains unescaped JSON string",
+		"Assertion method contains unescaped JSON string",
 		DIDDocTestCase{
 			didDoc: &DidDoc{
 				Id:         ValidTestDID,
@@ -375,7 +375,7 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 						Type string
 					}{
 						Id:   fmt.Sprintf("%s#fragment", ValidTestDID),
-						Type: "Ed25519VerificationKey2020",
+						Type: "Ed25519VerificationKey2018",
 					})
 					return string(b)
 				}()},
