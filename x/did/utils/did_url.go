@@ -126,12 +126,17 @@ func NormalizeDIDUrl(didURL string) string {
 	return JoinDIDUrl(did, path, query, fragment)
 }
 
-func NormalizeDIDUrlList(didURLs []string) []string {
+func NormalizeDIDUrlList(didURLs []string, verifyJSONEscaped bool) []string {
 	if didURLs == nil {
 		return nil
 	}
 	newDIDURLs := []string{}
 	for _, id := range didURLs {
+		if verifyJSONEscaped && IsJSONEscapedString(id) {
+			newDIDURLs = append(newDIDURLs, id)
+			continue
+		}
+
 		newDIDURLs = append(newDIDURLs, NormalizeDIDUrl(id))
 	}
 	return newDIDURLs

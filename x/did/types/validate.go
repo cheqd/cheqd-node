@@ -107,12 +107,6 @@ func IsDIDUrl(allowedNamespaces []string, pathRule, queryRule, fragmentRule Vali
 	})
 }
 
-type AssertionMethod struct {
-	Id         string
-	Type       string
-	Controller string
-}
-
 func IsAssertionMethod(allowedNamespaces []string, didDoc DidDoc) *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		err := validation.Validate(value, IsDIDUrl(allowedNamespaces, Empty, Empty, Required), HasPrefix(didDoc.Id))
@@ -140,7 +134,7 @@ func IsAssertionMethod(allowedNamespaces []string, didDoc DidDoc) *CustomErrorRu
 			return err
 		}
 
-		var result AssertionMethod
+		var result AssertionMethodJSONUnescaped
 		if err = json.Unmarshal([]byte(unescapedJSON), &result); err != nil {
 			return errors.New("assertionMethod should be a DIDUrl or an Escaped JSON string with id, type and controller values")
 		}
