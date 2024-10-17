@@ -425,7 +425,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 
 		assertionMethodJSONEscaped := func() string {
 			b, _ := json.Marshal(types.AssertionMethodJSONUnescaped{
-				Id:              fmt.Sprintf("%s#fragment", did),
+				Id:              keyID,
 				Type:            "Ed25519VerificationKey2018",
 				Controller:      did,
 				PublicKeyBase58: &publicKeyBase58, // arbitrarily chosen, loosely validated
@@ -465,7 +465,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 
 		assertionMethodJSONEscaped2 := func() string {
 			b, _ := json.Marshal(types.AssertionMethodJSONUnescaped{
-				Id:                 fmt.Sprintf("%s#fragment", did),
+				Id:                 keyID,
 				Type:               "Ed25519VerificationKey2020",
 				Controller:         did,
 				PublicKeyMultibase: &publicKeyMultibase, // arbitrarily chosen, loosely validated

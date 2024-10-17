@@ -315,7 +315,7 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 				}()},
 			},
 			isValid:  false,
-			errorMsg: "field InvalidField is not protobuf-supported",
+			errorMsg: "field invalidField is not protobuf-supported",
 		}),
 	Entry(
 		"Assertion method is missing controller value in JSON",
