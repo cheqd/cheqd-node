@@ -1,0 +1,15 @@
+{
+    "payload": {
+        "collectionId": "5a9b0701-c9b9-4a31-b53f-9a5d3b0d12c3",
+        "id": "76ecedeb-225d-4164-90c2-a4857ac3c01a",
+        "name": "UUID JsonWebKey2020",
+        "resourceType": "TestResourceType",
+        "data": "eyAibWVzc2FnZSI6ICJoZWxsbyB3b3JsZCJ9"
+    },
+    "signInputs": [
+        {
+            "verificationMethodId": "did:cheqd:testnet:5a9b0701-c9b9-4a31-b53f-9a5d3b0d12c3#key-1",
+            "privKey": "P3i6bBQ8MSKCiYmGa3OPLMDwF2YI55oIOLIaupacgax+F5zouGGaBcFqUz7EO5M4buS8tL05AM2qsbMerMyAGw=="
+        }
+    ]
+}

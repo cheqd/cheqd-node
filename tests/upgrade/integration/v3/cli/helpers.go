@@ -106,7 +106,7 @@ func CalculateUpgradeHeight(container string, binary string) (int64, int64, erro
 	if err != nil {
 		return 0, 0, err
 	}
-	return currentHeight + VotingPeriod/ExpectedBlockSeconds + ExtraBlocks*2, votingEndHeight, nil
+	return currentHeight + VotingPeriod/ExpectedBlockSeconds + ExtraBlocks*2, votingEndHeight + 100, nil
 }
 
 // Added to wait for the upgrade to be applied.
