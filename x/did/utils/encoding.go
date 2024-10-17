@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/mr-tron/base58"
 	"github.com/multiformats/go-multibase"
@@ -87,4 +88,21 @@ func ValidateBase58Ed25519VerificationKey2018(data string) error {
 		return err
 	}
 	return ValidateEd25519PubKey(pubKey)
+}
+
+func IsJSONEscapedString(value interface{}) bool {
+	casted, ok := value.(string)
+	if !ok {
+		panic("value must be a string: got: " + fmt.Sprintf("%T", value))
+	}
+
+	unescaped, err := strconv.Unquote(casted)
+	if err != nil {
+		return false
+	}
+
+	var unmarshaled interface{}
+	err = json.Unmarshal([]byte(unescaped), &unmarshaled)
+
+	return err == nil
 }

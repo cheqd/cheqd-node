@@ -4,7 +4,9 @@ package integration
 
 import (
 	"crypto/ed25519"
+	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/cheqd/cheqd-node/tests/integration/cli"
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
@@ -397,6 +399,135 @@ var _ = Describe("cheqd cli - positive did", func() {
 		Expect(res3.Code).To(BeEquivalentTo(0))
 
 		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "can query deactivated diddoc (Ed25519VerificationKey2018)"))
+		// Query the DID Doc
+
+		resp2, err := cli.QueryDidDoc(did)
+		Expect(err).To(BeNil())
+
+		didDoc2 := resp2.Value.DidDoc
+		Expect(didDoc2).To(BeEquivalentTo(didDoc))
+
+		// Check that the DID Doc is deactivated
+		Expect(resp2.Value.Metadata.Deactivated).To(BeTrue())
+	})
+
+	It("can create diddoc with augmented assertionMethod, update it and query the result (Ed25519VerificationKey2020)", func() {
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "can create diddoc with augmented assertionMethod (Ed25519VerificationKey2020)"))
+		// Create a new DID Doc
+		did := "did:cheqd:" + network.DidNamespace + ":" + uuid.NewString()
+		keyID := did + "#key1"
+
+		publicKey, privateKey, err := ed25519.GenerateKey(nil)
+		Expect(err).To(BeNil())
+
+		publicKeyMultibase := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(publicKey)
+		publicKeyBase58 := testsetup.GenerateEd25519VerificationKey2018VerificationMaterial(publicKey)
+
+		assertionMethodJSONEscaped := func() string {
+			b, _ := json.Marshal(types.AssertionMethodJSONUnescaped{
+				Id:              keyID,
+				Type:            "Ed25519VerificationKey2018",
+				Controller:      did,
+				PublicKeyBase58: &publicKeyBase58, // arbitrarily chosen, loosely validated
+			})
+			return strconv.Quote(string(b))
+		}()
+
+		payload := didcli.DIDDocument{
+			ID: did,
+			VerificationMethod: []didcli.VerificationMethod{
+				map[string]any{
+					"id":                 keyID,
+					"type":               "Ed25519VerificationKey2020",
+					"controller":         did,
+					"publicKeyMultibase": publicKeyMultibase,
+				},
+			},
+			Authentication:  []string{keyID},
+			AssertionMethod: []string{keyID, assertionMethodJSONEscaped},
+		}
+
+		signInputs := []didcli.SignInput{
+			{
+				VerificationMethodID: keyID,
+				PrivKey:              privateKey,
+			},
+		}
+
+		versionID := uuid.NewString()
+
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, versionID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid.String()))
+		Expect(err).To(BeNil())
+		Expect(res.Code).To(BeEquivalentTo(0))
+
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "can update diddoc with augmented assertionMethod (Ed25519VerificationKey2020)"))
+		// Update the DID Doc
+
+		assertionMethodJSONEscaped2 := func() string {
+			b, _ := json.Marshal(types.AssertionMethodJSONUnescaped{
+				Id:                 keyID,
+				Type:               "Ed25519VerificationKey2020",
+				Controller:         did,
+				PublicKeyMultibase: &publicKeyMultibase, // arbitrarily chosen, loosely validated
+			})
+			return strconv.Quote(string(b))
+		}()
+
+		payload2 := didcli.DIDDocument{
+			ID: did,
+			VerificationMethod: []didcli.VerificationMethod{
+				map[string]any{
+					"id":                 keyID,
+					"type":               "Ed25519VerificationKey2020",
+					"controller":         did,
+					"publicKeyMultibase": publicKeyMultibase,
+				},
+			},
+			Authentication:  []string{keyID},
+			AssertionMethod: []string{keyID, assertionMethodJSONEscaped, assertionMethodJSONEscaped2},
+		}
+
+		versionID = uuid.NewString()
+
+		res2, err := cli.UpdateDidDoc(tmpDir, payload2, signInputs, versionID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.UpdateDid.String()))
+		Expect(err).To(BeNil())
+		Expect(res2.Code).To(BeEquivalentTo(0))
+
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "can query diddoc with augmented assertionMethod (Ed25519VerificationKey2020)"))
+		// Query the DID Doc
+		resp, err := cli.QueryDidDoc(did)
+		Expect(err).To(BeNil())
+
+		didDoc := resp.Value.DidDoc
+		Expect(didDoc.Id).To(BeEquivalentTo(did))
+		Expect(didDoc.Authentication).To(HaveLen(1))
+		Expect(didDoc.Authentication[0]).To(BeEquivalentTo(keyID))
+		Expect(didDoc.VerificationMethod).To(HaveLen(1))
+		Expect(didDoc.VerificationMethod[0].Id).To(BeEquivalentTo(keyID))
+		Expect(didDoc.VerificationMethod[0].VerificationMethodType).To(BeEquivalentTo("Ed25519VerificationKey2020"))
+		Expect(didDoc.VerificationMethod[0].Controller).To(BeEquivalentTo(did))
+		Expect(didDoc.VerificationMethod[0].VerificationMaterial).To(BeEquivalentTo(publicKeyMultibase))
+		Expect(didDoc.AssertionMethod).To(HaveLen(3))
+		Expect(didDoc.AssertionMethod[0]).To(BeEquivalentTo(keyID))
+		Expect(didDoc.AssertionMethod[1]).To(BeEquivalentTo(assertionMethodJSONEscaped))
+		Expect(didDoc.AssertionMethod[2]).To(BeEquivalentTo(assertionMethodJSONEscaped2))
+
+		// Check that DIDDoc is not deactivated
+		Expect(resp.Value.Metadata.Deactivated).To(BeFalse())
+
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "can deactivate diddoc with augmented assertionMethod (Ed25519VerificationKey2020)"))
+		// Deactivate the DID Doc
+		payload3 := types.MsgDeactivateDidDocPayload{
+			Id: did,
+		}
+
+		versionID = uuid.NewString()
+
+		res3, err := cli.DeactivateDidDoc(tmpDir, payload3, signInputs, versionID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.DeactivateDid.String()))
+		Expect(err).To(BeNil())
+		Expect(res3.Code).To(BeEquivalentTo(0))
+
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "can query deactivated diddoc with augmented assertionMethod (Ed25519VerificationKey2020)"))
 		// Query the DID Doc
 
 		resp2, err := cli.QueryDidDoc(did)

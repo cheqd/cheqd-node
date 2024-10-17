@@ -1,8 +1,10 @@
 package types
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -102,6 +104,45 @@ func IsDIDUrl(allowedNamespaces []string, pathRule, queryRule, fragmentRule Vali
 		}
 
 		return nil
+	})
+}
+
+func IsAssertionMethod(allowedNamespaces []string, didDoc DidDoc) *CustomErrorRule {
+	return NewCustomErrorRule(func(value interface{}) error {
+		err := validation.Validate(value, IsDIDUrl(allowedNamespaces, Empty, Empty, Required), HasPrefix(didDoc.Id))
+		casted, ok := value.(string)
+		if !ok {
+			panic("IsAssertionMethod must be only applied on string properties")
+		}
+
+		if err == nil {
+			for _, v := range didDoc.VerificationMethod {
+				if v.Id == casted {
+					return nil
+				}
+			}
+
+			return errors.New("assertionMethod should be a valid key reference within the DID document's verification method")
+		}
+
+		unescapedJSON, err := strconv.Unquote(casted)
+		if err != nil {
+			return errors.New("assertionMethod should be a DIDUrl or an Escaped JSON string")
+		}
+
+		if err := utils.ValidateProtobufFields(unescapedJSON); err != nil {
+			return err
+		}
+
+		var result AssertionMethodJSONUnescaped
+		if err = json.Unmarshal([]byte(unescapedJSON), &result); err != nil {
+			return errors.New("assertionMethod should be a DIDUrl or an Escaped JSON string with id, type and controller values")
+		}
+
+		return validation.ValidateStruct(&result,
+			validation.Field(&result.Id, validation.Required, IsAssertionMethod(allowedNamespaces, didDoc)),
+			validation.Field(&result.Controller, validation.Required, IsDID(allowedNamespaces)),
+		)
 	})
 }
 

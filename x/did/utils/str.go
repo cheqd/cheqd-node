@@ -1,6 +1,13 @@
 package utils
 
-import "sort"
+import (
+	"encoding/json"
+	"errors"
+	"fmt"
+	"sort"
+
+	"google.golang.org/protobuf/proto"
+)
 
 func IndexOf(array []string, searchElement string, fromIndex int) int {
 	for i, v := range array[fromIndex:] {
@@ -99,4 +106,23 @@ func UniqueSorted(ls []string) []string {
 
 func StrBytes(p string) []byte {
 	return []byte(p)
+}
+
+// Generic function to validate protobuf-supported fields in a JSON string
+func ValidateProtobufFields(jsonString string) error {
+	var input map[string]interface{}
+	if err := json.Unmarshal([]byte(jsonString), &input); err != nil {
+		return errors.New("input should be a valid JSON string")
+	}
+
+	for key, value := range input {
+		switch value.(type) {
+		case string, int, int32, int64, float32, float64, bool, proto.Message:
+			continue
+		default:
+			return fmt.Errorf("field %s is not protobuf-supported", key)
+		}
+	}
+
+	return nil
 }
