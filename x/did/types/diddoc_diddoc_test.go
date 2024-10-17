@@ -246,16 +246,11 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 					},
 				},
 				AssertionMethod: []string{fmt.Sprintf("%s#fragment", ValidTestDID), func() string {
-					b, _ := json.Marshal(struct {
-						Id              string
-						Type            string
-						Controller      string
-						PublicKeyBase58 string
-					}{
+					b, _ := json.Marshal(AssertionMethodJSONUnescaped{
 						Id:              fmt.Sprintf("%s#fragment", ValidTestDID),
 						Type:            "Ed25519VerificationKey2018",
 						Controller:      ValidTestDID,
-						PublicKeyBase58: "base58", // arbitrarily chosen
+						PublicKeyBase58: &ValidEd25519VerificationKey2018VerificationMaterial, // arbitrarily chosen, loosely validated
 					})
 					return strconv.Quote(string(b))
 				}()},
@@ -278,16 +273,11 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 					},
 				},
 				AssertionMethod: []string{fmt.Sprintf("%s#fragment", ValidTestDID), func() string {
-					b, _ := json.Marshal(struct {
-						Id              string
-						Type            string
-						Controller      string
-						PublicKeyBase58 string
-					}{
+					b, _ := json.Marshal(AssertionMethodJSONUnescaped{
 						Id:              fmt.Sprintf("%s#fragment-1", ValidTestDID),
 						Type:            "Ed25519VerificationKey2018",
 						Controller:      ValidTestDID,
-						PublicKeyBase58: "base58", // arbitrarily chosen
+						PublicKeyBase58: &ValidEd25519VerificationKey2018VerificationMaterial, // arbitrarily chosen, loosely validated
 					})
 					return strconv.Quote(string(b))
 				}()},
@@ -311,10 +301,10 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 				},
 				AssertionMethod: []string{func() string {
 					b, _ := json.Marshal(struct {
-						Id           string
-						Type         string
-						Controller   string
-						InvalidField map[string]interface{}
+						Id           string                 `json:"id"`
+						Type         string                 `json:"type"`
+						Controller   string                 `json:"controller"`
+						InvalidField map[string]interface{} `json:"invalidField"`
 					}{
 						Id:           fmt.Sprintf("%s#fragment", ValidTestDID),
 						Type:         "Ed25519VerificationKey2018",
@@ -343,8 +333,8 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 				},
 				AssertionMethod: []string{func() string {
 					b, _ := json.Marshal(struct {
-						Id   string
-						Type string
+						Id   string `json:"id"`
+						Type string `json:"type"`
 					}{
 						Id:   fmt.Sprintf("%s#fragment", ValidTestDID),
 						Type: "Ed25519VerificationKey2018",
@@ -371,8 +361,8 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 				},
 				AssertionMethod: []string{func() string {
 					b, _ := json.Marshal(struct {
-						Id   string
-						Type string
+						Id   string `json:"id"`
+						Type string `json:"type"` // controller is intentionally missing, no additional fields are necessary as the focal point is the unescaped JSON string, i.e. deserialisation should fail first, before any other validation
 					}{
 						Id:   fmt.Sprintf("%s#fragment", ValidTestDID),
 						Type: "Ed25519VerificationKey2018",
