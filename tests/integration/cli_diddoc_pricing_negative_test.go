@@ -92,7 +92,6 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid.String()))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
-
 		By("preparing the update diddoc message")
 		payload2 := didcli.DIDDocument{
 			ID: payload.ID,

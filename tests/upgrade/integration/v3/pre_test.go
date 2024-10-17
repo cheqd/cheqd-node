@@ -7,7 +7,8 @@ import (
 	"path/filepath"
 
 	clihelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
-	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/v2/cli"
+	cliv2 "github.com/cheqd/cheqd-node/tests/upgrade/integration/v2/cli"
+	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/v3/cli"
 	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
@@ -19,7 +20,8 @@ import (
 var _ = Describe("Upgrade - Pre", func() {
 	var didFeeParams didtypes.FeeParams
 	var resourceFeeParams resourcetypes.FeeParams
-	var ProposalID string
+	ProposalID := "1"
+
 	BeforeEach(func() {
 		// query fee params - case: did
 		res, err := cli.QueryParams(cli.Validator0, didtypes.ModuleName, string(didtypes.ParamStoreKeyFeeParams))
@@ -37,7 +39,7 @@ var _ = Describe("Upgrade - Pre", func() {
 	Context("Before a software upgrade execution is initiated", func() {
 		It("should wait for chain to bootstrap", func() {
 			By("pinging the node status until the voting end height is reached")
-			err := cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, cli.BootstrapHeight, cli.BootstrapPeriod)
+			err := cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, cli.BootstrapHeight, cli.BootstrapPeriod+20)
 			Expect(err).To(BeNil())
 		})
 
@@ -58,9 +60,15 @@ var _ = Describe("Upgrade - Pre", func() {
 				DidDocCreateSignInput, err = Loader(payload, &DidDocCreatePayload)
 				Expect(err).To(BeNil())
 
-				res, err := cli.CreateDid(DidDocCreatePayload, DidDocCreateSignInput, cli.Validator0, "", didFeeParams.CreateDid.String())
+				res, err := cliv2.CreateDid(DidDocCreatePayload, DidDocCreateSignInput, cli.Validator0, "", didFeeParams.CreateDid.String())
 				Expect(err).To(BeNil())
 				Expect(res.Code).To(BeEquivalentTo(0))
+
+				By("waiting for an additional set of blocks to be produced")
+				height, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
+				Expect(err).To(BeNil())
+				err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, height+5, cli.VotingPeriod*6)
+				Expect(err).To(BeNil())
 			}
 		})
 
@@ -86,7 +94,7 @@ var _ = Describe("Upgrade - Pre", func() {
 				_, err = cli.LocalnetExecCopyAbsoluteWithPermissions(ResourceFile, cli.DockerHome, cli.Validator0)
 				Expect(err).To(BeNil())
 
-				res, err := cli.CreateResource(
+				res, err := cliv2.CreateResource(
 					ResourceCreatePayload,
 					filepath.Base(ResourceFile),
 					ResourceCreateSignInput,
@@ -95,6 +103,12 @@ var _ = Describe("Upgrade - Pre", func() {
 				)
 				Expect(err).To(BeNil())
 				Expect(res.Code).To(BeEquivalentTo(0))
+
+				By("waiting for an additional set of blocks to be produced")
+				height, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
+				Expect(err).To(BeNil())
+				err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, height+5, cli.VotingPeriod*6)
+				Expect(err).To(BeNil())
 			}
 		})
 
@@ -112,16 +126,19 @@ var _ = Describe("Upgrade - Pre", func() {
 
 		It("should submit a software upgrade proposal", func() {
 			By("sending a SubmitUpgradeProposal transaction from `validator0` container")
-			res, err := cli.SubmitUpgradeProposalLegacy(UpgradeHeight, cli.Validator0)
+			res, err := cli.SubmitUpgradeProposalLegacy(VotingEndHeight, cli.Validator0)
 			Expect(err).To(BeNil())
 			Expect(res.Code).To(BeEquivalentTo(0))
-			res, err = cli.QueryTxn(cli.Validator0, res.TxHash)
+		})
+
+		It("should wait for a certain number of blocks to be produced", func() {
+			By("fetching the current chain height")
+			currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
 			Expect(err).To(BeNil())
 
-			proposalId, err := cli.GetProposalID(res.RawLog)
+			By("waiting for 10 blocks to be produced on top, after the upgrade")
+			err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+3, cli.VotingPeriod*3)
 			Expect(err).To(BeNil())
-
-			ProposalID = proposalId
 		})
 
 		It("should deposit tokens for the software upgrade proposal", func() {
@@ -131,11 +148,31 @@ var _ = Describe("Upgrade - Pre", func() {
 			Expect(res.Code).To(BeEquivalentTo(0))
 		})
 
+		It("should wait for the proposal submission to be included in a block", func() {
+			By("getting the current block height")
+			currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
+			Expect(err).To(BeNil())
+
+			By("waiting for the proposal to be included in a block")
+			err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+3, cli.VotingPeriod*3)
+			Expect(err).To(BeNil())
+		})
+
 		It("should vote for the software upgrade proposal from `validator0` container", func() {
 			By("sending a VoteProposal transaction from `validator0` container")
 			res, err := cli.VoteProposal(cli.Validator0, ProposalID, "yes")
 			Expect(err).To(BeNil())
 			Expect(res.Code).To(BeEquivalentTo(0))
+		})
+
+		It("should wait for a certain number of blocks to be produced", func() {
+			By("fetching the current chain height")
+			currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
+			Expect(err).To(BeNil())
+
+			By("waiting for 10 blocks to be produced on top, after the upgrade")
+			err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+1, cli.VotingPeriod*2)
+			Expect(err).To(BeNil())
 		})
 
 		It("should vote for the software upgrade proposal from `validator1` container", func() {
@@ -145,6 +182,16 @@ var _ = Describe("Upgrade - Pre", func() {
 			Expect(res.Code).To(BeEquivalentTo(0))
 		})
 
+		It("should wait for a certain number of blocks to be produced", func() {
+			By("fetching the current chain height")
+			currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
+			Expect(err).To(BeNil())
+
+			By("waiting for 10 blocks to be produced on top, after the upgrade")
+			err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+1, cli.VotingPeriod*2)
+			Expect(err).To(BeNil())
+		})
+
 		It("should vote for the software upgrade proposal from `validator2` container", func() {
 			By("sending a VoteProposal transaction from `validator2` container")
 			res, err := cli.VoteProposal(cli.Validator2, ProposalID, "yes")
@@ -152,16 +199,19 @@ var _ = Describe("Upgrade - Pre", func() {
 			Expect(res.Code).To(BeEquivalentTo(0))
 		})
 
-		It("should vote for the software upgrade proposal from `validator3` container", func() {
-			By("sending a VoteProposal transaction from `validator3` container")
-			res, err := cli.VoteProposal(cli.Validator3, ProposalID, "yes")
+		It("should wait for a certain number of blocks to be produced", func() {
+			By("fetching the current chain height")
+			currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
 			Expect(err).To(BeNil())
-			Expect(res.Code).To(BeEquivalentTo(0))
+
+			By("waiting for 10 blocks to be produced on top, after the upgrade")
+			err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+1, cli.VotingPeriod*2)
+			Expect(err).To(BeNil())
 		})
 
 		It("should wait for the voting end height to be reached", func() {
 			By("pinging the node status until the voting end height is reached")
-			err := cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, VotingEndHeight, cli.VotingPeriod)
+			err := cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, VotingEndHeight, cli.VotingPeriod*10)
 			Expect(err).To(BeNil())
 		})
 

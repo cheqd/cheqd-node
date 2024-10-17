@@ -1,8 +1,10 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
 
+	"cosmossdk.io/errors"
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
 
@@ -11,11 +13,17 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
+	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 )
 
 var CLIQueryParams = []string{
 	"--chain-id", network.ChainID,
 	"--output", OutputFormat,
+}
+
+var KeyParams = []string{
+	"--output", OutputFormat,
+	"--keyring-backend", KeyringBackend,
 }
 
 func Query(module, query string, queryArgs ...string) (string, error) {
@@ -156,4 +164,67 @@ func QueryProposal(container, id string) (govtypesv1.Proposal, error) {
 		return govtypesv1.Proposal{}, err
 	}
 	return resp, nil
+}
+
+func QueryFeemarketParams() (feemarkettypes.Params, error) {
+	res, err := Query("feemarket", "params")
+	if err != nil {
+		return feemarkettypes.Params{}, err
+	}
+
+	var resp feemarkettypes.Params
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return feemarkettypes.Params{}, err
+	}
+
+	return resp, nil
+}
+
+func GetProposalID(rawLog string) (string, error) {
+	var logs []sdk.ABCIMessageLog
+	err := json.Unmarshal([]byte(rawLog), &logs)
+	if err != nil {
+		return "", err
+	}
+
+	// Iterate over logs and their events
+	for _, log := range logs {
+		for _, event := range log.Events {
+			// Look for the "submit_proposal" event type
+			if event.Type == "submit_proposal" {
+				for _, attr := range event.Attributes {
+					// Look for the "proposal_id" attribute
+					if attr.Key == "proposal_id" {
+						return attr.Value, nil
+					}
+				}
+			}
+		}
+	}
+
+	return "", fmt.Errorf("proposal_id not found")
+}
+
+// QueryKeys retrieves the key information and extracts the address
+func QueryKeys(name string) (string, error) {
+	args := []string{"keys", "show", name}
+
+	args = append(args, KeyParams...)
+
+	output, err := Exec(args...)
+	if err != nil {
+		return "", err
+	}
+
+	var result struct {
+		Address string `json:"address"`
+	}
+
+	err = json.Unmarshal([]byte(output), &result)
+	if err != nil {
+		return "", errors.Wrap(err, "failed to unmarshal JSON")
+	}
+
+	return result.Address, nil
 }
