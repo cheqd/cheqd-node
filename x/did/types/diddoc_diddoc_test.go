@@ -343,7 +343,7 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 				}()},
 			},
 			isValid:  false,
-			errorMsg: "assertion_method: (0: (Controller: cannot be blank.).).",
+			errorMsg: "assertion_method: (0: (controller: cannot be blank.).).",
 		}),
 	Entry(
 		"Assertion method contains unescaped JSON string",
