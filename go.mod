@@ -13,7 +13,7 @@ require (
 	github.com/cosmos/cosmos-proto v1.0.0-beta.5
 	github.com/cosmos/cosmos-sdk v0.47.13
 	github.com/cosmos/gogoproto v1.5.0
-	github.com/cosmos/ibc-go/v7 v7.4.0
+	github.com/cosmos/ibc-go/v7 v7.8.0
 	github.com/gabriel-vasile/mimetype v1.4.6
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/golang/protobuf v1.5.4
