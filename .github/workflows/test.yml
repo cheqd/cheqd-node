@@ -22,6 +22,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: "Modify runner's home directory permissions"
+        run: "sudo chmod 755 /home/runner"
+
       - name: "Fresh install with Cosmovisor"
         working-directory: ./installer
         run: |
@@ -50,6 +53,9 @@ jobs:
       DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: "Modify runner's home directory permissions"
+        run: "sudo chmod 755 /home/runner"
 
       - name: "Fresh install"
         working-directory: ./installer
