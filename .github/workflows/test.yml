@@ -14,13 +14,16 @@ permissions:
 jobs:
   installer-cosmovisor:
     name: "Installer - Cosmovisor mode"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     env:
       PYTHONDEVMODE: 1
       DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: "Modify runner's home directory permissions"
+        run: "sudo chmod 755 /home/runner"
 
       - name: "Fresh install with Cosmovisor"
         working-directory: ./installer
@@ -44,12 +47,15 @@ jobs:
 
   installer-standalone:
     name: "Installer - Standalone mode"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     env:
       PYTHONDEVMODE: 1
       DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: "Modify runner's home directory permissions"
+        run: "sudo chmod 755 /home/runner"
 
       - name: "Fresh install"
         working-directory: ./installer
@@ -73,7 +79,7 @@ jobs:
 
   unit-tests:
     name: "Unit Tests"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v4
@@ -99,7 +105,7 @@ jobs:
 
   integration-tests:
     name: "Integration Tests"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v4
@@ -166,7 +172,7 @@ jobs:
 
   upgrade-tests:
     name: "Upgrade Tests"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -295,7 +301,7 @@ jobs:
 
   report-results:
     name: "Report"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     # NOTE: If not next major release, only unit and integration tests are necessary, otherwise all tests are needed.
     # needs: [unit-tests, integration-tests]
     needs: [unit-tests, integration-tests, upgrade-tests]

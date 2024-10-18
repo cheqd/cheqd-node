@@ -14,11 +14,11 @@ jobs:
 
   build-binary:
     name: "Node binary"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: actions/setup-go@v5
         with:
           go-version-file: ./go.mod
@@ -39,7 +39,7 @@ jobs:
 
   build-docker:
     name: "Docker image"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     needs: build-binary
     env:
       IMAGE_NAME: ${{ github.repository }}
