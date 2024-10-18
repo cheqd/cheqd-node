@@ -23,8 +23,8 @@ require (
 	github.com/lestrrat-go/jwx v1.2.30
 	github.com/mr-tron/base58 v1.2.0
 	github.com/multiformats/go-multibase v0.2.0
-	github.com/onsi/ginkgo/v2 v2.17.3
-	github.com/onsi/gomega v1.33.1
+	github.com/onsi/ginkgo/v2 v2.20.2
+	github.com/onsi/gomega v1.34.2
 	github.com/osmosis-labs/fee-abstraction/v7 v7.0.2
 	github.com/rakyll/statik v0.1.7
 	github.com/skip-mev/feemarket v1.0.0-sdk47.0.20240822213759-ad21c7e69228
@@ -104,7 +104,7 @@ require (
 	github.com/google/btree v1.1.2 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/orderedcode v0.0.1 // indirect
-	github.com/google/pprof v0.0.0-20240424215950-a892ee059fd6 // indirect
+	github.com/google/pprof v0.0.0-20240827171923-fa2c70bbbfe5 // indirect
 	github.com/google/s2a-go v0.1.7 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.2 // indirect
 	github.com/googleapis/gax-go/v2 v2.12.4 // indirect
@@ -188,7 +188,7 @@ require (
 	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/arch v0.1.0 // indirect
 	golang.org/x/crypto v0.28.0 // indirect
-	golang.org/x/exp v0.0.0-20240404231335-c0f41cb1a7a0 // indirect
+	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
 	golang.org/x/net v0.30.0 // indirect
 	golang.org/x/oauth2 v0.20.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
