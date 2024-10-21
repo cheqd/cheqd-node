@@ -9,8 +9,7 @@
         {
             "name": "release/2.x",
             "range": "2.x",
-            "channel": "2.x",
-            "prerelease": true
+            "channel": "2.x"
         },
         {
             "name": "release/1.x",
