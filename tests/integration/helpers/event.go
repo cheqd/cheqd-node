@@ -26,7 +26,7 @@ func ReadableEvents(events []types.Event) []HumanReadableEvent {
 				Index: attribute.Index,
 			}
 		}
-		readableEvents = append(readableEvents, HumanReadableEvent{
+		readableEvents = append(readableEvents, 0, HumanReadableEvent{
 			Type:       event.Type,
 			Attributes: readableAttributes,
 		})
