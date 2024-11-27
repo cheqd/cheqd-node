@@ -2,10 +2,10 @@
 package didv2
 
 import (
-	_ "cosmossdk.io/api/amino"
-	v1beta1 "cosmossdk.io/api/cosmos/base/v1beta1"
-	_ "cosmossdk.io/api/cosmos/msg/v1"
 	fmt "fmt"
+	_ "github.com/cheqd/cheqd-node/api/v2/amino"
+	v1beta1 "github.com/cheqd/cheqd-node/api/v2/cosmos/base/v1beta1"
+	_ "github.com/cheqd/cheqd-node/api/v2/cosmos/msg/v1"
 	_ "github.com/cosmos/cosmos-proto"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
 	_ "github.com/cosmos/gogoproto/gogoproto"
