@@ -3,8 +3,8 @@ package didv2
 
 import (
 	fmt "fmt"
+	v1beta1 "github.com/cheqd/cheqd-node/api/v2/cosmos/base/query/v1beta1"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
-	v1beta1 "github.com/cosmos/cosmos-sdk/api/cosmos/base/query/v1beta1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoiface "google.golang.org/protobuf/runtime/protoiface"

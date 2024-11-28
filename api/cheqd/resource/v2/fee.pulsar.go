@@ -3,9 +3,9 @@ package resourcev2
 
 import (
 	fmt "fmt"
+	v1beta1 "github.com/cheqd/cheqd-node/api/v2/cosmos/base/v1beta1"
 	_ "github.com/cosmos/cosmos-proto"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
-	v1beta1 "github.com/cosmos/cosmos-sdk/api/cosmos/base/v1beta1"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoiface "google.golang.org/protobuf/runtime/protoiface"
