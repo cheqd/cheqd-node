@@ -3,6 +3,7 @@ module github.com/cheqd/cheqd-node/api/v2
 go 1.21
 
 require (
+	github.com/cosmos/cosmos-sdk v0.47.13
 	github.com/cosmos/cosmos-proto v1.0.0-beta.5
 	github.com/cosmos/gogoproto v1.5.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240610135401-a8a62080eff3
@@ -17,4 +18,10 @@ require (
 	golang.org/x/sys v0.26.0 // indirect
 	golang.org/x/text v0.19.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240709173604-40e1e62336c5 // indirect
+)
+
+replace (
+	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.47.10-height-mismatch
+
+	github.com/cosmos/iavl => github.com/cheqd/iavl v0.20.1-uneven-heights
 )
