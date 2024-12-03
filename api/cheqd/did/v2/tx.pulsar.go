@@ -3,11 +3,11 @@ package didv2
 
 import (
 	fmt "fmt"
-	_ "github.com/cheqd/cheqd-node/api/v2/amino"
-	v1beta1 "github.com/cheqd/cheqd-node/api/v2/cosmos/base/v1beta1"
-	_ "github.com/cheqd/cheqd-node/api/v2/cosmos/msg/v1"
 	_ "github.com/cosmos/cosmos-proto"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
+	types "github.com/cosmos/cosmos-sdk/types"
+	_ "github.com/cosmos/cosmos-sdk/types/msgservice"
+	_ "github.com/cosmos/cosmos-sdk/types/tx/amino"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoiface "google.golang.org/protobuf/runtime/protoiface"
@@ -7518,7 +7518,7 @@ func (x *fastReflection_MsgDeactivateDidDocResponse) ProtoMethods() *protoiface.
 var _ protoreflect.List = (*_MsgBurn_2_list)(nil)
 
 type _MsgBurn_2_list struct {
-	list *[]*v1beta1.Coin
+	list *[]*types.Coin
 }
 
 func (x *_MsgBurn_2_list) Len() int {
@@ -7534,18 +7534,18 @@ func (x *_MsgBurn_2_list) Get(i int) protoreflect.Value {
 
 func (x *_MsgBurn_2_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*v1beta1.Coin)
+	concreteValue := valueUnwrapped.Interface().(*types.Coin)
 	(*x.list)[i] = concreteValue
 }
 
 func (x *_MsgBurn_2_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*v1beta1.Coin)
+	concreteValue := valueUnwrapped.Interface().(*types.Coin)
 	*x.list = append(*x.list, concreteValue)
 }
 
 func (x *_MsgBurn_2_list) AppendMutable() protoreflect.Value {
-	v := new(v1beta1.Coin)
+	v := new(types.Coin)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
@@ -7558,7 +7558,7 @@ func (x *_MsgBurn_2_list) Truncate(n int) {
 }
 
 func (x *_MsgBurn_2_list) NewElement() protoreflect.Value {
-	v := new(v1beta1.Coin)
+	v := new(types.Coin)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
@@ -7768,7 +7768,7 @@ func (x *fastReflection_MsgBurn) Mutable(fd protoreflect.FieldDescriptor) protor
 	switch fd.FullName() {
 	case "cheqd.did.v2.MsgBurn.amount":
 		if x.Amount == nil {
-			x.Amount = []*v1beta1.Coin{}
+			x.Amount = []*types.Coin{}
 		}
 		value := &_MsgBurn_2_list{list: &x.Amount}
 		return protoreflect.ValueOfList(value)
@@ -7790,7 +7790,7 @@ func (x *fastReflection_MsgBurn) NewField(fd protoreflect.FieldDescriptor) proto
 	case "cheqd.did.v2.MsgBurn.from_address":
 		return protoreflect.ValueOfString("")
 	case "cheqd.did.v2.MsgBurn.amount":
-		list := []*v1beta1.Coin{}
+		list := []*types.Coin{}
 		return protoreflect.ValueOfList(&_MsgBurn_2_list{list: &list})
 	default:
 		if fd.IsExtension() {
@@ -8033,7 +8033,7 @@ func (x *fastReflection_MsgBurn) ProtoMethods() *protoiface.Methods {
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.Amount = append(x.Amount, &v1beta1.Coin{})
+				x.Amount = append(x.Amount, &types.Coin{})
 				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Amount[len(x.Amount)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
@@ -8432,7 +8432,7 @@ func (x *fastReflection_MsgBurnResponse) ProtoMethods() *protoiface.Methods {
 var _ protoreflect.List = (*_MsgMint_3_list)(nil)
 
 type _MsgMint_3_list struct {
-	list *[]*v1beta1.Coin
+	list *[]*types.Coin
 }
 
 func (x *_MsgMint_3_list) Len() int {
@@ -8448,18 +8448,18 @@ func (x *_MsgMint_3_list) Get(i int) protoreflect.Value {
 
 func (x *_MsgMint_3_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*v1beta1.Coin)
+	concreteValue := valueUnwrapped.Interface().(*types.Coin)
 	(*x.list)[i] = concreteValue
 }
 
 func (x *_MsgMint_3_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.Message()
-	concreteValue := valueUnwrapped.Interface().(*v1beta1.Coin)
+	concreteValue := valueUnwrapped.Interface().(*types.Coin)
 	*x.list = append(*x.list, concreteValue)
 }
 
 func (x *_MsgMint_3_list) AppendMutable() protoreflect.Value {
-	v := new(v1beta1.Coin)
+	v := new(types.Coin)
 	*x.list = append(*x.list, v)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
@@ -8472,7 +8472,7 @@ func (x *_MsgMint_3_list) Truncate(n int) {
 }
 
 func (x *_MsgMint_3_list) NewElement() protoreflect.Value {
-	v := new(v1beta1.Coin)
+	v := new(types.Coin)
 	return protoreflect.ValueOfMessage(v.ProtoReflect())
 }
 
@@ -8699,7 +8699,7 @@ func (x *fastReflection_MsgMint) Mutable(fd protoreflect.FieldDescriptor) protor
 	switch fd.FullName() {
 	case "cheqd.did.v2.MsgMint.amount":
 		if x.Amount == nil {
-			x.Amount = []*v1beta1.Coin{}
+			x.Amount = []*types.Coin{}
 		}
 		value := &_MsgMint_3_list{list: &x.Amount}
 		return protoreflect.ValueOfList(value)
@@ -8725,7 +8725,7 @@ func (x *fastReflection_MsgMint) NewField(fd protoreflect.FieldDescriptor) proto
 	case "cheqd.did.v2.MsgMint.to_address":
 		return protoreflect.ValueOfString("")
 	case "cheqd.did.v2.MsgMint.amount":
-		list := []*v1beta1.Coin{}
+		list := []*types.Coin{}
 		return protoreflect.ValueOfList(&_MsgMint_3_list{list: &list})
 	default:
 		if fd.IsExtension() {
@@ -9011,7 +9011,7 @@ func (x *fastReflection_MsgMint) ProtoMethods() *protoiface.Methods {
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.Amount = append(x.Amount, &v1beta1.Coin{})
+				x.Amount = append(x.Amount, &types.Coin{})
 				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Amount[len(x.Amount)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
@@ -10089,8 +10089,8 @@ type MsgBurn struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	FromAddress string          `protobuf:"bytes,1,opt,name=from_address,json=fromAddress,proto3" json:"from_address,omitempty"`
-	Amount      []*v1beta1.Coin `protobuf:"bytes,2,rep,name=amount,proto3" json:"amount,omitempty"`
+	FromAddress string        `protobuf:"bytes,1,opt,name=from_address,json=fromAddress,proto3" json:"from_address,omitempty"`
+	Amount      []*types.Coin `protobuf:"bytes,2,rep,name=amount,proto3" json:"amount,omitempty"`
 }
 
 func (x *MsgBurn) Reset() {
@@ -10120,7 +10120,7 @@ func (x *MsgBurn) GetFromAddress() string {
 	return ""
 }
 
-func (x *MsgBurn) GetAmount() []*v1beta1.Coin {
+func (x *MsgBurn) GetAmount() []*types.Coin {
 	if x != nil {
 		return x.Amount
 	}
@@ -10162,9 +10162,9 @@ type MsgMint struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Authority string          `protobuf:"bytes,1,opt,name=authority,proto3" json:"authority,omitempty"`
-	ToAddress string          `protobuf:"bytes,2,opt,name=to_address,json=toAddress,proto3" json:"to_address,omitempty"`
-	Amount    []*v1beta1.Coin `protobuf:"bytes,3,rep,name=amount,proto3" json:"amount,omitempty"`
+	Authority string        `protobuf:"bytes,1,opt,name=authority,proto3" json:"authority,omitempty"`
+	ToAddress string        `protobuf:"bytes,2,opt,name=to_address,json=toAddress,proto3" json:"to_address,omitempty"`
+	Amount    []*types.Coin `protobuf:"bytes,3,rep,name=amount,proto3" json:"amount,omitempty"`
 }
 
 func (x *MsgMint) Reset() {
@@ -10201,7 +10201,7 @@ func (x *MsgMint) GetToAddress() string {
 	return ""
 }
 
-func (x *MsgMint) GetAmount() []*v1beta1.Coin {
+func (x *MsgMint) GetAmount() []*types.Coin {
 	if x != nil {
 		return x.Amount
 	}
@@ -10468,7 +10468,7 @@ var file_cheqd_did_v2_tx_proto_goTypes = []interface{}{
 	(*VerificationMethod)(nil),          // 14: cheqd.did.v2.VerificationMethod
 	(*Service)(nil),                     // 15: cheqd.did.v2.Service
 	(*DidDocWithMetadata)(nil),          // 16: cheqd.did.v2.DidDocWithMetadata
-	(*v1beta1.Coin)(nil),                // 17: cosmos.base.v1beta1.Coin
+	(*types.Coin)(nil),                  // 17: cosmos.base.v1beta1.Coin
 }
 var file_cheqd_did_v2_tx_proto_depIdxs = []int32{
 	4,  // 0: cheqd.did.v2.MsgCreateDidDoc.payload:type_name -> cheqd.did.v2.MsgCreateDidDocPayload

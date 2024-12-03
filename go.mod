@@ -209,6 +209,7 @@ require (
 )
 
 replace (
+	cosmossdk.io/api => cosmossdk.io/api v0.3.1
 	// Keyring replacement from Cosmos SDK v0.46.8
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
 

@@ -3,8 +3,8 @@ package didv2
 
 import (
 	fmt "fmt"
-	v1beta1 "github.com/cheqd/cheqd-node/api/v2/cosmos/base/query/v1beta1"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
+	query "github.com/cosmos/cosmos-sdk/types/query"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoiface "google.golang.org/protobuf/runtime/protoiface"
@@ -1962,7 +1962,7 @@ func (x *fastReflection_QueryAllDidDocVersionsMetadataRequest) Set(fd protorefle
 	case "cheqd.did.v2.QueryAllDidDocVersionsMetadataRequest.id":
 		x.Id = value.Interface().(string)
 	case "cheqd.did.v2.QueryAllDidDocVersionsMetadataRequest.pagination":
-		x.Pagination = value.Message().Interface().(*v1beta1.PageRequest)
+		x.Pagination = value.Message().Interface().(*query.PageRequest)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.QueryAllDidDocVersionsMetadataRequest"))
@@ -1985,7 +1985,7 @@ func (x *fastReflection_QueryAllDidDocVersionsMetadataRequest) Mutable(fd protor
 	switch fd.FullName() {
 	case "cheqd.did.v2.QueryAllDidDocVersionsMetadataRequest.pagination":
 		if x.Pagination == nil {
-			x.Pagination = new(v1beta1.PageRequest)
+			x.Pagination = new(query.PageRequest)
 		}
 		return protoreflect.ValueOfMessage(x.Pagination.ProtoReflect())
 	case "cheqd.did.v2.QueryAllDidDocVersionsMetadataRequest.id":
@@ -2006,7 +2006,7 @@ func (x *fastReflection_QueryAllDidDocVersionsMetadataRequest) NewField(fd proto
 	case "cheqd.did.v2.QueryAllDidDocVersionsMetadataRequest.id":
 		return protoreflect.ValueOfString("")
 	case "cheqd.did.v2.QueryAllDidDocVersionsMetadataRequest.pagination":
-		m := new(v1beta1.PageRequest)
+		m := new(query.PageRequest)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
@@ -2246,7 +2246,7 @@ func (x *fastReflection_QueryAllDidDocVersionsMetadataRequest) ProtoMethods() *p
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
 				if x.Pagination == nil {
-					x.Pagination = &v1beta1.PageRequest{}
+					x.Pagination = &query.PageRequest{}
 				}
 				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Pagination); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
@@ -2517,7 +2517,7 @@ func (x *fastReflection_QueryAllDidDocVersionsMetadataResponse) Set(fd protorefl
 		clv := lv.(*_QueryAllDidDocVersionsMetadataResponse_1_list)
 		x.Versions = *clv.list
 	case "cheqd.did.v2.QueryAllDidDocVersionsMetadataResponse.pagination":
-		x.Pagination = value.Message().Interface().(*v1beta1.PageResponse)
+		x.Pagination = value.Message().Interface().(*query.PageResponse)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.did.v2.QueryAllDidDocVersionsMetadataResponse"))
@@ -2546,7 +2546,7 @@ func (x *fastReflection_QueryAllDidDocVersionsMetadataResponse) Mutable(fd proto
 		return protoreflect.ValueOfList(value)
 	case "cheqd.did.v2.QueryAllDidDocVersionsMetadataResponse.pagination":
 		if x.Pagination == nil {
-			x.Pagination = new(v1beta1.PageResponse)
+			x.Pagination = new(query.PageResponse)
 		}
 		return protoreflect.ValueOfMessage(x.Pagination.ProtoReflect())
 	default:
@@ -2566,7 +2566,7 @@ func (x *fastReflection_QueryAllDidDocVersionsMetadataResponse) NewField(fd prot
 		list := []*Metadata{}
 		return protoreflect.ValueOfList(&_QueryAllDidDocVersionsMetadataResponse_1_list{list: &list})
 	case "cheqd.did.v2.QueryAllDidDocVersionsMetadataResponse.pagination":
-		m := new(v1beta1.PageResponse)
+		m := new(query.PageResponse)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
@@ -2819,7 +2819,7 @@ func (x *fastReflection_QueryAllDidDocVersionsMetadataResponse) ProtoMethods() *
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
 				if x.Pagination == nil {
-					x.Pagination = &v1beta1.PageResponse{}
+					x.Pagination = &query.PageResponse{}
 				}
 				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Pagination); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
@@ -3069,7 +3069,7 @@ type QueryAllDidDocVersionsMetadataRequest struct {
 	// - did:cheqd:testnet:wGHEXrZvJxR8vw5P3UWH1j
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// pagination defines an optional pagination for the request.
-	Pagination *v1beta1.PageRequest `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	Pagination *query.PageRequest `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
 func (x *QueryAllDidDocVersionsMetadataRequest) Reset() {
@@ -3099,7 +3099,7 @@ func (x *QueryAllDidDocVersionsMetadataRequest) GetId() string {
 	return ""
 }
 
-func (x *QueryAllDidDocVersionsMetadataRequest) GetPagination() *v1beta1.PageRequest {
+func (x *QueryAllDidDocVersionsMetadataRequest) GetPagination() *query.PageRequest {
 	if x != nil {
 		return x.Pagination
 	}
@@ -3115,7 +3115,7 @@ type QueryAllDidDocVersionsMetadataResponse struct {
 	// versions is the list of all versions of the requested DID Document
 	Versions []*Metadata `protobuf:"bytes,1,rep,name=versions,proto3" json:"versions,omitempty"`
 	// pagination defines the pagination in the response.
-	Pagination *v1beta1.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	Pagination *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
 func (x *QueryAllDidDocVersionsMetadataResponse) Reset() {
@@ -3145,7 +3145,7 @@ func (x *QueryAllDidDocVersionsMetadataResponse) GetVersions() []*Metadata {
 	return nil
 }
 
-func (x *QueryAllDidDocVersionsMetadataResponse) GetPagination() *v1beta1.PageResponse {
+func (x *QueryAllDidDocVersionsMetadataResponse) GetPagination() *query.PageResponse {
 	if x != nil {
 		return x.Pagination
 	}
@@ -3261,9 +3261,9 @@ var file_cheqd_did_v2_query_proto_goTypes = []interface{}{
 	(*QueryAllDidDocVersionsMetadataRequest)(nil),  // 4: cheqd.did.v2.QueryAllDidDocVersionsMetadataRequest
 	(*QueryAllDidDocVersionsMetadataResponse)(nil), // 5: cheqd.did.v2.QueryAllDidDocVersionsMetadataResponse
 	(*DidDocWithMetadata)(nil),                     // 6: cheqd.did.v2.DidDocWithMetadata
-	(*v1beta1.PageRequest)(nil),                    // 7: cosmos.base.query.v1beta1.PageRequest
+	(*query.PageRequest)(nil),                      // 7: cosmos.base.query.v1beta1.PageRequest
 	(*Metadata)(nil),                               // 8: cheqd.did.v2.Metadata
-	(*v1beta1.PageResponse)(nil),                   // 9: cosmos.base.query.v1beta1.PageResponse
+	(*query.PageResponse)(nil),                     // 9: cosmos.base.query.v1beta1.PageResponse
 }
 var file_cheqd_did_v2_query_proto_depIdxs = []int32{
 	6, // 0: cheqd.did.v2.QueryDidDocResponse.value:type_name -> cheqd.did.v2.DidDocWithMetadata
