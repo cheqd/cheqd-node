@@ -6,7 +6,7 @@ require (
 	cosmossdk.io/api v0.3.1
 	cosmossdk.io/core v0.5.1
 	cosmossdk.io/errors v1.0.1
-	cosmossdk.io/math v1.3.0
+	cosmossdk.io/math v1.4.0
 	filippo.io/edwards25519 v1.1.0
 	github.com/cometbft/cometbft v0.37.5
 	github.com/cometbft/cometbft-db v0.9.1

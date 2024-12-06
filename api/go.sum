@@ -8,8 +8,8 @@ cosmossdk.io/depinject v1.0.0-alpha.4 h1:PLNp8ZYAMPTUKyG9IK2hsbciDWqna2z1Wsl98ok
 cosmossdk.io/depinject v1.0.0-alpha.4/go.mod h1:HeDk7IkR5ckZ3lMGs/o91AVUc7E596vMaOmslGFM3yU=
 cosmossdk.io/errors v1.0.1 h1:bzu+Kcr0kS/1DuPBtUFdWjzLqyUuCiyHjyJB6srBV/0=
 cosmossdk.io/errors v1.0.1/go.mod h1:MeelVSZThMi4bEakzhhhE/CKqVv3nOJDA25bIqRDu/U=
-cosmossdk.io/math v1.3.0 h1:RC+jryuKeytIiictDslBP9i1fhkVm6ZDmZEoNP316zE=
-cosmossdk.io/math v1.3.0/go.mod h1:vnRTxewy+M7BtXBNFybkuhSH4WfedVAAnERHgVFhp3k=
+cosmossdk.io/math v1.4.0 h1:XbgExXFnXmF/CccPPEto40gOO7FpWu9yWNAZPN3nkNQ=
+cosmossdk.io/math v1.4.0/go.mod h1:O5PkD4apz2jZs4zqFdTr16e1dcaQCc5z6lkEnrrppuk=
 filippo.io/edwards25519 v1.1.0 h1:FNf4tywRC1HmFuKW5xopWpigGjJKiJSV0Cqo0cJWDaA=
 filippo.io/edwards25519 v1.1.0/go.mod h1:BxyFTGdWcka3PhytdK4V28tE5sGfRvvvRV7EaN4VDT4=
 github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4 h1:/vQbFIOMbk2FiG/kXiLl8BRyzTWDw7gX/Hz7Dd5eDMs=
