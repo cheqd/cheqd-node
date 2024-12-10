@@ -1122,7 +1122,7 @@ class Installer():
                 logging.info("Configuring journald configuration for logging")
 
                 # Modify journald template file with values specific to the installation
-                with open(DEFAULT_JOURNAL_CONFIG_FILE, "w") as fname:
+                with open(DEFAULT_JOURNAL_CONFIG_FILE, "w"):
                     if is_valid_url(JOURNAL_TEMPLATE):
                         with request.urlopen(JOURNAL_TEMPLATE) as response, open(DEFAULT_JOURNAL_CONFIG_FILE, "w") as file:
                             file.write(response.read().decode("utf-8").strip())
