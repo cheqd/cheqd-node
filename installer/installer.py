@@ -1119,11 +1119,11 @@ class Installer():
                 else:
                     logging.debug("Default configuration doesn't need to be removed. Skipping...")
 
-                logging.info(f"Configuring journald configuration for logging")
+                logging.info("Configuring journald configuration for logging")
 
                 # Modify journald template file with values specific to the installation
                 with open(DEFAULT_JOURNAL_CONFIG_FILE, "w") as fname:
-                    if is_valid_url(DEFAULT_JOURNAL_CONFIG_FILE):
+                    if is_valid_url(JOURNAL_TEMPLATE):
                         with request.urlopen(JOURNAL_TEMPLATE) as response, open(DEFAULT_JOURNAL_CONFIG_FILE, "w") as file:
                             file.write(response.read().decode("utf-8").strip())
 
@@ -1137,13 +1137,13 @@ class Installer():
             if os.path.exists(DEFAULT_RSYSLOG_FILE):
                 logging.warning("Removing existing rsyslog configuration as requested")
                 self.remove_safe(DEFAULT_RSYSLOG_FILE)
-            else: 
+            else:
                 logging.debug("Default configuration doesn't need to be removed. Skipping...")
 
             if os.path.exists(DEFAULT_LOGROTATE_FILE):
                 logging.warning("Removing existing logrotate configuration as requested")
                 self.remove_safe(DEFAULT_LOGROTATE_FILE)
-            else: 
+            else:
                 logging.debug("Default configuration doesn't need to be removed. Skipping...")
             # Return True if both rsyslog and logrotate services are configured
             return True
@@ -2188,9 +2188,9 @@ class Interviewer:
         try:
             answer = self.ask("Overwrite existing configuration for cheqd-node logging, including the journald configuration file? (yes/no)", default="yes")
             if answer.lower().startswith("y"):
-                self.rewrite_rsyslog = True
+                self.rewrite_journal = True
             elif answer.lower().startswith("n"):
-                self.rewrite_rsyslog = False
+                self.rewrite_journal = False
             else:
                 logging.error("Please choose either 'yes' or 'no'\n")
                 self.ask_for_rewrite_journal()
